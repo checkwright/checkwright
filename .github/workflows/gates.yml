@@ -83,7 +83,8 @@ jobs:
   # spec: installer/SPEC.md §The consumer smoke — the CI legs; this one is judged against the baseline
   install-smoke-sh-linux:
     needs: [native-artifacts, native-artifacts-roster]
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['x86_64-unknown-linux-gnu'].runner }}
+    continue-on-error: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['x86_64-unknown-linux-gnu'].held }}
     permissions:
       contents: read
     steps:
@@ -94,6 +95,7 @@ jobs:
 
       # spec: gate-sdk/SPEC.md §gen-pre-commit — the hooks are POSIX sh; the next step names the /bin/sh they run under
       - name: name the shell the hooks run under
+        shell: bash
         run: readlink -f /bin/sh
 
       # spec: installer/SPEC.md §The consumer smoke — the producer's upload, downloaded by pattern
@@ -127,27 +129,46 @@ jobs:
           chmod +x "$dest"
           [[ -x "$dest" ]] || { echo "could not place the producer's $host artifact at $dest"; exit 1; }
           echo "SMOKE_ARTIFACTS=$art" >> "$GITHUB_ENV"
-          echo "SMOKE_HOST_BIN=$(cd "$(dirname "$dest")" && pwd)/${dest##*/}" >> "$GITHUB_ENV"
 
-      # spec: installer/SPEC.md §Requirements — one static Linux artifact serves musl hosts and glibc hosts below the old floor
-      - name: run the served Linux artifact on a musl host and on a glibc 2.36 host
+      # spec: installer/SPEC.md §The consumer smoke — the static artifact serves a musl host and a glibc host below the glibc floor, and the glibc artifact runs on neither, the premise selection's fallback rests on
+      - name: run both x86_64 Linux artifacts on a musl host and on a glibc 2.36 host
         shell: bash
         run: |
           set -euo pipefail
+          source gate-sdk/lib/gate.sh
+          binary="$(gate_native_bin)"; binary="${binary##*/}"
+          host="$(sh installer/consumer-smoke/host-target.sh)"
+          fallback="$(sh installer/consumer-smoke/host-target.sh --fallback "$host")"
+          [ -n "$fallback" ] || { echo "::error::the bootstrap names no fallback for $host"; exit 1; }
+          echo "glibc artifact: $host; static artifact: $fallback"
+          musl="$RUNNER_TEMP/foreign/static"
+          gnu="$RUNNER_TEMP/foreign/glibc"
+          mkdir -p "$musl" "$gnu"
+          for pair in "$fallback:$musl" "$host:$gnu"; do
+            src="$SMOKE_ARTIFACTS/${pair%%:*}/$binary"
+            [ -f "$src" ] || { echo "::error::the producer uploaded no artifact at $src"; exit 1; }
+            cp "$src" "${pair#*:}/$binary"
+            chmod +x "${pair#*:}/$binary"
+          done
           for image in \
             alpine@sha256:5291449c3df73caf6ed85e649dec1b9e818b39a5d8c871e97afc13e9cd5e8fa8 \
             debian@sha256:3783cc01769c7b2b1b83a5c5ad96c815348e28ed7da68e2e3687004faa906251; do
             echo "== ${image%%@*} =="
-            listing="$(docker run --rm -v "$(dirname "$SMOKE_HOST_BIN"):/gate:ro" "$image" \
-              "/gate/${SMOKE_HOST_BIN##*/}" --list)" \
-              || { echo "::error::the served Linux artifact exited non-zero on ${image%%@*}"; exit 1; }
+            listing="$(docker run --rm -v "$musl:/gate:ro" "$image" "/gate/$binary" --list)" \
+              || { echo "::error::the static Linux artifact exited non-zero on ${image%%@*}"; exit 1; }
             [ -n "$listing" ] \
-              || { echo "::error::the served Linux artifact listed nothing on ${image%%@*}"; exit 1; }
-            echo "listed $(printf '%s\n' "$listing" | wc -l) line(s) on ${image%%@*}"
+              || { echo "::error::the static Linux artifact listed nothing on ${image%%@*}"; exit 1; }
+            echo "static artifact listed $(printf '%s\n' "$listing" | wc -l) line(s) on ${image%%@*}"
+            if docker run --rm -v "$gnu:/gate:ro" "$image" "/gate/$binary" --help > /dev/null 2>&1; then
+              echo "::error::the glibc artifact ran on ${image%%@*}, so this host would never reach the fallback it is asserted to need"
+              exit 1
+            fi
+            echo "glibc artifact's --help exited non-zero on ${image%%@*}, so selection passes to the fallback there"
           done
 
       # spec: installer/SPEC.md §The consumer smoke — the baseline Linux leg is judged against the recorded baseline
       - name: install smoke, judged against the recorded baseline
+        shell: bash
         env:
           INSTALLER_SMOKE_TMP_DIR: ${{ runner.temp }}
           INSTALLER_SMOKE_TARBALL_OUT: ${{ runner.temp }}/page-install/pack
@@ -164,6 +185,7 @@ jobs:
 
       # spec: docs/site-architecture.md §Generated projections and their freshness gates — the install blocks
       - name: run the page's unix-install block against the packed tarball
+        shell: bash
         run: |
           set -euo pipefail
           work="$RUNNER_TEMP/page-install"
@@ -196,6 +218,7 @@ jobs:
 
       # spec: installer/SPEC.md §Requirements — the install blocks' witness, the one-liner under /bin/sh
       - name: run the hosted one-liner against the packed tarball
+        shell: bash
         run: |
           set -euo pipefail
           work="$RUNNER_TEMP/one-liner"
@@ -226,6 +249,7 @@ jobs:
 
       # spec: installer/SPEC.md §The CI action — its witness, through uses: ./installer
       - name: serve the packed release for the CI action
+        shell: bash
         run: |
           set -euo pipefail
           nohup python3 -m http.server 8731 --bind 127.0.0.1 --directory "$RUNNER_TEMP/one-liner/serve" \
@@ -245,6 +269,7 @@ jobs:
         env:
           CHECKWRIGHT_RELEASE_BASE: http://127.0.0.1:8731
       - name: the CI action wrote a one-run SARIF log
+        shell: bash
         env:
           SARIF: ${{ steps.action.outputs.sarif }}
         run: |
@@ -1799,8 +1824,8 @@ jobs:
   # spec: installer/SPEC.md §The consumer smoke — the CI legs; derived posture, the producer's upload
   install-smoke-sh-linux-arm64:
     needs: [native-artifacts, native-artifacts-roster]
-    runs-on: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-unknown-linux-musl'].runner }}
-    continue-on-error: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-unknown-linux-musl'].held }}
+    runs-on: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-unknown-linux-gnu'].runner }}
+    continue-on-error: ${{ fromJSON(needs.native-artifacts-roster.outputs.index)['aarch64-unknown-linux-gnu'].held }}
     timeout-minutes: 45
     permissions:
       contents: read

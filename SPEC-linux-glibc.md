@@ -26,9 +26,9 @@ Two units share one table, and this amendment settles both.
 
 ### (1) The detectors name a preferred triple and its fallback {design-bearing}
 
-**Not yet applied.** In `installer/bin/checkwright.sh`, `target_of_host` maps `Linux/x86_64` to `x86_64-unknown-linux-gnu` and `Linux/aarch64|Linux/arm64` to `aarch64-unknown-linux-gnu`. A new function `fallback_of_target` takes a triple and prints its fallback, `x86_64-unknown-linux-musl` for the first and `aarch64-unknown-linux-musl` for the second. It prints nothing for every other triple. Each fallback triple is the sole single-quoted operand of a `printf`, and the case patterns name the preferred triples unquoted. In `installer/bin/checkwright.ps1`, `Get-HostTarget` takes the same two gnu triples, and `Get-FallbackTarget` is the twin, each fallback the sole single-quoted operand of a `return` with `return ''` its no-mapping arm.
+**Applied** in the declaring commit. In `installer/bin/checkwright.sh`, `target_of_host` maps `Linux/x86_64` to `x86_64-unknown-linux-gnu` and `Linux/aarch64|Linux/arm64` to `aarch64-unknown-linux-gnu`. A new function `fallback_of_target` takes a triple and prints its fallback, `x86_64-unknown-linux-musl` for the first and `aarch64-unknown-linux-musl` for the second. It prints nothing for every other triple. Each fallback triple is the sole single-quoted operand of a `printf`, and the case patterns name the preferred triples unquoted. In `installer/bin/checkwright.ps1`, `Get-HostTarget` takes the same two gnu triples, and `Get-FallbackTarget` is the twin, each fallback the sole single-quoted operand of a `return` with `return ''` its no-mapping arm.
 
-`check-install-platforms` arm E (`native/src/gates/install_platforms.rs`) extracts each detector's emitted set as the union of both functions' operands, on the same fail-closed extraction: a function absent, unbounded or yielding nothing is exit 2. The fixture pair's `checkwright.sh` and `checkwright.ps1` gain the fallback function, and `bad/` gains a fallback triple its `install.md` does not declare. `installer/consumer-smoke/host-target.sh` is unchanged. It extracts `target_of_host`, so the smoke steers at the preferred triple.
+`check-install-platforms` arm E (`native/src/gates/install_platforms.rs`) extracts each detector's emitted set as the union of both functions' operands, on the same fail-closed extraction: a function absent, unbounded or yielding nothing is exit 2. The fixture pair's `checkwright.sh` and `checkwright.ps1` gain the fallback function, and `bad/` gains a fallback triple its `install.md` does not declare. `installer/consumer-smoke/host-target.sh`'s bare call is unchanged. It extracts `target_of_host`, so the smoke steers at the preferred triple. It gains `--fallback <triple>`, printing what `fallback_of_target` names, so deltas 4 and 5 name the static and the foreign triples without spelling them.
 
 In installer/SPEC.md §Platform resolution, the two shape bullets name both functions per half. The paragraph beginning "**Neither input answers the libc question, and none is asked.**" becomes:
 
@@ -36,7 +36,7 @@ In installer/SPEC.md §Platform resolution, the two shape bullets name both func
 
 ### (2) Selection walks the preferred triple, then its fallback {design-bearing}
 
-**Not yet applied.** In both bootstraps, selection and verification run per candidate, the preferred triple first:
+**Applied** in the declaring commit. In both bootstraps, selection and verification run per candidate, the preferred triple first:
 
 1. A candidate the payload's roster does not carry passes to its fallback. With no fallback it is the unrostered refusal, unchanged.
 2. A rostered candidate whose pair is incomplete is the broken-payload refusal, unchanged. It never passes to the fallback, since a publisher defect must not be masked by a smaller install.
@@ -72,7 +72,7 @@ In installer/SPEC.md §Parity between the two bootstraps, the step 2 row's obser
 
 ### (3) The gnu triples are declared, built on pinned images, then joined {design-bearing}
 
-**Not yet applied.** This lands in two commits, on the join predicate `native/targets.list`'s header states.
+**The declaring commit is applied; the join commit is not yet applied.** This lands in two commits, on the join predicate `native/targets.list`'s header states.
 
 **The declaring commit** lands with deltas 1 and 2, before the mid-iteration push:
 
@@ -95,7 +95,7 @@ In installer/SPEC.md §Requirements' **Platform posture** bullet, "The Linux art
 
 ### (4) The Linux legs consume the preferred triple and witness the fallback's premise {design-bearing}
 
-**Not yet applied. Rides delta 3's declaring commit**, since the mid-iteration run delta 3 reads as its join oracle needs these legs already consuming the gnu upload. In `.github/workflows/gates.yml`:
+**Applied in delta 3's declaring commit**, since the mid-iteration run delta 3 reads as its join oracle needs these legs already consuming the gnu upload. In `.github/workflows/gates.yml`:
 
 - **`install-smoke-sh-linux`** reads its `runs-on` and `continue-on-error` from the roster index keyed `x86_64-unknown-linux-gnu`, as the other platform legs read theirs, in place of `ubuntu-latest`. While the gnu row is held, this leg reports and does not bind, and the join commit makes it binding with no workflow edit.
 - **`install-smoke-sh-linux-arm64`** re-keys its index lookups from `aarch64-unknown-linux-musl` to `aarch64-unknown-linux-gnu`, the triple `host-target.sh` answers there.
@@ -112,7 +112,7 @@ In the paragraph "**Each leg installs the producer's upload, never a build of it
 
 ### (5) The artifact arm witnesses the fallback and the fourth refusal {design-bearing}
 
-**Not yet applied.** `installer/consumer-smoke/run-smoke.sh`'s artifact arm gains three cases on a Linux host whose hand-off carries a foreign-architecture gnu artifact. Every CI Linux leg's does, since each downloads every producer's upload. Each case builds its payload by placing artifacts **with their producer sidecars**, never by computing a digest (gate-sdk/SPEC.md §Consumer payload's one-producer rule). The foreign-architecture gnu artifact stands in for a preferred artifact that does not run, because its bytes verify and cannot start on this host.
+**Applied** in the declaring commit. `installer/consumer-smoke/run-smoke.sh`'s artifact arm gains three cases on a Linux host whose hand-off carries a foreign-architecture gnu artifact. Every CI Linux leg's does, since each downloads every producer's upload. Each case builds its payload by placing artifacts **with their producer sidecars**, never by computing a digest (gate-sdk/SPEC.md §Consumer payload's one-producer rule). The foreign-architecture gnu artifact stands in for a preferred artifact that does not run, because its bytes verify and cannot start on this host.
 
 - **Falls back.** Roster: the host's gnu triple and its musl fallback. The gnu directory holds the foreign artifact and its sidecar, and the musl directory holds the host's musl upload. `init` completes, and the lock's `artifact.target` is the musl triple.
 - **Held preferred.** Roster: the musl fallback alone. `init` completes on the musl triple.
@@ -165,7 +165,8 @@ Roster from `git grep -n -i "musl\|glibc\|libc" -- '*.md' '*.list' '*.yml' '*.sh
 - `native/src/gates/install_platforms.rs` arm G, the module shared with `native/src/gates/front_door_verbs.rs`, `scripts/check-install-platforms.gate`, its fixture pair, docs/install.md, docs/site-architecture.md's parity contract row, and installer/SPEC.md §The front door's verbs (delta 6).
 - CONTRIBUTING.md's Linux wording, which `git grep` shows naming the musl build, re-read for the native glibc local build (delta 5).
 - The on-site mirror `docs/installer/SPEC.md`, regenerated by the command `check-docs-mirror-fresh` prints (all deltas).
-- `.workflow/release-declarations.md` gets one Behavior changes bullet. The gate binary is published for Linux twice per architecture: a glibc build, `x86_64-unknown-linux-gnu` and `aarch64-unknown-linux-gnu`, and the static musl build. The installer takes the glibc build where it runs and the musl build everywhere else, and asks no question about the host's C library. An existing Linux install on a host where the glibc build runs moves to it on the next `init` or `update`, because the recorded target differs. Nothing to do (deltas 1 to 3).
+- `.workflow/release-declarations.md`'s Behavior changes section. The unreleased musl-switch bullets are rewritten into the net change from v0.26.0, whose Linux archives were gnu: the gate binary is published for Linux twice per architecture, a glibc build and the static musl build, and the installer takes the glibc build where it runs and the musl build everywhere else, asking no question about the host's C library. Nothing to do (deltas 1 to 3).
+- `installer/consumer-smoke/host-target.sh` gains `--fallback <triple>` (deltas 4 and 5).
 
 ## Retired spellings
 

@@ -53,18 +53,21 @@
 # than pin the `windows-11-vs2026-arm` test label, whose lifetime nothing states:
 # the first run whose leg on it logs the VS 2026 image is the first witness.
 #
-# Every `-latest` line here RIDES its image migrations, as do the hard-coded
-# `ubuntu-latest` install-smoke-sh-linux leg: their subject is the platform an
-# adopter meets today. The
+# Every `-latest` line here RIDES its image migrations: its subject is the
+# platform an adopter meets today. The
 # first witness of a migrated image is the first gates run whose leg logs it.
 # A ride that raises an artifact's OS floor reds the shared build body
 # (scripts/ci-build-artifact.sh), which is where pin-or-raise is decided. For
-# the Linux lines a migration cannot raise the floor: the artifact is static,
-# which the build body's static check holds.
+# the musl lines a migration cannot raise the floor: the artifact is static,
+# which the build body's static check holds. The glibc lines are PINNED
+# instead, because their floor is the glibc symbol set the image's toolchain
+# binds, and a floating image would move it.
 # Every other Linux job in .github/workflows/ builds and measures no adopter
 # platform, so it PINS `ubuntu-24.04`: a `-latest` label moves it with no tree
 # edit and, through a weeks-long rollout, varies run to run. Move those pins as
 # one deliberate edit, whose own push is the new image's witness.
+x86_64-unknown-linux-gnu   ubuntu-24.04
+aarch64-unknown-linux-gnu  ubuntu-24.04-arm
 x86_64-unknown-linux-musl  ubuntu-latest
 aarch64-unknown-linux-musl ubuntu-24.04-arm
 aarch64-apple-darwin      macos-latest

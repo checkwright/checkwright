@@ -13,3 +13,11 @@ target_of_host() {
         *) : ;;
     esac
 }
+
+# The fallback map's triple is emitted as surely as a mapped one, and the page declares it nowhere.
+fallback_of_target() {
+    case "$1" in
+        x86_64-unknown-linux-gnu) printf 'x86_64-unknown-linux-musl' ;;
+        *) : ;;
+    esac
+}

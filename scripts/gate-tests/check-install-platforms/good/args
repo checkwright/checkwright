@@ -1,6 +1,7 @@
-# Lockstep case: one `joined` triple that is a live roster line, one `held`
+# Lockstep case: two `joined` triples that are live roster lines, one `held`
 # triple with a stated precondition and no roster line, and two host detectors
-# whose emitted triple sets equal the declared set in both directions. Four args
+# whose emitted triple sets, each the union of the detector and its fallback
+# map, equal the declared set in both directions. Four args
 # steer the gate onto hermetic fixture copies of the install page, the target
 # roster and both bootstraps; arm D counts against the hermetic registry in this
 # case dir's own `scripts/`. The prerequisites block names both declared families,

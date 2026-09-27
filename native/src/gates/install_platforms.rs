@@ -244,6 +244,41 @@ const PWSH_DETECTOR: Detector = Detector {
     verb: "return",
 };
 
+// spec: installer/SPEC.md §Platform resolution — each half's fallback map, whose triples a host
+// reaches as surely as the preferred ones, so they join the half's extracted set
+const BASH_FALLBACK: Detector = Detector {
+    opener: "fallback_of_target()",
+    label: "fallback_of_target",
+    verb: "printf",
+};
+
+const PWSH_FALLBACK: Detector = Detector {
+    opener: "function Get-FallbackTarget",
+    label: "Get-FallbackTarget",
+    verb: "return",
+};
+
+// spec: installer/SPEC.md §Platform resolution — a half's emitted set is the union of both its
+// functions' operands, and either extraction degrading refuses the whole half
+fn half_triples(path: &str, functions: &[&Detector]) -> Result<Vec<String>, String> {
+    if !Path::new(path).is_file() {
+        return Err(format!("host detector not found: {}", path));
+    }
+    half_triples_in(&fresh::read_captured(path)?, path, functions)
+}
+
+fn half_triples_in(text: &str, path: &str, functions: &[&Detector]) -> Result<Vec<String>, String> {
+    let mut out: Vec<String> = Vec::new();
+    for d in functions {
+        for t in detector_triples_in(text, path, d)? {
+            if !out.contains(&t) {
+                out.push(t);
+            }
+        }
+    }
+    Ok(out)
+}
+
 // spec: installer/SPEC.md §The gate binary — the pinned shape: the verb's SOLE single-quoted
 // operand, so only whitespace may sit between the two. The empty operand is PowerShell's
 // no-mapping arm rather than a triple, and is dropped by the caller
@@ -260,18 +295,10 @@ fn sole_quoted_after<'a>(line: &'a str, verb: &str) -> Option<&'a str> {
     Some(&body[..close])
 }
 
-// spec: installer/SPEC.md §The gate binary — every failure here is a check that could not run and
-// never a pass: the function absent or renamed, its body unbounded, zero triples extracted, or the
-// file unreadable. An extraction that silently degrades to nothing is the one way a lockstep
+// spec: installer/SPEC.md §Platform resolution — every failure here is a check that could not run
+// and never a pass: the function absent or renamed, its body unbounded, zero triples extracted, or
+// the file unreadable. An extraction that silently degrades to nothing is the one way a lockstep
 // assertion reports agreement it never tested
-fn detector_triples(path: &str, d: &Detector) -> Result<Vec<String>, String> {
-    if !Path::new(path).is_file() {
-        return Err(format!("host detector not found: {}", path));
-    }
-    let text = fresh::read_captured(path)?;
-    detector_triples_in(&text, path, d)
-}
-
 fn detector_triples_in(text: &str, path: &str, d: &Detector) -> Result<Vec<String>, String> {
     let mut lines = text.lines();
     if !lines.any(|l| l.trim_start().starts_with(d.opener)) {
@@ -397,8 +424,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let listed = roster_triples(&roster_text);
 
     let detected = [
-        (bash_path, detector_triples(bash_path, &BASH_DETECTOR)?),
-        (pwsh_path, detector_triples(pwsh_path, &PWSH_DETECTOR)?),
+        (bash_path, half_triples(bash_path, &[&BASH_DETECTOR, &BASH_FALLBACK])?),
+        (pwsh_path, half_triples(pwsh_path, &[&PWSH_DETECTOR, &PWSH_FALLBACK])?),
     ];
 
     let mut findings: Vec<String> = Vec::new();
@@ -665,6 +692,26 @@ mod tests {
         assert!(detector_triples_in(only_the_empty_arm, "f", &PWSH_DETECTOR)
             .unwrap_err()
             .contains("extracted no triple"));
+    }
+
+    // spec: installer/SPEC.md §Platform resolution — a half's set is both functions' operands
+    // united, a triple both emit counted once, and a half missing its fallback map refuses
+    #[test]
+    fn a_half_unites_its_detector_and_its_fallback_map() {
+        let sh = "target_of_host() {\n    case \"$(host_shape)\" in\n        Linux/x86_64) printf 'x86_64-unknown-linux-gnu' ;;\n    esac\n}\nfallback_of_target() {\n    case \"$1\" in\n        x86_64-unknown-linux-gnu) printf 'x86_64-unknown-linux-musl' ;;\n        *) : ;;\n    esac\n}\n";
+        assert_eq!(
+            half_triples_in(sh, "f", &[&BASH_DETECTOR, &BASH_FALLBACK]).unwrap(),
+            vec!["x86_64-unknown-linux-gnu".to_string(), "x86_64-unknown-linux-musl".to_string()]
+        );
+        let ps = "function Get-HostTarget {\n    switch -Regex (Get-HostShape) {\n        '^linux/x64$' { return 'x86_64-unknown-linux-gnu' }\n    }\n    return ''\n}\nfunction Get-FallbackTarget {\n    param([string] $Target)\n    switch ($Target) {\n        'x86_64-unknown-linux-gnu' { return 'x86_64-unknown-linux-musl' }\n    }\n    return ''\n}\n";
+        assert_eq!(
+            half_triples_in(ps, "f", &[&PWSH_DETECTOR, &PWSH_FALLBACK]).unwrap(),
+            vec!["x86_64-unknown-linux-gnu".to_string(), "x86_64-unknown-linux-musl".to_string()]
+        );
+        let no_fallback = "target_of_host() {\n    printf 'x86_64-unknown-linux-gnu'\n}\n";
+        assert!(half_triples_in(no_fallback, "f", &[&BASH_DETECTOR, &BASH_FALLBACK])
+            .unwrap_err()
+            .contains("`fallback_of_target`"));
     }
 
     fn prereq_block(body: &str) -> String {

@@ -16,8 +16,10 @@ An install is possible only on a system below, where a prebuilt gate binary is p
 
 | System | Minimum | Binary | Status |
 |---|---|---|---|
-| Linux on x86-64, and WSL | Linux 3.2 | `x86_64-unknown-linux-musl` | joined |
-| Linux on arm64 | Linux 4.1 | `aarch64-unknown-linux-musl` | joined |
+| Linux on x86-64 (glibc), and WSL | glibc 2.39 | `x86_64-unknown-linux-gnu` | held: the gates run that builds this triple and installs it on its Linux leg |
+| Linux on arm64 (glibc) | glibc 2.39 | `aarch64-unknown-linux-gnu` | held: the gates run that builds this triple and installs it on its Linux leg |
+| Linux on x86-64 (any C library) | Linux 3.2 | `x86_64-unknown-linux-musl` | joined |
+| Linux on arm64 (any C library) | Linux 4.1 | `aarch64-unknown-linux-musl` | joined |
 | macOS on Apple silicon | macOS 11 | `aarch64-apple-darwin` | joined |
 | macOS on Intel | macOS 10.12 | `x86_64-apple-darwin` | joined |
 | Windows on x86-64 | Windows 10 | `x86_64-pc-windows-msvc` | joined |
@@ -25,7 +27,7 @@ An install is possible only on a system below, where a prebuilt gate binary is p
 
 <!-- platforms:end -->
 
-`joined` means a binary is published for that system; `held` means it is supported but not published yet, and names the run that would publish it. On any other system `init` refuses. Windows Subsystem for Linux (WSL) takes the Linux binary.
+`joined` means a binary is published for that system; `held` means it is supported but not published yet, and names the run that would publish it. On any other system `init` refuses. On Linux, `init` takes the glibc binary where it runs and the static one everywhere else. Windows Subsystem for Linux (WSL) takes the Linux binary.
 
 ### Installing and running the shipped gates
 

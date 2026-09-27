@@ -11,3 +11,12 @@ function Get-HostTarget {
     }
     return ''
 }
+
+# The same undeclared fallback triple as the file beside it.
+function Get-FallbackTarget {
+    param([string] $Target)
+    switch ($Target) {
+        'x86_64-unknown-linux-gnu' { return 'x86_64-unknown-linux-musl' }
+    }
+    return ''
+}

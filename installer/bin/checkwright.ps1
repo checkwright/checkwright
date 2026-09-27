@@ -19,6 +19,8 @@ function Die {
     exit $Code
 }
 
+$UNROSTERED_HELP = 'the support roster is fixed at pack time and this platform is not on it, so there is nothing to verify or run here and no adopter action to take.'
+
 # spec: installer/SPEC.md §The install boundary — step 1: the package's own payload directory, resolved from the script's own location through the symlink chain, because npm installs a bin entry as a link and the unresolved path's parent is node_modules
 function Resolve-InstallerRoot {
     $self = $PSCommandPath
@@ -53,41 +55,63 @@ function Get-HostShape {
     return "$os/$arch"
 }
 
-# spec: installer/SPEC.md §The gate binary — step 2: the twin of installer/bin/checkwright.sh's target_of_host(). It reads the platform and architecture off the runtime rather than shelling out to uname, because the host this half exists for need carry no POSIX shell at all
-# spec: installer/SPEC.md §The gate binary — every mapped triple here is the sole single-quoted operand of a `return` and the empty `return ''` is the no-mapping arm, which is the shape check-install-platforms extracts this detector's triple set from
+# spec: installer/SPEC.md §Platform resolution — step 2: the twin of installer/bin/checkwright.sh's target_of_host(). It reads the platform and architecture off the runtime rather than shelling out to uname, because the host this half exists for need carry no POSIX shell at all
+# spec: installer/SPEC.md §Platform resolution — every mapped triple here is the sole single-quoted operand of a `return` and the empty `return ''` is the no-mapping arm, which is the shape check-install-platforms extracts this detector's triple set from
 function Get-HostTarget {
     switch -Regex (Get-HostShape) {
         '^windows/(x64|amd64)$' { return 'x86_64-pc-windows-msvc' }
         '^windows/arm64$'       { return 'aarch64-pc-windows-msvc' }
-        '^linux/x64$'           { return 'x86_64-unknown-linux-musl' }
-        '^linux/arm64$'         { return 'aarch64-unknown-linux-musl' }
+        '^linux/x64$'           { return 'x86_64-unknown-linux-gnu' }
+        '^linux/arm64$'         { return 'aarch64-unknown-linux-gnu' }
         '^darwin/x64$'          { return 'x86_64-apple-darwin' }
         '^darwin/arm64$'        { return 'aarch64-apple-darwin' }
     }
     return ''
 }
 
-# spec: installer/SPEC.md §The gate binary — step 3: selection keeps three outcomes and only one of them proceeds, so the payload's own roster is read rather than a directory's presence inferred from — a platform never committed to and one whose artifact went missing are different answers, told apart by message and remedy
-function Select-Artifact {
-    param([string] $Payload, [string] $Target)
-    $shape = Get-HostShape
-    $unrostered = 'the support roster is fixed at pack time and this platform is not on it, so there is nothing to verify or run here and no adopter action to take.'
+# spec: installer/SPEC.md §Platform resolution — the twin of installer/bin/checkwright.sh's fallback_of_target(): each fallback is the sole single-quoted operand of a `return`, and `return ''` is the no-fallback arm
+function Get-FallbackTarget {
+    param([string] $Target)
+    switch ($Target) {
+        'x86_64-unknown-linux-gnu'  { return 'x86_64-unknown-linux-musl' }
+        'aarch64-unknown-linux-gnu' { return 'aarch64-unknown-linux-musl' }
+    }
+    return ''
+}
+
+# spec: installer/SPEC.md §Selection — step 4's probe: a start failure is the exception `&` throws, and a non-zero exit is the artifact's own answer
+function Test-ArtifactRuns {
+    param([string] $Artifact)
+    $ErrorActionPreference = 'Continue'
+    $global:LASTEXITCODE = -1
+    try {
+        $null = & $Artifact --help 2>&1
+        return ($LASTEXITCODE -eq 0)
+    } catch {
+        return $false
+    }
+}
+
+# spec: installer/SPEC.md §Selection — step 3: the payload's own roster is read rather than a directory's presence inferred from — a platform never committed to and one whose artifact went missing are different answers, told apart by message and remedy
+function Get-Roster {
+    param([string] $Payload)
     $dir = Join-Path $Payload 'artifact'
     if (-not (Test-Path -LiteralPath $dir -PathType Container)) {
-        Die "this host, detected as $shape, maps to no target this payload declares" $unrostered
+        Die "this host, detected as $(Get-HostShape), maps to no target this payload declares" $UNROSTERED_HELP
     }
     $roster = Join-Path $dir 'targets.list'
     if (-not (Test-Path -LiteralPath $roster -PathType Leaf)) {
         Die 'this payload carries prebuilt gate binaries but no target roster' `
             'the roster is copied verbatim beside them at pack time; artifacts without one cannot be selected from and the payload is broken, not narrower.'
     }
-    $declared = @(Get-Content -LiteralPath $roster |
+    return @(Get-Content -LiteralPath $roster |
         Where-Object { $_ -notmatch '^\s*(#|$)' } |
         ForEach-Object { $_.Trim() })
-    if (-not $Target -or $declared -notcontains $Target) {
-        Die "this host, detected as $shape, maps to no target this payload declares" $unrostered
-    }
-    $src = Join-Path $dir $Target
+}
+
+function Resolve-Pair {
+    param([string] $Payload, [string] $Target)
+    $src = Join-Path (Join-Path $Payload 'artifact') $Target
     $names = @(Get-ChildItem -LiteralPath $src -File -ErrorAction SilentlyContinue |
         Where-Object { $_.Name -notlike '*.sha256' } | Sort-Object Name)
     if ($names.Count -ne 1 -or -not (Test-Path -LiteralPath ($names[0].FullName + '.sha256') -PathType Leaf)) {
@@ -109,6 +133,31 @@ function Test-ArtifactDigest {
     }
 }
 
+# spec: installer/SPEC.md §Selection — the preferred candidate first; a candidate the roster lacks, or a verified one that does not run, passes to its fallback, and no refusal does
+function Select-Artifact {
+    param([string] $Payload)
+    $declared = @(Get-Roster -Payload $Payload)
+    $target = Get-HostTarget
+    $fallback = Get-FallbackTarget -Target $target
+    if (-not $target -or $declared -notcontains $target) {
+        if (-not $fallback -or $declared -notcontains $fallback) {
+            Die "this host, detected as $(Get-HostShape), maps to no target this payload declares" $UNROSTERED_HELP
+        }
+        $target = $fallback
+        $fallback = ''
+    }
+    $pair = Resolve-Pair -Payload $Payload -Target $target
+    Test-ArtifactDigest -Artifact $pair.Path -Sidecar $pair.Sidecar
+    if (-not $fallback -or (Test-ArtifactRuns -Artifact $pair.Path)) { return $pair }
+    if ($declared -notcontains $fallback) {
+        Die "the $target gate binary does not run on this host, and this payload carries no fallback for it" `
+            'no adopter action; report the host, the triple and the release.'
+    }
+    $pair = Resolve-Pair -Payload $Payload -Target $fallback
+    Test-ArtifactDigest -Artifact $pair.Path -Sidecar $pair.Sidecar
+    return $pair
+}
+
 $INSTALLER = Resolve-InstallerRoot
 $PAYLOAD = Join-Path $INSTALLER 'payload'
 if (-not (Test-Path -LiteralPath $PAYLOAD -PathType Container)) {
@@ -116,9 +165,7 @@ if (-not (Test-Path -LiteralPath $PAYLOAD -PathType Container)) {
         "the bootstrap runs the gate binary out of the package's own payload/, assembled at pack time; run it from an installed package, not from a source checkout."
 }
 
-$selected = Select-Artifact -Payload $PAYLOAD -Target (Get-HostTarget)
-
-Test-ArtifactDigest -Artifact $selected.Path -Sidecar $selected.Sidecar
+$selected = Select-Artifact -Payload $PAYLOAD
 
 # spec: installer/SPEC.md §The install boundary — step 5 is execute and not install: the artifact runs in place out of the payload, where the step above just verified it, under one unconditional argv rule — a dashless leading token is prefixed with `--` and everything after it is forwarded verbatim. The rule introduces no verb table into either bootstrap, so the two halves agree on the verb word instead of one forwarding it and the other consuming it
 $forward = @($args)

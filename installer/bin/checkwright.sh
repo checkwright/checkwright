@@ -62,16 +62,16 @@ host_arch() {   # -> this host's architecture, in `uname -m`'s vocabulary
     uname -m 2>/dev/null
 }
 
-# spec: installer/SPEC.md §The gate binary — step 2: which published artifact fits this host. Two
+# spec: installer/SPEC.md §Platform resolution — step 2: which published artifact fits this host. Two
 # fields rather than `uname -a` because that is the smallest input answering the question and the
 # one a PowerShell half can answer without parsing prose
-# spec: installer/SPEC.md §The gate binary — every mapped triple here is the sole single-quoted
+# spec: installer/SPEC.md §Platform resolution — every mapped triple here is the sole single-quoted
 # operand of a `printf` and appears nowhere else in this function, which is the shape
 # check-install-platforms extracts this detector's triple set from
-target_of_host() {   # -> the Rust target triple this host is, empty when it maps to none
+target_of_host() {   # -> the preferred Rust target triple for this host, empty when it maps to none
     case "$(host_shape)" in
-        Linux/x86_64)               printf 'x86_64-unknown-linux-musl' ;;
-        Linux/aarch64|Linux/arm64)  printf 'aarch64-unknown-linux-musl' ;;
+        Linux/x86_64)               printf 'x86_64-unknown-linux-gnu' ;;
+        Linux/aarch64|Linux/arm64)  printf 'aarch64-unknown-linux-gnu' ;;
         Darwin/x86_64)              printf 'x86_64-apple-darwin' ;;
         Darwin/arm64)               printf 'aarch64-apple-darwin' ;;
         # spec: installer/SPEC.md §The gate binary — the map answers which *published artifact*
@@ -83,25 +83,31 @@ target_of_host() {   # -> the Rust target triple this host is, empty when it map
     esac
 }
 
-# spec: installer/SPEC.md §The gate binary — step 3: selection keeps three outcomes and only one
-# of them proceeds, and they stay told apart by message and remedy rather than by exit status alone
-# — an undeclared host and a broken payload remain different answers to an adopter
+# spec: installer/SPEC.md §Platform resolution — the loader answers the libc question: a preferred
+# triple's fallback is taken when its verified artifact does not run. Each fallback is the sole
+# single-quoted operand of a `printf`, the shape check-install-platforms extracts
+fallback_of_target() {   # <triple> -> the triple selection falls back to, empty when it has none
+    case "$1" in
+        x86_64-unknown-linux-gnu)   printf 'x86_64-unknown-linux-musl' ;;
+        aarch64-unknown-linux-gnu)  printf 'aarch64-unknown-linux-musl' ;;
+        *) : ;;
+    esac
+}
+
+UNROSTERED_HELP="the support roster is fixed at pack time and this platform is not on it, so there is nothing to verify or run here and no adopter action to take."
+
+# spec: installer/SPEC.md §Selection — 0 when the payload's roster carries the triple
+rostered() {   # <triple>
+    [ -n "$1" ] && grep -Ev '^[[:space:]]*(#|$)' "$PAYLOAD/artifact/targets.list" | grep -qxF "$1"
+}
+
+# spec: installer/SPEC.md §Selection — step 3: the outcomes stay told apart by message and remedy
+# rather than by exit status alone — an undeclared host and a broken payload remain different
+# answers to an adopter
 ARTIFACT=""
-select_artifact() {
-    sel_dir="$PAYLOAD/artifact"
-    sel_target="$(target_of_host)"
-    if [ ! -d "$sel_dir" ]; then
-        die "this host, detected as $(host_shape), maps to no target this payload declares" \
-            "the support roster is fixed at pack time and this platform is not on it, so there is nothing to verify or run here and no adopter action to take."
-    fi
-    sel_roster="$sel_dir/targets.list"
-    [ -f "$sel_roster" ] || die "this payload carries prebuilt gate binaries but no target roster" \
-        "the roster is copied verbatim beside them at pack time; artifacts without one cannot be selected from and the payload is broken, not narrower."
-    if [ -z "$sel_target" ] || ! grep -Ev '^[[:space:]]*(#|$)' "$sel_roster" | grep -qxF "$sel_target"; then
-        die "this host, detected as $(host_shape), maps to no target this payload declares" \
-            "the support roster is fixed at pack time and this platform is not on it, so there is nothing to verify or run here and no adopter action to take."
-    fi
-    sel_src="$sel_dir/$sel_target"
+resolve_pair() {   # <triple> -> sets ARTIFACT to the rostered triple's one binary, or refuses
+    sel_target="$1"
+    sel_src="$PAYLOAD/artifact/$sel_target"
     # spec: installer/SPEC.md §The gate binary — a glob rather than `find`, so no primary can
     # disagree between GNU and BSD; it skips dotfiles, so a stray one is not a second artifact
     sel_count=0
@@ -116,6 +122,34 @@ select_artifact() {
         || die "the payload declares $sel_target but carries no complete artifact for it" \
            "a declared target whose binary or .sha256 sidecar is missing is a publisher defect you cannot act on; refusing rather than running a battery that silently shrank." 1
     ARTIFACT="$sel_src/$sel_name"
+}
+
+# spec: installer/SPEC.md §Selection — the preferred candidate first; a candidate the roster lacks,
+# or a verified one that does not run, passes to its fallback, and no refusal does
+select_artifact() {
+    [ -d "$PAYLOAD/artifact" ] \
+        || die "this host, detected as $(host_shape), maps to no target this payload declares" "$UNROSTERED_HELP"
+    [ -f "$PAYLOAD/artifact/targets.list" ] || die "this payload carries prebuilt gate binaries but no target roster" \
+        "the roster is copied verbatim beside them at pack time; artifacts without one cannot be selected from and the payload is broken, not narrower."
+    cand_target="$(target_of_host)"
+    cand_fallback="$(fallback_of_target "$cand_target")"
+    if ! rostered "$cand_target"; then
+        rostered "$cand_fallback" \
+            || die "this host, detected as $(host_shape), maps to no target this payload declares" "$UNROSTERED_HELP"
+        cand_target="$cand_fallback"
+        cand_fallback=""
+    fi
+    resolve_pair "$cand_target"
+    verify_digest
+    [ -n "$cand_fallback" ] || return 0
+    # spec: installer/SPEC.md §Selection — step 4's probe, run only on a verified candidate that has
+    # a fallback: a glibc below the artifact's floor or a host with no glibc loader fails it
+    "$ARTIFACT" --help >/dev/null 2>&1 && return 0
+    rostered "$cand_fallback" \
+        || die "the $cand_target gate binary does not run on this host, and this payload carries no fallback for it" \
+               "no adopter action; report the host, the triple and the release."
+    resolve_pair "$cand_fallback"
+    verify_digest
 }
 
 # spec: installer/SPEC.md §The install boundary — step 4, the one step that cannot use the binary
@@ -143,7 +177,6 @@ verify_digest() {
 }
 
 select_artifact
-verify_digest
 
 # spec: installer/SPEC.md §The install boundary — step 5: execute the verified artifact in place
 # out of the payload, under one unconditional argv rule — a dashless leading token is prefixed with
