@@ -8,6 +8,46 @@
 
 ## New Features
 
+### comment-tier-surface-excludes-ci-workflows
+
+[spec: SPEC-comment-actions.md] [recurrence: 2026-09-25]
+
+the CI workflow files' comments are ungated by corpus: `comment_surface` in `native/src/spec.rs` builds the governed set from `sh`, `gate` and `rs` files plus the tracked `.workflow/` tier, and `CANON_KIT_COMMENT_SURFACE` in `scripts/canon-config.knobs` names no `.yml`. Measured at spec with the surface widened: 1344 `check-comment-tier` findings over the six actions-shaped files, and 0 for `check-spec-pointer`.
+
+**Deliverable:** the amendment's seven deltas: an actions-shaped tier found by content behind `CANON_KIT_COMMENT_ACTIONS` (kit default `off`, this repo `on`), the two workflow valves blessed, and this repo's five files with findings swept to directives under a local strip-and-compare oracle.
+
+**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** the operator joined it to the iteration, having asked for it on 2026-09-09, 2026-09-25 and again today, under the standing direction "We should aim to have all technical assets covered by our gates" (operator direction, 2026-09-27). Knob or content detection was /spec's call, and the amendment takes content behind a knob so no adopter's workflows red on upgrade. The widening and sweep land before the iteration's new CI legs, so those are written under the gate.
+
+**Push need (2026-09-27, inside the budget):** the swept `gates.yml` runs only on a remote run, so it rides the one mid-iteration push that also serves [linux-musl-artifacts](#linux-musl-artifacts), [glibc-floor-lowering](#glibc-floor-lowering) and [crate-tests-other-triples](#crate-tests-other-triples).
+
+**Cost while deferred:** every workflow edit adds ungoverned prose to the public demonstration tree. Filed 2026-09-09 on an operator direction to widen and sweep; iceboxed as machinery-class; returned 2026-09-25 by consult as the paradigm of the rule that nothing is exempt as unread by adopters.
+
+### uninstall-artifact-ownership-asymmetry
+
+[spec: SPEC-artifact-ownership.md] [recurrence: 2026-09-25]
+
+installer/SPEC.md §The gate binary says the compiled artifact is never the adopter's, while §uninstall has the verb keep-and-report it on a hash mismatch, and `uninstall.rs` references no artifact at all; the two sections give opposite answers and the verb follows neither cleanly.
+
+**Deliverable:** the amendment's rule that the binary is never the adopter's in any verb: `uninstall` removes its row whatever its hash, the three sections agree, and a unit test and the consumer smoke's seam arm hold it.
+
+**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction lead-relayed (not a /consult ruling):** choosing between the two sections' answers is user-facing semantics. The amendment takes §The gate binary's answer, because a kept binary would be rewritten by the next `init` anyway. It lands before [installer-contract-brevity](#installer-contract-brevity) passes §The gate binary.
+
+**Cost while deferred:** an uninstall leaves the binary or reports it as edited. Filed 2026-08-28; returned from the icebox 2026-09-25 by consult, the two sections re-read.
+
+### crate-tests-other-triples
+
+[spec: SPEC-crate-tests-unix.md]
+
+the native crate's unit tests run on x86_64 Linux (the battery) and on the two Windows triples (`crate-tests-windows`); the two macOS triples and `aarch64-unknown-linux-gnu` only lint the crate under clippy in `native-artifacts`, so a unit test pinning a macOS or arm64 behaviour never runs there.
+
+**Deliverable:** a `crate-tests-unix` job running `cargo test` on every declared non-Windows triple except the battery's own, its legs derived by the roster job.
+
+**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** the theme's "wide platform/OS support" (operator direction, 2026-09-27) wants every published triple tested. Any musl triple [linux-musl-artifacts](#linux-musl-artifacts) adds joins the legs by derivation.
+
+**Push need (2026-09-27, inside the budget):** the new legs run only remotely; they ride the one mid-iteration push [comment-tier-surface-excludes-ci-workflows](#comment-tier-surface-excludes-ci-workflows) names.
+
+**Cost while deferred:** a platform-specific regression on those hosts reaches no test. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's spec; promoted 2026-09-26 at its close: →fix fails because a new CI leg is a unit scope must admit. Owner: gate-sdk/SPEC.md §check-crate-arms.
+
 ## Technical Debt
 
 ### installer-contract-brevity
@@ -454,20 +494,6 @@ CONTRIBUTING.md promises an inbound issue or pull request a disposition within o
 
 **Cost while deferred:** the first contributor past the cap reads a promise the tree breaks. Filed 2026-07-31; returned from the icebox 2026-09-25 by consult, the promise and the cap re-read.
 
-### comment-tier-surface-excludes-ci-workflows
-
-[cost: event/high] [surface: canon-kit] [recurrence: 2026-09-25]
-
-the CI workflow files' comments are ungated by corpus: `comment_surface` in `native/src/spec.rs` builds the governed set from `sh`, `gate` and `rs` files plus the tracked workflow-dir tier, and `CANON_KIT_COMMENT_SURFACE` in `scripts/canon-config.knobs` names no `.yml`. Measured when filed: 866 violations against 928 full-line comments across `gates.yml`, `publish.yml` and `site-health.yml` — the whole comment corpus, so this is a surface question before it is a sweep. `comment_tier.rs`'s classifier already styles YAML (its fall-through is `#`).
-
-**Deliverable:** the surface widened to actions-shaped YAML (found by content through `actions_shaped` in `actions_run.rs`, or by knob, never by a hard-coded path), the three workflows swept to directive comments, and the first reading of `check-spec-pointer` sized, since it shares the surface primitive.
-
-**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** the operator joined it to the iteration, having asked for it on 2026-09-09, 2026-09-25 and again today, under the standing direction "We should aim to have all technical assets covered by our gates" (operator direction, 2026-09-27). Knob or content detection is /spec's call; a kit-default widening reds adopters' workflows and owes a release note. Re-measured at scope: the three workflows carry 1295 full-line comments (gates.yml 1028, publish.yml 152, site-health.yml 115), and the shipped actions-shaped templates and `installer/action.yml` 139 more. The widening and sweep land before the iteration's new CI legs, so those are written under the gate.
-
-**Push need (2026-09-27, inside the budget):** the swept workflows run only on a remote run, so they ride the one mid-iteration push that also serves [linux-musl-artifacts](#linux-musl-artifacts), [glibc-floor-lowering](#glibc-floor-lowering) and [crate-tests-other-triples](#crate-tests-other-triples).
-
-**Cost while deferred:** every workflow edit adds ungoverned prose to the public demonstration tree. Filed 2026-09-09 on an operator direction to widen and sweep; iceboxed as machinery-class; returned 2026-09-25 by consult as the paradigm of the rule that nothing is exempt as unread by adopters.
-
 ### gate-tests-suite-identity-in-evidence
 
 [cost: iteration/low] [surface: evidence-kit] [recurrence: 2026-09-25]
@@ -507,18 +533,6 @@ a smoke that re-runs the battery inside its sandbox inherits no evidence-kit sco
 **Deliverable:** the nested run inherits or refuses the scope, and a fixture pins the refusal.
 
 **Cost while deferred:** a false clean in the evidence record. Filed 2026-08-18; returned from the icebox 2026-09-25 by consult, the smoke re-grepped.
-
-### uninstall-artifact-ownership-asymmetry
-
-[cost: event/low] [surface: installer] [recurrence: 2026-09-25]
-
-installer/SPEC.md §The gate binary says the compiled artifact is never the adopter's, while §uninstall has the verb keep-and-report it on a hash mismatch, and `uninstall.rs` references no artifact at all; the two sections give opposite answers and the verb follows neither cleanly.
-
-**Deliverable:** one ownership rule for the artifact, the verb implementing it, and a fixture.
-
-**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction lead-relayed (not a /consult ruling):** choosing between the two sections' answers is user-facing semantics. Re-verified at scope: `uninstall.rs` still references no artifact. It lands before [installer-contract-brevity](#installer-contract-brevity) passes §The gate binary.
-
-**Cost while deferred:** an uninstall leaves the binary or reports it as edited. Filed 2026-08-28; returned from the icebox 2026-09-25 by consult, the two sections re-read.
 
 ### battery-timing-file-overwritten-by-only-run
 
@@ -621,20 +635,6 @@ the lead template's capture rule (lifecycle-kit/templates/lead.md §Stamps are a
 **Cost while deferred:** a lead can destroy a live stage's evidence on a description nobody checked. Filed 2026-09-26 to the gap inbox by the lead on its own error; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because the rule widens a shipped template's contract and its scope is a design call. Re-verified at the drain: the removal is recorded in both the validate and lead journals. The filer's inferred cause, that the probe worktree reddened validate's first upgrade suite, did not reproduce: `--upgrade-smoke` ran clean with a linked worktree at `.tmp/probe-wt`. The gitignored-scratch clause therefore rests on no attested harm.
 
 **Inferred, not run:** concurrent lead activity in that worktree, rather than its presence, caused the one-off red — `bash gate-sdk/bin/run-gates.sh --upgrade-smoke` while a second session runs the battery inside a linked worktree under `.tmp/`
-
-### crate-tests-other-triples
-
-[cost: event/low] [surface: .github]
-
-the native crate's unit tests run on x86_64 Linux (the battery) and on the two Windows triples (`crate-tests-windows`); the two macOS triples and `aarch64-unknown-linux-gnu` only lint the crate under clippy in `native-artifacts`, so a unit test pinning a macOS or arm64 behaviour never runs there.
-
-**Deliverable:** a `cargo test` leg per remaining triple, or a stated ruling in gate-sdk/SPEC.md §check-crate-arms that those triples need none.
-
-**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** the theme's "wide platform/OS support" (operator direction, 2026-09-27) wants every published triple tested; the job's shape, and whether a new job name is minted, is /spec's. Any musl triple [linux-musl-artifacts](#linux-musl-artifacts) adds joins the same question. Re-verified at scope: only `crate-tests-windows` runs `cargo test`.
-
-**Push need (2026-09-27, inside the budget):** the new legs run only remotely; they ride the one mid-iteration push [comment-tier-surface-excludes-ci-workflows](#comment-tier-surface-excludes-ci-workflows) names.
-
-**Cost while deferred:** a platform-specific regression on those hosts reaches no test. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's spec; promoted 2026-09-26 at its close: →fix fails because a new CI leg is a unit scope must admit. Re-verified at the drain: `git grep 'cargo test' .github/workflows` returns only `crate-tests-windows`. Owner lookup: `cargo test`, `unit tests`, `apple-darwin`, `aarch64-unknown` in this file — none; owner gate-sdk/SPEC.md §check-crate-arms.
 
 ### windows-fresh-fixture-stub
 
