@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: platform-prerequisite-floors
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,26 @@
 ## New Features
 
 ## Technical Debt
+
+### installer-contract-brevity
+
+the installer/SPEC.md sections an install reads first: §The dependency boundary, §Requirements, §The install boundary, §The gate binary and §doctor; about 10.7k words. The rest of installer/SPEC.md, and every other SPEC, stays on [spec-brevity-residue](#spec-brevity-residue).
+
+**Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays, including a fact a sibling entry or another SPEC cites there.
+
+**Promoted as debt, split from spec-brevity-residue ahead of its filing order, operator direction 2026-09-27, lead-relayed (not a /consult ruling), at platform-prerequisite-floors's scope:** the moves run under gates that already exist and add no name, and the theme rewrites these sections anyway, so the pass joins without adding a stage. [prerequisite-floor-versions](#prerequisite-floor-versions) and [uninstall-artifact-ownership-asymmetry](#uninstall-artifact-ownership-asymmetry) edit §Requirements and §The gate binary, so they land first and the pass runs over their text.
+
+**Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-27 at scope from spec-brevity-residue, filed 2026-09-25; the word census is this scope's survey record.
+
+### installer-graph-artifact-literal
+
+`init` hardcodes `CHECK-GRAPH.html` (`native/src/installer/init.rs`) where the resolver owns the path through `GATE_SDK_GRAPH_ARTIFACT`, so an adopter's re-run writes the graph to the default path and ignores their knob.
+
+**Deliverable:** `init` resolves the artifact path through the knob, with a fixture.
+
+**Promoted as debt 2026-09-27 at platform-prerequisite-floors's scope, operator direction lead-relayed (not a /consult ruling):** it converges `init` on a knob the resolver already carries. Re-verified at scope: `init.rs` spells the literal at two sites.
+
+**Cost while deferred:** a re-run overwrites a path the adopter moved away from. Filed 2026-08-21; returned from the icebox 2026-09-25 by consult, the literal re-grepped.
 
 ## Deferred
 
@@ -386,11 +406,11 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 [cost: session/high] [surface: lifecycle-kit]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; then lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; then lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted; its contract sections are [installer-contract-brevity](#installer-contract-brevity)), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
-**Split eight times, 2026-09-25 to 09-27 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder, porting, native-contracts, runner, meta-gate, tooling and tail slices each left as their own debt entry, all since landed.
+**Split nine times, 2026-09-25 to 09-27 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder, porting, native-contracts, runner, meta-gate, tooling and tail slices each left as their own debt entry, all since landed; the ninth, installer's contract sections, left ahead of lifecycle-kit because the platform-prerequisite-floors theme rewrites them.
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
@@ -442,6 +462,10 @@ the CI workflow files' comments are ungated by corpus: `comment_surface` in `nat
 
 **Deliverable:** the surface widened to actions-shaped YAML (found by content through `actions_shaped` in `actions_run.rs`, or by knob, never by a hard-coded path), the three workflows swept to directive comments, and the first reading of `check-spec-pointer` sized, since it shares the surface primitive.
 
+**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** the operator joined it to the iteration, having asked for it on 2026-09-09, 2026-09-25 and again today, under the standing direction "We should aim to have all technical assets covered by our gates" (operator direction, 2026-09-27). Knob or content detection is /spec's call; a kit-default widening reds adopters' workflows and owes a release note. Re-measured at scope: the three workflows carry 1295 full-line comments (gates.yml 1028, publish.yml 152, site-health.yml 115), and the shipped actions-shaped templates and `installer/action.yml` 139 more. The widening and sweep land before the iteration's new CI legs, so those are written under the gate.
+
+**Push need (2026-09-27, inside the budget):** the swept workflows run only on a remote run, so they ride the one mid-iteration push that also serves [linux-musl-artifacts](#linux-musl-artifacts), [glibc-floor-lowering](#glibc-floor-lowering) and [crate-tests-other-triples](#crate-tests-other-triples).
+
 **Cost while deferred:** every workflow edit adds ungoverned prose to the public demonstration tree. Filed 2026-09-09 on an operator direction to widen and sweep; iceboxed as machinery-class; returned 2026-09-25 by consult as the paradigm of the rule that nothing is exempt as unread by adopters.
 
 ### gate-tests-suite-identity-in-evidence
@@ -492,17 +516,9 @@ installer/SPEC.md §The gate binary says the compiled artifact is never the adop
 
 **Deliverable:** one ownership rule for the artifact, the verb implementing it, and a fixture.
 
+**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction lead-relayed (not a /consult ruling):** choosing between the two sections' answers is user-facing semantics. Re-verified at scope: `uninstall.rs` still references no artifact. It lands before [installer-contract-brevity](#installer-contract-brevity) passes §The gate binary.
+
 **Cost while deferred:** an uninstall leaves the binary or reports it as edited. Filed 2026-08-28; returned from the icebox 2026-09-25 by consult, the two sections re-read.
-
-### installer-graph-artifact-literal
-
-[cost: event/low] [surface: installer] [recurrence: 2026-09-25]
-
-`init` hardcodes `CHECK-GRAPH.html` (`native/src/installer/init.rs`) where the resolver owns the path through `GATE_SDK_GRAPH_ARTIFACT`, so an adopter's re-run writes the graph to the default path and ignores their knob.
-
-**Deliverable:** `init` resolves the artifact path through the knob, with a fixture.
-
-**Cost while deferred:** a re-run overwrites a path the adopter moved away from. Filed 2026-08-21; returned from the icebox 2026-09-25 by consult, the literal re-grepped.
 
 ### battery-timing-file-overwritten-by-only-run
 
@@ -614,6 +630,10 @@ the native crate's unit tests run on x86_64 Linux (the battery) and on the two W
 
 **Deliverable:** a `cargo test` leg per remaining triple, or a stated ruling in gate-sdk/SPEC.md §check-crate-arms that those triples need none.
 
+**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** the theme's "wide platform/OS support" (operator direction, 2026-09-27) wants every published triple tested; the job's shape, and whether a new job name is minted, is /spec's. Any musl triple [linux-musl-artifacts](#linux-musl-artifacts) adds joins the same question. Re-verified at scope: only `crate-tests-windows` runs `cargo test`.
+
+**Push need (2026-09-27, inside the budget):** the new legs run only remotely; they ride the one mid-iteration push [comment-tier-surface-excludes-ci-workflows](#comment-tier-surface-excludes-ci-workflows) names.
+
 **Cost while deferred:** a platform-specific regression on those hosts reaches no test. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's spec; promoted 2026-09-26 at its close: →fix fails because a new CI leg is a unit scope must admit. Re-verified at the drain: `git grep 'cargo test' .github/workflows` returns only `crate-tests-windows`. Owner lookup: `cargo test`, `unit tests`, `apple-darwin`, `aarch64-unknown` in this file — none; owner gate-sdk/SPEC.md §check-crate-arms.
 
 ### windows-fresh-fixture-stub
@@ -666,7 +686,39 @@ the Linux gate binary needs glibc 2.39: `pidfd_spawnp` and `pidfd_getpid` bind `
 
 **Deliverable:** an operator ruling on the route, then the lowered floor landed in the platforms table the shared build body measures against.
 
+**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** /spec measures a musl build first (it compiles, the battery passes, its runtime cost) and escalates the route with that evidence; the preferred candidate is a third route, musl static binaries served to every Linux host, which [linux-musl-artifacts](#linux-musl-artifacts) holds and which would retire the glibc floor rather than lower it.
+
+**Push need (2026-09-27, inside the budget):** the chosen route's build leg runs only remotely; it rides the one mid-iteration push [comment-tier-surface-excludes-ci-workflows](#comment-tier-surface-excludes-ci-workflows) names.
+
 **Cost while deferred:** every evaluator on those distributions is turned away at the install's first step. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's build; promoted 2026-09-27 at its close: →fix fails because both routes reverse a runner choice and want a ruling. Re-verified: `objdump -T` on a local release build lists `GLIBC_2.39` as its newest version, and docs/install.md's platforms table states `glibc 2.39` for both Linux rows. Owner lookup: `glibc`, `runners.list`, `floor` in this file — only the landed `glibc-floor-unstated`; owner installer/SPEC.md §Requirements.
+
+### prerequisite-floor-versions
+
+[cost: event/high] [surface: installer]
+
+docs/install.md's toolchain block states no floor for `git`, `curl` or `shellcheck`, and the delivery-path tools installer/SPEC.md §Requirements names (`curl`, `tar`, `sha256sum` or `shasum`, Node for `npx`, the `/bin/sh` or PowerShell the one-line install runs, Git for Windows) and site-kit's Ruby with its `kramdown-parser-gfm` and `liquid` gems state none either. The page also states prerequisites once for every system, not per platform, so an adopter cannot tell before installing whether their host qualifies.
+
+**Deliverable:** every prerequisite states a floor measured from the construct that forces it, recorded with that construct under the pin rule (installer/SPEC.md §Requirements, context-kit/SPEC.md §bin/env-probe); a prerequisite no construct forces says so explicitly instead of "—"; the install page states each platform's prerequisites; `doctor` and `--emit env-probe` hold the roster members' new floors.
+
+**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** the iteration's theme, "all prerequisites should have floor versions and we should aim for wide platform/OS support with clearly documented prerequisites for each" (operator direction, 2026-09-27). On the pin rule, operator direction 2026-09-27: keep it, and meet the theme by measuring each member's forcing construct.
+
+**Cost while deferred:** an adopter on an old tool meets a mid-run failure the install page never warned of. Filed 2026-09-27 at platform-prerequisite-floors's scope, from the operator direction above and the lead's probe of the install page. Re-verified: the toolchain block's `git`, `curl` and `shellcheck` rows read "—", and `PROBE_SET` in `native/src/toolfloor.rs` pins only `bash` and `cargo`. Owner lookup: `floor`, `prerequisite`, `toolchain` in this file — only glibc-floor-lowering, DISTINCT (the binary's libc floor, not a tool's); owner installer/SPEC.md §Requirements.
+
+### linux-musl-artifacts
+
+[cost: event/high] [surface: installer]
+
+no `*-linux-musl` gate binary is published: `native/targets.list` carries only the two linux-gnu triples, installer/SPEC.md §The gate binary refuses a musl host at its libc row, and docs/install.md never names musl, so an Alpine or other musl host is turned away at the install's first step with no route offered.
+
+**Inferred, not run:** a statically linked `x86_64-unknown-linux-musl` gate binary also runs on glibc hosts below 2.39 — `docker run --rm -v "$PWD":/w debian:12 /w/<musl artifact> --help`
+
+**Deliverable:** musl artifacts for the Linux triples on the platform roster, built, published and install-smoked, the installer's libc row serving them, and the platforms table naming musl. Whether they also serve glibc hosts is [glibc-floor-lowering](#glibc-floor-lowering)'s route.
+
+**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** the theme's "wide platform/OS support" (operator direction, 2026-09-27); /spec measures the build before glibc-floor-lowering's route is escalated.
+
+**Push need (2026-09-27, inside the budget):** the musl build legs run only remotely; they ride the one mid-iteration push [comment-tier-surface-excludes-ci-workflows](#comment-tier-surface-excludes-ci-workflows) names.
+
+**Cost while deferred:** every musl host is refused. Filed 2026-09-27 at platform-prerequisite-floors's scope, from the lead's probe. Re-verified: `native/targets.list` lists six triples, none musl; installer/SPEC.md's libc table refuses a musl host; docs/install.md has no `musl`. Owner lookup: `musl`, `Alpine` in this file — none; owner installer/SPEC.md §The gate binary.
 
 ### crates-reservation-republish
 
