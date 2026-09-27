@@ -10,20 +10,6 @@
 
 ## Technical Debt
 
-### crate-tests-windows-flip
-
-[observed-by: gates]
-
-`crate-tests-windows` in `.github/workflows/gates.yml` carries a hard-coded `continue-on-error: true`; once one run is green on both triples it moves to the `matrix.held` expression `install-smoke-pwsh-windows` reads, and the reports-until-green sentences leave gate-sdk/SPEC.md §check-crate-arms and the capture-drain limit in §The workflow directory.
-
-**Deliverable:** that flip and those deletions, in one commit, after `windows-fresh-fixture-stub` lands.
-
-**Promoted as debt 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** the flip converges the job on the `matrix.held` convention and adds no name. Precondition (1) of the catalog submission, on the operator's ground that red jobs inside a green run read as ignored failures.
-
-**Push need (2026-09-27, overrun granted by operator direction, lead-relayed):** the mid-iteration observation push `windows-fresh-fixture-stub` spends supplies the green run this reads; the flip rides the closing push.
-
-**Cost while deferred:** a Windows crate-test failure passes every run as a warning only close reads. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's build as the follow-up crate-tests-unrun-on-windows' amendment ordered; promoted 2026-09-26 at its close: →fix fails because the job has no green run yet. Re-verified 2026-09-27 at scope: `gates.yml` reads `continue-on-error: true`, and run 36338295147 still fails the registry pair on both triples.
-
 ### spec-toolkits-guarantee
 
 docs/spec-toolkits.md says four defect classes "fail at commit and in CI" and never states what that guarantees: the pre-commit hook is skippable with `--no-verify`, so the guarantee is CI run as a required status check under branch protection, and the page does not say so. It also leaves unsaid that the four classes are document hygiene, not spec-to-code conformance. The operator found the page unconvincing (operator direction 2026-09-27, lead session).
@@ -222,7 +208,7 @@ the interop rung's submission half. The build half landed at companion-catalog-e
 
 **Deliverable:** the Spec Kit community-catalog submission, filed as the catalog's Extension Submission issue with its `download_url` naming the `checkwright-companion-<version>.zip` Release asset; the extension's README and the landing page then gain the catalog's install form.
 
-**Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **Ranked behind four preconditions the operator set on 2026-09-27:** [crate-tests-windows-flip](#crate-tests-windows-flip), since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; [catalog-landing-docs-polish](#catalog-landing-docs-polish); and [spec-toolkits-guarantee](#spec-toolkits-guarantee).
+**Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **Ranked behind four preconditions the operator set on 2026-09-27:** `crate-tests-windows-flip`, since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; [catalog-landing-docs-polish](#catalog-landing-docs-polish); and [spec-toolkits-guarantee](#spec-toolkits-guarantee).
 
 **Push need (2026-09-27, inside the budget):** the release tag push beside the closing push, since the submission needs the extension on a published tag; close's release policy decides the cut.
 
@@ -1495,5 +1481,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - foreign-spec-lifecycle-unowned
 - windows-fresh-fixture-stub
 - linux-glibc-artifacts
+- crate-tests-windows-flip
 
 ## Lessons Learned

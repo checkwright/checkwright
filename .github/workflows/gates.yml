@@ -1348,7 +1348,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  # spec: gate-sdk/SPEC.md §check-crate-arms — the test half on each Windows triple, reporting until green
+  # spec: gate-sdk/SPEC.md §check-crate-arms — the test half on each Windows triple
   crate-tests-windows:
     needs: native-artifacts-roster
     strategy:
@@ -1356,7 +1356,7 @@ jobs:
       matrix:
         include: ${{ fromJSON(needs.native-artifacts-roster.outputs.pwsh_legs) }}
     runs-on: ${{ matrix.runner }}
-    continue-on-error: true
+    continue-on-error: ${{ matrix.held }}
     timeout-minutes: 30
     permissions:
       contents: read
