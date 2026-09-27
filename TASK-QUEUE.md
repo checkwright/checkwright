@@ -386,7 +386,7 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 [cost: session/high] [surface: lifecycle-kit]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; then lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted; its contract sections are `installer-contract-brevity`), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; then lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted; its contract sections landed as `installer-contract-brevity`), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
@@ -659,6 +659,76 @@ shell-guard splits a compounded emitter write out of a compound (rule `emitter_w
 **Deliverable:** a compounded statement that alone matches an exact committed allow entry steered to its own call, in whichever rule owns the shape, with a `good/`+`bad/` fixture pair.
 
 **Cost while deferred:** a session compounding a granted truncation meets an out-of-band decision, which a classifier may deny. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's close; promoted 2026-09-27 at the next iteration's scope: →fix fails because choosing the owning rule is a design call on a shipped guard. Re-verified: a hook payload `grep -c x TASK-QUEUE.md; : > .workflow/subagent-stop-liveness.log` exits 0 with no steer, while the same compound with `echo hi >` is steered. Owner lookup: `compound`, `truncat` in this file — only the icebox's rejected-compound-commit-relabel, DISTINCT (a commit retry); owner guard-kit/SPEC.md §The generic ruleset.
+
+### docs-ux-authoring-rules
+
+[cost: event/low] [surface: docs]
+
+the site has no authoring rules for page and section naming, citation form or collapsible regions, so its UX improves only when an operator notices a page. The standing direction, operator direction 2026-09-27 (lead session, verbatim): "we should continue enhancing documentation with proper page names, section named, links, collapsable regions, aiming for superb human and LLM UX/UI. We should not be afraid to acknowledge mistakes and redo it the right way." Its first measured instance is citation form: rendered prose cites sections as bare text, such as docs/install.md's "(§With Node)" and TRAJECTORY.md's plain-text SPEC section citations. Links are the chosen form (operator direction, 2026-09-27, lead session) because `check-md-refs` resolves a link's file and anchor. A path-qualified bare citation is resolved by `check-spec-pointer`'s prose-citation pass, but a path-less one only asserts that some governed file carries the heading as a prefix, so a citation aimed at the wrong file passes.
+
+**Deliverable:** page-authoring rules in docs/site-architecture.md for page and section naming, link-form citations and collapsible-region use, each with a gate where one binds, and the § citations on rendered surfaces converted to links. Which surfaces count as rendered, and whether kit SPECs are in range, is scope's.
+
+**Cost while deferred:** readers find each cited section by hand, path-less citations stay liveness-gated only, and no gate prompts a redo. Filed 2026-09-27 to the gap inbox as two bullets by platform-prerequisite-floors' lead (the unlinked citations and the direction's missing home), merged here at its close: →fix fails because the rules are new governed names. Re-verified: `git grep -c '§'` reads seven on docs/install.md; `<details` appears on docs/install.md and docs/site-architecture.md only, and no page-authoring rule governs it. Owner lookup: `unlinked`, `section link`, `cross-ref`, `collaps` in this file — no entry on the subject; owner docs/site-architecture.md and canon-kit/SPEC.md §check-spec-pointer.
+
+### queue-write-side-verb
+
+[cost: iteration/low] [surface: queue-kit] [recurrence: 2026-09-27]
+
+the queue has gates and read arms but no write commands, so every restructure (promote, Done move, icebox, de-icebox, defer, split, recurrence stamp) is a hand edit the gates check only after the fact, and an entry's history (filed, promoted, iceboxed, returned) is reconstructed by hand from git. Filed 2026-08-12 on five throwaway queue scripts measured in one iteration; iceboxed 2026-09-11 as machinery-class. The lead measured 1293 commits touching TASK-QUEUE.md in the month to 2026-09-27, reconstructed entry histories by hand about six times in one session, and saw a scope session misread one. Operator direction, 2026-09-27 (lead session): such commands would be beneficial.
+
+**Deliverable:** queue-kit write commands for that operation set, with the queue gates as their post-check, and a `queue-history <slug>` read printing each transition's date and commit.
+
+**Cost while deferred:** every queue restructure is a hand edit, and each history question costs several git calls with a misread risk. Re-filed 2026-09-27 to the gap inbox by platform-prerequisite-floors' lead, widened from one write verb to the operation set and a history read; returned from the icebox at its close on a judged recurrence: →fix fails because the commands are new governed names. Re-verified: `git log --since=2026-08-27 -- TASK-QUEUE.md` lists 1291 commits at the close, and the evicting commit bd3dab89 holds the original body. Owner: queue-kit/SPEC.md §Per-component contracts.
+
+### manual-operation-spend-channel
+
+[cost: iteration/low] [surface: drift-kit]
+
+no measurement channel attributes a session's spend to repeated manual operations, so the close economics pass cannot surface a tooling opportunity. The stage-economics log prices spend per stage and tier, the overhead meter measures always-loaded bytes, prompt-friction sees only Bash calls that prompt (so Edit and Write queue edits are invisible to it), and knowledge-friction is self-reported. [queue-write-side-verb](#queue-write-side-verb)'s evidence came from an ad-hoc look at `.tmp/`. Operator expectation, 2026-09-27 (lead session): the economics analysis every close runs should surface such opportunities.
+
+**Deliverable:** a channel attributing repeated manual operations (tool-call shapes, hand edits of one surface) to sessions, and a close economics read listing the top candidates.
+
+**Cost while deferred:** tooling gaps surface only by chance and repeated manual work stays unpriced. Filed 2026-09-27 to the gap inbox by platform-prerequisite-floors' lead; promoted at its close: →fix fails because the channel is new mechanism. Re-verified: `.workflow/knowledge-friction.log` holds no line at this close. Owner lookup: `economics`, `tooling opportunit`, `repeated` in this file — [build-stage-tier-economics](#build-stage-tier-economics) and [queue-tier-label-correction-cost](#queue-tier-label-correction-cost), DISTINCT (tier pricing); owner drift-kit/SPEC.md §The stage-economics meter.
+
+### custom-gate-substrates
+
+[cost: event/high] [surface: gate-sdk]
+
+an adopter writes a custom gate in shell only. The registry resolves a member as a `.sh` or a `.gate` declaration (gate-sdk/SPEC.md §lib/gate.sh), and a `.gate` descriptor dispatches into the published binary, which an install cannot extend. On native Windows an adopter therefore needs Git for Windows' bash to author a gate, although the installer and the PowerShell front end already run under PowerShell; operator direction, 2026-09-27 (lead session): customers may write gates in shell, but on Windows they should be able to write them in PowerShell. And there is no supported path to a Rust gate, while a fork that adds the subcommand and ships its own build can (docs/install.md §Writing your own Rust gates; operator direction, 2026-09-27, lead session). Custom Rust gates are wanted as a capability, with install prerequisites split between shipped native gates, custom shell gates and custom Rust gates (operator direction, 2026-09-27, lead session).
+
+**Deliverable:** the registry resolving further substrates under the output, fail-closed, fixture-pair and self-lint contracts: `.ps1` resolution in the registry, the runner and the generated hook, with a PowerShell lint counterpart to `check-shellcheck`; a Rust path, as an adopter-built executable the registry dispatches or an extension crate; and the install page's prerequisites per substrate. Whether one executable-dispatch shape serves both is spec's.
+
+**Cost while deferred:** a native-Windows adopter authoring a gate takes on a bash dependency and a second shell dialect, and one wanting a typed, testable gate must write shell or fork. Filed 2026-09-27 to the gap inbox as two bullets by platform-prerequisite-floors' lead, merged here at its close because both ask which substrates the registry resolves beyond `.sh` and `.gate`: →fix fails because each substrate is new mechanism. The Rust bullet's premise, that an adopter cannot write a Rust gate at all, is corrected to the relayed direction above. Re-verified: `registry::resolve` tries `sh` then `gate` per dir and nothing else. Owner lookup: `ps1`, `PowerShell`, `custom gate`, `Rust gate`, `consumer crate` in this file — none; owner gate-sdk/SPEC.md §lib/gate.sh and §The port-candidate criteria.
+
+### doctor-shell-gate-bash
+
+[cost: event/low] [surface: context-kit]
+
+`doctor` does not owe `bash` for a consumer-registered shell gate. `bash`'s audience is derived over the kit roots and the anchor's fence-run corpus only (context-kit/SPEC.md §bin/env-probe), and a registered name with no `REGISTRY` row contributes nothing, so a native-Windows adopter who writes a shell gate without Git for Windows' bash reads `DOCTOR: clean` and meets the battery's exit 2 instead.
+
+**Deliverable:** a fourth derivation arm owing `bash` where the anchor's `gates.list` registers a member resolving to a `.sh` declaration in the gates dir, with its fixture.
+
+**Cost while deferred:** the requirement is stated on the install page only, and doctor's clean verdict misleads an adopter who skipped it. Filed 2026-09-27 to the gap inbox by platform-prerequisite-floors' build; promoted at its close: →fix fails because the arm widens doctor's verdict, adopter-visible semantics no amendment settled. Re-verified: the section's bash audience names three arms, two per kit root and one over the fence-run corpus, none reading a registered `.sh` member; docs/install.md's Windows section states the requirement. Owner lookup: `doctor`, `audience`, `env-probe` in this file — only [heterogeneous-agent-delegation](#heterogeneous-agent-delegation)'s CLI probe, DISTINCT; owner context-kit/SPEC.md §bin/env-probe. Related: [custom-gate-substrates](#custom-gate-substrates).
+
+### release-note-section-set-derivation
+
+[cost: event/high] [surface: installer] [recurrence: 2026-09-27]
+
+release notes serve human upgraders poorly, and their section set is crate literals. A note (installer/SPEC.md §The upgrade contract) has one human section, In brief, then declaration-bearing sections a mechanical consumer reconciles; the v0.26.0 note is 34,527 words against v0.25.0's 1,058. The section names are string literals in the release gates, the declaration parser and the upgrade smoke, so a rename is a crate edit, a new section is added by copying a call, and no gate asserts the gates' set equals the page's. Operator directions, 2026-09-27 (lead session): add sections for adopters with custom gates, whose reconcile differs; put a summary table at the top linking to the detail; reconsider the names, since "Tightened gates" also holds new gates, "Renamed knobs" also carries removals and new knobs have no section; and no hard code in gates. An operator question the same day asked where new platform support goes: this iteration's musl switch was declared as two Behavior changes bullets.
+
+**Deliverable:** a note structure with a linked summary table, audience-keyed sections and a Platforms section derived from the diff of docs/install.md's gated platforms table between two releases, its section set one knob-owned roster every reader derives from. The lead tokens are machine-read over a historical corpus the upgrade smoke resolves at any FROM/TO, so a rename owes an alias window or a note-corpus migration.
+
+**Cost while deferred:** every release ships a note a human must read whole to act on, custom-gate adopters are not told what applies to them, and a platform change hides in Behavior changes. Filed 2026-08-01 at close; iceboxed 2026-09-11 as dormant; re-filed 2026-09-27 to the gap inbox as two bullets (readability, a Platforms section) by platform-prerequisite-floors' lead, and returned at its close on a judged recurrence: →fix fails because the redesign renames machine-read tokens. Re-verified: `wc -w` over the two notes, and the literals in `native/src/gates/release_bump.rs`, `tightened_gates_grammar.rs`, `release_change_declared.rs`, `native/src/declaration.rs` and `native/src/emit/upgrade_smoke.rs`. [removed-knob-docs-cmd-valve](#removed-knob-docs-cmd-valve) is DISTINCT. Owner: installer/SPEC.md §The upgrade contract, RELEASING.md.
+
+### consumer-value-literal-gate
+
+[cost: event/low] [surface: gate-sdk]
+
+nothing enforces gate-sdk/SPEC.md §The port-candidate criteria's rule that every consumer value a member reads is a knob with one producer, never a crate literal. Instances surface by hand: `installer-graph-artifact-literal`, landed this iteration, and the release-note section names in [release-note-section-set-derivation](#release-note-section-set-derivation). Operator direction, 2026-09-27 (lead session): avoid any hard code in gates, because checkwright offers configurable gate templates to customers and benefits from them itself.
+
+**Deliverable:** an audit sizing the consumer-value literal population in `native/src/gates`, then a gate or lint over it with a declared valve.
+
+**Cost while deferred:** each literal publishes this repo's configuration as every adopter's mechanism, and instances surface only by chance. Filed 2026-09-27 to the gap inbox by platform-prerequisite-floors' lead; promoted at its close: →fix fails because the gate is new mechanism over an unsized corpus. Re-verified: the rule's sentence appears in gate-sdk/SPEC.md and its site mirror alone, with no gate section enforcing it. Owner lookup: `literal`, `hardcod` in this file's headings — [knob-default-accessor-singularity](#knob-default-accessor-singularity), DISTINCT (it bars re-spelling an existing knob's default; this bars a consumer value with no knob); owner gate-sdk/SPEC.md §The port-candidate criteria.
 
 ## Icebox
 
@@ -1128,10 +1198,6 @@ Wait and throughput are unmeasured.
 
 When to read cap headroom is unruled.
 
-### queue-write-side-verb
-
-The queue has no write-side verb.
-
 ### close-red-push-ownership
 
 No owner for a close blocked by a red push.
@@ -1267,10 +1333,6 @@ SPECs cite internal names, not knobs.
 ### lint-scope-hook-trigger
 
 extra lint dirs skip the commit hook, CI-only.
-
-### release-note-section-set-derivation
-
-release gate hand-lists note sections.
 
 ### knob-default-accessor-singularity
 
