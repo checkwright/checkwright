@@ -8,6 +8,58 @@
 
 ## New Features
 
+### linux-glibc-artifacts
+
+[spec: SPEC-linux-glibc.md]
+
+the next release would publish no glibc Linux gate binary: platform-prerequisite-floors replaced the two `*-linux-gnu` lines of `native/targets.list` with the `*-linux-musl` pair, over the hybrid that would publish both. The operator wants glibc artifacts published beside musl before the next tag (operator direction 2026-09-27, lead-relayed at companion-catalog-extension's close), and v0.27.0 is held on it.
+
+**Deliverable:** the gnu triples back in `native/targets.list` and `native/runners.list` beside musl, joined under that file's predicate; the installer's host-to-artifact choice between them on a Linux host; docs/install.md's platforms table and the release declarations to match.
+
+**Cost while deferred:** docs/spec-toolkits.md, live and linked from the front door, sends adopters to Release assets no tag yet carries, since v0.26.0 predates `companion/`, and that tag waits on this. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's close; promoted 2026-09-27 at the next iteration's scope. Re-verified: `native/targets.list` lists only the musl Linux triples, and `gh release view v0.26.0` lists only the gnu Linux archives. Owner lookup: `glibc`, `linux-gnu`, `targets.list` in this file — [install-platform-release-gap](#install-platform-release-gap), [musl-dev-binary](#musl-dev-binary) and [musl-smoke-build-wrapper](#musl-smoke-build-wrapper), DISTINCT (the page-to-gate binding; the dev binary; the smoke's hand-off); owner gate-sdk/SPEC.md §Consumer payload. Surface also gate-sdk.
+
+**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** the amendment settles the host-to-artifact choice and the declaration rows in one, with [install-platform-release-gap](#install-platform-release-gap)'s gate reading the table it settles.
+
+**Push need (2026-09-27, overrun granted by operator direction, lead-relayed):** the mid-iteration observation push, shared with [windows-fresh-fixture-stub](#windows-fresh-fixture-stub), that joins the gnu lines under the file's predicate; then the release tag beside the closing push, since v0.27.0 is held on this.
+
+### install-platform-release-gap
+
+[spec: SPEC-linux-glibc.md]
+
+docs/install.md defines `joined` as "a binary is published for that system", but `check-install-platforms` binds `joined` to a live `native/targets.list` line, so the two diverge between a platform join and the next tag. The two `*-linux-musl` triples joined at platform-prerequisite-floors while the newest release, v0.26.0, publishes only `*-linux-gnu` archives, and that close stamped `deferred:v0.27.0`. `check-front-door-verbs` holds the analogous claim for a verb the pinned release lacks; nothing holds it for a platform row or its Minimum.
+
+**Deliverable:** the page's definition and the gate's binding reconciled, with a gate that reds a `joined` row or Minimum the pinned release does not serve while the release disposition is `none` or deferred, in `check-front-door-verbs`' shape.
+
+**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** bundled with [linux-glibc-artifacts](#linux-glibc-artifacts), whose table shape it reads, so that one lands first.
+
+**Cost while deferred:** an adopter on a newly joined system, or below the old floor, follows the page and meets the pinned release's refusal or a glibc load error; the live instance lasts until the next tag. Filed 2026-09-27 to the gap inbox at platform-prerequisite-floors' close; promoted 2026-09-27 at the next iteration's scope: →fix fails because the gate is new mechanism. Re-verified: `gh release view v0.26.0` lists only the two `-linux-gnu` Linux archives, and docs/install.md's table reads the musl triples `joined`. Owner lookup: `joined`, `front-door-verbs`, `platform` in this file's headings — none; owner installer/SPEC.md §Versioning, with the platforms-block contract docs/site-architecture.md states.
+
+### windows-fresh-fixture-stub
+
+[spec: SPEC-observer-pin.md]
+
+`crate-tests-windows` still fails 2 of 1171 on both Windows triples: the registry-coverage pair (`every_registry_member_declares_the_programs_it_spawns` and `_roots_it_walks`) stops at `check-gate-binary-fresh`, whose good and bad fixtures set `GATE_SDK_NATIVE_BIN = ./stub-bin`, a bash-shebang stub Windows cannot start, so the member exits 2 and the observer's assertion panics each test at that case. No static stub serves both hosts under one knob value: probed, a shebang-less stub fails on unix at spawn (os error 8). Past it, `crate-tests-windows` installs none of the ruby gems whose absence exits `check-docs-render-fidelity` and `check-docs-liquid-parse` 2, and every later registry member is unobserved on Windows.
+
+**Deliverable:** a design ruling and its landing: the spawn funnel resolving `PATHEXT` on an extensionless path (reverses gate-sdk/SPEC.md §Fail-closed contract's pass-through rule), or the registry observer pinning a host-startable `GATE_SDK_NATIVE_BIN`; then the members past it observed green.
+
+**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** the design ruling is the amendment's; [crate-tests-windows-flip](#crate-tests-windows-flip) follows its observed green.
+
+**Push need (2026-09-27, overrun granted by operator direction, lead-relayed):** one mid-iteration observation push, shared with [linux-glibc-artifacts](#linux-glibc-artifacts), since no local run reaches a Windows host.
+
+**Cost while deferred:** `crate-tests-windows` stays report-only, so a Windows crate-test regression passes every run as a warning. The operator's cut-and-defer residue of `crate-tests-windows-failures` (operator direction 2026-09-26, lead session). Filed 2026-09-26 to the gap inbox by its build; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because both remedies are design-bearing and one reverses a stated rule. Re-verified: run 36264222274 reads 1169 passed, 2 failed, the pair above, on both triples. Owner lookup: `stub-bin`, `gate-binary-fresh`, `PATHEXT` in this file — none; owner gate-sdk/SPEC.md §check-gate-binary-fresh.
+
+### consumer-scratch-unignored
+
+[spec: SPEC-scratch-ignore.md]
+
+a battery run dirties an adopter's worktree: in a tree `init --profile prose` (v0.26.0) just wrote, `./scripts/checkwright-gates --run` leaves `.tmp/gate-timings.txt` untracked and unignored, since init seeds no ignore rule for `GATE_SDK_TMP_DIR` and the consumer has no root `.gitignore`. The next `init` or `update` then refuses a dirty worktree, and a habitual `git add -A` commits the timing file.
+
+**Deliverable:** init seeding an ignore line for the scratch directory, or the battery writing its timings elsewhere in a consumer — the unit's design call — with the consumer smoke asserting a clean worktree after a battery run.
+
+**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** a catalog adopter's first battery run meets it, so it rides the set that readies the listing.
+
+**Cost while deferred:** every adopter's first battery run leaves a file that blocks the next `update`. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's spec, observed in a scratch Spec Kit tree; promoted 2026-09-27 at its close: →fix fails because the bullet leaves the shape a design call. Re-verified: no `.gitignore` write under `installer/` or the init path, and the runner writes `gate-timings.txt` under `GATE_SDK_TMP_DIR`. Owner lookup: `gate-timings`, `GATE_SDK_TMP_DIR`, `gitignore` in this file — [battery-timing-file-overwritten-by-only-run](#battery-timing-file-overwritten-by-only-run), DISTINCT (the file's contents, not its tracking); owner installer/SPEC.md.
+
 ## Technical Debt
 
 ### crate-tests-windows-flip
@@ -592,22 +644,6 @@ the consult inbox needs a drain trigger and a status cue, on an operator directi
 
 **Cost while deferred:** the inbox, once it lands, is drained only when an operator remembers it. Filed 2026-09-26 to the gap inbox by the lead, extending the consult-inbox bullet; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails on the same amendment ground. Re-verified at the drain: `statusline.rs` reads `queue_counts::emit`. Owner lookup: `statusline counter`, `counter group` in this file — none.
 
-### windows-fresh-fixture-stub
-
-[cost: event/high] [surface: gate-sdk]
-
-`crate-tests-windows` still fails 2 of 1171 on both Windows triples: the registry-coverage pair (`every_registry_member_declares_the_programs_it_spawns` and `_roots_it_walks`) stops at `check-gate-binary-fresh`, whose good and bad fixtures set `GATE_SDK_NATIVE_BIN = ./stub-bin`, a bash-shebang stub Windows cannot start (os error 193). No static stub serves both hosts under one knob value: probed, a shebang-less stub fails on unix at spawn (os error 8); inferred, a `.cmd` stub's line 1 is echoed under `cmd /c` as the stdout line the gate reads as its stamp.
-
-**Inferred, not run:** past it, `check-docs-render-fidelity` and `check-docs-liquid-parse` exit 2 on Windows for want of the ruby gems the gates job installs, and registry members 116 to 140 are unobserved there.
-
-**Deliverable:** a design ruling and its landing: the spawn funnel resolving `PATHEXT` on an extensionless path (reverses gate-sdk/SPEC.md §check-graph's pass-through rule), or the registry observer pinning a host-startable `GATE_SDK_NATIVE_BIN`; then the members past it observed green.
-
-**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** the design ruling is the amendment's; [crate-tests-windows-flip](#crate-tests-windows-flip) follows its observed green.
-
-**Push need (2026-09-27, overrun granted by operator direction, lead-relayed):** one mid-iteration observation push, shared with [linux-glibc-artifacts](#linux-glibc-artifacts), since no local run reaches a Windows host.
-
-**Cost while deferred:** `crate-tests-windows` stays report-only, so a Windows crate-test regression passes every run as a warning. The operator's cut-and-defer residue of `crate-tests-windows-failures` (operator direction 2026-09-26, lead session). Filed 2026-09-26 to the gap inbox by its build; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because both remedies are design-bearing and one reverses a stated rule. Re-verified: run 36264222274 reads 1169 passed, 2 failed, the pair above, on both triples. Owner lookup: `stub-bin`, `gate-binary-fresh`, `PATHEXT` in this file — none; owner gate-sdk/SPEC.md §check-gate-binary-fresh.
-
 ### gate-output-contributor-door
 
 [cost: event/low] [surface: guard-kit] [recurrence: 2026-09-27]
@@ -732,18 +768,6 @@ nothing enforces gate-sdk/SPEC.md §The port-candidate criteria's rule that ever
 
 **Cost while deferred:** each literal publishes this repo's configuration as every adopter's mechanism, and instances surface only by chance. Filed 2026-09-27 to the gap inbox by platform-prerequisite-floors' lead; promoted at its close: →fix fails because the gate is new mechanism over an unsized corpus. Re-verified: the rule's sentence appears in gate-sdk/SPEC.md and its site mirror alone, with no gate section enforcing it. Owner lookup: `literal`, `hardcod` in this file's headings — [knob-default-accessor-singularity](#knob-default-accessor-singularity), DISTINCT (it bars re-spelling an existing knob's default; this bars a consumer value with no knob); owner gate-sdk/SPEC.md §The port-candidate criteria.
 
-### install-platform-release-gap
-
-[cost: event/low] [surface: installer]
-
-docs/install.md defines `joined` as "a binary is published for that system", but `check-install-platforms` binds `joined` to a live `native/targets.list` line, so the two diverge between a platform join and the next tag. The two `*-linux-musl` triples joined at platform-prerequisite-floors while the newest release, v0.26.0, publishes only `*-linux-gnu` archives, and that close stamped `deferred:v0.27.0`. `check-front-door-verbs` holds the analogous claim for a verb the pinned release lacks; nothing holds it for a platform row or its Minimum.
-
-**Deliverable:** the page's definition and the gate's binding reconciled, with a gate that reds a `joined` row or Minimum the pinned release does not serve while the release disposition is `none` or deferred, in `check-front-door-verbs`' shape.
-
-**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** bundled with [linux-glibc-artifacts](#linux-glibc-artifacts), whose table shape it reads, so that one lands first.
-
-**Cost while deferred:** an adopter on a newly joined system, or below the old floor, follows the page and meets the pinned release's refusal or a glibc load error; the live instance lasts until the next tag. Filed 2026-09-27 to the gap inbox at platform-prerequisite-floors' close; promoted 2026-09-27 at the next iteration's scope: →fix fails because the gate is new mechanism. Re-verified: `gh release view v0.26.0` lists only the two `-linux-gnu` Linux archives, and docs/install.md's table reads the musl triples `joined`. Owner lookup: `joined`, `front-door-verbs`, `platform` in this file's headings — none; owner installer/SPEC.md §Versioning, with the platforms-block contract docs/site-architecture.md states.
-
 ### spec-mirror-citation-links
 
 [cost: event/low] [surface: canon-kit]
@@ -753,18 +777,6 @@ the kit SPECs' on-site mirrors render their section citations as plain text, so 
 **Deliverable:** citation rendering at mirror time in that arm, each citation resolved through `check-spec-pointer`'s resolver into a relative link to the mirrored section, so every citation is reached with no hand conversion and no drift.
 
 **Cost while deferred:** every site reader of a SPEC follows its citations by hand. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's spec, split from `docs-ux-authoring-rules`, whose range was the hand-authored pages and READMEs; promoted 2026-09-27 at its close: →fix fails because the rendering is new mechanism in a shipped arm. Re-verified: the scope survey's oracle over the thirteen tracked `*/SPEC.md` counts 2,157 citation lines outside fences at the close, and the arm's `rewrite_line` rewrites `](` targets only. Owner lookup: `docs_mirror`, `mirror`, `citation` in this file — none; owner canon-kit/SPEC.md §The reference-link grammar.
-
-### consumer-scratch-unignored
-
-[cost: event/high] [surface: installer]
-
-a battery run dirties an adopter's worktree: in a tree `init --profile prose` (v0.26.0) just wrote, `./scripts/checkwright-gates --run` leaves `.tmp/gate-timings.txt` untracked and unignored, since init seeds no ignore rule for `GATE_SDK_TMP_DIR` and the consumer has no root `.gitignore`. The next `init` or `update` then refuses a dirty worktree, and a habitual `git add -A` commits the timing file.
-
-**Deliverable:** init seeding an ignore line for the scratch directory, or the battery writing its timings elsewhere in a consumer — the unit's design call — with the consumer smoke asserting a clean worktree after a battery run.
-
-**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** a catalog adopter's first battery run meets it, so it rides the set that readies the listing.
-
-**Cost while deferred:** every adopter's first battery run leaves a file that blocks the next `update`. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's spec, observed in a scratch Spec Kit tree; promoted 2026-09-27 at its close: →fix fails because the bullet leaves the shape a design call. Re-verified: no `.gitignore` write under `installer/` or the init path, and the runner writes `gate-timings.txt` under `GATE_SDK_TMP_DIR`. Owner lookup: `gate-timings`, `GATE_SDK_TMP_DIR`, `gitignore` in this file — [battery-timing-file-overwritten-by-only-run](#battery-timing-file-overwritten-by-only-run), DISTINCT (the file's contents, not its tracking); owner installer/SPEC.md.
 
 ### lead-clause-heading-family
 
@@ -871,20 +883,6 @@ the site has no rule for video, and the operator wants short intro and demo vide
 **Deliverable:** a page-authoring rule in docs/site-architecture.md admitting only the poster-link form, a gate reding an `<iframe>` or a third-party `src=` in docs pages, and first homes on docs/spec-toolkits.md and the front door.
 
 **Cost while deferred:** a video lands with no rule, and an embed would add the site's first third-party request. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead; promoted 2026-09-27 at its close: →fix fails because the gate is new mechanism. Re-verified: `docs/_layouts/default.html` loads only local assets, and `check-docs-render-fidelity` lists `iframe` as a known tag without refusing it. Owner lookup: `video`, `iframe`, `YouTube` in this file — none; owner docs/site-architecture.md §Page-authoring rules.
-
-### linux-glibc-artifacts
-
-[cost: event/high] [surface: installer]
-
-the next release would publish no glibc Linux gate binary: platform-prerequisite-floors replaced the two `*-linux-gnu` lines of `native/targets.list` with the `*-linux-musl` pair, over the hybrid that would publish both. The operator wants glibc artifacts published beside musl before the next tag (operator direction 2026-09-27, lead-relayed at companion-catalog-extension's close), and v0.27.0 is held on it.
-
-**Deliverable:** the gnu triples back in `native/targets.list` and `native/runners.list` beside musl, joined under that file's predicate; the installer's host-to-artifact choice between them on a Linux host; docs/install.md's platforms table and the release declarations to match.
-
-**Cost while deferred:** docs/spec-toolkits.md, live and linked from the front door, sends adopters to Release assets no tag yet carries, since v0.26.0 predates `companion/`, and that tag waits on this. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's close; promoted 2026-09-27 at the next iteration's scope. Re-verified: `native/targets.list` lists only the musl Linux triples, and `gh release view v0.26.0` lists only the gnu Linux archives. Owner lookup: `glibc`, `linux-gnu`, `targets.list` in this file — [install-platform-release-gap](#install-platform-release-gap), [musl-dev-binary](#musl-dev-binary) and [musl-smoke-build-wrapper](#musl-smoke-build-wrapper), DISTINCT (the page-to-gate binding; the dev binary; the smoke's hand-off); owner gate-sdk/SPEC.md §Consumer payload. Surface also gate-sdk.
-
-**Taken for /spec 2026-09-27 at catalog-submission-preconditions' scope, operator direction lead-relayed (not a /consult ruling):** the amendment settles the host-to-artifact choice and the declaration rows in one, with [install-platform-release-gap](#install-platform-release-gap)'s gate reading the table it settles.
-
-**Push need (2026-09-27, overrun granted by operator direction, lead-relayed):** the mid-iteration observation push, shared with [windows-fresh-fixture-stub](#windows-fresh-fixture-stub), that joins the gnu lines under the file's predicate; then the release tag beside the closing push, since v0.27.0 is held on this.
 
 ## Icebox
 
