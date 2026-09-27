@@ -6,3 +6,4 @@
 
 companion-catalog-extension scope a330ad95 2026-09-27 de5bf105
 companion-catalog-extension spec aa5b7789 2026-09-27 8774dc51
+companion-catalog-extension align a629528c 2026-09-27 8a4a4471
