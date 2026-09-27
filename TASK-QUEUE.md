@@ -48,6 +48,18 @@ the native crate's unit tests run on x86_64 Linux (the battery) and on the two W
 
 **Cost while deferred:** a platform-specific regression on those hosts reaches no test. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's spec; promoted 2026-09-26 at its close: →fix fails because a new CI leg is a unit scope must admit. Owner: gate-sdk/SPEC.md §check-crate-arms.
 
+### prerequisite-floor-versions
+
+[spec: SPEC-prerequisite-floors.md]
+
+docs/install.md's toolchain block states no floor for `git`, `curl` or `shellcheck`, and the delivery-path tools installer/SPEC.md §Requirements names (`curl`, `tar`, `sha256sum` or `shasum`, Node for `npx`, the `/bin/sh` or PowerShell the one-line install runs, Git for Windows) and site-kit's Ruby with its `kramdown-parser-gfm` and `liquid` gems state none either. The page also states prerequisites once for every system, not per platform, so an adopter cannot tell before installing whether their host qualifies.
+
+**Deliverable:** the amendment's measured floors (`git` 2.15, `curl` 5.9, `shellcheck` 0.6.0, `jq` 1.5, each with its construct), `any` for an unforced member, a per-system prerequisites block on the install page held by a new `check-install-platforms` arm, and `doctor` and `--emit env-probe` holding the new floors through the roster they already read.
+
+**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** the iteration's theme, "all prerequisites should have floor versions and we should aim for wide platform/OS support with clearly documented prerequisites for each" (operator direction, 2026-09-27). On the pin rule, operator direction 2026-09-27: keep it, and meet the theme by measuring each member's forcing construct. It lands before [installer-contract-brevity](#installer-contract-brevity) passes §Requirements.
+
+**Cost while deferred:** an adopter on an old tool meets a mid-run failure the install page never warned of. Filed 2026-09-27 at platform-prerequisite-floors's scope, from the operator direction above and the lead's probe of the install page. Owner: installer/SPEC.md §Requirements.
+
 ## Technical Debt
 
 ### installer-contract-brevity
@@ -691,18 +703,6 @@ the Linux gate binary needs glibc 2.39: `pidfd_spawnp` and `pidfd_getpid` bind `
 **Push need (2026-09-27, inside the budget):** the chosen route's build leg runs only remotely; it rides the one mid-iteration push [comment-tier-surface-excludes-ci-workflows](#comment-tier-surface-excludes-ci-workflows) names.
 
 **Cost while deferred:** every evaluator on those distributions is turned away at the install's first step. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's build; promoted 2026-09-27 at its close: →fix fails because both routes reverse a runner choice and want a ruling. Re-verified: `objdump -T` on a local release build lists `GLIBC_2.39` as its newest version, and docs/install.md's platforms table states `glibc 2.39` for both Linux rows. Owner lookup: `glibc`, `runners.list`, `floor` in this file — only the landed `glibc-floor-unstated`; owner installer/SPEC.md §Requirements.
-
-### prerequisite-floor-versions
-
-[cost: event/high] [surface: installer]
-
-docs/install.md's toolchain block states no floor for `git`, `curl` or `shellcheck`, and the delivery-path tools installer/SPEC.md §Requirements names (`curl`, `tar`, `sha256sum` or `shasum`, Node for `npx`, the `/bin/sh` or PowerShell the one-line install runs, Git for Windows) and site-kit's Ruby with its `kramdown-parser-gfm` and `liquid` gems state none either. The page also states prerequisites once for every system, not per platform, so an adopter cannot tell before installing whether their host qualifies.
-
-**Deliverable:** every prerequisite states a floor measured from the construct that forces it, recorded with that construct under the pin rule (installer/SPEC.md §Requirements, context-kit/SPEC.md §bin/env-probe); a prerequisite no construct forces says so explicitly instead of "—"; the install page states each platform's prerequisites; `doctor` and `--emit env-probe` hold the roster members' new floors.
-
-**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** the iteration's theme, "all prerequisites should have floor versions and we should aim for wide platform/OS support with clearly documented prerequisites for each" (operator direction, 2026-09-27). On the pin rule, operator direction 2026-09-27: keep it, and meet the theme by measuring each member's forcing construct.
-
-**Cost while deferred:** an adopter on an old tool meets a mid-run failure the install page never warned of. Filed 2026-09-27 at platform-prerequisite-floors's scope, from the operator direction above and the lead's probe of the install page. Re-verified: the toolchain block's `git`, `curl` and `shellcheck` rows read "—", and `PROBE_SET` in `native/src/toolfloor.rs` pins only `bash` and `cargo`. Owner lookup: `floor`, `prerequisite`, `toolchain` in this file — only glibc-floor-lowering, DISTINCT (the binary's libc floor, not a tool's); owner installer/SPEC.md §Requirements.
 
 ### linux-musl-artifacts
 
