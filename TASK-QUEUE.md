@@ -680,6 +680,36 @@ the crates.io reservation page still carries the retired methodology description
 
 **Cost while deferred:** a reader searching crates.io meets a second product description, the one `one-product-statement` removed everywhere else. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's build; promoted 2026-09-27 at its close: →fix fails because the write is operator-only. Re-verified: the crates.io API returns the retired description at `max_version` 0.0.0. Owner lookup: `crates.io`, `reserve`, `republish` in this file — none; owner installer/SPEC.md §The dependency boundary.
 
+### tier-only-rank-out-unruled
+
+[cost: iteration/low] [surface: lifecycle-kit]
+
+the audit roster's survey-engagement class does not say whether a scope survey that ranks a body-read entry out on the scope template's cost-tier order alone (session before iteration, high before low) has engaged the entry's self-declared strongest ground under limb (a). The class calls an entry ranked out on a blanket call alone a finding, while the template's rank order makes a tier sentence a sufficient rank-out. gate-sdk-tail-docs-standard's close met the case on heterogeneous-agent-delegation, whose demand-attested and live-lever grounds its survey left unengaged: the delegated reader called it a hit, and the close declined it on the predecessor sweep's precedent.
+
+**Deliverable:** the reading ruled and stated once, in the class's scope line and in lifecycle-kit/templates/stages/scope.md's counter-evidence paragraph: either a tier-only rank-out counts as engagement, or a body-read entry's strongest ground is weighed in the survey record before it ranks out.
+
+**Cost while deferred:** each close's survey-engagement sweep re-judges tier-only rank-outs and can reach opposite verdicts. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's close; promoted 2026-09-27 at the next iteration's scope: →fix fails because the specs leave the reading to precedent, and a ruling settles it. Re-verified: `.workflow/audit-roster.txt`'s survey-engagement row states the blanket-call finding, and its `declined:` field records the tier-ground decline. Owner lookup: `survey-engagement`, `rank-out`, `cost tier` in this file — survey-engagement-residue-untracked and survey-engagement-trigger-narrower-than-its-class, both DISTINCT (gitignored residue; non-scope surveys); owner lifecycle-kit/templates/stages/scope.md.
+
+### truncation-reclaim-residue
+
+[cost: iteration/low] [surface: delegation-kit]
+
+delegation-kit/SPEC.md declares a truncation reclaim, `reclaim=: > <log>`, for both of its advisory close surfaces, `.workflow/subagent-stop-liveness.log` and `.workflow/wait-primitive-evidence.txt`, while gate-sdk/SPEC.md §The workflow directory rules that a capture log a close reads before draining drains by rotation through `--emit capture-drain`, never by truncation: a truncate after the read erases every line appended between the two. guard-kit's and drift-kit's capture logs already declare the rotation.
+
+**Deliverable:** both declarations moved to the `capture-drain` reclaim, and the close's read taken off the drain file.
+
+**Cost while deferred:** every close's reclaim of those logs can erase lines a live session appended after the read, and the truncation spelling compounded with other calls is what the harness classifier denied as audit-log tampering. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's close; promoted 2026-09-27 at the next iteration's scope: →fix fails because the move changes the close's read surface for two logs. Re-verified: `grep 'close-surface:'` over the kit SPECs shows the two truncation reclaims beside three `capture-drain` ones. Owner lookup: `reclaim`, `capture-drain`, `truncat` in this file — only the icebox's [close-surface-reclaim-uncoupled-from-read](#close-surface-reclaim-uncoupled-from-read), DISTINCT (whether the row was read, not the reclaim's form); owner delegation-kit/SPEC.md.
+
+### truncation-compound-unsteered
+
+[cost: event/low] [surface: guard-kit]
+
+shell-guard splits a compounded emitter write out of a compound (rule `emitter_write` arm (a)) but lets a `: >` truncation compound through, so a call chaining an exact allow entry such as `: > .workflow/subagent-stop-liveness.log` with other allowlisted calls matches no single entry and is decided out of band, with no steer. Rule `allowlist_chain` reads only the leading statement, and `:` is no `GUARD_KIT_APPEND_BINS` member.
+
+**Deliverable:** a compounded statement that alone matches an exact committed allow entry steered to its own call, in whichever rule owns the shape, with a `good/`+`bad/` fixture pair.
+
+**Cost while deferred:** a session compounding a granted truncation meets an out-of-band decision, which a classifier may deny. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's close; promoted 2026-09-27 at the next iteration's scope: →fix fails because choosing the owning rule is a design call on a shipped guard. Re-verified: a hook payload `grep -c x TASK-QUEUE.md; : > .workflow/subagent-stop-liveness.log` exits 0 with no steer, while the same compound with `echo hi >` is steered. Owner lookup: `compound`, `truncat` in this file — only the icebox's rejected-compound-commit-relabel, DISTINCT (a commit retry); owner guard-kit/SPEC.md §The generic ruleset.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
