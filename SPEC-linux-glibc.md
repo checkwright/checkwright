@@ -78,6 +78,7 @@ In installer/SPEC.md §Parity between the two bootstraps, the step 2 row's obser
 
 - `native/runners.list` gains `x86_64-unknown-linux-gnu ubuntu-24.04` and `aarch64-unknown-linux-gnu ubuntu-24.04-arm`. The images are pinned rather than `ubuntu-latest`, so the glibc floor does not follow a floating image.
 - docs/install.md's platform block gains two rows, `held: the gates run that builds this triple and installs it on its Linux leg`, with Minimum `glibc <X.Y>`, the floor the build body measures on the pinned image (2.39 at the last gnu build). If the measurement differs, the leg refuses, and the cell takes the measured value. The System cells tell the four Linux rows apart by C library: the gnu rows "Linux on x86-64 (glibc), and WSL" and "Linux on arm64 (glibc)", and the musl rows "Linux on x86-64 (any C library)" and "Linux on arm64 (any C library)". The prose after the block gains one sentence: "On Linux, `init` takes the glibc binary where it runs and the static one everywhere else."
+- `.github/workflows/gates.yml`'s two Linux install-smoke legs re-key to the gnu triples (delta 4). This rides the declaring commit rather than waiting for the join: delta 1 lands in the same commit, so `target_of_host`/`Get-HostTarget` already answer the gnu triple once it lands, and the mid-iteration run this commit's own text reads as its oracle (below) needs the re-keyed legs to have consumed the gnu upload before that run can be read at all. Landing delta 4 later would leave `install-smoke-sh-linux` hard-coded to `ubuntu-latest` with no `continue-on-error` for a triple the roster still holds, and `install-smoke-sh-linux-arm64` reading the musl row's `joined` state for what the detector now answers as a gnu triple.
 - `bash gate-sdk/bin/build-native.sh`, since `native/runners.list` is in the source stamp.
 
 **The join commit** lands after the mid-iteration run shows, for each gnu triple, `native-artifacts` green and its Linux install-smoke leg green having consumed that upload (delta 4):
@@ -94,7 +95,7 @@ In installer/SPEC.md §Requirements' **Platform posture** bullet, "The Linux art
 
 ### (4) The Linux legs consume the preferred triple and witness the fallback's premise {design-bearing}
 
-**Not yet applied.** In `.github/workflows/gates.yml`:
+**Not yet applied. Rides delta 3's declaring commit**, since the mid-iteration run delta 3 reads as its join oracle needs these legs already consuming the gnu upload. In `.github/workflows/gates.yml`:
 
 - **`install-smoke-sh-linux`** reads its `runs-on` and `continue-on-error` from the roster index keyed `x86_64-unknown-linux-gnu`, as the other platform legs read theirs, in place of `ubuntu-latest`. While the gnu row is held, this leg reports and does not bind, and the join commit makes it binding with no workflow edit.
 - **`install-smoke-sh-linux-arm64`** re-keys its index lookups from `aarch64-unknown-linux-musl` to `aarch64-unknown-linux-gnu`, the triple `host-target.sh` answers there.
@@ -120,6 +121,8 @@ In the paragraph "**Each leg installs the producer's upload, never a build of it
 A host with no foreign artifact in its hand-off, including every local run, skips the three cases and says so, as the `shasum`-less host skips its case. In installer/SPEC.md §The consumer smoke, the artifact arm's paragraph ending "…That comparison keeps §The gate binary's three outcomes from collapsing into each other." takes "four outcomes" and a sentence naming the three cases and their skip.
 
 The paragraphs on the local build (the one beginning "`cargo` and `rustc` join the preflight" and the one after it) lose the musl build. On Linux the detector's triple is now the glibc one `rustc` builds natively, so the local smoke needs no `--target`, no musl standard library and no container route. "On Linux that triple is the musl one the installer serves, so the local build passes `--target` that triple, whose standard library the contributor installs once with `rustup target add`, and a failed build names that remedy." becomes "On a Linux host that triple is the glibc one `rustc` builds natively. Where the detector's triple is not `rustc`'s host, the build passes `--target` that triple and a failed build names the `rustup target add` remedy." The next paragraph, "A host with no rustup takes the hand-off path…", is deleted. The sentence "on Linux it costs the musl standard library the preflight paragraph below names" in "**The payload every profile installs carries a real gate binary**" is deleted. In `run-smoke.sh`, the comment "a Linux host builds the musl triple the installer serves, which its own toolchain's host triple is not" becomes "a host whose detector triple is not its toolchain's host cross-builds that triple". The branch stays as mechanism.
+
+CONTRIBUTING.md's pull-request bullet "On Linux the consumer smoke builds the musl target the installer serves, so add its standard library once: `rustup target add x86_64-unknown-linux-musl` (or `aarch64-unknown-linux-musl` on arm64)." becomes "On a Linux host the consumer smoke builds natively against the glibc triple `rustc` already targets; a host whose detector triple differs from its toolchain's own, as a foreign-architecture CI leg's does, adds that target once with `rustup target add`."
 
 ### (6) `check-install-platforms` holds `joined` to the pinned release {design-bearing}
 
@@ -170,7 +173,7 @@ Roster from `git grep -n -i "musl\|glibc\|libc" -- '*.md' '*.list' '*.yml' '*.sh
 
 ## Definition of Done
 
-- [ ] **Causal completeness.** Every point of canon-kit's causal-completeness check holds for the fallback function, the probe, the fourth refusal, the two gnu lines and arm G.
+- [ ] **Causal completeness.** Every point of canon-kit's causal-completeness check holds for the fallback function, the probe, the fourth refusal, the two gnu lines, the re-keyed Linux legs, the three `run-smoke.sh` artifact-arm cases and arm G.
 - [ ] **Instruction surfaces: instruction only.** No template changes.
 - [ ] **Merged with no information lost.** Each SPEC edit re-phrases the passage it refines.
 - [ ] **Amendment deleted.** This file is removed on merge (`ls SPEC-*.md`).
