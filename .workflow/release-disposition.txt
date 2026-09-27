@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+companion-catalog-extension release v0.27.0 — minor: the declarations since v0.26.0 derive a minor and no decommission, flooring at the previous close's deferred:v0.27.0; released on explicit operator direction, 2026-09-27, answered through the lead's question at this close after it escalated that docs/spec-toolkits.md's install steps name companion assets no published release carries
