@@ -384,7 +384,7 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 ### spec-brevity-residue
 
-[cost: session/high] [surface: gate-sdk]
+[cost: session/high] [surface: lifecycle-kit]
 
 the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; then lifecycle-kit (61k; §templates/lead.md opens with a ~900-word sentence), installer (48.5k, the smoke excepted), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
 
@@ -657,6 +657,28 @@ a release note's Renamed-knobs removal bullet must lead with the removed knob ba
 **Deliverable:** a valve that admits a removed knob in its sanctioned release-note position, or B reading the removal bullet's grammar, and the v0.26.0 note taken back off the exclude.
 
 **Cost while deferred:** every release that removes a knob buys a whole-doc exclude, and each excluded note loses its link and path checks for good. Filed 2026-09-26 to the gap inbox at front-door-release's close, which excluded the v0.26.0 note for three removed knobs; promoted 2026-09-26 at the next iteration's scope: →fix fails because the valve's shape is a design call on a shipped gate. Re-verified: `scripts/canon-config.knobs` carries the exclude for that note. Owner lookup: `docs-cmd`, `Renamed-knobs`, `MDREF_EXCLUDE` in this file — only the icebox's [docs-cmd-retired-path-blind-to-queue](#docs-cmd-retired-path-blind-to-queue), which is assertion C; owner canon-kit/SPEC.md §check-docs-cmd.
+
+### glibc-floor-lowering
+
+[cost: event/high] [surface: installer]
+
+the Linux gate binary needs glibc 2.39: `pidfd_spawnp` and `pidfd_getpid` bind `GLIBC_2.39`, everything else 2.34 or below, measured on v0.26.0's x86_64 and aarch64 linux-gnu archives. So Debian 12, RHEL 9 and Ubuntu 22.04 hosts meet a loader failure. `glibc-floor-unstated` stated and holds that floor; this entry would lower it. The routes are building the linux-gnu legs on an older image (ubuntu-22.04 gives 2.34 or 2.35, and retires on GitHub's clock) or through a glibc-versioned cross toolchain. Either reverses `native/runners.list`'s ride for those legs.
+
+**Deliverable:** an operator ruling on the route, then the lowered floor landed in the platforms table the shared build body measures against.
+
+**Cost while deferred:** every evaluator on those distributions is turned away at the install's first step. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's build; promoted 2026-09-27 at its close: →fix fails because both routes reverse a runner choice and want a ruling. Re-verified: `objdump -T` on a local release build lists `GLIBC_2.39` as its newest version, and docs/install.md's platforms table states `glibc 2.39` for both Linux rows. Owner lookup: `glibc`, `runners.list`, `floor` in this file — only the landed `glibc-floor-unstated`; owner installer/SPEC.md §Requirements.
+
+### crates-reservation-republish
+
+[cost: event/low] [surface: installer]
+
+the crates.io reservation page still carries the retired methodology description, because `reserve/crates/` was regenerated to the product statement but never republished. The republish is a registry write only the operator makes.
+
+**Inferred, not run:** crates.io versions are immutable, so the new description ships only as a new version (`0.0.1`), not over `0.0.0`.
+
+**Deliverable:** the reservation crate republished by the operator, and the live page reading the product statement.
+
+**Cost while deferred:** a reader searching crates.io meets a second product description, the one `one-product-statement` removed everywhere else. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's build; promoted 2026-09-27 at its close: →fix fails because the write is operator-only. Re-verified: the crates.io API returns the retired description at `max_version` 0.0.0. Owner lookup: `crates.io`, `reserve`, `republish` in this file — none; owner installer/SPEC.md §The dependency boundary.
 
 ## Icebox
 
