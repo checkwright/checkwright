@@ -12,3 +12,12 @@
 | Windows on ARM64 | | `aarch64-pc-windows-msvc` | held: a green producer leg consumed by a platform smoke leg |
 
 <!-- platforms:end -->
+
+<!-- prerequisites:begin -->
+
+| Tool | Minimum | Needed for | Why |
+|---|---|---|---|
+| `sh` | — | required to install on Linux and macOS | the bootstrap is POSIX sh |
+| Ruby | 2.3 | the docs gates, on macOS | the gems need it |
+
+<!-- prerequisites:end -->

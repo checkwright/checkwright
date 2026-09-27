@@ -9,3 +9,6 @@ install.md declares aarch64-pc-windows-msvc and checkwright.sh can never detect 
 install.md declares aarch64-pc-windows-msvc and checkwright.ps1 can never detect it
 omitted on each held platform: aarch64-apple-darwin omits 2 member(s)
 detected triples: checkwright.sh emits 4, checkwright.ps1 emits 4
+a prerequisite with no Minimum: `sh`
+a prerequisite neither `required` nor `optional: <condition>`: Ruby
+a declared system no prerequisite row names: Windows

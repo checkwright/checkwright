@@ -2,8 +2,8 @@
 
 <!-- toolchain:begin -->
 
-| Tool | Version | Needed by | Why |
+| Tool | Version | Needed | Why |
 |---|---|---|---|
-| `jq` | — | contributors | parses JSON inputs in the smoke harnesses |
+| `jq` | any | contributors | parses JSON inputs in the smoke harnesses |
 
 <!-- toolchain:end -->

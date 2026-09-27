@@ -1,1 +1,1 @@
-roster says | ≥ 4.0 | alpha-kit, beta-kit, gamma-kit |, page says | ≥ 4.0 | alpha-kit, beta-kit |
+roster says | ≥ 4.0 | optional: if your profile includes alpha-kit, beta-kit or gamma-kit |, page says | ≥ 4.0 | optional: if your profile includes alpha-kit or beta-kit |

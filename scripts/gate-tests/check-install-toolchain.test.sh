@@ -4,7 +4,7 @@
 # derived-audience under-declaration; this covers the two name-set directions,
 # the three spellings of an unconstrained member, the implementation-token axis
 # diverging on its own, the audience axis in parity, diverging each way, and
-# spelled with a Needed-by value no audience renders to, the floor divergence,
+# spelled with a Needed value no audience renders to, the floor divergence,
 # both placement directions, and the fail-closed arm of a derived audience with
 # no kit root to resolve.
 #
@@ -23,7 +23,7 @@ trap 'rm -rf "$tmp"' EXIT
 write_table() {
     {
         printf '# Fixture\n\n<!-- toolchain:begin -->\n\n'
-        printf '| Tool | Version | Needed by | Why |\n|---|---|---|---|\n'
+        printf '| Tool | Version | Needed | Why |\n|---|---|---|---|\n'
         [[ -n "$3" ]] && printf '%s\n' "$3"
         printf '\n<!-- toolchain:end -->\n'
     } >"$1/$2"
@@ -50,60 +50,60 @@ check_case() {
 }
 
 # A — a roster member the page never lists: the probed-but-not-listed direction.
-write_case "$tmp/a" '| `bash` | ≥ 4.0 | every profile | runs the battery |' 'bash:4.0 sort::coreutils'
+write_case "$tmp/a" '| `bash` | ≥ 4.0 | required | runs the battery |' 'bash:4.0 sort::coreutils'
 check_case "probed-not-listed" "$tmp/a" 1 "probed but not listed: sort"
 
 # B — a page row no roster member backs: the listed-but-not-probed direction.
-write_case "$tmp/b" '| `bash` | ≥ 4.0 | every profile | runs the battery |
-| `cmake` | — | every profile | builds nothing here |' 'bash:4.0'
+write_case "$tmp/b" '| `bash` | ≥ 4.0 | required | runs the battery |
+| `cmake` | any | required | builds nothing here |' 'bash:4.0'
 check_case "listed-not-probed" "$tmp/b" 1 "listed but not probed: cmake"
 
 # C — the three spellings of an unconstrained member are one member, so a page of
 # bare rows is in parity with a roster carrying empty trailing fields.
-write_case "$tmp/c" '| `awk` | — | every profile | scans lines |
-| `git` | — | every profile | reads tracked files |
-| `jq` | — | every profile | parses JSON inputs |' 'awk:: git: jq'
+write_case "$tmp/c" '| `awk` | any | required | scans lines |
+| `git` | any | required | reads tracked files |
+| `jq` | any | required | parses JSON inputs |' 'awk:: git: jq'
 check_case "empty-fields-are-unconstrained" "$tmp/c" 0 "INSTALL-TOOLCHAIN: clean"
 
 # D — the implementation axis diverges alone: names and floors agree, the page
 # names the wrong family. The reflex `GNU` for a coreutils member is exactly
 # this red.
-write_case "$tmp/d" '| `sort` | GNU | every profile | orders things |' 'sort::coreutils'
-check_case "impl-token-mismatch" "$tmp/d" 1 "roster says | coreutils | every profile |, page says | GNU | every profile |"
+write_case "$tmp/d" '| `sort` | GNU | required | orders things |' 'sort::coreutils'
+check_case "impl-token-mismatch" "$tmp/d" 1 "roster says | coreutils | required |, page says | GNU | required |"
 
 # E — an unconstrained roster member the page decorates with a floor: the
 # divergence pointing the other way from the bad fixture's.
-write_case "$tmp/e" '| `jq` | ≥ 1.5 | every profile | parses JSON inputs |' 'jq'
-check_case "page-invents-a-floor" "$tmp/e" 1 "roster says | — | every profile |, page says | ≥ 1.5 | every profile |"
+write_case "$tmp/e" '| `jq` | ≥ 1.5 | required | parses JSON inputs |' 'jq'
+check_case "page-invents-a-floor" "$tmp/e" 1 "roster says | any | required |, page says | ≥ 1.5 | required |"
 
 # F — the audience axis renders and reaches parity: a roster element carrying the
 # fourth field is clean only against a row that publishes it, on its own page.
-write_case "$tmp/f" '| `git` | — | every profile | reads tracked files |' 'git cargo:1.71::contributor' \
+write_case "$tmp/f" '| `git` | any | required | reads tracked files |' 'git cargo:1.71::contributor' \
     '| `cargo` | ≥ 1.71 | contributors | builds the crate |'
 check_case "audience-in-parity" "$tmp/f" 0 "INSTALL-TOOLCHAIN: clean"
 
 # G — the silent failure this axis makes possible, caught: a member quietly
 # marked contributor-only drops out of every consumer's floor, and the page
 # saying nothing about it is what would have hidden that.
-write_case "$tmp/g" '' 'git:::contributor' '| `git` | — | every profile | reads tracked files |'
-check_case "undeclared-audience" "$tmp/g" 1 "roster says | — | contributors |, page says | — | every profile |"
+write_case "$tmp/g" '' 'git:::contributor' '| `git` | any | required | reads tracked files |'
+check_case "undeclared-audience" "$tmp/g" 1 "roster says | any | contributors |, page says | any | required |"
 
 # H — the same divergence pointing the other way: a page that demotes a member
 # the roster still holds every audience to.
-write_case "$tmp/h" '' 'git' '| `git` | — | contributors | reads tracked files |'
-check_case "page-invents-an-audience" "$tmp/h" 1 "roster says | — | every profile |, page says | — | contributors |"
+write_case "$tmp/h" '' 'git' '| `git` | any | contributors | reads tracked files |'
+check_case "page-invents-an-audience" "$tmp/h" 1 "roster says | any | required |, page says | any | contributors |"
 
-# I — a Needed-by value no audience renders to is read as a kit list, so it reds
+# I — a Needed value no audience renders to is read as a kit list, so it reds
 # as one rather than being accepted as the audience it was meant to name.
-write_case "$tmp/i" '| `git` | — | every profile | reads tracked files |' 'git cargo:1.71::contributor' \
+write_case "$tmp/i" '| `git` | any | required | reads tracked files |' 'git cargo:1.71::contributor' \
     '| `cargo` | ≥ 1.71 | contributor | builds the crate |'
 check_case "unrendered-audience" "$tmp/i" 1 "page says | ≥ 1.71 | contributor |"
 
 # J — the floor divergence: name sets agree exactly, the page states `bash`
 # unconstrained while the roster pins a floor.
-write_case "$tmp/j" '| `bash` | — | every profile | runs the battery |
-| `git` | — | every profile | reads tracked files |' 'bash:4.0 git'
-check_case "floor-divergence" "$tmp/j" 1 "roster says | ≥ 4.0 | every profile |, page says | — | every profile |"
+write_case "$tmp/j" '| `bash` | any | required | runs the battery |
+| `git` | any | required | reads tracked files |' 'bash:4.0 git'
+check_case "floor-divergence" "$tmp/j" 1 "roster says | ≥ 4.0 | required |, page says | any | required |"
 
 # K — placement, one direction: a contributors row on the install page, in full
 # parity with the roster, still reds, because an adopter reads that page.
@@ -111,7 +111,7 @@ write_case "$tmp/k" '| `cargo` | ≥ 1.71 | contributors | builds the crate |' '
 check_case "contributor-row-on-install-page" "$tmp/k" 1 "a row on the wrong page: cargo belongs in CONTRIBUTING.md, not install.md"
 
 # L — placement, the other direction: an adopter's row kept in CONTRIBUTING.md.
-write_case "$tmp/l" '' 'git' '| `git` | — | every profile | reads tracked files |'
+write_case "$tmp/l" '' 'git' '| `git` | any | required | reads tracked files |'
 check_case "adopter-row-in-contributing" "$tmp/l" 1 "a row on the wrong page: git belongs in install.md, not CONTRIBUTING.md"
 
 # M — no row on either page is a check that could not run.
@@ -123,7 +123,7 @@ check_case "no-row-anywhere" "$tmp/m" 2 "no '| \`tool\` | … |' rows"
 # row that declares none, which is the silent under-declaration this axis exists
 # to make impossible. The kit-dirs knob names a directory that is not there, which
 # is what an unresolvable derivation looks like from inside the gate.
-write_case "$tmp/n" '| `bash` | — | every profile | runs the battery |' 'bash:4.0::derived'
+write_case "$tmp/n" '| `bash` | any | required | runs the battery |' 'bash:4.0::derived'
 out="$(cd "$tmp/n" \
     && gate_env GATE_SDK_KIT_DIRS=checkwright-no-such-kit \
     && gate_run check-install-toolchain "$GATES_DIR" install.md CONTRIBUTING.md roster.sh 2>&1)"; rc=$?
@@ -137,5 +137,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-install-toolchain.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-install-toolchain.test: ok (both name-set directions red; a bare row, a trailing empty field and a doubled empty field are one unconstrained member; the implementation token and an invented floor each red on their own; the audience axis reaches parity, reds in both directions, and reds on a Needed-by value no audience renders to; a floor divergence reds; a row on the wrong page reds in both directions; no row anywhere and a derived audience with no kit root each fail closed)"
+echo "check-install-toolchain.test: ok (both name-set directions red; a bare row, a trailing empty field and a doubled empty field are one unconstrained member; the implementation token and an invented floor each red on their own; the audience axis reaches parity, reds in both directions, and reds on a Needed value no audience renders to; a floor divergence reds; a row on the wrong page reds in both directions; no row anywhere and a derived audience with no kit root each fail closed)"
 exit 0

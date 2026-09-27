@@ -36,18 +36,6 @@ the native crate's unit tests run on x86_64 Linux (the battery) and on the two W
 
 **Cost while deferred:** a platform-specific regression on those hosts reaches no test. Filed 2026-09-26 to the gap inbox by native-contracts-brevity's spec; promoted 2026-09-26 at its close: →fix fails because a new CI leg is a unit scope must admit. Owner: gate-sdk/SPEC.md §check-crate-arms.
 
-### prerequisite-floor-versions
-
-[spec: SPEC-prerequisite-floors.md]
-
-docs/install.md's toolchain block states no floor for `git`, `curl` or `shellcheck`, and the delivery-path tools installer/SPEC.md §Requirements names (`curl`, `tar`, `sha256sum` or `shasum`, Node for `npx`, the `/bin/sh` or PowerShell the one-line install runs, Git for Windows) and site-kit's Ruby with its `kramdown-parser-gfm` and `liquid` gems state none either. The page also states prerequisites once for every system, not per platform, so an adopter cannot tell before installing whether their host qualifies.
-
-**Deliverable:** the amendment's measured floors (`git` 2.15, `curl` 5.9, `shellcheck` 0.6.0, `jq` 1.5, each with its construct), `any` for an unforced member, a per-system prerequisites block on the install page held by a new `check-install-platforms` arm, every optional prerequisite marked `optional:` with its condition, the page split by shipped gates, own shell gates and own Rust gates, and `doctor` and `--emit env-probe` holding the new floors through the roster they already read.
-
-**Taken for /spec 2026-09-27 at platform-prerequisite-floors's scope, operator direction 2026-09-27, lead-relayed (not a /consult ruling):** the iteration's theme, "all prerequisites should have floor versions and we should aim for wide platform/OS support with clearly documented prerequisites for each" (operator direction, 2026-09-27). On the pin rule, operator direction 2026-09-27: keep it, and meet the theme by measuring each member's forcing construct. Widened at /spec, operator direction 2026-09-27, lead-relayed: mark each optional prerequisite with the condition that owes it (`shellcheck` the example), and split prerequisites by what the adopter runs, the shell-gate split showing native Windows' bash requirement; PowerShell and Rust custom gates stay out, filed for a later scope. It lands before [installer-contract-brevity](#installer-contract-brevity) passes §Requirements.
-
-**Cost while deferred:** an adopter on an old tool meets a mid-run failure the install page never warned of. Filed 2026-09-27 at platform-prerequisite-floors's scope, from the operator direction above and the lead's probe of the install page. Owner: installer/SPEC.md §Requirements.
-
 ### linux-musl-artifacts
 
 [spec: SPEC-linux-musl.md]
@@ -84,7 +72,7 @@ the installer/SPEC.md sections an install reads first: §The dependency boundary
 
 **Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays, including a fact a sibling entry or another SPEC cites there.
 
-**Promoted as debt, split from spec-brevity-residue ahead of its filing order, operator direction 2026-09-27, lead-relayed (not a /consult ruling), at platform-prerequisite-floors's scope:** the moves run under gates that already exist and add no name, and the theme rewrites these sections anyway, so the pass joins without adding a stage. [prerequisite-floor-versions](#prerequisite-floor-versions) and `uninstall-artifact-ownership-asymmetry` edit §Requirements and §The gate binary, so they land first and the pass runs over their text.
+**Promoted as debt, split from spec-brevity-residue ahead of its filing order, operator direction 2026-09-27, lead-relayed (not a /consult ruling), at platform-prerequisite-floors's scope:** the moves run under gates that already exist and add no name, and the theme rewrites these sections anyway, so the pass joins without adding a stage. `prerequisite-floor-versions` and `uninstall-artifact-ownership-asymmetry` edit §Requirements and §The gate binary, so they land first and the pass runs over their text.
 
 **Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Split 2026-09-27 at scope from spec-brevity-residue, filed 2026-09-25; the word census is this scope's survey record.
 
@@ -1427,5 +1415,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 ## Done
 
 - uninstall-artifact-ownership-asymmetry
+- prerequisite-floor-versions
 
 ## Lessons Learned

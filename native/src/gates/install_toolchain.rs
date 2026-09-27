@@ -13,12 +13,14 @@ const END: &str = "<!-- toolchain:end -->";
 // cell's floor lead, its field separator, and its spelling for neither axis
 const GE: &str = "≥";
 const SEP: &str = ", ";
-const NEITHER: &str = "—";
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the
-// Needed-by cell's rendering of each audience that names no kit
-const EVERY_PROFILE: &str = "every profile";
+const NEITHER: &str = "any";
+// spec: docs/site-architecture.md §Generated projections and their freshness gates — the Needed
+// cell's rendering of each audience, a kit list's lead and its last-pair joiner among them
+const REQUIRED: &str = "required";
 const CONTRIBUTORS: &str = "contributors";
-const REGISTERED_GATES: &str = "registered gates";
+const REGISTERED_GATES: &str = "optional: if you register a gate that runs it";
+const KIT_LIST: &str = "optional: if your profile includes";
+const LAST_SEP: &str = " or ";
 
 pub fn run(args: &[String]) -> i32 {
     match rule(args) {
@@ -52,7 +54,7 @@ fn backticked_name(cell: &str) -> Option<&str> {
 struct Row {
     name: String,
     // spec: docs/site-architecture.md §Generated projections and their freshness gates — the
-    // Version and Needed-by cells as `render` spells them, compared verbatim
+    // Version and Needed cells as `render` spells them, compared verbatim
     cells: String,
     contributor: bool,
 }
@@ -103,7 +105,7 @@ fn roster_quad(element: &str, derived: &[String]) -> (String, String) {
 }
 
 // spec: docs/site-architecture.md §Generated projections and their freshness gates — the Version
-// and Needed-by cells an element demands
+// and Needed cells an element demands
 fn render(quad: &str) -> String {
     let mut it = quad.splitn(4, ':');
     it.next();
@@ -123,10 +125,19 @@ fn render(quad: &str) -> String {
         version.join(SEP)
     };
     let needed = match aud {
-        "" => EVERY_PROFILE.to_string(),
+        "" => REQUIRED.to_string(),
         CONTRIBUTOR => CONTRIBUTORS.to_string(),
         REGISTERED => REGISTERED_GATES.to_string(),
-        kits => kits.split(KIT_JOIN).collect::<Vec<&str>>().join(SEP),
+        kits => {
+            let names: Vec<&str> = kits.split(KIT_JOIN).collect();
+            let listed = match names.split_last() {
+                Some((last, rest)) if !rest.is_empty() => {
+                    format!("{}{}{}", rest.join(SEP), LAST_SEP, last)
+                }
+                _ => names.join(SEP),
+            };
+            format!("{} {}", KIT_LIST, listed)
+        }
     };
     format!("| {} | {} |", version, needed)
 }
@@ -252,7 +263,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
         println!("  help: each row renders its roster element verbatim —");
         println!(
-            "        `| \\`tool\\` | {} <floor>{}<impl-token> | <needed by> | <why> |`, the Version cell",
+            "        `| \\`tool\\` | {} <floor>{}<impl-token> | <needed> | <why> |`, the Version cell",
             GE, SEP
         );
         println!(
@@ -300,7 +311,7 @@ mod tests {
     #[test]
     fn the_page_side_reads_each_row_off_its_cells() {
         let text = format!(
-            "{}\n| Tool | Version | Needed by | Why |\n|---|---|---|---|\n|  `cargo` |  ≥ 1.71, gnu | contributors | x |\n| `jq` | — | every profile | y |\n{}\n",
+            "{}\n| Tool | Version | Needed | Why |\n|---|---|---|---|\n|  `cargo` |  ≥ 1.71, gnu | contributors | x |\n| `jq` | any | required | y |\n{}\n",
             BEGIN, END
         );
         let rows = listed_rows(&text);
@@ -312,11 +323,28 @@ mod tests {
         assert!(!rows[1].contributor);
     }
 
+    // spec: docs/site-architecture.md §Generated projections and their freshness gates — an
+    // optional row states its condition, and a kit list joins its last two names with ` or `
     #[test]
     fn render_spells_the_two_cells_an_element_demands() {
-        assert_eq!(render("jq:::"), "| — | every profile |");
-        assert_eq!(render("bash:4.0::"), "| ≥ 4.0 | every profile |");
-        assert_eq!(render("git:::contributor"), "| — | contributors |");
-        assert_eq!(render("bash:4.3:gnu:a-kit+b-kit"), "| ≥ 4.3, gnu | a-kit, b-kit |");
+        assert_eq!(render("jq:::"), "| any | required |");
+        assert_eq!(render("bash:4.0::"), "| ≥ 4.0 | required |");
+        assert_eq!(render("git:::contributor"), "| any | contributors |");
+        assert_eq!(
+            render("shellcheck:0.6::registered"),
+            "| ≥ 0.6 | optional: if you register a gate that runs it |"
+        );
+        assert_eq!(
+            render("curl:5.9::a-kit"),
+            "| ≥ 5.9 | optional: if your profile includes a-kit |"
+        );
+        assert_eq!(
+            render("bash:4.3:gnu:a-kit+b-kit"),
+            "| ≥ 4.3, gnu | optional: if your profile includes a-kit or b-kit |"
+        );
+        assert_eq!(
+            render("bash:4.3::a-kit+b-kit+c-kit"),
+            "| ≥ 4.3 | optional: if your profile includes a-kit, b-kit or c-kit |"
+        );
     }
 }

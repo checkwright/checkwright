@@ -6,10 +6,10 @@
 // a sourceable file loses no affordance the kit ever offered.
 pub const PROBE_SET: &[&str] = &[
     "bash:4.3::derived",
-    "git",
-    "jq:::contributor",
-    "curl:::delegation-kit",
-    "shellcheck:::registered",
+    "git:2.15",
+    "jq:1.5::contributor",
+    "curl:5.9::delegation-kit",
+    "shellcheck:0.6::registered",
     "cargo:1.71::contributor",
 ];
 
@@ -667,5 +667,28 @@ mod tests {
             "below 3.2.57 4.3"
         );
         assert_eq!(check("bash:4.3", "GNU bash, no version").rendered(), "uncomparable");
+    }
+
+    // spec: context-kit/SPEC.md §bin/env-probe — each measured floor compares against the banner
+    // its tool really prints, the version buried past a first line included
+    #[test]
+    fn each_measured_floor_reads_its_tools_own_banner() {
+        let floor = |name: &str| {
+            PROBE_SET
+                .iter()
+                .find(|e| parse(e).name == name)
+                .expect("a floored member left the roster")
+                .to_string()
+        };
+        assert_eq!(check(&floor("git"), "git version 2.7.4").rendered(), "below 2.7.4 2.15");
+        assert_eq!(check(&floor("git"), "git version 2.43.0.windows.1").rendered(), "ok");
+        assert_eq!(
+            check(&floor("curl"), "curl 5.8 (i386-pc-linux) libcurl 5.8").rendered(),
+            "below 5.8 5.9"
+        );
+        let sc = "ShellCheck - shell script analysis tool\nversion: 0.5.0\nlicense: GNU GPL v3\n";
+        assert_eq!(check(&floor("shellcheck"), sc).rendered(), "below 0.5.0 0.6");
+        assert_eq!(check(&floor("shellcheck"), &sc.replace("0.5.0", "0.6.0")).rendered(), "ok");
+        assert_eq!(check(&floor("jq"), "jq-1.4").rendered(), "below 1.4 1.5");
     }
 }

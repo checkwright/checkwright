@@ -37,9 +37,9 @@ Building Checkwright needs these tools beyond an adopter's:
 
 <!-- toolchain:begin -->
 
-| Tool | Version | Needed by | Why |
+| Tool | Version | Needed | Why |
 |---|---|---|---|
-| `jq` | — | contributors | guard-kit's smoke recipe and the installer's consumer smoke read JSON with it |
+| `jq` | ≥ 1.5 | contributors | guard-kit's smoke recipe and the installer's consumer smoke read JSON with it, passing `--argjson` and `--slurpfile` |
 | `cargo` | ≥ 1.71 | contributors | builds the `native/` crate before every commit (*Build the gate binary* above), at the highest MSRV in its resolved dependency graph |
 
 <!-- toolchain:end -->

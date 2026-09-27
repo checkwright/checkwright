@@ -26,20 +26,50 @@ An install is possible only on a system below, where a prebuilt gate binary is p
 
 `joined` means a binary is published for that system; `held` means it is supported but not published yet, and names the run that would publish it. On any other system `init` refuses. Windows Subsystem for Linux (WSL) takes the Linux binary.
 
-The gates run these tools, by who needs them. A kit's name means the tool is owed only if your profile includes that kit, and `registered gates` only if a gate you register needs it:
+### Installing and running the shipped gates
+
+The tools each shipped gate runs. `required` binds every install. An `optional` row binds you only under the condition it names:
 
 <!-- toolchain:begin -->
 
-| Tool | Version | Needed by | Why |
+| Tool | Version | Needed | Why |
 |---|---|---|---|
-| `bash` | ≥ 4.3 | context-kit, drift-kit, guard-kit | each ships a file your host runs with bash, and the gate library uses a nameref (`local -n`) |
-| `git` | — | every profile | the gates read tracked files and the hooks fire at commit time |
-| `curl` | — | delegation-kit | its usage poller (`--usage-poll`) fetches its source with it |
-| `shellcheck` | — | registered gates | `check-shellcheck` and `check-action-run-shell` run [ShellCheck](https://www.shellcheck.net/) once you register them |
+| `bash` | ≥ 4.3 | optional: if your profile includes context-kit, drift-kit or guard-kit | each ships a file your host runs with bash, and the gate library uses a nameref (`local -n`) |
+| `git` | ≥ 2.15 | required | the gates read tracked files and the hooks fire at commit time; `check-docs-cmd` reads `rev-parse --is-shallow-repository` |
+| `curl` | ≥ 5.9 | optional: if your profile includes delegation-kit | its usage poller (`--usage-poll`) fetches its source with `curl -fsS`, and `-S` arrived in 5.9 |
+| `shellcheck` | ≥ 0.6 | optional: if you register a gate that runs it | `check-shellcheck` and `check-action-run-shell` run [ShellCheck](https://www.shellcheck.net/) with `-S warning` once you register them |
 
 <!-- toolchain:end -->
 
-A missing tool comes from your distribution's package on Linux or WSL, from Homebrew on macOS, or from Chocolatey on native Windows. To publish a docs site with site-kit's render-fidelity gate, you also need Ruby with the `kramdown-parser-gfm` gem, and with the `liquid` gem if you register its Liquid-parse gate. To check your machine, run the gate binary with `--emit env-probe`: it writes an untracked `ENV.local.md` with each tool's version and verdict. Building Checkwright itself takes more: see the [contributing guide](https://github.com/checkwright/checkwright/blob/master/CONTRIBUTING.md).
+The install itself and the optional docs gates need these as well. `doctor` does not probe them:
+
+<!-- prerequisites:begin -->
+
+| Tool | Minimum | Needed for | Why |
+|---|---|---|---|
+| `sh` | any POSIX `sh` | required to install on Linux and macOS | the one-line install and the bootstrap are POSIX sh throughout |
+| `curl` | 5.9 | required to install on Linux and macOS | the install line fetches with `curl -fsSL`, and `-S` arrived in 5.9 |
+| `tar` | any GNU or BSD `tar` | required to install on Linux and macOS | `tar -xzf` unpacks the release tarball |
+| `sha256sum` or `shasum` | any | required to install on Linux and macOS | the release tarball and the gate binary are checked against their published digests |
+| Windows PowerShell | 5.1 | required to install on Windows | the one-line install, the install block and the bootstrap run under it; its `Get-FileHash` checks the digests |
+| `tar.exe` | Windows 10 version 1803 | required to install on Windows | the install block unpacks the tarball with `System32\tar.exe` |
+| Git for Windows | `git` and `bash` at the floors above | required to install on Windows | it supplies `git` and, where a row above owes it, `bash` |
+| Node | 8.2 | optional: only to install with npx | the first Node to bundle an npm carrying `npx` |
+| Ruby | 2.3 | optional: only if you register site-kit's docs gates | the two gems below need it |
+| `kramdown-parser-gfm` | any | optional: only if you register site-kit's docs gates | `check-docs-render-fidelity` re-renders every page through it |
+| `liquid` | 4.0.4 exactly | optional: only if you register site-kit's docs gates | `check-docs-liquid-parse` parses with the version GitHub Pages runs |
+
+<!-- prerequisites:end -->
+
+A missing tool comes from your distribution's package on Linux or WSL, from Homebrew on macOS, or from Chocolatey on native Windows. To check your machine, run the gate binary with `--emit env-probe`: it writes an untracked `ENV.local.md` with each tool's version and verdict. Building Checkwright itself takes more: see the [contributing guide](https://github.com/checkwright/checkwright/blob/master/CONTRIBUTING.md).
+
+### Writing your own shell gates
+
+A gate you write is a copy of gate-sdk's `templates/check-skeleton.sh`. It is a bash script that sources gate-sdk's library, so it needs the `bash` floor above on every system, whatever your profile. `doctor` does not check that, because the roster owes `bash` only through the kits you vendor. On native Windows that bash is Git for Windows' bash: a gate cannot be written in PowerShell today. `check-shellcheck` lints your gate if you register it, and then `shellcheck`'s row binds you.
+
+### Writing your own Rust gates
+
+There is no supported path today: a compiled gate is a subcommand of the published gate binary, and an install carries no crate to add one to. A fork that adds the subcommand and ships its own build can, since descriptors resolve consumer-first and so its own `.gate` descriptor runs. That fork then owns its own release, digest and upgrades, outside this project's. [gate-sdk/SPEC.md](gate-sdk/SPEC.md#the-port-candidate-criteria) owns this.
 
 ## Install
 
@@ -53,7 +83,7 @@ Run the one line for your system from your repository's root, in a new project o
 
 ### macOS and Linux
 
-**You need** git, `curl` and `tar`, plus `sha256sum` on Linux or the `shasum` macOS ships.
+**You need** the tools §Requirements lists for installing on Linux and macOS.
 
 On macOS, stock bash is 3.2, below the floor. If your profile owes `bash` (§Requirements), run this block, which installs Homebrew's bash and puts it first on your `PATH`, now and in `~/.zprofile`. If your login shell is bash, use `~/.bash_profile` instead. The floor's grounds are in [installer/SPEC.md](installer/SPEC.md#requirements) and context-kit's [env-probe](context-kit/SPEC.md#binenv-probe).
 
@@ -108,7 +138,7 @@ To uninstall, `sh "$cw/package/bin/checkwright.sh" uninstall` reverses it in one
 
 ### Windows
 
-**You need** Git for Windows. PowerShell, `Get-FileHash` and `tar.exe` ship with Windows (its minimum version is in §Requirements).
+**You need** the tools §Requirements lists for installing on Windows, where the minimum Windows version is stated too. Git for Windows' bash is also what runs any shell gate you write ([Writing your own shell gates](#writing-your-own-shell-gates)).
 
 Run this block in PowerShell first. It puts Git's `usr\bin` and `bin` on your `PATH`, for this session and every later one:
 
@@ -164,7 +194,7 @@ Verify as above. To uninstall, run the same last line with `uninstall` in place 
 
 ### With Node
 
-`npx checkwright init` runs the same `init` from the npm package, and it carries a build attestation the tarball cannot ([installer/SPEC.md](installer/SPEC.md#the-dependency-boundary)). `init` verifies the gate binary with `sha256sum` or `shasum`, and refuses without one.
+`npx checkwright init` runs the same `init` from the npm package, and it carries a build attestation the tarball cannot ([installer/SPEC.md](installer/SPEC.md#the-dependency-boundary)). `init` verifies the gate binary with `sha256sum` or `shasum`, and refuses without one. It needs Node 8.2 or later (§Requirements).
 
 ### Choosing a profile
 

@@ -12,3 +12,12 @@
 A line after the table is prose and declares nothing: `i686-unknown-linux-gnu` is not a row.
 
 <!-- platforms:end -->
+
+<!-- prerequisites:begin -->
+
+| Tool | Minimum | Needed for | Why |
+|---|---|---|---|
+| `sh` | any POSIX `sh` | required to install on Linux and macOS | the bootstrap is POSIX sh |
+| Ruby | 2.3 | optional: only if you register the docs gates | the gems need it |
+
+<!-- prerequisites:end -->

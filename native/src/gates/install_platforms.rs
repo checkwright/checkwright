@@ -1,6 +1,8 @@
 // spec: docs/site-architecture.md §Generated projections and their freshness gates — the install
 // page's platform declaration block, native/targets.list and both bootstraps' host detectors hold
 // lockstep, with each held platform's omitted count and each detector's triple count printed
+// spec: installer/SPEC.md §Requirements — arm F holds the page's prerequisites block against the
+// system families the platform block declares
 use crate::fresh;
 use crate::registry;
 use crate::walk;
@@ -22,6 +24,13 @@ const END: &str = "<!-- platforms:end -->";
 // states and no third, the held one carrying its precondition after the colon
 const JOINED: &str = "joined";
 const HELD: &str = "held:";
+// spec: installer/SPEC.md §Requirements — arm F's block: every prerequisite the roster does not
+// carry, each row stating a Minimum and whether it is required or optional under a condition
+const PREREQ_BEGIN: &str = "<!-- prerequisites:begin -->";
+const PREREQ_END: &str = "<!-- prerequisites:end -->";
+const REQUIRED: &str = "required";
+const OPTIONAL: &str = "optional:";
+const NO_FLOOR: &str = "—";
 
 pub fn run(args: &[String]) -> i32 {
     match rule(args) {
@@ -83,6 +92,107 @@ fn declarations(text: &str) -> Vec<Decl> {
         });
     }
     out
+}
+
+struct Prereq {
+    tool: String,
+    minimum: String,
+    needed: String,
+}
+
+// spec: docs/site-architecture.md §Generated projections and their freshness gates — a row is a
+// block line opening with `|` past the first, which is the header, and not a delimiter row
+fn prerequisites(text: &str) -> Option<Vec<Prereq>> {
+    let mut inb = false;
+    let mut seen = false;
+    let mut header = true;
+    let mut out: Vec<Prereq> = Vec::new();
+    for line in text.lines() {
+        if line == PREREQ_BEGIN {
+            inb = true;
+            seen = true;
+            continue;
+        }
+        if line == PREREQ_END {
+            inb = false;
+            continue;
+        }
+        if !inb || !line.trim_start().starts_with('|') {
+            continue;
+        }
+        if std::mem::take(&mut header) {
+            continue;
+        }
+        let cells = cells(line);
+        if cells.iter().all(|c| !c.is_empty() && c.chars().all(|ch| ch == '-' || ch == ':')) {
+            continue;
+        }
+        out.push(Prereq {
+            tool: cells.first().cloned().unwrap_or_default(),
+            minimum: cells.get(1).cloned().unwrap_or_default(),
+            needed: cells.get(2).cloned().unwrap_or_default(),
+        });
+    }
+    seen.then_some(out)
+}
+
+// spec: docs/site-architecture.md §Generated projections and their freshness gates — a system
+// family is the first word of a platform row's System cell
+fn families(text: &str) -> Vec<String> {
+    let mut inb = false;
+    let mut out: Vec<String> = Vec::new();
+    for line in text.lines() {
+        if line == BEGIN {
+            inb = true;
+            continue;
+        }
+        if line == END {
+            inb = false;
+            continue;
+        }
+        if !inb || !line.trim_start().starts_with('|') || backticked(line).is_none() {
+            continue;
+        }
+        let system = cells(line).first().cloned().unwrap_or_default();
+        if let Some(word) = system.split_whitespace().next() {
+            let word = word.trim_end_matches(',');
+            if !out.iter().any(|f| f == word) {
+                out.push(word.to_string());
+            }
+        }
+    }
+    out
+}
+
+// spec: installer/SPEC.md §Requirements — arm F: a row with no Minimum, a row neither required
+// nor optional under a condition, and a declared family no row's Needed-for cell names
+fn prerequisite_findings(rows: &[Prereq], families: &[String]) -> Vec<String> {
+    let mut findings: Vec<String> = Vec::new();
+    for r in rows {
+        if r.minimum.is_empty() || r.minimum == NO_FLOOR {
+            findings.push(format!("a prerequisite with no Minimum: {}", r.tool));
+        }
+        if !r.needed.starts_with(REQUIRED) && !r.needed.starts_with(OPTIONAL) {
+            findings.push(format!(
+                "a prerequisite neither `{}` nor `{} <condition>`: {}",
+                REQUIRED, OPTIONAL, r.tool
+            ));
+        }
+    }
+    for f in families {
+        let named = rows.iter().any(|r| {
+            r.needed
+                .split(|c: char| !c.is_alphanumeric())
+                .any(|w| w == f)
+        });
+        if !named {
+            findings.push(format!(
+                "a declared system no prerequisite row names: {}",
+                f
+            ));
+        }
+    }
+    findings
 }
 
 // spec: docs/site-architecture.md §Generated projections and their freshness gates — the first
@@ -268,6 +378,21 @@ fn rule(args: &[String]) -> Result<i32, String> {
         ));
     }
 
+    // spec: installer/SPEC.md §Requirements — a missing or empty prerequisites block is a check
+    // that could not run, as the platform block's own absence is
+    let prereqs = prerequisites(&install_text).ok_or_else(|| {
+        format!(
+            "no prerequisites marker block ({}) in {}",
+            PREREQ_BEGIN, install_md
+        )
+    })?;
+    if prereqs.is_empty() {
+        return Err(format!(
+            "prerequisites block present but no '| <tool> | <minimum> | <needed for> | <why> |' rows in {}",
+            install_md
+        ));
+    }
+
     let roster_text = fresh::read_captured(roster)?;
     let listed = roster_triples(&roster_text);
 
@@ -356,6 +481,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
+    let declared_families = families(&install_text);
+    findings.extend(prerequisite_findings(&prereqs, &declared_families));
+
     // spec: installer/SPEC.md §The gate binary — the count rides the clean line on the same
     // vacuous-pass ground arm D stands on: a source scan whose extraction quietly stops matching
     // reports an empty set as agreement, and a number is what makes that visible without an audit
@@ -389,11 +517,14 @@ fn rule(args: &[String]) -> Result<i32, String> {
         println!("        row's Minimum cell states the platform's OS floor.");
         println!("        Each detector's emitted triple set equals the declared set: a triple it");
         println!("        detects is declared, and a triple declared is one it can reach.");
+        println!("        Every prerequisites row states a Minimum (`any` where nothing forces");
+        println!("        one) and a Needed-for cell opening `required` or `optional: <condition>`,");
+        println!("        and every declared system family is named by some row's Needed-for cell.");
         return Ok(1);
     }
 
     println!(
-        "INSTALL-PLATFORMS: clean ({} declared platform(s) in {}, {} joined in lockstep with {} both directions, {} held with a stated precondition{}{}; both host detectors emit exactly the declared set — {}; omitted count is the registry members dispatching to the gate binary)",
+        "INSTALL-PLATFORMS: clean ({} declared platform(s) in {}, {} joined in lockstep with {} both directions, {} held with a stated precondition{}{}; both host detectors emit exactly the declared set — {}; omitted count is the registry members dispatching to the gate binary; {} prerequisite(s) each with a Minimum and a required/optional marker, naming every declared family — {})",
         decls.len(),
         install_md,
         joined,
@@ -401,7 +532,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
         held.len(),
         if held.is_empty() { "" } else { " — " },
         per_held,
-        detector_report
+        detector_report,
+        prereqs.len(),
+        declared_families.join(", ")
     );
     Ok(0)
 }
@@ -532,6 +665,53 @@ mod tests {
         assert!(detector_triples_in(only_the_empty_arm, "f", &PWSH_DETECTOR)
             .unwrap_err()
             .contains("extracted no triple"));
+    }
+
+    fn prereq_block(body: &str) -> String {
+        format!(
+            "{}\n\n| Tool | Minimum | Needed for | Why |\n|---|---|---|---|\n{}\n\n{}\n",
+            PREREQ_BEGIN, body, PREREQ_END
+        )
+    }
+
+    // spec: installer/SPEC.md §Requirements — arm F reads the header and delimiter as no row, and
+    // tells an absent block from an empty one
+    #[test]
+    fn the_prerequisites_block_reads_its_rows_and_its_absence() {
+        let text = prereq_block("| `tar` | any | required to install on Linux and macOS | x |");
+        let rows = prerequisites(&text).unwrap();
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0].tool, "`tar`");
+        assert_eq!(rows[0].minimum, "any");
+        assert!(prerequisites("no block here").is_none());
+        assert!(prerequisites(&prereq_block("")).unwrap().is_empty());
+    }
+
+    // spec: installer/SPEC.md §Requirements — arm F's three row findings, each reached, and a
+    // family matched as a word of the Needed-for cell
+    #[test]
+    fn arm_f_reds_a_missing_minimum_an_unmarked_row_and_an_unnamed_family() {
+        let platforms = block(&format!(
+            "{}| Linux on arm64 | glibc 2.39 | `aarch64-unknown-linux-gnu` | joined |\n| macOS on Intel | macOS 10.12 | `x86_64-apple-darwin` | joined |\n| Windows on x86-64 | Windows 10 | `x86_64-pc-windows-msvc` | joined |",
+            HEAD
+        ));
+        let fams = families(&platforms);
+        assert_eq!(fams, vec!["Linux", "macOS", "Windows"]);
+
+        let clean = prereq_block(
+            "| `sh` | any | required to install on Linux and macOS | x |\n| PowerShell | 5.1 | required to install on Windows | y |\n| Node | 8.2 | optional: only to install with npx | z |",
+        );
+        assert!(prerequisite_findings(&prerequisites(&clean).unwrap(), &fams).is_empty());
+
+        let red = prereq_block(
+            "| `sh` | — | required to install on Linux and macOS | x |\n| PowerShell |  | needed on Windowsish hosts | y |",
+        );
+        let f = prerequisite_findings(&prerequisites(&red).unwrap(), &fams);
+        assert_eq!(f.len(), 4, "{:?}", f);
+        assert!(f[0].contains("no Minimum: `sh`"));
+        assert!(f[1].contains("no Minimum: PowerShell"));
+        assert!(f[2].contains("neither"));
+        assert!(f[3].ends_with("names: Windows"));
     }
 
     // spec: gate-sdk/SPEC.md §Consumer payload — the roster's line grammar, so a commented triple
