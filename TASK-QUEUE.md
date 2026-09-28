@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: lifecycle-machine-brevity
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,50 @@
 ## New Features
 
 ## Technical Debt
+
+### lifecycle-kit-machine-brevity
+
+the three brevity moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) over lifecycle-kit/SPEC.md's state-machine tool sections under §Per-component contracts: §bin/enter-stage.sh, §check-stage-evidence, §check-stage-entry, §The ruling-staleness probe, §bin/session-id.sh and §bin/install-lifecycle.sh, about 134k bytes. The template sections and the sections above §Per-component contracts have already landed.
+
+**Deliverable:** the moves applied to those six sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every contract sentence kept.
+
+**Cost while deferred:** paid by every session that opens one of these sections, which every stage entry's refusal and every stamp question sends a reader to. Filed 2026-09-28 at scope as a split from its parent, on an operator direction lead-relayed (not a /consult ruling), unit set D.
+
+### truncation-reclaim-residue
+
+delegation-kit/SPEC.md declares a truncation reclaim, `reclaim=: > <log>`, for both of its advisory close surfaces, `.workflow/subagent-stop-liveness.log` and `.workflow/wait-primitive-evidence.txt`, while gate-sdk/SPEC.md §The workflow directory rules that a capture log a close reads before draining drains by rotation through `--emit capture-drain`, never by truncation: a truncate after the read erases every line appended between the two. guard-kit's and drift-kit's capture logs already declare the rotation.
+
+**Deliverable:** both declarations moved to the `capture-drain` reclaim, and the close's read taken off the drain file.
+
+**Cost while deferred:** every close's reclaim of those logs can erase lines a live session appended after the read, and the truncation spelling compounded with other calls is what the harness classifier denied as audit-log tampering. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's close; promoted 2026-09-27 at the next iteration's scope: →fix fails because the move changes the close's read surface for two logs. Re-verified: `grep 'close-surface:'` over the kit SPECs shows the two truncation reclaims beside three `capture-drain` ones. Owner lookup: `reclaim`, `capture-drain`, `truncat` in this file — only the icebox's [close-surface-reclaim-uncoupled-from-read](#close-surface-reclaim-uncoupled-from-read), DISTINCT (whether the row was read, not the reclaim's form); owner delegation-kit/SPEC.md.
+
+### gate-tests-suite-identity-in-evidence
+
+[recurrence: 2026-09-25]
+
+the evidence manifest's digest covers the suite's log bytes only (`run_validate.rs`), so two suites with identical output share one hash while evidence-kit/SPEC.md §Baseline manifest says the digest "pins which run produced the counts". **Premise corrected 2026-09-28 at scope:** each manifest line already carries its `<suite>` key beside the hash (`<iteration> <suite> sha256=<log-hash> …`), so the residue is the runner arguments behind that key and the SPEC's claim.
+
+**Deliverable:** the runner arguments folded into the digest or carried beside it, or the SPEC's claim brought to what the digest and the suite key prove.
+
+**Cost while deferred:** the attestation payload the paid rung would countersign cannot distinguish two suites. Filed 2026-08-01; returned from the icebox 2026-09-25 by consult, the hash input re-read.
+
+### windows-liveness-pid-reuse
+
+[recurrence: 2026-09-28]
+
+the Windows install-smoke leg's binding liveness step can red on a ground-truth flake. On the pin push's run for b799b176, row (a) read `measured nothing: ground truth read alive then alive` for Windows pid 6204, although the gate read held then free and `wait_gone` passed about 3s before the second read. The job was re-run rather than a push spent.
+
+**Inferred, cannot run before build:** the winpid was reused by another process between `wait_gone` and that read, so the truth read named a stranger — no local host reaches a Windows runner, so build's fix run on the leg is the first observation.
+
+**Recurred 2026-09-28 on row (bp)**, judged at companion-front-door-widening's close: gates run 36473045086 read `gate 1 alive, 1 gone, where 1 then 0 is owed`, truth gone and then `check-producer-liveness` reading Windows pid 4132 running.
+
+**Inferred, cannot run before build:** the same reuse, between the truth read and the gate's read — the same Windows-only reach.
+
+**Deliverable:** every row's reads keyed on more than the bare pid (the process start time), the gate's own read as well as the truth reads, or taken inside the wait. Taken now in the bash leg on an operator direction lead-relayed (not a /consult ruling), unit set D at this iteration's scope, accepting that [native-hook-dispatch](#native-hook-dispatch) retires the leg and the fix with it.
+
+**Push need (2026-09-28, inside the budget):** one mid-iteration push, since only the Windows install-smoke legs run the fixed step; with the closing push, two against the budget of two.
+
+**Cost while deferred:** a green push can red at random and costs a re-run or a hotfix push. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' close; promoted 2026-09-28 at the next iteration's scope: →fix fails because the fix is unprobed on a Windows host. Re-verified: `.github/workflows/gates.yml` reads `truth "${tpid[$r]}"` on the bare pid at both reads. Owner lookup: `winpid`, `pid reuse`, `liveness step` in this file — none; owner `.github/workflows/gates.yml`, with evidence-kit/SPEC.md §The producer-liveness lock.
 
 ## Deferred
 
@@ -360,6 +404,8 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 lifecycle-kit's sections above §Per-component contracts left 2026-09-28 at consult-inbox-front-brevity's scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `lifecycle-kit-front-brevity`.
 
+lifecycle-kit's state-machine tool sections left 2026-09-28 at this iteration's scope as [lifecycle-kit-machine-brevity](#lifecycle-kit-machine-brevity), on an operator direction lead-relayed (not a /consult ruling).
+
 ### prune-set-matches-walk-root-ancestors
 
 [cost: event/high] [surface: context-kit] [recurrence: 2026-09-25]
@@ -399,16 +445,6 @@ CONTRIBUTING.md promises an inbound issue or pull request a disposition within o
 **Deliverable:** either the cap carried on the public promise or a lane that honours it, and the disposition record named; CONTRIBUTING.md and the scope binding agree.
 
 **Cost while deferred:** the first contributor past the cap reads a promise the tree breaks. Filed 2026-07-31; returned from the icebox 2026-09-25 by consult, the promise and the cap re-read.
-
-### gate-tests-suite-identity-in-evidence
-
-[cost: iteration/low] [surface: evidence-kit] [recurrence: 2026-09-25]
-
-the evidence manifest's digest covers the suite's log bytes only (`run_validate.rs`), and the success line names no kit, so two suites with identical output share one hash while evidence-kit/SPEC.md §Baseline manifest says the digest "pins which run".
-
-**Deliverable:** the suite identity (kit and runner arguments) folded into the digest or carried beside it, and the SPEC's claim brought to what the digest proves.
-
-**Cost while deferred:** the attestation payload the paid rung would countersign cannot distinguish two suites. Filed 2026-08-01; returned from the icebox 2026-09-25 by consult, the hash input re-read.
 
 ### one-motion-commit-race-remains-open
 
@@ -523,16 +559,6 @@ the crates.io reservation page still carries the retired methodology description
 **Deliverable:** the reservation crate republished by the operator, and the live page reading the product statement.
 
 **Cost while deferred:** a reader searching crates.io meets a second product description, the one `one-product-statement` removed everywhere else. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's build; promoted 2026-09-27 at its close: →fix fails because the write is operator-only. Re-verified: the crates.io API returns the retired description at `max_version` 0.0.0. Owner lookup: `crates.io`, `reserve`, `republish` in this file — none; owner installer/SPEC.md §The dependency boundary.
-
-### truncation-reclaim-residue
-
-[cost: iteration/low] [surface: delegation-kit]
-
-delegation-kit/SPEC.md declares a truncation reclaim, `reclaim=: > <log>`, for both of its advisory close surfaces, `.workflow/subagent-stop-liveness.log` and `.workflow/wait-primitive-evidence.txt`, while gate-sdk/SPEC.md §The workflow directory rules that a capture log a close reads before draining drains by rotation through `--emit capture-drain`, never by truncation: a truncate after the read erases every line appended between the two. guard-kit's and drift-kit's capture logs already declare the rotation.
-
-**Deliverable:** both declarations moved to the `capture-drain` reclaim, and the close's read taken off the drain file.
-
-**Cost while deferred:** every close's reclaim of those logs can erase lines a live session appended after the read, and the truncation spelling compounded with other calls is what the harness classifier denied as audit-log tampering. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's close; promoted 2026-09-27 at the next iteration's scope: →fix fails because the move changes the close's read surface for two logs. Re-verified: `grep 'close-surface:'` over the kit SPECs shows the two truncation reclaims beside three `capture-drain` ones. Owner lookup: `reclaim`, `capture-drain`, `truncat` in this file — only the icebox's [close-surface-reclaim-uncoupled-from-read](#close-surface-reclaim-uncoupled-from-read), DISTINCT (whether the row was read, not the reclaim's form); owner delegation-kit/SPEC.md.
 
 ### truncation-compound-unsteered
 
@@ -705,18 +731,6 @@ the operator states that verification and workflow are fully decoupled, each shi
 **Deliverable:** the leg's oracles runnable locally before a package change commits, or the reader refusing what a YAML plain scalar cannot carry, with a `bad/` fixture holding the `: ` case.
 
 **Cost while deferred:** a front-matter slip is caught only by a push, which spends a hotfix from the budget. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' close; promoted 2026-09-28 at the next iteration's scope: →fix fails because a stricter reader changes a shipped gate's verdict. Re-verified: the reader above, and `.github/workflows/gates.yml` installs `skills-ref` in CI only. Owner lookup: `front matter`, `skills-ref`, `yaml` in this file — only the icebox's template-copy-parity-yaml-widening, DISTINCT (template copies); owner plugin/SPEC.md §check-plugin-parity.
-
-### windows-liveness-pid-reuse
-
-[cost: iteration/low] [surface: .github] [recurrence: 2026-09-28]
-
-the Windows install-smoke leg's binding liveness step can red on a ground-truth flake. On the pin push's run for b799b176, row (a) read `measured nothing: ground truth read alive then alive` for Windows pid 6204, although the gate read held then free and `wait_gone` passed about 3s before the second read. **Inferred, not run:** the winpid was reused by another process between `wait_gone` and that read, so the truth read named a stranger; the job was re-run rather than a push spent.
-
-**Recurred 2026-09-28 on row (bp)**, judged at companion-front-door-widening's close: gates run 36473045086 read `gate 1 alive, 1 gone, where 1 then 0 is owed`, truth gone and then `check-producer-liveness` reading Windows pid 4132 running. **Inferred, not run:** the same reuse, between the truth read and the gate's read.
-
-**Deliverable:** every row's reads keyed on more than the bare pid (the process start time), the gate's own read as well as the truth reads, or taken inside the wait. [native-hook-dispatch](#native-hook-dispatch) retires this leg, so the fix lands wherever the step then lives.
-
-**Cost while deferred:** a green push can red at random and costs a re-run or a hotfix push. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' close; promoted 2026-09-28 at the next iteration's scope: →fix fails because the fix is unprobed on a Windows host. Re-verified: `.github/workflows/gates.yml` reads `truth "${tpid[$r]}"` on the bare pid at both reads. Owner lookup: `winpid`, `pid reuse`, `liveness step` in this file — none; owner `.github/workflows/gates.yml`, with evidence-kit/SPEC.md §The producer-liveness lock.
 
 ### companion-spec-to-code-gates
 
