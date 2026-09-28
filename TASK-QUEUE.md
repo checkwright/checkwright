@@ -8,6 +8,20 @@
 
 ## New Features
 
+### companion-recipe-in-payload
+
+[spec: SPEC-recipe-payload.md]
+
+the OpenSpec recipe and its lifecycle layer are fetched by hand from raw.githubusercontent.com at a tag the adopter must type (docs/spec-toolkits.md §OpenSpec), because a recipe must match the installed gates and no GitHub Latest pointer exists: every release is a 0.x pre-release (installer/SPEC.md, the channel invariant's reader note). The Spec Kit extension already bundles its recipe. Operator question (lead session): why must the customer name a version instead of the latest.
+
+**Deliverable:** the payload carries the `companion/` recipes and `init` applies one, for instance through a flag naming the toolkit, so the recipe matches the running release with no version and no fetch; the consumer smoke's companion arm reads the recipe from the payload.
+
+**In set (2026-09-28, operator direction lead-relayed, not a /consult ruling):** companion-front-door-widening takes this entry; spec authors and promotes it.
+
+**Push need (2026-09-28, inside the budget):** the mid-iteration push, shared with [companion-gate-widening](#companion-gate-widening) and [piped-install-argument-witness](#piped-install-argument-witness): the `companion-toolkits` leg installs the extension with Spec Kit's own command only on CI.
+
+**Cost while deferred:** every OpenSpec adopter types a tag and fetches files by hand, and a mistyped tag installs a recipe that does not match the gates. Filed 2026-09-28 to the gap inbox by the lead after consult-inbox-front-brevity's close; promoted at the next iteration's scope. Re-verified: nothing under `native/src/installer/` names `companion`, and the packer derives its set from the kit roots, which `companion/` is not. Owner lookup: `recipe`, `payload` in this file — [companion-toolkit-profile](#companion-toolkit-profile) and [verify-workflow-decoupling](#verify-workflow-decoupling), DISTINCT (the submission, and the profile classification); owner companion/SPEC.md §Recipes, with installer/SPEC.md §The packer.
+
 ## Technical Debt
 
 ### uninstall-version-ask
@@ -745,20 +759,6 @@ the Windows install-smoke leg's binding liveness step can red on a ground-truth 
 **Deliverable:** row (a)'s second truth read keyed on more than the bare pid (the process start time), or taken inside the wait.
 
 **Cost while deferred:** a green push can red at random and costs a re-run or a hotfix push. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' close; promoted 2026-09-28 at the next iteration's scope: →fix fails because the fix is unprobed on a Windows host. Re-verified: `.github/workflows/gates.yml` reads `truth "${tpid[$r]}"` on the bare pid at both reads. Owner lookup: `winpid`, `pid reuse`, `liveness step` in this file — none; owner `.github/workflows/gates.yml`, with evidence-kit/SPEC.md §The producer-liveness lock.
-
-### companion-recipe-in-payload
-
-[cost: event/low] [surface: installer]
-
-the OpenSpec recipe and its lifecycle layer are fetched by hand from raw.githubusercontent.com at a tag the adopter must type (docs/spec-toolkits.md §OpenSpec), because a recipe must match the installed gates and no GitHub Latest pointer exists: every release is a 0.x pre-release (installer/SPEC.md, the channel invariant's reader note). The Spec Kit extension already bundles its recipe. Operator question (lead session): why must the customer name a version instead of the latest.
-
-**Deliverable:** the payload carries the `companion/` recipes and `init` applies one, for instance through a flag naming the toolkit, so the recipe matches the running release with no version and no fetch; the consumer smoke's companion arm reads the recipe from the payload.
-
-**In set (2026-09-28, operator direction lead-relayed, not a /consult ruling):** companion-front-door-widening takes this entry; spec authors and promotes it.
-
-**Push need (2026-09-28, inside the budget):** the mid-iteration push, shared with [companion-gate-widening](#companion-gate-widening) and [piped-install-argument-witness](#piped-install-argument-witness): the `companion-toolkits` leg installs the extension with Spec Kit's own command only on CI.
-
-**Cost while deferred:** every OpenSpec adopter types a tag and fetches files by hand, and a mistyped tag installs a recipe that does not match the gates. Filed 2026-09-28 to the gap inbox by the lead after consult-inbox-front-brevity's close; promoted at the next iteration's scope. Re-verified: nothing under `native/src/installer/` names `companion`, and the packer derives its set from the kit roots, which `companion/` is not. Owner lookup: `recipe`, `payload` in this file — [companion-toolkit-profile](#companion-toolkit-profile) and [verify-workflow-decoupling](#verify-workflow-decoupling), DISTINCT (the submission, and the profile classification); owner companion/SPEC.md §Recipes, with installer/SPEC.md §The packer.
 
 ### companion-gate-widening
 
