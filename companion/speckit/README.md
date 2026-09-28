@@ -24,3 +24,7 @@ The install needs git, and on Windows Git for Windows. It makes two commits: the
 
 - [Spec Kit and OpenSpec](https://checkwright.dev/spec-toolkits.html): what the gates catch in a spec tree, what makes CI the guarantee, which versions are tested, and the limits.
 - [The Checkwright repository](https://github.com/checkwright/checkwright), where this extension lives under `companion/speckit/`.
+
+## License
+
+Apache-2.0. The license text is `LICENSE` at the repository root.

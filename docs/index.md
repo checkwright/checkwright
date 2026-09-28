@@ -98,4 +98,4 @@ Where Checkwright sits against practices you may already run, one page per angle
 
 ## License
 
-Checkwright is Apache-2.0. Adoption is the goal.
+Checkwright is [Apache-2.0](https://github.com/checkwright/checkwright/blob/master/LICENSE). Adoption is the goal.

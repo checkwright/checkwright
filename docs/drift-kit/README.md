@@ -75,4 +75,8 @@ Run this arm the same way, from a source clone or a hand-vendored copy: it insta
 gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --run-consumer-smoke drift-kit   # report contract: sections, per-KPI rows, degradation, one-line --trend
 ```
+
+## License
+
+Apache-2.0. The license text is `LICENSE`, beside this file in an installed copy and at the repository root in the source tree.
 <!-- {% endraw %} -->

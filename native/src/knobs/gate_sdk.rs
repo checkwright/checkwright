@@ -169,6 +169,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("GATE_SDK_PROJECTION_ROSTER_SECTION", "").empty_takes_default(),
         Row::scalar("GATE_SDK_KIT_DIRS", "").empty_takes_default().words(),
         Row::scalar("GATE_SDK_PAYLOAD_WITHHOLD", "SPEC.md smoke").words(),
+        Row::scalar("GATE_SDK_PAYLOAD_LICENSE", "LICENSE"),
         Row::scalar("GATE_SDK_SPEC_BASE_URL", "").empty_takes_default(),
         Row::scalar("GATE_SDK_COMMIT_TYPES", "feat fix refactor perf docs test build ci chore style")
             .empty_takes_default().words(),

@@ -8,18 +8,6 @@
 
 ## New Features
 
-### license-text-and-alignment
-
-[spec: SPEC-license-text.md]
-
-the license text may not ship with the artifacts, and the license line differs across surfaces. `installer/package.json`'s `files` list carries no LICENSE and `installer/` holds none, so the npm package ships without the text, which Apache-2.0 section 4(a) asks a redistribution to give; no kit directory carries one either, and the release tarball's payload is unchecked. README.md links `[Apache-2.0](LICENSE)`, installer/README.md says `Apache-2.0.`, gate-sdk/README.md says "see the repository root", which names the adopter's root once vendored, and the other kit READMEs say nothing. Operator direction, 2026-09-28 (lead session): align the license line across the site and the READMEs.
-
-**Deliverable:** the text shipped in the npm package, the tarball and each vendored kit where redistribution needs it, and one license line on every README, linked where the link survives vendoring and the site mirror.
-
-**Taken for /spec 2026-09-28 at consult-inbox-front-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, the payload convention authored as an installer amendment.
-
-**Cost while deferred:** each published artifact redistributes without the license text. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' lead; promoted 2026-09-28 at the next iteration's scope, the site footer fixed inline there: →fix fails because shipping the text is a payload convention. Re-verified: the `files` list, and `ls` finds a LICENSE at the root only. Owner lookup: `license`, `licence` in this file — none; owner installer/SPEC.md, with each kit README.
-
 ## Technical Debt
 
 ### tier-only-rank-out-unruled
@@ -1445,5 +1433,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - consult-inbox
 - consult-inbox-drain-trigger
 - roadmap-horizon-motion-unowned
+- license-text-and-alignment
 
 ## Lessons Learned

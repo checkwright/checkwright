@@ -15,6 +15,7 @@ pub const KNOBS: &[&str] = &[
     "GATE_SDK_KIT_DIRS",
     "GATE_SDK_NATIVE_TARGETS_FILE",
     "GATE_SDK_NATIVE_BIN",
+    "GATE_SDK_PAYLOAD_LICENSE",
     "GATE_SDK_PAYLOAD_WITHHOLD",
     "GATE_SDK_SPEC_BASE_URL",
 ];
@@ -162,6 +163,8 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
 
     let version = resolve_version(&f.version)?;
 
+    let license = license_text(&commit, &walk::knob_scalar("GATE_SDK_PAYLOAD_LICENSE").map_err(refuse)?)?;
+
     // spec: installer/SPEC.md §The packer — the scratch base and its `TMPDIR` fallback, read off
     // the process environment: neither name is a kit knob, so neither may be declared
     let base = env_or("INSTALLER_PACK_TMP_DIR")
@@ -179,6 +182,7 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
     // spec: gate-sdk/SPEC.md §Consumer payload — the withheld shape reaches the kit roots alone:
     // `installer/` is packed whole, its own non-shipping content decided by the package roster
     pack_tracked(&commit, "installer", &asm, &[])?;
+    place_license(license.as_deref(), &asm)?;
 
     // spec: gate-sdk/SPEC.md §Consumer payload — one declared shape reaching every root the loop
     // yields, so the shipped set stays derived from the governed one; a per-kit roster would be the
@@ -210,6 +214,7 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
         let into = format!("{}/payload/{}", asm, leaf);
         pack_tracked(&commit, kit, &into, &withhold)?;
         rewritten += resolve_readme_links(&into, leaf, &spec_base_url)?;
+        place_license(license.as_deref(), &into)?;
         packed += 1;
     }
     if packed == 0 {
@@ -254,6 +259,56 @@ fn resolve_readme_links(into: &str, leaf: &str, base: &str) -> Result<usize, Ref
     }
     std::fs::write(&path, body).map_err(|e| refuse(format!("cannot write {}: {}", path, e)))?;
     Ok(count)
+}
+
+// spec: installer/SPEC.md §The packer — the license text comes from the stamped commit, so no
+// worktree edit reaches the placed bytes; an explicitly empty knob places nothing, and a set one
+// naming no regular file tracked there is a refusal rather than a redistribution without the text
+fn license_text(commit: &str, name: &str) -> Result<Option<Vec<u8>>, Refusal> {
+    let name = name.trim();
+    if name.is_empty() {
+        return Ok(None);
+    }
+    let short = &commit[..12.min(commit.len())];
+    let untracked = || {
+        refuse_help(
+            format!(
+                "GATE_SDK_PAYLOAD_LICENSE names {}, which is no regular file tracked at {}.",
+                name, short
+            ),
+            &["name the license file the tree tracks, or set the knob explicitly empty to place none."],
+        )
+    };
+    let listing = git(&["ls-tree", commit, "--", name]).map_err(|_| untracked())?;
+    let mut lines = listing.lines();
+    let (Some(line), None) = (lines.next(), lines.next()) else {
+        return Err(untracked());
+    };
+    let mut meta = line.split('\t').next().unwrap_or("").split_whitespace();
+    let (Some(mode), Some("blob"), Some(object)) = (meta.next(), meta.next(), meta.next()) else {
+        return Err(untracked());
+    };
+    if !mode.starts_with("100") {
+        return Err(untracked());
+    }
+    let done = proc::run(&programs::GIT, &["cat-file", "blob", object]).map_err(refuse)?;
+    match done.stdout() {
+        Some(b) => Ok(Some(b.to_vec())),
+        None => Err(refuse(format!(
+            "git cat-file could not read {} at {} — {}",
+            name,
+            short,
+            done.failure_report().unwrap_or_default()
+        ))),
+    }
+}
+
+fn place_license(text: Option<&[u8]>, dir: &str) -> Result<(), Refusal> {
+    let Some(bytes) = text else {
+        return Ok(());
+    };
+    let path = format!("{}/LICENSE", dir);
+    std::fs::write(&path, bytes).map_err(|e| refuse(format!("cannot write {}: {}", path, e)))
 }
 
 // spec: gate-sdk/SPEC.md §check-packed-links — the rewrite the gate replays: one function, so the
@@ -377,6 +432,10 @@ fn footprint(root: &str, artifacts: &str) -> Result<Vec<String>, Refusal> {
         if let Some(p) = inside(root, kit.trim_end_matches('/')) {
             spec.push(p);
         }
+    }
+    let license = walk::knob_scalar("GATE_SDK_PAYLOAD_LICENSE").map_err(refuse)?;
+    if let Some(p) = inside(root, license.trim()).filter(|_| !license.trim().is_empty()) {
+        spec.push(p);
     }
     if !artifacts.is_empty() {
         let roster = walk::knob_scalar("GATE_SDK_NATIVE_TARGETS_FILE").map_err(refuse)?;
@@ -877,6 +936,40 @@ mod tests {
             vec![root.clone()]
         );
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: installer/SPEC.md §The packer — the license text lands at the package root and in a
+    // packed kit root byte for byte, and an explicitly empty knob places nothing in either.
+    #[test]
+    fn the_license_text_is_placed_at_both_sites_and_empty_places_nothing() {
+        let dir = std::env::temp_dir().join(format!("cw-pack-license.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        let leaf = dir.join("payload").join("k-kit");
+        std::fs::create_dir_all(&leaf).expect("scratch assembly");
+        let asm = dir.display().to_string();
+        let kit = leaf.display().to_string();
+
+        assert_eq!(license_text(&"a".repeat(40), "").expect("empty is no refusal"), None);
+        assert_eq!(license_text(&"a".repeat(40), "  ").expect("blank is no refusal"), None);
+        place_license(None, &asm).expect("nothing to place");
+        assert!(!dir.join("LICENSE").exists());
+
+        let text = b"Apache License\nVersion 2.0\n";
+        place_license(Some(text), &asm).expect("package root placement");
+        place_license(Some(text), &kit).expect("kit root placement");
+        assert_eq!(std::fs::read(dir.join("LICENSE")).expect("root copy"), text);
+        assert_eq!(std::fs::read(leaf.join("LICENSE")).expect("kit copy"), text);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: installer/SPEC.md §The packer — a set knob naming no regular file tracked at the commit
+    // is a refusal: an absent path and a directory both refuse, whichever tree the test runs in.
+    #[test]
+    fn a_license_name_tracked_as_no_file_is_a_refusal() {
+        let absent = license_text("HEAD", "no-such-license-file.txt").expect_err("absent path refuses");
+        assert!(absent.cause.contains("GATE_SDK_PAYLOAD_LICENSE names no-such-license-file.txt"));
+        assert!(license_text("HEAD", "src").is_err());
+        assert!(license_text(&"0".repeat(40), "LICENSE").is_err());
     }
 
     // spec: gate-sdk/SPEC.md §Consumer payload — an empty base rewrites nothing and returns the

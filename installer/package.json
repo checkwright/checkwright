@@ -16,7 +16,8 @@
     "bin/",
     "payload/",
     "profiles.list",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "checkwright": {
     "commit": ""

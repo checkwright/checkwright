@@ -69,4 +69,8 @@ gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 ```
 
 The `usage-verdict` decision table and the `usage-trend` assertions are not shell runners: they live in the gate binary's crate test lane, where they read the same `usage-tests/` fixtures off disk and reach both subjects **in process** — no shell subject remains on either ([SPEC.md §Testing](SPEC.md#testing)).
+
+## License
+
+Apache-2.0. The license text is `LICENSE`, beside this file in an installed copy and at the repository root in the source tree.
 <!-- {% endraw %} -->

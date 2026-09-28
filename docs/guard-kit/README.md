@@ -71,4 +71,8 @@ Run this arm the same way:
 gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --run-guard-tests    # decision-table over the generic ruleset
 ```
+
+## License
+
+Apache-2.0. The license text is `LICENSE`, beside this file in an installed copy and at the repository root in the source tree.
 <!-- {% endraw %} -->

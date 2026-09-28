@@ -69,3 +69,7 @@ Run this arm with the gate binary `GATE_SDK_NATIVE_BIN` names, where `init` plac
 gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --run-gate-tests canon-kit/gate-tests canon-kit/checks
 ```
+
+## License
+
+Apache-2.0. The license text is `LICENSE`, beside this file in an installed copy and at the repository root in the source tree.

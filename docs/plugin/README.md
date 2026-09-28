@@ -33,4 +33,8 @@ If you already merged guard-kit's hook wiring into `.claude/settings.json`, keep
 ## Where the design lives
 
 [`plugin/SPEC.md`](SPEC.md): the two manifests, the skill roster and body, the hooks rendering, the marketplace pin, `check-plugin-parity`, the validation leg and the honest limits.
+
+## License
+
+Apache-2.0. The license text is `LICENSE`, beside this file in an installed copy and at the repository root in the source tree.
 <!-- {% endraw %} -->

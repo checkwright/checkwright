@@ -29,4 +29,8 @@ Both routes, what the gates catch in a spec tree and the tested versions are on 
 ## Where the design lives
 
 [`companion/SPEC.md`](SPEC.md): the recipe format and procedure, each recipe line with the idiom it answers, the lifecycle layer, the tested claim, the fixture rules, the extension's contract, the pack step, the toolkit legs and the honest limits.
+
+## License
+
+Apache-2.0. The license text is `LICENSE` at the repository root.
 <!-- {% endraw %} -->

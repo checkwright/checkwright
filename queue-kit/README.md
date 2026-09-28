@@ -77,3 +77,7 @@ Run this arm the same way:
 gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --run-gate-tests queue-kit/gate-tests queue-kit/checks
 ```
+
+## License
+
+Apache-2.0. The license text is `LICENSE`, beside this file in an installed copy and at the repository root in the source tree.

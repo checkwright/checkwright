@@ -716,6 +716,15 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
         || fail "$profile: the payload vendored withheld path(s) into the consumer: ${withheld% }"
     say "withholding: no kit SPEC.md and no kit smoke/ across ${#lock_kits[@]} vendored kit root(s)"
 
+    # spec: installer/SPEC.md §The packer — a vendored kit is a redistribution, so each vendored kit root carries the repository's license text as init wrote it from the payload
+    unlicensed=""
+    for k in "${lock_kits[@]}"; do
+        cmp -s "$REPO/LICENSE" "$C/$k/LICENSE" || unlicensed+="$k "
+    done
+    [[ -z "$unlicensed" ]] \
+        || fail "$profile: vendored kit root(s) carry no LICENSE equal to the repository's: ${unlicensed% }"
+    say "license: ${#lock_kits[@]} vendored kit root(s) carry the repository's LICENSE"
+
     # spec: installer/SPEC.md §What init seeds — green cannot witness the kit-root declaration: a root that drops out of the resolved set contributes no gate, and a battery over a smaller set is still a green battery, so this assertion COUNTS rather than reading a verdict. The manifest's kits key is the count already recorded, which is why no second roster is minted for it
     read_stream resolved_kits "resolved kit roots" < <( cd "$C" && PATH="$RUN_PATH" bash gate-sdk/bin/run-gates.sh --emit kit-roots )
     [[ "$(printf '%s\n' ${resolved_kits[@]+"${resolved_kits[@]}"} | LC_ALL=C sort)" \
@@ -1202,6 +1211,18 @@ shopt -u nullglob
 # spec: installer/SPEC.md §The consumer smoke — the leg proves its own premise, because a payload that quietly gained an artifact would be selected and verified and the refusal assertions would never run
 [[ ! -e "$BARE/package/payload/artifact" ]] \
     || fail "the artifact-less payload carries an artifact directory — the leg would assert a refusal against a payload with something to run"
+# spec: installer/SPEC.md §The packer — the license text is placed at the package root and in every packed kit root, each a byte copy of the repository's own file; a kit root is counted by its README so the artifact directory is never asked for one
+cmp -s "$REPO/LICENSE" "$BARE/package/LICENSE" \
+    || fail "the packed package carries no LICENSE equal to the repository's — the packer did not place the license text at the package root"
+licensed=0
+for readme in "$BARE"/package/payload/*/README.md; do
+    kit_dir="${readme%/README.md}"
+    cmp -s "$REPO/LICENSE" "$kit_dir/LICENSE" \
+        || fail "the packed kit ${kit_dir##*/} carries no LICENSE equal to the repository's — the packer did not place the license text in it"
+    licensed=$((licensed + 1))
+done
+[[ "$licensed" -gt 0 ]] || fail "the packed payload carries no kit README, so the license assertion checked nothing"
+say "license: the package root and $licensed packed kit root(s) carry the repository's LICENSE"
 
 C="$(consumer artifact-less)" || fail "could not build a scratch consumer for the artifact-less refusal leg"
 BARE_SEED="$(git -C "$C" rev-parse 'HEAD^{tree}')"

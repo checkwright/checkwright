@@ -57,3 +57,7 @@ gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --run-gate-tests context-kit/gate-tests context-kit/checks  # the gate fixture pairs
 "$gates" --run-index-tests                               # the advisory tools vs golden output
 ```
+
+## License
+
+Apache-2.0. The license text is `LICENSE`, beside this file in an installed copy and at the repository root in the source tree.

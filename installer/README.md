@@ -61,4 +61,6 @@ and the consumer smoke.
 
 <https://checkwright.dev> and <https://github.com/checkwright/checkwright>.
 
-Apache-2.0.
+## License
+
+Apache-2.0. The license text is [LICENSE](https://github.com/checkwright/checkwright/blob/master/LICENSE), shipped beside this file in the package.
