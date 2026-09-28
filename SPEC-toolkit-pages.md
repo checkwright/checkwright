@@ -45,7 +45,7 @@ One queue entry pairs it: [install-toolkit-page-structure](TASK-QUEUE.md#install
 - the moved §OpenSpec install sentence and its `companion-install` block;
 - the recipe sentence;
 - the **Keep each title unique within a spec** paragraph;
-- the lifecycle paragraph and its `companion-lifecycle` block;
+- the lifecycle paragraph and its `companion-full` block;
 - the same closing pointer to the overview.
 
 This delta's act depends on [companion-recipe-in-payload](TASK-QUEUE.md#companion-recipe-in-payload). If that unit landed in an earlier batch, the two marker blocks move from `docs/spec-toolkits.md` to `docs/openspec.md` unchanged. If it lands in this batch, its amendment's delta 6 writes them onto `docs/openspec.md` directly. This unit never lands before it, because the OpenSpec section it moves still carries the pasted recipe block until that unit retires it.
@@ -54,7 +54,7 @@ This delta's act depends on [companion-recipe-in-payload](TASK-QUEUE.md#companio
 
 **Not yet applied.** Each reader that names the OpenSpec blocks' page names `docs/openspec.md`:
 
-- `installer/consumer-smoke/run-smoke.sh`'s companion arm reads the OpenSpec `companion-install` and `companion-lifecycle` blocks from `docs/openspec.md`;
+- `installer/consumer-smoke/run-smoke.sh`'s companion arm reads the OpenSpec `companion-install` and `companion-full` blocks from `docs/openspec.md`;
 - installer/SPEC.md §The consumer smoke's companion-arm paragraph says *`docs/openspec.md`'s for OpenSpec* where it says *the landing page's for OpenSpec*;
 - docs/site-architecture.md §Generated projections and their freshness gates, the **toolkit install lines** bullet, names `docs/openspec.md` as the page carrying the two blocks;
 - companion/SPEC.md §Applying a recipe says *on the OpenSpec page, `docs/openspec.md`* where it says *on the landing page*.
