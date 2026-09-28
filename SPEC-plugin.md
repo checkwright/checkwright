@@ -120,7 +120,7 @@ Checkwright is in no harness plugin catalog, and adopters now find enforcement t
 - **The skills.** It validates each skill directory with the Agent Skills reference validator, `skills-ref validate <dir>`. That library says it is for demonstration and not production, so its commit is pinned and a finding it raises is read against the Agent Skills specification before a skill is changed for it.
 - **The build session runs the same commands locally.** It also installs the plugin into a scratch harness config from a scratch marketplace with a relative source. That run shows the skills registered, and a guard firing in a vendored scratch repository and staying silent in an empty one.
 
-**Inferred, not run:** the Agent Skills validator installs from its repository's subdirectory with pip — pip install "git+https://github.com/agentskills/agentskills@<sha>#subdirectory=skills-ref" && skills-ref validate plugin/skills/scope
+Measured at authoring: in a fresh virtual environment, `pip install "git+https://github.com/agentskills/agentskills@69ef37e9424c0a7ea9dd2293b559e43ec8176379#subdirectory=skills-ref"` installed the validator, and `skills-ref validate` on the scratch `scope` skill printed `Valid skill`. That commit is the job's pin.
 
 Measured at authoring: `CLAUDE_CONFIG_DIR=<scratch> claude plugin marketplace list` printed `No marketplaces configured` where the unset form lists the operator's own, so a scratch install leaves the operator's config untouched.
 
