@@ -44,6 +44,18 @@ a roadmap horizon moves only when a `/consult` happens to re-tag it. The consult
 
 **Cost while deferred:** the public roadmap lags direction until an operator-started consult notices. Filed 2026-09-26 to the gap inbox by the lead on an operator question; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because the signal is new mechanism on two surfaces. Re-verified at the drain: the consult binding's one roadmap hit is the projection sentence, and `--emit roadmap` printed now/ empty before the re-tag. Owner lookup: `horizon`, `consult-owed` in this file — no entry about motion.
 
+### license-text-and-alignment
+
+[spec: SPEC-license-text.md]
+
+the license text may not ship with the artifacts, and the license line differs across surfaces. `installer/package.json`'s `files` list carries no LICENSE and `installer/` holds none, so the npm package ships without the text, which Apache-2.0 section 4(a) asks a redistribution to give; no kit directory carries one either, and the release tarball's payload is unchecked. README.md links `[Apache-2.0](LICENSE)`, installer/README.md says `Apache-2.0.`, gate-sdk/README.md says "see the repository root", which names the adopter's root once vendored, and the other kit READMEs say nothing. Operator direction, 2026-09-28 (lead session): align the license line across the site and the READMEs.
+
+**Deliverable:** the text shipped in the npm package, the tarball and each vendored kit where redistribution needs it, and one license line on every README, linked where the link survives vendoring and the site mirror.
+
+**Taken for /spec 2026-09-28 at consult-inbox-front-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, the payload convention authored as an installer amendment.
+
+**Cost while deferred:** each published artifact redistributes without the license text. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' lead; promoted 2026-09-28 at the next iteration's scope, the site footer fixed inline there: →fix fails because shipping the text is a payload convention. Re-verified: the `files` list, and `ls` finds a LICENSE at the root only. Owner lookup: `license`, `licence` in this file — none; owner installer/SPEC.md, with each kit README.
+
 ## Technical Debt
 
 ### tier-only-rank-out-unruled
@@ -791,18 +803,6 @@ the Windows install-smoke leg's binding liveness step can red on a ground-truth 
 **Deliverable:** row (a)'s second truth read keyed on more than the bare pid (the process start time), or taken inside the wait.
 
 **Cost while deferred:** a green push can red at random and costs a re-run or a hotfix push. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' close; promoted 2026-09-28 at the next iteration's scope: →fix fails because the fix is unprobed on a Windows host. Re-verified: `.github/workflows/gates.yml` reads `truth "${tpid[$r]}"` on the bare pid at both reads. Owner lookup: `winpid`, `pid reuse`, `liveness step` in this file — none; owner `.github/workflows/gates.yml`, with evidence-kit/SPEC.md §The producer-liveness lock.
-
-### license-text-and-alignment
-
-[cost: event/low] [surface: installer]
-
-the license text may not ship with the artifacts, and the license line differs across surfaces. `installer/package.json`'s `files` list carries no LICENSE and `installer/` holds none, so the npm package ships without the text, which Apache-2.0 section 4(a) asks a redistribution to give; no kit directory carries one either, and the release tarball's payload is unchecked. README.md links `[Apache-2.0](LICENSE)`, installer/README.md says `Apache-2.0.`, gate-sdk/README.md says "see the repository root", which names the adopter's root once vendored, and the other kit READMEs say nothing. Operator direction, 2026-09-28 (lead session): align the license line across the site and the READMEs.
-
-**Deliverable:** the text shipped in the npm package, the tarball and each vendored kit where redistribution needs it, and one license line on every README, linked where the link survives vendoring and the site mirror.
-
-**Taken for /spec 2026-09-28 at consult-inbox-front-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, the payload convention authored as an installer amendment.
-
-**Cost while deferred:** each published artifact redistributes without the license text. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' lead; promoted 2026-09-28 at the next iteration's scope, the site footer fixed inline there: →fix fails because shipping the text is a payload convention. Re-verified: the `files` list, and `ls` finds a LICENSE at the root only. Owner lookup: `license`, `licence` in this file — none; owner installer/SPEC.md, with each kit README.
 
 ## Icebox
 
