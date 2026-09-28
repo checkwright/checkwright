@@ -10,24 +10,6 @@
 
 ## Technical Debt
 
-### windows-liveness-pid-reuse
-
-[recurrence: 2026-09-28]
-
-the Windows install-smoke leg's binding liveness step can red on a ground-truth flake. On the pin push's run for b799b176, row (a) read `measured nothing: ground truth read alive then alive` for Windows pid 6204, although the gate read held then free and `wait_gone` passed about 3s before the second read. The job was re-run rather than a push spent.
-
-**Inferred, cannot run before build:** the winpid was reused by another process between `wait_gone` and that read, so the truth read named a stranger — no local host reaches a Windows runner, so build's fix run on the leg is the first observation.
-
-**Recurred 2026-09-28 on row (bp)**, judged at companion-front-door-widening's close: gates run 36473045086 read `gate 1 alive, 1 gone, where 1 then 0 is owed`, truth gone and then `check-producer-liveness` reading Windows pid 4132 running.
-
-**Inferred, cannot run before build:** the same reuse, between the truth read and the gate's read — the same Windows-only reach.
-
-**Deliverable:** every row's reads keyed on more than the bare pid (the process start time), the gate's own read as well as the truth reads, or taken inside the wait. Taken now in the bash leg on an operator direction lead-relayed (not a /consult ruling), unit set D at this iteration's scope, accepting that [native-hook-dispatch](#native-hook-dispatch) retires the leg and the fix with it.
-
-**Push need (2026-09-28, inside the budget):** one mid-iteration push, since only the Windows install-smoke legs run the fixed step; with the closing push, two against the budget of two.
-
-**Cost while deferred:** a green push can red at random and costs a re-run or a hotfix push. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' close; promoted 2026-09-28 at the next iteration's scope: →fix fails because the fix is unprobed on a Windows host. Re-verified: `.github/workflows/gates.yml` reads `truth "${tpid[$r]}"` on the bare pid at both reads. Owner lookup: `winpid`, `pid reuse`, `liveness step` in this file — none; owner `.github/workflows/gates.yml`, with evidence-kit/SPEC.md §The producer-liveness lock.
-
 ## Deferred
 
 ### shellcheck-extra-dirs-trigger
@@ -756,7 +738,7 @@ native Windows still needs Git for Windows' bash, through the generated pre-comm
 
 **Deliverable:** hook dispatch moved into the binary, the hook one line handing off to it, after first probing whether Git for Windows runs a hook without sh; docs/install.md stating which shell, if any, the hook and battery need on native Windows. Operator direction: `install-smoke-sh-windows` and `-arm64` then retire, their full consumer-smoke coverage (init, battery, hooks, upgrade, uninstall) moving to the PowerShell legs under a non-bash smoke driver. Fallback only if sh stays: a Windows-on-ARM note and fewer spawns; splitting the job is not wanted. Still bash after: custom shell gates and the no-port harness templates.
 
-**Cost while deferred:** every push waits on the emulated leg, and a native-Windows adopter carries bash for a hook. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; promoted 2026-09-28 at the next iteration's scope: →fix fails because the dispatch is new mechanism. Owner lookup: `generated hook`, `hook dispatch` in this file — [custom-gate-substrates](#custom-gate-substrates), DISTINCT (the adopter's gate substrates; this is the hook Checkwright generates), reshaped by it; [windows-liveness-pid-reuse](#windows-liveness-pid-reuse) lives on a retired leg. Owner gate-sdk/SPEC.md, with installer/SPEC.md §The consumer smoke and §The install boundary.
+**Cost while deferred:** every push waits on the emulated leg, and a native-Windows adopter carries bash for a hook. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; promoted 2026-09-28 at the next iteration's scope: →fix fails because the dispatch is new mechanism. Owner lookup: `generated hook`, `hook dispatch` in this file — [custom-gate-substrates](#custom-gate-substrates), DISTINCT (the adopter's gate substrates; this is the hook Checkwright generates), reshaped by it; `windows-liveness-pid-reuse` lives on a retired leg. Owner gate-sdk/SPEC.md, with installer/SPEC.md §The consumer smoke and §The install boundary.
 
 ### gate-customer-value-audit
 
@@ -1465,5 +1447,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - lifecycle-kit-machine-brevity
 - truncation-reclaim-residue
 - gate-tests-suite-identity-in-evidence
+- windows-liveness-pid-reuse
 
 ## Lessons Learned
