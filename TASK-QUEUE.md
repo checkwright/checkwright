@@ -1424,15 +1424,4 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 ## Done
 
-- install-platform-release-gap
-- consumer-scratch-unignored
-- foreign-spec-lifecycle-unowned
-- windows-fresh-fixture-stub
-- linux-glibc-artifacts
-- crate-tests-windows-flip
-- spec-toolkits-guarantee
-- catalog-landing-docs-polish
-- musl-smoke-build-wrapper
-- musl-dev-binary
-
 ## Lessons Learned
