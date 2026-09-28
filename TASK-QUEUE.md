@@ -8,6 +8,20 @@
 
 ## New Features
 
+### queue-write-side-verb
+
+[spec: SPEC-queue-verbs.md] [recurrence: 2026-09-27, 2026-09-28]
+
+the queue has gates and read arms but no write commands, so every restructure (promote, Done move, icebox, de-icebox, defer, split, recurrence stamp) is a hand edit the gates check only after the fact, and an entry's history (filed, promoted, iceboxed, returned) is reconstructed by hand from git. Filed 2026-08-12 on five throwaway queue scripts measured in one iteration; iceboxed 2026-09-11 as machinery-class. The lead measured 1293 commits touching TASK-QUEUE.md in the month to 2026-09-27, reconstructed entry histories by hand about six times in one session, and saw a scope session misread one. Operator direction, 2026-09-27 (lead session): such commands would be beneficial.
+
+**The allowlist ground.** A raw Edit of the queue cannot be allowlisted narrowly, since a path rule grants every edit, while a write verb on the gate binary is one allowlist line scoped to its operation and post-checked by the queue gates. Operator direction, 2026-09-28 (lead session): weigh promoting it so the verbs can be explicitly allowlisted. Measured at spec: this repository's front-end and door grants already reach any new arm, so the verbs land granted.
+
+**Deliverable:** queue-kit write commands for that operation set, with the queue gates as their post-check, and a `queue-history <slug>` read printing each transition's date and commit.
+
+**Taken for /spec 2026-09-28 at plugin-marketplace-queue-verbs' scope, operator direction lead-relayed (not a /consult ruling):** entered on the recurrence threshold. It reshapes [recurrence-declaration-grammar-ungated](#recurrence-declaration-grammar-ungated), which shares its date parser, and record-stamp-encoding-compression, since one stamp writer makes that re-encoding a one-writer change.
+
+**Cost while deferred:** every queue restructure is a hand edit, and each history question costs several git calls with a misread risk. Re-filed 2026-09-27 to the gap inbox by platform-prerequisite-floors' lead, widened from one write verb to the operation set and a history read; returned from the icebox at its close on a judged recurrence: →fix fails because the commands are new governed names. Re-filed 2026-09-28 by catalog-submission-preconditions' lead, after the permission classifier denied close's Edit clearing Done. Re-verified: `git log --since=2026-08-27 -- TASK-QUEUE.md` lists 1291 commits at the close, and the evicting commit bd3dab89 holds the original body. Owner: queue-kit/SPEC.md §Per-component contracts.
+
 ## Technical Debt
 
 ### recurrence-declaration-grammar-ungated
@@ -613,20 +627,6 @@ shell-guard splits a compounded emitter write out of a compound (rule `emitter_w
 **Deliverable:** a compounded statement that alone matches an exact committed allow entry steered to its own call, in whichever rule owns the shape, with a `good/`+`bad/` fixture pair.
 
 **Cost while deferred:** a session compounding a granted truncation meets an out-of-band decision, which a classifier may deny. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's close; promoted 2026-09-27 at the next iteration's scope: →fix fails because choosing the owning rule is a design call on a shipped guard. Re-verified: a hook payload `grep -c x TASK-QUEUE.md; : > .workflow/subagent-stop-liveness.log` exits 0 with no steer, while the same compound with `echo hi >` is steered. Owner lookup: `compound`, `truncat` in this file — only the icebox's rejected-compound-commit-relabel, DISTINCT (a commit retry); owner guard-kit/SPEC.md §The generic ruleset.
-
-### queue-write-side-verb
-
-[cost: iteration/low] [surface: queue-kit] [recurrence: 2026-09-27, 2026-09-28]
-
-the queue has gates and read arms but no write commands, so every restructure (promote, Done move, icebox, de-icebox, defer, split, recurrence stamp) is a hand edit the gates check only after the fact, and an entry's history (filed, promoted, iceboxed, returned) is reconstructed by hand from git. Filed 2026-08-12 on five throwaway queue scripts measured in one iteration; iceboxed 2026-09-11 as machinery-class. The lead measured 1293 commits touching TASK-QUEUE.md in the month to 2026-09-27, reconstructed entry histories by hand about six times in one session, and saw a scope session misread one. Operator direction, 2026-09-27 (lead session): such commands would be beneficial.
-
-**The allowlist ground.** A raw Edit of the queue cannot be allowlisted narrowly, since a path rule grants every edit, while a write verb on the gate binary is one allowlist line scoped to its operation and post-checked by the queue gates. Operator direction, 2026-09-28 (lead session): weigh promoting it so the verbs can be explicitly allowlisted.
-
-**Deliverable:** queue-kit write commands for that operation set, with the queue gates as their post-check, and a `queue-history <slug>` read printing each transition's date and commit.
-
-**Taken for /spec 2026-09-28 at plugin-marketplace-queue-verbs' scope, operator direction lead-relayed (not a /consult ruling):** entered on the recurrence threshold. It reshapes [recurrence-declaration-grammar-ungated](#recurrence-declaration-grammar-ungated), which shares its date parser, and record-stamp-encoding-compression, since one stamp writer makes that re-encoding a one-writer change.
-
-**Cost while deferred:** every queue restructure is a hand edit, and each history question costs several git calls with a misread risk. Re-filed 2026-09-27 to the gap inbox by platform-prerequisite-floors' lead, widened from one write verb to the operation set and a history read; returned from the icebox at its close on a judged recurrence: →fix fails because the commands are new governed names. Re-filed 2026-09-28 by catalog-submission-preconditions' lead, after the permission classifier denied close's Edit clearing Done. Re-verified: `git log --since=2026-08-27 -- TASK-QUEUE.md` lists 1291 commits at the close, and the evicting commit bd3dab89 holds the original body. Owner: queue-kit/SPEC.md §Per-component contracts.
 
 ### manual-operation-spend-channel
 
