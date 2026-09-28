@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### gate-tests-suite-identity-in-evidence
-
-[recurrence: 2026-09-25]
-
-the evidence manifest's digest covers the suite's log bytes only (`run_validate.rs`), so two suites with identical output share one hash while evidence-kit/SPEC.md §Baseline manifest says the digest "pins which run produced the counts". **Premise corrected 2026-09-28 at scope:** each manifest line already carries its `<suite>` key beside the hash (`<iteration> <suite> sha256=<log-hash> …`), so the residue is the runner arguments behind that key and the SPEC's claim.
-
-**Deliverable:** the runner arguments folded into the digest or carried beside it, or the SPEC's claim brought to what the digest and the suite key prove.
-
-**Cost while deferred:** the attestation payload the paid rung would countersign cannot distinguish two suites. Filed 2026-08-01; returned from the icebox 2026-09-25 by consult, the hash input re-read.
-
 ### windows-liveness-pid-reuse
 
 [recurrence: 2026-09-28]
@@ -1474,5 +1464,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 - lifecycle-kit-machine-brevity
 - truncation-reclaim-residue
+- gate-tests-suite-identity-in-evidence
 
 ## Lessons Learned
