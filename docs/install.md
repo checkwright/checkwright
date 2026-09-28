@@ -80,6 +80,14 @@ There is no supported path today: a compiled gate is a subcommand of the publish
 
 Run the one line for your system from your repository's root, in a new project or an existing one with every change committed: `init` makes one commit and refuses a dirty worktree. The line downloads the newest Release tarball, checks it against its published digest, unpacks it outside your repository and runs `init`, with no runtime to install first. A step-by-step form sits under each line. For it, pick a version from the [releases](https://github.com/checkwright/checkwright/releases) page and put it in place of `X.Y.Z` on its first line. With Node, `npx checkwright init` does the same ([With Node](#with-node)).
 
+Pick your route:
+
+- **macOS or Linux:** [the one line and its steps](#macos-and-linux).
+- **Windows:** [natively, in PowerShell](#windows).
+- **Windows through WSL:** the [macOS and Linux](#macos-and-linux) line, in your WSL shell. The install places the Linux gate binary and the pre-commit hook runs it, so commit to that repository from WSL too: Git for Windows cannot start the Linux binary.
+- **With Node:** [`npx checkwright init`](#with-node).
+- **In Claude Code:** [the plugin marketplace](#from-a-plugin-marketplace).
+
 ### Try it first
 
 `demo` in place of `init` runs the whole arc in a scratch repository of its own and removes it, without touching yours: it installs the `full` profile, runs the battery green, commits a task marked done with no evidence behind it and shows the claim caught, then withdraws the claim and runs green again. Its spellings are `sh -s -- demo` on the macOS and Linux line or the script-block form with `demo` on Windows; with Node, `npx checkwright demo`. `full` owes `bash` 4.3 or later ([Requirements](#requirements)). On stock macOS run the Homebrew bash block below first; on Windows, the `PATH` block.
@@ -140,6 +148,8 @@ To uninstall, `sh "$cw/package/bin/checkwright.sh" uninstall` reverses it in one
 </details>
 
 ### Windows
+
+This is the native Windows route. Under WSL, take [macOS and Linux](#macos-and-linux).
 
 **You need** the tools [Requirements](#requirements) lists for installing on Windows, where the minimum Windows version is stated too. Git for Windows' bash is also what runs any shell gate you write ([Writing your own shell gates](#writing-your-own-shell-gates)).
 

@@ -22,7 +22,7 @@ The install needs git, and on Windows Git for Windows. It makes one commit.
 
 ## Learn more
 
-- [Spec Kit and OpenSpec](https://checkwright.dev/spec-toolkits.html): what the gates catch in a spec tree, what makes CI the guarantee, which versions are tested, and the limits.
+- [Checkwright for Spec Kit](https://checkwright.dev/speckit.html): the install, the `full` line that installs every kit, and a link on to what the gates catch in a spec tree, what makes CI the guarantee, which versions are tested, and the limits.
 - [The Checkwright repository](https://github.com/checkwright/checkwright), where this extension lives under `companion/speckit/`.
 
 ## License

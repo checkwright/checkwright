@@ -1037,19 +1037,17 @@ say "demo extra: refused at exit 2 with the usage line"
 COMPANION="$REPO/companion"
 # spec: companion/SPEC.md §The tested claim — the claimed gates, spelled here as the claim's oracle so a fixture tree missing a defect directory reds rather than shrinking the claim
 COMPANION_CLAIMED=(check-md-refs check-spec-pointer check-spec-fence-balance check-docs-cmd)
-companion_block() {   # $1 = a markdown file, $2 = marker name, $3 = a `## ` section title or empty for the whole file -> the block's lines, fences and blank lines dropped
-    awk -v b="<!-- $2:begin -->" -v e="<!-- $2:end -->" -v s="$3" '
-        /^## / { in_s = (s == "" || $0 == "## " s) }
-        s == "" { in_s = 1 }
+companion_block() {   # $1 = a markdown file, $2 = marker name -> the block's lines, fences and blank lines dropped
+    awk -v b="<!-- $2:begin -->" -v e="<!-- $2:end -->" '
         $0 == e { f = 0 }
-        f && in_s && NF && $0 !~ /^```/ { print }
+        f && NF && $0 !~ /^```/ { print }
         $0 == b { f = 1 }
     ' "$1"
 }
 companion_why() { printf 'companion arm: %s\n' "$*" >&2; return 1; }
-companion_line() {   # $1 = a markdown file, $2 = marker name, $3 = the words the line must carry, $4 = its `## ` section or empty -> the line's words from init to its end, one per line; the cause on stderr and 1 otherwise
-    local block words where="${1#"$REPO"/}${4:+ §$4}"
-    block="$(companion_block "$1" "$2" "${4:-}")"
+companion_line() {   # $1 = a markdown file, $2 = marker name, $3 = the words the line must carry -> the line's words from init to its end, one per line; the cause on stderr and 1 otherwise
+    local block words where="${1#"$REPO"/}"
+    block="$(companion_block "$1" "$2")"
     [[ -n "$block" ]] || { companion_why "$where carries no $2 block, or an empty one, so there is no documented line to run"; return 1; }
     [[ "$(wc -l <<<"$block")" -eq 1 ]] || { companion_why "the $2 block in $where holds more than one line"; return 1; }
     words="$(awk '{ for (i = 1; i <= NF; i++) if ($i == "init") { for (j = i; j <= NF; j++) print $j; exit } }' <<<"$block")"
@@ -1117,7 +1115,6 @@ companion_arm() {   # $1 = toolkit, $2 = label, $3.. = the line's words from ini
         say "$label: defects/$gate/ reds $gate"
     done
 }
-COMPANION_PAGE="$REPO/docs/spec-toolkits.md"
 printf 'companion arm for speckit (the Spec Kit recipe on its fixture tree, through the extension install command'"'"'s line)\n'
 out="$(companion_line "$COMPANION/speckit/commands/install.md" companion-install --recipe)" \
     || fail "companion arm, speckit: the extension install command carries no install line to run"
@@ -1126,22 +1123,23 @@ companion_arm speckit speckit "${COMPANION_WORDS[@]}"
 COMPANION_DONE+=(speckit)
 # spec: companion/SPEC.md §The two tiers — the Spec Kit full line on a second consumer, green and catching each planted defect again
 printf 'companion arm for speckit full (the Spec Kit page'"'"'s full line on its fixture tree)\n'
-out="$(companion_line "$COMPANION_PAGE" companion-full "--profile full" "Spec Kit")" \
-    || fail "companion arm, speckit full: the Spec Kit section carries no full line to run"
+out="$(companion_line "$REPO/docs/speckit.md" companion-full "--profile full")" \
+    || fail "companion arm, speckit full: the Spec Kit page carries no full line to run"
 mapfile -t COMPANION_WORDS <<<"$out"
 companion_arm speckit speckit-full "${COMPANION_WORDS[@]}"
-printf 'companion arm for openspec (the OpenSpec recipe on its fixture tree, through the landing page'"'"'s line)\n'
-out="$(companion_line "$COMPANION_PAGE" companion-install --recipe OpenSpec)" \
-    || fail "companion arm, openspec: the OpenSpec section carries no install line to run"
+COMPANION_OPENSPEC_PAGE="$REPO/docs/openspec.md"
+printf 'companion arm for openspec (the OpenSpec recipe on its fixture tree, through the OpenSpec page'"'"'s line)\n'
+out="$(companion_line "$COMPANION_OPENSPEC_PAGE" companion-install --recipe)" \
+    || fail "companion arm, openspec: the OpenSpec page carries no install line to run"
 mapfile -t COMPANION_WORDS <<<"$out"
 companion_arm openspec openspec "${COMPANION_WORDS[@]}"
 COMPANION_DONE+=(openspec)
 # spec: companion/SPEC.md §The lifecycle layer — the OpenSpec companion-full line, the recipe and the layer on a full install, the audit asserted to fire on a change touching two capabilities at a build cursor with no align stamp, and to clear once the change touches one
-printf 'companion arm for openspec lifecycle (the landing page'"'"'s full line, check-stage-entry over the lifecycle overlay)\n'
+printf 'companion arm for openspec lifecycle (the OpenSpec page'"'"'s full line, check-stage-entry over the lifecycle overlay)\n'
 COMPANION_LC="$COMPANION/fixtures/openspec/lifecycle"
 mapfile -t COMPANION_LC_DELTAS < <(cd "$COMPANION_LC" && find openspec/changes -path '*/specs/*/spec.md' | sort)
 [[ ${#COMPANION_LC_DELTAS[@]} -gt 0 ]] || fail "companion arm, openspec lifecycle: the overlay under companion/fixtures/openspec/lifecycle/ carries no change delta, so no second component is planted"
-out="$(companion_line "$COMPANION_PAGE" companion-full "--profile full" OpenSpec)" || fail "companion arm, openspec lifecycle: the OpenSpec section carries no full line to run"
+out="$(companion_line "$COMPANION_OPENSPEC_PAGE" companion-full "--profile full")" || fail "companion arm, openspec lifecycle: the OpenSpec page carries no full line to run"
 mapfile -t COMPANION_LC_WORDS <<<"$out"
 c="$(companion_consumer openspec openspec-lifecycle "${COMPANION_LC_WORDS[@]}")" \
     || fail "companion arm, openspec lifecycle: could not install ${COMPANION_LC_WORDS[*]} on the fixture tree"

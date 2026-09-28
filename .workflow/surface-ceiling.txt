@@ -17,7 +17,7 @@
 12431cp CLAUDE.md
 260014cp canon-kit/SPEC.md
 5785cp canon-kit/templates/SPEC-amendment.md
-17037cp companion/SPEC.md
+17059cp companion/SPEC.md
 130174cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
 270244cp delegation-kit/SPEC.md
@@ -33,10 +33,11 @@
 1472cp docs/gate-sdk/index.md
 1259cp docs/guard-kit/index.md
 5331cp docs/index.md
-16979cp docs/install.md
+17592cp docs/install.md
 1344cp docs/kits.md
 1395cp docs/lifecycle-kit/index.md
 3007cp docs/methodology.md
+1618cp docs/openspec.md
 11044cp docs/orchestration.md
 11075cp docs/positioning.md
 1869cp docs/posts/2026-07-09-announcing-checkwright.md
@@ -70,9 +71,10 @@
 3158cp docs/posts/2026-09-28-checkwright-v0-28-0.md
 1440cp docs/queue-kit/index.md
 789cp docs/releases.md
-39999cp docs/site-architecture.md
+39953cp docs/site-architecture.md
 2412cp docs/site-kit/index.md
-6295cp docs/spec-toolkits.md
+3387cp docs/spec-toolkits.md
+2002cp docs/speckit.md
 2520cp docs/value.md
 35405cp doctrine-kit/SPEC.md
 141064cp drift-kit/SPEC.md
@@ -82,7 +84,7 @@
 935142cp gate-sdk/SPEC.md
 301516cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
-282656cp installer/SPEC.md
+282571cp installer/SPEC.md
 364185cp lifecycle-kit/SPEC.md
 4909cp lifecycle-kit/templates/consult.md
 41046cp lifecycle-kit/templates/lead.md
