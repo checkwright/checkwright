@@ -12,11 +12,11 @@ consult-inbox-front-brevity queue_kit sha256=b7bfa7255550172f076ff11d2a619cd3608
 consult-inbox-front-brevity site_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
 consult-inbox-front-brevity scripts sha256=da678c039ae878171ffba00a2eb2a494bb220207cca3ead47cb04a839e6ddd81 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
 consult-inbox-front-brevity guard_tests sha256=50af7da51cc1a15eb9e72dea81613ec0b82b4b73a8faba1987ef537271e9ee9a pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
-consult-inbox-front-brevity demo sha256=1c2341b4883dba8575845f09d19a192100e7010652b6aec461c0a7cd7a7c15c7 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
-consult-inbox-front-brevity installer_smoke sha256=f2c4063a043ea7d49777e7e48625f25b090606459c8d25994b73e2e54b8336b7 pass=21 fail=0 ignore=0 verdict=clean 2026-09-28
-consult-inbox-front-brevity consumer_smoke sha256=3b1044701370c62c7c85ef32ec81701711a89adc9af9989919bd6e05ed78a9a1 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
-consult-inbox-front-brevity upgrade sha256=9fe22afc6d86ffa623ff5035fe589e83938ee96f1ceb3aee855c47ae0187d615 pass=0 fail=1 ignore=0 verdict=new-failures 2026-09-28
-consult-inbox-front-brevity agents_md_smoke sha256=caf7a77a6dfba61168d9df54d56df9a86590ee416b37fad50d15690fe0cc8fa3 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+consult-inbox-front-brevity demo sha256=c24d5d9592abb41e0538376d252172ff70cacb3c326d48b96506dac528a1dd30 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+consult-inbox-front-brevity installer_smoke sha256=d9a1579d89167cf8701bbd14dee6908b51f510a5d6f3704540e6b015072ec649 pass=21 fail=0 ignore=0 verdict=clean 2026-09-28
+consult-inbox-front-brevity consumer_smoke sha256=8bbb6a5077c3c451ae5d2debfd42b3758b70113d4b468ec9fa5839582c10a938 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+consult-inbox-front-brevity upgrade sha256=11b829043af447bfef1f3fc728585ab5ef35ce1d9de46d2adfe3e16a2fc26c98 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+consult-inbox-front-brevity agents_md_smoke sha256=9ee58f04a381312e59f3a105521d94278a14f730255e96b04c28a488cc586437 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
 consult-inbox-front-brevity index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
-consult-inbox-front-brevity native_crate sha256=d9063146f87ad9d156221e2fb8e265c2ac48f97eb2c970aaeefd03f4ec811929 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+consult-inbox-front-brevity native_crate sha256=f09318f86e5be3af641eae23f3f9f8487555c1afea27bf4713d33a57157900fe pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
 consult-inbox-front-brevity projection_witness sha256=179201c98788a64b1ece158a5de5465476ca5c0bbcf4bb9d25ee70f113d5c689 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
