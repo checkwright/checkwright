@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### tier-only-rank-out-unruled
-
-the audit roster's survey-engagement class does not say whether a scope survey that ranks a body-read entry out on the scope template's cost-tier order alone (session before iteration, high before low) has engaged the entry's self-declared strongest ground under limb (a). The class calls an entry ranked out on a blanket call alone a finding, while the template's rank order makes a tier sentence a sufficient rank-out. gate-sdk-tail-docs-standard's close met the case on heterogeneous-agent-delegation, whose demand-attested and live-lever grounds its survey left unengaged: the delegated reader called it a hit, and the close declined it on the predecessor sweep's precedent.
-
-**Deliverable:** the survey-engagement row's scope line in `.workflow/audit-roster.txt` narrowed to what lifecycle-kit/templates/stages/scope.md states — the cost-tier rank order and the inbound-edge aggregation — so a tier-only rank-out counts as engagement and limb (a) leaves the row.
-
-**Promoted as debt 2026-09-28 at consult-inbox-front-brevity's scope, operator direction lead-relayed (not a /consult ruling), reading (a):** the filing's premise is corrected — scope.md carries no counter-evidence paragraph and no strongest-ground obligation (`git grep` over it finds neither), so limb (a) audits an obligation its owner does not state, and the row converges on the owner.
-
-**Cost while deferred:** each close's survey-engagement sweep re-judges tier-only rank-outs and can reach opposite verdicts. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's close; promoted 2026-09-27 at the next iteration's scope: →fix fails because the specs leave the reading to precedent, and a ruling settles it. Re-verified: `.workflow/audit-roster.txt`'s survey-engagement row states the blanket-call finding, and its `declined:` field records the tier-ground decline. Owner lookup: `survey-engagement`, `rank-out`, `cost tier` in this file — survey-engagement-residue-untracked and survey-engagement-trigger-narrower-than-its-class, both DISTINCT (gitignored residue; non-scope surveys); owner lifecycle-kit/templates/stages/scope.md.
-
 ### lifecycle-kit-front-brevity
 
 the lifecycle-kit/SPEC.md sections above §Per-component contracts (§The state machine through §Testing), about 23.3k of the file's 61.6k words. The per-component contracts stay on [spec-brevity-residue](#spec-brevity-residue).
@@ -1434,5 +1424,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - consult-inbox-drain-trigger
 - roadmap-horizon-motion-unowned
 - license-text-and-alignment
+- tier-only-rank-out-unruled
 
 ## Lessons Learned
