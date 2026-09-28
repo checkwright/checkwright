@@ -8,20 +8,6 @@
 
 ## New Features
 
-### companion-recipe-in-payload
-
-[spec: SPEC-recipe-payload.md]
-
-the OpenSpec recipe and its lifecycle layer are fetched by hand from raw.githubusercontent.com at a tag the adopter must type (docs/spec-toolkits.md §OpenSpec), because a recipe must match the installed gates and no GitHub Latest pointer exists: every release is a 0.x pre-release (installer/SPEC.md, the channel invariant's reader note). The Spec Kit extension already bundles its recipe. Operator question (lead session): why must the customer name a version instead of the latest.
-
-**Deliverable:** the payload carries the `companion/` recipes and `init` applies one, for instance through a flag naming the toolkit, so the recipe matches the running release with no version and no fetch; the consumer smoke's companion arm reads the recipe from the payload.
-
-**In set (2026-09-28, operator direction lead-relayed, not a /consult ruling):** companion-front-door-widening takes this entry; spec authors and promotes it.
-
-**Push need (2026-09-28, inside the budget):** the mid-iteration push, shared with [companion-gate-widening](#companion-gate-widening) and [piped-install-argument-witness](#piped-install-argument-witness): the `companion-toolkits` leg installs the extension with Spec Kit's own command only on CI.
-
-**Cost while deferred:** every OpenSpec adopter types a tag and fetches files by hand, and a mistyped tag installs a recipe that does not match the gates. Filed 2026-09-28 to the gap inbox by the lead after consult-inbox-front-brevity's close; promoted at the next iteration's scope. Re-verified: nothing under `native/src/installer/` names `companion`, and the packer derives its set from the kit roots, which `companion/` is not. Owner lookup: `recipe`, `payload` in this file — [companion-toolkit-profile](#companion-toolkit-profile) and [verify-workflow-decoupling](#verify-workflow-decoupling), DISTINCT (the submission, and the profile classification); owner companion/SPEC.md §Recipes, with installer/SPEC.md §The packer.
-
 ### companion-gate-widening
 
 [spec: SPEC-profile-tiers.md]
@@ -32,7 +18,7 @@ the spec-toolkit companion ships document hygiene only. docs/spec-toolkits.md na
 
 **In set (2026-09-28, operator direction lead-relayed, not a /consult ruling):** companion-front-door-widening takes this entry, split from its spec-to-code half; spec authors and promotes it.
 
-**Push need (2026-09-28, inside the budget):** the mid-iteration push, shared with [companion-recipe-in-payload](#companion-recipe-in-payload), since the `companion-toolkits` leg runs the toolkits' own tools only on CI.
+**Push need (2026-09-28, inside the budget):** the mid-iteration push, shared with `companion-recipe-in-payload`, since the `companion-toolkits` leg runs the toolkits' own tools only on CI.
 
 **Cost while deferred:** the companion's catalog listing offers four of the battery's gates, and the submission ships whatever offer stands when it is filed. Filed 2026-09-28 to the gap inbox by the lead after consult-inbox-front-brevity's close; promoted at the next iteration's scope. Owner lookup: `widest`, `spec-to-code` in this file — none; [companion-toolkit-profile](#companion-toolkit-profile) is DISTINCT (the submission of the extension as built) and `lead-clause-heading-family` bears on OpenSpec trees; owner companion/SPEC.md, with docs/spec-toolkits.md.
 
@@ -44,7 +30,7 @@ no CI leg runs an argument form docs/install.md tells an adopter to type through
 
 **Deliverable:** a step on each leg piping the served `docs/install.sh` and `docs/install.ps1` with `init --profile starter` beside the bare line.
 
-**Push need (2026-09-28, inside the budget):** the mid-iteration push, shared with [companion-recipe-in-payload](#companion-recipe-in-payload); the PowerShell legs run only on CI. Land it after `uninstall-version-ask` and the recipe's `init` form, the argument forms it witnesses.
+**Push need (2026-09-28, inside the budget):** the mid-iteration push, shared with `companion-recipe-in-payload`; the PowerShell legs run only on CI. Land it after `uninstall-version-ask` and the recipe's `init` form, the argument forms it witnesses.
 
 **Cost while deferred:** a broken argument form reaches adopters with every leg green. Filed 2026-09-27 to the gap inbox by the front-door hotfix; promoted 2026-09-27 at companion-catalog-extension's close: →fix fails because the PowerShell 5.1 script-block leg cannot be witnessed on this host and a red would spend a hotfix push from an allocated budget. Re-verified: the one-liner step runs `curl … | … sh` with no argument. Owner lookup: `piped`, `one-liner`, `irm` in this file — none; owner installer/SPEC.md §Requirements.
 
@@ -1443,5 +1429,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - install-toolkit-page-structure
 - uninstall-version-ask
 - lead-clause-heading-family
+- companion-recipe-in-payload
 
 ## Lessons Learned
