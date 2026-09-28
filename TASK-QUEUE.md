@@ -1410,11 +1410,4 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 ## Done
 
-- consult-inbox
-- consult-inbox-drain-trigger
-- roadmap-horizon-motion-unowned
-- license-text-and-alignment
-- tier-only-rank-out-unruled
-- lifecycle-kit-front-brevity
-
 ## Lessons Learned
