@@ -10,7 +10,7 @@ Checkwright's `prose` profile governs a repository of documents. This page fits 
 
 ## What the gates catch
 
-With the recipe applied, four kinds of defect in your specs fail at commit and in CI:
+With the recipe applied, four kinds of defect in your specs fail CI, and a pre-commit hook catches them early:
 
 - a relative link to a missing file, or an anchored link to a heading that is not there, caught by `check-md-refs`;
 - a section citation such as `specs/001-login/spec.md §Assumptions` naming a heading that is not there, or one title used twice in a spec, caught by `check-spec-pointer`; <!-- citation-link-exempt: an example of the citation form the gate reads, not a citation -->
@@ -21,7 +21,7 @@ A citation's path is read from the repository root, so write `specs/001-login/sp
 
 These four are document hygiene: they hold your specs together as documents. None of them checks that your code does what a spec says.
 
-The pre-commit hook catches them early, but `git commit --no-verify` skips it. The guarantee is CI: `init` commits a workflow that runs the battery, and once its check is required, a red battery blocks the merge ([Requiring the CI check](install.md#requiring-the-ci-check)).
+`git commit --no-verify` skips the hook, so the guarantee is CI: `init` commits a workflow that runs the battery, and once its check is required, a red battery blocks the merge ([Requiring the CI check](install.md#requiring-the-ci-check)).
 
 ## Spec Kit
 

@@ -1,6 +1,6 @@
 # Checkwright for Spec Kit
 
-This extension puts [Checkwright](https://checkwright.dev)'s gates over a Spec Kit repository. Once installed, a broken link, a dangling section citation, an unclosed fence or a documented command that runs a missing script fails at commit and in CI instead of reaching review.
+This extension puts [Checkwright](https://checkwright.dev)'s gates over a Spec Kit repository. Once installed, a broken link, a dangling section citation, an unclosed fence or a documented command that runs a missing script fails CI instead of reaching review, and a pre-commit hook catches it early.
 
 ## Install
 

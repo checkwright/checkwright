@@ -4,7 +4,7 @@ extension:
   id: "checkwright"
   name: "Checkwright"
   version: "0.0.0"
-  description: "Deterministic gates over your specs and repository: broken links, dangling section citations, unclosed fences and missing scripts fail at commit and in CI."
+  description: "Deterministic gates over your specs and repository: broken links, dangling section citations, unclosed fences and missing scripts fail CI, and a pre-commit hook catches them early."
   author: "Checkwright"
   repository: "https://github.com/checkwright/checkwright"
   license: "Apache-2.0"
