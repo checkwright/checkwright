@@ -58,7 +58,7 @@ Vendoring stays with `init`. A plugin that vendored kits itself would be a secon
 - rewrites each `command` from `<command>` to `test -f gate-sdk/bin/run-gates.sh || exit 0; <command>`;
 - drops the template's `//` note, which is merge advice for a settings file.
 
-A plugin's hooks fire in every repository where the plugin is enabled, so each command first tests for the vendored front end and exits 0 without it. The harness runs a hook command under a POSIX shell, Git for Windows' bash on native Windows ([guard-kit/SPEC.md §The hook on native Windows](../guard-kit/SPEC.md#the-hook-on-native-windows)). It runs it from the directory the session was launched in, which is the repository root on an ordinary launch. Run with Claude Code 2.1.283, the plugin's shell-guard fired in a vendored repository launched at its root. It stayed silent in an empty repository, and in the vendored repository launched from a subdirectory.
+A plugin's hooks fire in every repository where the plugin is enabled, so each command first tests for the vendored front end and exits 0 without it. The harness runs a hook command under a POSIX shell, Git for Windows' bash on native Windows ([guard-kit/SPEC.md §The hook on native Windows](../guard-kit/SPEC.md#the-hook-on-native-windows)). It runs it from the directory the session was launched in, which is the repository root on an ordinary launch: the shell-guard fires in a vendored repository launched at its root and stays silent in an empty one.
 
 context-kit's session-start wiring is not rendered: it is a context brief rather than a guard.
 
