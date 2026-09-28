@@ -4,3 +4,7 @@ CANON_KIT_PROSE_SURFACE_GLOBS[] = cand-*.md
 # The widget spec joins the manifest set, so its repeated title is read.
 CANON_KIT_MANIFEST_FILES[] = README.md
 CANON_KIT_MANIFEST_FILES[] = SPEC-widget.md
+# A heading family and a lone family-shaped heading join it, so each lead-clause
+# bound has a citation only it refuses.
+CANON_KIT_MANIFEST_FILES[] = SPEC-family.md
+CANON_KIT_MANIFEST_FILES[] = SPEC-only.md

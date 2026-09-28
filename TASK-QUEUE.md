@@ -22,18 +22,6 @@ the OpenSpec recipe and its lifecycle layer are fetched by hand from raw.githubu
 
 **Cost while deferred:** every OpenSpec adopter types a tag and fetches files by hand, and a mistyped tag installs a recipe that does not match the gates. Filed 2026-09-28 to the gap inbox by the lead after consult-inbox-front-brevity's close; promoted at the next iteration's scope. Re-verified: nothing under `native/src/installer/` names `companion`, and the packer derives its set from the kit roots, which `companion/` is not. Owner lookup: `recipe`, `payload` in this file — [companion-toolkit-profile](#companion-toolkit-profile) and [verify-workflow-decoupling](#verify-workflow-decoupling), DISTINCT (the submission, and the profile classification); owner companion/SPEC.md §Recipes, with installer/SPEC.md §The packer.
 
-### lead-clause-heading-family
-
-[spec: SPEC-lead-clause.md]
-
-`check-spec-pointer`'s lead-clause admission holds no citation of a heading family whose titles share a lead clause: over an OpenSpec spec, where every requirement heading reads `Requirement: <name>`, a prose citation `§Requirement: Account lockout` resolves through the lead clause `Requirement` although no such requirement exists. A linked citation is held by `check-md-refs`' anchor check, so the loss is the bare-prose form only.
-
-**Deliverable:** the lead-clause rule calibrated (for instance, admitting it only when the full fragment matches no heading's prefix and the lead clause is unique in the file), with a fixture site in each case of the pair.
-
-**In set (2026-09-28, operator direction lead-relayed, not a /consult ruling):** companion-front-door-widening takes this entry beside [companion-gate-widening](#companion-gate-widening), whose OpenSpec trees make the loss adopter-facing; spec authors the calibration, a verdict change with more than one candidate rule, and promotes it.
-
-**Cost while deferred:** a companion adopter's bare-prose requirement citation dangles unseen. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's spec, reproduced in a scratch OpenSpec tree; promoted 2026-09-27 at its close: →fix fails because the calibration is a verdict change on a shipped gate with more than one candidate rule. Re-verified: `Heading::prefix_of` in `native/src/gates/spec_pointer.rs` admits a boundary-anchored prefix of `lead_clause`, which is `Requirement` for such a heading. Owner lookup: `lead clause`, `spec-pointer`, `OpenSpec` in this file — none; owner canon-kit/SPEC.md §check-spec-pointer.
-
 ### companion-gate-widening
 
 [spec: SPEC-profile-tiers.md]
@@ -46,7 +34,7 @@ the spec-toolkit companion ships document hygiene only. docs/spec-toolkits.md na
 
 **Push need (2026-09-28, inside the budget):** the mid-iteration push, shared with [companion-recipe-in-payload](#companion-recipe-in-payload), since the `companion-toolkits` leg runs the toolkits' own tools only on CI.
 
-**Cost while deferred:** the companion's catalog listing offers four of the battery's gates, and the submission ships whatever offer stands when it is filed. Filed 2026-09-28 to the gap inbox by the lead after consult-inbox-front-brevity's close; promoted at the next iteration's scope. Owner lookup: `widest`, `spec-to-code` in this file — none; [companion-toolkit-profile](#companion-toolkit-profile) is DISTINCT (the submission of the extension as built) and [lead-clause-heading-family](#lead-clause-heading-family) bears on OpenSpec trees; owner companion/SPEC.md, with docs/spec-toolkits.md.
+**Cost while deferred:** the companion's catalog listing offers four of the battery's gates, and the submission ships whatever offer stands when it is filed. Filed 2026-09-28 to the gap inbox by the lead after consult-inbox-front-brevity's close; promoted at the next iteration's scope. Owner lookup: `widest`, `spec-to-code` in this file — none; [companion-toolkit-profile](#companion-toolkit-profile) is DISTINCT (the submission of the extension as built) and `lead-clause-heading-family` bears on OpenSpec trees; owner companion/SPEC.md, with docs/spec-toolkits.md.
 
 ## Technical Debt
 
@@ -1454,5 +1442,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 - install-toolkit-page-structure
 - uninstall-version-ask
+- lead-clause-heading-family
 
 ## Lessons Learned

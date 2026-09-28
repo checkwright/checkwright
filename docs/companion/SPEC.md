@@ -80,7 +80,7 @@ The OpenSpec `full` line is held green by the lifecycle leg.
 
 No recipe drops a gate. A toolkit idiom a gate reds is answered by a knob line fitting the gate to it. Dropping a gate would narrow what the companion ships, so it is a change to this section and not a recipe edit.
 
-**Two citation forms pass unchecked.** `check-spec-pointer` reads a bare `<path>.md §<heading>` citation's path as repo-relative, so a file-relative `spec.md §…` is skipped. A bare `§Requirement: <name>` citation of a missing requirement passes through the gate's lead-clause rule. The fixtures cite repo-relatively and cite requirements by anchored link, which `check-md-refs` resolves.
+**One citation form passes unchecked.** `check-spec-pointer` reads a bare `<path>.md §<heading>` citation's path as repo-relative, so a file-relative `spec.md §…` is skipped. A bare `§Requirement: <name>` must name a requirement whole, since a lead clause shared by a family resolves nothing (canon-kit/SPEC.md §check-spec-pointer). The fixtures cite repo-relatively.
 
 ## The fixtures
 

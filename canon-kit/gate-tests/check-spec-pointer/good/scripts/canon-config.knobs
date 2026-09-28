@@ -4,3 +4,5 @@ CANON_KIT_PROSE_SURFACE_GLOBS[] = cand-*.md
 # The widget spec joins the manifest set, so a pathless citation resolves against it.
 CANON_KIT_MANIFEST_FILES[] = README.md
 CANON_KIT_MANIFEST_FILES[] = SPEC-widget.md
+# A heading family joins it, so a citation of one member resolves only whole.
+CANON_KIT_MANIFEST_FILES[] = SPEC-family.md

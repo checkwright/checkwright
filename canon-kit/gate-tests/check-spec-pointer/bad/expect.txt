@@ -7,3 +7,6 @@ bad.rs:2: target file not found: no-such-kit/SPEC.md
 README.md:6: §heading in no governed file: §The section nobody wrote
 README.md:9: §heading not found in SPEC-widget.md: §The linked heading that drifted
 SPEC-widget.md:3,7: heading title carried twice in one file: The widget contract
+README.md:12: §heading in no governed file: §Requirement: Account lockout
+README.md:15: §heading not found in SPEC-family.md: §Requirement (lockout)
+README.md:18: §heading not found in SPEC-only.md: §Requirement: Other

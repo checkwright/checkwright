@@ -4,6 +4,7 @@
 
 - `check-skill-binding` — lifecycle-kit/templates/lead.md gained the `consult-dispatch` slot, so a lead binding shim reds until it binds it. Bind the agent type your lead dispatches a consultation as, and a threshold or off — or state that your lead dispatches none.
 - `check-merge-attrs` — the derived union-merge set gained the consult inbox (`LIFECYCLE_KIT_CONSULT_INBOX_FILE`), so a `.gitattributes` marker block written before it reds until it carries that path's `merge=union` line. Re-run `--install-lifecycle` to regenerate the block.
+- `check-spec-pointer` — a prose citation's lead clause is no longer admitted where another heading in the file shares it, or where the citation continues with the heading's own separator, so a bare citation of a missing member of a heading family such as `Requirement: <name>` now reds. Cite the member whole, or, where a citation names a lead and runs on with its separator as prose, cite the whole heading or follow the lead with punctuation other than the heading's own separator.
 
 ## Behavior changes
 

@@ -552,14 +552,22 @@ struct Heading {
     line: usize,
     text: String,
     stripped: String,
-    lead: Option<String>,
+    lead: Option<Lead>,
+}
+
+#[derive(Clone)]
+struct Lead {
+    text: String,
+    sep: String,
 }
 
 impl Heading {
     fn prefix_of(&self, frag: &str) -> bool {
         is_prefix(frag, &self.text)
             || is_prefix(frag, &self.stripped)
-            || self.lead.as_deref().is_some_and(|l| is_prefix(frag, l))
+            || self.lead.as_ref().is_some_and(|l| {
+                is_prefix(frag, &l.text) && !frag[l.text.len()..].starts_with(l.sep.as_str())
+            })
     }
 }
 
@@ -596,6 +604,17 @@ impl HeadingCache {
                     });
                 }
             }
+            // spec: canon-kit/SPEC.md §check-spec-pointer — a lead another heading in the file
+            // shares names none of them
+            let mut leads: HashMap<String, usize> = HashMap::new();
+            for l in v.iter().filter_map(|h| h.lead.as_ref()) {
+                *leads.entry(l.text.clone()).or_default() += 1;
+            }
+            for h in &mut v {
+                if h.lead.as_ref().is_some_and(|l| leads[&l.text] > 1) {
+                    h.lead = None;
+                }
+            }
             self.files.insert(file.to_string(), v);
         }
         Ok(self.files.get(file).expect("heading set just inserted"))
@@ -615,14 +634,18 @@ impl HeadingCache {
 }
 
 // spec: canon-kit/SPEC.md §check-spec-pointer — the text before the first comma, em dash or colon,
-// kept only when it is shorter than the heading
-fn lead_clause(h: &str) -> Option<String> {
-    let cut = [", ", " — ", ": "]
+// kept only when it is shorter than the heading; the separator is kept as the heading spells it,
+// since a fragment continuing past the lead with it cites the whole heading
+fn lead_clause(h: &str) -> Option<Lead> {
+    let (cut, sep) = [", ", " — ", ": "]
         .iter()
-        .filter_map(|sep| h.find(sep))
+        .filter_map(|sep| h.find(sep).map(|at| (at, *sep)))
         .min()?;
     let lead = h[..cut].trim_end();
-    (!lead.is_empty()).then(|| lead.to_string())
+    (!lead.is_empty()).then(|| Lead {
+        text: lead.to_string(),
+        sep: h[lead.len()..cut + sep.len()].to_string(),
+    })
 }
 
 fn heading_text(line: &str) -> Option<String> {
