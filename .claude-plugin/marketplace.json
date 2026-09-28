@@ -5,8 +5,8 @@
   "plugins": [
     {
       "name": "checkwright",
-      "source": { "source": "git-subdir", "url": "checkwright/checkwright", "path": "plugin", "ref": "v0.28.0" },
-      "version": "0.28.0",
+      "source": { "source": "git-subdir", "url": "checkwright/checkwright", "path": "plugin", "ref": "v0.29.0" },
+      "version": "0.29.0",
       "description": "Checkwright's lifecycle stage skills and tool-call guards, which run what a Checkwright install vendors into the repository, and a skill that installs Checkwright.",
       "author": { "name": "Checkwright", "url": "https://checkwright.dev" }
     }
