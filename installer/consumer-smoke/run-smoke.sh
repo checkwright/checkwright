@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: installer/SPEC.md §The consumer smoke — builds the host gate binary, packs the package around it, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (init --dry-run writing nothing and planning the file set the real run then records, once per profile, once more over a consumer already holding every seeded surface and once over deleted seeds whose recorded hashes are stale, each re-seed recorded at what it wrote and none reported changed → install → every command init printed in its follow-up block resolves in the payload just written with every flag it names accepted → green battery leaving the worktree clean → manifest agrees with the tree, a disagreement whose own operands are hashes failing at exit 1 as a verdict about the consumer while one that reached the comparison malformed refuses at exit 2 as a precondition of this harness → the seeded queue satisfies queue-kit's section contract, or none is seeded where none is owed — which of the two is owed read from the package through the --install queue-source op rather than derived a second time here → idempotent re-run → doctor clean, naming a registered member disarmed → a planted prose defect caught and cleared → diff clean → update --dry-run planning a deleted file's restore and writing nothing → uninstall back to the pre-init tree object) plus the four profile-lattice assertions and the value assertion over the loop (some profile below the maximum catches that defect) (every named kit resolves, exactly one minimum and one maximum, the maximum is the payload-derived profile, and gate rosters are monotone across every comparable pair of the registries the installs wrote), an artifact-less refusal leg driving the packer's own artifact-free output and asserting that init, doctor, diff and a bare invocation all meet one bootstrap refusal that names the platform, carries a remedy and writes nothing, a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, whose first hop asserts a non-zero live-member count and a placed artifact in the consumer's registry before asserting the worktree is clean — so cleanliness is evidence over a hop that rewrote something rather than over one that rewrote nothing, a cross-version reversal arm carrying an unedited consumer across those same three versions and back to its pre-init tree object, so removability is asserted after a payload changed shape and the roster is asserted to cover an upgrade hop's write set rather than a first init's alone, a demo arm running checkwright demo once from inside an installed consumer and asserting it green, a FAIL: verdict line inside its act 3, every line of the front page's proof block in its output, the invoking tree object and worktree unchanged, its scratch torn down and an operand refused at exit 2, a companion arm installing each payload recipe on its fixture tree through its toolkit's documented install line, asserting one commit, the recorded recipes, the battery green, a bare re-run unchanged and each planted defect red by the gate that owns it, and the OpenSpec full line applying the lifecycle layer with check-stage-entry asserted red on a change touching two capabilities at a build cursor with no align stamp and clean once it touches one, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a jq-less arm asserting that diff, uninstall and init at the lattice minimum and at a guard-kit profile run clean with no jq on PATH, that the installed guard hook answers a payload there, and that doctor names jq nowhere, a bash-less arm installing every profile whose kit set owes no bash, running each printed follow-up command and committing through the installed hooks once clean and once refused with no bash on PATH, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it over a tampered gate binary, a narrowing arm re-running init at a smaller profile so files[] outlives kits, and an artifact arm driving the selection outcomes a single install cannot show — the unrostered host's refusal, the tampered artifact's and the declared-but-absent target's, asserted to differ in message and remedy rather than only in exit status, and wherever the hand-off carries a foreign-architecture preferred artifact the fallback taken, the fallback alone rostered, and the does-not-run refusal told apart from the other two; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
+# spec: installer/SPEC.md §The consumer smoke — builds the host gate binary, packs the package around it, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (init --dry-run writing nothing and planning the file set the real run then records, once per profile, once more over a consumer already holding every seeded surface and once over deleted seeds whose recorded hashes are stale, each re-seed recorded at what it wrote and none reported changed → install → every command init printed in its follow-up block resolves in the payload just written with every flag it names accepted → green battery leaving the worktree clean → manifest agrees with the tree, a disagreement whose own operands are hashes failing at exit 1 as a verdict about the consumer while one that reached the comparison malformed refuses at exit 2 as a precondition of this harness → the seeded queue satisfies queue-kit's section contract, or none is seeded where none is owed — which of the two is owed read from the package through the --install queue-source op rather than derived a second time here → idempotent re-run → doctor clean, naming a registered member disarmed → a planted prose defect caught and cleared → diff clean → update --dry-run planning a deleted file's restore and writing nothing → uninstall back to the pre-init tree object) plus the four profile-lattice assertions and the value assertion over the loop (some profile below the maximum catches that defect) (every named kit resolves, exactly one minimum and one maximum, the maximum is the payload-derived profile, and gate rosters are monotone across every comparable pair of the registries the installs wrote), an artifact-less refusal leg driving the packer's own artifact-free output and asserting that init, doctor, diff and a bare invocation all meet one bootstrap refusal that names the platform, carries a remedy and writes nothing, a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, whose first hop asserts a non-zero live-member count and a placed artifact in the consumer's registry before asserting the worktree is clean — so cleanliness is evidence over a hop that rewrote something rather than over one that rewrote nothing, a cross-version reversal arm carrying an unedited consumer across those same three versions and back to its pre-init tree object, so removability is asserted after a payload changed shape and the roster is asserted to cover an upgrade hop's write set rather than a first init's alone, a demo arm running checkwright demo once from inside an installed consumer and asserting it green, a FAIL: verdict line inside its act 3, every line of the front page's proof block in its output, the invoking tree object and worktree unchanged, its scratch torn down and an operand refused at exit 2, a companion arm installing each payload recipe on its fixture tree through its toolkit's documented install line, asserting one commit, the recorded recipes, the battery green, a bare re-run unchanged and each planted defect red by the gate that owns it, the Spec Kit full line doing the same on a second consumer, and the OpenSpec full line applying the lifecycle layer with check-stage-entry asserted red on a change touching two capabilities at a build cursor with no align stamp and clean once it touches one, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a jq-less arm asserting that diff, uninstall and init at the lattice minimum and at a guard-kit profile run clean with no jq on PATH, that the installed guard hook answers a payload there, and that doctor names jq nowhere, a bash-less arm installing every profile whose kit set owes no bash, running each printed follow-up command and committing through the installed hooks once clean and once refused with no bash on PATH, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it over a tampered gate binary, a narrowing arm re-running init at a smaller profile so files[] outlives kits, and an artifact arm driving the selection outcomes a single install cannot show — the unrostered host's refusal, the tampered artifact's and the declared-but-absent target's, asserted to differ in message and remedy rather than only in exit status, and wherever the hand-off carries a foreign-architecture preferred artifact the fallback taken, the fallback alone rostered, and the does-not-run refusal told apart from the other two; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
 # no-port: installer/SPEC.md §The consumer smoke, The port disposition — ruled 2026-08-31 by the operator in consult. This is the repo's own acceptance harness for the installer and rides no payload: the --pack-installer arm assembles the tarball and the npm package out of the kit roots and never out of installer/consumer-smoke/, so no adopter receives or runs it, and its only callers are the evidence-kit installer_smoke validate suite and the gates workflow. It is the same shape gate-sdk/SPEC.md §Consumer smoke, The port disposition declares on its leg 3 — a smoke executed by no adopter path — reached one step further, for a harness the payload does not even carry; and it drives cargo, the packer and init as black boxes across every profile, so a crate-side form would test the binary from inside the binary. Structural, not a sizing judgment: its size was measured at the ruling and is not the ground.
 set -uo pipefail
 
@@ -1033,26 +1033,28 @@ grep -q 'usage: checkwright demo' <<<"$out" \
     || { printf '%s\n' "$out" >&2; fail "demo arm: checkwright demo extra refused without the usage line"; }
 say "demo extra: refused at exit 2 with the usage line"
 
-# spec: installer/SPEC.md §The consumer smoke — the companion arm: each payload recipe applied by its toolkit's documented install line, read off its companion-install block, to its fixture tree from the packed tarball, asserted green and idempotent, then each planted defect asserted red by the gate that owns it, and the OpenSpec lifecycle layer's audit leg on the companion-full line
+# spec: installer/SPEC.md §The consumer smoke — the companion arm: each payload recipe applied by its toolkit's documented install line, read off its companion-install block, to its fixture tree from the packed tarball, asserted green and idempotent, then each planted defect asserted red by the gate that owns it, the Spec Kit companion-full line likewise, and the OpenSpec lifecycle layer's audit leg on the companion-full line
 COMPANION="$REPO/companion"
 # spec: companion/SPEC.md §The tested claim — the claimed gates, spelled here as the claim's oracle so a fixture tree missing a defect directory reds rather than shrinking the claim
 COMPANION_CLAIMED=(check-md-refs check-spec-pointer check-spec-fence-balance check-docs-cmd)
-companion_block() {   # $1 = a markdown file, $2 = marker name -> the block's lines, fences and blank lines dropped
-    awk -v b="<!-- $2:begin -->" -v e="<!-- $2:end -->" '
+companion_block() {   # $1 = a markdown file, $2 = marker name, $3 = a `## ` section title or empty for the whole file -> the block's lines, fences and blank lines dropped
+    awk -v b="<!-- $2:begin -->" -v e="<!-- $2:end -->" -v s="$3" '
+        /^## / { in_s = (s == "" || $0 == "## " s) }
+        s == "" { in_s = 1 }
         $0 == e { f = 0 }
-        f && NF && $0 !~ /^```/ { print }
+        f && in_s && NF && $0 !~ /^```/ { print }
         $0 == b { f = 1 }
     ' "$1"
 }
 companion_why() { printf 'companion arm: %s\n' "$*" >&2; return 1; }
-companion_line() {   # $1 = a markdown file, $2 = marker name, $3 = a flag the line must carry -> the line's words from init to its end, one per line; the cause on stderr and 1 otherwise
-    local block words
-    block="$(companion_block "$1" "$2")"
-    [[ -n "$block" ]] || { companion_why "${1#"$REPO"/} carries no $2 block, or an empty one, so there is no documented line to run"; return 1; }
-    [[ "$(wc -l <<<"$block")" -eq 1 ]] || { companion_why "the $2 block in ${1#"$REPO"/} holds more than one line"; return 1; }
+companion_line() {   # $1 = a markdown file, $2 = marker name, $3 = the words the line must carry, $4 = its `## ` section or empty -> the line's words from init to its end, one per line; the cause on stderr and 1 otherwise
+    local block words where="${1#"$REPO"/}${4:+ §$4}"
+    block="$(companion_block "$1" "$2" "${4:-}")"
+    [[ -n "$block" ]] || { companion_why "$where carries no $2 block, or an empty one, so there is no documented line to run"; return 1; }
+    [[ "$(wc -l <<<"$block")" -eq 1 ]] || { companion_why "the $2 block in $where holds more than one line"; return 1; }
     words="$(awk '{ for (i = 1; i <= NF; i++) if ($i == "init") { for (j = i; j <= NF; j++) print $j; exit } }' <<<"$block")"
-    [[ -n "$words" ]] || { companion_why "the $2 line in ${1#"$REPO"/} runs no init: $block"; return 1; }
-    grep -qx -- "$3" <<<"$words" || { companion_why "the $2 line in ${1#"$REPO"/} carries no $3: $block"; return 1; }
+    [[ -n "$words" ]] || { companion_why "the $2 line in $where runs no init: $block"; return 1; }
+    [[ " $(paste -sd ' ' - <<<"$words") " == *" $3 "* ]] || { companion_why "the $2 line in $where carries no $3: $block"; return 1; }
     printf '%s\n' "$words"
 }
 mapfile -t COMPANION_TOOLKITS < <(for d in "$COMPANION"/*/recipe/; do d="${d%/recipe/}"; printf '%s\n' "${d##*/}"; done)
@@ -1091,9 +1093,9 @@ companion_green() {   # $1 = label, $2 = consumer dir -> asserts the battery gre
         || { git -C "$2" status --porcelain >&2; fail "companion arm, $1: a bare init re-run changed the tree, so it did not re-apply the recorded payload recipes"; }
     say "$1: installed in one commit, the battery reads '$summary', and a bare init re-run leaves the tree object unchanged"
 }
-companion_arm() {   # $1 = toolkit, $2 = the markdown file holding its companion-install block
-    local tk="$1" c d gate out rc
-    local -a words
+companion_arm() {   # $1 = toolkit, $2 = label, $3.. = the line's words from init -> installed on the fixture tree, green, idempotent, and each planted defect red by its gate
+    local tk="$1" label="$2" c d gate out rc
+    shift 2
     [[ -d "$COMPANION/$tk/recipe" ]] || fail "companion arm: this arm names $tk, and companion/$tk/recipe/ does not exist"
     [[ -d "$PKG_ROOT/recipes/$tk" ]] || fail "companion arm, $tk: the installed package carries no recipes/$tk/, so GATE_SDK_PAYLOAD_RECIPES does not cover companion/$tk/recipe/"
     [[ -d "$COMPANION/fixtures/$tk/layout" ]] || fail "companion arm: companion/fixtures/$tk/layout/ does not exist, so the $tk recipe has no tree to govern"
@@ -1101,33 +1103,45 @@ companion_arm() {   # $1 = toolkit, $2 = the markdown file holding its companion
         [[ -d "$COMPANION/fixtures/$tk/defects/$gate" ]] \
             || fail "companion arm, $tk: no defects/$gate/ under companion/fixtures/$tk/, so the claim that $gate catches its class in a $tk tree is untested"
     done
-    out="$(companion_line "$2" companion-install --recipe)" || fail "companion arm, $tk: no install line to run"
-    mapfile -t words <<<"$out"
-    c="$(companion_consumer "$tk" "$tk" "${words[@]}")" || fail "companion arm, $tk: could not install ${words[*]} on the fixture tree"
-    companion_green "$tk, ${words[*]}" "$c"
+    c="$(companion_consumer "$tk" "$label" "$@")" || fail "companion arm, $label: could not install ${*} on the fixture tree"
+    companion_green "$label, ${*}" "$c"
     for d in "$COMPANION/fixtures/$tk/defects"/*/; do
         gate="${d%/}"; gate="${gate##*/}"
-        cp -R "$d." "$c/" || fail "companion arm, $tk: could not plant defects/$gate/"
+        cp -R "$d." "$c/" || fail "companion arm, $label: could not plant defects/$gate/"
         out="$( cd "$c" && ./scripts/checkwright-gates --run 2>&1 )"; rc=$?
         [[ "$rc" -ne 0 ]] && grep -qE "^  FAIL: $gate( |$)" <<<"$out" \
-            || { printf '%s\n' "$out" >&2; fail "companion arm, $tk: the battery did not red $gate on its planted defect (exit $rc)"; }
+            || { printf '%s\n' "$out" >&2; fail "companion arm, $label: the battery did not red $gate on its planted defect (exit $rc)"; }
         git -C "$c" checkout -q -- . && git -C "$c" clean -fdq \
-            || fail "companion arm, $tk: could not restore the consumer after defects/$gate/"
-        [[ -z "$(git -C "$c" status --porcelain)" ]] || fail "companion arm, $tk: the consumer is not clean after restoring defects/$gate/"
-        say "$tk: defects/$gate/ reds $gate"
+            || fail "companion arm, $label: could not restore the consumer after defects/$gate/"
+        [[ -z "$(git -C "$c" status --porcelain)" ]] || fail "companion arm, $label: the consumer is not clean after restoring defects/$gate/"
+        say "$label: defects/$gate/ reds $gate"
     done
-    COMPANION_DONE+=("$tk")
 }
+COMPANION_PAGE="$REPO/docs/spec-toolkits.md"
 printf 'companion arm for speckit (the Spec Kit recipe on its fixture tree, through the extension install command'"'"'s line)\n'
-companion_arm speckit "$COMPANION/speckit/commands/install.md"
+out="$(companion_line "$COMPANION/speckit/commands/install.md" companion-install --recipe)" \
+    || fail "companion arm, speckit: the extension install command carries no install line to run"
+mapfile -t COMPANION_WORDS <<<"$out"
+companion_arm speckit speckit "${COMPANION_WORDS[@]}"
+COMPANION_DONE+=(speckit)
+# spec: companion/SPEC.md §The two tiers — the Spec Kit full line on a second consumer, green and catching each planted defect again
+printf 'companion arm for speckit full (the Spec Kit page'"'"'s full line on its fixture tree)\n'
+out="$(companion_line "$COMPANION_PAGE" companion-full "--profile full" "Spec Kit")" \
+    || fail "companion arm, speckit full: the Spec Kit section carries no full line to run"
+mapfile -t COMPANION_WORDS <<<"$out"
+companion_arm speckit speckit-full "${COMPANION_WORDS[@]}"
 printf 'companion arm for openspec (the OpenSpec recipe on its fixture tree, through the landing page'"'"'s line)\n'
-companion_arm openspec "$REPO/docs/spec-toolkits.md"
+out="$(companion_line "$COMPANION_PAGE" companion-install --recipe OpenSpec)" \
+    || fail "companion arm, openspec: the OpenSpec section carries no install line to run"
+mapfile -t COMPANION_WORDS <<<"$out"
+companion_arm openspec openspec "${COMPANION_WORDS[@]}"
+COMPANION_DONE+=(openspec)
 # spec: companion/SPEC.md §The lifecycle layer — the OpenSpec companion-full line, the recipe and the layer on a full install, the audit asserted to fire on a change touching two capabilities at a build cursor with no align stamp, and to clear once the change touches one
 printf 'companion arm for openspec lifecycle (the landing page'"'"'s full line, check-stage-entry over the lifecycle overlay)\n'
 COMPANION_LC="$COMPANION/fixtures/openspec/lifecycle"
 mapfile -t COMPANION_LC_DELTAS < <(cd "$COMPANION_LC" && find openspec/changes -path '*/specs/*/spec.md' | sort)
 [[ ${#COMPANION_LC_DELTAS[@]} -gt 0 ]] || fail "companion arm, openspec lifecycle: the overlay under companion/fixtures/openspec/lifecycle/ carries no change delta, so no second component is planted"
-out="$(companion_line "$REPO/docs/spec-toolkits.md" companion-full --recipe)" || fail "companion arm, openspec lifecycle: no full line to run"
+out="$(companion_line "$COMPANION_PAGE" companion-full "--profile full" OpenSpec)" || fail "companion arm, openspec lifecycle: the OpenSpec section carries no full line to run"
 mapfile -t COMPANION_LC_WORDS <<<"$out"
 c="$(companion_consumer openspec openspec-lifecycle "${COMPANION_LC_WORDS[@]}")" \
     || fail "companion arm, openspec lifecycle: could not install ${COMPANION_LC_WORDS[*]} on the fixture tree"

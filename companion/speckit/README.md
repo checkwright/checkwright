@@ -14,7 +14,7 @@ Then, in a clean worktree, ask your agent to run the extension's install command
 
 ## What it adds
 
-- **`speckit.checkwright.install`** installs Checkwright's `prose` profile with the one-line install, `init --profile prose --recipe speckit`, pinned to the release this extension version was tested with, with the Spec Kit recipe applied, which prunes `.specify/` from the gates, governs the markdown under `specs/`, and drops the one gate a Spec Kit task list trips. It commits and runs the battery.
+- **`speckit.checkwright.install`** installs Checkwright's `prose` profile with the one-line install, `init --profile prose --recipe speckit`, pinned to the release this extension version was tested with, with the Spec Kit recipe applied, which prunes `.specify/` from the gates, governs the markdown under `specs/`, and admits the `Task:` lines of a Spec Kit task list's example block. It commits and runs the battery.
 - **`speckit.checkwright.check`** runs the battery and reports each red gate with its finding and remedy.
 - **An optional `after_implement` hook** that offers to run the check once an implementation finishes.
 

@@ -21,7 +21,7 @@ One queue entry pairs it: [companion-gate-widening](TASK-QUEUE.md#companion-gate
 
 ### (1) The Spec Kit recipe re-arms the fence gate {mechanical}
 
-**Not yet applied.** `companion/speckit/recipe/unregister.list` keeps its header line and loses `check-fence-command-head`. `companion/speckit/recipe/canon-config.knobs` gains `CANON_KIT_FENCE_PROGRAMS_EXTRA[] = Task:`.
+**Applied** in the landing commit. `companion/speckit/recipe/unregister.list` keeps its header line and loses `check-fence-command-head`. `companion/speckit/recipe/canon-config.knobs` gains `CANON_KIT_FENCE_PROGRAMS_EXTRA[] = Task:`.
 
 companion/SPEC.md §The Spec Kit recipe, the bullet opening *`check-fence-command-head`, in `unregister.list`* is replaced by:
 
@@ -34,7 +34,7 @@ companion/SPEC.md §The tested claim: *A recipe may drop a gate only where a too
 
 ### (2) The two tiers in the design record {design-bearing}
 
-**Not yet applied.** companion/SPEC.md:
+**Applied** in the landing commit. companion/SPEC.md:
 
 - The opener's *a **recipe** that makes the `prose` profile govern that toolkit's tree* becomes *a **recipe** that fits the `prose` and `full` profiles to that toolkit's tree*.
 - §Recipes, **Each line answers a red**: *with the `prose` profile installed* becomes *with the `prose` or `full` profile installed*.
@@ -53,7 +53,7 @@ companion/SPEC.md §The tested claim: *A recipe may drop a gate only where a too
 
 ### (3) The `full` lines on the pages {mechanical}
 
-**Not yet applied.** The Spec Kit page gains, after the recipe sentence:
+**Applied** in the landing commit. The Spec Kit page gains, after the recipe sentence:
 
 > **Every kit instead of `prose`.** After the extension's install, or in place of it, run your system's line from the [install page](install.md#install) with:
 >
@@ -73,7 +73,7 @@ The OpenSpec page's lifecycle paragraph, which holds the `companion-full` block,
 
 ### (4) The companion arm's Spec Kit `full` leg {design-bearing}
 
-**Not yet applied.** installer/SPEC.md §The consumer smoke, the companion-arm paragraph, as written by companion-recipe-in-payload's amendment (its delta 7). If that unit lands in this batch, its text is written with these additions. Otherwise it is edited to add them:
+**Applied** in the landing commit. installer/SPEC.md §The consumer smoke, the companion-arm paragraph, as written by companion-recipe-in-payload's amendment (its delta 7). If that unit lands in this batch, its text is written with these additions. Otherwise it is edited to add them:
 
 - the arm also reads each toolkit's `companion-full` block, the Spec Kit page's and the OpenSpec page's, refusing an absent or empty one, or one whose line does not carry `--profile full`;
 - *The Spec Kit toolkit then runs a `full` leg in a second consumer: `init` with its `companion-full` line's arguments, the battery green, and each planted defect red by the gate that owns it.*

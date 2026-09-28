@@ -1,6 +1,6 @@
 # Checkwright companion — design record
 
-The companion package puts Checkwright's gates over a repository whose specs another toolkit writes. It holds, for each supported spec-authoring toolkit, a **recipe** that makes the `prose` profile govern that toolkit's tree, and a fixture tree that proves the recipe. The package carries the recipes, and `init --recipe <name>` applies one ([installer/SPEC.md §Payload recipes](../installer/SPEC.md#payload-recipes)). For Spec Kit it also holds a catalog extension that installs Checkwright and applies the recipe. `companion/README.md` is the usage tier in front of this file.
+The companion package puts Checkwright's gates over a repository whose specs another toolkit writes. It holds, for each supported spec-authoring toolkit, a **recipe** that fits the `prose` and `full` profiles to that toolkit's tree, and a fixture tree that proves the recipe. The package carries the recipes, and `init --recipe <name>` applies one ([installer/SPEC.md §Payload recipes](../installer/SPEC.md#payload-recipes)). For Spec Kit it also holds a catalog extension that installs Checkwright and applies the recipe. `companion/README.md` is the usage tier in front of this file.
 
 ## The component
 
@@ -16,13 +16,21 @@ The companion package puts Checkwright's gates over a repository whose specs ano
 
 A recipe is a directory in installer/SPEC.md §Payload recipes' format, and that section owns how `init` applies one. Each file opens with a `#` comment citing this file.
 
-**Each line answers a red.** A line is in a recipe because a fresh tree of the toolkit at its pin, with the `prose` profile installed, reds a gate on one of the toolkit's own idioms until the line is there. The companion arm of the consumer smoke holds that both ways: a line it shows unnecessary is deleted, and one it shows missing is added, each with its idiom recorded below.
+**Each line answers a red.** A line is in a recipe because a fresh tree of the toolkit at its pin, with the `prose` or `full` profile installed, reds a gate on one of the toolkit's own idioms until the line is there. The companion arm of the consumer smoke holds that both ways: a line it shows unnecessary is deleted, and one it shows missing is added, each with its idiom recorded below.
 
 ### Applying a recipe
 
-An adopter applies a recipe with the install itself: `init --profile prose --recipe <name>`, through the one-line install or any other route to `init`. The install makes one commit with the recipe applied, and the manifest records the recipe, so an upgrade re-applies it with the release it was tested against. Each toolkit's documented line sits between `<!-- companion-install:begin -->` and `<!-- companion-install:end -->` as one fence holding one line. For OpenSpec it is on the landing page, a `text` fence reading `checkwright init …`, where `checkwright` stands for the reader's install line (docs/install.md §Managing's convention), so the page points to the install page rather than restating it. For Spec Kit it is in `speckit/commands/install.md`, an `sh` fence holding the one-line install the agent runs. The OpenSpec `full` line, which adds the lifecycle layer, sits between `<!-- companion-full:begin -->` and `<!-- companion-full:end -->` on the landing page, in the page's form. The companion arm runs each line's words from `init` to the line's end, so the documented steps are the tested steps.
+An adopter applies a recipe with the install itself: `init --profile prose --recipe <name>`, through the one-line install or any other route to `init`. The install makes one commit with the recipe applied, and the manifest records the recipe, so an upgrade re-applies it with the release it was tested against. Each toolkit's documented line sits between `<!-- companion-install:begin -->` and `<!-- companion-install:end -->` as one fence holding one line. For OpenSpec it is on the landing page, a `text` fence reading `checkwright init …`, where `checkwright` stands for the reader's install line (docs/install.md §Managing's convention), so the page points to the install page rather than restating it. For Spec Kit it is in `speckit/commands/install.md`, an `sh` fence holding the one-line install the agent runs. Each toolkit's `full` line takes a marker pair of its own (§The two tiers). The companion arm runs each line's words from `init` to the line's end, so the documented steps are the tested steps.
 
 **A flag, where this section once refused one.** The refusal's ground was that a flag would make a recipe `init`'s file, rewritten on the next run, unless the manifest recorded the recipe as well. It records it now. Its second ground, a script's PowerShell twin, does not reach a flag that runs behind the invoke. So the one-line install carries a recipe on every host, with no `sh` block to paste and no tag to type.
+
+### The two tiers
+
+Each toolkit has two install lines. The default, `prose`, puts canon-kit's document gates over the toolkit's tree, owes no `bash`, and seeds nothing beside the toolkit's own files. The second, `full`, installs every kit, so every gate a `full` install registers runs over the tree. It costs two things, and the toolkit's page names both. It needs `bash` 4.3 or later, since `full` carries kits that ship bash files (docs/install.md §Requirements). It also seeds Checkwright's own workflow surfaces beside the toolkit's: a task queue, a doctrine block in the agent file, and evidence files under `.workflow/`. Moving from `prose` to `full` only adds (installer/SPEC.md §Profiles), so an adopter who installed the default reaches `full` by running `init` with the second line.
+
+The documented `full` line sits between `<!-- companion-full:begin -->` and `<!-- companion-full:end -->` on each toolkit's page, in the same `text` form as the default line. On OpenSpec it also applies the lifecycle layer, which no gate `init` registers reads until a stage session runs (§The lifecycle layer). The Spec Kit extension installs the default only.
+
+Neither tier re-checks what a toolkit owns: OpenSpec's validator and Spec Kit's templates stay the toolkit's.
 
 ### The Spec Kit recipe
 
@@ -30,7 +38,8 @@ Measured on `specify init --here --non-interactive --integration claude --script
 
 - `GATE_SDK_PRUNE_EXTRA_DIRS = .specify`, in `gate-sdk-config.knobs`. Spec Kit's own scripts under `.specify/scripts/bash/` red `check-comment-tier`, since their comments carry no tier tag, and `check-path-dialect`, on their absoluteness tests. They are the toolkit's files and not the adopter's.
 - `CANON_KIT_PROSE_SURFACE_GLOBS[] = specs/**/*.md`, in `canon-config.knobs`. The feature specs join the governed doc set. Without the line no claimed gate reads `specs/`, so every planted defect passes.
-- `check-fence-command-head`, in `unregister.list`. The tasks template's parallel example is a `bash` fence of `Task:` lines, which no shell runs and the gate reds.
+- `CANON_KIT_FENCE_PROGRAMS_EXTRA[] = Task:`, in `canon-config.knobs`. The tasks template's parallel example is a `bash` fence of `Task:` lines, which `check-fence-command-head` reds as naming nothing that runs. The line admits `Task:` as a command head. The colon is part of the word. The gate's other remedy, another info string, would edit Spec Kit's template text, which no recipe edits.
+- `unregister.list` names no gate.
 
 ### The OpenSpec recipe
 
@@ -44,7 +53,7 @@ Measured on `openspec init --tools claude --no-animation --no-copilot-cloud .`, 
 
 ### The lifecycle layer
 
-An adopter who runs lifecycle-kit's stage machine installs `full`, the one profile carrying both lifecycle-kit and canon-kit, and passes `--recipe <toolkit> --recipe <toolkit>-lifecycle`. The layer binds the knobs that let `check-stage-entry` see the toolkit's in-flight work as amendments, so a cross-component build entry owes an align stamp. The directory is not named `recipe/`, so the companion arm's toolkit roster, read from `*/recipe/`, does not take it for a third toolkit.
+OpenSpec's `full` line (§The two tiers) applies the layer, as `--recipe openspec-lifecycle` beside the recipe. The layer binds the knobs that let `check-stage-entry` see the toolkit's in-flight work as amendments, so a cross-component build entry owes an align stamp. The directory is not named `recipe/`, so the companion arm's toolkit roster, read from `*/recipe/`, does not take it for a third toolkit.
 
 - **OpenSpec.** `openspec/lifecycle/` binds the amendment glob to in-flight change deltas by path, the roster basename to `spec.md` and the contract token to `spec.md`. A change touching two capabilities fires the audit, and so does a delta citing another capability's spec. An archived change sits one level deeper, under `openspec/changes/archive/`, and is no amendment. A queue entry's `[spec:]` ref names the change's `proposal.md` by repo-relative path.
 - **Spec Kit: no layer.** A feature's directory persists after it ships and the current feature is the branch's name, so nothing on disk marks a spec as in flight. A glob over `specs/*/spec.md` would demand the audit at every build entry once two features exist. `check-stage-entry` therefore sees no amendment in a Spec Kit tree, and the align trigger there is the authoring stage's own recommendation.
@@ -53,14 +62,16 @@ An adopter who runs lifecycle-kit's stage machine installs `full`, the one profi
 
 ## The tested claim
 
-The recipes are proved against four defect classes per toolkit, each caught by a named gate:
+The recipes are proved against four defect classes per toolkit, each caught by a named gate, on `prose` for both toolkits and on `full` for Spec Kit, whose `full` leg plants them again:
 
 - a broken relative or anchored link, by `check-md-refs`;
 - a dangling section citation, or a title carried twice in one spec, by `check-spec-pointer`;
 - an unclosed fence, by `check-spec-fence-balance`;
 - a documented command that invokes a missing script, by `check-docs-cmd`.
 
-A recipe may drop a gate only where a toolkit idiom reds it. Dropping one of these four narrows the claim, so it is a change to this section and not a recipe edit.
+The OpenSpec `full` line is held green by the lifecycle leg.
+
+No recipe drops a gate. A toolkit idiom a gate reds is answered by a knob line fitting the gate to it. Dropping a gate would narrow what the companion ships, so it is a change to this section and not a recipe edit.
 
 **Two citation forms pass unchecked.** `check-spec-pointer` reads a bare `<path>.md §<heading>` citation's path as repo-relative, so a file-relative `spec.md §…` is skipped. A bare `§Requirement: <name>` citation of a missing requirement passes through the gate's lead-clause rule. The fixtures cite repo-relatively and cite requirements by anchored link, which `check-md-refs` resolves.
 
