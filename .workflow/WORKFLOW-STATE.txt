@@ -12,3 +12,4 @@ consult-inbox-front-brevity build a001ff0e 2026-09-28 c164291f
 consult-inbox-front-brevity build a560efad 2026-09-28 9d956e33
 consult-inbox-front-brevity build abe7c3db 2026-09-28 9d3b0105
 consult-inbox-front-brevity validate a20d1ce0 2026-09-28 78f0bb75
+consult-inbox-front-brevity validate a5966403 2026-09-28 0cd07ef1
