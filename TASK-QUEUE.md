@@ -8,20 +8,6 @@
 
 ## New Features
 
-### companion-gate-widening
-
-[spec: SPEC-profile-tiers.md]
-
-the spec-toolkit companion ships document hygiene only. docs/spec-toolkits.md names four gates (`check-md-refs`, `check-spec-pointer`, `check-spec-fence-balance`, `check-docs-cmd`) and states none checks code against a spec; the recipes install the `prose` profile, and the Spec Kit recipe drops `check-fence-command-head`. Operator direction (lead session), verbatim: "we should aim to ship all gates checkwright offers while letting the accompanied projects do their part".
-
-**Deliverable:** the recipes install the widest profile whose gates apply to a spec-toolkit tree, each gate fitted to the toolkit's layout by configuration rather than dropped, deferring to the toolkit where it owns a check (OpenSpec's validator, Spec Kit's templates). The spec-to-code gates are [companion-spec-to-code-gates](#companion-spec-to-code-gates).
-
-**In set (2026-09-28, operator direction lead-relayed, not a /consult ruling):** companion-front-door-widening takes this entry, split from its spec-to-code half; spec authors and promotes it.
-
-**Push need (2026-09-28, inside the budget):** the mid-iteration push, shared with `companion-recipe-in-payload`, since the `companion-toolkits` leg runs the toolkits' own tools only on CI.
-
-**Cost while deferred:** the companion's catalog listing offers four of the battery's gates, and the submission ships whatever offer stands when it is filed. Filed 2026-09-28 to the gap inbox by the lead after consult-inbox-front-brevity's close; promoted at the next iteration's scope. Owner lookup: `widest`, `spec-to-code` in this file — none; [companion-toolkit-profile](#companion-toolkit-profile) is DISTINCT (the submission of the extension as built) and `lead-clause-heading-family` bears on OpenSpec trees; owner companion/SPEC.md, with docs/spec-toolkits.md.
-
 ## Technical Debt
 
 ### piped-install-argument-witness
@@ -744,7 +730,7 @@ the Windows install-smoke leg's binding liveness step can red on a ground-truth 
 
 [cost: event/high] [surface: companion]
 
-the companion checks documents and never code against a spec. Split 2026-09-28 at companion-front-door-widening's scope from [companion-gate-widening](#companion-gate-widening), on an operator direction lead-relayed (not a /consult ruling): the widening's profile half is taken, this half is new mechanism over formats nobody has probed.
+the companion checks documents and never code against a spec. Split 2026-09-28 at companion-front-door-widening's scope from `companion-gate-widening`, on an operator direction lead-relayed (not a /consult ruling): the widening's profile half is taken, this half is new mechanism over formats nobody has probed.
 
 **Deliverable:** the spec-to-code gates the toolkits' formats make possible, each deferring to the toolkit where it owns the check, with a fixture pair in each toolkit's layout.
 
@@ -1430,5 +1416,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - uninstall-version-ask
 - lead-clause-heading-family
 - companion-recipe-in-payload
+- companion-gate-widening
 
 ## Lessons Learned
