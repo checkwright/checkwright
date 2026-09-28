@@ -12,3 +12,4 @@ companion-front-door-widening build a55063b0 2026-09-28 635415ec
 companion-front-door-widening build aea7e1a3 2026-09-28 d3f5268e
 companion-front-door-widening build a68751a2 2026-09-28 56eb1788
 companion-front-door-widening validate a5c72087 2026-09-28 9d193fd2
+companion-front-door-widening close aa9af784 2026-09-28 bb78e511
