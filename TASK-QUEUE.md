@@ -22,6 +22,18 @@ the OpenSpec recipe and its lifecycle layer are fetched by hand from raw.githubu
 
 **Cost while deferred:** every OpenSpec adopter types a tag and fetches files by hand, and a mistyped tag installs a recipe that does not match the gates. Filed 2026-09-28 to the gap inbox by the lead after consult-inbox-front-brevity's close; promoted at the next iteration's scope. Re-verified: nothing under `native/src/installer/` names `companion`, and the packer derives its set from the kit roots, which `companion/` is not. Owner lookup: `recipe`, `payload` in this file — [companion-toolkit-profile](#companion-toolkit-profile) and [verify-workflow-decoupling](#verify-workflow-decoupling), DISTINCT (the submission, and the profile classification); owner companion/SPEC.md §Recipes, with installer/SPEC.md §The packer.
 
+### lead-clause-heading-family
+
+[spec: SPEC-lead-clause.md]
+
+`check-spec-pointer`'s lead-clause admission holds no citation of a heading family whose titles share a lead clause: over an OpenSpec spec, where every requirement heading reads `Requirement: <name>`, a prose citation `§Requirement: Account lockout` resolves through the lead clause `Requirement` although no such requirement exists. A linked citation is held by `check-md-refs`' anchor check, so the loss is the bare-prose form only.
+
+**Deliverable:** the lead-clause rule calibrated (for instance, admitting it only when the full fragment matches no heading's prefix and the lead clause is unique in the file), with a fixture site in each case of the pair.
+
+**In set (2026-09-28, operator direction lead-relayed, not a /consult ruling):** companion-front-door-widening takes this entry beside [companion-gate-widening](#companion-gate-widening), whose OpenSpec trees make the loss adopter-facing; spec authors the calibration, a verdict change with more than one candidate rule, and promotes it.
+
+**Cost while deferred:** a companion adopter's bare-prose requirement citation dangles unseen. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's spec, reproduced in a scratch OpenSpec tree; promoted 2026-09-27 at its close: →fix fails because the calibration is a verdict change on a shipped gate with more than one candidate rule. Re-verified: `Heading::prefix_of` in `native/src/gates/spec_pointer.rs` admits a boundary-anchored prefix of `lead_clause`, which is `Requirement` for such a heading. Owner lookup: `lead clause`, `spec-pointer`, `OpenSpec` in this file — none; owner canon-kit/SPEC.md §check-spec-pointer.
+
 ## Technical Debt
 
 ### uninstall-version-ask
@@ -635,18 +647,6 @@ the kit SPECs' on-site mirrors render their section citations as plain text, so 
 **Deliverable:** citation rendering at mirror time in that arm, each citation resolved through `check-spec-pointer`'s resolver into a relative link to the mirrored section, so every citation is reached with no hand conversion and no drift.
 
 **Cost while deferred:** every site reader of a SPEC follows its citations by hand. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's spec, split from `docs-ux-authoring-rules`, whose range was the hand-authored pages and READMEs; promoted 2026-09-27 at its close: →fix fails because the rendering is new mechanism in a shipped arm. Re-verified: the scope survey's oracle over the thirteen tracked `*/SPEC.md` counts 2,157 citation lines outside fences at the close, and the arm's `rewrite_line` rewrites `](` targets only. Owner lookup: `docs_mirror`, `mirror`, `citation` in this file — none; owner canon-kit/SPEC.md §The reference-link grammar.
-
-### lead-clause-heading-family
-
-[cost: event/low] [surface: canon-kit]
-
-`check-spec-pointer`'s lead-clause admission holds no citation of a heading family whose titles share a lead clause: over an OpenSpec spec, where every requirement heading reads `Requirement: <name>`, a prose citation `§Requirement: Account lockout` resolves through the lead clause `Requirement` although no such requirement exists. A linked citation is held by `check-md-refs`' anchor check, so the loss is the bare-prose form only.
-
-**Deliverable:** the lead-clause rule calibrated (for instance, admitting it only when the full fragment matches no heading's prefix and the lead clause is unique in the file), with a fixture site in each case of the pair.
-
-**In set (2026-09-28, operator direction lead-relayed, not a /consult ruling):** companion-front-door-widening takes this entry beside [companion-gate-widening](#companion-gate-widening), whose OpenSpec trees make the loss adopter-facing; spec authors the calibration, a verdict change with more than one candidate rule, and promotes it.
-
-**Cost while deferred:** a companion adopter's bare-prose requirement citation dangles unseen. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's spec, reproduced in a scratch OpenSpec tree; promoted 2026-09-27 at its close: →fix fails because the calibration is a verdict change on a shipped gate with more than one candidate rule. Re-verified: `Heading::prefix_of` in `native/src/gates/spec_pointer.rs` admits a boundary-anchored prefix of `lead_clause`, which is `Requirement` for such a heading. Owner lookup: `lead clause`, `spec-pointer`, `OpenSpec` in this file — none; owner canon-kit/SPEC.md §check-spec-pointer.
 
 ### worktree-crate-commit-red
 
