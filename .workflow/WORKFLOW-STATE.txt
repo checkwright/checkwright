@@ -6,3 +6,4 @@
 
 plugin-marketplace-queue-verbs scope a6e2345c 2026-09-28 e74e509a
 plugin-marketplace-queue-verbs spec a796e255 2026-09-28 267cfb26
+plugin-marketplace-queue-verbs align a800a100 2026-09-28 ccab347f
