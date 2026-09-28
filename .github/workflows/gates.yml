@@ -302,7 +302,7 @@ jobs:
 
   # spec: companion/SPEC.md §The toolkit legs — the toolkits' own tools at their pins, as oracles over the extension and the OpenSpec fixture
   companion-toolkits:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     steps:
@@ -367,7 +367,7 @@ jobs:
 
   # spec: plugin/SPEC.md §The validation leg — the external oracles for the plugin package, each at a pinned version
   plugin-validate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     steps:

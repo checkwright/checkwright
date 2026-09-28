@@ -708,11 +708,13 @@ the operator states that verification and workflow are fully decoupled, each shi
 
 ### windows-liveness-pid-reuse
 
-[cost: iteration/low] [surface: .github]
+[cost: iteration/low] [surface: .github] [recurrence: 2026-09-28]
 
 the Windows install-smoke leg's binding liveness step can red on a ground-truth flake. On the pin push's run for b799b176, row (a) read `measured nothing: ground truth read alive then alive` for Windows pid 6204, although the gate read held then free and `wait_gone` passed about 3s before the second read. **Inferred, not run:** the winpid was reused by another process between `wait_gone` and that read, so the truth read named a stranger; the job was re-run rather than a push spent.
 
-**Deliverable:** row (a)'s second truth read keyed on more than the bare pid (the process start time), or taken inside the wait.
+**Recurred 2026-09-28 on row (bp)**, judged at companion-front-door-widening's close: gates run 36473045086 read `gate 1 alive, 1 gone, where 1 then 0 is owed`, truth gone and then `check-producer-liveness` reading Windows pid 4132 running. **Inferred, not run:** the same reuse, between the truth read and the gate's read.
+
+**Deliverable:** every row's reads keyed on more than the bare pid (the process start time), the gate's own read as well as the truth reads, or taken inside the wait. [native-hook-dispatch](#native-hook-dispatch) retires this leg, so the fix lands wherever the step then lives.
 
 **Cost while deferred:** a green push can red at random and costs a re-run or a hotfix push. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' close; promoted 2026-09-28 at the next iteration's scope: →fix fails because the fix is unprobed on a Windows host. Re-verified: `.github/workflows/gates.yml` reads `truth "${tpid[$r]}"` on the bare pid at both reads. Owner lookup: `winpid`, `pid reuse`, `liveness step` in this file — none; owner `.github/workflows/gates.yml`, with evidence-kit/SPEC.md §The producer-liveness lock.
 
@@ -747,6 +749,56 @@ positional references to a block go stale like restated counts, and nothing catc
 **Deliverable:** doctrine-kit/DOCTRINE.md's De-literalization or Derivation-first rule naming positional references beside counts; a narrow gate weighed, a positional word citing a marked or generated block, since a general "last line" matcher would cry wolf.
 
 **Cost while deferred:** the next block edit strands a positional sentence silently. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; the three instances fixed at its close, the rule and gate promoted: →fix fails because a doctrine rule change is a scoped unit (the reasoning [intake-routing-test](#intake-routing-test) records) and the gate is new mechanism. Re-verified: the battery-roster block ended at `--projection-witness`. Owner lookup: `positional`, `ordinal`, `renumber` in this file — only the icebox's doctrine-rule-number-citation-liveness, DISTINCT (numbered doctrine-rule citations); owner doctrine-kit/DOCTRINE.md, with canon-kit/SPEC.md for any gate arm.
+
+### front-door-flag-grammar
+
+[cost: event/low] [surface: installer]
+
+an advertised `init` flag the pinned release lacks reds no gate and fires no release trigger. `check-front-door-verbs` invariant B reads only the verb after a route (installer/SPEC.md §The front door's verbs), and the close binding's release-policy trigger names a front-door verb, so a flag landed mid-iteration leaves the site advertising a refusal until an unforced release. Instance: docs/openspec.md, docs/speckit.md and docs/install.md advertised `init --recipe` while the pinned v0.28.0 refused it (`unknown argument: --recipe`, exit 2).
+
+**Deliverable:** invariant B, or a sibling arm, extended to a flag after an advertised verb, read against the pinned release's flag grammar (a flag table beside the verb table), and the release-policy trigger worded to match.
+
+**Cost while deferred:** each release window can publish a flag the one-liner refuses, found only by a reader. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's close; promoted 2026-09-28 at the next iteration's scope: →fix fails because the flag table is new mechanism. Re-verified: the pin now reads 0.29.0, whose `init.rs` carries `--recipe`, so the instance is gone and the class stands. Owner lookup: `front-door-verbs`, `flag table` in this file — none; owner installer/SPEC.md §The front door's verbs, with `.claude/commands/close.md`'s release-policy binding.
+
+### native-hook-dispatch
+
+[cost: iteration/high] [surface: gate-sdk]
+
+native Windows still needs Git for Windows' bash, through the generated pre-commit hook, against the native-binary direction (operator direction, 2026-09-28, lead session: "de-couple from bash towards native binaries and use native shell on the target OS"). Kits ship no shell gate, but the generated hook (`scripts/git-hooks/pre-commit` here, 578 lines) matches each gate's triggers in sh, which Git for Windows runs in MSYS sh on every commit. Its ARM64 build ships bash, coreutils and `msys-2.0.dll` as x86-64, so on Windows-on-ARM that sh runs emulated: `install-smoke-sh-windows-arm64` takes 18-21 min against 9-12 on x64 over five gates runs.
+
+**Deliverable:** hook dispatch moved into the binary, the hook one line handing off to it, after first probing whether Git for Windows runs a hook without sh; docs/install.md stating which shell, if any, the hook and battery need on native Windows. Operator direction: `install-smoke-sh-windows` and `-arm64` then retire, their full consumer-smoke coverage (init, battery, hooks, upgrade, uninstall) moving to the PowerShell legs under a non-bash smoke driver. Fallback only if sh stays: a Windows-on-ARM note and fewer spawns; splitting the job is not wanted. Still bash after: custom shell gates and the no-port harness templates.
+
+**Cost while deferred:** every push waits on the emulated leg, and a native-Windows adopter carries bash for a hook. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; promoted 2026-09-28 at the next iteration's scope: →fix fails because the dispatch is new mechanism. Owner lookup: `generated hook`, `hook dispatch` in this file — [custom-gate-substrates](#custom-gate-substrates), DISTINCT (the adopter's gate substrates; this is the hook Checkwright generates), reshaped by it; [windows-liveness-pid-reuse](#windows-liveness-pid-reuse) lives on a retired leg. Owner gate-sdk/SPEC.md, with installer/SPEC.md §The consumer smoke and §The install boundary.
+
+### gate-customer-value-audit
+
+[cost: iteration/high] [surface: gate-sdk]
+
+nothing asks whether each shipped gate is useful and configurable for a customer. Operator direction, 2026-09-28 (lead session): "offer customers useful and configurable gates"; a gate benefiting only Checkwright's own development, such as a GitHub Pages check that is not configurable, "should either be abstracted or not be shipped and tested on customer OSes". The provenance seam bars project content from kits, but customer value is another question, and the install disposition (zero-config, on-surface, never) decides registration, not whether a gate belongs in the payload.
+
+**Deliverable:** an audit over every shipped gate recording customer value and configurability, each gate then made generic, kept out of the payload and the customer-OS legs, or kept; site-kit's GitHub Pages gates first.
+
+**Cost while deferred:** every push runs gates of no customer value on customer-OS legs, and every adopter installs them. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; promoted 2026-09-28 at the next iteration's scope: →fix fails because the audit is unsized. Owner lookup: `customer value`, `payload` in this file — [consumer-value-literal-gate](#consumer-value-literal-gate), DISTINCT (a hard-coded value inside a gate, not the gate's place in the payload). Owner gate-sdk/SPEC.md §Consumer payload.
+
+### install-gate-selection
+
+[cost: event/high] [surface: installer]
+
+an adopter cannot choose which kits or gates to install, or which to replace with their own. Operator direction, 2026-09-28 (lead session): "choice is what customers want". `init` takes `--profile`, `--recipe`, `--no-recipe`, `--dry-run`, `--force` and `--no-commit` only; the profiles are fixed rosters; a recipe can unregister gates but is publisher-shipped; a `gates.list` edit survives a re-run only as an adopter-changed file. The registry already resolves consumer-first, so a same-named gate in the adopter's gates dir shadows a kit gate (gate-sdk/SPEC.md §Layout and configuration), but no adopter page presents that as the replace path.
+
+**Deliverable:** an install-time selection surface, include or exclude per kit and per gate, recorded in `checkwright.lock` so re-runs and `update` honour it, and the replace-with-your-own path documented.
+
+**Cost while deferred:** each adopter install takes a fixed roster and hand-edits it to choose. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead as `iteration/high`, re-classed `event/high` at promotion since its prose pays at an adopter's install; promoted 2026-09-28 at the next iteration's scope: →fix fails because the surface is new mechanism. Owner lookup: `selection`, `--profile` in this file — [verify-workflow-decoupling](#verify-workflow-decoupling), [gate-customer-value-audit](#gate-customer-value-audit), [custom-gate-substrates](#custom-gate-substrates) and [gate-authoring-sdk-surface](#gate-authoring-sdk-surface), each DISTINCT. Owner installer/SPEC.md §init, §Profiles and §The manifest.
+
+### toolkit-nav-hierarchy
+
+[cost: once/low] [surface: docs]
+
+the spec-toolkit pages sit in the nav as three flat siblings under Install whose labels do not read as one family, and no rule sets nav labels or titles beyond one. docs/spec-toolkits.md is titled "Spec Kit and OpenSpec" while its H1 reads "Gating specs that Spec Kit or OpenSpec writes", and docs/speckit.md and docs/openspec.md are its children in substance but its siblings in the nav (all `nav_parent: install`), since the nav renders one child level. docs/site-architecture.md's only label rule: title is the terse nav label, H1 the descriptive full form. Operator questions (lead session): should the toolkit pages get their own nav hierarchy, and can nav-label and title standards be set.
+
+**Deliverable:** a top-level nav entry for the toolkit overview carrying `nav_id`, Spec Kit and OpenSpec its children, as Kit Reference already is; label rules in docs/site-architecture.md's page-authoring rules (sibling labels parallel, a child label never repeating its parent, an overview never a sibling of its subpages, the H1 agreeing with the label); a `check-docs-nav-reachable` arm weighed for the overview-as-sibling rule. The lead's recommendation, not yet ruled.
+
+**Cost while deferred:** a reader sees one family as three unrelated pages. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; promoted 2026-09-28 at the next iteration's scope: →fix fails because the operator's questions are open. Owner lookup: `nav`, `label` in this file — none; owner docs/site-architecture.md, with docs/spec-toolkits.md, docs/speckit.md and docs/openspec.md.
 
 ## Icebox
 
