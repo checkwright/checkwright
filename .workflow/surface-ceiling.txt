@@ -1,5 +1,6 @@
 # contract: context-kit/SPEC.md §The surface ratchet
 7545cp .claude/agents/audit-sweep.md
+1562cp .claude/agents/consult-session.md
 2368cp .claude/agents/edit-sweep.md
 8486cp .claude/agents/stage-session.md
 1446cp .claude/commands/agent-execution.md
@@ -8,7 +9,7 @@
 9170cp .claude/commands/close.md
 1856cp .claude/commands/consult.md
 1590cp .claude/commands/economics.md
-4609cp .claude/commands/lead.md
+4729cp .claude/commands/lead.md
 715cp .claude/commands/release-sweep.md
 6847cp .claude/commands/scope.md
 1155cp .claude/commands/spec.md
@@ -19,7 +20,7 @@
 15460cp companion/SPEC.md
 130174cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
-269112cp delegation-kit/SPEC.md
+270244cp delegation-kit/SPEC.md
 36803cp delegation-kit/templates/agent-execution.md
 3397cp delegation-kit/templates/dispatch-checklists.md
 1308cp docs/canon-kit/index.md
@@ -82,9 +83,9 @@
 301516cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
 275634cp installer/SPEC.md
-395366cp lifecycle-kit/SPEC.md
-4663cp lifecycle-kit/templates/consult.md
-40197cp lifecycle-kit/templates/lead.md
+397314cp lifecycle-kit/SPEC.md
+5140cp lifecycle-kit/templates/consult.md
+41046cp lifecycle-kit/templates/lead.md
 2100cp lifecycle-kit/templates/release-sweep.md
 6939cp lifecycle-kit/templates/stages/align.md
 9182cp lifecycle-kit/templates/stages/build.md

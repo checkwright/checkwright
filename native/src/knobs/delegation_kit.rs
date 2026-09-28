@@ -59,6 +59,7 @@ pub const KIT: Kit = Kit {
         Row::indexed("DELEGATION_KIT_READONLY_TYPES", &[]),
         Row::indexed("DELEGATION_KIT_MUTATING_TYPES", &[]),
         Row::scalar("DELEGATION_KIT_REQUIRE_TIER", "off"),
+        Row::indexed("DELEGATION_KIT_STATUSLINE_INBOXES", &[]),
         Row::derived("DELEGATION_KIT_GATE_FILES", Shape::Indexed, gate_files, &["GATE_SDK_GATES_DIR"]),
         Row::derived(
             "DELEGATION_KIT_META_PATHS",
@@ -109,6 +110,17 @@ fn validate(v: &Values) -> Vec<String> {
     }
     if scalar(v, "DELEGATION_KIT_AGENT_DIR").is_some_and(str::is_empty) {
         errs.push("DELEGATION_KIT_AGENT_DIR is empty".to_string());
+    }
+    // spec: delegation-kit/SPEC.md §Layout and configuration — each inbox counter is `<label>=<path>`,
+    // neither half empty
+    for e in indexed(v, "DELEGATION_KIT_STATUSLINE_INBOXES").unwrap_or(&[]) {
+        match e.split_once('=') {
+            Some((l, p)) if !l.is_empty() && !p.is_empty() => {}
+            _ => errs.push(format!(
+                "DELEGATION_KIT_STATUSLINE_INBOXES element '{}' is not '<label>=<path>' with both halves non-empty",
+                e
+            )),
+        }
     }
     for n in ["DELEGATION_KIT_GATE_FILES", "DELEGATION_KIT_META_PATHS"] {
         if indexed(v, n).is_some_and(|e| e.is_empty()) {

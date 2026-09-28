@@ -112,6 +112,10 @@ Under the split posture the lead **routes** an escalation before answering it. A
 
 **One class the lead never rules, under either posture.** Reversing, demoting or re-scoping a **recorded operator ruling** or a stated objective is operator-class: the lead relays it, however well-grounded the escalating session's finding and however urgent the fix. Where the operator defers it, file it with `--emit file-consult` so it reaches the next consultation rather than your transcript. Nor does it decline a threshold-proposed entry that scope's escalation marks operator-routed. That entry has been declined twice, and it is relayed.
 
+**Dispatch a consultation for the consult inbox only while no stage session is live.** At a point where no dispatched stage session is live and the inbox (`LIFECYCLE_KIT_CONSULT_INBOX_FILE`) meets the slot's threshold, dispatch the consult skill as the agent type the slot names, its prompt naming the inbox items and nothing else. It escalates to you as a stage session does. Relay each ruling-class escalation to the operator and relay the answer back, stating its class. Dispatch no stage session while it is live.
+
+*<consult-dispatch: the agent type a lead dispatches a consultation as — never a stage-session type — and the batching threshold on the consult inbox: an item count, an oldest-item age, or off, which dispatches at the first quiet point after any item lands. Or the statement that this consumer's lead dispatches no consultation.>*
+
 ## Channel design
 
 Two channels, each with one job. Routine narration and findings go to the **resume journal** (a pull channel — delegation-kit's journal mechanics own the rest). The **message channel** carries only the escalation classes. This is how verbosity is controlled: by channel design, not by asking a session to be quiet.

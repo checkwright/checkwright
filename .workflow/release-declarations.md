@@ -1,5 +1,10 @@
 # contract: gate-sdk/SPEC.md §upgrade-smoke — the accumulating release declaration surface; the note's three declaration-bearing sections in the note's grammar, appended by the session landing a kit-shipped change or the one discovering its omission, composed into the release note and drained to this header at the tag.
 
+## Tightened gates
+
+- `check-skill-binding` — lifecycle-kit/templates/lead.md gained the `consult-dispatch` slot, so a lead binding shim reds until it binds it. Bind the agent type your lead dispatches a consultation as, and a threshold or off — or state that your lead dispatches none.
+
 ## Behavior changes
 
 - **lifecycle-kit/SPEC.md §The consult inbox** — a committed consult inbox (`LIFECYCLE_KIT_CONSULT_INBOX_FILE`, default `.workflow/consult-items.md`) that only the consult skill drains, written by the new `--emit file-consult` arm; `--install-lifecycle` now writes a `merge=union` line for it and `check-merge-attrs` reds its absence; close's gap drain gains a →forward disposition for a bullet only the operator can settle, and the consult template a drain step. Re-run `--install-lifecycle` to add the attribute, and re-read your close and consult bindings if they restate the drain or the ritual.
+- **delegation-kit/SPEC.md §The statusline arm** — an optional inbox counter group, `DELEGATION_KIT_STATUSLINE_INBOXES` (`<label>=<path>` elements), empty by default so the bar is unchanged; set it to show a bullet count per inbox. Nothing to do otherwise.

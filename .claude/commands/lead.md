@@ -19,3 +19,5 @@ Execute the template at lifecycle-kit/templates/lead.md, applying the bindings b
 scope, `spec`, and close stay on Opus, their generative and verificational judgment being what justifies the tier. Re-judge every tier when the harness model roster churns.
 
 **escalation-guard** — inert, the optional-guard default (as `--hook wakeup-guard`, unwired in `.claude/settings.json`). A lead-model session wires `--hook escalation-guard` on SendMessage per guard-kit/SPEC.md §wakeup-guard. Wiring is now a `command` field naming the arm, never a template copied into `scripts/`.
+
+**consult-dispatch** — the agent type is `consult-session` (`.claude/agents/consult-session.md`); the threshold is off.

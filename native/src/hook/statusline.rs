@@ -20,6 +20,7 @@ pub const KNOBS: &[&str] = &[
     "QUEUE_KIT_ACTIVE_SECTIONS",
     "QUEUE_KIT_DEFERRED_SECTION",
     "QUEUE_KIT_ICEBOX_SECTION",
+    "DELEGATION_KIT_STATUSLINE_INBOXES",
 ];
 
 // spec: delegation-kit/SPEC.md §The statusline arm — the gauge's geometry and its three
@@ -87,7 +88,7 @@ pub fn run(args: &[String]) -> i32 {
             bar.push_str(&format!(" {}", remaining(&seven_resets)));
         }
     }
-    let (iteration, stage, counts) = project();
+    let (iteration, stage, counts, inboxes) = project();
     if !iteration.is_empty() {
         bar.push_str(&format!(
             "·⟳ {}{}",
@@ -102,6 +103,10 @@ pub fn run(args: &[String]) -> i32 {
     let group = counters(&counts);
     if !group.is_empty() {
         bar.push_str(&format!("·{}", group));
+    }
+    let inbox_group = inbox_counters(&inboxes);
+    if !inbox_group.is_empty() {
+        bar.push_str(&format!("·{}", inbox_group));
     }
     println!("{}", bar);
     0
@@ -204,11 +209,26 @@ fn counters(tsv: &str) -> String {
         .join(" ")
 }
 
-// spec: delegation-kit/SPEC.md §The statusline arm — the project trio, read at their literal
-// tracked paths exactly as the shell member read them: an unresolvable root leaves all three empty
-// and the render drops their sections rather than printing a partial parse.
-fn project() -> (String, String, String) {
-    let empty = (String::new(), String::new(), String::new());
+// spec: delegation-kit/SPEC.md §The statusline arm — the inbox counters: one `<label><n>` token per
+// configured file holding a bullet; a zero, absent or unreadable file renders nothing.
+fn inbox_counters(counts: &[(String, usize)]) -> String {
+    counts
+        .iter()
+        .filter(|(_, n)| *n > 0)
+        .map(|(label, n)| format!("{}{}", label, n))
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+fn bullet_count(text: &str) -> usize {
+    text.lines().filter(|l| l.starts_with("- ")).count()
+}
+
+// spec: delegation-kit/SPEC.md §The statusline arm — the trio at their literal tracked paths, the
+// inboxes at their configured ones: an unresolvable root leaves all empty and the render drops
+// their sections rather than printing a partial parse.
+fn project() -> (String, String, String, Vec<(String, usize)>) {
+    let empty = (String::new(), String::new(), String::new(), Vec::new());
     let Ok(root) = walk::cwd().and_then(|d| walk::toplevel_in(&d)) else {
         return empty;
     };
@@ -236,7 +256,16 @@ fn project() -> (String, String, String) {
     // process. `Err` maps to an empty counter group, so an unresolvable queue file and a
     // malformed queue config drop the whole group and change nothing else about the bar.
     let counts = crate::emit::queue_counts::emit(&[]).unwrap_or_default();
-    (iteration, stage, counts)
+    let inboxes = walk::knob_array("DELEGATION_KIT_STATUSLINE_INBOXES")
+        .unwrap_or_default()
+        .iter()
+        .filter_map(|e| e.split_once('='))
+        .map(|(label, path)| {
+            let n = read(path).map(|t| bullet_count(&t)).unwrap_or(0);
+            (label.to_string(), n)
+        })
+        .collect();
+    (iteration, stage, counts, inboxes)
 }
 
 // spec: lifecycle-kit/SPEC.md §The stamp protocol — the cursor is the LAST stamp's stage, read as
@@ -297,6 +326,19 @@ mod tests {
         assert_eq!(counters("Deferred\t2\nDone\t3"), "De2 Do3");
         assert_eq!(counters(""), "");
         assert_eq!(counters("no tab here\n"), "");
+    }
+
+    // spec: delegation-kit/SPEC.md §The statusline arm — a zero count renders nothing, and only a
+    // line opening `- ` counts
+    #[test]
+    fn an_inbox_counts_its_bullets_and_a_zero_renders_nothing() {
+        assert_eq!(bullet_count("# contract: x\n- 2026-01-01 — a\n  - nested\n- 2026-01-02 — b\n"), 2);
+        assert_eq!(
+            inbox_counters(&[("C".to_string(), 2), ("G".to_string(), 0), ("X".to_string(), 1)]),
+            "C2 X1"
+        );
+        assert_eq!(inbox_counters(&[("C".to_string(), 0)]), "");
+        assert_eq!(inbox_counters(&[]), "");
     }
 
     // spec: lifecycle-kit/SPEC.md §The stamp protocol — the cursor is the last stamp's stage, and a
