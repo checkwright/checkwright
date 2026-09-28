@@ -1434,10 +1434,4 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 ## Done
 
-- lifecycle-kit-machine-brevity
-- truncation-reclaim-residue
-- gate-tests-suite-identity-in-evidence
-- windows-liveness-pid-reuse
-- truncation-compound-unsteered
-
 ## Lessons Learned
