@@ -8,7 +8,7 @@ You are a consultation dispatched by a live iteration lead, with no operator in 
 
 ## Escalation
 
-Batch every item that needs a ruling or an operator direction into one turn-end message to the lead (`to: "main"`), one Question / Options / Recommendation / Evidence block per item. Land a relayed answer in the class the relay names (lifecycle-kit/SPEC.md §The steering vocabulary); an answer relayed through the lead is never landed as a ruling.
+Escalate as the dispatched mode directs, in one turn-end message to the lead (`to: "main"`).
 
 ## Journal
 
