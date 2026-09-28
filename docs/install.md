@@ -114,7 +114,7 @@ Then, from your repository root:
 curl -fsSL https://checkwright.dev/install.sh | sh
 ```
 
-The script is `docs/install.sh` in this repository; read it at <https://checkwright.dev/install.sh> before you pipe it. To pass arguments, name the verb first, since the line runs `init` only when given none: end the line with `sh -s -- init --profile prose`, `sh -s -- demo` or `sh -s -- uninstall`. For `uninstall`, set `CHECKWRIGHT_VERSION` to the version you installed: `curl -fsSL https://checkwright.dev/install.sh | CHECKWRIGHT_VERSION=X.Y.Z sh -s -- uninstall`.
+The script is `docs/install.sh` in this repository; read it at <https://checkwright.dev/install.sh> before you pipe it. To pass arguments, name the verb first, since the line runs `init` only when given none: end the line with `sh -s -- init --profile prose`, `sh -s -- demo` or `sh -s -- uninstall`.
 
 <details markdown="1">
 <summary>Step by step</summary>
@@ -143,7 +143,7 @@ sh "$cw/package/bin/checkwright.sh" init   # from your repository root
 
 To verify, `git show --stat HEAD` lists everything the install brought in. Run the commands `init` prints to finish the setup.
 
-To uninstall, `sh "$cw/package/bin/checkwright.sh" uninstall` reverses it in one commit, from the same version you installed; download it again if `$cw` is gone.
+To uninstall, `sh "$cw/package/bin/checkwright.sh" uninstall` reverses it in one commit. If `$cw` is gone, download any release, as [Managing](#managing) says.
 
 </details>
 
@@ -171,7 +171,7 @@ Then, in PowerShell, from your repository root:
 irm https://checkwright.dev/install.ps1 | iex
 ```
 
-The script is `docs/install.ps1` in this repository; read it at <https://checkwright.dev/install.ps1> before you pipe it. To pass arguments, run it as a script block, the verb first: `& ([scriptblock]::Create((irm https://checkwright.dev/install.ps1))) init --profile prose`, or `demo`, or `uninstall`. For `uninstall`, set `$env:CHECKWRIGHT_VERSION` to the version you installed first.
+The script is `docs/install.ps1` in this repository; read it at <https://checkwright.dev/install.ps1> before you pipe it. To pass arguments, run it as a script block, the verb first: `& ([scriptblock]::Create((irm https://checkwright.dev/install.ps1))) init --profile prose`, or `demo`, or `uninstall`.
 
 <details markdown="1">
 <summary>Step by step</summary>
@@ -242,7 +242,7 @@ Moving to a profile that contains yours only adds. `init` refuses outside a git 
 - `checkwright update` upgrades the install to the version you are running.
 - `checkwright uninstall` reverses the install in one commit.
 
-`uninstall` removes only files `init` wrote and you left untouched. It keeps and reports any you edited, and never removes a file you wrote. Run it with `--dry-run` first to see the plan. A remedy block changes your machine and not your repository, so `uninstall` leaves it in place.
+`uninstall` needs no version: any release that reads your `checkwright.lock` runs it, so the one line reverses an install an older release made. `uninstall` removes only files `init` wrote and you left untouched. It keeps and reports any you edited, and never removes a file you wrote. Run it with `--dry-run` first to see the plan. A remedy block changes your machine and not your repository, so `uninstall` leaves it in place.
 
 ### Requiring the CI check
 

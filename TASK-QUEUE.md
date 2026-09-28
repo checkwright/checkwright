@@ -50,21 +50,13 @@ the spec-toolkit companion ships document hygiene only. docs/spec-toolkits.md na
 
 ## Technical Debt
 
-### uninstall-version-ask
-
-the uninstall path asks the adopter for the installed version it never checks. docs/install.md (the one-liner note, the step-by-step uninstall line and the Windows note) and installer/SPEC.md's arguments bullet tell the adopter to set `CHECKWRIGHT_VERSION` to the installed version for `uninstall`, while `native/src/installer/uninstall.rs` refuses only a `checkwright.lock` schema it does not know and reads the lock's version for display and the commit message alone. Operator question (lead session): why must uninstall name a version.
-
-**Deliverable:** the docs and the SPEC drop the ask, `uninstall` stated as running from any release that knows the manifest schema, with a witness that a newer payload's `uninstall` reverses an older install.
-
-**Cost while deferred:** every adopter reversing an install must remember a version the verb never uses, on the path the adoption story rests on. Filed 2026-09-28 to the gap inbox by the lead after consult-inbox-front-brevity's close; promoted at the next iteration's scope. Re-verified: `lock::SCHEMA` reads `checkwright-lock v1`, unchanged since the verbs moved behind the invoke, and `docs/install.sh` defaults the version to its own pin. Owner lookup: `CHECKWRIGHT_VERSION`, `uninstall` in this file — none; owner installer/SPEC.md §uninstall, with docs/install.sh, docs/install.ps1 and docs/install.md.
-
 ### piped-install-argument-witness
 
 no CI leg runs an argument form docs/install.md tells an adopter to type through the piped bootstrap: `.github/workflows/gates.yml` pipes `install.sh` and `install.ps1` with no arguments only, and profiles are exercised only as `init --profile <p>` against the bootstrap directly, which is how the flags-first examples shipped. `check-front-door-verbs` now reds a flag-led route statically, but nothing executes the page's argument examples.
 
 **Deliverable:** a step on each leg piping the served `docs/install.sh` and `docs/install.ps1` with `init --profile starter` beside the bare line.
 
-**Push need (2026-09-28, inside the budget):** the mid-iteration push, shared with [companion-recipe-in-payload](#companion-recipe-in-payload); the PowerShell legs run only on CI. Land it after [uninstall-version-ask](#uninstall-version-ask) and the recipe's `init` form, the argument forms it witnesses.
+**Push need (2026-09-28, inside the budget):** the mid-iteration push, shared with [companion-recipe-in-payload](#companion-recipe-in-payload); the PowerShell legs run only on CI. Land it after `uninstall-version-ask` and the recipe's `init` form, the argument forms it witnesses.
 
 **Cost while deferred:** a broken argument form reaches adopters with every leg green. Filed 2026-09-27 to the gap inbox by the front-door hotfix; promoted 2026-09-27 at companion-catalog-extension's close: →fix fails because the PowerShell 5.1 script-block leg cannot be witnessed on this host and a red would spend a hotfix push from an allocated budget. Re-verified: the one-liner step runs `curl … | … sh` with no argument. Owner lookup: `piped`, `one-liner`, `irm` in this file — none; owner installer/SPEC.md §Requirements.
 
@@ -1461,5 +1453,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 ## Done
 
 - install-toolkit-page-structure
+- uninstall-version-ask
 
 ## Lessons Learned
