@@ -1428,8 +1428,4 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 ## Done
 
-- queue-write-side-verb
-- recurrence-declaration-grammar-ungated
-- plugin-marketplace
-
 ## Lessons Learned
