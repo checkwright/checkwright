@@ -243,6 +243,42 @@ pub fn is_iso_date(tok: &str) -> bool {
         })
 }
 
+// spec: queue-kit/SPEC.md §The tag algebra — a calendar-valid `YYYY-MM-DD`: month 01 to 12, the day
+// within its month, Gregorian leap years
+pub fn is_calendar_date(tok: &str) -> bool {
+    if !is_iso_date(tok) {
+        return false;
+    }
+    let num = |r: std::ops::Range<usize>| tok[r].parse::<u32>().unwrap_or(0);
+    let (y, m, d) = (num(0..4), num(5..7), num(8..10));
+    let leap = (y % 4 == 0 && y % 100 != 0) || y % 400 == 0;
+    let last = match m {
+        1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
+        4 | 6 | 9 | 11 => 30,
+        2 if leap => 29,
+        2 => 28,
+        _ => return false,
+    };
+    (1..=last).contains(&d)
+}
+
+// spec: queue-kit/SPEC.md §The tag algebra — the strict `[recurrence:]` parse: every token a calendar
+// date, returned in order, or the first token that is not one. An empty value fails; an entry with no
+// tag has no dates.
+pub fn recurrence_array(tag_line: &str) -> Result<Vec<&str>, String> {
+    let Some(tag) = field_tags(tag_line, "recurrence").into_iter().next() else {
+        return Ok(Vec::new());
+    };
+    let mut out = Vec::new();
+    for tok in tag.raw.split(',').map(str::trim) {
+        if !is_calendar_date(tok) {
+            return Err(tok.to_string());
+        }
+        out.push(tok);
+    }
+    Ok(out)
+}
+
 // spec: queue-kit/SPEC.md §The shared queue adapters — one markdown link on a line: its target's
 // path half, its fragment half, and the byte offsets of the fragment and of the closing paren
 pub struct Link<'a> {
@@ -507,6 +543,135 @@ pub fn retired_set(file: &str, live: &[String]) -> Vec<String> {
         }
     }
     out
+}
+
+// spec: queue-kit/SPEC.md §The shared queue adapters — one revision of the queue file on the history
+// walk, its text already in the heading grammar; `None` where the commit does not carry the file
+pub struct Revision {
+    pub commit: String,
+    pub date: String,
+    pub subject: String,
+    pub text: Option<String>,
+}
+
+// spec: queue-kit/SPEC.md §check-queue-entry-budget — git's own record separator between the
+// `--format` fields: a subject may carry anything a shell quotes, and a unit separator cannot
+const FIELD: char = '\u{1f}';
+
+// spec: queue-kit/SPEC.md §The shared queue adapters — the one history walk the entry-history and
+// queue-history arms share; `visit` returns false to stop, and `Ok(false)` is a file with no
+// committed history to walk
+pub fn walk_history(
+    top: &str,
+    file: &str,
+    sec: &Sections,
+    visit: &mut dyn FnMut(&Revision) -> bool,
+) -> Result<bool, String> {
+    let git = crate::history::Git { top: top.to_string() };
+    let Some(log) = git.read(&["log", &format!("--format=%H{0}%cs{0}%s", FIELD), "--", file]) else {
+        return Ok(false);
+    };
+    let mut blobs = crate::history::Blobs::open(top)?;
+    for line in log.lines() {
+        let mut f = line.splitn(3, FIELD);
+        let (Some(commit), Some(date), Some(subject)) = (f.next(), f.next(), f.next()) else {
+            continue;
+        };
+        let text = blobs
+            .at(commit, file)?
+            .map(|t| crate::emit::queue_migrate::heading_form(&t, sec).into_owned());
+        let rev = Revision {
+            commit: commit.to_string(),
+            date: date.to_string(),
+            subject: subject.to_string(),
+            text,
+        };
+        if !visit(&rev) {
+            break;
+        }
+    }
+    Ok(true)
+}
+
+// spec: queue-kit/SPEC.md §The queue-history arm — the place a revision gives a slug
+pub const ABSENT: &str = "(absent)";
+
+// spec: queue-kit/SPEC.md §The queue-history arm — the task section heading its entry, the done
+// section when a bare done line carries it, or `(absent)`
+pub fn place_of(text: &str, sec: &Sections, slug: &str) -> String {
+    let lines: Vec<&str> = text.lines().collect();
+    if let Some(e) = entries(&lines, sec).into_iter().find(|e| e.slug == slug) {
+        return e.section;
+    }
+    if done_slugs(text, sec).iter().any(|s| s == slug) {
+        return sec.done.clone();
+    }
+    ABSENT.to_string()
+}
+
+// spec: queue-kit/SPEC.md §The queue-history arm — a commit at which the slug's place changed; `prior`
+// is the revision before it, the one the history-reading verbs open
+#[derive(Debug, Clone, PartialEq)]
+pub struct Transition {
+    pub commit: String,
+    pub date: String,
+    pub subject: String,
+    pub from: String,
+    pub to: String,
+    pub prior: Option<String>,
+}
+
+// spec: queue-kit/SPEC.md §The queue-history arm — every transition of one slug, oldest first,
+// the walk stopping where the slug is absent after being present
+pub fn transitions(file: &str, slug: &str, sec: &Sections) -> Result<Vec<Transition>, String> {
+    let text = std::fs::read_to_string(file).unwrap_or_default();
+    let live = live_slugs(&text, sec);
+    let known = live.iter().any(|s| s == slug)
+        || done_slugs(&text, sec).iter().any(|s| s == slug)
+        || retired_set(file, &live).iter().any(|s| s == slug);
+    if !known {
+        return Err(format!("not a live or retired slug: {}", slug));
+    }
+    if !crate::proc::on_path(&programs::GIT) {
+        return Ok(Vec::new());
+    }
+    let Some(top) = crate::walk::toplevel_opt().ok().flatten() else {
+        return Ok(Vec::new());
+    };
+    let mut out: Vec<Transition> = Vec::new();
+    let mut newer: Option<(String, String, String, String)> = None;
+    let mut seen = false;
+    walk_history(&top, file, sec, &mut |rev| {
+        let place = rev.text.as_deref().map_or_else(|| ABSENT.to_string(), |t| place_of(t, sec, slug));
+        if let Some((commit, date, subject, to)) = newer.take() {
+            if to != place {
+                out.push(Transition { commit, date, subject, from: place.clone(), to, prior: Some(rev.commit.clone()) });
+            }
+        }
+        let present = place != ABSENT;
+        if !present && seen {
+            return false;
+        }
+        seen |= present;
+        newer = Some((rev.commit.clone(), rev.date.clone(), rev.subject.clone(), place));
+        true
+    })?;
+    if let Some((commit, date, subject, to)) = newer {
+        if to != ABSENT {
+            out.push(Transition { commit, date, subject, from: ABSENT.to_string(), to, prior: None });
+        }
+    }
+    out.reverse();
+    Ok(out)
+}
+
+// spec: queue-kit/SPEC.md §The queue verbs — the queue file at one revision, in the heading grammar
+pub fn revision_text(file: &str, rev: &str, sec: &Sections) -> Result<Option<String>, String> {
+    let top = crate::walk::toplevel()?;
+    let mut blobs = crate::history::Blobs::open(&top)?;
+    Ok(blobs
+        .at(rev, file)?
+        .map(|t| crate::emit::queue_migrate::heading_form(&t, sec).into_owned()))
 }
 
 // spec: queue-kit/SPEC.md §The shared queue adapters — the body-position citation token: a
@@ -848,6 +1013,38 @@ mod tests {
         assert_eq!(recurrence_dates("[cost: once/low] [recurrence: 2026-09-03, 2026-09-10]"), vec!["2026-09-03", "2026-09-10"]);
         assert!(recurrence_dates("[recurrence: soon]").is_empty());
         assert!(recurrence_dates("[cost: once/low]").is_empty());
+    }
+
+    // spec: queue-kit/SPEC.md §The shared queue adapters — the strict parse: calendar-valid dates in
+    // order, or the first failing token, an empty value failing and an absent tag holding none
+    #[test]
+    fn the_strict_recurrence_parse_names_the_first_bad_token() {
+        assert_eq!(recurrence_array("[recurrence: 2024-02-29, 2026-09-28]"), Ok(vec!["2024-02-29", "2026-09-28"]));
+        assert_eq!(recurrence_array("[cost: once/low]"), Ok(vec![]));
+        assert_eq!(recurrence_array("[recurrence: 2026-09-27 2026-09-28]"), Err("2026-09-27 2026-09-28".to_string()));
+        assert_eq!(recurrence_array("[recurrence: 2025-02-29]"), Err("2025-02-29".to_string()));
+        assert_eq!(recurrence_array("[recurrence: ]"), Err(String::new()));
+        for bad in ["2026-13-01", "2026-04-31", "2026-00-10", "1900-02-29", "26-01-01"] {
+            assert!(!is_calendar_date(bad), "{}", bad);
+        }
+        assert!(is_calendar_date("2000-02-29"));
+    }
+
+    // spec: queue-kit/SPEC.md §The queue-history arm — a place is the heading section, the done
+    // section, or absence
+    #[test]
+    fn a_place_is_a_section_the_done_section_or_absent() {
+        let sec = Sections {
+            active: vec!["New Features".into()],
+            deferred: "Deferred".into(),
+            icebox: String::new(),
+            done: "Done".into(),
+        };
+        let text = "## New Features\n\n### a\n\n## Deferred\n\n### b\n\n#### b-sub\n\n## Done\n\n- c\n";
+        assert_eq!(place_of(text, &sec, "a"), "New Features");
+        assert_eq!(place_of(text, &sec, "b-sub"), "Deferred");
+        assert_eq!(place_of(text, &sec, "c"), "Done");
+        assert_eq!(place_of(text, &sec, "d"), ABSENT);
     }
 
     // spec: queue-kit/SPEC.md §The tag algebra — a same-file link's slug-shaped fragment

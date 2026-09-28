@@ -49,11 +49,22 @@ gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --emit queue-edges                       # every live slug with inbound citations, then retired targets, each marked where its name is still a tracked file's stem
 "$gates" --emit queue-edges --inbound <slug>      # one slug's inbound set, each edge with its citing line verbatim
 "$gates" --emit entry-history <slug>              # commits where one entry's counted extent fell — live or departed slug; advisory, no verdict
+"$gates" --emit queue-history <slug>              # one entry's section transitions, oldest first: date, commit, from -> to, subject
+"$gates" --queue promote <slug> <section> [--spec <file>]   # a deferred entry into an active section, its board tags dropped
+"$gates" --queue done <slug>                      # an entry to the done section, every link to it retired
+"$gates" --queue clear-done                       # every bullet under the done section removed
+"$gates" --queue icebox <slug> <sentence>         # a deferred entry into the icebox as one sentence
+"$gates" --queue recur <slug> [<date>]            # a date appended to the entry's [recurrence:] array
+"$gates" --queue demote <slug> [--cost <class>] [--surface <entry>]   # an active entry back to its deferred place and tags
+"$gates" --queue thaw <slug> [--date <date>]      # an icebox entry back with its body restored, a recurrence stamped
+"$gates" --queue split <parent> <child> <parent-sentence> < child.md   # the mechanical half of an authorized split
 "$gates" --lesson-sink <tag>                      # route a lesson body on stdin to its configured sink
 "$gates" --emit roadmap          # the public roadmap block, to stdout
 "$gates" --emit roadmap --write   # splice it into the configured projection page
 "$gates" --emit queue-migrate --write TASK-QUEUE.md   # once, on upgrade: bullet entries become ### headings with a tag line
 ```
+
+Each `--queue` verb runs the gates coupled to the queue file after it writes, and never stages or commits: exit 0 is written and green, 1 is written with a red to fix before you commit, 2 is nothing written.
 
 The roadmap projection is opt-in: it emits nothing until you set the horizon and track vocabularies and a projection page in your config (step 3 above), so an unconfigured consumer gets a clean skip rather than a kit-shaped roadmap.
 

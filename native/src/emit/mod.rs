@@ -47,8 +47,10 @@ pub mod pub_lang;
 pub mod queue_counts;
 pub mod queue_edges;
 pub mod queue_flow;
+pub mod queue_history;
 pub mod queue_index;
 pub mod queue_migrate;
+pub mod queue_verbs;
 pub mod reads_census;
 pub mod rewrite;
 pub mod scan_prompts;
@@ -377,6 +379,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
             "QUEUE_KIT_ICEBOX_SECTION",
         ],
     ),
+    // spec: queue-kit/SPEC.md §The queue-history arm — an `Arm::Emit` on entry-history's ground: a
+    // report with no 1, over the same walk, declaring the done section a place reads
+    (
+        "--emit-queue-history",
+        Arm::Emit(queue_history::emit, Grammar::Parsed(queue_history::USAGE)),
+        queue_history::KNOBS,
+    ),
     // spec: queue-kit/SPEC.md §The queue-counts arm — the four knobs `Sections::active_and_deferred`
     // resolves, plus the queue file. `QUEUE_KIT_DONE_SECTION` deliberately not: Done is not a task
     // section, and the arm must not acquire a read it does not make.
@@ -701,6 +710,9 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Run(lesson_sink::run),
         lesson_sink::KNOBS,
     ),
+    // spec: queue-kit/SPEC.md §The queue verbs — an `Arm::Run` because its 1, a move written under a
+    // red post-check, is the status its caller acts on; its verb is an operand on `--hook`'s shape
+    ("--queue", Arm::Run(queue_verbs::run), queue_verbs::KNOBS),
     // spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — an `Arm::Run` because the member
     // mutates two files and a git config key and emits no document; the `--install <op>` family is
     // refused with cause there, a hardcoded flag having no row to declare these eight knobs on

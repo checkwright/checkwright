@@ -1,6 +1,5 @@
 // spec: queue-kit/SPEC.md §check-queue-entry-budget — the entry-history arm: the commits at which
 // one entry's counted extent fell, reported and never judged, with no exit-1 path at all
-use crate::emit::queue_migrate;
 use crate::gates::queue_entry_budget;
 use crate::queue;
 
@@ -13,10 +12,6 @@ usage: --emit entry-history <slug> [queue-file]
   <slug> may be live or retired; a departed entry's header names the commit it
   departed at, and a slug in neither set is refused.
 ";
-
-// spec: queue-kit/SPEC.md §check-queue-entry-budget — git's own record separator between the two
-// `--format` fields: a subject may carry anything a shell quotes, and a unit separator cannot
-const FIELD: char = '\u{1f}';
 
 struct Row {
     commit: String,
@@ -48,10 +43,6 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         file
     };
     let top = crate::walk::toplevel()?;
-    let git = crate::history::Git { top: top.clone() };
-    let log = git
-        .read(&["log", &format!("--format=%H{}%s", FIELD), "--", &file])
-        .ok_or_else(|| format!("no committed history for {}", file))?;
 
     // spec: queue-kit/SPEC.md §check-queue-entry-budget — the addressable domain is the live slugs
     // plus the retired ones, and that membership is the bound the back-search would otherwise lack:
@@ -62,37 +53,27 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         return Err(format!("not a live or retired slug: {}", slug));
     }
 
-    let mut blobs = crate::history::Blobs::open(&top)?;
-
     let mut rows: Vec<Row> = Vec::new();
     let mut prev: Option<Row> = None;
     let mut walked = 0usize;
     let mut filing = String::new();
     let mut departure: Option<(String, String)> = None;
-    for line in log.lines() {
-        let (commit, subject) = match line.split_once(FIELD) {
-            Some(p) => p,
-            None => continue,
-        };
-        let count = match blobs.at(commit, &file)? {
-            Some(text) => count_of(&queue_migrate::heading_form(&text, &sec_cfg), &sec_cfg, &slug, unit),
-            None => None,
-        };
+    let had_history = queue::walk_history(&top, &file, &sec_cfg, &mut |rev| {
         // spec: queue-kit/SPEC.md §check-queue-entry-budget — the bound, and the departure commit:
         // the post-disposition run precedes the walk, and its oldest member is the commit one step
         // newer than the last live one.
-        let count = match count {
+        let count = match rev.text.as_deref().and_then(|t| count_of(t, &sec_cfg, &slug, unit)) {
             Some(k) => k,
             None => {
                 if walked > 0 {
-                    break;
+                    return false;
                 }
-                departure = Some((commit.to_string(), subject.to_string()));
-                continue;
+                departure = Some((rev.commit.clone(), rev.subject.clone()));
+                return true;
             }
         };
         walked += 1;
-        filing = commit.to_string();
+        filing = rev.commit.clone();
         if let Some(newer) = prev.take() {
             if newer.before < count {
                 rows.push(Row {
@@ -104,11 +85,15 @@ pub fn emit(args: &[String]) -> Result<String, String> {
             }
         }
         prev = Some(Row {
-            commit: commit.to_string(),
+            commit: rev.commit.clone(),
             before: count,
             after: count,
-            subject: subject.to_string(),
+            subject: rev.subject.clone(),
         });
+        true
+    })?;
+    if !had_history {
+        return Err(format!("no committed history for {}", file));
     }
     // spec: queue-kit/SPEC.md §check-queue-entry-budget — the retired set admits a slug on
     // entry shape alone, so a heading or bullet that never stood in a task section is addressable and

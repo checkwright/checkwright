@@ -29,6 +29,7 @@ pub const USAGE: &str = r#"usage: run-gates.sh [gates-dir]                run ev
        run-gates.sh --usage-poll               refresh the usage snapshot from its source
        run-gates.sh --usage-verdict [paths]    budget verdict: 0 OK/RESET-OK, 1 PAUSE, 2 STALE
        run-gates.sh --lesson-sink <tag>        route a lesson body on stdin to its sink
+       run-gates.sh --queue <verb> <slug> [args]  move or stamp one queue entry, then run the queue's gates
        run-gates.sh --upgrade-smoke            prove the FROM->TO kit upgrade in scratch
        run-gates.sh --run-consumer-smoke [args] prove the kits install into a scratch consumer
        run-gates.sh --install-lifecycle [file] install the lifecycle resident surfaces
@@ -77,6 +78,11 @@ pub const USAGE: &str = r#"usage: run-gates.sh [gates-dir]                run ev
           <tag>, or appends to <workflow-dir>/<tag>-harvest.md when none is.
           The sink's exit status is this arm's, so a failing sink is visible to
           the close step that ran it; unavailable is exit 2 for the same reason.
+  --queue  moves or stamps one entry of the queue file, then runs every gate
+          coupling to that file as its post-check. The verb roster prints on
+          stderr at exit 2 on misuse. Exit 0 written and green, 1 written and a
+          gate red (its findings are the worklist before commit), 2 nothing
+          written; unavailable is 2.
   --upgrade-smoke  vendors every kit at GATE_SDK_UPGRADE_FROM into a scratch
           consumer, swaps them wholesale to GATE_SDK_UPGRADE_TO and asserts the
           sync is deterministic and the phase-B red set is declared. Takes no

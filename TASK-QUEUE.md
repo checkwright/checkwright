@@ -8,20 +8,6 @@
 
 ## New Features
 
-### queue-write-side-verb
-
-[spec: SPEC-queue-verbs.md] [recurrence: 2026-09-27, 2026-09-28]
-
-the queue has gates and read arms but no write commands, so every restructure (promote, Done move, icebox, de-icebox, defer, split, recurrence stamp) is a hand edit the gates check only after the fact, and an entry's history (filed, promoted, iceboxed, returned) is reconstructed by hand from git. Filed 2026-08-12 on five throwaway queue scripts measured in one iteration; iceboxed 2026-09-11 as machinery-class. The lead measured 1293 commits touching TASK-QUEUE.md in the month to 2026-09-27, reconstructed entry histories by hand about six times in one session, and saw a scope session misread one. Operator direction, 2026-09-27 (lead session): such commands would be beneficial.
-
-**The allowlist ground.** A raw Edit of the queue cannot be allowlisted narrowly, since a path rule grants every edit, while a write verb on the gate binary is one allowlist line scoped to its operation and post-checked by the queue gates. Operator direction, 2026-09-28 (lead session): weigh promoting it so the verbs can be explicitly allowlisted. Measured at spec: this repository's front-end and door grants already reach any new arm, so the verbs land granted.
-
-**Deliverable:** queue-kit write commands for that operation set, with the queue gates as their post-check, and a `queue-history <slug>` read printing each transition's date and commit.
-
-**Taken for /spec 2026-09-28 at plugin-marketplace-queue-verbs' scope, operator direction lead-relayed (not a /consult ruling):** entered on the recurrence threshold. It reshapes [recurrence-declaration-grammar-ungated](#recurrence-declaration-grammar-ungated), which shares its date parser, and record-stamp-encoding-compression, since one stamp writer makes that re-encoding a one-writer change.
-
-**Cost while deferred:** every queue restructure is a hand edit, and each history question costs several git calls with a misread risk. Re-filed 2026-09-27 to the gap inbox by platform-prerequisite-floors' lead, widened from one write verb to the operation set and a history read; returned from the icebox at its close on a judged recurrence: →fix fails because the commands are new governed names. Re-filed 2026-09-28 by catalog-submission-preconditions' lead, after the permission classifier denied close's Edit clearing Done. Re-verified: `git log --since=2026-08-27 -- TASK-QUEUE.md` lists 1291 commits at the close, and the evicting commit bd3dab89 holds the original body. Owner: queue-kit/SPEC.md §Per-component contracts.
-
 ### plugin-marketplace
 
 [spec: SPEC-plugin.md] [roadmap: next/ecosystem] [roadmap-summary: The stage skills and guards installable as a harness plugin.]
@@ -50,7 +36,7 @@ harness plugin packaging. Harness plugin/marketplace packaging of the stage skil
 
 no gate checks a `[recurrence:]` array's date shape: `recurrence_dates` in `native/src/queue.rs` drops a token that is not a date silently, so a mistyped stamp undercounts the scope pre-emption threshold and the icebox age limb.
 
-**Deliverable:** a `check-queue-hygiene` axis refusing a malformed recurrence token, with a bad fixture. It shares its date parser with [queue-write-side-verb](#queue-write-side-verb)'s recurrence stamp, which lands first.
+**Deliverable:** a `check-queue-hygiene` axis refusing a malformed recurrence token, with a bad fixture. It shares its date parser with `queue-write-side-verb`'s recurrence stamp, which lands first.
 
 **Promoted as debt 2026-09-28 at plugin-marketplace-queue-verbs' scope, operator direction lead-relayed (not a /consult ruling):** the axis holds the grammar queue-kit/SPEC.md §The tag algebra already states and adds no name.
 
@@ -632,7 +618,7 @@ shell-guard splits a compounded emitter write out of a compound (rule `emitter_w
 
 [cost: iteration/low] [surface: drift-kit]
 
-no measurement channel attributes a session's spend to repeated manual operations, so the close economics pass cannot surface a tooling opportunity. The stage-economics log prices spend per stage and tier, the overhead meter measures always-loaded bytes, prompt-friction sees only Bash calls that prompt (so Edit and Write queue edits are invisible to it), and knowledge-friction is self-reported. [queue-write-side-verb](#queue-write-side-verb)'s evidence came from an ad-hoc look at `.tmp/`. Operator expectation, 2026-09-27 (lead session): the economics analysis every close runs should surface such opportunities.
+no measurement channel attributes a session's spend to repeated manual operations, so the close economics pass cannot surface a tooling opportunity. The stage-economics log prices spend per stage and tier, the overhead meter measures always-loaded bytes, prompt-friction sees only Bash calls that prompt (so Edit and Write queue edits are invisible to it), and knowledge-friction is self-reported. `queue-write-side-verb`'s evidence came from an ad-hoc look at `.tmp/`. Operator expectation, 2026-09-27 (lead session): the economics analysis every close runs should surface such opportunities.
 
 **Deliverable:** a channel attributing repeated manual operations (tool-call shapes, hand edits of one surface) to sessions, and a close economics read listing the top candidates.
 
@@ -1433,5 +1419,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 The consumer's local-only companion files (private brief, ops runbook) have read triggers but no write-back trigger, so shipped-unit forward memory and an out-of-tree state verifier drift until a consult audits them; owed are close and release-sweep template slots for both, and a retired-slug arm over plain code on the local-only globs.
 
 ## Done
+
+- queue-write-side-verb
 
 ## Lessons Learned

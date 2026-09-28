@@ -272,7 +272,8 @@ fn check_operand(
     Ok((canonical, content))
 }
 
-fn write_replacing(canonical: &str, content: &[u8]) -> Result<(), String> {
+// spec: queue-kit/SPEC.md §The queue verbs — the sibling-temporary-and-rename write the verbs share
+pub fn write_replacing(canonical: &str, content: &[u8]) -> Result<(), String> {
     let target = Path::new(canonical);
     let dir = target.parent().unwrap_or(Path::new("."));
     let leaf = target.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
