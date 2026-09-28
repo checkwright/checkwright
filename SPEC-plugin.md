@@ -40,7 +40,7 @@ Checkwright is in no harness plugin catalog, and adopters now find enforcement t
   - an adopter who also merged guard-kit's settings wiring runs each guard twice, and the friction log counts each fall-through twice, so the plugin README says to keep one of the two;
   - the fail-open prefix means a tree whose front end is missing runs unguarded, and says nothing about it.
 - `scripts/root-allowlist.list` gains `plugin` and `.claude-plugin`, each under a comment: the plugin package, not a kit; the marketplace manifest the harness reads at the repository root.
-- `scripts/canon-config.knobs`: `CANON_KIT_SEAM_SURFACE_GLOBS` gains `plugin/SPEC.md`, beside `companion/SPEC.md`. `CANON_KIT_MANIFEST_FILES` gains `plugin/README.md`. `CANON_KIT_PROSE_SURFACE_GLOBS` gains `plugin/skills/*/SKILL.md`, on the Spec Kit commands' precedent.
+- `scripts/canon-config.knobs`: `CANON_KIT_SEAM_SURFACE_GLOBS` gains `plugin/SPEC.md`, beside `companion/SPEC.md`. `CANON_KIT_PROSE_SURFACE_GLOBS` gains `plugin/skills/*/SKILL.md`, on the Spec Kit commands' precedent. `CANON_KIT_MANIFEST_FILES` gains nothing: its existing `*/README.md` entry already covers a one-level README (that knob's own comment states the precedent — a two-level entry like `companion/*/README.md` is what a deeper layout needs, and `plugin/README.md` sits at one level).
 
 ### (2) The two manifests
 
@@ -158,7 +158,7 @@ Measured at authoring: `CLAUDE_CONFIG_DIR=<scratch> claude plugin marketplace li
   - `check-gate-fixture-coverage`, `check-gate-substrate-parity` and `check-reads-couples` read the new gate's descriptor, pair and declared read (delta 6).
   - `check-front-door-verbs` reads the install skill (delta 7).
   - `check-docs-mirror-fresh` reads every top-level directory holding a `SPEC.md` (delta 9).
-  - The canon-kit gates read the three knob globs (delta 1).
+  - The canon-kit gates read the two knob globs (delta 1).
   - `check-kit-ref-liveness` reads every tracked path segment, which the component's naming satisfies.
 
 ## Existing sections updated
