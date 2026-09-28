@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### lifecycle-kit-machine-brevity
-
-the three brevity moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) over lifecycle-kit/SPEC.md's state-machine tool sections under §Per-component contracts: §bin/enter-stage.sh, §check-stage-evidence, §check-stage-entry, §The ruling-staleness probe, §bin/session-id.sh and §bin/install-lifecycle.sh, about 134k bytes. The template sections and the sections above §Per-component contracts have already landed.
-
-**Deliverable:** the moves applied to those six sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every contract sentence kept.
-
-**Cost while deferred:** paid by every session that opens one of these sections, which every stage entry's refusal and every stamp question sends a reader to. Filed 2026-09-28 at scope as a split from its parent, on an operator direction lead-relayed (not a /consult ruling), unit set D.
-
 ### truncation-reclaim-residue
 
 delegation-kit/SPEC.md declares a truncation reclaim, `reclaim=: > <log>`, for both of its advisory close surfaces, `.workflow/subagent-stop-liveness.log` and `.workflow/wait-primitive-evidence.txt`, while gate-sdk/SPEC.md §The workflow directory rules that a capture log a close reads before draining drains by rotation through `--emit capture-drain`, never by truncation: a truncate after the read erases every line appended between the two. guard-kit's and drift-kit's capture logs already declare the rotation.
@@ -404,7 +396,7 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 lifecycle-kit's sections above §Per-component contracts left 2026-09-28 at consult-inbox-front-brevity's scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `lifecycle-kit-front-brevity`.
 
-lifecycle-kit's state-machine tool sections left 2026-09-28 at this iteration's scope as [lifecycle-kit-machine-brevity](#lifecycle-kit-machine-brevity), on an operator direction lead-relayed (not a /consult ruling).
+lifecycle-kit's state-machine tool sections left 2026-09-28 at lifecycle-machine-brevity's scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `lifecycle-kit-machine-brevity`.
 
 ### prune-set-matches-walk-root-ancestors
 
@@ -1487,5 +1479,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 The consumer's local-only companion files (private brief, ops runbook) have read triggers but no write-back trigger, so shipped-unit forward memory and an out-of-tree state verifier drift until a consult audits them; owed are close and release-sweep template slots for both, and a retired-slug arm over plain code on the local-only globs.
 
 ## Done
+
+- lifecycle-kit-machine-brevity
 
 ## Lessons Learned
