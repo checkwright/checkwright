@@ -8,18 +8,6 @@
 
 ## New Features
 
-### roadmap-horizon-motion-unowned
-
-[spec: SPEC-roadmap-motion.md]
-
-a roadmap horizon moves only when a `/consult` happens to re-tag it. The consult binding (`.claude/commands/consult.md`) reads ROADMAP.md only as a projection and names no tag reconciliation; the roadmap arm prints an empty horizon as information (queue-kit/SPEC.md §The roadmap arm); scope reads the tag only as a ranking input; and no drain retires a tagged entry. `check-roadmap-fresh` compares the projection with the tags, never the tags with direction, so it stays green throughout. Attested: the 2026-09-25 consult refresh ranked three entries and tagged none, and now/ stood empty until an operator-directed re-tag at non-gate-arm-contract's close.
-
-**Deliverable:** close raises a consult-owed signal on a vacant now/ horizon or a landed tagged entry, feeding `consult-inbox`, and the consult binding reconciles tags on any direction change.
-
-**Taken for /spec 2026-09-28 at consult-inbox-front-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set A; `consult-inbox` goes first, its signal being the inbox's first consumer.
-
-**Cost while deferred:** the public roadmap lags direction until an operator-started consult notices. Filed 2026-09-26 to the gap inbox by the lead on an operator question; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because the signal is new mechanism on two surfaces. Re-verified at the drain: the consult binding's one roadmap hit is the projection sentence, and `--emit roadmap` printed now/ empty before the re-tag. Owner lookup: `horizon`, `consult-owed` in this file — no entry about motion.
-
 ### license-text-and-alignment
 
 [spec: SPEC-license-text.md]
@@ -1456,5 +1444,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 - consult-inbox
 - consult-inbox-drain-trigger
+- roadmap-horizon-motion-unowned
 
 ## Lessons Learned

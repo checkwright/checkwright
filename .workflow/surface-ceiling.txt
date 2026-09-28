@@ -7,7 +7,7 @@
 551cp .claude/commands/align.md
 1036cp .claude/commands/build.md
 9170cp .claude/commands/close.md
-1856cp .claude/commands/consult.md
+2355cp .claude/commands/consult.md
 1590cp .claude/commands/economics.md
 4729cp .claude/commands/lead.md
 715cp .claude/commands/release-sweep.md
@@ -83,13 +83,13 @@
 301516cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
 275634cp installer/SPEC.md
-397314cp lifecycle-kit/SPEC.md
+398419cp lifecycle-kit/SPEC.md
 5140cp lifecycle-kit/templates/consult.md
 41046cp lifecycle-kit/templates/lead.md
 2100cp lifecycle-kit/templates/release-sweep.md
 6939cp lifecycle-kit/templates/stages/align.md
 9182cp lifecycle-kit/templates/stages/build.md
-21537cp lifecycle-kit/templates/stages/close.md
+22119cp lifecycle-kit/templates/stages/close.md
 19401cp lifecycle-kit/templates/stages/scope.md
 9351cp lifecycle-kit/templates/stages/spec.md
 6058cp lifecycle-kit/templates/stages/validate.md

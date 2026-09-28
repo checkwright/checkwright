@@ -2,7 +2,7 @@ Execute the template at lifecycle-kit/templates/consult.md, applying the binding
 
 ## Bindings
 
-**entry-reading** — four surfaces, in this order: `TRAJECTORY.md` (the objectives of the running pivot and any standing ruling), `.workflow/consult-items.md` (the items owed to this session, drained per the template's step 2), `TASK-QUEUE.md` (the live queue and the Deferred rungs with their costed grounds), and `BRIEF.local.md` (the private companion brief — untracked, and the surface that carries what no public file may). Read `ROADMAP.md` only as a projection of the queue, never as a second source.
+**entry-reading** — four surfaces, in this order: `TRAJECTORY.md` (the objectives of the running pivot and any standing ruling), `.workflow/consult-items.md` (the items owed to this session, drained per the template's step 2), `TASK-QUEUE.md` (the live queue and the Deferred rungs with their costed grounds), and `BRIEF.local.md` (the private companion brief — untracked, and the surface that carries what no public file may). Read `ROADMAP.md` only as a projection of the queue, never as a second source. A consult-inbox item naming a roadmap slug or a vacant horizon is answered by the reconciliation below.
 
 **landing-surfaces** — by class (lifecycle-kit/SPEC.md §The steering vocabulary), and `TRAJECTORY.md` is the narrowest surface, not the default:
 
@@ -10,5 +10,6 @@ Execute the template at lifecycle-kit/templates/consult.md, applying the binding
 - A decision about mechanism → the owning kit's `SPEC.md`, undated, with its engineering grounds; this project's reading of a kit template → the `.claude/commands/` binding that names the template; a standing rule → one CLAUDE.md line pointing at its mechanism.
 - Who decided, when, through what channel, and what was refused → the landing commit's message. Git history is the archive; no file restates it.
 - Work — a gap, a task, a promotion signal → `TASK-QUEUE.md` via `--emit file-gap` mid-iteration, or a direct entry when the operator directs one (CLAUDE.md §Housekeeping).
+- A direction change that moves what is next → the `[roadmap:]` and `[roadmap-summary:]` tags on every entry it concerns, re-tagged in this session and `ROADMAP.md` regenerated (`bash gate-sdk/bin/run-gates.sh --emit roadmap --write`), so the public page states the direction the session set. A vacant first horizon the session leaves vacant is recorded as such in the landing commit's message.
 
-A decision fitting none of the four lands as a queue entry naming the surface it is owed on — the queue is the fallback because it is drained every close.
+A decision fitting none of the five lands as a queue entry naming the surface it is owed on — the queue is the fallback because it is drained every close.
