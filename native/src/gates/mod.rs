@@ -90,6 +90,7 @@ pub mod memory_off;
 pub mod merge_attrs;
 pub mod path_dialect;
 pub mod pipe_membership;
+pub mod plugin_parity;
 pub mod packed_links;
 pub mod payload_claim;
 pub mod portability_floor;
@@ -1646,6 +1647,14 @@ pub const REGISTRY: &[GateEntry] = &[
         front_door_verbs::run,
         &[],
         &["QUEUE_KIT_QUEUE_FILE"],
+        "-",
+        &[("git", "")],
+    ),
+    (
+        "check-plugin-parity",
+        plugin_parity::run,
+        &[("?", "", "", "dynamic@src/gates/plugin_parity.rs:129")],
+        &["LIFECYCLE_KIT_SKILLS_DIR", "QUEUE_KIT_QUEUE_FILE"],
         "-",
         &[("git", "")],
     ),

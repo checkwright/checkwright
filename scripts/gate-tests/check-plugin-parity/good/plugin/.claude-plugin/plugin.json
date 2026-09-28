@@ -1,0 +1,10 @@
+{
+  "name": "fixture",
+  "description": "A fixture plugin.",
+  "author": {
+    "name": "Fixture"
+  },
+  "homepage": "https://example.org",
+  "repository": "https://github.com/example/fixture",
+  "license": "Apache-2.0"
+}

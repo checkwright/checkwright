@@ -68,6 +68,12 @@ pub(crate) fn show_at(tag: &str, path: &str) -> Result<String, String> {
         .ok_or_else(|| format!("the tag {} exists and carries no {}", tag, path))
 }
 
+// spec: plugin/SPEC.md §check-plugin-parity — whether a resolved tag carries a path, where the
+// absence is the answer rather than a refusal
+pub(crate) fn carries(tag: &str, path: &str) -> Result<bool, String> {
+    Ok(git_ok(&["cat-file", "-e", &format!("{}:{}", tag, path)])?.is_some())
+}
+
 // spec: installer/SPEC.md §The front door's verbs — the live disposition file and queue file
 pub(crate) fn live_paths() -> Result<(String, String), String> {
     Ok((disposition_file()?, queue::knob_scalar("QUEUE_KIT_QUEUE_FILE")?))

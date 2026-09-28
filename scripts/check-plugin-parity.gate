@@ -1,0 +1,2 @@
+# graph: couples=plugin/**,.claude-plugin/**,knob:LIFECYCLE_KIT_SKILLS_DIR/*.md,guard-kit/templates/settings-hooks.json,docs/install.sh,.workflow/release-disposition.txt,native/src/gates/plugin_parity.rs dir=one valve=none tier=precommit
+# spec: plugin/SPEC.md §check-plugin-parity — the plugin package's manifests agree (A), its skills are the binding shims' renderings plus install (B), its hooks render guard-kit's template (C), the marketplace pins the hosted install pin (D), and the pinned release carries the package or is pending this iteration's release (E)

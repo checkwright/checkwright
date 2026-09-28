@@ -5,7 +5,13 @@ use std::collections::BTreeSet;
 
 const NAME: &str = "check-front-door-verbs";
 const README: &str = "installer/README.md";
-const PAGES: &[&str] = &["README.md", "docs/index.md", "docs/install.md", "installer/README.md"];
+const PAGES: &[&str] = &[
+    "README.md",
+    "docs/index.md",
+    "docs/install.md",
+    "installer/README.md",
+    "plugin/skills/install/SKILL.md",
+];
 const ROUTES: &[&str] = &["sh -s --", "install.ps1)))", "npx checkwright"];
 const SPAN_ROUTE: &str = "checkwright";
 // spec: installer/SPEC.md §The front door's verbs — the one flag a route may lead with

@@ -1,0 +1,3 @@
+# plugin-dir marketplace skills-dir hooks-template install-sh disposition queue pinned — the pinned
+# tag's answer is a file, so the fixture holds still as this repository's tags move.
+plugin marketplace.json commands hooks-template.json install.sh disposition.txt queue.md pinned.txt

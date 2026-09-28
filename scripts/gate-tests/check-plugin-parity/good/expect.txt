@@ -1,0 +1,1 @@
+PLUGIN-PARITY: clean (manifests agree, 2 skill(s) match commands and `install`, hooks match hooks-template.json, marketplace pinned to v1.2.3, pending release: v1.2.3 lacks the package)

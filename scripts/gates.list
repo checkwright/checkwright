@@ -110,6 +110,7 @@ check-release-bump
 check-release-channel-parity
 check-install-pin
 check-front-door-verbs
+check-plugin-parity
 check-tightened-gates-grammar
 check-release-declaration-parity
 check-release-change-declared

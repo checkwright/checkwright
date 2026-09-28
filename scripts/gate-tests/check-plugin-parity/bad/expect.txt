@@ -1,0 +1,9 @@
+plugin/.claude-plugin/plugin.json: `license` is "MIT", and plugin/plugin.json's is "Apache-2.0"; the two manifests carry it, equal
+plugin/plugin.json: `version` is "1.2.3"; expected absent, since the marketplace pin carries the version
+plugin/skills/stray: no binding shim in commands names it, and it is not `install`
+plugin/skills/scope/SKILL.md: the body is not the rendering for `templates/scope.md`; expected, after the front matter:
+    | - If this repository has a skill of its own that binds `templates/scope.md`, run that skill instead.
+plugin/hooks/hooks.json: not the rendering of hooks-template.json; expected, compared as JSON:
+    |             "command": "test -f gate-sdk/bin/run-gates.sh || exit 0; bash gate-sdk/bin/run-gates.sh --hook shell-guard",
+marketplace.json: `source.ref` is "v1.2.2"; expected "v1.2.3"
+marketplace.json: the pinned release v1.2.3 carries no plugin/.claude-plugin/plugin.json while iteration fixture-iteration's disposition is none
