@@ -364,6 +364,11 @@ pub fn diagnose(selection: Option<&Selection>) -> Report {
             let _ = writeln!(out, "  {:<12} {}", "commit", manifest.field("commit"));
             let _ = writeln!(out, "  {:<12} {}", "profile", manifest.field("profile"));
             let _ = writeln!(out, "  {:<12} {}", "kits", manifest.field("kits"));
+            // spec: installer/SPEC.md §doctor — the payload recipes applied, beside the profile
+            let recipes = manifest.field("recipes");
+            if !recipes.is_empty() {
+                let _ = writeln!(out, "  {:<12} {}", "recipes", recipes);
+            }
 
             // spec: installer/SPEC.md §doctor — the registry this tree's battery runs from is
             // named rather than left implicit: it is the one install fact the identity fields do

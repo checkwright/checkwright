@@ -2,7 +2,7 @@
 // payload into the consumer's repository and commits it, so what governs their tree afterwards is
 // committed, auditable source rather than something resolved at their build time.
 use crate::programs;
-use super::{lock, profile, recipe, refuse, workflow, Package, Refusal, AGENT_FILE, GATES_DIR, QUEUE_FILE};
+use super::{lock, payload_recipe, profile, recipe, refuse, workflow, Package, Refusal, AGENT_FILE, GATES_DIR, QUEUE_FILE};
 use crate::{install, sha256, toolfloor};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
@@ -12,10 +12,13 @@ struct Flags {
     dry: bool,
     force: bool,
     commit: bool,
+    // spec: installer/SPEC.md §Payload recipes — absent when neither `--recipe` nor `--no-recipe`
+    // was passed, which is what re-applies the recorded set
+    recipes: Option<Vec<String>>,
 }
 
 fn help(pkg: Option<&Package>) {
-    println!("usage: checkwright init [--profile <name>] [--dry-run] [--force] [--no-commit]\n");
+    println!("usage: checkwright init [--profile <name>] [--recipe <name>]... [--no-recipe] [--dry-run] [--force] [--no-commit]\n");
     println!("Vendors pinned kit source into this repository and commits it.");
     println!("Nothing is fetched: the source comes from this package.\n");
     let names = match pkg {
@@ -23,6 +26,9 @@ fn help(pkg: Option<&Package>) {
         None => String::new(),
     };
     println!("profiles: {} ", names);
+    if let Some(p) = pkg {
+        println!("payload recipes: {} ", payload_recipe::available(&p.root).join(" "));
+    }
 }
 
 fn parse(args: &[String], pkg: Option<&Package>) -> Result<Option<Flags>, Refusal> {
@@ -31,6 +37,7 @@ fn parse(args: &[String], pkg: Option<&Package>) -> Result<Option<Flags>, Refusa
         dry: false,
         force: false,
         commit: true,
+        recipes: None,
     };
     let mut i = 0;
     while i < args.len() {
@@ -42,6 +49,19 @@ fn parse(args: &[String], pkg: Option<&Package>) -> Result<Option<Flags>, Refusa
             }
             _ if a.starts_with("--profile=") => {
                 f.profile = a["--profile=".len()..].to_string();
+                i += 1;
+            }
+            "--recipe" => {
+                let name = args.get(i + 1).cloned().unwrap_or_default();
+                f.recipes.get_or_insert_with(Vec::new).push(name);
+                i += 2;
+            }
+            _ if a.starts_with("--recipe=") => {
+                f.recipes.get_or_insert_with(Vec::new).push(a["--recipe=".len()..].to_string());
+                i += 1;
+            }
+            "--no-recipe" => {
+                f.recipes = Some(Vec::new());
                 i += 1;
             }
             "--dry-run" => {
@@ -209,6 +229,31 @@ fn plan_gates(pkg: &Package, kits: &[String], profile_name: &str) -> String {
     out
 }
 
+// spec: installer/SPEC.md §Payload recipes — a seam a recipe writes into is claimed before the
+// composed text lands, as any seam is; a kept one returns false and is reported by the caller
+fn write_in(
+    root: &Path,
+    text: &str,
+    dest: &str,
+    prior: &BTreeMap<String, String>,
+    f: &Flags,
+    r: &mut Roster,
+) -> Result<bool, Refusal> {
+    if !claim(root, dest, prior, f.force, r) {
+        return Ok(false);
+    }
+    if !f.dry {
+        std::fs::write(root.join(dest), text)
+            .map_err(|e| refuse(format!("could not write {}: {}", dest, e), "", 2))?;
+    }
+    r.record(dest, None);
+    Ok(true)
+}
+
+fn file_name(dest: &str) -> &str {
+    dest.rsplit('/').next().unwrap_or(dest)
+}
+
 fn read_package_field(pkg: &Package, path: &[&str]) -> String {
     let Ok(text) = std::fs::read_to_string(pkg.root.join("package.json")) else {
         return String::new();
@@ -265,6 +310,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     let lock_path = lock::path(&root);
     let mut prior: BTreeMap<String, String> = BTreeMap::new();
     let mut profile_name = f.profile.clone();
+    let mut recorded_recipes = String::new();
     if lock_path.is_file() {
         let manifest = lock::Manifest::read(&lock_path)
             .filter(lock::Manifest::schema_ok)
@@ -301,6 +347,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         if profile_name.is_empty() {
             profile_name = manifest.field("profile");
         }
+        recorded_recipes = manifest.field("recipes");
         prior = manifest.files().into_iter().collect();
     }
 
@@ -327,11 +374,58 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         ));
     }
 
+    // spec: installer/SPEC.md §Payload recipes — the three refusals run ahead of any write, since
+    // each is a selection the run cannot honour
+    let recipe_names = payload_recipe::names_to_apply(f.recipes.as_deref(), &recorded_recipes);
+    let recipes = payload_recipe::resolve(&pkg.root, &recipe_names)?;
+    payload_recipe::check_seams(&pkg.root, &profile_name, &kits, &recipes)?;
+    let prior_recipes: Vec<payload_recipe::Recipe> = recorded_recipes
+        .split_whitespace()
+        .filter_map(|n| payload_recipe::resolve(&pkg.root, &[n.to_string()]).ok())
+        .flatten()
+        .collect();
+    let dropped = payload_recipe::drops(&recipes);
+    let artifact_name = pkg
+        .artifact
+        .file_name()
+        .unwrap_or_default()
+        .to_string_lossy()
+        .into_owned();
+    let artifact_dest = format!("{}/{}", GATES_DIR, artifact_name);
+    let seam = format!("{}/{}", GATES_DIR, payload_recipe::PLACEMENT_SEAM);
+    let declared = install::declared_lines(
+        &kits.join(" "),
+        &read_package_field(pkg, &["checkwright", "spec_base_url"]),
+    );
+    let seam_add = payload_recipe::lines_for(&recipes, payload_recipe::PLACEMENT_SEAM);
+    let seam_retire = payload_recipe::lines_for(&prior_recipes, payload_recipe::PLACEMENT_SEAM);
+    let mut composed: Vec<(String, String)> = Vec::new();
+    for kit in &kits {
+        for (src, dest) in recipe::config_seam_plan(&pkg.payload.join(kit), GATES_DIR) {
+            if payload_recipe::touches(&recipes, file_name(&dest)).is_empty() {
+                continue;
+            }
+            let template = std::fs::read_to_string(&src)
+                .map_err(|e| refuse(format!("could not read {}: {}", src, e), "", 2))?;
+            let text = payload_recipe::compose(&template, &recipes, file_name(&dest));
+            payload_recipe::check_composed(file_name(&dest), &text, &recipes)?;
+            composed.push((dest, text));
+        }
+    }
+    if !seam_add.is_empty() {
+        let existing = std::fs::read_to_string(root.join(&seam)).ok();
+        let text = install::seam_text_with(existing.as_deref(), &artifact_dest, &declared, &seam_retire, &seam_add);
+        payload_recipe::check_composed(payload_recipe::PLACEMENT_SEAM, &text, &recipes)?;
+    }
+
     // spec: installer/SPEC.md §init — doctor is the last precondition and still runs before any
     // file is written; running it after the manifest and kit set are resolved keeps a bad manifest
     // or an empty kit set from being reported as a toolchain fault.
     // spec: installer/SPEC.md §doctor — the gate set unites the profile's with an on-disk registry
-    let mut gates = profile::gate_set(&pkg.root, &profile_name);
+    let mut gates: Vec<String> = profile::gate_set(&pkg.root, &profile_name)
+        .into_iter()
+        .filter(|g| !dropped.contains(g))
+        .collect();
     if let Ok(text) = std::fs::read_to_string(root.join(GATES_DIR).join("gates.list")) {
         gates.extend(crate::registry::members(&text).iter().map(|m| m.trim().to_string()));
     }
@@ -371,13 +465,6 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     // and nothing hashes with an external tool.
     let artifact_digest = sha256::file_hex(&pkg.artifact)
         .map_err(|e| refuse(format!("could not hash the gate binary: {}", e), "", 2))?;
-    let artifact_name = pkg
-        .artifact
-        .file_name()
-        .unwrap_or_default()
-        .to_string_lossy()
-        .into_owned();
-    let artifact_dest = format!("{}/{}", GATES_DIR, artifact_name);
 
     let mut r = Roster::new();
 
@@ -426,7 +513,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     let _ = std::fs::create_dir_all(root.join(".workflow"));
     let gates_list = format!("{}/gates.list", GATES_DIR);
     let registry = if claim(&root, &gates_list, &prior, f.force, &mut r) {
-        let text = plan_gates(pkg, &kits, &profile_name);
+        let text = payload_recipe::drop_gates(&plan_gates(pkg, &kits, &profile_name), &dropped);
         if !f.dry {
             std::fs::write(root.join(&gates_list), &text)
                 .map_err(|e| refuse(format!("could not write {}: {}", gates_list, e), "", 2))?;
@@ -434,13 +521,26 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         r.record(&gates_list, None);
         text
     } else {
-        std::fs::read_to_string(root.join(&gates_list)).unwrap_or_default()
+        let kept = std::fs::read_to_string(root.join(&gates_list)).unwrap_or_default();
+        payload_recipe::report_kept(&gates_list, &[], &payload_recipe::still_registered(&kept, &dropped));
+        kept
     };
 
     for kit in &kits {
         let kit_payload = pkg.payload.join(kit);
         for (src, dest) in recipe::config_seam_plan(&kit_payload, GATES_DIR) {
-            copy_in(&root, Path::new(&src), &dest, &prior, None, f, &mut r)?;
+            // spec: installer/SPEC.md §Payload recipes — a seam a recipe writes into lands as the
+            // text composed and checked above; a kept one is reported with the lines it lacks
+            match composed.iter().find(|(d, _)| *d == dest) {
+                Some((_, text)) => {
+                    if !write_in(&root, text, &dest, &prior, f, &mut r)? {
+                        let kept = std::fs::read_to_string(root.join(&dest)).unwrap_or_default();
+                        let want = payload_recipe::lines_for(&recipes, file_name(&dest));
+                        payload_recipe::report_kept(&dest, &payload_recipe::missing(&kept, &want), &[]);
+                    }
+                }
+                None => copy_in(&root, Path::new(&src), &dest, &prior, None, f, &mut r)?,
+            }
         }
         // spec: installer/SPEC.md §init — `--dry-run` walks the same seam plan and the same seeding
         // arms the real run does, each arm withholding its write under `dry`: a second prediction of
@@ -531,11 +631,6 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     // value the manifest records
     // spec: installer/SPEC.md §The manifest — the publisher's SPEC base travels in the stamp and
     // reaches the consumer through the same seam
-    let seam = format!("{}/gate-sdk-config.knobs", GATES_DIR);
-    let declared = install::declared_lines(
-        &kits.join(" "),
-        &read_package_field(pkg, &["checkwright", "spec_base_url"]),
-    );
     let src = pkg.artifact.to_string_lossy().into_owned();
     let placement = install::Placement {
         root: root.clone(),
@@ -543,6 +638,8 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         dest: &artifact_dest,
         seam: &seam,
         declared: &declared,
+        recipe_add: &seam_add,
+        recipe_retire: &seam_retire,
         target: &pkg.target,
         digest: &artifact_digest,
         force: f.force,
@@ -560,6 +657,10 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
                 }
             }
             (Some("kept"), Some(p), h) => {
+                if p == seam {
+                    let kept = std::fs::read_to_string(root.join(p)).unwrap_or_default();
+                    payload_recipe::report_kept(p, &payload_recipe::missing(&kept, &seam_add), &[]);
+                }
                 r.changed.push(p.to_string());
                 if !r.is_written.contains(p) {
                     r.record(p, h);
@@ -641,6 +742,10 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         if !commit.is_empty() {
             e = e.ident("commit", &commit);
         }
+        // spec: installer/SPEC.md §The manifest — `recipes` is absent, never empty, when none applies
+        if !recipe_names.is_empty() {
+            e = e.ident("recipes", &recipe_names.join(" "));
+        }
         e = e.artifact(&pkg.target, &artifact_digest);
         let pending: Vec<bool> = r
             .written
@@ -672,6 +777,21 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
             profile_name, version
         );
         println!("would vendor {} kit(s): {}", kits.len(), kits.join(" "));
+        // spec: installer/SPEC.md §Payload recipes — the dry plan names the composed seams and the
+        // dropped gates the real run writes, read off the same composition
+        if !recipe_names.is_empty() {
+            println!("would apply payload recipe(s): {}", recipe_names.join(" "));
+            for (dest, _) in &composed {
+                println!("  composes {} from its template and the recipes' lines", dest);
+            }
+            if !seam_add.is_empty() {
+                println!("  composes {} with the recipes' lines", seam);
+            }
+            if !dropped.is_empty() {
+                let names: Vec<String> = dropped.iter().cloned().collect();
+                println!("  drops from {}: {}", gates_list, names.join(" "));
+            }
+        }
         println!("would write {} file(s), including:", stage.len() + 1);
         println!("  {}", gates_list);
         println!("  {}", lock::FILE);
@@ -888,6 +1008,16 @@ mod tests {
             .expect("the spaced spelling was refused")
             .expect("--help was taken for a flag");
         assert_eq!(spaced.profile, "starter");
+        assert_eq!(spaced.recipes, None, "no recipe flag still read as a set");
+        let args = |a: &[&str]| a.iter().map(|s| s.to_string()).collect::<Vec<_>>();
+        let named = parse(&args(&["--recipe", "a", "--recipe=b"]), None)
+            .expect("the recipe spellings were refused")
+            .expect("--help was taken for a flag");
+        assert_eq!(named.recipes, Some(vec!["a".to_string(), "b".to_string()]));
+        let cleared = parse(&args(&["--recipe", "a", "--no-recipe"]), None)
+            .expect("--no-recipe was refused")
+            .expect("--help was taken for a flag");
+        assert_eq!(cleared.recipes, Some(Vec::new()));
         assert!(parse(&["--nope".to_string()], None).is_err());
         assert!(parse(&["--help".to_string()], None).expect("help refused").is_none());
     }

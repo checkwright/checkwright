@@ -581,6 +581,18 @@ fn load(kit: &'static Kit, dir: &str, knob_file: &str, config_file: &str) -> Res
     })
 }
 
+// spec: installer/SPEC.md §Payload recipes — a composed seam is refused before any write by the
+// grammar its kit's reader applies at the battery's first run; a file no static kit reads is no finding
+pub fn check_seam(file_name: &str, text: &str) -> Result<(), String> {
+    let Some(kit) = STATIC_KITS
+        .iter()
+        .find(|k| format!("{}-config.knobs", k.stem()) == file_name)
+    else {
+        return Ok(());
+    };
+    layer(kit, file_name, text).map(|_| ())
+}
+
 fn read_layer(kit: &'static Kit, path: &str) -> Result<Layer, String> {
     if !Path::new(path).is_file() {
         return Ok(Layer::new());

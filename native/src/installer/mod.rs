@@ -6,6 +6,7 @@ pub mod diff;
 pub mod doctor;
 pub mod init;
 pub mod lock;
+pub mod payload_recipe;
 pub mod profile;
 pub mod recipe;
 pub mod uninstall;

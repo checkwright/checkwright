@@ -1,10 +1,10 @@
 # Checkwright companion — design record
 
-The companion package puts Checkwright's gates over a repository whose specs another toolkit writes. It holds, for each supported spec-authoring toolkit, a **recipe** that makes the `prose` profile govern that toolkit's tree, and a fixture tree that proves the recipe. For Spec Kit it also holds a catalog extension that installs Checkwright and applies the recipe. `companion/README.md` is the usage tier in front of this file.
+The companion package puts Checkwright's gates over a repository whose specs another toolkit writes. It holds, for each supported spec-authoring toolkit, a **recipe** that makes the `prose` profile govern that toolkit's tree, and a fixture tree that proves the recipe. The package carries the recipes, and `init --recipe <name>` applies one ([installer/SPEC.md §Payload recipes](../installer/SPEC.md#payload-recipes)). For Spec Kit it also holds a catalog extension that installs Checkwright and applies the recipe. `companion/README.md` is the usage tier in front of this file.
 
 ## The component
 
-`companion/` is repo-root-governed and not a kit. It carries no `checks/` and no `smoke/`, so no kit-root resolver admits it and no install payload carries it. It adds no kit mechanism: each recipe is consumer config in knobs the `prose` profile reads, and the lifecycle layer is config in knobs lifecycle-kit reads. The toolkits' names live here, on the docs pages and on the front door, and never in a kit SPEC or a kit literal ([gate-sdk/SPEC.md §The provenance seam](../gate-sdk/SPEC.md#the-provenance-seam)).
+`companion/` is repo-root-governed and not a kit. It carries no `checks/` and no `smoke/`, so no kit-root resolver admits it. The package carries its recipes under `recipes/`, named in this repository's `GATE_SDK_PAYLOAD_RECIPES`: `openspec`, `openspec-lifecycle` and `speckit`. It adds no kit mechanism: each recipe is consumer config in knobs the `prose` profile reads, and the lifecycle layer is config in knobs lifecycle-kit reads. The toolkits' names live here, on the docs pages and on the front door, and never in a kit SPEC or a kit literal ([gate-sdk/SPEC.md §The provenance seam](../gate-sdk/SPEC.md#the-provenance-seam)).
 
 - `toolkits.list` pins each toolkit, one `<toolkit> <package> <version>` line each. The toolkit name keys the line, the package is what the toolkit leg installs, and the version is what it pins and asserts (§The toolkit legs).
 - `<toolkit>/recipe/` holds a recipe (§Recipes).
@@ -14,23 +14,15 @@ The companion package puts Checkwright's gates over a repository whose specs ano
 
 ## Recipes
 
-A recipe is three files and one procedure. `gate-sdk-config.knobs` and `canon-config.knobs` hold lines appended to the consumer's knob files of the same names. `unregister.list` names gates dropped from the consumer's `gates.list`. A recipe needs no file it would leave empty, except `unregister.list`, which the procedure reads and which then holds its header alone. Each file opens with a `#` comment citing this file, and both the append and the drop skip `#` lines.
+A recipe is a directory in installer/SPEC.md §Payload recipes' format, and that section owns how `init` applies one. Each file opens with a `#` comment citing this file.
 
 **Each line answers a red.** A line is in a recipe because a fresh tree of the toolkit at its pin, with the `prose` profile installed, reds a gate on one of the toolkit's own idioms until the line is there. The companion arm of the consumer smoke holds that both ways: a line it shows unnecessary is deleted, and one it shows missing is added, each with its idiom recorded below.
 
-### The procedure
+### Applying a recipe
 
-The procedure is one POSIX `sh` block, run from the repository root after `init`, with `recipe` set to the recipe directory. It runs in a subshell under `set -e`, so a failed step stops it before the commit. It:
+An adopter applies a recipe with the install itself: `init --profile prose --recipe <name>`, through the one-line install or any other route to `init`. The install makes one commit with the recipe applied, and the manifest records the recipe, so an upgrade re-applies it with the release it was tested against. Each toolkit's documented line sits between `<!-- companion-install:begin -->` and `<!-- companion-install:end -->` as one fence holding one line. For OpenSpec it is on the landing page, a `text` fence reading `checkwright init …`, where `checkwright` stands for the reader's install line (docs/install.md §Managing's convention), so the page points to the install page rather than restating it. For Spec Kit it is in `speckit/commands/install.md`, an `sh` fence holding the one-line install the agent runs. The OpenSpec `full` line, which adds the lifecycle layer, sits between `<!-- companion-full:begin -->` and `<!-- companion-full:end -->` on the landing page, in the page's form. The companion arm runs each line's words from `init` to the line's end, so the documented steps are the tested steps.
 
-1. appends each recipe `*.knobs` file, minus its `#` lines, to the gates directory's file of the same name;
-2. drops from `scripts/gates.list` every gate `unregister.list` names;
-3. regenerates the hooks and the coupling graph through the installed binary, with `--emit git-hooks --write` and `--emit graph` into `scripts/CHECK-GRAPH.html`, the graph artifact's default path, since `check-graph` reds on a knob or roster change until both are regenerated;
-4. runs the battery;
-5. commits the gates directory.
-
-It needs no `bash`, so it runs under `/bin/sh` on macOS and Linux and under Git for Windows' `sh`. The landing page, `docs/spec-toolkits.md`, carries it between `<!-- companion-recipe:begin -->` and `<!-- companion-recipe:end -->`. `speckit/commands/install.md` carries the same block under the same markers, opened by the line `recipe=.specify/extensions/checkwright/recipe`. The companion arm runs both copies and holds them equal apart from that line, so the documented steps are the tested steps.
-
-**The procedure is a block, not a flag or a script.** An `init --recipe` flag would make a recipe `init`'s file, rewritten on its next run unless the manifest recorded the recipe as well. A shipped script would owe a PowerShell twin under the interpreter policy, and the block runs under a shell every supported host already has.
+**A flag, where this section once refused one.** The refusal's ground was that a flag would make a recipe `init`'s file, rewritten on the next run, unless the manifest recorded the recipe as well. It records it now. Its second ground, a script's PowerShell twin, does not reach a flag that runs behind the invoke. So the one-line install carries a recipe on every host, with no `sh` block to paste and no tag to type.
 
 ### The Spec Kit recipe
 
@@ -52,7 +44,7 @@ Measured on `openspec init --tools claude --no-animation --no-copilot-cloud .`, 
 
 ### The lifecycle layer
 
-An adopter who runs lifecycle-kit's stage machine installs `full`, the one profile carrying both lifecycle-kit and canon-kit, applies the toolkit's recipe, then applies `<toolkit>/lifecycle/` with the same procedure. The layer binds the knobs that let `check-stage-entry` see the toolkit's in-flight work as amendments, so a cross-component build entry owes an align stamp. The directory is not named `recipe/`, so the companion arm's toolkit roster, read from `*/recipe/`, does not take it for a third toolkit.
+An adopter who runs lifecycle-kit's stage machine installs `full`, the one profile carrying both lifecycle-kit and canon-kit, and passes `--recipe <toolkit> --recipe <toolkit>-lifecycle`. The layer binds the knobs that let `check-stage-entry` see the toolkit's in-flight work as amendments, so a cross-component build entry owes an align stamp. The directory is not named `recipe/`, so the companion arm's toolkit roster, read from `*/recipe/`, does not take it for a third toolkit.
 
 - **OpenSpec.** `openspec/lifecycle/` binds the amendment glob to in-flight change deltas by path, the roster basename to `spec.md` and the contract token to `spec.md`. A change touching two capabilities fires the audit, and so does a delta citing another capability's spec. An archived change sits one level deeper, under `openspec/changes/archive/`, and is no amendment. A queue entry's `[spec:]` ref names the change's `proposal.md` by repo-relative path.
 - **Spec Kit: no layer.** A feature's directory persists after it ships and the current feature is the branch's name, so nothing on disk marks a spec as in flight. A glob over `specs/*/spec.md` would demand the audit at every build entry once two features exist. `check-stage-entry` therefore sees no amendment in a Spec Kit tree, and the align trigger there is the authoring stage's own recommendation.
@@ -85,10 +77,10 @@ The OpenSpec layout passes `openspec validate --all --strict` at the pin, with a
 
 ## The Spec Kit extension
 
-`speckit/` is a Spec Kit extension: `extension.yml`, two command files, a `README.md` and the recipe.
+`speckit/` is a Spec Kit extension: `extension.yml`, two command files and a `README.md`.
 
 - **`extension.yml`** declares `schema_version: "1.0"`, the extension's identity (`id: checkwright`), `requires.speckit_version` at `>=` the `speckit` pin in `toolkits.list` and git as a required tool. It provides two commands and one hook, and carries two to four lowercase tags.
-- **`speckit.checkwright.install`** (`commands/install.md`) installs the release this extension version was tested with. It runs the one-line install with `CHECKWRIGHT_VERSION` set to `extension.version`, spelled with the verb, `init --profile prose`, since the line runs `init` only when given no argument. It then runs the commands `init` printed and the recipe block.
+- **`speckit.checkwright.install`** (`commands/install.md`) installs the release this extension version was tested with, with the recipe applied. It runs the one-line install with `CHECKWRIGHT_VERSION` set to `extension.version` and the arguments `init --profile prose --recipe speckit`, then runs the commands `init` printed.
 - **`speckit.checkwright.check`** (`commands/check.md`) runs the battery and reports its verdict, each red with its finding and its `help:` line. It fixes nothing unasked.
 - **The `after_implement` hook** is optional and offers the check.
 - **`README.md`** says what the extension adds, how to install it and where the landing page is, which the catalog requires of a listed extension. Its description line in `extension.yml` stays under the catalog's 200 characters.
@@ -101,7 +93,7 @@ Each command is an agent instruction. Spec Kit hands the command bodies and the 
 
 `scripts/ci-pack-extension.sh <version> <out-dir>` builds `checkwright-companion-<version>.zip` and its `.sha256` sidecar:
 
-- it extracts `companion/speckit/`'s tracked files at `HEAD` with `git archive` into a scratch `checkwright-companion-<version>/`, adding the repository's `LICENSE`;
+- it extracts `companion/speckit/`'s tracked files at `HEAD` with `git archive` into a scratch `checkwright-companion-<version>/`, less `recipe/`, which the package carries instead, adding the repository's `LICENSE`;
 - it rewrites the one `version: "0.0.0"` line to `<version>`, and refuses when that line is absent or occurs twice;
 - it zips the directory with `python3 -m zipfile -c`, so one top-level directory holds `extension.yml`, and writes the sidecar in the `<hex>  <name>` form the other assets use.
 
@@ -113,7 +105,7 @@ A Spec Kit archive install looks for `extension.yml` at the archive's root or in
 
 The toolkits' own tools are oracles, and nothing here re-implements their schemas. The `companion-toolkits` job in `.github/workflows/gates.yml` reads `toolkits.list` and:
 
-1. installs the pinned `specify-cli`, runs `specify init --here --non-interactive --integration claude --script sh --ignore-agent-tools` in an empty scratch directory, since the non-interactive init refuses a non-empty one and a runner carrying no `claude` CLI, and packs the extension at version `0.0.0`. It serves the zip from a local web server and installs it with `specify extension add checkwright --from <url>`, answering the trust prompt. It asserts exit 0, `.specify/extensions/checkwright/extension.yml` and the recipe present, and the hook registered in `.specify/extensions.yml`;
+1. installs the pinned `specify-cli`, runs `specify init --here --non-interactive --integration claude --script sh --ignore-agent-tools` in an empty scratch directory, since the non-interactive init refuses a non-empty one and a runner carrying no `claude` CLI, and packs the extension at version `0.0.0`. It serves the zip from a local web server and installs it with `specify extension add checkwright --from <url>`, answering the trust prompt. It asserts exit 0, `.specify/extensions/checkwright/extension.yml` present, and the hook registered in `.specify/extensions.yml`;
 2. asserts that `extension.yml`'s `requires.speckit_version` is `>=` the pinned version;
 3. runs the pinned `openspec validate --all --strict` inside a copy of `fixtures/openspec/layout/`, then again with the lifecycle overlay's `openspec/` copied over it.
 
@@ -122,7 +114,7 @@ A pin moves by editing its `toolkits.list` line, and the job then proves the new
 ## Honest limits
 
 - The Spec Kit fixture's fidelity rests on the pinned templates' structure, since Spec Kit ships no validator.
-- The agent-run parts of the extension, its command bodies and its hook, are exercised by no harness. The toolkit leg proves the archive installs, and the companion arm runs the install command's recipe block, but no run follows an agent through either command.
-- The Windows route is documented and not run.
+- The agent-run parts of the extension, its command bodies and its hook, are exercised by no harness. The toolkit leg proves the archive installs, and the companion arm runs the install command's install line, but no run follows an agent through either command.
+- The Windows route is documented and not run. A recipe adds no step of its own to it, and a leg piping the PowerShell line would retire this limit.
 - A pinned toolkit version says nothing about the next one.
 - A change whose two in-flight deltas sit under one capability in two changes fires the OpenSpec layer's audit, since each delta's directory is a component. So does a delta citing its own capability's spec, which sits outside the delta's directory. The align waiver is the valve. On Spec Kit the audit trigger is not machine-held.

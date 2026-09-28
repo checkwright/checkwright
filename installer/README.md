@@ -50,7 +50,7 @@ Re-running is idempotent and non-destructive. `init` reads the per-file hash `ch
 - **`prose`** — adds canon-kit instead, for a repository whose artifacts are documents rather than code.
 - **`full`** — everything in the payload.
 
-`starter`, `delegation` and `prose` are rosters in `profiles.list`, each membership recorded beside the criterion behind it; `full` is derived from the payload at run time rather than listed.
+`starter`, `delegation` and `prose` are rosters in `profiles.list`, each membership recorded beside the criterion behind it; `full` is derived from the payload at run time rather than listed. `--recipe <name>` applies a recipe the package carries, for a tree another tool lays out, such as a spec toolkit's.
 
 ## Where the design lives
 

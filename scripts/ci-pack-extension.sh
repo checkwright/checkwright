@@ -51,8 +51,8 @@ trap 'rm -rf "$scratch"' EXIT
 stage="$scratch/$name"
 mkdir "$stage"
 
-# spec: companion/SPEC.md §Packing the extension — the tracked files at HEAD, never the worktree, plus the repository's LICENSE
-git archive --format=tar HEAD:companion/speckit | tar -xf - -C "$stage"
+# spec: companion/SPEC.md §Packing the extension — the tracked files at HEAD, never the worktree, less recipe/, which the package carries, plus the repository's LICENSE
+git archive --format=tar HEAD:companion/speckit -- . ':(exclude)recipe' | tar -xf - -C "$stage"
 git show HEAD:LICENSE > "$stage/LICENSE"
 
 manifest="$stage/extension.yml"

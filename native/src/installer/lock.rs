@@ -13,7 +13,7 @@ pub const FILE: &str = "checkwright.lock";
 // spec: installer/SPEC.md §The manifest — the fields whose wire type is an array rather than a
 // string, which is knowledge only the schema owner has: `emit` splits exactly these on the space
 // the reader below joins them with, so one module holds both halves of the representation.
-const ARRAY_FIELDS: &[&str] = &["kits"];
+const ARRAY_FIELDS: &[&str] = &["kits", "recipes"];
 
 pub fn path(root: &Path) -> PathBuf {
     root.join(FILE)

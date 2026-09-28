@@ -15,6 +15,7 @@
   "files": [
     "bin/",
     "payload/",
+    "recipes/",
     "profiles.list",
     "README.md",
     "LICENSE"

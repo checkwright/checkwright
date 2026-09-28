@@ -1,4 +1,4 @@
-# spec: companion/SPEC.md §The lifecycle layer — appended to the consumer's scripts/lifecycle-config.knobs
+# spec: companion/SPEC.md §The lifecycle layer — composed by `init --recipe` into the consumer's scripts/lifecycle-config.knobs
 LIFECYCLE_KIT_AMENDMENT_GLOB = openspec/changes/*/specs/*/spec.md
 LIFECYCLE_KIT_ROSTER_BASENAME = spec.md
 LIFECYCLE_KIT_CONTRACT_TOKENS[] = spec.md

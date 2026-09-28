@@ -4,8 +4,8 @@ Checkwright's gates over a repository whose specs another toolkit writes. This d
 
 ## What it holds
 
-- **A recipe per toolkit**, in `<toolkit>/recipe/`: the knob lines and the dropped gate that fit the profile to the toolkit's layout, applied by one block of `sh` after `init`.
-- **A lifecycle layer for OpenSpec**, in `openspec/lifecycle/`: the knob lines that let lifecycle-kit's stage machine read a change's in-flight deltas as amendments, applied after the recipe by the same block.
+- **A recipe per toolkit**, in `<toolkit>/recipe/`: the knob lines and the dropped gate that fit the profile to the toolkit's layout, applied by `init --recipe <toolkit>`.
+- **A lifecycle layer for OpenSpec**, in `openspec/lifecycle/`: the knob lines that let lifecycle-kit's stage machine read a change's in-flight deltas as amendments, applied with `--recipe openspec-lifecycle`.
 - **A Spec Kit extension**, in `speckit/`, whose install command installs Checkwright and applies the Spec Kit recipe for you.
 - **A fixture tree per toolkit**, in `fixtures/`, in the toolkit's own layout, with one planted defect per claimed gate. The consumer smoke installs the profile on each tree, applies the recipe, and asserts the battery green and each defect caught.
 - **The tested versions**, in `toolkits.list`.
@@ -13,15 +13,15 @@ Checkwright's gates over a repository whose specs another toolkit writes. This d
 ## Using it
 
 - **Spec Kit:** add the extension from a Checkwright release and run its install command ([speckit/README.md](speckit/README.md)).
-- **OpenSpec:** install the `prose` profile, then run the recipe block with the OpenSpec recipe.
+- **OpenSpec:** install the `prose` profile with `--recipe openspec`.
 
-To run lifecycle-kit's stage machine as well, install `full` instead of `prose`, and on OpenSpec run the same block a second time with `openspec/lifecycle/`. Spec Kit has no lifecycle layer ([SPEC.md §The lifecycle layer](SPEC.md#the-lifecycle-layer)).
+To run lifecycle-kit's stage machine as well, install `full` instead of `prose`, and on OpenSpec add `--recipe openspec-lifecycle`. Spec Kit has no lifecycle layer ([SPEC.md §The lifecycle layer](SPEC.md#the-lifecycle-layer)).
 
 Both routes, what the gates catch in a spec tree and the tested versions are on the [Spec Kit and OpenSpec](https://checkwright.dev/spec-toolkits.html) page.
 
 ## Where the design lives
 
-[`companion/SPEC.md`](SPEC.md): the recipe format and procedure, each recipe line with the idiom it answers, the lifecycle layer, the tested claim, the fixture rules, the extension's contract, the pack step, the toolkit legs and the honest limits.
+[`companion/SPEC.md`](SPEC.md): how a recipe is applied, each recipe line with the idiom it answers, the lifecycle layer, the tested claim, the fixture rules, the extension's contract, the pack step, the toolkit legs and the honest limits.
 
 ## License
 

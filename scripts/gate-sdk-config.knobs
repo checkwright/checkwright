@@ -15,6 +15,11 @@ GATE_SDK_REGISTRY_DOC = docs/kits.md
 # spec: gate-sdk/SPEC.md §Layout and configuration — companion/fixtures/ holds consumer trees that carry, on purpose, each idiom and defect a gate reds; the companion arm of the consumer smoke governs them inside a scratch consumer, so this tree's walks skip every directory named fixtures
 GATE_SDK_PRUNE_EXTRA_DIRS = fixtures
 
+# spec: companion/SPEC.md §Recipes — the package carries each spec toolkit's recipe and OpenSpec's lifecycle layer, so `init --recipe <name>` applies the one the running release was tested with
+GATE_SDK_PAYLOAD_RECIPES[openspec] = companion/openspec/recipe
+GATE_SDK_PAYLOAD_RECIPES[openspec-lifecycle] = companion/openspec/lifecycle
+GATE_SDK_PAYLOAD_RECIPES[speckit] = companion/speckit/recipe
+
 # spec: gate-sdk/SPEC.md §check-shellcheck — this repo ships shell under no kit root: the installer's two bootstraps, its consumer smoke, the runnable adoption walkthrough, and the hosted one-line install script `docs/install.sh`, the only direct `*.sh` member of `docs`; name them so the lint that governs every other script in the tree governs these too. Each directory is named on its own because the gate globs *.sh per named directory and does not descend
 GATE_SDK_LINT_EXTRA_DIRS = installer/bin installer/consumer-smoke demo docs
 

@@ -25,7 +25,7 @@ One queue entry pairs it: [companion-recipe-in-payload](TASK-QUEUE.md#companion-
 
 ### (1) The recipe format and `init --recipe` {design-bearing}
 
-**Not yet applied.** installer/SPEC.md gains a section after §What init seeds:
+**Applied** in the landing commit. installer/SPEC.md gains a section after §What init seeds:
 
 > ## Payload recipes
 >
@@ -47,7 +47,7 @@ installer/SPEC.md §init's flag paragraph (the one opening **Re-running is idemp
 
 ### (2) The manifest records the recipes {design-bearing}
 
-**Not yet applied.** installer/SPEC.md §The manifest's field table gains a row after `profile`:
+**Applied** in the landing commit. installer/SPEC.md §The manifest's field table gains a row after `profile`:
 
 > | `recipes` | the payload recipes applied, in application order, or absent when none were | a re-run of `init` re-applies them when no `--recipe` or `--no-recipe` is passed (§Payload recipes); `doctor` reports them beside the profile |
 
@@ -55,7 +55,7 @@ The field is absent, never empty, when no recipe applies, on the table's present
 
 ### (3) The knob and the packer's placement {design-bearing}
 
-**Not yet applied.** gate-sdk/SPEC.md §Layout and configuration gains, after the `GATE_SDK_PAYLOAD_LICENSE` bullet:
+**Applied** in the landing commit. gate-sdk/SPEC.md §Layout and configuration gains, after the `GATE_SDK_PAYLOAD_LICENSE` bullet:
 
 > - `GATE_SDK_PAYLOAD_RECIPES` (keyed, default empty): each pair names a payload recipe and the repo-relative directory it is packed from. The packer places each directory's tracked files at `recipes/<name>/` in the package root (installer/SPEC.md §The packer). A name is `[a-z0-9][a-z0-9-]*`, since an adopter types it and a directory carries it. Empty packs no recipe.
 
@@ -71,7 +71,7 @@ installer/SPEC.md §The packer: the footprint's first member, *under `installer/
 
 ### (4) The package roster and this repository's recipes {mechanical}
 
-**Not yet applied.** `installer/package.json`'s `files` roster gains `"recipes/"`. installer/SPEC.md §Layout gains a bullet after `payload/`:
+**Applied** in the landing commit. `installer/package.json`'s `files` roster gains `"recipes/"`. installer/SPEC.md §Layout gains a bullet after `payload/`:
 
 > - `recipes/` — the payload recipes (§Payload recipes), assembled at pack time from the directories `GATE_SDK_PAYLOAD_RECIPES` names, never tracked here.
 
@@ -85,7 +85,7 @@ GATE_SDK_PAYLOAD_RECIPES[speckit] = companion/speckit/recipe
 
 ### (5) companion/SPEC.md cites the applier {design-bearing}
 
-**Not yet applied.** companion/SPEC.md:
+**Applied** in the landing commit. companion/SPEC.md:
 
 - The opening paragraph's *and a fixture tree that proves the recipe* sentence stands. The paragraph gains *The package carries the recipes, and `init --recipe <name>` applies one ([installer/SPEC.md §Payload recipes](../installer/SPEC.md#payload-recipes)).*
 - §The component: *so no kit-root resolver admits it and no install payload carries it* becomes *so no kit-root resolver admits it. The package carries its recipes under `recipes/`, named in this repository's `GATE_SDK_PAYLOAD_RECIPES`: `openspec`, `openspec-lifecycle` and `speckit`.*
@@ -104,7 +104,7 @@ GATE_SDK_PAYLOAD_RECIPES[speckit] = companion/speckit/recipe
 
 ### (6) The extension, the READMEs and the page {mechanical}
 
-**Not yet applied.**
+**Applied** in the landing commit.
 
 - `companion/speckit/commands/install.md`: the **Install the release** step's two lines gain ` --recipe speckit` after `init --profile prose`. The `sh` line moves between `<!-- companion-install:begin -->` and `<!-- companion-install:end -->`. The **Apply the recipe** step and its block are deleted. The closing rule *drop a gate the recipe does not name* becomes *drop a gate*.
 - `companion/speckit/README.md`: *It then applies the Spec Kit recipe in `recipe/`, which prunes …* becomes *with the Spec Kit recipe applied, which prunes …*; *It makes two commits: the install, then the recipe.* becomes *It makes one commit.*
@@ -117,7 +117,7 @@ GATE_SDK_PAYLOAD_RECIPES[speckit] = companion/speckit/recipe
 
 ### (7) The consumer smoke's companion arm {design-bearing}
 
-**Not yet applied.** installer/SPEC.md §The consumer smoke, the paragraph opening **The companion arm** and the numbered list and paragraph after it are replaced by:
+**Applied** in the landing commit. installer/SPEC.md §The consumer smoke, the paragraph opening **The companion arm** and the numbered list and paragraph after it are replaced by:
 
 > **The companion arm** runs after the demo arm and proves each payload recipe on its fixture tree ([companion/SPEC.md](../companion/SPEC.md#recipes)). It prints one header per toolkit, so each is its own scenario. It reads each toolkit's install line from its `companion-install` block, the landing page's for OpenSpec and the extension's install command's for Spec Kit, and takes the line's words from `init` to its end as the arguments. It refuses an absent or empty block, or a line carrying no `--recipe`, rather than skipping it. For each toolkit it:
 >
@@ -132,7 +132,7 @@ GATE_SDK_PAYLOAD_RECIPES[speckit] = companion/speckit/recipe
 
 ### (8) The site roster and the toolkit leg {mechanical}
 
-**Not yet applied.** docs/site-architecture.md §Generated projections and their freshness gates, the bullet **The recipe block** is replaced by:
+**Applied** in the landing commit. docs/site-architecture.md §Generated projections and their freshness gates, the bullet **The recipe block** is replaced by:
 
 > - **The toolkit install lines** — `docs/spec-toolkits.md` carries two marker blocks, hand-authored, each one `text` fence holding one `checkwright init …` line. The pair `companion-install:begin` and `companion-install:end` holds the OpenSpec install line, and the pair `companion-full:begin` and `companion-full:end` holds its `full` line, which adds the lifecycle layer. `companion/speckit/commands/install.md` carries a `companion-install` block holding the Spec Kit line, the one-line install in an `sh` fence. Their reader is the consumer smoke's companion arm, which runs each line's words from `init` to its end and reds by name on an absent or empty block ([companion/SPEC.md §Applying a recipe](companion/SPEC.md#applying-a-recipe)). The contract is the install blocks' own: no gate holds a block, and a red arrives with the smoke.
 

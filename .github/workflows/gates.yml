@@ -322,7 +322,6 @@ jobs:
             || { echo "::error::specify extension add exited non-zero on the packed extension"; exit 1; }
           installed="$work/tree/.specify/extensions/checkwright"
           [ -f "$installed/extension.yml" ] || { echo "::error::the install wrote no $installed/extension.yml"; exit 1; }
-          [ -f "$installed/recipe/unregister.list" ] || { echo "::error::the install carried no recipe/ into $installed"; exit 1; }
           grep -q 'speckit.checkwright.check' "$work/tree/.specify/extensions.yml" \
             || { echo "::error::the after_implement hook is not registered in .specify/extensions.yml"; exit 1; }
           echo "Spec Kit $SPECKIT_VERSION installed the packed extension and registered its hook"

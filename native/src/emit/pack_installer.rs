@@ -16,6 +16,7 @@ pub const KNOBS: &[&str] = &[
     "GATE_SDK_NATIVE_TARGETS_FILE",
     "GATE_SDK_NATIVE_BIN",
     "GATE_SDK_PAYLOAD_LICENSE",
+    "GATE_SDK_PAYLOAD_RECIPES",
     "GATE_SDK_PAYLOAD_WITHHOLD",
     "GATE_SDK_SPEC_BASE_URL",
 ];
@@ -184,6 +185,23 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
     pack_tracked(&commit, "installer", &asm, &[])?;
     place_license(license.as_deref(), &asm)?;
 
+    // spec: installer/SPEC.md §The packer — payload recipes ride the package root beside the
+    // payload, extracted like kits from the stamped commit
+    let recipes = recipe_plan(&asm, &walk::knob_map("GATE_SDK_PAYLOAD_RECIPES").map_err(refuse)?)?;
+    for (dir, into) in &recipes {
+        if !tracked_under(&commit, dir)? {
+            return Err(refuse_help(
+                format!(
+                    "GATE_SDK_PAYLOAD_RECIPES names {}, which holds no file tracked at {}.",
+                    dir,
+                    &commit[..12]
+                ),
+                &["a recipe the package cannot carry is a broken payload rather than a smaller one: commit the directory, or drop its pair."],
+            ));
+        }
+        pack_tracked(&commit, dir, into, &[])?;
+    }
+
     // spec: gate-sdk/SPEC.md §Consumer payload — one declared shape reaching every root the loop
     // yields, so the shipped set stays derived from the governed one; a per-kit roster would be the
     // maintained copy derivation-first refuses, and would let a kit fall out by being forgotten
@@ -301,6 +319,35 @@ fn license_text(commit: &str, name: &str) -> Result<Option<Vec<u8>>, Refusal> {
             done.failure_report().unwrap_or_default()
         ))),
     }
+}
+
+// spec: installer/SPEC.md §The packer — each pair's name is typed by an adopter and carried by a
+// directory, so a name outside `[a-z0-9][a-z0-9-]*` refuses before anything is extracted
+fn recipe_plan(asm: &str, pairs: &[(String, String)]) -> Result<Vec<(String, String)>, Refusal> {
+    let mut out = Vec::new();
+    for (name, dir) in pairs {
+        let lead = name.bytes().next();
+        let ok = lead.is_some_and(|b| b.is_ascii_lowercase() || b.is_ascii_digit())
+            && name.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-');
+        if !ok {
+            return Err(refuse_help(
+                format!("GATE_SDK_PAYLOAD_RECIPES names the payload recipe '{}', outside [a-z0-9][a-z0-9-]*.", name),
+                &["an adopter types the name and a directory carries it: lowercase letters, digits and hyphens, opening with a letter or digit."],
+            ));
+        }
+        out.push((
+            dir.trim().trim_end_matches('/').to_string(),
+            format!("{}/recipes/{}", asm, name),
+        ));
+    }
+    Ok(out)
+}
+
+fn tracked_under(commit: &str, dir: &str) -> Result<bool, Refusal> {
+    if dir.is_empty() {
+        return Ok(false);
+    }
+    Ok(!git(&["ls-tree", "-r", "--name-only", commit, "--", dir])?.is_empty())
 }
 
 fn place_license(text: Option<&[u8]>, dir: &str) -> Result<(), Refusal> {
@@ -436,6 +483,11 @@ fn footprint(root: &str, artifacts: &str) -> Result<Vec<String>, Refusal> {
     let license = walk::knob_scalar("GATE_SDK_PAYLOAD_LICENSE").map_err(refuse)?;
     if let Some(p) = inside(root, license.trim()).filter(|_| !license.trim().is_empty()) {
         spec.push(p);
+    }
+    for (_, dir) in walk::knob_map("GATE_SDK_PAYLOAD_RECIPES").map_err(refuse)? {
+        if let Some(p) = inside(root, dir.trim().trim_end_matches('/')) {
+            spec.push(p);
+        }
     }
     if !artifacts.is_empty() {
         let roster = walk::knob_scalar("GATE_SDK_NATIVE_TARGETS_FILE").map_err(refuse)?;
@@ -960,6 +1012,37 @@ mod tests {
         assert_eq!(std::fs::read(dir.join("LICENSE")).expect("root copy"), text);
         assert_eq!(std::fs::read(leaf.join("LICENSE")).expect("kit copy"), text);
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: installer/SPEC.md §The packer — two pairs place two recipes under the package root's
+    // `recipes/`, the empty default places none, and a name outside the grammar refuses
+    #[test]
+    fn each_recipe_pair_lands_under_the_package_root_and_a_bad_name_refuses() {
+        let pairs = vec![
+            ("one".to_string(), "a/one/".to_string()),
+            ("two-2".to_string(), "b/two".to_string()),
+        ];
+        assert_eq!(
+            recipe_plan("/asm", &pairs).expect("two good pairs refused"),
+            vec![
+                ("a/one".to_string(), "/asm/recipes/one".to_string()),
+                ("b/two".to_string(), "/asm/recipes/two-2".to_string()),
+            ]
+        );
+        assert!(recipe_plan("/asm", &[]).expect("the empty default refused").is_empty());
+        for bad in ["", "-lead", "Upper", "a/b", "dot.ted"] {
+            let r = recipe_plan("/asm", &[(bad.to_string(), "d".to_string())]).expect_err(bad);
+            assert!(r.cause.contains("outside [a-z0-9][a-z0-9-]*"), "{}", r.cause);
+        }
+    }
+
+    // spec: installer/SPEC.md §The packer — a recipe directory holding no tracked file at the commit
+    // is refused by the caller, whichever tree the test runs in
+    #[test]
+    fn a_recipe_directory_with_no_tracked_file_reads_as_none() {
+        assert!(!tracked_under("HEAD", "no-such-recipe-dir").expect("the probe failed"));
+        assert!(!tracked_under("HEAD", "").expect("the probe failed"));
+        assert!(tracked_under("HEAD", "src").expect("the probe failed"));
     }
 
     // spec: installer/SPEC.md §The packer — a set knob naming no regular file tracked at the commit

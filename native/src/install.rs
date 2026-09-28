@@ -196,6 +196,31 @@ fn seam_text(existing: Option<&str>, dest: &str, declared: &[(String, String)]) 
     out
 }
 
+// spec: installer/SPEC.md §Payload recipes — the gate-sdk seam has no kit template, so a payload
+// recipe's lines follow the placement's own: a line equal to one an applied or recorded recipe
+// carries is init's and is re-derived, and every other line is kept as it stands
+pub fn seam_text_with(
+    existing: Option<&str>,
+    dest: &str,
+    declared: &[(String, String)],
+    retire: &[String],
+    add: &[String],
+) -> String {
+    let retired = |l: &str| retire.iter().chain(add).any(|r| r.trim() == l.trim());
+    let kept: Option<String> = existing.map(|t| {
+        t.lines()
+            .filter(|l| !retired(l))
+            .map(|l| format!("{}\n", l))
+            .collect()
+    });
+    let mut out = seam_text(kept.as_deref(), dest, declared);
+    for l in add {
+        out.push_str(l);
+        out.push('\n');
+    }
+    out
+}
+
 // spec: installer/SPEC.md §The install boundary — the seam write is a temporary beside the
 // target and a rename, so no reader sees a half-written knob file and a failed write leaves
 // whatever was there intact.
@@ -224,6 +249,10 @@ pub struct Placement<'a> {
     // spec: installer/SPEC.md §The gate binary — the seam's declared lines: knob/value pairs the
     // install resolves rather than ships, supplied by the caller because the values are its own
     pub declared: &'a [(String, String)],
+    // spec: installer/SPEC.md §Payload recipes — the payload recipes' lines for this seam: those the
+    // run applies, and those a recorded set carried, which a re-run re-derives rather than keeps
+    pub recipe_add: &'a [String],
+    pub recipe_retire: &'a [String],
     pub target: &'a str,
     pub digest: &'a str,
     pub force: bool,
@@ -271,7 +300,7 @@ pub fn place(p: &Placement, recorded: &Recorded) -> Result<Vec<String>, String> 
                 };
                 write_atomically(
                     &seam_path,
-                    &seam_text(existing.as_deref(), p.dest, p.declared),
+                    &seam_text_with(existing.as_deref(), p.dest, p.declared, p.recipe_retire, p.recipe_add),
                 )?;
             }
             records.push(format!("own\t{}", p.seam));
@@ -326,6 +355,8 @@ fn place_artifact(args: &[String]) -> i32 {
         dest: &resolved[2],
         seam: &resolved[3],
         declared: &declared,
+        recipe_add: &[],
+        recipe_retire: &[],
         target: &resolved[4],
         digest: &resolved[5],
         force: parsed.set("force"),
@@ -453,6 +484,8 @@ mod tests {
             dest: "scripts/checkwright-gates",
             seam: "scripts/gate-sdk-config.knobs",
             declared: &[],
+            recipe_add: &[],
+            recipe_retire: &[],
             target: "x86_64-unknown-linux-gnu",
             digest,
             force: false,
@@ -523,6 +556,24 @@ mod tests {
             seam_text(Some(existing), "scripts/checkwright-gates", &declared),
             "GATE_SDK_TMP_DIR = .scratch\nGATE_SDK_NATIVE_BIN = scripts/checkwright-gates\n\
              GATE_SDK_KIT_DIRS = gate-sdk canon-kit\nGATE_SDK_SPEC_BASE_URL = https://example.test\n"
+        );
+    }
+
+    // spec: installer/SPEC.md §Payload recipes — a recipe line follows the placement's lines, a
+    // line a recorded recipe carried is re-derived rather than kept twice or kept after `--no-recipe`,
+    // and an adopter's own line survives
+    #[test]
+    fn a_recipe_line_is_re_derived_and_an_adopters_line_survives() {
+        let add = vec!["X_DIRS = .a".to_string()];
+        let retire = vec!["X_DIRS = .old".to_string()];
+        let existing = "MINE = 1\nX_DIRS = .a\nX_DIRS = .old\nGATE_SDK_NATIVE_BIN = b\n";
+        assert_eq!(
+            seam_text_with(Some(existing), "b", &[], &retire, &add),
+            "MINE = 1\nGATE_SDK_NATIVE_BIN = b\nX_DIRS = .a\n"
+        );
+        assert_eq!(
+            seam_text_with(Some(existing), "b", &[], &add, &[]),
+            "MINE = 1\nX_DIRS = .old\nGATE_SDK_NATIVE_BIN = b\n"
         );
     }
 

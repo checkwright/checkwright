@@ -1,2 +1,2 @@
-# spec: companion/SPEC.md §The Spec Kit recipe — appended to the consumer's scripts/gate-sdk-config.knobs
+# spec: companion/SPEC.md §The Spec Kit recipe — composed by `init --recipe` into the consumer's scripts/gate-sdk-config.knobs
 GATE_SDK_PRUNE_EXTRA_DIRS = .specify
