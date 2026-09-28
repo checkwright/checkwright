@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: consult-inbox-front-brevity
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,26 @@
 ## New Features
 
 ## Technical Debt
+
+### tier-only-rank-out-unruled
+
+the audit roster's survey-engagement class does not say whether a scope survey that ranks a body-read entry out on the scope template's cost-tier order alone (session before iteration, high before low) has engaged the entry's self-declared strongest ground under limb (a). The class calls an entry ranked out on a blanket call alone a finding, while the template's rank order makes a tier sentence a sufficient rank-out. gate-sdk-tail-docs-standard's close met the case on heterogeneous-agent-delegation, whose demand-attested and live-lever grounds its survey left unengaged: the delegated reader called it a hit, and the close declined it on the predecessor sweep's precedent.
+
+**Deliverable:** the survey-engagement row's scope line in `.workflow/audit-roster.txt` narrowed to what lifecycle-kit/templates/stages/scope.md states — the cost-tier rank order and the inbound-edge aggregation — so a tier-only rank-out counts as engagement and limb (a) leaves the row.
+
+**Promoted as debt 2026-09-28 at consult-inbox-front-brevity's scope, operator direction lead-relayed (not a /consult ruling), reading (a):** the filing's premise is corrected — scope.md carries no counter-evidence paragraph and no strongest-ground obligation (`git grep` over it finds neither), so limb (a) audits an obligation its owner does not state, and the row converges on the owner.
+
+**Cost while deferred:** each close's survey-engagement sweep re-judges tier-only rank-outs and can reach opposite verdicts. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's close; promoted 2026-09-27 at the next iteration's scope: →fix fails because the specs leave the reading to precedent, and a ruling settles it. Re-verified: `.workflow/audit-roster.txt`'s survey-engagement row states the blanket-call finding, and its `declined:` field records the tier-ground decline. Owner lookup: `survey-engagement`, `rank-out`, `cost tier` in this file — survey-engagement-residue-untracked and survey-engagement-trigger-narrower-than-its-class, both DISTINCT (gitignored residue; non-scope surveys); owner lifecycle-kit/templates/stages/scope.md.
+
+### lifecycle-kit-front-brevity
+
+the lifecycle-kit/SPEC.md sections above §Per-component contracts (§The state machine through §Testing), about 23.3k of the file's 61.6k words. The per-component contracts stay on [spec-brevity-residue](#spec-brevity-residue).
+
+**Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays, including a fact a sibling entry or another SPEC cites there.
+
+**Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-28, lead-relayed (not a /consult ruling), unit set A at consult-inbox-front-brevity's scope:** the moves run under gates that already exist and add no name. [consult-inbox](#consult-inbox)'s amendment edits §The steering vocabulary inside this slice, so it merges first and this pass runs last, over the merged text.
+
+**Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Filed 2026-09-25 as spec-brevity-residue, split 2026-09-28 at scope; the word census is this scope's survey record.
 
 ## Deferred
 
@@ -358,6 +378,8 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
+lifecycle-kit's sections above §Per-component contracts left 2026-09-28 at consult-inbox-front-brevity's scope as [lifecycle-kit-front-brevity](#lifecycle-kit-front-brevity), on an operator direction lead-relayed (not a /consult ruling).
+
 ### prune-set-matches-walk-root-ancestors
 
 [cost: event/high] [surface: context-kit] [recurrence: 2026-09-25]
@@ -496,6 +518,8 @@ a roadmap horizon moves only when a `/consult` happens to re-tag it. The consult
 
 **Deliverable:** close raises a consult-owed signal on a vacant now/ horizon or a landed tagged entry, feeding [consult-inbox](#consult-inbox), and the consult binding reconciles tags on any direction change.
 
+**Taken for /spec 2026-09-28 at consult-inbox-front-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set A; [consult-inbox](#consult-inbox) goes first, its signal being the inbox's first consumer.
+
 **Cost while deferred:** the public roadmap lags direction until an operator-started consult notices. Filed 2026-09-26 to the gap inbox by the lead on an operator question; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because the signal is new mechanism on two surfaces. Re-verified at the drain: the consult binding's one roadmap hit is the projection sentence, and `--emit roadmap` printed now/ empty before the re-tag. Owner lookup: `horizon`, `consult-owed` in this file — no entry about motion.
 
 ### consult-inbox
@@ -506,6 +530,8 @@ nothing queues work owed to `/consult`. Its only automatic trigger is `--emit ru
 
 **Deliverable, on an operator direction (2026-09-26, lead session, not a ruling):** a separate committed inbox drained only by `/consult`, each item ruled, re-classed back to the queue, or discarded with cause; the consult binding's entry-reading adds it after TRAJECTORY.md; the session-context hook surfaces its count, advisory and never blocking a stage. Items are public-safe; one needing private context points at a private-brief section rather than restating it. It stays apart from the gap inbox because the drain owners differ: close cannot rule a consult item, so a mixed inbox would stall close's drain. Open for /spec: age escalation, and whether close forwards consult-class gap bullets. First consumer: [roadmap-horizon-motion-unowned](#roadmap-horizon-motion-unowned)'s signal.
 
+**Taken for /spec 2026-09-28 at consult-inbox-front-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set A; its amendment merges before [lifecycle-kit-front-brevity](#lifecycle-kit-front-brevity) passes §The steering vocabulary.
+
 **Cost while deferred:** a consult-owed item survives only if a live session relays it. Filed 2026-09-26 to the gap inbox by the lead; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because a new committed surface with new governed names owes an amendment. Re-verified at the drain: `ruling-staleness` appears in the scope binding and the close template, not in either consult surface. Owner lookup: `consult inbox`, `consult-inbox` in this file — none.
 
 ### consult-inbox-drain-trigger
@@ -515,6 +541,8 @@ nothing queues work owed to `/consult`. Its only automatic trigger is `--emit ru
 the consult inbox needs a drain trigger and a status cue, on an operator direction (2026-09-26, lead session, not a ruling). (a) A status-line counter for the consult inbox, and optionally the gap inbox, through delegation-kit's statusline counter group, which takes its counts from the queue-counts arm today (`native/src/hook/statusline.rs`); the inbox path comes from a knob, since delegation-kit may not name a lifecycle-kit path. (b) The two consults split by trigger: an operator-started consult stays interactive, and the lead dispatches one for inbox items only while no stage session is live, because a consult writes TRAJECTORY.md and the queue. The dispatched consult re-classes or discards an item alone, with cause, and escalates a ruling-class item to the lead as a four-header block for the operator. Batching thresholds (count or age) are consumer-bound, off by default.
 
 **Deliverable:** both halves, with the open question stated in lifecycle-kit/SPEC.md §The steering vocabulary rather than assumed: whether an operator answer relayed through the lead into a dispatched consult is a ruling.
+
+**Taken for /spec 2026-09-28 at consult-inbox-front-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, unblocked in-set by [consult-inbox](#consult-inbox).
 
 **Cost while deferred:** the inbox, once it lands, is drained only when an operator remembers it. Filed 2026-09-26 to the gap inbox by the lead, extending the consult-inbox bullet; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails on the same amendment ground. Re-verified at the drain: `statusline.rs` reads `queue_counts::emit`. Owner lookup: `statusline counter`, `counter group` in this file — none.
 
@@ -551,16 +579,6 @@ the crates.io reservation page still carries the retired methodology description
 **Deliverable:** the reservation crate republished by the operator, and the live page reading the product statement.
 
 **Cost while deferred:** a reader searching crates.io meets a second product description, the one `one-product-statement` removed everywhere else. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's build; promoted 2026-09-27 at its close: →fix fails because the write is operator-only. Re-verified: the crates.io API returns the retired description at `max_version` 0.0.0. Owner lookup: `crates.io`, `reserve`, `republish` in this file — none; owner installer/SPEC.md §The dependency boundary.
-
-### tier-only-rank-out-unruled
-
-[cost: iteration/low] [surface: lifecycle-kit]
-
-the audit roster's survey-engagement class does not say whether a scope survey that ranks a body-read entry out on the scope template's cost-tier order alone (session before iteration, high before low) has engaged the entry's self-declared strongest ground under limb (a). The class calls an entry ranked out on a blanket call alone a finding, while the template's rank order makes a tier sentence a sufficient rank-out. gate-sdk-tail-docs-standard's close met the case on heterogeneous-agent-delegation, whose demand-attested and live-lever grounds its survey left unengaged: the delegated reader called it a hit, and the close declined it on the predecessor sweep's precedent.
-
-**Deliverable:** the reading ruled and stated once, in the class's scope line and in lifecycle-kit/templates/stages/scope.md's counter-evidence paragraph: either a tier-only rank-out counts as engagement, or a body-read entry's strongest ground is weighed in the survey record before it ranks out.
-
-**Cost while deferred:** each close's survey-engagement sweep re-judges tier-only rank-outs and can reach opposite verdicts. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's close; promoted 2026-09-27 at the next iteration's scope: →fix fails because the specs leave the reading to precedent, and a ruling settles it. Re-verified: `.workflow/audit-roster.txt`'s survey-engagement row states the blanket-call finding, and its `declined:` field records the tier-ground decline. Owner lookup: `survey-engagement`, `rank-out`, `cost tier` in this file — survey-engagement-residue-untracked and survey-engagement-trigger-narrower-than-its-class, both DISTINCT (gitignored residue; non-scope surveys); owner lifecycle-kit/templates/stages/scope.md.
 
 ### truncation-reclaim-residue
 
@@ -781,6 +799,8 @@ the Windows install-smoke leg's binding liveness step can red on a ground-truth 
 the license text may not ship with the artifacts, and the license line differs across surfaces. `installer/package.json`'s `files` list carries no LICENSE and `installer/` holds none, so the npm package ships without the text, which Apache-2.0 section 4(a) asks a redistribution to give; no kit directory carries one either, and the release tarball's payload is unchecked. README.md links `[Apache-2.0](LICENSE)`, installer/README.md says `Apache-2.0.`, gate-sdk/README.md says "see the repository root", which names the adopter's root once vendored, and the other kit READMEs say nothing. Operator direction, 2026-09-28 (lead session): align the license line across the site and the READMEs.
 
 **Deliverable:** the text shipped in the npm package, the tarball and each vendored kit where redistribution needs it, and one license line on every README, linked where the link survives vendoring and the site mirror.
+
+**Taken for /spec 2026-09-28 at consult-inbox-front-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, the payload convention authored as an installer amendment.
 
 **Cost while deferred:** each published artifact redistributes without the license text. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' lead; promoted 2026-09-28 at the next iteration's scope, the site footer fixed inline there: →fix fails because shipping the text is a payload convention. Re-verified: the `files` list, and `ls` finds a LICENSE at the root only. Owner lookup: `license`, `licence` in this file — none; owner installer/SPEC.md, with each kit README.
 
