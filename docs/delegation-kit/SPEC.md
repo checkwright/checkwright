@@ -387,9 +387,9 @@ The payload's `session_id` is shared by a dispatched agent and its dispatcher, a
 
 **The firings once read as a session's intermediate steps were a helper's, and the session's own firing is its turn end.** `SubagentStop` was seen firing seventeen times inside one dispatched session that had ended no turn, spaced by assistant steps (§The probe is asymmetric). A refusal at such a firing delivered nothing: two `live=yes verdict=red decision=refuse` lines interrupted no tool call, the session never received a reason, and it continued normally. The raw-payload read attributed those firings to the harness's progress-summary helper (*A harness helper's firing*, above). The helper fires after the session's steps and ignores a refusal. The session's own tool steps fired nothing, so the helper's allow removes a refusal that was never the session's. The helper test is not a turn-end discriminator: it tells a helper's firing from a session's, and every firing of the session's own still decides on the reading and the view. **The real turn end delivers.** A dispatched session ended its turn while its own `.run` record named a live producer. The firing logged `decision=refuse`, the reason reached the session as stop-hook feedback, and the session resumed work on the producer. The read's own deliberate turn end, taken while holding a running shell task, was refused the same way. When a producer exits, the next firing reads `verdict=green decision=allow`, so the refusal window closes with the producer's life, which is the bound the loop-protection paragraph above relies on. All of this sits under the contract's own limit: only a fresh firing catches a harness revision.
 
-**The log is capture-tier** — gitignored, advisory, drained by a named reclaim path (gate-sdk/SPEC.md §The workflow directory), which is what keeps `check-workflow-tiering` green on a member that is neither tracked nor ignored, and it declares itself on the close-surface roster (lifecycle-kit/SPEC.md §The close-surface roster) naming its own clear as the reclaim path:
+**The log is capture-tier** — gitignored and advisory (gate-sdk/SPEC.md §The workflow directory) — and declares itself on the close-surface roster (lifecycle-kit/SPEC.md §The close-surface roster) with its rotation as the reclaim path. Close reads the drain file that command prints, never the live log, then removes it with `--done`:
 
-close-surface: .workflow/subagent-stop-liveness.log advisory reclaim=: > .workflow/subagent-stop-liveness.log
+close-surface: .workflow/subagent-stop-liveness.log advisory reclaim=bash gate-sdk/bin/run-gates.sh --emit capture-drain .workflow/subagent-stop-liveness.log
 
 `advisory` rather than `forced`, on the reasoning guard-kit's friction log takes: nothing refuses a close that skips it, and a visible skip is the honest mode for a log whose enforcement lives in the exit code rather than in the file.
 
@@ -678,11 +678,11 @@ The producer's own PID is **not** logged: the `<key>.run` record already holds i
 
 **The duration sweep is a constant and deliberately not a knob**, on the same reading as the rest: the durations are the instrument's calibration, and a consumer varying them would be varying the experiment rather than configuring the tool.
 
-**The trials land in `.workflow/wait-primitive-evidence.txt`** — capture-tier, gitignored, advisory (gate-sdk/SPEC.md §The workflow directory), declared on the close-surface roster (lifecycle-kit/SPEC.md §The close-surface roster) naming its own clear as the reclaim path:
+**The trials land in `.workflow/wait-primitive-evidence.txt`** — capture-tier, gitignored, advisory (gate-sdk/SPEC.md §The workflow directory), declared on the close-surface roster (lifecycle-kit/SPEC.md §The close-surface roster) with its rotation as the reclaim path, read as the turn-end hook's log is:
 
-close-surface: .workflow/wait-primitive-evidence.txt advisory reclaim=: > .workflow/wait-primitive-evidence.txt
+close-surface: .workflow/wait-primitive-evidence.txt advisory reclaim=bash gate-sdk/bin/run-gates.sh --emit capture-drain .workflow/wait-primitive-evidence.txt
 
-`advisory` rather than `forced`, on the reasoning §The turn-end liveness hook's log already takes: nothing refuses a close that skips it, and a visible skip is the honest mode for a probe. The **finding** — the branch the trials select and its grounds — lands in this SPEC, never in the log; the log is evidence, and evidence is not the record.
+`advisory` for the reason §The turn-end liveness hook gives its log. The **finding** — the branch the trials select and its grounds — lands in this SPEC, never in the log; the log is evidence, and evidence is not the record.
 
 **This section is discharged, and the discharge is narrower than the kit's other one — narrow enough that stating the difference is this section's contribution to the port record.** There, a section's entire contract went in-crate. Here the *instrument* goes in-crate and its **subject** does not, so the section records itself discharged **with a named shell residue that is not residue**: the wait body, the local arming and the producer's launch are the artifact under test, not work left undone. A later reader counting a kit's owed sections needs both halves, because the second half is the one that looks like an unfinished port and is not.
 

@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### truncation-reclaim-residue
-
-delegation-kit/SPEC.md declares a truncation reclaim, `reclaim=: > <log>`, for both of its advisory close surfaces, `.workflow/subagent-stop-liveness.log` and `.workflow/wait-primitive-evidence.txt`, while gate-sdk/SPEC.md §The workflow directory rules that a capture log a close reads before draining drains by rotation through `--emit capture-drain`, never by truncation: a truncate after the read erases every line appended between the two. guard-kit's and drift-kit's capture logs already declare the rotation.
-
-**Deliverable:** both declarations moved to the `capture-drain` reclaim, and the close's read taken off the drain file.
-
-**Cost while deferred:** every close's reclaim of those logs can erase lines a live session appended after the read, and the truncation spelling compounded with other calls is what the harness classifier denied as audit-log tampering. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's close; promoted 2026-09-27 at the next iteration's scope: →fix fails because the move changes the close's read surface for two logs. Re-verified: `grep 'close-surface:'` over the kit SPECs shows the two truncation reclaims beside three `capture-drain` ones. Owner lookup: `reclaim`, `capture-drain`, `truncat` in this file — only the icebox's [close-surface-reclaim-uncoupled-from-read](#close-surface-reclaim-uncoupled-from-read), DISTINCT (whether the row was read, not the reclaim's form); owner delegation-kit/SPEC.md.
-
 ### gate-tests-suite-identity-in-evidence
 
 [recurrence: 2026-09-25]
@@ -1481,5 +1473,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 ## Done
 
 - lifecycle-kit-machine-brevity
+- truncation-reclaim-residue
 
 ## Lessons Learned

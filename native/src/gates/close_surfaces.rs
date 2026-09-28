@@ -1,6 +1,6 @@
 // spec: lifecycle-kit/SPEC.md §check-close-surfaces — the derived close-surface roster is complete
 // and moded: no undeclared capture surface, every declaration carries a mode with a well-formed
-// forced= citation, every capture-tier declaration names a reclaim command
+// forced= citation, every capture-tier declaration names a reclaim command that rotates
 use crate::emit::close_surfaces;
 
 fn is_space(b: u8) -> bool {
@@ -43,6 +43,20 @@ fn well_formed_forced(mode: &str) -> bool {
         }
     }
     false
+}
+
+// spec: lifecycle-kit/SPEC.md §check-close-surfaces — assertion D's positive form: the reclaim's
+// last tokens are `capture-drain`, an optional `--`, and the row's own path
+fn rotates(reclaim: &str, path: &str) -> bool {
+    let mut t = reclaim.split_ascii_whitespace().rev();
+    if t.next() != Some(path) {
+        return false;
+    }
+    match t.next() {
+        Some("capture-drain") => true,
+        Some("--") => t.next() == Some("capture-drain"),
+        _ => false,
+    }
 }
 
 pub fn run(args: &[String]) -> i32 {
@@ -111,6 +125,12 @@ fn rule(args: &[String]) -> Result<i32, String> {
                     "{}: 'close-surface: {}' is capture-tier (gitignored) and names no reclaim= command",
                     owner, path
                 ));
+            // assertion D: that reclaim rotates the row's own path aside
+            } else if !rotates(reclaim, path) {
+                errors.push(format!(
+                    "{}: 'close-surface: {}' reclaim does not rotate the log — close reads it before the reclaim, so a truncation erases every line appended in between; name '--emit capture-drain {}': {}",
+                    owner, path, path, reclaim
+                ));
             }
         }
     }
@@ -123,11 +143,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for e in &errors {
             println!("  {}", e);
         }
-        println!("  help: declare the surface with a full-line 'close-surface: <path> <mode> [reclaim=<command>]' directive in the SPEC section that already owns it — never a central list. <mode> is 'advisory' (no forcing function; a skip is a visible judgment) or 'forced=<owner-path>.md §<section>' naming the structural forcing function. A gitignored capture surface names the drain that empties it as the trailing reclaim=<command>.");
+        println!("  help: declare the surface with a full-line 'close-surface: <path> <mode> [reclaim=<command>]' directive in the SPEC section that already owns it — never a central list. <mode> is 'advisory' (no forcing function; a skip is a visible judgment) or 'forced=<owner-path>.md §<section>' naming the structural forcing function. A gitignored capture surface names the drain that empties it as the trailing reclaim=<command>, a rotation: '<gate binary> --emit capture-drain <path>'.");
         return Ok(1);
     }
     println!(
-        "CLOSE-SURFACES: clean ({} declared surface(s), {} capture-tier; every capture member declared, every declaration moded, every capture-tier declaration reclaimed)",
+        "CLOSE-SURFACES: clean ({} declared surface(s), {} capture-tier; every capture member declared, every declaration moded, every capture-tier declaration reclaimed by rotation)",
         declarations, captures
     );
     Ok(0)
@@ -151,5 +171,17 @@ mod tests {
         assert!(!well_formed_forced("forced=.md §x"));
         assert!(!well_formed_forced("forced=SPEC.mdx §x"));
         assert!(!well_formed_forced("advisory"));
+    }
+
+    #[test]
+    fn a_reclaim_rotates_only_as_capture_drain_on_the_rows_own_path() {
+        let p = ".workflow/x.log";
+        assert!(rotates("bash gate-sdk/bin/run-gates.sh --emit capture-drain .workflow/x.log", p));
+        assert!(rotates("checkwright --emit capture-drain -- .workflow/x.log", p));
+        assert!(!rotates(": > .workflow/x.log", p));
+        assert!(!rotates("truncate -s0 .workflow/x.log", p));
+        assert!(!rotates("run-gates.sh --emit capture-drain --done .workflow/x.log", p));
+        assert!(!rotates("run-gates.sh --emit capture-drain .workflow/other.log", p));
+        assert!(!rotates("run-gates.sh --emit capture-drain .workflow/x.log extra", p));
     }
 }
