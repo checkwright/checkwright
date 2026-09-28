@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### piped-install-argument-witness
-
-no CI leg runs an argument form docs/install.md tells an adopter to type through the piped bootstrap: `.github/workflows/gates.yml` pipes `install.sh` and `install.ps1` with no arguments only, and profiles are exercised only as `init --profile <p>` against the bootstrap directly, which is how the flags-first examples shipped. `check-front-door-verbs` now reds a flag-led route statically, but nothing executes the page's argument examples.
-
-**Deliverable:** a step on each leg piping the served `docs/install.sh` and `docs/install.ps1` with `init --profile starter` beside the bare line.
-
-**Push need (2026-09-28, inside the budget):** the mid-iteration push, shared with `companion-recipe-in-payload`; the PowerShell legs run only on CI. Land it after `uninstall-version-ask` and the recipe's `init` form, the argument forms it witnesses.
-
-**Cost while deferred:** a broken argument form reaches adopters with every leg green. Filed 2026-09-27 to the gap inbox by the front-door hotfix; promoted 2026-09-27 at companion-catalog-extension's close: →fix fails because the PowerShell 5.1 script-block leg cannot be witnessed on this host and a red would spend a hotfix push from an allocated budget. Re-verified: the one-liner step runs `curl … | … sh` with no argument. Owner lookup: `piped`, `one-liner`, `irm` in this file — none; owner installer/SPEC.md §Requirements.
-
 ## Deferred
 
 ### shellcheck-extra-dirs-trigger
@@ -1417,5 +1407,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - lead-clause-heading-family
 - companion-recipe-in-payload
 - companion-gate-widening
+- piped-install-argument-witness
 
 ## Lessons Learned
