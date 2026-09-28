@@ -18,6 +18,12 @@ recovery walkthrough at some-module.rs:42 needs a look.
 
 recovery is `git log -p -S'cite-line-bug' -- TASK-QUEUE.md`.
 
+### recur-typo
+
+[recurrence: 2026-09-27 2026-09-28]
+
+a recurrence stamp written space-separated, which the counting readers drop.
+
 ## Technical Debt
 
 ## Deferred

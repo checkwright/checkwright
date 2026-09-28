@@ -1,6 +1,6 @@
 // spec: queue-kit/SPEC.md §check-queue-hygiene — the queue holds only tasks, tags, and
 // structure: no HTML comments, no duplicate lines, no column-0 prose, no line-number cites,
-// no -S pickaxe on the queue
+// no -S pickaxe on the queue, no malformed recurrence date
 use crate::queue;
 use std::collections::HashMap;
 
@@ -154,6 +154,7 @@ pub fn run(args: &[String]) -> i32 {
     let mut dup: Vec<String> = Vec::new();
     let mut linecite: Vec<String> = Vec::new();
     let mut pickaxe: Vec<String> = Vec::new();
+    let mut recur: Vec<String> = Vec::new();
     let mut seen: HashMap<&str, usize> = HashMap::new();
     // spec: queue-kit/SPEC.md §check-queue-hygiene — a line inside an entry's extent is body, and the
     // first non-blank line under an entry heading may be its tag line
@@ -181,6 +182,13 @@ pub fn run(args: &[String]) -> i32 {
         }
         for span in dash_s_pickaxes(line, &queue_names) {
             pickaxe.push(format!("{}:{}: `{}`", file, fnr, span));
+        }
+        // spec: queue-kit/SPEC.md §check-queue-hygiene — a tag line's `[recurrence:]` array parses
+        // under the shared strict parse, whose counting readers drop a token that does not
+        if tag_line {
+            if let Err(tok) = queue::recurrence_array(line) {
+                recur.push(format!("{}:{}: '{}' in {}", file, fnr, tok, line.trim()));
+            }
         }
 
         // spec: queue-kit/SPEC.md §check-queue-hygiene — every column-0 line must be a
@@ -220,6 +228,7 @@ pub fn run(args: &[String]) -> i32 {
         || !dup.is_empty()
         || !linecite.is_empty()
         || !pickaxe.is_empty()
+        || !recur.is_empty()
     {
         if !html.is_empty() {
             println!("check-queue-hygiene: HTML comment(s) in the queue (provenance belongs in git history):");
@@ -273,12 +282,24 @@ pub fn run(args: &[String]) -> i32 {
             }
             println!("  help: use -G (queue-kit/SPEC.md §The icebox tier); -S stays correct over other files.");
         }
+        if !recur.is_empty() {
+            if !html.is_empty() || !dup.is_empty() || !prose.is_empty() || !linecite.is_empty() || !pickaxe.is_empty() {
+                println!();
+            }
+            println!("check-queue-hygiene: malformed [recurrence:] date(s) (a counting reader drops the");
+            println!("token, so the scope threshold and the icebox age limb undercount it):");
+            for x in &recur {
+                println!("  {}", x);
+            }
+            println!("  help: write each date as a calendar-valid YYYY-MM-DD, comma-separated");
+            println!("        (queue-kit/SPEC.md §The tag algebra); `--queue recur <slug>` stamps that form.");
+        }
         return 1;
     }
 
     println!(
         "QUEUE-HYGIENE: clean (no HTML comments, no duplicate lines, no column-0 prose, no \
-         line-number cites, no -S pickaxe on the queue in {})",
+         line-number cites, no -S pickaxe on the queue, no malformed recurrence date in {})",
         file
     );
     0

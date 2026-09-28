@@ -30,18 +30,6 @@ harness plugin packaging. Harness plugin/marketplace packaging of the stage skil
 
 ## Technical Debt
 
-### recurrence-declaration-grammar-ungated
-
-[recurrence: 2026-09-25]
-
-no gate checks a `[recurrence:]` array's date shape: `recurrence_dates` in `native/src/queue.rs` drops a token that is not a date silently, so a mistyped stamp undercounts the scope pre-emption threshold and the icebox age limb.
-
-**Deliverable:** a `check-queue-hygiene` axis refusing a malformed recurrence token, with a bad fixture. It shares its date parser with `queue-write-side-verb`'s recurrence stamp, which lands first.
-
-**Promoted as debt 2026-09-28 at plugin-marketplace-queue-verbs' scope, operator direction lead-relayed (not a /consult ruling):** the axis holds the grammar queue-kit/SPEC.md §The tag algebra already states and adds no name.
-
-**Cost while deferred:** a counted rule fires late on a typo nothing reports. Filed 2026-08-26; returned from the icebox 2026-09-25 by consult, the parser re-read. Re-verified 2026-09-28 at scope on a live instance: this session stamped `[recurrence: 2026-09-27 2026-09-28]` space-separated on queue-write-side-verb, the split on `,` dropped it to a count of 0, and the battery stayed green; corrected to the comma form.
-
 ## Deferred
 
 ### shellcheck-extra-dirs-trigger
@@ -1421,5 +1409,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 ## Done
 
 - queue-write-side-verb
+- recurrence-declaration-grammar-ungated
 
 ## Lessons Learned
