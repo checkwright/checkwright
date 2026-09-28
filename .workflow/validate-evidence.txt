@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+plugin-marketplace-queue-verbs gates sha256=3909bed5804e143184540d5e1a1fe8520ade78aa58adfacfabbdd62ea7f6d237 pass=142 fail=0 ignore=0 verdict=clean 2026-09-28
+plugin-marketplace-queue-verbs gate_sdk sha256=754fceb4addff652c31443cc80edb7fd86da22a6751d6a985b726be116728b35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+plugin-marketplace-queue-verbs canon_kit sha256=c8c86659070467fdef475b9ab59e091b4a29e93a353b0e30a310c03878820242 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+plugin-marketplace-queue-verbs context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+plugin-marketplace-queue-verbs delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+plugin-marketplace-queue-verbs doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+plugin-marketplace-queue-verbs evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+plugin-marketplace-queue-verbs guard_kit sha256=01d94b4120e133665e01946fe44d31a730d2c6cdfd1570e5ce6b96a7a1b30e1b pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+plugin-marketplace-queue-verbs lifecycle_kit sha256=0a16a2be3f1e408582252ab47d92fd8628178950f6367b1711422c95d7a0d8b0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+plugin-marketplace-queue-verbs queue_kit sha256=b7bfa7255550172f076ff11d2a619cd3608dbaa90f5f59911767456df1b52b8b pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+plugin-marketplace-queue-verbs site_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+plugin-marketplace-queue-verbs scripts sha256=da678c039ae878171ffba00a2eb2a494bb220207cca3ead47cb04a839e6ddd81 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+plugin-marketplace-queue-verbs guard_tests sha256=50af7da51cc1a15eb9e72dea81613ec0b82b4b73a8faba1987ef537271e9ee9a pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+plugin-marketplace-queue-verbs demo sha256=c30d7053cb459749760d8d3c1ea524aea5c84c63d5b36880f8744c6ba58d65bd pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+plugin-marketplace-queue-verbs installer_smoke sha256=7ae0fb0bb7ab5e6c1d7c5e5f430d0fd1ea5ed8503f81ea6b2ab1eab0cab85e15 pass=21 fail=0 ignore=0 verdict=clean 2026-09-28
+plugin-marketplace-queue-verbs consumer_smoke sha256=2ef3c4cb018502f617fa7477c6472760ec3f2d765a5d842e02b054b6d3283748 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+plugin-marketplace-queue-verbs upgrade sha256=d07b00d621fe9fa9774250e96899d36d9cbf2b5e1158d90b65ac855d4bb0aeba pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+plugin-marketplace-queue-verbs agents_md_smoke sha256=3136be4fb7170595378f478308dc7cc0c7f2a2d318dc42184e250aff64ecbec1 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+plugin-marketplace-queue-verbs index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+plugin-marketplace-queue-verbs native_crate sha256=732ee6fa288a125f0180df69acd7a620f0c958d2d31eb32cd019505424092d30 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
+plugin-marketplace-queue-verbs projection_witness sha256=9e029f5f9bc9dfcf20903757293ae5e21b86cc52b5af428537367b2ed0db4270 pass=1 fail=0 ignore=0 verdict=clean 2026-09-28
