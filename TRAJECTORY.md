@@ -7,7 +7,7 @@ close-surface: TRAJECTORY.md advisory
 
 It is not [ROADMAP.md](ROADMAP.md), a generated projection of the queue's `[roadmap:]` tags that answers *what is next*; this file answers *toward what, and under which overrides*.
 
-**Three acts.** *Correcting an aged fact* inside a paragraph (a retired slug, a moved count) is any session's, where an oracle settles the fact and the paragraph directs nothing different afterwards. *Retiring on discharge* is any session's: when a paragraph's `discharge:` oracle prints, or its `manual` condition is met, the paragraph is deleted, not judged. *Reversing, narrowing or re-ranking* a ruling is the operator's, through `/consult`, however well-grounded the finding — contrary evidence is escalated, never annotated in place.
+**Three acts.** *Correcting an aged fact* inside a paragraph (a retired slug, a moved count) is any session's, where an oracle settles the fact and the paragraph directs nothing different afterwards. *Retiring on discharge* is any session's: when a paragraph's `discharge:` oracle prints, or its `manual` condition is met, the paragraph is deleted, not judged. *Reversing, narrowing or re-ranking* a ruling is the operator's, through `/consult`, however well-grounded the finding — contrary evidence is filed to the consult inbox, never annotated in place.
 
 Each paragraph carries two declarations the ruling-staleness probe reads (lifecycle-kit/SPEC.md §The ruling-staleness probe): `ruling: <name>` — the noun other surfaces use for it, one or more, appended never rewritten — and `discharge: <name> <oracle>`, a command whose printed output means the condition fired, or `manual` followed by the condition.
 

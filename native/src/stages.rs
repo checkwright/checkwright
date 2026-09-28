@@ -24,10 +24,13 @@ pub fn supersede_set() -> Result<Vec<String>, String> {
     Ok(out)
 }
 
-// spec: lifecycle-kit/SPEC.md §The committed gap inbox — the union-merge set, distinct from
-// the keep-ours supersede set above
+// spec: lifecycle-kit/SPEC.md §Multi-operator semantics — the union-merge set, the two inboxes,
+// distinct from the keep-ours supersede set above
 pub fn union_set() -> Result<Vec<String>, String> {
-    Ok(vec![walk::knob_scalar("LIFECYCLE_KIT_GAP_INBOX_FILE")?])
+    Ok(vec![
+        walk::knob_scalar("LIFECYCLE_KIT_GAP_INBOX_FILE")?,
+        walk::knob_scalar("LIFECYCLE_KIT_CONSULT_INBOX_FILE")?,
+    ])
 }
 
 // spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — the resident registration block

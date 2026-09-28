@@ -18,6 +18,7 @@ pub mod enter_stage;
 pub mod entry_history;
 pub mod enum_sets;
 pub mod env_probe;
+pub mod file_consult;
 pub mod file_gap;
 pub mod file_install;
 pub mod file_survey;
@@ -516,6 +517,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-file-gap",
         Arm::Emit(file_gap::emit, Grammar::Parsed(file_gap::USAGE)),
         file_gap::KNOBS,
+    ),
+    // spec: lifecycle-kit/SPEC.md §The consult inbox — the consult-owed capture affordance, a
+    // sibling of `--emit-file-gap` on the same argv-shape split.
+    (
+        "--emit-file-consult",
+        Arm::Emit(file_consult::emit, Grammar::Parsed(file_consult::USAGE)),
+        file_consult::KNOBS,
     ),
     // spec: drift-kit/SPEC.md §The knowledge-friction loop — the capture affordance, riding the same
     // argv-shape split as `--emit-file-survey`: the refusal and the `--` escape cross the port with

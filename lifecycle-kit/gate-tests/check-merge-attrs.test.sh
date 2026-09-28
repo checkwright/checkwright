@@ -46,7 +46,7 @@ mkdir -p "$none"
 check_case "missing-gitattributes" "$none" 1 "the merge-supersede rule is unmechanized"
 
 # --- forward direction, union set: the iteration-scoped lines are complete but the
-#     gap inbox carries no merge=union line (a filed gap would be silently dropped) ---
+#     inboxes carry no merge=union line (a filed bullet would be silently dropped) ---
 uf="$SANDBOX/union-forward"
 mkdir -p "$uf"
 cat >"$uf/.gitattributes" <<'EOF'
@@ -64,6 +64,7 @@ cat >"$uok/.gitattributes" <<'EOF'
 .workflow/lesson-evidence.txt merge=iteration-scoped
 .workflow/survey-record.md merge=iteration-scoped
 .workflow/gap-inbox.md merge=union
+.workflow/consult-items.md merge=union
 CHANGELOG.md merge=union
 EOF
 check_case "union-reverse-legit" "$uok" 0 "MERGE-ATTRS: clean"

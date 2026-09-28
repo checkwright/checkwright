@@ -197,9 +197,12 @@ fn provenance(
     // first stage's alone, that reset being the only entry that writes them
     if new_stamps.iter().any(|(stg, _, _)| stg == first_stage) {
         permitted.push(rel(queue));
-        for p in stages::supersede_set()?.iter().chain(stages::union_set()?.iter()) {
-            permitted.push(rel(p));
+        for p in stages::supersede_set()? {
+            permitted.push(rel(&p));
         }
+        // spec: lifecycle-kit/SPEC.md §The consult inbox — the gap inbox alone of the union set:
+        // the boundary never writes the consult inbox
+        permitted.push(rel(&walk::knob_scalar("LIFECYCLE_KIT_GAP_INBOX_FILE")?));
     }
     for p in &staged {
         if !permitted.contains(p) {

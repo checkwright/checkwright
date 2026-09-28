@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Direct unit test of check-dispatch-entry — the cases one good/bad pair cannot
-# carry: the gap-inbox skip, an empty marker, the parallel two-line marker, and
+# carry: the gap- and consult-inbox skips, an empty marker, the parallel two-line marker, and
 # the no-arg, missing-file and wrong-arity edges.
 # The gate is named, never its substrate: gate_run resolves the declaration path.
 #
@@ -22,6 +22,8 @@ printf 'build\nbuild\n' > "$tmp/two.txt"
 : > "$tmp/empty.txt"
 printf '.workflow/gap-inbox.md\n' > "$tmp/inbox-only.txt"
 printf '.workflow/gap-inbox.md\nTASK-QUEUE.md\n' > "$tmp/inbox-plus.txt"
+printf '.workflow/consult-items.md\n' > "$tmp/consult-only.txt"
+printf '.workflow/gap-inbox.md\n.workflow/consult-items.md\n' > "$tmp/both-inboxes.txt"
 printf 'native/src/x.rs\n' > "$tmp/work.txt"
 
 run() {  # $1=marker $2=staged $3=paths
@@ -36,6 +38,10 @@ expect 0 "$(run "$tmp/one.txt" "$tmp/head.txt" "$tmp/inbox-only.txt")" \
     "a commit staging the gap inbox alone is the lead's sanctioned commit"
 expect 1 "$(run "$tmp/one.txt" "$tmp/head.txt" "$tmp/inbox-plus.txt")" \
     "the gap inbox beside another path is no longer the sanctioned commit"
+expect 0 "$(run "$tmp/one.txt" "$tmp/head.txt" "$tmp/consult-only.txt")" \
+    "a commit staging the consult inbox alone is a sanctioned capture commit"
+expect 1 "$(run "$tmp/one.txt" "$tmp/head.txt" "$tmp/both-inboxes.txt")" \
+    "both inboxes together are not one inbox alone"
 expect 0 "$(run "$tmp/empty.txt" "$tmp/head.txt" "$tmp/work.txt")" \
     "an empty marker declares nothing"
 expect 1 "$(run "$tmp/two.txt" "$tmp/head.txt" "$tmp/work.txt")" \
@@ -56,5 +62,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-dispatch-entry.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-dispatch-entry.test: ok (gap-inbox skip; empty marker; parallel lines; edges)"
+echo "check-dispatch-entry.test: ok (gap- and consult-inbox skips; empty marker; parallel lines; edges)"
 exit 0

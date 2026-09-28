@@ -90,17 +90,25 @@ pub fn run(args: &[String]) -> i32 {
         println!("DISPATCH-ENTRY: clean (no dispatch declaration stands)");
         return 0;
     }
-    let inbox = match walk::knob_scalar("LIFECYCLE_KIT_GAP_INBOX_FILE") {
-        Ok(v) => v,
-        Err(e) => {
+    let inboxes = match (
+        walk::knob_scalar("LIFECYCLE_KIT_GAP_INBOX_FILE"),
+        walk::knob_scalar("LIFECYCLE_KIT_CONSULT_INBOX_FILE"),
+    ) {
+        (Ok(g), Ok(c)) => [("gap", g), ("consult", c)],
+        (Err(e), _) | (_, Err(e)) => {
             eprintln!("check-dispatch-entry: {}", e);
             return 2;
         }
     };
-    // spec: lifecycle-kit/SPEC.md §check-dispatch-entry — the lead's one sanctioned commit
-    if inputs.paths.len() == 1 && inputs.paths[0] == inbox {
-        println!("DISPATCH-ENTRY: clean (the commit stages the gap inbox alone — the lead's sanctioned commit)");
-        return 0;
+    // spec: lifecycle-kit/SPEC.md §check-dispatch-entry — a lead's sanctioned capture commit
+    if inputs.paths.len() == 1 {
+        if let Some((name, _)) = inboxes.iter().find(|(_, p)| *p == inputs.paths[0]) {
+            println!(
+                "DISPATCH-ENTRY: clean (the commit stages the {} inbox alone — a lead's sanctioned capture commit)",
+                name
+            );
+            return 0;
+        }
     }
     let roster = match stages::stages() {
         Ok(s) => s,

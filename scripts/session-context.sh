@@ -72,6 +72,18 @@ if [[ -x "$NATIVE_BIN" ]]; then
     fi
 fi
 
+# spec: lifecycle-kit/SPEC.md §The consult inbox
+# copy-divergence: this consumer counts its consult inbox, LIFECYCLE_KIT_CONSULT_INBOX_FILE, which the template stays uncoupled from
+CONSULT_INBOX="${LIFECYCLE_KIT_CONSULT_INBOX_FILE:-${GATE_SDK_WORKFLOW_DIR:-.workflow}/consult-items.md}"
+if [[ -f "$CONSULT_INBOX" ]]; then
+    consult_n="$(grep -c '^- ' "$CONSULT_INBOX" 2>/dev/null)" || true
+    if [[ "${consult_n:-0}" -gt 0 ]]; then
+        consult_oldest="$(grep -m1 -oE '^- [0-9]{4}-[0-9]{2}-[0-9]{2}' "$CONSULT_INBOX" 2>/dev/null | cut -c3-)" || true
+        echo "Consult inbox: $consult_n item(s) owed to /consult, oldest ${consult_oldest:-undated}."
+        echo
+    fi
+fi
+
 # spec: context-kit/SPEC.md §The session-context hook — session-role signal: lead iff the marker's id matches this fire's payload session id (the payload, never CLAUDE_CODE_SESSION_ID — a subagent inherits its parent's); guarded, signal absent = byte-identical output
 role=""
 ROLE_FILE="${CONTEXT_KIT_SESSION_ROLE_FILE:-${GATE_SDK_TMP_DIR:-.tmp}/session-role}"

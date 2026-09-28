@@ -29,6 +29,10 @@ fn gap_inbox_file(resolve: Resolve) -> Result<Value, String> {
     in_workflow_dir(resolve, "gap-inbox.md")
 }
 
+fn consult_inbox_file(resolve: Resolve) -> Result<Value, String> {
+    in_workflow_dir(resolve, "consult-items.md")
+}
+
 fn survey_record_file(resolve: Resolve) -> Result<Value, String> {
     in_workflow_dir(resolve, "survey-record.md")
 }
@@ -90,6 +94,12 @@ pub const KIT: Kit = Kit {
             &["GATE_SDK_WORKFLOW_DIR"],
         ),
         Row::derived("LIFECYCLE_KIT_GAP_INBOX_FILE", Shape::Scalar, gap_inbox_file, &["GATE_SDK_WORKFLOW_DIR"]),
+        Row::derived(
+            "LIFECYCLE_KIT_CONSULT_INBOX_FILE",
+            Shape::Scalar,
+            consult_inbox_file,
+            &["GATE_SDK_WORKFLOW_DIR"],
+        ),
         Row::derived(
             "LIFECYCLE_KIT_SURVEY_RECORD_FILE",
             Shape::Scalar,
@@ -154,6 +164,7 @@ fn validate(v: &Values) -> Vec<String> {
         "LIFECYCLE_KIT_SKILLS_DIR",
         "LIFECYCLE_KIT_LESSON_EVIDENCE_FILE",
         "LIFECYCLE_KIT_GAP_INBOX_FILE",
+        "LIFECYCLE_KIT_CONSULT_INBOX_FILE",
         "LIFECYCLE_KIT_SURVEY_RECORD_FILE",
         "LIFECYCLE_KIT_LEAD_JOURNAL_FILE",
         "LIFECYCLE_KIT_DISPATCH_MARKER_FILE",

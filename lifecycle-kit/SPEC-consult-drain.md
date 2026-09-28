@@ -1,6 +1,6 @@
 # SPEC amendment: consult-drain
 
-The consult inbox ([SPEC-consult-inbox.md](SPEC-consult-inbox.md)) is drained only when an operator remembers to run a consultation. This amendment adds the status cue and the drain trigger: a status-line counter for the inbox, and a lead that dispatches a consultation for inbox items while no stage session is live. It also states, rather than assumes, the classification question a dispatched consultation raises.
+The consult inbox (lifecycle-kit/SPEC.md §The consult inbox) is drained only when an operator remembers to run a consultation. This amendment adds the status cue and the drain trigger: a status-line counter for the inbox, and a lead that dispatches a consultation for inbox items while no stage session is live. It also states, rather than assumes, the classification question a dispatched consultation raises.
 
 One queue entry pairs it: [consult-inbox-drain-trigger](../TASK-QUEUE.md#consult-inbox-drain-trigger), blocked by [consult-inbox](../TASK-QUEUE.md#consult-inbox). Every delta here reads the consult inbox's landed text and arm, so the blocked-by tag orders the two; no delta has a before-landing act.
 
@@ -71,7 +71,7 @@ lifecycle-kit/SPEC.md §templates/consult.md gains one paragraph:
 
 - `.claude/commands/lead.md` binds **consult-dispatch**: *the agent type is `consult-session` (`.claude/agents/consult-session.md`); the threshold is off.*
 - `.claude/agents/consult-session.md`, new, `model: opus`: it invokes the consult skill in its dispatched mode on the items its prompt names; batches ruling-class escalations to the lead (`to: "main"`) as four-header blocks; journals per delegation-kit/templates/agent-execution.md, its **Findings you will act on are durable before you act on them** bullet; and dispatches no sibling session. It cites those surfaces rather than restating them.
-- `scripts/delegation-config.knobs`: `DELEGATION_KIT_MUTATING_TYPES[] = consult-session`, since it commits to the shared tree; and `DELEGATION_KIT_STATUSLINE_INBOXES[] = C=.workflow/consult-inbox.md` and `DELEGATION_KIT_STATUSLINE_INBOXES[] = G=.workflow/gap-inbox.md`, each under a `# spec:` line citing delegation-kit/SPEC.md §The statusline arm. `LIFECYCLE_KIT_STAGE_SESSION_TYPES` is unchanged.
+- `scripts/delegation-config.knobs`: `DELEGATION_KIT_MUTATING_TYPES[] = consult-session`, since it commits to the shared tree; and `DELEGATION_KIT_STATUSLINE_INBOXES[] = C=.workflow/consult-items.md` and `DELEGATION_KIT_STATUSLINE_INBOXES[] = G=.workflow/gap-inbox.md`, each under a `# spec:` line citing delegation-kit/SPEC.md §The statusline arm. `LIFECYCLE_KIT_STAGE_SESSION_TYPES` is unchanged.
 
 ## Producers and consumers
 

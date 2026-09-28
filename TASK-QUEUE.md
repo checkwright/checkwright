@@ -8,39 +8,27 @@
 
 ## New Features
 
-### consult-inbox
-
-[spec: SPEC-consult-inbox.md]
-
-nothing queues work owed to `/consult`. Its only automatic trigger is `--emit ruling-staleness`, which the scope and close bindings read and the consult binding does not, so an operator-class reversal a stage finds, a threshold entry declined twice, a direction question misnamed as a ruling, or a vacant roadmap now/ horizon is relayed live or lost.
-
-**Deliverable, on an operator direction (2026-09-26, lead session, not a ruling):** a separate committed inbox drained only by `/consult`, each item ruled, re-classed back to the queue, or discarded with cause; the consult binding's entry-reading adds it after TRAJECTORY.md; the session-context hook surfaces its count, advisory and never blocking a stage. Items are public-safe; one needing private context points at a private-brief section rather than restating it. It stays apart from the gap inbox because the drain owners differ: close cannot rule a consult item, so a mixed inbox would stall close's drain. Open for /spec: age escalation, and whether close forwards consult-class gap bullets. First consumer: [roadmap-horizon-motion-unowned](#roadmap-horizon-motion-unowned)'s signal.
-
-**Taken for /spec 2026-09-28 at consult-inbox-front-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set A; its amendment merges before [lifecycle-kit-front-brevity](#lifecycle-kit-front-brevity) passes §The steering vocabulary.
-
-**Cost while deferred:** a consult-owed item survives only if a live session relays it. Filed 2026-09-26 to the gap inbox by the lead; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because a new committed surface with new governed names owes an amendment. Re-verified at the drain: `ruling-staleness` appears in the scope binding and the close template, not in either consult surface. Owner lookup: `consult inbox`, `consult-inbox` in this file — none.
-
 ### consult-inbox-drain-trigger
 
-[spec: SPEC-consult-drain.md] [blocked-by: consult-inbox]
+[spec: SPEC-consult-drain.md]
 
 the consult inbox needs a drain trigger and a status cue, on an operator direction (2026-09-26, lead session, not a ruling). (a) A status-line counter for the consult inbox, and optionally the gap inbox, through delegation-kit's statusline counter group, which takes its counts from the queue-counts arm today (`native/src/hook/statusline.rs`); the inbox path comes from a knob, since delegation-kit may not name a lifecycle-kit path. (b) The two consults split by trigger: an operator-started consult stays interactive, and the lead dispatches one for inbox items only while no stage session is live, because a consult writes TRAJECTORY.md and the queue. The dispatched consult re-classes or discards an item alone, with cause, and escalates a ruling-class item to the lead as a four-header block for the operator. Batching thresholds (count or age) are consumer-bound, off by default.
 
 **Deliverable:** both halves, with the open question stated in lifecycle-kit/SPEC.md §The steering vocabulary rather than assumed: whether an operator answer relayed through the lead into a dispatched consult is a ruling.
 
-**Taken for /spec 2026-09-28 at consult-inbox-front-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, unblocked in-set by [consult-inbox](#consult-inbox).
+**Taken for /spec 2026-09-28 at consult-inbox-front-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, unblocked in-set by `consult-inbox`.
 
-**Cost while deferred:** the inbox, once it lands, is drained only when an operator remembers it. Filed 2026-09-26 to the gap inbox by the lead, extending the consult-inbox bullet; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails on the same amendment ground. Re-verified at the drain: `statusline.rs` reads `queue_counts::emit`. Owner lookup: `statusline counter`, `counter group` in this file — none.
+**Cost while deferred:** the inbox is drained only when an operator remembers it. Filed 2026-09-26 to the gap inbox by the lead, extending the consult-inbox bullet; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails on the same amendment ground. Re-verified at the drain: `statusline.rs` reads `queue_counts::emit`. Owner lookup: `statusline counter`, `counter group` in this file — none.
 
 ### roadmap-horizon-motion-unowned
 
-[spec: SPEC-roadmap-motion.md] [blocked-by: consult-inbox]
+[spec: SPEC-roadmap-motion.md]
 
 a roadmap horizon moves only when a `/consult` happens to re-tag it. The consult binding (`.claude/commands/consult.md`) reads ROADMAP.md only as a projection and names no tag reconciliation; the roadmap arm prints an empty horizon as information (queue-kit/SPEC.md §The roadmap arm); scope reads the tag only as a ranking input; and no drain retires a tagged entry. `check-roadmap-fresh` compares the projection with the tags, never the tags with direction, so it stays green throughout. Attested: the 2026-09-25 consult refresh ranked three entries and tagged none, and now/ stood empty until an operator-directed re-tag at non-gate-arm-contract's close.
 
-**Deliverable:** close raises a consult-owed signal on a vacant now/ horizon or a landed tagged entry, feeding [consult-inbox](#consult-inbox), and the consult binding reconciles tags on any direction change.
+**Deliverable:** close raises a consult-owed signal on a vacant now/ horizon or a landed tagged entry, feeding `consult-inbox`, and the consult binding reconciles tags on any direction change.
 
-**Taken for /spec 2026-09-28 at consult-inbox-front-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set A; [consult-inbox](#consult-inbox) goes first, its signal being the inbox's first consumer.
+**Taken for /spec 2026-09-28 at consult-inbox-front-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set A; `consult-inbox` goes first, its signal being the inbox's first consumer.
 
 **Cost while deferred:** the public roadmap lags direction until an operator-started consult notices. Filed 2026-09-26 to the gap inbox by the lead on an operator question; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because the signal is new mechanism on two surfaces. Re-verified at the drain: the consult binding's one roadmap hit is the projection sentence, and `--emit roadmap` printed now/ empty before the re-tag. Owner lookup: `horizon`, `consult-owed` in this file — no entry about motion.
 
@@ -74,7 +62,7 @@ the lifecycle-kit/SPEC.md sections above §Per-component contracts (§The state 
 
 **Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays, including a fact a sibling entry or another SPEC cites there.
 
-**Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-28, lead-relayed (not a /consult ruling), unit set A at consult-inbox-front-brevity's scope:** the moves run under gates that already exist and add no name. [consult-inbox](#consult-inbox)'s amendment edits §The steering vocabulary inside this slice, so it merges first and this pass runs last, over the merged text.
+**Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-28, lead-relayed (not a /consult ruling), unit set A at consult-inbox-front-brevity's scope:** the moves run under gates that already exist and add no name. `consult-inbox`'s amendment edits §The steering vocabulary inside this slice, so it merges first and this pass runs last, over the merged text.
 
 **Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Filed 2026-09-25 as spec-brevity-residue, split 2026-09-28 at scope; the word census is this scope's survey record.
 
@@ -1477,5 +1465,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 The consumer's local-only companion files (private brief, ops runbook) have read triggers but no write-back trigger, so shipped-unit forward memory and an out-of-tree state verifier drift until a consult audits them; owed are close and release-sweep template slots for both, and a retired-slug arm over plain code on the local-only globs.
 
 ## Done
+
+- consult-inbox
 
 ## Lessons Learned

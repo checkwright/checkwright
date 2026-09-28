@@ -52,7 +52,7 @@ pub fn anchored_capture(knob: &str) -> Result<(String, String), String> {
     Ok((anchor(&walk::capture_path(&configured))?, configured))
 }
 
-// spec: lifecycle-kit/SPEC.md §The committed gap inbox — the two tracked capture arms refuse in a
+// spec: lifecycle-kit/SPEC.md §The committed gap inbox — the three tracked capture arms refuse in a
 // linked worktree rather than route: a line written there reaches the backlog only through a
 // commit that worktree makes, which an isolated child never does
 pub fn refuse_in_linked_worktree(knob: &str) -> Result<(), String> {

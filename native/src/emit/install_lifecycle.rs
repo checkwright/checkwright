@@ -2,7 +2,7 @@
 // registration block into the always-loaded agent file, the merge attributes into
 // `.gitattributes`, and the keep-ours driver into this clone's git config
 // spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Run` because the contract is an action with
-// an exit status, and a table member because it reads eight knobs a hardcoded flag would hide
+// an exit status, and a table member because it reads nine knobs a hardcoded flag would hide
 // from the knob-file derivation
 use crate::marker;
 use crate::{proc, programs};
@@ -22,6 +22,7 @@ pub const KNOBS: &[&str] = &[
     "LIFECYCLE_KIT_SURVEY_RECORD_FILE",
     "LIFECYCLE_KIT_BOUNDARY_TRUNCATE",
     "LIFECYCLE_KIT_GAP_INBOX_FILE",
+    "LIFECYCLE_KIT_CONSULT_INBOX_FILE",
 ];
 
 const BEGIN: &str = "<!-- lifecycle-kit:begin -->";

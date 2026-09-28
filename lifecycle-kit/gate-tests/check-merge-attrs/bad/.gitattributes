@@ -3,5 +3,6 @@
 .workflow/lesson-evidence.txt merge=iteration-scoped
 .workflow/survey-record.md merge=iteration-scoped
 .workflow/gap-inbox.md merge=union
+.workflow/consult-items.md merge=union
 # lifecycle-kit:merge:end
 README.md merge=iteration-scoped

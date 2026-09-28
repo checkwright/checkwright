@@ -7,4 +7,5 @@
 .workflow/release-disposition.txt merge=iteration-scoped
 .workflow/preflight-valve.txt merge=iteration-scoped
 .workflow/gap-inbox.md merge=union
+.workflow/consult-items.md merge=union
 # lifecycle-kit:merge:end
