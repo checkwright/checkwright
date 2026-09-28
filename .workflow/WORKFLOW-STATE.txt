@@ -6,3 +6,4 @@
 
 companion-front-door-widening scope a4bfe94e 2026-09-28 3f5c2a8d
 companion-front-door-widening spec a0ec9b5b 2026-09-28 9c52a046
+companion-front-door-widening align ada0f3f6 2026-09-28 8bbd6606
