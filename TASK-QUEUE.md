@@ -736,6 +736,50 @@ the Windows install-smoke leg's binding liveness step can red on a ground-truth 
 
 **Cost while deferred:** a green push can red at random and costs a re-run or a hotfix push. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' close; promoted 2026-09-28 at the next iteration's scope: →fix fails because the fix is unprobed on a Windows host. Re-verified: `.github/workflows/gates.yml` reads `truth "${tpid[$r]}"` on the bare pid at both reads. Owner lookup: `winpid`, `pid reuse`, `liveness step` in this file — none; owner `.github/workflows/gates.yml`, with evidence-kit/SPEC.md §The producer-liveness lock.
 
+### uninstall-version-ask
+
+[cost: once/low] [surface: installer]
+
+the uninstall path asks the adopter for the installed version it never checks. docs/install.md (the one-liner note, the step-by-step uninstall line and the Windows note) and installer/SPEC.md's arguments bullet tell the adopter to set `CHECKWRIGHT_VERSION` to the installed version for `uninstall`, while `native/src/installer/uninstall.rs` refuses only a `checkwright.lock` schema it does not know and reads the lock's version for display and the commit message alone. Operator question (lead session): why must uninstall name a version.
+
+**Deliverable:** the docs and the SPEC drop the ask, `uninstall` stated as running from any release that knows the manifest schema, with a witness that a newer payload's `uninstall` reverses an older install.
+
+**Cost while deferred:** every adopter reversing an install must remember a version the verb never uses, on the path the adoption story rests on. Filed 2026-09-28 to the gap inbox by the lead after consult-inbox-front-brevity's close; promoted at the next iteration's scope. Re-verified: `lock::SCHEMA` reads `checkwright-lock v1`, unchanged since the verbs moved behind the invoke, and `docs/install.sh` defaults the version to its own pin. Owner lookup: `CHECKWRIGHT_VERSION`, `uninstall` in this file — none; owner installer/SPEC.md §uninstall, with docs/install.sh, docs/install.ps1 and docs/install.md.
+
+### companion-recipe-in-payload
+
+[cost: event/low] [surface: installer]
+
+the OpenSpec recipe and its lifecycle layer are fetched by hand from raw.githubusercontent.com at a tag the adopter must type (docs/spec-toolkits.md §OpenSpec), because a recipe must match the installed gates and no GitHub Latest pointer exists: every release is a 0.x pre-release (installer/SPEC.md, the channel invariant's reader note). The Spec Kit extension already bundles its recipe. Operator question (lead session): why must the customer name a version instead of the latest.
+
+**Deliverable:** the payload carries the `companion/` recipes and `init` applies one, for instance through a flag naming the toolkit, so the recipe matches the running release with no version and no fetch; the consumer smoke's companion arm reads the recipe from the payload.
+
+**Cost while deferred:** every OpenSpec adopter types a tag and fetches files by hand, and a mistyped tag installs a recipe that does not match the gates. Filed 2026-09-28 to the gap inbox by the lead after consult-inbox-front-brevity's close; promoted at the next iteration's scope. Re-verified: nothing under `native/src/installer/` names `companion`, and the packer derives its set from the kit roots, which `companion/` is not. Owner lookup: `recipe`, `payload` in this file — [companion-toolkit-profile](#companion-toolkit-profile) and [verify-workflow-decoupling](#verify-workflow-decoupling), DISTINCT (the submission, and the profile classification); owner companion/SPEC.md §Recipes, with installer/SPEC.md §The packer.
+
+### companion-gate-widening
+
+[cost: iteration/high] [surface: companion]
+
+the spec-toolkit companion ships document hygiene only. docs/spec-toolkits.md names four gates (`check-md-refs`, `check-spec-pointer`, `check-spec-fence-balance`, `check-docs-cmd`) and states none checks code against a spec; the recipes install the `prose` profile, and the Spec Kit recipe drops `check-fence-command-head`. Operator direction (lead session), verbatim: "we should aim to ship all gates checkwright offers while letting the accompanied projects do their part".
+
+**Deliverable:** the recipes install the widest profile whose gates apply to a spec-toolkit tree, each gate fitted to the toolkit's layout by configuration rather than dropped, deferring to the toolkit where it owns a check (OpenSpec's validator, Spec Kit's templates); then the spec-to-code gates the toolkits' formats make possible.
+
+**Inferred, not run:** candidate spec-to-code checks, unprobed against the formats: requirement IDs cited by tasks and tests, a ticked task naming an absent file, `plan.md` paths existing, an OpenSpec delta agreeing with its base spec before archive.
+
+**Cost while deferred:** the companion's catalog listing offers four of the battery's gates, and the submission ships whatever offer stands when it is filed. Filed 2026-09-28 to the gap inbox by the lead after consult-inbox-front-brevity's close; promoted at the next iteration's scope. Owner lookup: `widest`, `spec-to-code` in this file — none; [companion-toolkit-profile](#companion-toolkit-profile) is DISTINCT (the submission of the extension as built) and [lead-clause-heading-family](#lead-clause-heading-family) bears on OpenSpec trees; owner companion/SPEC.md, with docs/spec-toolkits.md.
+
+### install-toolkit-page-structure
+
+[cost: once/low] [surface: docs]
+
+two landing pages outgrew their structure. docs/install.md (about 2.5k words, per-OS sections of about 55 lines, the rest OS-agnostic) routes WSL nowhere visible: the Windows section is native-only and WSL appears only as a Requirements row and a package note. docs/spec-toolkits.md serves two diverging companions (an extension, and a recipe plus lifecycle layer) on one page, and its OpenSpec section restates install.md's macOS-and-Linux one-liner while pointing Windows readers to install.md. Operator directions (lead session), three bullets merged here.
+
+**Deliverable:** (a) an OS picker at the top of install.md §Install (macOS and Linux, native Windows, WSL routed to the Linux path, Node, plugin marketplace), not per-OS sub-pages, which would scatter the shared content; (b) spec-toolkits.md as the overview (what the gates catch, limits, what is tested) with one sub-page each for Spec Kit and OpenSpec, both pointing to install.md §Install rather than restating it. Sequence (b) after [companion-recipe-in-payload](#companion-recipe-in-payload), which removes the recipe block and most OpenSpec steps; the consumer smoke's companion arm reads that block off this page (installer/SPEC.md §The consumer smoke), so (b) moves a contract.
+
+**Inferred, not run:** a WSL install vendors the Linux binary, so a commit from Windows Git reaches the wrong artifact; if probed true, (a) notes that one checkout is used from one side only.
+
+**Cost while deferred:** a Windows reader never learns WSL takes the Linux path, and the catalog submission lacks a Spec Kit landing page. Filed 2026-09-28 to the gap inbox by the lead after consult-inbox-front-brevity's close; promoted at the next iteration's scope. Owner lookup: `WSL`, `picker`, `sub-page` in this file — none; owner docs/site-architecture.md §Page-authoring rules, with docs/install.md and docs/spec-toolkits.md.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
