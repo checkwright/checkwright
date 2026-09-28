@@ -1,6 +1,6 @@
 ---
 name: agent-execution
-description: Runs Checkwright's protocol for executing a delegated agent: its safety rules, its resume journal and the checks after each agent commit. Run it only when the user asks for it.
+description: Runs Checkwright's protocol for executing a delegated agent, covering its safety rules, its resume journal and the checks after each agent commit. Run it only when the user asks for it.
 ---
 
 Execute the template at `delegation-kit/templates/agent-execution.md` in this repository.
