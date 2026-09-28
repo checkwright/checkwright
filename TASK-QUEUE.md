@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: companion-front-door-widening
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,24 @@
 ## New Features
 
 ## Technical Debt
+
+### uninstall-version-ask
+
+the uninstall path asks the adopter for the installed version it never checks. docs/install.md (the one-liner note, the step-by-step uninstall line and the Windows note) and installer/SPEC.md's arguments bullet tell the adopter to set `CHECKWRIGHT_VERSION` to the installed version for `uninstall`, while `native/src/installer/uninstall.rs` refuses only a `checkwright.lock` schema it does not know and reads the lock's version for display and the commit message alone. Operator question (lead session): why must uninstall name a version.
+
+**Deliverable:** the docs and the SPEC drop the ask, `uninstall` stated as running from any release that knows the manifest schema, with a witness that a newer payload's `uninstall` reverses an older install.
+
+**Cost while deferred:** every adopter reversing an install must remember a version the verb never uses, on the path the adoption story rests on. Filed 2026-09-28 to the gap inbox by the lead after consult-inbox-front-brevity's close; promoted at the next iteration's scope. Re-verified: `lock::SCHEMA` reads `checkwright-lock v1`, unchanged since the verbs moved behind the invoke, and `docs/install.sh` defaults the version to its own pin. Owner lookup: `CHECKWRIGHT_VERSION`, `uninstall` in this file — none; owner installer/SPEC.md §uninstall, with docs/install.sh, docs/install.ps1 and docs/install.md.
+
+### piped-install-argument-witness
+
+no CI leg runs an argument form docs/install.md tells an adopter to type through the piped bootstrap: `.github/workflows/gates.yml` pipes `install.sh` and `install.ps1` with no arguments only, and profiles are exercised only as `init --profile <p>` against the bootstrap directly, which is how the flags-first examples shipped. `check-front-door-verbs` now reds a flag-led route statically, but nothing executes the page's argument examples.
+
+**Deliverable:** a step on each leg piping the served `docs/install.sh` and `docs/install.ps1` with `init --profile starter` beside the bare line.
+
+**Push need (2026-09-28, inside the budget):** the mid-iteration push, shared with [companion-recipe-in-payload](#companion-recipe-in-payload); the PowerShell legs run only on CI. Land it after [uninstall-version-ask](#uninstall-version-ask) and the recipe's `init` form, the argument forms it witnesses.
+
+**Cost while deferred:** a broken argument form reaches adopters with every leg green. Filed 2026-09-27 to the gap inbox by the front-door hotfix; promoted 2026-09-27 at companion-catalog-extension's close: →fix fails because the PowerShell 5.1 script-block leg cannot be witnessed on this host and a red would spend a hotfix push from an allocated budget. Re-verified: the one-liner step runs `curl … | … sh` with no argument. Owner lookup: `piped`, `one-liner`, `irm` in this file — none; owner installer/SPEC.md §Requirements.
 
 ## Deferred
 
@@ -612,6 +630,8 @@ the kit SPECs' on-site mirrors render their section citations as plain text, so 
 
 **Deliverable:** the lead-clause rule calibrated (for instance, admitting it only when the full fragment matches no heading's prefix and the lead clause is unique in the file), with a fixture site in each case of the pair.
 
+**In set (2026-09-28, operator direction lead-relayed, not a /consult ruling):** companion-front-door-widening takes this entry beside [companion-gate-widening](#companion-gate-widening), whose OpenSpec trees make the loss adopter-facing; spec authors the calibration, a verdict change with more than one candidate rule, and promotes it.
+
 **Cost while deferred:** a companion adopter's bare-prose requirement citation dangles unseen. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's spec, reproduced in a scratch OpenSpec tree; promoted 2026-09-27 at its close: →fix fails because the calibration is a verdict change on a shipped gate with more than one candidate rule. Re-verified: `Heading::prefix_of` in `native/src/gates/spec_pointer.rs` admits a boundary-anchored prefix of `lead_clause`, which is `Requirement` for such a heading. Owner lookup: `lead clause`, `spec-pointer`, `OpenSpec` in this file — none; owner canon-kit/SPEC.md §check-spec-pointer.
 
 ### worktree-crate-commit-red
@@ -625,16 +645,6 @@ a session editing the crate in a linked worktree cannot land its commit there. `
 **Deliverable:** the crate's test arm and the hook green in a linked worktree, or the refusal stated as the contract with the tests pinning it.
 
 **Cost while deferred:** a worktree session's crate commit rests on a main-checkout re-run. Filed 2026-09-27 to the gap inbox as two bullets by the front-door hotfix; promoted 2026-09-27 at companion-catalog-extension's close: →fix fails because the hook cause is unprobed and the test's shape is a contract call. Re-verified: `native/src/gates/crate_arms.rs` refuses in a linked worktree lacking a stamp. Owner lookup: `linked worktree`, `gate-binary-fresh`, `crate-arms` in this file — `windows-fresh-fixture-stub`, DISTINCT (the same test pair, red on Windows for a stub it cannot start); owner gate-sdk/SPEC.md §check-crate-arms.
-
-### piped-install-argument-witness
-
-[cost: event/low] [surface: installer]
-
-no CI leg runs an argument form docs/install.md tells an adopter to type through the piped bootstrap: `.github/workflows/gates.yml` pipes `install.sh` and `install.ps1` with no arguments only, and profiles are exercised only as `init --profile <p>` against the bootstrap directly, which is how the flags-first examples shipped. `check-front-door-verbs` now reds a flag-led route statically, but nothing executes the page's argument examples.
-
-**Deliverable:** a step on each leg piping the served `docs/install.sh` and `docs/install.ps1` with `init --profile starter` beside the bare line.
-
-**Cost while deferred:** a broken argument form reaches adopters with every leg green. Filed 2026-09-27 to the gap inbox by the front-door hotfix; promoted 2026-09-27 at companion-catalog-extension's close: →fix fails because the PowerShell 5.1 script-block leg cannot be witnessed on this host and a red would spend a hotfix push from an allocated budget. Re-verified: the one-liner step runs `curl … | … sh` with no argument. Owner lookup: `piped`, `one-liner`, `irm` in this file — none; owner installer/SPEC.md §Requirements.
 
 ### hotfix-agent-definition
 
@@ -736,16 +746,6 @@ the Windows install-smoke leg's binding liveness step can red on a ground-truth 
 
 **Cost while deferred:** a green push can red at random and costs a re-run or a hotfix push. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' close; promoted 2026-09-28 at the next iteration's scope: →fix fails because the fix is unprobed on a Windows host. Re-verified: `.github/workflows/gates.yml` reads `truth "${tpid[$r]}"` on the bare pid at both reads. Owner lookup: `winpid`, `pid reuse`, `liveness step` in this file — none; owner `.github/workflows/gates.yml`, with evidence-kit/SPEC.md §The producer-liveness lock.
 
-### uninstall-version-ask
-
-[cost: once/low] [surface: installer]
-
-the uninstall path asks the adopter for the installed version it never checks. docs/install.md (the one-liner note, the step-by-step uninstall line and the Windows note) and installer/SPEC.md's arguments bullet tell the adopter to set `CHECKWRIGHT_VERSION` to the installed version for `uninstall`, while `native/src/installer/uninstall.rs` refuses only a `checkwright.lock` schema it does not know and reads the lock's version for display and the commit message alone. Operator question (lead session): why must uninstall name a version.
-
-**Deliverable:** the docs and the SPEC drop the ask, `uninstall` stated as running from any release that knows the manifest schema, with a witness that a newer payload's `uninstall` reverses an older install.
-
-**Cost while deferred:** every adopter reversing an install must remember a version the verb never uses, on the path the adoption story rests on. Filed 2026-09-28 to the gap inbox by the lead after consult-inbox-front-brevity's close; promoted at the next iteration's scope. Re-verified: `lock::SCHEMA` reads `checkwright-lock v1`, unchanged since the verbs moved behind the invoke, and `docs/install.sh` defaults the version to its own pin. Owner lookup: `CHECKWRIGHT_VERSION`, `uninstall` in this file — none; owner installer/SPEC.md §uninstall, with docs/install.sh, docs/install.ps1 and docs/install.md.
-
 ### companion-recipe-in-payload
 
 [cost: event/low] [surface: installer]
@@ -753,6 +753,10 @@ the uninstall path asks the adopter for the installed version it never checks. d
 the OpenSpec recipe and its lifecycle layer are fetched by hand from raw.githubusercontent.com at a tag the adopter must type (docs/spec-toolkits.md §OpenSpec), because a recipe must match the installed gates and no GitHub Latest pointer exists: every release is a 0.x pre-release (installer/SPEC.md, the channel invariant's reader note). The Spec Kit extension already bundles its recipe. Operator question (lead session): why must the customer name a version instead of the latest.
 
 **Deliverable:** the payload carries the `companion/` recipes and `init` applies one, for instance through a flag naming the toolkit, so the recipe matches the running release with no version and no fetch; the consumer smoke's companion arm reads the recipe from the payload.
+
+**In set (2026-09-28, operator direction lead-relayed, not a /consult ruling):** companion-front-door-widening takes this entry; spec authors and promotes it.
+
+**Push need (2026-09-28, inside the budget):** the mid-iteration push, shared with [companion-gate-widening](#companion-gate-widening) and [piped-install-argument-witness](#piped-install-argument-witness): the `companion-toolkits` leg installs the extension with Spec Kit's own command only on CI.
 
 **Cost while deferred:** every OpenSpec adopter types a tag and fetches files by hand, and a mistyped tag installs a recipe that does not match the gates. Filed 2026-09-28 to the gap inbox by the lead after consult-inbox-front-brevity's close; promoted at the next iteration's scope. Re-verified: nothing under `native/src/installer/` names `companion`, and the packer derives its set from the kit roots, which `companion/` is not. Owner lookup: `recipe`, `payload` in this file — [companion-toolkit-profile](#companion-toolkit-profile) and [verify-workflow-decoupling](#verify-workflow-decoupling), DISTINCT (the submission, and the profile classification); owner companion/SPEC.md §Recipes, with installer/SPEC.md §The packer.
 
@@ -762,11 +766,25 @@ the OpenSpec recipe and its lifecycle layer are fetched by hand from raw.githubu
 
 the spec-toolkit companion ships document hygiene only. docs/spec-toolkits.md names four gates (`check-md-refs`, `check-spec-pointer`, `check-spec-fence-balance`, `check-docs-cmd`) and states none checks code against a spec; the recipes install the `prose` profile, and the Spec Kit recipe drops `check-fence-command-head`. Operator direction (lead session), verbatim: "we should aim to ship all gates checkwright offers while letting the accompanied projects do their part".
 
-**Deliverable:** the recipes install the widest profile whose gates apply to a spec-toolkit tree, each gate fitted to the toolkit's layout by configuration rather than dropped, deferring to the toolkit where it owns a check (OpenSpec's validator, Spec Kit's templates); then the spec-to-code gates the toolkits' formats make possible.
+**Deliverable:** the recipes install the widest profile whose gates apply to a spec-toolkit tree, each gate fitted to the toolkit's layout by configuration rather than dropped, deferring to the toolkit where it owns a check (OpenSpec's validator, Spec Kit's templates). The spec-to-code gates are [companion-spec-to-code-gates](#companion-spec-to-code-gates).
 
-**Inferred, not run:** candidate spec-to-code checks, unprobed against the formats: requirement IDs cited by tasks and tests, a ticked task naming an absent file, `plan.md` paths existing, an OpenSpec delta agreeing with its base spec before archive.
+**In set (2026-09-28, operator direction lead-relayed, not a /consult ruling):** companion-front-door-widening takes this entry, split from its spec-to-code half; spec authors and promotes it.
+
+**Push need (2026-09-28, inside the budget):** the mid-iteration push, shared with [companion-recipe-in-payload](#companion-recipe-in-payload), since the `companion-toolkits` leg runs the toolkits' own tools only on CI.
 
 **Cost while deferred:** the companion's catalog listing offers four of the battery's gates, and the submission ships whatever offer stands when it is filed. Filed 2026-09-28 to the gap inbox by the lead after consult-inbox-front-brevity's close; promoted at the next iteration's scope. Owner lookup: `widest`, `spec-to-code` in this file — none; [companion-toolkit-profile](#companion-toolkit-profile) is DISTINCT (the submission of the extension as built) and [lead-clause-heading-family](#lead-clause-heading-family) bears on OpenSpec trees; owner companion/SPEC.md, with docs/spec-toolkits.md.
+
+### companion-spec-to-code-gates
+
+[cost: event/high] [surface: companion]
+
+the companion checks documents and never code against a spec. Split 2026-09-28 at companion-front-door-widening's scope from [companion-gate-widening](#companion-gate-widening), on an operator direction lead-relayed (not a /consult ruling): the widening's profile half is taken, this half is new mechanism over formats nobody has probed.
+
+**Deliverable:** the spec-to-code gates the toolkits' formats make possible, each deferring to the toolkit where it owns the check, with a fixture pair in each toolkit's layout.
+
+**Inferred, not run:** candidate checks, unprobed against the formats: requirement IDs cited by tasks and tests, a ticked task naming an absent file, `plan.md` paths existing, an OpenSpec delta agreeing with its base spec before archive.
+
+**Cost while deferred:** an adopter's spec and code drift apart with no red, which is the check the operator's "ship all gates checkwright offers" asks the companion to reach. Filed 2026-09-28 as a split, the parent's gap-inbox provenance carried. Owner lookup: `spec-to-code` in this file — the parent alone; owner companion/SPEC.md.
 
 ### install-toolkit-page-structure
 
@@ -777,6 +795,8 @@ two landing pages outgrew their structure. docs/install.md (about 2.5k words, pe
 **Deliverable:** (a) an OS picker at the top of install.md §Install (macOS and Linux, native Windows, WSL routed to the Linux path, Node, plugin marketplace), not per-OS sub-pages, which would scatter the shared content; (b) spec-toolkits.md as the overview (what the gates catch, limits, what is tested) with one sub-page each for Spec Kit and OpenSpec, both pointing to install.md §Install rather than restating it. Sequence (b) after [companion-recipe-in-payload](#companion-recipe-in-payload), which removes the recipe block and most OpenSpec steps; the consumer smoke's companion arm reads that block off this page (installer/SPEC.md §The consumer smoke), so (b) moves a contract.
 
 **Inferred, not run:** a WSL install vendors the Linux binary, so a commit from Windows Git reaches the wrong artifact; if probed true, (a) notes that one checkout is used from one side only.
+
+**In set (2026-09-28, operator direction lead-relayed, not a /consult ruling):** companion-front-door-widening takes this entry; spec authors and promotes it, since (b) moves the smoke's contract.
 
 **Cost while deferred:** a Windows reader never learns WSL takes the Linux path, and the catalog submission lacks a Spec Kit landing page. Filed 2026-09-28 to the gap inbox by the lead after consult-inbox-front-brevity's close; promoted at the next iteration's scope. Owner lookup: `WSL`, `picker`, `sub-page` in this file — none; owner docs/site-architecture.md §Page-authoring rules, with docs/install.md and docs/spec-toolkits.md.
 

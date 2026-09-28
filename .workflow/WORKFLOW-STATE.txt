@@ -4,4 +4,4 @@
 
 ---
 
-— scope a4bfe94e 2026-09-28 3f5c2a8d
+companion-front-door-widening scope a4bfe94e 2026-09-28 3f5c2a8d
