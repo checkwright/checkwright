@@ -216,8 +216,8 @@ jobs:
             || { echo "::error::the page's unix-install block exited 0 but wrote no checkwright.lock"; exit 1; }
           echo "the page's unix-install block installed into a clean consumer"
 
-      # spec: installer/SPEC.md §Requirements — the install blocks' witness, the one-liner under /bin/sh
-      - name: run the hosted one-liner against the packed tarball
+      # spec: installer/SPEC.md §Requirements — the install blocks' witness, the one-liner bare and with arguments under /bin/sh
+      - name: run the hosted one-liner against the packed tarball, bare and with arguments
         shell: bash
         run: |
           set -euo pipefail
@@ -246,6 +246,27 @@ jobs:
           [ -f "$work/consumer/checkwright.lock" ] \
             || { echo "::error::the hosted one-liner exited 0 but wrote no checkwright.lock"; exit 1; }
           echo "the hosted one-liner installed into a clean consumer under $(readlink -f /bin/sh)"
+          args="$work/args-consumer"
+          mkdir -p "$args"
+          git -C "$args" init -q
+          git -C "$args" config user.email 'smoke@example.invalid'
+          git -C "$args" config user.name 'one-liner arguments smoke'
+          pipe() {
+            echo "== curl -fsSL $base/install.sh | sh -s -- $*, installing v$v =="
+            ( cd "$args" \
+              && curl -fsSL "$base/install.sh" | CHECKWRIGHT_VERSION="$v" CHECKWRIGHT_RELEASE_BASE="$base" sh -s -- "$@" )
+          }
+          pipe init --profile starter || { echo "::error::the one-liner's init --profile starter exited non-zero"; exit 1; }
+          profile="$(jq -r .profile "$args/checkwright.lock")" \
+            || { echo "::error::the one-liner's init --profile starter wrote no readable checkwright.lock"; exit 1; }
+          [ "$profile" = starter ] \
+            || { echo "::error::the one-liner's init --profile starter recorded the profile '$profile'"; exit 1; }
+          pipe uninstall || { echo "::error::the one-liner's uninstall exited non-zero"; exit 1; }
+          [ ! -e "$args/checkwright.lock" ] \
+            || { echo "::error::the one-liner's uninstall exited 0 and left checkwright.lock, as an init run in its place would"; exit 1; }
+          [ -z "$(git -C "$args" status --porcelain)" ] \
+            || { echo "::error::the one-liner's uninstall left the worktree dirty"; exit 1; }
+          echo "the hosted one-liner took init --profile starter, then uninstall, under $(readlink -f /bin/sh)"
 
       # spec: installer/SPEC.md §The CI action — its witness, through uses: ./installer
       - name: serve the packed release for the CI action
@@ -1190,6 +1211,22 @@ jobs:
                   irm "$base/install.ps1" | iex
                   $code = $LASTEXITCODE
               } finally { Pop-Location }
+              $argued = Join-Path $env:PWSH_SCRATCH 'one-liner-args-consumer'
+              New-Item -ItemType Directory -Force -Path $argued | Out-Null
+              git -C $argued init -q
+              git -C $argued config user.email 'smoke@example.invalid'
+              git -C $argued config user.name 'one-liner arguments smoke'
+              $lock = Join-Path $argued 'checkwright.lock'
+              Push-Location $argued
+              try {
+                  Write-Host "== & ([scriptblock]::Create((irm $base/install.ps1))) init --profile starter, installing v$v =="
+                  & ([scriptblock]::Create((irm "$base/install.ps1"))) init --profile starter
+                  $initCode = $LASTEXITCODE
+                  $initProfile = if (Test-Path -LiteralPath $lock) { (Get-Content -Raw -LiteralPath $lock | ConvertFrom-Json).profile } else { $null }
+                  Write-Host "== & ([scriptblock]::Create((irm $base/install.ps1))) uninstall, installing v$v =="
+                  & ([scriptblock]::Create((irm "$base/install.ps1"))) uninstall
+                  $uninstallCode = $LASTEXITCODE
+              } finally { Pop-Location }
           } finally { Stop-Process -Id $srv.Id -Force -ErrorAction SilentlyContinue }
           if ($code -ne 0) { Write-Host "::error::the hosted one-liner left `$LASTEXITCODE $code"; exit 1 }
           if (-not (Test-Path -LiteralPath (Join-Path $consumer 'checkwright.lock'))) {
@@ -1197,6 +1234,15 @@ jobs:
               exit 1
           }
           Write-Host "the hosted one-liner installed into a clean consumer under Windows PowerShell"
+          if ($initCode -ne 0) { Write-Host "::error::the script-block form's init --profile starter left `$LASTEXITCODE $initCode"; exit 1 }
+          if ($initProfile -ne 'starter') { Write-Host "::error::the script-block form's init --profile starter recorded the profile '$initProfile'"; exit 1 }
+          if ($uninstallCode -ne 0) { Write-Host "::error::the script-block form's uninstall left `$LASTEXITCODE $uninstallCode"; exit 1 }
+          if (Test-Path -LiteralPath $lock) {
+              Write-Host "::error::the script-block form's uninstall left `$LASTEXITCODE 0 and left checkwright.lock, as an init run in its place would"
+              exit 1
+          }
+          if (git -C $argued status --porcelain) { Write-Host "::error::the script-block form's uninstall left the worktree dirty"; exit 1 }
+          Write-Host "the hosted one-liner's script-block form took init --profile starter, then uninstall, under Windows PowerShell"
 
       # spec: installer/SPEC.md §The dependency boundary — the live one-liner reads as text under 5.1
       - name: the live one-liner reads as text under Windows PowerShell 5.1
