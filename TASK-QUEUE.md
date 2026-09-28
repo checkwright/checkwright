@@ -1422,11 +1422,4 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 ## Done
 
-- install-toolkit-page-structure
-- uninstall-version-ask
-- lead-clause-heading-family
-- companion-recipe-in-payload
-- companion-gate-widening
-- piped-install-argument-witness
-
 ## Lessons Learned
