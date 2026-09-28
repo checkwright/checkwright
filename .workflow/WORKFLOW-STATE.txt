@@ -9,3 +9,4 @@ consult-inbox-front-brevity spec a49d02ff 2026-09-28 d626ca5e
 consult-inbox-front-brevity align ac263ad7 2026-09-28 ba1ee58d
 consult-inbox-front-brevity build ac56352e 2026-09-28 110a5923
 consult-inbox-front-brevity build a001ff0e 2026-09-28 c164291f
+consult-inbox-front-brevity build a560efad 2026-09-28 9d956e33
