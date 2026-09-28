@@ -8,6 +8,18 @@
 
 ## New Features
 
+### consult-inbox
+
+[spec: SPEC-consult-inbox.md]
+
+nothing queues work owed to `/consult`. Its only automatic trigger is `--emit ruling-staleness`, which the scope and close bindings read and the consult binding does not, so an operator-class reversal a stage finds, a threshold entry declined twice, a direction question misnamed as a ruling, or a vacant roadmap now/ horizon is relayed live or lost.
+
+**Deliverable, on an operator direction (2026-09-26, lead session, not a ruling):** a separate committed inbox drained only by `/consult`, each item ruled, re-classed back to the queue, or discarded with cause; the consult binding's entry-reading adds it after TRAJECTORY.md; the session-context hook surfaces its count, advisory and never blocking a stage. Items are public-safe; one needing private context points at a private-brief section rather than restating it. It stays apart from the gap inbox because the drain owners differ: close cannot rule a consult item, so a mixed inbox would stall close's drain. Open for /spec: age escalation, and whether close forwards consult-class gap bullets. First consumer: [roadmap-horizon-motion-unowned](#roadmap-horizon-motion-unowned)'s signal.
+
+**Taken for /spec 2026-09-28 at consult-inbox-front-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set A; its amendment merges before [lifecycle-kit-front-brevity](#lifecycle-kit-front-brevity) passes §The steering vocabulary.
+
+**Cost while deferred:** a consult-owed item survives only if a live session relays it. Filed 2026-09-26 to the gap inbox by the lead; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because a new committed surface with new governed names owes an amendment. Re-verified at the drain: `ruling-staleness` appears in the scope binding and the close template, not in either consult surface. Owner lookup: `consult inbox`, `consult-inbox` in this file — none.
+
 ## Technical Debt
 
 ### tier-only-rank-out-unruled
@@ -521,18 +533,6 @@ a roadmap horizon moves only when a `/consult` happens to re-tag it. The consult
 **Taken for /spec 2026-09-28 at consult-inbox-front-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set A; [consult-inbox](#consult-inbox) goes first, its signal being the inbox's first consumer.
 
 **Cost while deferred:** the public roadmap lags direction until an operator-started consult notices. Filed 2026-09-26 to the gap inbox by the lead on an operator question; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because the signal is new mechanism on two surfaces. Re-verified at the drain: the consult binding's one roadmap hit is the projection sentence, and `--emit roadmap` printed now/ empty before the re-tag. Owner lookup: `horizon`, `consult-owed` in this file — no entry about motion.
-
-### consult-inbox
-
-[cost: event/high] [surface: lifecycle-kit]
-
-nothing queues work owed to `/consult`. Its only automatic trigger is `--emit ruling-staleness`, which the scope and close bindings read and the consult binding does not, so an operator-class reversal a stage finds, a threshold entry declined twice, a direction question misnamed as a ruling, or a vacant roadmap now/ horizon is relayed live or lost.
-
-**Deliverable, on an operator direction (2026-09-26, lead session, not a ruling):** a separate committed inbox drained only by `/consult`, each item ruled, re-classed back to the queue, or discarded with cause; the consult binding's entry-reading adds it after TRAJECTORY.md; the session-context hook surfaces its count, advisory and never blocking a stage. Items are public-safe; one needing private context points at a private-brief section rather than restating it. It stays apart from the gap inbox because the drain owners differ: close cannot rule a consult item, so a mixed inbox would stall close's drain. Open for /spec: age escalation, and whether close forwards consult-class gap bullets. First consumer: [roadmap-horizon-motion-unowned](#roadmap-horizon-motion-unowned)'s signal.
-
-**Taken for /spec 2026-09-28 at consult-inbox-front-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set A; its amendment merges before [lifecycle-kit-front-brevity](#lifecycle-kit-front-brevity) passes §The steering vocabulary.
-
-**Cost while deferred:** a consult-owed item survives only if a live session relays it. Filed 2026-09-26 to the gap inbox by the lead; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because a new committed surface with new governed names owes an amendment. Re-verified at the drain: `ruling-staleness` appears in the scope binding and the close template, not in either consult surface. Owner lookup: `consult inbox`, `consult-inbox` in this file — none.
 
 ### consult-inbox-drain-trigger
 
