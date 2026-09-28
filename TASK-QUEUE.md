@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: plugin-marketplace-queue-verbs
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,18 @@
 ## New Features
 
 ## Technical Debt
+
+### recurrence-declaration-grammar-ungated
+
+[recurrence: 2026-09-25]
+
+no gate checks a `[recurrence:]` array's date shape: `recurrence_dates` in `native/src/queue.rs` drops a token that is not a date silently, so a mistyped stamp undercounts the scope pre-emption threshold and the icebox age limb.
+
+**Deliverable:** a `check-queue-hygiene` axis refusing a malformed recurrence token, with a bad fixture. It shares its date parser with [queue-write-side-verb](#queue-write-side-verb)'s recurrence stamp, which lands first.
+
+**Promoted as debt 2026-09-28 at plugin-marketplace-queue-verbs' scope, operator direction lead-relayed (not a /consult ruling):** the axis holds the grammar queue-kit/SPEC.md §The tag algebra already states and adds no name.
+
+**Cost while deferred:** a counted rule fires late on a typo nothing reports. Filed 2026-08-26; returned from the icebox 2026-09-25 by consult, the parser re-read. Re-verified 2026-09-28 at scope on a live instance: this session stamped `[recurrence: 2026-09-27 2026-09-28]` space-separated on queue-write-side-verb, the split on `,` dropped it to a count of 0, and the battery stayed green; corrected to the comma form.
 
 ## Deferred
 
@@ -111,6 +123,10 @@ harness plugin packaging. Harness plugin/marketplace packaging of the stage skil
 **Open question a promoting scope answers first — deliberately undecided here.** Whether the marketplace package vendors kits at all, or merely registers the skills and delegates all vendoring to the installer's `init`. Under the second answer it stops being a distribution channel and becomes a **discovery surface**, and `checkwright.lock` ceases to be a contract it must *honour* and becomes one it must not *violate* — the materially cheaper answer, and the one that dissolves most of the sequencing risk above. It is not settled here because it is downstream of this entry's standing ruling that the plugin substrate moves fast and the design must be made against the live manifest format at promotion; deciding it now would be deciding it against a format that will have moved. Recorded 2026-07-26 by close (`activation-path`).
 
 **The format has settled, and it answers the question.** A cross-vendor plugin packaging standard reached 1.0 (consult's landscape refresh, 2026-09-25), adopted by several harnesses with org-managed enable/block lists, and it excludes hooks from its portable core. So the package is a discovery surface registering the skills, vendoring stays with `init`, and the gates stay in the binary outside every harness — the cheaper answer above, now with a stable target.
+
+**Taken for /spec 2026-09-28 at plugin-marketplace-queue-verbs' scope, operator direction lead-relayed (not a /consult ruling):** the ledger's `catalog-then-plugin` second pick, within that ruling ahead of the catalog submission: [companion-toolkit-profile](#companion-toolkit-profile)'s tree work landed; only the submission remains, gated on the observed install.
+
+**Push need (2026-09-28, inside the budget):** a release tag beside the closing push if the package ships from a tag; close's release policy decides.
 
 **Cost while deferred:** zero mechanism rots — the install-ownership contract this must package against is already written and maintained by the installer's `init`; what is foregone is a discovery surface, and the plugin substrate's motion means a design taken early would be retaken at promotion anyway. Surfaced 2026-07-09 in adoption-track's split; evidence artifact retained: upstream Claude Code issue #75214 (project config can't lift the Task ask-first default), surfaced dogfooding the delegation nudge 2026-07-07.
 
@@ -424,16 +440,6 @@ the evidence manifest's digest covers the suite's log bytes only (`run_validate.
 
 **Cost while deferred:** the attestation payload the paid rung would countersign cannot distinguish two suites. Filed 2026-08-01; returned from the icebox 2026-09-25 by consult, the hash input re-read.
 
-### recurrence-declaration-grammar-ungated
-
-[cost: iteration/low] [surface: queue-kit] [recurrence: 2026-09-25]
-
-no gate checks a `[recurrence:]` array's date shape: `recurrence_dates` in `native/src/queue.rs` drops a token that is not a date silently, so a mistyped stamp undercounts the scope pre-emption threshold and the icebox age limb.
-
-**Deliverable:** a `check-queue-hygiene` axis refusing a malformed recurrence token, with a bad fixture.
-
-**Cost while deferred:** a counted rule fires late on a typo nothing reports. Filed 2026-08-26; returned from the icebox 2026-09-25 by consult, the parser re-read.
-
 ### one-motion-commit-race-remains-open
 
 [cost: session/low] [surface: CLAUDE.md] [recurrence: 2026-09-25]
@@ -610,13 +616,15 @@ shell-guard splits a compounded emitter write out of a compound (rule `emitter_w
 
 ### queue-write-side-verb
 
-[cost: iteration/low] [surface: queue-kit] [recurrence: 2026-09-27 2026-09-28]
+[cost: iteration/low] [surface: queue-kit] [recurrence: 2026-09-27, 2026-09-28]
 
 the queue has gates and read arms but no write commands, so every restructure (promote, Done move, icebox, de-icebox, defer, split, recurrence stamp) is a hand edit the gates check only after the fact, and an entry's history (filed, promoted, iceboxed, returned) is reconstructed by hand from git. Filed 2026-08-12 on five throwaway queue scripts measured in one iteration; iceboxed 2026-09-11 as machinery-class. The lead measured 1293 commits touching TASK-QUEUE.md in the month to 2026-09-27, reconstructed entry histories by hand about six times in one session, and saw a scope session misread one. Operator direction, 2026-09-27 (lead session): such commands would be beneficial.
 
 **The allowlist ground.** A raw Edit of the queue cannot be allowlisted narrowly, since a path rule grants every edit, while a write verb on the gate binary is one allowlist line scoped to its operation and post-checked by the queue gates. Operator direction, 2026-09-28 (lead session): weigh promoting it so the verbs can be explicitly allowlisted.
 
 **Deliverable:** queue-kit write commands for that operation set, with the queue gates as their post-check, and a `queue-history <slug>` read printing each transition's date and commit.
+
+**Taken for /spec 2026-09-28 at plugin-marketplace-queue-verbs' scope, operator direction lead-relayed (not a /consult ruling):** entered on the recurrence threshold. It reshapes [recurrence-declaration-grammar-ungated](#recurrence-declaration-grammar-ungated), which shares its date parser, and record-stamp-encoding-compression, since one stamp writer makes that re-encoding a one-writer change.
 
 **Cost while deferred:** every queue restructure is a hand edit, and each history question costs several git calls with a misread risk. Re-filed 2026-09-27 to the gap inbox by platform-prerequisite-floors' lead, widened from one write verb to the operation set and a history read; returned from the icebox at its close on a judged recurrence: →fix fails because the commands are new governed names. Re-filed 2026-09-28 by catalog-submission-preconditions' lead, after the permission classifier denied close's Edit clearing Done. Re-verified: `git log --since=2026-08-27 -- TASK-QUEUE.md` lists 1291 commits at the close, and the evicting commit bd3dab89 holds the original body. Owner: queue-kit/SPEC.md §Per-component contracts.
 
