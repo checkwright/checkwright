@@ -436,7 +436,7 @@ if staged_matches 'README.md' 'docs/index.md' 'docs/install.md' 'installer/READM
     run_gate check-front-door-verbs native/target/release/checkwright-gates check-front-door-verbs
 fi
 
-if staged_matches 'plugin/**' '.claude-plugin/**' '*.claude/commands/*.md' 'guard-kit/templates/settings-hooks.json' 'docs/install.sh' '.workflow/release-disposition.txt' 'native/src/gates/plugin_parity.rs' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'scripts/lifecycle-config.knobs' 'scripts/queue-config.knobs' 'native/src/gates/plugin_parity.rs' 'native/src/gates/install_pin.rs' 'native/src/gates/pinned_release.rs' 'native/src/gates/skill_binding.rs' 'native/src/fresh.rs'; then
+if staged_matches 'plugin/**' '.claude-plugin/**' '*.claude/commands/*.md' 'guard-kit/templates/settings-hooks.json' 'docs/install.sh' '.workflow/release-disposition.txt' 'LICENSE' 'native/src/gates/plugin_parity.rs' 'scripts/canon-config.knobs' 'scripts/gate-sdk-config.knobs' 'scripts/lifecycle-config.knobs' 'scripts/queue-config.knobs' 'native/src/gates/plugin_parity.rs' 'native/src/gates/install_pin.rs' 'native/src/gates/pinned_release.rs' 'native/src/gates/skill_binding.rs' 'native/src/fresh.rs'; then
     run_gate check-plugin-parity native/target/release/checkwright-gates check-plugin-parity
 fi
 

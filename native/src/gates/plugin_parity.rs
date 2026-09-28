@@ -1,5 +1,6 @@
 // spec: plugin/SPEC.md §check-plugin-parity — the plugin package matches this repository: its two
-// manifests (A), its skills (B), its hooks (C), the marketplace pin (D) and the pinned release (E)
+// manifests (A), its skills (B), its hooks (C), the marketplace pin (D), the pinned release (E) and
+// the license text (F)
 use super::install_pin::{is_triple, pin_of};
 use super::pinned_release::{self, read, Disposition};
 use super::skill_binding::template_of;
@@ -13,6 +14,7 @@ const PLUGIN_DIR: &str = "plugin";
 const MARKETPLACE: &str = ".claude-plugin/marketplace.json";
 const HOOKS_TEMPLATE: &str = "guard-kit/templates/settings-hooks.json";
 const INSTALL_SH: &str = "docs/install.sh";
+const LICENSE: &str = "LICENSE";
 const PORTABLE: &str = "plugin.json";
 const HARNESS: &str = ".claude-plugin/plugin.json";
 const HOOKS: &str = "hooks/hooks.json";
@@ -204,8 +206,8 @@ fn publication(
 
 fn rule(args: &[String]) -> Result<i32, String> {
     let positional = !args.is_empty();
-    if positional && args.len() != 8 {
-        return Err("usage: check-plugin-parity [plugin-dir marketplace skills-dir hooks-template install-sh disposition queue pinned]".to_string());
+    if positional && args.len() != 9 {
+        return Err("usage: check-plugin-parity [plugin-dir marketplace skills-dir hooks-template install-sh disposition queue pinned license]".to_string());
     }
     let arg = |i: usize, d: &str| if positional { args[i].clone() } else { d.to_string() };
     let plugin = arg(0, PLUGIN_DIR);
@@ -213,6 +215,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let skills_dir = if positional { args[2].clone() } else { walk::knob_scalar("LIFECYCLE_KIT_SKILLS_DIR")? };
     let hooks_template = arg(3, HOOKS_TEMPLATE);
     let install_sh = arg(4, INSTALL_SH);
+    let root_license = arg(8, LICENSE);
     let (disposition_path, queue_path) = if positional {
         (args[5].clone(), args[6].clone())
     } else {
@@ -336,6 +339,23 @@ fn rule(args: &[String]) -> Result<i32, String> {
         ));
     }
 
+    // spec: plugin/SPEC.md §check-plugin-parity — the marketplace installs `plugin/` alone, so its
+    // license text is a tracked byte copy of the root file (F)
+    let want_license = std::fs::read(&root_license).map_err(|e| format!("cannot read {}: {}", root_license, e))?;
+    let license_path = format!("{}/{}", plugin, LICENSE);
+    let license_state = match std::fs::read(&license_path) {
+        Ok(got) if got == want_license => None,
+        Ok(_) => Some("differs from"),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Some("is absent; expected a byte copy of"),
+        Err(e) => return Err(format!("cannot read {}: {}", license_path, e)),
+    };
+    if let Some(state) = license_state {
+        findings.push(format!(
+            "  {}: {} {}, since the marketplace installs {} alone; copy it: cp {} {}",
+            license_path, state, root_license, plugin, root_license, license_path
+        ));
+    }
+
     let publication = if Path::new(&marketplace).exists() {
         publication(&marketplace, &portable, &install_sh, &disposition_path, &queue_path, args, &mut findings)?
     } else {
@@ -347,12 +367,12 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for f in &findings {
             println!("{}", f);
         }
-        println!("  help: edit the named file to the expected value; a skill body or the hooks file is a rendering, so copy the expected text above, and a pinned release lacking the package is released (RELEASING.md) or the marketplace file withdrawn.");
+        println!("  help: edit the named file to the expected value; a skill body or the hooks file is a rendering, so copy the expected text above, the license text is copied as its line names, and a pinned release lacking the package is released (RELEASING.md) or the marketplace file withdrawn.");
         return Ok(1);
     }
     println!(
-        "PLUGIN-PARITY: clean (manifests agree, {} skill(s) match {} and `{}`, hooks match {}, {})",
-        skills, skills_dir, INSTALL_SKILL, hooks_template, publication
+        "PLUGIN-PARITY: clean (manifests agree, {} skill(s) match {} and `{}`, hooks match {}, license text matches {}, {})",
+        skills, skills_dir, INSTALL_SKILL, hooks_template, root_license, publication
     );
     Ok(0)
 }

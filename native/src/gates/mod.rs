@@ -1654,7 +1654,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-plugin-parity",
         plugin_parity::run,
-        &[("?", "", "", "dynamic@src/gates/plugin_parity.rs:129")],
+        &[("?", "", "", "dynamic@src/gates/plugin_parity.rs:131")],
         &["LIFECYCLE_KIT_SKILLS_DIR", "QUEUE_KIT_QUEUE_FILE"],
         "-",
         &[("git", "")],
