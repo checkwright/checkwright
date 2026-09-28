@@ -8,26 +8,6 @@
 
 ## New Features
 
-### plugin-marketplace
-
-[spec: SPEC-plugin.md] [roadmap: next/ecosystem] [roadmap-summary: The stage skills and guards installable as a harness plugin.]
-
-harness plugin packaging. Harness plugin/marketplace packaging of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped surface parity. Design against the live manifest format at promotion — the plugin substrate moves fast (the scope-session-routing ruling applies).
-
-**The install-ownership contract this must package against already exists:** `checkwright.lock`, written by the installer's `init` and specified at installer/SPEC.md §The manifest — its schema owner is `native/src/installer/lock.rs`. A marketplace package that installs kits without writing that manifest would be a second install model with no upgrade or uninstall story, which is the sequencing risk this entry has always flagged; the named contract replaces the re-derivation it used to imply. The upgrade/uninstall story itself has shipped as the installer's `update` and `uninstall` verbs, specified at installer/SPEC.md §update and §uninstall — sequence against those rather than duplicating them.
-
-**Negative result — the tarball channel's economics do not transfer here.** The retired `release-tarball-delivery-channel` was cheap for a structural reason that is absent from this rung: `.github/workflows/publish.yml`'s `pack` job already assembles and stamps one tarball and uploads it as the run's artifact, so a new channel is a sibling job that `needs: pack` and consumes that artifact. A marketplace package cannot consume it. Its unit of delivery is the harness's own plugin manifest format, not a packed npm assembly, and its subject is the stage skills and guards rather than the eleven-kit tree — so it shares neither the assembly nor the artifact. Recorded because the reflex at promotion will be to cost this by analogy from the tarball's sibling-job cheapness and arrive at the wrong number.
-
-**Open question a promoting scope answers first — deliberately undecided here.** Whether the marketplace package vendors kits at all, or merely registers the skills and delegates all vendoring to the installer's `init`. Under the second answer it stops being a distribution channel and becomes a **discovery surface**, and `checkwright.lock` ceases to be a contract it must *honour* and becomes one it must not *violate* — the materially cheaper answer, and the one that dissolves most of the sequencing risk above. It is not settled here because it is downstream of this entry's standing ruling that the plugin substrate moves fast and the design must be made against the live manifest format at promotion; deciding it now would be deciding it against a format that will have moved. Recorded 2026-07-26 by close (`activation-path`).
-
-**The format has settled, and it answers the question.** A cross-vendor plugin packaging standard reached 1.0 (consult's landscape refresh, 2026-09-25), adopted by several harnesses with org-managed enable/block lists, and it excludes hooks from its portable core. So the package is a discovery surface registering the skills, vendoring stays with `init`, and the gates stay in the binary outside every harness — the cheaper answer above, now with a stable target.
-
-**Taken for /spec 2026-09-28 at plugin-marketplace-queue-verbs' scope, operator direction lead-relayed (not a /consult ruling):** the ledger's `catalog-then-plugin` second pick, within that ruling ahead of the catalog submission: [companion-toolkit-profile](#companion-toolkit-profile)'s tree work landed, and its submission is the part still open.
-
-**Push need (2026-09-28, inside the budget):** a release tag beside the closing push. The package ships from a tag (the amendment's marketplace pin), so this close releases or withdraws the marketplace file; close's release policy decides which.
-
-**Cost while deferred:** zero mechanism rots — the install-ownership contract this must package against is already written and maintained by the installer's `init`; what is foregone is a discovery surface, and the plugin substrate's motion means a design taken early would be retaken at promotion anyway. Surfaced 2026-07-09 in adoption-track's split; evidence artifact retained: upstream Claude Code issue #75214 (project config can't lift the Task ask-first default), surfaced dogfooding the delegation nudge 2026-07-07.
-
 ## Technical Debt
 
 ## Deferred
@@ -140,7 +120,7 @@ hosted attestation. The team/paid rung: gates verified server-side by a party th
 
 foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent, extending the homogeneous multi-agent model to a heterogeneous fleet. It cashes the public no-lock-in claim and is the purest expression of the thesis — governance enforced at the git/gate boundary, not by trusting the author. *Already agent-neutral:* the verification substrate (git, the gate battery, the bash stamp state machine) does not care who authored the diff, and the coordination primitive is the shared git-index/HEAD serialization. *Homogeneous today — the real work, worst-first:* (1) the **escalation resume model** collapses into (2) as a property of the chosen transport, per the 2026-07-25 amendment below; (2) **dispatch transport** — today the harness `Agent`/`SendMessage`/task-notification; a foreign agent needs a transport-neutral handoff. The adapter contract is "open / prompt / permission-request / resume" spoken over each vendor's structured **machine plane, never its TUI**: a screen-scrape relay is the adapter of last resort for a vendor shipping no machine interface at all — it yields rendered frames not turn events, answers dialogs by heuristic, and bets on the vendor's least-stable surface. (3) **budget oracle** — the verdict tool is Anthropic-OAuth-specific; a heterogeneous fleet has N vendor-keyed oracles, the same seam as the credential-swap entries, and the vendors' JSONL event streams carry the token-usage events a TUI path would scrape from a status bar. (4) **stage-contract expression** — the lifecycle machinery is neutral bash but the stage-skill prose is not.
 
-**Seam ruling (on record):** generic mechanism only — transport, budget oracle, and escalation channel become consumer-config seams; a kit literal naming a vendor crosses the provenance seam and is ruled out, the pattern the retired `prose-profile` ruled. It extends the per-batch model-tiering lever across vendors, and interacts with [hosted-attestation-service](#hosted-attestation-service), [plugin-marketplace](#plugin-marketplace), and the credential-swap entries.
+**Seam ruling (on record):** generic mechanism only — transport, budget oracle, and escalation channel become consumer-config seams; a kit literal naming a vendor crosses the provenance seam and is ruled out, the pattern the retired `prose-profile` ruled. It extends the per-batch model-tiering lever across vendors, and interacts with [hosted-attestation-service](#hosted-attestation-service), `plugin-marketplace`, and the credential-swap entries.
 
 **Demand-gated — demand attested (2026-07-23):** the operator holds working foreign-vendor subscriptions and wants read-heavy delegation routed to them for budget headroom, and with three vendors live the N-keyed oracle seam is no longer hypothetical. First slice at promotion: a foreign-CLI executor for the already-pre-authorized read-heavy audit / mechanical-sweep class over a spawned non-interactive CLI process, one adapter per vendor as consumer config — not full stage dispatch.
 
@@ -1410,5 +1390,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 - queue-write-side-verb
 - recurrence-declaration-grammar-ungated
+- plugin-marketplace
 
 ## Lessons Learned

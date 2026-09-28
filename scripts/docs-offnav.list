@@ -16,6 +16,7 @@
 # listed, being reached from the install page's pointer.
 docs/installer/README.md
 docs/companion/README.md
+docs/plugin/README.md
 docs/evidence-data.md
 docs/install-evidence.md
 docs/site-architecture.md

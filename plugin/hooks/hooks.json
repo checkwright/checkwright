@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          { "type": "command", "command": "test -f gate-sdk/bin/run-gates.sh || exit 0; bash gate-sdk/bin/run-gates.sh --hook shell-guard" }
+        ]
+      },
+      {
+        "matcher": "ScheduleWakeup|CronCreate",
+        "hooks": [
+          { "type": "command", "command": "test -f gate-sdk/bin/run-gates.sh || exit 0; bash gate-sdk/bin/run-gates.sh --hook wakeup-guard" }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          { "type": "command", "command": "test -f gate-sdk/bin/run-gates.sh || exit 0; bash gate-sdk/bin/run-gates.sh --hook workflow-state-guard" }
+        ]
+      }
+    ]
+  }
+}

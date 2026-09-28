@@ -1,0 +1,9 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "checkwright",
+  "description": "Checkwright's lifecycle stage skills and tool-call guards, which run what a Checkwright install vendors into the repository, and a skill that installs Checkwright.",
+  "author": { "name": "Checkwright", "url": "https://checkwright.dev" },
+  "homepage": "https://checkwright.dev",
+  "repository": "https://github.com/checkwright/checkwright",
+  "license": "Apache-2.0"
+}

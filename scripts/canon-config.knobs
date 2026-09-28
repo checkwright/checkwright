@@ -17,6 +17,8 @@ CANON_KIT_SEAM_PRIVATE_SURFACES[] = BRIEF.local.md
 CANON_KIT_SEAM_SURFACE_GLOBS[] = installer/SPEC.md
 # comment-tier-exempt: companion/ is repo-root-governed on the same terms, and its SPEC is published the same two ways
 CANON_KIT_SEAM_SURFACE_GLOBS[] = companion/SPEC.md
+# comment-tier-exempt: plugin/ is repo-root-governed on the same terms, and its SPEC is published the same two ways
+CANON_KIT_SEAM_SURFACE_GLOBS[] = plugin/SPEC.md
 
 # comment-tier-exempt: deliberate-absence rulings may narrate what the kit excludes — an "Out of scope" section states what a kit does not carry and why, so the whole section is exempt from the temporal-narration gate
 CANON_KIT_TEMPORAL_EXEMPT_SECTIONS[] = Out of scope
@@ -115,6 +117,8 @@ CANON_KIT_PROSE_SURFACE_GLOBS[] = */templates/*.md
 CANON_KIT_PROSE_SURFACE_GLOBS[] = .claude/agents/*.md
 # comment-tier-exempt: the Spec Kit extension's agent commands, slot-free instruction prose this repo ships under companion/
 CANON_KIT_PROSE_SURFACE_GLOBS[] = companion/speckit/commands/*.md
+# comment-tier-exempt: the plugin's skills, slot-free instruction prose this repo ships under plugin/
+CANON_KIT_PROSE_SURFACE_GLOBS[] = plugin/skills/*/SKILL.md
 
 # comment-tier-exempt: this repo's governed-source surface, set so the corpus arrives through the knob the descriptors couple to rather than through the kit's default branch. The knob-file glob is the one widening past the kit default branch, which scans no `.knobs`: a static kit's consumer knob file carries `#` comments the tier governs, and the gate's default comment style reads them
 CANON_KIT_COMMENT_SURFACE[] = **/*.sh

@@ -1,0 +1,100 @@
+# Checkwright plugin — design record
+
+The plugin package lists Checkwright in a harness's plugin catalog. It registers Checkwright's lifecycle stage skills and wires guard-kit's guards, and a marketplace at the repository root lists it. It is a **discovery surface**: installing the plugin installs no kit. Its install skill runs the installer's `init`, which remains the only thing that vendors ([installer/SPEC.md §init](../installer/SPEC.md#init)), and the gates stay in the binary, outside every harness. `plugin/README.md` is the usage tier in front of this file.
+
+## The component
+
+`plugin/` is repo-root-governed and not a kit. It carries no `checks/` and no `smoke/`, so no kit-root resolver admits it and no install payload carries it. The harness names live here, in the root marketplace file and on the docs pages, and never in a kit SPEC or a kit literal ([gate-sdk/SPEC.md §The provenance seam](../gate-sdk/SPEC.md#the-provenance-seam)).
+
+The package serves two formats from one tree:
+
+- **Agent Plugins 1.0** (agent-plugins.org). The manifest is `plugin.json` at the package root, requiring `$schema` and `name`. Skills are the immediate subdirectories of `skills/` holding a `SKILL.md` in the Agent Skills format (agentskills.io). Hooks, commands and agents are outside the standard's portable core, and it defines no marketplace and no install route, leaving distribution to each client.
+- **Claude Code's plugin format.** The manifest is `.claude-plugin/plugin.json`, requiring only `name`. It reads the same `skills/<name>/SKILL.md` layout and a standard-layout `hooks/hooks.json`. A marketplace is `.claude-plugin/marketplace.json` at a repository's root, and `/plugin marketplace add <owner>/<repo>` reads it.
+
+The two formats read the same `skills/` layout, so one package carries both manifests over one set of skills, and a client implementing either reads its own manifest.
+
+## The manifests
+
+- `plugin/plugin.json`, the portable manifest, carries `$schema` (the published Agent Plugins schema URL), `name`, `description`, `author`, `homepage`, `repository` and `license`.
+- `plugin/.claude-plugin/plugin.json` carries the same six fields after `$schema`, and no component paths, since the standard layout already locates `skills/` and `hooks/hooks.json`.
+
+Every field has a reader. `name` keys the install. `description`, `author`, `homepage`, `repository` and `license` are what a listing shows a user deciding to install. `$schema` is read by the portable client and by the validation leg's schema check. `keywords` and `extensions` are left out because no reader of them was found.
+
+**Neither manifest carries `version`.** The marketplace entry carries it (§The marketplace pin). In Claude Code a `plugin.json` version wins over the entry's, so a tracked one would be a second version line to bump by hand, and a stale one would stop updates. `claude plugin validate plugin` warns on the missing version and passes.
+
+## The skills
+
+The plugin registers exactly the templates this repository binds in its own skills: one skill per binding shim in `LIFECYCLE_KIT_SKILLS_DIR` (a skill whose file carries lifecycle-kit's binding directive, [lifecycle-kit/SPEC.md §check-skill-binding](../lifecycle-kit/SPEC.md#check-skill-binding)), named for its shim, plus one skill of its own, `install`. What the plugin ships is what this repository's own iterations run. The roster is derived from the shims and held by `check-plugin-parity`, never listed.
+
+- **Front matter.** `name` is the directory's name. `description` says what the skill does, in one or two sentences, and that it runs only when the user asks for it. No other key, so the file stays inside the Agent Skills base set.
+- **The body is one fixed rendering.** Its only variable is `<path>`, the template the shim's directive names:
+
+  ```
+  Execute the template at `<path>` in this repository.
+
+  - If this repository has a skill of its own that binds `<path>`, run that skill instead.
+  - Otherwise, take each `*<slot: …>*` placeholder's own text as its binding.
+  - If `<path>` does not exist, Checkwright is not installed here, or not with the kit that ships this template. Say so, and stop: the `install` skill installs it.
+  ```
+
+**A skill runs a vendored template and binds nothing.** A stage template's slots are the consumer's to bind in its own skill. That is rule content a package serving every adopter cannot carry: a default chosen here would be this repository's calibration shipped as everyone's. So the skill defers to a skill of the repository's own that binds the template, and otherwise takes each slot's own text as its binding.
+
+**`install`** tells the agent four things:
+
+- choose a profile with the user, from the installer README's *Choosing a profile* section;
+- confirm the worktree is clean;
+- run the one-line install for the host with `init --profile <profile>` as its arguments, the PowerShell twin on Windows in the form docs/install.md gives;
+- run each command in the `next:` block `init` prints.
+
+The skill carries no template directive. It advertises `init` on a route, so it is a front-door page ([installer/SPEC.md §The front door's verbs](../installer/SPEC.md#the-front-doors-verbs)).
+
+Vendoring stays with `init`. A plugin that vendored kits itself would be a second install model with no manifest, update or uninstall story; the install skill hands to the installer, whose `checkwright.lock` the plugin never writes.
+
+## The guards
+
+`plugin/hooks/hooks.json` is a rendering of `guard-kit/templates/settings-hooks.json`, for the one harness that reads a plugin's hooks; the portable manifest carries skills alone, since the standard excludes hooks from its core. The rendering:
+
+- takes each block under `hooks`, its event, its matcher and its hook entries, in order;
+- rewrites each `command` from `<command>` to `test -f gate-sdk/bin/run-gates.sh || exit 0; <command>`;
+- drops the template's `//` note, which is merge advice for a settings file.
+
+A plugin's hooks fire in every repository where the plugin is enabled, so each command first tests for the vendored front end and exits 0 without it. The harness runs a hook command under a POSIX shell, Git for Windows' bash on native Windows ([guard-kit/SPEC.md §The hook on native Windows](../guard-kit/SPEC.md#the-hook-on-native-windows)). It runs it from the directory the session was launched in, which is the repository root on an ordinary launch. Run with Claude Code 2.1.283, the plugin's shell-guard fired in a vendored repository launched at its root. It stayed silent in an empty repository, and in the vendored repository launched from a subdirectory.
+
+context-kit's session-start wiring is not rendered: it is a context brief rather than a guard.
+
+## The marketplace pin
+
+`.claude-plugin/marketplace.json` carries `name` `checkwright`, `owner`, a one-sentence `description`, and one plugin entry: `name` `checkwright`, a `source` of `{"source": "git-subdir", "url": "checkwright/checkwright", "path": "plugin", "ref": "v<pin>"}`, `version` `<pin>`, and the manifests' `description` and `author`.
+
+`<pin>` is the hosted install pin ([installer/SPEC.md §The hosted install pin](../installer/SPEC.md#the-hosted-install-pin)), so the plugin and the one-line install always serve one release. The pin moves in the commit after the tag that moves the install pin (RELEASING.md), and the entry's `ref` and `version` move with it.
+
+**Publication is a release.** The package ships from the pinned tag, so a package the pinned release does not carry is published by the next release's pin move, and until then the marketplace names a tag the harness cannot install from. `check-plugin-parity` assertion E holds that to the close's release disposition.
+
+## check-plugin-parity
+
+A repo-root gate (this repo's `scripts/`), born native in `native/src/gates/plugin_parity.rs`. It checks only what no external tool knows, that the package matches this repository; the manifests' own validity is the validation leg's, whose oracles are the harness's CLI and the published schema, since a reader of our own would re-implement schemas that drift.
+
+- **(A) The manifests agree.** Both parse. `name`, `description`, `author`, `homepage`, `repository` and `license` are present and equal across the two. Neither carries `version`. The portable manifest's `$schema` is `https://agent-plugins.org/schemas/<X.Y.Z>/plugin.schema.json`.
+- **(B) The skills match the repository.** The skill directories equal, as a set, the binding shims in `LIFECYCLE_KIT_SKILLS_DIR` plus `install`. Each `SKILL.md` carries front matter whose `name` is its directory and whose `description` is 1 to 1024 characters. Each non-install body, after the front matter and its following blank lines, equals §The skills' rendering for the template its shim names, byte for byte, and that template exists.
+- **(C) The hooks match the template.** `plugin/hooks/hooks.json` equals §The guards' rendering of `guard-kit/templates/settings-hooks.json`, compared as JSON, so a block the template gains reds until the plugin carries it.
+- **(D) The marketplace is pinned.** `.claude-plugin/marketplace.json` carries exactly one entry, named as the manifests. Its source is `git-subdir`, with `path` `plugin` and `url` the manifests' repository slug. Its `ref` is `v<pin>` and its `version` is `<pin>`, `<pin>` read by `check-install-pin`'s own pin reader.
+- **(E) The pinned release carries the package.** `v<pin>:plugin/.claude-plugin/plugin.json` resolves. A tag lacking it is admitted on the pending terms of [installer/SPEC.md §The front door's verbs](../installer/SPEC.md#the-front-doors-verbs), through that section's reader: while `.workflow/release-disposition.txt` carries no line for the queue header's iteration, or a line whose field is a release. A `none` or `deferred:` field reds it, which leaves the close two remedies, releasing or withdrawing the marketplace file. Where `v<pin>` does not resolve, as in a shallow checkout, E is dormant and the clean line says so.
+
+Each red names the file, the field and the expected value; a (B) body red and a (C) red print the expected rendering. A missing or unreadable file, unparsable JSON, a missing skills dir, and the pin's own refusals exit 2. The marketplace file is the one exception: its absence is the withdrawn state E's remedy leaves, so D and E are dormant there and the clean line says so. It reads `LIFECYCLE_KIT_SKILLS_DIR`, declared on its registry row, and runs at `precommit`, coupled to `plugin/`, `.claude-plugin/`, the skills dir's shims, the hooks template, `docs/install.sh`, the disposition file and its module. Its positional form, `check-plugin-parity [plugin-dir marketplace skills-dir hooks-template install-sh disposition queue pinned]`, points it at a fixture tree. `pinned` is a file whose first word, `carries` or `lacks`, stands for the tag's answer, or `-` for a tag that does not resolve, so the fixture holds still as this repository's tags move.
+
+## The validation leg
+
+The `plugin-validate` job in `.github/workflows/gates.yml` runs each external oracle at a pinned version:
+
+- **The harness's CLI.** It installs `@anthropic-ai/claude-code` from npm at a pinned version and runs `claude plugin validate plugin` and `claude plugin validate .`. Each must pass. The missing-version warning is expected (§The manifests), and `--strict` is not used, since it turns that warning into a failure. The marketplace check reads the entry's shape and fetches nothing.
+- **The portable manifest.** It fetches the published schema and validates `plugin/plugin.json` against it with `ajv-cli` under JSON Schema draft 2020-12, the draft the schema declares.
+- **The skills.** It validates each skill directory with the Agent Skills reference validator, `skills-ref validate <dir>`, installed at a pinned commit. That library says it is for demonstration and not production, so a finding it raises is read against the Agent Skills specification before a skill is changed for it.
+
+A build that changes the package runs the same commands locally. It installs the plugin from a scratch marketplace with a relative source into a scratch harness config, to see the skills registered; `CLAUDE_CONFIG_DIR` pointed at a scratch directory leaves the user's own config untouched. A scratch config carries no login, so the guards are seen in a session that loads the package with `--plugin-dir`, which installs nothing: firing in a vendored scratch repository and silent in an empty one.
+
+## Honest limits
+
+- Only Claude Code's install is run. Every other Agent Plugins client is read off the standard.
+- A skill takes each slot's own text as its binding, which is weaker than a repository's own bound skill.
+- An adopter who also merged guard-kit's settings wiring runs each guard twice, and the friction log counts each fall-through twice, so the README says to keep one of the two.
+- The fail-open prefix means a tree whose front end is missing runs unguarded and says nothing about it. A session launched from a subdirectory is such a tree, since the hook resolves the front end against the launch directory.

@@ -38,6 +38,12 @@ installer
 # The companion package: the spec-toolkit recipes, their fixtures and the Spec Kit extension (not a kit — it carries no checks/ or smoke/)
 companion
 
+# The plugin package: the harness plugin's manifests, skills and hooks (not a kit — it carries no checks/ or smoke/)
+plugin
+
+# The plugin marketplace manifest, which the harness reads at the repository root
+.claude-plugin
+
 # crates.io name-reservation placeholder (not developed in; the npm name is installer/)
 reserve
 

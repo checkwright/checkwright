@@ -199,6 +199,17 @@ Verify as above. To uninstall, run the same last line with `uninstall` in place 
 
 `npx checkwright init` runs the same `init` from the npm package, and it carries a build attestation the tarball cannot ([installer/SPEC.md](installer/SPEC.md#the-dependency-boundary)). `init` verifies the gate binary with `sha256sum` or `shasum`, and refuses without one. It needs Node 8.2 or later (Requirements).
 
+### From a plugin marketplace
+
+In Claude Code, add Checkwright's marketplace and install its plugin:
+
+```text
+/plugin marketplace add checkwright/checkwright
+/plugin install checkwright@checkwright
+```
+
+The plugin installs no kit: it registers Checkwright's lifecycle skills and its guards. Ask for its `install` skill in your repository: it chooses a profile with you and runs the same `init` this page documents. Any Agent Plugins client loads the repository's `plugin/` directory by its own install route ([plugin/README.md](plugin/README.md)).
+
 ### Choosing a profile
 
 `init` vendors the kits, writes a `gates.list` and the config files they read, records the install in `checkwright.lock`, and makes one commit. It ends by printing the commands that finish the setup; run them.

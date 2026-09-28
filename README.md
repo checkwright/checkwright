@@ -44,7 +44,7 @@ irm https://checkwright.dev/install.ps1 | iex                                  #
 npx checkwright init                                                           # with Node
 ```
 
-Profiles, the other verbs and how to pass them arguments: [`docs/install.md` §Install](docs/install.md#install).
+Profiles, the other verbs and how to pass them arguments: [`docs/install.md` §Install](docs/install.md#install). From a harness's plugin marketplace instead: [`docs/install.md` §From a plugin marketplace](docs/install.md#from-a-plugin-marketplace).
 
 Where the project is heading, and what moves an item: [`ROADMAP.md`](ROADMAP.md). What is already *ruled* — the operator's standing overrides of business as usual — is [`TRAJECTORY.md`](TRAJECTORY.md), hand-authored rather than generated.
 

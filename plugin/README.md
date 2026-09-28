@@ -1,0 +1,28 @@
+# Checkwright plugin
+
+Checkwright's lifecycle stage skills and tool-call guards, packaged as a harness plugin. Installing the plugin installs no kit: its `install` skill runs the installer's `init`, and every other skill runs a template that install vendors into your repository.
+
+## What it registers
+
+- **The lifecycle skills:** the stage skills and every other skill Checkwright's own repository binds, under the same names. Each runs its Checkwright template in your repository. Where your repository has a skill of its own that binds that template, it runs yours instead; otherwise it takes each slot's own text as its binding.
+- **The `install` skill**, which chooses a profile with you and runs the one-line install with `init`.
+- **The guards**, in Claude Code only: guard-kit's shell, wakeup and workflow-state guards. Each does nothing in a repository without Checkwright vendored.
+
+## Installing it
+
+In Claude Code:
+
+```text
+/plugin marketplace add checkwright/checkwright
+/plugin install checkwright@checkwright
+```
+
+Any other Agent Plugins client loads this `plugin/` directory by its own install route.
+
+Then ask for the `install` skill in the repository you want governed, or install Checkwright yourself ([Install](https://checkwright.dev/install.html)).
+
+If you already merged guard-kit's hook wiring into `.claude/settings.json`, keep one of the two: with both, each guard runs twice and the friction log counts each fall-through twice.
+
+## Where the design lives
+
+[`plugin/SPEC.md`](SPEC.md): the two manifests, the skill roster and body, the hooks rendering, the marketplace pin, `check-plugin-parity`, the validation leg and the honest limits.
