@@ -86,7 +86,7 @@ Run the one line for your system from your repository's root, in a new project o
 
 ### macOS and Linux
 
-**You need** the tools Requirements lists for installing on Linux and macOS.
+**You need** the tools [Requirements](#requirements) lists for installing on Linux and macOS.
 
 On macOS, stock bash is 3.2, below the floor. If your profile owes `bash` (Requirements), run this block, which installs Homebrew's bash and puts it first on your `PATH`, now and in `~/.zprofile`. If your login shell is bash, use `~/.bash_profile` instead. The floor's grounds are in [installer/SPEC.md](installer/SPEC.md#requirements) and context-kit's [env-probe](context-kit/SPEC.md#binenv-probe).
 
@@ -141,7 +141,7 @@ To uninstall, `sh "$cw/package/bin/checkwright.sh" uninstall` reverses it in one
 
 ### Windows
 
-**You need** the tools Requirements lists for installing on Windows, where the minimum Windows version is stated too. Git for Windows' bash is also what runs any shell gate you write ([Writing your own shell gates](#writing-your-own-shell-gates)).
+**You need** the tools [Requirements](#requirements) lists for installing on Windows, where the minimum Windows version is stated too. Git for Windows' bash is also what runs any shell gate you write ([Writing your own shell gates](#writing-your-own-shell-gates)).
 
 Run this block in PowerShell first. It puts Git's `usr\bin` and `bin` on your `PATH`, for this session and every later one:
 
@@ -197,7 +197,7 @@ Verify as above. To uninstall, run the same last line with `uninstall` in place 
 
 ### With Node
 
-`npx checkwright init` runs the same `init` from the npm package, and it carries a build attestation the tarball cannot ([installer/SPEC.md](installer/SPEC.md#the-dependency-boundary)). `init` verifies the gate binary with `sha256sum` or `shasum`, and refuses without one. It needs Node 8.2 or later (Requirements).
+`npx checkwright init` runs the same `init` from the npm package, and it carries a build attestation the tarball cannot ([installer/SPEC.md](installer/SPEC.md#the-dependency-boundary)). `init` verifies the gate binary with `sha256sum` or `shasum`, and refuses without one. It needs Node 8.2 or later ([Requirements](#requirements)).
 
 ### From a plugin marketplace
 

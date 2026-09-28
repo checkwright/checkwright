@@ -754,6 +754,36 @@ the operator states that verification and workflow are fully decoupled, each shi
 
 **Cost while deferred:** the front door neither claims nor refutes a decoupling the operator believes in, and docs/kits.md reads as a dependency chain. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' lead; promoted at its close: →fix fails because the classification is a design ruling with no direction behind it. Re-verified: the three profiles' rows and comments in `installer/profiles.list`, and docs/kits.md line 13. Owner lookup: `decoupl`, `profiles.list`, `workflow-only` in this file — none; owner installer/SPEC.md §Profiles, with docs/kits.md.
 
+### plugin-front-matter-yaml
+
+[cost: event/low] [surface: plugin]
+
+`check-plugin-parity`'s front-matter reader (`front_matter` in `native/src/gates/plugin_parity.rs`) splits each line at its first `:` and strips one quote pair, so it admits a `SKILL.md` description that strict YAML rejects: an unquoted `: ` in agent-execution's description passed the local battery and the harness CLI and redded only CI's `skills-ref` step on the v0.28.0 stamp push. plugin/SPEC.md §The validation leg rules manifest validity the leg's, and nothing runs that leg's oracles before a push.
+
+**Deliverable:** the leg's oracles runnable locally before a package change commits, or the reader refusing what a YAML plain scalar cannot carry, with a `bad/` fixture holding the `: ` case.
+
+**Cost while deferred:** a front-matter slip is caught only by a push, which spends a hotfix from the budget. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' close; promoted 2026-09-28 at the next iteration's scope: →fix fails because a stricter reader changes a shipped gate's verdict. Re-verified: the reader above, and `.github/workflows/gates.yml` installs `skills-ref` in CI only. Owner lookup: `front matter`, `skills-ref`, `yaml` in this file — only the icebox's template-copy-parity-yaml-widening, DISTINCT (template copies); owner plugin/SPEC.md §check-plugin-parity.
+
+### windows-liveness-pid-reuse
+
+[cost: iteration/low] [surface: .github]
+
+the Windows install-smoke leg's binding liveness step can red on a ground-truth flake. On the pin push's run for b799b176, row (a) read `measured nothing: ground truth read alive then alive` for Windows pid 6204, although the gate read held then free and `wait_gone` passed about 3s before the second read. **Inferred, not run:** the winpid was reused by another process between `wait_gone` and that read, so the truth read named a stranger; the job was re-run rather than a push spent.
+
+**Deliverable:** row (a)'s second truth read keyed on more than the bare pid (the process start time), or taken inside the wait.
+
+**Cost while deferred:** a green push can red at random and costs a re-run or a hotfix push. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' close; promoted 2026-09-28 at the next iteration's scope: →fix fails because the fix is unprobed on a Windows host. Re-verified: `.github/workflows/gates.yml` reads `truth "${tpid[$r]}"` on the bare pid at both reads. Owner lookup: `winpid`, `pid reuse`, `liveness step` in this file — none; owner `.github/workflows/gates.yml`, with evidence-kit/SPEC.md §The producer-liveness lock.
+
+### license-text-and-alignment
+
+[cost: event/low] [surface: installer]
+
+the license text may not ship with the artifacts, and the license line differs across surfaces. `installer/package.json`'s `files` list carries no LICENSE and `installer/` holds none, so the npm package ships without the text, which Apache-2.0 section 4(a) asks a redistribution to give; no kit directory carries one either, and the release tarball's payload is unchecked. README.md links `[Apache-2.0](LICENSE)`, installer/README.md says `Apache-2.0.`, gate-sdk/README.md says "see the repository root", which names the adopter's root once vendored, and the other kit READMEs say nothing. Operator direction, 2026-09-28 (lead session): align the license line across the site and the READMEs.
+
+**Deliverable:** the text shipped in the npm package, the tarball and each vendored kit where redistribution needs it, and one license line on every README, linked where the link survives vendoring and the site mirror.
+
+**Cost while deferred:** each published artifact redistributes without the license text. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' lead; promoted 2026-09-28 at the next iteration's scope, the site footer fixed inline there: →fix fails because shipping the text is a payload convention. Re-verified: the `files` list, and `ls` finds a LICENSE at the root only. Owner lookup: `license`, `licence` in this file — none; owner installer/SPEC.md, with each kit README.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
