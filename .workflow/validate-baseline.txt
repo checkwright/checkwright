@@ -94,6 +94,7 @@ installer_smoke profile-invariant pass
 installer_smoke seed-arm pass
 installer_smoke demo-arm pass
 installer_smoke companion-arm-for-speckit pass
+installer_smoke companion-arm-for-speckit-full pass
 installer_smoke companion-arm-for-openspec pass
 installer_smoke companion-arm-for-openspec-lifecycle pass
 installer_smoke plan-parity-over-held-seeds pass
@@ -105,6 +106,7 @@ installer_smoke jq-less-arm pass
 installer_smoke bash-less-arm pass
 installer_smoke upgrade-arm pass
 installer_smoke cross-version-reversal-arm pass
+installer_smoke newer-verb-reversal-arm pass
 installer_smoke seam-arm pass
 installer_smoke narrowing-arm pass
 installer_smoke artifact-arm pass
