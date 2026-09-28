@@ -56,6 +56,7 @@ Roster probe: the probes above, plus `git grep -n "Two citation forms"` and `git
 - `native/src/gates/spec_pointer.rs` (delta 1).
 - `canon-kit/gate-tests/check-spec-pointer/bad/` and `canon-kit/gate-tests/check-spec-pointer/good/` (delta 2).
 - `companion/SPEC.md` — §The tested claim (delta 3).
+- `.workflow/surface-ceiling.txt` — `canon-kit/SPEC.md`'s row, re-stamped with `--emit always-loaded --ceiling` if the merge grows it, since `check-surface-ratchet` governs every `*/SPEC.md` here (delta 1).
 - `docs/canon-kit/SPEC.md` — the generated on-site mirror, as is `docs/companion/SPEC.md`, each regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write` (deltas 1 and 3).
 - `.workflow/release-declarations.md` — Tightened gates gains a bullet led by `check-spec-pointer`: a prose citation's lead clause is no longer admitted where another heading in the file shares it, or where the citation continues with the heading's own separator, so a bare citation of a missing member of a heading family such as `Requirement: <name>` now reds (delta 1).
 

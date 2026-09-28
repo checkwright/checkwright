@@ -34,6 +34,18 @@ the OpenSpec recipe and its lifecycle layer are fetched by hand from raw.githubu
 
 **Cost while deferred:** a companion adopter's bare-prose requirement citation dangles unseen. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's spec, reproduced in a scratch OpenSpec tree; promoted 2026-09-27 at its close: →fix fails because the calibration is a verdict change on a shipped gate with more than one candidate rule. Re-verified: `Heading::prefix_of` in `native/src/gates/spec_pointer.rs` admits a boundary-anchored prefix of `lead_clause`, which is `Requirement` for such a heading. Owner lookup: `lead clause`, `spec-pointer`, `OpenSpec` in this file — none; owner canon-kit/SPEC.md §check-spec-pointer.
 
+### install-toolkit-page-structure
+
+[spec: SPEC-toolkit-pages.md]
+
+two landing pages outgrew their structure. docs/install.md (about 2.5k words, per-OS sections of about 55 lines, the rest OS-agnostic) routes WSL nowhere visible: the Windows section is native-only and WSL appears only as a Requirements row and a package note. docs/spec-toolkits.md serves two diverging companions (an extension, and a recipe plus lifecycle layer) on one page, and its OpenSpec section restates install.md's macOS-and-Linux one-liner while pointing Windows readers to install.md. Operator directions (lead session), three bullets merged here.
+
+**Deliverable:** (a) an OS picker at the top of install.md §Install (macOS and Linux, native Windows, WSL routed to the Linux path, Node, plugin marketplace), not per-OS sub-pages, which would scatter the shared content; (b) spec-toolkits.md as the overview (what the gates catch, limits, what is tested) with one sub-page each for Spec Kit and OpenSpec, both pointing to install.md §Install rather than restating it. Sequence (b) after [companion-recipe-in-payload](#companion-recipe-in-payload), which removes the recipe block and most OpenSpec steps; the consumer smoke's companion arm reads that block off this page (installer/SPEC.md §The consumer smoke), so (b) moves a contract.
+
+**In set (2026-09-28, operator direction lead-relayed, not a /consult ruling):** companion-front-door-widening takes this entry; spec authors and promotes it, since (b) moves the smoke's contract.
+
+**Cost while deferred:** a Windows reader never learns WSL takes the Linux path, and the catalog submission lacks a Spec Kit landing page. Filed 2026-09-28 to the gap inbox by the lead after consult-inbox-front-brevity's close; promoted at the next iteration's scope. Owner lookup: `WSL`, `picker`, `sub-page` in this file — none; owner docs/site-architecture.md §Page-authoring rules, with docs/install.md and docs/spec-toolkits.md.
+
 ## Technical Debt
 
 ### uninstall-version-ask
@@ -785,20 +797,6 @@ the companion checks documents and never code against a spec. Split 2026-09-28 a
 **Inferred, not run:** candidate checks, unprobed against the formats: requirement IDs cited by tasks and tests, a ticked task naming an absent file, `plan.md` paths existing, an OpenSpec delta agreeing with its base spec before archive.
 
 **Cost while deferred:** an adopter's spec and code drift apart with no red, which is the check the operator's "ship all gates checkwright offers" asks the companion to reach. Filed 2026-09-28 as a split, the parent's gap-inbox provenance carried. Owner lookup: `spec-to-code` in this file — the parent alone; owner companion/SPEC.md.
-
-### install-toolkit-page-structure
-
-[cost: once/low] [surface: docs]
-
-two landing pages outgrew their structure. docs/install.md (about 2.5k words, per-OS sections of about 55 lines, the rest OS-agnostic) routes WSL nowhere visible: the Windows section is native-only and WSL appears only as a Requirements row and a package note. docs/spec-toolkits.md serves two diverging companions (an extension, and a recipe plus lifecycle layer) on one page, and its OpenSpec section restates install.md's macOS-and-Linux one-liner while pointing Windows readers to install.md. Operator directions (lead session), three bullets merged here.
-
-**Deliverable:** (a) an OS picker at the top of install.md §Install (macOS and Linux, native Windows, WSL routed to the Linux path, Node, plugin marketplace), not per-OS sub-pages, which would scatter the shared content; (b) spec-toolkits.md as the overview (what the gates catch, limits, what is tested) with one sub-page each for Spec Kit and OpenSpec, both pointing to install.md §Install rather than restating it. Sequence (b) after [companion-recipe-in-payload](#companion-recipe-in-payload), which removes the recipe block and most OpenSpec steps; the consumer smoke's companion arm reads that block off this page (installer/SPEC.md §The consumer smoke), so (b) moves a contract.
-
-**Inferred, not run:** a WSL install vendors the Linux binary, so a commit from Windows Git reaches the wrong artifact; if probed true, (a) notes that one checkout is used from one side only.
-
-**In set (2026-09-28, operator direction lead-relayed, not a /consult ruling):** companion-front-door-widening takes this entry; spec authors and promotes it, since (b) moves the smoke's contract.
-
-**Cost while deferred:** a Windows reader never learns WSL takes the Linux path, and the catalog submission lacks a Spec Kit landing page. Filed 2026-09-28 to the gap inbox by the lead after consult-inbox-front-brevity's close; promoted at the next iteration's scope. Owner lookup: `WSL`, `picker`, `sub-page` in this file — none; owner docs/site-architecture.md §Page-authoring rules, with docs/install.md and docs/spec-toolkits.md.
 
 ## Icebox
 

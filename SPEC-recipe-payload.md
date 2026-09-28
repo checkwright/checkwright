@@ -170,6 +170,7 @@ Roster probe: the probes above, plus `git grep -n "companion-recipe:"` and `git 
 - `installer/consumer-smoke/run-smoke.sh` (delta 7).
 - `docs/site-architecture.md` (delta 8).
 - `.github/workflows/gates.yml` and `scripts/ci-pack-extension.sh` (delta 8).
+- `.workflow/surface-ceiling.txt` — the rows of `installer/SPEC.md`, `gate-sdk/SPEC.md`, `companion/SPEC.md`, `docs/spec-toolkits.md` and `docs/install.md`, re-stamped with `--emit always-loaded --ceiling` in the commit that grows each, since `check-surface-ratchet` governs every `*/SPEC.md` and `docs/*.md` here (deltas 1, 3, 5 and 6).
 - `docs/companion/SPEC.md` — the generated on-site mirror, as are `docs/installer/SPEC.md`, `docs/installer/README.md`, `docs/gate-sdk/SPEC.md` and `docs/companion/README.md`, each regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write` (all deltas).
 - `.workflow/release-declarations.md` — Behavior changes gains a bullet led by **`init --recipe`**: the package carries payload recipes and `init` applies one by name, recorded in `checkwright.lock`. A tree that applied a recipe with the old block keeps its seams as the adopter's changes. It takes `init`'s files with `--force --recipe <name>` (deltas 1 and 2).
 
