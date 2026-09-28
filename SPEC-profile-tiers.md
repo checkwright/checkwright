@@ -67,7 +67,7 @@ companion/SPEC.md §The tested claim: *A recipe may drop a gate only where a too
 >
 > `full` adds every kit's gates to the four above. It needs `bash` 4.3 or later, which stock macOS lacks ([macOS and Linux](install.md#macos-and-linux) has the remedy). It seeds Checkwright's own task queue, a doctrine block in your agent file, and evidence files under `.workflow/`, beside Spec Kit's own.
 
-The OpenSpec page's lifecycle paragraph, which holds the `companion-full` block, opens instead with **Every kit instead of `prose`.** It names the same two costs. It then says the line also applies the lifecycle layer, so a change touching two capabilities owes the align stage before build once you run lifecycle-kit's stage machine.
+The OpenSpec page's lifecycle paragraph, which holds the `companion-full` block, opens instead with **Every kit instead of `prose`.** It names the same two costs. It then says the line also applies the lifecycle layer, so a change touching two capabilities owes the align stage before build once you run lifecycle-kit's stage machine. This delta rewords the paragraph's prose only — the fence's line, `checkwright init --profile full --recipe openspec --recipe openspec-lifecycle`, is [companion-recipe-in-payload](TASK-QUEUE.md#companion-recipe-in-payload)'s delta 6, unchanged here, the way the Spec Kit fence above states its own line because no other delta writes it.
 
 `docs/spec-toolkits.md`: the opener gains *Each toolkit has two lines: `prose`, the default, and `full`, every kit.* §What is tested gains, after its first sentence, *On Spec Kit it also installs `full` with the recipe and asserts the battery green and each defect caught.*
 

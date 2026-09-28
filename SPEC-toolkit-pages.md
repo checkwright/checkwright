@@ -35,7 +35,7 @@ One queue entry pairs it: [install-toolkit-page-structure](TASK-QUEUE.md#install
 
 `docs/speckit.md` is new, with `title: Spec Kit`, `nav_parent: install` and `nav_child_order: 2`. Under the heading *Checkwright for Spec Kit*, it holds, in order:
 
-- the moved §Spec Kit text: the extension's `specify extension add` fence, the install command paragraph and the recipe sentence;
+- the moved §Spec Kit text: the extension's `specify extension add` fence, the install command paragraph and the recipe sentence. Neither this amendment nor [companion-recipe-in-payload](TASK-QUEUE.md#companion-recipe-in-payload)'s (whose delta 6 never touches `docs/spec-toolkits.md` §Spec Kit) edits the install command paragraph's closing clause, *"runs the recipe block below with the Spec Kit recipe, and commits"* — a same-page pointer to `## The recipe block`, which recipe-payload's delta 6 deletes. Moved as-is it would dangle, uncaught by `check-md-refs` since it names no anchor. This delta rewrites the clause to *"applies the Spec Kit recipe, and commits"*, matching the inline `--recipe speckit` model recipe-payload's delta 5 gives the extension's own install bullet;
 - *The install command runs your system's line from the [install page](install.md#install), and that page's [Requirements](install.md#requirements) apply.*;
 - *Spec Kit has no lifecycle layer ([companion/SPEC.md §The lifecycle layer](companion/SPEC.md#the-lifecycle-layer)).*;
 - *What the gates catch, what is tested and the limits: [Spec Kit and OpenSpec](spec-toolkits.md).*
@@ -48,7 +48,7 @@ One queue entry pairs it: [install-toolkit-page-structure](TASK-QUEUE.md#install
 - the lifecycle paragraph and its `companion-full` block;
 - the same closing pointer to the overview.
 
-This delta's act depends on [companion-recipe-in-payload](TASK-QUEUE.md#companion-recipe-in-payload). If that unit landed in an earlier batch, the two marker blocks move from `docs/spec-toolkits.md` to `docs/openspec.md` unchanged. If it lands in this batch, its amendment's delta 6 writes them onto `docs/openspec.md` directly. This unit never lands before it, because the OpenSpec section it moves still carries the pasted recipe block until that unit retires it.
+This delta's act depends on [companion-recipe-in-payload](TASK-QUEUE.md#companion-recipe-in-payload), whose delta 6 always writes the two marker blocks onto `docs/spec-toolkits.md`, whether it lands in an earlier batch or this one — that amendment never spells `docs/openspec.md`, since it does not know this page exists. This delta is therefore what moves the two marker blocks from `docs/spec-toolkits.md` to `docs/openspec.md`, unchanged, regardless of landing order. This unit never lands before companion-recipe-in-payload, because the OpenSpec section it moves still carries the pasted recipe block until that unit retires it.
 
 ### (3) The readers of the marker blocks and the landing page {mechanical}
 
@@ -59,7 +59,7 @@ This delta's act depends on [companion-recipe-in-payload](TASK-QUEUE.md#companio
 - docs/site-architecture.md §Generated projections and their freshness gates, the **toolkit install lines** bullet, names `docs/openspec.md` as the page carrying the two blocks;
 - companion/SPEC.md §Applying a recipe says *on the OpenSpec page, `docs/openspec.md`* where it says *on the landing page*.
 
-The same two acts apply. If companion-recipe-in-payload landed earlier, each of these is an edit of the text it merged. If it lands in this batch, its amendment's deltas 5, 7 and 8 write `docs/openspec.md` in the first place.
+The same act applies regardless of landing order: companion-recipe-in-payload's deltas 5, 7 and 8 never spell `docs/openspec.md` — delta 5 and delta 7 write the generic "the landing page", and delta 8 writes the literal `docs/spec-toolkits.md`. So each of these four readers is repointed to `docs/openspec.md` by this delta, whether companion-recipe-in-payload landed in an earlier batch or this one.
 
 companion/SPEC.md §The OpenSpec recipe's *and the landing page states the convention* becomes *and the OpenSpec page states the convention*. §The Spec Kit extension's `README.md` bullet, *where the landing page is*, stands, and `companion/speckit/README.md`'s **Learn more** first link becomes `[Checkwright for Spec Kit](https://checkwright.dev/speckit.html)`, keeping its description.
 
