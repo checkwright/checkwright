@@ -604,6 +604,14 @@ jobs:
             [[ "$1" =~ ^[0-9]+$ ]] || { echo unknown; return; }
             ps_run pwsh -NoProfile -Command "if (Get-Process -Id $1 -ErrorAction SilentlyContinue) { 'alive' } else { 'gone' }" | tr -d '\r'
           }
+          # spec: evidence-kit/SPEC.md §The producer-liveness lock — ground truth keys a pid on its start time, so a reused pid reads as the stranger it is
+          started() {
+            [[ "$1" =~ ^[0-9]+$ ]] || { echo none; return; }
+            ps_run pwsh -NoProfile -Command "\$p = Get-Process -Id $1 -ErrorAction SilentlyContinue; if (-not \$p) { 'none' } else { try { \$p.StartTime.ToUniversalTime().Ticks } catch { 'unreadable' } }" | tr -d '\r'
+          }
+          ours() {
+            if [[ "$2" =~ ^[0-9]+$ && "$(started "$1")" == "$2" ]]; then echo alive; else echo gone; fi
+          }
           gate() {
             local out rc
             out="$("$bin" check-producer-liveness "$1" 2>&1)"
@@ -613,7 +621,7 @@ jobs:
           }
           wait_gone() {
             [[ "$1" =~ ^[0-9]+$ ]] || return 1
-            for _ in $(seq 1 30); do [[ "$(truth "$1")" == gone ]] && return 0; sleep 1; done
+            for _ in $(seq 1 30); do [[ "$(ours "$1" "$2")" == gone ]] && return 0; sleep 1; done
             return 1
           }
           wait_file() {
@@ -621,7 +629,7 @@ jobs:
             return 1
           }
           pid_of() { sed -n 's/^pid=\([0-9]*\) .*/\1/p' "$1" 2>/dev/null; }
-          declare -A t1 g1 t2 g2 tpid gd1 gd2
+          declare -A t1 g1 t2 g2 tpid gd1 gd2 born held2
           winpids=()
           # shellcheck disable=SC2329 # reached through the EXIT trap
           cleanup() {
@@ -670,8 +678,9 @@ jobs:
 
           echo "== reading 1, every process running =="
           for r in a b bp c; do
-            t1[$r]="$(truth "${tpid[$r]}")"; g1[$r]="$(gate "$rec/$r.run")"
-            echo "($r) truth=${t1[$r]} gate=${g1[$r]}"
+            born[$r]="$(started "${tpid[$r]}")"
+            t1[$r]="$(ours "${tpid[$r]}" "${born[$r]}")"; g1[$r]="$(gate "$rec/$r.run")"
+            echo "($r) truth=${t1[$r]} (start ${born[$r]}) gate=${g1[$r]}"
           done
           for f in "$rec"/d-*.run; do
             d="$(basename "$f")"; gd1[$d]="$(gate "$f")"
@@ -685,16 +694,20 @@ jobs:
           done
           for r in a b bp c; do
             [[ -n "${tpid[$r]}" ]] || continue
-            wait_gone "${tpid[$r]}" || echo "($r) ground truth still not gone after 30s"
+            wait_gone "${tpid[$r]}" "${born[$r]}" || echo "($r) ground truth still not gone after 30s"
           done
 
           echo "== reading 2, every process stopped =="
-          # spec: evidence-kit/SPEC.md §The producer-liveness lock — the accepted PID-reuse case
-          acoll="$(truth "$apid")"
-          echo "(a) msys pid $apid as a windows pid: $acoll"
+          # spec: evidence-kit/SPEC.md §The producer-liveness lock — the accepted PID-reuse case: whatever holds the record's pid around the gate's read owes held
+          declare -A rpid=([a]="$apid" [b]="${tpid[b]}" [bp]="${tpid[bp]}" [c]="${tpid[c]}")
           for r in a b bp c; do
-            t2[$r]="$(truth "${tpid[$r]}")"; g2[$r]="$(gate "$rec/$r.run")"
-            echo "($r) truth=${t2[$r]} gate=${g2[$r]}"
+            t2[$r]="$(ours "${tpid[$r]}" "${born[$r]}")"
+            held2[$r]=unstable
+            for _ in 1 2 3 4 5; do
+              h1="$(truth "${rpid[$r]}")"; g2[$r]="$(gate "$rec/$r.run")"; h2="$(truth "${rpid[$r]}")"
+              [[ "$h1" == "$h2" ]] && { held2[$r]="$h1"; break; }
+            done
+            echo "($r) truth=${t2[$r]}; record pid ${rpid[$r]:-<none>} read ${held2[$r]} around the gate; gate=${g2[$r]}"
           done
           for f in "$rec"/d-*.run; do
             d="$(basename "$f")"; gd2[$d]="$(gate "$f")"
@@ -723,9 +736,12 @@ jobs:
           misread=0
           for r in a b bp c; do
             want2=0
-            [[ "$r" == a && "$acoll" == alive ]] && want2=1
+            [[ "${held2[$r]}" == alive ]] && want2=1
             if [[ "${t1[$r]}" != alive || "${t2[$r]}" != gone ]]; then
               echo "::error::row ($r) measured nothing: ground truth read ${t1[$r]} then ${t2[$r]}"
+              misread=1
+            elif [[ "${held2[$r]}" == unstable ]]; then
+              echo "::error::row ($r) measured nothing: pid ${rpid[$r]} changed holder around each of 5 gate reads"
               misread=1
             elif [[ "${g1[$r]}" != 1 || "${g2[$r]}" != "$want2" ]]; then
               echo "::error::row ($r) misread: gate ${g1[$r]} alive, ${g2[$r]} gone, where 1 then $want2 is owed"
