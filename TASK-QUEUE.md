@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### lifecycle-kit-front-brevity
-
-the lifecycle-kit/SPEC.md sections above §Per-component contracts (§The state machine through §Testing), about 23.3k of the file's 61.6k words. The per-component contracts stay on [spec-brevity-residue](#spec-brevity-residue).
-
-**Deliverable:** the three moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) applied to those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm. A contract sentence stays, including a fact a sibling entry or another SPEC cites there.
-
-**Promoted as debt, split from spec-brevity-residue — operator direction 2026-09-28, lead-relayed (not a /consult ruling), unit set A at consult-inbox-front-brevity's scope:** the moves run under gates that already exist and add no name. `consult-inbox`'s amendment edits §The steering vocabulary inside this slice, so it merges first and this pass runs last, over the merged text.
-
-**Cost while deferred:** paid by every session that opens one of these sections and every adopter who reads it on the site. Filed 2026-09-25 as spec-brevity-residue, split 2026-09-28 at scope; the word census is this scope's survey record.
-
 ## Deferred
 
 ### shellcheck-extra-dirs-trigger
@@ -368,7 +358,7 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
-lifecycle-kit's sections above §Per-component contracts left 2026-09-28 at consult-inbox-front-brevity's scope as [lifecycle-kit-front-brevity](#lifecycle-kit-front-brevity), on an operator direction lead-relayed (not a /consult ruling).
+lifecycle-kit's sections above §Per-component contracts left 2026-09-28 at consult-inbox-front-brevity's scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `lifecycle-kit-front-brevity`.
 
 ### prune-set-matches-walk-root-ancestors
 
@@ -1425,5 +1415,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - roadmap-horizon-motion-unowned
 - license-text-and-alignment
 - tier-only-rank-out-unruled
+- lifecycle-kit-front-brevity
 
 ## Lessons Learned
