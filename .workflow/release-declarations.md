@@ -3,6 +3,7 @@
 ## Tightened gates
 
 - `check-skill-binding` — lifecycle-kit/templates/lead.md gained the `consult-dispatch` slot, so a lead binding shim reds until it binds it. Bind the agent type your lead dispatches a consultation as, and a threshold or off — or state that your lead dispatches none.
+- `check-merge-attrs` — the derived union-merge set gained the consult inbox (`LIFECYCLE_KIT_CONSULT_INBOX_FILE`), so a `.gitattributes` marker block written before it reds until it carries that path's `merge=union` line. Re-run `--install-lifecycle` to regenerate the block.
 
 ## Behavior changes
 
