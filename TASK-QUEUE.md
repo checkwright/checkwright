@@ -20,6 +20,18 @@ nothing queues work owed to `/consult`. Its only automatic trigger is `--emit ru
 
 **Cost while deferred:** a consult-owed item survives only if a live session relays it. Filed 2026-09-26 to the gap inbox by the lead; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because a new committed surface with new governed names owes an amendment. Re-verified at the drain: `ruling-staleness` appears in the scope binding and the close template, not in either consult surface. Owner lookup: `consult inbox`, `consult-inbox` in this file — none.
 
+### consult-inbox-drain-trigger
+
+[spec: SPEC-consult-drain.md] [blocked-by: consult-inbox]
+
+the consult inbox needs a drain trigger and a status cue, on an operator direction (2026-09-26, lead session, not a ruling). (a) A status-line counter for the consult inbox, and optionally the gap inbox, through delegation-kit's statusline counter group, which takes its counts from the queue-counts arm today (`native/src/hook/statusline.rs`); the inbox path comes from a knob, since delegation-kit may not name a lifecycle-kit path. (b) The two consults split by trigger: an operator-started consult stays interactive, and the lead dispatches one for inbox items only while no stage session is live, because a consult writes TRAJECTORY.md and the queue. The dispatched consult re-classes or discards an item alone, with cause, and escalates a ruling-class item to the lead as a four-header block for the operator. Batching thresholds (count or age) are consumer-bound, off by default.
+
+**Deliverable:** both halves, with the open question stated in lifecycle-kit/SPEC.md §The steering vocabulary rather than assumed: whether an operator answer relayed through the lead into a dispatched consult is a ruling.
+
+**Taken for /spec 2026-09-28 at consult-inbox-front-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, unblocked in-set by [consult-inbox](#consult-inbox).
+
+**Cost while deferred:** the inbox, once it lands, is drained only when an operator remembers it. Filed 2026-09-26 to the gap inbox by the lead, extending the consult-inbox bullet; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails on the same amendment ground. Re-verified at the drain: `statusline.rs` reads `queue_counts::emit`. Owner lookup: `statusline counter`, `counter group` in this file — none.
+
 ## Technical Debt
 
 ### tier-only-rank-out-unruled
@@ -533,18 +545,6 @@ a roadmap horizon moves only when a `/consult` happens to re-tag it. The consult
 **Taken for /spec 2026-09-28 at consult-inbox-front-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set A; [consult-inbox](#consult-inbox) goes first, its signal being the inbox's first consumer.
 
 **Cost while deferred:** the public roadmap lags direction until an operator-started consult notices. Filed 2026-09-26 to the gap inbox by the lead on an operator question; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails because the signal is new mechanism on two surfaces. Re-verified at the drain: the consult binding's one roadmap hit is the projection sentence, and `--emit roadmap` printed now/ empty before the re-tag. Owner lookup: `horizon`, `consult-owed` in this file — no entry about motion.
-
-### consult-inbox-drain-trigger
-
-[cost: event/low] [surface: delegation-kit] [blocked-by: consult-inbox]
-
-the consult inbox needs a drain trigger and a status cue, on an operator direction (2026-09-26, lead session, not a ruling). (a) A status-line counter for the consult inbox, and optionally the gap inbox, through delegation-kit's statusline counter group, which takes its counts from the queue-counts arm today (`native/src/hook/statusline.rs`); the inbox path comes from a knob, since delegation-kit may not name a lifecycle-kit path. (b) The two consults split by trigger: an operator-started consult stays interactive, and the lead dispatches one for inbox items only while no stage session is live, because a consult writes TRAJECTORY.md and the queue. The dispatched consult re-classes or discards an item alone, with cause, and escalates a ruling-class item to the lead as a four-header block for the operator. Batching thresholds (count or age) are consumer-bound, off by default.
-
-**Deliverable:** both halves, with the open question stated in lifecycle-kit/SPEC.md §The steering vocabulary rather than assumed: whether an operator answer relayed through the lead into a dispatched consult is a ruling.
-
-**Taken for /spec 2026-09-28 at consult-inbox-front-brevity's scope, operator direction lead-relayed (not a /consult ruling):** unit set A, unblocked in-set by [consult-inbox](#consult-inbox).
-
-**Cost while deferred:** the inbox, once it lands, is drained only when an operator remembers it. Filed 2026-09-26 to the gap inbox by the lead, extending the consult-inbox bullet; promoted 2026-09-26 at non-gate-arm-contract's close: →fix fails on the same amendment ground. Re-verified at the drain: `statusline.rs` reads `queue_counts::emit`. Owner lookup: `statusline counter`, `counter group` in this file — none.
 
 ### gate-output-contributor-door
 
