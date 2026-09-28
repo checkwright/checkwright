@@ -17,7 +17,7 @@
 12431cp CLAUDE.md
 260541cp canon-kit/SPEC.md
 5785cp canon-kit/templates/SPEC-amendment.md
-17039cp companion/SPEC.md
+16896cp companion/SPEC.md
 130174cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
 270244cp delegation-kit/SPEC.md
@@ -33,7 +33,7 @@
 1472cp docs/gate-sdk/index.md
 1259cp docs/guard-kit/index.md
 5331cp docs/index.md
-17482cp docs/install.md
+17476cp docs/install.md
 1344cp docs/kits.md
 1395cp docs/lifecycle-kit/index.md
 3007cp docs/methodology.md
@@ -69,6 +69,7 @@
 229102cp docs/posts/2026-09-26-checkwright-v0-26-0.md
 11140cp docs/posts/2026-09-28-checkwright-v0-27-0.md
 3158cp docs/posts/2026-09-28-checkwright-v0-28-0.md
+6070cp docs/posts/2026-09-28-checkwright-v0-29-0.md
 1440cp docs/queue-kit/index.md
 789cp docs/releases.md
 39953cp docs/site-architecture.md
