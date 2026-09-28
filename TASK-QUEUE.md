@@ -516,16 +516,6 @@ the crates.io reservation page still carries the retired methodology description
 
 **Cost while deferred:** a reader searching crates.io meets a second product description, the one `one-product-statement` removed everywhere else. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's build; promoted 2026-09-27 at its close: →fix fails because the write is operator-only. Re-verified: the crates.io API returns the retired description at `max_version` 0.0.0. Owner lookup: `crates.io`, `reserve`, `republish` in this file — none; owner installer/SPEC.md §The dependency boundary.
 
-### truncation-compound-unsteered
-
-[cost: event/low] [surface: guard-kit]
-
-shell-guard splits a compounded emitter write out of a compound (rule `emitter_write` arm (a)) but lets a `: >` truncation compound through, so a call chaining an exact allow entry such as `: > .workflow/subagent-stop-liveness.log` with other allowlisted calls matches no single entry and is decided out of band, with no steer. Rule `allowlist_chain` reads only the leading statement, and `:` is no `GUARD_KIT_APPEND_BINS` member.
-
-**Deliverable:** a compounded statement that alone matches an exact committed allow entry steered to its own call, in whichever rule owns the shape, with a `good/`+`bad/` fixture pair.
-
-**Cost while deferred:** a session compounding a granted truncation meets an out-of-band decision, which a classifier may deny. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's close; promoted 2026-09-27 at the next iteration's scope: →fix fails because choosing the owning rule is a design call on a shipped guard. Re-verified: a hook payload `grep -c x TASK-QUEUE.md; : > .workflow/subagent-stop-liveness.log` exits 0 with no steer, while the same compound with `echo hi >` is steered. Owner lookup: `compound`, `truncat` in this file — only the icebox's rejected-compound-commit-relabel, DISTINCT (a commit retry); owner guard-kit/SPEC.md §The generic ruleset.
-
 ### manual-operation-spend-channel
 
 [cost: iteration/low] [surface: drift-kit]
@@ -738,7 +728,7 @@ native Windows still needs Git for Windows' bash, through the generated pre-comm
 
 **Deliverable:** hook dispatch moved into the binary, the hook one line handing off to it, after first probing whether Git for Windows runs a hook without sh; docs/install.md stating which shell, if any, the hook and battery need on native Windows. Operator direction: `install-smoke-sh-windows` and `-arm64` then retire, their full consumer-smoke coverage (init, battery, hooks, upgrade, uninstall) moving to the PowerShell legs under a non-bash smoke driver. Fallback only if sh stays: a Windows-on-ARM note and fewer spawns; splitting the job is not wanted. Still bash after: custom shell gates and the no-port harness templates.
 
-**Cost while deferred:** every push waits on the emulated leg, and a native-Windows adopter carries bash for a hook. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; promoted 2026-09-28 at the next iteration's scope: →fix fails because the dispatch is new mechanism. Owner lookup: `generated hook`, `hook dispatch` in this file — [custom-gate-substrates](#custom-gate-substrates), DISTINCT (the adopter's gate substrates; this is the hook Checkwright generates), reshaped by it; `windows-liveness-pid-reuse` lives on a retired leg. Owner gate-sdk/SPEC.md, with installer/SPEC.md §The consumer smoke and §The install boundary.
+**Cost while deferred:** every push waits on the emulated leg, and a native-Windows adopter carries bash for a hook. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; promoted 2026-09-28 at the next iteration's scope: →fix fails because the dispatch is new mechanism. Owner lookup: `generated hook`, `hook dispatch` in this file — [custom-gate-substrates](#custom-gate-substrates), DISTINCT (the adopter's gate substrates; this is the hook Checkwright generates), reshaped by it; the landed `windows-liveness-pid-reuse` keyed the liveness step on `install-smoke-sh-windows`, so that step moves with the leg this retires. Owner gate-sdk/SPEC.md, with installer/SPEC.md §The consumer smoke and §The install boundary.
 
 ### gate-customer-value-audit
 
@@ -1448,5 +1438,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - truncation-reclaim-residue
 - gate-tests-suite-identity-in-evidence
 - windows-liveness-pid-reuse
+- truncation-compound-unsteered
 
 ## Lessons Learned
