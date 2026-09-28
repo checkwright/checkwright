@@ -234,3 +234,4 @@
 | platform-prerequisite-floors | sc sp a b v c | 7f/3d | 5 · ≤0d | 21s clean | 139 |
 | companion-catalog-extension | sc sp a b v c | 2f/1d | 3 · ≤0d | 21s clean | 141 |
 | catalog-submission-preconditions | sc sp a b v c | 7f/2d | 4 · ≤1d | 21s clean | 141 |
+| plugin-marketplace-queue-verbs | sc sp a b v c | 5f/1d | 2 · ≤0d | 21s clean | 142 |

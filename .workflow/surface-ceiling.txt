@@ -31,7 +31,7 @@
 1351cp docs/evidence-kit/index.md
 1472cp docs/gate-sdk/index.md
 1259cp docs/guard-kit/index.md
-5251cp docs/index.md
+5265cp docs/index.md
 16907cp docs/install.md
 1344cp docs/kits.md
 1395cp docs/lifecycle-kit/index.md

@@ -7,7 +7,7 @@ nav_order: 1
 
 <!-- product-statement:begin -->
 
-**Verification for coding-agent delivery.** Checkwright is the verification layer under agent orchestration: spec drift, skipped stages, and unsupported *done* claims become failing checks before a merge, instead of review findings after one.
+**Deterministic verification for coding-agent delivery.** Checkwright is the verification layer under agent orchestration: spec drift, skipped stages, and unsupported *done* claims become failing checks before a merge, instead of review findings after one.
 
 <!-- product-statement:end -->
 
