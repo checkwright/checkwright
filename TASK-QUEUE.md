@@ -728,6 +728,26 @@ the companion checks documents and never code against a spec. Split 2026-09-28 a
 
 **Cost while deferred:** an adopter's spec and code drift apart with no red, which is the check the operator's "ship all gates checkwright offers" asks the companion to reach. Filed 2026-09-28 as a split, the parent's gap-inbox provenance carried. Owner lookup: `spec-to-code` in this file — the parent alone; owner companion/SPEC.md.
 
+### license-line-owned-sentence
+
+[cost: once/low] [surface: docs]
+
+the license line differs between the READMEs and the site footer, and nothing owns it. Every README `## License` section reads `Apache-2.0. The license text is ...` with four location endings (24 at "beside this file in an installed copy and at the repository root in the source tree", 3 at the repository root, 2 packaged READMEs linking GitHub, the root README a relative link), while `docs/_layouts/default.html`'s footer reads "Licensed under Apache-2.0" linked to LICENSE. The site's README mirrors render that section on the same page as the footer. Operator direction, 2026-09-28 (lead session): align them on the footer's style, since the README form reads awkwardly.
+
+**Deliverable:** one owned sentence in the footer's style, the location clause its only per-context variant; the footer and every README using it; a gate holding the README License sections to it.
+
+**Cost while deferred:** a reader meets two license phrasings on one page, and the next README drifts unseen. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; promoted at its close: →fix fails because the gate is new mechanism, and aligning the prose without it repeats the drift. Re-verified: 30 README License lines in the four variants above, the footer at line 192, and `docs/gate-sdk/README.md` carrying the section beside the footer. Not a recurrence of the retired `license-text-and-alignment`: that landing put a line in every README and left its wording unowned, so this is a new defect. Owner lookup: `license` in this file — none; owner docs/site-architecture.md (site chrome), with installer/SPEC.md §The packer (the license placement).
+
+### positional-reference-rule
+
+[cost: event/low] [surface: canon-kit]
+
+positional references to a block go stale like restated counts, and nothing catches them. README.md said "The last line, `--run-demo`, is the adoption walkthrough" after the generated battery-roster block gained a later line; docs/install.md carried two more against its hand-authored recipes. All three were rewritten at companion-front-door-widening's close to name the referent. `check-manifest-count` gates cardinals only, and canon-kit/SPEC.md §check-amendment-retired-spelling records the renumber slice as undecidable, its durable fix being to name the referent rather than its position; no doctrine line states that for first/last/above/below prose. Operator question, 2026-09-28 (lead session): why are positional qualifiers allowed when restated counts are blocked.
+
+**Deliverable:** doctrine-kit/DOCTRINE.md's De-literalization or Derivation-first rule naming positional references beside counts; a narrow gate weighed, a positional word citing a marked or generated block, since a general "last line" matcher would cry wolf.
+
+**Cost while deferred:** the next block edit strands a positional sentence silently. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; the three instances fixed at its close, the rule and gate promoted: →fix fails because a doctrine rule change is a scoped unit (the reasoning [intake-routing-test](#intake-routing-test) records) and the gate is new mechanism. Re-verified: the battery-roster block ended at `--projection-witness`. Owner lookup: `positional`, `ordinal`, `renumber` in this file — only the icebox's doctrine-rule-number-citation-liveness, DISTINCT (numbered doctrine-rule citations); owner doctrine-kit/DOCTRINE.md, with canon-kit/SPEC.md for any gate arm.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).

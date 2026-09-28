@@ -236,3 +236,4 @@
 | catalog-submission-preconditions | sc sp a b v c | 7f/2d | 4 · ≤1d | 21s clean | 141 |
 | plugin-marketplace-queue-verbs | sc sp a b v c | 5f/1d | 2 · ≤0d | 21s clean | 142 |
 | consult-inbox-front-brevity | sc sp a b v c | 5f/3d | 4 · ≤0d | 27s 1✗ | 142 |
+| companion-front-door-widening | sc sp a b v c | 3f/0d | 4 · ≤0d | 21s clean | 142 |

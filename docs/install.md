@@ -201,7 +201,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$cw\package\bin\checkwright
 
 <!-- windows-install:end -->
 
-Verify as above. To uninstall, run the same last line with `uninstall` in place of `init`.
+Verify as above. To uninstall, run the `init` line with `uninstall` in place of `init`.
 
 </details>
 
@@ -235,7 +235,7 @@ Moving to a profile that contains yours only adds. `init` refuses outside a git 
 
 ## Managing
 
-`checkwright <verb>` below means the one line with `<verb>` as its argument (`sh -s -- <verb>` on macOS and Linux, the script-block form on Windows, since `irm … | iex` takes none), the last line of your install recipe with `<verb>` in place of `init`, or `npx checkwright <verb>`. Each verb answers in its exit status, so a CI step can gate on it.
+`checkwright <verb>` below means the one line with `<verb>` as its argument (`sh -s -- <verb>` on macOS and Linux, the script-block form on Windows, since `irm … | iex` takes none), your install recipe's `init` line with `<verb>` in place of `init`, or `npx checkwright <verb>`. Each verb answers in its exit status, so a CI step can gate on it.
 
 - `checkwright doctor` checks this machine against Requirements and reports what is installed.
 - `checkwright diff` lists the vendored files you have changed. Exit `0` means none.

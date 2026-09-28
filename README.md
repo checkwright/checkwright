@@ -89,7 +89,7 @@ bash gate-sdk/bin/run-gates.sh --projection-witness                             
 ```
 <!-- battery-roster:end -->
 
-The last line, `--run-demo`, is the adoption walkthrough, and it runs from a checkout because it copies the kits out of this tree: against a throwaway consumer repo, touching no tree but its own, it vendors the kits, passes the battery clean, introduces a defect and shows the gate that blocks it, then drops the defect and goes green again. A checkout tracks no binary, so `bash gate-sdk/bin/build-native.sh` builds one first. The arm is specified in [`gate-sdk/SPEC.md` §Consumer smoke](gate-sdk/SPEC.md#consumer-smoke).
+`--run-demo` is the adoption walkthrough, and it runs from a checkout because it copies the kits out of this tree: against a throwaway consumer repo, touching no tree but its own, it vendors the kits, passes the battery clean, introduces a defect and shows the gate that blocks it, then drops the defect and goes green again. A checkout tracks no binary, so `bash gate-sdk/bin/build-native.sh` builds one first. The arm is specified in [`gate-sdk/SPEC.md` §Consumer smoke](gate-sdk/SPEC.md#consumer-smoke).
 
 The gate binary's `--install-hooks` arm opts this clone into the generated pre-commit and commit-msg hooks. The repo also runs lifecycle-kit's own iteration state machine — [`TASK-QUEUE.md`](TASK-QUEUE.md) carries the iteration header, one iteration per hardening or roadmap unit.
 
