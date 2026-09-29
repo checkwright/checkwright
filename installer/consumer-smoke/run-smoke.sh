@@ -26,7 +26,7 @@ case "$(uname -s)" in
 esac
 
 # spec: installer/SPEC.md §The consumer smoke — the terminator handling the .files read owns, factored into the ONE owner every other multi-line reader of the manifest stream goes through: a `mapfile -t` splits on newline alone, so on a host whose stream ends its lines with CRLF every element keeps the carriage return and reaches an assertion as part of the value. Exactly one trailing CR is dropped per line so a doubled one still shows, the strips are counted, and the count is DECLARED rather than swallowed — which is what keeps a value that genuinely ended in a CR visible as a count instead of vanishing into an array element. The .files read keeps its own copy of the strip rather than calling here because it holds each line UNSTRIPPED as an evidence operand, which an array of stripped values cannot carry
-# spec: installer/SPEC.md §The consumer smoke — the byte gets a NAME and the strip gets a single spelling, because rounds 22 to 24 measured `${x%$'\r'}` behaving inconsistently across contexts on the Windows host — stripping where the count is computed and not where the value is stored, in adjacent lines of one function. No mechanism for that is established and none is asserted; what is chosen here is the construct that removes the context-dependence outright, since a `printf`-built variable in a quoted suffix pattern is one expansion with one reading everywhere. The strip is taken ONCE into a named scalar and both the count and the stored value read that scalar, so the two can no longer disagree whatever the cause was
+# spec: installer/SPEC.md §The consumer smoke — the byte gets a NAME and the strip one spelling, taken ONCE into a named scalar that both the count and the stored value read, so the two cannot disagree
 CR="$(printf '\r')"
 [[ "${#CR}" -eq 1 ]] \
     || blocked "the carriage return this harness strips by came out ${#CR} byte(s) long — every terminator assertion below would be measuring the wrong byte."
@@ -46,7 +46,7 @@ read_stream() {   # $1 = destination array name, $2 = what a declaration calls t
     }
 }
 # spec: installer/SPEC.md §The consumer smoke — no host this repository can reach emits the byte, so the reader above is exercised against a SYNTHETIC stream here rather than left to the one platform that produces it: a repair witnessed only on the host that motivated it is covered by nothing on every host that runs this smoke, and this arm reds on the LF hosts too. Silent and header-less by construction — the say is swallowed and nothing prints on the green path, so this buys no scenario in the parsed roster below
-# spec: installer/SPEC.md §The consumer smoke — the expectation is DERIVED from a `mapfile -t` over the identical channel and never spelled as a literal, because a literal makes this arm assert what the CHANNEL delivered rather than what the reader did: the round-21 host was measured putting a carriage return on a stream the LF hosts deliver clean, so a hard-coded `a b c` reds there on the harness's own synthetic data while the reader under test is behaving. The contract asserted instead is the reader's own — `mapfile -t` minus exactly one trailing carriage return per element, counted and declared — which is host-independent by construction. The vacuity guard is the strip having fired at all: a channel delivering no carriage return anywhere covers nothing and says so
+# spec: installer/SPEC.md §The consumer smoke — the expectation is DERIVED from a `mapfile -t` over the identical channel and never spelled as a literal, which would assert what the CHANNEL delivered rather than what the reader did: the contract is `mapfile -t` minus exactly one trailing carriage return per element, counted and declared. The vacuity guard is the strip having fired at all
 _rs_raw=(); _rs_probe=(); _rs_n=0
 mapfile -t _rs_raw < <(printf 'a\r\nb\nc\r\n')
 read_stream _rs_probe "self-test" < <(printf 'a\r\nb\nc\r\n') > /dev/null
@@ -58,9 +58,9 @@ for _rs_i in "${!_rs_raw[@]}"; do
     [[ "${_rs_probe[_rs_i]}" == "$_rs_cut" ]] \
         || blocked "the stream reader did not take exactly one trailing carriage return off element $_rs_i. The channel handed it $(printf '%q' "${_rs_raw[_rs_i]}") and it returned $(printf '%q' "${_rs_probe[_rs_i]}"); one strip off what it was handed is $(printf '%q' "$_rs_cut"). Read those three: a returned value equal to the handed one is a strip that did not fire, and every multi-line manifest read below would inherit the byte."
 done
-# spec: installer/SPEC.md §The consumer smoke — an uncovered strip is DECLARED here and never blocked on, and the two are different verdicts about different subjects. A reader that mishandles a terminator is this harness's precondition and refuses above; a channel that will not carry the byte the synthetic stream was written with is a fact about the HOST, and refusing on it would stop the one platform whose manifest reads this arm exists to protect before it reached a single one of them. The declaration prints the bytes rather than the conclusion, because the two readings it cannot separate — the channel consumed the carriage return, or the strip pattern never matched it — differ in which surface is at fault and agree on every count a verdict could print
+# spec: installer/SPEC.md §The consumer smoke — an uncovered strip is DECLARED here and never blocked on: a reader that mishandles a terminator is this harness's precondition and refuses above, while a channel that will not carry the byte is a fact about the host. The declaration prints the bytes, since the channel consuming the carriage return and the pattern never matching it agree on every count
 if [[ "$_rs_n" -eq 0 ]]; then
-    say "self-test: this host's channel delivered the synthetic CRLF stream with no carriage return for the reader to take — element 0 arrived as $(printf '%q' "${_rs_raw[0]}") and came back as $(printf '%q' "${_rs_probe[0]}"), and the reader's own declaration was [$CRLF_DECLARED]. The strip is UNCOVERED here and said so rather than greened over; every host whose channel carries the byte covers it. A NON-EMPTY declaration beside two identical operands is not an uncovered strip at all — it is a reader whose count and whose stored value disagree, and it is what rounds 22 to 24 were reading."
+    say "self-test: this host's channel delivered the synthetic CRLF stream with no carriage return for the reader to take — element 0 arrived as $(printf '%q' "${_rs_raw[0]}") and came back as $(printf '%q' "${_rs_probe[0]}"), and the reader's own declaration was [$CRLF_DECLARED]. The strip is UNCOVERED here and said so rather than greened over; every host whose channel carries the byte covers it. A NON-EMPTY declaration beside two identical operands is not an uncovered strip at all — it is a reader whose count and whose stored value disagree."
 else
     [[ "$CRLF_DECLARED" == "self-test: the stream delivered $_rs_n of ${#_rs_raw[@]} line(s)"* ]] \
         || blocked "the stream reader took $_rs_n strip(s) and declared [$CRLF_DECLARED] — a strip that stops declaring is the normalization the manifest arm below stays closed to."
@@ -612,7 +612,7 @@ assert_followups() {   # $1 = profile, $2 = the consumer init just wrote, $3 = i
 # spec: installer/SPEC.md §The consumer smoke — one encoding of the post-conditions, read by both transports, so the two arms cannot drift into asserting different things about the same install; ENTRY is the invocation of the installed entry point and RUN_PATH the PATH every step runs under, which is what lets the download arm mask node/npm without a second copy of the assertions
 # spec: installer/SPEC.md §The gate binary — the battery expectation is no longer a parameter of this helper and the alternative it once carried is no longer a branch: selection has one success path, so an install that ran at all placed a verified artifact and a green battery is the only post-condition an install can earn. The refusals are asserted where they now occur — at the bootstrap, before any verb — by the artifact-less leg and the artifact arm
 assert_install() {   # $1 = profile, $2 = scratch consumer dir
-    local profile="$1" C="$2" out rc before after LOCK mismatch checked malformed_first malformed_n raw_first raw_bad path want got target seam bin list k m line field crlf n_omitted q_seam q_bin queue_src files_raw withheld reserved stdin_root
+    local profile="$1" C="$2" out rc before after LOCK mismatch checked malformed_first malformed_n raw_first raw_bad path want got target seam bin list k m line field crlf n_omitted q_seam q_bin queue_src files_raw withheld reserved
     local bi hi disarmed member
     local -a bad_hash=() lock_kits=() want_kits=() resolved_kits=() hash_lines=() hash_one=() hash_single=() batch_paths=() batch_got=()
 
@@ -642,14 +642,9 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
     [[ "$(jq -r '.profile' "$LOCK")" == "$profile" ]] || fail "$profile: manifest records the wrong profile"
     mismatch=0; checked=0; malformed_first=""; malformed_n=0; raw_first=""; raw_bad=""; crlf=0
     # spec: installer/SPEC.md §The consumer smoke — the line is read WHOLE and split by parameter expansion, so the bytes the stream delivered exist in a variable the report can print: reading with IFS=$'\t' would make the split the same operation that consumes the evidence, and tab is IFS WHITESPACE, so that read also collapses tab runs and strips trailing ones — normalizing an anomalous line out of existence before anything can observe it. On the two-field, single-tab line the producer emits the two agree byte for byte, CR included, so this buys the witness and moves no value
-    # spec: installer/SPEC.md §The consumer smoke — the capture stays a command substitution and the line TERMINATOR is the read's to own, because this is the harness's only multi-line jq read and a terminator is host-dependent: a single-value control that comes back clean carries only the one terminator its own capture already consumes, so it discriminates nothing about the producer and reading it as a channel witness is what sent the previous repair at the channel
+    # spec: installer/SPEC.md §The consumer smoke — the capture stays a command substitution and the line TERMINATOR is the read's to own: a single-value control carries only the one terminator its own capture consumes, so it discriminates nothing about the producer
     files_raw="$(jq -r '.files | to_entries[] | "\(.key)\t\(.value)"' "$LOCK")"
     if [[ -n "$files_raw" ]]; then
-        # spec: installer/SPEC.md §The consumer smoke — the batch's paths travel on stdin, which MSYS never translates the way it translates argv, so the scratch root is re-spelled for git by cygpath -m wherever cygpath exists; same directory, same working directory, one spelling
-        stdin_root="$C"
-        if command -v cygpath > /dev/null 2>&1; then
-            stdin_root="$(cygpath -m "$C")" || blocked "$profile: cygpath -m could not re-spell the scratch consumer root $C for the manifest hash batch"
-        fi
         # spec: installer/SPEC.md §The consumer smoke — the first pass: every step before the hash, in the loop's order; the existence check stays here because one missing path makes the batch fatal, and a path the batch cannot carry takes the one-file call so it keeps its slot in the pairing
         while IFS= read -r line; do
             checked=$((checked + 1))
@@ -662,7 +657,7 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
             if [[ "$path" == *"$CR"* || "$path" == *$'\n'* || "$path" == '"'* ]]; then
                 hash_one+=(1); hash_single+=("$(git hash-object -- "$C/$path")")
             else
-                hash_one+=(0); hash_single+=(""); batch_paths+=("$stdin_root/$path")
+                hash_one+=(0); hash_single+=(""); batch_paths+=("$C/$path")
             fi
         done <<< "$files_raw"
         # spec: installer/SPEC.md §The consumer smoke — the batch: one --stdin-paths child from the same working directory, with no fallback on failure; a non-zero exit or an answer count other than the path count refuses, since pairing by index is only sound on equal counts
@@ -1348,7 +1343,7 @@ stem_is() {   # $1 = a program stem, $2 = a file name -> 0 when the file names t
     n="${n%%.*}"
     [[ "${n,,}" == "$1" ]]
 }
-# spec: installer/SPEC.md §The consumer smoke — a directory is FARMED only when it actually carries the masked program, and every other one is kept on the arm's PATH verbatim. Farming the whole of PATH was correct where a link is a link and free, and it is neither on a host whose `ln -s` deep-copies: it copies every executable on the system PATH into scratch, and the copies are then the only thing on PATH, so a relocated binary looks for the runtime library beside it and does not find it. Keeping the untouched directories removes both at once and takes nothing away from the mask, because a directory without the program in it cannot put it back
+# spec: installer/SPEC.md §The consumer smoke — a directory is FARMED only when it actually carries the masked program, and every other one is kept on the arm's PATH verbatim, which takes nothing from the mask: a directory without the program in it cannot put it back
 # spec: installer/SPEC.md §The consumer smoke — the kept directories go AFTER the farm rather than before, so a program present in both resolves to the original the host installed and not to the farm's stand-in for it. That ordering is free here because the mask does not depend on it: the program is absent from the farm by construction and from every kept directory by the test above, so no order can put it back
 path_without() {   # $1 = the program stem to mask, $2 = the farm dir to build -> the masked PATH on stdout
     local stem="$1" farm="$2" d f b here out
@@ -1809,7 +1804,7 @@ narrow_shadowed=0
 for f in "${SEAM_FILES[@]}"; do
     [[ "$(jq -r --arg f "$f" '.files | has($f)' "$NARROW_LOCK")" == "true" ]] || continue
     narrow_checked=$((narrow_checked + 1))
-    # spec: installer/SPEC.md §The consumer smoke — the separator is concatenated INSIDE jq and never passed in as the head of an argument, because an argument that looks like an absolute POSIX path is rewritten into a host path on its way to a native Windows program: `/gates.list` arrives as something under the interpreter's own install root, `endswith` then matches nothing, and the arm reports a manifest carrying no shadow rather than a query that was never asked. Both the value and the defect are invisible in the verdict, which is why the rule is to hand a native program a RELATIVE operand and let the filter build the rest
+    # spec: installer/SPEC.md §The consumer smoke — the separator is concatenated INSIDE jq and never passed in as the head of an argument: a native program takes a RELATIVE operand and the filter builds the rest
     shadow="$(jq -r --arg b "${f##*/}" --arg own "$f" \
         '.files | keys | map(select(endswith("/" + $b) and . != $own)) | length' "$NARROW_LOCK")"
     [[ "$shadow" -gt 0 ]] && narrow_shadowed=$((narrow_shadowed + 1))
@@ -1822,7 +1817,7 @@ for f in "${SEAM_FILES[@]}"; do
 done
 [[ "$narrow_checked" -gt 0 ]] \
     || fail "the narrowed manifest records none of [${SEAM_FILES[*]}] — the arm has no seam path to resolve"
-# spec: installer/SPEC.md §The consumer smoke — the vacuity refusal carries the roster it searched and not just its verdict, because the two things that produce this zero are indistinguishable from a count: a manifest that legitimately carries no shadowing fixture, and a search that looked for the wrong string. The first is a fact about the payload and the second is a defect in this arm, and a reader handed `0` alone has to buy a round to tell them apart — which is exactly what the round that first hit this on Windows had to do
+# spec: installer/SPEC.md §The consumer smoke — the vacuity refusal carries the roster it searched and not just its verdict, because the two things that produce this zero are indistinguishable from a count: a manifest that legitimately carries no shadowing fixture, and a search that looked for the wrong string. The first is a fact about the payload and the second is a defect in this arm, and a reader handed `0` alone has to buy a round to tell them apart
 [[ "$narrow_shadowed" -gt 0 ]] || {
     printf '  narrowed manifest: %s key(s), kits %s -> %s\n' \
         "$(jq -r '.files | length' "$NARROW_LOCK")" "$wide_kits" "$narrow_kits"
@@ -1830,7 +1825,7 @@ done
         printf '  recorded %-28s %s\n' "$f" "$(jq -r --arg f "$f" '.files | has($f)' "$NARROW_LOCK")"
         printf '  keys sharing its basename: %s\n' \
             "$(jq -r --arg b "${f##*/}" '[.files | keys[] | select(endswith("/" + $b))] | join(" ")' "$NARROW_LOCK")"
-        # spec: installer/SPEC.md §The consumer smoke — the operand is echoed back THROUGH the same program the query goes to, because that is the only way to see an argument a host rewrote in transit: a value printed by the shell is the value the shell holds, not the one the native program was handed, and the two came apart here once already
+        # spec: installer/SPEC.md §The consumer smoke — the operand is echoed back THROUGH the same program the query goes to, because that is the only way to see an argument a host rewrote in transit: a value printed by the shell is the value the shell holds, not the one the native program was handed
         printf '  that basename as jq received it: %s\n' \
             "$(jq -rn --arg b "${f##*/}" '$b')"
     done
@@ -1942,27 +1937,22 @@ grep -q 'no adopter action to take' <<<"$undeclared_out" \
 say "host off the payload roster: refused naming the platform, no adopter action, nothing written"
 cp "$ROSTER_FILE" "$PAY_ART/targets.list" || fail "could not restore the payload roster"
 
-# spec: installer/SPEC.md §The consumer smoke — the shasum fallback: sha256sum is masked by absence so the bootstrap's step 4 can only verify through `shasum -a 256`, and the leg installs through it and later refuses the tampered artifact through it; a host with no shasum, or a native Windows host whose farm would relocate its runtime, says so and skips
+# spec: installer/SPEC.md §The consumer smoke — the shasum fallback: sha256sum is masked by absence so the bootstrap's step 4 can only verify through `shasum -a 256`, and the leg installs through it and later refuses the tampered artifact through it; a host with no shasum says so and skips
 SHASUM_PATH=""
-case "$(uname -s)" in
-    MINGW*|MSYS*|CYGWIN*) say "shasum fallback skipped on a native Windows host: masking sha256sum there would farm the bundle's usr/bin" ;;
-    *)
-        if ! command -v shasum >/dev/null 2>&1; then
-            say "shasum fallback skipped: this host carries no shasum"
-        else
-            SHASUM_PATH="$(path_without sha256sum "$SCRATCH/shasumfarm")" || fail "could not build the shasum fallback's PATH farm"
-            [[ -z "$( PATH="$SHASUM_PATH" "$BASH" -c 'command -v sha256sum' 2>/dev/null )" ]] \
-                || fail "the mask did not take: sha256sum still resolves under the shasum fallback's PATH"
-            ( cd "$PAY_ART/$HOST_TARGET" && PATH="$SHASUM_PATH" shasum -a 256 -c "$NATIVE_BIN.sha256" ) >/dev/null 2>&1 \
-                || fail "the shasum farm's shasum -a 256 -c does not accept the payload's sidecar — either the farm's shasum will not run or it cannot read the <hex>  <name> line, and the fallback below would fail for a reason that is not the bootstrap's"
-            SC="$(consumer artifact-shasum)" || fail "could not build a scratch consumer for the shasum fallback"
-            out="$( cd "$SC" && PATH="$SHASUM_PATH" "${ENTRY[@]}" init --profile "$PROFILE_MIN" 2>&1 )" \
-                || { printf '%s\n' "$out" >&2; fail "init refused with sha256sum masked — the bootstrap's shasum branch did not verify an intact artifact"; }
-            [[ -f "$SC/checkwright.lock" ]] || fail "init with sha256sum masked exited 0 and wrote no manifest"
-            say "shasum fallback: sha256sum masked, the farm's shasum checks the sidecar, and init verified and installed through it"
-        fi
-        ;;
-esac
+if ! command -v shasum >/dev/null 2>&1; then
+    say "shasum fallback skipped: this host carries no shasum"
+else
+    SHASUM_PATH="$(path_without sha256sum "$SCRATCH/shasumfarm")" || fail "could not build the shasum fallback's PATH farm"
+    [[ -z "$( PATH="$SHASUM_PATH" "$BASH" -c 'command -v sha256sum' 2>/dev/null )" ]] \
+        || fail "the mask did not take: sha256sum still resolves under the shasum fallback's PATH"
+    ( cd "$PAY_ART/$HOST_TARGET" && PATH="$SHASUM_PATH" shasum -a 256 -c "$NATIVE_BIN.sha256" ) >/dev/null 2>&1 \
+        || fail "the shasum farm's shasum -a 256 -c does not accept the payload's sidecar — either the farm's shasum will not run or it cannot read the <hex>  <name> line, and the fallback below would fail for a reason that is not the bootstrap's"
+    SC="$(consumer artifact-shasum)" || fail "could not build a scratch consumer for the shasum fallback"
+    out="$( cd "$SC" && PATH="$SHASUM_PATH" "${ENTRY[@]}" init --profile "$PROFILE_MIN" 2>&1 )" \
+        || { printf '%s\n' "$out" >&2; fail "init refused with sha256sum masked — the bootstrap's shasum branch did not verify an intact artifact"; }
+    [[ -f "$SC/checkwright.lock" ]] || fail "init with sha256sum masked exited 0 and wrote no manifest"
+    say "shasum fallback: sha256sum masked, the farm's shasum checks the sidecar, and init verified and installed through it"
+fi
 
 # spec: installer/SPEC.md §The gate binary — the verification is pre-write, so the assertion is on the consumer's tree and not only on the exit code: a warn-then-install would exit non-zero too, and only an untouched tree tells the two apart
 printf 'tampered\n' >> "$PAY_ART/$HOST_TARGET/$NATIVE_BIN"

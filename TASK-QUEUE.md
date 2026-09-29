@@ -58,14 +58,6 @@ the Spec Kit extension installs only the document gates. companion/SPEC.md's `sp
 
 ## Technical Debt
 
-### consumer-smoke-windows-residue
-
-the unix-hosted consumer smoke keeps Windows-host branches its own preflight made unreachable. `installer/consumer-smoke/run-smoke.sh` refuses a MINGW, MSYS or Cygwin host at its top since the sh Windows legs retired, yet keeps a MINGW arm in the shasum-fallback case, a `cygpath -m` re-spelling of the manifest hash batch's stdin paths, and `spec:` comments narrating Windows-host measurements; installer/SPEC.md §The consumer smoke restates the same behaviour (the cygpath stdin re-spelling, the CRLF byte measured on the native Windows host, `ln -s` deep-copying under MSYS).
-
-**Deliverable:** the dead branches deleted and the section trimmed to what a unix host exercises, under the installer consumer-smoke suite; the `jq.exe` relative-operand paragraph stays, its site now a bash step inside `install-smoke-pwsh-windows`.
-
-**Cost while deferred:** a reader of the smoke or its section maintains, and trusts, branches no leg runs. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' close (the capability-liveness-after-descope audit); promoted 2026-09-29 at the next iteration's scope: →fix fails because the stage may not build. Re-verified: the refusal at line 25, the MINGW arm at 1892 and the cygpath branch at 650 of the script, and the section's cygpath and CRLF paragraphs. Owner lookup: `cygpath`, `MINGW`, `run-smoke` in this file — [compiled-consumer-smoke-driver](#compiled-consumer-smoke-driver), which would replace the script whole and so moot this if it landed first; owner installer/SPEC.md §The consumer smoke.
-
 ### installer-install-brevity
 
 installer/SPEC.md's install-surface sections under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §The verbs, §init, §What init seeds, §Payload recipes, §Profiles and §The manifest, about 59k characters, the sections an adopter choosing an install reads.
@@ -1529,5 +1521,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 The consumer's local-only companion files (private brief, ops runbook) have read triggers but no write-back trigger, so shipped-unit forward memory and an out-of-tree state verifier drift until a consult audits them; owed are close and release-sweep template slots for both, and a retired-slug arm over plain code on the local-only globs.
 
 ## Done
+
+- consumer-smoke-windows-residue
 
 ## Lessons Learned
