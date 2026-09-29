@@ -1,51 +1,12 @@
 #!/bin/sh
 # commit-msg - GENERATED, DO NOT EDIT.
 #
-# Emitted from the tier=commit-msg `# graph:` manifests by:
+# Emitted by:
 #     native/target/release/checkwright-gates --emit git-hooks --write
-# Edit a gate's manifest, then regenerate. check-graph asserts this file equals
-# `--emit git-hooks commit-msg`. git feeds the prospective message file as $1; each gate
-# prints its own per-finding + `help:` lines before this hook reports failure.
+# It hands off to the gate binary, which runs every tier=commit-msg gate on
+# the prospective message file git passes as $1.
+# check-graph asserts this file equals `--emit git-hooks commit-msg`.
 #
 # Install (opt-in, per clone):   native/target/release/checkwright-gates --install-hooks
 # Bypass once (use sparingly):   git commit --no-verify
-set -eu
-
-msg_file="${1:?commit-msg: git did not pass the message-file path}"
-
-# Uniform failure: the captured output was already reprinted above.
-hook_fail() {
-    echo ""
-    echo "commit-msg: $1 failed (see above)."
-    echo "  Bypass once (use sparingly): git commit --no-verify"
-    exit 1
-}
-
-GATE_SDK_VERBOSE="${GATE_SDK_VERBOSE:-}"
-_ran=0
-# Capture a gate's output; reprint it only on failure, or with GATE_SDK_VERBOSE.
-run_gate() {
-    _rg_name=$1; shift
-    _rg_ok=1
-    _rg_out=$("$@" 2>&1) || _rg_ok=0
-    _ran=$((_ran + 1))
-    if [ "$_rg_ok" -eq 0 ]; then
-        if [ -n "$_rg_out" ]; then printf '%s\n' "$_rg_out"; fi
-        hook_fail "$_rg_name"
-    fi
-    if [ -n "$GATE_SDK_VERBOSE" ]; then
-        if [ -n "$_rg_out" ]; then printf '%s\n' "$_rg_out"; fi
-        printf '  PASS: %s\n' "$_rg_name"
-    fi
-}
-
-run_gate check-commit-msg native/target/release/checkwright-gates check-commit-msg "$msg_file"
-
-run_gate check-commit-subject native/target/release/checkwright-gates check-commit-subject "$msg_file"
-
-run_gate check-stamp-subject native/target/release/checkwright-gates check-stamp-subject "$msg_file"
-
-run_gate check-dispatch-entry native/target/release/checkwright-gates check-dispatch-entry "$msg_file"
-
-printf 'commit-msg: %d gate(s) passed.\n' "$_ran"
-exit 0
+exec native/target/release/checkwright-gates --git-hook commit-msg "$1"

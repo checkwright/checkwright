@@ -32,8 +32,8 @@
 # runner: an unmatched label does not fail fast, it queues.
 #
 # The x64 windows label needs no such probe and is the one line here attested by this
-# repository's own runs: `windows-latest` is what both Windows install-smoke legs
-# in .github/workflows/gates.yml have been running on for rounds, so it resolves
+# repository's own runs: `windows-latest` is what the Windows install-smoke leg
+# in .github/workflows/gates.yml, `install-smoke-pwsh-windows`, has been running on for rounds, so it resolves
 # to a live image by measurement rather than by a table read.
 #
 # The arm64-Linux label is PROBED on the same terms and read 2026-09-11 against

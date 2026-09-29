@@ -204,7 +204,7 @@ fn validate_amend_manifest(file: &str, span: &str, errors: &mut Vec<String>) {
     let keyed = span.split_whitespace().any(|t| {
         matches!(
             t.split_once('='),
-            Some((k, _)) if matches!(k, "couples" | "dir" | "valve" | "tier" | "mode" | "trigger" | "gen")
+            Some((k, _)) if matches!(k, "couples" | "dir" | "valve" | "tier" | "mode" | "trigger")
         )
     });
     if !keyed {
@@ -212,7 +212,7 @@ fn validate_amend_manifest(file: &str, span: &str, errors: &mut Vec<String>) {
     }
     let (mut couples, mut dir, mut valve, mut tier) =
         (String::new(), String::new(), String::new(), String::new());
-    let (mut mode, mut trigger, mut gen) = (String::new(), String::new(), String::new());
+    let (mut mode, mut trigger) = (String::new(), String::new());
     let (mut have_couples, mut have_dir, mut have_valve, mut have_tier) = (false, false, false, false);
     let mut unknown: Vec<String> = Vec::new();
     for tok in span.split_whitespace() {
@@ -235,7 +235,6 @@ fn validate_amend_manifest(file: &str, span: &str, errors: &mut Vec<String>) {
             }
             Some(("mode", v)) => mode = v.to_string(),
             Some(("trigger", v)) => trigger = v.to_string(),
-            Some(("gen", v)) => gen = v.to_string(),
             _ => unknown.push(tok.to_string()),
         }
     }
@@ -275,9 +274,6 @@ fn validate_amend_manifest(file: &str, span: &str, errors: &mut Vec<String>) {
             "{}: mode= must be staged|whole-tree (got '{}')",
             where_, mode
         ));
-    }
-    if !gen.is_empty() && gen != "manual" {
-        errors.push(format!("{}: gen= must be manual (got '{}')", where_, gen));
     }
     if have_couples && couples.is_empty() {
         errors.push(format!("{}: couples= is empty", where_));
@@ -552,7 +548,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         };
         let (mut couples, mut dir, mut valve, mut tier) =
             (String::new(), String::new(), String::new(), String::new());
-        let (mut mode_f, mut trigger, mut gen_f) = (String::new(), String::new(), String::new());
+        let (mut mode_f, mut trigger) = (String::new(), String::new());
         for kv in man.trim_start_matches("# graph: ").split_whitespace() {
             match kv.split_once('=') {
                 Some(("couples", v)) => couples = v.to_string(),
@@ -561,7 +557,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 Some(("tier", v)) => tier = v.to_string(),
                 Some(("mode", v)) => mode_f = v.to_string(),
                 Some(("trigger", v)) => trigger = v.to_string(),
-                Some(("gen", v)) => gen_f = v.to_string(),
+                Some(("gen", _)) => errors.push(format!(
+                    "MANIFEST: {} carries gen=, which is retired — a hand-written hook region becomes a \
+                     trigger=* shell gate that reads the staged set itself",
+                    script
+                )),
                 _ => errors.push(format!(
                     "MANIFEST: {} unknown manifest key '{}'",
                     script, kv
@@ -649,12 +649,6 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 script, mode_f
             ));
         }
-        if !gen_f.is_empty() && gen_f != "manual" {
-            errors.push(format!(
-                "MANIFEST: {} gen= must be manual (got '{}')",
-                script, gen_f
-            ));
-        }
         for s in members(&couples) {
             if !in_vocab(s, &vocab) {
                 errors.push(format!(
@@ -722,7 +716,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    // assertion D: hook artifact freshness (each committed hook == its in-process emission)
+    // assertion D: each committed hook is its emitter's handoff to the `--git-hook` arm
     const REGEN: &str = "regenerate: bash gate-sdk/bin/run-gates.sh --emit git-hooks --write";
     let root = walk::cwd()?;
     let hooks_dir = walk::knob_scalar("GATE_SDK_HOOKS_DIR")?;
@@ -730,11 +724,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
     if !Path::new(&hook).is_file() {
         errors.push(format!("ARTIFACT: {} does not exist; {}", hook, REGEN));
     } else {
-        match git_hooks::pre_commit(&root, &cfg.gates_dir) {
+        match git_hooks::pre_commit() {
             Err(ref cause) => errors.push(format!("ARTIFACT: the pre-commit hook emission failed; fix it before trusting the hook{}", because(cause))),
             Ok(ref e) => {
                 if e.trim_end_matches('\n') != read_stripped(&hook)?.trim_end_matches('\n') {
-                    errors.push(format!("ARTIFACT: {} is stale vs the '# graph:' manifests; {}", hook, REGEN));
+                    errors.push(format!("ARTIFACT: {} is not its emitter's handoff to the gate binary's --git-hook arm; {}", hook, REGEN));
                 }
             }
         }
@@ -748,7 +742,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         Ok(Some(_)) if !Path::new(&msg_hook).is_file() => errors.push(format!("ARTIFACT: {} does not exist but a tier=commit-msg gate is registered; {}", msg_hook, REGEN)),
         Ok(Some(ref e)) => {
             if e.trim_end_matches('\n') != read_stripped(&msg_hook)?.trim_end_matches('\n') {
-                errors.push(format!("ARTIFACT: {} is stale vs the '# graph:' manifests; {}", msg_hook, REGEN));
+                errors.push(format!("ARTIFACT: {} is not its emitter's handoff to the gate binary's --git-hook arm; {}", msg_hook, REGEN));
             }
         }
     }

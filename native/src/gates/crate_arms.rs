@@ -98,6 +98,34 @@ fn fixture_arm(runner: &Program, suites: &[(String, String, String)], here: &str
     Ok((ok, ran))
 }
 
+pub(crate) const LINKED_WORKTREE: &str = "this is a linked worktree";
+
+// spec: gate-sdk/SPEC.md §check-crate-arms — in a linked worktree the main checkout's record
+// answers a local miss, and a miss there refuses rather than builds; `None` is the main checkout
+fn linked_worktree(main: Option<&str>, cache: &str, key: &str, crate_dir: &str) -> Option<i32> {
+    let main = main?;
+    let shared = walk::abs_against(main, cache);
+    if !key.is_empty() {
+        if let Ok(recorded) = std::fs::read_to_string(&shared) {
+            if recorded.trim_end_matches('\n') == key {
+                println!(
+                    "CRATE-ARMS: clean (cached in the main checkout — source stamp and toolchain match the green run recorded at {}; cargo clippy --all-targets at -D warnings and cargo test, both --release over {})",
+                    shared, crate_dir
+                );
+                return Some(0);
+            }
+        }
+    }
+    eprintln!(
+        "{}: {}, and neither {} nor the main checkout's {} records a green run for this crate's source and toolchain — the check could not run; treating as failure (not clean)",
+        NAME, LINKED_WORKTREE, cache, shared
+    );
+    eprintln!("  help: a build here is the mutation isolation exists to prevent, so this gate never runs cargo in a");
+    eprintln!("        linked worktree. A crate-source change lands from the main checkout, whose build and green run");
+    eprintln!("        answer for it; a worktree holding only source the main checkout recorded is read from that record.");
+    Some(2)
+}
+
 pub fn run(_args: &[String]) -> i32 {
     let crate_dir = match walk::knob_scalar("GATE_SDK_NATIVE_CRATE") {
         Ok(v) => v,
@@ -169,28 +197,8 @@ pub fn run(_args: &[String]) -> i32 {
         }
     }
 
-    // spec: gate-sdk/SPEC.md §check-crate-arms — in a linked worktree the main checkout's record
-    // answers a local miss, and a miss there refuses rather than builds
-    if let Some(main) = walk::main_checkout_root() {
-        let shared = walk::abs_against(&main, &cache);
-        if !key.is_empty() {
-            if let Ok(recorded) = std::fs::read_to_string(&shared) {
-                if recorded.trim_end_matches('\n') == key {
-                    println!(
-                        "CRATE-ARMS: clean (cached in the main checkout — source stamp and toolchain match the green run recorded at {}; cargo clippy --all-targets at -D warnings and cargo test, both --release over {})",
-                        shared, crate_dir
-                    );
-                    return 0;
-                }
-            }
-        }
-        eprintln!(
-            "{}: this is a linked worktree, and neither {} nor the main checkout's {} records a green run for this crate's source and toolchain — the check could not run; treating as failure (not clean)",
-            NAME, cache, shared
-        );
-        eprintln!("  help: a build here is the mutation isolation exists to prevent, so this gate never runs cargo in a");
-        eprintln!("        linked worktree. Run the battery in the main checkout, whose green run records the stamp read here.");
-        return 2;
+    if let Some(code) = linked_worktree(walk::main_checkout_root().as_deref(), &cache, &key, &crate_dir) {
+        return code;
     }
 
     // spec: gate-sdk/SPEC.md §check-crate-arms — both arms run even when the first fails, so one
@@ -366,6 +374,27 @@ mod tests {
         };
         let _ = std::fs::remove_dir_all(&dir);
         assert_eq!(verdict.expect("arm ran"), (true, 1), "the suite saw a repository locator the hook exported");
+    }
+
+    // spec: gate-sdk/SPEC.md §check-crate-arms — the refusal is the contract: a linked worktree whose
+    // main checkout records no green run for the key exits 2 and runs no cargo, one that records it
+    // reads it, and the main checkout is not answered here at all
+    #[test]
+    fn a_linked_worktree_without_a_record_refuses_and_runs_no_cargo() {
+        let main = std::env::temp_dir().join(format!("crate-arms-linked-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&main);
+        std::fs::create_dir_all(main.join(".tmp")).expect("scratch");
+        let m = main.display().to_string();
+        crate::proc::recorder::start();
+        let missed = linked_worktree(Some(&m), ".tmp/crate-arms-x.green", "stamp v", "native");
+        let spawned = crate::proc::recorder::stop();
+        std::fs::write(main.join(".tmp/crate-arms-x.green"), "stamp v\n").expect("record");
+        let recorded = linked_worktree(Some(&m), ".tmp/crate-arms-x.green", "stamp v", "native");
+        let _ = std::fs::remove_dir_all(&main);
+        assert_eq!(missed, Some(2));
+        assert!(spawned.is_empty(), "the refusal spawned {:?}", spawned);
+        assert_eq!(recorded, Some(0));
+        assert_eq!(linked_worktree(None, ".tmp/crate-arms-x.green", "stamp v", "native"), None);
     }
 
     // spec: gate-sdk/SPEC.md §check-crate-arms — an absent program contributes an empty version

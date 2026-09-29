@@ -1062,11 +1062,14 @@ fn exit_code(status: &std::process::ExitStatus) -> i32 {
 // dispatcher's `2>&1` did; reading them as two pipes would reorder a gate's own report.
 // spec: gate-sdk/SPEC.md §run-gates — stdin is `/dev/null`: under a worker pool an inherited
 // terminal is a shared resource two concurrent members could both read from.
+// spec: gate-sdk/SPEC.md §git-hook — `env` is added to the child's environment, never the process's,
+// which is how the hook arm's work-tree pin reaches a member
 pub fn dispatch(
     program: &Program,
     args: &[String],
     tmpdir: &std::path::Path,
     capture: &std::path::Path,
+    env: &[(String, String)],
 ) -> Result<Dispatched, String> {
     let io_err = |what: &str, e: std::io::Error| {
         format!(
@@ -1082,6 +1085,9 @@ pub fn dispatch(
         .stdout(std::process::Stdio::from(out))
         .stderr(std::process::Stdio::from(err))
         .env("TMPDIR", tmpdir);
+    for (k, v) in env {
+        cmd.env(k, v);
+    }
     let status = cmd.status().map_err(|e| io_err("spawn", e))?;
     let output = std::fs::read(capture).map_err(|e| io_err("read the capture file", e))?;
     Ok(Dispatched {

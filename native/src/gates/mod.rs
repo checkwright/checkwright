@@ -2729,10 +2729,32 @@ mod tests {
     // spec: gate-sdk/SPEC.md §check-reads-couples — unit test A: the declared roots are
     // held to what the code does, by running each member over its own fixture cases with
     // the walk recorder on. Nothing else makes a self-declared read set trustworthy.
+    // spec: gate-sdk/SPEC.md §check-crate-arms — in a linked worktree `check-crate-arms`' cases are
+    // its refusal, pinned rather than observed: each must exit 2 on the refusal's first line, and any
+    // other outcome fails as an unpinned case would
+    fn pinned_refusal(name: &str, case: &std::path::Path, run: &Observation, linked: bool) -> bool {
+        if !linked || name != "check-crate-arms" {
+            return false;
+        }
+        let line = format!("{}: {}", name, crate_arms::LINKED_WORKTREE);
+        assert!(
+            run.rc == 2 && run.output.contains(&line),
+            "{} on {} in a linked worktree exited {} without the refusal '{}':\n{}",
+            name,
+            case.display(),
+            run.rc,
+            line,
+            run.output
+        );
+        println!("{} on {}: pinned as the linked-worktree refusal, not observed", name, case.display());
+        true
+    }
+
     #[test]
     fn every_registry_member_declares_the_roots_it_walks() {
         assert!(!REGISTRY.is_empty(), "no member to assert over");
         let _env = crate::knobenv::lock();
+        let linked = walk::main_checkout_root().is_some();
         let mut cases_run = 0usize;
         let mut roots_observed = 0usize;
         let mut prunes_held = 0usize;
@@ -2742,6 +2764,9 @@ mod tests {
                 // spawn as the --run-gate-tests arm sets it, so an observed root is the same string
                 // the gate would walk from the repo root in the battery.
                 let run = observe_in_case(name, &case);
+                if pinned_refusal(name, &case, &run, linked) {
+                    continue;
+                }
                 assert_ne!(
                     run.rc, 2,
                     "{} errored on {} — an observation taken from a run that never walked \
@@ -2836,11 +2861,15 @@ mod tests {
     fn every_registry_member_declares_the_programs_it_spawns() {
         assert!(!REGISTRY.is_empty(), "no member to assert over");
         let _env = crate::knobenv::lock();
+        let linked = walk::main_checkout_root().is_some();
         let mut cases_run = 0usize;
         let mut offenders: Vec<String> = Vec::new();
         for (name, _, _, _, _, declared) in REGISTRY {
             for case in walk::fixture_case_dirs(name) {
                 let run = observe_in_case(name, &case);
+                if pinned_refusal(name, &case, &run, linked) {
+                    continue;
+                }
                 assert_ne!(
                     run.rc, 2,
                     "{} errored on {} — an observation taken from a run that never spawned \
@@ -2869,6 +2898,7 @@ mod tests {
 
     struct Observation {
         rc: i32,
+        output: String,
         walked: Vec<String>,
         spawned: Vec<String>,
         pruned: Vec<String>,
@@ -2954,6 +2984,7 @@ mod tests {
         );
         Observation {
             rc: rcs[0],
+            output: output.into_owned(),
             walked,
             spawned,
             pruned,

@@ -27,7 +27,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    ```
    <!-- gate-roster:end -->
 
-   They resolve through gate-sdk's registry path and their `# graph:` manifests put them in the generated pre-commit hook, written by `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names.
+   They resolve through gate-sdk's registry path and the pre-commit hook runs those their `# graph:` manifests trigger, read at commit. `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names writes that hook once, and again only to add the commit-msg hook when a first `tier=commit-msg` gate is registered.
 
 2. Bind the protocol skill and add its resident pointer:
    - Create `.claude/commands/agent-execution.md` as a binding shim naming `templates/agent-execution.md` and binding its two slots — the shared-file roster and the validate battery ([SPEC.md §One template, a resident pointer](SPEC.md#one-template-a-resident-pointer)).

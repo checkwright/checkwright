@@ -26,7 +26,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/), then:
    ```
    <!-- gate-roster:end -->
 
-   It resolves through gate-sdk's registry path (your gates dir first, then each kit's `checks/`), and its `# graph:` manifest puts it in the generated pre-commit hook.
+   It resolves through gate-sdk's registry path (your gates dir first, then each kit's `checks/`), and the pre-commit hook runs it when its `# graph:` manifest triggers, read at commit.
 
    No guard script is copied: the shell guard, the optional wakeup-guard and escalation-guard are binary arms, wired by pointing a hook's `command` field at `bash gate-sdk/bin/run-gates.sh --hook shell-guard` (or `--hook wakeup-guard`, `--hook escalation-guard`). Where the binary is absent the front end fails open and the guard steers nothing.
 

@@ -693,7 +693,7 @@ mod tests {
         );
     }
 
-    // spec: gate-sdk/SPEC.md §Layout and configuration — under a subdirectory vendoring the hook,
+    // spec: gate-sdk/SPEC.md §Layout and configuration — under a subdirectory vendoring the hook arm,
     // `--for` and this gate expand a `kit:` couple to the repository path, and the kit-parent
     // spelling is the control proving the scratch tree tells the two spellings apart
     #[test]
@@ -721,29 +721,26 @@ mod tests {
         let gates_dir = format!("{}/scripts", repo);
         knobs.set("GATE_SDK_ROOT", &format!("{}/tools/gate-sdk", repo));
         knobs.set("GATE_SDK_GATES_DIR", &gates_dir);
-        knobs.set("GATE_SDK_HOOKS_DIR", &format!("{}/scripts/git-hooks", repo));
         knobs.remove("GATE_SDK_KIT_DIRS");
         crate::knobs::reset(&knobs);
 
-        type Seen = (String, Vec<String>, Vec<String>, Vec<String>, Vec<String>);
+        type Seen = (Vec<String>, Vec<String>, Vec<String>, Vec<String>, Vec<String>);
         let run = || -> Result<Seen, String> {
             let here = walk::kit_roots_at(&repo)?;
             let parent = walk::kit_roots_rel()?;
-            let hook = crate::emit::git_hooks::pre_commit(&repo, &gates_dir)?;
             let resolve_dirs = crate::registry::resolve_dirs(&gates_dir, &walk::kit_roots_abs()?);
+            let spec = vec!["tools/alpha/SPEC.md".to_string()];
+            let alpha = vec!["check-alpha".to_string()];
+            let names = |s: Vec<crate::runner::Selected>| -> Vec<String> { s.into_iter().map(|s| s.name).collect() };
+            let hook = names(crate::emit::git_hook::precommit_selection(&alpha, &resolve_dirs, &here, &spec, Path::new(&repo))?);
             let select = |roots: &[String]| -> Result<Vec<String>, String> {
-                let spec = "tools/alpha/SPEC.md".to_string();
-                Ok(crate::runner::select_for(&["check-alpha".to_string()], &resolve_dirs, roots, &[spec])
-                    .map_err(|c| format!("--for exited {}", c))?
-                    .into_iter()
-                    .map(|s| s.name)
-                    .collect())
+                Ok(names(crate::runner::select(&alpha, &resolve_dirs, roots, &spec, None)?.run))
             };
             let (selected, selected_parent) = (select(&here)?, select(&parent)?);
             Ok((hook, here, parent, selected, selected_parent))
         };
         let result = run();
-        for var in ["GATE_SDK_ROOT", "GATE_SDK_GATES_DIR", "GATE_SDK_HOOKS_DIR"] {
+        for var in ["GATE_SDK_ROOT", "GATE_SDK_GATES_DIR"] {
             knobs.remove(var);
         }
         crate::knobs::reset(&knobs);
@@ -752,11 +749,7 @@ mod tests {
         let (hook, here, parent, selected, selected_parent) = result.expect("the scratch tree resolves");
         let listing = listing.expect("the scratch tree lists");
 
-        assert!(
-            hook.contains("'tools/alpha/SPEC.md'"),
-            "the pre-commit emission does not match the member on its repository path:\n{}",
-            hook
-        );
+        assert_eq!(hook, vec!["check-alpha".to_string()], "the hook arm did not select the member on its repository path");
         assert_eq!(selected, vec!["check-alpha".to_string()], "--for did not select the member the hook runs");
         assert!(
             selected_parent.is_empty(),

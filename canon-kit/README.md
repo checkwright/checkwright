@@ -50,7 +50,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required); the queue-facing gate
    check-deprecation-task       # needs a deprecation-marker vocabulary
    ```
 
-   They resolve through gate-sdk's registry path (your gates dir first, then each kit's `checks/`), and their `# graph:` manifests put the precommit-tier ones in the generated hook, which `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names writes.
+   They resolve through gate-sdk's registry path (your gates dir first, then each kit's `checks/`), and the pre-commit hook runs the precommit-tier ones their `# graph:` manifests trigger, read at commit. `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names writes that hook once, and again only to add the commit-msg hook when a first `tier=commit-msg` gate is registered.
 
 2. Adopt the amendment lifecycle — copy `templates/SPEC-amendment.md` when a designed-but-unimplemented change needs a home. Name it after the feature (`SPEC-<feature>.md`), place it in the owning component's directory (a governance ruling with no component lives at the repo root), and pair it with a queue entry tagged `[spec: SPEC-<feature>.md]`. Merge it into the canonical spec and delete it when the work completes.
 

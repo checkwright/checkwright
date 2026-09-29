@@ -28,7 +28,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    ```
    <!-- gate-roster:end -->
 
-   Regenerate the hook + graph artifacts by running `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names.
+   The pre-commit hook runs the gates their `# graph:` manifests trigger, read at commit; `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names writes it once, and again only to add the commit-msg hook when a first `tier=commit-msg` gate is registered.
 
 2. Seed the two surfaces — `.workflow/validate-baseline.txt`:
 

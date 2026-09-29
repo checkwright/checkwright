@@ -799,14 +799,14 @@ jobs:
   # spec: installer/SPEC.md §The install boundary — the pwsh bootstrap's leg: parity and payload coverage
   # spec: installer/SPEC.md §The consumer smoke — its posture, derived per declared Windows triple
   install-smoke-pwsh-windows:
-    needs: native-artifacts-roster
+    needs: [native-artifacts, native-artifacts-roster]
     strategy:
       fail-fast: false
       matrix:
         include: ${{ fromJSON(needs.native-artifacts-roster.outputs.pwsh_legs) }}
     runs-on: ${{ matrix.runner }}
     continue-on-error: ${{ matrix.held }}
-    timeout-minutes: 45
+    timeout-minutes: 75
     permissions:
       contents: read
     env:
@@ -822,8 +822,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      # spec: installer/SPEC.md §The consumer smoke — the producer's upload, downloaded by pattern
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: gate-binary-*
+          path: ${{ runner.temp }}/native-artifacts
+
       # spec: installer/SPEC.md §The consumer smoke — each platform leg steers the roster at its host
-      - name: build an artifact and pack a payload for this host
+      - name: place the producer's upload and pack a payload for this host
         shell: bash
         run: |
           set -uo pipefail
@@ -833,20 +839,28 @@ jobs:
           host="$(rustc -vV | awk '/^host:/{print $2}')"
           [[ -n "$host" ]] || { echo "rustc reported no host triple, so the roster cannot be steered"; exit 2; }
           echo "host triple: $host"
-          crate="$(gate_native_crate)"
           bin="$(gate_native_bin)"; bin="${bin##*/}"
-          art="$tmp/artifacts/$host"
-          mkdir -p "$art"
-          bash gate-sdk/bin/build-native.sh || { echo "the crate would not build on this host"; exit 2; }
-          cp "$crate/target/release/$bin" "$art/$bin" || exit 2
-          ( cd "$art" && sha256sum "$bin" > "$bin.sha256" ) || exit 2
+          art="$tmp/native-artifacts"
+          for d in "$art"/gate-binary-*; do
+            [[ -d "$d" ]] || continue
+            mv "$d" "$art/${d##*/gate-binary-}"
+          done
+          [[ -f "$art/$host/$bin" && -f "$art/$host/$bin.sha256" ]] || {
+            echo "the producer uploaded no complete $host artifact — this leg"
+            echo "exercises a release-shaped artifact and has none to exercise."
+            exit 1
+          }
+          dest="$(gate_native_bin)"
+          mkdir -p "$(dirname "$dest")"
+          cp "$art/$host/$bin" "$dest" && chmod +x "$dest" || exit 2
+          echo "artifact name $dest, placed from the producer's $host upload"
           roster="$tmp/targets.list"
           printf '%s\n' "$host" > "$roster"
           version="$(git describe --tags --abbrev=0 2>/dev/null)"; version="${version#v}"
           [[ -n "$version" ]] || version="0.0.0-pwsh-smoke"
           GATE_SDK_NATIVE_TARGETS_FILE="$roster" INSTALLER_PACK_TMP_DIR="$tmp" \
             bash gate-sdk/bin/run-gates.sh --pack-installer --root "$PWD" --version "$version" \
-              --out "$tmp" --artifacts "$tmp/artifacts" || exit 2
+              --out "$tmp" --artifacts "$art" || exit 2
           shopt -s nullglob
           tarballs=("$tmp"/*.tgz)
           shopt -u nullglob
@@ -860,6 +874,9 @@ jobs:
             echo "PWSH_BIN=$bin"
             echo "PWSH_TARBALL=$(cygpath -w "${tarballs[0]}")"
             echo "PWSH_VERSION=$version"
+            echo "PWSH_ARTIFACTS=$(cygpath -w "$art")"
+            echo "PWSH_ROSTER=$(cygpath -w "$roster")"
+            echo "PWSH_TREE_BIN=$(cygpath -w "$PWD/$dest")"
           } >> "$GITHUB_ENV"
 
       # spec: installer/SPEC.md §The install boundary — each step asserted on the observable that distinguishes it
@@ -1049,7 +1066,7 @@ jobs:
           if ($script:fails -gt 0) { Write-Host "$($script:fails) assertion(s) failed"; exit 1 }
           Write-Host "the PowerShell bootstrap answered all five steps and carried an install end to end"
 
-      # spec: gate-sdk/SPEC.md §gen-pre-commit — the hooks stay POSIX sh on native Windows; this is the oracle
+      # spec: gate-sdk/SPEC.md §gen-pre-commit — the handoff hooks on native Windows; this is the oracle
       # comment-tier-exempt: the system directory is spared, its bash.exe being the WSL launcher
       - name: commit through the generated hooks with no bash on PATH
         shell: pwsh
@@ -1114,7 +1131,7 @@ jobs:
               Check "the printed '$($hooksLine -join ' ')' wired the hooks" `
                     ($icode -eq 0 -and (git config --get core.hooksPath)) "exit $icode -- $iout"
 
-              Write-Host "== step 3: a clean change commits through the sh hook git runs itself =="
+              Write-Host "== step 3: a clean change commits through the handoff hook git runs itself =="
               $head = git rev-parse HEAD
               [IO.File]::WriteAllText((Join-Path $consumer 'hooks-probe.txt'), "probe`n")
               git add hooks-probe.txt
@@ -1135,7 +1152,74 @@ jobs:
           } finally { Pop-Location }
 
           if ($script:fails -gt 0) { Write-Host "$($script:fails) assertion(s) failed"; exit 1 }
-          Write-Host "git ran the sh hooks with no bash on PATH, and they both passed and refused"
+          Write-Host "git ran the handoff hooks with no bash on PATH, and they both passed and refused"
+
+      # spec: gate-sdk/SPEC.md §gen-pre-commit — the standing witness that the hook needs the sh Git for Windows bundles
+      - name: probe whether git runs the handoff hook with its bundled sh renamed away
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (Test-Path Variable:PSNativeCommandArgumentPassing) { $PSNativeCommandArgumentPassing = 'Standard' }
+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) { $PSNativeCommandUseErrorActionPreference = $false }
+          $consumer = Join-Path $env:PWSH_SCRATCH 'init-consumer'
+          $gitRoot = Split-Path (Split-Path (Split-Path (& git --exec-path)))
+          Write-Host "Git for Windows install root: $gitRoot"
+          $shells = @(Get-ChildItem -LiteralPath $gitRoot -Recurse -Filter 'sh.exe' -File -ErrorAction SilentlyContinue)
+          if ($shells.Count -eq 0) { Write-Host "::error::no sh.exe under $gitRoot, so the probe has nothing to rename away"; exit 1 }
+          $hook = Join-Path $consumer ((git -C $consumer config --get core.hooksPath) + '/pre-commit')
+          Write-Host "== the hook under probe: $hook =="
+          Get-Content -LiteralPath $hook | ForEach-Object { Write-Host "  | $_" }
+          git -C $consumer reset -q --hard HEAD
+          $head = git -C $consumer rev-parse HEAD
+          $renamed = New-Object System.Collections.Generic.List[string]
+          try {
+              foreach ($s in $shells) {
+                  Rename-Item -LiteralPath $s.FullName -NewName ($s.Name + '.probe-away')
+                  $renamed.Add($s.FullName)
+                  Write-Host "  renamed away $($s.FullName)"
+              }
+              $left = @(Get-Command sh -CommandType Application -All -ErrorAction SilentlyContinue)
+              Write-Host "sh still on PATH: $(if ($left.Count) { $left.Source -join ', ' } else { '<none>' })"
+              [IO.File]::WriteAllText((Join-Path $consumer 'no-sh-probe.txt'), "probe`n")
+              git -C $consumer add no-sh-probe.txt
+              $out = (& git -C $consumer commit -m 'docs: probe the hook with no sh' 2>&1) -join "`n"
+              $code = $LASTEXITCODE
+          } finally {
+              foreach ($p in $renamed) { Rename-Item -LiteralPath ($p + '.probe-away') -NewName (Split-Path $p -Leaf) }
+              Write-Host "restored $($renamed.Count) sh.exe"
+          }
+          Write-Host "== git commit exited $code =="
+          Write-Host $out
+          $ran = $out -match 'gate\(s\) passed|failed \(see above\)'
+          Write-Host "the hook ran with the bundled sh renamed away: $(if ($ran) { 'yes' } else { 'no' })"
+          git -C $consumer reset -q --hard $head
+          if ($ran -or $code -eq 0) {
+              Write-Host "::error::git ran the handoff hook, or landed the commit, with every bundled sh.exe renamed away, so the hook's form on native Windows is an open question"
+              exit 1
+          }
+          Write-Host "git could not start the handoff hook without the sh it bundles, and refused the commit"
+
+      # spec: installer/SPEC.md §Platform resolution — the POSIX half's witness on this Windows host
+      - name: the POSIX bootstrap installs the lattice minimum on this Windows host
+        shell: bash
+        run: |
+          set -uo pipefail
+          tmp="$(cygpath -u "$RUNNER_TEMP")"
+          pkg="$(cygpath -u "$PWSH_PKG")"
+          minimum="$(awk -F'\t' '!/^#/ && NF == 2 { n[$1]++ } END { for (p in n) print n[p], p }' "$pkg/profiles.list" | sort -n | awk 'NR == 1 { print $2 }')"
+          [[ -n "$minimum" ]] || { echo "::error::the package's profiles.list names no profile"; exit 1; }
+          consumer="$tmp/posix-bootstrap-consumer"
+          rm -rf "$consumer" && mkdir -p "$consumer" || exit 2
+          git -C "$consumer" init -q
+          git -C "$consumer" config user.email 'smoke@example.invalid'
+          git -C "$consumer" config user.name 'posix bootstrap smoke'
+          out="$(cd "$consumer" && sh "$pkg/bin/checkwright.sh" init --profile "$minimum" 2>&1)"; rc=$?
+          printf '%s\n' "$out"
+          [[ "$rc" -eq 0 ]] || { echo "::error::sh installer/bin/checkwright.sh init --profile $minimum exited $rc"; exit 1; }
+          got="$(tr -d '\r' < "$consumer/checkwright.lock" | jq -r '.artifact.target')"
+          [[ "$got" == "$PWSH_TARGET" ]] \
+            || { echo "::error::the manifest records artifact target '$got' where this host is '$PWSH_TARGET'"; exit 1; }
+          echo "the POSIX bootstrap installed $minimum here and recorded the $PWSH_TARGET artifact"
 
       # spec: docs/site-architecture.md §Generated projections and their freshness gates — the install blocks
       - name: run the page's windows-install block against the packed tarball
@@ -1306,6 +1390,17 @@ jobs:
           if ($bad -gt 0) { exit 1 }
           Write-Host "5.1 reads the live one-liner as a string that parses, changed on comment lines only"
 
+      # spec: installer/SPEC.md §The consumer smoke — the Windows driver: init, battery, hooks, upgrade, uninstall
+      - name: consumer smoke under PowerShell
+        shell: pwsh
+        run: |
+          $smoke = @{
+              Package = $env:PWSH_PKG; Scratch = $env:PWSH_SCRATCH; Artifacts = $env:PWSH_ARTIFACTS
+              Roster = $env:PWSH_ROSTER; Version = $env:PWSH_VERSION; Target = $env:PWSH_TARGET
+              TreeBinary = $env:PWSH_TREE_BIN
+          }
+          ./installer/consumer-smoke/run-smoke.ps1 @smoke
+
   # spec: gate-sdk/SPEC.md §Consumer payload — the release-shaped producer: one build body, no cross-build
   # spec: installer/SPEC.md §The consumer smoke — the producer's matrix is the declaration, not the roster
   native-artifacts-roster:
@@ -1444,7 +1539,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  # spec: gate-sdk/SPEC.md §check-crate-arms — the test half on each Windows triple
+  # spec: gate-sdk/SPEC.md §check-crate-arms — the test half on each Windows triple, and the x64 entry's bash-hosted steps
   crate-tests-windows:
     needs: native-artifacts-roster
     strategy:
@@ -1453,7 +1548,7 @@ jobs:
         include: ${{ fromJSON(needs.native-artifacts-roster.outputs.pwsh_legs) }}
     runs-on: ${{ matrix.runner }}
     continue-on-error: ${{ matrix.held }}
-    timeout-minutes: 30
+    timeout-minutes: 45
     permissions:
       contents: read
     steps:
@@ -1501,6 +1596,212 @@ jobs:
         run: |
           set -o pipefail
           cargo test --release --manifest-path native/Cargo.toml --target "$TARGET" 2>&1 | tee "$RUNNER_TEMP/crate-tests.log"
+
+      # spec: gate-sdk/SPEC.md §run-gates — the twin's parity where a native-Windows adopter meets it
+      - name: front-end parity, bash stub against its PowerShell twin
+        if: ${{ !cancelled() && matrix.target == 'x86_64-pc-windows-msvc' }}
+        shell: bash
+        run: bash gate-sdk/bin/run-gates.sh --run-front-end-parity
+
+      # spec: guard-kit/SPEC.md §The hook on native Windows — the decision table under Git Bash is its oracle
+      - name: guard decision table under Git Bash
+        if: ${{ !cancelled() && matrix.target == 'x86_64-pc-windows-msvc' }}
+        shell: bash
+        run: bash gate-sdk/bin/run-gates.sh --run-guard-tests
+
+      # spec: guard-kit/SPEC.md §scratch-run — binding; reds unless both PowerShell hosts ran their cases
+      - name: scratch runner under both PowerShells
+        if: ${{ !cancelled() && matrix.target == 'x86_64-pc-windows-msvc' }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          source gate-sdk/lib/gate.sh
+          out="$(GATE_SDK_NATIVE_BIN="$PWD/$(gate_native_bin)" bash guard-kit/gate-tests/scratch-run.test.sh 2>&1)"
+          rc=$?
+          printf '%s\n' "$out"
+          [[ "$rc" -eq 0 ]] || exit "$rc"
+          grep -qF "PowerShell hosts run: pwsh powershell)" <<<"$out" || {
+            echo "::error::the scratch runner's PowerShell cases did not run under both pwsh and powershell"
+            exit 1
+          }
+
+      # spec: evidence-kit/SPEC.md §The producer-liveness lock — binding, against Get-Process as ground truth
+      - name: producer liveness over Windows process ids
+        if: ${{ !cancelled() && matrix.target == 'x86_64-pc-windows-msvc' }}
+        shell: bash
+        run: |
+          set +e
+          source gate-sdk/lib/gate.sh
+          # comment-tier-exempt: the binary, not the front end, whose --only folds a member's exit 2 into 1
+          bin="$(gate_native_bin)"
+          rec="$(cygpath -m "$(mktemp -d "${SMOKE_TMP:-/tmp}/liveness.XXXXXX")")"
+          ps_run() { MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL='*' "$@"; }
+          truth() {
+            [[ "$1" =~ ^[0-9]+$ ]] || { echo unknown; return; }
+            ps_run pwsh -NoProfile -Command "if (Get-Process -Id $1 -ErrorAction SilentlyContinue) { 'alive' } else { 'gone' }" | tr -d '\r'
+          }
+          # spec: evidence-kit/SPEC.md §The producer-liveness lock — ground truth keys a pid on its start time, so a reused pid reads as the stranger it is
+          started() {
+            [[ "$1" =~ ^[0-9]+$ ]] || { echo none; return; }
+            ps_run pwsh -NoProfile -Command "\$p = Get-Process -Id $1 -ErrorAction SilentlyContinue; if (-not \$p) { 'none' } else { try { \$p.StartTime.ToUniversalTime().Ticks } catch { 'unreadable' } }" | tr -d '\r'
+          }
+          ours() {
+            if [[ "$2" =~ ^[0-9]+$ && "$(started "$1")" == "$2" ]]; then echo alive; else echo gone; fi
+          }
+          gate() {
+            local out rc
+            out="$("$bin" check-producer-liveness "$1" 2>&1)"
+            rc=$?
+            printf '%s\n' "$out" | sed 's/^/    | /' >&2
+            echo "$rc"
+          }
+          wait_gone() {
+            [[ "$1" =~ ^[0-9]+$ ]] || return 1
+            for _ in $(seq 1 30); do [[ "$(ours "$1" "$2")" == gone ]] && return 0; sleep 1; done
+            return 1
+          }
+          wait_file() {
+            for _ in $(seq 1 60); do [[ -s "$1" ]] && return 0; sleep 1; done
+            return 1
+          }
+          pid_of() { sed -n 's/^pid=\([0-9]*\) .*/\1/p' "$1" 2>/dev/null; }
+          declare -A t1 g1 t2 g2 tpid gd1 gd2 born held2
+          winpids=()
+          # shellcheck disable=SC2329 # reached through the EXIT trap
+          cleanup() {
+            [[ -n "$apid" ]] && kill "$apid" 2>/dev/null
+            for p in "${winpids[@]}"; do
+              ps_run pwsh -NoProfile -Command "Stop-Process -Id $p -Force -ErrorAction SilentlyContinue" >/dev/null 2>&1
+            done
+          }
+          trap cleanup EXIT
+
+          echo "== launch =="
+          sleep 300 >/dev/null 2>&1 &
+          apid=$!
+          printf 'pid=%s run=msys\n' "$apid" > "$rec/a.run"
+          # shellcheck disable=SC2016 # $PID and the backtick escape are PowerShell's
+          write_b='Set-Content -NoNewline -Path %s -Value "pid=$PID run=%s`n"; Start-Sleep 300'
+          # shellcheck disable=SC2059 # the format is the PowerShell command template above
+          ps_run pwsh -NoProfile -Command "$(printf "$write_b" "'$rec/b.run'" pwsh)" </dev/null >/dev/null 2>&1 &
+          # shellcheck disable=SC2059
+          ps_run powershell -NoProfile -Command "$(printf "$write_b" "'$rec/bp.run'" powershell)" </dev/null >/dev/null 2>&1 &
+          cpid="$(ps_run pwsh -NoProfile -Command '(Start-Process pwsh -ArgumentList "-NoProfile","-Command","Start-Sleep 300" -PassThru -WindowStyle Hidden).Id' </dev/null | tr -d '\r\n')"
+          printf 'pid=%s run=detached\n' "$cpid" > "$rec/c.run"
+          for r in b bp; do
+            wait_file "$rec/$r.run" || echo "row ($r): no record appeared within 60s"
+            echo "row ($r) record bytes:"; od -c "$rec/$r.run" 2>&1 | head -n 3
+            tpid[$r]="$(pid_of "$rec/$r.run")"
+          done
+          tpid[c]="$cpid"
+          for p in "${tpid[b]}" "${tpid[bp]}" "${tpid[c]}"; do [[ -n "$p" ]] && winpids+=("$p"); done
+          echo "rows (b) (bp) (c): windows pids ${tpid[b]:-<none>} ${tpid[bp]:-<none>} ${tpid[c]:-<none>}"
+
+          echo "== row (d): PowerShell's default writes, naming the live pid ${tpid[b]:-<none>} =="
+          for sh in pwsh powershell; do
+            ps_run "$sh" -NoProfile -Command "Set-Content -Path '$rec/d-$sh-setcontent.run' -Value 'pid=${tpid[b]} run=default'" </dev/null
+            ps_run "$sh" -NoProfile -Command "'pid=${tpid[b]} run=default' > '$rec/d-$sh-redirect.run'" </dev/null
+          done
+          for f in "$rec"/d-*.run; do echo "$(basename "$f"):"; od -c "$f" | head -n 4; done
+
+          # comment-tier-exempt: a winpid read right after the & can name the forked stub, so it is re-read
+          for _ in $(seq 1 10); do
+            tpid[a]="$(tr -d '\r\n' < "/proc/$apid/winpid" 2>/dev/null)"
+            [[ "$(truth "${tpid[a]}")" == alive ]] && break
+            sleep 1
+          done
+          echo "row (a): msys pid $apid, windows pid ${tpid[a]:-<unread>}"
+
+          echo "== reading 1, every process running =="
+          for r in a b bp c; do
+            born[$r]="$(started "${tpid[$r]}")"
+            t1[$r]="$(ours "${tpid[$r]}" "${born[$r]}")"; g1[$r]="$(gate "$rec/$r.run")"
+            echo "($r) truth=${t1[$r]} (start ${born[$r]}) gate=${g1[$r]}"
+          done
+          for f in "$rec"/d-*.run; do
+            d="$(basename "$f")"; gd1[$d]="$(gate "$f")"
+            echo "(d) $d truth=$(truth "${tpid[b]}") gate=${gd1[$d]}"
+          done
+
+          echo "== stop =="
+          kill "$apid" 2>/dev/null; wait "$apid" 2>/dev/null
+          for r in b bp c; do
+            [[ -n "${tpid[$r]}" ]] && ps_run pwsh -NoProfile -Command "Stop-Process -Id ${tpid[$r]} -Force -ErrorAction SilentlyContinue" </dev/null
+          done
+          for r in a b bp c; do
+            [[ -n "${tpid[$r]}" ]] || continue
+            wait_gone "${tpid[$r]}" "${born[$r]}" || echo "($r) ground truth still not gone after 30s"
+          done
+
+          echo "== reading 2, every process stopped =="
+          # spec: evidence-kit/SPEC.md §The producer-liveness lock — the accepted PID-reuse case: whatever holds the record's pid around the gate's read owes held
+          declare -A rpid=([a]="$apid" [b]="${tpid[b]}" [bp]="${tpid[bp]}" [c]="${tpid[c]}")
+          for r in a b bp c; do
+            t2[$r]="$(ours "${tpid[$r]}" "${born[$r]}")"
+            held2[$r]=unstable
+            for _ in 1 2 3 4 5; do
+              h1="$(truth "${rpid[$r]}")"; g2[$r]="$(gate "$rec/$r.run")"; h2="$(truth "${rpid[$r]}")"
+              [[ "$h1" == "$h2" ]] && { held2[$r]="$h1"; break; }
+            done
+            echo "($r) truth=${t2[$r]}; record pid ${rpid[$r]:-<none>} read ${held2[$r]} around the gate; gate=${g2[$r]}"
+          done
+          for f in "$rec"/d-*.run; do
+            d="$(basename "$f")"; gd2[$d]="$(gate "$f")"
+            echo "(d) $d truth=$(truth "${tpid[b]}") gate=${gd2[$d]}"
+          done
+
+          echo "== row (e): a job's process once its session exits =="
+          # shellcheck disable=SC2016
+          write_e='Start-Job { Set-Content -NoNewline -Path %s -Value "$PID"; Start-Sleep 300 } | Out-Null; Start-Sleep 10'
+          # shellcheck disable=SC2059
+          ps_run pwsh -NoProfile -Command "$(printf "$write_e" "'$rec/job.pid'")" </dev/null >/dev/null 2>&1
+          epid="$(tr -d '\r\n' < "$rec/job.pid" 2>/dev/null)"
+          [[ -n "$epid" ]] && winpids+=("$epid")
+          e_outcome="unmeasured: the job wrote no pid"
+          if [[ -n "$epid" ]]; then
+            e_outcome=alive
+            start=$SECONDS
+            while (( SECONDS - start <= 15 )); do
+              [[ "$(truth "$epid")" == gone ]] && { e_outcome="gone ($((SECONDS - start))s after its session exited)"; break; }
+              sleep 1
+            done
+          fi
+          echo "(e) job pid ${epid:-<none>} truth=$e_outcome"
+
+          echo "== verdict =="
+          misread=0
+          for r in a b bp c; do
+            want2=0
+            [[ "${held2[$r]}" == alive ]] && want2=1
+            if [[ "${t1[$r]}" != alive || "${t2[$r]}" != gone ]]; then
+              echo "::error::row ($r) measured nothing: ground truth read ${t1[$r]} then ${t2[$r]}"
+              misread=1
+            elif [[ "${held2[$r]}" == unstable ]]; then
+              echo "::error::row ($r) measured nothing: pid ${rpid[$r]} changed holder around each of 5 gate reads"
+              misread=1
+            elif [[ "${g1[$r]}" != 1 || "${g2[$r]}" != "$want2" ]]; then
+              echo "::error::row ($r) misread: gate ${g1[$r]} alive, ${g2[$r]} gone, where 1 then $want2 is owed"
+              misread=1
+            else
+              echo "row ($r): held then free, as owed"
+            fi
+          done
+          dn=0
+          for d in "${!gd1[@]}"; do
+            dn=$((dn + 1))
+            if [[ "${gd1[$d]}" != 2 || "${gd2[$d]}" != 2 ]]; then
+              echo "::error::row (d) $d read ${gd1[$d]} then ${gd2[$d]}, where corrupt (2) is owed"
+              misread=1
+            fi
+          done
+          (( dn == 4 )) || { echo "::error::row (d) wrote $dn of its 4 records"; misread=1; }
+          if [[ "$e_outcome" == gone* ]]; then
+            echo "row (e): a job's process is $e_outcome, so a job is no backgrounding form"
+          else
+            echo "::error::row (e): a job's process is $e_outcome, so a job outlives its session"
+            misread=1
+          fi
+          exit "$misread"
 
       - name: annotate the failing tests for ${{ matrix.target }}
         if: failure()

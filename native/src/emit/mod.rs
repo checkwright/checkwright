@@ -25,6 +25,7 @@ pub mod file_survey;
 pub mod footprint;
 pub mod foreign_shells;
 pub mod front_end_parity;
+pub mod git_hook;
 pub mod git_hooks;
 pub mod graph;
 pub mod install_evidence;
@@ -744,6 +745,14 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--install-hooks",
         Arm::Run(install_hooks::run),
         install_hooks::KNOBS,
+    ),
+    // spec: gate-sdk/SPEC.md §git-hook — an `Arm::Run` because its 1, a member's red, is the status
+    // git refuses the commit on; its caller is git through the generated hooks, so it is no
+    // harness-integration arm and does not fail open
+    (
+        "--git-hook",
+        Arm::Run(git_hook::run),
+        git_hook::KNOBS,
     ),
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — an `Arm::Run` because the exit contract
     // is three-state and every code is load-bearing: 0 a stamp or a reported no-op, 1 a refusal,

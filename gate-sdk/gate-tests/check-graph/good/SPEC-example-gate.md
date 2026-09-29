@@ -1,7 +1,7 @@
 # SPEC-example-gate — amendment fixture (good)
 
 Every shape assertion G must accept, one per branch it can clear: the four
-required keys alone, the full seven-key form with every optional value legal, a
+required keys alone, the full six-key form with every optional value legal, a
 `kit:<glob>` couples token, a `*` trigger, two manifests on one line, a manifest
 inside a non-`proto` fence, a `# graph:` span carrying no manifest key at all,
 and the two spans the extractor must not read as manifests in the first place.
@@ -14,7 +14,7 @@ and the two spans the extractor must not read as manifests in the first place.
       existence is not required, only glob syntax.
 - [ ] `check-two-gate.sh` (`# graph: couples=docs/two.md dir=one valve=none tier=precommit`) and `check-three-gate.sh` (`# graph: couples=docs/three.md dir=bi valve=PROPOSED tier=align-only`) land together — two manifests on one line, and the second must be validated as well as the first.
 - [ ] `check-full-gate.sh` carries every optional key at a legal value
-      (`# graph: couples=kit:checks/*.sh,scripts/gates.list trigger=* dir=bi valve=PROPOSED tier=commit-msg mode=whole-tree gen=manual`) —
+      (`# graph: couples=kit:checks/*.sh,scripts/gates.list trigger=* dir=bi valve=PROPOSED tier=commit-msg mode=whole-tree`) —
       the `kit:` prefix validates on its glob part, and a `*` trigger is exempt
       from token validation because it covers every surface.
 

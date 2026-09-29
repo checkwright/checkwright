@@ -51,8 +51,9 @@ pub const USAGE: &str = r#"usage: run-gates.sh [gates-dir]                run ev
           gate, which requires the selection to resolve to exactly one member:
           two or more with a `--` is a refusal, never a broadcast.
   --for   selects by coupling: every gate whose effective trigger matches one
-          of the given repo-relative paths, exactly as the generated hook
-          would. A path no gate couples to is a note, not a failure.
+          of the given repo-relative paths. The generated hooks' --git-hook
+          arm calls the same selector. A path no gate couples to is a note,
+          not a failure.
   --emit  dispatches the named non-gate arm of the native binary, handing it
           every remaining argument.
   --hook  dispatches the named harness hook member: the harness payload passes
@@ -174,15 +175,15 @@ pub const KNOBS: &[&str] = &[
 // `--only`'s `--` separator under a single-member selection. Empty under a bare run.
 pub(crate) struct Selected {
     pub(crate) name: String,
-    args: Vec<String>,
+    pub(crate) args: Vec<String>,
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — one member's finished run, buffered so the flush can be in
 // registry order rather than completion order
-struct Outcome {
+pub(crate) struct Outcome {
     tail: String,
-    output: Vec<u8>,
-    failed: bool,
+    pub(crate) output: Vec<u8>,
+    pub(crate) failed: bool,
     ms: u128,
 }
 
@@ -309,17 +310,15 @@ fn jobs() -> usize {
         .unwrap_or(1)
 }
 
-// spec: gate-sdk/SPEC.md §run-gates — `pathspec_matches`: a `mode=staged` member's hook branch
-// selects by git pathspec, the exact path or a subtree under it, which is a second mechanism beside
-// the glob matcher and is reproduced rather than folded into it
+// spec: gate-sdk/SPEC.md §run-gates — a `mode=staged` member selects by git pathspec, the exact
+// path or a subtree under it, a second mechanism beside the glob matcher
 fn pathspec_matches(p: &str, globs: &[&str]) -> bool {
     globs
         .iter()
         .any(|g| walk::pattern_match(g, p) || walk::pattern_match(&format!("{}/*", g), p))
 }
 
-// spec: gate-sdk/SPEC.md §run-gates — `gate_staged_matches`: a POSIX `case` pattern over the
-// trigger globs, the matcher the generated hook's `staged_matches` splices from the same body
+// spec: gate-sdk/SPEC.md §Reading a `couples=` field's reach — the one matcher
 fn staged_matches(p: &str, globs: &[&str]) -> bool {
     globs.iter().any(|g| registry::couple_matches(p, g))
 }
@@ -331,43 +330,50 @@ fn manifest(src: &str) -> Vec<(String, String)> {
         .unwrap_or_default()
 }
 
-// spec: gate-sdk/SPEC.md §run-gates — `--for` selection: every member whose effective trigger
-// (`trigger=` else `couples=`, kit-expanded, then its derived couples) matches a given path,
-// exactly as the generated hook would; an uncovered path is a note on stdout, never a failure.
-pub(crate) fn select_for(
+// spec: gate-sdk/SPEC.md §run-gates — one selection over a path set, and which paths it covered
+pub(crate) struct Selection {
+    pub(crate) run: Vec<Selected>,
+    pub(crate) covered: Vec<bool>,
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — the selector `--for` and the hook arm share. `tier` is the hook
+// arm's filter, under which a member resolving nowhere is selected for its dispatch to red
+// (§git-hook), where `--for` refuses it.
+pub(crate) fn select(
     members: &[String],
     resolve_dirs: &[String],
     kit_roots_here: &[String],
     paths: &[String],
-) -> Result<Vec<Selected>, i32> {
+    tier: Option<&str>,
+) -> Result<Selection, String> {
     let mut covered = vec![false; paths.len()];
     let mut run: Vec<Selected> = Vec::new();
     for name in members {
-        let src = match registry::resolve(name, resolve_dirs) {
-            Some(s) => s,
-            None => {
-                eprintln!(
-                    "{}: --for cannot resolve '{}' in: {}",
-                    TOOL,
-                    name,
-                    resolve_dirs.join(" ")
-                );
-                return Err(2);
+        let src = match (registry::resolve(name, resolve_dirs), tier) {
+            (Some(s), _) => s,
+            (None, Some(_)) => {
+                run.push(Selected {
+                    name: name.clone(),
+                    args: Vec::new(),
+                });
+                continue;
+            }
+            (None, None) => {
+                return Err(format!("cannot resolve '{}' in: {}", name, resolve_dirs.join(" ")));
             }
         };
         let f = manifest(&src);
+        if tier.is_some_and(|t| registry::field(&f, "tier") != t) {
+            continue;
+        }
         let trigger = registry::effective_trigger(&f);
         // spec: gate-sdk/SPEC.md §Fail-closed contract — an unresolvable couples token is exit 2,
         // never a narrower selection: a silently lost trigger is a gate the selector stops running.
-        let trigger = registry::expand_couples(&trigger, kit_roots_here).map_err(|e| {
-            eprintln!("{}: --for cannot expand {}'s trigger: {}", TOOL, name, e);
-            2
-        })?;
+        let trigger = registry::expand_couples(&trigger, kit_roots_here)
+            .map_err(|e| format!("cannot expand {}'s trigger: {}", name, e))?;
         let mode = registry::field(&f, "mode");
-        let derived = registry::derived_couples(name, resolve_dirs).map_err(|e| {
-            eprintln!("{}: --for cannot derive {}'s knob files: {}", TOOL, name, e);
-            2
-        })?;
+        let derived = registry::derived_couples(name, resolve_dirs)
+            .map_err(|e| format!("cannot derive {}'s knob files: {}", name, e))?;
         let mut globs: Vec<&str> = trigger.split(',').filter(|g| !g.is_empty()).collect();
         globs.extend(derived.iter().map(String::as_str));
         if trigger == "*" {
@@ -410,12 +416,27 @@ pub(crate) fn select_for(
             });
         }
     }
-    for (i, p) in paths.iter().enumerate() {
-        if !covered[i] {
+    Ok(Selection { run, covered })
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — `--for`: the selection, and an uncovered path as a note on
+// stdout, never a failure
+fn select_for(
+    members: &[String],
+    resolve_dirs: &[String],
+    kit_roots_here: &[String],
+    paths: &[String],
+) -> Result<Vec<Selected>, i32> {
+    let s = select(members, resolve_dirs, kit_roots_here, paths, None).map_err(|e| {
+        eprintln!("{}: --for {}", TOOL, e);
+        2
+    })?;
+    for (p, c) in paths.iter().zip(&s.covered) {
+        if !c {
             println!("{}: no registered gate couples to {}", TOOL, p);
         }
     }
-    Ok(run)
+    Ok(s.run)
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — `--only` selection: set-shaped and registry-ordered, so two
@@ -473,15 +494,17 @@ fn select_only(
         .collect())
 }
 
-struct Dispatch<'a> {
-    resolve_dirs: &'a [String],
-    self_exe: &'a str,
-    list: &'a str,
-    scratch: &'a Path,
+pub(crate) struct Dispatch<'a> {
+    pub(crate) resolve_dirs: &'a [String],
+    pub(crate) self_exe: &'a str,
+    pub(crate) list: &'a str,
+    pub(crate) scratch: &'a Path,
     // spec: gate-sdk/SPEC.md §run-gates — resolved once for the run rather than per red member: the
     // value is a knob read, and a battery reddening at scale would otherwise buy the same answer
     // once per failure
-    spec_base_url: &'a str,
+    pub(crate) spec_base_url: &'a str,
+    // spec: gate-sdk/SPEC.md §git-hook — added to each child's environment; the battery adds nothing
+    pub(crate) env: &'a [(String, String)],
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — the invariant line's reserved prefix, held here because the
@@ -559,7 +582,7 @@ fn resolved_location(path: &str, frag: &str, base: &str) -> (String, bool) {
 
 // spec: gate-sdk/SPEC.md §run-gates — one member, run as a child process; the in-process call is
 // refused there, on the declared-knob discipline, fault isolation and the surviving `.sh` members
-fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome {
+pub(crate) fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome {
     let started = Instant::now();
     // spec: gate-sdk/SPEC.md §run-gates — the invariant rides the `tail` field rather than a second
     // Outcome field: the flush already writes the tail with `writeln!`, so a multi-line value needs
@@ -622,7 +645,7 @@ fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome {
         );
     }
     let capture = d.scratch.join(format!("c{}", idx));
-    match proc::dispatch(&program, &args, &tmpdir, &capture) {
+    match proc::dispatch(&program, &args, &tmpdir, &capture, d.env) {
         Err(e) => fail(
             "dispatch harness error, exit 2",
             e,
@@ -757,8 +780,8 @@ pub fn run(args: &[String]) -> i32 {
             Err(c) => return c,
         }
     } else if !parsed.paths.is_empty() {
-        // spec: gate-sdk/SPEC.md §run-gates — the hook's spelling of the kit roots, relative to the
-        // working directory the door set to the toplevel, since the given paths are repo-relative
+        // spec: gate-sdk/SPEC.md §run-gates — the kit roots relative to the working directory the door
+        // set to the toplevel, since the given paths are repo-relative
         let kit_roots_here = match walk::kit_roots() {
             Ok(v) => v,
             Err(e) => {
@@ -832,6 +855,7 @@ pub fn run(args: &[String]) -> i32 {
         list: &list,
         scratch: &scratch,
         spec_base_url: &spec_base_url,
+        env: &[],
     };
 
     let sarif_path = std::env::var(sarif::KNOB).unwrap_or_default();
@@ -905,7 +929,7 @@ pub fn run(args: &[String]) -> i32 {
     code
 }
 
-fn trim_trailing_newlines(b: &[u8]) -> &[u8] {
+pub(crate) fn trim_trailing_newlines(b: &[u8]) -> &[u8] {
     let mut end = b.len();
     while end > 0 && b[end - 1] == b'\n' {
         end -= 1;
@@ -1029,102 +1053,25 @@ mod tests {
         assert!(!line.contains("FAIL: check-"));
     }
 
-    // spec: gate-sdk/SPEC.md §The port-candidate criteria — the criterion-6 discharge for the
-    // `staged_matches` twin the port created: one canned corpus of glob/path pairs put to
-    // `gate_staged_matches` and to this matcher, verdicts compared byte for byte.
+    // spec: gate-sdk/SPEC.md §Reading a `couples=` field's reach — POSIX `case` matching: `*` and
+    // `?` cross `/`, a bracket expression, a leading `*`, and an exact path matching only itself
     #[test]
-    fn the_staged_matcher_agrees_with_the_shell_library_on_a_canned_corpus() {
-        let globs: &[&[&str]] = &[
-            &["docs/*.md"],
-            &["docs/*"],
-            &["*.md"],
-            &["*"],
-            &["kit/**/x.rs"],
-            &["a?c/*.txt"],
-            &["[ab]lpha/*"],
-            &["[!ab]lpha/*"],
-            &["docs/index.md"],
-            &["scripts/*.sh", "kit/*.sh"],
-            &["docs/*.md", "nothing/at/all"],
-        ];
-        let paths = [
-            "docs/index.md",
-            "docs/a/b.md",
-            "docs",
-            "docsx/index.md",
-            "README.md",
-            "kit/deep/x.rs",
-            "kit/x.rs",
-            "abc/one.txt",
-            "ac/one.txt",
-            "alpha/one",
-            "blpha/one",
-            "clpha/one",
-            "scripts/run.sh",
-            "kit/run.sh",
-            "",
-        ];
-
-        let mut corpus = String::new();
-        let mut mine: Vec<bool> = Vec::new();
-        for g in globs {
-            for p in paths {
-                corpus.push('P');
-                corpus.push_str(p);
-                for one in *g {
-                    corpus.push('\t');
-                    corpus.push_str(one);
-                }
-                corpus.push('\n');
-                mine.push(staged_matches(p, g));
-            }
-        }
-
-        let lib = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("..")
-            .join("gate-sdk/lib/gate.sh");
-        // spec: gate-sdk/SPEC.md §The port-candidate criteria — each record carries a `P` sentinel
-        // ahead of the path, because `read` will not hand back an empty leading field and the empty
-        // path is a corpus row the two matchers must be compared on like any other
-        let script = concat!(
-            "source \"$1\"; ",
-            "while IFS=$'\\t' read -ra f; do ",
-            "  staged_all=\"${f[0]#P}\"; ",
-            "  if gate_staged_matches \"${f[@]:1}\"; then echo 1; else echo 0; fi; ",
-            "done"
-        );
-        let out = crate::proc::run_with_stdin(
-            &programs::BASH,
-            &["-c", script, "bash", &lib.display().to_string()],
-            corpus.as_bytes(),
-        )
-        .expect("cannot run the shell matcher");
-        let body = out
-            .stdout()
-            .expect("the shell matcher exited non-zero over the canned corpus");
-        let theirs: Vec<bool> = String::from_utf8_lossy(body)
-            .lines()
-            .map(|l| l.trim() == "1")
-            .collect();
-
-        assert_eq!(
-            theirs.len(),
-            mine.len(),
-            "the shell matcher answered {} of {} corpus rows",
-            theirs.len(),
-            mine.len()
-        );
-        let mut i = 0;
-        for g in globs {
-            for p in paths {
-                assert_eq!(
-                    mine[i], theirs[i],
-                    "the two staged matchers disagree on path {:?} against globs {:?}:                      the crate says {} and gate_staged_matches says {}",
-                    p, g, mine[i], theirs[i]
-                );
-                i += 1;
-            }
-        }
+    fn the_staged_matcher_reads_a_pattern_as_posix_case_matching() {
+        assert!(staged_matches("docs/a/b.md", &["docs/*.md"]));
+        assert!(staged_matches("kit/deep/x.rs", &["kit/*.rs"]));
+        assert!(staged_matches("abc/one.txt", &["a?c/*.txt"]));
+        assert!(!staged_matches("ac/one.txt", &["a?c/*.txt"]));
+        assert!(staged_matches("alpha/one", &["[ab]lpha/*"]));
+        assert!(!staged_matches("clpha/one", &["[ab]lpha/*"]));
+        assert!(staged_matches("clpha/one", &["[!ab]lpha/*"]));
+        assert!(staged_matches("vendor/scripts/run.sh", &["*scripts/*.sh"]));
+        assert!(staged_matches("README.md", &["*.md"]));
+        assert!(staged_matches("docs/index.md", &["docs/index.md"]));
+        assert!(!staged_matches("docs/index.mdx", &["docs/index.md"]));
+        assert!(!staged_matches("docs", &["docs/*"]));
+        assert!(staged_matches("kit/run.sh", &["scripts/*.sh", "kit/*.sh"]));
+        assert!(!staged_matches("", &["docs/*.md", "nothing/at/all"]));
+        assert!(staged_matches("", &["*"]));
     }
 
     // spec: gate-sdk/SPEC.md §run-gates — a `mode=staged` member matches by pathspec, the exact

@@ -335,20 +335,6 @@ gate_check_dirs() {
     done <<<"$roots"
 }
 
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the staged-path matcher the emitted pre-commit hook splices verbatim, so its body is POSIX sh: true when a line of the caller's newline-separated staged_all matches one of the given globs as a `case` pattern (`*` spans '/').
-# shellcheck disable=SC2154  # staged_all is the caller's newline-separated staged set
-gate_staged_matches() {
-    while IFS= read -r _gsm_f; do
-        for _gsm_pat in "$@"; do
-            # shellcheck disable=SC2254
-            case "$_gsm_f" in $_gsm_pat) return 0 ;; esac
-        done
-    done <<_CHECKWRIGHT_STAGED_
-$staged_all
-_CHECKWRIGHT_STAGED_
-    return 1
-}
-
 # spec: gate-sdk/SPEC.md §check-commit-msg — resolve the banned-pattern file set shared by check-commit-msg and check-tree-terms: explicit positional args win; otherwise GATE_SDK_MSG_PATTERN_FILES (tracked, must exist — fail-closed) plus GATE_SDK_MSG_PATTERN_FILES_LOCAL (gitignored, skipped when absent). Both are whitespace lists split with no expansion. Emits one existing readable file path per line; returns 2 when a required tracked file is missing.
 gate_msg_pattern_files() {
     if [[ $# -gt 0 ]]; then

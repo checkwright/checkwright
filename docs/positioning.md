@@ -46,7 +46,7 @@ The kit-injected always-loaded blocks (each kit's `<!-- kit:begin -->` / `<!-- k
 Two honest limits:
 
 - **Settings stay Claude-Code-native.** The settings pins, the session-context hook wiring, and memory-off enforcement remain Claude Code's — no standard cross-harness settings surface exists to port them to. This is the residue the claim above names as harness-native.
-- **Generated trigger lists carry default literals.** The generated pre-commit hook's per-gate trigger lists come from the gates' `# graph:` manifests, which carry the default `CLAUDE.md` literal. A nondefault agent file means adjusting the affected `# graph:` trigger lines and regenerating the hook, or relying on full-battery runs (the gate binary's `--run`), which read the knobs and are agent-file-agnostic.
+- **Trigger lists carry default literals.** The gates' `# graph:` manifests carry the default `CLAUDE.md` literal, and the pre-commit hook's selection and the graph artifact's trigger lists both read them. A nondefault agent file means adjusting the affected `# graph:` trigger lines and regenerating the graph artifact, or relying on full-battery runs (the gate binary's `--run`), which read the knobs and are agent-file-agnostic.
 
 ## The memory-off position
 

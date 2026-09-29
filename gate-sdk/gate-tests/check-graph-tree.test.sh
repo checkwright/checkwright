@@ -2,7 +2,7 @@
 # Behavioral test of check-graph's whole-registry path — assertions A (manifest
 # well-formedness), B (couples<->trigger parity), C (the cycle-valve rule),
 # D (pre-commit + commit-msg hook freshness), E (graph-artifact freshness) and
-# F (emitted asset hrefs resolve), and the `gen=manual` round-trip. None is
+# F (emitted asset hrefs resolve), and the retired `gen=` field. None is
 # reachable from the good/bad pair: the pair's cwd is a case dir and a `good/`
 # case must exit 0, while D and E always run on the full path, so satisfying D
 # from a case dir would need a committed byte-copy of the real repo's generated
@@ -148,7 +148,7 @@ want_red c-no-leading "check-epsilon is a dir=bi bijection with no leading desig
 # --- assertion D: both generated hooks -----------------------------------------
 seed; regen || true
 printf '# hand-edited\n' >>"$repo/scripts/git-hooks/pre-commit"
-run; want_red d-hook-stale "scripts/git-hooks/pre-commit is stale"
+run; want_red d-hook-stale "scripts/git-hooks/pre-commit is not its emitter's handoff"
 
 seed; regen || true
 rm -f "$repo/scripts/git-hooks/pre-commit"
@@ -156,7 +156,7 @@ run; want_red d-hook-absent "scripts/git-hooks/pre-commit does not exist"
 
 seed; regen || true
 printf '# hand-edited\n' >>"$repo/scripts/git-hooks/commit-msg"
-run; want_red d-msg-hook-stale "scripts/git-hooks/commit-msg is stale"
+run; want_red d-msg-hook-stale "scripts/git-hooks/commit-msg is not its emitter's handoff"
 
 # --- assertion E: the graph artifact -------------------------------------------
 seed; regen || true
@@ -186,40 +186,15 @@ regen || true; run
 want_green f-asset-href-resolves
 unset GATE_SDK_GRAPH_THEME_DIR
 
-# --- gen=manual: the placeholder, the round-trip, and a region edited in place ---
-manual_member() {
-    seed
-    printf 'check-eta\n' >>"$repo/scripts/gates.list"
-    member check-eta 'couples=docs/site.md trigger=docs/*.md dir=one valve=none tier=precommit gen=manual'
-}
-hook="$repo/scripts/git-hooks/pre-commit"
-todo='    # TODO: fill this manual region, then re-run --emit'
-
-manual_member; regen || true; run
-if ! grep -qxF -- "$todo" "$hook" || ! grep -qxF '# >>> manual: check-eta' "$hook" \
-    || ! grep -qxF '# <<< manual: check-eta' "$hook"; then
-    echo "  FAIL [manual-placeholder]: the hook lacks the sentinels around the TODO line"; fails=$((fails + 1))
-fi
-want_green manual-placeholder
-
-manual_member; regen || true
-filled="$(awk -v todo="$todo" '$0 == todo { print "    echo hand-filled"; print ""; print "    run_gate check-eta scripts/check-eta.sh"; next } { print }' "$hook")"
-printf '%s\n' "$filled" >"$hook"
-before="$(cat "$hook")"
+# --- the retired gen= field: a manifest still carrying it reds, naming the migration
+seed
+member check-alpha 'couples=scripts/gates.list trigger=* dir=one valve=none tier=precommit gen=bespoke'
 regen || true; run
-if ! grep -qxF '    echo hand-filled' "$hook" || [[ "$(cat "$hook")" != "$before" ]]; then
-    echo "  FAIL [manual-round-trip]: a second --write did not carry the filled region back byte for byte"; fails=$((fails + 1))
-fi
-want_green manual-round-trip
-
-manual_member; regen || true
-edited="$(awk -v todo="$todo" '$0 == todo { print "    echo edited-in-place"; next } { print }' "$hook")"
-printf '%s\n' "$edited" >"$hook"
-run; want_green manual-stale-region
+want_red a-gen-retired "carries gen=, which is retired"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-graph-tree.test: $fails case(s) failed"
     exit 1
 fi
-echo "check-graph-tree.test: ok (constructed consumer tree: A/B/C/D/E/F, both declaration spellings, 4 parity branches, 3 cycle-valve branches, the gen=manual round-trip, 18 cases)"
+echo "check-graph-tree.test: ok (constructed consumer tree: A/B/C/D/E/F, both declaration spellings, 4 parity branches, 3 cycle-valve branches, the retired gen= field, 16 cases)"
 exit 0
