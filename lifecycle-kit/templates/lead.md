@@ -14,6 +14,8 @@ The session-context hook reads it on each re-fire and suppresses its executor-fa
 
 Then open your resume journal with `--enter-stage --open-lead-journal` on the gate binary `GATE_SDK_NATIVE_BIN` names before writing to it; never overwrite the file.
 
+Then read the model roster: run `--price-coverage` on the gate binary `GATE_SDK_NATIVE_BIN` names (drift-kit/SPEC.md §The price-coverage arm; without drift-kit, skip this). An id it names unpriced is a harness roster churn. Re-judge every tier assignment before your first dispatch (§Economics), and file the missing row with `--emit file-gap`. File a `CHANGED` price page the same way.
+
 ## The lead model
 
 The lead takes one of two postures; which one — and the model tier each session rides — is standing dispatch policy (the ruling-config slot below):

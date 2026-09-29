@@ -1,12 +1,15 @@
 # price-table.tsv — consumer config for the --emit stage-economics arm (drift-kit/SPEC.md §The stage-economics meter).
 # Columns are USD per single token (a $/MTok price / 1,000,000), tab-separated.
-# One row per model id as it appears in a transcript's message.model.
+# One row per model id and effective date (`effective_from`, empty for an open start), the id as it appears in a transcript's message.model.
 #
 # priced-as-of: 2026-09-29 — transcribed from the published Anthropic model-pricing
 # table. Prices are a dated literal with no machine-readable feed to derive them from,
 # so nothing but this date says when it was last checked; re-verify against the
 # published table when kpi-price-table-age raises it. Every row below was re-verified
 # against the published table on this date.
+# price-page-hash: 191b4f0fcb4a98a0e0e1bfa31676d2e85f5a3094 — the page section's hash
+# --price-coverage printed when the rows above were re-verified (drift-kit/SPEC.md
+# §The price-coverage arm); transcribe the new one with priced-as-of:.
 #
 # cache_read is NOT always 0.1x input: the published table prices it at 0.025x on
 # claude-fable-5-1 and 0.05x on claude-opus-5-5, so never derive the column from input.
@@ -33,12 +36,12 @@
 # the saving — which is the opposite of what this block said until 2026-08-29.
 #
 # KNOWN UNDERCOUNT: fast mode bills the same model id at a different rate — Opus 5 at
-# speed=fast is 10 / 50 per MTok and Opus 5.5 is 8 / 40, double the standard rows below. The meter keys a price
-# on the model id alone and cannot see the speed field, so any fast-mode turn prices at
-# the standard rate and the reported cost is a floor. There is one row per model id by
-# construction, so this is a stated limit rather than a second row.
+# speed=fast is 10 / 50 per MTok and Opus 5.5 is 8 / 40, double the standard rows below. The meter
+# cannot see the speed field, so any fast-mode turn prices at the standard rate and the
+# reported cost is a floor. Rows are keyed by model id and date, and speed is neither,
+# so this is a stated limit rather than a second row.
 #
-# model	input	output	cache_read	cache_creation
+# model	input	output	cache_read	cache_creation	effective_from
 claude-fable-5-1	0.00001	0.00005	0.00000025	0.00002
 claude-fable-5	0.00001	0.00005	0.000001	0.00002
 claude-opus-5-5	0.000004	0.00002	0.0000002	0.000008
@@ -46,4 +49,4 @@ claude-opus-5	0.000005	0.000025	0.0000005	0.00001
 claude-opus-4-8	0.000005	0.000025	0.0000005	0.00001
 claude-sonnet-5-5	0.000002	0.00001	0.0000002	0.000004
 claude-sonnet-5	0.000002	0.00001	0.0000002	0.000004
-claude-haiku-4-5	0.000001	0.000005	0.0000001	0.000002
+claude-haiku-4-5-20251001	0.000001	0.000005	0.0000001	0.000002

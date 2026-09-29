@@ -5,17 +5,21 @@
 # provenance seam / graph-vocab pattern), so this template ships the schema and placeholders only.
 #
 # priced-as-of: 2000-01-01 — replace with the date you last transcribed these numbers.
-# prices-valid-through: 2000-01-01 — optional; the last date every row is still true.
-# Drop this line if no row is time-boxed. Where one is (introductory pricing, a
-# scheduled change), this header owns that date and the prose below cites it rather
-# than restating it. Both headers are read by kpi-price-table-age (drift-kit/SPEC.md
-# §Bundled KPIs): age alone cannot see a cliff, since a freshly retyped table reads
-# freshest on the morning its prices stop being true.
+# prices-valid-through: 2000-01-01 — optional; the date the table is vouched for through:
+# a cliff whose next rate is unpublished, or a re-check horizon. Drop this line if neither
+# applies. A scheduled change whose next rate is published is a row dated for the change
+# instead. The prose below cites this header rather than restating its date. Both headers
+# are read by kpi-price-table-age (drift-kit/SPEC.md §Bundled KPIs): age alone cannot see
+# a cliff, since a freshly retyped table reads freshest on the morning its prices stop
+# being true.
+# An optional price-page-hash: header carries the hash --price-coverage prints when
+# DRIFT_KIT_PRICE_PAGE_CMD is set, transcribed with priced-as-of:.
 #
-# Tab-separated. One row per model id (the id as it appears in the transcript's message.model).
-# Columns are USD per single token (a $/MTok price ÷ 1,000,000). A model with no row here
+# Tab-separated. One row per model id and effective date (the id as it appears in the
+# transcript's message.model; effective_from optional, an ISO day, empty for an open start).
+# Columns are USD per single token (a $/MTok price ÷ 1,000,000). A model with no row in force
 # degrades its cost cell to n/a — token counts still report; pricing is advisory, never required.
 #
-# model	input	output	cache_read	cache_creation
+# model	input	output	cache_read	cache_creation	effective_from
 example-model-large	0.000015	0.000075	0.0000015	0.00001875
 example-model-small	0.0000008	0.000004	0.00000008	0.000001

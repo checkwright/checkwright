@@ -8,26 +8,6 @@
 
 ## New Features
 
-### price-table-roster-coverage-oracle
-
-[spec: SPEC-price-table.md] [recurrence: 2026-09-29]
-
-an unpriced model id reds nothing. `kpi-price-table-age` reads only the table's two dating headers and never a row (drift-kit/SPEC.md §Bundled KPIs), so a table dated current reads healthy while the models actually running have no row, and the stage-economics meter degrades to `cost=n/a` as specified, silently. It happened twice: about ten iterations of Opus rows until 2026-08-01, and every stage session of native-hook-customer-legs, which ran on two ids the table lacked.
-
-**Deliverable, operator direction 2026-09-29, lead-relayed (not a ruling):** a check cheap enough to run at every lead start, in two halves. (a) Local roster coverage: the model ids in recent transcripts against the table's rows, a new id also reading as a harness roster churn, the trigger for the lead binding's re-judge-every-tier rule. (b) An opt-in price-change probe hashing the published pricing page's pricing-table section against a hash stored at `priced-as-of`; it is network at session start, so it ships off under Policy-as-choice and the adopter constraints. The seam holds: no kit literal enumerates model ids, so the roster derives from consumer-side data.
-
-**Cost while deferred:** each roster churn reproduces the blind spot, found only by a session reading `cost=n/a` closely. Filed 2026-08-01 at close; iceboxed; returned 2026-09-29 at the next iteration's scope from the gap-inbox recurrence bullet native-hook-customer-legs' lead filed that day, the two rows since added. Re-verified: `scripts/price-table.tsv` carries both ids, and the KPI still reads headers only. Owner lookup: `price table`, `roster`, `model id` in this file — [price-table-effective-dating](#price-table-effective-dating) and [tier-model-binding](#tier-model-binding), DISTINCT (a row's validity interval; the tier-to-model binding); owner drift-kit/SPEC.md §The stage-economics meter.
-
-### price-table-effective-dating
-
-[spec: SPEC-price-table.md]
-
-the stage-economics price table has no time axis: one row per model id (drift-kit/SPEC.md §The stage-economics meter, input 3), so every token is priced at the row's current rate whatever date its session ran. A re-run after a table edit reprices every iteration whose transcripts survive at today's rate, while a row whose transcript aged out keeps its first rate, so one log mixes two price regimes unmarked. The table's own comments show two cases the shape could not carry: an introductory rate held only as a `prices-valid-through` header, and a fast-mode rate stated as an undercount.
-
-**Deliverable:** an effective-from column, the meter picking the row in force on each log row's stamp date, which is already derived from stamps alone. Raised by the operator 2026-09-29, lead-relayed (not a ruling), on the 5.5-generation cache-read discount, whose start date the published page does not state.
-
-**Cost while deferred:** a price change for a live model misprices the other side of the change, silently. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at the next iteration's scope: →fix fails because the column is new grammar on a consumer file. Re-verified: the table's `One row per model id` header comment. Owner lookup: `price table`, `effective` in this file — [price-table-roster-coverage-oracle](#price-table-roster-coverage-oracle), DISTINCT (a missing row, not a row's validity interval); owner drift-kit/SPEC.md §The stage-economics meter.
-
 ### battery-timing-file-overwritten-by-only-run
 
 [spec: SPEC-battery-timings.md] [recurrence: 2026-09-25]
@@ -766,7 +746,7 @@ the generated pre-commit and commit-msg hooks start through a shell on every OS:
 
 the tier a dispatch rides is written as a harness model alias wherever it is chosen (the `model:` field of the stage-session, consult-session, audit-sweep and edit-sweep agent definitions, the lead binding's per-stage overrides, the build batch tiering), and no consumer setting chooses between following the newest model and pinning one. On 2026-09-29 the alias dispatches of native-hook-customer-legs resolved to two newer model ids with no edit, per the subagent transcripts.
 
-**Deliverable, operator direction 2026-09-29, lead-relayed (not a ruling):** (1) a consumer binding per tier class (judgment, routing, mechanical) to an alias, which follows the newest model, or an exact model id, which stays until changed; alias the default and pinning the opt-in, per Policy-as-choice; every place that chooses a tier reads the one binding. (2) Public documentation of alias tiering as a strength with its honest limit: an alias upgrade silently changes price and behaviour, so the claim ships with [price-table-roster-coverage-oracle](#price-table-roster-coverage-oracle)'s detector, and under a pin a new id in the transcripts means the pin was bypassed. **Inferred, not run:** that the harness accepts an exact model id wherever it accepts an alias.
+**Deliverable, operator direction 2026-09-29, lead-relayed (not a ruling):** (1) a consumer binding per tier class (judgment, routing, mechanical) to an alias, which follows the newest model, or an exact model id, which stays until changed; alias the default and pinning the opt-in, per Policy-as-choice; every place that chooses a tier reads the one binding. (2) Public documentation of alias tiering as a strength with its honest limit: an alias upgrade silently changes price and behaviour, so the claim ships with `price-table-roster-coverage-oracle`'s detector, and under a pin a new id in the transcripts means the pin was bypassed. **Inferred, not run:** that the harness accepts an exact model id wherever it accepts an alias.
 
 **Cost while deferred:** a model upgrade changes every dispatch's price and behaviour unannounced, and no consumer can opt out. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at the next iteration's scope: →fix fails because the binding is a new knob. Re-verified: `model: opus` or `model: sonnet` in the four agent definitions. Owner lookup: `alias`, `model id`, `tier` in this file — [session-model-identity-verification](#session-model-identity-verification), DISTINCT (verifying the running tier, not choosing it); owner delegation-kit/SPEC.md, with delegation-kit/templates/agent-execution.md's live-roster rule.
 
@@ -1523,5 +1503,7 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - npm-approval-delegation
 - install-author-discriminator
 - front-door-container-rehearsal
+- price-table-effective-dating
+- price-table-roster-coverage-oracle
 
 ## Lessons Learned

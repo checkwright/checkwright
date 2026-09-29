@@ -43,6 +43,7 @@ pub mod pack_installer;
 pub mod parse_smoke_log;
 pub mod projection_witness;
 pub mod port_blockers;
+pub mod price_coverage;
 pub mod product_statement;
 pub mod pub_index;
 pub mod pub_lang;
@@ -686,6 +687,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Run(crate::hook::poll::run),
         crate::hook::poll::KNOBS,
     ),
+    // spec: drift-kit/SPEC.md §The price-coverage arm — an `Arm::Run` though it exits 0 on every
+    // reading: its page half spawns a consumer's fetch, and the `--emit-` family is fence-safe
+    (
+        "--price-coverage",
+        Arm::Run(price_coverage::run),
+        price_coverage::KNOBS,
+    ),
     // spec: delegation-kit/SPEC.md §usage-verdict — an `Arm::Run` because its three-state exit
     // status carries a 1 a hook grades, which an emitting arm collapses to {0, 2}; its callers are
     // a session brief, a kit smoke and a gate in process, so it is no harness-integration arm
@@ -920,11 +928,12 @@ mod tests {
     // spec: gate-sdk/SPEC.md §The harness-integration arm — a renamed or deleted fail-open arm reds
     // here, before a stub's copy can name an arm the binary no longer dispatches
     // spec: gate-sdk/SPEC.md §The non-gate arm — the crate's network spawners, the arms reaching
-    // `curl`, `npm` and `docker`, are never fence-safe: admitting one reds here rather than in an
-    // adopter's scratch
+    // `curl`, `npm`, `docker` and a consumer's page fetch, are never fence-safe: admitting one reds
+    // here rather than in an adopter's scratch
     #[test]
     fn no_network_spawning_arm_is_fence_safe() {
-        const NETWORK_ARMS: &[&str] = &["--usage-poll", "--pack-installer", "--with-foreign-shells"];
+        const NETWORK_ARMS: &[&str] =
+            &["--usage-poll", "--pack-installer", "--with-foreign-shells", "--price-coverage"];
         for arm in NETWORK_ARMS {
             assert!(lookup(arm).is_some(), "{} names no arm-table row", arm);
             assert!(!fence_safe(arm), "{} spawns a network program and is fence-safe", arm);

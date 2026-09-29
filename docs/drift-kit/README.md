@@ -51,6 +51,7 @@ gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --emit queue-flow [<n>]  # design-pending pool filed/drained per trailing iteration, plus mean-filed
 "$gates" --emit overhead-meter   # governance-vs-task byte proxy for this session's transcript (a delegated session passes its transcript or stamp id)
 "$gates" --emit stage-economics  # real spend by stage × model × iteration (stamps ⋈ transcripts ⋈ price table)
+"$gates" --price-coverage  # which running model ids the price table cannot price; with a page command set, whether the pricing page moved
 "$gates" --emit file-install [--author] [--] <kind> <field>...  # record one observed install, red or check-in (three kinds, three arities); --author files the author seat's own
 "$gates" --emit install-evidence  # the aggregate-only projection over that record, for a consumer to pin behind a freshness gate
 ```

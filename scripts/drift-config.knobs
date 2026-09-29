@@ -3,3 +3,8 @@
 DRIFT_KIT_STAGES[] <- LIFECYCLE_KIT_STAGES
 # spec: drift-kit/SPEC.md §Layout and configuration — the icebox counterpart of queue-config's and canon-config's section knob; the three are independent by kit and set together by a consumer enabling the tier
 DRIFT_KIT_ICEBOX_SECTION = Icebox
+# spec: drift-kit/SPEC.md §The price-coverage arm — this repo opts the page half in: the pricing page's markdown form, hashed under its model-pricing heading
+DRIFT_KIT_PRICE_PAGE_CMD[] = curl
+DRIFT_KIT_PRICE_PAGE_CMD[] = -fsSL
+DRIFT_KIT_PRICE_PAGE_CMD[] = https://platform.claude.com/docs/en/about-claude/pricing.md
+DRIFT_KIT_PRICE_PAGE_SECTION = ## Model pricing

@@ -143,32 +143,67 @@ pub fn split_tokens(total: u64, counts: &[u64]) -> Vec<u64> {
 #[derive(Default)]
 pub struct Prices {
     pub present: bool,
-    rows: HashMap<String, [f64; 4]>,
+    pub malformed: usize,
+    rows: HashMap<String, Vec<Dated>>,
 }
 
+type Dated = (Option<String>, [f64; 4]);
+
 impl Prices {
+    // spec: drift-kit/SPEC.md §The stage-economics meter — input 3's optional `effective_from`:
+    // several rows per model, a repeated (model, date) replacing the first, a non-ISO date pricing
+    // nothing and counted.
     pub fn parse(text: &str) -> Prices {
-        let mut rows: HashMap<String, [f64; 4]> = HashMap::new();
+        let mut rows: HashMap<String, Vec<Dated>> = HashMap::new();
+        let mut malformed = 0usize;
         for line in text.lines() {
             let f: Vec<&str> = line.split('\t').collect();
             let m = f[0];
             if m.is_empty() || m.starts_with('#') || m == "model" {
                 continue;
             }
+            let from = f.get(5).map(|v| v.trim()).filter(|v| !v.is_empty());
+            if from.is_some_and(|d| !super::kpi::is_iso_day(d)) {
+                malformed += 1;
+                continue;
+            }
             let at = |i: usize| f.get(i).map_or(0.0, |v| v.trim().parse::<f64>().unwrap_or(0.0));
-            rows.insert(m.to_string(), [at(1), at(2), at(3), at(4)]);
+            let from = from.map(str::to_string);
+            let dated = rows.entry(m.to_string()).or_default();
+            let price = [at(1), at(2), at(3), at(4)];
+            match dated.iter_mut().find(|(d, _)| *d == from) {
+                Some(slot) => slot.1 = price,
+                None => dated.push((from, price)),
+            }
         }
         Prices {
             present: true,
+            malformed,
             rows,
         }
+    }
+
+    // spec: drift-kit/SPEC.md §The stage-economics meter — the row in force on `day`: the latest
+    // `effective_from` on or before it, an open start being earliest
+    pub fn in_force(&self, model: &str, day: &str) -> Option<&[f64; 4]> {
+        self.rows
+            .get(model)?
+            .iter()
+            .filter(|(from, _)| from.as_deref().map_or(true, |d| d <= day))
+            .max_by(|a, b| a.0.cmp(&b.0))
+            .map(|(_, p)| p)
     }
 
     // spec: drift-kit/SPEC.md §The stage-economics meter — floating-point addition is not
     // associative, so the four terms sum in the shell's own left-to-right order (in, out,
     // cache-read, cache-creation) or a cost's last digit can differ from the series already logged.
-    pub fn cell(&self, model: &str, t: Tokens) -> Option<String> {
-        let p = self.rows.get(model)?;
+    // spec: drift-kit/SPEC.md §The stage-economics meter — Degradation: no tokens price at
+    // zero before any lookup, so a placeholder-id turn never degrades a cell
+    pub fn cell(&self, model: &str, t: Tokens, day: &str) -> Option<String> {
+        if t == Tokens::default() {
+            return Some(format!("{:.4}", 0.0));
+        }
+        let p = self.in_force(model, day)?;
         let cost = t.input as f64 * p[0]
             + t.output as f64 * p[1]
             + t.cache_read as f64 * p[2]
@@ -267,9 +302,14 @@ impl Run {
     // per-row rewrite — the run reads the log once and writes it once, which is observationally
     // the shell's read-filter-rewrite per row and cheaper by the number of rows
     fn emit_row(&mut self, iter: &str, stage: &str, who: &str, model: &str, t: Tokens) {
+        let day = self
+            .dates
+            .row(iter, stage, &self.supervision, &self.fanout_suffix)
+            .unwrap_or(&self.today)
+            .to_string();
         let cost = self
             .prices
-            .cell(model, t)
+            .cell(model, t, &day)
             .unwrap_or_else(|| "n/a".to_string());
         if cost == "n/a" {
             self.incomplete = true;
@@ -371,6 +411,13 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
         head.push_str(&format!(
             "  no price table ({}) — token-only, cost=n/a (degraded, not failed)\n",
             price_table
+        ));
+    }
+    if r.prices.malformed > 0 {
+        head.push_str(&format!(
+            "  {} price-table row(s) skipped — effective_from is not an ISO day, so they price \
+             nothing\n",
+            r.prices.malformed
         ));
     }
 
@@ -1096,9 +1143,48 @@ mod tests {
             cache_read: 150,
             cache_write: 30,
         };
-        assert_eq!(p.cell("test-model", t).as_deref(), Some("606.0000"));
-        assert_eq!(p.cell("model", t), None, "the header row is not a priced model");
-        assert_eq!(p.cell("unpriced", t), None);
-        assert_eq!(Prices::default().cell("test-model", t), None);
+        let day = "2026-01-01";
+        assert_eq!(p.cell("test-model", t, day).as_deref(), Some("606.0000"));
+        assert_eq!(p.cell("model", t, day), None, "the header row is not a priced model");
+        assert_eq!(p.cell("unpriced", t, day), None);
+        assert_eq!(Prices::default().cell("test-model", t, day), None);
+        assert_eq!(p.malformed, 0);
+    }
+
+    // spec: drift-kit/SPEC.md §The stage-economics meter — input 3's `effective_from`: the row in
+    // force is the latest start on or before the day, an open start earliest; a day before every
+    // row has none; a repeated (model, date) replaces; a non-ISO date prices nothing and is counted
+    #[test]
+    fn the_row_in_force_is_the_latest_effective_from_on_or_before_the_day() {
+        let p = Prices::parse(
+            "model\tinput\toutput\tcache_read\tcache_creation\teffective_from\n\
+             m\t1\t0\t0\t0\n\
+             m\t2\t0\t0\t0\t2026-03-01\n\
+             m\t3\t0\t0\t0\t2026-06-01\n\
+             m\t9\t0\t0\t0\t2026-06-01\n\
+             late\t5\t0\t0\t0\t2026-05-01\n\
+             bad\t7\t0\t0\t0\tsoon\n",
+        );
+        let t = Tokens {
+            input: 1,
+            ..Tokens::default()
+        };
+        assert_eq!(p.cell("m", t, "2026-01-01").as_deref(), Some("1.0000"), "open start");
+        assert_eq!(p.cell("m", t, "2026-03-01").as_deref(), Some("2.0000"), "on the day");
+        assert_eq!(p.cell("m", t, "2026-05-31").as_deref(), Some("2.0000"));
+        assert_eq!(p.cell("m", t, "2026-07-01").as_deref(), Some("9.0000"), "a repeat replaces");
+        assert_eq!(p.cell("late", t, "2026-04-30"), None, "before its every row");
+        assert_eq!(p.cell("late", t, "2026-05-01").as_deref(), Some("5.0000"));
+        assert_eq!(p.cell("bad", t, "2026-07-01"), None, "a malformed date prices nothing");
+        assert_eq!(p.malformed, 1);
+    }
+
+    // spec: drift-kit/SPEC.md §The stage-economics meter — Degradation: four zero counts price
+    // `0.0000` at any rate, a missing row and an absent table included
+    #[test]
+    fn a_zero_token_cell_prices_at_zero_without_a_row() {
+        let z = Tokens::default();
+        assert_eq!(Prices::default().cell("x", z, "2026-01-01").as_deref(), Some("0.0000"));
+        assert_eq!(Prices::parse("").cell("x", z, "2026-01-01").as_deref(), Some("0.0000"));
     }
 }

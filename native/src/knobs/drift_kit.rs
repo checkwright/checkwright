@@ -1,5 +1,5 @@
 // spec: drift-kit/SPEC.md §Layout and configuration — drift-kit's static knob table and validator
-use super::{set_but_missing, Kit, Origin, Resolve, Row, Shape, Value, Values};
+use super::{scalar, set_but_missing, Kit, Origin, Resolve, Row, Shape, Value, Values};
 
 fn input_scalar(resolve: Resolve, name: &str) -> Result<(String, Origin), String> {
     resolve(name).map(|(v, o)| (v.wire(), o))
@@ -118,6 +118,10 @@ pub const KIT: Kit = Kit {
         Row::scalar("DRIFT_KIT_SUPERVISION_LABEL", "supervision"),
         Row::scalar("DRIFT_KIT_FANOUT_SUFFIX", "+fanout"),
         Row::derived("DRIFT_KIT_PRICE_TABLE", Shape::Scalar, price_table, &["GATE_SDK_GATES_DIR"]),
+        Row::scalar("DRIFT_KIT_PRICE_COVERAGE_DAYS", "7"),
+        Row::indexed("DRIFT_KIT_PRICE_PAGE_CMD", &[]),
+        Row::scalar("DRIFT_KIT_PRICE_PAGE_SECTION", ""),
+        Row::scalar("DRIFT_KIT_PRICE_PAGE_TIMEOUT", "10"),
         Row::derived("DRIFT_KIT_KPI_DIRS", Shape::Indexed, kpi_dirs, &["GATE_SDK_GATES_DIR"]),
     ],
     validate: Some(("drift config", validate)),
@@ -131,7 +135,17 @@ pub const KIT: Kit = Kit {
 };
 
 // spec: drift-kit/SPEC.md §Layout and configuration — the registry a consumer set to a path that is
-// absent is adopted-but-broken; an empty value stays the not-adopted answer
+// absent is adopted-but-broken; an empty value stays the not-adopted answer. The two price-coverage
+// integers refuse a value outside their stated shape.
 fn validate(v: &Values) -> Vec<String> {
-    set_but_missing(v, "DRIFT_KIT_KPIS_FILE").into_iter().collect()
+    let mut errs: Vec<String> = set_but_missing(v, "DRIFT_KIT_KPIS_FILE").into_iter().collect();
+    let digits = |s: &str| !s.is_empty() && s.bytes().all(|b| b.is_ascii_digit());
+    if let Some(s) = scalar(v, "DRIFT_KIT_PRICE_COVERAGE_DAYS").filter(|s| !digits(s)) {
+        errs.push(format!("DRIFT_KIT_PRICE_COVERAGE_DAYS '{}' is not a non-negative integer", s));
+    }
+    let positive = |s: &str| digits(s) && !s.bytes().all(|b| b == b'0');
+    if let Some(s) = scalar(v, "DRIFT_KIT_PRICE_PAGE_TIMEOUT").filter(|s| !positive(s)) {
+        errs.push(format!("DRIFT_KIT_PRICE_PAGE_TIMEOUT '{}' is not a positive integer", s));
+    }
+    errs
 }

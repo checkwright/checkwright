@@ -457,6 +457,69 @@ set -e
 grep -q 'cost=n/a' "$selog" || fail "absent price table did not degrade the cost cell to n/a"
 grep -q 'incomplete' <<<"$dout" || fail "degraded run did not carry the incomplete-pricing caveat"
 
+# spec: drift-kit/SPEC.md §The stage-economics meter — input 3's effective_from and the zero-token
+# rule, over their own sessions dir, state and log: the flat set's log is asserted one line.
+dsdir="$work/dated-sessions"; mkdir -p "$dsdir"
+cat > "$dsdir/agent-dated123abc.jsonl" <<'EOF'
+{"type":"assistant","message":{"id":"d1","model":"dated-model","usage":{"input_tokens":3,"output_tokens":0,"cache_read_input_tokens":0,"cache_creation_input_tokens":0}}}
+{"type":"assistant","message":{"id":"z1","model":"zero-model","usage":{"input_tokens":0,"output_tokens":0,"cache_read_input_tokens":0,"cache_creation_input_tokens":0}}}
+EOF
+printf 'smoke build dated123 %s none\n' "$(date +%F)" > "$work/dated-state.txt"
+printf 'dated-model\t1\t0\t0\t0\ndated-model\t2\t0\t0\t0\t%s\n' "$(date +%F)" > "$work/dated-prices.tsv"
+dlog="$work/dated-log.txt"
+datedout="$(DRIFT_KIT_STATE_FILE="$work/dated-state.txt" DRIFT_KIT_SESSIONS_DIR="$dsdir" \
+    DRIFT_KIT_PRICE_TABLE="$work/dated-prices.tsv" DRIFT_KIT_STAGE_ECONOMICS_LOG="$dlog" \
+    bash "$DRIFT_ARM" --emit stage-economics)"
+grep -qE ' smoke build dated-model in=3 .* cost=6\.0000$' "$dlog" \
+    || fail "a row dated on its stamp's day did not price at the dated rate over the open start: $(cat "$dlog")"
+grep -qE ' smoke build zero-model in=0 out=0 cr=0 cw=0 cost=0\.0000$' "$dlog" \
+    || fail "a zero-usage model with no row did not price at 0.0000: $(cat "$dlog")"
+if grep -q 'incomplete' <<<"$datedout"; then
+    fail "a zero-usage cell raised the incomplete-pricing caveat: $datedout"
+fi
+
+# spec: drift-kit/SPEC.md §The price-coverage arm — the roster half over its own sessions dir and
+# table, the page half over a fixture page a bash -c argv prints, each verdict by its own line.
+pcdir="$work/pc-sessions"; mkdir -p "$pcdir"
+cat > "$pcdir/pc1.jsonl" <<'EOF'
+{"type":"assistant","message":{"id":"p1","model":"pc-unpriced","usage":{"input_tokens":5}}}
+{"type":"assistant","message":{"id":"p2","model":"pc-zero","usage":{"input_tokens":0}}}
+{"type":"assistant","message":{"id":"p3","model":"pc-open","usage":{"input_tokens":1}}}
+{"type":"assistant","message":{"id":"p4","model":"pc-future","usage":{"input_tokens":1}}}
+EOF
+printf 'pc-open\t1\t1\t1\t1\npc-future\t1\t1\t1\t1\t%s\n' "$(date -d tomorrow +%F)" > "$work/pc-prices.tsv"
+pcov() { DRIFT_KIT_SESSIONS_DIR="${PC_SESSIONS:-$pcdir}" DRIFT_KIT_PRICE_TABLE="${PC_TABLE:-$work/pc-prices.tsv}" \
+    bash "$DRIFT_ARM" --price-coverage; }
+pcout="$(pcov)"
+grep -q '^price-coverage: 3 model id(s) with usage in 1 transcript(s) of the last 7d$' <<<"$pcout" \
+    || fail "the coverage head line did not count the three ids with usage (the zero-usage id excluded): $pcout"
+grep -q '^  unpriced: pc-unpriced, pc-future — no row in force today in ' <<<"$pcout" \
+    || fail "an id with no row, or with a row dated after today, did not read unpriced in first-seen order: $pcout"
+grep -q '^price-page: off$' <<<"$pcout" || fail "the page half did not read off with its command knob empty: $pcout"
+grep -q 'unpriced: pc-unpriced, pc-open, pc-future — no price table' <<<"$(PC_TABLE="$work/no-such-table.tsv" pcov)" \
+    || fail "an absent table did not read every id unpriced"
+grep -q '^  no sessions dir .* — set DRIFT_KIT_SESSIONS_DIR$' <<<"$(PC_SESSIONS="$work/no-such-sessions" pcov)" \
+    || fail "a sessions dir that is not a directory did not say so in place of the coverage line"
+
+printf '# Pricing\nintro\n## Model pricing\n| m | $1 |\n### Note\nx\n## Other\ny\n' > "$work/pc-page.md"
+pchash="$(printf '## Model pricing\n| m | $1 |\n### Note\nx\n' | git hash-object --stdin)"
+printf '# priced-as-of: 2026-01-01\n# price-page-hash: %s\npc-open\t1\t1\t1\t1\n' "$pchash" > "$work/pc-hashed.tsv"
+printf 'DRIFT_KIT_PRICE_PAGE_CMD[] = bash\nDRIFT_KIT_PRICE_PAGE_CMD[] = -c\nDRIFT_KIT_PRICE_PAGE_CMD[] = cat %s\n' \
+    "$work/pc-page.md" > "$work/pc-page.knobs"
+ppage() { DRIFT_KIT_KNOB_FILE="${PC_KNOBS:-$work/pc-page.knobs}" DRIFT_KIT_PRICE_PAGE_SECTION="${PC_SECTION:-## Model pricing}" \
+    PC_TABLE="$work/pc-hashed.tsv" pcov | grep '^price-page:'; }
+[[ "$(ppage)" == 'price-page: unchanged since priced-as-of 2026-01-01' ]] \
+    || fail "the page half did not read unchanged against the section's stored hash: $(ppage)"
+printf '# Pricing\nintro\n## Model pricing\n| m | $2 |\n### Note\nx\n## Other\ny\n' > "$work/pc-page.md"
+grep -q '^price-page: CHANGED since priced-as-of 2026-01-01 — re-verify the rows, then record: # price-page-hash: ' <<<"$(ppage)" \
+    || fail "one price edited in the section did not read CHANGED: $(ppage)"
+[[ "$(PC_SECTION='## Absent' ppage)" == 'price-page: n/a (section heading not found)' ]] \
+    || fail "a heading the page lacks did not read not found: $(PC_SECTION='## Absent' ppage)"
+printf 'DRIFT_KIT_PRICE_PAGE_CMD[] = bash\nDRIFT_KIT_PRICE_PAGE_CMD[] = -c\nDRIFT_KIT_PRICE_PAGE_CMD[] = sleep 5\nDRIFT_KIT_PRICE_PAGE_TIMEOUT = 1\n' \
+    > "$work/pc-slow.knobs"
+[[ "$(PC_KNOBS="$work/pc-slow.knobs" ppage)" == 'price-page: n/a (fetch failed: timed out after 1s)' ]] \
+    || fail "a fetch outliving DRIFT_KIT_PRICE_PAGE_TIMEOUT did not read as a timed-out fetch"
+
 # spec: drift-kit/SPEC.md §Testing — history ∪ live over the trajectory extractor's
 # fake-history repo, whose live state file already carries only beta's stamp.
 hdir="$work/hist-sessions"; mkdir -p "$hdir"
