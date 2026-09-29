@@ -17,6 +17,7 @@ description: "Task list for the release notes export"
 
 - [ ] T002 [US1] Read the merged changes between two tags
 - [X] T003 [US1] Write them as one markdown file in src/format-notes.awk
+- [ ] T004 [US2] Export every release since the last tag
 
 ## Parallel Example: User Story 1
 

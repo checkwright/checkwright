@@ -1,3 +1,3 @@
 ## 1. Implementation
-- [ ] 1.1 Write the digest section above the entries
+- [x] 1.1 Write the digest section above the entries in src/digest.awk
 - [ ] 1.2 Lower the entry limit

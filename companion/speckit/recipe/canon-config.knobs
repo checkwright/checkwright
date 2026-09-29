@@ -1,3 +1,6 @@
 # spec: companion/SPEC.md §The Spec Kit recipe — composed by `init --recipe` into the consumer's scripts/canon-config.knobs
 CANON_KIT_PROSE_SURFACE_GLOBS[] = specs/**/*.md
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = Task:
+CANON_KIT_TASK_LIST_GLOBS[] = specs/*/tasks.md
+CANON_KIT_TASK_LABEL_CITES[story] = \[US([0-9]+)\]
+CANON_KIT_TASK_LABEL_DEFINES[story] = ^### User Story ([0-9]+)[ ]

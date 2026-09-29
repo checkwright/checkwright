@@ -1,3 +1,4 @@
 # spec: companion/SPEC.md §The OpenSpec recipe — composed by `init --recipe` into the consumer's scripts/canon-config.knobs
 CANON_KIT_PROSE_SURFACE_GLOBS[] = openspec/**/*.md
 CANON_KIT_TEMPORAL_EXEMPT_PATHS[] = openspec/changes/**
+CANON_KIT_TASK_LIST_GLOBS[] = openspec/changes/*/tasks.md

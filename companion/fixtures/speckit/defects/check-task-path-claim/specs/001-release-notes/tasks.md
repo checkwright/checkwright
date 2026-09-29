@@ -16,7 +16,7 @@ description: "Task list for the release notes export"
 ## Phase 2: User Story 1 - Export one release (Priority: P1)
 
 - [ ] T002 [US1] Read the merged changes between two tags
-- [X] T003 [US1] Write them as one markdown file in src/format-notes.awk
+- [X] T003 [US1] Write them as one markdown file in src/format-notes.sh
 
 ## Parallel Example: User Story 1
 

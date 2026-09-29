@@ -23,7 +23,7 @@ The companion package puts Checkwright's gates over a repository whose specs ano
 
 A recipe is a directory in installer/SPEC.md §Payload recipes' format, and that section owns how `init` applies one. Each file opens with a `#` comment citing this file.
 
-**Each line answers a red.** A line is in a recipe because a fresh tree of the toolkit at its pin, with the `prose` or `full` profile installed, reds a gate on one of the toolkit's own idioms until the line is there. The companion arm of the consumer smoke holds that both ways: a line it shows unnecessary is deleted, and one it shows missing is added, each with its idiom recorded below.
+**Each line answers a red, or arms a gate that registers disarmed.** A fresh tree of the toolkit at its pin, with the `prose` or `full` profile installed, reds a gate on one of the toolkit's own idioms until the line is there. Or a gate asserts nothing on that tree until the line points it there. The companion arm of the consumer smoke holds that both ways: a line it shows unnecessary is deleted, and one it shows missing is added, each with its idiom recorded below.
 
 ### Applying a recipe
 
@@ -46,6 +46,8 @@ Measured on `specify init --here --non-interactive --integration claude --script
 - `GATE_SDK_PRUNE_EXTRA_DIRS = .specify`, in `gate-sdk-config.knobs`. Spec Kit's own scripts under `.specify/scripts/bash/` red `check-comment-tier`, since their comments carry no tier tag, and `check-path-dialect`, on their absoluteness tests. They are the toolkit's files and not the adopter's.
 - `CANON_KIT_PROSE_SURFACE_GLOBS[] = specs/**/*.md`, in `canon-config.knobs`. The feature specs join the governed doc set. Without the line no claimed gate reads `specs/`, so every planted defect passes.
 - `CANON_KIT_FENCE_PROGRAMS_EXTRA[] = Task:`, in `canon-config.knobs`. The tasks template's parallel example is a `bash` fence of `Task:` lines, which `check-fence-command-head` reds as naming nothing that runs. The line admits `Task:` as a command head. The colon is part of the word. The gate's other remedy, another info string, would edit Spec Kit's template text, which no recipe edits.
+- `CANON_KIT_TASK_LIST_GLOBS[] = specs/*/tasks.md`, in `canon-config.knobs`, arms `check-task-path-claim` and `check-task-label-resolution` on each feature's task list.
+- `CANON_KIT_TASK_LABEL_CITES[story] = \[US([0-9]+)\]` and `CANON_KIT_TASK_LABEL_DEFINES[story] = ^### User Story ([0-9]+)[ ]`, in the same file, bind the user-story family: a task's `[USn]` label names the `### User Story n` heading in the `spec.md` beside it. The define pattern's trailing space is a bracket, since the knob grammar trims a value's trailing blank. A converge task's `per FR-003` is not bound, since each claimed gate has one planted defect and the family would be untested; an adopter adds that family with two knob lines.
 - `unregister.list` names no gate.
 
 ### The OpenSpec recipe
@@ -54,6 +56,7 @@ Measured on `openspec init --tools claude --no-animation --no-copilot-cloud .`, 
 
 - `CANON_KIT_PROSE_SURFACE_GLOBS[] = openspec/**/*.md`, in `canon-config.knobs`, for the reason the Spec Kit line has.
 - `CANON_KIT_TEMPORAL_EXEMPT_PATHS[] = openspec/changes/**`, in the same file. A MODIFIED requirement in a change delta carries a `(Previously: …)` line, the form OpenSpec's own docs show, and `check-manifest-temporal` reds on it. Change deltas and the archive under `openspec/changes/` are history by design.
+- `CANON_KIT_TASK_LIST_GLOBS[] = openspec/changes/*/tasks.md`, in the same file, arms `check-task-path-claim` on each in-flight change's task list. The single `*` keeps `openspec/changes/archive/` out, since an archived change's paths are history.
 - `unregister.list` names no gate.
 
 **One convention, and no dropped gate for it.** OpenSpec specs often repeat a scenario title under two requirements, which `check-spec-pointer`'s one-title-per-file rule reds. A citation of the second title binds to the first, so the rule holds for any spec that is cited. The recipe keeps the gate, and the OpenSpec page states the convention: a title is unique within its spec.
@@ -69,14 +72,17 @@ OpenSpec's `full` line (§The two tiers) applies the layer, as `--recipe openspe
 
 ## The tested claim
 
-The recipes are proved against four defect classes per toolkit, each caught by a named gate, on `prose` for both toolkits and on `full` for Spec Kit, whose `full` leg plants them again:
+The recipes are proved against the defect classes below, each caught by a named gate, on `prose` for both toolkits and on `full` for Spec Kit, whose `full` leg plants them again. Both toolkits carry:
 
 - a broken relative or anchored link, by `check-md-refs`;
 - a dangling section citation, or a title carried twice in one spec, by `check-spec-pointer`;
 - an unclosed fence, by `check-spec-fence-balance`;
-- a documented command that invokes a missing script, by `check-docs-cmd`.
+- a documented command that invokes a missing script, by `check-docs-cmd`;
+- a ticked task naming a path that does not exist, by `check-task-path-claim`.
 
-The OpenSpec `full` line is held green by the lifecycle leg.
+Spec Kit also carries a task citing a user story its spec does not define, by `check-task-label-resolution`.
+
+The OpenSpec `full` line is held green by the lifecycle leg. The toolkit keeps what it owns: OpenSpec's archive refuses a delta that disagrees with its base spec, so no gate re-checks it. `plan.md`'s source tree draws the structure a feature will have, so no gate reads it either.
 
 No recipe drops a gate. A toolkit idiom a gate reds is answered by a knob line fitting the gate to it. Dropping a gate would narrow what the companion ships, so it is a change to this section and not a recipe edit.
 
@@ -86,10 +92,12 @@ No recipe drops a gate. A toolkit idiom a gate reds is answered by a knob line f
 
 `fixtures/<toolkit>/layout/` is a tree in the toolkit's layout at its pin, authored here. Its section structure follows the toolkit's own templates, and no template text is copied, so the tree tests the same gates and ships no third-party text. It carries every idiom a recipe line answers, so a dropped line reds the arm's green leg or lets a planted defect pass. It also carries cross-file links and at least one repo-relative section citation that resolves.
 
-- **Spec Kit:** `.specify/memory/constitution.md`; a `.specify/scripts/bash/` script with ordinary comments and a `/*` absoluteness test; and one feature under `specs/001-release-notes/` with `spec.md`, `plan.md` and `tasks.md`, whose `tasks.md` carries the `bash` fence of `Task:` lines.
-- **OpenSpec:** `openspec/config.yaml`; one capability spec under `openspec/specs/`; and one change under `openspec/changes/` with a proposal, tasks and a delta whose MODIFIED requirement carries a `(Previously: …)` line. A lifecycle overlay under `fixtures/openspec/lifecycle/` adds a second capability to that change, at a build cursor with no align stamp.
+- **Spec Kit:** `.specify/memory/constitution.md`; a `.specify/scripts/bash/` script with ordinary comments and a `/*` absoluteness test; and one feature under `specs/001-release-notes/` with `spec.md`, `plan.md` and `tasks.md`. Its `tasks.md` carries the `bash` fence of `Task:` lines, `[US1]` labels and a ticked `T003` naming a source file under `src/`.
+- **OpenSpec:** `openspec/config.yaml`; one capability spec under `openspec/specs/`; and one change under `openspec/changes/` with a proposal, tasks and a delta whose MODIFIED requirement carries a `(Previously: …)` line. Its task `1.1` is ticked and names a source file under `src/`. A lifecycle overlay under `fixtures/openspec/lifecycle/` adds a second capability to that change, at a build cursor with no align stamp.
 
-`fixtures/<toolkit>/defects/<gate>/` holds, per claimed gate, the files that replace their layout counterparts to plant that gate's defect. OpenSpec's `check-spec-pointer` defect is a scenario title carried twice in one spec, and its `check-md-refs` defect adds an anchored link to a missing requirement.
+Each source file is neither markdown nor a shell script, so no other claimed gate reads it.
+
+`fixtures/<toolkit>/defects/<gate>/` holds, per claimed gate, the files that replace their layout counterparts to plant that gate's defect. OpenSpec's `check-spec-pointer` defect is a scenario title carried twice in one spec, and its `check-md-refs` defect adds an anchored link to a missing requirement. Each toolkit's `check-task-path-claim` defect is its ticked task naming an absent path, and Spec Kit's `check-task-label-resolution` defect adds a task citing `[US2]`, which `spec.md` does not define.
 
 The OpenSpec layout passes `openspec validate --all --strict` at the pin, with and without the lifecycle overlay, so the toolkit is its own fixture's oracle. This repository prunes every directory named `fixtures` from its own walks (`GATE_SDK_PRUNE_EXTRA_DIRS` in `scripts/gate-sdk-config.knobs`), since the trees carry each red on purpose. The companion arm governs them instead, inside a scratch consumer ([installer/SPEC.md §The consumer smoke](../installer/SPEC.md#the-consumer-smoke)).
 

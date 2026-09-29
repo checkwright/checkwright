@@ -16,7 +16,7 @@ checkwright init --profile prose --recipe openspec
 
 <!-- companion-install:end -->
 
-The recipe governs the markdown under `openspec/` and exempts `openspec/changes/` from the rule against history words, since a change's delta records what a requirement said before. The install records it, so an upgrade re-applies it with the release it was tested against.
+The recipe governs the markdown under `openspec/`, exempts `openspec/changes/` from the rule against history words, since a change's delta records what a requirement said before, and points `check-task-path-claim` at each in-flight change's `tasks.md`. The install records it, so an upgrade re-applies it with the release it was tested against.
 
 **Keep each title unique within a spec.** OpenSpec specs often repeat a scenario title under two requirements. A citation of the second title would reach the first, so `check-spec-pointer` reds the repeat. Rename one apart, for instance *Idle timeout, web* and *Idle timeout, API*.
 

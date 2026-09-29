@@ -1035,8 +1035,9 @@ say "demo extra: refused at exit 2 with the usage line"
 
 # spec: installer/SPEC.md §The consumer smoke — the companion arm: each payload recipe applied by its toolkit's documented install line, read off its companion-install block, to its fixture tree from the packed tarball, asserted green and idempotent, then each planted defect asserted red by the gate that owns it, the Spec Kit companion-full line likewise, and the OpenSpec lifecycle layer's audit leg on the companion-full line
 COMPANION="$REPO/companion"
-# spec: companion/SPEC.md §The tested claim — the claimed gates, spelled here as the claim's oracle so a fixture tree missing a defect directory reds rather than shrinking the claim
-COMPANION_CLAIMED=(check-md-refs check-spec-pointer check-spec-fence-balance check-docs-cmd)
+# spec: companion/SPEC.md §The tested claim — the claimed gates, spelled here as the claim's oracle so a fixture tree missing a defect directory reds rather than shrinking the claim; the shared roster first, then the Spec Kit roster beside it
+COMPANION_CLAIMED=(check-md-refs check-spec-pointer check-spec-fence-balance check-docs-cmd check-task-path-claim)
+COMPANION_CLAIMED_SPECKIT=(check-task-label-resolution)
 companion_block() {   # $1 = a markdown file, $2 = marker name -> the block's lines, fences and blank lines dropped
     awk -v b="<!-- $2:begin -->" -v e="<!-- $2:end -->" '
         $0 == e { f = 0 }
@@ -1097,7 +1098,9 @@ companion_arm() {   # $1 = toolkit, $2 = label, $3.. = the line's words from ini
     [[ -d "$COMPANION/$tk/recipe" ]] || fail "companion arm: this arm names $tk, and companion/$tk/recipe/ does not exist"
     [[ -d "$PKG_ROOT/recipes/$tk" ]] || fail "companion arm, $tk: the installed package carries no recipes/$tk/, so GATE_SDK_PAYLOAD_RECIPES does not cover companion/$tk/recipe/"
     [[ -d "$COMPANION/fixtures/$tk/layout" ]] || fail "companion arm: companion/fixtures/$tk/layout/ does not exist, so the $tk recipe has no tree to govern"
-    for gate in "${COMPANION_CLAIMED[@]}"; do
+    local own=()
+    [[ "$tk" == speckit ]] && own=("${COMPANION_CLAIMED_SPECKIT[@]}")
+    for gate in "${COMPANION_CLAIMED[@]}" ${own[@]+"${own[@]}"}; do
         [[ -d "$COMPANION/fixtures/$tk/defects/$gate" ]] \
             || fail "companion arm, $tk: no defects/$gate/ under companion/fixtures/$tk/, so the claim that $gate catches its class in a $tk tree is untested"
     done
