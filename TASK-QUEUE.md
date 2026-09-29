@@ -8,30 +8,6 @@
 
 ## New Features
 
-### front-door-flag-grammar
-
-[spec: SPEC-flag-table.md]
-
-an advertised `init` flag the pinned release lacks reds no gate and fires no release trigger. `check-front-door-verbs` invariant B reads only the verb after a route (installer/SPEC.md §The front door's verbs), and the close binding's release-policy trigger names a front-door verb, so a flag landed mid-iteration leaves the site advertising a refusal until an unforced release. Instance: docs/openspec.md, docs/speckit.md and docs/install.md advertised `init --recipe` while the pinned v0.28.0 refused it (`unknown argument: --recipe`, exit 2).
-
-**Deliverable:** invariant B, or a sibling arm, extended to a flag after an advertised verb, read against the pinned release's flag grammar (a flag table beside the verb table), and the release-policy trigger worded to match.
-
-**Push need (2026-09-29, inside the budget):** the same mid-iteration batch push, since its gate arm is native crate code the Windows and macOS legs compile; lands before [install-gate-selection](#install-gate-selection), whose new `init` flags are the class it gates. It also forces this close's release, on an operator direction lead-relayed (not a ruling): v0.29.0 carries no flag table, so the front door's flags read as unreleased and a withheld disposition reds. The tag, at or above the deferred v0.30.0, rides the closing push and adds its `publish` run.
-
-**Cost while deferred:** each release window can publish a flag the one-liner refuses, found only by a reader. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's close; promoted 2026-09-28 at the next iteration's scope: →fix fails because the flag table is new mechanism. Re-verified: the pin now reads 0.29.0, whose `init.rs` carries `--recipe`, so the instance is gone and the class stands. Owner lookup: `front-door-verbs`, `flag table` in this file — none; owner installer/SPEC.md §The front door's verbs, with `.claude/commands/close.md`'s release-policy binding.
-
-### install-gate-selection
-
-[spec: SPEC-gate-selection.md]
-
-an adopter cannot choose which kits or gates to install, or which to replace with their own. Operator direction, 2026-09-28 (lead session): "choice is what customers want". `init` takes `--profile`, `--recipe`, `--no-recipe`, `--dry-run`, `--force` and `--no-commit` only; the profiles are fixed rosters; a recipe can unregister gates but is publisher-shipped; a `gates.list` edit survives a re-run only as an adopter-changed file. The registry already resolves consumer-first, so a same-named gate in the adopter's gates dir shadows a kit gate (gate-sdk/SPEC.md §Layout and configuration), but no adopter page presents that as the replace path.
-
-**Deliverable:** an install-time selection surface, include or exclude per kit and per gate, recorded in `checkwright.lock` so re-runs and `update` honour it, and the replace-with-your-own path documented.
-
-**Push need (2026-09-29, inside the budget):** the same mid-iteration batch push, since the new `init` flags run on the pwsh Windows smoke legs; lands after [front-door-flag-grammar](#front-door-flag-grammar), so its flags meet the flag table, and before `installer-install-brevity`.
-
-**Cost while deferred:** each adopter install takes a fixed roster and hand-edits it to choose. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead as `iteration/high`, re-classed `event/high` at promotion since its prose pays at an adopter's install; promoted 2026-09-28 at the next iteration's scope: →fix fails because the surface is new mechanism. Owner lookup: `selection`, `--profile` in this file — [verify-workflow-decoupling](#verify-workflow-decoupling), [gate-customer-value-audit](#gate-customer-value-audit), [custom-gate-substrates](#custom-gate-substrates) and [gate-authoring-sdk-surface](#gate-authoring-sdk-surface), each DISTINCT. Owner installer/SPEC.md §init, §Profiles and §The manifest.
-
 ### companion-spec-to-code-gates
 
 [spec: SPEC-spec-to-code.md]
@@ -208,7 +184,7 @@ the interop rung's submission half. The build half landed at companion-catalog-e
 
 **Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **The four preconditions the operator set on 2026-09-27 landed at catalog-submission-preconditions:** `crate-tests-windows-flip`, since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; `catalog-landing-docs-polish`; and `spec-toolkits-guarantee`.
 
-**Four more prerequisites, operator direction 2026-09-29, lead-relayed (not a ruling):** [install-gate-selection](#install-gate-selection), [companion-spec-to-code-gates](#companion-spec-to-code-gates), [speckit-extension-full-profile](#speckit-extension-full-profile) and [adoption-prompt-templates](#adoption-prompt-templates). Ground: Spec Kit and OpenSpec are technical toolkits, so a companion offering only document gates reads as near-useless, and the launch needs an early-adopter wow.
+**Four more prerequisites, operator direction 2026-09-29, lead-relayed (not a ruling):** `install-gate-selection`, [companion-spec-to-code-gates](#companion-spec-to-code-gates), [speckit-extension-full-profile](#speckit-extension-full-profile) and [adoption-prompt-templates](#adoption-prompt-templates). Ground: Spec Kit and OpenSpec are technical toolkits, so a companion offering only document gates reads as near-useless, and the launch needs an early-adopter wow.
 
 **Push need (2026-09-27, inside the budget):** the release tag push beside the closing push, since the submission needs the extension on a published tag; close's release policy decides the cut.
 
@@ -1516,5 +1492,7 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 - consumer-smoke-windows-residue
 - installer-install-brevity
+- front-door-flag-grammar
+- install-gate-selection
 
 ## Lessons Learned
