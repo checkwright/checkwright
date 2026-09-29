@@ -13,3 +13,10 @@
 - rev: 445055c5f4910aac12339288416a1fb295be6b64
 - finding: Spec Kit tasks read '- [ ] T005 [P] [US1] desc in src/x.py' (bare path after in, some pathless; ticked [X] or [x]); [USn] labels map to '### User Story n' spec headings; FR-/SC- IDs appear in tasks only in the optional converge phase; plan.md's structure is a text-fence tree of intended paths; analyze is agent prose. OpenSpec tasks '- [ ] 1.1 text' carry no paths; validate --strict exits 0 on MODIFIED-absent, RENAMED-absent-source and ADDED-existing (INFO only) and REMOVED-absent (silent); archive -y refuses the first three and archives REMOVED-absent as already removed. Extension commands receive free-text ARGUMENTS.
 - inferred: that OpenSpec doctor and status inspect no code (unrun)
+
+## 2026-09-29 align — Do the four iteration amendments hold against the tree?
+- corpus: native installer companion docs
+- oracle: read-site greps and one audit sweep
+- rev: ed9968eb9528b23fc6165ce231e6d361cb658192
+- finding: Quoted sources hold; EreCapture lacks a from-offset capture (fixed in the amendment as capture_from); rosters gained companion Recipes and Fixtures, ere.rs, release-declaration rows; two wording fixes
+- inferred: none
