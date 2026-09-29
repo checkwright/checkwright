@@ -45,11 +45,11 @@ fn cache_path(tmp_dir: &str, crate_dir: &str) -> String {
     format!("{}/crate-arms-{}.green", tmp_dir, id)
 }
 
-// spec: gate-sdk/SPEC.md §check-crate-arms — one arm's spawn and its report: the merged capture is
-// read whatever the status, because for these two the *failing* run is the one whose report has to
-// print, and a command substitution's value keeps exactly one trailing newline when echoed back
+// spec: gate-sdk/SPEC.md §check-crate-arms — one arm's spawn, stripped of git's repository
+// locators, and its report: the merged capture is read whatever the status, because for these two
+// the *failing* run is the one whose report has to print
 fn arm(label: &str, crate_dir: &str, argv: &[&str]) -> Result<bool, String> {
-    let m = proc::run_merged(&CARGO, argv)?;
+    let m = proc::run_merged_without(&CARGO, argv, proc::GIT_REPO_LOCATORS)?;
     if m.succeeded() {
         return Ok(true);
     }

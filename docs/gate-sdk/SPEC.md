@@ -2855,6 +2855,8 @@ cargo test --release --manifest-path "$CRATE/Cargo.toml" --target-dir "$TARGET_D
 
 `$CRATE` is `gate_native_crate` (§Layout and configuration) and `$TARGET_DIR` is `GATE_SDK_CARGO_TARGET_DIR`. Both arms run even when the first fails, so one commit-time report carries what a CI run would have said in two. The second spawn is unconditional on the first's verdict, and the fixture arm on both.
 
+Every spawn, each arm and each fixture suite below, runs with git's repository locators (`proc::GIT_REPO_LOCATORS`) stripped: git exports them to a hook, and a sandbox running git would otherwise read the hook's index, red only from the hook.
+
 **This gate is the one spelling of the arms.** `bin/build-native.sh` only builds, so a battery without this gate let a commit pass that CI then failed. A near-identical command elsewhere is the same hole one flag narrower, so CI's own lint-and-test step is deleted rather than kept in step: two copies held equal by nobody is the defect, and removing the duplication outranks gating it. CI's build step stays, since §check-gate-binary-fresh needs the artifact.
 
 **A third arm runs every fixture suite**, because a rule narrowed in a shared module discharges §Fixture-pair discipline only once every `<tests-dir>/<gate>/` that module backs has been re-run, and the pre-commit battery runs gates rather than suites. Under the same predicate and after the first two, it runs `--run-gate-tests` over each row of `registry::fixture_suites()`, the one fixture-suite derivation and the rows `--emit fixture-suites` prints. So a consumer-owned pair behind a shared module is in the roster by derivation.
@@ -2862,7 +2864,6 @@ cargo test --release --manifest-path "$CRATE/Cargo.toml" --target-dir "$TARGET_D
 - A suite's failure is the gate's failure: the report prints that suite's runner output, which names the case, and the one-suite re-run command.
 - The runner is the binary `GATE_SDK_NATIVE_BIN` names, so the arm is meaningful only with §check-gate-binary-fresh green, which the same commit's battery requires. It never rebuilds.
 - A suite whose tests dir holds the working directory is skipped, since re-entering it would recurse. This gate's own fixture cases pin `GATE_SDK_KIT_DIRS` to a root with no `gate-tests/`, so they resolve no suite.
-- Each suite runs with git's repository locators (`proc::GIT_REPO_LOCATORS`) stripped from its environment. Git exports them to a hook, and a suite whose sandbox runs git inside a linked worktree would otherwise read the hook's index, red only from the hook.
 - The stamp cache is unchanged, so a fixture-only edit is not re-run here: its author edited that case knowingly, and the per-case run covers it. The cost falls only on a commit missing the stamp, one touching the crate, the only commits that can move a shared module's verdict.
 
 It is an arm rather than a command to run by hand because the failure it closes is remembering, not typing.
