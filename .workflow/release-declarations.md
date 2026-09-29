@@ -5,6 +5,7 @@
 - `check-close-surfaces` — a new assertion D reds a gitignored roster row whose `reclaim=` does not rotate its log, since close reads every row before reclaiming it and a truncation erases the lines appended in between. Spell the reclaim `<gate binary> --emit capture-drain <path>`, and read the drain file it prints rather than the live log.
 - `check-task-path-claim` — new in canon-kit: a ticked task in a task list `CANON_KIT_TASK_LIST_GLOBS` names reds on each path it names that does not exist. It registers disarmed and asserts nothing until that knob is set; a path absent by design takes `task-path-exempt: <reason>` on the task's line or the one above.
 - `check-task-label-resolution` — new in canon-kit: a label a task list cites, per a family in `CANON_KIT_TASK_LABEL_CITES` and `CANON_KIT_TASK_LABEL_DEFINES`, reds unless a markdown file beside the list defines it. It registers disarmed and asserts nothing until the cite knob and the task-list knob are set; the two knobs must carry one key set of one-group EREs, or every canon-kit gate exits 2.
+- `check-gate-substrate-parity` — reds after upgrading through assertion I, which holds every gate the binary carries for a kit you vendor to be registered in your `gates.list` or declared `# unregistered:` there. If you vendor canon-kit, the new `check-task-path-claim` and `check-task-label-resolution` are such gates: register each, or declare `# unregistered: <gate> — <reason>`.
 
 ## Behavior changes
 
