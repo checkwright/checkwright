@@ -48,7 +48,7 @@ no rule says whether every docs page needs its own menu entry or may be reached 
 
 **Deliverable:** the rule stated in docs/site-architecture.md, the collapsed Releases children, and `check-docs-nav-reachable` holding the strict form.
 
-**Cost while deferred:** the nav's reach is decided page by page, and the Releases children grow the menu with every release. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead after its close; promoted 2026-09-29 at the next iteration's scope: →fix fails because the rule is new. Re-verified: the `nav_children_key` loop in nav.html renders every release as a list item. Owner lookup: `reachab`, `collapsed` in this file — [toolkit-nav-hierarchy](#toolkit-nav-hierarchy), DISTINCT (labels and parenting, not reach); [releases-page-table](#releases-page-table) keeps both its table and the now collapsed nav children, and [nav-spec-suffix-restore](#nav-spec-suffix-restore) stands under the strict rule. Owner docs/site-architecture.md.
+**Cost while deferred:** the nav's reach is decided page by page, and the Releases children grow the menu with every release. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead after its close; promoted 2026-09-29 at the next iteration's scope: →fix fails because the rule is new. Re-verified: the `nav_children_key` loop in nav.html renders every release as a list item. Owner lookup: `reachab`, `collapsed` in this file — [toolkit-nav-hierarchy](#toolkit-nav-hierarchy), DISTINCT (labels and parenting, not reach); [releases-page-table](#releases-page-table) keeps both its table and the now collapsed nav children, and `nav-spec-suffix-restore` stands under the strict rule. Owner docs/site-architecture.md.
 
 **Push need (2026-09-29, inside the budget):** the iteration's one mid-iteration batch push, since the collapsed nav renders in the Pages build, which the local render oracle reaches only in part; the nav units ride it together.
 
@@ -91,14 +91,6 @@ no page states which Checkwright checks each companion toolkit gets: docs/spec-t
 **Push need (2026-09-29, inside the budget):** the iteration's one mid-iteration batch push, since its freshness gate is native crate code the Windows and macOS legs compile and no local run reaches.
 
 ## Technical Debt
-
-### nav-spec-suffix-restore
-
-the site nav's kit suffix offers `readme` only, while every kit page links both its README and its SPEC, so the SPEC mirrors are the one reachable page class the menu does not reach. Traced 2026-09-29: delta 11 of the payload-withholding amendment, tagged `{mechanical}`, was applied by d2fbbd2a as a SPEC-title filter in docs/_includes/nav.html with a matching exclusion in `check-docs-nav-reachable`; no TRAJECTORY.md ruling covers it. Operator direction, 2026-09-29, lead-relayed (not a ruling): every reachable page is reachable from the menu, so the `spec` suffix returns. Grounds: the muted suffix already was the reference-tier affordance, evaluators of a verification tool are the SPECs' readers, and payload withholding is a footprint choice that does not carry to the website.
-
-**Deliverable:** the exclusion dropped from the nav include, from `check-docs-nav-reachable`'s model and from any docs/site-architecture.md sentence stating it. Process lesson, for the build to weigh: an information-architecture choice tagged `{mechanical}` inside an unrelated amendment reached no operator.
-
-**Cost while deferred:** a site reader finds a kit's SPEC only through its page body. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead after its close; promoted 2026-09-29 at the next iteration's scope: →fix fails because the stage may not build. Re-verified: `s.title != 'SPEC'` at nav.html line 12 and `SUFFIX_EXCLUDED_TITLE` in `native/src/gates/docs_nav_reachable.rs`. Owner lookup: `suffix`, `SPEC-title` in this file — none; owner docs/site-architecture.md, with [nav-strict-reachability](#nav-strict-reachability) refining the rule it restores under.
 
 ### homepage-license-duplicate
 
@@ -1603,5 +1595,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 The consumer's local-only companion files (private brief, ops runbook) have read triggers but no write-back trigger, so shipped-unit forward memory and an out-of-tree state verifier drift until a consult audits them; owed are close and release-sweep template slots for both, and a retired-slug arm over plain code on the local-only globs.
 
 ## Done
+
+- nav-spec-suffix-restore
 
 ## Lessons Learned
