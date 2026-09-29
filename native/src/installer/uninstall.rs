@@ -413,13 +413,11 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
         );
     } else if f.commit {
         let message = format!("chore: remove Checkwright kits ({}, v{})", profile, version);
-        if super::git_code(&root, &["commit", "-q", "-m", &message]) != Some(0) {
-            return Err(refuse(
-                "the commit failed — the removal is staged; commit it yourself to finish",
-                "",
-                1,
-            ));
-        }
+        super::commit_or_refuse(
+            &root,
+            &message,
+            "the commit failed — the removal is staged; commit it yourself to finish",
+        )?;
         println!(
             "\nUNINSTALL: removed {} file(s), kept {}, and committed the removal.",
             remove_set.len(),

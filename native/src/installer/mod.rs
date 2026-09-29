@@ -234,6 +234,32 @@ pub fn git_code(root: &Path, args: &[&str]) -> Option<i32> {
     proc::run(&programs::GIT, &argv).ok()?.code()
 }
 
+// spec: installer/SPEC.md §init — a failed commit is fatal, and its `Err` is git's own account,
+// hook output included, since the verb's refusal line cannot say which of them stopped it
+pub fn git_commit(root: &Path, message: &str) -> Result<(), String> {
+    let root = root.to_string_lossy().into_owned();
+    let done = proc::run(&programs::GIT, &["-C", &root, "commit", "-q", "-m", message])?;
+    if done.stdout().is_some() {
+        return Ok(());
+    }
+    let (out, err) = done.streams();
+    let account: Vec<String> = [out, err]
+        .iter()
+        .map(|s| String::from_utf8_lossy(s).trim_end().to_string())
+        .filter(|s| !s.is_empty())
+        .collect();
+    Err(account.join("\n"))
+}
+
+pub fn commit_or_refuse(root: &Path, message: &str, refusal: &str) -> Result<(), Refusal> {
+    git_commit(root, message).map_err(|account| {
+        if !account.is_empty() {
+            eprintln!("{}", account);
+        }
+        refuse(refusal, "", 1)
+    })
+}
+
 // spec: installer/SPEC.md §init — the roster goes to git in batches, so a large profile's install
 // is not bounded by the host's argv width. The status is captured rather than discarded: a read
 // that failed and returned nothing would look exactly like a clean tree.
@@ -293,6 +319,41 @@ mod tests {
             "demo" => demo::USAGE[0].to_string(),
             other => panic!("VERBS carries `{}`, which this test reads no usage line for", other),
         }
+    }
+
+    // spec: installer/SPEC.md §init — a hook's refusal reaches the caller as the commit's account,
+    // rather than as a bare failure that cannot say what stopped it
+    #[test]
+    fn a_refused_commit_carries_the_hooks_own_account() {
+        let dir = std::env::temp_dir().join(format!("cw-commit-account-{}", std::process::id()));
+        std::fs::remove_dir_all(&dir).ok();
+        std::fs::create_dir_all(dir.join("hooks")).expect("cannot make the scratch repo");
+        let git = |args: &[&str]| {
+            let d = dir.to_string_lossy().into_owned();
+            let mut argv = vec!["-C", d.as_str()];
+            argv.extend_from_slice(args);
+            proc::run(&programs::GIT, &argv).expect("git did not spawn");
+        };
+        git(&["init", "-q"]);
+        git(&["config", "user.name", "Scratch"]);
+        git(&["config", "user.email", "scratch@example.com"]);
+        git(&["config", "core.hooksPath", "hooks"]);
+        let hook = dir.join("hooks").join("pre-commit");
+        std::fs::write(&hook, "#!/bin/sh\necho 'the hook refused this commit' >&2\nexit 1\n")
+            .expect("cannot write the hook");
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(&hook, std::fs::Permissions::from_mode(0o755))
+                .expect("cannot mark the hook executable");
+        }
+        std::fs::write(dir.join("f.txt"), "x\n").expect("cannot write the staged file");
+        git(&["add", "f.txt"]);
+        let account = git_commit(&dir, "scratch").expect_err("the hook's refusal was not a failure");
+        assert!(account.contains("the hook refused this commit"), "the account dropped the hook's words: {}", account);
+        std::fs::remove_file(&hook).expect("cannot remove the hook");
+        assert!(git_commit(&dir, "scratch").is_ok(), "a commit with no hook in the way failed");
+        std::fs::remove_dir_all(&dir).ok();
     }
 
     // spec: installer/SPEC.md §The verbs — a usage line's flags, each with whether a `<operand>`

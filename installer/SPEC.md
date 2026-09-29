@@ -132,6 +132,8 @@ It writes the kit directories, a `gates.list` seeded with each kit's starting ga
 
 **"Nothing to change" still commits what the run rewrote.** `init` regenerates its vendored tools' projections on every run, and **one commit** is a promise about what the run leaves behind. So the no-op exit commits anything it rewrote that is uncommitted, under the vendoring commit's message, and says so; under `--no-commit` the arm is off. That commit sits **inside** the exit, never ahead of it, because a commit against an empty index fails and `init` treats a failed commit as fatal.
 
+**A failed commit relays git's own account.** The files stay staged and `init` exits 1, first printing what git and any hook it ran wrote. Its own refusal line cannot say whether a hook's red or a missing git identity stopped the commit, and the remedy differs.
+
 **Each projection lands where your knobs put it.** The hooks go to `GATE_SDK_HOOKS_DIR` and the coupling graph to `GATE_SDK_GRAPH_ARTIFACT`, resolved from your gates directory's knob files as a battery run at the root resolves them. A re-run so writes, records and stages the file your `check-graph` reads. A knob pointing outside the repository gets its file written but not recorded, since `files` holds repo-relative paths (§The manifest). `init` compares no freshness, and the projections stay `init`'s `files` entries.
 
 **A payload older than the recorded install is refused as a silent downgrade.** "Older" is the floor predicate's comparison (context-kit/SPEC.md §bin/env-probe), over dotted digit runs only, so a prerelease or build suffix is unordered and never reads as a downgrade (§Versioning). `--force` means one thing in all three places it appears, the changed-file protection, the downgrade refusal and `uninstall`'s kept files (§uninstall): overwrite what `init` would otherwise protect.
@@ -515,7 +517,7 @@ The trim runs through the payload's own copy of doctrine-kit's installer (doctri
 
 `--dry-run` prints the plan, writes nothing, and exits 0. The plan is what would be removed, counted by top-level directory with a root file its own key, what would be kept and why, the residual manifest if there is one, and any file of yours left behind inside a vendored directory.
 
-**The commit** is one commit naming the profile and the version, staging the removals and the manifest disposition. Files kept for you are never staged, on the reasoning that keeps `init`'s written set and its recorded roster apart. A run with nothing to remove says so and exits 0 without narrowing the manifest: the install is still there, so disowning it would be false.
+**The commit** is one commit naming the profile and the version, staging the removals and the manifest disposition. Files kept for you are never staged, on the reasoning that keeps `init`'s written set and its recorded roster apart. A run with nothing to remove says so and exits 0 without narrowing the manifest: the install is still there, so disowning it would be false. A failed commit leaves the removal staged and relays git's account, as `init`'s does (§init).
 
 ## demo
 

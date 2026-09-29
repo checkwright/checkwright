@@ -8,6 +8,9 @@ use crate::{install, sha256, toolfloor};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
+const COMMIT_FAILED: &str =
+    "the commit failed — the files are staged; commit them yourself to finish the install";
+
 pub(super) struct Flags {
     profile: String,
     dry: bool,
@@ -939,13 +942,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
                     let listed = super::git_capture(&root, &["diff", "--cached", "--name-only"])
                         .unwrap_or_default();
                     let residue = listed.lines().filter(|l| !l.is_empty()).count();
-                    if super::git_code(&root, &["commit", "-q", "-m", &message]) != Some(0) {
-                        return Err(refuse(
-                            "the commit failed — the files are staged; commit them yourself to finish the install",
-                            "",
-                            1,
-                        ));
-                    }
+                    super::commit_or_refuse(&root, &message, COMMIT_FAILED)?;
                     println!(
                         "INIT: already at the {} profile (v{}) — {} file(s) checked; {} that init had rewritten were uncommitted and are now committed.",
                         profile_name, version, r.written.len(), residue
@@ -965,13 +962,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         // spec: installer/SPEC.md §init — the commit is the distribution model, not a
         // convenience: vendored-and-committed is what makes the tree auditable, so leaving it dirty
         // would hand the adopter the step that does the proving.
-        if super::git_code(&root, &["commit", "-q", "-m", &message]) != Some(0) {
-            return Err(refuse(
-                "the commit failed — the files are staged; commit them yourself to finish the install",
-                "",
-                1,
-            ));
-        }
+        super::commit_or_refuse(&root, &message, COMMIT_FAILED)?;
         println!(
             "INIT: vendored {} kit(s) at the {} profile (v{}) and committed them.",
             kits.len(),
