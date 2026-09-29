@@ -717,9 +717,10 @@ grep -q -- '--list is captured at exit 0 ← a surface$' "$kflog" \
 # front-end over a throwaway record and a throwaway gates roster, the seam a crate unit test cannot
 # see: the front-end's arm composition, the consumer knobs, and the record as a file on disk.
 irec="$work/install-observations.log"
+irec_author="$work/author-install-observations.log"
 iroster="$work/install-gates.list"
 printf '# a throwaway roster\ncheck-alpha\ncheck-zeta\n' > "$iroster"
-fin() { DRIFT_KIT_INSTALL_RECORD="$irec" bash "$DRIFT_ARM" --emit file-install "$@"; }
+fin() { DRIFT_KIT_INSTALL_RECORD="$irec" DRIFT_KIT_AUTHOR_INSTALL_RECORD="$irec_author" bash "$DRIFT_ARM" --emit file-install "$@"; }
 iev() { DRIFT_KIT_INSTALL_RECORD="$irec" DRIFT_KIT_GATES_FILE="$iroster" bash "$DRIFT_ARM" --emit install-evidence; }
 today="$(date +%F)"
 
@@ -796,6 +797,22 @@ irefuse "a day outside its set"            checkin i1 14 gate-sdk yes
 irefuse "a retained value outside its set" checkin i1 7 gate-sdk maybe
 irefuse "a malformed ttfg"                 install i1 a-profile a-floor 12m
 irefuse "a flag in a positional slot"      install i1 --list a-floor 12
+
+# spec: drift-kit/SPEC.md §The install-observation record — a leading --author files into the author
+# record and leaves the non-author record, and so the projection over it, byte-unchanged; a misplaced
+# --author is refused and writes neither record.
+iauthor_before="$(iev)"
+fin --author install rehearsal-0 full linux 5 >/dev/null
+grep -q "^$today install rehearsal-0 full linux 5\$" "$irec_author" \
+    || fail "--author did not file its line into the author record: $(cat "$irec_author" 2>&1)"
+cmp -s "$work/install-record.before" "$irec" \
+    || fail "--author wrote the non-author record"
+[[ "$(iev)" == "$iauthor_before" ]] \
+    || fail "the install-evidence projection read the author record"
+cp "$irec_author" "$work/author-record.before"
+irefuse "a misplaced --author"             install --author rehearsal-1 full linux 5
+cmp -s "$work/author-record.before" "$irec_author" \
+    || fail "a misplaced --author wrote the author record"
 
 # spec: drift-kit/SPEC.md §The install-evidence projection — every published figure carries its
 # denominator, the group-bys render in a fixed order with the unrostered aggregate last, and two

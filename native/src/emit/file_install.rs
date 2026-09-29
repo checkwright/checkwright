@@ -3,14 +3,26 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — a table member and not a hardcoded flag, because the
 // arm reads a consumer knob, which a hardcoded flag would hide from the knob-file derivation.
 
-pub const KNOBS: &[&str] = &["DRIFT_KIT_INSTALL_RECORD"];
+pub const KNOBS: &[&str] = &["DRIFT_KIT_INSTALL_RECORD", "DRIFT_KIT_AUTHOR_INSTALL_RECORD"];
 
-pub const USAGE: &str = "usage: --emit file-install [--] <kind> <field>...\n  \
+pub const USAGE: &str = "usage: --emit file-install [--author] [--] <kind> <field>...\n  \
      install <id> <profile> <floor> <ttfg>\n  \
      red <id> <gate> <verdict> <disposition> <behaviour>\n  \
      checkin <id> <day> <kit> <retained>\n  \
      appends one dated line to the install-observation record; \
-     \"--\" files a field beginning with \"-\" (a `-` ttfg among them)";
+     \"--\" files a field beginning with \"-\" (a `-` ttfg among them)\n  \
+     --author, first, files into the author seat's record, which no projection reads";
+
+const AUTHOR_FLAG: &str = "--author";
+
+// spec: drift-kit/SPEC.md §The install-observation record — the flag is honoured only as the first
+// token, so a misplaced one falls to the any-slot refusal rather than landing a line in the wrong seat.
+fn seat(args: &[String]) -> (&'static str, &[String]) {
+    match args.first().map(String::as_str) {
+        Some(AUTHOR_FLAG) => ("DRIFT_KIT_AUTHOR_INSTALL_RECORD", &args[1..]),
+        _ => ("DRIFT_KIT_INSTALL_RECORD", args),
+    }
+}
 
 // spec: drift-kit/SPEC.md §The install-observation record — the closed value sets, one per field a
 // published count aggregates: an open value there yields a column no projection renders honestly.
@@ -177,6 +189,7 @@ fn replace_in_place(body: &str, k: &Kind, want: &str, new: &str) -> Option<Strin
 }
 
 pub fn emit(args: &[String]) -> Result<String, String> {
+    let (knob, args) = seat(args);
     let argv =
         super::file_survey::positionals(args, "field").map_err(|e| format!("{}\n{}", e, USAGE))?;
     let name = argv.first().ok_or_else(|| USAGE.to_string())?;
@@ -195,7 +208,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     let fields = &argv[1..];
     validate(k, fields)?;
 
-    let (record, spelled) = super::file_survey::anchored_capture("DRIFT_KIT_INSTALL_RECORD")?;
+    let (record, spelled) = super::file_survey::anchored_capture(knob)?;
     let path = std::path::Path::new(&record);
     if let Some(dir) = path.parent() {
         let _ = std::fs::create_dir_all(dir);
@@ -257,6 +270,27 @@ mod tests {
                 .expect("the separator did not end option processing"),
             &sep[1..]
         );
+    }
+
+    // spec: drift-kit/SPEC.md §The install-observation record — the seat is chosen by a leading
+    // `--author` alone; anywhere else before a `--` the flag is refused, after one it is a value.
+    #[test]
+    fn a_leading_author_flag_selects_the_author_record_and_a_later_one_is_refused() {
+        let lead = argv(&["--author", "install", "i1", "p", "f", "5"]);
+        let (knob, rest) = seat(&lead);
+        assert_eq!(knob, "DRIFT_KIT_AUTHOR_INSTALL_RECORD");
+        assert_eq!(rest, &lead[1..]);
+        let plain = argv(&["install", "i1", "p", "f", "5"]);
+        assert_eq!(seat(&plain).0, "DRIFT_KIT_INSTALL_RECORD");
+        let late = argv(&["install", "--author", "i1", "p", "f", "5"]);
+        let (knob, rest) = seat(&late);
+        assert_eq!(knob, "DRIFT_KIT_INSTALL_RECORD");
+        assert!(file_survey::positionals(rest, "field").is_err(), "a later --author was captured");
+        assert!(emit(&late).is_err(), "a later --author filed a line");
+        let valued = argv(&["--", "install", "--author", "p", "f", "5"]);
+        let (knob, rest) = seat(&valued);
+        assert_eq!(knob, "DRIFT_KIT_INSTALL_RECORD");
+        assert!(file_survey::positionals(rest, "field").is_ok(), "after -- it is a value");
     }
 
     // spec: drift-kit/SPEC.md §The install-observation record — `--help` is a refusal rather than

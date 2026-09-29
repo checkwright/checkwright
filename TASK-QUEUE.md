@@ -8,16 +8,6 @@
 
 ## New Features
 
-### install-author-discriminator
-
-[spec: SPEC-install-author.md]
-
-the install-observation record cannot tell an author's install from a non-author's. drift-kit/SPEC.md §The install-observation record exists for reds a non-author hit, yet its `install` line is `<date> install <id> <profile> <floor> <ttfg>`, so an operator-seat or rehearsal install filed through `--emit file-install` would read as external evidence and inflate docs/install-evidence.md.
-
-**Deliverable:** an author/non-author discriminator on the record, or a separate operator-seat channel, and the projection counting only non-author rows.
-
-**Cost while deferred:** author-run evidence, the rehearsal [design-partner-preview](#design-partner-preview) now runs first included, has no channel. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at its close: →fix fails because the field is a design choice between two shapes, →forward because no ruling is owed. Re-verified: the install line's five fields above. Owner lookup: `discriminator`, `operator-seat`, `author` in this file — [external-gate-quality-evidence](#external-gate-quality-evidence), DISTINCT (the red evidence, not the install line); owner drift-kit/SPEC.md §The install-observation record.
-
 ### price-table-roster-coverage-oracle
 
 [spec: SPEC-price-table.md] [recurrence: 2026-09-29]
@@ -72,7 +62,7 @@ no public page states what the battery costs a commit, the adopter's "will this 
 
 ### front-door-container-rehearsal
 
-a clean-container first-run rehearsal of the published front door, split from [design-partner-preview](#design-partner-preview)'s readiness paragraph: the release installer as docs/install.md prints it, `init` on a sample repository, `demo`, and a first red, in a container carrying nothing the author's machine does. Operator direction, 2026-09-29, lead-relayed (not a ruling): it runs before the observed install, and its evidence stays out of `--emit file-install` until [install-author-discriminator](#install-author-discriminator) lands.
+a clean-container first-run rehearsal of the published front door, split from [design-partner-preview](#design-partner-preview)'s readiness paragraph: the release installer as docs/install.md prints it, `init` on a sample repository, `demo`, and a first red, in a container carrying nothing the author's machine does. Operator direction, 2026-09-29, lead-relayed (not a ruling): it runs before the observed install, and its evidence stays out of `--emit file-install` until `install-author-discriminator` lands.
 
 **Deliverable:** the rehearsal run against the newest published release in a clean Linux container, its time to first green and first red recorded, each finding fixed in the iteration where it is debt or filed with `--emit file-gap`, and the run filed through the author channel the discriminator lands, so it builds after that unit. Host floors a Linux container cannot reach (macOS, native Windows) are named unrehearsed, never inferred.
 
@@ -1539,5 +1529,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 ## Done
 
 - npm-approval-delegation
+- install-author-discriminator
 
 ## Lessons Learned
