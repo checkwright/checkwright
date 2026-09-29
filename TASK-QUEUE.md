@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### installer-remainder-brevity
-
-installer/SPEC.md's remaining sections under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §Implementation, §Layout, §Selecting kits and gates, §update, §diff, §uninstall, §demo, §The CI action, §The packer, §Vendoring without the installer, §Reviewing the pre-commit hook, §Versioning and §The upgrade contract, about 83k characters; §The consumer smoke stays on the parent.
-
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every `##` heading kept verbatim and every fact another surface cites into them kept, per a citation survey. Applied after the iteration's amendments that could rewrite any of them merged: `adoption-prompt-templates` touched none, and `license-line-owned-sentence` rewrote §The packer, so no section is passed twice in one iteration. Deferred entries still owe rewrites in §The upgrade contract and §The front door's verbs; the operator took the whole remainder with that known (operator direction, 2026-09-29).
-
-**Cost while deferred:** paid by every session and adopter that reads an unpassed installer section. Filed 2026-09-29 as a split at companion-adoption-landing's scope from [spec-brevity-residue](#spec-brevity-residue), on an operator direction, 2026-09-29, lead-relayed (not a /consult ruling), riding the installer surface the iteration's adoption unit carries.
-
 ## Deferred
 
 ### shellcheck-extra-dirs-trigger
@@ -362,7 +354,7 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 [cost: session/high] [surface: installer]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; lifecycle-kit is finished (`lifecycle-template-brevity` and the three slices below); what remains starts at installer (48.5k, the smoke excepted; its contract sections landed as `installer-contract-brevity` and its install-surface sections as `installer-install-brevity`), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; lifecycle-kit is finished (`lifecycle-template-brevity` and the three slices below); installer is finished apart from §The consumer smoke (its contract, install-surface and remaining sections landed as `installer-contract-brevity`, `installer-install-brevity` and `installer-remainder-brevity`); what remains starts at guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
@@ -378,7 +370,7 @@ lifecycle-kit's remaining sections left 2026-09-29 at native-hook-customer-legs'
 
 installer's install-surface sections (§The verbs through §The manifest) left 2026-09-29 at companion-technical-gates' scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `installer-install-brevity`.
 
-installer's remaining sections other than §The consumer smoke left 2026-09-29 at companion-adoption-landing's scope, on an operator direction, 2026-09-29, lead-relayed (not a /consult ruling), as [installer-remainder-brevity](#installer-remainder-brevity), which finishes installer apart from the smoke.
+installer's remaining sections other than §The consumer smoke left 2026-09-29 at companion-adoption-landing's scope, on an operator direction, 2026-09-29, lead-relayed (not a /consult ruling), and landed as `installer-remainder-brevity`, which finishes installer apart from the smoke.
 
 ### prune-set-matches-walk-root-ancestors
 
@@ -1508,5 +1500,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - toolkit-nav-hierarchy
 - nav-strict-reachability
 - site-sitemap-robots
+- installer-remainder-brevity
 
 ## Lessons Learned
