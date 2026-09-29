@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### lifecycle-kit-tail-brevity
-
-the three brevity moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) over the rest of lifecycle-kit/SPEC.md: the gate and adapter sections under §Per-component contracts outside the six state-machine tool sections already passed (§The stage-machine adapters, §The close-surfaces emit arm, and §check-close-surfaces through §check-gap-inbox-neutrality), plus §templates/release-sweep.md, §templates/upgrade.md and §templates/consult.md, about 65k bytes. It finishes lifecycle-kit.
-
-**Deliverable:** the moves applied to those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every contract sentence kept.
-
-**Cost while deferred:** paid by every session that opens one of these sections, which each gate's red sends a reader to. Filed 2026-09-29 at scope as a split from its parent, on an operator direction lead-relayed (not a /consult ruling), unit set A.
-
 ## Deferred
 
 ### shellcheck-extra-dirs-trigger
@@ -370,7 +362,7 @@ lifecycle-kit's sections above §Per-component contracts left 2026-09-28 at cons
 
 lifecycle-kit's state-machine tool sections left 2026-09-28 at lifecycle-machine-brevity's scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `lifecycle-kit-machine-brevity`.
 
-lifecycle-kit's remaining sections left 2026-09-29 at native-hook-customer-legs' scope as [lifecycle-kit-tail-brevity](#lifecycle-kit-tail-brevity), on an operator direction lead-relayed (not a /consult ruling).
+lifecycle-kit's remaining sections left 2026-09-29 at native-hook-customer-legs' scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `lifecycle-kit-tail-brevity`, which finishes lifecycle-kit.
 
 ### prune-set-matches-walk-root-ancestors
 
@@ -1430,5 +1422,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 - native-hook-dispatch
 - worktree-crate-commit-red
+- lifecycle-kit-tail-brevity
 
 ## Lessons Learned
