@@ -1,3 +1,3 @@
-# contract: companion/SPEC.md §The component — one `<toolkit> <package> <version>` line per supported spec-authoring toolkit; the toolkit leg installs <package> at <version>
-speckit specify-cli 1.0.12
-openspec @fission-ai/openspec 1.13.2
+# contract: companion/SPEC.md §The component — one `<toolkit> <package> <version> <name…>` line per supported spec-authoring toolkit; the toolkit leg installs <package> at <version>, and the support table heads the toolkit's column with <name…>
+speckit specify-cli 1.0.12 Spec Kit
+openspec @fission-ai/openspec 1.13.2 OpenSpec

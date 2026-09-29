@@ -20,14 +20,14 @@ One queue entry pairs it: [toolkit-support-table](TASK-QUEUE.md#toolkit-support-
 
 ### (1) The two rosters {mechanical}
 
-**Not yet applied.**
+**Applied.**
 
 - `companion/native.list`, new, opening `# contract: companion/SPEC.md §The toolkit legs — one <toolkit> <arguments…> line per check the toolkit itself ships; the toolkit leg runs each with the toolkit's pinned package, and the support table lists each`. Its one line is `openspec validate --all --strict --no-interactive`.
 - `companion/toolkits.list`: each line gains the toolkit's display name after its version: `speckit specify-cli 1.0.12 Spec Kit` and `openspec @fission-ai/openspec 1.13.2 OpenSpec`. Its contract comment reads `<toolkit> <package> <version> <name…>`. The leg's `pin()` reads fields 2 and 3 and is unaffected.
 
 ### (2) The lifecycle overlay moves, and the leg runs the roster {mechanical}
 
-**Not yet applied.** `git mv companion/fixtures/openspec/lifecycle companion/fixtures/openspec/full/check-stage-entry`. Its two readers follow: `installer/consumer-smoke/run-smoke.sh`'s `COMPANION_LC`, and `.github/workflows/gates.yml`'s OpenSpec validation step. That step becomes a loop over `companion/native.list`'s lines for each toolkit with a layout. It runs each line with `npx --yes "<package>@<version>"` over a copy of `fixtures/<toolkit>/layout/`, then again with each `fixtures/<toolkit>/full/*/` overlay copied over that copy.
+**Applied.** `git mv companion/fixtures/openspec/lifecycle companion/fixtures/openspec/full/check-stage-entry`. Its two readers follow: `installer/consumer-smoke/run-smoke.sh`'s `COMPANION_LC`, and `.github/workflows/gates.yml`'s OpenSpec validation step. That step becomes a loop over `companion/native.list`'s lines for each toolkit with a layout. It runs each line with `npx --yes "<package>@<version>"` over a copy of `fixtures/<toolkit>/layout/`, then again with each `fixtures/<toolkit>/full/*/` overlay copied over that copy.
 
 installer/SPEC.md §The consumer smoke, the lifecycle leg's sentence, reads *It overlays `companion/fixtures/openspec/full/check-stage-entry/`*.
 
@@ -51,7 +51,7 @@ companion/SPEC.md §The fixtures: *A lifecycle overlay under `fixtures/openspec/
 
 ### (5) The page and the rosters it joins {mechanical}
 
-**Not yet applied.** `docs/spec-toolkits.md` gains `## Which checks each toolkit gets`, after §What the gates check against your code. It holds one sentence and the block. The sentence: *`prose`: the default line arms and tests it, and `full` keeps it. `full`: only the `full` line does. `opt-in`: an overlap you add beside the toolkit's own check ([the value bar](companion/SPEC.md#the-two-tiers)). `toolkit`: the toolkit's own check, which Checkwright leaves to it.*
+**Partly applied: the site-architecture row lands with the gate.** `docs/spec-toolkits.md` gains `## Which checks each toolkit gets`, after §What the gates check against your code. It holds one sentence and the block. The sentence: *`prose`: the default line arms and tests it, and `full` keeps it. `full`: only the `full` line does. `opt-in`: an overlap you add beside the toolkit's own check ([the value bar](companion/SPEC.md#the-two-tiers)). `toolkit`: the toolkit's own check, which Checkwright leaves to it.*
 
 docs/site-architecture.md §Generated projections and their freshness gates gains the row: *- **The toolkit support table** `<!-- projection: check-support-table-fresh -->` — `docs/spec-toolkits.md`'s marker block, one row per check proven in `companion/fixtures/` or listed in `companion/native.list`, one column per `companion/toolkits.list` line: `bash gate-sdk/bin/run-gates.sh --emit support-table --write` (`check-support-table-fresh` byte-gates it).*
 

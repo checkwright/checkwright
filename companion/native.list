@@ -1,0 +1,2 @@
+# contract: companion/SPEC.md §The toolkit legs — one <toolkit> <arguments…> line per check the toolkit itself ships; the toolkit leg runs each with the toolkit's pinned package, and the support table lists each
+openspec validate --all --strict --no-interactive

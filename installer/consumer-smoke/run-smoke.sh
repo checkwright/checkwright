@@ -1144,9 +1144,9 @@ companion_arm openspec openspec "${COMPANION_WORDS[@]}"
 COMPANION_DONE+=(openspec)
 # spec: companion/SPEC.md §The lifecycle layer — the OpenSpec companion-full line, the recipe and the layer on a full install, the audit asserted to fire on a change touching two capabilities at a build cursor with no align stamp, and to clear once the change touches one
 printf 'companion arm for openspec lifecycle (the OpenSpec page'"'"'s full line, check-stage-entry over the lifecycle overlay)\n'
-COMPANION_LC="$COMPANION/fixtures/openspec/lifecycle"
+COMPANION_LC="$COMPANION/fixtures/openspec/full/check-stage-entry"
 mapfile -t COMPANION_LC_DELTAS < <(cd "$COMPANION_LC" && find openspec/changes -path '*/specs/*/spec.md' | sort)
-[[ ${#COMPANION_LC_DELTAS[@]} -gt 0 ]] || fail "companion arm, openspec lifecycle: the overlay under companion/fixtures/openspec/lifecycle/ carries no change delta, so no second component is planted"
+[[ ${#COMPANION_LC_DELTAS[@]} -gt 0 ]] || fail "companion arm, openspec lifecycle: the overlay under companion/fixtures/openspec/full/check-stage-entry/ carries no change delta, so no second component is planted"
 out="$(companion_line "$COMPANION_OPENSPEC_PAGE" companion-full "--profile full")" || fail "companion arm, openspec lifecycle: the OpenSpec page carries no full line to run"
 mapfile -t COMPANION_LC_WORDS <<<"$out"
 c="$(companion_consumer openspec openspec-lifecycle "${COMPANION_LC_WORDS[@]}")" \

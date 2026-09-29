@@ -16,6 +16,7 @@ Checkwright's gates over a repository whose specs another toolkit writes. This d
 - **A Spec Kit extension**, in `speckit/`, whose install command installs Checkwright and applies the Spec Kit recipe for you.
 - **A fixture tree per toolkit**, in `fixtures/`, in the toolkit's own layout, with one planted defect per claimed gate. The consumer smoke installs the profile on each tree, applies the recipe, and asserts the battery green and each defect caught.
 - **The tested versions**, in `toolkits.list`.
+- **The toolkits' own checks**, in `native.list`, which the toolkit leg runs and the support table lists.
 
 ## Using it
 
@@ -24,11 +25,11 @@ Checkwright's gates over a repository whose specs another toolkit writes. This d
 
 Each toolkit also has a `full` line, which installs every kit and on OpenSpec applies `openspec/lifecycle/` too ([SPEC.md §The two tiers](SPEC.md#the-two-tiers)).
 
-What the gates catch in a spec tree and the tested versions are on the [Spec toolkits](https://checkwright.dev/spec-toolkits.html) page, and each route is on its toolkit's page: [Spec Kit](https://checkwright.dev/speckit.html) and [OpenSpec](https://checkwright.dev/openspec.html).
+What the gates catch in a spec tree, which checks each toolkit gets and the tested versions are on the [Spec toolkits](https://checkwright.dev/spec-toolkits.html) page, and each route is on its toolkit's page: [Spec Kit](https://checkwright.dev/speckit.html) and [OpenSpec](https://checkwright.dev/openspec.html).
 
 ## Where the design lives
 
-[`companion/SPEC.md`](SPEC.md): how a recipe is applied, each recipe line with the idiom it answers, the lifecycle layer, the tested claim, the fixture rules, the extension's contract, the pack step, the toolkit legs and the honest limits.
+[`companion/SPEC.md`](SPEC.md): how a recipe is applied, each recipe line with the idiom it answers, the lifecycle layer, the tested claim, the fixture rules, the extension's contract, the pack step, the toolkit legs, the support table and the honest limits.
 
 ## License
 

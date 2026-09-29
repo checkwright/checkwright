@@ -13,7 +13,8 @@ The companion package puts Checkwright's gates over a repository whose specs ano
 
 `companion/` is repo-root-governed and not a kit. It carries no `checks/` and no `smoke/`, so no kit-root resolver admits it. The package carries its recipes under `recipes/`, named in this repository's `GATE_SDK_PAYLOAD_RECIPES`: `openspec`, `openspec-lifecycle` and `speckit`. It adds no kit mechanism: each recipe is consumer config in knobs the `prose` profile reads, and the lifecycle layer is config in knobs lifecycle-kit reads. The toolkits' names live here, on the docs pages and on the front door, and never in a kit SPEC or a kit literal ([gate-sdk/SPEC.md §The provenance seam](../gate-sdk/SPEC.md#the-provenance-seam)).
 
-- `toolkits.list` pins each toolkit, one `<toolkit> <package> <version>` line each. The toolkit name keys the line, the package is what the toolkit leg installs, and the version is what it pins and asserts (§The toolkit legs).
+- `toolkits.list` pins each toolkit, one `<toolkit> <package> <version> <name…>` line each. The toolkit name keys the line, the package is what the toolkit leg installs, the version is what it pins and asserts (§The toolkit legs), and the display name heads the toolkit's column in the support table (§The support table), in the file's order.
+- `native.list` rosters the checks each toolkit itself ships, one `<toolkit> <arguments…>` line each. The toolkit leg runs every line and the support table lists it, so the roster has two readers and no line goes untested.
 - `<toolkit>/recipe/` holds a recipe (§Recipes).
 - `openspec/lifecycle/` holds OpenSpec's lifecycle layer (§The lifecycle layer).
 - `speckit/` is the Spec Kit extension around its recipe (§The Spec Kit extension). The directory is not named after the toolkit's repository, and a page links that repository at its root only, because `check-kit-ref-liveness` reds a `<name>-kit` path segment that names no kit root.
@@ -92,20 +93,24 @@ No recipe drops a gate. A toolkit idiom a gate reds is answered by a knob line f
 
 **One citation form passes unchecked.** `check-spec-pointer` reads a bare `<path>.md §<heading>` citation's path as repo-relative, so a file-relative `spec.md §…` is skipped. A bare `§Requirement: <name>` must name a requirement whole, since a lead clause shared by a family resolves nothing (canon-kit/SPEC.md §check-spec-pointer). The fixtures cite repo-relatively.
 
+The support table on the toolkit page is derived from the fixture directories and `native.list`, so it states what is tested (§The support table).
+
 ## The fixtures
 
 `fixtures/<toolkit>/layout/` is a tree in the toolkit's layout at its pin, authored here. Its section structure follows the toolkit's own templates, and no template text is copied, so the tree tests the same gates and ships no third-party text. It carries every idiom a recipe line answers, so a dropped line reds the arm's green leg or lets a planted defect pass. It also carries cross-file links and at least one repo-relative section citation that resolves.
 
 - **Spec Kit:** `.specify/memory/constitution.md`; a `.specify/scripts/bash/` script with ordinary comments and a `/*` absoluteness test; and one feature under `specs/001-release-notes/` with `spec.md`, `plan.md` and `tasks.md`. Its `tasks.md` carries the `bash` fence of `Task:` lines, `[US1]` labels and a ticked `T003` naming a source file under `src/`.
-- **OpenSpec:** `openspec/config.yaml`; one capability spec under `openspec/specs/`; and one change under `openspec/changes/` with a proposal, tasks and a delta whose MODIFIED requirement carries a `(Previously: …)` line. Its task `1.1` is ticked and names a source file under `src/`. A lifecycle overlay under `fixtures/openspec/lifecycle/` adds a second capability to that change, at a build cursor with no align stamp.
+- **OpenSpec:** `openspec/config.yaml`; one capability spec under `openspec/specs/`; and one change under `openspec/changes/` with a proposal, tasks and a delta whose MODIFIED requirement carries a `(Previously: …)` line. Its task `1.1` is ticked and names a source file under `src/`. A `full` overlay under `fixtures/openspec/full/check-stage-entry/` adds a second capability to that change, at a build cursor with no align stamp.
 
 Each source file is neither markdown nor a shell script, so no other claimed gate reads it.
 
 `fixtures/<toolkit>/defects/<gate>/` holds, per claimed gate, the files that replace their layout counterparts to plant that gate's defect. OpenSpec's `check-spec-pointer` defect is a scenario title carried twice in one spec, and its `check-md-refs` defect adds an anchored link to a missing requirement. Each toolkit's `check-task-path-claim` defect is its ticked task naming an absent path, and Spec Kit's `check-task-label-resolution` defect adds a task citing `[US2]`, which `spec.md` does not define.
 
+`fixtures/<toolkit>/full/<gate>/` overlays the layout with what only the `full` line's gate reads, and names that gate.
+
 `fixtures/<toolkit>/overlap/<gate>/` plants the defect an overlap exists for, over the layout. The companion arm applies the toolkit's recipe and overlap layer and asserts the gate reds it. The toolkit leg runs the toolkit's own check over the same planted tree and asserts the check misses it, so a pin move to a release that closes the miss reds the leg, and the overlap is weighed again (§The two tiers).
 
-The OpenSpec layout passes `openspec validate --all --strict` at the pin, with and without the lifecycle overlay, so the toolkit is its own fixture's oracle. This repository prunes every directory named `fixtures` from its own walks (`GATE_SDK_PRUNE_EXTRA_DIRS` in `scripts/gate-sdk-config.knobs`), since the trees carry each red on purpose. The companion arm governs them instead, inside a scratch consumer ([installer/SPEC.md §The consumer smoke](../installer/SPEC.md#the-consumer-smoke)).
+The OpenSpec layout passes `openspec validate --all --strict` at the pin, with and without the `full` overlay, so the toolkit is its own fixture's oracle. This repository prunes every directory named `fixtures` from its own walks (`GATE_SDK_PRUNE_EXTRA_DIRS` in `scripts/gate-sdk-config.knobs`), since the trees carry each red on purpose. The companion arm governs them instead, inside a scratch consumer ([installer/SPEC.md §The consumer smoke](../installer/SPEC.md#the-consumer-smoke)).
 
 ## The Spec Kit extension
 
@@ -139,10 +144,21 @@ The toolkits' own tools are oracles, and nothing here re-implements their schema
 
 1. installs the pinned `specify-cli`, runs `specify init --here --non-interactive --integration claude --script sh --ignore-agent-tools` in an empty scratch directory, since the non-interactive init refuses a non-empty one and a runner carrying no `claude` CLI, and packs the extension at version `0.0.0`. It serves the zip from a local web server and installs it with `specify extension add checkwright --from <url>`, answering the trust prompt. It asserts exit 0, `.specify/extensions/checkwright/extension.yml` present, and the hook registered in `.specify/extensions.yml`;
 2. asserts that `extension.yml`'s `requires.speckit_version` is `>=` the pinned version;
-3. runs the pinned `openspec validate --all --strict` inside a copy of `fixtures/openspec/layout/`, then again with the lifecycle overlay's `openspec/` copied over it;
+3. runs each `native.list` line of a toolkit with a layout, with the toolkit's pinned package, over a copy of the layout and again with each `full` overlay copied over it;
 4. for each `fixtures/<toolkit>/overlap/<gate>/`, runs the toolkit's own check over the layout with the defect planted, and asserts that it passes.
 
 A pin moves by editing its `toolkits.list` line, and the job then proves the new version on the next push.
+
+## The support table
+
+`docs/spec-toolkits.md` carries a table with one row per check and one column per toolkit, between `<!-- support-table:begin -->` and `<!-- support-table:end -->` with a blank line inside each marker. `bash gate-sdk/bin/run-gates.sh --emit support-table` prints the block, and `--write` rewrites it and touches nothing else. A row is a tested fact, so it derives from the fixture tree and `native.list`, never from the recipe files: one recipe line arms many gates, while a defect directory proves one.
+
+- **The header** is `| Check |`, then each `toolkits.list` display name in file order.
+- **A gate row** is one per gate name under any toolkit's `fixtures/<toolkit>/{defects,full,overlap}/`, sorted by name, the name in a code span. The directory is the tier. A toolkit's cell reads `prose` where its `defects/<gate>/` exists, since the default line arms and tests it and `full` only adds. Otherwise it reads `full` where its `full/<gate>/` exists, `opt-in` where its `overlap/<gate>/` exists (§The two tiers), and `—` elsewhere.
+- **A toolkit row** follows the gate rows, one per `native.list` line in file order: the line's `<toolkit> <arguments…>` in a code span, `toolkit` in that toolkit's cell and `—` in every other.
+- **Exit 2**, from the arm and from its gate, on a roster it cannot read: an unreadable `toolkits.list` or `native.list`, a `toolkits.list` line with no name, or a `native.list` line naming a toolkit `toolkits.list` lacks or carrying no arguments. It also exits 2 on a fixture toolkit directory `toolkits.list` lacks, and on a block that is absent or occurs twice.
+
+`check-support-table-fresh` compares the page's block with the arm's rendering in process, one finding for a stale block, printing the regen command. Its positional form is `check-support-table-fresh [companion-dir page]`, so a fixture tree stands in.
 
 ## Honest limits
 

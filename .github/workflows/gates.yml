@@ -320,8 +320,7 @@ jobs:
           set -euo pipefail
           pin() { awk -v t="$1" -v f="$2" '$1 == t { print $f; found = 1 } END { exit !found }' companion/toolkits.list; }
           sp="$(pin speckit 2)"; sv="$(pin speckit 3)"
-          op="$(pin openspec 2)"; ov="$(pin openspec 3)"
-          printf '%s\n' "SPECKIT_PACKAGE=$sp" "SPECKIT_VERSION=$sv" "OPENSPEC_PACKAGE=$op" "OPENSPEC_VERSION=$ov" >> "$GITHUB_ENV"
+          printf '%s\n' "SPECKIT_PACKAGE=$sp" "SPECKIT_VERSION=$sv" >> "$GITHUB_ENV"
 
       - name: install the packed extension with the pinned Spec Kit CLI
         run: |
@@ -355,15 +354,28 @@ jobs:
             || { echo "::error::extension.yml requires speckit_version '$floor', where the pin in companion/toolkits.list is $SPECKIT_VERSION"; exit 1; }
           echo "requires.speckit_version is $floor"
 
-      - name: validate the OpenSpec fixture with the pinned OpenSpec CLI
+      # spec: companion/SPEC.md §The toolkit legs — each native.list line over the layout, then over each full overlay
+      - name: run each toolkit's own checks over its fixture with the pinned package
         run: |
           set -euo pipefail
-          work="$RUNNER_TEMP/openspec"
-          mkdir -p "$work"
-          cp -R companion/fixtures/openspec/layout/. "$work/"
-          ( cd "$work" && npx --yes "$OPENSPEC_PACKAGE@$OPENSPEC_VERSION" validate --all --strict --no-interactive )
-          cp -R companion/fixtures/openspec/lifecycle/openspec/. "$work/openspec/"
-          ( cd "$work" && npx --yes "$OPENSPEC_PACKAGE@$OPENSPEC_VERSION" validate --all --strict --no-interactive )
+          pin() { awk -v t="$1" -v f="$2" '$1 == t { print $f; found = 1 } END { exit !found }' companion/toolkits.list; }
+          while read -r tk rest; do
+            case "$tk" in '' | '#'*) continue ;; esac
+            layout="companion/fixtures/$tk/layout"
+            [ -d "$layout" ] || continue
+            read -r -a argv <<< "$rest"
+            pkg="$(pin "$tk" 2)"; ver="$(pin "$tk" 3)"
+            for overlay in "" companion/fixtures/"$tk"/full/*/; do
+              [ -z "$overlay" ] || [ -d "$overlay" ] || continue
+              work="$RUNNER_TEMP/native-$tk"
+              rm -rf "$work"; mkdir -p "$work"
+              cp -R "$layout/." "$work/"
+              [ -z "$overlay" ] || cp -R "$overlay." "$work/"
+              ( cd "$work" && npx --yes "$pkg@$ver" "${argv[@]}" < /dev/null ) \
+                || { echo "::error::$tk ${argv[*]} failed over $layout${overlay:+ with $overlay}"; exit 1; }
+              echo "$tk $ver: ${argv[*]} passes over $layout${overlay:+ with $overlay}"
+            done
+          done < companion/native.list
 
   # spec: plugin/SPEC.md §The validation leg — the external oracles for the plugin package, each at a pinned version
   plugin-validate:

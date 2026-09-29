@@ -26,6 +26,25 @@ A citation's path is read from the repository root, so write `specs/001-login/sp
 
 The task gates read your task lists against the tree. A task you ticked that names a file or directory the repository does not have reds `check-task-path-claim`. On Spec Kit, a task labelled with a user story the spec beside it does not define, such as `[US3]` with no User Story 3, reds `check-task-label-resolution`. Both check that a path or a story exists, not that the code does what the task says.
 
+## Which checks each toolkit gets
+
+`prose`: the default line arms and tests it, and `full` keeps it. `full`: only the `full` line does. `opt-in`: an overlap you add beside the toolkit's own check ([the value bar](companion/SPEC.md#the-two-tiers)). `toolkit`: the toolkit's own check, which Checkwright leaves to it.
+
+<!-- support-table:begin -->
+
+| Check | Spec Kit | OpenSpec |
+| --- | --- | --- |
+| `check-docs-cmd` | prose | prose |
+| `check-md-refs` | prose | prose |
+| `check-spec-fence-balance` | prose | prose |
+| `check-spec-pointer` | prose | prose |
+| `check-stage-entry` | — | full |
+| `check-task-label-resolution` | prose | — |
+| `check-task-path-claim` | prose | prose |
+| `openspec validate --all --strict --no-interactive` | — | toolkit |
+
+<!-- support-table:end -->
+
 ## What is tested
 
 Every push to Checkwright's repository installs the profile on a tree in each toolkit's layout, applies the recipe through the toolkit's documented install line, and asserts the battery green. On Spec Kit it also installs `full` with the recipe and asserts the battery green and each defect caught. It then plants each defect and asserts the gate that owns it reds. The same run installs the extension with Spec Kit's own command and validates the OpenSpec tree with OpenSpec's own validator. On OpenSpec it also applies the lifecycle layer to a `full` install and asserts that a change touching two capabilities demands the align stage. The versions tested are pinned in [`companion/toolkits.list`](https://github.com/checkwright/checkwright/blob/master/companion/toolkits.list). The recipes, the fixture trees and their design are under [`companion/`](companion/SPEC.md).
