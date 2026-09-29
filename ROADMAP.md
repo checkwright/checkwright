@@ -31,6 +31,7 @@ Adoption evidence, mostly. A rung promotes when someone hits the friction it des
 
 - [gate-authoring-sdk-surface](TASK-QUEUE.md#gate-authoring-sdk-surface) *(ecosystem)* — Author a gate in any language behind one substrate-neutral descriptor.
 - [gate-customer-value-audit](TASK-QUEUE.md#gate-customer-value-audit) *(adoption)* — Every installed gate useful to its adopter and configurable, and no gate shipped that serves only Checkwright's own development.
+- [companion-install-tier](TASK-QUEUE.md#companion-install-tier) *(ecosystem)* — A companion install exposing every deterministic gate a spec toolkit does not already do.
 
 ### later
 

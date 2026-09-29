@@ -42,7 +42,7 @@ ported gate modules carry `spec:` comments citing a section for a literal awk or
 
 **Deliverable:** a sweep of the crate's `spec:` comments against their cited sections, each unstated one retagged `comment-tier-exempt:` where the fact is local, deleted where it is port residue, or moved to the section where it is a contract.
 
-**Cost while deferred:** a reader following such a pointer finds no support for the literal, and a later SPEC edit cannot tell the comment depends on it. Filed 2026-09-26 to the gap inbox by gate-sdk-meta-gate-brevity's citation survey; promoted 2026-09-26 at front-door-release's close: →fix fails because the class spans the crate and each comment needs a local-versus-contract call. The survey's other instance, `native/src/hook/stop_liveness.rs` citing §check-test-hermetic for per-case scratch roots, was fixed at the drain, as were eight in `native/src/emit/pack_installer.rs` citing §The packer (2026-09-29 drain), which shows the class reaching emit arms too. Owner lookup: `spec-pointer`, `comment-tier-exempt`, `shell form` in this file — none; owner canon-kit/SPEC.md §check-comment-tier.
+**Cost while deferred:** a reader following such a pointer finds no support for the literal, and a later SPEC edit cannot tell the comment depends on it. Filed 2026-09-26 to the gap inbox by gate-sdk-meta-gate-brevity's citation survey; promoted 2026-09-26 at front-door-release's close: →fix fails because the class spans the crate and each comment needs a local-versus-contract call. The survey's other instance, `native/src/hook/stop_liveness.rs` citing §check-test-hermetic for per-case scratch roots, was fixed at the drain, as were eight in `native/src/emit/pack_installer.rs` citing §The packer (2026-09-29 drain), which shows the class reaching emit arms too. Folded in at preview-readiness' close, from `drift-kit-measurement-brevity`'s citation survey, all pre-dating this entry: the KPI members under `native/src/emit/kpi/` (`overhead.rs`, `gate_runtime.rs`, `gate_backlog.rs`, `task_split.rs`, `incident_recurrence.rs`, `queue_net_delta.rs`, `amendment_age.rs`) citing §Bundled KPIs, and `native/src/emit/stage_economics.rs` and `native/src/history.rs` citing §The stage-economics meter, for window sizes, rounding, age bands, tie-breaks, regexes and iteration orders neither section states. Owner lookup: `spec-pointer`, `comment-tier-exempt`, `shell form` in this file — none; owner canon-kit/SPEC.md §check-comment-tier.
 
 ### absence-statement-gate-arms
 
@@ -160,7 +160,7 @@ the interop rung's submission half. The build half landed at companion-catalog-e
 
 **Deliverable:** the Spec Kit community-catalog submission, filed as the catalog's Extension Submission issue with its `download_url` naming the `checkwright-companion-<version>.zip` Release asset; the extension's README and the landing page then gain the catalog's install form.
 
-**Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **The four preconditions the operator set on 2026-09-27 landed at catalog-submission-preconditions:** `crate-tests-windows-flip`, since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; `catalog-landing-docs-polish`; and `spec-toolkits-guarantee`.
+**Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **Also gated, operator direction 2026-09-29, lead-relayed (not a ruling),** on [companion-install-tier](#companion-install-tier) and [gate-customer-value-audit](#gate-customer-value-audit): the audit's verdicts decide which gates that tier exposes, so scope reads the two as one sequencing. **The four preconditions the operator set on 2026-09-27 landed at catalog-submission-preconditions:** `crate-tests-windows-flip`, since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; `catalog-landing-docs-polish`; and `spec-toolkits-guarantee`.
 
 **Four more prerequisites, operator direction 2026-09-29, lead-relayed (not a ruling):** three landed at companion-technical-gates (`install-gate-selection`, `companion-spec-to-code-gates`, `speckit-extension-full-profile`), and `adoption-prompt-templates` landed at companion-adoption-landing. Ground: Spec Kit and OpenSpec are technical toolkits, so a companion offering only document gates reads as near-useless, and the launch needs an early-adopter wow.
 
@@ -186,7 +186,7 @@ a narrow external preview before any broad announcement: a preview cohort whose 
 
 **Consult ruling, 2026-09-27, superseding the 2026-09-25 recommendation to promote next:** the cohort was re-ruled in the brief — one observed pre-submission install, then the installers the catalogs and the plugin marketplace send — so this entry runs *through* the two ecosystem units the ledger's `catalog-then-plugin` ruling sequenced first, not ahead of them; that ruling discharged 2026-09-29, the extension and the plugin package both published. The observed install is owed before the catalog submission; the rest re-promotes on the first observed install, as stated above.
 
-**Readiness ahead of the observed install, operator direction 2026-09-29, lead-relayed (not a ruling):** a clean-container first-run rehearsal runs first, split out 2026-09-29 at preview-readiness' scope as `front-door-container-rehearsal`, which carries its shape and the author-evidence rule. Operator-seat adoption on the operator's own projects is independent evidence and gates nothing; counting it toward the observed install was declined.
+**Readiness ahead of the observed install, operator direction 2026-09-29, lead-relayed (not a ruling):** a clean-container first-run rehearsal ran first, as `front-door-container-rehearsal` at preview-readiness, its runs filed to the author seat's record (drift-kit/SPEC.md §The install-observation record), never the published one. Operator-seat adoption on the operator's own projects is independent evidence and gates nothing; counting it toward the observed install was declined.
 
 **Cost while deferred — still the highest of its intake, and now the more exposed half.** Every claim that would be strongest with external evidence still rests on internal dogfooding, and the channel that would carry it is built and reading zero: the published page states an honest `0` on every pass while the volume of unattested governed surface keeps growing. Deferring also silently defers [benchmark-ab-experiment](#benchmark-ab-experiment), since running that first would fix the wrong metrics. Surfaced 2026-08-02 at close, in the same intake pass, as the review's fourth-ranked item.
 
@@ -682,6 +682,8 @@ nothing asks whether each shipped gate is useful and configurable for a customer
 
 Audited: site-kit, 5 gates (5 kept, 2 made generic, 0 withheld); the other 118 shipped gates remain, kit by kit, under gate-sdk/SPEC.md §Consumer payload's rule.
 
+**A precondition of [companion-toolkit-profile](#companion-toolkit-profile)'s submission, operator direction 2026-09-29, lead-relayed (not a ruling),** beside [companion-install-tier](#companion-install-tier), whose exposed kits this audit's verdicts decide, so those kits are its natural first slices.
+
 ### compiled-consumer-smoke-driver
 
 [cost: iteration/high] [surface: installer]
@@ -708,7 +710,7 @@ the generated pre-commit and commit-msg hooks start through a shell on every OS:
 
 the tier a dispatch rides is written as a harness model alias wherever it is chosen (the `model:` field of the stage-session, consult-session, audit-sweep and edit-sweep agent definitions, the lead binding's per-stage overrides, the build batch tiering), and no consumer setting chooses between following the newest model and pinning one. On 2026-09-29 the alias dispatches of native-hook-customer-legs resolved to two newer model ids with no edit, per the subagent transcripts.
 
-**Deliverable, operator direction 2026-09-29, lead-relayed (not a ruling):** (1) a consumer binding per tier class (judgment, routing, mechanical) to an alias, which follows the newest model, or an exact model id, which stays until changed; alias the default and pinning the opt-in, per Policy-as-choice; every place that chooses a tier reads the one binding. (2) Public documentation of alias tiering as a strength with its honest limit: an alias upgrade silently changes price and behaviour, so the claim ships with `price-table-roster-coverage-oracle`'s detector, and under a pin a new id in the transcripts means the pin was bypassed. **Inferred, not run:** that the harness accepts an exact model id wherever it accepts an alias.
+**Deliverable, operator direction 2026-09-29, lead-relayed (not a ruling):** (1) a consumer binding per tier class (judgment, routing, mechanical) to an alias, which follows the newest model, or an exact model id, which stays until changed; alias the default and pinning the opt-in, per Policy-as-choice; every place that chooses a tier reads the one binding. (2) Public documentation of alias tiering as a strength with its honest limit: an alias upgrade silently changes price and behaviour, so the claim ships with the price-coverage arm's detector (drift-kit/SPEC.md §The price-coverage arm), and under a pin a new id in the transcripts means the pin was bypassed. **Inferred, not run:** that the harness accepts an exact model id wherever it accepts an alias.
 
 **Cost while deferred:** a model upgrade changes every dispatch's price and behaviour unannounced, and no consumer can opt out. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at the next iteration's scope: →fix fails because the binding is a new knob. Re-verified: `model: opus` or `model: sonnet` in the four agent definitions. Owner lookup: `alias`, `model id`, `tier` in this file — [session-model-identity-verification](#session-model-identity-verification), DISTINCT (verifying the running tier, not choosing it); owner delegation-kit/SPEC.md, with delegation-kit/templates/agent-execution.md's live-roster rule.
 
@@ -791,6 +793,50 @@ a user-facing choice can ride a `{mechanical}` delta and reach no operator: the 
 **Deliverable:** an assertion that every template a shim under `LIFECYCLE_KIT_SKILLS_DIR` binds matches a `couples=` member of the gate's own descriptor, with a fixture pair; or a boundary note in lifecycle-kit/SPEC.md §check-skill-binding refusing it.
 
 **Cost while deferred:** a slot added to an uncoupled bound template fires nothing at commit and surfaces one tier late. Filed 2026-09-29 at companion-adoption-landing's close as the drain's gap generalization for the economics omission it fixed. Owner lookup: `skill-binding`, `couples` in this file — none; owner lifecycle-kit/SPEC.md §check-skill-binding.
+
+### companion-install-tier
+
+[roadmap: next/ecosystem] [cost: event/high] [surface: companion] [roadmap-summary: A companion install exposing every deterministic gate a spec toolkit does not already do.]
+
+a companion install tier, operator direction 2026-09-29, lead-relayed (not a ruling). A Spec Kit or OpenSpec adopter installs a profile exposing every kit's deterministic gates except the kits whose job the toolkit already does (candidates, unmeasured: lifecycle-kit's stage machine, queue-kit's task queue), each exclusion recorded with the toolkit it defers to, so adopting an excluded kit later is the path to replacing that piece. Each toolkit's customers get a recipe for adopting the non-conflicting kits, in the toolkit's extension where one exists and at minimum on its docs page (OpenSpec has none today). Ground: the companion brings those toolkits' customers to deterministic checks, which complement the toolkit's own work.
+
+**Deliverable:** the tier, its exclusion record and the per-toolkit recipes, under the companion arm's tested-line rule (companion/SPEC.md §Applying a recipe).
+
+**Horizon, operator direction 2026-09-29, lead-relayed (not a ruling):** one outcome row, `now` if the next scope takes it, else `next` until the first close landing a slice moves it to `now`; its slices stay off the roadmap.
+
+**Cost while deferred:** [companion-toolkit-profile](#companion-toolkit-profile)'s submission waits on it, and a companion adopter today chooses between document gates alone and every kit installed beside the toolkit's own workflow. Filed 2026-09-29 to the gap inbox by preview-readiness' lead; promoted 2026-09-30 at its close: →fix fails because a tier is new mechanism and new governed names, →forward because the direction is given. Re-verified: companion/SPEC.md §The two tiers has `prose` (canon-kit's document gates) and `full` (every kit), with no exclusion. Owner lookup: `exclusion`, `conflict`, `companion tier` in this file — none; owner companion/SPEC.md §The two tiers, with installer/SPEC.md §Profiles.
+
+### roadmap-horizon-lag-detector
+
+[cost: iteration/low] [surface: lifecycle-kit]
+
+close's roadmap-motion read files a consult item only for a slug that left the projection and for a vacant first horizon, so an entry a ruling re-sequences, or that iterations work toward while it stays tagged `next`, fires neither. The operator's horizon principle, 2026-09-29, lead-relayed (not a ruling), gives the detector its criterion: a horizon reflects reality, `now` when work is planned as soon as possible, else `next`, and the first close landing a slice of an entry moves it to `now`. So an entry with a slice landed in the range (a Done split child, or a landed line in its body) still tagged `next`, or carrying no roadmap tag though its outcome is curated, is lagging, and close files the consult item.
+
+**Deliverable:** that read in lifecycle-kit/templates/stages/close.md step 5, with its mechanical half (slice landed, horizon tag) on an arm rather than a judgment, or a boundary note in lifecycle-kit/SPEC.md §templates/stages/ refusing it.
+
+**Inferred, not run:** rulings landed before the consult binding's re-tag surface existed had no retroactive horizon pass.
+
+**Cost while deferred:** the public roadmap lags the queue until a consult happens to look. Instances: [companion-toolkit-profile](#companion-toolkit-profile) held `next` from 2026-08-02 through the companion iterations; [spec-brevity-residue](#spec-brevity-residue) and [gate-customer-value-audit](#gate-customer-value-audit) carried no tag with slices landed, both curated at the 2026-09-29 consult, the audit to `next` on the relayed conditional. Filed 2026-09-29 to the gap inbox by preview-readiness' lead, with an addendum carrying the criterion, merged here; promoted 2026-09-30 at its close: →fix fails because a close read is new stage mechanism, →forward because no ruling is owed. Re-verified: close.md step 5 names only the two triggers. Owner lookup: `horizon`, `lagging` in this file — none; owner lifecycle-kit/templates/stages/close.md, with queue-kit/SPEC.md §The roadmap arm.
+
+### update-availability-notice
+
+[cost: event/low] [surface: installer]
+
+nothing tells an installed consumer a newer Checkwright release exists, so an upgrade happens only when the adopter thinks to run `update`. Operator direction 2026-09-29, lead-relayed (not a ruling): add one. The lead's proposed shape, for spec to challenge: an advisory line from the session-context hook (every profile and agent session) and the same reading in `doctor`; the probe `git ls-remote --tags` on the upstream (git is the one floor), compared with the manifest's recorded version, cached in gitignored scratch under a consumer-selectable interval set with off among it, bounded by a timeout, silent offline or on failure. The operator's seeded default is weekly; the probe discloses the adopter's IP to the host each interval, so `init` states it is on and how to turn it off.
+
+**Deliverable:** that notice, or spec's challenge to its shape; the zero-code interim is a docs pointer to `npm outdated` and GitHub release watching.
+
+**Cost while deferred:** an adopter runs a stale release unknowingly, paid at each release. Filed 2026-09-29 to the gap inbox by preview-readiness' lead; promoted 2026-09-30 at its close: →fix fails because the notice is new mechanism with a knob, →forward because the direction is given. Re-verified: no `ls-remote` probe or newer-release notice in installer/SPEC.md, context-kit/SPEC.md or `native/src`. Owner lookup: `update notice`, `newer release`, `outdated` in this file — none; owner installer/SPEC.md §The upgrade contract, with context-kit/SPEC.md for the hook. Surface also context-kit.
+
+### front-door-rehearsal-rule
+
+[cost: event/high] [surface: lifecycle-kit]
+
+the front-door rehearsal belongs in the methodology, operator direction 2026-09-29, lead-relayed (not a ruling). `front-door-container-rehearsal` found two defects no smoke had caught, a hooked update or profile move refused by `check-gate-tamper` and `init`/`uninstall` hiding git's own failure output, because every smoke installs a tree-packed payload from the author's seat and never the published artifact from a clean one.
+
+**Deliverable, three layers:** (1) a generic kit rule, before an audience-facing event rehearse the published front door from a clean seat and file what it finds, the container, platform and route set being consumer config (doctrine-kit or lifecycle-kit's release step, per the provenance seam); (2) here, a post-publish job in `.github/workflows/publish.yml` installing the just-published Release on clean runners (init, hooks on, a first red, an upgrade from the previous release, a hooked profile move), reaching the macOS and Windows runners a container cannot; (3) a manual agent-walked rehearsal of the routes CI cannot drive (the adoption prompt, the plugin marketplace, the Spec Kit extension), before audience events only, a catalog submission or a partner install, per the operator.
+
+**Cost while deferred:** each audience event risks a front-door defect only a clean-seat install would show; the one-off left macOS, native Windows, arm64 Linux, WSL and the npx, plugin, PowerShell and agent-prompt routes unrehearsed. Filed 2026-09-29 to the gap inbox by preview-readiness' lead; promoted 2026-09-30 at its close: →fix fails because each layer is new mechanism, →forward because the direction is given. Re-verified: `publish.yml` runs roster, build, pack, npm and release and installs nothing after publishing. Owner lookup: `rehears`, `post-publish`, `clean seat` in this file — [design-partner-preview](#design-partner-preview), DISTINCT (the observed install this precedes); owner RELEASING.md for layer 2, the kit rule's home open. Surface also doctrine-kit.
 
 ## Icebox
 
@@ -1461,15 +1507,5 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 The consumer's local-only companion files (private brief, ops runbook) have read triggers but no write-back trigger, so shipped-unit forward memory and an out-of-tree state verifier drift until a consult audits them; owed are close and release-sweep template slots for both, and a retired-slug arm over plain code on the local-only globs.
 
 ## Done
-
-- npm-approval-delegation
-- install-author-discriminator
-- front-door-container-rehearsal
-- price-table-effective-dating
-- price-table-roster-coverage-oracle
-- battery-timing-file-overwritten-by-only-run
-- per-commit-cost-figure
-- gate-timing-baseline-comparability
-- drift-kit-measurement-brevity
 
 ## Lessons Learned
