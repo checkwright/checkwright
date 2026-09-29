@@ -858,6 +858,56 @@ docs/releases.md renders its derived note list as a bare list of version links, 
 
 **Cost while deferred:** a reader skipping several versions opens each note to learn which need action. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead, at the operator's leave; promoted at its close: →fix fails because the keys are new grammar on the notes, →forward because no ruling is owed. Re-verified: the page's `<ul>` loop and 29 notes carrying `release:`. Owner lookup: `releases.md`, `front-matter` in this file — none; owner docs/site-architecture.md, with installer/SPEC.md §The upgrade contract for the keys.
 
+### value-table-overflow
+
+[cost: event/low] [surface: docs]
+
+the generated kit table on docs/value.md, nine columns and sixteen kit rows, overflows its column by a few pixels and shows a horizontal scrollbar (operator observation, 2026-09-29). **Inferred, not measured in a browser:** Primer renders a `.markdown-body` table as `display:block; width:max-content; max-width:100%; overflow:auto`; the content column is about 836px at full desktop width (docs/_layouts/default.html's 1180px maximum less the 280px nav and 2rem of padding each side), which nine columns of Primer's `6px 13px` cell padding plus their longest words just exceed. Operator direction, 2026-09-29, lead-relayed (not a ruling): the table's content stays as is, and only the rendering is fixed.
+
+**Deliverable:** slightly tighter table cell padding in the layout's table rules, measured in a browser at desktop width and in a narrower window, then checked against every other table on the site.
+
+**Cost while deferred:** every desktop reader of the value page meets a scrollbar on its main table. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead after its close; promoted 2026-09-29 at the next iteration's scope: →fix fails because the stage may not build and the fix wants a browser measurement. Re-verified: the table's nine-column header and sixteen rows, and the layout's `max-width: 1180px` and `flex: 0 0 280px`. Owner lookup: `overflow`, `scrollbar` in this file — none; owner docs/site-architecture.md's chrome rules, with docs/_layouts/default.html.
+
+### nav-spec-suffix-restore
+
+[cost: event/low] [surface: docs]
+
+the site nav's kit suffix offers `readme` only, while every kit page links both its README and its SPEC, so the SPEC mirrors are the one reachable page class the menu does not reach. Traced 2026-09-29: delta 11 of the payload-withholding amendment, tagged `{mechanical}`, was applied by d2fbbd2a as a SPEC-title filter in docs/_includes/nav.html with a matching exclusion in `check-docs-nav-reachable`; no TRAJECTORY.md ruling covers it. Operator direction, 2026-09-29, lead-relayed (not a ruling): every reachable page is reachable from the menu, so the `spec` suffix returns. Grounds: the muted suffix already was the reference-tier affordance, evaluators of a verification tool are the SPECs' readers, and payload withholding is a footprint choice that does not carry to the website.
+
+**Deliverable:** the exclusion dropped from the nav include, from `check-docs-nav-reachable`'s model and from any docs/site-architecture.md sentence stating it. Process lesson, for the build to weigh: an information-architecture choice tagged `{mechanical}` inside an unrelated amendment reached no operator.
+
+**Cost while deferred:** a site reader finds a kit's SPEC only through its page body. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead after its close; promoted 2026-09-29 at the next iteration's scope: →fix fails because the stage may not build. Re-verified: `s.title != 'SPEC'` at nav.html line 12 and `SUFFIX_EXCLUDED_TITLE` in `native/src/gates/docs_nav_reachable.rs`. Owner lookup: `suffix`, `SPEC-title` in this file — none; owner docs/site-architecture.md, with [nav-strict-reachability](#nav-strict-reachability) refining the rule it restores under.
+
+### nav-strict-reachability
+
+[cost: event/low] [surface: docs]
+
+no rule says whether every docs page needs its own menu entry or may be reached through an index page the menu links to. Operator direction, 2026-09-29, lead-relayed (not a ruling): prefer strict reachability, every page its own menu entry, provided the Releases entry's per-release children render collapsed by default; where that proves infeasible, reachability through an index page the menu links to (the releases table) is acceptable. **Inferred, not built:** a `details` element in docs/_includes/nav.html, closed by default, with Liquid adding `open` when the current page carries `release:`, so no JavaScript is needed.
+
+**Deliverable:** the rule stated in docs/site-architecture.md, the collapsed Releases children, and `check-docs-nav-reachable` holding the strict form.
+
+**Cost while deferred:** the nav's reach is decided page by page, and the Releases children grow the menu with every release. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead after its close; promoted 2026-09-29 at the next iteration's scope: →fix fails because the rule is new. Re-verified: the `nav_children_key` loop in nav.html renders every release as a list item. Owner lookup: `reachab`, `collapsed` in this file — [toolkit-nav-hierarchy](#toolkit-nav-hierarchy), DISTINCT (labels and parenting, not reach); [releases-page-table](#releases-page-table) keeps both its table and the now collapsed nav children, and [nav-spec-suffix-restore](#nav-spec-suffix-restore) stands under the strict rule. Owner docs/site-architecture.md.
+
+### site-sitemap-robots
+
+[cost: event/low] [surface: docs]
+
+the site serves no `sitemap.xml` and no `robots.txt`: both return 404 at the site root, and docs/_config.yml loads only `jekyll-relative-links` and `jekyll-optional-front-matter`. An HTML sitemap page is refused as outdated practice, since the nav and search cover it; an XML sitemap for crawlers is current practice. **Inferred, not probed:** that `jekyll-sitemap` is on GitHub Pages' supported plugin list.
+
+**Deliverable:** `jekyll-sitemap` in the plugin list and a `robots.txt` naming the sitemap, then a check that the generated sitemap excludes `layout: null` outputs such as `search.json`.
+
+**Cost while deferred:** crawlers index the site from links alone. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead after its close, on the lead's judgment of value after an operator question; promoted 2026-09-29 at the next iteration's scope: →fix fails because a new site file is new surface. Re-verified: both paths 404 on the live site and the two-entry plugin list. Owner lookup: `sitemap`, `robots` in this file — none; owner docs/site-architecture.md.
+
+### homepage-license-duplicate
+
+[cost: event/low] [surface: docs]
+
+the homepage states its license twice (operator observation, 2026-09-29): the layout footer at docs/_layouts/default.html line 192, added 2026-09-28 by 6bad6185 as a scope session's inline gap fix, and the hand-written `## License` section at docs/index.md lines 99 to 101, which that fix left in place. That breaks docs/site-architecture.md's one-statement-one-home rule. Operator direction, 2026-09-29, lead-relayed (not a ruling): file it rather than hotfix it.
+
+**Deliverable:** the section deleted from docs/index.md, its one voice line ("Adoption is the goal.") moved into the homepage body or dropped; README.md keeps its own, since GitHub readers see no site footer. Asked at the fix: which gate would have caught a chrome addition duplicating a page statement.
+
+**Cost while deferred:** every homepage reader meets the license twice. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead after its close; promoted 2026-09-29 at the next iteration's scope: →fix fails because the operator directed a filing. Re-verified: both statements at the lines above. Owner lookup: `license` in this file — [license-line-owned-sentence](#license-line-owned-sentence), DISTINCT (the README and footer wording, not the homepage's second statement); owner docs/site-architecture.md.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
