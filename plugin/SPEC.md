@@ -39,7 +39,7 @@ The plugin registers exactly the templates this repository binds in its own skil
 
 **A skill runs a vendored template and binds nothing.** A stage template's slots are the consumer's to bind in its own skill. That is rule content a package serving every adopter cannot carry: a default chosen here would be this repository's calibration shipped as everyone's. So the skill defers to a skill of the repository's own that binds the template, and otherwise takes each slot's own text as its binding.
 
-**`install`** tells the agent five things:
+**`install`** tells the agent to:
 
 - choose a profile with the user, from the installer README's *Choosing a profile* section;
 - confirm the worktree is clean;

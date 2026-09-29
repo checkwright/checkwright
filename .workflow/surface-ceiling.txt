@@ -88,7 +88,7 @@
 2899cp gate-sdk/templates/adopt.md
 301494cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
-267892cp installer/SPEC.md
+267307cp installer/SPEC.md
 337668cp lifecycle-kit/SPEC.md
 4909cp lifecycle-kit/templates/consult.md
 41046cp lifecycle-kit/templates/lead.md
@@ -100,7 +100,7 @@
 9351cp lifecycle-kit/templates/stages/spec.md
 6058cp lifecycle-kit/templates/stages/validate.md
 2765cp lifecycle-kit/templates/upgrade.md
-13657cp plugin/SPEC.md
+13648cp plugin/SPEC.md
 176937cp queue-kit/SPEC.md
 1392cp queue-kit/templates/TASK-QUEUE.md
 62216cp site-kit/SPEC.md
