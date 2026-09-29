@@ -30,9 +30,11 @@ Each toolkit has two install lines. The default, `prose`, puts canon-kit's docum
 
 The documented `full` line sits between `<!-- companion-full:begin -->` and `<!-- companion-full:end -->` on each toolkit's page, in the same `text` form as the default line. On OpenSpec it also applies the lifecycle layer, which no gate `init` registers reads until a stage session runs (§The lifecycle layer). The Spec Kit extension's install command installs either, `full` when the user's input asks for it, and its `full` line sits in its own `companion-full` block.
 
-Neither tier re-checks what a toolkit owns: OpenSpec's validator and Spec Kit's templates stay the toolkit's.
+Neither tier re-checks what a toolkit's own checks cover, unless an overlap clears the value bar. An overlap re-checks ground a toolkit's check covers, and is admitted only for a defect that check misses where it matters: a check that runs only after commit, or one a flag skips. The miss is measured at the toolkit's pin, recorded with that version, and pinned by a fixture that the toolkit leg runs the toolkit's own check against (§The toolkit legs), so a toolkit release that closes the miss is seen rather than assumed. An overlap is additive and off by default. It ships as a recipe layer, `<toolkit>/overlap/`, which the adopter applies as `--recipe <toolkit>-overlap` beside the toolkit's recipe, on the lifecycle layer's pattern, and the toolkit's own check stays enabled. The default install line carries no overlap, and the manifest records the layer as it records any recipe. The gate an overlap arms is a kit's and stays toolkit-blind; the layer holds its binding.
 
 ### The Spec Kit recipe
+
+Spec Kit's own checks: none over the written specs. It ships templates and no validator.
 
 Measured on `specify init --here --non-interactive --integration claude --script sh`, which writes `.specify/` and the agent's skills, with one feature written under `specs/`:
 
@@ -44,6 +46,8 @@ Measured on `specify init --here --non-interactive --integration claude --script
 - `unregister.list` names no gate.
 
 ### The OpenSpec recipe
+
+OpenSpec's own checks: `openspec validate --strict`, over the structure of specs and change deltas, and `openspec archive`, which refuses a MODIFIED, RENAMED or ADDED delta disagreeing with its base spec unless `--skip-specs` is passed.
 
 Measured on `openspec init --tools claude --no-animation --no-copilot-cloud .`, with a capability spec and one change:
 
@@ -75,7 +79,7 @@ The recipes are proved against the defect classes below, each caught by a named 
 
 Spec Kit also carries a task citing a user story its spec does not define, by `check-task-label-resolution`.
 
-The OpenSpec `full` line is held green by the lifecycle leg. The toolkit keeps what it owns: OpenSpec's archive refuses a delta that disagrees with its base spec, so no gate re-checks it. `plan.md`'s source tree draws the structure a feature will have, so no gate reads it either.
+The OpenSpec `full` line is held green by the lifecycle leg. Delta-to-base agreement is OpenSpec's, at archive. A gate for it is an overlap, and none ships until one clears the value bar (§The two tiers). `plan.md`'s source tree draws the structure a feature will have, so no gate reads it either.
 
 No recipe drops a gate. A toolkit idiom a gate reds is answered by a knob line fitting the gate to it. Dropping a gate would narrow what the companion ships, so it is a change to this section and not a recipe edit.
 
@@ -91,6 +95,8 @@ No recipe drops a gate. A toolkit idiom a gate reds is answered by a knob line f
 Each source file is neither markdown nor a shell script, so no other claimed gate reads it.
 
 `fixtures/<toolkit>/defects/<gate>/` holds, per claimed gate, the files that replace their layout counterparts to plant that gate's defect. OpenSpec's `check-spec-pointer` defect is a scenario title carried twice in one spec, and its `check-md-refs` defect adds an anchored link to a missing requirement. Each toolkit's `check-task-path-claim` defect is its ticked task naming an absent path, and Spec Kit's `check-task-label-resolution` defect adds a task citing `[US2]`, which `spec.md` does not define.
+
+`fixtures/<toolkit>/overlap/<gate>/` plants the defect an overlap exists for, over the layout. The companion arm applies the toolkit's recipe and overlap layer and asserts the gate reds it. The toolkit leg runs the toolkit's own check over the same planted tree and asserts the check misses it, so a pin move to a release that closes the miss reds the leg, and the overlap is weighed again (§The two tiers).
 
 The OpenSpec layout passes `openspec validate --all --strict` at the pin, with and without the lifecycle overlay, so the toolkit is its own fixture's oracle. This repository prunes every directory named `fixtures` from its own walks (`GATE_SDK_PRUNE_EXTRA_DIRS` in `scripts/gate-sdk-config.knobs`), since the trees carry each red on purpose. The companion arm governs them instead, inside a scratch consumer ([installer/SPEC.md §The consumer smoke](../installer/SPEC.md#the-consumer-smoke)).
 
@@ -126,7 +132,8 @@ The toolkits' own tools are oracles, and nothing here re-implements their schema
 
 1. installs the pinned `specify-cli`, runs `specify init --here --non-interactive --integration claude --script sh --ignore-agent-tools` in an empty scratch directory, since the non-interactive init refuses a non-empty one and a runner carrying no `claude` CLI, and packs the extension at version `0.0.0`. It serves the zip from a local web server and installs it with `specify extension add checkwright --from <url>`, answering the trust prompt. It asserts exit 0, `.specify/extensions/checkwright/extension.yml` present, and the hook registered in `.specify/extensions.yml`;
 2. asserts that `extension.yml`'s `requires.speckit_version` is `>=` the pinned version;
-3. runs the pinned `openspec validate --all --strict` inside a copy of `fixtures/openspec/layout/`, then again with the lifecycle overlay's `openspec/` copied over it.
+3. runs the pinned `openspec validate --all --strict` inside a copy of `fixtures/openspec/layout/`, then again with the lifecycle overlay's `openspec/` copied over it;
+4. for each `fixtures/<toolkit>/overlap/<gate>/`, runs the toolkit's own check over the layout with the defect planted, and asserts that it passes.
 
 A pin moves by editing its `toolkits.list` line, and the job then proves the new version on the next push.
 
@@ -136,4 +143,5 @@ A pin moves by editing its `toolkits.list` line, and the job then proves the new
 - The agent-run parts of the extension, its command bodies and its hook, are exercised by no harness. The toolkit leg proves the archive installs, and the companion arm runs both of the install command's lines, but no run follows an agent through either command.
 - The Windows route is documented and not run. A recipe adds no step of its own to it, and a leg piping the PowerShell line would retire this limit.
 - A pinned toolkit version says nothing about the next one.
+- No overlap has shipped, so neither the companion arm nor the toolkit leg yet loops over `fixtures/<toolkit>/overlap/`; the first overlap adds both loops.
 - A change whose two in-flight deltas sit under one capability in two changes fires the OpenSpec layer's audit, since each delta's directory is a component. So does a delta citing its own capability's spec, which sits outside the delta's directory. The align waiver is the valve. On Spec Kit the audit trigger is not machine-held.

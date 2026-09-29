@@ -8,16 +8,6 @@
 
 ## New Features
 
-### toolkit-overlap-value-bar
-
-[spec: companion/SPEC-value-bar.md]
-
-companion/SPEC.md §The two tiers states the toolkit boundary absolutely: *Neither tier re-checks what a toolkit owns*. Operator direction 2026-09-29, lead-relayed (not a ruling): stay off a toolkit's ground by default, and overlap only where Checkwright proves significant value, the adopter then choosing toolkit-native tooling alone (the default) or Checkwright's check beside it.
-
-**Deliverable:** (1) the boundary restated with a checkable value bar: a measured defect the toolkit's own check misses where it matters (a later-only check, a bypass flag), recorded with the toolkit version it was measured on and pinned by a fixture, since a shadowing gate drifts with the toolkit's semantics; (2) the overlap additive, the toolkit's own check left enabled, and consumer-selectable with off the default (Policy-as-choice). [openspec-delta-base-agreement](#openspec-delta-base-agreement) is the first candidate held to it.
-
-**Cost while deferred:** the SPEC forbids an overlap the operator wants available, so a measured toolkit gap has no lawful gate. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead; promoted at its close: →fix fails because the bar is new mechanism, →forward because the direction is given. Re-verified: companion/SPEC.md line 33 carries the sentence. Owner lookup: `overlap`, `value bar` in this file — none; owner companion/SPEC.md §The two tiers.
-
 ### adoption-prompt-templates
 
 [spec: SPEC-adoption-prompts.md]
@@ -82,11 +72,11 @@ the site serves no `sitemap.xml` and no `robots.txt`: both return 404 at the sit
 
 no page states which Checkwright checks each companion toolkit gets: docs/spec-toolkits.md carries prose sections and no table. Operator direction 2026-09-29, lead-relayed (not a ruling): a toolkit support table on the website.
 
-**Deliverable:** a generated table, never hand-kept (Derivation-first), its rows derived from what each companion recipe arms per tier (prose, full) under a freshness gate; each check marked toolkit-native, Checkwright or adopter-selectable, per [toolkit-overlap-value-bar](#toolkit-overlap-value-bar); its home docs/spec-toolkits.md.
+**Deliverable:** a generated table, never hand-kept (Derivation-first), its rows derived from what each companion recipe arms per tier (prose, full) under a freshness gate; each check marked toolkit-native, Checkwright or adopter-selectable, per `toolkit-overlap-value-bar`; its home docs/spec-toolkits.md.
 
 **Cost while deferred:** a reader weighing a toolkit cannot see what the companion adds without reading both recipes. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead; promoted at its close: →fix fails because the projection is new mechanism, →forward because the direction is given. Re-verified: docs/spec-toolkits.md has no table row. Owner lookup: `support table` in this file — none; [toolkit-nav-hierarchy](#toolkit-nav-hierarchy) is DISTINCT (nav labels on the same pages) and pairs well. Owner companion/SPEC.md, with docs/site-architecture.md §Generated projections for the roster row.
 
-**Ordering, operator direction, 2026-09-29, lead-relayed (not a ruling):** lands after [toolkit-overlap-value-bar](#toolkit-overlap-value-bar), whose marks its rows carry, in the same iteration.
+**Ordering, operator direction, 2026-09-29, lead-relayed (not a ruling):** lands after `toolkit-overlap-value-bar`, whose marks its rows carry, in the same iteration.
 
 **Push need (2026-09-29, inside the budget):** the iteration's one mid-iteration batch push, since its freshness gate is native crate code the Windows and macOS legs compile and no local run reaches.
 
@@ -856,7 +846,7 @@ the stage-economics price table has no time axis: one row per model id (drift-ki
 
 an OpenSpec change delta that disagrees with its base spec passes the battery and OpenSpec's own validator, and is caught, if at all, only at archive. Measured on openspec 1.13.2 at companion-technical-gates' spec: `validate --strict` exits 0 on a MODIFIED or RENAMED delta naming an absent requirement and on an ADDED one naming an existing requirement, printing only an INFO line; `archive -y` refuses those three, but `--skip-specs` bypasses the refusal; a REMOVED delta naming an absent requirement passes validate silently and archive takes it as already removed.
 
-**Deliverable:** a generic commit-time gate for heading-set delta agreement, its OpenSpec binding in the recipe, if it clears the value bar [toolkit-overlap-value-bar](#toolkit-overlap-value-bar) lands; it is that bar's first candidate, since OpenSpec owns the check at archive and this gate would re-check it earlier.
+**Deliverable:** a generic commit-time gate for heading-set delta agreement, its OpenSpec binding in the recipe, if it clears the value bar `toolkit-overlap-value-bar` landed (companion/SPEC.md §The two tiers); it is that bar's first candidate, since OpenSpec owns the check at archive and this gate would re-check it earlier.
 
 **Cost while deferred:** an OpenSpec adopter's technical gates read nothing on a conventional task list, which names no paths, so the companion's code-facing reach there is `check-task-path-claim` alone. Filed 2026-09-29 at companion-technical-gates' spec on an operator direction lead-relayed (not a ruling). Owner lookup: `delta`, `archive`, `openspec` in this file — `companion-spec-to-code-gates`, DISTINCT (it ships the task gates and defers this one), and [toolkit-nav-hierarchy](#toolkit-nav-hierarchy), DISTINCT (nav labels); owner companion/SPEC.md.
 
@@ -1583,5 +1573,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - nav-spec-suffix-restore
 - value-table-overflow
 - homepage-license-duplicate
+- toolkit-overlap-value-bar
 
 ## Lessons Learned

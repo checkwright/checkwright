@@ -4,7 +4,7 @@ No page states which checks each companion toolkit gets. `docs/spec-toolkits.md`
 
 This amendment adds a generated support table to that page, one row per check and one column per toolkit. Each cell marks the check as Checkwright's at a tier, as an overlap the adopter opts into, or as the toolkit's own. The rows derive from the companion's fixture tree and one new roster of the toolkit's own checks, which the toolkit leg also runs. A freshness gate holds the block.
 
-One queue entry pairs it: [toolkit-support-table](TASK-QUEUE.md#toolkit-support-table). It lands after [toolkit-overlap-value-bar](TASK-QUEUE.md#toolkit-overlap-value-bar), whose value bar (companion/SPEC-value-bar.md) the `opt-in` and `toolkit` marks cite.
+One queue entry pairs it: [toolkit-support-table](TASK-QUEUE.md#toolkit-support-table). It lands after `toolkit-overlap-value-bar`, whose value bar (companion/SPEC.md §The two tiers) the `opt-in` and `toolkit` marks cite.
 
 **The rulings.**
 
