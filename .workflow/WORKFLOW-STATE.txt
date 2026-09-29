@@ -8,3 +8,4 @@ companion-adoption-landing scope a0f33f59 2026-09-29 1fd9c2d2
 companion-adoption-landing spec abb3cb2c 2026-09-29 53fe9ddd
 companion-adoption-landing align ab06a942 2026-09-29 95c017b1
 companion-adoption-landing build a726b47c 2026-09-29 cd8384a6
+companion-adoption-landing build a2004852 2026-09-29 1f92c3f8
