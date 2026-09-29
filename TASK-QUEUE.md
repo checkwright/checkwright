@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### drift-kit-measurement-brevity
-
-drift-kit/SPEC.md's measurement sections under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §Bundled KPIs, §The stage-economics meter, §The install-observation record and §The install-evidence projection, about 72k characters; drift-kit's other sections stay on the parent.
-
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every `##` heading kept verbatim and every fact another surface cites into them kept, per a citation survey. Applied after the iteration's drift-kit amendments merge, so no section is passed twice in one iteration.
-
-**Cost while deferred:** paid by every session and adopter that reads an unpassed drift-kit section. Filed 2026-09-29 as a split at preview-readiness' scope, ahead of guard-kit in the size order because the iteration's amendments rewrite these sections, as installer's contract sections went ahead of lifecycle-kit. Part of the operator's selection of the set over the pool ranking, direction 2026-09-29, lead-relayed (not a ruling).
-
 ## Deferred
 
 ### shellcheck-extra-dirs-trigger
@@ -380,7 +372,7 @@ installer's install-surface sections (§The verbs through §The manifest) left 2
 
 installer's remaining sections other than §The consumer smoke left 2026-09-29 at companion-adoption-landing's scope, on an operator direction, 2026-09-29, lead-relayed (not a /consult ruling), and landed as `installer-remainder-brevity`, which finishes installer apart from the smoke.
 
-drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, on an operator direction lead-relayed (not a /consult ruling), as [drift-kit-measurement-brevity](#drift-kit-measurement-brevity).
+drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `drift-kit-measurement-brevity`; drift-kit's other sections remain.
 
 ### prune-set-matches-walk-root-ancestors
 
@@ -1478,5 +1470,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - battery-timing-file-overwritten-by-only-run
 - per-commit-cost-figure
 - gate-timing-baseline-comparability
+- drift-kit-measurement-brevity
 
 ## Lessons Learned

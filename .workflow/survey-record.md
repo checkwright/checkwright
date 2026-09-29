@@ -20,3 +20,10 @@
 - rev: dc4800f70a5bd43a8a912a432f30c49f01d39490
 - finding: Four precommit-tier members read git diff --cached themselves: check-gate-tamper (delegation-kit), check-stage-evidence (lifecycle-kit), check-docs-cmd (canon-kit) and check-release-change-declared (this repo's scripts). check-dispatch-entry does too but is commit-msg tier. The hook arm's run_over hands the path set only to the runner's selection, so under --measure-commit those four see an empty staged set.
 - inferred: none
+
+## 2026-09-29 build — Which facts do other surfaces cite into drift-kit/SPEC.md §Bundled KPIs, §The stage-economics meter, §The install-observation record and §The install-evidence projection?
+- corpus: . ':!docs/drift-kit/SPEC.md' ':!TASK-QUEUE.md' ':!.workflow/survey-record.md'
+- oracle: git grep -n -F for the four section names and the fourteen kpi- member names over the corpus, each hit read against the section text
+- rev: 439341b9ec6383db0851cbee1b2ffcf5ecb718a5
+- finding: Corpus scoping: generated docs mirrors and release posts read as copies, not citers. Every cited sub-anchor resolves and is kept: input 3, The trend log, Feeding, the fold, the fan-out row, the reserved supervision value, history ∪ live, Degradation, The under-count bound, the attribution invariant. Contract facts cited but unstated, now stated: settings-local's three-list sum and unparseable degrade (settings_local.rs), file-install's confirmation line (file_install.rs), the projection's fixed column count and unreadable-line skip (install_evidence.rs). A loose cite in the meter's Degradation now names DRIFT_KIT_TRAJECTORY_SURFACES. Implementation-detail pointers in the KPI members, stage_economics.rs and history.rs went to the gap inbox under spec-pointer-unstated-literal's class.
+- inferred: none
