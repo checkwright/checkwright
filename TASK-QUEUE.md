@@ -8,16 +8,6 @@
 
 ## New Features
 
-### battery-timing-file-overwritten-by-only-run
-
-[spec: SPEC-battery-timings.md] [recurrence: 2026-09-25]
-
-the runner writes `gate-timings.txt` from whatever subset ran (`runner.rs`), so a `--only` run overwrites the battery's timing file, and `kpi-gate-runtime` reports the subset as the battery total with no partial-sample check.
-
-**Deliverable:** only an unfiltered run of the configured registry writes the timings file, so a `--only`, `--for` or foreign-gates-dir run leaves the last full battery's reading for the KPI; a unit test pins the write predicate and a smoke pins the file byte-identical across a `--only` run.
-
-**Cost while deferred:** a confident wrong number on an evidence page. Filed 2026-09-07; returned from the icebox 2026-09-25 by consult, both sites re-read.
-
 ### per-commit-cost-figure
 
 [spec: SPEC-commit-cost.md]
@@ -1505,5 +1495,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - front-door-container-rehearsal
 - price-table-effective-dating
 - price-table-roster-coverage-oracle
+- battery-timing-file-overwritten-by-only-run
 
 ## Lessons Learned

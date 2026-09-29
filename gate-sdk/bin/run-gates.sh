@@ -4,7 +4,7 @@
 #
 # usage: run-gates.sh [gates-dir] | --only <name>... [-- <arg>...] | --for <path>... | --emit <arm> [args...] | --pack-installer [--version <semver>] [--out <dir>] [--artifacts <dir>] [--root <dir>] | -h | --help
 #        every arm, its refusals and the knobs print from the tool itself: run-gates.sh --help
-#   timings → $GATE_SDK_TMP_DIR/gate-timings.txt (default .tmp/); a measurement, never committed
+#   timings → $GATE_SDK_TMP_DIR/gate-timings.txt (default .tmp/); a measurement, never committed, written by an unfiltered run
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

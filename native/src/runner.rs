@@ -158,7 +158,7 @@ quiet-green output contract suppresses; GATE_SDK_JOBS sets the worker count
 (default: the machine's parallelism; 1 restores a serial run);
 GATE_SDK_SARIF_FILE names a file the run also writes its verdict to as a SARIF
 2.1.0 log, the exit status unchanged unless that file cannot be written (exit 2).
-Per-gate timings land in $GATE_SDK_TMP_DIR/gate-timings.txt (default .tmp/)."#;
+Per-gate timings of an unfiltered run land in $GATE_SDK_TMP_DIR/gate-timings.txt (default .tmp/)."#;
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the arm's own reads, plus the sentinel standing for
 // the reads of every member the argv can dispatch
@@ -703,6 +703,12 @@ fn report_omissions(list_text: &str) {
     }
 }
 
+// spec: gate-sdk/SPEC.md §run-gates — only an unfiltered run of the configured registry writes the
+// timings file, so its one reader never sums a subset.
+fn writes_timings(only: &[String], paths: &[String], explicit: bool) -> bool {
+    only.is_empty() && paths.is_empty() && !explicit
+}
+
 fn write_timings(path: &Path, order: &[Selected], outcomes: &[Outcome]) {
     let mut body = String::new();
     let mut total: u128 = 0;
@@ -862,11 +868,13 @@ pub fn run(args: &[String]) -> i32 {
     let outcomes = dispatch_all(&d, &selected);
     let _ = std::fs::remove_dir_all(&scratch);
 
-    write_timings(
-        &PathBuf::from(&tmp_dir).join("gate-timings.txt"),
-        &selected,
-        &outcomes,
-    );
+    if writes_timings(&parsed.only, &parsed.paths, explicit) {
+        write_timings(
+            &PathBuf::from(&tmp_dir).join("gate-timings.txt"),
+            &selected,
+            &outcomes,
+        );
+    }
 
     let verbose = std::env::var("GATE_SDK_VERBOSE").map(|v| !v.is_empty()).unwrap_or(false);
     let stdout = std::io::stdout();
@@ -1000,6 +1008,17 @@ fn dispatch_all(d: &Dispatch, selected: &[Selected]) -> Vec<Outcome> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: gate-sdk/SPEC.md §run-gates — the write predicate over a bare run and the three
+    // filtered ones
+    #[test]
+    fn only_a_bare_run_of_the_configured_registry_writes_timings() {
+        let one = vec!["x".to_string()];
+        assert!(writes_timings(&[], &[], false));
+        assert!(!writes_timings(&one, &[], false));
+        assert!(!writes_timings(&[], &one, false));
+        assert!(!writes_timings(&[], &[], true));
+    }
 
     // spec: gate-sdk/SPEC.md §Layout and configuration — both branches of the resolution, and the
     // two shapes the mirror does not publish: a nested path and a non-SPEC document, each keeping

@@ -119,7 +119,9 @@ if grep -q 'SMOKE-PASS: clean' <<<"$out"; then echo "smoke(quiet): red run print
 # narrowed rather than that the battery happened to pass
 only_run() { env -u GATE_SDK_VERBOSE GATE_SDK_GATES_DIR="$q" GATE_SDK_TMP_DIR="$q/tmp" bash "$SDK/bin/run-gates.sh" "$@"; }
 
+mkdir -p "$q/tmp"; printf 'check-smoke-pass 7\nTOTAL 7\n' > "$q/tmp/gate-timings.txt"; cp "$q/tmp/gate-timings.txt" "$q/timings.seed"
 out="$(only_run --only check-smoke-pass)" || { echo "smoke(--only): selecting the passing member of a red registry went red" >&2; exit 1; }
+cmp -s "$q/tmp/gate-timings.txt" "$q/timings.seed" || { echo "smoke(--only): a filtered run rewrote the timings file" >&2; exit 1; }
 grep -q 'All 1 gates passed' <<<"$out" || { echo "smoke(--only): summary N is not the selected count" >&2; exit 1; }
 if grep -q 'SMOKE-FAIL: 1 stub finding' <<<"$out"; then echo "smoke(--only): ran a member that was not selected" >&2; exit 1; fi
 
