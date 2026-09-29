@@ -9,7 +9,7 @@ Two queue entries pair it: [per-commit-cost-figure](TASK-QUEUE.md#per-commit-cos
 **The rulings.**
 
 - **The hook's own run is what is measured.** The `pre-commit` arm runs its members **serially**, stopping at the first red (gate-sdk/SPEC.md §git-hook). `--run` runs the same members on a worker pool, so the battery's wall-clock under `--run` understates a commit, and the timings file's `TOTAL` is a sum under contention. `--measure-commit` calls the hook's own selection and dispatch, so the figure cannot drift from what a commit runs.
-- **The worst case, on a fresh `full` install.** Every tracked path counts as staged, so every pre-commit member whose triggers match anything runs, each staged-mode member over every file it matches. `full` is the top of the profile lattice, so every other profile's members are a subset of its members, and the figure bounds a commit in any freshly initialized repository. The reference repository is one the pinned release's one-line install has just initialized, which is the tree an adopter starts from.
+- **Every path-selected member over every tracked file, on a fresh `full` install** (operator direction 2026-09-29, lead-relayed, not a ruling). Every tracked path is handed to the hook's selection as staged, so every pre-commit member whose triggers match anything runs, each staged-mode member over every file it matches. `full` is the top of the profile lattice, so every other profile's members are a subset of its members. **Honest limit:** a member that reads the staged set from the index itself sees the index as it stands, which is nothing staged, so the figure is a reference reading rather than a bound. The reference repository is one the pinned release's one-line install has just initialized, which is the tree an adopter starts from.
 - **An adopter measures their own.** The same arm, run in the adopter's repository, answers the question for that repository. The page names it, so the published figure is a reference point, never the only reading.
 - **Re-derived at release, held by the pin gate.** The page's figure names the release it was measured at, and `check-install-pin` gains an invariant holding that version to the pin. The commit that moves the pin must therefore carry a new measurement. The figure is one host's, so no gate can re-run it. The gate holds its currency and nothing more, and the page says whose host it was.
 - **The per-platform limits are stated, not measured.** The figure excludes the hook's process start, which runs through `sh`. On Windows that is Git for Windows' bundled sh, emulated on Arm. The start cost per operating system is [native-executable-git-hooks](TASK-QUEUE.md#native-executable-git-hooks)' third deliverable, and until it lands the page names the cost as unmeasured. A per-OS and per-arch CI table was refused at filing: CI job times measure runner hardware rather than the operating system.
@@ -27,11 +27,11 @@ Two queue entries pair it: [per-commit-cost-figure](TASK-QUEUE.md#per-commit-cos
 *The binary's `--measure-commit` arm times what the `pre-commit` hook would run if every tracked file were staged. It lists the tracked paths with `git ls-files -z` and passes them to the hook arm's own selection and serial dispatch (§git-hook), three times. Nothing is staged, and the tree and the index are left as they were. It prints two lines:*
 
 ```text
-measure-commit: <median>ms median of 3 (<a>ms, <b>ms, <c>ms) — <m> pre-commit member(s) over <p> tracked path(s), every path staged
+measure-commit: <median>ms median of 3 (<a>ms, <b>ms, <c>ms) — <m> pre-commit member(s) over <p> tracked path(s), every path selected
 host: <os> <arch>, <n> logical CPU(s)
 ```
 
-*The host line comes from the build's target constants and the available parallelism, with no spawn. A member that goes red ends the run at exit 1 with the hook's own failure report and no figure, because a red battery measures a failure path rather than a commit. The arm exits 2 on any operand, outside a repository, or on an unreadable registry. It is an `Arm::Run`, and its knob roster is the hook arm's. The figure is the hook's work: it excludes git's own and the hook's process start.*
+*The host line comes from the build's target constants and the available parallelism, with no spawn. A member that goes red ends the run at exit 1 with the hook's own failure report and no figure, because a red battery measures a failure path rather than a commit. The arm exits 2 on any operand, outside a repository, or on an unreadable registry. It is an `Arm::Run`, and its knob roster is the hook arm's. The figure is the hook's work: it excludes git's own and the hook's process start. **Honest limit:** the path list reaches the selection alone, so a member that reads the staged set from the index itself sees nothing staged.*
 
 ***Named caller and transition**: an adopter asking what a commit costs in their own repository; and the release step that re-measures the install page's figure (RELEASING.md step 4), whose transition is the pin-moving commit.*
 
@@ -43,11 +43,11 @@ gate-sdk/SPEC.md §The non-gate arm, the **Fixed by the subject** bullet, gains:
 
 *### What a commit costs*
 
-*The pre-commit hook runs the gates your profile registers whose triggers match the staged files, one after another, and stops at the first red. The figure is the worst case on a fresh install: every file staged, in a repository the one-line install has just initialized with `full`, the profile that contains every other.*
+*The pre-commit hook runs the gates your profile registers whose triggers match the staged files, one after another, and stops at the first red. The figure runs every gate whose triggers match a file over every tracked file, in a repository the one-line install has just initialized with `full`, the profile that contains every other. A gate that reads the staged set from git itself sees nothing staged, so the figure is a reference reading, not a ceiling.*
 
 *`<!-- commit-cost:begin -->`*
 
-*On `<os> <arch>` with `<n>` logical CPUs, a commit staging every file ran `<m>` pre-commit gates in **`<N>` ms**, the median of three, measured at v`<X.Y.Z>`.*
+*On `<os> <arch>` with `<n>` logical CPUs, the hook ran `<m>` pre-commit gates over every tracked file in **`<N>` ms**, the median of three, measured at v`<X.Y.Z>`.*
 
 *`<!-- commit-cost:end -->`*
 
