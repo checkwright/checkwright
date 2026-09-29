@@ -35,7 +35,7 @@ companion/SPEC.md §The fixtures: *A lifecycle overlay under `fixtures/openspec/
 
 ### (3) The emitter {design-bearing}
 
-**Not yet applied.** A repo-root arm, `--emit support-table [--write]`, in `native/src/emit/support_table.rs`. It renders a GitHub-Flavored Markdown table between `<!-- support-table:begin -->` and `<!-- support-table:end -->` in `docs/spec-toolkits.md`, with a blank line inside each marker.
+**Applied.** A repo-root arm, `--emit support-table [--write]`, in `native/src/emit/support_table.rs`. It renders a GitHub-Flavored Markdown table between `<!-- support-table:begin -->` and `<!-- support-table:end -->` in `docs/spec-toolkits.md`, with a blank line inside each marker.
 
 - **Header**: `| Check |`, then each `toolkits.list` display name in file order.
 - **Gate rows**: the union of the gate names under `companion/fixtures/<toolkit>/{defects,full,overlap}/` for every toolkit, sorted by name. The first cell is the name in a code span. A toolkit's cell is `prose` where its `defects/<gate>/` exists, else `full` where its `full/<gate>/` does, else `opt-in` where its `overlap/<gate>/` does, else `—`.
@@ -45,13 +45,13 @@ companion/SPEC.md §The fixtures: *A lifecycle overlay under `fixtures/openspec/
 
 ### (4) `check-support-table-fresh` {design-bearing}
 
-**Not yet applied.** A repo-root freshness gate, born native: `native/src/gates/support_table_fresh.rs`, `scripts/check-support-table-fresh.gate` at `tier=precommit`, registered in `scripts/gates.list`. It compares the page's block with the arm's rendering in process, and one stale block is one finding printing the regen command. It carries `# projection: docs/spec-toolkits.md` and couples `companion/toolkits.list`, `companion/native.list`, `companion/fixtures/*/*/*/**`, `docs/spec-toolkits.md` and its module. Its positional form is `check-support-table-fresh [companion-dir page]`, so a fixture tree stands in.
+**Applied.** A repo-root freshness gate, born native: `native/src/gates/support_table_fresh.rs`, `scripts/check-support-table-fresh.gate` at `tier=precommit`, registered in `scripts/gates.list`. It compares the page's block with the arm's rendering in process, and one stale block is one finding printing the regen command. It carries `# projection: docs/spec-toolkits.md` and couples `companion/toolkits.list`, `companion/native.list`, `companion/fixtures/*/*/*/**`, `docs/spec-toolkits.md` and its module. Its positional form is `check-support-table-fresh [companion-dir page]`, so a fixture tree stands in.
 
 `scripts/gate-tests/check-support-table-fresh/`: `good/` holds a companion tree of two toolkits, one gate proven on both, one under `full/` on one of them and one under `overlap/`, a `native.list` line and a page whose block matches. `bad/` holds the same tree with the page's block missing the `full` row, and `expect.txt` holds the finding.
 
 ### (5) The page and the rosters it joins {mechanical}
 
-**Partly applied: the site-architecture row lands with the gate.** `docs/spec-toolkits.md` gains `## Which checks each toolkit gets`, after §What the gates check against your code. It holds one sentence and the block. The sentence: *`prose`: the default line arms and tests it, and `full` keeps it. `full`: only the `full` line does. `opt-in`: an overlap you add beside the toolkit's own check ([the value bar](companion/SPEC.md#the-two-tiers)). `toolkit`: the toolkit's own check, which Checkwright leaves to it.*
+**Applied.** `docs/spec-toolkits.md` gains `## Which checks each toolkit gets`, after §What the gates check against your code. It holds one sentence and the block. The sentence: *`prose`: the default line arms and tests it, and `full` keeps it. `full`: only the `full` line does. `opt-in`: an overlap you add beside the toolkit's own check ([the value bar](companion/SPEC.md#the-two-tiers)). `toolkit`: the toolkit's own check, which Checkwright leaves to it.*
 
 docs/site-architecture.md §Generated projections and their freshness gates gains the row: *- **The toolkit support table** `<!-- projection: check-support-table-fresh -->` — `docs/spec-toolkits.md`'s marker block, one row per check proven in `companion/fixtures/` or listed in `companion/native.list`, one column per `companion/toolkits.list` line: `bash gate-sdk/bin/run-gates.sh --emit support-table --write` (`check-support-table-fresh` byte-gates it).*
 

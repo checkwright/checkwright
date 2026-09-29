@@ -1,0 +1,1 @@
+SUPPORT-TABLE-FRESH: clean (page.md carries the table companion derives)

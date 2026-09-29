@@ -40,6 +40,7 @@ check-enforcement-fresh
 check-value-rollup-fresh
 check-product-statement-fresh
 check-license-line
+check-support-table-fresh
 check-hook-exec-bit
 check-exec-bit
 check-commit-msg

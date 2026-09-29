@@ -131,6 +131,7 @@ pub mod stage_evidence;
 pub mod stage_skill_coverage;
 pub mod stamp_subject;
 pub mod surface_duplication;
+pub mod support_table_fresh;
 pub mod surface_ratchet;
 pub mod survey_record;
 pub mod tag_lead_line;
@@ -1743,6 +1744,14 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-product-statement-fresh",
         product_statement_fresh::run,
+        &[],
+        &[],
+        "-",
+        &[],
+    ),
+    (
+        "check-support-table-fresh",
+        support_table_fresh::run,
         &[],
         &[],
         "-",

@@ -58,6 +58,7 @@ pub mod rewrite;
 pub mod scan_prompts;
 pub mod stage_economics;
 pub mod stage_rules;
+pub mod support_table;
 pub mod roadmap;
 pub mod ruling_staleness;
 pub mod run_consumer_smoke;
@@ -286,6 +287,11 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     (
         "--emit-product-statement",
         Arm::Emit(product_statement::emit, Grammar::Flags(&["--write"])),
+        &[],
+    ),
+    (
+        "--emit-support-table",
+        Arm::Emit(support_table::emit, Grammar::Flags(&["--write"])),
         &[],
     ),
     // spec: canon-kit/SPEC.md §The reference-link grammar — the source set is derived from the
