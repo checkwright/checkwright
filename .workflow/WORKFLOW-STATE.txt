@@ -5,3 +5,4 @@
 ---
 
 preview-readiness scope a455f2a8 2026-09-29 175388e6
+preview-readiness spec a55f0273 2026-09-29 a5847516
