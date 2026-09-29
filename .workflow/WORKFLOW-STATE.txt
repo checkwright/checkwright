@@ -4,4 +4,4 @@
 
 ---
 
-— scope a5d27e07 2026-09-29 bdb9f21d
+companion-technical-gates scope a5d27e07 2026-09-29 bdb9f21d

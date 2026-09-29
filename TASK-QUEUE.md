@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: companion-technical-gates
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,22 @@
 ## New Features
 
 ## Technical Debt
+
+### consumer-smoke-windows-residue
+
+the unix-hosted consumer smoke keeps Windows-host branches its own preflight made unreachable. `installer/consumer-smoke/run-smoke.sh` refuses a MINGW, MSYS or Cygwin host at its top since the sh Windows legs retired, yet keeps a MINGW arm in the shasum-fallback case, a `cygpath -m` re-spelling of the manifest hash batch's stdin paths, and `spec:` comments narrating Windows-host measurements; installer/SPEC.md §The consumer smoke restates the same behaviour (the cygpath stdin re-spelling, the CRLF byte measured on the native Windows host, `ln -s` deep-copying under MSYS).
+
+**Deliverable:** the dead branches deleted and the section trimmed to what a unix host exercises, under the installer consumer-smoke suite; the `jq.exe` relative-operand paragraph stays, its site now a bash step inside `install-smoke-pwsh-windows`.
+
+**Cost while deferred:** a reader of the smoke or its section maintains, and trusts, branches no leg runs. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' close (the capability-liveness-after-descope audit); promoted 2026-09-29 at the next iteration's scope: →fix fails because the stage may not build. Re-verified: the refusal at line 25, the MINGW arm at 1892 and the cygpath branch at 650 of the script, and the section's cygpath and CRLF paragraphs. Owner lookup: `cygpath`, `MINGW`, `run-smoke` in this file — [compiled-consumer-smoke-driver](#compiled-consumer-smoke-driver), which would replace the script whole and so moot this if it landed first; owner installer/SPEC.md §The consumer smoke.
+
+### installer-install-brevity
+
+installer/SPEC.md's install-surface sections under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §The verbs, §init, §What init seeds, §Payload recipes, §Profiles and §The manifest, about 59k characters, the sections an adopter choosing an install reads.
+
+**Deliverable:** the three moves over those six sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every `##` heading kept verbatim and every fact another surface cites into them kept, per a citation survey; applied after [install-gate-selection](#install-gate-selection)'s amendment merges, since that amendment rewrites §init, §Profiles and §The manifest and a pass before it would be bought twice.
+
+**Cost while deferred:** paid by every session and adopter that reads the install surface unpassed. Filed 2026-09-29 as a split at companion-technical-gates' scope from [spec-brevity-residue](#spec-brevity-residue), on an operator direction lead-relayed (not a /consult ruling), riding the installer surface the iteration's selection unit carries.
 
 ## Deferred
 
@@ -366,6 +382,8 @@ lifecycle-kit's state-machine tool sections left 2026-09-28 at lifecycle-machine
 
 lifecycle-kit's remaining sections left 2026-09-29 at native-hook-customer-legs' scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `lifecycle-kit-tail-brevity`, which finishes lifecycle-kit.
 
+installer's install-surface sections (§The verbs through §The manifest) left 2026-09-29 at companion-technical-gates' scope, on an operator direction lead-relayed (not a /consult ruling), as [installer-install-brevity](#installer-install-brevity).
+
 ### prune-set-matches-walk-root-ancestors
 
 [cost: event/high] [surface: context-kit] [recurrence: 2026-09-25]
@@ -690,6 +708,8 @@ the companion checks documents and never code against a spec. Split 2026-09-28 a
 
 **Inferred, not run:** candidate checks, unprobed against the formats: requirement IDs cited by tasks and tests, a ticked task naming an absent file, `plan.md` paths existing, an OpenSpec delta agreeing with its base spec before archive.
 
+**Push need (2026-09-29, inside the budget):** the iteration's one mid-iteration batch push, since the new native gates run on the Windows and macOS legs no local run reaches; lands before [speckit-extension-full-profile](#speckit-extension-full-profile), whose full tier carries them.
+
 **Cost while deferred:** an adopter's spec and code drift apart with no red, which is the check the operator's "ship all gates checkwright offers" asks the companion to reach. Filed 2026-09-28 as a split, the parent's gap-inbox provenance carried. Owner lookup: `spec-to-code` in this file — the parent alone; owner companion/SPEC.md.
 
 ### license-line-owned-sentence
@@ -720,6 +740,8 @@ an advertised `init` flag the pinned release lacks reds no gate and fires no rel
 
 **Deliverable:** invariant B, or a sibling arm, extended to a flag after an advertised verb, read against the pinned release's flag grammar (a flag table beside the verb table), and the release-policy trigger worded to match.
 
+**Push need (2026-09-29, inside the budget):** the same mid-iteration batch push, since its gate arm is native crate code the Windows and macOS legs compile; lands before [install-gate-selection](#install-gate-selection), whose new `init` flags are the class it gates.
+
 **Cost while deferred:** each release window can publish a flag the one-liner refuses, found only by a reader. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's close; promoted 2026-09-28 at the next iteration's scope: →fix fails because the flag table is new mechanism. Re-verified: the pin now reads 0.29.0, whose `init.rs` carries `--recipe`, so the instance is gone and the class stands. Owner lookup: `front-door-verbs`, `flag table` in this file — none; owner installer/SPEC.md §The front door's verbs, with `.claude/commands/close.md`'s release-policy binding.
 
 ### gate-customer-value-audit
@@ -743,6 +765,8 @@ Audited: site-kit, 5 gates (5 kept, 2 made generic, 0 withheld); the other 118 s
 an adopter cannot choose which kits or gates to install, or which to replace with their own. Operator direction, 2026-09-28 (lead session): "choice is what customers want". `init` takes `--profile`, `--recipe`, `--no-recipe`, `--dry-run`, `--force` and `--no-commit` only; the profiles are fixed rosters; a recipe can unregister gates but is publisher-shipped; a `gates.list` edit survives a re-run only as an adopter-changed file. The registry already resolves consumer-first, so a same-named gate in the adopter's gates dir shadows a kit gate (gate-sdk/SPEC.md §Layout and configuration), but no adopter page presents that as the replace path.
 
 **Deliverable:** an install-time selection surface, include or exclude per kit and per gate, recorded in `checkwright.lock` so re-runs and `update` honour it, and the replace-with-your-own path documented.
+
+**Push need (2026-09-29, inside the budget):** the same mid-iteration batch push, since the new `init` flags run on the pwsh Windows smoke legs; lands after [front-door-flag-grammar](#front-door-flag-grammar), so its flags meet the flag table, and before [installer-install-brevity](#installer-install-brevity).
 
 **Cost while deferred:** each adopter install takes a fixed roster and hand-edits it to choose. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead as `iteration/high`, re-classed `event/high` at promotion since its prose pays at an adopter's install; promoted 2026-09-28 at the next iteration's scope: →fix fails because the surface is new mechanism. Owner lookup: `selection`, `--profile` in this file — [verify-workflow-decoupling](#verify-workflow-decoupling), [gate-customer-value-audit](#gate-customer-value-audit), [custom-gate-substrates](#custom-gate-substrates) and [gate-authoring-sdk-surface](#gate-authoring-sdk-surface), each DISTINCT. Owner installer/SPEC.md §init, §Profiles and §The manifest.
 
@@ -805,16 +829,6 @@ the generated pre-commit and commit-msg hooks start through a shell on every OS:
 **Deliverable:** (1) a probe of whether git's hook lookup starts a native executable directly on each OS (the Windows `.exe` lookup inferred from git's source, never run); (2) where a native hook lives, since a per-platform binary cannot be the tracked text hook scripts/git-hooks/ holds: hooks installed untracked with the generated-projection contract and its freshness gate re-pointed at the installer, or a tracked shim kept, which is the shell this removes; (3) the per-commit start cost per OS.
 
 **Cost while deferred:** every commit on Windows starts an emulated-or-bundled shell. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at its close: →fix fails because the probe is unrun and the home undecided, →forward because the direction is given. Re-verified: scripts/git-hooks/pre-commit opens `#!/bin/sh`. Not a recurrence of `native-hook-dispatch`, which removed the bash dependency. Owner lookup: `native executable`, `hook shim` in this file — none; owner gate-sdk/SPEC.md, with installer/SPEC.md for an untracked install.
-
-### consumer-smoke-windows-residue
-
-[cost: event/low] [surface: installer]
-
-the unix-hosted consumer smoke keeps Windows-host branches its own preflight made unreachable. `installer/consumer-smoke/run-smoke.sh` refuses a MINGW, MSYS or Cygwin host at its top since the sh Windows legs retired, yet keeps a MINGW arm in the shasum-fallback case, a `cygpath -m` re-spelling of the manifest hash batch's stdin paths, and `spec:` comments narrating Windows-host measurements; installer/SPEC.md §The consumer smoke restates the same behaviour (the cygpath stdin re-spelling, the CRLF byte measured on the native Windows host, `ln -s` deep-copying under MSYS).
-
-**Deliverable:** the dead branches deleted and the section trimmed to what a unix host exercises, under the installer consumer-smoke suite; the `jq.exe` relative-operand paragraph stays, its site now a bash step inside `install-smoke-pwsh-windows`.
-
-**Cost while deferred:** a reader of the smoke or its section maintains, and trusts, branches no leg runs. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' close (the capability-liveness-after-descope audit); promoted 2026-09-29 at the next iteration's scope: →fix fails because the stage may not build. Re-verified: the refusal at line 25, the MINGW arm at 1892 and the cygpath branch at 650 of the script, and the section's cygpath and CRLF paragraphs. Owner lookup: `cygpath`, `MINGW`, `run-smoke` in this file — [compiled-consumer-smoke-driver](#compiled-consumer-smoke-driver), which would replace the script whole and so moot this if it landed first; owner installer/SPEC.md §The consumer smoke.
 
 ### tier-model-binding
 
