@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: preview-readiness
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,22 @@
 ## New Features
 
 ## Technical Debt
+
+### front-door-container-rehearsal
+
+a clean-container first-run rehearsal of the published front door, split from [design-partner-preview](#design-partner-preview)'s readiness paragraph: the release installer as docs/install.md prints it, `init` on a sample repository, `demo`, and a first red, in a container carrying nothing the author's machine does. Operator direction, 2026-09-29, lead-relayed (not a ruling): it runs before the observed install, and its evidence stays out of `--emit file-install` until [install-author-discriminator](#install-author-discriminator) lands.
+
+**Deliverable:** the rehearsal run against the newest published release in a clean Linux container, its time to first green and first red recorded, each finding fixed in the iteration where it is debt or filed with `--emit file-gap`, and the run filed through the author channel the discriminator lands, so it builds after that unit. Host floors a Linux container cannot reach (macOS, native Windows) are named unrehearsed, never inferred.
+
+**Cost while deferred:** the observed install, one-shot and the catalog submission's last gate, becomes the first run of the printed front door on a machine the author does not control, so a front-door defect a rehearsal would catch spends that observation. Filed 2026-09-29 as a split at preview-readiness' scope. The set is the operator's selection over the pool ranking, direction 2026-09-29, lead-relayed (not a ruling), which ranked a guard-kit set first once `catalog-then-plugin` discharged. Re-verified: v0.30.0's Release carries the installer tarball and the companion zip, and a Docker daemon runs on the build host.
+
+### drift-kit-measurement-brevity
+
+drift-kit/SPEC.md's measurement sections under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §Bundled KPIs, §The stage-economics meter, §The install-observation record and §The install-evidence projection, about 72k characters; drift-kit's other sections stay on the parent.
+
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every `##` heading kept verbatim and every fact another surface cites into them kept, per a citation survey. Applied after the iteration's drift-kit amendments merge, so no section is passed twice in one iteration.
+
+**Cost while deferred:** paid by every session and adopter that reads an unpassed drift-kit section. Filed 2026-09-29 as a split at preview-readiness' scope, ahead of guard-kit in the size order because the iteration's amendments rewrite these sections, as installer's contract sections went ahead of lifecycle-kit. Part of the operator's selection of the set over the pool ranking, direction 2026-09-29, lead-relayed (not a ruling).
 
 ## Deferred
 
@@ -184,9 +200,9 @@ a narrow external preview before any broad announcement: a preview cohort whose 
 
 **Held deferred twice on 2026-09-26, operator direction lead-relayed (not a ruling),** until the repaired front door (`front-door-demo-unreachable`, `demo-catches-a-done-claim`) was published, which v0.26.0 did.
 
-**Consult ruling, 2026-09-27, superseding the 2026-09-25 recommendation to promote next:** the cohort was re-ruled in the brief — one observed pre-submission install, then the installers the catalogs and the plugin marketplace send — so this entry runs *through* the two ecosystem units the ledger's `catalog-then-plugin` ruling sequences first, not ahead of them. The observed install is owed before the catalog submission; the rest re-promotes on the first observed install, as stated above.
+**Consult ruling, 2026-09-27, superseding the 2026-09-25 recommendation to promote next:** the cohort was re-ruled in the brief — one observed pre-submission install, then the installers the catalogs and the plugin marketplace send — so this entry runs *through* the two ecosystem units the ledger's `catalog-then-plugin` ruling sequenced first, not ahead of them; that ruling discharged 2026-09-29, the extension and the plugin package both published. The observed install is owed before the catalog submission; the rest re-promotes on the first observed install, as stated above.
 
-**Readiness ahead of the observed install, operator direction 2026-09-29, lead-relayed (not a ruling):** a clean-container first-run rehearsal of the published front door (release installer, init on a sample repo, demo, first red) runs first. Operator-seat adoption on the operator's own projects is independent evidence and gates nothing; counting it toward the observed install was declined. Author-run evidence, rehearsal results included, stays out of `--emit file-install` until [install-author-discriminator](#install-author-discriminator) lands.
+**Readiness ahead of the observed install, operator direction 2026-09-29, lead-relayed (not a ruling):** a clean-container first-run rehearsal runs first, split out 2026-09-29 at preview-readiness' scope as [front-door-container-rehearsal](#front-door-container-rehearsal), which carries its shape and the author-evidence rule. Operator-seat adoption on the operator's own projects is independent evidence and gates nothing; counting it toward the observed install was declined.
 
 **Cost while deferred — still the highest of its intake, and now the more exposed half.** Every claim that would be strongest with external evidence still rests on internal dogfooding, and the channel that would carry it is built and reading zero: the published page states an honest `0` on every pass while the volume of unattested governed surface keeps growing. Deferring also silently defers [benchmark-ab-experiment](#benchmark-ab-experiment), since running that first would fix the wrong metrics. Surfaced 2026-08-02 at close, in the same intake pass, as the review's fourth-ranked item.
 
@@ -371,6 +387,8 @@ lifecycle-kit's remaining sections left 2026-09-29 at native-hook-customer-legs'
 installer's install-surface sections (§The verbs through §The manifest) left 2026-09-29 at companion-technical-gates' scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `installer-install-brevity`.
 
 installer's remaining sections other than §The consumer smoke left 2026-09-29 at companion-adoption-landing's scope, on an operator direction, 2026-09-29, lead-relayed (not a /consult ruling), and landed as `installer-remainder-brevity`, which finishes installer apart from the smoke.
+
+drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, on an operator direction lead-relayed (not a /consult ruling), as [drift-kit-measurement-brevity](#drift-kit-measurement-brevity).
 
 ### prune-set-matches-walk-root-ancestors
 
@@ -809,16 +827,6 @@ docs/releases.md renders its derived note list as a bare list of version links, 
 **Deliverable:** a derived table whose columns answer an upgrader, above all whether a release needs action on upgrade (it carries Tightened gates or Renamed knobs entries); also version, date, bump class and per-section counts. The note composer writes the counts and the action flag as front-matter keys and a gate holds them equal to the note's sections; parsing sections in Liquid at render time is refused as fragile.
 
 **Cost while deferred:** a reader skipping several versions opens each note to learn which need action. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead, at the operator's leave; promoted at its close: →fix fails because the keys are new grammar on the notes, →forward because no ruling is owed. Re-verified: the page's `<ul>` loop and 29 notes carrying `release:`. Owner lookup: `releases.md`, `front-matter` in this file — none; owner docs/site-architecture.md, with installer/SPEC.md §The upgrade contract for the keys.
-
-### npm-approval-delegation
-
-[cost: event/low] [surface: RELEASING.md]
-
-RELEASING.md step 5 says the publish run pauses for "your approval" before the `npm` job, and does not say whether a close session a lead dispatched may give it. At companion-technical-gates' close a dispatched close approved publish run 36570759630's npm deployment on the lead's relay that a release was owed. Operator direction, 2026-09-29, given first-hand to the lead and lead-relayed (not a ruling): a delegated close may approve the npm-publish deployment without the operator's own confirmation, on the footing the Release assets already publish on, and the lead's dispatch prompt needs no separate grant.
-
-**Deliverable:** step 5 states that the approving session may be a delegated close. Operator direction, 2026-09-29: the edit is made in a session the operator drives, since a stage session's attempt was refused by the harness's permission classifier.
-
-**Cost while deferred:** a delegated close reads step 5 as addressed to the operator, and either escalates a release that needs no escalation or approves on a grant no tracked surface states. Filed 2026-09-29 as a direct entry at companion-adoption-landing's scope on the operator's direction, from two companion-technical-gates post-close gap bullets forwarded to the consult inbox and discarded there as not consult-class. Re-verified: step 5's "need your approval" sentence. Owner lookup: `npm-publish`, `approval`, `pending_deployments` in this file — none; owner RELEASING.md.
 
 ### consult-intake-narrowing
 
@@ -1529,5 +1537,7 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 The consumer's local-only companion files (private brief, ops runbook) have read triggers but no write-back trigger, so shipped-unit forward memory and an out-of-tree state verifier drift until a consult audits them; owed are close and release-sweep template slots for both, and a retired-slug arm over plain code on the local-only globs.
 
 ## Done
+
+- npm-approval-delegation
 
 ## Lessons Learned
