@@ -20,6 +20,11 @@ say() { printf '  %s\n' "$*"; }
 fail() { printf 'INSTALLER-SMOKE: FAIL — %s\n' "$*"; exit 1; }
 blocked() { printf 'INSTALLER-SMOKE: %s\n' "$*" >&2; exit 2; }
 
+# spec: installer/SPEC.md §The consumer smoke — the suite is unix-hosted; the PowerShell driver carries native Windows
+case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*) blocked "this suite is unix-hosted and refuses a native Windows host; run installer/consumer-smoke/run-smoke.ps1 there." ;;
+esac
+
 # spec: installer/SPEC.md §The consumer smoke — the terminator handling the .files read owns, factored into the ONE owner every other multi-line reader of the manifest stream goes through: a `mapfile -t` splits on newline alone, so on a host whose stream ends its lines with CRLF every element keeps the carriage return and reaches an assertion as part of the value. Exactly one trailing CR is dropped per line so a doubled one still shows, the strips are counted, and the count is DECLARED rather than swallowed — which is what keeps a value that genuinely ended in a CR visible as a count instead of vanishing into an array element. The .files read keeps its own copy of the strip rather than calling here because it holds each line UNSTRIPPED as an evidence operand, which an array of stripped values cannot carry
 # spec: installer/SPEC.md §The consumer smoke — the byte gets a NAME and the strip gets a single spelling, because rounds 22 to 24 measured `${x%$'\r'}` behaving inconsistently across contexts on the Windows host — stripping where the count is computed and not where the value is stored, in adjacent lines of one function. No mechanism for that is established and none is asserted; what is chosen here is the construct that removes the context-dependence outright, since a `printf`-built variable in a quoted suffix pattern is one expansion with one reading everywhere. The strip is taken ONCE into a named scalar and both the count and the stored value read that scalar, so the two can no longer disagree whatever the cause was
 CR="$(printf '\r')"
@@ -1441,78 +1446,69 @@ assert_jq_free "uninstall --dry-run" "$C" uninstall --dry-run
 
 # spec: installer/SPEC.md §The consumer smoke — the bash-less arm: at every profile whose kit set owes no bash it installs, runs each printed follow-up command, and commits through the installed hooks once clean and once refused, with no bash on PATH. The mask is by ABSENCE for the jq-less arm's reason — the question is what a machine without bash meets — so a bash lookup anywhere fails the step that made it, and that step's own message names the command. /bin/sh is not masked: it is the shell git runs hooks with
 printf 'bash-less arm (the profiles owing no bash, bash absent from PATH)\n'
-case "$(uname -s)" in
-    MINGW*|MSYS*|CYGWIN*) BASHLESS_HOST=skip ;;
-    *) BASHLESS_HOST=run ;;
-esac
-# spec: installer/SPEC.md §The consumer smoke — a native Windows host runs every hook through Git for Windows' bundled shell whatever PATH carries, so no PATH there can be bash-less for git, and farming that bundle's usr/bin would relocate the runtime library its programs load; install-smoke-pwsh-windows holds the bash-less commit on that host
-if [[ "$BASHLESS_HOST" == skip ]]; then
-    say "skipped on a native Windows host: git runs its hooks through its bundled shell whatever PATH carries, and install-smoke-pwsh-windows commits with bash stripped there"
-else
-    BASH_PATH="$(path_without bash "$SCRATCH/bashfarm")" || fail "could not build the bash-less arm's PATH farm"
-    [[ -z "$( PATH="$BASH_PATH" "$BASH" -c 'command -v bash' 2>/dev/null )" ]] \
-        || fail "the mask did not take: bash still resolves under the arm's PATH"
-    PATH="$BASH_PATH" git --version >/dev/null 2>&1 \
-        || fail "the bash-less farm's git will not run — the arm's PATH resolves entries this host cannot execute, so every step below would fail for a reason that is not bash"
-    # spec: installer/SPEC.md §The consumer smoke — the arm runs the bootstrap through the farm's own sh, so a farm that dropped sh would fail every step below for a reason that is not bash
-    PATH="$BASH_PATH" sh -c ':' >/dev/null 2>&1 \
-        || fail "the bash-less farm's sh will not run — the arm runs the bootstrap as the install page does, through sh on PATH, so every step below would fail for a reason that is not bash"
-    say "mask: bash resolves to nothing, and the farm's git and sh still run"
+BASH_PATH="$(path_without bash "$SCRATCH/bashfarm")" || fail "could not build the bash-less arm's PATH farm"
+[[ -z "$( PATH="$BASH_PATH" "$BASH" -c 'command -v bash' 2>/dev/null )" ]] \
+    || fail "the mask did not take: bash still resolves under the arm's PATH"
+PATH="$BASH_PATH" git --version >/dev/null 2>&1 \
+    || fail "the bash-less farm's git will not run — the arm's PATH resolves entries this host cannot execute, so every step below would fail for a reason that is not bash"
+# spec: installer/SPEC.md §The consumer smoke — the arm runs the bootstrap through the farm's own sh, so a farm that dropped sh would fail every step below for a reason that is not bash
+PATH="$BASH_PATH" sh -c ':' >/dev/null 2>&1 \
+    || fail "the bash-less farm's sh will not run — the arm runs the bootstrap as the install page does, through sh on PATH, so every step below would fail for a reason that is not bash"
+say "mask: bash resolves to nothing, and the farm's git and sh still run"
 
-    ENTRY=(sh "$DL_ENTRY")
-    C="$(consumer bash-less-probe)" || fail "could not build a scratch consumer for the bash-less arm"
-    # spec: installer/SPEC.md §doctor — with no install bash is undecided, so doctor exits 0 without it and renders it unprobed; whether the line then names kits or states the predicate is that section's own case split, since a derived audience with no kit root to reach has no list to name, so this arm asserts the unprobed rendering and takes no roster out of it
-    out="$( cd "$C" && PATH="$BASH_PATH" "${ENTRY[@]}" doctor 2>&1 )"; rc=$?
-    [[ "$rc" -eq 0 ]] \
-        || { printf '%s\n' "$out" >&2; fail "doctor exited $rc with no install and bash absent — with no selection bash is undecided rather than owed, so it cannot set the verdict"; }
-    grep -qE '^  bash +not probed — owed where .+ is selected$' <<<"$out" \
-        || { printf '%s\n' "$out" >&2; fail "doctor with no install did not render bash as not probed, naming the audience it is owed by"; }
-    say "doctor (no install): clean with no bash on PATH, bash rendered unprobed"
-    # spec: installer/SPEC.md §The consumer smoke — the subjects are the profiles whose own installed doctor report carried no bash row, recorded by the profile loop above; the verdict is read off each selection's own report rather than by intersecting kit names against an audience rendered with nothing to resolve against, which is a roster only while the audience is a static list and degrades to a sentence no kit name matches the moment it is derived
-    BASHLESS_PROFILES=()
-    for p in "${PROFILES[@]}"; do
-        [[ -n "${OWES_BASH[$p]+set}" ]] \
-            || fail "the profile loop recorded no bash verdict for $p, so the bash-less arm cannot tell whether it owes bash"
-        [[ "${OWES_BASH[$p]}" -eq 0 ]] && BASHLESS_PROFILES+=("$p")
+ENTRY=(sh "$DL_ENTRY")
+C="$(consumer bash-less-probe)" || fail "could not build a scratch consumer for the bash-less arm"
+# spec: installer/SPEC.md §doctor — with no install bash is undecided, so doctor exits 0 without it and renders it unprobed; whether the line then names kits or states the predicate is that section's own case split, since a derived audience with no kit root to reach has no list to name, so this arm asserts the unprobed rendering and takes no roster out of it
+out="$( cd "$C" && PATH="$BASH_PATH" "${ENTRY[@]}" doctor 2>&1 )"; rc=$?
+[[ "$rc" -eq 0 ]] \
+    || { printf '%s\n' "$out" >&2; fail "doctor exited $rc with no install and bash absent — with no selection bash is undecided rather than owed, so it cannot set the verdict"; }
+grep -qE '^  bash +not probed — owed where .+ is selected$' <<<"$out" \
+    || { printf '%s\n' "$out" >&2; fail "doctor with no install did not render bash as not probed, naming the audience it is owed by"; }
+say "doctor (no install): clean with no bash on PATH, bash rendered unprobed"
+# spec: installer/SPEC.md §The consumer smoke — the subjects are the profiles whose own installed doctor report carried no bash row, recorded by the profile loop above; the verdict is read off each selection's own report rather than by intersecting kit names against an audience rendered with nothing to resolve against, which is a roster only while the audience is a static list and degrades to a sentence no kit name matches the moment it is derived
+BASHLESS_PROFILES=()
+for p in "${PROFILES[@]}"; do
+    [[ -n "${OWES_BASH[$p]+set}" ]] \
+        || fail "the profile loop recorded no bash verdict for $p, so the bash-less arm cannot tell whether it owes bash"
+    [[ "${OWES_BASH[$p]}" -eq 0 ]] && BASHLESS_PROFILES+=("$p")
+done
+[[ " ${BASHLESS_PROFILES[*]} " == *" $PROFILE_MIN "* ]] \
+    || fail "the lattice minimum $PROFILE_MIN owes bash by its own doctor report, so the arm has no bash-free profile to install"
+
+for p in "${BASHLESS_PROFILES[@]}"; do
+    C="$(consumer "bash-less-$p")" || fail "could not build a scratch consumer for the bash-less arm at $p"
+    out="$( cd "$C" && PATH="$BASH_PATH" "${ENTRY[@]}" init --profile "$p" 2>&1 )" \
+        || { printf '%s\n' "$out" >&2; fail "init --profile $p failed with no bash on PATH — the profile owes no bash, so init reached for it"; }
+    mapfile -t bl_cmds < <(awk '$0 == "next:" { b = 1; next } b && /^[[:space:]]+[^[:space:]]/ { sub(/#.*$/, ""); sub(/^[[:space:]]+/, ""); sub(/[[:space:]]+$/, ""); print; next } b { exit }' <<<"$out")
+    [[ ${#bl_cmds[@]} -gt 0 ]] \
+        || { printf '%s\n' "$out" >&2; blocked "$p: init printed no follow-up block, so the bash-less arm has no command to execute."; }
+    for line in "${bl_cmds[@]}"; do
+        read -r -a bl_toks <<<"$line"
+        bl_out="$( cd "$C" && PATH="$BASH_PATH" "${bl_toks[@]}" 2>&1 )" \
+            || { printf '%s\n' "$bl_out" >&2; fail "$p: the follow-up command '$line' failed with no bash on PATH"; }
     done
-    [[ " ${BASHLESS_PROFILES[*]} " == *" $PROFILE_MIN "* ]] \
-        || fail "the lattice minimum $PROFILE_MIN owes bash by its own doctor report, so the arm has no bash-free profile to install"
+    say "$p: init and ${#bl_cmds[@]} follow-up command(s) ran with no bash on PATH"
 
-    for p in "${BASHLESS_PROFILES[@]}"; do
-        C="$(consumer "bash-less-$p")" || fail "could not build a scratch consumer for the bash-less arm at $p"
-        out="$( cd "$C" && PATH="$BASH_PATH" "${ENTRY[@]}" init --profile "$p" 2>&1 )" \
-            || { printf '%s\n' "$out" >&2; fail "init --profile $p failed with no bash on PATH — the profile owes no bash, so init reached for it"; }
-        mapfile -t bl_cmds < <(awk '$0 == "next:" { b = 1; next } b && /^[[:space:]]+[^[:space:]]/ { sub(/#.*$/, ""); sub(/^[[:space:]]+/, ""); sub(/[[:space:]]+$/, ""); print; next } b { exit }' <<<"$out")
-        [[ ${#bl_cmds[@]} -gt 0 ]] \
-            || { printf '%s\n' "$out" >&2; blocked "$p: init printed no follow-up block, so the bash-less arm has no command to execute."; }
-        for line in "${bl_cmds[@]}"; do
-            read -r -a bl_toks <<<"$line"
-            bl_out="$( cd "$C" && PATH="$BASH_PATH" "${bl_toks[@]}" 2>&1 )" \
-                || { printf '%s\n' "$bl_out" >&2; fail "$p: the follow-up command '$line' failed with no bash on PATH"; }
-        done
-        say "$p: init and ${#bl_cmds[@]} follow-up command(s) ran with no bash on PATH"
+    printf 'a clean note\n' > "$C/bash-less-note.txt"
+    git -C "$C" add bash-less-note.txt
+    bl_out="$( cd "$C" && PATH="$BASH_PATH" git commit -m "docs: add a note" 2>&1 )" \
+        || { printf '%s\n' "$bl_out" >&2; fail "$p: a clean commit through the installed hooks failed with no bash on PATH"; }
+    grep -qE '^pre-commit: [0-9]+ gate\(s\) passed\.$' <<<"$bl_out" \
+        || { printf '%s\n' "$bl_out" >&2; fail "$p: the clean commit landed without the installed pre-commit hook reporting — the hook did not run"; }
+    say "$p: a clean commit passed through the installed hooks"
 
-        printf 'a clean note\n' > "$C/bash-less-note.txt"
-        git -C "$C" add bash-less-note.txt
-        bl_out="$( cd "$C" && PATH="$BASH_PATH" git commit -m "docs: add a note" 2>&1 )" \
-            || { printf '%s\n' "$bl_out" >&2; fail "$p: a clean commit through the installed hooks failed with no bash on PATH"; }
-        grep -qE '^pre-commit: [0-9]+ gate\(s\) passed\.$' <<<"$bl_out" \
-            || { printf '%s\n' "$bl_out" >&2; fail "$p: the clean commit landed without the installed pre-commit hook reporting — the hook did not run"; }
-        say "$p: a clean commit passed through the installed hooks"
-
-        # spec: installer/SPEC.md §The consumer smoke — the refused commit plants a home-directory path, which gate-sdk's zero-config message-pattern seed names, so every profile's hook refuses it; the refusing gate is read off the hook's own line and held to the consumer's registry rather than named here
-        printf 'see /%s/bashless-smoke/notes\n' home > "$C/bash-less-leak.txt"
-        git -C "$C" add bash-less-leak.txt
-        bl_out="$( cd "$C" && PATH="$BASH_PATH" git commit -m "docs: add a leak" 2>&1 )" \
-            && { printf '%s\n' "$bl_out" >&2; fail "$p: a commit planting a home-directory path landed through the installed hooks"; }
-        bl_gate="$(sed -nE 's/^pre-commit: ([a-z0-9-]+) failed \(see above\)\.$/\1/p' <<<"$bl_out")"
-        [[ -n "$bl_gate" ]] && grep -qxF "$bl_gate" "$C/$GATES_DIR/gates.list" \
-            || { printf '%s\n' "$bl_out" >&2; fail "$p: the refused commit was not refused by a registered gate the pre-commit hook named"; }
-        git -C "$C" reset -q --hard HEAD
-        say "$p: a planted home-directory path was refused by $bl_gate through the installed hook"
-    done
-    say "bash-less: ${#BASHLESS_PROFILES[@]} profile(s) owing no bash installed and committed through the hooks: ${BASHLESS_PROFILES[*]}"
-fi
+    # spec: installer/SPEC.md §The consumer smoke — the refused commit plants a home-directory path, which gate-sdk's zero-config message-pattern seed names, so every profile's hook refuses it; the refusing gate is read off the hook's own line and held to the consumer's registry rather than named here
+    printf 'see /%s/bashless-smoke/notes\n' home > "$C/bash-less-leak.txt"
+    git -C "$C" add bash-less-leak.txt
+    bl_out="$( cd "$C" && PATH="$BASH_PATH" git commit -m "docs: add a leak" 2>&1 )" \
+        && { printf '%s\n' "$bl_out" >&2; fail "$p: a commit planting a home-directory path landed through the installed hooks"; }
+    bl_gate="$(sed -nE 's/^pre-commit: ([a-z0-9-]+) failed \(see above\)\.$/\1/p' <<<"$bl_out")"
+    [[ -n "$bl_gate" ]] && grep -qxF "$bl_gate" "$C/$GATES_DIR/gates.list" \
+        || { printf '%s\n' "$bl_out" >&2; fail "$p: the refused commit was not refused by a registered gate the pre-commit hook named"; }
+    git -C "$C" reset -q --hard HEAD
+    say "$p: a planted home-directory path was refused by $bl_gate through the installed hook"
+done
+say "bash-less: ${#BASHLESS_PROFILES[@]} profile(s) owing no bash installed and committed through the hooks: ${BASHLESS_PROFILES[*]}"
 
 # spec: installer/SPEC.md §The consumer smoke — the upgrade arm packs a second, higher version and drives the same installed tree across it, because everything above installs at one version: what only a cross-version run reaches is the manifest's version comparison falling through in the upgrade direction, the profile re-read from the lock with no flag, and claim() re-applying around a file the adopter has since edited
 printf 'upgrade arm (two cross-version hops, %s profile — the lattice minimum, so the arm is the smallest install that carries the manifest behavior it asserts)\n' "$PROFILE_MIN"

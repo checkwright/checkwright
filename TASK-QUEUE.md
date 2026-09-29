@@ -8,34 +8,6 @@
 
 ## New Features
 
-### native-hook-dispatch
-
-[spec: SPEC-native-hook-dispatch.md]
-
-native Windows still needs Git for Windows' bash, through the generated pre-commit hook, against the native-binary direction (operator direction, 2026-09-28, lead session: "de-couple from bash towards native binaries and use native shell on the target OS"). Kits ship no shell gate, but the generated hook (`scripts/git-hooks/pre-commit` here, 578 lines) matches each gate's triggers in sh, which Git for Windows runs in MSYS sh on every commit. Its ARM64 build ships bash, coreutils and `msys-2.0.dll` as x86-64, so on Windows-on-ARM that sh runs emulated: `install-smoke-sh-windows-arm64` takes 18-21 min against 9-12 on x64 over five gates runs.
-
-**Deliverable:** hook dispatch moved into the binary, the hook one line handing off to it, after first probing whether Git for Windows runs a hook without sh; docs/install.md stating which shell, if any, the hook and battery need on native Windows. Operator direction: `install-smoke-sh-windows` and `-arm64` then retire, their full consumer-smoke coverage (init, battery, hooks, upgrade, uninstall) moving to the PowerShell legs under a non-bash smoke driver. Fallback only if sh stays: a Windows-on-ARM note and fewer spawns; splitting the job is not wanted. Still bash after: custom shell gates and the no-port harness templates.
-
-**Cost while deferred:** every push waits on the emulated leg, and a native-Windows adopter carries bash for a hook. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; promoted 2026-09-28 at the next iteration's scope: →fix fails because the dispatch is new mechanism. Owner lookup: `generated hook`, `hook dispatch` in this file — [custom-gate-substrates](#custom-gate-substrates), DISTINCT (the adopter's gate substrates; this is the hook Checkwright generates), reshaped by it; the landed `windows-liveness-pid-reuse` keyed the liveness step on `install-smoke-sh-windows`, so that step moves with the leg this retires. Owner gate-sdk/SPEC.md, with installer/SPEC.md §The consumer smoke and §The install boundary.
-
-**In set (2026-09-29, operator direction lead-relayed, not a /consult ruling):** native-hook-customer-legs takes this entry, with [worktree-crate-commit-red](#worktree-crate-commit-red) riding it; spec authors and promotes it. It reshapes the deferred [custom-gate-substrates](#custom-gate-substrates) and [shellcheck-extra-dirs-trigger](#shellcheck-extra-dirs-trigger), whose hook halves then land in the binary.
-
-**Push need (2026-09-29, inside the budget):** the mid-iteration push, shared with [gate-customer-value-audit](#gate-customer-value-audit): the Windows hook change and the retirement of the two sh-windows legs run only on CI.
-
-### worktree-crate-commit-red
-
-[spec: SPEC-native-hook-dispatch.md]
-
-a session editing the crate in a linked worktree cannot land its commit there. `cargo test --release` reds on `every_registry_member_declares_the_roots_it_walks` and `_the_programs_it_spawns`, which run `check-crate-arms` over its fixtures, and that gate refuses at exit 2 in a linked worktree with no recorded green stamp. And the generated pre-commit hook reds `check-gate-binary-fresh` with `git could not hash the tracked source under native`, while `run-gates.sh --run` over the same staged tree passed that gate a minute earlier.
-
-Probed 2026-09-29 at spec, in a scratch repository with a linked worktree: git exports an absolute `GIT_DIR` and no `GIT_WORK_TREE` to that worktree's hook, so `git -C native ls-files` prints root-relative paths that `hash-object` then cannot open (exit 128); the main checkout's hook gets no `GIT_DIR` and passes.
-
-**Deliverable:** the crate's test arm and the hook green in a linked worktree, or the refusal stated as the contract with the tests pinning it.
-
-**Cost while deferred:** a worktree session's crate commit rests on a main-checkout re-run. Filed 2026-09-27 to the gap inbox as two bullets by the front-door hotfix; promoted 2026-09-27 at companion-catalog-extension's close: →fix fails because the hook cause is unprobed and the test's shape is a contract call. Re-verified: `native/src/gates/crate_arms.rs` refuses in a linked worktree lacking a stamp. Owner lookup: `linked worktree`, `gate-binary-fresh`, `crate-arms` in this file — `windows-fresh-fixture-stub`, DISTINCT (the same test pair, red on Windows for a stub it cannot start); owner gate-sdk/SPEC.md §check-crate-arms.
-
-**In set (2026-09-29, operator direction lead-relayed, not a /consult ruling):** native-hook-customer-legs takes this entry riding [native-hook-dispatch](#native-hook-dispatch), which moves its hook half into the binary; spec settles its shape with that amendment and promotes it.
-
 ### gate-customer-value-audit
 
 [spec: SPEC-gate-customer-value.md]
@@ -48,7 +20,7 @@ nothing asks whether each shipped gate is useful and configurable for a customer
 
 **In set (2026-09-29, operator direction lead-relayed, not a /consult ruling):** native-hook-customer-legs takes this entry's first slice, the audit record and site-kit's GitHub Pages gates, bounded at spec; spec authors and promotes it.
 
-**Push need (2026-09-29, inside the budget):** the mid-iteration push, shared with [native-hook-dispatch](#native-hook-dispatch), for any payload or customer-OS leg change the slice makes.
+**Push need (2026-09-29, inside the budget):** the mid-iteration push, shared with `native-hook-dispatch`, for any payload or customer-OS leg change the slice makes.
 
 ## Technical Debt
 
@@ -366,7 +338,7 @@ the harness project-dir derivation `check-memory-off` and its two shell twins sh
 
 **Why it promotes rather than fixing or iceboxing.** →fix fails on evidence, not on effort: the missing fact is *which spelling the harness uses on Windows*, an observation of another program on a host this tree has none of, and no command on a Linux box produces it — writing a fold without it would be inventing a Windows fact, which is what spec declined to do. →icebox fails because a live trigger exists and is dated: the Windows leg `platform-support-ci-matrix` shipped before retiring 2026-09-06 still runs on every push to master and is the run that can observe it, and the migration that just landed made every *other* producer dialect-correct, so these three are now the tree's recorded exception rather than part of a uniform unfixed background.
 
-**Standing exclusion — `lead, own-authority` 2026-09-10 through the lead's message channel, at `host-resolution-fail-open-cut`'s scope:** the worklist reads the retired slug and not the live CI leg `install-smoke-sh-windows`, so it scores this entry false-eligible; [icebox-trigger-blind-to-retired-carrier](#icebox-trigger-blind-to-retired-carrier) owns that predicate defect, DECLINED as a rider then with the exposure accepted in writing.
+**Standing exclusion — `lead, own-authority` 2026-09-10 through the lead's message channel, at `host-resolution-fail-open-cut`'s scope:** the worklist reads the retired slug and not the live CI leg `install-smoke-pwsh-windows`, so it scores this entry false-eligible; [icebox-trigger-blind-to-retired-carrier](#icebox-trigger-blind-to-retired-carrier) owns that predicate defect, DECLINED as a rider then with the exposure accepted in writing.
 
 **Owner is context-kit, not gate-sdk.** The rule's home is context-kit/SPEC.md §Layout and configuration; the dialect contract is gate-sdk's. It is that seam, not a migration defect.
 
@@ -636,7 +608,7 @@ no tracked agent definition exists for the operator-ruled hotfix path of the sco
 
 **Deliverable:** a hotfix agent definition under `.claude/agents/` carrying that policy, declared in `DELEGATION_KIT_MUTATING_TYPES`, and the lead template naming the dispatch shape.
 
-**Cost while deferred:** every hotfix costs a restated prompt and a second dispatch. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead; promoted 2026-09-27 at its close: →fix fails because the definition is a new governed name. Owner lookup: `hotfix`, `agents/`, `MUTATING_TYPES` in this file — none; owner delegation-kit/SPEC.md, with [worktree-crate-commit-red](#worktree-crate-commit-red) as the worktree half.
+**Cost while deferred:** every hotfix costs a restated prompt and a second dispatch. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead; promoted 2026-09-27 at its close: →fix fails because the definition is a new governed name. Owner lookup: `hotfix`, `agents/`, `MUTATING_TYPES` in this file — none; owner delegation-kit/SPEC.md, with `worktree-crate-commit-red` as the worktree half.
 
 ### readme-spec-links-offsite
 
@@ -1453,5 +1425,8 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 The consumer's local-only companion files (private brief, ops runbook) have read triggers but no write-back trigger, so shipped-unit forward memory and an out-of-tree state verifier drift until a consult audits them; owed are close and release-sweep template slots for both, and a retired-slug arm over plain code on the local-only globs.
 
 ## Done
+
+- native-hook-dispatch
+- worktree-crate-commit-red
 
 ## Lessons Learned

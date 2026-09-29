@@ -141,6 +141,18 @@ fn report(hook: &str, d: &Dispatch, selected: &[Selected], verbose: bool, out: &
 
 fn hook_run(hook: &Hook) -> Result<(i32, String), String> {
     walk::toplevel_opt()?.ok_or_else(|| "not inside a git repository".to_string())?;
+    let paths = match hook {
+        Hook::PreCommit => staged()?,
+        Hook::CommitMsg(_) => Vec::new(),
+    };
+    run_over(hook, &paths)
+}
+
+// spec: gate-sdk/SPEC.md §git-hook — an empty staged set exits 0 printing nothing, before the registry is read
+fn run_over(hook: &Hook, paths: &[String]) -> Result<(i32, String), String> {
+    if matches!(hook, Hook::PreCommit) && paths.is_empty() {
+        return Ok((0, String::new()));
+    }
     let env = pin()?;
     let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
     let list = registry::list_path(&gates_dir);
@@ -148,13 +160,7 @@ fn hook_run(hook: &Hook) -> Result<(i32, String), String> {
     let members = first_seen(&text);
     let resolve_dirs = registry::resolve_dirs(&gates_dir, &walk::kit_roots_abs()?);
     let selected = match hook {
-        Hook::PreCommit => {
-            let paths = staged()?;
-            if paths.is_empty() {
-                return Ok((0, String::new()));
-            }
-            precommit_selection(&members, &resolve_dirs, &walk::kit_roots()?, &paths, Path::new("."))?
-        }
+        Hook::PreCommit => precommit_selection(&members, &resolve_dirs, &walk::kit_roots()?, paths, Path::new("."))?,
         Hook::CommitMsg(file) => commit_msg_selection(&members, &resolve_dirs, file),
     };
     let self_exe = std::env::current_exe()
@@ -218,6 +224,11 @@ mod tests {
         assert!(matches!(parse(&argv(&["pre-commit"])), Ok(Hook::PreCommit)));
         assert!(matches!(parse(&argv(&["commit-msg", "m"])), Ok(Hook::CommitMsg(f)) if f == "m"));
         assert_eq!(run(&argv(&["nope"])), 2);
+    }
+
+    #[test]
+    fn an_empty_staged_set_passes_printing_nothing() {
+        assert_eq!(run_over(&Hook::PreCommit, &[]), Ok((0, String::new())));
     }
 
     #[test]
