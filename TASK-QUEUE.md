@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: native-hook-customer-legs
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,14 @@
 ## New Features
 
 ## Technical Debt
+
+### lifecycle-kit-tail-brevity
+
+the three brevity moves of [spec-brevity-residue](#spec-brevity-residue) (run-on structure, archaeology, restatement) over the rest of lifecycle-kit/SPEC.md: the gate and adapter sections under §Per-component contracts outside the six state-machine tool sections already passed (§The stage-machine adapters, §The close-surfaces emit arm, and §check-close-surfaces through §check-gap-inbox-neutrality), plus §templates/release-sweep.md, §templates/upgrade.md and §templates/consult.md, about 65k bytes. It finishes lifecycle-kit.
+
+**Deliverable:** the moves applied to those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every contract sentence kept.
+
+**Cost while deferred:** paid by every session that opens one of these sections, which each gate's red sends a reader to. Filed 2026-09-29 at scope as a split from its parent, on an operator direction lead-relayed (not a /consult ruling), unit set A.
 
 ## Deferred
 
@@ -362,6 +370,8 @@ lifecycle-kit's sections above §Per-component contracts left 2026-09-28 at cons
 
 lifecycle-kit's state-machine tool sections left 2026-09-28 at lifecycle-machine-brevity's scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `lifecycle-kit-machine-brevity`.
 
+lifecycle-kit's remaining sections left 2026-09-29 at native-hook-customer-legs' scope as [lifecycle-kit-tail-brevity](#lifecycle-kit-tail-brevity), on an operator direction lead-relayed (not a /consult ruling).
+
 ### prune-set-matches-walk-root-ancestors
 
 [cost: event/high] [surface: context-kit] [recurrence: 2026-09-25]
@@ -588,6 +598,8 @@ a session editing the crate in a linked worktree cannot land its commit there. `
 
 **Cost while deferred:** a worktree session's crate commit rests on a main-checkout re-run. Filed 2026-09-27 to the gap inbox as two bullets by the front-door hotfix; promoted 2026-09-27 at companion-catalog-extension's close: →fix fails because the hook cause is unprobed and the test's shape is a contract call. Re-verified: `native/src/gates/crate_arms.rs` refuses in a linked worktree lacking a stamp. Owner lookup: `linked worktree`, `gate-binary-fresh`, `crate-arms` in this file — `windows-fresh-fixture-stub`, DISTINCT (the same test pair, red on Windows for a stub it cannot start); owner gate-sdk/SPEC.md §check-crate-arms.
 
+**In set (2026-09-29, operator direction lead-relayed, not a /consult ruling):** native-hook-customer-legs takes this entry riding [native-hook-dispatch](#native-hook-dispatch), which moves its hook half into the binary; spec settles its shape with that amendment and promotes it.
+
 ### hotfix-agent-definition
 
 [cost: event/low] [surface: delegation-kit]
@@ -730,6 +742,10 @@ native Windows still needs Git for Windows' bash, through the generated pre-comm
 
 **Cost while deferred:** every push waits on the emulated leg, and a native-Windows adopter carries bash for a hook. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; promoted 2026-09-28 at the next iteration's scope: →fix fails because the dispatch is new mechanism. Owner lookup: `generated hook`, `hook dispatch` in this file — [custom-gate-substrates](#custom-gate-substrates), DISTINCT (the adopter's gate substrates; this is the hook Checkwright generates), reshaped by it; the landed `windows-liveness-pid-reuse` keyed the liveness step on `install-smoke-sh-windows`, so that step moves with the leg this retires. Owner gate-sdk/SPEC.md, with installer/SPEC.md §The consumer smoke and §The install boundary.
 
+**In set (2026-09-29, operator direction lead-relayed, not a /consult ruling):** native-hook-customer-legs takes this entry, with [worktree-crate-commit-red](#worktree-crate-commit-red) riding it; spec authors and promotes it. It reshapes the deferred [custom-gate-substrates](#custom-gate-substrates) and [shellcheck-extra-dirs-trigger](#shellcheck-extra-dirs-trigger), whose hook halves then land in the binary.
+
+**Push need (2026-09-29, inside the budget):** the mid-iteration push, shared with [gate-customer-value-audit](#gate-customer-value-audit): the Windows hook change and the retirement of the two sh-windows legs run only on CI.
+
 ### gate-customer-value-audit
 
 [cost: iteration/high] [surface: gate-sdk]
@@ -739,6 +755,10 @@ nothing asks whether each shipped gate is useful and configurable for a customer
 **Deliverable:** an audit over every shipped gate recording customer value and configurability, each gate then made generic, kept out of the payload and the customer-OS legs, or kept; site-kit's GitHub Pages gates first.
 
 **Cost while deferred:** every push runs gates of no customer value on customer-OS legs, and every adopter installs them. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; promoted 2026-09-28 at the next iteration's scope: →fix fails because the audit is unsized. Owner lookup: `customer value`, `payload` in this file — [consumer-value-literal-gate](#consumer-value-literal-gate), DISTINCT (a hard-coded value inside a gate, not the gate's place in the payload). Owner gate-sdk/SPEC.md §Consumer payload.
+
+**In set (2026-09-29, operator direction lead-relayed, not a /consult ruling):** native-hook-customer-legs takes this entry's first slice, the audit record and site-kit's GitHub Pages gates, bounded at spec; spec authors and promotes it.
+
+**Push need (2026-09-29, inside the budget):** the mid-iteration push, shared with [native-hook-dispatch](#native-hook-dispatch), for any payload or customer-OS leg change the slice makes.
 
 ### install-gate-selection
 
