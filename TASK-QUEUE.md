@@ -16,7 +16,7 @@ an advertised `init` flag the pinned release lacks reds no gate and fires no rel
 
 **Deliverable:** invariant B, or a sibling arm, extended to a flag after an advertised verb, read against the pinned release's flag grammar (a flag table beside the verb table), and the release-policy trigger worded to match.
 
-**Push need (2026-09-29, inside the budget):** the same mid-iteration batch push, since its gate arm is native crate code the Windows and macOS legs compile; lands before [install-gate-selection](#install-gate-selection), whose new `init` flags are the class it gates.
+**Push need (2026-09-29, inside the budget):** the same mid-iteration batch push, since its gate arm is native crate code the Windows and macOS legs compile; lands before [install-gate-selection](#install-gate-selection), whose new `init` flags are the class it gates. It also forces this close's release, on an operator direction lead-relayed (not a ruling): v0.29.0 carries no flag table, so the front door's flags read as unreleased and a withheld disposition reds. The tag, at or above the deferred v0.30.0, rides the closing push and adds its `publish` run.
 
 **Cost while deferred:** each release window can publish a flag the one-liner refuses, found only by a reader. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's close; promoted 2026-09-28 at the next iteration's scope: →fix fails because the flag table is new mechanism. Re-verified: the pin now reads 0.29.0, whose `init.rs` carries `--recipe`, so the instance is gone and the class stands. Owner lookup: `front-door-verbs`, `flag table` in this file — none; owner installer/SPEC.md §The front door's verbs, with `.claude/commands/close.md`'s release-policy binding.
 
@@ -849,6 +849,16 @@ the stage-economics price table has no time axis: one row per model id (drift-ki
 **Deliverable:** an effective-from column, the meter picking the row in force on each log row's stamp date, which is already derived from stamps alone. Raised by the operator 2026-09-29, lead-relayed (not a ruling), on the 5.5-generation cache-read discount, whose start date the published page does not state.
 
 **Cost while deferred:** a price change for a live model misprices the other side of the change, silently. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at the next iteration's scope: →fix fails because the column is new grammar on a consumer file. Re-verified: the table's `One row per model id` header comment. Owner lookup: `price table`, `effective` in this file — [price-table-roster-coverage-oracle](#price-table-roster-coverage-oracle), DISTINCT (a missing row, not a row's validity interval); owner drift-kit/SPEC.md §The stage-economics meter.
+
+### openspec-delta-base-agreement
+
+[cost: event/low] [surface: companion]
+
+an OpenSpec change delta that disagrees with its base spec passes the battery and OpenSpec's own validator, and is caught, if at all, only at archive. Measured on openspec 1.13.2 at companion-technical-gates' spec: `validate --strict` exits 0 on a MODIFIED or RENAMED delta naming an absent requirement and on an ADDED one naming an existing requirement, printing only an INFO line; `archive -y` refuses those three, but `--skip-specs` bypasses the refusal; a REMOVED delta naming an absent requirement passes validate silently and archive takes it as already removed.
+
+**Deliverable:** a scope ruling on whether a generic commit-time gate for heading-set delta agreement ships, its OpenSpec binding in the recipe. The question to weigh is the conflict with companion/SPEC.md §The two tiers, *Neither tier re-checks what a toolkit owns*: OpenSpec owns the check at archive, and this gate would re-check it earlier.
+
+**Cost while deferred:** an OpenSpec adopter's technical gates read nothing on a conventional task list, which names no paths, so the companion's code-facing reach there is `check-task-path-claim` alone. Filed 2026-09-29 at companion-technical-gates' spec on an operator direction lead-relayed (not a ruling). Owner lookup: `delta`, `archive`, `openspec` in this file — [companion-spec-to-code-gates](#companion-spec-to-code-gates), DISTINCT (it ships the task gates and defers this one), and [toolkit-nav-hierarchy](#toolkit-nav-hierarchy), DISTINCT (nav labels); owner companion/SPEC.md.
 
 ## Icebox
 

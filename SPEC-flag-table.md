@@ -9,12 +9,12 @@ One queue entry pairs it: [front-door-flag-grammar](TASK-QUEUE.md#front-door-fla
 **The rulings.**
 
 - **The roster's owner is the binary, as for verbs.** A flag is advertisable because a verb's parser accepts it. The roster is a const beside `VERBS`, and a crate test holds each parser and each `usage:` line to it, so the table, the parsers and the help cannot disagree.
-- **A pinned tag carrying no flag table has the empty pinned flag set.** It is not a dormancy. The verb table's own reasoning rules it: a dormancy keyed to the absent table would green the very defect the gate exists for (installer/SPEC.md §The front door's verbs). The consequence is escalated below as Q1, both acts written.
+- **A pinned tag carrying no flag table has the empty pinned flag set.** It is not a dormancy. The verb table's own reasoning rules it: a dormancy keyed to the absent table would green the very defect the gate exists for (installer/SPEC.md §The front door's verbs). Its consequence for this close is below.
 - **The extension's install command is not a front-door page.** `companion/speckit/commands/install.md` runs the release named by the extension's stamped version, and the pack step stamps the tag the extension is packed from (companion/SPEC.md §Packing the extension). So its line always names a release that carries its own flags, and the pinned release is the wrong comparison for it.
 - **An operand is out of reach.** The gate reads a flag, never its value. A recipe or profile name the pinned release lacks, after a released flag, is filed as a gap.
 - **The seam.** Repo-root only: a repo-local gate, the installer's README and SPEC, and the close binding. No kit surface changes.
 
-**Q1, escalated to the lead.** The pinned v0.29.0 carries no flag table, and the front door advertises `--profile` after a route today (`docs/install.md` lines 117 and 176, `plugin/skills/install/SKILL.md` lines 11 and 12, and `installer/README.md` line 21) and `--recipe` on the toolkit pages. Under the empty pinned flag set, every such flag is pending from the landing commit, so this iteration's close must release. A `none` or `deferred:` disposition reds B. The alternative is a dormant flag arm on a tag without a table, whose clean line says so. It greens every flag until a release happens for another reason, including `install-gate-selection`'s new `init` flags. **Recommended: the empty set.** Delta 3 is written with it. If the lead rules the dormancy instead, delta 3's pinned-set sentence reads *A tag whose `installer/README.md` carries no flag table leaves the flag half of B dormant, and the clean line names that tag*, and delta 4 is dropped.
+**The first release of the table: an operator direction, lead-relayed (not a /consult ruling).** The pinned v0.29.0 carries no flag table, and the front door advertises `--profile` after a route today (`docs/install.md` lines 117 and 176, `plugin/skills/install/SKILL.md` lines 11 and 12, and `installer/README.md` line 21) and `--recipe` on the toolkit pages. Under the empty pinned flag set, every such flag is pending from the landing commit, so this iteration's close must release, and a `none` or `deferred:` disposition reds B. A dormant flag arm on a tag without a table was the alternative, refused: it greens every flag until a release happens for another reason, `install-gate-selection`'s new `init` flags included. The release carries the deferred v0.30.0's floor (installer/SPEC.md §Versioning's second input).
 
 ## What changes
 
@@ -62,7 +62,7 @@ installer/SPEC.md §The verbs' first paragraph gains, after *rather than by a ro
 
 ### (4) The release trigger names the flag {mechanical}
 
-**Not yet applied; dropped if Q1 rules the dormancy.** `.claude/commands/close.md`'s release-policy bullet becomes: *A front-door verb or flag the pinned release lacks. `check-front-door-verbs` reds a `none` or `deferred:` disposition while the front door advertises one, so release, or withdraw the advertisement in the same close.*
+**Not yet applied.** `.claude/commands/close.md`'s release-policy bullet becomes: *A front-door verb or flag the pinned release lacks. `check-front-door-verbs` reds a `none` or `deferred:` disposition while the front door advertises one, so release, or withdraw the advertisement in the same close.*
 
 ### (5) The fixture pair {mechanical}
 
@@ -79,7 +79,7 @@ Probe: `native/src/installer/{init,uninstall,update,doctor,diff,demo}.rs` read f
 - **`FLAGS`** (delta 1). Producer: the crate source. Consumers: each verb's parser and `usage:` line, through the crate test; invariant A's flag half, in process; invariant B's pending admission.
 - **The flag table** (delta 2). Producer: `installer/README.md`, carried by every tag. Consumers: invariant A at HEAD and B's pinned flag set at `v<pin>`. Red condition: A reds a pair the table and `FLAGS` do not share; an absent or empty table at HEAD exits 2.
 - **Advertised flags** (delta 3). Producer: the front-door and toolkit pages. Consumer: B. It reds a flag outside the pinned set that `FLAGS` lacks, or that `FLAGS` carries while the disposition withholds. The clean line lists the pending ones.
-- **The widened page set** (delta 3). It reds no page today beyond Q1's pending flags: the two toolkit pages carry `init` and `--profile`, `--recipe` after it, and `init` is in the pinned verb set.
+- **The widened page set** (delta 3). It reds no page today beyond the pending flags the empty pinned flag set makes: the two toolkit pages carry `init` and `--profile`, `--recipe` after it, and `init` is in the pinned verb set.
 - **The trigger** (delta 4). Reader: the close session's release-policy step, which B's red enforces at the disposition commit.
 
 ## Existing sections updated
