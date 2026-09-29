@@ -8,85 +8,13 @@
 
 ## New Features
 
-### adoption-prompt-templates
-
-[spec: SPEC-adoption-prompts.md]
-
-no shipped prompt template drives a coding agent through adoption. Operator direction, 2026-09-29, lead-relayed (not a ruling): a template set taking an agent through install, profile choice, knob configuration against the adopter's layout, and first-red triage, serving the operator's own two adoptions first, which are its first test, and adopters after.
-
-**Deliverable:** the template set, authored once as a harness-neutral kit template and shipped twice, operator direction 2026-09-29, lead-relayed (not a ruling): as a plugin skill binding it, the pattern every `plugin/skills/*` stage skill uses, and as a plain prompt template any coding agent can be handed, since the adopter constraints assume no harness. `plugin/skills/install/SKILL.md` already covers install and profile choice; knob configuration and first-red triage are missing, as an extension of that skill or a sibling its `next:` step hands to, which scope rules. The clean-container rehearsal [design-partner-preview](#design-partner-preview) runs can drive it unattended.
-
-**Cost while deferred:** every adopter's agent configures the install by reading pages. A prerequisite of [companion-toolkit-profile](#companion-toolkit-profile). Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at its close: →fix fails because the set is a new governed surface, →forward because the direction is given. Re-verified: no `prompt` in docs/install.md or installer/README.md. Owner lookup: `prompt template`, `adoption prompt` in this file — none; owner installer/SPEC.md, or plugin/SPEC.md for a command home.
-
-**Push need (2026-09-29, inside the budget):** the iteration's one mid-iteration batch push, since a plugin skill's front matter is validated only by CI's `skills-ref` step.
-
-### toolkit-nav-hierarchy
-
-[spec: SPEC-nav-rules.md]
-
-the spec-toolkit pages sit in the nav as three flat siblings under Install whose labels do not read as one family, and no rule sets nav labels or titles beyond one. docs/spec-toolkits.md is titled "Spec Kit and OpenSpec" while its H1 reads "Gating specs that Spec Kit or OpenSpec writes", and docs/speckit.md and docs/openspec.md are its children in substance but its siblings in the nav (all `nav_parent: install`), since the nav renders one child level. docs/site-architecture.md's only label rule: title is the terse nav label, H1 the descriptive full form. Operator questions (lead session): should the toolkit pages get their own nav hierarchy, and can nav-label and title standards be set.
-
-**Deliverable:** a top-level nav entry for the toolkit overview carrying `nav_id`, Spec Kit and OpenSpec its children, as Kit Reference already is; label rules in docs/site-architecture.md's page-authoring rules (sibling labels parallel, a child label never repeating its parent, an overview never a sibling of its subpages, the H1 agreeing with the label); a `check-docs-nav-reachable` arm weighed for the overview-as-sibling rule. Operator direction, 2026-09-29, lead-relayed (not a ruling): yes to both questions, adopting this recommendation as stated.
-
-**Cost while deferred:** a reader sees one family as three unrelated pages. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; promoted 2026-09-28 at the next iteration's scope: →fix fails because the operator's questions are open. Owner lookup: `nav`, `label` in this file — none; owner docs/site-architecture.md, with docs/spec-toolkits.md, docs/speckit.md and docs/openspec.md.
-
-### nav-strict-reachability
-
-[spec: SPEC-nav-rules.md]
-
-no rule says whether every docs page needs its own menu entry or may be reached through an index page the menu links to. Operator direction, 2026-09-29, lead-relayed (not a ruling): prefer strict reachability, every page its own menu entry, provided the Releases entry's per-release children render collapsed by default; where that proves infeasible, reachability through an index page the menu links to (the releases table) is acceptable. The amendment takes the strict form, the `details` element its design.
-
-**Deliverable:** the rule stated in docs/site-architecture.md, the collapsed Releases children, and `check-docs-nav-reachable` holding the strict form.
-
-**Cost while deferred:** the nav's reach is decided page by page, and the Releases children grow the menu with every release. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead after its close; promoted 2026-09-29 at the next iteration's scope: →fix fails because the rule is new. Re-verified: the `nav_children_key` loop in nav.html renders every release as a list item. Owner lookup: `reachab`, `collapsed` in this file — [toolkit-nav-hierarchy](#toolkit-nav-hierarchy), DISTINCT (labels and parenting, not reach); [releases-page-table](#releases-page-table) keeps both its table and the now collapsed nav children, and `nav-spec-suffix-restore` stands under the strict rule. Owner docs/site-architecture.md.
-
-**Push need (2026-09-29, inside the budget):** the iteration's one mid-iteration batch push, since the collapsed nav renders in the Pages build, which the local render oracle reaches only in part; the nav units ride it together.
-
-### license-line-owned-sentence
-
-[spec: SPEC-license-line.md]
-
-the license line differs between the READMEs and the site footer, and nothing owns it. Every README `## License` section reads `Apache-2.0. The license text is ...` with four location endings (24 at "beside this file in an installed copy and at the repository root in the source tree", 3 at the repository root, 2 packaged READMEs linking GitHub, the root README a relative link), while `docs/_layouts/default.html`'s footer reads "Licensed under Apache-2.0" linked to LICENSE. The site's README mirrors render that section on the same page as the footer. Operator direction, 2026-09-28 (lead session): align them on the footer's style, since the README form reads awkwardly.
-
-**Deliverable:** one owned sentence in the footer's style, the location clause its only per-context variant; the footer and every README using it; a gate holding the README License sections to it.
-
-**Cost while deferred:** a reader meets two license phrasings on one page, and the next README drifts unseen. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; promoted at its close: →fix fails because the gate is new mechanism, and aligning the prose without it repeats the drift. Re-verified: 30 README License lines in the four variants above, the footer at line 192, and `docs/gate-sdk/README.md` carrying the section beside the footer. Not a recurrence of the retired `license-text-and-alignment`: that landing put a line in every README and left its wording unowned, so this is a new defect. Owner lookup: `license` in this file — none; owner docs/site-architecture.md (site chrome), with installer/SPEC.md §The packer (the license placement).
-
-**Push need (2026-09-29, inside the budget):** the iteration's one mid-iteration batch push, since its new gate is native crate code the Windows and macOS legs compile and no local run reaches.
-
-### site-sitemap-robots
-
-[spec: SPEC-sitemap.md]
-
-the site serves no `sitemap.xml` and no `robots.txt`: both return 404 at the site root, and docs/_config.yml loads only `jekyll-relative-links` and `jekyll-optional-front-matter`. An HTML sitemap page is refused as outdated practice, since the nav and search cover it; an XML sitemap for crawlers is current practice. Probed at spec: GitHub Pages' version list carries `jekyll-sitemap` 1.4.0, which also writes `robots.txt`.
-
-**Deliverable:** `jekyll-sitemap` in the plugin list and a `robots.txt` naming the sitemap, then a check that the generated sitemap excludes `layout: null` outputs such as `search.json`.
-
-**Cost while deferred:** crawlers index the site from links alone. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead after its close, on the lead's judgment of value after an operator question; promoted 2026-09-29 at the next iteration's scope: →fix fails because a new site file is new surface. Re-verified: both paths 404 on the live site and the two-entry plugin list. Owner lookup: `sitemap`, `robots` in this file — none; owner docs/site-architecture.md.
-
-**Push need (2026-09-29, inside the budget):** the iteration's one mid-iteration batch push, since only the Pages build runs the sitemap plugin.
-
-### toolkit-support-table
-
-[spec: SPEC-support-table.md]
-
-no page states which Checkwright checks each companion toolkit gets: docs/spec-toolkits.md carries prose sections and no table. Operator direction 2026-09-29, lead-relayed (not a ruling): a toolkit support table on the website.
-
-**Deliverable:** a generated table, never hand-kept (Derivation-first), its rows derived from what each companion recipe arms per tier (prose, full) under a freshness gate; each check marked toolkit-native, Checkwright or adopter-selectable, per `toolkit-overlap-value-bar`; its home docs/spec-toolkits.md.
-
-**Cost while deferred:** a reader weighing a toolkit cannot see what the companion adds without reading both recipes. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead; promoted at its close: →fix fails because the projection is new mechanism, →forward because the direction is given. Re-verified: docs/spec-toolkits.md has no table row. Owner lookup: `support table` in this file — none; [toolkit-nav-hierarchy](#toolkit-nav-hierarchy) is DISTINCT (nav labels on the same pages) and pairs well. Owner companion/SPEC.md, with docs/site-architecture.md §Generated projections for the roster row.
-
-**Ordering, operator direction, 2026-09-29, lead-relayed (not a ruling):** lands after `toolkit-overlap-value-bar`, whose marks its rows carry, in the same iteration.
-
-**Push need (2026-09-29, inside the budget):** the iteration's one mid-iteration batch push, since its freshness gate is native crate code the Windows and macOS legs compile and no local run reaches.
-
 ## Technical Debt
 
 ### installer-remainder-brevity
 
 installer/SPEC.md's remaining sections under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §Implementation, §Layout, §Selecting kits and gates, §update, §diff, §uninstall, §demo, §The CI action, §The packer, §Vendoring without the installer, §Reviewing the pre-commit hook, §Versioning and §The upgrade contract, about 83k characters; §The consumer smoke stays on the parent.
 
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every `##` heading kept verbatim and every fact another surface cites into them kept, per a citation survey. Applied after the iteration's amendments that rewrite any of them merge ([adoption-prompt-templates](#adoption-prompt-templates) wherever it lands, [license-line-owned-sentence](#license-line-owned-sentence) in §The packer), so no section is passed twice in one iteration. Deferred entries still owe rewrites in §The upgrade contract and §The front door's verbs; the operator took the whole remainder with that known (operator direction, 2026-09-29).
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every `##` heading kept verbatim and every fact another surface cites into them kept, per a citation survey. Applied after the iteration's amendments that could rewrite any of them merged: `adoption-prompt-templates` touched none, and `license-line-owned-sentence` rewrote §The packer, so no section is passed twice in one iteration. Deferred entries still owe rewrites in §The upgrade contract and §The front door's verbs; the operator took the whole remainder with that known (operator direction, 2026-09-29).
 
 **Cost while deferred:** paid by every session and adopter that reads an unpassed installer section. Filed 2026-09-29 as a split at companion-adoption-landing's scope from [spec-brevity-residue](#spec-brevity-residue), on an operator direction, 2026-09-29, lead-relayed (not a /consult ruling), riding the installer surface the iteration's adoption unit carries.
 
@@ -242,7 +170,7 @@ the interop rung's submission half. The build half landed at companion-catalog-e
 
 **Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **The four preconditions the operator set on 2026-09-27 landed at catalog-submission-preconditions:** `crate-tests-windows-flip`, since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; `catalog-landing-docs-polish`; and `spec-toolkits-guarantee`.
 
-**Four more prerequisites, operator direction 2026-09-29, lead-relayed (not a ruling):** three landed at companion-technical-gates (`install-gate-selection`, `companion-spec-to-code-gates`, `speckit-extension-full-profile`), and [adoption-prompt-templates](#adoption-prompt-templates) remains. Ground: Spec Kit and OpenSpec are technical toolkits, so a companion offering only document gates reads as near-useless, and the launch needs an early-adopter wow.
+**Four more prerequisites, operator direction 2026-09-29, lead-relayed (not a ruling):** three landed at companion-technical-gates (`install-gate-selection`, `companion-spec-to-code-gates`, `speckit-extension-full-profile`), and `adoption-prompt-templates` landed at companion-adoption-landing. Ground: Spec Kit and OpenSpec are technical toolkits, so a companion offering only document gates reads as near-useless, and the launch needs an early-adopter wow.
 
 **Push need (2026-09-27, inside the budget):** the release tag push beside the closing push, since the submission needs the extension on a published tag; close's release policy decides the cut.
 
@@ -848,7 +776,7 @@ an OpenSpec change delta that disagrees with its base spec passes the battery an
 
 **Deliverable:** a generic commit-time gate for heading-set delta agreement, its OpenSpec binding in the recipe, if it clears the value bar `toolkit-overlap-value-bar` landed (companion/SPEC.md §The two tiers); it is that bar's first candidate, since OpenSpec owns the check at archive and this gate would re-check it earlier.
 
-**Cost while deferred:** an OpenSpec adopter's technical gates read nothing on a conventional task list, which names no paths, so the companion's code-facing reach there is `check-task-path-claim` alone. Filed 2026-09-29 at companion-technical-gates' spec on an operator direction lead-relayed (not a ruling). Owner lookup: `delta`, `archive`, `openspec` in this file — `companion-spec-to-code-gates`, DISTINCT (it ships the task gates and defers this one), and [toolkit-nav-hierarchy](#toolkit-nav-hierarchy), DISTINCT (nav labels); owner companion/SPEC.md.
+**Cost while deferred:** an OpenSpec adopter's technical gates read nothing on a conventional task list, which names no paths, so the companion's code-facing reach there is `check-task-path-claim` alone. Filed 2026-09-29 at companion-technical-gates' spec on an operator direction lead-relayed (not a ruling). Owner lookup: `delta`, `archive`, `openspec` in this file — `companion-spec-to-code-gates`, DISTINCT (it ships the task gates and defers this one), and `toolkit-nav-hierarchy`, DISTINCT (nav labels); owner companion/SPEC.md.
 
 ### front-door-flag-operand
 
@@ -1574,5 +1502,11 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - value-table-overflow
 - homepage-license-duplicate
 - toolkit-overlap-value-bar
+- adoption-prompt-templates
+- license-line-owned-sentence
+- toolkit-support-table
+- toolkit-nav-hierarchy
+- nav-strict-reachability
+- site-sitemap-robots
 
 ## Lessons Learned
