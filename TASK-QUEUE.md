@@ -44,7 +44,7 @@ the stage-economics price table has no time axis: one row per model id (drift-ki
 
 the runner writes `gate-timings.txt` from whatever subset ran (`runner.rs`), so a `--only` run overwrites the battery's timing file, and `kpi-gate-runtime` reports the subset as the battery total with no partial-sample check.
 
-**Deliverable:** the runner marks a filtered run, the KPI reads the mark, and a fixture pins the refusal to sum a subset.
+**Deliverable:** only an unfiltered run of the configured registry writes the timings file, so a `--only`, `--for` or foreign-gates-dir run leaves the last full battery's reading for the KPI; a unit test pins the write predicate and a smoke pins the file byte-identical across a `--only` run.
 
 **Cost while deferred:** a confident wrong number on an evidence page. Filed 2026-09-07; returned from the icebox 2026-09-25 by consult, both sites re-read.
 

@@ -57,17 +57,17 @@ Build fills the angle-bracketed fields from the arm's two output lines. The pin 
 
 ### (3) Invariant D of the hosted install pin {design-bearing}
 
-**Not yet applied.** installer/SPEC.md §The hosted install pin gains, after Invariant C:
+**Not yet applied.** installer/SPEC.md §The hosted install pin: the opening paragraph's *`check-install-pin` (this repo's `scripts/`) holds three invariants* becomes *four invariants*, and the section gains, after Invariant C:
 
 *- **Invariant D — the commit-cost figure is the pinned release's.** docs/install.md carries exactly one `<!-- commit-cost:begin -->` … `<!-- commit-cost:end -->` block, holding exactly one `measured at v<X.Y.Z>` token, whose version equals the pin. So the commit that moves the pin carries a new measurement (RELEASING.md step 4). **Honest limit:** D reads the version and never the host or the figure, so a figure copied forward under a new version passes.*
 
-The fail-closed paragraph gains *a missing or duplicated commit-cost block, and a block carrying no `measured at` token or more than one*. D is hermetic, since the pin and the page are both in the tree, so no dormancy applies. Implementation: `native/src/gates/install_pin.rs` over the `md_text` it already reads. The descriptor's `# spec:` line in `scripts/check-install-pin.gate` names (D) beside (A), (B) and (C). `scripts/gate-tests/check-install-pin/good/install.md` gains a block at the fixture's pin. The `bad/` install.md gains a block naming another version, and `bad/expect.txt` gains the D line.
+The fail-closed paragraph gains *a missing or duplicated commit-cost block, and a block carrying no `measured at` token or more than one*. D is hermetic, since the pin and the page are both in the tree, so no dormancy applies. Implementation: `native/src/gates/install_pin.rs` over the `md_text` it already reads. The descriptor's `# spec:` line in `scripts/check-install-pin.gate` names (D) beside (A), (B) and (C). `scripts/gate-tests/check-install-pin/good/install.md` gains a block at the fixture's pin. The `bad/` install.md gains a block naming another version, and `bad/expect.txt` gains the D line. The fail-closed cases are a unit test in `install_pin.rs` beside `a_missing_duplicated_or_malformed_pin_fails_closed`: a missing block, a duplicated block, and a block with no `measured at` token or two, each exiting 2.
 
 ### (4) The release step {mechanical}
 
 **Not yet applied.** RELEASING.md step 4, the paragraph opening *Tag with `git tag -a vX.Y.Z`*. After the sentence ending *which `check-install-pin` demands from the first commit after the tag*, add:
 
-*That commit also carries the new commit-cost figure, so make it once step 5's publish watch is green. In an empty scratch repository, run the one line with `init --profile full`, then the installed gate binary with `--measure-commit`, and write its two lines into docs/install.md's `commit-cost` block as `measured at vX.Y.Z` (invariant D).*
+*That commit also carries the new commit-cost figure, so make it once step 5's publish watch is green. In an empty scratch repository, run the one line with `CHECKWRIGHT_VERSION=X.Y.Z` set, since the hosted pin still names the previous release until this commit moves it, and `init --profile full`; then run the installed gate binary with `--measure-commit`, and write its two lines into docs/install.md's `commit-cost` block as `measured at vX.Y.Z` (invariant D).*
 
 ### (5) The unread baseline is retired {mechanical}
 

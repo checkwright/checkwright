@@ -18,7 +18,7 @@ One queue entry pairs it: [battery-timing-file-overwritten-by-only-run](TASK-QUE
 
 **Not yet applied.** gate-sdk/SPEC.md §run-gates, first paragraph. The parenthesis *(`<tmp-dir>/gate-timings.txt`, `<gate> <elapsed-ms>` per line + `TOTAL` — uncommitted by design: a measurement, not state)* becomes:
 
-*(`<tmp-dir>/gate-timings.txt`, `<gate> <elapsed-ms>` per line + `TOTAL` — uncommitted by design: a measurement, not state. Only an unfiltered run of the configured registry writes it. A `--only` or `--for` selection, or a gates-dir positional naming another registry, leaves the file as the last full battery wrote it, so its one reader never sums a subset.)*
+*(`<tmp-dir>/gate-timings.txt`, `<gate> <elapsed-ms>` per line + `TOTAL` — uncommitted by design: a measurement, not state. Only an unfiltered run of the configured registry writes it. A `--only` or `--for` selection, or a gates-dir positional spelled other than the configured `GATE_SDK_GATES_DIR`, leaves the file as the last full battery wrote it, so its one reader never sums a subset.)*
 
 Implementation: `native/src/runner.rs` calls `write_timings` only when `parsed.only` and `parsed.paths` are empty and `explicit` is false. The usage text's closing line becomes *Per-gate timings of an unfiltered run land in $GATE_SDK_TMP_DIR/gate-timings.txt (default .tmp/).*
 

@@ -13,3 +13,10 @@
 - rev: ea22c055efc76c393070a29ce5c604b94451f258
 - finding: Corpus: the harness sessions dir for this checkout, transcripts modified in the last 7 days (500, 694 MB), outside the tree. Ids with usage: claude-opus-5-5, claude-sonnet-5, claude-sonnet-5-5, claude-opus-5, claude-fable-5-1, claude-haiku-4-5-20251001 (95 turns). A placeholder id carries only zero-usage turns. The table's claude-haiku-4-5 row matches no transcript id in the whole sessions dir, so the dated haiku id is unpriced: 14 stage-economics log rows read cost=n/a for it, and 98 read n/a for the zero-usage placeholder.
 - inferred: none
+
+## 2026-09-29 align — Which pre-commit members re-read the staged set from the index themselves, and so see nothing staged under a --measure-commit run?
+- corpus: native/src/gates
+- oracle: git grep -n -e '"--cached"' -e '"--staged"' -- native/src/gates, then the tier= field of each hit's .gate descriptor
+- rev: dc4800f70a5bd43a8a912a432f30c49f01d39490
+- finding: Four precommit-tier members read git diff --cached themselves: check-gate-tamper (delegation-kit), check-stage-evidence (lifecycle-kit), check-docs-cmd (canon-kit) and check-release-change-declared (this repo's scripts). check-dispatch-entry does too but is commit-msg tier. The hook arm's run_over hands the path set only to the runner's selection, so under --measure-commit those four see an empty staged set.
+- inferred: none
