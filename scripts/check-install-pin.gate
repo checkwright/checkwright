@@ -1,2 +1,2 @@
 # graph: couples=docs/install.sh,docs/install.ps1,docs/install.md,gate-sdk/SPEC.md dir=one valve=none tier=precommit
-# spec: installer/SPEC.md §The hosted install pin — the hosted install scripts' pin lines agree with each other (A) and with the newest release tag (B), and every fetch surface spells only the pinned release's declared asset names (C)
+# spec: installer/SPEC.md §The hosted install pin — the hosted install scripts' pin lines agree with each other (A) and with the newest release tag (B), and every fetch surface spells only the pinned release's declared asset names (C), and the install page's commit-cost figure is the pinned release's (D)
