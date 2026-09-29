@@ -11,3 +11,4 @@ companion-adoption-landing build a726b47c 2026-09-29 cd8384a6
 companion-adoption-landing build a2004852 2026-09-29 1f92c3f8
 companion-adoption-landing build a66bfa63 2026-09-29 1cb34418
 companion-adoption-landing build aead5b57 2026-09-29 2e55c52e
+companion-adoption-landing build a6244084 2026-09-29 27f8e8fd
