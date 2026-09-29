@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+companion-technical-gates gates sha256=626a6c308037c5ad41dab1504e202e6895c4542eabfb3b7e895e7f3c08a4701d pass=144 fail=0 ignore=0 verdict=clean 2026-09-29
+companion-technical-gates gate_sdk sha256=754fceb4addff652c31443cc80edb7fd86da22a6751d6a985b726be116728b35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-29
+companion-technical-gates canon_kit sha256=d9cec07353e748f83a104f2a43ebff9e600c7db21207808b0a592fba59a5285f pass=1 fail=0 ignore=0 verdict=clean 2026-09-29
+companion-technical-gates context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-29
+companion-technical-gates delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-29
+companion-technical-gates doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-29
+companion-technical-gates evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-29
+companion-technical-gates guard_kit sha256=01d94b4120e133665e01946fe44d31a730d2c6cdfd1570e5ce6b96a7a1b30e1b pass=1 fail=0 ignore=0 verdict=clean 2026-09-29
+companion-technical-gates lifecycle_kit sha256=0a16a2be3f1e408582252ab47d92fd8628178950f6367b1711422c95d7a0d8b0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-29
+companion-technical-gates queue_kit sha256=b7bfa7255550172f076ff11d2a619cd3608dbaa90f5f59911767456df1b52b8b pass=1 fail=0 ignore=0 verdict=clean 2026-09-29
+companion-technical-gates site_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-09-29
+companion-technical-gates scripts sha256=da678c039ae878171ffba00a2eb2a494bb220207cca3ead47cb04a839e6ddd81 pass=1 fail=0 ignore=0 verdict=clean 2026-09-29
+companion-technical-gates guard_tests sha256=50af7da51cc1a15eb9e72dea81613ec0b82b4b73a8faba1987ef537271e9ee9a pass=1 fail=0 ignore=0 verdict=clean 2026-09-29
+companion-technical-gates demo sha256=6031b87f8bbdacc2350b24dacc9fdee841a6fd1595850f714dde6442014f201b pass=1 fail=0 ignore=0 verdict=clean 2026-09-29
+companion-technical-gates installer_smoke sha256=699b34452836a320a14e6a87eb5ca9fefc9b0de34b57bf516a5b133447331176 pass=24 fail=0 ignore=0 verdict=clean 2026-09-29
+companion-technical-gates consumer_smoke sha256=68eeb8b4e96c9a77a436feb2b52550fb01265c9d2db744f40d15438c2f0d0ce9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-29
+companion-technical-gates upgrade sha256=ef165c4cd51bb566468e6747e7caffdc0e03c2994b78a38955be828b3e4e8e19 pass=1 fail=0 ignore=0 verdict=clean 2026-09-29
+companion-technical-gates agents_md_smoke sha256=95b5f283b684aaf3276fd0e8b4b804e218e53ca7f02632913f5d91ec4e694e17 pass=1 fail=0 ignore=0 verdict=clean 2026-09-29
+companion-technical-gates index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-29
+companion-technical-gates native_crate sha256=6ade45a66ab59da579774d018898ae7dacc25aa53aa4bb72bcf0e7eb52c07c62 pass=1 fail=0 ignore=0 verdict=clean 2026-09-29
+companion-technical-gates projection_witness sha256=decc78b75af7ee6aa82f62f61f0099847b9ac4405c33655b5808ca85e7e4ef5a pass=1 fail=0 ignore=0 verdict=clean 2026-09-29
