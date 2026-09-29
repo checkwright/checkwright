@@ -60,7 +60,7 @@ Install Checkwright in this repository. Choose a profile with me from https://ch
 
 ### (6) The release declaration {mechanical}
 
-**Not yet applied.** `.workflow/release-declarations.md`'s Behavior changes section gains a bullet in the grammar installer/SPEC.md §The upgrade contract gives: *gate-sdk ships `templates/adopt.md`, a walk an agent follows after `init` to fit the knobs to your layout and triage the first reds. Nothing to do.*
+**Not yet applied.** `.workflow/release-declarations.md`, drained to its header, gains a `## Behavior changes` heading and a bullet whose lead token is the bolded template path, in the grammar installer/SPEC.md §The upgrade contract gives: *- **gate-sdk/templates/adopt.md** — a walk an agent follows after `init` to fit the knobs to your layout and triage the first reds. Nothing to do.*
 
 ## Producers and consumers
 

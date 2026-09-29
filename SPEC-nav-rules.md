@@ -25,7 +25,7 @@ Two queue entries pair it: [toolkit-nav-hierarchy](TASK-QUEUE.md#toolkit-nav-hie
 - `docs/spec-toolkits.md`: `title: Spec toolkits`, `nav_order: 4`, `nav_id: toolkits`. Its `nav_parent` and `nav_child_order` lines go. Its H1 becomes `# Spec toolkits: gating what Spec Kit and OpenSpec write`.
 - `docs/speckit.md` and `docs/openspec.md`: `nav_parent: toolkits`, their `nav_child_order` renumbered to 1 and 2.
 - The top-level slots after it move down one: `docs/value.md` to `nav_order: 5`, `docs/kits.md` to 6, `docs/releases.md` to 7. `docs/value.md`'s front matter sits outside its generated marker block, so the edit is by hand. `docs/install.md` keeps `nav_id: install` and has no children left.
-- Link texts naming the old label read `Spec toolkits`: `docs/install.md` line 229, `docs/openspec.md` line 35, `docs/speckit.md` line 35 and `companion/README.md` line 20.
+- Link texts naming the old label read `Spec toolkits`: `docs/install.md` line 229, `docs/openspec.md` line 35, `docs/positioning.md` line 30, `docs/speckit.md` line 35 and `companion/README.md` line 20.
 
 ### (2) The label rules {mechanical}
 
@@ -88,7 +88,7 @@ Overview proxy probe: `grep -o -E '\]\([a-z-]+\.md'` over each parent's children
 
 Roster probe: `git grep -n -i "link walk\|nav-reachable\|nav_reachable\|nav_order\|nav_parent: install\|spec-toolkits"` over the tracked tree, less `docs/posts/`, the generated mirrors and `docs/check-graph.html`.
 
-- `docs/spec-toolkits.md`, `docs/speckit.md`, `docs/openspec.md`, `docs/value.md`, `docs/kits.md`, `docs/releases.md`, `docs/install.md`, `companion/README.md` (deltas 1 and 4).
+- `docs/spec-toolkits.md`, `docs/speckit.md`, `docs/openspec.md`, `docs/positioning.md`, `docs/value.md`, `docs/kits.md`, `docs/releases.md`, `docs/install.md`, `companion/README.md` (deltas 1 and 4).
 - `docs/site-architecture.md` — §Page-authoring rules (delta 2), §Site chrome and the nav contract (deltas 3, 4 and 6).
 - `docs/_includes/nav.html`, `docs/_layouts/default.html` (deltas 3 and 4).
 - `scripts/docs-offnav.list` (delta 4).
