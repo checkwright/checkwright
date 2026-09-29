@@ -11,3 +11,4 @@ Install Checkwright into this repository.
    - macOS and Linux: `curl -fsSL https://checkwright.dev/install.sh | sh -s -- init --profile <profile>`
    - Windows, in PowerShell: `& ([scriptblock]::Create((irm https://checkwright.dev/install.ps1))) init --profile <profile>`
 4. Run each command in the `next:` block `init` prints, in order.
+5. Then run the `adopt` skill, which fits the knobs to this repository and triages the first reds.

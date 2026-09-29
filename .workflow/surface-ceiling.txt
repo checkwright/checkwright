@@ -3,6 +3,7 @@
 1307cp .claude/agents/consult-session.md
 2368cp .claude/agents/edit-sweep.md
 8486cp .claude/agents/stage-session.md
+93cp .claude/commands/adopt.md
 1446cp .claude/commands/agent-execution.md
 551cp .claude/commands/align.md
 980cp .claude/commands/build.md
@@ -33,7 +34,7 @@
 1472cp docs/gate-sdk/index.md
 1259cp docs/guard-kit/index.md
 5205cp docs/index.md
-18399cp docs/install.md
+19082cp docs/install.md
 1344cp docs/kits.md
 1395cp docs/lifecycle-kit/index.md
 3007cp docs/methodology.md
@@ -77,13 +78,14 @@
 2412cp docs/site-kit/index.md
 4493cp docs/spec-toolkits.md
 2164cp docs/speckit.md
-2520cp docs/value.md
+2524cp docs/value.md
 35405cp doctrine-kit/SPEC.md
 141064cp drift-kit/SPEC.md
 2698cp drift-kit/templates/close-knowledge.md
 3752cp drift-kit/templates/economics.md
 93466cp evidence-kit/SPEC.md
-933451cp gate-sdk/SPEC.md
+935186cp gate-sdk/SPEC.md
+2899cp gate-sdk/templates/adopt.md
 301494cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
 277424cp installer/SPEC.md
@@ -98,7 +100,7 @@
 9351cp lifecycle-kit/templates/stages/spec.md
 6058cp lifecycle-kit/templates/stages/validate.md
 2765cp lifecycle-kit/templates/upgrade.md
-13242cp plugin/SPEC.md
+13657cp plugin/SPEC.md
 176937cp queue-kit/SPEC.md
 1392cp queue-kit/templates/TASK-QUEUE.md
 62216cp site-kit/SPEC.md

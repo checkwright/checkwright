@@ -46,14 +46,17 @@ The plugin registers exactly the templates this repository binds in its own skil
 
 **A skill runs a vendored template and binds nothing.** A stage template's slots are the consumer's to bind in its own skill. That is rule content a package serving every adopter cannot carry: a default chosen here would be this repository's calibration shipped as everyone's. So the skill defers to a skill of the repository's own that binds the template, and otherwise takes each slot's own text as its binding.
 
-**`install`** tells the agent four things:
+**`install`** tells the agent five things:
 
 - choose a profile with the user, from the installer README's *Choosing a profile* section;
 - confirm the worktree is clean;
 - run the one-line install for the host with `init --profile <profile>` as its arguments, the PowerShell twin on Windows in the form docs/install.md gives;
-- run each command in the `next:` block `init` prints.
+- run each command in the `next:` block `init` prints;
+- hand to the `adopt` skill.
 
 The skill carries no template directive. It advertises `init` on a route, so it is a front-door page ([installer/SPEC.md §The front door's verbs](../installer/SPEC.md#the-front-doors-verbs)).
+
+**`adopt`** is `install`'s sibling rather than its extension. Fitting the knobs and triaging the first reds run over files `init` wrote, so they are a vendored template's job, [gate-sdk/SPEC.md §templates/adopt.md](../gate-sdk/SPEC.md#templatesadoptmd), while `install` runs before anything is vendored. `adopt` is an ordinary shim-derived skill, and `install`'s last step hands to it.
 
 Vendoring stays with `init`. A plugin that vendored kits itself would be a second install model with no manifest, update or uninstall story; the install skill hands to the installer, whose `checkwright.lock` the plugin never writes.
 

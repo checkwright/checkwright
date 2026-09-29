@@ -26,7 +26,7 @@ In Claude Code:
 
 Any other Agent Plugins client loads this `plugin/` directory by its own install route.
 
-Then ask for the `install` skill in the repository you want governed, or install Checkwright yourself ([Install](https://checkwright.dev/install.html)).
+Then ask for the `install` skill, then for the `adopt` skill, in the repository you want governed, or install Checkwright yourself ([Install](https://checkwright.dev/install.html)).
 
 If you already merged guard-kit's hook wiring into `.claude/settings.json`, keep one of the two: with both, each guard runs twice and the friction log counts each fall-through twice.
 

@@ -18,7 +18,7 @@ One queue entry pairs it: [adoption-prompt-templates](TASK-QUEUE.md#adoption-pro
 
 ### (1) The template {design-bearing}
 
-**Not yet applied.** `gate-sdk/templates/adopt.md`. It is a boundary template, like lifecycle-kit's `upgrade.md`: it stamps no state and runs in any session after `init`. It has no slots, so the plugin's fallback, each slot's own text, has nothing to bind. Its opening states its exit condition: *the full battery is green, or every red carries a disposition the user accepted.* Its steps, each an instruction with no grounds:
+**Applied.** `gate-sdk/templates/adopt.md`. It is a boundary template, like lifecycle-kit's `upgrade.md`: it stamps no state and runs in any session after `init`. It has no slots, so the plugin's fallback, each slot's own text, has nothing to bind. Its opening states its exit condition: *the full battery is green, or every red carries a disposition the user accepted.* Its steps, each an instruction with no grounds:
 
 1. **Confirm the install.** `checkwright.lock` exists at the repository root and the worktree is clean. If the lock is missing, Checkwright is not installed here, so say so and stop. Read the lock for the profile, the kits and any selection.
 2. **Run the battery** on the gate binary `GATE_SDK_NATIVE_BIN` names, with `--run`, and keep its output. Each red is a triage item. Each clean line that counts zero files, pages or entries names a gate that reads nothing on this tree, and is a configuration item.
@@ -36,19 +36,19 @@ gate-sdk/SPEC.md gains `### templates/adopt.md` after §templates/gates-workflow
 
 ### (2) The binding shim {mechanical}
 
-**Not yet applied.** `.claude/commands/adopt.md`, in the shim form: its one line is `Execute the template at gate-sdk/templates/adopt.md, applying the bindings below.`, and a `## Bindings` heading follows with no binding under it. `lifecycle-kit/checks/check-skill-binding.gate`'s `couples=` gains `gate-sdk/templates/adopt.md` beside `delegation-kit/templates/agent-execution.md`, since the gate couples each out-of-tree bound template by name.
+**Applied.** `.claude/commands/adopt.md`, in the shim form: its one line is `Execute the template at gate-sdk/templates/adopt.md, applying the bindings below.`, and a `## Bindings` heading follows with no binding under it. `lifecycle-kit/checks/check-skill-binding.gate`'s `couples=` gains `gate-sdk/templates/adopt.md` beside `delegation-kit/templates/agent-execution.md`, since the gate couples each out-of-tree bound template by name.
 
 ### (3) The plugin skill {mechanical}
 
-**Not yet applied.** `plugin/skills/adopt/SKILL.md`: front matter `name: adopt` and a `description` of the form plugin/SPEC.md §The skills sets, *Fits Checkwright's knobs to this repository's layout and triages the first reds after an install, with the user. Run it only when the user asks for it.* Its body is §The skills' fixed rendering for `gate-sdk/templates/adopt.md`, which `check-plugin-parity` assertion B derives from the shim and holds byte for byte.
+**Applied.** `plugin/skills/adopt/SKILL.md`: front matter `name: adopt` and a `description` of the form plugin/SPEC.md §The skills sets, *Fits Checkwright's knobs to this repository's layout and triages the first reds after an install, with the user. Run it only when the user asks for it.* Its body is §The skills' fixed rendering for `gate-sdk/templates/adopt.md`, which `check-plugin-parity` assertion B derives from the shim and holds byte for byte.
 
 ### (4) `install` hands to `adopt` {mechanical}
 
-**Not yet applied.** `plugin/skills/install/SKILL.md` gains step 5: *Then run the `adopt` skill, which fits the knobs to this repository and triages the first reds.* plugin/SPEC.md §The skills: *`install` tells the agent four things* becomes *five*, and the list gains *hand to the `adopt` skill*. plugin/README.md's line on asking for the `install` skill gains *, then for the `adopt` skill*.
+**Applied.** `plugin/skills/install/SKILL.md` gains step 5: *Then run the `adopt` skill, which fits the knobs to this repository and triages the first reds.* plugin/SPEC.md §The skills: *`install` tells the agent four things* becomes *five*, and the list gains *hand to the `adopt` skill*. plugin/README.md's line on asking for the `install` skill gains *, then for the `adopt` skill*.
 
 ### (5) The install page gives the plain prompt {mechanical}
 
-**Not yet applied.** docs/install.md §From a plugin marketplace: *Ask for its `install` skill …* gains *, then its `adopt` skill, which fits the knobs to your layout and triages the first reds.* §Install gains `### With another coding agent`, after §From a plugin marketplace:
+**Applied.** docs/install.md §From a plugin marketplace: *Ask for its `install` skill …* gains *, then its `adopt` skill, which fits the knobs to your layout and triages the first reds.* §Install gains `### With another coding agent`, after §From a plugin marketplace:
 
 *Give your agent this prompt:*
 
@@ -60,7 +60,7 @@ Install Checkwright in this repository. Choose a profile with me from https://ch
 
 ### (6) The release declaration {mechanical}
 
-**Not yet applied.** `.workflow/release-declarations.md`, drained to its header, gains a `## Behavior changes` heading and a bullet whose lead token is the bolded template path, in the grammar installer/SPEC.md §The upgrade contract gives: *- **gate-sdk/templates/adopt.md** — a walk an agent follows after `init` to fit the knobs to your layout and triage the first reds. Nothing to do.*
+**Applied.** `.workflow/release-declarations.md`, drained to its header, gains a `## Behavior changes` heading and a bullet whose lead token is the bolded template path, in the grammar installer/SPEC.md §The upgrade contract gives: *- **gate-sdk/templates/adopt.md** — a walk an agent follows after `init` to fit the knobs to your layout and triage the first reds. Nothing to do.*
 
 ## Producers and consumers
 

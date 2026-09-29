@@ -88,6 +88,7 @@ Pick your route:
 - **Windows through WSL:** the [macOS and Linux](#macos-and-linux) line, in your WSL shell. The install places the Linux gate binary and the pre-commit hook runs it, so commit to that repository from WSL too: Git for Windows cannot start the Linux binary.
 - **With Node:** [`npx checkwright init`](#with-node).
 - **In Claude Code:** [the plugin marketplace](#from-a-plugin-marketplace).
+- **With another coding agent:** [a prompt to give it](#with-another-coding-agent).
 
 ### Try it first
 
@@ -221,7 +222,17 @@ In Claude Code, add Checkwright's marketplace and install its plugin:
 /plugin install checkwright@checkwright
 ```
 
-The plugin installs no kit: it registers Checkwright's lifecycle skills and its guards. Ask for its `install` skill in your repository: it chooses a profile with you and runs the same `init` this page documents. Any Agent Plugins client loads the repository's `plugin/` directory by its own install route ([plugin/README.md](plugin/README.md)).
+The plugin installs no kit: it registers Checkwright's lifecycle skills and its guards. Ask for its `install` skill in your repository: it chooses a profile with you and runs the same `init` this page documents. Then ask for its `adopt` skill: it fits the knobs to your layout, and works through the first reds with you until the battery is green or each has a disposition you accept. Any Agent Plugins client loads the repository's `plugin/` directory by its own install route ([plugin/README.md](plugin/README.md)).
+
+### With another coding agent
+
+Give your agent this prompt:
+
+```text
+Install Checkwright in this repository. Choose a profile with me from https://checkwright.dev/install.html#choosing-a-profile, then install it as https://checkwright.dev/install.html#install describes for this host, and run each command init prints. Then follow gate-sdk/templates/adopt.md.
+```
+
+The last step is the same walk the plugin's `adopt` skill runs.
 
 ### Choosing a profile
 
