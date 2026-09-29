@@ -50,7 +50,7 @@ One queue entry pairs it: [companion-spec-to-code-gates](TASK-QUEUE.md#companion
 >
 > Declared by `checks/check-task-label-resolution.gate`, `# install: zero-config`, `# armed-by: CANON_KIT_TASK_LABEL_CITES`, dispatching to the binary, with `knob:CANON_KIT_TASK_LIST_GLOBS` and `*.md` in `couples=`. It also asserts nothing while `CANON_KIT_TASK_LIST_GLOBS` is empty, which `check-task-path-claim`'s declaration already names to `doctor`.
 
-`native/src/gates/task_label_resolution.rs` implements it over `EreCapture` and `find_from`, with no new engine item. `canon-kit/gate-tests/check-task-label-resolution/` holds the pair. `good/` has a family whose citations resolve in a sibling file, and a citation in a fence naming an undefined label. `bad/` has an unresolved citation, plus a knob pair whose key sets differ, which exits 2 in its own case.
+`native/src/gates/task_label_resolution.rs` implements it over `EreCapture`, which gains `capture_from(hay, from)` beside `capture`, the from-offset form `Ere::find_from` already is, so a line's every leftmost-longest match is found in turn. gate-sdk/SPEC.md §The POSIX ERE matcher names the method. `canon-kit/gate-tests/check-task-label-resolution/` holds the pair. `good/` has a family whose citations resolve in a sibling file, and a citation in a fence naming an undefined label. `bad/` has an unresolved citation, plus a knob pair whose key sets differ, which exits 2 in its own case.
 
 ### (3) The knobs {mechanical}
 
@@ -93,7 +93,7 @@ companion/SPEC.md §The Spec Kit recipe and §The OpenSpec recipe each gain a bu
 - §What the gates catch's *four kinds of defect in your specs* stays, since it lists the document gates.
 - §What is tested's *plants each of the four defects* becomes *plants each defect*.
 
-`companion/speckit/extension.yml`'s description and `companion/speckit/README.md`'s gate sentence each add the ticked-task check, the description kept under the catalog's 200 characters. `docs/speckit.md` line 31's *to the four [the overview](spec-toolkits.md#what-the-gates-catch) names* becomes *to the ones [the overview](spec-toolkits.md) names*.
+`companion/speckit/extension.yml`'s description and `companion/speckit/README.md`'s gate sentence each add the ticked-task check, the description kept under the catalog's 200 characters. `docs/speckit.md` line 31's *to the four [the overview](spec-toolkits.md#what-the-gates-catch) names* becomes *to the gates [the overview](spec-toolkits.md#what-the-gates-catch) names*.
 
 ## Producers and consumers
 
@@ -114,7 +114,8 @@ Roster probe: `git grep -n "check-tracking-claim"` over the tracked tree, for ea
 - `canon-kit/README.md`, `canon-kit/smoke/install.sh` (delta 3).
 - `scripts/gates.list` — registers both, disarmed on this tree (deltas 1 and 2).
 - `companion/speckit/recipe/canon-config.knobs`, `companion/openspec/recipe/canon-config.knobs` (delta 4).
-- `companion/SPEC.md` — §The Spec Kit recipe, §The OpenSpec recipe (delta 4), §The tested claim (delta 5).
+- `native/src/ere.rs`, and gate-sdk/SPEC.md §The POSIX ERE matcher (delta 2): `EreCapture::capture_from`.
+- `companion/SPEC.md` — §Recipes, whose rule a recipe line answers a red gains *or arms a gate that registers disarmed* (delta 4); §The Spec Kit recipe, §The OpenSpec recipe (delta 4); §The tested claim, §The fixtures, whose layout contents and per-claimed-gate `defects/` roster gain the source file and the two new gates (delta 5).
 - `companion/fixtures/speckit/` and `companion/fixtures/openspec/` layouts and defects (delta 5).
 - `installer/consumer-smoke/run-smoke.sh`, `installer/SPEC.md` §The consumer smoke (delta 5).
 - `docs/spec-toolkits.md`, `docs/speckit.md`, `companion/speckit/extension.yml`, `companion/speckit/README.md` (delta 6).

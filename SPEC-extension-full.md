@@ -11,7 +11,7 @@ One queue entry pairs it: [speckit-extension-full-profile](TASK-QUEUE.md#speckit
 - **The line the command runs is the line the arm runs.** The Spec Kit `full` leg runs the command's own `full` line, as the default leg runs its `prose` line. The page's `full` line is held to carry the same words, so the page and the command cannot name two installs.
 - **The seam.** Repo-root only: the companion package, its design record, the smoke and the docs. No kit surface changes.
 
-**Sequencing.** This lands after [companion-spec-to-code-gates](TASK-QUEUE.md#companion-spec-to-code-gates). Both edit `companion/speckit/extension.yml`'s description, `companion/speckit/README.md`, `docs/speckit.md` and the companion arm. Where that unit has landed in an earlier batch or lands in this one, the text below is written over its edits. Otherwise, each passage it would have changed is left as it stands, and this amendment's edits are applied beside it.
+**Sequencing.** This lands after [companion-spec-to-code-gates](TASK-QUEUE.md#companion-spec-to-code-gates). Both edit `companion/speckit/extension.yml` (that unit the extension's own `description`, this one the `speckit.checkwright.install` command's), `companion/speckit/README.md` (its gate sentence and its install bullet), `docs/speckit.md` and the companion arm. Where that unit has landed in an earlier batch or lands in this one, the text below is written over its edits. Otherwise, each passage it would have changed is left as it stands, and this amendment's edits are applied beside it.
 
 ## What changes
 
@@ -34,7 +34,7 @@ One queue entry pairs it: [speckit-extension-full-profile](TASK-QUEUE.md#speckit
 
 - §The two tiers: *The Spec Kit extension installs the default only.* becomes *The Spec Kit extension's install command installs either, `full` when the user's input asks for it, and its `full` line sits in its own `companion-full` block.*
 - §Applying a recipe: *For Spec Kit it is in `speckit/commands/install.md`, an `sh` fence holding the one-line install the agent runs.* becomes *For Spec Kit both lines are in `speckit/commands/install.md`, each an `sh` fence holding the one-line install the agent runs, and the Spec Kit page's `full` line carries the same words from `init`.*
-- §The Spec Kit extension, the `speckit.checkwright.install` bullet: *and the arguments `init --profile prose --recipe speckit`* becomes *and the arguments `init --profile prose --recipe speckit`, or `--profile full` when the user's input asks for `full`. It names `full`'s costs before running it.*
+- §The Spec Kit extension, the `speckit.checkwright.install` bullet: *and the arguments `init --profile prose --recipe speckit`* becomes *and the arguments `init --profile prose --recipe speckit`, or `--profile full` when the user's input asks for `full`, naming `full`'s costs before running it, then runs the commands `init` printed.*
 - §Honest limits' agent-run bullet: *the companion arm runs the install command's install line* becomes *the companion arm runs both of the install command's lines*.
 
 ### (3) The companion arm runs the command's `full` line {design-bearing}
@@ -63,7 +63,7 @@ Probe: the survey record's toolkit-format block for `$ARGUMENTS` and `argument-h
 Roster probe: `git grep -n "installs the default only\|install command's install line\|init --profile prose --recipe speckit\|companion-full"` over `companion`, `docs`, `installer`.
 
 - `companion/speckit/commands/install.md`, `companion/speckit/extension.yml` (delta 1).
-- `companion/SPEC.md` — §Applying a recipe, §The two tiers, §The Spec Kit extension, §Honest limits (delta 2).
+- `companion/SPEC.md` — §Applying a recipe, §The two tiers (its default-only sentence, and the paragraph naming `init` with the second line as the adopter's route to `full`, which gains *or asks the install command for `full`*), §The Spec Kit extension, §Honest limits (delta 2).
 - `installer/consumer-smoke/run-smoke.sh`, `installer/SPEC.md` §The consumer smoke (delta 3).
 - `docs/speckit.md`, `companion/speckit/README.md` (delta 4).
 - `docs/companion/SPEC.md`, `docs/installer/SPEC.md`, the generated mirrors, regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write` (deltas 2 and 3).

@@ -95,6 +95,7 @@ Roster probe: `git grep -n "front-door-verbs\|front_door_verbs\|verb table"` ove
 - `scripts/gate-tests/check-front-door-verbs/` (delta 5).
 - `docs/installer/SPEC.md` and `docs/installer/README.md`, the generated mirrors, regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write` (all deltas).
 - `.workflow/surface-ceiling.txt` — the grown `installer/SPEC.md` and `installer/README.md` rows re-stamped with `--emit always-loaded --ceiling` in the growing commit (deltas 1, 2 and 3).
+- `.workflow/release-declarations.md` — Behavior changes gains a bullet led by **`update`**: its `usage:` line names the recipe flags it already forwarded (delta 1).
 
 ## Retired spellings
 
