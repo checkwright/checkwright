@@ -4,7 +4,7 @@
 use super::{lock, refuse, Refusal, AGENT_FILE, GATES_DIR};
 use std::collections::BTreeSet;
 
-const USAGE: &[&str] = &[
+pub(super) const USAGE: &[&str] = &[
     "usage: checkwright uninstall [--dry-run] [--force] [--no-commit]",
     "",
     "Removes the files init recorded in checkwright.lock and commits the removal.",
@@ -12,13 +12,13 @@ const USAGE: &[&str] = &[
     "init wrote it is kept and reported, except the gate binary, which is never yours; --force removes it anyway.",
 ];
 
-struct Flags {
+pub(super) struct Flags {
     dry: bool,
     force: bool,
     commit: bool,
 }
 
-fn parse(args: &[String]) -> Result<Option<Flags>, Refusal> {
+pub(super) fn parse(args: &[String]) -> Result<Option<Flags>, Refusal> {
     let mut f = Flags {
         dry: false,
         force: false,

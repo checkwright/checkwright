@@ -31,6 +31,18 @@ pub const VERBS: &[(&str, Verb)] = &[
     ("--demo", demo::run),
 ];
 
+// spec: installer/SPEC.md §The verbs — the same ownership for each verb's flags: a flag is
+// advertisable because the parsers of the verbs named beside it accept it, and a crate test holds
+// every parser and `usage:` line to this table. `-h`/`--help` takes no row, being every verb's.
+pub const FLAGS: &[(&str, &[&str])] = &[
+    ("--profile", &["init", "update"]),
+    ("--recipe", &["init", "update"]),
+    ("--no-recipe", &["init", "update"]),
+    ("--dry-run", &["init", "update", "uninstall"]),
+    ("--force", &["init", "update", "uninstall"]),
+    ("--no-commit", &["init", "update", "uninstall"]),
+];
+
 // spec: installer/SPEC.md §What init seeds — the consumer-layout names the verbs write against,
 // which are the owning kits' own defaults, held here because a second verb reads what init wrote:
 // uninstall trims the agent file, demo stages its claim in the queue and state file.
@@ -263,6 +275,72 @@ fn chunks(paths: &[String]) -> Vec<&[String]> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::collections::BTreeSet;
+
+    fn usage_line(verb: &str) -> String {
+        match verb {
+            "init" => init::USAGE.to_string(),
+            "update" => update::USAGE[0].to_string(),
+            "uninstall" => uninstall::USAGE[0].to_string(),
+            "doctor" => doctor::USAGE[0].to_string(),
+            "diff" => diff::usage()[0].clone(),
+            "demo" => demo::USAGE[0].to_string(),
+            other => panic!("VERBS carries `{}`, which this test reads no usage line for", other),
+        }
+    }
+
+    // spec: installer/SPEC.md §The verbs — a usage line's flags, each with whether a `<operand>`
+    // follows it
+    fn usage_flags(line: &str) -> Vec<(String, bool)> {
+        let toks: Vec<String> = line
+            .split_whitespace()
+            .map(|t| t.trim_start_matches('[').trim_end_matches("...").trim_end_matches(']').to_string())
+            .collect();
+        toks.iter()
+            .enumerate()
+            .filter(|(_, t)| t.starts_with("--") && t.as_str() != "--help")
+            .map(|(i, t)| (t.clone(), toks.get(i + 1).is_some_and(|n| n.starts_with('<'))))
+            .collect()
+    }
+
+    // spec: installer/SPEC.md §The verbs — `update` forwards its argv to `init` verbatim, so its
+    // parser is init's; `doctor`, `diff` and `demo` take no flag and answer only through `run`
+    fn refused_at(verb: &str, args: &[String]) -> Option<i32> {
+        match verb {
+            "init" | "update" => init::parse(args, None).err().map(|r| r.code),
+            "uninstall" => uninstall::parse(args).err().map(|r| r.code),
+            _ => {
+                let (_, run) = VERBS.iter().find(|(v, _)| v.trim_start_matches("--") == verb)?;
+                Some(run(args)).filter(|c| *c != 0)
+            }
+        }
+    }
+
+    // spec: installer/SPEC.md §The verbs — each row's flag parses for every verb it names, in both
+    // spellings where it takes an operand; a flag no row names for a verb is refused at exit 2 by
+    // that verb; and each verb's `usage:` line lists exactly its rows
+    #[test]
+    fn the_flag_roster_is_every_parsers_and_usage_lines() {
+        for (verb, _) in VERBS {
+            let verb = verb.trim_start_matches("--");
+            let rows: BTreeSet<&str> = FLAGS.iter().filter(|(_, vs)| vs.contains(&verb)).map(|(f, _)| *f).collect();
+            let listed = usage_flags(&usage_line(verb));
+            let names: BTreeSet<&str> = listed.iter().map(|(f, _)| f.as_str()).collect();
+            assert_eq!(names, rows, "{}'s usage line and its FLAGS rows disagree", verb);
+            for (flag, operand) in &listed {
+                let mut spellings = vec![vec![flag.clone()]];
+                if *operand {
+                    spellings = vec![vec![flag.clone(), "x".to_string()], vec![format!("{}=x", flag)]];
+                }
+                for args in spellings {
+                    assert_eq!(refused_at(verb, &args), None, "{} refused {:?}", verb, args);
+                }
+            }
+            for (flag, _) in FLAGS.iter().filter(|(_, vs)| !vs.contains(&verb)) {
+                assert_eq!(refused_at(verb, &[flag.to_string()]), Some(2), "{} did not refuse {}", verb, flag);
+            }
+        }
+    }
 
     // spec: installer/SPEC.md §init — every path lands in exactly one chunk, no chunk exceeds
     // the budget, an empty roster is no call at all, and a single path wider than the budget still

@@ -3,8 +3,8 @@
 // never perform the first one. Every init flag stays valid, `--dry-run` included.
 use super::{lock, refuse, Refusal};
 
-const USAGE: &[&str] = &[
-    "usage: checkwright update [--profile <name>] [--dry-run] [--force] [--no-commit]",
+pub(super) const USAGE: &[&str] = &[
+    "usage: checkwright update [--profile <name>] [--recipe <name>]... [--no-recipe] [--dry-run] [--force] [--no-commit]",
     "",
     "Runs checkwright init with the same arguments, refusing when there is no",
     "existing install for it to update. Every init flag is valid here — see",

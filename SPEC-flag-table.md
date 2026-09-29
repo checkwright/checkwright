@@ -1,5 +1,7 @@
 # SPEC amendment: flag-table
 
+**Merged at build; held on disk until the Done move.** Every delta below is applied and merged into its canonical section. The Definition of Done moves the entry to Done only once the mid-iteration push's runs are green, and `check-amendment-queue` holds an active entry's `[spec:]` ref to this file, so the file is deleted in the Done-move commit.
+
 `check-front-door-verbs` holds a verb the front door advertises to the pinned release, and reads nothing after the verb (installer/SPEC.md §The front door's verbs). So a flag landed mid-iteration and advertised after a route reds no gate and fires no release trigger. The site then advertises a line the one-liner refuses until an unforced release ships the flag. The recorded instance was `init --recipe` on the toolkit pages while the pinned v0.28.0 refused it (`unknown argument: --recipe`, exit 2). Two further holes let that instance through: the toolkit pages are not front-door pages, and a fenced line opening with `checkwright` is not a route.
 
 This amendment gives the binary a flag roster beside `VERBS`, puts a flag table beside the verb table, extends invariant B to the flags after an advertised verb, adds the toolkit pages and the fenced `checkwright` route, and words the close's release trigger to match.
@@ -20,7 +22,7 @@ One queue entry pairs it: [front-door-flag-grammar](TASK-QUEUE.md#front-door-fla
 
 ### (1) The binary's flag roster {design-bearing}
 
-**Not yet applied.** `native/src/installer/mod.rs` gains `FLAGS`, beside `VERBS`. It holds one row per flag, each row the flag's `--`-spelling and the verbs whose parsers accept it. `-h` and `--help` take no row: they are the help arm every verb carries (§The verbs). The rows at this amendment, read off the parsers in `init.rs` and `uninstall.rs` and off `update.rs`'s forwarding to `init`:
+**Applied.** `native/src/installer/mod.rs` gains `FLAGS`, beside `VERBS`. It holds one row per flag, each row the flag's `--`-spelling and the verbs whose parsers accept it. `-h` and `--help` take no row: they are the help arm every verb carries (§The verbs). The rows at this amendment, read off the parsers in `init.rs` and `uninstall.rs` and off `update.rs`'s forwarding to `init`:
 
 | flag | verbs |
 | --- | --- |
@@ -39,11 +41,11 @@ installer/SPEC.md §The verbs' first paragraph gains, after *rather than by a ro
 
 ### (2) The flag table {mechanical}
 
-**Not yet applied.** `installer/README.md` gains a table after the verb table's closing paragraphs, and before `## Choosing a profile`, headed `| flag | verbs | means |`. Its rows are delta 1's, each `means` cell one clause, such as *vendor this profile* for `--profile`, and *print the plan, write nothing* for `--dry-run`. The first column is code-spanned and the second lists code-spanned verbs, comma-separated.
+**Applied.** `installer/README.md` gains a table after the verb table's closing paragraphs, and before `## Choosing a profile`, headed `| flag | verbs | means |`. Its rows are delta 1's, each `means` cell one clause, such as *vendor this profile* for `--profile`, and *print the plan, write nothing* for `--dry-run`. The first column is code-spanned and the second lists code-spanned verbs, comma-separated.
 
 ### (3) Invariant B reads the flags after an advertised verb {design-bearing}
 
-**Not yet applied.** installer/SPEC.md §The front door's verbs is rewritten:
+**Applied.** installer/SPEC.md §The front door's verbs is rewritten:
 
 - The opener becomes: *Every route on the front door resolves to the newest release, so a verb the front door advertises, and each flag after it, must be one that release carries.*
 - **Invariant A** becomes *the tables are the binary's rosters*: the verb table's first-column code spans equal `VERBS` as a set, as today. Then: *The flag table, the table whose header row's first cell is `flag`, yields one pair per verb its second column lists beside the first column's flag, and those pairs equal `FLAGS`'s as a set.*
@@ -62,11 +64,11 @@ installer/SPEC.md §The verbs' first paragraph gains, after *rather than by a ro
 
 ### (4) The release trigger names the flag {mechanical}
 
-**Not yet applied.** `.claude/commands/close.md`'s release-policy bullet becomes: *A front-door verb or flag the pinned release lacks. `check-front-door-verbs` reds a `none` or `deferred:` disposition while the front door advertises one, so release, or withdraw the advertisement in the same close.*
+**Applied.** `.claude/commands/close.md`'s release-policy bullet becomes: *A front-door verb or flag the pinned release lacks. `check-front-door-verbs` reds a `none` or `deferred:` disposition while the front door advertises one, so release, or withdraw the advertisement in the same close.*
 
 ### (5) The fixture pair {mechanical}
 
-**Not yet applied.** `scripts/gate-tests/check-front-door-verbs/`:
+**Applied.** `scripts/gate-tests/check-front-door-verbs/`:
 
 - `good/readme.md` and `good/pinned.md` gain a flag table, and `good/released.md` advertises a released flag after a verb in a span and in a fenced `checkwright` line. `good/pending.md` advertises a flag `FLAGS` carries that the pinned table lacks, under the good disposition, and a flag after a placeholder, which reads nothing.
 - `bad/` gains three findings: a flag the pinned table lacks while the disposition withholds, a flag neither the pinned table nor `FLAGS` carries, and a `readme.md` flag table missing one of `FLAGS`'s pairs. Each `expect.txt` is updated.

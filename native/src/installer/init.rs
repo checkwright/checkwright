@@ -7,7 +7,7 @@ use crate::{install, sha256, toolfloor};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
-struct Flags {
+pub(super) struct Flags {
     profile: String,
     dry: bool,
     force: bool,
@@ -17,8 +17,11 @@ struct Flags {
     recipes: Option<Vec<String>>,
 }
 
+pub(super) const USAGE: &str =
+    "usage: checkwright init [--profile <name>] [--recipe <name>]... [--no-recipe] [--dry-run] [--force] [--no-commit]";
+
 fn help(pkg: Option<&Package>) {
-    println!("usage: checkwright init [--profile <name>] [--recipe <name>]... [--no-recipe] [--dry-run] [--force] [--no-commit]\n");
+    println!("{}\n", USAGE);
     println!("Vendors pinned kit source into this repository and commits it.");
     println!("Nothing is fetched: the source comes from this package.\n");
     let names = match pkg {
@@ -31,7 +34,7 @@ fn help(pkg: Option<&Package>) {
     }
 }
 
-fn parse(args: &[String], pkg: Option<&Package>) -> Result<Option<Flags>, Refusal> {
+pub(super) fn parse(args: &[String], pkg: Option<&Package>) -> Result<Option<Flags>, Refusal> {
     let mut f = Flags {
         profile: String::new(),
         dry: false,

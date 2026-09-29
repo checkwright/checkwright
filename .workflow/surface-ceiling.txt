@@ -6,7 +6,7 @@
 1446cp .claude/commands/agent-execution.md
 551cp .claude/commands/align.md
 980cp .claude/commands/build.md
-9170cp .claude/commands/close.md
+9178cp .claude/commands/close.md
 2355cp .claude/commands/consult.md
 1590cp .claude/commands/economics.md
 4729cp .claude/commands/lead.md
@@ -72,7 +72,7 @@
 6070cp docs/posts/2026-09-28-checkwright-v0-29-0.md
 1440cp docs/queue-kit/index.md
 789cp docs/releases.md
-39522cp docs/site-architecture.md
+39532cp docs/site-architecture.md
 2412cp docs/site-kit/index.md
 3387cp docs/spec-toolkits.md
 2002cp docs/speckit.md
@@ -85,7 +85,7 @@
 932872cp gate-sdk/SPEC.md
 301494cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
-285734cp installer/SPEC.md
+287792cp installer/SPEC.md
 337668cp lifecycle-kit/SPEC.md
 4909cp lifecycle-kit/templates/consult.md
 41046cp lifecycle-kit/templates/lead.md

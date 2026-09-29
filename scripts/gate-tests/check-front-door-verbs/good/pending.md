@@ -1,7 +1,11 @@
-# A verb the pinned release lacks
+# A verb and a flag the pinned release lacks
 
 ```sh
 npx checkwright demo
 ```
 
-It is admitted while this iteration carries no disposition line.
+```sh
+checkwright init --recipe speckit
+```
+
+Both are admitted while this iteration carries no disposition line. A placeholder advertises no flag: `checkwright <verb> --anything`.

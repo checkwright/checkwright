@@ -41,6 +41,17 @@ Re-running is idempotent and non-destructive. `init` reads the per-file hash `ch
 
 `uninstall` reverses an install against the roster `init` recorded, keeping and reporting any file you edited rather than removing it — which is what lets an evaluation you decide against leave nothing of its own behind.
 
+The flags each verb takes, owned by the binary as the verbs are:
+
+| flag | verbs | means |
+| --- | --- | --- |
+| `--profile` | `init`, `update` | vendor this profile |
+| `--recipe` | `init`, `update` | apply this payload recipe; repeats |
+| `--no-recipe` | `init`, `update` | clear the recorded recipes |
+| `--dry-run` | `init`, `update`, `uninstall` | print the plan, write nothing |
+| `--force` | `init`, `update`, `uninstall` | overwrite what the verb would otherwise protect |
+| `--no-commit` | `init`, `update`, `uninstall` | stage the change and leave the commit to you |
+
 ## Choosing a profile
 
 `starter`, `delegation`, `prose`, `full`. Not four rungs on one ladder: the profiles are ordered by kit-set containment, so moving to one that contains yours only ever adds, and two that contain neither the other — `delegation` and `prose` — are alternatives rather than steps.

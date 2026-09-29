@@ -3,7 +3,7 @@
 // edit have different remedies. Exit status is the verdict: 0 all match, 1 at least one does not.
 use super::{lock, refuse, Refusal};
 
-fn usage() -> Vec<String> {
+pub(super) fn usage() -> Vec<String> {
     vec![
         "usage: checkwright diff".to_string(),
         String::new(),

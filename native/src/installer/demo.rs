@@ -7,7 +7,7 @@ use crate::{proc, programs};
 use std::path::{Path, PathBuf};
 
 const VERDICT: &str = "DEMO";
-const USAGE: &[&str] = &[
+pub(super) const USAGE: &[&str] = &[
     "usage: checkwright demo",
     "",
     "Shows the adoption arc without touching your repository: installs the full",

@@ -6,7 +6,7 @@ use crate::toolfloor::{self, Owing, Selection, Verdict as Floor};
 use crate::{proc, programs, sha256};
 use std::fmt::Write as _;
 
-const USAGE: &[&str] = &[
+pub(super) const USAGE: &[&str] = &[
     "usage: checkwright doctor",
     "",
     "Reports whether this machine meets the toolchain contract it needs as a",
