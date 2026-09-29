@@ -1,5 +1,7 @@
 # SPEC amendment: extension-full
 
+**Merged at build; held on disk until the Done move.** Every delta below is applied and merged into its canonical section. The Definition of Done moves the entry to Done only once the next push's `companion-toolkits` job is green, and `check-amendment-queue` holds an active entry's `[spec:]` ref to this file, so the file is deleted in the Done-move commit.
+
 The Spec Kit extension installs the `prose` profile only (companion/SPEC.md §The two tiers: *The Spec Kit extension installs the default only*). Its install command runs `init --profile prose --recipe speckit`, so a Spec Kit user who arrives through the catalog meets the document gates, and reaches `full` only by leaving the extension for the page's second line. This amendment lets the install command install either tier. The user's input selects it, `prose` stays the default, and the command names `full`'s two costs before running it. The companion arm proves the command's `full` line.
 
 One queue entry pairs it: [speckit-extension-full-profile](TASK-QUEUE.md#speckit-extension-full-profile).
@@ -17,7 +19,7 @@ One queue entry pairs it: [speckit-extension-full-profile](TASK-QUEUE.md#speckit
 
 ### (1) The install command offers the tier {design-bearing}
 
-**Not yet applied.** `companion/speckit/commands/install.md`:
+**Applied.** `companion/speckit/commands/install.md`:
 
 - The front matter gains `argument-hint: "prose (the default) or full"`, and its description becomes *Install Checkwright's gates, prose or every kit, and apply the Spec Kit recipe*.
 - A step opens the `## Steps` list, ahead of the install step:
@@ -30,7 +32,7 @@ One queue entry pairs it: [speckit-extension-full-profile](TASK-QUEUE.md#speckit
 
 ### (2) The design record {mechanical}
 
-**Not yet applied.** companion/SPEC.md:
+**Applied.** companion/SPEC.md:
 
 - §The two tiers: *The Spec Kit extension installs the default only.* becomes *The Spec Kit extension's install command installs either, `full` when the user's input asks for it, and its `full` line sits in its own `companion-full` block.*
 - §Applying a recipe: *For Spec Kit it is in `speckit/commands/install.md`, an `sh` fence holding the one-line install the agent runs.* becomes *For Spec Kit both lines are in `speckit/commands/install.md`, each an `sh` fence holding the one-line install the agent runs, and the Spec Kit page's `full` line carries the same words from `init`.*
@@ -39,13 +41,13 @@ One queue entry pairs it: [speckit-extension-full-profile](TASK-QUEUE.md#speckit
 
 ### (3) The companion arm runs the command's `full` line {design-bearing}
 
-**Not yet applied.** `installer/consumer-smoke/run-smoke.sh`'s Spec Kit `full` leg reads its line with `companion_line` from `companion/speckit/commands/install.md`'s `companion-full` block, not `docs/speckit.md`'s. Its header becomes `companion arm for speckit full (the extension install command's full line on its fixture tree)`. Before it runs, the leg reads `docs/speckit.md`'s `companion-full` line the same way, and fails when the page's words from `init` differ from the command's, naming both lines.
+**Applied.** `installer/consumer-smoke/run-smoke.sh`'s Spec Kit `full` leg reads its line with `companion_line` from `companion/speckit/commands/install.md`'s `companion-full` block, not `docs/speckit.md`'s. Its header becomes `companion arm for speckit full (the extension install command's full line on its fixture tree)`. Before it runs, the leg reads `docs/speckit.md`'s `companion-full` line the same way, and fails when the page's words from `init` differ from the command's, naming both lines.
 
 installer/SPEC.md §The consumer smoke, the companion paragraph: *It reads each toolkit's `companion-full` block, `docs/speckit.md`'s and `docs/openspec.md`'s* becomes *It reads each toolkit's `companion-full` block, the extension's install command's for Spec Kit and `docs/openspec.md`'s for OpenSpec*. It gains: *The Spec Kit page's `companion-full` line must carry the command's words from `init`, and the arm fails naming both when it does not.*
 
 ### (4) The pages {mechanical}
 
-**Not yet applied.**
+**Applied.**
 
 - `docs/speckit.md` line 15: *It installs the `prose` profile at the release the extension was tested with* becomes *It installs the `prose` profile, or `full` when you ask it for `full`, at the release the extension was tested with*. Line 21: *After the extension's install, or in place of it, run your system's line from the install page with:* becomes *Ask the install command for `full`, or run your system's line from the install page with:*.
 - `companion/speckit/README.md`'s `speckit.checkwright.install` bullet: *installs Checkwright's `prose` profile with the one-line install, `init --profile prose --recipe speckit`* becomes *installs Checkwright's `prose` profile, or `full` when you ask for it, with the one-line install, `init --profile prose --recipe speckit`*. The bullet gains *`full` adds every kit's gates, needs `bash` 4.3 or later, and seeds Checkwright's task queue and evidence files beside Spec Kit's; the command says so before it runs.*

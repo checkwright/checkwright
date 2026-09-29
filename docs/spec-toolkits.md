@@ -32,7 +32,7 @@ Every push to Checkwright's repository installs the profile on a tree in each to
 ## Limits
 
 - Spec Kit ships no validator, so the Spec Kit test tree follows the structure of its templates at the pinned version, and nothing checks it further.
-- The extension's two commands and its hook are instructions your agent follows. No test runs an agent through them; the tests run the install line the install command contains.
+- The extension's two commands and its hook are instructions your agent follows. No test runs an agent through them; the tests run both install lines the install command contains.
 - A required check stops a skipped hook, not an author who edits the workflow.
 - The Windows route is documented and not run.
 - A pinned version says nothing about the next one.

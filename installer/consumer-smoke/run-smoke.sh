@@ -1124,11 +1124,16 @@ out="$(companion_line "$COMPANION/speckit/commands/install.md" companion-install
 mapfile -t COMPANION_WORDS <<<"$out"
 companion_arm speckit speckit "${COMPANION_WORDS[@]}"
 COMPANION_DONE+=(speckit)
-# spec: companion/SPEC.md §The two tiers — the Spec Kit full line on a second consumer, green and catching each planted defect again
-printf 'companion arm for speckit full (the Spec Kit page'"'"'s full line on its fixture tree)\n'
-out="$(companion_line "$REPO/docs/speckit.md" companion-full "--profile full")" \
-    || fail "companion arm, speckit full: the Spec Kit page carries no full line to run"
+# spec: companion/SPEC.md §The two tiers — the extension install command's full line on a second consumer, green and catching each planted defect again, with the Spec Kit page's full line held to the same words from init
+printf 'companion arm for speckit full (the extension install command'"'"'s full line on its fixture tree)\n'
+out="$(companion_line "$COMPANION/speckit/commands/install.md" companion-full "--profile full")" \
+    || fail "companion arm, speckit full: the extension install command carries no full line to run"
 mapfile -t COMPANION_WORDS <<<"$out"
+COMPANION_PAGE_WORDS="$(companion_line "$REPO/docs/speckit.md" companion-full "--profile full")" \
+    || fail "companion arm, speckit full: the Spec Kit page carries no full line"
+[[ "$COMPANION_PAGE_WORDS" == "$out" ]] \
+    || fail "companion arm, speckit full: the Spec Kit page's full line and the extension install command's differ from init — page: $(companion_block "$REPO/docs/speckit.md" companion-full); command: $(companion_block "$COMPANION/speckit/commands/install.md" companion-full)"
+say "speckit full: the Spec Kit page's full line carries the extension install command's words from init"
 companion_arm speckit speckit-full "${COMPANION_WORDS[@]}"
 COMPANION_OPENSPEC_PAGE="$REPO/docs/openspec.md"
 printf 'companion arm for openspec (the OpenSpec recipe on its fixture tree, through the OpenSpec page'"'"'s line)\n'

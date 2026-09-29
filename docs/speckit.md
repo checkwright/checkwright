@@ -12,13 +12,13 @@ Add the extension from a Checkwright release, with `X.Y.Z` the release's version
 specify extension add checkwright --from https://github.com/checkwright/checkwright/releases/download/vX.Y.Z/checkwright-companion-X.Y.Z.zip
 ```
 
-Then, in a clean worktree, ask your agent to run the extension's install command, `speckit.checkwright.install`. It installs the `prose` profile at the release the extension was tested with, with the Spec Kit recipe applied, and commits. The extension's `speckit.checkwright.check` command runs the battery, and an optional hook offers it after `implement`. The [extension's README](https://github.com/checkwright/checkwright/blob/master/companion/speckit/README.md) lists what it adds.
+Then, in a clean worktree, ask your agent to run the extension's install command, `speckit.checkwright.install`. It installs the `prose` profile, or `full` when you ask it for `full`, at the release the extension was tested with, with the Spec Kit recipe applied, and commits. The extension's `speckit.checkwright.check` command runs the battery, and an optional hook offers it after `implement`. The [extension's README](https://github.com/checkwright/checkwright/blob/master/companion/speckit/README.md) lists what it adds.
 
 The Spec Kit recipe prunes `.specify/`, whose scripts are Spec Kit's own, governs the markdown under `specs/`, admits `Task:` as a command, the first word of each line in the task list's example block, and points the task gates at each feature's `tasks.md`, a `[USn]` label resolving to the `### User Story n` heading in the `spec.md` beside it.
 
 The install command runs your system's line from the [install page](install.md#install), and that page's [Requirements](install.md#requirements) apply.
 
-**Every kit instead of `prose`.** After the extension's install, or in place of it, run your system's line from the install page with:
+**Every kit instead of `prose`.** Ask the install command for `full`, or run your system's line from the install page with:
 
 <!-- companion-full:begin -->
 
