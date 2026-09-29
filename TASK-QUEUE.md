@@ -100,14 +100,6 @@ the homepage states its license twice (operator observation, 2026-09-29): the la
 
 **Cost while deferred:** every homepage reader meets the license twice. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead after its close; promoted 2026-09-29 at the next iteration's scope: →fix fails because the operator directed a filing. Re-verified: both statements at the lines above. Owner lookup: `license` in this file — [license-line-owned-sentence](#license-line-owned-sentence), DISTINCT (the README and footer wording, not the homepage's second statement); owner docs/site-architecture.md.
 
-### value-table-overflow
-
-the generated kit table on docs/value.md, nine columns and sixteen kit rows, overflows its column by a few pixels and shows a horizontal scrollbar (operator observation, 2026-09-29). The cause is a hypothesis for the build to confirm in a browser, since the theme's stylesheet is not in the tree: Primer renders a `.markdown-body` table as `display:block; width:max-content; max-width:100%; overflow:auto`; the content column is about 836px at full desktop width (docs/_layouts/default.html's 1180px maximum less the 280px nav and 2rem of padding each side), which nine columns of Primer's `6px 13px` cell padding plus their longest words just exceed. Operator direction, 2026-09-29, lead-relayed (not a ruling): the table's content stays as is, and only the rendering is fixed.
-
-**Deliverable:** slightly tighter table cell padding in the layout's table rules, measured in a browser at desktop width and in a narrower window, then checked against every other table on the site.
-
-**Cost while deferred:** every desktop reader of the value page meets a scrollbar on its main table. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead after its close; promoted 2026-09-29 at the next iteration's scope: →fix fails because the stage may not build and the fix wants a browser measurement. Re-verified: the table's nine-column header and sixteen rows, and the layout's `max-width: 1180px` and `flex: 0 0 280px`. Owner lookup: `overflow`, `scrollbar` in this file — none; owner docs/site-architecture.md's chrome rules, with docs/_layouts/default.html.
-
 ### installer-remainder-brevity
 
 installer/SPEC.md's remaining sections under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §Implementation, §Layout, §Selecting kits and gates, §update, §diff, §uninstall, §demo, §The CI action, §The packer, §Vendoring without the installer, §Reviewing the pre-commit hook, §Versioning and §The upgrade contract, about 83k characters; §The consumer smoke stays on the parent.
@@ -1597,5 +1589,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 ## Done
 
 - nav-spec-suffix-restore
+- value-table-overflow
 
 ## Lessons Learned
