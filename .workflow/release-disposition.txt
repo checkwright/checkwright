@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+preview-readiness release v0.31.0 — a minor over v0.30.0, eight behavior changes and no tightened gate or renamed knob; cut on operator direction relayed by the lead (2026-09-30), docs/install.md advertising --measure-commit, which v0.30.0 lacks
