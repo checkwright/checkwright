@@ -6,3 +6,4 @@
 
 companion-technical-gates scope a5d27e07 2026-09-29 bdb9f21d
 companion-technical-gates spec ac216f65 2026-09-29 ff91f54b
+companion-technical-gates align a4491c31 2026-09-29 9ed44bbf
