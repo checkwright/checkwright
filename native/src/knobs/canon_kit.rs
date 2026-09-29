@@ -1,5 +1,5 @@
 // spec: canon-kit/SPEC.md §Layout and configuration — canon-kit's static knob table and validator
-use super::{indexed, scalar, Kit, Packing, Resolve, Row, Shape, Value, Values};
+use super::{indexed, keyed, scalar, Kit, Packing, Resolve, Row, Shape, Value, Values};
 
 // spec: canon-kit/SPEC.md §Layout and configuration — `CANON_KIT_EMBED_LANGS`' element packing
 const EMBED_LANGS_PACKING: Packing = Packing {
@@ -60,6 +60,9 @@ pub const KIT: Kit = Kit {
         Row::indexed("CANON_KIT_PAGE_REPEAT_PAGES", &[]),
         Row::scalar("CANON_KIT_PAGE_REPEAT_MIN_WORDS", "8"),
         Row::indexed("CANON_KIT_CITATION_LINK_PAGES", &[]),
+        Row::indexed("CANON_KIT_TASK_LIST_GLOBS", &[]),
+        Row::keyed("CANON_KIT_TASK_LABEL_CITES", &[]),
+        Row::keyed("CANON_KIT_TASK_LABEL_DEFINES", &[]),
         Row::indexed(
             "CANON_KIT_FENCE_PROGRAMS",
             &[
@@ -353,6 +356,35 @@ fn validate(v: &Values) -> Vec<String> {
     if let Some(s) = scalar(v, "CANON_KIT_PROSE_BOUND_REPEAT_MIN").filter(|s| !at_least_or_off(s, 2) || *s == "off") {
         errs.push(format!("CANON_KIT_PROSE_BOUND_REPEAT_MIN must be an integer >= 2 (got '{}')", s));
     }
+    errs.extend(task_label_refusals(
+        keyed(v, "CANON_KIT_TASK_LABEL_CITES").unwrap_or(&[]),
+        keyed(v, "CANON_KIT_TASK_LABEL_DEFINES").unwrap_or(&[]),
+    ));
+    errs
+}
+
+// spec: canon-kit/SPEC.md §check-task-label-resolution — the two label knobs carry one key set,
+// and each value compiles to the one-group capture shape
+pub(crate) fn task_label_refusals(cites: &[(String, String)], defines: &[(String, String)]) -> Vec<String> {
+    let mut errs: Vec<String> = Vec::new();
+    for (have, lack, a, b) in [
+        ("CANON_KIT_TASK_LABEL_CITES", "CANON_KIT_TASK_LABEL_DEFINES", cites, defines),
+        ("CANON_KIT_TASK_LABEL_DEFINES", "CANON_KIT_TASK_LABEL_CITES", defines, cites),
+    ] {
+        for (k, _) in a.iter().filter(|(k, _)| !b.iter().any(|(bk, _)| bk == k)) {
+            errs.push(format!(
+                "the label family '{}' is a key of {} and not of {}: the two knobs carry one key set",
+                k, have, lack
+            ));
+        }
+    }
+    for (knob, pairs) in [("CANON_KIT_TASK_LABEL_CITES", cites), ("CANON_KIT_TASK_LABEL_DEFINES", defines)] {
+        for (k, p) in pairs {
+            if let Err(e) = crate::ere::EreCapture::compile(p) {
+                errs.push(format!("{}[{}] = '{}' is not a one-group ERE: {}", knob, k, p, e));
+            }
+        }
+    }
     errs
 }
 
@@ -431,6 +463,20 @@ mod tests {
             assert!(!at_least_or_off(bad, 1), "{}", bad);
         }
         assert!(!at_least_or_off("2", 3));
+    }
+
+    // spec: canon-kit/SPEC.md §check-task-label-resolution — the exit-2 config, which a `bad/`
+    // fixture held to exit 1 cannot express: differing key sets and a pattern outside the shape
+    #[test]
+    fn the_label_knobs_carry_one_key_set_and_one_group_patterns() {
+        let pair = |a: &str, b: &str| vec![(a.to_string(), b.to_string())];
+        assert!(task_label_refusals(&pair("story", "\\[US([0-9]+)\\]"), &pair("story", "^### ([0-9]+)")).is_empty());
+        let e = task_label_refusals(&pair("story", "(a)"), &pair("req", "(b)"));
+        assert_eq!(e.len(), 2, "{:?}", e);
+        assert!(e[0].contains("'story'") && e[1].contains("'req'"), "{:?}", e);
+        let e = task_label_refusals(&pair("story", "a"), &pair("story", "(b)(c)"));
+        assert!(e[0].contains("CANON_KIT_TASK_LABEL_CITES[story]") && e[0].contains("no capture group"), "{:?}", e);
+        assert!(e[1].contains("second capture group"), "{:?}", e);
     }
 
     // spec: canon-kit/SPEC.md §check-prose-tells — the abbreviation floor is two or more, or off

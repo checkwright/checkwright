@@ -1,5 +1,7 @@
 # SPEC amendment: spec-to-code
 
+**Merged at build; held on disk until the Done move.** Every delta below is applied and merged into its canonical section. The Definition of Done moves the entry to Done only once the mid-iteration push's runs are green, and `check-amendment-queue` holds an active entry's `[spec:]` ref to this file, so the file is deleted in the Done-move commit.
+
 The companion checks a toolkit's specs as documents and never against the code (docs/spec-toolkits.md §What the gates catch: *None of them checks that your code does what a spec says*). This amendment adds the two spec-to-code checks the pinned toolkits' formats make possible, as generic canon-kit gates, and binds them to each toolkit's layout in its recipe:
 
 - `check-task-path-claim`: a ticked task in a task list names only paths that exist. A ticked task is a done claim, and a path it names that is not in the tree is the "phantom completion" the done-claim failure class describes.
@@ -24,7 +26,7 @@ One queue entry pairs it: [companion-spec-to-code-gates](TASK-QUEUE.md#companion
 
 ### (1) `check-task-path-claim` {design-bearing}
 
-**Not yet applied.** canon-kit/SPEC.md gains a section after §check-tracking-claim:
+**Applied.** canon-kit/SPEC.md gains a section after §check-tracking-claim:
 
 > ### check-task-path-claim
 >
@@ -40,7 +42,7 @@ One queue entry pairs it: [companion-spec-to-code-gates](TASK-QUEUE.md#companion
 
 ### (2) `check-task-label-resolution` {design-bearing}
 
-**Not yet applied.** canon-kit/SPEC.md gains a section after delta 1's:
+**Applied.** canon-kit/SPEC.md gains a section after delta 1's:
 
 > ### check-task-label-resolution
 >
@@ -54,7 +56,7 @@ One queue entry pairs it: [companion-spec-to-code-gates](TASK-QUEUE.md#companion
 
 ### (3) The knobs {mechanical}
 
-**Not yet applied.** canon-kit/SPEC.md §Layout and configuration's knob list gains:
+**Applied.** canon-kit/SPEC.md §Layout and configuration's knob list gains:
 
 > - `CANON_KIT_TASK_LIST_GLOBS` — array of globs, default empty: the task lists `check-task-path-claim` and `check-task-label-resolution` read. `CANON_KIT_TASK_LABEL_CITES` and `CANON_KIT_TASK_LABEL_DEFINES` — keyed, default empty: per label family, the one-group ERE that cites a label and the one that defines it (§check-task-label-resolution).
 
@@ -62,7 +64,7 @@ The corpus-knob clause in that section is derived from the walks, so it reaches 
 
 ### (4) The recipes arm them {mechanical}
 
-**Not yet applied.** `companion/speckit/recipe/canon-config.knobs` gains:
+**Applied.** `companion/speckit/recipe/canon-config.knobs` gains:
 
 ```text
 CANON_KIT_TASK_LIST_GLOBS[] = specs/*/tasks.md
@@ -76,7 +78,7 @@ companion/SPEC.md §The Spec Kit recipe and §The OpenSpec recipe each gain a bu
 
 ### (5) The fixtures and the tested claim {design-bearing}
 
-**Not yet applied.**
+**Applied.**
 
 - **Fixtures.** Each toolkit's `layout/` gains one source file that is neither markdown nor a shell script, so no other claimed gate reads it, and a ticked task naming it: `T003` on Spec Kit and `1.1` on OpenSpec. `defects/check-task-path-claim/` on each toolkit replaces the task list with that task naming an absent path. `defects/check-task-label-resolution/` on Spec Kit replaces `tasks.md` with a task citing `[US2]`, which `spec.md` does not define. The OpenSpec layout still passes `openspec validate --all --strict`.
 - **companion/SPEC.md §The tested claim** becomes a roster per toolkit. It keeps the four document classes for both, and adds *a ticked task naming a path that does not exist, by `check-task-path-claim`* for both, and *a task citing a user story its spec does not define, by `check-task-label-resolution`* for Spec Kit. The first sentence's *four defect classes per toolkit* becomes *the defect classes below*. The paragraph gains: *The toolkit keeps what it owns: OpenSpec's archive refuses a delta that disagrees with its base spec, so no gate re-checks it.*
@@ -84,7 +86,7 @@ companion/SPEC.md §The Spec Kit recipe and §The OpenSpec recipe each gain a bu
 
 ### (6) The pages {mechanical}
 
-**Not yet applied.** `docs/spec-toolkits.md`:
+**Applied.** `docs/spec-toolkits.md`:
 
 - The line *These four are document hygiene: … None of them checks that your code does what a spec says.* is replaced by a section `## What the gates check against your code`:
 

@@ -351,14 +351,20 @@ impl EreCapture {
     // the largest group start the prefix can reach, then the largest group end the suffix
     // can still finish from
     pub fn capture(&self, hay: &str) -> Option<(usize, usize)> {
-        let (s, e) = self.whole.find(hay)?;
+        self.capture_from(hay, 0).map(|(_, group)| group)
+    }
+
+    // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — the from-offset form `find_from` is: the
+    // whole match beside the group, so a caller steps past each match to find the next
+    pub fn capture_from(&self, hay: &str, from: usize) -> Option<((usize, usize), (usize, usize))> {
+        let (s, e) = self.whole.find_from(hay, from)?;
         let b = hay.as_bytes();
         let prefix_ends = self.prefix.match_ends(b, s);
         for i in (s..=e).rev().filter(|&i| prefix_ends[i]) {
             let group_ends = self.group.match_ends(b, i);
             for j in (i..=e).rev().filter(|&j| group_ends[j]) {
                 if self.suffix.match_ends(b, j)[e] {
-                    return Some((i, j));
+                    return Some(((s, e), (i, j)));
                 }
             }
         }
@@ -1056,5 +1062,23 @@ done"#;
         assert_eq!(star.find_from("baa", 2), Some((2, 3)));
         let empty = Ere::compile("x*").expect("compiles");
         assert_eq!(empty.find_from("abc", 3), Some((3, 3)));
+    }
+
+    // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — the from-offset capture finds a line's every
+    // match in turn, each group within its own match, and keeps `^` at the subject's position 0
+    #[test]
+    fn a_from_offset_capture_steps_through_every_match() {
+        let cap = EreCapture::compile("\\[US([0-9]+)\\]").expect("compiles");
+        let hay = "T1 [US1] and [US22] then [x]";
+        let mut got: Vec<&str> = Vec::new();
+        let mut from = 0;
+        while let Some(((_, e), (gs, ge))) = cap.capture_from(hay, from) {
+            got.push(&hay[gs..ge]);
+            from = e;
+        }
+        assert_eq!(got, vec!["1", "22"]);
+        let bol = EreCapture::compile("^a(b)").expect("compiles");
+        assert_eq!(bol.capture_from("abab", 1), None);
+        assert_eq!(bol.capture("abab"), Some((1, 2)));
     }
 }

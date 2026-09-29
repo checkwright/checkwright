@@ -1,0 +1,4 @@
+# graph: couples=knob:CANON_KIT_TASK_LIST_GLOBS,* dir=one valve=none tier=precommit
+# install: zero-config
+# armed-by: CANON_KIT_TASK_LIST_GLOBS
+# spec: canon-kit/SPEC.md §check-task-path-claim — every ticked task in a task list CANON_KIT_TASK_LIST_GLOBS names holds only paths that exist

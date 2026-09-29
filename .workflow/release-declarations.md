@@ -3,6 +3,8 @@
 ## Tightened gates
 
 - `check-close-surfaces` — a new assertion D reds a gitignored roster row whose `reclaim=` does not rotate its log, since close reads every row before reclaiming it and a truncation erases the lines appended in between. Spell the reclaim `<gate binary> --emit capture-drain <path>`, and read the drain file it prints rather than the live log.
+- `check-task-path-claim` — new in canon-kit: a ticked task in a task list `CANON_KIT_TASK_LIST_GLOBS` names reds on each path it names that does not exist. It registers disarmed and asserts nothing until that knob is set; a path absent by design takes `task-path-exempt: <reason>` on the task's line or the one above.
+- `check-task-label-resolution` — new in canon-kit: a label a task list cites, per a family in `CANON_KIT_TASK_LABEL_CITES` and `CANON_KIT_TASK_LABEL_DEFINES`, reds unless a markdown file beside the list defines it. It registers disarmed and asserts nothing until the cite knob and the task-list knob are set; the two knobs must carry one key set of one-group EREs, or every canon-kit gate exits 2.
 
 ## Behavior changes
 
@@ -11,4 +13,5 @@
 - **gate-sdk/SPEC.md §The `# graph:` manifest** — `gen=manual` is retired and a manifest carrying `gen=` reds `check-graph`; a hand-written hook region becomes a `trigger=*` shell gate that reads the staged set itself.
 - **`update`** — its `usage:` line names `[--recipe <name>]...` and `[--no-recipe]`, the recipe flags it already forwarded to `init`; nothing an adopter runs changes.
 - **`init` and `update`** — five selection flags, `--with-kit`, `--without-kit`, `--with-gate`, `--without-gate` and `--no-selection`, adjust a profile's kit set and registry per install, recorded under the manifest's new `selection` key and re-applied by a bare re-run (installer/SPEC.md §Selecting kits and gates). An install passing none records none and changes nothing.
+- **the Spec Kit and OpenSpec recipes** — each arms `check-task-path-claim` on its toolkit's task lists, and the Spec Kit recipe binds the user-story label family for `check-task-label-resolution`. A tree applying either recipe from this release reds on a ticked task naming a missing path, and on Spec Kit on a `[USn]` label with no `### User Story n` in the `spec.md` beside it; correct the task, untick it, or valve it.
 - **site-kit/SPEC.md §check-docs-liquid-parse** — the Liquid template set is the new knob `SITE_KIT_LIQUID_TEMPLATES`, repo-relative pathspecs defaulting to the three directories the gate read before (`docs/_layouts/*`, `docs/_includes/*`, `docs/_posts/*`), so a site that renames its template directories or moves its docs dir sets it.

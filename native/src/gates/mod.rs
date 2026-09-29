@@ -134,6 +134,8 @@ pub mod surface_ratchet;
 pub mod survey_record;
 pub mod tag_lead_line;
 pub mod task_conservation;
+pub mod task_label_resolution;
+pub mod task_path_claim;
 pub mod todo_task_liveness;
 pub mod task_names;
 pub mod template_copy_parity;
@@ -650,6 +652,32 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_DIRS",
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "CANON_KIT_CITATION_LINK_PAGES",
+        ],
+        "canon-kit",
+        &[],
+    ),
+    // spec: canon-kit/SPEC.md §check-task-path-claim — the task lists are the knob's glob walk; a
+    // path token is a stat, not a walk
+    (
+        "check-task-path-claim",
+        task_path_claim::run,
+        &[(".", "glob:knob:CANON_KIT_TASK_LIST_GLOBS", "", "")],
+        &["GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS", "CANON_KIT_TASK_LIST_GLOBS"],
+        "canon-kit",
+        &[],
+    ),
+    // spec: canon-kit/SPEC.md §check-task-label-resolution — the task lists are the knob's glob walk;
+    // each list's own directory is a single-level listing, which descends nothing
+    (
+        "check-task-label-resolution",
+        task_label_resolution::run,
+        &[(".", "glob:knob:CANON_KIT_TASK_LIST_GLOBS", "", "")],
+        &[
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+            "CANON_KIT_TASK_LIST_GLOBS",
+            "CANON_KIT_TASK_LABEL_CITES",
+            "CANON_KIT_TASK_LABEL_DEFINES",
         ],
         "canon-kit",
         &[],

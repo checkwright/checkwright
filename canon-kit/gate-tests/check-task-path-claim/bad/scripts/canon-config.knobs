@@ -1,0 +1,2 @@
+# spec: canon-kit/SPEC.md §check-task-path-claim — fixture consumer config: every markdown file under work/ is a task list
+CANON_KIT_TASK_LIST_GLOBS[] = work/*.md

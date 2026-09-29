@@ -1,0 +1,4 @@
+# spec: canon-kit/SPEC.md §check-task-label-resolution — fixture consumer config: the task lists under work/ cite stories their sibling spec defines
+CANON_KIT_TASK_LIST_GLOBS[] = work/tasks.md
+CANON_KIT_TASK_LABEL_CITES[story] = \[US([0-9]+)\]
+CANON_KIT_TASK_LABEL_DEFINES[story] = ^### User Story ([0-9]+)[ ]

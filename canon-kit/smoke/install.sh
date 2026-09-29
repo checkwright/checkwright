@@ -38,6 +38,8 @@ check-prose-tells
 check-provenance-seam
 check-spec-fence-balance
 check-spec-pointer
+check-task-label-resolution
+check-task-path-claim
 check-todo-task-liveness
 check-tracking-claim
 check-unmarked-claim

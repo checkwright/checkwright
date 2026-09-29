@@ -1,0 +1,4 @@
+# graph: couples=knob:CANON_KIT_TASK_LIST_GLOBS,*.md dir=one valve=none tier=precommit
+# install: zero-config
+# armed-by: CANON_KIT_TASK_LABEL_CITES
+# spec: canon-kit/SPEC.md §check-task-label-resolution — every label a task list cites resolves to its definition in a markdown file beside the list

@@ -134,6 +134,8 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | [canon-kit](canon-kit/index.md) | check-measured-claim | precommit |
 | [canon-kit](canon-kit/index.md) | check-unmarked-claim | precommit |
 | [canon-kit](canon-kit/index.md) | check-tracking-claim | precommit |
+| [canon-kit](canon-kit/index.md) | check-task-path-claim | precommit |
+| [canon-kit](canon-kit/index.md) | check-task-label-resolution | precommit |
 | [canon-kit](canon-kit/index.md) | check-prose-enum | precommit |
 | [canon-kit](canon-kit/index.md) | check-prose-tells | precommit |
 | [canon-kit](canon-kit/index.md) | check-prose-bounds | precommit |
