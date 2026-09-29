@@ -9,3 +9,4 @@ companion-technical-gates spec ac216f65 2026-09-29 ff91f54b
 companion-technical-gates align a4491c31 2026-09-29 9ed44bbf
 companion-technical-gates build a02de01b 2026-09-29 c54de45c
 companion-technical-gates build aa658a34 2026-09-29 8004d2a3
+companion-technical-gates validate a4f1f2a3 2026-09-29 34585bb4
