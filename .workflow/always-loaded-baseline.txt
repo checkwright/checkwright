@@ -1,2 +1,2 @@
 # contract: context-kit/SPEC.md §The always-loaded meter
-12609cp 12467cp 556b493bf4f9771fa98265a7de927bfa6fe60f52
+12609cp 12467cp 5b5ecb8c1f932b32d3d21815afcf7d0ca6e47dde
