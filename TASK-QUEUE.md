@@ -560,6 +560,16 @@ release notes serve human upgraders poorly, and their section set is crate liter
 
 **Cost while deferred:** every release ships a note a human must read whole to act on, custom-gate adopters are not told what applies to them, and a platform change hides in Behavior changes. Filed 2026-08-01 at close; iceboxed 2026-09-11 as dormant; re-filed 2026-09-27 to the gap inbox as two bullets (readability, a Platforms section) by platform-prerequisite-floors' lead, and returned at its close on a judged recurrence: →fix fails because the redesign renames machine-read tokens. Re-verified: `wc -w` over the two notes, and the literals in `native/src/gates/release_bump.rs`, `tightened_gates_grammar.rs`, `release_change_declared.rs`, `native/src/declaration.rs` and `native/src/emit/upgrade_smoke.rs`. [removed-knob-docs-cmd-valve](#removed-knob-docs-cmd-valve) is DISTINCT. Owner: installer/SPEC.md §The upgrade contract, RELEASING.md.
 
+### price-table-roster-coverage-oracle
+
+[cost: iteration/low] [surface: drift-kit] [recurrence: 2026-09-29]
+
+an unpriced model id reds nothing. `kpi-price-table-age` reads only the table's two dating headers and never a row (drift-kit/SPEC.md §Bundled KPIs), so a table dated current reads healthy while the models actually running have no row, and the stage-economics meter degrades to `cost=n/a` as specified, silently. It happened twice: about ten iterations of Opus rows until 2026-08-01, and every stage session of native-hook-customer-legs, which ran on two ids the table lacked.
+
+**Deliverable, operator direction 2026-09-29, lead-relayed (not a ruling):** a check cheap enough to run at every lead start, in two halves. (a) Local roster coverage: the model ids in recent transcripts against the table's rows, a new id also reading as a harness roster churn, the trigger for the lead binding's re-judge-every-tier rule. (b) An opt-in price-change probe hashing the published pricing page's pricing-table section against a hash stored at `priced-as-of`; it is network at session start, so it ships off under Policy-as-choice and the adopter constraints. The seam holds: no kit literal enumerates model ids, so the roster derives from consumer-side data.
+
+**Cost while deferred:** each roster churn reproduces the blind spot, found only by a session reading `cost=n/a` closely. Filed 2026-08-01 at close; iceboxed; returned 2026-09-29 at the next iteration's scope from the gap-inbox recurrence bullet native-hook-customer-legs' lead filed that day, the two rows since added. Re-verified: `scripts/price-table.tsv` carries both ids, and the KPI still reads headers only. Owner lookup: `price table`, `roster`, `model id` in this file — [price-table-effective-dating](#price-table-effective-dating) and [tier-model-binding](#tier-model-binding), DISTINCT (a row's validity interval; the tier-to-model binding); owner drift-kit/SPEC.md §The stage-economics meter.
+
 ### consumer-value-literal-gate
 
 [cost: event/low] [surface: gate-sdk]
@@ -796,6 +806,36 @@ the generated pre-commit and commit-msg hooks start through a shell on every OS:
 
 **Cost while deferred:** every commit on Windows starts an emulated-or-bundled shell. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at its close: →fix fails because the probe is unrun and the home undecided, →forward because the direction is given. Re-verified: scripts/git-hooks/pre-commit opens `#!/bin/sh`. Not a recurrence of `native-hook-dispatch`, which removed the bash dependency. Owner lookup: `native executable`, `hook shim` in this file — none; owner gate-sdk/SPEC.md, with installer/SPEC.md for an untracked install.
 
+### consumer-smoke-windows-residue
+
+[cost: event/low] [surface: installer]
+
+the unix-hosted consumer smoke keeps Windows-host branches its own preflight made unreachable. `installer/consumer-smoke/run-smoke.sh` refuses a MINGW, MSYS or Cygwin host at its top since the sh Windows legs retired, yet keeps a MINGW arm in the shasum-fallback case, a `cygpath -m` re-spelling of the manifest hash batch's stdin paths, and `spec:` comments narrating Windows-host measurements; installer/SPEC.md §The consumer smoke restates the same behaviour (the cygpath stdin re-spelling, the CRLF byte measured on the native Windows host, `ln -s` deep-copying under MSYS).
+
+**Deliverable:** the dead branches deleted and the section trimmed to what a unix host exercises, under the installer consumer-smoke suite; the `jq.exe` relative-operand paragraph stays, its site now a bash step inside `install-smoke-pwsh-windows`.
+
+**Cost while deferred:** a reader of the smoke or its section maintains, and trusts, branches no leg runs. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' close (the capability-liveness-after-descope audit); promoted 2026-09-29 at the next iteration's scope: →fix fails because the stage may not build. Re-verified: the refusal at line 25, the MINGW arm at 1892 and the cygpath branch at 650 of the script, and the section's cygpath and CRLF paragraphs. Owner lookup: `cygpath`, `MINGW`, `run-smoke` in this file — [compiled-consumer-smoke-driver](#compiled-consumer-smoke-driver), which would replace the script whole and so moot this if it landed first; owner installer/SPEC.md §The consumer smoke.
+
+### tier-model-binding
+
+[cost: event/low] [surface: delegation-kit]
+
+the tier a dispatch rides is written as a harness model alias wherever it is chosen (the `model:` field of the stage-session, consult-session, audit-sweep and edit-sweep agent definitions, the lead binding's per-stage overrides, the build batch tiering), and no consumer setting chooses between following the newest model and pinning one. On 2026-09-29 the alias dispatches of native-hook-customer-legs resolved to two newer model ids with no edit, per the subagent transcripts.
+
+**Deliverable, operator direction 2026-09-29, lead-relayed (not a ruling):** (1) a consumer binding per tier class (judgment, routing, mechanical) to an alias, which follows the newest model, or an exact model id, which stays until changed; alias the default and pinning the opt-in, per Policy-as-choice; every place that chooses a tier reads the one binding. (2) Public documentation of alias tiering as a strength with its honest limit: an alias upgrade silently changes price and behaviour, so the claim ships with [price-table-roster-coverage-oracle](#price-table-roster-coverage-oracle)'s detector, and under a pin a new id in the transcripts means the pin was bypassed. **Inferred, not run:** that the harness accepts an exact model id wherever it accepts an alias.
+
+**Cost while deferred:** a model upgrade changes every dispatch's price and behaviour unannounced, and no consumer can opt out. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at the next iteration's scope: →fix fails because the binding is a new knob. Re-verified: `model: opus` or `model: sonnet` in the four agent definitions. Owner lookup: `alias`, `model id`, `tier` in this file — [session-model-identity-verification](#session-model-identity-verification), DISTINCT (verifying the running tier, not choosing it); owner delegation-kit/SPEC.md, with delegation-kit/templates/agent-execution.md's live-roster rule.
+
+### price-table-effective-dating
+
+[cost: event/low] [surface: drift-kit]
+
+the stage-economics price table has no time axis: one row per model id (drift-kit/SPEC.md §The stage-economics meter, input 3), so every token is priced at the row's current rate whatever date its session ran. A re-run after a table edit reprices every iteration whose transcripts survive at today's rate, while a row whose transcript aged out keeps its first rate, so one log mixes two price regimes unmarked. The table's own comments show two cases the shape could not carry: an introductory rate held only as a `prices-valid-through` header, and a fast-mode rate stated as an undercount.
+
+**Deliverable:** an effective-from column, the meter picking the row in force on each log row's stamp date, which is already derived from stamps alone. Raised by the operator 2026-09-29, lead-relayed (not a ruling), on the 5.5-generation cache-read discount, whose start date the published page does not state.
+
+**Cost while deferred:** a price change for a live model misprices the other side of the change, silently. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at the next iteration's scope: →fix fails because the column is new grammar on a consumer file. Re-verified: the table's `One row per model id` header comment. Owner lookup: `price table`, `effective` in this file — [price-table-roster-coverage-oracle](#price-table-roster-coverage-oracle), DISTINCT (a missing row, not a row's validity interval); owner drift-kit/SPEC.md §The stage-economics meter.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
@@ -935,10 +975,6 @@ Immutable prose, live machine read.
 ### path-pinned-allow-entry-oracle
 
 No scanner reds a path-naming grant.
-
-### price-table-roster-coverage-oracle
-
-An unpriced model id reds nothing.
 
 ### economics-posture-binding-stale
 
