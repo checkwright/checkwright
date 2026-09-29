@@ -33,7 +33,7 @@
 1472cp docs/gate-sdk/index.md
 1259cp docs/guard-kit/index.md
 5331cp docs/index.md
-18342cp docs/install.md
+18399cp docs/install.md
 1344cp docs/kits.md
 1395cp docs/lifecycle-kit/index.md
 3007cp docs/methodology.md
@@ -73,9 +73,9 @@
 6814cp docs/posts/2026-09-29-checkwright-v0-30-0.md
 1440cp docs/queue-kit/index.md
 789cp docs/releases.md
-39655cp docs/site-architecture.md
+40145cp docs/site-architecture.md
 2412cp docs/site-kit/index.md
-3679cp docs/spec-toolkits.md
+3714cp docs/spec-toolkits.md
 2164cp docs/speckit.md
 2520cp docs/value.md
 35405cp doctrine-kit/SPEC.md

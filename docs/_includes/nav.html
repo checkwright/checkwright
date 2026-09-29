@@ -2,32 +2,49 @@
   {%- assign navpages = site.pages | where_exp: "p", "p.nav_order" | sort: "nav_order" -%}
   <ul>
     {%- for p in navpages -%}
-    <li class="{% if p.url == page.url %}current{% endif %}">
+    {%- assign pairs = p.nav_suffix | split: " " -%}
+    {%- assign p_current = false -%}
+    {%- if p.url == page.url -%}{%- assign p_current = true -%}{%- endif -%}
+    {%- for pr in pairs -%}{%- assign pp = pr | split: "=" -%}{%- assign t = site.pages | where: "path", pp[1] | first -%}{%- if t.url == page.url -%}{%- assign p_current = true -%}{%- endif -%}{%- endfor -%}
+    {%- capture entry -%}
       <a href="{{ p.url | relative_url }}">{{ p.title | default: p.name }}</a>
+      {%- if pairs != empty -%}
+      <span class="nav-suffix">[{% for pr in pairs %}{% assign pp = pr | split: "=" %}{% assign t = site.pages | where: "path", pp[1] | first %}<a href="{{ t.url | relative_url }}" class="{% if t.url == page.url %}current{% endif %}">{{ pp[0] }}</a>{% unless forloop.last %}|{% endunless %}{% endfor %}]</span>
+      {%- endif -%}
+    {%- endcapture -%}
+    {%- assign ckids = "" | split: "" -%}
+    {%- if p.nav_children_key -%}
+      {%- assign ckids = site.pages | where_exp: "c", "c[p.nav_children_key]" | sort: "path" | reverse -%}
+    {%- endif -%}
+    <li class="{% if p_current %}current{% endif %}{% if pairs != empty %} has-suffix{% endif %}">
+      {%- if ckids != empty -%}
+      <details{% if page[p.nav_children_key] %} open{% endif %}>
+        <summary>{{ entry }}</summary>
+        <ul class="nav-children">
+          {%- for c in ckids -%}
+          <li class="{% if c.url == page.url %}current{% endif %}"><a href="{{ c.url | relative_url }}">{{ c[p.nav_children_key] }}</a></li>
+          {%- endfor -%}
+        </ul>
+      </details>
+      {%- else -%}
+      {{ entry }}
+      {%- endif -%}
       {%- if p.nav_id -%}
         {%- assign kids = site.pages | where: "nav_parent", p.nav_id | sort: "nav_child_order" -%}
         {%- if kids != empty -%}
         <ul class="nav-children">
           {%- for k in kids -%}
           {%- assign sufs = site.pages | where: "dir", k.dir | where_exp: "s", "s.generated" | sort: "title" -%}
+          {%- assign kpairs = k.nav_suffix | split: " " -%}
           {%- assign kid_current = false -%}
           {%- if k.url == page.url -%}{%- assign kid_current = true -%}{%- endif -%}
           {%- for s in sufs -%}{%- if s.url == page.url -%}{%- assign kid_current = true -%}{%- endif -%}{%- endfor -%}
-          <li class="{% if kid_current %}current{% endif %}{% if sufs != empty %} has-suffix{% endif %}"><a href="{{ k.url | relative_url }}">{{ k.title }}</a>
-            {%- if sufs != empty -%}
-            <span class="nav-suffix">[{% for s in sufs %}<a href="{{ s.url | relative_url }}" class="{% if s.url == page.url %}current{% endif %}">{{ s.title | downcase }}</a>{% unless forloop.last %}|{% endunless %}{% endfor %}]</span>
+          {%- for pr in kpairs -%}{%- assign pp = pr | split: "=" -%}{%- assign t = site.pages | where: "path", pp[1] | first -%}{%- if t.url == page.url -%}{%- assign kid_current = true -%}{%- endif -%}{%- endfor -%}
+          <li class="{% if kid_current %}current{% endif %}{% if sufs != empty or kpairs != empty %} has-suffix{% endif %}"><a href="{{ k.url | relative_url }}">{{ k.title }}</a>
+            {%- if sufs != empty or kpairs != empty -%}
+            <span class="nav-suffix">[{% for s in sufs %}<a href="{{ s.url | relative_url }}" class="{% if s.url == page.url %}current{% endif %}">{{ s.title | downcase }}</a>{% unless forloop.last %}|{% endunless %}{% endfor %}{% if sufs != empty and kpairs != empty %}|{% endif %}{% for pr in kpairs %}{% assign pp = pr | split: "=" %}{% assign t = site.pages | where: "path", pp[1] | first %}<a href="{{ t.url | relative_url }}" class="{% if t.url == page.url %}current{% endif %}">{{ pp[0] }}</a>{% unless forloop.last %}|{% endunless %}{% endfor %}]</span>
             {%- endif -%}
           </li>
-          {%- endfor -%}
-        </ul>
-        {%- endif -%}
-      {%- endif -%}
-      {%- if p.nav_children_key -%}
-        {%- assign ckids = site.pages | where_exp: "c", "c[p.nav_children_key]" | sort: "path" | reverse -%}
-        {%- if ckids != empty -%}
-        <ul class="nav-children">
-          {%- for c in ckids -%}
-          <li class="{% if c.url == page.url %}current{% endif %}"><a href="{{ c.url | relative_url }}">{{ c[p.nav_children_key] }}</a></li>
           {%- endfor -%}
         </ul>
         {%- endif -%}

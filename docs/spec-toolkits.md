@@ -2,6 +2,7 @@
 title: Spec toolkits
 nav_order: 4
 nav_id: toolkits
+nav_suffix: spec=companion/SPEC.md
 ---
 
 # Spec toolkits: gating what Spec Kit and OpenSpec write

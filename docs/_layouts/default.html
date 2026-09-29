@@ -82,10 +82,14 @@
     .nav-children { margin-left: 0.75rem !important; border-left: 1px solid var(--ck-border);
       padding-left: 0.35rem !important; }
     .nav-children a { font-size: 0.9rem; color: var(--ck-muted); }
-    .nav-children li.has-suffix { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.15rem; }
-    .nav-children li.has-suffix > a { white-space: nowrap; }
+    .nav-tree li.has-suffix { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.15rem; }
+    .nav-tree li.has-suffix > a { white-space: nowrap; }
+    .nav-tree li.has-suffix > ul, .nav-tree li.has-suffix > details { flex-basis: 100%; }
+    .nav-tree summary { cursor: pointer; }
+    .nav-tree summary > a { display: inline-block; }
+    .nav-tree li.current > details > summary > a { color: var(--ck-accent); font-weight: 600; }
     .nav-suffix { font-size: 0.72rem; color: var(--ck-muted); white-space: nowrap; }
-    .nav-suffix a { display: inline; padding: 0 0.1rem; font-size: inherit; }
+    .nav-suffix a { display: inline; padding: 0 0.1rem; font-size: inherit; color: var(--ck-muted); }
     .nav-suffix a.current { color: var(--ck-accent); font-weight: 600; }
     .site-content { flex: 1 1 auto; min-width: 0; padding: 1.5rem 2rem 4rem; }
     .site-content .markdown-body { background: transparent; color: var(--ck-fg); }

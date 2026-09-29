@@ -1,2 +1,7 @@
-not reachable from the rendered nav
+docs/orphan.md: not reachable from the rendered nav
+docs/linked.md: not reachable from the rendered nav
+docs/lost/SPEC.md: not reachable from the rendered nav
+docs/notes/v1.md: not reachable from the rendered nav
 docs/tools-overview.md: an overview among its siblings under tools
+docs/tools.md: nav_suffix names absent/SPEC.md, which is not a docs page
+docs/tools.md: nav_suffix pair broken is malformed

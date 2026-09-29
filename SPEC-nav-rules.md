@@ -37,7 +37,7 @@ Two queue entries pair it: [toolkit-nav-hierarchy](TASK-QUEUE.md#toolkit-nav-hie
 
 ### (3) The Releases children collapse {design-bearing}
 
-**Not yet applied.** In `docs/_includes/nav.html`, a top-level entry naming `nav_children_key` renders its link and children inside one `<details>`: `<details><summary>` holding the entry's link, then the children's `<ul class="nav-children">`, then `</details>`. The element carries `open` when the current page carries the key, so a release note shows its list open with the note marked current. The Releases page and every other page show it closed. The `nav_id` branch is unchanged.
+**Applied.** In `docs/_includes/nav.html`, a top-level entry naming `nav_children_key` renders its link and children inside one `<details>`: `<details><summary>` holding the entry's link, then the children's `<ul class="nav-children">`, then `</details>`. The element carries `open` when the current page carries the key, so a release note shows its list open with the note marked current. The Releases page and every other page show it closed. The `nav_id` branch is unchanged.
 
 `docs/_layouts/default.html` gains the rules that keep the summary's link one line with its marker, beside the `.nav-tree` rules. Measure in a browser at desktop width and in a narrow window, closed and open. `check-docs-collapsible` reads `.md` pages only, so the include's element is outside its form rule.
 
@@ -45,7 +45,7 @@ docs/site-architecture.md §Site chrome and the nav contract, the sentence on `n
 
 ### (4) The `nav_suffix` key {design-bearing}
 
-**Not yet applied.** A nav page, top-level or child, may carry `nav_suffix: <label>=<path> …`: space-separated pairs, each `<path>` relative to the docs root. The include renders each pair as a suffix link labelled `<label>` to the page at `<path>`, in the `.nav-suffix` span the kit suffix already uses, after that entry's own suffix links. The layout's `.has-suffix` rules widen from `.nav-children` to `.nav-tree`, so a top-level entry carries a suffix too.
+**Applied.** A nav page, top-level or child, may carry `nav_suffix: <label>=<path> …`: space-separated pairs, each `<path>` relative to the docs root. The include renders each pair as a suffix link labelled `<label>` to the page at `<path>`, in the `.nav-suffix` span the kit suffix already uses, after that entry's own suffix links. The layout's `.has-suffix` rules widen from `.nav-children` to `.nav-tree`, so a top-level entry carries a suffix too.
 
 - `docs/install.md`: `nav_suffix: spec=installer/SPEC.md plugin=plugin/SPEC.md`.
 - `docs/spec-toolkits.md`: `nav_suffix: spec=companion/SPEC.md`.
@@ -60,7 +60,7 @@ docs/site-architecture.md §Site chrome and the nav contract gains, after the su
 
 ### (6) Strict reachability {design-bearing}
 
-**Not yet applied.** `check-docs-nav-reachable`'s reach becomes the **menu set** alone. That is every page holding a nav slot (`nav_order`, or `nav_parent` naming a top-level `nav_id`), every derived child, every generated sibling of a nav child's `index.md`, and every page a menu entry's `nav_suffix` names. The link walk is removed. A page outside the menu set and off the allowlist is a finding, as today. A `nav_suffix` pair that is malformed, lacking its `=`, or that names no docs page is a finding: *`<page>`: `nav_suffix` names `<path>`, which is not a docs page.* The `help:` lines drop *or link it from a nav page*, and name `nav_suffix` for a mirror page.
+**Applied.** `check-docs-nav-reachable`'s reach becomes the **menu set** alone. That is every page holding a nav slot (`nav_order`, or `nav_parent` naming a top-level `nav_id`), every derived child, every generated sibling of a nav child's `index.md`, and every page a menu entry's `nav_suffix` names. The link walk is removed. A page outside the menu set and off the allowlist is a finding, as today. A `nav_suffix` pair that is malformed, lacking its `=`, or that names no docs page is a finding: *`<page>`: `nav_suffix` names `<path>`, which is not a docs page*, and a malformed pair, lacking its `=` or either side, has its own: *`<page>`: `nav_suffix` pair `<pair>` is malformed — it takes `<label>=<path>`* (ruled at build: a pair with no `=` names no path to report). The gate checks the pairs on every page carrying the key, and adds a pair's page to the menu set only from a menu entry, since the include renders pairs only there. The `help:` lines drop *or link it from a nav page*, and name `nav_suffix` for a mirror page.
 
 The clean line reads: *each carries a title block and holds a menu entry — a nav slot, a derived child, a suffix link or a `nav_suffix` pair — or is allowlisted off-nav.*
 
@@ -68,7 +68,7 @@ docs/site-architecture.md §Site chrome and the nav contract: *reachability from
 
 ### (7) The fixture pair {mechanical}
 
-**Not yet applied.** `scripts/gate-tests/check-docs-nav-reachable/`:
+**Applied.** `scripts/gate-tests/check-docs-nav-reachable/`:
 
 - `good/`: `linked.md` moves to `bad/`. `good/` gains a top-level page carrying `nav_suffix` naming a generated page in a directory with no `index.md`. The SPEC-titled mirror is re-described as reached by the suffix, under the restore's change. `good/args`' comment is updated.
 - `bad/`: gains `linked.md`, reached only by a link from a nav page, and a `nav_suffix` pair naming an absent page. It also gains a `nav_id` parent with three children, one of which every sibling links and which links each sibling. `bad/expect.txt` gains the finding texts of deltas 5 and 6, and `bad/args`' comment is updated.

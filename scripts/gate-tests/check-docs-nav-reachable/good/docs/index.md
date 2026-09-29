@@ -6,5 +6,4 @@ nav_id: home
 
 # Home
 
-The [linked page](linked.md) is reached by the walk; [Sub](sub/index.md) nests
-under this page in the nav.
+[Sub](sub/index.md) nests under this page in the nav.

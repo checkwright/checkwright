@@ -1,6 +1,6 @@
 // spec: docs/site-architecture.md §Site chrome and the nav contract — every tracked docs page
-// carries a title front-matter block and is reachable from the rendered nav (a nav slot, or a
-// relative-link walk seeded from the nav set), or is listed in the off-nav allowlist
+// carries a title block and a menu entry of its own (nav slot, derived child, generated-sibling
+// suffix link, nav_suffix pair), or is listed in the off-nav allowlist
 use crate::fresh;
 use crate::walk;
 use std::collections::{HashMap, HashSet};
@@ -14,7 +14,7 @@ const SPACE: [char; 5] = [' ', '\t', '\r', '\x0b', '\x0c'];
 
 // spec: docs/site-architecture.md §Site chrome and the nav contract — front-matter facts per
 // page: title:, the nav_order slot, nav_id / nav_parent, the generated: mirror marker, and
-// nav_children_key (the derived-children key a nav page names)
+// nav_children_key (the derived-children key a nav page names), and the nav_suffix pairs
 #[derive(Default)]
 struct Fm {
     title: bool,
@@ -23,6 +23,7 @@ struct Fm {
     parent: String,
     generated: bool,
     children_key: String,
+    suffix: Vec<String>,
 }
 
 fn is_space(c: char) -> bool {
@@ -88,8 +89,21 @@ fn front_matter(text: &str) -> Fm {
         if key_matches(line, "nav_children_key:").is_some() {
             fm.children_key = field2(line);
         }
+        if let Some(t) = key_matches(line, "nav_suffix:") {
+            fm.suffix = t.split(is_space).filter(|f| !f.is_empty()).map(String::from).collect();
+        }
     }
     fm
+}
+
+// spec: docs/site-architecture.md §Site chrome and the nav contract — a nav_suffix pair is
+// `<label>=<path>`, the path relative to the docs root; None where either side is empty
+fn suffix_target(root: &str, pair: &str) -> Option<String> {
+    let (label, path) = pair.split_once('=')?;
+    if label.is_empty() || path.is_empty() {
+        return None;
+    }
+    Some(format!("{}/{}", root, path))
 }
 
 // spec: docs/site-architecture.md §Site chrome and the nav contract — the include's
@@ -304,45 +318,42 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     let inscope: HashSet<&String> = pages.iter().collect();
-    let mut reach: HashSet<String> = HashSet::new();
-    let mut queue: Vec<String> = Vec::new();
+    let mut bad: Vec<String> = Vec::new();
+    let mut reach: HashSet<String> = derived.clone();
     for p in &pages {
         let fm = &fms[p];
-        let seeded = fm.order
-            || (!fm.parent.is_empty() && top_nav_ids.contains(&fm.parent))
-            || derived.contains(p);
-        if seeded {
-            reach.insert(p.clone());
-            queue.push(p.clone());
-        }
-    }
-
-    let mut head = 0usize;
-    while head < queue.len() {
-        let cur = queue[head].clone();
-        head += 1;
-        for tgt in links_of(&cur, &texts[&cur]) {
-            if inscope.contains(&tgt) && !reach.contains(&tgt) {
-                reach.insert(tgt.clone());
-                queue.push(tgt);
+        for pair in &fm.suffix {
+            match suffix_target(&root, pair) {
+                None => bad.push(format!(
+                    "{}: nav_suffix pair {} is malformed — it takes <label>=<path>",
+                    p, pair
+                )),
+                Some(t) if !inscope.contains(&t) => bad.push(format!(
+                    "{}: nav_suffix names {}, which is not a docs page",
+                    p,
+                    pair.split_once('=').map_or("", |(_, path)| path)
+                )),
+                Some(_) => {}
             }
+        }
+        let child = !fm.parent.is_empty() && top_nav_ids.contains(&fm.parent);
+        if !(fm.order || child) {
+            continue;
+        }
+        reach.insert(p.clone());
+        for t in fm.suffix.iter().filter_map(|pair| suffix_target(&root, pair)) {
+            reach.insert(t);
         }
         // spec: docs/site-architecture.md §Site chrome and the nav contract — the include's
-        // suffix-link rule: a generated mirror page is reachable iff its directory-sibling
-        // index.md is nav-reachable
-        if basename(&cur) == "index.md" {
-            let curdir = dirname(&cur).to_string();
-            for sib in &pages {
-                if dirname(sib) == curdir && fms[sib].generated && !reach.contains(sib)
-                {
-                    reach.insert(sib.clone());
-                    queue.push(sib.clone());
-                }
+        // suffix-link rule: a nav child's index.md hangs its generated directory siblings
+        if child && basename(p) == "index.md" {
+            let dir = dirname(p);
+            for sib in pages.iter().filter(|s| dirname(s) == dir && fms[*s].generated) {
+                reach.insert(sib.clone());
             }
         }
     }
 
-    let mut bad: Vec<String> = Vec::new();
     for (id, kids) in children_by_id(&pages, &fms) {
         for overview in overviews(&kids, &texts) {
             bad.push(format!(
@@ -363,27 +374,28 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
         if !reach.contains(p) {
             bad.push(format!(
-                "{}: not reachable from the rendered nav — no nav slot and no link walk reaches it",
+                "{}: not reachable from the rendered nav — it holds no menu entry of its own",
                 p
             ));
         }
     }
 
     if !bad.is_empty() {
-        println!("check-docs-nav-reachable: docs page(s) fall outside the site nav:");
+        println!("check-docs-nav-reachable: docs page(s) fall outside the site nav or break its rules:");
         for b in &bad {
             println!("  {}", b);
         }
         println!("  help: open the page with a front-matter block carrying 'title:', and give it a nav slot");
-        println!("        ('nav_order: <n>' top-level, or 'nav_parent: <id>' under one), or link it from a nav");
+        println!("        ('nav_order: <n>' top-level, or 'nav_parent: <id>' under one). A mirror page with no");
+        println!("        kit index is named in 'nav_suffix: <label>=<path>' on the page documenting its");
         println!(
-            "        page. A page off-nav by design (an embedded fragment) goes in {}.",
+            "        component. A page off-nav by design (an embedded fragment) goes in {}.",
             allowlist
         );
         return Ok(1);
     }
     println!(
-        "DOCS-NAV-REACHABLE: clean ({} docs page(s) under {}; each carries a title block and sits in the rendered nav — a nav slot, its link walk, or the generated-sibling suffix rule — or is allowlisted off-nav)",
+        "DOCS-NAV-REACHABLE: clean ({} docs page(s) under {}; each carries a title block and holds a menu entry — a nav slot, a derived child, a suffix link or a nav_suffix pair — or is allowlisted off-nav)",
         pages.len(),
         root
     );
@@ -405,6 +417,19 @@ mod tests {
         assert!(!none.title);
         let closed = front_matter("---\n---\nnav_order: 2\n");
         assert!(!closed.order);
+    }
+
+    // spec: docs/site-architecture.md §Site chrome and the nav contract — a pair resolves
+    // against the docs root, and one lacking its `=` or either side resolves to nothing
+    #[test]
+    fn a_nav_suffix_pair_takes_label_equals_path() {
+        assert_eq!(
+            suffix_target("docs", "spec=installer/SPEC.md").as_deref(),
+            Some("docs/installer/SPEC.md")
+        );
+        assert_eq!(suffix_target("docs", "installer/SPEC.md"), None);
+        assert_eq!(suffix_target("docs", "spec="), None);
+        assert_eq!(suffix_target("docs", "=x.md"), None);
     }
 
     // spec: docs/site-architecture.md §Site chrome and the nav contract — a link scan per

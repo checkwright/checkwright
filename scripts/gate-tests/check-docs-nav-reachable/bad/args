@@ -1,11 +1,13 @@
 # Point the gate at this fixture's synthetic docs tree and its (empty) allowlist.
-# orphan.md carries a title but holds no nav slot, is linked from no nav page,
-# and is not allowlisted — the fell-out-of-the-nav drift; lost/SPEC.md is a
-# generated mirror with no nav-reachable sibling index.md, so the sibling rule
-# must not rescue it; notes/v1.md carries a `release:` key but no nav page names
-# `release` in nav_children_key, so the derived-children rule must not rescue it
-# either; tools-overview.md is a child of Tools that both its siblings link and
-# that links each of them, an overview sitting as their sibling. The gate
-# REJECTS.
+# orphan.md carries a title but holds no nav slot and is not allowlisted — the
+# fell-out-of-the-nav drift; linked.md is linked from the Home nav page but
+# holds no menu entry, and a link in a page body is not reach; lost/SPEC.md is
+# a generated mirror with no nav-child sibling index.md, so the suffix rule
+# must not rescue it; notes/v1.md carries a `release:` key but no nav page
+# names `release` in nav_children_key, so the derived-children rule must not
+# rescue it either; tools-overview.md is a child of Tools that both its
+# siblings link and that links each of them, an overview sitting as their
+# sibling; and Tools' nav_suffix names an absent page and carries a pair with
+# no '='. The gate REJECTS.
 docs
 docs-offnav.list

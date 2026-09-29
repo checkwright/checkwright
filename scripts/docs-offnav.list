@@ -1,5 +1,5 @@
 # Off-nav docs pages — exempt from check-docs-nav-reachable's front-matter floor
-# and reachability walk. One repo-relative path per line; '#' comments.
+# and menu-reach check. One repo-relative path per line; '#' comments.
 # A page belongs here only when it is off-nav by design: an embedded data
 # fragment no link targets, or an immutable dated post that joins no nav by
 # derivation either — e.g. the front-matter-less announcement post, rendered
@@ -13,7 +13,8 @@
 # package front door rather than site content acquires a page the site has no
 # reader for. Listed rather than suppressed, because the emitter's corpus has
 # one rule and an exception would be a second; the sibling SPEC page is NOT
-# listed, being reached from the install page's pointer.
+# listed, being reached from the `nav_suffix` of the page documenting its
+# component.
 docs/installer/README.md
 docs/companion/README.md
 docs/plugin/README.md
