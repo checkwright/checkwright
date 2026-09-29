@@ -60,14 +60,6 @@ no public page states what the battery costs a commit, the adopter's "will this 
 
 ## Technical Debt
 
-### front-door-container-rehearsal
-
-a clean-container first-run rehearsal of the published front door, split from [design-partner-preview](#design-partner-preview)'s readiness paragraph: the release installer as docs/install.md prints it, `init` on a sample repository, `demo`, and a first red, in a container carrying nothing the author's machine does. Operator direction, 2026-09-29, lead-relayed (not a ruling): it runs before the observed install, and its evidence stays out of `--emit file-install` until `install-author-discriminator` lands.
-
-**Deliverable:** the rehearsal run against the newest published release in a clean Linux container, its time to first green and first red recorded, each finding fixed in the iteration where it is debt or filed with `--emit file-gap`, and the run filed through the author channel the discriminator lands, so it builds after that unit. Host floors a Linux container cannot reach (macOS, native Windows) are named unrehearsed, never inferred.
-
-**Cost while deferred:** the observed install, one-shot and the catalog submission's last gate, becomes the first run of the printed front door on a machine the author does not control, so a front-door defect a rehearsal would catch spends that observation. Filed 2026-09-29 as a split at preview-readiness' scope. The set is the operator's selection over the pool ranking, direction 2026-09-29, lead-relayed (not a ruling), which ranked a guard-kit set first once `catalog-then-plugin` discharged. Re-verified: v0.30.0's Release carries the installer tarball and the companion zip, and a Docker daemon runs on the build host.
-
 ### drift-kit-measurement-brevity
 
 drift-kit/SPEC.md's measurement sections under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §Bundled KPIs, §The stage-economics meter, §The install-observation record and §The install-evidence projection, about 72k characters; drift-kit's other sections stay on the parent.
@@ -252,7 +244,7 @@ a narrow external preview before any broad announcement: a preview cohort whose 
 
 **Consult ruling, 2026-09-27, superseding the 2026-09-25 recommendation to promote next:** the cohort was re-ruled in the brief — one observed pre-submission install, then the installers the catalogs and the plugin marketplace send — so this entry runs *through* the two ecosystem units the ledger's `catalog-then-plugin` ruling sequenced first, not ahead of them; that ruling discharged 2026-09-29, the extension and the plugin package both published. The observed install is owed before the catalog submission; the rest re-promotes on the first observed install, as stated above.
 
-**Readiness ahead of the observed install, operator direction 2026-09-29, lead-relayed (not a ruling):** a clean-container first-run rehearsal runs first, split out 2026-09-29 at preview-readiness' scope as [front-door-container-rehearsal](#front-door-container-rehearsal), which carries its shape and the author-evidence rule. Operator-seat adoption on the operator's own projects is independent evidence and gates nothing; counting it toward the observed install was declined.
+**Readiness ahead of the observed install, operator direction 2026-09-29, lead-relayed (not a ruling):** a clean-container first-run rehearsal runs first, split out 2026-09-29 at preview-readiness' scope as `front-door-container-rehearsal`, which carries its shape and the author-evidence rule. Operator-seat adoption on the operator's own projects is independent evidence and gates nothing; counting it toward the observed install was declined.
 
 **Cost while deferred — still the highest of its intake, and now the more exposed half.** Every claim that would be strongest with external evidence still rests on internal dogfooding, and the channel that would carry it is built and reading zero: the published page states an honest `0` on every pass while the volume of unattested governed surface keeps growing. Deferring also silently defers [benchmark-ab-experiment](#benchmark-ab-experiment), since running that first would fix the wrong metrics. Surfaced 2026-08-02 at close, in the same intake pass, as the review's fourth-ranked item.
 
@@ -1530,5 +1522,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 - npm-approval-delegation
 - install-author-discriminator
+- front-door-container-rehearsal
 
 ## Lessons Learned
