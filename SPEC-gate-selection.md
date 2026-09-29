@@ -1,5 +1,7 @@
 # SPEC amendment: gate-selection
 
+**Merged at build; held on disk until the Done move.** Every delta below is applied and merged into its canonical section. The Definition of Done moves the entry to Done only once the mid-iteration push's runs are green, and `check-amendment-queue` holds an active entry's `[spec:]` ref to this file, so the file is deleted in the Done-move commit.
+
 An adopter cannot choose which kits or gates `init` installs, or replace one with their own. `init` takes a profile and recipes and nothing finer (installer/SPEC.md §init). The profiles are fixed rosters, a recipe is publisher-shipped, and a hand edit to `gates.list` survives a re-run only as an adopter-changed file that then stops receiving the registry's updates (§What init seeds). The registry already resolves consumer-first, so a gate of the same name in the adopter's gates directory shadows a kit's (gate-sdk/SPEC.md §Layout and configuration). No adopter page presents that as the replace path.
 
 This amendment adds an install-time selection: `init` and `update` flags that add or remove a kit from the profile's set and a gate from the derived registry. `checkwright.lock` records the selection, so a re-run and `update` re-apply it. The replace path is documented.
@@ -21,7 +23,7 @@ One queue entry pairs it: [install-gate-selection](TASK-QUEUE.md#install-gate-se
 
 ### (1) The selection flags {design-bearing}
 
-**Not yet applied.** `init` gains five flags, and `update` forwards them unchanged (§update):
+**Applied.** `init` gains five flags, and `update` forwards them unchanged (§update):
 
 - `--with-kit <kit>`, repeatable: adds a payload kit to the profile's kit set;
 - `--without-kit <kit>`, repeatable: removes one;
@@ -50,7 +52,7 @@ A `--without-gate` naming a shipped gate the derived registry does not carry, su
 
 ### (2) The manifest records the selection {design-bearing}
 
-**Not yet applied.** `checkwright.lock` gains an optional top-level `selection` object, absent when nothing is selected. It holds up to four arrays: `with-kits`, `without-kits`, `with-gates` and `without-gates`. Each is present only when non-empty and holds names in the order given, and keys sort at every level as the emitter already rules.
+**Applied.** `checkwright.lock` gains an optional top-level `selection` object, absent when nothing is selected. It holds up to four arrays: `with-kits`, `without-kits`, `with-gates` and `without-gates`. Each is present only when non-empty and holds names in the order given, and keys sort at every level as the emitter already rules.
 
 installer/SPEC.md §The manifest's table gains a row:
 
@@ -60,7 +62,7 @@ The paragraph on additive keys gains `selection` beside `recipes`. A release bui
 
 ### (3) The rewritten install sections {design-bearing}
 
-**Not yet applied.** installer/SPEC.md:
+**Applied.** installer/SPEC.md:
 
 - **§init**, the opener: *vendors the selected profile's kit source* becomes *vendors the selected kit set: a profile's, adjusted by any selection (§Selecting kits and gates)*. The *resolves the profile's kit set, and refuses a profile resolving to no kit* sentence of the `doctor` precondition becomes *resolves the selected kit set, and refuses one resolving to no kit or a selection it cannot honour*.
 - **A section `## Selecting kits and gates`** is added after §Payload recipes. It holds delta 1's composition, refusals and re-run rule, and the replace path:
@@ -76,7 +78,7 @@ The paragraph on additive keys gains `selection` beside `recipes`. A release bui
 
 ### (4) The adopter pages {mechanical}
 
-**Not yet applied.** `docs/install.md` §Choosing a profile gains, after the profile list's closing paragraph:
+**Applied.** `docs/install.md` §Choosing a profile gains, after the profile list's closing paragraph:
 
 > **Choosing kits and gates.** `--with-kit` and `--without-kit` add a kit to your profile or take one out, and `--with-gate` and `--without-gate` do the same for a gate. Each repeats, `checkwright.lock` records them, and a re-run keeps them until you pass new ones or `--no-selection`. `gate-sdk` stays, since it runs the others. To replace a gate with your own, put a gate of the same name in your gates directory: it runs instead of the kit's, and `init` never overwrites it.
 
@@ -84,11 +86,11 @@ The paragraph on additive keys gains `selection` beside `recipes`. A release bui
 
 ### (5) The flag roster {mechanical}
 
-**Not yet applied.** If [front-door-flag-grammar](TASK-QUEUE.md#front-door-flag-grammar) landed in an earlier batch or lands in this one, `FLAGS` and `installer/README.md`'s flag table gain five rows, each naming `init` and `update`: `--with-kit`, `--without-kit`, `--with-gate`, `--without-gate` and `--no-selection`. `init`'s and `update`'s `usage:` lines gain them. If it lands later, its delta 1 reads these rows off the parsers, and its crate test holds them.
+**Applied.** If [front-door-flag-grammar](TASK-QUEUE.md#front-door-flag-grammar) landed in an earlier batch or lands in this one, `FLAGS` and `installer/README.md`'s flag table gain five rows, each naming `init` and `update`: `--with-kit`, `--without-kit`, `--with-gate`, `--without-gate` and `--no-selection`. `init`'s and `update`'s `usage:` lines gain them. If it lands later, its delta 1 reads these rows off the parsers, and its crate test holds them.
 
 ### (6) The consumer smoke's selection arm {design-bearing}
 
-**Not yet applied.** `installer/consumer-smoke/run-smoke.sh` gains a selection arm. It names no gate or kit literally, and reads each name off the package: the payload's kit roots, the derived registry and each gate's `# install:` line. It runs over one consumer at the lattice minimum:
+**Applied.** `installer/consumer-smoke/run-smoke.sh` gains a selection arm. It names no gate or kit literally, and reads each name off the package: the payload's kit roots, the derived registry and each gate's `# install:` line. It runs over one consumer at the lattice minimum:
 
 1. `init` with `--with-kit` naming a payload kit outside the minimum's set, `--without-gate` naming the first member of the minimum's registry, and `--with-gate` naming an `on-surface` member of the added kit. It asserts one commit, `kits` holding both kits, the registry lacking the dropped member and carrying the added one, the manifest's `selection` equal to what was passed, and the battery's resolved kit roots equal to `kits`. The battery is not asserted green, since an `on-surface` member may red on a tree lacking its surface.
 2. A bare re-run leaves the tree object unchanged.

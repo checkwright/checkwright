@@ -369,6 +369,11 @@ pub fn diagnose(selection: Option<&Selection>) -> Report {
             if !recipes.is_empty() {
                 let _ = writeln!(out, "  {:<12} {}", "recipes", recipes);
             }
+            // spec: installer/SPEC.md §doctor — the selection, beside the profile and recipes
+            let chosen = super::selection::Selection::from_lists(|k| manifest.nested_list("selection", k));
+            if !chosen.is_empty() {
+                let _ = writeln!(out, "  {:<12} {}", "selection", chosen.summary());
+            }
 
             // spec: installer/SPEC.md §doctor — the registry this tree's battery runs from is
             // named rather than left implicit: it is the one install fact the identity fields do

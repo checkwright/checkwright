@@ -51,6 +51,11 @@ The flags each verb takes, owned by the binary as the verbs are:
 | `--dry-run` | `init`, `update`, `uninstall` | print the plan, write nothing |
 | `--force` | `init`, `update`, `uninstall` | overwrite what the verb would otherwise protect |
 | `--no-commit` | `init`, `update`, `uninstall` | stage the change and leave the commit to you |
+| `--with-kit` | `init`, `update` | add this kit to the profile; repeats |
+| `--without-kit` | `init`, `update` | take this kit out of the profile; repeats |
+| `--with-gate` | `init`, `update` | register this gate too; repeats |
+| `--without-gate` | `init`, `update` | drop this gate from the registry; repeats |
+| `--no-selection` | `init`, `update` | clear the recorded kit and gate selection |
 
 ## Choosing a profile
 
@@ -62,6 +67,8 @@ The flags each verb takes, owned by the binary as the verbs are:
 - **`full`** — everything in the payload.
 
 `starter`, `delegation` and `prose` are rosters in `profiles.list`, each membership recorded beside the criterion behind it; `full` is derived from the payload at run time rather than listed. `--recipe <name>` applies a recipe the package carries, for a tree another tool lays out, such as a spec toolkit's.
+
+`--with-kit`, `--without-kit`, `--with-gate` and `--without-gate` adjust a profile per install, and a gate file of your own under a kit gate's name, in your gates directory, replaces it ([SPEC.md §Selecting kits and gates](SPEC.md#selecting-kits-and-gates)).
 
 ## Where the design lives
 

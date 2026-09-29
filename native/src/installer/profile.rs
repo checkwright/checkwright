@@ -77,13 +77,13 @@ pub fn known(installer: &Path, want: &str) -> bool {
     names(installer).iter().any(|n| n == want)
 }
 
-// spec: installer/SPEC.md §Profiles — what an adopter meets is the battery, not the directory
-// list, so the gate set is a derivation in its own right: one function answers it for the registry
-// init writes and for the smoke's monotonicity assertion, rather than each unioning it itself.
-pub fn gate_set(installer: &Path, profile: &str) -> Vec<String> {
+// spec: installer/SPEC.md §What init seeds — what an adopter meets is the battery, not the
+// directory list, so the gate set is a derivation in its own right: one function unions it over a
+// kit set, and the registry init writes is its one caller.
+pub fn gate_set(installer: &Path, kit_set: &[String], profile: &str) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
-    for kit in kits(installer, profile) {
-        out.extend(recipe::gates(&installer.join("payload").join(&kit), profile));
+    for kit in kit_set {
+        out.extend(recipe::gates(&installer.join("payload").join(kit), profile));
     }
     out.sort();
     out.dedup();

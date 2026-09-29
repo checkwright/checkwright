@@ -9,6 +9,7 @@ pub mod lock;
 pub mod payload_recipe;
 pub mod profile;
 pub mod recipe;
+pub mod selection;
 pub mod uninstall;
 pub mod update;
 pub mod workflow;
@@ -41,6 +42,11 @@ pub const FLAGS: &[(&str, &[&str])] = &[
     ("--dry-run", &["init", "update", "uninstall"]),
     ("--force", &["init", "update", "uninstall"]),
     ("--no-commit", &["init", "update", "uninstall"]),
+    ("--with-kit", &["init", "update"]),
+    ("--without-kit", &["init", "update"]),
+    ("--with-gate", &["init", "update"]),
+    ("--without-gate", &["init", "update"]),
+    ("--no-selection", &["init", "update"]),
 ];
 
 // spec: installer/SPEC.md §What init seeds — the consumer-layout names the verbs write against,

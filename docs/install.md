@@ -235,6 +235,8 @@ Choose a profile with `--profile`. If another toolkit writes your specs, pass `-
 
 Moving to a profile that contains yours only adds. `init` refuses outside a git work tree, on a dirty worktree (`--no-commit` stages instead of committing), or when `checkwright doctor` finds a missing tool. Re-running it is safe: it reports files you have edited instead of overwriting them, unless you pass `--force`. `--dry-run` prints the plan and writes nothing.
 
+**Choosing kits and gates.** `--with-kit` and `--without-kit` add a kit to your profile or take one out. `--with-gate` and `--without-gate` do the same for a gate. Each repeats. `checkwright.lock` records them, so a re-run keeps them until you pass new ones or `--no-selection`. `gate-sdk` stays, since it runs the others. To replace a gate with your own, put a gate of the same name in your gates directory. It runs instead of the kit's, and `init` never overwrites it.
+
 ## Managing
 
 `checkwright <verb>` below means the one line with `<verb>` as its argument (`sh -s -- <verb>` on macOS and Linux, the script-block form on Windows, since `irm … | iex` takes none), your install recipe's `init` line with `<verb>` in place of `init`, or `npx checkwright <verb>`. Each verb answers in its exit status, so a CI step can gate on it.

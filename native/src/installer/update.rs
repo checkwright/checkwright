@@ -4,7 +4,7 @@
 use super::{lock, refuse, Refusal};
 
 pub(super) const USAGE: &[&str] = &[
-    "usage: checkwright update [--profile <name>] [--recipe <name>]... [--no-recipe] [--dry-run] [--force] [--no-commit]",
+    "usage: checkwright update [--profile <name>] [--recipe <name>]... [--no-recipe] [--with-kit <kit>]... [--without-kit <kit>]... [--with-gate <gate>]... [--without-gate <gate>]... [--no-selection] [--dry-run] [--force] [--no-commit]",
     "",
     "Runs checkwright init with the same arguments, refusing when there is no",
     "existing install for it to update. Every init flag is valid here — see",

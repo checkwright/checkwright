@@ -128,6 +128,15 @@ impl Manifest {
         }
     }
 
+    // spec: installer/SPEC.md §The manifest — one array of an optional object, empty when either
+    // is absent
+    pub fn nested_list(&self, object: &str, key: &str) -> Vec<String> {
+        match self.doc.get(object).and_then(|o| o.get(key)) {
+            Some(Value::Array(items)) => items.iter().filter_map(Value::as_str).map(String::from).collect(),
+            _ => Vec::new(),
+        }
+    }
+
     pub fn artifact(&self) -> (String, String) {
         let at = |k: &str| {
             self.doc
@@ -144,10 +153,13 @@ impl Manifest {
 // spec: installer/SPEC.md §The manifest — the single writer of the wire shape, so a second
 // writing arm cannot drift from the first: keys sorted at every nesting level, and an identity
 // field present exactly when the caller supplied it rather than as an empty placeholder.
+type Arrays = Vec<(String, Vec<String>)>;
+
 pub struct Emit {
     idents: Vec<(String, String)>,
     artifact: Option<(String, String)>,
     files: Vec<(String, String)>,
+    lists: Vec<(String, Arrays)>,
 }
 
 impl Emit {
@@ -156,7 +168,22 @@ impl Emit {
             idents: Vec::new(),
             artifact: None,
             files: Vec::new(),
+            lists: Vec::new(),
         }
+    }
+
+    // spec: installer/SPEC.md §The manifest — an object of arrays, each array present only when
+    // non-empty and the object only when one is
+    pub fn lists(mut self, key: &str, arrays: &[(&str, &Vec<String>)]) -> Emit {
+        let kept: Arrays = arrays
+            .iter()
+            .filter(|(_, v)| !v.is_empty())
+            .map(|(k, v)| (k.to_string(), (*v).clone()))
+            .collect();
+        if !kept.is_empty() {
+            self.lists.push((key.to_string(), kept));
+        }
+        self
     }
 
     pub fn ident(mut self, key: &str, value: &str) -> Emit {
@@ -194,6 +221,13 @@ impl Emit {
             files.insert(p.clone(), Value::String(h.clone()));
         }
         doc.insert("files".to_string(), Value::Object(files));
+        for (key, arrays) in &self.lists {
+            let mut o = Map::new();
+            for (k, v) in arrays {
+                o.insert(k.clone(), Value::Array(v.iter().map(|s| Value::String(s.clone())).collect()));
+            }
+            doc.insert(key.clone(), Value::Object(o));
+        }
         if let Some((target, digest)) = &self.artifact {
             let mut a = Map::new();
             a.insert("target".to_string(), Value::String(target.clone()));
@@ -237,6 +271,13 @@ mod tests {
         let with = Emit::new().artifact("t", "d").render();
         let doc: Value = serde_json::from_str(&with).expect("the emitted manifest is not JSON");
         assert_eq!(doc["artifact"]["target"], Value::String("t".to_string()));
+
+        let (full, empty) = (vec!["b".to_string(), "a".to_string()], Vec::new());
+        let listed = Emit::new().lists("selection", &[("z", &full), ("y", &empty)]).render();
+        let doc: Value = serde_json::from_str(&listed).expect("the emitted manifest is not JSON");
+        assert_eq!(doc["selection"]["z"][0], Value::String("b".to_string()), "the given order was not kept");
+        assert!(doc["selection"].get("y").is_none(), "an empty array was written");
+        assert!(!Emit::new().lists("selection", &[("y", &empty)]).render().contains("selection"));
     }
 
     // spec: installer/SPEC.md §The manifest — the reader's inverse: an array joins on the space
@@ -262,6 +303,11 @@ mod tests {
         assert_eq!(m.own_file("scripts/gates.list"), "scripts/gates.list");
         assert_eq!(m.own_file("gates.list"), "");
         assert_eq!(m.file_count(), 1);
+        assert!(m.nested_list("selection", "with-kits").is_empty());
+        std::fs::write(&p, Emit::new().lists("selection", &[("with-kits", &vec!["k".to_string()])]).render())
+            .expect("cannot rewrite the scratch manifest");
+        let m = Manifest::read(&p).expect("the scratch manifest did not parse");
+        assert_eq!(m.nested_list("selection", "with-kits"), vec!["k".to_string()]);
         std::fs::write(&p, "{\"schema\":\"other\"}").expect("cannot rewrite the scratch manifest");
         assert!(!Manifest::read(&p).expect("did not parse").schema_ok());
         std::fs::remove_dir_all(&dir).ok();

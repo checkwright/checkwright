@@ -108,7 +108,7 @@ pub fn seams_written(payload: &Path, kits: &[String]) -> BTreeSet<String> {
 }
 
 // spec: installer/SPEC.md §Payload recipes — the second refusal: a recipe file naming a seam the
-// resolved profile does not write, whose help names the profiles that write every one
+// selected kit set does not write, whose help names the profiles that write every one
 pub fn check_seams(pkg_root: &Path, profile_name: &str, kits: &[String], recipes: &[Recipe]) -> Result<(), Refusal> {
     let payload = pkg_root.join("payload");
     let written = seams_written(&payload, kits);
@@ -133,7 +133,7 @@ pub fn check_seams(pkg_root: &Path, profile_name: &str, kits: &[String], recipes
         .collect();
     Err(refuse(
         format!(
-            "payload recipe {} writes {}, which the {} profile does not seed",
+            "payload recipe {} writes {}, which the selected kit set of the {} profile does not seed",
             recipe, file, profile_name
         ),
         format!("choose a profile that seeds every file the recipes write: {} ", fit.join(" ")),
@@ -236,7 +236,7 @@ pub fn report_kept(file: &str, lines: &[String], gates: &[String]) {
     if lines.is_empty() && gates.is_empty() {
         return;
     }
-    println!("\n{} is yours, so the payload recipes' change is not placed there:", file);
+    println!("\n{} is yours, so the payload recipes' or the selection's change is not placed there:", file);
     for l in lines {
         println!("  add:  {}", l);
     }

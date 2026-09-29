@@ -17,3 +17,8 @@
 | `--dry-run` | `init`, `update`, `uninstall` | print the plan |
 | `--force` | `init`, `update`, `uninstall` | overwrite |
 | `--no-commit` | `init`, `update`, `uninstall` | leave the commit |
+| `--with-kit` | `init`, `update` | add a kit |
+| `--without-kit` | `init`, `update` | remove a kit |
+| `--with-gate` | `init`, `update` | add a gate |
+| `--without-gate` | `init`, `update` | drop a gate |
+| `--no-selection` | `init`, `update` | clear the selection |

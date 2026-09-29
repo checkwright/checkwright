@@ -2,6 +2,7 @@
 // payload into the consumer's repository and commits it, so what governs their tree afterwards is
 // committed, auditable source rather than something resolved at their build time.
 use crate::programs;
+use super::selection::{self, Selection};
 use super::{lock, payload_recipe, profile, recipe, refuse, workflow, Package, Refusal, AGENT_FILE, GATES_DIR, QUEUE_FILE};
 use crate::{install, sha256, toolfloor};
 use std::collections::{BTreeMap, BTreeSet};
@@ -15,10 +16,12 @@ pub(super) struct Flags {
     // spec: installer/SPEC.md §Payload recipes — absent when neither `--recipe` nor `--no-recipe`
     // was passed, which is what re-applies the recorded set
     recipes: Option<Vec<String>>,
+    // spec: installer/SPEC.md §Selecting kits and gates — absent when no selection flag was
+    // passed, which is what re-applies the recorded selection
+    selection: Option<Selection>,
 }
 
-pub(super) const USAGE: &str =
-    "usage: checkwright init [--profile <name>] [--recipe <name>]... [--no-recipe] [--dry-run] [--force] [--no-commit]";
+pub(super) const USAGE: &str = "usage: checkwright init [--profile <name>] [--recipe <name>]... [--no-recipe] [--with-kit <kit>]... [--without-kit <kit>]... [--with-gate <gate>]... [--without-gate <gate>]... [--no-selection] [--dry-run] [--force] [--no-commit]";
 
 fn help(pkg: Option<&Package>) {
     println!("{}\n", USAGE);
@@ -31,6 +34,7 @@ fn help(pkg: Option<&Package>) {
     println!("profiles: {} ", names);
     if let Some(p) = pkg {
         println!("payload recipes: {} ", payload_recipe::available(&p.root).join(" "));
+        println!("kits: {} ", profile::payload_kits(&p.root).join(" "));
     }
 }
 
@@ -41,11 +45,39 @@ pub(super) fn parse(args: &[String], pkg: Option<&Package>) -> Result<Option<Fla
         force: false,
         commit: true,
         recipes: None,
+        selection: None,
     };
+    let mut cleared = false;
     let mut i = 0;
     while i < args.len() {
         let a = args[i].as_str();
+        // spec: installer/SPEC.md §Selecting kits and gates — the four operand flags, each
+        // repeatable and each in both spellings
+        let operand = [
+            ("--with-kit", 0usize),
+            ("--without-kit", 1),
+            ("--with-gate", 2),
+            ("--without-gate", 3),
+        ]
+        .into_iter()
+        .find_map(|(flag, slot)| {
+            if a == flag {
+                Some((slot, args.get(i + 1).cloned().unwrap_or_default(), 2))
+            } else {
+                a.strip_prefix(flag).and_then(|r| r.strip_prefix('=')).map(|v| (slot, v.to_string(), 1))
+            }
+        });
+        if let Some((slot, name, width)) = operand {
+            let s = f.selection.get_or_insert_with(Selection::default);
+            [&mut s.with_kits, &mut s.without_kits, &mut s.with_gates, &mut s.without_gates][slot].push(name);
+            i += width;
+            continue;
+        }
         match a {
+            "--no-selection" => {
+                cleared = true;
+                i += 1;
+            }
             "--profile" => {
                 f.profile = args.get(i + 1).cloned().unwrap_or_default();
                 i += 2;
@@ -85,6 +117,18 @@ pub(super) fn parse(args: &[String], pkg: Option<&Package>) -> Result<Option<Fla
             }
             other => return Err(refuse(format!("unknown argument: {}", other), "", 2)),
         }
+    }
+    // spec: installer/SPEC.md §Selecting kits and gates — `--no-selection` clears the recorded
+    // selection, so it stands alone rather than beside a selection it would contradict
+    if cleared {
+        if f.selection.is_some() {
+            return Err(refuse(
+                "--no-selection beside another selection flag",
+                "--no-selection clears the recorded selection; pass it alone, or pass the whole new selection without it.",
+                2,
+            ));
+        }
+        f.selection = Some(Selection::default());
     }
     Ok(Some(f))
 }
@@ -210,10 +254,10 @@ fn plan_gates(pkg: &Package, kits: &[String], profile_name: &str) -> String {
         profile_name
     ));
     out.push_str("# Each kit's starting subset; its README names the full roster to grow into.\n");
-    // spec: installer/SPEC.md §Profiles — the gate set is derived once, by the function the
-    // smoke's monotonicity assertion also reads, so the registry and the invariant over it share
-    // one derivation. The loop only sections it by kit; a member several kits register lands once.
-    let mut pending: BTreeSet<String> = profile::gate_set(&pkg.root, profile_name)
+    // spec: installer/SPEC.md §What init seeds — the gate set is derived once over the kit set, and
+    // this registry is the one reader of it. The loop only sections it by kit; a member several kits
+    // register lands once.
+    let mut pending: BTreeSet<String> = profile::gate_set(&pkg.root, kits, profile_name)
         .into_iter()
         .collect();
     for kit in kits {
@@ -314,6 +358,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     let mut prior: BTreeMap<String, String> = BTreeMap::new();
     let mut profile_name = f.profile.clone();
     let mut recorded_recipes = String::new();
+    let mut recorded_selection = Selection::default();
     if lock_path.is_file() {
         let manifest = lock::Manifest::read(&lock_path)
             .filter(lock::Manifest::schema_ok)
@@ -351,6 +396,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
             profile_name = manifest.field("profile");
         }
         recorded_recipes = manifest.field("recipes");
+        recorded_selection = Selection::from_lists(|k| manifest.nested_list("selection", k));
         prior = manifest.files().into_iter().collect();
     }
 
@@ -368,14 +414,19 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         ));
     }
 
-    let kits = profile::kits(&pkg.root, &profile_name);
-    if kits.is_empty() {
+    let profile_kits = profile::kits(&pkg.root, &profile_name);
+    if profile_kits.is_empty() {
         return Err(refuse(
             format!("profile '{}' resolves to no kit in this payload", profile_name),
             "every kit a profile names must exist in the package payload; this one names none that do.",
             2,
         ));
     }
+    // spec: installer/SPEC.md §Selecting kits and gates — a run passing no selection flag re-applies
+    // the recorded selection, and one passing any replaces it whole; every refusal precedes a write
+    let chosen = f.selection.clone().unwrap_or(recorded_selection);
+    let kits = selection::kit_set(&pkg.root, &profile_kits, &chosen);
+    selection::check(&pkg.root, &root, &kits, &chosen)?;
 
     // spec: installer/SPEC.md §Payload recipes — the three refusals run ahead of any write, since
     // each is a selection the run cannot honour
@@ -387,7 +438,8 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         .filter_map(|n| payload_recipe::resolve(&pkg.root, &[n.to_string()]).ok())
         .flatten()
         .collect();
-    let dropped = payload_recipe::drops(&recipes);
+    let dropped = selection::dropped(&payload_recipe::drops(&recipes), &chosen);
+    let planned_registry = selection::adjust(&plan_gates(pkg, &kits, &profile_name), &dropped, &chosen);
     let artifact_name = pkg
         .artifact
         .file_name()
@@ -424,10 +476,11 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     // spec: installer/SPEC.md §init — doctor is the last precondition and still runs before any
     // file is written; running it after the manifest and kit set are resolved keeps a bad manifest
     // or an empty kit set from being reported as a toolchain fault.
-    // spec: installer/SPEC.md §doctor — the gate set unites the profile's with an on-disk registry
-    let mut gates: Vec<String> = profile::gate_set(&pkg.root, &profile_name)
-        .into_iter()
-        .filter(|g| !dropped.contains(g))
+    // spec: installer/SPEC.md §doctor — the gate set unites the registry this run will write with
+    // an on-disk registry
+    let mut gates: Vec<String> = crate::registry::members(&planned_registry)
+        .iter()
+        .map(|m| m.trim().to_string())
         .collect();
     if let Ok(text) = std::fs::read_to_string(root.join(GATES_DIR).join("gates.list")) {
         gates.extend(crate::registry::members(&text).iter().map(|m| m.trim().to_string()));
@@ -516,7 +569,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     let _ = std::fs::create_dir_all(root.join(".workflow"));
     let gates_list = format!("{}/gates.list", GATES_DIR);
     let registry = if claim(&root, &gates_list, &prior, f.force, &mut r) {
-        let text = payload_recipe::drop_gates(&plan_gates(pkg, &kits, &profile_name), &dropped);
+        let text = planned_registry.clone();
         if !f.dry {
             std::fs::write(root.join(&gates_list), &text)
                 .map_err(|e| refuse(format!("could not write {}: {}", gates_list, e), "", 2))?;
@@ -525,7 +578,13 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         text
     } else {
         let kept = std::fs::read_to_string(root.join(&gates_list)).unwrap_or_default();
-        payload_recipe::report_kept(&gates_list, &[], &payload_recipe::still_registered(&kept, &dropped));
+        let wanted = crate::registry::members(&planned_registry).iter().map(|m| m.trim().to_string()).collect::<Vec<_>>();
+        let added: Vec<String> = chosen.with_gates.iter().filter(|g| wanted.contains(g)).cloned().collect();
+        payload_recipe::report_kept(
+            &gates_list,
+            &payload_recipe::missing(&kept, &added),
+            &payload_recipe::still_registered(&kept, &dropped),
+        );
         kept
     };
 
@@ -630,7 +689,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     // spec: installer/SPEC.md §The install boundary — the placement is the `--install
     // place-artifact` op called in-process: one derivation, two callers, this arm and that flag.
     // spec: installer/SPEC.md §What init seeds — the vendored tree's kit-root set is DECLARED and
-    // not left to the on-disk predicate, and the declared set is the resolved profile's, the same
+    // not left to the on-disk predicate, and the declared set is the selected kit set, the same
     // value the manifest records
     // spec: installer/SPEC.md §The manifest — the publisher's SPEC base travels in the stamp and
     // reaches the consumer through the same seam
@@ -749,6 +808,8 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         if !recipe_names.is_empty() {
             e = e.ident("recipes", &recipe_names.join(" "));
         }
+        // spec: installer/SPEC.md §The manifest — `selection` is absent, never empty, when none applies
+        e = e.lists("selection", &chosen.lists());
         e = e.artifact(&pkg.target, &artifact_digest);
         let pending: Vec<bool> = r
             .written
@@ -793,6 +854,18 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
             if !dropped.is_empty() {
                 let names: Vec<String> = dropped.iter().cloned().collect();
                 println!("  drops from {}: {}", gates_list, names.join(" "));
+            }
+        }
+        // spec: installer/SPEC.md §Selecting kits and gates — the dry plan names the selection and
+        // the gates it adds and drops, read off the same composition
+        if !chosen.is_empty() {
+            println!("would apply the selection: {}", chosen.summary());
+            let added: Vec<&String> = chosen.with_gates.iter().filter(|g| !dropped.contains(*g)).collect();
+            if !added.is_empty() {
+                println!("  adds to {}: {}", gates_list, added.iter().map(|g| g.as_str()).collect::<Vec<_>>().join(" "));
+            }
+            if !chosen.without_gates.is_empty() {
+                println!("  drops from {}: {}", gates_list, chosen.without_gates.join(" "));
             }
         }
         println!("would write {} file(s), including:", stage.len() + 1);
