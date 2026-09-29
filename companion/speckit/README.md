@@ -27,4 +27,4 @@ The install needs git, and on Windows Git for Windows. It makes one commit.
 
 ## License
 
-Apache-2.0. The license text is `LICENSE` at the repository root.
+Licensed under Apache-2.0, with the text in `LICENSE` beside this file in an installed copy and at the repository root in the source tree.

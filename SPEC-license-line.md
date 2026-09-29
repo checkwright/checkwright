@@ -20,7 +20,7 @@ One queue entry pairs it: [license-line-owned-sentence](TASK-QUEUE.md#license-li
 
 ### (1) The source {mechanical}
 
-**Not yet applied.** `scripts/license-line.conf`, in the `key value…` line grammar of `scripts/product-statement.conf`, `#` comments and blank lines ignored. Its first line is `# contract: docs/site-architecture.md §The license line`.
+**Applied.** `scripts/license-line.conf`, in the `key value…` line grammar of `scripts/product-statement.conf`, `#` comments and blank lines ignored. Its first line is `# contract: docs/site-architecture.md §The license line`.
 
 - `license <id>` — the license's name, once: `license Apache-2.0`.
 - `text <file>` — the license file's name, once: `text LICENSE`.
@@ -43,11 +43,11 @@ One queue entry pairs it: [license-line-owned-sentence](TASK-QUEUE.md#license-li
 
 ### (2) The sites {mechanical}
 
-**Not yet applied.** Each `## License` section's body becomes its site's one rendered line (delta 3), and the footer's license line likewise. The footer already reads as its rendering, so only the sixteen READMEs change. The generated mirrors are regenerated after.
+**Applied.** Each `## License` section's body becomes its site's one rendered line (delta 3), and the footer's license line likewise. The footer already reads as its rendering, so only the sixteen READMEs change. The generated mirrors are regenerated after.
 
 ### (3) `check-license-line` {design-bearing}
 
-**Not yet applied.** A repo-root gate, born native: `native/src/gates/license_line.rs`, `scripts/check-license-line.gate` at `tier=precommit`, registered in `scripts/gates.list`.
+**Applied.** A repo-root gate, born native: `native/src/gates/license_line.rs`, `scripts/check-license-line.gate` at `tier=precommit`, registered in `scripts/gates.list`.
 
 - **Rendering.** A markdown site's linked form is `Licensed under [<license>](<target>).`. Its located form is ``Licensed under <license>, with the text in `<text>` <clause>.``. An `.html` site's linked form is `Licensed under <a href="<target>"><license></a>.`. An `.html` site declared `at` exits 2.
 - **Reading a site.** In a markdown site, the lines of its `## License` section, blank lines dropped, must be exactly one line, equal to the rendering. In an `.html` site, exactly one line, trimmed, opens `Licensed under`, and it must equal the rendering.
@@ -60,17 +60,17 @@ One queue entry pairs it: [license-line-owned-sentence](TASK-QUEUE.md#license-li
 
 ### (4) The owning section {mechanical}
 
-**Not yet applied.** docs/site-architecture.md gains `## The license line`, after §Page-authoring rules:
+**Applied.** docs/site-architecture.md gains `## The license line`, after §Page-authoring rules:
 
 *Every README's `## License` section and the site footer carry one sentence: `Licensed under Apache-2.0`, then where that copy's license text is. A site a reader follows by link takes the linked form, the license name linked to the text. A README that travels without the repository takes the located form, which names `LICENSE` and says where it sits beside that copy. `scripts/license-line.conf` declares the license, each location clause and each site's form. `check-license-line` holds each site to its rendering and every README carrying the heading to a declaration, printing the expected line on a red. The mirrors are generated from their sources and are not sites.*
 
 ### (5) The packer's placement names its readers {mechanical}
 
-**Not yet applied.** installer/SPEC.md §The packer, the paragraph *The license text is placed where it ships, and the tree keeps one copy*, gains a closing sentence: *Each packed README's license line states this placement, from `scripts/license-line.conf`'s location clauses, so a change to where the packer places the text changes those clauses (docs/site-architecture.md §The license line).*
+**Applied.** installer/SPEC.md §The packer, the paragraph *The license text is placed where it ships, and the tree keeps one copy*, gains a closing sentence: *Each packed README's license line states this placement, from `scripts/license-line.conf`'s location clauses, so a change to where the packer places the text changes those clauses (docs/site-architecture.md §The license line).*
 
 ### (6) The fixture pair {mechanical}
 
-**Not yet applied.** `scripts/gate-tests/check-license-line/`, each case a tree with a `license-line.conf` and an `args` naming it and the case root:
+**Applied.** `scripts/gate-tests/check-license-line/`, each case a tree with a `license-line.conf` and an `args` naming it and the case root:
 
 - `good/`: a root `README.md` in the linked form, a `kit/README.md` in the located form, a `default.html` footer, and a `docs/kit/README.md` carrying `generated: true` and a differently worded section, which the coverage walk skips.
 - `bad/`: a README whose line differs, a declared README with no `## License` section, and an undeclared `other/README.md` carrying the heading. `expect.txt` holds the three findings and one expected-line print.

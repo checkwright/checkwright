@@ -25,4 +25,4 @@ What the gates catch in a spec tree and the tested versions are on the [Spec too
 
 ## License
 
-Apache-2.0. The license text is `LICENSE` at the repository root.
+Licensed under Apache-2.0, with the text in `LICENSE` at the repository root.

@@ -81,4 +81,4 @@ and the consumer smoke.
 
 ## License
 
-Apache-2.0. The license text is [LICENSE](https://github.com/checkwright/checkwright/blob/master/LICENSE), shipped beside this file in the package.
+Licensed under Apache-2.0, with the text in `LICENSE` beside this file in the package.

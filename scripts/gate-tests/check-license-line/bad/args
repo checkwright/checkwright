@@ -1,0 +1,4 @@
+# The source, then the case root the coverage walk reads. README.md keeps the old
+# wording, kit/README.md is declared but carries no License section, and
+# other/README.md carries the heading undeclared. The gate REJECTS.
+license-line.conf .

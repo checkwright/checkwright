@@ -1,0 +1,2 @@
+# graph: couples=scripts/license-line.conf,README.md,*/README.md,*/*/README.md,docs/_layouts/default.html,native/src/gates/license_line.rs dir=one valve=none tier=precommit
+# spec: docs/site-architecture.md §The license line — every README's License section and the site footer carry the one line scripts/license-line.conf renders for that site, and every README carrying the heading is a declared site

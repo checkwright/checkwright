@@ -99,4 +99,4 @@ Contributing: the fixture is the unit of contribution — see [`CONTRIBUTING.md`
 
 ## License
 
-Apache-2.0. The license text is [LICENSE](LICENSE).
+Licensed under [Apache-2.0](LICENSE).

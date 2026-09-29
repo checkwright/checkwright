@@ -70,6 +70,7 @@ pub mod release_channel_parity;
 pub mod trajectory_fresh;
 pub mod value_rollup_fresh;
 pub mod product_statement_fresh;
+pub mod license_line;
 pub mod gap_inbox_neutrality;
 pub mod hook_exec_bit;
 pub mod identity;
@@ -1744,6 +1745,14 @@ pub const REGISTRY: &[GateEntry] = &[
         product_statement_fresh::run,
         &[],
         &[],
+        "-",
+        &[],
+    ),
+    (
+        "check-license-line",
+        license_line::run,
+        &[(".", "name:lit:README.md", "", "")],
+        &["GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS"],
         "-",
         &[],
     ),

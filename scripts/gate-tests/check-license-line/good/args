@@ -1,0 +1,4 @@
+# The source, then the case root the coverage walk reads. docs/kit/README.md is a
+# generated mirror carrying a differently worded section, which the walk skips.
+# The gate ACCEPTS.
+license-line.conf .
