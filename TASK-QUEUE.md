@@ -8,26 +8,6 @@
 
 ## New Features
 
-### per-commit-cost-figure
-
-[spec: SPEC-commit-cost.md]
-
-no public page states what the battery costs a commit, the adopter's "will this slow my commits" question. The one timing record, `.workflow/gate-timing-baseline.txt`, is the pre-port bash battery on one Linux host (2026-08-02). An operator question, lead-relayed, asked for a per-OS and per-arch table; CI job times measure runner hardware rather than OS or arch (the Intel macOS leg runs about twice the arm64 one on every step, run 36541257396), so the lead advised against it.
-
-**Deliverable:** an absolute per-commit cost, the pre-commit battery's wall-clock on a stated reference machine and profile, measured by a reproducible command and re-derived at release (Derivation-first); structural per-platform penalties go on the install page as limits.
-
-**Cost while deferred:** an adopter judges the cost from nothing. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead, at the operator's leave; promoted at its close: →fix fails because the measurement is new mechanism, →forward because no ruling is owed. Re-verified: no per-commit or wall-clock claim in docs/*.md, README.md or installer/README.md. Owner lookup: `wall-clock`, `per-commit` in this file — [native-executable-git-hooks](#native-executable-git-hooks), DISTINCT (its deliverable 3 is one component of this figure), and the icebox's validate-suite-wall-clock-unowned, DISTINCT (validate's suites, not a commit); owner docs/install.md, with drift-kit/SPEC.md for the measurement.
-
-### gate-timing-baseline-comparability
-
-[spec: SPEC-commit-cost.md] [recurrence: 2026-09-25]
-
-`.workflow/gate-timing-baseline.txt` has no reader in `native/src` or `scripts`; its named trigger, a second substrate port, has fired.
-
-**Deliverable:** a comparer arm, or the file retired from the workflow directory with its declaration.
-
-**Cost while deferred:** a tracked baseline nothing compares against. Filed 2026-08-02; returned from the icebox 2026-09-25 by consult on the fired trigger.
-
 ## Technical Debt
 
 ### drift-kit-measurement-brevity
@@ -1496,5 +1476,7 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - price-table-effective-dating
 - price-table-roster-coverage-oracle
 - battery-timing-file-overwritten-by-only-run
+- per-commit-cost-figure
+- gate-timing-baseline-comparability
 
 ## Lessons Learned

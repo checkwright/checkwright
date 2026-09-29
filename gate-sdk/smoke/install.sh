@@ -170,6 +170,32 @@ grep -q 'unused_var' <<<"$out" || { echo "smoke(hook): red hook output not verba
 git reset -q -- scripts/smoke-hook-probe.sh
 rm scripts/smoke-hook-probe.sh
 
+# spec: gate-sdk/SPEC.md §measure-commit — the kit smoke's cases, over a stub registry because this
+# consumer is uncommitted until every kit has installed
+mq="$PWD/.tmp/measure-smoke"
+rm -rf "$mq"; mkdir -p "$mq"
+printf '#!/usr/bin/env bash\n# graph: couples=* dir=one valve=none tier=precommit\necho "MEASURE-PASS: clean (stub)"\n' > "$mq/check-measure-pass.sh"
+printf '#!/usr/bin/env bash\n# graph: couples=* dir=one valve=none tier=precommit\necho "MEASURE-FAIL: 1 stub finding"\nexit 1\n' > "$mq/check-measure-fail.sh"
+chmod +x "$mq"/check-measure-pass.sh "$mq"/check-measure-fail.sh
+printf 'check-measure-pass\n' > "$mq/gates.list"
+mc_run() { env -u GATE_SDK_VERBOSE GATE_SDK_GATES_DIR="$mq" bash "$SDK/bin/run-gates.sh" --measure-commit "$@"; }
+mc_before="$(git status --porcelain)"
+out="$(mc_run)" || { echo "smoke(measure-commit): the stub registry did not measure: $out" >&2; exit 1; }
+mc_paths="$(git ls-files | wc -l | tr -d ' ')"
+grep -qE "^measure-commit: [0-9]+ms median of 3 \([0-9]+ms, [0-9]+ms, [0-9]+ms\) — 1 pre-commit member\(s\) over $mc_paths tracked path\(s\), every path selected$" <<<"$out" || {
+    echo "smoke(measure-commit): the figure line lost its shape or its path count ($mc_paths): $out" >&2; exit 1; }
+grep -qE '^host: [a-z0-9_]+ [a-z0-9_]+, [0-9]+ logical CPU\(s\)$' <<<"$out" || { echo "smoke(measure-commit): the host line lost its shape: $out" >&2; exit 1; }
+[[ "$(git status --porcelain)" == "$mc_before" ]] || { echo "smoke(measure-commit): the run moved the tree or the index" >&2; exit 1; }
+printf 'check-measure-pass\ncheck-measure-fail\n' > "$mq/gates.list"
+mc_rc=0; out="$(mc_run 2>&1)" || mc_rc=$?
+[[ "$mc_rc" -eq 1 ]] || { echo "smoke(measure-commit): a red member exited $mc_rc, not 1: $out" >&2; exit 1; }
+grep -q 'pre-commit: check-measure-fail failed' <<<"$out" || { echo "smoke(measure-commit): a red member lost the hook's failure report: $out" >&2; exit 1; }
+if grep -q '^measure-commit:' <<<"$out"; then echo "smoke(measure-commit): a red run printed a figure: $out" >&2; exit 1; fi
+mc_rc=0; out="$(mc_run extra 2>&1)" || mc_rc=$?
+[[ "$mc_rc" -eq 2 ]] || { echo "smoke(measure-commit): an operand exited $mc_rc, not 2" >&2; exit 1; }
+grep -q "unexpected operand 'extra'" <<<"$out" || { echo "smoke(measure-commit): the operand refusal did not name it: $out" >&2; exit 1; }
+rm -rf "$mq"
+
 # spec: gate-sdk/SPEC.md §port-blockers — the tokenizer rules, exercised behaviourally because the
 # arm owes no fixture pair and no in-crate test reaches the front-end path: a scan that truncates at
 # a here-string, or steals a case-pattern close inside a substitution, loses the trailing requirement

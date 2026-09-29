@@ -768,6 +768,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Run(git_hook::run),
         git_hook::KNOBS,
     ),
+    // spec: gate-sdk/SPEC.md §measure-commit — an `Arm::Run` because a member's red ends it at 1
+    // with no figure, and on the hook arm's knob roster because it is that arm's selection and dispatch
+    (
+        "--measure-commit",
+        Arm::Run(git_hook::measure),
+        git_hook::KNOBS,
+    ),
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — an `Arm::Run` because the exit contract
     // is three-state and every code is load-bearing: 0 a stamp or a reported no-op, 1 a refusal,
     // 2 a usage or configuration error, and the state machine reads that difference.

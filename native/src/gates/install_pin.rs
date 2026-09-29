@@ -1,6 +1,6 @@
 // spec: installer/SPEC.md §The hosted install pin — the two hosted install scripts carry one pin
 // each, the pins agree (A), the pin is the newest release (B), and every fetch surface spells only
-// the pinned release's asset names (C)
+// the pinned release's asset names (C), and the install page's commit-cost figure is the pin's (D)
 use super::release_assets::{declaration, DEFAULT_DOC};
 use super::release_channel_parity::newest_tag;
 use crate::{fresh, proc, programs};
@@ -122,6 +122,61 @@ fn normalize(run: &str) -> String {
     out
 }
 
+const COST_BEGIN: &str = "<!-- commit-cost:begin -->";
+const COST_END: &str = "<!-- commit-cost:end -->";
+const MEASURED_AT: &str = "measured at";
+
+// spec: installer/SPEC.md §The hosted install pin — invariant D's reading: exactly one commit-cost
+// block, holding exactly one `measured at v<X.Y.Z>` token, whose version is returned
+fn commit_cost_version(path: &str, text: &str) -> Result<String, String> {
+    let lines = fresh::file_lines(text);
+    let at = |marker: &str| -> Vec<usize> {
+        lines.iter().enumerate().filter(|(_, l)| l.trim() == marker).map(|(n, _)| n).collect()
+    };
+    let (begin, end) = match (at(COST_BEGIN).as_slice(), at(COST_END).as_slice()) {
+        ([b], [e]) if b < e => (*b, *e),
+        (b, e) => {
+            return Err(format!(
+                "{} carries {} '{}' and {} '{}' line(s); exactly one block, opened before it closes, is admissible (installer/SPEC.md §The hosted install pin, invariant D)",
+                path,
+                b.len(),
+                COST_BEGIN,
+                e.len(),
+                COST_END
+            ))
+        }
+    };
+    let block = lines[begin + 1..end].join("\n");
+    let tokens: Vec<&str> = block.match_indices(MEASURED_AT).map(|(i, _)| &block[i + MEASURED_AT.len()..]).collect();
+    let [rest] = tokens.as_slice() else {
+        return Err(format!(
+            "{}:{}: the commit-cost block carries {} '{}' token(s); exactly one is admissible (installer/SPEC.md §The hosted install pin, invariant D)",
+            path,
+            begin + 1,
+            tokens.len(),
+            MEASURED_AT
+        ));
+    };
+    let version: String = rest
+        .trim_start()
+        .trim_start_matches('`')
+        .strip_prefix('v')
+        .unwrap_or("")
+        .chars()
+        .take_while(|c| c.is_ascii_digit() || *c == '.')
+        .collect();
+    let version = version.trim_end_matches('.');
+    if !is_triple(version) {
+        return Err(format!(
+            "{}:{}: the commit-cost block's '{}' names no v<major>.<minor>.<patch>",
+            path,
+            begin + 1,
+            MEASURED_AT
+        ));
+    }
+    Ok(version.to_string())
+}
+
 // spec: installer/SPEC.md §The hosted install pin — invariant C's findings over the three fetch
 // surfaces: an undeclared token, a surface with none, and a matched non-sidecar template whose
 // `.sha256` sidecar the pinned declaration lacks
@@ -223,6 +278,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let md_text = fresh::read_captured(install_md)?;
     let sh_pin = pin_of(install_sh, &sh_text, "pin")?;
     let ps_pin = pin_of(install_ps1, &ps_text, "$pin")?;
+    let cost_version = commit_cost_version(install_md, &md_text)?;
 
     let mut findings: Vec<String> = Vec::new();
     if sh_pin != ps_pin {
@@ -270,6 +326,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
             Some((source, count))
         }
     };
+    let d_red = cost_version != sh_pin;
+    if d_red {
+        findings.push(format!(
+            "  invariant D: {}'s commit-cost block was measured at v{}, and the pin is {}",
+            install_md, cost_version, sh_pin
+        ));
+    }
 
     if !findings.is_empty() {
         println!("check-install-pin: a hosted install surface disagrees with what it is held to (installer/SPEC.md §The hosted install pin):");
@@ -281,6 +344,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
         if findings.iter().any(|f| f.contains("invariant C")) {
             println!("  help: spell the pinned release's asset names on every fetch surface, or, in the commit moving the pin, the new release's names.");
+        }
+        if d_red {
+            println!("  help: re-measure the pinned release with --measure-commit and rewrite the commit-cost block, in the commit moving the pin — RELEASING.md step 4.");
         }
         return Ok(1);
     }
@@ -295,7 +361,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
             count, sh_pin, source
         ),
     };
-    println!("INSTALL-PIN: clean (both scripts pin {}; {}; {})", sh_pin, b_note, c_note);
+    println!(
+        "INSTALL-PIN: clean (both scripts pin {}; {}; {}; the commit-cost figure measured at v{})",
+        sh_pin, b_note, c_note, cost_version
+    );
     Ok(0)
 }
 
@@ -329,6 +398,22 @@ mod tests {
         assert!(pin_of("s", "pin='1.2.3'\npin='1.2.4'\n", "pin").is_err());
         assert!(pin_of("s", "pin=\"1.2.3\"\n", "pin").is_err());
         assert!(pin_of("p", "$pin = 'v1.2.3'\n", "$pin").is_err());
+    }
+
+    // spec: installer/SPEC.md §The hosted install pin — invariant D's exit-2 set: a missing or
+    // duplicated block, and a block with no `measured at` token, two, or no triple after it
+    #[test]
+    fn a_missing_duplicated_or_malformed_commit_cost_block_fails_closed() {
+        let block = |body: &str| format!("x\n{}\n\n{}\n\n{}\n", COST_BEGIN, body, COST_END);
+        let one = block("in **9 ms**, the median of three, measured at v1.2.3.");
+        assert_eq!(commit_cost_version("m", &one), Ok("1.2.3".to_string()));
+        assert_eq!(commit_cost_version("m", &block("measured at `v1.2.3`")), Ok("1.2.3".to_string()));
+        assert!(commit_cost_version("m", "x\n").is_err());
+        assert!(commit_cost_version("m", &format!("{}{}", one, one)).is_err());
+        assert!(commit_cost_version("m", &format!("{}\n{}\n", COST_END, COST_BEGIN)).is_err());
+        assert!(commit_cost_version("m", &block("no token here")).is_err());
+        assert!(commit_cost_version("m", &block("measured at v1.2.3, measured at v1.2.4")).is_err());
+        assert!(commit_cost_version("m", &block("measured at v1.2")).is_err());
     }
 
     fn names(text: &str) -> Vec<String> {

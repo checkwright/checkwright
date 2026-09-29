@@ -145,13 +145,14 @@ fn hook_run(hook: &Hook) -> Result<(i32, String), String> {
         Hook::PreCommit => staged()?,
         Hook::CommitMsg(_) => Vec::new(),
     };
-    run_over(hook, &paths)
+    run_over(hook, &paths).map(|(code, out, _)| (code, out))
 }
 
-// spec: gate-sdk/SPEC.md §git-hook — an empty staged set exits 0 printing nothing, before the registry is read
-fn run_over(hook: &Hook, paths: &[String]) -> Result<(i32, String), String> {
+// spec: gate-sdk/SPEC.md §git-hook — an empty staged set exits 0 printing nothing, before the registry
+// is read; the third field is the selected member count `--measure-commit` reports
+fn run_over(hook: &Hook, paths: &[String]) -> Result<(i32, String, usize), String> {
     if matches!(hook, Hook::PreCommit) && paths.is_empty() {
-        return Ok((0, String::new()));
+        return Ok((0, String::new(), 0));
     }
     let env = pin()?;
     let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
@@ -182,7 +183,81 @@ fn run_over(hook: &Hook, paths: &[String]) -> Result<(i32, String), String> {
     let mut out = String::new();
     let code = report(hook.name(), &d, &selected, verbose, &mut out);
     let _ = std::fs::remove_dir_all(&scratch);
-    Ok((code, out))
+    Ok((code, out, selected.len()))
+}
+
+pub const MEASURE_USAGE: &str = "usage: --measure-commit (takes no operand; run it at the repository's top level)";
+
+// spec: gate-sdk/SPEC.md §measure-commit — the figure is the middle of the samples, ordered
+fn median(samples: &[u128]) -> u128 {
+    let mut s = samples.to_vec();
+    s.sort_unstable();
+    s.get(s.len() / 2).copied().unwrap_or(0)
+}
+
+fn tracked() -> Result<Vec<String>, String> {
+    let c = proc::run(&programs::GIT, &["ls-files", "-z"])?;
+    let out = c.stdout().ok_or_else(|| "git could not list the tracked paths".to_string())?;
+    Ok(String::from_utf8_lossy(out)
+        .split('\0')
+        .filter(|p| !p.is_empty())
+        .map(String::from)
+        .collect())
+}
+
+// spec: gate-sdk/SPEC.md §measure-commit — git runs a hook at the top level, where `ls-files`
+// paths are the ones the selection resolves
+fn measure_run() -> Result<(i32, String), String> {
+    walk::toplevel_opt()?.ok_or_else(|| "not inside a git repository".to_string())?;
+    let prefix = proc::run(&programs::GIT, &["rev-parse", "--show-prefix"])?;
+    let prefix = prefix.stdout().ok_or_else(|| "git could not name the working directory's prefix".to_string())?;
+    if !String::from_utf8_lossy(prefix).trim().is_empty() {
+        return Err("not at the repository's top level, where git runs the hook".to_string());
+    }
+    let paths = tracked()?;
+    let (mut samples, mut members) = (Vec::new(), 0);
+    for _ in 0..3 {
+        let t = std::time::Instant::now();
+        let (code, out, n) = run_over(&Hook::PreCommit, &paths)?;
+        if code != 0 {
+            return Ok((code, out));
+        }
+        samples.push(t.elapsed().as_millis());
+        members = n;
+    }
+    let cpus = std::thread::available_parallelism().map(|n| n.get().to_string()).unwrap_or_else(|_| "?".to_string());
+    Ok((
+        0,
+        format!(
+            "measure-commit: {}ms median of 3 ({}ms, {}ms, {}ms) — {} pre-commit member(s) over {} tracked path(s), every path selected\nhost: {} {}, {} logical CPU(s)\n",
+            median(&samples),
+            samples[0],
+            samples[1],
+            samples[2],
+            members,
+            paths.len(),
+            std::env::consts::OS,
+            std::env::consts::ARCH,
+            cpus
+        ),
+    ))
+}
+
+pub fn measure(args: &[String]) -> i32 {
+    if let Some(a) = args.first() {
+        eprintln!("measure-commit: unexpected operand '{}'\n{}", a, MEASURE_USAGE);
+        return 2;
+    }
+    match measure_run() {
+        Ok((code, out)) => {
+            print!("{}", out);
+            code
+        }
+        Err(e) => {
+            eprintln!("measure-commit: {} — nothing was measured", e);
+            2
+        }
+    }
 }
 
 pub fn run(args: &[String]) -> i32 {
@@ -228,7 +303,18 @@ mod tests {
 
     #[test]
     fn an_empty_staged_set_passes_printing_nothing() {
-        assert_eq!(run_over(&Hook::PreCommit, &[]), Ok((0, String::new())));
+        assert_eq!(run_over(&Hook::PreCommit, &[]), Ok((0, String::new(), 0)));
+    }
+
+    // spec: gate-sdk/SPEC.md §measure-commit — the median is the middle sample whatever the run
+    // order, and an operand is refused before anything is read
+    #[test]
+    fn the_figure_is_the_middle_sample_and_an_operand_is_refused() {
+        assert_eq!(median(&[30, 10, 20]), 20);
+        assert_eq!(median(&[5, 5, 9]), 5);
+        assert_eq!(median(&[7]), 7);
+        assert_eq!(median(&[]), 0);
+        assert_eq!(measure(&argv(&["x"])), 2);
     }
 
     #[test]

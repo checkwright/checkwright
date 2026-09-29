@@ -67,6 +67,18 @@ The install itself and the optional docs gates need these as well. `doctor` does
 
 A missing tool comes from your distribution's package on Linux or WSL, from Homebrew on macOS, or from Chocolatey on native Windows. To check your machine, run the gate binary with `--emit env-probe`: it writes an untracked `ENV.local.md` with each tool's version and verdict. Building Checkwright itself takes more: see the [contributing guide](https://github.com/checkwright/checkwright/blob/master/CONTRIBUTING.md).
 
+### What a commit costs
+
+The pre-commit hook runs the gates your profile registers whose triggers match the staged files. It runs them one after another and stops at the first red. The figure runs every gate whose triggers match a file over every tracked file, in a repository the one-line install has just initialized with `full`, the profile that contains every other. A gate that reads the staged set from git itself sees nothing staged, so the figure is a reference reading, not a ceiling.
+
+<!-- commit-cost:begin -->
+
+On `linux x86_64` with `14` logical CPUs, the hook ran `49` pre-commit gates over every tracked file in **2083 ms**, the median of three, measured at v0.30.0.
+
+<!-- commit-cost:end -->
+
+To measure your own repository, run the gate binary with `--measure-commit`. It stages nothing and times the same run over every tracked file. Two costs sit outside the figure. First, the hook starts through `sh`, whose start cost is unmeasured; on Windows that is the `sh` Git for Windows bundles, which runs emulated on Arm. Second, a gate you register yourself adds its own time.
+
 ### Writing your own shell gates
 
 A gate you write is a copy of gate-sdk's `templates/check-skeleton.sh`. It is a bash script that sources gate-sdk's library, so it needs the `bash` floor above on every system, whatever your profile. `doctor` does not check that, because the roster owes `bash` only through the kits you vendor. On native Windows that bash is Git for Windows' bash: a gate cannot be written in PowerShell today. `check-shellcheck` lints your gate if you register it, and then `shellcheck`'s row binds you.
