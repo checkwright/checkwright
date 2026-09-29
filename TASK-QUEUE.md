@@ -118,7 +118,7 @@ hosted attestation. The team/paid rung: gates verified server-side by a party th
 
 [roadmap: later/ecosystem] [cost: iteration/low] [surface: delegation-kit] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
 
-foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent, extending the homogeneous multi-agent model to a heterogeneous fleet. It cashes the public no-lock-in claim and is the purest expression of the thesis — governance enforced at the git/gate boundary, not by trusting the author. *Already agent-neutral:* the verification substrate (git, the gate battery, the bash stamp state machine) does not care who authored the diff, and the coordination primitive is the shared git-index/HEAD serialization. *Homogeneous today — the real work, worst-first:* (1) the **escalation resume model** collapses into (2) as a property of the chosen transport, per the 2026-07-25 amendment below; (2) **dispatch transport** — today the harness `Agent`/`SendMessage`/task-notification; a foreign agent needs a transport-neutral handoff. The adapter contract is "open / prompt / permission-request / resume" spoken over each vendor's structured **machine plane, never its TUI**: a screen-scrape relay is the adapter of last resort for a vendor shipping no machine interface at all — it yields rendered frames not turn events, answers dialogs by heuristic, and bets on the vendor's least-stable surface. (3) **budget oracle** — the verdict tool is Anthropic-OAuth-specific; a heterogeneous fleet has N vendor-keyed oracles, the same seam as the credential-swap entries, and the vendors' JSONL event streams carry the token-usage events a TUI path would scrape from a status bar. (4) **stage-contract expression** — the lifecycle machinery is neutral bash but the stage-skill prose is not.
+foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent. It cashes the public no-lock-in claim and is the purest expression of the thesis — governance enforced at the git/gate boundary, not by trusting the author. *Already agent-neutral:* the verification substrate (git, the gate battery, the bash stamp state machine) does not care who authored the diff, and the coordination primitive is the shared git-index/HEAD serialization. *Homogeneous today — the real work, worst-first:* (1) the **escalation resume model** collapses into (2) as a property of the chosen transport, per the 2026-07-25 amendment below; (2) **dispatch transport** — today the harness `Agent`/`SendMessage`/task-notification; a foreign agent needs a transport-neutral handoff. The adapter contract is "open / prompt / permission-request / resume" spoken over each vendor's structured **machine plane, never its TUI**: a screen-scrape relay is the adapter of last resort for a vendor shipping no machine interface at all — it yields rendered frames not turn events, answers dialogs by heuristic, and bets on the vendor's least-stable surface. (3) **budget oracle** — the verdict tool is Anthropic-OAuth-specific; a heterogeneous fleet has N vendor-keyed oracles, the same seam as the credential-swap entries, and the vendors' JSONL event streams carry the token-usage events a TUI path would scrape from a status bar. (4) **stage-contract expression** — the lifecycle machinery is neutral bash but the stage-skill prose is not.
 
 **Seam ruling (on record):** generic mechanism only — transport, budget oracle, and escalation channel become consumer-config seams; a kit literal naming a vendor crosses the provenance seam and is ruled out, the pattern the retired `prose-profile` ruled. It extends the per-batch model-tiering lever across vendors, and interacts with [hosted-attestation-service](#hosted-attestation-service), the harness plugin package's reach ([plugin-harness-reach](#plugin-harness-reach)), and the credential-swap entries.
 
@@ -126,9 +126,11 @@ foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a fore
 
 **Its citers** ([companion-toolkit-profile](#companion-toolkit-profile), the credential-swap entries) block on none of it.
 
+**Its scoping owes an attribution policy**, operator direction 2026-09-29, lead-relayed (not a ruling): each foreign harness's trailer adds a GitHub contributor per vendor. Candidates: each harness credits itself, or trailers off with the method stated once in the README (the lead's lean); a harness setting change waits on operator confirmation.
+
 **Design-memory amendment (2026-07-25):** the TUI relay buys no session resume or token efficiency — both live in the vendor's session store (stateless APIs, the same on-disk transcript replayed against the same server-side prompt cache), so interactive-vs-headless is rendering, not state. Headless warm-resume by session id and JSONL turn events ship on the vendors probed, which makes (1) plumbing.
 
-**Verification capability (2026-08-02):** those probes ran against **installed binaries** (the foreign CLIs are on the development machine), so the executor is verifiable, not inferred from vendor docs — a change to the unit's risk under oracle-first: the executor ships with a smoke that invokes them. The machine profile (context-kit/SPEC.md §bin/env-probe, local-only) owns which CLIs and how.
+**Verification capability (2026-08-02):** those probes ran against **installed binaries**, so the executor is verifiable, not inferred from vendor docs — a change to the unit's risk under oracle-first: the executor ships with a smoke that invokes them. The machine profile (context-kit/SPEC.md §bin/env-probe, local-only) owns which CLIs and how.
 
 **Cost while deferred:** the foregone lever is live — read-heavy audits and mechanical sweeps all bill against one vendor's budget while three subscriptions are held — and this design memory ages against fast-moving CLIs. Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question).
 
@@ -160,7 +162,7 @@ the interop rung's submission half. The build half landed at companion-catalog-e
 
 **Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **The four preconditions the operator set on 2026-09-27 landed at catalog-submission-preconditions:** `crate-tests-windows-flip`, since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; `catalog-landing-docs-polish`; and `spec-toolkits-guarantee`.
 
-**Four more prerequisites, operator direction 2026-09-29, lead-relayed (not a ruling):** `install-gate-selection`, `companion-spec-to-code-gates`, `speckit-extension-full-profile` and [adoption-prompt-templates](#adoption-prompt-templates). Ground: Spec Kit and OpenSpec are technical toolkits, so a companion offering only document gates reads as near-useless, and the launch needs an early-adopter wow.
+**Four more prerequisites, operator direction 2026-09-29, lead-relayed (not a ruling):** three landed at companion-technical-gates (`install-gate-selection`, `companion-spec-to-code-gates`, `speckit-extension-full-profile`), and [adoption-prompt-templates](#adoption-prompt-templates) remains. Ground: Spec Kit and OpenSpec are technical toolkits, so a companion offering only document gates reads as near-useless, and the launch needs an early-adopter wow.
 
 **Push need (2026-09-27, inside the budget):** the release tag push beside the closing push, since the submission needs the extension on a published tag; close's release policy decides the cut.
 
@@ -742,7 +744,7 @@ the install-observation record cannot tell an author's install from a non-author
 
 no shipped prompt template drives a coding agent through adoption. Operator direction, 2026-09-29, lead-relayed (not a ruling): a template set taking an agent through install, profile choice, knob configuration against the adopter's layout, and first-red triage, serving the operator's own two adoptions first, which are its first test, and adopters after.
 
-**Deliverable:** the template set, at a home scope rules: the installer's activation surface, or a kit template the harness plugin exposes as a command. The clean-container rehearsal [design-partner-preview](#design-partner-preview) runs can drive it unattended.
+**Deliverable:** the template set, authored once as a harness-neutral kit template and shipped twice, operator direction 2026-09-29, lead-relayed (not a ruling): as a plugin skill binding it, the pattern every `plugin/skills/*` stage skill uses, and as a plain prompt template any coding agent can be handed, since the adopter constraints assume no harness. `plugin/skills/install/SKILL.md` already covers install and profile choice; knob configuration and first-red triage are missing, as an extension of that skill or a sibling its `next:` step hands to, which scope rules. The clean-container rehearsal [design-partner-preview](#design-partner-preview) runs can drive it unattended.
 
 **Cost while deferred:** every adopter's agent configures the install by reading pages. A prerequisite of [companion-toolkit-profile](#companion-toolkit-profile). Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at its close: →fix fails because the set is a new governed surface, →forward because the direction is given. Re-verified: no `prompt` in docs/install.md or installer/README.md. Owner lookup: `prompt template`, `adoption prompt` in this file — none; owner installer/SPEC.md, or plugin/SPEC.md for a command home.
 
@@ -792,9 +794,69 @@ the stage-economics price table has no time axis: one row per model id (drift-ki
 
 an OpenSpec change delta that disagrees with its base spec passes the battery and OpenSpec's own validator, and is caught, if at all, only at archive. Measured on openspec 1.13.2 at companion-technical-gates' spec: `validate --strict` exits 0 on a MODIFIED or RENAMED delta naming an absent requirement and on an ADDED one naming an existing requirement, printing only an INFO line; `archive -y` refuses those three, but `--skip-specs` bypasses the refusal; a REMOVED delta naming an absent requirement passes validate silently and archive takes it as already removed.
 
-**Deliverable:** a scope ruling on whether a generic commit-time gate for heading-set delta agreement ships, its OpenSpec binding in the recipe. The question to weigh is the conflict with companion/SPEC.md §The two tiers, *Neither tier re-checks what a toolkit owns*: OpenSpec owns the check at archive, and this gate would re-check it earlier.
+**Deliverable:** a generic commit-time gate for heading-set delta agreement, its OpenSpec binding in the recipe, if it clears the value bar [toolkit-overlap-value-bar](#toolkit-overlap-value-bar) lands; it is that bar's first candidate, since OpenSpec owns the check at archive and this gate would re-check it earlier.
 
 **Cost while deferred:** an OpenSpec adopter's technical gates read nothing on a conventional task list, which names no paths, so the companion's code-facing reach there is `check-task-path-claim` alone. Filed 2026-09-29 at companion-technical-gates' spec on an operator direction lead-relayed (not a ruling). Owner lookup: `delta`, `archive`, `openspec` in this file — `companion-spec-to-code-gates`, DISTINCT (it ships the task gates and defers this one), and [toolkit-nav-hierarchy](#toolkit-nav-hierarchy), DISTINCT (nav labels); owner companion/SPEC.md.
+
+### front-door-flag-operand
+
+[cost: event/low] [surface: installer]
+
+`check-front-door-verbs` reads an advertised verb and each flag after it, never a flag's value, so a recipe or profile name the pinned release lacks after a flag it carries reds nothing and fires no release trigger (installer/SPEC.md §The front door's verbs, *Honest limits*).
+
+**Deliverable:** invariant B also reads the operand of `--recipe` and `--profile` against the pinned tag's recipes and `installer/profiles.list`, under the same pending admission.
+
+**Cost while deferred:** a new toolkit page can advertise a recipe the one-liner refuses until an unforced release. Filed 2026-09-29 to the gap inbox at companion-technical-gates' spec; promoted at its close: →fix fails because the assertion is new mechanism on a shipped gate, →forward because no ruling is owed. Re-verified: the honest-limit sentence names a flag's value. Owner lookup: `operand`, `flag's value` in this file — none; owner installer/SPEC.md §The front door's verbs.
+
+### toolkit-overlap-value-bar
+
+[cost: event/low] [surface: companion]
+
+companion/SPEC.md §The two tiers states the toolkit boundary absolutely: *Neither tier re-checks what a toolkit owns*. Operator direction 2026-09-29, lead-relayed (not a ruling): stay off a toolkit's ground by default, and overlap only where Checkwright proves significant value, the adopter then choosing toolkit-native tooling alone (the default) or Checkwright's check beside it.
+
+**Deliverable:** (1) the boundary restated with a checkable value bar: a measured defect the toolkit's own check misses where it matters (a later-only check, a bypass flag), recorded with the toolkit version it was measured on and pinned by a fixture, since a shadowing gate drifts with the toolkit's semantics; (2) the overlap additive, the toolkit's own check left enabled, and consumer-selectable with off the default (Policy-as-choice). [openspec-delta-base-agreement](#openspec-delta-base-agreement) is the first candidate held to it.
+
+**Cost while deferred:** the SPEC forbids an overlap the operator wants available, so a measured toolkit gap has no lawful gate. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead; promoted at its close: →fix fails because the bar is new mechanism, →forward because the direction is given. Re-verified: companion/SPEC.md line 33 carries the sentence. Owner lookup: `overlap`, `value bar` in this file — none; owner companion/SPEC.md §The two tiers.
+
+### toolkit-support-table
+
+[cost: event/low] [surface: companion]
+
+no page states which Checkwright checks each companion toolkit gets: docs/spec-toolkits.md carries prose sections and no table. Operator direction 2026-09-29, lead-relayed (not a ruling): a toolkit support table on the website.
+
+**Deliverable:** a generated table, never hand-kept (Derivation-first), its rows derived from what each companion recipe arms per tier (prose, full) under a freshness gate; each check marked toolkit-native, Checkwright or adopter-selectable, per [toolkit-overlap-value-bar](#toolkit-overlap-value-bar); its home docs/spec-toolkits.md.
+
+**Cost while deferred:** a reader weighing a toolkit cannot see what the companion adds without reading both recipes. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead; promoted at its close: →fix fails because the projection is new mechanism, →forward because the direction is given. Re-verified: docs/spec-toolkits.md has no table row. Owner lookup: `support table` in this file — none; [toolkit-nav-hierarchy](#toolkit-nav-hierarchy) is DISTINCT (nav labels on the same pages) and pairs well. Owner companion/SPEC.md, with docs/site-architecture.md §Generated projections for the roster row.
+
+### install-smoke-sh-matrix
+
+[cost: event/low] [surface: .github]
+
+`.github/workflows/gates.yml` spells three unix install-smoke legs as hand-copied jobs, `install-smoke-sh-macos`, `install-smoke-sh-macos-intel` and `install-smoke-sh-linux-arm64`, while every other derived job group is a matrix. The two macOS legs differ only in triple, one `uname -m` probe line and log strings; the arm64 leg is the same shape less the macOS remedy step. The roster step already emits `unix_legs`, read only by `crate-tests-unix`.
+
+**Deliverable:** one install-smoke-sh matrix over `unix_legs` less the baseline triple, the remedy step conditioned on the runner OS being macOS; `install-smoke-sh-linux` stays its own job for its baseline diff and foreign-host containers. **Inferred, not probed:** that nothing reds a declared triple with no smoke leg.
+
+**Cost while deferred:** triplicated YAML held in step by nobody, and a new unix triple needs a hand-written smoke job. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead on an operator question; promoted at its close: →fix fails because the rewrite needs a push to witness, →forward because no ruling is owed. Re-verified: the three job keys and the `unix_legs` output in gates.yml. Owner lookup: `install-smoke-sh`, `unix_legs` in this file — none; owner installer/SPEC.md §The consumer smoke.
+
+### per-commit-cost-figure
+
+[cost: event/low] [surface: docs]
+
+no public page states what the battery costs a commit, the adopter's "will this slow my commits" question. The one timing record, `.workflow/gate-timing-baseline.txt`, is the pre-port bash battery on one Linux host (2026-08-02). An operator question, lead-relayed, asked for a per-OS and per-arch table; CI job times measure runner hardware rather than OS or arch (the Intel macOS leg runs about twice the arm64 one on every step, run 36541257396), so the lead advised against it.
+
+**Deliverable:** an absolute per-commit cost, the pre-commit battery's wall-clock on a stated reference machine and profile, measured by a reproducible command and re-derived at release (Derivation-first); structural per-platform penalties go on the install page as limits.
+
+**Cost while deferred:** an adopter judges the cost from nothing. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead, at the operator's leave; promoted at its close: →fix fails because the measurement is new mechanism, →forward because no ruling is owed. Re-verified: no per-commit or wall-clock claim in docs/*.md, README.md or installer/README.md. Owner lookup: `wall-clock`, `per-commit` in this file — [native-executable-git-hooks](#native-executable-git-hooks), DISTINCT (its deliverable 3 is one component of this figure), and the icebox's validate-suite-wall-clock-unowned, DISTINCT (validate's suites, not a commit); owner docs/install.md, with drift-kit/SPEC.md for the measurement.
+
+### releases-page-table
+
+[cost: event/low] [surface: docs]
+
+docs/releases.md renders its derived note list as a bare list of version links, which repeats the nav: the page carries `nav_children_key: release`, so the nav already lists every note. Operator question, 2026-09-29, lead-relayed: a stats table instead.
+
+**Deliverable:** a derived table whose columns answer an upgrader, above all whether a release needs action on upgrade (it carries Tightened gates or Renamed knobs entries); also version, date, bump class and per-section counts. The note composer writes the counts and the action flag as front-matter keys and a gate holds them equal to the note's sections; parsing sections in Liquid at render time is refused as fragile.
+
+**Cost while deferred:** a reader skipping several versions opens each note to learn which need action. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead, at the operator's leave; promoted at its close: →fix fails because the keys are new grammar on the notes, →forward because no ruling is owed. Re-verified: the page's `<ul>` loop and 29 notes carrying `release:`. Owner lookup: `releases.md`, `front-matter` in this file — none; owner docs/site-architecture.md, with installer/SPEC.md §The upgrade contract for the keys.
 
 ## Icebox
 
