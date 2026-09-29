@@ -1,1 +1,2 @@
 alias 'alt.example'
+other than the tree/CNAME host:

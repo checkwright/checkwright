@@ -1,5 +1,5 @@
-// spec: site-kit/SPEC.md §check-docs-cname-parity — the docs/CNAME host is the single gated
-// source of truth for the docs host; no tracked file names a configured host alias other than
+// spec: site-kit/SPEC.md §check-docs-cname-parity — the host in the CNAME file SITE_KIT_CNAME
+// names is the single gated source of truth for the docs host; no tracked file names a configured host alias other than
 // that host in a URL
 use crate::fresh;
 use crate::{proc, programs};
@@ -156,11 +156,17 @@ fn inner(args: &[String]) -> Result<i32, String> {
     }
 
     if !bad.is_empty() {
-        println!("check-docs-cname-parity: tracked file(s) cite a configured host alias other than the docs/CNAME host:");
+        println!(
+            "check-docs-cname-parity: tracked file(s) cite a configured host alias other than the {} host:",
+            cname
+        );
         for b in &bad {
             println!("  {}", b);
         }
-        println!("  help: point the URL at the docs/CNAME host '{}' (a rename is a one-file edit to the CNAME", host);
+        println!(
+            "  help: point the URL at the {} host '{}' (a rename is a one-file edit to the CNAME",
+            cname, host
+        );
         println!("        that this gate then enumerates); SITE_KIT_EXEMPT_PATHS sites are exempt.");
         return Ok(1);
     }

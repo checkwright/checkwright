@@ -1,0 +1,3 @@
+SITE_KIT_LIQUID_TEMPLATES[] = docs/_templates/*
+SITE_KIT_LIQUID_TEMPLATES[] = docs/_includes/*
+SITE_KIT_LIQUID_TEMPLATES[] = docs/_posts/*

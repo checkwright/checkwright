@@ -2166,6 +2166,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[
             "SITE_KIT_DOCS_DIR",
             "SITE_KIT_LIQUID_PARSER",
+            "SITE_KIT_LIQUID_TEMPLATES",
             "GATE_SDK_PRUNE_DIRS",
             "GATE_SDK_PRUNE_EXTRA_DIRS",
         ],

@@ -3,13 +3,11 @@ use super::docs_render_fidelity::{jekyll_internal, nul_records, spawn_filter};
 use crate::fresh;
 use crate::walk;
 use crate::{proc, programs};
+use std::collections::HashSet;
 use std::io::Read;
 use std::path::Path;
 
 const NAME: &str = "check-docs-liquid-parse";
-
-// spec: site-kit/SPEC.md §check-docs-liquid-parse — the three Jekyll directories whose files are Liquid templates or pages
-const TEMPLATE_DIRS: &[&str] = &["_layouts", "_includes", "_posts"];
 
 const CLIP: usize = 200;
 
@@ -67,15 +65,17 @@ fn inner(_args: &[String]) -> Result<i32, String> {
         }
     };
 
+    let pathspecs = walk::knob_array("SITE_KIT_LIQUID_TEMPLATES").map_err(|e| format!("{}: {}", NAME, e))?;
+    let templates = selected(&pathspecs)?;
+
     let prune = walk::prune_dirs().map_err(|e| format!("{}: {}", NAME, e))?;
     let mut corpus: Vec<(String, Class)> = Vec::new();
     for p in listing.lines() {
         if p.is_empty() || walk::path_pruned(p, &prune) || !Path::new(p).is_file() {
             continue;
         }
-        let rel = walk::rel_under(&docs, p).unwrap_or(p);
         let fenced = || first_line_is_fence(p);
-        if let Some(class) = classify(rel, fenced) {
+        if let Some(class) = classify(p, &docs, &templates, fenced) {
             corpus.push((p.to_string(), class));
         }
     }
@@ -143,13 +143,26 @@ fn probe_refusal(probed: &Result<Vec<Vec<u8>>, String>) -> Option<String> {
     }
 }
 
-// spec: site-kit/SPEC.md §check-docs-liquid-parse — the corpus's three classes, read on the path relative to the docs dir
-fn classify(rel: &str, fenced: impl FnOnce() -> bool) -> Option<Class> {
-    let mut segs = rel.split('/');
-    let top = segs.next().unwrap_or("");
-    if segs.next().is_some() && TEMPLATE_DIRS.contains(&top) {
+// spec: site-kit/SPEC.md §check-docs-liquid-parse — the tracked files SITE_KIT_LIQUID_TEMPLATES selects, as git resolves a pathspec, and none when the knob is empty
+fn selected(pathspecs: &[String]) -> Result<HashSet<String>, String> {
+    if pathspecs.is_empty() {
+        return Ok(HashSet::new());
+    }
+    let mut argv: Vec<&str> = vec!["ls-files", "--"];
+    argv.extend(pathspecs.iter().map(String::as_str));
+    let ls = proc::run(&programs::GIT, &argv).map_err(|e| format!("{}: {}", NAME, e))?;
+    match ls.stdout() {
+        Some(o) => Ok(String::from_utf8_lossy(o).lines().filter(|l| !l.is_empty()).map(str::to_string).collect()),
+        None => Err(format!("DOCS-LIQUID-PARSE: {}", fresh::fail_closed("git-ls-files", ls.code()))),
+    }
+}
+
+// spec: site-kit/SPEC.md §check-docs-liquid-parse — a template is matched on the repository-relative path the pathspecs are written against, every other class on the path relative to the docs dir
+fn classify(path: &str, docs: &str, templates: &HashSet<String>, fenced: impl FnOnce() -> bool) -> Option<Class> {
+    if templates.contains(path) {
         return Some(Class::Template);
     }
+    let rel = walk::rel_under(docs, path).unwrap_or(path);
     if jekyll_internal(rel) {
         return None;
     }
@@ -203,19 +216,34 @@ fn clip(verdict: &str) -> String {
 mod tests {
     use super::*;
 
+    fn set(paths: &[&str]) -> HashSet<String> {
+        paths.iter().map(|p| p.to_string()).collect()
+    }
+
     #[test]
     fn the_corpus_holds_three_classes_and_nothing_else() {
-        assert_eq!(classify("install.md", || false), Some(Class::Page));
-        assert_eq!(classify("kit/SPEC.md", || false), Some(Class::Page));
-        assert_eq!(classify("search.json", || true), Some(Class::FrontMatter));
-        assert_eq!(classify("raw.html", || false), None);
-        assert_eq!(classify("_layouts/default.html", || false), Some(Class::Template));
-        assert_eq!(classify("_includes/nav.html", || false), Some(Class::Template));
-        assert_eq!(classify("_posts/2026-01-01-a.md", || false), Some(Class::Template));
-        assert_eq!(classify("_data/x.md", || true), None);
-        assert_eq!(classify("_draft.md", || true), None);
-        assert_eq!(classify("a/_layouts/x.html", || true), None);
-        assert_eq!(classify("_layouts", || true), None);
+        let default = set(&["docs/_layouts/default.html", "docs/_includes/nav.html", "docs/_posts/2026-01-01-a.md"]);
+        let c = |p: &str, fenced: bool| classify(p, "docs", &default, || fenced);
+        assert_eq!(c("docs/install.md", false), Some(Class::Page));
+        assert_eq!(c("docs/kit/SPEC.md", false), Some(Class::Page));
+        assert_eq!(c("docs/search.json", true), Some(Class::FrontMatter));
+        assert_eq!(c("docs/raw.html", false), None);
+        assert_eq!(c("docs/_layouts/default.html", false), Some(Class::Template));
+        assert_eq!(c("docs/_includes/nav.html", false), Some(Class::Template));
+        assert_eq!(c("docs/_posts/2026-01-01-a.md", false), Some(Class::Template));
+        assert_eq!(c("docs/_data/x.md", true), None);
+        assert_eq!(c("docs/_draft.md", true), None);
+        assert_eq!(c("docs/a/_layouts/x.html", true), None);
+    }
+
+    #[test]
+    fn a_renamed_template_set_reads_its_own_files_and_excludes_the_unnamed_directory() {
+        let renamed = set(&["site/_templates/default.html"]);
+        let c = |p: &str| classify(p, "site", &renamed, || true);
+        assert_eq!(c("site/_templates/default.html"), Some(Class::Template));
+        assert_eq!(c("site/_layouts/default.html"), None);
+        assert_eq!(c("site/_templates/other.html"), None);
+        assert_eq!(c("site/page.md"), Some(Class::Page));
     }
 
     #[test]
