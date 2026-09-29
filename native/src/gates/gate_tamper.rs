@@ -252,6 +252,12 @@ fn rule(args: &[String]) -> Result<i32, String> {
             meta.push(dir);
         }
     }
+    // spec: delegation-kit/SPEC.md §Verify after every agent commit — the install manifest joins at
+    // the toplevel, since every update and profile move co-stages it with the gate files it rewrites
+    let manifest = crate::installer::lock::FILE.to_string();
+    if !meta.contains(&manifest) {
+        meta.push(manifest);
+    }
 
     let mut fixture: Option<String> = None;
     let mut i = 0usize;

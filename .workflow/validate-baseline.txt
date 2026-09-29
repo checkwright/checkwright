@@ -107,6 +107,7 @@ installer_smoke bash-less-arm pass
 installer_smoke upgrade-arm pass
 installer_smoke cross-version-reversal-arm pass
 installer_smoke newer-verb-reversal-arm pass
+installer_smoke hooked-move-arm pass
 installer_smoke seam-arm pass
 installer_smoke narrowing-arm pass
 installer_smoke selection-arm pass

@@ -1,5 +1,7 @@
 # a legitimate gate-only commit: gate file + meta-layer paths only,
-# plus a newly added path exemption that matches nothing co-staged
+# plus a newly added path exemption that matches nothing co-staged;
+# the toplevel install manifest rides it as an update's commit does
 scripts/check-foo.sh
 scripts/SPEC.md
 TASK-QUEUE.md
+checkwright.lock

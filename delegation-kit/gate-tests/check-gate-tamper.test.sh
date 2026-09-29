@@ -121,9 +121,23 @@ case_run "$d" a-registered-gate-outside-every-glob 1 "gate edit not isolated"
 d="$(registered_outside_globs registered-alone)"
 case_run "$d" a-registered-gate-outside-every-glob-staged-alone 0 "registered gate file(s) covered"
 
+# H — the install manifest at the toplevel is meta-layer, so an update's commit co-staging it with a
+#     rewritten gate file is isolated; a file of that name anywhere below the toplevel is not.
+d="$(new_repo manifest-beside-gate)"
+printf '# edited\n' >>"$d/scripts/check-sample.sh"
+printf '{}\n' >"$d/checkwright.lock"
+git -C "$d" add scripts/check-sample.sh checkwright.lock
+case_run "$d" the-install-manifest-beside-a-gate-edit 0 "GATE-TAMPER: clean"
+
+d="$(new_repo nested-manifest-beside-gate)"
+printf '# edited\n' >>"$d/scripts/check-sample.sh"
+printf '{}\n' >"$d/product/checkwright.lock"
+git -C "$d" add scripts/check-sample.sh product/checkwright.lock
+case_run "$d" a-nested-manifest-namesake-beside-a-gate-edit 1 "  product/checkwright.lock"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-gate-tamper.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-gate-tamper.test: ok (live arm: HEAD-resident exemptions excluded, a newly added one excusing a co-staged file rejected, an unmatched one silent, a gate-file deletion read as empty, a registered gate outside every glob covered)"
+echo "check-gate-tamper.test: ok (live arm: HEAD-resident exemptions excluded, a newly added one excusing a co-staged file rejected, an unmatched one silent, a gate-file deletion read as empty, a registered gate outside every glob covered, the toplevel install manifest meta-layer and a nested namesake not)"
 exit 0
