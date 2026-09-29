@@ -20,3 +20,10 @@
 - rev: ed9968eb9528b23fc6165ce231e6d361cb658192
 - finding: Quoted sources hold; EreCapture lacks a from-offset capture (fixed in the amendment as capture_from); rosters gained companion Recipes and Fixtures, ere.rs, release-declaration rows; two wording fixes
 - inferred: none
+
+## 2026-09-29 build — Which facts do other tracked surfaces cite into installer/SPEC.md's install-surface sections (§The verbs, §init, §What init seeds, §Payload recipes, §Profiles, §The manifest)?
+- corpus: installer native/src gate-sdk/SPEC.md companion/SPEC.md plugin/SPEC.md queue-kit/SPEC.md context-kit/SPEC.md docs/site-architecture.md
+- oracle: git grep -nE '(§|SPEC\.md ?§? ?)(The verbs|init|What init seeds|Payload recipes|Profiles|The manifest)|#(the-verbs|init|what-init-seeds|payload-recipes|profiles|the-manifest)' -- . ':!docs/installer' ':!docs/posts'
+- rev: 8ba692ff267507e9b3f024753b0b9ac6eae82bc2
+- finding: Per-section keep-lists recorded in the installer-install-brevity commit; every cited fact survives the pass. Dangling: §The verbs lacked the -h/--help-answers-on-its-own rule and the refusal-prefix idiom (7 crate sites, main.rs, §demo cite it), now stated there; native/src/installer/recipe.rs cited §Profiles for the profile-keyed roster, which §What init seeds states, now repointed. update's verbatim forwarding stays in §update.
+- inferred: Rust spec: comments were read to their first ~250 characters, so a keep fact built from a comment head alone is inferred.

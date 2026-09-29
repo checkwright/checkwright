@@ -28,7 +28,7 @@ an adopter cannot choose which kits or gates to install, or which to replace wit
 
 **Deliverable:** an install-time selection surface, include or exclude per kit and per gate, recorded in `checkwright.lock` so re-runs and `update` honour it, and the replace-with-your-own path documented.
 
-**Push need (2026-09-29, inside the budget):** the same mid-iteration batch push, since the new `init` flags run on the pwsh Windows smoke legs; lands after [front-door-flag-grammar](#front-door-flag-grammar), so its flags meet the flag table, and before [installer-install-brevity](#installer-install-brevity).
+**Push need (2026-09-29, inside the budget):** the same mid-iteration batch push, since the new `init` flags run on the pwsh Windows smoke legs; lands after [front-door-flag-grammar](#front-door-flag-grammar), so its flags meet the flag table, and before `installer-install-brevity`.
 
 **Cost while deferred:** each adopter install takes a fixed roster and hand-edits it to choose. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead as `iteration/high`, re-classed `event/high` at promotion since its prose pays at an adopter's install; promoted 2026-09-28 at the next iteration's scope: →fix fails because the surface is new mechanism. Owner lookup: `selection`, `--profile` in this file — [verify-workflow-decoupling](#verify-workflow-decoupling), [gate-customer-value-audit](#gate-customer-value-audit), [custom-gate-substrates](#custom-gate-substrates) and [gate-authoring-sdk-surface](#gate-authoring-sdk-surface), each DISTINCT. Owner installer/SPEC.md §init, §Profiles and §The manifest.
 
@@ -57,14 +57,6 @@ the Spec Kit extension installs only the document gates. companion/SPEC.md's `sp
 **Cost while deferred:** a Spec Kit user meets document gates only. A prerequisite of [companion-toolkit-profile](#companion-toolkit-profile), operator direction 2026-09-29, lead-relayed (not a ruling). Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead as part of that direction; filed as its own entry at its close: →fix fails because the extension's command changes shape, →forward because the direction is given. Re-verified: companion/SPEC.md's install command above. Owner lookup: `Spec Kit extension`, `full profile` in this file — [companion-spec-to-code-gates](#companion-spec-to-code-gates), DISTINCT (new gates, not the extension's reach); owner companion/SPEC.md.
 
 ## Technical Debt
-
-### installer-install-brevity
-
-installer/SPEC.md's install-surface sections under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §The verbs, §init, §What init seeds, §Payload recipes, §Profiles and §The manifest, about 59k characters, the sections an adopter choosing an install reads.
-
-**Deliverable:** the three moves over those six sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every `##` heading kept verbatim and every fact another surface cites into them kept, per a citation survey; applied after [install-gate-selection](#install-gate-selection)'s amendment merges, since that amendment rewrites §init, §Profiles and §The manifest and a pass before it would be bought twice.
-
-**Cost while deferred:** paid by every session and adopter that reads the install surface unpassed. Filed 2026-09-29 as a split at companion-technical-gates' scope from [spec-brevity-residue](#spec-brevity-residue), on an operator direction lead-relayed (not a /consult ruling), riding the installer surface the iteration's selection unit carries.
 
 ## Deferred
 
@@ -408,7 +400,7 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 [cost: session/high] [surface: installer]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; lifecycle-kit is finished (`lifecycle-template-brevity` and the three slices below); what remains starts at installer (48.5k, the smoke excepted; its contract sections landed as `installer-contract-brevity`), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; lifecycle-kit is finished (`lifecycle-template-brevity` and the three slices below); what remains starts at installer (48.5k, the smoke excepted; its contract sections landed as `installer-contract-brevity` and its install-surface sections as `installer-install-brevity`), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
@@ -422,7 +414,7 @@ lifecycle-kit's state-machine tool sections left 2026-09-28 at lifecycle-machine
 
 lifecycle-kit's remaining sections left 2026-09-29 at native-hook-customer-legs' scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `lifecycle-kit-tail-brevity`, which finishes lifecycle-kit.
 
-installer's install-surface sections (§The verbs through §The manifest) left 2026-09-29 at companion-technical-gates' scope, on an operator direction lead-relayed (not a /consult ruling), as [installer-install-brevity](#installer-install-brevity).
+installer's install-surface sections (§The verbs through §The manifest) left 2026-09-29 at companion-technical-gates' scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `installer-install-brevity`.
 
 ### prune-set-matches-walk-root-ancestors
 
@@ -1523,5 +1515,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 ## Done
 
 - consumer-smoke-windows-residue
+- installer-install-brevity
 
 ## Lessons Learned
