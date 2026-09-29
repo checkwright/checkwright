@@ -8,30 +8,6 @@
 
 ## New Features
 
-### companion-spec-to-code-gates
-
-[spec: SPEC-spec-to-code.md]
-
-the companion checks documents and never code against a spec. Split 2026-09-28 at companion-front-door-widening's scope from `companion-gate-widening`, on an operator direction lead-relayed (not a /consult ruling): the widening's profile half is taken, this half is new mechanism over formats nobody has probed.
-
-**Deliverable:** the spec-to-code gates the toolkits' formats make possible, each deferring to the toolkit where it owns the check, with a fixture pair in each toolkit's layout.
-
-**Probed at spec (2026-09-29):** a ticked task naming an absent path and a task's story label naming an undefined story are checkable; OpenSpec's archive owns delta-to-base agreement, and `plan.md`'s tree is future state.
-
-**Push need (2026-09-29, inside the budget):** the iteration's one mid-iteration batch push, since the new native gates run on the Windows and macOS legs no local run reaches; lands before [speckit-extension-full-profile](#speckit-extension-full-profile), whose two tiers both carry them.
-
-**Cost while deferred:** an adopter's spec and code drift apart with no red, which is the check the operator's "ship all gates checkwright offers" asks the companion to reach. Filed 2026-09-28 as a split, the parent's gap-inbox provenance carried. Owner lookup: `spec-to-code` in this file — the parent alone; owner companion/SPEC.md.
-
-### speckit-extension-full-profile
-
-[spec: SPEC-extension-full.md]
-
-the Spec Kit extension installs only the document gates. companion/SPEC.md's `speckit.checkwright.install` runs `init --profile prose --recipe speckit`, and §The tested claim is proved on prose, so the `full` tier the recipes carry is out of the extension's reach.
-
-**Deliverable:** the extension offering the technical gates (the `full` profile, or a choice between the two), proved by the consumer smoke's companion arm.
-
-**Cost while deferred:** a Spec Kit user meets document gates only. A prerequisite of [companion-toolkit-profile](#companion-toolkit-profile), operator direction 2026-09-29, lead-relayed (not a ruling). Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead as part of that direction; filed as its own entry at its close: →fix fails because the extension's command changes shape, →forward because the direction is given. Re-verified: companion/SPEC.md's install command above. Owner lookup: `Spec Kit extension`, `full profile` in this file — [companion-spec-to-code-gates](#companion-spec-to-code-gates), DISTINCT (new gates, not the extension's reach); owner companion/SPEC.md.
-
 ## Technical Debt
 
 ## Deferred
@@ -184,7 +160,7 @@ the interop rung's submission half. The build half landed at companion-catalog-e
 
 **Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **The four preconditions the operator set on 2026-09-27 landed at catalog-submission-preconditions:** `crate-tests-windows-flip`, since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; `catalog-landing-docs-polish`; and `spec-toolkits-guarantee`.
 
-**Four more prerequisites, operator direction 2026-09-29, lead-relayed (not a ruling):** `install-gate-selection`, [companion-spec-to-code-gates](#companion-spec-to-code-gates), [speckit-extension-full-profile](#speckit-extension-full-profile) and [adoption-prompt-templates](#adoption-prompt-templates). Ground: Spec Kit and OpenSpec are technical toolkits, so a companion offering only document gates reads as near-useless, and the launch needs an early-adopter wow.
+**Four more prerequisites, operator direction 2026-09-29, lead-relayed (not a ruling):** `install-gate-selection`, `companion-spec-to-code-gates`, `speckit-extension-full-profile` and [adoption-prompt-templates](#adoption-prompt-templates). Ground: Spec Kit and OpenSpec are technical toolkits, so a companion offering only document gates reads as near-useless, and the launch needs an early-adopter wow.
 
 **Push need (2026-09-27, inside the budget):** the release tag push beside the closing push, since the submission needs the extension on a published tag; close's release policy decides the cut.
 
@@ -818,7 +794,7 @@ an OpenSpec change delta that disagrees with its base spec passes the battery an
 
 **Deliverable:** a scope ruling on whether a generic commit-time gate for heading-set delta agreement ships, its OpenSpec binding in the recipe. The question to weigh is the conflict with companion/SPEC.md §The two tiers, *Neither tier re-checks what a toolkit owns*: OpenSpec owns the check at archive, and this gate would re-check it earlier.
 
-**Cost while deferred:** an OpenSpec adopter's technical gates read nothing on a conventional task list, which names no paths, so the companion's code-facing reach there is `check-task-path-claim` alone. Filed 2026-09-29 at companion-technical-gates' spec on an operator direction lead-relayed (not a ruling). Owner lookup: `delta`, `archive`, `openspec` in this file — [companion-spec-to-code-gates](#companion-spec-to-code-gates), DISTINCT (it ships the task gates and defers this one), and [toolkit-nav-hierarchy](#toolkit-nav-hierarchy), DISTINCT (nav labels); owner companion/SPEC.md.
+**Cost while deferred:** an OpenSpec adopter's technical gates read nothing on a conventional task list, which names no paths, so the companion's code-facing reach there is `check-task-path-claim` alone. Filed 2026-09-29 at companion-technical-gates' spec on an operator direction lead-relayed (not a ruling). Owner lookup: `delta`, `archive`, `openspec` in this file — `companion-spec-to-code-gates`, DISTINCT (it ships the task gates and defers this one), and [toolkit-nav-hierarchy](#toolkit-nav-hierarchy), DISTINCT (nav labels); owner companion/SPEC.md.
 
 ## Icebox
 
@@ -1494,5 +1470,7 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 - installer-install-brevity
 - front-door-flag-grammar
 - install-gate-selection
+- companion-spec-to-code-gates
+- speckit-extension-full-profile
 
 ## Lessons Learned
