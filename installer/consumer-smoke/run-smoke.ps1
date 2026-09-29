@@ -4,11 +4,10 @@
 param(
     [Parameter(Mandatory)] [string] $Package,
     [Parameter(Mandatory)] [string] $Scratch,
-    [Parameter(Mandatory)] [string] $Artifacts,
-    [Parameter(Mandatory)] [string] $Roster,
     [Parameter(Mandatory)] [string] $Version,
     [Parameter(Mandatory)] [string] $Target,
-    [Parameter(Mandatory)] [string] $TreeBinary
+    [Parameter(Mandatory)] [string] $UpgradePackage,
+    [Parameter(Mandatory)] [string] $UpgradeVersion
 )
 
 Set-StrictMode -Version Latest
@@ -21,7 +20,6 @@ if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) { $PSNativeComma
 $GatesDir = 'scripts'
 $ProfileDerived = 'full'
 
-$Repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $Base = Join-Path $Scratch 'ps1-smoke'
 if (Test-Path -LiteralPath $Base) { Remove-Item -Recurse -Force -LiteralPath $Base }
 New-Item -ItemType Directory -Force -Path $Base | Out-Null
@@ -212,31 +210,11 @@ foreach ($p in $profiles) {
     }
 }
 
-# spec: installer/SPEC.md §The consumer smoke — the upgrade arm: the tree packed at the next patch version, and update run from that tarball
-$core = ($Version -split '[-+]')[0] -split '\.'
-if ($core.Count -ne 3) { Fail "the packed version $Version is not <major>.<minor>.<patch>" }
-$next = '{0}.{1}.{2}' -f [int]$core[0], [int]$core[1], ([int]$core[2] + 1)
+# spec: installer/SPEC.md §The consumer smoke — the upgrade arm: update run from the tree packed at the next patch version, which the leg's pack step extracts
+$next = $UpgradeVersion
+$upPackage = $UpgradePackage
 Write-Host "upgrade arm ($minimum): $Version -> $next through update"
-$up = Join-Path $Base 'upgrade-pack'
-New-Item -ItemType Directory -Force -Path $up | Out-Null
-$gitRoot = Split-Path (Split-Path (Split-Path (& git --exec-path)))
-$env:PATH = (Join-Path $gitRoot 'usr\bin') + ';' + $sessionPath
-$env:GATE_SDK_NATIVE_TARGETS_FILE = $Roster
-$env:INSTALLER_PACK_TMP_DIR = $Scratch
-try {
-    $pk = Invoke-Captured $TreeBinary @('--pack-installer', '--root', $Repo, '--version', $next, '--out', $up, '--artifacts', $Artifacts) $Repo
-} finally {
-    $env:PATH = $sessionPath
-    Remove-Item Env:GATE_SDK_NATIVE_TARGETS_FILE, Env:INSTALLER_PACK_TMP_DIR -ErrorAction SilentlyContinue
-}
-if ($pk.Code -ne 0) { Write-Host $pk.Out; Fail "the upgrade pack at $next exited $($pk.Code)" }
-$tarballs = @(Get-ChildItem -LiteralPath $up -Filter '*.tgz' -File)
-if ($tarballs.Count -ne 1) { Fail "expected one upgrade tarball, found $($tarballs.Count)" }
-# spec: installer/SPEC.md §The consumer smoke — the system directory's tar, which reads a drive-letter path as a path
-$tar = Join-Path ([Environment]::SystemDirectory) 'tar.exe'
-& $tar -xzf $tarballs[0].FullName -C $up
-if ($LASTEXITCODE -ne 0) { Fail "tar could not extract the upgrade tarball" }
-$upPackage = Join-Path $up 'package'
+if (-not (Test-Path -LiteralPath (Join-Path $upPackage 'bin/checkwright.ps1'))) { Fail "the upgrade package at $upPackage carries no bin/checkwright.ps1" }
 
 $c = New-Consumer 'upgrade'
 $r = Invoke-Bootstrap $Package $c @('init', '--profile', $minimum)

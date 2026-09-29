@@ -867,6 +867,15 @@ jobs:
           [[ ${#tarballs[@]} -eq 1 ]] || { echo "expected one tarball, found ${#tarballs[@]}"; exit 2; }
           mkdir -p "$tmp/pkg"
           tar -xzf "${tarballs[0]}" -C "$tmp/pkg" || exit 2
+          # spec: installer/SPEC.md §The consumer smoke — the upgrade arm's second tarball, the next patch version
+          next="$(awk -F. '{ printf "%d.%d.%d", $1, $2, $3 + 1 }' <<<"${version%%[-+]*}")"
+          mkdir -p "$tmp/upgrade"
+          GATE_SDK_NATIVE_TARGETS_FILE="$roster" INSTALLER_PACK_TMP_DIR="$tmp" \
+            bash gate-sdk/bin/run-gates.sh --pack-installer --root "$PWD" --version "$next" \
+              --out "$tmp/upgrade" --artifacts "$art" || exit 2
+          up=("$tmp"/upgrade/*.tgz)
+          [[ ${#up[@]} -eq 1 && -f "${up[0]}" ]] || { echo "expected one upgrade tarball in $tmp/upgrade"; exit 2; }
+          tar -xzf "${up[0]}" -C "$tmp/upgrade" || exit 2
           {
             echo "PWSH_PKG=$(cygpath -w "$tmp/pkg/package")"
             echo "PWSH_SCRATCH=$(cygpath -w "$tmp")"
@@ -874,9 +883,8 @@ jobs:
             echo "PWSH_BIN=$bin"
             echo "PWSH_TARBALL=$(cygpath -w "${tarballs[0]}")"
             echo "PWSH_VERSION=$version"
-            echo "PWSH_ARTIFACTS=$(cygpath -w "$art")"
-            echo "PWSH_ROSTER=$(cygpath -w "$roster")"
-            echo "PWSH_TREE_BIN=$(cygpath -w "$PWD/$dest")"
+            echo "PWSH_UPGRADE_PKG=$(cygpath -w "$tmp/upgrade/package")"
+            echo "PWSH_UPGRADE_VERSION=$next"
           } >> "$GITHUB_ENV"
 
       # spec: installer/SPEC.md §The install boundary — each step asserted on the observable that distinguishes it
@@ -1395,9 +1403,8 @@ jobs:
         shell: pwsh
         run: |
           $smoke = @{
-              Package = $env:PWSH_PKG; Scratch = $env:PWSH_SCRATCH; Artifacts = $env:PWSH_ARTIFACTS
-              Roster = $env:PWSH_ROSTER; Version = $env:PWSH_VERSION; Target = $env:PWSH_TARGET
-              TreeBinary = $env:PWSH_TREE_BIN
+              Package = $env:PWSH_PKG; Scratch = $env:PWSH_SCRATCH; Version = $env:PWSH_VERSION
+              Target = $env:PWSH_TARGET; UpgradePackage = $env:PWSH_UPGRADE_PKG; UpgradeVersion = $env:PWSH_UPGRADE_VERSION
           }
           ./installer/consumer-smoke/run-smoke.ps1 @smoke
 

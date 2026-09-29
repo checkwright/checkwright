@@ -56,7 +56,7 @@ The install itself and the optional docs gates need these as well. `doctor` does
 | `sha256sum` or `shasum` | any | required to install on Linux and macOS | the release tarball and the gate binary are checked against their published digests |
 | Windows PowerShell | 5.1 | required to install on Windows | the one-line install, the install block and the bootstrap run under it; its `Get-FileHash` checks the digests |
 | `tar.exe` | Windows 10 version 1803 | required to install on Windows | the install block unpacks the tarball with `System32\tar.exe` |
-| Git for Windows | `git` and `bash` at the floors above | required to install on Windows | it supplies `git` and, where a row above owes it, `bash` |
+| Git for Windows | `git` and `bash` at the floors above | required to install on Windows | it supplies `git`, and the sh it bundles, which runs the pre-commit hook; `bash` where a row above owes it |
 | Node | 8.2 | optional: only to install with npx | the first Node to bundle an npm carrying `npx` |
 | Ruby | 2.3 | optional: only if you register site-kit's docs gates | the two gems below need it |
 | `kramdown-parser-gfm` | any | optional: only if you register site-kit's docs gates | `check-docs-render-fidelity` re-renders every page through it |
@@ -152,6 +152,8 @@ To uninstall, `sh "$cw/package/bin/checkwright.sh" uninstall` reverses it in one
 This is the native Windows route. Under WSL, take [macOS and Linux](#macos-and-linux).
 
 **You need** the tools [Requirements](#requirements) lists for installing on Windows, where the minimum Windows version is stated too. Git for Windows' bash is also what runs any shell gate you write ([Writing your own shell gates](#writing-your-own-shell-gates)).
+
+The pre-commit hook needs no `bash` on your `PATH`: git runs it through the sh Git for Windows bundles, and it hands off to the gate binary. The battery needs no shell: run the gate binary with `--run`, or `gate-sdk/bin/run-gates.ps1` from PowerShell. On Windows on Arm, Git for Windows' sh runs under emulation, so each commit pays one emulated start.
 
 Run this block in PowerShell first. It puts Git's `usr\bin` and `bin` on your `PATH`, for this session and every later one:
 
