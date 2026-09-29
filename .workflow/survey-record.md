@@ -1,15 +1,1 @@
 # contract: lifecycle-kit/SPEC.md §The survey record — carried surveys, one block per survey; boundary-truncated, cited only behind a passing witness.
-
-## 2026-09-28 scope — Which deferred entries rank first for this boundary's unit set, and what cites or supersedes them
-- corpus: TASK-QUEUE.md
-- oracle: bash gate-sdk/bin/run-gates.sh --emit queue-edges
-- rev: 1ed9ab962096ad58408dfb442383228715e1d211
-- finding: Over the Deferred and Icebox sections. First tier: spec-brevity-residue (session/high), one-motion-commit-race-remains-open (session/low), native-hook-dispatch and gate-customer-value-audit (iteration/high), then iteration/low heterogeneous-agent-delegation, gate-tests-suite-identity-in-evidence, truncation-reclaim-residue, manual-operation-spend-channel, windows-liveness-pid-reuse. No inbound hub above two citers; no entry at the recurrence threshold of 2. Supersession: windows-liveness-pid-reuse and custom-gate-substrates reshaped by native-hook-dispatch; truncation-compound-unsteered reshaped by truncation-reclaim-residue. Surface rows: gate-sdk 11, canon-kit 7, installer, guard-kit, drift-kit and delegation-kit 6 each; lifecycle-kit 2, its other row blocked on an observed install.
-- inferred: cost classes read off the tag lines as declared; bodies read for the first-tier shortlist only
-
-## 2026-09-29 build — Which facts do other surfaces cite into lifecycle-kit/SPEC.md's six state-machine tool sections, so a brevity pass over them must keep them?
-- corpus: .
-- oracle: git grep -n -E '§(bin/enter-stage\.sh|check-stage-evidence|check-stage-entry|The ruling-staleness probe|bin/session-id\.sh|bin/install-lifecycle\.sh)' -- ':!docs/' ':!lifecycle-kit/SPEC.md' ':!TASK-QUEUE.md'
-- rev: e17dd495a7d0175010e984eb97ffc4f46ac26432
-- finding: Must-keep facts beyond the headings: CLAUDE_CODE_CHILD_SESSION verified not trusted (delegation-kit); the one config-home derivation, CLAUDE_CONFIG_DIR when set non-empty else ~/.claude (delegation-kit, sessions.rs); the delegated verdict as its own export (drift-kit overhead meter); the newest-transcript mis-pick a lead verifies (lead.md); the front-end cwd versus the direct arm (lifecycle-kit README); the empty roster and env_only name (gate-sdk non-gate arm); the second sanctioned caller and non-git harnesses (gate-sdk run-gates, eight gate-tests headers); simulate as advisory tooling owing no fixture pair (gate-sdk bin-tool contract); ENTRY_PREFLIGHT exec'd with no interpreter word (evidence-kit); the worktree lock-pid class via ek_pid_alive (evidence-kit); the Lessons forced refusal (queue-kit close-surface line); BOUNDARY_REQUIRE disposition lines (RELEASING, scope binding); the boundary wipe of scratch (delegation-kit resume journal); the workflow-state-guard paragraph and is_state_file predicate (guard-kit rewrite); assertion B's drain-exempt and backstop, C's waiver form, D and E's marker reads (stage templates, stage_entry.rs); stage_evidence.rs's inertness (a)-(d), pair identity, purity-set predicate and delete-first recovery; install_lifecycle.rs's three steps, never-minted agent file and agent-file positional.
-- inferred: none
