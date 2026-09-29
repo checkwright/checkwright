@@ -8,6 +8,66 @@
 
 ## New Features
 
+### install-author-discriminator
+
+[spec: SPEC-install-author.md]
+
+the install-observation record cannot tell an author's install from a non-author's. drift-kit/SPEC.md §The install-observation record exists for reds a non-author hit, yet its `install` line is `<date> install <id> <profile> <floor> <ttfg>`, so an operator-seat or rehearsal install filed through `--emit file-install` would read as external evidence and inflate docs/install-evidence.md.
+
+**Deliverable:** an author/non-author discriminator on the record, or a separate operator-seat channel, and the projection counting only non-author rows.
+
+**Cost while deferred:** author-run evidence, the rehearsal [design-partner-preview](#design-partner-preview) now runs first included, has no channel. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at its close: →fix fails because the field is a design choice between two shapes, →forward because no ruling is owed. Re-verified: the install line's five fields above. Owner lookup: `discriminator`, `operator-seat`, `author` in this file — [external-gate-quality-evidence](#external-gate-quality-evidence), DISTINCT (the red evidence, not the install line); owner drift-kit/SPEC.md §The install-observation record.
+
+### price-table-roster-coverage-oracle
+
+[spec: SPEC-price-table.md] [recurrence: 2026-09-29]
+
+an unpriced model id reds nothing. `kpi-price-table-age` reads only the table's two dating headers and never a row (drift-kit/SPEC.md §Bundled KPIs), so a table dated current reads healthy while the models actually running have no row, and the stage-economics meter degrades to `cost=n/a` as specified, silently. It happened twice: about ten iterations of Opus rows until 2026-08-01, and every stage session of native-hook-customer-legs, which ran on two ids the table lacked.
+
+**Deliverable, operator direction 2026-09-29, lead-relayed (not a ruling):** a check cheap enough to run at every lead start, in two halves. (a) Local roster coverage: the model ids in recent transcripts against the table's rows, a new id also reading as a harness roster churn, the trigger for the lead binding's re-judge-every-tier rule. (b) An opt-in price-change probe hashing the published pricing page's pricing-table section against a hash stored at `priced-as-of`; it is network at session start, so it ships off under Policy-as-choice and the adopter constraints. The seam holds: no kit literal enumerates model ids, so the roster derives from consumer-side data.
+
+**Cost while deferred:** each roster churn reproduces the blind spot, found only by a session reading `cost=n/a` closely. Filed 2026-08-01 at close; iceboxed; returned 2026-09-29 at the next iteration's scope from the gap-inbox recurrence bullet native-hook-customer-legs' lead filed that day, the two rows since added. Re-verified: `scripts/price-table.tsv` carries both ids, and the KPI still reads headers only. Owner lookup: `price table`, `roster`, `model id` in this file — [price-table-effective-dating](#price-table-effective-dating) and [tier-model-binding](#tier-model-binding), DISTINCT (a row's validity interval; the tier-to-model binding); owner drift-kit/SPEC.md §The stage-economics meter.
+
+### price-table-effective-dating
+
+[spec: SPEC-price-table.md]
+
+the stage-economics price table has no time axis: one row per model id (drift-kit/SPEC.md §The stage-economics meter, input 3), so every token is priced at the row's current rate whatever date its session ran. A re-run after a table edit reprices every iteration whose transcripts survive at today's rate, while a row whose transcript aged out keeps its first rate, so one log mixes two price regimes unmarked. The table's own comments show two cases the shape could not carry: an introductory rate held only as a `prices-valid-through` header, and a fast-mode rate stated as an undercount.
+
+**Deliverable:** an effective-from column, the meter picking the row in force on each log row's stamp date, which is already derived from stamps alone. Raised by the operator 2026-09-29, lead-relayed (not a ruling), on the 5.5-generation cache-read discount, whose start date the published page does not state.
+
+**Cost while deferred:** a price change for a live model misprices the other side of the change, silently. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at the next iteration's scope: →fix fails because the column is new grammar on a consumer file. Re-verified: the table's `One row per model id` header comment. Owner lookup: `price table`, `effective` in this file — [price-table-roster-coverage-oracle](#price-table-roster-coverage-oracle), DISTINCT (a missing row, not a row's validity interval); owner drift-kit/SPEC.md §The stage-economics meter.
+
+### battery-timing-file-overwritten-by-only-run
+
+[spec: SPEC-battery-timings.md] [recurrence: 2026-09-25]
+
+the runner writes `gate-timings.txt` from whatever subset ran (`runner.rs`), so a `--only` run overwrites the battery's timing file, and `kpi-gate-runtime` reports the subset as the battery total with no partial-sample check.
+
+**Deliverable:** the runner marks a filtered run, the KPI reads the mark, and a fixture pins the refusal to sum a subset.
+
+**Cost while deferred:** a confident wrong number on an evidence page. Filed 2026-09-07; returned from the icebox 2026-09-25 by consult, both sites re-read.
+
+### per-commit-cost-figure
+
+[spec: SPEC-commit-cost.md]
+
+no public page states what the battery costs a commit, the adopter's "will this slow my commits" question. The one timing record, `.workflow/gate-timing-baseline.txt`, is the pre-port bash battery on one Linux host (2026-08-02). An operator question, lead-relayed, asked for a per-OS and per-arch table; CI job times measure runner hardware rather than OS or arch (the Intel macOS leg runs about twice the arm64 one on every step, run 36541257396), so the lead advised against it.
+
+**Deliverable:** an absolute per-commit cost, the pre-commit battery's wall-clock on a stated reference machine and profile, measured by a reproducible command and re-derived at release (Derivation-first); structural per-platform penalties go on the install page as limits.
+
+**Cost while deferred:** an adopter judges the cost from nothing. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead, at the operator's leave; promoted at its close: →fix fails because the measurement is new mechanism, →forward because no ruling is owed. Re-verified: no per-commit or wall-clock claim in docs/*.md, README.md or installer/README.md. Owner lookup: `wall-clock`, `per-commit` in this file — [native-executable-git-hooks](#native-executable-git-hooks), DISTINCT (its deliverable 3 is one component of this figure), and the icebox's validate-suite-wall-clock-unowned, DISTINCT (validate's suites, not a commit); owner docs/install.md, with drift-kit/SPEC.md for the measurement.
+
+### gate-timing-baseline-comparability
+
+[spec: SPEC-commit-cost.md] [recurrence: 2026-09-25]
+
+`.workflow/gate-timing-baseline.txt` has no reader in `native/src` or `scripts`; its named trigger, a second substrate port, has fired.
+
+**Deliverable:** a comparer arm, or the file retired from the workflow directory with its declaration.
+
+**Cost while deferred:** a tracked baseline nothing compares against. Filed 2026-08-02; returned from the icebox 2026-09-25 by consult on the fired trigger.
+
 ## Technical Debt
 
 ### front-door-container-rehearsal
@@ -450,26 +510,6 @@ a smoke that re-runs the battery inside its sandbox inherits no evidence-kit sco
 
 **Cost while deferred:** a false clean in the evidence record. Filed 2026-08-18; returned from the icebox 2026-09-25 by consult, the smoke re-grepped.
 
-### battery-timing-file-overwritten-by-only-run
-
-[cost: event/low] [surface: drift-kit] [recurrence: 2026-09-25]
-
-the runner writes `gate-timings.txt` from whatever subset ran (`runner.rs`), so a `--only` run overwrites the battery's timing file, and `kpi-gate-runtime` reports the subset as the battery total with no partial-sample check.
-
-**Deliverable:** the runner marks a filtered run, the KPI reads the mark, and a fixture pins the refusal to sum a subset.
-
-**Cost while deferred:** a confident wrong number on an evidence page. Filed 2026-09-07; returned from the icebox 2026-09-25 by consult, both sites re-read.
-
-### gate-timing-baseline-comparability
-
-[cost: once/low] [surface: drift-kit] [recurrence: 2026-09-25]
-
-`.workflow/gate-timing-baseline.txt` has no reader in `native/src` or `scripts`; its named trigger, a second substrate port, has fired.
-
-**Deliverable:** a comparer arm, or the file retired from the workflow directory with its declaration.
-
-**Cost while deferred:** a tracked baseline nothing compares against. Filed 2026-08-02; returned from the icebox 2026-09-25 by consult on the fired trigger.
-
 ### site-health-probe-no-retry-on-transient
 
 [cost: event/low] [surface: site-kit] [recurrence: 2026-09-25]
@@ -583,16 +623,6 @@ release notes serve human upgraders poorly, and their section set is crate liter
 **Deliverable:** a note structure with a linked summary table, audience-keyed sections and a Platforms section derived from the diff of docs/install.md's gated platforms table between two releases, its section set one knob-owned roster every reader derives from. The lead tokens are machine-read over a historical corpus the upgrade smoke resolves at any FROM/TO, so a rename owes an alias window or a note-corpus migration.
 
 **Cost while deferred:** every release ships a note a human must read whole to act on, custom-gate adopters are not told what applies to them, and a platform change hides in Behavior changes. Filed 2026-08-01 at close; iceboxed 2026-09-11 as dormant; re-filed 2026-09-27 to the gap inbox as two bullets (readability, a Platforms section) by platform-prerequisite-floors' lead, and returned at its close on a judged recurrence: →fix fails because the redesign renames machine-read tokens. Re-verified: `wc -w` over the two notes, and the literals in `native/src/gates/release_bump.rs`, `tightened_gates_grammar.rs`, `release_change_declared.rs`, `native/src/declaration.rs` and `native/src/emit/upgrade_smoke.rs`. [removed-knob-docs-cmd-valve](#removed-knob-docs-cmd-valve) is DISTINCT. Owner: installer/SPEC.md §The upgrade contract, RELEASING.md.
-
-### price-table-roster-coverage-oracle
-
-[cost: iteration/low] [surface: drift-kit] [recurrence: 2026-09-29]
-
-an unpriced model id reds nothing. `kpi-price-table-age` reads only the table's two dating headers and never a row (drift-kit/SPEC.md §Bundled KPIs), so a table dated current reads healthy while the models actually running have no row, and the stage-economics meter degrades to `cost=n/a` as specified, silently. It happened twice: about ten iterations of Opus rows until 2026-08-01, and every stage session of native-hook-customer-legs, which ran on two ids the table lacked.
-
-**Deliverable, operator direction 2026-09-29, lead-relayed (not a ruling):** a check cheap enough to run at every lead start, in two halves. (a) Local roster coverage: the model ids in recent transcripts against the table's rows, a new id also reading as a harness roster churn, the trigger for the lead binding's re-judge-every-tier rule. (b) An opt-in price-change probe hashing the published pricing page's pricing-table section against a hash stored at `priced-as-of`; it is network at session start, so it ships off under Policy-as-choice and the adopter constraints. The seam holds: no kit literal enumerates model ids, so the roster derives from consumer-side data.
-
-**Cost while deferred:** each roster churn reproduces the blind spot, found only by a session reading `cost=n/a` closely. Filed 2026-08-01 at close; iceboxed; returned 2026-09-29 at the next iteration's scope from the gap-inbox recurrence bullet native-hook-customer-legs' lead filed that day, the two rows since added. Re-verified: `scripts/price-table.tsv` carries both ids, and the KPI still reads headers only. Owner lookup: `price table`, `roster`, `model id` in this file — [price-table-effective-dating](#price-table-effective-dating) and [tier-model-binding](#tier-model-binding), DISTINCT (a row's validity interval; the tier-to-model binding); owner drift-kit/SPEC.md §The stage-economics meter.
 
 ### consumer-value-literal-gate
 
@@ -728,16 +758,6 @@ nothing asks whether each shipped gate is useful and configurable for a customer
 
 Audited: site-kit, 5 gates (5 kept, 2 made generic, 0 withheld); the other 118 shipped gates remain, kit by kit, under gate-sdk/SPEC.md §Consumer payload's rule.
 
-### install-author-discriminator
-
-[cost: event/low] [surface: drift-kit]
-
-the install-observation record cannot tell an author's install from a non-author's. drift-kit/SPEC.md §The install-observation record exists for reds a non-author hit, yet its `install` line is `<date> install <id> <profile> <floor> <ttfg>`, so an operator-seat or rehearsal install filed through `--emit file-install` would read as external evidence and inflate docs/install-evidence.md.
-
-**Deliverable:** an author/non-author discriminator on the record, or a separate operator-seat channel, and the projection counting only non-author rows.
-
-**Cost while deferred:** author-run evidence, the rehearsal [design-partner-preview](#design-partner-preview) now runs first included, has no channel. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at its close: →fix fails because the field is a design choice between two shapes, →forward because no ruling is owed. Re-verified: the install line's five fields above. Owner lookup: `discriminator`, `operator-seat`, `author` in this file — [external-gate-quality-evidence](#external-gate-quality-evidence), DISTINCT (the red evidence, not the install line); owner drift-kit/SPEC.md §The install-observation record.
-
 ### compiled-consumer-smoke-driver
 
 [cost: iteration/high] [surface: installer]
@@ -768,16 +788,6 @@ the tier a dispatch rides is written as a harness model alias wherever it is cho
 
 **Cost while deferred:** a model upgrade changes every dispatch's price and behaviour unannounced, and no consumer can opt out. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at the next iteration's scope: →fix fails because the binding is a new knob. Re-verified: `model: opus` or `model: sonnet` in the four agent definitions. Owner lookup: `alias`, `model id`, `tier` in this file — [session-model-identity-verification](#session-model-identity-verification), DISTINCT (verifying the running tier, not choosing it); owner delegation-kit/SPEC.md, with delegation-kit/templates/agent-execution.md's live-roster rule.
 
-### price-table-effective-dating
-
-[cost: event/low] [surface: drift-kit]
-
-the stage-economics price table has no time axis: one row per model id (drift-kit/SPEC.md §The stage-economics meter, input 3), so every token is priced at the row's current rate whatever date its session ran. A re-run after a table edit reprices every iteration whose transcripts survive at today's rate, while a row whose transcript aged out keeps its first rate, so one log mixes two price regimes unmarked. The table's own comments show two cases the shape could not carry: an introductory rate held only as a `prices-valid-through` header, and a fast-mode rate stated as an undercount.
-
-**Deliverable:** an effective-from column, the meter picking the row in force on each log row's stamp date, which is already derived from stamps alone. Raised by the operator 2026-09-29, lead-relayed (not a ruling), on the 5.5-generation cache-read discount, whose start date the published page does not state.
-
-**Cost while deferred:** a price change for a live model misprices the other side of the change, silently. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at the next iteration's scope: →fix fails because the column is new grammar on a consumer file. Re-verified: the table's `One row per model id` header comment. Owner lookup: `price table`, `effective` in this file — [price-table-roster-coverage-oracle](#price-table-roster-coverage-oracle), DISTINCT (a missing row, not a row's validity interval); owner drift-kit/SPEC.md §The stage-economics meter.
-
 ### openspec-delta-base-agreement
 
 [cost: event/low] [surface: companion]
@@ -807,16 +817,6 @@ an OpenSpec change delta that disagrees with its base spec passes the battery an
 **Deliverable:** one install-smoke-sh matrix over `unix_legs` less the baseline triple, the remedy step conditioned on the runner OS being macOS; `install-smoke-sh-linux` stays its own job for its baseline diff and foreign-host containers. **Inferred, not probed:** that nothing reds a declared triple with no smoke leg.
 
 **Cost while deferred:** triplicated YAML held in step by nobody, and a new unix triple needs a hand-written smoke job. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead on an operator question; promoted at its close: →fix fails because the rewrite needs a push to witness, →forward because no ruling is owed. Re-verified: the three job keys and the `unix_legs` output in gates.yml. Owner lookup: `install-smoke-sh`, `unix_legs` in this file — none; owner installer/SPEC.md §The consumer smoke.
-
-### per-commit-cost-figure
-
-[cost: event/low] [surface: docs]
-
-no public page states what the battery costs a commit, the adopter's "will this slow my commits" question. The one timing record, `.workflow/gate-timing-baseline.txt`, is the pre-port bash battery on one Linux host (2026-08-02). An operator question, lead-relayed, asked for a per-OS and per-arch table; CI job times measure runner hardware rather than OS or arch (the Intel macOS leg runs about twice the arm64 one on every step, run 36541257396), so the lead advised against it.
-
-**Deliverable:** an absolute per-commit cost, the pre-commit battery's wall-clock on a stated reference machine and profile, measured by a reproducible command and re-derived at release (Derivation-first); structural per-platform penalties go on the install page as limits.
-
-**Cost while deferred:** an adopter judges the cost from nothing. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead, at the operator's leave; promoted at its close: →fix fails because the measurement is new mechanism, →forward because no ruling is owed. Re-verified: no per-commit or wall-clock claim in docs/*.md, README.md or installer/README.md. Owner lookup: `wall-clock`, `per-commit` in this file — [native-executable-git-hooks](#native-executable-git-hooks), DISTINCT (its deliverable 3 is one component of this figure), and the icebox's validate-suite-wall-clock-unowned, DISTINCT (validate's suites, not a commit); owner docs/install.md, with drift-kit/SPEC.md for the measurement.
 
 ### releases-page-table
 
