@@ -160,6 +160,8 @@ the interop rung's submission half. The build half landed at companion-catalog-e
 
 **Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **The four preconditions the operator set on 2026-09-27 landed at catalog-submission-preconditions:** `crate-tests-windows-flip`, since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; `catalog-landing-docs-polish`; and `spec-toolkits-guarantee`.
 
+**Four more prerequisites, operator direction 2026-09-29, lead-relayed (not a ruling):** [install-gate-selection](#install-gate-selection), [companion-spec-to-code-gates](#companion-spec-to-code-gates), [speckit-extension-full-profile](#speckit-extension-full-profile) and [adoption-prompt-templates](#adoption-prompt-templates). Ground: Spec Kit and OpenSpec are technical toolkits, so a companion offering only document gates reads as near-useless, and the launch needs an early-adopter wow.
+
 **Push need (2026-09-27, inside the budget):** the release tag push beside the closing push, since the submission needs the extension on a published tag; close's release policy decides the cut.
 
 **Cost while deferred:** the extension installs only from a Release URL a reader must already hold, so a Spec Kit user browsing the catalog, where adopters find enforcement extensions, does not find it. Surfaced 2026-08-02 at close; demoted 2026-09-27 at companion-catalog-extension's build, on its amendment's Definition of Done; survey correction (2), a lifecycle stage machine over a foreign workflow, went to the gap inbox.
@@ -174,15 +176,15 @@ a narrow external preview before any broad announcement: a preview cohort whose 
 
 **Sequencing is the load-bearing part.** The preview runs *before* [benchmark-ab-experiment](#benchmark-ab-experiment), so pilot findings shape that experiment's task classes and metrics rather than being retrofitted to them; per-gate true/false-positive history and profile retention are preview deliverables, not pre-launch builds. The full launch ruling behind this sequencing is operator material and stays in the local-only private brief; this entry carries only the queue-visible rung.
 
-**The cohort was a named population here until 2026-08-09 and is deliberately no longer one** — the composition it stated had since been re-ruled, so the sentence contradicted the ruling it was meant to carry; the fix is to name the owner rather than restate a ruling this file does not hold.
-
 **Expected FIRST FINDING, not a precondition:** today's quick start is curl, sha256sum, tar and `bash … init` from a repository root; macOS needs GNU bash and coreutils by adopter action; native Windows needs Git for Windows. That is why the merged channel gives the installer no delta — those host-floor facts are an output of the observation, not an input.
 
 **Refused, grounds carried forward:** parking behind `native-windows-bash-floor` (landed 2026-09-18) or the git-only-floor discharge (the trigger is what the preview measures); the icebox (the highest cost-while-deferred in the intake).
 
-**Held deferred 2026-09-26 at scope, operator direction lead-relayed (not a ruling):** re-offered at the next scope, after `front-door-demo-unreachable` and `demo-catches-a-done-claim` repair the front door the cohort would meet. Both landed 2026-09-26 on master, but the published release lacks the `demo` verb, so an installing cohort meets the repaired front door only from the next tag. **Held again 2026-09-26 at front-door-release's scope, operator direction lead-relayed (not a ruling):** deferred until v0.26.0, which this iteration's close cuts on the same direction, publishes; it then re-promotes on the first observed install, as stated above.
+**Held deferred twice on 2026-09-26, operator direction lead-relayed (not a ruling),** until the repaired front door (`front-door-demo-unreachable`, `demo-catches-a-done-claim`) was published, which v0.26.0 did.
 
 **Consult ruling, 2026-09-27, superseding the 2026-09-25 recommendation to promote next:** the cohort was re-ruled in the brief — one observed pre-submission install, then the installers the catalogs and the plugin marketplace send — so this entry runs *through* the two ecosystem units the ledger's `catalog-then-plugin` ruling sequences first, not ahead of them. The observed install is owed before the catalog submission; the rest re-promotes on the first observed install, as stated above.
+
+**Readiness ahead of the observed install, operator direction 2026-09-29, lead-relayed (not a ruling):** a clean-container first-run rehearsal of the published front door (release installer, init on a sample repo, demo, first red) runs first. Operator-seat adoption on the operator's own projects is independent evidence and gates nothing; counting it toward the observed install was declined. Author-run evidence, rehearsal results included, stays out of `--emit file-install` until [install-author-discriminator](#install-author-discriminator) lands.
 
 **Cost while deferred — still the highest of its intake, and now the more exposed half.** Every claim that would be strongest with external evidence still rests on internal dogfooding, and the channel that would carry it is built and reading zero: the published page states an honest `0` on every pass while the volume of unattested governed surface keeps growing. Deferring also silently defers [benchmark-ab-experiment](#benchmark-ab-experiment), since running that first would fix the wrong metrics. Surfaced 2026-08-02 at close, in the same intake pass, as the review's fourth-ranked item.
 
@@ -348,9 +350,9 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 ### spec-brevity-residue
 
-[cost: session/high] [surface: lifecycle-kit]
+[cost: session/high] [surface: installer]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; then lifecycle-kit (61k; its §templates/stages/ and §templates/lead.md landed as `lifecycle-template-brevity`), installer (48.5k, the smoke excepted; its contract sections landed as `installer-contract-brevity`), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; lifecycle-kit is finished (`lifecycle-template-brevity` and the three slices below); what remains starts at installer (48.5k, the smoke excepted; its contract sections landed as `installer-contract-brevity`), guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
@@ -582,11 +584,11 @@ the kit SPECs' on-site mirrors render their section citations as plain text, so 
 
 [cost: event/low] [surface: delegation-kit]
 
-no tracked agent definition exists for the operator-ruled hotfix path of the scope-gated intake rule. A lead dispatching one picks general-purpose and restates standing policy in the prompt (not a stage, no stage entry, no queue or state writes, one test-and-doc-complete commit, the battery and every reached kit suite, stop on a design question, the gap-inbox disposition): the policy-is-config tell (lifecycle-kit/templates/lead.md §Policy is config, not prose). `agent-dispatch-guard` confines an undeclared type to a worktree, where this repo's hook reds and `--emit file-gap` refuses, so the 2026-09-27 front-door hotfix needed a second dispatch to land.
+no tracked agent definition exists for the operator-ruled hotfix path of the scope-gated intake rule. A lead dispatching one picks general-purpose and restates standing policy in the prompt (not a stage, no stage entry, no queue or state writes, one test-and-doc-complete commit, the battery and every reached kit suite, stop on a design question, the gap-inbox disposition): the policy-is-config tell (lifecycle-kit/templates/lead.md §Policy is config, not prose). `agent-dispatch-guard` confines an undeclared type to a worktree, where a crate-source commit is refused and `--emit file-gap` refuses, so the 2026-09-27 front-door hotfix needed a second dispatch to land.
 
 **Deliverable:** a hotfix agent definition under `.claude/agents/` carrying that policy, declared in `DELEGATION_KIT_MUTATING_TYPES`, and the lead template naming the dispatch shape.
 
-**Cost while deferred:** every hotfix costs a restated prompt and a second dispatch. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead; promoted 2026-09-27 at its close: →fix fails because the definition is a new governed name. Owner lookup: `hotfix`, `agents/`, `MUTATING_TYPES` in this file — none; owner delegation-kit/SPEC.md, with `worktree-crate-commit-red` as the worktree half.
+**Cost while deferred:** every hotfix costs a restated prompt and a second dispatch. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead; promoted 2026-09-27 at its close: →fix fails because the definition is a new governed name. Owner lookup: `hotfix`, `agents/`, `MUTATING_TYPES` in this file — none; owner delegation-kit/SPEC.md. The worktree half landed as `worktree-crate-commit-red`: the hook greens in a worktree, and `check-crate-arms` refusing a crate-source commit there is now the stated contract.
 
 ### readme-spec-links-offsite
 
@@ -720,9 +722,7 @@ nothing asks whether each shipped gate is useful and configurable for a customer
 
 **Cost while deferred:** every push runs gates of no customer value on customer-OS legs, and every adopter installs them. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; promoted 2026-09-28 at the next iteration's scope: →fix fails because the audit is unsized. Owner lookup: `customer value`, `payload` in this file — [consumer-value-literal-gate](#consumer-value-literal-gate), DISTINCT (a hard-coded value inside a gate, not the gate's place in the payload). Owner gate-sdk/SPEC.md §Consumer payload.
 
-**In set (2026-09-29, operator direction lead-relayed, not a /consult ruling):** native-hook-customer-legs takes this entry's first slice, the audit record and site-kit's GitHub Pages gates, bounded at spec; spec authors and promotes it.
-
-**Push need (2026-09-29, inside the budget):** the mid-iteration push, shared with `native-hook-dispatch`, for any payload or customer-OS leg change the slice makes.
+**First slice landed 2026-09-29 at native-hook-customer-legs, operator direction lead-relayed (not a /consult ruling):** the payload rule at gate-sdk/SPEC.md §Consumer payload, and site-kit audited against it.
 
 Audited: site-kit, 5 gates (5 kept, 2 made generic, 0 withheld); the other 118 shipped gates remain, kit by kit, under gate-sdk/SPEC.md §Consumer payload's rule.
 
@@ -745,6 +745,56 @@ the spec-toolkit pages sit in the nav as three flat siblings under Install whose
 **Deliverable:** a top-level nav entry for the toolkit overview carrying `nav_id`, Spec Kit and OpenSpec its children, as Kit Reference already is; label rules in docs/site-architecture.md's page-authoring rules (sibling labels parallel, a child label never repeating its parent, an overview never a sibling of its subpages, the H1 agreeing with the label); a `check-docs-nav-reachable` arm weighed for the overview-as-sibling rule. The lead's recommendation, not yet ruled.
 
 **Cost while deferred:** a reader sees one family as three unrelated pages. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; promoted 2026-09-28 at the next iteration's scope: →fix fails because the operator's questions are open. Owner lookup: `nav`, `label` in this file — none; owner docs/site-architecture.md, with docs/spec-toolkits.md, docs/speckit.md and docs/openspec.md.
+
+### install-author-discriminator
+
+[cost: event/low] [surface: drift-kit]
+
+the install-observation record cannot tell an author's install from a non-author's. drift-kit/SPEC.md §The install-observation record exists for reds a non-author hit, yet its `install` line is `<date> install <id> <profile> <floor> <ttfg>`, so an operator-seat or rehearsal install filed through `--emit file-install` would read as external evidence and inflate docs/install-evidence.md.
+
+**Deliverable:** an author/non-author discriminator on the record, or a separate operator-seat channel, and the projection counting only non-author rows.
+
+**Cost while deferred:** author-run evidence, the rehearsal [design-partner-preview](#design-partner-preview) now runs first included, has no channel. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at its close: →fix fails because the field is a design choice between two shapes, →forward because no ruling is owed. Re-verified: the install line's five fields above. Owner lookup: `discriminator`, `operator-seat`, `author` in this file — [external-gate-quality-evidence](#external-gate-quality-evidence), DISTINCT (the red evidence, not the install line); owner drift-kit/SPEC.md §The install-observation record.
+
+### adoption-prompt-templates
+
+[cost: event/high] [surface: installer]
+
+no shipped prompt template drives a coding agent through adoption. Operator direction, 2026-09-29, lead-relayed (not a ruling): a template set taking an agent through install, profile choice, knob configuration against the adopter's layout, and first-red triage, serving the operator's own two adoptions first, which are its first test, and adopters after.
+
+**Deliverable:** the template set, at a home scope rules: the installer's activation surface, or a kit template the harness plugin exposes as a command. The clean-container rehearsal [design-partner-preview](#design-partner-preview) runs can drive it unattended.
+
+**Cost while deferred:** every adopter's agent configures the install by reading pages. A prerequisite of [companion-toolkit-profile](#companion-toolkit-profile). Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at its close: →fix fails because the set is a new governed surface, →forward because the direction is given. Re-verified: no `prompt` in docs/install.md or installer/README.md. Owner lookup: `prompt template`, `adoption prompt` in this file — none; owner installer/SPEC.md, or plugin/SPEC.md for a command home.
+
+### speckit-extension-full-profile
+
+[cost: event/low] [surface: companion]
+
+the Spec Kit extension installs only the document gates. companion/SPEC.md's `speckit.checkwright.install` runs `init --profile prose --recipe speckit`, and §The tested claim is proved on prose, so the `full` tier the recipes carry is out of the extension's reach.
+
+**Deliverable:** the extension offering the technical gates (the `full` profile, or a choice between the two), proved by the consumer smoke's companion arm.
+
+**Cost while deferred:** a Spec Kit user meets document gates only. A prerequisite of [companion-toolkit-profile](#companion-toolkit-profile), operator direction 2026-09-29, lead-relayed (not a ruling). Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead as part of that direction; filed as its own entry at its close: →fix fails because the extension's command changes shape, →forward because the direction is given. Re-verified: companion/SPEC.md's install command above. Owner lookup: `Spec Kit extension`, `full profile` in this file — [companion-spec-to-code-gates](#companion-spec-to-code-gates), DISTINCT (new gates, not the extension's reach); owner companion/SPEC.md.
+
+### compiled-consumer-smoke-driver
+
+[cost: iteration/high] [surface: installer]
+
+the consumer smoke has two drivers. native-hook-customer-legs chose a PowerShell driver over the entry's five coverage classes, so installer/consumer-smoke/run-smoke.sh and run-smoke.ps1 both spell init, battery, hooks, upgrade and uninstall, and about 15 run-smoke.sh arms do not run on native Windows (inferred at spec, not recounted).
+
+**Deliverable:** one compiled driver on every leg, replacing both scripts.
+
+**Cost while deferred:** two drivers held in step by nobody, and Windows loses those arms. Filed 2026-09-29 to the gap inbox at native-hook-customer-legs' spec; promoted 2026-09-29 at its close: →fix fails because the driver is new mechanism, →forward because no ruling is owed. Re-verified: both scripts exist (2015 and 232 lines). Owner lookup: `consumer smoke`, `run-smoke.ps1`, `smoke driver` in this file — none; owner installer/SPEC.md §The consumer smoke.
+
+### native-executable-git-hooks
+
+[cost: event/high] [surface: gate-sdk]
+
+the generated pre-commit and commit-msg hooks start through a shell on every OS: each is two lines of POSIX sh that exec the gate binary, and on Windows git needs Git for Windows' bundled sh to start it, emulated on Arm (the delta-6 probe, CI Windows x64 and arm64, 2026-09-29). Operator direction, 2026-09-29, lead-relayed (not a ruling): explore a hook git starts as a native executable, one shape on every OS, never a Windows-only exception.
+
+**Deliverable:** (1) a probe of whether git's hook lookup starts a native executable directly on each OS (the Windows `.exe` lookup inferred from git's source, never run); (2) where a native hook lives, since a per-platform binary cannot be the tracked text hook scripts/git-hooks/ holds: hooks installed untracked with the generated-projection contract and its freshness gate re-pointed at the installer, or a tracked shim kept, which is the shell this removes; (3) the per-commit start cost per OS.
+
+**Cost while deferred:** every commit on Windows starts an emulated-or-bundled shell. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at its close: →fix fails because the probe is unrun and the home undecided, →forward because the direction is given. Re-verified: scripts/git-hooks/pre-commit opens `#!/bin/sh`. Not a recurrence of `native-hook-dispatch`, which removed the bash dependency. Owner lookup: `native executable`, `hook shim` in this file — none; owner gate-sdk/SPEC.md, with installer/SPEC.md for an untracked install.
 
 ## Icebox
 
@@ -1419,9 +1469,5 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 The consumer's local-only companion files (private brief, ops runbook) have read triggers but no write-back trigger, so shipped-unit forward memory and an out-of-tree state verifier drift until a consult audits them; owed are close and release-sweep template slots for both, and a retired-slug arm over plain code on the local-only globs.
 
 ## Done
-
-- native-hook-dispatch
-- worktree-crate-commit-red
-- lifecycle-kit-tail-brevity
 
 ## Lessons Learned
