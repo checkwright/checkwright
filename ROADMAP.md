@@ -23,11 +23,11 @@ Adoption evidence, mostly. A rung promotes when someone hits the friction it des
 <!-- roadmap:begin -->
 ### now
 
+- [companion-toolkit-profile](TASK-QUEUE.md#companion-toolkit-profile) *(ecosystem)* — Gate a tree whose specs another toolkit's workflow wrote.
 - [design-partner-preview](TASK-QUEUE.md#design-partner-preview) *(adoption)* — A small observed preview measuring first green, first useful red and retention on real installs.
 
 ### next
 
-- [companion-toolkit-profile](TASK-QUEUE.md#companion-toolkit-profile) *(ecosystem)* — Gate a tree whose specs another toolkit's workflow wrote.
 - [gate-authoring-sdk-surface](TASK-QUEUE.md#gate-authoring-sdk-surface) *(ecosystem)* — Author a gate in any language behind one substrate-neutral descriptor.
 
 ### later
