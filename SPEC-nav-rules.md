@@ -20,7 +20,7 @@ Two queue entries pair it: [toolkit-nav-hierarchy](TASK-QUEUE.md#toolkit-nav-hie
 
 ### (1) The toolkit overview becomes a top-level parent {mechanical}
 
-**Not yet applied.** Front matter only; no page body moves.
+**Applied.** Front matter only; no page body moves.
 
 - `docs/spec-toolkits.md`: `title: Spec toolkits`, `nav_order: 4`, `nav_id: toolkits`. Its `nav_parent` and `nav_child_order` lines go. Its H1 becomes `# Spec toolkits: gating what Spec Kit and OpenSpec write`.
 - `docs/speckit.md` and `docs/openspec.md`: `nav_parent: toolkits`, their `nav_child_order` renumbered to 1 and 2.
@@ -29,7 +29,7 @@ Two queue entries pair it: [toolkit-nav-hierarchy](TASK-QUEUE.md#toolkit-nav-hie
 
 ### (2) The label rules {mechanical}
 
-**Not yet applied.** docs/site-architecture.md §Page-authoring rules: its first paragraph's opening sentence is rewritten, and the page gains one paragraph after it:
+**Applied.** docs/site-architecture.md §Page-authoring rules: its first paragraph's opening sentence is rewritten, and the page gains one paragraph after it:
 
 *A page's `title:` is its nav label and its H1 the label's full form: the H1 names the label's subject, as* Install *and* Install and upgrade *do.*
 
@@ -56,7 +56,7 @@ docs/site-architecture.md §Site chrome and the nav contract gains, after the su
 
 ### (5) The overview-as-sibling arm {design-bearing}
 
-**Not yet applied.** `check-docs-nav-reachable` gains an arm. For each `nav_id` with three or more children, a child that every other child links and that links every other child is a finding: *`<page>`: an overview among its siblings under `<nav_id>`. Every sibling links it and it links each of them, so make it their parent with `nav_id`.* A link is the gate's own `links_of` scan, a relative `.md` target, anchors dropped.
+**Applied.** `check-docs-nav-reachable` gains an arm. For each `nav_id` with three or more children, a child that every other child links and that links every other child is a finding: *`<page>`: an overview among its siblings under `<nav_id>`. Every sibling links it and it links each of them, so make it their parent with `nav_id`.* A link is the gate's own `links_of` scan, a relative `.md` target, anchors dropped.
 
 ### (6) Strict reachability {design-bearing}
 

@@ -1,6 +1,6 @@
 ---
 title: Releases
-nav_order: 6
+nav_order: 7
 nav_children_key: release
 ---
 

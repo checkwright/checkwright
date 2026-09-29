@@ -1,10 +1,10 @@
 ---
-title: Spec Kit and OpenSpec
-nav_parent: install
-nav_child_order: 1
+title: Spec toolkits
+nav_order: 4
+nav_id: toolkits
 ---
 
-# Gating specs that Spec Kit or OpenSpec writes
+# Spec toolkits: gating what Spec Kit and OpenSpec write
 
 Checkwright's `prose` profile governs a repository of documents. A recipe fits it to a spec tree that [Spec Kit](https://github.com/github/spec-kit) or [OpenSpec](https://github.com/Fission-AI/OpenSpec) writes: a few lines of gate configuration, applied with the install. Each toolkit has two lines: `prose`, the default, and `full`, every kit. Each toolkit has a page: [Spec Kit](speckit.md), whose extension installs Checkwright with the recipe applied, and [OpenSpec](openspec.md), whose recipe you pass to `init`.
 

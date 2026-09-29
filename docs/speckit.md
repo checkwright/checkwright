@@ -1,7 +1,7 @@
 ---
 title: Spec Kit
-nav_parent: install
-nav_child_order: 2
+nav_parent: toolkits
+nav_child_order: 1
 ---
 
 # Checkwright for Spec Kit
@@ -32,4 +32,4 @@ checkwright init --profile full --recipe speckit
 
 Spec Kit has no lifecycle layer ([companion/SPEC.md §The lifecycle layer](companion/SPEC.md#the-lifecycle-layer)).
 
-What the gates catch, what is tested and the limits: [Spec Kit and OpenSpec](spec-toolkits.md).
+What the gates catch, what is tested and the limits: [Spec toolkits](spec-toolkits.md).

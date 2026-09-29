@@ -187,6 +187,46 @@ fn links_of(path: &str, text: &str) -> Vec<String> {
     out
 }
 
+// spec: docs/site-architecture.md §Page-authoring rules — the nav children of each nav_id, in
+// page order, for the overview-as-sibling arm
+fn children_by_id(pages: &[String], fms: &HashMap<String, Fm>) -> Vec<(String, Vec<String>)> {
+    let ids: HashSet<&String> = pages.iter().map(|p| &fms[p].id).filter(|i| !i.is_empty()).collect();
+    let mut out: Vec<(String, Vec<String>)> = Vec::new();
+    for p in pages {
+        let parent = &fms[p].parent;
+        if parent.is_empty() || !ids.contains(parent) {
+            continue;
+        }
+        match out.iter_mut().find(|(id, _)| id == parent) {
+            Some((_, kids)) => kids.push(p.clone()),
+            None => out.push((parent.clone(), vec![p.clone()])),
+        }
+    }
+    out.sort();
+    out
+}
+
+// spec: docs/site-architecture.md §Page-authoring rules — the overview proxy: under three or
+// more siblings, a child every other sibling links and that links every other sibling; two
+// children linking each other are a pair, hence the floor
+fn overviews(kids: &[String], texts: &HashMap<String, String>) -> Vec<String> {
+    if kids.len() < 3 {
+        return Vec::new();
+    }
+    let links: HashMap<&String, HashSet<String>> = kids
+        .iter()
+        .map(|k| (k, links_of(k, &texts[k]).into_iter().collect()))
+        .collect();
+    kids.iter()
+        .filter(|x| {
+            kids.iter()
+                .filter(|y| y != x)
+                .all(|y| links[y].contains(*x) && links[*x].contains(y))
+        })
+        .cloned()
+        .collect()
+}
+
 pub fn run(args: &[String]) -> i32 {
     match rule(args) {
         Ok(rc) => rc,
@@ -303,6 +343,14 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     let mut bad: Vec<String> = Vec::new();
+    for (id, kids) in children_by_id(&pages, &fms) {
+        for overview in overviews(&kids, &texts) {
+            bad.push(format!(
+                "{}: an overview among its siblings under {}. Every sibling links it and it links each of them, so make it their parent with nav_id.",
+                overview, id
+            ));
+        }
+    }
     for p in &pages {
         if allow.contains(p) {
             continue;

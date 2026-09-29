@@ -17,7 +17,7 @@ Checkwright's gates over a repository whose specs another toolkit writes. This d
 
 Each toolkit also has a `full` line, which installs every kit and on OpenSpec applies `openspec/lifecycle/` too ([SPEC.md §The two tiers](SPEC.md#the-two-tiers)).
 
-What the gates catch in a spec tree and the tested versions are on the [Spec Kit and OpenSpec](https://checkwright.dev/spec-toolkits.html) page, and each route is on its toolkit's page: [Spec Kit](https://checkwright.dev/speckit.html) and [OpenSpec](https://checkwright.dev/openspec.html).
+What the gates catch in a spec tree and the tested versions are on the [Spec toolkits](https://checkwright.dev/spec-toolkits.html) page, and each route is on its toolkit's page: [Spec Kit](https://checkwright.dev/speckit.html) and [OpenSpec](https://checkwright.dev/openspec.html).
 
 ## Where the design lives
 

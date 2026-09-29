@@ -1,7 +1,7 @@
 ---
 title: OpenSpec
-nav_parent: install
-nav_child_order: 3
+nav_parent: toolkits
+nav_child_order: 2
 ---
 
 # Checkwright for OpenSpec
@@ -32,4 +32,4 @@ checkwright init --profile full --recipe openspec --recipe openspec-lifecycle
 
 It costs what the [Spec Kit](speckit.md) `full` line costs: `bash` 4.3 or later, and Checkwright's own workflow files beside OpenSpec's. The line also applies the lifecycle layer, which lets lifecycle-kit's stage machine read OpenSpec's in-flight changes: once you run the stage machine, a change touching two capabilities owes the align stage before build.
 
-What the gates catch, what is tested and the limits: [Spec Kit and OpenSpec](spec-toolkits.md).
+What the gates catch, what is tested and the limits: [Spec toolkits](spec-toolkits.md).

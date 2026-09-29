@@ -4,6 +4,8 @@
 # generated mirror with no nav-reachable sibling index.md, so the sibling rule
 # must not rescue it; notes/v1.md carries a `release:` key but no nav page names
 # `release` in nav_children_key, so the derived-children rule must not rescue it
-# either. The gate REJECTS.
+# either; tools-overview.md is a child of Tools that both its siblings link and
+# that links each of them, an overview sitting as their sibling. The gate
+# REJECTS.
 docs
 docs-offnav.list
