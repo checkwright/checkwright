@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: companion-adoption-landing
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,38 @@
 ## New Features
 
 ## Technical Debt
+
+### nav-spec-suffix-restore
+
+the site nav's kit suffix offers `readme` only, while every kit page links both its README and its SPEC, so the SPEC mirrors are the one reachable page class the menu does not reach. Traced 2026-09-29: delta 11 of the payload-withholding amendment, tagged `{mechanical}`, was applied by d2fbbd2a as a SPEC-title filter in docs/_includes/nav.html with a matching exclusion in `check-docs-nav-reachable`; no TRAJECTORY.md ruling covers it. Operator direction, 2026-09-29, lead-relayed (not a ruling): every reachable page is reachable from the menu, so the `spec` suffix returns. Grounds: the muted suffix already was the reference-tier affordance, evaluators of a verification tool are the SPECs' readers, and payload withholding is a footprint choice that does not carry to the website.
+
+**Deliverable:** the exclusion dropped from the nav include, from `check-docs-nav-reachable`'s model and from any docs/site-architecture.md sentence stating it. Process lesson, for the build to weigh: an information-architecture choice tagged `{mechanical}` inside an unrelated amendment reached no operator.
+
+**Cost while deferred:** a site reader finds a kit's SPEC only through its page body. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead after its close; promoted 2026-09-29 at the next iteration's scope: →fix fails because the stage may not build. Re-verified: `s.title != 'SPEC'` at nav.html line 12 and `SUFFIX_EXCLUDED_TITLE` in `native/src/gates/docs_nav_reachable.rs`. Owner lookup: `suffix`, `SPEC-title` in this file — none; owner docs/site-architecture.md, with [nav-strict-reachability](#nav-strict-reachability) refining the rule it restores under.
+
+### homepage-license-duplicate
+
+the homepage states its license twice (operator observation, 2026-09-29): the layout footer at docs/_layouts/default.html line 192, added 2026-09-28 by 6bad6185 as a scope session's inline gap fix, and the hand-written `## License` section at docs/index.md lines 99 to 101, which that fix left in place. That breaks docs/site-architecture.md's one-statement-one-home rule. Operator direction, 2026-09-29, lead-relayed (not a ruling): file it rather than hotfix it.
+
+**Deliverable:** the section deleted from docs/index.md, its one voice line ("Adoption is the goal.") moved into the homepage body or dropped; README.md keeps its own, since GitHub readers see no site footer. Asked at the fix: which gate would have caught a chrome addition duplicating a page statement.
+
+**Cost while deferred:** every homepage reader meets the license twice. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead after its close; promoted 2026-09-29 at the next iteration's scope: →fix fails because the operator directed a filing. Re-verified: both statements at the lines above. Owner lookup: `license` in this file — [license-line-owned-sentence](#license-line-owned-sentence), DISTINCT (the README and footer wording, not the homepage's second statement); owner docs/site-architecture.md.
+
+### value-table-overflow
+
+the generated kit table on docs/value.md, nine columns and sixteen kit rows, overflows its column by a few pixels and shows a horizontal scrollbar (operator observation, 2026-09-29). The cause is a hypothesis for the build to confirm in a browser, since the theme's stylesheet is not in the tree: Primer renders a `.markdown-body` table as `display:block; width:max-content; max-width:100%; overflow:auto`; the content column is about 836px at full desktop width (docs/_layouts/default.html's 1180px maximum less the 280px nav and 2rem of padding each side), which nine columns of Primer's `6px 13px` cell padding plus their longest words just exceed. Operator direction, 2026-09-29, lead-relayed (not a ruling): the table's content stays as is, and only the rendering is fixed.
+
+**Deliverable:** slightly tighter table cell padding in the layout's table rules, measured in a browser at desktop width and in a narrower window, then checked against every other table on the site.
+
+**Cost while deferred:** every desktop reader of the value page meets a scrollbar on its main table. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead after its close; promoted 2026-09-29 at the next iteration's scope: →fix fails because the stage may not build and the fix wants a browser measurement. Re-verified: the table's nine-column header and sixteen rows, and the layout's `max-width: 1180px` and `flex: 0 0 280px`. Owner lookup: `overflow`, `scrollbar` in this file — none; owner docs/site-architecture.md's chrome rules, with docs/_layouts/default.html.
+
+### installer-remainder-brevity
+
+installer/SPEC.md's remaining sections under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §Implementation, §Layout, §Selecting kits and gates, §update, §diff, §uninstall, §demo, §The CI action, §The packer, §Vendoring without the installer, §Reviewing the pre-commit hook, §Versioning and §The upgrade contract, about 83k characters; §The consumer smoke stays on the parent.
+
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every `##` heading kept verbatim and every fact another surface cites into them kept, per a citation survey. Applied after the iteration's amendments that rewrite any of them merge ([adoption-prompt-templates](#adoption-prompt-templates) wherever it lands, [license-line-owned-sentence](#license-line-owned-sentence) in §The packer), so no section is passed twice in one iteration. Deferred entries still owe rewrites in §The upgrade contract and §The front door's verbs; the operator took the whole remainder with that known (operator direction, 2026-09-29).
+
+**Cost while deferred:** paid by every session and adopter that reads an unpassed installer section. Filed 2026-09-29 as a split at companion-adoption-landing's scope from [spec-brevity-residue](#spec-brevity-residue), on an operator direction, 2026-09-29, lead-relayed (not a /consult ruling), riding the installer surface the iteration's adoption unit carries.
 
 ## Deferred
 
@@ -370,6 +402,8 @@ lifecycle-kit's remaining sections left 2026-09-29 at native-hook-customer-legs'
 
 installer's install-surface sections (§The verbs through §The manifest) left 2026-09-29 at companion-technical-gates' scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `installer-install-brevity`.
 
+installer's remaining sections other than §The consumer smoke left 2026-09-29 at companion-adoption-landing's scope, on an operator direction, 2026-09-29, lead-relayed (not a /consult ruling), as [installer-remainder-brevity](#installer-remainder-brevity), which finishes installer apart from the smoke.
+
 ### prune-set-matches-walk-root-ancestors
 
 [cost: event/high] [surface: context-kit] [recurrence: 2026-09-25]
@@ -694,6 +728,8 @@ the license line differs between the READMEs and the site footer, and nothing ow
 
 **Cost while deferred:** a reader meets two license phrasings on one page, and the next README drifts unseen. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; promoted at its close: →fix fails because the gate is new mechanism, and aligning the prose without it repeats the drift. Re-verified: 30 README License lines in the four variants above, the footer at line 192, and `docs/gate-sdk/README.md` carrying the section beside the footer. Not a recurrence of the retired `license-text-and-alignment`: that landing put a line in every README and left its wording unowned, so this is a new defect. Owner lookup: `license` in this file — none; owner docs/site-architecture.md (site chrome), with installer/SPEC.md §The packer (the license placement).
 
+**Push need (2026-09-29, inside the budget):** the iteration's one mid-iteration batch push, since its new gate is native crate code the Windows and macOS legs compile and no local run reaches.
+
 ### positional-reference-rule
 
 [cost: event/low] [surface: canon-kit]
@@ -724,7 +760,7 @@ Audited: site-kit, 5 gates (5 kept, 2 made generic, 0 withheld); the other 118 s
 
 the spec-toolkit pages sit in the nav as three flat siblings under Install whose labels do not read as one family, and no rule sets nav labels or titles beyond one. docs/spec-toolkits.md is titled "Spec Kit and OpenSpec" while its H1 reads "Gating specs that Spec Kit or OpenSpec writes", and docs/speckit.md and docs/openspec.md are its children in substance but its siblings in the nav (all `nav_parent: install`), since the nav renders one child level. docs/site-architecture.md's only label rule: title is the terse nav label, H1 the descriptive full form. Operator questions (lead session): should the toolkit pages get their own nav hierarchy, and can nav-label and title standards be set.
 
-**Deliverable:** a top-level nav entry for the toolkit overview carrying `nav_id`, Spec Kit and OpenSpec its children, as Kit Reference already is; label rules in docs/site-architecture.md's page-authoring rules (sibling labels parallel, a child label never repeating its parent, an overview never a sibling of its subpages, the H1 agreeing with the label); a `check-docs-nav-reachable` arm weighed for the overview-as-sibling rule. The lead's recommendation, not yet ruled.
+**Deliverable:** a top-level nav entry for the toolkit overview carrying `nav_id`, Spec Kit and OpenSpec its children, as Kit Reference already is; label rules in docs/site-architecture.md's page-authoring rules (sibling labels parallel, a child label never repeating its parent, an overview never a sibling of its subpages, the H1 agreeing with the label); a `check-docs-nav-reachable` arm weighed for the overview-as-sibling rule. Operator direction, 2026-09-29, lead-relayed (not a ruling): yes to both questions, adopting this recommendation as stated.
 
 **Cost while deferred:** a reader sees one family as three unrelated pages. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; promoted 2026-09-28 at the next iteration's scope: →fix fails because the operator's questions are open. Owner lookup: `nav`, `label` in this file — none; owner docs/site-architecture.md, with docs/spec-toolkits.md, docs/speckit.md and docs/openspec.md.
 
@@ -747,6 +783,8 @@ no shipped prompt template drives a coding agent through adoption. Operator dire
 **Deliverable:** the template set, authored once as a harness-neutral kit template and shipped twice, operator direction 2026-09-29, lead-relayed (not a ruling): as a plugin skill binding it, the pattern every `plugin/skills/*` stage skill uses, and as a plain prompt template any coding agent can be handed, since the adopter constraints assume no harness. `plugin/skills/install/SKILL.md` already covers install and profile choice; knob configuration and first-red triage are missing, as an extension of that skill or a sibling its `next:` step hands to, which scope rules. The clean-container rehearsal [design-partner-preview](#design-partner-preview) runs can drive it unattended.
 
 **Cost while deferred:** every adopter's agent configures the install by reading pages. A prerequisite of [companion-toolkit-profile](#companion-toolkit-profile). Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at its close: →fix fails because the set is a new governed surface, →forward because the direction is given. Re-verified: no `prompt` in docs/install.md or installer/README.md. Owner lookup: `prompt template`, `adoption prompt` in this file — none; owner installer/SPEC.md, or plugin/SPEC.md for a command home.
+
+**Push need (2026-09-29, inside the budget):** the iteration's one mid-iteration batch push, since a plugin skill's front matter is validated only by CI's `skills-ref` step.
 
 ### compiled-consumer-smoke-driver
 
@@ -828,6 +866,10 @@ no page states which Checkwright checks each companion toolkit gets: docs/spec-t
 
 **Cost while deferred:** a reader weighing a toolkit cannot see what the companion adds without reading both recipes. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead; promoted at its close: →fix fails because the projection is new mechanism, →forward because the direction is given. Re-verified: docs/spec-toolkits.md has no table row. Owner lookup: `support table` in this file — none; [toolkit-nav-hierarchy](#toolkit-nav-hierarchy) is DISTINCT (nav labels on the same pages) and pairs well. Owner companion/SPEC.md, with docs/site-architecture.md §Generated projections for the roster row.
 
+**Ordering, operator direction, 2026-09-29, lead-relayed (not a ruling):** lands after [toolkit-overlap-value-bar](#toolkit-overlap-value-bar), whose marks its rows carry, in the same iteration.
+
+**Push need (2026-09-29, inside the budget):** the iteration's one mid-iteration batch push, since its freshness gate is native crate code the Windows and macOS legs compile and no local run reaches.
+
 ### install-smoke-sh-matrix
 
 [cost: event/low] [surface: .github]
@@ -858,26 +900,6 @@ docs/releases.md renders its derived note list as a bare list of version links, 
 
 **Cost while deferred:** a reader skipping several versions opens each note to learn which need action. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead, at the operator's leave; promoted at its close: →fix fails because the keys are new grammar on the notes, →forward because no ruling is owed. Re-verified: the page's `<ul>` loop and 29 notes carrying `release:`. Owner lookup: `releases.md`, `front-matter` in this file — none; owner docs/site-architecture.md, with installer/SPEC.md §The upgrade contract for the keys.
 
-### value-table-overflow
-
-[cost: event/low] [surface: docs]
-
-the generated kit table on docs/value.md, nine columns and sixteen kit rows, overflows its column by a few pixels and shows a horizontal scrollbar (operator observation, 2026-09-29). **Inferred, not measured in a browser:** Primer renders a `.markdown-body` table as `display:block; width:max-content; max-width:100%; overflow:auto`; the content column is about 836px at full desktop width (docs/_layouts/default.html's 1180px maximum less the 280px nav and 2rem of padding each side), which nine columns of Primer's `6px 13px` cell padding plus their longest words just exceed. Operator direction, 2026-09-29, lead-relayed (not a ruling): the table's content stays as is, and only the rendering is fixed.
-
-**Deliverable:** slightly tighter table cell padding in the layout's table rules, measured in a browser at desktop width and in a narrower window, then checked against every other table on the site.
-
-**Cost while deferred:** every desktop reader of the value page meets a scrollbar on its main table. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead after its close; promoted 2026-09-29 at the next iteration's scope: →fix fails because the stage may not build and the fix wants a browser measurement. Re-verified: the table's nine-column header and sixteen rows, and the layout's `max-width: 1180px` and `flex: 0 0 280px`. Owner lookup: `overflow`, `scrollbar` in this file — none; owner docs/site-architecture.md's chrome rules, with docs/_layouts/default.html.
-
-### nav-spec-suffix-restore
-
-[cost: event/low] [surface: docs]
-
-the site nav's kit suffix offers `readme` only, while every kit page links both its README and its SPEC, so the SPEC mirrors are the one reachable page class the menu does not reach. Traced 2026-09-29: delta 11 of the payload-withholding amendment, tagged `{mechanical}`, was applied by d2fbbd2a as a SPEC-title filter in docs/_includes/nav.html with a matching exclusion in `check-docs-nav-reachable`; no TRAJECTORY.md ruling covers it. Operator direction, 2026-09-29, lead-relayed (not a ruling): every reachable page is reachable from the menu, so the `spec` suffix returns. Grounds: the muted suffix already was the reference-tier affordance, evaluators of a verification tool are the SPECs' readers, and payload withholding is a footprint choice that does not carry to the website.
-
-**Deliverable:** the exclusion dropped from the nav include, from `check-docs-nav-reachable`'s model and from any docs/site-architecture.md sentence stating it. Process lesson, for the build to weigh: an information-architecture choice tagged `{mechanical}` inside an unrelated amendment reached no operator.
-
-**Cost while deferred:** a site reader finds a kit's SPEC only through its page body. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead after its close; promoted 2026-09-29 at the next iteration's scope: →fix fails because the stage may not build. Re-verified: `s.title != 'SPEC'` at nav.html line 12 and `SUFFIX_EXCLUDED_TITLE` in `native/src/gates/docs_nav_reachable.rs`. Owner lookup: `suffix`, `SPEC-title` in this file — none; owner docs/site-architecture.md, with [nav-strict-reachability](#nav-strict-reachability) refining the rule it restores under.
-
 ### nav-strict-reachability
 
 [cost: event/low] [surface: docs]
@@ -887,6 +909,8 @@ no rule says whether every docs page needs its own menu entry or may be reached 
 **Deliverable:** the rule stated in docs/site-architecture.md, the collapsed Releases children, and `check-docs-nav-reachable` holding the strict form.
 
 **Cost while deferred:** the nav's reach is decided page by page, and the Releases children grow the menu with every release. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead after its close; promoted 2026-09-29 at the next iteration's scope: →fix fails because the rule is new. Re-verified: the `nav_children_key` loop in nav.html renders every release as a list item. Owner lookup: `reachab`, `collapsed` in this file — [toolkit-nav-hierarchy](#toolkit-nav-hierarchy), DISTINCT (labels and parenting, not reach); [releases-page-table](#releases-page-table) keeps both its table and the now collapsed nav children, and [nav-spec-suffix-restore](#nav-spec-suffix-restore) stands under the strict rule. Owner docs/site-architecture.md.
+
+**Push need (2026-09-29, inside the budget):** the iteration's one mid-iteration batch push, since the collapsed nav renders in the Pages build, which the local render oracle reaches only in part; the nav units ride it together.
 
 ### site-sitemap-robots
 
@@ -898,15 +922,17 @@ the site serves no `sitemap.xml` and no `robots.txt`: both return 404 at the sit
 
 **Cost while deferred:** crawlers index the site from links alone. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead after its close, on the lead's judgment of value after an operator question; promoted 2026-09-29 at the next iteration's scope: →fix fails because a new site file is new surface. Re-verified: both paths 404 on the live site and the two-entry plugin list. Owner lookup: `sitemap`, `robots` in this file — none; owner docs/site-architecture.md.
 
-### homepage-license-duplicate
+**Push need (2026-09-29, inside the budget):** the iteration's one mid-iteration batch push, since only the Pages build runs the sitemap plugin.
 
-[cost: event/low] [surface: docs]
+### npm-approval-delegation
 
-the homepage states its license twice (operator observation, 2026-09-29): the layout footer at docs/_layouts/default.html line 192, added 2026-09-28 by 6bad6185 as a scope session's inline gap fix, and the hand-written `## License` section at docs/index.md lines 99 to 101, which that fix left in place. That breaks docs/site-architecture.md's one-statement-one-home rule. Operator direction, 2026-09-29, lead-relayed (not a ruling): file it rather than hotfix it.
+[cost: event/low] [surface: RELEASING.md]
 
-**Deliverable:** the section deleted from docs/index.md, its one voice line ("Adoption is the goal.") moved into the homepage body or dropped; README.md keeps its own, since GitHub readers see no site footer. Asked at the fix: which gate would have caught a chrome addition duplicating a page statement.
+RELEASING.md step 5 says the publish run pauses for "your approval" before the `npm` job, and does not say whether a close session a lead dispatched may give it. At companion-technical-gates' close a dispatched close approved publish run 36570759630's npm deployment on the lead's relay that a release was owed. Operator direction, 2026-09-29, given first-hand to the lead and lead-relayed (not a ruling): a delegated close may approve the npm-publish deployment without the operator's own confirmation, on the footing the Release assets already publish on, and the lead's dispatch prompt needs no separate grant.
 
-**Cost while deferred:** every homepage reader meets the license twice. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead after its close; promoted 2026-09-29 at the next iteration's scope: →fix fails because the operator directed a filing. Re-verified: both statements at the lines above. Owner lookup: `license` in this file — [license-line-owned-sentence](#license-line-owned-sentence), DISTINCT (the README and footer wording, not the homepage's second statement); owner docs/site-architecture.md.
+**Deliverable:** step 5 states that the approving session may be a delegated close. Operator direction, 2026-09-29: the edit is made in a session the operator drives, since a stage session's attempt was refused by the harness's permission classifier.
+
+**Cost while deferred:** a delegated close reads step 5 as addressed to the operator, and either escalates a release that needs no escalation or approves on a grant no tracked surface states. Filed 2026-09-29 as a direct entry at companion-adoption-landing's scope on the operator's direction, from two companion-technical-gates post-close gap bullets forwarded to the consult inbox and discarded there as not consult-class. Re-verified: step 5's "need your approval" sentence. Owner lookup: `npm-publish`, `approval`, `pending_deployments` in this file — none; owner RELEASING.md.
 
 ## Icebox
 

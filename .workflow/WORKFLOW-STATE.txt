@@ -4,4 +4,4 @@
 
 ---
 
-— scope a0f33f59 2026-09-29 1fd9c2d2
+companion-adoption-landing scope a0f33f59 2026-09-29 1fd9c2d2
