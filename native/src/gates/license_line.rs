@@ -20,6 +20,7 @@ enum Form {
 struct Conf {
     license: String,
     text: String,
+    pages: Option<String>,
     wheres: Vec<(String, String)>,
     sites: Vec<(String, Form)>,
 }
@@ -37,6 +38,7 @@ pub fn run(args: &[String]) -> i32 {
 fn parse(path: &str, text: &str) -> Result<Conf, String> {
     let mut license: Option<String> = None;
     let mut lic_text: Option<String> = None;
+    let mut pages: Option<String> = None;
     let mut wheres: Vec<(String, String)> = Vec::new();
     let mut sites: Vec<(String, Form)> = Vec::new();
     for (n, line) in fresh::file_lines(text).into_iter().enumerate() {
@@ -46,11 +48,15 @@ fn parse(path: &str, text: &str) -> Result<Conf, String> {
         let at = format!("{}:{}", path, n + 1);
         let words: Vec<&str> = line.split_whitespace().collect();
         match words[0] {
-            "license" | "text" => {
+            "license" | "text" | "pages" => {
                 if words.len() != 2 {
                     return Err(format!("{}: '{}' takes one value", at, words[0]));
                 }
-                let slot = if words[0] == "license" { &mut license } else { &mut lic_text };
+                let slot = match words[0] {
+                    "license" => &mut license,
+                    "text" => &mut lic_text,
+                    _ => &mut pages,
+                };
                 if slot.is_some() {
                     return Err(format!("{}: '{}' repeated", at, words[0]));
                 }
@@ -83,7 +89,7 @@ fn parse(path: &str, text: &str) -> Result<Conf, String> {
             }
             other => {
                 return Err(format!(
-                    "{}: unknown key '{}' (admitted: license, text, where, site)",
+                    "{}: unknown key '{}' (admitted: license, text, pages, where, site)",
                     at, other
                 ))
             }
@@ -99,6 +105,7 @@ fn parse(path: &str, text: &str) -> Result<Conf, String> {
     Ok(Conf {
         license: license.ok_or_else(|| format!("{}: key 'license' missing", path))?,
         text: lic_text.ok_or_else(|| format!("{}: key 'text' missing", path))?,
+        pages,
         wheres,
         sites,
     })
@@ -244,19 +251,45 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
+    // spec: docs/site-architecture.md §The license line — the site chrome states the license on
+    // every page, so a hand-written page under `pages` carrying the heading repeats it; a README
+    // there is the coverage walk's above
+    let mut pages = 0usize;
+    if let Some(dir) = &conf.pages {
+        for p in walk::find_files(&Path::new(&root).join(dir), &["md"])? {
+            let rel = site_key(p.strip_prefix(&root).unwrap_or(&p));
+            if p.file_name().is_some_and(|n| n == README) {
+                continue;
+            }
+            let text = fresh::read_captured(&p.display().to_string()).map_err(|e| format!("{}: {}", rel, e))?;
+            if generated(&text) {
+                continue;
+            }
+            pages += 1;
+            if license_section(&text).is_some() {
+                findings.push(format!(
+                    "  {}: a page under {} carries '{}', which the site chrome already states",
+                    rel, dir, HEADING
+                ));
+            }
+        }
+    }
+
     if !findings.is_empty() {
         println!("{}: license line(s) out of step with {}:", NAME, source);
         for f in &findings {
             println!("{}", f);
         }
-        println!("  help: paste each expected line as its site's one license line, and declare every");
-        println!("        README carrying the heading in {} (docs/site-architecture.md §The license line).", source);
+        println!("  help: paste each expected line as its site's one license line, declare every README");
+        println!("        carrying the heading in {}, and drop a page's own License section", source);
+        println!("        (docs/site-architecture.md §The license line).");
         return Ok(1);
     }
     println!(
-        "LICENSE-LINE: clean ({} site(s) carry the license line; {} README(s) declared)",
+        "LICENSE-LINE: clean ({} site(s) carry the license line; {} README(s) declared; {} page(s) carry none)",
         conf.sites.len(),
-        covered
+        covered,
+        pages
     );
     Ok(0)
 }
@@ -299,6 +332,7 @@ mod tests {
             "license A\ntext LICENSE\nsite R.md at nowhere\n",
             "license A\ntext LICENSE\nsite R.md link L\nsite R.md link L\n",
             "license A\ntext LICENSE\nsite R.md beside L\n",
+            "license A\ntext LICENSE\npages d\npages e\n",
         ] {
             assert!(parse("t.conf", bad).is_err(), "accepted: {:?}", bad);
         }

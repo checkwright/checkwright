@@ -14,7 +14,7 @@ One queue entry pairs it: [license-line-owned-sentence](TASK-QUEUE.md#license-li
 - **Coverage is derived.** Every tracked `README.md` carrying a `## License` heading must be a declared site, so a new README's line is held from its first commit. The generated mirrors under `docs/` are excluded by their `generated: true` front matter, since they are the docs-mirror's output of a declared source.
 - **The seam.** Repo-root only: a repo-root gate, its source file, the site architecture page and the installer's packer section. The kit READMEs change wording, which ships to adopters, but no kit mechanism changes, so no release declaration is owed.
 
-**Sibling unit.** [homepage-license-duplicate](TASK-QUEUE.md#homepage-license-duplicate), a debt entry, deletes `docs/index.md`'s `## License` section. That page is not a README, so this gate never reads it, and either unit may land first.
+**Sibling unit.** [homepage-license-duplicate](TASK-QUEUE.md#homepage-license-duplicate), a debt entry, deletes `docs/index.md`'s `## License` section, and widens this gate to catch it. The site chrome states the license on every page, so a hand-written page under the declared pages root that carries the heading repeats it. The gate reds that page, and the deletion lands in the widening's commit. This gate holds the license instance only. The general class, site chrome duplicating a page statement, is a gap filed apart.
 
 ## What changes
 
@@ -24,6 +24,7 @@ One queue entry pairs it: [license-line-owned-sentence](TASK-QUEUE.md#license-li
 
 - `license <id>` — the license's name, once: `license Apache-2.0`.
 - `text <file>` — the license file's name, once: `text LICENSE`.
+- `pages <dir>` — the root of the pages the site chrome renders on, at most once: `pages docs`.
 - `where <name> <clause…>` — a named location clause, one per placement:
   - `where installed beside this file in an installed copy and at the repository root in the source tree`
   - `where beside beside this file`
@@ -51,18 +52,18 @@ One queue entry pairs it: [license-line-owned-sentence](TASK-QUEUE.md#license-li
 
 - **Rendering.** A markdown site's linked form is `Licensed under [<license>](<target>).`. Its located form is ``Licensed under <license>, with the text in `<text>` <clause>.``. An `.html` site's linked form is `Licensed under <a href="<target>"><license></a>.`. An `.html` site declared `at` exits 2.
 - **Reading a site.** In a markdown site, the lines of its `## License` section, blank lines dropped, must be exactly one line, equal to the rendering. In an `.html` site, exactly one line, trimmed, opens `Licensed under`, and it must equal the rendering.
-- **Coverage.** Every `README.md` under `root`, walked with the gate-sdk prune set applied, whose text carries a `## License` heading, and whose front matter does not set `generated: true`, must be a declared site.
-- **Red**, one finding each: a site whose line differs, printing the expected line; a markdown site with no `## License` section, or one with more than one line; an `.html` site with no `Licensed under` line, or more than one; an undeclared README carrying the heading.
-- **Exit 2**: an unreadable source or site; a missing or repeated `license` or `text`; an unknown key; a `where` name declared twice or a `site` naming an undeclared one; a site declared twice; a `site` line whose form is neither `link` nor `at`.
-- **Clean line**: `LICENSE-LINE: clean (<n> site(s) carry the license line; <m> README(s) declared)`.
+- **Coverage.** Every `README.md` under `root`, walked with the gate-sdk prune set applied, whose text carries a `## License` heading, and whose front matter does not set `generated: true`, must be a declared site. Where the source declares `pages`, every other `.md` page under it, walked with the same prune set, whose front matter does not set `generated: true`, must carry no `## License` section.
+- **Red**, one finding each: a site whose line differs, printing the expected line; a markdown site with no `## License` section, or one with more than one line; an `.html` site with no `Licensed under` line, or more than one; an undeclared README carrying the heading; a page under `pages` carrying it.
+- **Exit 2**: an unreadable source or site; a missing or repeated `license` or `text`; a repeated `pages`; an unknown key; a `where` name declared twice or a `site` naming an undeclared one; a site declared twice; a `site` line whose form is neither `link` nor `at`.
+- **Clean line**: `LICENSE-LINE: clean (<n> site(s) carry the license line; <m> README(s) declared; <k> page(s) carry none)`.
 - **Positional form**: `check-license-line [source root]`, `root` the tree the coverage walk reads, so a fixture tree stands in for the repository.
-- **Descriptor**: `couples=scripts/license-line.conf,README.md,*/README.md,*/*/README.md,docs/_layouts/default.html,native/src/gates/license_line.rs`, `dir=one valve=none`. Its `# spec:` line cites docs/site-architecture.md §The license line.
+- **Descriptor**: `couples=scripts/license-line.conf,README.md,*/README.md,*/*/README.md,docs/_layouts/default.html,docs/*.md,docs/*/*.md,native/src/gates/license_line.rs`, `dir=one valve=none`. Its `# spec:` line cites docs/site-architecture.md §The license line.
 
 ### (4) The owning section {mechanical}
 
 **Applied.** docs/site-architecture.md gains `## The license line`, after §Page-authoring rules:
 
-*Every README's `## License` section and the site footer carry one sentence: `Licensed under Apache-2.0`, then where that copy's license text is. A site a reader follows by link takes the linked form, the license name linked to the text. A README that travels without the repository takes the located form, which names `LICENSE` and says where it sits beside that copy. `scripts/license-line.conf` declares the license, each location clause and each site's form. `check-license-line` holds each site to its rendering and every README carrying the heading to a declaration, printing the expected line on a red. The mirrors are generated from their sources and are not sites.*
+*Every README's `## License` section and the site footer carry one sentence: `Licensed under Apache-2.0`, then where that copy's license text is. A site a reader follows by link takes the linked form, the license name linked to the text. A README that travels without the repository takes the located form, which names `LICENSE` and says where it sits beside that copy. `scripts/license-line.conf` declares the license, each location clause and each site's form. `check-license-line` holds each site to its rendering and every README carrying the heading to a declaration, printing the expected line on a red. The mirrors are generated from their sources and are not sites. The footer states the license on every page, so a hand-written page under the source's `pages` root carries no License section of its own, and the gate reds one that does.*
 
 ### (5) The packer's placement names its readers {mechanical}
 
@@ -72,8 +73,8 @@ One queue entry pairs it: [license-line-owned-sentence](TASK-QUEUE.md#license-li
 
 **Applied.** `scripts/gate-tests/check-license-line/`, each case a tree with a `license-line.conf` and an `args` naming it and the case root:
 
-- `good/`: a root `README.md` in the linked form, a `kit/README.md` in the located form, a `default.html` footer, and a `docs/kit/README.md` carrying `generated: true` and a differently worded section, which the coverage walk skips.
-- `bad/`: a README whose line differs, a declared README with no `## License` section, and an undeclared `other/README.md` carrying the heading. `expect.txt` holds the three findings and one expected-line print.
+- `good/`: a root `README.md` in the linked form, a `kit/README.md` in the located form, a `default.html` footer, and a `docs/kit/README.md` carrying `generated: true` and a differently worded section, which the coverage walk skips; `pages docs`, with a `docs/page.md` carrying no section and a generated `docs/mirror.md` carrying one, which the page walk skips.
+- `bad/`: a README whose line differs, a declared README with no `## License` section, an undeclared `other/README.md` carrying the heading, and, under `pages docs`, a hand-written `docs/index.md` carrying it. `expect.txt` holds the four findings and one expected-line print.
 
 ## Producers and consumers
 

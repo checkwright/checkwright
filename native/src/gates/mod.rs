@@ -1751,7 +1751,10 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-license-line",
         license_line::run,
-        &[(".", "name:lit:README.md", "", "")],
+        &[
+            (".", "name:lit:README.md", "", ""),
+            ("?", "", "", "dynamic@src/gates/license_line.rs:259"),
+        ],
         &["GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS"],
         "-",
         &[],

@@ -2,3 +2,4 @@ README.md: the license line differs from its rendering
 expected: Licensed under [Apache-2.0](LICENSE).
 kit/README.md: no '## License' section
 other/README.md: carries '## License' but is not a declared site
+docs/index.md: a page under docs carries '## License', which the site chrome already states

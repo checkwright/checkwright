@@ -92,14 +92,6 @@ no page states which Checkwright checks each companion toolkit gets: docs/spec-t
 
 ## Technical Debt
 
-### homepage-license-duplicate
-
-the homepage states its license twice (operator observation, 2026-09-29): the layout footer at docs/_layouts/default.html line 192, added 2026-09-28 by 6bad6185 as a scope session's inline gap fix, and the hand-written `## License` section at docs/index.md lines 99 to 101, which that fix left in place. That breaks docs/site-architecture.md's one-statement-one-home rule. Operator direction, 2026-09-29, lead-relayed (not a ruling): file it rather than hotfix it.
-
-**Deliverable:** the section deleted from docs/index.md, its one voice line ("Adoption is the goal.") moved into the homepage body or dropped; README.md keeps its own, since GitHub readers see no site footer. Asked at the fix: which gate would have caught a chrome addition duplicating a page statement.
-
-**Cost while deferred:** every homepage reader meets the license twice. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead after its close; promoted 2026-09-29 at the next iteration's scope: →fix fails because the operator directed a filing. Re-verified: both statements at the lines above. Owner lookup: `license` in this file — [license-line-owned-sentence](#license-line-owned-sentence), DISTINCT (the README and footer wording, not the homepage's second statement); owner docs/site-architecture.md.
-
 ### installer-remainder-brevity
 
 installer/SPEC.md's remaining sections under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §Implementation, §Layout, §Selecting kits and gates, §update, §diff, §uninstall, §demo, §The CI action, §The packer, §Vendoring without the installer, §Reviewing the pre-commit hook, §Versioning and §The upgrade contract, about 83k characters; §The consumer smoke stays on the parent.
@@ -1590,5 +1582,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 - nav-spec-suffix-restore
 - value-table-overflow
+- homepage-license-duplicate
 
 ## Lessons Learned

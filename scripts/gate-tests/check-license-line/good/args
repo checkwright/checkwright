@@ -1,4 +1,5 @@
 # The source, then the case root the coverage walk reads. docs/kit/README.md is a
-# generated mirror carrying a differently worded section, which the walk skips.
-# The gate ACCEPTS.
+# generated mirror carrying a differently worded section, which the walk skips;
+# under the pages root docs/, page.md carries no License section and the generated
+# mirror.md, which does, is skipped. The gate ACCEPTS.
 license-line.conf .
