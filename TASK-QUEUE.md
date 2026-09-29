@@ -8,6 +8,54 @@
 
 ## New Features
 
+### front-door-flag-grammar
+
+[spec: SPEC-flag-table.md]
+
+an advertised `init` flag the pinned release lacks reds no gate and fires no release trigger. `check-front-door-verbs` invariant B reads only the verb after a route (installer/SPEC.md §The front door's verbs), and the close binding's release-policy trigger names a front-door verb, so a flag landed mid-iteration leaves the site advertising a refusal until an unforced release. Instance: docs/openspec.md, docs/speckit.md and docs/install.md advertised `init --recipe` while the pinned v0.28.0 refused it (`unknown argument: --recipe`, exit 2).
+
+**Deliverable:** invariant B, or a sibling arm, extended to a flag after an advertised verb, read against the pinned release's flag grammar (a flag table beside the verb table), and the release-policy trigger worded to match.
+
+**Push need (2026-09-29, inside the budget):** the same mid-iteration batch push, since its gate arm is native crate code the Windows and macOS legs compile; lands before [install-gate-selection](#install-gate-selection), whose new `init` flags are the class it gates.
+
+**Cost while deferred:** each release window can publish a flag the one-liner refuses, found only by a reader. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's close; promoted 2026-09-28 at the next iteration's scope: →fix fails because the flag table is new mechanism. Re-verified: the pin now reads 0.29.0, whose `init.rs` carries `--recipe`, so the instance is gone and the class stands. Owner lookup: `front-door-verbs`, `flag table` in this file — none; owner installer/SPEC.md §The front door's verbs, with `.claude/commands/close.md`'s release-policy binding.
+
+### install-gate-selection
+
+[spec: SPEC-gate-selection.md]
+
+an adopter cannot choose which kits or gates to install, or which to replace with their own. Operator direction, 2026-09-28 (lead session): "choice is what customers want". `init` takes `--profile`, `--recipe`, `--no-recipe`, `--dry-run`, `--force` and `--no-commit` only; the profiles are fixed rosters; a recipe can unregister gates but is publisher-shipped; a `gates.list` edit survives a re-run only as an adopter-changed file. The registry already resolves consumer-first, so a same-named gate in the adopter's gates dir shadows a kit gate (gate-sdk/SPEC.md §Layout and configuration), but no adopter page presents that as the replace path.
+
+**Deliverable:** an install-time selection surface, include or exclude per kit and per gate, recorded in `checkwright.lock` so re-runs and `update` honour it, and the replace-with-your-own path documented.
+
+**Push need (2026-09-29, inside the budget):** the same mid-iteration batch push, since the new `init` flags run on the pwsh Windows smoke legs; lands after [front-door-flag-grammar](#front-door-flag-grammar), so its flags meet the flag table, and before [installer-install-brevity](#installer-install-brevity).
+
+**Cost while deferred:** each adopter install takes a fixed roster and hand-edits it to choose. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead as `iteration/high`, re-classed `event/high` at promotion since its prose pays at an adopter's install; promoted 2026-09-28 at the next iteration's scope: →fix fails because the surface is new mechanism. Owner lookup: `selection`, `--profile` in this file — [verify-workflow-decoupling](#verify-workflow-decoupling), [gate-customer-value-audit](#gate-customer-value-audit), [custom-gate-substrates](#custom-gate-substrates) and [gate-authoring-sdk-surface](#gate-authoring-sdk-surface), each DISTINCT. Owner installer/SPEC.md §init, §Profiles and §The manifest.
+
+### companion-spec-to-code-gates
+
+[spec: SPEC-spec-to-code.md]
+
+the companion checks documents and never code against a spec. Split 2026-09-28 at companion-front-door-widening's scope from `companion-gate-widening`, on an operator direction lead-relayed (not a /consult ruling): the widening's profile half is taken, this half is new mechanism over formats nobody has probed.
+
+**Deliverable:** the spec-to-code gates the toolkits' formats make possible, each deferring to the toolkit where it owns the check, with a fixture pair in each toolkit's layout.
+
+**Probed at spec (2026-09-29):** a ticked task naming an absent path and a task's story label naming an undefined story are checkable; OpenSpec's archive owns delta-to-base agreement, and `plan.md`'s tree is future state.
+
+**Push need (2026-09-29, inside the budget):** the iteration's one mid-iteration batch push, since the new native gates run on the Windows and macOS legs no local run reaches; lands before [speckit-extension-full-profile](#speckit-extension-full-profile), whose two tiers both carry them.
+
+**Cost while deferred:** an adopter's spec and code drift apart with no red, which is the check the operator's "ship all gates checkwright offers" asks the companion to reach. Filed 2026-09-28 as a split, the parent's gap-inbox provenance carried. Owner lookup: `spec-to-code` in this file — the parent alone; owner companion/SPEC.md.
+
+### speckit-extension-full-profile
+
+[spec: SPEC-extension-full.md]
+
+the Spec Kit extension installs only the document gates. companion/SPEC.md's `speckit.checkwright.install` runs `init --profile prose --recipe speckit`, and §The tested claim is proved on prose, so the `full` tier the recipes carry is out of the extension's reach.
+
+**Deliverable:** the extension offering the technical gates (the `full` profile, or a choice between the two), proved by the consumer smoke's companion arm.
+
+**Cost while deferred:** a Spec Kit user meets document gates only. A prerequisite of [companion-toolkit-profile](#companion-toolkit-profile), operator direction 2026-09-29, lead-relayed (not a ruling). Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead as part of that direction; filed as its own entry at its close: →fix fails because the extension's command changes shape, →forward because the direction is given. Re-verified: companion/SPEC.md's install command above. Owner lookup: `Spec Kit extension`, `full profile` in this file — [companion-spec-to-code-gates](#companion-spec-to-code-gates), DISTINCT (new gates, not the extension's reach); owner companion/SPEC.md.
+
 ## Technical Debt
 
 ### consumer-smoke-windows-residue
@@ -698,20 +746,6 @@ the operator states that verification and workflow are fully decoupled, each shi
 
 **Cost while deferred:** a front-matter slip is caught only by a push, which spends a hotfix from the budget. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' close; promoted 2026-09-28 at the next iteration's scope: →fix fails because a stricter reader changes a shipped gate's verdict. Re-verified: the reader above, and `.github/workflows/gates.yml` installs `skills-ref` in CI only. Owner lookup: `front matter`, `skills-ref`, `yaml` in this file — only the icebox's template-copy-parity-yaml-widening, DISTINCT (template copies); owner plugin/SPEC.md §check-plugin-parity.
 
-### companion-spec-to-code-gates
-
-[cost: event/high] [surface: companion]
-
-the companion checks documents and never code against a spec. Split 2026-09-28 at companion-front-door-widening's scope from `companion-gate-widening`, on an operator direction lead-relayed (not a /consult ruling): the widening's profile half is taken, this half is new mechanism over formats nobody has probed.
-
-**Deliverable:** the spec-to-code gates the toolkits' formats make possible, each deferring to the toolkit where it owns the check, with a fixture pair in each toolkit's layout.
-
-**Inferred, not run:** candidate checks, unprobed against the formats: requirement IDs cited by tasks and tests, a ticked task naming an absent file, `plan.md` paths existing, an OpenSpec delta agreeing with its base spec before archive.
-
-**Push need (2026-09-29, inside the budget):** the iteration's one mid-iteration batch push, since the new native gates run on the Windows and macOS legs no local run reaches; lands before [speckit-extension-full-profile](#speckit-extension-full-profile), whose full tier carries them.
-
-**Cost while deferred:** an adopter's spec and code drift apart with no red, which is the check the operator's "ship all gates checkwright offers" asks the companion to reach. Filed 2026-09-28 as a split, the parent's gap-inbox provenance carried. Owner lookup: `spec-to-code` in this file — the parent alone; owner companion/SPEC.md.
-
 ### license-line-owned-sentence
 
 [cost: once/low] [surface: docs]
@@ -732,18 +766,6 @@ positional references to a block go stale like restated counts, and nothing catc
 
 **Cost while deferred:** the next block edit strands a positional sentence silently. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; the three instances fixed at its close, the rule and gate promoted: →fix fails because a doctrine rule change is a scoped unit (the reasoning [intake-routing-test](#intake-routing-test) records) and the gate is new mechanism. Re-verified: the battery-roster block ended at `--projection-witness`. Owner lookup: `positional`, `ordinal`, `renumber` in this file — only the icebox's doctrine-rule-number-citation-liveness, DISTINCT (numbered doctrine-rule citations); owner doctrine-kit/DOCTRINE.md, with canon-kit/SPEC.md for any gate arm.
 
-### front-door-flag-grammar
-
-[cost: event/low] [surface: installer]
-
-an advertised `init` flag the pinned release lacks reds no gate and fires no release trigger. `check-front-door-verbs` invariant B reads only the verb after a route (installer/SPEC.md §The front door's verbs), and the close binding's release-policy trigger names a front-door verb, so a flag landed mid-iteration leaves the site advertising a refusal until an unforced release. Instance: docs/openspec.md, docs/speckit.md and docs/install.md advertised `init --recipe` while the pinned v0.28.0 refused it (`unknown argument: --recipe`, exit 2).
-
-**Deliverable:** invariant B, or a sibling arm, extended to a flag after an advertised verb, read against the pinned release's flag grammar (a flag table beside the verb table), and the release-policy trigger worded to match.
-
-**Push need (2026-09-29, inside the budget):** the same mid-iteration batch push, since its gate arm is native crate code the Windows and macOS legs compile; lands before [install-gate-selection](#install-gate-selection), whose new `init` flags are the class it gates.
-
-**Cost while deferred:** each release window can publish a flag the one-liner refuses, found only by a reader. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's close; promoted 2026-09-28 at the next iteration's scope: →fix fails because the flag table is new mechanism. Re-verified: the pin now reads 0.29.0, whose `init.rs` carries `--recipe`, so the instance is gone and the class stands. Owner lookup: `front-door-verbs`, `flag table` in this file — none; owner installer/SPEC.md §The front door's verbs, with `.claude/commands/close.md`'s release-policy binding.
-
 ### gate-customer-value-audit
 
 [cost: iteration/high] [surface: gate-sdk]
@@ -757,18 +779,6 @@ nothing asks whether each shipped gate is useful and configurable for a customer
 **First slice landed 2026-09-29 at native-hook-customer-legs, operator direction lead-relayed (not a /consult ruling):** the payload rule at gate-sdk/SPEC.md §Consumer payload, and site-kit audited against it.
 
 Audited: site-kit, 5 gates (5 kept, 2 made generic, 0 withheld); the other 118 shipped gates remain, kit by kit, under gate-sdk/SPEC.md §Consumer payload's rule.
-
-### install-gate-selection
-
-[cost: event/high] [surface: installer]
-
-an adopter cannot choose which kits or gates to install, or which to replace with their own. Operator direction, 2026-09-28 (lead session): "choice is what customers want". `init` takes `--profile`, `--recipe`, `--no-recipe`, `--dry-run`, `--force` and `--no-commit` only; the profiles are fixed rosters; a recipe can unregister gates but is publisher-shipped; a `gates.list` edit survives a re-run only as an adopter-changed file. The registry already resolves consumer-first, so a same-named gate in the adopter's gates dir shadows a kit gate (gate-sdk/SPEC.md §Layout and configuration), but no adopter page presents that as the replace path.
-
-**Deliverable:** an install-time selection surface, include or exclude per kit and per gate, recorded in `checkwright.lock` so re-runs and `update` honour it, and the replace-with-your-own path documented.
-
-**Push need (2026-09-29, inside the budget):** the same mid-iteration batch push, since the new `init` flags run on the pwsh Windows smoke legs; lands after [front-door-flag-grammar](#front-door-flag-grammar), so its flags meet the flag table, and before [installer-install-brevity](#installer-install-brevity).
-
-**Cost while deferred:** each adopter install takes a fixed roster and hand-edits it to choose. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead as `iteration/high`, re-classed `event/high` at promotion since its prose pays at an adopter's install; promoted 2026-09-28 at the next iteration's scope: →fix fails because the surface is new mechanism. Owner lookup: `selection`, `--profile` in this file — [verify-workflow-decoupling](#verify-workflow-decoupling), [gate-customer-value-audit](#gate-customer-value-audit), [custom-gate-substrates](#custom-gate-substrates) and [gate-authoring-sdk-surface](#gate-authoring-sdk-surface), each DISTINCT. Owner installer/SPEC.md §init, §Profiles and §The manifest.
 
 ### toolkit-nav-hierarchy
 
@@ -799,16 +809,6 @@ no shipped prompt template drives a coding agent through adoption. Operator dire
 **Deliverable:** the template set, at a home scope rules: the installer's activation surface, or a kit template the harness plugin exposes as a command. The clean-container rehearsal [design-partner-preview](#design-partner-preview) runs can drive it unattended.
 
 **Cost while deferred:** every adopter's agent configures the install by reading pages. A prerequisite of [companion-toolkit-profile](#companion-toolkit-profile). Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at its close: →fix fails because the set is a new governed surface, →forward because the direction is given. Re-verified: no `prompt` in docs/install.md or installer/README.md. Owner lookup: `prompt template`, `adoption prompt` in this file — none; owner installer/SPEC.md, or plugin/SPEC.md for a command home.
-
-### speckit-extension-full-profile
-
-[cost: event/low] [surface: companion]
-
-the Spec Kit extension installs only the document gates. companion/SPEC.md's `speckit.checkwright.install` runs `init --profile prose --recipe speckit`, and §The tested claim is proved on prose, so the `full` tier the recipes carry is out of the extension's reach.
-
-**Deliverable:** the extension offering the technical gates (the `full` profile, or a choice between the two), proved by the consumer smoke's companion arm.
-
-**Cost while deferred:** a Spec Kit user meets document gates only. A prerequisite of [companion-toolkit-profile](#companion-toolkit-profile), operator direction 2026-09-29, lead-relayed (not a ruling). Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead as part of that direction; filed as its own entry at its close: →fix fails because the extension's command changes shape, →forward because the direction is given. Re-verified: companion/SPEC.md's install command above. Owner lookup: `Spec Kit extension`, `full profile` in this file — [companion-spec-to-code-gates](#companion-spec-to-code-gates), DISTINCT (new gates, not the extension's reach); owner companion/SPEC.md.
 
 ### compiled-consumer-smoke-driver
 
