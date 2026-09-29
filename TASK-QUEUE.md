@@ -1528,11 +1528,4 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 
 ## Done
 
-- consumer-smoke-windows-residue
-- installer-install-brevity
-- front-door-flag-grammar
-- install-gate-selection
-- companion-spec-to-code-gates
-- speckit-extension-full-profile
-
 ## Lessons Learned
