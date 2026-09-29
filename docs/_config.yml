@@ -2,14 +2,14 @@ title: Checkwright
 description: "Deterministic verification for coding-agent delivery. Checkwright is the verification layer under agent orchestration: spec drift, skipped stages, and unsupported done claims become failing checks before a merge, instead of review findings after one."
 theme: jekyll-theme-primer
 
-# GitHub Pages enables these by default; declaring them keeps a local build faithful.
-# relative-links rewrites in-repo .md references to their built .html (so a flipped
-# reference block and the mirror's cross-links resolve on the served site);
-# optional-front-matter renders the front-matter-less pages (dated posts, the
-# generated evidence/enforcement pages) through the chrome.
+# GitHub Pages supports these; declaring them keeps a local build faithful.
+# relative-links rewrites in-repo .md references to their built .html;
+# optional-front-matter renders the front-matter-less pages through the chrome;
+# sitemap writes sitemap.xml and, since the tree has none, robots.txt naming it.
 plugins:
   - jekyll-relative-links
   - jekyll-optional-front-matter
+  - jekyll-sitemap
 
 # Every page renders through the site chrome; search.json opts back out to layout: null.
 defaults:

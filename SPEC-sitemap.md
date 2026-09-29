@@ -17,18 +17,18 @@ One queue entry pairs it: [site-sitemap-robots](TASK-QUEUE.md#site-sitemap-robot
 
 ### (1) The plugin {mechanical}
 
-**Not yet applied.** `docs/_config.yml`'s `plugins:` list gains `- jekyll-sitemap`, after the two it carries. The comment above the list is rewritten to one clause per plugin: *relative-links rewrites in-repo `.md` references to their built `.html`; optional-front-matter renders the front-matter-less pages through the chrome; sitemap writes `sitemap.xml` and, since the tree has none, `robots.txt` naming it.* Its first line becomes *GitHub Pages supports these; declaring them keeps a local build faithful.*, since the sitemap plugin is supported but is not one Pages enables by default.
+**Applied.** `docs/_config.yml`'s `plugins:` list gains `- jekyll-sitemap`, after the two it carries. The comment above the list is rewritten to one clause per plugin: *relative-links rewrites in-repo `.md` references to their built `.html`; optional-front-matter renders the front-matter-less pages through the chrome; sitemap writes `sitemap.xml` and, since the tree has none, `robots.txt` naming it.* Its first line becomes *GitHub Pages supports these; declaring them keeps a local build faithful.*, since the sitemap plugin is supported but is not one Pages enables by default.
 
 ### (2) The site-architecture sentence {mechanical}
 
-**Not yet applied.** docs/site-architecture.md §Site chrome and the nav contract, after the first sentence: *`jekyll-sitemap` writes `sitemap.xml`, every HTML page less one setting `sitemap: false`, and a `robots.txt` naming it, so the tree carries neither file and a page leaves the sitemap only by that key.*
+**Applied.** docs/site-architecture.md §Site chrome and the nav contract, after the first sentence: *`jekyll-sitemap` writes `sitemap.xml`, every HTML page less one setting `sitemap: false`, and a `robots.txt` naming it, so the tree carries neither file and a page leaves the sitemap only by that key.*
 
 ## Producers and consumers
 
 Probe: `https://pages.github.com/versions.json`, read on the day of authoring, lists `"jekyll-sitemap":"1.4.0"` beside `"github-pages":"232"`. The plugin's source at tag `v1.4.0`, `lib/jekyll/jekyll-sitemap.rb`, adds `sitemap.xml` and `robots.txt` to the site's pages when the source lacks each. `lib/sitemap.xml` loops over `site.html_pages | where_exp:'doc','doc.sitemap != false' | where_exp:'doc','doc.url != "/404.html"'`, and `lib/robots.txt` reads `Sitemap: {{ "sitemap.xml" | absolute_url }}`. `git ls-files docs | grep -E 'robots|sitemap'` finds no tracked file, and `grep -rn '^sitemap:' docs` finds no page setting the key.
 
 - **`sitemap.xml` and `robots.txt`** (delta 1). Producer: the Pages build, on each push to master. Consumer: a crawler, by fetch. No gate reads either: they exist only in the built site.
-- **The absolute URL.** `absolute_url` prefixes the site's `url`. **Inferred, not probed:** that the Pages build sets `url` from the `CNAME`, through the `github-pages` gem's metadata plugin, since `docs/_config.yml` carries no `url:`. The post-push check below settles it: a relative or `http://` `Sitemap:` line means `url: https://checkwright.dev` joins `docs/_config.yml`.
+- **The absolute URL.** `absolute_url` prefixes the site's `url`. **Inferred, not probed:** that the Pages build sets `url` from the `CNAME`, through the `github-pages` gem's metadata plugin, since `docs/_config.yml` carries no `url:`. The post-push check below settles it: a relative or `http://` `Sitemap:` line means `url: https://checkwright.dev` joins `docs/_config.yml`. Build ran delta 1 through a local Jekyll 4.4.1 render with the plugin at 1.4.0: `sitemap.xml` lists 89 pages, the home page and every release note among them, and not `search.json`, and `robots.txt` reads `Sitemap: /sitemap.xml`, the relative form a build with no `url` gives, so the local run cannot settle the Pages one.
 
 ## Existing sections updated
 

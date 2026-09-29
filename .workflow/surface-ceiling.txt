@@ -73,7 +73,7 @@
 6814cp docs/posts/2026-09-29-checkwright-v0-30-0.md
 1440cp docs/queue-kit/index.md
 789cp docs/releases.md
-40145cp docs/site-architecture.md
+40346cp docs/site-architecture.md
 2412cp docs/site-kit/index.md
 3714cp docs/spec-toolkits.md
 2164cp docs/speckit.md
