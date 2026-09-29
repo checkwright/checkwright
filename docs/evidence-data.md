@@ -240,3 +240,4 @@
 | lifecycle-machine-brevity | sc · · b v c | 0f/1d | 0 | 21s clean | 142 |
 | native-hook-customer-legs | sc sp a b v c | 4f/1d | 2 · ≤0d | 21s clean | 142 |
 | companion-technical-gates | sc sp a b v c | 5f/1d | 4 · ≤0d | 21s clean | 144 |
+| companion-adoption-landing | sc sp a b v c | 8f/4d | 6 · ≤0d | 21s clean | 146 |

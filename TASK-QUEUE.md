@@ -42,7 +42,7 @@ ported gate modules carry `spec:` comments citing a section for a literal awk or
 
 **Deliverable:** a sweep of the crate's `spec:` comments against their cited sections, each unstated one retagged `comment-tier-exempt:` where the fact is local, deleted where it is port residue, or moved to the section where it is a contract.
 
-**Cost while deferred:** a reader following such a pointer finds no support for the literal, and a later SPEC edit cannot tell the comment depends on it. Filed 2026-09-26 to the gap inbox by gate-sdk-meta-gate-brevity's citation survey; promoted 2026-09-26 at front-door-release's close: →fix fails because the class spans the crate and each comment needs a local-versus-contract call. The survey's other instance, `native/src/hook/stop_liveness.rs` citing §check-test-hermetic for per-case scratch roots, was fixed at the drain. Owner lookup: `spec-pointer`, `comment-tier-exempt`, `shell form` in this file — none; owner canon-kit/SPEC.md §check-comment-tier.
+**Cost while deferred:** a reader following such a pointer finds no support for the literal, and a later SPEC edit cannot tell the comment depends on it. Filed 2026-09-26 to the gap inbox by gate-sdk-meta-gate-brevity's citation survey; promoted 2026-09-26 at front-door-release's close: →fix fails because the class spans the crate and each comment needs a local-versus-contract call. The survey's other instance, `native/src/hook/stop_liveness.rs` citing §check-test-hermetic for per-case scratch roots, was fixed at the drain, as were eight in `native/src/emit/pack_installer.rs` citing §The packer (2026-09-29 drain), which shows the class reaching emit arms too. Owner lookup: `spec-pointer`, `comment-tier-exempt`, `shell form` in this file — none; owner canon-kit/SPEC.md §check-comment-tier.
 
 ### absence-statement-gate-arms
 
@@ -820,6 +820,46 @@ RELEASING.md step 5 says the publish run pauses for "your approval" before the `
 
 **Cost while deferred:** a delegated close reads step 5 as addressed to the operator, and either escalates a release that needs no escalation or approves on a grant no tracked surface states. Filed 2026-09-29 as a direct entry at companion-adoption-landing's scope on the operator's direction, from two companion-technical-gates post-close gap bullets forwarded to the consult inbox and discarded there as not consult-class. Re-verified: step 5's "need your approval" sentence. Owner lookup: `npm-publish`, `approval`, `pending_deployments` in this file — none; owner RELEASING.md.
 
+### consult-intake-narrowing
+
+[cost: event/high] [surface: lifecycle-kit]
+
+the consult inbox takes more than the operator's model of consult. Operator direction, 2026-09-29, lead-relayed (not a ruling): consult is for (a) reconsidering a ruling and (b) an expert opinion from a superior model on strategic direction, such as architecture. lifecycle-kit/SPEC.md §The consult inbox also admits an operator-class finding a session cannot relay live, a threshold entry declined twice, a misnamed direction question and a stage's operator signal; the catch-alls twice pulled in a question the operator had already answered as a direction (the operator-seat install item, re-classed at 30a5343b; the npm-approval item, discarded at 8ea1233c).
+
+**Deliverable:** the producer list narrowed to (a) and (b), the other classes routed to the gap inbox or a live lead; templates/consult.md (the operator rules) reconciled with (b)'s advisory reading; whether (b) pins consult's tier, where [consult-tier-declaration](#consult-tier-declaration) asserts the tier consult dispatches; and whether a lead-dispatched consultation with no operator, which can only re-class or discard, still earns a dispatch.
+
+**Cost while deferred:** each misfiled item costs a consultation to route it back out. Filed 2026-09-29 to the gap inbox by companion-adoption-landing's lead; promoted at its close: →fix fails because narrowing a producer set is a contract change to a SPEC section, →forward because the direction is given and filing it to consult is the misfile it names. Re-verified: §The consult inbox's Producers paragraph and opening list. Owner lookup: `consult inbox`, `intake` in this file — [consult-tier-declaration](#consult-tier-declaration), DISTINCT (the tier consult runs at, not what enters it); owner lifecycle-kit/SPEC.md §The consult inbox.
+
+### user-facing-delta-unsurfaced
+
+[cost: event/low] [surface: lifecycle-kit]
+
+a user-facing choice can ride a `{mechanical}` delta and reach no operator: the payload-withholding amendment's delta 11 hid the SPEC mirrors from the site nav's kit suffix, and `nav-spec-suffix-restore` reversed it at companion-adoption-landing's build. The work-class tag measures the execution judgment a delta demands (lifecycle-kit/templates/stages/spec.md, Label every delta), not whether it changes what a reader meets.
+
+**Deliverable:** a spec-stage rule that a delta changing user-facing semantics, the site's reach or labels included, is surfaced in the amendment's rulings, and align's check of it; or a boundary note refusing both.
+
+**Cost while deferred:** the next such choice lands unreviewed and costs a later reversal unit. Filed 2026-09-29 to the gap inbox by companion-adoption-landing's build; promoted at its close: →fix fails because a stage rule is new kit mechanism, →forward because no ruling is owed. Re-verified: spec.md's Label every delta defines the tag by execution judgment. Owner lookup: `work-class`, `user-facing`, `mechanical` in this file — the icebox's amendment-work-class-label-placement, DISTINCT (where the tag sits, not what it misses); owner lifecycle-kit/templates/stages/spec.md.
+
+### docs-chrome-page-repeat
+
+[cost: event/low] [surface: docs]
+
+`check-docs-page-repeat` reads page sources and never `docs/_layouts` or `docs/_includes`, so a chrome addition repeating a page's statement passes. Found at `homepage-license-duplicate`, where the footer's license line duplicated docs/index.md's License section; that unit's `check-license-line` widening holds the license instance only.
+
+**Deliverable:** an arm prefixing the layout's and includes' literal text nodes (Liquid excluded) to every page's corpus, so a sentence of eight words or more or a link target stated in both reds; or a boundary note refusing it.
+
+**Cost while deferred:** the next chrome addition can duplicate a page statement unseen until a reader finds it. Filed 2026-09-29 to the gap inbox by companion-adoption-landing's build; promoted at its close: →fix fails because the arm is new mechanism with a false-positive risk to calibrate, →forward because no ruling is owed. Re-verified: canon-kit/SPEC.md §check-docs-page-repeat reads each `CANON_KIT_PAGE_REPEAT_PAGES` page alone and deliberately asserts no repeat across pages, so the arm must weigh that boundary. Owner lookup: `page-repeat`, `_layouts`, `chrome` in this file — [site-video-poster-rule](#site-video-poster-rule), DISTINCT (embeds); owner canon-kit/SPEC.md §check-docs-page-repeat, with docs/site-architecture.md §Page-authoring rules. Surface also canon-kit.
+
+### skill-binding-couples-drift
+
+[cost: event/low] [surface: lifecycle-kit]
+
+`check-skill-binding` couples each out-of-tree bound template by name, and nothing checks the list against the templates the shims bind: `drift-kit/templates/economics.md` was absent until companion-adoption-landing's close, and `gate-sdk/templates/adopt.md` was added by hand at its spec.
+
+**Deliverable:** an assertion that every template a shim under `LIFECYCLE_KIT_SKILLS_DIR` binds matches a `couples=` member of the gate's own descriptor, with a fixture pair; or a boundary note in lifecycle-kit/SPEC.md §check-skill-binding refusing it.
+
+**Cost while deferred:** a slot added to an uncoupled bound template fires nothing at commit and surfaces one tier late. Filed 2026-09-29 at companion-adoption-landing's close as the drain's gap generalization for the economics omission it fixed. Owner lookup: `skill-binding`, `couples` in this file — none; owner lifecycle-kit/SPEC.md §check-skill-binding.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
@@ -1489,17 +1529,5 @@ Capture arms take their prose as argv, so a filing carrying shell punctuation co
 The consumer's local-only companion files (private brief, ops runbook) have read triggers but no write-back trigger, so shipped-unit forward memory and an out-of-tree state verifier drift until a consult audits them; owed are close and release-sweep template slots for both, and a retired-slug arm over plain code on the local-only globs.
 
 ## Done
-
-- nav-spec-suffix-restore
-- value-table-overflow
-- homepage-license-duplicate
-- toolkit-overlap-value-bar
-- adoption-prompt-templates
-- license-line-owned-sentence
-- toolkit-support-table
-- toolkit-nav-hierarchy
-- nav-strict-reachability
-- site-sitemap-robots
-- installer-remainder-brevity
 
 ## Lessons Learned

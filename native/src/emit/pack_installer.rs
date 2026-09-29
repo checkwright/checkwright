@@ -21,13 +21,8 @@ pub const KNOBS: &[&str] = &[
     "GATE_SDK_SPEC_BASE_URL",
 ];
 
-// spec: installer/SPEC.md §The packer — the diagnostic prefix the shell form printed, kept across
-// the cut so a reader of a finished CI log meets one name and not two
 const NAME: &str = "pack-installer";
 
-// spec: installer/SPEC.md §The packer — one refusal type behind one formatter, so the arm has no
-// exit path that prints nothing: the shell form ran without `-e` and could leave a reader a
-// non-zero status with no cause at all
 #[derive(Debug)]
 struct Refusal {
     cause: String,
@@ -48,8 +43,6 @@ fn refuse_help(cause: impl Into<String>, help: &[&str]) -> Refusal {
     }
 }
 
-// spec: installer/SPEC.md §The packer — the single refusal formatter: the prefix, the cause and
-// any help lines on stderr, exit 2; every refusal in this module returns through it
 fn report(r: &Refusal) -> i32 {
     eprintln!("{}: {}", NAME, r.cause);
     for h in &r.help {
@@ -58,8 +51,6 @@ fn report(r: &Refusal) -> i32 {
     2
 }
 
-// spec: installer/SPEC.md §The packer — the scratch teardown as the arm's own `Drop` rather than
-// an `EXIT` trap, the shape `--run-demo` established: every return path unwinds through it
 struct Scratch {
     dir: String,
 }
@@ -550,7 +541,7 @@ fn env_or(name: &str) -> Option<String> {
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — git's stdout is reachable only through the
 // accessor that read the status, so a failed probe cannot be read as an empty answer
-// spec: installer/SPEC.md §The packer — trailing whitespace only: a porcelain entry's first two
+// comment-tier-exempt: trailing whitespace only: a porcelain entry's first two
 // bytes ARE its state code, so trimming both ends would re-column the one line the dirty
 // diagnostic prints first, and no other caller here reads a leading blank
 fn git(args: &[&str]) -> Result<String, Refusal> {
@@ -821,7 +812,7 @@ fn stamp(asm: &str, version: &str, commit: &str, spec_base_url: &str) -> Result<
         .map_err(|e| refuse(format!("could not write {}: {}", path, e)))
 }
 
-// spec: installer/SPEC.md §The packer — `npm pack` stays a spawn deliberately: reproducing the
+// comment-tier-exempt: `npm pack` stays a spawn deliberately: reproducing the
 // package format in-crate is a second implementation of a format, not a port
 fn npm_pack(asm: &str) -> Result<String, Refusal> {
     let done = proc::run_merged_in(&programs::NPM, &["pack"], &[], Some(std::path::Path::new(asm)))
@@ -849,7 +840,7 @@ fn npm_pack(asm: &str) -> Result<String, Refusal> {
     }
 }
 
-// spec: installer/SPEC.md §The packer — the tarball is moved out of the scratch before the
+// comment-tier-exempt: the tarball is moved out of the scratch before the
 // teardown runs; the copy-then-remove fallback is what a cross-filesystem rename needs, which two
 // separately configurable directories make reachable
 fn move_file(from: &str, to: &str) -> Result<(), Refusal> {
@@ -913,8 +904,6 @@ mod tests {
         assert_eq!(1 + "a/b/c".matches('/').count(), 3);
     }
 
-    // spec: installer/SPEC.md §The packer — the single formatter prints the prefix, the cause and
-    // every help line, so no refusal reaches a reader as a bare non-zero status.
     #[test]
     fn every_refusal_carries_the_prefix_and_exits_two() {
         assert_eq!(report(&refuse("cause")), 2);
