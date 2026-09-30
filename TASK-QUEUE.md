@@ -8,6 +8,18 @@
 
 ## New Features
 
+### prose-tells-absence-knobs
+
+[spec: SPEC-absence-vocabularies.md]
+
+`check-prose-tells` assertion G bakes its two phrase lists with no knob: `ABSENCE_PLACEHOLDERS` (none, n/a, nothing, a hyphen, an em dash) and `ABSENCE_OPENERS` (none, nothing, there is no, there are no, not applicable, n/a) in `native/src/gates/prose_tells.rs`. The sibling queue-kit arm already takes `QUEUE_KIT_PLACEHOLDER_TOKENS`, and a consumer's absence idiom (nil, tbd, no known issues, a non-English token) keeps G's contract true under another list, so doctrine-kit/DOCTRINE.md Policy-as-choice reaches it; `CANON_KIT_PROSE_TELL_ABSENCE_GLOBS` binds which files, not which phrases.
+
+**Deliverable:** `CANON_KIT_PROSE_TELL_ABSENCE_TOKENS` and `CANON_KIT_PROSE_TELL_ABSENCE_OPENERS`, bundled vocabularies with their `_EXTRA`, defaulting to the current lists, empty turning that half off, named in canon-kit/SPEC.md §check-prose-tells.
+
+**Cost while deferred:** an adopter binding G meets only this repo's absence idiom. Filed 2026-09-30 to the gap inbox by canon-kit-value-pass' close baked-calibration sweep; promoted 2026-09-30 at the next iteration's scope: →fix fails because two knobs are new governed names owing an amendment. Re-verified: both constants at `native/src/gates/prose_tells.rs` lines 345 and 349. Owner lookup: `ABSENCE_`, `prose-tells`, `absence idiom` in this file — none; owner canon-kit/SPEC.md §check-prose-tells.
+
+**Selected 2026-10-01 for install-disposition-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, ruling the two vocabularies' config shape.
+
 ## Technical Debt
 
 ### canon-kit-gate-brevity
@@ -807,18 +819,6 @@ RELEASING.md's numbered procedure steps are cited by position, the shape doctrin
 **Deliverable:** each citation names the step by its bold title or a heading, never its number.
 
 **Cost while deferred:** a step inserted or reordered in RELEASING.md mis-points about fifteen citations, several in shipped kit SPECs and a gate's printed remedy. Filed 2026-09-30 to the gap inbox by canon-kit-value-pass' close positional-reference sweep, outside its range corpus; promoted 2026-09-30 at the next iteration's scope: →fix fails because the sweep reaches a gate's printed remedy, owing the native build and the battery. Re-verified: a grep for `RELEASING.md step <n>` hits every site named above. Owner lookup: `positional`, `step number`, `RELEASING.md step` in this file — none; owner RELEASING.md, with doctrine-kit/DOCTRINE.md Derivation-first. Surface also installer.
-
-### prose-tells-absence-knobs
-
-[cost: event/low] [surface: canon-kit]
-
-`check-prose-tells` assertion G bakes its two phrase lists with no knob: `ABSENCE_PLACEHOLDERS` (none, n/a, nothing, a hyphen, an em dash) and `ABSENCE_OPENERS` (none, nothing, there is no, there are no, not applicable, n/a) in `native/src/gates/prose_tells.rs`. The sibling queue-kit arm already takes `QUEUE_KIT_PLACEHOLDER_TOKENS`, and a consumer's absence idiom (nil, tbd, no known issues, a non-English token) keeps G's contract true under another list, so doctrine-kit/DOCTRINE.md Policy-as-choice reaches it; `CANON_KIT_PROSE_TELL_ABSENCE_GLOBS` binds which files, not which phrases.
-
-**Deliverable:** `CANON_KIT_PROSE_TELL_ABSENCE_TOKENS` and `CANON_KIT_PROSE_TELL_ABSENCE_OPENERS`, bundled vocabularies with their `_EXTRA`, defaulting to the current lists, empty turning that half off, named in canon-kit/SPEC.md §check-prose-tells.
-
-**Cost while deferred:** an adopter binding G meets only this repo's absence idiom. Filed 2026-09-30 to the gap inbox by canon-kit-value-pass' close baked-calibration sweep; promoted 2026-09-30 at the next iteration's scope: →fix fails because two knobs are new governed names owing an amendment. Re-verified: both constants at `native/src/gates/prose_tells.rs` lines 345 and 349. Owner lookup: `ABSENCE_`, `prose-tells`, `absence idiom` in this file — none; owner canon-kit/SPEC.md §check-prose-tells.
-
-**Selected 2026-10-01 for install-disposition-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, ruling the two vocabularies' config shape.
 
 ## Icebox
 
