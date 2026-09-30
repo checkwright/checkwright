@@ -44,6 +44,18 @@ doctrine-kit/DOCTRINE.md's Absence statements rule has an audit-roster class and
 
 **Cost while deferred:** an absence sentence on a ledger is found only by the close audit sweep. No live instance exists: the queue's and the ruling record's empty sections are headings alone. Filed 2026-09-26 to the gap inbox by absence-statement-grammar's amendment, which costed the arms without building them; promoted 2026-09-26 at its close: →fix fails because each arm is new mechanism with a knob, and no live instance needs repair. Owner lookup: `absence`, `placeholder` in this file — none live; owner doctrine-kit/DOCTRINE.md Absence statements, with the arms in canon-kit/SPEC.md §check-prose-tells and queue-kit/SPEC.md §check-task-names. Surface also queue-kit.
 
+### positional-reference-rule
+
+[spec: SPEC-positional-reference.md]
+
+positional references to a block go stale like restated counts, and nothing catches them. README.md said "The last line, `--run-demo`, is the adoption walkthrough" after the generated battery-roster block gained a later line; docs/install.md carried two more against its hand-authored recipes. All three were rewritten at companion-front-door-widening's close to name the referent. `check-manifest-count` gates cardinals only, and canon-kit/SPEC.md §check-amendment-retired-spelling records the renumber slice as undecidable, its durable fix being to name the referent rather than its position; no doctrine line states that for first/last/above/below prose. Operator question, 2026-09-28 (lead session): why are positional qualifiers allowed when restated counts are blocked.
+
+**Deliverable:** doctrine-kit/DOCTRINE.md's De-literalization or Derivation-first rule naming positional references beside counts; a narrow gate weighed, a positional word citing a marked or generated block, since a general "last line" matcher would cry wolf.
+
+**Selected 2026-09-30 for canon-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, the doctrine line with any gate arm.
+
+**Cost while deferred:** the next block edit strands a positional sentence silently. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; the three instances fixed at its close, the rule and gate promoted: →fix fails because a doctrine rule change is a scoped unit (the reasoning [intake-routing-test](#intake-routing-test) records) and the gate is new mechanism. Re-verified: the battery-roster block ended at `--projection-witness`. Owner lookup: `positional`, `ordinal`, `renumber` in this file — only the icebox's doctrine-rule-number-citation-liveness, DISTINCT (numbered doctrine-rule citations); owner doctrine-kit/DOCTRINE.md, with canon-kit/SPEC.md for any gate arm.
+
 ## Technical Debt
 
 ### canon-kit-amendment-brevity
@@ -595,18 +607,6 @@ the operator states that verification and workflow are fully decoupled, each shi
 **Deliverable:** the leg's oracles runnable locally before a package change commits, or the reader refusing what a YAML plain scalar cannot carry, with a `bad/` fixture holding the `: ` case.
 
 **Cost while deferred:** a front-matter slip is caught only by a push, which spends a hotfix from the budget. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' close; promoted 2026-09-28 at the next iteration's scope: →fix fails because a stricter reader changes a shipped gate's verdict. Re-verified: the reader above, and `.github/workflows/gates.yml` installs `skills-ref` in CI only. Owner lookup: `front matter`, `skills-ref`, `yaml` in this file — only the icebox's template-copy-parity-yaml-widening, DISTINCT (template copies); owner plugin/SPEC.md §check-plugin-parity.
-
-### positional-reference-rule
-
-[cost: event/low] [surface: canon-kit]
-
-positional references to a block go stale like restated counts, and nothing catches them. README.md said "The last line, `--run-demo`, is the adoption walkthrough" after the generated battery-roster block gained a later line; docs/install.md carried two more against its hand-authored recipes. All three were rewritten at companion-front-door-widening's close to name the referent. `check-manifest-count` gates cardinals only, and canon-kit/SPEC.md §check-amendment-retired-spelling records the renumber slice as undecidable, its durable fix being to name the referent rather than its position; no doctrine line states that for first/last/above/below prose. Operator question, 2026-09-28 (lead session): why are positional qualifiers allowed when restated counts are blocked.
-
-**Deliverable:** doctrine-kit/DOCTRINE.md's De-literalization or Derivation-first rule naming positional references beside counts; a narrow gate weighed, a positional word citing a marked or generated block, since a general "last line" matcher would cry wolf.
-
-**Selected 2026-09-30 for canon-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, the doctrine line with any gate arm.
-
-**Cost while deferred:** the next block edit strands a positional sentence silently. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; the three instances fixed at its close, the rule and gate promoted: →fix fails because a doctrine rule change is a scoped unit (the reasoning [intake-routing-test](#intake-routing-test) records) and the gate is new mechanism. Re-verified: the battery-roster block ended at `--projection-witness`. Owner lookup: `positional`, `ordinal`, `renumber` in this file — only the icebox's doctrine-rule-number-citation-liveness, DISTINCT (numbered doctrine-rule citations); owner doctrine-kit/DOCTRINE.md, with canon-kit/SPEC.md for any gate arm.
 
 ### gate-customer-value-audit
 
