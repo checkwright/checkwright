@@ -32,6 +32,7 @@ check-md-refs
 check-md-unwrapped
 check-measured-claim
 check-payload-claim
+check-pendency-contradiction
 check-prose-bounds
 check-prose-enum
 check-prose-tells

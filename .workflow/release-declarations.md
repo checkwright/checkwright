@@ -11,6 +11,7 @@
 - `check-kit-enum` — exits 2 on a `gates.list` member that resolves nowhere, which `check-rule-citation` now is where you registered it by hand. Drop that line.
 - `check-prose-tells` — gains assertion G, armed only once you set the new `CANON_KIT_PROSE_TELL_ABSENCE_GLOBS` (default empty, off): a section on those surfaces whose whole body is a placeholder or one sentence like "There are no known issues." reds. Nothing to do while it stays empty; to arm it, bind hand prose only, never a checklist or a work queue.
 - `check-task-names` — reds a placeholder token (`None`, `n/a`, a dash, from the new `QUEUE_KIT_PLACEHOLDER_TOKENS`, shipped set on by default) standing outside every entry of a task section, as a done slug or as an entry heading. Delete the line: an empty section is its heading alone. Set the knob empty to switch the arm off.
+- `check-pendency-contradiction` — new, zero-config: a governed manifest file that calls one code span both pending (`waits on`, `lands after`, `does not exist yet` …) and landed (`implemented by`, `landed`, `ships` …) reds. Make the pending sentence past or drop it; a deliberate pair takes `<!-- pendency-exempt: <reason> -->`, and extending or replacing the phrase sets is `CANON_KIT_PENDENCY_*` in your canon-config.knobs.
 
 ## Behavior changes
 

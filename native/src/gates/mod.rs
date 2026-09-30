@@ -94,6 +94,7 @@ pub mod pipe_membership;
 pub mod plugin_parity;
 pub mod packed_links;
 pub mod payload_claim;
+pub mod pendency_contradiction;
 pub mod portability_floor;
 pub mod projection_roster;
 pub mod producer_liveness;
@@ -529,6 +530,29 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_TEMPORAL_MARKERS_EXTRA",
             "CANON_KIT_TEMPORAL_EXEMPT_SECTIONS",
             "CANON_KIT_TEMPORAL_EXEMPT_PATHS",
+        ],
+        "canon-kit",
+        &[("git", "")],
+    ),
+    // spec: canon-kit/SPEC.md §check-pendency-contradiction — the manifest set, read with the two
+    // construction vocabularies and their extras
+    (
+        "check-pendency-contradiction",
+        pendency_contradiction::run,
+        MANIFEST_ROOTS,
+        &[
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+            "GATE_SDK_KIT_DIRS",
+            "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_MIRROR_ROOT",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_MANIFEST_FILES",
+            "CANON_KIT_PROSE_SURFACE_GLOBS",
+            "CANON_KIT_PENDENCY_PENDING",
+            "CANON_KIT_PENDENCY_PENDING_EXTRA",
+            "CANON_KIT_PENDENCY_LANDED",
+            "CANON_KIT_PENDENCY_LANDED_EXTRA",
         ],
         "canon-kit",
         &[("git", "")],

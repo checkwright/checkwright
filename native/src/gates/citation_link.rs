@@ -119,8 +119,8 @@ struct Scan {
 
 // spec: canon-kit/SPEC.md §check-citation-link — the reader's paragraphs over prose only: the
 // front-matter block, HTML comments and generated regions, markers included, are blanked in place,
-// so every line keeps its number
-fn prose_only(text: &str) -> String {
+// so every line keeps its number; §check-pendency-contradiction reads its corpus through it too
+pub(crate) fn prose_only(text: &str) -> String {
     let mut out: Vec<String> = Vec::new();
     let raw: Vec<&str> = text.lines().collect();
     let mut front = raw.first().map(|l| l.trim_end() == "---").unwrap_or(false);

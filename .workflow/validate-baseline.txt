@@ -57,6 +57,7 @@ gates check-docs-cmd pass
 gates check-install-toolchain pass
 gates check-release-bump pass
 gates check-manifest-temporal pass
+gates check-pendency-contradiction pass
 gates check-manifest-count pass
 gates check-prose-enum pass
 gates check-prose-tells pass

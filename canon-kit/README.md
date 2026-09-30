@@ -36,6 +36,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required); the queue-facing gate
    check-measured-claim         # needs a measured-claim oracle (marked claims re-measured)
    check-unmarked-claim         # needs a claim-class roster (a declared class carries a marker)
    check-manifest-temporal      # no temporal narration in manifest prose
+   check-pendency-contradiction  # no file calls one code span both pending and landed
    check-provenance-seam        # no publisher provenance in a kit SPEC or a declared seam surface
    check-tracking-claim         # a path's tracking status in prose agrees with git
    check-task-path-claim        # needs task lists (a ticked task names only paths that exist)

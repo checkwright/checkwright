@@ -95,6 +95,36 @@ pub const KIT: Kit = Kit {
             ],
         ),
         Row::indexed("CANON_KIT_TEMPORAL_MARKERS_EXTRA", &[]),
+        Row::indexed(
+            "CANON_KIT_PENDENCY_PENDING",
+            &[
+                "waits on {}",
+                "wait on {}",
+                "waiting on {}",
+                "lands after {}",
+                "land after {}",
+                "blocked by {}",
+                "until {} lands",
+                "once {} lands",
+                "{} does not exist yet",
+                "{} is not yet",
+                "{} has not landed",
+            ],
+        ),
+        Row::indexed("CANON_KIT_PENDENCY_PENDING_EXTRA", &[]),
+        Row::indexed(
+            "CANON_KIT_PENDENCY_LANDED",
+            &[
+                "implemented by {}",
+                "built by {}",
+                "delivered by {}",
+                "{} landed",
+                "{} has landed",
+                "{} ships",
+                "{} shipped",
+            ],
+        ),
+        Row::indexed("CANON_KIT_PENDENCY_LANDED_EXTRA", &[]),
         Row::indexed("CANON_KIT_TEMPORAL_EXEMPT_SECTIONS", &[]),
         Row::indexed("CANON_KIT_TEMPORAL_EXEMPT_PATHS", &[]),
         Row::indexed(
@@ -310,6 +340,20 @@ fn validate(v: &Values) -> Vec<String> {
     }
     if empty_list("CANON_KIT_SEAM_AUTHORITY_MARKERS") && empty_list("CANON_KIT_SEAM_AUTHORITY_MARKERS_EXTRA") {
         errs.push("CANON_KIT_SEAM_AUTHORITY_MARKERS is empty".to_string());
+    }
+    // spec: canon-kit/SPEC.md §Layout and configuration — a construction member carries one `{}`
+    // slot and a word beside it; an empty class is the off position, never malformed
+    for n in [
+        "CANON_KIT_PENDENCY_PENDING",
+        "CANON_KIT_PENDENCY_PENDING_EXTRA",
+        "CANON_KIT_PENDENCY_LANDED",
+        "CANON_KIT_PENDENCY_LANDED_EXTRA",
+    ] {
+        for m in indexed(v, n).unwrap_or(&[]) {
+            if let Some(why) = crate::gates::pendency_contradiction::slot_refusal(m) {
+                errs.push(format!("{} member '{}' {}", n, m, why));
+            }
+        }
     }
     if empty_list("CANON_KIT_COUNT_COLLECTIONS") {
         errs.push("CANON_KIT_COUNT_COLLECTIONS is empty".to_string());
