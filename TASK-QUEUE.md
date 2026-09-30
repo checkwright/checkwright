@@ -20,6 +20,18 @@ a release note's Renamed-knobs removal bullet must lead with the removed knob ba
 
 **Cost while deferred:** every release that removes a knob buys a whole-doc exclude, and each excluded note loses its link and path checks for good. Filed 2026-09-26 to the gap inbox at front-door-release's close, which excluded the v0.26.0 note for three removed knobs; promoted 2026-09-26 at the next iteration's scope: →fix fails because the valve's shape is a design call on a shipped gate. Re-verified: `scripts/canon-config.knobs` carries the exclude for that note. Owner lookup: `docs-cmd`, `Renamed-knobs`, `MDREF_EXCLUDE` in this file — only the icebox's [docs-cmd-retired-path-blind-to-queue](#docs-cmd-retired-path-blind-to-queue), which is assertion C; owner canon-kit/SPEC.md §check-docs-cmd.
 
+### citation-link-root-docs-range
+
+[spec: SPEC-citation-link-root-docs.md]
+
+`check-citation-link`'s `CANON_KIT_CITATION_LINK_PAGES` binding (`docs/*.md`, `docs/*/index.md`, `*/README.md`, `README.md`) leaves out the other root docs GitHub renders; TRAJECTORY.md carries plain section citations, one written unlinked by the docs-ux build batch itself. With it, each ruling could be anchored by a header whose slug is its primary ruling name, so a citation links `TRAJECTORY.md#<name>` as queue slugs do; no tracked file cites that file by anchor today, citers using the ruling name the ruling-staleness probe sweeps.
+
+**Deliverable:** the binding widened to GitHub-rendered root docs (TRAJECTORY.md, ROADMAP.md and the like), excluding agent-loaded surfaces such as CLAUDE.md where links grow the always-loaded meter; and the ruling-header option costed with it, never as its own unit (operator direction, 2026-09-27, lead session). Against the headers: the record format is lifecycle-kit's, a ruling may declare several names while a header carries one slug, and the file shrinks toward empty.
+
+**Selected 2026-09-30 for canon-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, landing before [canon-kit-value-audit](#canon-kit-value-audit) rules `check-citation-link`.
+
+**Cost while deferred:** a root-doc reader hunts cited sections by hand. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead, on an operator direction to file rather than widen mid-iteration, with an addendum; promoted 2026-09-27 at its close: →fix fails because the widening is a ruled deferral. Re-verified: `scripts/canon-config.knobs` binds the four globs, and TRAJECTORY.md lines 4, 12 and 18 carry `§`. Owner lookup: `citation-link`, `CITATION_LINK_PAGES`, `TRAJECTORY.md#` in this file — none; owner canon-kit/SPEC.md §check-citation-link, with lifecycle-kit/SPEC.md §The ruling-staleness probe.
+
 ## Technical Debt
 
 ### canon-kit-amendment-brevity
@@ -533,18 +545,6 @@ a kit README's citation of another kit's SPEC section links off-site to the GitH
 **Deliverable:** the pack-time rewrite widened to `../<leaf>/SPEC.md[#frag]` for a packed leaf, giving on-site targets on the mirror and published ones in the payload.
 
 **Cost while deferred:** about fourteen README citations leave the site. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's docs-ux build; promoted 2026-09-27 at its close: →fix fails because the rewrite bound is a packer contract change. Re-verified: 14 blob-SPEC link lines across the twelve top-level READMEs. Owner lookup: `packed-links`, `blob`, `rewrite` in this file — none; owner gate-sdk/SPEC.md §check-packed-links. Related: [spec-mirror-citation-links](#spec-mirror-citation-links).
-
-### citation-link-root-docs-range
-
-[cost: event/low] [surface: canon-kit]
-
-`check-citation-link`'s `CANON_KIT_CITATION_LINK_PAGES` binding (`docs/*.md`, `docs/*/index.md`, `*/README.md`, `README.md`) leaves out the other root docs GitHub renders; TRAJECTORY.md carries plain section citations, one written unlinked by the docs-ux build batch itself. With it, each ruling could be anchored by a header whose slug is its primary ruling name, so a citation links `TRAJECTORY.md#<name>` as queue slugs do; no tracked file cites that file by anchor today, citers using the ruling name the ruling-staleness probe sweeps.
-
-**Deliverable:** the binding widened to GitHub-rendered root docs (TRAJECTORY.md, ROADMAP.md and the like), excluding agent-loaded surfaces such as CLAUDE.md where links grow the always-loaded meter; and the ruling-header option costed with it, never as its own unit (operator direction, 2026-09-27, lead session). Against the headers: the record format is lifecycle-kit's, a ruling may declare several names while a header carries one slug, and the file shrinks toward empty.
-
-**Selected 2026-09-30 for canon-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, landing before [canon-kit-value-audit](#canon-kit-value-audit) rules `check-citation-link`.
-
-**Cost while deferred:** a root-doc reader hunts cited sections by hand. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead, on an operator direction to file rather than widen mid-iteration, with an addendum; promoted 2026-09-27 at its close: →fix fails because the widening is a ruled deferral. Re-verified: `scripts/canon-config.knobs` binds the four globs, and TRAJECTORY.md lines 4, 12 and 18 carry `§`. Owner lookup: `citation-link`, `CITATION_LINK_PAGES`, `TRAJECTORY.md#` in this file — none; owner canon-kit/SPEC.md §check-citation-link, with lifecycle-kit/SPEC.md §The ruling-staleness probe.
 
 ### site-video-poster-rule
 
