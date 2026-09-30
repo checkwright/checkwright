@@ -115,7 +115,13 @@ README.md's contributor paragraph ("Most commits here carry a `Co-Authored-By` t
   - `stderr.txt` is read by a person diagnosing a failed run.
   - The kept clone is read by a person inspecting a refusal, and by the iteration boundary's scratch reset, which removes it with the scratch dir.
 - **The verdict line's fields.** The `report` and `patch` paths are what the dispatcher opens next, and `exit` with the verdict is what it routes on.
-- **Enabling config.** No tracked configuration can set an adapter, since every adapter names a vendor's program. The deployed configuration is therefore the operator's private overlay, `scripts/delegation-config.local.knobs`, which `.gitignore` already covers. One vendor CLI is installed on the authoring machine (`which` over the candidate names, not recorded here on the provenance seam). The build writes one adapter there once the operator confirms it (Definition of Done, *a live run*), so the producer is reachable outside the crate tests.
+- **Enabling config.** No tracked configuration can set an adapter, since every adapter names a vendor's program. The deployed configuration is therefore the operator's private overlay, `scripts/delegation-config.local.knobs`, which `.gitignore` already covers. One vendor CLI is installed on the authoring machine (`which` over the candidate names, not recorded here on the provenance seam). The operator confirmed one live acceptance run (operator direction, 2026-09-30, lead-relayed; not a ruling), bounded as follows:
+  - one read-only audit, through the vendor CLI installed on this machine;
+  - billed to that vendor's subscription, with repository content sent to that vendor;
+  - the adapter configured in the gitignored `scripts/delegation-config.local.knobs`;
+  - no harness setting changed.
+
+  That scope is the whole grant, and it is spent once the one run is done. The build writes the adapter there and makes that run (Definition of Done, *a live run*), so the producer is reachable outside the crate tests.
 
 ## Existing sections updated
 
