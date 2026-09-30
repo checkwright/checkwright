@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### guard-kit-front-brevity
-
-guard-kit/SPEC.md's front sections under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §The friction loop, §The shell guard, §Consumer rules and §The hook on native Windows, about 7.8k of the file's 48.2k words; guard-kit's other sections stay on the parent.
-
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every `##` heading kept verbatim and every fact another surface cites into them kept, per a citation survey. Applied after the iteration's guard-kit amendments merge, so no section is passed twice in one iteration.
-
-**Cost while deferred:** paid by every session and adopter that reads an unpassed guard-kit section. Filed 2026-09-30 as a split at guard-kit-steering's scope, next in the parent's size order since installer's §The consumer smoke waits on [compiled-consumer-smoke-driver](#compiled-consumer-smoke-driver). Part of the operator's selection of the set, direction 2026-09-30, lead-relayed (not a ruling).
-
 ## Deferred
 
 ### shellcheck-extra-dirs-trigger
@@ -362,7 +354,7 @@ installer's remaining sections other than §The consumer smoke left 2026-09-29 a
 
 drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `drift-kit-measurement-brevity`; drift-kit's other sections remain.
 
-guard-kit's front sections left 2026-09-30 at guard-kit-steering's scope, on an operator direction lead-relayed (not a /consult ruling), as [guard-kit-front-brevity](#guard-kit-front-brevity).
+guard-kit's front sections left 2026-09-30 at guard-kit-steering's scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `guard-kit-front-brevity`; guard-kit's preamble and other sections remain.
 
 ### prune-set-matches-walk-root-ancestors
 
@@ -1479,5 +1471,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - side-effect-free-read-arms
 - guard-kit-value-audit
 - gate-output-contributor-door
+- guard-kit-front-brevity
 
 ## Lessons Learned
