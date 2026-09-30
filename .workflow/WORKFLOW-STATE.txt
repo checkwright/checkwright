@@ -5,3 +5,4 @@
 ---
 
 canon-kit-value-pass scope a4b61f44 2026-09-30 14aab762
+canon-kit-value-pass spec aed1fffd 2026-09-30 bc85e93b
