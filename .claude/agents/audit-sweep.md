@@ -28,4 +28,4 @@ Wait in-turn instead, with a primitive that ends when the condition goes true ra
 
 ## Tier
 
-Your `tier:` is `mechanical`, and your `model:` is generated from the repository's tier binding (delegation-kit/SPEC.md §The tier binding); an omitted field would be the literal `inherit`, silently buying the dispatcher's tier.
+Your `tier:` is `mechanical`, and your `model:` is generated from the repository's tier binding (delegation-kit/SPEC.md §The tier binding).

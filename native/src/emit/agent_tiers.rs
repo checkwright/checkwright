@@ -1,6 +1,5 @@
 // spec: delegation-kit/SPEC.md §check-agent-tier-explicit — the generator of every agent
-// definition's `model:` line: the bound value of the class its `tier:` field declares. The gate's
-// assertion B calls `plan` in process, so the arm and the gate cannot disagree about `--write`.
+// definition's `model:` line: the bound value of the class its `tier:` field declares.
 use crate::walk;
 use std::path::Path;
 
