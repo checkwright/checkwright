@@ -15,7 +15,7 @@
 6847cp .claude/commands/scope.md
 1155cp .claude/commands/spec.md
 1728cp .claude/commands/validate.md
-12463cp CLAUDE.md
+12471cp CLAUDE.md
 265441cp canon-kit/SPEC.md
 5785cp canon-kit/templates/SPEC-amendment.md
 23669cp companion/SPEC.md
@@ -92,7 +92,7 @@
 270104cp installer/SPEC.md
 337972cp lifecycle-kit/SPEC.md
 4909cp lifecycle-kit/templates/consult.md
-41433cp lifecycle-kit/templates/lead.md
+41562cp lifecycle-kit/templates/lead.md
 2100cp lifecycle-kit/templates/release-sweep.md
 6939cp lifecycle-kit/templates/stages/align.md
 9182cp lifecycle-kit/templates/stages/build.md
