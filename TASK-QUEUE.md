@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: install-disposition-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,14 @@
 ## New Features
 
 ## Technical Debt
+
+### canon-kit-gate-brevity
+
+canon-kit/SPEC.md's sections this iteration's features edit or re-judge, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §Layout and configuration, and under §Per-component contracts §check-comment-tier, §check-spec-pointer, §check-manifest-count, §check-manifest-temporal, §check-md-refs, §check-knob-default-coupling and §check-prose-tells, about 11.3k words by an awk count.
+
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. [prose-tells-absence-knobs](#prose-tells-absence-knobs) edits §check-prose-tells and §Layout and configuration, and [canon-kit-zero-config-rejudge](#canon-kit-zero-config-rejudge) may edit the others, so the pass rides the batch after theirs.
+
+**Cost while deferred:** paid by every session and adopter that reads an unpassed canon-kit section. Filed 2026-10-01 as a split at install-disposition-pass' scope, on an operator direction lead-relayed (not a ruling), taking the sections the iteration already edits.
 
 ## Deferred
 
@@ -21,6 +29,8 @@ a `gates.list` name that resolves nowhere reds six gates at once — `check-gate
 **Deliverable:** one owner for the unresolved-registration verdict, with the siblings skipping an unresolved member rather than re-reporting it, its fixture pair, and the declaration burden it removes stated in gate-sdk/SPEC.md §Layout and configuration; or a boundary note there keeping the cascade.
 
 **Cost while deferred:** paid per adopter per withholding or rename, as six reds and six declaration bullets for one line. Filed 2026-09-30 to the gap inbox by the lead off build batch 4's upgrade smoke; promoted at delegation-tier-binding's close: →fix fails because narrowing five gates' verdicts is a contract change owing fixtures and a release note. Re-verified: a probe name appended to a scratch copy of the gates dir (`GATE_SDK_GATES_DIR`) reds all five named siblings. Owner lookup: `resolves nowhere`, `dangling`, `unresolved registration` in this file — none; owner gate-sdk/SPEC.md §Layout and configuration.
+
+**Selected 2026-10-01 for install-disposition-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, choosing the owner gate or the boundary note.
 
 ### foreign-vendor-critique
 
@@ -42,6 +52,8 @@ a consumer's use of the foreign-vendor run (delegation-kit/SPEC.md §The foreign
 
 **Cost while deferred:** a consumer's lint findings in knob-added dirs arrive one tier late. Filed 2026-09-26 to the gap inbox by gate-sdk-tooling-brevity; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because a new manifest token is a contract change to `check-graph`. Re-verified: `GATE_SDK_LINT_EXTRA_DIRS` is declared `.words()` in `native/src/knobs/gate_sdk.rs`, and the descriptor couples only `knob:GATE_SDK_GATES_DIR/*.sh,kit:*.sh`. Owner lookup: `LINT_EXTRA`, `word-list` in this file — none; owner gate-sdk/SPEC.md §check-shellcheck.
 
+**Selected 2026-10-01 for install-disposition-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, choosing the manifest token or the boundary note.
+
 ### seeded-ci-gates-on-surface
 
 [cost: event/low] [surface: gate-sdk]
@@ -51,6 +63,8 @@ a consumer's use of the foreign-vendor run (delegation-kit/SPEC.md §The foreign
 **Deliverable:** both gates zero-config with a tightened-gate release note and the adopter allowed-red the upgrade contract requires (installer/SPEC.md §The upgrade contract), or a boundary note in gate-sdk/SPEC.md §check-action-pinning ruling on-surface permanent.
 
 **Cost while deferred:** an adopter's hand-written workflows carry unpinned actions and undeclared token scopes with no red, paid at each adopter install. Filed 2026-09-26 to the gap inbox by front-door-release's spec; promoted 2026-09-26 at its close: →fix fails because the move changes what an adopter's install reds, which is user-facing semantics and owes a release note. Re-verified: both `.gate` files read `# install: on-surface`. Owner lookup: `action-pinning`, `action-permissions`, `zero-config` in this file — none; owner gate-sdk/SPEC.md §check-action-pinning. Surface also installer.
+
+**Selected 2026-10-01 for install-disposition-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it after [canon-kit-zero-config-rejudge](#canon-kit-zero-config-rejudge), whose boundary for the definition decides which of its two branches holds.
 
 ### spec-pointer-unstated-literal
 
@@ -304,6 +318,8 @@ delegation-kit's tier sections left 2026-09-30 at delegation-tier-binding's scop
 
 canon-kit's amendment-family sections left 2026-09-30 at canon-kit-value-pass' scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `canon-kit-amendment-brevity`; canon-kit's other sections remain.
 
+canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, on an operator direction lead-relayed (not a /consult ruling), as [canon-kit-gate-brevity](#canon-kit-gate-brevity); canon-kit's other sections remain.
+
 ### prune-set-matches-walk-root-ancestors
 
 [cost: event/high] [surface: context-kit] [recurrence: 2026-09-25]
@@ -445,6 +461,8 @@ a kit README's citation of another kit's SPEC section links off-site to the GitH
 **Deliverable:** the pack-time rewrite widened to `../<leaf>/SPEC.md[#frag]` for a packed leaf, giving on-site targets on the mirror and published ones in the payload.
 
 **Cost while deferred:** about fourteen README citations leave the site. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's docs-ux build; promoted 2026-09-27 at its close: →fix fails because the rewrite bound is a packer contract change. Re-verified: 14 blob-SPEC link lines across the twelve top-level READMEs. Owner lookup: `packed-links`, `blob`, `rewrite` in this file — none; owner gate-sdk/SPEC.md §check-packed-links. Related: `spec-mirror-citation-links`, done, which linked the SPEC mirror's citations and copies a README as it stands, so this remains.
+
+**Selected 2026-10-01 for install-disposition-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, as a packer contract change.
 
 ### site-video-poster-rule
 
@@ -762,17 +780,23 @@ a kit `smoke/install.sh` or `smoke/violation.sh` that bash cannot parse passes t
 
 **Cost while deferred:** a broken kit smoke script can land and ride a release unless validate runs the smoke. Filed 2026-09-30 to the gap inbox by guard-kit-steering's build; promoted at its close: →fix fails because a gate spawning bash meets the adopter constraints' no-toolchain floor, a design question, →forward because no ruling is owed. Re-verified: gate-sdk/SPEC.md §Consumer smoke now forbids the quote character in the hint, the instance's fix, and names no parse. Owner lookup: `smoke-entry-guard`, `bash -n`, `parse` in this file — the icebox's smoke-roster-guard-precedes-hand-off, DISTINCT (guard ordering); owner gate-sdk/SPEC.md §check-smoke-entry-guard.
 
+**Selected 2026-10-01 for install-disposition-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, ruling the parse check's behaviour where bash is absent.
+
 ### canon-kit-zero-config-rejudge
 
-[cost: session/high] [surface: canon-kit]
+[cost: session/high] [surface: gate-sdk]
 
-canon-kit's `zero-config` members read surfaces the adopter authors. gate-sdk/SPEC.md §The install disposition defines `zero-config` as every surface the gate reads being one `init` writes and the adopter does not author, yet `check-comment-tier` and its comment-surface siblings read the adopter's own `.sh` sources, and the manifest-set gates (`check-manifest-temporal`, `check-manifest-count`, `check-md-refs`, `check-spec-pointer` among them) read the adopter's own READMEs, so a fresh prose-profile install can red on content `init` never wrote. `check-knob-default-coupling` is `zero-config` too, yet in a vendored tree its owning SPECs are withheld, so every knob skips and it can only print a skip count.
+`zero-config` members read surfaces the adopter authors; canon-kit's are the instances found. gate-sdk/SPEC.md §The install disposition defines `zero-config` as every surface the gate reads being one `init` writes and the adopter does not author, yet `check-comment-tier` and its comment-surface siblings read the adopter's own `.sh` sources, and the manifest-set gates (`check-manifest-temporal`, `check-manifest-count`, `check-md-refs`, `check-spec-pointer` among them) read the adopter's own READMEs, so a fresh prose-profile install can red on content `init` never wrote. `check-knob-default-coupling` is `zero-config` too, yet in a vendored tree its owning SPECs are withheld, so every knob skips and it can only print a skip count.
 
-**Deliverable:** each canon-kit `zero-config` member re-judged against the definition, and moved to `on-surface` or the definition's boundary stated.
+**Deliverable:** every kit's `zero-config` member, 54 at scope's census (canon-kit 26, gate-sdk 15, queue-kit 6, evidence-kit 2, one each in context-kit, delegation-kit, doctrine-kit, guard-kit and site-kit), re-judged against the definition, and moved to `on-surface` or the definition's boundary stated.
+
+**Widened 2026-10-01 at install-disposition-pass' scope from canon-kit's 26 to every kit, operator direction lead-relayed (not a ruling).** The 28 members outside canon-kit are unsurveyed for adopter-authored reads; the slug keeps its canon-kit prefix because it is the entry's anchor.
+
+**Selected 2026-10-01 for install-disposition-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, landing before [seeded-ci-gates-on-surface](#seeded-ci-gates-on-surface), which the definition's boundary decides.
 
 **Inferred, not run:** the filer's probe that one plain full-line comment in an adopter `.sh` reds `check-comment-tier` in a fresh install.
 
-**Cost while deferred:** an adopter's first battery may red on its own prose and scripts at install. Filed 2026-09-30 to the gap inbox by canon-kit-value-pass' build; promoted at its close: →fix fails because re-judging 26 members changes which gates `init` registers, an adopter-visible install change, →forward because no ruling is owed. Re-verified: `# install: zero-config` on 26 of canon-kit's `checks/*.gate`, `check-comment-tier` among them, and the definition's sentence. Owner lookup: `zero-config`, `install disposition` in this file — [gate-customer-value-audit](#gate-customer-value-audit), DISTINCT (a gate's place in the payload, not its registration); owner gate-sdk/SPEC.md §The install disposition.
+**Cost while deferred:** an adopter's first battery may red on its own prose and scripts at install. Filed 2026-09-30 to the gap inbox by canon-kit-value-pass' build; promoted at its close: →fix fails because re-judging 26 members changes which gates `init` registers, an adopter-visible install change, →forward because no ruling is owed. Re-verified: `# install: zero-config` on 26 of canon-kit's `checks/*.gate`, `check-comment-tier` among them, and the definition's sentence. Owner lookup: `zero-config`, `install disposition` in this file — [gate-customer-value-audit](#gate-customer-value-audit), DISTINCT (a gate's place in the payload, not its registration); owner gate-sdk/SPEC.md §The install disposition. Surface also every kit shipping a `zero-config` member.
 
 ### release-step-number-cites
 
@@ -793,6 +817,8 @@ RELEASING.md's numbered procedure steps are cited by position, the shape doctrin
 **Deliverable:** `CANON_KIT_PROSE_TELL_ABSENCE_TOKENS` and `CANON_KIT_PROSE_TELL_ABSENCE_OPENERS`, bundled vocabularies with their `_EXTRA`, defaulting to the current lists, empty turning that half off, named in canon-kit/SPEC.md §check-prose-tells.
 
 **Cost while deferred:** an adopter binding G meets only this repo's absence idiom. Filed 2026-09-30 to the gap inbox by canon-kit-value-pass' close baked-calibration sweep; promoted 2026-09-30 at the next iteration's scope: →fix fails because two knobs are new governed names owing an amendment. Re-verified: both constants at `native/src/gates/prose_tells.rs` lines 345 and 349. Owner lookup: `ABSENCE_`, `prose-tells`, `absence idiom` in this file — none; owner canon-kit/SPEC.md §check-prose-tells.
+
+**Selected 2026-10-01 for install-disposition-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, ruling the two vocabularies' config shape.
 
 ## Icebox
 
