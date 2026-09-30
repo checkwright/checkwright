@@ -4,15 +4,4 @@
 
 ---
 
-preview-readiness scope a455f2a8 2026-09-29 175388e6
-preview-readiness spec a55f0273 2026-09-29 a5847516
-preview-readiness align a7e32f4b 2026-09-29 1f0bdc7f
-preview-readiness align a6f48448 2026-09-29 cc65d96e
-preview-readiness build ae2422be 2026-09-29 eeac9789
-preview-readiness build a91ab4f6 2026-09-29 ca1bd4cd
-preview-readiness build af1b65a5 2026-09-29 37e15c24
-preview-readiness build a1e5156f 2026-09-29 9f4eb6d5
-preview-readiness build a307fb13 2026-09-29 ec636d73
-preview-readiness build a7a336f1 2026-09-29 b8171e51
-preview-readiness validate aadddfbe 2026-09-29 7c09cb01
-preview-readiness close a857f3d0 2026-09-30 4e83c541
+— scope a5a363a8 2026-09-30 043f14bd
