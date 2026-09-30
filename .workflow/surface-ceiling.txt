@@ -17,7 +17,7 @@
 1155cp .claude/commands/spec.md
 1728cp .claude/commands/validate.md
 12471cp CLAUDE.md
-263357cp canon-kit/SPEC.md
+263303cp canon-kit/SPEC.md
 5785cp canon-kit/templates/SPEC-amendment.md
 23669cp companion/SPEC.md
 130174cp context-kit/SPEC.md
@@ -85,7 +85,7 @@
 134702cp drift-kit/SPEC.md
 2698cp drift-kit/templates/close-knowledge.md
 3752cp drift-kit/templates/economics.md
-95552cp evidence-kit/SPEC.md
+95453cp evidence-kit/SPEC.md
 939716cp gate-sdk/SPEC.md
 2899cp gate-sdk/templates/adopt.md
 316094cp guard-kit/SPEC.md
