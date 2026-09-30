@@ -58,14 +58,6 @@ a kit README's citation of another kit's SPEC section links off-site to the GitH
 
 ## Technical Debt
 
-### canon-kit-gate-brevity
-
-canon-kit/SPEC.md's sections this iteration's features edit or re-judge, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §Layout and configuration, and under §Per-component contracts §check-comment-tier, §check-spec-pointer, §check-manifest-count, §check-manifest-temporal, §check-md-refs, §check-knob-default-coupling and §check-prose-tells, about 11.3k words by an awk count.
-
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. `prose-tells-absence-knobs` edits §check-prose-tells and §Layout and configuration, and `canon-kit-zero-config-rejudge` may edit the others, so the pass rides the batch after theirs.
-
-**Cost while deferred:** paid by every session and adopter that reads an unpassed canon-kit section. Filed 2026-10-01 as a split at install-disposition-pass' scope, on an operator direction lead-relayed (not a ruling), taking the sections the iteration already edits.
-
 ## Deferred
 
 ### spec-pointer-bare-section-mark
@@ -342,7 +334,7 @@ delegation-kit's tier sections left 2026-09-30 at delegation-tier-binding's scop
 
 canon-kit's amendment-family sections left 2026-09-30 at canon-kit-value-pass' scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `canon-kit-amendment-brevity`; canon-kit's other sections remain.
 
-canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, on an operator direction lead-relayed (not a /consult ruling), as [canon-kit-gate-brevity](#canon-kit-gate-brevity); canon-kit's other sections remain.
+canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `canon-kit-gate-brevity`; canon-kit's other sections remain.
 
 ### prune-set-matches-walk-root-ancestors
 
@@ -1469,5 +1461,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - canon-kit-zero-config-rejudge
 - seeded-ci-gates-on-surface
 - prose-tells-absence-knobs
+- canon-kit-gate-brevity
 
 ## Lessons Learned
