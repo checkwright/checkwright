@@ -20,7 +20,7 @@ a gate's printed finding or help line reaches an adopter's installed tree, yet a
 
 **Cost while deferred:** an adopter following a red's remedy runs a path their tree lacks. Filed 2026-09-26 to the gap inbox by the done-claim-demo build (check-evidence-manifest's assertion-C remedy, fixed at the drain); promoted 2026-09-26 at its close: →fix fails because the holding assertion is new mechanism and some sites (the prose-bounds worklist, the smoke-entry guard) need a contributor-or-adopter call each. Re-verified at the drain: `git grep 'run-gates.sh' native/src/gates` over `println!`/`format!` lines returns fifteen sites before the fix. Owner lookup: `door`, `run-gates.sh`, `remedy` in this file — none live; owner guard-kit/SPEC.md §check-door-binding.
 
-**Selected 2026-09-30 for guard-kit-steering, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it, after [guard-kit-value-audit](#guard-kit-value-audit) rules the gate. Re-verified: 16 `println!`/`format!` lines under `native/src/gates` name `run-gates.sh`.
+**Selected 2026-09-30 for guard-kit-steering, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it, after `guard-kit-value-audit` rules the gate. Re-verified: 16 `println!`/`format!` lines under `native/src/gates` name `run-gates.sh`.
 
 ## Technical Debt
 
@@ -31,14 +31,6 @@ guard-kit/SPEC.md's front sections under [spec-brevity-residue](#spec-brevity-re
 **Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every `##` heading kept verbatim and every fact another surface cites into them kept, per a citation survey. Applied after the iteration's guard-kit amendments merge, so no section is passed twice in one iteration.
 
 **Cost while deferred:** paid by every session and adopter that reads an unpassed guard-kit section. Filed 2026-09-30 as a split at guard-kit-steering's scope, next in the parent's size order since installer's §The consumer smoke waits on [compiled-consumer-smoke-driver](#compiled-consumer-smoke-driver). Part of the operator's selection of the set, direction 2026-09-30, lead-relayed (not a ruling).
-
-### guard-kit-value-audit
-
-[gate-customer-value-audit](#gate-customer-value-audit)'s guard-kit slice: `check-door-binding`, the one gate guard-kit ships (`# install: zero-config`), audited for customer value and configurability under gate-sdk/SPEC.md §Consumer payload's rule.
-
-**Deliverable:** the gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated. Ruled before [gate-output-contributor-door](#gate-output-contributor-door), whose new assertion lands on this gate.
-
-**Cost while deferred:** the parent's cost, for this kit. Filed 2026-09-30 as a split at guard-kit-steering's scope; its landing moves the parent's roadmap row to `now` under the operator's horizon principle. Part of the operator's selection of the set, direction 2026-09-30, lead-relayed (not a ruling).
 
 ## Deferred
 
@@ -640,9 +632,9 @@ nothing asks whether each shipped gate is useful and configurable for a customer
 
 **First slice landed 2026-09-29 at native-hook-customer-legs, operator direction lead-relayed (not a /consult ruling):** the payload rule at gate-sdk/SPEC.md §Consumer payload, and site-kit audited against it.
 
-Audited: site-kit, 5 gates (5 kept, 2 made generic, 0 withheld); the other 118 shipped gates remain, kit by kit, under gate-sdk/SPEC.md §Consumer payload's rule.
+Audited: site-kit, 5 gates (5 kept, 2 made generic, 0 withheld); guard-kit, 1 gate (1 kept, 0 made generic, 0 withheld); the other 119 shipped gates remain, kit by kit, under gate-sdk/SPEC.md §Consumer payload's rule.
 
-guard-kit's slice left 2026-09-30 at guard-kit-steering's scope, on an operator direction lead-relayed (not a /consult ruling), as [guard-kit-value-audit](#guard-kit-value-audit).
+guard-kit's slice left 2026-09-30 at guard-kit-steering's scope, on an operator direction lead-relayed (not a /consult ruling), as `guard-kit-value-audit`, and landed in that iteration's build.
 
 **A precondition of [companion-toolkit-profile](#companion-toolkit-profile)'s submission, operator direction 2026-09-29, lead-relayed (not a ruling),** beside [companion-install-tier](#companion-install-tier), whose exposed kits this audit's verdicts decide, so those kits are its natural first slices.
 
@@ -1499,5 +1491,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - plugin-guards-subdir-launch
 - one-motion-commit-race-remains-open
 - side-effect-free-read-arms
+- guard-kit-value-audit
 
 ## Lessons Learned
