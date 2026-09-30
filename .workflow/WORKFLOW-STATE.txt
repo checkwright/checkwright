@@ -5,3 +5,4 @@
 ---
 
 install-disposition-pass scope ad06777b 2026-09-30 7ec69651
+install-disposition-pass spec a16e01f8 2026-10-01 aedc1a92
