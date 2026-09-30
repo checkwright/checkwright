@@ -34,6 +34,18 @@ a gate's printed finding or help line reaches an adopter's installed tree, yet a
 
 **Selected 2026-09-30 for guard-kit-steering, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it, after [guard-kit-value-audit](#guard-kit-value-audit) rules the gate. Re-verified: 16 `println!`/`format!` lines under `native/src/gates` name `run-gates.sh`.
 
+### consumer-guard-rule-coverage
+
+[spec: SPEC-consumer-guard-cases.md] [recurrence: 2026-09-25]
+
+consumer-only guard rules are untested: the three destructive rules in `scripts/guard-rules.sh` (`--no-verify`, the harness temp path, `git clean -x`) have no test case, and guard-kit ships no lane in which a consumer tests its own rules.
+
+**Deliverable:** a consumer-rule test lane in the guard test runner (`--run-guard-tests` over a consumer rules file with its cases), this repo's three rules covered, and the lane named at guard-kit/SPEC.md §The generic ruleset.
+
+**Cost while deferred:** the demonstration tree's most destructive guards are the ones nothing verifies, and an adopter writing a rule has no way to prove it fires. Filed 2026-08-13; returned from the icebox 2026-09-25 by consult, the case files re-checked at zero.
+
+**Selected 2026-09-30 for guard-kit-steering, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it, its lane landing in §The generic ruleset, outside [guard-kit-front-brevity](#guard-kit-front-brevity)'s sections.
+
 ## Technical Debt
 
 ### guard-kit-front-brevity
@@ -419,18 +431,6 @@ the walk's prune set matches path components anywhere in an absolute path, not o
 **Deliverable:** prune relative to the walk root, a fixture whose root path carries a default leaf, and the boundary stated at context-kit/SPEC.md §Layout and configuration.
 
 **Cost while deferred:** an adopter under `~/build/` or `~/dist/` sees the index arms return nothing and no red says why. Filed 2026-09-02; returned from the icebox 2026-09-25 by consult, the walk re-read and the match still absolute.
-
-### consumer-guard-rule-coverage
-
-[cost: event/high] [surface: guard-kit] [recurrence: 2026-09-25]
-
-consumer-only guard rules are untested: the three destructive rules in `scripts/guard-rules.sh` (`--no-verify`, the harness temp path, `git clean -x`) have no test case, and guard-kit ships no lane in which a consumer tests its own rules.
-
-**Deliverable:** a consumer-rule test lane in the guard test runner (`--run-guard-tests` over a consumer rules file with its cases), this repo's three rules covered, and the lane named at guard-kit/SPEC.md §The generic ruleset.
-
-**Cost while deferred:** the demonstration tree's most destructive guards are the ones nothing verifies, and an adopter writing a rule has no way to prove it fires. Filed 2026-08-13; returned from the icebox 2026-09-25 by consult, the case files re-checked at zero.
-
-**Selected 2026-09-30 for guard-kit-steering, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it, its lane landing in §The generic ruleset, outside [guard-kit-front-brevity](#guard-kit-front-brevity)'s sections.
 
 ### tarball-build-attestation
 
