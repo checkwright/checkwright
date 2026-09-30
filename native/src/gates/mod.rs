@@ -183,13 +183,20 @@ pub type GateEntry = (
 // spec: canon-kit/SPEC.md §The shared spec adapters — `spec::manifest_files`' branch set: the configured corpus
 // and the prose surface it adds, declared once for the members that call it
 // spec: gate-sdk/SPEC.md §check-reads-couples — each branch declares, the fallback under its selector's guard
-const MANIFEST_ROOTS: &[RootDecl] = &[
-    (".", "glob:knob:CANON_KIT_MANIFEST_FILES", "", ""),
-    (".", "else:CANON_KIT_MANIFEST_FILES:name:knob:CANON_KIT_SPEC_NAME", crate::spec::CANON_SPEC_PRUNE_DECL, ""),
-    (".", "else:CANON_KIT_MANIFEST_FILES:name:lit:README.md", "", ""),
-    (".", "else:CANON_KIT_MANIFEST_FILES:name:lit:CLAUDE.md", "", ""),
-    (".", "glob:knob:CANON_KIT_PROSE_SURFACE_GLOBS", "", ""),
-];
+macro_rules! manifest_roots {
+    ($($lead:expr),*) => {
+        &[
+            $($lead,)*
+            (".", "glob:knob:CANON_KIT_MANIFEST_FILES", "", ""),
+            (".", "else:CANON_KIT_MANIFEST_FILES:name:knob:CANON_KIT_SPEC_NAME", crate::spec::CANON_SPEC_PRUNE_DECL, ""),
+            (".", "else:CANON_KIT_MANIFEST_FILES:name:lit:README.md", "", ""),
+            (".", "else:CANON_KIT_MANIFEST_FILES:name:lit:CLAUDE.md", "", ""),
+            (".", "glob:knob:CANON_KIT_PROSE_SURFACE_GLOBS", "", ""),
+        ]
+    };
+}
+
+const MANIFEST_ROOTS: &[RootDecl] = manifest_roots!();
 
 // spec: canon-kit/SPEC.md §The shared spec adapters — `spec::comment_surface`'s two runtime branches,
 // and the actions tier declared unconditionally because the walk it over-approximates is guarded by a
@@ -1617,10 +1624,23 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-docs-mirror-fresh",
         docs_mirror_fresh::run,
-        &[("?", "", "", "dynamic@src/gates/docs_mirror_fresh.rs:68")],
+        // spec: canon-kit/SPEC.md §The reference-link grammar — beside the orphan sweep's root, the
+        // manifest set the mirror's citation renderer resolves a path-less citation into
+        manifest_roots!(("?", "", "", "dynamic@src/gates/docs_mirror_fresh.rs:68")),
         // spec: gate-sdk/SPEC.md §The non-gate arm — the generator it now calls in-process reads
-        // the blob ref, so the comparator declares what its callee reads.
-        &["CANON_KIT_DOCS_BLOB_REF", "CANON_KIT_MIRROR_ROOT", "GATE_SDK_NATIVE_BIN"],
+        // the blob ref and the manifest set, so the comparator declares what its callee reads.
+        &[
+            "CANON_KIT_DOCS_BLOB_REF",
+            "CANON_KIT_MIRROR_ROOT",
+            "GATE_SDK_NATIVE_BIN",
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+            "GATE_SDK_KIT_DIRS",
+            "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_MANIFEST_FILES",
+            "CANON_KIT_PROSE_SURFACE_GLOBS",
+        ],
         "-",
         &[("date", ""), ("git", "")],
     ),

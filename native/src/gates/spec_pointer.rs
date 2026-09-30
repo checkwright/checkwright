@@ -375,6 +375,20 @@ impl Para {
         }
         self.lines[li]
     }
+
+    // spec: canon-kit/SPEC.md §The reference-link grammar — a joined offset as its physical line's
+    // index in the paragraph and its byte offset in that line: from the first line's start, and
+    // past a continued line's stripped indent, since the join keeps only the first line's
+    pub(crate) fn locate(&self, at: usize) -> (usize, usize) {
+        let from = |i: usize| if i > 0 { self.lstart[i] + 1 } else { self.lstart[i] };
+        let mut li = 0usize;
+        for i in 0..self.lstart.len() {
+            if from(i) <= at {
+                li = i;
+            }
+        }
+        (li, at - from(li))
+    }
 }
 
 // spec: canon-kit/SPEC.md §check-spec-pointer — the blank-line paragraph join, fenced code skipped
@@ -516,7 +530,7 @@ fn link_target(b: &[u8], end: usize) -> Option<(usize, String)> {
 
 // spec: canon-kit/SPEC.md §check-spec-pointer — the link target resolved from the citing file's
 // directory with its `#anchor` stripped; a URL or a path climbing out of the tree resolves to none
-fn link_path(citing_rel: &str, target: &str) -> Option<String> {
+pub(crate) fn link_path(citing_rel: &str, target: &str) -> Option<String> {
     if target.contains("://") || target.starts_with("mailto:") {
         return None;
     }
@@ -563,16 +577,34 @@ struct Lead {
 
 impl Heading {
     fn prefix_of(&self, frag: &str) -> bool {
-        is_prefix(frag, &self.text)
-            || is_prefix(frag, &self.stripped)
-            || self.lead.as_ref().is_some_and(|l| {
-                is_prefix(frag, &l.text) && !frag[l.text.len()..].starts_with(l.sep.as_str())
-            })
+        self.prefix_len(frag).is_some()
+    }
+
+    // spec: canon-kit/SPEC.md §check-spec-pointer — the length of the fragment prefix the heading
+    // matched: its whole title, its qualifier-stripped title or its lead clause, longest first
+    fn prefix_len(&self, frag: &str) -> Option<usize> {
+        if is_prefix(frag, &self.text) {
+            return Some(self.text.len());
+        }
+        if is_prefix(frag, &self.stripped) {
+            return Some(self.stripped.len());
+        }
+        self.lead
+            .as_ref()
+            .filter(|l| is_prefix(frag, &l.text) && !frag[l.text.len()..].starts_with(l.sep.as_str()))
+            .map(|l| l.text.len())
     }
 }
 
+// spec: canon-kit/SPEC.md §The reference-link grammar — the heading a citation resolved to, whole,
+// and how much of the citing fragment it matched
+pub(crate) struct Matched {
+    pub(crate) heading: String,
+    pub(crate) prefix: usize,
+}
+
 #[derive(Default)]
-struct HeadingCache {
+pub(crate) struct HeadingCache {
     files: HashMap<String, Vec<Heading>>,
 }
 
@@ -621,15 +653,55 @@ impl HeadingCache {
     }
 
     fn present(&mut self, file: &str, frag: &str, mode: Mode) -> Result<bool, String> {
+        Ok(self.matched(file, frag, mode)?.is_some())
+    }
+
+    fn matched(&mut self, file: &str, frag: &str, mode: Mode) -> Result<Option<Matched>, String> {
         let stripped = strip_qualifier(frag);
         let hs = self.headings(file)?;
-        Ok(hs.iter().any(|h| {
-            if mode == Mode::Prefix {
-                h.prefix_of(frag)
+        Ok(hs.iter().find_map(|h| {
+            let prefix = if mode == Mode::Prefix {
+                h.prefix_len(frag)?
+            } else if h.text == frag || h.stripped == frag || h.text == stripped || h.stripped == stripped {
+                frag.len()
             } else {
-                h.text == frag || h.stripped == frag || h.text == stripped || h.stripped == stripped
-            }
+                return None;
+            };
+            Some(Matched {
+                heading: h.text.clone(),
+                prefix,
+            })
         }))
+    }
+
+    // spec: canon-kit/SPEC.md §The reference-link grammar — a prose citation naming its file
+    // resolves there, in the prefix mode the prose pass uses
+    pub(crate) fn resolve(&mut self, file: &str, frag: &str) -> Result<Option<Matched>, String> {
+        self.matched(file, frag, Mode::Prefix)
+    }
+
+    // spec: canon-kit/SPEC.md §The reference-link grammar — a path-less citation resolves to the
+    // citing file first, then to the one other file holding the heading; several or none is
+    // nothing, while the gate's liveness verdict stays the union
+    pub(crate) fn resolve_bare(
+        &mut self,
+        citing: &str,
+        others: &[String],
+        frag: &str,
+    ) -> Result<Option<(String, Matched)>, String> {
+        if let Some(m) = self.resolve(citing, frag)? {
+            return Ok(Some((citing.to_string(), m)));
+        }
+        let mut found: Option<(String, Matched)> = None;
+        for f in others.iter().filter(|f| f.as_str() != citing) {
+            if let Some(m) = self.resolve(f, frag)? {
+                if found.is_some() {
+                    return Ok(None);
+                }
+                found = Some((f.clone(), m));
+            }
+        }
+        Ok(found)
     }
 }
 

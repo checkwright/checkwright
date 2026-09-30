@@ -444,26 +444,15 @@ pub fn strip_dot_slash(s: &str) -> String {
 // spec: canon-kit/SPEC.md §check-md-refs — the heading-to-anchor slug rule, held here rather than
 // in either reader: `check-md-refs` resolves an `#anchor` against it and the runner's invariant
 // line builds a published fragment with it, and two copies is how the two would come to disagree
+// spec: canon-kit/SPEC.md §check-md-refs — each space becomes its own hyphen, as GitHub and the
+// site's kramdown ids render it, so a dropped character between spaces leaves two
 pub fn anchor_slug(heading: &str) -> String {
-    let kept: String = heading
+    heading
         .to_lowercase()
         .chars()
         .filter(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || *c == ' ' || *c == '_' || *c == '-')
-        .collect();
-    let mut out = String::with_capacity(kept.len());
-    let mut in_run = false;
-    for c in kept.chars() {
-        if c == ' ' {
-            if !in_run {
-                out.push('-');
-                in_run = true;
-            }
-            continue;
-        }
-        in_run = false;
-        out.push(c);
-    }
-    out
+        .map(|c| if c == ' ' { '-' } else { c })
+        .collect()
 }
 
 // spec: canon-kit/SPEC.md §The shared spec adapters — the claim-gate primitives the two members share:
@@ -1682,6 +1671,16 @@ fn delimited(b: &[u8], d: u8, nonempty: bool) -> Option<(usize, usize)> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: canon-kit/SPEC.md §check-md-refs — the three shapes a collapsing slug got wrong: an em
+    // dash between spaces, a dropped `#`, and a leading dropped `§`
+    #[test]
+    fn each_space_is_its_own_hyphen() {
+        assert_eq!(anchor_slug("Content tiering — the star topology"), "content-tiering--the-star-topology");
+        assert_eq!(anchor_slug("The # graph: manifest"), "the--graph-manifest");
+        assert_eq!(anchor_slug("§ The seam"), "-the-seam");
+        assert_eq!(anchor_slug("check-md-refs"), "check-md-refs");
+    }
 
     // spec: canon-kit/SPEC.md §The shared spec adapters — the walk and every registry declaration
     // cannot disagree about the prune

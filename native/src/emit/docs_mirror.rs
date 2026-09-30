@@ -3,6 +3,8 @@
 // grammar. Its source set is derived from the tree, so its one knob is a URL prefix.
 use crate::emit::self_repo_prefix;
 use crate::fresh;
+use crate::gates::citation_link::links;
+use crate::gates::spec_pointer::{link_path, opens_heading, paragraphs, sites, HeadingCache};
 use crate::spec;
 use crate::walk;
 use std::path::Path;
@@ -153,7 +155,180 @@ fn rewrite_line(ctx: &Ctx, srcdir: &str, line: &str) -> String {
     out
 }
 
-fn emit_one(ctx: &Ctx, src: &str) -> Result<String, String> {
+// spec: canon-kit/SPEC.md §The reference-link grammar — a copy of the source whose fences, fenced
+// lines, headings and HTML comments are blanked byte for byte, so the citation reader's paragraphs
+// see prose only and every offset it reports is an offset in the source line
+fn prose_mask(lines: &[&str]) -> Vec<String> {
+    let blank = |l: &str| " ".repeat(l.len());
+    let mut out: Vec<String> = Vec::new();
+    let mut fence = false;
+    let mut comment = false;
+    for line in lines {
+        if !comment && spec::is_fence_line(line) {
+            fence = !fence;
+            out.push(blank(line));
+            continue;
+        }
+        if fence || (!comment && spec::prose_heading_level(line) > 0) {
+            out.push(blank(line));
+            continue;
+        }
+        let mut b = line.as_bytes().to_vec();
+        let mut i = 0usize;
+        while i < b.len() {
+            if !comment && b[i..].starts_with(b"<!--") {
+                comment = true;
+            }
+            if comment {
+                if b[i..].starts_with(b"-->") {
+                    b[i..i + 3].fill(b' ');
+                    i += 3;
+                    comment = false;
+                    continue;
+                }
+                b[i] = b' ';
+            }
+            i += 1;
+        }
+        out.push(String::from_utf8(b).unwrap_or_else(|_| blank(line)));
+    }
+    out
+}
+
+// spec: canon-kit/SPEC.md §The reference-link grammar — one insertion or replacement in a source
+// line, applied right to left so earlier columns hold
+struct Splice {
+    line: usize,
+    from: usize,
+    to: usize,
+    text: String,
+}
+
+// spec: canon-kit/SPEC.md §The reference-link grammar — the governed files a path-less citation
+// may resolve into, keyed as the heading reader opens them
+struct Governed {
+    files: Vec<String>,
+    headings: HeadingCache,
+}
+
+fn governed(ctx: &Ctx) -> Result<Governed, String> {
+    let mut files: Vec<String> = Vec::new();
+    for p in spec::manifest_files(&ctx.root)? {
+        let shown = p.display().to_string();
+        let rel = spec::strip_dot_slash(walk::rel_under(&ctx.root, &shown).unwrap_or(&shown));
+        let key = ctx.under(&rel);
+        if !files.contains(&key) {
+            files.push(key);
+        }
+    }
+    Ok(Governed {
+        files,
+        headings: HeadingCache::default(),
+    })
+}
+
+// spec: canon-kit/SPEC.md §The reference-link grammar — each resolvable section citation becomes a
+// link, its own text through the matched heading prefix, targeting the heading's anchor in the cited
+// file; `rewrite_line` then carries the target to its mirrored or blob form
+fn cite_splices(ctx: &Ctx, src: &str, lines: &[&str], gov: &mut Governed) -> Result<Vec<Splice>, String> {
+    let srcdir = src.rsplit_once('/').map(|(d, _)| d).unwrap_or("");
+    let masked = prose_mask(lines);
+    let text = masked.join("\n");
+    let citing = ctx.under(src);
+    let mut out: Vec<Splice> = Vec::new();
+    for para in paragraphs(&text) {
+        let j = para.joined.as_str();
+        let spans = links(j);
+        let at_col = |at: usize| {
+            let (li, off) = para.locate(at);
+            let line = para.lines[li] - 1;
+            let indent = if li > 0 {
+                masked[line].len() - masked[line].trim_start().len()
+            } else {
+                0
+            };
+            (line, off + indent)
+        };
+        let mut last_end = 0usize;
+        for site in sites(j) {
+            if !opens_heading(&site.frag)
+                || j.as_bytes()[..site.at].iter().filter(|&&c| c == b'`').count() % 2 == 1
+                || spans.iter().any(|(s, e, _)| *s <= site.at && site.at < *e)
+            {
+                continue;
+            }
+            let (start, fold, file, m) = if let Some((start, path)) = &site.path {
+                let quoted = *start > 0 && j.as_bytes()[start - 1] == b'`';
+                let file = ctx.under(path);
+                if !Path::new(&file).is_file() {
+                    continue;
+                }
+                match gov.headings.resolve(&file, &site.frag)? {
+                    Some(m) => (if quoted { start - 1 } else { *start }, None, path.clone(), m),
+                    None => continue,
+                }
+            } else if let Some((open, target)) = &site.link {
+                let Some(path) = link_path(src, target) else { continue };
+                let file = ctx.under(&path);
+                let Some((_, close, _)) = spans.iter().find(|(s, _, _)| *s == open + 1) else {
+                    continue;
+                };
+                if !Path::new(&file).is_file() || at_col(*close).0 != at_col(site.at).0 {
+                    continue;
+                }
+                match gov.headings.resolve(&file, &site.frag)? {
+                    Some(m) => (*open, Some(*close), path, m),
+                    None => continue,
+                }
+            } else if site.bare {
+                match gov.headings.resolve_bare(&citing, &gov.files, &site.frag)? {
+                    Some((file, m)) => {
+                        let rel = spec::strip_dot_slash(walk::rel_under(&ctx.root, &file).unwrap_or(&file));
+                        (site.at, None, rel, m)
+                    }
+                    None => continue,
+                }
+            } else {
+                continue;
+            };
+            if start < last_end {
+                continue;
+            }
+            let end = site.at + "§".len() + m.prefix;
+            last_end = end;
+            let anchor = spec::anchor_slug(&m.heading);
+            let target = if file == src {
+                format!("#{}", anchor)
+            } else {
+                format!("{}#{}", relative_to(srcdir, &file), anchor)
+            };
+            match fold {
+                Some(close) => {
+                    let (line, from) = at_col(close);
+                    out.push(Splice { line, from, to: at_col(site.at).1, text: " ".to_string() });
+                }
+                None => {
+                    let (line, from) = at_col(start);
+                    out.push(Splice { line, from, to: from, text: "[".to_string() });
+                }
+            }
+            let (line, at) = at_col(end);
+            out.push(Splice { line, from: at, to: at, text: format!("]({})", target) });
+        }
+    }
+    Ok(out)
+}
+
+fn apply(lines: &[&str], mut splices: Vec<Splice>) -> Vec<String> {
+    let mut out: Vec<String> = lines.iter().map(|l| l.to_string()).collect();
+    splices.sort_by_key(|s| std::cmp::Reverse((s.line, s.from)));
+    for s in splices {
+        out[s.line].replace_range(s.from..s.to, &s.text);
+    }
+    out
+}
+
+fn emit_one(ctx: &Ctx, src: &str, gov: &mut Governed) -> Result<String, String> {
     let (srcdir, base) = match src.rsplit_once('/') {
         Some((d, b)) => (d, b),
         None => ("", src),
@@ -190,7 +365,15 @@ fn emit_one(ctx: &Ctx, src: &str) -> Result<String, String> {
          the page is that source's, and the banner above is the regeneration recipe -->\n",
     );
     out.push_str(RAW_OPEN);
-    for line in fresh::file_lines(&text) {
+    let lines: Vec<&str> = fresh::file_lines(&text);
+    // spec: canon-kit/SPEC.md §The reference-link grammar — a mirrored README's citations are hand
+    // links check-citation-link already holds, so only a SPEC and the doctrine are rendered
+    let body: Vec<String> = if title == "README" {
+        lines.iter().map(|l| l.to_string()).collect()
+    } else {
+        apply(&lines, cite_splices(ctx, src, &lines, gov)?)
+    };
+    for line in &body {
         out.push_str(&rewrite_line(ctx, srcdir, line));
         out.push('\n');
     }
@@ -282,18 +465,19 @@ pub fn emit(args: &[String]) -> Result<String, String> {
             if !Path::new(&ctx.under(&src)).is_file() {
                 return Err(format!("source not found: {}", ctx.under(&src)));
             }
-            emit_one(&ctx, &src)
+            emit_one(&ctx, &src, &mut governed(&ctx)?)
         }
         Mode::Write => {
             let srcs = sources(&ctx)?;
             let mirror = spec::mirror_root()?;
+            let mut gov = governed(&ctx)?;
             for src in &srcs {
                 let dest = ctx.under(&format!("{}/{}", mirror, src));
                 if let Some((dir, _)) = dest.rsplit_once('/') {
                     std::fs::create_dir_all(dir)
                         .map_err(|e| format!("cannot create {}: {}", dir, e))?;
                 }
-                let page = emit_one(&ctx, src)?;
+                let page = emit_one(&ctx, src, &mut gov)?;
                 std::fs::write(&dest, page)
                     .map_err(|e| format!("cannot write {}: {}", dest, e))?;
             }
@@ -342,6 +526,54 @@ mod tests {
         assert_eq!(relative_to("/r", &walk::normalize_abs("/r/a/./b")), "a/b");
         assert_eq!(relative_to("/r/x", &walk::normalize_abs("/r/x/../y")), "../y");
         assert_eq!(relative_to("/r", &walk::normalize_abs("/r")), ".");
+    }
+
+    // spec: canon-kit/SPEC.md §The reference-link grammar — each citation form, the bare
+    // resolution order, an ambiguous bare citation, a lead-clause match anchored on the whole
+    // heading, a citation broken by a wrap, and the sites left plain
+    #[test]
+    fn each_resolvable_citation_renders_as_a_link_to_its_section() {
+        let d = std::env::temp_dir().join(format!("checkwright-mirror-cite.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        let put = |rel: &str, body: &str| {
+            let p = d.join(rel);
+            std::fs::create_dir_all(p.parent().unwrap()).unwrap();
+            std::fs::write(p, body).unwrap();
+        };
+        put("b/SPEC.md", "# b\n\n## Gamma\n\n## Delta\n");
+        put("c/README.md", "# c\n\n## Delta\n");
+        let src = "# a\n\n## Alpha — the first\n\n## Beta\n\n\
+            Cites §Beta, a/SPEC.md §Alpha here, `b/SPEC.md` §Gamma and [b](../b/SPEC.md) §Gamma rest.\n\n\
+            Bare §Gamma, §Delta and §Nowhere.\n\n\
+            A wrapped §Alpha\n  — the first continues.\n\n\
+            Plain: `§Beta`, [see §Beta](x.md) <!-- §Beta -->.\n\n\
+            ```\n§Beta\n```\n";
+        put("a/SPEC.md", src);
+        let root = d.display().to_string();
+        let ctx = Ctx {
+            root: root.clone(),
+            abs_root: root.clone(),
+            blob: "https://example.test/blob/master/".to_string(),
+            tree: "https://example.test/tree/master/".to_string(),
+        };
+        let mut gov = Governed {
+            files: ["a/SPEC.md", "b/SPEC.md", "c/README.md"].iter().map(|r| ctx.under(r)).collect(),
+            headings: HeadingCache::default(),
+        };
+        let lines: Vec<&str> = fresh::file_lines(src);
+        let got = apply(&lines, cite_splices(&ctx, "a/SPEC.md", &lines, &mut gov).unwrap());
+        let _ = std::fs::remove_dir_all(&d);
+        assert_eq!(
+            got[6],
+            "Cites [§Beta](#beta), [a/SPEC.md §Alpha](#alpha--the-first) here, \
+             [`b/SPEC.md` §Gamma](../b/SPEC.md#gamma) and [b §Gamma](../b/SPEC.md#gamma) rest."
+        );
+        assert_eq!(got[8], "Bare [§Gamma](../b/SPEC.md#gamma), §Delta and §Nowhere.");
+        assert_eq!(got[10], "A wrapped [§Alpha");
+        assert_eq!(got[11], "  — the first](#alpha--the-first) continues.");
+        assert_eq!(got[13], lines[13]);
+        assert_eq!(got[2], lines[2]);
+        assert_eq!(got[16], lines[16]);
     }
 
     // spec: canon-kit/SPEC.md §The reference-link grammar — a source may carry any Liquid-looking

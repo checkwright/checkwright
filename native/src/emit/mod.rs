@@ -299,12 +299,22 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         &[],
     ),
     // spec: canon-kit/SPEC.md §The reference-link grammar — the source set is derived from the
-    // tracked tree rather than enumerated, so the configured values are the blob ref and the
-    // mirror root
+    // tracked tree rather than enumerated, so the configured values are the blob ref, the mirror
+    // root and the manifest set a path-less citation resolves into
     (
         "--emit-docs-mirror",
         Arm::Emit(docs_mirror::emit, Grammar::Parsed(docs_mirror::USAGE)),
-        &["CANON_KIT_DOCS_BLOB_REF", "CANON_KIT_MIRROR_ROOT"],
+        &[
+            "CANON_KIT_DOCS_BLOB_REF",
+            "CANON_KIT_MIRROR_ROOT",
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+            "GATE_SDK_KIT_DIRS",
+            "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_MANIFEST_FILES",
+            "CANON_KIT_PROSE_SURFACE_GLOBS",
+        ],
     ),
     // spec: drift-kit/SPEC.md §The published-evidence extractor — the stage roster and the
     // evidence-surface pair are this consumer's vocabulary, so they are knobs; a

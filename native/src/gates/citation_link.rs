@@ -187,7 +187,7 @@ pub(crate) fn prose_only(text: &str) -> String {
 
 // spec: canon-kit/SPEC.md §check-citation-link — an inline link's text span and its target, read
 // outside code spans so a bracket quoted in code opens nothing
-fn links(joined: &str) -> Vec<(usize, usize, String)> {
+pub(crate) fn links(joined: &str) -> Vec<(usize, usize, String)> {
     let b = joined.as_bytes();
     let mut out: Vec<(usize, usize, String)> = Vec::new();
     let mut opens: Vec<usize> = Vec::new();
