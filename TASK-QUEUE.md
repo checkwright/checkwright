@@ -32,6 +32,18 @@ a `gates.list` name that resolves nowhere reds six gates at once — `check-gate
 
 **Selected 2026-10-01 for install-disposition-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, choosing the owner gate or the boundary note.
 
+### shellcheck-extra-dirs-trigger
+
+[spec: SPEC-word-list-roots.md]
+
+`check-shellcheck`'s generated-hook trigger never fires on a directory only `GATE_SDK_LINT_EXTRA_DIRS` adds: the knob is a `.words()` row, which `check-graph` refuses as a `knob:` couples token, so an edit there is linted by the full battery and CI but not at commit. gate-sdk/SPEC.md §check-shellcheck states the limit.
+
+**Deliverable:** a manifest token that expands a word-list knob into trigger globs, or a boundary note ruling the late tier acceptable.
+
+**Cost while deferred:** a consumer's lint findings in knob-added dirs arrive one tier late. Filed 2026-09-26 to the gap inbox by gate-sdk-tooling-brevity; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because a new manifest token is a contract change to `check-graph`. Re-verified: `GATE_SDK_LINT_EXTRA_DIRS` is declared `.words()` in `native/src/knobs/gate_sdk.rs`, and the descriptor couples only `knob:GATE_SDK_GATES_DIR/*.sh,kit:*.sh`. Owner lookup: `LINT_EXTRA`, `word-list` in this file — none; owner gate-sdk/SPEC.md §check-shellcheck.
+
+**Selected 2026-10-01 for install-disposition-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, choosing the manifest token or the boundary note.
+
 ## Technical Debt
 
 ### canon-kit-gate-brevity
@@ -53,18 +65,6 @@ a consumer's use of the foreign-vendor run (delegation-kit/SPEC.md §The foreign
 **Why design-pending:** a close-stage review hook is new stage mechanism; each live run takes an operator grant, and a standing grant for a recurring review is the operator's to give; whether foreign adapters map onto `DELEGATION_KIT_TIER_MODEL`'s classes belongs to [heterogeneous-agent-delegation](#heterogeneous-agent-delegation)'s next slice. The foreign subscription's budget is small beside the primary harness's, so an exhausted foreign budget never blocks an iteration — a review degrades to skipped-with-notice — while a strategic consultation may wait for the limit to reset. Distinct from that entry, which owns transport and the adapter seam; this one is a consumer's use of it. Vendor model literals stay in consumer config (gate-sdk/SPEC.md §The provenance seam).
 
 **Cost while deferred:** a second-vendor reading of the iteration's work is foregone, and the deterministic gates stay the only critique. Filed 2026-09-30 to the gap inbox by the lead; promoted at delegation-tier-binding's close: →fix fails because the hook is new mechanism, →forward because the direction is already given and only its per-run grants are the operator's. Owner lookup: `critique`, `foreign-run`, `review adapter` in this file — only heterogeneous-agent-delegation, whose subject is transport; owner delegation-kit/SPEC.md §The foreign-vendor run.
-
-### shellcheck-extra-dirs-trigger
-
-[cost: event/low] [surface: gate-sdk]
-
-`check-shellcheck`'s generated-hook trigger never fires on a directory only `GATE_SDK_LINT_EXTRA_DIRS` adds: the knob is a `.words()` row, which `check-graph` refuses as a `knob:` couples token, so an edit there is linted by the full battery and CI but not at commit. gate-sdk/SPEC.md §check-shellcheck states the limit.
-
-**Deliverable:** a manifest token that expands a word-list knob into trigger globs, or a boundary note ruling the late tier acceptable.
-
-**Cost while deferred:** a consumer's lint findings in knob-added dirs arrive one tier late. Filed 2026-09-26 to the gap inbox by gate-sdk-tooling-brevity; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because a new manifest token is a contract change to `check-graph`. Re-verified: `GATE_SDK_LINT_EXTRA_DIRS` is declared `.words()` in `native/src/knobs/gate_sdk.rs`, and the descriptor couples only `knob:GATE_SDK_GATES_DIR/*.sh,kit:*.sh`. Owner lookup: `LINT_EXTRA`, `word-list` in this file — none; owner gate-sdk/SPEC.md §check-shellcheck.
-
-**Selected 2026-10-01 for install-disposition-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, choosing the manifest token or the boundary note.
 
 ### seeded-ci-gates-on-surface
 
