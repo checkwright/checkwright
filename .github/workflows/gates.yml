@@ -767,12 +767,12 @@ jobs:
               Write-Host "== step 4: a violation is refused by the gate that owns it =="
               $head = git rev-parse HEAD
               [IO.File]::WriteAllText((Join-Path $consumer 'hooks-violation.sh'),
-                  "#!/usr/bin/env bash`nroot=`"`$(git rev-parse --show-toplevel)`"`necho `"`$root`"`n")
+                  ('#!/usr/bin/env bash' + "`n" + 'set -o pipefail' + "`n" + 'names=(a b c)' + "`n" + 'if printf "%s\n" "${names[@]}" | grep -q b; then echo found; fi' + "`n"))
               git add hooks-violation.sh
-              $vout = (& git commit -m 'chore: add a script that binds an uncrossed root' 2>&1) -join "`n"
+              $vout = (& git commit -m 'chore: add a pipeline that can lose its match' 2>&1) -join "`n"
               $vcode = $LASTEXITCODE
               Check "the violating commit was refused" ($vcode -ne 0 -and (git rev-parse HEAD) -eq $head) "exit $vcode -- $vout"
-              Check "the refusal names the gate that owns the violation" ($vout -match 'check-path-dialect failed') "$vout"
+              Check "the refusal names the gate that owns the violation" ($vout -match 'check-pipe-membership failed') "$vout"
           } finally { Pop-Location }
 
           if ($script:fails -gt 0) { Write-Host "$($script:fails) assertion(s) failed"; exit 1 }

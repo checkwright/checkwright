@@ -32,7 +32,7 @@ Take a fictional cargo-shipping domain — the classic domain-driven design teac
 
 Those long-hand word boundaries are deliberate. The gate matches through a portable extended regular expression engine, which refuses the GNU `\b` escape by name, so a list written with GNU extensions fails closed instead of quietly matching nothing (`gate-sdk/SPEC.md §check-tree-terms`).
 
-Point the tree scan at it — the pattern-file argument stands in for the standing `GATE_SDK_MSG_PATTERN_FILES` configuration:
+Register the tree scan, which no install profile registers for you (pass `--with-gate check-tree-terms` to `init`, or add the name to your `gates.list`), and point it at the list — the pattern-file argument stands in for the standing `GATE_SDK_MSG_PATTERN_FILES` configuration:
 
 <!-- door-contributor: a worked example of a contributor's own tree scan, typed in a clone whose binary is built by construction -->
 ```bash

@@ -37,6 +37,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let tracked: HashSet<&str> = raw.split('\0').filter(|s| !s.is_empty()).collect();
 
     let whitelist = spec::knob_array_pub("CANON_KIT_COMMENT_WHITELIST")?;
+    let title_once = title_once()?;
     let mut headings: HeadingCache = HeadingCache::default();
     let mut errors: Vec<String> = Vec::new();
     let mut scanned = 0usize;
@@ -120,6 +121,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
         let mf = m.display().to_string();
         let hs = headings.headings(&mf)?;
         union.extend(hs.iter().cloned());
+        if !title_once {
+            continue;
+        }
         // spec: canon-kit/SPEC.md §check-spec-pointer — a title names one section per file
         let mut seen: HashMap<&str, usize> = HashMap::new();
         for h in hs {
@@ -170,14 +174,37 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for e in &errors {
             println!("  {}", e);
         }
-        println!("  help: a spec:/contract: directive and a free-prose <path>.md §<heading> citation each bind a site to the requirement that governs it — the binding is only live if it resolves. Fix the <path> (repo-relative, tracked) or the §<heading> to name the current target, or drop the § fragment for a file-only pointer; a § with no path must name a heading some governed file carries, and a title carried twice in one file is renamed apart. A renamed heading updates every inbound pointer and citation in the same commit.");
+        let rename = if title_once {
+            ", and a title carried twice in one file is renamed apart"
+        } else {
+            ""
+        };
+        println!("  help: a spec:/contract: directive and a free-prose <path>.md §<heading> citation each bind a site to the requirement that governs it — the binding is only live if it resolves. Fix the <path> (repo-relative, tracked) or the §<heading> to name the current target, or drop the § fragment for a file-only pointer; a § with no path must name a heading some governed file carries{}. A renamed heading updates every inbound pointer and citation in the same commit.", rename);
         return Ok(1);
     }
+    let once = if title_once {
+        ", no title carried twice in one file"
+    } else {
+        ""
+    };
     println!(
-        "SPEC-POINTER: clean ({} directive pointer(s) across {} governed source(s), {} version-marker header(s) skipped as naming no path, {} naming a withheld kit SPEC; {} path-qualified and {} unqualified prose citation(s) across {} manifest file(s); every target file tracked, named §heading present, no title carried twice in one file)",
-        pointers, scanned, markers, withheld, prose_cites, unqualified, manifests
+        "SPEC-POINTER: clean ({} directive pointer(s) across {} governed source(s), {} version-marker header(s) skipped as naming no path, {} naming a withheld kit SPEC; {} path-qualified and {} unqualified prose citation(s) across {} manifest file(s); every target file tracked, named §heading present{})",
+        pointers, scanned, markers, withheld, prose_cites, unqualified, manifests, once
     );
     Ok(0)
+}
+
+// spec: canon-kit/SPEC.md §Layout and configuration — `CANON_KIT_SPEC_POINTER_TITLE_ONCE` is `off`
+// or `on`, and any other value refuses rather than resolving to either
+fn title_once() -> Result<bool, String> {
+    match spec::knob_pub("CANON_KIT_SPEC_POINTER_TITLE_ONCE")?.as_str() {
+        "off" => Ok(false),
+        "on" => Ok(true),
+        v => Err(format!(
+            "CANON_KIT_SPEC_POINTER_TITLE_ONCE must be off|on (got '{}')",
+            v
+        )),
+    }
 }
 
 fn rel_of(root: &str, f: &str) -> String {

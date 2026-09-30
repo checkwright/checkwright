@@ -1,7 +1,9 @@
 # The candidate glob the finder discriminates: the slot-free cand-tmpl.md is
 # included, so its dangling citation is scanned and reddens.
 CANON_KIT_PROSE_SURFACE_GLOBS[] = cand-*.md
-# The widget spec joins the manifest set, so its repeated title is read.
+# The widget spec joins the manifest set, and the title rule is on, so its
+# repeated title reddens.
+CANON_KIT_SPEC_POINTER_TITLE_ONCE = on
 CANON_KIT_MANIFEST_FILES[] = README.md
 CANON_KIT_MANIFEST_FILES[] = SPEC-widget.md
 # A heading family and a lone family-shaped heading join it, so each lead-clause

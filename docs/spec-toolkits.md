@@ -14,7 +14,7 @@ Checkwright's `prose` profile governs a repository of documents. A recipe fits i
 With the recipe applied, four kinds of defect in your specs fail CI, and a pre-commit hook catches them early:
 
 - a relative link to a missing file, or an anchored link to a heading that is not there, caught by `check-md-refs`;
-- a section citation such as `specs/001-login/spec.md §Assumptions` naming a heading that is not there, or one title used twice in a spec, caught by `check-spec-pointer`; <!-- citation-link-exempt: an example of the citation form the gate reads, not a citation -->
+- a section citation such as `specs/001-login/spec.md §Assumptions` naming a heading that is not there, caught by `check-spec-pointer`; <!-- citation-link-exempt: an example of the citation form the gate reads, not a citation -->
 - a code fence that is never closed, caught by `check-spec-fence-balance`;
 - a documented command that runs a script your repository does not have, caught by `check-docs-cmd`.
 

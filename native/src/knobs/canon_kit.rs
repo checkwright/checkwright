@@ -167,6 +167,7 @@ pub const KIT: Kit = Kit {
         Row::indexed("CANON_KIT_COMMENT_POSITIONAL", &[]),
         Row::indexed("CANON_KIT_COMMENT_WHITELIST", &[]),
         Row::scalar("CANON_KIT_COMMENT_RUN_CAP", "3"),
+        Row::scalar("CANON_KIT_SPEC_POINTER_TITLE_ONCE", "off"),
         Row::indexed("CANON_KIT_PROSE_TELL_GLOBS", &[]),
         Row::indexed("CANON_KIT_PROSE_TELL_ABSENCE_GLOBS", &[]),
         Row::scalar("CANON_KIT_PROSE_TELL_EMDASH_MAX", "2"),

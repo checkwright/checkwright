@@ -617,8 +617,8 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
             && !r.is_written.contains(AGENT_FILE);
         if seeds_agent {
             // spec: installer/SPEC.md §What init seeds — the seeded agent file carries the
-            // section heading context-kit's brevity gate reads by default, so the gate init
-            // registers has the surface it was pointed at from the first commit.
+            // section heading context-kit's brevity gate reads by default, so the gate an adopter
+            // registers with `--with-gate` has the surface it was pointed at from the first commit.
             let body = format!(
                 "# {}\n\nResident instructions for agent sessions in this repository.\n\n## Shared conventions\n\n- **Terse:** one line per rule here; the mechanism behind the pointer.\n",
                 AGENT_FILE

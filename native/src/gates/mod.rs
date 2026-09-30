@@ -1064,6 +1064,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_COMMENT_SURFACE",
             "CANON_KIT_COMMENT_ACTIONS",
             "CANON_KIT_COMMENT_WHITELIST",
+            "CANON_KIT_SPEC_POINTER_TITLE_ONCE",
         ],
         "canon-kit",
         &[("git", "")],

@@ -143,7 +143,7 @@ pub fn write_queue(src: &str, root: &Path, queue_file: &str) -> Result<(), Strin
 // kit's starting gates, a narrower question than which kit writes into it: reading this membership
 // as the seeding roster is the conflation that section's rule exists to settle.
 pub fn needs_agent_file(kit: &str) -> bool {
-    matches!(kit, "context-kit" | "doctrine-kit")
+    kit == "doctrine-kit"
 }
 
 // spec: installer/SPEC.md §init — the absence test is the one predicate the dry plan and the run
