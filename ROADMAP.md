@@ -35,8 +35,8 @@ Adoption evidence, mostly. A rung promotes when someone hits the friction it des
 
 ### later
 
+- [heterogeneous-agent-delegation](TASK-QUEUE.md#heterogeneous-agent-delegation) *(ecosystem)* — Dispatch a stage to any vendor's coding agent, gated identically.
 - [benchmark-ab-experiment](TASK-QUEUE.md#benchmark-ab-experiment) *(adoption)* — A controlled experiment measuring drift with and without governance.
 - [hosted-attestation-service](TASK-QUEUE.md#hosted-attestation-service) *(commercial)* — Gate runs verified by a neutral party no committing agent can touch.
-- [heterogeneous-agent-delegation](TASK-QUEUE.md#heterogeneous-agent-delegation) *(ecosystem)* — Dispatch a stage to any vendor's coding agent, gated identically.
 
 <!-- roadmap:end -->
