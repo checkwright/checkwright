@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### delegation-kit-tier-brevity
-
-delegation-kit/SPEC.md's tier sections under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §check-agent-tier-explicit, §usage-verdict with its subsections, §Trend reporter and §Layout and configuration, about 8.4k of the file's 43.1k words; delegation-kit's other sections stay on the parent.
-
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every `##` heading kept verbatim and every fact another surface cites into them kept, per a citation survey. Applied after the iteration's delegation-kit amendments merge, so no section is passed twice in one iteration.
-
-**Cost while deferred:** paid by every session and adopter that reads an unpassed delegation-kit section. Filed 2026-09-30 as a split at delegation-tier-binding's scope, taken ahead of guard-kit's remainder in the parent's size order because §The generic ruleset, its bulk, is rewritten by the deferred [write-side-steering](#write-side-steering) and [compound-read-classifier-reach](#compound-read-classifier-reach). Part of the operator's selection of the set, direction 2026-09-30, lead-relayed (not a ruling).
-
 ## Deferred
 
 ### shellcheck-extra-dirs-trigger
@@ -338,7 +330,7 @@ drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, on
 
 guard-kit's front sections left 2026-09-30 at guard-kit-steering's scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `guard-kit-front-brevity`; guard-kit's preamble and other sections remain.
 
-delegation-kit's tier sections left 2026-09-30 at delegation-tier-binding's scope, on an operator direction lead-relayed (not a /consult ruling), as [delegation-kit-tier-brevity](#delegation-kit-tier-brevity).
+delegation-kit's tier sections left 2026-09-30 at delegation-tier-binding's scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `delegation-kit-tier-brevity`; its other sections remain.
 
 ### prune-set-matches-walk-root-ancestors
 
@@ -1515,5 +1507,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - consult-tier-declaration
 - hotfix-agent-definition
 - delegation-kit-value-audit
+- delegation-kit-tier-brevity
 
 ## Lessons Learned

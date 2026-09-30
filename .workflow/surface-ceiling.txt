@@ -22,7 +22,7 @@
 23669cp companion/SPEC.md
 130174cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
-295240cp delegation-kit/SPEC.md
+286243cp delegation-kit/SPEC.md
 37827cp delegation-kit/templates/agent-execution.md
 3397cp delegation-kit/templates/dispatch-checklists.md
 1308cp docs/canon-kit/index.md

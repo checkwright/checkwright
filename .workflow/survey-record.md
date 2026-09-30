@@ -13,3 +13,10 @@
 - rev: d6b84cee9cef8124d49b16fa7c1884e4484b5b80
 - finding: Aliases only: .claude/agents stage-session and consult-session model: opus, audit-sweep and edit-sweep model: sonnet (plus the two sweeps' Tier prose); .claude/commands/lead.md ruling-config (model: opus default, three model: sonnet overrides, stay on Opus); .claude/commands/economics.md posture restates them. Kit side names no model: agent-execution.md Match bullet derives the ladder from the live roster; lifecycle-kit/templates/lead.md maps class to model at dispatch by pointing there; consult.md step 7 names the tier per dispatch. The dispatch tool's per-dispatch model parameter is an alias enum (no exact id); transcripts carry message.model.
 - inferred: that the harness honours an exact id in a definition's model: field (documented, unrun)
+
+## 2026-09-30 build — Which surfaces cite into delegation-kit/SPEC.md's check-agent-tier-explicit, usage-verdict (with its usage.txt contract and statusline arm subsections), Trend reporter and Layout and configuration sections, and what content does each rely on?
+- corpus: delegation-kit/SPEC.md gate-sdk/SPEC.md queue-kit/SPEC.md TASK-QUEUE.md native/src scripts delegation-kit
+- oracle: git grep -n 'delegation-kit/SPEC.md §\(check-agent-tier-explicit\|usage-verdict\|The usage.txt contract\|The statusline arm\|Trend reporter\|Layout and configuration\)' -- ':!docs'
+- rev: dccd64b4d5d4992081fe0b03e12d97ac2fa4ad8b
+- finding: Every citer names a section heading, never a sub-anchor: gate-sdk cites usage-verdict for the exit mapping 0/1/2, the argv refusal (a non-reading dressed as a reading) and the declared-knob roster, and Trend reporter for declaring no 1; queue-kit cites the statusline arm for where the in-process counter call resolves its four knobs; the queue cites usage-verdict for the post-login server lag; crate and script spec: pointers cite all five by heading. All six headings are kept verbatim and each relied-on fact is kept.
+- inferred: none
