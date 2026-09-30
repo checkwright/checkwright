@@ -213,6 +213,10 @@ pub fn run(args: &[String]) -> i32 {
         + dangling.len()
         + unlinked.len();
     if total > 0 {
+        let Some(door) = super::door_or_report("check-task-names", "--emit queue-migrate --write <queue-file>.") else {
+            return 2;
+        };
+        let migrate = format!("        {}", door);
         let mut sep = false;
         let mut block = |head: &[&str], items: &Vec<String>, help: &[&str]| {
             if items.is_empty() {
@@ -237,7 +241,7 @@ pub fn run(args: &[String]) -> i32 {
             &missing,
             &[
                 "  help: open the entry with its slug as a heading — '### the-slug' — or run",
-                "        bash gate-sdk/bin/run-gates.sh --emit queue-migrate --write <queue-file>.",
+                &migrate,
             ],
         );
         block(

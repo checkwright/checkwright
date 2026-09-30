@@ -8,20 +8,6 @@
 
 ## New Features
 
-### gate-output-contributor-door
-
-[spec: SPEC-gate-output-door.md] [recurrence: 2026-09-27]
-
-a gate's printed finding or help line reaches an adopter's installed tree, yet about fourteen `println!`/`format!` sites under `native/src/gates/` still name `bash gate-sdk/bin/run-gates.sh` as the command to run (the install-lifecycle and install-doctrine remedies, the roadmap and value-rollup regenerators, the file-gap, file-survey and cite-survey arms, among them); an adopter's door is the binary `GATE_SDK_NATIVE_BIN` names. `check-door-binding` reads kit READMEs, templates, `lib/` and `bin/` and never a compiled gate's strings, so nothing reds.
-
-**Recurred 2026-09-27, observed in a consumer:** in a scratch prose install of v0.26.0, `check-graph`'s red printed its hook and graph regenerators in the bash spelling (`native/src/gates/graph.rs`, three sites), while `./scripts/checkwright-gates --emit git-hooks --write` and `--emit graph` ran there. A starter or prose install owes no bash (installer/SPEC.md §Requirements), and run-gates.sh needs bash 4.3, which stock macOS lacks, so the remedy is unrunnable on such a host, not only misrouted.
-
-**Deliverable:** each site re-pointed at the binary `GATE_SDK_NATIVE_BIN` names, or declared contributor-facing, and a check-door-binding assertion over gate-module output strings holding it.
-
-**Cost while deferred:** an adopter following a red's remedy runs a path their tree lacks. Filed 2026-09-26 to the gap inbox by the done-claim-demo build (check-evidence-manifest's assertion-C remedy, fixed at the drain); promoted 2026-09-26 at its close: →fix fails because the holding assertion is new mechanism and some sites (the prose-bounds worklist, the smoke-entry guard) need a contributor-or-adopter call each. Re-verified at the drain: `git grep 'run-gates.sh' native/src/gates` over `println!`/`format!` lines returns fifteen sites before the fix. Owner lookup: `door`, `run-gates.sh`, `remedy` in this file — none live; owner guard-kit/SPEC.md §check-door-binding.
-
-**Selected 2026-09-30 for guard-kit-steering, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it, after `guard-kit-value-audit` rules the gate. Re-verified: 16 `println!`/`format!` lines under `native/src/gates` name `run-gates.sh`.
-
 ## Technical Debt
 
 ### guard-kit-front-brevity
@@ -1492,5 +1478,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - one-motion-commit-race-remains-open
 - side-effect-free-read-arms
 - guard-kit-value-audit
+- gate-output-contributor-door
 
 ## Lessons Learned

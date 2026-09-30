@@ -717,18 +717,18 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     // assertion D: each committed hook is its emitter's handoff to the `--git-hook` arm
-    const REGEN: &str = "regenerate: bash gate-sdk/bin/run-gates.sh --emit git-hooks --write";
+    let regen = format!("regenerate: {}", super::door_command("--emit git-hooks --write")?);
     let root = walk::cwd()?;
     let hooks_dir = walk::knob_scalar("GATE_SDK_HOOKS_DIR")?;
     let hook = format!("{}/pre-commit", hooks_dir.trim_end_matches('/'));
     if !Path::new(&hook).is_file() {
-        errors.push(format!("ARTIFACT: {} does not exist; {}", hook, REGEN));
+        errors.push(format!("ARTIFACT: {} does not exist; {}", hook, regen));
     } else {
         match git_hooks::pre_commit() {
             Err(ref cause) => errors.push(format!("ARTIFACT: the pre-commit hook emission failed; fix it before trusting the hook{}", because(cause))),
             Ok(ref e) => {
                 if e.trim_end_matches('\n') != read_stripped(&hook)?.trim_end_matches('\n') {
-                    errors.push(format!("ARTIFACT: {} is not its emitter's handoff to the gate binary's --git-hook arm; {}", hook, REGEN));
+                    errors.push(format!("ARTIFACT: {} is not its emitter's handoff to the gate binary's --git-hook arm; {}", hook, regen));
                 }
             }
         }
@@ -739,10 +739,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
     match git_hooks::commit_msg(&root, &cfg.gates_dir) {
         Err(ref cause) => errors.push(format!("ARTIFACT: the commit-msg hook emission failed; fix it before trusting the hook{}", because(cause))),
         Ok(None) => {}
-        Ok(Some(_)) if !Path::new(&msg_hook).is_file() => errors.push(format!("ARTIFACT: {} does not exist but a tier=commit-msg gate is registered; {}", msg_hook, REGEN)),
+        Ok(Some(_)) if !Path::new(&msg_hook).is_file() => errors.push(format!("ARTIFACT: {} does not exist but a tier=commit-msg gate is registered; {}", msg_hook, regen)),
         Ok(Some(ref e)) => {
             if e.trim_end_matches('\n') != read_stripped(&msg_hook)?.trim_end_matches('\n') {
-                errors.push(format!("ARTIFACT: {} is not its emitter's handoff to the gate binary's --git-hook arm; {}", msg_hook, REGEN));
+                errors.push(format!("ARTIFACT: {} is not its emitter's handoff to the gate binary's --git-hook arm; {}", msg_hook, regen));
             }
         }
     }
@@ -755,15 +755,16 @@ fn rule(args: &[String]) -> Result<i32, String> {
         Some(at) => artifact[..at].to_string(),
         None => ".".to_string(),
     };
+    let graph_door = super::door_command("--emit graph")?;
     if !Path::new(&artifact).is_file() {
         errors.push(format!(
-            "ARTIFACT: {} does not exist; regenerate: bash gate-sdk/bin/run-gates.sh --emit graph > {}",
-            artifact, artifact
+            "ARTIFACT: {} does not exist; regenerate: {} > {}",
+            artifact, graph_door, artifact
         ));
     } else if emitted.trim_end_matches('\n') != read_stripped(&artifact)?.trim_end_matches('\n') {
         errors.push(format!(
-            "ARTIFACT: {} is stale vs the '# graph:' manifests; regenerate: bash gate-sdk/bin/run-gates.sh --emit graph > {}",
-            artifact, artifact
+            "ARTIFACT: {} is stale vs the '# graph:' manifests; regenerate: {} > {}",
+            artifact, graph_door, artifact
         ));
     }
 

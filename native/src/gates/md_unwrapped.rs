@@ -348,7 +348,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             println!("{}", f);
         }
         println!("  help: join each paragraph onto one line —");
-        println!("        bash gate-sdk/bin/run-gates.sh --emit md-unwrap --write <file>…");
+        println!("        {}", super::door_command("--emit md-unwrap --write <file>…")?);
         return Ok(1);
     }
     println!("MD-UNWRAPPED: clean ({} file(s); no paragraph broken across lines)", files.len());

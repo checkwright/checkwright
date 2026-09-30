@@ -20,11 +20,9 @@ pub fn run(_args: &[String]) -> i32 {
         Ok(r) => r,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            eprintln!(
-                "{}: help: write the ceilings with \
-                 `bash gate-sdk/bin/run-gates.sh --emit always-loaded --ceiling` and commit them",
-                NAME
-            );
+            if let Some(door) = super::door_or_report(NAME, "--emit always-loaded --ceiling") {
+                eprintln!("{}: help: write the ceilings with `{}` and commit them", NAME, door);
+            }
             return 2;
         }
     };
@@ -55,6 +53,9 @@ pub fn run(_args: &[String]) -> i32 {
     }
 
     if !findings.is_empty() {
+        let Some(door) = super::door_or_report(NAME, "--emit always-loaded --ceiling") else {
+            return 2;
+        };
         println!(
             "SURFACE-RATCHET: {} governed surface(s) past their ceiling in {}:",
             findings.len(),
@@ -65,9 +66,8 @@ pub fn run(_args: &[String]) -> i32 {
         }
         println!(
             "  help: cut the surface back under its row, or — where the growth is deliberate — \
-             re-stamp with `bash gate-sdk/bin/run-gates.sh --emit always-loaded --ceiling` and \
-             commit {} with the growth it prices",
-            ceiling_file
+             re-stamp with `{}` and commit {} with the growth it prices",
+            door, ceiling_file
         );
         return 1;
     }

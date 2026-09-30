@@ -456,7 +456,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         println!("{}", help);
     }
     if !under.is_empty() {
-        println!("  help: a pass that removed findings records the lowered row in the same commit, so the slack cannot hide a later regression. The worklist is 'CANON_KIT_PROSE_BOUND_CEILING_FILE= bash gate-sdk/bin/run-gates.sh --only check-prose-bounds'.");
+        println!("  help: a pass that removed findings records the lowered row in the same commit, so the slack cannot hide a later regression. The worklist is 'CANON_KIT_PROSE_BOUND_CEILING_FILE= {}'.", super::door_command("--only check-prose-bounds")?);
     }
     Ok(1)
 }

@@ -213,13 +213,16 @@ pub fn run(args: &[String]) -> i32 {
     }
 
     if !findings.is_empty() {
+        let Some(door) = super::door_or_report("check-scratch-citation", "--emit cite-survey") else {
+            return 2;
+        };
         println!("check-scratch-citation: permanent surface(s) point a reader into per-iteration scratch:");
         for f in &findings {
             println!("{}", f);
         }
         println!("  help: a boundary-truncated surface is emptied by the next --enter-stage boundary reset, so the");
         println!("        pointer resolves to nothing one iteration after it is written. Inline the finding instead —");
-        println!("        bash gate-sdk/bin/run-gates.sh --emit cite-survey \"<heading-substring>\" emits the block's");
+        println!("        {} \"<heading-substring>\" emits the block's", door);
         println!("        heading and all five witness fields, which is what keeps it re-usable rather than");
         println!("        merely readable.");
         println!("        A surface that must quote a dead citation verbatim tags the line above it");

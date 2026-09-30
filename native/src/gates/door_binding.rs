@@ -163,6 +163,40 @@ fn scopes(lines: &[&str]) -> Scopes {
     s
 }
 
+// spec: guard-kit/SPEC.md §check-door-binding — a Rust member's output region: the source up to its
+// test module, the cut the crate's reads-couples reader makes, since a test literal is no output
+fn rust_region(src: &str) -> &str {
+    src.find("#[cfg(test)]\nmod tests {").map_or(src, |at| &src[..at])
+}
+
+// spec: guard-kit/SPEC.md §check-door-binding — a Rust member's declarations: the token inside a
+// `//` comment, site scope alone, since a Rust file has no fence and its `#[…]` lines would read
+// as the whole-file scope's heading
+fn rust_scopes(lines: &[&str]) -> Scopes {
+    let mut s = Scopes {
+        file: false,
+        spans: Vec::new(),
+        declared: vec![false; lines.len()],
+        malformed: Vec::new(),
+    };
+    for (i, line) in lines.iter().enumerate() {
+        let Some(at) = line.find(DECL) else { continue };
+        if !line[..at].contains("//") {
+            continue;
+        }
+        match decl_reason(line) {
+            Some("") => s.malformed.push(i),
+            Some(_) => s.declared[i] = true,
+            None => {}
+        }
+    }
+    s
+}
+
+fn is_rust_comment(line: &str) -> bool {
+    line.trim_start_matches([' ', '\t']).starts_with("//")
+}
+
 impl Scopes {
     fn exempts(&self, i: usize) -> bool {
         self.file
@@ -345,14 +379,15 @@ fn rule(args: &[String]) -> Result<i32, String> {
     for (shown, path) in configured(&root)? {
         let text = read(&path)?;
         let base = Path::new(&path).file_name().and_then(|n| n.to_str()).unwrap_or("");
-        let lines: Vec<&str> = text.lines().collect();
-        let scope = scopes(&lines);
+        let rust = shown.ends_with(".rs");
+        let lines: Vec<&str> = if rust { rust_region(&text) } else { &text }.lines().collect();
+        let scope = if rust { rust_scopes(&lines) } else { scopes(&lines) };
         configured_swept += 1;
         for i in &scope.malformed {
             malformed.push(format!("{}:{}: {}", shown, i + 1, lines[*i].trim()));
         }
         for (n, line) in lines.iter().enumerate() {
-            if scope.exempts(n) {
+            if scope.exempts(n) || (rust && is_rust_comment(line)) {
                 continue;
             }
             for _ in doors_on(line, base) {
@@ -401,7 +436,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
             println!("        GATE_SDK_NATIVE_BIN instead, and where the binary does not exist yet carry");
             println!("        the precondition at the site (gate-sdk/SPEC.md §The adopter constraints). A");
             println!("        door inside a generated region takes its declaration from the emitter, never");
-            println!("        from the page, which the next regeneration would erase.");
+            println!("        from the page, which the next regeneration would erase. In a Rust member the");
+            println!("        declaration is a '// door-contributor: <reason>' comment on the door's line or");
+            println!("        the line above, and no span scope applies.");
         }
         if !malformed.is_empty() {
             if !doors.is_empty() || !seam.is_empty() || !undeclared.is_empty() {
@@ -532,5 +569,31 @@ mod tests {
             let (s, e) = token_span(line, at, a.len());
             assert_eq!(line[s..e].contains('/'), want, "{}", line);
         }
+    }
+
+    // spec: guard-kit/SPEC.md §check-door-binding — a Rust member is read up to its test module,
+    // declares in a `//` comment with site scope alone, and never takes a span scope
+    #[test]
+    fn a_rust_member_reads_its_output_region_with_site_scoped_comment_declarations() {
+        let src = "fn a() {}\n#[cfg(test)]\nmod tests {\n    \"bash gate-sdk/bin/run-gates.sh --emit x\"\n}\n";
+        assert_eq!(rust_region(src), "fn a() {}\n");
+        assert_eq!(rust_region("fn a() {}\n"), "fn a() {}\n");
+
+        let lines = [
+            "// door-contributor: a contributor's regenerator",
+            "#[derive(Debug)]",
+            "    \"bash gate-sdk/bin/run-gates.sh --emit graph\",",
+            "    \"bash gate-sdk/bin/run-gates.sh --emit graph\", // door-contributor: inline",
+            "    // door-contributor:",
+            "    const D: &str = \"door-contributor: not a comment\";",
+        ];
+        let s = rust_scopes(&lines);
+        assert!(!s.file && s.spans.is_empty(), "no span scope in a Rust member");
+        assert!(s.exempts(1) && !s.exempts(2), "site scope is the line and the line above");
+        assert!(s.exempts(3), "a trailing comment declares its own line");
+        assert_eq!(s.malformed, vec![4]);
+        assert!(!s.declared[5], "the token outside a comment declares nothing");
+        assert!(is_rust_comment("   /// doc naming bash gate-sdk/bin/run-gates.sh --emit x"));
+        assert!(!is_rust_comment("    println!(\"// not a comment\");"));
     }
 }

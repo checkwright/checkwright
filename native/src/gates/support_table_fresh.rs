@@ -25,7 +25,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             page, blk.line, dir
         );
         fresh::print_capped_diff(&blk.actual, &want);
-        println!("  help: regenerate — bash gate-sdk/bin/run-gates.sh --emit support-table --write");
+        println!("  help: regenerate — {}", super::door_command("--emit support-table --write")?);
         return Ok(1);
     }
     println!(

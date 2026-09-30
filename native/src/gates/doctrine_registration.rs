@@ -232,9 +232,12 @@ pub fn run(args: &[String]) -> i32 {
             "check-doctrine-registration: {} carries no markdown link to the doctrine file:",
             agent_file
         );
+        let Some(door) = super::door_or_report("check-doctrine-registration", "--install-doctrine") else {
+            return 2;
+        };
         println!("  {}", doctrine_file);
         println!("  help: install the doctrine reference block into the always-loaded agent file —");
-        println!("        bash gate-sdk/bin/run-gates.sh --install-doctrine — so a session that loads it");
+        println!("        {} — so a session that loads it", door);
         println!("        follows the link to the delivery doctrine. Override the paths with");
         println!("        DOCTRINE_KIT_AGENT_FILE / DOCTRINE_KIT_DOCTRINE_FILE.");
         return 1;
@@ -424,6 +427,9 @@ pub fn run(args: &[String]) -> i32 {
         println!("        untrailered rule would ship every consumer a digest one rule short.");
     }
     if !text_findings.is_empty() {
+        let Some(door) = super::door_or_report("check-doctrine-registration", "--install-doctrine") else {
+            return 2;
+        };
         println!(
             "check-doctrine-registration: a digest bullet's text is not the doctrine's summary in {}:",
             agent_file
@@ -433,7 +439,7 @@ pub fn run(args: &[String]) -> i32 {
         }
         println!("  help: the digest block is generated — --install-doctrine copies each rule's '*Digest:*'");
         println!("        summary verbatim, so a hand-edited bullet is silently reverted on the next run.");
-        println!("        Restore the bullet (bash gate-sdk/bin/run-gates.sh --install-doctrine), or move the");
+        println!("        Restore the bullet ({}), or move the", door);
         println!("        local wording outside the doctrine-kit marker span, where it is never rewritten.");
     }
     1

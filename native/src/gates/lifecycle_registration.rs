@@ -40,8 +40,11 @@ pub fn run(args: &[String]) -> i32 {
             "check-lifecycle-registration: no lifecycle-kit registration block in {}",
             agent
         );
+        let Some(door) = super::door_or_report("check-lifecycle-registration", "--install-lifecycle") else {
+            return 2;
+        };
         println!("  help: install the resident registration block into the always-loaded agent file —");
-        println!("        bash gate-sdk/bin/run-gates.sh --install-lifecycle — so a session that loads it");
+        println!("        {} — so a session that loads it", door);
         println!("        is pointed at the stage machine. Override the path with LIFECYCLE_KIT_AGENT_FILE.");
         return 1;
     }
@@ -90,12 +93,15 @@ pub fn run(args: &[String]) -> i32 {
             "check-lifecycle-registration: the registration block in {} is stale — it does not match the block derived from the live stage machine:",
             agent
         );
+        let Some(door) = super::door_or_report("check-lifecycle-registration", "--install-lifecycle") else {
+            return 2;
+        };
         for l in diff::normal_diff(&expected, &present) {
             println!("  {}", l);
         }
         println!("  help: a reshaped stage machine (LIFECYCLE_KIT_STAGES / LIFECYCLE_KIT_QUEUE_FILE) or a");
         println!("        hand-edited block staled the registration — regenerate it in place:");
-        println!("        bash gate-sdk/bin/run-gates.sh --install-lifecycle");
+        println!("        {}", door);
         return 1;
     }
 

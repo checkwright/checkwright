@@ -56,7 +56,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
         let left = format!("{}\n", emitted.trim_end_matches('\n'));
         fresh::print_capped_diff(&left, &projection_raw);
         println!(
-            "  help: regenerate — bash gate-sdk/bin/run-gates.sh --emit install-evidence > docs/install-evidence.md"
+            "  help: regenerate — {} > docs/install-evidence.md",
+            super::door_command("--emit install-evidence")?
         );
         return Ok(1);
     }

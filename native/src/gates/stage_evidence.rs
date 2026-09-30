@@ -61,16 +61,16 @@ fn git_blob(args: &[&str]) -> Option<String> {
 // spec: lifecycle-kit/SPEC.md §check-stage-evidence — the recovery names the delete, because every
 // reported stamp is uncommitted by construction and a bare re-entry appends beside the stale line;
 // the purity class gets its own line, one text serving both being wrong for whichever it missed
-fn provenance_help(state: &str) -> Vec<String> {
+fn provenance_help(state: &str, door: &str) -> Vec<String> {
     vec![
         format!(
             "help: every stamp named above is UNCOMMITTED by construction — the assertion skips \
              any line already in HEAD's version of {} — so re-running --enter-stage cannot clear \
              this on its own: the fresh line lands BESIDE the stale one and this refusal repeats \
              verbatim. For a stale-head or 'none' stamp: delete that line from {} (it was never \
-             committed, so nothing is lost), then run 'bash gate-sdk/bin/run-gates.sh \
-             --enter-stage <stage>' and commit the fresh stamp on its own.",
-            state, state
+             committed, so nothing is lost), then run '{} <stage>' and commit the fresh stamp \
+             on its own.",
+            state, state, door
         ),
         "help: for an 'also stages' issue the stamp itself is sound — unstage the named path \
          ('git restore --staged <path>') and commit it separately from the stamp commit \
@@ -372,11 +372,14 @@ pub fn run(args: &[String]) -> i32 {
             return 2;
         }
         Ok(v) if !v.is_empty() => {
+            let Some(door) = super::door_or_report("check-stage-evidence", "--enter-stage") else {
+                return 2;
+            };
             println!("STAGE-EVIDENCE: {} stamp-provenance issue(s) in {}:", v.len(), state);
             for e in &v {
                 println!("  {}", e);
             }
-            for l in provenance_help(&state) {
+            for l in provenance_help(&state, &door) {
                 println!("  {}", l);
             }
             return 1;
@@ -416,7 +419,7 @@ mod tests {
     // attested twice in a row with a byte-identical message
     #[test]
     fn the_provenance_help_names_the_delete_and_not_only_the_re_entry() {
-        let h = provenance_help(".workflow/WORKFLOW-STATE.txt");
+        let h = provenance_help(".workflow/WORKFLOW-STATE.txt", "./gates --enter-stage");
         let joined = h.join(" ");
         assert!(joined.contains("delete that line from .workflow/WORKFLOW-STATE.txt"), "{}", joined);
         assert!(joined.contains("UNCOMMITTED by construction"), "{}", joined);

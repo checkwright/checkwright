@@ -91,6 +91,9 @@ pub fn run(args: &[String]) -> i32 {
     let union_missing = difference(&union_derived, &union_have);
 
     if !missing.is_empty() || !extra.is_empty() || !union_missing.is_empty() {
+        let Some(door) = super::door_or_report("check-merge-attrs", "--install-lifecycle") else {
+            return 2;
+        };
         println!(
             "check-merge-attrs: {} merge attributes are out of parity with the derived supersede/union sets:",
             attrs
@@ -104,7 +107,7 @@ pub fn run(args: &[String]) -> i32 {
         for p in &union_missing {
             println!("  union-merge path with no merge=union attribute (a bullet filed on either side of a concurrent merge would be silently dropped): {}", p);
         }
-        println!("  help: regenerate the marker block — bash gate-sdk/bin/run-gates.sh --install-lifecycle — which writes one 'merge=iteration-scoped' line per boundary-truncated surface (LIFECYCLE_KIT_STATE_FILE, LIFECYCLE_KIT_LESSON_EVIDENCE_FILE, LIFECYCLE_KIT_SURVEY_RECORD_FILE, and each LIFECYCLE_KIT_BOUNDARY_TRUNCATE member) and one 'merge=union' line per union surface (LIFECYCLE_KIT_GAP_INBOX_FILE, LIFECYCLE_KIT_CONSULT_INBOX_FILE). Remove any hand-added merge=iteration-scoped attribute on a path outside the supersede set.");
+        println!("  help: regenerate the marker block — {} — which writes one 'merge=iteration-scoped' line per boundary-truncated surface (LIFECYCLE_KIT_STATE_FILE, LIFECYCLE_KIT_LESSON_EVIDENCE_FILE, LIFECYCLE_KIT_SURVEY_RECORD_FILE, and each LIFECYCLE_KIT_BOUNDARY_TRUNCATE member) and one 'merge=union' line per union surface (LIFECYCLE_KIT_GAP_INBOX_FILE, LIFECYCLE_KIT_CONSULT_INBOX_FILE). Remove any hand-added merge=iteration-scoped attribute on a path outside the supersede set.", door);
         return 1;
     }
 

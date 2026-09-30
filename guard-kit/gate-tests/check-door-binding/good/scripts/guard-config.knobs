@@ -1,3 +1,4 @@
 # spec: guard-kit/SPEC.md §check-door-binding — the fixture's configured extra corpus, so a green
-# line proves assertion C's three declaration scopes rather than an unset knob
+# line proves assertion C's three declaration scopes and its Rust reading rather than an unset knob
 GUARD_KIT_DOOR_ROOTS[] = site
+GUARD_KIT_DOOR_ROOTS[] = src/remedy.rs

@@ -353,6 +353,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "QUEUE_KIT_DEFERRED_SECTION",
             "QUEUE_KIT_ICEBOX_SECTION",
             "QUEUE_KIT_DONE_SECTION",
+            "GATE_SDK_NATIVE_BIN",
         ],
         "queue-kit",
         &[],
@@ -368,6 +369,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "QUEUE_KIT_ACTIVE_SECTIONS",
             "QUEUE_KIT_DEFERRED_SECTION",
             "QUEUE_KIT_ICEBOX_SECTION",
+            "GATE_SDK_NATIVE_BIN",
         ],
         "queue-kit",
         &[],
@@ -753,7 +755,12 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-md-unwrapped",
         md_unwrapped::run,
         &[],
-        &["CANON_KIT_UNWRAP_GLOBS", "CANON_KIT_UNWRAP_EXCLUDE", "CANON_KIT_UNWRAP_DECLARATION_LEADS"],
+        &[
+            "CANON_KIT_UNWRAP_GLOBS",
+            "CANON_KIT_UNWRAP_EXCLUDE",
+            "CANON_KIT_UNWRAP_DECLARATION_LEADS",
+            "GATE_SDK_NATIVE_BIN",
+        ],
         "canon-kit",
         &[("git", "")],
     ),
@@ -885,6 +892,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_PROSE_BOUND_REPEAT_WORDS",
             "CANON_KIT_PROSE_BOUND_REPEAT_MIN",
             "CANON_KIT_PROSE_BOUND_CEILING_FILE",
+            "GATE_SDK_NATIVE_BIN",
         ],
         "canon-kit",
         &[("git", "")],
@@ -1143,6 +1151,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "QUEUE_KIT_TRACKS",
             "QUEUE_KIT_ROADMAP_FILE",
             "QUEUE_KIT_ROADMAP_MARKER",
+            "GATE_SDK_NATIVE_BIN",
         ],
         "queue-kit",
         &[("date", ""), ("git", "")],
@@ -1216,7 +1225,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-door-binding",
         door_binding::run,
-        &[("?", "", "", "dynamic@src/gates/door_binding.rs:243")],
+        &[("?", "", "", "dynamic@src/gates/door_binding.rs:277")],
         &["GATE_SDK_KIT_DIRS", "GUARD_KIT_DOOR_ROOTS"],
         "guard-kit",
         &[("git", "")],
@@ -1281,6 +1290,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "LIFECYCLE_KIT_AGENT_FILE",
             "LIFECYCLE_KIT_STAGES",
             "LIFECYCLE_KIT_QUEUE_FILE",
+            "GATE_SDK_NATIVE_BIN",
         ],
         "lifecycle-kit",
         &[],
@@ -1289,7 +1299,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-gap-inbox-neutrality",
         gap_inbox_neutrality::run,
         &[],
-        &["LIFECYCLE_KIT_GAP_INBOX_FILE"],
+        &["LIFECYCLE_KIT_GAP_INBOX_FILE", "GATE_SDK_NATIVE_BIN"],
         "lifecycle-kit",
         &[],
     ),
@@ -1304,6 +1314,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "LIFECYCLE_KIT_BOUNDARY_TRUNCATE",
             "LIFECYCLE_KIT_GAP_INBOX_FILE",
             "LIFECYCLE_KIT_CONSULT_INBOX_FILE",
+            "GATE_SDK_NATIVE_BIN",
         ],
         "lifecycle-kit",
         &[],
@@ -1416,6 +1427,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "LIFECYCLE_KIT_BOUNDARY_TRUNCATE",
             "LIFECYCLE_KIT_GAP_INBOX_FILE",
             "LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE",
+            "GATE_SDK_NATIVE_BIN",
         ],
         "lifecycle-kit",
         &[("git", "")],
@@ -1435,7 +1447,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-survey-record",
         survey_record::run,
         &[],
-        &["LIFECYCLE_KIT_SURVEY_RECORD_FILE"],
+        &["LIFECYCLE_KIT_SURVEY_RECORD_FILE", "GATE_SDK_NATIVE_BIN"],
         "lifecycle-kit",
         &[("git", "")],
     ),
@@ -1490,6 +1502,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "LIFECYCLE_KIT_LESSON_EVIDENCE_FILE",
             "LIFECYCLE_KIT_SURVEY_RECORD_FILE",
             "LIFECYCLE_KIT_BOUNDARY_TRUNCATE",
+            "GATE_SDK_NATIVE_BIN",
         ],
         "lifecycle-kit",
         &[("git", "")],
@@ -1578,7 +1591,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("?", "", "", "dynamic@src/gates/docs_mirror_fresh.rs:68")],
         // spec: gate-sdk/SPEC.md §The non-gate arm — the generator it now calls in-process reads
         // the blob ref, so the comparator declares what its callee reads.
-        &["CANON_KIT_DOCS_BLOB_REF", "CANON_KIT_MIRROR_ROOT"],
+        &["CANON_KIT_DOCS_BLOB_REF", "CANON_KIT_MIRROR_ROOT", "GATE_SDK_NATIVE_BIN"],
         "-",
         &[("date", ""), ("git", "")],
     ),
@@ -1700,6 +1713,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "DRIFT_KIT_GATES_FILE",
             "DRIFT_KIT_STAGES",
             "GATE_SDK_WORKFLOW_DIR",
+            "GATE_SDK_NATIVE_BIN",
         ],
         "-",
         &[("date", ""), ("git", "")],
@@ -1711,7 +1725,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-install-evidence-fresh",
         install_evidence_fresh::run,
         &[],
-        &["DRIFT_KIT_INSTALL_RECORD", "DRIFT_KIT_GATES_FILE"],
+        &["DRIFT_KIT_INSTALL_RECORD", "DRIFT_KIT_GATES_FILE", "GATE_SDK_NATIVE_BIN"],
         "-",
         &[("git", "")],
     ),
@@ -1737,6 +1751,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "EVIDENCE_KIT_SUITES",
             "EVIDENCE_KIT_RUN_*",
             "CONTEXT_KIT_SURFACES",
+            "GATE_SDK_NATIVE_BIN",
         ],
         "-",
         &[("date", ""), ("git", "")],
@@ -1745,7 +1760,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-product-statement-fresh",
         product_statement_fresh::run,
         &[],
-        &[],
+        &["GATE_SDK_NATIVE_BIN"],
         "-",
         &[],
     ),
@@ -1753,7 +1768,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-support-table-fresh",
         support_table_fresh::run,
         &[],
-        &[],
+        &["GATE_SDK_NATIVE_BIN"],
         "-",
         &[],
     ),
@@ -1777,7 +1792,7 @@ pub const REGISTRY: &[GateEntry] = &[
             (".", "glob:lit:*/SPEC.md", "", ""),
             ("?", "", "", "dynamic@src/emit/footprint.rs:90 via emit::footprint::emit"),
         ],
-        &["CONTEXT_KIT_SURFACES", "CONTEXT_KIT_FOOTPRINT_FILE"],
+        &["CONTEXT_KIT_SURFACES", "CONTEXT_KIT_FOOTPRINT_FILE", "GATE_SDK_NATIVE_BIN"],
         "context-kit",
         &[("date", ""), ("git", "")],
     ),
@@ -1799,6 +1814,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_DOCS_BLOB_REF",
             "EVIDENCE_KIT_SUITES",
             "EVIDENCE_KIT_RUN_*",
+            "GATE_SDK_NATIVE_BIN",
         ],
         "gate-sdk",
         &[("date", ""), ("git", "")],
@@ -1830,6 +1846,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CONTEXT_KIT_CEILING_FILE",
             "CONTEXT_KIT_SURFACES",
             "CONTEXT_KIT_RATCHET_PATHS",
+            "GATE_SDK_NATIVE_BIN",
         ],
         "context-kit",
         &[("git", "")],
@@ -1845,6 +1862,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "DOCTRINE_KIT_AGENT_FILE",
             "DOCTRINE_KIT_DOCTRINE_FILE",
             "DOCTRINE_KIT_DIGEST_SECTION",
+            "GATE_SDK_NATIVE_BIN",
         ],
         "doctrine-kit",
         &[],
@@ -2448,6 +2466,19 @@ const _: () = {
         i += 1;
     }
 };
+
+// spec: gate-sdk/SPEC.md §run-gates — a gate's printed remedy names the adopter door: the binary
+// `GATE_SDK_NATIVE_BIN` resolves, spelled as a command by the installer's one spelling function
+pub fn door_command(args: &str) -> Result<String, String> {
+    let bin = crate::walk::knob_scalar("GATE_SDK_NATIVE_BIN")?;
+    Ok(format!("{} {}", crate::installer::init::command_token(&bin), args))
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — the same door for a gate answering in `i32`: a knob read that
+// fails reports on stderr and yields `None`, and the caller's exit 2, never a remedy without a door
+pub fn door_or_report(gate: &str, args: &str) -> Option<String> {
+    door_command(args).map_err(|e| eprintln!("{}: {}", gate, e)).ok()
+}
 
 pub fn lookup(name: &str) -> Option<GateFn> {
     REGISTRY

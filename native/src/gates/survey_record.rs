@@ -398,6 +398,9 @@ pub fn run(args: &[String]) -> i32 {
     }
 
     if !findings.is_empty() {
+        let Some(door) = super::door_or_report("check-survey-record", "--emit file-survey") else {
+            return 2;
+        };
         println!(
             "check-survey-record: {} malformed survey block(s) in {}:",
             findings.len(),
@@ -406,7 +409,7 @@ pub fn run(args: &[String]) -> i32 {
         for f in &findings {
             println!("  {}", f);
         }
-        println!("  help: each '## <date> <stage> — <question>' block carries exactly five lines — '- corpus:', '- oracle:', '- rev:', '- finding:', '- inferred:' — in that order, with a corpus that is either the literal 'none' (a survey over no tree corpus) or space-separated git pathspecs — single-quoted where one carries a quote, a shell metacharacter, a glob character or pathspec magic — each matching a path in the tree at rev, scoping prose going to the finding, a non-empty oracle (the literal 'none' is the honest form for a survey no oracle grounds), a full 40-hex rev naming a real commit, and a non-empty inferred listing each claim the survey reasoned to without running a command (the literal 'none' for a survey that inferred nothing). Every git-object-shaped token in the other four fields must name a real object too — an identifier you did not read is not a citation — and one that names none on purpose takes a '<!-- survey-token-exempt: <reason> -->' line on its block, reason mandatory. File blocks with 'bash gate-sdk/bin/run-gates.sh --emit file-survey \"<question>\" \"<corpus>\" \"<oracle>\" \"<inferred>\" \"<finding>\"', which stamps the rev itself.");
+        println!("  help: each '## <date> <stage> — <question>' block carries exactly five lines — '- corpus:', '- oracle:', '- rev:', '- finding:', '- inferred:' — in that order, with a corpus that is either the literal 'none' (a survey over no tree corpus) or space-separated git pathspecs — single-quoted where one carries a quote, a shell metacharacter, a glob character or pathspec magic — each matching a path in the tree at rev, scoping prose going to the finding, a non-empty oracle (the literal 'none' is the honest form for a survey no oracle grounds), a full 40-hex rev naming a real commit, and a non-empty inferred listing each claim the survey reasoned to without running a command (the literal 'none' for a survey that inferred nothing). Every git-object-shaped token in the other four fields must name a real object too — an identifier you did not read is not a citation — and one that names none on purpose takes a '<!-- survey-token-exempt: <reason> -->' line on its block, reason mandatory. File blocks with '{} \"<question>\" \"<corpus>\" \"<oracle>\" \"<inferred>\" \"<finding>\"', which stamps the rev itself.", door);
         return 1;
     }
 

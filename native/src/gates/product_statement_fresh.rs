@@ -45,7 +45,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for f in &findings {
             println!("{}", f);
         }
-        println!("  help: regenerate — bash gate-sdk/bin/run-gates.sh --emit product-statement --write");
+        println!("  help: regenerate — {}", super::door_command("--emit product-statement --write")?);
         return Ok(1);
     }
     println!(

@@ -60,7 +60,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         // spec: gate-sdk/SPEC.md §The consumer remainder cohort — both sides are
         // `printf '%s\n'` process substitutions here, so both carry one terminating newline
         fresh::print_capped_diff(&format!("{}\n", emitted), &format!("{}\n", block));
-        println!("  help: regenerate — bash gate-sdk/bin/run-gates.sh --emit value-rollup --write");
+        println!("  help: regenerate — {}", super::door_command("--emit value-rollup --write")?);
         return Ok(1);
     }
     println!(

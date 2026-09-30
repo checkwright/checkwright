@@ -1,1 +1,2 @@
 DOOR-BINDING: clean
+3 configured surface(s) swept

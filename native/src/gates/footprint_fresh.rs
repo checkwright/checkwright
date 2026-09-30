@@ -47,7 +47,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
         let left = format!("{}\n", emitted.trim_end_matches('\n'));
         fresh::print_capped_diff(&left, &projection_raw);
         println!(
-            "  help: regenerate — bash gate-sdk/bin/run-gates.sh --emit footprint > {}",
+            "  help: regenerate — {} > {}",
+            super::door_command("--emit footprint")?,
             projection
         );
         return Ok(1);

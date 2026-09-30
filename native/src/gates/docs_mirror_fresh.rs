@@ -94,7 +94,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
             println!("  {}", b);
         }
         println!(
-            "  help: regenerate — bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write — and stage {}/.",
+            "  help: regenerate — {} — and stage {}/.",
+            super::door_command("--emit docs-mirror --write")?,
             mirror
         );
         return Ok(1);

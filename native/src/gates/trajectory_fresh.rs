@@ -47,7 +47,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
         let left = format!("{}\n", emitted.trim_end_matches('\n'));
         fresh::print_capped_diff(&left, &projection_raw);
         println!(
-            "  help: regenerate — bash gate-sdk/bin/run-gates.sh --emit trajectory > docs/evidence-data.md"
+            "  help: regenerate — {} > docs/evidence-data.md",
+            super::door_command("--emit trajectory")?
         );
         return Ok(1);
     }

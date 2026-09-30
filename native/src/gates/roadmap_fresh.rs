@@ -157,7 +157,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             name, projection
         );
         fresh::print_capped_diff(&format!("{}\n", emitted), &format!("{}\n", block));
-        println!("  help: regenerate — bash gate-sdk/bin/run-gates.sh --emit roadmap --write");
+        println!("  help: regenerate — {}", super::door_command("--emit roadmap --write")?);
         return Ok(1);
     }
     println!(

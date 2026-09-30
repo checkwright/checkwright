@@ -266,6 +266,9 @@ pub fn run(args: &[String]) -> i32 {
                 println!("  {}", x);
             }
         }
+        let Some(door) = super::door_or_report("check-queue-entry-budget", "--emit entry-history") else {
+            return 2;
+        };
         println!("  help: add the cost field, or evict the entry to the icebox as its heading and one sentence.");
         println!("        Over the cap: compress by ANSWERING grounds, never by dropping them —");
         println!("        an unanswered ground is relocated to a linked entry. Relocating it into");
@@ -279,7 +282,7 @@ pub fn run(args: &[String]) -> i32 {
         // failure's reader, who is by construction the session about to compress; it is routed
         // here because no other trigger reaches that session at that moment
         println!("        Before compressing, read what has already left the entry:");
-        println!("        bash gate-sdk/bin/run-gates.sh --emit entry-history <slug> — the commits");
+        println!("        {} <slug> — the commits", door);
         println!("        in which its counted extent fell. Advisory, no verdict: it is how you");
         println!("        avoid re-answering an answered ground or dropping an unanswered one.");
         return 1;
