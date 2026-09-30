@@ -346,7 +346,7 @@ enum Body {
 
 // spec: guard-kit/SPEC.md §The generic ruleset — a redirect word in either reader's grammar: `Some`
 // with whether it stands alone and so takes the next word as its target.
-fn redirect_word(tok: &str) -> Option<bool> {
+pub(super) fn redirect_word(tok: &str) -> Option<bool> {
     let t = tok.trim_start_matches(|c: char| c.is_ascii_digit() || c == '*' || c == '&');
     let op = t.strip_prefix(">>").or_else(|| t.strip_prefix('>')).or_else(|| t.strip_prefix('<'));
     let lead = tok.len() - t.len();

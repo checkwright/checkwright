@@ -205,6 +205,8 @@ block	pkill -f run-smoke.sh; bash run-smoke.sh
 block	pgrep -f run-smoke.sh
 block	while pgrep -f 'checkwright-gates --run-validate'; do sleep 5; done
 block	if pgrep -f worker; then echo up; fi
+block	while pgrep -f run-validate >/dev/null; do sleep 10; done
+block	while pgrep -f "run-validate" > /dev/null 2>&1; do sleep 15; done; echo finished
 block	bash run.sh; pgrep -if 'R[U]N'
 fallthrough	bash run.sh; pgrep -f 'R[U]N'
 fallthrough	pgrep run-smoke.sh; bash run-smoke.sh
@@ -313,6 +315,7 @@ fallthrough	grep x tracked.md | sed 's/a/b/w out.txt'
 fallthrough	awk 'BEGIN {system("ls")}'
 fallthrough	grep x tracked.md | awk '{"date" | getline d; print d}'
 fallthrough	grep x tracked.md | sed -f prog.sed
+fallthrough	grep x tracked.md | sed -l 5 s/a/b/
 # banner tolerance (rules `find_glob` and `cat_file`'s): a literal echo/printf
 # segment is skipped, but at least one roster read must remain
 allow	echo === | grep foo src

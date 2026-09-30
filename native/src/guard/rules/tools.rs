@@ -215,7 +215,7 @@ pub fn sed_file(ctx: &Ctx) -> Decided {
         if p.inplace && (tool == "sed" || !p.operands.is_empty()) {
             return block(format!("don't rewrite a file with '{} -i' — use the rewrite arm: '{} --rewrite [--regex] [--expect <n>] [--] <find> <replace> <file>…' replaces a literal (or, with --regex, a line-scoped POSIX ERE) with fixed text across every named file and prints each changed span. For an edit a fixed replacement cannot express (a capture group, a deletion keyed on context), use the Edit tool. If you genuinely need the in-place edit, run it yourself with !<command>.", tool, door));
         }
-        if tool == "sed" && !p.operands.is_empty() {
+        if tool == "sed" && !p.operands.is_empty() && !p.unmodelled {
             return block("don't read a file through 'sed' — use the Read tool (offset/limit for a line range): it returns numbered lines and registers the file for a later Edit. For a markdown section, the consumer's section extractor beats a line range. If you genuinely need sed, pipe into it or run it yourself with !<command>.");
         }
     }
@@ -834,6 +834,10 @@ fn pgrep_pattern(seg: &str) -> Option<(bool, String)> {
         }
         if skip {
             skip = false;
+            continue;
+        }
+        if let Some(alone) = super::reach::redirect_word(tok) {
+            skip = alone;
             continue;
         }
         match tok {

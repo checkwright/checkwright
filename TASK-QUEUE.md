@@ -600,9 +600,9 @@ positional references to a block go stale like restated counts, and nothing catc
 
 ### gate-customer-value-audit
 
-[roadmap: next/adoption] [cost: iteration/high] [surface: gate-sdk] [roadmap-summary: Every installed gate useful to its adopter and configurable, and no gate shipped that serves only Checkwright's own development.]
+[roadmap: now/adoption] [cost: iteration/high] [surface: gate-sdk] [roadmap-summary: Every installed gate useful to its adopter and configurable, and no gate shipped that serves only Checkwright's own development.]
 
-nothing asks whether each shipped gate is useful and configurable for a customer. Operator direction, 2026-09-28 (lead session): "offer customers useful and configurable gates"; a gate benefiting only Checkwright's own development, such as a GitHub Pages check that is not configurable, "should either be abstracted or not be shipped and tested on customer OSes". The provenance seam bars project content from kits, but customer value is another question, and the install disposition (zero-config, on-surface, never) decides registration, not whether a gate belongs in the payload. Horizon `next`, operator direction 2026-09-29, lead-relayed (not a ruling): `now` if the next scope takes it, else at the first close landing a slice; the per-kit slices stay off the roadmap.
+nothing asks whether each shipped gate is useful and configurable for a customer. Operator direction, 2026-09-28 (lead session): "offer customers useful and configurable gates"; a gate benefiting only Checkwright's own development, such as a GitHub Pages check that is not configurable, "should either be abstracted or not be shipped and tested on customer OSes". The provenance seam bars project content from kits, but customer value is another question, and the install disposition (zero-config, on-surface, never) decides registration, not whether a gate belongs in the payload. Horizon `now` since guard-kit-steering's close, on the operator direction of 2026-09-29, lead-relayed (not a ruling): `now` if the next scope takes it, else at the first close landing a slice; the per-kit slices stay off the roadmap.
 
 **Deliverable:** an audit over every shipped gate recording customer value and configurability, each gate then made generic, kept out of the payload and the customer-OS legs, or kept; site-kit's GitHub Pages gates first.
 
@@ -694,6 +694,8 @@ the consult inbox takes more than the operator's model of consult. Operator dire
 
 **Deliverable:** the producer list narrowed to (a) and (b), the other classes routed to the gap inbox or a live lead; templates/consult.md (the operator rules) reconciled with (b)'s advisory reading; whether (b) pins consult's tier, where [consult-tier-declaration](#consult-tier-declaration) asserts the tier consult dispatches; and whether a lead-dispatched consultation with no operator, which can only re-class or discard, still earns a dispatch.
 
+**Addendum, operator direction 2026-09-30, lead session (not a ruling):** consult's main use is a recommendation from a top-tier model. A request expecting a reply gets one; a request expecting a tracked change makes it through the ordinary workflow (adding, removing or updating a deferred entry, say); a ruling is written to TRAJECTORY.md only where that workflow would otherwise challenge or reject the direction, as when the assets still name Bash gates and the direction is Rust ones. The lead's caution to weigh with it: a change consult lands carries its provenance as consult advice, marked operator-accepted or not, so a later session can tell model advice from operator direction. Drained into this entry at guard-kit-steering's close, not a recurrence: it adds what consult is for, where the defect above is what enters it.
+
 **Cost while deferred:** each misfiled item costs a consultation to route it back out. Filed 2026-09-29 to the gap inbox by companion-adoption-landing's lead; promoted at its close: →fix fails because narrowing a producer set is a contract change to a SPEC section, →forward because the direction is given and filing it to consult is the misfile it names. Re-verified: §The consult inbox's Producers paragraph and opening list. Owner lookup: `consult inbox`, `intake` in this file — [consult-tier-declaration](#consult-tier-declaration), DISTINCT (the tier consult runs at, not what enters it); owner lifecycle-kit/SPEC.md §The consult inbox.
 
 ### user-facing-delta-unsurfaced
@@ -742,7 +744,7 @@ a companion install tier, operator direction 2026-09-29, lead-relayed (not a rul
 
 [cost: iteration/low] [surface: lifecycle-kit]
 
-close's roadmap-motion read files a consult item only for a slug that left the projection and for a vacant first horizon, so an entry a ruling re-sequences, or that iterations work toward while it stays tagged `next`, fires neither. The operator's horizon principle, 2026-09-29, lead-relayed (not a ruling), gives the detector its criterion: a horizon reflects reality, `now` when work is planned as soon as possible, else `next`, and the first close landing a slice of an entry moves it to `now`. So an entry with a slice landed in the range (a Done split child, or a landed line in its body) still tagged `next`, or carrying no roadmap tag though its outcome is curated, is lagging, and close files the consult item.
+close's roadmap-motion read files a consult item only for a slug that left the projection and for a vacant first horizon, so an entry a ruling re-sequences, or that iterations work toward while it stays tagged `next`, fires neither. The operator's horizon principle, 2026-09-29, lead-relayed (not a ruling), gives the detector its criterion: a horizon reflects reality, `now` when work is planned as soon as possible, else `next`, and the first close landing a slice of an entry moves it to `now`. So an entry with a slice landed in the range (a Done split child, or a landed line in its body) still tagged `next`, or carrying no roadmap tag though its outcome is curated, is lagging. Close re-tags a lagging entry whose own recorded horizon condition settles the move, and files the consult item otherwise; that re-tag landed at guard-kit-steering's close on an operator direction lead-relayed (not a ruling), found there by reading rather than by an arm, so this entry keeps the detection half only.
 
 **Deliverable:** that read in lifecycle-kit/templates/stages/close.md step 5, with its mechanical half (slice landed, horizon tag) on an arm rather than a judgment, or a boundary note in lifecycle-kit/SPEC.md §templates/stages/ refusing it.
 
@@ -789,6 +791,84 @@ the Lessons Learned channel may be obsolete, operator direction 2026-09-30, lead
 **Deliverable:** a function-to-replacement map and the essay harvest's reader confirmed; then, per Policy-as-choice, most likely the section made consumer-optional and off here rather than deleted, since queue-kit and lifecycle-kit ship it to adopters.
 
 **Cost while deferred:** every close walks a lesson step and a disposition gate over an empty channel, and validate routes observations to a section nothing reads. Filed 2026-09-30 to the gap inbox by preview-readiness' lead; promoted 2026-09-30 at the next iteration's scope: →fix fails because the audit is unsized and its likely outcome is a new knob. Re-verified: the `## Lessons Learned` section holds no bullet. Owner lookup: `lesson`, `essay` in this file — only the icebox's reclaim-precondition-outside-the-tree, DISTINCT (the essay sink's reclaim); owner queue-kit/SPEC.md §The queue format, with lifecycle-kit/templates/stages/close.md. Surface also lifecycle-kit.
+
+### hook-emit-remedy-door
+
+[cost: event/high] [surface: guard-kit]
+
+hook-member and emit-arm output strings print the bash front end as a remedy to run, outside the `native/src/gates` corpus `gate-output-contributor-door` moved to the binary door: the workflow-state hook's two `--enter-stage` remedies, the usage lines of the usage poller and the usage verdict, and an unclassified set across `native/src/emit`. An adopter meets them where bash may be absent.
+
+**Deliverable:** each string classified as a remedy to run or a description of the front end; each remedy printed through the gate module's door spelling; `GUARD_KIT_DOOR_ROOTS` widened to the hook and emit trees so `check-door-binding` assertion C holds them.
+
+**Cost while deferred:** an adopter without bash is told to run a command it cannot, at every refusal those members print. Filed 2026-09-30 to the gap inbox at guard-kit-steering's spec; promoted at its close: →fix fails because the classification spans forty files, →forward because no ruling is owed. Re-verified: 40 files under `native/src` outside `gates` name `run-gates`, and the four named lines print it. Not a recurrence of `gate-output-contributor-door`, which is done and scoped its corpus to the gate modules. Owner lookup: `usage line`, `front end`, `door` in this file — none; owner guard-kit/SPEC.md §check-door-binding.
+
+### hook-wiring-relative-command
+
+[cost: event/low] [surface: context-kit]
+
+the statusLine and SessionStart wirings spell repo-relative commands: delegation-kit/README.md's statusLine step, context-kit/templates/settings-sessionstart.json and this repo's `.claude/settings.json` statusLine and SessionStart. Hooks run in the session's current directory (measured at guard-kit-steering's spec), so after a session `cd` the status bar blanks and a resume or compact brief fails.
+
+**Deliverable:** both wirings anchored at the harness's project-dir variable in the kit templates and README, the repo's own settings diff prepared for the operator to apply, as `plugin-guards-subdir-launch` anchored the guard hooks.
+
+**Inferred, not run:** that the project-dir variable reaches a statusLine command.
+
+**Cost while deferred:** a session that changes directory loses its status bar and its post-compact brief. Filed 2026-09-30 to the gap inbox at guard-kit-steering's spec; promoted at its close: →fix fails because the statusLine reach is unmeasured and this repo's settings edit is the operator's to apply, →forward because no ruling is owed. Re-verified: the three wirings spell `bash gate-sdk/bin/run-gates.sh --statusline` and `bash scripts/session-context.sh`. Owner lookup: `statusLine`, `SessionStart`, `CLAUDE_PROJECT_DIR` in this file — none; owner context-kit/SPEC.md, with delegation-kit/SPEC.md §The statusline arm. Surface also delegation-kit.
+
+### write-side-steering
+
+[cost: event/high] [surface: guard-kit]
+
+a shell write that falls through the guard (a `tee` to a file, `find -delete`, a redirect, `rm`, `mv` or `cp` against the tree) goes to the harness's out-of-band decision: the auto-mode classifier, which gives occasional false positives (operator report, 2026-09-30), or a prompt. Only `--rewrite` and the scratch-append grants steer writes today. The property is a bounded write (in the repo, a gitignored scratch path, a named roster) rather than no side effect, so it probably takes the read ladder's standard-spelling-first order with a bounds test in place of a side-effect test.
+
+**Deliverable:** the write ladder specified and landed in guard-kit's rule roster, each rung with its bounds test and decision-table cases.
+
+**Cost while deferred:** write-shaped calls keep costing classifier decisions and false-positive stalls. Filed 2026-09-30 to the gap inbox by guard-kit-steering's lead on an operator question; promoted at its close: →fix fails because each rung is new mechanism, →forward because no ruling is owed. Re-verified: no queue entry names write arms. DISTINCT from `side-effect-free-read-arms`, done, which covered reads. Owner lookup: `write-side`, `bounded write`, `tee` in this file — only [manual-operation-spend-channel](#manual-operation-spend-channel), DISTINCT (a spend meter), and the icebox's interpreter-grant-redirect-residue, DISTINCT (an interpreter grant's redirected shapes); owner guard-kit/SPEC.md §The rule roster.
+
+### compound-read-classifier-reach
+
+[cost: event/high] [surface: guard-kit]
+
+a read-shaped compound or redirected call still falls to the classifier. `side-effect-free-read-arms`' program check reaches 6 of 30 sed and awk reads in the prompt-friction log (its align survey), because the other 23 are compounds or carry a redirect, which rule `ro_pipeline` refuses on its own terms. Operator direction 2026-09-30, lead session: keep that unit as specified and file this.
+
+**Deliverable:** rule `ro_pipeline`'s reach over a compound of read-only statements and over a redirect to a bounded target, the redirect half landed with [write-side-steering](#write-side-steering)'s bounds test.
+
+**Cost while deferred:** the classifier keeps deciding most read-shaped calls, with its occasional false positives. Filed 2026-09-30 to the gap inbox by guard-kit-steering's lead; promoted at its close: →fix fails because widening a grant is new mechanism, →forward because the direction is given. Owner lookup: `ro_pipeline`, `compound`, `redirect` in this file — [write-side-steering](#write-side-steering), overlapping on the redirect only; owner guard-kit/SPEC.md §The rule roster, rule `ro_pipeline`.
+
+**Inferred, not run:** the 6-of-30 count, carried from the align survey without a re-run.
+
+### bash-reader-escaped-separator
+
+[cost: event/low] [surface: guard-kit]
+
+guard-kit's bash reader cuts its compound split at a backslash-escaped `;`, so `find … -exec cmd {} \;` arrives as a segment ending in a lone backslash plus an empty segment; the PowerShell reader splits nothing at an escaped separator. Rule `find_exec` reads the lone backslash as the terminator, and every other rule reading segments sees a spurious statement boundary.
+
+**Deliverable:** the split skipping an escaped separator, rule `find_exec` re-pointed at the kept `\;`, and decision-table cases for both; or a boundary note if the harness's own matcher splits there too.
+
+**Inferred, not run:** how the harness's permission matcher splits at `\;`, which the guard's split models.
+
+**Cost while deferred:** a mis-split can attribute words to the wrong segment in any rule. Filed 2026-09-30 to the gap inbox by `side-effect-free-read-arms`' build, which worked around it in one rule; promoted at guard-kit-steering's close: →fix fails because the split is shared by every rule and the harness's behaviour is unmeasured, →forward because no ruling is owed. Re-verified: `split_on` in native/src/guard/bash.rs matches `;` bytewise with no escape test. Owner lookup: `backslash`, `find_exec`, `compound split` in this file — only [harness-project-dir-fold-dialect-unresolved](#harness-project-dir-fold-dialect-unresolved)'s backslash-spelled root, DISTINCT; owner guard-kit/SPEC.md §The reader and its views.
+
+### kit-prose-harness-coupling
+
+[cost: event/high] [surface: gate-sdk]
+
+kit prose couples to the master harness. The kit SPECs and READMEs (guard-kit, lifecycle-kit, delegation-kit, context-kit, plugin) name Claude Code's `CLAUDE_PROJECT_DIR` as the hook anchor, so a customer running another master harness reads a contract bound to one vendor. Operator direction 2026-09-30, lead session (not a ruling): the Claude binding belongs only on the Claude adapter surfaces (guard-kit/templates/settings-hooks.json, the plugin, and the settings and plugin-parity readers of those files); generic prose names the harness's project-dir variable and gives Claude Code's as one binding.
+
+**Deliverable:** that sweep, extended to every other Claude-only name in kit prose.
+
+**Inferred, not run:** the per-SPEC framing the bullet names.
+
+**Cost while deferred:** an adopter on another harness reads every hook contract as bound to Claude Code. Filed 2026-09-30 to the gap inbox by guard-kit-steering's lead; promoted at its close: →fix fails because the sweep spans five kits, →forward because the direction is given. Owner lookup: `CLAUDE_PROJECT_DIR`, `master harness`, `Codex` in this file — [plugin-harness-reach](#plugin-harness-reach), DISTINCT (the plugin package on other harnesses), and [heterogeneous-agent-delegation](#heterogeneous-agent-delegation), DISTINCT (a master harness delegating to other vendors, where this is the master harness swapped); owner gate-sdk/SPEC.md §The adopter constraints.
+
+### smoke-script-parse-unchecked
+
+[cost: event/low] [surface: gate-sdk]
+
+a kit `smoke/install.sh` or `smoke/violation.sh` that bash cannot parse passes the whole commit-time battery. At guard-kit-steering's build an apostrophe in the `SMOKE_KIT_ROOT` entry-guard hint left every kit's smoke script unparseable, and only `--run-consumer-smoke`, a validate suite, caught it; `check-smoke-entry-guard` reads the guard by prefix and never parses the script, and no shell-syntax gate reaches the smoke dirs.
+
+**Deliverable:** a parse check over the smoke roster at commit time, in `check-smoke-entry-guard` or a shell-syntax gate's corpus, with its behaviour where bash is absent stated.
+
+**Cost while deferred:** a broken kit smoke script can land and ride a release unless validate runs the smoke. Filed 2026-09-30 to the gap inbox by guard-kit-steering's build; promoted at its close: →fix fails because a gate spawning bash meets the adopter constraints' no-toolchain floor, a design question, →forward because no ruling is owed. Re-verified: gate-sdk/SPEC.md §Consumer smoke now forbids the quote character in the hint, the instance's fix, and names no parse. Owner lookup: `smoke-entry-guard`, `bash -n`, `parse` in this file — the icebox's smoke-roster-guard-precedes-hand-off, DISTINCT (guard ordering); owner gate-sdk/SPEC.md §check-smoke-entry-guard.
 
 ## Icebox
 
@@ -1463,14 +1543,5 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 Whether a live queue entry should cite shipped mechanism by a stable anchor (a SPEC section, a gate name, a path) rather than a retired slug, and whether a check-queue-hygiene axis should hold that, is unruled; close's retired-block read corrects each instance inline meanwhile, as it did twice at preview-readiness' close.
 
 ## Done
-
-- scratch-auto-allow-no-decoration-steer
-- consumer-guard-rule-coverage
-- plugin-guards-subdir-launch
-- one-motion-commit-race-remains-open
-- side-effect-free-read-arms
-- guard-kit-value-audit
-- gate-output-contributor-door
-- guard-kit-front-brevity
 
 ## Lessons Learned
