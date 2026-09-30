@@ -8,6 +8,18 @@
 
 ## New Features
 
+### removed-knob-docs-cmd-valve
+
+[spec: SPEC-removed-knob-valve.md]
+
+a release note's Renamed-knobs removal bullet must lead with the removed knob backticked (installer/SPEC.md §The upgrade contract), and `check-docs-cmd` assertion B reds a backticked kit-prefixed knob no kit code carries, which a removed knob by definition is. The temporal-exempt path and marker valves do not reach B, so the only valve is the whole-doc `CANON_KIT_MDREF_EXCLUDE`, which also drops the note's md-refs and docs-cmd path checks.
+
+**Deliverable:** a valve that admits a removed knob in its sanctioned release-note position, or B reading the removal bullet's grammar, and the v0.26.0 note taken back off the exclude.
+
+**Selected 2026-09-30 for canon-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, landing before [canon-kit-value-audit](#canon-kit-value-audit) rules `check-docs-cmd`.
+
+**Cost while deferred:** every release that removes a knob buys a whole-doc exclude, and each excluded note loses its link and path checks for good. Filed 2026-09-26 to the gap inbox at front-door-release's close, which excluded the v0.26.0 note for three removed knobs; promoted 2026-09-26 at the next iteration's scope: →fix fails because the valve's shape is a design call on a shipped gate. Re-verified: `scripts/canon-config.knobs` carries the exclude for that note. Owner lookup: `docs-cmd`, `Renamed-knobs`, `MDREF_EXCLUDE` in this file — only the icebox's [docs-cmd-retired-path-blind-to-queue](#docs-cmd-retired-path-blind-to-queue), which is assertion C; owner canon-kit/SPEC.md §check-docs-cmd.
+
 ## Technical Debt
 
 ### canon-kit-amendment-brevity
@@ -437,18 +449,6 @@ queue provenance prose restates what `git log` answers; the ruled sweep is small
 **Deliverable:** the ten sites cut to the fact the entry needs, and the writing rule at queue-kit/SPEC.md §The queue format.
 
 **Cost while deferred:** low; paid by every reader of those entries. Filed 2026-09-09; returned from the icebox 2026-09-25 by consult, the count re-run.
-
-### removed-knob-docs-cmd-valve
-
-[cost: event/low] [surface: canon-kit]
-
-a release note's Renamed-knobs removal bullet must lead with the removed knob backticked (installer/SPEC.md §The upgrade contract), and `check-docs-cmd` assertion B reds a backticked kit-prefixed knob no kit code carries, which a removed knob by definition is. The temporal-exempt path and marker valves do not reach B, so the only valve is the whole-doc `CANON_KIT_MDREF_EXCLUDE`, which also drops the note's md-refs and docs-cmd path checks.
-
-**Deliverable:** a valve that admits a removed knob in its sanctioned release-note position, or B reading the removal bullet's grammar, and the v0.26.0 note taken back off the exclude.
-
-**Selected 2026-09-30 for canon-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, landing before [canon-kit-value-audit](#canon-kit-value-audit) rules `check-docs-cmd`.
-
-**Cost while deferred:** every release that removes a knob buys a whole-doc exclude, and each excluded note loses its link and path checks for good. Filed 2026-09-26 to the gap inbox at front-door-release's close, which excluded the v0.26.0 note for three removed knobs; promoted 2026-09-26 at the next iteration's scope: →fix fails because the valve's shape is a design call on a shipped gate. Re-verified: `scripts/canon-config.knobs` carries the exclude for that note. Owner lookup: `docs-cmd`, `Renamed-knobs`, `MDREF_EXCLUDE` in this file — only the icebox's [docs-cmd-retired-path-blind-to-queue](#docs-cmd-retired-path-blind-to-queue), which is assertion C; owner canon-kit/SPEC.md §check-docs-cmd.
 
 ### crates-reservation-republish
 
