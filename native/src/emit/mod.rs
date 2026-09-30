@@ -892,8 +892,6 @@ pub const FAIL_OPEN_ARMS: &[&str] = &["--hook", "--statusline"];
 pub const FENCE_SAFE_ARMS: &[&str] = &["--help", "--list", "--run", "--run-gate-tests"];
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the read-only arm set, a subset of the fence-safe set.
-// --emit-md-section's call graph, read when it joined: `emit` calls `read_text` (`std::fs::read`) and
-// the `section` module's line helpers, and the dispatcher spawns nothing before the arm.
 pub const READ_ONLY_ARMS: &[&str] = &["--emit-md-section"];
 
 pub fn fence_safe(arm: &str) -> bool {
