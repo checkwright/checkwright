@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+delegation-tier-binding gates sha256=f447155fb05c8e31790a8f74d30182062d3bef3d6597f277e33a56b580e1df85 pass=146 fail=0 ignore=0 verdict=clean 2026-09-30
+delegation-tier-binding gate_sdk sha256=754fceb4addff652c31443cc80edb7fd86da22a6751d6a985b726be116728b35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-30
+delegation-tier-binding canon_kit sha256=d9cec07353e748f83a104f2a43ebff9e600c7db21207808b0a592fba59a5285f pass=1 fail=0 ignore=0 verdict=clean 2026-09-30
+delegation-tier-binding context_kit sha256=96e7ab53d80f16512586ed77f3d925feb4283d5d695d3adebdf3ae0940e954d9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-30
+delegation-tier-binding delegation_kit sha256=e8b7dacc5b3a03c2084bd61274ee3c701400be4001eeaafa4126bc7f4b710363 pass=1 fail=0 ignore=0 verdict=clean 2026-09-30
+delegation-tier-binding doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-30
+delegation-tier-binding evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-30
+delegation-tier-binding guard_kit sha256=01d94b4120e133665e01946fe44d31a730d2c6cdfd1570e5ce6b96a7a1b30e1b pass=1 fail=0 ignore=0 verdict=clean 2026-09-30
+delegation-tier-binding lifecycle_kit sha256=0a16a2be3f1e408582252ab47d92fd8628178950f6367b1711422c95d7a0d8b0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-30
+delegation-tier-binding queue_kit sha256=b7bfa7255550172f076ff11d2a619cd3608dbaa90f5f59911767456df1b52b8b pass=1 fail=0 ignore=0 verdict=clean 2026-09-30
+delegation-tier-binding site_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-09-30
+delegation-tier-binding scripts sha256=ac53213bc568b054752c32a26c465f301d36366e4deb5994aa76afb353bd942f pass=1 fail=0 ignore=0 verdict=clean 2026-09-30
+delegation-tier-binding guard_tests sha256=9867df3761ae211c26e28979720eddc80368d539db4ea9ce593a5e8b720fc2da pass=1 fail=0 ignore=0 verdict=clean 2026-09-30
+delegation-tier-binding demo sha256=857affd95e61b5418b3a9f5b2f34d15521a3f1b61fb97729484fad38faf4f014 pass=1 fail=0 ignore=0 verdict=clean 2026-09-30
+delegation-tier-binding installer_smoke sha256=d7aad073c905bf4bcfb23f41563ddec4c8f7bc85474bc88d93450858160b5baf pass=25 fail=0 ignore=0 verdict=clean 2026-09-30
+delegation-tier-binding consumer_smoke sha256=67e18da62afe00943bba53aa6a1825afa67b9823b02e5beb73893cd652df90ca pass=1 fail=0 ignore=0 verdict=clean 2026-09-30
+delegation-tier-binding upgrade sha256=4f33b5c7423f892b36a391bc66b2bc88f10265f1207ea1f2b5e02f2b12de93f9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-30
+delegation-tier-binding agents_md_smoke sha256=aa5d881e764b9b5e725af8ef96ce79474644391c86fb664db6810cef97996b29 pass=1 fail=0 ignore=0 verdict=clean 2026-09-30
+delegation-tier-binding index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-09-30
+delegation-tier-binding native_crate sha256=b4c8e122f2d6d3683e1d940b56387e2c0e604ac86ae6aeedbc8684ad52d6edfd pass=1 fail=0 ignore=0 verdict=clean 2026-09-30
+delegation-tier-binding projection_witness sha256=3259d010b2f990c0f6cb4f91dd7006d82064c4620365e98d571ca06d3f751f7a pass=1 fail=0 ignore=0 verdict=clean 2026-09-30
