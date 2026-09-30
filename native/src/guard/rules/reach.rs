@@ -731,6 +731,42 @@ pub fn worktree_refuses(ctx: &Ctx, c: &Cmd) -> Result<Option<(String, String)>, 
     Ok(Some(hit))
 }
 
+// spec: guard-kit/SPEC.md §The rule roster — rule `worktree_confinement`'s second admitted form: the
+// gate binary, or the front end under bash, running a read-only arm, `--emit <name>` normalized to
+// `--emit-<name>` as the binary normalizes it.
+fn read_only_arm(h: &crate::guard::host::Host, cw: &str) -> bool {
+    let ws = words(cw);
+    let r = h.roots();
+    let at = |w: &str, rel: &str| {
+        let rel = rel.strip_prefix("./").unwrap_or(rel);
+        let t = h.lexical(w);
+        t == h.lexical(rel) || (!r.main.is_empty() && t == h.lexical(&format!("{}/{}", r.main, rel)))
+    };
+    let arm_at = match ws.first() {
+        Some(&w) if w == h.door || (walk::path_root(&h.door).is_none() && at(w, &h.door)) => 1,
+        Some(&"bash") if ws.get(1).is_some_and(|w| at(w, "gate-sdk/bin/run-gates.sh")) => 2,
+        _ => return false,
+    };
+    let arm = match ws.get(arm_at) {
+        Some(&"--emit") => match ws.get(arm_at + 1) {
+            Some(name) => format!("--emit-{}", name),
+            None => return false,
+        },
+        Some(a) => a.to_string(),
+        None => return false,
+    };
+    crate::emit::READ_ONLY_ARMS.contains(&arm.as_str())
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — the read-only arms as a steer prints them, on the door.
+fn read_only_arm_spellings(h: &crate::guard::host::Host) -> String {
+    crate::emit::READ_ONLY_ARMS
+        .iter()
+        .map(|a| format!("'{} {}'", h.door, a.replacen("--emit-", "--emit ", 1)))
+        .collect::<Vec<_>>()
+        .join(", ")
+}
+
 // spec: guard-kit/SPEC.md §The generic ruleset — the admitted read: every segment a roster read in
 // none of its declared write and execute forms, none led by a program-bearing tool, and every
 // redirect target inert, in the own worktree or under a main-checkout scratch dir.
@@ -746,6 +782,10 @@ fn worktree_admitted(ctx: &Ctx, c: &Cmd, s: &str) -> Result<bool, Fault> {
             continue;
         }
         let cw = command_word(&segment_core(seg));
+        if read_only_arm(h, &cw) {
+            reads += 1;
+            continue;
+        }
         if program_bearing(h, head_word(&cw)) || !is_ro_segment(h, &cw) {
             return Ok(false);
         }
@@ -775,7 +815,8 @@ pub fn worktree_confinement(ctx: &Ctx) -> Decided {
     let h = ctx.host();
     let Some((word, path)) = worktree_refuses(ctx, ctx.cmd())? else { return Ok(None) };
     let reads = if h.worktree_reads == "read-only" && ctx.shell() == Shell::Bash {
-        format!(" a search or read of it as a read-only pipeline, every segment led by one of the read-only roster ({}) in none of its write or execute forms and no segment led by sed, awk or an interpreter, redirecting only to /dev/null, your own worktree or the main checkout's scratch dir;", h.ro_bins.join(" "))
+        let roster: Vec<&str> = h.ro_bins.iter().map(String::as_str).filter(|b| !program_bearing(h, b)).collect();
+        format!(" a search or read of it as a read-only pipeline, every segment led by one of the read-only roster ({}) in none of its write or execute forms and no segment led by sed, awk or an interpreter, redirecting only to /dev/null, your own worktree or the main checkout's scratch dir; a read-only arm of the gate binary ({});", roster.join(" "), read_only_arm_spellings(h))
     } else {
         String::new()
     };

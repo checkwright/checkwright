@@ -891,6 +891,11 @@ pub const FAIL_OPEN_ARMS: &[&str] = &["--hook", "--statusline"];
 // registered gate join by derivation in `fence_safe`, so only the rest are spelled here
 pub const FENCE_SAFE_ARMS: &[&str] = &["--help", "--list", "--run", "--run-gate-tests"];
 
+// spec: gate-sdk/SPEC.md §The non-gate arm — the read-only arm set, a subset of the fence-safe set.
+// --emit-md-section's call graph, read when it joined: `emit` calls `read_text` (`std::fs::read`) and
+// the `section` module's line helpers, and the dispatcher spawns nothing before the arm.
+pub const READ_ONLY_ARMS: &[&str] = &["--emit-md-section"];
+
 pub fn fence_safe(arm: &str) -> bool {
     FENCE_SAFE_ARMS.contains(&arm)
         || emit_names().contains(&arm)
@@ -954,6 +959,43 @@ mod tests {
         }
         assert!(fence_safe("--emit-knob-roster"));
         assert!(!fence_safe("--emit"));
+    }
+
+    // spec: gate-sdk/SPEC.md §The non-gate arm — each read-only member names an arm-table row, is
+    // fence-safe, and its module's rule text carries no write, removal, rename, copy, permission or
+    // link call and no program spawn
+    #[test]
+    fn every_read_only_arm_is_a_fence_safe_read() {
+        const SOURCES: &[(&str, &str)] = &[("--emit-md-section", include_str!("md_section.rs"))];
+        const WRITES: &[&str] = &[
+            "fs::write",
+            "File::create",
+            "OpenOptions",
+            "create_dir",
+            "remove_file",
+            "remove_dir",
+            "fs::rename",
+            "fs::copy",
+            "set_permissions",
+            "hard_link",
+            "symlink",
+            "Command::new",
+            "proc::",
+            ".spawn(",
+            "make_scratch",
+        ];
+        for arm in READ_ONLY_ARMS {
+            assert!(lookup(arm).is_some(), "{} names no arm-table row", arm);
+            assert!(fence_safe(arm), "{} is read-only and not fence-safe", arm);
+            let src = SOURCES.iter().find(|(a, _)| a == arm).map(|(_, s)| *s);
+            let src = src.unwrap_or_else(|| panic!("{} has no module source to scan", arm));
+            let rule = src.split("#[cfg(test)]").next().unwrap_or(src);
+            for line in rule.lines().filter(|l| !l.trim_start().starts_with("//")) {
+                for w in WRITES {
+                    assert!(!line.contains(w), "{} reaches '{}': {}", arm, w, line.trim());
+                }
+            }
+        }
     }
 
     fn never_runs(_: &[String]) -> Result<String, String> {

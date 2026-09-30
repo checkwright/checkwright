@@ -26,6 +26,7 @@ pub static TABLE: &[Rule] = &[
     Rule { name: "brace_glyph", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: spelling::brace_glyph },
     Rule { name: "sed_file", shells: BASH, views: &[SqDqHd, Dequoted, View::Body], test: tools::sed_file },
     Rule { name: "find_glob", shells: BASH, views: &[Raw, SqDqHd], test: tools::find_glob },
+    Rule { name: "find_exec", shells: BASH, views: &[SqDqHd, Dequoted], test: tools::find_exec },
     Rule { name: "cat_file", shells: BASH, views: &[Raw, SqDqHd], test: tools::cat_file },
     Rule { name: "git_grep", shells: BOTH, views: &[Raw, SqDqHd], test: tools::git_grep },
     Rule { name: "pgrep_self_match", shells: BASH, views: &[Raw], test: tools::pgrep_self_match },
@@ -281,9 +282,10 @@ fn ro_forms_kit(bin: &str) -> Option<&'static str> {
         "sort" => "-o --output --compress-program",
         "uniq" => "pos:2",
         "find" => "-delete -exec -execdir -ok -okdir -fprint -fprint0 -fprintf -fls",
+        "sed" => "-i --in-place",
         "rg" => "--pre",
         "grep" | "egrep" | "fgrep" | "head" | "tail" | "cat" | "wc" | "cut" | "tr" | "nl" | "rev" | "tac"
-        | "paste" | "comm" | "column" | "diff" | "jq" | "ls" | "xargs" => "none",
+        | "paste" | "comm" | "column" | "diff" | "jq" | "ls" | "xargs" | "awk" => "none",
         _ => return None,
     })
 }
@@ -367,6 +369,9 @@ fn ro_forms_clear(ctx: &Ctx, c: &Cmd) -> Result<bool, Fault> {
         if !ro_invocation_clear(h, bin, &strip(&dcw), &strip(&core), false) {
             return Ok(false);
         }
+        if matches!(bin, "sed" | "awk") && !tools::program_clear(bin, &dcw) {
+            return Ok(false);
+        }
         if bin != "xargs" {
             continue;
         }
@@ -381,6 +386,9 @@ fn ro_forms_clear(ctx: &Ctx, c: &Cmd) -> Result<bool, Fault> {
             continue;
         }
         if !ro_invocation_clear(h, &xcmd, &dtoks[idx + 1..].join(" "), "", true) {
+            return Ok(false);
+        }
+        if matches!(xcmd.as_str(), "sed" | "awk") && !tools::program_clear(&xcmd, &dtoks[idx..].join(" ")) {
             return Ok(false);
         }
     }
@@ -529,10 +537,10 @@ mod tests {
     #[test]
     fn the_table_rows_are_distinct_and_their_views_spell() {
         let mut names: Vec<&str> = TABLE.iter().map(|r| r.name).collect();
-        assert_eq!(names.len(), 28);
+        assert_eq!(names.len(), 29);
         names.sort();
         names.dedup();
-        assert_eq!(names.len(), 28);
+        assert_eq!(names.len(), 29);
         for r in TABLE {
             let mut spelt: Vec<&str> = r.views.iter().map(|v| v.spelling()).collect();
             let n = spelt.len();

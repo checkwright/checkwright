@@ -101,6 +101,13 @@ want off-journal       "$SANDBOX/off.knobs" allow "printf 'x\n' >> $main/.tmp/jo
 # --- a program-bearing tool is never admitted, whatever the roster declares of it
 want awk-declared      "$SANDBOX/awk.knobs" block "awk '{print}' $main/docs/a.md" "$refusal"
 
+# --- a read-only arm on the gate binary or the front end is admitted over the main checkout, in either
+#     spelling of the arm; an arm outside the read-only set is refused
+want arm-md-section    "$d" fallthrough "$BIN --emit md-section $main/docs/a.md \"H\""
+want arm-md-section-2  "$d" fallthrough "$BIN --emit-md-section $main/docs/a.md \"H\""
+want arm-front-end     "$d" fallthrough "bash gate-sdk/bin/run-gates.sh --emit md-section $main/docs/a.md \"H\""
+want arm-writing       "$d" block "$BIN --emit md-unwrap --write $main/docs/a.md" "$refusal"
+
 # --- rule `script_interpreter` reads the main checkout's scratch dir from here too, and steers the script to the
 #     worktree's own scratch dir, since the runner refuses a main-checkout path from a worktree;
 #     a script under the worktree's own scratch dir keeps the plain runner steer
@@ -112,6 +119,12 @@ want own-scratch-body  "$d" block "bash .tmp/own.sh" "run a scratch script throu
 checks=$((checks + 1))
 decide "$d" "find $main/docs -delete" >/dev/null
 grep -qF "(grep egrep fgrep" "$SANDBOX/err" || { echo "  FAIL [roster-named]: the refusal does not name the loaded roster — $(cat "$SANDBOX/err")"; fails=$((fails + 1)); }
+# the roster it names omits the program-bearing members the admitted read excludes, and it names the
+# read-only arms on the door
+checks=$((checks + 1))
+grep -qF " ls xargs)" "$SANDBOX/err" || { echo "  FAIL [roster-no-program]: the refusal's roster names sed or awk — $(cat "$SANDBOX/err")"; fails=$((fails + 1)); }
+checks=$((checks + 1))
+grep -qF -- "'$BIN --emit md-section'" "$SANDBOX/err" || { echo "  FAIL [arms-named]: the refusal does not name the read-only arms — $(cat "$SANDBOX/err")"; fails=$((fails + 1)); }
 
 # --- a PowerShell call meets the rule with no admitted read: a backslash is a separator, the
 #     journal append under the main scratch dir falls through, and the corrective omits the read
@@ -165,5 +178,5 @@ grep -qF "from-the-main-checkout" "$main/.workflow/prompt-friction.log" 2>/dev/n
 git -C "$main" worktree remove --force "$wt"
 
 [[ "$fails" -eq 0 ]] || { echo "worktree-confinement.test: $fails of $checks assertion(s) failed"; exit 1; }
-echo "worktree-confinement.test: ok ($checks assertions; from a linked worktree the journal append under the main scratch dir and read-only searches of the main checkout pass, every write naming the main checkout outside its scratch dir is refused with the loaded roster named, a PowerShell call meets the same refusal with no admitted read and has a main-checkout scratch body steered to the own scratch dir, a write in the own worktree is not the rule's, 'off' refuses the search and keeps the journal, a program-bearing tool is never admitted, and the liveness record resolves to the main checkout's scratch dir for the launch, its grant and the git-write hold, and a fall-through at the relative log default lands in the main checkout's log)"
+echo "worktree-confinement.test: ok ($checks assertions; from a linked worktree the journal append under the main scratch dir and read-only searches of the main checkout pass, every write naming the main checkout outside its scratch dir is refused with the loaded roster named, a PowerShell call meets the same refusal with no admitted read and has a main-checkout scratch body steered to the own scratch dir, a write in the own worktree is not the rule's, 'off' refuses the search and keeps the journal, a program-bearing tool is never admitted while a read-only arm of the gate binary is and the refusal names both forms, and the liveness record resolves to the main checkout's scratch dir for the launch, its grant and the git-write hold, and a fall-through at the relative log default lands in the main checkout's log)"
 exit 0

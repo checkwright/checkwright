@@ -1,5 +1,5 @@
 # contract: context-kit/SPEC.md §The surface ratchet
-7545cp .claude/agents/audit-sweep.md
+7572cp .claude/agents/audit-sweep.md
 1307cp .claude/agents/consult-session.md
 2368cp .claude/agents/edit-sweep.md
 8486cp .claude/agents/stage-session.md
@@ -21,8 +21,8 @@
 23669cp companion/SPEC.md
 130174cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
-270159cp delegation-kit/SPEC.md
-36998cp delegation-kit/templates/agent-execution.md
+270229cp delegation-kit/SPEC.md
+37037cp delegation-kit/templates/agent-execution.md
 3397cp delegation-kit/templates/dispatch-checklists.md
 1308cp docs/canon-kit/index.md
 1613cp docs/context-kit/index.md
@@ -85,9 +85,9 @@
 2698cp drift-kit/templates/close-knowledge.md
 3752cp drift-kit/templates/economics.md
 93466cp evidence-kit/SPEC.md
-937873cp gate-sdk/SPEC.md
+938991cp gate-sdk/SPEC.md
 2899cp gate-sdk/templates/adopt.md
-308166cp guard-kit/SPEC.md
+315905cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
 270104cp installer/SPEC.md
 337984cp lifecycle-kit/SPEC.md

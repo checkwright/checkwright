@@ -66,7 +66,7 @@ allow	cat <<'EOF' > .tmp/note.md@NL@the path @ROOT@/tools/report.py is steered@N
 #          unquoted-delimiter heredoc body — the stated bound on the hd class.
 block	echo $(pwd)
 block	P=/tmp/x
-fallthrough	awk '$1' data.txt
+allow	awk '$1' data.txt
 # 'hdq': an unquoted delimiter expands, so its body stays live; a quoted one
 # cannot expand, and the shell is what guarantees that — so its body is inert
 block	cat <<EOF > .tmp/n.md@NL@value is $(date)@NL@EOF
@@ -90,35 +90,40 @@ block	find .tmp/../x -exec cat {} +
 block	git log @{u}..
 block	echo {1..5}
 block	mkdir -p a/{b,c}
-fallthrough	awk '{print $1}'
-fallthrough	find . -exec grep foo '{}' +
+allow	awk '{print $1}'
+block	find . -exec grep foo '{}' +
 allow	grep -rnE "^[a-z]{2,}" src
 allow	cat <<'EOF' > .tmp/note.md@NL@a brace {a,b} in prose@NL@EOF
 block	cat <<'EOF' > a/{b,c}/note.md@NL@prose@NL@EOF
 
-# rule `sed_file` — sed or awk reading a file, or sed rewriting one; a piped-into sed is a
-#          filter. awk fires on two read shapes, each with one file operand and no
-#          pipe into the segment — a line range (steered to Read) and a markdown
-#          heading range (steered to the section extractor); a transform, a
-#          single-regex filter, a program file, a non-.md range, a second operand
-#          and a piped-into awk all pass. perl fires on an in-place bundle with at
+# rule `sed_file` — sed or awk reading a file or a stream's line range, or sed rewriting one; a
+#          piped-into sed is a filter unless its script is a bare range print
+#          (steered to head and tail). awk fires on two read shapes — a line range
+#          with one file operand and no pipe into the segment (steered to Read),
+#          and the same range piped into with no operand (steered to head and
+#          tail); a transform, a regex filter or range, a program file, a second
+#          operand and a piped-into awk with an action all pass, most of them to
+#          rule `ro_pipeline`'s program check. perl fires on an in-place bundle with at
 #          least one file operand, a sweep or a glob included; perl -pi reading
 #          stdin, an xargs-led perl, an unmodelled perl option and a perl without
 #          the in-place flag all pass, and so does the --rewrite arm both steer to
 block	sed -n '1,60p' TASK-QUEUE.md
 block	sed -i 's/a/b/' notes.md
-fallthrough	sed -E 's/a/b/'
-fallthrough	grep foo file | sed -e s/a/b/
+allow	sed -E 's/a/b/'
+allow	grep foo file | sed -e s/a/b/
+block	grep -n x tracked.md | sed -n '5,10p'
+block	grep -n x tracked.md | awk 'NR>=5 && NR<=10'
+allow	grep -n x tracked.md | head -n 10 | tail -n +5
 block	awk 'NR>=10 && NR<=40' TASK-QUEUE.md
 block	awk -F: 'NR==5,NR==9 { print $0 }' notes.txt
-block	awk '/^## Layout/,/^## Testing/' SPEC.md
+allow	awk '/^## Layout/,/^## Testing/' SPEC.md
 block	awk 'NR<=5' notes.txt | head -3
-fallthrough	awk 'NR>=10 && NR<=40 {print $2}' notes.txt
-fallthrough	awk '/needle/' notes.txt
-fallthrough	awk '/^## Layout/,/^## Testing/' notes.txt
+allow	awk 'NR>=10 && NR<=40 {print $2}' notes.txt
+allow	awk '/needle/' notes.txt
+allow	awk '/^## Layout/,/^## Testing/' notes.txt
 fallthrough	awk -f prog.awk notes.txt
-fallthrough	awk 'NR<=5' a.txt b.txt
-fallthrough	grep -n foo notes.txt | awk 'NR<=5' notes.txt
+allow	awk 'NR<=5' a.txt b.txt
+allow	grep -n foo notes.txt | awk 'NR<=5' notes.txt
 fallthrough	awk -W posix 'NR<=5' notes.txt
 block	perl -pi -e 's/a/b/' notes.md
 block	perl -0pi -e 's/a/b/' notes.md
@@ -152,9 +157,21 @@ block	find lib -type f; find lib -type d
 block	find lib -type f; echo ===; find lib -type d
 fallthrough	find lib -type f; find lib -delete
 fallthrough	find . -name '*.tmp' -delete
-fallthrough	find src -type f -exec grep -q foo '{}' ';'
 allow	find . -type f | head
 fallthrough	find . -type f > listing.txt
+
+# rule `find_exec` — a read-only roster command under one find -exec is steered to
+#          find -print0 | xargs -0; another action, a command off the roster or in
+#          one of its write forms, and a second -exec all pass
+block	find . -name '*.md' -exec grep -l x '{}' +
+block	find src -type f -exec grep -q foo '{}' ';'
+block	find src -type f -exec grep -q foo '{}' \;
+fallthrough	find src -type f -exec grep -q foo '{}' \; -print
+allow	find . -name '*.md' -print0 | xargs -0 grep -l x
+fallthrough	find . -name '*.tsv' -delete
+fallthrough	find . -exec md5sum '{}' +
+fallthrough	find . -exec sort -o out.txt '{}' +
+fallthrough	find . -exec grep x '{}' + -exec grep y '{}' +
 
 # rule `cat_file` — bare single-file cat steered to Read, alone or as a ';'-batch of reads
 #           (a literal echo/printf banner between reads is fine); multi-file, piped,
@@ -283,7 +300,19 @@ allow	cat >> .tmp/journal.md 2>&1
 
 # rule `ro_pipeline` — read-only pipeline auto-allow; a non-roster segment falls through
 allow	grep -rn foo src | head
-fallthrough	grep foo file | awk '{print}'
+allow	grep foo file | awk '{print}'
+fallthrough	grep foo file | md5sum
+# the sed and awk program discriminator: a program the static check clears is read-only (a redirect
+# glyph inside an awk string is skipped); an output redirect, a written file, a system() call, a
+# command piped into getline and a program file withhold
+allow	grep -n x tracked.md | sed 's/a/b/'
+allow	grep -c x tracked.md | awk '{s+=$1} END {print s}'
+allow	awk '{print "a > b | c"}' tracked.md
+fallthrough	grep x tracked.md | awk '{print > "out.txt"}'
+fallthrough	grep x tracked.md | sed 's/a/b/w out.txt'
+fallthrough	awk 'BEGIN {system("ls")}'
+fallthrough	grep x tracked.md | awk '{"date" | getline d; print d}'
+fallthrough	grep x tracked.md | sed -f prog.sed
 # banner tolerance (rules `find_glob` and `cat_file`'s): a literal echo/printf
 # segment is skipped, but at least one roster read must remain
 allow	echo === | grep foo src
@@ -293,7 +322,8 @@ fallthrough	echo a | echo b
 # 'fallthrough git status' below) is still never intercepted here
 allow	git status | head
 allow	git status | head -20
-block	git status | awk '{print}'
+allow	git status | awk '{print}'
+block	git status | md5sum
 # xargs is on the roster but executes rather than filters, so it is granted only
 # when the command it runs is itself a roster binary. The refusing cases are the
 # point of the discriminator: each is a write, and each is silently granted

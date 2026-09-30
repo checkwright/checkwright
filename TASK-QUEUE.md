@@ -22,18 +22,6 @@ a gate's printed finding or help line reaches an adopter's installed tree, yet a
 
 **Selected 2026-09-30 for guard-kit-steering, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it, after [guard-kit-value-audit](#guard-kit-value-audit) rules the gate. Re-verified: 16 `println!`/`format!` lines under `native/src/gates` name `run-gates.sh`.
 
-### side-effect-free-read-arms
-
-[spec: SPEC-side-effect-free-read-arms.md]
-
-shell utilities an agent runs for read-only work can also write: `sed -i`, `find -delete` and `-exec`, awk's `system()`, `tee`, redirects. The operator's shape: block side-effect-capable utilities and steer to side-effect-free arms of the gate binary that can be allowlisted and advertised as their replacements. The seed is a read-only subset declared beside gate-sdk's fence-safe arm set, `FENCE_SAFE_ARMS`, which admits working-tree writes (gate-sdk/SPEC.md §The non-gate arm) and so cannot be the seed itself; corrected at spec. It succeeds guard-kit rule `worktree_confinement`'s admitted read for isolated children, whose declared-forms trust is that rule's stated honest limit.
-
-**Deliverable:** standard utilities first — a steer to a side-effect-free standard spelling where one exists, a static program check admitting a side-effect-free `sed` or `awk` program, and a read-only arm set for the residue; no allowlist entry. New governed names, so it owes an amendment.
-
-**Cost while deferred:** a read-only shell call keeps a write path the guard must judge per call, and an isolated child's read set stays the interim allowlist. Filed 2026-09-23 to the gap inbox by the lead on an operator direction; the operator recalls earlier discussion and no tracked record was found. Promoted 2026-09-23 at seam-and-stage-residue's close drain: an initiative with new names, never a drain fix. Owner lookup: `side-effect`, `FENCE_SAFE`, `dual-use`, `sed -i` in this file — none. Surface also delegation-kit and gate-sdk.
-
-**Selected 2026-09-30 for guard-kit-steering, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it, the set's one unit reaching gate-sdk's arm set and delegation-kit's isolated-child allowlist. Clarified 2026-09-30, operator direction lead-relayed (not a ruling): a side-effect-capable read falls through to the harness's out-of-band decision, the auto-mode classifier with its false positives, and the unit takes those calls off that path.
-
 ## Technical Debt
 
 ### guard-kit-front-brevity
@@ -1510,5 +1498,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - consumer-guard-rule-coverage
 - plugin-guards-subdir-launch
 - one-motion-commit-race-remains-open
+- side-effect-free-read-arms
 
 ## Lessons Learned

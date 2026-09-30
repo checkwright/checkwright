@@ -29,7 +29,7 @@ pub const KIT: Kit = Kit {
             "GUARD_KIT_RO_BINS",
             &[
                 "grep", "egrep", "fgrep", "rg", "head", "tail", "cat", "wc", "sort", "uniq", "cut", "tr", "nl",
-                "rev", "tac", "paste", "comm", "column", "diff", "jq", "find", "ls", "xargs",
+                "rev", "tac", "paste", "comm", "column", "diff", "jq", "find", "ls", "xargs", "sed", "awk",
             ],
         ),
         Row::keyed("GUARD_KIT_RO_FORMS", &[]),
