@@ -5,3 +5,4 @@
 ---
 
 delegation-tier-binding scope a02aa410 2026-09-30 1e94411c
+delegation-tier-binding spec a6577f5d 2026-09-30 8ed44c65
