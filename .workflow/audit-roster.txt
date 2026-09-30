@@ -103,3 +103,8 @@ last: delegation-tier-binding close
 corpus: git diff 1e94411c..70e0bf5e over TASK-QUEUE.md, the .workflow/ records and governed .md less docs/ and gate-tests, for a section emptied or reduced to one body line; added lines grepped for none, nothing, empty and n/a; TRAJECTORY.md unchanged; Done and the gap inbox emptied at this close keep their heading and contract header; delegated to a worktree
 hits: 0
 declined: New Features and Technical Debt are headings alone, the expected shape; the three new SPEC sections carry full bodies; the added none, nothing and empty matches are in-body semantics (a knob's empty-is-off default, the class=<classes|none> grammar, the D6 inert row); the queue entries promoted at spec left whole, not emptied
+
+class: positional-reference
+scope: a sentence locating a member by its position inside a collection another surface grows (the last line of a roster, the first row of a generated table, a numbered rule cited by number), on governed prose, per doctrine-kit/DOCTRINE.md Derivation-first; un-gateable, since a positional word's referent is not decidable from the word. Corpus: the lines the iteration's range added to a marked or generated block, a fenced recipe or a numbered list, from git diff <base>..HEAD, each read for prose elsewhere that locates a member by position. A pointer to an adjacent block names no position and is clean. Fix by naming the member.
+due: an iteration that adds, removes or reorders a member of a generated block, a fenced recipe or a numbered rule list
+last: never

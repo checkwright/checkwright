@@ -8,18 +8,6 @@
 
 ## New Features
 
-### positional-reference-rule
-
-[spec: SPEC-positional-reference.md]
-
-positional references to a block go stale like restated counts, and nothing catches them. README.md said "The last line, `--run-demo`, is the adoption walkthrough" after the generated battery-roster block gained a later line; docs/install.md carried two more against its hand-authored recipes. All three were rewritten at companion-front-door-widening's close to name the referent. `check-manifest-count` gates cardinals only, and canon-kit/SPEC.md §check-amendment-retired-spelling records the renumber slice as undecidable, its durable fix being to name the referent rather than its position; no doctrine line states that for first/last/above/below prose. Operator question, 2026-09-28 (lead session): why are positional qualifiers allowed when restated counts are blocked.
-
-**Deliverable:** doctrine-kit/DOCTRINE.md's De-literalization or Derivation-first rule naming positional references beside counts; a narrow gate weighed, a positional word citing a marked or generated block, since a general "last line" matcher would cry wolf.
-
-**Selected 2026-09-30 for canon-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, the doctrine line with any gate arm.
-
-**Cost while deferred:** the next block edit strands a positional sentence silently. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; the three instances fixed at its close, the rule and gate promoted: →fix fails because a doctrine rule change is a scoped unit (the reasoning [intake-routing-test](#intake-routing-test) records) and the gate is new mechanism. Re-verified: the battery-roster block ended at `--projection-witness`. Owner lookup: `positional`, `ordinal`, `renumber` in this file — only the icebox's doctrine-rule-number-citation-liveness, DISTINCT (numbered doctrine-rule citations); owner doctrine-kit/DOCTRINE.md, with canon-kit/SPEC.md for any gate arm.
-
 ## Technical Debt
 
 ### canon-kit-amendment-brevity
@@ -1470,5 +1458,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - baseline-row-prose-coupling-gate
 - intra-file-pendency-contradiction-scan
 - spec-mirror-citation-links
+- positional-reference-rule
 
 ## Lessons Learned
