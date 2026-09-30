@@ -6,3 +6,7 @@ set -uo pipefail
 # comment-tier-exempt: the roster is checkwright-specific by construction and its boundary is the gate's false-positive contract — gate-substrates recognizes a claim about what the enforcement core is implemented in, in BOTH directions, because one oracle settles both and a sentence overstating either way is the same defect. The subject `every gate` is deliberately absent: the census measured dozens of non-substrate uses, so the noisy subject is excluded and the predicate it attaches to (`all source the library`) is rostered instead. `dispatches` is rostered and `dispatching` is not: a participle introduces a restrictive clause naming a subset, where the finite verb asserts of the whole. A bare implementation-tool token (`awk` alone) is excluded with no predicate to roster in its place, which is this roster's one measured coverage cost.
 printf '%s\t%s\n' \
     gate-substrates 'bare[ -]bash|are bash scripts|is a small shell script|written in awk|all source the library|vendored kit is bash|the one language the rest of the tree is written in|dispatch(es)? to a compiled subcommand'
+
+# comment-tier-exempt: the baseline file's name is this repo's layout, so the class is this repo's; a sentence quoting a row carries a measured: marker keyed by --emit baseline-claims, and one recording a retired row takes the unmarked-claim-exempt valve naming it
+printf '%s\t%s\n' \
+    baseline-row 'validate-baseline\.txt[^.]*`[a-z0-9_-]+ [a-z0-9_.-]+ (pass|fail|ignore)[ `]|`[a-z0-9_-]+ [a-z0-9_.-]+ (pass|fail|ignore)[ `][^.]*validate-baseline\.txt'

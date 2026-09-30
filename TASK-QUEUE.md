@@ -48,26 +48,6 @@ the kit SPECs' on-site mirrors render their section citations as plain text, so 
 
 **Cost while deferred:** every site reader of a SPEC follows its citations by hand. Filed 2026-09-27 to the gap inbox at companion-catalog-extension's spec, split from `docs-ux-authoring-rules`, whose range was the hand-authored pages and READMEs; promoted 2026-09-27 at its close: →fix fails because the rendering is new mechanism in a shipped arm. Re-verified: the scope survey's oracle over the thirteen tracked `*/SPEC.md` counts 2,157 citation lines outside fences at the close, and the arm's `rewrite_line` rewrites `](` targets only. Owner lookup: `docs_mirror`, `mirror`, `citation` in this file — none; owner canon-kit/SPEC.md §The reference-link grammar.
 
-### baseline-row-prose-coupling-gate
-
-[spec: SPEC-baseline-claims.md]
-
-governed prose asserts what `.workflow/validate-baseline.txt` holds, and nothing checks it against the file.
-
-**The instance that bought this entry** was fixed at this close, not deferred: `gate-sdk/SPEC.md` claimed in two places that the baseline carried a held `installer_smoke fail` row. It was flipped to `pass` in `97683db2`, so a cohort pricing criterion 5 read a pointer to a mechanism it could not find, and the cheapest wrong conclusion was that the row had been dropped rather than earned out. Both sentences were re-worded at this close.
-
-**Why it is gateable, unlike its neighbours.** The general class — prose making claims about machine surfaces — is the human-audit class [gate-spec-claim-assertion-parity](#gate-spec-claim-assertion-parity) already rules ungateable. This slice is not: a sentence naming `.workflow/validate-baseline.txt` and quoting one of its `<suite> <scenario> <status>` rows is a decidable pattern, and the live file is a lookup keyed on suite and scenario. A quoted status that disagrees with the row reds.
-
-**Deliverable:** an evidence-kit emitter arm printing each baseline row as a `measured:` oracle line, and a claim class in this repo's `CANON_KIT_CLAIM_CLASSES_CMD` that makes a sentence quoting a row carry a marker, so `check-unmarked-claim` pressures the marker and `check-measured-claim` compares it with the row; plus a ruling on the past-tense form: a sentence deliberately recording a *retired* row must not red.
-
-**Selected 2026-09-30 for canon-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it. The mechanism, an evidence-kit emitter arm plus a canon-kit claim class rather than a new gate, is a decision of the iteration's intent oracle (the selecting scope session), lead-relayed at spec, not a ruling: canon-kit/SPEC.md §Content tiering names `check-measured-claim` and `check-unmarked-claim` as the mechanism for a transcribed machine value.
-
-**A SECOND instance was authored 2026-08-24, at this close's eviction review.** Ruling the `installer_smoke` row's attribution put a claim about that file's slug column into two governed surfaces at once — `bridged-knob-case-tmp-dir-override-inert`'s body and evidence-kit/SPEC.md §Baseline manifest. That pair is no longer live: the entry's body left the queue with its Done move (2026-09-12), and evidence-kit/SPEC.md carries no `installer_smoke` claim either (`git grep -c installer_smoke evidence-kit/SPEC.md` finds none).
-
-**No `recurrence:` date joins:** the entry names an unbuilt gate rather than a defect, so authoring a new instance of the class it would catch is the class recurring, not the finding re-firing.
-
-**Cost while deferred:** low and slow, but it recurs on exactly the readers who most need the file — a cohort pricing criterion 5 reads the prose first. Filed 2026-08-14 by close, from its own gap-inbox drain and staleness review; kept in Deferred at the 2026-08-24 eviction review on the trigger above and on the live slug it names.
-
 ## Technical Debt
 
 ### canon-kit-amendment-brevity
@@ -82,7 +62,7 @@ canon-kit/SPEC.md's amendment-family sections under [spec-brevity-residue](#spec
 
 [gate-customer-value-audit](#gate-customer-value-audit)'s canon-kit slice: the gates canon-kit ships, 44 `.gate` descriptors (27 zero-config and 11 on-surface by install disposition), audited for customer value and configurability under gate-sdk/SPEC.md §Consumer payload's rule. canon-kit is the companion's `prose` tier, which every companion install exposes.
 
-**Deliverable:** each gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated. `check-docs-cmd`, `check-citation-link` and `check-prose-tells` are ruled after `removed-knob-docs-cmd-valve`, `citation-link-root-docs-range` and `absence-statement-gate-arms` land, since those change them, and `check-measured-claim` and `check-unmarked-claim` after [baseline-row-prose-coupling-gate](#baseline-row-prose-coupling-gate) lands, since its baseline claims ride them; [companion-install-tier](#companion-install-tier) reads the verdicts after.
+**Deliverable:** each gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated. `check-docs-cmd`, `check-citation-link` and `check-prose-tells` are ruled after `removed-knob-docs-cmd-valve`, `citation-link-root-docs-range` and `absence-statement-gate-arms` land, since those change them, and `check-measured-claim` and `check-unmarked-claim` after `baseline-row-prose-coupling-gate` lands, since its baseline claims ride them; [companion-install-tier](#companion-install-tier) reads the verdicts after.
 
 **Cost while deferred:** the parent's cost, for this kit. Filed 2026-09-30 as a split at canon-kit-value-pass' scope. Part of the operator's selection of the set, direction 2026-09-30, lead-relayed (not a ruling).
 
@@ -1515,5 +1495,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - removed-knob-docs-cmd-valve
 - citation-link-root-docs-range
 - absence-statement-gate-arms
+- baseline-row-prose-coupling-gate
 
 ## Lessons Learned

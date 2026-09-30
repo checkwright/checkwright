@@ -5,6 +5,7 @@ use crate::programs;
 pub mod agent_tiers;
 pub mod agents_md_smoke;
 pub mod always_loaded;
+pub mod baseline_claims;
 pub mod capture_drain;
 pub mod cite_survey;
 pub mod close_surfaces;
@@ -636,6 +637,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-kit-roots",
         Arm::Emit(crate::walk::emit_kit_roots, Grammar::Flags(&[])),
         &["GATE_SDK_KIT_DIRS"],
+    ),
+    // spec: evidence-kit/SPEC.md §The baseline-claims arm — each baseline row as a `measured:`
+    // oracle line, for a consumer's `CANON_KIT_MEASURED_CLAIMS_CMD` to name or append
+    (
+        "--emit-baseline-claims",
+        Arm::Emit(baseline_claims::emit, Grammar::Flags(&[])),
+        baseline_claims::KNOBS,
     ),
     // spec: evidence-kit/SPEC.md §Layout and configuration — the two parser adapters, reached as
     // the *value* of `EVIDENCE_KIT_PARSER_<suite>` rather than as a named adapter spec: gate-

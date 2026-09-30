@@ -40,3 +40,8 @@ _mc_owed="${_mc_tree##*, }"
 _mc_owed="${_mc_owed% owed}"
 [[ "$_mc_owed" =~ ^[0-9]+$ ]] || { echo "measured-claims: --emit port-blockers --tree did not report an owed count: $_mc_tree" >&2; exit 2; }
 printf 'tree-shell-owed\t%s\n' "$_mc_owed"
+
+# spec: evidence-kit/SPEC.md §The baseline-claims arm — each validate-baseline row as a key a
+# sentence quoting the row binds to
+"$(gate_native_bin_spelled)" --emit baseline-claims \
+    || { echo "measured-claims: --emit baseline-claims failed" >&2; exit 2; }
