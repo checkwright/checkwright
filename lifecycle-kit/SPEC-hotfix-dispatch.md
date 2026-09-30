@@ -47,7 +47,7 @@ The body:
 >
 > ## Not a stage
 >
-> Run no `--enter-stage`, write no stamp, and make no queue move. A hotfix belongs to no iteration. Dispatch no session; read-only fan-outs stay sanctioned.
+> Run no `--enter-stage`, write no stamp, and make no queue move. A hotfix belongs to no iteration. Dispatch no stage, consultation or hotfix session; a read-only fan-out stays sanctioned.
 >
 > ## The one commit
 >
@@ -66,13 +66,13 @@ The body:
 
 ### (2) The type is declared mutating
 
-`scripts/delegation-config.knobs` gains `DELEGATION_KIT_MUTATING_TYPES[] = hotfix-session` after `consult-session`'s line {mechanical}. **Not yet applied.** D4 then admits the type unisolated. D5 passes it on its definition's `model:`.
+`scripts/delegation-config.knobs` gains `DELEGATION_KIT_MUTATING_TYPES[] = hotfix-session` after `consult-session`'s line {mechanical}. **Not yet applied.** D4 then admits the type unisolated. D5 passes it on its definition's `model:`. `scripts/lifecycle-config.knobs`' `LIFECYCLE_KIT_STAGE_SESSION_TYPES` is left naming `stage-session` alone, since a hotfix stamps nothing.
 
 ### (3) The lead template names the dispatch
 
 lifecycle-kit/templates/lead.md gains a paragraph in §The escalation protocol after the consult-dispatch slot, and the `ruling-config` slot's description widens {mechanical}. **Not yet applied.**
 
-> **Dispatch an operator-ruled hotfix only while no stage session is live.** When the operator rules a hotfix (doctrine-kit/DOCTRINE.md, Scope-gated intake), dispatch it as the hotfix type your ruling-config names. Its prompt names the ruling, the failure, and the queue entry or gap bullet the fix disposes, and nothing else, and grants its journal path. Verify its one commit as you verify any agent commit, and dispatch no stage session while it is live. Where your ruling-config names no hotfix type, dispatch none: the operator lands the hotfix in a session of their own.
+> **Dispatch an operator-ruled hotfix only while no stage session and no consultation is live.** When the operator rules a hotfix (doctrine-kit/DOCTRINE.md, Scope-gated intake), dispatch it as the hotfix type your ruling-config names. Its prompt names the ruling, the failure, and the queue entry or gap bullet the fix disposes, and nothing else, and grants its journal path. Verify its one commit as you verify any agent commit, and dispatch no stage session and no consultation while it is live. Where your ruling-config names no hotfix type, dispatch none: the operator lands the hotfix in a session of their own.
 
 The slot becomes:
 
@@ -86,7 +86,7 @@ lifecycle-kit/SPEC.md §templates/lead.md re-phrases its slot roster's `ruling-c
 
 The paragraph:
 
-> **An operator-ruled hotfix is a dispatch, never a track.** The refused parallel hotfix track (§Deviation transitions) is a standing lane that contends on live stage surfaces. Doctrine-kit's valve is one ruled fix, and the lead dispatches it only while no stage session is live, the condition a consultation dispatch takes. Its standing policy is the hotfix type's definition, never a prompt, on §Policy is config: not a stage, one commit, the battery and every reached suite, stop on a design question. The type is declared mutating, because isolation refuses a crate-source commit (gate-sdk/SPEC.md §check-crate-arms) and a gap filing (§The committed gap inbox), both of which a hotfix may need. The type is named in the `ruling-config` slot rather than a slot of its own, since `check-skill-binding` pairs slots by name and a new one would red every adopter's shim for a type most consumers never dispatch.
+> **An operator-ruled hotfix is a dispatch, never a track.** The refused parallel hotfix track (§Deviation transitions) is a standing lane that contends on live stage surfaces. Doctrine-kit's valve is one ruled fix, and the lead dispatches it only while no stage session is live, the condition a consultation dispatch takes. A hotfix and a consultation are never live together either: a dispatched consultation checks its tier by the newest transcript under the lead (§templates/consult.md), and a live hotfix would out-date it. Its type is never one `LIFECYCLE_KIT_STAGE_SESSION_TYPES` lists, whose stamp-before-write rule refuses a session that stamps nothing (§check-dispatch-entry). Its standing policy is the hotfix type's definition, never a prompt, on §Policy is config: not a stage, one commit, the battery and every reached suite, stop on a design question. The type is declared mutating, because isolation refuses a crate-source commit (gate-sdk/SPEC.md §check-crate-arms) and a gap filing (§The committed gap inbox), both of which a hotfix may need. The type is named in the `ruling-config` slot rather than a slot of its own, since `check-skill-binding` pairs slots by name and a new one would red every adopter's shim for a type most consumers never dispatch.
 
 ### (5) This repository's lead binding names the type
 
@@ -95,7 +95,7 @@ The paragraph:
 ## Producers and consumers
 
 - **The hotfix type.**
-  - Producer: the lead, dispatching on an operator's hotfix ruling while no stage session is live.
+  - Producer: the lead, dispatching on an operator's hotfix ruling while no stage session and no consultation is live.
   - Consumers:
     - The dispatched session, which reads its definition.
     - `agent-dispatch-guard`, D4 through the mutating roster and D5 through `model:`.
@@ -115,7 +115,8 @@ The paragraph:
 - `lifecycle-kit/templates/lead.md`: §The escalation protocol and the `ruling-config` slot (delta 3). tier-model-binding's tier-reading edit and consult-tier's consult-dispatch edit change other passages of the same file.
 - `lifecycle-kit/SPEC.md` §templates/lead.md, the slot roster's `ruling-config` bullet and the new paragraph (delta 4).
 - `.claude/commands/lead.md` (delta 5). tier-model-binding's repository binding and model-verdict's prompt-line edit change the same binding's tiering text.
-- `docs/lifecycle-kit/SPEC.md`: the generated mirror (all deltas).
+- `docs/lifecycle-kit/SPEC.md`: the generated mirror (delta 4).
+- `.workflow/surface-ceiling.txt` — the new `.claude/agents/hotfix-session.md` row and the grown `lifecycle-kit/templates/lead.md`, `lifecycle-kit/SPEC.md` and `.claude/commands/lead.md` rows stamped with `bash gate-sdk/bin/run-gates.sh --emit always-loaded --ceiling`, which `check-surface-ratchet` demands with the growth (deltas 1, 3, 4 and 5).
 
 The roster came from `git grep -n -i 'hotfix'` over the tracked tree outside `docs/posts` and the queue, and from `git grep -n 'MUTATING_TYPES'` for the roster's readers.
 
@@ -128,7 +129,7 @@ The roster came from `git grep -n -i 'hotfix'` over the tracked tree outside `do
 - [ ] **Causal completeness** — every point of canon-kit/SPEC.md §The causal-completeness check holds for the type, its commit, its escalation and the widened slot.
 - [ ] **Instruction surfaces: instruction only** — the definition and the template paragraph carry no grounds; they sit in §templates/lead.md.
 - [ ] **Merged with no information lost** — §templates/lead.md reads the hotfix dispatch beside the consult dispatch as one rule for when a lead dispatches a non-stage session.
-- [ ] **Amendment deleted** — this file removed on merge; none remain for the component (`ls lifecycle-kit/SPEC-*.md`).
+- [ ] **Amendment deleted** — this file removed on merge; `ls lifecycle-kit/SPEC-hotfix-dispatch.md` finds nothing.
 - [ ] **Removals propagated** — nothing retired.
 - [ ] **Gaps filed** — a cross-component gap found during the work filed with `--emit file-gap`.
 - [ ] **The entry moves** — `hotfix-agent-definition` moves to Done in the landing commit, a stage before the drain stage.

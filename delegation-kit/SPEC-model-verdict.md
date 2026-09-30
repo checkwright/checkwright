@@ -8,7 +8,7 @@
 
 - A transcript's assistant records carry the model id each turn ran on, at `message.model`. The authoring session's own transcript carried `claude-opus-5-5` on every such record.
 - The newest record exists while a tool call runs. The tail of the transcript held an assistant record while the probing command executed, so a session asking about itself finds its own current turn.
-- drift-kit's meter already reads the field (`usage_by_model` in `native/src/emit/stage_economics.rs`). It counts a record only when its usage is not all zero, which excludes the harness's synthetic records.
+- drift-kit's meter already reads the field (`usage_by_model` in `native/src/emit/stage_economics.rs`). It skips a record whose usage is absent or null, keeps the last record per message id, and folds the rest into per-model sums, so it names no newest record. The all-zero test that excludes the harness's synthetic records is `--price-coverage`'s, applied to an id's summed counts (`used_ids` in `native/src/emit/price_coverage.rs`).
 - The top-level interface already renders the model through this kit's `--statusline` arm, which reads the harness's statusline payload. `SessionStart`'s payload carries a `model` field only optionally, and no other hook event carries one (harness hook documentation, fetched at authoring). So the running model reaches a session only through its transcript, and a hook-side route would reach top-level sessions alone, where the statusline already shows it. context-kit's hook is therefore not changed.
 
 **Two alternatives were weighed and refused.**
@@ -28,7 +28,7 @@ delegation-kit gains the compiled arm `bash gate-sdk/bin/run-gates.sh --model-ve
 >
 > **Which transcript.** A `.jsonl` operand is read as given. An eight-character operand names a transcript through the shared inverse lookup, whose normalization strips a leading `agent-` from each candidate (drift-kit/SPEC.md §The stage-economics meter). Bare, the arm takes the delegation-aware derivation's pick (lifecycle-kit/SPEC.md §bin/session-id.sh): a top-level session's own transcript, and for a dispatched session the newest transcript under its lead's `subagents/`. The sessions dir is `DELEGATION_KIT_SESSIONS_DIR`, empty meaning derived, as drift-kit's knob is. **Honest limit:** a sibling session writing at the same moment can out-date a dispatched caller's own transcript, so the line prints the key it read, and a caller holding its own id passes it.
 >
-> **Which model.** The newest assistant record whose usage is not all zero, the meter's own test for a record that counts, gives `message.model`. A model switched mid-session is read as the model now running.
+> **Which model.** The newest assistant record whose usage is not all zero gives `message.model`. The record is read by the meter's own per-record reader, and all-zero is the test `--price-coverage` applies to an id, here applied to one record, since the harness's synthetic records carry zero usage. A model switched mid-session is read as the model now running.
 >
 > **The verdict.** The id's classes are the bound classes whose value it matches (§The tier binding). Without `--expect`, the line is a reading and exits 0. With it, the id meets class `E` when it matches `E` or a class ranked above it. The ranking is judgment, then routing, then mechanical, so a check at a floor passes a stronger model.
 >
@@ -56,13 +56,13 @@ delegation-kit gains the compiled arm `bash gate-sdk/bin/run-gates.sh --model-ve
 
 The §Layout and configuration bullet, after `DELEGATION_KIT_TIER_MODEL`'s:
 
-> - `DELEGATION_KIT_SESSIONS_DIR` — the transcript directory `--model-verdict` reads (§model-verdict); default empty, which derives `<config-home>/projects/<cwd-slug>` through the crate's one derivation (lifecycle-kit/SPEC.md §bin/session-id.sh), the same emptiness drift-kit's `DRIFT_KIT_SESSIONS_DIR` takes. A kit resolves its own knob and hands the answer to the shared module, so the two are separate names for one default.
+> - `DELEGATION_KIT_SESSIONS_DIR` — the transcript directory `--model-verdict` reads (§model-verdict); default empty, which derives `<config-home>/projects/<cwd-slug>` through the crate's one derivation (lifecycle-kit/SPEC.md §bin/session-id.sh), the same emptiness drift-kit's `DRIFT_KIT_SESSIONS_DIR` takes. A kit resolves its own knob and hands the answer to the shared module. So this knob, drift-kit's and lifecycle-kit's environment-only `LIFECYCLE_KIT_SESSIONS_DIR` are three names for one default.
 
 Registration:
 
 - the knob row joins `native/src/knobs/delegation_kit.rs`;
 - the arm row joins `native/src/emit/mod.rs`'s table, and its usage line joins `native/src/runner.rs`'s help;
-- the model reading is shared with `usage_by_model`'s record test, not re-implemented, so the arm and the meter agree on what a counting record is;
+- the per-record reader is factored out of `usage_by_model`, which then calls it, and the arm calls the same function, so the two agree on what a record's model and usage are. The arm adds only the all-zero test;
 - the matcher is tier-model-binding delta 1's.
 
 ### (2) The verdict's crate tests cover every row
@@ -101,16 +101,18 @@ The lead names the class in every stage dispatch prompt, and a stage session che
   - The verdict token and the consequence are what every caller routes on.
 - **`DELEGATION_KIT_SESSIONS_DIR`.** Producer: the consumer's knob file, where a consumer's harness home is non-standard. This repository leaves it at the derived default. Consumers: the arm, and the roster-holding readers of a knob name: `native/src/knobs/delegation_kit.rs`'s table, `--emit knob-roster`, `check-knob-citation` and `check-knob-default-coupling`.
 - **The `tier: <class>` prompt line.** Producer: the lead, per this repository's binding (delta 3). Consumer: the dispatched stage session, at its first step after the stamp.
-- **The arm name.** Its roster-holding readers are the arm table and the fence-safe derivation in `native/src/emit/mod.rs`, and the help text in `native/src/runner.rs`.
+- **The arm name.** Its roster-holding readers are the arm table in `native/src/emit/mod.rs` and the help text in `native/src/runner.rs`. The fence-safe derivation there admits the `--emit-` family alone, so it does not reach this `Arm::Run` row.
 
 ## Existing sections updated
 
 - `delegation-kit/SPEC.md`: §model-verdict, new, and §Layout and configuration's bullet (delta 1); §Testing (delta 2).
 - `native/src/knobs/delegation_kit.rs`, `native/src/emit/mod.rs`, `native/src/runner.rs` and a new verdict module under `native/src/hook/`, beside `verdict.rs` (delta 1).
+- `native/src/emit/stage_economics.rs`: the per-record reader factored out of `usage_by_model` (delta 1).
 - The verdict module's tests (delta 2).
 - `.claude/commands/lead.md` and `.claude/agents/stage-session.md` (delta 3).
 - `delegation-kit/README.md`: the verdict's one-line entry beside `--usage-verdict`'s (delta 1).
-- `docs/delegation-kit/SPEC.md` and `docs/delegation-kit/README.md`: the generated mirror (all deltas).
+- `docs/delegation-kit/SPEC.md` and `docs/delegation-kit/README.md`: the generated mirror (deltas 1 and 2).
+- `.workflow/surface-ceiling.txt` — the grown `delegation-kit/SPEC.md`, `.claude/commands/lead.md` and `.claude/agents/stage-session.md` rows re-stamped with `bash gate-sdk/bin/run-gates.sh --emit always-loaded --ceiling`, which `check-surface-ratchet` demands with the growth (all deltas).
 
 The roster came from `git grep -l 'usage-verdict'` over the tracked tree, for the sites a delegation-kit `Arm::Run` verdict is registered or cited at, and from `git grep -n 'DRIFT_KIT_SESSIONS_DIR'` for the sessions-dir knob's pattern.
 
@@ -123,7 +125,7 @@ The roster came from `git grep -l 'usage-verdict'` over the tracked tree, for th
 - [ ] **Causal completeness** — every point of canon-kit/SPEC.md §The causal-completeness check holds for the arm, its line, its knob and the prompt line.
 - [ ] **Instruction surfaces: instruction only** — the stage-session bullet carries the command, the two exits' acts and a pointer, and no grounds.
 - [ ] **Merged with no information lost** — §model-verdict reads as `usage-verdict`'s sibling. The two refused alternatives land in it as its grounds, and its honest limit sits beside the delegated pick.
-- [ ] **Amendment deleted** — this file removed on merge; none remain for the component (`ls delegation-kit/SPEC-*.md`).
+- [ ] **Amendment deleted** — this file removed on merge; `ls delegation-kit/SPEC-model-verdict.md` finds nothing.
 - [ ] **Removals propagated** — nothing retired.
 - [ ] **Gaps filed** — a cross-component gap found during the work filed with `--emit file-gap`.
 - [ ] **The entry moves** — `session-model-identity-verification` moves to Done in the landing commit, a stage before the drain stage.

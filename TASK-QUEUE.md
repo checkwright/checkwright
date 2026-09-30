@@ -22,7 +22,7 @@ the tier a dispatch rides is written as a harness model alias wherever it is cho
 
 ### session-model-identity-verification
 
-[spec: SPEC-model-verdict.md]
+[spec: SPEC-model-verdict.md] [blocked-by: tier-model-binding]
 
 a session cannot report or verify the model tier it is running at. The session-context hook prints iteration, budget and drift; `drift-report` prints neither. Nothing surfaces the running model, so a session cannot state its own tier without a human hand-reading the harness transcript, and no stage can assert the tier it was dispatched at.
 

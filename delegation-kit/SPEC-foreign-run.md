@@ -68,7 +68,7 @@ Registration:
 
 - the arm row joins `native/src/emit/mod.rs`'s table;
 - `--foreign-run` joins the crate's network-spawner list there, which a unit test holds disjoint from the fence-safe set;
-- its usage line joins `native/src/runner.rs`'s help;
+- its usage line joins `native/src/runner.rs`'s help, and a one-line entry joins `delegation-kit/README.md`'s command block beside `--usage-verdict`'s;
 - gate-sdk/SPEC.md §The non-gate arm's spawner rosters gain it: the network-spawner sentence of the fence-safe paragraph, and the *changeable by a consumer* bullet ("`--foreign-run` spawns `git` for the clone and whatever `DELEGATION_KIT_FOREIGN_ADAPTERS` names").
 
 ### (3) The executor's crate tests
@@ -132,8 +132,10 @@ README.md's contributor paragraph ("Most commits here carry a `Co-Authored-By` t
 - `gate-sdk/SPEC.md` §The non-gate arm, the spawner rosters (delta 2).
 - `delegation-kit/templates/delegation-config.knobs` (delta 1).
 - `delegation-kit/templates/agent-execution.md` (delta 4). tier-model-binding's tier-reading edit changes the neighbouring bullet.
+- `delegation-kit/README.md`: the arm's one-line entry (delta 2).
 - `README.md` (delta 5).
-- `docs/delegation-kit/SPEC.md`, `docs/delegation-kit/README.md` and `docs/gate-sdk/SPEC.md`: the generated mirror (all deltas).
+- `docs/delegation-kit/SPEC.md`, `docs/delegation-kit/README.md` and `docs/gate-sdk/SPEC.md`: the generated mirror (deltas 1, 2, 3 and 6).
+- `.workflow/surface-ceiling.txt` — the grown `delegation-kit/SPEC.md`, `gate-sdk/SPEC.md` and `delegation-kit/templates/agent-execution.md` rows re-stamped with `bash gate-sdk/bin/run-gates.sh --emit always-loaded --ceiling`, which `check-surface-ratchet` demands with the growth (deltas 1, 2, 3, 4 and 6).
 
 The roster came from `git grep -n 'price-coverage'` and `git grep -n 'with-foreign-shells'` for the registration sites of a network-spawning `Arm::Run`, `git grep -n 'DELEGATION_KIT_STATUSLINE_INBOXES'` for a delegation-kit indexed knob's readers, and `grep -n -i 'co-authored\|trailer' README.md CLAUDE.md` for the attribution statement.
 
@@ -146,7 +148,7 @@ The roster came from `git grep -n 'price-coverage'` and `git grep -n 'with-forei
 - [ ] **Causal completeness** — every point of canon-kit/SPEC.md §The causal-completeness check holds for the knobs, the arm, the run's files and the template bullet.
 - [ ] **Instruction surfaces: instruction only** — the template bullet carries the route and its limits as instructions; the grounds sit in §The foreign-vendor run.
 - [ ] **Merged with no information lost** — §The foreign-vendor run carries the refused alternatives as its grounds and the honest limits beside the mechanism.
-- [ ] **Amendment deleted** — this file removed on merge; none remain for the component (`ls delegation-kit/SPEC-*.md`).
+- [ ] **Amendment deleted** — this file removed on merge; `ls delegation-kit/SPEC-foreign-run.md` finds nothing.
 - [ ] **Removals propagated** — nothing retired.
 - [ ] **No harness setting changed** — no settings file in the tree and no vendor configuration was edited for the attribution policy.
 - [ ] **A live run** — with the operator's confirmation of the adapter's argv (its sandbox mode included) and of the vendor spend, the private overlay configures one adapter. One read-only audit then runs through `--foreign-run` to `OK`, and its verdict line is quoted in the landing commit's message with the adapter name elided.
