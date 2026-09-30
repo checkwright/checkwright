@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: delegation-tier-binding
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,22 @@
 ## New Features
 
 ## Technical Debt
+
+### delegation-kit-tier-brevity
+
+delegation-kit/SPEC.md's tier sections under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §check-agent-tier-explicit, §usage-verdict with its subsections, §Trend reporter and §Layout and configuration, about 8.4k of the file's 43.1k words; delegation-kit's other sections stay on the parent.
+
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every `##` heading kept verbatim and every fact another surface cites into them kept, per a citation survey. Applied after the iteration's delegation-kit amendments merge, so no section is passed twice in one iteration.
+
+**Cost while deferred:** paid by every session and adopter that reads an unpassed delegation-kit section. Filed 2026-09-30 as a split at delegation-tier-binding's scope, taken ahead of guard-kit's remainder in the parent's size order because §The generic ruleset, its bulk, is rewritten by the deferred [write-side-steering](#write-side-steering) and [compound-read-classifier-reach](#compound-read-classifier-reach). Part of the operator's selection of the set, direction 2026-09-30, lead-relayed (not a ruling).
+
+### delegation-kit-value-audit
+
+[gate-customer-value-audit](#gate-customer-value-audit)'s delegation-kit slice: `check-agent-tier-explicit`, `check-gate-tamper` and `check-rule-citation`, the three gates delegation-kit ships, audited for customer value and configurability under gate-sdk/SPEC.md §Consumer payload's rule.
+
+**Deliverable:** each gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated. Ruled after [tier-model-binding](#tier-model-binding) lands, since `check-agent-tier-explicit` reads the `model:` field that binding re-sources.
+
+**Cost while deferred:** the parent's cost, for this kit. Filed 2026-09-30 as a split at delegation-tier-binding's scope; delegation-kit is a kit a companion full install exposes. Part of the operator's selection of the set, direction 2026-09-30, lead-relayed (not a ruling).
 
 ## Deferred
 
@@ -98,7 +114,7 @@ hosted attestation. The team/paid rung: gates verified server-side by a party th
 
 [roadmap: later/ecosystem] [cost: iteration/low] [surface: delegation-kit] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
 
-foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent. It cashes the public no-lock-in claim and is the purest expression of the thesis — governance enforced at the git/gate boundary, not by trusting the author. *Already agent-neutral:* the verification substrate (git, the gate battery, the bash stamp state machine) does not care who authored the diff, and the coordination primitive is the shared git-index/HEAD serialization. *Homogeneous today — the real work, worst-first:* (1) the **escalation resume model** collapses into (2) as a property of the chosen transport, per the 2026-07-25 amendment below; (2) **dispatch transport** — today the harness `Agent`/`SendMessage`/task-notification; a foreign agent needs a transport-neutral handoff. The adapter contract is "open / prompt / permission-request / resume" spoken over each vendor's structured **machine plane, never its TUI**: a screen-scrape relay is the adapter of last resort for a vendor shipping no machine interface at all — it yields rendered frames not turn events, answers dialogs by heuristic, and bets on the vendor's least-stable surface. (3) **budget oracle** — the verdict tool is Anthropic-OAuth-specific; a heterogeneous fleet has N vendor-keyed oracles, the same seam as the credential-swap entries, and the vendors' JSONL event streams carry the token-usage events a TUI path would scrape from a status bar. (4) **stage-contract expression** — the lifecycle machinery is neutral bash but the stage-skill prose is not.
+foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent. It cashes the public no-lock-in claim and is the purest expression of the thesis — governance enforced at the git/gate boundary, not by trusting the author. *Already agent-neutral:* the verification substrate (git, the gate battery, the bash stamp state machine) does not care who authored the diff, and the coordination primitive is the shared git-index/HEAD serialization. *Homogeneous today — the real work, worst-first:* (1) the **escalation resume model**, plumbing of (2) per the 2026-07-25 amendment below; (2) **dispatch transport** — today the harness `Agent`/`SendMessage`/task-notification; a foreign agent needs a transport-neutral handoff. The adapter contract is "open / prompt / permission-request / resume" spoken over each vendor's structured **machine plane, never its TUI**: a screen-scrape relay is the adapter of last resort for a vendor shipping no machine interface at all — it yields rendered frames not turn events, answers dialogs by heuristic, and bets on the vendor's least-stable surface. (3) **budget oracle** — the verdict tool is Anthropic-OAuth-specific; a heterogeneous fleet has N vendor-keyed oracles, the same seam as the credential-swap entries, and the vendors' JSONL event streams carry the token-usage events a TUI path would scrape from a status bar. (4) **stage-contract expression** — the lifecycle machinery is neutral bash but the stage-skill prose is not.
 
 **Seam ruling (on record):** generic mechanism only — transport, budget oracle, and escalation channel become consumer-config seams; a kit literal naming a vendor crosses the provenance seam and is ruled out, the pattern the retired `prose-profile` ruled. It extends the per-batch model-tiering lever across vendors, and interacts with [hosted-attestation-service](#hosted-attestation-service), the harness plugin package's reach ([plugin-harness-reach](#plugin-harness-reach)), and the credential-swap entries.
 
@@ -106,11 +122,13 @@ foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a fore
 
 **Its citers** ([companion-toolkit-profile](#companion-toolkit-profile), the credential-swap entries) block on none of it.
 
-**Its scoping owes an attribution policy**, operator direction 2026-09-29, lead-relayed (not a ruling): each foreign harness's trailer adds a GitHub contributor per vendor. Candidates: each harness credits itself, or trailers off with the method stated once in the README (the lead's lean); a harness setting change waits on operator confirmation.
+**Attribution, operator direction 2026-09-30, lead-relayed (not a ruling):** foreign harnesses' commit trailers off, since each adds a GitHub contributor per vendor, and the method stated once in the README; a harness setting change waits on operator confirmation.
 
-**Design-memory amendment (2026-07-25):** the TUI relay buys no session resume or token efficiency — both live in the vendor's session store (stateless APIs, the same on-disk transcript replayed against the same server-side prompt cache), so interactive-vs-headless is rendering, not state. Headless warm-resume by session id and JSONL turn events ship on the vendors probed, which makes (1) plumbing.
+**Selected 2026-09-30 for delegation-tier-binding, operator direction lead-relayed (not a ruling):** the first slice above; spec authors and promotes it after [tier-model-binding](#tier-model-binding), whose binding the adapters extend.
 
-**Verification capability (2026-08-02):** those probes ran against **installed binaries**, so the executor is verifiable, not inferred from vendor docs — a change to the unit's risk under oracle-first: the executor ships with a smoke that invokes them. The machine profile (context-kit/SPEC.md §bin/env-probe, local-only) owns which CLIs and how.
+**Design-memory amendment (2026-07-25):** the TUI relay buys no session resume or token efficiency — both live in the vendor's session store (stateless APIs, the same on-disk transcript replayed against the same server-side prompt cache), so interactive-vs-headless is rendering, not state. Headless warm-resume by session id and JSONL turn events ship on the vendors probed.
+
+**Verification capability (2026-08-02):** those probes ran against **installed binaries**, so the executor is verifiable, not inferred from vendor docs: the executor ships with a smoke that invokes them. The machine profile (context-kit/SPEC.md §bin/env-probe, local-only) owns which CLIs and how.
 
 **Cost while deferred:** the foregone lever is live — read-heavy audits and mechanical sweeps all bill against one vendor's budget while three subscriptions are held — and this design memory ages against fast-moving CLIs. Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question).
 
@@ -226,6 +244,8 @@ a session cannot report or verify the model tier it is running at. The session-c
 
 **Cost while deferred:** every tiering rule in the tree is unverifiable — including the two filed alongside this one. [consult-tier-declaration](#consult-tier-declaration) blocks on it outright, and the `Co-Authored-By` attribution defect has no derivable fix without it. Filed 2026-08-04 at close from the gap inbox; filed by the lead.
 
+**Selected 2026-09-30 for delegation-tier-binding, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it, after [tier-model-binding](#tier-model-binding), whose binding supplies the consumer-config tier expectation.
+
 ### consult-tier-declaration
 
 [blocked-by: session-model-identity-verification] [cost: event/high] [surface: delegation-kit]
@@ -237,6 +257,8 @@ a session cannot report or verify the model tier it is running at. The session-c
 **The shape that keeps the seam intact:** the *skill* declares its own floor, the *kit* never spells a model name — the same split [session-model-identity-verification](#session-model-identity-verification) sets up, which is why this blocks on it rather than racing it. Without the mechanism this entry is a prose assertion of the kind that already failed twice this iteration.
 
 **Cost while deferred:** the repo's one escalation-grade skill is silently downgradeable, and the failure is invisible in the artifact — a thin consultation reads as a short one. Filed 2026-08-04 at close from the gap inbox; filed by the lead on operator direction.
+
+**Selected 2026-09-30 for delegation-tier-binding, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it after [session-model-identity-verification](#session-model-identity-verification), its blocker, in the same set.
 
 ### intra-file-pendency-contradiction-scan
 
@@ -355,6 +377,8 @@ installer's remaining sections other than §The consumer smoke left 2026-09-29 a
 drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `drift-kit-measurement-brevity`; drift-kit's other sections remain.
 
 guard-kit's front sections left 2026-09-30 at guard-kit-steering's scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `guard-kit-front-brevity`; guard-kit's preamble and other sections remain.
+
+delegation-kit's tier sections left 2026-09-30 at delegation-tier-binding's scope, on an operator direction lead-relayed (not a /consult ruling), as [delegation-kit-tier-brevity](#delegation-kit-tier-brevity).
 
 ### prune-set-matches-walk-root-ancestors
 
@@ -518,6 +542,8 @@ no tracked agent definition exists for the operator-ruled hotfix path of the sco
 
 **Cost while deferred:** every hotfix costs a restated prompt and a second dispatch. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead; promoted 2026-09-27 at its close: →fix fails because the definition is a new governed name. Owner lookup: `hotfix`, `agents/`, `MUTATING_TYPES` in this file — none; owner delegation-kit/SPEC.md. The worktree half landed as `worktree-crate-commit-red`: the hook greens in a worktree, and `check-crate-arms` refusing a crate-source commit there is now the stated contract.
 
+**Selected 2026-09-30 for delegation-tier-binding, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it, its `model:` field read through [tier-model-binding](#tier-model-binding)'s binding.
+
 ### readme-spec-links-offsite
 
 [cost: event/low] [surface: gate-sdk]
@@ -614,6 +640,8 @@ Audited: site-kit, 5 gates (5 kept, 2 made generic, 0 withheld); guard-kit, 1 ga
 
 guard-kit's slice left 2026-09-30 at guard-kit-steering's scope, on an operator direction lead-relayed (not a /consult ruling), as `guard-kit-value-audit`, and landed in that iteration's build.
 
+delegation-kit's slice left 2026-09-30 at delegation-tier-binding's scope, on an operator direction lead-relayed (not a /consult ruling), as [delegation-kit-value-audit](#delegation-kit-value-audit).
+
 **A precondition of [companion-toolkit-profile](#companion-toolkit-profile)'s submission, operator direction 2026-09-29, lead-relayed (not a ruling),** beside [companion-install-tier](#companion-install-tier), whose exposed kits this audit's verdicts decide, so those kits are its natural first slices.
 
 ### compiled-consumer-smoke-driver
@@ -645,6 +673,8 @@ the tier a dispatch rides is written as a harness model alias wherever it is cho
 **Deliverable, operator direction 2026-09-29, lead-relayed (not a ruling):** (1) a consumer binding per tier class (judgment, routing, mechanical) to an alias, which follows the newest model, or an exact model id, which stays until changed; alias the default and pinning the opt-in, per Policy-as-choice; every place that chooses a tier reads the one binding. (2) Public documentation of alias tiering as a strength with its honest limit: an alias upgrade silently changes price and behaviour, so the claim ships with the price-coverage arm's detector (drift-kit/SPEC.md §The price-coverage arm), and under a pin a new id in the transcripts means the pin was bypassed. **Inferred, not run:** that the harness accepts an exact model id wherever it accepts an alias.
 
 **Cost while deferred:** a model upgrade changes every dispatch's price and behaviour unannounced, and no consumer can opt out. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at the next iteration's scope: →fix fails because the binding is a new knob. Re-verified: `model: opus` or `model: sonnet` in the four agent definitions. Owner lookup: `alias`, `model id`, `tier` in this file — [session-model-identity-verification](#session-model-identity-verification), DISTINCT (verifying the running tier, not choosing it); owner delegation-kit/SPEC.md, with delegation-kit/templates/agent-execution.md's live-roster rule.
+
+**Selected 2026-09-30 for delegation-tier-binding, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it first in the set, since the verification, the consult floor, the hotfix definition and the vendor adapters read its binding.
 
 ### openspec-delta-base-agreement
 
