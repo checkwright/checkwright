@@ -243,3 +243,4 @@
 | companion-adoption-landing | sc sp a b v c | 8f/4d | 6 · ≤0d | 21s clean | 146 |
 | preview-readiness | sc sp a b v c | 3f/5d | 4 · ≤0d | 21s clean | 146 |
 | guard-kit-steering | sc sp a b v c | 9f/1d | 5 · ≤0d | 21s clean | 146 |
+| delegation-tier-binding | sc sp a b v c | 4f/0d | 4 · ≤0d | 21s clean | 146 |

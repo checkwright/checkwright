@@ -7,7 +7,7 @@
 93cp .claude/commands/adopt.md
 1446cp .claude/commands/agent-execution.md
 551cp .claude/commands/align.md
-980cp .claude/commands/build.md
+1135cp .claude/commands/build.md
 9178cp .claude/commands/close.md
 2355cp .claude/commands/consult.md
 1451cp .claude/commands/economics.md
@@ -22,7 +22,7 @@
 23669cp companion/SPEC.md
 130174cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
-286243cp delegation-kit/SPEC.md
+286192cp delegation-kit/SPEC.md
 37827cp delegation-kit/templates/agent-execution.md
 3397cp delegation-kit/templates/dispatch-checklists.md
 1308cp docs/canon-kit/index.md

@@ -12,6 +12,26 @@
 
 ## Deferred
 
+### dangling-registration-cascade
+
+[cost: event/low] [surface: gate-sdk]
+
+a `gates.list` name that resolves nowhere reds six gates at once — `check-gate-output`, `check-gate-fixture-coverage`, `check-gate-substrate-parity`, `check-graph`, `check-kit-enum` (exit 2) and the dangling member itself — rather than one clear unresolved-registration error. An adopter upgrading across a gate withheld or renamed reads six unrelated-looking reds for one stale line, and each such release owes a Tightened-gates bullet per sibling gate, as delegation-tier-binding's withholding of `check-rule-citation` did.
+
+**Deliverable:** one owner for the unresolved-registration verdict, with the siblings skipping an unresolved member rather than re-reporting it, its fixture pair, and the declaration burden it removes stated in gate-sdk/SPEC.md §Layout and configuration; or a boundary note there keeping the cascade.
+
+**Cost while deferred:** paid per adopter per withholding or rename, as six reds and six declaration bullets for one line. Filed 2026-09-30 to the gap inbox by the lead off build batch 4's upgrade smoke; promoted at delegation-tier-binding's close: →fix fails because narrowing five gates' verdicts is a contract change owing fixtures and a release note. Re-verified: a probe name appended to a scratch copy of the gates dir (`GATE_SDK_GATES_DIR`) reds all five named siblings. Owner lookup: `resolves nowhere`, `dangling`, `unresolved registration` in this file — none; owner gate-sdk/SPEC.md §Layout and configuration.
+
+### foreign-vendor-critique
+
+[cost: event/low] [surface: delegation-kit]
+
+a consumer's use of the foreign-vendor run (delegation-kit/SPEC.md §The foreign-vendor run) for critique alongside the deterministic gates. Operator direction 2026-09-30, lead-relayed, not a ruling; the uses are candidates. Two adapters sit in the gitignored local overlay, each pinning its model and effort in argv so a run never follows the vendor CLI's last-switched model: a review adapter for typical work, and an expert adapter for top-expertise work. Candidate uses: work review, for example at iteration close; strategic consultation, for example a SWOT or an architecture discussion.
+
+**Why design-pending:** a close-stage review hook is new stage mechanism; each live run takes an operator grant, and a standing grant for a recurring review is the operator's to give; whether foreign adapters map onto `DELEGATION_KIT_TIER_MODEL`'s classes belongs to [heterogeneous-agent-delegation](#heterogeneous-agent-delegation)'s next slice. The foreign subscription's budget is small beside the primary harness's, so an exhausted foreign budget never blocks an iteration — a review degrades to skipped-with-notice — while a strategic consultation may wait for the limit to reset. Distinct from that entry, which owns transport and the adapter seam; this one is a consumer's use of it. Vendor model literals stay in consumer config (gate-sdk/SPEC.md §The provenance seam).
+
+**Cost while deferred:** a second-vendor reading of the iteration's work is foregone, and the deterministic gates stay the only critique. Filed 2026-09-30 to the gap inbox by the lead; promoted at delegation-tier-binding's close: →fix fails because the hook is new mechanism, →forward because the direction is already given and only its per-run grants are the operator's. Owner lookup: `critique`, `foreign-run`, `review adapter` in this file — only heterogeneous-agent-delegation, whose subject is transport; owner delegation-kit/SPEC.md §The foreign-vendor run.
+
 ### shellcheck-extra-dirs-trigger
 
 [cost: event/low] [surface: gate-sdk]
@@ -650,7 +670,7 @@ docs/releases.md renders its derived note list as a bare list of version links, 
 
 the consult inbox takes more than the operator's model of consult. Operator direction, 2026-09-29, lead-relayed (not a ruling): consult is for (a) reconsidering a ruling and (b) an expert opinion from a superior model on strategic direction, such as architecture. lifecycle-kit/SPEC.md §The consult inbox also admits an operator-class finding a session cannot relay live, a threshold entry declined twice, a misnamed direction question and a stage's operator signal; the catch-alls twice pulled in a question the operator had already answered as a direction (the operator-seat install item, re-classed at 30a5343b; the npm-approval item, discarded at 8ea1233c).
 
-**Deliverable:** the producer list narrowed to (a) and (b), the other classes routed to the gap inbox or a live lead; templates/consult.md (the operator rules) reconciled with (b)'s advisory reading; whether (b) pins consult's tier, where `consult-tier-declaration` asserts the tier consult dispatches; and whether a lead-dispatched consultation with no operator, which can only re-class or discard, still earns a dispatch.
+**Deliverable:** the producer list narrowed to (a) and (b), the other classes routed to the gap inbox or a live lead; templates/consult.md (the operator rules) reconciled with (b)'s advisory reading, whose tier is settled — consult declares and checks the judgment class at entry (lifecycle-kit/SPEC.md §templates/consult.md); and whether a lead-dispatched consultation with no operator, which can only re-class or discard, still earns a dispatch.
 
 **Addendum, operator direction 2026-09-30, lead session (not a ruling):** consult's main use is a recommendation from a top-tier model. A request expecting a reply gets one; a request expecting a tracked change makes it through the ordinary workflow (adding, removing or updating a deferred entry, say); a ruling is written to TRAJECTORY.md only where that workflow would otherwise challenge or reject the direction, as when the assets still name Bash gates and the direction is Rust ones. The lead's caution to weigh with it: a change consult lands carries its provenance as consult advice, marked operator-accepted or not, so a later session can tell model advice from operator direction. Drained into this entry at guard-kit-steering's close, not a recurrence: it adds what consult is for, where the defect above is what enters it.
 
@@ -708,7 +728,7 @@ close's roadmap-motion read files a consult item only for a slug that left the p
 
 **Inferred, not run:** rulings landed before the consult binding's re-tag surface existed had no retroactive horizon pass.
 
-**Cost while deferred:** the public roadmap lags the queue until a consult happens to look. Instances: [companion-toolkit-profile](#companion-toolkit-profile) held `next` from 2026-08-02 through the companion iterations; [spec-brevity-residue](#spec-brevity-residue) and [gate-customer-value-audit](#gate-customer-value-audit) carried no tag with slices landed, both curated at the 2026-09-29 consult, the audit to `next` on the relayed conditional. Filed 2026-09-29 to the gap inbox by preview-readiness' lead, with an addendum carrying the criterion, merged here; promoted 2026-09-30 at its close: →fix fails because a close read is new stage mechanism, →forward because no ruling is owed. Re-verified: close.md step 5 names only the two triggers. Owner lookup: `horizon`, `lagging` in this file — none; owner lifecycle-kit/templates/stages/close.md, with queue-kit/SPEC.md §The roadmap arm.
+**Cost while deferred:** the public roadmap lags the queue until a consult happens to look. Instances: [companion-toolkit-profile](#companion-toolkit-profile) held `next` from 2026-08-02 through the companion iterations; [spec-brevity-residue](#spec-brevity-residue) and [gate-customer-value-audit](#gate-customer-value-audit) carried no tag with slices landed, both curated at the 2026-09-29 consult, the audit to `next` on the relayed conditional; [heterogeneous-agent-delegation](#heterogeneous-agent-delegation) held `later` through its first slice at delegation-tier-binding, filed to consult at that close. Filed 2026-09-29 to the gap inbox by preview-readiness' lead, with an addendum carrying the criterion, merged here; promoted 2026-09-30 at its close: →fix fails because a close read is new stage mechanism, →forward because no ruling is owed. Re-verified: close.md step 5 names only the two triggers. Owner lookup: `horizon`, `lagging` in this file — none; owner lifecycle-kit/templates/stages/close.md, with queue-kit/SPEC.md §The roadmap arm.
 
 ### update-availability-notice
 
@@ -1501,12 +1521,5 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 Whether a live queue entry should cite shipped mechanism by a stable anchor (a SPEC section, a gate name, a path) rather than a retired slug, and whether a check-queue-hygiene axis should hold that, is unruled; close's retired-block read corrects each instance inline meanwhile, as it did twice at preview-readiness' close.
 
 ## Done
-
-- tier-model-binding
-- session-model-identity-verification
-- consult-tier-declaration
-- hotfix-agent-definition
-- delegation-kit-value-audit
-- delegation-kit-tier-brevity
 
 ## Lessons Learned
