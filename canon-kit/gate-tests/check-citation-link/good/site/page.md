@@ -23,6 +23,10 @@ kit/SPEC.md §A fenced citation
 <!-- citation-link-exempt: a quoted directive line the fixture shows as prose -->
 contract: kit/SPEC.md §Valved
 
+<!-- roster:begin -->
+An emitter wrote kit/SPEC.md §A generated citation here.
+<!-- roster:end -->
+
 ## Choosing a profile
 
 Here kit/SPEC.md §Requirements, then kit/SPEC.md §Requirements again.

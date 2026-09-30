@@ -118,18 +118,30 @@ struct Scan {
 }
 
 // spec: canon-kit/SPEC.md §check-citation-link — the reader's paragraphs over prose only: the
-// front-matter block and HTML comments are blanked in place, so every line keeps its number
+// front-matter block, HTML comments and generated regions, markers included, are blanked in place,
+// so every line keeps its number
 fn prose_only(text: &str) -> String {
     let mut out: Vec<String> = Vec::new();
     let raw: Vec<&str> = text.lines().collect();
     let mut front = raw.first().map(|l| l.trim_end() == "---").unwrap_or(false);
     let mut fence = false;
     let mut comment = false;
+    let mut gen = false;
     for (i, line) in raw.iter().enumerate() {
         if front {
             if i > 0 && line.trim_end() == "---" {
                 front = false;
             }
+            out.push(String::new());
+            continue;
+        }
+        if gen {
+            gen = !spec::is_gen_marker(line, ":end");
+            out.push(String::new());
+            continue;
+        }
+        if !comment && !fence && spec::is_gen_marker(line, ":begin") {
+            gen = true;
             out.push(String::new());
             continue;
         }
@@ -368,6 +380,12 @@ mod tests {
     fn front_matter_comments_fences_placeholders_and_code_spans_are_not_citations() {
         let page = "---\ntitle: a.md §Rules\n---\n<!-- a.md §Rules -->\n```\na.md §Rules\n```\nA §<heading> and `CANON §X` and § alone.\n";
         assert!(scan(page).findings.is_empty());
+    }
+
+    #[test]
+    fn a_generated_region_is_held_out_and_its_numbering_kept() {
+        let page = "<!-- roster:begin -->\na.md §Rules\n<!-- roster:end -->\nb.md §Rules\n";
+        assert_eq!(arms(page), vec![(4, Arm::Unlinked)]);
     }
 
     // spec: canon-kit/SPEC.md §check-citation-link — the exit-2 path, which a `bad/` fixture held

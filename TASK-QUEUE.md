@@ -8,18 +8,6 @@
 
 ## New Features
 
-### citation-link-root-docs-range
-
-[spec: SPEC-citation-link-root-docs.md]
-
-`check-citation-link`'s `CANON_KIT_CITATION_LINK_PAGES` binding (`docs/*.md`, `docs/*/index.md`, `*/README.md`, `README.md`) leaves out the other root docs GitHub renders; TRAJECTORY.md carries plain section citations, one written unlinked by the docs-ux build batch itself. With it, each ruling could be anchored by a header whose slug is its primary ruling name, so a citation links `TRAJECTORY.md#<name>` as queue slugs do; no tracked file cites that file by anchor today, citers using the ruling name the ruling-staleness probe sweeps.
-
-**Deliverable:** the binding widened to GitHub-rendered root docs (TRAJECTORY.md, ROADMAP.md and the like), excluding agent-loaded surfaces such as CLAUDE.md where links grow the always-loaded meter; and the ruling-header option costed with it, never as its own unit (operator direction, 2026-09-27, lead session). Against the headers: the record format is lifecycle-kit's, a ruling may declare several names while a header carries one slug, and the file shrinks toward empty.
-
-**Selected 2026-09-30 for canon-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, landing before [canon-kit-value-audit](#canon-kit-value-audit) rules `check-citation-link`.
-
-**Cost while deferred:** a root-doc reader hunts cited sections by hand. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead, on an operator direction to file rather than widen mid-iteration, with an addendum; promoted 2026-09-27 at its close: →fix fails because the widening is a ruled deferral. Re-verified: `scripts/canon-config.knobs` binds the four globs, and TRAJECTORY.md lines 4, 12 and 18 carry `§`. Owner lookup: `citation-link`, `CITATION_LINK_PAGES`, `TRAJECTORY.md#` in this file — none; owner canon-kit/SPEC.md §check-citation-link, with lifecycle-kit/SPEC.md §The ruling-staleness probe.
-
 ### absence-statement-gate-arms
 
 [spec: SPEC-absence-arms.md]
@@ -106,7 +94,7 @@ canon-kit/SPEC.md's amendment-family sections under [spec-brevity-residue](#spec
 
 [gate-customer-value-audit](#gate-customer-value-audit)'s canon-kit slice: the gates canon-kit ships, 44 `.gate` descriptors (27 zero-config and 11 on-surface by install disposition), audited for customer value and configurability under gate-sdk/SPEC.md §Consumer payload's rule. canon-kit is the companion's `prose` tier, which every companion install exposes.
 
-**Deliverable:** each gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated. `check-docs-cmd`, `check-citation-link` and `check-prose-tells` are ruled after `removed-knob-docs-cmd-valve`, [citation-link-root-docs-range](#citation-link-root-docs-range) and [absence-statement-gate-arms](#absence-statement-gate-arms) land, since those change them, and `check-measured-claim` and `check-unmarked-claim` after [baseline-row-prose-coupling-gate](#baseline-row-prose-coupling-gate) lands, since its baseline claims ride them; [companion-install-tier](#companion-install-tier) reads the verdicts after.
+**Deliverable:** each gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated. `check-docs-cmd`, `check-citation-link` and `check-prose-tells` are ruled after `removed-knob-docs-cmd-valve`, `citation-link-root-docs-range` and [absence-statement-gate-arms](#absence-statement-gate-arms) land, since those change them, and `check-measured-claim` and `check-unmarked-claim` after [baseline-row-prose-coupling-gate](#baseline-row-prose-coupling-gate) lands, since its baseline claims ride them; [companion-install-tier](#companion-install-tier) reads the verdicts after.
 
 **Cost while deferred:** the parent's cost, for this kit. Filed 2026-09-30 as a split at canon-kit-value-pass' scope. Part of the operator's selection of the set, direction 2026-09-30, lead-relayed (not a ruling).
 
@@ -1537,5 +1525,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 ## Done
 
 - removed-knob-docs-cmd-valve
+- citation-link-root-docs-range
 
 ## Lessons Learned

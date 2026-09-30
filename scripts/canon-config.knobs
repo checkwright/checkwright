@@ -77,11 +77,17 @@ CANON_KIT_RESTATEMENT_PAGES[] = docs/*/index.md
 CANON_KIT_PAGE_REPEAT_PAGES[] = docs/*.md
 CANON_KIT_PAGE_REPEAT_PAGES[] = docs/*/index.md
 
-# comment-tier-exempt: the hand-authored pages whose section citations are links (docs/site-architecture.md §Page-authoring rules): the site pages, the front door and the top-level READMEs; the dated posts and the generated mirrors stay out
+# comment-tier-exempt: the hand-authored pages whose section citations are links (docs/site-architecture.md §Page-authoring rules): the site pages, the front door, the top-level READMEs and the other root documents GitHub renders; CLAUDE.md and the queue stay out as agent-loaded working surfaces, where links grow every session's read, and the dated posts and generated mirrors stay out
 CANON_KIT_CITATION_LINK_PAGES[] = docs/*.md
 CANON_KIT_CITATION_LINK_PAGES[] = docs/*/index.md
 CANON_KIT_CITATION_LINK_PAGES[] = */README.md
 CANON_KIT_CITATION_LINK_PAGES[] = README.md
+CANON_KIT_CITATION_LINK_PAGES[] = CONTRIBUTING.md
+CANON_KIT_CITATION_LINK_PAGES[] = SECURITY.md
+CANON_KIT_CITATION_LINK_PAGES[] = CODE_OF_CONDUCT.md
+CANON_KIT_CITATION_LINK_PAGES[] = RELEASING.md
+CANON_KIT_CITATION_LINK_PAGES[] = TRAJECTORY.md
+CANON_KIT_CITATION_LINK_PAGES[] = ROADMAP.md
 
 # comment-tier-exempt: this repo's measured-claim oracle and the surface its markers are read from — the keys and the facts behind them are consumer config for the same provenance-seam reason the transport and payload vocabularies are, and the surface is the governed manifest set widened by the stage-skill shims, which carry governed prose no other surface reaches (the prose surface excludes them by an ownership decision about copy shape, which is not the ownership this gate's rule needs), and by the work queue, which takes the marker without taking the manifest tier's bare-cardinal ban (canon-kit/SPEC.md §check-manifest-count)
 CANON_KIT_MEASURED_CLAIMS_CMD[] = bash
