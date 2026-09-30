@@ -108,6 +108,18 @@ canon-kit/SPEC.md's sections this iteration's features edit or re-judge, under [
 
 ## Deferred
 
+### spec-pointer-bare-section-mark
+
+[cost: event/low] [surface: canon-kit]
+
+`check-spec-pointer`'s unqualified prose-citation form reads a bare `§N` (or `§2.1`) in adopter prose as a heading citation and reds "§heading in no governed file", under `## 3. Terms` as under `## Terms`, for documents that use `§` as a section-number mark. Operator direction 2026-10-01, lead-relayed (not a `/consult` ruling): state the limit, file the narrowing.
+
+**Inferred, not run:** how many adopter documents carry a bare `§N` outside legal-style text.
+
+**Deliverable:** a fragment opening with a digit, a bare section number, never fires in the unqualified form (native/src/gates/spec_pointer.rs, the fragment-opening rule), with a `good/` fixture line and canon-kit/SPEC.md §check-spec-pointer's carve-out sentence and honest limit updated.
+
+**Cost while deferred:** a `prose` or `full` install over a document citing `§3` reds a defect-class gate on content that is not wrong, which the install-disposition amendment states as the gate's honest limit. Filed 2026-10-01 at install-disposition-pass's align: the probe reddened both heading shapes; →fix fails because narrowing changes the gate's asserted behavior, an envelope change.
+
 ### foreign-vendor-critique
 
 [cost: event/low] [surface: delegation-kit]
