@@ -774,6 +774,26 @@ canon-kit's `zero-config` members read surfaces the adopter authors. gate-sdk/SP
 
 **Cost while deferred:** an adopter's first battery may red on its own prose and scripts at install. Filed 2026-09-30 to the gap inbox by canon-kit-value-pass' build; promoted at its close: →fix fails because re-judging 26 members changes which gates `init` registers, an adopter-visible install change, →forward because no ruling is owed. Re-verified: `# install: zero-config` on 26 of canon-kit's `checks/*.gate`, `check-comment-tier` among them, and the definition's sentence. Owner lookup: `zero-config`, `install disposition` in this file — [gate-customer-value-audit](#gate-customer-value-audit), DISTINCT (a gate's place in the payload, not its registration); owner gate-sdk/SPEC.md §The install disposition.
 
+### release-step-number-cites
+
+[cost: event/low] [surface: RELEASING.md]
+
+RELEASING.md's numbered procedure steps are cited by position, the shape doctrine-kit/DOCTRINE.md Derivation-first names: inside RELEASING.md itself, and from outside it as "RELEASING.md step N" in gate-sdk/SPEC.md, installer/SPEC.md (three sites), docs/site-architecture.md, .claude/commands/close.md, `native/src/gates/install_pin.rs`'s two printed remedies and scripts/guard-config.knobs. Every number is correct today, since the list was re-linked, not reordered.
+
+**Deliverable:** each citation names the step by its bold title or a heading, never its number.
+
+**Cost while deferred:** a step inserted or reordered in RELEASING.md mis-points about fifteen citations, several in shipped kit SPECs and a gate's printed remedy. Filed 2026-09-30 to the gap inbox by canon-kit-value-pass' close positional-reference sweep, outside its range corpus; promoted 2026-09-30 at the next iteration's scope: →fix fails because the sweep reaches a gate's printed remedy, owing the native build and the battery. Re-verified: a grep for `RELEASING.md step <n>` hits every site named above. Owner lookup: `positional`, `step number`, `RELEASING.md step` in this file — none; owner RELEASING.md, with doctrine-kit/DOCTRINE.md Derivation-first. Surface also installer.
+
+### prose-tells-absence-knobs
+
+[cost: event/low] [surface: canon-kit]
+
+`check-prose-tells` assertion G bakes its two phrase lists with no knob: `ABSENCE_PLACEHOLDERS` (none, n/a, nothing, a hyphen, an em dash) and `ABSENCE_OPENERS` (none, nothing, there is no, there are no, not applicable, n/a) in `native/src/gates/prose_tells.rs`. The sibling queue-kit arm already takes `QUEUE_KIT_PLACEHOLDER_TOKENS`, and a consumer's absence idiom (nil, tbd, no known issues, a non-English token) keeps G's contract true under another list, so doctrine-kit/DOCTRINE.md Policy-as-choice reaches it; `CANON_KIT_PROSE_TELL_ABSENCE_GLOBS` binds which files, not which phrases.
+
+**Deliverable:** `CANON_KIT_PROSE_TELL_ABSENCE_TOKENS` and `CANON_KIT_PROSE_TELL_ABSENCE_OPENERS`, bundled vocabularies with their `_EXTRA`, defaulting to the current lists, empty turning that half off, named in canon-kit/SPEC.md §check-prose-tells.
+
+**Cost while deferred:** an adopter binding G meets only this repo's absence idiom. Filed 2026-09-30 to the gap inbox by canon-kit-value-pass' close baked-calibration sweep; promoted 2026-09-30 at the next iteration's scope: →fix fails because two knobs are new governed names owing an amendment. Re-verified: both constants at `native/src/gates/prose_tells.rs` lines 345 and 349. Owner lookup: `ABSENCE_`, `prose-tells`, `absence idiom` in this file — none; owner canon-kit/SPEC.md §check-prose-tells.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
