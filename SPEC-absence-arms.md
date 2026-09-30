@@ -129,6 +129,7 @@ The digest is unchanged, so no agent file's digest bullet moves.
 - `docs/canon-kit/SPEC.md`, `docs/queue-kit/SPEC.md` and `docs/doctrine-kit/DOCTRINE.md`: the generated mirrors, regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write` (deltas 2, 4 and 5).
 - `scripts/canon-config.knobs` and `.workflow/audit-roster.txt` (delta 6).
 - `.workflow/release-declarations.md` (delta 7).
+- `.workflow/prose-bound-ceiling.txt`: the `canon-kit/SPEC.md`, `queue-kit/SPEC.md` and `doctrine-kit/DOCTRINE.md` rows, re-stamped to the counts `check-prose-bounds` prints if deltas 2, 4 and 5 move them (deltas 2, 4 and 5).
 
 The roster came from `grep -n 'PROSE_TELL_GLOBS' canon-kit/SPEC.md native/src/gates/mod.rs native/src/knobs/canon_kit.rs canon-kit/checks/check-prose-tells.gate`, `grep -n 'QUEUE_KIT_PROSE_LEADS' queue-kit/SPEC.md native/src/knobs/queue_kit.rs`, and `grep -n -i 'absence' doctrine-kit/DOCTRINE.md .workflow/audit-roster.txt`.
 

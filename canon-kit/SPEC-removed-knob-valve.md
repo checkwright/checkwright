@@ -80,6 +80,7 @@ This lands with delta 1 or after it. Alone it reds `check-docs-cmd` on the 14 fi
 - `docs/canon-kit/SPEC.md`: the generated mirror, regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write` (deltas 2 and 3).
 - `scripts/canon-config.knobs`: the exclude and its comment (delta 4).
 - `.workflow/release-declarations.md`: the Behavior changes bullet (delta 5).
+- `.workflow/prose-bound-ceiling.txt`: the `canon-kit/SPEC.md` row, re-stamped to the count `check-prose-bounds` prints if deltas 2 and 3 move it (deltas 2 and 3).
 
 The roster came from `git grep -n -e CANON_KIT_MDREF_EXCLUDE -e 'History is admitted' -e 'also admit a retired'` over the tracked tree, and from `grep -n 'fn \|help' native/src/gates/docs_cmd.rs`.
 

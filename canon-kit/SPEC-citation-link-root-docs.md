@@ -70,6 +70,7 @@ The TRAJECTORY.md edits touch its contract prose and no ruling, the any-session 
 - `scripts/canon-config.knobs`: the binding and its comment (delta 2).
 - `RELEASING.md`, `CONTRIBUTING.md`, `SECURITY.md`, `TRAJECTORY.md`, `ROADMAP.md`: the conversions (delta 3). ROADMAP.md's edit is to the hand-authored intro, outside the marker block `check-roadmap-fresh` compares.
 - `.workflow/release-declarations.md`: the Behavior changes bullet (delta 4).
+- `.workflow/prose-bound-ceiling.txt`: the `canon-kit/SPEC.md` row, re-stamped to the count `check-prose-bounds` prints if delta 1 moves it (delta 1).
 
 The roster came from the widened scratch run above, from `git grep -n CITATION_LINK_PAGES` over the tracked tree, and from `grep -n 'prose_only\|is_gen_marker' native/src/gates/citation_link.rs native/src/spec.rs`.
 
