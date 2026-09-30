@@ -1448,14 +1448,4 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 
 ## Done
 
-- removed-knob-docs-cmd-valve
-- citation-link-root-docs-range
-- absence-statement-gate-arms
-- baseline-row-prose-coupling-gate
-- intra-file-pendency-contradiction-scan
-- spec-mirror-citation-links
-- positional-reference-rule
-- canon-kit-amendment-brevity
-- canon-kit-value-audit
-
 ## Lessons Learned
