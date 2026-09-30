@@ -230,6 +230,18 @@ fallthrough	grep -rn foo src | head &
 # '|&' pipes stderr too and backgrounds nothing
 fallthrough	make build |& tail -5
 
+# rule `commit_only_paths` — a `git add` then a commit of the whole index (no path, or -a/-i) is
+#           steered to the only-paths form; a commit naming its paths, a quoted mention
+#           and a lone commit or add pass
+block	git add tracked.md && git commit -m x
+block	git add -A; git commit -m x
+block	git add tracked.md && git commit -am x
+block	git add tracked.md && git commit -i tracked.md -m x
+fallthrough	git add scratch.txt && git commit -o scratch.txt tracked.md -m x
+fallthrough	git add scratch.txt && git commit scratch.txt -m x
+fallthrough	git add tracked.md && git commit -m 'git commit -a' -- tracked.md
+fallthrough	git commit -m x
+
 # rule `truncate_scratch` — `: > file` truncation auto-allowed iff every target is gitignored
 allow	: > scratch.txt
 fallthrough	: > tracked.txt

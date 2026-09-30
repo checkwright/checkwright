@@ -26,6 +26,174 @@ pub fn git_rewrite(ctx: &Ctx) -> Decided {
     Ok(Some(Verdict::Advise("re-verify volatile git state before this history rewrite (DOCTRINE.md: Re-verify volatile state before a git history rewrite): confirm HEAD with 'git log --oneline -3' before an amend or squash; after a 'git reset --soft' re-stage and verify staged content with 'git show :<path>' before committing (the soft reset keeps the old index snapshot); carry the message in the command ('-m', or '-F -' from a heredoc) — a scratch message file may be another session's, and a leftover lands the wrong message with exit 0; if you must use a file, write it in this same command and read the result back with 'git log -1 --format=%B'; and rewrite the message when amending so it states the combined change.".to_string())))
 }
 
+// spec: guard-kit/SPEC.md §The rule roster — rule `commit_only_paths`'s long options of `git commit`,
+// each resolved by git's unambiguous-prefix rule; the first group takes a separate value.
+const COMMIT_VALUED: &[&str] = &[
+    "message",
+    "file",
+    "reuse-message",
+    "reedit-message",
+    "template",
+    "author",
+    "date",
+    "fixup",
+    "squash",
+    "cleanup",
+    "trailer",
+    "pathspec-from-file",
+];
+const COMMIT_FLAGS: &[&str] = &[
+    "all",
+    "include",
+    "only",
+    "quiet",
+    "verbose",
+    "reset-author",
+    "short",
+    "branch",
+    "porcelain",
+    "long",
+    "null",
+    "signoff",
+    "verify",
+    "allow-empty",
+    "allow-empty-message",
+    "edit",
+    "amend",
+    "post-rewrite",
+    "pathspec-file-nul",
+    "untracked-files",
+    "gpg-sign",
+    "dry-run",
+    "status",
+    "patch",
+    "interactive",
+];
+
+enum CommitLong {
+    Valued(&'static str),
+    Flag(&'static str),
+}
+
+fn commit_long(name: &str) -> Option<CommitLong> {
+    let exact = COMMIT_VALUED.iter().map(|n| CommitLong::Valued(n)).chain(COMMIT_FLAGS.iter().map(|n| CommitLong::Flag(n)));
+    let full = |o: &CommitLong| match o {
+        CommitLong::Valued(n) | CommitLong::Flag(n) => *n,
+    };
+    let mut hits: Vec<CommitLong> = Vec::new();
+    for o in exact {
+        if full(&o) == name {
+            return Some(o);
+        }
+        if full(&o).starts_with(name) {
+            hits.push(o);
+        }
+    }
+    (hits.len() == 1).then(|| hits.remove(0))
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — rule `commit_only_paths`'s test on a commit's words: true
+// when it takes the whole index, `None` where a word cannot be read without guessing.
+fn commits_whole_index(args: &[String]) -> Option<bool> {
+    let (mut paths, mut whole, mut skip, mut ends) = (false, false, false, false);
+    let mut i = 0usize;
+    while i < args.len() {
+        let w = args[i].replace('\\', "");
+        i += 1;
+        if std::mem::take(&mut skip) {
+            continue;
+        }
+        if ends {
+            paths = true;
+            continue;
+        }
+        if matches!(w.as_str(), "<<" | "<<-" | "<<<" | "<" | ">" | ">>" | "&>")
+            || (w.len() == 2 && w.as_bytes()[0].is_ascii_digit() && w.ends_with('>'))
+        {
+            skip = true;
+            continue;
+        }
+        let t = w.trim_start_matches(|c: char| c.is_ascii_digit());
+        if t.starts_with('<') || t.starts_with('>') || t.starts_with("&>") {
+            continue;
+        }
+        if w == "--" {
+            ends = true;
+            continue;
+        }
+        if let Some(long) = w.strip_prefix("--") {
+            let (name, attached) = match long.split_once('=') {
+                Some((n, _)) => (n, true),
+                None => (long, false),
+            };
+            if name.starts_with("no-") {
+                continue;
+            }
+            match commit_long(name)? {
+                CommitLong::Valued(n) => {
+                    if n == "pathspec-from-file" {
+                        paths = true;
+                    }
+                    skip = !attached;
+                }
+                CommitLong::Flag("all" | "include") => whole = true,
+                CommitLong::Flag(_) => {}
+            }
+            continue;
+        }
+        if let Some(bundle) = w.strip_prefix('-').filter(|b| !b.is_empty()) {
+            for (k, letter) in bundle.char_indices() {
+                match letter {
+                    'a' | 'i' => whole = true,
+                    'o' | 'q' | 'v' | 's' | 'n' | 'e' | 'z' | 'p' => {}
+                    'u' | 'S' => break,
+                    'm' | 'F' | 'C' | 'c' | 't' => {
+                        skip = k + 1 == bundle.len();
+                        break;
+                    }
+                    _ => return None,
+                }
+            }
+            continue;
+        }
+        paths = true;
+    }
+    Some(whole || !paths)
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — rule `commit_only_paths`: a `git add` and, after it, a
+// commit of the whole index, in one call.
+pub fn commit_only_paths(ctx: &Ctx) -> Decided {
+    let c = ctx.cmd();
+    let live = ctx.view(c, SqHdq)?;
+    let declines = match ctx.shell() {
+        Shell::Bash => has_expansion(&live),
+        Shell::PowerShell => live.contains('$'),
+    };
+    if declines {
+        return Ok(None);
+    }
+    let s = ctx.view(c, SqDqHd)?;
+    let dsegs = ctx.dequoted(c)?.map(|v| ctx.segments(&v)).unwrap_or_default();
+    let mut added = false;
+    for (i, seg) in ctx.segments(&s).iter().enumerate() {
+        let src = dsegs.get(i).filter(|d| !d.is_empty()).map_or(seg.as_str(), String::as_str);
+        let cmdseg = command_word(src);
+        if head_word(&cmdseg) != "git" {
+            continue;
+        }
+        let Some(ws) = git_subcommand(&cmdseg, GitWalk::Args) else { continue };
+        match ws.first().map(String::as_str) {
+            Some("add") => added = true,
+            Some("commit") if added && commits_whole_index(&ws[1..]) == Some(true) => {
+                return block("don't stage with 'git add' and then commit the whole index in one call — a pathless 'git commit', or one carrying -a or -i, commits everything staged, so a path a concurrent session staged in this shared index rides your commit under your message. Name the paths: 'git commit -o <path>… -m '<msg>'' commits exactly those paths whatever else is staged; a new file is 'git add'ed first, in this same call or its own. A lone pathless 'git commit' is untouched. If you genuinely mean the whole index, run it yourself with !<command>.");
+            }
+            _ => {}
+        }
+    }
+    Ok(None)
+}
+
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `rm_tracked`'s test, a block for it and a
 // predicate for rule `bounded_wait`'s arm (B): the first refusal, or none.
 pub fn rm_tracked_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<String>, Fault> {

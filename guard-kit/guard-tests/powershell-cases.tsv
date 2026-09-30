@@ -32,6 +32,10 @@ fallthrough	Start-Process -wa pwsh
 fallthrough	Start-Process pwsh -WhatIf
 fallthrough	Start-Job { Start-Sleep 60 }
 
+# rule `commit_only_paths` — a git add then a pathless commit; a commit naming its path passes
+block	git add tracked.md; git commit -m x
+fallthrough	git add tracked.md; git commit -o tracked.md -m x
+
 # rule `rm_tracked` — the deletion commands, their parameters, and the git rm force arm
 block	Remove-Item tracked.md
 block	rm tracked.md

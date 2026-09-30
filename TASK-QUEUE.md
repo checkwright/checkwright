@@ -8,18 +8,6 @@
 
 ## New Features
 
-### one-motion-commit-race-remains-open
-
-[spec: SPEC-commit-only-paths.md] [recurrence: 2026-09-25]
-
-CLAUDE.md offers "stage and commit in one motion" as the shared-index remedy, and the filing measured that `git add … && git commit` still races a concurrent stage; `git commit -o <paths>` (the only-paths form) closes it and is steered nowhere.
-
-**Deliverable:** the always-loaded line names the only-paths form, the guard steers `add`-then-`commit` to it, and the delegation protocol's shared-index bullet agrees.
-
-**Cost while deferred:** every session reads a remedy that does not close the race it is offered for. Filed 2026-08-27; returned from the icebox 2026-09-25 by consult, the line re-read.
-
-**Selected 2026-09-30 for guard-kit-steering, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it. Re-verified: no guard rule, CLAUDE.md line or delegation-kit surface names `git commit -o`.
-
 ### gate-output-contributor-door
 
 [spec: SPEC-gate-output-door.md] [recurrence: 2026-09-27]
@@ -1521,5 +1509,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - scratch-auto-allow-no-decoration-steer
 - consumer-guard-rule-coverage
 - plugin-guards-subdir-launch
+- one-motion-commit-race-remains-open
 
 ## Lessons Learned
