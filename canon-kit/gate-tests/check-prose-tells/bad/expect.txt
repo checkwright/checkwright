@@ -1,3 +1,4 @@
 mechanical AI-prose tell
 absence.md:3: [G] absence section "Limitations" (its whole body is one negative-existential sentence)
 absence.md:7: [G] absence section "Deprecations" (its whole body is a placeholder)
+absence.md:11: [G] absence section "Open questions" (its whole body is a placeholder)

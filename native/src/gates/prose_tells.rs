@@ -340,13 +340,39 @@ impl spec::ProseSink for Sink<'_> {
 
 const EXEMPT: &str = "prose-tell-exempt:";
 
-// spec: canon-kit/SPEC.md §check-prose-tells — assertion G's lone tokens, compared
-// case-insensitively once the line is reduced
-const ABSENCE_PLACEHOLDERS: &[&str] = &["none", "n/a", "nothing", "-", "—"];
+// spec: canon-kit/SPEC.md §check-prose-tells — assertion G's two vocabularies, each lowercased
+// once; an empty set turns its half of G off
+struct Absence {
+    tokens: Vec<String>,
+    openers: Vec<String>,
+}
 
-// spec: canon-kit/SPEC.md §check-prose-tells — assertion G's negative-existential openers, each
-// ending at a word boundary; a bare `No` opens one only with a word after it
-const ABSENCE_OPENERS: &[&str] = &["none", "nothing", "there is no", "there are no", "not applicable", "n/a"];
+impl Absence {
+    fn new(tokens: Vec<String>, openers: Vec<String>) -> Self {
+        let low = |v: Vec<String>| -> Vec<String> {
+            v.into_iter().filter(|s| !s.is_empty()).map(|s| s.to_lowercase()).collect()
+        };
+        Absence { tokens: low(tokens), openers: low(openers) }
+    }
+
+    fn is_placeholder(&self, line: &str) -> bool {
+        let s = strip_emphasis(strip_marker(line));
+        let s = strip_emphasis(s.strip_suffix('.').unwrap_or(s)).to_lowercase();
+        self.tokens.contains(&s)
+    }
+
+    // spec: canon-kit/SPEC.md §check-prose-tells — a member ends at a non-alphanumeric character,
+    // and one ending in a space and `…` needs a word after the part before the `…`
+    fn opens(&self, sentence: &str) -> bool {
+        let lc = strip_emphasis(sentence).to_lowercase();
+        self.openers.iter().any(|o| match o.strip_suffix('…').filter(|p| p.ends_with(' ')) {
+            Some(head) => lc
+                .strip_prefix(head)
+                .is_some_and(|r| r.chars().next().is_some_and(|c| c.is_alphanumeric())),
+            None => lc.starts_with(o.as_str()) && !lc[o.len()..].chars().next().is_some_and(|c| c.is_alphanumeric()),
+        })
+    }
+}
 
 fn strip_marker(s: &str) -> &str {
     let t = s.trim();
@@ -359,23 +385,6 @@ fn strip_marker(s: &str) -> &str {
 
 fn strip_emphasis(s: &str) -> &str {
     s.trim_matches(|c| c == '*' || c == '_').trim()
-}
-
-fn is_absence_placeholder(line: &str) -> bool {
-    let s = strip_emphasis(strip_marker(line));
-    let s = strip_emphasis(s.strip_suffix('.').unwrap_or(s));
-    ABSENCE_PLACEHOLDERS.iter().any(|t| t.eq_ignore_ascii_case(s))
-}
-
-fn opens_absence(sentence: &str) -> bool {
-    let lc = strip_emphasis(sentence).to_lowercase();
-    let bounded = |o: &str| {
-        lc.starts_with(o) && !lc[o.len()..].chars().next().is_some_and(|c| c.is_alphanumeric())
-    };
-    ABSENCE_OPENERS.iter().any(|o| bounded(o))
-        || lc
-            .strip_prefix("no ")
-            .is_some_and(|r| r.chars().next().is_some_and(|c| c.is_alphanumeric()))
 }
 
 #[derive(Default)]
@@ -398,11 +407,11 @@ impl AbsenceSection {
         self.body.push(line.to_string());
     }
 
-    fn verdict(&self) -> Option<&'static str> {
+    fn verdict(&self, vocab: &Absence) -> Option<&'static str> {
         if self.valved || self.code || self.body.is_empty() {
             return None;
         }
-        if self.body.len() == 1 && is_absence_placeholder(&self.body[0]) {
+        if self.body.len() == 1 && vocab.is_placeholder(&self.body[0]) {
             return Some("a placeholder");
         }
         if self.units != 1 {
@@ -412,7 +421,7 @@ impl AbsenceSection {
         let joined = joined.join(" ");
         let spans = spec::sentence_spans(&joined);
         match spans.as_slice() {
-            [(s, e)] if opens_absence(&joined[*s..*e]) => Some("one negative-existential sentence"),
+            [(s, e)] if vocab.opens(&joined[*s..*e]) => Some("one negative-existential sentence"),
             _ => None,
         }
     }
@@ -420,12 +429,12 @@ impl AbsenceSection {
 
 // spec: canon-kit/SPEC.md §check-prose-tells — assertion G: a section is a heading of any level
 // to the next, and its body is its non-blank lines less comment-only lines and generated regions
-fn g_absence(file: &str, text: &str) -> Vec<String> {
+fn g_absence(file: &str, text: &str, vocab: &Absence) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     let raw: Vec<&str> = text.lines().collect();
     let mut flush = |sec: Option<AbsenceSection>| {
         if let Some(s) = sec {
-            if let Some(what) = s.verdict() {
+            if let Some(what) = s.verdict(vocab) {
                 out.push(format!(
                     "{}:{}: [G] absence section \"{}\" (its whole body is {})",
                     file, s.ln, s.title, what
@@ -581,9 +590,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
         sink.flush_file(f);
         findings.extend(sink.out);
     }
+    let vocab = Absence::new(
+        crate::spec::vocabulary("CANON_KIT_PROSE_TELL_ABSENCE_TOKENS", "CANON_KIT_PROSE_TELL_ABSENCE_TOKENS_EXTRA")?,
+        crate::spec::vocabulary("CANON_KIT_PROSE_TELL_ABSENCE_OPENERS", "CANON_KIT_PROSE_TELL_ABSENCE_OPENERS_EXTRA")?,
+    );
     let mut absent: Vec<String> = Vec::new();
     for f in &absence {
-        absent.extend(g_absence(f, &spec::read_text(Path::new(f))?));
+        absent.extend(g_absence(f, &spec::read_text(Path::new(f))?, &vocab));
     }
 
     findings.retain(|l| !l.trim().is_empty());
@@ -661,8 +674,19 @@ mod tests {
         assert!(abbreviations(buf, "off").is_empty());
     }
 
+    fn words(v: &[&str]) -> Vec<String> {
+        v.iter().map(|s| s.to_string()).collect()
+    }
+
+    fn bundled() -> Absence {
+        Absence::new(
+            words(&["none", "n/a", "nothing", "-", "—"]),
+            words(&["none", "nothing", "there is no", "there are no", "not applicable", "n/a", "no …"]),
+        )
+    }
+
     fn absent_lines(text: &str) -> Vec<String> {
-        g_absence("f.md", text)
+        g_absence("f.md", text, &bundled())
             .iter()
             .map(|l| l.split(": ").next().unwrap_or("").to_string())
             .collect()
@@ -679,15 +703,29 @@ mod tests {
 
     #[test]
     fn a_placeholder_is_the_reduced_line_and_an_opener_ends_at_a_word() {
-        assert!(is_absence_placeholder("- None"));
-        assert!(is_absence_placeholder("**N/A**."));
-        assert!(is_absence_placeholder("—"));
-        assert!(is_absence_placeholder("1. nothing"));
-        assert!(!is_absence_placeholder("None yet"));
-        assert!(opens_absence("No known issues"));
-        assert!(opens_absence("*Nothing* applies"));
-        assert!(!opens_absence("Nonetheless it runs"));
-        assert!(!opens_absence("Notably it runs"));
-        assert!(!opens_absence("No"));
+        let v = bundled();
+        assert!(v.is_placeholder("- None"));
+        assert!(v.is_placeholder("**N/A**."));
+        assert!(v.is_placeholder("—"));
+        assert!(v.is_placeholder("1. nothing"));
+        assert!(!v.is_placeholder("None yet"));
+        assert!(v.opens("No known issues"));
+        assert!(v.opens("*Nothing* applies"));
+        assert!(!v.opens("Nonetheless it runs"));
+        assert!(!v.opens("Notably it runs"));
+    }
+
+    // spec: canon-kit/SPEC.md §check-prose-tells — an opener ending in a space and `…` needs a
+    // word after its head, and an empty set turns its half of G off
+    #[test]
+    fn an_ellipsis_member_needs_a_word_and_an_empty_set_is_off() {
+        let v = bundled();
+        assert!(v.opens("No changes."));
+        assert!(!v.opens("No-op builds are fast."));
+        assert!(!v.opens("No"));
+        let kein = Absence::new(Vec::new(), words(&["kein …"]));
+        assert!(kein.opens("Kein Eintrag."));
+        assert!(!kein.opens("No changes."));
+        assert!(!kein.is_placeholder("None"));
     }
 }

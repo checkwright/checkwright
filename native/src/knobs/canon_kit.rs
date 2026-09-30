@@ -170,6 +170,13 @@ pub const KIT: Kit = Kit {
         Row::scalar("CANON_KIT_SPEC_POINTER_TITLE_ONCE", "off"),
         Row::indexed("CANON_KIT_PROSE_TELL_GLOBS", &[]),
         Row::indexed("CANON_KIT_PROSE_TELL_ABSENCE_GLOBS", &[]),
+        Row::indexed("CANON_KIT_PROSE_TELL_ABSENCE_TOKENS", &["none", "n/a", "nothing", "-", "—"]),
+        Row::indexed("CANON_KIT_PROSE_TELL_ABSENCE_TOKENS_EXTRA", &[]),
+        Row::indexed(
+            "CANON_KIT_PROSE_TELL_ABSENCE_OPENERS",
+            &["none", "nothing", "there is no", "there are no", "not applicable", "n/a", "no …"],
+        ),
+        Row::indexed("CANON_KIT_PROSE_TELL_ABSENCE_OPENERS_EXTRA", &[]),
         Row::scalar("CANON_KIT_PROSE_TELL_EMDASH_MAX", "2"),
         Row::scalar("CANON_KIT_PROSE_TELL_CONTRAST_MAX", "1"),
         Row::scalar("CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES", "4"),

@@ -11,3 +11,7 @@ There is no network access. The widget reads only the files it is handed.
 <!-- roster:begin -->
 None.
 <!-- roster:end -->
+
+## Caching
+
+Nothing is cached between runs.
