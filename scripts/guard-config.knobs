@@ -28,6 +28,9 @@ GUARD_KIT_BREADTH_DECLARED[Bash(gh secret *)] = operator-ruled 2026-08-23 out of
 GUARD_KIT_CONSUMER_RULES_CMD[] = bash
 GUARD_KIT_CONSUMER_RULES_CMD[] = scripts/guard-rules.sh
 
+# spec: guard-kit/SPEC.md §Testing — this repo's rows for that command, a firing and a non-firing case per rule
+GUARD_KIT_CONSUMER_CASES = scripts/guard-rules-cases.tsv
+
 # spec: guard-kit/SPEC.md §Layout and configuration — this harness build carries no dedicated Glob or Grep tool in either session class, probed with a ToolSearch selecting both in a main and in a dispatched session, so guard-kit rules `find_glob` and `git_grep` stay inert and bare find and grep stay the working forms
 GUARD_KIT_SEARCH_TOOLS =
 

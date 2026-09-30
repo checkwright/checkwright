@@ -8,10 +8,10 @@ use crate::programs;
 use crate::walk;
 use std::path::Path;
 
-// spec: guard-kit/SPEC.md §Testing — one declared knob; the two omissions are ruled there,
-// `GUARD_KIT_LOG` because the arm overrides it and the guard's own knobs because the spawned
-// member reads them from the binary.
-pub const KNOBS: &[&str] = &["GATE_SDK_KIT_DIRS"];
+// spec: guard-kit/SPEC.md §Testing — the declared roster and its omissions are ruled there.
+pub const KNOBS: &[&str] = &["GATE_SDK_KIT_DIRS", "GUARD_KIT_CONSUMER_RULES_CMD", "GUARD_KIT_CONSUMER_CASES"];
+
+const CASES_KNOB: &str = "GUARD_KIT_CONSUMER_CASES";
 
 const NAME: &str = "run-guard-tests";
 
@@ -87,6 +87,8 @@ fn execute(args: &[String]) -> Result<i32, String> {
             NAME, cases, bg_cases, ps_cases, ps_bg_cases
         ));
     }
+    let kit_ran = tally.ran;
+    let consumer = consumer_lane(&mut tally)?;
     if tally.fails > 0 {
         println!(
             "{}: {}/{} case(s) failed",
@@ -94,11 +96,54 @@ fn execute(args: &[String]) -> Result<i32, String> {
         );
         return Ok(1);
     }
+    let consumer_note = consumer.map_or(String::new(), |(n, table)| format!(", and {} consumer case(s) from {}", n, table));
     println!(
-        "{}: ok ({} cases across the generic ruleset, the backgrounding arm, the PowerShell reader and its backgrounding arm)",
-        NAME, tally.ran
+        "{}: ok ({} cases across the generic ruleset, the backgrounding arm, the PowerShell reader and its backgrounding arm{})",
+        NAME, kit_ran, consumer_note
     );
     Ok(0)
+}
+
+// spec: guard-kit/SPEC.md §Testing — the consumer lane: the consumer's rows against its own
+// command, spawned directly from the arm's working directory; `None` where no table is named.
+fn consumer_lane(tally: &mut Tally) -> Result<Option<(usize, String)>, String> {
+    let table = crate::walk::knob_scalar(CASES_KNOB)?;
+    if table.is_empty() {
+        return Ok(None);
+    }
+    let argv = crate::guard::host::consumer_cmd()?;
+    let Some((head, rest)) = argv.split_first() else {
+        return Err(format!(
+            "{}: {} names {} but GUARD_KIT_CONSUMER_RULES_CMD is empty, so there is no command for its rows to drive",
+            NAME, CASES_KNOB, table
+        ));
+    };
+    if !Path::new(&table).is_file() {
+        return Err(format!("{}: {} names {}, which is not a readable file", NAME, CASES_KNOB, table));
+    }
+    let root = walk::cwd().map_err(|e| format!("{}: {}", NAME, e))?;
+    let bin = running_binary()?;
+    let program = programs::Program::consumer("GUARD_KIT_CONSUMER_RULES_CMD", head.as_str());
+    let args: Vec<&str> = rest.iter().map(String::as_str).collect();
+    let set = [("GATE_SDK_NATIVE_BIN".to_string(), bin)];
+    let env = proc::ChildEnv { set: &set, unset: &[], cwd: None };
+    let before = tally.ran;
+    for row in rows(&table, 2)? {
+        let cmd = substitute(&row[1], &root);
+        let done = proc::run_with_stdin_in(&program, &args, payload(&cmd, None, "Bash").as_bytes(), &env)?;
+        let out = String::from_utf8_lossy(done.streams().0).into_owned();
+        let got = classify(done.reported_code(), out.trim_end_matches('\n'));
+        tally.check(&row[0], &got, &format!("[consumer {}] {}", argv.join(" "), cmd));
+    }
+    Ok(Some((tally.ran - before, table)))
+}
+
+// spec: guard-kit/SPEC.md §Testing — the guard reads its knobs from the binary, and the
+// repo-relative default names nothing from inside the sandbox, so the running binary is exported
+fn running_binary() -> Result<String, String> {
+    let bin = std::env::current_exe()
+        .map_err(|e| format!("{}: cannot name the running binary: {}", NAME, e))?;
+    Ok(walk::normalize_abs(&bin.to_string_lossy()))
 }
 
 fn positional(args: &[String], at: usize, default: &str) -> String {
@@ -183,11 +228,7 @@ fn fields(line: &str, width: usize) -> Vec<String> {
 // spec: guard-kit/SPEC.md §Testing — one case, spawned from inside the sandbox with the same inputs
 // the harness supplied, driving the `--hook shell-guard` member directly with no front end.
 fn decide(root: &str, log: &str, cmd: &str, background: Option<&str>, tool: &str) -> Result<String, String> {
-    // spec: guard-kit/SPEC.md §Testing — the guard reads its knobs from the binary, and the
-    // repo-relative default names nothing from inside the sandbox, so the running binary is exported
-    let bin = std::env::current_exe()
-        .map_err(|e| format!("{}: cannot name the running binary: {}", NAME, e))?;
-    let bin = walk::normalize_abs(&bin.to_string_lossy());
+    let bin = running_binary()?;
     let set = [
         ("GUARD_KIT_LOG".to_string(), log.to_string()),
         ("GATE_SDK_NATIVE_BIN".to_string(), bin.clone()),

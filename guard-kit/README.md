@@ -62,8 +62,10 @@ Run this arm the same way:
 
 ```sh
 gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
-"$gates" --run-guard-tests    # decision-table over the generic ruleset
+"$gates" --run-guard-tests    # decision-table over the generic ruleset, then your own rules' table
 ```
+
+To test your own rules, name a table in `cases.tsv`'s grammar with `GUARD_KIT_CONSUMER_CASES`, a firing and a non-firing row per rule; the arm runs its rows against your rule command ([guard-kit/SPEC.md §Testing](SPEC.md#testing)).
 
 ## License
 

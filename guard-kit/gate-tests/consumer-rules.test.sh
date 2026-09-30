@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Direct test of the shell guard's consumer stage and of --guard-json, the toolkit a consumer rule
-# command calls. Each stage case drives the shell-guard member from a scratch checkout under a
+# Direct test of the shell guard's consumer stage, of --guard-json, the toolkit a consumer rule
+# command calls, and of --run-guard-tests' consumer lane. Each stage case drives the shell-guard member from a scratch checkout under a
 # sandbox knob file naming a scratch rule command, so the command's exit, stdout and stderr are the
 # case's input and the member's relay of them is what is asserted.
 #
@@ -181,9 +181,45 @@ checks=$((checks + 1))
 [[ ! -e "$tmp/friction.log" ]] || fail "control-byte-no-fallthrough" "a fall-through was logged: $(cat "$tmp/friction.log")"
 eq "control-byte-view" "$(printf '%s' "$forged" | "$BIN" --guard-json view sq dq hd | wc -c | tr -d ' ')" 0
 
+# --- the consumer lane of --run-guard-tests: the consumer's rows against its own command, spawned
+#     from the arm's working directory with the running binary exported; the kit tables are one
+#     inert row each, so the lane is what is measured
+cat >"$tmp/lane-rule.sh" <<'EOF'
+#!/usr/bin/env bash
+cmd="$("$GATE_SDK_NATIVE_BIN" --guard-json field .tool_input.command)" || exit 3
+case "$cmd" in
+    "at $(pwd -P)") exit 2 ;;
+    forbidden*) echo "lane: forbidden" >&2; exit 2 ;;
+esac
+exit 0
+EOF
+kit_rows="$tmp/kit-rows.tsv"
+printf 'fallthrough\tmake build\n' >"$kit_rows"
+printf 'fallthrough\tfalse\tmake build\n' >"$tmp/kit-bg-rows.tsv"
+lane() {  # $1=knob file — the arm from the scratch checkout, output to $tmp/out, the exit status echoed
+    (cd "$tmp/cwd" && env -u GATE_SDK_NATIVE_BIN GUARD_KIT_KNOB_FILE="$1" GATE_SDK_KIT_DIRS="$GATE_SDK_ROOT/../guard-kit" \
+        "$BIN" --run-guard-tests "$kit_rows" "$tmp/kit-bg-rows.tsv" "$kit_rows" "$tmp/kit-bg-rows.tsv" >"$tmp/out" 2>&1)
+    echo $?
+}
+printf 'GUARD_KIT_CONSUMER_RULES_CMD[] = bash\nGUARD_KIT_CONSUMER_RULES_CMD[] = %s\nGUARD_KIT_CONSUMER_CASES = lane.tsv\n' "$tmp/lane-rule.sh" >"$tmp/lane.knobs"
+printf 'block\tforbidden x\nfallthrough\tmake build\nblock\tat @ROOT@\n' >"$tmp/cwd/lane.tsv"
+eq "lane-green-status" "$(lane "$tmp/lane.knobs")" 0
+has "lane-green-count" "$tmp/out" "3 consumer case(s) from lane.tsv"
+printf 'fallthrough\tforbidden x\nblock\tmake build\n' >"$tmp/cwd/lane.tsv"
+eq "lane-mismatch-status" "$(lane "$tmp/lane.knobs")" 1
+has "lane-mismatch-unblocked" "$tmp/out" "want 'fallthrough', got 'block' -- [consumer bash $tmp/lane-rule.sh] forbidden x"
+has "lane-mismatch-blocked" "$tmp/out" "want 'block', got 'fallthrough' -- [consumer bash $tmp/lane-rule.sh] make build"
+printf 'GUARD_KIT_CONSUMER_RULES_CMD[] = bash\nGUARD_KIT_CONSUMER_RULES_CMD[] = %s\n' "$tmp/lane-rule.sh" >"$tmp/lane-off.knobs"
+eq "lane-off-status" "$(lane "$tmp/lane-off.knobs")" 0
+lacks "lane-off-count" "$tmp/out" "consumer case"
+printf 'GUARD_KIT_CONSUMER_CASES = lane.tsv\n' >"$tmp/lane-nocmd.knobs"
+eq "lane-nocmd-status" "$(lane "$tmp/lane-nocmd.knobs")" 2
+printf 'GUARD_KIT_CONSUMER_RULES_CMD[] = bash\nGUARD_KIT_CONSUMER_RULES_CMD[] = %s\nGUARD_KIT_CONSUMER_CASES = no-such.tsv\n' "$tmp/lane-rule.sh" >"$tmp/lane-nofile.knobs"
+eq "lane-nofile-status" "$(lane "$tmp/lane-nofile.knobs")" 2
+
 if [[ "$fails" -gt 0 ]]; then
     echo "consumer-rules.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "consumer-rules.test: ok ($checks assertions; the consumer command reads the payload bytes as received with the working directory and environment inherited, a block and a decision are relayed verbatim ahead of the generic ruleset, an empty result falls through to it, a fault — non-zero-non-2 exit, unparseable or non-object stdout, a command that cannot start — rides the ruleset's own answer and never silences it, an empty knob runs no stage; --guard-json field reads bytes verbatim and view prints the named view through the tool's reader, nothing for a tool no reader serves; a raw control byte is blocked by name before any rule)"
+echo "consumer-rules.test: ok ($checks assertions; the consumer command reads the payload bytes as received with the working directory and environment inherited, a block and a decision are relayed verbatim ahead of the generic ruleset, an empty result falls through to it, a fault — non-zero-non-2 exit, unparseable or non-object stdout, a command that cannot start — rides the ruleset's own answer and never silences it, an empty knob runs no stage; --guard-json field reads bytes verbatim and view prints the named view through the tool's reader, nothing for a tool no reader serves; a raw control byte is blocked by name before any rule; --run-guard-tests' consumer lane drives the consumer's rows against its command from the arm's working directory, reds a mismatch either way, is silent where no table is named, and refuses a table with no command or no file at exit 2)"
 exit 0

@@ -1,0 +1,20 @@
+# This repo's consumer-rule decision table — <expected-decision><TAB><command>,
+# run by --run-guard-tests against GUARD_KIT_CONSUMER_RULES_CMD
+# (guard-kit/SPEC.md §Testing, the consumer lane). A firing and a non-firing
+# case per rule in scripts/guard-rules.sh.
+
+# the hook bypass
+block	git commit --no-verify -m x
+block	git commit -n -m x
+fallthrough	git commit -m 'drop --no-verify from the docs'
+fallthrough	git commit -m x
+
+# the harness's per-session temporary path
+block	ls /tmp/claude-0/scratch
+fallthrough	ls .tmp/scratch
+
+# git clean over gitignored state
+block	git clean -fdx
+block	git clean -X -n
+fallthrough	git clean -fd
+fallthrough	git commit -F - <<'MSG'@NL@never run git clean -x here@NL@MSG
