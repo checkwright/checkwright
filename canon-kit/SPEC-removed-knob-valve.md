@@ -68,7 +68,7 @@ This lands with delta 1 or after it. Alone it reds `check-docs-cmd` on the 14 fi
   - Producer: `check-docs-cmd`'s rule, per run, on the generated pre-commit hook, `run-gates.sh` and CI.
   - Enabling config: any history valve. This repository sets `CANON_KIT_TEMPORAL_EXEMPT_PATHS` to `docs/posts/*` and `CANON_KIT_TEMPORAL_EXEMPT_SECTIONS` to `Out of scope`.
   - Consumer: the committing session through the output contract, which reads the clean line's admitted count and the red line's finding.
-  - The admission adds no field and no knob.
+  - The admission adds no knob; its one output field is the clean-line count above.
 - **Readers of the exclude.** Delta 4 empties `CANON_KIT_MDREF_EXCLUDE` in this repository. Each of its six readers (`git grep -n CANON_KIT_MDREF_EXCLUDE -- native/src`) either passes on the note or was probed above. Their red conditions are per-violation, never a count or a floor, so a wider corpus can only add findings, and the probe found none beyond B.
 - **Readers of B's code.** `check-docs-restatement-parity` reuses B's matcher `kit_knob_runs` and `check-action-run-path` reuses A's `invoked_tokens` (`git grep -n docs_cmd -- native/src`). The admission lives in the rule and not in either helper, so neither changes.
 

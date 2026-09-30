@@ -4,7 +4,7 @@
 
 **Out of range: the agent-loaded working surfaces.** CLAUDE.md is always loaded, so every link's target and anchor bytes grow the always-loaded meter on every session. TASK-QUEUE.md is the stage sessions' working file, read and machine-edited at every stage. Neither is read chiefly on GitHub.
 
-**One kit change comes with the widening.** ROADMAP.md is the first bound page carrying a generated region, the `roadmap:begin`…`roadmap:end` block its emitter writes. `check-citation-link` scans a generated region like hand prose, and a finding there is unfixable at the page, since the repair is to the emitter's source. `check-prose-tells` already holds generated regions out on that ground (§check-prose-tells), through the shared marker test (§The shared spec adapters), and this gate takes the same holdout.
+**One kit change comes with the widening.** Bound pages already carry generated regions (the README and docs-index blocks their emitters write), and ROADMAP.md adds the `roadmap:begin`…`roadmap:end` block its emitter writes. `check-citation-link` scans a generated region like hand prose, and a finding there is unfixable at the page, since the repair is to the emitter's source. The holdout also narrows the scan of the pages already bound, none of which holds a count or floor. `check-prose-tells` already holds generated regions out on that ground (§check-prose-tells), through the shared marker test (§The shared spec adapters), and this gate takes the same holdout.
 
 **Measured at authoring.** `bash gate-sdk/bin/run-gates.sh --only check-citation-link` over a copy of `scripts/canon-config.knobs` with the six documents added reds 31 arm-A findings: RELEASING.md 19, CONTRIBUTING.md 5, SECURITY.md 3, TRAJECTORY.md 3, ROADMAP.md 1 and CODE_OF_CONDUCT.md none. There are no arm-B findings. None of the cited headings carries an em dash (`grep -n` over the cited files' headings), so no anchor depends on `spec-mirror-citation-links`' slug delta. ROADMAP.md's one finding is its hand-authored intro, and its generated block carries no `§`.
 
@@ -55,9 +55,9 @@ The TRAJECTORY.md edits touch its contract prose and no ruling, the any-session 
 
 - **The holdout.**
   - Producer: `check-citation-link`'s page read, per page, per run.
-  - Enabling config: any bound page carrying a marker pair. This repository's ROADMAP.md does once delta 2 lands.
+  - Enabling config: any bound page carrying a marker pair, which this repository's README.md and docs pages already do.
   - Consumer: the committing session through the output contract. The region's lines never reach arms A and B.
-- **The widened corpus.** Delta 2 widens a corpus and narrows none. The gate reds per citation and holds no count or floor, so no reader's verdict turns on the corpus shrinking.
+- **The widened corpus.** Delta 2 widens a corpus; delta 1's holdout narrows the scan of pages with generated regions. The gate reds per citation and holds no count or floor, so no reader's verdict turns on the scan shrinking: the holdout removes emitter-owned lines, and a finding there was never fixable at the page.
   - The six documents are already in the manifest set. `check-md-refs` therefore already resolves each new link's target and anchor, and `check-spec-pointer` already resolves each citation.
   - `check-docs-page-repeat` binds its own pages knob, which delta 2 does not touch, so a link added here is never its finding.
   - `check-surface-ratchet` holds `.workflow/surface-ceiling.txt` rows for grown always-loaded surfaces. None of the six is one (`grep -n` over that file).

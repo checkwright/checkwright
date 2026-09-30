@@ -10,7 +10,7 @@ This amendment spans canon-kit, queue-kit and doctrine-kit, so it sits at the re
 **Measured at authoring, and correcting the entry's premise.**
 
 - `check-task-names` already reds a column-0 `- none` in a task section, as a bullet outside every entry. What passes it and `check-queue-hygiene` alike is an indented `None` or `- none` outside every entry, and a `- none` under Done, read as the bare slug `none`. The runs were `bash gate-sdk/bin/run-gates.sh --only <gate> -- <scratch queue>`, one gate per call.
-- A sweep of the tracked kit SPECs, READMEs, `docs/*.md`, CLAUDE.md, TRAJECTORY.md and ROADMAP.md finds no section whose whole body is one negative-existential sentence. The same sweep over TASK-QUEUE.md's Icebox finds 20 one-sentence entry bodies that open with "No". Each describes a gap, and none states its own section's emptiness. So the queue stays out of arm (a)'s corpus, and arm (b) covers the queue.
+- A sweep of the tracked kit SPECs, READMEs, `docs/*.md`, CLAUDE.md, TRAJECTORY.md and ROADMAP.md finds no section whose whole body is one negative-existential sentence. The same sweep over TASK-QUEUE.md's Icebox finds one-sentence entry bodies that open with "No". Each describes a gap, and none states its own section's emptiness. So the queue stays out of arm (a)'s corpus, and arm (b) covers the queue.
 - The live queue carries no placeholder line (`grep -n -i -E '^\s*(- )?(none|n/a|nil|tbd|nothing|empty|-|—)\.?\s*$' TASK-QUEUE.md` prints nothing).
 - This repository's `CANON_KIT_PROSE_TELL_GLOBS` is `docs/*.md`, which reaches no `SPEC-*.md` amendment.
 
@@ -124,7 +124,7 @@ The digest is unchanged, so no agent file's digest bullet moves.
 - `native/src/gates/prose_tells.rs`, `canon-kit/gate-tests/check-prose-tells/good/` and `bad/`: assertion G (delta 1).
 - `canon-kit/SPEC.md` §check-prose-tells and §Layout and configuration, `native/src/knobs/canon_kit.rs`, `native/src/gates/mod.rs` and `canon-kit/checks/check-prose-tells.gate` (delta 2).
 - `native/src/gates/task_names.rs` and `queue-kit/gate-tests/check-task-names/good/` and `bad/`: the placeholder arm (delta 3).
-- `queue-kit/SPEC.md` §check-task-names and §Layout and configuration, and `native/src/knobs/queue_kit.rs` (delta 4).
+- `queue-kit/SPEC.md` §check-task-names and §Layout and configuration, `native/src/knobs/queue_kit.rs` and `native/src/gates/mod.rs` (the member's knob list) (delta 4).
 - `doctrine-kit/DOCTRINE.md`, Absence statements (delta 5).
 - `docs/canon-kit/SPEC.md`, `docs/queue-kit/SPEC.md` and `docs/doctrine-kit/DOCTRINE.md`: the generated mirrors, regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write` (deltas 2, 4 and 5).
 - `scripts/canon-config.knobs` and `.workflow/audit-roster.txt` (delta 6).

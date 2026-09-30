@@ -88,6 +88,7 @@ A scratch probe applied delta 3's ERE to the lowercased tracked markdown less fi
 - `evidence-kit/SPEC.md`: the new §The baseline-claims arm and §Baseline manifest (delta 2).
 - `scripts/measured-claims.sh` and `scripts/claim-classes.sh` (delta 3).
 - `gate-sdk/SPEC.md` §upgrade-smoke (delta 4).
+- `evidence-kit/README.md`: the sentence naming the kit's two non-gate arms gains the third, `--emit baseline-claims` (delta 1), and `docs/evidence-kit/README.md` regenerates with it.
 - `docs/evidence-kit/SPEC.md` and `docs/gate-sdk/SPEC.md`: the generated mirrors, regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write` (deltas 2 and 4).
 - `.workflow/prose-bound-ceiling.txt`: the `evidence-kit/SPEC.md` and `gate-sdk/SPEC.md` rows, re-stamped to the counts `check-prose-bounds` prints if deltas 2 and 4 move them (deltas 2 and 4).
 - `.workflow/release-declarations.md` (delta 5).
