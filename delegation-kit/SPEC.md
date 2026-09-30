@@ -494,7 +494,7 @@ The union is built in both modes (live and `--fixture`). A registered member res
 
 ## The tier binding
 
-A consumer binds each **tier class** to a model once, and every place that chooses a tier reads the binding. The classes are kit vocabulary, highest first: **judgment** (design decisions), **routing** (a split-posture lead's own turns, lifecycle-kit/templates/lead.md §The lead model) and **mechanical** (oracle-running, read-heavy audits, rename and merge sweeps). A spec stage's `design-bearing` work class maps to judgment and its `mechanical` class to mechanical. The order matters only to a floor check, which reads "at or above". `DELEGATION_KIT_TIER_MODEL` holds the binding, one `<class>=<model>` element per class, read by `--emit knob-values DELEGATION_KIT_TIER_MODEL`. An unbound class is one no element names. An empty binding is off: nothing below fires, and tiers stay each dispatcher's to name.
+A consumer binds each **tier class** to a model once, and every place that chooses a tier reads the binding. The classes are kit vocabulary, highest first: **judgment** (design decisions), **routing** (a split-posture lead's own turns, lifecycle-kit/templates/lead.md §The lead model) and **mechanical** (oracle-running, read-heavy audits, rename and merge sweeps). A spec stage's `design-bearing` work class maps to judgment and its `mechanical` class to mechanical. The order matters only to a floor check, which reads "at or above". `DELEGATION_KIT_TIER_MODEL` holds the binding, one `<class>=<model>` element per class, read by `--emit knob-values DELEGATION_KIT_TIER_MODEL`. An unbound class is one no element names. An empty binding is off: nothing below fires, and tiers stay each dispatcher's to name. The mechanical class may also run on another vendor's agent through a configured adapter (§The foreign-vendor run).
 
 **Why a binding.** Without one, the tier a dispatch rides is written as a harness model alias wherever it is chosen — a definition's `model:`, a lead's per-stage overrides, a batch's `model` parameter — and the class-to-model mapping lives in each dispatcher's head. An alias resolves to whatever model the harness currently names by it, so a roster move changes every dispatch's price and behaviour with no edit anywhere, and no setting chooses between following and pinning.
 
@@ -508,7 +508,7 @@ A consumer binds each **tier class** to a model once, and every place that choos
 
 **Following is a strength with a stated cost.** An upgrade under an alias changes price and behaviour silently. What surfaces it is a new id in the transcripts, where every assistant record carries the model its turn ran on (`message.model`): drift-kit's `--price-coverage` names an id its price table cannot price (drift-kit/SPEC.md §The price-coverage arm), and the lead reads it before its first dispatch. Under a pin, a new id in a pinned class's transcripts means the pin was bypassed, and `--model-verdict` reports it as a mismatch.
 
-**Two shapes were weighed and refused.** *Three scalar knobs, one per class*: a scalar takes an environment override under its own name (gate-sdk/SPEC.md §The knob file). The binding feeds a freshness gate (§check-agent-tier-explicit), so a session exporting an override would red that gate against a tree nothing changed; an indexed knob takes none. *Keeping `model:` hand-written and checking only that its value is some bound value*: two classes bound to one alias make that check blind, and rebinding one of them then leaves every definition that meant the other class silently wrong. A definition has to say which class it is.
+**Two shapes were weighed and refused.** *Three scalar knobs, one per class*: a scalar takes an environment override under its own name (gate-sdk/SPEC.md §The knob file). The binding feeds a freshness gate (§check-agent-tier-explicit), so a session exporting an override would red that gate against a tree nothing changed; an indexed knob takes none. *Keeping `model:` hand-written and checking only that its value is some bound value*: two classes bound to one alias make that check blind, and rebinding one of them then leaves every definition that meant the rebound class silently wrong. A definition has to say which class it is.
 
 ## check-agent-tier-explicit
 
@@ -744,6 +744,41 @@ close-surface: .workflow/wait-primitive-evidence.txt advisory reclaim=bash gate-
 
 **This section is discharged, and the discharge is narrower than the kit's other one — narrow enough that stating the difference is this section's contribution to the port record.** There, a section's entire contract went in-crate. Here the *instrument* goes in-crate and its **subject** does not, so the section records itself discharged **with a named shell residue that is not residue**: the wait body, the local arming and the producer's launch are the artifact under test, not work left undone. A later reader counting a kit's owed sections needs both halves, because the second half is the one that looks like an unfinished port and is not.
 
+## The foreign-vendor run
+
+A read-only audit or a mechanical sweep, the mechanical tier class (§The tier binding), may run on another vendor's coding agent instead of a dispatch. Every dispatch otherwise rides the master harness's own `Agent` tool, so all delegated spend lands on one vendor's window. `bash gate-sdk/bin/run-gates.sh --foreign-run <adapter> <prompt-file> [--mode audit|sweep] [--key <key>]` runs one such unit. The mode defaults to `audit`. The key defaults to the prompt file's basename without its extension, must be one path component, and names the run's directory, `<GATE_SDK_TMP_DIR>/foreign/<key>/`.
+
+**The executor is kit mechanism and each adapter is consumer config.** An adapter is the program and its argv, carrying its vendor's non-interactive mode, output format, sandbox mode and model. It names a vendor, so it is never a kit literal (gate-sdk/SPEC.md §The provenance seam). An adapter speaks its vendor's machine plane, never its interactive screen: a screen relay yields rendered frames rather than turn events and bets on the vendor's least-stable surface.
+
+1. **The tree.** A shared, no-checkout clone of the toplevel, checked out detached at the committed `HEAD`, under the run's directory as `tree/`, with its `origin` remote removed. A clone rather than a linked worktree, on §upgrade-smoke's ground (gate-sdk/SPEC.md): a killed run leaves scratch and no registration. A clone's refs are its own, and with no remote nothing in it can push here, so a foreign commit is unreachable from this repository's refs by construction rather than by a check that could be skipped. The foreign agent sees committed state only, as an isolated child does (§The delegation model, isolation's untracked-blindness cost). A clone an earlier refusal kept under the same key is evidence awaiting inspection, so the run fails rather than overwrite it.
+2. **The spawn.** The adapter's argv from `DELEGATION_KIT_FOREIGN_ADAPTERS`, spawned directly with no shell, with its working directory the clone and its standard input the prompt file. The `GIT_*` location variables are removed from its environment, so a hook context cannot point it back at this repository. Standard output goes to `report.txt` and standard error to `stderr.txt`, both in the run's directory, bounded by `DELEGATION_KIT_FOREIGN_TIMEOUT`, whose expiry kills the adapter's own process.
+3. **The shape.** Checked after every spawn that started, a timeout or a non-zero exit included, and a refusal outranks a failure. A clone whose `HEAD` or any ref moved is refused: the foreign agent committed, and its commits are never taken. In `audit` mode, a clone whose status is not clean is refused: an audit wrote. In `sweep` mode, after an adapter exit of 0, the clone's whole change, untracked files included, is written as a binary-safe `change.patch` in the run's directory against the checked-out commit. An empty change writes no patch.
+4. **The cleanup.** The clone is removed, except on a refusal, where it stays for inspection and the line names it.
+
+**The verdict line** is `foreign-run: adapter=<adapter> mode=<mode> key=<key> exit=<status> report=<path|none> patch=<path|none> -> <VERDICT>`. `exit` is the adapter's status, `timeout` when the bound expired, and `-` when nothing was spawned, where `report` reads `none`. The exits:
+
+- **0 `OK`** — the adapter exited 0 and the shape held.
+- **1 `REFUSED (<why>)`** — the shape broke: `committed`, or `audit wrote`, followed by `— clone kept at <path>`.
+- **2 `FAILED (<why>)`** — an unknown adapter, an unreadable prompt file, a kept clone under the key, a clone or spawn failure, a timeout, or a non-zero adapter exit. The report is kept, and the line names the adapter's status.
+
+A malformed argv (an operand count other than two, a dash-led token naming no option, a mode other than the two, a key that is not one path component) is a shape refusal at exit 2, with the usage on standard error. `--` ends option processing.
+
+**What returns, and how it lands.**
+
+- `report.txt` is the unit's return value, and a durable one: it outlives the calling session, so a successor finds it. The adapter selects the vendor mode whose standard output is the report, and the kit reads bytes: parsing each vendor's event stream would put a vendor schema in a kit literal.
+- A sweep's `change.patch` is applied by the dispatching session, which verifies it as it verifies any agent commit (§Verify after every agent commit) and commits it under its own attribution. So a foreign vendor's work carries no trailer of its own, and the repository's contributor list does not grow per vendor. A consumer's README states that method once. Letting the foreign agent commit on the shared tree is refused: it would race the shared git index, and each vendor's own trailer would add a contributor per vendor.
+- The adapter's argv carries its own vendor's model choice, an alias or a pinned id, on §The tier binding's follow-or-pin reading.
+
+**Honest limits.**
+
+- **Confinement.** The clone is the agent's working directory, not a sandbox. A foreign program can write any path it can reach, so an adapter selects its vendor's read-only or workspace-bounded sandbox mode, and that mode is the only confinement there is. This is the residue §The delegation model records for a program an isolated child runs.
+- **No guard fires.** The executor is reached through a shell call, and the budget guard and the dispatch guard fire on the master harness's `Agent` tool, so neither fires on it and nothing budgets a foreign vendor's window. Gating it behind the budget guard is refused: the guard reads the master harness's window, and a foreign run spends a different vendor's, which is the point. A foreign vendor's budget oracle is a later, vendor-keyed seam.
+- **The kill.** The timeout kills the adapter's own process. A program the adapter started may outlive it, and the clone is removed beneath it.
+- **No resume.** A run is not resumable, and its escalation channel is its report.
+- **The report's own claims.** A report's claims carry the tier a dispatcher gives any child's report: checked before they are built on.
+
+It is an `Arm::Run` row that spawns a consumer's program which may reach the network, so it takes a bare-flag spelling and stays out of the fence-safe set (gate-sdk/SPEC.md §The non-gate arm). Its declared knobs are `DELEGATION_KIT_FOREIGN_ADAPTERS`, `DELEGATION_KIT_FOREIGN_TIMEOUT` and `GATE_SDK_TMP_DIR`.
+
 ## Layout and configuration
 
 ```
@@ -793,6 +828,8 @@ Config is a **knob file**: copy `templates/delegation-config.knobs` into the gat
 - `DELEGATION_KIT_TIER_MODEL` — the tier binding (§The tier binding): indexed, one `<class>=<model>` element per class, the class one of `judgment`, `routing` and `mechanical`; default empty, which is off. The table validator refuses a malformed element, an unknown class, a class bound twice, an empty value, a value carrying whitespace, an `inherit` value, an all-digit value and a value equal to the leading token of a different bound value. Being indexed, it has no environment spelling: a freshness gate reads it, and a per-session override would red that gate against an unchanged tree.
 - `DELEGATION_KIT_SESSIONS_DIR` — the transcript directory `--model-verdict` reads (§model-verdict); default empty, which derives `<config-home>/projects/<cwd-slug>` through the crate's one derivation (lifecycle-kit/SPEC.md §bin/session-id.sh), the same emptiness drift-kit's `DRIFT_KIT_SESSIONS_DIR` takes. A kit resolves its own knob and hands the answer to the shared module. So this knob, drift-kit's and lifecycle-kit's environment-only `LIFECYCLE_KIT_SESSIONS_DIR` are three names for one default.
 - `DELEGATION_KIT_STATUSLINE_INBOXES` — array of `<label>=<path>` elements, each a repo-root-relative bullet file the status line counts (§The statusline arm); default empty, which renders no inbox group. The table validator refuses an element with no `=`, an empty label or an empty path, at exit 2.
+- `DELEGATION_KIT_FOREIGN_ADAPTERS` — the foreign adapters `--foreign-run` spawns (§The foreign-vendor run): indexed, each element `<adapter>=<word>`, an adapter's argv being its words in element order. Default empty, which configures no adapter. The table validator refuses an element with no `=`, an adapter name outside `[a-z0-9-]` or an empty word. A word containing `@PROMPT_FILE@` has the prompt file's absolute path substituted. The kit ships no adapter, since every one names a vendor's program, so a consumer's adapters usually live in the gitignored `.local` overlay.
+- `DELEGATION_KIT_FOREIGN_TIMEOUT` — the wall-clock bound on one foreign run, in seconds; default `1800`, validated a positive integer by the table validator. A run outliving it is killed and reads as failed.
 
 `check-gate-tamper` registers in the consumer's `gates.list` (tier: precommit) — in this repo's too; dogfooding is day-one, and agents commit here.
 
@@ -886,6 +923,15 @@ A member with no live tree corpus, whose input is a crafted snapshot or processe
 - both operand forms, a path and an eight-character key naming an `agent-` transcript;
 - the newest-record rule, a transcript switching model mid-file reading the later model;
 - the shape refusals and the `--` escape.
+
+**The foreign-vendor run.** `native/src/emit/foreign_run.rs`'s test module drives the arm's library function against a throwaway source repository. Its stub adapters are programs the crate's tests already spawn: `git` first (`git hash-object` reads the prompt, `git config --file` writes a file, `git commit --allow-empty` moves `HEAD`), and `bash` for a sweep's two writes and for the timeout row's `exec sleep` under a one-second bound. It covers:
+
+- `OK` in both modes: an audit whose adapter prints and writes nothing returns its output as the report, and a sweep writing a tracked and an untracked file yields a patch that `git apply --check` accepts in the source repository, while an empty change yields none;
+- `REFUSED`: a committing adapter in both modes as `committed`, and an audit that wrote as `audit wrote`, each keeping its clone, and a kept clone failing the next run under its key;
+- `FAILED`: an unknown adapter, an unreadable prompt file, a non-zero adapter exit with its report kept, and a timeout;
+- `@PROMPT_FILE@` substitution, standard input carrying the prompt, the clone removed on every non-refusal exit, the clone carrying no remote, the argv shape, and an adapter's words assembled in element order.
+
+The adapter table's refusals and the timeout's shape are crate tests beside the knob table.
 
 **The dispatch and budget guards.** `agent-budget-guard` and `agent-dispatch-guard` are hooks rather than gates, so each speaks exit-2 + hook JSON rather than the gate output contract. Their cases run as crate `#[test]`s reaching the subject directly. **A runner lives in the crate when its *cases* can be driven from there, the subject reached in process *or* spawned.** No crate test spawns a kit **`bin/` tool as a test subject**. Crate tests do source `gate-sdk/lib/gate.sh` to read the shell library's *own* answer: a pre-binary accessor, the gates-directory default or the source stamp. That is deliberate, because a Rust literal would restore the second source of truth those tests exist to hold, and that library stays shell on its own grounds (gate-sdk/SPEC.md §lib/gate.sh).
 

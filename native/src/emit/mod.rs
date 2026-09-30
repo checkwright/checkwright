@@ -24,6 +24,7 @@ pub mod file_gap;
 pub mod file_install;
 pub mod file_survey;
 pub mod footprint;
+pub mod foreign_run;
 pub mod foreign_shells;
 pub mod front_end_parity;
 pub mod git_hook;
@@ -718,6 +719,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Run(crate::hook::model_verdict::run),
         crate::hook::model_verdict::KNOBS,
     ),
+    // spec: delegation-kit/SPEC.md §The foreign-vendor run — an `Arm::Run` because it spawns a
+    // consumer's program that may reach the network, and its 1, a refused shape, is its own status
+    (
+        "--foreign-run",
+        Arm::Run(foreign_run::run),
+        foreign_run::KNOBS,
+    ),
     // spec: guard-kit/SPEC.md §scratch-run — an `Arm::Run` on two independent grounds: the runner
     // passes the child's exit code through verbatim, and its stdout must reach the terminal as the
     // child produces it rather than as a string returned at the end.
@@ -954,12 +962,17 @@ mod tests {
     // spec: gate-sdk/SPEC.md §The harness-integration arm — a renamed or deleted fail-open arm reds
     // here, before a stub's copy can name an arm the binary no longer dispatches
     // spec: gate-sdk/SPEC.md §The non-gate arm — the crate's network spawners, the arms reaching
-    // `curl`, `npm`, `docker` and a consumer's page fetch, are never fence-safe: admitting one reds
+    // `curl`, `npm`, `docker`, a consumer's page fetch and a foreign adapter, are never fence-safe: admitting one reds
     // here rather than in an adopter's scratch
     #[test]
     fn no_network_spawning_arm_is_fence_safe() {
-        const NETWORK_ARMS: &[&str] =
-            &["--usage-poll", "--pack-installer", "--with-foreign-shells", "--price-coverage"];
+        const NETWORK_ARMS: &[&str] = &[
+            "--usage-poll",
+            "--pack-installer",
+            "--with-foreign-shells",
+            "--price-coverage",
+            "--foreign-run",
+        ];
         for arm in NETWORK_ARMS {
             assert!(lookup(arm).is_some(), "{} names no arm-table row", arm);
             assert!(!fence_safe(arm), "{} spawns a network program and is fence-safe", arm);

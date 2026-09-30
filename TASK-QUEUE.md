@@ -34,28 +34,6 @@ no tracked agent definition exists for the operator-ruled hotfix path of the sco
 
 **Selected 2026-09-30 for delegation-tier-binding, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it, its `model:` field read through `tier-model-binding`'s binding.
 
-### heterogeneous-agent-delegation
-
-[spec: SPEC-foreign-run.md] [roadmap: later/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
-
-foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent. It cashes the public no-lock-in claim and is the purest expression of the thesis — governance enforced at the git/gate boundary, not by trusting the author. *Already agent-neutral:* the verification substrate (git, the gate battery, the bash stamp state machine) does not care who authored the diff, and the coordination primitive is the shared git-index/HEAD serialization. *Homogeneous today — the real work, worst-first:* (1) the **escalation resume model**, plumbing of (2) per the 2026-07-25 amendment below; (2) **dispatch transport** — today the harness `Agent`/`SendMessage`/task-notification; a foreign agent needs a transport-neutral handoff. The adapter contract is "open / prompt / permission-request / resume" spoken over each vendor's structured **machine plane, never its TUI**: a screen-scrape relay is the adapter of last resort for a vendor shipping no machine interface at all — it yields rendered frames not turn events, answers dialogs by heuristic, and bets on the vendor's least-stable surface. (3) **budget oracle** — the verdict tool is Anthropic-OAuth-specific; a heterogeneous fleet has N vendor-keyed oracles, the same seam as the credential-swap entries, and the vendors' JSONL event streams carry the token-usage events a TUI path would scrape from a status bar. (4) **stage-contract expression** — the lifecycle machinery is neutral bash but the stage-skill prose is not.
-
-**Seam ruling (on record):** generic mechanism only — transport, budget oracle, and escalation channel become consumer-config seams; a kit literal naming a vendor crosses the provenance seam and is ruled out, the pattern the retired `prose-profile` ruled. It extends the per-batch model-tiering lever across vendors, and interacts with [hosted-attestation-service](#hosted-attestation-service), the harness plugin package's reach ([plugin-harness-reach](#plugin-harness-reach)), and the credential-swap entries.
-
-**Demand-gated — demand attested (2026-07-23):** the operator holds working foreign-vendor subscriptions and wants read-heavy delegation routed to them for budget headroom, and with three vendors live the N-keyed oracle seam is no longer hypothetical. First slice at promotion: a foreign-CLI executor for the already-pre-authorized read-heavy audit / mechanical-sweep class over a spawned non-interactive CLI process, one adapter per vendor as consumer config — not full stage dispatch.
-
-**Its citers** ([companion-toolkit-profile](#companion-toolkit-profile), the credential-swap entries) block on none of it.
-
-**Attribution, operator direction 2026-09-30, lead-relayed (not a ruling):** foreign harnesses' commit trailers off, since each adds a GitHub contributor per vendor, and the method stated once in the README; a harness setting change waits on operator confirmation.
-
-**Selected 2026-09-30 for delegation-tier-binding, operator direction lead-relayed (not a ruling):** the first slice above; spec authors and promotes it after `tier-model-binding`, whose binding the adapters extend.
-
-**Design-memory amendment (2026-07-25):** the TUI relay buys no session resume or token efficiency — both live in the vendor's session store (stateless APIs, the same on-disk transcript replayed against the same server-side prompt cache), so interactive-vs-headless is rendering, not state. Headless warm-resume by session id and JSONL turn events ship on the vendors probed.
-
-**Verification capability (2026-08-02):** those probes ran against **installed binaries**, so the executor is verifiable, not inferred from vendor docs: the executor ships with a smoke that invokes them. The machine profile (context-kit/SPEC.md §bin/env-probe, local-only) owns which CLIs and how.
-
-**Cost while deferred:** the foregone lever is live — read-heavy audits and mechanical sweeps all bill against one vendor's budget while three subscriptions are held — and this design memory ages against fast-moving CLIs. Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question).
-
 ## Technical Debt
 
 ### delegation-kit-tier-brevity
@@ -157,6 +135,24 @@ a controlled A/B trial.
 hosted attestation. The team/paid rung: gates verified server-side by a party the committing agents cannot touch — hosted gate runs as a neutral attestation, cross-repo drift dashboards, maintained rulesets. A service, not code: cloning the kits does not clone the neutrality or the ops. Demand-gated — this entry is the public roadmap marker, not a scaffold; hosting and sequencing decisions are on record in the operator's local brief, and multi-operator-semantics is its prerequisite mechanism. Surfaced 2026-07-07.
 
 **Cost while deferred:** zero — this is a service rather than tree mechanism, so nothing rots; the residue is that gate runs stay self-attested, which binds only when a party the committing agents cannot touch is asked to trust them.
+
+### heterogeneous-agent-delegation
+
+[cost: iteration/low] [surface: delegation-kit] [roadmap: later/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
+
+foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent. It cashes the public no-lock-in claim — governance enforced at the git/gate boundary, not by trusting the author; the verification substrate and the shared git-index/HEAD serialization are already agent-neutral. *Remaining, worst-first:* (1) the **escalation resume model**, plumbing of (2); (2) **dispatch transport** — today the harness `Agent`/`SendMessage`/task-notification; a foreign agent needs a transport-neutral "open / prompt / permission-request / resume" handoff over each vendor's **machine plane, never its TUI** (a screen relay yields frames not turn events and bets on the least-stable surface); (3) **budget oracle** — N vendor-keyed oracles, the credential-swap entries' seam, fed by the vendors' JSONL token-usage events; (4) **stage-contract expression** — the stage-skill prose is not vendor-neutral.
+
+**First slice landed 2026-09-30 (delegation-tier-binding):** the foreign-CLI executor, delegation-kit/SPEC.md §The foreign-vendor run — `--foreign-run` runs a read-only audit or mechanical sweep in a scratch clone, returning a report and a patch, adapters as consumer config. Live acceptance, operator direction 2026-09-30 lead-relayed (not a ruling): one read-only audit through the codex CLI, `codex exec --sandbox read-only --ephemeral --color never -`, returned OK; the spec's "one vendor CLI installed" premise was wrong (two are), and the operator chose codex. **Next slice:** (2), with (1) riding it.
+
+**Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, the pattern the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service), [plugin-harness-reach](#plugin-harness-reach) and the credential-swap entries.
+
+**Demand attested (2026-07-23):** the operator holds three foreign-vendor subscriptions and wants read-heavy delegation routed to them for budget headroom. **Its citers** ([companion-toolkit-profile](#companion-toolkit-profile), the credential-swap entries) block on none of it.
+
+**Attribution, operator direction 2026-09-30, lead-relayed (not a ruling):** foreign harnesses' commit trailers off and the method stated once in the README, held by construction (foreign work lands in the delegating session's commit); a harness setting change waits on operator confirmation.
+
+**Design memory (2026-07-25, 2026-08-02):** a TUI relay buys no resume or token efficiency — both live in the vendor's session store, so interactive-vs-headless is rendering, not state; headless warm-resume by session id and JSONL turn events ship on the installed binaries probed. The machine profile (context-kit/SPEC.md §bin/env-probe, local-only) owns which CLIs and how.
+
+**Cost while deferred:** stage-level work still bills one vendor's budget while three subscriptions are held, and this design memory ages against fast-moving CLIs. Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question).
 
 ### background-credential-swap-support
 

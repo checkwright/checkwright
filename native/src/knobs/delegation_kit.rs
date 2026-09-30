@@ -62,6 +62,8 @@ pub const KIT: Kit = Kit {
         Row::indexed("DELEGATION_KIT_TIER_MODEL", &[]),
         Row::scalar("DELEGATION_KIT_SESSIONS_DIR", ""),
         Row::indexed("DELEGATION_KIT_STATUSLINE_INBOXES", &[]),
+        Row::indexed("DELEGATION_KIT_FOREIGN_ADAPTERS", &[]),
+        Row::scalar("DELEGATION_KIT_FOREIGN_TIMEOUT", "1800"),
         Row::derived("DELEGATION_KIT_GATE_FILES", Shape::Indexed, gate_files, &["GATE_SDK_GATES_DIR"]),
         Row::derived(
             "DELEGATION_KIT_META_PATHS",
@@ -90,7 +92,7 @@ fn numeric(s: &str) -> bool {
 }
 
 // spec: delegation-kit/SPEC.md §Layout and configuration — a broken delegation config runs no tool:
-// the numeric shapes, the positive fan width, D5's on|off switch, the tier binding, and the
+// the numeric shapes, the positive integers, D5's switch, the adapter table, the tier binding, and the
 // emptiness of the agent dir and the two path sets
 fn validate(v: &Values) -> Vec<String> {
     let mut errs: Vec<String> = Vec::new();
@@ -104,8 +106,10 @@ fn validate(v: &Values) -> Vec<String> {
             errs.push(format!("{} must be a non-negative integer (got '{}')", n, s));
         }
     }
-    if let Some(s) = scalar(v, "DELEGATION_KIT_FAN_WIDTH").filter(|s| !digits(s) || s.bytes().all(|b| b == b'0')) {
-        errs.push(format!("DELEGATION_KIT_FAN_WIDTH must be a positive integer (got '{}')", s));
+    for n in ["DELEGATION_KIT_FAN_WIDTH", "DELEGATION_KIT_FOREIGN_TIMEOUT"] {
+        if let Some(s) = scalar(v, n).filter(|s| !digits(s) || s.bytes().all(|b| b == b'0')) {
+            errs.push(format!("{} must be a positive integer (got '{}')", n, s));
+        }
     }
     if let Some(s) = scalar(v, "DELEGATION_KIT_REQUIRE_TIER").filter(|s| !matches!(*s, "on" | "off")) {
         errs.push(format!("DELEGATION_KIT_REQUIRE_TIER must be on|off (got '{}')", s));
@@ -120,6 +124,20 @@ fn validate(v: &Values) -> Vec<String> {
             Some((l, p)) if !l.is_empty() && !p.is_empty() => {}
             _ => errs.push(format!(
                 "DELEGATION_KIT_STATUSLINE_INBOXES element '{}' is not '<label>=<path>' with both halves non-empty",
+                e
+            )),
+        }
+    }
+    // spec: delegation-kit/SPEC.md §Layout and configuration — each adapter element is
+    // `<adapter>=<word>`, the name within `[a-z0-9-]` and the word non-empty
+    for e in indexed(v, "DELEGATION_KIT_FOREIGN_ADAPTERS").unwrap_or(&[]) {
+        match e.split_once('=') {
+            Some((a, w))
+                if !a.is_empty()
+                    && a.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
+                    && !w.is_empty() => {}
+            _ => errs.push(format!(
+                "DELEGATION_KIT_FOREIGN_ADAPTERS element '{}' is not '<adapter>=<word>' with an adapter name in [a-z0-9-] and a non-empty word",
                 e
             )),
         }
@@ -165,6 +183,28 @@ mod tests {
         for (want, elems) in cases {
             let errs = binding(elems);
             assert!(errs.iter().any(|e| e.contains(want)), "{:?} did not refuse with '{}': {:?}", elems, want, errs);
+        }
+    }
+
+    // spec: delegation-kit/SPEC.md §Layout and configuration — the adapter table's three refusals and
+    // the timeout's positive-integer shape, each beside a passing row
+    #[test]
+    fn the_foreign_adapter_table_and_timeout_refuse_their_malformed_shapes() {
+        let run = |elems: &[&str], timeout: &str| {
+            let mut v: Values = Values::new();
+            v.insert(
+                "DELEGATION_KIT_FOREIGN_ADAPTERS",
+                (Value::Indexed(elems.iter().map(|s| s.to_string()).collect()), Origin::Tracked),
+            );
+            v.insert("DELEGATION_KIT_FOREIGN_TIMEOUT", (Value::Scalar(timeout.to_string()), Origin::Tracked));
+            validate(&v)
+        };
+        assert!(run(&["ad-1=prog", "ad-1=--flag=x", "ad-1=@PROMPT_FILE@"], "1800").is_empty());
+        for bad in [&["noequals"][..], &["Ad=prog"], &["a_b=prog"], &["=prog"], &["ad="]] {
+            assert_eq!(run(bad, "1800").len(), 1, "{:?} must refuse", bad);
+        }
+        for bad in ["0", "", "1.5", "-3"] {
+            assert_eq!(run(&[], bad).len(), 1, "timeout '{}' must refuse", bad);
         }
     }
 

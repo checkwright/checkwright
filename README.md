@@ -93,7 +93,7 @@ bash gate-sdk/bin/run-gates.sh --projection-witness                             
 
 The gate binary's `--install-hooks` arm opts this clone into the generated pre-commit and commit-msg hooks. The repo also runs lifecycle-kit's own iteration state machine — [`TASK-QUEUE.md`](TASK-QUEUE.md) carries the iteration header, one iteration per hardening or roadmap unit.
 
-Most commits here carry a `Co-Authored-By` trailer naming the coding agent that drafted them with the maintainer, which is why GitHub lists that agent as a contributor. The trailer records how a change was drafted, and the gates hold agent-drafted and hand-written changes alike.
+Most commits here carry a `Co-Authored-By` trailer naming the coding agent that drafted them with the maintainer, which is why GitHub lists that agent as a contributor. Work delegated to another vendor's coding agent carries no trailer of its own: it returns as a report or a patch and lands in the delegating session's commit, so the contributor list does not grow per vendor. The trailer records how a change was drafted, and the gates hold agent-drafted and hand-written changes alike.
 
 Contributing: the fixture is the unit of contribution — see [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md). Reporting a vulnerability: [`SECURITY.md`](SECURITY.md), never a public issue.
 

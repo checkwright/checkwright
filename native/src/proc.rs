@@ -569,6 +569,57 @@ pub fn run_bounded_capture(
     Ok(outcome.map(|code| (code, bytes)))
 }
 
+// spec: delegation-kit/SPEC.md §The foreign-vendor run — `run_bounded` with a working directory, a
+// file as stdin and a file for each output stream: the run's files are its return value, so they are
+// written where the caller names them rather than captured. `Ok(None)` is the bound expiring.
+pub struct Redirect<'a> {
+    pub cwd: &'a std::path::Path,
+    pub stdin: &'a std::path::Path,
+    pub stdout: &'a std::path::Path,
+    pub stderr: &'a std::path::Path,
+    pub unset: &'a [String],
+}
+
+pub fn run_bounded_redirected(
+    program: &Program,
+    args: &[&str],
+    io: &Redirect,
+    secs: u64,
+) -> Result<Option<i32>, String> {
+    #[cfg(test)]
+    recorder::note(program.invocation());
+    let spawn_err = |e: std::io::Error| {
+        format!("cannot run {}: {}", program.label(), e)
+    };
+    let stdin = std::fs::File::open(io.stdin).map_err(spawn_err)?;
+    let stdout = std::fs::File::create(io.stdout).map_err(spawn_err)?;
+    let stderr = std::fs::File::create(io.stderr).map_err(spawn_err)?;
+    let mut cmd = Command::new(spawn_target(program.invocation())?.as_ref());
+    cmd.args(args)
+        .current_dir(io.cwd)
+        .stdin(std::process::Stdio::from(stdin))
+        .stdout(std::process::Stdio::from(stdout))
+        .stderr(std::process::Stdio::from(stderr));
+    for k in io.unset {
+        cmd.env_remove(k);
+    }
+    let mut child = cmd.spawn().map_err(spawn_err)?;
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(secs);
+    loop {
+        match child.try_wait() {
+            Ok(Some(status)) => return Ok(Some(exit_code(&status))),
+            Ok(None) => {}
+            Err(e) => return Err(format!("cannot wait for {}: {}", program, e)),
+        }
+        if std::time::Instant::now() >= deadline {
+            let _ = child.kill();
+            let _ = child.wait();
+            return Ok(None);
+        }
+        std::thread::sleep(std::time::Duration::from_millis(25));
+    }
+}
+
 // spec: drift-kit/SPEC.md §The KPI plugin contract — `run` with additions to the *child's*
 // environment, the one shape `run` cannot carry. Writing the child's rather than the process's is
 // what leaves knobenv's guard the only writer of the process-global one.

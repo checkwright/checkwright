@@ -29,6 +29,7 @@ pub const USAGE: &str = r#"usage: run-gates.sh [gates-dir]                run ev
        run-gates.sh --usage-poll               refresh the usage snapshot from its source
        run-gates.sh --usage-verdict [paths]    budget verdict: 0 OK/RESET-OK, 1 PAUSE, 2 STALE
        run-gates.sh --model-verdict [--expect <class>] [transcript]  running-model verdict: 0 READ/OK, 1 BELOW/UNBOUND, 2 UNKNOWN
+       run-gates.sh --foreign-run <adapter> <prompt-file> [--mode audit|sweep] [--key <key>]  one unit on a foreign adapter: 0 OK, 1 REFUSED, 2 FAILED
        run-gates.sh --lesson-sink <tag>        route a lesson body on stdin to its sink
        run-gates.sh --queue <verb> <slug> [args]  move or stamp one queue entry, then run the queue's gates
        run-gates.sh --upgrade-smoke            prove the FROM->TO kit upgrade in scratch
@@ -82,6 +83,12 @@ pub const USAGE: &str = r#"usage: run-gates.sh [gates-dir]                run ev
           expected tier), 2 UNKNOWN (unverified, never a refusal). The operand
           names the transcript by path or eight-character session id; bare, it
           takes the delegation-aware pick. Unavailable is exit 2.
+  --foreign-run  runs one read-only audit or mechanical sweep on the adapter
+          DELEGATION_KIT_FOREIGN_ADAPTERS configures, in a scratch clone of
+          committed HEAD, and emits one verdict line: exit 0 OK, 1 REFUSED
+          (the agent committed, or an audit wrote), 2 FAILED. The report, and a
+          sweep's patch, land under <tmp-dir>/foreign/<key>/. Unavailable is
+          exit 2.
   --lesson-sink  reads a lesson body on stdin and runs the sink configured for
           <tag>, or appends to <workflow-dir>/<tag>-harvest.md when none is.
           The sink's exit status is this arm's, so a failing sink is visible to

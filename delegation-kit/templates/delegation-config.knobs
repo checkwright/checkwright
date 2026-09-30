@@ -6,3 +6,7 @@
 # spec: delegation-kit/SPEC.md §The tier binding — one element per class (judgment, routing, mechanical); a value is an alias (follows the newest model) or an exact model id (pinned); default empty (off)
 # DELEGATION_KIT_TIER_MODEL[] = judgment=<model>
 # DELEGATION_KIT_TIER_MODEL[] = mechanical=<model>
+
+# spec: delegation-kit/SPEC.md §The foreign-vendor run — one `<adapter>=<word>` element per argv word, in order; the kit ships no adapter (each names a vendor's program), so set one in the gitignored `.local` overlay; default empty
+# DELEGATION_KIT_FOREIGN_ADAPTERS[] = <adapter>=<program>
+# DELEGATION_KIT_FOREIGN_ADAPTERS[] = <adapter>=@PROMPT_FILE@
