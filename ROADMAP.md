@@ -23,6 +23,7 @@ Adoption evidence, mostly. A rung promotes when someone hits the friction it des
 <!-- roadmap:begin -->
 ### now
 
+- [heterogeneous-agent-delegation](TASK-QUEUE.md#heterogeneous-agent-delegation) *(ecosystem)* — Dispatch a stage to any vendor's coding agent, gated identically.
 - [companion-toolkit-profile](TASK-QUEUE.md#companion-toolkit-profile) *(ecosystem)* — Gate a tree whose specs another toolkit's workflow wrote.
 - [design-partner-preview](TASK-QUEUE.md#design-partner-preview) *(adoption)* — A small observed preview measuring first green, first useful red and retention on real installs.
 - [spec-brevity-residue](TASK-QUEUE.md#spec-brevity-residue) *(adoption)* — Kit SPECs that state their contracts without run-ons, history or restatement.
@@ -30,7 +31,6 @@ Adoption evidence, mostly. A rung promotes when someone hits the friction it des
 
 ### next
 
-- [heterogeneous-agent-delegation](TASK-QUEUE.md#heterogeneous-agent-delegation) *(ecosystem)* — Dispatch a stage to any vendor's coding agent, gated identically.
 - [gate-authoring-sdk-surface](TASK-QUEUE.md#gate-authoring-sdk-surface) *(ecosystem)* — Author a gate in any language behind one substrate-neutral descriptor.
 - [companion-install-tier](TASK-QUEUE.md#companion-install-tier) *(ecosystem)* — A companion install exposing every deterministic gate a spec toolkit does not already do.
 
