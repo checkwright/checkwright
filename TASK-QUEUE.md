@@ -46,6 +46,18 @@ consumer-only guard rules are untested: the three destructive rules in `scripts/
 
 **Selected 2026-09-30 for guard-kit-steering, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it, its lane landing in §The generic ruleset, outside [guard-kit-front-brevity](#guard-kit-front-brevity)'s sections.
 
+### plugin-guards-subdir-launch
+
+[spec: SPEC-hook-root-resolution.md]
+
+a harness session launched from a repository subdirectory runs the guards silent: `plugin/hooks/hooks.json`'s fail-open test `test -f gate-sdk/bin/run-gates.sh || exit 0` resolves against the launch directory, so it exits clean there (measured by build with Claude Code 2.1.283, launched from `docs/` of a vendored tree). `guard-kit/templates/settings-hooks.json` spells the same relative command. Measured at spec (Claude Code 2.1.285): a hook runs in the session's current directory, so a root-launched session that `cd`s loses both renderings too, the settings one exiting 127 as a non-blocking error; a subdirectory launch loads no project settings at all.
+
+**Deliverable:** both renderings resolve the front end from the repository root (the git toplevel or the harness's project-dir variable, chosen against the adopter constraints and the per-call hook cost), with a probe from a subdirectory for each.
+
+**Cost while deferred:** every subdirectory-launched session in an adopter tree runs with no shell, wakeup or workflow-state guard, and nothing says so. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' build; promoted at its close: →fix fails because the root resolution is a design choice across two kits' wiring and this repo's own settings file. Re-verified: both files carry the relative spelling. Owner lookup: `hooks.json`, `settings-hooks`, `subdirector` in this file — none; owner guard-kit/SPEC.md, with plugin/SPEC.md §The guards.
+
+**Selected 2026-09-30 for guard-kit-steering, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it. Re-verified: both files still carry the relative spelling.
+
 ## Technical Debt
 
 ### guard-kit-front-brevity
@@ -613,18 +625,6 @@ the site has no rule for video, and the operator wants short intro and demo vide
 **Deliverable:** a page-authoring rule in docs/site-architecture.md admitting only the poster-link form, a gate reding an `<iframe>` or a third-party `src=` in docs pages, and first homes on docs/spec-toolkits.md and the front door.
 
 **Cost while deferred:** a video lands with no rule, and an embed would add the site's first third-party request. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead; promoted 2026-09-27 at its close: →fix fails because the gate is new mechanism. Re-verified: `docs/_layouts/default.html` loads only local assets, and `check-docs-render-fidelity` lists `iframe` as a known tag without refusing it. Owner lookup: `video`, `iframe`, `YouTube` in this file — none; owner docs/site-architecture.md §Page-authoring rules.
-
-### plugin-guards-subdir-launch
-
-[cost: event/high] [surface: guard-kit]
-
-a harness session launched from a repository subdirectory runs the guards silent: `plugin/hooks/hooks.json`'s fail-open test `test -f gate-sdk/bin/run-gates.sh || exit 0` resolves against the launch directory, so it exits clean there (measured by build with Claude Code 2.1.283, launched from `docs/` of a vendored tree). `guard-kit/templates/settings-hooks.json` spells the same relative command. **Inferred, not run:** whether settings hooks also run from the launch directory, where the relative command would fail rather than fall open.
-
-**Deliverable:** both renderings resolve the front end from the repository root (the git toplevel or the harness's project-dir variable, chosen against the adopter constraints and the per-call hook cost), with a probe from a subdirectory for each.
-
-**Cost while deferred:** every subdirectory-launched session in an adopter tree runs with no shell, wakeup or workflow-state guard, and nothing says so. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' build; promoted at its close: →fix fails because the root resolution is a design choice across two kits' wiring and this repo's own settings file. Re-verified: both files carry the relative spelling. Owner lookup: `hooks.json`, `settings-hooks`, `subdirector` in this file — none; owner guard-kit/SPEC.md, with plugin/SPEC.md §The guards.
-
-**Selected 2026-09-30 for guard-kit-steering, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it. Re-verified: both files still carry the relative spelling.
 
 ### intake-routing-test
 
