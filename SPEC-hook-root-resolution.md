@@ -17,7 +17,7 @@
 
 ### (1) The settings rendering resolves the front end through `CLAUDE_PROJECT_DIR`
 
-`guard-kit/templates/settings-hooks.json`'s three commands become `bash "${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh" --hook <member>` {mechanical}. **Not yet applied.** That spelling is the one both wiring readers already parse:
+`guard-kit/templates/settings-hooks.json`'s three commands become `bash "${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh" --hook <member>` {mechanical}. **Applied.** That spelling is the one both wiring readers already parse:
 
 - `check-settings-paths` strips a leading `${CLAUDE_PROJECT_DIR}` as the repository root and resolves the rest (`native/src/gates/settings_paths.rs`, the `hook_path` unit tests covering the quoted braced form).
 - The hook registration parser reads the member after any path whose basename is the front end (`native/src/hook/mod.rs`, the unit test registering `"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh" --hook x`).
@@ -26,7 +26,7 @@ guard-kit/SPEC.md §The shell guard's sentence "`templates/settings-hooks.json`'
 
 ### (2) The plugin rendering resolves the toplevel through git
 
-plugin/SPEC.md §The guards' rewrite rule changes its prefix from `test -f gate-sdk/bin/run-gates.sh || exit 0; ` to `r=$(git -C "${CLAUDE_PROJECT_DIR:-.}" rev-parse --show-toplevel 2>/dev/null) && test -f "$r/gate-sdk/bin/run-gates.sh" || exit 0; CLAUDE_PROJECT_DIR=$r; ` {design-bearing}. **Not yet applied.** The template command follows it unchanged, so the rendering stays the template's command behind a fixed prefix. The prefix resolves the toplevel of the project directory, falling back to the working directory where the variable is unset. It exits 0 where there is no repository or no vendored front end. It then rebinds `CLAUDE_PROJECT_DIR` to the toplevel for the template command it prefixes, so one template spelling serves a root launch, a subdirectory launch and a `cd` alike. The rebinding is local to the hook's shell and its children.
+plugin/SPEC.md §The guards' rewrite rule changes its prefix from `test -f gate-sdk/bin/run-gates.sh || exit 0; ` to `r=$(git -C "${CLAUDE_PROJECT_DIR:-.}" rev-parse --show-toplevel 2>/dev/null) && test -f "$r/gate-sdk/bin/run-gates.sh" || exit 0; CLAUDE_PROJECT_DIR=$r; ` {design-bearing}. **Applied.** The template command follows it unchanged, so the rendering stays the template's command behind a fixed prefix. The prefix resolves the toplevel of the project directory, falling back to the working directory where the variable is unset. It exits 0 where there is no repository or no vendored front end. It then rebinds `CLAUDE_PROJECT_DIR` to the toplevel for the template command it prefixes, so one template spelling serves a root launch, a subdirectory launch and a `cd` alike. The rebinding is local to the hook's shell and its children.
 
 - `native/src/gates/plugin_parity.rs`'s `FAIL_OPEN` constant becomes the new prefix, and `plugin/hooks/hooks.json` is regenerated to match (`check-plugin-parity` assertion C).
 - `scripts/gate-tests/check-plugin-parity/{good,bad}/` carry the new rendering, and `bad/expect.txt`'s printed prefix moves with it.
@@ -37,7 +37,7 @@ plugin/SPEC.md §The guards' rewrite rule changes its prefix from `test -f gate-
 
 ### (3) Every hook-wiring instruction names the anchored spelling
 
-Each instruction telling an adopter to wire a front-end hook spells `bash "${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh" --hook <member>` {mechanical}. **Not yet applied.** The roster, from `git grep -n 'run-gates.sh --hook' -- ':!docs' ':!native' ':!*gate-tests*'`, with each site's value:
+Each instruction telling an adopter to wire a front-end hook spells `bash "${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh" --hook <member>` {mechanical}. **Applied.** The roster, from `git grep -n 'run-gates.sh --hook' -- ':!docs' ':!native' ':!*gate-tests*'`, with each site's value:
 
 - `guard-kit/README.md` — the wiring step's `bash gate-sdk/bin/run-gates.sh --hook shell-guard` (and the `--hook wakeup-guard` and `--hook escalation-guard` alternatives): re-spelled.
 - `delegation-kit/README.md` — steps 4 and 5 (`--hook agent-budget-guard`, `--hook subagent-stop-liveness`): re-spelled.
@@ -49,14 +49,14 @@ Each instruction telling an adopter to wire a front-end hook spells `bash "${CLA
 
 ### (4) Each rendering is probed from a subdirectory
 
-The settings rendering gets a hermetic probe in guard-kit's consumer smoke, and the plugin rendering gets a harness probe in the plugin's validation run {design-bearing}. **Not yet applied.**
+The settings rendering gets a hermetic probe in guard-kit's consumer smoke, and the plugin rendering gets a harness probe in the plugin's validation run {design-bearing}. **Applied.**
 
 - **`guard-kit/smoke/install.sh`**, after its existing `cd_compound` assertion, reads the merged `Bash|PowerShell` group's shell-guard `command` string. It executes it with `bash -c` from a subdirectory the smoke creates in the scratch consumer, with `CLAUDE_PROJECT_DIR` set to the consumer root and the `cd deploy && ls` payload on stdin, and asserts the same block carrying rule `cd_compound`'s steer. The existing assertions drive the member directly. This one drives the wiring string, so a relative spelling reds it: from the subdirectory it exits 127 and blocks nothing. guard-kit/SPEC.md §Testing's smoke paragraph gains the sentence.
 - **plugin/SPEC.md §The validation leg**'s local run, a build that changes the package, adds two sessions to "firing in a vendored scratch repository and silent in an empty one". One is launched from a subdirectory of the vendored repository. In the other, the session's Bash tool changes into a subdirectory before its next call. The guard fires in both.
 
 ### (5) This repository's own wiring follows, prepared rather than applied
 
-`.claude/settings.json`'s five front-end hook commands (`--hook subagent-stop-liveness`, `shell-guard`, `agent-budget-guard`, `agent-dispatch-guard` and `workflow-state-guard`) take the delta 1 spelling {mechanical}. **Not yet applied.** Hook wiring is a permission-surface write: CLAUDE.md §Housekeeping has a delegated session only prepare the diff, and this one rewires every guard, so it is high-impact. The build session prepares the diff and the operator applies it. The entry moves only once it is applied, because until then this repository's own sessions keep the defect.
+`.claude/settings.json`'s five front-end hook commands (`--hook subagent-stop-liveness`, `shell-guard`, `agent-budget-guard`, `agent-dispatch-guard` and `workflow-state-guard`) take the delta 1 spelling {mechanical}. **Not yet applied.** Hook wiring is a permission-surface write: CLAUDE.md §Housekeeping has a delegated session only prepare the diff, and this one rewires every guard, so it is high-impact. The build session prepares the diff and the operator applies it. The entry moves only once it is applied, because until then this repository's own sessions keep the defect. Deltas 1 to 4 are merged into the canonical surfaces; this delta is the one outstanding, and the session that sees it applied deletes this file and moves the entry.
 
 ## Producers and consumers
 
@@ -86,10 +86,10 @@ The settings rendering gets a hermetic probe in guard-kit's consumer smoke, and 
 
 ## Definition of Done
 
-- [ ] **Causal completeness** — every point of canon-kit/SPEC.md §The causal-completeness check holds for both spellings and both probes.
-- [ ] **Every roster site has its value** — each delta 3 site re-spelled or kept as stated, re-derived with the roster's `git grep`.
-- [ ] **Merged with no information lost** — the measurements above land in guard-kit/SPEC.md §The shell guard and plugin/SPEC.md §The guards as the grounds for each spelling.
+- [x] **Causal completeness** — every point of canon-kit/SPEC.md §The causal-completeness check holds for both spellings and both probes.
+- [x] **Every roster site has its value** — each delta 3 site re-spelled or kept as stated, re-derived with the roster's `git grep`.
+- [x] **Merged with no information lost** — the measurements above land in guard-kit/SPEC.md §The shell guard and plugin/SPEC.md §The guards as the grounds for each spelling.
 - [ ] **Amendment deleted** — this file removed on merge; none remain at the repo root (`ls SPEC-*.md`).
-- [ ] **Removals propagated** — both declarations are exempt, so `check-amendment-retired-spelling` counts and scans neither. Two things hold the removals instead. The delta 3 roster's `git grep` is re-derived under the second item above. And `check-plugin-parity` assertion C holds the plugin prefix to `FAIL_OPEN`.
-- [ ] **Gaps filed** — the statusline and session-start wirings, filed with `--emit file-gap` at authoring.
+- [x] **Removals propagated** — both declarations are exempt, so `check-amendment-retired-spelling` counts and scans neither. Two things hold the removals instead. The delta 3 roster's `git grep` is re-derived under the second item above. And `check-plugin-parity` assertion C holds the plugin prefix to `FAIL_OPEN`.
+- [x] **Gaps filed** — the statusline and session-start wirings, filed with `--emit file-gap` at authoring.
 - [ ] **The entry moves** — `plugin-guards-subdir-launch` moves to Done once delta 5's diff is applied, a stage before the drain stage.

@@ -4,19 +4,19 @@
       {
         "matcher": "Bash|PowerShell",
         "hooks": [
-          { "type": "command", "command": "test -f gate-sdk/bin/run-gates.sh || exit 0; bash gate-sdk/bin/run-gates.sh --hook shell-guard" }
+          { "type": "command", "command": "r=$(git -C \"${CLAUDE_PROJECT_DIR:-.}\" rev-parse --show-toplevel 2>/dev/null) && test -f \"$r/gate-sdk/bin/run-gates.sh\" || exit 0; CLAUDE_PROJECT_DIR=$r; bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook shell-guard" }
         ]
       },
       {
         "matcher": "ScheduleWakeup|CronCreate",
         "hooks": [
-          { "type": "command", "command": "test -f gate-sdk/bin/run-gates.sh || exit 0; bash gate-sdk/bin/run-gates.sh --hook wakeup-guard" }
+          { "type": "command", "command": "r=$(git -C \"${CLAUDE_PROJECT_DIR:-.}\" rev-parse --show-toplevel 2>/dev/null) && test -f \"$r/gate-sdk/bin/run-gates.sh\" || exit 0; CLAUDE_PROJECT_DIR=$r; bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook wakeup-guard" }
         ]
       },
       {
         "matcher": "Write|Edit",
         "hooks": [
-          { "type": "command", "command": "test -f gate-sdk/bin/run-gates.sh || exit 0; bash gate-sdk/bin/run-gates.sh --hook workflow-state-guard" }
+          { "type": "command", "command": "r=$(git -C \"${CLAUDE_PROJECT_DIR:-.}\" rev-parse --show-toplevel 2>/dev/null) && test -f \"$r/gate-sdk/bin/run-gates.sh\" || exit 0; CLAUDE_PROJECT_DIR=$r; bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook workflow-state-guard" }
         ]
       }
     ]

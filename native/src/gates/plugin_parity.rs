@@ -25,7 +25,9 @@ const SCHEMA_LEAD: &str = "https://agent-plugins.org/schemas/";
 const SCHEMA_TAIL: &str = "/plugin.schema.json";
 const REPO_HOST: &str = "https://github.com/";
 // spec: plugin/SPEC.md §The guards — the fail-open prefix every rendered hook command carries
-const FAIL_OPEN: &str = "test -f gate-sdk/bin/run-gates.sh || exit 0; ";
+// spec: gate-sdk/SPEC.md §The path-dialect contract — shell text the hook's own shell runs, so the
+// toplevel it names is produced and read there, never in the crate
+const FAIL_OPEN: &str = "r=$(git -C \"${CLAUDE_PROJECT_DIR:-.}\" rev-parse --show-toplevel 2>/dev/null) && test -f \"$r/gate-sdk/bin/run-gates.sh\" || exit 0; CLAUDE_PROJECT_DIR=$r; ";
 // spec: plugin/SPEC.md §The skills — the Agent Skills bound on a description's length
 const DESCRIPTION_MAX: usize = 1024;
 
@@ -388,13 +390,12 @@ mod tests {
             r#"{"//":"merge advice","hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"bash x --hook a"}]},{"matcher":"Write","hooks":[{"type":"command","command":"bash x --hook b"}]}]}}"#,
         )
         .unwrap();
-        let want: Value = serde_json::from_str(
-            r#"{"hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"test -f gate-sdk/bin/run-gates.sh || exit 0; bash x --hook a"}]},{"matcher":"Write","hooks":[{"type":"command","command":"test -f gate-sdk/bin/run-gates.sh || exit 0; bash x --hook b"}]}]}}"#,
-        )
-        .unwrap();
+        let want = serde_json::json!({"hooks":{"PreToolUse":[
+            {"matcher":"Bash","hooks":[{"type":"command","command":format!("{}bash x --hook a", FAIL_OPEN)}]},
+            {"matcher":"Write","hooks":[{"type":"command","command":format!("{}bash x --hook b", FAIL_OPEN)}]}
+        ]}});
         assert_eq!(render_hooks(&t).unwrap(), want);
     }
-
     // spec: plugin/SPEC.md §The skills — the front matter's scalars and the body after it
     #[test]
     fn the_front_matter_reader_takes_scalars_and_the_body() {

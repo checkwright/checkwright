@@ -65,10 +65,12 @@ Vendoring stays with `init`. A plugin that vendored kits itself would be a secon
 `plugin/hooks/hooks.json` is a rendering of `guard-kit/templates/settings-hooks.json`, for the one harness that reads a plugin's hooks; the portable manifest carries skills alone, since the standard excludes hooks from its core. The rendering:
 
 - takes each block under `hooks`, its event, its matcher and its hook entries, in order;
-- rewrites each `command` from `<command>` to `test -f gate-sdk/bin/run-gates.sh || exit 0; <command>`;
+- rewrites each `command` from `<command>` to `r=$(git -C "${CLAUDE_PROJECT_DIR:-.}" rev-parse --show-toplevel 2>/dev/null) && test -f "$r/gate-sdk/bin/run-gates.sh" || exit 0; CLAUDE_PROJECT_DIR=$r; <command>`;
 - drops the template's `//` note, which is merge advice for a settings file.
 
-A plugin's hooks fire in every repository where the plugin is enabled, so each command first tests for the vendored front end and exits 0 without it. The harness runs a hook command under a POSIX shell, Git for Windows' bash on native Windows ([guard-kit/SPEC.md §The hook on native Windows](../guard-kit/SPEC.md#the-hook-on-native-windows)). It runs it from the directory the session was launched in, which is the repository root on an ordinary launch: the shell-guard fires in a vendored repository launched at its root and stays silent in an empty one.
+A plugin's hooks fire in every repository where the plugin is enabled, so each command first tests for the vendored front end and exits 0 without it. The harness runs a hook command under a POSIX shell, Git for Windows' bash on native Windows ([guard-kit/SPEC.md §The hook on native Windows](../guard-kit/SPEC.md#the-hook-on-native-windows)). It runs it in the session's current directory, which a subdirectory launch or the session's own `cd` moves off the root, so the prefix resolves the repository's toplevel from the harness's project directory. The shell-guard fires anywhere inside a vendored repository and stays silent outside one.
+
+The prefix differs from the settings rendering's anchor because the plugin loads where project settings do not. Launched from a subdirectory, a session loads no project settings, and a hook supplied any other way runs with its working directory and `CLAUDE_PROJECT_DIR` both naming that subdirectory. So the variable cannot name the root here, and the prefix asks git for the toplevel, one spawn per call measured at under a millisecond, git being the adopter floor's one unconditional member. It falls back to the working directory where the variable is unset, exits 0 where there is no repository or no vendored front end, and rebinds `CLAUDE_PROJECT_DIR` to the toplevel for the template command after it. The rebinding is local to the hook's shell and its children, so one template spelling serves a root launch, a subdirectory launch and a `cd` alike.
 
 context-kit's session-start wiring is not rendered: it is a context brief rather than a guard.
 
@@ -101,12 +103,13 @@ The `plugin-validate` job in `.github/workflows/gates.yml` runs each external or
 - **The portable manifest.** It fetches the published schema and validates `plugin/plugin.json` against it with `ajv-cli` under JSON Schema draft 2020-12, the draft the schema declares.
 - **The skills.** It validates each skill directory with the Agent Skills reference validator, `skills-ref validate <dir>`, installed at a pinned commit. That library says it is for demonstration and not production, so a finding it raises is read against the Agent Skills specification before a skill is changed for it.
 
-A build that changes the package runs the same commands locally. It installs the plugin from a scratch marketplace with a relative source into a scratch harness config, to see the skills registered; `CLAUDE_CONFIG_DIR` pointed at a scratch directory leaves the user's own config untouched. A scratch config carries no login, so the guards are seen in a session that loads the package with `--plugin-dir`, which installs nothing: firing in a vendored scratch repository and silent in an empty one.
+A build that changes the package runs the same commands locally. It installs the plugin from a scratch marketplace with a relative source into a scratch harness config, to see the skills registered; `CLAUDE_CONFIG_DIR` pointed at a scratch directory leaves the user's own config untouched. A scratch config carries no login, so the guards are seen in a session that loads the package with `--plugin-dir`, which installs nothing: firing in a vendored scratch repository and silent in an empty one. Two more sessions follow, and the guard fires in both: one launched from a subdirectory of the vendored repository, and one whose Bash tool changes into a subdirectory before its next call.
 
 ## Honest limits
 
 - Only Claude Code's install is run. Every other Agent Plugins client is read off the standard.
 - A skill takes each slot's own text as its binding, which is weaker than a repository's own bound skill.
 - An adopter who also merged guard-kit's settings wiring runs each guard twice, and the friction log counts each fall-through twice, so the README says to keep one of the two.
-- The fail-open prefix means a tree whose front end is missing runs unguarded and says nothing about it. A session launched from a subdirectory is such a tree, since the hook resolves the front end against the launch directory.
+- The fail-open prefix means a tree whose front end is missing runs unguarded and says nothing about it.
+- On native Windows the harness hands the hook `CLAUDE_PROJECT_DIR` in a Windows spelling. That `git -C` accepts it and `test -f` accepts the forward-slash toplevel git answers is inferred rather than run: no Windows host has driven the prefix.
 <!-- {% endraw %} -->

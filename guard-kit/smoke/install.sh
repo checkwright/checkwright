@@ -98,6 +98,21 @@ if ! jq -e '[.hooks.PreToolUse[] | select(.matcher == "Bash|PowerShell") | .hook
     echo "guard-kit/smoke/install.sh: the merged wiring carries no Bash|PowerShell matcher group running the shell-guard" >&2
     exit 1
 fi
+# spec: guard-kit/SPEC.md §Testing — the wiring string itself, run as the harness runs it from a
+# subdirectory, so a command resolved against the hook's working directory reds here
+wired="$(jq -r '[.hooks.PreToolUse[] | select(.matcher == "Bash|PowerShell") | .hooks[].command
+                 | select(test("--hook shell-guard"))][0]' .claude/settings.json)"
+consumer_root="$(pwd -P)"
+mkdir -p smoke-subdir/deeper
+set +e
+msg="$(cd smoke-subdir/deeper && printf '%s' '{"tool_name":"Bash","tool_input":{"command":"cd deploy && ls"}}' | CLAUDE_PROJECT_DIR="$consumer_root" bash -c "$wired" 2>&1 >/dev/null)"
+rc=$?
+set -e
+rm -rf smoke-subdir
+if [[ "$rc" -ne 2 || "$msg" != *"'cd'"* ]]; then
+    echo "guard-kit/smoke/install.sh: the wired command '$wired', run from a subdirectory, did not block a compound-cd payload with rule \`cd_compound\`'s steer (exit $rc, want 2): $msg" >&2
+    exit 1
+fi
 set +e
 msg="$(printf '%s' '{"tool_name":"PowerShell","tool_input":{"command":"Set-Location deploy; Get-ChildItem"}}' | "$door" --hook shell-guard 2>&1 >/dev/null)"
 rc=$?

@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash gate-sdk/bin/run-gates.sh --hook shell-guard"
+            "command": "test -f gate-sdk/bin/run-gates.sh || exit 0; bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook shell-guard"
           }
         ]
       }
