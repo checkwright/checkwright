@@ -18,9 +18,14 @@ pub fn run(args: &[String]) -> i32 {
     }
 }
 
+enum Finding {
+    Red(String),
+    Valved(String, usize, String),
+}
+
 enum Token {
     Path(usize, String),
-    Knob(usize, String),
+    Knob(usize, String, bool),
     Cited(usize, String),
     Amendment(usize, String),
 }
@@ -59,7 +64,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let tree = Tree::read(&top)?;
     let cwd = walk::cwd()?;
 
-    let mut bad: Vec<String> = Vec::new();
+    let mut found: Vec<Finding> = Vec::new();
+    let mut cands: HashSet<String> = HashSet::new();
     let mut npath = 0usize;
     let mut nknob = 0usize;
     let mut ncited = 0usize;
@@ -75,38 +81,56 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 Token::Path(ln, t) => {
                     npath += 1;
                     if !path_ok(&docdir, &t)? {
-                        bad.push(format!("{}:{}: invoked script '{}' is not a tracked file", f, ln, t));
+                        found.push(Finding::Red(format!("{}:{}: invoked script '{}' is not a tracked file", f, ln, t)));
                     }
                 }
-                Token::Knob(ln, t) => {
+                Token::Knob(ln, t, valved) => {
                     nknob += 1;
-                    if !knob_ok(&defined, &t) {
-                        bad.push(format!(
-                            "{}:{}: env knob '{}' occurs in no tracked kit source",
-                            f, ln, t
-                        ));
+                    if knob_ok(&defined, &t) {
+                        continue;
+                    }
+                    if valved {
+                        cands.insert(t.clone());
+                        found.push(Finding::Valved(f.clone(), ln, t));
+                    } else {
+                        found.push(Finding::Red(knob_finding(f, ln, &t)));
                     }
                 }
                 Token::Cited(ln, t) => {
                     ncited += 1;
                     let cands = resolutions(&top, &cwd, &docdir, &t, &roots);
                     if tree.retired_unresolved(&cands) {
-                        bad.push(format!(
+                        found.push(Finding::Red(format!(
                             "{}:{}: cited path '{}' was retired (no tracked file under any resolution)",
                             f, ln, t
-                        ));
+                        )));
                     }
                 }
                 Token::Amendment(ln, t) => {
                     ncited += 1;
                     if tree.retired_basename(&t) {
-                        bad.push(format!(
+                        found.push(Finding::Red(format!(
                             "{}:{}: cited amendment '{}' was retired (no tracked file carries the basename)",
                             f, ln, t
-                        ));
+                        )));
                     }
                 }
             }
+        }
+    }
+
+    let retired = if cands.is_empty() {
+        HashSet::new()
+    } else {
+        retired_knobs(&top, &cands)?
+    };
+    let mut bad: Vec<String> = Vec::new();
+    let mut nretired = 0usize;
+    for finding in found {
+        match finding {
+            Finding::Red(s) => bad.push(s),
+            Finding::Valved(_, _, t) if retired.contains(&t) => nretired += 1,
+            Finding::Valved(f, ln, t) => bad.push(knob_finding(&f, ln, &t)),
         }
     }
 
@@ -118,9 +142,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
         println!("  help: fix the path (relative to the doc, or repo-relative) and track the script, or");
         println!("        correct the knob name. A hypothetical invocation goes outside a fence, or the doc");
         println!("        joins CANON_KIT_MDREF_EXCLUDE.");
-        println!("        A retired cited path: re-point it at the capability's current holder, or mark the");
-        println!("        line as history with '<!-- manifest-temporal-exempt: <reason> -->' on it or the line");
-        println!("        above, CANON_KIT_TEMPORAL_EXEMPT_SECTIONS or CANON_KIT_TEMPORAL_EXEMPT_PATHS.");
+        println!("        A retired cited path or a removed knob: re-point it at the capability's current");
+        println!("        holder, or mark the line as history with '<!-- manifest-temporal-exempt: <reason> -->'");
+        println!("        on it or the line above, CANON_KIT_TEMPORAL_EXEMPT_SECTIONS or");
+        println!("        CANON_KIT_TEMPORAL_EXEMPT_PATHS.");
         return Ok(1);
     }
     let shallow = if tree.shallow {
@@ -129,10 +154,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
         ""
     };
     println!(
-        "DOCS-CMD: clean ({} doc(s); {} invoked path(s) + {} kit-prefixed knob(s) resolve; {} cited path(s) name no retired path){}",
+        "DOCS-CMD: clean ({} doc(s); {} invoked path(s) + {} kit-prefixed knob(s) resolve; {} retired knob(s) admitted on history lines; {} cited path(s) name no retired path){}",
         files.len(),
         npath,
-        nknob,
+        nknob - nretired,
+        nretired,
         ncited,
         shallow
     );
@@ -262,6 +288,54 @@ impl Tree {
     fn retired_basename(&self, base: &str) -> bool {
         !self.tracked_base.contains(base) && self.retired_base.contains(base)
     }
+}
+
+fn knob_finding(f: &str, ln: usize, t: &str) -> String {
+    format!("{}:{}: env knob '{}' occurs in no tracked kit source", f, ln, t)
+}
+
+// spec: canon-kit/SPEC.md §check-docs-cmd — B's retired knob: a candidate some held commit carried
+// in a tracked path outside markdown and the fixture trees, read in one pickaxe pass over the
+// candidates alone; an unborn HEAD has retired nothing
+fn retired_knobs(top: &str, cands: &HashSet<String>) -> Result<HashSet<String>, String> {
+    let head = proc::run(&programs::GIT, &["-C", top, "rev-parse", "--verify", "-q", "HEAD"])?;
+    match head.code() {
+        Some(0) => {}
+        Some(1) => return Ok(HashSet::new()),
+        _ => return Err("git rev-parse failed resolving HEAD for the retired knobs".to_string()),
+    }
+    let mut names: Vec<&str> = cands.iter().map(String::as_str).collect();
+    names.sort_unstable();
+    let pickaxe = format!("-G({})", names.join("|"));
+    let text = git_text(
+        top,
+        &[
+            "log",
+            &pickaxe,
+            "-p",
+            "--format=",
+            "--no-color",
+            "--no-ext-diff",
+            "--no-textconv",
+            "--",
+            ".",
+            ":!*.md",
+            ":!*/gate-tests/*",
+        ],
+        "reading retired knobs from history",
+    )?;
+    let mut set = HashSet::new();
+    for line in text.lines() {
+        if !(line.starts_with('+') || line.starts_with('-')) {
+            continue;
+        }
+        for run in caps_runs(line, 1) {
+            if cands.contains(&run) {
+                set.insert(run);
+            }
+        }
+    }
+    Ok(set)
 }
 
 fn basename(p: &str) -> &str {
@@ -395,8 +469,8 @@ fn caps_runs(s: &str, min_tail: usize) -> Vec<String> {
     out
 }
 
-// spec: canon-kit/SPEC.md §check-docs-cmd — a history valve exempts a line's cited paths alone;
-// its fenced invocations and knobs are still scanned
+// spec: canon-kit/SPEC.md §check-docs-cmd — a history valve exempts a line's cited paths and
+// marks its knobs for the retired-knob admission; its fenced invocations are still scanned
 fn scan(
     text: &str,
     prefixes: &[String],
@@ -410,11 +484,12 @@ fn scan(
             LineKind::Fence => {}
             LineKind::Fenced => {
                 scan_a(line.raw, line.ln, &mut out);
-                scan_b(line.raw, line.ln, prefixes, &mut out);
+                scan_b(line.raw, line.ln, prefixes, false, &mut out);
             }
             LineKind::Heading | LineKind::Prose => {
+                let history = !cite || line.valved;
                 for span in inline_code_spans(line.raw) {
-                    scan_b(&span, line.ln, prefixes, &mut out);
+                    scan_b(&span, line.ln, prefixes, history, &mut out);
                     if cite && !line.valved {
                         scan_c(&span, line.ln, amend_glob, &mut out);
                     }
@@ -442,9 +517,9 @@ pub(crate) fn inline_code_spans(line: &str) -> Vec<String> {
     out
 }
 
-fn scan_b(text: &str, ln: usize, prefixes: &[String], out: &mut Vec<Token>) {
+fn scan_b(text: &str, ln: usize, prefixes: &[String], history: bool, out: &mut Vec<Token>) {
     for run in kit_knob_runs(text, prefixes) {
-        out.push(Token::Knob(ln, run));
+        out.push(Token::Knob(ln, run, history));
     }
 }
 
@@ -662,9 +737,9 @@ mod tests {
     }
 
     #[test]
-    fn a_valved_line_exempts_citations_and_not_knobs() {
+    fn a_valved_line_exempts_citations_and_still_yields_its_knobs() {
         let valve = TemporalValve::new(vec!["History".into()], vec![]);
-        let text = "<!-- manifest-temporal-exempt: port record -->\n`bin/a.sh` `GATE_SDK_NATIVE_BIN`\n## History\n`bin/b.sh`\n## Now\n`bin/c.sh`\n";
+        let text = "<!-- manifest-temporal-exempt: port record -->\n`bin/a.sh` `GATE_SDK_NATIVE_BIN`\n## History\n`bin/b.sh`\n## Now\n`bin/c.sh` `GATE_SDK_NATIVE_BIN`\n";
         let toks = scan(text, &["GATE_SDK_".to_string()], "SPEC-*.md", &valve, true);
         let cited: Vec<String> = toks
             .iter()
@@ -674,6 +749,7 @@ mod tests {
             })
             .collect();
         assert_eq!(cited, vec!["bin/c.sh".to_string()]);
-        assert!(toks.iter().any(|t| matches!(t, Token::Knob(2, _))));
+        assert!(toks.iter().any(|t| matches!(t, Token::Knob(2, _, true))));
+        assert!(toks.iter().any(|t| matches!(t, Token::Knob(6, _, false))));
     }
 }

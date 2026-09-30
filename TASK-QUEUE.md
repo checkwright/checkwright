@@ -8,18 +8,6 @@
 
 ## New Features
 
-### removed-knob-docs-cmd-valve
-
-[spec: SPEC-removed-knob-valve.md]
-
-a release note's Renamed-knobs removal bullet must lead with the removed knob backticked (installer/SPEC.md §The upgrade contract), and `check-docs-cmd` assertion B reds a backticked kit-prefixed knob no kit code carries, which a removed knob by definition is. The temporal-exempt path and marker valves do not reach B, so the only valve is the whole-doc `CANON_KIT_MDREF_EXCLUDE`, which also drops the note's md-refs and docs-cmd path checks.
-
-**Deliverable:** a valve that admits a removed knob in its sanctioned release-note position, or B reading the removal bullet's grammar, and the v0.26.0 note taken back off the exclude.
-
-**Selected 2026-09-30 for canon-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, landing before [canon-kit-value-audit](#canon-kit-value-audit) rules `check-docs-cmd`.
-
-**Cost while deferred:** every release that removes a knob buys a whole-doc exclude, and each excluded note loses its link and path checks for good. Filed 2026-09-26 to the gap inbox at front-door-release's close, which excluded the v0.26.0 note for three removed knobs; promoted 2026-09-26 at the next iteration's scope: →fix fails because the valve's shape is a design call on a shipped gate. Re-verified: `scripts/canon-config.knobs` carries the exclude for that note. Owner lookup: `docs-cmd`, `Renamed-knobs`, `MDREF_EXCLUDE` in this file — only the icebox's [docs-cmd-retired-path-blind-to-queue](#docs-cmd-retired-path-blind-to-queue), which is assertion C; owner canon-kit/SPEC.md §check-docs-cmd.
-
 ### citation-link-root-docs-range
 
 [spec: SPEC-citation-link-root-docs.md]
@@ -118,7 +106,7 @@ canon-kit/SPEC.md's amendment-family sections under [spec-brevity-residue](#spec
 
 [gate-customer-value-audit](#gate-customer-value-audit)'s canon-kit slice: the gates canon-kit ships, 44 `.gate` descriptors (27 zero-config and 11 on-surface by install disposition), audited for customer value and configurability under gate-sdk/SPEC.md §Consumer payload's rule. canon-kit is the companion's `prose` tier, which every companion install exposes.
 
-**Deliverable:** each gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated. `check-docs-cmd`, `check-citation-link` and `check-prose-tells` are ruled after [removed-knob-docs-cmd-valve](#removed-knob-docs-cmd-valve), [citation-link-root-docs-range](#citation-link-root-docs-range) and [absence-statement-gate-arms](#absence-statement-gate-arms) land, since those change them, and `check-measured-claim` and `check-unmarked-claim` after [baseline-row-prose-coupling-gate](#baseline-row-prose-coupling-gate) lands, since its baseline claims ride them; [companion-install-tier](#companion-install-tier) reads the verdicts after.
+**Deliverable:** each gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated. `check-docs-cmd`, `check-citation-link` and `check-prose-tells` are ruled after `removed-knob-docs-cmd-valve`, [citation-link-root-docs-range](#citation-link-root-docs-range) and [absence-statement-gate-arms](#absence-statement-gate-arms) land, since those change them, and `check-measured-claim` and `check-unmarked-claim` after [baseline-row-prose-coupling-gate](#baseline-row-prose-coupling-gate) lands, since its baseline claims ride them; [companion-install-tier](#companion-install-tier) reads the verdicts after.
 
 **Cost while deferred:** the parent's cost, for this kit. Filed 2026-09-30 as a split at canon-kit-value-pass' scope. Part of the operator's selection of the set, direction 2026-09-30, lead-relayed (not a ruling).
 
@@ -536,7 +524,7 @@ release notes serve human upgraders poorly, and their section set is crate liter
 
 **Deliverable:** a note structure with a linked summary table, audience-keyed sections and a Platforms section derived from the diff of docs/install.md's gated platforms table between two releases, its section set one knob-owned roster every reader derives from. The lead tokens are machine-read over a historical corpus the upgrade smoke resolves at any FROM/TO, so a rename owes an alias window or a note-corpus migration.
 
-**Cost while deferred:** every release ships a note a human must read whole to act on, custom-gate adopters are not told what applies to them, and a platform change hides in Behavior changes. Filed 2026-08-01 at close; iceboxed 2026-09-11 as dormant; re-filed 2026-09-27 to the gap inbox as two bullets (readability, a Platforms section) by platform-prerequisite-floors' lead, and returned at its close on a judged recurrence: →fix fails because the redesign renames machine-read tokens. Re-verified: `wc -w` over the two notes, and the literals in `native/src/gates/release_bump.rs`, `tightened_gates_grammar.rs`, `release_change_declared.rs`, `native/src/declaration.rs` and `native/src/emit/upgrade_smoke.rs`. [removed-knob-docs-cmd-valve](#removed-knob-docs-cmd-valve) is DISTINCT. Owner: installer/SPEC.md §The upgrade contract, RELEASING.md.
+**Cost while deferred:** every release ships a note a human must read whole to act on, custom-gate adopters are not told what applies to them, and a platform change hides in Behavior changes. Filed 2026-08-01 at close; iceboxed 2026-09-11 as dormant; re-filed 2026-09-27 to the gap inbox as two bullets (readability, a Platforms section) by platform-prerequisite-floors' lead, and returned at its close on a judged recurrence: →fix fails because the redesign renames machine-read tokens. Re-verified: `wc -w` over the two notes, and the literals in `native/src/gates/release_bump.rs`, `tightened_gates_grammar.rs`, `release_change_declared.rs`, `native/src/declaration.rs` and `native/src/emit/upgrade_smoke.rs`. `removed-knob-docs-cmd-valve` is DISTINCT. Owner: installer/SPEC.md §The upgrade contract, RELEASING.md.
 
 ### consumer-value-literal-gate
 
@@ -1547,5 +1535,7 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 Whether a live queue entry should cite shipped mechanism by a stable anchor (a SPEC section, a gate name, a path) rather than a retired slug, and whether a check-queue-hygiene axis should hold that, is unruled; close's retired-block read corrects each instance inline meanwhile, as it did twice at preview-readiness' close.
 
 ## Done
+
+- removed-knob-docs-cmd-valve
 
 ## Lessons Learned

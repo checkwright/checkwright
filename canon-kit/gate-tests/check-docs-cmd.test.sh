@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: canon-kit/SPEC.md §check-docs-cmd — assertion (C) reads the retired set out of the history the tree holds, which a static case dir cannot carry: the pair runs inside whatever repo vendored it, so a pair case that reds on a retirement reds only where that repo's history happens to hold the deletion. Every retirement-dependent case builds its own history here instead.
+# spec: canon-kit/SPEC.md §check-docs-cmd — assertion (C) and (B)'s admission read the retired set out of the history the tree holds, which a static case dir cannot carry: the pair runs inside whatever repo vendored it, so a pair case that reds on a retirement reds only where that repo's history happens to hold the deletion. Every retirement-dependent case builds its own history here instead.
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -14,14 +14,18 @@ mkdir -p "$sb/bin" "$sb/comp"
 printf '#!/usr/bin/env bash\n' >"$sb/bin/old.sh"
 printf '# SPEC amendment: gone\n' >"$sb/comp/SPEC-gone.md"
 printf '#!/usr/bin/env bash\n' >"$sb/bin/staged.sh"
+printf '#!/usr/bin/env bash\n: "${CANON_KIT_FIXTURE_GONE:-}"\n' >"$sb/bin/knob.sh"
 printf '# doc\n' >"$sb/doc.md"
+mkdir -p "$sb/posts"
+printf 'CANON_KIT_TEMPORAL_EXEMPT_PATHS[] = posts/*\n' >"$sb/valve.knobs"
 git -C "$sb" add -A
 git -C "$sb" commit -qm seed
-git -C "$sb" rm -q bin/old.sh comp/SPEC-gone.md
+git -C "$sb" rm -q bin/old.sh comp/SPEC-gone.md bin/knob.sh
 git -C "$sb" commit -qm retire
 
 fails=0
-run() { ( cd "$sb" && gate_run check-docs-cmd "$DIR/checks" doc.md 2>&1 ); }
+doc=doc.md
+run() { ( cd "$sb" && gate_env CANON_KIT_KNOB_FILE="$sb/valve.knobs" && gate_run check-docs-cmd "$DIR/checks" "$doc" 2>&1 ); }
 expect() {  # $1=case $2=want-exit $3=want-line
     local out rc
     out="$(run)"; rc=$?
@@ -53,9 +57,21 @@ expect retired-amendment-basename 1 "cited amendment 'SPEC-gone.md' was retired"
 printf '# doc\n\nAn illustrative `SPEC-never.md` amendment.\n' >"$sb/doc.md"
 expect never-tracked-amendment 0 "DOCS-CMD: clean"
 
+doc=posts/note.md
+printf '# note\n\n- `CANON_KIT_FIXTURE_GONE` is removed.\n' >"$sb/$doc"
+expect retired-knob-path-valved 0 "1 retired knob(s) admitted on history lines"
+
+doc=doc.md
+printf '# doc\n\n- `CANON_KIT_FIXTURE_GONE` is removed.\n' >"$sb/$doc"
+expect retired-knob-unvalved 1 "env knob 'CANON_KIT_FIXTURE_GONE' occurs in no tracked kit source"
+
+doc=posts/note.md
+printf '# note\n\n- `CANON_KIT_FIXTURE_NEVER` is removed.\n' >"$sb/$doc"
+expect invented-knob-path-valved 1 "env knob 'CANON_KIT_FIXTURE_NEVER' occurs in no tracked kit source"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-docs-cmd.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-docs-cmd.test.sh: clean (retired set from the scratch repo's own history: committed and staged deletions red, the history valve and a never-tracked path clear, a retired amendment basename reds and a never-tracked one clears, 6 cases)"
+echo "check-docs-cmd.test.sh: clean (retired set from the scratch repo's own history: committed and staged deletions red, the history valve and a never-tracked path clear, a retired amendment basename reds and a never-tracked one clears, a removed knob clears on a path-valved line and reds unvalved, an invented knob reds on a valved line, 9 cases)"
 exit 0
