@@ -8,33 +8,19 @@
 
 ## New Features
 
-### session-model-identity-verification
-
-[spec: SPEC-model-verdict.md]
-
-a session cannot report or verify the model tier it is running at. The session-context hook prints iteration, budget and drift; `drift-report` prints neither. Nothing surfaces the running model, so a session cannot state its own tier without a human hand-reading the harness transcript, and no stage can assert the tier it was dispatched at.
-
-**Operator-proposed shape, recorded 2026-08-04:** a `usage-verdict`-shaped check — snapshot in, exit 0/1/2, fail-soft — reusing the `--emit-session-id` arm's projects-dir derivation, with the *tier expectation in consumer config* rather than a kit literal. Both halves of that placement are forced: a baked model-name ladder is drift by construction (delegation-kit's agent-execution rule keys tiering to capability, not to a name), and the provenance seam keeps product constants out of kit literals regardless.
-
-**Feature-shaped, so it wants `/spec`, not a debt promotion.** It spans derivation lifecycle or context, verdict delegation, and a consumer config surface, and it introduces a new governed name. Cross-kit ownership plus a new name is the amendment threshold, and a scope that promotes this straight to build will be authoring the contract inside the build.
-
-**Cost while deferred:** every tiering rule in the tree is unverifiable — including the two filed alongside this one. [consult-tier-declaration](#consult-tier-declaration) blocks on it outright, and the `Co-Authored-By` attribution defect has no derivable fix without it. Filed 2026-08-04 at close from the gap inbox; filed by the lead.
-
-**Selected 2026-09-30 for delegation-tier-binding, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it, after `tier-model-binding`, whose binding supplies the consumer-config tier expectation.
-
 ### consult-tier-declaration
 
-[spec: SPEC-consult-tier.md] [blocked-by: session-model-identity-verification]
+[spec: SPEC-consult-tier.md]
 
 `/consult` governs the tier of what it dispatches and asserts nothing about its own. The skill landed this iteration to carry judgment-tier boundary questions, and its own amendment argues it is judgment-tier *by nature* — yet it declares no floor for the session running it and verifies nothing at entry. A consultation answered at a cheap tier is indistinguishable, in the record, from one answered at the tier the skill was built for.
 
 **Operator direction 2026-08-04:** it must run on the top model and verify that at entry.
 
-**The shape that keeps the seam intact:** the *skill* declares its own floor, the *kit* never spells a model name — the same split [session-model-identity-verification](#session-model-identity-verification) sets up, which is why this blocks on it rather than racing it. Without the mechanism this entry is a prose assertion of the kind that already failed twice this iteration.
+**The shape that keeps the seam intact:** the *skill* declares its own floor, the *kit* never spells a model name — the same split `session-model-identity-verification` sets up, which is why this blocks on it rather than racing it. Without the mechanism this entry is a prose assertion of the kind that already failed twice this iteration.
 
 **Cost while deferred:** the repo's one escalation-grade skill is silently downgradeable, and the failure is invisible in the artifact — a thin consultation reads as a short one. Filed 2026-08-04 at close from the gap inbox; filed by the lead on operator direction.
 
-**Selected 2026-09-30 for delegation-tier-binding, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it after [session-model-identity-verification](#session-model-identity-verification), its blocker, in the same set.
+**Selected 2026-09-30 for delegation-tier-binding, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it after `session-model-identity-verification`, its blocker, in the same set.
 
 ### hotfix-agent-definition
 
@@ -1563,5 +1549,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 ## Done
 
 - tier-model-binding
+- session-model-identity-verification
 
 ## Lessons Learned

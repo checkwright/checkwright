@@ -2,7 +2,7 @@
 7385cp .claude/agents/audit-sweep.md
 1322cp .claude/agents/consult-session.md
 2205cp .claude/agents/edit-sweep.md
-8501cp .claude/agents/stage-session.md
+8969cp .claude/agents/stage-session.md
 93cp .claude/commands/adopt.md
 1446cp .claude/commands/agent-execution.md
 551cp .claude/commands/align.md
@@ -10,7 +10,7 @@
 9178cp .claude/commands/close.md
 2355cp .claude/commands/consult.md
 1451cp .claude/commands/economics.md
-4994cp .claude/commands/lead.md
+5099cp .claude/commands/lead.md
 715cp .claude/commands/release-sweep.md
 6847cp .claude/commands/scope.md
 1155cp .claude/commands/spec.md
@@ -21,7 +21,7 @@
 23669cp companion/SPEC.md
 130174cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
-279718cp delegation-kit/SPEC.md
+286578cp delegation-kit/SPEC.md
 37174cp delegation-kit/templates/agent-execution.md
 3397cp delegation-kit/templates/dispatch-checklists.md
 1308cp docs/canon-kit/index.md
@@ -39,7 +39,7 @@
 1395cp docs/lifecycle-kit/index.md
 3007cp docs/methodology.md
 1682cp docs/openspec.md
-11604cp docs/orchestration.md
+11646cp docs/orchestration.md
 11086cp docs/positioning.md
 1869cp docs/posts/2026-07-09-announcing-checkwright.md
 1034cp docs/posts/2026-07-14-checkwright-v0-1-0.md

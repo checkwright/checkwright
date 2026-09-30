@@ -51,6 +51,7 @@ Run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names, where `init` pl
 gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --usage-verdict            # budget verdict: exit 0 OK/RESET-OK, 1 PAUSE, 2 STALE
 "$gates" --usage-verdict <snapshot> # verdict for an explicit usage.txt (test injection)
+"$gates" --model-verdict --expect judgment  # running-model verdict against the tier binding: exit 0 OK, 1 BELOW/UNBOUND, 2 UNKNOWN
 "$gates" --emit usage-trend          # footprint trend over the sample log (needs DELEGATION_KIT_USAGE_HISTORY)
 "$gates" --wait-probe sweep          # wait-primitive probe: the harness-uninvolved reproducer (sleeps for its declared sweep)
 "$gates" --wait-probe report         # classify the recorded trials and print the verdict (exit 1 when none are)

@@ -711,6 +711,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Run(crate::hook::verdict::run),
         crate::hook::verdict::KNOBS,
     ),
+    // spec: delegation-kit/SPEC.md §model-verdict — an `Arm::Run` for `--usage-verdict`'s reason: its
+    // 1, the session off its expected tier, is the signal its callers grade
+    (
+        "--model-verdict",
+        Arm::Run(crate::hook::model_verdict::run),
+        crate::hook::model_verdict::KNOBS,
+    ),
     // spec: guard-kit/SPEC.md §scratch-run — an `Arm::Run` on two independent grounds: the runner
     // passes the child's exit code through verbatim, and its stdout must reach the terminal as the
     // child produces it rather than as a string returned at the end.

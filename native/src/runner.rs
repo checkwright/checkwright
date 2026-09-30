@@ -28,6 +28,7 @@ pub const USAGE: &str = r#"usage: run-gates.sh [gates-dir]                run ev
        run-gates.sh --statusline               render the harness status line, payload on stdin
        run-gates.sh --usage-poll               refresh the usage snapshot from its source
        run-gates.sh --usage-verdict [paths]    budget verdict: 0 OK/RESET-OK, 1 PAUSE, 2 STALE
+       run-gates.sh --model-verdict [--expect <class>] [transcript]  running-model verdict: 0 READ/OK, 1 BELOW/UNBOUND, 2 UNKNOWN
        run-gates.sh --lesson-sink <tag>        route a lesson body on stdin to its sink
        run-gates.sh --queue <verb> <slug> [args]  move or stamp one queue entry, then run the queue's gates
        run-gates.sh --upgrade-smoke            prove the FROM->TO kit upgrade in scratch
@@ -75,6 +76,12 @@ pub const USAGE: &str = r#"usage: run-gates.sh [gates-dir]                run ev
           positionals override the snapshot and credentials paths for test
           injection; a path beginning with a dash is passed after `--`.
           Unavailable is exit 2, the same code an unreadable snapshot takes.
+  --model-verdict  emits one line naming the model the session runs on, read
+          off its transcript, and with --expect <class> judges it against the
+          tier binding: exit 0 READ or OK, 1 BELOW or UNBOUND (off its
+          expected tier), 2 UNKNOWN (unverified, never a refusal). The operand
+          names the transcript by path or eight-character session id; bare, it
+          takes the delegation-aware pick. Unavailable is exit 2.
   --lesson-sink  reads a lesson body on stdin and runs the sink configured for
           <tag>, or appends to <workflow-dir>/<tag>-harvest.md when none is.
           The sink's exit status is this arm's, so a failing sink is visible to

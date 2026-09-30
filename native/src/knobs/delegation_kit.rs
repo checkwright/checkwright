@@ -60,6 +60,7 @@ pub const KIT: Kit = Kit {
         Row::indexed("DELEGATION_KIT_MUTATING_TYPES", &[]),
         Row::scalar("DELEGATION_KIT_REQUIRE_TIER", "off"),
         Row::indexed("DELEGATION_KIT_TIER_MODEL", &[]),
+        Row::scalar("DELEGATION_KIT_SESSIONS_DIR", ""),
         Row::indexed("DELEGATION_KIT_STATUSLINE_INBOXES", &[]),
         Row::derived("DELEGATION_KIT_GATE_FILES", Shape::Indexed, gate_files, &["GATE_SDK_GATES_DIR"]),
         Row::derived(

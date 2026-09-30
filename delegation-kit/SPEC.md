@@ -500,13 +500,13 @@ A consumer binds each **tier class** to a model once, and every place that choos
 
 **A value is an alias or an exact model id, and the choice is the consumer's.** An alias follows: the harness resolves it to the newest model it names by it. A model upgrade then arrives with no edit, and so do its price and its behaviour. An exact id pins: it stays until the consumer changes it. The kit ships no value, because the harness roster churns and the values are consumer config (gate-sdk/SPEC.md §The provenance seam).
 
-**Matching.** A running model **matches** a value when the value equals its id or equals one of the id's `-`-separated tokens after the first. So an alias matches every id in its family and an exact id matches only itself. The kit holds no alias list, because the harness's ids already carry their family as a token. The leading token is skipped because it is the namespace every id shares: a value equal to it would match every model and hold no tier. The table validator sees the binding and no id, so it cannot tell a namespace spelling from an alias. The skip therefore makes such a value match nothing, and every reader reports it (D6 blocks) rather than matching every id silently. The validator refuses the two spellings it can see: an all-digit value, a version token that crosses families, and a value equal to the leading token of a different bound value. One value bound to two classes is not that second spelling, and passes. **Honest limit:** a harness whose ids lead with their family reaches it by exact id only.
+**Matching.** A running model **matches** a value when the value equals its id or equals one of the id's `-`-separated tokens after the first. So an alias matches every id in its family and an exact id matches only itself. The kit holds no alias list, because the harness's ids already carry their family as a token. The leading token is skipped because it is the namespace every id shares: a value equal to it would match every model and hold no tier. The table validator sees the binding and no id, so it cannot tell a namespace spelling from an alias. The skip therefore makes such a value match nothing, and every reader reports it (D6 blocks, `--model-verdict` reads `UNBOUND`) rather than matching every id silently. The validator refuses the two spellings it can see: an all-digit value, a version token that crosses families, and a value equal to the leading token of a different bound value. One value bound to two classes is not that second spelling, and passes. **Honest limit:** a harness whose ids lead with their family reaches it by exact id only.
 
-**The binding is read where a tier is chosen.** A definition's `model:` is generated from the class its `tier:` field declares (§check-agent-tier-explicit). A dispatch naming a model is held to a bound value (§The delegation model, D6).
+**The binding is read at three places.** A definition's `model:` is generated from the class its `tier:` field declares (§check-agent-tier-explicit). A dispatch naming a model is held to a bound value (§The delegation model, D6). A session reads the class of the model it runs on (§model-verdict).
 
 **Honest limit on pinning.** This harness takes a per-dispatch `model` as an alias only: the dispatch tool's parameter is an enum of aliases. So a pinned class cannot ride a per-dispatch override, and a consumer pinning a class it reaches by override dispatches it as a type whose definition carries the pin instead. The definition's `model:` does take an exact id. Measured: a definition pinned to one family's exact id, dispatched from a session running another, ran on the pinned id, which its transcript's `message.model` carried on every record. A harness loads its definitions at session start, so a pin reaches only sessions started after it lands. Pinning an alias's own resolution is harness configuration (its default-model environment settings), outside this kit, on the reasoning §The delegation model applies to `worktree.baseRef`.
 
-**Following is a strength with a stated cost.** An upgrade under an alias changes price and behaviour silently. What surfaces it is a new id in the transcripts, where every assistant record carries the model its turn ran on (`message.model`): drift-kit's `--price-coverage` names an id its price table cannot price (drift-kit/SPEC.md §The price-coverage arm), and the lead reads it before its first dispatch. Under a pin, a new id in a pinned class's transcripts means the pin was bypassed.
+**Following is a strength with a stated cost.** An upgrade under an alias changes price and behaviour silently. What surfaces it is a new id in the transcripts, where every assistant record carries the model its turn ran on (`message.model`): drift-kit's `--price-coverage` names an id its price table cannot price (drift-kit/SPEC.md §The price-coverage arm), and the lead reads it before its first dispatch. Under a pin, a new id in a pinned class's transcripts means the pin was bypassed, and `--model-verdict` reports it as a mismatch.
 
 **Two shapes were weighed and refused.** *Three scalar knobs, one per class*: a scalar takes an environment override under its own name (gate-sdk/SPEC.md §The knob file). The binding feeds a freshness gate (§check-agent-tier-explicit), so a session exporting an override would red that gate against a tree nothing changed; an indexed knob takes none. *Keeping `model:` hand-written and checking only that its value is some bound value*: two classes bound to one alias make that check blind, and rebinding one of them then leaves every definition that meant the other class silently wrong. A definition has to say which class it is.
 
@@ -622,6 +622,42 @@ The `iteration@stage` readout's two halves come from two surfaces: the iteration
 - **So the residual failure is total and visible, never partial and wrong.** A malformed queue config, which the table validator refuses, drops the **whole** counter group and changes nothing else about the bar — one of the degradations above. A consumer's configured tier silently missing from a rendered tally has no spelling on this path.
 
 The render cost is one in-process scan per statusline fire, which is the kit's most frequent trigger by a wide margin (§The usage.txt contract). A full scan of a ~3,600-line queue measures in single-digit milliseconds, so the group needs no cache — recorded so a later session does not add one on suspicion.
+
+## model-verdict
+
+Emits one verdict line naming the model the session runs on and, with `--expect <class>`, whether that model meets the class (§The tier binding): `bash gate-sdk/bin/run-gates.sh --model-verdict [--expect <class>] [<transcript.jsonl | session8>]`. Without it every tiering rule is unverifiable from inside the session it binds: a stage session dispatched on the mechanical class cannot tell whether it got it, and a pin cannot be seen holding or failing.
+
+**Which transcript.** A `.jsonl` operand is read as given. An eight-character operand names a transcript through the shared inverse lookup, whose normalization strips a leading `agent-` from each candidate (drift-kit/SPEC.md §The stage-economics meter). Bare, the arm takes the delegation-aware derivation's pick (lifecycle-kit/SPEC.md §bin/session-id.sh): a top-level session's own transcript, and for a dispatched session the newest transcript under its lead's `subagents/`. The sessions dir is `DELEGATION_KIT_SESSIONS_DIR`, empty meaning derived, as drift-kit's knob is. **Honest limit:** a sibling session writing at the same moment can out-date a dispatched caller's own transcript, so the line prints the key it read, and a caller holding its own id passes it.
+
+**Which model.** The newest assistant record whose usage is not all zero gives `message.model`. The record is read by the meter's own per-record reader, so the two agree on what a record's model and usage are. All-zero is the test `--price-coverage` applies to an id's summed counts, here applied to one record, since the harness's synthetic records carry zero usage. The newest record exists while a tool call runs, so a session asking about itself finds its own current turn. A model switched mid-session is read as the model now running.
+
+**The verdict.** The id's classes are the bound classes whose value it matches (§The tier binding). Without `--expect`, the line is a reading and exits 0. With it, the id meets class `E` when it matches `E` or a class ranked above it. The ranking is judgment, then routing, then mechanical, so a check at a floor passes a stronger model.
+
+| verdict | when | exit |
+| --- | --- | --- |
+| `READ` | no `--expect`, and a model id was read | 0 |
+| `OK` | the id meets the expected class | 0 |
+| `BELOW` | the id matches only classes ranked under the expected one | 1 |
+| `UNBOUND` | the id matches no bound value | 1 |
+| `UNKNOWN` | no transcript, no counting record, the binding empty under `--expect`, or the expected class unbound | 2 |
+
+`UNBOUND` is a mismatch rather than an unknown, since the model is known and the binding does not name it. Under a pinned class it is the pin bypassed. Under aliases it is a model outside the consumer's tiers, a forced subagent model for one.
+
+**The line** is `model-verdict: id=<id> session=<key> class=<classes|none> expect=<class|-> -> <VERDICT>`, followed by its consequence, on §usage-verdict's verdict-string contract: reading, epistemic status, consequence.
+
+- `OK` and `READ` carry no consequence clause.
+- `BELOW` and `UNBOUND` carry `— the session is not on its expected tier; stop before work that needs it and have it re-dispatched at that tier`.
+- `UNKNOWN` carries its cause in parentheses, then `— tier unverified, not refused; the caller's rule says whether to proceed`.
+
+**Exit 2 is fail-soft on refusing work**, as `usage-verdict`'s STALE is. A binding or a transcript that cannot be read is no evidence of the wrong tier, so no caller refuses on it alone.
+
+**The arm** is an `Arm::Run` row: its 1 is the signal its callers grade, so it cannot be an `--emit-` member (§usage-verdict states the same forcing). It spawns nothing and writes nothing. Its declared knobs are `DELEGATION_KIT_TIER_MODEL` and `DELEGATION_KIT_SESSIONS_DIR`, and the harness's session variables arrive as inputs, as they do for the meter. A dash-led operand naming no option, an `--expect` naming no class of the vocabulary, and a second operand are refusals at exit 2, and `--` ends option processing.
+
+**Callers.** The consult skill at its entry (lifecycle-kit/templates/consult.md), a stage session whose dispatch names its class, and any session asked what it runs on.
+
+**Why the transcript.** The top-level interface already renders the model through this kit's `--statusline` arm, which reads the harness's statusline payload. `SessionStart`'s payload carries a `model` field only optionally, and no other hook event carries one. So the running model reaches a session only through its transcript, and a hook-side route would reach top-level sessions alone, where the statusline already shows it.
+
+**Two shapes were weighed and refused.** *Stamping the model into `--enter-stage`'s record* would change the stamp grammar of lifecycle-kit's state machine for a fact a stage session can ask for at the moment it needs it. It would also leave a consultation, which stamps nothing, uncovered. *Refusing the delegated case, as the overhead meter does*: the meter must never measure a sibling's transcript, because its output is a logged cost. A verdict prints the transcript key it read, and its caller can check that key against its own stamp id or pass its id as the operand, so a verdict can take the newest transcript where a meter cannot.
 
 ## Trend reporter
 
@@ -755,6 +791,7 @@ Config is a **knob file**: copy `templates/delegation-config.knobs` into the gat
 - `DELEGATION_KIT_REQUIRE_TIER` — D5's switch, `on` or `off`; default `off`, in which case D5 is inert. The table validator refuses any other value. A switch rather than a roster of model names, because the kit ships no model name and the tier each type rides is its definition's `model:` field (§check-agent-tier-explicit) or the dispatch's own `model`.
 - `DELEGATION_KIT_AGENT_DIR` is also D5's lookup root: a type counts as tiered when a definition under it declares that type and states `model:`.
 - `DELEGATION_KIT_TIER_MODEL` — the tier binding (§The tier binding): indexed, one `<class>=<model>` element per class, the class one of `judgment`, `routing` and `mechanical`; default empty, which is off. The table validator refuses a malformed element, an unknown class, a class bound twice, an empty value, a value carrying whitespace, an `inherit` value, an all-digit value and a value equal to the leading token of a different bound value. Being indexed, it has no environment spelling: a freshness gate reads it, and a per-session override would red that gate against an unchanged tree.
+- `DELEGATION_KIT_SESSIONS_DIR` — the transcript directory `--model-verdict` reads (§model-verdict); default empty, which derives `<config-home>/projects/<cwd-slug>` through the crate's one derivation (lifecycle-kit/SPEC.md §bin/session-id.sh), the same emptiness drift-kit's `DRIFT_KIT_SESSIONS_DIR` takes. A kit resolves its own knob and hands the answer to the shared module. So this knob, drift-kit's and lifecycle-kit's environment-only `LIFECYCLE_KIT_SESSIONS_DIR` are three names for one default.
 - `DELEGATION_KIT_STATUSLINE_INBOXES` — array of `<label>=<path>` elements, each a repo-root-relative bullet file the status line counts (§The statusline arm); default empty, which renders no inbox group. The table validator refuses an element with no `=`, an empty label or an empty path, at exit 2.
 
 `check-gate-tamper` registers in the consumer's `gates.list` (tier: precommit) — in this repo's too; dogfooding is day-one, and agents commit here.
@@ -838,6 +875,17 @@ Armed and short-circuit are the firing/non-firing pair over the same stub, so th
 - each row is also held against its own expected value, so two empty outputs cannot pass as agreement.
 
 A member with no live tree corpus, whose input is a crafted snapshot or processes it stands up itself, has its case set for its corpus, so the comparison over it is complete rather than demoted.
+
+**The model verdict.** `native/src/hook/model_verdict.rs`'s test module drives the arm's library function over transcripts it writes, each verdict row both reached and missed. The binding and the sessions dir are written into each case's sandbox knob file under the budget verdict's hermetic contract, with the `DELEGATION_KIT_*` namespace held aside. It covers:
+
+- `READ`, a bare read of an unbound id;
+- `OK` by an exact id, by an alias token, and by a stronger class under a floor;
+- `BELOW`, a mechanical-only match against `--expect judgment`;
+- `UNBOUND`, an id matching nothing;
+- `UNKNOWN` for an empty transcript, a transcript whose only assistant record has all-zero usage, the binding empty under `--expect`, and an unbound expected class;
+- both operand forms, a path and an eight-character key naming an `agent-` transcript;
+- the newest-record rule, a transcript switching model mid-file reading the later model;
+- the shape refusals and the `--` escape.
 
 **The dispatch and budget guards.** `agent-budget-guard` and `agent-dispatch-guard` are hooks rather than gates, so each speaks exit-2 + hook JSON rather than the gate output contract. Their cases run as crate `#[test]`s reaching the subject directly. **A runner lives in the crate when its *cases* can be driven from there, the subject reached in process *or* spawned.** No crate test spawns a kit **`bin/` tool as a test subject**. Crate tests do source `gate-sdk/lib/gate.sh` to read the shell library's *own* answer: a pre-binary accessor, the gates-directory default or the source stamp. That is deliberate, because a Rust literal would restore the second source of truth those tests exist to hold, and that library stays shell on its own grounds (gate-sdk/SPEC.md §lib/gate.sh).
 

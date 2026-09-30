@@ -6,6 +6,7 @@ use serde_json::Value;
 pub mod budget;
 pub mod dispatch;
 pub mod escalation;
+pub mod model_verdict;
 pub mod poll;
 pub mod shell_guard;
 pub mod statusline;

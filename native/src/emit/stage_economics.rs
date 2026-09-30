@@ -85,36 +85,42 @@ impl<V> Ordered<V> {
     }
 }
 
+// spec: drift-kit/SPEC.md §The stage-economics meter — one transcript line read as an assistant
+// record: its message id, its model and its usage. A line that is not one, or carries no usage, is
+// none. The meter and delegation-kit's `--model-verdict` both read records through this.
+pub struct Record {
+    pub id: String,
+    pub model: String,
+    pub tokens: Tokens,
+}
+
+pub fn record(line: &str) -> Option<Record> {
+    let v = serde_json::from_str::<serde_json::Value>(line).ok()?;
+    if v.get("type").and_then(|t| t.as_str()) != Some("assistant") {
+        return None;
+    }
+    let msg = v.get("message")?;
+    let usage = msg.get("usage").filter(|u| !u.is_null())?;
+    let n = |k: &str| usage.get(k).and_then(|x| x.as_u64()).unwrap_or(0);
+    Some(Record {
+        id: msg.get("id").and_then(|x| x.as_str()).unwrap_or("?").to_string(),
+        model: msg.get("model").and_then(|x| x.as_str()).unwrap_or("?").to_string(),
+        tokens: Tokens {
+            input: n("input_tokens"),
+            output: n("output_tokens"),
+            cache_read: n("cache_read_input_tokens"),
+            cache_write: n("cache_creation_input_tokens"),
+        },
+    })
+}
+
 // spec: drift-kit/SPEC.md §The stage-economics meter — a streaming transcript repeats a message id
 // across lines with input and cache constant and output growing, so the **last** record per id is
 // kept and raw lines are never summed; an unreadable line is skipped rather than fatal.
 pub fn usage_by_model(body: &str) -> Vec<(String, Tokens)> {
     let mut ids: Ordered<(String, Tokens)> = Ordered::default();
-    for line in body.lines() {
-        let Ok(v) = serde_json::from_str::<serde_json::Value>(line) else {
-            continue;
-        };
-        if v.get("type").and_then(|t| t.as_str()) != Some("assistant") {
-            continue;
-        }
-        let Some(msg) = v.get("message") else { continue };
-        let Some(usage) = msg.get("usage").filter(|u| !u.is_null()) else {
-            continue;
-        };
-        let id = msg.get("id").and_then(|x| x.as_str()).unwrap_or("?");
-        let model = msg
-            .get("model")
-            .and_then(|x| x.as_str())
-            .unwrap_or("?")
-            .to_string();
-        let n = |k: &str| usage.get(k).and_then(|x| x.as_u64()).unwrap_or(0);
-        let t = Tokens {
-            input: n("input_tokens"),
-            output: n("output_tokens"),
-            cache_read: n("cache_read_input_tokens"),
-            cache_write: n("cache_creation_input_tokens"),
-        };
-        ids.set(id, (model, t));
+    for r in body.lines().filter_map(record) {
+        ids.set(&r.id, (r.model, r.tokens));
     }
     let mut by_model: Ordered<Tokens> = Ordered::default();
     for (_, (model, t)) in ids.iter() {

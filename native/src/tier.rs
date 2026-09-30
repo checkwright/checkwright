@@ -95,6 +95,16 @@ pub fn refusals(binding: &[String]) -> Vec<String> {
     errs
 }
 
+// spec: delegation-kit/SPEC.md §model-verdict — the classes whose bound value the id matches,
+// highest first
+pub fn classes_of(binding: &[String], id: &str) -> Vec<&'static str> {
+    CLASSES
+        .iter()
+        .filter(|c| bound(binding, c).is_some_and(|v| matches(v, id)))
+        .copied()
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -124,5 +134,8 @@ mod tests {
         assert_eq!(bound(&binding, "routing"), Some("big"));
         assert_eq!(values(&binding), vec!["small", "big", "big"]);
         assert_eq!(bound(&b(&["judgment=big"]), "mechanical"), None);
+        assert_eq!(classes_of(&binding, "vendor-big-5"), vec!["judgment", "routing"]);
+        assert_eq!(classes_of(&binding, "vendor-small-4"), vec!["mechanical"]);
+        assert!(classes_of(&binding, "vendor-tiny-1").is_empty());
     }
 }
