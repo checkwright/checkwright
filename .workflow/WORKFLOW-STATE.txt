@@ -6,3 +6,4 @@
 
 guard-kit-steering scope a5a363a8 2026-09-30 043f14bd
 guard-kit-steering spec a7fab11a 2026-09-30 b8d659ae
+guard-kit-steering align aee744f2 2026-09-30 8ca986c8
