@@ -16,8 +16,8 @@ The system SHALL write the notes for one named release as a markdown file.
 - **THEN** the export refuses and writes no file
 
 ### Requirement: Entry length
-The system SHALL cut each entry to 120 characters.
+The system SHALL cut each entry to 120 characters, after dating the file per openspec/specs/notes/spec.md §Requirement: Release date.
 
-#### Scenario: Tagged release
+#### Scenario: Long subject
 - **WHEN** a merged change's subject runs past 120 characters
 - **THEN** its entry ends at the limit with an ellipsis

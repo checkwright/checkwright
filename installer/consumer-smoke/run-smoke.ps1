@@ -120,6 +120,13 @@ function Assert-BatteryGreen([string] $label, [string] $consumer, [string] $bin)
         Fail "${label}: the battery left the worktree dirty"
     }
     Say "battery: $([regex]::Match($b.Out, 'All \d+ gates passed\.').Value)"
+    # spec: gate-sdk/SPEC.md §build-native — the leaked-builder-path hold's second leg: no profile registers check-tree-terms, so it runs by name over the committed binary
+    $t = Invoke-Captured $bin @('--run', '--only', 'check-tree-terms') $consumer
+    if ($t.Code -ne 0 -or $t.Out -notmatch 'All 1 gates passed') {
+        Write-Host $t.Out
+        Fail "${label}: check-tree-terms, run by name, is not green over the tree init committed (exit $($t.Code))"
+    }
+    Say "check-tree-terms: green by name over the committed tree"
 }
 
 # spec: installer/SPEC.md §Profiles — the rows of profiles.list, a '#' anywhere ending a line; the payload-derived profile is never a row
@@ -185,19 +192,19 @@ foreach ($p in $profiles) {
         if ($clean.Out -notmatch '(?m)^pre-commit: \d+ gate\(s\) passed\.') { Write-Host $clean.Out; Fail "${p}: the clean commit landed with no pre-commit summary line" }
         Say "hooks: a clean commit passed through the handoff"
 
-        # spec: installer/SPEC.md §The consumer smoke — a planted home-directory path, which gate-sdk's zero-config pattern seed names, so every profile's hook refuses it; the refusing gate is read off the hook's own line and held to the consumer's registry
+        # spec: installer/SPEC.md §The consumer smoke — a planted shell pipeline that can lose its match, which a gate-sdk starting gate refuses, so every profile's hook refuses it; the refusing gate is read off the hook's own line and held to the consumer's registry
         $head = git -C $c rev-parse HEAD
-        [IO.File]::WriteAllText((Join-Path $c 'ps1-leak.txt'), ('see /' + 'home' + "/ps1-smoke/notes`n"))
-        git -C $c add ps1-leak.txt
-        $refused = Invoke-Captured 'git' @('commit', '-m', 'docs: add a leak') $c
-        if ($refused.Code -eq 0 -or (git -C $c rev-parse HEAD) -ne $head) { Write-Host $refused.Out; Fail "${p}: a commit planting a home-directory path landed" }
+        [IO.File]::WriteAllText((Join-Path $c 'ps1-plant.sh'), ('#!/usr/bin/env bash' + "`n" + 'set -o pipefail' + "`n" + 'names=(a b c)' + "`n" + 'if printf "%s\n" "${names[@]}" | grep -q b; then echo found; fi' + "`n"))
+        git -C $c add ps1-plant.sh
+        $refused = Invoke-Captured 'git' @('commit', '-m', 'chore: add a pipeline that can lose its match') $c
+        if ($refused.Code -eq 0 -or (git -C $c rev-parse HEAD) -ne $head) { Write-Host $refused.Out; Fail "${p}: a commit planting a shell pipeline that can lose its match landed" }
         $m = [regex]::Match($refused.Out, '(?m)^pre-commit: ([a-z0-9-]+) failed \(see above\)\.\r?$')
         $registry = @(Get-Content -LiteralPath (Join-Path $c "$GatesDir/gates.list"))
         if (-not $m.Success -or $registry -notcontains $m.Groups[1].Value) {
             Write-Host $refused.Out
             Fail "${p}: the refused commit was not refused by a registered gate the pre-commit hook named"
         }
-        Say "hooks: a planted home-directory path was refused by $($m.Groups[1].Value)"
+        Say "hooks: a planted shell pipeline that can lose its match was refused by $($m.Groups[1].Value)"
 
         git -C $c reset -q --hard $initHead
         $u = Invoke-Bootstrap $Package $c @('uninstall')

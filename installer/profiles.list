@@ -24,10 +24,10 @@
 # generated hook and at least one gate that reds on a real consumer defect
 # needing no configuration outside the gates directory. gate-sdk is forced in:
 # without it there is no runner, no hook generator, and no registry for a gate
-# name to resolve against. It also already satisfies the last clause several
-# times over, through gates that read the adopter's own tree rather than the
-# vendored source — a tracked script missing its exec bit, a mutable action ref
-# in their workflows, a malformed commit subject. So any second kit would make the set larger than the
+# name to resolve against. It also already satisfies the last clause, through a
+# gate that reads the adopter's own tree rather than the vendored source — a
+# pipeline under `pipefail` that can lose its match to a closed pipe. So any
+# second kit would make the set larger than the
 # criterion asks for, and the first experience is the framework, not a reading
 # list.
 starter	gate-sdk
@@ -63,9 +63,10 @@ delegation	doctrine-kit
 # rather than steps — or a deployed site.
 #
 # What the adopter actually receives, stated here because a criterion that
-# overpromises is worse than none: link, claim, staleness and pointer governance
+# overpromises is worse than none: link, citation, command and claim checks
 # over every README.md at any depth plus the agent file, which is real for a
-# documentation repository since a docs tree is usually a tree of READMEs. It is
+# documentation repository since a docs tree is usually a tree of READMEs;
+# canon-kit's house rules are the adopter's to turn on. It is
 # not governance over `docs/*.md` — neither the manifest set nor the comment
 # surface reads that path, and widening to it is the adopter's own
 # CANON_KIT_PROSE_SURFACE_GLOBS edit in the config seam init already delivers.

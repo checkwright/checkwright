@@ -631,6 +631,12 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
     # spec: installer/SPEC.md §The consumer smoke — asserted here, before the second init, because only here is the battery the one writer a dirty path can be laid at
     [[ -z "$(git -C "$C" status --porcelain)" ]] \
         || { git -C "$C" status --porcelain >&2; fail "$profile: the battery left the worktree dirty — the paths above were written outside the self-ignoring scratch directory"; }
+    # spec: gate-sdk/SPEC.md §build-native — the leaked-builder-path hold's second leg: no profile registers check-tree-terms, so it runs by name over the committed binary
+    out="$( cd "$C" && PATH="$RUN_PATH" bash gate-sdk/bin/run-gates.sh --run --only check-tree-terms 2>&1 )" \
+        || { printf '%s\n' "$out" >&2; fail "$profile: check-tree-terms, run by name, is not green over the tree init committed, the placed binary included"; }
+    grep -qE 'All 1 gates passed' <<<"$out" \
+        || { printf '%s\n' "$out" >&2; fail "$profile: the by-name check-tree-terms run printed no one-gate summary, so it ran nothing"; }
+    say "$profile: check-tree-terms, run by name, is green over the committed tree"
 
     # spec: installer/SPEC.md §The manifest — the files[] hash is what init's changed-file detection reads, so a manifest that disagrees with the tree it describes would make the non-destructive re-run report on noise
     LOCK="$C/checkwright.lock"
@@ -1500,16 +1506,16 @@ for p in "${BASHLESS_PROFILES[@]}"; do
         || { printf '%s\n' "$bl_out" >&2; fail "$p: the clean commit landed without the installed pre-commit hook reporting — the hook did not run"; }
     say "$p: a clean commit passed through the installed hooks"
 
-    # spec: installer/SPEC.md §The consumer smoke — the refused commit plants a home-directory path, which gate-sdk's zero-config message-pattern seed names, so every profile's hook refuses it; the refusing gate is read off the hook's own line and held to the consumer's registry rather than named here
-    printf 'see /%s/bashless-smoke/notes\n' home > "$C/bash-less-leak.txt"
-    git -C "$C" add bash-less-leak.txt
-    bl_out="$( cd "$C" && PATH="$BASH_PATH" git commit -m "docs: add a leak" 2>&1 )" \
-        && { printf '%s\n' "$bl_out" >&2; fail "$p: a commit planting a home-directory path landed through the installed hooks"; }
+    # spec: installer/SPEC.md §The consumer smoke — the refused commit plants a shell pipeline that can lose its match, which a gate-sdk starting gate refuses, so every profile's hook refuses it; the refusing gate is read off the hook's own line and held to the consumer's registry rather than named here
+    printf '#!/usr/bin/env bash\nset -o pipefail\nnames=(a b c)\nif printf "%%s\\n" "${names[@]}" | grep -q b; then echo found; fi\n' > "$C/bash-less-plant.sh"
+    git -C "$C" add bash-less-plant.sh
+    bl_out="$( cd "$C" && PATH="$BASH_PATH" git commit -m "chore: add a pipeline that can lose its match" 2>&1 )" \
+        && { printf '%s\n' "$bl_out" >&2; fail "$p: a commit planting a shell pipeline that can lose its match landed through the installed hooks"; }
     bl_gate="$(sed -nE 's/^pre-commit: ([a-z0-9-]+) failed \(see above\)\.$/\1/p' <<<"$bl_out")"
     [[ -n "$bl_gate" ]] && grep -qxF "$bl_gate" "$C/$GATES_DIR/gates.list" \
         || { printf '%s\n' "$bl_out" >&2; fail "$p: the refused commit was not refused by a registered gate the pre-commit hook named"; }
     git -C "$C" reset -q --hard HEAD
-    say "$p: a planted home-directory path was refused by $bl_gate through the installed hook"
+    say "$p: a planted shell pipeline that can lose its match was refused by $bl_gate through the installed hook"
 done
 say "bash-less: ${#BASHLESS_PROFILES[@]} profile(s) owing no bash installed and committed through the hooks: ${BASHLESS_PROFILES[*]}"
 

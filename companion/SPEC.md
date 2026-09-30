@@ -17,7 +17,7 @@ The companion package puts Checkwright's gates over a repository whose specs ano
 
 A recipe is a directory in installer/SPEC.md §Payload recipes' format, and that section owns how `init` applies one. Each file opens with a `#` comment citing this file.
 
-**Each line answers a red, or arms a gate that registers disarmed.** A fresh tree of the toolkit at its pin, with the `prose` or `full` profile installed, reds a gate on one of the toolkit's own idioms until the line is there. Or a gate asserts nothing on that tree until the line points it there. The companion arm of the consumer smoke holds that both ways: a line it shows unnecessary is deleted, and one it shows missing is added, each with its idiom recorded below.
+**Each line answers a red, answers a red of a house rule the adopter registers, or arms a gate that registers disarmed.** Install `prose` or `full` on a fresh tree of the toolkit at its pin. It reds a gate on one of the toolkit's own idioms until the line is there. For a house rule, it would red once the adopter registers that rule with `--with-gate`. Or a gate asserts nothing on that tree until the line points it there. The companion arm of the consumer smoke holds that both ways: a line it shows unnecessary is deleted, and one it shows missing is added, each with its idiom recorded below.
 
 ### Applying a recipe
 
@@ -57,7 +57,7 @@ Measured on `openspec init --tools claude --no-animation --no-copilot-cloud .`, 
 - `CANON_KIT_TASK_LIST_GLOBS[] = openspec/changes/*/tasks.md`, in the same file, arms `check-task-path-claim` on each in-flight change's task list. The single `*` keeps `openspec/changes/archive/` out, since an archived change's paths are history.
 - `unregister.list` names no gate.
 
-**One convention, and no dropped gate for it.** OpenSpec specs often repeat a scenario title under two requirements, which `check-spec-pointer`'s one-title-per-file rule reds. A citation of the second title binds to the first, so the rule holds for any spec that is cited. The recipe keeps the gate, and the OpenSpec page states the convention: a title is unique within its spec.
+**One convention, left to the adopter.** OpenSpec specs often repeat a scenario title under two requirements, and a citation of the second title binds to the first. `check-spec-pointer`'s one-title-per-file rule reds the repeat when `CANON_KIT_SPEC_POINTER_TITLE_ONCE` is `on`, a house rule the recipe does not arm; the OpenSpec page states the convention and the knob line.
 
 ### The lifecycle layer
 
@@ -73,7 +73,7 @@ OpenSpec's `full` line (§The two tiers) applies the layer, as `--recipe openspe
 The recipes are proved against the defect classes below, each caught by a named gate, on `prose` for both toolkits and on `full` for Spec Kit, whose `full` leg plants them again. Both toolkits carry:
 
 - a broken relative or anchored link, by `check-md-refs`;
-- a dangling section citation, or a title carried twice in one spec, by `check-spec-pointer`;
+- a dangling section citation, by `check-spec-pointer`;
 - an unclosed fence, by `check-spec-fence-balance`;
 - a documented command that invokes a missing script, by `check-docs-cmd`;
 - a ticked task naming a path that does not exist, by `check-task-path-claim`.
@@ -97,7 +97,7 @@ The support table on the toolkit page is derived from the fixture directories an
 
 Each source file is neither markdown nor a shell script, so no other claimed gate reads it.
 
-`fixtures/<toolkit>/defects/<gate>/` holds, per claimed gate, the files that replace their layout counterparts to plant that gate's defect. OpenSpec's `check-spec-pointer` defect is a scenario title carried twice in one spec, and its `check-md-refs` defect adds an anchored link to a missing requirement. Each toolkit's `check-task-path-claim` defect is its ticked task naming an absent path, and Spec Kit's `check-task-label-resolution` defect adds a task citing `[US2]`, which `spec.md` does not define.
+`fixtures/<toolkit>/defects/<gate>/` holds, per claimed gate, the files that replace their layout counterparts to plant that gate's defect. OpenSpec's `check-spec-pointer` defect is a citation of a requirement its spec does not carry, and its `check-md-refs` defect adds an anchored link to a missing requirement. Each toolkit's `check-task-path-claim` defect is its ticked task naming an absent path, and Spec Kit's `check-task-label-resolution` defect adds a task citing `[US2]`, which `spec.md` does not define.
 
 `fixtures/<toolkit>/full/<gate>/` overlays the layout with what only the `full` line's gate reads, and names that gate.
 
