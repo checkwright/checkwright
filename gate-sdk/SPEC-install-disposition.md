@@ -99,10 +99,20 @@ Two surfaces describing the prior flow follow the move {mechanical}. **Not yet a
 
 ### (10) The companion's tested claim meets `check-spec-pointer`'s move
 
-**Open, escalated to the iteration lead at authoring; the act below lands only once answered** {design-bearing}. companion/SPEC.md §The tested claim proves each toolkit's recipe against `check-spec-pointer` "on `prose` for both toolkits", and the consumer smoke's companion arm requires `FAIL: check-spec-pointer` on its planted defect (`installer/consumer-smoke/run-smoke.sh:1039`, `:1103-1114`; `companion/fixtures/openspec/defects/check-spec-pointer/`, `companion/fixtures/speckit/defects/check-spec-pointer/`). With the gate `on-surface`, no `prose` or `full` install registers it, so three companion legs red. Recipes can drop a gate and cannot add one (installer/SPEC.md §Payload recipes). Separately, three recipe lines answer reds from gates that also leave the registry, `GATE_SDK_PRUNE_EXTRA_DIRS = .specify` (`check-comment-tier`, `check-path-dialect`), `CANON_KIT_FENCE_PROGRAMS_EXTRA[] = Task:` (`check-fence-command-head`) and `CANON_KIT_TEMPORAL_EXEMPT_PATHS[] = openspec/changes/**` (`check-manifest-temporal`), and companion/SPEC.md §Recipes deletes a line that answers no red.
+Each documented companion install line gains `--with-gate check-spec-pointer`, so the tested claim and its fixtures stand unchanged {design-bearing}. Operator direction, relayed by the iteration lead on 2026-10-01 (not a `/consult` ruling), chose this over dropping the gate from the claim.
 
-- **C1 (recommended):** each documented companion line gains `--with-gate check-spec-pointer`, recorded in the manifest like any selection, so the tested claim and the fixtures stand. The three lines stay, since the adopter may register those house rules, and §Recipes' rule gains "or answers a red of a house rule the adopter registers".
-- **C2:** `check-spec-pointer` leaves the claim, `COMPANION_CLAIMED` and both fixture trees, and the three lines are deleted as answering no red.
+**Why it is owed.** companion/SPEC.md §The tested claim proves each toolkit's recipe against `check-spec-pointer` "on `prose` for both toolkits", and the consumer smoke's companion arm requires `FAIL: check-spec-pointer` on its planted defect (`installer/consumer-smoke/run-smoke.sh:1039`, `:1103-1114`; `companion/fixtures/openspec/defects/check-spec-pointer/`, `companion/fixtures/speckit/defects/check-spec-pointer/`). After delta 2 no `prose` or `full` install registers the gate, and a recipe can drop a gate but never add one (installer/SPEC.md §Payload recipes). A selection can: `--with-gate` registers it and the manifest records it, so a re-run and an `update` re-apply it (installer/SPEC.md §Selecting kits and gates).
+
+**The lines.** Each line the companion arm runs, and its twins, carries the flag after its recipes:
+
+- `docs/openspec.md`'s `companion-install` and `companion-full` lines (`checkwright init --profile prose --recipe openspec`, and the `full` line with `--recipe openspec-lifecycle`);
+- `companion/speckit/commands/install.md`'s four lines, the `sh` and PowerShell forms of the `prose` and `full` installs.
+
+The arm needs no edit: it runs each line's words from `init` to the line's end, checks the recorded recipes alone, and reads `COMPANION_CLAIMED` unchanged.
+
+**The three recipe lines stay.** `GATE_SDK_PRUNE_EXTRA_DIRS = .specify` (`check-comment-tier`, `check-path-dialect`), `CANON_KIT_FENCE_PROGRAMS_EXTRA[] = Task:` (`check-fence-command-head`) and `CANON_KIT_TEMPORAL_EXEMPT_PATHS[] = openspec/changes/**` (`check-manifest-temporal`) answer reds from gates the install no longer registers, and keep a toolkit tree green for an adopter who registers them.
+
+**Not yet applied:** companion/SPEC.md §Recipes' rule "**Each line answers a red, or arms a gate that registers disarmed.**" becomes "**Each line answers a red, answers a red of a house rule the adopter registers, or arms a gate that registers disarmed.**", and its next sentence gains after "reds a gate on one of the toolkit's own idioms until the line is there": "or would, once the adopter registers that house rule with `--with-gate`". §Applying a recipe's example, `init --profile prose --recipe <name>`, gains `--with-gate check-spec-pointer`, with the sentence "The flag registers `check-spec-pointer`, a house rule `prose` does not register, since the tested claim holds the recipe to it (gate-sdk/SPEC.md §The install disposition)." §The tested claim's "on `prose` for both toolkits" becomes "on `prose` with `check-spec-pointer` registered by the install line, for both toolkits".
 
 ## Producers and consumers
 
@@ -140,7 +150,9 @@ Roster produced by `grep -rn 'zero-config\|on-surface' --include='*.md' .` over 
 - `gate-sdk/SPEC.md` — §build-native's sufficiency argument and §check-tree-terms' binary-arm sentence (delta 8).
 - `installer/SPEC.md` — §What init seeds' disposition-change paragraph (delta 9).
 - `context-kit/smoke/install.sh` — the `no-port` comment's leg-2 clause (delta 9).
-- `companion/SPEC.md`, `companion/speckit/commands/install.md`, `docs/openspec.md`, `docs/spec-toolkits.md`, `companion/speckit/recipe/`, `companion/openspec/recipe/`, `companion/fixtures/` — the companion's lines, claim, recipes and fixtures, per the answered option (delta 10).
+- `companion/SPEC.md` — §Recipes, §Applying a recipe and §The tested claim (delta 10).
+- `docs/openspec.md`, `companion/speckit/commands/install.md` — the documented install lines (delta 10).
+- `docs/companion/SPEC.md` — the regenerated mirror (delta 10).
 - `TASK-QUEUE.md` — the two paired entries move to Done at merge (all deltas).
 
 ## Retired spellings
