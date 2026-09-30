@@ -112,7 +112,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash gate-sdk/bin/run-gates.sh --hook subagent-stop-liveness"
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook subagent-stop-liveness"
           }
         ]
       }
@@ -123,7 +123,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash gate-sdk/bin/run-gates.sh --hook shell-guard"
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook shell-guard"
           }
         ]
       },
@@ -132,11 +132,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash gate-sdk/bin/run-gates.sh --hook agent-budget-guard"
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook agent-budget-guard"
           },
           {
             "type": "command",
-            "command": "bash gate-sdk/bin/run-gates.sh --hook agent-dispatch-guard"
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook agent-dispatch-guard"
           }
         ]
       },
@@ -145,7 +145,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash gate-sdk/bin/run-gates.sh --hook workflow-state-guard"
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook workflow-state-guard"
           }
         ]
       }
