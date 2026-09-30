@@ -3,6 +3,12 @@
 ## Tightened gates
 
 - `check-agent-tier-explicit` — gains assertion B, armed only once you set the new `DELEGATION_KIT_TIER_MODEL` binding: each agent definition then carries `tier: <class>` with the `model:` that class is bound to, or states `model: inherit` with no `tier:`. Nothing to do while the binding stays empty; once you bind it, declare each definition's `tier:` and run `--emit agent-tiers --write`.
+- `check-rule-citation` — leaves delegation-kit (Behavior changes), so a `gates.list` line still naming it, which the kit README's roster had you add, resolves nowhere and reds. Drop the line; `init` never registered it.
+- `check-gate-output` — reds on a `gates.list` member that resolves nowhere, which `check-rule-citation` now is where you registered it by hand. Drop that line.
+- `check-gate-fixture-coverage` — reds on a `gates.list` member that resolves nowhere, which `check-rule-citation` now is where you registered it by hand. Drop that line.
+- `check-gate-substrate-parity` — reds on a `gates.list` member that resolves nowhere, which `check-rule-citation` now is where you registered it by hand. Drop that line.
+- `check-graph` — reds on a `gates.list` member that resolves nowhere, which `check-rule-citation` now is where you registered it by hand. Drop that line and regenerate the hooks.
+- `check-kit-enum` — exits 2 on a `gates.list` member that resolves nowhere, which `check-rule-citation` now is where you registered it by hand. Drop that line.
 
 ## Behavior changes
 
