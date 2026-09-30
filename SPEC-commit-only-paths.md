@@ -20,10 +20,10 @@
 
 The always-loaded shared-index sentence and the gap-capture bullet that points at it name `git commit -o <paths>` in place of "one motion" {mechanical}. **Not yet applied.**
 
-- **§This repo is governed by its own kits**, the sentence "The git index is shared with any concurrent session: check `git status` for a foreign staged path before `git add`, or stage and commit in one motion." becomes: "The git index is shared with any concurrent session: commit with `git commit -o <paths>`, which takes only the named paths; `git add` a new file first."
+- **§This repo is governed by its own kits**, the sentence "The git index is shared with any concurrent session: check `git status` for a foreign staged path before `git add`, or stage and commit in one motion." becomes: "The git index is shared with any concurrent session: commit with `git commit -o <paths>`, which takes only those paths; `git add` new files first."
 - **§Housekeeping, the gap-capture bullet**, "staged and committed in one motion under the shared-index rule above" becomes "committed with the only-paths form under the shared-index rule above".
 
-The line stays one line, under the always-loaded shape rule, and the replacement is no longer than the sentence it replaces, so `check-surface-ratchet`'s ceiling on the always-loaded surface does not move.
+The line stays one line, under the always-loaded shape rule. `check-surface-ratchet` measures CLAUDE.md at exactly its committed ceiling (12467 code points, read at align), so the edit may not grow it by one. Measured at align, the first replacement is 146 characters against the 150 it replaces, and the second is 68 against 68. So the ceiling does not move.
 
 ### (2) guard-kit gains rule `commit_only_paths`
 
@@ -51,6 +51,7 @@ delegation-kit/templates/agent-execution.md's **Serialize on shared files** bull
 - **Rule `commit_only_paths`.** Producer: the shell guard's rule table, reached on every `Bash` or `PowerShell` payload the `Bash|PowerShell` matcher hands the member, in every consumer that wires `templates/settings-hooks.json` or the plugin's hooks, so its enabling config is the default wiring. Consumer: the agent, through the block's stderr. Roster-holding readers of the name: `check-guard-registration` (arms A to D hold the roster item, the crate table's order and declarations, and every citation), the decision tables, and the generated `docs/guard-kit/SPEC.md` mirror, held by `check-docs-mirror-fresh`.
 - **The CLAUDE.md sentence.** Producer: the always-loaded file. Consumer: every session in this repository, and the stage-session and consult-session agent definitions, which point at the section rather than restating it. `git grep -n -i 'one motion\|shared-index\|shared index' -- ':!docs'` produced that pointer set at authoring: `.claude/agents/stage-session.md` and `.claude/agents/consult-session.md` cite the section by name and stay unedited, and lifecycle-kit/templates/lead.md cites the agent definition.
 - **The template bullet.** Consumer: any dispatching session that loads `/agent-execution`. No gate reads its wording.
+- **The failure statements that stay.** Four sites describe the sweep as a failure the protocol closes, and none names "one motion": delegation-kit/SPEC.md's opening paragraph and its **Serialize on shared files** rationale, delegation-kit/README.md's "Why" paragraph, and lifecycle-kit/SPEC.md §The committed gap inbox's "its `git add` can sweep". Each stays true under the only-paths form. The race they describe is real, serialization stays the protocol's answer to index-lock and `HEAD` contention, and a `git add -A` still sweeps an untracked file. They stay unedited.
 
 No field, state or event is added beyond the rule's verdict.
 

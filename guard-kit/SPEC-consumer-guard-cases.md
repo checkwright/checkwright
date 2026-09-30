@@ -58,13 +58,15 @@ The temporary-path rows carry the harness's generic prefix with a synthetic suff
 ## Existing sections updated
 
 - `guard-kit/SPEC.md` — §Consumer rules and §Writing a consumer rule (delta 3); §Testing, the roster paragraph and the new lane paragraph (delta 2); §Layout and configuration, the knob bullet (delta 1).
+- `gate-sdk/SPEC.md` — §The non-gate arm's spawn roster, whose "Split between the arm and its subject" bullet reads "`--run-guard-tests` spawns `bash` per case for the unchanged guard, and `git` and `mktemp` to build the sandbox". It gains: "and, in the consumer lane, the argv `GUARD_KIT_CONSUMER_RULES_CMD` names, whose programs are the consumer's" (delta 2).
+- `docs/gate-sdk/SPEC.md` — the generated mirror of that bullet (delta 2).
 - `native/src/knobs/guard_kit.rs` — the knob row (delta 1).
 - `native/src/emit/run_guard_tests.rs` — `KNOBS` and the lane (delta 2).
 - `guard-kit/templates/guard-config.knobs` — the example line (delta 1).
 - `scripts/guard-config.knobs` and `scripts/guard-rules-cases.tsv` — this repository's value and table (delta 4).
 - `docs/guard-kit/SPEC.md` — the generated mirror (all deltas).
 
-The roster came from `git grep -n 'GUARD_KIT_CONSUMER_RULES_CMD'` for the readers a guard-kit consumer knob reaches, and `git grep -n 'run-guard-tests'` for the lane's callers.
+The roster came from `git grep -n 'GUARD_KIT_CONSUMER_RULES_CMD'` for the readers a guard-kit consumer knob reaches, and `git grep -n 'run-guard-tests'` for the lane's callers. The gate-sdk entry was added at align: that grep hits the bullet, but the first roster read it as a caller and not as a statement of what the arm spawns.
 
 ## Retired spellings
 

@@ -5,11 +5,11 @@
 **Measured at authoring, Claude Code 2.1.285, `claude -p`, in a scratch git repository whose project settings wire logging hooks:**
 
 - **A hook runs in the session's current directory, and that directory follows the session's own `cd`.** In a session launched at the root, the `PreToolUse(Bash)` hook ran at the root. After the session's Bash tool ran `cd sub`, the next hook ran in `sub`. So the ordinary launch is not safe: any session that changes directory into a subdirectory loses a relatively spelled hook from its next call on. The settings rendering then exits 127, which the harness treats as a non-blocking error, and the plugin rendering falls open. Either way the guard is silent.
-- **`CLAUDE_PROJECT_DIR` holds the launch directory, and a `cd` does not move it.** It held the root before and after the session's `cd`. It was set for `SessionStart`, `UserPromptSubmit`, `PreToolUse` on the Bash and Agent matchers, and `SubagentStop`.
+- **`CLAUDE_PROJECT_DIR` holds the launch directory, and a `cd` does not move it.** It held the root before and after the session's `cd`. It was set for `SessionStart`, `UserPromptSubmit`, `PreToolUse` on the Bash and Agent matchers, and `SubagentStop`. Measured again at align, the same harness version: after the session's Bash tool ran `cd sub`, a `PreToolUse` hook on the `Write|Edit` matcher ran in `sub` with the variable still naming the root. The `ScheduleWakeup|CronCreate` matcher was not reached, since a `claude -p` session does not call those tools. It rides the same `PreToolUse` event, so the variable's presence there is inferred rather than measured.
 - **A subdirectory launch loads no project settings.** Launched from `sub/deeper`, the project's `.claude/settings.json` hooks did not fire at all. A hook supplied another way (`--settings`, the path a user-scope or plugin hook takes) did fire, with its working directory and `CLAUDE_PROJECT_DIR` both `sub/deeper`, while `git rev-parse --show-toplevel` answered the repository root.
 - **Resolving the root costs 0.8 ms**: the mean of 50 runs of `git -C docs rev-parse --show-toplevel` in this checkout.
 
-**So the two renderings take different resolutions, each the cheapest that is correct for where it loads.** The settings rendering loads only in a root launch, where `CLAUDE_PROJECT_DIR` is the root and survives every `cd`. So the variable resolves it with no spawn, and every reader of the wiring already parses it. The plugin loads in every launch, subdirectories included, where the variable names the subdirectory. So it resolves the toplevel through git from the variable, one spawn per call, git being the one unconditional member of the adopter floor. This premise on the queue entry is settled by the second and third bullets: "whether settings hooks also run from the launch directory, where the relative command would fail rather than fall open". The entry's inferred marker is deleted in the promoting commit.
+**So the two renderings take different resolutions, each the cheapest that is correct for where it loads.** The settings rendering loads only in a root launch, where `CLAUDE_PROJECT_DIR` is the root and survives every `cd`. So the variable resolves it with no spawn, and every reader of the wiring already parses it. The plugin loads in every launch, subdirectories included, where the variable names the subdirectory. So it resolves the toplevel through git from the variable, one spawn per call, git being the one unconditional member of the adopter floor. This premise on the queue entry is settled by the second and third bullets: "whether settings hooks also run from the launch directory, where the relative command would fail rather than fall open". The entry's inferred marker was deleted in the promoting commit.
 
 **What stays as it is.** The front end's own resolution: `gate-sdk/bin/run-gates.sh` already `cd`s to the git toplevel of its working directory, so once it is found, a subdirectory working directory is harmless. The fail-open arm exemption in `check-door-binding`, which keys on the `--hook` token wherever the path sits. The statusline and session-start wirings, which spell a repository-relative command outside the front-end hooks this unit covers. They are filed as a gap rather than swept here.
 
@@ -33,7 +33,7 @@ plugin/SPEC.md §The guards' rewrite rule changes its prefix from `test -f gate-
 - plugin/SPEC.md §The guards' paragraph "…It runs it from the directory the session was launched in, which is the repository root on an ordinary launch: …" becomes: "It runs it in the session's current directory, which a subdirectory launch or the session's own `cd` moves off the root, so the prefix resolves the repository's toplevel from the harness's project directory: the shell-guard fires anywhere inside a vendored repository and stays silent outside one."
 - plugin/SPEC.md §Honest limits drops the bullet's sentence "A session launched from a subdirectory is such a tree, since the hook resolves the front end against the launch directory."
 
-**Inferred, cannot run before build:** the rendered prefix resolves under Git for Windows' bash, where `CLAUDE_PROJECT_DIR` arrives in a Windows spelling that `git -C` accepts and `git` answers with a forward-slash toplevel that `test -f` accepts — no Windows host is available here, and delta 4's probe is what runs on one.
+**Inferred, cannot run on this host:** both renderings resolve under Git for Windows' bash, the shell the harness runs a hook command in on that host (guard-kit/SPEC.md §The hook on native Windows). There `CLAUDE_PROJECT_DIR` arrives in a Windows spelling. Delta 1's `bash "${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh"` needs bash to open the path it forms. Delta 2's prefix needs `git -C` to accept that spelling and `test -f` to accept the forward-slash toplevel `git` answers. No Windows host is available here, and no leg this unit adds runs a hook wiring on one: delta 4's smoke probe runs on the Linux legs, and its plugin probe on the building session's host.
 
 ### (3) Every hook-wiring instruction names the anchored spelling
 
@@ -44,7 +44,7 @@ Each instruction telling an adopter to wire a front-end hook spells `bash "${CLA
 - `delegation-kit/SPEC.md` — the two "Wire `bash gate-sdk/bin/run-gates.sh --hook …`" sentences: re-spelled.
 - `lifecycle-kit/README.md` — step 5 (`--hook workflow-state-guard`): re-spelled.
 - `lifecycle-kit/SPEC.md` — "It is invoked as `bash gate-sdk/bin/run-gates.sh --hook workflow-state-guard`": re-spelled.
-- `guard-kit/SPEC.md` §Testing's smoke paragraph and installer/SPEC.md's installed-guard bullet name `bash gate-sdk/bin/run-gates.sh --hook shell-guard` as the command the smoke *drives* from the consumer root, not as a wiring, and stay.
+- `guard-kit/SPEC.md` §Testing's smoke paragraph and installer/SPEC.md's installed-guard bullet each call `bash gate-sdk/bin/run-gates.sh --hook shell-guard` the wired member the smoke drives. Read at align, neither smoke drives the front end. `guard-kit/smoke/install.sh` pipes its payloads to `"$door" --hook shell-guard`, the binary `gate_native_bin_spelled` names, and `installer/consumer-smoke/run-smoke.sh` pipes its payload to `"$guard_bin" --hook shell-guard`. Each sentence is re-spelled to the member on the gate binary, which is what the smoke drives. Delta 4's probe is then the one assertion that runs the wiring string.
 - gate-sdk/SPEC.md §run-gates' `run-gates.sh --hook <member>` describes the arm's dispatch and stays.
 
 ### (4) Each rendering is probed from a subdirectory
@@ -67,8 +67,10 @@ The settings rendering gets a hermetic probe in guard-kit's consumer smoke, and 
 ## Existing sections updated
 
 - `guard-kit/templates/settings-hooks.json` — the three commands (delta 1).
-- `guard-kit/SPEC.md` — §The shell guard (delta 1), §Testing's smoke paragraph (delta 4).
-- `plugin/hooks/hooks.json`, `native/src/gates/plugin_parity.rs`, `scripts/gate-tests/check-plugin-parity/` — the rendering and its holder (delta 2).
+- `guard-kit/SPEC.md` — §The shell guard (delta 1), §Testing's smoke paragraph (deltas 3 and 4). §The hook on native Windows stays: "the committed wiring is the same on every host" holds for the anchored spelling, whose Windows resolution is delta 2's inferred marker.
+- `installer/SPEC.md` — the installed-guard bullet of the consumer smoke (delta 3).
+- `plugin/hooks/hooks.json` — the rendering, the template's command behind the prefix, so both of its halves move (deltas 1 and 2).
+- `native/src/gates/plugin_parity.rs`, `scripts/gate-tests/check-plugin-parity/` — the prefix's holder (delta 2).
 - `plugin/SPEC.md` — §The guards and §Honest limits (delta 2), §The validation leg (delta 4).
 - `guard-kit/README.md`, `delegation-kit/README.md`, `delegation-kit/SPEC.md`, `lifecycle-kit/README.md`, `lifecycle-kit/SPEC.md` — the wiring instructions (delta 3).
 - `guard-kit/smoke/install.sh` — the subdirectory probe (delta 4).
@@ -77,7 +79,7 @@ The settings rendering gets a hermetic probe in guard-kit's consumer smoke, and 
 
 ## Retired spellings
 
-<!-- retired-spelling-exempt: the relative front-end spelling stays lawful where a smoke or a test drives the member from the root, in fixtures, and in SPEC prose describing the arm's dispatch -->
+<!-- retired-spelling-exempt: the relative front-end spelling stays lawful where a test drives the member from the root, in fixtures, and in SPEC prose describing the arm's dispatch -->
 - `bash gate-sdk/bin/run-gates.sh --hook` — retired as a wiring spelling (deltas 1, 3 and 5).
 <!-- retired-spelling-exempt: the queue entry quoting the prefix leaves the queue body at its Done move, and a check-plugin-parity unit test may keep it as the prior form its assertion rejects -->
 - `test -f gate-sdk/bin/run-gates.sh || exit 0; ` — the plugin's prefix (delta 2).
@@ -88,6 +90,6 @@ The settings rendering gets a hermetic probe in guard-kit's consumer smoke, and 
 - [ ] **Every roster site has its value** — each delta 3 site re-spelled or kept as stated, re-derived with the roster's `git grep`.
 - [ ] **Merged with no information lost** — the measurements above land in guard-kit/SPEC.md §The shell guard and plugin/SPEC.md §The guards as the grounds for each spelling.
 - [ ] **Amendment deleted** — this file removed on merge; none remain at the repo root (`ls SPEC-*.md`).
-- [ ] **Removals propagated** — `check-amendment-retired-spelling` runs both declarations.
+- [ ] **Removals propagated** — both declarations are exempt, so `check-amendment-retired-spelling` counts and scans neither. Two things hold the removals instead. The delta 3 roster's `git grep` is re-derived under the second item above. And `check-plugin-parity` assertion C holds the plugin prefix to `FAIL_OPEN`.
 - [ ] **Gaps filed** — the statusline and session-start wirings, filed with `--emit file-gap` at authoring.
 - [ ] **The entry moves** — `plugin-guards-subdir-launch` moves to Done once delta 5's diff is applied, a stage before the drain stage.

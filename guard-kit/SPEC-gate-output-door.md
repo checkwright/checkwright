@@ -48,6 +48,8 @@ The six `scripts/` gates re-point too, rather than declaring themselves contribu
 
 `smoke_entry_guard.rs`'s help line tells a kit author to paste `: "${SMOKE_KIT_ROOT:?…}"` into a smoke script, and today its message reads `run via run-gates.sh --run-consumer-smoke` {design-bearing}. **Not yet applied.** That text ships inside a kit's `smoke/` script. A resolved binary path there would publish one consumer's install location in a kit file, which is the provenance seam `check-door-binding`'s assertion B exists for, and the stub spelling is the adopter door this sweep retires. So the pasted message names the arm on the binary without a path: `run via the gate binary's --run-consumer-smoke`. `check-smoke-entry-guard` recognizes the guard by its `${SMOKE_KIT_ROOT:?` prefix alone (the module's `GUARD` constant), whatever message follows, so no smoke script already carrying the old message goes red.
 
+The message has two more homes, and both follow it, so the help line, the contract and the shipped scripts keep one spelling. gate-sdk/SPEC.md §Consumer smoke's **The `smoke/` per-kit contract** quotes the guard as `: "${SMOKE_KIT_ROOT:?run via run-gates.sh --run-consumer-smoke}"` and takes the new message. The twenty kit smoke scripts carrying it, each kit's `smoke/install.sh` and `smoke/violation.sh`, take it too, in one `--rewrite` over `git grep -l 'run via run-gates.sh --run-consumer-smoke' -- '*/smoke/*.sh'`. The fixtures under `gate-sdk/gate-tests/` keep the old message. They are the executable statement that the guard is recognized by its prefix alone.
+
 ### (3) Assertion C reads a Rust member's output strings
 
 `check-door-binding`'s assertion C gains a reading for a configured member whose name ends `.rs` {design-bearing}. **Not yet applied.** Such a member is read up to its test module, the first `#[cfg(test)]` line followed by `mod tests {`, which is the cut the crate's `check-reads-couples` reader already makes for a module's rule text. A test literal is no output string. Within that region:
@@ -83,8 +85,10 @@ No new knob or name is minted beyond `door_command`, a crate-internal helper no 
 
 ## Existing sections updated
 
-- `guard-kit/SPEC.md` — §check-door-binding: the corpus paragraph and the discriminator paragraph gain the Rust reading, and the red and clean paragraphs are unchanged (delta 3). §Layout and configuration's `GUARD_KIT_DOOR_ROOTS` bullet says a `.rs` entry is read as Rust source (delta 3).
+- `guard-kit/SPEC.md` — §check-door-binding: the corpus paragraph and the discriminator paragraph gain the Rust reading, the discriminator paragraph naming the `//` form of the token beside `<!-- door-contributor: <reason> -->`. The two-scopes paragraph gains that a Rust member takes site scope alone. The red and clean paragraphs are unchanged (delta 3). §Layout and configuration's `GUARD_KIT_DOOR_ROOTS` bullet says a `.rs` entry is read as Rust source (delta 3).
 - `gate-sdk/SPEC.md` — §run-gates, the paragraph "The front-end serves a harness shim and a pre-build clone rather than an adopter door": its list "every kit README, template, knob header and stage procedure" gains "and every compiled gate's printed remedy", held there by the helper and by C's Rust reading (deltas 1 and 3).
+- `gate-sdk/SPEC.md` — §Consumer smoke, the `smoke/` per-kit contract's quoted guard (delta 2).
+- Every kit's `smoke/install.sh` and `smoke/violation.sh` — the guard's message (delta 2).
 - `native/src/gates/mod.rs` — the helper and the registry rows (delta 1).
 - The 23 roster modules — their output lines (deltas 1 and 2).
 - `native/src/gates/door_binding.rs` — the Rust reading (delta 3).
