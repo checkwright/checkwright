@@ -4,13 +4,4 @@
 
 ---
 
-delegation-tier-binding scope a02aa410 2026-09-30 1e94411c
-delegation-tier-binding spec a6577f5d 2026-09-30 8ed44c65
-delegation-tier-binding align a93122a7 2026-09-30 00592cba
-delegation-tier-binding align ab4e5c55 2026-09-30 2d527011
-delegation-tier-binding build ad56b0be 2026-09-30 2c119ea9
-delegation-tier-binding build a3d44e29 2026-09-30 5a192cba
-delegation-tier-binding build abb91648 2026-09-30 d2edc605
-delegation-tier-binding build a661ef9d 2026-09-30 d8887f54
-delegation-tier-binding validate a161e77a 2026-09-30 a3c09e14
-delegation-tier-binding close a0ad2913 2026-09-30 66df0291
+— scope a4b61f44 2026-09-30 14aab762
