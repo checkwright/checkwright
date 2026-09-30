@@ -32,6 +32,18 @@ a release note's Renamed-knobs removal bullet must lead with the removed knob ba
 
 **Cost while deferred:** a root-doc reader hunts cited sections by hand. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead, on an operator direction to file rather than widen mid-iteration, with an addendum; promoted 2026-09-27 at its close: →fix fails because the widening is a ruled deferral. Re-verified: `scripts/canon-config.knobs` binds the four globs, and TRAJECTORY.md lines 4, 12 and 18 carry `§`. Owner lookup: `citation-link`, `CITATION_LINK_PAGES`, `TRAJECTORY.md#` in this file — none; owner canon-kit/SPEC.md §check-citation-link, with lifecycle-kit/SPEC.md §The ruling-staleness probe.
 
+### absence-statement-gate-arms
+
+[spec: SPEC-absence-arms.md]
+
+doctrine-kit/DOCTRINE.md's Absence statements rule has an audit-roster class and no gate. Two arms are narrow enough to decide mechanically: (a) a `check-prose-tells` arm redding a section whose whole body is one negative-existential sentence, over a consumer-configured surface glob, off by default and never all markdown, exempting generated regions; (b) a placeholder-slug denylist in `check-task-names`, since an indented None or `- none` outside every entry, and a `- none` under Done, pass `check-task-names` and `check-queue-hygiene` today (a column-0 `- none` already reds as a bullet outside every entry). The roster class calls the rule un-gateable as a whole; these arms take only the shapes that need no judgment of whether a reader must know the question was considered.
+
+**Deliverable:** per arm, a knob, an assertion and a `good/`+`bad/` fixture pair, or a SPEC boundary note refusing it.
+
+**Selected 2026-09-30 for canon-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, landing before [canon-kit-value-audit](#canon-kit-value-audit) rules `check-prose-tells`.
+
+**Cost while deferred:** an absence sentence on a ledger is found only by the close audit sweep. No live instance exists: the queue's and the ruling record's empty sections are headings alone. Filed 2026-09-26 to the gap inbox by absence-statement-grammar's amendment, which costed the arms without building them; promoted 2026-09-26 at its close: →fix fails because each arm is new mechanism with a knob, and no live instance needs repair. Owner lookup: `absence`, `placeholder` in this file — none live; owner doctrine-kit/DOCTRINE.md Absence statements, with the arms in canon-kit/SPEC.md §check-prose-tells and queue-kit/SPEC.md §check-task-names. Surface also queue-kit.
+
 ## Technical Debt
 
 ### canon-kit-amendment-brevity
@@ -103,18 +115,6 @@ ported gate modules carry `spec:` comments citing a section for a literal awk or
 **Deliverable:** a sweep of the crate's `spec:` comments against their cited sections, each unstated one retagged `comment-tier-exempt:` where the fact is local, deleted where it is port residue, or moved to the section where it is a contract.
 
 **Cost while deferred:** a reader following such a pointer finds no support for the literal, and a later SPEC edit cannot tell the comment depends on it. Filed 2026-09-26 to the gap inbox by gate-sdk-meta-gate-brevity's citation survey; promoted 2026-09-26 at front-door-release's close: →fix fails because the class spans the crate and each comment needs a local-versus-contract call. The survey's other instance, `native/src/hook/stop_liveness.rs` citing §check-test-hermetic for per-case scratch roots, was fixed at the drain, as were eight in `native/src/emit/pack_installer.rs` citing §The packer (2026-09-29 drain), which shows the class reaching emit arms too. Folded in at preview-readiness' close, from `drift-kit-measurement-brevity`'s citation survey, all pre-dating this entry: the KPI members under `native/src/emit/kpi/` (`overhead.rs`, `gate_runtime.rs`, `gate_backlog.rs`, `task_split.rs`, `incident_recurrence.rs`, `queue_net_delta.rs`, `amendment_age.rs`) citing §Bundled KPIs, and `native/src/emit/stage_economics.rs` and `native/src/history.rs` citing §The stage-economics meter, for window sizes, rounding, age bands, tie-breaks, regexes and iteration orders neither section states. Owner lookup: `spec-pointer`, `comment-tier-exempt`, `shell form` in this file — none; owner canon-kit/SPEC.md §check-comment-tier.
-
-### absence-statement-gate-arms
-
-[cost: event/low] [surface: canon-kit]
-
-doctrine-kit/DOCTRINE.md's Absence statements rule has an audit-roster class and no gate. Two arms are narrow enough to decide mechanically: (a) a `check-prose-tells` arm redding a section whose whole body is one negative-existential sentence, over a consumer-configured surface glob, off by default and never all markdown, exempting generated regions; (b) a placeholder-slug denylist in `check-task-names`, since a queue section holding only a `none` bullet or an indented None passes `check-task-names` and `check-queue-hygiene` today. The roster class calls the rule un-gateable as a whole; these arms take only the shapes that need no judgment of whether a reader must know the question was considered.
-
-**Deliverable:** per arm, a knob, an assertion and a `good/`+`bad/` fixture pair, or a SPEC boundary note refusing it.
-
-**Selected 2026-09-30 for canon-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, landing before [canon-kit-value-audit](#canon-kit-value-audit) rules `check-prose-tells`.
-
-**Cost while deferred:** an absence sentence on a ledger is found only by the close audit sweep. No live instance exists: the queue's and the ruling record's empty sections are headings alone. Filed 2026-09-26 to the gap inbox by absence-statement-grammar's amendment, which costed the arms without building them; promoted 2026-09-26 at its close: →fix fails because each arm is new mechanism with a knob, and no live instance needs repair. Owner lookup: `absence`, `placeholder` in this file — none live; owner doctrine-kit/DOCTRINE.md Absence statements, with the arms in canon-kit/SPEC.md §check-prose-tells and queue-kit/SPEC.md §check-task-names. Surface also queue-kit.
 
 ### docs-liquid-literal-unseen
 
