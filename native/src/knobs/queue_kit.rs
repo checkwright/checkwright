@@ -29,6 +29,10 @@ pub const KIT: Kit = Kit {
         Row::scalar("QUEUE_KIT_SLUG_MAX", "30"),
         Row::indexed("QUEUE_KIT_REQUIRED_SECTIONS", REQUIRED_SECTIONS),
         Row::indexed("QUEUE_KIT_PROSE_LEADS", &["Protocol:"]),
+        Row::indexed(
+            "QUEUE_KIT_PLACEHOLDER_TOKENS",
+            &["none", "n/a", "n-a", "nil", "tbd", "nothing", "empty", "-", "—"],
+        ),
         Row::indexed("QUEUE_KIT_PROSE_SURFACE_GLOBS", &[]),
         Row::indexed("QUEUE_KIT_CITATION_SURFACE_GLOBS", &[]),
         Row::scalar(

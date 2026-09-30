@@ -353,6 +353,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "QUEUE_KIT_DEFERRED_SECTION",
             "QUEUE_KIT_ICEBOX_SECTION",
             "QUEUE_KIT_DONE_SECTION",
+            "QUEUE_KIT_PLACEHOLDER_TOKENS",
             "GATE_SDK_NATIVE_BIN",
         ],
         "queue-kit",
@@ -858,11 +859,15 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-prose-tells",
         prose_tells::run,
-        &[(".", "glob:knob:CANON_KIT_PROSE_TELL_GLOBS", "", "")],
+        &[
+            (".", "glob:knob:CANON_KIT_PROSE_TELL_GLOBS", "", ""),
+            (".", "glob:knob:CANON_KIT_PROSE_TELL_ABSENCE_GLOBS", "", ""),
+        ],
         &[
             "GATE_SDK_PRUNE_DIRS",
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "CANON_KIT_PROSE_TELL_GLOBS",
+            "CANON_KIT_PROSE_TELL_ABSENCE_GLOBS",
             "CANON_KIT_PROSE_TELL_PHRASES",
             "CANON_KIT_PROSE_TELL_PHRASES_EXTRA",
             "CANON_KIT_PROSE_TELL_ABBR_ALLOW",

@@ -8,18 +8,6 @@
 
 ## New Features
 
-### absence-statement-gate-arms
-
-[spec: SPEC-absence-arms.md]
-
-doctrine-kit/DOCTRINE.md's Absence statements rule has an audit-roster class and no gate. Two arms are narrow enough to decide mechanically: (a) a `check-prose-tells` arm redding a section whose whole body is one negative-existential sentence, over a consumer-configured surface glob, off by default and never all markdown, exempting generated regions; (b) a placeholder-slug denylist in `check-task-names`, since an indented None or `- none` outside every entry, and a `- none` under Done, pass `check-task-names` and `check-queue-hygiene` today (a column-0 `- none` already reds as a bullet outside every entry). The roster class calls the rule un-gateable as a whole; these arms take only the shapes that need no judgment of whether a reader must know the question was considered.
-
-**Deliverable:** per arm, a knob, an assertion and a `good/`+`bad/` fixture pair, or a SPEC boundary note refusing it.
-
-**Selected 2026-09-30 for canon-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, landing before [canon-kit-value-audit](#canon-kit-value-audit) rules `check-prose-tells`.
-
-**Cost while deferred:** an absence sentence on a ledger is found only by the close audit sweep. No live instance exists: the queue's and the ruling record's empty sections are headings alone. Filed 2026-09-26 to the gap inbox by absence-statement-grammar's amendment, which costed the arms without building them; promoted 2026-09-26 at its close: →fix fails because each arm is new mechanism with a knob, and no live instance needs repair. Owner lookup: `absence`, `placeholder` in this file — none live; owner doctrine-kit/DOCTRINE.md Absence statements, with the arms in canon-kit/SPEC.md §check-prose-tells and queue-kit/SPEC.md §check-task-names. Surface also queue-kit.
-
 ### positional-reference-rule
 
 [spec: SPEC-positional-reference.md]
@@ -94,7 +82,7 @@ canon-kit/SPEC.md's amendment-family sections under [spec-brevity-residue](#spec
 
 [gate-customer-value-audit](#gate-customer-value-audit)'s canon-kit slice: the gates canon-kit ships, 44 `.gate` descriptors (27 zero-config and 11 on-surface by install disposition), audited for customer value and configurability under gate-sdk/SPEC.md §Consumer payload's rule. canon-kit is the companion's `prose` tier, which every companion install exposes.
 
-**Deliverable:** each gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated. `check-docs-cmd`, `check-citation-link` and `check-prose-tells` are ruled after `removed-knob-docs-cmd-valve`, `citation-link-root-docs-range` and [absence-statement-gate-arms](#absence-statement-gate-arms) land, since those change them, and `check-measured-claim` and `check-unmarked-claim` after [baseline-row-prose-coupling-gate](#baseline-row-prose-coupling-gate) lands, since its baseline claims ride them; [companion-install-tier](#companion-install-tier) reads the verdicts after.
+**Deliverable:** each gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated. `check-docs-cmd`, `check-citation-link` and `check-prose-tells` are ruled after `removed-knob-docs-cmd-valve`, `citation-link-root-docs-range` and `absence-statement-gate-arms` land, since those change them, and `check-measured-claim` and `check-unmarked-claim` after [baseline-row-prose-coupling-gate](#baseline-row-prose-coupling-gate) lands, since its baseline claims ride them; [companion-install-tier](#companion-install-tier) reads the verdicts after.
 
 **Cost while deferred:** the parent's cost, for this kit. Filed 2026-09-30 as a split at canon-kit-value-pass' scope. Part of the operator's selection of the set, direction 2026-09-30, lead-relayed (not a ruling).
 
@@ -1526,5 +1514,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 
 - removed-knob-docs-cmd-valve
 - citation-link-root-docs-range
+- absence-statement-gate-arms
 
 ## Lessons Learned

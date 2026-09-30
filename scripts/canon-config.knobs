@@ -144,6 +144,16 @@ CANON_KIT_FENCE_PROGRAMS_EXTRA[] = specify
 # comment-tier-exempt: this repo's reader-facing prose surfaces for check-prose-tells — the hand-authored top-level docs living pages only; the single-level docs/*.md glob deliberately excludes the generated kit mirror (docs/<kit>/) and the immutable dated posts (docs/posts/), since a prose gate forcing edits to generated or immutable pages contradicts them; consumer editorial scope, never a kit literal (the provenance seam)
 CANON_KIT_PROSE_TELL_GLOBS[] = docs/*.md
 
+# comment-tier-exempt: this repo's hand prose held to check-prose-tells' absence section, where a heading alone shows an empty section; the queue stays out because its one-sentence entry bodies describe gaps and check-task-names' placeholder arm holds it, and amendments stay out because their Retired spellings token is a declaration a reader needs
+CANON_KIT_PROSE_TELL_ABSENCE_GLOBS[] = */SPEC.md
+CANON_KIT_PROSE_TELL_ABSENCE_GLOBS[] = */README.md
+CANON_KIT_PROSE_TELL_ABSENCE_GLOBS[] = README.md
+CANON_KIT_PROSE_TELL_ABSENCE_GLOBS[] = doctrine-kit/DOCTRINE.md
+CANON_KIT_PROSE_TELL_ABSENCE_GLOBS[] = docs/*.md
+CANON_KIT_PROSE_TELL_ABSENCE_GLOBS[] = CLAUDE.md
+CANON_KIT_PROSE_TELL_ABSENCE_GLOBS[] = TRAJECTORY.md
+CANON_KIT_PROSE_TELL_ABSENCE_GLOBS[] = ROADMAP.md
+
 # comment-tier-exempt: tokens this repo's audience reads as jargon-free and so exempt from the undefined-abbreviation tell — this repo's own standard names alongside industry terms nobody expands on an install page; consumer vocabulary, never a kit literal (the provenance seam)
 CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA[] = SPEC
 CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA[] = KPI

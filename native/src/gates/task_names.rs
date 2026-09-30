@@ -77,6 +77,20 @@ fn bare_done_slug(line: &str) -> Option<&str> {
     }
 }
 
+// spec: queue-kit/SPEC.md §check-task-names — the placeholder arm's reduction: indentation, a
+// bullet marker, emphasis and a trailing period stripped, the rest matched case-insensitively
+fn placeholder<'a>(line: &str, tokens: &'a [String]) -> Option<&'a str> {
+    let t = line.trim();
+    let t = queue::strip_bullet_lead(t).unwrap_or(t).trim();
+    let t = t.trim_matches(|c| c == '*' || c == '_').trim();
+    let t = t.strip_suffix('.').unwrap_or(t);
+    let t = t.trim_matches(|c| c == '*' || c == '_').trim();
+    if t.is_empty() {
+        return None;
+    }
+    tokens.iter().map(String::as_str).find(|s| s.eq_ignore_ascii_case(t))
+}
+
 pub fn run(args: &[String]) -> i32 {
     let sec = match queue::Sections::with_done() {
         Ok(s) => s,
@@ -102,9 +116,17 @@ pub fn run(args: &[String]) -> i32 {
             return 2;
         }
     };
+    let tokens = match queue::knob_array("QUEUE_KIT_PLACEHOLDER_TOKENS") {
+        Ok(v) => v,
+        Err(e) => {
+            eprintln!("check-task-names: {}", e);
+            return 2;
+        }
+    };
 
     let (mut missing, mut invalid, mut dup, mut baddone) =
         (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+    let mut held: Vec<String> = Vec::new();
     let mut live: HashMap<String, usize> = HashMap::new();
     let mut done: Vec<String> = Vec::new();
     let mut brefs: Vec<(String, usize)> = Vec::new();
@@ -114,6 +136,9 @@ pub fn run(args: &[String]) -> i32 {
     // entry's tag line; a sub-task's lines are its own, not its parent's
     let mut owner: Vec<Option<(&str, bool)>> = vec![None; lines.len()];
     for e in &entries {
+        if let Some(t) = placeholder(&e.slug, &tokens) {
+            held.push(format!("{}:{}: entry heading '{}'", file, e.start + 1, t));
+        }
         match live.get(&e.slug) {
             Some(first) => dup.push(format!(
                 "{}:{}: {} (first seen at line {})",
@@ -155,11 +180,18 @@ pub fn run(args: &[String]) -> i32 {
                 invalid.push(format!("{}:{}: {}", file, fnr, line));
             } else if owner[i].is_none() && queue::is_top_level_bullet(line) {
                 missing.push(format!("{}:{}: {}", file, fnr, line));
+            } else if owner[i].is_none() {
+                if let Some(t) = placeholder(line, &tokens) {
+                    held.push(format!("{}:{}: '{}' outside every entry", file, fnr, t));
+                }
             }
             continue;
         }
         if cur == "done" && queue::is_bullet(line) {
             match bare_done_slug(line) {
+                Some(d) if placeholder(d, &tokens).is_some() => {
+                    held.push(format!("{}:{}: done slug '{}'", file, fnr, d))
+                }
                 Some(d) => done.push(d.to_string()),
                 None => baddone.push(format!("{}:{}: {}", file, fnr, line)),
             }
@@ -211,7 +243,8 @@ pub fn run(args: &[String]) -> i32 {
         + unresolved.len()
         + stale.len()
         + dangling.len()
-        + unlinked.len();
+        + unlinked.len()
+        + held.len();
     if total > 0 {
         let Some(door) = super::door_or_report("check-task-names", "--emit queue-migrate --write <queue-file>.") else {
             return 2;
@@ -285,6 +318,11 @@ pub fn run(args: &[String]) -> i32 {
             &unlinked,
             &["  help: a live reference is a link — '[the-slug](#the-slug)'."],
         );
+        block(
+            &["check-task-names: placeholder token standing where an entry would:"],
+            &held,
+            &["  help: an empty section is its heading alone: delete the line."],
+        );
         return 1;
     }
 
@@ -318,6 +356,19 @@ mod tests {
         assert_eq!(bare_done_slug("- the-slug   "), Some("the-slug"));
         assert_eq!(bare_done_slug("- the-slug and prose"), None);
         assert_eq!(bare_done_slug("- **bold**"), None);
+    }
+
+    #[test]
+    fn a_placeholder_is_the_reduced_line_matched_case_insensitively() {
+        let t: Vec<String> = ["none", "n/a", "-", "—"].iter().map(|s| s.to_string()).collect();
+        assert_eq!(placeholder("  None", &t), Some("none"));
+        assert_eq!(placeholder("- **N/A**.", &t), Some("n/a"));
+        assert_eq!(placeholder("-", &t), Some("-"));
+        assert_eq!(placeholder("  —", &t), Some("—"));
+        assert_eq!(placeholder("---", &t), None);
+        assert_eq!(placeholder("none-left-over", &t), None);
+        assert_eq!(placeholder("None of these apply.", &t), None);
+        assert_eq!(placeholder("none", &[]), None);
     }
 
     // spec: queue-kit/SPEC.md §check-task-names — assertion R's token is single-backtick, and a

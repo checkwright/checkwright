@@ -2,7 +2,7 @@
 233 canon-kit/SPEC.md
 130 context-kit/SPEC.md
 238 delegation-kit/SPEC.md
-46 doctrine-kit/DOCTRINE.md
+47 doctrine-kit/DOCTRINE.md
 43 doctrine-kit/SPEC.md
 68 drift-kit/SPEC.md
 119 evidence-kit/SPEC.md

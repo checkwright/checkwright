@@ -24,6 +24,10 @@ a nested unit of beta.
 
 collapse the duplicated log lines.
 
+### none-left-over
+
+a slug that only starts with a placeholder token.
+
 ## Deferred
 
   A section preamble may list its entries: [gamma-feature](#gamma-feature).

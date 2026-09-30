@@ -9,6 +9,8 @@
 - `check-gate-substrate-parity` — reds on a `gates.list` member that resolves nowhere, which `check-rule-citation` now is where you registered it by hand. Drop that line.
 - `check-graph` — reds on a `gates.list` member that resolves nowhere, which `check-rule-citation` now is where you registered it by hand. Drop that line and regenerate the hooks.
 - `check-kit-enum` — exits 2 on a `gates.list` member that resolves nowhere, which `check-rule-citation` now is where you registered it by hand. Drop that line.
+- `check-prose-tells` — gains assertion G, armed only once you set the new `CANON_KIT_PROSE_TELL_ABSENCE_GLOBS` (default empty, off): a section on those surfaces whose whole body is a placeholder or one sentence like "There are no known issues." reds. Nothing to do while it stays empty; to arm it, bind hand prose only, never a checklist or a work queue.
+- `check-task-names` — reds a placeholder token (`None`, `n/a`, a dash, from the new `QUEUE_KIT_PLACEHOLDER_TOKENS`, shipped set on by default) standing outside every entry of a task section, as a done slug or as an entry heading. Delete the line: an empty section is its heading alone. Set the knob empty to switch the arm off.
 
 ## Behavior changes
 

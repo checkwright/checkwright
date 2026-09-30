@@ -8,3 +8,6 @@ same-file link naming no live entry
 TASK-QUEUE.md:15: (#gone-task)
 live entry cited in backticks rather than linked
 TASK-QUEUE.md:9: `tidy-logs`
+placeholder token standing where an entry would
+TASK-QUEUE.md:27: 'none' outside every entry
+TASK-QUEUE.md:34: done slug 'none'

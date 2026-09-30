@@ -137,6 +137,7 @@ pub const KIT: Kit = Kit {
         Row::indexed("CANON_KIT_COMMENT_WHITELIST", &[]),
         Row::scalar("CANON_KIT_COMMENT_RUN_CAP", "3"),
         Row::indexed("CANON_KIT_PROSE_TELL_GLOBS", &[]),
+        Row::indexed("CANON_KIT_PROSE_TELL_ABSENCE_GLOBS", &[]),
         Row::scalar("CANON_KIT_PROSE_TELL_EMDASH_MAX", "2"),
         Row::scalar("CANON_KIT_PROSE_TELL_CONTRAST_MAX", "1"),
         Row::scalar("CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES", "4"),

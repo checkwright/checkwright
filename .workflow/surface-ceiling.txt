@@ -17,7 +17,7 @@
 1155cp .claude/commands/spec.md
 1728cp .claude/commands/validate.md
 12471cp CLAUDE.md
-265905cp canon-kit/SPEC.md
+266949cp canon-kit/SPEC.md
 5785cp canon-kit/templates/SPEC-amendment.md
 23669cp companion/SPEC.md
 130174cp context-kit/SPEC.md
@@ -103,6 +103,6 @@
 6058cp lifecycle-kit/templates/stages/validate.md
 2765cp lifecycle-kit/templates/upgrade.md
 15010cp plugin/SPEC.md
-176937cp queue-kit/SPEC.md
+177942cp queue-kit/SPEC.md
 1392cp queue-kit/templates/TASK-QUEUE.md
 62216cp site-kit/SPEC.md

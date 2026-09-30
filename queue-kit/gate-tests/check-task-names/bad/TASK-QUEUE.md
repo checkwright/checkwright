@@ -24,10 +24,13 @@ a heading whose text is no slug.
 
 - **stray-entry** — a bullet entry left in the retired grammar.
 
+  None
+
 ## Deferred
 
 ## Done
 
 - gone-task
+- none
 
 ## Lessons Learned
