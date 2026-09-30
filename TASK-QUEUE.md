@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### canon-kit-amendment-brevity
-
-canon-kit/SPEC.md's amendment-family sections under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §The spec model, §The amendment lifecycle with its two subsections, §Content tiering — the star topology, and under §Per-component contracts §The shared spec adapters, §check-amendment-queue, §check-amendment-update-target, §check-amendment-retired-spelling, §check-spec-dod-singleton, §check-spec-derivable-section and §check-spec-embedded-source, about 10.0k of the file's 41.6k words; canon-kit's other sections stay on the parent.
-
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. No amendment of this iteration edits these sections, so the pass may ride any batch.
-
-**Cost while deferred:** paid by every session and adopter that reads an unpassed canon-kit section. Filed 2026-09-30 as a split at canon-kit-value-pass' scope, taken ahead of guard-kit's and delegation-kit's remainders because their bulk is rewritten by deferred entries: guard-kit's §The generic ruleset by [write-side-steering](#write-side-steering), delegation-kit's §The delegation model by [heterogeneous-agent-delegation](#heterogeneous-agent-delegation)'s transport slice. Part of the operator's selection of the set, direction 2026-09-30, lead-relayed (not a ruling).
-
 ### canon-kit-value-audit
 
 [gate-customer-value-audit](#gate-customer-value-audit)'s canon-kit slice: the gates canon-kit ships, 44 `.gate` descriptors (27 zero-config and 11 on-surface by install disposition), audited for customer value and configurability under gate-sdk/SPEC.md §Consumer payload's rule. canon-kit is the companion's `prose` tier, which every companion install exposes.
@@ -318,7 +310,7 @@ guard-kit's front sections left 2026-09-30 at guard-kit-steering's scope, on an 
 
 delegation-kit's tier sections left 2026-09-30 at delegation-tier-binding's scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `delegation-kit-tier-brevity`; its other sections remain.
 
-canon-kit's amendment-family sections left 2026-09-30 at canon-kit-value-pass' scope, on an operator direction lead-relayed (not a /consult ruling), as [canon-kit-amendment-brevity](#canon-kit-amendment-brevity); canon-kit's other sections remain.
+canon-kit's amendment-family sections left 2026-09-30 at canon-kit-value-pass' scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `canon-kit-amendment-brevity`; canon-kit's other sections remain.
 
 ### prune-set-matches-walk-root-ancestors
 
@@ -1459,5 +1451,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - intra-file-pendency-contradiction-scan
 - spec-mirror-citation-links
 - positional-reference-rule
+- canon-kit-amendment-brevity
 
 ## Lessons Learned
