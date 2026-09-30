@@ -10,3 +10,4 @@ delegation-tier-binding align a93122a7 2026-09-30 00592cba
 delegation-tier-binding align ab4e5c55 2026-09-30 2d527011
 delegation-tier-binding build ad56b0be 2026-09-30 2c119ea9
 delegation-tier-binding build a3d44e29 2026-09-30 5a192cba
+delegation-tier-binding build abb91648 2026-09-30 d2edc605
