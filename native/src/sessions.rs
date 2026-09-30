@@ -36,7 +36,7 @@ pub fn normalize(id: &str) -> String {
 // held here rather than spelled at each of its readers, on gate-sdk/SPEC.md §lib/gate.sh's *exactly
 // one place a value is computed*. A bare id passes through it unchanged.
 pub fn key(path: &str) -> String {
-    let base = path.rsplit('/').next().unwrap_or(path);
+    let base = path.rsplit(['/', '\\']).next().unwrap_or(path);
     normalize(base.strip_suffix(".jsonl").unwrap_or(base))
 }
 
@@ -225,4 +225,18 @@ pub fn every_transcript(i: &Inputs) -> Vec<String> {
         .iter()
         .flat_map(|g| crate::walk::glob_entries(g))
         .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::key;
+
+    // spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the basename under either separator, so a
+    // Windows transcript path keys by its file name rather than its drive
+    #[test]
+    fn a_key_takes_the_basename_under_either_separator() {
+        assert_eq!(key("/s/lead/subagents/agent-abcdef1234.jsonl"), "abcdef12");
+        assert_eq!(key(r"C:\s\lead\subagents\agent-abcdef1234.jsonl"), "abcdef12");
+        assert_eq!(key("0123456789ab"), "01234567");
+    }
 }
