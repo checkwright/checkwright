@@ -11,9 +11,11 @@
 # empty declare), proving D2 stays inert on the roster's absence rather than on
 # this type's absence from a populated one. A subagent_type prefixed 'armed:'
 # runs with DELEGATION_KIT_MUTATING_TYPES=(mut-type), DELEGATION_KIT_REQUIRE_TIER=on
-# and one definition stating model:, for tiered-type. Either prefix is stripped
-# before it reaches the guard's payload. subagent_type UNPARSEABLE sends invalid
-# JSON on stdin instead of a built payload.
+# and one definition stating model:, for tiered-type, and an empty tier binding. A
+# subagent_type prefixed 'bound:' runs with the table's roster and the tier binding
+# DELEGATION_KIT_TIER_MODEL=(judgment=big-model mechanical=small). Each prefix is
+# stripped before it reaches the guard's payload. subagent_type UNPARSEABLE sends
+# invalid JSON on stdin instead of a built payload.
 
 # D1 — the fork ban is unconditional
 block	fork	-	-	-	a fork dispatch blocks regardless of isolation or roster
@@ -37,6 +39,13 @@ block	armed:mut-type	-	-	-	a dispatch naming no model, of a type no definition t
 fallthrough	armed:mut-type	-	-	named	the same dispatch naming its model does not block
 fallthrough	armed:tiered-type	worktree	-	-	a type whose definition states model: needs no model at dispatch
 fallthrough	noroster:mut-type	-	-	-	D5 stays inert while its switch is off
+
+# D6 — the bound tier: a named model is one of the bound values
+block	bound:other-type	-	-	named	a named model matching no bound value blocks
+fallthrough	bound:other-type	-	-	small	a named model equal to a bound value does not block
+fallthrough	bound:other-type	-	-	vendor-small-4	a model id carrying a bound value as a token after its first does not block
+fallthrough	bound:other-type	-	-	-	a dispatch naming no model is D5's, never D6's
+fallthrough	armed:mut-type	-	-	named	D6 stays inert while the binding is empty
 
 # D3 — nested-dispatch advisory (never blocks)
 advise	other-type	-	yes	-	a payload carrying agent_id advises: this dispatch creates a grandchild

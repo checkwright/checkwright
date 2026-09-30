@@ -31,15 +31,15 @@ Every top-level directory carrying a `SPEC.md` takes a row, kit or not, and one 
 | canon-kit | — | 5785cp · ~1531t |
 | companion | — | — |
 | context-kit | — | 2351cp · ~594t |
-| delegation-kit | — | 40434cp · ~10182t |
+| delegation-kit | — | 40571cp · ~10217t |
 | doctrine-kit | 1999cp · ~508t | — |
 | drift-kit | — | 6450cp · ~1630t |
 | evidence-kit | — | — |
 | gate-sdk | — | 2899cp · ~730t |
 | guard-kit | — | 4394cp · ~1114t |
 | installer | — | — |
-| lifecycle-kit | 301cp · ~76t | 124322cp · ~31348t |
+| lifecycle-kit | 301cp · ~76t | 124668cp · ~31436t |
 | plugin | — | — |
 | queue-kit | — | 1392cp · ~359t |
 | site-kit | — | — |
-| **total** | 2300cp · ~584t | 188027cp · ~47491t |
+| **total** | 2300cp · ~584t | 188510cp · ~47613t |

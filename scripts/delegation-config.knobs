@@ -15,6 +15,11 @@ DELEGATION_KIT_STATUSLINE_INBOXES[] = G=.workflow/gap-inbox.md
 # spec: delegation-kit/SPEC.md §The delegation model — D5 on: a dispatch names its model unless its type's definition states one
 DELEGATION_KIT_REQUIRE_TIER = on
 
+# spec: delegation-kit/SPEC.md §The tier binding — every class follows an alias; routing binds the judgment model because this repo splits the lead by session, not by tier
+DELEGATION_KIT_TIER_MODEL[] = judgment=opus
+DELEGATION_KIT_TIER_MODEL[] = routing=opus
+DELEGATION_KIT_TIER_MODEL[] = mechanical=sonnet
+
 # spec: delegation-kit/SPEC.md §usage-verdict — sample the footprint per verdict into the gitignored measurement dir; --emit-usage-trend reports the evolution
 DELEGATION_KIT_USAGE_HISTORY = .metric/usage-history.log
 

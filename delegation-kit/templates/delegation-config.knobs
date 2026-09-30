@@ -2,3 +2,7 @@
 
 # spec: delegation-kit/SPEC.md §Layout and configuration — D2's roster: the consumer's own read-only-dispatched agent-type names; default empty (D2 inert) — never a kit-shipped vocabulary (gate-sdk/SPEC.md §The provenance seam)
 # DELEGATION_KIT_READONLY_TYPES[] = <agent-type>
+
+# spec: delegation-kit/SPEC.md §The tier binding — one element per class (judgment, routing, mechanical); a value is an alias (follows the newest model) or an exact model id (pinned); default empty (off)
+# DELEGATION_KIT_TIER_MODEL[] = judgment=<model>
+# DELEGATION_KIT_TIER_MODEL[] = mechanical=<model>

@@ -1,6 +1,6 @@
 // spec: delegation-kit/SPEC.md §The delegation model — the PreToolUse(Agent) dispatch-shape guard:
-// D1 the fork ban, D2 the read-only isolation claim, D4 default isolation, D5 the chosen tier, D3
-// the nested-dispatch advisory.
+// D1 the fork ban, D2 the read-only isolation claim, D4 default isolation, D5 the chosen tier, D6
+// the bound tier, D3 the nested-dispatch advisory.
 use crate::gates::agent_tier_explicit;
 use crate::hook;
 use crate::walk;
@@ -10,13 +10,14 @@ use std::path::Path;
 const NAME: &str = "agent-dispatch-guard";
 
 // spec: delegation-kit/SPEC.md §The delegation model — the configuration the routing reads: D2's
-// roster, D4's roster, D5's switch, and D5's definition lookup, a function so the decision table
-// can fix it without a directory
+// roster, D4's roster, D5's switch, D5's definition lookup, a function so the decision table
+// can fix it without a directory, and D6's tier binding
 struct Config<'a> {
     readonly: &'a [String],
     mutating: &'a [String],
     require_tier: bool,
     tier_defined: &'a dyn Fn(&str) -> bool,
+    binding: &'a [String],
 }
 
 // spec: delegation-kit/SPEC.md §The delegation model — one knob read: its value, or empty with a
@@ -46,13 +47,14 @@ pub fn run(payload: Option<&Value>) -> i32 {
             (false, String::new())
         }
     };
+    let binding = read_array("DELEGATION_KIT_TIER_MODEL", "D6 (the bound tier)", &mut notes);
     let Some(doc) = payload.filter(|d| d.get("tool_input").is_some_and(Value::is_object)) else {
         return degraded("the hook payload did not parse, or carried no tool_input object");
     };
 
     let subagent_type = hook::field(Some(doc), &["tool_input", "subagent_type"]);
     let isolation = hook::field(Some(doc), &["tool_input", "isolation"]);
-    let model_named = !hook::field(Some(doc), &["tool_input", "model"]).is_empty();
+    let model = hook::field(Some(doc), &["tool_input", "model"]);
     let nested = doc.get("agent_id").is_some_and(|v| !v.is_null());
     let lookup = |ty: &str| tier_defined(&agent_dir, ty);
     let cfg = Config {
@@ -60,13 +62,15 @@ pub fn run(payload: Option<&Value>) -> i32 {
         mutating: &mutating,
         require_tier,
         tier_defined: &lookup,
+        binding: &binding,
     };
 
-    match route(&subagent_type, &isolation, nested, model_named, &cfg) {
+    match route(&subagent_type, &isolation, nested, &model, &cfg) {
         "fork" => return hook::block(NAME, FORK_BAN),
         "read-only" => return hook::block(NAME, &read_only_claim(&subagent_type)),
         "isolation" => return hook::block(NAME, &default_isolation(&subagent_type)),
         "tier" => return hook::block(NAME, &chosen_tier(&subagent_type, &agent_dir)),
+        "bound" => return hook::block(NAME, &bound_tier(&model, &binding)),
         _ => {}
     }
 
@@ -107,7 +111,7 @@ fn advise(note: &str) -> i32 {
 // dispatch and names the rules it could not enforce, so the reviewer knows what to check by hand.
 fn degraded(reason: &str) -> i32 {
     advise(&format!(
-        "allowed this dispatch WITHOUT enforcing the fork ban (D1), the read-only isolation claim (D2), default isolation (D4) or the chosen tier (D5) — {}. Check the dispatch by hand: no fork, a child claimed read-only or of an undeclared type takes isolation: worktree, and the dispatch names its model unless its type's definition states one (delegation-kit/SPEC.md §The delegation model).",
+        "allowed this dispatch WITHOUT enforcing the fork ban (D1), the read-only isolation claim (D2), default isolation (D4), the chosen tier (D5) or the bound tier (D6) — {}. Check the dispatch by hand: no fork, a child claimed read-only or of an undeclared type takes isolation: worktree, the dispatch names its model unless its type's definition states one, and a named model is one of the consumer's bound tiers (delegation-kit/SPEC.md §The delegation model).",
         reason
     ))
 }
@@ -142,10 +146,21 @@ fn chosen_tier(subagent_type: &str, agent_dir: &str) -> String {
     )
 }
 
+// spec: delegation-kit/SPEC.md §The delegation model — D6's message names the bound values, which
+// are the consumer's config rather than kit literals
+fn bound_tier(model: &str, binding: &[String]) -> String {
+    format!(
+        "this dispatch names model '{}', which matches none of the consumer's bound tiers ({}), so it would choose around the tier binding rather than among its tiers. Name one of the bound values (bash gate-sdk/bin/run-gates.sh --emit knob-values DELEGATION_KIT_TIER_MODEL), or, where the class you need is pinned to an exact model id, dispatch a type whose definition declares that class: a per-dispatch model is an alias only (delegation-kit/SPEC.md §The tier binding).",
+        model,
+        binding.join(", ")
+    )
+}
+
 // spec: delegation-kit/SPEC.md §The delegation model — the routing the kit's decision table
 // asserts over, kept apart from the messages so the table drives the decision rather than a
 // process; the rule order is that section's
-fn route(subagent_type: &str, isolation: &str, nested: bool, model_named: bool, cfg: &Config) -> &'static str {
+fn route(subagent_type: &str, isolation: &str, nested: bool, model: &str, cfg: &Config) -> &'static str {
+    let model_named = !model.is_empty();
     if subagent_type == "fork" {
         return "fork";
     }
@@ -158,6 +173,12 @@ fn route(subagent_type: &str, isolation: &str, nested: bool, model_named: bool, 
     }
     if cfg.require_tier && !model_named && !(cfg.tier_defined)(subagent_type) {
         return "tier";
+    }
+    if !cfg.binding.is_empty()
+        && model_named
+        && !crate::tier::values(cfg.binding).iter().any(|v| crate::tier::matches(v, model))
+    {
+        return "bound";
     }
     if nested {
         return "advise";
@@ -212,14 +233,19 @@ mod tests {
             .join("../delegation-kit/usage-tests/dispatch-guard-cases.tsv");
         let text = std::fs::read_to_string(&table).expect("the kit's decision table must be read");
         // spec: delegation-kit/SPEC.md §Testing — the driver fixes the configuration: D2's roster
-        // everywhere, and D4's roster, D5's switch and one tier-stating definition behind `armed:`
+        // everywhere, D4's roster, D5's switch and one tier-stating definition behind `armed:`, and
+        // D6's binding behind `bound:`
         let readonly = vec!["ro-type".to_string()];
         let mutating = vec!["mut-type".to_string()];
+        let binding = vec!["judgment=big-model".to_string(), "mechanical=small".to_string()];
         let tiered = |t: &str| t == "tiered-type";
         let none = |_: &str| false;
-        let quiet = Config { readonly: &readonly, mutating: &[], require_tier: false, tier_defined: &none };
-        let bare = Config { readonly: &[], mutating: &[], require_tier: false, tier_defined: &none };
-        let armed = Config { readonly: &readonly, mutating: &mutating, require_tier: true, tier_defined: &tiered };
+        let quiet = Config { readonly: &readonly, mutating: &[], require_tier: false, tier_defined: &none, binding: &[] };
+        let bare = Config { readonly: &[], mutating: &[], require_tier: false, tier_defined: &none, binding: &[] };
+        let armed =
+            Config { readonly: &readonly, mutating: &mutating, require_tier: true, tier_defined: &tiered, binding: &[] };
+        let bound =
+            Config { readonly: &readonly, mutating: &[], require_tier: false, tier_defined: &none, binding: &binding };
         let mut ran = 0usize;
         for line in text.lines() {
             if line.trim().is_empty() || line.starts_with('#') {
@@ -230,7 +256,7 @@ mod tests {
             let (want, ty, iso, nested, model) = (cols[0], cols[1], cols[2], cols[3], cols[4]);
             let desc = cols.get(5).copied().unwrap_or("");
             fn dash(v: &str) -> &str { if v == "-" { "" } else { v } }
-            // spec: delegation-kit/SPEC.md §Testing — the table's three type-column sentinels;
+            // spec: delegation-kit/SPEC.md §Testing — the table's four type-column sentinels;
             // `UNPARSEABLE` is the degraded path, which advises without reaching the routing
             let got = if ty == "UNPARSEABLE" {
                 "advise"
@@ -239,11 +265,13 @@ mod tests {
                     (t, &bare)
                 } else if let Some(t) = ty.strip_prefix("armed:") {
                     (t, &armed)
+                } else if let Some(t) = ty.strip_prefix("bound:") {
+                    (t, &bound)
                 } else {
                     (ty, &quiet)
                 };
-                match route(dash(bare_ty), dash(iso), dash(nested) == "yes", !dash(model).is_empty(), cfg) {
-                    "fork" | "read-only" | "isolation" | "tier" => "block",
+                match route(dash(bare_ty), dash(iso), dash(nested) == "yes", dash(model), cfg) {
+                    "fork" | "read-only" | "isolation" | "tier" | "bound" => "block",
                     other => other,
                 }
             };

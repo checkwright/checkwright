@@ -2,6 +2,7 @@
 // registration and no fixture pair; it owes a test module in its own file, and a named caller: a
 // regen command, a comparator calling `emit()`, a stage step, a gate reaching it in process.
 use crate::programs;
+pub mod agent_tiers;
 pub mod agents_md_smoke;
 pub mod always_loaded;
 pub mod capture_drain;
@@ -663,6 +664,14 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-usage-trend",
         Arm::Emit(usage_trend::emit, Grammar::Parsed(usage_trend::USAGE)),
         usage_trend::KNOBS,
+    ),
+    // spec: delegation-kit/SPEC.md §check-agent-tier-explicit — the definitions' `model:` generator,
+    // an `--emit-` member because its exit grammar is the collapse: 0 a report or a write, 2 an
+    // unbound class or an unreadable definition
+    (
+        "--emit-agent-tiers",
+        Arm::Emit(agent_tiers::emit, Grammar::Flags(&["--write"])),
+        agent_tiers::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §run-gates — the battery runner: the class's first member
     // that returns a verdict rather than a document, and the reason the table is keyed by flag

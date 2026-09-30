@@ -8,21 +8,9 @@
 
 ## New Features
 
-### tier-model-binding
-
-[spec: SPEC-tier-model-binding.md]
-
-the tier a dispatch rides is written as a harness model alias wherever it is chosen (the `model:` field of the stage-session, consult-session, audit-sweep and edit-sweep agent definitions, the lead binding's per-stage overrides, the build batch tiering), and no consumer setting chooses between following the newest model and pinning one. On 2026-09-29 the alias dispatches of native-hook-customer-legs resolved to two newer model ids with no edit, per the subagent transcripts.
-
-**Deliverable, operator direction 2026-09-29, lead-relayed (not a ruling):** (1) a consumer binding per tier class (judgment, routing, mechanical) to an alias, which follows the newest model, or an exact model id, which stays until changed; alias the default and pinning the opt-in, per Policy-as-choice; every place that chooses a tier reads the one binding. (2) Public documentation of alias tiering as a strength with its honest limit: an alias upgrade silently changes price and behaviour, so the claim ships with the price-coverage arm's detector (drift-kit/SPEC.md §The price-coverage arm), and under a pin a new id in the transcripts means the pin was bypassed. Probed at spec: the per-dispatch `model` parameter takes an alias only, so an exact id rides a definition's `model:` alone; the amendment carries that field's own exact-id premise.
-
-**Cost while deferred:** a model upgrade changes every dispatch's price and behaviour unannounced, and no consumer can opt out. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at the next iteration's scope: →fix fails because the binding is a new knob. Re-verified: `model: opus` or `model: sonnet` in the four agent definitions. Owner lookup: `alias`, `model id`, `tier` in this file — [session-model-identity-verification](#session-model-identity-verification), DISTINCT (verifying the running tier, not choosing it); owner delegation-kit/SPEC.md, with delegation-kit/templates/agent-execution.md's live-roster rule.
-
-**Selected 2026-09-30 for delegation-tier-binding, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it first in the set, since the verification, the consult floor, the hotfix definition and the vendor adapters read its binding.
-
 ### session-model-identity-verification
 
-[spec: SPEC-model-verdict.md] [blocked-by: tier-model-binding]
+[spec: SPEC-model-verdict.md]
 
 a session cannot report or verify the model tier it is running at. The session-context hook prints iteration, budget and drift; `drift-report` prints neither. Nothing surfaces the running model, so a session cannot state its own tier without a human hand-reading the harness transcript, and no stage can assert the tier it was dispatched at.
 
@@ -32,7 +20,7 @@ a session cannot report or verify the model tier it is running at. The session-c
 
 **Cost while deferred:** every tiering rule in the tree is unverifiable — including the two filed alongside this one. [consult-tier-declaration](#consult-tier-declaration) blocks on it outright, and the `Co-Authored-By` attribution defect has no derivable fix without it. Filed 2026-08-04 at close from the gap inbox; filed by the lead.
 
-**Selected 2026-09-30 for delegation-tier-binding, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it, after [tier-model-binding](#tier-model-binding), whose binding supplies the consumer-config tier expectation.
+**Selected 2026-09-30 for delegation-tier-binding, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it, after `tier-model-binding`, whose binding supplies the consumer-config tier expectation.
 
 ### consult-tier-declaration
 
@@ -58,7 +46,7 @@ no tracked agent definition exists for the operator-ruled hotfix path of the sco
 
 **Cost while deferred:** every hotfix costs a restated prompt and a second dispatch. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead; promoted 2026-09-27 at its close: →fix fails because the definition is a new governed name. Owner lookup: `hotfix`, `agents/`, `MUTATING_TYPES` in this file — none; owner delegation-kit/SPEC.md. The worktree half landed as `worktree-crate-commit-red`: the hook greens in a worktree, and `check-crate-arms` refusing a crate-source commit there is now the stated contract.
 
-**Selected 2026-09-30 for delegation-tier-binding, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it, its `model:` field read through [tier-model-binding](#tier-model-binding)'s binding.
+**Selected 2026-09-30 for delegation-tier-binding, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it, its `model:` field read through `tier-model-binding`'s binding.
 
 ### heterogeneous-agent-delegation
 
@@ -74,7 +62,7 @@ foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a fore
 
 **Attribution, operator direction 2026-09-30, lead-relayed (not a ruling):** foreign harnesses' commit trailers off, since each adds a GitHub contributor per vendor, and the method stated once in the README; a harness setting change waits on operator confirmation.
 
-**Selected 2026-09-30 for delegation-tier-binding, operator direction lead-relayed (not a ruling):** the first slice above; spec authors and promotes it after [tier-model-binding](#tier-model-binding), whose binding the adapters extend.
+**Selected 2026-09-30 for delegation-tier-binding, operator direction lead-relayed (not a ruling):** the first slice above; spec authors and promotes it after `tier-model-binding`, whose binding the adapters extend.
 
 **Design-memory amendment (2026-07-25):** the TUI relay buys no session resume or token efficiency — both live in the vendor's session store (stateless APIs, the same on-disk transcript replayed against the same server-side prompt cache), so interactive-vs-headless is rendering, not state. Headless warm-resume by session id and JSONL turn events ship on the vendors probed.
 
@@ -96,7 +84,7 @@ delegation-kit/SPEC.md's tier sections under [spec-brevity-residue](#spec-brevit
 
 [gate-customer-value-audit](#gate-customer-value-audit)'s delegation-kit slice: `check-agent-tier-explicit`, `check-gate-tamper` and `check-rule-citation`, the three gates delegation-kit ships, audited for customer value and configurability under gate-sdk/SPEC.md §Consumer payload's rule.
 
-**Deliverable:** each gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated. Ruled after [tier-model-binding](#tier-model-binding) lands, since `check-agent-tier-explicit` reads the `model:` field that binding re-sources.
+**Deliverable:** each gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated. Ruled after `tier-model-binding` lands, since `check-agent-tier-explicit` reads the `model:` field that binding re-sources.
 
 **Cost while deferred:** the parent's cost, for this kit. Filed 2026-09-30 as a split at delegation-tier-binding's scope; delegation-kit is a kit a companion full install exposes. Part of the operator's selection of the set, direction 2026-09-30, lead-relayed (not a ruling).
 
@@ -1573,5 +1561,7 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 Whether a live queue entry should cite shipped mechanism by a stable anchor (a SPEC section, a gate name, a path) rather than a retired slug, and whether a check-queue-hygiene axis should hold that, is unruled; close's retired-block read corrects each instance inline meanwhile, as it did twice at preview-readiness' close.
 
 ## Done
+
+- tier-model-binding
 
 ## Lessons Learned

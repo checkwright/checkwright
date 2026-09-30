@@ -59,6 +59,7 @@ pub const KIT: Kit = Kit {
         Row::indexed("DELEGATION_KIT_READONLY_TYPES", &[]),
         Row::indexed("DELEGATION_KIT_MUTATING_TYPES", &[]),
         Row::scalar("DELEGATION_KIT_REQUIRE_TIER", "off"),
+        Row::indexed("DELEGATION_KIT_TIER_MODEL", &[]),
         Row::indexed("DELEGATION_KIT_STATUSLINE_INBOXES", &[]),
         Row::derived("DELEGATION_KIT_GATE_FILES", Shape::Indexed, gate_files, &["GATE_SDK_GATES_DIR"]),
         Row::derived(
@@ -88,8 +89,8 @@ fn numeric(s: &str) -> bool {
 }
 
 // spec: delegation-kit/SPEC.md §Layout and configuration — a broken delegation config runs no tool:
-// the numeric shapes, the positive fan width, D5's on|off switch, and the emptiness of the agent
-// dir and the two path sets
+// the numeric shapes, the positive fan width, D5's on|off switch, the tier binding, and the
+// emptiness of the agent dir and the two path sets
 fn validate(v: &Values) -> Vec<String> {
     let mut errs: Vec<String> = Vec::new();
     for n in ["DELEGATION_KIT_PAUSE_PCT", "DELEGATION_KIT_PAUSE_PCT_7D"] {
@@ -122,10 +123,59 @@ fn validate(v: &Values) -> Vec<String> {
             )),
         }
     }
+    // spec: delegation-kit/SPEC.md §The tier binding — the refusals are the matcher module's, so
+    // the validator and every reader share one reading of an element
+    errs.extend(crate::tier::refusals(indexed(v, "DELEGATION_KIT_TIER_MODEL").unwrap_or(&[])));
     for n in ["DELEGATION_KIT_GATE_FILES", "DELEGATION_KIT_META_PATHS"] {
         if indexed(v, n).is_some_and(|e| e.is_empty()) {
             errs.push(format!("{} is empty", n));
         }
     }
     errs
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::knobs::Origin;
+
+    fn binding(elems: &[&str]) -> Vec<String> {
+        let mut v: Values = Values::new();
+        v.insert(
+            "DELEGATION_KIT_TIER_MODEL",
+            (Value::Indexed(elems.iter().map(|s| s.to_string()).collect()), Origin::Tracked),
+        );
+        validate(&v)
+    }
+
+    // spec: delegation-kit/SPEC.md §Layout and configuration — one firing row per tier-binding refusal
+    #[test]
+    fn every_tier_binding_refusal_fires_on_its_own_shape() {
+        let cases: &[(&str, &[&str])] = &[
+            ("is not '<class>=<model>'", &["judgment"]),
+            ("not one of judgment, routing, mechanical", &["premium=big"]),
+            ("binds class 'judgment' twice", &["judgment=big", "judgment=bigger"]),
+            ("has an empty value", &["judgment="]),
+            ("carries whitespace", &["judgment=big model"]),
+            ("binds 'inherit'", &["judgment=inherit"]),
+            ("is all digits", &["mechanical=5"]),
+            ("is the leading token of 'vendor-big-5'", &["judgment=vendor-big-5", "mechanical=vendor"]),
+        ];
+        for (want, elems) in cases {
+            let errs = binding(elems);
+            assert!(errs.iter().any(|e| e.contains(want)), "{:?} did not refuse with '{}': {:?}", elems, want, errs);
+        }
+    }
+
+    // spec: delegation-kit/SPEC.md §Layout and configuration — a binding refusing on several findings
+    // reports every one; three aliases, one alias bound to two classes, and an alias beside an exact
+    // id all pass
+    #[test]
+    fn a_well_formed_binding_passes_and_a_broken_one_reports_every_finding() {
+        assert!(binding(&["judgment=big", "routing=big", "mechanical=small"]).is_empty());
+        assert!(binding(&["judgment=vendor-big-5-5", "mechanical=small"]).is_empty());
+        assert!(binding(&[]).is_empty());
+        let errs = binding(&["judgment", "premium=x", "mechanical=inherit"]);
+        assert_eq!(errs.len(), 3, "{:?}", errs);
+    }
 }

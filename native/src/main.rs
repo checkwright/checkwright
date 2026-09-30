@@ -35,6 +35,7 @@ mod sessions;
 mod sha256;
 mod spec;
 mod stages;
+mod tier;
 mod toolfloor;
 #[cfg(test)]
 mod usage_tests;

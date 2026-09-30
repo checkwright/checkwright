@@ -1,16 +1,16 @@
 # contract: context-kit/SPEC.md §The surface ratchet
-7572cp .claude/agents/audit-sweep.md
-1307cp .claude/agents/consult-session.md
-2368cp .claude/agents/edit-sweep.md
-8486cp .claude/agents/stage-session.md
+7385cp .claude/agents/audit-sweep.md
+1322cp .claude/agents/consult-session.md
+2205cp .claude/agents/edit-sweep.md
+8501cp .claude/agents/stage-session.md
 93cp .claude/commands/adopt.md
 1446cp .claude/commands/agent-execution.md
 551cp .claude/commands/align.md
 980cp .claude/commands/build.md
 9178cp .claude/commands/close.md
 2355cp .claude/commands/consult.md
-1590cp .claude/commands/economics.md
-4729cp .claude/commands/lead.md
+1451cp .claude/commands/economics.md
+4994cp .claude/commands/lead.md
 715cp .claude/commands/release-sweep.md
 6847cp .claude/commands/scope.md
 1155cp .claude/commands/spec.md
@@ -21,8 +21,8 @@
 23669cp companion/SPEC.md
 130174cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
-270229cp delegation-kit/SPEC.md
-37037cp delegation-kit/templates/agent-execution.md
+279718cp delegation-kit/SPEC.md
+37174cp delegation-kit/templates/agent-execution.md
 3397cp delegation-kit/templates/dispatch-checklists.md
 1308cp docs/canon-kit/index.md
 1613cp docs/context-kit/index.md
@@ -39,7 +39,7 @@
 1395cp docs/lifecycle-kit/index.md
 3007cp docs/methodology.md
 1682cp docs/openspec.md
-11044cp docs/orchestration.md
+11604cp docs/orchestration.md
 11086cp docs/positioning.md
 1869cp docs/posts/2026-07-09-announcing-checkwright.md
 1034cp docs/posts/2026-07-14-checkwright-v0-1-0.md
@@ -75,7 +75,7 @@
 4672cp docs/posts/2026-09-30-checkwright-v0-31-0.md
 1440cp docs/queue-kit/index.md
 789cp docs/releases.md
-42803cp docs/site-architecture.md
+43106cp docs/site-architecture.md
 2412cp docs/site-kit/index.md
 4493cp docs/spec-toolkits.md
 2164cp docs/speckit.md
@@ -91,8 +91,8 @@
 4394cp guard-kit/templates/close-triage.md
 270104cp installer/SPEC.md
 337972cp lifecycle-kit/SPEC.md
-4909cp lifecycle-kit/templates/consult.md
-41562cp lifecycle-kit/templates/lead.md
+4986cp lifecycle-kit/templates/consult.md
+41831cp lifecycle-kit/templates/lead.md
 2100cp lifecycle-kit/templates/release-sweep.md
 6939cp lifecycle-kit/templates/stages/align.md
 9182cp lifecycle-kit/templates/stages/build.md

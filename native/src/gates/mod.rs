@@ -1881,8 +1881,14 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-agent-tier-explicit",
         agent_tier_explicit::run,
-        &[("?", "", "", "dynamic@src/gates/agent_tier_explicit.rs:59")],
-        &["DELEGATION_KIT_AGENT_DIR", "GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS"],
+        &[("?", "", "", "dynamic@src/gates/agent_tier_explicit.rs:61")],
+        &[
+            "DELEGATION_KIT_AGENT_DIR",
+            "DELEGATION_KIT_TIER_MODEL",
+            "GATE_SDK_NATIVE_BIN",
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+        ],
         "delegation-kit",
         &[],
     ),

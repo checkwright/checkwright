@@ -1,1 +1,3 @@
 no 'model:' field in frontmatter
+stale model: cheap-tier-placeholder (tier 'judgment' is bound to big-tier-placeholder)
+tier 'routing' names no bound class

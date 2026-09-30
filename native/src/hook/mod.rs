@@ -56,6 +56,7 @@ pub const HOOKS: &[(&str, HookFn, &[&str], &str)] = &[
             "DELEGATION_KIT_MUTATING_TYPES",
             "DELEGATION_KIT_REQUIRE_TIER",
             "DELEGATION_KIT_AGENT_DIR",
+            "DELEGATION_KIT_TIER_MODEL",
         ],
         "delegation-kit",
     ),

@@ -1,6 +1,7 @@
 ---
 name: audit-sweep
 description: A read-only audit or survey sweep — reviewing a corpus against a stated rule and reporting what violates it, with the judgment to tell a real finding from a false positive. Use it for cross-spec consistency audits, staleness and drift sweeps, roster and coverage checks, and any "does the tree still hold X" question. It reviews rather than merely locating, so it is the type an audit dispatch rides instead of an excerpt-locator that disclaims audit work; it mutates nothing, so a sweep that must edit is not this type.
+tier: mechanical
 model: sonnet
 ---
 
@@ -27,4 +28,4 @@ Wait in-turn instead, with a primitive that ends when the condition goes true ra
 
 ## Tier
 
-Your `model:` field is set to a class cheaper than the judgment tier a lead or stage session runs on, because that is what this work class is worth. The assignment is re-judged when the harness's model roster churns; it is stated here rather than omitted because an omitted field is not a neutral default but the literal `inherit`, which would silently buy the dispatcher's tier (delegation-kit/SPEC.md §check-agent-tier-explicit).
+Your `tier:` is `mechanical`, and your `model:` is generated from the repository's tier binding (delegation-kit/SPEC.md §The tier binding); an omitted field would be the literal `inherit`, silently buying the dispatcher's tier.

@@ -1,6 +1,7 @@
 ---
 name: edit-sweep
 description: A mechanical edit sweep — a rename, a merge, a relocation or a regeneration applied across a corpus to a rule its dispatch states, committed as one unit. Use it when the sweep must change files and the change is mechanical rather than a design judgment; a sweep that only reads and reports is audit-sweep, and a unit carrying design judgment stays with the dispatching session. It is the declared mutating sweep type, so it dispatches without a worktree when it must commit to the shared tree.
+tier: mechanical
 model: sonnet
 ---
 
@@ -16,4 +17,4 @@ Append each unit, as you land it, to the resume journal your dispatch grants, ab
 
 ## Tier
 
-Your `model:` field is set to a class cheaper than the judgment tier a lead or stage session runs on, because a mechanical sweep is worth that and no more. The assignment is re-judged when the harness's model roster churns; it is stated rather than omitted because an omitted field is the literal `inherit`, which would silently buy the dispatcher's tier (delegation-kit/SPEC.md §check-agent-tier-explicit).
+Your `tier:` is `mechanical`, and your `model:` is generated from the repository's tier binding (delegation-kit/SPEC.md §The tier binding); an omitted field would be the literal `inherit`, silently buying the dispatcher's tier.
