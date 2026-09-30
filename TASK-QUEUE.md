@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: guard-kit-steering
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,22 @@
 ## New Features
 
 ## Technical Debt
+
+### guard-kit-front-brevity
+
+guard-kit/SPEC.md's front sections under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §The friction loop, §The shell guard, §Consumer rules and §The hook on native Windows, about 7.8k of the file's 48.2k words; guard-kit's other sections stay on the parent.
+
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every `##` heading kept verbatim and every fact another surface cites into them kept, per a citation survey. Applied after the iteration's guard-kit amendments merge, so no section is passed twice in one iteration.
+
+**Cost while deferred:** paid by every session and adopter that reads an unpassed guard-kit section. Filed 2026-09-30 as a split at guard-kit-steering's scope, next in the parent's size order since installer's §The consumer smoke waits on [compiled-consumer-smoke-driver](#compiled-consumer-smoke-driver). Part of the operator's selection of the set, direction 2026-09-30, lead-relayed (not a ruling).
+
+### guard-kit-value-audit
+
+[gate-customer-value-audit](#gate-customer-value-audit)'s guard-kit slice: `check-door-binding`, the one gate guard-kit ships (`# install: zero-config`), audited for customer value and configurability under gate-sdk/SPEC.md §Consumer payload's rule.
+
+**Deliverable:** the gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated. Ruled before [gate-output-contributor-door](#gate-output-contributor-door), whose new assertion lands on this gate.
+
+**Cost while deferred:** the parent's cost, for this kit. Filed 2026-09-30 as a split at guard-kit-steering's scope; its landing moves the parent's roadmap row to `now` under the operator's horizon principle. Part of the operator's selection of the set, direction 2026-09-30, lead-relayed (not a ruling).
 
 ## Deferred
 
@@ -73,6 +89,8 @@ shell utilities an agent runs for read-only work can also write: `sed -i`, `find
 **Deliverable:** the arm roster that replaces each blocked read, the guard rules that steer to it, and the allowlist entries. New governed names, so it owes an amendment.
 
 **Cost while deferred:** a read-only shell call keeps a write path the guard must judge per call, and an isolated child's read set stays the interim allowlist. Filed 2026-09-23 to the gap inbox by the lead on an operator direction; the operator recalls earlier discussion and no tracked record was found. Promoted 2026-09-23 at seam-and-stage-residue's close drain: an initiative with new names, never a drain fix. Owner lookup: `side-effect`, `FENCE_SAFE`, `dual-use`, `sed -i` in this file — none. Surface also delegation-kit and gate-sdk.
+
+**Selected 2026-09-30 for guard-kit-steering, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it, the set's one unit reaching gate-sdk's arm set and delegation-kit's isolated-child allowlist.
 
 ### config-variant-battery-harness
 
@@ -364,6 +382,8 @@ installer's remaining sections other than §The consumer smoke left 2026-09-29 a
 
 drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `drift-kit-measurement-brevity`; drift-kit's other sections remain.
 
+guard-kit's front sections left 2026-09-30 at guard-kit-steering's scope, on an operator direction lead-relayed (not a /consult ruling), as [guard-kit-front-brevity](#guard-kit-front-brevity).
+
 ### prune-set-matches-walk-root-ancestors
 
 [cost: event/high] [surface: context-kit] [recurrence: 2026-09-25]
@@ -383,6 +403,8 @@ consumer-only guard rules are untested: the three destructive rules in `scripts/
 **Deliverable:** a consumer-rule test lane in the guard test runner (`--run-guard-tests` over a consumer rules file with its cases), this repo's three rules covered, and the lane named at guard-kit/SPEC.md §The generic ruleset.
 
 **Cost while deferred:** the demonstration tree's most destructive guards are the ones nothing verifies, and an adopter writing a rule has no way to prove it fires. Filed 2026-08-13; returned from the icebox 2026-09-25 by consult, the case files re-checked at zero.
+
+**Selected 2026-09-30 for guard-kit-steering, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it, its lane landing in §The generic ruleset, outside [guard-kit-front-brevity](#guard-kit-front-brevity)'s sections.
 
 ### tarball-build-attestation
 
@@ -414,6 +436,8 @@ CLAUDE.md offers "stage and commit in one motion" as the shared-index remedy, an
 
 **Cost while deferred:** every session reads a remedy that does not close the race it is offered for. Filed 2026-08-27; returned from the icebox 2026-09-25 by consult, the line re-read.
 
+**Selected 2026-09-30 for guard-kit-steering, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it. Re-verified: no guard rule, CLAUDE.md line or delegation-kit surface names `git commit -o`.
+
 ### nested-battery-env-inheritance-invisible
 
 [cost: event/low] [surface: evidence-kit] [recurrence: 2026-09-25]
@@ -433,16 +457,6 @@ the shipped `site-kit/templates/site-health.yml` takes one curl sample and files
 **Deliverable:** a bounded retry before the failure path, in the template and the copy.
 
 **Cost while deferred:** one transient files a public issue. Filed 2026-08-27; returned from the icebox 2026-09-25 by consult, the template re-read.
-
-### scratch-auto-allow-no-decoration-steer
-
-[cost: event/low] [surface: guard-kit] [recurrence: 2026-09-25]
-
-the guard declines a chained scratch append (`grants.rs`) and steers only allowlisted leads to the decorated form, so the most frequent write the protocol asks for costs a permission decision with no steer for everyone else.
-
-**Deliverable:** the decline names the granted spelling, with a fixture.
-
-**Cost while deferred:** a permission prompt per journal line. Filed 2026-09-04; returned from the icebox 2026-09-25 by consult, the grant re-read.
 
 ### release-drain-ordering-contradiction
 
@@ -475,6 +489,8 @@ a gate's printed finding or help line reaches an adopter's installed tree, yet a
 **Deliverable:** each site re-pointed at the binary `GATE_SDK_NATIVE_BIN` names, or declared contributor-facing, and a check-door-binding assertion over gate-module output strings holding it.
 
 **Cost while deferred:** an adopter following a red's remedy runs a path their tree lacks. Filed 2026-09-26 to the gap inbox by the done-claim-demo build (check-evidence-manifest's assertion-C remedy, fixed at the drain); promoted 2026-09-26 at its close: →fix fails because the holding assertion is new mechanism and some sites (the prose-bounds worklist, the smoke-entry guard) need a contributor-or-adopter call each. Re-verified at the drain: `git grep 'run-gates.sh' native/src/gates` over `println!`/`format!` lines returns fifteen sites before the fix. Owner lookup: `door`, `run-gates.sh`, `remedy` in this file — none live; owner guard-kit/SPEC.md §check-door-binding.
+
+**Selected 2026-09-30 for guard-kit-steering, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it, after [guard-kit-value-audit](#guard-kit-value-audit) rules the gate. Re-verified: 16 `println!`/`format!` lines under `native/src/gates` name `run-gates.sh`.
 
 ### removed-knob-docs-cmd-valve
 
@@ -608,6 +624,8 @@ a harness session launched from a repository subdirectory runs the guards silent
 
 **Cost while deferred:** every subdirectory-launched session in an adopter tree runs with no shell, wakeup or workflow-state guard, and nothing says so. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' build; promoted at its close: →fix fails because the root resolution is a design choice across two kits' wiring and this repo's own settings file. Re-verified: both files carry the relative spelling. Owner lookup: `hooks.json`, `settings-hooks`, `subdirector` in this file — none; owner guard-kit/SPEC.md, with plugin/SPEC.md §The guards.
 
+**Selected 2026-09-30 for guard-kit-steering, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it. Re-verified: both files still carry the relative spelling.
+
 ### intake-routing-test
 
 [cost: event/low] [surface: doctrine-kit]
@@ -671,6 +689,8 @@ nothing asks whether each shipped gate is useful and configurable for a customer
 **First slice landed 2026-09-29 at native-hook-customer-legs, operator direction lead-relayed (not a /consult ruling):** the payload rule at gate-sdk/SPEC.md §Consumer payload, and site-kit audited against it.
 
 Audited: site-kit, 5 gates (5 kept, 2 made generic, 0 withheld); the other 118 shipped gates remain, kit by kit, under gate-sdk/SPEC.md §Consumer payload's rule.
+
+guard-kit's slice left 2026-09-30 at guard-kit-steering's scope, on an operator direction lead-relayed (not a /consult ruling), as [guard-kit-value-audit](#guard-kit-value-audit).
 
 **A precondition of [companion-toolkit-profile](#companion-toolkit-profile)'s submission, operator direction 2026-09-29, lead-relayed (not a ruling),** beside [companion-install-tier](#companion-install-tier), whose exposed kits this audit's verdicts decide, so those kits are its natural first slices.
 
@@ -1521,5 +1541,7 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 Whether a live queue entry should cite shipped mechanism by a stable anchor (a SPEC section, a gate name, a path) rather than a retired slug, and whether a check-queue-hygiene axis should hold that, is unruled; close's retired-block read corrects each instance inline meanwhile, as it did twice at preview-readiness' close.
 
 ## Done
+
+- scratch-auto-allow-no-decoration-steer
 
 ## Lessons Learned
