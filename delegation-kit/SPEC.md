@@ -168,7 +168,7 @@ Two implementation facts those rows force, recorded because the obvious build ge
 
 `templates/agent-execution.md` is the single source for the protocol — a binding-shim *template* in lifecycle-kit's grammar (lifecycle-kit/SPEC.md §check-skill-binding). The consumer creates `.claude/commands/agent-execution.md` as a shim that names the template and binds its two slots — the shared-file roster and the validate battery — the consumer-specialization discipline of guard-kit's consumer-rules block, now carried by the slot/binding mechanism the lifecycle skills already use. `check-skill-binding` enforces the slot pairing on the consumer side.
 
-A spec reference to one of those rules uses the citation grammar `the template's **<name>** rule`, where `<name>` is a bullet's bold lead-in verbatim minus its trailing period; `check-rule-citation` resolves every such citation in §The delegation model forward into the template, so a lead-in rename cannot silently dangle a reference.
+A spec reference to one of those rules uses the citation grammar `the template's **<name>** rule`, where `<name>` is a bullet's bold lead-in verbatim minus its trailing period; `check-rule-citation` resolves every such citation in §The delegation model forward into the template, so a lead-in rename cannot silently dangle a reference. It is the publisher's own gate and does not ship: its subject is this SPEC, which the payload withholds (gate-sdk/SPEC.md §Consumer payload). Its fixture pair passes a fixture-local spec and template as its two positional arguments, a citation resolving to a lead-in against one naming an absent lead-in.
 
 `templates/dispatch-checklists.md` is a second, load-triggered template the protocol template reaches by a single pointer line: `agent-execution.md` names it for a deletion, rename, or heavy cross-spec audit dispatch, and it loads only then — never resident, and not a binding shim (it binds no slots, so `check-skill-binding` does not scan it). It carries the mechanical pre-flight for those dispatch shapes — the importer/collision/sweep-verification checks — while the protocol proper stays whole in `agent-execution.md`; the pointer-line contract is that the protocol template stays complete alone and the checklists are a reach-through, so the width, journal, and validate rules live once in the protocol template and are cited from the checklists, never restated. This is the load-trigger-residency rule applied a rung deeper: even inside a load-triggered template, a subset that only a narrower trigger (a deletion or rename dispatch) needs sits behind its own pointer.
 
@@ -787,11 +787,9 @@ delegation-kit/
   usage-tests/dispatch-guard-cases.tsv  # expected-outcome <TAB> scenario knobs; read by the crate test that replaced its shell driver
   usage-tests/trend-history.log   # fixture history for the trend assertions, read by that same crate module
   checks/check-gate-tamper.gate  # binary-dispatched; live arm reads the index through git
-  checks/check-rule-citation.gate  # hermetic, binary-dispatched: every SPEC rule citation resolves to a template lead-in
   checks/check-agent-tier-explicit.gate  # hermetic, binary-dispatched: every agent definition declares an explicit model:
   gate-tests/check-gate-tamper/{good,bad}/
   gate-tests/check-gate-tamper.test.sh  # the live arm, over throwaway git repos
-  gate-tests/check-rule-citation/{good,bad}/
   gate-tests/check-agent-tier-explicit/{good,bad}/
   templates/agent-execution.md            # full protocol, bound as a skill shim
   templates/dispatch-checklists.md        # deletion/rename/audit pre-flight, reached by a pointer
@@ -846,7 +844,6 @@ Config is a **knob file**: copy `templates/delegation-config.knobs` into the gat
 The kit's gates speak the full gate contract (`<GATE>: clean (…)` / findings + `help:` lines / exit 0-1-2). Each ships a `good/`+`bad/` fixture pair driven by gate-sdk's `--run-gate-tests` arm:
 
 - **`check-gate-tamper`**, through `--fixture`. The bad case reaches both assertions: it carries a co-staged non-meta path *and* a newly added path exemption matching one of its own staged files, beside a bare token assertion B must pass over.
-- **`check-rule-citation`**, over fixture-local spec and template files passed as its two positional arguments. The pair is a citation resolving to a template lead-in against one naming an absent lead-in.
 - **`check-agent-tier-explicit`**, over a fixture-local agent directory passed as its one positional argument, with a case knob file binding two classes. The `good/` side carries both passing shapes, a definition naming a cheaper class outright, with its class's bound model, and one declaring `inherit`, so the pair proves the gate discriminates omission from choice rather than merely finding a `model:` string. The `bad/` side omits the field (A), and carries a stale model line and a definition naming an unbound class (B). The arm's report, its `--write` and its refusal are its own module's unit tests, and the binding's refusals and matcher are crate tests beside the knob table and the matcher.
 
 **The tamper pair cannot reach the live arm, a property of the injection rather than of the cases.** `--fixture` supplies both lists directly, so the function that derives them runs in no fixture case. That function reads each staged gate file's bytes out of the object store and diffs its exemption set against `HEAD`'s. `gate-tests/check-gate-tamper.test.sh` exercises it: each case builds a throwaway git repo, stages a commit shape into a real index, and runs the gate inside it. It pins the four verdicts the pair cannot:

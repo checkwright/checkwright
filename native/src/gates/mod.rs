@@ -1900,7 +1900,7 @@ pub const REGISTRY: &[GateEntry] = &[
         rule_citation::run,
         &[],
         &[],
-        "delegation-kit",
+        "-",
         &[],
     ),
     (

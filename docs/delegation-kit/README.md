@@ -22,7 +22,6 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    <!-- gate-roster:begin -->
    ```
    check-gate-tamper
-   check-rule-citation   # holds SPEC §The delegation model's rule citations to the template
    check-agent-tier-explicit   # every tracked agent definition states a model: tier
    ```
    <!-- gate-roster:end -->

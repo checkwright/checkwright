@@ -16,7 +16,6 @@ cat >> scripts/gates.list <<'EOF'
 # delegation-kit
 check-gate-tamper
 check-agent-tier-explicit
-check-rule-citation
 EOF
 
 snap="$(mktemp)"

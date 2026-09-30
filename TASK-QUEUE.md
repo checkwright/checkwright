@@ -18,14 +18,6 @@ delegation-kit/SPEC.md's tier sections under [spec-brevity-residue](#spec-brevit
 
 **Cost while deferred:** paid by every session and adopter that reads an unpassed delegation-kit section. Filed 2026-09-30 as a split at delegation-tier-binding's scope, taken ahead of guard-kit's remainder in the parent's size order because §The generic ruleset, its bulk, is rewritten by the deferred [write-side-steering](#write-side-steering) and [compound-read-classifier-reach](#compound-read-classifier-reach). Part of the operator's selection of the set, direction 2026-09-30, lead-relayed (not a ruling).
 
-### delegation-kit-value-audit
-
-[gate-customer-value-audit](#gate-customer-value-audit)'s delegation-kit slice: `check-agent-tier-explicit`, `check-gate-tamper` and `check-rule-citation`, the three gates delegation-kit ships, audited for customer value and configurability under gate-sdk/SPEC.md §Consumer payload's rule.
-
-**Deliverable:** each gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated. Ruled after `tier-model-binding` lands, since `check-agent-tier-explicit` reads the `model:` field that binding re-sources.
-
-**Cost while deferred:** the parent's cost, for this kit. Filed 2026-09-30 as a split at delegation-tier-binding's scope; delegation-kit is a kit a companion full install exposes. Part of the operator's selection of the set, direction 2026-09-30, lead-relayed (not a ruling).
-
 ## Deferred
 
 ### shellcheck-extra-dirs-trigger
@@ -592,11 +584,11 @@ nothing asks whether each shipped gate is useful and configurable for a customer
 
 **First slice landed 2026-09-29 at native-hook-customer-legs, operator direction lead-relayed (not a /consult ruling):** the payload rule at gate-sdk/SPEC.md §Consumer payload, and site-kit audited against it.
 
-Audited: site-kit, 5 gates (5 kept, 2 made generic, 0 withheld); guard-kit, 1 gate (1 kept, 0 made generic, 0 withheld); the other 119 shipped gates remain, kit by kit, under gate-sdk/SPEC.md §Consumer payload's rule.
+Audited: site-kit, 5 gates (5 kept, 2 made generic, 0 withheld); guard-kit, 1 gate (1 kept, 0 made generic, 0 withheld); delegation-kit, 3 gates (2 kept, 0 made generic, 1 withheld); the other 116 shipped gates remain, kit by kit, under gate-sdk/SPEC.md §Consumer payload's rule.
 
 guard-kit's slice left 2026-09-30 at guard-kit-steering's scope, on an operator direction lead-relayed (not a /consult ruling), as `guard-kit-value-audit`, and landed in that iteration's build.
 
-delegation-kit's slice left 2026-09-30 at delegation-tier-binding's scope, on an operator direction lead-relayed (not a /consult ruling), as [delegation-kit-value-audit](#delegation-kit-value-audit).
+delegation-kit's slice left 2026-09-30 at delegation-tier-binding's scope, on an operator direction lead-relayed (not a /consult ruling), as `delegation-kit-value-audit`, and landed in that iteration's build.
 
 **A precondition of [companion-toolkit-profile](#companion-toolkit-profile)'s submission, operator direction 2026-09-29, lead-relayed (not a ruling),** beside [companion-install-tier](#companion-install-tier), whose exposed kits this audit's verdicts decide, so those kits are its natural first slices.
 
@@ -1522,5 +1514,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - session-model-identity-verification
 - consult-tier-declaration
 - hotfix-agent-definition
+- delegation-kit-value-audit
 
 ## Lessons Learned

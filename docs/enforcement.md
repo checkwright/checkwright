@@ -151,7 +151,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | [evidence-kit](evidence-kit/index.md) | check-evidence-manifest | precommit |
 | [evidence-kit](evidence-kit/index.md) | check-battery-roster | precommit |
 | [delegation-kit](delegation-kit/index.md) | check-gate-tamper | precommit |
-| [delegation-kit](delegation-kit/index.md) | check-rule-citation | precommit |
+| (consumer) | check-rule-citation | precommit |
 | [delegation-kit](delegation-kit/index.md) | check-agent-tier-explicit | precommit |
 | [context-kit](context-kit/index.md) | check-brevity | precommit |
 | [context-kit](context-kit/index.md) | check-surface-ratchet | precommit |
