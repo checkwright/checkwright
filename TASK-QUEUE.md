@@ -424,7 +424,7 @@ release notes serve human upgraders poorly, and their section set is crate liter
 
 **Deliverable:** a note structure with a linked summary table, audience-keyed sections and a Platforms section derived from the diff of docs/install.md's gated platforms table between two releases, its section set one knob-owned roster every reader derives from. The lead tokens are machine-read over a historical corpus the upgrade smoke resolves at any FROM/TO, so a rename owes an alias window or a note-corpus migration.
 
-**Cost while deferred:** every release ships a note a human must read whole to act on, custom-gate adopters are not told what applies to them, and a platform change hides in Behavior changes. Filed 2026-08-01 at close; iceboxed 2026-09-11 as dormant; re-filed 2026-09-27 to the gap inbox as two bullets (readability, a Platforms section) by platform-prerequisite-floors' lead, and returned at its close on a judged recurrence: →fix fails because the redesign renames machine-read tokens. Re-verified: `wc -w` over the two notes, and the literals in `native/src/gates/release_bump.rs`, `tightened_gates_grammar.rs`, `release_change_declared.rs`, `native/src/declaration.rs` and `native/src/emit/upgrade_smoke.rs`. `removed-knob-docs-cmd-valve` is DISTINCT. Owner: installer/SPEC.md §The upgrade contract, RELEASING.md.
+**Cost while deferred:** every release ships a note a human must read whole to act on, custom-gate adopters are not told what applies to them, and a platform change hides in Behavior changes. Filed 2026-08-01 at close; iceboxed 2026-09-11 as dormant; re-filed 2026-09-27 to the gap inbox as two bullets (readability, a Platforms section) by platform-prerequisite-floors' lead, and returned at its close on a judged recurrence: →fix fails because the redesign renames machine-read tokens. Re-verified: `wc -w` over the two notes, and the literals in `native/src/gates/release_bump.rs`, `tightened_gates_grammar.rs`, `release_change_declared.rs`, `native/src/declaration.rs` and `native/src/emit/upgrade_smoke.rs`. `removed-knob-docs-cmd-valve`, done, is DISTINCT. Owner: installer/SPEC.md §The upgrade contract, RELEASING.md.
 
 ### consumer-value-literal-gate
 
@@ -444,7 +444,7 @@ a kit README's citation of another kit's SPEC section links off-site to the GitH
 
 **Deliverable:** the pack-time rewrite widened to `../<leaf>/SPEC.md[#frag]` for a packed leaf, giving on-site targets on the mirror and published ones in the payload.
 
-**Cost while deferred:** about fourteen README citations leave the site. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's docs-ux build; promoted 2026-09-27 at its close: →fix fails because the rewrite bound is a packer contract change. Re-verified: 14 blob-SPEC link lines across the twelve top-level READMEs. Owner lookup: `packed-links`, `blob`, `rewrite` in this file — none; owner gate-sdk/SPEC.md §check-packed-links. Related: `spec-mirror-citation-links`.
+**Cost while deferred:** about fourteen README citations leave the site. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's docs-ux build; promoted 2026-09-27 at its close: →fix fails because the rewrite bound is a packer contract change. Re-verified: 14 blob-SPEC link lines across the twelve top-level READMEs. Owner lookup: `packed-links`, `blob`, `rewrite` in this file — none; owner gate-sdk/SPEC.md §check-packed-links. Related: `spec-mirror-citation-links`, done, which linked the SPEC mirror's citations and copies a README as it stands, so this remains.
 
 ### site-video-poster-rule
 
@@ -761,6 +761,18 @@ a kit `smoke/install.sh` or `smoke/violation.sh` that bash cannot parse passes t
 **Deliverable:** a parse check over the smoke roster at commit time, in `check-smoke-entry-guard` or a shell-syntax gate's corpus, with its behaviour where bash is absent stated.
 
 **Cost while deferred:** a broken kit smoke script can land and ride a release unless validate runs the smoke. Filed 2026-09-30 to the gap inbox by guard-kit-steering's build; promoted at its close: →fix fails because a gate spawning bash meets the adopter constraints' no-toolchain floor, a design question, →forward because no ruling is owed. Re-verified: gate-sdk/SPEC.md §Consumer smoke now forbids the quote character in the hint, the instance's fix, and names no parse. Owner lookup: `smoke-entry-guard`, `bash -n`, `parse` in this file — the icebox's smoke-roster-guard-precedes-hand-off, DISTINCT (guard ordering); owner gate-sdk/SPEC.md §check-smoke-entry-guard.
+
+### canon-kit-zero-config-rejudge
+
+[cost: session/high] [surface: canon-kit]
+
+canon-kit's `zero-config` members read surfaces the adopter authors. gate-sdk/SPEC.md §The install disposition defines `zero-config` as every surface the gate reads being one `init` writes and the adopter does not author, yet `check-comment-tier` and its comment-surface siblings read the adopter's own `.sh` sources, and the manifest-set gates (`check-manifest-temporal`, `check-manifest-count`, `check-md-refs`, `check-spec-pointer` among them) read the adopter's own READMEs, so a fresh prose-profile install can red on content `init` never wrote. `check-knob-default-coupling` is `zero-config` too, yet in a vendored tree its owning SPECs are withheld, so every knob skips and it can only print a skip count.
+
+**Deliverable:** each canon-kit `zero-config` member re-judged against the definition, and moved to `on-surface` or the definition's boundary stated.
+
+**Inferred, not run:** the filer's probe that one plain full-line comment in an adopter `.sh` reds `check-comment-tier` in a fresh install.
+
+**Cost while deferred:** an adopter's first battery may red on its own prose and scripts at install. Filed 2026-09-30 to the gap inbox by canon-kit-value-pass' build; promoted at its close: →fix fails because re-judging 26 members changes which gates `init` registers, an adopter-visible install change, →forward because no ruling is owed. Re-verified: `# install: zero-config` on 26 of canon-kit's `checks/*.gate`, `check-comment-tier` among them, and the definition's sentence. Owner lookup: `zero-config`, `install disposition` in this file — [gate-customer-value-audit](#gate-customer-value-audit), DISTINCT (a gate's place in the payload, not its registration); owner gate-sdk/SPEC.md §The install disposition.
 
 ## Icebox
 
