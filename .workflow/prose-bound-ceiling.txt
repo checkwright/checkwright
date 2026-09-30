@@ -1,5 +1,5 @@
 # contract: canon-kit/SPEC.md §check-prose-bounds — <findings> <path>
-156 canon-kit/SPEC.md
+155 canon-kit/SPEC.md
 130 context-kit/SPEC.md
 238 delegation-kit/SPEC.md
 48 doctrine-kit/DOCTRINE.md

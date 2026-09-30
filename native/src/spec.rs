@@ -231,7 +231,7 @@ pub fn comment_surface(root: &str, with_templates: bool) -> Result<Vec<String>, 
     let globs = knob_array("CANON_KIT_COMMENT_SURFACE")?;
     let actions = comment_actions()?;
     let mut selected: Vec<PathBuf> = if globs.is_empty() {
-        walk::find_files(rootp, &["sh", "gate", "rs"])?
+        walk::find_files(rootp, &["sh", "gate"])?
     } else {
         // spec: canon-kit/SPEC.md §check-comment-tier — the prune set bounds the `**` descent and
         // then the result, the second for a glob that names a pruned directory outright
@@ -1774,6 +1774,43 @@ mod tests {
         assert_eq!(added, actions, "on added something other than the actions_files set");
         assert!(surface("yes").is_err(), "a value other than off or on resolved");
         knobs.remove("CANON_KIT_COMMENT_ACTIONS");
+        knobs.remove("GATE_SDK_GATES_DIR");
+        crate::knobs::reset(&knobs);
+        let _ = std::fs::remove_dir_all(&d);
+    }
+
+    // spec: canon-kit/SPEC.md §The shared spec adapters — the derived surface is the kit's own gate
+    // file types and no language of the consumer's: a `.rs` source joins only through the knob
+    #[test]
+    fn the_derived_comment_surface_reads_no_consumer_language() {
+        let knobs = crate::knobenv::lock();
+        let d = std::env::temp_dir().join(format!("checkwright-comment-langs.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        let gates = d.join("gates");
+        let tree = d.join("tree");
+        std::fs::create_dir_all(&gates).expect("scratch");
+        std::fs::create_dir_all(tree.join("src")).expect("scratch");
+        for f in ["a.sh", "b.gate", "src/main.rs"] {
+            std::fs::write(tree.join(f), "\n").expect("write");
+        }
+        knobs.set("GATE_SDK_GATES_DIR", &gates.display().to_string());
+        knobs.remove("CANON_KIT_KNOB_FILE");
+        knobs.remove("CANON_KIT_COMMENT_ACTIONS");
+        knobs.remove("CANON_KIT_COMMENT_SURFACE");
+        crate::knobs::reset(&knobs);
+        let root = tree.display().to_string();
+        let base = |f: &String| f.rsplit('/').next().unwrap_or(f).to_string();
+        let derived: Vec<String> = comment_surface(&root, true).expect("derives").iter().map(base).collect();
+        assert_eq!(derived, vec!["a.sh", "b.gate"], "the derived surface reached a consumer language");
+        std::fs::write(
+            gates.join("canon-config.knobs"),
+            "CANON_KIT_COMMENT_SURFACE[] = **/*.sh\nCANON_KIT_COMMENT_SURFACE[] = **/*.gate\nCANON_KIT_COMMENT_SURFACE[] = **/*.rs\n",
+        )
+        .expect("write");
+        crate::knobs::reset(&knobs);
+        let bound: Vec<String> = comment_surface(&root, true).expect("binds").iter().map(base).collect();
+        assert_eq!(bound, vec!["a.sh", "b.gate", "main.rs"], "the knob did not bring the language in");
+        knobs.remove("CANON_KIT_COMMENT_SURFACE");
         knobs.remove("GATE_SDK_GATES_DIR");
         crate::knobs::reset(&knobs);
         let _ = std::fs::remove_dir_all(&d);

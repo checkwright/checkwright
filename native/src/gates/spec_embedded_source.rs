@@ -84,9 +84,11 @@ impl Langs {
     }
 }
 
-fn is_spec_name(path: &str) -> bool {
+// spec: canon-kit/SPEC.md §check-spec-embedded-source — a spec is never a source: a candidate
+// named as the configured canonical spec or matching the amendment glob stays out of the index
+fn is_spec_name(path: &str, spec_name: &str, amendment_glob: &str) -> bool {
     let b = path.rsplit('/').next().unwrap_or(path);
-    b.contains("SPEC") && b.ends_with(".md")
+    b == spec_name || walk::pattern_match(amendment_glob, b)
 }
 
 // spec: canon-kit/SPEC.md §check-spec-embedded-source — the opening fence carries a bare
@@ -180,8 +182,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // distinct non-trivial trimmed line, naming every source file carrying it
     let mut idx: BTreeMap<String, Vec<String>> = BTreeMap::new();
     let mut fkind: BTreeMap<String, String> = BTreeMap::new();
+    let spec_name = spec::spec_name()?;
+    let amendment_glob = walk::knob_scalar("CANON_KIT_AMENDMENT_GLOB")?;
     for f in &candidates {
-        if is_spec_name(f) {
+        if is_spec_name(f, &spec_name, &amendment_glob) {
             continue;
         }
         let text = match std::fs::read(Path::new(f)) {

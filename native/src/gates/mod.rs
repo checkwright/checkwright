@@ -203,7 +203,7 @@ const MANIFEST_ROOTS: &[RootDecl] = manifest_roots!();
 // selector resolving `on`, which the `else:` form cannot spell
 const COMMENT_SURFACE_ROOTS: &[RootDecl] = &[
     (".", "glob:knob:CANON_KIT_COMMENT_SURFACE", "", ""),
-    (".", "else:CANON_KIT_COMMENT_SURFACE:ext:lit:sh,gate,rs", "", ""),
+    (".", "else:CANON_KIT_COMMENT_SURFACE:ext:lit:sh,gate", "", ""),
     (".", "ext:lit:yml,yaml", "", ""),
 ];
 
@@ -217,7 +217,7 @@ const SPEC_POINTER_ROOTS: &[RootDecl] = &[
     (".", "else:CANON_KIT_MANIFEST_FILES:name:lit:CLAUDE.md", "", ""),
     (".", "glob:knob:CANON_KIT_PROSE_SURFACE_GLOBS", "", ""),
     (".", "glob:knob:CANON_KIT_COMMENT_SURFACE", "", ""),
-    (".", "else:CANON_KIT_COMMENT_SURFACE:ext:lit:sh,gate,rs", "", ""),
+    (".", "else:CANON_KIT_COMMENT_SURFACE:ext:lit:sh,gate", "", ""),
     (".", "ext:lit:yml,yaml", "", ""),
 ];
 
@@ -2349,7 +2349,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-docs-link-convention",
         docs_link_convention::run,
         &[("?", "", "", "dynamic@src/gates/docs_link_convention.rs:132")],
-        &["CANON_KIT_LINK_ROOT"],
+        &["CANON_KIT_LINK_ROOT", "CANON_KIT_SPEC_NAME"],
         "canon-kit",
         &[("git", "")],
     ),
@@ -2408,6 +2408,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[(".", "name:knob:CANON_KIT_SPEC_NAME", crate::spec::CANON_SPEC_PRUNE_DECL, "")],
         &[
             "CANON_KIT_GLOSSARY_FILE",
+            "CANON_KIT_GLOSSARY_TERM_SECTION",
             "CANON_KIT_DUP_SURFACES",
             "CANON_KIT_SPEC_NAME",
             "CANON_KIT_MIRROR_ROOT",

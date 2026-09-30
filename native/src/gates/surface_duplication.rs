@@ -79,20 +79,26 @@ fn lead_in_body(line: &str) -> Option<&str> {
     Some(rest)
 }
 
-// spec: canon-kit/SPEC.md §check-surface-duplication — the glossary's term set: the Quick
-// reference table's first column, slash-separated alternates split out, plus every bold lead-in in
-// the body. `sort -u`, so the count is of distinct terms.
-fn glossary_terms(text: &str) -> Vec<String> {
+// spec: canon-kit/SPEC.md §check-surface-duplication — the glossary's term set: the first column
+// of every table in the term section, slash-separated alternates split out, plus every bold lead-in
+// in the body. `sort -u`, so the count is of distinct terms.
+fn glossary_terms(text: &str, section: &str) -> Vec<String> {
+    let lines: Vec<&str> = text.lines().collect();
     let mut terms: Vec<String> = Vec::new();
-    let mut in_qr = false;
-    for line in text.lines() {
-        if line.starts_with("## Quick reference") {
-            in_qr = true;
+    let mut open: Option<usize> = None;
+    for (i, line) in lines.iter().copied().enumerate() {
+        if let Some((level, title)) = atx_heading(line) {
+            if open.is_some_and(|o| level <= o) {
+                open = None;
+            }
+            if open.is_none() && !section.is_empty() && title.starts_with(section) {
+                open = Some(level);
+            }
         }
-        if in_qr && line.starts_with("---") {
-            in_qr = false;
+        if open.is_some() && line.starts_with("---") {
+            open = None;
         }
-        if in_qr && line.starts_with('|') && !is_header_row(line) && !is_rule_row(line) {
+        if open.is_some() && line.starts_with('|') && !is_header_row(&lines, i) && !is_rule_row(line) {
             let cell = line.split('|').nth(1).unwrap_or("");
             let cell = strip_parens(&cell.chars().filter(|c| *c != '`').collect::<String>());
             for part in cell.split('/') {
@@ -115,14 +121,31 @@ fn glossary_terms(text: &str) -> Vec<String> {
     terms
 }
 
-// spec: canon-kit/SPEC.md §check-surface-duplication — `^\| *Canonical`, the table's header row
-fn is_header_row(line: &str) -> bool {
-    line[1..].trim_start_matches(' ').starts_with("Canonical")
+// spec: canon-kit/SPEC.md §check-surface-duplication — an ATX heading's level and text, the
+// grammar that opens and closes the term section
+fn atx_heading(line: &str) -> Option<(usize, &str)> {
+    let level = line.len() - line.trim_start_matches('#').len();
+    if level == 0 || level > 6 {
+        return None;
+    }
+    let rest = &line[level..];
+    if !rest.is_empty() && !rest.starts_with(is_space) {
+        return None;
+    }
+    Some((level, trim_posix(rest)))
 }
 
-// spec: canon-kit/SPEC.md §check-surface-duplication — `^\|[-| ]*$`, the table's rule row
+// spec: canon-kit/SPEC.md §check-surface-duplication — a table's header row is the row its
+// delimiter row follows, read off the table's own grammar rather than a column's name
+fn is_header_row(lines: &[&str], i: usize) -> bool {
+    lines
+        .get(i + 1)
+        .is_some_and(|next| next.starts_with('|') && is_rule_row(next))
+}
+
+// spec: canon-kit/SPEC.md §check-surface-duplication — `^\|[-:| ]*$`, the table's delimiter row
 fn is_rule_row(line: &str) -> bool {
-    line[1..].chars().all(|c| matches!(c, '-' | '|' | ' '))
+    line[1..].chars().all(|c| matches!(c, '-' | ':' | '|' | ' '))
 }
 
 // spec: canon-kit/SPEC.md §check-surface-duplication — the valve's term, read off the tag: take
@@ -315,7 +338,8 @@ fn check(args: &[String]) -> Result<i32, String> {
         return Ok(0);
     }
 
-    let terms = glossary_terms(&read(&gloss)?);
+    let section = spec::knob_pub("CANON_KIT_GLOSSARY_TERM_SECTION")?;
+    let terms = glossary_terms(&read(&gloss)?, &section);
     let tcount = terms.len();
 
     let mut errors: Vec<String> = Vec::new();
@@ -503,10 +527,42 @@ mod tests {
                      \n\
                      **Cog.** A toothed wheel.\n";
         assert_eq!(
-            glossary_terms(gloss),
+            glossary_terms(gloss, "Quick reference"),
             vec!["cog", "gizmo", "sprocket", "widget"],
             "the term set gained furniture or lost an alternate, so the gate flags the wrong \
              heads"
+        );
+    }
+
+    // spec: canon-kit/SPEC.md §check-surface-duplication — the term section is the configured
+    // heading at any level, closed by a heading of its level or above; the header row is the one
+    // the delimiter row follows, whatever its column is named; an empty section reads no table
+    #[test]
+    fn the_term_section_and_header_come_from_config_and_table_grammar() {
+        let gloss = "# G\n\
+                     \n\
+                     ### Terms\n\
+                     \n\
+                     | Term | Meaning |\n\
+                     |:-----|--------:|\n\
+                     | Widget | a unit |\n\
+                     \n\
+                     #### Aside\n\
+                     \n\
+                     | Gizmo | still inside the section |\n\
+                     \n\
+                     ## Elsewhere\n\
+                     \n\
+                     | Sprocket | outside the section |\n";
+        assert_eq!(
+            glossary_terms(gloss, "Terms"),
+            vec!["gizmo", "widget"],
+            "the term section or its header row was read off a literal, not the knob and the \
+             table grammar"
+        );
+        assert!(
+            glossary_terms(gloss, "").is_empty(),
+            "an empty term section still read a table, so the knob cannot switch the table source off"
         );
     }
 }

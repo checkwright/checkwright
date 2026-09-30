@@ -141,6 +141,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
         return Ok(0);
     }
 
+    let spec_name = crate::spec::spec_name().map_err(|e| format!("check-docs-link-convention: {}", e))?;
     let mut bad: Vec<String> = Vec::new();
     // spec: canon-kit/SPEC.md §check-docs-link-convention — which of the three rules fired, so the
     // report carries each fired rule's own remedy and no other rule's
@@ -209,7 +210,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
                 }
                 if !kit.is_empty() && anchor.is_empty() {
                     let b = base_of(&p);
-                    if (b == "README.md" || b == "SPEC.md")
+                    if (b == "README.md" || b == spec_name)
                         && base_of(dir_of(&p)) == kit
                         && !exempt(&lines, lno)
                     {

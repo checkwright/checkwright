@@ -6,3 +6,7 @@ CANON_KIT_MANIFEST_FILES[] = README.md
 CANON_KIT_MANIFEST_FILES[] = SPEC-widget.md
 # A heading family joins it, so a citation of one member resolves only whole.
 CANON_KIT_MANIFEST_FILES[] = SPEC-family.md
+# A Rust consumer brings its language into the derived surface through the knob.
+CANON_KIT_COMMENT_SURFACE[] = **/*.sh
+CANON_KIT_COMMENT_SURFACE[] = **/*.gate
+CANON_KIT_COMMENT_SURFACE[] = **/*.rs

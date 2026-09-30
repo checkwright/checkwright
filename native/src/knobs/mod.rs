@@ -1499,6 +1499,7 @@ mod tests {
     fn a_whitespace_default_scalar_is_declared_words() {
         const ONE_VALUE: &[&str] = &[
             "CANON_KIT_DOD_HEADING",
+            "CANON_KIT_GLOSSARY_TERM_SECTION",
             "DOCTRINE_KIT_DIGEST_SECTION",
             "QUEUE_KIT_PRECONDITION_REGEX",
             "QUEUE_KIT_PRECONDITION_PAST_REGEX",

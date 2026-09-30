@@ -51,6 +51,7 @@ pub const KIT: Kit = Kit {
         Row::indexed("CANON_KIT_EMBED_ILLUSTRATIVE", &["json"]),
         Row::scalar("CANON_KIT_EMBED_WIRE_KIND", "proto"),
         Row::scalar("CANON_KIT_GLOSSARY_FILE", "GLOSSARY.md"),
+        Row::scalar("CANON_KIT_GLOSSARY_TERM_SECTION", "Quick reference"),
         Row::indexed("CANON_KIT_DUP_SURFACES", &["VISION.md"]),
         Row::indexed("CANON_KIT_MDREF_EXCLUDE", &[]),
         Row::indexed("CANON_KIT_UNWRAP_GLOBS", &[]),

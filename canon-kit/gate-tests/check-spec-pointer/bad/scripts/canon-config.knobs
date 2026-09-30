@@ -8,3 +8,7 @@ CANON_KIT_MANIFEST_FILES[] = SPEC-widget.md
 # bound has a citation only it refuses.
 CANON_KIT_MANIFEST_FILES[] = SPEC-family.md
 CANON_KIT_MANIFEST_FILES[] = SPEC-only.md
+# A Rust consumer brings its language into the derived surface through the knob.
+CANON_KIT_COMMENT_SURFACE[] = **/*.sh
+CANON_KIT_COMMENT_SURFACE[] = **/*.gate
+CANON_KIT_COMMENT_SURFACE[] = **/*.rs

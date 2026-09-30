@@ -1,5 +1,3 @@
-# spec: canon-kit/SPEC.md §check-deprecation-task — the marker vocabulary the pair's comment surface is scanned for; the default corpus reads no knob file, so the literal is spelled whole here
-CANON_KIT_DEPRECATION_MARKERS[] = @deprecated
 # spec: canon-kit/SPEC.md §The shared spec adapters — a Rust consumer brings its language into the derived surface through the knob, the arm this pair proves
 CANON_KIT_COMMENT_SURFACE[] = **/*.sh
 CANON_KIT_COMMENT_SURFACE[] = **/*.gate

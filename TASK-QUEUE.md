@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### canon-kit-value-audit
-
-[gate-customer-value-audit](#gate-customer-value-audit)'s canon-kit slice: the gates canon-kit ships, 44 `.gate` descriptors (27 zero-config and 11 on-surface by install disposition), audited for customer value and configurability under gate-sdk/SPEC.md §Consumer payload's rule. canon-kit is the companion's `prose` tier, which every companion install exposes.
-
-**Deliverable:** each gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated. `check-docs-cmd`, `check-citation-link` and `check-prose-tells` are ruled after `removed-knob-docs-cmd-valve`, `citation-link-root-docs-range` and `absence-statement-gate-arms` land, since those change them, and `check-measured-claim` and `check-unmarked-claim` after `baseline-row-prose-coupling-gate` lands, since its baseline claims ride them; [companion-install-tier](#companion-install-tier) reads the verdicts after.
-
-**Cost while deferred:** the parent's cost, for this kit. Filed 2026-09-30 as a split at canon-kit-value-pass' scope. Part of the operator's selection of the set, direction 2026-09-30, lead-relayed (not a ruling).
-
 ## Deferred
 
 ### dangling-registration-cascade
@@ -516,7 +508,7 @@ nothing asks whether each shipped gate is useful and configurable for a customer
 
 **First slice landed 2026-09-29 at native-hook-customer-legs, operator direction lead-relayed (not a /consult ruling):** the payload rule at gate-sdk/SPEC.md §Consumer payload, and site-kit audited against it.
 
-Audited: site-kit, 5 gates (5 kept, 2 made generic, 0 withheld); guard-kit, 1 gate (1 kept, 0 made generic, 0 withheld); delegation-kit, 3 gates (2 kept, 0 made generic, 1 withheld); the other 116 shipped gates remain, kit by kit, under gate-sdk/SPEC.md §Consumer payload's rule.
+Audited: site-kit, 5 gates (5 kept, 2 made generic, 0 withheld); guard-kit, 1 gate (1 kept, 0 made generic, 0 withheld); delegation-kit, 3 gates (2 kept, 0 made generic, 1 withheld); canon-kit, 37 gates (37 kept, 7 made generic, 0 withheld); the other 80 shipped gates remain, kit by kit, under gate-sdk/SPEC.md §Consumer payload's rule.
 
 guard-kit's slice left 2026-09-30 at guard-kit-steering's scope, on an operator direction lead-relayed (not a /consult ruling), as `guard-kit-value-audit`, and landed in that iteration's build.
 
@@ -524,7 +516,7 @@ delegation-kit's slice left 2026-09-30 at delegation-tier-binding's scope, on an
 
 **A precondition of [companion-toolkit-profile](#companion-toolkit-profile)'s submission, operator direction 2026-09-29, lead-relayed (not a ruling),** beside [companion-install-tier](#companion-install-tier), whose exposed kits this audit's verdicts decide, so those kits are its natural first slices.
 
-canon-kit's slice left 2026-09-30 at canon-kit-value-pass' scope, on an operator direction lead-relayed (not a /consult ruling), as [canon-kit-value-audit](#canon-kit-value-audit).
+canon-kit's slice left 2026-09-30 at canon-kit-value-pass' scope, on an operator direction lead-relayed (not a /consult ruling), as `canon-kit-value-audit`, and landed in that iteration's build.
 
 ### compiled-consumer-smoke-driver
 
@@ -1452,5 +1444,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - spec-mirror-citation-links
 - positional-reference-rule
 - canon-kit-amendment-brevity
+- canon-kit-value-audit
 
 ## Lessons Learned

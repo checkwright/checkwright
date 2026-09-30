@@ -1,2 +1,6 @@
 # spec: canon-kit/SPEC.md §check-comment-tier — fixture consumer config: the actions tier on, so the workflow's prose is read
 CANON_KIT_COMMENT_ACTIONS = on
+# spec: canon-kit/SPEC.md §The shared spec adapters — a Rust consumer brings its language into the derived surface through the knob, the arm this pair proves
+CANON_KIT_COMMENT_SURFACE[] = **/*.sh
+CANON_KIT_COMMENT_SURFACE[] = **/*.gate
+CANON_KIT_COMMENT_SURFACE[] = **/*.rs
