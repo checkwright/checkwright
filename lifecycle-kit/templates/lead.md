@@ -114,7 +114,9 @@ Under the split posture the lead **routes** an escalation before answering it. A
 
 **One class the lead never rules, under either posture.** Reversing, demoting or re-scoping a **recorded operator ruling** or a stated objective is operator-class: the lead relays it, however well-grounded the escalating session's finding and however urgent the fix. Where the operator defers it, file it with `--emit file-consult` so it reaches the next consultation rather than your transcript. Nor does it decline a threshold-proposed entry that scope's escalation marks operator-routed. That entry has been declined twice, and it is relayed.
 
-**Dispatch a consultation for the consult inbox only while no stage session is live.** At a point where no dispatched stage session is live and the inbox (`LIFECYCLE_KIT_CONSULT_INBOX_FILE`) meets the slot's threshold, dispatch the consult skill as the agent type the slot names, its prompt naming the inbox items and nothing else. It escalates to you as a stage session does. Relay each ruling-class escalation to the operator and relay the answer back, stating its class. Dispatch no stage session while it is live.
+**Dispatch a consultation for the consult inbox only while no stage session is live.** At a point where no dispatched stage session is live and the inbox (`LIFECYCLE_KIT_CONSULT_INBOX_FILE`) meets the slot's threshold, dispatch the consult skill as the agent type the slot names, on the judgment class, its prompt naming the inbox items and nothing else. It escalates to you as a stage session does. Relay each ruling-class escalation to the operator and relay the answer back, stating its class. Dispatch no stage session while it is live.
+
+**Dispatch an operator-ruled hotfix only while no stage session and no consultation is live.** When the operator rules a hotfix (doctrine-kit/DOCTRINE.md, Scope-gated intake), dispatch it as the hotfix type your ruling-config names. Its prompt names the ruling, the failure, and the queue entry or gap bullet the fix disposes, and nothing else, and grants its journal path. Verify its one commit as you verify any agent commit, and dispatch no stage session and no consultation while it is live. Where your ruling-config names no hotfix type, dispatch none: the operator lands the hotfix in a session of their own.
 
 *<consult-dispatch: the agent type a lead dispatches a consultation as — never a stage-session type — and the batching threshold on the consult inbox: an item count, an oldest-item age, or off, which dispatches at the first quiet point after any item lands. Or the statement that this consumer's lead dispatches no consultation.>*
 
@@ -150,7 +152,7 @@ All *standing* dispatch policy — everything true of every dispatch, not the ru
 
 The rule cuts both ways: policy binding the **lead itself** is standing too, and its tracked source is this template rather than the agent definition it dispatches. The completion-notification dispatch precondition (§The lead model) is standing policy of exactly that kind, named here so it is stated once and not re-improvised in each dispatch prompt.
 
-*<ruling-config: the tracked agent-definition the lead dispatches and the roster it carries — its path, the subagent type the dispatch names, and where the ruling classes are stated.>*
+*<ruling-config: the tracked agent-definitions the lead dispatches and the roster each carries — for the stage-session type, and for a hotfix type where this consumer has one: its path, the subagent type the dispatch names, and where its ruling classes are stated.>*
 
 ## Stamps are authoritative (the load-bearing invariant)
 

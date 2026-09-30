@@ -2,6 +2,7 @@
 7385cp .claude/agents/audit-sweep.md
 1322cp .claude/agents/consult-session.md
 2205cp .claude/agents/edit-sweep.md
+2597cp .claude/agents/hotfix-session.md
 8969cp .claude/agents/stage-session.md
 93cp .claude/commands/adopt.md
 1446cp .claude/commands/agent-execution.md
@@ -10,7 +11,7 @@
 9178cp .claude/commands/close.md
 2355cp .claude/commands/consult.md
 1451cp .claude/commands/economics.md
-5099cp .claude/commands/lead.md
+5254cp .claude/commands/lead.md
 715cp .claude/commands/release-sweep.md
 6847cp .claude/commands/scope.md
 1155cp .claude/commands/spec.md
@@ -90,9 +91,9 @@
 316094cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
 270104cp installer/SPEC.md
-337972cp lifecycle-kit/SPEC.md
-4986cp lifecycle-kit/templates/consult.md
-41831cp lifecycle-kit/templates/lead.md
+340558cp lifecycle-kit/SPEC.md
+5550cp lifecycle-kit/templates/consult.md
+42551cp lifecycle-kit/templates/lead.md
 2100cp lifecycle-kit/templates/release-sweep.md
 6939cp lifecycle-kit/templates/stages/align.md
 9182cp lifecycle-kit/templates/stages/build.md

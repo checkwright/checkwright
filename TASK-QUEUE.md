@@ -8,32 +8,6 @@
 
 ## New Features
 
-### consult-tier-declaration
-
-[spec: SPEC-consult-tier.md]
-
-`/consult` governs the tier of what it dispatches and asserts nothing about its own. The skill landed this iteration to carry judgment-tier boundary questions, and its own amendment argues it is judgment-tier *by nature* — yet it declares no floor for the session running it and verifies nothing at entry. A consultation answered at a cheap tier is indistinguishable, in the record, from one answered at the tier the skill was built for.
-
-**Operator direction 2026-08-04:** it must run on the top model and verify that at entry.
-
-**The shape that keeps the seam intact:** the *skill* declares its own floor, the *kit* never spells a model name — the same split `session-model-identity-verification` sets up, which is why this blocks on it rather than racing it. Without the mechanism this entry is a prose assertion of the kind that already failed twice this iteration.
-
-**Cost while deferred:** the repo's one escalation-grade skill is silently downgradeable, and the failure is invisible in the artifact — a thin consultation reads as a short one. Filed 2026-08-04 at close from the gap inbox; filed by the lead on operator direction.
-
-**Selected 2026-09-30 for delegation-tier-binding, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it after `session-model-identity-verification`, its blocker, in the same set.
-
-### hotfix-agent-definition
-
-[spec: SPEC-hotfix-dispatch.md]
-
-no tracked agent definition exists for the operator-ruled hotfix path of the scope-gated intake rule. A lead dispatching one picks general-purpose and restates standing policy in the prompt (not a stage, no stage entry, no queue or state writes, one test-and-doc-complete commit, the battery and every reached kit suite, stop on a design question, the gap-inbox disposition): the policy-is-config tell (lifecycle-kit/templates/lead.md §Policy is config, not prose). `agent-dispatch-guard` confines an undeclared type to a worktree, where a crate-source commit is refused and `--emit file-gap` refuses, so the 2026-09-27 front-door hotfix needed a second dispatch to land.
-
-**Deliverable:** a hotfix agent definition under `.claude/agents/` carrying that policy, declared in `DELEGATION_KIT_MUTATING_TYPES`, and the lead template naming the dispatch shape.
-
-**Cost while deferred:** every hotfix costs a restated prompt and a second dispatch. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead; promoted 2026-09-27 at its close: →fix fails because the definition is a new governed name. Owner lookup: `hotfix`, `agents/`, `MUTATING_TYPES` in this file — none; owner delegation-kit/SPEC.md. The worktree half landed as `worktree-crate-commit-red`: the hook greens in a worktree, and `check-crate-arms` refusing a crate-source commit there is now the stated contract.
-
-**Selected 2026-09-30 for delegation-tier-binding, operator direction lead-relayed (not a ruling);** the spec stage authors and promotes it, its `model:` field read through `tier-model-binding`'s binding.
-
 ## Technical Debt
 
 ### delegation-kit-tier-brevity
@@ -564,7 +538,7 @@ no guidance routes a mid-iteration operator request into the current iteration. 
 
 **Deliverable:** a routing test over {defer to scope, hotfix, gap fixed at close's drain, refuse to the next iteration} in the lead template, and rule 11 naming the drain route.
 
-**Cost while deferred:** a correct route is abandoned on generic operator wording, each time a lead meets one. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' lead; promoted at its close: →fix fails because rule 11 itself makes amending the doctrine a scoped unit. Re-verified: rule 11 names the two entries and no other; lead.md carries no intake route. Owner lookup: `intake`, `Scope-gated`, `hotfix` in this file — [hotfix-agent-definition](#hotfix-agent-definition), DISTINCT (the hotfix path's agent type, not the routing); owner doctrine-kit/DOCTRINE.md, with lifecycle-kit/templates/lead.md.
+**Cost while deferred:** a correct route is abandoned on generic operator wording, each time a lead meets one. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' lead; promoted at its close: →fix fails because rule 11 itself makes amending the doctrine a scoped unit. Re-verified: rule 11 names the two entries and no other; lead.md carries no intake route. Owner lookup: `intake`, `Scope-gated`, `hotfix` in this file — `hotfix-agent-definition`, DISTINCT (the hotfix path's agent type, not the routing); owner doctrine-kit/DOCTRINE.md, with lifecycle-kit/templates/lead.md.
 
 ### plugin-harness-reach
 
@@ -692,11 +666,11 @@ docs/releases.md renders its derived note list as a bare list of version links, 
 
 the consult inbox takes more than the operator's model of consult. Operator direction, 2026-09-29, lead-relayed (not a ruling): consult is for (a) reconsidering a ruling and (b) an expert opinion from a superior model on strategic direction, such as architecture. lifecycle-kit/SPEC.md §The consult inbox also admits an operator-class finding a session cannot relay live, a threshold entry declined twice, a misnamed direction question and a stage's operator signal; the catch-alls twice pulled in a question the operator had already answered as a direction (the operator-seat install item, re-classed at 30a5343b; the npm-approval item, discarded at 8ea1233c).
 
-**Deliverable:** the producer list narrowed to (a) and (b), the other classes routed to the gap inbox or a live lead; templates/consult.md (the operator rules) reconciled with (b)'s advisory reading; whether (b) pins consult's tier, where [consult-tier-declaration](#consult-tier-declaration) asserts the tier consult dispatches; and whether a lead-dispatched consultation with no operator, which can only re-class or discard, still earns a dispatch.
+**Deliverable:** the producer list narrowed to (a) and (b), the other classes routed to the gap inbox or a live lead; templates/consult.md (the operator rules) reconciled with (b)'s advisory reading; whether (b) pins consult's tier, where `consult-tier-declaration` asserts the tier consult dispatches; and whether a lead-dispatched consultation with no operator, which can only re-class or discard, still earns a dispatch.
 
 **Addendum, operator direction 2026-09-30, lead session (not a ruling):** consult's main use is a recommendation from a top-tier model. A request expecting a reply gets one; a request expecting a tracked change makes it through the ordinary workflow (adding, removing or updating a deferred entry, say); a ruling is written to TRAJECTORY.md only where that workflow would otherwise challenge or reject the direction, as when the assets still name Bash gates and the direction is Rust ones. The lead's caution to weigh with it: a change consult lands carries its provenance as consult advice, marked operator-accepted or not, so a later session can tell model advice from operator direction. Drained into this entry at guard-kit-steering's close, not a recurrence: it adds what consult is for, where the defect above is what enters it.
 
-**Cost while deferred:** each misfiled item costs a consultation to route it back out. Filed 2026-09-29 to the gap inbox by companion-adoption-landing's lead; promoted at its close: →fix fails because narrowing a producer set is a contract change to a SPEC section, →forward because the direction is given and filing it to consult is the misfile it names. Re-verified: §The consult inbox's Producers paragraph and opening list. Owner lookup: `consult inbox`, `intake` in this file — [consult-tier-declaration](#consult-tier-declaration), DISTINCT (the tier consult runs at, not what enters it); owner lifecycle-kit/SPEC.md §The consult inbox.
+**Cost while deferred:** each misfiled item costs a consultation to route it back out. Filed 2026-09-29 to the gap inbox by companion-adoption-landing's lead; promoted at its close: →fix fails because narrowing a producer set is a contract change to a SPEC section, →forward because the direction is given and filing it to consult is the misfile it names. Re-verified: §The consult inbox's Producers paragraph and opening list. Owner lookup: `consult inbox`, `intake` in this file — `consult-tier-declaration`, DISTINCT (the tier consult runs at, not what enters it); owner lifecycle-kit/SPEC.md §The consult inbox.
 
 ### user-facing-delta-unsurfaced
 
@@ -1546,5 +1520,7 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 
 - tier-model-binding
 - session-model-identity-verification
+- consult-tier-declaration
+- hotfix-agent-definition
 
 ## Lessons Learned

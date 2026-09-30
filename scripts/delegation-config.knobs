@@ -7,6 +7,7 @@ DELEGATION_KIT_READONLY_TYPES[] = audit-sweep
 DELEGATION_KIT_MUTATING_TYPES[] = stage-session
 DELEGATION_KIT_MUTATING_TYPES[] = edit-sweep
 DELEGATION_KIT_MUTATING_TYPES[] = consult-session
+DELEGATION_KIT_MUTATING_TYPES[] = hotfix-session
 
 # spec: delegation-kit/SPEC.md §The statusline arm — the two lifecycle inboxes this repo's bar counts, consult first
 DELEGATION_KIT_STATUSLINE_INBOXES[] = C=.workflow/consult-items.md
