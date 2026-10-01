@@ -1430,13 +1430,4 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 
 ## Done
 
-- canon-kit-zero-config-rejudge
-- seeded-ci-gates-on-surface
-- prose-tells-absence-knobs
-- canon-kit-gate-brevity
-- dangling-registration-cascade
-- shellcheck-extra-dirs-trigger
-- readme-spec-links-offsite
-- smoke-script-parse-unchecked
-
 ## Lessons Learned
