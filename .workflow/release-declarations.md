@@ -14,6 +14,7 @@
 - `check-surface-duplication` — the glossary's term-table section is named by the new `CANON_KIT_GLOSSARY_TERM_SECTION` (default `Quick reference`) and opens at a heading of any level, closing at a heading of its level or above or at a `---` line; a table's header row is the row its delimiter row follows, whatever its column is named. A term table under a heading level other than `##` now contributes its terms, so a surface restating one reds. Set the knob to your term section's heading, or empty to read bold lead-ins alone.
 - `check-docs-link-convention` — a kit page's anchorless back-link to its canonical spec is read by `CANON_KIT_SPEC_NAME` rather than the literal `SPEC.md`. Nothing to do at the default; under another spec name, anchor each finding's link.
 - `check-memory-off` — with `CONTEXT_KIT_MEMORY_DIRS` empty, the derived memory dir is now the one the harness creates: the repository root under the harness's own encoding, every character outside `[A-Za-z0-9]` folded to `-` rather than only `/` and `.`, under `CLAUDE_CONFIG_DIR` when set, and under `USERPROFILE` on Windows. A polluted memory dir the old fold missed, on a root carrying `_`, a space or another such character, now reds. Empty the dir it names.
+- `check-template-copy-parity` — reds your copy of context-kit's `session-context.sh` while its step 5 still reads `CONTEXT_KIT_MEMORY_DIRS` itself, since the template's step 5 now reads `--emit memory-dirs` and declares no such knob read. Re-copy step 5 from the template.
 
 ## Behavior changes
 
