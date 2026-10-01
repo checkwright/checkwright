@@ -8,18 +8,6 @@
 
 ## New Features
 
-### user-facing-delta-unsurfaced
-
-[spec: SPEC-user-facing-delta.md]
-
-a user-facing choice can ride a `{mechanical}` delta and reach no operator: the payload-withholding amendment's delta 11 hid the SPEC mirrors from the site nav's kit suffix, and `nav-spec-suffix-restore` reversed it at companion-adoption-landing's build. The work-class tag measures the execution judgment a delta demands (lifecycle-kit/templates/stages/spec.md, Label every delta), not whether it changes what a reader meets.
-
-**Deliverable:** a spec-stage rule that a delta changing user-facing semantics, the site's reach or labels included, is surfaced in the amendment's rulings, and align's check of it; or a boundary note refusing both.
-
-**Cost while deferred:** the next such choice lands unreviewed and costs a later reversal unit. Filed 2026-09-29 to the gap inbox by companion-adoption-landing's build; promoted at its close: →fix fails because a stage rule is new kit mechanism, →forward because no ruling is owed. Re-verified: spec.md's Label every delta defines the tag by execution judgment. Owner lookup: `work-class`, `user-facing`, `mechanical` in this file — the icebox's amendment-work-class-label-placement, DISTINCT (where the tag sits, not what it misses); owner lifecycle-kit/templates/stages/spec.md.
-
-**Selected 2026-10-01 for lifecycle-queue-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, the rule or its refusal.
-
 ### lessons-learned-channel-audit
 
 [spec: SPEC-lessons-channel.md]
@@ -1380,5 +1368,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - roadmap-horizon-lag-detector
 - hotfix-push-owner
 - skill-binding-couples-drift
+- user-facing-delta-unsurfaced
 
 ## Lessons Learned
