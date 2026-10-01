@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### context-kit-feature-brevity
-
-context-kit/SPEC.md's sections this iteration's features edit, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §Index-first reading, §The session-context hook, §bin/env-probe and §Layout and configuration, about 9.6k of the file's 20.1k words by awk count; context-kit's other sections stay on the parent.
-
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. It rides the batch after the features that edit them: `prune-set-matches-walk-root-ancestors` (§Index-first reading, §Layout and configuration), `doctor-shell-gate-bash` (§bin/env-probe), `hook-wiring-relative-command` (§The session-context hook) and `harness-project-dir-fold-dialect-unresolved` (§Layout and configuration).
-
-**Cost while deferred:** paid by every session and adopter that reads an unpassed context-kit section. Filed 2026-10-01 as a split at context-kit-value-pass' scope. Part of the operator's selection of set A+, direction 2026-10-01, lead-relayed (not a ruling).
-
 ## Deferred
 
 ### manifest-finder-untracked-walk
@@ -286,7 +278,7 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes, landing as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes, landing as `installer-install-brevity` and `installer-remainder-brevity`.
 
-Each on an operator direction lead-relayed (not a /consult ruling), the kit's other sections remaining: drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections (its preamble remains), delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope as [context-kit-feature-brevity](#context-kit-feature-brevity).
+Each on an operator direction lead-relayed (not a /consult ruling), the kit's other sections remaining: drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections (its preamble remains), delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope, landing as `context-kit-feature-brevity`.
 
 ### tarball-build-attestation
 
@@ -1367,5 +1359,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - hook-wiring-relative-command
 - intake-routing-test
 - small-kit-value-audit
+- context-kit-feature-brevity
 
 ## Lessons Learned
