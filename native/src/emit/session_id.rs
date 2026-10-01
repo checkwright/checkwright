@@ -35,7 +35,7 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
         child: var("CLAUDE_CODE_CHILD_SESSION"),
         sessions_dir: var("LIFECYCLE_KIT_SESSIONS_DIR"),
         config_home: var("CLAUDE_CONFIG_DIR"),
-        home: var("HOME"),
+        home: var(crate::sessions::HOME_VAR),
         here,
     };
     Ok(format!("{}\n", derive(&inputs)?))

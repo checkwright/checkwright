@@ -9,9 +9,7 @@ fn trim(s: &str) -> &str {
     s.trim_matches([' ', '\t', '\r'])
 }
 
-// spec: context-kit/SPEC.md §Layout and configuration — the variable the harness reads its home
-// from: `USERPROFILE` on Windows, where a set `HOME` is ignored, and `HOME` elsewhere
-const HOME_VAR: &str = if cfg!(windows) { "USERPROFILE" } else { "HOME" };
+use crate::sessions::HOME_VAR;
 
 // spec: context-kit/SPEC.md §Layout and configuration — the project dir under the harness's
 // config home, named by the session encoder over the repository toplevel, the spelling the

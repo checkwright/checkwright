@@ -66,7 +66,7 @@ pub struct Paths {
 pub fn paths() -> Result<Paths, String> {
     let k = crate::walk::knob_scalar;
     let var = |n: &str| std::env::var(n).unwrap_or_default();
-    let home = var("HOME");
+    let home = var(crate::sessions::HOME_VAR);
     let mut p = Paths {
         usage_file: k("DELEGATION_KIT_USAGE_FILE")?,
         cred_file: k("DELEGATION_KIT_CRED_FILE")?,

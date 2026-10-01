@@ -90,6 +90,10 @@ pub fn sessions_dir(i: &Inputs) -> String {
     format!("{}/projects/{}", config_home(&i.config_home, &i.home), slug(&i.here))
 }
 
+// spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the variable `~` is read from, one name for
+// every reader of the harness's home
+pub const HOME_VAR: &str = if cfg!(windows) { "USERPROFILE" } else { "HOME" };
+
 // spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the harness's config home, `$CLAUDE_CONFIG_DIR`
 // when set non-empty, else `~/.claude`: the one derivation every reader of that home shares
 pub fn config_home(config_dir: &str, home: &str) -> String {
@@ -262,6 +266,21 @@ pub fn every_transcript(i: &Inputs) -> Vec<String> {
 #[cfg(test)]
 mod tests {
     use super::{key, slug};
+
+    // spec: lifecycle-kit/SPEC.md §bin/session-id.sh — a reader spelling `HOME` itself misses the
+    // harness's home on Windows, so every reader names `HOME_VAR`
+    #[test]
+    fn no_reader_spells_the_home_variable_itself() {
+        let _knobs = crate::knobenv::lock();
+        let src = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+        let files = crate::walk::find_files(&src, &["rs"]).expect("cannot enumerate the crate's sources");
+        assert!(!files.is_empty(), "no crate source found to scan");
+        let hits: Vec<_> = files
+            .iter()
+            .filter(|f| std::fs::read_to_string(f).is_ok_and(|s| s.contains("var(\"HOME\")")))
+            .collect();
+        assert!(hits.is_empty(), "{:?}", hits);
+    }
 
     // spec: lifecycle-kit/SPEC.md §bin/session-id.sh — each case is a spelling the harness was seen
     // to create: the Linux root from an unauthenticated run, the Windows one from the CI probe of

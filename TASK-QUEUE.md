@@ -454,6 +454,10 @@ the consumer smoke has two drivers. native-hook-customer-legs chose a PowerShell
 
 **Deliverable:** one compiled driver on every leg, replacing both scripts.
 
+**The driver also owns the nested batteries' environment.** run-smoke.sh re-runs a battery inside each scratch consumer under the invoker's environment with only `PATH` overridden, so an exported `EVIDENCE_KIT_*_FILE`, `EVIDENCE_KIT_LOCK_FILE`, `GATE_SDK_TMP_DIR` or other path scalar redirects the nested gates to the outer repo's files or a wrong sandbox path; gate-sdk/lib/test-hermetic.sh pins this for gate-tests suites only. The compiled driver scrubs those scalars. Attached 2026-10-01 at context-kit-value-pass' close on the operator's direction of that day, lead-relayed (not a ruling); the residual of the deleted `nested-battery-env-inheritance-invisible`, whose false-clean premise is unreachable. Re-verified: no `unset` or `env -u` reaches a nested battery call.
+
+**Inferred, not run:** that a nested evidence gate reads the redirected file.
+
 **Cost while deferred:** two drivers held in step by nobody, and Windows loses those arms. Filed 2026-09-29 to the gap inbox at native-hook-customer-legs' spec; promoted 2026-09-29 at its close: →fix fails because the driver is new mechanism, →forward because no ruling is owed. Re-verified: both scripts exist (2015 and 232 lines). Owner lookup: `consumer smoke`, `run-smoke.ps1`, `smoke driver` in this file — none; owner installer/SPEC.md §The consumer smoke.
 
 ### native-executable-git-hooks
@@ -677,6 +681,28 @@ RELEASING.md's numbered procedure steps are cited by position, the shape doctrin
 **Deliverable:** each citation names the step by its bold title or a heading, never its number.
 
 **Cost while deferred:** a step inserted or reordered in RELEASING.md mis-points about fifteen citations, several in shipped kit SPECs and a gate's printed remedy. Filed 2026-09-30 to the gap inbox by canon-kit-value-pass' close positional-reference sweep, outside its range corpus; promoted 2026-09-30 at the next iteration's scope: →fix fails because the sweep reaches a gate's printed remedy, owing the native build and the battery. Re-verified: a grep for `RELEASING.md step <n>` hits every site named above. Owner lookup: `positional`, `step number`, `RELEASING.md step` in this file — none; owner RELEASING.md, with doctrine-kit/DOCTRINE.md Derivation-first. Surface also installer.
+
+### worktree-memory-dir-key
+
+[cost: event/low] [surface: context-kit]
+
+`check-memory-off` derives the memory dir from the repository toplevel, which in a linked worktree is the worktree's own path, while the installed harness bundle keys its per-project memory dir on a canonical working-copy root (its default path reads a canonical-root lookup before the raw path). A linked-worktree session's memory may therefore land under the main checkout's slug, or under one no scan reads.
+
+**Deliverable:** an authenticated probe of where a linked-worktree session's memory dir lands, then the derivation in context-kit/SPEC.md §Layout and configuration matched to it, or a stated reason the worktree's own slug is right.
+
+**Inferred, not run:** the harness's canonical-root keying, read from its bundle; an unauthenticated run writes no memory dir, so the key was never observed.
+
+**Cost while deferred:** a worktree session's memory could accrete where `check-memory-off` never scans. Filed 2026-10-01 to the gap inbox at context-kit-value-pass' spec; promoted 2026-10-01 at its close: →fix fails because the harness behaviour is unobserved and the probe needs an authenticated session, →forward because no ruling is owed. Re-verified: the gate's default reads `walk::toplevel_opt`, which runs `git rev-parse --show-toplevel`. Owner lookup: `memory`, `worktree`, `canonical` in this file — none; owner context-kit/SPEC.md §check-memory-off.
+
+### footprint-arm-publisher-page
+
+[cost: event/low] [surface: context-kit]
+
+context-kit's `--emit footprint` arm ships in the binary but prints this site's page: Jekyll front matter (`nav_parent: value`), the site's own title and regen command, and a kit roster derived from `*/SPEC.md` files the payload withholds. In an adopter's tree it measures nothing of theirs, yet context-kit/README.md lists it among the adopter tools. Its gate, `check-footprint-fresh`, was withheld at `small-kit-value-audit`, which audited gates and did not reach this non-gate arm, so this is DISTINCT from that unit.
+
+**Deliverable:** one of two dispositions, chosen at spec: withhold the arm from the README and the payload docs as a publisher tool, or make the preamble and the roster knobs an adopter can set.
+
+**Cost while deferred:** an adopter running a listed tool gets a page about Checkwright. Filed 2026-10-01 to the gap inbox at context-kit-value-pass' build; promoted 2026-10-01 at its close: →fix fails because the choice between the two dispositions is a design call and the second adds knobs, →forward because no ruling is owed. Re-verified: the arm's output opens with the front matter, and the README's tool list carries `--emit footprint`. Owner lookup: `footprint` in this file — none; owner context-kit/SPEC.md §bin/footprint.
 
 ## Icebox
 

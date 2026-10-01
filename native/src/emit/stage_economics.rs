@@ -390,7 +390,7 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
             child: String::new(),
             sessions_dir: knob("DRIFT_KIT_SESSIONS_DIR")?,
             config_home: var("CLAUDE_CONFIG_DIR"),
-            home: var("HOME"),
+            home: var(crate::sessions::HOME_VAR),
             here,
         },
         out: String::new(),
