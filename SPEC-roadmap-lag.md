@@ -40,7 +40,7 @@ queue-kit/SPEC.md gains a section after §check-roadmap-fresh. {design-bearing} 
 > - **Exit** 0 with the report, and 2 on a usage error, an unreadable queue file, or no configured horizon, as §The roadmap arm exits. There is no 1: the arm reports and rules nothing.
 > - **Degradations** are the retired set's (§The queue-edges arm). With no git work tree or no `git`, no slice can be confirmed, so the arm prints no row and says why on stderr. A shallow clone under-claims.
 >
-> **Its reader is the closing stage**, after the moot sweep and before the done section is cleared, which is when the done section holds the iteration's exits (lifecycle-kit/templates/stages/close.md, step 5). The arm reports and the session rules: it re-tags where an entry's recorded horizon condition settles the move and files the rest. **A gate is refused**: a lagging horizon is a true state of the queue until the party who sets direction moves it, the ground §The roadmap arm gives for not gating a horizon's size.
+> **Its reader is the closing stage**, after the moot sweep and before the done section is cleared, which is when the done section holds the iteration's exits (lifecycle-kit/templates/stages/close.md, step 5). The arm reports and the session rules: it re-tags where an entry's recorded horizon condition settles the move and routes the rest with the motion read's findings. **A gate is refused**: a lagging horizon is a true state of the queue until the party who sets direction moves it, the ground §The roadmap arm gives for not gating a horizon's size.
 >
 > **Why a separate arm.** The roadmap arm's output is the page's body, which `check-roadmap-fresh` byte-compares. A lag report is a second grammar over a second input, the done section and the history walk, so it stands beside that arm and not inside it (§The queue-counts arm's refusal).
 >
@@ -57,9 +57,9 @@ The comment directive on `walk_history` in `native/src/queue.rs` names the third
 
 In lifecycle-kit/templates/stages/close.md, step 5, the sentence "Then read each `[roadmap:]` entry's recorded horizon condition, and re-tag one the range met in this stage's queue commit, regenerating the projection and naming the condition and the landing that met it." becomes: {mechanical} **Not yet applied.**
 
-> Then run `--emit roadmap-lag` over the queue file (queue-kit/SPEC.md §The roadmap-lag arm). Each row is an entry outside the first configured horizon, or untagged, under which a split slice landed this iteration. Read each `[roadmap:]` entry's recorded horizon condition, the arm's rows first, and re-tag one the range met in this stage's queue commit, regenerating the projection and naming the condition and the landing that met it. File each row no recorded condition settles into the motion read's item, as one more finding of it.
+> Then run `--emit roadmap-lag` over the queue file (queue-kit/SPEC.md §The roadmap-lag arm). Each row is an entry outside the first configured horizon, or untagged, under which a split slice landed this iteration. Read each `[roadmap:]` entry's recorded horizon condition, the arm's rows first, and re-tag one the range met in this stage's queue commit, regenerating the projection and naming the condition and the landing that met it. A row no recorded condition settles is one more finding of the motion read, routed with its others.
 
-The sentences around it stand. `consult-intake-narrowing`, promoted this iteration, rewrites where the motion read files its item and the clause "a consultation sets new direction". This delta's sentence routes its rows to wherever the motion read files, so the act is the same whether that unit lands in the same build batch, an earlier one or a later one.
+The sentences around it stand. `consult-intake-narrowing`, promoted this iteration, rewrites how the motion read routes its findings and the clause "a consultation sets new direction". This delta's sentence names no route, so its act is the same whether that unit lands in the same build batch, an earlier one or a later one.
 
 ### (4) lifecycle-kit/SPEC.md carries the grounds
 
@@ -75,7 +75,7 @@ In lifecycle-kit/SPEC.md §templates/stages/, *The close template*, the paragrap
 
 - **The arm (delta 1).** Producer: a closing session running `--emit roadmap-lag` at step 5. The enabling config is a non-empty `QUEUE_KIT_HORIZONS`, which this repo sets (`scripts/queue-config.knobs`). Without it the arm exits 2 and close skips the read, as it skips the motion read.
 - **The report's fields.** Each has one reader, the closing session at step 5:
-  - the slug, read to re-tag the entry or file it;
+  - the slug, read to re-tag the entry or route it;
   - the horizon, read against the entry's recorded condition, `-` meaning the curation question rather than a move;
   - the slices, read to name the landing in the queue commit and to discard a pair that is no split.
 - **Readers whose verdict moves.** None. The arm is no gate, and the close step gains a command and no refusal. `check-roadmap-fresh` reads the projection, which only a re-tag the session makes changes, regenerated in that commit as step 5 already requires.
