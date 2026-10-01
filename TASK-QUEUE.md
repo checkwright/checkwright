@@ -1378,13 +1378,4 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 
 ## Done
 
-- nested-battery-env-inheritance-invisible
-- prune-set-matches-walk-root-ancestors
-- doctor-shell-gate-bash
-- harness-project-dir-fold-dialect-unresolved
-- hook-wiring-relative-command
-- intake-routing-test
-- small-kit-value-audit
-- context-kit-feature-brevity
-
 ## Lessons Learned
