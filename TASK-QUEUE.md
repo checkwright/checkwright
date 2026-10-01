@@ -22,30 +22,6 @@ Read at spec 2026-10-01: the installed harness spawns a statusLine command throu
 
 **Selected 2026-10-01 for context-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, running the statusLine probe above first; this repo's settings diff is prepared for the operator, never applied.
 
-### harness-project-dir-fold-dialect-unresolved
-
-[spec: SPEC-harness-project-fold.md] [not-icebox-eligible: 2026-09-10 live CI-leg trigger]
-
-the harness project-dir derivation `check-memory-off` and its two shell twins share folds a repo root's `/` and `.` to `-`, and under gate-sdk/SPEC.md §The path-dialect contract's per-substrate dialects the two substrates fold the *same* Windows checkout to two different names: the crate reads a drive-lettered root and yields one spelling, an MSYS shell reads the `/c/…` spelling and yields another. Only one can match the directory the harness itself creates, so on Windows at most one of the three sites is right and nothing here says which.
-
-**The three sites, verified 2026-08-30:** `native/src/gates/memory_off.rs` `memory_dir_default()` (a char fold over the raw repo root) and `scripts/session-context.sh`, its `tr '/.' '-'` fold, / `context-kit/templates/session-context.sh`, the same fold.
-
-**Why it promotes rather than fixing or iceboxing.** →fix fails on evidence, not on effort: the missing fact is *which spelling the harness uses on Windows*, an observation of another program on a host this tree has none of, and no command on a Linux box produces it — writing a fold without it would be inventing a Windows fact, which is what spec declined to do. →icebox fails because a live trigger exists and is dated: the Windows leg `platform-support-ci-matrix` shipped before retiring 2026-09-06 still runs on every push to master and is the run that can observe it, and the migration that just landed made every *other* producer dialect-correct, so these three are now the tree's recorded exception rather than part of a uniform unfixed background.
-
-**Standing exclusion — `lead, own-authority` 2026-09-10 through the lead's message channel, at `host-resolution-fail-open-cut`'s scope:** the worklist reads the retired slug and not the live CI leg `install-smoke-pwsh-windows`, so it scores this entry false-eligible; [icebox-trigger-blind-to-retired-carrier](#icebox-trigger-blind-to-retired-carrier) owns that predicate defect, DECLINED as a rider then with the exposure accepted in writing.
-
-**Owner is context-kit, not gate-sdk.** The rule's home is context-kit/SPEC.md §Layout and configuration; the dialect contract is gate-sdk's. It is that seam, not a migration defect.
-
-**Pre-existing, not a regression** — the fold is already wrong on a backslash-spelled root today, so `msys-dialect-migration` discharged its whole deliverable without answering this.
-
-**Cost while deferred:** low today and stepwise later — no Windows adopter exists pre-launch, so the wrong fold silently disables a memory check nobody is running; it becomes reader-visible the first time a Windows session opens, which is the same event that supplies the answer.
-
-**Deliverable:** the observed harness spelling recorded as a fact with its witness, one fold that produces it on both substrates, and a fixture pinning the cross-substrate agreement. Filed 2026-08-30 by close, promoted from the gap inbox (spec filed it; the three sites carry a recorded `spec:` verdict naming the open question rather than an invented answer).
-
-**Selected 2026-10-01 for context-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, the Windows spelling observed by a CI probe before the fold is written.
-
-**Push need (2026-10-01, inside the budget):** one mid-iteration push carrying the Windows probe, whose run is read before build writes the fold; the closing push is the second of two.
-
 ### intake-routing-test
 
 [spec: SPEC-intake-routing.md]
@@ -72,7 +48,7 @@ no guidance routes a mid-iteration operator request into the current iteration. 
 
 context-kit/SPEC.md's sections this iteration's features edit, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §Index-first reading, §The session-context hook, §bin/env-probe and §Layout and configuration, about 9.6k of the file's 20.1k words by awk count; context-kit's other sections stay on the parent.
 
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. It rides the batch after the features that edit them: `prune-set-matches-walk-root-ancestors` (§Index-first reading, §Layout and configuration), `doctor-shell-gate-bash` (§bin/env-probe), [hook-wiring-relative-command](#hook-wiring-relative-command) (§The session-context hook) and [harness-project-dir-fold-dialect-unresolved](#harness-project-dir-fold-dialect-unresolved) (§Layout and configuration).
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. It rides the batch after the features that edit them: `prune-set-matches-walk-root-ancestors` (§Index-first reading, §Layout and configuration), `doctor-shell-gate-bash` (§bin/env-probe), [hook-wiring-relative-command](#hook-wiring-relative-command) (§The session-context hook) and `harness-project-dir-fold-dialect-unresolved` (§Layout and configuration).
 
 **Cost while deferred:** paid by every session and adopter that reads an unpassed context-kit section. Filed 2026-10-01 as a split at context-kit-value-pass' scope. Part of the operator's selection of set A+, direction 2026-10-01, lead-relayed (not a ruling).
 
@@ -720,7 +696,7 @@ guard-kit's bash reader cuts its compound split at a backslash-escaped `;`, so `
 
 **Inferred, not run:** how the harness's permission matcher splits at `\;`, which the guard's split models.
 
-**Cost while deferred:** a mis-split can attribute words to the wrong segment in any rule. Filed 2026-09-30 to the gap inbox by `side-effect-free-read-arms`' build, which worked around it in one rule; promoted at guard-kit-steering's close: →fix fails because the split is shared by every rule and the harness's behaviour is unmeasured, →forward because no ruling is owed. Re-verified: `split_on` in native/src/guard/bash.rs matches `;` bytewise with no escape test. Owner lookup: `backslash`, `find_exec`, `compound split` in this file — only [harness-project-dir-fold-dialect-unresolved](#harness-project-dir-fold-dialect-unresolved)'s backslash-spelled root, DISTINCT; owner guard-kit/SPEC.md §The reader and its views.
+**Cost while deferred:** a mis-split can attribute words to the wrong segment in any rule. Filed 2026-09-30 to the gap inbox by `side-effect-free-read-arms`' build, which worked around it in one rule; promoted at guard-kit-steering's close: →fix fails because the split is shared by every rule and the harness's behaviour is unmeasured, →forward because no ruling is owed. Re-verified: `split_on` in native/src/guard/bash.rs matches `;` bytewise with no escape test. Owner lookup: `backslash`, `find_exec`, `compound split` in this file — only `harness-project-dir-fold-dialect-unresolved`'s backslash-spelled root, DISTINCT; owner guard-kit/SPEC.md §The reader and its views.
 
 ### kit-prose-harness-coupling
 
@@ -1421,5 +1397,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - nested-battery-env-inheritance-invisible
 - prune-set-matches-walk-root-ancestors
 - doctor-shell-gate-bash
+- harness-project-dir-fold-dialect-unresolved
 
 ## Lessons Learned
