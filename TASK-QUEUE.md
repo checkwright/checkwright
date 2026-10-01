@@ -390,18 +390,6 @@ CONTRIBUTING.md promises an inbound issue or pull request a disposition within o
 
 **Cost while deferred:** the first contributor past the cap reads a promise the tree breaks. Filed 2026-07-31; returned from the icebox 2026-09-25 by consult, the promise and the cap re-read.
 
-### nested-battery-env-inheritance-invisible
-
-[cost: event/low] [surface: evidence-kit] [recurrence: 2026-09-25]
-
-a smoke that re-runs the battery inside its sandbox inherits no evidence-kit scoping and reads clean: `installer/consumer-smoke/run-smoke.sh` re-executes batteries in three places with no `EVIDENCE_KIT` reference, so a scoped nested run can record `verdict=clean` for a battery the outer run never scoped.
-
-**Deliverable:** the nested run inherits or refuses the scope, and a fixture pins the refusal.
-
-**Cost while deferred:** a false clean in the evidence record. Filed 2026-08-18; returned from the icebox 2026-09-25 by consult, the smoke re-grepped.
-
-**Selected 2026-10-01 for context-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, the refusal on the evidence-kit side so [compiled-consumer-smoke-driver](#compiled-consumer-smoke-driver) inherits it.
-
 ### site-health-probe-no-retry-on-transient
 
 [cost: event/low] [surface: site-kit] [recurrence: 2026-09-25]
@@ -1453,5 +1441,7 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 Whether a live queue entry should cite shipped mechanism by a stable anchor (a SPEC section, a gate name, a path) rather than a retired slug, and whether a check-queue-hygiene axis should hold that, is unruled; close's retired-block read corrects each instance inline meanwhile, as it did twice at preview-readiness' close.
 
 ## Done
+
+- nested-battery-env-inheritance-invisible
 
 ## Lessons Learned
