@@ -553,6 +553,13 @@ pub fn canonicalize(p: impl AsRef<Path>) -> Option<String> {
     fs::canonicalize(p).ok().map(|c| c.display().to_string())
 }
 
+// spec: gate-sdk/SPEC.md §The crate's crosser — a path a caller hands the binary as an argument
+// crosses here, folding separators only: an argument may be relative, which `normalize_abs` reads
+// as separator-rooted
+pub fn cross_arg(p: &str) -> String {
+    p.replace('\\', "/")
+}
+
 // spec: gate-sdk/SPEC.md §The crate's crosser — the UNC clause's second lawful property, owned
 // beside its producer: a caller that composes onto `canonicalize`'s answer strips it first.
 pub fn strip_extended_prefix(c: &str) -> &str {

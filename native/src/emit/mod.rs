@@ -114,6 +114,8 @@ pub fn self_repo_prefix(reference: &str) -> String {
 // here on `self_repo_prefix`'s reading: one traversal-exclusion set, so one copy of the walk.
 // spec: gate-sdk/SPEC.md §The bin/-tool contract — the paths are free text, so a dash-led one is
 // a shape refusal carrying the calling member's usage.
+// spec: gate-sdk/SPEC.md §The crate's crosser — a given path enters the tree here, so it crosses
+// here and the walk below spells every entry in the declared dialect.
 pub fn targets(args: &[String], usage: &str) -> Result<Vec<String>, String> {
     let args = file_survey::positionals(args, "path").map_err(|e| format!("{}\n{}", e, usage))?;
     if args.is_empty() {
@@ -122,7 +124,7 @@ pub fn targets(args: &[String], usage: &str) -> Result<Vec<String>, String> {
             None => crate::walk::cwd()?,
         }]);
     }
-    Ok(args.to_vec())
+    Ok(args.iter().map(|a| crate::walk::cross_arg(a)).collect())
 }
 
 // spec: context-kit/SPEC.md §Index-first reading — `find <targets> -name <glob>` with the prune set
@@ -990,15 +992,33 @@ mod tests {
         let only_pruned = base.join("build").join("empty");
         std::fs::create_dir_all(only_pruned.join("dist")).unwrap();
         std::fs::write(only_pruned.join("dist").join("d.md"), "# d\n").unwrap();
-        let r = root.display().to_string();
-        let a = root.join("a.md").display().to_string();
+        let r = crate::walk::cross_arg(&root.display().to_string());
+        let a = crate::walk::child(std::path::Path::new(&r), "a.md").display().to_string();
         let got = corpus(std::slice::from_ref(&r), &["*.md"]);
         let file = corpus(std::slice::from_ref(&a), &["*.md"]);
-        let empty = corpus(&[only_pruned.display().to_string()], &["*.md"]);
+        let empty = corpus(&[crate::walk::cross_arg(&only_pruned.display().to_string())], &["*.md"]);
         let _ = std::fs::remove_dir_all(&base);
         assert_eq!(got.unwrap(), vec![a.clone()], "the root's own file, and nothing under target/");
         assert_eq!(file.unwrap(), vec![a], "an explicit file target under a pruned ancestor");
         assert!(empty.unwrap().is_empty(), "a root holding only pruned subtrees");
+    }
+
+    // spec: gate-sdk/SPEC.md §The crate's crosser — a backslash-spelled target crosses where it
+    // enters, so the walk below it answers in one dialect; a relative target stays relative
+    #[test]
+    fn a_given_target_crosses_into_the_declared_dialect() {
+        let args = vec![r"C:\w\docs".to_string(), r"docs\sub".to_string(), "a/b.md".to_string()];
+        assert_eq!(targets(&args, "").unwrap(), vec!["C:/w/docs", "docs/sub", "a/b.md"]);
+        let base = std::env::temp_dir().join(format!("cw-corpus-cross-{}", std::process::id()));
+        std::fs::create_dir_all(base.join("sub")).unwrap();
+        std::fs::write(base.join("sub").join("README.md"), "# r\n").unwrap();
+        let t = format!("{}\\sub", crate::walk::cross_arg(&base.display().to_string()));
+        let walked = corpus(&targets(std::slice::from_ref(&t), "").unwrap(), &["README.md"]);
+        let file = corpus(&targets(&[format!("{}\\README.md", t)], "").unwrap(), &["README.md"]);
+        let _ = std::fs::remove_dir_all(&base);
+        let want = format!("{}/README.md", crate::walk::cross_arg(&t));
+        assert_eq!(walked.unwrap(), vec![want.clone()], "a directory target walks in one dialect");
+        assert_eq!(file.unwrap(), vec![want], "a file target's basename meets a whole-name glob");
     }
 
     // spec: gate-sdk/SPEC.md §The non-gate arm — the table is keyed by the arm's own flag, so a
