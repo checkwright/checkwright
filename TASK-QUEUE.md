@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: context-kit-value-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,22 @@
 ## New Features
 
 ## Technical Debt
+
+### small-kit-value-audit
+
+[gate-customer-value-audit](#gate-customer-value-audit)'s slice for the three small kits the companion tier would expose: context-kit's six gates (all on-surface), evidence-kit's four (two zero-config, one on-surface, one never) and doctrine-kit's one (zero-config), 11 `.gate` descriptors audited for customer value and configurability under gate-sdk/SPEC.md §Consumer payload's rule.
+
+**Deliverable:** each gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated. [companion-install-tier](#companion-install-tier) reads the verdicts after, and gate-sdk's 55 gates stay the one exposed kit unaudited.
+
+**Cost while deferred:** the parent's cost, for these kits. Filed 2026-10-01 as a split at context-kit-value-pass' scope. Part of the operator's selection of set A+, direction 2026-10-01, lead-relayed (not a ruling).
+
+### context-kit-feature-brevity
+
+context-kit/SPEC.md's sections this iteration's features edit, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §Index-first reading, §The session-context hook, §bin/env-probe and §Layout and configuration, about 9.6k of the file's 20.1k words by awk count; context-kit's other sections stay on the parent.
+
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. It rides the batch after the features that edit them: [prune-set-matches-walk-root-ancestors](#prune-set-matches-walk-root-ancestors) (§Index-first reading, §Layout and configuration), [doctor-shell-gate-bash](#doctor-shell-gate-bash) (§bin/env-probe), [hook-wiring-relative-command](#hook-wiring-relative-command) (§The session-context hook) and [harness-project-dir-fold-dialect-unresolved](#harness-project-dir-fold-dialect-unresolved) (§Layout and configuration).
+
+**Cost while deferred:** paid by every session and adopter that reads an unpassed context-kit section. Filed 2026-10-01 as a split at context-kit-value-pass' scope. Part of the operator's selection of set A+, direction 2026-10-01, lead-relayed (not a ruling).
 
 ## Deferred
 
@@ -264,6 +280,10 @@ the harness project-dir derivation `check-memory-off` and its two shell twins sh
 
 **Deliverable:** the observed harness spelling recorded as a fact with its witness, one fold that produces it on both substrates, and a fixture pinning the cross-substrate agreement. Filed 2026-08-30 by close, promoted from the gap inbox (spec filed it; the three sites carry a recorded `spec:` verdict naming the open question rather than an invented answer).
 
+**Selected 2026-10-01 for context-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, the Windows spelling observed by a CI probe before the fold is written.
+
+**Push need (2026-10-01, inside the budget):** one mid-iteration push carrying the Windows probe, whose run is read before build writes the fold; the closing push is the second of two.
+
 ### record-stamp-encoding-compression
 
 [cost: event/low] [surface: queue-kit] [recurrence: 2026-09-03] [not-icebox-eligible: 2026-09-22 operator-ruled direction of 2026-09-01; evicting it would demote that ruling]
@@ -298,15 +318,7 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes, landing as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes, landing as `installer-install-brevity` and `installer-remainder-brevity`.
 
-drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `drift-kit-measurement-brevity`; drift-kit's other sections remain.
-
-guard-kit's front sections left 2026-09-30 at guard-kit-steering's scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `guard-kit-front-brevity`; guard-kit's preamble and other sections remain.
-
-delegation-kit's tier sections left 2026-09-30 at delegation-tier-binding's scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `delegation-kit-tier-brevity`; its other sections remain.
-
-canon-kit's amendment-family sections left 2026-09-30 at canon-kit-value-pass' scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `canon-kit-amendment-brevity`; canon-kit's other sections remain.
-
-canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, on an operator direction lead-relayed (not a /consult ruling), and landed as `canon-kit-gate-brevity`; canon-kit's other sections remain.
+Each on an operator direction lead-relayed (not a /consult ruling), the kit's other sections remaining: drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections (its preamble remains), delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope as [context-kit-feature-brevity](#context-kit-feature-brevity).
 
 ### prune-set-matches-walk-root-ancestors
 
@@ -317,6 +329,8 @@ the walk's prune set matches path components anywhere in an absolute path, not o
 **Deliverable:** prune relative to the walk root, a fixture whose root path carries a default leaf, and the boundary stated at context-kit/SPEC.md §Layout and configuration.
 
 **Cost while deferred:** an adopter under `~/build/` or `~/dist/` sees the index arms return nothing and no red says why. Filed 2026-09-02; returned from the icebox 2026-09-25 by consult, the walk re-read and the match still absolute.
+
+**Selected 2026-10-01 for context-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, since §Index-first reading states the `-not -path "*/<prune>/*"` form the fix changes; `path_pruned` in `native/src/walk.rs` also prunes gate-sdk's `--tree` shell corpus.
 
 ### tarball-build-attestation
 
@@ -347,6 +361,8 @@ a smoke that re-runs the battery inside its sandbox inherits no evidence-kit sco
 **Deliverable:** the nested run inherits or refuses the scope, and a fixture pins the refusal.
 
 **Cost while deferred:** a false clean in the evidence record. Filed 2026-08-18; returned from the icebox 2026-09-25 by consult, the smoke re-grepped.
+
+**Selected 2026-10-01 for context-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, the refusal on the evidence-kit side so [compiled-consumer-smoke-driver](#compiled-consumer-smoke-driver) inherits it.
 
 ### site-health-probe-no-retry-on-transient
 
@@ -420,6 +436,8 @@ an adopter writes a custom gate in shell only. The registry resolves a member as
 
 **Cost while deferred:** the requirement is stated on the install page only, and doctor's clean verdict misleads an adopter who skipped it. Filed 2026-09-27 to the gap inbox by platform-prerequisite-floors' build; promoted at its close: →fix fails because the arm widens doctor's verdict, adopter-visible semantics no amendment settled. Re-verified: the section's bash audience names three arms, two per kit root and one over the fence-run corpus, none reading a registered `.sh` member; docs/install.md's Windows section states the requirement. Owner lookup: `doctor`, `audience`, `env-probe` in this file — only [heterogeneous-agent-delegation](#heterogeneous-agent-delegation)'s CLI probe, DISTINCT; owner context-kit/SPEC.md §bin/env-probe. Related: [custom-gate-substrates](#custom-gate-substrates).
 
+**Selected 2026-10-01 for context-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it ahead of [custom-gate-substrates](#custom-gate-substrates), which generalizes the arm per substrate.
+
 ### release-note-section-set-derivation
 
 [cost: event/high] [surface: installer] [recurrence: 2026-09-27]
@@ -459,6 +477,8 @@ no guidance routes a mid-iteration operator request into the current iteration. 
 **Deliverable:** a routing test over {defer to scope, hotfix, gap fixed at close's drain, refuse to the next iteration} in the lead template, and rule 11 naming the drain route.
 
 **Cost while deferred:** a correct route is abandoned on generic operator wording, each time a lead meets one. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' lead; promoted at its close: →fix fails because rule 11 itself makes amending the doctrine a scoped unit. Re-verified: rule 11 names the two entries and no other; lead.md carries no intake route. Owner lookup: `intake`, `Scope-gated`, `hotfix` in this file — `hotfix-agent-definition`, DISTINCT (the hotfix path's agent type, not the routing); owner doctrine-kit/DOCTRINE.md, with lifecycle-kit/templates/lead.md.
+
+**Selected 2026-10-01 for context-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, its route set naming where [consult-intake-narrowing](#consult-intake-narrowing) would send the classes it re-routes.
 
 ### plugin-harness-reach
 
@@ -511,6 +531,8 @@ delegation-kit's slice left 2026-09-30 at delegation-tier-binding's scope, on an
 **A precondition of [companion-toolkit-profile](#companion-toolkit-profile)'s submission, operator direction 2026-09-29, lead-relayed (not a ruling),** beside [companion-install-tier](#companion-install-tier), whose exposed kits this audit's verdicts decide, so those kits are its natural first slices.
 
 canon-kit's slice left 2026-09-30 at canon-kit-value-pass' scope, on an operator direction lead-relayed (not a /consult ruling), as `canon-kit-value-audit`, and landed in that iteration's build.
+
+context-kit's, evidence-kit's and doctrine-kit's slice left 2026-10-01 at context-kit-value-pass' scope, on an operator direction lead-relayed (not a /consult ruling), as [small-kit-value-audit](#small-kit-value-audit).
 
 ### compiled-consumer-smoke-driver
 
@@ -696,9 +718,11 @@ the statusLine and SessionStart wirings spell repo-relative commands: delegation
 
 **Deliverable:** both wirings anchored at the harness's project-dir variable in the kit templates and README, the repo's own settings diff prepared for the operator to apply, as `plugin-guards-subdir-launch` anchored the guard hooks.
 
-**Inferred, not run:** that the project-dir variable reaches a statusLine command.
+**Inferred, not run:** that the project-dir variable reaches a statusLine command — in a scratch project, set the statusLine command to `env > .tmp/statusline-env.txt`, open a session, then `grep CLAUDE_PROJECT_DIR .tmp/statusline-env.txt`
 
 **Cost while deferred:** a session that changes directory loses its status bar and its post-compact brief. Filed 2026-09-30 to the gap inbox at guard-kit-steering's spec; promoted at its close: →fix fails because the statusLine reach is unmeasured and this repo's settings edit is the operator's to apply, →forward because no ruling is owed. Re-verified: the three wirings spell `bash gate-sdk/bin/run-gates.sh --statusline` and `bash scripts/session-context.sh`. Owner lookup: `statusLine`, `SessionStart`, `CLAUDE_PROJECT_DIR` in this file — none; owner context-kit/SPEC.md, with delegation-kit/SPEC.md §The statusline arm. Surface also delegation-kit.
+
+**Selected 2026-10-01 for context-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, running the statusLine probe above first; this repo's settings diff is prepared for the operator, never applied.
 
 ### write-side-steering
 
