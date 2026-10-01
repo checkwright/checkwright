@@ -10,19 +10,11 @@
 
 ## Technical Debt
 
-### lifecycle-queue-value-audit
-
-[gate-customer-value-audit](#gate-customer-value-audit)'s slice for lifecycle-kit's 15 gates and queue-kit's 11, 26 `.gate` descriptors audited for customer value and configurability under gate-sdk/SPEC.md §Consumer payload's rule.
-
-**Deliverable:** each gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated, leaving gate-sdk's 43 gates the one kit unaudited. `check-lesson-disposition`'s verdict follows `lessons-learned-channel-audit`'s channel decision, and `check-skill-binding`'s reads `skill-binding-couples-drift`'s assertion.
-
-**Cost while deferred:** the parent's cost, for these kits. Filed 2026-10-01 as a split at lifecycle-queue-value-pass' scope. Part of the operator's selection of set A, direction 2026-10-01, lead-relayed (not a ruling).
-
 ### queue-kit-gate-brevity
 
 queue-kit/SPEC.md's eleven gate sections, §check-roadmap-fresh and §check-queue-hygiene through §check-queue-slug-liveness, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement), about 9.5k of the file's 28.8k words by awk count; queue-kit's other sections stay on the parent.
 
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. It rides the batch after [lifecycle-queue-value-audit](#lifecycle-queue-value-audit), whose queue-kit verdicts may edit the same sections.
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. It rides the batch after `lifecycle-queue-value-audit`, whose queue-kit verdicts may edit the same sections.
 
 **Cost while deferred:** paid by every session and adopter that reads an unpassed queue-kit gate section. Filed 2026-10-01 as a split at lifecycle-queue-value-pass' scope. Part of the operator's selection of set A, direction 2026-10-01, lead-relayed (not a ruling).
 
@@ -450,7 +442,7 @@ nothing asks whether each shipped gate is useful and configurable for a customer
 
 **First slice landed 2026-09-29 at native-hook-customer-legs, operator direction lead-relayed (not a /consult ruling):** the payload rule at gate-sdk/SPEC.md §Consumer payload, and site-kit audited against it.
 
-Audited: site-kit, 5 gates (5 kept, 2 made generic, 0 withheld); guard-kit, 1 gate (1 kept, 0 made generic, 0 withheld); delegation-kit, 3 gates (2 kept, 0 made generic, 1 withheld); canon-kit, 37 gates (37 kept, 7 made generic, 0 withheld); context-kit, 6 gates (5 kept, 0 made generic, 1 withheld); evidence-kit, 4 gates (4 kept, 1 made generic, 0 withheld); doctrine-kit, 1 gate (1 kept, 0 made generic, 0 withheld); the other 69 shipped gates remain, kit by kit, under gate-sdk/SPEC.md §Consumer payload's rule.
+Audited: site-kit, 5 gates (5 kept, 2 made generic, 0 withheld); guard-kit, 1 gate (1 kept, 0 made generic, 0 withheld); delegation-kit, 3 gates (2 kept, 0 made generic, 1 withheld); canon-kit, 37 gates (37 kept, 7 made generic, 0 withheld); context-kit, 6 gates (5 kept, 0 made generic, 1 withheld); evidence-kit, 4 gates (4 kept, 1 made generic, 0 withheld); doctrine-kit, 1 gate (1 kept, 0 made generic, 0 withheld); lifecycle-kit, 15 gates (15 kept, 0 made generic, 0 withheld); queue-kit, 11 gates (11 kept, 0 made generic, 0 withheld); gate-sdk's 43 shipped gates remain, the one kit unaudited under gate-sdk/SPEC.md §Consumer payload's rule.
 
 guard-kit's slice left 2026-09-30 at guard-kit-steering's scope, on an operator direction lead-relayed (not a /consult ruling), as `guard-kit-value-audit`, and landed in that iteration's build.
 
@@ -462,7 +454,7 @@ canon-kit's slice left 2026-09-30 at canon-kit-value-pass' scope, on an operator
 
 context-kit's, evidence-kit's and doctrine-kit's slice left 2026-10-01 at context-kit-value-pass' scope, on an operator direction lead-relayed (not a /consult ruling), as `small-kit-value-audit`, and landed in that iteration's build.
 
-lifecycle-kit's and queue-kit's slice left 2026-10-01 at lifecycle-queue-value-pass' scope, on an operator direction lead-relayed (not a /consult ruling), as [lifecycle-queue-value-audit](#lifecycle-queue-value-audit).
+lifecycle-kit's and queue-kit's slice left 2026-10-01 at lifecycle-queue-value-pass' scope, on an operator direction lead-relayed (not a /consult ruling), as `lifecycle-queue-value-audit`, and landed in that iteration's build.
 
 ### compiled-consumer-smoke-driver
 
@@ -1349,3 +1341,4 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - user-facing-delta-unsurfaced
 - kit-roots-dialect-index-env
 - lessons-learned-channel-audit
+- lifecycle-queue-value-audit
