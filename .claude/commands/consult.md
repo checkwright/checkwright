@@ -2,7 +2,7 @@ Execute the template at lifecycle-kit/templates/consult.md, applying the binding
 
 ## Bindings
 
-**entry-reading** — four surfaces, in this order: `TRAJECTORY.md` (the objectives of the running pivot and any standing ruling), `.workflow/consult-items.md` (the items owed to this session, drained per the template's step 2), `TASK-QUEUE.md` (the live queue and the Deferred rungs with their costed grounds), and `BRIEF.local.md` (the private companion brief — untracked, and the surface that carries what no public file may). Read `ROADMAP.md` only as a projection of the queue, never as a second source. A consult-inbox item naming a roadmap slug or a vacant horizon is answered by the reconciliation below.
+**entry-reading** — four surfaces, in this order: `TRAJECTORY.md` (the objectives of the running pivot and any standing ruling), `.workflow/consult-items.md` (the items owed to this session, drained per the template's step 2), `TASK-QUEUE.md` (the live queue and the Deferred rungs with their costed grounds), and `BRIEF.local.md` (the private companion brief — untracked, and the surface that carries what no public file may). Read `ROADMAP.md` only as a projection of the queue, never as a second source. A request for advice naming a roadmap slug or a vacant horizon is answered by the reconciliation below.
 
 **landing-surfaces** — by class (lifecycle-kit/SPEC.md §The steering vocabulary), and `TRAJECTORY.md` is the narrowest surface, not the default:
 

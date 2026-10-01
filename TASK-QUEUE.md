@@ -46,22 +46,6 @@ Run at spec, 2026-10-01: no retroactive horizon pass is owed, since the four ent
 
 **Selected 2026-10-01 for lifecycle-queue-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, running the unrun marker it carried.
 
-### consult-intake-narrowing
-
-[spec: SPEC-consult-intake.md]
-
-the consult inbox takes more than the operator's model of consult. Operator direction, 2026-09-29, lead-relayed (not a ruling): consult is for (a) reconsidering a ruling and (b) an expert opinion from a superior model on strategic direction, such as architecture. lifecycle-kit/SPEC.md §The consult inbox also admits an operator-class finding a session cannot relay live, a threshold entry declined twice, a misnamed direction question and a stage's operator signal; the catch-alls twice pulled in a question the operator had already answered as a direction (the operator-seat install item, re-classed at 30a5343b; the npm-approval item, discarded at 8ea1233c).
-
-**Deliverable:** the producer list narrowed to (a) and (b), the other classes routed to the gap inbox or a live lead; templates/consult.md (the operator rules) reconciled with (b)'s advisory reading, whose tier is settled — consult declares and checks the judgment class at entry (lifecycle-kit/SPEC.md §templates/consult.md); and whether a lead-dispatched consultation with no operator, which can only re-class or discard, still earns a dispatch.
-
-**Addendum, operator direction 2026-09-30, lead session (not a ruling):** consult's main use is a recommendation from a top-tier model. A request expecting a reply gets one; a request expecting a tracked change makes it through the ordinary workflow (adding, removing or updating a deferred entry, say); a ruling is written to TRAJECTORY.md only where that workflow would otherwise challenge or reject the direction, as when the assets still name Bash gates and the direction is Rust ones. The lead's caution to weigh with it: a change consult lands carries its provenance as consult advice, marked operator-accepted or not, so a later session can tell model advice from operator direction. Drained into this entry at guard-kit-steering's close, not a recurrence: it adds what consult is for, where the defect above is what enters it.
-
-**Cost while deferred:** each misfiled item costs a consultation to route it back out. Filed 2026-09-29 to the gap inbox by companion-adoption-landing's lead; promoted at its close: →fix fails because narrowing a producer set is a contract change to a SPEC section, →forward because the direction is given and filing it to consult is the misfile it names. Re-verified: §The consult inbox's Producers paragraph and opening list. Owner lookup: `consult inbox`, `intake` in this file — `consult-tier-declaration`, DISTINCT (the tier consult runs at, not what enters it); owner lifecycle-kit/SPEC.md §The consult inbox.
-
-**Selected 2026-10-01 for lifecycle-queue-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it within the 2026-09-29 and 09-30 directions above; whether a lead-dispatched consultation still earns a dispatch is escalated, not invented.
-
-**Answered at spec, operator direction 2026-10-01, lead session (not a ruling):** the dispatch stays, to answer requests for advice, under a sixth steering term, Advice, marked `consult advice` or, once accepted, `operator direction … on consult advice` — the marking the lead's 2026-09-30 caution proposed, shown to the operator with the choice.
-
 ### lessons-learned-channel-audit
 
 [spec: SPEC-lessons-channel.md]
@@ -1425,5 +1409,7 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 Whether a live queue entry should cite shipped mechanism by a stable anchor (a SPEC section, a gate name, a path) rather than a retired slug, and whether a check-queue-hygiene axis should hold that, is unruled; close's retired-block read corrects each instance inline meanwhile, as it did twice at preview-readiness' close.
 
 ## Done
+
+- consult-intake-narrowing
 
 ## Lessons Learned

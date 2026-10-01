@@ -1,6 +1,6 @@
 # contract: context-kit/SPEC.md §The surface ratchet
 7297cp .claude/agents/audit-sweep.md
-1322cp .claude/agents/consult-session.md
+1370cp .claude/agents/consult-session.md
 2117cp .claude/agents/edit-sweep.md
 2597cp .claude/agents/hotfix-session.md
 8969cp .claude/agents/stage-session.md
@@ -91,14 +91,14 @@
 316327cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
 270777cp installer/SPEC.md
-341955cp lifecycle-kit/SPEC.md
-5550cp lifecycle-kit/templates/consult.md
-43765cp lifecycle-kit/templates/lead.md
+344054cp lifecycle-kit/SPEC.md
+6534cp lifecycle-kit/templates/consult.md
+44131cp lifecycle-kit/templates/lead.md
 2100cp lifecycle-kit/templates/release-sweep.md
 6939cp lifecycle-kit/templates/stages/align.md
 9182cp lifecycle-kit/templates/stages/build.md
-22055cp lifecycle-kit/templates/stages/close.md
-19401cp lifecycle-kit/templates/stages/scope.md
+22330cp lifecycle-kit/templates/stages/close.md
+19577cp lifecycle-kit/templates/stages/scope.md
 9351cp lifecycle-kit/templates/stages/spec.md
 6058cp lifecycle-kit/templates/stages/validate.md
 2765cp lifecycle-kit/templates/upgrade.md

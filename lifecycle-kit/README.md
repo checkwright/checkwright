@@ -71,7 +71,7 @@ gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --enter-stage <stage>          # stamp a stage entry (the transition itself)
 "$gates" --install-lifecycle    # (re)write the registration and merge-attribute blocks
 "$gates" --emit file-gap "<gap>"   # route a work-shaped finding to the gap inbox
-"$gates" --emit file-consult "<item>"   # route an item owed to the consult skill to its inbox
+"$gates" --emit file-consult "<item>"   # route a ruling to reconsider or a request for advice to the consult inbox
 "$gates" --emit file-survey "<question>" "<corpus>" "<oracle>" "<inferred>" "<finding>"
 "$gates" --emit cite-survey "<heading-substring>"   # one carried survey, inline-ready
 "$gates" --emit session-id                       # the canonical stamp id, by the derivation order
