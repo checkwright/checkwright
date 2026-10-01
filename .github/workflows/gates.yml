@@ -1426,6 +1426,64 @@ jobs:
           fi
           exit "$misread"
 
+      - name: one-shot probe, the harness's project-dir spelling on Windows
+        if: ${{ !cancelled() && matrix.target == 'x86_64-pc-windows-msvc' }}
+        continue-on-error: true
+        timeout-minutes: 10
+        shell: pwsh
+        env:
+          PROBE_VERSION: 2.1.286
+          PROBE_BASH: |
+            set -u
+            echo "== git bash run =="
+            echo "git rev-parse --show-toplevel: $(git rev-parse --show-toplevel)"
+            echo "pwd -P: $(pwd -P)"
+            r="$(cygpath -u "$PROBE_ROOT")"
+            export HOME="$r/bash-home"
+            export USERPROFILE="$(cygpath -w "$r/bash-userprofile")"
+            unset CLAUDE_CONFIG_DIR ANTHROPIC_API_KEY CLAUDE_CODE_OAUTH_TOKEN
+            echo "HOME=$HOME USERPROFILE=$USERPROFILE"
+            timeout 120 "$(cygpath -u "$PROBE_EXE")" -p hi </dev/null > "$r/bash.out" 2>&1
+            echo "exit=$?"
+            head -c 600 "$r/bash.out"; echo
+        run: |
+          $root = Join-Path $env:RUNNER_TEMP 'harness-probe'
+          New-Item -ItemType Directory -Force -Path $root | Out-Null
+          $realProfile = [Environment]::GetFolderPath('UserProfile')
+          npm install --prefix $root --no-audit --no-fund "@anthropic-ai/claude-code@$env:PROBE_VERSION" 2>&1 | Select-Object -Last 5
+          $exe = Join-Path $root 'node_modules\@anthropic-ai\claude-code-win32-x64\claude.exe'
+          Write-Output "harness binary: $exe present=$(Test-Path $exe)"
+          $env:CLAUDE_CODE_GIT_BASH_PATH = Join-Path $env:ProgramFiles 'Git\bin\bash.exe'
+          Remove-Item Env:CLAUDE_CONFIG_DIR, Env:ANTHROPIC_API_KEY, Env:CLAUDE_CODE_OAUTH_TOKEN -ErrorAction SilentlyContinue
+          $homes = @('pwsh-home', 'pwsh-userprofile', 'bash-home', 'bash-userprofile') | ForEach-Object { Join-Path $root $_ }
+          $homes | ForEach-Object { New-Item -ItemType Directory -Force -Path $_ | Out-Null }
+          $empty = Join-Path $root 'empty.in'
+          Set-Content -NoNewline -Path $empty -Value ''
+
+          Write-Output "== pwsh run =="
+          Write-Output "git rev-parse --show-toplevel: $(git rev-parse --show-toplevel)"
+          Write-Output "(Get-Location).Path: $((Get-Location).Path)"
+          $env:HOME = $homes[0]
+          $env:USERPROFILE = $homes[1]
+          Write-Output "HOME=$env:HOME USERPROFILE=$env:USERPROFILE"
+          $p = Start-Process -FilePath $exe -ArgumentList '-p', 'hi' -NoNewWindow -PassThru `
+            -RedirectStandardInput $empty -RedirectStandardOutput (Join-Path $root 'pwsh.out') -RedirectStandardError (Join-Path $root 'pwsh.err')
+          $null = $p.Handle
+          if (-not $p.WaitForExit(120000)) { $p.Kill(); Write-Output 'timed out' }
+          Write-Output "exit=$($p.ExitCode)"
+          Get-Content (Join-Path $root 'pwsh.out'), (Join-Path $root 'pwsh.err') -ErrorAction SilentlyContinue | Select-Object -First 10
+
+          $env:PROBE_ROOT = $root
+          $env:PROBE_EXE = $exe
+          & (Join-Path $env:ProgramFiles 'Git\bin\bash.exe') -c $env:PROBE_BASH
+
+          Write-Output "== project dirs created =="
+          foreach ($h in $homes + @($realProfile)) {
+            Write-Output "-- under ${h}:"
+            Get-ChildItem -Force -Recurse -Depth 3 -Directory -Path $h -ErrorAction SilentlyContinue |
+              Where-Object { $_.Parent.Name -eq 'projects' } | ForEach-Object { Write-Output "   $($_.FullName)" }
+          }
+
       - name: annotate the failing tests for ${{ matrix.target }}
         if: failure()
         shell: bash
