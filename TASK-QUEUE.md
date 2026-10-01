@@ -930,10 +930,6 @@ Model trailer is a baked literal.
 
 Tree steers unpaired; the kit's are templated.
 
-### reclaim-precondition-outside-the-tree
-
-Essay-sink reclaim can never fire.
-
 ### amendment-dod-sibling-dependence
 
 DoD items depend on unnamed siblings.
@@ -1355,4 +1351,6 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 Whether a live queue entry should cite shipped mechanism by a stable anchor (a SPEC section, a gate name, a path) rather than a retired slug, and whether a check-queue-hygiene axis should hold that, is unruled; close's retired-block read corrects each instance inline meanwhile, as it did twice at preview-readiness' close.
 
 ## Done
+
+- reclaim-precondition-outside-the-tree
 
