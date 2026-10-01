@@ -120,6 +120,17 @@ Under the split posture the lead **routes** an escalation before answering it. A
 
 *<consult-dispatch: the agent type a lead dispatches a consultation as — never a stage-session type — and the batching threshold on the consult inbox: an item count, an oldest-item age, or off, which dispatches at the first quiet point after any item lands. Or the statement that this consumer's lead dispatches no consultation.>*
 
+## Mid-iteration intake
+
+**Route an operator's mid-iteration request by its shape, never by its wording.** Take the first route that fits. "Add it to this iteration" asks for a timing, which the routes already answer, and moves no request off its route.
+
+1. **A question rather than work** — answer it, or relay it to the operator as you relay an escalation (§The escalation protocol).
+2. **An impacting failure** — propose the hotfix with its cost against the iteration's (doctrine-kit/DOCTRINE.md, Scope-gated intake). On the operator's ruling, dispatch it as §The escalation protocol says; without one, take the first later route that fits.
+3. **Debt** — a change converging on names the governed surfaces already carry, needing no design ruling: file it with `--emit file-gap` and tell the operator the closing stage's drain fixes it this iteration.
+4. **Anything else** — a new name, a design ruling, or more than one drain session holds: file it the same way. The drain promotes it and the next scope ranks it. Where the operator wanted it in this iteration, say it cannot enter before the next, and write their wish into the bullet's prose as their direction for the next scope.
+
+Never start a request's work in a batch of your own, and never write its queue entry.
+
 ## Channel design
 
 Two channels, each with one job. Routine narration and findings go to the **resume journal** (a pull channel — delegation-kit's journal mechanics own the rest). The **message channel** carries only the escalation classes. This is how verbosity is controlled: by channel design, not by asking a session to be quiet.

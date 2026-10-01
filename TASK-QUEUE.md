@@ -8,18 +8,6 @@
 
 ## New Features
 
-### intake-routing-test
-
-[spec: SPEC-intake-routing.md]
-
-no guidance routes a mid-iteration operator request into the current iteration. doctrine-kit/DOCTRINE.md rule 11 (Scope-gated intake) names two entries, a Deferred filing through scope and an operator-ruled hotfix. Close's gap-inbox drain tries →fix first, a third entry rule 11 does not name, and lifecycle-kit/templates/lead.md has no route for an operator's "add X to this iteration". Observed 2026-09-28: a lead offered close's drain for a copy change, then on the operator's "add to this iteration" switched without a stated reason to an unsanctioned build batch writing its own queue entry, and the operator steered it back.
-
-**Deliverable:** a routing test over {defer to scope, hotfix, gap fixed at close's drain, refuse to the next iteration} in the lead template, and rule 11 naming the drain route.
-
-**Cost while deferred:** a correct route is abandoned on generic operator wording, each time a lead meets one. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' lead; promoted at its close: →fix fails because rule 11 itself makes amending the doctrine a scoped unit. Re-verified: rule 11 names the two entries and no other; lead.md carries no intake route. Owner lookup: `intake`, `Scope-gated`, `hotfix` in this file — `hotfix-agent-definition`, DISTINCT (the hotfix path's agent type, not the routing); owner doctrine-kit/DOCTRINE.md, with lifecycle-kit/templates/lead.md.
-
-**Selected 2026-10-01 for context-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, its route set naming where [consult-intake-narrowing](#consult-intake-narrowing) would send the classes it re-routes.
-
 ## Technical Debt
 
 ### small-kit-value-audit
@@ -1385,5 +1373,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - doctor-shell-gate-bash
 - harness-project-dir-fold-dialect-unresolved
 - hook-wiring-relative-command
+- intake-routing-test
 
 ## Lessons Learned
