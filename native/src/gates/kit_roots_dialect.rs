@@ -196,7 +196,7 @@ fn vendor(tree: &str, base: &str, layout: &'static str) -> Result<Layout, String
         vec!["-C", &dir, "add", "-A", "."],
         vec!["-C", &dir, "-c", "user.email=fixture@localhost", "-c", "user.name=fixture", "commit", "-q", "-m", "vendored"],
     ] {
-        let c = proc::run(&programs::GIT, &argv)?;
+        let c = proc::run_merged_without(&programs::GIT, &argv, proc::GIT_REPO_LOCATORS)?;
         if c.code() != Some(0) {
             return Err(format!(
                 "git {} failed (exit {}) preparing the {} vendoring — the check could not run; treating as failure (not clean)",
@@ -256,11 +256,16 @@ fn emit(layout: &Layout, arm: &str) -> Result<String, String> {
     // was vendored is handed down. GATE_SDK_KIT_DIRS especially is not: an env value outranks a
     // knob file, so passing one would overwrite the very config a vendoring's own scripts/ carries
     let env = vec![("GATE_SDK_ROOT".to_string(), layout.root.clone())];
-    let c = proc::run_with_env_in(
+    let unset: Vec<String> = proc::GIT_REPO_LOCATORS.iter().map(|k| k.to_string()).collect();
+    let c = proc::run_with_stdin_in(
         &programs::CHECKWRIGHT_GATES.at(bin.as_str()),
         &[arm],
-        &env,
-        Some(Path::new(&layout.dir)),
+        b"",
+        &proc::ChildEnv {
+            set: &env,
+            unset: &unset,
+            cwd: Some(Path::new(&layout.dir)),
+        },
     )?;
     match c.stdout() {
         Some(o) if c.code() == Some(0) => Ok(String::from_utf8_lossy(o).into_owned()),

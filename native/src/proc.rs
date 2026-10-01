@@ -392,7 +392,8 @@ pub fn run_merged(program: &Program, args: &[&str]) -> Result<Merged, String> {
 }
 
 // spec: gate-sdk/SPEC.md §check-crate-arms — the variables git exports to a hook that name a
-// repository; a child inheriting them reads the hook's repository instead of its own
+// repository; a child inheriting them reads the hook's repository instead of its own, so
+// check-crate-arms and check-kit-roots-dialect (§check-kit-roots-dialect) strip them from theirs
 pub const GIT_REPO_LOCATORS: &[&str] = &["GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_PREFIX", "GIT_COMMON_DIR"];
 
 // spec: gate-sdk/SPEC.md §check-crate-arms — `run_merged` with names stripped from the child's

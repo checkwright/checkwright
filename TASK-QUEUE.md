@@ -40,14 +40,6 @@ queue-kit/SPEC.md's eleven gate sections, §check-roadmap-fresh and §check-queu
 
 **Cost while deferred:** paid by every session and adopter that reads an unpassed queue-kit gate section. Filed 2026-10-01 as a split at lifecycle-queue-value-pass' scope. Part of the operator's selection of set A, direction 2026-10-01, lead-relayed (not a ruling).
 
-### kit-roots-dialect-index-env
-
-`check-kit-roots-dialect` reds in the pre-commit hook under the only-paths commit form: git exports a relative `GIT_INDEX_FILE` (`.git/next-index-N.lock`) to the hook, the gate's vendoring children (`git init`/`add`/`commit` at `native/src/gates/kit_roots_dialect.rs`, then `--emit-enum-sets` with its cwd inside the vendoring) inherit it, it resolves to no index there, and `--emit-enum-sets` exits 2. Re-verified at scope: with `.git/index` copied to `.tmp/idx-copy`, `GIT_INDEX_FILE=.tmp/idx-copy bash gate-sdk/bin/run-gates.sh --only check-kit-roots-dialect` reds and the plain run passes; no other production gate runs `git init` in a scratch dir.
-
-**Deliverable:** the gate's children spawned with `proc::GIT_REPO_LOCATORS` stripped, the shape `check-crate-arms` already takes through `run_merged_without`, that list's `spec:` binding widened to name both gates, and a fixture or crate test running the gate under a relative `GIT_INDEX_FILE`.
-
-**Cost while deferred:** every only-paths commit touching the gate's trigger set reds, forcing a plain commit against the shared-index rule. Filed 2026-10-01 to the gap inbox after context-kit-value-pass' close, surfaced by the emit::corpus dialect hotfix; promoted at lifecycle-queue-value-pass' scope on the operator's direction of that day, lead-relayed (not a ruling).
-
 ## Deferred
 
 ### manifest-finder-untracked-walk
@@ -1369,5 +1361,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - hotfix-push-owner
 - skill-binding-couples-drift
 - user-facing-delta-unsurfaced
+- kit-roots-dialect-index-env
 
 ## Lessons Learned
