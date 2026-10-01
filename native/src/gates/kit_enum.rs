@@ -17,6 +17,13 @@ fn couples_of(text: &str) -> Option<String> {
         .find_map(|kv| kv.strip_prefix("couples=").map(String::from))
 }
 
+// spec: gate-sdk/SPEC.md §check-kit-enum — an unreadable manifest is red, not a skip
+fn read_declaration(path: &str) -> Result<String, String> {
+    std::fs::read(path)
+        .map(|b| String::from_utf8_lossy(&b).into_owned())
+        .map_err(|e| format!("cannot read {}: {} — treating as failure (not clean)", path, e))
+}
+
 pub fn run(args: &[String]) -> i32 {
     let gates_dir = match args.first() {
         Some(a) => a.clone(),
@@ -99,12 +106,15 @@ pub fn run(args: &[String]) -> i32 {
             unresolved += 1;
             continue;
         };
+        let declared = match read_declaration(&src) {
+            Ok(t) => t,
+            Err(e) => {
+                eprintln!("check-kit-enum: {}", e);
+                return 2;
+            }
+        };
         // spec: gate-sdk/SPEC.md §check-kit-enum — no manifest is check-graph's finding, not this
         // gate's, and a manifest with no couples= field names no roots to group
-        let declared = match std::fs::read(&src) {
-            Ok(b) => String::from_utf8_lossy(&b).into_owned(),
-            Err(_) => continue,
-        };
         let Some(couples) = couples_of(&declared) else {
             continue;
         };
@@ -208,5 +218,12 @@ mod tests {
         assert_eq!(couples_of(&two), Some("a/x.sh,b/x.sh".to_string()));
         assert_eq!(couples_of("# spec: no manifest here\n"), None);
         assert_eq!(couples_of(&man("dir=one valve=none tier=precommit")), None);
+    }
+
+    #[test]
+    fn an_unreadable_declaration_is_an_error_not_a_skip() {
+        let dir = std::env::temp_dir();
+        let err = read_declaration(&dir.display().to_string()).unwrap_err();
+        assert!(err.contains("not clean"), "{}", err);
     }
 }
