@@ -125,9 +125,9 @@ pub fn targets(args: &[String], usage: &str) -> Result<Vec<String>, String> {
     Ok(args.to_vec())
 }
 
-// spec: context-kit/SPEC.md §Index-first reading — `find <targets> -name <glob> -not -path
-// "*/<prune>/*"`, in that section's traversal and order, down to what a target that is neither a
-// file nor a directory contributes.
+// spec: context-kit/SPEC.md §Index-first reading — `find <targets> -name <glob>` with the prune set
+// matched below each target, never on the target or its ancestors, in that section's traversal and
+// order, down to what a target that is neither a file nor a directory contributes.
 pub fn corpus(targets: &[String], globs: &[&str]) -> Result<Vec<String>, String> {
     let prune = crate::walk::knob_array("CONTEXT_KIT_PRUNE_DIRS")?;
     let mut out: Vec<String> = Vec::new();
@@ -136,7 +136,11 @@ pub fn corpus(targets: &[String], globs: &[&str]) -> Result<Vec<String>, String>
         if path.is_dir() {
             for p in crate::walk::find_link_entries_with_prune(path, &|n| prune.iter().any(|d| d == n))?
             {
-                out.push(p.display().to_string());
+                let p = p.display().to_string();
+                let below = crate::walk::rel_under(t, &p).unwrap_or(&p);
+                if !crate::walk::path_pruned(below, &prune) {
+                    out.push(p);
+                }
             }
         } else if path.is_file() {
             out.push(t.clone());
@@ -145,7 +149,6 @@ pub fn corpus(targets: &[String], globs: &[&str]) -> Result<Vec<String>, String>
     out.retain(|p| {
         let base = p.rsplit('/').next().unwrap_or(p);
         globs.iter().any(|g| crate::walk::pattern_match(g, base))
-            && !crate::walk::path_pruned(p, &prune)
     });
     out.sort_unstable();
     Ok(out)
@@ -967,6 +970,29 @@ pub fn arms() -> Vec<&'static str> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: context-kit/SPEC.md §Index-first reading — the prune set binds below each target, so a
+    // root under a pruned ancestor indexes whole while a pruned leaf below it is still excluded
+    #[test]
+    fn corpus_prunes_below_its_target_never_above() {
+        let base = std::env::temp_dir().join(format!("cw-corpus-prune-{}", std::process::id()));
+        let root = base.join("build").join("r");
+        std::fs::create_dir_all(root.join("target")).unwrap();
+        std::fs::write(root.join("a.md"), "# a\n").unwrap();
+        std::fs::write(root.join("target").join("t.md"), "# t\n").unwrap();
+        let only_pruned = base.join("build").join("empty");
+        std::fs::create_dir_all(only_pruned.join("dist")).unwrap();
+        std::fs::write(only_pruned.join("dist").join("d.md"), "# d\n").unwrap();
+        let r = root.display().to_string();
+        let a = root.join("a.md").display().to_string();
+        let got = corpus(std::slice::from_ref(&r), &["*.md"]);
+        let file = corpus(std::slice::from_ref(&a), &["*.md"]);
+        let empty = corpus(&[only_pruned.display().to_string()], &["*.md"]);
+        let _ = std::fs::remove_dir_all(&base);
+        assert_eq!(got.unwrap(), vec![a.clone()], "the root's own file, and nothing under target/");
+        assert_eq!(file.unwrap(), vec![a], "an explicit file target under a pruned ancestor");
+        assert!(empty.unwrap().is_empty(), "a root holding only pruned subtrees");
+    }
 
     // spec: gate-sdk/SPEC.md §The non-gate arm — the table is keyed by the arm's own flag, so a
     // near-miss spelling resolves to nothing rather than to a different member

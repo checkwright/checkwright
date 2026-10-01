@@ -8,18 +8,6 @@
 
 ## New Features
 
-### prune-set-matches-walk-root-ancestors
-
-[spec: SPEC-index-walk-root.md] [recurrence: 2026-09-25]
-
-the walk's prune set matches path components anywhere in an absolute path, not only below the walk root: `path_pruned` in `native/src/emit/mod.rs` tests `/<leaf>/` against the full path, and the default set carries `target`, `build`, `dist` and `worktrees`. A consumer whose checkout sits under a directory carrying any of those names gets an empty md and pub index, silently.
-
-**Deliverable:** prune relative to the walk root, a fixture whose root path carries a default leaf, and the boundary stated at context-kit/SPEC.md §Layout and configuration.
-
-**Cost while deferred:** an adopter under `~/build/` or `~/dist/` sees the index arms return nothing and no red says why. Filed 2026-09-02; returned from the icebox 2026-09-25 by consult, the walk re-read and the match still absolute.
-
-**Selected 2026-10-01 for context-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, since §Index-first reading states the `-not -path "*/<prune>/*"` form the fix changes; `path_pruned` in `native/src/walk.rs` also prunes gate-sdk's `--tree` shell corpus.
-
 ### doctor-shell-gate-bash
 
 [spec: SPEC-doctor-shell-gate.md]
@@ -96,7 +84,7 @@ no guidance routes a mid-iteration operator request into the current iteration. 
 
 context-kit/SPEC.md's sections this iteration's features edit, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §Index-first reading, §The session-context hook, §bin/env-probe and §Layout and configuration, about 9.6k of the file's 20.1k words by awk count; context-kit's other sections stay on the parent.
 
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. It rides the batch after the features that edit them: [prune-set-matches-walk-root-ancestors](#prune-set-matches-walk-root-ancestors) (§Index-first reading, §Layout and configuration), [doctor-shell-gate-bash](#doctor-shell-gate-bash) (§bin/env-probe), [hook-wiring-relative-command](#hook-wiring-relative-command) (§The session-context hook) and [harness-project-dir-fold-dialect-unresolved](#harness-project-dir-fold-dialect-unresolved) (§Layout and configuration).
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. It rides the batch after the features that edit them: `prune-set-matches-walk-root-ancestors` (§Index-first reading, §Layout and configuration), [doctor-shell-gate-bash](#doctor-shell-gate-bash) (§bin/env-probe), [hook-wiring-relative-command](#hook-wiring-relative-command) (§The session-context hook) and [harness-project-dir-fold-dialect-unresolved](#harness-project-dir-fold-dialect-unresolved) (§Layout and configuration).
 
 **Cost while deferred:** paid by every session and adopter that reads an unpassed context-kit section. Filed 2026-10-01 as a split at context-kit-value-pass' scope. Part of the operator's selection of set A+, direction 2026-10-01, lead-relayed (not a ruling).
 
@@ -1443,5 +1431,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 ## Done
 
 - nested-battery-env-inheritance-invisible
+- prune-set-matches-walk-root-ancestors
 
 ## Lessons Learned
