@@ -5,7 +5,6 @@
 set -uo pipefail
 
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null || exit 0
-REPO_ROOT="$(pwd -P)"
 
 # spec: context-kit/SPEC.md §The session-context hook — consumer layout: the vendored gate-sdk library and a governed queue file, retarget to yours [EDIT ME]. The queue index and the three index arms are arms of the gate binary GATE_SDK_NATIVE_BIN names, spelled as a command by gate-sdk's own accessor; this hook already runs at the git toplevel, where each arm reads a consumer's section and cap overrides itself (gate-sdk/SPEC.md §The non-gate arm). The library is sourced rather than subshelled because it defines functions and runs nothing, so no read of it can fail a session.
 NATIVE_BIN=""
@@ -90,17 +89,17 @@ if [[ "$role" != lead ]]; then
     esac
 fi
 
-# spec: context-kit/SPEC.md §The session-context hook — step 5 memory-off backstop; check-memory-off fires at commit, this surfaces pollution between commits
-# spec: gate-sdk/SPEC.md §The path-dialect contract — this fold compares against a harness-owned directory name, the one place the per-substrate dialects would meet; which spelling the harness uses on Windows is not decidable from this tree, so the producer above is normalized like any other and this open question is recorded rather than guessed (gap filed)
-MEM_DIRS="${CONTEXT_KIT_MEMORY_DIRS:-$HOME/.claude/projects/$(printf '%s' "$REPO_ROOT" | tr '/.' '-')/memory}"
-for _md in $MEM_DIRS; do
-    [[ -d "$_md" ]] || continue
-    if find "$_md" -type f ! -name .gitkeep -print -quit 2>/dev/null | grep -q .; then
-        echo "⚠ harness memory dir holds content ($_md) — durable facts belong in a tracked surface (context-kit/SPEC.md §The memory-off doctrine), not per-session memory."
-        echo
-        break
-    fi
-done
+# spec: context-kit/SPEC.md §The session-context hook — step 5 memory-off backstop; check-memory-off fires at commit, this surfaces pollution between commits, over the scan set the gate itself reads
+if [[ -x "$NATIVE_BIN" ]]; then
+    while IFS= read -r _md; do
+        [[ -d "$_md" ]] || continue
+        if find "$_md" -type f ! -name .gitkeep -print -quit 2>/dev/null | grep -q .; then
+            echo "⚠ harness memory dir holds content ($_md) — durable facts belong in a tracked surface (context-kit/SPEC.md §The memory-off doctrine), not per-session memory."
+            echo
+            break
+        fi
+    done < <("$NATIVE_BIN" --emit memory-dirs 2>/dev/null)
+fi
 
 # spec: context-kit/SPEC.md §The session-context hook — step 6 scratch sweep
 TMP_DIR="${GATE_SDK_TMP_DIR:-.tmp}"

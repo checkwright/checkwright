@@ -9,25 +9,35 @@ fn trim(s: &str) -> &str {
     s.trim_matches([' ', '\t', '\r'])
 }
 
-// spec: context-kit/SPEC.md §Layout and configuration — the harness names each project's dir by
-// its absolute path with '/' and '.' folded to '-', and this is the rule's one implementation
-// since the shell library's copy left with the gate that called it.
+// spec: context-kit/SPEC.md §Layout and configuration — the variable the harness reads its home
+// from: `USERPROFILE` on Windows, where a set `HOME` is ignored, and `HOME` elsewhere
+const HOME_VAR: &str = if cfg!(windows) { "USERPROFILE" } else { "HOME" };
+
+// spec: context-kit/SPEC.md §Layout and configuration — the project dir under the harness's
+// config home, named by the session encoder over the repository toplevel, the spelling the
+// harness was observed folding on every substrate
 fn memory_dir_default() -> Result<Option<String>, String> {
     let Some(top) = walk::toplevel_opt()? else {
         return Ok(None);
     };
-    // spec: context-kit/SPEC.md §check-memory-off — the shell reads `$HOME` under `set -u`, so an
-    // unset HOME aborts it rather than yielding a verdict; the port refuses on the same state
-    // instead of deriving a path under `/` that would be absent and therefore read as clean
-    let home = std::env::var("HOME").map_err(|_| {
-        "HOME is unset — the harness memory dir cannot be derived; treating as failure (not clean)"
-            .to_string()
-    })?;
-    let folded: String = top
-        .chars()
-        .map(|c| if c == '/' || c == '.' { '-' } else { c })
-        .collect();
-    Ok(Some(format!("{}/.claude/projects/{}/memory", home, folded)))
+    let config_dir = std::env::var("CLAUDE_CONFIG_DIR").unwrap_or_default();
+    // spec: context-kit/SPEC.md §check-memory-off — an unreadable home refuses rather than
+    // deriving a path under `/` that would be absent and therefore read as clean
+    let home = if config_dir.is_empty() {
+        std::env::var(HOME_VAR).map_err(|_| {
+            format!(
+                "{} is unset — the harness memory dir cannot be derived; treating as failure (not clean)",
+                HOME_VAR
+            )
+        })?
+    } else {
+        String::new()
+    };
+    Ok(Some(format!(
+        "{}/projects/{}/memory",
+        crate::sessions::config_home(&config_dir, &home),
+        crate::sessions::slug(&top)
+    )))
 }
 
 // spec: context-kit/SPEC.md §check-memory-off — the line grammar's guard: a line failing it is
@@ -43,7 +53,7 @@ fn split_pin(line: &str) -> Option<(&str, &str)> {
     Some((path, expected))
 }
 
-fn resolve_memory_dirs() -> Result<Vec<String>, String> {
+pub(crate) fn resolve_memory_dirs() -> Result<Vec<String>, String> {
     // spec: context-kit/SPEC.md §check-memory-off — the knob is a word-split list of globs, so
     // each element splits again on whitespace exactly as the shell's unquoted `$memdirs`
     // does; empty means "derive it", not "no dir"
@@ -64,6 +74,12 @@ fn resolve_memory_dirs() -> Result<Vec<String>, String> {
         dirs.extend(walk::glob_entries(p));
     }
     Ok(dirs)
+}
+
+// spec: context-kit/SPEC.md §check-memory-off — the scan set the gate reads, one dir per line, so
+// the session-context hook's step 5 folds nothing of its own
+pub fn emit_memory_dirs(_args: &[String]) -> Result<String, String> {
+    Ok(resolve_memory_dirs()?.into_iter().map(|d| format!("{}\n", d)).collect())
 }
 
 pub fn run(args: &[String]) -> i32 {
@@ -240,5 +256,22 @@ mod tests {
         let compact: Value = serde_json::from_str("{\"a\":1}").unwrap();
         assert!(values_equal(&spaced, &compact));
         assert!(Value::Null.is_null());
+    }
+
+    // spec: context-kit/SPEC.md §Layout and configuration — a set `CLAUDE_CONFIG_DIR` roots the
+    // derived dir, as it roots the project dir the harness creates
+    #[test]
+    fn a_set_config_dir_roots_the_derived_memory_dir() {
+        let knobs = crate::knobenv::lock();
+        let prior = std::env::var("CLAUDE_CONFIG_DIR").ok();
+        knobs.set("CLAUDE_CONFIG_DIR", "/cfg");
+        let got = memory_dir_default();
+        match &prior {
+            Some(v) => knobs.set("CLAUDE_CONFIG_DIR", v),
+            None => knobs.remove("CLAUDE_CONFIG_DIR"),
+        }
+        let top = walk::toplevel_opt().unwrap().expect("the crate sits in a work tree");
+        let want = format!("/cfg/projects/{}/memory", crate::sessions::slug(&top));
+        assert_eq!(got.unwrap(), Some(want));
     }
 }

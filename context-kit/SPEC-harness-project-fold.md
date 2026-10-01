@@ -1,5 +1,7 @@
 # SPEC amendment: harness-project-fold
 
+**Merged; this file's deletion rides the entry's Done move**, which waits on the Definition of Done's remote oracle. Delta 1's probe answered the inferred passage below: the Windows harness folds git's drive-lettered toplevel (`D:/a/checkwright/checkwright` became `D--a-checkwright-checkwright` under pwsh and Git Bash alike) and roots it under `USERPROFILE`, even where `HOME` is set. The session-id readers did not move with the memory derivation; their `HOME` read on Windows is filed to the gap inbox.
+
 **The memory-dir derivation folds a repository root the way the harness folds it, through the crate's one encoder.** `check-memory-off`'s default derivation (`memory_dir_default`, `native/src/gates/memory_off.rs`) and its two shell twins fold only `/` and `.` to `-`. The twins are step 5 of `scripts/session-context.sh` and of `context-kit/templates/session-context.sh`, each a `tr '/.' '-'` over `pwd -P`. On Windows the two substrates fold one checkout to two names: the crate reads git's drive-lettered toplevel and the shell reads MSYS's `/c/…` spelling. A third fold already exists. `sessions::slug` (`native/src/sessions.rs`) is the sessions-dir slug lifecycle-kit's session-id derivation uses (lifecycle-kit/SPEC.md §bin/session-id.sh), and it maps every non-alphanumeric character.
 
 **Measured at authoring**, with the installed harness (version 2.1.286), each unauthenticated `claude -p hi` run under a scratch `HOME`. Every run exits 1 with `Not logged in`, after creating its project dir:

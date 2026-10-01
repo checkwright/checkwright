@@ -651,6 +651,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Emit(crate::walk::emit_kit_roots, Grammar::Flags(&[])),
         &["GATE_SDK_KIT_DIRS"],
     ),
+    // spec: context-kit/SPEC.md §check-memory-off — the gate's scan set, for the session-context
+    // hook's step 5
+    (
+        "--emit-memory-dirs",
+        Arm::Emit(crate::gates::memory_off::emit_memory_dirs, Grammar::Flags(&[])),
+        &["CONTEXT_KIT_MEMORY_DIRS"],
+    ),
     // spec: evidence-kit/SPEC.md §The baseline-claims arm — each baseline row as a `measured:`
     // oracle line, for a consumer's `CANON_KIT_MEASURED_CLAIMS_CMD` to name or append
     (

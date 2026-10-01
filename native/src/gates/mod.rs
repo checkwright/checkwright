@@ -2032,7 +2032,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-memory-off",
         memory_off::run,
-        &[("?", "", "", "dynamic@src/gates/memory_off.rs:116")],
+        &[("?", "", "", "dynamic@src/gates/memory_off.rs:132")],
         &[
             "CONTEXT_KIT_MEMORY_DIRS",
             "CONTEXT_KIT_SETTINGS_FILE",

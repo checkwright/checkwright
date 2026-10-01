@@ -40,12 +40,44 @@ pub fn key(path: &str) -> String {
     normalize(base.strip_suffix(".jsonl").unwrap_or(base))
 }
 
-// spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the cwd slug: every non-alphanumeric character
-// mapped to `-`, which is `sed 's/[^a-zA-Z0-9]/-/g'` over the same string.
-fn slug(path: &str) -> String {
-    path.chars()
-        .map(|c| if c.is_ascii_alphanumeric() { c } else { '-' })
-        .collect()
+// spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the harness's own cut and hash, values it owns,
+// so neither is a knob
+const SLUG_CAP: usize = 200;
+
+fn harness_hash(units: &[u16]) -> i32 {
+    units
+        .iter()
+        .fold(0i32, |h, &c| (h << 5).wrapping_sub(h).wrapping_add(i32::from(c)))
+}
+
+fn base36(mut n: u32) -> String {
+    let mut digits = Vec::new();
+    loop {
+        digits.push(char::from_digit(n % 36, 36).unwrap_or('0'));
+        n /= 36;
+        if n == 0 {
+            break;
+        }
+    }
+    digits.iter().rev().collect()
+}
+
+// spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the cwd slug is the harness's encoder: every
+// UTF-16 unit outside ASCII `[A-Za-z0-9]` maps to `-`, and past the cap the slug is cut and
+// suffixed with `-` and the base-36 absolute value of the raw path's 32-bit hash
+pub(crate) fn slug(path: &str) -> String {
+    let units: Vec<u16> = path.encode_utf16().collect();
+    let folded: String = units
+        .iter()
+        .map(|&u| match u8::try_from(u) {
+            Ok(b) if b.is_ascii_alphanumeric() => char::from(b),
+            _ => '-',
+        })
+        .collect();
+    if units.len() <= SLUG_CAP {
+        return folded;
+    }
+    format!("{}-{}", &folded[..SLUG_CAP], base36(harness_hash(&units).unsigned_abs()))
 }
 
 // spec: lifecycle-kit/SPEC.md §bin/session-id.sh — source 3's sessions dir: the override, else
@@ -229,7 +261,26 @@ pub fn every_transcript(i: &Inputs) -> Vec<String> {
 
 #[cfg(test)]
 mod tests {
-    use super::key;
+    use super::{key, slug};
+
+    // spec: lifecycle-kit/SPEC.md §bin/session-id.sh — each case is a spelling the harness was seen
+    // to create: the Linux root from an unauthenticated run, the Windows one from the CI probe of
+    // a checkout at `D:\a\checkwright\checkwright`
+    #[test]
+    fn the_slug_is_the_harness_encoder() {
+        assert_eq!(slug("/srv/my_proj dir.x"), "-srv-my-proj-dir-x");
+        assert_eq!(slug("D:/a/checkwright/checkwright"), "D--a-checkwright-checkwright");
+        assert_eq!(slug(r"D:\a\checkwright\checkwright"), "D--a-checkwright-checkwright");
+        assert_eq!(slug("/x/\u{1F600}y"), "-x---y");
+    }
+
+    // spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the suffix is the harness's own expression,
+    // evaluated with `node -e 'function fQ(t){let e=0;for(let n=0;n<t.length;n++)e=(e<<5)-e+t.charCodeAt(n)|0;return e}console.log(Math.abs(fQ("/"+"a".repeat(259))).toString(36))'`
+    #[test]
+    fn a_slug_past_the_cap_is_cut_and_hash_suffixed() {
+        let path = format!("/{}", "a".repeat(259));
+        assert_eq!(slug(&path), format!("-{}-z255qm", "a".repeat(199)));
+    }
 
     // spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the basename under either separator, so a
     // Windows transcript path keys by its file name rather than its drive

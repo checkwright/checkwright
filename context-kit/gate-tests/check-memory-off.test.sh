@@ -60,9 +60,33 @@ check_case "local-override-red" 1 "local settings override" '{"autoMemoryEnabled
 # check-settings-pins' absent-pin refusal: a pinned key explicitly set to null sets no override
 check_case "local-null-clean" 0 "MEMORY-OFF: clean" '{"autoMemoryEnabled": null}'
 
+# spec: context-kit/SPEC.md §Layout and configuration — the cross-substrate agreement: under the
+# derived default the gate and the arm the hook's step 5 reads resolve one dir, the harness's fold
+# of git's toplevel, which the sed below spells independently of the binary
+REPO="$SANDBOX/my_proj dir.x"
+git init -q "$REPO"
+H="$SANDBOX/home"
+H_NATIVE="$(cygpath -m "$H" 2>/dev/null || printf '%s' "$H")"
+mem="$H/.claude/projects/$(git -C "$REPO" rev-parse --show-toplevel | sed 's/[^a-zA-Z0-9]/-/g')/memory"
+mkdir -p "$mem"
+printf 'x\n' >"$mem/note.md"
+derived_env() {
+    gate_env HOME="$H_NATIVE" USERPROFILE="$H_NATIVE" CLAUDE_CONFIG_DIR= CONTEXT_KIT_MEMORY_DIRS= \
+        CONTEXT_KIT_SETTINGS_FILE="$SANDBOX/settings.json" \
+        CONTEXT_KIT_SETTINGS_PINS="$SANDBOX/settings-pins.conf"
+}
+out="$(cd "$REPO" && derived_env && gate_run check-memory-off "$DIR/checks" 2>&1)"; rc=$?
+if [[ "$rc" -ne 1 ]] || ! grep -qF "memory dir holds content" <<<"$out"; then
+    echo "  FAIL [derived-dir-red]: want exit 1 naming the polluted dir, got $rc -- $out"; fails=$((fails + 1))
+fi
+printed="$(cd "$REPO" && derived_env && gate_arm_run --emit memory-dirs 2>&1)"
+if [[ "$(grep -c . <<<"$printed")" -ne 1 || ! "$printed" -ef "$mem" ]]; then
+    echo "  FAIL [arm-agrees]: --emit memory-dirs printed '$printed', want the one dir $mem"; fails=$((fails + 1))
+fi
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-memory-off.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-memory-off.test.sh: clean (no-local clean, unrelated-local clean, pinned-key override red, explicit-null clean, 4 cases)"
+echo "check-memory-off.test.sh: clean (no-local clean, unrelated-local clean, pinned-key override red, explicit-null clean, derived dir red with the arm agreeing, 5 cases)"
 exit 0

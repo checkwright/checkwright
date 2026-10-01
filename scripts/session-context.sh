@@ -5,7 +5,6 @@
 set -uo pipefail
 
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null || exit 0
-REPO_ROOT="$(pwd -P)"
 
 NATIVE_BIN=""                                     # the gate binary: the queue surface, the index arms and the verdict
 # shellcheck source=/dev/null
@@ -109,16 +108,16 @@ if [[ "$role" != lead ]]; then
     esac
 fi
 
-# spec: gate-sdk/SPEC.md §The path-dialect contract — this fold compares against a harness-owned directory name, the one place the per-substrate dialects would meet; which spelling the harness uses on Windows is not decidable from this tree, so the producer above is normalized like any other and this open question is recorded rather than guessed (gap filed)
-MEM_DIRS="${CONTEXT_KIT_MEMORY_DIRS:-$HOME/.claude/projects/$(printf '%s' "$REPO_ROOT" | tr '/.' '-')/memory}"
-for _md in $MEM_DIRS; do
-    [[ -d "$_md" ]] || continue
-    if find "$_md" -type f ! -name .gitkeep -print -quit 2>/dev/null | grep -q .; then
-        echo "⚠ harness memory dir holds content ($_md) — durable facts belong in a tracked surface (context-kit/SPEC.md §The memory-off doctrine), not per-session memory."
-        echo
-        break
-    fi
-done
+if [[ -x "$NATIVE_BIN" ]]; then
+    while IFS= read -r _md; do
+        [[ -d "$_md" ]] || continue
+        if find "$_md" -type f ! -name .gitkeep -print -quit 2>/dev/null | grep -q .; then
+            echo "⚠ harness memory dir holds content ($_md) — durable facts belong in a tracked surface (context-kit/SPEC.md §The memory-off doctrine), not per-session memory."
+            echo
+            break
+        fi
+    done < <("$NATIVE_BIN" --emit memory-dirs 2>/dev/null)
+fi
 
 TMP_DIR="${GATE_SDK_TMP_DIR:-.tmp}"
 if [[ -d "$TMP_DIR" ]]; then
