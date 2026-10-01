@@ -20,6 +20,18 @@
 
 **Selected 2026-10-01 for lifecycle-queue-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it beside [lifecycle-queue-value-audit](#lifecycle-queue-value-audit)'s verdict on the same gate.
 
+### user-facing-delta-unsurfaced
+
+[spec: SPEC-user-facing-delta.md]
+
+a user-facing choice can ride a `{mechanical}` delta and reach no operator: the payload-withholding amendment's delta 11 hid the SPEC mirrors from the site nav's kit suffix, and `nav-spec-suffix-restore` reversed it at companion-adoption-landing's build. The work-class tag measures the execution judgment a delta demands (lifecycle-kit/templates/stages/spec.md, Label every delta), not whether it changes what a reader meets.
+
+**Deliverable:** a spec-stage rule that a delta changing user-facing semantics, the site's reach or labels included, is surfaced in the amendment's rulings, and align's check of it; or a boundary note refusing both.
+
+**Cost while deferred:** the next such choice lands unreviewed and costs a later reversal unit. Filed 2026-09-29 to the gap inbox by companion-adoption-landing's build; promoted at its close: →fix fails because a stage rule is new kit mechanism, →forward because no ruling is owed. Re-verified: spec.md's Label every delta defines the tag by execution judgment. Owner lookup: `work-class`, `user-facing`, `mechanical` in this file — the icebox's amendment-work-class-label-placement, DISTINCT (where the tag sits, not what it misses); owner lifecycle-kit/templates/stages/spec.md.
+
+**Selected 2026-10-01 for lifecycle-queue-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, the rule or its refusal.
+
 ## Technical Debt
 
 ### lifecycle-queue-value-audit
@@ -569,18 +581,6 @@ the consult inbox takes more than the operator's model of consult. Operator dire
 **Cost while deferred:** each misfiled item costs a consultation to route it back out. Filed 2026-09-29 to the gap inbox by companion-adoption-landing's lead; promoted at its close: →fix fails because narrowing a producer set is a contract change to a SPEC section, →forward because the direction is given and filing it to consult is the misfile it names. Re-verified: §The consult inbox's Producers paragraph and opening list. Owner lookup: `consult inbox`, `intake` in this file — `consult-tier-declaration`, DISTINCT (the tier consult runs at, not what enters it); owner lifecycle-kit/SPEC.md §The consult inbox.
 
 **Selected 2026-10-01 for lifecycle-queue-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it within the 2026-09-29 and 09-30 directions above; whether a lead-dispatched consultation still earns a dispatch is escalated, not invented.
-
-### user-facing-delta-unsurfaced
-
-[cost: event/low] [surface: lifecycle-kit]
-
-a user-facing choice can ride a `{mechanical}` delta and reach no operator: the payload-withholding amendment's delta 11 hid the SPEC mirrors from the site nav's kit suffix, and `nav-spec-suffix-restore` reversed it at companion-adoption-landing's build. The work-class tag measures the execution judgment a delta demands (lifecycle-kit/templates/stages/spec.md, Label every delta), not whether it changes what a reader meets.
-
-**Deliverable:** a spec-stage rule that a delta changing user-facing semantics, the site's reach or labels included, is surfaced in the amendment's rulings, and align's check of it; or a boundary note refusing both.
-
-**Cost while deferred:** the next such choice lands unreviewed and costs a later reversal unit. Filed 2026-09-29 to the gap inbox by companion-adoption-landing's build; promoted at its close: →fix fails because a stage rule is new kit mechanism, →forward because no ruling is owed. Re-verified: spec.md's Label every delta defines the tag by execution judgment. Owner lookup: `work-class`, `user-facing`, `mechanical` in this file — the icebox's amendment-work-class-label-placement, DISTINCT (where the tag sits, not what it misses); owner lifecycle-kit/templates/stages/spec.md.
-
-**Selected 2026-10-01 for lifecycle-queue-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, the rule or its refusal.
 
 ### docs-chrome-page-repeat
 
