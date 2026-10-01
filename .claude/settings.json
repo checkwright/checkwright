@@ -94,7 +94,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash gate-sdk/bin/run-gates.sh --statusline"
+    "command": "bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --statusline"
   },
   "hooks": {
     "SessionStart": [
@@ -102,7 +102,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash scripts/session-context.sh"
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/scripts/session-context.sh\""
           }
         ]
       }

@@ -204,7 +204,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 
 | kit | surface |
 | --- | --- |
-| (consumer) | scripts/session-context.sh |
+| (consumer) | "${CLAUDE_PROJECT_DIR}/scripts/session-context.sh" |
 
 ## Validate suites
 
