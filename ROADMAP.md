@@ -23,11 +23,11 @@ Adoption evidence, mostly. A rung promotes when someone hits the friction it des
 <!-- roadmap:begin -->
 ### now
 
+- [gate-customer-value-audit](TASK-QUEUE.md#gate-customer-value-audit) *(adoption)* — Every installed gate useful to its adopter and configurable, and no gate shipped that serves only Checkwright's own development.
 - [heterogeneous-agent-delegation](TASK-QUEUE.md#heterogeneous-agent-delegation) *(ecosystem)* — Dispatch a stage to any vendor's coding agent, gated identically.
 - [companion-toolkit-profile](TASK-QUEUE.md#companion-toolkit-profile) *(ecosystem)* — Gate a tree whose specs another toolkit's workflow wrote.
 - [design-partner-preview](TASK-QUEUE.md#design-partner-preview) *(adoption)* — A small observed preview measuring first green, first useful red and retention on real installs.
 - [spec-brevity-residue](TASK-QUEUE.md#spec-brevity-residue) *(adoption)* — Kit SPECs that state their contracts without run-ons, history or restatement.
-- [gate-customer-value-audit](TASK-QUEUE.md#gate-customer-value-audit) *(adoption)* — Every installed gate useful to its adopter and configurable, and no gate shipped that serves only Checkwright's own development.
 
 ### next
 

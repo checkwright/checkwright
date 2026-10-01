@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: gate-sdk-value-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,34 @@
 ## New Features
 
 ## Technical Debt
+
+### gate-customer-value-audit
+
+[roadmap: now/adoption] [roadmap-summary: Every installed gate useful to its adopter and configurable, and no gate shipped that serves only Checkwright's own development.]
+
+nothing asks whether each shipped gate is useful and configurable for a customer. Operator direction, 2026-09-28 (lead session): "offer customers useful and configurable gates"; a gate benefiting only Checkwright's own development, such as a GitHub Pages check that is not configurable, "should either be abstracted or not be shipped and tested on customer OSes". The provenance seam bars project content from kits, but customer value is another question, and the install disposition (zero-config, on-surface, never) decides registration, not whether a gate belongs in the payload. Horizon `now` since guard-kit-steering's close, on the operator direction of 2026-09-29, lead-relayed (not a ruling): `now` if the next scope takes it, else at the first close landing a slice; the per-kit slices stay off the roadmap.
+
+**Deliverable:** an audit over every shipped gate recording customer value and configurability, each gate then made generic, kept out of the payload and the customer-OS legs, or kept; site-kit's GitHub Pages gates first.
+
+**Cost while deferred:** every push runs gates of no customer value on customer-OS legs, and every adopter installs them. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; promoted 2026-09-28 at the next iteration's scope: →fix fails because the audit is unsized. Owner lookup: `customer value`, `payload` in this file — [consumer-value-literal-gate](#consumer-value-literal-gate), DISTINCT (a hard-coded value inside a gate, not the gate's place in the payload). Owner gate-sdk/SPEC.md §Consumer payload.
+
+**First slice landed 2026-09-29 at native-hook-customer-legs, operator direction lead-relayed (not a /consult ruling):** the payload rule at gate-sdk/SPEC.md §Consumer payload, and site-kit audited against it.
+
+Audited: site-kit, 5 gates (5 kept, 2 made generic, 0 withheld); guard-kit, 1 gate (1 kept, 0 made generic, 0 withheld); delegation-kit, 3 gates (2 kept, 0 made generic, 1 withheld); canon-kit, 37 gates (37 kept, 7 made generic, 0 withheld); context-kit, 6 gates (5 kept, 0 made generic, 1 withheld); evidence-kit, 4 gates (4 kept, 1 made generic, 0 withheld); doctrine-kit, 1 gate (1 kept, 0 made generic, 0 withheld); lifecycle-kit, 15 gates (15 kept, 0 made generic, 0 withheld); queue-kit, 11 gates (11 kept, 0 made generic, 0 withheld); gate-sdk's 43 shipped gates remain, the one kit unaudited under gate-sdk/SPEC.md §Consumer payload's rule.
+
+Slices left at scope, each on an operator direction lead-relayed (not a /consult ruling), and landed in that iteration's build: guard-kit's 2026-09-30 at guard-kit-steering as `guard-kit-value-audit`; delegation-kit's 2026-09-30 at delegation-tier-binding as `delegation-kit-value-audit`; canon-kit's 2026-09-30 at canon-kit-value-pass as `canon-kit-value-audit`; context-kit's, evidence-kit's and doctrine-kit's 2026-10-01 at context-kit-value-pass as `small-kit-value-audit`; lifecycle-kit's and queue-kit's 2026-10-01 at lifecycle-queue-value-pass as `lifecycle-queue-value-audit`.
+
+**A precondition of [companion-toolkit-profile](#companion-toolkit-profile)'s submission, operator direction 2026-09-29, lead-relayed (not a ruling),** beside [companion-install-tier](#companion-install-tier), whose exposed kits this audit's verdicts decide, so those kits are its natural first slices.
+
+**gate-sdk's slice, the last, selected 2026-10-01 for gate-sdk-value-pass, operator direction lead-relayed (not a ruling):** the entry itself promoted, its deliverable gate-sdk's 43 gates and the tally completed. It precedes [consumer-value-literal-gate](#consumer-value-literal-gate), whose literal census its made-generic verdicts shrink, and its verdict on `check-action-run-shell` reads the iceboxed [action-run-shell-scan-predicate](#action-run-shell-scan-predicate), which a configurable verdict moots.
+
+### guard-kit-tool-brevity
+
+guard-kit/SPEC.md's tool sections, §scratch-run through §The close-stage triage step, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement), about 12.9k of the file's 50.7k words by awk count; guard-kit's preamble, §The generic ruleset, §Layout and configuration and §Testing stay on the parent, the ruleset until the deferred guard-kit rule entries that rewrite it land.
+
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. It rides the batch after [hook-emit-remedy-door](#hook-emit-remedy-door), whose door-roots widening edits §check-door-binding.
+
+**Cost while deferred:** paid by every session and adopter that reads an unpassed guard-kit tool section. Filed 2026-10-01 as a split at gate-sdk-value-pass' scope. Part of the operator's selection of set A+, direction 2026-10-01, lead-relayed (not a ruling).
 
 ## Deferred
 
@@ -310,6 +338,8 @@ Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-ki
 
 Each on an operator direction lead-relayed (not a /consult ruling), the kit's other sections remaining: drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections (its preamble remains), delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope, landing as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope, landing as `queue-kit-gate-brevity`.
 
+guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope as [guard-kit-tool-brevity](#guard-kit-tool-brevity).
+
 ### tarball-build-attestation
 
 [cost: event/high] [surface: installer] [recurrence: 2026-09-25]
@@ -412,6 +442,8 @@ nothing enforces gate-sdk/SPEC.md §The port-candidate criteria's rule that ever
 
 **Cost while deferred:** each literal publishes this repo's configuration as every adopter's mechanism, and instances surface only by chance. Filed 2026-09-27 to the gap inbox by platform-prerequisite-floors' lead; promoted at its close: →fix fails because the gate is new mechanism over an unsized corpus. Re-verified: the rule's sentence appears in gate-sdk/SPEC.md and its site mirror alone, with no gate section enforcing it. Owner lookup: `literal`, `hardcod` in this file's headings — [knob-default-accessor-singularity](#knob-default-accessor-singularity), DISTINCT (it bars re-spelling an existing knob's default; this bars a consumer value with no knob); owner gate-sdk/SPEC.md §The port-candidate criteria.
 
+**Selected 2026-10-01 for gate-sdk-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it; its census runs after [gate-customer-value-audit](#gate-customer-value-audit)'s gate-sdk verdicts, which remove literals by making gates generic.
+
 ### site-video-poster-rule
 
 [cost: event/low] [surface: site-kit]
@@ -451,32 +483,6 @@ the operator states that verification and workflow are fully decoupled, each shi
 **Deliverable:** the leg's oracles runnable locally before a package change commits, or the reader refusing what a YAML plain scalar cannot carry, with a `bad/` fixture holding the `: ` case.
 
 **Cost while deferred:** a front-matter slip is caught only by a push, which spends a hotfix from the budget. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' close; promoted 2026-09-28 at the next iteration's scope: →fix fails because a stricter reader changes a shipped gate's verdict. Re-verified: the reader above, and `.github/workflows/gates.yml` installs `skills-ref` in CI only. Owner lookup: `front matter`, `skills-ref`, `yaml` in this file — only the icebox's template-copy-parity-yaml-widening, DISTINCT (template copies); owner plugin/SPEC.md §check-plugin-parity.
-
-### gate-customer-value-audit
-
-[roadmap: now/adoption] [cost: iteration/high] [surface: gate-sdk] [roadmap-summary: Every installed gate useful to its adopter and configurable, and no gate shipped that serves only Checkwright's own development.]
-
-nothing asks whether each shipped gate is useful and configurable for a customer. Operator direction, 2026-09-28 (lead session): "offer customers useful and configurable gates"; a gate benefiting only Checkwright's own development, such as a GitHub Pages check that is not configurable, "should either be abstracted or not be shipped and tested on customer OSes". The provenance seam bars project content from kits, but customer value is another question, and the install disposition (zero-config, on-surface, never) decides registration, not whether a gate belongs in the payload. Horizon `now` since guard-kit-steering's close, on the operator direction of 2026-09-29, lead-relayed (not a ruling): `now` if the next scope takes it, else at the first close landing a slice; the per-kit slices stay off the roadmap.
-
-**Deliverable:** an audit over every shipped gate recording customer value and configurability, each gate then made generic, kept out of the payload and the customer-OS legs, or kept; site-kit's GitHub Pages gates first.
-
-**Cost while deferred:** every push runs gates of no customer value on customer-OS legs, and every adopter installs them. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; promoted 2026-09-28 at the next iteration's scope: →fix fails because the audit is unsized. Owner lookup: `customer value`, `payload` in this file — [consumer-value-literal-gate](#consumer-value-literal-gate), DISTINCT (a hard-coded value inside a gate, not the gate's place in the payload). Owner gate-sdk/SPEC.md §Consumer payload.
-
-**First slice landed 2026-09-29 at native-hook-customer-legs, operator direction lead-relayed (not a /consult ruling):** the payload rule at gate-sdk/SPEC.md §Consumer payload, and site-kit audited against it.
-
-Audited: site-kit, 5 gates (5 kept, 2 made generic, 0 withheld); guard-kit, 1 gate (1 kept, 0 made generic, 0 withheld); delegation-kit, 3 gates (2 kept, 0 made generic, 1 withheld); canon-kit, 37 gates (37 kept, 7 made generic, 0 withheld); context-kit, 6 gates (5 kept, 0 made generic, 1 withheld); evidence-kit, 4 gates (4 kept, 1 made generic, 0 withheld); doctrine-kit, 1 gate (1 kept, 0 made generic, 0 withheld); lifecycle-kit, 15 gates (15 kept, 0 made generic, 0 withheld); queue-kit, 11 gates (11 kept, 0 made generic, 0 withheld); gate-sdk's 43 shipped gates remain, the one kit unaudited under gate-sdk/SPEC.md §Consumer payload's rule.
-
-guard-kit's slice left 2026-09-30 at guard-kit-steering's scope, on an operator direction lead-relayed (not a /consult ruling), as `guard-kit-value-audit`, and landed in that iteration's build.
-
-delegation-kit's slice left 2026-09-30 at delegation-tier-binding's scope, on an operator direction lead-relayed (not a /consult ruling), as `delegation-kit-value-audit`, and landed in that iteration's build.
-
-**A precondition of [companion-toolkit-profile](#companion-toolkit-profile)'s submission, operator direction 2026-09-29, lead-relayed (not a ruling),** beside [companion-install-tier](#companion-install-tier), whose exposed kits this audit's verdicts decide, so those kits are its natural first slices.
-
-canon-kit's slice left 2026-09-30 at canon-kit-value-pass' scope, on an operator direction lead-relayed (not a /consult ruling), as `canon-kit-value-audit`, and landed in that iteration's build.
-
-context-kit's, evidence-kit's and doctrine-kit's slice left 2026-10-01 at context-kit-value-pass' scope, on an operator direction lead-relayed (not a /consult ruling), as `small-kit-value-audit`, and landed in that iteration's build.
-
-lifecycle-kit's and queue-kit's slice left 2026-10-01 at lifecycle-queue-value-pass' scope, on an operator direction lead-relayed (not a /consult ruling), as `lifecycle-queue-value-audit`, and landed in that iteration's build.
 
 ### compiled-consumer-smoke-driver
 
@@ -602,7 +608,9 @@ hook-member and emit-arm output strings print the bash front end as a remedy to 
 
 **Deliverable:** each string classified as a remedy to run or a description of the front end; each remedy printed through the gate module's door spelling; `GUARD_KIT_DOOR_ROOTS` widened to the hook and emit trees so `check-door-binding` assertion C holds them.
 
-**Cost while deferred:** an adopter without bash is told to run a command it cannot, at every refusal those members print. Filed 2026-09-30 to the gap inbox at guard-kit-steering's spec; promoted at its close: →fix fails because the classification spans forty files, →forward because no ruling is owed. Re-verified: 40 files under `native/src` outside `gates` name `run-gates`, and the four named lines print it. Not a recurrence of `gate-output-contributor-door`, which is done and scoped its corpus to the gate modules. Owner lookup: `usage line`, `front end`, `door` in this file — none; owner guard-kit/SPEC.md §check-door-binding.
+**Cost while deferred:** an adopter without bash is told to run a command it cannot, at every refusal those members print. Filed 2026-09-30 to the gap inbox at guard-kit-steering's spec; promoted at its close: →fix fails because the classification spans forty files, →forward because no ruling is owed. Re-verified: 43 files under `native/src` outside `gates` name `run-gates` (40 at filing, re-counted at gate-sdk-value-pass' scope), and the four named lines print it. Not a recurrence of `gate-output-contributor-door`, which is done and scoped its corpus to the gate modules. Owner lookup: `usage line`, `front end`, `door` in this file — none; owner guard-kit/SPEC.md §check-door-binding.
+
+**Selected 2026-10-01 for gate-sdk-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it; it lands before [guard-kit-tool-brevity](#guard-kit-tool-brevity) passes §check-door-binding.
 
 ### write-side-steering
 
@@ -637,6 +645,8 @@ guard-kit's bash reader cuts its compound split at a backslash-escaped `;`, so `
 **Inferred, not run:** how the harness's permission matcher splits at `\;`, which the guard's split models.
 
 **Cost while deferred:** a mis-split can attribute words to the wrong segment in any rule. Filed 2026-09-30 to the gap inbox by `side-effect-free-read-arms`' build, which worked around it in one rule; promoted at guard-kit-steering's close: →fix fails because the split is shared by every rule and the harness's behaviour is unmeasured, →forward because no ruling is owed. Re-verified: `split_on` in native/src/guard/bash.rs matches `;` bytewise with no escape test. Owner lookup: `backslash`, `find_exec`, `compound split` in this file — only `harness-project-dir-fold-dialect-unresolved`'s backslash-spelled root, DISTINCT; owner guard-kit/SPEC.md §The reader and its views.
+
+**Selected 2026-10-01 for gate-sdk-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, a feature because §The generic ruleset's `find_exec` bullet states the cut at `\;`. It precedes [write-side-steering](#write-side-steering) and [compound-read-classifier-reach](#compound-read-classifier-reach), whose rules read its segments, and the ruleset's brevity slice, which waits on all three.
 
 ### kit-prose-harness-coupling
 
