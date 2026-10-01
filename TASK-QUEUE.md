@@ -22,6 +22,18 @@ Measured at spec: the harness's matcher does not split at `\;` (the amendment re
 
 **Selected 2026-10-01 for gate-sdk-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, a feature because §The generic ruleset's `find_exec` bullet states the cut at `\;`. It precedes [write-side-steering](#write-side-steering) and [compound-read-classifier-reach](#compound-read-classifier-reach), whose rules read its segments, and the ruleset's brevity slice, which waits on all three.
 
+### hook-emit-remedy-door
+
+[spec: SPEC-hook-emit-door.md]
+
+hook-member and emit-arm output strings print the bash front end as a remedy to run, outside the `native/src/gates` corpus `gate-output-contributor-door` moved to the binary door: the workflow-state hook's two `--enter-stage` remedies, the usage lines of the usage poller and the usage verdict, and an unclassified set across `native/src/emit`. An adopter meets them where bash may be absent.
+
+**Deliverable:** each string classified as a remedy to run or a description of the front end; each remedy printed through the gate module's door spelling; `GUARD_KIT_DOOR_ROOTS` widened to the hook and emit trees so `check-door-binding` assertion C holds them.
+
+**Cost while deferred:** an adopter without bash is told to run a command it cannot, at every refusal those members print. Filed 2026-09-30 to the gap inbox at guard-kit-steering's spec; promoted at its close: →fix fails because the classification spans forty files, →forward because no ruling is owed. Re-verified: 43 files under `native/src` outside `gates` name `run-gates` (40 at filing, re-counted at gate-sdk-value-pass' scope), and the four named lines print it. Not a recurrence of `gate-output-contributor-door`, which is done and scoped its corpus to the gate modules. Owner lookup: `usage line`, `front end`, `door` in this file — none; owner guard-kit/SPEC.md §check-door-binding.
+
+**Selected 2026-10-01 for gate-sdk-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it; it lands before [guard-kit-tool-brevity](#guard-kit-tool-brevity) passes §check-door-binding.
+
 ## Technical Debt
 
 ### gate-customer-value-audit
@@ -613,18 +625,6 @@ the front-door rehearsal belongs in the methodology, operator direction 2026-09-
 **Deliverable:** invariant B reads a gate-binary arm the page advertises outside a route, under the same pending admission, with a `bad/` fixture holding the prose form; or a boundary note keeping the limit.
 
 **Cost while deferred:** a front-door page can advertise an arm the installed release refuses, unseen until an adopter runs it. Filed 2026-09-30 to the gap inbox at preview-readiness' close, where `--measure-commit` landed after v0.30.0 and a `deferred:v0.31.0` probe line left the gate green; promoted 2026-09-30 at the next iteration's scope: →fix fails because widening a shipped gate's read is new mechanism. Re-verified: docs/install.md advertises both arms in prose, and v0.31.0 carries `--measure-commit`, so the instance is discharged and the class stands. Owner lookup: `front-door-verbs`, `route` in this file — [front-door-flag-operand](#front-door-flag-operand), DISTINCT (a flag's value after a route, not an arm outside one); owner installer/SPEC.md §The front door's verbs.
-
-### hook-emit-remedy-door
-
-[cost: event/high] [surface: guard-kit]
-
-hook-member and emit-arm output strings print the bash front end as a remedy to run, outside the `native/src/gates` corpus `gate-output-contributor-door` moved to the binary door: the workflow-state hook's two `--enter-stage` remedies, the usage lines of the usage poller and the usage verdict, and an unclassified set across `native/src/emit`. An adopter meets them where bash may be absent.
-
-**Deliverable:** each string classified as a remedy to run or a description of the front end; each remedy printed through the gate module's door spelling; `GUARD_KIT_DOOR_ROOTS` widened to the hook and emit trees so `check-door-binding` assertion C holds them.
-
-**Cost while deferred:** an adopter without bash is told to run a command it cannot, at every refusal those members print. Filed 2026-09-30 to the gap inbox at guard-kit-steering's spec; promoted at its close: →fix fails because the classification spans forty files, →forward because no ruling is owed. Re-verified: 43 files under `native/src` outside `gates` name `run-gates` (40 at filing, re-counted at gate-sdk-value-pass' scope), and the four named lines print it. Not a recurrence of `gate-output-contributor-door`, which is done and scoped its corpus to the gate modules. Owner lookup: `usage line`, `front end`, `door` in this file — none; owner guard-kit/SPEC.md §check-door-binding.
-
-**Selected 2026-10-01 for gate-sdk-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it; it lands before [guard-kit-tool-brevity](#guard-kit-tool-brevity) passes §check-door-binding.
 
 ### write-side-steering
 
