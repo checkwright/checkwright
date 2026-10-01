@@ -70,6 +70,18 @@ the harness project-dir derivation `check-memory-off` and its two shell twins sh
 
 **Push need (2026-10-01, inside the budget):** one mid-iteration push carrying the Windows probe, whose run is read before build writes the fold; the closing push is the second of two.
 
+### intake-routing-test
+
+[spec: SPEC-intake-routing.md]
+
+no guidance routes a mid-iteration operator request into the current iteration. doctrine-kit/DOCTRINE.md rule 11 (Scope-gated intake) names two entries, a Deferred filing through scope and an operator-ruled hotfix. Close's gap-inbox drain tries →fix first, a third entry rule 11 does not name, and lifecycle-kit/templates/lead.md has no route for an operator's "add X to this iteration". Observed 2026-09-28: a lead offered close's drain for a copy change, then on the operator's "add to this iteration" switched without a stated reason to an unsanctioned build batch writing its own queue entry, and the operator steered it back.
+
+**Deliverable:** a routing test over {defer to scope, hotfix, gap fixed at close's drain, refuse to the next iteration} in the lead template, and rule 11 naming the drain route.
+
+**Cost while deferred:** a correct route is abandoned on generic operator wording, each time a lead meets one. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' lead; promoted at its close: →fix fails because rule 11 itself makes amending the doctrine a scoped unit. Re-verified: rule 11 names the two entries and no other; lead.md carries no intake route. Owner lookup: `intake`, `Scope-gated`, `hotfix` in this file — `hotfix-agent-definition`, DISTINCT (the hotfix path's agent type, not the routing); owner doctrine-kit/DOCTRINE.md, with lifecycle-kit/templates/lead.md.
+
+**Selected 2026-10-01 for context-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, its route set naming where [consult-intake-narrowing](#consult-intake-narrowing) would send the classes it re-routes.
+
 ## Technical Debt
 
 ### small-kit-value-audit
@@ -481,18 +493,6 @@ the site has no rule for video, and the operator wants short intro and demo vide
 **Deliverable:** a page-authoring rule in docs/site-architecture.md admitting only the poster-link form, a gate reding an `<iframe>` or a third-party `src=` in docs pages, and first homes on docs/spec-toolkits.md and the front door.
 
 **Cost while deferred:** a video lands with no rule, and an embed would add the site's first third-party request. Filed 2026-09-27 to the gap inbox by companion-catalog-extension's lead; promoted 2026-09-27 at its close: →fix fails because the gate is new mechanism. Re-verified: `docs/_layouts/default.html` loads only local assets, and `check-docs-render-fidelity` lists `iframe` as a known tag without refusing it. Owner lookup: `video`, `iframe`, `YouTube` in this file — none; owner docs/site-architecture.md §Page-authoring rules.
-
-### intake-routing-test
-
-[cost: event/low] [surface: doctrine-kit]
-
-no guidance routes a mid-iteration operator request into the current iteration. doctrine-kit/DOCTRINE.md rule 11 (Scope-gated intake) names two entries, a Deferred filing through scope and an operator-ruled hotfix. Close's gap-inbox drain tries →fix first, a third entry rule 11 does not name, and lifecycle-kit/templates/lead.md has no route for an operator's "add X to this iteration". Observed 2026-09-28: a lead offered close's drain for a copy change, then on the operator's "add to this iteration" switched without a stated reason to an unsanctioned build batch writing its own queue entry, and the operator steered it back.
-
-**Deliverable:** a routing test over {defer to scope, hotfix, gap fixed at close's drain, refuse to the next iteration} in the lead template, and rule 11 naming the drain route.
-
-**Cost while deferred:** a correct route is abandoned on generic operator wording, each time a lead meets one. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' lead; promoted at its close: →fix fails because rule 11 itself makes amending the doctrine a scoped unit. Re-verified: rule 11 names the two entries and no other; lead.md carries no intake route. Owner lookup: `intake`, `Scope-gated`, `hotfix` in this file — `hotfix-agent-definition`, DISTINCT (the hotfix path's agent type, not the routing); owner doctrine-kit/DOCTRINE.md, with lifecycle-kit/templates/lead.md.
-
-**Selected 2026-10-01 for context-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, its route set naming where [consult-intake-narrowing](#consult-intake-narrowing) would send the classes it re-routes.
 
 ### plugin-harness-reach
 
