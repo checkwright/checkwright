@@ -122,7 +122,7 @@ Under the split posture the lead **routes** an escalation before answering it. A
 
 ## Mid-iteration intake
 
-**Route an operator's mid-iteration request by its shape, never by its wording.** Take the first route that fits. "Add it to this iteration" asks for a timing, which the routes already answer, and moves no request off its route.
+**Route an operator's mid-iteration request by its shape, never by its wording.** Take the first route that fits. "Add it to this iteration" moves no request off its route.
 
 1. **A question rather than work** — answer it, or relay it to the operator as you relay an escalation (§The escalation protocol).
 2. **An impacting failure** — propose the hotfix with its cost against the iteration's (doctrine-kit/DOCTRINE.md, Scope-gated intake). On the operator's ruling, dispatch it as §The escalation protocol says; without one, take the first later route that fits.

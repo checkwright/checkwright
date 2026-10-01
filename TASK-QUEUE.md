@@ -692,7 +692,7 @@ RELEASING.md's numbered procedure steps are cited by position, the shape doctrin
 
 **Inferred, not run:** the harness's canonical-root keying, read from its bundle; an unauthenticated run writes no memory dir, so the key was never observed.
 
-**Cost while deferred:** a worktree session's memory could accrete where `check-memory-off` never scans. Filed 2026-10-01 to the gap inbox at context-kit-value-pass' spec; promoted 2026-10-01 at its close: →fix fails because the harness behaviour is unobserved and the probe needs an authenticated session, →forward because no ruling is owed. Re-verified: the gate's default reads `walk::toplevel_opt`, which runs `git rev-parse --show-toplevel`. Owner lookup: `memory`, `worktree`, `canonical` in this file — none; owner context-kit/SPEC.md §check-memory-off.
+**Cost while deferred:** a worktree session's memory could accrete where `check-memory-off` never scans. Filed 2026-10-01 to the gap inbox at context-kit-value-pass' spec; promoted 2026-10-01 at its close: →fix fails because the harness behaviour is unobserved and the probe needs an authenticated session, →forward because no ruling is owed. Re-verified: the gate's default derives from the repository toplevel (`git rev-parse --show-toplevel`). Owner lookup: `memory`, `worktree`, `canonical` in this file — none; owner context-kit/SPEC.md §check-memory-off.
 
 ### footprint-arm-publisher-page
 

@@ -82,12 +82,12 @@ Steps, in order:
 - **Match.** The session is `lead` only when the marker's id equals the 8-char prefix of **its own payload's session id**. It is read from the hook payload, never from `CLAUDE_CODE_SESSION_ID`, because a subagent is handed its *parent's* id in that variable. The named assumption: were the harness to fire `SessionStart` in subagents, an env-var read would match every stage session to its lead's marker and invert the suppression onto its intended audience. A concurrent or later top-level session never bleeds, and a stale marker self-invalidates when the id rotates.
 - **One stdin read.** The payload arrives on stdin, consumable once, so this read is its sole consumer; a later payload-derived signal hoists that one read ahead of this guard, never adds a second. The guard is *stdin is not a TTY*, which a **manual** run inheriting an open pipe satisfies, so the read blocks: run the hook by hand with stdin from `/dev/null`.
 - **Why top-level scoping suffices.** `SessionStart` does not fire for Task-spawned subagents, so the hook fires only in leads and manual runs, and the identity match discriminates exactly those.
-- **Effect.** A `lead` session suppresses steps 4 and 8; everything else emits unchanged. With no signal the output is byte-identical to the signal-free hook, and the read is guarded like every step.
+- **Effect.** A `lead` session suppresses the stage-conditioned nudges and the craft-rule pointers; everything else emits unchanged. With no signal the output is byte-identical to the signal-free hook, and the read is guarded like every step.
 
 Accepted limits, not defects:
 
 - The startup fire precedes `/lead` by construction: one fire per lead session, against the per-compact and per-resume recurrence that is the actual waste.
-- The marker ages out with step 6's day-horizon sweep, degrading to absent-signal behavior.
+- The marker ages out with the scratch sweep's day horizon, degrading to absent-signal behavior.
 - The marker lives as long as the **lead session, not the iteration**, so a consumer boundary ritual wiping gitignored scratch must spare it; otherwise a lead outliving the boundary reverts to absent-signal behavior until it rewrites the marker.
 - The producer inherits `--emit-session-id`'s `CLAUDE_CODE_SESSION_ID` dependency. Unset, the newest-transcript fallback in a lead with live subagents returns an `agent-` prefix no payload matches, and the signal no-ops, costing a suppression and never a correctness property.
 
