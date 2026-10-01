@@ -17,7 +17,7 @@ The rule spans a queue-kit arm and lifecycle-kit's close template, so this amend
 
 ### (1) queue-kit ships the roadmap-lag arm
 
-The binary gains `--emit-roadmap-lag`, reached as `run-gates.sh --emit roadmap-lag [<queue-file>]`, in a new module `native/src/emit/roadmap_lag.rs` with its arm-table row in `native/src/emit/mod.rs`. {design-bearing} {user-facing: the entry's deliverable, the lag read's mechanical half on an arm} The row declares `QUEUE_KIT_QUEUE_FILE`, `QUEUE_KIT_ACTIVE_SECTIONS`, `QUEUE_KIT_DEFERRED_SECTION`, `QUEUE_KIT_ICEBOX_SECTION`, `QUEUE_KIT_DONE_SECTION` and `QUEUE_KIT_HORIZONS`. The arm reads the queue file and its history through `walk_history`, writes stdout only, and mutates nothing. Its contract is delta 2's section, and its unit tests cover the slice rule and the row rule over in-memory texts. `queue-kit/gate-tests/roadmap-lag.test.sh` builds a sandbox history in which:
+The binary gains `--emit-roadmap-lag`, reached as `run-gates.sh --emit roadmap-lag [<queue-file>]`, in a new module `native/src/emit/roadmap_lag.rs` with its arm-table row in `native/src/emit/mod.rs`. {design-bearing} {user-facing: the entry's deliverable, the lag read's mechanical half on an arm} **Not yet applied.** The row declares `QUEUE_KIT_QUEUE_FILE`, `QUEUE_KIT_ACTIVE_SECTIONS`, `QUEUE_KIT_DEFERRED_SECTION`, `QUEUE_KIT_ICEBOX_SECTION`, `QUEUE_KIT_DONE_SECTION` and `QUEUE_KIT_HORIZONS`. The arm reads the queue file and its history through `walk_history`, writes stdout only, and mutates nothing. Its contract is delta 2's section, and its unit tests cover the slice rule and the row rule over in-memory texts. `queue-kit/gate-tests/roadmap-lag.test.sh` builds a sandbox history in which:
 
 - a split child lands under a parent tagged with a later horizon, which prints a row;
 - one lands under an untagged parent, which prints a row with `-`;
@@ -44,7 +44,7 @@ queue-kit/SPEC.md gains a section after §check-roadmap-fresh. {design-bearing} 
 >
 > **Why a separate arm.** The roadmap arm's output is the page's body, which `check-roadmap-fresh` byte-compares. A lag report is a second grammar over a second input, the done section and the history walk, so it stands beside that arm and not inside it (§The queue-counts arm's refusal).
 >
-> **Honest limits.** A slice its parent records only in prose has no citation pair, and a reader finds it. Two entries citing each other for another reason read as a split. The row names the slice, so the reading session discards that case at a glance.
+> **Honest limits.** A slice its parent records only in prose has no citation pair, and a reader finds it. Two entries citing each other for another reason read as a split, and so does a split child the moot sweep retired rather than a landing. The row names the slice, so the reading session discards either case at a glance.
 
 Two passages elsewhere in queue-kit/SPEC.md take the arm:
 
@@ -55,7 +55,7 @@ The comment directive on `walk_history` in `native/src/queue.rs` names the third
 
 ### (3) Close's roadmap read runs the arm
 
-In lifecycle-kit/templates/stages/close.md, step 5, the sentence "Then read each `[roadmap:]` entry's recorded horizon condition, and re-tag one the range met in this stage's queue commit, regenerating the projection and naming the condition and the landing that met it." becomes: {mechanical} **Not yet applied.**
+In lifecycle-kit/templates/stages/close.md, step 5, the sentence "Then read each `[roadmap:]` entry's recorded horizon condition, and re-tag one the range met in this stage's queue commit, regenerating the projection and naming the condition and the landing that met it." becomes: {mechanical} {user-facing: the entry's deliverable, the lag read in close step 5} **Not yet applied.**
 
 > Then run `--emit roadmap-lag` over the queue file (queue-kit/SPEC.md §The roadmap-lag arm). Each row is an entry outside the first configured horizon, or untagged, under which a split slice landed this iteration. Read each `[roadmap:]` entry's recorded horizon condition, the arm's rows first, and re-tag one the range met in this stage's queue commit, regenerating the projection and naming the condition and the landing that met it. A row no recorded condition settles is one more finding of the motion read, routed with its others.
 
@@ -63,13 +63,13 @@ The sentences around it stand. `consult-intake-narrowing`, promoted this iterati
 
 ### (4) lifecycle-kit/SPEC.md carries the grounds
 
-In lifecycle-kit/SPEC.md §templates/stages/, *The close template*, the paragraph **A settled horizon is re-tagged, not filed.** keeps its first sentence and its honest limit becomes: {mechanical} **Not yet applied.**
+In lifecycle-kit/SPEC.md §templates/stages/, *The close template*, the paragraph **A settled horizon is re-tagged, not filed.** keeps its first two sentences, and its last, the sentence opening **Honest limit:**, becomes: {mechanical} **Not yet applied.**
 
 > **The lag read covers what the motion read cannot see.** The motion read reports a slug leaving the projection and a vacant first horizon, and an entry left outside the first horizon while its work lands changes neither. A landed split slice is the mechanical half of that lag, so an arm reports it and the session judges the rest (queue-kit/SPEC.md §The roadmap-lag arm). **Honest limit:** a slice recorded only in its parent's prose, and a met condition of any other shape, are found by reading, and nothing gates that any of the three reads ran.
 
 ### (5) The README and the site mirrors follow
 
-`queue-kit/README.md` gains a usage line after the `--emit roadmap --write` line, `"$gates" --emit roadmap-lag          # entries outside the first horizon, or untagged, with a split slice in the done section`. {mechanical} `docs/queue-kit/SPEC.md`, `docs/queue-kit/README.md` and `docs/lifecycle-kit/SPEC.md` are regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write` in the commits landing deltas 2, 4 and this README line.
+`queue-kit/README.md` gains a usage line after the `--emit roadmap --write` line, `"$gates" --emit roadmap-lag          # entries outside the first horizon, or untagged, with a split slice in the done section`. {mechanical} {user-facing: the entry's deliverable, the arm's usage line} **Not yet applied.** `docs/queue-kit/SPEC.md`, `docs/queue-kit/README.md` and `docs/lifecycle-kit/SPEC.md` are regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write` in the commits landing deltas 2, 4 and this README line. `docs/footprint.md` and `docs/value.md`'s rollup block are regenerated (`--emit footprint > docs/footprint.md`, `--emit value-rollup --write`) in delta 3's commit, whose template markdown the footprint measures. That commit appends the unit's Behavior-changes bullet to `.workflow/release-declarations.md`, a new arm and a new close step a vendoring consumer meets (lifecycle-kit/templates/stages/build.md, *Declare what a vendoring consumer will meet*).
 
 ## Producers and consumers
 
@@ -99,6 +99,8 @@ Roster produced by `git grep -n "emit roadmap\|walk_history\|queue-history\` arm
 - `lifecycle-kit/SPEC.md` — §templates/stages/, *The close template*, the settled-horizon paragraph (delta 4).
 - `queue-kit/README.md` — the usage line (delta 5).
 - `docs/queue-kit/SPEC.md`, `docs/queue-kit/README.md`, `docs/lifecycle-kit/SPEC.md` — the regenerated mirrors (deltas 2, 4 and 5).
+- `docs/footprint.md`, `docs/value.md` — the regenerated footprint and rollup block (delta 5).
+- `.workflow/release-declarations.md` — the unit's Behavior-changes bullet (delta 5).
 
 ## Retired spellings
 

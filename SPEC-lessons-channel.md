@@ -20,21 +20,24 @@ The change spans queue-kit's queue format, lifecycle-kit's close and validate te
 
 ### (1) queue-kit states the channel optional
 
-In queue-kit/SPEC.md, two passages are re-phrased. {design-bearing} **Not yet applied.**
+In queue-kit/SPEC.md, two passages are re-phrased. {design-bearing} {user-facing: operator direction 2026-10-01, lead session, the channel consumer-optional and shipped on} **Not yet applied.**
 
-§The tag algebra, the paragraph opening "Two tags ride **Lessons Learned** entries", gains after its first sentence:
+§The tag algebra, after the paragraph opening "Two tags ride **Lessons Learned** entries", its close-surface declaration and its two tag bullets, gains a closing paragraph:
 
 > **The section is consumer-optional and ships on.** A consumer that leaves it out of its queue and out of `QUEUE_KIT_REQUIRED_SECTIONS` runs without the lesson channel, and every reader of the section reads no lesson, which is that consumer's off. The default required set names it, so an adopter keeps the channel until it chooses otherwise.
 
 §Layout and configuration, the `QUEUE_KIT_REQUIRED_SECTIONS` bullet, gains a closing sentence: "Leaving `Lessons Learned` out is how a consumer turns the lesson channel off (§The tag algebra)."
 
+In the same commit, the comment directive in `native/src/emit/enum_sets.rs` citing "queue-kit/SPEC.md §The Lessons Learned channel", a heading the SPEC does not carry, cites §The tag algebra instead.
+
 ### (2) The close and validate templates run the channel only where it exists
 
-Three template sentences gain the condition. {mechanical} **Not yet applied.**
+Four template sentences gain the condition. {mechanical} {user-facing: operator direction 2026-10-01, lead session, the channel consumer-optional and shipped on} **Not yet applied.**
 
 - `lifecycle-kit/templates/stages/close.md`, the opening: "Exit condition: Done and Lessons Learned sections cleared (harvestable lessons promoted first)." becomes "Exit condition: the Done section cleared, and the Lessons Learned section too where the queue keeps one (harvestable lessons promoted first)."
 - `close.md` step 1's lead, "**Process Lessons Learned** → durable rules or debt tasks, then clear the section.", becomes "**Process Lessons Learned** → durable rules or debt tasks, then clear the section. A queue keeping no such section skips this step."
 - `lifecycle-kit/templates/stages/validate.md`'s filing rule, "an observation about how the work should be done ⇒ the lessons section, dispositioned at close.", becomes "an observation about how the work should be done ⇒ the lessons section where the queue keeps one, else the gap inbox (`--emit file-gap`), dispositioned at close either way."
+- `validate.md`'s red triage, "first grep the queue's deferred/lessons sections", becomes "first grep the queue's deferred section, and its lessons section where it keeps one".
 
 ### (3) lifecycle-kit carries the grounds and the replacement map
 
@@ -50,7 +53,7 @@ lifecycle-kit/SPEC.md gains one paragraph and re-phrases two sentences. {design-
 
 ### (4) This repo binds the channel off
 
-This repo's queue, queue config, close binding and ignore file take the off state, in one commit. {mechanical} {user-facing: operator direction 2026-10-01, lead session, the channel off here with the `[essay]` tag, its sink row and the harvest-routing step dropped}
+This repo's queue, queue config, close binding and ignore file take the off state, in one commit. {mechanical} {user-facing: operator direction 2026-10-01, lead session, the channel off here with the `[essay]` tag, its sink row and the harvest-routing step dropped} **Not yet applied.**
 
 - `TASK-QUEUE.md` drops its `## Lessons Learned` heading.
 - `scripts/queue-config.knobs` binds `QUEUE_KIT_REQUIRED_SECTIONS` to `Iteration:`, `New Features`, `Technical Debt`, `Deferred` and `Done`, one `QUEUE_KIT_REQUIRED_SECTIONS[] =` line each, under the policy-calibrations comment. It drops `QUEUE_KIT_LESSON_TAGS[] = essay`, and the header comment drops its lesson-harvest-tag clause.
@@ -59,7 +62,7 @@ This repo's queue, queue config, close binding and ignore file take the off stat
 
 ### (5) The site mirrors follow
 
-`docs/queue-kit/SPEC.md` and `docs/lifecycle-kit/SPEC.md` are regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write` in the commits landing deltas 1 and 3. {mechanical}
+`docs/queue-kit/SPEC.md` and `docs/lifecycle-kit/SPEC.md` are regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write` in the commits landing deltas 1 and 3. {mechanical} `docs/footprint.md` and `docs/value.md`'s rollup block are regenerated (`--emit footprint > docs/footprint.md`, `--emit value-rollup --write`) in delta 2's commit, whose template markdown the footprint measures. That commit appends the unit's Behavior-changes bullet to `.workflow/release-declarations.md`: the lesson channel is consumer-optional, nothing to do for a consumer keeping it (lifecycle-kit/templates/stages/build.md, *Declare what a vendoring consumer will meet*).
 
 ## Producers and consumers
 
@@ -77,12 +80,15 @@ This repo's queue, queue config, close binding and ignore file take the off stat
 
 Roster produced by `git grep -n -i "lesson" -- ':!TASK-QUEUE.md' ':!docs/posts' ':!*/gate-tests/*'`, with each hit read.
 
-- `queue-kit/SPEC.md` — §The tag algebra's Lessons paragraph and §Layout and configuration's `QUEUE_KIT_REQUIRED_SECTIONS` bullet (delta 1).
+- `queue-kit/SPEC.md` — §The tag algebra's Lessons passage and §Layout and configuration's `QUEUE_KIT_REQUIRED_SECTIONS` bullet (delta 1).
+- `native/src/emit/enum_sets.rs` — the comment directive's section citation (delta 1).
 - `lifecycle-kit/templates/stages/close.md` — the opening and step 1 (delta 2).
-- `lifecycle-kit/templates/stages/validate.md` — the filing rule (delta 2).
+- `lifecycle-kit/templates/stages/validate.md` — the red triage and the filing rule (delta 2).
 - `lifecycle-kit/SPEC.md` — §templates/stages/ *The close template*, §bin/enter-stage.sh and §check-lesson-disposition (delta 3).
 - `TASK-QUEUE.md`, `scripts/queue-config.knobs`, `.claude/commands/close.md`, `.gitignore` — this repo's off binding (delta 4).
 - `docs/queue-kit/SPEC.md`, `docs/lifecycle-kit/SPEC.md` — the regenerated mirrors (deltas 1, 3 and 5).
+- `docs/footprint.md`, `docs/value.md` — the regenerated footprint and rollup block (delta 5).
+- `.workflow/release-declarations.md` — the unit's Behavior-changes bullet (delta 5).
 
 The other hits keep their text, since each describes the channel where it exists: the lesson-sink arm, the queue-index attention block, `check-tag-lead-line`, the kit READMEs' install skeleton, the close-surface rows and `check-lesson-disposition`'s grammar.
 

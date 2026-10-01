@@ -13,7 +13,7 @@
 
 ### (1) The descriptor couples every kit's templates
 
-The `couples=` field of `lifecycle-kit/checks/check-skill-binding.gate` becomes `knob:LIFECYCLE_KIT_SKILLS_DIR/*.md,kit:templates/*.md`, with every other manifest field unchanged. {mechanical} The eight literal template couples go: the stage-template dir glob, `lead.md`, `release-sweep.md`, `upgrade.md`, `consult.md`, `delegation-kit/templates/agent-execution.md`, `gate-sdk/templates/adopt.md` and `drift-kit/templates/economics.md`. `kit:templates/*.md` reaches every one, since the field's `*` crosses `/`.
+The `couples=` field of `lifecycle-kit/checks/check-skill-binding.gate` becomes `knob:LIFECYCLE_KIT_SKILLS_DIR/*.md,kit:templates/*.md`, with every other manifest field unchanged. {mechanical} **Not yet applied.** The eight literal template couples go: the stage-template dir glob, `lead.md`, `release-sweep.md`, `upgrade.md`, `consult.md`, `delegation-kit/templates/agent-execution.md`, `gate-sdk/templates/adopt.md` and `drift-kit/templates/economics.md`. `kit:templates/*.md` reaches every one, since the field's `*` crosses `/`.
 
 ### (2) The section states the derived couple and refuses the assertion
 

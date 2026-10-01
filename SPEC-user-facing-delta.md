@@ -21,7 +21,7 @@ The rule spans lifecycle-kit's stage templates and canon-kit's statement of what
 
 ### (2) The audit and build templates read the mark
 
-`lifecycle-kit/templates/stages/align.md` gains a paragraph directly after *Audit the amendment against itself before auditing it against the tree*. {mechanical} **Not yet applied.**
+`lifecycle-kit/templates/stages/align.md` gains a paragraph directly after *Audit the amendment against itself before auditing it against the tree*. {mechanical} {user-facing: the entry's deliverable, align's check of the mark} **Not yet applied.**
 
 > **Read every delta for what a user meets.** A delta changing it carries the authoring stage's `{user-facing: …}` mark naming the direction that settles it (lifecycle-kit/templates/stages/spec.md). An unmarked one, or one whose direction does not settle the choice it makes, is an envelope question for the lead or the operator, never one to reword away.
 
@@ -46,7 +46,7 @@ In canon-kit/SPEC.md §The amendment lifecycle, two sentences are re-phrased. {m
 
 ### (5) The site mirrors follow
 
-`docs/lifecycle-kit/SPEC.md` and `docs/canon-kit/SPEC.md` are regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write`, in the commits landing deltas 3 and 4. {mechanical}
+`docs/lifecycle-kit/SPEC.md` and `docs/canon-kit/SPEC.md` are regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write`, in the commits landing deltas 3 and 4. {mechanical} `docs/footprint.md` and `docs/value.md`'s rollup block are regenerated (`--emit footprint > docs/footprint.md`, `--emit value-rollup --write`) in the commit landing deltas 1 and 2, whose template markdown the footprint measures. That commit appends the unit's Behavior-changes bullet to `.workflow/release-declarations.md`: the authoring and audit stages mark and read a user-facing delta (lifecycle-kit/templates/stages/build.md, *Declare what a vendoring consumer will meet*).
 
 ## Producers and consumers
 
@@ -67,6 +67,8 @@ Roster produced by `git grep -n "work-class\|user-facing\|envelope" -- lifecycle
 - `lifecycle-kit/SPEC.md` — §templates/stages/, *The spec.md template* and *The align template* (delta 3).
 - `canon-kit/SPEC.md` — §The amendment lifecycle, the two work-class sentences (delta 4).
 - `docs/lifecycle-kit/SPEC.md`, `docs/canon-kit/SPEC.md` — the regenerated mirrors (deltas 3, 4 and 5).
+- `docs/footprint.md`, `docs/value.md` — the regenerated footprint and rollup block (delta 5).
+- `.workflow/release-declarations.md` — the unit's Behavior-changes bullet (delta 5).
 
 The remaining hits need no edit. `lifecycle-kit/templates/lead.md` reads work-class labels at batch cut, and the mark adds nothing to its tiering. `.claude/agents/stage-session.md`'s envelope roster already escalates a user-facing change "the amendment did not already settle", which the mark is how an amendment records.
 
