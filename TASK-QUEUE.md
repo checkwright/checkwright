@@ -62,6 +62,20 @@ the consult inbox takes more than the operator's model of consult. Operator dire
 
 **Answered at spec, operator direction 2026-10-01, lead session (not a ruling):** the dispatch stays, to answer requests for advice, under a sixth steering term, Advice, marked `consult advice` or, once accepted, `operator direction … on consult advice` — the marking the lead's 2026-09-30 caution proposed, shown to the operator with the choice.
 
+### lessons-learned-channel-audit
+
+[spec: SPEC-lessons-channel.md]
+
+the Lessons Learned channel may be obsolete, operator direction 2026-09-30, lead session (not a ruling). TASK-QUEUE.md's section is empty; the last tagged lesson was written 2026-07-11 and the last harvested 2026-09-16. Still wired to it: close step 1 with `check-lesson-disposition`, the lesson-evidence file and its boundary truncate, queue-index's attend-tag attention block, the essay harvest through `--lesson-sink`, and validate's filing rule routing method observations there. Candidate replacements: the gap inbox, kfric, the survey record, the consult inbox and the lead journal. Possible losses: a door from method observation to durable rule, since the gap drain offers fix, promote or drop; and the essay harvest, if posts draw on it.
+
+**Deliverable:** a function-to-replacement map and the essay harvest's reader confirmed; then, per Policy-as-choice, most likely the section made consumer-optional and off here rather than deleted, since queue-kit and lifecycle-kit ship it to adopters.
+
+**Cost while deferred:** every close walks a lesson step and a disposition gate over an empty channel, and validate routes observations to a section nothing reads. Filed 2026-09-30 to the gap inbox by preview-readiness' lead; promoted 2026-09-30 at the next iteration's scope: →fix fails because the audit is unsized and its likely outcome is a new knob. Re-verified: the `## Lessons Learned` section holds no bullet. Owner lookup: `lesson`, `essay` in this file — only the icebox's reclaim-precondition-outside-the-tree, DISTINCT (the essay sink's reclaim); owner queue-kit/SPEC.md §The queue format, with lifecycle-kit/templates/stages/close.md. Surface also lifecycle-kit.
+
+**Selected 2026-10-01 for lifecycle-queue-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it ahead of [lifecycle-queue-value-audit](#lifecycle-queue-value-audit), whose verdict on `check-lesson-disposition` follows the channel decision.
+
+**Answered at spec, operator direction 2026-10-01, lead session (not a ruling):** the essay harvest's reader is live, and the channel goes off here anyway, dropping the essay harvest tag, its sink's close-surface row and the harvest-routing step; that reader's own sweep of this repo's session record carries the same sessions.
+
 ## Technical Debt
 
 ### lifecycle-queue-value-audit
@@ -649,18 +663,6 @@ the front-door rehearsal belongs in the methodology, operator direction 2026-09-
 **Deliverable:** invariant B reads a gate-binary arm the page advertises outside a route, under the same pending admission, with a `bad/` fixture holding the prose form; or a boundary note keeping the limit.
 
 **Cost while deferred:** a front-door page can advertise an arm the installed release refuses, unseen until an adopter runs it. Filed 2026-09-30 to the gap inbox at preview-readiness' close, where `--measure-commit` landed after v0.30.0 and a `deferred:v0.31.0` probe line left the gate green; promoted 2026-09-30 at the next iteration's scope: →fix fails because widening a shipped gate's read is new mechanism. Re-verified: docs/install.md advertises both arms in prose, and v0.31.0 carries `--measure-commit`, so the instance is discharged and the class stands. Owner lookup: `front-door-verbs`, `route` in this file — [front-door-flag-operand](#front-door-flag-operand), DISTINCT (a flag's value after a route, not an arm outside one); owner installer/SPEC.md §The front door's verbs.
-
-### lessons-learned-channel-audit
-
-[cost: iteration/low] [surface: queue-kit]
-
-the Lessons Learned channel may be obsolete, operator direction 2026-09-30, lead session (not a ruling). TASK-QUEUE.md's section is empty; the last tagged lesson was written 2026-07-11 and the last harvested 2026-09-16. Still wired to it: close step 1 with `check-lesson-disposition`, the lesson-evidence file and its boundary truncate, queue-index's attend-tag attention block, the essay harvest through `--lesson-sink`, and validate's filing rule routing method observations there. Candidate replacements: the gap inbox, kfric, the survey record, the consult inbox and the lead journal. Possible losses: a door from method observation to durable rule, since the gap drain offers fix, promote or drop; and the essay harvest, if posts draw on it.
-
-**Deliverable:** a function-to-replacement map and the essay harvest's reader confirmed; then, per Policy-as-choice, most likely the section made consumer-optional and off here rather than deleted, since queue-kit and lifecycle-kit ship it to adopters.
-
-**Cost while deferred:** every close walks a lesson step and a disposition gate over an empty channel, and validate routes observations to a section nothing reads. Filed 2026-09-30 to the gap inbox by preview-readiness' lead; promoted 2026-09-30 at the next iteration's scope: →fix fails because the audit is unsized and its likely outcome is a new knob. Re-verified: the `## Lessons Learned` section holds no bullet. Owner lookup: `lesson`, `essay` in this file — only the icebox's reclaim-precondition-outside-the-tree, DISTINCT (the essay sink's reclaim); owner queue-kit/SPEC.md §The queue format, with lifecycle-kit/templates/stages/close.md. Surface also lifecycle-kit.
-
-**Selected 2026-10-01 for lifecycle-queue-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it ahead of [lifecycle-queue-value-audit](#lifecycle-queue-value-audit), whose verdict on `check-lesson-disposition` follows the channel decision.
 
 ### hook-emit-remedy-door
 
