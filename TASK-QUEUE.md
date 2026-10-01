@@ -32,20 +32,6 @@ a user-facing choice can ride a `{mechanical}` delta and reach no operator: the 
 
 **Selected 2026-10-01 for lifecycle-queue-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, the rule or its refusal.
 
-### roadmap-horizon-lag-detector
-
-[spec: SPEC-roadmap-lag.md]
-
-close's roadmap-motion read files a consult item only for a slug that left the projection and for a vacant first horizon, so an entry a ruling re-sequences, or that iterations work toward while it stays tagged `next`, fires neither. The operator's horizon principle, 2026-09-29, lead-relayed (not a ruling), gives the detector its criterion: a horizon reflects reality, `now` when work is planned as soon as possible, else `next`, and the first close landing a slice of an entry moves it to `now`. So an entry with a slice landed in the range (a Done split child, or a landed line in its body) still tagged `next`, or carrying no roadmap tag though its outcome is curated, is lagging. Close re-tags a lagging entry whose own recorded horizon condition settles the move, and files the consult item otherwise; that re-tag landed at guard-kit-steering's close on an operator direction lead-relayed (not a ruling), found there by reading rather than by an arm, so this entry keeps the detection half only.
-
-**Deliverable:** that read in lifecycle-kit/templates/stages/close.md step 5, with its mechanical half (slice landed, horizon tag) on an arm rather than a judgment, or a boundary note in lifecycle-kit/SPEC.md §templates/stages/ refusing it.
-
-Run at spec, 2026-10-01: no retroactive horizon pass is owed, since the four entries then outside the first horizon carried no landed slice.
-
-**Cost while deferred:** the public roadmap lags the queue until a consult happens to look. Instances: [companion-toolkit-profile](#companion-toolkit-profile) held `next` from 2026-08-02 through the companion iterations; [spec-brevity-residue](#spec-brevity-residue) and [gate-customer-value-audit](#gate-customer-value-audit) carried no tag with slices landed, both curated at the 2026-09-29 consult, the audit to `next` on the relayed conditional; [heterogeneous-agent-delegation](#heterogeneous-agent-delegation) held `later` through its first slice at delegation-tier-binding, filed to consult at that close. Filed 2026-09-29 to the gap inbox by preview-readiness' lead, with an addendum carrying the criterion, merged here; promoted 2026-09-30 at its close: →fix fails because a close read is new stage mechanism, →forward because no ruling is owed. Re-verified: close.md step 5 names only the two triggers. Owner lookup: `horizon`, `lagging` in this file — none; owner lifecycle-kit/templates/stages/close.md, with queue-kit/SPEC.md §The roadmap arm.
-
-**Selected 2026-10-01 for lifecycle-queue-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, running the unrun marker it carried.
-
 ### lessons-learned-channel-audit
 
 [spec: SPEC-lessons-channel.md]
@@ -1411,5 +1397,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 ## Done
 
 - consult-intake-narrowing
+- roadmap-horizon-lag-detector
 
 ## Lessons Learned

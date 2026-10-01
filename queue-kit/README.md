@@ -61,6 +61,7 @@ gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --lesson-sink <tag>                      # route a lesson body on stdin to its configured sink
 "$gates" --emit roadmap          # the public roadmap block, to stdout
 "$gates" --emit roadmap --write   # splice it into the configured projection page
+"$gates" --emit roadmap-lag          # entries outside the first horizon, or untagged, with a split slice in the done section
 "$gates" --emit queue-migrate --write TASK-QUEUE.md   # once, on upgrade: bullet entries become ### headings with a tag line
 ```
 

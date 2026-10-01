@@ -558,9 +558,9 @@ pub struct Revision {
 // `--format` fields: a subject may carry anything a shell quotes, and a unit separator cannot
 const FIELD: char = '\u{1f}';
 
-// spec: queue-kit/SPEC.md §The shared queue adapters — the one history walk the entry-history and
-// queue-history arms share; `visit` returns false to stop, and `Ok(false)` is a file with no
-// committed history to walk
+// spec: queue-kit/SPEC.md §The shared queue adapters — the one history walk the entry-history,
+// queue-history and roadmap-lag arms share; `visit` returns false to stop, and `Ok(false)` is a
+// file with no committed history to walk
 pub fn walk_history(
     top: &str,
     file: &str,

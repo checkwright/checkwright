@@ -64,6 +64,7 @@ pub mod stage_economics;
 pub mod stage_rules;
 pub mod support_table;
 pub mod roadmap;
+pub mod roadmap_lag;
 pub mod ruling_staleness;
 pub mod run_consumer_smoke;
 pub mod run_gate_tests;
@@ -350,6 +351,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
             "QUEUE_KIT_ROADMAP_FILE",
             "QUEUE_KIT_ROADMAP_MARKER",
         ],
+    ),
+    // spec: queue-kit/SPEC.md §The roadmap-lag arm — an `Arm::Emit` on the queue-history arm's
+    // ground: a report with no 1, reading the done section and the history walk
+    (
+        "--emit-roadmap-lag",
+        Arm::Emit(roadmap_lag::emit, Grammar::Parsed(roadmap_lag::USAGE)),
+        roadmap_lag::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §check-graph — the theme is configured as a *path* rather than as
     // content: a knob value cannot carry a newline and a stylesheet is newline-bearing by
