@@ -8,27 +8,13 @@
 
 ## New Features
 
-### lessons-learned-channel-audit
-
-[spec: SPEC-lessons-channel.md]
-
-the Lessons Learned channel may be obsolete, operator direction 2026-09-30, lead session (not a ruling). TASK-QUEUE.md's section is empty; the last tagged lesson was written 2026-07-11 and the last harvested 2026-09-16. Still wired to it: close step 1 with `check-lesson-disposition`, the lesson-evidence file and its boundary truncate, queue-index's attend-tag attention block, the essay harvest through `--lesson-sink`, and validate's filing rule routing method observations there. Candidate replacements: the gap inbox, kfric, the survey record, the consult inbox and the lead journal. Possible losses: a door from method observation to durable rule, since the gap drain offers fix, promote or drop; and the essay harvest, if posts draw on it.
-
-**Deliverable:** a function-to-replacement map and the essay harvest's reader confirmed; then, per Policy-as-choice, most likely the section made consumer-optional and off here rather than deleted, since queue-kit and lifecycle-kit ship it to adopters.
-
-**Cost while deferred:** every close walks a lesson step and a disposition gate over an empty channel, and validate routes observations to a section nothing reads. Filed 2026-09-30 to the gap inbox by preview-readiness' lead; promoted 2026-09-30 at the next iteration's scope: →fix fails because the audit is unsized and its likely outcome is a new knob. Re-verified: the `## Lessons Learned` section holds no bullet. Owner lookup: `lesson`, `essay` in this file — only the icebox's reclaim-precondition-outside-the-tree, DISTINCT (the essay sink's reclaim); owner queue-kit/SPEC.md §The queue format, with lifecycle-kit/templates/stages/close.md. Surface also lifecycle-kit.
-
-**Selected 2026-10-01 for lifecycle-queue-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it ahead of [lifecycle-queue-value-audit](#lifecycle-queue-value-audit), whose verdict on `check-lesson-disposition` follows the channel decision.
-
-**Answered at spec, operator direction 2026-10-01, lead session (not a ruling):** the essay harvest's reader is live, and the channel goes off here anyway, dropping the essay harvest tag, its sink's close-surface row and the harvest-routing step; that reader's own sweep of this repo's session record carries the same sessions.
-
 ## Technical Debt
 
 ### lifecycle-queue-value-audit
 
 [gate-customer-value-audit](#gate-customer-value-audit)'s slice for lifecycle-kit's 15 gates and queue-kit's 11, 26 `.gate` descriptors audited for customer value and configurability under gate-sdk/SPEC.md §Consumer payload's rule.
 
-**Deliverable:** each gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated, leaving gate-sdk's 43 gates the one kit unaudited. `check-lesson-disposition`'s verdict follows [lessons-learned-channel-audit](#lessons-learned-channel-audit)'s channel decision, and `check-skill-binding`'s reads `skill-binding-couples-drift`'s assertion.
+**Deliverable:** each gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated, leaving gate-sdk's 43 gates the one kit unaudited. `check-lesson-disposition`'s verdict follows `lessons-learned-channel-audit`'s channel decision, and `check-skill-binding`'s reads `skill-binding-couples-drift`'s assertion.
 
 **Cost while deferred:** the parent's cost, for these kits. Filed 2026-10-01 as a split at lifecycle-queue-value-pass' scope. Part of the operator's selection of set A, direction 2026-10-01, lead-relayed (not a ruling).
 
@@ -1362,5 +1348,4 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - skill-binding-couples-drift
 - user-facing-delta-unsurfaced
 - kit-roots-dialect-index-env
-
-## Lessons Learned
+- lessons-learned-channel-audit

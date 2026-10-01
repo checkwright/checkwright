@@ -8,7 +8,7 @@ use crate::walk;
 pub const KNOBS: &[&str] = &["GATE_SDK_KIT_DIRS", "QUEUE_KIT_LESSON_TAGS"];
 
 // spec: canon-kit/SPEC.md §check-prose-enum — the Lessons channel is queue-kit's own `[attend]`
-// (queue-kit/SPEC.md §The Lessons Learned channel) plus the consumer's configured harvest tags;
+// (queue-kit/SPEC.md §The tag algebra) plus the consumer's configured harvest tags;
 // every other governed tag is a task/selection tag
 const ATTEND: &str = "attend";
 
