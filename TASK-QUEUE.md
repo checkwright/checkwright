@@ -20,6 +20,18 @@ the walk's prune set matches path components anywhere in an absolute path, not o
 
 **Selected 2026-10-01 for context-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, since §Index-first reading states the `-not -path "*/<prune>/*"` form the fix changes; `path_pruned` in `native/src/walk.rs` also prunes gate-sdk's `--tree` shell corpus.
 
+### doctor-shell-gate-bash
+
+[spec: SPEC-doctor-shell-gate.md]
+
+`doctor` does not owe `bash` for a consumer-registered shell gate. `bash`'s audience is derived over the kit roots and the anchor's fence-run corpus only (context-kit/SPEC.md §bin/env-probe), and a registered name with no `REGISTRY` row contributes nothing, so a native-Windows adopter who writes a shell gate without Git for Windows' bash reads `DOCTOR: clean` and meets the battery's exit 2 instead.
+
+**Deliverable:** a fourth derivation arm owing `bash` where the anchor's `gates.list` registers a member resolving to a `.sh` declaration in the gates dir, with its fixture.
+
+**Cost while deferred:** the requirement is stated on the install page only, and doctor's clean verdict misleads an adopter who skipped it. Filed 2026-09-27 to the gap inbox by platform-prerequisite-floors' build; promoted at its close: →fix fails because the arm widens doctor's verdict, adopter-visible semantics no amendment settled. Re-verified: the section's bash audience names three arms, two per kit root and one over the fence-run corpus, none reading a registered `.sh` member; docs/install.md's Windows section states the requirement. Owner lookup: `doctor`, `audience`, `env-probe` in this file — only [heterogeneous-agent-delegation](#heterogeneous-agent-delegation)'s CLI probe, DISTINCT; owner context-kit/SPEC.md §bin/env-probe. Related: [custom-gate-substrates](#custom-gate-substrates).
+
+**Selected 2026-10-01 for context-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it ahead of [custom-gate-substrates](#custom-gate-substrates), which generalizes the arm per substrate.
+
 ## Technical Debt
 
 ### small-kit-value-audit
@@ -425,18 +437,6 @@ an adopter writes a custom gate in shell only. The registry resolves a member as
 **Deliverable:** the registry resolving further substrates under the output, fail-closed, fixture-pair and self-lint contracts: `.ps1` resolution in the registry and the runner, which the hook's `--git-hook` arm dispatches through, with a PowerShell lint counterpart to `check-shellcheck`; a Rust path, as an adopter-built executable the registry dispatches or an extension crate; and the install page's prerequisites per substrate. Whether one executable-dispatch shape serves both is spec's.
 
 **Cost while deferred:** a native-Windows adopter authoring a gate takes on a bash dependency and a second shell dialect, and one wanting a typed, testable gate must write shell or fork. Filed 2026-09-27 to the gap inbox as two bullets by platform-prerequisite-floors' lead, merged here at its close because both ask which substrates the registry resolves beyond `.sh` and `.gate`: →fix fails because each substrate is new mechanism. The Rust bullet's premise, that an adopter cannot write a Rust gate at all, is corrected to the relayed direction above. Re-verified: `registry::resolve` tries `sh` then `gate` per dir and nothing else. Owner lookup: `ps1`, `PowerShell`, `custom gate`, `Rust gate`, `consumer crate` in this file — none; owner gate-sdk/SPEC.md §lib/gate.sh and §The port-candidate criteria.
-
-### doctor-shell-gate-bash
-
-[cost: event/low] [surface: context-kit]
-
-`doctor` does not owe `bash` for a consumer-registered shell gate. `bash`'s audience is derived over the kit roots and the anchor's fence-run corpus only (context-kit/SPEC.md §bin/env-probe), and a registered name with no `REGISTRY` row contributes nothing, so a native-Windows adopter who writes a shell gate without Git for Windows' bash reads `DOCTOR: clean` and meets the battery's exit 2 instead.
-
-**Deliverable:** a fourth derivation arm owing `bash` where the anchor's `gates.list` registers a member resolving to a `.sh` declaration in the gates dir, with its fixture.
-
-**Cost while deferred:** the requirement is stated on the install page only, and doctor's clean verdict misleads an adopter who skipped it. Filed 2026-09-27 to the gap inbox by platform-prerequisite-floors' build; promoted at its close: →fix fails because the arm widens doctor's verdict, adopter-visible semantics no amendment settled. Re-verified: the section's bash audience names three arms, two per kit root and one over the fence-run corpus, none reading a registered `.sh` member; docs/install.md's Windows section states the requirement. Owner lookup: `doctor`, `audience`, `env-probe` in this file — only [heterogeneous-agent-delegation](#heterogeneous-agent-delegation)'s CLI probe, DISTINCT; owner context-kit/SPEC.md §bin/env-probe. Related: [custom-gate-substrates](#custom-gate-substrates).
-
-**Selected 2026-10-01 for context-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it ahead of [custom-gate-substrates](#custom-gate-substrates), which generalizes the arm per substrate.
 
 ### release-note-section-set-derivation
 
