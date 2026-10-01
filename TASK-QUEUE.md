@@ -34,6 +34,20 @@ hook-member and emit-arm output strings print the bash front end as a remedy to 
 
 **Selected 2026-10-01 for gate-sdk-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it; it lands before [guard-kit-tool-brevity](#guard-kit-tool-brevity) passes §check-door-binding.
 
+### consumer-value-literal-gate
+
+[spec: SPEC-consumer-value-literal.md]
+
+nothing enforces gate-sdk/SPEC.md §The port-candidate criteria's rule that every consumer value a member reads is a knob with one producer, never a crate literal. Instances surface by hand: `installer-graph-artifact-literal`, landed this iteration, and the release-note section names in [release-note-section-set-derivation](#release-note-section-set-derivation). Operator direction, 2026-09-27 (lead session): avoid any hard code in gates, because checkwright offers configurable gate templates to customers and benefits from them itself.
+
+**Deliverable:** an audit sizing the consumer-value literal population in `native/src/gates`, then a gate or lint over it with a declared valve.
+
+**Cost while deferred:** each literal publishes this repo's configuration as every adopter's mechanism, and instances surface only by chance. Filed 2026-09-27 to the gap inbox by platform-prerequisite-floors' lead; promoted at its close: →fix fails because the gate is new mechanism over an unsized corpus. Re-verified: the rule's sentence appears in gate-sdk/SPEC.md and its site mirror alone, with no gate section enforcing it. Owner lookup: `literal`, `hardcod` in this file's headings — [knob-default-accessor-singularity](#knob-default-accessor-singularity), DISTINCT (it bars re-spelling an existing knob's default; this bars a consumer value with no knob); owner gate-sdk/SPEC.md §The port-candidate criteria.
+
+**Selected 2026-10-01 for gate-sdk-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it; its census runs after [gate-customer-value-audit](#gate-customer-value-audit)'s gate-sdk verdicts, which remove literals by making gates generic.
+
+**Corpus set 2026-10-02 by operator direction, lead-relayed (not a ruling), option C:** the kit-shipped gates' modules this iteration. Every module, the withheld `scripts/` gates included, is filed as [withheld-gate-literal-knobs](#withheld-gate-literal-knobs).
+
 ## Technical Debt
 
 ### gate-customer-value-audit
@@ -458,18 +472,6 @@ release notes serve human upgraders poorly, and their section set is crate liter
 
 **Cost while deferred:** every release ships a note a human must read whole to act on, custom-gate adopters are not told what applies to them, and a platform change hides in Behavior changes. Filed 2026-08-01 at close; iceboxed 2026-09-11 as dormant; re-filed 2026-09-27 to the gap inbox as two bullets (readability, a Platforms section) by platform-prerequisite-floors' lead, and returned at its close on a judged recurrence: →fix fails because the redesign renames machine-read tokens. Re-verified: `wc -w` over the two notes, and the literals in `native/src/gates/release_bump.rs`, `tightened_gates_grammar.rs`, `release_change_declared.rs`, `native/src/declaration.rs` and `native/src/emit/upgrade_smoke.rs`. `removed-knob-docs-cmd-valve`, done, is DISTINCT. Owner: installer/SPEC.md §The upgrade contract, RELEASING.md.
 
-### consumer-value-literal-gate
-
-[cost: event/low] [surface: gate-sdk]
-
-nothing enforces gate-sdk/SPEC.md §The port-candidate criteria's rule that every consumer value a member reads is a knob with one producer, never a crate literal. Instances surface by hand: `installer-graph-artifact-literal`, landed this iteration, and the release-note section names in [release-note-section-set-derivation](#release-note-section-set-derivation). Operator direction, 2026-09-27 (lead session): avoid any hard code in gates, because checkwright offers configurable gate templates to customers and benefits from them itself.
-
-**Deliverable:** an audit sizing the consumer-value literal population in `native/src/gates`, then a gate or lint over it with a declared valve.
-
-**Cost while deferred:** each literal publishes this repo's configuration as every adopter's mechanism, and instances surface only by chance. Filed 2026-09-27 to the gap inbox by platform-prerequisite-floors' lead; promoted at its close: →fix fails because the gate is new mechanism over an unsized corpus. Re-verified: the rule's sentence appears in gate-sdk/SPEC.md and its site mirror alone, with no gate section enforcing it. Owner lookup: `literal`, `hardcod` in this file's headings — [knob-default-accessor-singularity](#knob-default-accessor-singularity), DISTINCT (it bars re-spelling an existing knob's default; this bars a consumer value with no knob); owner gate-sdk/SPEC.md §The port-candidate criteria.
-
-**Selected 2026-10-01 for gate-sdk-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it; its census runs after [gate-customer-value-audit](#gate-customer-value-audit)'s gate-sdk verdicts, which remove literals by making gates generic.
-
 ### site-video-poster-rule
 
 [cost: event/low] [surface: site-kit]
@@ -691,6 +693,16 @@ context-kit's `--emit footprint` arm ships in the binary but prints this site's 
 **Deliverable:** one of two dispositions, chosen at spec: withhold the arm from the README and the payload docs as a publisher tool, or make the preamble and the roster knobs an adopter can set.
 
 **Cost while deferred:** an adopter running a listed tool gets a page about Checkwright. Filed 2026-10-01 to the gap inbox at context-kit-value-pass' build; promoted 2026-10-01 at its close: →fix fails because the choice between the two dispositions is a design call and the second adds knobs, →forward because no ruling is owed. Re-verified: the arm's output opens with the front matter, and the README's tool list carries `--emit footprint`. Owner lookup: `footprint` in this file — none; owner context-kit/SPEC.md §bin/footprint.
+
+### withheld-gate-literal-knobs
+
+[cost: event/low] [surface: gate-sdk]
+
+`check-consumer-value-literal` holds only the kit-shipped gates' crate modules. The 26 gates withheld to `scripts/` keep their consumer-value literals: 62 consumer values and 39 borderline rows at gate-sdk-value-pass' spec census, 23 of them `const DEFAULT_<NAME>` positional layout defaults. Operator direction 2026-09-27, kept on record for this half by the operator's choice of option C, 2026-10-02, lead-relayed (not a ruling): avoid any hard code in gates, because checkwright benefits from configurable gates itself.
+
+**Deliverable:** the gate's corpus widened to every gate module, and each withheld gate's literal moved to a descriptor-declared knob (gate-sdk/SPEC.md §The declaration cohort, a knob no static kit's prefix owns) or valved with its ground.
+
+**Cost while deferred:** no adopter meets these literals, since a withheld gate never ships. The cost is that this repo's own gates stay unconfigurable, and a new withheld gate's literal reds nowhere. Filed 2026-10-02 at gate-sdk-value-pass' spec on that direction. Owner lookup: `literal`, `withheld` in this file — [consumer-value-literal-gate](#consumer-value-literal-gate), DISTINCT (the kit-shipped half); owner gate-sdk/SPEC.md §The port-candidate criteria.
 
 ## Icebox
 
