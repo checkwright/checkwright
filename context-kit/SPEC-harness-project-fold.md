@@ -42,11 +42,11 @@ Its readers are the session-id derivation (lifecycle-kit's sessions dir) and, af
 - On Windows, if the probe shows the harness folding the drive-lettered root git reports, the input is `walk::toplevel_opt` unchanged. If it shows another spelling (a different drive-letter case, say), the input is converted to it in this function and nowhere else.
 - `home` is `HOME`. If the probe shows the Windows harness reading `USERPROFILE` where the two differ, `home` is `USERPROFILE` on Windows. Either way an unset home stays the fail-closed exit 2 §check-memory-off states, and it binds only when `CLAUDE_CONFIG_DIR` is unset.
 
-The `spec:` comments recording the open Windows question at `memory_dir_default` and at both shell twins are removed with the fold they qualified.
+The `spec:` comment at `memory_dir_default` stating the `/`-and-`.` fold is rewritten to name the shared encoder, and the `spec:` comments recording the open Windows question at both shell twins are removed with the fold they qualified. `sessions::slug` and `resolve_memory_dirs` become `pub(crate)` for the cross-module reads this delta and delta 4 add. Where the Windows probe shows `USERPROFILE` read, the session-id arm's `Inputs.home` is the caller's and the build records whether the two readers move together.
 
 ### (4) The shell twins read the derivation from the binary
 
-{mechanical} A new non-gate arm, `--emit memory-dirs` (`--emit-memory-dirs`, an `Arm::Emit` row in `native/src/emit/mod.rs` declaring `CONTEXT_KIT_MEMORY_DIRS`), prints `resolve_memory_dirs()`'s answer one directory per line. That answer is the knob's globs expanded, else the derived dir. Step 5 of `scripts/session-context.sh` and of `context-kit/templates/session-context.sh` reads its scan set from this arm through `$NATIVE_BIN`, under step 2's guard (`-x "$NATIVE_BIN"`, taken before any output). It no longer folds anything itself. The step is silent where the binary is absent, as steps 1 to 3 already are. A consumer's knob-file value now reaches the step, which read only the environment before.
+{mechanical} A new non-gate arm, `--emit memory-dirs` (`--emit-memory-dirs`, an `Arm::Emit` row in `native/src/emit/mod.rs` declaring `CONTEXT_KIT_MEMORY_DIRS`), prints `resolve_memory_dirs()`'s answer one directory per line. That answer is the knob's globs expanded, else the derived dir. Step 5 of `scripts/session-context.sh` and of `context-kit/templates/session-context.sh` reads its scan set from this arm through `$NATIVE_BIN`, under its own binary guard (`-x "$NATIVE_BIN"`, as steps 1 and 3 carry, since step 2's guard is combined with a dirty-component test and does not bind step 5). It no longer folds anything itself. The step is silent where the binary is absent, as steps 1 to 3 already are. A consumer's knob-file value now reaches the step, which read only the environment before.
 
 ### (5) Tests pin the encoder against the observed spellings
 
@@ -71,14 +71,15 @@ The `spec:` comments recording the open Windows question at `memory_dir_default`
 
 {mechanical} **Not yet applied.**
 
+- drift-kit/SPEC.md §`DRIFT_KIT_SESSIONS_DIR`: the `<cwd-slug>` sentence ("the working directory with every non-alphanumeric replaced by `-`") becomes the encoder's statement, citing lifecycle-kit/SPEC.md §bin/session-id.sh.
 - lifecycle-kit/SPEC.md §bin/session-id.sh: the clause "and the cwd slug maps every non-alphanumeric character of the cwd to `-`" becomes "and the cwd slug is the harness's encoder: every UTF-16 unit outside `[A-Za-z0-9]` maps to `-`, and a slug past 200 units is cut there and suffixed with `-` and the base-36 absolute value of the path's 32-bit string hash".
 - context-kit/SPEC.md §check-memory-off: the fail-closed sentence's "or a `HOME` it cannot read when the default derivation is the one in play" becomes "or no home it can read when the default derivation is the one in play and `CLAUDE_CONFIG_DIR` is unset". A paragraph is added after *It has one arm, and the knobs are it*: "**`--emit memory-dirs` prints the scan set**, one directory per line, from the same resolution the gate scans, so the session-context hook's step 5 folds nothing of its own."
-- context-kit/SPEC.md §The session-context hook (template), step 5: "one warning line when the harness memory dir (`CONTEXT_KIT_MEMORY_DIRS`) holds content" becomes "one warning line when a dir `--emit memory-dirs` prints holds content, under step 2's binary guard".
+- context-kit/SPEC.md §The session-context hook (template), step 5: "one warning line when the harness memory dir (`CONTEXT_KIT_MEMORY_DIRS`) holds content" becomes "one warning line when a dir `--emit memory-dirs` prints holds content, under its own binary guard".
 - context-kit/SPEC.md §Layout and configuration, the paragraph after the knob list: `CONTEXT_KIT_MEMORY_DIRS` leaves the list of names the template reads from its own environment, since step 5 reads it through the arm.
 
 ### (8) The site mirrors follow
 
-{mechanical} `docs/context-kit/SPEC.md` and `docs/lifecycle-kit/SPEC.md` are regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write`, in the commit landing deltas 6 and 7.
+{mechanical} `docs/context-kit/SPEC.md`, `docs/lifecycle-kit/SPEC.md` and `docs/drift-kit/SPEC.md` are regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write`, in the commit landing deltas 6 and 7.
 
 ## Producers and consumers
 
@@ -97,7 +98,7 @@ The `spec:` comments recording the open Windows question at `memory_dir_default`
 
 ## Existing sections updated
 
-Roster produced by `git grep -n "tr '/.' '-'\|memory_dir_default\|fn slug\|projects/<slug>\|cwd slug\|CONTEXT_KIT_MEMORY_DIRS" -- . ':!TASK-QUEUE.md'`, with each hit read.
+Roster produced by `git grep -n "tr '/.' '-'\|memory_dir_default\|fn slug\|projects/<slug>\|cwd slug\|cwd-slug\|CONTEXT_KIT_MEMORY_DIRS" -- . ':!TASK-QUEUE.md'`, with each hit read.
 
 - `.github/workflows/gates.yml` — `crate-tests-windows`, the probe step (deltas 1 and 6).
 - `native/src/sessions.rs` — `slug` and its tests (deltas 2 and 5).
@@ -107,6 +108,7 @@ Roster produced by `git grep -n "tr '/.' '-'\|memory_dir_default\|fn slug\|proje
 - `context-kit/gate-tests/check-memory-off.test.sh` — the agreement case (delta 5).
 - `context-kit/SPEC.md` — §Layout and configuration (deltas 6 and 7); §check-memory-off and §The session-context hook (template), step 5 (delta 7).
 - `lifecycle-kit/SPEC.md` — §bin/session-id.sh (delta 7).
+- `drift-kit/SPEC.md`, `docs/drift-kit/SPEC.md` — the `DRIFT_KIT_SESSIONS_DIR` slug sentence and its mirror (delta 7; the mirror regenerated in delta 8).
 - `docs/context-kit/SPEC.md`, `docs/lifecycle-kit/SPEC.md` — the regenerated mirrors (delta 8).
 
 ## Retired spellings

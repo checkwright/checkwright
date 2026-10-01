@@ -27,7 +27,7 @@ A member resolving into a kit's `checks/` adds nothing here, because the kit-roo
 
 The callers pass the gates dir:
 
-- `installed_selection` passes `crate::knobs::gates_dir()`, the dir its registry read already uses.
+- `installed_selection` passes `crate::knobs::gates_dir()`. Its existing registry read goes through the manifest's `{GATES_DIR}/gates.list` constant, which equals the knob only at defaults, so the new arm reads the registry from the knob's dir and the delta does not move the existing read.
 - `derived_audience_here` passes the same knob.
 - `init` passes none: the payload holds no adopter content. The fence arm's honest limit covers this unchanged. A gate registered after `init` is owed from the next `doctor` or env-probe read, and until then the battery's fail-closed exit 2 on a missing `bash` keeps the gap loud.
 
@@ -52,6 +52,8 @@ The arm's predicate reads files the way the other arms do. An unreadable registr
 {mechanical} **Not yet applied.**
 
 context-kit/SPEC.md §bin/env-probe:
+
+- The predicate's description of its non-kit arms as "keyed on document content" and the sentence calling an adopter's opt-in shell-gate skeleton "already accounted for" by the contributor audience and the door surfaces are reworded to include the fourth arm, which is keyed on registry and gates-dir content and owes `bash` for a registered shell gate.
 
 - The third-arm paragraph's sentence "A **bash surface** is whatever any of the three arms reads." becomes:
 
@@ -90,6 +92,7 @@ Roster produced by `git grep -n 'derived_audience\|bash surface\|outside the aud
 
 - `native/src/toolfloor.rs` — `derived_audience_at`, `derived_audience_here`, the new arm (delta 1) and its test (delta 2).
 - `native/src/installer/doctor.rs` — `installed_selection`'s call (delta 1).
+- `native/src/gates/mod.rs` — the reads-couples census row pinning `toolfloor::derived_kit_audience_here` to a `src/toolfloor.rs` line, re-pinned in the commit landing delta 1, which shifts it.
 - `native/src/installer/init.rs` — its call, passing no gates dir (delta 1).
 - `context-kit/SPEC.md` — §bin/env-probe: the third-arm paragraph, the narrowing paragraph, the `registered` bullet (delta 3).
 - `installer/SPEC.md` — §Requirements, *The `bash` audience* (delta 3).

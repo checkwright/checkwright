@@ -9,7 +9,7 @@
 - `check-settings-paths` reads `hooks.*[].hooks[]` commands (not `statusLine`). It strips a leading `${CLAUDE_PROJECT_DIR}` (quoted or bare) before its existence check (`strip_project_root`, `native/src/gates/settings_paths.rs`), so the anchored SessionStart command still resolves.
 - The bash-audience derivation's settings arm (`spawns_bash_in_settings`, `native/src/toolfloor.rs`) still finds `bash` as the first word.
 - `check-door-binding` exempts `--statusline` and `--hook` wherever they sit (guard-kit/SPEC.md §check-door-binding).
-- The enforcement-map emitter rows each SessionStart command by its first `/`-bearing token, verbatim (`native/src/emit/enforcement_map.rs`). So `docs/enforcement.md`'s session-warnings row changes when this repo's own SessionStart spelling does.
+- The enforcement-map emitter rows each SessionStart command by its first `/`-bearing token, verbatim (`native/src/emit/enforcement_map.rs`). So `docs/enforcement.md`'s session-warnings row changes when this repo's own SessionStart spelling does. The anchored spelling renders that token verbatim, quotes and variable included, and the kit column stays "(consumer)", since no `-kit` segment is in it; the regenerated row is read once for clean rendering.
 - No installer arm writes an adopter's settings (guard-kit/SPEC.md §check-door-binding), and `plugin/hooks/hooks.json` carries neither wiring.
 
 ## What changes

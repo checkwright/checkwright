@@ -26,13 +26,13 @@ The `-not -path "*/<prune>/*"` spelling in `corpus`'s `spec:` comment is replace
 
 ### (2) A crate test pins a root under a pruned ancestor
 
-{mechanical} The `emit` module gains a unit test building a scratch tree whose root sits below a directory named by a default leaf (`<tmp>/build/r`). It asserts three things:
+{mechanical} The `emit` module gains a unit test building a scratch tree whose root sits below a directory named by a default leaf (`<tmp>/build/r`). It asserts three things, and a fourth case beside them:
 
 - `corpus` over the absolute root returns the root's `a.md`.
 - `corpus` over that absolute file path returns the file.
 - A `target/` directory **below** the root is still excluded.
 
-It also covers the empty case: `corpus` over a root holding only pruned subtrees returns nothing.
+The fourth case is the empty one: `corpus` over a root holding only pruned subtrees returns nothing.
 
 The index-tests goldens are unchanged. Every golden invocation names one explicit file under `context-kit/index-tests/corpus/`, and no default leaf names a directory on that path in this tree.
 
@@ -48,7 +48,7 @@ In §Layout and configuration, the `CONTEXT_KIT_PRUNE_DIRS` bullet's "array of *
 
 In gate-sdk/SPEC.md §lib/gate.sh, the sentence "The match is on the **leaf basename**, so neither the parent nor its siblings are taken." becomes:
 
-> The match is on the **leaf basename**, so neither the parent nor its siblings are taken. `gate_path_pruned` and `walk::path_pruned` match a leaf anywhere in the string they are handed, so a caller hands them a path relative to the walk's root, never an absolute one.
+> The match is on the **leaf basename**, so neither the parent nor its siblings are taken. `gate_path_pruned` and `walk::path_pruned` match a leaf anywhere in the string they are handed, so a caller hands them a path relative to the walk's root, never an absolute one. `spec::comment_surface` takes the same caller contract: its callers default the root to `.` and pass it explicitly, and an absolute root reaches the same defect through its glob branch.
 
 ### (4) The site mirrors follow
 
