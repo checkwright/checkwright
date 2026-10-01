@@ -72,14 +72,6 @@ queue-kit/SPEC.md's eleven gate sections, §check-roadmap-fresh and §check-queu
 
 **Cost while deferred:** every only-paths commit touching the gate's trigger set reds, forcing a plain commit against the shared-index rule. Filed 2026-10-01 to the gap inbox after context-kit-value-pass' close, surfaced by the emit::corpus dialect hotfix; promoted at lifecycle-queue-value-pass' scope on the operator's direction of that day, lead-relayed (not a ruling).
 
-### hotfix-push-owner
-
-`.claude/agents/hotfix-session.md` names no push owner: a hotfix landing after the closing push (a red closing run) must push and watch its run, and the lead improvised a per-dispatch push grant, standing policy riding a dispatch prompt (lifecycle-kit/templates/lead.md §Policy is config, not prose). Re-verified at scope: the definition carries no push rule, and it is consumer-tracked, not generated from a kit template.
-
-**Deliverable:** the definition naming the push and the watch-to-green for a hotfix landing after the closing push, within the close binding's `push-budget` (`.claude/commands/close.md`) and after the ops runbook's account step. Should it widen lifecycle-kit/SPEC.md §templates/lead.md's hotfix policy list, that is an envelope question for the lead.
-
-**Cost while deferred:** each post-close hotfix rides a hand-written push grant. Filed 2026-10-01 to the gap inbox by the lead after context-kit-value-pass' close; promoted at lifecycle-queue-value-pass' scope on the operator's direction of that day, lead-relayed (not a ruling).
-
 ## Deferred
 
 ### manifest-finder-untracked-walk
@@ -1398,5 +1390,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 
 - consult-intake-narrowing
 - roadmap-horizon-lag-detector
+- hotfix-push-owner
 
 ## Lessons Learned

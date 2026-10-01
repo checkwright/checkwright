@@ -167,7 +167,7 @@ The rule cuts both ways: policy binding the **lead itself** is standing too, and
 
 ## Stamps are authoritative (the load-bearing invariant)
 
-The lead writes **no** lifecycle state — no WORKFLOW-STATE stamps, no queue writes, no evidence files, no push — a push is the stage session's whose next act reads its run (lifecycle-kit/SPEC.md §The state machine). The dispatch marker is scratch, not lifecycle state. Every stamp originates in the stage session via `--enter-stage`. Lead-does-stamping is ruled out, not merely omitted (lifecycle-kit/SPEC.md §The state machine).
+The lead writes **no** lifecycle state — no WORKFLOW-STATE stamps, no queue writes, no evidence files, no push — a push is the stage session's whose next act reads its run (lifecycle-kit/SPEC.md §The state machine), or a hotfix's landing after the closing push, whose definition owns that push and its watch (lifecycle-kit/SPEC.md §templates/lead.md). The dispatch marker is scratch, not lifecycle state. Every stamp originates in the stage session via `--enter-stage`. Lead-does-stamping is ruled out, not merely omitted (lifecycle-kit/SPEC.md §The state machine).
 
 **The lead stamping nothing is not the batch stamping nothing**, and the two read alike from here. A dispatched batch stamps on entry like any stage session: an intra-stage split makes the second batch a *session*, not a re-entry to suppress, and a sibling stamp naming a stage the cursor already sits on moves nothing — the stage skill owns that rule and its gate tolerance (lifecycle-kit/templates/stages/build.md). Directing a batch not to stamp is therefore not conflict-avoidance; it silently spends the per-session audit trail the stamp exists to provide, and no later session can repair it.
 
