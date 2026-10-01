@@ -122,15 +122,39 @@ pub fn derived_audience_at(
     anchor: &str,
     roots: &[String],
     sdk_root: &str,
+    gates_dir: Option<&str>,
 ) -> Result<Vec<String>, String> {
     let mut out = kit_arms_at(anchor, roots, sdk_root)?;
-    if let Some(owner) = fence_executor(anchor, roots, &kit_name(sdk_root))? {
+    let floor = kit_name(sdk_root);
+    let anchored = [
+        fence_executor(anchor, roots, &floor)?,
+        gates_dir.and_then(|g| registered_shell_gate(anchor, roots, &floor, g)),
+    ];
+    for owner in anchored.into_iter().flatten() {
         if !out.contains(&owner) {
             out.push(owner);
         }
     }
     out.sort();
     Ok(out)
+}
+
+// spec: context-kit/SPEC.md §bin/env-probe — the fourth arm, over the anchor's registry: a member
+// resolving to a `.sh` in the gates dir owes `bash` through the floor-holder, whose runner spawns
+// it. An unreadable registry contributes nothing, the fence arm's degrade for an unreadable doc.
+fn registered_shell_gate(anchor: &str, roots: &[String], floor: &str, gates_dir: &str) -> Option<String> {
+    if !roots.iter().any(|r| kit_name(r) == floor) {
+        return None;
+    }
+    let gates = under(anchor, gates_dir).display().to_string();
+    let text = std::fs::read_to_string(crate::registry::list_path(&gates)).ok()?;
+    let kit_dirs: Vec<String> = roots.iter().map(|r| under(anchor, r).display().to_string()).collect();
+    let dirs = crate::registry::resolve_dirs(&gates, &kit_dirs);
+    crate::registry::members(&text)
+        .iter()
+        .map(|m| m.trim())
+        .any(|m| crate::registry::resolve(m, &dirs).is_some_and(|p| p == format!("{}/{}.sh", gates, m)))
+        .then(|| floor.to_string())
 }
 
 // spec: context-kit/SPEC.md §bin/env-probe — the two per-kit-root arms alone, the audience a
@@ -194,7 +218,7 @@ fn fence_executor(anchor: &str, roots: &[String], floor: &str) -> Result<Option<
 // not `kit_roots_rel()`: it opens files, so it takes the repository-path spelling.
 pub fn derived_audience_here() -> Result<Vec<String>, String> {
     let here = crate::walk::cwd()?;
-    derived_audience_at(&here, &crate::walk::kit_roots()?, &crate::walk::sdk_root())
+    derived_audience_at(&here, &crate::walk::kit_roots()?, &crate::walk::sdk_root(), Some(&crate::knobs::gates_dir()))
 }
 
 // spec: context-kit/SPEC.md §bin/env-probe — the kit-root arms against the tree the reader stands
@@ -442,7 +466,7 @@ mod tests {
             .collect();
         let roots: Vec<String> =
             kits.iter().map(|k| repo.join(k).display().to_string()).collect();
-        let derived = derived_audience_at(&repo.display().to_string(), &roots, &sdk)
+        let derived = derived_audience_at(&repo.display().to_string(), &roots, &sdk, None)
             .expect("the derivation could not run");
         (kits, derived)
     }
@@ -547,11 +571,50 @@ mod tests {
         let a = anchor.display().to_string();
         let roots = vec![kit.display().to_string()];
         let sdk = anchor.join("gate-sdk").display().to_string();
-        assert!(derived_audience_at(&a, &roots, &sdk).unwrap().is_empty());
+        assert!(derived_audience_at(&a, &roots, &sdk, None).unwrap().is_empty());
         std::fs::write(anchor.join("README.md"), marked).unwrap();
-        assert_eq!(derived_audience_at(&a, &roots, &sdk).unwrap(), vec!["canon-kit"]);
-        assert!(derived_audience_at(&a, &[], &sdk).unwrap().is_empty());
+        assert_eq!(derived_audience_at(&a, &roots, &sdk, None).unwrap(), vec!["canon-kit"]);
+        assert!(derived_audience_at(&a, &[], &sdk, None).unwrap().is_empty());
         let _ = std::fs::remove_dir_all(&anchor);
+    }
+
+    // spec: context-kit/SPEC.md §bin/env-probe — the fourth arm: a registered member resolving to a
+    // `.sh` in the gates dir owes `bash` through the floor-holder, and nothing else here does
+    #[test]
+    fn a_registered_shell_gate_in_the_gates_dir_brings_the_floor_holder_into_the_audience() {
+        let _knobs = crate::knobenv::lock();
+        let anchor = std::env::temp_dir().join(format!("toolfloor-shell-gate.{}", std::process::id()));
+        let gates = anchor.join("scripts");
+        let sdk = anchor.join("gate-sdk");
+        let kit = anchor.join("other-kit");
+        std::fs::create_dir_all(&gates).unwrap();
+        std::fs::create_dir_all(sdk.join("checks")).unwrap();
+        std::fs::create_dir_all(kit.join("checks")).unwrap();
+        let a = anchor.display().to_string();
+        let s = sdk.display().to_string();
+        let roots = vec![s.clone(), kit.display().to_string()];
+        let derive = |g: Option<&str>| derived_audience_at(&a, &roots, &s, g).unwrap();
+        let list = |body: &str| std::fs::write(gates.join("gates.list"), body).unwrap();
+
+        list("check-x\n");
+        std::fs::write(gates.join("check-x.sh"), "echo x\n").unwrap();
+        assert_eq!(derive(Some("scripts")), vec!["gate-sdk"]);
+        assert!(derive(None).is_empty(), "no gates dir passed");
+        std::fs::remove_file(gates.join("check-x.sh")).unwrap();
+        std::fs::write(gates.join("check-x.gate"), "argv: x\n").unwrap();
+        assert!(derive(Some("scripts")).is_empty(), "a .gate declaration");
+
+        list("");
+        std::fs::write(gates.join("check-y.sh"), "echo y\n").unwrap();
+        assert!(derive(Some("scripts")).is_empty(), "an unregistered .sh");
+
+        list("check-z\n");
+        std::fs::write(kit.join("checks").join("check-z.sh"), "echo z\n").unwrap();
+        assert!(derive(Some("scripts")).is_empty(), "a member resolving into a kit's checks/");
+        let _ = std::fs::remove_dir_all(&anchor);
+
+        let sel = derived_selection(&["gate-sdk"], &[], &["gate-sdk"]);
+        assert_eq!(owed("bash:4.3::derived", Some(&sel)), Owing::Owed);
     }
 
     // spec: context-kit/SPEC.md §bin/env-probe — `under` synthesizes no separator, the property

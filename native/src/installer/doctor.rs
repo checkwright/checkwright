@@ -294,10 +294,12 @@ fn installed_selection(root: &std::path::Path) -> Option<Selection> {
     // install put the kits in, which is the one place a consumer-side reader can evaluate the
     // predicate; an unreadable tree leaves it empty and the owed-predicate answers undecided
     let here = root.display().to_string();
+    let gates_dir = crate::knobs::gates_dir();
     let derived = toolfloor::derived_audience_at(
         &here,
-        &crate::walk::kit_roots_abs_at(&here, &crate::knobs::gates_dir()).unwrap_or_default(),
+        &crate::walk::kit_roots_abs_at(&here, &gates_dir).unwrap_or_default(),
         &crate::walk::sdk_root(),
+        Some(&gates_dir),
     )
     .unwrap_or_default();
     Some(Selection {

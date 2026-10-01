@@ -502,6 +502,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         &payload.display().to_string(),
         &payload_roots,
         &crate::walk::sdk_root(),
+        None,
     )
     .map_err(|e| refuse(format!("could not derive the bash audience: {}", e), "", 2))?;
     let selection = toolfloor::Selection {

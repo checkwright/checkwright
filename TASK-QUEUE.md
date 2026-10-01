@@ -8,18 +8,6 @@
 
 ## New Features
 
-### doctor-shell-gate-bash
-
-[spec: SPEC-doctor-shell-gate.md]
-
-`doctor` does not owe `bash` for a consumer-registered shell gate. `bash`'s audience is derived over the kit roots and the anchor's fence-run corpus only (context-kit/SPEC.md §bin/env-probe), and a registered name with no `REGISTRY` row contributes nothing, so a native-Windows adopter who writes a shell gate without Git for Windows' bash reads `DOCTOR: clean` and meets the battery's exit 2 instead.
-
-**Deliverable:** a fourth derivation arm owing `bash` where the anchor's `gates.list` registers a member resolving to a `.sh` declaration in the gates dir, with its fixture.
-
-**Cost while deferred:** the requirement is stated on the install page only, and doctor's clean verdict misleads an adopter who skipped it. Filed 2026-09-27 to the gap inbox by platform-prerequisite-floors' build; promoted at its close: →fix fails because the arm widens doctor's verdict, adopter-visible semantics no amendment settled. Re-verified: the section's bash audience names three arms, two per kit root and one over the fence-run corpus, none reading a registered `.sh` member; docs/install.md's Windows section states the requirement. Owner lookup: `doctor`, `audience`, `env-probe` in this file — only [heterogeneous-agent-delegation](#heterogeneous-agent-delegation)'s CLI probe, DISTINCT; owner context-kit/SPEC.md §bin/env-probe. Related: [custom-gate-substrates](#custom-gate-substrates).
-
-**Selected 2026-10-01 for context-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it ahead of [custom-gate-substrates](#custom-gate-substrates), which generalizes the arm per substrate.
-
 ### hook-wiring-relative-command
 
 [spec: SPEC-anchored-wirings.md]
@@ -84,7 +72,7 @@ no guidance routes a mid-iteration operator request into the current iteration. 
 
 context-kit/SPEC.md's sections this iteration's features edit, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §Index-first reading, §The session-context hook, §bin/env-probe and §Layout and configuration, about 9.6k of the file's 20.1k words by awk count; context-kit's other sections stay on the parent.
 
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. It rides the batch after the features that edit them: `prune-set-matches-walk-root-ancestors` (§Index-first reading, §Layout and configuration), [doctor-shell-gate-bash](#doctor-shell-gate-bash) (§bin/env-probe), [hook-wiring-relative-command](#hook-wiring-relative-command) (§The session-context hook) and [harness-project-dir-fold-dialect-unresolved](#harness-project-dir-fold-dialect-unresolved) (§Layout and configuration).
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. It rides the batch after the features that edit them: `prune-set-matches-walk-root-ancestors` (§Index-first reading, §Layout and configuration), `doctor-shell-gate-bash` (§bin/env-probe), [hook-wiring-relative-command](#hook-wiring-relative-command) (§The session-context hook) and [harness-project-dir-fold-dialect-unresolved](#harness-project-dir-fold-dialect-unresolved) (§Layout and configuration).
 
 **Cost while deferred:** paid by every session and adopter that reads an unpassed context-kit section. Filed 2026-10-01 as a split at context-kit-value-pass' scope. Part of the operator's selection of set A+, direction 2026-10-01, lead-relayed (not a ruling).
 
@@ -1432,5 +1420,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 
 - nested-battery-env-inheritance-invisible
 - prune-set-matches-walk-root-ancestors
+- doctor-shell-gate-bash
 
 ## Lessons Learned

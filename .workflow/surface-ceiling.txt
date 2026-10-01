@@ -20,7 +20,7 @@
 257084cp canon-kit/SPEC.md
 5785cp canon-kit/templates/SPEC-amendment.md
 23762cp companion/SPEC.md
-130332cp context-kit/SPEC.md
+131200cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
 286192cp delegation-kit/SPEC.md
 37827cp delegation-kit/templates/agent-execution.md
@@ -35,7 +35,7 @@
 1472cp docs/gate-sdk/index.md
 1259cp docs/guard-kit/index.md
 5205cp docs/index.md
-20169cp docs/install.md
+20136cp docs/install.md
 1344cp docs/kits.md
 1395cp docs/lifecycle-kit/index.md
 3007cp docs/methodology.md
@@ -90,7 +90,7 @@
 2899cp gate-sdk/templates/adopt.md
 316094cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
-270785cp installer/SPEC.md
+270777cp installer/SPEC.md
 340558cp lifecycle-kit/SPEC.md
 5550cp lifecycle-kit/templates/consult.md
 42551cp lifecycle-kit/templates/lead.md
