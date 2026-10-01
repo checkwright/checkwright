@@ -317,8 +317,8 @@ cat > "$il/CLAUDE.md" <<'EOF'
 
 Resident context the consumer keeps.
 EOF
-il_run() { LIFECYCLE_KIT_AGENT_FILE="$il/CLAUDE.md" bash "$SDK/bin/run-gates.sh" --install-lifecycle "$@"; }
-il_gate() { ( export LIFECYCLE_KIT_AGENT_FILE="$il/CLAUDE.md"; kit_gate check-lifecycle-registration "$@" ); }
+il_run() { LIFECYCLE_KIT_AGENT_FILE="$il/CLAUDE.md" bash "$SDK/bin/run-gates.sh" --install-lifecycle; }
+il_gate() { ( export LIFECYCLE_KIT_AGENT_FILE="$il/CLAUDE.md"; kit_gate check-lifecycle-registration ); }
 
 il_run >/dev/null
 grep -q "<!-- lifecycle-kit:begin -->" "$il/CLAUDE.md" || { echo "smoke(install-lifecycle): block not injected" >&2; exit 1; }

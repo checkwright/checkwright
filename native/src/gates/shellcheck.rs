@@ -6,10 +6,10 @@ use crate::walk;
 
 const NAME: &str = "check-shellcheck";
 
-// spec: gate-sdk/SPEC.md §check-shellcheck — each kit root contributes these four directories and
-// no other, so the derived set is the shell form's own `"$k/lib" "$k/bin" "$k/checks" "$k/templates"`
+// spec: gate-sdk/SPEC.md §check-shellcheck — each kit root contributes these five directories and
+// no other, so the derived set is the shell form's own `"$k/lib" "$k/bin" "$k/checks" "$k/templates" "$k/smoke"`
 // in that order: the target list's order is the order shellcheck reports in
-const KIT_SUBDIRS: &[&str] = &["lib", "bin", "checks", "templates"];
+const KIT_SUBDIRS: &[&str] = &["lib", "bin", "checks", "templates", "smoke"];
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the refusal is this member's own text at the
 // shell form's own point in the order: before the target glob, so a tree with nothing to lint and

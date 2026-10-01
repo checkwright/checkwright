@@ -8,18 +8,6 @@
 
 ## New Features
 
-### smoke-script-parse-unchecked
-
-[spec: SPEC-smoke-lint.md]
-
-a kit `smoke/install.sh` or `smoke/violation.sh` that bash cannot parse passes the whole commit-time battery. At guard-kit-steering's build an apostrophe in the `SMOKE_KIT_ROOT` entry-guard hint left every kit's smoke script unparseable, and only `--run-consumer-smoke`, a validate suite, caught it; `check-smoke-entry-guard` reads the guard by prefix and never parses the script, and no shell-syntax gate reaches the smoke dirs.
-
-**Deliverable:** a parse check over the smoke roster at commit time, in `check-smoke-entry-guard` or a shell-syntax gate's corpus, with its behaviour where bash is absent stated.
-
-**Cost while deferred:** a broken kit smoke script can land and ride a release unless validate runs the smoke. Filed 2026-09-30 to the gap inbox by guard-kit-steering's build; promoted at its close: →fix fails because a gate spawning bash meets the adopter constraints' no-toolchain floor, a design question, →forward because no ruling is owed. Re-verified: gate-sdk/SPEC.md §Consumer smoke now forbids the quote character in the hint, the instance's fix, and names no parse. Owner lookup: `smoke-entry-guard`, `bash -n`, `parse` in this file — the icebox's smoke-roster-guard-precedes-hand-off, DISTINCT (guard ordering); owner gate-sdk/SPEC.md §check-smoke-entry-guard.
-
-**Selected 2026-10-01 for install-disposition-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, ruling the parse check's behaviour where bash is absent.
-
 ## Technical Debt
 
 ## Deferred
@@ -1429,5 +1417,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - dangling-registration-cascade
 - shellcheck-extra-dirs-trigger
 - readme-spec-links-offsite
+- smoke-script-parse-unchecked
 
 ## Lessons Learned

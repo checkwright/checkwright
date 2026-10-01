@@ -410,7 +410,7 @@ econ() {   # $1 = price-table path (a missing path exercises the degradation)
 }
 
 set +e
-eout="$(econ "$work/se-prices.tsv" 2>&1)"; erc=$?
+econ "$work/se-prices.tsv" >/dev/null 2>&1; erc=$?
 set -e
 [[ "$erc" -eq 0 ]] || fail "stage-economics exited $erc (advisory tool must exit 0)"
 
@@ -533,12 +533,12 @@ set +e
 # spec: gate-sdk/SPEC.md §The non-gate arm — the binary knob is absolutised for the same reason
 # the trajectory arm's own fake-history run does: after the cd, a repo-relative default resolves
 # to nothing in the throwaway repo.
-hout="$( cd "$trepo" && GATE_SDK_NATIVE_BIN="$TRAJ_BIN" \
+( cd "$trepo" && GATE_SDK_NATIVE_BIN="$TRAJ_BIN" \
     DRIFT_KIT_STATE_FILE=".workflow/WORKFLOW-STATE.txt" \
     DRIFT_KIT_SESSIONS_DIR="$hdir" \
     DRIFT_KIT_PRICE_TABLE="$work/se-prices.tsv" \
     DRIFT_KIT_STAGE_ECONOMICS_LOG="$hlog" \
-    bash "$DRIFT_ARM" --emit stage-economics 2>&1 )"; hrc=$?
+    bash "$DRIFT_ARM" --emit stage-economics >/dev/null 2>&1 ); hrc=$?
 set -e
 [[ "$hrc" -eq 0 ]] || fail "stage-economics over fake history exited $hrc (advisory tool must exit 0)"
 grep -q '^alpha build s2 ' "$trepo/.workflow/WORKFLOW-STATE.txt" \
