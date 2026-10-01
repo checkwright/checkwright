@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: lifecycle-queue-value-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,38 @@
 ## New Features
 
 ## Technical Debt
+
+### lifecycle-queue-value-audit
+
+[gate-customer-value-audit](#gate-customer-value-audit)'s slice for lifecycle-kit's 15 gates and queue-kit's 11, 26 `.gate` descriptors audited for customer value and configurability under gate-sdk/SPEC.md §Consumer payload's rule.
+
+**Deliverable:** each gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated, leaving gate-sdk's 43 gates the one kit unaudited. `check-lesson-disposition`'s verdict follows [lessons-learned-channel-audit](#lessons-learned-channel-audit)'s channel decision, and `check-skill-binding`'s reads [skill-binding-couples-drift](#skill-binding-couples-drift)'s assertion.
+
+**Cost while deferred:** the parent's cost, for these kits. Filed 2026-10-01 as a split at lifecycle-queue-value-pass' scope. Part of the operator's selection of set A, direction 2026-10-01, lead-relayed (not a ruling).
+
+### queue-kit-gate-brevity
+
+queue-kit/SPEC.md's eleven gate sections, §check-roadmap-fresh and §check-queue-hygiene through §check-queue-slug-liveness, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement), about 9.5k of the file's 28.8k words by awk count; queue-kit's other sections stay on the parent.
+
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. It rides the batch after [lifecycle-queue-value-audit](#lifecycle-queue-value-audit), whose queue-kit verdicts may edit the same sections.
+
+**Cost while deferred:** paid by every session and adopter that reads an unpassed queue-kit gate section. Filed 2026-10-01 as a split at lifecycle-queue-value-pass' scope. Part of the operator's selection of set A, direction 2026-10-01, lead-relayed (not a ruling).
+
+### kit-roots-dialect-index-env
+
+`check-kit-roots-dialect` reds in the pre-commit hook under the only-paths commit form: git exports a relative `GIT_INDEX_FILE` (`.git/next-index-N.lock`) to the hook, the gate's vendoring children (`git init`/`add`/`commit` at `native/src/gates/kit_roots_dialect.rs`, then `--emit-enum-sets` with its cwd inside the vendoring) inherit it, it resolves to no index there, and `--emit-enum-sets` exits 2. Re-verified at scope: with `.git/index` copied to `.tmp/idx-copy`, `GIT_INDEX_FILE=.tmp/idx-copy bash gate-sdk/bin/run-gates.sh --only check-kit-roots-dialect` reds and the plain run passes; no other production gate runs `git init` in a scratch dir.
+
+**Deliverable:** the gate's children spawned with `proc::GIT_REPO_LOCATORS` stripped, the shape `check-crate-arms` already takes through `run_merged_without`, that list's `spec:` binding widened to name both gates, and a fixture or crate test running the gate under a relative `GIT_INDEX_FILE`.
+
+**Cost while deferred:** every only-paths commit touching the gate's trigger set reds, forcing a plain commit against the shared-index rule. Filed 2026-10-01 to the gap inbox after context-kit-value-pass' close, surfaced by the emit::corpus dialect hotfix; promoted at lifecycle-queue-value-pass' scope on the operator's direction of that day, lead-relayed (not a ruling).
+
+### hotfix-push-owner
+
+`.claude/agents/hotfix-session.md` names no push owner: a hotfix landing after the closing push (a red closing run) must push and watch its run, and the lead improvised a per-dispatch push grant, standing policy riding a dispatch prompt (lifecycle-kit/templates/lead.md §Policy is config, not prose). Re-verified at scope: the definition carries no push rule, and it is consumer-tracked, not generated from a kit template.
+
+**Deliverable:** the definition naming the push and the watch-to-green for a hotfix landing after the closing push, within the close binding's `push-budget` (`.claude/commands/close.md`) and after the ops runbook's account step. Should it widen lifecycle-kit/SPEC.md §templates/lead.md's hotfix policy list, that is an envelope question for the lead.
+
+**Cost while deferred:** each post-close hotfix rides a hand-written push grant. Filed 2026-10-01 to the gap inbox by the lead after context-kit-value-pass' close; promoted at lifecycle-queue-value-pass' scope on the operator's direction of that day, lead-relayed (not a ruling).
 
 ## Deferred
 
@@ -278,7 +310,7 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes, landing as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes, landing as `installer-install-brevity` and `installer-remainder-brevity`.
 
-Each on an operator direction lead-relayed (not a /consult ruling), the kit's other sections remaining: drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections (its preamble remains), delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope, landing as `context-kit-feature-brevity`.
+Each on an operator direction lead-relayed (not a /consult ruling), the kit's other sections remaining: drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections (its preamble remains), delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope, landing as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope as [queue-kit-gate-brevity](#queue-kit-gate-brevity).
 
 ### tarball-build-attestation
 
@@ -446,6 +478,8 @@ canon-kit's slice left 2026-09-30 at canon-kit-value-pass' scope, on an operator
 
 context-kit's, evidence-kit's and doctrine-kit's slice left 2026-10-01 at context-kit-value-pass' scope, on an operator direction lead-relayed (not a /consult ruling), as `small-kit-value-audit`, and landed in that iteration's build.
 
+lifecycle-kit's and queue-kit's slice left 2026-10-01 at lifecycle-queue-value-pass' scope, on an operator direction lead-relayed (not a /consult ruling), as [lifecycle-queue-value-audit](#lifecycle-queue-value-audit).
+
 ### compiled-consumer-smoke-driver
 
 [cost: iteration/high] [surface: installer]
@@ -522,6 +556,8 @@ the consult inbox takes more than the operator's model of consult. Operator dire
 
 **Cost while deferred:** each misfiled item costs a consultation to route it back out. Filed 2026-09-29 to the gap inbox by companion-adoption-landing's lead; promoted at its close: →fix fails because narrowing a producer set is a contract change to a SPEC section, →forward because the direction is given and filing it to consult is the misfile it names. Re-verified: §The consult inbox's Producers paragraph and opening list. Owner lookup: `consult inbox`, `intake` in this file — `consult-tier-declaration`, DISTINCT (the tier consult runs at, not what enters it); owner lifecycle-kit/SPEC.md §The consult inbox.
 
+**Selected 2026-10-01 for lifecycle-queue-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it within the 2026-09-29 and 09-30 directions above; whether a lead-dispatched consultation still earns a dispatch is escalated, not invented.
+
 ### user-facing-delta-unsurfaced
 
 [cost: event/low] [surface: lifecycle-kit]
@@ -531,6 +567,8 @@ a user-facing choice can ride a `{mechanical}` delta and reach no operator: the 
 **Deliverable:** a spec-stage rule that a delta changing user-facing semantics, the site's reach or labels included, is surfaced in the amendment's rulings, and align's check of it; or a boundary note refusing both.
 
 **Cost while deferred:** the next such choice lands unreviewed and costs a later reversal unit. Filed 2026-09-29 to the gap inbox by companion-adoption-landing's build; promoted at its close: →fix fails because a stage rule is new kit mechanism, →forward because no ruling is owed. Re-verified: spec.md's Label every delta defines the tag by execution judgment. Owner lookup: `work-class`, `user-facing`, `mechanical` in this file — the icebox's amendment-work-class-label-placement, DISTINCT (where the tag sits, not what it misses); owner lifecycle-kit/templates/stages/spec.md.
+
+**Selected 2026-10-01 for lifecycle-queue-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, the rule or its refusal.
 
 ### docs-chrome-page-repeat
 
@@ -551,6 +589,8 @@ a user-facing choice can ride a `{mechanical}` delta and reach no operator: the 
 **Deliverable:** an assertion that every template a shim under `LIFECYCLE_KIT_SKILLS_DIR` binds matches a `couples=` member of the gate's own descriptor, with a fixture pair; or a boundary note in lifecycle-kit/SPEC.md §check-skill-binding refusing it.
 
 **Cost while deferred:** a slot added to an uncoupled bound template fires nothing at commit and surfaces one tier late. Filed 2026-09-29 at companion-adoption-landing's close as the drain's gap generalization for the economics omission it fixed. Owner lookup: `skill-binding`, `couples` in this file — none; owner lifecycle-kit/SPEC.md §check-skill-binding.
+
+**Selected 2026-10-01 for lifecycle-queue-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it beside [lifecycle-queue-value-audit](#lifecycle-queue-value-audit)'s verdict on the same gate.
 
 ### companion-install-tier
 
@@ -575,6 +615,8 @@ close's roadmap-motion read files a consult item only for a slug that left the p
 **Inferred, not run:** rulings landed before the consult binding's re-tag surface existed had no retroactive horizon pass.
 
 **Cost while deferred:** the public roadmap lags the queue until a consult happens to look. Instances: [companion-toolkit-profile](#companion-toolkit-profile) held `next` from 2026-08-02 through the companion iterations; [spec-brevity-residue](#spec-brevity-residue) and [gate-customer-value-audit](#gate-customer-value-audit) carried no tag with slices landed, both curated at the 2026-09-29 consult, the audit to `next` on the relayed conditional; [heterogeneous-agent-delegation](#heterogeneous-agent-delegation) held `later` through its first slice at delegation-tier-binding, filed to consult at that close. Filed 2026-09-29 to the gap inbox by preview-readiness' lead, with an addendum carrying the criterion, merged here; promoted 2026-09-30 at its close: →fix fails because a close read is new stage mechanism, →forward because no ruling is owed. Re-verified: close.md step 5 names only the two triggers. Owner lookup: `horizon`, `lagging` in this file — none; owner lifecycle-kit/templates/stages/close.md, with queue-kit/SPEC.md §The roadmap arm.
+
+**Selected 2026-10-01 for lifecycle-queue-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, running the unrun marker above or rewriting it to the cannot-run form.
 
 ### update-availability-notice
 
@@ -615,6 +657,8 @@ the Lessons Learned channel may be obsolete, operator direction 2026-09-30, lead
 **Deliverable:** a function-to-replacement map and the essay harvest's reader confirmed; then, per Policy-as-choice, most likely the section made consumer-optional and off here rather than deleted, since queue-kit and lifecycle-kit ship it to adopters.
 
 **Cost while deferred:** every close walks a lesson step and a disposition gate over an empty channel, and validate routes observations to a section nothing reads. Filed 2026-09-30 to the gap inbox by preview-readiness' lead; promoted 2026-09-30 at the next iteration's scope: →fix fails because the audit is unsized and its likely outcome is a new knob. Re-verified: the `## Lessons Learned` section holds no bullet. Owner lookup: `lesson`, `essay` in this file — only the icebox's reclaim-precondition-outside-the-tree, DISTINCT (the essay sink's reclaim); owner queue-kit/SPEC.md §The queue format, with lifecycle-kit/templates/stages/close.md. Surface also lifecycle-kit.
+
+**Selected 2026-10-01 for lifecycle-queue-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it ahead of [lifecycle-queue-value-audit](#lifecycle-queue-value-audit), whose verdict on `check-lesson-disposition` follows the channel decision.
 
 ### hook-emit-remedy-door
 
