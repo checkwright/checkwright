@@ -60,10 +60,10 @@ pub fn run(_args: &[String]) -> i32 {
 
     let mut neither: Vec<String> = Vec::new();
     let mut halfpair: Vec<String> = Vec::new();
-    let (mut fixtured, mut optout, mut total) = (0usize, 0usize, 0usize);
+    let (mut fixtured, mut optout, mut total, mut unresolved) = (0usize, 0usize, 0usize, 0usize);
     for m in &members {
-        total += 1;
         if let Some(gd) = fixture_dir_for(m, &tests_dirs) {
+            total += 1;
             let good = fresh::is_dir(&format!("{}/good", gd));
             let bad = fresh::is_dir(&format!("{}/bad", gd));
             if good && bad {
@@ -76,13 +76,10 @@ pub fn run(_args: &[String]) -> i32 {
             continue;
         }
         let Some(src) = registry::resolve(m, &resolve_dirs) else {
-            neither.push(format!(
-                "{} (no fixture pair, and source resolves in none of: {})",
-                m,
-                resolve_dirs.join(" ")
-            ));
+            unresolved += 1;
             continue;
         };
+        total += 1;
         let declared = std::fs::read(&src)
             .map(|b| String::from_utf8_lossy(&b).into_owned())
             .unwrap_or_default();
@@ -100,7 +97,11 @@ pub fn run(_args: &[String]) -> i32 {
         }
     }
 
+    let skipped = registry::unresolved_skipped(unresolved);
     if !neither.is_empty() || !halfpair.is_empty() {
+        if !skipped.is_empty() {
+            println!("check-gate-fixture-coverage: {} member(s) checked{}", total, skipped);
+        }
         if !neither.is_empty() {
             println!("check-gate-fixture-coverage: gates.list member(s) with neither a fixture pair");
             println!("nor a '# no-fixture:' opt-out (gate-sdk/SPEC.md §Fixture-pair discipline — a");
@@ -133,8 +134,8 @@ pub fn run(_args: &[String]) -> i32 {
     }
 
     println!(
-        "GATE-FIXTURE-COVERAGE: clean ({} members: {} fixtured, {} opted-out)",
-        total, fixtured, optout
+        "GATE-FIXTURE-COVERAGE: clean ({} members: {} fixtured, {} opted-out{})",
+        total, fixtured, optout, skipped
     );
     0
 }

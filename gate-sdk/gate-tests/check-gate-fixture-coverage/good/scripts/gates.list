@@ -1,5 +1,7 @@
 # Fixture registry: check-alpha carries a gate-tests/check-alpha/{good,bad}
-# pair, and check-beta carries a '# no-fixture:' opt-out. Both are covered, so
+# pair, and check-beta carries a '# no-fixture:' opt-out. Both are covered, and
+# check-withheld resolves nowhere and is skipped and counted, so
 # check-gate-fixture-coverage must ACCEPT.
 check-alpha
 check-beta
+check-withheld

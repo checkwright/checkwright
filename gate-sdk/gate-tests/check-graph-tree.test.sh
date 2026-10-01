@@ -94,11 +94,13 @@ want_red() {  # want_red() <label> <substring>
     fi
 }
 
-want_green() {  # want_green() <label>
+want_green() {  # want_green() <label> [substring]
     if [[ "$rc" -ne 0 ]]; then
         echo "  FAIL [$1]: want exit 0, got $rc -- $out"; fails=$((fails + 1))
     elif ! grep -qF 'CHECK-GRAPH: clean' <<<"$out"; then
         echo "  FAIL [$1]: exit 0 but output lacks the clean line -- $out"; fails=$((fails + 1))
+    elif [[ -n "${2:-}" ]] && ! grep -qF -- "$2" <<<"$out"; then
+        echo "  FAIL [$1]: exit 0 but output lacks '$2' -- $out"; fails=$((fails + 1))
     fi
 }
 
@@ -121,7 +123,7 @@ want_red a-enum "dir= must be bi|one (got 'mono')"
 seed
 printf 'check-zeta\n' >>"$repo/scripts/gates.list"
 regen || true; run
-want_red a-unresolved "check-zeta is in gates.list but resolves in none of"
+want_green a-unresolved "1 unresolved member(s) skipped, reported by the runner"
 
 seed
 member check-alpha 'couples=scripts/gates.list,lib/x.rs trigger=* dir=one valve=none tier=precommit'

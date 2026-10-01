@@ -1,2 +1,3 @@
 GATE-OUTPUT: clean
 2 source-grepped as no-fixture members
+1 unresolved member(s) skipped, reported by the runner

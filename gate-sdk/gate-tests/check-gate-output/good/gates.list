@@ -1,4 +1,6 @@
-# Fixture registry (scanned as text, never executed): names one member that
-# DOES carry a '<NAME>: clean' success line — check-gate-output must ACCEPT.
+# Fixture registry (scanned as text, never executed): names members that DO
+# carry a '<NAME>: clean' success line, plus check-withheld, which resolves
+# nowhere and is skipped and counted — check-gate-output must ACCEPT.
 check-sample
 check-native-sample
+check-withheld

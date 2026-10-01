@@ -8,18 +8,6 @@
 
 ## New Features
 
-### dangling-registration-cascade
-
-[spec: SPEC-unresolved-registration.md]
-
-a `gates.list` name that resolves nowhere reds six gates at once — `check-gate-output`, `check-gate-fixture-coverage`, `check-gate-substrate-parity`, `check-graph`, `check-kit-enum` (exit 2) and the dangling member itself — rather than one clear unresolved-registration error. An adopter upgrading across a gate withheld or renamed reads six unrelated-looking reds for one stale line, and each such release owes a Tightened-gates bullet per sibling gate, as delegation-tier-binding's withholding of `check-rule-citation` did.
-
-**Deliverable:** one owner for the unresolved-registration verdict, with the siblings skipping an unresolved member rather than re-reporting it, its fixture pair, and the declaration burden it removes stated in gate-sdk/SPEC.md §Layout and configuration; or a boundary note there keeping the cascade.
-
-**Cost while deferred:** paid per adopter per withholding or rename, as six reds and six declaration bullets for one line. Filed 2026-09-30 to the gap inbox by the lead off build batch 4's upgrade smoke; promoted at delegation-tier-binding's close: →fix fails because narrowing five gates' verdicts is a contract change owing fixtures and a release note. Re-verified: a probe name appended to a scratch copy of the gates dir (`GATE_SDK_GATES_DIR`) reds all five named siblings. Owner lookup: `resolves nowhere`, `dangling`, `unresolved registration` in this file — none; owner gate-sdk/SPEC.md §Layout and configuration.
-
-**Selected 2026-10-01 for install-disposition-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, choosing the owner gate or the boundary note.
-
 ### shellcheck-extra-dirs-trigger
 
 [spec: SPEC-word-list-roots.md]
@@ -1462,5 +1450,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - seeded-ci-gates-on-surface
 - prose-tells-absence-knobs
 - canon-kit-gate-brevity
+- dangling-registration-cascade
 
 ## Lessons Learned

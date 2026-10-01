@@ -620,6 +620,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // cut, for which a zero in a tree that declares holds is the vacuous-pass tell
     let mut portuntil_grounded = 0usize;
     let mut declpaths: Vec<String> = Vec::new();
+    let mut unresolved = 0usize;
     for m in &members {
         for d in &resolve_dirs {
             if Path::new(&format!("{}/{}.sh", d, m)).is_file()
@@ -632,11 +633,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             }
         }
         let Some(src) = registry::resolve(m, &resolve_dirs) else {
-            ctx.findings.push(format!(
-                "unresolvable member: {} declares in none of: {}",
-                m,
-                resolve_dirs.join(" ")
-            ));
+            unresolved += 1;
             continue;
         };
         declpaths.push(src.clone());
@@ -972,8 +969,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let wf_absent_list = list_or_none(&wf_absent);
     let wf_followed_n = wf_followed.len();
 
+    let skipped = registry::unresolved_skipped(unresolved);
     if !ctx.findings.is_empty() {
-        println!("check-gate-substrate-parity: the gate substrate seam is not conserved:");
+        println!("check-gate-substrate-parity: the gate substrate seam is not conserved{}:", skipped);
         for f in &ctx.findings {
             println!("  {}", f);
         }
@@ -984,7 +982,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     println!(
-        "GATE-SUBSTRATE-PARITY: clean ({declared} member(s) with one declaration each, {dispatching} of them dispatching to the binary; {noport_declared} of the {declpaths_shell} shell declaration(s) declare '# no-port:' with a cause and {portuntil_declared} declare '# port-until:' with a slug, neither on any descriptor nor both on one declaration; the tracked shell tree beyond that set {tree_state}, {tree_scanned} file(s) read for header-declaration shape and {tree_declared} of them declaring, counted apart from the declaration set so an empty one stays visible; {portuntil_grounded} of those held declaration(s) reach their ground in one hop, the section their own '# spec:' field names stating the hold; {ndesc} descriptor(s) in parity with the {nsub}-subcommand roster ({in_scope} in scope, {out_of_scope} out of scope — an unvendored kit, or a consumer declaration from another tree), {refonly} reference-only; {unregistered_declared} in-scope subcommand(s) unregistered in {list} with a declared reason and none undeclared, the reverse direction empty; {j_state}; {sensitive} substrate-sensitive member(s) all dispositioned; {impl_scanned} implementation source(s) free of manifest-class annotation; {kit_scanned} kit root(s) scanned for an implementation sibling, crate root {crate_dir} outside every kit root; target roster {roster_state} at {roster_file} with {roster_targets} well-formed target(s); publish workflow(s) read: {wf_read_list}; absent: {wf_absent_list}; {wf_matrix} matrix declaration(s) roster-derived across {wf_jobs} job(s) with one producer per digest, {wf_followed_n} called script(s) read one hop deep)",
+        "GATE-SUBSTRATE-PARITY: clean ({declared} member(s) with one declaration each, {dispatching} of them dispatching to the binary{skipped};{noport_declared} of the {declpaths_shell} shell declaration(s) declare '# no-port:' with a cause and {portuntil_declared} declare '# port-until:' with a slug, neither on any descriptor nor both on one declaration; the tracked shell tree beyond that set {tree_state}, {tree_scanned} file(s) read for header-declaration shape and {tree_declared} of them declaring, counted apart from the declaration set so an empty one stays visible; {portuntil_grounded} of those held declaration(s) reach their ground in one hop, the section their own '# spec:' field names stating the hold; {ndesc} descriptor(s) in parity with the {nsub}-subcommand roster ({in_scope} in scope, {out_of_scope} out of scope — an unvendored kit, or a consumer declaration from another tree), {refonly} reference-only; {unregistered_declared} in-scope subcommand(s) unregistered in {list} with a declared reason and none undeclared, the reverse direction empty; {j_state}; {sensitive} substrate-sensitive member(s) all dispositioned; {impl_scanned} implementation source(s) free of manifest-class annotation; {kit_scanned} kit root(s) scanned for an implementation sibling, crate root {crate_dir} outside every kit root; target roster {roster_state} at {roster_file} with {roster_targets} well-formed target(s); publish workflow(s) read: {wf_read_list}; absent: {wf_absent_list}; {wf_matrix} matrix declaration(s) roster-derived across {wf_jobs} job(s) with one producer per digest, {wf_followed_n} called script(s) read one hop deep)",
         ndesc = descriptors.len(),
         nsub = roster.len(),
         in_scope = verdict.in_scope,

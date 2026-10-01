@@ -136,6 +136,15 @@ pub fn resolve(name: &str, dirs: &[String]) -> Option<String> {
     None
 }
 
+// spec: gate-sdk/SPEC.md §Layout and configuration — a registered name resolving nowhere is the
+// runner's one red; a gate reading the registry skips it and names the skip on its own line
+pub fn unresolved_skipped(n: usize) -> String {
+    if n == 0 {
+        return String::new();
+    }
+    format!(", {} unresolved member(s) skipped, reported by the runner", n)
+}
+
 // spec: gate-sdk/SPEC.md §run-gates — the resolve-dir order a battery reads a member's declaration
 // through: the gates dir first, then each kit's `checks/`
 pub fn resolve_dirs(gates_dir: &str, kit_roots: &[String]) -> Vec<String> {

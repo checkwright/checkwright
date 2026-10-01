@@ -522,18 +522,12 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let allowed = walk::knob_words("GATE_SDK_GRAPH_EXTERNAL_REFS")?;
 
     let mut errors: Vec<String> = Vec::new();
+    let mut unresolved = 0usize;
 
     for c in &checks {
-        let script = match registry::resolve(c, &cfg.resolve_dirs) {
-            Some(s) => s,
-            None => {
-                errors.push(format!(
-                    "MANIFEST: {} is in gates.list but resolves in none of: {}",
-                    c,
-                    cfg.resolve_dirs.join(" ")
-                ));
-                continue;
-            }
+        let Some(script) = registry::resolve(c, &cfg.resolve_dirs) else {
+            unresolved += 1;
+            continue;
         };
         let body = read_stripped(&script)?;
         let man = match registry::manifest_line(&body) {
@@ -792,15 +786,16 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // assertion G: every `# graph:` manifest in a SPEC-*.md amendment body is well-formed
     amendment_findings(".", &mut errors)?;
 
+    let skipped = registry::unresolved_skipped(unresolved);
     if !errors.is_empty() {
-        println!("CHECK-GRAPH: {} violation(s):", errors.len());
+        println!("CHECK-GRAPH: {} violation(s){}:", errors.len(), skipped);
         for e in &errors {
             println!("  {}", e);
         }
         println!("  help: fix the '# graph:' manifest / gates.list-membership / hook-trigger mismatch (or the malformed amendment-body manifest), then regenerate the hook and graph artifacts");
         return Ok(1);
     }
-    println!("CHECK-GRAPH: clean ({} gates; manifests well-formed, couples<->trigger parity, cycle valves, the generated pre-commit hook + CHECK-GRAPH.html artifacts fresh, emitted asset hrefs resolve, external refs allowlisted, edge count within the render cap, and amendment-body manifests valid)", checks.len());
+    println!("CHECK-GRAPH: clean ({} gates{}; manifests well-formed, couples<->trigger parity, cycle valves, the generated pre-commit hook + CHECK-GRAPH.html artifacts fresh, emitted asset hrefs resolve, external refs allowlisted, edge count within the render cap, and amendment-body manifests valid)", checks.len() - unresolved, skipped);
     Ok(0)
 }
 

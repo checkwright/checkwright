@@ -93,15 +93,11 @@ pub fn run(args: &[String]) -> i32 {
 
     let mut violations: Vec<String> = Vec::new();
     let mut groups_checked = 0usize;
+    let mut unresolved = 0usize;
     for m in &members {
         let Some(src) = registry::resolve(m, &resolve_dirs) else {
-            eprintln!(
-                "check-kit-enum: {} in {} resolves in none of: {}",
-                m,
-                list,
-                resolve_dirs.join(" ")
-            );
-            return 2;
+            unresolved += 1;
+            continue;
         };
         // spec: gate-sdk/SPEC.md §check-kit-enum — no manifest is check-graph's finding, not this
         // gate's, and a manifest with no couples= field names no roots to group
@@ -169,8 +165,9 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
+    let skipped = registry::unresolved_skipped(unresolved);
     if !violations.is_empty() {
-        println!("check-kit-enum: gate(s) hand-list kit roots incompletely — the kit set drifted:");
+        println!("check-kit-enum: gate(s) hand-list kit roots incompletely — the kit set drifted{}:", skipped);
         for v in &violations {
             println!("  {}", v);
         }
@@ -180,8 +177,8 @@ pub fn run(args: &[String]) -> i32 {
         return 1;
     }
     println!(
-        "KIT-ENUM: clean ({} multi-kit hand-list group(s) complete; kit:<glob> keeps them so)",
-        groups_checked
+        "KIT-ENUM: clean ({} multi-kit hand-list group(s) complete; kit:<glob> keeps them so{})",
+        groups_checked, skipped
     );
     0
 }

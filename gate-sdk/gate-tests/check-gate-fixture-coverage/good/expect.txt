@@ -1,1 +1,2 @@
 GATE-FIXTURE-COVERAGE: clean
+1 unresolved member(s) skipped, reported by the runner

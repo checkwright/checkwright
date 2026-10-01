@@ -2,6 +2,7 @@
 // success line and a help: remedy
 use crate::ere::Ere;
 use crate::fresh;
+use crate::registry;
 use crate::walk;
 use std::path::Path;
 
@@ -122,16 +123,13 @@ pub fn run(args: &[String]) -> i32 {
     let mut out_of_reach: Vec<String> = Vec::new();
     let mut total = 0usize;
     let mut runtime = 0usize;
+    let mut unresolved = 0usize;
     for m in &members {
-        total += 1;
         let Some(src) = resolve_declaration(m, &resolve_dirs) else {
-            missing.push(format!(
-                "{} (source resolves in none of: {})",
-                m,
-                resolve_dirs.join(" ")
-            ));
+            unresolved += 1;
             continue;
         };
+        total += 1;
         let declared = std::fs::read(&src)
             .map(|b| String::from_utf8_lossy(&b).into_owned())
             .unwrap_or_default();
@@ -173,7 +171,11 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
+    let skipped = registry::unresolved_skipped(unresolved);
     if !missing.is_empty() || !no_help.is_empty() {
+        if !skipped.is_empty() {
+            println!("check-gate-output: {} member(s) checked{}", total, skipped);
+        }
         if !missing.is_empty() {
             println!("check-gate-output: gates.list member(s) with no machine-keyable success line");
             println!("(gate-sdk/SPEC.md §Output contract — success is '^<NAME>: clean (<what>)'):");
@@ -217,11 +219,12 @@ pub fn run(args: &[String]) -> i32 {
         )
     };
     println!(
-        "GATE-OUTPUT: clean ({} gates.list member(s): {} source-grepped as no-fixture members, {} asserted on real output by run-gate-tests{})",
+        "GATE-OUTPUT: clean ({} gates.list member(s): {} source-grepped as no-fixture members, {} asserted on real output by run-gate-tests{}{})",
         total,
         total - runtime - out_of_reach.len(),
         runtime,
-        declared
+        declared,
+        skipped
     );
     0
 }
