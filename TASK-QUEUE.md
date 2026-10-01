@@ -8,6 +8,18 @@
 
 ## New Features
 
+### skill-binding-couples-drift
+
+[spec: SPEC-skill-binding-reach.md]
+
+`check-skill-binding` couples each out-of-tree bound template by name, and nothing checks the list against the templates the shims bind: `drift-kit/templates/economics.md` was absent until companion-adoption-landing's close, and `gate-sdk/templates/adopt.md` was added by hand at its spec.
+
+**Deliverable:** an assertion that every template a shim under `LIFECYCLE_KIT_SKILLS_DIR` binds matches a `couples=` member of the gate's own descriptor, with a fixture pair; or a boundary note in lifecycle-kit/SPEC.md §check-skill-binding refusing it.
+
+**Cost while deferred:** a slot added to an uncoupled bound template fires nothing at commit and surfaces one tier late. Filed 2026-09-29 at companion-adoption-landing's close as the drain's gap generalization for the economics omission it fixed. Owner lookup: `skill-binding`, `couples` in this file — none; owner lifecycle-kit/SPEC.md §check-skill-binding.
+
+**Selected 2026-10-01 for lifecycle-queue-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it beside [lifecycle-queue-value-audit](#lifecycle-queue-value-audit)'s verdict on the same gate.
+
 ## Technical Debt
 
 ### lifecycle-queue-value-audit
@@ -579,18 +591,6 @@ a user-facing choice can ride a `{mechanical}` delta and reach no operator: the 
 **Deliverable:** an arm prefixing the layout's and includes' literal text nodes (Liquid excluded) to every page's corpus, so a sentence of eight words or more or a link target stated in both reds; or a boundary note refusing it.
 
 **Cost while deferred:** the next chrome addition can duplicate a page statement unseen until a reader finds it. Filed 2026-09-29 to the gap inbox by companion-adoption-landing's build; promoted at its close: →fix fails because the arm is new mechanism with a false-positive risk to calibrate, →forward because no ruling is owed. Re-verified: canon-kit/SPEC.md §check-docs-page-repeat reads each `CANON_KIT_PAGE_REPEAT_PAGES` page alone and deliberately asserts no repeat across pages, so the arm must weigh that boundary. Owner lookup: `page-repeat`, `_layouts`, `chrome` in this file — [site-video-poster-rule](#site-video-poster-rule), DISTINCT (embeds); owner canon-kit/SPEC.md §check-docs-page-repeat, with docs/site-architecture.md §Page-authoring rules. Surface also canon-kit.
-
-### skill-binding-couples-drift
-
-[cost: event/low] [surface: lifecycle-kit]
-
-`check-skill-binding` couples each out-of-tree bound template by name, and nothing checks the list against the templates the shims bind: `drift-kit/templates/economics.md` was absent until companion-adoption-landing's close, and `gate-sdk/templates/adopt.md` was added by hand at its spec.
-
-**Deliverable:** an assertion that every template a shim under `LIFECYCLE_KIT_SKILLS_DIR` binds matches a `couples=` member of the gate's own descriptor, with a fixture pair; or a boundary note in lifecycle-kit/SPEC.md §check-skill-binding refusing it.
-
-**Cost while deferred:** a slot added to an uncoupled bound template fires nothing at commit and surfaces one tier late. Filed 2026-09-29 at companion-adoption-landing's close as the drain's gap generalization for the economics omission it fixed. Owner lookup: `skill-binding`, `couples` in this file — none; owner lifecycle-kit/SPEC.md §check-skill-binding.
-
-**Selected 2026-10-01 for lifecycle-queue-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it beside [lifecycle-queue-value-audit](#lifecycle-queue-value-audit)'s verdict on the same gate.
 
 ### companion-install-tier
 
