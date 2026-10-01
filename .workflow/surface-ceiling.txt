@@ -17,7 +17,7 @@
 1155cp .claude/commands/spec.md
 1728cp .claude/commands/validate.md
 12521cp CLAUDE.md
-257141cp canon-kit/SPEC.md
+257160cp canon-kit/SPEC.md
 5785cp canon-kit/templates/SPEC-amendment.md
 23762cp companion/SPEC.md
 123699cp context-kit/SPEC.md

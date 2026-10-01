@@ -12,6 +12,36 @@
 
 ## Deferred
 
+### kit-log-declaration-transport
+
+[cost: event/high] [surface: lifecycle-kit]
+
+`check-close-surfaces` reds an adopter on kit-owned capture logs it cannot declare. The `close-surface:` declarations for drift-kit's `knowledge-friction.log`, guard-kit's `prompt-friction.log` and `wakeup-attempts.log`, and delegation-kit's `subagent-stop-liveness.log` and `wait-primitive-evidence.txt` live only in those kits' SPEC.md files, which the payload withholds, while guard-kit's and drift-kit's READMEs have the adopter gitignore the logs. The gate's help sends the adopter to "the SPEC section that already owns it", which the adopter does not have.
+
+**Deliverable:** a declaration channel that reaches a vendored tree (a shipped declaration file per kit, or the payload carrying the declaration lines), with a consumer-smoke leg installing lifecycle-kit beside a capture-logging kit and reading `check-close-surfaces` clean.
+
+**Cost while deferred:** an adopter running lifecycle-kit with any capture-logging kit meets a red with no documented cure until it hand-declares the logs and widens `LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS`. Filed 2026-10-01 to the gap inbox at lifecycle-queue-value-pass' build; promoted at its close: →fix fails because the channel is new mechanism across gate-sdk's payload and four kits, →forward because no ruling is owed. Re-verified: installer/SPEC.md states the payload withholds a kit's SPEC.md; guard-kit/README.md step 3 and drift-kit/README.md step 2 gitignore the logs; the five declarations sit only in the three kit SPECs. The red itself was probed at that build (a knob file whose roster basename and surface globs match nothing reds three gitignored logs undeclared) and not re-run here. Distinct from `lifecycle-queue-value-audit`, whose kept verdict on the gate this does not reopen. Owner lookup: `close-surface`, `declaration transport`, `undeclared` in this file — only the iceboxed [close-surface-reclaim-uncoupled-from-read](#close-surface-reclaim-uncoupled-from-read), whose subject is the reclaim; owner lifecycle-kit/SPEC.md §The close-surface roster.
+
+### required-sections-literal
+
+[cost: event/low] [surface: queue-kit]
+
+`QUEUE_KIT_REQUIRED_SECTIONS`'s default (`native/src/knobs/queue_kit.rs`, `REQUIRED_SECTIONS`) re-lists as literals the names the active, deferred and done section knobs own, plus `Lessons Learned`; only the icebox is composed in (`native/src/queue.rs`, `required_sections`). An adopter renaming a section through its own knob, or dropping the optional Lessons channel, must restate the whole required list, or `check-queue-sections` reds on the old name.
+
+**Deliverable:** the default composed from the section knobs (Lessons Learned only while the lesson channel is on), with a fixture renaming the deferred section through its knob alone, queue-kit/SPEC.md §Layout and configuration updated, and a release declaration for the changed default.
+
+**Cost while deferred:** a second copy of each section name a renaming adopter must keep in step; this repo already restates the list in `scripts/queue-config.knobs` to drop Lessons Learned. Filed 2026-10-01 to the gap inbox at lifecycle-queue-value-pass' build; promoted at its close: →fix fails because it changes a shipped knob's default, adopter-visible semantics no amendment settled, →forward because no ruling is owed. Re-verified: the literal list and the icebox-only composition read as filed. Owner lookup: `REQUIRED_SECTIONS`, `required list` in this file — none; owner queue-kit/SPEC.md §Layout and configuration.
+
+### wait-on-unreachable-condition
+
+[cost: event/low] [surface: delegation-kit]
+
+a dispatched session can park a wait on a condition nothing will make true. A mechanical-tier align session of lifecycle-queue-value-pass looped `until [ -f .tmp/never-exists-marker ]`; on the foreground timeout the harness backgrounded the loops, and the session read as live past its hand-back for the 30-minute background limit, the holder lifecycle-kit/templates/lead.md names. The waiting rule in delegation-kit/templates/agent-execution.md (**Background + notification, never poll**) bars a self-matching `pgrep` and a record-falsified condition, not a condition with no writer at all, and its "never end a turn in order to wait" clause can read as covering a wait for the lead's answer, which is a turn end.
+
+**Deliverable:** one clause in that bullet (a wait owes a producer that will write its condition; a question to a caller is a turn end, never a wait), propagated to the operative copies in `.claude/agents/` per delegation-kit/SPEC.md §Operative residency.
+
+**Cost while deferred:** a lead reads a finished session as live, for up to the background limit, per occurrence. Filed 2026-10-01 to the gap inbox at lifecycle-queue-value-pass' align; promoted at its close: →fix fails because the rule lands in a kit template and its operative copies in harness agent definitions, a dispatch-policy change for the lead to see, →forward because no ruling is owed. Re-verified: no clause in the template or `.claude/agents/stage-session.md` names a writerless condition. Owner lookup: `waiter`, `never go true`, `never-exists` in this file — only the iceboxed [waiter-loop-condition-predicate-gap](#waiter-loop-condition-predicate-gap), a guard-rule gap over `pgrep` waiters, declined as a recurrence; owner delegation-kit/SPEC.md §The delegation model.
+
 ### manifest-finder-untracked-walk
 
 [cost: event/low] [surface: canon-kit]

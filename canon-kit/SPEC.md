@@ -462,7 +462,7 @@ The possessive shape is one class with the section citation — both point into 
 - an all-digit abbreviated object name passes, which is about one in thirty at seven characters and rarer beyond; so does an uppercase one, and a decimal CI run or job id, which no shape tells from a measured number;
 - a UUID segment or an eight-digit hex colour in prose reds as a hex reference; fence the specimen, since fences are the gate's one escape;
 - an attributive agent-file pointer (*the agent file's ban*) passes, because telling it from a consumer-side mention (*the consumer's agent file carries …*) is judgement;
-- kit templates, kit READMEs and a kit's doctrine file are outside the corpus;
+- kit templates, kit READMEs, kit smoke scripts and a kit's doctrine file are outside the corpus;
 - a singleton roster quote passes, as do a word-valued element, an unbackticked mention and a scalar knob's value — the content class beyond the roster shape is judged by gate-sdk/SPEC.md §The provenance seam's discriminator at review.
 
 Those shapes are held by the close-stage review, not by this gate.

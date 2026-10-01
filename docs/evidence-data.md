@@ -247,3 +247,4 @@
 | canon-kit-value-pass | sc sp a b v c | 14f/1d | 7 · ≤0d | 21s clean | 147 |
 | install-disposition-pass | sc sp a b v c | 16f/0d | 6 · ≤0d | 21s clean | 147 |
 | context-kit-value-pass | sc sp a b v c | 9f/1d | 5 · ≤0d | 21s clean | 147 |
+| lifecycle-queue-value-pass | sc sp a b v c | 11f/2d | 5 · ≤0d | 21s clean | 147 |
