@@ -8,18 +8,6 @@
 
 ## New Features
 
-### skill-binding-couples-drift
-
-[spec: SPEC-skill-binding-reach.md]
-
-`check-skill-binding` couples each out-of-tree bound template by name, and nothing checks the list against the templates the shims bind: `drift-kit/templates/economics.md` was absent until companion-adoption-landing's close, and `gate-sdk/templates/adopt.md` was added by hand at its spec.
-
-**Deliverable:** an assertion that every template a shim under `LIFECYCLE_KIT_SKILLS_DIR` binds matches a `couples=` member of the gate's own descriptor, with a fixture pair; or a boundary note in lifecycle-kit/SPEC.md §check-skill-binding refusing it.
-
-**Cost while deferred:** a slot added to an uncoupled bound template fires nothing at commit and surfaces one tier late. Filed 2026-09-29 at companion-adoption-landing's close as the drain's gap generalization for the economics omission it fixed. Owner lookup: `skill-binding`, `couples` in this file — none; owner lifecycle-kit/SPEC.md §check-skill-binding.
-
-**Selected 2026-10-01 for lifecycle-queue-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it beside [lifecycle-queue-value-audit](#lifecycle-queue-value-audit)'s verdict on the same gate.
-
 ### user-facing-delta-unsurfaced
 
 [spec: SPEC-user-facing-delta.md]
@@ -52,7 +40,7 @@ the Lessons Learned channel may be obsolete, operator direction 2026-09-30, lead
 
 [gate-customer-value-audit](#gate-customer-value-audit)'s slice for lifecycle-kit's 15 gates and queue-kit's 11, 26 `.gate` descriptors audited for customer value and configurability under gate-sdk/SPEC.md §Consumer payload's rule.
 
-**Deliverable:** each gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated, leaving gate-sdk's 43 gates the one kit unaudited. `check-lesson-disposition`'s verdict follows [lessons-learned-channel-audit](#lessons-learned-channel-audit)'s channel decision, and `check-skill-binding`'s reads [skill-binding-couples-drift](#skill-binding-couples-drift)'s assertion.
+**Deliverable:** each gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated, leaving gate-sdk's 43 gates the one kit unaudited. `check-lesson-disposition`'s verdict follows [lessons-learned-channel-audit](#lessons-learned-channel-audit)'s channel decision, and `check-skill-binding`'s reads `skill-binding-couples-drift`'s assertion.
 
 **Cost while deferred:** the parent's cost, for these kits. Filed 2026-10-01 as a split at lifecycle-queue-value-pass' scope. Part of the operator's selection of set A, direction 2026-10-01, lead-relayed (not a ruling).
 
@@ -1391,5 +1379,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - consult-intake-narrowing
 - roadmap-horizon-lag-detector
 - hotfix-push-owner
+- skill-binding-couples-drift
 
 ## Lessons Learned
