@@ -48,7 +48,7 @@ The match is on the **leaf basename**, the same rule and the same reasoning [gat
 
 ## The session-context hook (template)
 
-`templates/session-context.sh` is a consumer copy, copied into the gates dir and edited there: wired as the harness's session-start hook via `templates/settings-sessionstart.json`, it assembles the session brief. Every step is guarded and degrades silently — the hook never fails a session.
+`templates/session-context.sh` is a consumer copy, copied into the gates dir and edited there: wired as the harness's session-start hook via `templates/settings-sessionstart.json`, its command anchored at the project directory ([guard-kit/SPEC.md §The shell guard](../guard-kit/SPEC.md#the-shell-guard)), it assembles the session brief. Every step is guarded and degrades silently — the hook never fails a session.
 
 **The template and its consumer copy are both permanently shell**, declared `# no-port:` under the class ruling at [gate-sdk/SPEC.md §The harness-template port disposition](../gate-sdk/SPEC.md#the-harness-template-port-disposition). The template carries an `[EDIT ME]` gap at every layout-judgment step below — tool paths, the dirty-surface pre-run, the stage-conditioned nudges, the index footer, the probe path — and README.md tells an adopter to fill them as layout judgment rather than mechanism, so those gaps *are* the extension point and a compiled form would leave nothing to fill. The copy declares on the second ground: it is the filled instance, so everything it holds beyond the template is this repo's own layout content.
 

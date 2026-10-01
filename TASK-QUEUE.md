@@ -8,20 +8,6 @@
 
 ## New Features
 
-### hook-wiring-relative-command
-
-[spec: SPEC-anchored-wirings.md]
-
-the statusLine and SessionStart wirings spell repo-relative commands: delegation-kit/README.md's statusLine step, context-kit/templates/settings-sessionstart.json and this repo's `.claude/settings.json` statusLine and SessionStart. Hooks run in the session's current directory (measured at guard-kit-steering's spec), so after a session `cd` the status bar blanks and a resume or compact brief fails.
-
-**Deliverable:** both wirings anchored at the harness's project-dir variable in the kit templates and README, the repo's own settings diff prepared for the operator to apply, as `plugin-guards-subdir-launch` anchored the guard hooks.
-
-Read at spec 2026-10-01: the installed harness spawns a statusLine command through its hook command runner, which sets the project-dir variable, so it reaches a statusLine command as it reaches a hook.
-
-**Cost while deferred:** a session that changes directory loses its status bar and its post-compact brief. Filed 2026-09-30 to the gap inbox at guard-kit-steering's spec; promoted at its close: →fix fails because the statusLine reach is unmeasured and this repo's settings edit is the operator's to apply, →forward because no ruling is owed. Re-verified: the three wirings spell `bash gate-sdk/bin/run-gates.sh --statusline` and `bash scripts/session-context.sh`. Owner lookup: `statusLine`, `SessionStart`, `CLAUDE_PROJECT_DIR` in this file — none; owner context-kit/SPEC.md, with delegation-kit/SPEC.md §The statusline arm. Surface also delegation-kit.
-
-**Selected 2026-10-01 for context-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, running the statusLine probe above first; this repo's settings diff is prepared for the operator, never applied.
-
 ### intake-routing-test
 
 [spec: SPEC-intake-routing.md]
@@ -48,7 +34,7 @@ no guidance routes a mid-iteration operator request into the current iteration. 
 
 context-kit/SPEC.md's sections this iteration's features edit, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §Index-first reading, §The session-context hook, §bin/env-probe and §Layout and configuration, about 9.6k of the file's 20.1k words by awk count; context-kit's other sections stay on the parent.
 
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. It rides the batch after the features that edit them: `prune-set-matches-walk-root-ancestors` (§Index-first reading, §Layout and configuration), `doctor-shell-gate-bash` (§bin/env-probe), [hook-wiring-relative-command](#hook-wiring-relative-command) (§The session-context hook) and `harness-project-dir-fold-dialect-unresolved` (§Layout and configuration).
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. It rides the batch after the features that edit them: `prune-set-matches-walk-root-ancestors` (§Index-first reading, §Layout and configuration), `doctor-shell-gate-bash` (§bin/env-probe), `hook-wiring-relative-command` (§The session-context hook) and `harness-project-dir-fold-dialect-unresolved` (§Layout and configuration).
 
 **Cost while deferred:** paid by every session and adopter that reads an unpassed context-kit section. Filed 2026-10-01 as a split at context-kit-value-pass' scope. Part of the operator's selection of set A+, direction 2026-10-01, lead-relayed (not a ruling).
 
@@ -1398,5 +1384,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - prune-set-matches-walk-root-ancestors
 - doctor-shell-gate-bash
 - harness-project-dir-fold-dialect-unresolved
+- hook-wiring-relative-command
 
 ## Lessons Learned
