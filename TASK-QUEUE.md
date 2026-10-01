@@ -32,6 +32,20 @@ the walk's prune set matches path components anywhere in an absolute path, not o
 
 **Selected 2026-10-01 for context-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it ahead of [custom-gate-substrates](#custom-gate-substrates), which generalizes the arm per substrate.
 
+### hook-wiring-relative-command
+
+[spec: SPEC-anchored-wirings.md]
+
+the statusLine and SessionStart wirings spell repo-relative commands: delegation-kit/README.md's statusLine step, context-kit/templates/settings-sessionstart.json and this repo's `.claude/settings.json` statusLine and SessionStart. Hooks run in the session's current directory (measured at guard-kit-steering's spec), so after a session `cd` the status bar blanks and a resume or compact brief fails.
+
+**Deliverable:** both wirings anchored at the harness's project-dir variable in the kit templates and README, the repo's own settings diff prepared for the operator to apply, as `plugin-guards-subdir-launch` anchored the guard hooks.
+
+Read at spec 2026-10-01: the installed harness spawns a statusLine command through its hook command runner, which sets the project-dir variable, so it reaches a statusLine command as it reaches a hook.
+
+**Cost while deferred:** a session that changes directory loses its status bar and its post-compact brief. Filed 2026-09-30 to the gap inbox at guard-kit-steering's spec; promoted at its close: →fix fails because the statusLine reach is unmeasured and this repo's settings edit is the operator's to apply, →forward because no ruling is owed. Re-verified: the three wirings spell `bash gate-sdk/bin/run-gates.sh --statusline` and `bash scripts/session-context.sh`. Owner lookup: `statusLine`, `SessionStart`, `CLAUDE_PROJECT_DIR` in this file — none; owner context-kit/SPEC.md, with delegation-kit/SPEC.md §The statusline arm. Surface also delegation-kit.
+
+**Selected 2026-10-01 for context-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, running the statusLine probe above first; this repo's settings diff is prepared for the operator, never applied.
+
 ## Technical Debt
 
 ### small-kit-value-audit
@@ -709,20 +723,6 @@ hook-member and emit-arm output strings print the bash front end as a remedy to 
 **Deliverable:** each string classified as a remedy to run or a description of the front end; each remedy printed through the gate module's door spelling; `GUARD_KIT_DOOR_ROOTS` widened to the hook and emit trees so `check-door-binding` assertion C holds them.
 
 **Cost while deferred:** an adopter without bash is told to run a command it cannot, at every refusal those members print. Filed 2026-09-30 to the gap inbox at guard-kit-steering's spec; promoted at its close: →fix fails because the classification spans forty files, →forward because no ruling is owed. Re-verified: 40 files under `native/src` outside `gates` name `run-gates`, and the four named lines print it. Not a recurrence of `gate-output-contributor-door`, which is done and scoped its corpus to the gate modules. Owner lookup: `usage line`, `front end`, `door` in this file — none; owner guard-kit/SPEC.md §check-door-binding.
-
-### hook-wiring-relative-command
-
-[cost: event/low] [surface: context-kit]
-
-the statusLine and SessionStart wirings spell repo-relative commands: delegation-kit/README.md's statusLine step, context-kit/templates/settings-sessionstart.json and this repo's `.claude/settings.json` statusLine and SessionStart. Hooks run in the session's current directory (measured at guard-kit-steering's spec), so after a session `cd` the status bar blanks and a resume or compact brief fails.
-
-**Deliverable:** both wirings anchored at the harness's project-dir variable in the kit templates and README, the repo's own settings diff prepared for the operator to apply, as `plugin-guards-subdir-launch` anchored the guard hooks.
-
-**Inferred, not run:** that the project-dir variable reaches a statusLine command — in a scratch project, set the statusLine command to `env > .tmp/statusline-env.txt`, open a session, then `grep CLAUDE_PROJECT_DIR .tmp/statusline-env.txt`
-
-**Cost while deferred:** a session that changes directory loses its status bar and its post-compact brief. Filed 2026-09-30 to the gap inbox at guard-kit-steering's spec; promoted at its close: →fix fails because the statusLine reach is unmeasured and this repo's settings edit is the operator's to apply, →forward because no ruling is owed. Re-verified: the three wirings spell `bash gate-sdk/bin/run-gates.sh --statusline` and `bash scripts/session-context.sh`. Owner lookup: `statusLine`, `SessionStart`, `CLAUDE_PROJECT_DIR` in this file — none; owner context-kit/SPEC.md, with delegation-kit/SPEC.md §The statusline arm. Surface also delegation-kit.
-
-**Selected 2026-10-01 for context-kit-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, running the statusLine probe above first; this repo's settings diff is prepared for the operator, never applied.
 
 ### write-side-steering
 
