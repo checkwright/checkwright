@@ -24,9 +24,7 @@ check-brevity
 check-memory-off
 check-settings-pins
 check-settings-paths
-# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion I's own declaration grammar,
-# a sibling of the ratchet's own unregistered-and-exercised comment below (§The install disposition)
-# unregistered: check-footprint-fresh — byte-compares docs/footprint.md against its emitter; the scratch consumer vendors no docs/ tree
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion I's own declaration grammar (§The install disposition)
 # unregistered: check-surface-ratchet — exercised unregistered by this script's own ratchet() calls below: a ceiling stamped and registered here would be asserted against a half-installed consumer every co-vendored kit installing after context-kit still grows
 EOF
 

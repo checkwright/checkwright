@@ -320,7 +320,9 @@ Fail-closed (exit 2) when it cannot read what is present to check: a local setti
 
 ## check-footprint-fresh
 
-`checks/check-footprint-fresh.gate` (hermetic, `precommit`) byte-compares the committed footprint page (`CONTEXT_KIT_FOOTPRINT_FILE`) against the footprint emitter, the `check-docs-mirror-fresh`/`check-trajectory-fresh` posture: a generated, freshness-gated projection is Derivation-first's sanctioned copy, so the maintainer re-runs the emitter after any change to a measured surface and a stale page reddens the battery. Its `# graph:` manifest couples the measured surfaces — the configured agent file and each kit's `templates/` tree — and the `*/SPEC.md` glob the kit roster derives from, so an edit to what the page counts, or a kit arriving or leaving, re-fires the gate.
+**It is the publisher's own gate and does not ship.** Its subject is the publisher's footprint page, and its kit roster derives from `*/SPEC.md` files the payload withholds ([gate-sdk/SPEC.md §Consumer payload](../gate-sdk/SPEC.md#consumer-payload)), so an adopter's tree holds nothing it could measure. The descriptor and its fixture pair sit in the publisher's gates dir; the rule stays in the crate.
+
+`check-footprint-fresh` (hermetic, `precommit`) byte-compares the committed footprint page (`CONTEXT_KIT_FOOTPRINT_FILE`) against the footprint emitter, the `check-docs-mirror-fresh`/`check-trajectory-fresh` posture: a generated, freshness-gated projection is Derivation-first's sanctioned copy, so the maintainer re-runs the emitter after any change to a measured surface and a stale page reddens the battery. Its `# graph:` manifest couples the measured surfaces — the configured agent file and each kit's `templates/` tree — and the `*/SPEC.md` glob the kit roster derives from, so an edit to what the page counts, or a kit arriving or leaving, re-fires the gate.
 
 **It is a registry member of the gate binary, and its emitter is a function call rather than a spawn.** The comparator and the emitter ported in one unit, so where the shell form ran `bash <emitter> --emit` in a subprocess, the compiled member calls the emitter module's `emit()` **in-process** — which is what retires the family's `bash` hop for this member ([gate-sdk/SPEC.md §The first cohort, and the rule that selects the next](../gate-sdk/SPEC.md#the-first-cohort-and-the-rule-that-selects-the-next)). The `CONTEXT_KIT_SURFACES` the emitter reads is one of context-kit's static knobs, declared by this member.
 
@@ -335,13 +337,11 @@ context-kit/
   checks/check-settings-pins.gate  # hermetic, binary-dispatched: pins hold against the settings file
   checks/check-settings-paths.gate # hermetic, binary-dispatched: literal .sh grants and hook paths resolve, --hook members exist
   checks/check-memory-off.gate   # local-environment, binary-dispatched: memory dir + local overrides
-  checks/check-footprint-fresh.gate # hermetic, binary-dispatched: the footprint page byte-fresh vs the emitter it calls in-process
   gate-tests/check-brevity/{good,bad}/
   gate-tests/check-surface-ratchet/{good,bad}/
   gate-tests/check-settings-pins/{good,bad}/
   gate-tests/check-settings-paths/{good,bad}/
   gate-tests/check-memory-off/{good,bad}/
-  gate-tests/check-footprint-fresh/{good,bad}/
   gate-tests/check-brevity.test.sh      # the section-set resolution axes the pair cannot hold
   gate-tests/check-surface-ratchet.test.sh # the refusal axis the pair cannot hold
   gate-tests/check-memory-off.test.sh   # the local-override axis the pair cannot hold

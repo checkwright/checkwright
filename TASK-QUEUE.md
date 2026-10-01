@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### small-kit-value-audit
-
-[gate-customer-value-audit](#gate-customer-value-audit)'s slice for the three small kits the companion tier would expose: context-kit's six gates (all on-surface), evidence-kit's four (two zero-config, one on-surface, one never) and doctrine-kit's one (zero-config), 11 `.gate` descriptors audited for customer value and configurability under gate-sdk/SPEC.md §Consumer payload's rule.
-
-**Deliverable:** each gate's verdict applied (made generic, kept out of the payload and the customer-OS legs, or kept) and the parent's audited tally updated. [companion-install-tier](#companion-install-tier) reads the verdicts after, and gate-sdk's 55 gates stay the one exposed kit unaudited.
-
-**Cost while deferred:** the parent's cost, for these kits. Filed 2026-10-01 as a split at context-kit-value-pass' scope. Part of the operator's selection of set A+, direction 2026-10-01, lead-relayed (not a ruling).
-
 ### context-kit-feature-brevity
 
 context-kit/SPEC.md's sections this iteration's features edit, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): §Index-first reading, §The session-context hook, §bin/env-probe and §Layout and configuration, about 9.6k of the file's 20.1k words by awk count; context-kit's other sections stay on the parent.
@@ -450,7 +442,7 @@ nothing asks whether each shipped gate is useful and configurable for a customer
 
 **First slice landed 2026-09-29 at native-hook-customer-legs, operator direction lead-relayed (not a /consult ruling):** the payload rule at gate-sdk/SPEC.md §Consumer payload, and site-kit audited against it.
 
-Audited: site-kit, 5 gates (5 kept, 2 made generic, 0 withheld); guard-kit, 1 gate (1 kept, 0 made generic, 0 withheld); delegation-kit, 3 gates (2 kept, 0 made generic, 1 withheld); canon-kit, 37 gates (37 kept, 7 made generic, 0 withheld); the other 80 shipped gates remain, kit by kit, under gate-sdk/SPEC.md §Consumer payload's rule.
+Audited: site-kit, 5 gates (5 kept, 2 made generic, 0 withheld); guard-kit, 1 gate (1 kept, 0 made generic, 0 withheld); delegation-kit, 3 gates (2 kept, 0 made generic, 1 withheld); canon-kit, 37 gates (37 kept, 7 made generic, 0 withheld); context-kit, 6 gates (5 kept, 0 made generic, 1 withheld); evidence-kit, 4 gates (4 kept, 1 made generic, 0 withheld); doctrine-kit, 1 gate (1 kept, 0 made generic, 0 withheld); the other 69 shipped gates remain, kit by kit, under gate-sdk/SPEC.md §Consumer payload's rule.
 
 guard-kit's slice left 2026-09-30 at guard-kit-steering's scope, on an operator direction lead-relayed (not a /consult ruling), as `guard-kit-value-audit`, and landed in that iteration's build.
 
@@ -460,7 +452,7 @@ delegation-kit's slice left 2026-09-30 at delegation-tier-binding's scope, on an
 
 canon-kit's slice left 2026-09-30 at canon-kit-value-pass' scope, on an operator direction lead-relayed (not a /consult ruling), as `canon-kit-value-audit`, and landed in that iteration's build.
 
-context-kit's, evidence-kit's and doctrine-kit's slice left 2026-10-01 at context-kit-value-pass' scope, on an operator direction lead-relayed (not a /consult ruling), as [small-kit-value-audit](#small-kit-value-audit).
+context-kit's, evidence-kit's and doctrine-kit's slice left 2026-10-01 at context-kit-value-pass' scope, on an operator direction lead-relayed (not a /consult ruling), as `small-kit-value-audit`, and landed in that iteration's build.
 
 ### compiled-consumer-smoke-driver
 
@@ -1374,5 +1366,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - harness-project-dir-fold-dialect-unresolved
 - hook-wiring-relative-command
 - intake-routing-test
+- small-kit-value-audit
 
 ## Lessons Learned

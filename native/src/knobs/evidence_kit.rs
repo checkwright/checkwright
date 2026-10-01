@@ -93,6 +93,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("EVIDENCE_KIT_RUNNER_DOC", "README.md"),
         Row::keyed("EVIDENCE_KIT_SCENARIO_GLOBS", &[]),
         Row::indexed("EVIDENCE_KIT_PERMANENT_SLUGS", &[]),
+        Row::scalar("EVIDENCE_KIT_DONE_SECTION", "Done"),
         Row::derived(
             "EVIDENCE_KIT_FIXTURE_SUITES",
             Shape::Indexed,
@@ -114,8 +115,8 @@ pub const KIT: Kit = Kit {
     env_only: &[],
 };
 
-// spec: evidence-kit/SPEC.md §Layout and configuration — the four paths and the parser non-empty,
-// and every suite a valid family suffix
+// spec: evidence-kit/SPEC.md §Layout and configuration — the paths, the parser and the Done section
+// non-empty, and every suite a valid family suffix
 fn validate(v: &Values) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     for name in [
@@ -123,6 +124,7 @@ fn validate(v: &Values) -> Vec<String> {
         "EVIDENCE_KIT_BASELINE_FILE",
         "EVIDENCE_KIT_MANIFEST_FILE",
         "EVIDENCE_KIT_QUEUE_FILE",
+        "EVIDENCE_KIT_DONE_SECTION",
     ] {
         if scalar(v, name).is_some_and(str::is_empty) {
             out.push(format!("{} is empty", name));

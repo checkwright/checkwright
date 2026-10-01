@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Behavioral test of check-evidence-baseline — the slug-liveness and
 # scenario-coverage branches the one good/bad pair (grammar) cannot hold: a Done
-# slug is stale-red, an unknown slug is red, a permanent marker is accepted, a
+# slug is stale-red under the configured finished section, an unknown slug is red, a permanent marker is accepted, a
 # configured scenario glob asserts manifest↔disk set equality both ways, a row whose
 # suite left a non-empty roster is red, and the
 # flip assertion judges reproduces-at against a scratch repository's iteration start.
@@ -38,7 +38,23 @@ case_run "live-slug-clean" \
 # B — a fail slug that is a Done task is stale-red.
 case_run "done-slug-stale" \
     'u a fail gone-task\n' '## Done\n- gone-task\n' \
-    1 "is a Done task"
+    1 "is a task under '## Done'"
+
+# B2 — the finished section is EVIDENCE_KIT_DONE_SECTION: a renamed one is stale-red, and a
+#      section merely named Done is live.
+_done_cfg() {
+    local d="$tmp/done"; mkdir -p "$d/scripts"
+    printf 'EVIDENCE_KIT_DONE_SECTION = Shipped\n' >"$d/scripts/evidence-config.knobs"
+    printf '# fixture\nu a fail gone-task\nu b fail kept-task\n' >"$d/base.txt"
+    printf '## Done\n- kept-task\n## Shipped\n- gone-task\n' >"$d/queue.md"
+    ( cd "$d" && unset EVIDENCE_KIT_KNOB_FILE \
+        && gate_env GATE_SDK_GATES_DIR=scripts \
+        && gate_run check-evidence-baseline "$DIR/checks" base.txt queue.md 2>&1 )
+}
+out="$(_done_cfg)"
+if ! grep -qF "'gone-task' is a task under '## Shipped'" <<<"$out" || grep -qF "kept-task" <<<"$out"; then
+    echo "  FAIL: done-section knob not honoured: $out"; fails=$((fails + 1))
+fi
 
 # C — a fail slug that resolves nowhere is red.
 case_run "unknown-slug" \

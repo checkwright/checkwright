@@ -144,16 +144,17 @@ fn flip_causation(baseline: &str, state: &str, rows: &[Row], errors: &mut Vec<St
 }
 
 pub fn run(args: &[String]) -> i32 {
-    let (baseline, queue, state, globs, permanent) = match (
+    let (baseline, queue, state, globs, permanent, done) = match (
         knob_or(args, 0, "EVIDENCE_KIT_BASELINE_FILE"),
         knob_or(args, 1, "EVIDENCE_KIT_QUEUE_FILE"),
         knob_or(args, 2, "EVIDENCE_KIT_STATE_FILE"),
         walk::knob_map("EVIDENCE_KIT_SCENARIO_GLOBS"),
         walk::knob_array("EVIDENCE_KIT_PERMANENT_SLUGS"),
+        walk::knob_scalar("EVIDENCE_KIT_DONE_SECTION"),
     ) {
-        (Ok(a), Ok(b), Ok(e), Ok(c), Ok(d)) => (a, b, e, c, d),
-        (a, b, e, c, d) => {
-            let err = [a.err(), b.err(), e.err(), c.err(), d.err()]
+        (Ok(a), Ok(b), Ok(e), Ok(c), Ok(d), Ok(f)) => (a, b, e, c, d, f),
+        (a, b, e, c, d, f) => {
+            let err = [a.err(), b.err(), e.err(), c.err(), d.err(), f.err()]
                 .into_iter()
                 .flatten()
                 .next()
@@ -234,7 +235,7 @@ pub fn run(args: &[String]) -> i32 {
         let entries = queue_entries(&qtext);
         let live: Vec<&String> = entries
             .iter()
-            .filter(|(_, sec)| sec != "Done")
+            .filter(|(_, sec)| *sec != done)
             .map(|(s, _)| s)
             .collect();
         blocking.sort();
@@ -242,10 +243,10 @@ pub fn run(args: &[String]) -> i32 {
             if permanent.contains(slug) || live.contains(&slug) {
                 continue;
             }
-            if entries.iter().any(|(s, sec)| s == slug && sec == "Done") {
+            if entries.iter().any(|(s, sec)| s == slug && *sec == done) {
                 errors.push(format!(
-                    "blocking slug '{}' is a Done task — stale; promote the scenario or repoint the slug",
-                    slug
+                    "blocking slug '{}' is a task under '## {}' — stale; promote the scenario or repoint the slug",
+                    slug, done
                 ));
             } else {
                 errors.push(format!(

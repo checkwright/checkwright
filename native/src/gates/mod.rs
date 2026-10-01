@@ -1374,6 +1374,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "EVIDENCE_KIT_PERMANENT_SLUGS",
             "EVIDENCE_KIT_SUITES",
             "EVIDENCE_KIT_STATE_FILE",
+            "EVIDENCE_KIT_DONE_SECTION",
         ],
         "evidence-kit",
         &[("bash", ""), ("git", "")],
@@ -1847,7 +1848,7 @@ pub const REGISTRY: &[GateEntry] = &[
             ("?", "", "", "dynamic@src/emit/footprint.rs:90 via emit::footprint::emit"),
         ],
         &["CONTEXT_KIT_SURFACES", "CONTEXT_KIT_FOOTPRINT_FILE", "GATE_SDK_NATIVE_BIN"],
-        "context-kit",
+        "-",
         &[("date", ""), ("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — the monitor walk's root is the emitter's own

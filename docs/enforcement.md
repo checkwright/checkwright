@@ -53,7 +53,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | (consumer) | check-kit-ref-liveness | precommit |
 | (consumer) | check-trajectory-fresh | precommit |
 | (consumer) | check-install-evidence-fresh | precommit |
-| [context-kit](context-kit/index.md) | check-footprint-fresh | precommit |
+| (consumer) | check-footprint-fresh | precommit |
 | (consumer) | check-docs-mirror-fresh | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-enforcement-fresh | precommit |
 | (consumer) | check-value-rollup-fresh | precommit |
