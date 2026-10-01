@@ -661,7 +661,7 @@ A new optional top-level key is additive within the versioned wire key: a reader
 **The packer writes into the assembly in exactly three places**, a closed set:
 
 - the stamp above, into `{asm}/package.json`;
-- inside the kit loop, right after a kit's tracked set is extracted, a rewrite of `{asm}/payload/{leaf}/README.md`, so an own-SPEC link resolves to the published location rather than to the withheld `SPEC.md`;
+- inside the kit loop, right after a kit's tracked set is extracted, a rewrite of `{asm}/payload/{leaf}/README.md`, so a link to its own or another packed kit's `SPEC.md` resolves to the published location rather than to the withheld file;
 - the license text, the file `GATE_SDK_PAYLOAD_LICENSE` names read from the stamped commit, at `{asm}/LICENSE` and at `{asm}/payload/{leaf}/LICENSE` for every packed kit, so the package and each vendored kit carry the text a redistribution owes.
 
 The first two read the same resolved base, so it is resolved once, **above** the loop. [gate-sdk/SPEC.md §Consumer payload](../gate-sdk/SPEC.md#consumer-payload) owns the rewrite's rule and its four bounds, and [gate-sdk/SPEC.md §check-packed-links](../gate-sdk/SPEC.md#check-packed-links) the gate reading its output. All three writes land in the assembly scratch, which the pack step tears down, so none reaches a tracked file.

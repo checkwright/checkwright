@@ -1,6 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-packed-links — a packed kit README carries no link to a path the
 // payload withholds, and with an empty base the packed README is its tracked source byte for byte
-use crate::emit::pack_installer::resolve_own_spec_links;
+use crate::emit::pack_installer::resolve_spec_links;
 use crate::gates::smoke_entry_guard::{kit_abs, kit_name, scan_root};
 use crate::walk;
 use std::path::Path;
@@ -134,6 +134,12 @@ pub fn run(args: &[String]) -> i32 {
         configured.as_str()
     };
 
+    // spec: gate-sdk/SPEC.md §Consumer payload — the packed-leaf set the packer's rewrite reads,
+    // from the same kit-root derivation its loop yields
+    let leaves: Vec<String> = kit_roots
+        .iter()
+        .map(|r| kit_name(r.trim_end_matches('/')).to_string())
+        .collect();
     let mut findings: Vec<String> = Vec::new();
     let mut swept = 0usize;
     let mut skipped = 0usize;
@@ -163,7 +169,7 @@ pub fn run(args: &[String]) -> i32 {
         swept += 1;
 
         // assertion A: with a non-empty base, no packed README links a path the payload withholds
-        let (packed, count) = resolve_own_spec_links(&text, leaf, base);
+        let (packed, count) = resolve_spec_links(&text, leaf, &leaves, base);
         resolved += count;
         for (i, line) in packed.split('\n').enumerate() {
             for t in targets(line) {
@@ -180,7 +186,7 @@ pub fn run(args: &[String]) -> i32 {
         }
 
         // assertion B: with an empty base the packed README is its tracked source byte for byte
-        let (unset, n) = resolve_own_spec_links(&text, leaf, "");
+        let (unset, n) = resolve_spec_links(&text, leaf, &leaves, "");
         if n != 0 || unset != text {
             let at = unset
                 .as_bytes()
@@ -211,7 +217,7 @@ pub fn run(args: &[String]) -> i32 {
     }
 
     println!(
-        "PACKED-LINKS: clean ({} packed kit README(s) carry no withheld link target; {} own-SPEC link(s) resolved to the published location; {} kit root(s) without a README skipped)",
+        "PACKED-LINKS: clean ({} packed kit README(s) carry no withheld link target; {} SPEC link(s) resolved to the published location; {} kit root(s) without a README skipped)",
         swept, resolved, skipped
     );
     0

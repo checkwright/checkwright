@@ -11,7 +11,7 @@ Safe delegated-`Agent` execution for budget-bounded sessions. A supervisor dispa
 
 Why: three failure surfaces dominate delegation. **Shared mutable state** — two committing agents race the git index and one sweeps the other's staged files under the wrong message (the index and HEAD are shared for *every* committing agent, disjoint source files notwithstanding). **Interrupted long units** — a usage-window wall fires mid-flight and the uncommitted investigation dies with the session. **Untrustworthy self-reports** — a sub-agent's "passed" claim, or a gate quietly weakened to make its commit pass. The protocol closes all three, and those pieces are its mechanical floors. See [SPEC.md](SPEC.md) for the full contracts.
 
-This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is [gate-sdk/SPEC.md §Consumer payload](https://github.com/checkwright/checkwright/blob/master/gate-sdk/SPEC.md#consumer-payload).
+This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is [gate-sdk/SPEC.md §Consumer payload](../gate-sdk/SPEC.md#consumer-payload).
 
 ## Install
 

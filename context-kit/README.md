@@ -4,7 +4,7 @@ Token-economics-aware context management for stateless agent sessions: an index-
 
 Why: a stateless session pays for context twice. The *on-demand* cost is opening a whole SPEC or source file when one section was needed — the index tools cut that ("index, then read the one you need"). The *standing* cost is the always-loaded surface (the instructions file, the session-start hook output) where every added line is a recurring per-session tax that grows silently, because no single session sees the trend — the meter, the gate, and the close-stage pass make that growth visible and actionable. See [SPEC.md](SPEC.md) for the full contracts.
 
-This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is [gate-sdk/SPEC.md §Consumer payload](https://github.com/checkwright/checkwright/blob/master/gate-sdk/SPEC.md#consumer-payload).
+This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is [gate-sdk/SPEC.md §Consumer payload](../gate-sdk/SPEC.md#consumer-payload).
 
 ## Install
 

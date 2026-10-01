@@ -1,5 +1,6 @@
 # Same synthetic-tree steer as good/. alpha-kit links into the withheld smoke/
-# directory — the class the own-SPEC rewrite does not reach; beta-kit links a
-# sibling kit's withheld SPEC.md, which lands under a different kit than the one
-# carrying the link, so the finding's resolved path is the discriminating half.
+# directory — the class the SPEC rewrite does not reach; beta-kit links the
+# withheld SPEC.md of a kit this pack does not pack, which lands under a
+# different kit than the one carrying the link, so the finding's resolved path
+# is the discriminating half.
 .

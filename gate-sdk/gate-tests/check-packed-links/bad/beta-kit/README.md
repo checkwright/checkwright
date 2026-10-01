@@ -1,5 +1,6 @@
 # beta-kit
 
-The sibling kit's contracts are in [alpha-kit's SPEC](../alpha-kit/SPEC.md) — a
-cross-kit spelling the own-SPEC rewrite has no leaf for, so it lands on a
-withheld path under a *different* kit than the one linking it.
+The other kit's contracts are in [omega-kit's SPEC](../omega-kit/SPEC.md) — a
+cross-kit spelling naming a kit this pack does not pack, so the rewrite has no
+leaf for it and it lands on a withheld path under a *different* kit than the one
+linking it.

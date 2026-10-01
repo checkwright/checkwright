@@ -21,7 +21,7 @@ Deployment-truth governance for a docs site served from the repo (GitHub Pages a
 
 The template — `templates/site-health.yml` — is a scheduled probe of the live site (apex/www/http HTTPS, redirects, certificate expiry, release-body note pointers, and theme highlight-class drift against that snapshot). It verifies a *deployment*, not a tree, so it ships as a workflow a consumer copies, never a gate: the line is where the asserted object lives, and none of what it asserts is in any checkout. See [SPEC.md](SPEC.md#the-monitor-boundary) for why that boundary is load-bearing.
 
-This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is [gate-sdk/SPEC.md §Consumer payload](https://github.com/checkwright/checkwright/blob/master/gate-sdk/SPEC.md#consumer-payload).
+This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is [gate-sdk/SPEC.md §Consumer payload](../gate-sdk/SPEC.md#consumer-payload).
 
 ## Install
 

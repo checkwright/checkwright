@@ -11,7 +11,7 @@ Drift reporting for coding-agent sessions. Gates block what a single diff makes 
 
 Advisory by construction: the report exits 0, never fails a session, and reads **trend, not level** — a KPI's absolute value is noise; its direction across sessions is the signal. See [SPEC.md](SPEC.md) for the report frame, the plugin contract, the bundled KPI set, and the knowledge-friction loop.
 
-This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is [gate-sdk/SPEC.md §Consumer payload](https://github.com/checkwright/checkwright/blob/master/gate-sdk/SPEC.md#consumer-payload).
+This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is [gate-sdk/SPEC.md §Consumer payload](../gate-sdk/SPEC.md#consumer-payload).
 
 drift-kit registers **no gates**: its surface is a set of advisory `--emit` arms and a KPI registry, so nothing joins `gates.list`. It follows gate-sdk's resolution and smoke conventions without depending on its registry.
 

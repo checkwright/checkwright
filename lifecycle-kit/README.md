@@ -4,7 +4,7 @@ The iteration stage state machine for coding-agent-assisted delivery: stage skil
 
 Why: a stateless agent session doesn't reliably re-read process prose. So the process state lives in two files a gate can read, and every stage skill stamps its invocation as its first step (mechanized by the `--enter-stage <stage>` arm on the gate binary `GATE_SDK_NATIVE_BIN` names, so the misformat-prone hand ritual is one command). That stamp *is* the stage transition — there is no second copy of the cursor to keep in sync, and stage motion writes no queue at all. `check-stage-evidence` verifies the stamp file's grammar and that every stamp belongs to the header's iteration; `check-stage-entry` verifies the predecessor stamp, the drained queue at validate entry, and, at build entry, the cross-component audit trigger and no unrun inferred-claim marker. See [SPEC.md](SPEC.md) for the full contracts.
 
-This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is [gate-sdk/SPEC.md §Consumer payload](https://github.com/checkwright/checkwright/blob/master/gate-sdk/SPEC.md#consumer-payload).
+This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is [gate-sdk/SPEC.md §Consumer payload](../gate-sdk/SPEC.md#consumer-payload).
 
 The linear stage walk is the default; the gate-legal ways to leave it — abandon, split, reopen — compose existing mechanism with no new tooling ([SPEC.md §Deviation transitions](SPEC.md#deviation-transitions)).
 
@@ -80,7 +80,7 @@ gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 
 `--emit session-id` is [SPEC.md §bin/session-id.sh](SPEC.md#binsession-idsh)'s derivation order, which `--enter-stage` reads for you: reach for it directly only where a session writes an id itself, as `templates/lead.md`'s session-role marker step does. It takes no argument and resolves no knob. **The front-end route reads the cwd `bin/run-gates.sh` cds to** — the git toplevel — so a caller standing elsewhere whose sessions dir is the cwd-slugged default invokes the binary's `--emit-session-id` arm directly instead, which is what `--enter-stage` does.
 
-The two survey arms are the capture and citation affordances of [SPEC.md §The survey record](SPEC.md#the-survey-record). `--` ends option processing for either, and a positional beginning with `-` without it, `--help` included, is a refusal that prints the arm's usage at exit 2 ([gate-sdk/SPEC.md §The bin/-tool contract](https://github.com/checkwright/checkwright/blob/master/gate-sdk/SPEC.md#the-bin-tool-contract)).
+The two survey arms are the capture and citation affordances of [SPEC.md §The survey record](SPEC.md#the-survey-record). `--` ends option processing for either, and a positional beginning with `-` without it, `--help` included, is a refusal that prints the arm's usage at exit 2 ([gate-sdk/SPEC.md §The bin/-tool contract](../gate-sdk/SPEC.md#the-bin-tool-contract)).
 
 ## Test
 

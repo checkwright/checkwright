@@ -212,17 +212,24 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
     // spec: gate-sdk/SPEC.md §Layout and configuration — statted and handed to an uncwd-anchored
     // git, so the working-directory spelling, while the payload leaf stays the basename
     mkdir(&format!("{}/payload", asm))?;
+    let kits: Vec<String> = walk::kit_roots()
+        .map_err(refuse)?
+        .iter()
+        .map(|k| k.trim_end_matches('/').to_string())
+        .filter(|k| !k.is_empty() && std::path::Path::new(k).is_dir())
+        .collect();
+    // spec: gate-sdk/SPEC.md §Consumer payload — the packed-leaf set is resolved once, above the
+    // loop, so a README's link to another kit's SPEC is rewritten only for a kit this pack packs
+    let leaves: Vec<String> = kits
+        .iter()
+        .map(|k| k.rsplit('/').next().unwrap_or(k).to_string())
+        .collect();
     let mut packed = 0usize;
     let mut rewritten = 0usize;
-    for kit in walk::kit_roots().map_err(refuse)? {
-        let kit = kit.trim_end_matches('/');
-        if kit.is_empty() || !std::path::Path::new(kit).is_dir() {
-            continue;
-        }
-        let leaf = kit.rsplit('/').next().unwrap_or(kit);
+    for (kit, leaf) in kits.iter().zip(&leaves) {
         let into = format!("{}/payload/{}", asm, leaf);
         pack_tracked(&commit, kit, &into, &withhold)?;
-        rewritten += resolve_readme_links(&into, leaf, &spec_base_url)?;
+        rewritten += resolve_readme_links(&into, leaf, &leaves, &spec_base_url)?;
         place_license(license.as_deref(), &into)?;
         packed += 1;
     }
@@ -252,17 +259,17 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
     ))
 }
 
-// spec: gate-sdk/SPEC.md §Consumer payload — the payload withholds each kit's `SPEC.md`, so a
-// packed README's own-SPEC link is rewritten to the published location the base names; the tracked
-// README is never touched, the rewrite reaching only the extracted copy under `{asm}/payload/`
-fn resolve_readme_links(into: &str, leaf: &str, base: &str) -> Result<usize, Refusal> {
+// spec: gate-sdk/SPEC.md §Consumer payload — a packed README's link to any packed kit's SPEC is
+// rewritten to the published location; the rewrite reaches only the extracted copy under
+// `{asm}/payload/`, never the tracked README
+fn resolve_readme_links(into: &str, leaf: &str, packed: &[String], base: &str) -> Result<usize, Refusal> {
     let path = format!("{}/README.md", into);
     let text = match std::fs::read_to_string(&path) {
         Ok(t) => t,
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(0),
         Err(e) => return Err(refuse(format!("cannot read {}: {}", path, e))),
     };
-    let (body, count) = resolve_own_spec_links(&text, leaf, base);
+    let (body, count) = resolve_spec_links(&text, leaf, packed, base);
     if count == 0 {
         return Ok(0);
     }
@@ -351,11 +358,10 @@ fn place_license(text: Option<&[u8]>, dir: &str) -> Result<(), Refusal> {
 
 // spec: gate-sdk/SPEC.md §check-packed-links — the rewrite the gate replays: one function, so the
 // bytes the gate asserts on are the bytes the packer writes and no second implementation can drift
-// spec: gate-sdk/SPEC.md §Consumer payload — an empty base rewrites nothing, which is the knob's
-// documented *resolve in the tree* meaning; `<leaf>` is the packer's own directory name, never
-// parsed out of the link, and a fragment passes through as the already-normalized heading slug it is
-pub fn resolve_own_spec_links(text: &str, leaf: &str, base: &str) -> (String, usize) {
-    const OPEN: &str = "](SPEC.md";
+// spec: gate-sdk/SPEC.md §Consumer payload — an empty base rewrites nothing; a `../<leaf>/`
+// target's leaf must be one `packed` names, and a fragment passes through unchanged
+pub fn resolve_spec_links(text: &str, leaf: &str, packed: &[String], base: &str) -> (String, usize) {
+    const OPEN: &str = "](";
     if base.is_empty() || leaf.is_empty() {
         return (text.to_string(), 0);
     }
@@ -367,26 +373,16 @@ pub fn resolve_own_spec_links(text: &str, leaf: &str, base: &str) -> (String, us
         let (head, tail) = rest.split_at(at);
         out.push_str(head);
         let after = &tail[OPEN.len()..];
-        // spec: gate-sdk/SPEC.md §check-packed-links — the target is `SPEC.md` exactly or
-        // `SPEC.md#<fragment>`; anything else after the name (a longer path, a link title) is a
-        // different target this rewrite has no published location for, and passes through untouched
-        let rewrite = match after.as_bytes().first() {
-            Some(b')') => Some((String::new(), 1usize)),
-            Some(b'#') => after
-                .find(')')
-                .map(|end| (after[1..end].to_string(), end + 1)),
-            _ => None,
-        };
-        match rewrite {
-            Some((frag, consumed)) => {
+        match spec_target(after, leaf, packed) {
+            Some((target, frag, consumed)) => {
                 out.push_str("](");
                 out.push_str(base);
                 out.push('/');
-                out.push_str(leaf);
+                out.push_str(target);
                 out.push_str("/SPEC");
                 if !frag.is_empty() {
                     out.push('#');
-                    out.push_str(&frag);
+                    out.push_str(frag);
                 }
                 out.push(')');
                 count += 1;
@@ -400,6 +396,27 @@ pub fn resolve_own_spec_links(text: &str, leaf: &str, base: &str) -> (String, us
     }
     out.push_str(rest);
     (out, count)
+}
+
+// spec: gate-sdk/SPEC.md §Consumer payload — the target is `SPEC.md` or `../<packed>/SPEC.md`,
+// exactly or with `#<fragment>`; yields its leaf, fragment and length through the closing paren
+fn spec_target<'a>(after: &'a str, leaf: &'a str, packed: &'a [String]) -> Option<(&'a str, &'a str, usize)> {
+    const NAME: &str = "SPEC.md";
+    let (target, skip) = match after.strip_prefix("../") {
+        Some(rel) => {
+            let other = &rel[..rel.find('/')?];
+            let p = packed.iter().find(|p| p.as_str() == other)?;
+            (p.as_str(), "../".len() + other.len() + 1)
+        }
+        None => (leaf, 0),
+    };
+    let tail = after[skip..].strip_prefix(NAME)?;
+    let used = skip + NAME.len();
+    match tail.as_bytes().first() {
+        Some(b')') => Some((target, "", used + 1)),
+        Some(b'#') => tail.find(')').map(|end| (target, &tail[1..end], used + end + 1)),
+        _ => None,
+    }
 }
 
 // spec: installer/SPEC.md §The packer — a caller that already holds the tree it means says so;
@@ -1049,9 +1066,10 @@ mod tests {
     // `check-packed-links` assertion B holds: an unconditional rewrite fails this.
     #[test]
     fn an_empty_base_rewrites_nothing() {
-        let src = "See [SPEC.md](SPEC.md) and [SPEC.md](SPEC.md#stage-rules).\n";
-        assert_eq!(resolve_own_spec_links(src, "queue-kit", ""), (src.to_string(), 0));
-        assert_eq!(resolve_own_spec_links(src, "", "https://h.test"), (src.to_string(), 0));
+        let src = "See [SPEC.md](SPEC.md), [SPEC.md](SPEC.md#stage-rules) and [g](../gate-sdk/SPEC.md).\n";
+        let packed = vec!["queue-kit".to_string(), "gate-sdk".to_string()];
+        assert_eq!(resolve_spec_links(src, "queue-kit", &packed, ""), (src.to_string(), 0));
+        assert_eq!(resolve_spec_links(src, "", &packed, "https://h.test"), (src.to_string(), 0));
     }
 
     // spec: gate-sdk/SPEC.md §check-packed-links — the leaf is the packer's own directory name and
@@ -1059,9 +1077,10 @@ mod tests {
     // `resolved_location`'s spelling of the same published location.
     #[test]
     fn an_own_spec_link_resolves_to_the_published_target_with_its_fragment() {
-        let (got, n) = resolve_own_spec_links(
+        let (got, n) = resolve_spec_links(
             "a [SPEC.md](SPEC.md) b [x](SPEC.md#the-monitor-boundary) c\n",
             "site-kit",
+            &["site-kit".to_string()],
             "https://h.test/",
         );
         assert_eq!(n, 2);
@@ -1071,13 +1090,18 @@ mod tests {
         );
     }
 
-    // spec: gate-sdk/SPEC.md §check-packed-links — only the exact `SPEC.md` target is rewritten: a
-    // longer path, a sibling kit's spelling, a link title and a prose mention of the name each pass
-    // through, so the rewrite cannot invent a published location it has no leaf for.
+    // spec: gate-sdk/SPEC.md §Consumer payload — a packed kit's `../<leaf>/SPEC.md` is rewritten
+    // with its fragment; an unpacked leaf, a longer path, a `./` prefix, a link title and a prose
+    // mention pass through, so no published location is invented for a leaf the pack lacks
     #[test]
-    fn only_the_exact_own_spec_target_is_rewritten() {
-        let src = "[a](../gate-sdk/SPEC.md) [b](docs/SPEC.md) [c](SPEC.md \"t\") `SPEC.md` [d](SPEC.mdx)\n";
-        assert_eq!(resolve_own_spec_links(src, "k-kit", "https://h.test"), (src.to_string(), 0));
+    fn only_an_exact_packed_spec_target_is_rewritten() {
+        let packed = vec!["k-kit".to_string(), "gate-sdk".to_string()];
+        let (got, n) = resolve_spec_links("[a](../gate-sdk/SPEC.md#x)\n", "k-kit", &packed, "https://h.test");
+        assert_eq!(n, 1);
+        assert_eq!(got, "[a](https://h.test/gate-sdk/SPEC#x)\n");
+        let src = "[a](../omega/SPEC.md) [b](docs/SPEC.md) [c](SPEC.md \"t\") `SPEC.md` [d](SPEC.mdx) \
+                   [e](../gate-sdk/SPEC.mdx) [f](../gate-sdk/docs/SPEC.md) [g](./SPEC.md)\n";
+        assert_eq!(resolve_spec_links(src, "k-kit", &packed, "https://h.test"), (src.to_string(), 0));
     }
 
     // spec: installer/SPEC.md §The packer — the diagnostic names the entries it found, bounded,
