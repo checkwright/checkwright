@@ -8,18 +8,6 @@
 
 ## New Features
 
-### shellcheck-extra-dirs-trigger
-
-[spec: SPEC-word-list-roots.md]
-
-`check-shellcheck`'s generated-hook trigger never fires on a directory only `GATE_SDK_LINT_EXTRA_DIRS` adds: the knob is a `.words()` row, which `check-graph` refuses as a `knob:` couples token, so an edit there is linted by the full battery and CI but not at commit. gate-sdk/SPEC.md §check-shellcheck states the limit.
-
-**Deliverable:** a manifest token that expands a word-list knob into trigger globs, or a boundary note ruling the late tier acceptable.
-
-**Cost while deferred:** a consumer's lint findings in knob-added dirs arrive one tier late. Filed 2026-09-26 to the gap inbox by gate-sdk-tooling-brevity; promoted 2026-09-26 at capture-integrity-brevity's close: →fix fails because a new manifest token is a contract change to `check-graph`. Re-verified: `GATE_SDK_LINT_EXTRA_DIRS` is declared `.words()` in `native/src/knobs/gate_sdk.rs`, and the descriptor couples only `knob:GATE_SDK_GATES_DIR/*.sh,kit:*.sh`. Owner lookup: `LINT_EXTRA`, `word-list` in this file — none; owner gate-sdk/SPEC.md §check-shellcheck.
-
-**Selected 2026-10-01 for install-disposition-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, choosing the manifest token or the boundary note.
-
 ### smoke-script-parse-unchecked
 
 [spec: SPEC-smoke-lint.md]
@@ -1451,5 +1439,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - prose-tells-absence-knobs
 - canon-kit-gate-brevity
 - dangling-registration-cascade
+- shellcheck-extra-dirs-trigger
 
 ## Lessons Learned

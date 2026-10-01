@@ -166,8 +166,8 @@ pub fn is_locator(name: &str) -> bool {
     matches!(name, "GATE_SDK_GATES_DIR" | "GATE_SDK_ROOT")
 }
 
-// spec: gate-sdk/SPEC.md §The `# graph:` manifest — why a name cannot root a glob: a root is one
-// directory, so only a locator or a declared scalar row that is no word list roots one
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — why a name cannot root a glob: a root is a
+// directory or a word list of them, so only a locator or a declared unpacked scalar row roots one
 pub fn root_refusal(name: &str) -> Option<String> {
     if is_locator(name) {
         return None;
@@ -176,10 +176,11 @@ pub fn root_refusal(name: &str) -> Option<String> {
         return Some(format!("{} is no knob a static kit declares", name));
     };
     if row.shape != Shape::Scalar || row.packing.is_some() {
-        return Some(format!("{}'s row is {}, and a root is one directory", name, row.shape.word()));
-    }
-    if row.words {
-        return Some(format!("{}'s row is declared `.words()`, and a root is one directory", name));
+        return Some(format!(
+            "{}'s row is {}, and a root is a directory or a word list of them",
+            name,
+            row.shape.word()
+        ));
     }
     None
 }

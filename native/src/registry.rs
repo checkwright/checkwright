@@ -700,22 +700,22 @@ fn covering_pattern(member: &str) -> String {
     }
 }
 
-// spec: gate-sdk/SPEC.md §The `# graph:` manifest — a `knob:<NAME>/<glob>` token's covering pattern:
-// the one directory the knob resolves to, then the glob; an empty root is a refusal, since it would
-// re-root the glob at the repository root
-fn rooted_pattern(token: &str) -> Result<String, String> {
-    rooted_path(token, "couples").map(|p| covering_pattern(&p))
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — a `knob:<NAME>/<glob>` token's covering patterns:
+// the glob under each directory the knob resolves to
+fn rooted_patterns(token: &str) -> Result<Vec<String>, String> {
+    rooted_paths(token, "couples").map(|ps| ps.iter().map(|p| covering_pattern(p)).collect())
 }
 
-// spec: gate-sdk/SPEC.md §The `# graph:` manifest — a rooted token's path before any conversion: the
-// knob's value trimmed of a trailing `/` and a leading `./`, `.` read as no prefix, then the glob
-fn rooted_path(token: &str, kind: &str) -> Result<String, String> {
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — a rooted token's paths before any conversion:
+// a scalar root is one path and an empty one a refusal, since it would re-root the glob at the
+// repository root; a word list roots the glob at each word, and an empty list names no root at all
+fn rooted_paths(token: &str, kind: &str) -> Result<Vec<String>, String> {
     let Some((name, glob)) = crate::knobs::rooted(token) else {
         return Err(format!("{} token 'knob:{}' is not rooted", kind, token));
     };
     let refuse = |why: String| {
         format!(
-            "{} token 'knob:{}' cannot be expanded: {} — a rooted token is one glob under the \
+            "{} token 'knob:{}' cannot be expanded: {} — a rooted token is one glob under each \
              directory its knob resolves to; treating as failure (not clean)",
             kind, token, why
         )
@@ -726,13 +726,23 @@ fn rooted_path(token: &str, kind: &str) -> Result<String, String> {
     if !literal_glob(glob) {
         return Err(refuse(format!("'{}' is not a literal glob", glob)));
     }
-    let value = crate::walk::knob_scalar(name).map_err(&refuse)?;
+    let roots = if crate::knobs::is_words(name) {
+        crate::walk::knob_words(name).map_err(&refuse)?
+    } else {
+        vec![crate::walk::knob_scalar(name).map_err(&refuse)?]
+    };
+    roots.iter().map(|r| rooted_join(name, r, glob).map_err(&refuse)).collect()
+}
+
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — one root's terms: a trailing `/` trimmed, a
+// leading `./` dropped, `.` read as no prefix, and an empty root or one carrying a comma refused
+fn rooted_join(name: &str, value: &str, glob: &str) -> Result<String, String> {
     let root = value.trim_end_matches('/');
     if root.is_empty() {
-        return Err(refuse(format!("{} resolves to no directory", name)));
+        return Err(format!("{} resolves to no directory", name));
     }
     if root.contains(',') || root.chars().any(char::is_whitespace) {
-        return Err(refuse(format!("{}'s value '{}' carries a comma or whitespace", name, root)));
+        return Err(format!("{}'s value '{}' carries a comma or whitespace", name, root));
     }
     let root = root.strip_prefix("./").unwrap_or(root);
     if root == "." {
@@ -756,7 +766,7 @@ pub fn knob_paths(token: &str) -> Result<Vec<String>, String> {
         return Ok(vec![token.to_string()]);
     };
     if crate::knobs::rooted(name).is_some() {
-        return rooted_path(name, "knob-path").map(|p| vec![p]);
+        return rooted_paths(name, "knob-path");
     }
     let members = match crate::knobs::reference(name) {
         (knob, Some(field)) => crate::knobs::project(knob, field),
@@ -778,7 +788,7 @@ pub fn expand_couples(field: &str, kit_roots_rel: &[String]) -> Result<String, S
     let mut once: Vec<String> = Vec::new();
     for tok in field.split(',') {
         match tok.strip_prefix("knob:") {
-            Some(name) if crate::knobs::rooted(name).is_some() => once.push(rooted_pattern(name)?),
+            Some(name) if crate::knobs::rooted(name).is_some() => once.extend(rooted_patterns(name)?),
             Some(name) => {
                 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a `<NAME>.<field>` token expands to
                 // the field's members across the elements, and a bare token on a packed knob is refused
@@ -1219,13 +1229,41 @@ mod tests {
             expand_couples("knob:GATE_SDK_GATES_DIR/gates.list,knob:GATE_SDK_WORKFLOW_DIR/*.md", &roots).unwrap(),
             format!("*{}/gates.list,*wf/*.md", d.display())
         );
-        for bad in ["knob:GATE_SDK_PROGRAM_FLOOR/x", "knob:GATE_SDK_KIT_DIRS/x", "knob:PROBE_ABSENT_DIR/x", "knob:GATE_SDK_WORKFLOW_DIR/a b"] {
+        for bad in ["knob:GATE_SDK_PROGRAM_FLOOR/x", "knob:PROBE_ABSENT_DIR/x", "knob:GATE_SDK_WORKFLOW_DIR/a b"] {
             assert!(expand_couples(bad, &roots).is_err(), "{} must refuse", bad);
         }
         std::fs::write(d.join("gate-sdk-config.knobs"), "GATE_SDK_WORKFLOW_DIR =\n").expect("write");
         crate::knobs::reset(&knobs);
         let e = expand_couples("knob:GATE_SDK_WORKFLOW_DIR/*.md", &roots).unwrap_err();
         assert!(e.contains("resolves to no directory"), "{}", e);
+        unscratch(&knobs, &d);
+    }
+
+    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a rooted token over a word list roots its glob
+    // at each word on the scalar root's terms, and an empty list expands to no pattern
+    #[test]
+    fn a_rooted_token_over_a_word_list_expands_once_per_word() {
+        let knobs = crate::knobenv::lock();
+        let roots = vec!["gate-sdk".to_string()];
+        let d = scratch_corpus(&knobs, "rootedwords", "");
+        knobs.remove("GATE_SDK_LINT_EXTRA_DIRS");
+        std::fs::write(d.join("gate-sdk-config.knobs"), "GATE_SDK_LINT_EXTRA_DIRS = ops/ ./tools\n").expect("write");
+        crate::knobs::reset(&knobs);
+        assert_eq!(
+            expand_couples("knob:GATE_SDK_LINT_EXTRA_DIRS/*.sh", &roots).unwrap(),
+            "*ops/*.sh,*tools/*.sh"
+        );
+        assert_eq!(
+            knob_paths("knob:GATE_SDK_LINT_EXTRA_DIRS/*.sh").unwrap(),
+            vec!["ops/*.sh".to_string(), "tools/*.sh".to_string()]
+        );
+        std::fs::write(d.join("gate-sdk-config.knobs"), "GATE_SDK_LINT_EXTRA_DIRS = ops a,b\n").expect("write");
+        crate::knobs::reset(&knobs);
+        assert!(expand_couples("knob:GATE_SDK_LINT_EXTRA_DIRS/*.sh", &roots).is_err());
+        std::fs::write(d.join("gate-sdk-config.knobs"), "GATE_SDK_LINT_EXTRA_DIRS =\n").expect("write");
+        crate::knobs::reset(&knobs);
+        assert_eq!(expand_couples("knob:GATE_SDK_LINT_EXTRA_DIRS/*.sh,a/b", &roots).unwrap(), "a/b");
+        assert!(knob_paths("knob:GATE_SDK_LINT_EXTRA_DIRS/*.sh").unwrap().is_empty());
         unscratch(&knobs, &d);
     }
 

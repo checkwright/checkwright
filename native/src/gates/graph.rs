@@ -362,7 +362,7 @@ fn root_findings(field: &str) -> Vec<(&str, String)> {
 fn root_finding(token: &str, why: &str) -> String {
     format!(
         "couples token 'knob:{}' cannot root its glob: {} — a rooted token names a locator or a \
-         declared scalar row holding one directory",
+         declared scalar row holding a directory or a word list of them",
         token, why
     )
 }
@@ -577,7 +577,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 let declared = crate::gates::declared(c).unwrap_or(&[]);
                 if let Some((name, _)) = crate::knobs::rooted(token) {
                     // spec: gate-sdk/SPEC.md §check-graph — a rooted token is admissible on the bare
-                    // token's test or as a locator, and its knob must hold one directory
+                    // token's test or as a locator, and its knob must hold a directory or a word
+                    // list of them
                     if !crate::knobs::is_locator(name) && !declared.contains(&name) {
                         errors.push(format!(
                             "MANIFEST: {} carries couples token 'knob:{}', but {} declares no knob \
