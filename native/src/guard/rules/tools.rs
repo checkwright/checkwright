@@ -711,19 +711,12 @@ pub fn find_exec(ctx: &Ctx) -> Decided {
         return Ok(None);
     }
     let h = ctx.host();
-    for (k, (seg, dseg)) in segs.iter().zip(&dsegs).enumerate() {
+    for (seg, dseg) in segs.iter().zip(&dsegs) {
         let seg = trim_start(seg);
         if head_word(seg) != "find" || seg.contains("{}") {
             continue;
         }
-        let mut dr: Vec<&str> = words(trim_start(dseg));
-        if dr.last() == Some(&"\\") {
-            if matches!(dsegs.get(k + 1), Some(n) if !trim_start(n).trim_end().is_empty()) {
-                continue;
-            }
-            dr.pop();
-            dr.push(";");
-        }
+        let dr: Vec<&str> = words(trim_start(dseg));
         let dw: Vec<String> = dr.iter().map(|w| text::unsentinel(w)).collect();
         let execs: Vec<usize> = dw.iter().enumerate().filter(|(_, w)| *w == "-exec").map(|(i, _)| i).collect();
         if execs.len() != 1 {

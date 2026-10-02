@@ -77,7 +77,11 @@ fn split_on(cmd: &str, seps: &[&[u8]]) -> Vec<String> {
     let mut segs: Vec<Vec<u8>> = vec![Vec::new()];
     let mut i = 0usize;
     while i < b.len() {
-        match seps.iter().find(|s| b[i..].starts_with(s)) {
+        match seps
+            .iter()
+            .find(|s| b[i..].starts_with(s))
+            .filter(|s| !(**s == b";" && escaped(b, i)))
+        {
             Some(s) => {
                 segs.push(Vec::new());
                 i += s.len();
@@ -91,6 +95,11 @@ fn split_on(cmd: &str, seps: &[&[u8]]) -> Vec<String> {
     segs.iter()
         .map(|s| String::from_utf8_lossy(s).into_owned())
         .collect()
+}
+
+// spec: guard-kit/SPEC.md §The reader and its views — the escaped `;`.
+fn escaped(b: &[u8], i: usize) -> bool {
+    b[..i].iter().rev().take_while(|&&c| c == b'\\').count() % 2 == 1
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — the heredoc opener as the terminator scan reads it,
@@ -642,6 +651,19 @@ mod tests {
         assert_eq!(split_compound("a |& b"), vec!["a ", " b"]);
         assert_eq!(split_compound("a\nb;c\n"), vec!["a", "b", "c", ""]);
         assert_eq!(statements("a | b;c||d |& e"), vec!["a | b", "c", "d |& e"]);
+    }
+
+    // spec: guard-kit/SPEC.md §The reader and its views — the escaped `;`
+    #[test]
+    fn the_splitter_keeps_a_semicolon_after_an_odd_backslash_run() {
+        assert_eq!(split_compound("a \\; b"), vec!["a \\; b"]);
+        assert_eq!(split_compound("a \\\\; b"), vec!["a \\\\", " b"]);
+        assert_eq!(split_compound("a \\\\\\; b"), vec!["a \\\\\\; b"]);
+        assert_eq!(statements("a \\; b"), vec!["a \\; b"]);
+        assert_eq!(split_compound("a \\| b"), vec!["a \\", " b"]);
+        let quoted = skeleton("a '\\;' b", SQDQ);
+        assert!(!quoted.contains('\\'));
+        assert_eq!(split_compound(&quoted).len(), 1);
     }
 
     // spec: guard-kit/SPEC.md §The shell guard — placeholder, never deletion

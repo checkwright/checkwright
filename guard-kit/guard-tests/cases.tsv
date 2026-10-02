@@ -167,6 +167,8 @@ block	find . -name '*.md' -exec grep -l x '{}' +
 block	find src -type f -exec grep -q foo '{}' ';'
 block	find src -type f -exec grep -q foo '{}' \;
 fallthrough	find src -type f -exec grep -q foo '{}' \; -print
+# an even backslash run is a literal backslash operand and a real break, so no terminator
+fallthrough	find src -type f -exec grep -q foo '{}' \\;
 allow	find . -name '*.md' -print0 | xargs -0 grep -l x
 fallthrough	find . -name '*.tsv' -delete
 fallthrough	find . -exec md5sum '{}' +
@@ -304,6 +306,10 @@ allow	cat >> .tmp/journal.md 2>&1
 allow	grep -rn foo src | head
 allow	grep foo file | awk '{print}'
 fallthrough	grep foo file | md5sum
+# the split keeps an escaped ';' in its word, but the rule's own chain test reads any ';'
+# in the skeleton and declines; an even backslash run is a real break besides
+fallthrough	grep foo a\;b
+fallthrough	grep foo a\\;b
 # the sed and awk program discriminator: a program the static check clears is read-only (a redirect
 # glyph inside an awk string is skipped); an output redirect, a written file, a system() call, a
 # command piped into getline and a program file withhold

@@ -8,20 +8,6 @@
 
 ## New Features
 
-### bash-reader-escaped-separator
-
-[spec: SPEC-escaped-separator.md]
-
-guard-kit's bash reader cuts its compound split at a backslash-escaped `;`, so `find … -exec cmd {} \;` arrives as a segment ending in a lone backslash plus an empty segment; the PowerShell reader splits nothing at an escaped separator. Rule `find_exec` reads the lone backslash as the terminator, and every other rule reading segments sees a spurious statement boundary.
-
-**Deliverable:** the split skipping an escaped separator, rule `find_exec` re-pointed at the kept `\;`, and decision-table cases for both; or a boundary note if the harness's own matcher splits there too.
-
-Measured at spec: the harness's matcher does not split at `\;` (the amendment records the probe).
-
-**Cost while deferred:** a mis-split can attribute words to the wrong segment in any rule. Filed 2026-09-30 to the gap inbox by `side-effect-free-read-arms`' build, which worked around it in one rule; promoted at guard-kit-steering's close: →fix fails because the split is shared by every rule and the harness's behaviour is unmeasured, →forward because no ruling is owed. Re-verified: `split_on` in native/src/guard/bash.rs matches `;` bytewise with no escape test. Owner lookup: `backslash`, `find_exec`, `compound split` in this file — only `harness-project-dir-fold-dialect-unresolved`'s backslash-spelled root, DISTINCT; owner guard-kit/SPEC.md §The reader and its views.
-
-**Selected 2026-10-01 for gate-sdk-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it, a feature because §The generic ruleset's `find_exec` bullet states the cut at `\;`. It precedes [write-side-steering](#write-side-steering) and [compound-read-classifier-reach](#compound-read-classifier-reach), whose rules read its segments, and the ruleset's brevity slice, which waits on all three.
-
 ### hook-emit-remedy-door
 
 [spec: SPEC-hook-emit-door.md]
@@ -1343,4 +1329,5 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - reclaim-precondition-outside-the-tree
 - gate-customer-value-audit
 - consumer-value-literal-gate
+- bash-reader-escaped-separator
 
