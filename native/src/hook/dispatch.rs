@@ -47,16 +47,7 @@ pub fn run(payload: Option<&Value>) -> i32 {
             (false, String::new())
         }
     };
-    let mut binding = read_array("DELEGATION_KIT_TIER_MODEL", "D6 (the bound tier)", &mut notes);
-    let door = if binding.is_empty() {
-        String::new()
-    } else {
-        crate::gates::door_command("--emit knob-values DELEGATION_KIT_TIER_MODEL").unwrap_or_else(|e| {
-            notes.push_str(&format!("D6 (the bound tier) went unenforced on this dispatch: {}. ", e));
-            binding.clear();
-            String::new()
-        })
-    };
+    let binding = read_array("DELEGATION_KIT_TIER_MODEL", "D6 (the bound tier)", &mut notes);
     let Some(doc) = payload.filter(|d| d.get("tool_input").is_some_and(Value::is_object)) else {
         return degraded("the hook payload did not parse, or carried no tool_input object");
     };
@@ -79,7 +70,10 @@ pub fn run(payload: Option<&Value>) -> i32 {
         "read-only" => return hook::block(NAME, &read_only_claim(&subagent_type)),
         "isolation" => return hook::block(NAME, &default_isolation(&subagent_type)),
         "tier" => return hook::block(NAME, &chosen_tier(&subagent_type, &agent_dir)),
-        "bound" => return hook::block(NAME, &bound_tier(&model, &binding, &door)),
+        "bound" => {
+            let door = crate::gates::door_command("--emit knob-values DELEGATION_KIT_TIER_MODEL");
+            return hook::block(NAME, &bound_tier(&model, &binding, door));
+        }
         _ => {}
     }
 
@@ -156,8 +150,13 @@ fn chosen_tier(subagent_type: &str, agent_dir: &str) -> String {
 }
 
 // spec: delegation-kit/SPEC.md §The delegation model — D6's message names the bound values, which
-// are the consumer's config rather than kit literals
-fn bound_tier(model: &str, binding: &[String], door: &str) -> String {
+// are the consumer's config rather than kit literals; a door that cannot be read costs the message
+// its door, never the block
+fn bound_tier(model: &str, binding: &[String], door: Result<String, String>) -> String {
+    let door = match door {
+        Ok(d) => d,
+        Err(e) => format!("the gate binary's door that prints them could not be read: {}", e),
+    };
     format!(
         "this dispatch names model '{}', which matches none of the consumer's bound tiers ({}), so it would choose around the tier binding rather than among its tiers. Name one of the bound values ({}), or, where the class you need is pinned to an exact model id, dispatch a type whose definition declares that class: a per-dispatch model is an alias only (delegation-kit/SPEC.md §The tier binding).",
         model,
@@ -298,6 +297,18 @@ mod tests {
         assert_eq!(degraded("the hook payload did not parse, or carried no tool_input object"), 0);
         let no_object = payload(r#"{"tool_input":"not-an-object"}"#);
         assert!(!no_object.get("tool_input").is_some_and(Value::is_object));
+    }
+
+    // spec: delegation-kit/SPEC.md §The delegation model — the door-fault row: D6 still refuses,
+    // naming the binding and the fault in place of the door
+    #[test]
+    fn an_unreadable_door_costs_the_refusal_its_door_and_never_the_block() {
+        let binding = vec!["judgment=big-model".to_string()];
+        let msg = bound_tier("other", &binding, Err("GATE_SDK_NATIVE_BIN is unset".to_string()));
+        assert!(msg.contains("(judgment=big-model)"), "the binding must still be named: {}", msg);
+        assert!(msg.contains("could not be read: GATE_SDK_NATIVE_BIN is unset"), "the fault must be named: {}", msg);
+        let quiet = Config { readonly: &[], mutating: &[], require_tier: false, tier_defined: &|_| false, binding: &binding };
+        assert_eq!(route("audit-sweep", "", false, "other", &quiet), "bound");
     }
 
     // spec: delegation-kit/SPEC.md §The delegation model — D5's lookup reads a definition's
