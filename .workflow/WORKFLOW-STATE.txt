@@ -7,3 +7,4 @@
 gate-sdk-value-pass scope a77fb768 2026-10-01 f8ce1650
 gate-sdk-value-pass spec ab3fd8c7 2026-10-01 66f5f6d1
 gate-sdk-value-pass align a2a20bdb 2026-10-02 1e0d58cb
+gate-sdk-value-pass build a2dfeb53 2026-10-02 7efce802
