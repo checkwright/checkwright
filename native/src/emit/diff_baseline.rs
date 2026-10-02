@@ -7,20 +7,21 @@ use crate::evidence;
 use crate::walk;
 use std::path::Path;
 
-// spec: evidence-kit/SPEC.md §Layout and configuration — the five names this arm resolves, every
-// one a row of evidence-kit's table and a read a hardcoded flag would hide from the knob-file derivation.
+// spec: evidence-kit/SPEC.md §Layout and configuration — the names this arm resolves, each a read a
+// hardcoded flag would hide from the knob-file derivation.
 pub const KNOBS: &[&str] = &[
     "EVIDENCE_KIT_BASELINE_FILE",
     "EVIDENCE_KIT_SKIP_FILE",
     "EVIDENCE_KIT_TMP_DIR",
     "EVIDENCE_KIT_PARSER",
     "EVIDENCE_KIT_PARSER_*",
+    "GATE_SDK_NATIVE_BIN",
 ];
 
 // spec: gate-sdk/SPEC.md §The bin/-tool contract — the usage a refusal prints, the `-h`/`--help`
 // half having retired to the front-end. It names the `--` escape because the shape refusal it
 // accompanies is the reason a caller would need one.
-const USAGE: &str = "usage: run-gates.sh --diff-baseline [--] <suite> <logfile> [<status>] [<suite> <logfile> [<status>]...]
+const USAGE: &str = "usage: --diff-baseline [--] <suite> <logfile> [<status>] [<suite> <logfile> [<status>]...]
   <status> is the suite command's own exit status. A suite whose parser reads the
   log may omit it; an 'exit-code' suite may not, because the status is its verdict.
   \"--\" ends option processing, so a positional beginning with \"-\" is still reachable.";
@@ -103,12 +104,13 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
                 // success: an exit-code suite parsed against an assumed 0 reports pass for every
                 // log it is ever handed, clearing a red it structurally cannot see.
                 if parser == "exit-code" {
+                    let door = crate::gates::door_command(&format!("--diff-baseline {} {} <status>", suite, log))?;
                     eprintln!(
                         "diff-baseline: suite '{}' is parsed by exit code and no status was given.",
                         suite
                     );
                     eprintln!("  help: pass the suite's own exit status as a third argument —");
-                    eprintln!("        run-gates.sh --diff-baseline {} {} <status>", suite, log);
+                    eprintln!("        {}", door);
                     eprintln!("        Without it this tool cannot observe a failure in that suite at all.");
                     return Ok(2);
                 }

@@ -17,7 +17,7 @@ pub const KNOBS: &[&str] = &[
 // spec: gate-sdk/SPEC.md §The bin/-tool contract — the usage a shape refusal prints, the
 // `-h`/`--help` half having retired to the front-end. It names the `--` escape because the refusal
 // it accompanies is the only reason a caller would reach for one.
-pub const USAGE: &str = "usage: run-gates.sh --emit usage-trend [--] [history-file]
+pub const USAGE: &str = "usage: --emit usage-trend [--] [history-file]
   [history-file] overrides DELEGATION_KIT_USAGE_HISTORY, for test injection.
   \"--\" ends option processing, so a path beginning with \"-\" is still reachable.";
 
@@ -349,7 +349,7 @@ mod tests {
     fn a_dash_led_operand_refuses_with_the_usage() {
         let flag = emit(&["--help".to_string()]).expect_err("[--help]: want a refusal");
         assert!(
-            flag.contains("unrecognized option: --help") && flag.contains("usage: run-gates.sh --emit"),
+            flag.contains("unrecognized option: --help") && flag.contains("usage: --emit"),
             "[--help]: the refusal must name the flag and print the usage block: {}",
             flag
         );

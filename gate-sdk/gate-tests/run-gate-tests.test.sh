@@ -86,7 +86,7 @@ assert_has both 'GATE-TESTS: clean' "$out"
 out="$(gate_arm_run --run-gate-tests --help 2>&1)"; rc=$?
 assert_rc  help-flag "$rc" 2
 assert_has help-flag 'unrecognized option: --help' "$out"
-assert_has help-flag 'usage: run-gates.sh --run-gate-tests' "$out"
+assert_has help-flag 'usage: --run-gate-tests' "$out"
 assert_absent help-flag 'no fixture tree at' "$out"
 out="$(gate_arm_run --run-gate-tests -- "$t" "$scratch/checks" 2>&1)"; rc=$?
 assert_rc  separator "$rc" 0

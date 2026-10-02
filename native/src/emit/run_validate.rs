@@ -84,11 +84,11 @@ fn config() -> Result<Cfg, Refusal> {
 
 // spec: evidence-kit/SPEC.md §bin/run-validate.sh — the whole input arrives as knobs, so the
 // member takes no argument and any word is refused before the lock is claimed: a `--help` read as
-// nothing would start a full producer run. Usage lives in the front-end.
+// nothing would start a full producer run.
 fn dispatch(args: &[String]) -> Result<i32, Refusal> {
     if let Some(a) = args.first() {
         return Err(guard(format!(
-            "takes no arguments (got: {}) — usage: run-gates.sh --help",
+            "takes no arguments (got: {}) — usage: --run-validate   (it takes no argument)",
             a
         )));
     }

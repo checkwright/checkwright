@@ -579,6 +579,7 @@ fn run_battery(consumer: &str) -> Result<(i32, String), Fail> {
         &programs::BASH,
         &[
             "-c",
+            // door-contributor: a source-clone smoke drives the vendored front end on purpose; executed, never printed
             r#"cd "$1" && export GATE_SDK_ROOT="$1/gate-sdk" && exec bash gate-sdk/bin/run-gates.sh"#,
             "bash",
             consumer,
@@ -679,6 +680,7 @@ fn stage_all(consumer: &str) -> Result<(), Fail> {
 // this process's, because the host's value is a different tree's.
 fn regenerate(consumer: &str, to: &str) -> Result<(), Fail> {
     let hook = bash(
+        // door-contributor: a source-clone smoke drives the vendored front end on purpose; executed, never printed
         r#"cd "$1" && export GATE_SDK_ROOT="$1/gate-sdk" && exec bash gate-sdk/bin/run-gates.sh --emit git-hooks --write >/dev/null"#,
         &[consumer],
         Stderr::Inherit,
@@ -691,6 +693,7 @@ fn regenerate(consumer: &str, to: &str) -> Result<(), Fail> {
     }
 
     let resolved = bash(
+        // door-contributor: a source-clone smoke drives the vendored front end on purpose; executed, never printed
         r#"cd "$1" && export GATE_SDK_ROOT="$1/gate-sdk" && exec bash gate-sdk/bin/run-gates.sh --emit knob-values GATE_SDK_GRAPH_ARTIFACT"#,
         &[consumer],
         Stderr::Inherit,
@@ -715,6 +718,7 @@ fn regenerate(consumer: &str, to: &str) -> Result<(), Fail> {
     }
 
     let emitted = bash(
+        // door-contributor: a source-clone smoke drives the vendored front end on purpose; executed, never printed
         r#"cd "$1" && export GATE_SDK_ROOT="$1/gate-sdk" && exec bash gate-sdk/bin/run-gates.sh --emit graph > "$2""#,
         &[consumer, &artifact],
         Stderr::Inherit,
@@ -731,6 +735,7 @@ fn regenerate(consumer: &str, to: &str) -> Result<(), Fail> {
     // quietly false and drop this step out of phase A altogether.
     if Path::new(&format!("{}/doctrine-kit/DOCTRINE.md", consumer)).is_file() {
         let doctrine = bash(
+            // door-contributor: a source-clone smoke drives the vendored front end on purpose; executed, never printed
             r#"cd "$1" && export GATE_SDK_ROOT="$1/gate-sdk" && exec bash gate-sdk/bin/run-gates.sh --install-doctrine >/dev/null"#,
             &[consumer],
             Stderr::Inherit,

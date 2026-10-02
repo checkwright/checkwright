@@ -157,7 +157,8 @@ pub fn table(f: &Footprint) -> String {
 
 // spec: guard-kit/SPEC.md §check-door-binding — the file-scoped declaration stands before the first
 // heading and is written by the emitter, one in emitted output being erased by the next regeneration
-const PREAMBLE: &str = r#"---
+const PREAMBLE: &str = concat!(
+    r#"---
 title: Footprint
 nav_parent: value
 nav_child_order: 2
@@ -166,7 +167,10 @@ nav_child_order: 2
 
 # Context footprint
 
-What vendoring Checkwright costs a consumer's context budget, measured per kit and split by when the cost is paid. Every number here is generated from the tracked kit surfaces by `bash gate-sdk/bin/run-gates.sh --emit footprint` and held current by a freshness gate, so the page cannot drift from what the kits actually ship.
+What vendoring Checkwright costs a consumer's context budget, measured per kit and split by when the cost is paid. "#,
+    // door-contributor: the regeneration recipe behind the page's numbers, read by the contributor who regenerates it
+    "Every number here is generated from the tracked kit surfaces by `bash gate-sdk/bin/run-gates.sh --emit footprint` and held current by a freshness gate, so the page cannot drift from what the kits actually ship.",
+    r#"
 
 ## What is measured
 
@@ -185,7 +189,8 @@ The figures are kit-share only — what a kit itself ships. A consumer's own bin
 
 Every top-level directory carrying a `SPEC.md` takes a row, kit or not, and one that ships nothing into context shows an empty tier in both columns.
 
-"#;
+"#
+);
 
 pub fn emit(_args: &[String]) -> Result<String, String> {
     Ok(format!("{}{}", PREAMBLE, table(&measure()?)))

@@ -21,7 +21,7 @@ pub const KNOBS: &[&str] = &[
 pub fn run(args: &[String]) -> i32 {
     if let Some(a) = args.first() {
         eprintln!(
-            "checkwright-gates: --price-coverage: takes no argument (got: {}) — usage: run-gates.sh --price-coverage",
+            "checkwright-gates: --price-coverage: takes no argument (got: {}) — usage: --price-coverage   (it takes no argument)",
             a
         );
         return 2;

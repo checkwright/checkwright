@@ -150,15 +150,15 @@ impl Say {
 
 fn usage(stages: &[String]) -> String {
     format!(
-        "usage: run-gates.sh --enter-stage [--simulate] <stage>          (stage ∈ {})\n       \
-         run-gates.sh --enter-stage [--simulate] --rename <name>  (rename the iteration: queue \
-         header + column 1 of every stamp)\n       run-gates.sh --enter-stage [--simulate] \
+        "usage: --enter-stage [--simulate] <stage>          (stage ∈ {})\n       \
+         --enter-stage [--simulate] --rename <name>  (rename the iteration: queue \
+         header + column 1 of every stamp)\n       --enter-stage [--simulate] \
          --open-lead-journal  (open the lead journal under a heading keyed on the cursor)\n       \
-         run-gates.sh --enter-stage --dispatch <stage> [--waive <reason…>]  (the dispatcher: \
+         --enter-stage --dispatch <stage> [--waive <reason…>]  (the dispatcher: \
          pre-flight, then declare a stage-session dispatch, optionally carrying a user-ruled \
-         audit waiver)\nrun-gates.sh --enter-stage --dispatch-withdraw <stage>  \
+         audit waiver)\n       --enter-stage --dispatch-withdraw <stage>  \
          (withdraw a dispatch whose session ended without entering)\n       \
-         run-gates.sh --enter-stage [-h|--help]",
+         --enter-stage [-h|--help]",
         stages.join(" ")
     )
 }

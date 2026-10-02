@@ -8,25 +8,13 @@
 
 ## New Features
 
-### hook-emit-remedy-door
-
-[spec: SPEC-hook-emit-door.md]
-
-hook-member and emit-arm output strings print the bash front end as a remedy to run, outside the `native/src/gates` corpus `gate-output-contributor-door` moved to the binary door: the workflow-state hook's two `--enter-stage` remedies, the usage lines of the usage poller and the usage verdict, and an unclassified set across `native/src/emit`. An adopter meets them where bash may be absent.
-
-**Deliverable:** each string classified as a remedy to run or a description of the front end; each remedy printed through the gate module's door spelling; `GUARD_KIT_DOOR_ROOTS` widened to the hook and emit trees so `check-door-binding` assertion C holds them.
-
-**Cost while deferred:** an adopter without bash is told to run a command it cannot, at every refusal those members print. Filed 2026-09-30 to the gap inbox at guard-kit-steering's spec; promoted at its close: →fix fails because the classification spans forty files, →forward because no ruling is owed. Re-verified: 43 files under `native/src` outside `gates` name `run-gates` (40 at filing, re-counted at gate-sdk-value-pass' scope), and the four named lines print it. Not a recurrence of `gate-output-contributor-door`, which is done and scoped its corpus to the gate modules. Owner lookup: `usage line`, `front end`, `door` in this file — none; owner guard-kit/SPEC.md §check-door-binding.
-
-**Selected 2026-10-01 for gate-sdk-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it; it lands before [guard-kit-tool-brevity](#guard-kit-tool-brevity) passes §check-door-binding.
-
 ## Technical Debt
 
 ### guard-kit-tool-brevity
 
 guard-kit/SPEC.md's tool sections, §scratch-run through §The close-stage triage step, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement), about 12.9k of the file's 50.7k words by awk count; guard-kit's preamble, §The generic ruleset, §Layout and configuration and §Testing stay on the parent, the ruleset until the deferred guard-kit rule entries that rewrite it land.
 
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. It rides the batch after [hook-emit-remedy-door](#hook-emit-remedy-door), whose door-roots widening edits §check-door-binding.
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. It rides the batch after `hook-emit-remedy-door`, whose door-roots widening edits §check-door-binding.
 
 **Cost while deferred:** paid by every session and adopter that reads an unpassed guard-kit tool section. Filed 2026-10-01 as a split at gate-sdk-value-pass' scope. Part of the operator's selection of set A+, direction 2026-10-01, lead-relayed (not a ruling).
 
@@ -1330,4 +1318,5 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - gate-customer-value-audit
 - consumer-value-literal-gate
 - bash-reader-escaped-separator
+- hook-emit-remedy-door
 

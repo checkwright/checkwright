@@ -86,9 +86,9 @@
 2698cp drift-kit/templates/close-knowledge.md
 3752cp drift-kit/templates/economics.md
 95666cp evidence-kit/SPEC.md
-947846cp gate-sdk/SPEC.md
+947957cp gate-sdk/SPEC.md
 2899cp gate-sdk/templates/adopt.md
-317017cp guard-kit/SPEC.md
+317186cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
 270777cp installer/SPEC.md
 346962cp lifecycle-kit/SPEC.md

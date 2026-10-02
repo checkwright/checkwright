@@ -8,12 +8,13 @@ use crate::registry;
 use crate::walk;
 use std::path::Path;
 
-// spec: gate-sdk/SPEC.md §install-hooks — this arm's own three names, then the five its
-// registry-resolved callee declares
+// spec: gate-sdk/SPEC.md §install-hooks — this arm's own names, then those its registry-resolved
+// callee declares
 pub const KNOBS: &[&str] = &[
     "GATE_SDK_HOOKS_DIR",
     "GATE_SDK_GATES_DIR",
     "GATE_SDK_KIT_DIRS",
+    "GATE_SDK_NATIVE_BIN",
     "GATE_SDK_IDENTITY_FILE",
     "GATE_SDK_GIT_EMAIL_FILE",
     "GATE_SDK_GIT_REMOTES_FILE",
@@ -26,7 +27,7 @@ const IDENTITY: &str = "check-identity";
 // spec: gate-sdk/SPEC.md §The bin/-tool contract — the member takes no argument, so any token is
 // a refusal before either knob resolves; usage itself lives on this arm's own front-end `case` arm,
 // which the class gives every member holding one.
-const USAGE: &str = "usage: run-gates.sh --install-hooks
+const USAGE: &str = "usage: --install-hooks
   Takes no argument: the whole input is the GATE_SDK_* configuration.";
 
 pub fn run(args: &[String]) -> i32 {
@@ -52,8 +53,9 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
     let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
     if !Path::new(&hooks_dir).is_dir() {
         return Err(format!(
-            "no hooks dir at {} — generate the pre-commit hook first:\n  bash gate-sdk/bin/run-gates.sh --emit git-hooks --write",
-            hooks_dir
+            "no hooks dir at {} — generate the pre-commit hook first:\n  {}",
+            hooks_dir,
+            crate::gates::door_command("--emit git-hooks --write")?
         ));
     }
 

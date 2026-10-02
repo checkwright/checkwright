@@ -16,7 +16,7 @@ pub const KNOBS: &[&str] = &[
 
 const NAME: &str = "run-gate-tests";
 
-const USAGE: &str = "usage: run-gates.sh --run-gate-tests [--] [<tests-dir> [<checks-dir>...]]
+const USAGE: &str = "usage: --run-gate-tests [--] [<tests-dir> [<checks-dir>...]]
   <tests-dir> defaults to GATE_SDK_TESTS_DIR; each <checks-dir> must exist, and the set replaces
   the resolved gate-declaration dirs. \"--\" ends option processing, so a path beginning with
   \"-\" is still reachable.";

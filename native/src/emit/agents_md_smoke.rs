@@ -292,6 +292,7 @@ fn regenerate(consumer: &str) -> Result<(), Outcome> {
     // spec: context-kit/SPEC.md §Testing — the graph artifact is a redirect rather than a capture,
     // so the emit's own stderr stays out of the committed HTML.
     let graph = spawn(
+        // door-contributor: a source-clone smoke drives the vendored front end on purpose; executed, never printed
         r#"cd "$1" && exec env LIFECYCLE_KIT_AGENT_FILE="$2" CANON_KIT_KNOB_FILE="$3" bash gate-sdk/bin/run-gates.sh --emit graph > scripts/CHECK-GRAPH.html"#,
         &[consumer, "AGENTS.md", "scripts/canon-config.knobs"],
     )?;
@@ -369,6 +370,7 @@ fn always_loaded_measures_the_agent_file(consumer: &str) -> Result<(), Outcome> 
         .map(|b| super::always_loaded::cp_of(&b))
         .map_err(|e| Outcome::Refuse(format!("{}: cannot read {}: {}", NAME, agent, e)))?;
     let done = spawn(
+        // door-contributor: a source-clone smoke drives the vendored front end on purpose; executed, never printed
         r#"cd "$1" && exec bash gate-sdk/bin/run-gates.sh --emit always-loaded"#,
         &[consumer],
     )?;
@@ -387,6 +389,7 @@ fn always_loaded_measures_the_agent_file(consumer: &str) -> Result<(), Outcome> 
 // `CLAUDE.md` default the emitter would find no surface file and measure zero.
 fn footprint_measures_the_agent_file(consumer: &str) -> Result<(), Outcome> {
     let done = spawn(
+        // door-contributor: a source-clone smoke drives the vendored front end on purpose; executed, never printed
         r#"cd "$1" && exec bash gate-sdk/bin/run-gates.sh --emit footprint"#,
         &[consumer],
     )?;

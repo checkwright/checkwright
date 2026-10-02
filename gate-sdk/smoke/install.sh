@@ -238,7 +238,7 @@ fi
 if err="$(bash "$SDK/bin/run-gates.sh" --emit port-blockers --help --group 2>&1 >/dev/null)"; then
     echo "smoke(port-blockers): --help was not refused" >&2; exit 1
 fi
-grep -q '^usage: run-gates.sh --emit port-blockers' <<<"$err" || {
+grep -q '^usage: --emit port-blockers' <<<"$err" || {
     echo "smoke(port-blockers): the --help refusal did not carry the usage: $err" >&2; exit 1; }
 # spec: gate-sdk/SPEC.md §port-blockers — the missing-registry refusal, structurally absent from
 # every in-crate test: a registry arm handed a directory with no gates.list refuses rather than

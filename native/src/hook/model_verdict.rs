@@ -7,7 +7,7 @@ use crate::walk;
 
 pub const KNOBS: &[&str] = &["DELEGATION_KIT_TIER_MODEL", "DELEGATION_KIT_SESSIONS_DIR"];
 
-const USAGE: &str = "usage: run-gates.sh --model-verdict [--expect <class>] [--] [<transcript.jsonl | session8>]\n  --expect names the floor class (judgment, routing or mechanical); the operand names the transcript by path or by an eight-character session id, and \"--\" takes one beginning with \"-\"";
+const USAGE: &str = "usage: --model-verdict [--expect <class>] [--] [<transcript.jsonl | session8>]\n  --expect names the floor class (judgment, routing or mechanical); the operand names the transcript by path or by an eight-character session id, and \"--\" takes one beginning with \"-\"";
 
 const OFF_TIER: &str =
     "the session is not on its expected tier; stop before work that needs it and have it re-dispatched at that tier";

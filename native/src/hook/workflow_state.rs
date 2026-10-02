@@ -21,7 +21,10 @@ pub fn run(payload: Option<&Value>) -> i32 {
     }
     let path = hook::field(payload, &["tool_input", "file_path"]);
     if !path.is_empty() && same_file(&path, &state_file) {
-        return hook::block(NAME, &blocked(&state_file));
+        return match blocked(&state_file) {
+            Ok(m) => hook::block(NAME, &m),
+            Err(e) => hook::decline(NAME, &format!("the direct-edit rule could not resolve GATE_SDK_NATIVE_BIN ({})", e), payload),
+        };
     }
     stamp_before_write(payload)
 }
@@ -51,7 +54,10 @@ fn stamp_before_write(payload: Option<&Value>) -> i32 {
         Err(e) => return hook::decline(NAME, &format!("the stamp-before-write rule could not read the state file ({})", e), payload),
     };
     if !stamped(&state.1, &id) {
-        return hook::block(NAME, &unstamped(&agent_type, &id, &state.0));
+        return match unstamped(&agent_type, &id, &state.0) {
+            Ok(m) => hook::block(NAME, &m),
+            Err(e) => hook::decline(NAME, &format!("the stamp-before-write rule could not resolve GATE_SDK_NATIVE_BIN ({})", e), payload),
+        };
     }
     superseded_stage(payload, &agent_type, &id, &state.1)
 }
@@ -117,11 +123,14 @@ fn left_stage(agent_type: &str, id: &str, own: &str, cursor: &str, tmp: &str) ->
     )
 }
 
-fn unstamped(agent_type: &str, id: &str, state_file: &str) -> String {
-    format!(
-        "this '{}' session ({}) has not entered its stage — no data line of {} carries its id. Run 'bash gate-sdk/bin/run-gates.sh --enter-stage <stage>' first and commit the stamp: the stamp is what records this session's work, and a write made before it lands under no stamp at all. If the entry refuses, that refusal is a gate verdict to escalate, not to write around.",
-        agent_type, id, state_file
-    )
+fn unstamped(agent_type: &str, id: &str, state_file: &str) -> Result<String, String> {
+    Ok(format!(
+        "this '{}' session ({}) has not entered its stage — no data line of {} carries its id. Run '{}' first and commit the stamp: the stamp is what records this session's work, and a write made before it lands under no stamp at all. If the entry refuses, that refusal is a gate verdict to escalate, not to write around.",
+        agent_type,
+        id,
+        state_file,
+        crate::gates::door_command("--enter-stage <stage>")?
+    ))
 }
 
 fn state_file() -> Result<String, String> {
@@ -174,11 +183,13 @@ fn resolve(p: &str) -> PathBuf {
     }
 }
 
-fn blocked(state_file: &str) -> String {
-    format!(
-        "{} is written by lifecycle-kit's --enter-stage arm, never by hand — run 'bash gate-sdk/bin/run-gates.sh --enter-stage <stage>' to stamp, or 'bash gate-sdk/bin/run-gates.sh --enter-stage --rename <name>' to rename the iteration (it rewrites the queue header and column 1 of every stamp in one motion, proving columns 2 through NF unchanged). The stamp *is* the stage transition, so a hand-written line moves the cursor for every reader for the rest of the session, and every gate that would catch it fires only at commit: an uncommitted hand-stamp is never seen at all. If enter-stage refuses, that refusal is a gate verdict to resolve at its source, not to write around.",
-        state_file
-    )
+fn blocked(state_file: &str) -> Result<String, String> {
+    Ok(format!(
+        "{} is written by lifecycle-kit's --enter-stage arm, never by hand — run '{}' to stamp, or '{}' to rename the iteration (it rewrites the queue header and column 1 of every stamp in one motion, proving columns 2 through NF unchanged). The stamp *is* the stage transition, so a hand-written line moves the cursor for every reader for the rest of the session, and every gate that would catch it fires only at commit: an uncommitted hand-stamp is never seen at all. If enter-stage refuses, that refusal is a gate verdict to resolve at its source, not to write around.",
+        state_file,
+        crate::gates::door_command("--enter-stage <stage>")?,
+        crate::gates::door_command("--enter-stage --rename <name>")?
+    ))
 }
 
 #[cfg(test)]

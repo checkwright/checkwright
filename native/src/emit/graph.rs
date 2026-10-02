@@ -63,6 +63,7 @@ const HEAD_CHROME: &str = r##"  </style>
 
 // spec: gate-sdk/SPEC.md §check-graph — the regen command the page names in its own prose, one
 // spelling shared with the artifact's header comment below so a reader is never offered two.
+// door-contributor: the regeneration recipe on a generated page, read by the contributor who regenerates it
 const REGEN_CMD: &str = "bash gate-sdk/bin/run-gates.sh --emit graph";
 
 const KIT_BODY_A: &str = r##"  <header>

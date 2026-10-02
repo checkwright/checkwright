@@ -31,7 +31,7 @@ fn fail(problem: &str, help: &str) -> i32 {
 pub fn run(args: &[String]) -> i32 {
     if let Some(a) = args.first() {
         eprintln!(
-            "usage-poller: takes no argument (got: {}) — usage: run-gates.sh --help",
+            "usage-poller: takes no argument (got: {}) — usage: --usage-poll   (it takes no argument)",
             a
         );
         return 2;

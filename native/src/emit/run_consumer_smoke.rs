@@ -165,6 +165,7 @@ fn smoke(given: &[String], teardown: &mut Teardown) -> Outcome {
         )];
         report.extend(lines);
         report.push(format!(
+            // door-contributor: the reproduce line of a source-clone smoke, read by the contributor who runs it
             "  help: reproduce with bash gate-sdk/bin/run-gates.sh --run-consumer-smoke --keep {}",
             r
         ));

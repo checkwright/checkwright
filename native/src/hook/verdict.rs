@@ -20,7 +20,7 @@ pub const KNOBS: &[&str] = &[
     "DELEGATION_KIT_FAN_WIDTH",
 ];
 
-const USAGE: &str = "usage: run-gates.sh --usage-verdict [--] [usage-file [credentials-file]]\n  the two positionals override DELEGATION_KIT_USAGE_FILE and DELEGATION_KIT_CRED_FILE (test injection); \"--\" takes a path beginning with \"-\"";
+const USAGE: &str = "usage: --usage-verdict [--] [usage-file [credentials-file]]\n  the two positionals override DELEGATION_KIT_USAGE_FILE and DELEGATION_KIT_CRED_FILE (test injection); \"--\" takes a path beginning with \"-\"";
 
 // spec: delegation-kit/SPEC.md §usage-verdict — the consequence half of every STALE line: the status
 // half is site-specific, the consequence half is uniform, so it is one constant rather than five.

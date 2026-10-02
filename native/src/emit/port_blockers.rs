@@ -25,7 +25,7 @@ pub const KNOBS: &[&str] = &[
 ];
 
 pub const USAGE: &str = "\
-usage: run-gates.sh --emit port-blockers [--gates-dir <dir>] [--group | --tree]
+usage: --emit port-blockers [--gates-dir <dir>] [--group | --tree]
 
   (no arm)       criterion 7: every registered gate's external-program
                  requirements beyond GATE_SDK_PROGRAM_FLOOR, one

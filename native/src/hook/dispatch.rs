@@ -47,7 +47,16 @@ pub fn run(payload: Option<&Value>) -> i32 {
             (false, String::new())
         }
     };
-    let binding = read_array("DELEGATION_KIT_TIER_MODEL", "D6 (the bound tier)", &mut notes);
+    let mut binding = read_array("DELEGATION_KIT_TIER_MODEL", "D6 (the bound tier)", &mut notes);
+    let door = if binding.is_empty() {
+        String::new()
+    } else {
+        crate::gates::door_command("--emit knob-values DELEGATION_KIT_TIER_MODEL").unwrap_or_else(|e| {
+            notes.push_str(&format!("D6 (the bound tier) went unenforced on this dispatch: {}. ", e));
+            binding.clear();
+            String::new()
+        })
+    };
     let Some(doc) = payload.filter(|d| d.get("tool_input").is_some_and(Value::is_object)) else {
         return degraded("the hook payload did not parse, or carried no tool_input object");
     };
@@ -70,7 +79,7 @@ pub fn run(payload: Option<&Value>) -> i32 {
         "read-only" => return hook::block(NAME, &read_only_claim(&subagent_type)),
         "isolation" => return hook::block(NAME, &default_isolation(&subagent_type)),
         "tier" => return hook::block(NAME, &chosen_tier(&subagent_type, &agent_dir)),
-        "bound" => return hook::block(NAME, &bound_tier(&model, &binding)),
+        "bound" => return hook::block(NAME, &bound_tier(&model, &binding, &door)),
         _ => {}
     }
 
@@ -148,11 +157,12 @@ fn chosen_tier(subagent_type: &str, agent_dir: &str) -> String {
 
 // spec: delegation-kit/SPEC.md §The delegation model — D6's message names the bound values, which
 // are the consumer's config rather than kit literals
-fn bound_tier(model: &str, binding: &[String]) -> String {
+fn bound_tier(model: &str, binding: &[String], door: &str) -> String {
     format!(
-        "this dispatch names model '{}', which matches none of the consumer's bound tiers ({}), so it would choose around the tier binding rather than among its tiers. Name one of the bound values (bash gate-sdk/bin/run-gates.sh --emit knob-values DELEGATION_KIT_TIER_MODEL), or, where the class you need is pinned to an exact model id, dispatch a type whose definition declares that class: a per-dispatch model is an alias only (delegation-kit/SPEC.md §The tier binding).",
+        "this dispatch names model '{}', which matches none of the consumer's bound tiers ({}), so it would choose around the tier binding rather than among its tiers. Name one of the bound values ({}), or, where the class you need is pinned to an exact model id, dispatch a type whose definition declares that class: a per-dispatch model is an alias only (delegation-kit/SPEC.md §The tier binding).",
         model,
-        binding.join(", ")
+        binding.join(", "),
+        door
     )
 }
 

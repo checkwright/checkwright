@@ -11,7 +11,7 @@ pub const KNOBS: &[&str] = &[
     "GATE_SDK_TMP_DIR",
 ];
 
-const USAGE: &str = "usage: run-gates.sh --foreign-run <adapter> <prompt-file> [--mode audit|sweep] [--key <key>] [--]\n  runs one unit on the adapter DELEGATION_KIT_FOREIGN_ADAPTERS configures, in a scratch clone of committed HEAD; the key names the run's directory and defaults to the prompt file's stem";
+const USAGE: &str = "usage: --foreign-run <adapter> <prompt-file> [--mode audit|sweep] [--key <key>] [--]\n  runs one unit on the adapter DELEGATION_KIT_FOREIGN_ADAPTERS configures, in a scratch clone of committed HEAD; the key names the run's directory and defaults to the prompt file's stem";
 
 const PROMPT_TOKEN: &str = "@PROMPT_FILE@";
 

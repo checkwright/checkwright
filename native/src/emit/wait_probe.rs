@@ -64,7 +64,7 @@ printf 'pid=%s\n' "$!"
 // calibration rather than configuration: a consumer varying them varies the experiment
 const SWEEP_MS: &[u64] = &[10_000, 100_000, 200_000];
 
-const ROSTER: &str = "usage: run-gates.sh --wait-probe <subcommand> [args]
+const ROSTER: &str = "usage: --wait-probe <subcommand> [args]
 
   produce <key> <duration_ms>   stand a producer up: sleep <duration_ms>, then write the marker.
                                 Records its pid at launch in <scratch>/<key>.run.

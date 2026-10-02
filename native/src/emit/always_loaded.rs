@@ -16,6 +16,7 @@ pub const KNOBS: &[&str] = &[
     "CONTEXT_KIT_CEILING_FILE",
     "CONTEXT_KIT_RATCHET_PATHS",
     "CONTEXT_KIT_STATE_FILE",
+    "GATE_SDK_NATIVE_BIN",
 ];
 
 // spec: context-kit/SPEC.md §The always-loaded meter — the usage an unrecognized mode operand
@@ -191,13 +192,10 @@ pub fn ceiling_rows(path: &str) -> Result<Vec<(u64, String)>, String> {
         let (size, rest) = t.split_at(t.find([' ', '\t']).ok_or_else(bad)?);
         let file = trim_space(rest);
         if legacy(size) {
-            return Err(format!(
-                "{}:{}: ceiling row in the retired line unit: {} — re-stamp with \
-                 `bash gate-sdk/bin/run-gates.sh --emit always-loaded --ceiling`",
-                path,
-                n + 1,
-                t
-            ));
+            let cause = format!("{}:{}: ceiling row in the retired line unit: {}", path, n + 1, t);
+            let door = crate::gates::door_command("--emit always-loaded --ceiling")
+                .map_err(|e| format!("{} — {}", cause, e))?;
+            return Err(format!("{} — re-stamp with `{}`", cause, door));
         }
         let size: u64 = count(size).ok_or_else(bad)?;
         if file.is_empty() {
