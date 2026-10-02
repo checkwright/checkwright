@@ -10,7 +10,8 @@
 - **The PowerShell driver** takes six parameters the workflow's Windows pack step fills, drives `bin/checkwright.ps1` alone, prints its own `RUN-SMOKE-PS1:` header grammar, which no parser reads, and covers init, battery, hooks, a one-hop `update` and uninstall.
 - **Nested invocations inherit the invoker's environment whole.** No `unset`, `env -u` or `env -i` reaches a nested call. The driver exports `GATE_SDK_NATIVE_TARGETS_FILE` to every child when it steers, and `HOME` is not isolated. An exported knob redirects a nested gate: `EVIDENCE_KIT_MANIFEST_FILE=.tmp/no-such-manifest.md bash gate-sdk/bin/run-gates.sh --only check-evidence-manifest` prints `manifest not found: .tmp/no-such-manifest.md`, so a kit knob in the environment outranks the knob file the scratch consumer's `init` wrote.
 - **Both bootstraps print the same refusal phrases**: each of `checkwright.sh` and `checkwright.ps1` carries six lines matching the artifact arm's five phrases (`grep -c`), so the driver's per-bootstrap expectations are one set.
-- **The PowerShell bootstrap's detector is three functions**, `Get-HostShape`, `Get-HostTarget` and `Get-FallbackTarget`, as the POSIX one's is `host_shape`, `target_of_host` and `fallback_of_target`, which `host-target.sh` extracts.
+- **The PowerShell bootstrap's detector is three functions**, `Get-HostShape`, `Get-HostTarget` and `Get-FallbackTarget`, and `Get-HostTarget` calls `Get-HostShape`. The POSIX one's is four, `host_arch`, `host_shape`, `target_of_host` and `fallback_of_target`, which `host-target.sh` extracts together.
+- **Every CI leg already runs the producer's upload.** Each install-smoke leg places the producer's artifact as the tree's own gate binary before the smoke runs (`.github/workflows/gates.yml`, the *normalize the producer's upload* steps), so its pack call sites dispatch to uploaded bytes. Only `publish.yml`'s `pack:` job builds the binary it packs with.
 
 ## What changes
 
@@ -21,8 +22,8 @@ An `Arm::Run` member of the arm table, implemented under `native/src/emit/instal
 - **The tree is the current directory's git toplevel**, the tree whose knob files the binary reads, so the tree packed and the tree configuring the run are one by construction. Every spawn the driver makes into that tree names it as its working directory. The `PACK:` line names the root.
 - **It reads three environment values undeclared**, `INSTALLER_SMOKE_TMP_DIR`, `INSTALLER_SMOKE_ARTIFACTS_DIR` and `INSTALLER_SMOKE_TARBALL_OUT`, since no static kit owns the prefix, with the meanings installer/SPEC.md §The consumer smoke gives them. It declares `GATE_SDK_NATIVE_TARGETS_FILE`, whose caller-set value decides whether it steers.
 - **Its callers** are the five install-smoke legs, the `installer_smoke` validate suite's run command, and a contributor's local run, `bash gate-sdk/bin/run-gates.sh --installer-smoke`. It needs a checkout, as `--run-demo` does, since it packs the tree it runs in.
-- **It packs by spawning the running binary's `--pack-installer`** with the root as working directory, its steered roster and pack scratch in that child's environment, never by an in-process call, so a pack's environment and refusal stay its own.
-- **It is a network spawner** (`npm pack`), so it is a bare-flag member outside the fence-safe set.
+- **It packs by spawning the running binary's `--pack-installer --root <root>`** with the root as working directory, naming both decisions as installer/SPEC.md §The packer requires of every pack call site, its steered roster and pack scratch in that child's environment, never by an in-process call, so a pack's environment and refusal stay its own.
+- **It is a network spawner** (`npm pack`), so it is a bare-flag member outside the fence-safe set, and it joins the crate's network-spawner roster that a unit test holds disjoint from that set.
 
 **Not yet applied.**
 
@@ -34,7 +35,7 @@ The preflight so loses `cargo`, `rustc` and `jq`. The driver parses the manifest
 
 ### (3) Every arm runs on every leg, through the host's bootstrap {design-bearing} {user-facing: the entry's deliverable, one compiled driver on every leg}
 
-The arms run in the bash driver's order under its 27 header names, byte-identical up to each parenthetical, so the baseline rows hold. Each arm drives **the host's bootstrap**. On a unix host the npm-installed `node_modules/.bin/checkwright` and the extracted package's `sh bin/checkwright.sh` are driven where the bash driver drives them. On native Windows the same packages, the npm-installed one included, are driven through their `bin/checkwright.ps1` under `pwsh -NoProfile -File`, the route docs/install.md's Windows section gives, so the install arm's `npm install --offline` still runs and its `.bin` entry is not the route under test there. The host triple comes from the host bootstrap's own detector: `installer/consumer-smoke/host-target.sh` on unix, and on Windows `Get-HostTarget` and `Get-FallbackTarget` extracted from `bin/checkwright.ps1` through PowerShell's parser and run by `pwsh`, so neither leg holds a mapping of its own.
+The arms run in the bash driver's order under its 27 header names, byte-identical up to each parenthetical, so the baseline rows hold. Each arm drives **the host's bootstrap**. On a unix host the npm-installed `node_modules/.bin/checkwright` and the extracted package's `sh bin/checkwright.sh` are driven where the bash driver drives them. On native Windows the same packages, the npm-installed one included, are driven through their `bin/checkwright.ps1` under `pwsh -NoProfile -File`, as the PowerShell driver drives it today, so the install arm's `npm install --offline` still runs and its `.bin` entry is not the route under test there. The documented Windows PowerShell route, `powershell -NoProfile -ExecutionPolicy Bypass -File` (docs/install.md §Windows), stays the Windows leg's page-install step's. The host triple comes from the host bootstrap's own detector: `installer/consumer-smoke/host-target.sh` on unix, and on Windows `Get-HostShape`, `Get-HostTarget` and `Get-FallbackTarget` extracted from `bin/checkwright.ps1` through PowerShell's parser and run by `pwsh`, so neither leg holds a mapping of its own.
 
 Per-host spellings, each the same claim:
 
@@ -68,7 +69,7 @@ EVIDENCE_KIT_PARSER_installer_smoke = bash gate-sdk/bin/run-gates.sh --emit pars
 EVIDENCE_KIT_RUN_installer_smoke = bash gate-sdk/bin/run-gates.sh --installer-smoke
 ```
 
-**Not yet applied.**
+The parser value is then the driver-less form `scripts/gate-tests/evidence-parser-values.test.sh` uses as its negative control D, so that test is rewritten with it. Its fixture smoke log opens with `smoke-roster:` lines, so arm B's configured value still yields the scenarios it baselines. Control D becomes a log carrying no roster lines, which the configured value refuses with no scenario produced, its expected refusal text being the log-only form's rather than the missing positional's. **Not yet applied.**
 
 ### (6) The manifest-disagreement report keeps its readings and drops the bash instrument {design-bearing}
 
@@ -83,14 +84,14 @@ installer/SPEC.md §The consumer smoke's failure-path report is restated for a c
 **Not yet applied.**
 
 - **`.github/workflows/gates.yml`:** the four unix legs run `bash gate-sdk/bin/run-gates.sh --installer-smoke` where they ran the script, with their environment unchanged; the baseline Linux leg keeps its `tee`, status capture and `--diff-baseline installer_smoke`. `install-smoke-pwsh-windows` runs `gate-sdk/bin/run-gates.ps1 --installer-smoke` under `pwsh` with `INSTALLER_SMOKE_TMP_DIR`, `INSTALLER_SMOKE_ARTIFACTS_DIR` and a steered `GATE_SDK_NATIVE_TARGETS_FILE`, as the macOS legs set them. Its pack step's second, next-patch pack and the `PWSH_UPGRADE_*` values only the deleted driver read are removed; its first pack stays for the steps that read `PWSH_PKG`. Its `timeout-minutes` is widened to cover the whole suite and narrowed only after a measured run, on §The consumer smoke's widen-before-narrow rule.
-
-**Inferred, cannot run before build:** the whole suite's duration on the Windows runners, which sets that timeout — only the leg's first run of the arm measures it.
 - **`README.md`**'s contributor line names `bash gate-sdk/bin/run-gates.sh --installer-smoke`.
 - **`.claude/settings.json`**'s allow entry for the deleted script is replaced by one for the arm. This edit is applied on the operator's behalf, never by the build session, which prepares the diff and routes it to the lead (guard-kit/SPEC.md §compare-settings-allow).
 - **`guard-kit/guard-tests/cases.tsv`**'s rows whose specimen command names the script name the arm instead, each row keeping its decision.
 - **`native/src/emit/parse_smoke_log.rs` and `native/src/emit/foreign_shells.rs`** test fixtures name a neutral driver file and command.
 - **`native/targets.list`**'s comment names the arm as the roster's smoke owner.
 - **`installer/consumer-smoke/host-target.sh`**'s header states its own port disposition: it is the unix legs' and the driver's extraction of the POSIX detector, and ships in no payload.
+
+**Inferred, cannot run before build:** the whole suite's duration on the Windows runners, which sets that timeout — only the leg's first run of the arm measures it.
 
 ### (8) Both scripts are deleted after a recorded parity run {mechanical}
 
@@ -101,8 +102,9 @@ The batch that deletes `run-smoke.sh` and `run-smoke.ps1` first runs the bash dr
 **Not yet applied.**
 
 - **installer/SPEC.md §The consumer smoke:** the opening names the arm; *The port disposition* paragraph is deleted, since a compiled driver owes none; the tree-selection and two-mechanisms paragraphs become delta 1's one sentence; the preflight and *What it costs to run* follow delta 2; *The PowerShell driver carries native Windows* is deleted and replaced by delta 3's host paragraph and table; delta 4 gains a paragraph; the report passages follow delta 6; *Who reads the 2* names the log-declared roster; the cargo, rustc and hand-off paragraph follows delta 2; and the CI paragraphs name the arm. The section's prose otherwise awaits `installer-smoke-brevity`, which passes it as this unit leaves it.
-- **installer/SPEC.md §The packer**, ROUTE 1's first sentence: *`--installer-smoke` packs with the binary it runs as, which its caller built or a producer uploaded.*
-- **gate-sdk/SPEC.md §The non-gate arm**, *The heaviest.* gains the arm's spawn set: `git`, `npm`, `tar`, `sh` or `pwsh` for the host bootstrap, the running binary for each pack, `shasum` as the fallback's control, and whatever the vendored kits' installers and the scratch consumers' batteries spawn.
+- **installer/SPEC.md §The packer**, the ROUTE 1 paragraph's lead and first two sentences: ***The publishing caller builds the binary it dispatches to: ROUTE 1.** `--installer-smoke` packs with the binary it runs as: a contributor's build, or on a CI leg the producer's upload placed as the tree's gate binary. Those legs publish nothing.* Its `publish.yml` sentence stays, and the refusal paragraph after it keeps binding the job that assembles and stamps the published tarball.
+- **gate-sdk/SPEC.md §The non-gate arm**, *The heaviest.* gains the arm's spawn set: `git`, `npm`, `tar`, `sh` or `pwsh` for the host bootstrap, the running binary for each pack, `shasum` as the fallback's control, and whatever the vendored kits' installers and the scratch consumers' batteries spawn. The fence-safe paragraph's roster of the crate's network spawners gains `--installer-smoke` (`npm`).
+- **gate-sdk/SPEC.md §git-hook**, the closing sentence's list of parsers of the hook strings drops `run-smoke.ps1`. The `bash`-less arm it names runs in the compiled driver on every leg.
 - **gate-sdk/SPEC.md §The program roster** and `native/src/programs.rs`: `sh` and `shasum` join as `contributor` members.
 - **evidence-kit/SPEC.md §Layout and configuration**, the parser paragraph gains delta 5's second form, and its installer-smoke sentences say the roster is the log's.
 - **context-kit/SPEC.md**'s `jq:1.5::contributor` line names `guard-kit/smoke/install.sh` alone.
@@ -117,10 +119,10 @@ The batch that deletes `run-smoke.sh` and `run-smoke.ps1` first runs the bash dr
 
 ## Existing sections updated
 
-Probes: `git grep -l "run-smoke.sh\|run-smoke.ps1\|RUN-SMOKE-PS1"` over the tracked tree (20 files, none under `docs/posts`), and `git grep -n "consumer-smoke/"` and `git grep -n "wantalt\|read_stream"`.
+Probes: `git grep -l "run-smoke.sh\|run-smoke.ps1\|RUN-SMOKE-PS1"` over the tracked tree (20 files, none under `docs/posts`), and `git grep -n "consumer-smoke/"`, `git grep -n "wantalt\|read_stream"` and `git grep -n "parse-smoke-log"`.
 
 - `installer/SPEC.md` §The consumer smoke and §The packer (deltas 1, 2, 3, 4, 5, 6 and 9).
-- `gate-sdk/SPEC.md` §The non-gate arm and §The program roster (delta 9).
+- `gate-sdk/SPEC.md` §The non-gate arm, §The program roster and §git-hook (delta 9).
 - `evidence-kit/SPEC.md` §Layout and configuration (deltas 5 and 9).
 - `context-kit/SPEC.md` — the `jq` audience line (delta 9).
 - `native/src/emit/installer_smoke/` — new (deltas 1, 2, 3, 4, 5 and 6).
@@ -130,6 +132,7 @@ Probes: `git grep -l "run-smoke.sh\|run-smoke.ps1\|RUN-SMOKE-PS1"` over the trac
 - `native/src/programs.rs` — `sh` and `shasum` (delta 9).
 - `native/targets.list` — the comment (delta 7).
 - `scripts/evidence-config.knobs` — both values (delta 5).
+- `scripts/gate-tests/evidence-parser-values.test.sh` — the roster-bearing fixture log and the rewritten control D (delta 5).
 - `.github/workflows/gates.yml` — the five legs (delta 7).
 - `README.md` — the contributor line (delta 7).
 - `.claude/settings.json` — the allow entry, prepared for the operator (delta 7).

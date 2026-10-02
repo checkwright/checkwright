@@ -24,7 +24,7 @@ The fixture pair's `pinned.md` moves to `pinned/installer/README.md`, its `readm
 
 ### (2) Invariant B reads the operand of `--profile` and `--recipe` {design-bearing}
 
-After an advertised flag that takes a value, the value is an **advertised operand** of that flag: the part after the flag's `=` when the token carries one, else the next token, unless that token is a stop token, opens with `-` or `#`, or is past the walk's end. An operand is read only when it matches `[a-z0-9][a-z0-9-]*`, so a placeholder such as `<profile>` advertises none. Two flags take a roster-checked operand:
+After an advertised flag that takes a value, the value is an **advertised operand** of that flag: the part after the flag's `=` when the token carries one, else the next token, unless the code text ends first, that token is a **stop token**, or it opens with `-`. A stop token is one of those ending the flag read today, a token that is `|`, `;`, `&&`, `||` or `)`, or that opens with `#` or `>` (`STOPS` in the gate's module and its two prefix tests), and delta 4 names the set in the **Flags.** paragraph. An operand is read only when it matches `[a-z0-9][a-z0-9-]*`, so a placeholder such as `<profile>` advertises none. Two flags take a roster-checked operand:
 
 - `--profile`, against the **profile set**: the first column of `installer/profiles.list`'s rows, comments and blanks dropped, plus `full`, the name the profile module derives rather than lists (§Profiles).
 - `--recipe`, against the **recipe set**: the keys of the `GATE_SDK_PAYLOAD_RECIPES[<name>]` lines in the gate-sdk knob seam file, the set the packer packs (§The packer).
@@ -35,7 +35,7 @@ Each set is read at HEAD and at the tag by the same reader. An operand in the ta
 
 An inline code span on a front-door page whose text's first token opens with `--` is an **advertised arm**, unless that token is a flag of HEAD's `FLAGS` or the pinned flag table, which stays a flag named apart from its route. `--emit <name>` reads as the arm `--emit-<name>`, the normalization the binary applies to that spelling. README.md's `## This repo, governed` section is not read for arms, since its arms run on a binary the checkout builds. Fenced code lines are not read for arms.
 
-The **pinned arm set** is the tag's arm table: the first string literal of each top-level tuple of `ARMS` in `native/src/emit/mod.rs`, with every literal of `TOP_LEVEL_FLAGS` in `native/src/main.rs`. The binary's arm set is `emit::arms()` with `TOP_LEVEL_FLAGS`, read in process. An arm in the pinned set passes. One the binary carries and the pin lacks takes the pending admission, and one in neither set is never admitted. A tag carrying either file with its array absent or yielding no member fails the gate closed, exit 2, since an empty arm set there is a parse that went wrong rather than a release with no arms. A unit test holds the extractor to the binary: applied to the crate's own `native/src/emit/mod.rs` and `native/src/main.rs` text, it yields exactly the in-process set, so a change to the arrays' shape reds in the commit that makes it. **Not yet applied.**
+The **pinned arm set** is the tag's arm table: the first string literal of each top-level tuple of `ARMS` in `native/src/emit/mod.rs`, with every literal of `TOP_LEVEL_FLAGS` in `native/src/main.rs`. The binary's arm set is `emit::arms()` with `TOP_LEVEL_FLAGS`, read in process. An arm in the pinned set passes. One the binary carries and the pin lacks takes the pending admission, and one in neither set is never admitted. A tag carrying either file with its array absent or yielding no member fails the gate closed, exit 2, since an empty arm set there is a parse that went wrong rather than a release with no arms. A tag carrying neither file predates the gate binary and has the empty arm set, the ground a tag without a flag table has the empty flag set. A unit test holds the extractor to the binary: applied to the crate's own `native/src/emit/mod.rs` and `native/src/main.rs` text, it yields exactly the in-process set, so a change to the arrays' shape reds in the commit that makes it. **Not yet applied.**
 
 ### (4) installer/SPEC.md §The front door's verbs states the widened invariant {design-bearing}
 
@@ -49,17 +49,19 @@ Invariant B's bullet gains a final sentence:
 
 > Each advertised operand must be in the pinned profile or recipe set, and each advertised arm in the pinned arm set (below).
 
+The **Flags.** paragraph names its terminators: *each following token of the same code text is read until a **stop token**, one that is `|`, `;`, `&&`, `||` or `)`, or that opens with `#` or `>`.*
+
 After the **Flags.** paragraph, two paragraphs:
 
-> **Operands.** After an advertised `--profile` or `--recipe`, the value after its `=`, or else the next token unless it is a stop token or opens with `-` or `#`, is an advertised operand when it matches `[a-z0-9][a-z0-9-]*`, so a placeholder advertises none. A `--profile` operand is held to the profile set, the first column of `installer/profiles.list` plus the derived `full` (§Profiles). A `--recipe` operand is held to the recipe set, the keys of `GATE_SDK_PAYLOAD_RECIPES` in the gate-sdk knob seam file (§The packer). Each set is read at HEAD and at the tag by one reader, and a tag lacking the file has the empty set.
+> **Operands.** After an advertised `--profile` or `--recipe`, the value after its `=`, or else the next token unless the code text ends, it is a stop token or it opens with `-`, is an advertised operand when it matches `[a-z0-9][a-z0-9-]*`, so a placeholder advertises none. A `--profile` operand is held to the profile set, the first column of `installer/profiles.list` plus the derived `full` (§Profiles). A `--recipe` operand is held to the recipe set, the keys of `GATE_SDK_PAYLOAD_RECIPES` in the gate-sdk knob seam file (§The packer). Each set is read at HEAD and at the tag by one reader, and a tag lacking the file has the empty set.
 >
-> **Arms.** An inline code span whose first token opens with `--` and is no flag of `FLAGS` or the pinned flag table is an advertised gate-binary arm, `--emit <name>` reading as `--emit-<name>`. README.md's `## This repo, governed` section is not read for arms: it describes a checkout, whose binary is built from the tree. The pinned arm set is the tag's `ARMS` table in `native/src/emit/mod.rs`, the first string literal of each top-level tuple, with `TOP_LEVEL_FLAGS` in `native/src/main.rs`. No file a release carries holds the arms as a table, so the source arrays are the record, and a unit test holds the extractor equal to the binary's own set over the crate's source, so a reshaped array reds in the commit that reshapes it.
+> **Arms.** An inline code span whose first token opens with `--` and is no flag of `FLAGS` or the pinned flag table is an advertised gate-binary arm, `--emit <name>` reading as `--emit-<name>`. README.md's `## This repo, governed` section is not read for arms: it describes a checkout, whose binary is built from the tree. The pinned arm set is the tag's `ARMS` table in `native/src/emit/mod.rs`, the first string literal of each top-level tuple, with `TOP_LEVEL_FLAGS` in `native/src/main.rs`. No file a release carries holds the arms as a table, so the source arrays are the record, and a unit test holds the extractor equal to the binary's own set over the crate's source, so a reshaped array reds in the commit that reshapes it. A tag carrying neither source file has the empty arm set.
 
 **The pending admission.**'s first sentence becomes:
 
 > A verb, flag, operand or arm B would red is admitted while HEAD carries it — the verb in `VERBS`, the pair in `FLAGS`, the operand in HEAD's profile or recipe set, the arm in the binary's arm table — and `.workflow/release-disposition.txt` carries no line for the iteration the queue header names.
 
-and every later *verb or flag* in that paragraph reads *advertisement*.
+and every later *verb or flag* in that paragraph reads *advertisement*, *an advertised verb or flag* reading *an advertisement*.
 
 The fail-closed paragraph gains, after its tag sentence:
 
@@ -93,7 +95,7 @@ and its positional sentence becomes:
 
 Probe for the reader roster: `git grep -n "front-door-verbs\|pinned-readme"` over the tracked tree less `docs/posts` and `TASK-QUEUE.md`, and `git grep -n "check-front-door-verbs"` in `.claude/`.
 
-- `installer/SPEC.md` §The front door's verbs — the opening sentence, invariant B, the Operands and Arms paragraphs, the pending admission, the fail-closed paragraph and the honest limits (deltas 2, 3 and 4).
+- `installer/SPEC.md` §The front door's verbs — the opening sentence, invariant B, the Flags paragraph's named stop tokens, the Operands and Arms paragraphs, the pending admission, the fail-closed paragraph and the honest limits (deltas 2, 3 and 4).
 - `native/src/gates/front_door_verbs.rs` — the tree readers and positional form, the operand walk, the arm read and extractor, the findings, the clean line and the unit tests (all deltas).
 - `native/src/gates/mod.rs` — `GATE_SDK_GATES_DIR` joins the gate's declared knobs (delta 1).
 - `scripts/check-front-door-verbs.gate` — the `couples=` additions and the `# spec:` line (deltas 1, 2 and 3).
