@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: consumer-smoke-driver-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,14 @@
 ## New Features
 
 ## Technical Debt
+
+### installer-smoke-brevity
+
+installer/SPEC.md's §The consumer smoke, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement), about 16.1k of the file's 44.3k words by `wc -w` at this scope; the last installer section that entry held.
+
+**Deliverable:** the three moves over that section under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into it kept, per a citation survey. It passes the section as [compiled-consumer-smoke-driver](#compiled-consumer-smoke-driver) leaves it, so it rides the batch after that driver lands.
+
+**Cost while deferred:** paid by every session and adopter that reads the unpassed section. Filed 2026-10-02 as a split at consumer-smoke-driver-pass' scope. Part of the operator's selection of the unit set, direction 2026-10-02, lead-relayed (not a ruling).
 
 ## Deferred
 
@@ -22,6 +30,8 @@ A discarded finding has no durable disposition, so it is re-filed. A drain disca
 
 **Cost while deferred:** each recurring dropped finding costs a filing and a drain re-verification per close. Operator direction 2026-10-02, lead-relayed (not a ruling): the operator wanted it this iteration. Filed 2026-10-02 to the gap inbox by companion-tier-delegation-pass' lead; promoted at its close: →fix fails because a record and its matcher add governed names, →forward because the direction is given and no ruling is owed. Re-verified: the four filings (08663d34, d9c65019, bbad7889, 7c91b291) and their discards read as filed; the advisory's live-set scope reads so in §The committed gap inbox. The runner-notice instance is fixed in the close binding's push-budget line. Owner lookup: `disposed`, `discarded once`, `disposition record` in this file — none on this subject; owner lifecycle-kit/SPEC.md §The committed gap inbox.
 
+**Selected 2026-10-02 for consumer-smoke-driver-pass, operator direction lead-relayed (not a ruling):** a feature, the spec stage's to author and promote; independent of the set's other units, its need the closing push alone.
+
 ### kit-log-declaration-transport
 
 [cost: event/high] [surface: lifecycle-kit]
@@ -31,6 +41,8 @@ A discarded finding has no durable disposition, so it is re-filed. A drain disca
 **Deliverable:** a declaration channel that reaches a vendored tree (a shipped declaration file per kit, or the payload carrying the declaration lines), with a consumer-smoke leg installing lifecycle-kit beside a capture-logging kit and reading `check-close-surfaces` clean.
 
 **Cost while deferred:** an adopter running lifecycle-kit with any capture-logging kit meets a red with no documented cure until it hand-declares the logs and widens `LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS`. Filed 2026-10-01 to the gap inbox at lifecycle-queue-value-pass' build; promoted at its close: →fix fails because the channel is new mechanism across gate-sdk's payload and four kits, →forward because no ruling is owed. Re-verified: installer/SPEC.md states the payload withholds a kit's SPEC.md; guard-kit/README.md step 3 and drift-kit/README.md step 2 gitignore the logs; the five declarations sit only in the three kit SPECs. The red itself was probed at that build (a knob file whose roster basename and surface globs match nothing reds three gitignored logs undeclared) and not re-run here. Distinct from `lifecycle-queue-value-audit`, whose kept verdict on the gate this does not reopen. Owner lookup: `close-surface`, `declaration transport`, `undeclared` in this file — only the iceboxed [close-surface-reclaim-uncoupled-from-read](#close-surface-reclaim-uncoupled-from-read), whose subject is the reclaim; owner lifecycle-kit/SPEC.md §The close-surface roster.
+
+**Selected 2026-10-02 for consumer-smoke-driver-pass, operator direction lead-relayed (not a ruling):** a feature; its consumer-smoke leg is written in [compiled-consumer-smoke-driver](#compiled-consumer-smoke-driver)'s driver, so it lands after that driver and rides its push.
 
 ### required-sections-literal
 
@@ -288,7 +300,7 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 [roadmap: now/adoption] [cost: session/high] [surface: installer] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; lifecycle-kit is finished (`lifecycle-template-brevity` and the three slices below); installer is finished apart from §The consumer smoke (its contract, install-surface and remaining sections landed as `installer-contract-brevity`, `installer-install-brevity` and `installer-remainder-brevity`); what remains starts at guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling): a slice has landed at each recent scope; the per-kit slices stay off the roadmap.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; lifecycle-kit and installer are finished (the slices below, `lifecycle-template-brevity` and `installer-contract-brevity`); what remains starts at guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling): a slice has landed at each recent scope; the per-kit slices stay off the roadmap.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
@@ -299,6 +311,8 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes, landing as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes, landing as `installer-install-brevity` and `installer-remainder-brevity`; and, the kit's other sections remaining: drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections (its preamble remains), delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope, landing as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope, landing as `queue-kit-gate-brevity`; guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope, landing as `guard-kit-tool-brevity`.
 
 delegation-kit's §The delegation model left 2026-10-02 at companion-tier-delegation-pass' scope, landing as `delegation-kit-model-brevity`.
+
+installer's §The consumer smoke left 2026-10-02 at consumer-smoke-driver-pass' scope, landing as [installer-smoke-brevity](#installer-smoke-brevity).
 
 ### tarball-build-attestation
 
@@ -446,6 +460,10 @@ the consumer smoke has two drivers. native-hook-customer-legs chose a PowerShell
 
 **Cost while deferred:** two drivers held in step by nobody, and Windows loses those arms. Filed 2026-09-29 to the gap inbox at native-hook-customer-legs' spec; promoted 2026-09-29 at its close: →fix fails because the driver is new mechanism, →forward because no ruling is owed. Re-verified: both scripts exist (2015 and 232 lines). Owner lookup: `consumer smoke`, `run-smoke.ps1`, `smoke driver` in this file — none; owner installer/SPEC.md §The consumer smoke.
 
+**Selected 2026-10-02 for consumer-smoke-driver-pass, operator direction lead-relayed (not a ruling):** a feature, landing first of the smoke-touching units, ahead of [kit-log-declaration-transport](#kit-log-declaration-transport)'s smoke leg and [installer-smoke-brevity](#installer-smoke-brevity).
+
+**Push need (2026-10-02, inside the budget):** one mid-iteration push, since its native-Windows and macOS legs run only in CI; with the closing push the set needs 2 against a budget of one to two.
+
 ### native-executable-git-hooks
 
 [cost: event/high] [surface: gate-sdk]
@@ -475,6 +493,8 @@ an OpenSpec change delta that disagrees with its base spec passes the battery an
 **Deliverable:** invariant B also reads the operand of `--recipe` and `--profile` against the pinned tag's recipes and `installer/profiles.list`, under the same pending admission.
 
 **Cost while deferred:** a new toolkit page can advertise a recipe the one-liner refuses until an unforced release. Filed 2026-09-29 to the gap inbox at companion-technical-gates' spec; promoted at its close: →fix fails because the assertion is new mechanism on a shipped gate, →forward because no ruling is owed. Re-verified: the honest-limit sentence names a flag's value. Owner lookup: `operand`, `flag's value` in this file — none; owner installer/SPEC.md §The front door's verbs.
+
+**Selected 2026-10-02 for consumer-smoke-driver-pass, operator direction lead-relayed (not a ruling):** a feature, one batch with [front-door-arm-route-blind](#front-door-arm-route-blind), both widening invariant B; independent of the driver in order, and its need the closing push alone, since the gate reads the pinned tag from local git.
 
 ### install-smoke-sh-matrix
 
@@ -535,6 +555,8 @@ the front-door rehearsal belongs in the methodology, operator direction 2026-09-
 **Deliverable:** invariant B reads a gate-binary arm the page advertises outside a route, under the same pending admission, with a `bad/` fixture holding the prose form; or a boundary note keeping the limit.
 
 **Cost while deferred:** a front-door page can advertise an arm the installed release refuses, unseen until an adopter runs it. Filed 2026-09-30 to the gap inbox at preview-readiness' close, where `--measure-commit` landed after v0.30.0 and a `deferred:v0.31.0` probe line left the gate green; promoted 2026-09-30 at the next iteration's scope: →fix fails because widening a shipped gate's read is new mechanism. Re-verified: docs/install.md advertises both arms in prose, and v0.31.0 carries `--measure-commit`, so the instance is discharged and the class stands. Owner lookup: `front-door-verbs`, `route` in this file — [front-door-flag-operand](#front-door-flag-operand), DISTINCT (a flag's value after a route, not an arm outside one); owner installer/SPEC.md §The front door's verbs.
+
+**Selected 2026-10-02 for consumer-smoke-driver-pass, operator direction lead-relayed (not a ruling):** a feature, one batch with [front-door-flag-operand](#front-door-flag-operand), both widening invariant B; independent of the driver in order, and its need the closing push alone, since the gate reads the pinned tag from local git.
 
 ### write-side-steering
 
