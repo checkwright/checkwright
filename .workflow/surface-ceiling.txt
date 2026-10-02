@@ -8,7 +8,7 @@
 1446cp .claude/commands/agent-execution.md
 551cp .claude/commands/align.md
 1135cp .claude/commands/build.md
-8512cp .claude/commands/close.md
+8484cp .claude/commands/close.md
 2355cp .claude/commands/consult.md
 1451cp .claude/commands/economics.md
 5151cp .claude/commands/lead.md
@@ -17,13 +17,13 @@
 1155cp .claude/commands/spec.md
 1728cp .claude/commands/validate.md
 12521cp CLAUDE.md
-257160cp canon-kit/SPEC.md
+257132cp canon-kit/SPEC.md
 5785cp canon-kit/templates/SPEC-amendment.md
 25770cp companion/SPEC.md
 123699cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
 255484cp delegation-kit/SPEC.md
-38313cp delegation-kit/templates/agent-execution.md
+38010cp delegation-kit/templates/agent-execution.md
 3397cp delegation-kit/templates/dispatch-checklists.md
 1308cp docs/canon-kit/index.md
 1613cp docs/context-kit/index.md
@@ -91,7 +91,7 @@
 301685cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
 271637cp installer/SPEC.md
-347902cp lifecycle-kit/SPEC.md
+347793cp lifecycle-kit/SPEC.md
 6534cp lifecycle-kit/templates/consult.md
 44530cp lifecycle-kit/templates/lead.md
 2100cp lifecycle-kit/templates/release-sweep.md
