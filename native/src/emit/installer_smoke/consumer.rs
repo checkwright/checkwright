@@ -11,6 +11,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 pub(super) const GATES_DIR: &str = "scripts";
 pub(super) const QUEUE_FILE: &str = "TASK-QUEUE.md";
 pub(super) const PROFILE_DERIVED: &str = "full";
+pub(super) const WORKFLOW_DIR: &str = ".workflow";
 
 static SEQ: AtomicUsize = AtomicUsize::new(0);
 

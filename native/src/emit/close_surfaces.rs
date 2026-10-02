@@ -56,10 +56,14 @@ fn trim_ws(s: &str) -> &str {
     s.trim_matches(WS)
 }
 
+// spec: gate-sdk/SPEC.md §Consumer payload — the carried declarations' basename in a packed kit
+// root, one constant because the release that packs the file is the release whose binary reads it
+pub(crate) const CARRIED: &str = "close-surfaces.txt";
+
 // spec: lifecycle-kit/SPEC.md §The close-surface roster — fenced blocks are skipped, so the
 // directive's own grammar is quotable where it is specified (check-spec-pointer's carve-out, same
 // reason); the lead token is matched full-line, which needs no regex
-fn declaration_lines(text: &str) -> Vec<&str> {
+pub(crate) fn declaration_lines(text: &str) -> Vec<&str> {
     let mut out: Vec<&str> = Vec::new();
     let mut fence = false;
     for line in text.lines() {
@@ -83,7 +87,7 @@ fn declaration_lines(text: &str) -> Vec<&str> {
 // spec: lifecycle-kit/SPEC.md §The close-surfaces emit arm — the mode is echoed verbatim and a malformed
 // one is passed through for check-close-surfaces to rule on, so the split never repairs what the
 // gate exists to catch: `reclaim=` runs to end of line, and the mode is whatever follows the path.
-fn split_declaration(line: &str) -> (String, String, String) {
+pub(crate) fn split_declaration(line: &str) -> (String, String, String) {
     let after = match line.find("close-surface:") {
         Some(i) => &line[i + "close-surface:".len()..],
         None => line,
@@ -214,39 +218,55 @@ pub struct Roster {
     pub rows: Vec<String>,
 }
 
-pub fn derive(args: &[String]) -> Result<Roster, String> {
-    let base = base(args)?;
-
+// spec: lifecycle-kit/SPEC.md §The close-surfaces emit arm — each kit root's roster file and its
+// carried declarations, each where present
+fn kit_surfaces(base: &str, roots: &[String], roster_basename: &str) -> Vec<String> {
     let mut surfaces: Vec<String> = Vec::new();
-    let roster_basename = walk::knob_scalar("LIFECYCLE_KIT_ROSTER_BASENAME")?;
-    // spec: gate-sdk/SPEC.md §Layout and configuration — the root is joined onto a path statted
-    // under the base and then carried as the surface's own path, so it takes `kit_roots`
-    for r in walk::kit_roots()? {
+    for r in roots {
         if r.is_empty() {
             continue;
         }
-        let rel = format!("{}/{}", r.trim_end_matches('/'), roster_basename);
-        if Path::new(&joined(&base, &rel)).is_file() {
-            add_surface(&mut surfaces, rel);
+        for name in [roster_basename, CARRIED] {
+            let rel = format!("{}/{}", r.trim_end_matches('/'), name);
+            if Path::new(&joined(base, &rel)).is_file() {
+                add_surface(&mut surfaces, rel);
+            }
         }
     }
+    surfaces
+}
+
+// spec: lifecycle-kit/SPEC.md §The close-surfaces emit arm — a row's owner column is the surface
+// it was read from
+fn declared_rows(base: &str, surfaces: &[String]) -> Result<(Vec<String>, Vec<String>), String> {
+    let mut rows: Vec<String> = Vec::new();
+    let mut declared: Vec<String> = Vec::new();
+    for s in surfaces {
+        let text = std::fs::read_to_string(joined(base, s))
+            .map_err(|e| format!("declaration surface not readable: {}: {}", s, e))?;
+        for line in declaration_lines(&text) {
+            let (path, mode, reclaim) = split_declaration(line);
+            let state = row_state(base, &path);
+            rows.push(format!("{}\t{}\t{}\t{}\t{}", path, mode, reclaim, s, state));
+            declared.push(path);
+        }
+    }
+    Ok((rows, declared))
+}
+
+pub fn derive(args: &[String]) -> Result<Roster, String> {
+    let base = base(args)?;
+
+    let roster_basename = walk::knob_scalar("LIFECYCLE_KIT_ROSTER_BASENAME")?;
+    // spec: gate-sdk/SPEC.md §Layout and configuration — the root is joined onto a path statted
+    // under the base and then carried as the surface's own path, so it takes `kit_roots`
+    let mut surfaces = kit_surfaces(&base, &walk::kit_roots()?, &roster_basename);
     let globs = walk::knob_array("LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS")?;
     for p in walk::glob_corpus(Path::new(&base), &globs)? {
         add_surface(&mut surfaces, relativize(&base, &p));
     }
 
-    let mut rows: Vec<String> = Vec::new();
-    let mut declared: Vec<String> = Vec::new();
-    for s in &surfaces {
-        let text = std::fs::read_to_string(joined(&base, s))
-            .map_err(|e| format!("declaration surface not readable: {}: {}", s, e))?;
-        for line in declaration_lines(&text) {
-            let (path, mode, reclaim) = split_declaration(line);
-            let state = row_state(&base, &path);
-            rows.push(format!("{}\t{}\t{}\t{}\t{}", path, mode, reclaim, s, state));
-            declared.push(path);
-        }
-    }
+    let (mut rows, declared) = declared_rows(&base, &surfaces)?;
 
     // spec: lifecycle-kit/SPEC.md §The close-surface roster — source 2, the closure that makes the
     // roster fail loudly: every gitignored member of the workflow directory is capture-tier by
@@ -375,6 +395,35 @@ mod tests {
         std::fs::write(dir.join("gone.log.drain.part"), "crashed\n").expect("w");
         assert_eq!(row_state(&base, "gone.log"), "non-empty", "a part shows on an absent log's row");
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The close-surface roster — a vendored kit root holds no SPEC.md,
+    // so its carried declarations are its surface and the rows name that file as their owner
+    #[test]
+    fn a_vendored_root_contributes_its_carried_rows_with_the_carried_file_as_owner() {
+        let dir = std::env::temp_dir().join(format!("close-surfaces-carried-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(dir.join("vendored-kit")).expect("mk");
+        std::fs::create_dir_all(dir.join("bare-kit")).expect("mk");
+        std::fs::write(
+            dir.join("vendored-kit").join(CARRIED),
+            "# carried\nclose-surface: .workflow/k.log advisory reclaim=x --emit capture-drain .workflow/k.log\n",
+        )
+        .expect("w");
+        let base = dir.display().to_string();
+        let roots = vec!["vendored-kit".to_string(), "bare-kit/".to_string()];
+        let surfaces = kit_surfaces(&base, &roots, "SPEC.md");
+        assert_eq!(surfaces, vec![format!("vendored-kit/{}", CARRIED)]);
+        let (rows, declared) = declared_rows(&base, &surfaces).expect("rows");
+        let _ = std::fs::remove_dir_all(&dir);
+        assert_eq!(declared, vec![".workflow/k.log".to_string()]);
+        assert_eq!(
+            rows,
+            vec![format!(
+                ".workflow/k.log\tadvisory\tx --emit capture-drain .workflow/k.log\tvendored-kit/{}\tabsent",
+                CARRIED
+            )]
+        );
     }
 
     // spec: lifecycle-kit/SPEC.md §The close-surface roster — only a companion of a declared log folds

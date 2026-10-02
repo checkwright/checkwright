@@ -143,7 +143,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for e in &errors {
             println!("  {}", e);
         }
-        println!("  help: declare the surface with a full-line 'close-surface: <path> <mode> [reclaim=<command>]' directive in the SPEC section that already owns it — never a central list. <mode> is 'advisory' (no forcing function; a skip is a visible judgment) or 'forced=<owner-path>.md §<section>' naming the structural forcing function. A gitignored capture surface names the drain that empties it as the trailing reclaim=<command>, a rotation: '<gate binary> --emit capture-drain <path>'.");
+        println!("  help: declare the surface with a full-line 'close-surface: <path> <mode> [reclaim=<command>]' directive in the section that owns the surface — never a central list; for an undeclared kit-owned log in a vendored tree, run `update`. <mode> is 'advisory' (no forcing function; a skip is a visible judgment) or 'forced=<owner-path>.md §<section>' naming the structural forcing function. A gitignored capture surface names the drain that empties it as the trailing reclaim=<command>, a rotation: '<gate binary> --emit capture-drain <path>'.");
         return Ok(1);
     }
     println!(

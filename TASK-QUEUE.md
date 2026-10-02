@@ -10,7 +10,7 @@
 
 ### kit-log-declaration-transport
 
-[spec: SPEC-close-surface-carry.md]
+[spec: installer/SPEC.md]
 
 `check-close-surfaces` reds an adopter on kit-owned capture logs it cannot declare. The `close-surface:` declarations for drift-kit's `knowledge-friction.log`, guard-kit's `prompt-friction.log` and `wakeup-attempts.log`, and delegation-kit's `subagent-stop-liveness.log` and `wait-primitive-evidence.txt` live only in those kits' SPEC.md files, which the payload withholds, while guard-kit's and drift-kit's READMEs have the adopter gitignore the logs. The gate's help sends the adopter to "the SPEC section that already owns it", which the adopter does not have.
 

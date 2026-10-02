@@ -80,9 +80,19 @@ check_case "declared-log-with-drain" "$drained" 0 "CLOSE-SURFACES: clean"
 printf 'x\n' >"$drained/.workflow/stray.log.drain"
 check_case "drain-of-undeclared-log" "$drained" 1 ".workflow/stray.log.drain"
 
+# --- a vendored kit root: no SPEC.md, its declarations carried beside it ---
+vendored="$SANDBOX/vendored"
+seed_repo "$vendored" ""
+rm "$vendored/owners/SPEC.md"
+mkdir -p "$vendored/vendored-kit"
+printf '# carried\nclose-surface: .workflow/capture.log advisory reclaim=run-gates.sh --emit capture-drain .workflow/capture.log\n' >"$vendored/vendored-kit/close-surfaces.txt"
+GATE_SDK_KIT_DIRS=vendored-kit check_case "vendored-root-carried" "$vendored" 0 "CLOSE-SURFACES: clean"
+rm "$vendored/vendored-kit/close-surfaces.txt"
+GATE_SDK_KIT_DIRS=vendored-kit check_case "vendored-root-without-carry" "$vendored" 1 ".workflow/capture.log: capture-tier workflow member with no 'close-surface:' declaration"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-close-surfaces.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-close-surfaces.test.sh: clean (undeclared capture, declared-without-reclaim, a truncating reclaim, the satisfied case, a gitignored declared path outside the workflow dir, a declared log's drain folded into its row, and a drain beside no declared log reported, 7 cases)"
+echo "check-close-surfaces.test.sh: clean (undeclared capture, declared-without-reclaim, a truncating reclaim, the satisfied case, a gitignored declared path outside the workflow dir, a declared log's drain folded into its row, a drain beside no declared log reported, and a vendored kit root read clean through its carried declarations and undeclared without them, 9 cases)"
 exit 0

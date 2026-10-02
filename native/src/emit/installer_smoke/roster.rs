@@ -26,6 +26,7 @@ pub(super) const ARMS: &[Row] = &[
     row("install", "from the tarball, --offline", super::staging::install),
     row("profile invariant", "", super::profiles::invariant),
     row("seed arm", "the CI workflow init seeded, every profile", super::profiles::seed),
+    row("close-surface arm", "the kits' capture logs declared in a vendored tree", super::carry::close_surface),
     row("demo arm", "checkwright demo from the packed package, inside an installed {min} consumer", super::profiles::demo),
     row(
         "companion arm for speckit",

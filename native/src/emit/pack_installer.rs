@@ -3,6 +3,7 @@
 // copy of any kit is ever checked in or written inside the worktree
 // spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Run` and not an `--emit-` member: the
 // product is a tarball plus a receipt, so an emitting arm would return a receipt for a side effect
+use super::close_surfaces;
 use crate::ere::Ere;
 use crate::proc::{self, Stderr};
 use crate::programs;
@@ -226,11 +227,14 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
         .collect();
     let mut packed = 0usize;
     let mut rewritten = 0usize;
+    let mut carried = 0usize;
     for (kit, leaf) in kits.iter().zip(&leaves) {
         let into = format!("{}/payload/{}", asm, leaf);
+        refuse_tracked_carry(".", &commit, kit)?;
         pack_tracked(&commit, kit, &into, &withhold)?;
         rewritten += resolve_readme_links(&into, leaf, &leaves, &spec_base_url)?;
         place_license(license.as_deref(), &into)?;
+        carried += carry_declarations(".", &commit, kit, &into, &withhold)?;
         packed += 1;
     }
     if packed == 0 {
@@ -248,13 +252,14 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
     move_file(&format!("{}/{}", asm, tarball), &landed)?;
 
     Ok(format!(
-        "PACK: {} (version {}, commit {}, root {}, {} kit(s) in payload, {} README link(s) resolved to the published SPEC, {} prebuilt gate binary/binaries)",
+        "PACK: {} (version {}, commit {}, root {}, {} kit(s) in payload, {} README link(s) resolved to the published SPEC, {} close-surface declaration(s) carried, {} prebuilt gate binary/binaries)",
         landed,
         version,
         &commit[..12],
         root,
         packed,
         rewritten,
+        carried,
         artifacts
     ))
 }
@@ -295,29 +300,83 @@ fn license_text(commit: &str, name: &str) -> Result<Option<Vec<u8>>, Refusal> {
             &["name the license file the tree tracks, or set the knob explicitly empty to place none."],
         )
     };
-    let listing = git(&["ls-tree", commit, "--", name]).map_err(|_| untracked())?;
+    tracked_file(".", commit, name)?.map(Some).ok_or_else(untracked)
+}
+
+// spec: installer/SPEC.md §The packer — a path's bytes at the stamped commit when it is a regular
+// file tracked there, and none when it is absent or anything else
+fn tracked_file(repo: &str, commit: &str, path: &str) -> Result<Option<Vec<u8>>, Refusal> {
+    let listing = git(&["-C", repo, "ls-tree", commit, "--", path])?;
     let mut lines = listing.lines();
     let (Some(line), None) = (lines.next(), lines.next()) else {
-        return Err(untracked());
+        return Ok(None);
     };
     let mut meta = line.split('\t').next().unwrap_or("").split_whitespace();
     let (Some(mode), Some("blob"), Some(object)) = (meta.next(), meta.next(), meta.next()) else {
-        return Err(untracked());
+        return Ok(None);
     };
     if !mode.starts_with("100") {
-        return Err(untracked());
+        return Ok(None);
     }
-    let done = proc::run(&programs::GIT, &["cat-file", "blob", object]).map_err(refuse)?;
+    let done = proc::run(&programs::GIT, &["-C", repo, "cat-file", "blob", object]).map_err(refuse)?;
     match done.stdout() {
         Some(b) => Ok(Some(b.to_vec())),
         None => Err(refuse(format!(
             "git cat-file could not read {} at {} — {}",
-            name,
-            short,
+            path,
+            &commit[..12.min(commit.len())],
             done.failure_report().unwrap_or_default()
         ))),
     }
 }
+
+// spec: gate-sdk/SPEC.md §Consumer payload — the carry would overwrite a shipped file of its name,
+// so a kit root tracking one refuses before anything of the kit is extracted
+fn refuse_tracked_carry(repo: &str, commit: &str, kit: &str) -> Result<(), Refusal> {
+    let path = format!("{}/{}", kit.trim_end_matches('/'), close_surfaces::CARRIED);
+    if git(&["-C", repo, "ls-tree", "--name-only", commit, "--", &path])?.is_empty() {
+        return Ok(());
+    }
+    Err(refuse_help(
+        format!("{} is tracked at {}, the name the packer carries the kit's close-surface declarations under.", path, &commit[..12.min(commit.len())]),
+        &["rename or remove the tracked file; the carried one is generated from the kit's withheld spec at every pack."],
+    ))
+}
+
+// spec: gate-sdk/SPEC.md §Consumer payload — each withheld member that is a file at the stamped
+// commit gives up its `close-surface:` lines, read by the derivation's own line reader and written
+// in source order beside the kit; a kit with none gets no file
+fn carry_declarations(repo: &str, commit: &str, kit: &str, into: &str, withhold: &[String]) -> Result<usize, Refusal> {
+    let mut lines: Vec<String> = Vec::new();
+    for member in withhold {
+        let member = member.trim_matches('/');
+        if member.is_empty() {
+            continue;
+        }
+        let path = format!("{}/{}", kit.trim_end_matches('/'), member);
+        if let Some(bytes) = tracked_file(repo, commit, &path)? {
+            let text = String::from_utf8_lossy(&bytes);
+            lines.extend(close_surfaces::declaration_lines(&text).into_iter().map(str::to_string));
+        }
+    }
+    write_carry(into, &lines)?;
+    Ok(lines.len())
+}
+
+fn write_carry(into: &str, lines: &[String]) -> Result<(), Refusal> {
+    if lines.is_empty() {
+        return Ok(());
+    }
+    let mut body = String::from(CARRY_HEADER);
+    for l in lines {
+        body.push_str(l);
+        body.push('\n');
+    }
+    let path = format!("{}/{}", into, close_surfaces::CARRIED);
+    std::fs::write(&path, body).map_err(|e| refuse(format!("cannot write {}: {}", path, e)))
+}
+
+const CARRY_HEADER: &str = "# Generated at pack time from this kit's spec; lifecycle-kit/SPEC.md §The close-surface roster.\n";
 
 // spec: installer/SPEC.md §The packer — each pair's name is typed by an adopter and carried by a
 // directory, so a name outside `[a-z0-9][a-z0-9-]*` refuses before anything is extracted
@@ -1059,6 +1118,52 @@ mod tests {
         assert!(absent.cause.contains("GATE_SDK_PAYLOAD_LICENSE names no-such-license-file.txt"));
         assert!(license_text("HEAD", "src").is_err());
         assert!(license_text(&"0".repeat(40), "LICENSE").is_err());
+    }
+
+    // spec: gate-sdk/SPEC.md §Consumer payload — the carry reads the withheld spec at the commit:
+    // an unfenced declaration is carried and a fenced one is not, a spec with none writes no file,
+    // a withheld directory contributes nothing, and a kit root tracking the carried name refuses
+    #[test]
+    fn the_carry_takes_unfenced_declarations_alone_and_a_tracked_carried_name_refuses() {
+        let dir = std::env::temp_dir().join(format!("pack-installer-carry-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        for kit in ["a-kit/smoke", "b-kit", "c-kit", "into-a", "into-b"] {
+            std::fs::create_dir_all(dir.join(kit)).expect("mk");
+        }
+        std::fs::write(
+            dir.join("a-kit/SPEC.md"),
+            "# A\n\nclose-surface: .workflow/a.log advisory reclaim=x --emit capture-drain .workflow/a.log\n\n```\nclose-surface: <path> <mode>\n```\n",
+        )
+        .expect("w");
+        std::fs::write(dir.join("a-kit/smoke/s.sh"), "close-surface: .workflow/no.log advisory\n").expect("w");
+        std::fs::write(dir.join("b-kit/SPEC.md"), "# B, declaring nothing\n").expect("w");
+        std::fs::write(dir.join("c-kit").join(close_surfaces::CARRIED), "shipped\n").expect("w");
+        let repo = dir.display().to_string();
+        let git_in = |a: &[&str]| {
+            let mut v = vec!["-C", repo.as_str(), "-c", "user.email=t@t.invalid", "-c", "user.name=t"];
+            v.extend_from_slice(a);
+            proc::run(&programs::GIT, &v).expect("git").stdout().is_some()
+        };
+        assert!(git_in(&["init", "-q"]) && git_in(&["add", "a-kit", "b-kit", "c-kit"]) && git_in(&["commit", "-qm", "base"]));
+        let withhold = vec!["SPEC.md".to_string(), "smoke".to_string()];
+        let into_a = dir.join("into-a").display().to_string();
+        let into_b = dir.join("into-b").display().to_string();
+        let a = carry_declarations(&repo, "HEAD", "a-kit", &into_a, &withhold).expect("a carries");
+        let b = carry_declarations(&repo, "HEAD", "b-kit", &into_b, &withhold).expect("b carries");
+        let carried = std::fs::read_to_string(dir.join("into-a").join(close_surfaces::CARRIED)).unwrap_or_default();
+        let b_wrote = dir.join("into-b").join(close_surfaces::CARRIED).exists();
+        let ok = refuse_tracked_carry(&repo, "HEAD", "a-kit").is_ok();
+        let refused = refuse_tracked_carry(&repo, "HEAD", "c-kit").err().map(|r| r.cause).unwrap_or_default();
+        let _ = std::fs::remove_dir_all(&dir);
+        assert_eq!(a, 1);
+        assert_eq!(
+            carried,
+            format!("{}close-surface: .workflow/a.log advisory reclaim=x --emit capture-drain .workflow/a.log\n", CARRY_HEADER)
+        );
+        assert_eq!(b, 0);
+        assert!(!b_wrote, "a spec declaring nothing wrote a carried file");
+        assert!(ok);
+        assert!(refused.contains("c-kit/close-surfaces.txt is tracked"), "{}", refused);
     }
 
     // spec: gate-sdk/SPEC.md §Consumer payload — an empty base rewrites nothing and returns the

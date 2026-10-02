@@ -6,6 +6,7 @@ use crate::proc;
 use std::collections::BTreeMap;
 
 mod artifact;
+mod carry;
 mod companion;
 mod consumer;
 mod lines;
@@ -17,13 +18,14 @@ mod roster;
 mod staging;
 mod upgrade;
 
-// spec: gate-sdk/SPEC.md §The non-gate arm — the declared names, each gate-sdk's; the scratch base,
-// the artifact hand-off and the tarball hand-out are read undeclared, no static kit owning their
-// prefix
+// spec: gate-sdk/SPEC.md §The non-gate arm — the declared names; the scratch base, the artifact
+// hand-off and the tarball hand-out are read undeclared, no static kit owning their prefix
 pub const KNOBS: &[&str] = &[
+    "GATE_SDK_KIT_DIRS",
     "GATE_SDK_NATIVE_BIN",
     "GATE_SDK_NATIVE_CRATE",
     "GATE_SDK_NATIVE_TARGETS_FILE",
+    "LIFECYCLE_KIT_ROSTER_BASENAME",
 ];
 
 const NAME: &str = "installer-smoke";
