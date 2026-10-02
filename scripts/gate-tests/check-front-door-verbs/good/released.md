@@ -17,3 +17,5 @@ A toolkit page's fenced line stands for the reader's install line:
 ```sh
 checkwright init --profile=prose --dry-run   # plan first
 ```
+
+The gate binary's own arms, named apart from any route: `--emit env-probe`, also spelled `--emit-env-probe`, and `--run`. An installer flag named apart from its route is no arm: `--profile`.

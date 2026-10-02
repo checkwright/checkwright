@@ -1,7 +1,15 @@
-page.md:4: `demo` is advertised, and the pinned release pinned.md lacks it while iteration fixture-iteration's disposition is deferred:v9.9.9
-page.md:7: `frobnicate` is advertised, and neither the pinned release pinned.md nor the binary's VERBS carries it
-page.md:14: `init --recipe` is advertised, and the pinned release pinned.md lacks it while iteration fixture-iteration's disposition is deferred:v9.9.9
-page.md:14: `init --frob` is advertised, and neither the pinned release pinned.md nor the binary's FLAGS carries it
+page.md:4: `demo` is advertised, and the pinned release pinned lacks it while iteration fixture-iteration's disposition is deferred:v9.9.9
+page.md:7: `frobnicate` is advertised, and neither the pinned release pinned nor the binary's VERBS carries it
+page.md:14: `init --recipe` is advertised, and the pinned release pinned lacks it while iteration fixture-iteration's disposition is deferred:v9.9.9
+page.md:14: `init --frob` is advertised, and neither the pinned release pinned nor the binary's FLAGS carries it
+page.md:20: `init --profile` is advertised, and the pinned release pinned lacks it while iteration fixture-iteration's disposition is deferred:v9.9.9
+page.md:20: `init --recipe` is advertised, and the pinned release pinned lacks it while iteration fixture-iteration's disposition is deferred:v9.9.9
+page.md:21: `init --profile` is advertised, and the pinned release pinned lacks it while iteration fixture-iteration's disposition is deferred:v9.9.9
+page.md:20: `--profile delegation` is advertised, and the pinned release pinned lacks the profile `delegation` while iteration fixture-iteration's disposition is deferred:v9.9.9
+page.md:20: `--recipe openspec` is advertised, and the pinned release pinned lacks the recipe `openspec` while iteration fixture-iteration's disposition is deferred:v9.9.9
+page.md:21: `--profile nosuch` is advertised, and neither the pinned release pinned nor HEAD's profile set carries `nosuch`
+page.md:24: the arm `--measure-commit` is advertised, and the pinned release pinned lacks it while iteration fixture-iteration's disposition is deferred:v9.9.9
+page.md:24: the arm `--emit-frobnicate` is advertised, and neither the pinned release pinned nor the binary's arm table carries it
 page.md:9: a route leads with `--profile`, which reaches the binary as its first argument rather than a verb's
-readme.md: the verb table lacks `uninstall`, which the binary's VERBS carries
-readme.md: the flag table lacks `--no-commit` for `uninstall`, which the binary's FLAGS carries
+head/installer/README.md: the verb table lacks `uninstall`, which the binary's VERBS carries
+head/installer/README.md: the flag table lacks `--no-commit` for `uninstall`, which the binary's FLAGS carries

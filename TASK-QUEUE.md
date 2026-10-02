@@ -8,30 +8,6 @@
 
 ## New Features
 
-### front-door-flag-operand
-
-[spec: SPEC-front-door-reach.md]
-
-`check-front-door-verbs` reads an advertised verb and each flag after it, never a flag's value, so a recipe or profile name the pinned release lacks after a flag it carries reds nothing and fires no release trigger (installer/SPEC.md §The front door's verbs, *Honest limits*).
-
-**Deliverable:** invariant B also reads the operand of `--recipe` and `--profile` against the pinned tag's recipes and `installer/profiles.list`, admitted on the release disposition as a flag is.
-
-**Cost while deferred:** a new toolkit page can advertise a recipe the one-liner refuses until an unforced release. Filed 2026-09-29 to the gap inbox at companion-technical-gates' spec; promoted at its close: →fix fails because the assertion is new mechanism on a shipped gate, →forward because no ruling is owed. Re-verified: the honest-limit sentence names a flag's value. Owner lookup: `operand`, `flag's value` in this file — none; owner installer/SPEC.md §The front door's verbs.
-
-**Selected 2026-10-02 for consumer-smoke-driver-pass, operator direction lead-relayed (not a ruling):** a feature, one batch with [front-door-arm-route-blind](#front-door-arm-route-blind), both widening invariant B; independent of the driver in order, and its need the closing push alone, since the gate reads the pinned tag from local git.
-
-### front-door-arm-route-blind
-
-[spec: SPEC-front-door-reach.md]
-
-`check-front-door-verbs` reads an advertised flag only after a route, so a gate-binary arm a front-door page advertises in prose, as docs/install.md's "run the gate binary with `--measure-commit`" and `--emit env-probe` do, is never checked against the pinned release, and a `none` or `deferred:` disposition passes it. installer/SPEC.md §The front door's verbs states the limit ("A flag named apart from its route … is out of reach").
-
-**Deliverable:** invariant B reads a gate-binary arm the page advertises outside a route, admitted on the release disposition as a flag is, with a `bad/` fixture holding the prose form; or a boundary note keeping the limit.
-
-**Cost while deferred:** a front-door page can advertise an arm the installed release refuses, unseen until an adopter runs it. Filed 2026-09-30 to the gap inbox at preview-readiness' close, where `--measure-commit` landed after v0.30.0 and a `deferred:v0.31.0` probe line left the gate green; promoted 2026-09-30 at the next iteration's scope: →fix fails because widening a shipped gate's read is new mechanism. Re-verified: docs/install.md advertises both arms in prose, and v0.31.0 carries `--measure-commit`, so the instance is discharged and the class stands. Owner lookup: `front-door-verbs`, `route` in this file — [front-door-flag-operand](#front-door-flag-operand), DISTINCT (a flag's value after a route, not an arm outside one); owner installer/SPEC.md §The front door's verbs.
-
-**Selected 2026-10-02 for consumer-smoke-driver-pass, operator direction lead-relayed (not a ruling):** a feature, one batch with [front-door-flag-operand](#front-door-flag-operand), both widening invariant B; independent of the driver in order, and its need the closing push alone, since the gate reads the pinned tag from local git.
-
 ### disposed-findings-register
 
 [spec: SPEC-disposed-findings.md] [recurrence: 2026-09-29, 2026-10-01, 2026-10-02]
@@ -1354,4 +1330,7 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 A balanced Liquid token a docs page means literally parses and renders blank, and neither check-docs-liquid-parse nor check-docs-render-fidelity sees the loss; no live page carries it, and the fix is a render-side assertion or a token scan outside raw blocks (site-kit/SPEC.md §check-docs-liquid-parse).
 
 ## Done
+
+- front-door-flag-operand
+- front-door-arm-route-blind
 

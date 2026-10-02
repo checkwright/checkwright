@@ -1,1 +1,1 @@
-FRONT-DOOR-VERBS: clean (2 page(s), 8 advertised site(s), 4 advertised flag(s), pinned set pinned.md, tables equal to VERBS and FLAGS, pending release: demo, pending flags: init --recipe)
+FRONT-DOOR-VERBS: clean (2 page(s), 10 advertised site(s), 7 advertised flag(s), 5 advertised operand(s), 4 advertised arm(s), pinned set pinned, tables equal to VERBS and FLAGS, pending release: demo, pending flags: init --recipe, pending operands: --profile delegation, --recipe openspec, pending arms: --measure-commit)

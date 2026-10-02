@@ -1,11 +1,16 @@
-// spec: installer/SPEC.md §The front door's verbs — the verb and flag tables are the binary's
-// rosters (A), and every route-advertised verb and each flag after it is in the pinned release's
-// tables, or pending its release (B)
+// spec: installer/SPEC.md §The front door's verbs — the tables are the binary's rosters (A), and
+// every advertised verb, flag, operand and arm is in the pinned release, or pending its release (B)
 use super::pinned_release::{self, read, Disposition};
+use crate::knobfile::{self, Form};
 use std::collections::BTreeSet;
+use std::path::Path;
 
 const NAME: &str = "check-front-door-verbs";
 const README: &str = "installer/README.md";
+const PROFILES: &str = "installer/profiles.list";
+const EMIT_SRC: &str = "native/src/emit/mod.rs";
+const MAIN_SRC: &str = "native/src/main.rs";
+const RECIPE_KNOB: &str = "GATE_SDK_PAYLOAD_RECIPES";
 const PAGES: &[&str] = &[
     "README.md",
     "docs/index.md",
@@ -21,8 +26,16 @@ const CODE_ROUTE: &str = "checkwright";
 const HELP_FLAGS: &[&str] = &["--help", "-h"];
 // spec: installer/SPEC.md §The front door's verbs — the tokens that end a verb's flag walk
 const STOPS: &[&str] = &["|", ";", "&&", "||", ")"];
+// spec: installer/SPEC.md §The front door's verbs — the two flags whose operand is held to a roster
+const PROFILE_FLAG: &str = "--profile";
+const RECIPE_FLAG: &str = "--recipe";
+// spec: installer/SPEC.md §The front door's verbs — the page section describing a checkout, whose
+// binary is built from the tree, so it is not read for arms
+const CHECKOUT_SECTION: (&str, &str) = ("README.md", "## This repo, governed");
+const EMIT: &str = "--emit";
 
 type Pair = (String, String);
+type Flag = (String, Option<String>);
 
 pub fn run(args: &[String]) -> i32 {
     match rule(args) {
@@ -46,6 +59,186 @@ fn binary_flags() -> BTreeSet<Pair> {
         .iter()
         .flat_map(|(f, vs)| vs.iter().map(move |v| (v.to_string(), f.to_string())))
         .collect()
+}
+
+fn binary_arms() -> BTreeSet<String> {
+    crate::emit::arms()
+        .into_iter()
+        .chain(crate::TOP_LEVEL_FLAGS.iter().copied())
+        .map(str::to_string)
+        .collect()
+}
+
+// spec: installer/SPEC.md §The front door's verbs — HEAD's tree or the tag's, each read at the same
+// repo-relative paths, so a roster read off either side is one parse
+enum Tree {
+    Dir(String),
+    Tag(String),
+}
+
+impl Tree {
+    fn label(&self) -> String {
+        match self {
+            Tree::Dir(d) | Tree::Tag(d) => d.clone(),
+        }
+    }
+
+    fn path(&self, rel: &str) -> String {
+        match self {
+            Tree::Dir(d) if d == "." => rel.to_string(),
+            Tree::Dir(d) => format!("{}/{}", d.trim_end_matches('/'), rel),
+            Tree::Tag(t) => format!("{}:{}", t, rel),
+        }
+    }
+
+    fn get(&self, rel: &str) -> Result<Option<String>, String> {
+        match self {
+            Tree::Dir(_) => {
+                let p = self.path(rel);
+                if Path::new(&p).is_file() {
+                    Ok(Some(read(&p)?))
+                } else {
+                    Ok(None)
+                }
+            }
+            Tree::Tag(t) => {
+                if pinned_release::carries(t, rel)? {
+                    Ok(Some(pinned_release::show_at(t, rel)?))
+                } else {
+                    Ok(None)
+                }
+            }
+        }
+    }
+
+    fn required(&self, rel: &str) -> Result<String, String> {
+        match self {
+            Tree::Dir(_) => read(&self.path(rel)),
+            Tree::Tag(t) => pinned_release::show_at(t, rel),
+        }
+    }
+}
+
+// spec: installer/SPEC.md §The front door's verbs — the gate-sdk knob seam file, in the directory
+// `GATE_SDK_GATES_DIR` names
+fn seam_path() -> Result<String, String> {
+    let kit = crate::knobs::owner(RECIPE_KNOB).ok_or_else(|| format!("no static kit owns {}", RECIPE_KNOB))?;
+    let dir = crate::walk::knob_scalar("GATE_SDK_GATES_DIR")?;
+    Ok(format!("{}/{}-config.knobs", dir.trim_end_matches('/'), kit.stem()))
+}
+
+// spec: installer/SPEC.md §The front door's verbs — the profile set: the roster's names with the
+// derived one; a tree lacking the roster has the empty set
+fn profile_set(text: Option<String>) -> BTreeSet<String> {
+    text.map(|t| crate::installer::profile::names_in(&t).into_iter().collect())
+        .unwrap_or_default()
+}
+
+// spec: installer/SPEC.md §The front door's verbs — the recipe set: the keys of the recipe knob's
+// lines in the seam file; a tree lacking the file has the empty set
+fn recipe_set(label: &str, text: Option<String>) -> Result<BTreeSet<String>, String> {
+    let Some(text) = text else { return Ok(BTreeSet::new()) };
+    Ok(knobfile::parse(&text, label)?
+        .into_iter()
+        .filter(|e| e.name == RECIPE_KNOB)
+        .filter_map(|e| match e.form {
+            Form::Keyed(k) => Some(k),
+            _ => None,
+        })
+        .collect())
+}
+
+// spec: installer/SPEC.md §The front door's verbs — each string literal of the array `decl` names,
+// with its depth and the ordinal of the top-level element it sits in; comments and char literals
+// skipped. None where the declaration is absent or its array never closes.
+fn array_literals(src: &str, decl: &str) -> Option<Vec<(usize, usize, String)>> {
+    let at = src.find(&format!("const {}:", decl))?;
+    let eq = at + src[at..].find('=')?;
+    let open = eq + src[eq..].find('[')?;
+    let b = src.as_bytes();
+    let (mut i, mut depth, mut ordinal) = (open, 0usize, 0usize);
+    let mut out = Vec::new();
+    while i < b.len() {
+        match b[i] {
+            b'[' | b'(' | b'{' => {
+                depth += 1;
+                if depth == 2 {
+                    ordinal += 1;
+                }
+            }
+            b']' | b')' | b'}' => {
+                depth = depth.checked_sub(1)?;
+                if depth == 0 {
+                    return Some(out);
+                }
+            }
+            b'/' if b.get(i + 1) == Some(&b'/') => {
+                while i < b.len() && b[i] != b'\n' {
+                    i += 1;
+                }
+            }
+            b'/' if b.get(i + 1) == Some(&b'*') => {
+                i += src[i + 2..].find("*/")? + 3;
+            }
+            b'\'' if b.get(i + 1) == Some(&b'\\') => {
+                i += src[i + 2..].find('\'')? + 2;
+            }
+            b'\'' if b.get(i + 2) == Some(&b'\'') => i += 2,
+            b'"' => {
+                let mut s = String::new();
+                i += 1;
+                while i < b.len() && b[i] != b'"' {
+                    if b[i] == b'\\' {
+                        i += 1;
+                    }
+                    s.push(*b.get(i)? as char);
+                    i += 1;
+                }
+                if depth == 1 || !out.iter().any(|(_, o, _)| *o == ordinal) {
+                    out.push((depth, ordinal, s));
+                }
+            }
+            _ => {}
+        }
+        i += 1;
+    }
+    None
+}
+
+// spec: installer/SPEC.md §The front door's verbs — the arm table off the two source arrays: the
+// first literal of each top-level tuple of `ARMS`, with every literal of `TOP_LEVEL_FLAGS`; None
+// where either array is absent or yields no member
+fn arm_table(emit_src: &str, main_src: &str) -> Option<BTreeSet<String>> {
+    let arms: Vec<String> = array_literals(emit_src, "ARMS")?
+        .into_iter()
+        .filter(|(d, _, _)| *d >= 2)
+        .map(|(_, _, s)| s)
+        .collect();
+    let top: Vec<String> = array_literals(main_src, "TOP_LEVEL_FLAGS")?
+        .into_iter()
+        .map(|(_, _, s)| s)
+        .collect();
+    if arms.is_empty() || top.is_empty() {
+        return None;
+    }
+    Some(arms.into_iter().chain(top).collect())
+}
+
+// spec: installer/SPEC.md §The front door's verbs — a tree carrying neither source file predates
+// the gate binary and has the empty arm set; one carrying either must yield both arrays
+fn pinned_arms(tree: &Tree) -> Result<BTreeSet<String>, String> {
+    let (emit, main) = (tree.get(EMIT_SRC)?, tree.get(MAIN_SRC)?);
+    if emit.is_none() && main.is_none() {
+        return Ok(BTreeSet::new());
+    }
+    arm_table(emit.as_deref().unwrap_or(""), main.as_deref().unwrap_or("")).ok_or_else(|| {
+        format!(
+            "{} carries no `ARMS` array in {} or no `TOP_LEVEL_FLAGS` array in {}, or one yielding no member, so its arm set could not be read",
+            tree.label(),
+            EMIT_SRC,
+            MAIN_SRC
+        )
+    })
 }
 
 fn cells(line: &str) -> Vec<&str> {
@@ -125,31 +318,92 @@ fn code_texts(text: &str) -> Vec<(usize, &str)> {
     out
 }
 
+// spec: installer/SPEC.md §The front door's verbs — the arms a page names: each inline code span
+// outside a fence and outside the checkout section whose first token opens with `--` and is no
+// flag, `--emit <name>` read as `--emit-<name>`
+fn advertised_arms(page: &str, text: &str, flags: &BTreeSet<String>) -> Vec<(usize, String)> {
+    let mut out = Vec::new();
+    let (mut fenced, mut checkout) = (false, false);
+    for (i, line) in text.lines().enumerate() {
+        let t = line.trim_start();
+        if t.starts_with("```") || t.starts_with("~~~") {
+            fenced = !fenced;
+            continue;
+        }
+        if fenced {
+            continue;
+        }
+        if t.starts_with("# ") || t.starts_with("## ") {
+            checkout = page == CHECKOUT_SECTION.0 && line.trim_end() == CHECKOUT_SECTION.1;
+            continue;
+        }
+        if checkout {
+            continue;
+        }
+        for (k, seg) in line.split('`').enumerate() {
+            if k % 2 == 1 {
+                out.extend(arm_of(seg, flags).map(|a| (i + 1, a)));
+            }
+        }
+    }
+    out
+}
+
+fn arm_of(span: &str, flags: &BTreeSet<String>) -> Option<String> {
+    let mut words = span.split_whitespace();
+    let first = words.next()?;
+    let name = first.split('=').next().unwrap_or(first);
+    if !name.starts_with("--") || flags.contains(name) {
+        return None;
+    }
+    if name == EMIT {
+        let member = words.next().filter(|w| is_operand(w))?;
+        return Some(format!("{}-{}", EMIT, member));
+    }
+    Some(name.to_string())
+}
+
 #[derive(Debug, PartialEq)]
 enum Tok {
-    Verb(String, Vec<String>),
+    Verb(String, Vec<Flag>),
     Flag(String),
     Placeholder,
 }
 
 fn is_verb(t: &str) -> bool {
+    t.as_bytes().first().is_some_and(u8::is_ascii_lowercase) && is_operand(t)
+}
+
+fn is_operand(t: &str) -> bool {
     let b = t.as_bytes();
     !b.is_empty()
-        && b[0].is_ascii_lowercase()
+        && (b[0].is_ascii_lowercase() || b[0].is_ascii_digit())
         && b.iter().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || *c == b'-')
 }
 
+fn is_stop(w: &str) -> bool {
+    STOPS.contains(&w) || w.starts_with('#') || w.starts_with('>')
+}
+
 // spec: installer/SPEC.md §The front door's verbs — the flags after an advertised verb, read to the
-// first command separator or comment, each cut at its first `=`
-fn flags_after<'a>(words: impl Iterator<Item = &'a str>) -> Vec<String> {
+// first stop token, each cut at its first `=`, a `--profile` or `--recipe` carrying its operand
+fn flags_after(words: &[&str]) -> Vec<Flag> {
     let mut out = Vec::new();
-    for w in words {
-        if STOPS.contains(&w) || w.starts_with('#') || w.starts_with('>') {
+    for (i, w) in words.iter().enumerate() {
+        if is_stop(w) {
             break;
         }
-        if w.starts_with('-') && !HELP_FLAGS.contains(&w) {
-            out.push(w.split('=').next().unwrap_or(w).to_string());
+        if !w.starts_with('-') || HELP_FLAGS.contains(w) {
+            continue;
         }
+        let (flag, value) = match w.split_once('=') {
+            Some((f, v)) => (f, Some(v)),
+            None => (*w, words.get(i + 1).copied().filter(|t| !is_stop(t) && !t.starts_with('-'))),
+        };
+        let operand = value
+            .filter(|v| (flag == PROFILE_FLAG || flag == RECIPE_FLAG) && is_operand(v))
+            .map(str::to_string);
+        out.push((flag.to_string(), operand));
     }
     out
 }
@@ -158,14 +412,14 @@ fn token(after: &str) -> Option<Tok> {
     if !after.starts_with(char::is_whitespace) {
         return None;
     }
-    let mut words = after.split_whitespace();
-    let t = words.next()?;
+    let words: Vec<&str> = after.split_whitespace().collect();
+    let t = *words.first()?;
     Some(if HELP_FLAGS.contains(&t) {
         Tok::Placeholder
     } else if t.starts_with('-') {
         Tok::Flag(t.to_string())
     } else if is_verb(t) {
-        Tok::Verb(t.to_string(), flags_after(words))
+        Tok::Verb(t.to_string(), flags_after(&words[1..]))
     } else {
         Tok::Placeholder
     })
@@ -213,26 +467,57 @@ struct Pinned {
     label: String,
     verbs: BTreeSet<String>,
     flags: BTreeSet<Pair>,
+    profiles: BTreeSet<String>,
+    recipes: BTreeSet<String>,
+    arms: BTreeSet<String>,
+}
+
+// spec: installer/SPEC.md §The front door's verbs — the pending admission, one rule for every
+// advertisement
+enum Verdict<'a> {
+    Released,
+    Pending,
+    Withheld(&'a str),
+    Unknown,
+}
+
+fn verdict(disp: &Disposition, pinned: bool, head: bool) -> Verdict<'_> {
+    if pinned {
+        return Verdict::Released;
+    }
+    if !head {
+        return Verdict::Unknown;
+    }
+    match disp {
+        Disposition::Absent | Disposition::Release => Verdict::Pending,
+        Disposition::Withheld(field) => Verdict::Withheld(field),
+    }
+}
+
+#[derive(Default)]
+struct Findings {
+    verbs: Vec<String>,
+    flags: Vec<String>,
+    operands: Vec<String>,
+    arms: Vec<String>,
+    pending_verbs: BTreeSet<String>,
+    pending_flags: BTreeSet<String>,
+    pending_operands: BTreeSet<String>,
+    pending_arms: BTreeSet<String>,
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
     let positional = !args.is_empty();
     if positional && args.len() < 5 {
-        return Err("usage: check-front-door-verbs [readme pinned-readme disposition queue page...]".to_string());
+        return Err("usage: check-front-door-verbs [head pinned disposition queue page...]".to_string());
     }
-    let readme = if positional { args[0].clone() } else { README.to_string() };
-    // spec: installer/SPEC.md §The front door's verbs — the pinned sets are the tables at the tag the
-    // hosted pin names, or the positional file; an unresolvable tag leaves B dormant
-    let pinned_text: Option<(String, String)> = if positional {
-        Some((args[1].clone(), read(&args[1])?))
+    let head = Tree::Dir(if positional { args[0].clone() } else { ".".to_string() });
+    // spec: installer/SPEC.md §The front door's verbs — the pinned tree is the tag the hosted pin
+    // names, or the positional directory; an unresolvable tag leaves B dormant
+    let pinned_tree: Option<Tree> = if positional {
+        Some(Tree::Dir(args[1].clone()))
     } else {
-        match pinned_release::pinned_tag()? {
-            None => None,
-            Some(tag) => {
-                let text = pinned_release::show_at(&tag, README)?;
-                Some((tag, text))
-            }
-        }
+        pinned_release::pinned_tag()?.map(Tree::Tag)
     };
     let (disposition_path, queue_path) = if positional {
         (args[2].clone(), args[3].clone())
@@ -246,28 +531,45 @@ fn rule(args: &[String]) -> Result<i32, String> {
     };
 
     let (iteration, disp) = pinned_release::iteration_disposition(&disposition_path, &queue_path)?;
+    let seam = seam_path()?;
 
     let binary = binary_verbs();
     let binary_flags = binary_flags();
-    let readme_text = read(&readme)?;
-    let head: BTreeSet<String> = table(&readme, &readme_text)?.into_iter().collect();
+    let binary_arms = binary_arms();
+    let readme = head.path(README);
+    let readme_text = head.required(README)?;
+    let head_verbs: BTreeSet<String> = table(&readme, &readme_text)?.into_iter().collect();
     let head_flags = head_flags(&readme, &readme_text)?;
-    // spec: installer/SPEC.md §The front door's verbs — a tag carrying no flag table has the empty
-    // pinned flag set, never a dormancy
-    let pinned: Option<Pinned> = match &pinned_text {
-        Some((label, text)) => Some(Pinned {
-            label: label.clone(),
-            verbs: table(label, text)?.into_iter().collect(),
-            flags: flag_table(text).unwrap_or_default().into_iter().collect(),
-        }),
+    let head_profiles = profile_set(head.get(PROFILES)?);
+    let head_recipes = recipe_set(&head.path(&seam), head.get(&seam)?)?;
+    // spec: installer/SPEC.md §The front door's verbs — a tag carrying no flag table, roster or seam
+    // file has the empty set for it, never a dormancy
+    let pinned: Option<Pinned> = match &pinned_tree {
+        Some(t) => {
+            let label = t.label();
+            let text = t.required(README)?;
+            Some(Pinned {
+                verbs: table(&label, &text)?.into_iter().collect(),
+                flags: flag_table(&text).unwrap_or_default().into_iter().collect(),
+                profiles: profile_set(t.get(PROFILES)?),
+                recipes: recipe_set(&t.path(&seam), t.get(&seam)?)?,
+                arms: pinned_arms(t)?,
+                label,
+            })
+        }
         None => None,
     };
+    let flag_names: BTreeSet<String> = binary_flags
+        .iter()
+        .chain(pinned.iter().flat_map(|p| p.flags.iter()))
+        .map(|(_, f)| f.clone())
+        .collect();
 
     let mut a_findings: Vec<String> = Vec::new();
-    for v in binary.difference(&head) {
+    for v in binary.difference(&head_verbs) {
         a_findings.push(format!("  {}: the verb table lacks `{}`, which the binary's VERBS carries", readme, v));
     }
-    for v in head.difference(&binary) {
+    for v in head_verbs.difference(&binary) {
         a_findings.push(format!("  {}: the verb table lists `{}`, which the binary's VERBS does not carry", readme, v));
     }
     for (v, f) in binary_flags.difference(&head_flags) {
@@ -277,12 +579,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
         a_findings.push(format!("  {}: the flag table lists `{}` for `{}`, which the binary's FLAGS does not carry", readme, f, v));
     }
 
-    let mut b_findings: Vec<String> = Vec::new();
-    let mut unreleased_flags: Vec<String> = Vec::new();
+    let mut b = Findings::default();
     let mut lead_findings: Vec<String> = Vec::new();
-    let mut pending: BTreeSet<String> = BTreeSet::new();
-    let mut pending_flags: BTreeSet<String> = BTreeSet::new();
-    let (mut sites, mut flag_sites) = (0usize, 0usize);
+    let (mut sites, mut flag_sites, mut operand_sites, mut arm_sites) = (0usize, 0usize, 0usize, 0usize);
     for page in &pages {
         let text = read(page)?;
         for (n, code) in code_texts(&text) {
@@ -297,61 +596,98 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 let Tok::Verb(v, flags) = tok else { continue };
                 sites += 1;
                 flag_sites += flags.len();
+                operand_sites += flags.iter().filter(|(_, o)| o.is_some()).count();
                 let Some(p) = &pinned else { continue };
-                if !p.verbs.contains(&v) {
-                    if !binary.contains(&v) {
-                        b_findings.push(format!(
-                            "  {}:{}: `{}` is advertised, and neither the pinned release {} nor the binary's VERBS carries it",
-                            page, n, v, p.label
-                        ));
-                    } else {
-                        match &disp {
-                            Disposition::Absent | Disposition::Release => {
-                                pending.insert(v.clone());
-                            }
-                            Disposition::Withheld(field) => b_findings.push(format!(
-                                "  {}:{}: `{}` is advertised, and the pinned release {} lacks it while iteration {}'s disposition is {}",
-                                page, n, v, p.label, iteration, field
-                            )),
-                        }
+                match verdict(&disp, p.verbs.contains(&v), binary.contains(&v)) {
+                    Verdict::Released => {}
+                    Verdict::Pending => {
+                        b.pending_verbs.insert(v.clone());
                     }
+                    Verdict::Withheld(field) => b.verbs.push(format!(
+                        "  {}:{}: `{}` is advertised, and the pinned release {} lacks it while iteration {}'s disposition is {}",
+                        page, n, v, p.label, iteration, field
+                    )),
+                    Verdict::Unknown => b.verbs.push(format!(
+                        "  {}:{}: `{}` is advertised, and neither the pinned release {} nor the binary's VERBS carries it",
+                        page, n, v, p.label
+                    )),
                 }
-                for f in flags {
+                for (f, operand) in flags {
                     let pair = (v.clone(), f.clone());
-                    if p.flags.contains(&pair) {
-                        continue;
-                    }
-                    if !binary_flags.contains(&pair) {
-                        unreleased_flags.push(format!(
-                            "  {}:{}: `{} {}` is advertised, and neither the pinned release {} nor the binary's FLAGS carries it",
-                            page, n, v, f, p.label
-                        ));
-                        continue;
-                    }
-                    match &disp {
-                        Disposition::Absent | Disposition::Release => {
-                            pending_flags.insert(format!("{} {}", v, f));
+                    match verdict(&disp, p.flags.contains(&pair), binary_flags.contains(&pair)) {
+                        Verdict::Released => {}
+                        Verdict::Pending => {
+                            b.pending_flags.insert(format!("{} {}", v, f));
                         }
-                        Disposition::Withheld(field) => unreleased_flags.push(format!(
+                        Verdict::Withheld(field) => b.flags.push(format!(
                             "  {}:{}: `{} {}` is advertised, and the pinned release {} lacks it while iteration {}'s disposition is {}",
                             page, n, v, f, p.label, iteration, field
+                        )),
+                        Verdict::Unknown => b.flags.push(format!(
+                            "  {}:{}: `{} {}` is advertised, and neither the pinned release {} nor the binary's FLAGS carries it",
+                            page, n, v, f, p.label
+                        )),
+                    }
+                    let Some(op) = operand else { continue };
+                    let (kind, pinned_set, head_set) = if f == PROFILE_FLAG {
+                        ("profile", &p.profiles, &head_profiles)
+                    } else {
+                        ("recipe", &p.recipes, &head_recipes)
+                    };
+                    match verdict(&disp, pinned_set.contains(&op), head_set.contains(&op)) {
+                        Verdict::Released => {}
+                        Verdict::Pending => {
+                            b.pending_operands.insert(format!("{} {}", f, op));
+                        }
+                        Verdict::Withheld(field) => b.operands.push(format!(
+                            "  {}:{}: `{} {}` is advertised, and the pinned release {} lacks the {} `{}` while iteration {}'s disposition is {}",
+                            page, n, f, op, p.label, kind, op, iteration, field
+                        )),
+                        Verdict::Unknown => b.operands.push(format!(
+                            "  {}:{}: `{} {}` is advertised, and neither the pinned release {} nor HEAD's {} set carries `{}`",
+                            page, n, f, op, p.label, kind, op
                         )),
                     }
                 }
             }
         }
+        for (n, arm) in advertised_arms(page, &text, &flag_names) {
+            arm_sites += 1;
+            let Some(p) = &pinned else { continue };
+            match verdict(&disp, p.arms.contains(&arm), binary_arms.contains(&arm)) {
+                Verdict::Released => {}
+                Verdict::Pending => {
+                    b.pending_arms.insert(arm);
+                }
+                Verdict::Withheld(field) => b.arms.push(format!(
+                    "  {}:{}: the arm `{}` is advertised, and the pinned release {} lacks it while iteration {}'s disposition is {}",
+                    page, n, arm, p.label, iteration, field
+                )),
+                Verdict::Unknown => b.arms.push(format!(
+                    "  {}:{}: the arm `{}` is advertised, and neither the pinned release {} nor the binary's arm table carries it",
+                    page, n, arm, p.label
+                )),
+            }
+        }
     }
 
-    if !a_findings.is_empty() || !b_findings.is_empty() || !unreleased_flags.is_empty() || !lead_findings.is_empty() {
-        println!("{}: the front door advertises a verb or flag its pinned release does not carry, leads a route with a flag, or a table is not the binary's roster (installer/SPEC.md §The front door's verbs):", NAME);
-        for f in b_findings.iter().chain(&unreleased_flags).chain(&lead_findings).chain(&a_findings) {
+    let red = [&b.verbs, &b.flags, &b.operands, &b.arms, &lead_findings, &a_findings];
+    if red.iter().any(|f| !f.is_empty()) {
+        println!("{}: the front door advertises a verb, flag, operand or arm its pinned release does not carry, leads a route with a flag, or a table is not the binary's roster (installer/SPEC.md §The front door's verbs):", NAME);
+        for f in red.iter().flat_map(|f| f.iter()) {
             println!("{}", f);
         }
-        if !b_findings.is_empty() {
+        if !b.verbs.is_empty() {
             println!("  help: release the verb so the pin carries it (RELEASING.md), or withdraw the advertisement from the page.");
         }
-        if !unreleased_flags.is_empty() {
+        if !b.flags.is_empty() {
             println!("  help: release the flag so the pin carries it (RELEASING.md), or withdraw it from the page.");
+        }
+        if !b.operands.is_empty() {
+            println!("  help: release the profile or recipe so the pin carries it (RELEASING.md), or withdraw it from the page.");
+        }
+        if !b.arms.is_empty() {
+            println!("  help: release the arm so the pin carries it (RELEASING.md), or withdraw it from the page.");
         }
         if !lead_findings.is_empty() {
             println!("  help: name the verb before its flags, as `sh -s -- init --profile prose`: the one-line install runs `init` only on an empty argument list, and the bootstrap forwards a leading flag unchanged.");
@@ -366,17 +702,23 @@ fn rule(args: &[String]) -> Result<i32, String> {
         None => "B dormant — the pinned tag does not resolve here".to_string(),
     };
     let mut pending_state = String::new();
-    if !pending.is_empty() {
-        pending_state.push_str(&format!(", pending release: {}", pending.into_iter().collect::<Vec<_>>().join(" ")));
-    }
-    if !pending_flags.is_empty() {
-        pending_state.push_str(&format!(", pending flags: {}", pending_flags.into_iter().collect::<Vec<_>>().join(", ")));
+    for (label, set, sep) in [
+        ("pending release", &b.pending_verbs, " "),
+        ("pending flags", &b.pending_flags, ", "),
+        ("pending operands", &b.pending_operands, ", "),
+        ("pending arms", &b.pending_arms, " "),
+    ] {
+        if !set.is_empty() {
+            pending_state.push_str(&format!(", {}: {}", label, set.iter().cloned().collect::<Vec<_>>().join(sep)));
+        }
     }
     println!(
-        "FRONT-DOOR-VERBS: clean ({} page(s), {} advertised site(s), {} advertised flag(s), {}, tables equal to VERBS and FLAGS{})",
+        "FRONT-DOOR-VERBS: clean ({} page(s), {} advertised site(s), {} advertised flag(s), {} advertised operand(s), {} advertised arm(s), {}, tables equal to VERBS and FLAGS{})",
         pages.len(),
         sites,
         flag_sites,
+        operand_sites,
+        arm_sites,
         pinned_state,
         pending_state
     );
@@ -391,8 +733,11 @@ mod tests {
         Tok::Verb(s.to_string(), Vec::new())
     }
 
-    fn vf(s: &str, flags: &[&str]) -> Tok {
-        Tok::Verb(s.to_string(), flags.iter().map(|f| f.to_string()).collect())
+    fn vf(s: &str, flags: &[(&str, Option<&str>)]) -> Tok {
+        Tok::Verb(
+            s.to_string(),
+            flags.iter().map(|(f, o)| (f.to_string(), o.map(str::to_string))).collect(),
+        )
     }
 
     // spec: installer/SPEC.md §The front door's verbs — each route, a leading flag, the help flag, a
@@ -418,19 +763,94 @@ mod tests {
     }
 
     // spec: installer/SPEC.md §The front door's verbs — the flags after a verb, cut at `=`, the help
-    // arm read as none, and the walk ending at a separator or a comment
+    // arm read as none, and the walk ending at a stop token
     #[test]
-    fn the_flag_walk_reads_to_the_first_separator() {
+    fn the_flag_walk_reads_to_the_first_stop_token() {
+        assert_eq!(advertised("checkwright init --help --dry-run"), vec![vf("init", &[("--dry-run", None)])]);
+        assert_eq!(advertised("sh -s -- init --force | tee log --no"), vec![vf("init", &[("--force", None)])]);
+        assert_eq!(advertised("checkwright init --force # --no-commit"), vec![vf("init", &[("--force", None)])]);
+        assert_eq!(advertised("checkwright init > out --x"), vec![v("init")]);
+        assert_eq!(
+            advertised("checkwright init --force && git log --oneline"),
+            vec![vf("init", &[("--force", None)])]
+        );
+        assert_eq!(advertised("checkwright <verb> --force"), vec![Tok::Placeholder]);
+    }
+
+    // spec: installer/SPEC.md §The front door's verbs — the operand of `--profile` and `--recipe`,
+    // in its `=` and next-token forms; a placeholder, a stop token and a following flag carry none,
+    // and no other flag's value is read
+    #[test]
+    fn the_operand_walk_reads_a_profile_or_recipe_value() {
         assert_eq!(
             advertised("sh -s -- init --profile full --recipe=speckit"),
-            vec![vf("init", &["--profile", "--recipe"])]
+            vec![vf("init", &[("--profile", Some("full")), ("--recipe", Some("speckit"))])]
         );
-        assert_eq!(advertised("checkwright init --help --dry-run"), vec![vf("init", &["--dry-run"])]);
-        assert_eq!(advertised("sh -s -- init --force | tee log --no"), vec![vf("init", &["--force"])]);
-        assert_eq!(advertised("checkwright init --force # --no-commit"), vec![vf("init", &["--force"])]);
-        assert_eq!(advertised("checkwright init > out --x"), vec![v("init")]);
-        assert_eq!(advertised("checkwright init --force && git log --oneline"), vec![vf("init", &["--force"])]);
-        assert_eq!(advertised("checkwright <verb> --force"), vec![Tok::Placeholder]);
+        assert_eq!(advertised("checkwright init --profile <profile>"), vec![vf("init", &[("--profile", None)])]);
+        assert_eq!(advertised("checkwright init --recipe=<name>"), vec![vf("init", &[("--recipe", None)])]);
+        assert_eq!(advertised("checkwright init --profile | x"), vec![vf("init", &[("--profile", None)])]);
+        assert_eq!(advertised("checkwright init --profile"), vec![vf("init", &[("--profile", None)])]);
+        assert_eq!(
+            advertised("checkwright init --recipe --force"),
+            vec![vf("init", &[("--recipe", None), ("--force", None)])]
+        );
+        assert_eq!(
+            advertised("checkwright init --with-kit drift-kit"),
+            vec![vf("init", &[("--with-kit", None)])]
+        );
+    }
+
+    // spec: installer/SPEC.md §The front door's verbs — an inline span's leading `--` token, `--emit
+    // <name>` normalized, an installer flag and a placeholder skipped, fenced lines and the checkout
+    // section unread
+    #[test]
+    fn the_arm_read_takes_inline_spans_outside_the_checkout_section() {
+        let flags: BTreeSet<String> = ["--profile".to_string()].into_iter().collect();
+        let page = "# p\n\nRun `--emit env-probe`, `--measure-commit` or `--run x`; pass `--profile prose`.\n\
+                    Not `--emit <name>`, nor `checkwright --run`.\n\n```sh\n--usage-poll\n```\n\n\
+                    ## This repo, governed\n\n`--install-hooks`\n\n### Sub\n\n`--run-demo`\n\n## After\n\n`--list`\n";
+        let arms = |p: &str| -> Vec<(usize, String)> { advertised_arms(p, page, &flags) };
+        let s = |n: usize, a: &str| (n, a.to_string());
+        let outside = vec![s(3, "--emit-env-probe"), s(3, "--measure-commit"), s(3, "--run"), s(20, "--list")];
+        assert_eq!(arms("README.md"), outside);
+        let mut everywhere = outside.clone();
+        everywhere.insert(3, s(12, "--install-hooks"));
+        everywhere.insert(4, s(16, "--run-demo"));
+        assert_eq!(arms("docs/install.md"), everywhere);
+    }
+
+    // spec: installer/SPEC.md §The front door's verbs — the extractor applied to the crate's own two
+    // source files yields exactly the in-process arm set, so a reshaped array reds where it lands
+    #[test]
+    fn the_arm_extractor_equals_the_binarys_own_arm_set() {
+        let got = arm_table(include_str!("../emit/mod.rs"), include_str!("../main.rs"));
+        assert_eq!(got, Some(binary_arms()));
+    }
+
+    // spec: installer/SPEC.md §The front door's verbs — a nested literal and a comment are skipped,
+    // and an absent or memberless array is no arm set
+    #[test]
+    fn the_arm_extractor_takes_each_tuples_first_literal() {
+        let emit = "pub const ARMS: &[(&str, Arm, &[&str])] = &[\n    // \"--commented\"\n    (\"--a\", Arm::Emit(f, Grammar::Flags(&[\"--write\"])), &[\"K\"]),\n    (\n        \"--b\",\n        Arm::Run(g),\n        &[],\n    ),\n];\n";
+        let main = "const TOP_LEVEL_FLAGS: &[&str] = &[\"--help\", \"-h\"];\n";
+        let set = |xs: &[&str]| -> BTreeSet<String> { xs.iter().map(|x| x.to_string()).collect() };
+        assert_eq!(arm_table(emit, main), Some(set(&["--a", "--b", "--help", "-h"])));
+        assert_eq!(arm_table("", main), None);
+        assert_eq!(arm_table("pub const ARMS: &[(&str,)] = &[];\n", main), None);
+        assert_eq!(arm_table(emit, "const TOP_LEVEL_FLAGS: &[&str] = &[];\n"), None);
+    }
+
+    // spec: installer/SPEC.md §The front door's verbs — the profile roster's names with the derived
+    // one, and the recipe knob's keys, each empty where the file is absent
+    #[test]
+    fn the_operand_sets_read_the_roster_and_the_seam() {
+        let set = |xs: &[&str]| -> BTreeSet<String> { xs.iter().map(|x| x.to_string()).collect() };
+        assert_eq!(profile_set(Some("# c\nstarter\ta\nprose\tb # note\n".to_string())), set(&["starter", "prose", "full"]));
+        assert_eq!(profile_set(None), set(&[]));
+        let seam = "GATE_SDK_PAYLOAD_RECIPES[speckit] = x\nGATE_SDK_PAYLOAD_LICENSE = y\nGATE_SDK_PAYLOAD_RECIPES[openspec] = z\n";
+        assert_eq!(recipe_set("s", Some(seam.to_string())), Ok(set(&["speckit", "openspec"])));
+        assert_eq!(recipe_set("s", None), Ok(set(&[])));
+        assert!(recipe_set("s", Some("no equals here\n".to_string())).is_err());
     }
 
     // spec: installer/SPEC.md §The front door's verbs — the table whose header's first cell is

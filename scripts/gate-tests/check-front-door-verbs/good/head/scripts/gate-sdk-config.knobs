@@ -1,0 +1,2 @@
+GATE_SDK_PAYLOAD_RECIPES[openspec] = companion/openspec/recipe
+GATE_SDK_PAYLOAD_RECIPES[speckit] = companion/speckit/recipe

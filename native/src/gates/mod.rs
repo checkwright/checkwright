@@ -1763,7 +1763,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-front-door-verbs",
         front_door_verbs::run,
         &[],
-        &["QUEUE_KIT_QUEUE_FILE"],
+        &["GATE_SDK_GATES_DIR", "QUEUE_KIT_QUEUE_FILE"],
         "-",
         &[("git", "")],
     ),

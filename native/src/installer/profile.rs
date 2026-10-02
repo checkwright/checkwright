@@ -26,6 +26,10 @@ fn rows(installer: &Path) -> Vec<(String, String)> {
     let Ok(text) = std::fs::read_to_string(installer.join("profiles.list")) else {
         return Vec::new();
     };
+    rows_in(&text)
+}
+
+fn rows_in(text: &str) -> Vec<(String, String)> {
     text.lines()
         .filter_map(|line| {
             let body = match line.find('#') {
@@ -43,8 +47,18 @@ fn rows(installer: &Path) -> Vec<(String, String)> {
 
 // spec: installer/SPEC.md §Profiles — every selectable profile, the derived one last.
 pub fn names(installer: &Path) -> Vec<String> {
+    names_of(rows(installer))
+}
+
+// spec: installer/SPEC.md §The front door's verbs — the same names off a roster's text, the form a
+// reader of a release's copy at its tag takes
+pub fn names_in(text: &str) -> Vec<String> {
+    names_of(rows_in(text))
+}
+
+fn names_of(rows: Vec<(String, String)>) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
-    for (p, _) in rows(installer) {
+    for (p, _) in rows {
         if !p.is_empty() && !out.contains(&p) {
             out.push(p);
         }
