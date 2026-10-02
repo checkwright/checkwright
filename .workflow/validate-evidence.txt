@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+gate-sdk-value-pass gates sha256=b4e9a6f8ca8a755f667accaddbf7ac654ed6bcadf2d40fc373c0342f360d0cf7 pass=148 fail=0 ignore=0 verdict=clean 2026-10-02
+gate-sdk-value-pass gate_sdk sha256=5dd4867ce7d597e3acd2fa303c310f044a08712faa3896899ea2832d543a3848 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+gate-sdk-value-pass canon_kit sha256=9ded695f71c62d1a057f2305280bdec741e5de304cdaa10f982c496574b48323 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+gate-sdk-value-pass context_kit sha256=a72a655fbdc2336af37022b95846efa73ffc06864ae2241f7ed48d2867d96cc0 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+gate-sdk-value-pass delegation_kit sha256=e8b7dacc5b3a03c2084bd61274ee3c701400be4001eeaafa4126bc7f4b710363 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+gate-sdk-value-pass doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+gate-sdk-value-pass evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+gate-sdk-value-pass guard_kit sha256=01d94b4120e133665e01946fe44d31a730d2c6cdfd1570e5ce6b96a7a1b30e1b pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+gate-sdk-value-pass lifecycle_kit sha256=0a16a2be3f1e408582252ab47d92fd8628178950f6367b1711422c95d7a0d8b0 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+gate-sdk-value-pass queue_kit sha256=254333a369dea6280bbb8ede558b56de8b5fcfb334b35f4cf49256502e871743 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+gate-sdk-value-pass site_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+gate-sdk-value-pass scripts sha256=49dacb217bc9bf8c6be056cfe56c9b86206a045896bf399678cdc401a89e2bde pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+gate-sdk-value-pass guard_tests sha256=d43280c2ec08eb5164bc55f3dd0cc77d3965a86793dfba4f9ffce11ed41bcd97 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+gate-sdk-value-pass demo sha256=b0a6bb3fb395fe52cc07f75312e8f11039e57777fceb2c57bb3b31044fe83d16 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+gate-sdk-value-pass installer_smoke sha256=166d6bf51166c5a641f0aa9c95bb2ed2d468e475cbc20673f809f9835cd37b02 pass=25 fail=0 ignore=0 verdict=clean 2026-10-02
+gate-sdk-value-pass consumer_smoke sha256=8611292530465f41d2e0664a4f910b4775ba0644a54fed5cd347f941884813f2 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+gate-sdk-value-pass upgrade sha256=638c028124e10926b200e67d25d70b7b701d4d05be9acbf850b19dd83c924115 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+gate-sdk-value-pass agents_md_smoke sha256=7766877d48f02e009bf5b86e649d979f8ef8b7444d8d8f7fe6d88ddc13c7ea42 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+gate-sdk-value-pass index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+gate-sdk-value-pass native_crate sha256=69ed8d7af323101b6e516e702eb7207ba64df3236573cc82b5ac07dc24552fae pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+gate-sdk-value-pass projection_witness sha256=a35019ce4e5d047f27c94e1873a452eb3be8553836f139356cf7ff1028b95fc9 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
