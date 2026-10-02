@@ -56,6 +56,22 @@ A discarded finding has no durable disposition, so it is re-filed. A drain disca
 
 **Selected 2026-10-02 for consumer-smoke-driver-pass, operator direction lead-relayed (not a ruling):** a feature; its consumer-smoke leg is written in [compiled-consumer-smoke-driver](#compiled-consumer-smoke-driver)'s driver, so it lands after that driver and rides its push.
 
+### compiled-consumer-smoke-driver
+
+[spec: SPEC-installer-smoke-driver.md]
+
+the consumer smoke has two drivers. native-hook-customer-legs chose a PowerShell driver over the entry's five coverage classes, so installer/consumer-smoke/run-smoke.sh and run-smoke.ps1 both spell init, battery, hooks, upgrade and uninstall, and the arms installer/SPEC.md §The consumer smoke names as staying on the unix legs do not run on native Windows.
+
+**Deliverable:** one compiled driver on every leg, replacing both scripts.
+
+**The driver also owns the nested batteries' environment.** run-smoke.sh re-runs a battery inside each scratch consumer under the invoker's environment with only `PATH` overridden, so an exported `EVIDENCE_KIT_*_FILE`, `EVIDENCE_KIT_LOCK_FILE`, `GATE_SDK_TMP_DIR` or other path scalar redirects the nested gates to the outer repo's files or a wrong sandbox path; gate-sdk/lib/test-hermetic.sh pins this for gate-tests suites only. The compiled driver scrubs those scalars. Attached 2026-10-01 at context-kit-value-pass' close on the operator's direction of that day, lead-relayed (not a ruling); the residual of the deleted `nested-battery-env-inheritance-invisible`, whose false-clean premise is unreachable. Re-verified: no `unset` or `env -u` reaches a nested battery call. Probed 2026-10-02 at spec: an exported `EVIDENCE_KIT_MANIFEST_FILE` redirects `check-evidence-manifest`, which reports the redirected path missing.
+
+**Cost while deferred:** two drivers held in step by nobody, and Windows loses those arms. Filed 2026-09-29 to the gap inbox at native-hook-customer-legs' spec; promoted 2026-09-29 at its close: →fix fails because the driver is new mechanism, →forward because no ruling is owed. Re-verified: both scripts exist (2015 and 232 lines). Owner lookup: `consumer smoke`, `run-smoke.ps1`, `smoke driver` in this file — none; owner installer/SPEC.md §The consumer smoke.
+
+**Selected 2026-10-02 for consumer-smoke-driver-pass, operator direction lead-relayed (not a ruling):** a feature, landing first of the smoke-touching units, ahead of [kit-log-declaration-transport](#kit-log-declaration-transport)'s smoke leg and [installer-smoke-brevity](#installer-smoke-brevity).
+
+**Push need (2026-10-02, inside the budget):** one mid-iteration push, since its native-Windows and macOS legs run only in CI; with the closing push the set needs 2 against a budget of one to two.
+
 ## Technical Debt
 
 ### installer-smoke-brevity
@@ -469,24 +485,6 @@ the operator states that verification and workflow are fully decoupled, each shi
 **Deliverable:** the leg's oracles runnable locally before a package change commits, or the reader refusing what a YAML plain scalar cannot carry, with a `bad/` fixture holding the `: ` case.
 
 **Cost while deferred:** a front-matter slip is caught only by a push, which spends a hotfix from the budget. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' close; promoted 2026-09-28 at the next iteration's scope: →fix fails because a stricter reader changes a shipped gate's verdict. Re-verified: the reader above, and `.github/workflows/gates.yml` installs `skills-ref` in CI only. Owner lookup: `front matter`, `skills-ref`, `yaml` in this file — only the icebox's template-copy-parity-yaml-widening, DISTINCT (template copies); owner plugin/SPEC.md §check-plugin-parity.
-
-### compiled-consumer-smoke-driver
-
-[cost: iteration/high] [surface: installer]
-
-the consumer smoke has two drivers. native-hook-customer-legs chose a PowerShell driver over the entry's five coverage classes, so installer/consumer-smoke/run-smoke.sh and run-smoke.ps1 both spell init, battery, hooks, upgrade and uninstall, and the arms installer/SPEC.md §The consumer smoke names as staying on the unix legs do not run on native Windows.
-
-**Deliverable:** one compiled driver on every leg, replacing both scripts.
-
-**The driver also owns the nested batteries' environment.** run-smoke.sh re-runs a battery inside each scratch consumer under the invoker's environment with only `PATH` overridden, so an exported `EVIDENCE_KIT_*_FILE`, `EVIDENCE_KIT_LOCK_FILE`, `GATE_SDK_TMP_DIR` or other path scalar redirects the nested gates to the outer repo's files or a wrong sandbox path; gate-sdk/lib/test-hermetic.sh pins this for gate-tests suites only. The compiled driver scrubs those scalars. Attached 2026-10-01 at context-kit-value-pass' close on the operator's direction of that day, lead-relayed (not a ruling); the residual of the deleted `nested-battery-env-inheritance-invisible`, whose false-clean premise is unreachable. Re-verified: no `unset` or `env -u` reaches a nested battery call.
-
-**Inferred, not run:** that a nested evidence gate reads the redirected file.
-
-**Cost while deferred:** two drivers held in step by nobody, and Windows loses those arms. Filed 2026-09-29 to the gap inbox at native-hook-customer-legs' spec; promoted 2026-09-29 at its close: →fix fails because the driver is new mechanism, →forward because no ruling is owed. Re-verified: both scripts exist (2015 and 232 lines). Owner lookup: `consumer smoke`, `run-smoke.ps1`, `smoke driver` in this file — none; owner installer/SPEC.md §The consumer smoke.
-
-**Selected 2026-10-02 for consumer-smoke-driver-pass, operator direction lead-relayed (not a ruling):** a feature, landing first of the smoke-touching units, ahead of [kit-log-declaration-transport](#kit-log-declaration-transport)'s smoke leg and [installer-smoke-brevity](#installer-smoke-brevity).
-
-**Push need (2026-10-02, inside the budget):** one mid-iteration push, since its native-Windows and macOS legs run only in CI; with the closing push the set needs 2 against a budget of one to two.
 
 ### native-executable-git-hooks
 
