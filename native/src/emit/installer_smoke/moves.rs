@@ -11,7 +11,7 @@ use crate::{programs, walk};
 use std::path::Path;
 
 fn cw(state: &Run, c: &str, args: &[&str]) -> Result<crate::proc::Merged, Outcome> {
-    entry_run(&Entry::Bin(state.cw.clone()), c, args, &[])
+    entry_run(&state.installed(), c, args, &[])
 }
 
 fn init_ok(state: &Run, c: &str, args: &[&str], why: &str) -> Result<String, Outcome> {
@@ -91,7 +91,7 @@ pub(super) fn hooked_move(state: &mut Run) -> Step {
         ));
     }
     append(&lib, "# A gate-library change this release ships.\n")?;
-    let m = entry_run(&Entry::Sh(format!("{}/package/bin/checkwright.sh", hup)), &hc, &["init"], &[])?;
+    let m = entry_run(&Entry::Extracted(format!("{}/package", hup)), &hc, &["init"], &[])?;
     if !m.succeeded() {
         return Err(failed(&m, format!(
             "the hooked upgrade to {} exited non-zero — the upgrade's own commit was refused by a gate it vendors",

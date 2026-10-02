@@ -226,7 +226,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | [gate-sdk](gate-sdk/index.md) | scripts |
 | [gate-sdk](gate-sdk/index.md) | guard_tests |
 | [gate-sdk](gate-sdk/index.md) | demo |
-| (consumer) | installer_smoke |
+| [gate-sdk](gate-sdk/index.md) | installer_smoke |
 | [gate-sdk](gate-sdk/index.md) | consumer_smoke |
 | [gate-sdk](gate-sdk/index.md) | upgrade |
 | [gate-sdk](gate-sdk/index.md) | agents_md_smoke |

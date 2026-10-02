@@ -22,7 +22,7 @@
 
 ### compiled-consumer-smoke-driver
 
-[spec: SPEC-installer-smoke-driver.md]
+[spec: installer/SPEC.md]
 
 the consumer smoke has two drivers. native-hook-customer-legs chose a PowerShell driver over the entry's five coverage classes, so installer/consumer-smoke/run-smoke.sh and run-smoke.ps1 both spell init, battery, hooks, upgrade and uninstall, and the arms installer/SPEC.md §The consumer smoke names as staying on the unix legs do not run on native Windows.
 

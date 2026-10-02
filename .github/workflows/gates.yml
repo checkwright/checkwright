@@ -177,7 +177,7 @@ jobs:
           log="$RUNNER_TEMP/installer-smoke.log"
           set +e
           INSTALLER_SMOKE_ARTIFACTS_DIR="$SMOKE_ARTIFACTS" \
-            bash installer/consumer-smoke/run-smoke.sh 2>&1 | tee "$log"
+            bash gate-sdk/bin/run-gates.sh --installer-smoke 2>&1 | tee "$log"
           rc="${PIPESTATUS[0]}"
           set -e
           echo "installer_smoke exited $rc; the verdict below is the baseline diff, not that status"
@@ -422,7 +422,7 @@ jobs:
         include: ${{ fromJSON(needs.native-artifacts-roster.outputs.pwsh_legs) }}
     runs-on: ${{ matrix.runner }}
     continue-on-error: ${{ matrix.held }}
-    timeout-minutes: 45
+    timeout-minutes: 120
     permissions:
       contents: read
     env:
@@ -483,15 +483,6 @@ jobs:
           [[ ${#tarballs[@]} -eq 1 ]] || { echo "expected one tarball, found ${#tarballs[@]}"; exit 2; }
           mkdir -p "$tmp/pkg"
           tar -xzf "${tarballs[0]}" -C "$tmp/pkg" || exit 2
-          # spec: installer/SPEC.md §The consumer smoke — the upgrade arm's second tarball, the next patch version
-          next="$(awk -F. '{ printf "%d.%d.%d", $1, $2, $3 + 1 }' <<<"${version%%[-+]*}")"
-          mkdir -p "$tmp/upgrade"
-          GATE_SDK_NATIVE_TARGETS_FILE="$roster" INSTALLER_PACK_TMP_DIR="$tmp" \
-            bash gate-sdk/bin/run-gates.sh --pack-installer --root "$PWD" --version "$next" \
-              --out "$tmp/upgrade" --artifacts "$art" || exit 2
-          up=("$tmp"/upgrade/*.tgz)
-          [[ ${#up[@]} -eq 1 && -f "${up[0]}" ]] || { echo "expected one upgrade tarball in $tmp/upgrade"; exit 2; }
-          tar -xzf "${up[0]}" -C "$tmp/upgrade" || exit 2
           {
             echo "PWSH_PKG=$(cygpath -w "$tmp/pkg/package")"
             echo "PWSH_SCRATCH=$(cygpath -w "$tmp")"
@@ -499,8 +490,8 @@ jobs:
             echo "PWSH_BIN=$bin"
             echo "PWSH_TARBALL=$(cygpath -w "${tarballs[0]}")"
             echo "PWSH_VERSION=$version"
-            echo "PWSH_UPGRADE_PKG=$(cygpath -w "$tmp/upgrade/package")"
-            echo "PWSH_UPGRADE_VERSION=$next"
+            echo "PWSH_ARTIFACTS=$(cygpath -w "$art")"
+            echo "PWSH_ROSTER=$(cygpath -w "$roster")"
           } >> "$GITHUB_ENV"
 
       # spec: installer/SPEC.md §The install boundary — each step asserted on the observable that distinguishes it
@@ -1014,15 +1005,16 @@ jobs:
           if ($bad -gt 0) { exit 1 }
           Write-Host "5.1 reads the live one-liner as a string that parses, changed on comment lines only"
 
-      # spec: installer/SPEC.md §The consumer smoke — the Windows driver: init, battery, hooks, upgrade, uninstall
-      - name: consumer smoke under PowerShell
+      # spec: installer/SPEC.md §The consumer smoke — each platform leg steers the roster at its host
+      - name: install smoke on a native Windows host
         shell: pwsh
+        env:
+          GATE_SDK_NATIVE_TARGETS_FILE: ${{ env.PWSH_ROSTER }}
+          INSTALLER_SMOKE_TMP_DIR: ${{ env.PWSH_SCRATCH }}
+          INSTALLER_SMOKE_ARTIFACTS_DIR: ${{ env.PWSH_ARTIFACTS }}
         run: |
-          $smoke = @{
-              Package = $env:PWSH_PKG; Scratch = $env:PWSH_SCRATCH; Version = $env:PWSH_VERSION
-              Target = $env:PWSH_TARGET; UpgradePackage = $env:PWSH_UPGRADE_PKG; UpgradeVersion = $env:PWSH_UPGRADE_VERSION
-          }
-          ./installer/consumer-smoke/run-smoke.ps1 @smoke
+          ./gate-sdk/bin/run-gates.ps1 --installer-smoke
+          exit $LASTEXITCODE
 
   # spec: gate-sdk/SPEC.md §Consumer payload — the release-shaped producer: one build body, no cross-build
   # spec: installer/SPEC.md §The consumer smoke — the producer's matrix is the declaration, not the roster
@@ -1684,7 +1676,7 @@ jobs:
           log="$RUNNER_TEMP/installer-smoke-macos.log"
           GATE_SDK_NATIVE_TARGETS_FILE="$roster" INSTALLER_SMOKE_TMP_DIR="$RUNNER_TEMP" \
             INSTALLER_SMOKE_ARTIFACTS_DIR="$SMOKE_ARTIFACTS" \
-            bash installer/consumer-smoke/run-smoke.sh 2>&1 | tee "$log"
+            bash gate-sdk/bin/run-gates.sh --installer-smoke 2>&1 | tee "$log"
           rc="${PIPESTATUS[0]}"
           echo "== verdict =="
           echo "installer_smoke on macOS exited $rc"
@@ -1841,7 +1833,7 @@ jobs:
           log="$RUNNER_TEMP/installer-smoke-macos-intel.log"
           GATE_SDK_NATIVE_TARGETS_FILE="$roster" INSTALLER_SMOKE_TMP_DIR="$RUNNER_TEMP" \
             INSTALLER_SMOKE_ARTIFACTS_DIR="$SMOKE_ARTIFACTS" \
-            bash installer/consumer-smoke/run-smoke.sh 2>&1 | tee "$log"
+            bash gate-sdk/bin/run-gates.sh --installer-smoke 2>&1 | tee "$log"
           rc="${PIPESTATUS[0]}"
           echo "== verdict =="
           echo "installer_smoke on Intel macOS exited $rc"
@@ -1936,7 +1928,7 @@ jobs:
           log="$RUNNER_TEMP/installer-smoke-linux-arm64.log"
           GATE_SDK_NATIVE_TARGETS_FILE="$roster" INSTALLER_SMOKE_TMP_DIR="$RUNNER_TEMP" \
             INSTALLER_SMOKE_ARTIFACTS_DIR="$SMOKE_ARTIFACTS" \
-            bash installer/consumer-smoke/run-smoke.sh 2>&1 | tee "$log"
+            bash gate-sdk/bin/run-gates.sh --installer-smoke 2>&1 | tee "$log"
           rc="${PIPESTATUS[0]}"
           echo "== verdict =="
           echo "installer_smoke on arm64 Linux exited $rc"

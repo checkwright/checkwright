@@ -206,7 +206,7 @@ mod tests {
         let driver = DRIVER.to_string();
         let dir = std::env::temp_dir().join("cw-parse-smoke-log");
         std::fs::create_dir_all(&dir).expect("scratch dir");
-        let dpath = dir.join("run-smoke.sh");
+        let dpath = dir.join("smoke-driver.sh");
         std::fs::write(&dpath, &driver).expect("write driver");
 
         let aborted = dir.join("aborted.log");
@@ -286,7 +286,7 @@ mod tests {
         );
         assert!(
             emit(&[
-                "/nonexistent/run-smoke.sh".to_string(),
+                "/nonexistent/smoke-driver.sh".to_string(),
                 "/nonexistent/run.log".to_string()
             ])
             .is_err(),

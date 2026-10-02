@@ -114,18 +114,6 @@ pub(super) fn declare() {
     print!("{}", declaration());
 }
 
-// spec: installer/SPEC.md §The consumer smoke — the programs the driver spawns beside the running
-// binary: git, npm and tar, and the host bootstrap's shell
-#[cfg(unix)]
-fn host_shell() -> programs::Program {
-    programs::SH
-}
-
-#[cfg(not(unix))]
-fn host_shell() -> programs::Program {
-    programs::PWSH
-}
-
 // spec: installer/SPEC.md §The consumer smoke — every precondition refuses at exit 2 before the
 // first arm: the scratch base and a set hand-off are directories, each program resolves, and the
 // tree the run packs is clean
@@ -143,7 +131,7 @@ pub(super) fn preflight(state: &mut Run) -> Step {
             return Err(refuse(format!("artifact hand-off not a directory: {}", d)));
         }
     }
-    for tool in [programs::GIT, programs::NPM, programs::TAR, host_shell()] {
+    for tool in [programs::GIT, programs::NPM, programs::TAR, super::consumer::host_shell()] {
         if !proc::on_path(&tool) {
             return Err(refuse(format!("{} not found on PATH — the smoke cannot run.", tool)));
         }

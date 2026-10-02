@@ -221,10 +221,10 @@ mod tests {
     // it did not run, which is what tells a skip from a run
     #[test]
     fn the_skip_line_names_the_reason_and_the_command_not_run() {
-        let args = ["bash".to_string(), "run-smoke.sh".to_string()];
+        let args = ["bash".to_string(), "suite.sh".to_string()];
         assert_eq!(
             skip_line("no docker on PATH", &args),
-            "with-foreign-shells: skipped — no docker on PATH; bash run-smoke.sh not run"
+            "with-foreign-shells: skipped — no docker on PATH; bash suite.sh not run"
         );
     }
 

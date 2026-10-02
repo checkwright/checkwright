@@ -562,7 +562,7 @@ fn withholding(state: &Run, profile: &str, c: &str, lock_kits: &[String]) -> Ste
 // rather than read off a verdict
 pub(super) fn kit_roots(state: &Run, c: &str) -> Result<Vec<String>, Outcome> {
     let set = super::consumer::path_set(&state.run_path);
-    let done = super::in_consumer(&programs::BASH, &["gate-sdk/bin/run-gates.sh", "--emit", "kit-roots"], &set, c)?;
+    let done = super::consumer::front_end_split(c, &["--emit", "kit-roots"], &set)?;
     match done.stdout() {
         Some(o) => Ok(lines::of("resolved kit roots", o).into_iter().filter(|l| !l.is_empty()).collect()),
         None => Err(fail(format!(
@@ -578,11 +578,11 @@ pub(super) fn kit_roots(state: &Run, c: &str) -> Result<Vec<String>, Outcome> {
 fn queue(state: &Run, profile: &str, c: &str, lock: &Lock, want_kits: &[String]) -> Step {
     let payload = format!("{}/payload", state.pkg_root);
     let kits = want_kits.join(",");
-    let m = merged_in(
-        &programs::CHECKWRIGHT_GATES.at(state.cw.clone()),
+    let m = super::consumer::entry_run(
+        &state.installed(),
+        &state.scratch,
         &["--install", "queue-source", "--payload", &payload, "--kits", &kits],
         &[],
-        &state.scratch,
     )?;
     if !m.succeeded() {
         return Err(failed(&m, format!(

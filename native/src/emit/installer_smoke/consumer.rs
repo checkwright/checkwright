@@ -20,30 +20,80 @@ pub(super) fn path_set(path: &Option<String>) -> Vec<(String, String)> {
     path.iter().map(|p| ("PATH".to_string(), p.clone())).collect()
 }
 
+// spec: installer/SPEC.md §The consumer smoke — the host's bootstrap inside a package, the shell
+// that runs it and the argv that shell takes before the script: `sh <script>` on a unix host,
+// `pwsh -NoProfile -File <script>` on native Windows
 #[cfg(unix)]
-pub(super) fn sh() -> Result<Program, Outcome> {
-    Ok(programs::SH)
+pub(super) const BOOTSTRAP: &str = "bin/checkwright.sh";
+#[cfg(not(unix))]
+pub(super) const BOOTSTRAP: &str = "bin/checkwright.ps1";
+
+#[cfg(unix)]
+pub(super) fn host_shell() -> Program {
+    programs::SH
 }
 
 #[cfg(not(unix))]
-pub(super) fn sh() -> Result<Program, Outcome> {
-    Err(refuse("the extracted package's POSIX bootstrap is driven on a unix host only"))
+pub(super) fn host_shell() -> Program {
+    programs::PWSH
 }
 
+#[cfg(unix)]
+const SCRIPT_ARGS: &[&str] = &[];
+#[cfg(not(unix))]
+const SCRIPT_ARGS: &[&str] = &["-NoProfile", "-File"];
+
+// spec: installer/SPEC.md §The consumer smoke — the host shell's no-op, the control a mask proof
+// runs to show the masked PATH still starts the shell every bootstrap step needs
+#[cfg(unix)]
+pub(super) const SHELL_NOOP: &[&str] = &["-c", ":"];
+#[cfg(not(unix))]
+pub(super) const SHELL_NOOP: &[&str] = &["-NoProfile", "-Command", "exit 0"];
+
 // spec: installer/SPEC.md §The consumer smoke — one entry point run in one directory, the arm's
-// PATH and any value it sets in that child's environment
+// PATH and any value it sets in that child's environment; on a unix host the npm-installed package
+// is driven through its `.bin` entry, and every other entry through the host's bootstrap
 pub(super) fn entry_run(entry: &Entry, cwd: &str, args: &[&str], set: &[(String, String)]) -> Result<proc::Merged, Outcome> {
-    match entry {
-        Entry::Bin(p) => merged_in(&programs::CHECKWRIGHT_GATES.at(p.clone()), args, set, cwd),
-        Entry::Sh(p) => {
-            let mut argv = vec![p.as_str()];
-            argv.extend_from_slice(args);
-            merged_in(&sh()?, &argv, set, cwd)
-        }
+    if let (true, Entry::Installed { bin, .. }) = (cfg!(unix), entry) {
+        return merged_in(&programs::CHECKWRIGHT_GATES.at(bin.clone()), args, set, cwd);
     }
+    let script = entry.bootstrap();
+    let mut argv: Vec<&str> = SCRIPT_ARGS.to_vec();
+    argv.push(&script);
+    argv.extend_from_slice(args);
+    merged_in(&host_shell(), &argv, set, cwd)
+}
+
+// spec: installer/SPEC.md §The consumer smoke — a consumer's front end: `bash
+// gate-sdk/bin/run-gates.sh` on a unix host, and on native Windows `pwsh -NoProfile -File
+// gate-sdk/bin/run-gates.ps1`, the front end a PowerShell battery runs through
+#[cfg(unix)]
+fn front_end_argv<'a>(args: &[&'a str]) -> (Program, Vec<&'a str>) {
+    let mut argv = vec!["gate-sdk/bin/run-gates.sh"];
+    argv.extend_from_slice(args);
+    (programs::BASH, argv)
+}
+
+#[cfg(not(unix))]
+fn front_end_argv<'a>(args: &[&'a str]) -> (Program, Vec<&'a str>) {
+    let mut argv = vec!["-NoProfile", "-File", "gate-sdk/bin/run-gates.ps1"];
+    argv.extend_from_slice(args);
+    (programs::PWSH, argv)
+}
+
+// spec: installer/SPEC.md §The consumer smoke — the front end's split capture, for a reader of its
+// stdout alone
+pub(super) fn front_end_split(c: &str, args: &[&str], set: &[(String, String)]) -> Result<proc::Completed, Outcome> {
+    let (program, argv) = front_end_argv(args);
+    in_consumer(&program, &argv, set, c)
 }
 
 impl Run {
+    // spec: installer/SPEC.md §The consumer smoke — the npm-installed package as an entry point
+    pub(super) fn installed(&self) -> Entry {
+        Entry::Installed { bin: self.cw.clone(), package: self.pkg_root.clone() }
+    }
+
     pub(super) fn verb(&self, cwd: &str, args: &[&str]) -> Result<proc::Merged, Outcome> {
         self.verb_with(cwd, args, &[])
     }
@@ -57,9 +107,8 @@ impl Run {
     // spec: installer/SPEC.md §The consumer smoke — the battery or a front-end arm of the consumer
     // itself, through its vendored front-end under the arm's PATH
     pub(super) fn front_end(&self, cwd: &str, args: &[&str]) -> Result<proc::Merged, Outcome> {
-        let mut argv = vec!["gate-sdk/bin/run-gates.sh"];
-        argv.extend_from_slice(args);
-        merged_in(&programs::BASH, &argv, &path_set(&self.run_path), cwd)
+        let (program, argv) = front_end_argv(args);
+        merged_in(&program, &argv, &path_set(&self.run_path), cwd)
     }
 }
 
@@ -300,11 +349,7 @@ pub(super) fn files_under(root: &Path, ext: &str) -> Result<Vec<String>, Outcome
 // spec: installer/SPEC.md §The consumer smoke — where a program resolves on a PATH an arm built,
 // the crate's own PATH search with no spawn
 pub(super) fn resolves(program: &str, path: &str) -> Option<String> {
-    #[cfg(windows)]
-    let pathext = Some(std::env::var("PATHEXT").unwrap_or_default());
-    #[cfg(not(windows))]
-    let pathext: Option<String> = None;
-    proc::resolve_on_path(program, Some(std::ffi::OsStr::new(path)), pathext.as_deref(), proc::is_executable)
+    proc::resolve_as_spawned(program, std::ffi::OsStr::new(path))
 }
 
 pub(super) fn invoking_path() -> String {
@@ -319,7 +364,7 @@ pub(super) fn argv_program(cwd: &str, head: &str) -> Result<Program, Outcome> {
     }
     match head {
         "bash" => Ok(programs::BASH),
-        "sh" => sh(),
+        "sh" if cfg!(unix) => Ok(host_shell()),
         other => Err(refuse(format!(
             "the printed command's head '{}' is neither a path nor an interpreter this arm can run",
             other
@@ -361,9 +406,11 @@ pub(super) fn mkdir(p: &str) -> Result<(), Outcome> {
 }
 
 // spec: installer/SPEC.md §The consumer smoke — a tarball extracted with tar into a directory, the
-// Node-free transport's own step
+// Node-free transport's own step; the bytes reach tar on its stdin, since a GNU tar reads a drive
+// letter's colon in an archive operand as a remote host
 pub(super) fn extract(tarball: &str, into: &str) -> Result<(), Outcome> {
-    let done = proc::run(&programs::TAR, &["-xzf", tarball, "-C", into]).map_err(refuse)?;
+    let bytes = std::fs::read(tarball).map_err(|e| fail(format!("could not read {}: {}", tarball, e)))?;
+    let done = proc::run_with_stdin(&programs::TAR, &["-xzf", "-", "-C", into], &bytes).map_err(refuse)?;
     match done.failure_report() {
         None => Ok(()),
         Some(r) => Err(fail(format!("tar could not extract {}: {}", tarball, r))),

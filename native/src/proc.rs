@@ -303,6 +303,33 @@ fn resolve_outside_system_dir<F: Fn(&std::path::Path) -> bool>(
         })
 }
 
+// spec: installer/SPEC.md §The consumer smoke — where a program resolves under a PATH a caller
+// built for a child rather than the one this process holds, with the system-directory rejection
+// the spawn funnel applies, so a mask's proof reads the answer the masked child's own spawn gets
+pub(crate) fn resolve_as_spawned(program: &str, path: &std::ffi::OsStr) -> Option<String> {
+    #[cfg(windows)]
+    {
+        let dirs: Vec<std::path::PathBuf> = std::env::split_paths(path).collect();
+        let pathext = std::env::var("PATHEXT").unwrap_or_default();
+        let root = if is_system_dir_homonym(program) { std::env::var("SystemRoot").ok() } else { None };
+        resolve_outside_system_dir(program, &dirs, Some(pathext.as_str()), root.as_deref(), is_executable).ok()
+    }
+    #[cfg(not(windows))]
+    {
+        resolve_on_path(program, Some(path), None, is_executable)
+    }
+}
+
+// spec: gate-sdk/SPEC.md §check-graph — one directory held against every view Windows shows its
+// system directory through, folded as Windows compares directories
+#[cfg_attr(not(windows), allow(dead_code))]
+pub(crate) fn is_windows_system_dir(dir: &std::path::Path, system_root: &str) -> bool {
+    let key = windows_dir_key(dir);
+    WINDOWS_SYSTEM_DIR_VIEWS
+        .iter()
+        .any(|view| windows_dir_key(&std::path::Path::new(system_root).join(view)) == key)
+}
+
 // spec: context-kit/SPEC.md §bin/env-probe — a REPORTING resolver: its value is rendered in
 // doctor's banner and the env-probe emitter, which is the identity the funnel cannot absorb and why
 // it keeps its own callers

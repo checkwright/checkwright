@@ -8,12 +8,48 @@ use std::path::Path;
 
 const REBUILD: &str = "run `bash gate-sdk/bin/build-native.sh`, then the smoke";
 
-// spec: installer/SPEC.md §The consumer smoke — the host triple is the host bootstrap's own
-// detector's answer, through the helper that extracts it, so the arm holds no mapping
+// spec: installer/SPEC.md §The consumer smoke — the host bootstrap's detector, run with no mapping
+// held here: on a unix host the helper that extracts the POSIX bootstrap's four functions, and on
+// native Windows the PowerShell bootstrap's three, extracted through PowerShell's parser
 #[cfg(unix)]
-fn host_target(root: &str) -> Result<String, Outcome> {
-    let helper = format!("{}/installer/consumer-smoke/host-target.sh", root);
-    let done = proc::run(&programs::SH, &[&helper]).map_err(refuse)?;
+fn detector(state: &Run, args: &[&str]) -> Result<proc::Completed, Outcome> {
+    let helper = format!("{}/installer/consumer-smoke/host-target.sh", state.root);
+    let mut argv = vec![helper.as_str()];
+    argv.extend_from_slice(args);
+    proc::run(&programs::SH, &argv).map_err(refuse)
+}
+
+#[cfg(not(unix))]
+const DETECTOR: &str = "param([string] $Bootstrap, [string] $Fallback)
+$ErrorActionPreference = 'Stop'
+$ast = [System.Management.Automation.Language.Parser]::ParseFile($Bootstrap, [ref] $null, [ref] $null)
+foreach ($name in 'Get-HostShape', 'Get-HostTarget', 'Get-FallbackTarget') {
+    $fn = $ast.Find({ param($a) $a -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $a.Name -eq $name }, $true)
+    if (-not $fn) { [Console]::Error.WriteLine(\"host-target: $Bootstrap carries no $name\"); exit 2 }
+    . ([scriptblock]::Create($fn.Extent.Text))
+}
+if ($PSBoundParameters.ContainsKey('Fallback')) { [Console]::Out.WriteLine((Get-FallbackTarget -Target $Fallback)); exit 0 }
+$answer = Get-HostTarget
+if (-not $answer) { [Console]::Error.WriteLine(\"host-target: the bootstrap maps this host, detected as $(Get-HostShape), to no triple\"); exit 2 }
+[Console]::Out.WriteLine($answer)
+";
+
+#[cfg(not(unix))]
+fn detector(state: &Run, args: &[&str]) -> Result<proc::Completed, Outcome> {
+    let script = format!("{}/host-target.ps1", state.scratch);
+    std::fs::write(&script, DETECTOR).map_err(|e| refuse(format!("could not write the detector extraction {}: {}", script, e)))?;
+    let bootstrap = format!("{}/installer/bin/checkwright.ps1", state.root);
+    let mut argv = vec!["-NoProfile", "-NonInteractive", "-File", script.as_str(), "-Bootstrap", bootstrap.as_str()];
+    if let ["--fallback", triple] = args {
+        argv.extend(["-Fallback", *triple]);
+    }
+    proc::run(&programs::PWSH, &argv).map_err(refuse)
+}
+
+// spec: installer/SPEC.md §The consumer smoke — the host triple is the host bootstrap's own
+// detector's answer, so the arm holds no mapping
+fn host_target(state: &Run) -> Result<String, Outcome> {
+    let done = detector(state, &[])?;
     let triple = done.stdout().map(|o| text(o).trim().to_string()).unwrap_or_default();
     if done.failure_report().is_some() || triple.is_empty() {
         return Err(refuse(format!(
@@ -25,32 +61,17 @@ fn host_target(root: &str) -> Result<String, Outcome> {
     Ok(triple)
 }
 
-#[cfg(not(unix))]
-fn host_target(_root: &str) -> Result<String, Outcome> {
-    Err(refuse(
-        "this binary's driver does not yet carry the native Windows host's spellings — the \
-         PowerShell driver under installer/consumer-smoke/ carries that host.",
-    ))
-}
-
 // spec: installer/SPEC.md §The consumer smoke — the triple the bootstrap's own fallback map names
-// for one, through the same helper, empty where the map names none
-#[cfg(unix)]
-pub(super) fn fallback_of(root: &str, triple: &str) -> Result<String, Outcome> {
-    let helper = format!("{}/installer/consumer-smoke/host-target.sh", root);
-    let done = proc::run(&programs::SH, &[&helper, "--fallback", triple]).map_err(refuse)?;
+// for one, through the same detector, empty where the map names none
+pub(super) fn fallback_of(state: &Run, triple: &str) -> Result<String, Outcome> {
+    let done = detector(state, &["--fallback", triple])?;
     match done.stdout() {
         Some(o) => Ok(text(o).trim().to_string()),
         None => Err(fail(format!(
-            "the helper could not read the bootstrap's fallback map — {}",
+            "the detector could not read the bootstrap's fallback map — {}",
             done.failure_report().unwrap_or_default()
         ))),
     }
-}
-
-#[cfg(not(unix))]
-pub(super) fn fallback_of(root: &str, _triple: &str) -> Result<String, Outcome> {
-    host_target(root)
 }
 
 fn exe() -> Result<String, Outcome> {
@@ -87,7 +108,7 @@ pub(super) fn build(state: &mut Run) -> Step {
     let bin = walk::knob_scalar("GATE_SDK_NATIVE_BIN").map_err(refuse)?;
     let bin_name = bin.rsplit(['/', '\\']).next().unwrap_or(&bin).to_string();
     state.bin_name = bin_name.clone();
-    state.host = host_target(&state.root)?;
+    state.host = host_target(state)?;
     // spec: installer/SPEC.md §The consumer smoke — the run steers its own roster at this host
     // unless the caller already set the knob, which keeps the override branch a live path
     let roster_file = match undeclared("GATE_SDK_NATIVE_TARGETS_FILE") {
@@ -388,9 +409,9 @@ pub(super) fn install(state: &mut Run) -> Step {
     if !proc::is_executable(Path::new(&entry)) {
         return Err(fail("the installed package exposes no executable checkwright bin entry"));
     }
-    state.cw = entry.clone();
-    state.entry = super::Entry::Bin(entry);
+    state.cw = entry;
     state.pkg_root = format!("{}/node_modules/checkwright", home);
+    state.entry = state.installed();
     let manifest = format!("{}/package.json", state.pkg_root);
     let version = std::fs::read_to_string(&manifest)
         .ok()

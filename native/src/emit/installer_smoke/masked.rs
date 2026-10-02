@@ -69,7 +69,7 @@ pub(super) fn artifact_less(state: &mut Run) -> Step {
     say(&format!("license: the package root and {} packed kit root(s) carry the repository's LICENSE", licensed));
     let c = consumer(state, "artifact-less")?;
     let seed = tree(&c)?;
-    let entry = Entry::Sh(format!("{}/package/bin/checkwright.sh", bare));
+    let entry = Entry::Extracted(format!("{}/package", bare));
     let m = entry_run(&entry, &c, &["init", "--profile", BARE_PROFILE], &[])?;
     if m.succeeded() {
         return Err(failed(&m, "a payload the packer produced with no artifact directory installed anyway — selection has one success path, and this is not it"));
@@ -97,10 +97,10 @@ pub(super) fn artifact_less(state: &mut Run) -> Step {
     Ok(())
 }
 
-// spec: installer/SPEC.md §The consumer smoke — a reach mask: a PATH-first directory of shims that
-// exit non-zero naming themselves, so a latent reach fails loudly
+// spec: installer/SPEC.md §The consumer smoke — a reach mask: on a unix host a PATH-first directory
+// of shims that exit non-zero naming themselves, so a latent reach fails loudly
 #[cfg(unix)]
-fn shims(dir: &str, names: &[&str], arm: &str, what: &str) -> Result<String, Outcome> {
+fn reach_mask(dir: &str, names: &[&str], arm: &str, what: &str) -> Result<String, Outcome> {
     use std::os::unix::fs::PermissionsExt;
     mkdir(dir)?;
     for n in names {
@@ -112,27 +112,29 @@ fn shims(dir: &str, names: &[&str], arm: &str, what: &str) -> Result<String, Out
     Ok(format!("{}:{}", dir, invoking_path()))
 }
 
+// spec: installer/SPEC.md §The consumer smoke — on native Windows the directories holding a masked
+// program leave PATH, so the program resolves to nothing
 #[cfg(not(unix))]
-fn shims(_dir: &str, _names: &[&str], _arm: &str, _what: &str) -> Result<String, Outcome> {
-    Err(refuse("the reach mask's shims are built on a unix host only"))
+fn reach_mask(_dir: &str, names: &[&str], _arm: &str, _what: &str) -> Result<String, Outcome> {
+    dropped_path(names)
 }
 
 // spec: installer/SPEC.md §The consumer smoke — the mask is proved rather than assumed: each masked
-// name resolves to its shim
-fn prove_shims(dir: &str, names: &[&str], path: &str) -> Step {
+// name resolves to its shim, or on native Windows to nothing
+fn prove_reach(dir: &str, names: &[&str], path: &str, arm: &str) -> Step {
     for n in names {
         let got = resolves(n, path);
-        if got.as_deref() != Some(format!("{}/{}", dir, n).as_str()) {
+        let want = cfg!(unix).then(|| format!("{}/{}", dir, n));
+        if got != want {
             return Err(fail(format!(
-                "the mask did not take: {} resolves to '{}', not the shim at {}/{}",
+                "the mask did not take: {} resolves to '{}', not {}",
                 n,
                 got.unwrap_or_else(|| "nothing".to_string()),
-                dir,
-                n
+                want.map_or_else(|| "nothing".to_string(), |w| format!("the shim at {}", w))
             )));
         }
     }
-    Ok(())
+    prove_control(&programs::GIT, &["--version"], path, arm, &names.join("/"))
 }
 
 // spec: installer/SPEC.md §The consumer smoke — the exclusion is the masked program's case-folded
@@ -148,20 +150,20 @@ pub(super) fn stem_is(stem: &str, name: &str) -> bool {
 pub(super) fn path_without(stem: &str, farm: &str) -> Result<String, Outcome> {
     mkdir(farm)?;
     let mut keep: Vec<String> = Vec::new();
-    for d in invoking_path().split(':').filter(|d| Path::new(d).is_dir()) {
-        let names: Vec<String> = walk::list_dir(Path::new(d))
+    for d in std::env::split_paths(&invoking_path()).filter(|d| d.is_dir()) {
+        let names: Vec<String> = walk::list_dir(&d)
             .unwrap_or_default()
             .into_iter()
             .map(|(n, _)| n)
             .filter(|n| !n.starts_with('.'))
             .collect();
         if !names.iter().any(|n| stem_is(stem, n)) {
-            keep.push(d.to_string());
+            keep.push(d.display().to_string());
             continue;
         }
         for n in names.iter().filter(|n| !stem_is(stem, n)) {
-            let (from, to) = (format!("{}/{}", d, n), format!("{}/{}", farm, n));
-            if crate::proc::is_executable(Path::new(&from)) && !Path::new(&to).exists() {
+            let (from, to) = (d.join(n), Path::new(farm).join(n));
+            if crate::proc::is_executable(&from) && !to.exists() {
                 let _ = std::os::unix::fs::symlink(&from, &to);
             }
         }
@@ -169,9 +171,82 @@ pub(super) fn path_without(stem: &str, farm: &str) -> Result<String, Outcome> {
     Ok(std::iter::once(farm.to_string()).chain(keep).collect::<Vec<_>>().join(":"))
 }
 
+// spec: installer/SPEC.md §The consumer smoke — on native Windows the directories holding the
+// masked program leave PATH, and git is re-added alone through Git's `cmd` directory
 #[cfg(not(unix))]
-pub(super) fn path_without(_stem: &str, _farm: &str) -> Result<String, Outcome> {
-    Err(refuse("the absence mask's link farm is built on a unix host only"))
+pub(super) fn path_without(stem: &str, _farm: &str) -> Result<String, Outcome> {
+    dropped_path(&[stem])
+}
+
+// spec: installer/SPEC.md §The consumer smoke — the Windows column's PATH: each directory holding a
+// masked program dropped, the system directory spared, and each re-added directory appended
+#[cfg_attr(unix, allow(dead_code))]
+pub(super) fn dropping(
+    dirs: &[std::path::PathBuf],
+    holds: impl Fn(&Path) -> bool,
+    spared: impl Fn(&Path) -> bool,
+    readd: &[std::path::PathBuf],
+) -> Vec<std::path::PathBuf> {
+    let mut kept: Vec<std::path::PathBuf> = dirs.iter().filter(|d| spared(d) || !holds(d)).cloned().collect();
+    for r in readd {
+        if !kept.contains(r) {
+            kept.push(r.clone());
+        }
+    }
+    kept
+}
+
+#[cfg(not(unix))]
+fn dropped_path(names: &[&str]) -> Result<String, Outcome> {
+    let dirs: Vec<std::path::PathBuf> = std::env::split_paths(&invoking_path()).collect();
+    let root = std::env::var("SystemRoot").unwrap_or_default();
+    let holds = |d: &Path| {
+        walk::list_dir(d)
+            .unwrap_or_default()
+            .iter()
+            .any(|(n, dir)| !dir && names.iter().any(|s| stem_is(s, n)))
+    };
+    let spared = |d: &Path| !root.is_empty() && crate::proc::is_windows_system_dir(d, &root);
+    let join = |kept: &[std::path::PathBuf]| -> Result<String, Outcome> {
+        std::env::join_paths(kept)
+            .map(|p| p.to_string_lossy().into_owned())
+            .map_err(|e| refuse(format!("the masked PATH cannot be joined: {}", e)))
+    };
+    let kept = dropping(&dirs, holds, spared, &[]);
+    if resolves("git", &join(&kept)?).is_some() {
+        return join(&kept);
+    }
+    let readd: Vec<std::path::PathBuf> = git_cmd_dir().into_iter().filter(|d| !holds(d)).collect();
+    join(&dropping(&dirs, holds, spared, &readd))
+}
+
+// spec: installer/SPEC.md §The consumer smoke — Git for Windows' `cmd` directory, three levels above
+// its exec path, the one holding git and no shell
+#[cfg(not(unix))]
+fn git_cmd_dir() -> Option<std::path::PathBuf> {
+    let done = crate::proc::run(&programs::GIT, &["--exec-path"]).ok()?;
+    let exec = text(done.stdout()?).trim().to_string();
+    let cmd = Path::new(&exec).parent()?.parent()?.parent()?.join("cmd");
+    cmd.join("git.exe").is_file().then_some(cmd)
+}
+
+// spec: installer/SPEC.md §The consumer smoke — a control program resolved on the masked PATH and
+// run at what it resolved to, since the spawn funnel resolves a bare name against this process's
+// own PATH
+fn prove_control(program: &crate::programs::Program, args: &[&str], path: &str, arm: &str, masked: &str) -> Step {
+    let set = path_set(&Some(path.to_string()));
+    let ran = resolves(&program.name(), path).is_some_and(|at| {
+        super::in_consumer(&program.clone().at(at), args, &set, &invoking_dir()).is_ok_and(|d| d.failure_report().is_none())
+    });
+    if !ran {
+        return Err(fail(format!(
+            "the {} arm's {} will not run on its masked PATH — the PATH resolves entries this host cannot execute, so every step below would fail for a reason that is not {}",
+            arm,
+            program.name(),
+            masked
+        )));
+    }
+    Ok(())
 }
 
 // spec: installer/SPEC.md §The consumer smoke — the absence mask proved both ways: the program
@@ -180,17 +255,7 @@ pub(super) fn prove_absent(stem: &str, path: &str, arm: &str) -> Step {
     if resolves(stem, path).is_some() {
         return Err(fail(format!("the mask did not take: {} still resolves under the arm's PATH", stem)));
     }
-    let set = path_set(&Some(path.to_string()));
-    let ran = super::in_consumer(&programs::GIT, &["--version"], &set, &invoking_dir())
-        .map(|d| d.failure_report().is_none())
-        .unwrap_or(false);
-    if !ran {
-        return Err(fail(format!(
-            "the {} farm's git will not run — the arm's PATH resolves entries this host cannot execute, so every step below would fail for a reason that is not {}",
-            arm, stem
-        )));
-    }
-    Ok(())
+    prove_control(&programs::GIT, &["--version"], path, arm, stem)
 }
 
 fn invoking_dir() -> String {
@@ -214,20 +279,22 @@ pub(super) fn download(state: &mut Run) -> Step {
         ));
     }
     extract(&copy, &dl)?;
-    state.dl_entry = format!("{}/package/bin/checkwright.sh", dl);
-    if !is_file(&state.dl_entry) {
-        return Err(fail(
-            "the extracted tarball carries no package/bin/checkwright.sh — the Node-free entry point is not in the payload",
-        ));
+    state.dl_package = format!("{}/package", dl);
+    let extracted = Entry::Extracted(state.dl_package.clone());
+    if !is_file(&extracted.bootstrap()) {
+        return Err(fail(format!(
+            "the extracted tarball carries no package/{} — the Node-free entry point is not in the payload",
+            super::consumer::BOOTSTRAP
+        )));
     }
     say(&format!("verified {} against its digest and extracted package/ with tar", name));
     let mask = format!("{}/mask", state.scratch);
     let masked = ["node", "npm", "npx"];
-    let path = shims(&mask, &masked, "download arm", "the tarball path is not Node-free")?;
-    state.entry = Entry::Sh(state.dl_entry.clone());
+    let path = reach_mask(&mask, &masked, "download arm", "the tarball path is not Node-free")?;
+    state.entry = extracted;
     state.run_path = Some(path.clone());
-    prove_shims(&mask, &masked, &path)?;
-    say("mask: node, npm and npx resolve to failing shims");
+    prove_reach(&mask, &masked, &path, "download")?;
+    say("mask: node, npm and npx are masked off the arm's PATH, and its git still runs");
     let c = consumer(state, "download")?;
     let seed = tree(&c)?;
     assert_install(state, PROFILE_DERIVED, &c)?;
@@ -239,11 +306,11 @@ pub(super) fn download(state: &mut Run) -> Step {
 pub(super) fn toolchain_free(state: &mut Run) -> Step {
     let mask = format!("{}/toolmask", state.scratch);
     let masked = ["cargo", "rustc"];
-    let path = shims(&mask, &masked, "toolchain-free arm", "the install path is not free of the Rust toolchain")?;
-    state.entry = Entry::Bin(state.cw.clone());
+    let path = reach_mask(&mask, &masked, "toolchain-free arm", "the install path is not free of the Rust toolchain")?;
+    state.entry = state.installed();
     state.run_path = Some(path.clone());
-    prove_shims(&mask, &masked, &path)?;
-    say("mask: cargo and rustc resolve to failing shims");
+    prove_reach(&mask, &masked, &path, "toolchain-free")?;
+    say("mask: cargo and rustc are masked off the arm's PATH, and its git still runs");
     let c = consumer(state, "toolchain-free")?;
     let m = state.verb(&c, &["doctor"])?;
     if !m.succeeded() {
@@ -265,9 +332,9 @@ pub(super) fn toolchain_free(state: &mut Run) -> Step {
 pub(super) fn jq_less(state: &mut Run) -> Step {
     let path = path_without("jq", &format!("{}/jqfarm", state.scratch))?;
     prove_absent("jq", &path, "jq-less")?;
-    say("mask: jq resolves to nothing, and the farm's git still runs");
+    say("mask: jq resolves to nothing, and the masked PATH's git still runs");
     let set = path_set(&Some(path.clone()));
-    let entry = Entry::Bin(state.cw.clone());
+    let entry = state.installed();
     let silent = |label: &str, c: &str| -> Step {
         let m = entry_run(&entry, c, &["doctor"], &set)?;
         if !m.succeeded() {
@@ -362,16 +429,13 @@ pub(super) fn bash_less(state: &mut Run) -> Step {
     let path = path_without("bash", &format!("{}/bashfarm", state.scratch))?;
     prove_absent("bash", &path, "bash-less")?;
     let set = path_set(&Some(path.clone()));
-    let sh_ran = super::in_consumer(&super::consumer::sh()?, &["-c", ":"], &set, &invoking_dir())
-        .map(|d| d.failure_report().is_none())
-        .unwrap_or(false);
-    if !sh_ran {
-        return Err(fail(
-            "the bash-less farm's sh will not run — the arm runs the bootstrap as the install page does, through sh on PATH, so every step below would fail for a reason that is not bash",
-        ));
-    }
-    say("mask: bash resolves to nothing, and the farm's git and sh still run");
-    state.entry = Entry::Sh(state.dl_entry.clone());
+    let shell = super::consumer::host_shell();
+    prove_control(&shell, super::consumer::SHELL_NOOP, &path, "bash-less", "bash")?;
+    say(&format!(
+        "mask: bash resolves to nothing, and the masked PATH's git and {} still run",
+        shell.name()
+    ));
+    state.entry = Entry::Extracted(state.dl_package.clone());
     let c = consumer(state, "bash-less-probe")?;
     let m = entry_run(&state.entry, &c, &["doctor"], &set)?;
     if !m.succeeded() {
@@ -506,5 +570,26 @@ mod tests {
         assert!(stem_is("jq", "jq.cmd"));
         assert!(!stem_is("jq", "jqx"));
         assert!(!stem_is("bash", "bashbug"));
+    }
+
+    // spec: installer/SPEC.md §The consumer smoke — the Windows column's mask: a directory holding a
+    // masked program leaves PATH, the system directory stays though it holds one, a re-added
+    // directory lands once at the end, and every other directory keeps its order
+    #[test]
+    fn the_windows_mask_drops_holders_spares_the_system_directory_and_re_adds_alone() {
+        let p = |s: &str| std::path::PathBuf::from(s);
+        let dirs = [
+            p(r"C:\Windows\System32"),
+            p(r"C:\Program Files\Git\bin"),
+            p(r"C:\tools"),
+            p(r"C:\Program Files\Git\usr\bin"),
+        ];
+        let holds = |d: &Path| {
+            let s = d.to_string_lossy();
+            s.contains("Git") || s.contains("System32")
+        };
+        let spared = |d: &Path| crate::proc::is_windows_system_dir(d, r"C:\Windows");
+        let got = dropping(&dirs, holds, spared, &[p(r"C:\Program Files\Git\cmd"), p(r"C:\tools")]);
+        assert_eq!(got, vec![p(r"C:\Windows\System32"), p(r"C:\tools"), p(r"C:\Program Files\Git\cmd")]);
     }
 }

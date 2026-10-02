@@ -202,18 +202,18 @@ fallthrough	git grep --cached foo
 #           harness wrapper's argv, which carries the whole command. A `pgrep`
 #           without `-f`, `-x`/`-v`, and a pattern that does not match its own
 #           text pass.
-block	bash run-smoke.sh & until ! pgrep -f run-smoke.sh; do sleep 5; done
-block	pkill -f run-smoke.sh; bash run-smoke.sh
-block	pgrep -f run-smoke.sh
+block	bash gate-sdk/bin/run-gates.sh --installer-smoke & until ! pgrep -f installer-smoke; do sleep 5; done
+block	pkill -f installer-smoke; bash gate-sdk/bin/run-gates.sh --installer-smoke
+block	pgrep -f installer-smoke
 block	while pgrep -f 'checkwright-gates --run-validate'; do sleep 5; done
 block	if pgrep -f worker; then echo up; fi
 block	while pgrep -f run-validate >/dev/null; do sleep 10; done
 block	while pgrep -f "run-validate" > /dev/null 2>&1; do sleep 15; done; echo finished
 block	bash run.sh; pgrep -if 'R[U]N'
 fallthrough	bash run.sh; pgrep -f 'R[U]N'
-fallthrough	pgrep run-smoke.sh; bash run-smoke.sh
-fallthrough	until ! pgrep -f '[r]un-smoke.sh'; do sleep 5; done
-fallthrough	pgrep -xf run-smoke.sh
+fallthrough	pgrep installer-smoke; bash gate-sdk/bin/run-gates.sh --installer-smoke
+fallthrough	until ! pgrep -f '[i]nstaller-smoke'; do sleep 5; done
+fallthrough	pgrep -xf installer-smoke
 
 # rule `bare_sleep` — bare foreground sleep steered to a condition wait. The non-firing
 #           cases are the load-bearing ones: a sleep inside an `until … do … done`

@@ -58,16 +58,29 @@ fn show(out: &str) {
 }
 
 // spec: installer/SPEC.md §The consumer smoke — the entry point an arm drives: the npm-installed
-// `.bin` entry run directly, or an extracted package's bootstrap run through `sh`
+// package, through its `.bin` entry on a unix host, or an extracted package; each is driven through
+// the host's bootstrap
 #[derive(Clone)]
 pub(super) enum Entry {
-    Bin(String),
-    Sh(String),
+    Installed { bin: String, package: String },
+    Extracted(String),
 }
 
 impl Default for Entry {
     fn default() -> Self {
-        Entry::Bin(String::new())
+        Entry::Extracted(String::new())
+    }
+}
+
+impl Entry {
+    // spec: installer/SPEC.md §The consumer smoke — the host bootstrap's script inside the package
+    // the entry names
+    pub(super) fn bootstrap(&self) -> String {
+        let package = match self {
+            Entry::Installed { package, .. } => package,
+            Entry::Extracted(package) => package,
+        };
+        format!("{}/{}", package, consumer::BOOTSTRAP)
     }
 }
 
@@ -98,7 +111,7 @@ pub(super) struct Run {
     owes_bash: BTreeMap<String, bool>,
     value_red: Vec<String>,
     seeded: Vec<String>,
-    dl_entry: String,
+    dl_package: String,
     up_version: String,
     up2_version: String,
     up: String,

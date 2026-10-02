@@ -94,11 +94,11 @@ fn hop(state: &Run, dir: &str, version: &str, which: &str, moment: &str) -> Resu
 }
 
 fn cw(state: &Run) -> Entry {
-    Entry::Bin(state.cw.clone())
+    state.installed()
 }
 
 fn bootstrap(dir: &str) -> Entry {
-    Entry::Sh(format!("{}/package/bin/checkwright.sh", dir))
+    Entry::Extracted(format!("{}/package", dir))
 }
 
 // spec: installer/SPEC.md §The consumer smoke — the upgrade arm: a minimum install with two committed

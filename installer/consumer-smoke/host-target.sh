@@ -1,6 +1,6 @@
 #!/bin/sh
 # spec: installer/SPEC.md §The consumer smoke — prints the triple the bootstrap's own detector maps this host to, or with `--fallback <triple>` the triple the bootstrap's fallback map names for it, holding no mapping of its own
-# no-port: installer/SPEC.md §The consumer smoke, The port disposition — the smoke's own helper, on run-smoke.sh's ground: the payload carries nothing under installer/consumer-smoke/, so no adopter path runs it.
+# no-port: installer/SPEC.md §The consumer smoke — the unix legs' and the --installer-smoke arm's extraction of the POSIX bootstrap's detector; it ships in no payload, so no adopter path runs it.
 set -u
 
 bootstrap="$(cd "$(dirname "$0")/../bin" 2>/dev/null && pwd)/checkwright.sh"

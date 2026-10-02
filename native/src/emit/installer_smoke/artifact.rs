@@ -105,7 +105,7 @@ pub(super) fn artifact(state: &mut Run) -> Step {
         "the packed payload carries {} for {} with the sidecar the build leg emitted",
         state.bin_name, state.host
     ));
-    state.entry = Entry::Sh(format!("{}/package/bin/checkwright.sh", artp));
+    state.entry = Entry::Extracted(format!("{}/package", artp));
     state.run_path = None;
     let c = consumer(state, "artifact")?;
     let min = state.profile_min.clone();
@@ -212,7 +212,7 @@ pub(super) fn artifact(state: &mut Run) -> Step {
 // spec: installer/SPEC.md §The consumer smoke — the fallback cases, wherever the hand-off carries a
 // foreign-architecture preferred artifact beside the host's own fallback upload
 fn fallbacks(state: &Run, art: &str, undeclared: &str, absent: &str) -> Step {
-    let host_fallback = fallback_of(&state.root, &state.host)?;
+    let host_fallback = fallback_of(state, &state.host)?;
     let mut foreign = String::new();
     if let (Some(handed), false) = (&state.handed, host_fallback.is_empty()) {
         for (t, _) in crate::walk::list_dir(Path::new(handed)).unwrap_or_default().into_iter().filter(|(_, d)| *d) {
@@ -220,7 +220,7 @@ fn fallbacks(state: &Run, art: &str, undeclared: &str, absent: &str) -> Step {
             if t == state.host || !is_file(&b) || !is_file(&format!("{}.sha256", b)) {
                 continue;
             }
-            if !fallback_of(&state.root, &t)?.is_empty() {
+            if !fallback_of(state, &t)?.is_empty() {
                 foreign = t;
                 break;
             }

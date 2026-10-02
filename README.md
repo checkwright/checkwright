@@ -83,7 +83,7 @@ cargo test --release --manifest-path native/Cargo.toml                          
 bash gate-sdk/bin/run-gates.sh --agents-md-smoke                                                # the AGENTS.md projection, end to end
 bash gate-sdk/bin/run-gates.sh --run-consumer-smoke                                             # every kit installs into a scratch consumer
 bash gate-sdk/bin/run-gates.sh --upgrade-smoke                                                  # a vendored tree upgrades in place
-bash installer/consumer-smoke/run-smoke.sh                                                      # the activation path, per profile
+bash gate-sdk/bin/run-gates.sh --installer-smoke                                                # the activation path, per profile
 bash gate-sdk/bin/run-gates.sh --run-demo                                                        # the adoption walkthrough
 bash gate-sdk/bin/run-gates.sh --projection-witness                                              # each projection's declared trigger, perturbed
 ```

@@ -89,8 +89,8 @@ new-failure gates check-gamma
 diff-baseline: NEW failures against $tmp/base.txt (see 'new-failure' lines above)
 rc=1"
 
-# B — the CONFIGURED installer_smoke value resolves, including the driver path its leading
-#     positional carries, and attributes the last arm reached off the absent completion marker.
+# B — the CONFIGURED installer_smoke value resolves, reads the roster off the log's own head, and
+#     attributes the last arm reached off the absent completion marker.
 check "configured installer_smoke value" "$(_diff "$CONFIG" installer_smoke "$tmp/smoke.log" 1)" \
 "new-failure installer_smoke install
 diff-baseline: NEW failures against $tmp/base.txt (see 'new-failure' lines above)
@@ -109,12 +109,10 @@ rc=1"
 grep -q 'parse-gates-log.sh' "$tmp/err" \
     || { echo "  FAIL: the dead gates value produced no diagnostic naming the path that did not resolve"; fails=$((fails + 1)); }
 
-# D — negative control for the failure mode the log-only form admits: a driver-less installer_smoke
+# D — negative control for the failure mode the log-only form admits: the CONFIGURED installer_smoke
 #     value over a log declaring no roster, so the arm has no roster to read and refuses.
-sed "s#^EVIDENCE_KIT_PARSER_installer_smoke = .*#EVIDENCE_KIT_PARSER_installer_smoke = bash gate-sdk/bin/run-gates.sh --emit parse-smoke-log#" \
-    "$CONFIG" >"$tmp/driverless.knobs"
-check "a driver-less value over a roster-less log produces nothing" \
-    "$(_diff "$tmp/driverless.knobs" installer_smoke "$tmp/bare-smoke.log" 1)" \
+check "the configured installer_smoke value over a roster-less log produces nothing" \
+    "$(_diff "$CONFIG" installer_smoke "$tmp/bare-smoke.log" 1)" \
 "new-failure installer_smoke build
 new-failure installer_smoke pack
 diff-baseline: NEW failures against $tmp/base.txt (see 'new-failure' lines above)
@@ -126,5 +124,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "evidence-parser-values.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "evidence-parser-values.test: ok (both configured EVIDENCE_KIT_PARSER_<suite> values resolve and answer through the compiled dispatch; a dead value and a driver-less value over a roster-less log each produce nothing)"
+echo "evidence-parser-values.test: ok (both configured EVIDENCE_KIT_PARSER_<suite> values resolve and answer through the compiled dispatch; a dead value, and the installer_smoke value over a roster-less log, each produce nothing)"
 exit 0
