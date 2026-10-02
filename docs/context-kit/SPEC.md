@@ -138,7 +138,7 @@ A `derived` value resolves to its kit list first and then takes the kit-list arm
 
 The constrained members and what forces each:
 
-- `bash:4.3::derived` — the floor is the **highest** construct the shipped shell runs, not the most numerous. Three bash-4.0 constructs are present: `declare -A` (gate-sdk, evidence-kit, the installer's consumer smoke), `mapfile` (across the kits) and case-modification expansion (gate-sdk's gate library and the installer's consumer smoke). The **nameref** (`local -n`, bash 4.3) outranks them: `_gate_prebinary_file_value` in `gate-sdk/lib/gate.sh`, which the front-end and context-kit's session template source, so 4.3 is the floor of every shell surface sourcing that library. A `4.0` floor would be a fail-open: `env-probe` would report `ok` on a 4.2 box the battery fails with an obscure syntax error.
+- `bash:4.3::derived` — the floor is the **highest** construct the shipped shell runs, not the most numerous. The one bash-4.0 construct present is `mapfile` (gate-sdk's gate library and test harness). The **nameref** (`local -n`, bash 4.3) outranks it: `_gate_prebinary_file_value` in `gate-sdk/lib/gate.sh`, which the front-end and context-kit's session template source, so 4.3 is the floor of every shell surface sourcing that library. A `4.0` floor would be a fail-open: `env-probe` would report `ok` on a 4.2 box the battery fails with an obscure syntax error.
 
   **The audience is derived, not listed**, and this is the predicate a kit is measured against. A kit root is in the bash audience when it **ships a file the adopter's host runs with bash**: a file under that root, outside `gate-tests/` and `smoke/`, that either
   - carries a **bash shebang**, or

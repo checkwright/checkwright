@@ -12,6 +12,26 @@
 
 ## Deferred
 
+### amendment-manifest-prose-span
+
+[cost: event/low] [surface: gate-sdk]
+
+`check-graph`'s amendment-manifest reader (`native/src/gates/graph.rs`, the inline-span loop beside `validate_amend_manifest`) takes every backticked span opening `# graph: ` on any `SPEC-*.md` line as a manifest, so a prose sentence naming a manifest key mid-paragraph reds assertion G for missing `dir=`/`valve=`/`tier=` and an empty `couples=`. An amendment author must rephrase around the token.
+
+**Deliverable:** gate-sdk/SPEC.md §check-graph states which spans are manifests, so a mid-sentence mention is told apart from an embedded manifest, and the reader follows it, with a bad/good fixture pair over a mid-sentence mention.
+
+**Cost while deferred:** a false red at amendment authoring for prose that names a manifest key. Filed 2026-10-02 to the gap inbox at consumer-smoke-driver-pass' spec; promoted at its close: →fix fails because which spans count is a grammar decision the SPEC does not settle, →forward because no ruling is owed. Re-verified: an untracked root `SPEC-zzprobe.md` carrying the mid-sentence span turns `check-graph` red on four AMEND-MANIFEST lines. Owner lookup: `# graph:`, `mid-line`, `amendment manifest`, `assertion G` in this file — none; owner gate-sdk/SPEC.md §check-graph.
+
+### criterion-five-omit-stale
+
+[cost: event/low] [surface: gate-sdk]
+
+gate-sdk/SPEC.md's criterion 5 still prices a port against an omit-and-declare install outcome the installer retired: an unrostered or hasher-less host is now refused at the bootstrap, and the installer writes no `# omitted:` record (installer/SPEC.md §Hosts refused at the bootstrap, §The gate binary). The *ruled condition* paragraph, the residual's instrument (an artifact-free install whose `gates.list` declares the dispatched set at a non-zero count), the measurement order, the growth predicate, the criterion-5 bullet and exception class (b), §Binary dispatch's install-model sentence and the binary meta-gates' shared predicate all describe the retired outcome, contradicting the same SPEC's *omission branch* and *all-omitted install refuses* paragraphs. The cut records ruling *accept and declare* read as current.
+
+**Deliverable:** criterion 5 restated against the bootstrap refusal, deciding what a cohort's binary-less price measures now that an uncovered host gets no install; the stale sentences rewritten or cut, and each per-cut record's criterion-5 ruling either kept as a record or re-pointed.
+
+**Cost while deferred:** a porting session reads an instrument that no longer exists and a price the install model no longer charges. Filed 2026-10-03 to the gap inbox at consumer-smoke-driver-pass' build; promoted at its close: →fix fails because the stale reach spans a dozen paragraphs and what criterion 5 prices now is a design call, →forward because no ruling is reversed (the installer's own SPEC already retired the outcome). Re-verified: the binary-less leg asserts the refusal (installer/SPEC.md §The consumer smoke, *artifact-less refusal leg*), and `native/src/emit/installer_smoke/profiles.rs` fails any install carrying an omission record. Owner lookup: `criterion 5`, `omission`, `binary-less`, `accept and declare`, `residual`, `artifact-free`, `uncovered` in this file — none; owner gate-sdk/SPEC.md §Porting a gate to the binary substrate.
+
 ### required-sections-literal
 
 [cost: event/low] [surface: queue-kit]
@@ -266,7 +286,7 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 ### spec-brevity-residue
 
-[roadmap: now/adoption] [cost: session/high] [surface: installer] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
+[roadmap: now/adoption] [cost: session/high] [surface: guard-kit] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
 
 the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; lifecycle-kit and installer are finished (the slices below, `lifecycle-template-brevity` and `installer-contract-brevity`); what remains starts at guard-kit (48.3k), delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling): a slice has landed at each recent scope; the per-kit slices stay off the roadmap.
 
@@ -314,7 +334,7 @@ the shipped `site-kit/templates/site-health.yml` takes one curl sample and files
 
 ### release-drain-ordering-contradiction
 
-[cost: event/low] [surface: RELEASING.md] [recurrence: 2026-09-25]
+[cost: event/low] [surface: RELEASING.md] [recurrence: 2026-09-25] [not-icebox-eligible: 2026-10-03 returned from the icebox by consult 2026-09-25; evicting it would reverse that consult]
 
 RELEASING.md's step-4 opener bundles the drain and the close stamp as one commit, and the step's body separates them; a public runbook that contradicts itself.
 
@@ -324,7 +344,7 @@ RELEASING.md's step-4 opener bundles the drain and the close stamp as one commit
 
 ### queue-provenance-restates-git-history
 
-[cost: once/low] [surface: TASK-QUEUE.md] [recurrence: 2026-09-25]
+[cost: once/low] [surface: TASK-QUEUE.md] [recurrence: 2026-09-25] [not-icebox-eligible: 2026-10-03 returned from the icebox by consult 2026-09-25; evicting it would reverse that consult]
 
 queue provenance prose restates what `git log` answers; the ruled sweep is small, ten route-phrase hits remaining when re-counted.
 
@@ -1282,11 +1302,4 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 A balanced Liquid token a docs page means literally parses and renders blank, and neither check-docs-liquid-parse nor check-docs-render-fidelity sees the loss; no live page carries it, and the fix is a render-side assertion or a token scan outside raw blocks (site-kit/SPEC.md §check-docs-liquid-parse).
 
 ## Done
-
-- front-door-flag-operand
-- front-door-arm-route-blind
-- disposed-findings-register
-- compiled-consumer-smoke-driver
-- installer-smoke-brevity
-- kit-log-declaration-transport
 
