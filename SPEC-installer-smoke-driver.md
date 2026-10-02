@@ -67,7 +67,7 @@ Two cases skip on a stated reason rather than red, printing the reason:
 
 **Inferred, cannot run before build:** that on the Windows runners each masked program's directories hold no program an arm needs beyond the ones it re-adds, and that `pwsh` can extract and run the PowerShell detector's functions — no native Windows host is reachable before the mid-iteration push runs the arm there.
 
-**Partly applied:** the unix column runs every arm through the host's bootstrap: the `.bin` entry directly and the extracted package's `bin/checkwright.sh` through `sh`, and a printed follow-up's path head as the binary `init` placed. The `shasum` fallback's control spawns `shasum`, a `contributor` member on unix builds (gate-sdk/SPEC.md §The program roster). On a native Windows host the arm still refuses at exit 2 in `build`, and the Windows column, the PowerShell detector extraction and the two skip reasons there are not yet applied.
+**Partly applied:** the unix column runs every arm through the host's bootstrap: the `.bin` entry directly and the extracted package's `bin/checkwright.sh` through `sh`, and a printed follow-up's path head as the binary `init` placed. The `shasum` fallback's control spawns `shasum`, a `contributor` member on unix builds (gate-sdk/SPEC.md §The program roster). The fallback cases' premise is proved on every host: the foreign artifact, once placed executable as the host's preferred one, runs `--help`, and one that starts skips the three cases naming why. On a native Windows host the arm still refuses at exit 2 in `build`, and the Windows column, the PowerShell detector extraction and the two skip reasons there are not yet applied.
 
 ### (4) Nested invocations run under a scrubbed environment {design-bearing}
 

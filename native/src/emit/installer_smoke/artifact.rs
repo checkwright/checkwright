@@ -232,6 +232,16 @@ fn fallbacks(state: &Run, art: &str, undeclared: &str, absent: &str) -> Step {
         return Ok(());
     }
     place(state, art, &state.host, &foreign)?;
+    // spec: installer/SPEC.md §The consumer smoke — the stand-in's premise is proved, not assumed: a
+    // foreign artifact that starts here, as under emulation, is no preferred artifact that cannot
+    let placed = format!("{}/{}/{}", art, state.host, state.bin_name);
+    if crate::proc::run(&crate::programs::CHECKWRIGHT_GATES.at(placed), &["--help"]).is_ok() {
+        say(&format!(
+            "fallback cases skipped: the foreign {} artifact starts on this host, so it cannot stand in for a preferred artifact that does not run",
+            foreign
+        ));
+        return Ok(());
+    }
     place(state, art, &host_fallback, &host_fallback)?;
     roster(art, &format!("{}\n{}\n", state.host, host_fallback))?;
     let fc = consumer(state, "artifact-fallback")?;
