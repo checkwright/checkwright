@@ -10,3 +10,4 @@ gate-sdk-value-pass align a2a20bdb 2026-10-02 1e0d58cb
 gate-sdk-value-pass build a2dfeb53 2026-10-02 7efce802
 gate-sdk-value-pass build acba5207 2026-10-02 926a9834
 gate-sdk-value-pass validate a19251bb 2026-10-02 49ce3b81
+gate-sdk-value-pass close a5f98e74 2026-10-02 344e5b8d
