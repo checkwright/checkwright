@@ -180,7 +180,7 @@ the interop rung's submission half. The build half landed at companion-catalog-e
 
 **Deliverable:** the Spec Kit community-catalog submission, filed as the catalog's Extension Submission issue with its `download_url` naming the `checkwright-companion-<version>.zip` Release asset; the extension's README and the landing page then gain the catalog's install form.
 
-**Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **Also gated, operator direction 2026-09-29, lead-relayed (not a ruling),** on [companion-install-tier](#companion-install-tier) and `gate-customer-value-audit`: the audit's verdicts decide which gates that tier exposes, so scope reads the two as one sequencing. **The four preconditions the operator set on 2026-09-27 landed at catalog-submission-preconditions:** `crate-tests-windows-flip`, since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; `catalog-landing-docs-polish`; and `spec-toolkits-guarantee`.
+**Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **Also gated, operator direction 2026-09-29, lead-relayed (not a ruling),** on [companion-install-tier](#companion-install-tier) and `gate-customer-value-audit`, which landed at gate-sdk-value-pass: its verdicts decide which gates that tier exposes. **The four preconditions the operator set on 2026-09-27 landed at catalog-submission-preconditions:** `crate-tests-windows-flip`, since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; `catalog-landing-docs-polish`; and `spec-toolkits-guarantee`.
 
 **Four more prerequisites, operator direction 2026-09-29, lead-relayed (not a ruling):** three landed at companion-technical-gates (`install-gate-selection`, `companion-spec-to-code-gates`, `speckit-extension-full-profile`), and `adoption-prompt-templates` landed at companion-adoption-landing. Ground: Spec Kit and OpenSpec are technical toolkits, so a companion offering only document gates reads as near-useless, and the launch needs an early-adopter wow.
 
@@ -635,6 +635,55 @@ context-kit's `--emit footprint` arm ships in the binary but prints this site's 
 **Deliverable:** the gate's corpus widened to every gate module, and each withheld gate's literal moved to a descriptor-declared knob (gate-sdk/SPEC.md §The declaration cohort, a knob no static kit's prefix owns) or valved with its ground.
 
 **Cost while deferred:** no adopter meets these literals, since a withheld gate never ships. The cost is that this repo's own gates stay unconfigurable, and a new withheld gate's literal reds nowhere. Filed 2026-10-02 at gate-sdk-value-pass' spec on that direction. Owner lookup: `literal`, `withheld` in this file — `consumer-value-literal-gate`, DISTINCT (the kit-shipped half); owner gate-sdk/SPEC.md §The port-candidate criteria.
+
+### lead-notification-wake-race
+
+[cost: iteration/high] [surface: lifecycle-kit]
+
+a lead can sleep through its stage session's completion notification. On 2026-09-30 and again on 2026-10-01 the same shape stalled the walk: the session's hand-back message woke the lead, and the harness queued the task's completion notification about 50ms later, while the lead was still writing its reply. The lead's reply made no tool call and ended its turn waiting for that notification, as lifecycle-kit/templates/lead.md's dispatch precondition requires. After the stop hook, the harness wrote the queued notification into the transcript, 0.3s and 0.6s after the turn end, and started no turn. The operator woke the lead 8.7h and 5.3h later. The template's fallback for a notification that never arrives presumes a lead awake to apply it, and delegation-kit/templates/agent-execution.md's backgrounding bullet states without limit that a notification wakes a supervisor.
+
+**Deliverable:** a probe of the delivery rule (does a notification queued during a turn with no tool call wake its session, and does one tool call before the turn end drain it), then the lead's wait clause matched to the result in lead.md §The lead model, with the agent-execution bullet's claim bounded.
+
+**Inferred, not run:** that a tool call before the turn end would have delivered the notification. Both transcripts show only that the queue was not drained before the stop.
+
+**Cost while deferred:** hours of idle wall-clock per firing, at a stage boundary every iteration crosses five times; it fired in two consecutive iterations. Filed 2026-10-02 at gate-sdk-value-pass' close, from a lead observation; →fix fails because the remedy changes the lead's dispatch-wait policy, a kit template's mechanism, before the delivery rule is probed. →forward fails because no ruling is owed. Re-verified by a scan of every lead transcript for a notification followed by more than five minutes of silence: exactly these two firings, each enqueued mid-turn, which corrects the observation's premise that it landed after the turn end. Owner lookup: `notification`, `turn end`, `wake` in this file — [wait-on-unreachable-condition](#wait-on-unreachable-condition), DISTINCT (a dispatched session's writerless wait); owner lifecycle-kit/templates/lead.md §The lead model. Surface also delegation-kit.
+
+### front-end-door-residue
+
+[cost: event/low] [surface: native]
+
+the binary still names or spawns the bash front end where an adopter meets it: the `--help` text (native/src/runner.rs `USAGE`, pinned across both front ends), the runner's `--only` steer for a gate passed as a gates dir, installer/demo.rs's walkthrough line, and `EVIDENCE_KIT_RUN_<suite>`'s default in native/src/knobs/evidence_kit.rs. Widening `GUARD_KIT_DOOR_ROOTS` from the gates, hook and emit trees to all of native/src reds exactly these.
+
+**Deliverable:** each site respelled to the binary door, the knob default's working-directory change (the front end changes to the toplevel, the binary does not) settled in evidence-kit/SPEC.md, and the door roots widened to native/src.
+
+**Cost while deferred:** an adopter reading `--help` or the demo meets a command their install may not carry. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' build; promoted at its close: →fix fails because the knob default is a behaviour change across two front ends, →forward because no ruling is owed. Re-verified: grep finds all four sites. `hook-emit-remedy-door` scoped its fix to the hook and emit trees; this is DISTINCT, not a recurrence. Owner lookup: `run-gates.sh`, `DOOR_ROOTS` in this file — none; owner guard-kit/SPEC.md §check-door-binding, with gate-sdk/SPEC.md §run-gates.
+
+### bash-reader-escaped-pipe
+
+[cost: event/low] [surface: guard-kit]
+
+guard-kit's bash reader still cuts its compound, statement and pipe splits at an escaped `|` (native/src/guard/bash.rs pins `a \| b` as two segments) and, per its filer, at a backslash before a newline. An extra segment only withholds a grant, so the split errs conservative.
+
+**Deliverable:** the harness matcher's reading of both measured, then the splits matched to it with decision-table rows, as the escaped `;` was.
+
+**Inferred, not run:** the harness matcher's reading of both shapes (a confirming probe was refused by the session's permission classifier), and the backslash-newline cut.
+
+**Cost while deferred:** a call carrying either shape may cost a permission decision a grant would have taken. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' build; promoted at its close: →fix fails because the target behaviour is unmeasured, →forward because no ruling is owed. `bash-reader-escaped-separator` fixed the escaped `;` alone; DISTINCT, not a recurrence. Owner lookup: `escaped`, `backslash` in this file — none live; owner guard-kit/SPEC.md §The reader and its views.
+
+### gate-sdk-layout-assumptions
+
+[cost: event/low] [surface: gate-sdk]
+
+four kept gate-sdk gates assume this repo's layout, found at gate-sdk-value-pass' gate audit:
+
+- `check-gate-substrate-parity` defaults its conservation doc to `<GATE_SDK_ROOT>/SPEC.md`, which the payload withholds, so a bare run in an installed tree exits 2. The consumer smoke vendors by copy and masks it.
+- `check-template-copy-parity` globs `<root>/*/templates/*.sh` rather than joining the kit roots, so under a subdirectory vendoring its corpus empties and it reads clean.
+- `check-tree-terms` and `check-portability-floor` exempt their own pattern files by the shipped basename prefix, so a consumer whose pattern-file knob names another file reds on its own roster.
+- `--emit enforcement-map` links each kit to `<kit>/index.md`, this site's docs layout, so an adopter's page ships one dead link per kit.
+
+**Deliverable:** each gate made layout-neutral, with a fixture per change and gate-sdk/SPEC.md's gate sections updated, and a release declaration for each verdict change.
+
+**Cost while deferred:** an adopter registering the parity gate meets a refusal it cannot discharge; a nested vendoring drifts template copies unchecked; a renamed pattern file reds; the enforcement page ships dead links. Filed 2026-10-02 to the gap inbox as four bullets at gate-sdk-value-pass' build; promoted at its close as one entry: →fix fails because each changes a shipped gate's verdict, →forward because no ruling is owed. Re-verified at gate_substrate_parity.rs's default and `GATE_SDK_PAYLOAD_WITHHOLD`, template_copy_parity.rs's glob, both `SELF_EXEMPT_PREFIX` constants and enforcement_map.rs's `kit_cell`. Owner lookup: `layout`, `kit roots`, `enforcement-map` in this file — [footprint-arm-publisher-page](#footprint-arm-publisher-page), DISTINCT (another emitter's page); owner gate-sdk/SPEC.md, each gate's section.
 
 ## Icebox
 
@@ -1305,11 +1354,4 @@ The consumer's local-only companion files (private brief, ops runbook) have read
 Whether a live queue entry should cite shipped mechanism by a stable anchor (a SPEC section, a gate name, a path) rather than a retired slug, and whether a check-queue-hygiene axis should hold that, is unruled; close's retired-block read corrects each instance inline meanwhile, as it did twice at preview-readiness' close.
 
 ## Done
-
-- reclaim-precondition-outside-the-tree
-- gate-customer-value-audit
-- consumer-value-literal-gate
-- bash-reader-escaped-separator
-- hook-emit-remedy-door
-- guard-kit-tool-brevity
 
