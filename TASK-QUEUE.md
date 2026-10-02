@@ -8,6 +8,24 @@
 
 ## New Features
 
+### companion-install-tier
+
+[spec: SPEC-companion-tier.md] [roadmap: next/ecosystem] [roadmap-summary: A companion install exposing every deterministic gate a spec toolkit does not already do.]
+
+a companion install tier, operator direction 2026-09-29, lead-relayed (not a ruling). A Spec Kit or OpenSpec adopter installs a profile exposing every kit's deterministic gates except the kits whose job the toolkit already does (candidates, unmeasured: lifecycle-kit's stage machine, queue-kit's task queue), each exclusion recorded with the toolkit it defers to, so adopting an excluded kit later is the path to replacing that piece. Each toolkit's customers get a recipe for adopting the non-conflicting kits, in the toolkit's extension where one exists and at minimum on its docs page (OpenSpec has none today). Ground: the companion brings those toolkits' customers to deterministic checks, which complement the toolkit's own work.
+
+**Deliverable:** the tier, its exclusion record and the per-toolkit recipes, under the companion arm's tested-line rule (companion/SPEC.md §Applying a recipe).
+
+**Horizon, operator direction 2026-09-29, lead-relayed (not a ruling):** one outcome row, `now` if the next scope takes it, else `next` until the first close landing a slice moves it to `now`; its slices stay off the roadmap.
+
+**Cost while deferred:** [companion-toolkit-profile](#companion-toolkit-profile)'s submission waits on it, and a companion adopter today chooses between document gates alone and every kit installed beside the toolkit's own workflow. Filed 2026-09-29 to the gap inbox by preview-readiness' lead; promoted 2026-09-30 at its close: →fix fails because a tier is new mechanism and new governed names, →forward because the direction is given. Re-verified: companion/SPEC.md §The two tiers has `prose` (canon-kit's document gates) and `full` (every kit), with no exclusion. Owner lookup: `exclusion`, `conflict`, `companion tier` in this file — none; owner companion/SPEC.md §The two tiers, with installer/SPEC.md §Profiles.
+
+**Selected 2026-10-02 for companion-tier-delegation-pass, operator direction lead-relayed (not a ruling):** a feature, so spec authors and promotes it; unblocked since `gate-customer-value-audit` landed. Its tested arm lands in the current smoke drivers, which [compiled-consumer-smoke-driver](#compiled-consumer-smoke-driver) later ports. Spelled as a selection, it leaves installer/SPEC.md §Profiles and `installer/profiles.list` to [verify-workflow-decoupling](#verify-workflow-decoupling).
+
+**Measured 2026-10-02 at spec:** lifecycle-kit, queue-kit and doctrine-kit leave for both toolkits, the lead's decision applying the direction's test; the tier is `complement`, operator direction 2026-10-02 lead-relayed (not a ruling), spelled `full` plus `--without-kit`, the lead's decision.
+
+**Push need (2026-10-02, inside the budget):** one mid-iteration push, only if the tier changes an extension or recipe install line the CI `companion-toolkits` job runs at its pins. It fires: the tier changes the packed extension's install command.
+
 ## Technical Debt
 
 ### dispatch-guard-door-degrade
@@ -537,22 +555,6 @@ docs/releases.md renders its derived note list as a bare list of version links, 
 **Deliverable:** an arm prefixing the layout's and includes' literal text nodes (Liquid excluded) to every page's corpus, so a sentence of eight words or more or a link target stated in both reds; or a boundary note refusing it.
 
 **Cost while deferred:** the next chrome addition can duplicate a page statement unseen until a reader finds it. Filed 2026-09-29 to the gap inbox by companion-adoption-landing's build; promoted at its close: →fix fails because the arm is new mechanism with a false-positive risk to calibrate, →forward because no ruling is owed. Re-verified: canon-kit/SPEC.md §check-docs-page-repeat reads each `CANON_KIT_PAGE_REPEAT_PAGES` page alone and deliberately asserts no repeat across pages, so the arm must weigh that boundary. Owner lookup: `page-repeat`, `_layouts`, `chrome` in this file — [site-video-poster-rule](#site-video-poster-rule), DISTINCT (embeds); owner canon-kit/SPEC.md §check-docs-page-repeat, with docs/site-architecture.md §Page-authoring rules. Surface also canon-kit.
-
-### companion-install-tier
-
-[roadmap: next/ecosystem] [cost: event/high] [surface: companion] [roadmap-summary: A companion install exposing every deterministic gate a spec toolkit does not already do.]
-
-a companion install tier, operator direction 2026-09-29, lead-relayed (not a ruling). A Spec Kit or OpenSpec adopter installs a profile exposing every kit's deterministic gates except the kits whose job the toolkit already does (candidates, unmeasured: lifecycle-kit's stage machine, queue-kit's task queue), each exclusion recorded with the toolkit it defers to, so adopting an excluded kit later is the path to replacing that piece. Each toolkit's customers get a recipe for adopting the non-conflicting kits, in the toolkit's extension where one exists and at minimum on its docs page (OpenSpec has none today). Ground: the companion brings those toolkits' customers to deterministic checks, which complement the toolkit's own work.
-
-**Deliverable:** the tier, its exclusion record and the per-toolkit recipes, under the companion arm's tested-line rule (companion/SPEC.md §Applying a recipe).
-
-**Horizon, operator direction 2026-09-29, lead-relayed (not a ruling):** one outcome row, `now` if the next scope takes it, else `next` until the first close landing a slice moves it to `now`; its slices stay off the roadmap.
-
-**Cost while deferred:** [companion-toolkit-profile](#companion-toolkit-profile)'s submission waits on it, and a companion adopter today chooses between document gates alone and every kit installed beside the toolkit's own workflow. Filed 2026-09-29 to the gap inbox by preview-readiness' lead; promoted 2026-09-30 at its close: →fix fails because a tier is new mechanism and new governed names, →forward because the direction is given. Re-verified: companion/SPEC.md §The two tiers has `prose` (canon-kit's document gates) and `full` (every kit), with no exclusion. Owner lookup: `exclusion`, `conflict`, `companion tier` in this file — none; owner companion/SPEC.md §The two tiers, with installer/SPEC.md §Profiles.
-
-**Selected 2026-10-02 for companion-tier-delegation-pass, operator direction lead-relayed (not a ruling):** a feature, so spec authors and promotes it; unblocked since `gate-customer-value-audit` landed. Its tested arm lands in the current smoke drivers, which [compiled-consumer-smoke-driver](#compiled-consumer-smoke-driver) later ports; it shares installer/SPEC.md §Profiles and `installer/profiles.list` with [verify-workflow-decoupling](#verify-workflow-decoupling).
-
-**Push need (2026-10-02, inside the budget):** one mid-iteration push, only if the tier changes an extension or recipe install line the CI `companion-toolkits` job runs at its pins.
 
 ### update-availability-notice
 

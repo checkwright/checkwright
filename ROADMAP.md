@@ -30,8 +30,8 @@ Adoption evidence, mostly. A rung promotes when someone hits the friction it des
 
 ### next
 
-- [gate-authoring-sdk-surface](TASK-QUEUE.md#gate-authoring-sdk-surface) *(ecosystem)* — Author a gate in any language behind one substrate-neutral descriptor.
 - [companion-install-tier](TASK-QUEUE.md#companion-install-tier) *(ecosystem)* — A companion install exposing every deterministic gate a spec toolkit does not already do.
+- [gate-authoring-sdk-surface](TASK-QUEUE.md#gate-authoring-sdk-surface) *(ecosystem)* — Author a gate in any language behind one substrate-neutral descriptor.
 
 ### later
 
