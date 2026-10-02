@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+companion-tier-delegation-pass gates sha256=fbd5385f000c095639f36b50152025d272224ac62d3b3a10c4fa4633a8b1e0ee pass=148 fail=0 ignore=0 verdict=clean 2026-10-02
+companion-tier-delegation-pass gate_sdk sha256=5dd4867ce7d597e3acd2fa303c310f044a08712faa3896899ea2832d543a3848 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+companion-tier-delegation-pass canon_kit sha256=9ded695f71c62d1a057f2305280bdec741e5de304cdaa10f982c496574b48323 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+companion-tier-delegation-pass context_kit sha256=a72a655fbdc2336af37022b95846efa73ffc06864ae2241f7ed48d2867d96cc0 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+companion-tier-delegation-pass delegation_kit sha256=e8b7dacc5b3a03c2084bd61274ee3c701400be4001eeaafa4126bc7f4b710363 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+companion-tier-delegation-pass doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+companion-tier-delegation-pass evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+companion-tier-delegation-pass guard_kit sha256=01d94b4120e133665e01946fe44d31a730d2c6cdfd1570e5ce6b96a7a1b30e1b pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+companion-tier-delegation-pass lifecycle_kit sha256=0a16a2be3f1e408582252ab47d92fd8628178950f6367b1711422c95d7a0d8b0 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+companion-tier-delegation-pass queue_kit sha256=254333a369dea6280bbb8ede558b56de8b5fcfb334b35f4cf49256502e871743 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+companion-tier-delegation-pass site_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+companion-tier-delegation-pass scripts sha256=49dacb217bc9bf8c6be056cfe56c9b86206a045896bf399678cdc401a89e2bde pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+companion-tier-delegation-pass guard_tests sha256=d43280c2ec08eb5164bc55f3dd0cc77d3965a86793dfba4f9ffce11ed41bcd97 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+companion-tier-delegation-pass demo sha256=e6cba1ff5c2adbf7c9cbe43d1d1f89173ce8eed351181e8dbeed6c34947e9406 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+companion-tier-delegation-pass installer_smoke sha256=fc9c24653f4e6cb38bc71faab04ec93ab99b418749259f0cc1217bb63ed0bd27 pass=27 fail=0 ignore=0 verdict=clean 2026-10-02
+companion-tier-delegation-pass consumer_smoke sha256=4d91197b707f85479aa8e29b30a1732adf20ec2e6221e79e820ceac8686861d1 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+companion-tier-delegation-pass upgrade sha256=b96eb39a6cf22712b6f3b94a5bb5387916ee14a082251cfecabb3dd15eebdafe pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+companion-tier-delegation-pass agents_md_smoke sha256=020701acc5283167a1bbd30b71dba8c020dcc9d7b94b0f05fce0bd05ca597ec6 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+companion-tier-delegation-pass index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+companion-tier-delegation-pass native_crate sha256=25f2c479c350f588af0b4fbeb01727fad11d2d3e90eb663b94e6a9162af5d24f pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
+companion-tier-delegation-pass projection_witness sha256=6ccc1f75e99568165f3b2212ff782d2912a9b8ce1cab5de447ca205be36c1cfc pass=1 fail=0 ignore=0 verdict=clean 2026-10-02
