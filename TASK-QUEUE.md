@@ -10,30 +10,6 @@
 
 ## Technical Debt
 
-### wait-on-unreachable-condition
-
-a dispatched session can park a wait on a condition nothing will make true. A mechanical-tier align session of lifecycle-queue-value-pass looped `until [ -f .tmp/never-exists-marker ]`; on the foreground timeout the harness backgrounded the loops, and the session read as live past its hand-back for the 30-minute background limit, the holder lifecycle-kit/templates/lead.md names. The waiting rule in delegation-kit/templates/agent-execution.md (**Background + notification, never poll**) bars a self-matching `pgrep` and a record-falsified condition, not a condition with no writer at all, and its "never end a turn in order to wait" clause can read as covering a wait for the lead's answer, which is a turn end.
-
-**Deliverable:** one clause in that bullet (a wait owes a producer that will write its condition; a question to a caller is a turn end, never a wait), propagated to the operative copies in `.claude/agents/` per delegation-kit/SPEC.md §Operative residency.
-
-**Cost while deferred:** a lead reads a finished session as live, for up to the background limit, per occurrence. Filed 2026-10-01 to the gap inbox at lifecycle-queue-value-pass' align; promoted at its close: →fix fails because the rule lands in a kit template and its operative copies in harness agent definitions, a dispatch-policy change for the lead to see, →forward because no ruling is owed. Re-verified: no clause in the template or `.claude/agents/stage-session.md` names a writerless condition. Owner lookup: `waiter`, `never go true`, `never-exists` in this file — only the iceboxed [waiter-loop-condition-predicate-gap](#waiter-loop-condition-predicate-gap), a guard-rule gap over `pgrep` waiters, declined as a recurrence; owner delegation-kit/SPEC.md §The delegation model.
-
-**Selected 2026-10-02 for companion-tier-delegation-pass, operator direction lead-relayed (not a ruling):** debt, landed with [lead-notification-wake-race](#lead-notification-wake-race) as one edit of the bullet. Re-verified at this scope: the bullet still names no writerless condition.
-
-### lead-notification-wake-race
-
-a lead can sleep through its stage session's completion notification. On 2026-09-30 and again on 2026-10-01 the same shape stalled the walk: the session's hand-back message woke the lead, and the harness queued the task's completion notification about 50ms later, while the lead was still writing its reply. The lead's reply made no tool call and ended its turn waiting for that notification, as lifecycle-kit/templates/lead.md's dispatch precondition requires. After the stop hook, the harness wrote the queued notification into the transcript, 0.3s and 0.6s after the turn end, and started no turn. The operator woke the lead 8.7h and 5.3h later. The template's fallback for a notification that never arrives presumes a lead awake to apply it, and delegation-kit/templates/agent-execution.md's backgrounding bullet states without limit that a notification wakes a supervisor.
-
-**Deliverable, narrowed 2026-10-02 at companion-tier-delegation-pass' scope, operator direction lead-relayed (not a ruling):** the remedy lands without the probe — lead.md §The lead model's wait clause gains one tool call before any turn that ends to await a notification, and the agent-execution backgrounding bullet's "a notification wakes a supervisor" is bounded to what was observed. It lands with [wait-on-unreachable-condition](#wait-on-unreachable-condition) as one edit of that bullet and its operative copies.
-
-The remedy is unprobed, an honest limit carried in prose: both transcripts show only that the queue was not drained before the stop. One supporting instance, filed 2026-10-02 by gate-sdk-value-pass' lead and folded in at the next scope: a lead turn that made tool calls before ending received close's completion notification inside that turn, after the tool results. Consistent with the remedy, not a probe of it.
-
-**Cost while deferred:** hours of idle wall-clock per firing, at a stage boundary every iteration crosses five times; it fired in two consecutive iterations. Filed 2026-10-02 at gate-sdk-value-pass' close, from a lead observation; →fix fails because the remedy changes the lead's dispatch-wait policy, a kit template's mechanism, before the delivery rule is probed. →forward fails because no ruling is owed. Re-verified by a scan of every lead transcript for a notification followed by more than five minutes of silence: exactly these two firings, each enqueued mid-turn, which corrects the observation's premise that it landed after the turn end. Owner lookup: `notification`, `turn end`, `wake` in this file — [wait-on-unreachable-condition](#wait-on-unreachable-condition), DISTINCT (a dispatched session's writerless wait); owner lifecycle-kit/templates/lead.md §The lead model. Surface also delegation-kit.
-
-**Selected 2026-10-02 for companion-tier-delegation-pass, operator direction lead-relayed (not a ruling):** debt, no new name.
-
-The probe left 2026-10-02 at companion-tier-delegation-pass' scope as [notification-delivery-probe](#notification-delivery-probe), operator direction lead-relayed (not a ruling): the remedy lands without it.
-
 ## Deferred
 
 ### kit-log-declaration-transport
@@ -630,7 +606,7 @@ context-kit's `--emit footprint` arm ships in the binary but prints this site's 
 
 [cost: event/low] [surface: lifecycle-kit]
 
-the delivery rule under [lead-notification-wake-race](#lead-notification-wake-race)'s remedy, unprobed: does a completion notification queued during a supervisor's turn that makes no tool call wake its session, and does one tool call before the turn end drain it.
+the delivery rule under `lead-notification-wake-race`'s remedy, unprobed: does a completion notification queued during a supervisor's turn that makes no tool call wake its session, and does one tool call before the turn end drain it.
 
 **Deliverable:** that probe, run by a lead with the operator present, since a dispatched session's turn end is its session end and cannot observe it; then lifecycle-kit/templates/lead.md §The lead model's wait clause and the agent-execution backgrounding bullet's bound confirmed or corrected against the result.
 
@@ -1352,4 +1328,6 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 - companion-install-tier
 - dispatch-guard-door-degrade
 - delegation-kit-model-brevity
+- wait-on-unreachable-condition
+- lead-notification-wake-race
 
