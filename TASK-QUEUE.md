@@ -44,6 +44,18 @@ A discarded finding has no durable disposition, so it is re-filed. A drain disca
 
 **Selected 2026-10-02 for consumer-smoke-driver-pass, operator direction lead-relayed (not a ruling):** a feature, the spec stage's to author and promote; independent of the set's other units, its need the closing push alone.
 
+### kit-log-declaration-transport
+
+[spec: SPEC-close-surface-carry.md]
+
+`check-close-surfaces` reds an adopter on kit-owned capture logs it cannot declare. The `close-surface:` declarations for drift-kit's `knowledge-friction.log`, guard-kit's `prompt-friction.log` and `wakeup-attempts.log`, and delegation-kit's `subagent-stop-liveness.log` and `wait-primitive-evidence.txt` live only in those kits' SPEC.md files, which the payload withholds, while guard-kit's and drift-kit's READMEs have the adopter gitignore the logs. The gate's help sends the adopter to "the SPEC section that already owns it", which the adopter does not have.
+
+**Deliverable:** a declaration channel that reaches a vendored tree (a shipped declaration file per kit, or the payload carrying the declaration lines), with a consumer-smoke leg installing lifecycle-kit beside a capture-logging kit and reading `check-close-surfaces` clean.
+
+**Cost while deferred:** an adopter running lifecycle-kit with any capture-logging kit meets a red with no documented cure until it hand-declares the logs and widens `LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS`. Filed 2026-10-01 to the gap inbox at lifecycle-queue-value-pass' build; promoted at its close: →fix fails because the channel is new mechanism across gate-sdk's payload and four kits, →forward because no ruling is owed. Re-verified: installer/SPEC.md states the payload withholds a kit's SPEC.md; guard-kit/README.md step 3 and drift-kit/README.md step 2 gitignore the logs; the five declarations sit only in the three kit SPECs. The red itself was probed at that build (a knob file whose roster basename and surface globs match nothing reds three gitignored logs undeclared) and not re-run here. Distinct from `lifecycle-queue-value-audit`, whose kept verdict on the gate this does not reopen. Owner lookup: `close-surface`, `declaration transport`, `undeclared` in this file — only the iceboxed [close-surface-reclaim-uncoupled-from-read](#close-surface-reclaim-uncoupled-from-read), whose subject is the reclaim; owner lifecycle-kit/SPEC.md §The close-surface roster.
+
+**Selected 2026-10-02 for consumer-smoke-driver-pass, operator direction lead-relayed (not a ruling):** a feature; its consumer-smoke leg is written in [compiled-consumer-smoke-driver](#compiled-consumer-smoke-driver)'s driver, so it lands after that driver and rides its push.
+
 ## Technical Debt
 
 ### installer-smoke-brevity
@@ -55,18 +67,6 @@ installer/SPEC.md's §The consumer smoke, under [spec-brevity-residue](#spec-bre
 **Cost while deferred:** paid by every session and adopter that reads the unpassed section. Filed 2026-10-02 as a split at consumer-smoke-driver-pass' scope. Part of the operator's selection of the unit set, direction 2026-10-02, lead-relayed (not a ruling).
 
 ## Deferred
-
-### kit-log-declaration-transport
-
-[cost: event/high] [surface: lifecycle-kit]
-
-`check-close-surfaces` reds an adopter on kit-owned capture logs it cannot declare. The `close-surface:` declarations for drift-kit's `knowledge-friction.log`, guard-kit's `prompt-friction.log` and `wakeup-attempts.log`, and delegation-kit's `subagent-stop-liveness.log` and `wait-primitive-evidence.txt` live only in those kits' SPEC.md files, which the payload withholds, while guard-kit's and drift-kit's READMEs have the adopter gitignore the logs. The gate's help sends the adopter to "the SPEC section that already owns it", which the adopter does not have.
-
-**Deliverable:** a declaration channel that reaches a vendored tree (a shipped declaration file per kit, or the payload carrying the declaration lines), with a consumer-smoke leg installing lifecycle-kit beside a capture-logging kit and reading `check-close-surfaces` clean.
-
-**Cost while deferred:** an adopter running lifecycle-kit with any capture-logging kit meets a red with no documented cure until it hand-declares the logs and widens `LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS`. Filed 2026-10-01 to the gap inbox at lifecycle-queue-value-pass' build; promoted at its close: →fix fails because the channel is new mechanism across gate-sdk's payload and four kits, →forward because no ruling is owed. Re-verified: installer/SPEC.md states the payload withholds a kit's SPEC.md; guard-kit/README.md step 3 and drift-kit/README.md step 2 gitignore the logs; the five declarations sit only in the three kit SPECs. The red itself was probed at that build (a knob file whose roster basename and surface globs match nothing reds three gitignored logs undeclared) and not re-run here. Distinct from `lifecycle-queue-value-audit`, whose kept verdict on the gate this does not reopen. Owner lookup: `close-surface`, `declaration transport`, `undeclared` in this file — only the iceboxed [close-surface-reclaim-uncoupled-from-read](#close-surface-reclaim-uncoupled-from-read), whose subject is the reclaim; owner lifecycle-kit/SPEC.md §The close-surface roster.
-
-**Selected 2026-10-02 for consumer-smoke-driver-pass, operator direction lead-relayed (not a ruling):** a feature; its consumer-smoke leg is written in [compiled-consumer-smoke-driver](#compiled-consumer-smoke-driver)'s driver, so it lands after that driver and rides its push.
 
 ### required-sections-literal
 
