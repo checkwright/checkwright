@@ -46,23 +46,18 @@ lifecycle-kit/SPEC.md §The committed gap inbox and the two drain steps change a
 - **`templates/stages/scope.md`**'s second step, its *discarded with cause in the commit message* clause, gains *, its record appended to the disposed-findings record or the matching record cited (lifecycle-kit/SPEC.md §The committed gap inbox)*.
 - **canon-kit/SPEC.md §Layout and configuration**, the list of surfaces `check-kit-ref-liveness` valves, gains *the disposed-findings record (`LIFECYCLE_KIT_DISPOSED_FILE`, read by its knob), valved as a frozen record: a discarded finding may name a knob or path that was never minted, and a record outlives the iteration that wrote it*, and `native/src/gates/kit_ref_liveness.rs` reads the knob beside the survey record's. The gate scans every tracked file outside its valves, so without this a record of a discarded proposal reds the tree.
 
-### (4) `check-disposed-findings` holds the record's grammar {design-bearing} {user-facing: the operator's direction of 2026-10-02 on the entry, lead-relayed: its contract and a fixture pair; its `zero-config` disposition, which registers it at install, is a lead decision at align, not an operator direction}
+### (4) `check-disposed-findings` holds the record's grammar {design-bearing} {user-facing: the operator's direction of 2026-10-02 on the entry, lead-relayed: its contract and a fixture pair; its `on-surface` disposition is the operator's direction of 2026-10-02 in the lead session, lead-relayed (not a ruling)}
 
 A native gate, `lifecycle-kit/checks/check-disposed-findings.gate`, implemented in `native/src/gates/disposed_findings.rs` and owned by lifecycle-kit in `gates::REGISTRY`, declaring `LIFECYCLE_KIT_DISPOSED_FILE`. Its graph manifest couples `knob:LIFECYCLE_KIT_DISPOSED_FILE` at `tier=precommit`.
 
-**Its descriptor carries `install: zero-config`** (gate-sdk/SPEC.md §The install disposition). Its subject is a construct only the methodology introduces, the disposition's second condition, and on the tree `init` makes the record is absent, which the gate reads clean, so it can red on nothing a fresh consumer holds. It is the first lifecycle-kit gate `init` registers, so the three surfaces stating that none is are corrected, and lifecycle-kit's smoke registers it, as `check-install-disposition` assertion B requires of a `zero-config` member:
-
-- **installer/SPEC.md §What init seeds**, the starting-roster paragraph's **No lifecycle-kit gate is `zero-config`** becomes ***One lifecycle-kit gate is `zero-config`**, `check-disposed-findings`, clean on a fresh consumer's absent record*, and the per-gate reasons that follow are stated of the rest.
-- **gate-sdk/SPEC.md §The install disposition**, *lifecycle-kit registers nothing at install, because its gates read a stage attestation only a stage session writes* becomes *lifecycle-kit registers one gate at install, `check-disposed-findings`, which reads clean while its record is absent; its others read a stage attestation only a stage session writes*.
-- **`installer/profiles.list`**, the `delegation` comment's *lifecycle-kit registers **no gate** at install, because none of its gates is `zero-config`* names the one that is. *Vendored is not yet enforced* is narrowed to the stage machinery.
-- **`lifecycle-kit/smoke/install.sh`**'s gate roster gains `check-disposed-findings`.
+**Its descriptor carries `install: on-surface`** (gate-sdk/SPEC.md §The install disposition). The record is a surface only a stage session writes, the analogue of the stage attestation that disposition names, so the gate arms when the adopter registers it rather than at install. lifecycle-kit's stance that no gate of its registers at install (installer/SPEC.md §What init seeds) holds unchanged.
 
 Invariant: every non-blank line below the `# contract:` header is a record in delta 1's grammar: a valid date, at least one backticked term with no empty span, and non-empty prose. The matcher skips a malformed record silently, so a malformed record would turn a discard's protection off with nothing printed, and this gate is what tells. The header's presence and form are `check-workflow-tiering`'s.
 
 - **Output**: `DISPOSED-FINDINGS: clean (<n> record(s))`, and per finding the line and what it lacks, with a `help:` naming the grammar.
 - **Fail-closed**: exit 2 on an unreadable file or an explicitly named missing one. An absent record at the configured path is clean, since a consumer that never discarded a finding is in a legal state.
 - **Bare drives the configured record; an explicit file argument drives it hermetically**, the §check-gap-inbox-neutrality precedent.
-- **Fixture pair** `lifecycle-kit/gate-tests/check-disposed-findings/{good,bad}`: the good case two records, one with two terms; the bad case a record with no term, one with an empty span, one with no prose and one with an unparseable date. The module's unit tests pin the absent-record clean line that `zero-config` rests on.
+- **Fixture pair** `lifecycle-kit/gate-tests/check-disposed-findings/{good,bad}`: the good case two records, one with two terms; the bad case a record with no term, one with an empty span, one with no prose and one with an unparseable date. The module's unit tests pin the absent-record clean line the fail-closed bullet states, which only the bare form reaches, since a named missing file is exit 2.
 - **Self-lint**: registration in this repo's `scripts/gates.list`, beside `check-gap-inbox-neutrality`.
 
 lifecycle-kit/SPEC.md gains a `### check-disposed-findings` section in the per-component contracts, stating the above. **Not yet applied.**
@@ -80,8 +75,8 @@ The build seeds `.workflow/disposed-findings.txt` with its header and one record
 - **A record.** Producer: the session running close's gap drain or the first stage's carried-bullet intake, at a →discard, with no enabling config: the knob's default makes the path live wherever lifecycle-kit is vendored. Consumers: the `--emit-file-gap` arm, reading the file after its append (delta 2); every filing's owner lookup, a session grep (delta 3); `check-disposed-findings` (delta 4). Each field's reader: the date, the advisory text and the drain's citation; the terms, the matcher and the lookup's grep; the prose, the advisory text and the drain's re-verification of the ground.
 - **The advisory.** Producer: `--emit file-gap`, on a term match. Consumer: the filer, who writes the re-filing claim into the bullet's prose, which the drain reads.
 - **A record's deletion.** Producer: a drain whose re-verification shows the ground fell. Consumer: the next capture, which no longer matches.
-- **Roster-holding readers of the minted names.** `LIFECYCLE_KIT_DISPOSED_FILE` joins lifecycle-kit's static knob table (`native/src/knobs/lifecycle_kit.rs`) and the file-gap arm's declared roster, `KNOBS` in `native/src/emit/file_gap.rs`, which the arm-table row in `native/src/emit/mod.rs` names by reference and so leaves unchanged. `check-disposed-findings` joins `gates::REGISTRY`, this repo's `scripts/gates.list`, lifecycle-kit/README.md's gate roster, lifecycle-kit's smoke roster, the generated enforcement map, and, through its `zero-config` disposition, the registry `init` writes for every profile carrying lifecycle-kit. `LIFECYCLE_KIT_DISPOSED_FILE` joins `check-kit-ref-liveness`'s valve. The new tracked `.workflow/` member is read by `check-workflow-tiering`, which its header satisfies, and by the close-surface derivation's tracked-file pass, which reads only gitignored members and declarations, so the file adds no row.
-- **Red conditions.** `check-disposed-findings` reds on a malformed record, never on finding none, and an absent record is clean, so its install-time registration reds no fresh consumer. No existing reader's corpus narrows: `check-kit-ref-liveness`'s valve takes out only the new record, which it never read.
+- **Roster-holding readers of the minted names.** `LIFECYCLE_KIT_DISPOSED_FILE` joins lifecycle-kit's static knob table (`native/src/knobs/lifecycle_kit.rs`) and the file-gap arm's declared roster, `KNOBS` in `native/src/emit/file_gap.rs`, which the arm-table row in `native/src/emit/mod.rs` names by reference and so leaves unchanged. `check-disposed-findings` joins `gates::REGISTRY`, this repo's `scripts/gates.list`, lifecycle-kit/README.md's gate roster and the generated enforcement map; as an `on-surface` member it joins no registry `init` writes. `LIFECYCLE_KIT_DISPOSED_FILE` joins `check-kit-ref-liveness`'s valve. The new tracked `.workflow/` member is read by `check-workflow-tiering`, which its header satisfies, and by the close-surface derivation's tracked-file pass, which reads only gitignored members and declarations, so the file adds no row.
+- **Red conditions.** `check-disposed-findings` reds on a malformed record, never on finding none, and an absent record is clean, so an adopter registering it before its first discard reads clean. No existing reader's corpus narrows: `check-kit-ref-liveness`'s valve takes out only the new record, which it never read.
 
 ## Existing sections updated
 
@@ -93,10 +88,6 @@ Probe for the reader roster: `git grep -n "LIFECYCLE_KIT_GAP_INBOX_FILE\|Filing 
 - `lifecycle-kit/templates/stages/close.md` — step 2's →discard clause and its re-verification passage (delta 3).
 - `lifecycle-kit/templates/stages/scope.md` — the second step's discard clause (delta 3).
 - `lifecycle-kit/README.md` — the gate roster gains `check-disposed-findings` (delta 4).
-- `lifecycle-kit/smoke/install.sh` — the gate roster gains `check-disposed-findings` (delta 4).
-- `installer/SPEC.md` §What init seeds — the starting-roster paragraph (delta 4).
-- `installer/profiles.list` — the `delegation` comment (delta 4).
-- `gate-sdk/SPEC.md` §The install disposition — the lifecycle-kit sentence (delta 4).
 - `canon-kit/SPEC.md` §Layout and configuration — the valve list (delta 3).
 - `native/src/gates/kit_ref_liveness.rs` — the record's valve (delta 3).
 - `lifecycle-kit/checks/check-disposed-findings.gate` and `lifecycle-kit/gate-tests/check-disposed-findings/` — new (delta 4).
@@ -106,11 +97,11 @@ Probe for the reader roster: `git grep -n "LIFECYCLE_KIT_GAP_INBOX_FILE\|Filing 
 - `native/src/gates/disposed_findings.rs` and `native/src/gates/mod.rs` — the gate and its registry row (delta 4).
 - `scripts/gates.list` — the registration (delta 4).
 - `.workflow/disposed-findings.txt` — seeded (delta 5).
-- `.workflow/release-declarations.md` — the new gate, registered at install, its knob and the advisory, and the two template steps a consumer copying them out re-takes (deltas 2, 3 and 4).
+- `.workflow/release-declarations.md` — the new gate, its knob and the advisory, and the two template steps a consumer copying them out re-takes (deltas 2, 3 and 4).
 - `docs/enforcement.md` — the generated enforcement map gains the gate (delta 4).
 - `docs/check-graph.html` — regenerated for the new descriptor (delta 4).
 - `docs/lifecycle-kit/SPEC.md` — the generated mirror (all deltas).
-- `docs/installer/SPEC.md`, `docs/gate-sdk/SPEC.md`, `docs/canon-kit/SPEC.md` — the generated mirrors (deltas 3 and 4).
+- `docs/canon-kit/SPEC.md` — the generated mirror (delta 3).
 
 ## Retired spellings
 
