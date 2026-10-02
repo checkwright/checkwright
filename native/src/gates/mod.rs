@@ -1248,8 +1248,9 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_TMP_DIR",
             "GATE_SDK_NATIVE_BIN",
+            "GATE_SDK_TESTS_DIR",
         ],
-        "gate-sdk",
+        "-",
         &[("git", ""), ("?", "GATE_SDK_NATIVE_BIN")],
     ),
     (
@@ -2024,7 +2025,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PAYLOAD_WITHHOLD",
             "GATE_SDK_SPEC_BASE_URL",
         ],
-        "gate-sdk",
+        "-",
         &[],
     ),
     // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — no joint
@@ -2126,7 +2127,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_NATIVE_CRATE",
             "GATE_SDK_KIT_DIRS",
         ],
-        "gate-sdk",
+        "-",
         &[("git", ""), ("?", "GATE_SDK_NATIVE_BIN")],
     ),
     // spec: gate-sdk/SPEC.md §check-crate-arms — no walk root: the corpus is a crate cargo is
@@ -2147,7 +2148,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_KIT_DIRS",
             "GATE_SDK_GATES_DIR",
         ],
-        "gate-sdk",
+        "-",
         &[("cargo", ""), ("git", ""), ("rustc", ""), ("?", "GATE_SDK_NATIVE_BIN")],
     ),
     // spec: gate-sdk/SPEC.md §check-gate-assertions — no walk root: the corpus is the kit SPEC
@@ -2212,8 +2213,8 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-install-disposition",
         install_disposition::run,
-        &[("?", "", "", "dynamic@src/gates/install_disposition.rs:190")],
-        &["GATE_SDK_KIT_DIRS"],
+        &[("?", "", "", "dynamic@src/gates/install_disposition.rs:192")],
+        &["GATE_SDK_KIT_DIRS", "GATE_SDK_NATIVE_SRC"],
         "gate-sdk",
         &[("git", "")],
     ),

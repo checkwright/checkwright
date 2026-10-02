@@ -9,7 +9,7 @@
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # gate-sdk/
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # scripts/, the gates dir declaring the member
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -17,7 +17,7 @@ fails=0
 tree="$DIR/gate-tests/check-kit-roots-dialect/good/tree"
 
 out="$( cd "$SANDBOX" && GATE_SDK_TMP_DIR="$SANDBOX/tmp" GIT_INDEX_FILE=no-such-dir/next-index-1.lock \
-    gate_run check-kit-roots-dialect "$DIR/checks" "$tree" 2>&1 )"; rc=$?
+    gate_run check-kit-roots-dialect "$DIR" "$tree" 2>&1 )"; rc=$?
 if [[ "$rc" -ne 0 ]]; then
     echo "  FAIL [relative-index]: want exit 0, got $rc -- $out"; fails=$((fails + 1))
 elif ! grep -qF 'KIT-ROOTS-DIALECT: clean' <<<"$out"; then

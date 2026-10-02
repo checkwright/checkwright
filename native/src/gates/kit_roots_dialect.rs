@@ -40,16 +40,16 @@ pub fn run(args: &[String]) -> i32 {
     }
 }
 
-// spec: gate-sdk/SPEC.md §check-kit-roots-dialect — the tree defaults to the fixture this kit
-// ships, resolved off the gate-sdk locator so a consumer that vendored the kit elsewhere still
-// finds it; a positional overrides it, which is how the fixture pair names its two trees
+// spec: gate-sdk/SPEC.md §check-kit-roots-dialect — the tree defaults to the gate's own `good/`
+// fixture, resolved off the tests dir that holds the publisher's pair; a positional overrides
+// it, which is how the fixture pair names its two trees
 fn tree_of(args: &[String]) -> Result<String, String> {
     let given = args.first().filter(|a| !a.is_empty()).cloned();
     let tree = match given {
         Some(a) => a,
         None => format!(
-            "{}/gate-tests/{}/good/tree",
-            walk::sdk_root().trim_end_matches('/'),
+            "{}/{}/good/tree",
+            walk::knob_scalar("GATE_SDK_TESTS_DIR")?.trim_end_matches('/'),
             NAME
         ),
     };

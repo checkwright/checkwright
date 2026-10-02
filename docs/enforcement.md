@@ -29,8 +29,8 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | [gate-sdk](gate-sdk/index.md) | check-gate-fixture-coverage | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-gate-exemption-tasks | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-gate-substrate-parity | precommit |
-| [gate-sdk](gate-sdk/index.md) | check-gate-binary-fresh | precommit |
-| [gate-sdk](gate-sdk/index.md) | check-crate-arms | precommit |
+| (consumer) | check-gate-binary-fresh | precommit |
+| (consumer) | check-crate-arms | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-install-disposition | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-test-hermetic | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-path-dialect | precommit |
@@ -41,9 +41,9 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | [gate-sdk](gate-sdk/index.md) | check-reads-couples | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-kit-enum | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-kit-registration | precommit |
-| [gate-sdk](gate-sdk/index.md) | check-kit-roots-dialect | precommit |
+| (consumer) | check-kit-roots-dialect | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-readme-roster | precommit |
-| [gate-sdk](gate-sdk/index.md) | check-packed-links | precommit |
+| (consumer) | check-packed-links | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-smoke-entry-guard | precommit |
 | (consumer) | check-docs-kit-parity | precommit |
 | (consumer) | check-docs-nav-reachable | precommit |

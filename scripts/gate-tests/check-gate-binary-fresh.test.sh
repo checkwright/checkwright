@@ -10,9 +10,10 @@
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # gate-sdk/
-# shellcheck source=../lib/gate.sh
-source "$DIR/lib/gate.sh"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+GATES_DIR="$ROOT/scripts"
+# shellcheck source=../../gate-sdk/lib/gate.sh
+source "$ROOT/gate-sdk/lib/gate.sh"
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -40,7 +41,7 @@ DESC='# graph: couples=docs/*.md dir=one valve=none tier=precommit
 # gate reads that exported value, which outranks every knob file.
 gate_argv() {  # gate_argv <knob> <value> -> ARGV
     local knob="$1" val="$2"
-    mapfile -t ARGV < <(gate_command check-gate-binary-fresh "$DIR/checks")
+    mapfile -t ARGV < <(gate_command check-gate-binary-fresh "$GATES_DIR")
     [[ ${#ARGV[@]} -gt 0 ]] || return 2
     export "$knob=$val"
 }

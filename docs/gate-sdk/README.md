@@ -76,8 +76,6 @@ check-gate-fail-closed
 check-gate-fixture-coverage
 check-gate-assertions
 check-gate-substrate-parity
-check-gate-binary-fresh
-check-crate-arms
 check-install-disposition
 check-test-hermetic
 check-path-dialect
@@ -90,9 +88,7 @@ check-reads-couples
 check-enforcement-fresh
 check-kit-enum
 check-kit-registration
-check-kit-roots-dialect
 check-readme-roster
-check-packed-links
 check-smoke-entry-guard
 check-core-files
 check-identity

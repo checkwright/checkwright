@@ -22,7 +22,6 @@ check-gate-fixture-coverage
 check-gate-exemption-tasks
 check-gate-assertions
 check-gate-substrate-parity
-check-crate-arms
 check-install-disposition
 check-graph
 check-commit-msg
@@ -36,11 +35,9 @@ check-exec-bit
 check-hook-exec-bit
 check-identity
 check-kit-enum
-check-kit-roots-dialect
 check-path-dialect
 check-pipe-membership
 check-front-end-fail-open
-check-packed-links
 check-readme-roster
 check-reads-couples
 check-smoke-entry-guard
@@ -58,15 +55,12 @@ check-action-job-ref
 # grammar (a sibling of §The install disposition's `# smoke-unregistered:`, on a second
 # roster): gate-sdk-owned subcommands this leg's minimal registry deliberately omits,
 # each read by name and reason so the residue is on the surface the assertion reads.
-# unregistered: check-gate-binary-fresh — its subject is the crate the binary was built from; GATE_SDK_NATIVE_CRATE is kept outside every kit root and a scratch consumer never rebuilds against a source checkout
 # unregistered: check-root-tiering — its subject is the consumer-curated root manifest, which no kit install can author: the vendored root set is per-adoption and gate-sdk installs first, before that set exists
 # unregistered: check-enforcement-fresh — compares docs/enforcement.md against its emitter; the scratch consumer vendors no docs/ site
 # unregistered: check-kit-registration — checks a root README kit-registry table and a fixture-runner doc; the scratch consumer vendors neither
 EOF
 
 # smoke-unregistered: check-root-tiering — its subject is the consumer-curated root manifest GATE_SDK_ROOT_ALLOWLIST (default scripts/root-allowlist.list), which no kit install can author: the vendored root set is per-adoption and gate-sdk installs first, before that set exists
-# spec: gate-sdk/SPEC.md §Consumer smoke — check-gate-binary-fresh is deliberately NOT registered here and deliberately carries no smoke-unregistered declaration (assertion I's roster above is a second accounting, with no probe exemption): its subject is the crate the binary was built from, GATE_SDK_NATIVE_CRATE is kept outside every kit root by design, so the probe derives the exemption every run and a written reason would be the inversion the accounting refuses
-
 # spec: gate-sdk/SPEC.md §Consumer smoke — ship the tracked default pattern list; the local companion is absent, exercising the fresh-clone path
 cp "$SDK/templates/msg-patterns.list" scripts/msg-patterns.list
 

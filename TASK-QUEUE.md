@@ -44,31 +44,11 @@ nothing enforces gate-sdk/SPEC.md §The port-candidate criteria's rule that ever
 
 **Cost while deferred:** each literal publishes this repo's configuration as every adopter's mechanism, and instances surface only by chance. Filed 2026-09-27 to the gap inbox by platform-prerequisite-floors' lead; promoted at its close: →fix fails because the gate is new mechanism over an unsized corpus. Re-verified: the rule's sentence appears in gate-sdk/SPEC.md and its site mirror alone, with no gate section enforcing it. Owner lookup: `literal`, `hardcod` in this file's headings — [knob-default-accessor-singularity](#knob-default-accessor-singularity), DISTINCT (it bars re-spelling an existing knob's default; this bars a consumer value with no knob); owner gate-sdk/SPEC.md §The port-candidate criteria.
 
-**Selected 2026-10-01 for gate-sdk-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it; its census runs after [gate-customer-value-audit](#gate-customer-value-audit)'s gate-sdk verdicts, which remove literals by making gates generic.
+**Selected 2026-10-01 for gate-sdk-value-pass, operator direction lead-relayed (not a ruling):** spec authors and promotes it; its census runs after `gate-customer-value-audit`'s gate-sdk verdicts, which remove literals by making gates generic.
 
 **Corpus set 2026-10-02 by operator direction, lead-relayed (not a ruling), option C:** the kit-shipped gates' modules this iteration. Every module, the withheld `scripts/` gates included, is filed as [withheld-gate-literal-knobs](#withheld-gate-literal-knobs).
 
 ## Technical Debt
-
-### gate-customer-value-audit
-
-[roadmap: now/adoption] [roadmap-summary: Every installed gate useful to its adopter and configurable, and no gate shipped that serves only Checkwright's own development.]
-
-nothing asks whether each shipped gate is useful and configurable for a customer. Operator direction, 2026-09-28 (lead session): "offer customers useful and configurable gates"; a gate benefiting only Checkwright's own development, such as a GitHub Pages check that is not configurable, "should either be abstracted or not be shipped and tested on customer OSes". The provenance seam bars project content from kits, but customer value is another question, and the install disposition (zero-config, on-surface, never) decides registration, not whether a gate belongs in the payload. Horizon `now` since guard-kit-steering's close, on the operator direction of 2026-09-29, lead-relayed (not a ruling): `now` if the next scope takes it, else at the first close landing a slice; the per-kit slices stay off the roadmap.
-
-**Deliverable:** an audit over every shipped gate recording customer value and configurability, each gate then made generic, kept out of the payload and the customer-OS legs, or kept; site-kit's GitHub Pages gates first.
-
-**Cost while deferred:** every push runs gates of no customer value on customer-OS legs, and every adopter installs them. Filed 2026-09-28 to the gap inbox by companion-front-door-widening's lead; promoted 2026-09-28 at the next iteration's scope: →fix fails because the audit is unsized. Owner lookup: `customer value`, `payload` in this file — [consumer-value-literal-gate](#consumer-value-literal-gate), DISTINCT (a hard-coded value inside a gate, not the gate's place in the payload). Owner gate-sdk/SPEC.md §Consumer payload.
-
-**First slice landed 2026-09-29 at native-hook-customer-legs, operator direction lead-relayed (not a /consult ruling):** the payload rule at gate-sdk/SPEC.md §Consumer payload, and site-kit audited against it.
-
-Audited: site-kit, 5 gates (5 kept, 2 made generic, 0 withheld); guard-kit, 1 gate (1 kept, 0 made generic, 0 withheld); delegation-kit, 3 gates (2 kept, 0 made generic, 1 withheld); canon-kit, 37 gates (37 kept, 7 made generic, 0 withheld); context-kit, 6 gates (5 kept, 0 made generic, 1 withheld); evidence-kit, 4 gates (4 kept, 1 made generic, 0 withheld); doctrine-kit, 1 gate (1 kept, 0 made generic, 0 withheld); lifecycle-kit, 15 gates (15 kept, 0 made generic, 0 withheld); queue-kit, 11 gates (11 kept, 0 made generic, 0 withheld); gate-sdk's 43 shipped gates remain, the one kit unaudited under gate-sdk/SPEC.md §Consumer payload's rule.
-
-Slices left at scope, each on an operator direction lead-relayed (not a /consult ruling), and landed in that iteration's build: guard-kit's 2026-09-30 at guard-kit-steering as `guard-kit-value-audit`; delegation-kit's 2026-09-30 at delegation-tier-binding as `delegation-kit-value-audit`; canon-kit's 2026-09-30 at canon-kit-value-pass as `canon-kit-value-audit`; context-kit's, evidence-kit's and doctrine-kit's 2026-10-01 at context-kit-value-pass as `small-kit-value-audit`; lifecycle-kit's and queue-kit's 2026-10-01 at lifecycle-queue-value-pass as `lifecycle-queue-value-audit`.
-
-**A precondition of [companion-toolkit-profile](#companion-toolkit-profile)'s submission, operator direction 2026-09-29, lead-relayed (not a ruling),** beside [companion-install-tier](#companion-install-tier), whose exposed kits this audit's verdicts decide, so those kits are its natural first slices.
-
-**gate-sdk's slice, the last, selected 2026-10-01 for gate-sdk-value-pass, operator direction lead-relayed (not a ruling):** the entry itself promoted, its deliverable gate-sdk's 43 gates and the tally completed. It precedes [consumer-value-literal-gate](#consumer-value-literal-gate), whose literal census its made-generic verdicts shrink, and its verdict on `check-action-run-shell` reads the iceboxed [action-run-shell-scan-predicate](#action-run-shell-scan-predicate), which a configurable verdict moots.
 
 ### guard-kit-tool-brevity
 
@@ -248,7 +228,7 @@ the interop rung's submission half. The build half landed at companion-catalog-e
 
 **Deliverable:** the Spec Kit community-catalog submission, filed as the catalog's Extension Submission issue with its `download_url` naming the `checkwright-companion-<version>.zip` Release asset; the extension's README and the landing page then gain the catalog's install form.
 
-**Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **Also gated, operator direction 2026-09-29, lead-relayed (not a ruling),** on [companion-install-tier](#companion-install-tier) and [gate-customer-value-audit](#gate-customer-value-audit): the audit's verdicts decide which gates that tier exposes, so scope reads the two as one sequencing. **The four preconditions the operator set on 2026-09-27 landed at catalog-submission-preconditions:** `crate-tests-windows-flip`, since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; `catalog-landing-docs-polish`; and `spec-toolkits-guarantee`.
+**Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **Also gated, operator direction 2026-09-29, lead-relayed (not a ruling),** on [companion-install-tier](#companion-install-tier) and `gate-customer-value-audit`: the audit's verdicts decide which gates that tier exposes, so scope reads the two as one sequencing. **The four preconditions the operator set on 2026-09-27 landed at catalog-submission-preconditions:** `crate-tests-windows-flip`, since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; `catalog-landing-docs-polish`; and `spec-toolkits-guarantee`.
 
 **Four more prerequisites, operator direction 2026-09-29, lead-relayed (not a ruling):** three landed at companion-technical-gates (`install-gate-selection`, `companion-spec-to-code-gates`, `speckit-extension-full-profile`), and `adoption-prompt-templates` landed at companion-adoption-landing. Ground: Spec Kit and OpenSpec are technical toolkits, so a companion offering only document gates reads as near-useless, and the launch needs an early-adopter wow.
 
@@ -1375,4 +1355,5 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 ## Done
 
 - reclaim-precondition-outside-the-tree
+- gate-customer-value-audit
 

@@ -10,7 +10,9 @@ use std::path::Path;
 // else. The help line's alternation is joined from this set rather than spelled twice.
 const VOCAB: &[&str] = &["zero-config", "on-surface", "never"];
 const ZERO_CONFIG: &str = "zero-config";
-const RECIPE: &str = "native/src/installer/recipe.rs";
+// spec: gate-sdk/SPEC.md §check-install-disposition — the recipe's place inside the crate source,
+// joined onto GATE_SDK_NATIVE_SRC rather than spelling one tree's crate root
+const RECIPE_IN_SRC: &str = "installer/recipe.rs";
 const DECL: &str = "# install:";
 
 // spec: gate-sdk/SPEC.md §check-install-disposition — assertion D: a second line, a knob no static
@@ -270,9 +272,21 @@ pub fn run(args: &[String]) -> i32 {
     // spec: gate-sdk/SPEC.md §check-install-disposition — assertion C, whose holder moved in-crate
     // with the recipe rather than retiring with it: the subject is the derivation, not the language.
     // The file is still absent in a vendored consumer, so its absence is a skip and never a finding.
-    let recipe = format!("{}/{}", root, RECIPE);
+    let src = match walk::knob_scalar("GATE_SDK_NATIVE_SRC") {
+        Ok(s) => s.trim_end_matches('/').to_string(),
+        Err(e) => {
+            eprintln!("check-install-disposition: {}", e);
+            return 2;
+        }
+    };
+    let shown = format!("{}/{}", src, RECIPE_IN_SRC);
+    let recipe = if walk::path_root(&shown).is_some() {
+        shown.clone()
+    } else {
+        format!("{}/{}", root, shown)
+    };
     let mut recipe_checked = "no";
-    if Path::new(&recipe).is_file() {
+    if !src.is_empty() && Path::new(&recipe).is_file() {
         recipe_checked = "yes";
         let Ok(bytes) = std::fs::read(&recipe) else {
             eprintln!(
@@ -285,7 +299,7 @@ pub fn run(args: &[String]) -> i32 {
         for n in recipe_hits(&text) {
             findings.push(format!(
                 "{}:{}: literal gate name — the roster is derived from each gate's declaration, never listed here",
-                RECIPE, n
+                shown, n
             ));
         }
     }
@@ -308,7 +322,7 @@ pub fn run(args: &[String]) -> i32 {
         );
         println!(
             "        declared knobs of the gate's own kit; and keep {} free of literal",
-            RECIPE
+            shown
         );
         println!("        gate names — it derives the roster (gate-sdk/SPEC.md §The install disposition).");
         return 1;
