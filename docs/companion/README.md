@@ -7,7 +7,7 @@ generated: true
 <!-- {% raw %} -->
 # Checkwright companion
 
-Checkwright's gates over a repository whose specs another toolkit writes. This directory holds what fits the `prose` and `full` profiles to a Spec Kit or OpenSpec spec tree, and the tests that prove it.
+Checkwright's gates over a repository whose specs another toolkit writes. This directory holds what fits each install tier to a Spec Kit or OpenSpec spec tree, and the tests that prove it.
 
 ## What it holds
 
@@ -16,6 +16,7 @@ Checkwright's gates over a repository whose specs another toolkit writes. This d
 - **A Spec Kit extension**, in `speckit/`, whose install command installs Checkwright and applies the Spec Kit recipe for you.
 - **A fixture tree per toolkit**, in `fixtures/`, in the toolkit's own layout, with one planted defect per claimed gate. The consumer smoke installs the profile on each tree, applies the recipe, and asserts the battery green and each defect caught.
 - **The tested versions**, in `toolkits.list`.
+- **The left-out kits**, in `exclusions.list`: each kit a toolkit's `complement` line leaves out, with the toolkit's own surface that does its job.
 - **The toolkits' own checks**, in `native.list`, which the toolkit leg runs and the support table lists.
 
 ## Using it
@@ -23,7 +24,7 @@ Checkwright's gates over a repository whose specs another toolkit writes. This d
 - **Spec Kit:** add the extension from a Checkwright release and run its install command ([speckit/README.md](https://github.com/checkwright/checkwright/blob/master/companion/speckit/README.md)).
 - **OpenSpec:** install the `prose` profile with `--recipe openspec`.
 
-Each toolkit also has a `full` line, which installs every kit and on OpenSpec applies `openspec/lifecycle/` too ([SPEC.md §The two tiers](SPEC.md#the-two-tiers)).
+Each toolkit also has a `complement` line, which installs every kit but those whose job the toolkit already does, and a `full` line, which installs every kit and on OpenSpec applies `openspec/lifecycle/` too ([SPEC.md §The tiers](SPEC.md#the-tiers)).
 
 What the gates catch in a spec tree, which checks each toolkit gets and the tested versions are on the [Spec toolkits](https://checkwright.dev/spec-toolkits.html) page, and each route is on its toolkit's page: [Spec Kit](https://checkwright.dev/speckit.html) and [OpenSpec](https://checkwright.dev/openspec.html).
 

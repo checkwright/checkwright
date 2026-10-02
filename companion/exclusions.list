@@ -1,0 +1,7 @@
+# contract: companion/SPEC.md §The component — one `<toolkit> <kit> <surface…>` line per kit a toolkit's `complement` line leaves out; <toolkit> keys a toolkits.list line, <kit> names a payload kit root, and <surface…> is the toolkit's own artifact that already does the kit's job; the companion arm holds each toolkit's `complement` line's `--without-kit` set to its rows
+speckit lifecycle-kit the specify, plan, tasks and implement workflow, .specify/workflows/speckit/workflow.yml
+speckit queue-kit each feature's task list, specs/<feature>/tasks.md
+speckit doctrine-kit the project constitution, .specify/memory/constitution.md
+openspec lifecycle-kit the propose, apply and archive change workflow
+openspec queue-kit each change's task list, openspec/changes/<change>/tasks.md
+openspec doctrine-kit the project context and rules in openspec/config.yaml

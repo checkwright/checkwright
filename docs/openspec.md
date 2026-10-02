@@ -20,7 +20,19 @@ The recipe governs the markdown under `openspec/`, exempts `openspec/changes/` f
 
 **Keep each title unique within a spec.** OpenSpec specs often repeat a scenario title under two requirements. A citation of the second title would reach the first, so set `CANON_KIT_SPEC_POINTER_TITLE_ONCE = on` in `canon-config.knobs` to have `check-spec-pointer` red the repeat. Rename one apart, for instance *Idle timeout, web* and *Idle timeout, API*.
 
-**Every kit instead of `prose`.** The second line installs `full`:
+**Every kit OpenSpec does not replace.** The second line installs `complement`:
+
+<!-- companion-complement:begin -->
+
+```text
+checkwright init --profile full --without-kit lifecycle-kit --without-kit queue-kit --without-kit doctrine-kit --recipe openspec
+```
+
+<!-- companion-complement:end -->
+
+`complement` leaves out each kit whose job OpenSpec already does. [`companion/exclusions.list`](https://github.com/checkwright/checkwright/blob/master/companion/exclusions.list) records the OpenSpec surface each one defers to, and the line carries one `--without-kit` per kit. It needs `bash` 4.3 or later and seeds evidence files under `.workflow/`, beside OpenSpec's own. Drop a kit's `--without-kit` to adopt it later. It applies no lifecycle layer, since it leaves the stage machine to OpenSpec.
+
+**Every kit.** The third line installs `full`:
 
 <!-- companion-full:begin -->
 

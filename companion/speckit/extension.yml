@@ -20,7 +20,7 @@ provides:
   commands:
     - name: "speckit.checkwright.install"
       file: "commands/install.md"
-      description: "Install Checkwright's gates, prose or every kit, and apply the Spec Kit recipe"
+      description: "Install Checkwright's gates (prose, complement or full) and apply the Spec Kit recipe"
     - name: "speckit.checkwright.check"
       file: "commands/check.md"
       description: "Run Checkwright's gate battery and report its verdict"

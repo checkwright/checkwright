@@ -10,7 +10,7 @@
 
 ### companion-install-tier
 
-[spec: SPEC-companion-tier.md] [roadmap: next/ecosystem] [roadmap-summary: A companion install exposing every deterministic gate a spec toolkit does not already do.]
+[spec: companion/SPEC.md] [roadmap: next/ecosystem] [roadmap-summary: A companion install exposing every deterministic gate a spec toolkit does not already do.]
 
 a companion install tier, operator direction 2026-09-29, lead-relayed (not a ruling). A Spec Kit or OpenSpec adopter installs a profile exposing every kit's deterministic gates except the kits whose job the toolkit already does (candidates, unmeasured: lifecycle-kit's stage machine, queue-kit's task queue), each exclusion recorded with the toolkit it defers to, so adopting an excluded kit later is the path to replacing that piece. Each toolkit's customers get a recipe for adopting the non-conflicting kits, in the toolkit's extension where one exists and at minimum on its docs page (OpenSpec has none today). Ground: the companion brings those toolkits' customers to deterministic checks, which complement the toolkit's own work.
 
@@ -512,7 +512,7 @@ the generated pre-commit and commit-msg hooks start through a shell on every OS:
 
 an OpenSpec change delta that disagrees with its base spec passes the battery and OpenSpec's own validator, and is caught, if at all, only at archive. Measured on openspec 1.13.2 at companion-technical-gates' spec: `validate --strict` exits 0 on a MODIFIED or RENAMED delta naming an absent requirement and on an ADDED one naming an existing requirement, printing only an INFO line; `archive -y` refuses those three, but `--skip-specs` bypasses the refusal; a REMOVED delta naming an absent requirement passes validate silently and archive takes it as already removed.
 
-**Deliverable:** a generic commit-time gate for heading-set delta agreement, its OpenSpec binding in the recipe, if it clears the value bar `toolkit-overlap-value-bar` landed (companion/SPEC.md §The two tiers); it is that bar's first candidate, since OpenSpec owns the check at archive and this gate would re-check it earlier.
+**Deliverable:** a generic commit-time gate for heading-set delta agreement, its OpenSpec binding in the recipe, if it clears the value bar `toolkit-overlap-value-bar` landed (companion/SPEC.md §The tiers); it is that bar's first candidate, since OpenSpec owns the check at archive and this gate would re-check it earlier.
 
 **Cost while deferred:** an OpenSpec adopter's technical gates read nothing on a conventional task list, which names no paths, so the companion's code-facing reach there is `check-task-path-claim` alone. Filed 2026-09-29 at companion-technical-gates' spec on an operator direction lead-relayed (not a ruling). Owner lookup: `delta`, `archive`, `openspec` in this file — `companion-spec-to-code-gates`, DISTINCT (it ships the task gates and defers this one), and `toolkit-nav-hierarchy`, DISTINCT (nav labels); owner companion/SPEC.md.
 
