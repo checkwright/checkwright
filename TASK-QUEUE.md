@@ -634,7 +634,7 @@ a lead can sleep through its stage session's completion notification. On 2026-09
 
 **Deliverable:** a probe of the delivery rule (does a notification queued during a turn with no tool call wake its session, and does one tool call before the turn end drain it), then the lead's wait clause matched to the result in lead.md §The lead model, with the agent-execution bullet's claim bounded.
 
-**Inferred, not run:** that a tool call before the turn end would have delivered the notification. Both transcripts show only that the queue was not drained before the stop.
+**Inferred, not run:** that a tool call before the turn end would have delivered the notification. Both transcripts show only that the queue was not drained before the stop. One supporting instance, filed 2026-10-02 by gate-sdk-value-pass' lead and folded in at the next scope: a lead turn that made tool calls before ending received close's completion notification inside that turn, after the tool results. Consistent with the remedy, not a probe of it.
 
 **Cost while deferred:** hours of idle wall-clock per firing, at a stage boundary every iteration crosses five times; it fired in two consecutive iterations. Filed 2026-10-02 at gate-sdk-value-pass' close, from a lead observation; →fix fails because the remedy changes the lead's dispatch-wait policy, a kit template's mechanism, before the delivery rule is probed. →forward fails because no ruling is owed. Re-verified by a scan of every lead transcript for a notification followed by more than five minutes of silence: exactly these two firings, each enqueued mid-turn, which corrects the observation's premise that it landed after the turn end. Owner lookup: `notification`, `turn end`, `wake` in this file — [wait-on-unreachable-condition](#wait-on-unreachable-condition), DISTINCT (a dispatched session's writerless wait); owner lifecycle-kit/templates/lead.md §The lead model. Surface also delegation-kit.
 
@@ -674,6 +674,16 @@ four kept gate-sdk gates assume this repo's layout, found at gate-sdk-value-pass
 **Deliverable:** each gate made layout-neutral, with a fixture per change and gate-sdk/SPEC.md's gate sections updated, and a release declaration for each verdict change.
 
 **Cost while deferred:** an adopter registering the parity gate meets a refusal it cannot discharge; a nested vendoring drifts template copies unchecked; a renamed pattern file reds; the enforcement page ships dead links. Filed 2026-10-02 to the gap inbox as four bullets at gate-sdk-value-pass' build; promoted at its close as one entry: →fix fails because each changes a shipped gate's verdict, →forward because no ruling is owed. Re-verified at gate_substrate_parity.rs's default and `GATE_SDK_PAYLOAD_WITHHOLD`, template_copy_parity.rs's glob, both `SELF_EXEMPT_PREFIX` constants and enforcement_map.rs's `kit_cell`. Owner lookup: `layout`, `kit roots`, `enforcement-map` in this file — [footprint-arm-publisher-page](#footprint-arm-publisher-page), DISTINCT (another emitter's page); owner gate-sdk/SPEC.md, each gate's section.
+
+### dispatch-guard-door-degrade
+
+[cost: event/low] [surface: delegation-kit]
+
+the agent-dispatch guard drops D6 (the bound tier) with an advisory when the gate binary's door cannot be read for the refusal's remedy text: native/src/hook/dispatch.rs clears the binding on `door_command`'s error. delegation-kit/SPEC.md §The delegation model's fail-posture table unenforces D6 only when `DELEGATION_KIT_TIER_MODEL`'s own read fails, so the code is out of its spec, and a remedy line that cannot render costs the rule rather than the line.
+
+**Deliverable:** the refusal renders without the door when it cannot be read, D6 stays enforced, and a decision-table row pins it.
+
+**Cost while deferred:** a binary-door fault silently widens every dispatch past the consumer's tier binding, with only an advisory. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' close (its baked-calibration sweep), a regression of that iteration's binary-door change; promoted 2026-10-02 at the next scope, the spec already settling the fix's shape. Re-verified at dispatch.rs's `door_command` call and the table's two D6 rows. Owner lookup: `D6`, `door_command`, `fail-posture` in this file — none; owner delegation-kit/SPEC.md §The delegation model.
 
 ## Icebox
 
