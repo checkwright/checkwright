@@ -1,15 +1,1 @@
 # contract: lifecycle-kit/SPEC.md §The survey record — carried surveys, one block per survey; boundary-truncated, cited only behind a passing witness.
-
-## 2026-10-01 scope — Which deferred entries lead the next unit set by cost class, roadmap row and inbound edges?
-- corpus: 'TASK-QUEUE.md'
-- oracle: bash gate-sdk/bin/run-gates.sh --emit queue-edges
-- rev: df83f0579f56781179ee2785665891dc65ead512
-- finding: Tier one: spec-brevity-residue (session/high) leads; its installer slice waits on compiled-consumer-smoke-driver, so guard-kit's tool sections (§scratch-run through §The close-stage triage step, about 12.9k of 50.7k words) are the next unblocked slice. gate-customer-value-audit (iteration/high, roadmap now) has one slice left, gate-sdk's 43 gates, and gates companion-toolkit-profile (4 inbound, the most of any live entry). compiled-consumer-smoke-driver is the other iteration/high row. No deferred entry reaches the recurrence threshold of 2. Queue-flow mean-filed is 2.4. Supersession: consumer-value-literal-gate is reshaped by the audit (audit first); hook-emit-remedy-door edits §check-door-binding inside the brevity slice (feature first); installer §The consumer smoke brevity is reshaped by compiled-consumer-smoke-driver.
-- inferred: That guard-kit's §The generic ruleset is the section write-side-steering, compound-read-classifier-reach and bash-reader-escaped-separator rewrite, read off their deliverables, not a diff.
-
-## 2026-10-02 build — Which facts do other surfaces cite into guard-kit/SPEC.md's tool sections (scratch-run through The close-stage triage step)?
-- corpus: .
-- oracle: git grep -n -E "§(scratch-run|rewrite|The rewrite arm's security posture|scan-prompts|check-door-binding|compare-settings-allow|wakeup-guard|escalation-guard|The close-stage triage step)" -- . ':(exclude)docs/**/SPEC.md' ':(exclude).workflow/*'
-- rev: c65cf8c8f56a8f57c6dd852bbf594762d6985770
-- finding: 242 citations over the tracked tree, docs mirrors and .workflow records excluded; none by anchor form outside docs mirrors, none quoting a bold lead. Kept per section: scratch-run's echo, snapshot, resolved-path reach, extension-decided interpreter, taken cost; rewrite's escapes, report, exit codes, operand refusals and security posture; scan-prompts' three-way split, per-segment grant, harness view, four unreachable shapes, first-segment key with write suffix, PowerShell section, count contract and the KPI step records drift-kit cites; check-door-binding's three assertions, corpus, Rust reading, declaration grammar and scopes, exit 2 and clean-line counts; compare-settings-allow's three questions, impact classes CLAUDE.md cites, declaration match, placement ruling; wakeup-guard's fail-closed deny and log shape; escalation-guard's advisory tier queue-kit cites; the triage step's order.
-- inferred: the fact each citing line relies on was read off its first comment line, not the whole block
