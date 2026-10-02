@@ -559,7 +559,7 @@ Advisory: surfaces recurring permission-friction sources from the friction log, 
 
 **The ranker is composed from the bash reader**: the compound split, the skeleton and the redirect scan (§The reader and its views), the functions the rules call, so the ranker and the guard read a command one way.
 
-**What a consumer on an artifact-less host loses is one advisory ranking**, step 1 of the five in `templates/close-triage.md`. The kit registers no gate here, so no `gates.list` row is omitted (gate-sdk/SPEC.md §The port-candidate criteria, criterion 5). **The friction loop itself does not move**: the guard still blocks, steers and logs, the log accrues, `compare-settings-allow` runs, and the step's other four items stand. Such a consumer triages an **unranked** log by reading it, which is worse than ranking it and is not losing the loop.
+**What a consumer on an artifact-less host loses is one advisory ranking**, the `scan-prompts` step of `templates/close-triage.md`. The kit registers no gate here, so no `gates.list` row is omitted (gate-sdk/SPEC.md §The port-candidate criteria, criterion 5). **The friction loop itself does not move**: the guard still blocks, steers and logs, the log accrues, `compare-settings-allow` runs, and the step's other four items stand. Such a consumer triages an **unranked** log by reading it, which is worse than ranking it and is not losing the loop.
 
 **The two settings documents are parsed by the arm itself.** A settings read delegated to an external program fails *open* when the program is absent. The allowlist reads empty, every logged command reads as prompting, and the ranking reports a large, plausible, wrong number at exit 0 for a KPI to record as a trend. **The arm's spawned-program set is empty**, stated here because nothing mechanical records it: an arm-table row carries no requirement element, and `--needs` answers for registry members only (gate-sdk/SPEC.md §The non-gate arm). The claim is bounded to this reader: `smoke/install.sh` still shells to `jq` for the install recipe's settings merge, a contributor floor rather than an adopter one.
 
@@ -757,7 +757,7 @@ It is the mechanical floor under lifecycle-kit's lead protocol (lifecycle-kit/SP
 
 ## The close-stage triage step
 
-`templates/close-triage.md` is the recurring step a consumer splices into its close-stage skill, filling the `housekeeping` slot (step 4) of lifecycle-kit's close template. The step, in order:
+`templates/close-triage.md` is the recurring step a consumer splices into its close-stage skill, filling the `housekeeping` slot of lifecycle-kit's close template. The step, in order:
 
 1. Drain the friction log, run `scan-prompts` over the drain, and resolve each recurring pattern by the triage criterion.
 2. Drain and review the wakeup log, if present.
@@ -765,7 +765,7 @@ It is the mechanical floor under lifecycle-kit's lead protocol (lifecycle-kit/SP
 4. By judgment, prune the remaining one-off exact-string local entries and promote recurring safe patterns to the committed settings as globs.
 5. Remove the drained friction log.
 
-Step 4 holds two judgments the reports cannot make. An entry naming a **script path** rather than a fixed command is not content-pinned, since it grants whatever the file says at run time; its sanctioned form is the `--scratch-run` arm (§scratch-run), whose echo is the compensating control. And widening the committed set is the consumer's call: a session does not widen its own auto-allow set on its own say-so. The goal is a small local set, every durable pattern in the committed, reviewable allowlist, and no local glob auto-allowing a command the consumer declared bad. One step, two reports, one reader: no new invocation point and no new schedule.
+Pruning holds two judgments the reports cannot make. An entry naming a **script path** rather than a fixed command is not content-pinned, since it grants whatever the file says at run time; its sanctioned form is the `--scratch-run` arm (§scratch-run), whose echo is the compensating control. And widening the committed set is the consumer's call: a session does not widen its own auto-allow set on its own say-so. The goal is a small local set, every durable pattern in the committed, reviewable allowlist, and no local glob auto-allowing a command the consumer declared bad. One step, two reports, one reader: no new invocation point and no new schedule.
 
 The friction log is a capture-tier surface with no forcing function, since nothing refuses a close that skips it, so it declares itself advisory on the close-surface roster (lifecycle-kit/SPEC.md §The close-surface roster), naming the clear above as its reclaim path. The ranking's allowlist-unreachable section is advisory on those same terms and adds no obligation:
 

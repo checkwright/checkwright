@@ -620,7 +620,7 @@ context-kit's `--emit footprint` arm ships in the binary but prints this site's 
 
 [cost: event/low] [surface: gate-sdk]
 
-`check-consumer-value-literal` holds only the kit-shipped gates' crate modules. The 26 gates withheld to `scripts/` keep their consumer-value literals: 62 consumer values and 39 borderline rows at gate-sdk-value-pass' spec census, 23 of them `const DEFAULT_<NAME>` positional layout defaults. Operator direction 2026-09-27, kept on record for this half by the operator's choice of option C, 2026-10-02, lead-relayed (not a ruling): avoid any hard code in gates, because checkwright benefits from configurable gates itself.
+`check-consumer-value-literal` holds only the kit-shipped gates' crate modules. The gates withheld to `scripts/` keep their consumer-value literals: at gate-sdk-value-pass' spec census, over the 26 then withheld, 62 consumer values and 39 borderline rows, 23 of them `const DEFAULT_<NAME>` positional layout defaults. Operator direction 2026-09-27, kept on record for this half by the operator's choice of option C, 2026-10-02, lead-relayed (not a ruling): avoid any hard code in gates, because checkwright benefits from configurable gates itself.
 
 **Deliverable:** the gate's corpus widened to every gate module, and each withheld gate's literal moved to a descriptor-declared knob (gate-sdk/SPEC.md §The declaration cohort, a knob no static kit's prefix owns) or valved with its ground.
 
