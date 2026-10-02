@@ -10,21 +10,11 @@
 
 ## Technical Debt
 
-### dispatch-guard-door-degrade
-
-the agent-dispatch guard drops D6 (the bound tier) with an advisory when the gate binary's door cannot be read for the refusal's remedy text: native/src/hook/dispatch.rs clears the binding on `door_command`'s error. delegation-kit/SPEC.md §The delegation model's fail-posture table unenforces D6 only when `DELEGATION_KIT_TIER_MODEL`'s own read fails, so the code is out of its spec, and a remedy line that cannot render costs the rule rather than the line.
-
-**Deliverable:** the refusal renders without the door when it cannot be read, D6 stays enforced, and a decision-table row pins it.
-
-**Cost while deferred:** a binary-door fault silently widens every dispatch past the consumer's tier binding, with only an advisory. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' close (its baked-calibration sweep), a regression of that iteration's binary-door change; promoted 2026-10-02 at the next scope, the spec already settling the fix's shape. Re-verified at dispatch.rs's `door_command` call and the table's two D6 rows. Owner lookup: `D6`, `door_command`, `fail-posture` in this file — none; owner delegation-kit/SPEC.md §The delegation model.
-
-**Selected 2026-10-02 for companion-tier-delegation-pass, operator direction lead-relayed (not a ruling):** debt; it lands before [delegation-kit-model-brevity](#delegation-kit-model-brevity) passes the fail-posture table.
-
 ### delegation-kit-model-brevity
 
 delegation-kit/SPEC.md's §The delegation model, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement), about 13.3k of the file's 45.6k words by awk count; §The turn-end liveness hook and the sections after the tier group stay on the parent.
 
-**Deliverable:** the three moves over that section under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into it kept, per a citation survey. It rides the batch after [dispatch-guard-door-degrade](#dispatch-guard-door-degrade), whose decision-table row lands in this section's fail-posture table.
+**Deliverable:** the three moves over that section under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into it kept, per a citation survey. It rides the batch after `dispatch-guard-door-degrade`, whose decision-table row lands in this section's fail-posture table.
 
 **Cost while deferred:** paid by every session and adopter that reads the unpassed section. Filed 2026-10-02 as a split at companion-tier-delegation-pass' scope. Part of the operator's selection of set A, direction 2026-10-02, lead-relayed (not a ruling).
 
@@ -1368,4 +1358,5 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 ## Done
 
 - companion-install-tier
+- dispatch-guard-door-degrade
 
