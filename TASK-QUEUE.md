@@ -32,6 +32,18 @@
 
 **Selected 2026-10-02 for consumer-smoke-driver-pass, operator direction lead-relayed (not a ruling):** a feature, one batch with [front-door-flag-operand](#front-door-flag-operand), both widening invariant B; independent of the driver in order, and its need the closing push alone, since the gate reads the pinned tag from local git.
 
+### disposed-findings-register
+
+[spec: SPEC-disposed-findings.md] [recurrence: 2026-09-29, 2026-10-01, 2026-10-02]
+
+A discarded finding has no durable disposition, so it is re-filed. A drain discard's only record is its commit message, and `--emit file-gap`'s live-slug advisory and the filing owner lookup (lifecycle-kit/SPEC.md §The committed gap inbox) search live queue entries only, so a finding discarded once is never matched when filed again. Witness: the ubuntu-latest runner notice, filed by four closes and discarded at each next drain on one ground, native/runners.list's pin-or-ride rule.
+
+**Deliverable:** a finding's disposition recorded at its first processing, with capture or filing matching a new bullet against it (a disposed-findings record, say), its contract in lifecycle-kit/SPEC.md §The committed gap inbox and a fixture pair.
+
+**Cost while deferred:** each recurring dropped finding costs a filing and a drain re-verification per close. Operator direction 2026-10-02, lead-relayed (not a ruling): the operator wanted it this iteration. Filed 2026-10-02 to the gap inbox by companion-tier-delegation-pass' lead; promoted at its close: →fix fails because a record and its matcher add governed names, →forward because the direction is given and no ruling is owed. Re-verified: the four filings (08663d34, d9c65019, bbad7889, 7c91b291) and their discards read as filed; the advisory's live-set scope reads so in §The committed gap inbox. The runner-notice instance is fixed in the close binding's push-budget line. Owner lookup: `disposed`, `discarded once`, `disposition record` in this file — none on this subject; owner lifecycle-kit/SPEC.md §The committed gap inbox.
+
+**Selected 2026-10-02 for consumer-smoke-driver-pass, operator direction lead-relayed (not a ruling):** a feature, the spec stage's to author and promote; independent of the set's other units, its need the closing push alone.
+
 ## Technical Debt
 
 ### installer-smoke-brevity
@@ -43,18 +55,6 @@ installer/SPEC.md's §The consumer smoke, under [spec-brevity-residue](#spec-bre
 **Cost while deferred:** paid by every session and adopter that reads the unpassed section. Filed 2026-10-02 as a split at consumer-smoke-driver-pass' scope. Part of the operator's selection of the unit set, direction 2026-10-02, lead-relayed (not a ruling).
 
 ## Deferred
-
-### disposed-findings-register
-
-[cost: event/high] [surface: lifecycle-kit] [recurrence: 2026-09-29, 2026-10-01, 2026-10-02]
-
-A discarded finding has no durable disposition, so it is re-filed. A drain discard's only record is its commit message, and `--emit file-gap`'s live-slug advisory and the filing owner lookup (lifecycle-kit/SPEC.md §The committed gap inbox) search live queue entries only, so a finding discarded once is never matched when filed again. Witness: the ubuntu-latest runner notice, filed by four closes and discarded at each next drain on one ground, native/runners.list's pin-or-ride rule.
-
-**Deliverable:** a finding's disposition recorded at its first processing, with capture or filing matching a new bullet against it (a disposed-findings record, say), its contract in lifecycle-kit/SPEC.md §The committed gap inbox and a fixture pair.
-
-**Cost while deferred:** each recurring dropped finding costs a filing and a drain re-verification per close. Operator direction 2026-10-02, lead-relayed (not a ruling): the operator wanted it this iteration. Filed 2026-10-02 to the gap inbox by companion-tier-delegation-pass' lead; promoted at its close: →fix fails because a record and its matcher add governed names, →forward because the direction is given and no ruling is owed. Re-verified: the four filings (08663d34, d9c65019, bbad7889, 7c91b291) and their discards read as filed; the advisory's live-set scope reads so in §The committed gap inbox. The runner-notice instance is fixed in the close binding's push-budget line. Owner lookup: `disposed`, `discarded once`, `disposition record` in this file — none on this subject; owner lifecycle-kit/SPEC.md §The committed gap inbox.
-
-**Selected 2026-10-02 for consumer-smoke-driver-pass, operator direction lead-relayed (not a ruling):** a feature, the spec stage's to author and promote; independent of the set's other units, its need the closing push alone.
 
 ### kit-log-declaration-transport
 
