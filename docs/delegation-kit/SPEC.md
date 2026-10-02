@@ -25,6 +25,10 @@ Reaping holds for an `Agent` child and not for a shell one: a shell producer kep
 
 **A dispatched role waits in-turn, on the work's own artifact.** A session that reads the liveness hazard correctly and ends its turn to await the completion notification destroys the one channel it meant to use. A rule whose correct application needs a channel the reader lacks defeats careful readers too, so the template names the channel a dispatched role has.
 
+**A wait needs a writer, and a question is no wait.** A mechanical-tier session looped on a marker nothing would create; the harness backgrounded the loop at the foreground timeout, and the session read as live past its hand-back for the background limit. The guard's refusals reach a self-matching `pgrep` and a record-falsified condition, never a condition with no writer, so the template states it. The never-end-a-turn-to-wait clause also read as covering a wait for the caller's answer. That answer arrives as a new turn, so asking is a turn end and the template says so.
+
+**A notification wakes a supervisor only from after its turn.** A notification queued while the supervisor's turn is still running has landed after a turn that made no further tool call, and started none. The template bounds its claim to that; the lead's remedy and its honest limit are [lifecycle-kit/SPEC.md §The stamp protocol](../lifecycle-kit/SPEC.md#the-stamp-protocol)'s.
+
 **The wait is named by its property, not its form.** The harness offers waiting primitives with opposite reactivity, and a session choosing among named forms chooses by shape. The template names the property a wait must have, ending when its condition goes true, and sorts the forms under it. That discriminator survives a harness adding a third form, which makes it a correctness bound.
 
 **Two waitable things, and only one of them has a path.** The template splits what a session waits *on*: an `Agent`, by its completion notification, and a shell child, by an artifact the session placed. The split is complete. The artifact's home is the resume journal's scoping widened, so the survivability grounds are stated once.
