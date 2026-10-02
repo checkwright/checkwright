@@ -20,6 +20,8 @@
 
 **Selected 2026-10-02 for consumer-smoke-driver-pass, operator direction lead-relayed (not a ruling):** a feature; its consumer-smoke leg is written in `compiled-consumer-smoke-driver`'s driver, so it lands after that driver and rides its push.
 
+**Push need (2026-10-03, third push, above the budget; operator direction lead-relayed, not a ruling):** the driver's mid-iteration push had already gone when the arm landed, so installer-smoke-brevity's batch ends with one watched push carrying every local commit, reads the CI legs running the close-surface arm, then moves this entry to Done.
+
 ## Technical Debt
 
 ### installer-smoke-brevity
