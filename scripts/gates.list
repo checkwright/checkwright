@@ -72,6 +72,7 @@ check-survey-record
 check-audit-roster
 check-scratch-citation
 check-gap-inbox-neutrality
+check-disposed-findings
 check-queue-sections
 check-queue-hygiene
 check-tag-lead-line

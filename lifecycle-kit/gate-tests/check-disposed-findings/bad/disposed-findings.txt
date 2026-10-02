@@ -1,0 +1,5 @@
+# contract: lifecycle-kit/SPEC.md §The disposed-findings record — - <YYYY-MM-DD> — `<term>`[, `<term>`]… — <finding and ground>
+- 2026-01-02 — the runner notice names no term at all — discarded on the runner map's rule.
+- 2026-01-03 — `stale-hook`, `` — a record whose second term is an empty span.
+- 2026-01-04 — `release-flag` —
+- 2026-13-01 — `nightly-image` — a record whose date is no calendar date.

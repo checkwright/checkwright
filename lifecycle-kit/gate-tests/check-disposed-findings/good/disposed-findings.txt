@@ -1,0 +1,3 @@
+# contract: lifecycle-kit/SPEC.md §The disposed-findings record — - <YYYY-MM-DD> — `<term>`[, `<term>`]… — <finding and ground>
+- 2026-01-02 — `nightly-image` — the nightly runner image moves under no commit of ours; discarded, since the runner map already rules that a floating label rides its migrations.
+- 2026-01-05 — `hook drift`, `stale-hook` — the vendored hook drifts from its manifest between commits; discarded, since the hook is regenerated from the manifests at every commit and cannot hold a stale copy.

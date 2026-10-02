@@ -1,7 +1,7 @@
 // spec: lifecycle-kit/SPEC.md §The committed gap inbox — the capture affordance: one dated bullet
 // per gap, the grammar stamped by the producer rather than by its filer.
 // spec: gate-sdk/SPEC.md §The non-gate arm — a table member and not a hardcoded flag, because the
-// arm reads five consumer knobs, which a hardcoded flag would hide from the knob-file derivation.
+// arm reads six consumer knobs, which a hardcoded flag would hide from the knob-file derivation.
 use crate::stages;
 
 pub const KNOBS: &[&str] = &[
@@ -10,6 +10,7 @@ pub const KNOBS: &[&str] = &[
     "LIFECYCLE_KIT_STATE_FILE",
     "LIFECYCLE_KIT_STAGES",
     "LIFECYCLE_KIT_FIRST_STAGE",
+    "LIFECYCLE_KIT_DISPOSED_FILE",
 ];
 
 pub const USAGE: &str = "usage: --emit file-gap [--] \"<gap prose>\"\n  appends one dated bullet to the committed gap inbox; \"--\" files prose beginning with \"-\"";
@@ -34,6 +35,9 @@ fn boundary(c: Option<char>) -> bool {
 }
 
 fn bounded(hay: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return false;
+    }
     let mut from = 0;
     while let Some(rel) = hay[from..].find(needle) {
         let at = from + rel;
@@ -42,7 +46,7 @@ fn bounded(hay: &str, needle: &str) -> bool {
         if boundary(before) && boundary(after) {
             return true;
         }
-        from = at + 1;
+        from = at + needle.chars().next().map_or(1, char::len_utf8);
     }
     false
 }
@@ -77,6 +81,20 @@ pub fn live_slug(queue_text: &str, prose: &str) -> Option<String> {
         }
     }
     best.map(str::to_string)
+}
+
+// spec: lifecycle-kit/SPEC.md §The disposed-findings record — every well-formed record any of whose
+// terms occurs in the prose, case-insensitive and word-bounded, in file order; a malformed record is
+// skipped, left to check-disposed-findings
+pub fn disposed_matches<'a>(record_text: &'a str, prose: &str) -> Vec<(&'a str, &'a str, &'a str)> {
+    let hay = prose.to_lowercase();
+    crate::gates::disposed_findings::lines(record_text)
+        .filter_map(|(_, l)| crate::gates::disposed_findings::record(l).ok())
+        .filter_map(|r| {
+            let term = r.terms.iter().find(|t| bounded(&hay, &t.to_lowercase()))?;
+            Some((r.date, *term, r.prose))
+        })
+        .collect()
 }
 
 // spec: lifecycle-kit/SPEC.md §The stage-machine adapters — the closing-stage predicate, composed here from the
@@ -124,6 +142,11 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     super::file_survey::append(path, &format!("{}\n", line))
         .map_err(|e| format!("cannot append to {}: {}", spelled, e))?;
 
+    let (disposed, _) = super::file_survey::anchored("LIFECYCLE_KIT_DISPOSED_FILE")?;
+    let record_text = std::fs::read(disposed)
+        .map(|b| String::from_utf8_lossy(&b).into_owned())
+        .unwrap_or_default();
+
     // spec: lifecycle-kit/SPEC.md §The committed gap inbox — the advisory asks rather than asserts,
     // and rides stderr because the returned string is the filed bullet.
     if let Some(s) = slug {
@@ -133,6 +156,18 @@ pub fn emit(args: &[String]) -> Result<String, String> {
              entry, say it is DISTINCT and why. The closing stage's drain judges the recurrence and \
              reads what you wrote — it has nothing else to go on.",
             s
+        );
+    }
+    // spec: lifecycle-kit/SPEC.md §The disposed-findings record — prompts rather than decides, on the
+    // live-slug advisory's ground
+    for (date, term, ground) in disposed_matches(&record_text, prose) {
+        let ground = ground.trim_end();
+        let stop = if ground.ends_with('.') { "" } else { "." };
+        eprintln!(
+            "file-gap: the prose matches the finding disposed {} (`{}`): {}{} If this bullet re-files \
+             it, say in the prose what has changed since; the drain discards a re-filing whose \
+             ground still holds by citing that record.",
+            date, term, ground, stop
         );
     }
     // spec: lifecycle-kit/SPEC.md §The committed gap inbox — warn at the point of capture, while
@@ -295,6 +330,28 @@ one line, still live work.
                 flag
             );
         }
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The disposed-findings record — word-bounded on `[a-z0-9-]` and
+    // case-insensitive; a hyphen-embedded term and a malformed record raise nothing; every matching
+    // record is named, in file order
+    #[test]
+    fn a_disposed_term_matches_word_bounded_and_case_insensitively() {
+        let rec = "# contract: x\n\
+                   - 2026-09-27 — `ubuntu-latest` — the runner notice; its ground.\n\
+                   - 2026-09-28 — `Runner Image`, `pin` — a second finding.\n\
+                   - 2026-09-29 — `ubuntu-latest` —\n";
+        let m = disposed_matches(rec, "GitHub annotates every Ubuntu-Latest job and its runner image");
+        assert_eq!(
+            m,
+            vec![
+                ("2026-09-27", "ubuntu-latest", "the runner notice; its ground."),
+                ("2026-09-28", "Runner Image", "a second finding."),
+            ]
+        );
+        assert!(disposed_matches(rec, "the ubuntu-latest-arm label").is_empty());
+        assert!(disposed_matches(rec, "a pinned leg").is_empty());
+        assert!(disposed_matches("", "ubuntu-latest").is_empty());
     }
 
     // spec: lifecycle-kit/SPEC.md §The committed gap inbox — one positional, required non-empty;

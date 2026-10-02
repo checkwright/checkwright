@@ -109,6 +109,7 @@ The gate valves the surfaces that legitimately name design-ahead or frozen brand
 - the generated trajectory data and `SPEC-*.md` amendments;
 - the three design-ahead records, the queue and the two inboxes (`LIFECYCLE_KIT_GAP_INBOX_FILE`, `LIFECYCLE_KIT_CONSULT_INBOX_FILE`), each read by its knob. Each names knobs and paths not yet minted; the gap inbox cannot hold one past the close that truncates it, and a consult item holds one until a consultation disposes of it;
 - the survey record (`LIFECYCLE_KIT_SURVEY_RECORD_FILE`, read by its knob), valved as a frozen record. A block quotes the names its oracle searched at its recorded revision, and a later delta in the same iteration may retire one. The record is never edited in place (lifecycle-kit/SPEC.md §The survey record) and holds nothing past the boundary that truncates it.
+- the disposed-findings record (`LIFECYCLE_KIT_DISPOSED_FILE`, read by its knob), valved as a frozen record: a discarded finding may name a knob or path that was never minted, and a record outlives the iteration that wrote it (lifecycle-kit/SPEC.md §The disposed-findings record).
 
 So a rename cannot leave a dangle without turning a gate red.
 

@@ -88,10 +88,36 @@ filed "$p"
 plain done-slug "$p"
 grep -qF "$ASKS" <<<"$ERR" && note done-ask "a done-section slug raised the recurrence advisory: $ERR"
 
+# --- a disposed-findings record whose term the prose spells asks the filer; stdout stays the bullet alone ---
+cat >"$SANDBOX/disposed.txt" <<'EOF'
+# contract: lifecycle-kit/SPEC.md §The disposed-findings record — - <YYYY-MM-DD> — `<term>`[, `<term>`]… — <finding and ground>
+- 2026-01-02 — `nightly-image` — the nightly runner image moves; discarded on the runner map's ride rule.
+- 2026-01-03 — `stale-hook` —
+EOF
+disposed() {   # $1=prose -> one filing into a fresh inbox with the record set
+    local inbox="$SANDBOX/inbox-$RANDOM.md"
+    OUT="$(env LIFECYCLE_KIT_GAP_INBOX_FILE="$inbox" \
+            LIFECYCLE_KIT_QUEUE_FILE="$SANDBOX/TASK-QUEUE.md" \
+            LIFECYCLE_KIT_DISPOSED_FILE="$SANDBOX/disposed.txt" \
+            bash "$SDK/bin/run-gates.sh" --emit file-gap "$1" 2>"$SANDBOX/err.txt")"
+    ERR="$(cat "$SANDBOX/err.txt")"
+}
+DISPOSED='matches the finding disposed'
+p='the Nightly-Image label moved again this week'
+disposed "$p"
+grep -qxF -- "file-gap: - $DATE — $p" <<<"$OUT" \
+    || note disposed-stdout "stdout is not the filed bullet alone: $OUT"
+grep -qF "$DISPOSED 2026-01-02 (\`nightly-image\`)" <<<"$ERR" \
+    || note disposed-ask "no advisory naming the record's date and term: $ERR"
+disposed 'the nightly-image-arm label moved'
+grep -qF "$DISPOSED" <<<"$ERR" && note disposed-hyphen "a term inside a longer hyphenated token raised the advisory: $ERR"
+disposed 'the stale-hook finding again'
+grep -qF "$DISPOSED" <<<"$ERR" && note disposed-malformed "a malformed record raised the advisory: $ERR"
+
 # --- no filing ever writes the queue ---
 [[ "$qbefore" == "$(cat "$SANDBOX/TASK-QUEUE.md")" ]] \
     || note no-queue-write "the arm modified the queue file — the constraint the gap inbox exists to hold"
 
 [[ "$fails" -eq 0 ]] || { echo "file-gap-recurrence.test: $fails assertion(s) failed"; exit 1; }
-echo "file-gap-recurrence.test: clean (the set knobs reach the arm, every filing writes the plain bullet and no verdict, a fresh inbox is seeded with the contract header, a live slug asks the filer while a done slug stays silent, and no filing writes the queue)"
+echo "file-gap-recurrence.test: clean (the set knobs reach the arm, every filing writes the plain bullet and no verdict, a fresh inbox is seeded with the contract header, a live slug asks the filer while a done slug stays silent, a disposed record's word-bounded term asks the filer while a malformed record stays silent, and no filing writes the queue)"
 exit 0

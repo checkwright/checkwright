@@ -36,6 +36,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    check-audit-roster           # inert until LIFECYCLE_KIT_AUDIT_ROSTER_FILE names a roster
    check-scratch-citation       # no permanent surface points a reader into per-iteration scratch
    check-gap-inbox-neutrality   # inert until a gap is filed (--emit file-gap)
+   check-disposed-findings      # inert until a drain discards a finding
    check-stamp-subject          # commit-msg tier: a stamp commit's subject scope is its stage
    check-dispatch-entry         # commit-msg tier: inert until a lead declares a dispatch (--enter-stage --dispatch)
    ```

@@ -87,6 +87,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | [lifecycle-kit](lifecycle-kit/index.md) | check-audit-roster | precommit |
 | [lifecycle-kit](lifecycle-kit/index.md) | check-scratch-citation | precommit |
 | [lifecycle-kit](lifecycle-kit/index.md) | check-gap-inbox-neutrality | precommit |
+| [lifecycle-kit](lifecycle-kit/index.md) | check-disposed-findings | precommit |
 | [queue-kit](queue-kit/index.md) | check-queue-sections | precommit |
 | [queue-kit](queue-kit/index.md) | check-queue-hygiene | precommit |
 | [queue-kit](queue-kit/index.md) | check-tag-lead-line | precommit |

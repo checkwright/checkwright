@@ -236,6 +236,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // by its knob's resolved repo-relative path
     let survey_record_file = walk::knob_scalar("LIFECYCLE_KIT_SURVEY_RECORD_FILE")
         .map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
+    // spec: canon-kit/SPEC.md §Layout and configuration — the disposed-findings record is valved
+    // as frozen, by its knob's resolved repo-relative path
+    let disposed_file = walk::knob_scalar("LIFECYCLE_KIT_DISPOSED_FILE")
+        .map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
     let prune = walk::prune_dirs().map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
 
     let ls = proc::run(&programs::GIT, &["ls-files", "--", scanroot])
@@ -264,6 +268,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             || path == gap_inbox_file
             || path == consult_inbox_file
             || path == survey_record_file
+            || path == disposed_file
         {
             continue;
         }

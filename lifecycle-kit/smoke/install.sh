@@ -32,6 +32,7 @@ check-lifecycle-registration
 check-survey-record
 check-audit-roster
 check-gap-inbox-neutrality
+check-disposed-findings
 check-scratch-citation
 check-stamp-subject
 check-dispatch-entry
@@ -81,6 +82,13 @@ bash "$SDK/bin/run-gates.sh" --emit file-survey \
     "bash gate-sdk/bin/run-gates.sh --for .workflow/survey-record.md" \
     "none" \
     "yes — a filed block naming the seed commit parses clean" >/dev/null
+
+# spec: lifecycle-kit/SPEC.md §check-disposed-findings — seed one well-formed record so the gate's
+# registration exercises the record grammar, not the absent-record clean pass
+cat > .workflow/disposed-findings.txt <<'EOF'
+# contract: lifecycle-kit/SPEC.md §The disposed-findings record — - <YYYY-MM-DD> — `<term>`[, `<term>`]… — <finding and ground>
+- 2026-01-02 — `smoke-runner-image` — a smoke finding discarded on a ground that still holds.
+EOF
 
 # spec: lifecycle-kit/README.md §Install — step 4 points the consumer's own always-loaded agent file at the machine; run it on the consumer, not only on a scratch copy, or check-lifecycle-registration has nothing to hold
 if [[ ! -f CLAUDE.md ]]; then

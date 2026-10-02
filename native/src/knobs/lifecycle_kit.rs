@@ -37,6 +37,10 @@ fn survey_record_file(resolve: Resolve) -> Result<Value, String> {
     in_workflow_dir(resolve, "survey-record.md")
 }
 
+fn disposed_file(resolve: Resolve) -> Result<Value, String> {
+    in_workflow_dir(resolve, "disposed-findings.txt")
+}
+
 // spec: lifecycle-kit/SPEC.md §The state machine — the journal pattern defers to the scratch dir's
 // own knob rather than restating its literal
 fn stage_journal_pattern(resolve: Resolve) -> Result<Value, String> {
@@ -106,6 +110,7 @@ pub const KIT: Kit = Kit {
             survey_record_file,
             &["GATE_SDK_WORKFLOW_DIR"],
         ),
+        Row::derived("LIFECYCLE_KIT_DISPOSED_FILE", Shape::Scalar, disposed_file, &["GATE_SDK_WORKFLOW_DIR"]),
         Row::scalar("LIFECYCLE_KIT_RECURRENCE_THRESHOLD", "2"),
         Row::derived(
             "LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN",

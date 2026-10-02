@@ -1,0 +1,3 @@
+# graph: couples=knob:LIFECYCLE_KIT_DISPOSED_FILE dir=one valve=none tier=precommit
+# install: on-surface
+# spec: lifecycle-kit/SPEC.md §check-disposed-findings — every line below the disposed-findings record's contract header is a record: a calendar date, at least one backticked term with no empty span, and non-empty prose

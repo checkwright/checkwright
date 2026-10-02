@@ -19,6 +19,7 @@ pub mod comment_tier;
 pub mod commit_subject;
 pub mod consumer_value_literal;
 pub mod dispatch_entry;
+pub mod disposed_findings;
 pub mod doctrine_registration;
 pub mod door_binding;
 pub mod deferred_board_tags;
@@ -1335,6 +1336,14 @@ pub const REGISTRY: &[GateEntry] = &[
             "LIFECYCLE_KIT_QUEUE_FILE",
             "GATE_SDK_NATIVE_BIN",
         ],
+        "lifecycle-kit",
+        &[],
+    ),
+    (
+        "check-disposed-findings",
+        disposed_findings::run,
+        &[],
+        &["LIFECYCLE_KIT_DISPOSED_FILE"],
         "lifecycle-kit",
         &[],
     ),
