@@ -33,6 +33,26 @@ fn host_target(_root: &str) -> Result<String, Outcome> {
     ))
 }
 
+// spec: installer/SPEC.md §The consumer smoke — the triple the bootstrap's own fallback map names
+// for one, through the same helper, empty where the map names none
+#[cfg(unix)]
+pub(super) fn fallback_of(root: &str, triple: &str) -> Result<String, Outcome> {
+    let helper = format!("{}/installer/consumer-smoke/host-target.sh", root);
+    let done = proc::run(&programs::SH, &[&helper, "--fallback", triple]).map_err(refuse)?;
+    match done.stdout() {
+        Some(o) => Ok(text(o).trim().to_string()),
+        None => Err(fail(format!(
+            "the helper could not read the bootstrap's fallback map — {}",
+            done.failure_report().unwrap_or_default()
+        ))),
+    }
+}
+
+#[cfg(not(unix))]
+pub(super) fn fallback_of(root: &str, _triple: &str) -> Result<String, Outcome> {
+    host_target(root)
+}
+
 fn exe() -> Result<String, Outcome> {
     std::env::current_exe()
         .map(|p| p.display().to_string())
@@ -41,7 +61,7 @@ fn exe() -> Result<String, Outcome> {
 
 // spec: installer/SPEC.md §The consumer smoke — a digest sidecar in the host hasher's own line
 // shape, `<hex>  <name>`, emitted with the crate's hasher beside the bytes it names
-fn sidecar(file: &str) -> Step {
+pub(super) fn sidecar(file: &str) -> Step {
     let digest = crate::sha256::file_hex(Path::new(file)).map_err(fail)?;
     let name = Path::new(file).file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
     std::fs::write(format!("{}.sha256", file), format!("{}  {}\n", digest, name))
@@ -66,6 +86,7 @@ fn drop_exec_mode(_file: &str) -> Step {
 pub(super) fn build(state: &mut Run) -> Step {
     let bin = walk::knob_scalar("GATE_SDK_NATIVE_BIN").map_err(refuse)?;
     let bin_name = bin.rsplit(['/', '\\']).next().unwrap_or(&bin).to_string();
+    state.bin_name = bin_name.clone();
     state.host = host_target(&state.root)?;
     // spec: installer/SPEC.md §The consumer smoke — the run steers its own roster at this host
     // unless the caller already set the knob, which keeps the override branch a live path
@@ -80,7 +101,8 @@ pub(super) fn build(state: &mut Run) -> Step {
             f
         }
     };
-    let roster_text = std::fs::read_to_string(walk::abs_against(&state.root, &roster_file))
+    state.roster_file = walk::abs_against(&state.root, &roster_file);
+    let roster_text = std::fs::read_to_string(&state.roster_file)
         .map_err(|e| refuse(format!("no declared target at {}: {}", roster_file, e)))?;
     let roster = crate::registry::members(&roster_text);
     if roster.is_empty() {
@@ -111,7 +133,8 @@ pub(super) fn build(state: &mut Run) -> Step {
                     handed, bin_name, state.host
                 )));
             }
-            state.pack_artifacts = handed;
+            state.pack_artifacts = handed.clone();
+            state.handed = Some(handed);
             say(&format!(
                 "adopted {} for {} from the hand-off, sidecar and all — nothing rebuilt, nothing rehashed",
                 bin_name, state.host
@@ -163,23 +186,21 @@ fn stage_running_binary(state: &mut Run, bin_name: &str) -> Step {
 
 // spec: installer/SPEC.md §The packer — a pack spawn names both decisions: the root as its working
 // directory and as `--root`, under the invoking environment, the steered roster and pack scratch
-fn pack_with(state: &Run, out: &str, roster: Option<&str>) -> Result<proc::Merged, Outcome> {
-    let version = version(&state.root);
+pub(super) fn pack_with(
+    state: &Run,
+    out: &str,
+    roster: Option<&str>,
+    version: &str,
+    artifacts: bool,
+) -> Result<proc::Merged, Outcome> {
     let mut env = vec![("INSTALLER_PACK_TMP_DIR".to_string(), state.scratch.clone())];
     if let Some(r) = roster.or(state.steer.as_deref()) {
         env.push(("GATE_SDK_NATIVE_TARGETS_FILE".to_string(), r.to_string()));
     }
-    let args = [
-        "--pack-installer",
-        "--root",
-        &state.root,
-        "--version",
-        &version,
-        "--out",
-        out,
-        "--artifacts",
-        &state.pack_artifacts,
-    ];
+    let mut args = vec!["--pack-installer", "--root", &state.root, "--version", version, "--out", out];
+    if artifacts {
+        args.extend(["--artifacts", state.pack_artifacts.as_str()]);
+    }
     proc::run_merged_in(&programs::CHECKWRIGHT_GATES.at(exe()?), &args, &env, Some(Path::new(&state.root)))
         .map_err(refuse)
 }
@@ -202,27 +223,47 @@ fn output(m: &proc::Merged) -> String {
 // arm, hands the tarball out where asked, and witnesses the two refusals a steered roster and a
 // clean tree leave no ordinary path to reach
 pub(super) fn pack(state: &mut Run) -> Step {
-    let packed = pack_with(state, &state.scratch, None)?;
-    if !packed.succeeded() {
-        eprintln!("{}", output(&packed));
-        return Err(refuse("the pack step failed."));
-    }
-    if let Some(line) = output(&packed).lines().find(|l| l.starts_with("PACK:")) {
-        say(line);
-    }
-    let tarballs: Vec<String> = walk::list_dir(Path::new(&state.scratch))
-        .map_err(refuse)?
-        .into_iter()
-        .filter(|(n, dir)| !dir && n.ends_with(".tgz"))
-        .map(|(n, _)| format!("{}/{}", state.scratch, n))
-        .collect();
-    let [tarball] = tarballs.as_slice() else {
-        return Err(fail(format!("expected exactly one tarball, found {}", tarballs.len())));
-    };
-    state.tarball = tarball.clone();
+    state.version = version(&state.root);
+    state.tarball = pack_one(state, &state.scratch, &state.version, true, "", "the pack step failed.")?;
     hand_out(state)?;
     planted_roster(state)?;
     footprint(state)
+}
+
+// spec: installer/SPEC.md §The consumer smoke — a pack the run installs from: refused at exit 2 when
+// it fails, its `PACK:` line said, and exactly one tarball found in its output directory
+pub(super) fn pack_one(
+    state: &Run,
+    out: &str,
+    version: &str,
+    artifacts: bool,
+    which: &str,
+    refusal: &str,
+) -> Result<String, Outcome> {
+    let packed = pack_with(state, out, None, version, artifacts)?;
+    if !packed.succeeded() {
+        eprintln!("{}", output(&packed));
+        return Err(Outcome::Refuse(refusal.to_string()));
+    }
+    one_tarball(&packed, out, which)
+}
+
+// spec: installer/SPEC.md §The consumer smoke — a pack that succeeded: its `PACK:` line said, and
+// exactly one tarball found in its output directory
+pub(super) fn one_tarball(packed: &proc::Merged, out: &str, which: &str) -> Result<String, Outcome> {
+    if let Some(line) = output(packed).lines().find(|l| l.starts_with("PACK:")) {
+        say(line);
+    }
+    let tarballs: Vec<String> = walk::list_dir(Path::new(out))
+        .map_err(refuse)?
+        .into_iter()
+        .filter(|(n, dir)| !dir && n.ends_with(".tgz"))
+        .map(|(n, _)| format!("{}/{}", out, n))
+        .collect();
+    match tarballs.as_slice() {
+        [tarball] => Ok(tarball.clone()),
+        _ => Err(fail(format!("expected exactly one {}tarball, found {}", which, tarballs.len()))),
+    }
 }
 
 // spec: installer/SPEC.md §The consumer smoke — INSTALLER_SMOKE_TARBALL_OUT receives the packed
@@ -250,7 +291,7 @@ fn planted_roster(state: &Run) -> Step {
     let other = state.host.split_once('-').map_or(state.host.as_str(), |(_, rest)| rest);
     std::fs::write(&roster, format!("{}\nother-{}\n", state.host, other))
         .map_err(|e| fail(format!("could not write the planted roster: {}", e)))?;
-    let planted = pack_with(state, &out, Some(&roster))?;
+    let planted = pack_with(state, &out, Some(&roster), &state.version, true)?;
     if planted.succeeded() {
         return Err(fail(
             "pack accepted a roster declaring a target the artifact directory has nothing for — a \
@@ -317,7 +358,7 @@ fn footprint(state: &mut Run) -> Step {
 fn footprint_pack(state: &mut Run, out: &str, plant: &str) -> Result<proc::Merged, Outcome> {
     std::fs::write(plant, "").map_err(|e| fail(format!("could not plant {} for the footprint witness: {}", plant, e)))?;
     state.plant = Some(plant.to_string());
-    let packed = pack_with(state, out, None);
+    let packed = pack_with(state, out, None, &state.version, true);
     std::fs::remove_file(plant)
         .map_err(|e| fail(format!("could not remove the footprint witness's plant at {}: {}", plant, e)))?;
     state.plant = None;
@@ -347,7 +388,10 @@ pub(super) fn install(state: &mut Run) -> Step {
     if !proc::is_executable(Path::new(&entry)) {
         return Err(fail("the installed package exposes no executable checkwright bin entry"));
     }
-    let manifest = format!("{}/node_modules/checkwright/package.json", home);
+    state.cw = entry.clone();
+    state.entry = super::Entry::Bin(entry);
+    state.pkg_root = format!("{}/node_modules/checkwright", home);
+    let manifest = format!("{}/package.json", state.pkg_root);
     let version = std::fs::read_to_string(&manifest)
         .ok()
         .and_then(|t| serde_json::from_str::<serde_json::Value>(&t).ok())

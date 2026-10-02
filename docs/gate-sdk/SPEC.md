@@ -524,7 +524,7 @@ The roster records the **union**. Which member spawns a program is recorded per 
 
 - `pwsh` and `powershell` are `contributor` members: `--run-front-end-parity` spawns them on CI legs ([§run-gates](#run-gates)), and [§with-foreign-shells](#with-foreign-shells) probes the `pwsh` it copies, so the floor-or-probe relation does not bind them. `docker` and `dash` are `contributor` members on that arm's ground alone, and members on Linux builds only.
 - `mktemp` and `cp` are `contributor` members because only source-clone arms spawn them: `--run-demo`, `--run-consumer-smoke`'s builder, `--upgrade-smoke` and `--agents-md-smoke` need the kit sources and a cargo-built binary, the payload withholds `smoke/` (`GATE_SDK_PAYLOAD_WITHHOLD`), and `--pack-installer` is the publisher's own. A later adopter-side spawn of either reclaims an adopter audience.
-- `sh` is a `contributor` member on unix builds only: `--installer-smoke`, which needs a checkout, spawns it for the host bootstrap's detector ([installer/SPEC.md §The consumer smoke](../installer/SPEC.md#the-consumer-smoke)).
+- `sh` is a `contributor` member on unix builds only: `--installer-smoke`, which needs a checkout, spawns it for the host bootstrap's detector ([installer/SPEC.md §The consumer smoke](../installer/SPEC.md#the-consumer-smoke)). `shasum` is one on the same ground: the arm spawns it as the control of the bootstrap's `shasum` fallback.
 - `date` and `ps` are members on non-unix builds only.
 - `bash`'s spawners include canon-kit's `check-fence-run`, which spawns it only when a doc marks a fence runnable and records it on its `REGISTRY` row; the bash audience's `derived` arm owes that spawn ([context-kit/SPEC.md §bin/env-probe](../context-kit/SPEC.md#binenv-probe)).
 

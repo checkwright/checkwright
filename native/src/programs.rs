@@ -64,6 +64,8 @@ roster! {
     UNAME = "uname", "contributor";
     #[cfg(unix)]
     SH = "sh", "contributor";
+    #[cfg(unix)]
+    SHASUM = "shasum", "contributor";
     PWSH = "pwsh", "contributor";
     POWERSHELL = "powershell", "contributor";
     #[cfg(target_os = "linux")]

@@ -3,9 +3,19 @@
 // which an emitting arm collapses
 use crate::programs::Program;
 use crate::proc;
+use std::collections::BTreeMap;
 
+mod artifact;
+mod companion;
+mod consumer;
+mod lines;
+mod masked;
+mod moves;
+mod profiles;
+mod report;
 mod roster;
 mod staging;
+mod upgrade;
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the declared names, each gate-sdk's; the scratch base,
 // the artifact hand-off and the tarball hand-out are read undeclared, no static kit owning their
@@ -41,6 +51,26 @@ fn say(line: &str) {
     println!("  {}", line);
 }
 
+// spec: installer/SPEC.md §The consumer smoke — a failing child's whole account goes to stderr
+// before the verdict that cites it
+fn show(out: &str) {
+    eprintln!("{}", out);
+}
+
+// spec: installer/SPEC.md §The consumer smoke — the entry point an arm drives: the npm-installed
+// `.bin` entry run directly, or an extracted package's bootstrap run through `sh`
+#[derive(Clone)]
+pub(super) enum Entry {
+    Bin(String),
+    Sh(String),
+}
+
+impl Default for Entry {
+    fn default() -> Self {
+        Entry::Bin(String::new())
+    }
+}
+
 // spec: installer/SPEC.md §The consumer smoke — what the arms hand each other, in run order; the
 // arms run in sequence, so each reads what an earlier one wrote
 #[derive(Default)]
@@ -48,10 +78,31 @@ pub(super) struct Run {
     root: String,
     scratch: String,
     host: String,
+    bin_name: String,
+    handed: Option<String>,
     steer: Option<String>,
+    roster_file: String,
     pack_artifacts: String,
+    version: String,
     tarball: String,
     plant: Option<String>,
+    pkg_root: String,
+    cw: String,
+    entry: Entry,
+    run_path: Option<String>,
+    payload_kits: Vec<String>,
+    profiles: Vec<String>,
+    order: Vec<(String, String)>,
+    profile_min: String,
+    registry: BTreeMap<String, Vec<String>>,
+    owes_bash: BTreeMap<String, bool>,
+    value_red: Vec<String>,
+    seeded: Vec<String>,
+    dl_entry: String,
+    up_version: String,
+    up2_version: String,
+    up: String,
+    up2: String,
 }
 
 impl Drop for Run {
@@ -73,7 +124,7 @@ pub fn run(args: &[String]) -> i32 {
     let mut state = Run::default();
     match smoke(&mut state) {
         Ok(()) => {
-            println!("{}", roster::MARKER);
+            println!("{} ({})", roster::MARKER, profiles::summary(&state));
             0
         }
         Err(Outcome::Fail(why)) => {
@@ -93,18 +144,8 @@ fn smoke(state: &mut Run) -> Step {
     roster::declare();
     roster::preflight(state)?;
     for row in roster::ARMS {
-        let Some(arm) = row.arm else {
-            return Err(refuse(format!(
-                "the '{}' arm and the ones after it are not compiled into this binary yet — the \
-                 shell driver beside installer/consumer-smoke/host-target.sh runs the whole suite",
-                row.name
-            )));
-        };
-        match row.detail {
-            Some(d) => println!("{} ({})", row.name, d),
-            None => println!("{}", row.name),
-        }
-        arm(state)?;
+        println!("{}", roster::header(row, state));
+        (row.arm)(state)?;
     }
     Ok(())
 }
@@ -118,13 +159,30 @@ fn in_consumer(
     set: &[(String, String)],
     cwd: &str,
 ) -> Result<proc::Completed, Outcome> {
+    in_consumer_fed(program, args, set, cwd, b"")
+}
+
+fn in_consumer_fed(
+    program: &Program,
+    args: &[&str],
+    set: &[(String, String)],
+    cwd: &str,
+    input: &[u8],
+) -> Result<proc::Completed, Outcome> {
     let unset = crate::knobs::inherited_under_static_prefixes();
     let child = proc::ChildEnv {
         set,
         unset: &unset,
         cwd: Some(std::path::Path::new(cwd)),
     };
-    proc::run_with_stdin_in(program, args, b"", &child).map_err(refuse)
+    proc::run_with_stdin_in(program, args, input, &child).map_err(refuse)
+}
+
+// spec: installer/SPEC.md §The consumer smoke — the same scrub with both streams merged, the capture
+// every verb's verdict is read from
+fn merged_in(program: &Program, args: &[&str], set: &[(String, String)], cwd: &str) -> Result<proc::Merged, Outcome> {
+    let unset = crate::knobs::inherited_under_static_prefixes();
+    proc::run_merged_scrubbed(program, args, set, std::path::Path::new(cwd), &unset).map_err(refuse)
 }
 
 fn text(bytes: &[u8]) -> String {
@@ -170,23 +228,23 @@ mod tests {
         );
     }
 
-    // spec: installer/SPEC.md §The consumer smoke — the scrub reaches the child itself: an
-    // exported kit knob is absent from a scratch consumer's environment and an arm's own value is
-    // present
+    // spec: installer/SPEC.md §The consumer smoke — the scrub reaches the child itself, on both
+    // capture faces: an exported kit knob is absent from a scratch consumer's environment and an
+    // arm's own value is present
     #[cfg(unix)]
     #[test]
     fn a_scratch_consumers_child_meets_no_exported_kit_knob() {
         let guard = crate::knobenv::lock();
         guard.set("EVIDENCE_KIT_MANIFEST_FILE", ".tmp/no-such-manifest.md");
         let dir = std::env::temp_dir().display().to_string();
-        let got = in_consumer(
-            &crate::programs::SH,
-            &["-c", "printf '%s|%s' \"${EVIDENCE_KIT_MANIFEST_FILE-unset}\" \"$DEMO_TMP_DIR\""],
-            &[("DEMO_TMP_DIR".to_string(), "set".to_string())],
-            &dir,
-        );
+        let probe = ["-c", "printf '%s|%s' \"${EVIDENCE_KIT_MANIFEST_FILE-unset}\" \"$DEMO_TMP_DIR\""];
+        let set = [("DEMO_TMP_DIR".to_string(), "set".to_string())];
+        let split = in_consumer(&crate::programs::SH, &probe, &set, &dir);
+        let joined = merged_in(&crate::programs::SH, &probe, &set, &dir);
         guard.remove("EVIDENCE_KIT_MANIFEST_FILE");
-        let Ok(done) = got else { panic!("the scrubbed spawn did not run") };
+        let Ok(done) = split else { panic!("the scrubbed spawn did not run") };
         assert_eq!(text(done.stdout().unwrap_or_default()), "unset|set");
+        let Ok(done) = joined else { panic!("the scrubbed merged spawn did not run") };
+        assert_eq!(text(done.output()), "unset|set");
     }
 }

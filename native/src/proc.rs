@@ -414,6 +414,19 @@ pub fn run_merged_in(
     merged(program, args, env, cwd, false, &[])
 }
 
+// spec: installer/SPEC.md §The consumer smoke — `run_merged_in` with names stripped as well, the one
+// shape it cannot carry: a scratch consumer's child meets no knob the invoker exported
+pub fn run_merged_scrubbed(
+    program: &Program,
+    args: &[&str],
+    env: &[(String, String)],
+    cwd: &std::path::Path,
+    unset: &[String],
+) -> Result<Merged, String> {
+    let unset: Vec<&str> = unset.iter().map(String::as_str).collect();
+    merged(program, args, env, Some(cwd), false, &unset)
+}
+
 // spec: canon-kit/SPEC.md §check-fence-run — `run_merged_in` whose child inherits no variable at
 // all: the environment is exactly `env`, the fixed one a documented fence runs under
 pub fn run_merged_isolated(

@@ -9,49 +9,94 @@ type Arm = fn(&mut Run) -> Step;
 
 pub(super) struct Row {
     pub name: &'static str,
-    pub detail: Option<&'static str>,
-    pub arm: Option<Arm>,
+    pub detail: &'static str,
+    pub arm: Arm,
 }
 
-const fn row(name: &'static str, detail: Option<&'static str>, arm: Arm) -> Row {
-    Row { name, detail, arm: Some(arm) }
-}
-
-const fn pending(name: &'static str) -> Row {
-    Row { name, detail: None, arm: None }
+const fn row(name: &'static str, detail: &'static str, arm: Arm) -> Row {
+    Row { name, detail, arm }
 }
 
 // spec: installer/SPEC.md §The consumer smoke — the arms in run order under the names the
-// baseline's rows carry; a row with no arm is one this binary does not compile yet
+// baseline's rows carry; a parenthetical's `{min}`, `{max}`, `{version}`, `{up}` and `{bare}` are
+// read off the run when its header prints, each set by an arm before it
 pub(super) const ARMS: &[Row] = &[
-    row("build", Some("the host gate binary the main payload carries"), super::staging::build),
-    row("pack", None, super::staging::pack),
-    row("install", Some("from the tarball, --offline"), super::staging::install),
-    pending("profile invariant"),
-    pending("seed arm"),
-    pending("demo arm"),
-    pending("companion arm for speckit"),
-    pending("companion arm for speckit full"),
-    pending("companion arm for speckit complement"),
-    pending("companion arm for openspec"),
-    pending("companion arm for openspec complement"),
-    pending("companion arm for openspec lifecycle"),
-    pending("plan parity over held seeds"),
-    pending("plan parity over deleted seeds with stale hashes"),
-    pending("artifact-less refusal leg"),
-    pending("download arm"),
-    pending("toolchain-free arm"),
-    pending("jq-less arm"),
-    pending("bash-less arm"),
-    pending("upgrade arm"),
-    pending("cross-version reversal arm"),
-    pending("newer-verb reversal arm"),
-    pending("hooked move arm"),
-    pending("seam arm"),
-    pending("narrowing arm"),
-    pending("selection arm"),
-    pending("artifact arm"),
+    row("build", "the host gate binary the main payload carries", super::staging::build),
+    row("pack", "", super::staging::pack),
+    row("install", "from the tarball, --offline", super::staging::install),
+    row("profile invariant", "", super::profiles::invariant),
+    row("seed arm", "the CI workflow init seeded, every profile", super::profiles::seed),
+    row("demo arm", "checkwright demo from the packed package, inside an installed {min} consumer", super::profiles::demo),
+    row(
+        "companion arm for speckit",
+        "the Spec Kit recipe on its fixture tree, through the extension install command's line",
+        super::companion::speckit,
+    ),
+    row(
+        "companion arm for speckit full",
+        "the extension install command's full line on its fixture tree",
+        super::companion::speckit_full,
+    ),
+    row(
+        "companion arm for speckit complement",
+        "the extension install command's complement line on its fixture tree, the left-out kits held to companion/exclusions.list",
+        super::companion::speckit_complement,
+    ),
+    row(
+        "companion arm for openspec",
+        "the OpenSpec recipe on its fixture tree, through the OpenSpec page's line",
+        super::companion::openspec,
+    ),
+    row(
+        "companion arm for openspec complement",
+        "the OpenSpec page's complement line on its fixture tree, the left-out kits held to companion/exclusions.list",
+        super::companion::openspec_complement,
+    ),
+    row(
+        "companion arm for openspec lifecycle",
+        "the OpenSpec page's full line, check-stage-entry over the lifecycle overlay",
+        super::companion::openspec_lifecycle,
+    ),
+    row("plan parity over held seeds", "{max}", super::profiles::held_seeds),
+    row("plan parity over deleted seeds with stale hashes", "{max}", super::profiles::re_seed),
+    row("artifact-less refusal leg", "{bare}, payload packed with no artifact", super::masked::artifact_less),
+    row("download arm", "{max}, node/npm masked", super::masked::download),
+    row("toolchain-free arm", "{max}, cargo/rustc masked", super::masked::toolchain_free),
+    row("jq-less arm", "{min}, jq absent from the verbs' PATH", super::masked::jq_less),
+    row("bash-less arm", "the profiles owing no bash, bash absent from PATH", super::masked::bash_less),
+    row(
+        "upgrade arm",
+        "two cross-version hops, {min} profile — the lattice minimum, so the arm is the smallest install that carries the manifest behavior it asserts",
+        super::upgrade::upgrade,
+    ),
+    row("cross-version reversal arm", "three versions, no adopter edit, {min}", super::upgrade::cross_version_reversal),
+    row(
+        "newer-verb reversal arm",
+        "installed at {version}, reversed by {up} with no upgrade, {min}",
+        super::upgrade::newer_verb_reversal,
+    ),
+    row("hooked move arm", "{min} to {max}, then to {up}, hooks on", super::moves::hooked_move),
+    row("seam arm", "same-version re-run, {max} profile", super::moves::seam),
+    row("narrowing arm", "{max} installed, re-run at {min}", super::moves::narrowing),
+    row("selection arm", "{min} with a kit added, a gate dropped and one added", super::moves::selection),
+    row("artifact arm", "selection outcomes, on a mutated copy of the packed payload", super::artifact::artifact),
 ];
+
+// spec: installer/SPEC.md §The consumer smoke — an arm's header: its name, then its parenthetical
+// with the run's values in place
+pub(super) fn header(row: &Row, state: &Run) -> String {
+    if row.detail.is_empty() {
+        return row.name.to_string();
+    }
+    let detail = row
+        .detail
+        .replace("{min}", &state.profile_min)
+        .replace("{max}", super::consumer::PROFILE_DERIVED)
+        .replace("{version}", &state.version)
+        .replace("{up}", &state.up_version)
+        .replace("{bare}", super::masked::BARE_PROFILE);
+    format!("{} ({})", row.name, detail)
+}
 
 // spec: evidence-kit/SPEC.md §Layout and configuration — the completion marker, the roster's last
 // name
@@ -153,6 +198,22 @@ mod tests {
             assert!(!n.contains(" ("), "{} carries a parenthetical in its name", n);
         }
         assert!(MARKER.starts_with(super::super::VERDICT));
+    }
+
+    // spec: installer/SPEC.md §The consumer smoke — every parenthetical renders with no
+    // placeholder left, and a bare row prints its name alone
+    #[test]
+    fn every_header_renders_with_no_placeholder_left() {
+        let mut state = Run::default();
+        state.profile_min = "starter".to_string();
+        state.version = "1.2.3".to_string();
+        state.up_version = "1.2.4".to_string();
+        for r in ARMS {
+            let h = header(r, &state);
+            assert!(h.starts_with(r.name), "{} renders as {}", r.name, h);
+            assert!(!h.contains('{') && !h.contains('}'), "{} left a placeholder: {}", r.name, h);
+        }
+        assert_eq!(header(&ARMS[1], &state), "pack");
     }
 
     // spec: evidence-kit/SPEC.md §Layout and configuration — the declaration this arm prints is
