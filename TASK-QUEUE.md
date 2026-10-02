@@ -14,7 +14,7 @@
 
 ### disposed-findings-register
 
-[cost: event/high] [surface: lifecycle-kit]
+[cost: event/high] [surface: lifecycle-kit] [recurrence: 2026-09-29, 2026-10-01, 2026-10-02]
 
 A discarded finding has no durable disposition, so it is re-filed. A drain discard's only record is its commit message, and `--emit file-gap`'s live-slug advisory and the filing owner lookup (lifecycle-kit/SPEC.md §The committed gap inbox) search live queue entries only, so a finding discarded once is never matched when filed again. Witness: the ubuntu-latest runner notice, filed by four closes and discarded at each next drain on one ground, native/runners.list's pin-or-ride rule.
 
