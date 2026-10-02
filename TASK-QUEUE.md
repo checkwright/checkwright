@@ -1335,9 +1335,3 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 
 ## Done
 
-- companion-install-tier
-- dispatch-guard-door-degrade
-- delegation-kit-model-brevity
-- wait-on-unreachable-condition
-- lead-notification-wake-race
-
