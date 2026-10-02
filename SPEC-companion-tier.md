@@ -62,6 +62,8 @@ The sections below are rewritten {design-bearing} {user-facing: the operator's d
 >
 > **A left-out kit is the path to replacing that piece of the toolkit's workflow.** Run the `complement` line again without that kit's `--without-kit`: a run passing any selection flag replaces the recorded selection whole. Each toolkit's page carries its `complement` line between `<!-- companion-complement:begin -->` and `<!-- companion-complement:end -->` and its `full` line between `<!-- companion-full:begin -->` and `<!-- companion-full:end -->`, in the same `text` form as the default line. On OpenSpec the `full` line also applies the lifecycle layer, which no gate `init` registers reads until a stage session runs (§The lifecycle layer). The Spec Kit extension's install command installs any of the three, by the user's input, its `complement` and `full` lines each in its own block.
 
+**Every other citation of §The two tiers** in companion/SPEC.md becomes §The tiers: the one in §The tested claim's lifecycle-leg paragraph, the one in §The fixtures' overlap paragraph, and the one in §The support table's gate-row bullet, beside the sentence delta 2 rewrites there.
+
 **§The lifecycle layer**'s first sentence cites §The tiers, and gains a second:
 
 > The `complement` line leaves lifecycle-kit out, so it carries no layer, and `init` refuses the layer beside it, since the layer writes a seam no selected kit writes (installer/SPEC.md §Payload recipes).
@@ -176,7 +178,7 @@ The script's header comment and the companion arm's `# spec:` lines name the new
 Roster produced by `git grep -n -i "the two tiers\|the-two-tiers\|companion-full\|companion-install"` over the tracked tree, the reads of companion/SPEC.md, installer/SPEC.md §The consumer smoke, the toolkit pages and the extension, and the measurements above.
 
 - `companion/exclusions.list` (delta 1).
-- `companion/SPEC.md`: the preamble, §The component, §Recipes, §Applying a recipe, §The two tiers retitled §The tiers, §The lifecycle layer, §The tested claim, §The Spec Kit extension, §The support table and §Honest limits (delta 2).
+- `companion/SPEC.md`: the preamble, §The component, §Recipes, §Applying a recipe, §The two tiers retitled §The tiers, §The lifecycle layer, §The tested claim, §The fixtures, §The Spec Kit extension, §The support table and §Honest limits (delta 2).
 - `companion/speckit/commands/install.md` (delta 3).
 - `companion/speckit/extension.yml` (delta 3).
 - `companion/speckit/README.md` (delta 3).
