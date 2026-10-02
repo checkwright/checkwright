@@ -5,3 +5,4 @@
 ---
 
 companion-tier-delegation-pass scope ab834c17 2026-10-02 71b4e79a
+companion-tier-delegation-pass spec a081b78d 2026-10-02 b9e2c6c0
