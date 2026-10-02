@@ -129,6 +129,9 @@ CANON_KIT_COMMENT_SURFACE[] = **/*.gate
 CANON_KIT_COMMENT_SURFACE[] = **/*.rs
 CANON_KIT_COMMENT_SURFACE[] = **/*.knobs
 
+# spec: gate-sdk/SPEC.md §check-consumer-value-literal — this repo's own gate's site valve
+CANON_KIT_COMMENT_MACHINE[] = consumer-value-exempt:
+
 # spec: canon-kit/SPEC.md §check-comment-tier
 CANON_KIT_COMMENT_ACTIONS = on
 

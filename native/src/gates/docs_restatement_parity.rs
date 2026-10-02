@@ -16,6 +16,7 @@ pub fn run(args: &[String]) -> i32 {
     }
 }
 
+// consumer-value-exempt: the README beside a restating page, the pairing the rule itself states
 const SOURCE: &str = "README.md";
 
 fn rule(args: &[String]) -> Result<i32, String> {

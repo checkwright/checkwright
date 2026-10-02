@@ -201,12 +201,14 @@ pub fn manifest_files(root: &str) -> Result<Vec<PathBuf>, String> {
     } else {
         out.extend(canonical_specs(root)?);
 
+        // consumer-value-exempt: the default branch's file name; CANON_KIT_MANIFEST_FILES replaces the branch
         let readmes = walk::find_named(rootp, &["README.md"])?
             .into_iter()
             .filter(|p| !under_templates(&p.display().to_string()))
             .collect();
         out.extend(prune_kit_roots(root, readmes)?);
 
+        // consumer-value-exempt: the default branch's file name; CANON_KIT_MANIFEST_FILES replaces the branch
         out.extend(walk::find_named(rootp, &["CLAUDE.md"])?);
     }
     let prose_globs = knob_array("CANON_KIT_PROSE_SURFACE_GLOBS")?;

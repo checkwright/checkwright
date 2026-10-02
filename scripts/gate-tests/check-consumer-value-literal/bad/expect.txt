@@ -1,0 +1,4 @@
+crate/src/gates/install_disposition.rs:1: "docs/guide.md" — path arm: names the tracked path docs/guide.md
+crate/src/gates/install_disposition.rs:2: "## Done" — heading arm: the heading '## Done' in docs/guide.md
+crate/src/gates/install_disposition.rs:3: "Release notes index" — heading arm: the heading '## Release notes index' in docs/guide.md
+crate/src/gates/install_disposition.rs:4: // consumer-value-exempt:

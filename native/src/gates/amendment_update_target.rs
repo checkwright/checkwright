@@ -9,8 +9,8 @@ const EXEMPT: &str = "update-target-exempt:";
 // spec: canon-kit/SPEC.md §check-amendment-update-target — the two heading names are kit
 // constants, not config: they are canon-kit's own template's headings, and a consumer editing
 // them has edited the artifact rather than configured it
-const WHAT_CHANGES: &str = "## What changes";
-const UPDATED: &str = "## Existing sections updated";
+const WHAT_CHANGES: &str = "## What changes"; // consumer-value-exempt: the amendment template's heading, a kit constant
+const UPDATED: &str = "## Existing sections updated"; // consumer-value-exempt: the amendment template's heading, a kit constant
 
 pub fn run(args: &[String]) -> i32 {
     match rule(args) {

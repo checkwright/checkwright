@@ -117,6 +117,7 @@ check-tightened-gates-grammar
 check-release-declaration-parity
 check-release-change-declared
 check-release-assets
+check-consumer-value-literal
 check-npm-publish-spec
 check-manifest-temporal
 check-pendency-contradiction

@@ -155,6 +155,7 @@ fn gate_section(gates_dir: &str) -> Result<Option<Section>, String> {
     rows.extend(msg);
     rows.extend(align);
     Ok(Some(Section {
+        // consumer-value-exempt: the emitter's own section title, which the page it writes carries
         title: "Blocking gates".into(),
         columns: vec!["gate".into(), "tier".into()],
         rows,
@@ -209,6 +210,7 @@ fn kpi_section(gates_dir: &str) -> Result<Option<Section>, String> {
         return Ok(None);
     }
     Ok(Some(Section {
+        // consumer-value-exempt: the emitter's own section title, which the page it writes carries
         title: "Advisory KPIs".into(),
         columns: vec!["KPI".into()],
         rows,
@@ -281,6 +283,7 @@ fn hook_sections(settings: &str, set: bool) -> Result<Vec<Section>, String> {
     }
     if !warnings.is_empty() {
         out.push(Section {
+            // consumer-value-exempt: the emitter's own section title, which the page it writes carries
             title: "Session warnings".into(),
             columns: vec!["surface".into()],
             rows: warnings,
@@ -316,6 +319,7 @@ fn suite_section() -> Result<Option<Section>, String> {
         });
     }
     Ok(Some(Section {
+        // consumer-value-exempt: the emitter's own section title, which the page it writes carries
         title: "Validate suites".into(),
         columns: vec!["suite".into()],
         rows,
@@ -396,11 +400,16 @@ fn monitor_surface(line: &str) -> Option<String> {
 // spec: gate-sdk/SPEC.md §check-enforcement-fresh — the owner sections, in class order: a fixture
 // case must carry none of these paths, or its projection links through the enclosing repo's origin
 const CLASS_OWNERS: [(&str, &str, &str); 6] = [
+    // consumer-value-exempt: a kit SPEC's own section title, the class owner's citation
     ("gate-sdk/SPEC.md", "enforcement-tiers", "Enforcement tiers"),
+    // consumer-value-exempt: a kit SPEC's own section title, the class owner's citation
     ("drift-kit/SPEC.md", "the-kpi-plugin-contract", "The KPI plugin contract"),
+    // consumer-value-exempt: a kit SPEC's own section title, the class owner's citation
     ("guard-kit/SPEC.md", "the-shell-guard", "The shell guard"),
     ("context-kit/SPEC.md", "the-session-context-hook-template", "The session-context hook"),
+    // consumer-value-exempt: a kit SPEC's own section title, the class owner's citation
     ("evidence-kit/SPEC.md", "baseline-manifest", "Baseline manifest"),
+    // consumer-value-exempt: a kit SPEC's own section title, the class owner's citation
     ("site-kit/SPEC.md", "the-monitor-boundary", "The monitor boundary"),
 ];
 

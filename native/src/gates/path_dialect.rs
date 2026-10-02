@@ -5,7 +5,7 @@ use crate::walk;
 use std::path::Path;
 
 const NAME: &str = "check-path-dialect";
-const CITATION: &str = "The path-dialect contract";
+const CITATION: &str = "The path-dialect contract"; // consumer-value-exempt: gate-sdk SPEC's own section the remedy cites
 
 // spec: gate-sdk/SPEC.md §The path-dialect contract — the scanner's own vocabulary is a recorded
 // verdict rather than an uncrossed producer: a gate that reds on the forms it hunts is unwritable

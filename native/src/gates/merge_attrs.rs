@@ -38,7 +38,7 @@ fn attributed(text: &str, attr: &str) -> Vec<String> {
 pub fn run(args: &[String]) -> i32 {
     let attrs = match args.first().filter(|a| !a.is_empty()) {
         Some(a) => a.clone(),
-        None => ".gitattributes".to_string(),
+        None => ".gitattributes".to_string(), // consumer-value-exempt: git's own attributes file
     };
 
     let derived = match stages::supersede_set() {

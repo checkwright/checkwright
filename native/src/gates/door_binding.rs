@@ -165,7 +165,7 @@ fn scopes(lines: &[&str]) -> Scopes {
 
 // spec: guard-kit/SPEC.md §check-door-binding — a Rust member's output region: the source up to its
 // test module, the cut the crate's reads-couples reader makes, since a test literal is no output
-fn rust_region(src: &str) -> &str {
+pub fn rust_region(src: &str) -> &str {
     src.find("#[cfg(test)]\nmod tests {").map_or(src, |at| &src[..at])
 }
 
@@ -283,6 +283,7 @@ fn walk_tree(root: &str) -> Result<Vec<String>, String> {
 // spec: guard-kit/SPEC.md §check-door-binding — the corpus predicate over one kit root: its README,
 // and anything under the three shipped directories
 fn in_corpus(rel: &str) -> bool {
+    // consumer-value-exempt: a kit root's own README, read relative to that root
     rel == "README.md" || DIRS.iter().any(|d| walk::under(d, rel))
 }
 

@@ -210,6 +210,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
                 }
                 if !kit.is_empty() && anchor.is_empty() {
                     let b = base_of(&p);
+                    // consumer-value-exempt: a kit root's own README, kit vocabulary beside the knob-named spec
                     if (b == "README.md" || b == spec_name)
                         && base_of(dir_of(&p)) == kit
                         && !exempt(&lines, lno)

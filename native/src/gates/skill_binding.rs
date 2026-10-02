@@ -53,7 +53,7 @@ fn bindings_of(text: &str) -> Vec<String> {
     let mut out = Vec::new();
     let mut inb = false;
     for line in text.lines() {
-        if line.starts_with("## Bindings") {
+        if line.starts_with("## Bindings") { // consumer-value-exempt: the binding shim's section, lifecycle-kit's grammar
             inb = true;
             continue;
         }

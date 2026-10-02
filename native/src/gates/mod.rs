@@ -17,6 +17,7 @@ pub mod citation_link;
 pub mod close_surfaces;
 pub mod comment_tier;
 pub mod commit_subject;
+pub mod consumer_value_literal;
 pub mod dispatch_entry;
 pub mod doctrine_registration;
 pub mod door_binding;
@@ -1612,6 +1613,22 @@ pub const REGISTRY: &[GateEntry] = &[
         "-",
         &[],
     ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — no walk root: the members come from the
+    // registry, the crate files from their derived cuts, and the tracked set from git
+    (
+        "check-consumer-value-literal",
+        consumer_value_literal::run,
+        &[],
+        &[
+            "GATE_SDK_NATIVE_SRC",
+            "GATE_SDK_GATES_DIR",
+            "GATE_SDK_KIT_DIRS",
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+        ],
+        "-",
+        &[("git", "")],
+    ),
     // spec: gate-sdk/SPEC.md §The consumer remainder cohort — the rest of the consumer's own
     // gates directory, every member on the `-` sentinel. The two that declare a knob declare
     // what they execute: a shared derivation's whole knob set.
@@ -1792,7 +1809,7 @@ pub const REGISTRY: &[GateEntry] = &[
         value_rollup_fresh::run,
         &[
             (".", "glob:lit:*/SPEC.md", "", ""),
-            ("?", "", "", "dynamic@src/emit/enforcement_map.rs:340 via emit::value_rollup::emit"),
+            ("?", "", "", "dynamic@src/emit/enforcement_map.rs:344 via emit::value_rollup::emit"),
             ("?", "", "", "dynamic@src/emit/footprint.rs:90 via emit::value_rollup::emit"),
         ],
         &[
@@ -1857,7 +1874,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-enforcement-fresh",
         enforcement_fresh::run,
-        &[("?", "", "", "dynamic@src/emit/enforcement_map.rs:340 via emit::enforcement_map::emit")],
+        &[("?", "", "", "dynamic@src/emit/enforcement_map.rs:344 via emit::enforcement_map::emit")],
         &[
             "GATE_SDK_ENFORCEMENT_FILE",
             "GATE_SDK_GATES_DIR",

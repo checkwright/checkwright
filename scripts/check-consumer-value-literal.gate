@@ -1,0 +1,2 @@
+# graph: couples=native/src/*.rs,*.gate,*.md dir=one valve=none tier=precommit
+# spec: gate-sdk/SPEC.md §check-consumer-value-literal — every literal a kit-shipped gate's crate modules carry that names a tracked consumer path or heading is a knob or a declared site

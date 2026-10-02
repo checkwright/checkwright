@@ -10,9 +10,9 @@ const EXEMPT: &str = "retired-spelling-exempt:";
 
 // spec: canon-kit/SPEC.md §check-amendment-retired-spelling — the three heading names are kit
 // constants on §check-amendment-update-target's own ground, not config
-const WHAT_CHANGES: &str = "## What changes";
-const UPDATED: &str = "## Existing sections updated";
-const RETIRED: &str = "## Retired spellings";
+const WHAT_CHANGES: &str = "## What changes"; // consumer-value-exempt: the amendment template's heading, a kit constant
+const UPDATED: &str = "## Existing sections updated"; // consumer-value-exempt: the amendment template's heading, a kit constant
+const RETIRED: &str = "## Retired spellings"; // consumer-value-exempt: the amendment template's heading, a kit constant
 
 const EXCLUDE_KNOB: &str = "CANON_KIT_RETIRED_SPELLING_EXCLUDE";
 

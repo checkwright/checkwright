@@ -9,11 +9,11 @@ use crate::{fresh, proc, walk};
 // optional allowlist file, never a literal the crate carries (the graph-vocab.knobs pattern)
 fn builtin_allow(queue: &str, agent: &str) -> Vec<String> {
     vec![
-        "README.md".to_string(),
-        "LICENSE".to_string(),
+        "README.md".to_string(), // consumer-value-exempt: the generic fallback set above
+        "LICENSE".to_string(),   // consumer-value-exempt: the generic fallback set above
         queue.to_string(),
         agent.to_string(),
-        ".gitignore".to_string(),
+        ".gitignore".to_string(), // consumer-value-exempt: the generic fallback set above
         "SPEC-*.md".to_string(),
     ]
 }

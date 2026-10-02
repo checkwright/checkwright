@@ -9,7 +9,7 @@ use crate::section;
 use crate::walk;
 use std::path::Path;
 
-const SECTION: &str = "## Meta-gate conservation for the binary substrate";
+const SECTION: &str = "## Meta-gate conservation for the binary substrate"; // consumer-value-exempt: gate-sdk SPEC's own section, a kit constant
 
 // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion B's owner column: a kit
 // directory basename, or this sentinel for a member the consumer's own gates directory declares

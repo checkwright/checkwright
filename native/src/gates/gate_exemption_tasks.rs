@@ -21,8 +21,8 @@ fn lstrip(s: &str) -> &str {
 // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the section set and the lead-line shape are
 // literals and never knobs, and the crate's own knob-taking queue module is deliberately not
 // reached: a consumer free to redefine the shape could redefine it back into the fail-open
-const LIVE_OPEN: &[&str] = &["## New Features", "## Technical Debt", "## Deferred"];
-const LIVE_CLOSE: &[&str] = &["## Done", "## Lessons Learned"];
+const LIVE_OPEN: &[&str] = &["## New Features", "## Technical Debt", "## Deferred"]; // consumer-value-exempt: literals by the fail-open ground above
+const LIVE_CLOSE: &[&str] = &["## Done", "## Lessons Learned"]; // consumer-value-exempt: literals by the fail-open ground above
 
 fn is_slug_byte(c: u8) -> bool {
     c.is_ascii_lowercase() || c.is_ascii_digit() || c == b'-'

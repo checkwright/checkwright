@@ -5,8 +5,8 @@ use crate::walk;
 
 // spec: doctrine-kit/SPEC.md §check-doctrine-registration — the doctrine-side section headings are
 // kit mechanism (the kit ships DOCTRINE.md), never config
-const METH_SECTION: &str = "## Methodology-maintenance rules";
-const CRAFT_SECTION: &str = "## Engineering-craft rules";
+const METH_SECTION: &str = "## Methodology-maintenance rules"; // consumer-value-exempt: the shipped DOCTRINE.md register heading, a kit constant
+const CRAFT_SECTION: &str = "## Engineering-craft rules"; // consumer-value-exempt: the shipped DOCTRINE.md register heading, a kit constant
 
 fn spacey(c: char) -> bool {
     matches!(c, ' ' | '\t' | '\n' | '\u{b}' | '\u{c}' | '\r')
