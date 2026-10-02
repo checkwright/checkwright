@@ -7,7 +7,7 @@
 68 drift-kit/SPEC.md
 119 evidence-kit/SPEC.md
 21 gate-sdk/SPEC.md
-270 guard-kit/SPEC.md
+185 guard-kit/SPEC.md
 3 installer/SPEC.md
 1 lifecycle-kit/SPEC.md
 94 queue-kit/SPEC.md

@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### guard-kit-tool-brevity
-
-guard-kit/SPEC.md's tool sections, §scratch-run through §The close-stage triage step, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement), about 12.9k of the file's 50.7k words by awk count; guard-kit's preamble, §The generic ruleset, §Layout and configuration and §Testing stay on the parent, the ruleset until the deferred guard-kit rule entries that rewrite it land.
-
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. It rides the batch after `hook-emit-remedy-door`, whose door-roots widening edits §check-door-binding.
-
-**Cost while deferred:** paid by every session and adopter that reads an unpassed guard-kit tool section. Filed 2026-10-01 as a split at gate-sdk-value-pass' scope. Part of the operator's selection of set A+, direction 2026-10-01, lead-relayed (not a ruling).
-
 ## Deferred
 
 ### kit-log-declaration-transport
@@ -318,7 +310,7 @@ Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-ki
 
 Each on an operator direction lead-relayed (not a /consult ruling), the kit's other sections remaining: drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections (its preamble remains), delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope, landing as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope, landing as `queue-kit-gate-brevity`.
 
-guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope as [guard-kit-tool-brevity](#guard-kit-tool-brevity).
+guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope, landing as `guard-kit-tool-brevity`.
 
 ### tarball-build-attestation
 
@@ -1319,4 +1311,5 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 - consumer-value-literal-gate
 - bash-reader-escaped-separator
 - hook-emit-remedy-door
+- guard-kit-tool-brevity
 
