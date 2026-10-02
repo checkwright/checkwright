@@ -7,3 +7,4 @@
 companion-tier-delegation-pass scope ab834c17 2026-10-02 71b4e79a
 companion-tier-delegation-pass spec a081b78d 2026-10-02 b9e2c6c0
 companion-tier-delegation-pass align a4755333 2026-10-02 b41fc027
+companion-tier-delegation-pass build aa38affd 2026-10-02 1d75f946
