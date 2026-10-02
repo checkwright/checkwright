@@ -18,23 +18,7 @@
 
 **Cost while deferred:** an adopter running lifecycle-kit with any capture-logging kit meets a red with no documented cure until it hand-declares the logs and widens `LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS`. Filed 2026-10-01 to the gap inbox at lifecycle-queue-value-pass' build; promoted at its close: →fix fails because the channel is new mechanism across gate-sdk's payload and four kits, →forward because no ruling is owed. Re-verified: installer/SPEC.md states the payload withholds a kit's SPEC.md; guard-kit/README.md step 3 and drift-kit/README.md step 2 gitignore the logs; the five declarations sit only in the three kit SPECs. The red itself was probed at that build (a knob file whose roster basename and surface globs match nothing reds three gitignored logs undeclared) and not re-run here. Distinct from `lifecycle-queue-value-audit`, whose kept verdict on the gate this does not reopen. Owner lookup: `close-surface`, `declaration transport`, `undeclared` in this file — only the iceboxed [close-surface-reclaim-uncoupled-from-read](#close-surface-reclaim-uncoupled-from-read), whose subject is the reclaim; owner lifecycle-kit/SPEC.md §The close-surface roster.
 
-**Selected 2026-10-02 for consumer-smoke-driver-pass, operator direction lead-relayed (not a ruling):** a feature; its consumer-smoke leg is written in [compiled-consumer-smoke-driver](#compiled-consumer-smoke-driver)'s driver, so it lands after that driver and rides its push.
-
-### compiled-consumer-smoke-driver
-
-[spec: installer/SPEC.md]
-
-the consumer smoke has two drivers. native-hook-customer-legs chose a PowerShell driver over the entry's five coverage classes, so installer/consumer-smoke/run-smoke.sh and run-smoke.ps1 both spell init, battery, hooks, upgrade and uninstall, and the arms installer/SPEC.md §The consumer smoke names as staying on the unix legs do not run on native Windows.
-
-**Deliverable:** one compiled driver on every leg, replacing both scripts.
-
-**The driver also owns the nested batteries' environment.** run-smoke.sh re-runs a battery inside each scratch consumer under the invoker's environment with only `PATH` overridden, so an exported `EVIDENCE_KIT_*_FILE`, `EVIDENCE_KIT_LOCK_FILE`, `GATE_SDK_TMP_DIR` or other path scalar redirects the nested gates to the outer repo's files or a wrong sandbox path; gate-sdk/lib/test-hermetic.sh pins this for gate-tests suites only. The compiled driver scrubs those scalars. Attached 2026-10-01 at context-kit-value-pass' close on the operator's direction of that day, lead-relayed (not a ruling); the residual of the deleted `nested-battery-env-inheritance-invisible`, whose false-clean premise is unreachable. Re-verified: no `unset` or `env -u` reaches a nested battery call. Probed 2026-10-02 at spec: an exported `EVIDENCE_KIT_MANIFEST_FILE` redirects `check-evidence-manifest`, which reports the redirected path missing.
-
-**Cost while deferred:** two drivers held in step by nobody, and Windows loses those arms. Filed 2026-09-29 to the gap inbox at native-hook-customer-legs' spec; promoted 2026-09-29 at its close: →fix fails because the driver is new mechanism, →forward because no ruling is owed. Re-verified: both scripts exist (2015 and 232 lines). Owner lookup: `consumer smoke`, `run-smoke.ps1`, `smoke driver` in this file — none; owner installer/SPEC.md §The consumer smoke.
-
-**Selected 2026-10-02 for consumer-smoke-driver-pass, operator direction lead-relayed (not a ruling):** a feature, landing first of the smoke-touching units, ahead of [kit-log-declaration-transport](#kit-log-declaration-transport)'s smoke leg and [installer-smoke-brevity](#installer-smoke-brevity).
-
-**Push need (2026-10-02, inside the budget):** one mid-iteration push, since its native-Windows and macOS legs run only in CI; with the closing push the set needs 2 against a budget of one to two.
+**Selected 2026-10-02 for consumer-smoke-driver-pass, operator direction lead-relayed (not a ruling):** a feature; its consumer-smoke leg is written in `compiled-consumer-smoke-driver`'s driver, so it lands after that driver and rides its push.
 
 ## Technical Debt
 
@@ -42,7 +26,7 @@ the consumer smoke has two drivers. native-hook-customer-legs chose a PowerShell
 
 installer/SPEC.md's §The consumer smoke, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement), about 16.1k of the file's 44.3k words by `wc -w` at this scope; the last installer section that entry held.
 
-**Deliverable:** the three moves over that section under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into it kept, per a citation survey. It passes the section as [compiled-consumer-smoke-driver](#compiled-consumer-smoke-driver) leaves it, so it rides the batch after that driver lands.
+**Deliverable:** the three moves over that section under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into it kept, per a citation survey. It passes the section as `compiled-consumer-smoke-driver` leaves it, so it rides the batch after that driver lands.
 
 **Cost while deferred:** paid by every session and adopter that reads the unpassed section. Filed 2026-10-02 as a split at consumer-smoke-driver-pass' scope. Part of the operator's selection of the unit set, direction 2026-10-02, lead-relayed (not a ruling).
 
@@ -1322,4 +1306,5 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 - front-door-flag-operand
 - front-door-arm-route-blind
 - disposed-findings-register
+- compiled-consumer-smoke-driver
 
