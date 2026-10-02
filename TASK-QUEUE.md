@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### delegation-kit-model-brevity
-
-delegation-kit/SPEC.md's §The delegation model, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement), about 13.3k of the file's 45.6k words by awk count; §The turn-end liveness hook and the sections after the tier group stay on the parent.
-
-**Deliverable:** the three moves over that section under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into it kept, per a citation survey. It rides the batch after `dispatch-guard-door-degrade`, whose decision-table row lands in this section's fail-posture table.
-
-**Cost while deferred:** paid by every session and adopter that reads the unpassed section. Filed 2026-10-02 as a split at companion-tier-delegation-pass' scope. Part of the operator's selection of set A, direction 2026-10-02, lead-relayed (not a ruling).
-
 ### wait-on-unreachable-condition
 
 a dispatched session can park a wait on a condition nothing will make true. A mechanical-tier align session of lifecycle-queue-value-pass looped `until [ -f .tmp/never-exists-marker ]`; on the foreground timeout the harness backgrounded the loops, and the session read as live past its hand-back for the 30-minute background limit, the holder lifecycle-kit/templates/lead.md names. The waiting rule in delegation-kit/templates/agent-execution.md (**Background + notification, never poll**) bars a self-matching `pgrep` and a record-falsified condition, not a condition with no writer at all, and its "never end a turn in order to wait" clause can read as covering a wait for the lead's answer, which is a turn end.
@@ -320,7 +312,7 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes, landing as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes, landing as `installer-install-brevity` and `installer-remainder-brevity`; and, the kit's other sections remaining: drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections (its preamble remains), delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope, landing as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope, landing as `queue-kit-gate-brevity`; guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope, landing as `guard-kit-tool-brevity`.
 
-delegation-kit's §The delegation model left 2026-10-02 at companion-tier-delegation-pass' scope as [delegation-kit-model-brevity](#delegation-kit-model-brevity).
+delegation-kit's §The delegation model left 2026-10-02 at companion-tier-delegation-pass' scope as `delegation-kit-model-brevity`.
 
 ### tarball-build-attestation
 
@@ -1359,4 +1351,5 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 
 - companion-install-tier
 - dispatch-guard-door-degrade
+- delegation-kit-model-brevity
 
