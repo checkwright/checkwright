@@ -8,24 +8,6 @@
 
 ## New Features
 
-### companion-install-tier
-
-[spec: companion/SPEC.md] [roadmap: next/ecosystem] [roadmap-summary: A companion install exposing every deterministic gate a spec toolkit does not already do.]
-
-a companion install tier, operator direction 2026-09-29, lead-relayed (not a ruling). A Spec Kit or OpenSpec adopter installs a profile exposing every kit's deterministic gates except the kits whose job the toolkit already does (candidates, unmeasured: lifecycle-kit's stage machine, queue-kit's task queue), each exclusion recorded with the toolkit it defers to, so adopting an excluded kit later is the path to replacing that piece. Each toolkit's customers get a recipe for adopting the non-conflicting kits, in the toolkit's extension where one exists and at minimum on its docs page (OpenSpec has none today). Ground: the companion brings those toolkits' customers to deterministic checks, which complement the toolkit's own work.
-
-**Deliverable:** the tier, its exclusion record and the per-toolkit recipes, under the companion arm's tested-line rule (companion/SPEC.md §Applying a recipe).
-
-**Horizon, operator direction 2026-09-29, lead-relayed (not a ruling):** one outcome row, `now` if the next scope takes it, else `next` until the first close landing a slice moves it to `now`; its slices stay off the roadmap.
-
-**Cost while deferred:** [companion-toolkit-profile](#companion-toolkit-profile)'s submission waits on it, and a companion adopter today chooses between document gates alone and every kit installed beside the toolkit's own workflow. Filed 2026-09-29 to the gap inbox by preview-readiness' lead; promoted 2026-09-30 at its close: →fix fails because a tier is new mechanism and new governed names, →forward because the direction is given. Re-verified: companion/SPEC.md §The two tiers has `prose` (canon-kit's document gates) and `full` (every kit), with no exclusion. Owner lookup: `exclusion`, `conflict`, `companion tier` in this file — none; owner companion/SPEC.md §The two tiers, with installer/SPEC.md §Profiles.
-
-**Selected 2026-10-02 for companion-tier-delegation-pass, operator direction lead-relayed (not a ruling):** a feature, so spec authors and promotes it; unblocked since `gate-customer-value-audit` landed. Its tested arm lands in the current smoke drivers, which [compiled-consumer-smoke-driver](#compiled-consumer-smoke-driver) later ports. Spelled as a selection, it leaves installer/SPEC.md §Profiles and `installer/profiles.list` to [verify-workflow-decoupling](#verify-workflow-decoupling).
-
-**Measured 2026-10-02 at spec:** lifecycle-kit, queue-kit and doctrine-kit leave for both toolkits, the lead's decision applying the direction's test; the tier is `complement`, operator direction 2026-10-02 lead-relayed (not a ruling), spelled `full` plus `--without-kit`, the lead's decision.
-
-**Push need (2026-10-02, inside the budget):** one mid-iteration push, only if the tier changes an extension or recipe install line the CI `companion-toolkits` job runs at its pins. It fires: the tier changes the packed extension's install command.
-
 ## Technical Debt
 
 ### dispatch-guard-door-degrade
@@ -220,7 +202,7 @@ the interop rung's submission half. The build half landed at companion-catalog-e
 
 **Deliverable:** the Spec Kit community-catalog submission, filed as the catalog's Extension Submission issue with its `download_url` naming the `checkwright-companion-<version>.zip` Release asset; the extension's README and the landing page then gain the catalog's install form.
 
-**Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **Also gated, operator direction 2026-09-29, lead-relayed (not a ruling),** on [companion-install-tier](#companion-install-tier) and `gate-customer-value-audit`, which landed at gate-sdk-value-pass: its verdicts decide which gates that tier exposes. **The four preconditions the operator set on 2026-09-27 landed at catalog-submission-preconditions:** `crate-tests-windows-flip`, since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; `catalog-landing-docs-polish`; and `spec-toolkits-guarantee`.
+**Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **Also gated, operator direction 2026-09-29, lead-relayed (not a ruling),** on `companion-install-tier` and `gate-customer-value-audit`, which landed at gate-sdk-value-pass: its verdicts decide which gates that tier exposes. **The four preconditions the operator set on 2026-09-27 landed at catalog-submission-preconditions:** `crate-tests-windows-flip`, since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; `catalog-landing-docs-polish`; and `spec-toolkits-guarantee`.
 
 **Four more prerequisites, operator direction 2026-09-29, lead-relayed (not a ruling):** three landed at companion-technical-gates (`install-gate-selection`, `companion-spec-to-code-gates`, `speckit-extension-full-profile`), and `adoption-prompt-templates` landed at companion-adoption-landing. Ground: Spec Kit and OpenSpec are technical toolkits, so a companion offering only document gates reads as near-useless, and the launch needs an early-adopter wow.
 
@@ -1384,4 +1366,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 A balanced Liquid token a docs page means literally parses and renders blank, and neither check-docs-liquid-parse nor check-docs-render-fidelity sees the loss; no live page carries it, and the fix is a render-side assertion or a token scan outside raw blocks (site-kit/SPEC.md §check-docs-liquid-parse).
 
 ## Done
+
+- companion-install-tier
 
