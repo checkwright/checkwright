@@ -12,6 +12,16 @@
 
 ## Deferred
 
+### disposed-findings-register
+
+[cost: event/high] [surface: lifecycle-kit]
+
+A discarded finding has no durable disposition, so it is re-filed. A drain discard's only record is its commit message, and `--emit file-gap`'s live-slug advisory and the filing owner lookup (lifecycle-kit/SPEC.md §The committed gap inbox) search live queue entries only, so a finding discarded once is never matched when filed again. Witness: the ubuntu-latest runner notice, filed by four closes and discarded at each next drain on one ground, native/runners.list's pin-or-ride rule.
+
+**Deliverable:** a finding's disposition recorded at its first processing, with capture or filing matching a new bullet against it (a disposed-findings record, say), its contract in lifecycle-kit/SPEC.md §The committed gap inbox and a fixture pair.
+
+**Cost while deferred:** each recurring dropped finding costs a filing and a drain re-verification per close. Operator direction 2026-10-02, lead-relayed (not a ruling): the operator wanted it this iteration. Filed 2026-10-02 to the gap inbox by companion-tier-delegation-pass' lead; promoted at its close: →fix fails because a record and its matcher add governed names, →forward because the direction is given and no ruling is owed. Re-verified: the four filings (08663d34, d9c65019, bbad7889, 7c91b291) and their discards read as filed; the advisory's live-set scope reads so in §The committed gap inbox. The runner-notice instance is fixed in the close binding's push-budget line. Owner lookup: `disposed`, `discarded once`, `disposition record` in this file — none on this subject; owner lifecycle-kit/SPEC.md §The committed gap inbox.
+
 ### kit-log-declaration-transport
 
 [cost: event/high] [surface: lifecycle-kit]
@@ -160,7 +170,7 @@ the interop rung's submission half. The build half landed at companion-catalog-e
 
 **Deliverable:** the Spec Kit community-catalog submission, filed as the catalog's Extension Submission issue with its `download_url` naming the `checkwright-companion-<version>.zip` Release asset; the extension's README and the landing page then gain the catalog's install form.
 
-**Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **Also gated, operator direction 2026-09-29, lead-relayed (not a ruling),** on `companion-install-tier` and `gate-customer-value-audit`, which landed at gate-sdk-value-pass: its verdicts decide which gates that tier exposes. **The four preconditions the operator set on 2026-09-27 landed at catalog-submission-preconditions:** `crate-tests-windows-flip`, since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; `catalog-landing-docs-polish`; and `spec-toolkits-guarantee`.
+**Gated on** a published tag carrying that asset, since the catalog installs from a tagged archive, and on [design-partner-preview](#design-partner-preview)'s observed install. **Also gated, operator direction 2026-09-29, lead-relayed (not a ruling),** on `gate-customer-value-audit`, which landed at gate-sdk-value-pass, and `companion-install-tier`, which landed at companion-tier-delegation-pass: the audit's verdicts decide which gates that tier exposes. **The four preconditions the operator set on 2026-09-27 landed at catalog-submission-preconditions:** `crate-tests-windows-flip`, since red jobs inside a green run read as ignored failures; `linux-glibc-artifacts`; `catalog-landing-docs-polish`; and `spec-toolkits-guarantee`.
 
 **Four more prerequisites, operator direction 2026-09-29, lead-relayed (not a ruling):** three landed at companion-technical-gates (`install-gate-selection`, `companion-spec-to-code-gates`, `speckit-extension-full-profile`), and `adoption-prompt-templates` landed at companion-adoption-landing. Ground: Spec Kit and OpenSpec are technical toolkits, so a companion offering only document gates reads as near-useless, and the launch needs an early-adopter wow.
 
@@ -288,7 +298,7 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes, landing as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes, landing as `installer-install-brevity` and `installer-remainder-brevity`; and, the kit's other sections remaining: drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections (its preamble remains), delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope, landing as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope, landing as `queue-kit-gate-brevity`; guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope, landing as `guard-kit-tool-brevity`.
 
-delegation-kit's §The delegation model left 2026-10-02 at companion-tier-delegation-pass' scope as `delegation-kit-model-brevity`.
+delegation-kit's §The delegation model left 2026-10-02 at companion-tier-delegation-pass' scope, landing as `delegation-kit-model-brevity`.
 
 ### tarball-build-attestation
 
