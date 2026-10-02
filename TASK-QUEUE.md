@@ -24,14 +24,6 @@
 
 ## Technical Debt
 
-### installer-smoke-brevity
-
-installer/SPEC.md's §The consumer smoke, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement), about 16.1k of the file's 44.3k words by `wc -w` at this scope; the last installer section that entry held.
-
-**Deliverable:** the three moves over that section under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into it kept, per a citation survey. It passes the section as `compiled-consumer-smoke-driver` leaves it, so it rides the batch after that driver lands.
-
-**Cost while deferred:** paid by every session and adopter that reads the unpassed section. Filed 2026-10-02 as a split at consumer-smoke-driver-pass' scope. Part of the operator's selection of the unit set, direction 2026-10-02, lead-relayed (not a ruling).
-
 ## Deferred
 
 ### required-sections-literal
@@ -302,7 +294,7 @@ Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-ki
 
 delegation-kit's §The delegation model left 2026-10-02 at companion-tier-delegation-pass' scope, landing as `delegation-kit-model-brevity`.
 
-installer's §The consumer smoke left 2026-10-02 at consumer-smoke-driver-pass' scope, landing as [installer-smoke-brevity](#installer-smoke-brevity).
+installer's §The consumer smoke left 2026-10-02 at consumer-smoke-driver-pass' scope, landing as `installer-smoke-brevity`.
 
 ### tarball-build-attestation
 
@@ -1309,4 +1301,5 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 - front-door-arm-route-blind
 - disposed-findings-register
 - compiled-consumer-smoke-driver
+- installer-smoke-brevity
 
