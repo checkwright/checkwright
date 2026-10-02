@@ -25,13 +25,15 @@ An `Arm::Run` member of the arm table, implemented under `native/src/emit/instal
 - **It packs by spawning the running binary's `--pack-installer --root <root>`** with the root as working directory, naming both decisions as installer/SPEC.md §The packer requires of every pack call site, its steered roster and pack scratch in that child's environment, never by an in-process call, so a pack's environment and refusal stay its own.
 - **It is a network spawner** (`npm pack`), so it is a bare-flag member outside the fence-safe set, and it joins the crate's network-spawner roster that a unit test holds disjoint from that set.
 
-**Not yet applied.**
+**Partly applied:** the arm row, `native/src/emit/installer_smoke/` with its preflight-and-roster and staging-and-packing modules, the argument grammar, the exit classes and the network-spawner roster (gate-sdk/SPEC.md §The non-gate arm) have landed. The table rosters all 27 arms; the `build`, `pack` and `install` arms run, and the arm refuses at exit 2 at the first arm it does not yet compile, naming `run-smoke.sh`. The knob declaration is `GATE_SDK_NATIVE_BIN`, `GATE_SDK_NATIVE_CRATE` and `GATE_SDK_NATIVE_TARGETS_FILE`, since the staging reads the first two.
 
 ### (2) The driver stages the binary it runs as and builds nothing {design-bearing}
 
 The binary running the assertions is now part of the subject, so a mid-run rebuild would pack a binary other than the one judging it. So the `build` arm keeps its header and changes its act. Without the artifact hand-off, it asserts that the running binary's baked source stamp equals the tree's, refusing at exit 2 with the remedy *run `bash gate-sdk/bin/build-native.sh`, then the smoke* when they differ. It then copies the running binary (`std::env::current_exe`) into the host's artifact directory, on a unix host drops its executable mode as the artifact transport does, and emits its digest sidecar with the crate's own hasher. With the hand-off, it stages the handed bytes and sidecar unchanged, as today. Either way the host triple is the host bootstrap's detector's (delta 3), and a running binary built for another triple is refused naming the hand-off as the remedy.
 
-The preflight so loses `cargo`, `rustc` and `jq`. The driver parses the manifest and `package.json` with the crate's JSON reader, so `jq` is needed only where an arm masks it from the verbs. It requires `git`, `npm` and `tar`, plus `sh` on a unix host or `pwsh` on Windows, refusing at exit 2 on any absent one, and the clean tree as today. **Not yet applied.**
+The preflight so loses `cargo`, `rustc` and `jq`. The driver parses the manifest and `package.json` with the crate's JSON reader, so `jq` is needed only where an arm masks it from the verbs. It requires `git`, `npm` and `tar`, plus `sh` on a unix host or `pwsh` on Windows, refusing at exit 2 on any absent one, and the clean tree as today.
+
+**Applied** on unix hosts, with two calibrations the merge carries. The running binary's triple is baked at build time from cargo's `TARGET` as `CHECKWRIGHT_TARGET` (`native/build.rs`), so the refusal compares two exact triples and holds no mapping. The tree stamp is `crate::fresh::source_stamp` over `GATE_SDK_NATIVE_CRATE`, the helper `check-gate-binary-fresh` reads. `sh` joins `native/src/programs.rs` as a unix-only `contributor` member now, since this delta spawns it; `shasum` joins with its first spawner.
 
 ### (3) Every arm runs on every leg, through the host's bootstrap {design-bearing} {user-facing: the entry's deliverable, one compiled driver on every leg}
 
@@ -58,7 +60,9 @@ Two cases skip on a stated reason rather than red, printing the reason:
 
 ### (4) Nested invocations run under a scrubbed environment {design-bearing}
 
-Every spawn whose working directory is a scratch consumer, an extracted package or a throwaway copy of either receives the invoking environment **less every variable named under a static kit's prefix**, plus the values the arm sets for that call (a masked `PATH`, `DEMO_TMP_DIR`). The prefix set is derived from the crate's static knob tables, never listed, and a unit test holds it equal to their prefixes. So an exported `EVIDENCE_KIT_*_FILE`, `EVIDENCE_KIT_LOCK_FILE`, `GATE_SDK_TMP_DIR`, `GATE_SDK_NATIVE_BIN`, `GATE_SDK_ROOT` or steered `GATE_SDK_NATIVE_TARGETS_FILE` no longer redirects a scratch consumer's gates, and each nested run reads the knob files its own `init` wrote. A pack spawn runs in the source tree with the invoking environment and its steering, since that tree's configuration is the one being packed. `HOME` and git's global configuration are left as they are: each scratch consumer sets its own identity and maintenance keys locally. **Not yet applied.**
+Every spawn whose working directory is a scratch consumer, an extracted package or a throwaway copy of either receives the invoking environment **less every variable named under a static kit's prefix**, plus the values the arm sets for that call (a masked `PATH`, `DEMO_TMP_DIR`). The prefix set is derived from the crate's static knob tables, never listed, and a unit test holds it equal to their prefixes. So an exported `EVIDENCE_KIT_*_FILE`, `EVIDENCE_KIT_LOCK_FILE`, `GATE_SDK_TMP_DIR`, `GATE_SDK_NATIVE_BIN`, `GATE_SDK_ROOT` or steered `GATE_SDK_NATIVE_TARGETS_FILE` no longer redirects a scratch consumer's gates, and each nested run reads the knob files its own `init` wrote. A pack spawn runs in the source tree with the invoking environment and its steering, since that tree's configuration is the one being packed. `HOME` and git's global configuration are left as they are: each scratch consumer sets its own identity and maintenance keys locally.
+
+**Applied.** The prefix derivation is `knobs::inherited_under_static_prefixes`, which `--run-front-end-parity`'s scrub now composes rather than holding a second copy. The `install` arm's `npm install` is the scrub's first caller: its host directory is a scratch consumer of the package. A unit test spawns a child under an exported `EVIDENCE_KIT_MANIFEST_FILE` and reads it unset there.
 
 ### (5) The log declares the roster the validate parser reads {design-bearing} {user-facing: operator direction 2026-10-02, lead-relayed (not a ruling): the additive `smoke-roster:` log-head form of `--emit parse-smoke-log`, chosen knowing it widens a shipped evidence-kit contract the selected set did not name}
 
@@ -69,7 +73,9 @@ EVIDENCE_KIT_PARSER_installer_smoke = bash gate-sdk/bin/run-gates.sh --emit pars
 EVIDENCE_KIT_RUN_installer_smoke = bash gate-sdk/bin/run-gates.sh --installer-smoke
 ```
 
-The parser value is then the driver-less form `scripts/gate-tests/evidence-parser-values.test.sh` uses as its negative control D, so that test is rewritten with it. Its fixture smoke log opens with `smoke-roster:` lines, so arm B's configured value still yields the scenarios it baselines. Control D becomes a log carrying no roster lines, which the configured value refuses with no scenario produced, its expected refusal text being the log-only form's rather than the missing positional's. **Not yet applied.**
+The parser value is then the driver-less form `scripts/gate-tests/evidence-parser-values.test.sh` uses as its negative control D, so that test is rewritten with it. Its fixture smoke log opens with `smoke-roster:` lines, so arm B's configured value still yields the scenarios it baselines. Control D becomes a log carrying no roster lines, which the configured value refuses with no scenario produced, its expected refusal text being the log-only form's rather than the missing positional's.
+
+**Partly applied:** the log-only form (evidence-kit/SPEC.md §Layout and configuration), the driver's roster declaration from its table through the parser's own `ROSTER_LINE` constant, the release declaration, and the test's roster-bearing fixture log and control D. The two knob values move with the callers (delta 7), so arm B still drives the driver form until then.
 
 ### (6) The manifest-disagreement report keeps its readings and drops the bash instrument {design-bearing}
 
@@ -99,7 +105,7 @@ The batch that deletes `run-smoke.sh` and `run-smoke.ps1` first runs the bash dr
 
 ### (9) The owning sections state the compiled driver {design-bearing}
 
-**Not yet applied.**
+**Partly applied:** evidence-kit's parser paragraph carries the second form, gate-sdk/SPEC.md §The non-gate arm's network-spawner roster carries the arm, and §The program roster's audience list carries `sh`. The rest merges with the driver's last part.
 
 - **installer/SPEC.md §The consumer smoke:** the opening names the arm; *The port disposition* paragraph is deleted, since a compiled driver owes none; the tree-selection and two-mechanisms paragraphs become delta 1's one sentence; the preflight and *What it costs to run* follow delta 2; *The PowerShell driver carries native Windows* is deleted and replaced by delta 3's host paragraph and table; delta 4 gains a paragraph; the report passages follow delta 6; *Who reads the 2* names the log-declared roster; the cargo, rustc and hand-off paragraph follows delta 2; and the CI paragraphs name the arm. The section's prose otherwise awaits `installer-smoke-brevity`, which passes it as this unit leaves it.
 - **installer/SPEC.md §The packer**, the ROUTE 1 paragraph's lead and first two sentences: ***The publishing caller builds the binary it dispatches to: ROUTE 1.** `--installer-smoke` packs with the binary it runs as: a contributor's build, or on a CI leg the producer's upload placed as the tree's gate binary. Those legs publish nothing.* Its `publish.yml` sentence stays, and the refusal paragraph after it keeps binding the job that assembles and stamps the published tarball.

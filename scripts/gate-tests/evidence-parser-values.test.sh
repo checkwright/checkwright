@@ -65,12 +65,16 @@ check-gamma listed in scripts/gates.list but resolves in none of: scripts
 2 of 3 gates FAILED: check-beta check-gamma
 EOF
 
-cat >"$tmp/smoke.log" <<'EOF'
+cat >"$tmp/bare-smoke.log" <<'EOF'
 build (the host gate binary the main payload carries)
 pack
 install (from the tarball, --offline)
 boom
 EOF
+{
+    printf 'smoke-roster: %s\n' build pack install 'profile invariant' 'INSTALLER-SMOKE: clean'
+    cat "$tmp/bare-smoke.log"
+} >"$tmp/smoke.log"
 
 # The baseline names the scenario each configured value must produce as `pass`, so a value that
 # produced nothing reds it as absent while a value that produced it stays silent; the scenarios it
@@ -105,22 +109,22 @@ rc=1"
 grep -q 'parse-gates-log.sh' "$tmp/err" \
     || { echo "  FAIL: the dead gates value produced no diagnostic naming the path that did not resolve"; fails=$((fails + 1)); }
 
-# D — negative control for the failure mode this wiring newly admits: an installer_smoke value
-#     whose leading positional is missing, so the arm cannot derive a roster and refuses.
+# D — negative control for the failure mode the log-only form admits: a driver-less installer_smoke
+#     value over a log declaring no roster, so the arm has no roster to read and refuses.
 sed "s#^EVIDENCE_KIT_PARSER_installer_smoke = .*#EVIDENCE_KIT_PARSER_installer_smoke = bash gate-sdk/bin/run-gates.sh --emit parse-smoke-log#" \
     "$CONFIG" >"$tmp/driverless.knobs"
-check "a driver-less installer_smoke value produces nothing" \
-    "$(_diff "$tmp/driverless.knobs" installer_smoke "$tmp/smoke.log" 1)" \
+check "a driver-less value over a roster-less log produces nothing" \
+    "$(_diff "$tmp/driverless.knobs" installer_smoke "$tmp/bare-smoke.log" 1)" \
 "new-failure installer_smoke build
 new-failure installer_smoke pack
 diff-baseline: NEW failures against $tmp/base.txt (see 'new-failure' lines above)
 rc=1"
-grep -q 'the driver is the consumer' "$tmp/err" \
-    || { echo "  FAIL: the driver-less value produced no refusal naming the missing positional"; fails=$((fails + 1)); }
+grep -q "fewer than two 'smoke-roster:' lines" "$tmp/err" \
+    || { echo "  FAIL: the roster-less log produced no refusal naming the missing roster"; fails=$((fails + 1)); }
 
 if [[ "$fails" -gt 0 ]]; then
     echo "evidence-parser-values.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "evidence-parser-values.test: ok (both configured EVIDENCE_KIT_PARSER_<suite> values resolve and answer through the compiled dispatch; a dead value and a value missing its driver positional each produce nothing)"
+echo "evidence-parser-values.test: ok (both configured EVIDENCE_KIT_PARSER_<suite> values resolve and answer through the compiled dispatch; a dead value and a driver-less value over a roster-less log each produce nothing)"
 exit 0

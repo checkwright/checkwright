@@ -435,6 +435,16 @@ pub fn owner(name: &str) -> Option<&'static Kit> {
         .find(|k| name.starts_with(&k.prefix()))
 }
 
+// spec: gate-sdk/SPEC.md §The knob file — every variable this process inherited under a static
+// kit's prefix: the set stripped from a child that must resolve its own tree's knobs
+pub fn inherited_under_static_prefixes() -> Vec<String> {
+    let prefixes: Vec<String> = STATIC_KITS.iter().map(|k| k.prefix()).collect();
+    std::env::vars_os()
+        .filter_map(|(k, _)| k.into_string().ok())
+        .filter(|k| prefixes.iter().any(|p| k.starts_with(p.as_str())))
+        .collect()
+}
+
 // spec: canon-kit/SPEC.md §Layout and configuration — a scanned member resolves through a stem
 // only when that stem is a declared family: a static kit's table names it exactly, and a stem no
 // static table owns falls back to what its kit source spells

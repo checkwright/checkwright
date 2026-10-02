@@ -95,6 +95,13 @@ fn main() {
     }
     println!("cargo:rustc-env=CHECKWRIGHT_SOURCE_STAMP={}", stamp);
 
+    // spec: installer/SPEC.md §The consumer smoke — the triple the binary was built for, read by
+    // `--installer-smoke` against the host bootstrap's detector, so no triple mapping is held here
+    match std::env::var("TARGET") {
+        Ok(t) => println!("cargo:rustc-env=CHECKWRIGHT_TARGET={}", t),
+        Err(_) => panic!("checkwright-gates build: TARGET is unset"),
+    }
+
     // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the two events that can change the
     // stamp are the two triggers: each input's own path, and the index. No directory sweep
     for p in &paths {

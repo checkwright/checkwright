@@ -62,6 +62,8 @@ roster! {
     TAR = "tar", "contributor";
     NPM = "npm", "contributor";
     UNAME = "uname", "contributor";
+    #[cfg(unix)]
+    SH = "sh", "contributor";
     PWSH = "pwsh", "contributor";
     POWERSHELL = "powershell", "contributor";
     #[cfg(target_os = "linux")]

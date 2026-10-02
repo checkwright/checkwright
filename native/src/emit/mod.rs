@@ -34,6 +34,7 @@ pub mod graph;
 pub mod install_evidence;
 pub mod install_hooks;
 pub mod install_lifecycle;
+pub mod installer_smoke;
 pub mod kfric;
 pub mod kpi;
 pub mod lesson_sink;
@@ -913,6 +914,14 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Run(run_consumer_smoke::run),
         run_consumer_smoke::KNOBS,
     ),
+    // spec: installer/SPEC.md §The consumer smoke — an `Arm::Run` because the contract is the
+    // 0/1/2 split of clean, a finding about the payload and a harness precondition; a bare flag
+    // because it spawns `npm`, so it may not join the fence-safe set by derivation
+    (
+        "--installer-smoke",
+        Arm::Run(installer_smoke::run),
+        installer_smoke::KNOBS,
+    ),
     // spec: gate-sdk/SPEC.md §projection-witness — an `Arm::Run` because the contract is the 0/1/2
     // split of clean, a gate red outside its trigger, and a witness that could not run
     (
@@ -1048,6 +1057,7 @@ mod tests {
         const NETWORK_ARMS: &[&str] = &[
             "--usage-poll",
             "--pack-installer",
+            "--installer-smoke",
             "--with-foreign-shells",
             "--price-coverage",
             "--foreign-run",

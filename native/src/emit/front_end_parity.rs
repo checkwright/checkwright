@@ -431,13 +431,14 @@ fn scratch_root() -> Result<PathBuf, String> {
 // spec: gate-sdk/SPEC.md §run-gates — every name under a static kit's prefix, plus git's own
 // repository locators, is stripped from both halves' environment: the case sets what it measures
 fn inherited_knobs() -> Vec<String> {
-    let prefixes: Vec<String> = crate::knobs::STATIC_KITS.iter().map(|k| k.prefix()).collect();
-    std::env::vars_os()
-        .filter_map(|(k, _)| k.into_string().ok())
-        .filter(|k| {
-            prefixes.iter().any(|p| k.starts_with(p.as_str())) || crate::proc::GIT_REPO_LOCATORS.contains(&k.as_str())
-        })
-        .collect()
+    let mut names = crate::knobs::inherited_under_static_prefixes();
+    names.extend(
+        crate::proc::GIT_REPO_LOCATORS
+            .iter()
+            .filter(|k| std::env::var_os(k).is_some())
+            .map(|k| k.to_string()),
+    );
+    names
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — a case's scratch: a fresh repository vendoring the tree's own
