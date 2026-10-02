@@ -10,3 +10,4 @@ companion-tier-delegation-pass align a4755333 2026-10-02 b41fc027
 companion-tier-delegation-pass build aa38affd 2026-10-02 1d75f946
 companion-tier-delegation-pass build aa6746f6 2026-10-02 5561c756
 companion-tier-delegation-pass validate a0b8ac4b 2026-10-02 c2cc818a
+companion-tier-delegation-pass close a09311ad 2026-10-02 9bb06cb5
