@@ -422,7 +422,7 @@ jobs:
         include: ${{ fromJSON(needs.native-artifacts-roster.outputs.pwsh_legs) }}
     runs-on: ${{ matrix.runner }}
     continue-on-error: ${{ matrix.held }}
-    timeout-minutes: 120
+    timeout-minutes: 60
     permissions:
       contents: read
     env:
