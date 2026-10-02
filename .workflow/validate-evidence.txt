@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+consumer-smoke-driver-pass gates sha256=63635b40e8ad2df83cea9ea1099c93d937b0a63114283a99049190b7ba689947 pass=149 fail=0 ignore=0 verdict=clean 2026-10-03
+consumer-smoke-driver-pass gate_sdk sha256=5dd4867ce7d597e3acd2fa303c310f044a08712faa3896899ea2832d543a3848 pass=1 fail=0 ignore=0 verdict=clean 2026-10-03
+consumer-smoke-driver-pass canon_kit sha256=9ded695f71c62d1a057f2305280bdec741e5de304cdaa10f982c496574b48323 pass=1 fail=0 ignore=0 verdict=clean 2026-10-03
+consumer-smoke-driver-pass context_kit sha256=a72a655fbdc2336af37022b95846efa73ffc06864ae2241f7ed48d2867d96cc0 pass=1 fail=0 ignore=0 verdict=clean 2026-10-03
+consumer-smoke-driver-pass delegation_kit sha256=e8b7dacc5b3a03c2084bd61274ee3c701400be4001eeaafa4126bc7f4b710363 pass=1 fail=0 ignore=0 verdict=clean 2026-10-03
+consumer-smoke-driver-pass doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-10-03
+consumer-smoke-driver-pass evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-10-03
+consumer-smoke-driver-pass guard_kit sha256=01d94b4120e133665e01946fe44d31a730d2c6cdfd1570e5ce6b96a7a1b30e1b pass=1 fail=0 ignore=0 verdict=clean 2026-10-03
+consumer-smoke-driver-pass lifecycle_kit sha256=cbaa0819e63f67af3b143f07598bd56276d7d56e708e4cdb2bfc407d03bca40f pass=1 fail=0 ignore=0 verdict=clean 2026-10-03
+consumer-smoke-driver-pass queue_kit sha256=254333a369dea6280bbb8ede558b56de8b5fcfb334b35f4cf49256502e871743 pass=1 fail=0 ignore=0 verdict=clean 2026-10-03
+consumer-smoke-driver-pass site_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-10-03
+consumer-smoke-driver-pass scripts sha256=49dacb217bc9bf8c6be056cfe56c9b86206a045896bf399678cdc401a89e2bde pass=1 fail=0 ignore=0 verdict=clean 2026-10-03
+consumer-smoke-driver-pass guard_tests sha256=d43280c2ec08eb5164bc55f3dd0cc77d3965a86793dfba4f9ffce11ed41bcd97 pass=1 fail=0 ignore=0 verdict=clean 2026-10-03
+consumer-smoke-driver-pass demo sha256=a4490d9b6073178489afd9b7f4efcbbfce8ee190566262d84b4b6e5ded9fc256 pass=1 fail=0 ignore=0 verdict=clean 2026-10-03
+consumer-smoke-driver-pass installer_smoke sha256=0f32afa13d81bb71bacad572a048735e70a93543797e93946740216f73771fad pass=28 fail=0 ignore=0 verdict=clean 2026-10-03
+consumer-smoke-driver-pass consumer_smoke sha256=c3b1f60a8124c5ac3da4d77feabe41fee910b0a89a842c6535f9fb7c8babf00d pass=1 fail=0 ignore=0 verdict=clean 2026-10-03
+consumer-smoke-driver-pass upgrade sha256=ea05882594a01d1d9eb3b1446b3fca7b38c7c938257b2823d4dae1aaa23803e5 pass=1 fail=0 ignore=0 verdict=clean 2026-10-03
+consumer-smoke-driver-pass agents_md_smoke sha256=3b1a5afd3303483fbbad2aed7b53a3d5a83ddfde2c210dc36326ddb98f9cc813 pass=1 fail=0 ignore=0 verdict=clean 2026-10-03
+consumer-smoke-driver-pass index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-10-03
+consumer-smoke-driver-pass native_crate sha256=6d989206413b2be5350e19889267b88c4ea12079c535ff193f53746630a5f9d7 pass=1 fail=0 ignore=0 verdict=clean 2026-10-03
+consumer-smoke-driver-pass projection_witness sha256=6ccc1f75e99568165f3b2212ff782d2912a9b8ce1cab5de447ca205be36c1cfc pass=1 fail=0 ignore=0 verdict=clean 2026-10-03
