@@ -4,4 +4,4 @@
 
 ---
 
-— scope ab834c17 2026-10-02 71b4e79a
+companion-tier-delegation-pass scope ab834c17 2026-10-02 71b4e79a

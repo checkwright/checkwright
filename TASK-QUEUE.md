@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: companion-tier-delegation-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,48 @@
 ## New Features
 
 ## Technical Debt
+
+### dispatch-guard-door-degrade
+
+the agent-dispatch guard drops D6 (the bound tier) with an advisory when the gate binary's door cannot be read for the refusal's remedy text: native/src/hook/dispatch.rs clears the binding on `door_command`'s error. delegation-kit/SPEC.md §The delegation model's fail-posture table unenforces D6 only when `DELEGATION_KIT_TIER_MODEL`'s own read fails, so the code is out of its spec, and a remedy line that cannot render costs the rule rather than the line.
+
+**Deliverable:** the refusal renders without the door when it cannot be read, D6 stays enforced, and a decision-table row pins it.
+
+**Cost while deferred:** a binary-door fault silently widens every dispatch past the consumer's tier binding, with only an advisory. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' close (its baked-calibration sweep), a regression of that iteration's binary-door change; promoted 2026-10-02 at the next scope, the spec already settling the fix's shape. Re-verified at dispatch.rs's `door_command` call and the table's two D6 rows. Owner lookup: `D6`, `door_command`, `fail-posture` in this file — none; owner delegation-kit/SPEC.md §The delegation model.
+
+**Selected 2026-10-02 for companion-tier-delegation-pass, operator direction lead-relayed (not a ruling):** debt; it lands before [delegation-kit-model-brevity](#delegation-kit-model-brevity) passes the fail-posture table.
+
+### delegation-kit-model-brevity
+
+delegation-kit/SPEC.md's §The delegation model, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement), about 13.3k of the file's 45.6k words by awk count; §The turn-end liveness hook and the sections after the tier group stay on the parent.
+
+**Deliverable:** the three moves over that section under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into it kept, per a citation survey. It rides the batch after [dispatch-guard-door-degrade](#dispatch-guard-door-degrade), whose decision-table row lands in this section's fail-posture table.
+
+**Cost while deferred:** paid by every session and adopter that reads the unpassed section. Filed 2026-10-02 as a split at companion-tier-delegation-pass' scope. Part of the operator's selection of set A, direction 2026-10-02, lead-relayed (not a ruling).
+
+### wait-on-unreachable-condition
+
+a dispatched session can park a wait on a condition nothing will make true. A mechanical-tier align session of lifecycle-queue-value-pass looped `until [ -f .tmp/never-exists-marker ]`; on the foreground timeout the harness backgrounded the loops, and the session read as live past its hand-back for the 30-minute background limit, the holder lifecycle-kit/templates/lead.md names. The waiting rule in delegation-kit/templates/agent-execution.md (**Background + notification, never poll**) bars a self-matching `pgrep` and a record-falsified condition, not a condition with no writer at all, and its "never end a turn in order to wait" clause can read as covering a wait for the lead's answer, which is a turn end.
+
+**Deliverable:** one clause in that bullet (a wait owes a producer that will write its condition; a question to a caller is a turn end, never a wait), propagated to the operative copies in `.claude/agents/` per delegation-kit/SPEC.md §Operative residency.
+
+**Cost while deferred:** a lead reads a finished session as live, for up to the background limit, per occurrence. Filed 2026-10-01 to the gap inbox at lifecycle-queue-value-pass' align; promoted at its close: →fix fails because the rule lands in a kit template and its operative copies in harness agent definitions, a dispatch-policy change for the lead to see, →forward because no ruling is owed. Re-verified: no clause in the template or `.claude/agents/stage-session.md` names a writerless condition. Owner lookup: `waiter`, `never go true`, `never-exists` in this file — only the iceboxed [waiter-loop-condition-predicate-gap](#waiter-loop-condition-predicate-gap), a guard-rule gap over `pgrep` waiters, declined as a recurrence; owner delegation-kit/SPEC.md §The delegation model.
+
+**Selected 2026-10-02 for companion-tier-delegation-pass, operator direction lead-relayed (not a ruling):** debt, landed with [lead-notification-wake-race](#lead-notification-wake-race) as one edit of the bullet. Re-verified at this scope: the bullet still names no writerless condition.
+
+### lead-notification-wake-race
+
+a lead can sleep through its stage session's completion notification. On 2026-09-30 and again on 2026-10-01 the same shape stalled the walk: the session's hand-back message woke the lead, and the harness queued the task's completion notification about 50ms later, while the lead was still writing its reply. The lead's reply made no tool call and ended its turn waiting for that notification, as lifecycle-kit/templates/lead.md's dispatch precondition requires. After the stop hook, the harness wrote the queued notification into the transcript, 0.3s and 0.6s after the turn end, and started no turn. The operator woke the lead 8.7h and 5.3h later. The template's fallback for a notification that never arrives presumes a lead awake to apply it, and delegation-kit/templates/agent-execution.md's backgrounding bullet states without limit that a notification wakes a supervisor.
+
+**Deliverable, narrowed 2026-10-02 at companion-tier-delegation-pass' scope, operator direction lead-relayed (not a ruling):** the remedy lands without the probe — lead.md §The lead model's wait clause gains one tool call before any turn that ends to await a notification, and the agent-execution backgrounding bullet's "a notification wakes a supervisor" is bounded to what was observed. It lands with [wait-on-unreachable-condition](#wait-on-unreachable-condition) as one edit of that bullet and its operative copies.
+
+The remedy is unprobed, an honest limit carried in prose: both transcripts show only that the queue was not drained before the stop. One supporting instance, filed 2026-10-02 by gate-sdk-value-pass' lead and folded in at the next scope: a lead turn that made tool calls before ending received close's completion notification inside that turn, after the tool results. Consistent with the remedy, not a probe of it.
+
+**Cost while deferred:** hours of idle wall-clock per firing, at a stage boundary every iteration crosses five times; it fired in two consecutive iterations. Filed 2026-10-02 at gate-sdk-value-pass' close, from a lead observation; →fix fails because the remedy changes the lead's dispatch-wait policy, a kit template's mechanism, before the delivery rule is probed. →forward fails because no ruling is owed. Re-verified by a scan of every lead transcript for a notification followed by more than five minutes of silence: exactly these two firings, each enqueued mid-turn, which corrects the observation's premise that it landed after the turn end. Owner lookup: `notification`, `turn end`, `wake` in this file — [wait-on-unreachable-condition](#wait-on-unreachable-condition), DISTINCT (a dispatched session's writerless wait); owner lifecycle-kit/templates/lead.md §The lead model. Surface also delegation-kit.
+
+**Selected 2026-10-02 for companion-tier-delegation-pass, operator direction lead-relayed (not a ruling):** debt, no new name.
+
+The probe left 2026-10-02 at companion-tier-delegation-pass' scope as [notification-delivery-probe](#notification-delivery-probe), operator direction lead-relayed (not a ruling): the remedy lands without it.
 
 ## Deferred
 
@@ -31,16 +73,6 @@
 **Deliverable:** the default composed from the section knobs (Lessons Learned only while the lesson channel is on), with a fixture renaming the deferred section through its knob alone, queue-kit/SPEC.md §Layout and configuration updated, and a release declaration for the changed default.
 
 **Cost while deferred:** a second copy of each section name a renaming adopter must keep in step; this repo already restates the list in `scripts/queue-config.knobs` to drop Lessons Learned. Filed 2026-10-01 to the gap inbox at lifecycle-queue-value-pass' build; promoted at its close: →fix fails because it changes a shipped knob's default, adopter-visible semantics no amendment settled, →forward because no ruling is owed. Re-verified: the literal list and the icebox-only composition read as filed. Owner lookup: `REQUIRED_SECTIONS`, `required list` in this file — none; owner queue-kit/SPEC.md §Layout and configuration.
-
-### wait-on-unreachable-condition
-
-[cost: event/low] [surface: delegation-kit]
-
-a dispatched session can park a wait on a condition nothing will make true. A mechanical-tier align session of lifecycle-queue-value-pass looped `until [ -f .tmp/never-exists-marker ]`; on the foreground timeout the harness backgrounded the loops, and the session read as live past its hand-back for the 30-minute background limit, the holder lifecycle-kit/templates/lead.md names. The waiting rule in delegation-kit/templates/agent-execution.md (**Background + notification, never poll**) bars a self-matching `pgrep` and a record-falsified condition, not a condition with no writer at all, and its "never end a turn in order to wait" clause can read as covering a wait for the lead's answer, which is a turn end.
-
-**Deliverable:** one clause in that bullet (a wait owes a producer that will write its condition; a question to a caller is a turn end, never a wait), propagated to the operative copies in `.claude/agents/` per delegation-kit/SPEC.md §Operative residency.
-
-**Cost while deferred:** a lead reads a finished session as live, for up to the background limit, per occurrence. Filed 2026-10-01 to the gap inbox at lifecycle-queue-value-pass' align; promoted at its close: →fix fails because the rule lands in a kit template and its operative copies in harness agent definitions, a dispatch-policy change for the lead to see, →forward because no ruling is owed. Re-verified: no clause in the template or `.claude/agents/stage-session.md` names a writerless condition. Owner lookup: `waiter`, `never go true`, `never-exists` in this file — only the iceboxed [waiter-loop-condition-predicate-gap](#waiter-loop-condition-predicate-gap), a guard-rule gap over `pgrep` waiters, declined as a recurrence; owner delegation-kit/SPEC.md §The delegation model.
 
 ### manifest-finder-untracked-walk
 
@@ -296,11 +328,9 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
-Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes, landing as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes, landing as `installer-install-brevity` and `installer-remainder-brevity`.
+Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes, landing as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes, landing as `installer-install-brevity` and `installer-remainder-brevity`; and, the kit's other sections remaining: drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections (its preamble remains), delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope, landing as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope, landing as `queue-kit-gate-brevity`; guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope, landing as `guard-kit-tool-brevity`.
 
-Each on an operator direction lead-relayed (not a /consult ruling), the kit's other sections remaining: drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections (its preamble remains), delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope, landing as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope, landing as `queue-kit-gate-brevity`.
-
-guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope, landing as `guard-kit-tool-brevity`.
+delegation-kit's §The delegation model left 2026-10-02 at companion-tier-delegation-pass' scope as [delegation-kit-model-brevity](#delegation-kit-model-brevity).
 
 ### tarball-build-attestation
 
@@ -520,6 +550,10 @@ a companion install tier, operator direction 2026-09-29, lead-relayed (not a rul
 
 **Cost while deferred:** [companion-toolkit-profile](#companion-toolkit-profile)'s submission waits on it, and a companion adopter today chooses between document gates alone and every kit installed beside the toolkit's own workflow. Filed 2026-09-29 to the gap inbox by preview-readiness' lead; promoted 2026-09-30 at its close: →fix fails because a tier is new mechanism and new governed names, →forward because the direction is given. Re-verified: companion/SPEC.md §The two tiers has `prose` (canon-kit's document gates) and `full` (every kit), with no exclusion. Owner lookup: `exclusion`, `conflict`, `companion tier` in this file — none; owner companion/SPEC.md §The two tiers, with installer/SPEC.md §Profiles.
 
+**Selected 2026-10-02 for companion-tier-delegation-pass, operator direction lead-relayed (not a ruling):** a feature, so spec authors and promotes it; unblocked since `gate-customer-value-audit` landed. Its tested arm lands in the current smoke drivers, which [compiled-consumer-smoke-driver](#compiled-consumer-smoke-driver) later ports; it shares installer/SPEC.md §Profiles and `installer/profiles.list` with [verify-workflow-decoupling](#verify-workflow-decoupling).
+
+**Push need (2026-10-02, inside the budget):** one mid-iteration push, only if the tier changes an extension or recipe install line the CI `companion-toolkits` job runs at its pins.
+
 ### update-availability-notice
 
 [cost: event/low] [surface: installer]
@@ -626,17 +660,17 @@ context-kit's `--emit footprint` arm ships in the binary but prints this site's 
 
 **Cost while deferred:** no adopter meets these literals, since a withheld gate never ships. The cost is that this repo's own gates stay unconfigurable, and a new withheld gate's literal reds nowhere. Filed 2026-10-02 at gate-sdk-value-pass' spec on that direction. Owner lookup: `literal`, `withheld` in this file — `consumer-value-literal-gate`, DISTINCT (the kit-shipped half); owner gate-sdk/SPEC.md §The port-candidate criteria.
 
-### lead-notification-wake-race
+### notification-delivery-probe
 
-[cost: iteration/high] [surface: lifecycle-kit]
+[cost: event/low] [surface: lifecycle-kit]
 
-a lead can sleep through its stage session's completion notification. On 2026-09-30 and again on 2026-10-01 the same shape stalled the walk: the session's hand-back message woke the lead, and the harness queued the task's completion notification about 50ms later, while the lead was still writing its reply. The lead's reply made no tool call and ended its turn waiting for that notification, as lifecycle-kit/templates/lead.md's dispatch precondition requires. After the stop hook, the harness wrote the queued notification into the transcript, 0.3s and 0.6s after the turn end, and started no turn. The operator woke the lead 8.7h and 5.3h later. The template's fallback for a notification that never arrives presumes a lead awake to apply it, and delegation-kit/templates/agent-execution.md's backgrounding bullet states without limit that a notification wakes a supervisor.
+the delivery rule under [lead-notification-wake-race](#lead-notification-wake-race)'s remedy, unprobed: does a completion notification queued during a supervisor's turn that makes no tool call wake its session, and does one tool call before the turn end drain it.
 
-**Deliverable:** a probe of the delivery rule (does a notification queued during a turn with no tool call wake its session, and does one tool call before the turn end drain it), then the lead's wait clause matched to the result in lead.md §The lead model, with the agent-execution bullet's claim bounded.
+**Deliverable:** that probe, run by a lead with the operator present, since a dispatched session's turn end is its session end and cannot observe it; then lifecycle-kit/templates/lead.md §The lead model's wait clause and the agent-execution backgrounding bullet's bound confirmed or corrected against the result.
 
-**Inferred, not run:** that a tool call before the turn end would have delivered the notification. Both transcripts show only that the queue was not drained before the stop. One supporting instance, filed 2026-10-02 by gate-sdk-value-pass' lead and folded in at the next scope: a lead turn that made tool calls before ending received close's completion notification inside that turn, after the tool results. Consistent with the remedy, not a probe of it.
+**Inferred, not run:** that a tool call before the turn end delivers the notification — two stalled transcripts show only an undrained queue at the stop, and one 2026-10-02 lead turn with tool calls received its notification inside the turn.
 
-**Cost while deferred:** hours of idle wall-clock per firing, at a stage boundary every iteration crosses five times; it fired in two consecutive iterations. Filed 2026-10-02 at gate-sdk-value-pass' close, from a lead observation; →fix fails because the remedy changes the lead's dispatch-wait policy, a kit template's mechanism, before the delivery rule is probed. →forward fails because no ruling is owed. Re-verified by a scan of every lead transcript for a notification followed by more than five minutes of silence: exactly these two firings, each enqueued mid-turn, which corrects the observation's premise that it landed after the turn end. Owner lookup: `notification`, `turn end`, `wake` in this file — [wait-on-unreachable-condition](#wait-on-unreachable-condition), DISTINCT (a dispatched session's writerless wait); owner lifecycle-kit/templates/lead.md §The lead model. Surface also delegation-kit.
+**Cost while deferred:** the lead's wait clause rests on an inferred mechanism; if it is wrong, a stall still costs hours of idle wall-clock until the operator wakes the lead. Filed 2026-10-02 as a split at companion-tier-delegation-pass' scope, operator direction lead-relayed (not a ruling).
 
 ### front-end-door-residue
 
@@ -674,16 +708,6 @@ four kept gate-sdk gates assume this repo's layout, found at gate-sdk-value-pass
 **Deliverable:** each gate made layout-neutral, with a fixture per change and gate-sdk/SPEC.md's gate sections updated, and a release declaration for each verdict change.
 
 **Cost while deferred:** an adopter registering the parity gate meets a refusal it cannot discharge; a nested vendoring drifts template copies unchecked; a renamed pattern file reds; the enforcement page ships dead links. Filed 2026-10-02 to the gap inbox as four bullets at gate-sdk-value-pass' build; promoted at its close as one entry: →fix fails because each changes a shipped gate's verdict, →forward because no ruling is owed. Re-verified at gate_substrate_parity.rs's default and `GATE_SDK_PAYLOAD_WITHHOLD`, template_copy_parity.rs's glob, both `SELF_EXEMPT_PREFIX` constants and enforcement_map.rs's `kit_cell`. Owner lookup: `layout`, `kit roots`, `enforcement-map` in this file — [footprint-arm-publisher-page](#footprint-arm-publisher-page), DISTINCT (another emitter's page); owner gate-sdk/SPEC.md, each gate's section.
-
-### dispatch-guard-door-degrade
-
-[cost: event/low] [surface: delegation-kit]
-
-the agent-dispatch guard drops D6 (the bound tier) with an advisory when the gate binary's door cannot be read for the refusal's remedy text: native/src/hook/dispatch.rs clears the binding on `door_command`'s error. delegation-kit/SPEC.md §The delegation model's fail-posture table unenforces D6 only when `DELEGATION_KIT_TIER_MODEL`'s own read fails, so the code is out of its spec, and a remedy line that cannot render costs the rule rather than the line.
-
-**Deliverable:** the refusal renders without the door when it cannot be read, D6 stays enforced, and a decision-table row pins it.
-
-**Cost while deferred:** a binary-door fault silently widens every dispatch past the consumer's tier binding, with only an advisory. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' close (its baked-calibration sweep), a regression of that iteration's binary-door change; promoted 2026-10-02 at the next scope, the spec already settling the fix's shape. Re-verified at dispatch.rs's `door_command` call and the table's two D6 rows. Owner lookup: `D6`, `door_command`, `fail-posture` in this file — none; owner delegation-kit/SPEC.md §The delegation model.
 
 ## Icebox
 
