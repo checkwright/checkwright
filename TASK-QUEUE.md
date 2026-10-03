@@ -22,6 +22,18 @@ Measured at spec: the harness's matcher splits at neither shape, and at both aft
 
 **Cost while deferred:** a call carrying either shape may cost a permission decision a grant would have taken. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' build; promoted at its close: →fix fails because the target behaviour is unmeasured, →forward because no ruling is owed. `bash-reader-escaped-separator` fixed the escaped `;` alone; DISTINCT, not a recurrence. Owner lookup: `escaped`, `backslash` in this file — none live; owner guard-kit/SPEC.md §The reader and its views.
 
+### compound-read-classifier-reach
+
+[spec: SPEC-compound-read.md]
+
+a read-shaped compound or redirected call still falls to the classifier. `side-effect-free-read-arms`' align survey found most sed and awk reads in the prompt-friction log were compounds or carried a redirect, which rule `ro_pipeline` refuses on its own terms. Operator direction 2026-09-30, lead session: keep that unit as specified and file this. Measured at spec over the current log (that survey's corpus was drained): the compound half flips 26 of 211 fall-through lines, and the redirect half one more (the amendment records the method).
+
+**Deliverable:** rule `ro_pipeline`'s reach over a compound of read-only statements and over a redirect to a bounded target, the redirect half landed with [write-side-steering](#write-side-steering)'s bounds test.
+
+**Cost while deferred:** the classifier keeps deciding most read-shaped calls, with its occasional false positives. Filed 2026-09-30 to the gap inbox by guard-kit-steering's lead; promoted at its close: →fix fails because widening a grant is new mechanism, →forward because the direction is given. Owner lookup: `ro_pipeline`, `compound`, `redirect` in this file — [write-side-steering](#write-side-steering), overlapping on the redirect only; owner guard-kit/SPEC.md §The rule roster, rule `ro_pipeline`.
+
+**Selected 2026-10-03 for guard-kit-write-side-pass, operator direction lead-relayed (not a ruling):** a feature, the spec stage's to author and promote; third in order, after [bash-reader-escaped-pipe](#bash-reader-escaped-pipe), whose splits it reads, and [write-side-steering](#write-side-steering); its need the closing push alone.
+
 ## Technical Debt
 
 ### guard-kit-remainder-brevity
@@ -537,20 +549,6 @@ a shell write that falls through the guard (a `tee` to a file, `find -delete`, a
 **Selected 2026-10-03 for guard-kit-write-side-pass, operator direction lead-relayed (not a ruling):** a feature, the spec stage's to author and promote; second in order, after [bash-reader-escaped-pipe](#bash-reader-escaped-pipe), and ahead of [compound-read-classifier-reach](#compound-read-classifier-reach), whose redirect half rides its bounds test.
 
 **Push need (2026-10-03, inside the budget):** the closing push alone, unless its bounds test resolves paths through the path-dialect layer, whose native-Windows leg runs only in CI; then one mid-iteration push, 2 against a budget of one to two. The spec stage states which.
-
-### compound-read-classifier-reach
-
-[cost: event/high] [surface: guard-kit]
-
-a read-shaped compound or redirected call still falls to the classifier. `side-effect-free-read-arms`' program check reaches 6 of 30 sed and awk reads in the prompt-friction log (its align survey), because the other 23 are compounds or carry a redirect, which rule `ro_pipeline` refuses on its own terms. Operator direction 2026-09-30, lead session: keep that unit as specified and file this.
-
-**Deliverable:** rule `ro_pipeline`'s reach over a compound of read-only statements and over a redirect to a bounded target, the redirect half landed with [write-side-steering](#write-side-steering)'s bounds test.
-
-**Cost while deferred:** the classifier keeps deciding most read-shaped calls, with its occasional false positives. Filed 2026-09-30 to the gap inbox by guard-kit-steering's lead; promoted at its close: →fix fails because widening a grant is new mechanism, →forward because the direction is given. Owner lookup: `ro_pipeline`, `compound`, `redirect` in this file — [write-side-steering](#write-side-steering), overlapping on the redirect only; owner guard-kit/SPEC.md §The rule roster, rule `ro_pipeline`.
-
-**Inferred, not run:** the 6-of-30 count, carried from the align survey without a re-run.
-
-**Selected 2026-10-03 for guard-kit-write-side-pass, operator direction lead-relayed (not a ruling):** a feature, the spec stage's to author and promote; third in order, after [bash-reader-escaped-pipe](#bash-reader-escaped-pipe), whose splits it reads, and [write-side-steering](#write-side-steering); its need the closing push alone.
 
 ### kit-prose-harness-coupling
 
