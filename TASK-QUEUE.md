@@ -572,6 +572,30 @@ the binary still names or spawns the bash front end where an adopter meets it: t
 
 **Cost while deferred:** an adopter reading `--help` or the demo meets a command their install may not carry. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' build; promoted at its close: →fix fails because the knob default is a behaviour change across two front ends, →forward because no ruling is owed. Re-verified: grep finds all four sites. `hook-emit-remedy-door` scoped its fix to the hook and emit trees; this is DISTINCT, not a recurrence. Owner lookup: `run-gates.sh`, `DOOR_ROOTS` in this file — none; owner guard-kit/SPEC.md §check-door-binding, with gate-sdk/SPEC.md §run-gates.
 
+### usage-trend-suspect-endpoint
+
+[cost: event/low] [surface: delegation-kit]
+
+`--emit usage-trend` reports a segment's endpoints, its weekly headroom and the multi-account combine line from the last non-suspect smoothed sample (native/src/emit/usage_trend.rs, `flush`), where delegation-kit/SPEC.md §Trend reporter steps 3 and 4 promise the first and last smoothed pct and step 2 excludes suspect samples from rate math only. A segment ending in a downward correction, say 10, 100, 96, reports 10%, and an account at 96% drops out of the at-or-over count.
+
+**Deliverable:** the endpoints, headroom and combine line read the segment's own first and last smoothed samples, with rate math still over the non-suspect ones, under a fixture segment ending in a correction.
+
+**Inferred, not run:** the 10, 100, 96 example is a source read, not a run.
+
+**Cost while deferred:** a rotating operator under-reads an account near its weekly ceiling. Filed 2026-10-04 to the gap inbox by delegation-transport-pass' close second-vendor review; promoted at the next scope: →fix fails because the reading feeds the rate, headroom and combine lines and §Testing's segment assertions, a build with its fixture rather than a drain commit; →forward because the SPEC settles it. Re-verified: `flush` takes `live.first()`/`live.last()` over the non-suspect indices. Owner lookup: `usage-trend`, `suspect`, `smoothed`, `Trend reporter` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §Trend reporter.
+
+### foreign-resume-session-edges
+
+[cost: event/low] [surface: delegation-kit]
+
+delegation-kit/SPEC.md §Resuming a session misstates two edges. (1) It says a sweep session's `change.patch` is always the session's whole change, but a `FAILED` resume turn returns before regenerating it (native/src/emit/foreign_run.rs, the `outcome` check ahead of `write_patch`), so a session closed after a failed sweep turn keeps a patch missing that turn while `--close` removes the clone. (2) Nothing serializes commands sharing a key: two resumes, or a resume and `--close`, can rotate one report, write one turn or remove a running turn's clone, and the section states no one-writer-per-key rule.
+
+**Deliverable:** the patch regenerated on every spawned sweep turn, `FAILED` included, with a fixture; and for (2) either an honest limit naming the dispatcher as the key's one writer, or a per-key lock, as the unit-set ruling settles.
+
+**Inferred, not run:** the races in (2) are a source read, not reproduced.
+
+**Cost while deferred:** a dispatcher applying a closed session's patch silently loses a failed turn's change. Filed 2026-10-04 to the gap inbox by delegation-transport-pass' close second-vendor review; promoted at the next scope: →fix fails because (2) is a shape choice between a stated limit and new lock mechanism, →forward because no recorded ruling is touched. Re-verified: the resume path returns on `outcome`'s error before `write_patch`. Owner lookup: `foreign-resume`, `change.patch`, `one-writer`, `per key` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §Resuming a session.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
