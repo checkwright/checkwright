@@ -8,16 +8,6 @@
 
 ## New Features
 
-### kept-gate-disposition-report
-
-[spec: SPEC-kept-gate-report.md]
-
-init and update print nothing for a gate whose install disposition moved off zero-config while an adopter-edited `gates.list` keeps it. init's kept-registry report covers only recipe `unregister.list` and `--without-gate` drops, so the members install-disposition-pass moved to `on-surface` stay registered silently in an edited registry.
-
-**Deliverable:** a report of kept members the derivation no longer starts, which needs the lock to record the prior starting set, since a deliberately registered on-surface gate is otherwise indistinguishable.
-
-**Cost while deferred:** an adopter who edited `gates.list` is not told which kept gates are now house rules they never chose; the release note's `--with-gate` line is the only notice. Filed 2026-10-01 to the gap inbox at install-disposition-pass' build on a lead decision; promoted at its close: →fix fails because the report needs a new lock field, adopter-visible mechanism no amendment settled, →forward because no ruling is owed. Re-verified: the report is fed only by the recipe and `--without-gate` drop sets. Owner lookup: `still.registered`, `kept members`, `kept-registry`, `edited gates.list`, `prior starting set` in this file — none; owner installer/SPEC.md §What init seeds.
-
 ### tarball-build-attestation
 
 [spec: SPEC-tarball-attestation.md] [recurrence: 2026-09-25]
@@ -1263,4 +1253,5 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 - usage-trend-suspect-endpoint
 - foreign-resume-session-edges
 - delegation-kit-tail-brevity
+- kept-gate-disposition-report
 
