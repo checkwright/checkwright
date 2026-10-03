@@ -6,3 +6,4 @@
 
 installer-trust-pass scope ab1b020b 2026-10-04 b557eafd
 installer-trust-pass spec a9d19c03 2026-10-04 9f8a86d1
+installer-trust-pass align a3fc4fdb 2026-10-04 403a76fb
