@@ -64,7 +64,7 @@ Rosters by `git grep -n "smoke/violation.sh"` and `git grep -n "violations fired
 - [ ] **Causal completeness** — every point of canon-kit/SPEC.md §The causal-completeness check holds for each new state, event, interface and obligation.
 - [ ] **Instruction surfaces: instruction only** — the recipe carries commands, not grounds.
 - [ ] **Merged with no information lost** — §Testing reads as one section naming both recipes.
-- [ ] **Amendment deleted** — this file removed on merge; none remain for the component (`ls guard-kit/SPEC-*.md`).
+- [ ] **Amendment deleted** — this file removed on merge; none remain for the component (`ls guard-kit/SPEC-*.md`), discharged at the iteration while a sibling guard-kit amendment is in flight.
 - [ ] **Removals propagated** — `check-amendment-retired-spelling` green over the declaration above.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as debt tasks.
 - [ ] **Run green** — `bash gate-sdk/bin/build-native.sh`, the full battery, and `--run-consumer-smoke` with guard-kit's recipe firing, in the merging batch.

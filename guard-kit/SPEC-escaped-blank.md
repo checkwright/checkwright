@@ -17,8 +17,8 @@ The module's tests: `dequoted("rm x\\ y")` holds `0x01` after the backslash; `de
 **Which verdicts move, and which way.** The view's readers, by `grep -rn "dequoted(" native/src/guard` (no reader outside `native/src/guard`): `rules/grants.rs` (`slot_reach` behind rule `grant_path_slot` and its predicate uses, `rewrite_granted`, and rule `bounded_write`), `rules/mod.rs` (the declared-forms reader), `rules/liveness.rs` (rule `bounded_wait`'s recorded launch), `rules/tools.rs` (rule `sed_file`'s awk, stream and python arms, rule `find_exec`) and `rules/reach.rs` (rule `commit_only_paths`, rule `rm_tracked`'s `git rm` arm, rule `worktree_confinement`'s path words). An unquoted `\ ` now reads as one word where it read as two:
 
 - **Grants more, as the shell reads it:** rule `grant_path_slot`'s false block ends, and its predicate turns clean behind rules `abs_script`, `brace_glyph`, `bounded_wait` arm (B) and `bounded_write`; rule `bounded_write` grants `touch .tmp/a\ b`, one bounded target; the declared-forms reader no longer reads an option-shaped fragment after an escaped blank as an option, since the shell passes it inside a word.
-- **Blocks more, as the shell reads it:** rule `commit_only_paths` reads `git commit -m fix\ it` as `-m` consuming `fix it`, a pathless commit, as `-m 'fix it'` is; rule `sed_file`'s awk, stream and python arms count one operand where they counted two.
-- **Unmoved:** rule `rm_tracked`'s `rm` arm and rule `sed_file`'s main arm read the skeleton; rule `find_exec` still blocks, its steer text aside; rule `worktree_confinement` roots a path word by its head, which an escaped blank inside the word cannot forge.
+- **Blocks more, as the shell reads it:** rule `commit_only_paths` reads `git commit -m fix\ it` as `-m` consuming `fix it`, a pathless commit, as `-m 'fix it'` is; rule `sed_file`'s awk read arm (`awk_read`, which steers only a program with exactly one operand) reads `awk 'NR==2' my\ file` as one file and steers it to the Read tool, where it read two operands and passed; and its python arm reads an unquoted `-c` program carrying an escaped blank whole, where it read the fragment before the blank.
+- **Unmoved:** rule `rm_tracked`'s `rm` arm and rule `sed_file`'s main arm read the skeleton; rule `sed_file`'s stream arm passes any segment with an operand, so one operand or two decide the same; rule `find_exec` still blocks, its steer text aside; rule `worktree_confinement` roots a path word by its head, which an escaped blank inside the word cannot forge.
 
 The decision table is the oracle: build runs `--run-guard-tests` and gives every moved row a cause before it lands. A row that moved for no cause is a defect the change exposed, fixed in this unit and never re-expected.
 
@@ -59,7 +59,7 @@ In §The generic ruleset's rule roster, two sentences gain the escaped blank: ru
 
 `.workflow/release-declarations.md`, under Behavior changes, in the commit landing delta 1. **Not yet applied.**
 
-> - **guard-kit shell guard, the bash reader's dequoted view** — a blank or tab after an odd run of backslashes stays inside its word, as the shell reads it, so a slot operand spelled `x\ y` is one operand and rule `grant_path_slot` no longer blocks it, rule `bounded_write` grants a bounded target so spelled, and rule `commit_only_paths` reads `git commit -m fix\ it` as a pathless commit. Nothing to do.
+> - **guard-kit shell guard, the bash reader's dequoted view** — a blank or tab after an odd run of backslashes stays inside its word, as the shell reads it, so a slot operand spelled `x\ y` is one operand and rule `grant_path_slot` no longer blocks it, rule `bounded_write` grants a bounded target so spelled, rule `commit_only_paths` reads `git commit -m fix\ it` as a pathless commit, and rule `sed_file` steers an `awk` line-range read of a file so spelled to the Read tool and reads an inline python program so spelled whole. Nothing to do.
 
 ## Producers and consumers
 

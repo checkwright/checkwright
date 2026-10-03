@@ -1,6 +1,8 @@
 # SPEC amendment: layout-neutral
 
-**Four kit-shipped gate-sdk members read this repository's layout where the consumer's own value is already on hand, and each is made to read the consumer's, with no new knob.** `check-gate-substrate-parity` defaults its conservation doc to `<GATE_SDK_ROOT>/SPEC.md`, which the payload withholds (`GATE_SDK_PAYLOAD_WITHHOLD` defaults to `SPEC.md smoke`), so a bare run in an installed tree exits 2. `check-template-copy-parity` globs `<root>/*/templates/*.sh` (`template_copy_parity.rs`), so under a subdirectory vendoring its corpus empties and it reads clean. `check-tree-terms` and `check-portability-floor` exempt their rosters by the shipped basename prefix (the two `SELF_EXEMPT_PREFIX` constants), so a consumer whose pattern-file knob names another file reds on its own roster. `--emit enforcement-map` links each kit to `<kit>/index.md` (`kit_cell`), so an adopter's page ships one dead link per kit. Each premise was read in source at authoring; the tree satisfies none of the fixes.
+**Four kit-shipped gate-sdk members and one emitter arm read this repository's layout where the consumer's own value is already on hand, and each is made to read the consumer's, with no new knob.** `check-gate-substrate-parity` defaults its conservation doc to `<GATE_SDK_ROOT>/SPEC.md`, which the payload withholds (`GATE_SDK_PAYLOAD_WITHHOLD` defaults to `SPEC.md smoke`), so a bare run in an installed tree exits 2. `check-template-copy-parity` globs `<root>/*/templates/*.sh` (`template_copy_parity.rs`), so under a subdirectory vendoring its corpus empties and it reads clean. `check-tree-terms` and `check-portability-floor` exempt their rosters by the shipped basename prefix (the two `SELF_EXEMPT_PREFIX` constants), so a consumer whose pattern-file knob names another file reds on its own roster. `--emit enforcement-map` links each kit to `<kit>/index.md` (`kit_cell`), so an adopter's page ships one dead link per kit. Each premise was read in source at authoring; the tree satisfies none of the fixes.
+
+**Landing order.** Delta 4 and the anchor re-pointing of delta 8 land before withheld-literals' delta 3, which edits the same emitter module and registry rows; SPEC-withheld-literals.md states the order.
 
 **Measured at authoring.** `git ls-files` over names beginning `msg-patterns` or `portability-patterns` returns `scripts/msg-patterns.list`, `scripts/portability-patterns.list`, the two `gate-sdk/templates/` starter rosters and fixture files under `gate-tests/`, so delta 3 moves no verdict in this tree. `git ls-files docs` tracks `docs/<kit>/index.md` for every kit the enforcement page rows, so delta 4 leaves `docs/enforcement.md` unchanged.
 
@@ -19,7 +21,7 @@ A payload-carried copy of the section was refused as a second home for the dispo
 
 ### (2) `check-template-copy-parity` pairs the templates of each kit root {design-bearing} {user-facing: gate-sdk-layout-assumptions's deliverable, the template-copy gate made layout-neutral with a release declaration for the verdict change}
 
-`native/src/gates/template_copy_parity.rs`: the corpus is `<kit root>/templates/*.sh` for each kit root `walk::kit_roots` resolves under the scan root (the roots `GATE_SDK_KIT_DIRS` names, else the derivation), replacing the `*/templates/*.sh` glob. The pairing, the `*-config.sh` exclusion, the unpaired skip and the three assertions are unchanged. The member's registry row in `native/src/gates/mod.rs` declares `GATE_SDK_KIT_DIRS` beside `GATE_SDK_GATES_DIR`, and its walk-root declaration takes the `?` line `check-template-registry-parity`'s row carries. The clean line gains `; M kit root(s) read`, a report with no floor, so an emptied corpus is visible. The descriptor's `couples=` changes `*/templates/*.sh` to `kit:templates/*.sh`, so the trigger reaches a vendored root.
+`native/src/gates/template_copy_parity.rs`: the corpus is `<scan root>/<kit root>/templates/*.sh` for each kit root `walk::kit_roots_under(<scan root>)` returns (the roots `GATE_SDK_KIT_DIRS` names, else the derivation, spelled against the scan root and narrowed to those under it), replacing the `*/templates/*.sh` glob. `walk::kit_roots` is refused here: it spells a root against the working directory, while the scan root is the gate's first argument. A kit root equal to the scan root is dropped, as the old glob never paired it. The pairing, the `*-config.sh` exclusion, the unpaired skip and the three assertions are unchanged. The member's registry row in `native/src/gates/mod.rs` declares `GATE_SDK_KIT_DIRS` beside `GATE_SDK_GATES_DIR`, and its walk-root declaration takes the `?` line `check-template-registry-parity`'s row carries. The clean line gains `; M kit root(s) read`, a report with no floor, so an emptied corpus is visible. The descriptor's `couples=` changes `*/templates/*.sh` to `kit:templates/*.sh`, so the trigger reaches a vendored root.
 
 The verdict moves both ways: under a subdirectory vendoring, pairs the glob never reached are compared, and a top-level directory carrying `templates/*.sh` that is no kit root is no longer paired. An installed tree is unaffected, since the installer writes the kit set into the knob.
 
@@ -28,15 +30,15 @@ The verdict moves both ways: under a subdirectory vendoring, pairs the glob neve
 `native/src/gates/tree_terms.rs` and `native/src/gates/portability_floor.rs`: the two `SELF_EXEMPT_PREFIX` constants and their basename-prefix tests retire. A tracked path is self-exempt when it is one of:
 
 - **a pattern file the gate resolved**: for `check-tree-terms` the files `GATE_SDK_MSG_PATTERN_FILES` and `GATE_SDK_MSG_PATTERN_FILES_LOCAL` name, or the positional list; for `check-portability-floor` those `GATE_SDK_PORTABILITY_PATTERNS` names, or the positional list. The comparison is lexical against the path `git ls-files` prints, a leading `./` stripped and an absolute value spelled against the working directory.
-- **a kit's own starter roster**: `<kit root>/templates/<name>`, `<name>` the basename of that gate's pattern-knob default, read from the knob row so the literal is held once. The shipped roster spells the shapes it bans and is vendored, tracked, in every consumer, so scanning it would red every adopter.
+- **a kit's own starter roster**: `<kit root>/templates/<name>`, each kit root from `walk::kit_roots` (spelled against the working directory, as `git ls-files` prints the tracked paths), `<name>` the basename of that gate's pattern-knob default: `msg-patterns.list` for `check-tree-terms` (the `GATE_SDK_MSG_PATTERN_FILES` default; the local list ships no starter) and `portability-patterns.list` for `check-portability-floor`. Those defaults are derived rows (`in_gates_dir` in `native/src/knobs/gate_sdk.rs`) with no readable default value, so each basename is hoisted to a `pub const` beside its derivation, which both the derivation and the gate read, holding the literal once inside the knob tables. The shipped roster spells the shapes it bans and is vendored, tracked, in every consumer, so scanning it would red every adopter.
 
 Both members' registry rows declare `GATE_SDK_KIT_DIRS`. The verdict moves both ways: a roster the knob names under another basename stops reddening on itself, and a tracked file merely beginning with the prefix that no knob names (a stale `msg-patterns.old.list`) is now scanned and reds on a banned shape in it.
 
 ### (4) The enforcement map links a kit page only where the tree tracks one {design-bearing} {user-facing: gate-sdk-layout-assumptions's deliverable, the emitted page made layout-neutral with a release declaration for the verdict change}
 
-`native/src/emit/enforcement_map.rs`, `kit_cell`: a kit cell is `[<kit>](<kit>/index.md)` when `<dir of GATE_SDK_ENFORCEMENT_FILE>/<kit>/index.md` is a tracked file (the `tracked()` test `owner_ref` applies), and plain `<kit>` text otherwise, as the `(consumer)` group already is. The link is relative to the page, so the test is made at the same spot and a dead link is unrepresentable; tracked rather than present, so a local untracked page cannot make a local run fresh where CI reds. The lookup is made in `emit()`, not `measure()`, so the value rollup's structured read is unchanged. The `--emit-enforcement-map` row in `native/src/emit/mod.rs` declares `GATE_SDK_ENFORCEMENT_FILE`.
+`native/src/emit/enforcement_map.rs`, `kit_cell`: a kit cell is `[<kit>](<kit>/index.md)` when `<dir of GATE_SDK_ENFORCEMENT_FILE>/<kit>/index.md` is a tracked file (the `tracked()` test `owner_ref` applies), and plain `<kit>` text otherwise, as the `(consumer)` group already is. The link is relative to the page, so the test is made at the same spot and a dead link is unrepresentable; tracked rather than present, so a local untracked page cannot make a local run fresh where CI reds. `kit_cell` is called from `render()`, so `emit()` reads the knob, computes the set of kits whose page is tracked and hands it to `render()`, which passes each row's membership to `kit_cell`; `measure()` is untouched, so the value rollup's structured read is unchanged. The `--emit-enforcement-map` row in `native/src/emit/mod.rs` declares `GATE_SDK_ENFORCEMENT_FILE`.
 
-**Honest limit:** the page now depends on a tracked file's presence that `check-enforcement-fresh`'s `couples=` cannot name, since a `knob:` token roots at a directory knob and this is a file knob's directory. Adding a kit page alone does not fire the gate at commit; the full battery and CI do.
+**Honest limits:** the link base is the knob's directory, so a page redirected to another path, or compared at another path through `check-enforcement-fresh`'s positional, is linked as if it sat at the knob's. And the page now depends on a tracked file's presence that `check-enforcement-fresh`'s `couples=` cannot name, since a `knob:` token roots at a directory knob and this is a file knob's directory. Adding a kit page alone does not fire the gate at commit; the full battery and CI do.
 
 ### (5) Fixtures and tests, one per change {mechanical}
 
@@ -46,7 +48,7 @@ Both members' registry rows declare `GATE_SDK_KIT_DIRS`. The verdict moves both 
 - **Portability floor** (`gate-sdk/gate-tests/check-portability-floor/`): the same shape.
 - **Enforcement map**: `check-enforcement-fresh/good` tracks the kit page its committed page links; a unit test in `enforcement_map.rs` pins both arms of `kit_cell`; `gate-sdk/gate-tests/enforcement-map.test.sh` asserts a run with `GATE_SDK_ENFORCEMENT_FILE` in an untracked scratch directory writes the kit names as plain text.
 
-**Inferred, cannot run before build:** that a case's `scripts/gate-sdk-config.knobs` row steers `GATE_SDK_KIT_DIRS` for the template-copy and pattern-gate fixtures as it does for `check-gate-substrate-parity/good` — the reads delta 2 and delta 3 add land in build.
+A case's `scripts/gate-sdk-config.knobs` row steers `GATE_SDK_KIT_DIRS` for the kit-root resolver these reads call: `--emit kit-roots` run with `check-enforcement-fresh/good` as the working directory prints that case's `demo-kit`.
 
 ### (6) The SPEC text states each rule {mechanical}
 
@@ -72,7 +74,7 @@ and in the same section the clean line is said to count the kit roots read, and 
 
 > The **kit column links a kit's docs page** (`<kit>/index.md`, relative to the page) where the page's directory tracks it, so a tree with no docs layout carries no dead link; a kit with no page, and the `(consumer)` group, stay plain text.
 
-The starter rosters' header comments, `gate-sdk/templates/msg-patterns.list` and `gate-sdk/templates/portability-patterns.list`, and this repo's copies `scripts/msg-patterns.list` and `scripts/portability-patterns.list`, replace the prefix sentence with *The pattern files this gate resolves are self-exempt.*; `tree_terms.rs`' module comment drops its prefix sentence. A comment-only template edit is outside `check-release-change-declared`'s class T.
+The starter rosters' header comments, `gate-sdk/templates/msg-patterns.list` and `gate-sdk/templates/portability-patterns.list`, and this repo's copies `scripts/msg-patterns.list` and `scripts/portability-patterns.list`, replace the prefix sentence with *The pattern files this gate resolves are self-exempt.* The prefix comment over `SELF_EXEMPT_PREFIX` in `tree_terms.rs` leaves with the constant (delta 3); the module's header comment already states the exemption without the prefix and stands. A comment-only template edit is outside `check-release-change-declared`'s class T.
 
 ### (7) The release declarations {mechanical}
 
@@ -113,10 +115,11 @@ Roster by `git grep -n -F '*/templates/*.sh'`, `git grep -n 'SELF_EXEMPT_PREFIX'
 - `gate-sdk/SPEC.md` — §check-gate-substrate-parity, §check-template-copy-parity, §check-tree-terms, §check-portability-floor and §enforcement-map (delta 6).
 - `native/src/gates/gate_substrate_parity.rs` — the doc read's order and the clean line (delta 1).
 - `native/src/gates/template_copy_parity.rs` — the per-kit-root corpus and clean line (delta 2).
-- `native/src/gates/tree_terms.rs` — the self-exemption and module comment (deltas 3 and 6).
+- `native/src/gates/tree_terms.rs` — the self-exemption and its comment (delta 3).
 - `native/src/gates/portability_floor.rs` — the self-exemption (delta 3).
+- `native/src/knobs/gate_sdk.rs` — the two pattern-roster basenames hoisted to constants (delta 3).
 - `native/src/emit/enforcement_map.rs` — `kit_cell` and its unit test (deltas 4 and 5).
-- `native/src/gates/mod.rs` — three registry rows and their anchors (deltas 2, 3 and 8).
+- `native/src/gates/mod.rs` — the three members' rows (deltas 2 and 3), and the `dynamic@` anchors `check-reads-couples` names once the edits shift their lines, among them `check-gate-substrate-parity`'s, `check-enforcement-fresh`'s and `check-value-rollup-fresh`'s (delta 8).
 - `native/src/emit/mod.rs` — the enforcement-map arm row (delta 4).
 - `gate-sdk/checks/check-template-copy-parity.gate` — its `couples=` (delta 2).
 - `gate-sdk/gate-tests/` — the fixture pairs and `.test.sh` suites delta 5 names (delta 5).
@@ -133,7 +136,7 @@ Roster by `git grep -n -F '*/templates/*.sh'`, `git grep -n 'SELF_EXEMPT_PREFIX'
 
 - `*/templates/*.sh` — the template-copy glob, in its source and descriptor (delta 2).
 - `SELF_EXEMPT_PREFIX` — the two basename-prefix constants (delta 3).
-- `msg-patterns*` — the prefix-glob exemption in the starter roster's comment, this repo's copy and the module comment (deltas 3 and 6).
+- `msg-patterns*` — the prefix-glob exemption in the starter roster's comment, this repo's copy and the constant's comment (deltas 3 and 6).
 - `portability-patterns*` — the same, for the portability roster (deltas 3 and 6).
 
 ## Definition of Done
