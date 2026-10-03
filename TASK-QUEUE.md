@@ -34,6 +34,22 @@ a read-shaped compound or redirected call still falls to the classifier. `side-e
 
 **Selected 2026-10-03 for guard-kit-write-side-pass, operator direction lead-relayed (not a ruling):** a feature, the spec stage's to author and promote; third in order, after [bash-reader-escaped-pipe](#bash-reader-escaped-pipe), whose splits it reads, and [write-side-steering](#write-side-steering); its need the closing push alone.
 
+### write-side-steering
+
+[spec: SPEC-write-side.md]
+
+a shell write that falls through the guard (a `tee` to a file, `find -delete`, a redirect, `rm`, `mv` or `cp` against the tree) goes to the harness's out-of-band decision: the auto-mode classifier, which gives occasional false positives (operator report, 2026-09-30), or a prompt. Only `--rewrite` and the scratch-append grants steer writes today. The property is a bounded write (in the repo, a gitignored scratch path, a named roster) rather than no side effect, so it probably takes the read ladder's standard-spelling-first order with a bounds test in place of a side-effect test.
+
+**Deliverable:** the write ladder specified and landed in guard-kit's rule roster, each rung with its bounds test and decision-table cases.
+
+**Cost while deferred:** write-shaped calls keep costing classifier decisions and false-positive stalls. Filed 2026-09-30 to the gap inbox by guard-kit-steering's lead on an operator question; promoted at its close: →fix fails because each rung is new mechanism, →forward because no ruling is owed. Re-verified: no queue entry names write arms. DISTINCT from `side-effect-free-read-arms`, done, which covered reads. Owner lookup: `write-side`, `bounded write`, `tee` in this file — only [manual-operation-spend-channel](#manual-operation-spend-channel), DISTINCT (a spend meter), and the icebox's interpreter-grant-redirect-residue, DISTINCT (an interpreter grant's redirected shapes); owner guard-kit/SPEC.md §The rule roster.
+
+**Selected 2026-10-03 for guard-kit-write-side-pass, operator direction lead-relayed (not a ruling):** a feature, the spec stage's to author and promote; second in order, after [bash-reader-escaped-pipe](#bash-reader-escaped-pipe), and ahead of [compound-read-classifier-reach](#compound-read-classifier-reach), whose redirect half rides its bounds test.
+
+**Push need (2026-10-03, inside the budget):** the closing push alone, 1 against a budget of one to two. The spec stage found that the bounds test reads relative path words only and composes no root, so nothing passes through the path-dialect layer (the amendment's delta 1).
+
+**Directed at spec (operator direction 2026-10-03, lead-relayed, not a ruling):** a write lands strictly under a scratch dir and passes the other bounds clauses. Both kinds are granted, the redirect to a bounded target and the `GUARD_KIT_WRITE_BINS` utilities.
+
 ## Technical Debt
 
 ### guard-kit-remainder-brevity
@@ -535,20 +551,6 @@ the front-door rehearsal belongs in the methodology, operator direction 2026-09-
 **Deliverable, three layers:** (1) a generic kit rule, before an audience-facing event rehearse the published front door from a clean seat and file what it finds, the container, platform and route set being consumer config (doctrine-kit or lifecycle-kit's release step, per the provenance seam); (2) here, a post-publish job in `.github/workflows/publish.yml` installing the just-published Release on clean runners (init, hooks on, a first red, an upgrade from the previous release, a hooked profile move), reaching the macOS and Windows runners a container cannot; (3) a manual agent-walked rehearsal of the routes CI cannot drive (the adoption prompt, the plugin marketplace, the Spec Kit extension), before audience events only, a catalog submission or a partner install, per the operator.
 
 **Cost while deferred:** each audience event risks a front-door defect only a clean-seat install would show; the one-off left macOS, native Windows, arm64 Linux, WSL and the npx, plugin, PowerShell and agent-prompt routes unrehearsed. Filed 2026-09-29 to the gap inbox by preview-readiness' lead; promoted 2026-09-30 at its close: →fix fails because each layer is new mechanism, →forward because the direction is given. Re-verified: `publish.yml` runs roster, build, pack, npm and release and installs nothing after publishing. Owner lookup: `rehears`, `post-publish`, `clean seat` in this file — [design-partner-preview](#design-partner-preview), DISTINCT (the observed install this precedes); owner RELEASING.md for layer 2, the kit rule's home open. Surface also doctrine-kit.
-
-### write-side-steering
-
-[cost: event/high] [surface: guard-kit]
-
-a shell write that falls through the guard (a `tee` to a file, `find -delete`, a redirect, `rm`, `mv` or `cp` against the tree) goes to the harness's out-of-band decision: the auto-mode classifier, which gives occasional false positives (operator report, 2026-09-30), or a prompt. Only `--rewrite` and the scratch-append grants steer writes today. The property is a bounded write (in the repo, a gitignored scratch path, a named roster) rather than no side effect, so it probably takes the read ladder's standard-spelling-first order with a bounds test in place of a side-effect test.
-
-**Deliverable:** the write ladder specified and landed in guard-kit's rule roster, each rung with its bounds test and decision-table cases.
-
-**Cost while deferred:** write-shaped calls keep costing classifier decisions and false-positive stalls. Filed 2026-09-30 to the gap inbox by guard-kit-steering's lead on an operator question; promoted at its close: →fix fails because each rung is new mechanism, →forward because no ruling is owed. Re-verified: no queue entry names write arms. DISTINCT from `side-effect-free-read-arms`, done, which covered reads. Owner lookup: `write-side`, `bounded write`, `tee` in this file — only [manual-operation-spend-channel](#manual-operation-spend-channel), DISTINCT (a spend meter), and the icebox's interpreter-grant-redirect-residue, DISTINCT (an interpreter grant's redirected shapes); owner guard-kit/SPEC.md §The rule roster.
-
-**Selected 2026-10-03 for guard-kit-write-side-pass, operator direction lead-relayed (not a ruling):** a feature, the spec stage's to author and promote; second in order, after [bash-reader-escaped-pipe](#bash-reader-escaped-pipe), and ahead of [compound-read-classifier-reach](#compound-read-classifier-reach), whose redirect half rides its bounds test.
-
-**Push need (2026-10-03, inside the budget):** the closing push alone, unless its bounds test resolves paths through the path-dialect layer, whose native-Windows leg runs only in CI; then one mid-iteration push, 2 against a budget of one to two. The spec stage states which.
 
 ### kit-prose-harness-coupling
 
