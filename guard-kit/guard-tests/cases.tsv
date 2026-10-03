@@ -322,6 +322,8 @@ allow	grep foo a \| b
 fallthrough	grep foo a \\| md5sum
 allow	grep -c foo tracked.md \@NL@scratch.txt
 fallthrough	grep -c foo tracked.md \\@NL@md5sum scratch.txt
+# the continued line's words are read whole, so a write form on its second line still withholds
+fallthrough	sort a.txt \@NL@-o out.txt
 fallthrough	grep foo 'a\' | sort -o out.txt
 # the sed and awk program discriminator: a program the static check clears is read-only (a redirect
 # glyph inside an awk string is skipped); an output redirect, a written file, a system() call, a

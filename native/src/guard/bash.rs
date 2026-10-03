@@ -77,11 +77,16 @@ fn split_on(cmd: &str, seps: &[&[u8]]) -> Vec<String> {
     let mut segs: Vec<Vec<u8>> = vec![Vec::new()];
     let mut i = 0usize;
     while i < b.len() {
-        match seps
-            .iter()
-            .find(|s| b[i..].starts_with(s))
-            .filter(|s| !(escapable(s[0]) && escaped(b, i)))
-        {
+        match seps.iter().find(|s| b[i..].starts_with(s)) {
+            Some(s) if escapable(s[0]) && escaped(b, i) => {
+                let open = segs.last_mut().expect("one segment is always open");
+                if s[0] == b'\n' {
+                    open.pop();
+                } else {
+                    open.push(b[i]);
+                }
+                i += 1;
+            }
             Some(s) => {
                 segs.push(Vec::new());
                 i += s.len();
@@ -97,7 +102,8 @@ fn split_on(cmd: &str, seps: &[&[u8]]) -> Vec<String> {
         .collect()
 }
 
-// spec: guard-kit/SPEC.md §The reader and its views — the escaped separator; `&&` stays bytewise.
+// spec: guard-kit/SPEC.md §The reader and its views — the escaped separator; `&&` stays bytewise, and
+// a continued line drops its backslash-newline so no segment carries a newline a word reader stops at.
 fn escapable(c: u8) -> bool {
     matches!(c, b';' | b'|' | b'\n')
 }
@@ -676,16 +682,18 @@ mod tests {
         assert_eq!(split_compound("a \\\\| b"), vec!["a \\\\", " b"]);
         assert_eq!(split_compound("a \\|| b"), vec!["a \\|", " b"]);
         assert_eq!(split_compound("a \\|& b"), vec!["a \\|& b"]);
-        assert_eq!(split_compound("a \\\nb"), vec!["a \\\nb"]);
+        assert_eq!(split_compound("a \\\nb"), vec!["a b"]);
+        assert_eq!(split_compound("a\\\n-o b"), vec!["a-o b"]);
         assert_eq!(split_compound("a \\\\\nb"), vec!["a \\\\", "b"]);
-        assert_eq!(statements("a \\\nb"), vec!["a \\\nb"]);
+        assert_eq!(split_compound("a \\\\\\\nb"), vec!["a \\\\b"]);
+        assert_eq!(statements("a \\\nb"), vec!["a b"]);
         assert_eq!(split_compound("a \\&& b"), vec!["a \\", " b"]);
         let quoted = skeleton("a '\\|' b", SQDQ);
         assert!(!quoted.contains('\\'));
         assert_eq!(split_compound(&quoted).len(), 1);
         assert_eq!(Bash.pipes("a \\| b"), vec!["a \\| b"]);
         assert_eq!(Bash.pipes("a | b"), vec!["a ", " b"]);
-        assert_eq!(Bash.pipes("a \\\nb"), vec!["a \\\nb"]);
+        assert_eq!(Bash.pipes("a \\\nb"), vec!["a b"]);
     }
 
     // spec: guard-kit/SPEC.md §The shell guard — placeholder, never deletion
