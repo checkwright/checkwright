@@ -1,2 +1,12 @@
 # graph: couples=README.md,docs/index.md,docs/install.md,installer/README.md,plugin/skills/install/SKILL.md,docs/speckit.md,docs/openspec.md,docs/install.sh,docs/install.ps1,.workflow/release-disposition.txt,installer/profiles.list,knob:GATE_SDK_GATES_DIR/gate-sdk-config.knobs dir=one valve=none tier=precommit
 # spec: installer/SPEC.md §The front door's verbs — the verb and flag tables are the binary's rosters (A), and every route-advertised verb, each flag after it, each `--profile` or `--recipe` operand and each arm a page names is in the pinned release, or pending this iteration's release (B)
+# knob: GATE_LOCAL_FRONT_DOOR_SURFACES[] = README.md
+# knob: GATE_LOCAL_FRONT_DOOR_SURFACES[] = docs/index.md
+# knob: GATE_LOCAL_FRONT_DOOR_SURFACES[] = docs/install.md
+# knob: GATE_LOCAL_FRONT_DOOR_SURFACES[] = installer/README.md
+# knob: GATE_LOCAL_FRONT_DOOR_SURFACES[] = plugin/skills/install/SKILL.md
+# knob: GATE_LOCAL_FRONT_DOOR_SURFACES[] = docs/speckit.md
+# knob: GATE_LOCAL_FRONT_DOOR_SURFACES[] = docs/openspec.md
+# knob: GATE_LOCAL_CHECKOUT_SECTION = ## This repo, governed
+# knob: GATE_LOCAL_README_FILE = README.md
+# knob: GATE_LOCAL_INSTALLER_DIR = installer

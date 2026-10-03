@@ -516,6 +516,7 @@ fn checked() -> &'static Checked {
 pub fn reset(_guard: &crate::knobenv::KnobEnv) {
     cache().lock().unwrap_or_else(|e| e.into_inner()).clear();
     checked().lock().unwrap_or_else(|e| e.into_inner()).clear();
+    declared_cache().lock().unwrap_or_else(|e| e.into_inner()).clear();
 }
 
 fn cache_key(kit: &'static Kit) -> CacheKey {
@@ -1050,7 +1051,48 @@ pub fn wire(name: &str) -> Result<String, String> {
     if let Some((v, _)) = locator(name) {
         return Ok(v.wire());
     }
+    if owner(name).is_none() {
+        return declared_wire(name);
+    }
     resolve(name).map(|(v, _)| v.wire())
+}
+
+type Declared = Arc<Result<Vec<crate::registry::DeclaredKnob>, String>>;
+
+fn declared_cache() -> &'static Mutex<Vec<(String, Declared)>> {
+    static DECLARED: Mutex<Vec<(String, Declared)>> = Mutex::new(Vec::new());
+    &DECLARED
+}
+
+// spec: gate-sdk/SPEC.md §The declaration cohort — a name no static kit owns resolves only where a
+// descriptor in the resolved gates directory declares it: from the environment, the wire's own
+// serialization for an indexed knob, then the declaring line's value
+fn declared_wire(name: &str) -> Result<String, String> {
+    let dir = gates_dir();
+    let set = {
+        let mut held = declared_cache().lock().unwrap_or_else(|e| e.into_inner());
+        match held.iter().find(|(d, _)| *d == dir) {
+            Some((_, s)) => s.clone(),
+            None => {
+                let s: Declared = Arc::new(crate::registry::descriptor_knobs(&dir));
+                held.push((dir.clone(), s.clone()));
+                s
+            }
+        }
+    };
+    let set = set.as_ref().as_ref().map_err(String::clone)?;
+    let Some(d) = set.iter().find(|d| d.name == name) else {
+        return Err(format!(
+            "{} is not a statically owned knob, and no descriptor in {} declares it on a `{}` line",
+            name,
+            dir,
+            crate::registry::KNOB_LINE
+        ));
+    };
+    match std::env::var(name) {
+        Ok(v) => Ok(v),
+        Err(_) => Ok(d.value.wire()),
+    }
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — one line per element in the roster's grammar, and one
@@ -1215,6 +1257,70 @@ mod tests {
         assert_eq!(wire_in(&tree.dir(), "GATE_SDK_PORTABILITY_PATHS").unwrap(), "env.sh");
         assert!(wire_in(&tree.dir(), "PROBE_KIT_ARMING").is_err());
         clean(&env, &here.dir());
+        restore(&env);
+    }
+
+    // spec: gate-sdk/SPEC.md §The declaration cohort — a descriptor-declared knob resolves from the
+    // environment, then its declaring line, a scalar and an indexed knob alike
+    #[test]
+    fn a_declared_scalar_and_indexed_knob_resolve_environment_first() {
+        let env = knobenv::lock();
+        let s = Scratch::new("declared");
+        clean(&env, &s.dir());
+        env.remove("GATE_LOCAL_PROBE_PAGE");
+        env.remove("GATE_LOCAL_PROBE_SITES");
+        s.write(
+            "check-probe.gate",
+            "# graph: couples=x tier=precommit\n# knob: GATE_LOCAL_PROBE_PAGE = docs/page.md\n\
+             # knob: GATE_LOCAL_PROBE_SITES[] = a.md\n# knob: GATE_LOCAL_PROBE_SITES[] = b c.md\n",
+        );
+        reset(&env);
+        assert_eq!(wire("GATE_LOCAL_PROBE_PAGE").unwrap(), "docs/page.md");
+        assert_eq!(crate::walk::knob_array("GATE_LOCAL_PROBE_SITES").unwrap(), vec!["a.md", "b c.md"]);
+        env.set("GATE_LOCAL_PROBE_PAGE", "env.md");
+        env.set("GATE_LOCAL_PROBE_SITES", "x.md\ty.md");
+        assert_eq!(wire("GATE_LOCAL_PROBE_PAGE").unwrap(), "env.md");
+        assert_eq!(crate::walk::knob_array("GATE_LOCAL_PROBE_SITES").unwrap(), vec!["x.md", "y.md"]);
+        env.remove("GATE_LOCAL_PROBE_PAGE");
+        env.remove("GATE_LOCAL_PROBE_SITES");
+        clean(&env, &s.dir());
+        restore(&env);
+    }
+
+    // spec: gate-sdk/SPEC.md §The declaration cohort — each name has one producer: a static kit's
+    // name on a `# knob:` line and a name two descriptors declare are refused, naming the files
+    #[test]
+    fn a_static_name_or_a_second_declaration_on_a_knob_line_refuses() {
+        let env = knobenv::lock();
+        let s = Scratch::new("declared-refusals");
+        clean(&env, &s.dir());
+        s.write("check-a.gate", "# knob: GATE_SDK_WORKFLOW_DIR = elsewhere\n");
+        reset(&env);
+        let e = wire("GATE_LOCAL_PROBE_PAGE").unwrap_err();
+        assert!(e.contains("check-a.gate:1") && e.contains("gate-sdk"), "{}", e);
+        s.write("check-a.gate", "# knob: GATE_LOCAL_PROBE_PAGE = a.md\n");
+        s.write("check-b.gate", "# graph: couples=x\n# knob: GATE_LOCAL_PROBE_PAGE = b.md\n");
+        reset(&env);
+        let e = wire("GATE_LOCAL_PROBE_PAGE").unwrap_err();
+        assert!(e.contains("check-b.gate:2") && e.contains("check-a.gate"), "{}", e);
+        clean(&env, &s.dir());
+        restore(&env);
+    }
+
+    // spec: gate-sdk/SPEC.md §The declaration cohort — an undeclared name stays refused, so the
+    // environment alone never makes a name a knob
+    #[test]
+    fn an_undeclared_local_name_stays_refused_whatever_the_environment_carries() {
+        let env = knobenv::lock();
+        let s = Scratch::new("declared-undeclared");
+        clean(&env, &s.dir());
+        s.write("check-a.gate", "# knob: GATE_LOCAL_PROBE_PAGE = a.md\n");
+        env.set("GATE_LOCAL_PROBE_SITES", "x.md");
+        reset(&env);
+        let e = wire("GATE_LOCAL_PROBE_SITES").unwrap_err();
+        assert!(e.contains("no descriptor"), "{}", e);
+        env.remove("GATE_LOCAL_PROBE_SITES");
+        clean(&env, &s.dir());
         restore(&env);
     }
 

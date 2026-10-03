@@ -5,8 +5,6 @@ use super::release_bump::disposition_file;
 use crate::{fresh, proc, programs, queue, stages};
 use std::path::Path;
 
-const INSTALL_SH: &str = "docs/install.sh";
-
 #[derive(Debug, PartialEq)]
 pub(crate) enum Disposition {
     Absent,
@@ -56,7 +54,8 @@ pub(crate) fn read(path: &str) -> Result<String, String> {
 // spec: installer/SPEC.md §The front door's verbs — the tag the hosted pin names, or none where it
 // does not resolve here, as in a shallow checkout
 pub(crate) fn pinned_tag() -> Result<Option<String>, String> {
-    let pin = pin_of(INSTALL_SH, &fresh::read_captured(INSTALL_SH)?, "pin")?;
+    let install_sh = crate::walk::knob_scalar("GATE_LOCAL_INSTALL_SH")?;
+    let pin = pin_of(&install_sh, &fresh::read_captured(&install_sh)?, "pin")?;
     let tag = format!("v{}", pin);
     Ok(git_ok(&["rev-parse", "--verify", "--quiet", &format!("refs/tags/{}", tag)])?.map(|_| tag))
 }

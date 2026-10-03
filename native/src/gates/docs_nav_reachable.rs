@@ -6,8 +6,6 @@ use crate::walk;
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
 
-const DEFAULT_ROOT: &str = "docs";
-const DEFAULT_ALLOWLIST: &str = "scripts/docs-offnav.list";
 // spec: docs/site-architecture.md §Site chrome and the nav contract — POSIX `[[:space:]]` minus
 // the newline awk's record separator already consumed
 const SPACE: [char; 5] = [' ', '\t', '\r', '\x0b', '\x0c'];
@@ -252,8 +250,7 @@ pub fn run(args: &[String]) -> i32 {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let root = fresh::strip_trailing_slash(fresh::positional(args, 0, DEFAULT_ROOT)).to_string();
-    let allowlist = fresh::positional(args, 1, DEFAULT_ALLOWLIST).to_string();
+    let root = fresh::strip_trailing_slash(&fresh::positional_or_knob(args, 0, "SITE_KIT_DOCS_DIR")?).to_string();
     if !fresh::is_dir(&root) {
         return Err(format!("not a directory: {}", root));
     }
@@ -275,6 +272,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(0);
     }
 
+    let allowlist = fresh::positional_or_knob(args, 1, "GATE_LOCAL_OFFNAV_LIST")?;
     let mut allow: HashSet<String> = HashSet::new();
     if Path::new(&allowlist).is_file() {
         for line in fresh::read_captured(&allowlist)?.lines() {

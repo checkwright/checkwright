@@ -1,0 +1,4 @@
+# graph: couples=refs.md dir=one valve=none tier=precommit
+# spec: canon-kit/SPEC.md §Layout and configuration — the case's own declaration of the release record its argument-less run valves
+# knob: GATE_LOCAL_RELEASE_POSTS_DIR = docs/posts
+# knob: GATE_LOCAL_EVIDENCE_PAGE = docs/evidence-data.md

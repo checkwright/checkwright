@@ -5,8 +5,6 @@ use crate::toolfloor::{CONTRIBUTOR, KIT_JOIN, REGISTERED};
 use std::collections::BTreeMap;
 use std::path::Path;
 
-const DEFAULT_INSTALL_MD: &str = "docs/install.md";
-const DEFAULT_CONTRIBUTING_MD: &str = "CONTRIBUTING.md";
 const BEGIN: &str = "<!-- toolchain:begin -->";
 const END: &str = "<!-- toolchain:end -->";
 // spec: docs/site-architecture.md §Generated projections and their freshness gates — the Version
@@ -149,7 +147,7 @@ fn elements_of(roster: Option<&String>) -> Result<(Vec<String>, String), String>
     let Some(path) = roster else {
         return Ok((
             crate::toolfloor::PROBE_SET.iter().map(|e| e.to_string()).collect(),
-            crate::toolfloor::ROSTER.to_string(),
+            crate::toolfloor::roster()?,
         ));
     };
     if !Path::new(path).is_file() {
@@ -173,11 +171,11 @@ fn page_rows(page: &str) -> Result<Vec<Row>, String> {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let install_md = fresh::positional(args, 0, DEFAULT_INSTALL_MD);
-    let contributing_md = fresh::positional(args, 1, DEFAULT_CONTRIBUTING_MD);
-
-    let install_rows = page_rows(install_md)?;
-    let contributing_rows = page_rows(contributing_md)?;
+    let install_md = fresh::positional_or_knob(args, 0, "GATE_LOCAL_INSTALL_PAGE")?;
+    let install_rows = page_rows(&install_md)?;
+    let contributing_md = fresh::positional_or_knob(args, 1, "GATE_LOCAL_CONTRIBUTING_FILE")?;
+    let contributing_rows = page_rows(&contributing_md)?;
+    let (install_md, contributing_md) = (install_md.as_str(), contributing_md.as_str());
     if install_rows.is_empty() && contributing_rows.is_empty() {
         return Err(format!(
             "marker blocks present but no '| `tool` | … |' rows in {} or {}",

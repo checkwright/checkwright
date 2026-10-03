@@ -2,14 +2,8 @@
 // statement: one source, two renderings, five sites, one function the gate calls in process
 use crate::fresh;
 
-pub const SOURCE: &str = "scripts/product-statement.conf";
-pub const SITES: &[&str] = &[
-    "README.md",
-    "docs/index.md",
-    "docs/_config.yml",
-    "installer/package.json",
-    "reserve/crates/Cargo.toml",
-];
+pub const SOURCE_KNOB: &str = "GATE_LOCAL_PRODUCT_STATEMENT_CONF";
+pub const SITES_KNOB: &str = "GATE_LOCAL_PRODUCT_STATEMENT_SURFACES";
 const BEGIN: &str = "<!-- product-statement:begin -->";
 const END: &str = "<!-- product-statement:end -->";
 const KEYS: &[&str] = &["category", "summary"];
@@ -211,10 +205,12 @@ fn rewrite(site: &str, text: &str, s: &Statement) -> Result<String, String> {
 // spec: gate-sdk/SPEC.md §The non-gate arm — the bare arm prints each site's expected text; `--write`
 // rewrites every site's slot in place, and only after every site has placed its slot
 pub fn emit(args: &[String]) -> Result<String, String> {
-    let st = parse(SOURCE, &crate::emit::read_text(SOURCE)?)?;
+    let source = crate::walk::knob_scalar(SOURCE_KNOB)?;
+    let st = parse(&source, &crate::emit::read_text(&source)?)?;
+    let sites = crate::walk::knob_array(SITES_KNOB)?;
     if args.iter().any(|a| a == "--write") {
         let mut staged: Vec<(&str, String, bool)> = Vec::new();
-        for site in SITES {
+        for site in &sites {
             let text = crate::emit::read_text(site)?;
             let new = rewrite(site, &text, &st)?;
             let changed = new != text;
@@ -233,7 +229,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         return Ok(out);
     }
     let mut out = String::new();
-    for site in SITES {
+    for site in &sites {
         out.push_str(&format!("{}: {}\n", site, expected(site, &st)?));
     }
     Ok(out)

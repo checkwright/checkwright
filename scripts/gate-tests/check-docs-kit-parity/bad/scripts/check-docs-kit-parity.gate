@@ -1,0 +1,3 @@
+# graph: couples=docs/kits.md dir=one valve=none tier=precommit
+# spec: docs/site-architecture.md §Site chrome and the nav contract — the case's own declaration of the page its argument-less run reads
+# knob: GATE_LOCAL_KIT_REGISTRY_PAGE = docs/kits.md

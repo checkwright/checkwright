@@ -16,6 +16,7 @@ const SHELL_COLON: &[&str] = &[
     "install:",
     "armed-by:",
     "projection:",
+    "knob:",
     "exception-list:",
     "no-fixture:",
     "portability-declared:",

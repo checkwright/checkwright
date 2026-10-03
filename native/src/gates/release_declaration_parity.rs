@@ -10,10 +10,12 @@ use std::collections::BTreeSet;
 use std::path::Path;
 
 const NAME: &str = "check-release-declaration-parity";
-const DEFAULT_POSTS: &str = "docs/posts";
 const SECTIONS: [(&str, TokenRule); 3] = [
+    // consumer-value-exempt: a release-note section, the note grammar installer/SPEC.md §The upgrade contract owns
     ("Tightened gates", TokenRule::GateName),
+    // consumer-value-exempt: a release-note section, the note grammar installer/SPEC.md §The upgrade contract owns
     ("Renamed knobs", TokenRule::Backticked),
+    // consumer-value-exempt: a release-note section, the note grammar installer/SPEC.md §The upgrade contract owns
     ("Behavior changes", TokenRule::Bolded),
 ];
 
@@ -44,11 +46,8 @@ fn grounds(section: &str) -> (&'static str, &'static str) {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let posts = args
-        .first()
-        .filter(|a| !a.is_empty())
-        .map(String::as_str)
-        .unwrap_or(DEFAULT_POSTS);
+    let posts = crate::fresh::positional_or_knob(args, 0, "GATE_LOCAL_RELEASE_POSTS_DIR")?;
+    let posts = posts.as_str();
     let decl_file = match args.get(1).filter(|a| !a.is_empty()) {
         Some(a) => a.clone(),
         None => format!("{}/release-declarations.md", walk::knob_scalar("GATE_SDK_WORKFLOW_DIR")?),

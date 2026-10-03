@@ -268,6 +268,89 @@ pub fn projection(text: &str) -> Vec<String> {
         .collect()
 }
 
+// spec: gate-sdk/SPEC.md §The declaration cohort — the descriptor line declaring a knob no static
+// kit's prefix owns, and the prefix its name carries
+pub const KNOB_LINE: &str = "# knob:";
+pub const LOCAL_PREFIX: &str = "GATE_LOCAL_";
+
+// spec: gate-sdk/SPEC.md §The declaration cohort — one declared knob: its declared value, a scalar or
+// an indexed knob's elements in line order, and the descriptor declaring it
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DeclaredKnob {
+    pub name: String,
+    pub value: crate::knobs::Value,
+    pub file: String,
+}
+
+// spec: gate-sdk/SPEC.md §The declaration cohort — every `# knob:` line of one gates directory's
+// descriptors, each read by the knob-file line reader and held to one producer per name
+// spec: gate-sdk/SPEC.md §check-reads-couples — a single-level listing, so a knob read walks no root
+pub fn descriptor_knobs(gates_dir: &str) -> Result<Vec<DeclaredKnob>, String> {
+    use crate::knobfile::Form;
+    use crate::knobs::Value;
+    let dir = Path::new(gates_dir);
+    if !dir.is_dir() {
+        return Ok(Vec::new());
+    }
+    let mut names: Vec<String> = crate::walk::list_dir(dir)?
+        .into_iter()
+        .filter(|(n, is_dir)| !is_dir && n.ends_with(".gate"))
+        .map(|(n, _)| n)
+        .collect();
+    names.sort();
+    let mut out: Vec<DeclaredKnob> = Vec::new();
+    for n in names {
+        let path = format!("{}/{}", gates_dir.trim_end_matches('/'), n);
+        let text = std::fs::read(&path)
+            .map(|b| String::from_utf8_lossy(&b).into_owned())
+            .map_err(|e| format!("cannot read {}: {}", path, e))?;
+        for (idx, line) in text.lines().enumerate() {
+            let Some(rest) = line.strip_prefix(KNOB_LINE) else { continue };
+            let at = format!("{}:{}", path, idx + 1);
+            let entries = crate::knobfile::parse(rest, &path)
+                .map_err(|e| e.replacen(&format!("{}:1:", path), &format!("{}:", at), 1))?;
+            let Some(e) = entries.into_iter().next() else {
+                return Err(format!("{}: a `{}` line carries no knob-file line", at, KNOB_LINE));
+            };
+            if let Some(kit) = crate::knobs::owner(&e.name) {
+                return Err(format!(
+                    "{}: {} is {}'s knob, and a descriptor declares only a name no static kit's prefix owns",
+                    at, e.name, kit.root
+                ));
+            }
+            if !e.name.starts_with(LOCAL_PREFIX) {
+                return Err(format!("{}: {} carries no {} prefix", at, e.name, LOCAL_PREFIX));
+            }
+            let element = match e.form {
+                Form::Scalar => None,
+                Form::Indexed => Some(e.value.clone()),
+                Form::Keyed(_) | Form::Reference(_) => {
+                    return Err(format!(
+                        "{}: {} — a descriptor declares `NAME = value` or one `NAME[] = element` line per element",
+                        at, e.name
+                    ))
+                }
+            };
+            match (out.iter_mut().find(|d| d.name == e.name), element) {
+                (None, None) => out.push(DeclaredKnob { name: e.name, value: Value::Scalar(e.value), file: path.clone() }),
+                (None, Some(el)) => out.push(DeclaredKnob { name: e.name, value: Value::Indexed(vec![el]), file: path.clone() }),
+                (Some(d), Some(el)) if d.file == path && matches!(d.value, Value::Indexed(_)) => {
+                    if let Value::Indexed(v) = &mut d.value {
+                        v.push(el);
+                    }
+                }
+                (Some(d), _) => {
+                    return Err(format!(
+                        "{}: {} is declared again — {} declares it, and a name has one declaring line set",
+                        at, e.name, d.file
+                    ))
+                }
+            }
+        }
+    }
+    Ok(out)
+}
+
 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — one field's value, empty when the field is
 // absent; never an error on a missing field
 pub fn field(fields: &[(String, String)], key: &str) -> String {

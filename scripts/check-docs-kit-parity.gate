@@ -1,2 +1,3 @@
 # graph: couples=docs/*/index.md dir=one valve=none tier=precommit
 # spec: docs/site-architecture.md §Site chrome and the nav contract — every docs/<kit>/index.md carries the nav child block, so a landed kit page cannot fall out of the site nav; the kit rows on docs/kits.md are check-kit-registration's
+# knob: GATE_LOCAL_KIT_REGISTRY_PAGE = docs/kits.md

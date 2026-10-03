@@ -1,3 +1,5 @@
 # graph: couples=companion/toolkits.list,companion/native.list,companion/fixtures/*/*/*/**,docs/spec-toolkits.md,native/src/gates/support_table_fresh.rs,native/src/emit/support_table.rs dir=one valve=none tier=precommit
 # projection: docs/spec-toolkits.md
 # spec: companion/SPEC.md §The support table — the toolkit page's support-table block carries the table the companion fixture tree and native.list derive
+# knob: GATE_LOCAL_SUPPORT_TABLE_PAGE = docs/spec-toolkits.md
+# knob: GATE_LOCAL_COMPANION_DIR = companion

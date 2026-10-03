@@ -1,5 +1,5 @@
-// spec: gate-sdk/SPEC.md §check-consumer-value-literal — every literal a kit-shipped gate's crate
-// modules carry that names a tracked consumer path or heading is a knob or a declared site
+// spec: gate-sdk/SPEC.md §check-consumer-value-literal — every literal a gate's crate modules carry
+// that names a tracked consumer path or heading is a knob or a declared site
 use crate::gates::door_binding::rust_region;
 use crate::registry::{self, GATE_MODULES};
 use crate::{proc, programs, walk};
@@ -12,8 +12,9 @@ const NAME: &str = "check-consumer-value-literal";
 // mandatory on the `door-contributor:` convention and an empty one is malformed, not exempting
 const DECL: &str = "consumer-value-exempt:";
 
-// spec: gate-sdk/SPEC.md §check-consumer-value-literal — the knob tables are the one sanctioned
-// producer of a consumer value, so a file under this crate directory leaves the corpus
+// spec: gate-sdk/SPEC.md §check-consumer-value-literal — the knob tables and the descriptor knob
+// lines are the sanctioned producers of a consumer value, so a file under this crate directory
+// leaves the corpus
 const KNOB_TABLES: &str = "knobs";
 
 pub fn run(args: &[String]) -> i32 {
@@ -274,14 +275,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
     let dirs = registry::resolve_dirs(&gates_dir, &kit_roots);
 
-    // spec: gate-sdk/SPEC.md §check-consumer-value-literal — the members: a registry row whose
-    // descriptor resolves under a kit root ships; one resolving to the gates dir is withheld
+    // spec: gate-sdk/SPEC.md §check-consumer-value-literal — the members: every registry row whose
+    // descriptor resolves, under a kit root or in the gates dir
     let mut members = 0usize;
     let mut corpus: BTreeSet<String> = BTreeSet::new();
     let knob_dir = format!("{}/{}", src, KNOB_TABLES);
     for (member, _) in GATE_MODULES {
-        let Some(desc) = registry::resolve(member, &dirs) else { continue };
-        if !under_any(&kit_roots, &desc) {
+        if registry::resolve(member, &dirs).is_none() {
             continue;
         }
         members += 1;
@@ -292,7 +292,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
     if members == 0 {
-        return Err("no kit-shipped member resolves under any kit root".to_string());
+        return Err("no member resolves under the gates dir or any kit root".to_string());
     }
 
     let listed = proc::run(&programs::GIT, &["ls-files"])?;
@@ -345,12 +345,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     if !findings.is_empty() || !malformed.is_empty() {
         if !findings.is_empty() {
-            println!("{}: kit-shipped gate source carries a consumer value as a literal:", NAME);
+            println!("{}: gate source carries a consumer value as a literal:", NAME);
             for x in &findings {
                 println!("  {}", x);
             }
-            println!("  help: read the value from a knob in the owning kit's table, the literal as its");
-            println!("        default (gate-sdk/SPEC.md §The knob file), or declare the site with");
+            println!("  help: read the value from a knob, the literal as its default, in the owning kit's");
+            println!("        table or on the reading gate's descriptor (gate-sdk/SPEC.md §The knob file,");
+            println!("        §The declaration cohort), or declare the site with");
             println!("        '// {} <reason>' on the literal's line or the line above.", DECL);
         }
         if !malformed.is_empty() {
@@ -369,7 +370,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     // spec: gate-sdk/SPEC.md §check-consumer-value-literal — the counts are a report with no floor
     println!(
-        "CONSUMER-VALUE-LITERAL: clean ({} kit-shipped member(s) swept, {} crate file(s) read, {} literal(s) read, {} site(s) valved)",
+        "CONSUMER-VALUE-LITERAL: clean ({} member(s) swept, {} crate file(s) read, {} literal(s) read, {} site(s) valved)",
         members,
         corpus.len(),
         read_lits,

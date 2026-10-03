@@ -10,16 +10,10 @@ use crate::fresh;
 use crate::registry;
 use std::path::Path;
 
-const DEFAULT_INSTALL_MD: &str = "docs/install.md";
-// spec: gate-sdk/SPEC.md §Consumer payload — a positional operand with a layout default and never
-// a read of GATE_SDK_NATIVE_TARGETS_FILE, whose value is a smoke's narrowed host roster: a bound
-// reading that would be discharged by the narrowing rather than by the declaration
-const DEFAULT_ROSTER: &str = "native/targets.list";
-// spec: installer/SPEC.md §The gate binary — the two hand-kept host detectors, read as the
-// OWNERS of their triple sets rather than against a roster comment beside them, which would be the
-// second copy this whole binding exists to refuse
-const DEFAULT_BASH_BOOTSTRAP: &str = "installer/bin/checkwright.sh";
-const DEFAULT_PWSH_BOOTSTRAP: &str = "installer/bin/checkwright.ps1";
+// spec: gate-sdk/SPEC.md §Consumer payload — the roster is this gate's own knob and never
+// GATE_SDK_NATIVE_TARGETS_FILE, whose value is a smoke's narrowed host roster: a bound reading that
+// would be discharged by the narrowing rather than by the declaration
+const ROSTER_KNOB: &str = "GATE_LOCAL_TARGETS_ROSTER";
 const BEGIN: &str = "<!-- platforms:begin -->";
 const END: &str = "<!-- platforms:end -->";
 // spec: docs/site-architecture.md §Generated projections and their freshness gates — two join
@@ -415,10 +409,15 @@ fn unserved(decls: &[Decl], pinned: &Pinned) -> (Vec<(String, String)>, bool) {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let install_md = fresh::positional(args, 0, DEFAULT_INSTALL_MD);
-    let roster = fresh::positional(args, 1, DEFAULT_ROSTER);
-    let bash_path = fresh::positional(args, 2, DEFAULT_BASH_BOOTSTRAP);
-    let pwsh_path = fresh::positional(args, 3, DEFAULT_PWSH_BOOTSTRAP);
+    let install_md = fresh::positional_or_knob(args, 0, "GATE_LOCAL_INSTALL_PAGE")?;
+    let roster = fresh::positional_or_knob(args, 1, ROSTER_KNOB)?;
+    // spec: installer/SPEC.md §The gate binary — the two hand-kept host detectors, read as the
+    // OWNERS of their triple sets rather than against a roster comment beside them, which would be
+    // the second copy this whole binding exists to refuse
+    let bash_path = fresh::positional_or_knob(args, 2, "GATE_LOCAL_BOOTSTRAP_SH")?;
+    let pwsh_path = fresh::positional_or_knob(args, 3, "GATE_LOCAL_BOOTSTRAP_PS1")?;
+    let (install_md, roster) = (install_md.as_str(), roster.as_str());
+    let (bash_path, pwsh_path) = (bash_path.as_str(), pwsh_path.as_str());
     let pinned = pinned_input(args, install_md, roster)?;
 
     if !Path::new(install_md).is_file() {

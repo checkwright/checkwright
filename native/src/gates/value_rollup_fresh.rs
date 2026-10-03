@@ -3,7 +3,6 @@
 use crate::fresh;
 use std::path::Path;
 
-const DEFAULT_PROJECTION: &str = "docs/value.md";
 const BEGIN: &str = "<!-- value-rollup:begin -->";
 const END: &str = "<!-- value-rollup:end -->";
 
@@ -24,7 +23,8 @@ fn marker_block(text: &str) -> String {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let projection = fresh::positional(args, 0, DEFAULT_PROJECTION);
+    let projection = fresh::positional_or_knob(args, 0, "GATE_LOCAL_VALUE_PAGE")?;
+    let projection = projection.as_str();
     let emit_src = args.get(1).map(String::as_str).unwrap_or("");
 
     if !Path::new(projection).is_file() {

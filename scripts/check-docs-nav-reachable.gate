@@ -1,2 +1,3 @@
 # graph: couples=docs/*.md,docs/*/index.md,docs/*/SPEC.md,docs/*/README.md,docs/doctrine-kit/DOCTRINE.md,docs/posts/*.md,scripts/docs-offnav.list dir=one valve=none tier=precommit
 # spec: docs/site-architecture.md §Site chrome and the nav contract — every tracked docs page carries a title front-matter block and holds a menu entry of its own (a nav slot, a derived child, a generated-sibling suffix link, or a nav_suffix pair), or is listed in the off-nav allowlist
+# knob: GATE_LOCAL_OFFNAV_LIST = scripts/docs-offnav.list

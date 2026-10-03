@@ -7,7 +7,7 @@ use crate::gates::release_bump::read_text;
 use crate::walk;
 use std::path::Path;
 
-const DEFAULT_POSTS: &str = "docs/posts";
+// consumer-value-exempt: a release-note section, the note grammar installer/SPEC.md §The upgrade contract owns
 const SECTION: &str = "Tightened gates";
 
 // spec: gate-sdk/SPEC.md §lib/declaration.sh — `^release:[[:space:]]+v`, the gate's own literal
@@ -34,11 +34,8 @@ pub fn run(args: &[String]) -> i32 {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let posts = args
-        .first()
-        .filter(|a| !a.is_empty())
-        .map(String::as_str)
-        .unwrap_or(DEFAULT_POSTS);
+    let posts = crate::fresh::positional_or_knob(args, 0, "GATE_LOCAL_RELEASE_POSTS_DIR")?;
+    let posts = posts.as_str();
     if !Path::new(posts).is_dir() {
         return Err(format!("posts dir not found: {}", posts));
     }

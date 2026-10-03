@@ -105,6 +105,7 @@ pub fn queue_source(payload: &Path, kits: &[String]) -> Option<String> {
         if needs_queue(kit) {
             needs = true;
         }
+        // consumer-value-exempt: the queue template's name in a kit root (installer/SPEC.md §What init seeds)
         let candidate = ["templates", "TASK-QUEUE.md"]
             .iter()
             .fold(crate::walk::child(payload, kit), |d, seg| crate::walk::child(&d, seg));
@@ -180,6 +181,7 @@ pub fn seed(kit: &str, kit_payload: &Path, root: &Path, dry: bool) -> Result<Vec
         "evidence-kit" => {
             seed_absent(
                 root,
+                // consumer-value-exempt: the layout init writes a new tree against (installer/SPEC.md §What init seeds)
                 ".workflow/validate-baseline.txt",
                 "# contract: evidence-kit/SPEC.md §Baseline manifest — held-constant validate baseline: <suite> <scenario> <status> [<slug> [reproduces-at=<rev>]]\n",
                 dry,
@@ -187,6 +189,7 @@ pub fn seed(kit: &str, kit_payload: &Path, root: &Path, dry: bool) -> Result<Vec
             )?;
             seed_absent(
                 root,
+                // consumer-value-exempt: the layout init writes a new tree against (installer/SPEC.md §What init seeds)
                 ".workflow/validate-evidence.txt",
                 "# contract: evidence-manifest v1\n",
                 dry,

@@ -52,12 +52,16 @@ pub const FLAGS: &[(&str, &[&str])] = &[
 // spec: installer/SPEC.md §What init seeds — the consumer-layout names the verbs write against,
 // which are the owning kits' own defaults, held here because a second verb reads what init wrote:
 // uninstall trims the agent file, demo stages its claim in the queue and state file.
+// consumer-value-exempt: the layout init writes a new tree against (installer/SPEC.md §What init seeds)
 pub const GATES_DIR: &str = "scripts";
 // spec: installer/SPEC.md §Profiles — the payload's one reserved sibling of the kit roots: the
 // packer writes the prebuilt binaries there, so it is a payload directory that is not a kit
 pub const ARTIFACT_DIR: &str = "artifact";
+// consumer-value-exempt: the layout init writes a new tree against (installer/SPEC.md §What init seeds)
 pub const AGENT_FILE: &str = "CLAUDE.md";
+// consumer-value-exempt: the layout init writes a new tree against (installer/SPEC.md §What init seeds)
 pub const QUEUE_FILE: &str = "TASK-QUEUE.md";
+// consumer-value-exempt: the layout init writes a new tree against (installer/SPEC.md §What init seeds)
 pub const STATE_FILE: &str = ".workflow/WORKFLOW-STATE.txt";
 
 // spec: installer/SPEC.md §init — the rule that an install's size is never bounded by the host's

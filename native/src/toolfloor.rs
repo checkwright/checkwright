@@ -284,7 +284,10 @@ pub fn owed(element: &str, selection: Option<&Selection>) -> Owing {
 
 // spec: context-kit/SPEC.md §bin/env-probe — the roster's home, named for the reports that cite
 // where a verdict came from; a caller handed no override reads `PROBE_SET` above directly.
-pub const ROSTER: &str = "native/src/toolfloor.rs";
+pub fn roster() -> Result<String, String> {
+    let src = crate::walk::knob_scalar("GATE_SDK_NATIVE_SRC")?;
+    Ok(format!("{}/toolfloor.rs", src.trim_end_matches('/')))
+}
 
 // spec: context-kit/SPEC.md §bin/env-probe — `<name>[:<min-version>[:<impl-token>[:<audience>]]]`,
 // positional, an empty field meaning unconstrained on that axis exactly as an omitted trailing one

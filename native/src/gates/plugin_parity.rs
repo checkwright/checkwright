@@ -10,11 +10,9 @@ use std::collections::BTreeSet;
 use std::path::Path;
 
 const NAME: &str = "check-plugin-parity";
-const PLUGIN_DIR: &str = "plugin";
-const MARKETPLACE: &str = ".claude-plugin/marketplace.json";
+// consumer-value-exempt: the plugin package's license file name, a file under the plugin directory
+const PLUGIN_LICENSE: &str = "LICENSE";
 const HOOKS_TEMPLATE: &str = "guard-kit/templates/settings-hooks.json";
-const INSTALL_SH: &str = "docs/install.sh";
-const LICENSE: &str = "LICENSE";
 const PORTABLE: &str = "plugin.json";
 const HARNESS: &str = ".claude-plugin/plugin.json";
 const HOOKS: &str = "hooks/hooks.json";
@@ -143,11 +141,11 @@ fn shims(dir: &str) -> Result<Vec<(String, String)>, String> {
 // spec: plugin/SPEC.md §check-plugin-parity — the marketplace pinned to the hosted install pin (D),
 // and the pinned release carrying the package or pending this iteration's release (E)
 fn publication(
+    plugin: &str,
     marketplace: &str,
     portable: &Value,
     install_sh: &str,
-    disposition_path: &str,
-    queue_path: &str,
+    (disposition_path, queue_path): (&str, &str),
     args: &[String],
     findings: &mut Vec<String>,
 ) -> Result<String, String> {
@@ -167,7 +165,7 @@ fn publication(
         let expect: [(&str, Option<&Value>, Value); 6] = [
             ("name", e.get("name"), portable.get("name").cloned().unwrap_or(Value::Null)),
             ("source.source", src.and_then(|s| s.get("source")), Value::from("git-subdir")),
-            ("source.path", src.and_then(|s| s.get("path")), Value::from(PLUGIN_DIR)),
+            ("source.path", src.and_then(|s| s.get("path")), Value::from(plugin)),
             ("source.url", src.and_then(|s| s.get("url")), slug.map(Value::from).unwrap_or(Value::Null)),
             ("source.ref", src.and_then(|s| s.get("ref")), Value::from(tag.clone())),
             ("version", e.get("version"), Value::from(pin.clone())),
@@ -183,7 +181,7 @@ fn publication(
         pinned_answer(&args[7])?
     } else if pinned_release::pinned_tag()?.is_none() {
         Pinned::Unresolved
-    } else if pinned_release::carries(&tag, &format!("{}/{}", PLUGIN_DIR, HARNESS))? {
+    } else if pinned_release::carries(&tag, &format!("{}/{}", plugin, HARNESS))? {
         Pinned::Carries
     } else {
         Pinned::Lacks
@@ -197,7 +195,7 @@ fn publication(
             Disposition::Withheld(field) => {
                 findings.push(format!(
                     "  {}: the pinned release {} carries no {}/{} while iteration {}'s disposition is {}",
-                    marketplace, tag, PLUGIN_DIR, HARNESS, iteration, field
+                    marketplace, tag, plugin, HARNESS, iteration, field
                 ));
                 String::new()
             }
@@ -212,12 +210,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Err("usage: check-plugin-parity [plugin-dir marketplace skills-dir hooks-template install-sh disposition queue pinned license]".to_string());
     }
     let arg = |i: usize, d: &str| if positional { args[i].clone() } else { d.to_string() };
-    let plugin = arg(0, PLUGIN_DIR);
-    let marketplace = arg(1, MARKETPLACE);
+    let knob = |i: usize, k: &str| if positional { Ok(args[i].clone()) } else { walk::knob_scalar(k) };
+    let plugin = knob(0, "GATE_LOCAL_PLUGIN_DIR")?;
+    let marketplace = knob(1, "GATE_LOCAL_MARKETPLACE_FILE")?;
     let skills_dir = if positional { args[2].clone() } else { walk::knob_scalar("LIFECYCLE_KIT_SKILLS_DIR")? };
     let hooks_template = arg(3, HOOKS_TEMPLATE);
-    let install_sh = arg(4, INSTALL_SH);
-    let root_license = arg(8, LICENSE);
+    let install_sh = knob(4, "GATE_LOCAL_INSTALL_SH")?;
+    let root_license = knob(8, "GATE_SDK_PAYLOAD_LICENSE")?;
     let (disposition_path, queue_path) = if positional {
         (args[5].clone(), args[6].clone())
     } else {
@@ -344,7 +343,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // spec: plugin/SPEC.md §check-plugin-parity — the marketplace installs `plugin/` alone, so its
     // license text is a tracked byte copy of the root file (F)
     let want_license = std::fs::read(&root_license).map_err(|e| format!("cannot read {}: {}", root_license, e))?;
-    let license_path = format!("{}/{}", plugin, LICENSE);
+    let license_path = format!("{}/{}", plugin, PLUGIN_LICENSE);
     let license_state = match std::fs::read(&license_path) {
         Ok(got) if got == want_license => None,
         Ok(_) => Some("differs from"),
@@ -359,7 +358,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     let publication = if Path::new(&marketplace).exists() {
-        publication(&marketplace, &portable, &install_sh, &disposition_path, &queue_path, args, &mut findings)?
+        publication(&plugin, &marketplace, &portable, &install_sh, (&disposition_path, &queue_path), args, &mut findings)?
     } else {
         format!("D and E dormant — {} is withdrawn", marketplace)
     };

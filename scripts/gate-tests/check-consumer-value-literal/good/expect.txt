@@ -1,1 +1,1 @@
-CONSUMER-VALUE-LITERAL: clean (1 kit-shipped member(s) swept, 1 crate file(s) read, 6 literal(s) read, 3 site(s) valved)
+CONSUMER-VALUE-LITERAL: clean (2 member(s) swept, 2 crate file(s) read, 7 literal(s) read, 4 site(s) valved)

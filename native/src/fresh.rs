@@ -118,6 +118,20 @@ pub fn positional_or_knob(args: &[String], n: usize, knob: &str) -> Result<Strin
     }
 }
 
+// spec: gate-sdk/SPEC.md §check-consumer-value-literal — a file under a directory knob: the knob's
+// value joined with the file name the crate keeps as its literal tail
+pub fn knob_joined(knob: &str, tail: &str) -> Result<String, String> {
+    let dir = crate::walk::knob_scalar(knob)?;
+    Ok(format!("{}/{}", strip_trailing_slash(&dir), tail))
+}
+
+pub fn positional_or_joined(args: &[String], n: usize, knob: &str, tail: &str) -> Result<String, String> {
+    match args.get(n).filter(|a| !a.is_empty()) {
+        Some(a) => Ok(a.clone()),
+        None => knob_joined(knob, tail),
+    }
+}
+
 // spec: gate-sdk/SPEC.md §The consumer remainder cohort — bash's `${ROOT%/}`
 pub fn strip_trailing_slash(s: &str) -> &str {
     s.strip_suffix('/').unwrap_or(s)

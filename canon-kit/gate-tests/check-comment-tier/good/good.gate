@@ -1,4 +1,6 @@
 # graph: couples=X dir=one valve=none tier=precommit
 # install: zero-config
+# knob: GATE_LOCAL_PROBE_PAGE = docs/page.md
+# knob: GATE_LOCAL_PROBE_SITES[] = a.md
 # spec: some/SPEC.md §thing — the descriptor arm of the governed corpus: a
 #   declaration file is directives end to end, and the run cap covers this wrap.

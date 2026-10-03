@@ -5,10 +5,7 @@ use crate::walk;
 use std::path::Path;
 
 const NAME: &str = "check-license-line";
-const SOURCE: &str = "scripts/license-line.conf";
-const HEADING: &str = "## License";
 const LEAD: &str = "Licensed under";
-const README: &str = "README.md";
 
 #[derive(Debug, PartialEq)]
 enum Form {
@@ -143,9 +140,9 @@ fn render(conf: &Conf, site: &str, form: &Form) -> Result<String, String> {
 
 // spec: docs/site-architecture.md §The license line — a section runs from its heading to the next
 // heading of level one or two, or the end of the file; `None` when the heading is absent
-fn license_section(text: &str) -> Option<Vec<&str>> {
+fn license_section<'a>(text: &'a str, heading: &str) -> Option<Vec<&'a str>> {
     let lines = fresh::file_lines(text);
-    let start = lines.iter().position(|l| l.trim_end() == HEADING)?;
+    let start = lines.iter().position(|l| l.trim_end() == heading)?;
     Some(
         lines[start + 1..]
             .iter()
@@ -180,7 +177,8 @@ fn site_key(p: &Path) -> String {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let source = fresh::positional(args, 0, SOURCE);
+    let source = fresh::positional_or_knob(args, 0, "GATE_LOCAL_LICENSE_CONF")?;
+    let source = source.as_str();
     let root = fresh::strip_trailing_slash(fresh::positional(args, 1, ".")).to_string();
     if !fresh::is_dir(&root) {
         return Err(format!("root not found: {}", root));
@@ -189,6 +187,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
         source,
         &fresh::read_captured(source).map_err(|e| format!("{}: {}", source, e))?,
     )?;
+    let heading = walk::knob_scalar("GATE_LOCAL_LICENSE_HEADING")?;
+    let heading = heading.as_str();
+    let readme = walk::knob_scalar("GATE_LOCAL_README_FILE")?;
     let at_root = |p: &str| Path::new(&root).join(p).display().to_string();
 
     let mut findings: Vec<String> = Vec::new();
@@ -212,16 +213,16 @@ fn rule(args: &[String]) -> Result<i32, String> {
             }
             lines
         } else {
-            match license_section(&text) {
+            match license_section(&text, heading) {
                 None => {
-                    findings.push(format!("  {}: no '{}' section", site, HEADING));
+                    findings.push(format!("  {}: no '{}' section", site, heading));
                     continue;
                 }
                 Some(lines) if lines.len() != 1 => {
                     findings.push(format!(
                         "  {}: the '{}' section carries {} line(s), not one",
                         site,
-                        HEADING,
+                        heading,
                         lines.len()
                     ));
                     continue;
@@ -236,17 +237,17 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     let mut covered = 0usize;
-    for p in walk::find_named(Path::new(&root), &[README])? {
+    for p in walk::find_named(Path::new(&root), &[readme.as_str()])? {
         let rel = site_key(p.strip_prefix(&root).unwrap_or(&p));
         let text = fresh::read_captured(&p.display().to_string()).map_err(|e| format!("{}: {}", rel, e))?;
-        if generated(&text) || !fresh::file_lines(&text).iter().any(|l| l.trim_end() == HEADING) {
+        if generated(&text) || !fresh::file_lines(&text).iter().any(|l| l.trim_end() == heading) {
             continue;
         }
         covered += 1;
         if !conf.sites.iter().any(|(s, _)| *s == rel) {
             findings.push(format!(
                 "  {}: carries '{}' but is not a declared site in {}",
-                rel, HEADING, source
+                rel, heading, source
             ));
         }
     }
@@ -258,7 +259,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     if let Some(dir) = &conf.pages {
         for p in walk::find_files(&Path::new(&root).join(dir), &["md"])? {
             let rel = site_key(p.strip_prefix(&root).unwrap_or(&p));
-            if p.file_name().is_some_and(|n| n == README) {
+            if p.file_name().is_some_and(|n| n == readme.as_str()) {
                 continue;
             }
             let text = fresh::read_captured(&p.display().to_string()).map_err(|e| format!("{}: {}", rel, e))?;
@@ -266,10 +267,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 continue;
             }
             pages += 1;
-            if license_section(&text).is_some() {
+            if license_section(&text, heading).is_some() {
                 findings.push(format!(
                     "  {}: a page under {} carries '{}', which the site chrome already states",
-                    rel, dir, HEADING
+                    rel, dir, heading
                 ));
             }
         }
@@ -341,8 +342,8 @@ mod tests {
     #[test]
     fn the_section_ends_at_the_next_heading_and_drops_blanks() {
         let text = "# T\n\n## License\n\nLine one.\n\n### Sub\nmore\n## Next\nafter\n";
-        assert_eq!(license_section(text).unwrap(), vec!["Line one.", "### Sub", "more"]);
-        assert_eq!(license_section("# T\n## Other\n"), None);
+        assert_eq!(license_section(text, "## License").unwrap(), vec!["Line one.", "### Sub", "more"]);
+        assert_eq!(license_section("# T\n## Other\n", "## License"), None);
     }
 
     #[test]

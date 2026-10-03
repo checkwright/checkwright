@@ -10,6 +10,7 @@ use std::collections::BTreeSet;
 use std::path::Path;
 
 const NAME: &str = "check-guard-registration";
+// consumer-value-exempt: guard-kit/SPEC.md's section, a kit constant the docs mirror also carries
 const SECTION: &str = "The rule roster";
 const CLAUSE: &str = "Declares `";
 const SHELLS: &str = "Shells `";

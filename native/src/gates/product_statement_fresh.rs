@@ -14,11 +14,12 @@ pub fn run(args: &[String]) -> i32 {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let source = fresh::positional(args, 0, ps::SOURCE);
-    let sites: Vec<&str> = if args.len() > 1 {
-        args[1..].iter().map(String::as_str).collect()
+    let source = fresh::positional_or_knob(args, 0, ps::SOURCE_KNOB)?;
+    let source = source.as_str();
+    let sites: Vec<String> = if args.len() > 1 {
+        args[1..].to_vec()
     } else {
-        ps::SITES.to_vec()
+        crate::walk::knob_array(ps::SITES_KNOB)?
     };
     let st = ps::parse(source, &fresh::read_captured(source).map_err(|e| format!("{}: {}", source, e))?)?;
 

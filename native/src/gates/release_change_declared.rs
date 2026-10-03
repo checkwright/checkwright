@@ -8,6 +8,7 @@ use crate::{proc, programs};
 use std::path::Path;
 
 const NAME: &str = "check-release-change-declared";
+// consumer-value-exempt: a release-note section, the note grammar installer/SPEC.md §The upgrade contract owns
 const SECTION: &str = "Behavior changes";
 
 pub fn run(args: &[String]) -> i32 {

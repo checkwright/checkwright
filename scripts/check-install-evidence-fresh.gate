@@ -1,3 +1,4 @@
 # graph: couples=docs/install-evidence.md,scripts/gates.list,native/src/diff.rs,knob:DRIFT_KIT_INSTALL_RECORD dir=one valve=none tier=precommit trigger=docs/install-evidence.md,scripts/gates.list,native/src/diff.rs,knob:DRIFT_KIT_INSTALL_RECORD
 # projection: docs/install-evidence.md
 # spec: drift-kit/SPEC.md §The install-evidence projection — docs/install-evidence.md is the byte-fresh projection of the install-evidence arm, inert on a counted zero where the gitignored record resolves to no file
+# knob: GATE_LOCAL_INSTALL_EVIDENCE_PAGE = docs/install-evidence.md

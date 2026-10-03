@@ -241,8 +241,19 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let disposed_file = walk::knob_scalar("LIFECYCLE_KIT_DISPOSED_FILE")
         .map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
     let prune = walk::prune_dirs().map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
+    // spec: canon-kit/SPEC.md §Layout and configuration — the release record is valved as frozen:
+    // the posts directory, the evidence projection and the release declarations, each by its knob
+    let frozen = || -> Result<(String, String, String), String> {
+        Ok((
+            fresh::strip_trailing_slash(&walk::knob_scalar("GATE_LOCAL_RELEASE_POSTS_DIR")?).to_string(),
+            walk::knob_scalar("GATE_LOCAL_EVIDENCE_PAGE")?,
+            fresh::knob_joined("GATE_SDK_WORKFLOW_DIR", "release-declarations.md")?,
+        ))
+    };
+    let (posts_dir, evidence_page, declarations) =
+        frozen().map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
 
-    let ls = proc::run(&programs::GIT, &["ls-files", "--", scanroot])
+    let ls =proc::run(&programs::GIT, &["ls-files", "--", scanroot])
         .map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
     let listing = match ls.stdout() {
         Some(o) => String::from_utf8_lossy(o).into_owned(),
@@ -262,9 +273,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
         if walk::path_pruned(path, &prune) {
             continue;
         }
-        if path.starts_with("docs/posts/")
-            || path == "docs/evidence-data.md"
-            || path == ".workflow/release-declarations.md"
+        if walk::at_or_under(&posts_dir, path)
+            || path == evidence_page
+            || path == declarations
             || path == gap_inbox_file
             || path == consult_inbox_file
             || path == survey_record_file

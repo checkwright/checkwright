@@ -62,6 +62,7 @@ fn delegation_model_section(text: &str) -> String {
 }
 
 fn is_delegation_model_heading(line: &str) -> bool {
+    // consumer-value-exempt: delegation-kit/SPEC.md's section, a kit constant the docs mirror also carries
     match line.strip_prefix("## The delegation model") {
         Some(rest) => rest
             .bytes()

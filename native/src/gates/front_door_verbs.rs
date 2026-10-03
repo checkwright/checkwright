@@ -2,24 +2,12 @@
 // every advertised verb, flag, operand and arm is in the pinned release, or pending its release (B)
 use super::pinned_release::{self, read, Disposition};
 use crate::knobfile::{self, Form};
+use crate::{fresh, walk};
 use std::collections::BTreeSet;
 use std::path::Path;
 
 const NAME: &str = "check-front-door-verbs";
-const README: &str = "installer/README.md";
-const PROFILES: &str = "installer/profiles.list";
-const EMIT_SRC: &str = "native/src/emit/mod.rs";
-const MAIN_SRC: &str = "native/src/main.rs";
 const RECIPE_KNOB: &str = "GATE_SDK_PAYLOAD_RECIPES";
-const PAGES: &[&str] = &[
-    "README.md",
-    "docs/index.md",
-    "docs/install.md",
-    "installer/README.md",
-    "plugin/skills/install/SKILL.md",
-    "docs/speckit.md",
-    "docs/openspec.md",
-];
 const ROUTES: &[&str] = &["sh -s --", "install.ps1)))", "npx checkwright"];
 const CODE_ROUTE: &str = "checkwright";
 // spec: installer/SPEC.md §The front door's verbs — the one flag a route may lead with
@@ -29,9 +17,6 @@ const STOPS: &[&str] = &["|", ";", "&&", "||", ")"];
 // spec: installer/SPEC.md §The front door's verbs — the two flags whose operand is held to a roster
 const PROFILE_FLAG: &str = "--profile";
 const RECIPE_FLAG: &str = "--recipe";
-// spec: installer/SPEC.md §The front door's verbs — the page section describing a checkout, whose
-// binary is built from the tree, so it is not read for arms
-const CHECKOUT_SECTION: (&str, &str) = ("README.md", "## This repo, governed");
 const EMIT: &str = "--emit";
 
 type Pair = (String, String);
@@ -224,10 +209,36 @@ fn arm_table(emit_src: &str, main_src: &str) -> Option<BTreeSet<String>> {
     Some(arms.into_iter().chain(top).collect())
 }
 
+// spec: installer/SPEC.md §The front door's verbs — the repo-relative files each tree is read at:
+// the installer's README and profile roster, the crate's two arm sources, and the page section
+// describing a checkout, whose binary is built from the tree, so it is not read for arms
+struct Layout {
+    readme: String,
+    profiles: String,
+    emit_src: String,
+    main_src: String,
+    checkout: (String, String),
+}
+
+fn layout() -> Result<Layout, String> {
+    Ok(Layout {
+        // consumer-value-exempt: a file name under the installer directory knob, no layout of its own
+        readme: fresh::knob_joined("GATE_LOCAL_INSTALLER_DIR", "README.md")?,
+        profiles: fresh::knob_joined("GATE_LOCAL_INSTALLER_DIR", "profiles.list")?,
+        emit_src: fresh::knob_joined("GATE_SDK_NATIVE_SRC", "emit/mod.rs")?,
+        main_src: fresh::knob_joined("GATE_SDK_NATIVE_SRC", "main.rs")?,
+        checkout: (
+            walk::knob_scalar("GATE_LOCAL_README_FILE")?,
+            walk::knob_scalar("GATE_LOCAL_CHECKOUT_SECTION")?,
+        ),
+    })
+}
+
 // spec: installer/SPEC.md §The front door's verbs — a tree carrying neither source file predates
 // the gate binary and has the empty arm set; one carrying either must yield both arrays
-fn pinned_arms(tree: &Tree) -> Result<BTreeSet<String>, String> {
-    let (emit, main) = (tree.get(EMIT_SRC)?, tree.get(MAIN_SRC)?);
+fn pinned_arms(tree: &Tree, l: &Layout) -> Result<BTreeSet<String>, String> {
+    let (emit_src, main_src) = (l.emit_src.as_str(), l.main_src.as_str());
+    let (emit, main) = (tree.get(emit_src)?, tree.get(main_src)?);
     if emit.is_none() && main.is_none() {
         return Ok(BTreeSet::new());
     }
@@ -235,8 +246,8 @@ fn pinned_arms(tree: &Tree) -> Result<BTreeSet<String>, String> {
         format!(
             "{} carries no `ARMS` array in {} or no `TOP_LEVEL_FLAGS` array in {}, or one yielding no member, so its arm set could not be read",
             tree.label(),
-            EMIT_SRC,
-            MAIN_SRC
+            emit_src,
+            main_src
         )
     })
 }
@@ -321,9 +332,9 @@ fn code_texts(text: &str) -> Vec<(usize, &str)> {
 // spec: installer/SPEC.md §The front door's verbs — the arms a page names: each inline code span
 // outside a fence and outside the checkout section whose first token opens with `--` and is no
 // flag, `--emit <name>` read as `--emit-<name>`
-fn advertised_arms(page: &str, text: &str, flags: &BTreeSet<String>) -> Vec<(usize, String)> {
+fn advertised_arms(page: &str, text: &str, flags: &BTreeSet<String>, checkout: (&str, &str)) -> Vec<(usize, String)> {
     let mut out = Vec::new();
-    let (mut fenced, mut checkout) = (false, false);
+    let (mut fenced, mut in_checkout) = (false, false);
     for (i, line) in text.lines().enumerate() {
         let t = line.trim_start();
         if t.starts_with("```") || t.starts_with("~~~") {
@@ -334,10 +345,10 @@ fn advertised_arms(page: &str, text: &str, flags: &BTreeSet<String>) -> Vec<(usi
             continue;
         }
         if t.starts_with("# ") || t.starts_with("## ") {
-            checkout = page == CHECKOUT_SECTION.0 && line.trim_end() == CHECKOUT_SECTION.1;
+            in_checkout = page == checkout.0 && line.trim_end() == checkout.1;
             continue;
         }
-        if checkout {
+        if in_checkout {
             continue;
         }
         for (k, seg) in line.split('`').enumerate() {
@@ -527,8 +538,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let pages: Vec<String> = if positional {
         args[4..].to_vec()
     } else {
-        PAGES.iter().map(|p| p.to_string()).collect()
+        walk::knob_array("GATE_LOCAL_FRONT_DOOR_SURFACES")?
     };
+    let l = layout()?;
 
     let (iteration, disp) = pinned_release::iteration_disposition(&disposition_path, &queue_path)?;
     let seam = seam_path()?;
@@ -536,24 +548,24 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let binary = binary_verbs();
     let binary_flags = binary_flags();
     let binary_arms = binary_arms();
-    let readme = head.path(README);
-    let readme_text = head.required(README)?;
+    let readme = head.path(&l.readme);
+    let readme_text = head.required(&l.readme)?;
     let head_verbs: BTreeSet<String> = table(&readme, &readme_text)?.into_iter().collect();
     let head_flags = head_flags(&readme, &readme_text)?;
-    let head_profiles = profile_set(head.get(PROFILES)?);
+    let head_profiles = profile_set(head.get(&l.profiles)?);
     let head_recipes = recipe_set(&head.path(&seam), head.get(&seam)?)?;
     // spec: installer/SPEC.md §The front door's verbs — a tag carrying no flag table, roster or seam
     // file has the empty set for it, never a dormancy
     let pinned: Option<Pinned> = match &pinned_tree {
         Some(t) => {
             let label = t.label();
-            let text = t.required(README)?;
+            let text = t.required(&l.readme)?;
             Some(Pinned {
                 verbs: table(&label, &text)?.into_iter().collect(),
                 flags: flag_table(&text).unwrap_or_default().into_iter().collect(),
-                profiles: profile_set(t.get(PROFILES)?),
+                profiles: profile_set(t.get(&l.profiles)?),
                 recipes: recipe_set(&t.path(&seam), t.get(&seam)?)?,
-                arms: pinned_arms(t)?,
+                arms: pinned_arms(t, &l)?,
                 label,
             })
         }
@@ -651,7 +663,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 }
             }
         }
-        for (n, arm) in advertised_arms(page, &text, &flag_names) {
+        for (n, arm) in advertised_arms(page, &text, &flag_names, (&l.checkout.0, &l.checkout.1)) {
             arm_sites += 1;
             let Some(p) = &pinned else { continue };
             match verdict(&disp, p.arms.contains(&arm), binary_arms.contains(&arm)) {
@@ -809,7 +821,7 @@ mod tests {
         let page = "# p\n\nRun `--emit env-probe`, `--measure-commit` or `--run x`; pass `--profile prose`.\n\
                     Not `--emit <name>`, nor `checkwright --run`.\n\n```sh\n--usage-poll\n```\n\n\
                     ## This repo, governed\n\n`--install-hooks`\n\n### Sub\n\n`--run-demo`\n\n## After\n\n`--list`\n";
-        let arms = |p: &str| -> Vec<(usize, String)> { advertised_arms(p, page, &flags) };
+        let arms = |p: &str| -> Vec<(usize, String)> { advertised_arms(p, page, &flags, ("README.md", "## This repo, governed")) };
         let s = |n: usize, a: &str| (n, a.to_string());
         let outside = vec![s(3, "--emit-env-probe"), s(3, "--measure-commit"), s(3, "--run"), s(20, "--list")];
         assert_eq!(arms("README.md"), outside);

@@ -164,7 +164,7 @@ fn scratch() -> Result<String, String> {
 fn vendor(tree: &str, base: &str, layout: &'static str) -> Result<Layout, String> {
     let dir = format!("{}/{}", base, layout);
     let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
-    let gates_leaf = gates_dir.trim_end_matches('/').rsplit('/').next().unwrap_or("scripts").to_string();
+    let gates_leaf = gates_dir.trim_end_matches('/').rsplit('/').next().unwrap_or(crate::knobs::GATES_DIR_DEFAULT).to_string();
     std::fs::create_dir_all(&dir).map_err(|e| format!("cannot create {}: {}", dir, e))?;
     let mut sdk_parent = dir.clone();
     if layout == "nested" {

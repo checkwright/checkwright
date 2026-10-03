@@ -6,10 +6,6 @@ use super::release_channel_parity::newest_tag;
 use crate::{fresh, proc, programs};
 use std::path::Path;
 
-const DEFAULT_INSTALL_SH: &str = "docs/install.sh";
-const DEFAULT_INSTALL_PS1: &str = "docs/install.ps1";
-const DEFAULT_INSTALL_MD: &str = "docs/install.md";
-
 pub fn run(args: &[String]) -> i32 {
     match rule(args) {
         Ok(rc) => rc,
@@ -262,9 +258,10 @@ fn pinned_declaration(doc_arg: Option<&str>, pin: &str) -> Result<Option<(String
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let install_sh = fresh::positional(args, 0, DEFAULT_INSTALL_SH);
-    let install_ps1 = fresh::positional(args, 1, DEFAULT_INSTALL_PS1);
-    let install_md = fresh::positional(args, 2, DEFAULT_INSTALL_MD);
+    let install_sh = fresh::positional_or_knob(args, 0, "GATE_LOCAL_INSTALL_SH")?;
+    let install_ps1 = fresh::positional_or_knob(args, 1, "GATE_LOCAL_INSTALL_PS1")?;
+    let install_md = fresh::positional_or_knob(args, 2, "GATE_LOCAL_INSTALL_PAGE")?;
+    let (install_sh, install_ps1, install_md) = (install_sh.as_str(), install_ps1.as_str(), install_md.as_str());
     let pinned_doc = args.get(3).map(String::as_str).filter(|a| !a.is_empty());
     let version_arg = args.get(4).map(String::as_str).unwrap_or("");
 

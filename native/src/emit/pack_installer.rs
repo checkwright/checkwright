@@ -10,7 +10,7 @@ use crate::programs;
 use crate::walk;
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the declared names, each defined in gate-sdk's knob
-// table; `INSTALLER_PACK_TMP_DIR` and its `TMPDIR` fallback are absent and must be, no kit library
+// table but the package directory, a descriptor knob; `INSTALLER_PACK_TMP_DIR` and its `TMPDIR` fallback are absent and must be, no kit library
 // defining either
 pub const KNOBS: &[&str] = &[
     "GATE_SDK_KIT_DIRS",
@@ -20,7 +20,12 @@ pub const KNOBS: &[&str] = &[
     "GATE_SDK_PAYLOAD_RECIPES",
     "GATE_SDK_PAYLOAD_WITHHOLD",
     "GATE_SDK_SPEC_BASE_URL",
+    INSTALLER_KNOB,
 ];
+
+// spec: installer/SPEC.md §The packer — the package directory, a descriptor knob of the publishing
+// repository, so a tree declaring none refuses by name
+const INSTALLER_KNOB: &str = "GATE_LOCAL_INSTALLER_DIR";
 
 const NAME: &str = "pack-installer";
 
@@ -126,16 +131,17 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
         }
     }
 
-    if !std::path::Path::new("installer/package.json").is_file() {
-        return Err(refuse(
-            "installer/package.json not found — there is no package to pack.",
-        ));
+    let installer = walk::knob_scalar(INSTALLER_KNOB).map_err(refuse)?;
+    let installer = installer.trim_end_matches('/');
+    let package = format!("{}/package.json", installer);
+    if !std::path::Path::new(&package).is_file() {
+        return Err(refuse(format!("{} not found — there is no package to pack.", package)));
     }
 
     // spec: installer/SPEC.md §The packer — the refusal asks about the payload's own footprint
     // rather than the whole worktree, on both grounds that section states: the stamp, on the two
     // members the worktree can reach, and the tree-under-test property across the whole footprint
-    let spec = footprint(&root, &f.artifacts)?;
+    let spec = footprint(&root, &f.artifacts, installer)?;
     let mut status: Vec<&str> = vec!["status", "--porcelain", "--"];
     status.extend(spec.iter().map(String::as_str));
     let dirty = git(&status)?;
@@ -174,7 +180,7 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
 
     // spec: gate-sdk/SPEC.md §Consumer payload — the withheld shape reaches the kit roots alone:
     // `installer/` is packed whole, its own non-shipping content decided by the package roster
-    pack_tracked(&commit, "installer", &asm, &[])?;
+    pack_tracked(&commit, installer, &asm, &[])?;
     place_license(license.as_deref(), &asm)?;
 
     // spec: installer/SPEC.md §The packer — payload recipes ride the package root beside the
@@ -535,8 +541,8 @@ fn resolve_version(given: &str) -> Result<String, Refusal> {
 // spec: installer/SPEC.md §The packer — the payload's tree footprint, DERIVED from the same two
 // resolvers the pack loop itself runs so the refusal's corpus cannot drift from the packed set;
 // the roster rides on `--artifacts`, which is what makes it a payload input at all
-fn footprint(root: &str, artifacts: &str) -> Result<Vec<String>, Refusal> {
-    let mut spec = vec!["installer".to_string()];
+fn footprint(root: &str, artifacts: &str, installer: &str) -> Result<Vec<String>, Refusal> {
+    let mut spec = vec![installer.to_string()];
     // spec: installer/SPEC.md §The packer — the pack loop's own on-disk `is_dir` test is
     // deliberately NOT applied here: filtering the pathspec by it would blind the refusal to the
     // one divergence only it can see

@@ -3,7 +3,6 @@ use crate::fresh;
 use serde_json::Value;
 use std::path::Path;
 
-const DEFAULT_PKG: &str = "installer/package.json";
 // spec: gate-sdk/SPEC.md §The consumer remainder cohort — the field's presence is the finding, not its emptiness
 const DEP_FIELDS: &[&str] = &["dependencies", "peerDependencies", "optionalDependencies"];
 const LIFECYCLE_KEYS: &[&str] = &["preinstall", "install", "postinstall"];
@@ -19,7 +18,8 @@ pub fn run(args: &[String]) -> i32 {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let pkg = fresh::positional(args, 0, DEFAULT_PKG);
+    let pkg = fresh::positional_or_joined(args, 0, "GATE_LOCAL_INSTALLER_DIR", "package.json")?;
+    let pkg = pkg.as_str();
     if !Path::new(pkg).is_file() {
         return Err(format!("package file not found: {}", pkg));
     }
@@ -44,6 +44,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
     for k in LIFECYCLE_KEYS {
+        // consumer-value-exempt: the npm lifecycle key of a package.json, a file-format name and no layout
         if has(doc.get("scripts"), k) {
             findings.push(format!("install-time lifecycle script declared: scripts.{}", k));
         }

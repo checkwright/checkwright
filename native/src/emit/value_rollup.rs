@@ -5,7 +5,7 @@ use crate::emit::enforcement_map;
 use crate::emit::footprint;
 use crate::marker;
 
-const PAGE: &str = "docs/value.md";
+pub const PAGE_KNOB: &str = "GATE_LOCAL_VALUE_PAGE";
 const BEGIN: &str = "<!-- value-rollup:begin -->";
 const END: &str = "<!-- value-rollup:end -->";
 
@@ -152,8 +152,9 @@ fn body() -> Result<String, String> {
 pub fn emit(args: &[String]) -> Result<String, String> {
     let text = body()?;
     if args.iter().any(|a| a == "--write") {
-        marker::write_block(PAGE, BEGIN, END, &text)?;
-        return Ok(format!("value-rollup: replaced the block in {}\n", PAGE));
+        let page = crate::walk::knob_scalar(PAGE_KNOB)?;
+        marker::write_block(&page, BEGIN, END, &text)?;
+        return Ok(format!("value-rollup: replaced the block in {}\n", page));
     }
     Ok(text)
 }

@@ -3,8 +3,8 @@
 use crate::fresh;
 use std::path::Path;
 
-pub const COMPANION: &str = "companion";
-pub const PAGE: &str = "docs/spec-toolkits.md";
+pub const COMPANION_KNOB: &str = "GATE_LOCAL_COMPANION_DIR";
+pub const PAGE_KNOB: &str = "GATE_LOCAL_SUPPORT_TABLE_PAGE";
 const BEGIN: &str = "<!-- support-table:begin -->";
 const END: &str = "<!-- support-table:end -->";
 // spec: companion/SPEC.md §The support table — the directory is the tier, in the order a cell
@@ -171,15 +171,16 @@ fn rewrite(page: &str, text: &str, table: &str) -> Result<String, String> {
 // spec: companion/SPEC.md §The support table — the bare arm prints the block; `--write` rewrites
 // it in place and touches nothing else
 pub fn emit(args: &[String]) -> Result<String, String> {
-    let table = render(COMPANION)?;
+    let table = render(&crate::walk::knob_scalar(COMPANION_KNOB)?)?;
     if args.iter().any(|a| a == "--write") {
-        let text = crate::emit::read_text(PAGE)?;
-        let new = rewrite(PAGE, &text, &table)?;
+        let page = crate::walk::knob_scalar(PAGE_KNOB)?;
+        let text = crate::emit::read_text(&page)?;
+        let new = rewrite(&page, &text, &table)?;
         if new == text {
-            return Ok(format!("support-table: {} already fresh\n", PAGE));
+            return Ok(format!("support-table: {} already fresh\n", page));
         }
-        std::fs::write(PAGE, new).map_err(|e| format!("cannot write {}: {}", PAGE, e))?;
-        return Ok(format!("support-table: rewrote {}\n", PAGE));
+        std::fs::write(&page, new).map_err(|e| format!("cannot write {}: {}", page, e))?;
+        return Ok(format!("support-table: rewrote {}\n", page));
     }
     Ok(format!("{}\n", table.trim_matches('\n')))
 }

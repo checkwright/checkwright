@@ -1,2 +1,4 @@
 # graph: couples=scripts/license-line.conf,README.md,*/README.md,*/*/README.md,docs/_layouts/default.html,docs/*.md,docs/*/*.md,native/src/gates/license_line.rs dir=one valve=none tier=precommit
 # spec: docs/site-architecture.md §The license line — every README's License section and the site footer carry the one line scripts/license-line.conf renders for that site, every README carrying the heading is a declared site, and no hand-written page under the declared pages root carries the heading
+# knob: GATE_LOCAL_LICENSE_CONF = scripts/license-line.conf
+# knob: GATE_LOCAL_LICENSE_HEADING = ## License

@@ -4,9 +4,6 @@ use crate::fresh;
 use crate::{proc, programs};
 use std::path::Path;
 
-const DEFAULT_INSTALL_MD: &str = "docs/install.md";
-const DEFAULT_PUBLISH_YML: &str = ".github/workflows/publish.yml";
-
 pub fn run(args: &[String]) -> i32 {
     match rule(args) {
         Ok(rc) => rc,
@@ -65,8 +62,15 @@ fn semver_major(v: &str) -> Option<u64> {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let install_md = fresh::positional(args, 0, DEFAULT_INSTALL_MD);
-    let publish_yml = fresh::positional(args, 1, DEFAULT_PUBLISH_YML);
+    let install_md = fresh::positional_or_knob(args, 0, "GATE_LOCAL_INSTALL_PAGE")?;
+    let publish_yml = match args.get(1).filter(|a| !a.is_empty()) {
+        Some(a) => a.clone(),
+        None => crate::walk::knob_words("GATE_SDK_NATIVE_PUBLISH_WORKFLOW")?
+            .into_iter()
+            .next()
+            .ok_or("GATE_SDK_NATIVE_PUBLISH_WORKFLOW names no workflow")?,
+    };
+    let (install_md, publish_yml) = (install_md.as_str(), publish_yml.as_str());
     let version_arg = args.get(2).map(String::as_str).unwrap_or("");
 
     if !Path::new(install_md).is_file() {

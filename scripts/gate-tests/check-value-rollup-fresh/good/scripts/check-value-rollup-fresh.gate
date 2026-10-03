@@ -1,0 +1,3 @@
+# graph: couples=docs/value.md dir=one valve=none tier=precommit
+# spec: docs/site-architecture.md §Generated projections and their freshness gates — the case's own declaration of the page its argument-less run reads
+# knob: GATE_LOCAL_VALUE_PAGE = docs/value.md

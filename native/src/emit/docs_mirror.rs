@@ -334,6 +334,7 @@ fn emit_one(ctx: &Ctx, src: &str, gov: &mut Governed) -> Result<String, String> 
         None => ("", src),
     };
     let title = match base {
+        // consumer-value-exempt: the kit layout's member names, which every kit root carries
         "README.md" => "README",
         "SPEC.md" => "SPEC",
         "DOCTRINE.md" => "DOCTRINE",

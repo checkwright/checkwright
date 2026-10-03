@@ -8,16 +8,6 @@
 
 ## New Features
 
-### withheld-gate-literal-knobs
-
-[spec: SPEC-withheld-literals.md]
-
-`check-consumer-value-literal` holds only the kit-shipped gates' crate modules. The gates withheld to `scripts/` keep their consumer-value literals: at gate-sdk-value-pass' spec census, over the 26 then withheld, 62 consumer values and 39 borderline rows, 23 of them `const DEFAULT_<NAME>` positional layout defaults. Operator direction 2026-09-27, kept on record for this half by the operator's choice of option C, 2026-10-02, lead-relayed (not a ruling): avoid any hard code in gates, because checkwright benefits from configurable gates itself.
-
-**Deliverable:** the gate's corpus widened to every gate module, and each withheld gate's literal moved to a descriptor-declared knob (gate-sdk/SPEC.md §The declaration cohort, a knob no static kit's prefix owns) or valved with its ground.
-
-**Cost while deferred:** no adopter meets these literals, since a withheld gate never ships. The cost is that this repo's own gates stay unconfigurable, and a new withheld gate's literal reds nowhere. Filed 2026-10-02 at gate-sdk-value-pass' spec on that direction. Owner lookup: `literal`, `withheld` in this file — `consumer-value-literal-gate`, DISTINCT (the kit-shipped half); owner gate-sdk/SPEC.md §The port-candidate criteria.
-
 ## Technical Debt
 
 ## Deferred
@@ -1248,4 +1238,5 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 - amendment-manifest-prose-span
 - criterion-five-omit-stale
 - gate-sdk-layout-assumptions
+- withheld-gate-literal-knobs
 

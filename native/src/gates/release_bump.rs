@@ -6,7 +6,6 @@ use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
-const DEFAULT_POSTS: &str = "docs/posts";
 const GRAMMAR: &str = "<major>.<minor>.<patch>, each a run of ASCII digits";
 
 // spec: gate-sdk/SPEC.md §The declaration cohort — ordering is defined over a stated grammar
@@ -140,11 +139,8 @@ pub fn run(args: &[String]) -> i32 {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let posts = args
-        .first()
-        .filter(|a| !a.is_empty())
-        .map(String::as_str)
-        .unwrap_or(DEFAULT_POSTS);
+    let posts = crate::fresh::positional_or_knob(args, 0, "GATE_LOCAL_RELEASE_POSTS_DIR")?;
+    let posts = posts.as_str();
     let disposition = match args.get(1).filter(|a| !a.is_empty()) {
         Some(a) => a.clone(),
         None => disposition_file()?,
@@ -219,6 +215,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let under_composition = proc::run(&programs::GIT, &["rev-parse", "-q", "--verify", &tag])?.code() != Some(0);
     let text = read_text(&newest.file)?;
     let in_brief_state = if under_composition {
+        // consumer-value-exempt: a release-note section, the note grammar installer/SPEC.md §The upgrade contract owns
         if declaration::section_bullets(&text, "In brief").is_none() {
             return Err(format!("newest note {} is under composition (v{} carries no tag) and has no 'In brief' section — the 30-second human read is a fixed section, not optional (installer/SPEC.md §The upgrade contract owns the note grammar)", newest.file, newest.raw));
         }
@@ -234,8 +231,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
             .map(|b| b.len())
             .ok_or_else(|| format!("newest note {} has no '{}' section — the floor cannot be derived (installer/SPEC.md §The upgrade contract owns the note grammar)", newest.file, section))
     };
+    // consumer-value-exempt: a release-note section, the note grammar installer/SPEC.md §The upgrade contract owns
     let tg = count("Tightened gates")?;
+    // consumer-value-exempt: a release-note section, the note grammar installer/SPEC.md §The upgrade contract owns
     let rk = count("Renamed knobs")?;
+    // consumer-value-exempt: a release-note section, the note grammar installer/SPEC.md §The upgrade contract owns
     let bc = count("Behavior changes")?;
 
     let patch_only = newest.version.0 == prev.version.0 && newest.version.1 == prev.version.1;

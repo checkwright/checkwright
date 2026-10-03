@@ -1,2 +1,3 @@
 # graph: couples=.github/workflows/*.yml,.github/workflows/*.yaml dir=one valve=none tier=precommit
 # spec: RELEASING.md §The publish spec — every `npm publish` positional spec in a workflow is unambiguously a path by its own literal text: a leading `.` or `/`, or an expansion of a proven-absolute root
+# knob: GATE_LOCAL_WORKFLOWS_DIR = .github/workflows

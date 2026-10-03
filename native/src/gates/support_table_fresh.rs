@@ -14,8 +14,9 @@ pub fn run(args: &[String]) -> i32 {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let dir = fresh::positional(args, 0, st::COMPANION);
-    let page = fresh::positional(args, 1, st::PAGE);
+    let dir = fresh::positional_or_knob(args, 0, st::COMPANION_KNOB)?;
+    let page = fresh::positional_or_knob(args, 1, st::PAGE_KNOB)?;
+    let (dir, page) = (dir.as_str(), page.as_str());
     let want = st::render(dir)?;
     let text = fresh::read_captured(page).map_err(|e| format!("{}: {}", page, e))?;
     let blk = st::block(page, &text)?;

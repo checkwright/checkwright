@@ -292,19 +292,21 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
             "EVIDENCE_KIT_SUITES",
             "EVIDENCE_KIT_RUN_*",
             "CONTEXT_KIT_SURFACES",
+            value_rollup::PAGE_KNOB,
         ],
     ),
     // spec: docs/site-architecture.md §Generated projections and their freshness gates — a
-    // repo-local projection beside the value rollup; its source and sites are this repo's paths
+    // repo-local projection beside the value rollup; its source and sites are this repo's descriptor
+    // knobs, which a tree declaring none refuses by name
     (
         "--emit-product-statement",
         Arm::Emit(product_statement::emit, Grammar::Flags(&["--write"])),
-        &[],
+        &[product_statement::SOURCE_KNOB, product_statement::SITES_KNOB],
     ),
     (
         "--emit-support-table",
         Arm::Emit(support_table::emit, Grammar::Flags(&["--write"])),
-        &[],
+        &[support_table::PAGE_KNOB, support_table::COMPANION_KNOB],
     ),
     // spec: canon-kit/SPEC.md §The reference-link grammar — the source set is derived from the
     // tracked tree rather than enumerated, so the configured values are the blob ref, the mirror

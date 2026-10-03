@@ -5,7 +5,6 @@ use crate::fresh;
 use crate::walk;
 use std::path::Path;
 
-const DEFAULT_REGISTRY: &str = "docs/kits.md";
 // spec: docs/site-architecture.md §Site chrome and the nav contract — POSIX `[[:space:]]` minus
 // the newline the record separator already consumed, so a CRLF front matter reads as the shell
 // form read it
@@ -74,7 +73,8 @@ fn dirname(p: &str) -> String {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let reg = fresh::positional(args, 0, DEFAULT_REGISTRY);
+    let reg = fresh::positional_or_knob(args, 0, "GATE_LOCAL_KIT_REGISTRY_PAGE")?;
+    let reg = reg.as_str();
     // spec: gate-sdk/SPEC.md §Fail-closed contract — a missing page or a sweep finding no kit page
     // is a refusal, since either would otherwise read as a clean nav
     if !Path::new(reg).is_file() {

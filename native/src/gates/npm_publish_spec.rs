@@ -5,7 +5,6 @@ use crate::fresh;
 use crate::walk;
 use std::path::Path;
 
-const DEFAULT_WFDIR: &str = ".github/workflows";
 // spec: RELEASING.md §The publish spec — the roster is proven-absolute by written contract,
 // never by runner observation
 const ABS_ROOTS: &[&str] = &["PWD", "GITHUB_WORKSPACE", "RUNNER_TEMP"];
@@ -81,7 +80,8 @@ fn spec_unambiguous(s: &str) -> bool {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let wfdir = fresh::positional(args, 0, DEFAULT_WFDIR);
+    let wfdir = fresh::positional_or_knob(args, 0, "GATE_LOCAL_WORKFLOWS_DIR")?;
+    let wfdir = wfdir.as_str();
     if !fresh::is_dir(wfdir) {
         if !args.is_empty() {
             return Err(format!(

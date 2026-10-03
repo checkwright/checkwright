@@ -6,7 +6,7 @@ use crate::spec;
 use crate::walk;
 use std::path::Path;
 
-const MIRROR_NAMES: &[&str] = &["SPEC.md", "README.md", "DOCTRINE.md"];
+const MIRROR_NAMES: &[&str] = &["SPEC.md", "README.md", "DOCTRINE.md"]; // consumer-value-exempt: the kit layout's member names, which every kit root carries
 
 // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — the generator is
 // a function call, not a spawn: it ported in the same unit, so there is no shell left to reach and

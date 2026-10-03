@@ -1,0 +1,4 @@
+# graph: couples=license-line.conf dir=one valve=none tier=precommit
+# spec: docs/site-architecture.md §The license line — the case's own declaration of the heading and README name, which no positional names
+# knob: GATE_LOCAL_LICENSE_HEADING = ## License
+# knob: GATE_LOCAL_README_FILE = README.md
