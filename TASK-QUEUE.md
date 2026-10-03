@@ -18,6 +18,16 @@ guard-kit registers `check-door-binding` but ships no `smoke/violation.sh`, whic
 
 **Cost while deferred:** the consumer smoke never proves guard-kit's one gate reds a scratch consumer. Filed 2026-10-03 to the gap inbox at guard-kit-write-side-pass' build; promoted at its close: →fix fails because a violation recipe is new mechanism; →forward because no ruling is owed. Re-verified: `ls */smoke/violation.sh` lists nine kits and not guard-kit. drift-kit/SPEC.md's stale *as guard-kit does* clause was fixed at the same close. Owner lookup: `violation.sh`, `violation recipe` in this file — none; owner guard-kit/SPEC.md §Testing.
 
+### amendment-manifest-prose-span
+
+[spec: SPEC-manifest-span.md]
+
+`check-graph`'s amendment-manifest reader (`native/src/gates/graph.rs`, the inline-span loop beside `validate_amend_manifest`) takes every backticked span opening `# graph: ` on any `SPEC-*.md` line as a manifest, so a prose sentence naming a manifest key mid-paragraph reds assertion G for missing `dir=`/`valve=`/`tier=` and an empty `couples=`. An amendment author must rephrase around the token.
+
+**Deliverable:** gate-sdk/SPEC.md §check-graph states which spans are manifests, so a mid-sentence mention is told apart from an embedded manifest, and the reader follows it, with a bad/good fixture pair over a mid-sentence mention.
+
+**Cost while deferred:** a false red at amendment authoring for prose that names a manifest key. Filed 2026-10-02 to the gap inbox at consumer-smoke-driver-pass' spec; promoted at its close: →fix fails because which spans count is a grammar decision the SPEC does not settle, →forward because no ruling is owed. Re-verified: an untracked root `SPEC-zzprobe.md` carrying the mid-sentence span turns `check-graph` red on four AMEND-MANIFEST lines. Owner lookup: `# graph:`, `mid-line`, `amendment manifest`, `assertion G` in this file — none; owner gate-sdk/SPEC.md §check-graph.
+
 ## Technical Debt
 
 ### guard-kit-ruleset-brevity
@@ -49,16 +59,6 @@ Rule `grant_path_slot` false-blocks a backslash-escaped blank inside a slot oper
 **Deliverable:** guard-kit/SPEC.md §The reader and its views states how the dequoted view holds an escaped blank, the reader follows it, and a decision-table row pairs the escaped-blank slot operand with a real second operand.
 
 **Cost while deferred:** a false block on a rare spelling, in the safe direction. Filed 2026-10-03 to the gap inbox at guard-kit-write-side-pass' build (predates the iteration); promoted at its close: →fix fails because the dequoted view is shared by every rule declaring it, so the change is a reader contract with cross-rule reach; →forward because no ruling is owed. Re-verified: the hook blocks that command under this repo's grant. Owner lookup: `escaped`, `backslash`, `grant_path_slot` in this file — none; owner guard-kit/SPEC.md §The reader and its views.
-
-### amendment-manifest-prose-span
-
-[cost: event/low] [surface: gate-sdk]
-
-`check-graph`'s amendment-manifest reader (`native/src/gates/graph.rs`, the inline-span loop beside `validate_amend_manifest`) takes every backticked span opening `# graph: ` on any `SPEC-*.md` line as a manifest, so a prose sentence naming a manifest key mid-paragraph reds assertion G for missing `dir=`/`valve=`/`tier=` and an empty `couples=`. An amendment author must rephrase around the token.
-
-**Deliverable:** gate-sdk/SPEC.md §check-graph states which spans are manifests, so a mid-sentence mention is told apart from an embedded manifest, and the reader follows it, with a bad/good fixture pair over a mid-sentence mention.
-
-**Cost while deferred:** a false red at amendment authoring for prose that names a manifest key. Filed 2026-10-02 to the gap inbox at consumer-smoke-driver-pass' spec; promoted at its close: →fix fails because which spans count is a grammar decision the SPEC does not settle, →forward because no ruling is owed. Re-verified: an untracked root `SPEC-zzprobe.md` carrying the mid-sentence span turns `check-graph` red on four AMEND-MANIFEST lines. Owner lookup: `# graph:`, `mid-line`, `amendment manifest`, `assertion G` in this file — none; owner gate-sdk/SPEC.md §check-graph.
 
 ### criterion-five-omit-stale
 
