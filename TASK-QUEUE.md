@@ -8,6 +8,16 @@
 
 ## New Features
 
+### kept-gate-disposition-report
+
+[spec: SPEC-kept-gate-report.md]
+
+init and update print nothing for a gate whose install disposition moved off zero-config while an adopter-edited `gates.list` keeps it. init's kept-registry report covers only recipe `unregister.list` and `--without-gate` drops, so the members install-disposition-pass moved to `on-surface` stay registered silently in an edited registry.
+
+**Deliverable:** a report of kept members the derivation no longer starts, which needs the lock to record the prior starting set, since a deliberately registered on-surface gate is otherwise indistinguishable.
+
+**Cost while deferred:** an adopter who edited `gates.list` is not told which kept gates are now house rules they never chose; the release note's `--with-gate` line is the only notice. Filed 2026-10-01 to the gap inbox at install-disposition-pass' build on a lead decision; promoted at its close: →fix fails because the report needs a new lock field, adopter-visible mechanism no amendment settled, →forward because no ruling is owed. Re-verified: the report is fed only by the recipe and `--without-gate` drop sets. Owner lookup: `still.registered`, `kept members`, `kept-registry`, `edited gates.list`, `prior starting set` in this file — none; owner installer/SPEC.md §What init seeds.
+
 ## Technical Debt
 
 ### delegation-kit-tail-brevity
@@ -107,16 +117,6 @@ canon-kit/SPEC.md §check-md-refs says the scan runs over tracked sources only, 
 **Deliverable:** the finder takes the tracked set, or each member's SPEC states the walk — a per-member call, since some fixture cases run outside a git repository — with a fixture case carrying an untracked manifest.
 
 **Cost while deferred:** an adopter's untracked vendored or generated READMEs red defect-class gates on content they never authored. Filed 2026-10-01 to the gap inbox at install-disposition-pass' spec; promoted at its close: →fix fails because the finder feeds every manifest-set member and the tracked-versus-walk choice is per member, →forward because the SPEC already rules md-refs' side. Re-verified: a nested probe repo with a committed `CLAUDE.md` and an untracked `vendor/lib/README.md` linking `absent.md` turns `check-md-refs` from clean to exit 1. Owner lookup: `manifest set`, `find_named`, `untracked.*README`, `tracked sources`, `tracked set` in this file — none; owner canon-kit/SPEC.md §The shared spec adapters.
-
-### kept-gate-disposition-report
-
-[cost: event/low] [surface: installer]
-
-init and update print nothing for a gate whose install disposition moved off zero-config while an adopter-edited `gates.list` keeps it. init's kept-registry report covers only recipe `unregister.list` and `--without-gate` drops, so the members install-disposition-pass moved to `on-surface` stay registered silently in an edited registry.
-
-**Deliverable:** a report of kept members the derivation no longer starts, which needs the lock to record the prior starting set, since a deliberately registered on-surface gate is otherwise indistinguishable.
-
-**Cost while deferred:** an adopter who edited `gates.list` is not told which kept gates are now house rules they never chose; the release note's `--with-gate` line is the only notice. Filed 2026-10-01 to the gap inbox at install-disposition-pass' build on a lead decision; promoted at its close: →fix fails because the report needs a new lock field, adopter-visible mechanism no amendment settled, →forward because no ruling is owed. Re-verified: the report is fed only by the recipe and `--without-gate` drop sets. Owner lookup: `still.registered`, `kept members`, `kept-registry`, `edited gates.list`, `prior starting set` in this file — none; owner installer/SPEC.md §What init seeds.
 
 ### spec-pointer-bare-section-mark
 
