@@ -341,7 +341,8 @@ pub fn kit_roots() -> Result<Vec<String>, String> {
 }
 
 // spec: gate-sdk/SPEC.md §Layout and configuration — the same spelling against a named anchor, the
-// form a reader asking about a tree it has not entered takes
+// form a reader asking about a tree it has not entered takes. Pass an absolute anchor: a rootless
+// one is normalized, never resolved against the working directory, so `.` reads as `/`.
 pub fn kit_roots_at(anchor: &str) -> Result<Vec<String>, String> {
     let (here, roots) = roots_at(normalize_abs(anchor), &sdk_root(), &knob_scalar("GATE_SDK_KIT_DIRS")?)?;
     Ok(roots.iter().map(|r| spelled(&here, r)).collect())
@@ -355,8 +356,8 @@ pub fn kit_roots_rel() -> Result<Vec<String>, String> {
 }
 
 // spec: gate-sdk/SPEC.md §Layout and configuration — the roots a git pathspec against `anchor` can
-// name at all: spelled against it and narrowed to those lying under it, since a root elsewhere is
-// no path in that repository and passing it is the exit-128 refusal rather than an empty match
+// name at all: spelled by `kit_roots_at` (an absolute anchor) and narrowed to those under it, since
+// a root elsewhere is no path in that repository: passing it is exit 128, not an empty match
 pub fn kit_roots_under(anchor: &str) -> Result<Vec<String>, String> {
     Ok(kit_roots_at(anchor)?
         .into_iter()
