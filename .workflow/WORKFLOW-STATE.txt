@@ -5,3 +5,4 @@
 ---
 
 delegation-transport-pass scope acf950bf 2026-10-03 5343c5ab
+delegation-transport-pass spec aa35fa93 2026-10-03 79d06fdf
