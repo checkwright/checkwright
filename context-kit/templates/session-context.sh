@@ -44,7 +44,7 @@ mapfile -t changed < <(
         | while read -r l; do p="${l##* }"; [[ "$p" == */* && -d "${p%%/*}/src" ]] && echo "${p%%/*}"; done \
         | sort -u
 )
-# spec: context-kit/SPEC.md §The session-context hook — the public-surface block guards on the gate binary: the index tools are arms of it, and a missing binary would print the header and nothing under it on every host the artifact roster does not cover. Read the binary first and the block is absent rather than empty — the way the deleted `-f` guard degraded.
+# spec: context-kit/SPEC.md §The session-context hook — the public-surface block guards on the gate binary: the index tools are arms of it, and a missing binary would print the header and nothing under it in every tree with no gate binary. Read the binary first and the block is absent rather than empty — the way the deleted `-f` guard degraded.
 if [[ ${#changed[@]} -gt 0 && -x "$NATIVE_BIN" ]]; then
     echo "Uncommitted changes touch: ${changed[*]}"
     echo "Public API surface of those components (pub-index — read the file for bodies):"

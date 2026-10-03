@@ -920,7 +920,7 @@ A hardcoded top-level flag would have no table row to declare them on, so no che
 
 **The front-end requires a repository.** `bash gate-sdk/bin/run-gates.sh` cds to `git rev-parse --show-toplevel` and refuses outside a repository (gate-sdk/SPEC.md §run-gates), so a non-repo cwd exits 2 with nothing written. That is correct rather than a narrowing. Both install targets are **repo-root-relative by this kit's config**, so a run outside a repository would write two files into whatever directory the caller stood in. The driver-config step keeps its own non-repo skip, which the front-end's refusal leaves unreachable through it.
 
-**Advisory tooling, not a gate, so no fixture pair is owed.** `smoke/install.sh`, the member's only caller, exercises every step end to end. **The platform residual bites at adoption rather than during use.** A vendored consumer on a host the artifact roster does not cover cannot install or refresh its registration block and merge attributes, which it writes on day one. The residual is accepted because `check-lifecycle-registration` and `check-merge-attrs` are compiled too. Such a host loses the writer and the asserter together, rather than being held to a standard it cannot meet.
+**Advisory tooling, not a gate, so no fixture pair is owed.** `smoke/install.sh`, the member's only caller, exercises every step end to end. No platform residual bites at adoption: a host the artifact roster does not cover is refused at the bootstrap (installer/SPEC.md §Hosts refused at the bootstrap). So no vendored consumer is left holding the registration block and merge attributes with no writer, and `check-lifecycle-registration` and `check-merge-attrs`, compiled too, never face a host that cannot run them.
 
 ### The close-surfaces emit arm
 

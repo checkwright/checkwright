@@ -144,7 +144,7 @@ pub(super) fn artifact(state: &mut Run) -> Step {
     let m = init_min(state, &nc, &[])?;
     let undeclared = out(&m);
     if m.succeeded() {
-        return Err(failed(&m, "init installed on a host the payload never committed to — omit-and-declare retired with the relocation, so this platform is refused rather than served an install whose battery cannot run"));
+        return Err(failed(&m, "init installed on a host the payload never committed to — this platform is refused at the bootstrap rather than served an install whose battery cannot run"));
     }
     if !undeclared.contains(NO_TARGET) {
         return Err(failed(&m, "the unrostered host was refused without being told that this platform is the thing the payload carries nothing for"));

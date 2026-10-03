@@ -1,7 +1,6 @@
 INSTALL-PLATFORMS: clean
 2 joined in lockstep with targets.list both directions
 1 held with a stated precondition
-aarch64-apple-darwin omits 2 member(s)
 both host detectors emit exactly the declared set — checkwright.sh emits 3, checkwright.ps1 emits 3
 2 prerequisite(s) each with a Minimum and a required/optional marker, naming every declared family — Linux, macOS
 arm G against the pinned release pinned-targets.list, pending release: x86_64-unknown-linux-musl)

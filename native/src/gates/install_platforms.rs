@@ -1,6 +1,6 @@
 // spec: docs/site-architecture.md §Generated projections and their freshness gates — the install
 // page's platform declaration block, native/targets.list and both bootstraps' host detectors hold
-// lockstep, with each held platform's omitted count and each detector's triple count printed
+// lockstep, with each detector's triple count printed
 // spec: installer/SPEC.md §Requirements — arm F holds the page's prerequisites block against the
 // system families the platform block declares
 // spec: installer/SPEC.md §The front door's verbs — arm G holds each `joined` row to the pinned
@@ -8,7 +8,6 @@
 use super::pinned_release;
 use crate::fresh;
 use crate::registry;
-use crate::walk;
 use std::path::Path;
 
 const DEFAULT_INSTALL_MD: &str = "docs/install.md";
@@ -341,45 +340,6 @@ fn detector_triples_in(text: &str, path: &str, d: &Detector) -> Result<Vec<Strin
     Ok(out)
 }
 
-// spec: gate-sdk/SPEC.md §The port-candidate criteria — arm D's corpus: the registry members that
-// resolve to a `.gate` descriptor are exactly what a host with no published artifact loses, so the
-// binary-less residual is a count over the live registry rather than a number carried in prose
-fn omitted_members() -> Result<usize, String> {
-    let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
-    // spec: gate-sdk/SPEC.md §Layout and configuration — the same opened `{root}/checks` resolve
-    // set `check-gate-binary-fresh` builds, and it takes the same spelling for the same reason
-    let mut resolve_dirs = vec![gates_dir.clone()];
-    resolve_dirs.extend(
-        walk::kit_roots()?
-            .into_iter()
-            .filter(|r| !r.is_empty())
-            .map(|r| format!("{}/checks", r.trim_end_matches('/'))),
-    );
-    let list = registry::list_path(&gates_dir);
-    if !Path::new(&list).is_file() {
-        return Err(format!("no gate registry at {}", list));
-    }
-    let listing = fresh::read_captured(&list)?;
-    Ok(registry::members(&listing)
-        .into_iter()
-        .filter(|m| registry::resolve(m, &resolve_dirs).map(|s| s.ends_with(".gate")) == Some(true))
-        .count())
-}
-
-// spec: gate-sdk/SPEC.md §The port-candidate criteria — a count that could not be taken must not
-// suppress three verdicts that do not depend on it, so the walk failure is reported once as the
-// count's own value and never as this gate's exit status
-fn omitted_report(held: &[&str]) -> String {
-    match omitted_members() {
-        Ok(n) => held
-            .iter()
-            .map(|t| format!("{} omits {} member(s)", t, n))
-            .collect::<Vec<String>>()
-            .join(", "),
-        Err(e) => format!("uncounted for every held platform — {}", e),
-    }
-}
-
 // spec: installer/SPEC.md §The front door's verbs — the pinned release arm G holds `joined` to:
 // its roster, read at the gate's own roster path, and its install page
 struct Pinned {
@@ -620,19 +580,14 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     };
 
-    // spec: installer/SPEC.md §The gate binary — the count rides the clean line on the same
-    // vacuous-pass ground arm D stands on: a source scan whose extraction quietly stops matching
-    // reports an empty set as agreement, and a number is what makes that visible without an audit
+    // spec: installer/SPEC.md §The gate binary — the count rides the clean line because a source
+    // scan whose extraction quietly stops matching reports an empty set as agreement, and a number
+    // is what makes that visible without an audit
     let detector_report = detected
         .iter()
         .map(|(p, s)| format!("{} emits {}", p, s.len()))
         .collect::<Vec<String>>()
         .join(", ");
-
-    // spec: gate-sdk/SPEC.md §The port-candidate criteria — arm D rides the red line as well as
-    // the clean one: a number that appears only when something is already broken is a post-mortem
-    // rather than an instrument
-    let per_held = omitted_report(&held);
 
     if !findings.is_empty() {
         println!(
@@ -641,9 +596,6 @@ fn rule(args: &[String]) -> Result<i32, String> {
         );
         for f in &findings {
             println!("  {}", f);
-        }
-        if !held.is_empty() {
-            println!("  omitted on each held platform: {}", per_held);
         }
         println!("  detected triples: {}", detector_report);
         println!("  help: every row's Status cell is `joined` — a live line in the roster — or");
@@ -665,14 +617,12 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     println!(
-        "INSTALL-PLATFORMS: clean ({} declared platform(s) in {}, {} joined in lockstep with {} both directions, {} held with a stated precondition{}{}; both host detectors emit exactly the declared set — {}; omitted count is the registry members dispatching to the gate binary; {} prerequisite(s) each with a Minimum and a required/optional marker, naming every declared family — {}; {})",
+        "INSTALL-PLATFORMS: clean ({} declared platform(s) in {}, {} joined in lockstep with {} both directions, {} held with a stated precondition; both host detectors emit exactly the declared set — {}; {} prerequisite(s) each with a Minimum and a required/optional marker, naming every declared family — {}; {})",
         decls.len(),
         install_md,
         joined,
         roster,
         held.len(),
-        if held.is_empty() { "" } else { " — " },
-        per_held,
         detector_report,
         prereqs.len(),
         declared_families.join(", "),

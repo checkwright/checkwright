@@ -8,16 +8,6 @@
 
 ## New Features
 
-### criterion-five-omit-stale
-
-[spec: SPEC-criterion-five.md]
-
-gate-sdk/SPEC.md's criterion 5 still prices a port against an omit-and-declare install outcome the installer retired: an unrostered or hasher-less host is now refused at the bootstrap, and the installer writes no `# omitted:` record (installer/SPEC.md §Hosts refused at the bootstrap, §The gate binary). The *ruled condition* paragraph, the residual's instrument (an artifact-free install whose `gates.list` declares the dispatched set at a non-zero count), the measurement order, the growth predicate, the criterion-5 bullet and exception class (b), §Binary dispatch's install-model sentence and the binary meta-gates' shared predicate all describe the retired outcome, contradicting the same SPEC's *omission branch* and *all-omitted install refuses* paragraphs. The cut records ruling *accept and declare* read as current.
-
-**Deliverable:** criterion 5 restated against the bootstrap refusal, deciding what a cohort's binary-less price measures now that an uncovered host gets no install; the stale sentences rewritten or cut, and each per-cut record's criterion-5 ruling either kept as a record or re-pointed.
-
-**Cost while deferred:** a porting session reads an instrument that no longer exists and a price the install model no longer charges. Filed 2026-10-03 to the gap inbox at consumer-smoke-driver-pass' build; promoted at its close: →fix fails because the stale reach spans a dozen paragraphs and what criterion 5 prices now is a design call, →forward because no ruling is reversed (the installer's own SPEC already retired the outcome). Re-verified: the binary-less leg asserts the refusal (installer/SPEC.md §The consumer smoke, *artifact-less refusal leg*), and `native/src/emit/installer_smoke/profiles.rs` fails any install carrying an omission record. Owner lookup: `criterion 5`, `omission`, `binary-less`, `accept and declare`, `residual`, `artifact-free`, `uncovered` in this file — none; owner gate-sdk/SPEC.md §Porting a gate to the binary substrate.
-
 ### gate-sdk-layout-assumptions
 
 [spec: SPEC-layout-neutral.md]
@@ -1271,4 +1261,5 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 - grant-slot-escaped-blank
 - guard-kit-ruleset-brevity
 - amendment-manifest-prose-span
+- criterion-five-omit-stale
 

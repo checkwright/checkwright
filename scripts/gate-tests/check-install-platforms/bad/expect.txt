@@ -9,7 +9,6 @@ checkwright.sh detects x86_64-unknown-linux-musl and install.md declares it nowh
 checkwright.ps1 detects x86_64-unknown-linux-musl and install.md declares it nowhere
 install.md declares aarch64-pc-windows-msvc and checkwright.sh can never detect it
 install.md declares aarch64-pc-windows-msvc and checkwright.ps1 can never detect it
-omitted on each held platform: aarch64-apple-darwin omits 2 member(s)
 detected triples: checkwright.sh emits 6, checkwright.ps1 emits 6
 a prerequisite with no Minimum: `sh`
 a prerequisite neither `required` nor `optional: <condition>`: Ruby

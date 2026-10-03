@@ -3,8 +3,7 @@
 # whose emitted triple sets, each the union of the detector and its fallback
 # map, equal the declared set in both directions. The first four args
 # steer the gate onto hermetic fixture copies of the install page, the target
-# roster and both bootstraps; arm D counts against the hermetic registry in this
-# case dir's own `scripts/`. The prerequisites block names both declared families,
+# roster and both bootstraps. The prerequisites block names both declared families,
 # Linux and macOS, and each row states a Minimum and a required/optional marker.
 # The last four are arm G's pinned roster, pinned page, disposition and queue, as
 # files so the case holds still as the tags move: the pinned release lacks the

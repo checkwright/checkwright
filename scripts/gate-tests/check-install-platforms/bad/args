@@ -5,8 +5,7 @@
 # declares it nowhere, each fallback map emits `x86_64-unknown-linux-musl` the
 # page declares nowhere, and the page declares `aarch64-pc-windows-msvc` while
 # neither detector can ever emit it. That last row also leaves its Minimum cell
-# empty, a support claim with no floor. Arm D still reports, on the red path as
-# well as the clean one. Arm F reds three ways over the prerequisites block: a row
+# empty, a support claim with no floor. Arm F reds three ways over the prerequisites block: a row
 # whose Minimum is `—`, a row whose Needed-for cell is neither `required` nor
 # `optional:`, and the declared Windows family that no row's Needed-for cell names.
 # Arm G reds twice under a `deferred:` disposition: the joined Windows row the
