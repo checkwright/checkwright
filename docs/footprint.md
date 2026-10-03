@@ -38,8 +38,8 @@ Every top-level directory carrying a `SPEC.md` takes a row, kit or not, and one 
 | gate-sdk | — | 2899cp · ~730t |
 | guard-kit | — | 4394cp · ~1114t |
 | installer | — | — |
-| lifecycle-kit | 301cp · ~76t | 131698cp · ~33200t |
+| lifecycle-kit | 301cp · ~76t | 131852cp · ~33239t |
 | plugin | — | — |
 | queue-kit | — | 1392cp · ~359t |
 | site-kit | — | — |
-| **total** | 2350cp · ~596t | 197179cp · ~49788t |
+| **total** | 2350cp · ~596t | 197333cp · ~49826t |

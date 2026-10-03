@@ -8,16 +8,6 @@
 
 ## New Features
 
-### foreign-vendor-critique
-
-[spec: SPEC-foreign-review.md]
-
-a consumer's use of the foreign-vendor run (delegation-kit/SPEC.md §The foreign-vendor run) for critique alongside the deterministic gates. Operator direction 2026-09-30, lead-relayed, not a ruling; the uses are candidates. Two adapters sit in the gitignored local overlay, each pinning its model and effort in argv so a run never follows the vendor CLI's last-switched model: a review adapter for typical work, and an expert adapter for top-expertise work. Candidate uses: work review, for example at iteration close; strategic consultation, for example a SWOT or an architecture discussion.
-
-**Why design-pending:** a close-stage review hook is new stage mechanism; each live run takes an operator grant, and a standing grant for a recurring review is the operator's to give; whether foreign adapters map onto `DELEGATION_KIT_TIER_MODEL`'s classes belongs to [heterogeneous-agent-delegation](#heterogeneous-agent-delegation)'s next slice. The foreign subscription's budget is small beside the primary harness's, so an exhausted foreign budget never blocks an iteration — a review degrades to skipped-with-notice — while a strategic consultation may wait for the limit to reset. Distinct from that entry, which owns transport and the adapter seam; this one is a consumer's use of it. Vendor model literals stay in consumer config (gate-sdk/SPEC.md §The provenance seam).
-
-**Cost while deferred:** a second-vendor reading of the iteration's work is foregone, and the deterministic gates stay the only critique. Filed 2026-09-30 to the gap inbox by the lead; promoted at delegation-tier-binding's close: →fix fails because the hook is new mechanism, →forward because the direction is already given and only its per-run grants are the operator's. Owner lookup: `critique`, `foreign-run`, `review adapter` in this file — only heterogeneous-agent-delegation, whose subject is transport; owner delegation-kit/SPEC.md §The foreign-vendor run.
-
 ## Technical Debt
 
 ### delegation-liveness-brevity
@@ -1244,4 +1234,5 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 
 - background-credential-swap-support
 - fan-width-unenforced
+- foreign-vendor-critique
 
