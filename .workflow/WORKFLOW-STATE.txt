@@ -13,3 +13,4 @@ delegation-transport-pass build ae5006ad 2026-10-03 d8ad0b29
 delegation-transport-pass build a980bb68 2026-10-03 db7fc8da
 delegation-transport-pass build a526a8f0 2026-10-03 d818fd2b
 delegation-transport-pass validate a3c80829 2026-10-03 bb4aec63
+delegation-transport-pass close ac7f95f3 2026-10-03 b22016a2
