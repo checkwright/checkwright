@@ -5,6 +5,7 @@
 **The entry's four components, re-verified against the tree at authoring.**
 
 - **(a) Detection** and **(d) the account-keyed settle** are one change to one check, the post-login reroute, so they land as one delta (delta 1). Both turn on comparing the snapshot's `account` with the live account identity. That identity is the account config's `oauthAccount.accountUuid`, the field both shipped producers already stamp as `account` (`native/src/hook/poll.rs`, `native/src/hook/statusline.rs`).
+- **(a)'s `tier` needs no comparison of its own.** Both producers read `tier` out of the credentials file's `claudeAiOauth.subscriptionType`, so a tier change rewrites that file. Its mtime then postdates the snapshot's `updated_at`, which the settle floor already reroutes until a re-poll. The forced re-poll keys on the account, the entry's swap.
 - **(b) Evidence** is mostly in the tree already. §Trend reporter segments on `account` and `tier`, so a swap reads as a segment boundary and never as a spurious drop, and the boundary is derivable from the samples, so no marker line is added. The one unpartitioned reader left is the roll witness, which reads the log's last line whatever its account (`native/src/hook/verdict.rs`, `previous_boundary`). Delta 2 partitions it.
 - **(c) Safety** is an aggregate view rather than a block (delta 3). A combined ceiling has no single threshold to enforce: the accounts' windows are independent and may differ in tier. So the shipped remedy makes the combined position visible where the weekly headroom is already read, and leaves the pause decision per account.
 
@@ -20,20 +21,26 @@
 
 The verdict reads the **live identity**, the account config's `oauthAccount.accountUuid`, through the reader's existing empty-means-derive fill of `DELEGATION_KIT_ACCOUNT_CONFIG`. It compares that identity with the snapshot's `account`. Where both are present:
 
-- **A different account** routes a would-be OK to STALE with the reason `snapshot predates an account switch`. The demand-driven refresh ignores `DELEGATION_KIT_REFRESH_MIN_AGE` on that reading, so a configured poller re-polls at once. The reroute stays asymmetric: an at-or-over reading still pauses.
+- **A different account** forces a re-poll, then reroutes. The demand-driven refresh runs before the snapshot is read, and its short-circuit check reads the on-disk snapshot's `account` beside its `updated_at`. Where that account differs from the live identity, the refresh ignores `DELEGATION_KIT_REFRESH_MIN_AGE`, so a configured poller re-polls before the verdict reads. A snapshot still naming another account after that refresh, because no poller is configured or the poll failed, routes a would-be OK to `-> STALE (snapshot predates an account switch; <the never-blocks clause>)`. The clause is the uniform consequence half of §usage-verdict's verdict-string contract. The reroute stays asymmetric: an at-or-over reading still pauses.
 - **The same account** replaces the blanket window with a settle floor: the reroute fires only while the snapshot's `updated_at` is less than `DELEGATION_KIT_LOGIN_SETTLE` seconds past the credentials file's mtime. A routine token rotation therefore blinds the verdict for the settle floor, not for the whole window.
 
 Where either identity is absent or unreadable, the blanket `DELEGATION_KIT_LOGIN_WINDOW` reroute runs as it does today. The roll witnesses disarm the reroute on both arms, as now.
 
 Failure mode 3's replacement text:
 
-> 3. **Post-login lag** — a fresh login starts a new window but the server-fed percentage lags it, and the file-write age check cannot see that. The verdict compares the snapshot's `account` with the **live identity**, the account config's `oauthAccount.accountUuid`. A different account routes a would-be OK to STALE and forces the demand-driven refresh past its short-circuit. The same account trusts a snapshot taken at least `DELEGATION_KIT_LOGIN_SETTLE` seconds after the credentials file's mtime, the auth event. Where either identity is missing, the verdict falls back to the blanket reroute: within `DELEGATION_KIT_LOGIN_WINDOW` of the mtime, a would-be OK routes to STALE. Letting the lag print OK would emit a fresh-looking chimera, the new account's id beside the dead login's percentage and `resets_at`.
+> 3. **Post-login lag** — a fresh login starts a new window but the server-fed percentage lags it, and the file-write age check cannot see that. The verdict compares the snapshot's `account` with the **live identity**, the account config's `oauthAccount.accountUuid`. A snapshot naming a different account forces the demand-driven refresh past its short-circuit before the read, and one still naming it after that refresh routes a would-be OK to STALE. The same account trusts a snapshot taken at least `DELEGATION_KIT_LOGIN_SETTLE` seconds after the credentials file's mtime, the auth event. Where either identity is missing, the verdict falls back to the blanket reroute: within `DELEGATION_KIT_LOGIN_WINDOW` of the mtime, a would-be OK routes to STALE. Letting the lag print OK would emit a fresh-looking chimera, the new account's id beside the dead login's percentage and `resets_at`.
 
 The mtime-proxy paragraph's closing **Honest limit** sentence is replaced:
 
-> **Honest limit:** where the snapshot carries no `account` or the account config is unreadable, a rotation with no roll still blinds the blanket window, because no witness contradicts it. A swap that changes neither the credentials file nor the account config is invisible to every arm.
+> **Honest limit:** where the snapshot carries no `account` or the account config is unreadable, a rotation with no roll still blinds the blanket window, because no witness contradicts it. A swap that changes neither the credentials file nor the account config is invisible to every arm. A producer stamps `account` from the account config at its read, not from the token behind its percentage, so a swap that rewrites the account config and leaves that token in place labels the old token's reading with the new account, and the comparison passes it.
 
-The check order's `login-STALE` step reads the identity first, so the order becomes "parse → RESET-OK → age-STALE → pause axes → account-STALE or login-STALE → OK". The **Eleven declared knobs** paragraph becomes twelve, gaining `_LOGIN_SETTLE`. Its clause "so `_ACCOUNT_CONFIG` is declared although the verdict never opens that file" is replaced by "and the verdict opens `_ACCOUNT_CONFIG` for the live identity". §Layout and configuration gains, after `DELEGATION_KIT_LOGIN_WINDOW`:
+The check order's `login-STALE` step reads the identity first, so the order becomes "parse → RESET-OK → age-STALE → pause axes → account-STALE or login-STALE → OK". The **Eleven declared knobs** paragraph becomes twelve, gaining `_LOGIN_SETTLE`. Its clause "so `_ACCOUNT_CONFIG` is declared although the verdict never opens that file" is replaced by "and the verdict opens `_ACCOUNT_CONFIG` for the live identity".
+
+The demand-driven refresh's short-circuit paragraph, after "or at least that old by its `updated_at`", gains: "A snapshot whose `account` differs from the live identity is re-polled whatever its age, since its reading speaks for another account's windows." The fail-soft paragraph's closing sentence, which keeps a refresh inside `DELEGATION_KIT_LOGIN_WINDOW` STALE for the window, is replaced:
+
+> A refresh soon after an auth event rewrites `updated_at` while the server-fed percentage may still lag the login by about a minute, so the reroute keeps those readings STALE for the settle floor, or for the blanket window where the identity is unreadable, save the at-or-over ones it may not suppress.
+
+§Layout and configuration's `DELEGATION_KIT_ACCOUNT_CONFIG` bullet: "Both usage producers read it and neither requires it" becomes "Both usage producers and the verdict read it, and none requires it", and the `DELEGATION_KIT_LOGIN_WINDOW` bullet gains "the blanket reroute, which the account-keyed settle floor replaces wherever both identities are readable (§usage-verdict)". §Layout and configuration gains, after `DELEGATION_KIT_LOGIN_WINDOW`:
 
 > - `DELEGATION_KIT_LOGIN_SETTLE` — the account-keyed settle floor (§usage-verdict); default `90` (seconds), validated a non-negative integer by the table validator. The server-fed percentage lags a login by about a minute, so the default leaves that lag a margin. `DELEGATION_KIT_LOGIN_WINDOW` stays the fallback for a snapshot or host whose identity cannot be read.
 
@@ -49,34 +56,34 @@ The fall-open list gains "no sample for the snapshot's account", so a first read
 
 ### (3) The trend reporter closes with a cross-account view
 
-§Trend reporter's step 3 gains a closing block {design-bearing} {user-facing: envelope the entry's deliverable (a)-(d), the unit selected by operator direction 2026-10-03; the advisory-only block, with no aggregate PAUSE, is spec's calibration}. **Not yet applied.** Where the log carries two or more distinct `account` values:
+§Trend reporter's numbered steps gain a fourth {design-bearing} {user-facing: envelope the entry's deliverable (a)-(d), the unit selected by operator direction 2026-10-03; the advisory-only block, with no aggregate PAUSE, is spec's calibration}. **Not yet applied.** Where the log carries two or more distinct `account` values:
 
 > 4. **Combine** the accounts after the per-segment report: one line per account, its newest weekly segment's last smoothed pct and its headroom against `DELEGATION_KIT_PAUSE_PCT_7D`, then `accounts: <n>, at or over the weekly ceiling: <k>`. A rotating operator reads the combined position there. The view is advisory and sums nothing: accounts may differ in tier, so a sum would add different denominators, and the pause decision stays per account. An account with no weekly segment prints `-` for both values.
 
-A log with one account, or none, prints no block. The declared knobs are unchanged, since the ceiling is already `DELEGATION_KIT_PAUSE_PCT_7D`.
+A log with one account, or none, prints no block. No line of the block begins with the two-space segment prefixes `  [5h]` and `  [7d]`, on which §Testing anchors its segment counts. The declared knobs are unchanged, since the ceiling is already `DELEGATION_KIT_PAUSE_PCT_7D`.
 
 ### (4) Tests
 
 The verdict's case table and the trend reporter's module tests gain the rows deltas 1 to 3 need {mechanical}. **Not yet applied.**
 
-- **Delta 1.** `delegation-kit/usage-tests/cases.tsv` gains two columns, the snapshot's `account` and the live identity the case writes into a fixture account config, `-` omitting each. Its rows then gain:
+- **Delta 1.** `delegation-kit/usage-tests/cases.tsv` gains two columns, the snapshot's `account` and the live identity the case writes into a fixture account config, `-` omitting each. Its header comment names both columns, and its defaults line gains `LOGIN_SETTLE=90`. Its rows then gain:
   - a mismatched account inside and outside the window, routing OK to STALE;
   - a mismatched account at or over threshold, still PAUSE;
   - a matched account past the settle floor inside the old window, reading OK;
   - a matched account within the settle floor, reading STALE;
   - a snapshot without `account`, keeping the blanket window.
-- **Delta 1's refresh.** A crate test stubs `DELEGATION_KIT_REFRESH_CMD` and asserts it runs on a mismatch inside `DELEGATION_KIT_REFRESH_MIN_AGE`.
+- **Delta 1's refresh.** A crate test stubs `DELEGATION_KIT_REFRESH_CMD` over a snapshot under `DELEGATION_KIT_REFRESH_MIN_AGE` naming another account. A stub that rewrites the snapshot with the live account is invoked and the verdict reads its fresh percentage; a failing stub leaves the account-switch STALE.
 - **Delta 2.** The roll-witness unit test gains a history whose last line is another account's.
-- **Delta 3.** `delegation-kit/usage-tests/trend-history.log` gains a second account. The trend assertions gain the block, and its absence for a one-account log.
+- **Delta 3.** `delegation-kit/usage-tests/trend-history.log` already carries two accounts, so the block prints on it unchanged. The trend needles gain the block's golden lines, the segment counts stay as they are, and a one-account log the test writes asserts the block's absence.
 
 §Testing names the new rows.
 
 ## Producers and consumers
 
-- **The live identity.** Producer: the harness, which writes the account config. The verdict reads it through the existing fill, the third reader of `oauthAccount.accountUuid` beside the two snapshot producers. Its one consumer is the comparison in delta 1, at the verdict.
+- **The live identity.** Producer: the harness, which writes the account config. The verdict reads it through the existing fill, the third reader of `oauthAccount.accountUuid` beside the two snapshot producers. Its consumers are delta 1's two comparisons: the refresh's short-circuit check before the read, and the reroute after it.
 - **The account-switch STALE.** Producer: the verdict, on a mismatch. Consumers: `agent-budget-guard`, which relays it at exit 2 as advice; the session brief and any session reading `--usage-verdict`; and the history log, which samples it as `verdict=STALE`. It carries no account id, so no identity reaches a session's context.
 - **`DELEGATION_KIT_LOGIN_SETTLE`.** Producer: delegation-kit's table, default `90`; this repo sets no override. Consumers: the verdict, plus the roster-holding readers of a knob name: the table and its validator in `native/src/knobs/delegation_kit.rs`, `--emit knob-roster`, `check-knob-citation`, `check-knob-default-coupling` (the `90` in §Layout and configuration) and the verdict's declared-knob list (`native/src/hook/verdict.rs`'s `KNOBS`), which `check-reads-couples` and `check-gate-substrate-parity` read.
-- **The forced refresh.** Producer: delta 1's mismatch arm. Consumer: `DELEGATION_KIT_REFRESH_CMD`'s argv, which this repo points at the poll producer. A consumer with no refresh command gets the STALE and no re-poll.
+- **The forced refresh.** Producer: the refresh's short-circuit check, on a snapshot naming another account. Consumer: `DELEGATION_KIT_REFRESH_CMD`'s argv, which this repo points at the poll producer. A consumer with no refresh command gets the STALE and no re-poll.
 - **The partitioned roll witness.** Consumer: the reroute, at the verdict, as now.
 - **The combine block.** Producer: `--emit usage-trend`. Consumers: the operator planning a rotation, and a lead reading the weekly headroom before sizing a batch. Each field has that reader: the per-account pct and headroom for the one account, and the count at or over the ceiling for the rotation as a whole.
 - **Enabling config.** This repo sets `DELEGATION_KIT_USAGE_HISTORY` and `DELEGATION_KIT_REFRESH_CMD` (`scripts/delegation-config.knobs`), so deltas 1 and 2 run on every dispatch here. Delta 3's block needs a second account in the log, which only a rotating operator produces. The fixture log is its tested producer, and the trend reporter is demand-gated on the entry's own terms.
@@ -84,8 +91,8 @@ The verdict's case table and the trend reporter's module tests gain the rows del
 
 ## Existing sections updated
 
-- `delegation-kit/SPEC.md` §usage-verdict: failure mode 3, the mtime-proxy honest limit, the check order and the declared-knob paragraph (delta 1); the roll witnesses (delta 2).
-- `delegation-kit/SPEC.md` §Layout and configuration: the new knob bullet and the `agent-budget-guard` paragraph's count (delta 1).
+- `delegation-kit/SPEC.md` §usage-verdict: failure mode 3, the mtime-proxy honest limit, the check order, the declared-knob paragraph and the demand-driven refresh's short-circuit and fail-soft paragraphs (delta 1); the roll witnesses (delta 2).
+- `delegation-kit/SPEC.md` §Layout and configuration: the new knob bullet, the `DELEGATION_KIT_ACCOUNT_CONFIG` and `DELEGATION_KIT_LOGIN_WINDOW` bullets and the `agent-budget-guard` paragraph's count (delta 1).
 - `delegation-kit/SPEC.md` §Trend reporter (delta 3) and §Testing (delta 4).
 - `native/src/hook/verdict.rs` (deltas 1 and 2), `native/src/knobs/delegation_kit.rs` (delta 1), `native/src/emit/usage_trend.rs` (delta 3).
 - `native/src/usage_tests.rs`, `delegation-kit/usage-tests/cases.tsv` and `delegation-kit/usage-tests/trend-history.log` (delta 4).

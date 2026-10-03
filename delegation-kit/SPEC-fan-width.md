@@ -26,9 +26,11 @@ In the paragraph opening "**The `width=<n>` field.**", the sentence "It is the k
 
 > It is the knob's mechanical reader, and it reports the bound without enforcing it (§The delegation model).
 
+§Layout and configuration's `DELEGATION_KIT_FAN_WIDTH` bullet closes on the same phrase. Its "the knob's mechanical reader" becomes "the knob's mechanical reader, which reports the bound and enforces nothing (§The delegation model)".
+
 ### (3) The template tells the dispatcher that the bound is its own to hold
 
-delegation-kit/templates/agent-execution.md's **Serialize on shared files; ≤`DELEGATION_KIT_FAN_WIDTH`-wide otherwise** bullet: the sentence "Independent read-only units may run ≤`DELEGATION_KIT_FAN_WIDTH`-wide." is replaced {mechanical}. **Not yet applied.**
+delegation-kit/templates/agent-execution.md's **Serialize on shared files; ≤`DELEGATION_KIT_FAN_WIDTH`-wide otherwise** bullet: the sentence "Independent read-only units may run ≤`DELEGATION_KIT_FAN_WIDTH`-wide." is replaced {mechanical} {user-facing: the entry's deliverable, whose second branch, the bound stated as discipline the guard only surfaces, the entry leaves to spec; the unit selected by operator direction 2026-10-03; the wording is spec's calibration}. **Not yet applied.**
 
 > Independent read-only units may run ≤`DELEGATION_KIT_FAN_WIDTH`-wide, counting every dispatch still in flight, those you send in one message included. No guard counts them: the budget check's `width=` field reports the bound and nothing refuses a dispatch past it.
 
@@ -42,7 +44,7 @@ The bullet's lead-in is unchanged, so `check-rule-citation`'s resolution of §Th
 
 ## Existing sections updated
 
-- `delegation-kit/SPEC.md` §The delegation model (delta 1) and §usage-verdict (delta 2).
+- `delegation-kit/SPEC.md` §The delegation model (delta 1), §usage-verdict and §Layout and configuration's `DELEGATION_KIT_FAN_WIDTH` bullet (delta 2).
 - `delegation-kit/templates/agent-execution.md`, the **Serialize on shared files; ≤`DELEGATION_KIT_FAN_WIDTH`-wide otherwise** bullet (delta 3).
 - `docs/delegation-kit/SPEC.md`, the generated mirror (all deltas).
 

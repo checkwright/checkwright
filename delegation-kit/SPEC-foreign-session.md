@@ -46,7 +46,7 @@ delegation-kit gains `DELEGATION_KIT_FOREIGN_RESUME` and `DELEGATION_KIT_FOREIGN
 
 > 4. **The cleanup, or the session.** On a one-shot adapter the clone is removed, except on a refusal, where it stays for inspection and the line names it. On a resumable adapter an `OK` turn opens a **session**. The clone stays, and `session.txt` in the run's directory records `adapter=<adapter> mode=<mode> base=<commit> turn=1 id=<id|->`. The refs the shape check compared are kept beside it as `refs.txt`, for the next turn's check. A resume form needing an id where no marker produced one opens no session: the clone is removed and the line says why.
 
-The verdict line keeps its fields. An `OK` that opened a session carries the consequence clause `— resumable: --foreign-resume <key> <prompt-file>`, and one that could not open a session carries `— not resumable (<why>)`. That is §usage-verdict's verdict-string contract: reading, status, consequence. A run whose key holds an open session fails as a kept clone does, naming the session and `--close`.
+The verdict line keeps its fields. An `OK` that opened a session carries the consequence clause `— resumable: --foreign-resume <key> <prompt-file>`, and one that could not open a session carries `— not resumable (<why>)`. That is §usage-verdict's verdict-string contract: reading, status, consequence. A run whose key holds an open session fails as a kept clone does, naming the session and `--close`, so the `FAILED` bullet's "a kept clone under the key" becomes "a kept clone or an open session under the key".
 
 ### (3) `--foreign-resume` answers a session and closes it
 
@@ -70,10 +70,10 @@ Registration matches `--foreign-run`'s:
 
 - the arm row joins `native/src/emit/mod.rs`'s table, with declared knobs `DELEGATION_KIT_FOREIGN_ADAPTERS`, `DELEGATION_KIT_FOREIGN_RESUME`, `DELEGATION_KIT_FOREIGN_SESSION_MARKER`, `DELEGATION_KIT_FOREIGN_TIMEOUT` and `GATE_SDK_TMP_DIR`;
 - `--foreign-resume` joins the crate's network-spawner list there, which a unit test holds disjoint from the fence-safe set;
-- its usage line joins `native/src/runner.rs`'s help;
+- its usage line joins `native/src/runner.rs`'s help, and delegation-kit/README.md's **Use** block gains `"$gates" --foreign-resume <key> <prompt-file>  # the next turn of a session a resumable adapter opened: exit 0 OK, 1 REFUSED, 2 FAILED; --close ends it` after the `--foreign-run` line;
 - gate-sdk/SPEC.md §The non-gate arm's spawner rosters gain it beside `--foreign-run`.
 
-`--foreign-run`'s declared knobs gain the two from delta 1.
+`--foreign-run`'s declared knobs gain the two from delta 1, in its arm row and in §The foreign-vendor run's closing sentence naming them.
 
 ### (4) §The foreign-vendor run states the transport model and its limits
 
@@ -90,7 +90,7 @@ The **What returns, and how it lands** list's model bullet gains: "No adapter bi
 
 ### (5) The protocol template carries the resume
 
-delegation-kit/templates/agent-execution.md's **A foreign-vendor run is mechanical work returned through files** bullet: the closing sentence "No guard fires on it and it cannot be resumed, so size it to finish in one run." is replaced {mechanical}. **Not yet applied.**
+delegation-kit/templates/agent-execution.md's **A foreign-vendor run is mechanical work returned through files** bullet: the closing sentence "No guard fires on it and it cannot be resumed, so size it to finish in one run." is replaced {mechanical} {user-facing: envelope the entry's next slice, (2) with (1) riding it, the unit selected by operator direction 2026-10-03; the wording is spec's calibration}. **Not yet applied.**
 
 > No guard fires on it. Ask the agent to end its turn with its open questions rather than guess. Where your consumer configures the adapter's resume form, answer a question with `--foreign-resume <key> <answer-file>`, which continues the same session in the same clone, and end the session with `--foreign-resume <key> --close` once you hold the result. Otherwise size the unit to finish in one run. A turn can outlast a foreground call, so launch a long one backgrounded with its liveness record and commit nothing while it runs.
 
@@ -111,7 +111,7 @@ The stubs use programs the crate's tests already spawn, as the first slice's do.
 ## Producers and consumers
 
 - **`DELEGATION_KIT_FOREIGN_RESUME` and `DELEGATION_KIT_FOREIGN_SESSION_MARKER`.**
-  - Producer: a consumer's knob file, here the private overlay `scripts/delegation-config.local.knobs`, which `.gitignore` covers. Its two adapters today carry the vendor's ephemeral flag, so neither can resume. The build adds a resumable adapter there once the operator confirms its argv (Definition of Done, *a live run*).
+  - Producer: a consumer's knob file, here the private overlay `scripts/delegation-config.local.knobs`, which `.gitignore` covers. Its two adapters today carry the vendor's ephemeral flag, so neither can resume. The build adds a third, resumable adapter there once the operator confirms its argv (Definition of Done, *a live run*), and leaves the two one-shot: the close review's standing direction names the existing review adapter (the `second-vendor-review` roster block foreign-review lands), and a resume form on it would open a session at every close.
   - Consumers: the two arms, the table and its validator in `native/src/knobs/delegation_kit.rs`, `--emit knob-roster`, `check-knob-citation`, `check-knob-default-coupling` (the two "Default empty") and the template's example lines.
 - **`session.txt`.** Producer: an `OK` open on a resumable adapter. Reader: `--foreign-resume`. Each field has its reader there: `adapter` picks the resume form, `mode` picks the shape check, `base` is the sweep patch's base, `turn` names the rotated reports, and `id` fills `@SESSION_ID@`. Its absence is the closed state, which a new `--foreign-run` reads as a free key.
 - **`refs.txt`.** Producer: the open. Reader: each resume's committed check.
@@ -123,7 +123,8 @@ The stubs use programs the crate's tests already spawn, as the first slice's do.
 
 ## Existing sections updated
 
-- `delegation-kit/SPEC.md`: §The foreign-vendor run, step 4 and the verdict line (delta 2), the new **Resuming a session** subsection (delta 3), and the transport model and honest limits (delta 4); §Layout and configuration (delta 1); §Testing (delta 6).
+- `delegation-kit/SPEC.md`: §The foreign-vendor run, step 4, the verdict line and the `FAILED` bullet (delta 2), the new **Resuming a session** subsection and the declared-knob sentence (delta 3), and the transport model and honest limits (delta 4); §Layout and configuration (delta 1); §Testing (delta 6).
+- `delegation-kit/README.md`, the **Use** block (delta 3).
 - `native/src/knobs/delegation_kit.rs` (delta 1).
 - `native/src/emit/foreign_run.rs` (deltas 2 and 3) and its tests (delta 6).
 - `native/src/emit/mod.rs` and `native/src/runner.rs` (delta 3).
@@ -145,6 +146,6 @@ The roster came from `git grep -n 'foreign-run\|foreign_run\|FOREIGN_ADAPTERS' -
 - [ ] **Merged with no information lost** — §The foreign-vendor run reads as one document, its one-shot behavior unchanged for an adapter with no resume form.
 - [ ] **Amendment deleted** — this file removed on merge; none remain for the component (`ls delegation-kit/SPEC-*.md`).
 - [ ] **Removals propagated** — nothing retired.
-- [ ] **A live run** — granted: an operator grant, 2026-10-03, relayed by the lead, iteration-scoped and unspent at authoring. Build spends it and archives it in the spending commit's message. The grant covers one resumable codex adapter in the private overlay, non-ephemeral, in the read-only sandbox, with a resume form and a session-id marker, and about three small foreign turns. One read-only audit opens a session whose prompt asks the agent to end its first turn with a question. One `--foreign-resume` answers it to `OK`, and `--close` ends the session. The landing commit's message quotes the three verdict lines with the adapter name elided. A live run contradicting the inferred session-id placement corrects delta 1's marker rule before the slice lands.
+- [ ] **A live run** — granted: an operator grant, 2026-10-03, relayed by the lead, iteration-scoped and unspent at authoring. Build spends it and archives it in the spending commit's message. The grant covers one resumable codex adapter in the private overlay, added beside the two one-shot adapters rather than converting either, non-ephemeral, in the read-only sandbox, with a resume form and a session-id marker, and about three small foreign turns. One read-only audit opens a session whose prompt asks the agent to end its first turn with a question. One `--foreign-resume` answers it to `OK`, and `--close` ends the session. The landing commit's message quotes the three verdict lines with the adapter name elided. A live run contradicting the inferred session-id placement corrects delta 1's marker rule before the slice lands.
 - [ ] **Gaps filed** — a cross-component gap found during the work filed with `--emit file-gap`.
 - [ ] **The entry is demoted, not done** — its deliverable is the corpus of slices, so the landing commit returns `heterogeneous-agent-delegation` to the deferred section with `--queue demote`, a stage before the drain stage. It drops the `[spec:]` tag, records this slice as landed and names the next, (3) the budget oracle or (4) stage-contract expression (canon-kit/SPEC.md §Merging an amendment, step 4). The same commit rewords the entry's body to fit queue-kit's per-entry cap.
