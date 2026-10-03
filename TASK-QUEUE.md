@@ -55,14 +55,6 @@ four kept gate-sdk gates assume this repo's layout, found at gate-sdk-value-pass
 
 ## Technical Debt
 
-### guard-kit-ruleset-brevity
-
-guard-kit/SPEC.md's §The generic ruleset (its preamble, §The rule roster and §Writing a consumer rule), under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement), about 22.5k of the file's 48.7k words by `wc -w` at this scope, the rule roster 21.0k of it; the last guard-kit section the moves have not passed.
-
-**Deliverable:** the three moves over that section under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading and rule name kept verbatim and every fact another surface cites into it kept, per a citation survey. Applied last, after `grant-slot-escaped-blank`, whose rule `grant_path_slot` the roster cites at six sites.
-
-**Cost while deferred:** paid by every session and adopter that reads the rule roster. Filed 2026-10-03 as a split at guard-ruleset-gate-neutrality-pass' scope. Part of the operator's selection of the unit set, direction 2026-10-03, lead-relayed (not a ruling).
-
 ## Deferred
 
 ### audit-trigger-mirror-component
@@ -341,7 +333,7 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes, landing as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes, landing as `installer-install-brevity` and `installer-remainder-brevity`; and, the kit's other sections remaining: drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections, delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope, landing as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope, landing as `queue-kit-gate-brevity`; guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope, landing as `guard-kit-tool-brevity`.
 
-delegation-kit's §The delegation model and installer's §The consumer smoke left 2026-10-02 at the companion-tier-delegation-pass and consumer-smoke-driver-pass scopes, landing as `delegation-kit-model-brevity` and `installer-smoke-brevity`; guard-kit's remainder and §The generic ruleset left 2026-10-03 at the guard-kit-write-side-pass and guard-ruleset-gate-neutrality-pass scopes, landing as `guard-kit-remainder-brevity` and [guard-kit-ruleset-brevity](#guard-kit-ruleset-brevity).
+delegation-kit's §The delegation model and installer's §The consumer smoke left 2026-10-02 at the companion-tier-delegation-pass and consumer-smoke-driver-pass scopes, landing as `delegation-kit-model-brevity` and `installer-smoke-brevity`; guard-kit's remainder and §The generic ruleset left 2026-10-03 at the guard-kit-write-side-pass and guard-ruleset-gate-neutrality-pass scopes, landing as `guard-kit-remainder-brevity` and `guard-kit-ruleset-brevity`.
 
 ### tarball-build-attestation
 
@@ -1287,4 +1279,5 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 
 - guard-kit-violation-recipe
 - grant-slot-escaped-blank
+- guard-kit-ruleset-brevity
 
