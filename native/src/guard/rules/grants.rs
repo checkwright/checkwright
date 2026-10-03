@@ -133,7 +133,7 @@ pub fn ro_pipeline(ctx: &Ctx) -> Decided {
         return Ok(None);
     }
     let s = ctx.view(ctx.cmd(), SqDqHd)?;
-    if s.contains(['\'', '"']) || grep_q(r"(&&|\|\||;|&)", &s) {
+    if s.contains(['\'', '"']) || shell_backgrounds(&s) {
         return Ok(None);
     }
     for tgt in redirect_targets(&s) {
@@ -141,20 +141,22 @@ pub fn ro_pipeline(ctx: &Ctx) -> Decided {
             return Ok(None);
         }
     }
-    let segs = ctx.segments(&s);
+    let decorated = ctx.segments(&s).len() > 1;
     let mut reads = 0usize;
-    for (i, seg) in segs.iter().enumerate() {
-        let seg = trim_start(seg);
-        if seg.is_empty() || is_banner(seg) {
-            continue;
+    for stmt in ctx.statements(&s) {
+        for (i, seg) in ctx.pipes(&stmt).iter().enumerate() {
+            let seg = trim_start(seg);
+            if seg.is_empty() || is_banner(seg) {
+                continue;
+            }
+            if head_word(seg) == "xargs" && !is_ro_xargs(h, seg) {
+                return Ok(None);
+            }
+            if !is_ro_segment(h, seg) && !(i == 0 && decorated && is_bare_allow(h, seg).0) {
+                return Ok(None);
+            }
+            reads += 1;
         }
-        if head_word(seg) == "xargs" && !is_ro_xargs(h, seg) {
-            return Ok(None);
-        }
-        if !is_ro_segment(h, seg) && !(i == 0 && segs.len() > 1 && is_bare_allow(h, seg).0) {
-            return Ok(None);
-        }
-        reads += 1;
     }
     if reads == 0 || !ro_forms_clear(ctx, ctx.cmd())? || refused(ctx, ctx.cmd())? {
         return Ok(None);

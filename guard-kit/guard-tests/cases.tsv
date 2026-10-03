@@ -182,8 +182,8 @@ block	cat TASK-QUEUE.md
 block	cat -n guard-kit/SPEC.md
 block	cat a.md; cat b.md
 block	cat a.md; echo ===; cat b.md
-fallthrough	cat a.md; find lib -type f
-fallthrough	cat a.md && cat b.md
+fallthrough	cat a.md; make build
+fallthrough	cat a.md && make build
 fallthrough	echo a; echo b
 allow	cat one.md two.md
 allow	cat notes.md | wc -l
@@ -310,9 +310,24 @@ fallthrough	cat >> .tmp/j.md <<'EOF' \@NL@; touch x@NL@EOF
 allow	grep -rn foo src | head
 allow	grep foo file | awk '{print}'
 fallthrough	grep foo file | md5sum
-# the split keeps an escaped ';' in its word, but the rule's own chain test reads any ';'
-# in the skeleton and declines; an even backslash run is a real break besides
-fallthrough	grep foo a\;b
+# a compound is read statement by statement whatever joins it: each separator, a banner
+# statement, and the widened lead opening a later statement (rule `allowlist_chain` would block
+# it otherwise); a statement off the roster, a write form or a write in a later statement, and
+# the backgrounding '&' still refuse
+allow	grep -c x tracked.md; wc -l tracked.md
+allow	grep -q x tracked.md && head -1 tracked.md
+allow	grep -q x tracked.md || echo none
+allow	echo ---; grep -c x tracked.md
+allow	git status; grep -c x tracked.md
+allow	git status && ls
+allow	cat a.md; find lib -type f
+fallthrough	grep -c x tracked.md; md5sum tracked.md
+fallthrough	grep -c x tracked.md; sort -o out.txt tracked.md
+fallthrough	grep -c x tracked.md; touch tracked.md
+fallthrough	grep -c x tracked.md & wc -l tracked.md
+# the split keeps an escaped ';' in its word, so the call is one read; an even backslash run is
+# a real break, and its second statement 'b' is off the roster
+allow	grep foo a\;b
 fallthrough	grep foo a\\;b
 # an escaped '|' and a backslash-newline are no break either, so each call below is one read; an
 # even run is a literal backslash and then a real break, here before a segment off the roster. The
@@ -468,6 +483,10 @@ allow	printf x >> .tmp/journal.md@NL@rm -rf .tmp/x
 allow	printf x >> .tmp/journal.md && git status
 allow	rm -rf .tmp/x .tmp/y
 allow	rm -f .tmp/dead-producer.run
+# a read redirected to a bounded target is this rule's grant, not rule `ro_pipeline`'s, and a target
+# outside every scratch dir is neither's
+allow	grep -c x tracked.md > .tmp/n.txt; wc -l .tmp/n.txt
+fallthrough	grep -c x tracked.md > out.txt
 # one refusing row per clause: the scratch member itself and a path outside every member (b); a
 # '..' component and a rooted path (a); a tracked destination (c, d); the operand grammar's
 # withheld forms; an xargs running a write utility (d); a backgrounded write, which rule
@@ -486,18 +505,20 @@ block	rm .tmp/x &
 fallthrough	make build > .tmp/b.log
 
 # rule `allowlist_chain` — decorated allowlisted bare lead with an unmatched segment blocked;
-#           chaining steer, redirect steer, and the untouched non-firing cases
+#           chaining steer, redirect steer, and the untouched non-firing cases; a compound of
+#           allowlisted segments ends in a script glob off the read roster, since rule
+#           `ro_pipeline` grants an allowlisted lead beside roster reads first
 block	git status && rm -rf tmp
 block	git status 2>&1
 fallthrough	git status
 fallthrough	frobnicate && git status
-fallthrough	git status && ls
-fallthrough	git status && printf done
+fallthrough	git status && ls && bash scripts/check-x.sh
+fallthrough	git status && printf done && bash scripts/check-x.sh
 # a segment the allowlist glob matches but a backgrounding '&' ends is not granted — the harness
 # grants no backgrounded call — so it is the unmatched segment; printf's word-bounded ':*' matches
 # the bare 'printf' the harness also grants
 block	git status && printf done &
-fallthrough	git status && printf
+fallthrough	git status && printf && bash scripts/check-x.sh
 # the bare head of an entry whose only '*' is a closing ' *' is a bare lead ('git rm -q *');
 # a lead carrying an argument is not
 block	git rm -q; make build

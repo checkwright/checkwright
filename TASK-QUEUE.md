@@ -8,25 +8,13 @@
 
 ## New Features
 
-### compound-read-classifier-reach
-
-[spec: SPEC-compound-read.md]
-
-a read-shaped compound or redirected call still falls to the classifier. `side-effect-free-read-arms`' align survey found most sed and awk reads in the prompt-friction log were compounds or carried a redirect, which rule `ro_pipeline` refuses on its own terms. Operator direction 2026-09-30, lead session: keep that unit as specified and file this. Measured at spec over the current log (that survey's corpus was drained): the compound half flips 26 of 211 fall-through lines, and the redirect half one more (the amendment records the method).
-
-**Deliverable:** rule `ro_pipeline`'s reach over a compound of read-only statements and over a redirect to a bounded target, the redirect half landed with `write-side-steering`'s bounds test.
-
-**Cost while deferred:** the classifier keeps deciding most read-shaped calls, with its occasional false positives. Filed 2026-09-30 to the gap inbox by guard-kit-steering's lead; promoted at its close: →fix fails because widening a grant is new mechanism, →forward because the direction is given. Owner lookup: `ro_pipeline`, `compound`, `redirect` in this file — `write-side-steering`, overlapping on the redirect only; owner guard-kit/SPEC.md §The rule roster, rule `ro_pipeline`.
-
-**Selected 2026-10-03 for guard-kit-write-side-pass, operator direction lead-relayed (not a ruling):** a feature, the spec stage's to author and promote; third in order, after `bash-reader-escaped-pipe`, whose splits it reads, and `write-side-steering`; its need the closing push alone.
-
 ## Technical Debt
 
 ### guard-kit-remainder-brevity
 
 guard-kit/SPEC.md's preamble, §Layout and configuration, §Testing and §Out of scope, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement), about 8.9k of the file's 48.1k words by `wc -w` at this scope; §The generic ruleset stays on the parent until the rule entries that rewrite it land.
 
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. Applied last, after `bash-reader-escaped-pipe`, `write-side-steering` and [compound-read-classifier-reach](#compound-read-classifier-reach) merge, since their decision-table cases may edit §Testing.
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. Applied last, after `bash-reader-escaped-pipe`, `write-side-steering` and `compound-read-classifier-reach` merge, since their decision-table cases may edit §Testing.
 
 **Cost while deferred:** paid by every session and adopter that reads an unpassed guard-kit section. Filed 2026-10-03 as a split at guard-kit-write-side-pass' scope. Part of the operator's selection of the unit set, direction 2026-10-03, lead-relayed (not a ruling).
 
@@ -1289,4 +1277,5 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 
 - bash-reader-escaped-pipe
 - write-side-steering
+- compound-read-classifier-reach
 
