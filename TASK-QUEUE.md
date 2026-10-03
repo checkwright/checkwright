@@ -8,6 +8,16 @@
 
 ## New Features
 
+### guard-kit-violation-recipe
+
+[spec: SPEC-violation-recipe.md]
+
+guard-kit registers `check-door-binding` but ships no `smoke/violation.sh`, which gate-sdk/SPEC.md §Consumer smoke makes owed wherever a battery-reddening violation is craftable; the nine other kits each ship one.
+
+**Deliverable:** `guard-kit/smoke/violation.sh` planting a `check-door-binding` violation in the scratch consumer, run green by `--run-consumer-smoke`, and guard-kit/SPEC.md §Testing's smoke paragraph naming it.
+
+**Cost while deferred:** the consumer smoke never proves guard-kit's one gate reds a scratch consumer. Filed 2026-10-03 to the gap inbox at guard-kit-write-side-pass' build; promoted at its close: →fix fails because a violation recipe is new mechanism; →forward because no ruling is owed. Re-verified: `ls */smoke/violation.sh` lists nine kits and not guard-kit. drift-kit/SPEC.md's stale *as guard-kit does* clause was fixed at the same close. Owner lookup: `violation.sh`, `violation recipe` in this file — none; owner guard-kit/SPEC.md §Testing.
+
 ## Technical Debt
 
 ### guard-kit-ruleset-brevity
@@ -39,16 +49,6 @@ Rule `grant_path_slot` false-blocks a backslash-escaped blank inside a slot oper
 **Deliverable:** guard-kit/SPEC.md §The reader and its views states how the dequoted view holds an escaped blank, the reader follows it, and a decision-table row pairs the escaped-blank slot operand with a real second operand.
 
 **Cost while deferred:** a false block on a rare spelling, in the safe direction. Filed 2026-10-03 to the gap inbox at guard-kit-write-side-pass' build (predates the iteration); promoted at its close: →fix fails because the dequoted view is shared by every rule declaring it, so the change is a reader contract with cross-rule reach; →forward because no ruling is owed. Re-verified: the hook blocks that command under this repo's grant. Owner lookup: `escaped`, `backslash`, `grant_path_slot` in this file — none; owner guard-kit/SPEC.md §The reader and its views.
-
-### guard-kit-violation-recipe
-
-[cost: once/low] [surface: guard-kit]
-
-guard-kit registers `check-door-binding` but ships no `smoke/violation.sh`, which gate-sdk/SPEC.md §Consumer smoke makes owed wherever a battery-reddening violation is craftable; the nine other kits each ship one.
-
-**Deliverable:** `guard-kit/smoke/violation.sh` planting a `check-door-binding` violation in the scratch consumer, run green by `--run-consumer-smoke`, and guard-kit/SPEC.md §Testing's smoke paragraph naming it.
-
-**Cost while deferred:** the consumer smoke never proves guard-kit's one gate reds a scratch consumer. Filed 2026-10-03 to the gap inbox at guard-kit-write-side-pass' build; promoted at its close: →fix fails because a violation recipe is new mechanism; →forward because no ruling is owed. Re-verified: `ls */smoke/violation.sh` lists nine kits and not guard-kit. drift-kit/SPEC.md's stale *as guard-kit does* clause was fixed at the same close. Owner lookup: `violation.sh`, `violation recipe` in this file — none; owner guard-kit/SPEC.md §Testing.
 
 ### amendment-manifest-prose-span
 
