@@ -250,6 +250,42 @@ fn copy_in(
 // spec: installer/SPEC.md §What init seeds — a starting-roster member is written by name and
 // nothing else: the install-time omission retired with the bootstrap's one success path (§The gate
 // binary), so no reason token is resolved and no second roster of ported gates is maintained.
+// spec: installer/SPEC.md §Payload recipes — the registry init last wrote is the blob at the hash
+// the manifest carries forward while the file is kept; an absent row classifies nothing, and a blob
+// gone from the object store says so and classifies nothing
+fn retired_members(
+    root: &Path,
+    recorded: Option<&String>,
+    kept: &str,
+    planned: &str,
+    dropped: &BTreeSet<String>,
+) -> Vec<(String, String)> {
+    let Some(hash) = recorded else {
+        return Vec::new();
+    };
+    let root_s = root.to_string_lossy().into_owned();
+    let blob = crate::proc::run(&programs::GIT, &["-C", &root_s, "cat-file", "blob", hash])
+        .ok()
+        .and_then(|out| out.stdout().map(|o| String::from_utf8_lossy(o).into_owned()));
+    let Some(last_written) = blob else {
+        println!(
+            "note: the registry init last wrote ({}) is not in this repository's object store, so kept members are not classified",
+            hash
+        );
+        return Vec::new();
+    };
+    let dirs = super::doctor::tree_decl_dirs(root).map(|(_, d)| d).unwrap_or_default();
+    payload_recipe::retired(kept, &last_written, planned, dropped)
+        .into_iter()
+        .map(|m| {
+            let disposition = crate::registry::resolve(&m, &dirs)
+                .map(|src| recipe::install_disposition(Path::new(&src)))
+                .unwrap_or_default();
+            (m, disposition)
+        })
+        .collect()
+}
+
 fn plan_gates(pkg: &Package, kits: &[String], profile_name: &str) -> String {
     let mut out = String::new();
     out.push_str(&format!(
@@ -588,6 +624,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
             &gates_list,
             &payload_recipe::missing(&kept, &added),
             &payload_recipe::still_registered(&kept, &dropped),
+            &retired_members(&root, prior.get(&gates_list), &kept, &planned_registry, &dropped),
         );
         kept
     };
@@ -602,7 +639,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
                     if !write_in(&root, text, &dest, &prior, f, &mut r)? {
                         let kept = std::fs::read_to_string(root.join(&dest)).unwrap_or_default();
                         let want = payload_recipe::lines_for(&recipes, file_name(&dest));
-                        payload_recipe::report_kept(&dest, &payload_recipe::missing(&kept, &want), &[]);
+                        payload_recipe::report_kept(&dest, &payload_recipe::missing(&kept, &want), &[], &[]);
                     }
                 }
                 None => copy_in(&root, Path::new(&src), &dest, &prior, None, f, &mut r)?,
@@ -725,7 +762,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
             (Some("kept"), Some(p), h) => {
                 if p == seam {
                     let kept = std::fs::read_to_string(root.join(p)).unwrap_or_default();
-                    payload_recipe::report_kept(p, &payload_recipe::missing(&kept, &seam_add), &[]);
+                    payload_recipe::report_kept(p, &payload_recipe::missing(&kept, &seam_add), &[], &[]);
                 }
                 r.changed.push(p.to_string());
                 if !r.is_written.contains(p) {

@@ -231,19 +231,44 @@ pub fn still_registered(kept_registry: &str, dropped: &BTreeSet<String>) -> Vec<
         .collect()
 }
 
-// spec: installer/SPEC.md §Payload recipes — the report a kept seam or registry gets, with the remedy
-pub fn report_kept(file: &str, lines: &[String], gates: &[String]) {
-    if lines.is_empty() && gates.is_empty() {
+// spec: installer/SPEC.md §Payload recipes — a retired member: the kept registry and the one init
+// last wrote both carry it, this run's does not, and no drop already reports it
+pub fn retired(kept: &str, last_written: &str, planned: &str, dropped: &BTreeSet<String>) -> Vec<String> {
+    let set = |text: &str| -> BTreeSet<String> {
+        crate::registry::members(text).into_iter().map(|m| m.trim().to_string()).collect()
+    };
+    let (prior, plan) = (set(last_written), set(planned));
+    crate::registry::members(kept)
+        .into_iter()
+        .map(|m| m.trim().to_string())
+        .filter(|m| prior.contains(m) && !plan.contains(m) && !dropped.contains(m))
+        .collect()
+}
+
+// spec: installer/SPEC.md §Payload recipes — the report a kept seam or registry gets, with the remedy;
+// a retired member pairs with its install disposition, empty when none resolves
+pub fn report_kept(file: &str, lines: &[String], gates: &[String], retired: &[(String, String)]) {
+    if lines.is_empty() && gates.is_empty() && retired.is_empty() {
         return;
     }
-    println!("\n{} is yours, so the payload recipes' or the selection's change is not placed there:", file);
+    println!("\n{} is yours, so init's change is not placed there:", file);
     for l in lines {
         println!("  add:  {}", l);
     }
     for g in gates {
         println!("  drop: {}", g);
     }
-    println!("  help: add them by hand, or pass --force to take init's file.");
+    for (g, disposition) in retired {
+        match disposition.as_str() {
+            "" => println!("  retire: {} — init's registry no longer starts it", g),
+            d => println!("  retire: {} — init's registry no longer starts it (# install: {})", g, d),
+        }
+    }
+    if retired.is_empty() {
+        println!("  help: add or remove the lines by hand, or pass --force to take init's file.");
+    } else {
+        println!("  help: add or remove the lines by hand, keep a retired gate deliberately with --with-gate <gate>, or pass --force to take init's file.");
+    }
 }
 
 #[cfg(test)]
@@ -340,6 +365,20 @@ mod tests {
         assert_eq!(still_registered(&format!("# h\n{}\n", stem), &dropped), vec![stem.clone()]);
         assert!(still_registered("# h\n", &dropped).is_empty());
         assert_eq!(drop_gates(&format!("# {}\n{}\nkeep\n", stem, stem), &dropped), format!("# {}\nkeep\n", stem));
+    }
+
+    // spec: installer/SPEC.md §Payload recipes — a retired member is one the kept and last-written
+    // registries carry and this run's does not, a drop excluded
+    #[test]
+    fn a_retired_member_is_kept_last_written_and_unplanned() {
+        let none: BTreeSet<String> = BTreeSet::new();
+        assert!(retired("a\n", "a\n", "a\n", &none).is_empty());
+        assert_eq!(retired("# h\na\nb\n", "a\nb\n", "a\n", &none), vec!["b".to_string()]);
+        let dropped: BTreeSet<String> = ["b".to_string()].into_iter().collect();
+        assert!(retired("a\nb\n", "a\nb\n", "a\n", &dropped).is_empty());
+        assert_eq!(still_registered("a\nb\n", &dropped), vec!["b".to_string()]);
+        assert!(retired("a\nmine\n", "a\n", "a\n", &none).is_empty());
+        assert!(retired("a\nb\n", "", "", &none).is_empty());
     }
 
     // spec: installer/SPEC.md §Payload recipes — neither flag re-applies the recorded set; a given

@@ -213,20 +213,25 @@ fn content_empty(
     (present > 0).then_some(true)
 }
 
+fn tree_disarmed_block(out: &mut String, root: &std::path::Path, list_text: &str) {
+    let Some((gates, dirs)) = tree_decl_dirs(root) else {
+        return;
+    };
+    disarmed_block(out, root, list_text, &dirs, |k| crate::knobs::wire_in(&gates, k));
+}
+
 // spec: installer/SPEC.md §doctor — the tree's own resolution, anchored at its root as the battery
 // run there anchors it: its gates directory first, then each kit root's `checks/`
-fn tree_disarmed_block(out: &mut String, root: &std::path::Path, list_text: &str) {
+pub(super) fn tree_decl_dirs(root: &std::path::Path) -> Option<(String, Vec<String>)> {
     let gates = crate::knobs::gates_dir();
     let gates = if crate::walk::path_root(&gates).is_some() {
         gates
     } else {
         root.join(&gates).display().to_string()
     };
-    let Ok(kits) = crate::walk::kit_roots_abs_at(&root.display().to_string(), &gates) else {
-        return;
-    };
+    let kits = crate::walk::kit_roots_abs_at(&root.display().to_string(), &gates).ok()?;
     let dirs = crate::registry::resolve_dirs(&gates, &kits);
-    disarmed_block(out, root, list_text, &dirs, |k| crate::knobs::wire_in(&gates, k));
+    Some((gates, dirs))
 }
 
 // spec: installer/SPEC.md §doctor — the toolchain block over the selection: an owed member is

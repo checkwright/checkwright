@@ -5,7 +5,7 @@ use super::consumer::{
     append, commits, consumer, copy_tree, entry_run, failed, find_line, first_starting, git, git_out, hash_in, is_file,
     out, porcelain, seam_of, sorted, tree, write, Lock, GATES_DIR, PROFILE_DERIVED,
 };
-use super::profiles::{kit_roots, live_members, profile_kits};
+use super::profiles::{commit_all, kit_roots, live_members, profile_kits};
 use super::{fail, lines, merged_in, say, Entry, Outcome, Run, Step};
 use crate::{programs, walk};
 use std::path::Path;
@@ -506,6 +506,27 @@ pub(super) fn selection(state: &mut Run) -> Step {
             kit
         )));
     }
+    // spec: installer/SPEC.md §The consumer smoke — a kept registry reports a member init's registry
+    // stopped starting, and a --with-gate naming it ends the report
+    let selected = ["init", "--profile", &min, "--with-kit", &kit, "--without-gate", &drop, "--with-gate", &gate];
+    init_ok(state, &sc, &selected, "selection arm: re-applying the selection failed")?;
+    append(&list, "# kept by the adopter\n")?;
+    commit_all(&sc, "chore: keep the registry", "selection arm: committing the edited registry failed")?;
+    let retire = format!("retire: {}", gate);
+    let o = init_ok(state, &sc, &["init", "--no-selection"], "selection arm: a kept --no-selection run failed")?;
+    if !o.contains(&retire) {
+        return Err(fail(format!(
+            "selection arm: a kept registry still registering {} after --no-selection printed no '{}' line",
+            gate, retire
+        )));
+    }
+    if !std::fs::read_to_string(&list).unwrap_or_default().lines().any(|l| l == gate) {
+        return Err(fail(format!("selection arm: the kept registry lost {} — init wrote a file it does not own", gate)));
+    }
+    let o = init_ok(state, &sc, &selected, "selection arm: re-selecting over the kept registry failed")?;
+    if o.contains(&retire) {
+        return Err(fail(format!("selection arm: {} named with --with-gate is still reported retired", gate)));
+    }
     let t = tree(&sc)?;
     let pid = std::process::id();
     let first_min = min_kits.first().cloned().unwrap_or_default();
@@ -530,8 +551,8 @@ pub(super) fn selection(state: &mut Run) -> Step {
         }
     }
     say(&format!(
-        "selection: {} added and {} registered, {} dropped, all recorded; a bare re-run unchanged; --no-selection restores {} with {} left on disk; three refusals at exit 2 writing nothing",
-        kit, gate, drop, min, kit
+        "selection: {} added and {} registered, {} dropped, all recorded; a bare re-run unchanged; --no-selection restores {} with {} left on disk; a kept registry reports {} retired until --with-gate names it; three refusals at exit 2 writing nothing",
+        kit, gate, drop, min, kit, gate
     ));
     Ok(())
 }
