@@ -579,8 +579,8 @@ const TREND_NEEDLES: &[(&str, &str)] = &[
     ("per-account grouping: acctA heads its own block", "account acctA"),
     ("per-account grouping: acctB heads its own block", "account acctB"),
     (
-        "spike-then-correction excluded, not averaged: the ends stay put",
-        "reset@20000 tier=pro: 10.0%->25.0%",
+        "spike-then-correction excluded from the rate, not averaged; the ends are the segment's own",
+        "reset@20000 tier=pro: 10.0%->40.0% over 3.00h, +15.00%/h",
     ),
     ("spike-then-correction: the pair is flagged suspect", "2 suspect"),
     (
@@ -657,6 +657,33 @@ fn the_kits_trend_fixture_reports_its_segments() {
         "[combine absent]: a one-account log printed the combine block: {}",
         alone
     );
+
+    // spec: delegation-kit/SPEC.md §Trend reporter — a weekly segment ending in a downward
+    // correction reports its own last reading on the segment line, the headroom and the combine
+    // block, while the rate leaves both suspects out
+    let corrected = dir.join("ends-in-correction.log");
+    std::fs::write(
+        &corrected,
+        "updated_at=1000 pct=5 resets_at=20000 login_at=500 account=acctC tier=pro pct_7d=10 resets_7d=600000\n\
+         updated_at=4600 pct=6 resets_at=20000 login_at=500 account=acctC tier=pro pct_7d=100 resets_7d=600000\n\
+         updated_at=8200 pct=7 resets_at=20000 login_at=500 account=acctC tier=pro pct_7d=96 resets_7d=600000\n\
+         updated_at=1000 pct=5 resets_at=20000 login_at=700 account=acctD tier=pro pct_7d=20 resets_7d=700000\n",
+    )
+    .expect("the correction log must be writable");
+    let ends = usage_trend::emit(&[text(&corrected)]).expect("the correction log must report");
+    for needle in [
+        "[7d] reset@600000 tier=pro: 10.0%->96.0% over 2.00h, n/a (one trusted reading), 3 sample(s), 2 suspect",
+        "weekly headroom: -1.0% to the 95% ceiling",
+        "  account acctC: weekly 96.0%, headroom -1.0% to the 95% ceiling",
+        "accounts: 2, at or over the weekly ceiling: 1",
+    ] {
+        assert!(
+            ends.contains(needle),
+            "[ends in a correction]: output missing '{}': {}",
+            needle,
+            ends
+        );
+    }
 
     // spec: delegation-kit/SPEC.md §Trend reporter — the two fail-closed arms, preserved as the
     // arm's own `Err` into `Arm::Emit`'s exit 2 rather than as the shell idiom that read a status

@@ -213,6 +213,11 @@ fn flush(rows: &[&Rec], pause7: &str, last_acct: &mut Option<String>, out: &mut 
     let susp = suspect(rows);
     let nsusp = susp.iter().filter(|s| **s).count();
     let live: Vec<usize> = (0..n).filter(|i| !susp[*i]).collect();
+    // spec: delegation-kit/SPEC.md §Trend reporter — suspects leave the rate only: the endpoints,
+    // the span, the token delta, the headroom and the combine line read the segment's own first and
+    // last samples, so a segment ending in a correction reports the corrected reading.
+    let (first, last) = (sp[0], sp[n - 1]);
+    let hours = (num(&rows[n - 1].updated) - num(&rows[0].updated)) / 3600.0;
     // spec: delegation-kit/SPEC.md §Trend reporter — every sample suspect falls back to the raw
     // span so the segment still reports rather than vanishing; the suspect count beside it is what
     // tells a reader the numbers came from an unreliable producer.
@@ -220,13 +225,12 @@ fn flush(rows: &[&Rec], pause7: &str, last_acct: &mut Option<String>, out: &mut 
         (Some(f), Some(l)) => (*f, *l),
         _ => (0, n - 1),
     };
-    let (first, last) = (sp[fi], sp[li]);
-    let hours = (num(&rows[li].updated) - num(&rows[fi].updated)) / 3600.0;
-    let (rate, ratefmt) = if hours > 0.0 {
-        let r = (last - first) / hours;
+    let rate_hours = (num(&rows[li].updated) - num(&rows[fi].updated)) / 3600.0;
+    let (rate, ratefmt) = if rate_hours > 0.0 {
+        let r = (sp[li] - sp[fi]) / rate_hours;
         (r, format!("{:+.2}%/h", r))
     } else {
-        (0.0, "n/a (single reading)".to_string())
+        (0.0, "n/a (one trusted reading)".to_string())
     };
 
     let acct = &rows[0].acct;
@@ -244,11 +248,11 @@ fn flush(rows: &[&Rec], pause7: &str, last_acct: &mut Option<String>, out: &mut 
     ));
     // spec: delegation-kit/SPEC.md §The usage.txt contract — the token axis is read only when both
     // endpoints carry it, the omit-don't-empty rule meaning a mixed segment has no delta to report.
-    if rows[li].tin != ABSENT && rows[fi].tin != ABSENT {
+    if rows[n - 1].tin != ABSENT && rows[0].tin != ABSENT {
         out.push_str(&format!(
             "      tokens: +{} in / +{} out over the segment\n",
-            (num(&rows[li].tin) - num(&rows[fi].tin)) as i64,
-            (num(&rows[li].tout) - num(&rows[fi].tout)) as i64
+            (num(&rows[n - 1].tin) - num(&rows[0].tin)) as i64,
+            (num(&rows[n - 1].tout) - num(&rows[0].tout)) as i64
         ));
     }
     // spec: delegation-kit/SPEC.md §Trend reporter — the weekly planning number, printed against

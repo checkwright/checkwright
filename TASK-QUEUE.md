@@ -60,14 +60,6 @@ delegation-kit/SPEC.md's sections no brevity slice has passed — the preamble, 
 
 **Cost while deferred:** paid by every session and adopter that reads those contracts. Filed 2026-10-04 as a split at scope. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling).
 
-### usage-trend-suspect-endpoint
-
-`--emit usage-trend` reports a segment's endpoints, its weekly headroom and the multi-account combine line from the last non-suspect smoothed sample (native/src/emit/usage_trend.rs, `flush`), where delegation-kit/SPEC.md §Trend reporter steps 3 and 4 promise the first and last smoothed pct and step 2 excludes suspect samples from rate math only. A segment ending in a downward correction, say 10, 100, 96, reports 10%, and an account at 96% drops out of the at-or-over count.
-
-**Deliverable:** the endpoints, headroom and combine line read the segment's own first and last smoothed samples, with rate math still over the non-suspect ones, under a fixture segment ending in a correction.
-
-**Cost while deferred:** a rotating operator under-reads an account near its weekly ceiling. Filed 2026-10-04 to the gap inbox by delegation-transport-pass' close second-vendor review; promoted at the next scope: →fix fails because the reading feeds the rate, headroom and combine lines and §Testing's segment assertions, a build with its fixture rather than a drain commit; →forward because the SPEC settles it. Re-verified: `flush` takes `live.first()`/`live.last()` over the non-suspect indices, and a run over a weekly segment of 10, 100, 96 printed `10.0%->10.0%` and a combine line of 10.0%. Owner lookup: `usage-trend`, `suspect`, `smoothed`, `Trend reporter` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §Trend reporter.
-
 ### foreign-resume-session-edges
 
 delegation-kit/SPEC.md §Resuming a session misstates two edges. (1) It says a sweep session's `change.patch` is always the session's whole change, but a `FAILED` resume turn returns before regenerating it (native/src/emit/foreign_run.rs, the `outcome` check ahead of `write_patch`), so a session closed after a failed sweep turn keeps a patch missing that turn while `--close` removes the clone. (2) Nothing serializes commands sharing a key: two resumes, or a resume and `--close`, can rotate one report, write one turn or remove a running turn's clone, and the section states no one-writer-per-key rule.
@@ -1283,4 +1275,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 A balanced Liquid token a docs page means literally parses and renders blank, and neither check-docs-liquid-parse nor check-docs-render-fidelity sees the loss; no live page carries it, and the fix is a render-side assertion or a token scan outside raw blocks (site-kit/SPEC.md §check-docs-liquid-parse).
 
 ## Done
+
+- usage-trend-suspect-endpoint
 

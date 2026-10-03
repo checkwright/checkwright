@@ -676,7 +676,7 @@ Emits one verdict line naming the model the session runs on and, with `--expect 
 
 **The declared knobs are `DELEGATION_KIT_USAGE_HISTORY` and `DELEGATION_KIT_PAUSE_PCT_7D`**, both rows of delegation-kit's static table ([§Layout and configuration](#layout-and-configuration)), so no reader-side default can drift from a consumer's override. They differ in how absence reads. The history knob's default **is** the empty string, so an unset knob and a configured-empty one are one reading, which takes the arm's own "unset — no history to report" diagnostic. The ceiling's default is a real value, so a failed read of it is a resolution failure and surfaces as one.
 
-**The wire shape is a contract.** `--usage-verdict` appends the sample line ([§The usage.txt contract](#the-usagetxt-contract)) with optional keys **omitted rather than emitted empty**. So the reader defaults a missing `account` or `tier` to `-`, a missing `login_at` to `0`, and a missing `verdict`, `tokens_in` or `tokens_out` to `-`. Each default is the reader's half of that rule; dropping one would turn an absent optional key into a parse failure on a line the producer may write. The two-axis emission is the same contract: a 5h record per sample, and a weekly one only when **both** weekly keys are present, so a log without them yields 5h segments alone rather than an error.
+**The wire shape is a contract.** `--usage-verdict` appends the sample line ([§The usage.txt contract](#the-usagetxt-contract)) with optional keys **omitted rather than emitted empty**. So the reader defaults a missing `account` or `tier` to `-`, a missing `login_at` to `0`, and a missing `verdict`, `tokens_in` or `tokens_out` to `-`. Each default is the reader's half of that rule ([§The usage.txt contract](#the-usagetxt-contract)). The two-axis emission is the same contract: a 5h record per sample, and a weekly one only when **both** weekly keys are present, so a log without them yields 5h segments alone rather than an error.
 
 **The segment order is a contract the reader reproduces, and its tie rule is a byte comparison of the whole record rather than input order.**
 
@@ -926,7 +926,7 @@ Armed and short-circuit are the firing/non-firing pair over the same stub, so th
 
 - per-axis segmentation at a reset boundary, a `login_at` change and an account change;
 - per-account grouping reuniting a weekly trajectory across a switch-back;
-- a spike-then-correction flagged and excluded rather than averaged;
+- a spike-then-correction flagged and excluded from the rate rather than averaged, and a segment ending in one keeping its last reading;
 - token deltas and weekly headroom on the report;
 - the combine block's golden lines over the fixture's two accounts, and its absence from a one-account log the test writes;
 - the fail-closed refusals (knob unset, history missing), each read off the arm's own `Err`;
