@@ -8,16 +8,6 @@
 
 ## New Features
 
-### fan-width-unenforced
-
-[spec: SPEC-fan-width.md]
-
-the read-only fan-out bound is a template rule nothing enforces, and no surface a stage session reads says so. delegation-kit/templates/agent-execution.md binds independent read-only units to `≤DELEGATION_KIT_FAN_WIDTH`-wide; `usage-verdict` surfaces the knob as its `width=` field, and `agent-budget-guard` blocks only on its PAUSE status, while `agent-dispatch-guard`'s rules D1 to D6 count nothing in flight. A close session dispatched three concurrent read-only audits under `width=2`.
-
-**Deliverable:** a dispatch-guard rule refusing a read-only dispatch past the bound, with its decision-table row and its degradation row, or the template and §usage-verdict's width paragraph stating the bound as discipline the guard only surfaces; which is spec's, since whether a `PreToolUse` payload can see the in-flight set is unprobed.
-
-**Cost while deferred:** a fan-out past the bound spends more of the window than the knob's loss-bounding invariant allows when the wall fires mid-flight. Lead-observed once, no harm. Filed 2026-10-03 to the gap inbox by guard-ruleset-gate-neutrality-pass' lead, from its close; promoted 2026-10-03 at the next iteration's scope: →fix fails because either branch changes the guard's or the template's asserted behaviour, →forward because no ruling is owed. Re-verified: the guard grades only status 1 as its block, and the dispatch guard's table carries no width rule. Owner lookup: `width`, `FAN_WIDTH`, `fan-out` in this file — none; owner delegation-kit/SPEC.md §usage-verdict, with §The delegation model's dispatch guard.
-
 ### foreign-vendor-critique
 
 [spec: SPEC-foreign-review.md]
@@ -1253,4 +1243,5 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 ## Done
 
 - background-credential-swap-support
+- fan-width-unenforced
 
