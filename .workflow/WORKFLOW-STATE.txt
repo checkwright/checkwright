@@ -4,4 +4,4 @@
 
 ---
 
-— scope ab1b020b 2026-10-04 b557eafd
+installer-trust-pass scope ab1b020b 2026-10-04 b557eafd

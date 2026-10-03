@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: installer-trust-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,30 @@
 ## New Features
 
 ## Technical Debt
+
+### delegation-kit-tail-brevity
+
+delegation-kit/SPEC.md's sections no brevity slice has passed — the preamble, §Resume journal, §Verify after every agent commit, §Trend reporter, §bin/wait-probe, §The foreign-vendor run with §Resuming a session, and §Out of scope — under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): about 8.5k of the file's 36.6k words by `wc -w` at this scope, and all 33 of its `check-prose-bounds` findings with the ceiling knob emptied.
+
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey; the file's ceiling row re-stamped. Applied last, after the iteration's delegation-kit fixes land in the same file.
+
+**Cost while deferred:** paid by every session and adopter that reads those contracts. Filed 2026-10-04 as a split at scope. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling).
+
+### usage-trend-suspect-endpoint
+
+`--emit usage-trend` reports a segment's endpoints, its weekly headroom and the multi-account combine line from the last non-suspect smoothed sample (native/src/emit/usage_trend.rs, `flush`), where delegation-kit/SPEC.md §Trend reporter steps 3 and 4 promise the first and last smoothed pct and step 2 excludes suspect samples from rate math only. A segment ending in a downward correction, say 10, 100, 96, reports 10%, and an account at 96% drops out of the at-or-over count.
+
+**Deliverable:** the endpoints, headroom and combine line read the segment's own first and last smoothed samples, with rate math still over the non-suspect ones, under a fixture segment ending in a correction.
+
+**Cost while deferred:** a rotating operator under-reads an account near its weekly ceiling. Filed 2026-10-04 to the gap inbox by delegation-transport-pass' close second-vendor review; promoted at the next scope: →fix fails because the reading feeds the rate, headroom and combine lines and §Testing's segment assertions, a build with its fixture rather than a drain commit; →forward because the SPEC settles it. Re-verified: `flush` takes `live.first()`/`live.last()` over the non-suspect indices, and a run over a weekly segment of 10, 100, 96 printed `10.0%->10.0%` and a combine line of 10.0%. Owner lookup: `usage-trend`, `suspect`, `smoothed`, `Trend reporter` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §Trend reporter.
+
+### foreign-resume-session-edges
+
+delegation-kit/SPEC.md §Resuming a session misstates two edges. (1) It says a sweep session's `change.patch` is always the session's whole change, but a `FAILED` resume turn returns before regenerating it (native/src/emit/foreign_run.rs, the `outcome` check ahead of `write_patch`), so a session closed after a failed sweep turn keeps a patch missing that turn while `--close` removes the clone. (2) Nothing serializes commands sharing a key: two resumes, or a resume and `--close`, can rotate one report, write one turn or remove a running turn's clone, and the section states no one-writer-per-key rule.
+
+**Deliverable:** the patch regenerated on every spawned sweep turn, `FAILED` included, with a fixture; and for (2) an honest limit naming the dispatcher as the key's one writer, operator direction 2026-10-04, lead-relayed (not a ruling): a per-key lock is not built.
+
+**Cost while deferred:** a dispatcher applying a closed session's patch silently loses a failed turn's change. Filed 2026-10-04 to the gap inbox by delegation-transport-pass' close second-vendor review; promoted at the next scope: →fix fails because (2) was a shape choice between a stated limit and new lock mechanism, →forward because no recorded ruling is touched. Re-verified: the resume path returns on `outcome`'s error before `write_patch`, and `grep -i lock` over foreign_run.rs finds no lock. Owner lookup: `foreign-resume`, `change.patch`, `one-writer`, `per key` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §Resuming a session.
 
 ## Deferred
 
@@ -292,7 +316,7 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 [roadmap: now/adoption] [cost: session/high] [surface: delegation-kit] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; lifecycle-kit, installer and guard-kit are finished or split out (the slices below); what remains starts at delegation-kit, canon-kit, queue-kit, drift-kit, context-kit, evidence-kit, site-kit, then doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling): a slice has landed at each recent scope; the per-kit slices stay off the roadmap.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; lifecycle-kit, installer, guard-kit and delegation-kit are finished or split out (the slices below); what remains starts at canon-kit, queue-kit, drift-kit, context-kit, evidence-kit, site-kit, then doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling): a slice has landed at each recent scope; the per-kit slices stay off the roadmap.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
@@ -302,7 +326,7 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes, landing as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes, landing as `installer-install-brevity` and `installer-remainder-brevity`; and, the kit's other sections remaining: drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections, delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope, landing as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope, landing as `queue-kit-gate-brevity`; guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope, landing as `guard-kit-tool-brevity`.
 
-delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes, landing as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`.
+delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes, landing as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as [delegation-kit-tail-brevity](#delegation-kit-tail-brevity).
 
 ### tarball-build-attestation
 
@@ -312,7 +336,19 @@ the primary install channel carries no build provenance: the Release tarball shi
 
 **Deliverable:** the publish workflow attests the tarball, the shell installers verify it where the verifier is present and say so where it is not, and the install page's claim is corrected; installer/SPEC.md §The dependency boundary owns the rule.
 
-**Cost while deferred:** the channel most adopters take is the one with no provenance, on a project whose pitch is verified claims. Filed 2026-07-26; returned from the icebox 2026-09-25 by consult as a trust gap on a public claim.
+**Cost while deferred:** the channel most adopters take is the one with no provenance, on a project whose pitch is verified claims. Filed 2026-07-26; returned from the icebox 2026-09-25 by consult as a trust gap on a public claim. Its observation half, a published Release verifying, split 2026-10-04 at scope to [tarball-attestation-observed](#tarball-attestation-observed), since only a release run produces it.
+
+**Push need (2026-10-04, inside the budget):** one mid-iteration push, for the PowerShell installer's verify leg that no local run reaches; [update-availability-notice](#update-availability-notice) rides the same push if its design lands a Windows-only leg.
+
+### tarball-attestation-observed
+
+[cost: event/low] [surface: installer] [observed-by: publish]
+
+the observation half of [tarball-build-attestation](#tarball-build-attestation): the first Release cut after that entry lands carries an artifact attestation on its tarball, and a shell installer run against that Release verifies it where the verifier is present.
+
+**Deliverable:** that observation, read off the `publish` run and one install from the published Release, with any defect it shows filed.
+
+**Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
 ### contributor-writeback-disposition
 
@@ -363,6 +399,8 @@ the crates.io reservation page still carries the retired methodology description
 **Inferred, not run:** crates.io versions are immutable, so the new description ships only as a new version (`0.0.1`), not over `0.0.0`.
 
 **Deliverable:** the reservation crate republished by the operator, and the live page reading the product statement.
+
+**Close obligation (2026-10-04, operator direction lead-relayed, not a ruling):** offered to the operator at installer-trust-pass' close as an operator-only registry write.
 
 **Cost while deferred:** a reader searching crates.io meets a second product description, the one `one-product-statement` removed everywhere else. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's build; promoted 2026-09-27 at its close: →fix fails because the write is operator-only. Re-verified: the crates.io API returns the retired description at `max_version` 0.0.0. Owner lookup: `crates.io`, `reserve`, `republish` in this file — none; owner installer/SPEC.md §The dependency boundary.
 
@@ -571,30 +609,6 @@ the binary still names or spawns the bash front end where an adopter meets it: t
 **Deliverable:** each site respelled to the binary door, the knob default's working-directory change (the front end changes to the toplevel, the binary does not) settled in evidence-kit/SPEC.md, and the door roots widened to native/src.
 
 **Cost while deferred:** an adopter reading `--help` or the demo meets a command their install may not carry. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' build; promoted at its close: →fix fails because the knob default is a behaviour change across two front ends, →forward because no ruling is owed. Re-verified: grep finds all four sites. `hook-emit-remedy-door` scoped its fix to the hook and emit trees; this is DISTINCT, not a recurrence. Owner lookup: `run-gates.sh`, `DOOR_ROOTS` in this file — none; owner guard-kit/SPEC.md §check-door-binding, with gate-sdk/SPEC.md §run-gates.
-
-### usage-trend-suspect-endpoint
-
-[cost: event/low] [surface: delegation-kit]
-
-`--emit usage-trend` reports a segment's endpoints, its weekly headroom and the multi-account combine line from the last non-suspect smoothed sample (native/src/emit/usage_trend.rs, `flush`), where delegation-kit/SPEC.md §Trend reporter steps 3 and 4 promise the first and last smoothed pct and step 2 excludes suspect samples from rate math only. A segment ending in a downward correction, say 10, 100, 96, reports 10%, and an account at 96% drops out of the at-or-over count.
-
-**Deliverable:** the endpoints, headroom and combine line read the segment's own first and last smoothed samples, with rate math still over the non-suspect ones, under a fixture segment ending in a correction.
-
-**Inferred, not run:** the 10, 100, 96 example is a source read, not a run.
-
-**Cost while deferred:** a rotating operator under-reads an account near its weekly ceiling. Filed 2026-10-04 to the gap inbox by delegation-transport-pass' close second-vendor review; promoted at the next scope: →fix fails because the reading feeds the rate, headroom and combine lines and §Testing's segment assertions, a build with its fixture rather than a drain commit; →forward because the SPEC settles it. Re-verified: `flush` takes `live.first()`/`live.last()` over the non-suspect indices. Owner lookup: `usage-trend`, `suspect`, `smoothed`, `Trend reporter` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §Trend reporter.
-
-### foreign-resume-session-edges
-
-[cost: event/low] [surface: delegation-kit]
-
-delegation-kit/SPEC.md §Resuming a session misstates two edges. (1) It says a sweep session's `change.patch` is always the session's whole change, but a `FAILED` resume turn returns before regenerating it (native/src/emit/foreign_run.rs, the `outcome` check ahead of `write_patch`), so a session closed after a failed sweep turn keeps a patch missing that turn while `--close` removes the clone. (2) Nothing serializes commands sharing a key: two resumes, or a resume and `--close`, can rotate one report, write one turn or remove a running turn's clone, and the section states no one-writer-per-key rule.
-
-**Deliverable:** the patch regenerated on every spawned sweep turn, `FAILED` included, with a fixture; and for (2) either an honest limit naming the dispatcher as the key's one writer, or a per-key lock, as the unit-set ruling settles.
-
-**Inferred, not run:** the races in (2) are a source read, not reproduced.
-
-**Cost while deferred:** a dispatcher applying a closed session's patch silently loses a failed turn's change. Filed 2026-10-04 to the gap inbox by delegation-transport-pass' close second-vendor review; promoted at the next scope: →fix fails because (2) is a shape choice between a stated limit and new lock mechanism, →forward because no recorded ruling is touched. Re-verified: the resume path returns on `outcome`'s error before `write_patch`. Owner lookup: `foreign-resume`, `change.patch`, `one-writer`, `per key` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §Resuming a session.
 
 ## Icebox
 
