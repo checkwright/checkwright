@@ -1611,7 +1611,7 @@ The **iteration lead** template: an optional live session that dispatches an ite
 **Batching and tiering carry grounds of their own.**
 
 - **The roster is every unit the iteration promoted**, never the amendment set, which a debt unit carries no `[spec:]` ref to join.
-- **A shared surface groups a batch without ordering one.** A cut across a producer/consumer edge between deltas dispatches the consumer against an input that does not exist yet.
+- **A shared surface groups a batch without ordering one.** A cut across a producer/consumer edge between deltas dispatches the consumer against an input that does not exist yet. A push rider is such a consumer: batched after the push it rides, it buys a push of its own.
 - **Judgment is what the tier buys.** Downgrading a design-bearing batch trades a large correctness risk for a small window saving. A stage-uniform class is a collapsed default, not a bound roster.
 - **An intra-stage batch split is N sibling stage sessions the lead dispatches and verifies**, each a same-stage re-entry (§The state machine). A stage session never dispatches a sibling stage session, and that is a ban rather than a preference: a stage that sub-dispatches its own batches nests a second supervisor at the lead's tier, hidden from the lead's budget and context accounting. That is the redundancy the split posture exists to remove, reintroduced where nothing watches for it.
 - **The split posture's saving is a trade, not a pure saving.** Splitting converts the escalations a lead rules alone off a governed surface into relays. The template ships the method by which a consumer measures that trade; the threshold and every count taken stay the consumer's.

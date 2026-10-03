@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: guard-kit-write-side-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,14 @@
 ## New Features
 
 ## Technical Debt
+
+### guard-kit-remainder-brevity
+
+guard-kit/SPEC.md's preamble, §Layout and configuration, §Testing and §Out of scope, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement), about 8.9k of the file's 48.1k words by `wc -w` at this scope; §The generic ruleset stays on the parent until the rule entries that rewrite it land.
+
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. Applied last, after [bash-reader-escaped-pipe](#bash-reader-escaped-pipe), [write-side-steering](#write-side-steering) and [compound-read-classifier-reach](#compound-read-classifier-reach) merge, since their decision-table cases may edit §Testing.
+
+**Cost while deferred:** paid by every session and adopter that reads an unpassed guard-kit section. Filed 2026-10-03 as a split at guard-kit-write-side-pass' scope. Part of the operator's selection of the unit set, direction 2026-10-03, lead-relayed (not a ruling).
 
 ## Deferred
 
@@ -292,15 +300,13 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
-**Split ten times, 2026-09-25 to 09-27 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder, porting, native-contracts, runner, meta-gate, tooling and tail slices each left as their own debt entry, all since landed; the ninth, installer's contract sections, left ahead of lifecycle-kit because the platform-prerequisite-floors theme rewrites them; the tenth is lifecycle-kit's template sections.
+**Split ten times, 2026-09-25 to 09-27 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder, porting, native-contracts, runner, meta-gate, tooling and tail slices each left as their own debt entry, all since landed, as did the ninth and tenth, installer's contract and lifecycle-kit's template sections.
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
-Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes, landing as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes, landing as `installer-install-brevity` and `installer-remainder-brevity`; and, the kit's other sections remaining: drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections (its preamble remains), delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope, landing as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope, landing as `queue-kit-gate-brevity`; guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope, landing as `guard-kit-tool-brevity`.
+Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes, landing as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes, landing as `installer-install-brevity` and `installer-remainder-brevity`; and, the kit's other sections remaining: drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections, delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope, landing as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope, landing as `queue-kit-gate-brevity`; guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope, landing as `guard-kit-tool-brevity`.
 
-delegation-kit's §The delegation model left 2026-10-02 at companion-tier-delegation-pass' scope, landing as `delegation-kit-model-brevity`.
-
-installer's §The consumer smoke left 2026-10-02 at consumer-smoke-driver-pass' scope, landing as `installer-smoke-brevity`.
+delegation-kit's §The delegation model and installer's §The consumer smoke left 2026-10-02 at the companion-tier-delegation-pass and consumer-smoke-driver-pass scopes, landing as `delegation-kit-model-brevity` and `installer-smoke-brevity`; guard-kit's preamble, §Layout and configuration, §Testing and §Out of scope left 2026-10-03 at guard-kit-write-side-pass' scope, landing as [guard-kit-remainder-brevity](#guard-kit-remainder-brevity).
 
 ### tarball-build-attestation
 
@@ -514,6 +520,10 @@ a shell write that falls through the guard (a `tee` to a file, `find -delete`, a
 
 **Cost while deferred:** write-shaped calls keep costing classifier decisions and false-positive stalls. Filed 2026-09-30 to the gap inbox by guard-kit-steering's lead on an operator question; promoted at its close: →fix fails because each rung is new mechanism, →forward because no ruling is owed. Re-verified: no queue entry names write arms. DISTINCT from `side-effect-free-read-arms`, done, which covered reads. Owner lookup: `write-side`, `bounded write`, `tee` in this file — only [manual-operation-spend-channel](#manual-operation-spend-channel), DISTINCT (a spend meter), and the icebox's interpreter-grant-redirect-residue, DISTINCT (an interpreter grant's redirected shapes); owner guard-kit/SPEC.md §The rule roster.
 
+**Selected 2026-10-03 for guard-kit-write-side-pass, operator direction lead-relayed (not a ruling):** a feature, the spec stage's to author and promote; second in order, after [bash-reader-escaped-pipe](#bash-reader-escaped-pipe), and ahead of [compound-read-classifier-reach](#compound-read-classifier-reach), whose redirect half rides its bounds test.
+
+**Push need (2026-10-03, inside the budget):** the closing push alone, unless its bounds test resolves paths through the path-dialect layer, whose native-Windows leg runs only in CI; then one mid-iteration push, 2 against a budget of one to two. The spec stage states which.
+
 ### compound-read-classifier-reach
 
 [cost: event/high] [surface: guard-kit]
@@ -525,6 +535,8 @@ a read-shaped compound or redirected call still falls to the classifier. `side-e
 **Cost while deferred:** the classifier keeps deciding most read-shaped calls, with its occasional false positives. Filed 2026-09-30 to the gap inbox by guard-kit-steering's lead; promoted at its close: →fix fails because widening a grant is new mechanism, →forward because the direction is given. Owner lookup: `ro_pipeline`, `compound`, `redirect` in this file — [write-side-steering](#write-side-steering), overlapping on the redirect only; owner guard-kit/SPEC.md §The rule roster, rule `ro_pipeline`.
 
 **Inferred, not run:** the 6-of-30 count, carried from the align survey without a re-run.
+
+**Selected 2026-10-03 for guard-kit-write-side-pass, operator direction lead-relayed (not a ruling):** a feature, the spec stage's to author and promote; third in order, after [bash-reader-escaped-pipe](#bash-reader-escaped-pipe), whose splits it reads, and [write-side-steering](#write-side-steering); its need the closing push alone.
 
 ### kit-prose-harness-coupling
 
@@ -610,7 +622,11 @@ guard-kit's bash reader still cuts its compound, statement and pipe splits at an
 
 **Deliverable:** the harness matcher's reading of both measured, then the splits matched to it with decision-table rows, as the escaped `;` was.
 
-**Inferred, not run:** the harness matcher's reading of both shapes (a confirming probe was refused by the session's permission classifier), and the backslash-newline cut.
+**Inferred, not run:** the harness matcher's reading of both shapes (a confirming probe was refused by the session's permission classifier).
+
+Re-verified 2026-10-03 at scope: the reader cuts at a backslash-newline too, since `escaped()` in native/src/guard/bash.rs exempts the `;` separator alone.
+
+**Selected 2026-10-03 for guard-kit-write-side-pass, operator direction lead-relayed (not a ruling):** a feature, the spec stage's to author and promote; first in order, since [compound-read-classifier-reach](#compound-read-classifier-reach) reads its splits; its need the closing push alone.
 
 **Cost while deferred:** a call carrying either shape may cost a permission decision a grant would have taken. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' build; promoted at its close: →fix fails because the target behaviour is unmeasured, →forward because no ruling is owed. `bash-reader-escaped-separator` fixed the escaped `;` alone; DISTINCT, not a recurrence. Owner lookup: `escaped`, `backslash` in this file — none live; owner guard-kit/SPEC.md §The reader and its views.
 
