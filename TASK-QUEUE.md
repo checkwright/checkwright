@@ -12,6 +12,26 @@
 
 ## Deferred
 
+### guard-quoted-operand-words
+
+[cost: event/low] [surface: guard-kit]
+
+Two rules read a command word without its quoting. Rule `rm_tracked`'s bash arm tests the `sq dq hd` skeleton's words (`native/src/guard/rules/reach.rs`, `rm_tracked_reach`), so any quoted operand reaches the tracked test as a mark: `rm 'README.md'` and `rm "README.md"` pass while `rm README.md` blocks, against guard-kit/SPEC.md's rule entry, which blocks an `rm` naming a tracked path. Rule `find_exec`'s steer re-quotes dequoted words (`native/src/guard/rules/tools.rs`, `shell_word`), and the dequoted view keeps an escaping backslash, indistinguishable there from a literal one inside single quotes: `-exec cat a\ b '{}' \;` is steered to `cat 'a\ b'`, a different file.
+
+**Deliverable:** each word read with its quoting known: the skeleton's held word beside the dequoted one, or a reader-owned word that carries it. The tracked test takes a quoted operand literally (`:(literal)`) and an unquoted one as the glob the shell expands. Both steers print the shell's own word. Each rule gets a decision-table row (a quoted tracked operand, a blank-bearing name, a single-quoted regex backslash), and guard-kit/SPEC.md §The reader and its views states the contract.
+
+**Cost while deferred:** a quoted `rm` of a tracked path deletes unstaged, outside the block's steer; a `find_exec` steer naming an escaped blank cannot be followed as printed. Filed 2026-10-03 to the gap inbox as two bullets at guard-ruleset-gate-neutrality-pass' spec; promoted together at its close: →fix fails because an exact word needs per-word quoting provenance that no rule consumes yet, and stripping backslashes, as rule `grant_path_slot` does, breaks the common single-quoted regex steer. That makes it a reader contract with cross-rule reach, the escaped-blank precedent's ground. →forward fails because no ruling is owed. Re-verified by hook probe: both steers as quoted above, and the `rm_tracked` premise widened from blank-bearing names to every quoted operand. Owner lookup: `shell_word`, `quoted operand`, `rm_tracked`, `exact word` in this file — none; owner guard-kit/SPEC.md §The reader and its views.
+
+### shared-tree-stash-steer
+
+[cost: event/low] [surface: guard-kit]
+
+A build session ran `git stash` / `git stash pop` on the shared checkout to rebuild a pre-change binary for a before/after probe. Stash rewrites the shared index and worktree under any concurrent session. Rule `git_mutation_under_producer` blocks `stash` only while a live producer record exists (guard-kit/SPEC.md, its act set), and no rule, agent-execution bullet or stage template steers a before/after probe to a throwaway worktree.
+
+**Deliverable:** a steer from a worktree-rewriting `git stash` on the main checkout to `git worktree add` under the scratch dir, either as a guard-kit block with its decision-table rows or as a delegation-kit/templates/agent-execution.md bullet; choosing between them is the unit's spec question.
+
+**Cost while deferred:** a concurrent session's uncommitted edits or staged paths can vanish or be re-applied under it. Lead-observed once, with the tree intact; the frequency is **inferred, not run**. Filed 2026-10-03 to the gap inbox by the lead at guard-ruleset-gate-neutrality-pass' build; promoted at its close: →fix fails because both shapes add adopter-visible semantics that no amendment settled, a new block verdict or a new standing instruction. →forward fails because no ruling is owed. Re-verified: `stash` sits only in the live-producer act set, and no template text names stash or a before/after probe. Owner lookup: `stash`, `before/after`, `throwaway` in this file — none; owner guard-kit/SPEC.md §The rule roster.
+
 ### audit-trigger-mirror-component
 
 [cost: iteration/low] [surface: lifecycle-kit]
