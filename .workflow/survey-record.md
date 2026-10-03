@@ -13,3 +13,10 @@
 - rev: 91c091cde6659b2837d176e2440bfe653482142a
 - finding: No entry aggregates more than 3 inbound edges (design-partner-preview 3). No deferred entry reaches the recurrence threshold of 2 dates. Tier one: spec-brevity-residue (session/high, delegation-kit, roadmap now) leads; heterogeneous-agent-delegation (iteration/low, delegation-kit, roadmap now) joins only with a feature stage; audit-trigger-mirror-component (lifecycle-kit) and manual-operation-spend-channel (drift-kit) lead later sets. Board surfaces by row count: installer 6, gate-sdk 6, then delegation-kit, lifecycle-kit and drift-kit 4. Supersession: releases-page-table reshaped by release-note-section-set-derivation; front-door-rehearsal-rule's post-publish job reshaped by tarball-build-attestation.
 - inferred: per-entry supersession was read by grep over deliverable names, not by an oracle
+
+## 2026-10-04 build — Which facts do other surfaces cite into delegation-kit/SPEC.md's preamble, Resume journal, Verify after every agent commit, Trend reporter, bin/wait-probe, The foreign-vendor run with Resuming a session, and Out of scope?
+- corpus: .
+- oracle: git grep -n -F for each section's §heading over the tracked tree
+- rev: 555a59d33fccc74cb0d5680b46acb1a58e0906b8
+- finding: Scoped past the generated docs/delegation-kit/ mirror and TASK-QUEUE.md. Inbound cites rest on rules only: the return leaving no artifact, DONE as the last line, the shell-append journal, the provenance floor, never re-running the producer, tamper A and B by shape with the meta layer and manifest, the trend arm's no-verdict exit and reader defaults, wait-probe's while polarity, three-state exit, exec-into, two-field record and closed cause list, the foreign run's report, patch and HEAD-only view, and the statusline's self-contained ANSI. The preamble is uncited; no cite rests on the sections' attested narratives.
+- inferred: the per-arm spec: tags in the native test modules were summarised by topic, not read one by one
