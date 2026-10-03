@@ -844,6 +844,7 @@ guard-kit/
   templates/settings-allow.json  # the recommended allow entries, merged by hand
   templates/close-triage.md
   smoke/install.sh
+  smoke/violation.sh
 ```
 
 The shell guard itself is compiled: the member is `native/src/hook/shell_guard.rs` and its engine, readers and rules are `native/src/guard/` (§The shell guard), shipped in the gate binary rather than in this kit's tree.
@@ -974,6 +975,8 @@ Arm (c)'s outside-repository and device-target compounds lead with `make build` 
 - It runs that group's `command` string itself with `bash -c` from a subdirectory it creates, `CLAUDE_PROJECT_DIR` set to the consumer root, and asserts the same block. The other assertions drive the member and this one drives the wiring, so a relatively spelled command reds it.
 - The merge asserts that every hook event a co-vendored kit wired before it survives. An overwrite would silently drop that kit's wiring from the composed consumer, and nothing downstream reads the final file.
 - It unions `templates/settings-allow.json`'s entries into the same file beside a sentinel entry written first, asserting the sentinel survives. It then feeds each template entry's literal form through the member, `Bash(` and `)` stripped and each `*` replaced by the word `x`, failing on any block. A rule later blocking a form the recommendation grants would otherwise ship that steer/grant contradiction to every adopter (§The recommended allowlist).
+
+`smoke/violation.sh` plants one `check-door-binding` violation: a line naming the front end as a command to run, appended to the vendored kit's `README.md`, which assertion A reads under the shipped defaults. Assertions B and C are held by the gate's fixture pair.
 
 `gate-tests/compare-settings-allow.test.sh` holds `compare-settings-allow`'s breadth criterion in the bespoke lane, a report no decision row can express. It drives the arm through the battery runner's `--emit` front-end, with `GUARD_KIT_KNOB_FILE` pointed at a sandbox knob file and `GUARD_KIT_SETTINGS`/`GUARD_KIT_SETTINGS_LOCAL` set in the environment, so the consumer's own probe array cannot leak in. Its cases:
 
