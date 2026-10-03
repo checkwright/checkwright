@@ -988,8 +988,9 @@ mod tests {
         assert_eq!(v.code, 0, "{}", v.line);
         assert!(v.line.starts_with("foreign-resume: adapter=s mode=audit key=prompt turn=2 exit=0 report="), "{}", v.line);
         assert!(v.line.ends_with("patch=none -> OK — resumable: --foreign-resume prompt <prompt-file>"), "{}", v.line);
-        let answer = r.root.join("answer.md").display().to_string();
-        assert_eq!(r.read("report.txt"), format!("abc-1.x {}\nthe answer\n", answer));
+        // comment-tier-exempt: a Windows bash stub prints the substituted path with forward slashes
+        let answer = r.root.join("answer.md").display().to_string().replace('\\', "/");
+        assert_eq!(r.read("report.txt").replace('\\', "/"), format!("abc-1.x {}\nthe answer\n", answer));
         assert_eq!(r.read("report.1.txt"), "session id: abc-1.x\n", "the open's report is rotated");
         assert!(r.run_dir().join("stderr.1.txt").is_file());
         assert!(r.read("session.txt").contains(" turn=2 id=abc-1.x"), "{}", r.read("session.txt"));
