@@ -8,6 +8,34 @@
 
 ## New Features
 
+### fan-width-unenforced
+
+[spec: SPEC-fan-width.md]
+
+the read-only fan-out bound is a template rule nothing enforces, and no surface a stage session reads says so. delegation-kit/templates/agent-execution.md binds independent read-only units to `≤DELEGATION_KIT_FAN_WIDTH`-wide; `usage-verdict` surfaces the knob as its `width=` field, and `agent-budget-guard` blocks only on its PAUSE status, while `agent-dispatch-guard`'s rules D1 to D6 count nothing in flight. A close session dispatched three concurrent read-only audits under `width=2`.
+
+**Deliverable:** a dispatch-guard rule refusing a read-only dispatch past the bound, with its decision-table row and its degradation row, or the template and §usage-verdict's width paragraph stating the bound as discipline the guard only surfaces; which is spec's, since whether a `PreToolUse` payload can see the in-flight set is unprobed.
+
+**Cost while deferred:** a fan-out past the bound spends more of the window than the knob's loss-bounding invariant allows when the wall fires mid-flight. Lead-observed once, no harm. Filed 2026-10-03 to the gap inbox by guard-ruleset-gate-neutrality-pass' lead, from its close; promoted 2026-10-03 at the next iteration's scope: →fix fails because either branch changes the guard's or the template's asserted behaviour, →forward because no ruling is owed. Re-verified: the guard grades only status 1 as its block, and the dispatch guard's table carries no width rule. Owner lookup: `width`, `FAN_WIDTH`, `fan-out` in this file — none; owner delegation-kit/SPEC.md §usage-verdict, with §The delegation model's dispatch guard.
+
+### background-credential-swap-support
+
+[spec: SPEC-account-swap.md]
+
+first-class support for swapping the Anthropic OAuth credential out from under in-flight agents (to spread burn across accounts), which the budget oracle does not model today. Four components, worst-first; all delegation-kit SPEC+code, all demand-gated (no one swaps in background yet — this is the roadmap marker).
+
+**(a) Detection.** usage-verdict's auth-change reroute fires only on CRED_FILE mtime, so an out-of-band / env-var / path token swap that does not rewrite that file bypasses it — the verdict trusts the prior account's snapshot and the poller re-fetches the stale file's token. Broaden the reroute to also fire when the live account identity (oauthAccount.accountUuid / subscriptionType) differs from the snapshot's `account=` / `tier=`, forcing a re-poll on any swap.
+
+**(b) Evidence.** the `.metric/` trend samples already carry `account=` / `tier=`, but the wave-over-wave burn projection reads the tail **unpartitioned**, so a swap reads as a spurious used% drop that corrupts the projection and masks aggregate load. Segment usage analysis by `account=` and mark the swap boundary in the trend log so the evidence is per-account-honest.
+
+**(c) Safety.** the budget guard's premise is one account = one rate window per wave; background rotation moves the wall in-flight agents bill against and lets rotation collectively exceed what any single account's 5h/7-day PAUSE would allow while each account stays individually under threshold. Add a cross-account aggregate view so supported swapping cannot silently blow past the true combined ceiling.
+
+**(d) Signal-quality refinement (advisory, not a bug).** the post-login reroute (`DELEGATION_KIT_LOGIN_WINDOW`) is correctly advisory-only — STALE never blocks (delegation-kit/SPEC.md §usage-verdict, which also states the server lag the next point turns on), so this is signal quality, not a dispatch-blocking defect. Two points: the window default is 600s while the SPEC's own stated server-lag is "about a minute", a ~10x margin worth tightening; and it is a **blanket** time-window where an **account-keyed** check is sharper — trust `usage.txt` when its `account=` matches the current credential's account AND `updated_at > login_at`, with a short (~90s) settling floor for the server lag. That restores the true reading in ~1 min instead of 10 and stops 10 min of STALE samples polluting the trend log (`.metric/usage-history.log`) — which directly sharpens (b).
+
+**Cost while deferred:** any background swap today silently corrupts the burn projection and can breach the combined budget ceiling with every account reading individually safe; and the login window over-STALEs by ~10x.
+
+**Seam:** all four are generic delegation-kit mechanism — the account-id is already on the `usage.txt` contract; nothing consumer-specific is added. This is the budget-oracle prerequisite cluster heterogeneous-agent-delegation cross-references. Surfaced 2026-07-17 in the release-in-lifecycle session (kfric plus one operator-raised refinement).
+
 ## Technical Debt
 
 ### delegation-liveness-brevity
@@ -161,24 +189,6 @@ foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a fore
 **Design memory (2026-07-25, 2026-08-02):** a TUI relay buys no resume or token efficiency — both live in the vendor's session store, so interactive-vs-headless is rendering, not state; headless warm-resume by session id and JSONL turn events ship on the installed binaries probed. The machine profile (context-kit/SPEC.md §bin/env-probe, local-only) owns which CLIs and how.
 
 **Cost while deferred:** stage-level work still bills one vendor's budget while three subscriptions are held, and this design memory ages against fast-moving CLIs. Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question).
-
-### background-credential-swap-support
-
-[cost: event/high] [surface: delegation-kit]
-
-first-class support for swapping the Anthropic OAuth credential out from under in-flight agents (to spread burn across accounts), which the budget oracle does not model today. Four components, worst-first; all delegation-kit SPEC+code, all demand-gated (no one swaps in background yet — this is the roadmap marker).
-
-**(a) Detection.** usage-verdict's auth-change reroute fires only on CRED_FILE mtime, so an out-of-band / env-var / path token swap that does not rewrite that file bypasses it — the verdict trusts the prior account's snapshot and the poller re-fetches the stale file's token. Broaden the reroute to also fire when the live account identity (oauthAccount.accountUuid / subscriptionType) differs from the snapshot's `account=` / `tier=`, forcing a re-poll on any swap.
-
-**(b) Evidence.** the `.metric/` trend samples already carry `account=` / `tier=`, but the wave-over-wave burn projection reads the tail **unpartitioned**, so a swap reads as a spurious used% drop that corrupts the projection and masks aggregate load. Segment usage analysis by `account=` and mark the swap boundary in the trend log so the evidence is per-account-honest.
-
-**(c) Safety.** the budget guard's premise is one account = one rate window per wave; background rotation moves the wall in-flight agents bill against and lets rotation collectively exceed what any single account's 5h/7-day PAUSE would allow while each account stays individually under threshold. Add a cross-account aggregate view so supported swapping cannot silently blow past the true combined ceiling.
-
-**(d) Signal-quality refinement (advisory, not a bug).** the post-login reroute (`DELEGATION_KIT_LOGIN_WINDOW`) is correctly advisory-only — STALE never blocks (delegation-kit/SPEC.md §usage-verdict, which also states the server lag the next point turns on), so this is signal quality, not a dispatch-blocking defect. Two points: the window default is 600s while the SPEC's own stated server-lag is "about a minute", a ~10x margin worth tightening; and it is a **blanket** time-window where an **account-keyed** check is sharper — trust `usage.txt` when its `account=` matches the current credential's account AND `updated_at > login_at`, with a short (~90s) settling floor for the server lag. That restores the true reading in ~1 min instead of 10 and stops 10 min of STALE samples polluting the trend log (`.metric/usage-history.log`) — which directly sharpens (b).
-
-**Cost while deferred:** any background swap today silently corrupts the burn projection and can breach the combined budget ceiling with every account reading individually safe; and the login window over-STALEs by ~10x.
-
-**Seam:** all four are generic delegation-kit mechanism — the account-id is already on the `usage.txt` contract; nothing consumer-specific is added. This is the budget-oracle prerequisite cluster heterogeneous-agent-delegation cross-references. Surfaced 2026-07-17 in the release-in-lifecycle session (kfric plus one operator-raised refinement).
 
 ### companion-toolkit-profile
 
@@ -585,16 +595,6 @@ the binary still names or spawns the bash front end where an adopter meets it: t
 **Deliverable:** each site respelled to the binary door, the knob default's working-directory change (the front end changes to the toplevel, the binary does not) settled in evidence-kit/SPEC.md, and the door roots widened to native/src.
 
 **Cost while deferred:** an adopter reading `--help` or the demo meets a command their install may not carry. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' build; promoted at its close: →fix fails because the knob default is a behaviour change across two front ends, →forward because no ruling is owed. Re-verified: grep finds all four sites. `hook-emit-remedy-door` scoped its fix to the hook and emit trees; this is DISTINCT, not a recurrence. Owner lookup: `run-gates.sh`, `DOOR_ROOTS` in this file — none; owner guard-kit/SPEC.md §check-door-binding, with gate-sdk/SPEC.md §run-gates.
-
-### fan-width-unenforced
-
-[cost: event/low] [surface: delegation-kit]
-
-the read-only fan-out bound is a template rule nothing enforces, and no surface a stage session reads says so. delegation-kit/templates/agent-execution.md binds independent read-only units to `≤DELEGATION_KIT_FAN_WIDTH`-wide; `usage-verdict` surfaces the knob as its `width=` field, and `agent-budget-guard` blocks only on its PAUSE status, while `agent-dispatch-guard`'s rules D1 to D6 count nothing in flight. A close session dispatched three concurrent read-only audits under `width=2`.
-
-**Deliverable:** a dispatch-guard rule refusing a read-only dispatch past the bound, with its decision-table row and its degradation row, or the template and §usage-verdict's width paragraph stating the bound as discipline the guard only surfaces; which is spec's, since whether a `PreToolUse` payload can see the in-flight set is unprobed.
-
-**Cost while deferred:** a fan-out past the bound spends more of the window than the knob's loss-bounding invariant allows when the wall fires mid-flight. Lead-observed once, no harm. Filed 2026-10-03 to the gap inbox by guard-ruleset-gate-neutrality-pass' lead, from its close; promoted 2026-10-03 at the next iteration's scope: →fix fails because either branch changes the guard's or the template's asserted behaviour, →forward because no ruling is owed. Re-verified: the guard grades only status 1 as its block, and the dispatch guard's table carries no width rule. Owner lookup: `width`, `FAN_WIDTH`, `fan-out` in this file — none; owner delegation-kit/SPEC.md §usage-verdict, with §The delegation model's dispatch guard.
 
 ## Icebox
 
