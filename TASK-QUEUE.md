@@ -8,6 +8,20 @@
 
 ## New Features
 
+### bash-reader-escaped-pipe
+
+[spec: SPEC-escaped-pipe.md]
+
+guard-kit's bash reader still cuts its compound, statement and pipe splits at an escaped `|` (native/src/guard/bash.rs pins `a \| b` as two segments) and, per its filer, at a backslash before a newline. An extra segment only withholds a grant, so the split errs conservative.
+
+**Deliverable:** the harness matcher's reading of both measured, then the splits matched to it with decision-table rows, as the escaped `;` was.
+
+Measured at spec: the harness's matcher splits at neither shape, and at both after an even backslash run (the amendment records the probe). Re-verified 2026-10-03 at scope: the reader cuts at a backslash-newline too, since `escaped()` in native/src/guard/bash.rs exempts the `;` separator alone.
+
+**Selected 2026-10-03 for guard-kit-write-side-pass, operator direction lead-relayed (not a ruling):** a feature, the spec stage's to author and promote; first in order, since [compound-read-classifier-reach](#compound-read-classifier-reach) reads its splits; its need the closing push alone.
+
+**Cost while deferred:** a call carrying either shape may cost a permission decision a grant would have taken. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' build; promoted at its close: →fix fails because the target behaviour is unmeasured, →forward because no ruling is owed. `bash-reader-escaped-separator` fixed the escaped `;` alone; DISTINCT, not a recurrence. Owner lookup: `escaped`, `backslash` in this file — none live; owner guard-kit/SPEC.md §The reader and its views.
+
 ## Technical Debt
 
 ### guard-kit-remainder-brevity
@@ -613,22 +627,6 @@ the binary still names or spawns the bash front end where an adopter meets it: t
 **Deliverable:** each site respelled to the binary door, the knob default's working-directory change (the front end changes to the toplevel, the binary does not) settled in evidence-kit/SPEC.md, and the door roots widened to native/src.
 
 **Cost while deferred:** an adopter reading `--help` or the demo meets a command their install may not carry. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' build; promoted at its close: →fix fails because the knob default is a behaviour change across two front ends, →forward because no ruling is owed. Re-verified: grep finds all four sites. `hook-emit-remedy-door` scoped its fix to the hook and emit trees; this is DISTINCT, not a recurrence. Owner lookup: `run-gates.sh`, `DOOR_ROOTS` in this file — none; owner guard-kit/SPEC.md §check-door-binding, with gate-sdk/SPEC.md §run-gates.
-
-### bash-reader-escaped-pipe
-
-[cost: event/low] [surface: guard-kit]
-
-guard-kit's bash reader still cuts its compound, statement and pipe splits at an escaped `|` (native/src/guard/bash.rs pins `a \| b` as two segments) and, per its filer, at a backslash before a newline. An extra segment only withholds a grant, so the split errs conservative.
-
-**Deliverable:** the harness matcher's reading of both measured, then the splits matched to it with decision-table rows, as the escaped `;` was.
-
-**Inferred, not run:** the harness matcher's reading of both shapes (a confirming probe was refused by the session's permission classifier).
-
-Re-verified 2026-10-03 at scope: the reader cuts at a backslash-newline too, since `escaped()` in native/src/guard/bash.rs exempts the `;` separator alone.
-
-**Selected 2026-10-03 for guard-kit-write-side-pass, operator direction lead-relayed (not a ruling):** a feature, the spec stage's to author and promote; first in order, since [compound-read-classifier-reach](#compound-read-classifier-reach) reads its splits; its need the closing push alone.
-
-**Cost while deferred:** a call carrying either shape may cost a permission decision a grant would have taken. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' build; promoted at its close: →fix fails because the target behaviour is unmeasured, →forward because no ruling is owed. `bash-reader-escaped-separator` fixed the escaped `;` alone; DISTINCT, not a recurrence. Owner lookup: `escaped`, `backslash` in this file — none live; owner guard-kit/SPEC.md §The reader and its views.
 
 ### gate-sdk-layout-assumptions
 
