@@ -17,10 +17,12 @@ const KIT_PREFIX: &str = "DELEGATION_KIT_";
 const KIT_DEFAULTS: &[(&str, &str)] = &[
     ("DELEGATION_KIT_USAGE_FILE", ""),
     ("DELEGATION_KIT_CRED_FILE", ""),
+    ("DELEGATION_KIT_ACCOUNT_CONFIG", ""),
     ("DELEGATION_KIT_PAUSE_PCT", "80"),
     ("DELEGATION_KIT_PAUSE_PCT_7D", "95"),
     ("DELEGATION_KIT_STALE_AGE", "600"),
     ("DELEGATION_KIT_LOGIN_WINDOW", "600"),
+    ("DELEGATION_KIT_LOGIN_SETTLE", "90"),
     ("DELEGATION_KIT_REFRESH_MIN_AGE", "60"),
     ("DELEGATION_KIT_USAGE_HISTORY", ""),
     ("DELEGATION_KIT_FAN_WIDTH", "2"),
@@ -137,6 +139,7 @@ struct Verdict<'a> {
     sandbox: PathBuf,
     usage: PathBuf,
     cred: PathBuf,
+    account_config: PathBuf,
     hist: PathBuf,
     now: i64,
     knobs: &'a knobenv::KnobEnv,
@@ -162,6 +165,25 @@ impl Verdict<'_> {
         std::fs::write(&self.usage, body).expect("the snapshot must be writable");
     }
 
+    fn stamp_account(&self, account: &str) {
+        let body = std::fs::read_to_string(&self.usage).expect("the snapshot must be readable");
+        std::fs::write(&self.usage, format!("{}account={}\n", body, account))
+            .expect("the snapshot must be writable");
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — the live identity is a fixture account config the
+    // sandbox owns, never the host's own, which the knob's empty default would derive.
+    fn set_live(&self, live: Option<&str>) {
+        let _ = std::fs::remove_file(&self.account_config);
+        if let Some(uuid) = live {
+            std::fs::write(
+                &self.account_config,
+                format!("{{\"oauthAccount\":{{\"accountUuid\":\"{}\"}}}}\n", uuid),
+            )
+            .expect("the account config must be writable");
+        }
+    }
+
     fn set_credentials(&self, age: Option<i64>) {
         let _ = std::fs::remove_file(&self.cred);
         if let Some(seconds) = age {
@@ -180,7 +202,9 @@ impl Verdict<'_> {
     fn run(&self, extra: &[(&str, String)]) -> Ran {
         self.knobs.set(POISON.0, POISON.1);
         strip_kit(self.knobs);
-        seed_kit(self.knobs, &self.sandbox, extra);
+        let mut seeded: Vec<(&str, String)> = vec![("DELEGATION_KIT_ACCOUNT_CONFIG", text(&self.account_config))];
+        seeded.extend(extra.iter().cloned());
+        seed_kit(self.knobs, &self.sandbox, &seeded);
         let (out, code) = verdict::verdict(&[text(&self.usage), text(&self.cred)]);
         Ran { out, code }
     }
@@ -228,6 +252,7 @@ fn the_kits_verdict_decision_table_holds() {
     let v = Verdict {
         usage: dir.join("usage.txt"),
         cred: dir.join(".credentials.json"),
+        account_config: dir.join("account.json"),
         hist: dir.join("history.log"),
         sandbox: dir,
         now: now_epoch(),
@@ -242,9 +267,10 @@ fn the_kits_verdict_decision_table_holds() {
             continue;
         }
         let cols: Vec<&str> = line.split('\t').collect();
-        assert_eq!(cols.len(), 11, "malformed case row: {}", line);
+        assert_eq!(cols.len(), 13, "malformed case row: {}", line);
         let (verdict, want, pct) = (cols[0], cols[1], cols[2]);
-        let (pct_7d, append, axis, desc) = (cols[6], cols[8], cols[9], cols[10]);
+        let (pct_7d, account, live) = (cols[6], cols[8], cols[9]);
+        let (append, axis, desc) = (cols[10], cols[11], cols[12]);
         let num = |c: &str| c.parse::<i64>().unwrap_or_else(|_| panic!("case [{}]: {}", desc, line));
         let weekly = if pct_7d == "-" {
             None
@@ -252,6 +278,10 @@ fn the_kits_verdict_decision_table_holds() {
             Some((pct_7d, num(cols[7])))
         };
         v.write_snapshot(pct, num(cols[3]), num(cols[4]), weekly);
+        if account != "-" {
+            v.stamp_account(account);
+        }
+        v.set_live(if live == "-" { None } else { Some(live) });
         v.set_credentials(if cols[5] == "-" { None } else { Some(num(cols[5])) });
         let _ = std::fs::remove_file(&v.hist);
 
@@ -278,6 +308,14 @@ fn the_kits_verdict_decision_table_holds() {
         assert!(
             got.out.contains("width=2 "),
             "[{}]: verdict line dropped the fan-width field: {}",
+            desc,
+            got.out
+        );
+        let switched = account != "-" && live != "-" && account != live;
+        assert_eq!(
+            got.out.contains("account switch"),
+            switched && verdict == "STALE",
+            "[{}]: the account-switch STALE fired off its arm: {}",
             desc,
             got.out
         );
@@ -317,6 +355,7 @@ fn the_kits_verdict_decision_table_holds() {
     // spec: delegation-kit/SPEC.md §Testing — the anti-vacuity guard the shell runner spelled as
     // its exit-2 `ran == 0` refusal
     assert!(ran > 0, "no cases parsed from {}", table.display());
+    v.set_live(None);
 
     // spec: delegation-kit/SPEC.md §usage-verdict — the width field tracks the fan-width knob
     // rather than a literal
@@ -410,6 +449,54 @@ fn the_kits_verdict_decision_table_holds() {
          refresh — the render path would hammer the source: {}",
         fresh.out
     );
+
+    // spec: delegation-kit/SPEC.md §usage-verdict — a snapshot naming another account than the
+    // live one is re-polled whatever its age, and one still naming it after a failed poll is the
+    // account-switch STALE
+    std::fs::write(
+        &stub,
+        format!(
+            "#!/usr/bin/env bash\ntouch \"{}\"\n{{\n    printf 'five_hour_used_pct=33\\n'\n    printf 'five_hour_resets_at={}\\n'\n    printf 'updated_at={}\\n'\n    printf 'account=acctB\\n'\n}} > \"{}.tmp\" && mv \"{}.tmp\" \"{}\"\n",
+            text(&stamp),
+            v.now + 3600,
+            v.now,
+            text(&v.usage),
+            text(&v.usage),
+            text(&v.usage)
+        ),
+    )
+    .expect("the refresh stub must be writable");
+    v.write_snapshot("40", 0, 3600, None);
+    v.stamp_account("acctA");
+    v.set_live(Some("acctB"));
+    v.set_credentials(None);
+    let _ = std::fs::remove_file(&stamp);
+    let swapped = v.run(&[refresh(&stub)]);
+    assert!(
+        stamp.exists(),
+        "[refresh-account-switch]: a fresh snapshot naming another account did not invoke the refresh: {}",
+        swapped.out
+    );
+    assert!(
+        swapped.code == 0 && swapped.out.contains("used=33%"),
+        "[refresh-account-switch]: the verdict did not read the re-polled live account's pct: {}",
+        swapped.out
+    );
+
+    std::fs::write(
+        &stub,
+        "#!/usr/bin/env bash\necho \"usage-poller: fetch failed\" >&2\nexit 1\n",
+    )
+    .expect("the refresh stub must be writable");
+    v.write_snapshot("40", 0, 3600, None);
+    v.stamp_account("acctA");
+    let unswapped = v.run(&[refresh(&stub)]);
+    assert!(
+        unswapped.code == 2 && unswapped.out.contains("account switch"),
+        "[refresh-account-switch-fail-soft]: a failed re-poll must leave the account-switch STALE: {}",
+        unswapped.out
+    );
+    v.set_live(None);
 
     let crossed = v.now - 3600;
     roll_case(
@@ -510,6 +597,15 @@ const TREND_NEEDLES: &[(&str, &str)] = &[
         "PAUSE onset annotated where the pause first landed",
         "first PAUSE onset at epoch 33600",
     ),
+    (
+        "combine: acctA's newest weekly segment and its headroom",
+        "  account acctA: weekly 70.0%, headroom 25.0% to the 95% ceiling",
+    ),
+    (
+        "combine: acctB's newest weekly segment is its later login's",
+        "  account acctB: weekly 15.0%, headroom 80.0% to the 95% ceiling",
+    ),
+    ("combine: the rotation's count line", "accounts: 2, at or over the weekly ceiling: 0"),
 ];
 
 // spec: delegation-kit/SPEC.md §Testing — the segment counts are anchored on the reporter's own
@@ -545,6 +641,22 @@ fn the_kits_trend_fixture_reports_its_segments() {
         let got = report.lines().filter(|l| l.starts_with(prefix)).count();
         assert_eq!(got, *want, "[{}]: segment lines under '{}'", label, prefix);
     }
+
+    // spec: delegation-kit/SPEC.md §Trend reporter — a log with one account prints no combine block
+    let single = dir.join("one-account.log");
+    let one: String = std::fs::read_to_string(&history)
+        .expect("the fixture history must be readable")
+        .lines()
+        .filter(|l| !l.contains("account=acctB"))
+        .map(|l| format!("{}\n", l))
+        .collect();
+    std::fs::write(&single, one).expect("the one-account log must be writable");
+    let alone = usage_trend::emit(&[text(&single)]).expect("the one-account log must report");
+    assert!(
+        alone.contains("account acctA") && !alone.contains("accounts:"),
+        "[combine absent]: a one-account log printed the combine block: {}",
+        alone
+    );
 
     // spec: delegation-kit/SPEC.md §Trend reporter — the two fail-closed arms, preserved as the
     // arm's own `Err` into `Arm::Emit`'s exit 2 rather than as the shell idiom that read a status

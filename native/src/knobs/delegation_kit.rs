@@ -47,6 +47,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("DELEGATION_KIT_PAUSE_PCT_7D", "95"),
         Row::scalar("DELEGATION_KIT_STALE_AGE", "600"),
         Row::scalar("DELEGATION_KIT_LOGIN_WINDOW", "600"),
+        Row::scalar("DELEGATION_KIT_LOGIN_SETTLE", "90"),
         Row::indexed("DELEGATION_KIT_REFRESH_CMD", &[]),
         Row::scalar("DELEGATION_KIT_REFRESH_MIN_AGE", "60"),
         Row::scalar("DELEGATION_KIT_USAGE_HISTORY", ""),
@@ -103,7 +104,12 @@ fn validate(v: &Values) -> Vec<String> {
             errs.push(format!("{} must be numeric (got '{}')", n, s));
         }
     }
-    for n in ["DELEGATION_KIT_STALE_AGE", "DELEGATION_KIT_LOGIN_WINDOW", "DELEGATION_KIT_REFRESH_MIN_AGE"] {
+    for n in [
+        "DELEGATION_KIT_STALE_AGE",
+        "DELEGATION_KIT_LOGIN_WINDOW",
+        "DELEGATION_KIT_LOGIN_SETTLE",
+        "DELEGATION_KIT_REFRESH_MIN_AGE",
+    ] {
         if let Some(s) = scalar(v, n).filter(|s| !digits(s)) {
             errs.push(format!("{} must be a non-negative integer (got '{}')", n, s));
         }

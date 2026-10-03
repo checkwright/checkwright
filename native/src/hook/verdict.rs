@@ -14,6 +14,7 @@ pub const KNOBS: &[&str] = &[
     "DELEGATION_KIT_PAUSE_PCT_7D",
     "DELEGATION_KIT_STALE_AGE",
     "DELEGATION_KIT_LOGIN_WINDOW",
+    "DELEGATION_KIT_LOGIN_SETTLE",
     "DELEGATION_KIT_REFRESH_CMD",
     "DELEGATION_KIT_REFRESH_MIN_AGE",
     "DELEGATION_KIT_USAGE_HISTORY",
@@ -56,10 +57,12 @@ fn parse(args: &[String]) -> Result<(Option<&str>, Option<&str>), String> {
 struct Config {
     usage_file: String,
     cred_file: String,
+    account_config: String,
     pause_pct: String,
     pause_pct_7d: String,
     stale_age: String,
     login_window: i64,
+    login_settle: i64,
     refresh_cmd: Vec<String>,
     refresh_min_age: i64,
     history: String,
@@ -72,10 +75,12 @@ fn config() -> Result<Config, String> {
     Ok(Config {
         usage_file: paths.usage_file,
         cred_file: paths.cred_file,
+        account_config: paths.account_config,
         pause_pct: k("DELEGATION_KIT_PAUSE_PCT")?,
         pause_pct_7d: k("DELEGATION_KIT_PAUSE_PCT_7D")?,
         stale_age: k("DELEGATION_KIT_STALE_AGE")?,
         login_window: int(&k("DELEGATION_KIT_LOGIN_WINDOW")?),
+        login_settle: int(&k("DELEGATION_KIT_LOGIN_SETTLE")?),
         refresh_cmd: walk::knob_array("DELEGATION_KIT_REFRESH_CMD")?,
         refresh_min_age: int(&k("DELEGATION_KIT_REFRESH_MIN_AGE")?),
         history: k("DELEGATION_KIT_USAGE_HISTORY")?,
@@ -218,15 +223,20 @@ fn append_sample(cfg: &Config, snap: &Snapshot, login_at: i64, verdict: &str) {
     }
 }
 
-// spec: delegation-kit/SPEC.md §usage-verdict — the roll witnesses: read the newest sample's
-// boundary before any append of this run's own, so the reroute is judged against the previous
-// reading, never against itself. Absent, unreadable or non-numeric falls open to the reroute.
-fn previous_boundary(history: &str) -> Option<i64> {
+// spec: delegation-kit/SPEC.md §usage-verdict — the roll witnesses: the boundary of the newest sample
+// for the snapshot's own account (any account where it carries none), read before this run's append,
+// so the witness is a previous reading of the same account's window; every unanswerable log falls open.
+fn previous_boundary(history: &str, account: &str) -> Option<i64> {
     if history.is_empty() {
         return None;
     }
     let body = std::fs::read_to_string(history).ok()?;
-    let last = body.lines().next_back()?;
+    let last = body.lines().rev().find(|line| {
+        account.is_empty()
+            || line
+                .split_ascii_whitespace()
+                .any(|f| f.strip_prefix("account=") == Some(account))
+    })?;
     let field = last
         .split_ascii_whitespace()
         .find_map(|f| f.strip_prefix("resets_at="))?;
@@ -250,8 +260,9 @@ fn credentials_mtime(path: &str) -> i64 {
 }
 
 // spec: delegation-kit/SPEC.md §usage-verdict — demand-driven refresh, short-circuited under
-// REFRESH_MIN_AGE and fail-soft; DELEGATION_KIT_REFRESH_CMD is an argv spawned with no shell.
-fn refresh(cfg: &Config) {
+// REFRESH_MIN_AGE save for a snapshot naming another account than the live one, and fail-soft;
+// DELEGATION_KIT_REFRESH_CMD is an argv spawned with no shell.
+fn refresh(cfg: &Config, live: &str) {
     let Some((program, rest)) = cfg.refresh_cmd.split_first() else {
         return;
     };
@@ -259,12 +270,16 @@ fn refresh(cfg: &Config) {
         // spec: delegation-kit/SPEC.md §usage-verdict — the short-circuit probe is `awk -F=`'s
         // read, which takes a final unterminated record where the `read` loop above drops it, so
         // the two spellings stay the two the shell form had rather than collapsing into one.
-        let stamp = body
-            .lines()
-            .find_map(|l| l.split_once('=').filter(|(k, _)| *k == "updated_at"))
-            .map(|(_, v)| v.split('=').next().unwrap_or(v).to_string())
-            .unwrap_or_default();
-        if is_unsigned_epoch(&stamp) && now_epoch() - int(&stamp) < cfg.refresh_min_age {
+        let field = |key: &str| {
+            body.lines()
+                .find_map(|l| l.split_once('=').filter(|(k, _)| *k == key))
+                .map(|(_, v)| v.split('=').next().unwrap_or(v).to_string())
+                .unwrap_or_default()
+        };
+        let stamp = field("updated_at");
+        let account = field("account");
+        let switched = !account.is_empty() && !live.is_empty() && account != live;
+        if !switched && is_unsigned_epoch(&stamp) && now_epoch() - int(&stamp) < cfg.refresh_min_age {
             return;
         }
     }
@@ -298,7 +313,10 @@ pub fn verdict(args: &[String]) -> (String, i32) {
         cfg.cred_file = p.to_string();
     }
 
-    refresh(&cfg);
+    // spec: delegation-kit/SPEC.md §usage-verdict — the live identity, read before the refresh
+    // because its short-circuit is keyed on it as well as the reroute after the read.
+    let live = crate::hook::usage::json_field(&cfg.account_config, &["oauthAccount", "accountUuid"]);
+    refresh(&cfg, &live);
 
     let stale = |body: String| (format!("{} -> STALE ({})", body, NEVER_BLOCKS), 2);
 
@@ -333,7 +351,7 @@ pub fn verdict(args: &[String]) -> (String, i32) {
     } else {
         0
     };
-    let rolled = match previous_boundary(&walk::capture_path(&cfg.history)) {
+    let rolled = match previous_boundary(&walk::capture_path(&cfg.history), &snap.account) {
         Some(prev) => int(&snap.resets_at) != prev && int(&snap.updated_at) > prev,
         None => false,
     };
@@ -343,7 +361,7 @@ pub fn verdict(args: &[String]) -> (String, i32) {
     );
 
     // spec: delegation-kit/SPEC.md §usage-verdict — check order: parse -> RESET-OK -> age-STALE ->
-    // pause axes -> login-STALE -> OK.
+    // pause axes -> account-STALE or login-STALE -> OK.
     if resets_in <= 0 {
         append_sample(&cfg, &snap, login_at, "RESET-OK");
         return (
@@ -398,10 +416,26 @@ pub fn verdict(args: &[String]) -> (String, i32) {
     }
 
     // spec: delegation-kit/SPEC.md §usage-verdict — the reroute follows the axis compares and may
-    // suppress only the non-blocking outcome; a demonstrated roll refutes its lagging-reading
-    // premise, so the witnesses disarm it.
+    // suppress only the non-blocking outcome; a roll refutes the two lag arms' premise, never the
+    // account-switch arm's, so the witnesses disarm the lag arms alone.
+    let keyed = !snap.account.is_empty() && !live.is_empty();
+    if keyed && snap.account != live {
+        append_sample(&cfg, &snap, login_at, "STALE");
+        return (
+            format!(
+                "{} -> STALE (snapshot predates an account switch; {})",
+                reading, NEVER_BLOCKS
+            ),
+            2,
+        );
+    }
     let cred_age = now - login_at;
-    if login_at > 0 && cred_age >= 0 && cred_age < cfg.login_window && !rolled {
+    let lagging = if keyed {
+        int(&snap.updated_at) - login_at < cfg.login_settle
+    } else {
+        cred_age < cfg.login_window
+    };
+    if login_at > 0 && cred_age >= 0 && lagging && !rolled {
         append_sample(&cfg, &snap, login_at, "STALE");
         return (
             format!(
@@ -470,21 +504,41 @@ mod tests {
     }
 
     // spec: delegation-kit/SPEC.md §usage-verdict — the witness reads the newest sample's boundary
-    // and falls open on every way the log cannot answer
+    // for the snapshot's account and falls open on every way the log cannot answer
     #[test]
     fn the_roll_witness_falls_open_on_every_unanswerable_log() {
         let dir = std::env::temp_dir().join(format!("checkwright-verdict.{}", std::process::id()));
         let _ = std::fs::create_dir_all(&dir);
         let log = dir.join("history.log");
         let path = log.to_string_lossy().into_owned();
-        assert_eq!(previous_boundary(""), None, "an unset knob falls open");
-        assert_eq!(previous_boundary(&path), None, "an absent file falls open");
+        assert_eq!(previous_boundary("", ""), None, "an unset knob falls open");
+        assert_eq!(previous_boundary(&path, ""), None, "an absent file falls open");
         std::fs::write(&log, "updated_at=1 pct=3 resets_at=notanepoch verdict=OK\n")
             .expect("the tail must be writable");
-        assert_eq!(previous_boundary(&path), None, "a non-numeric tail falls open");
+        assert_eq!(previous_boundary(&path, ""), None, "a non-numeric tail falls open");
         std::fs::write(&log, "updated_at=1 resets_at=10 verdict=OK\nupdated_at=2 resets_at=20 verdict=OK\n")
             .expect("the tail must be writable");
-        assert_eq!(previous_boundary(&path), Some(20), "the newest sample is the witness");
+        assert_eq!(previous_boundary(&path, ""), Some(20), "the newest sample is the witness");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: delegation-kit/SPEC.md §usage-verdict — a swap leaves another account's sample at the
+    // tail, and the witness passes over it to the snapshot's own account's newest sample
+    #[test]
+    fn the_roll_witness_reads_the_snapshots_own_account() {
+        let dir = std::env::temp_dir().join(format!("checkwright-verdict-acct.{}", std::process::id()));
+        let _ = std::fs::create_dir_all(&dir);
+        let log = dir.join("history.log");
+        let path = log.to_string_lossy().into_owned();
+        std::fs::write(
+            &log,
+            "updated_at=1 resets_at=10 verdict=OK account=a\nupdated_at=2 resets_at=20 verdict=OK account=b\n",
+        )
+        .expect("the tail must be writable");
+        assert_eq!(previous_boundary(&path, "a"), Some(10), "the snapshot's own account is the witness");
+        assert_eq!(previous_boundary(&path, "b"), Some(20));
+        assert_eq!(previous_boundary(&path, ""), Some(20), "no account reads the newest sample of all");
+        assert_eq!(previous_boundary(&path, "c"), None, "no sample for the account falls open");
         let _ = std::fs::remove_dir_all(&dir);
     }
 }

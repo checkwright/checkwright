@@ -204,10 +204,10 @@ fn suspect(rows: &[&Rec]) -> Vec<bool> {
 // spec: delegation-kit/SPEC.md §Trend reporter — the per-segment report. `last_acct` carries
 // across segments because the account heading prints on change alone, which is what groups a
 // rotating operator's weekly trajectory instead of interleaving it.
-fn flush(rows: &[&Rec], pause7: &str, last_acct: &mut Option<String>, out: &mut String) {
+fn flush(rows: &[&Rec], pause7: &str, last_acct: &mut Option<String>, out: &mut String) -> Option<(f64, f64)> {
     let n = rows.len();
     if n == 0 {
-        return;
+        return None;
     }
     let sp = smoothed(rows);
     let susp = suspect(rows);
@@ -272,6 +272,41 @@ fn flush(rows: &[&Rec], pause7: &str, last_acct: &mut Option<String>, out: &mut 
     if let Some(r) = rows.iter().find(|r| r.verdict == "PAUSE") {
         out.push_str(&format!("      first PAUSE onset at epoch {}\n", r.updated));
     }
+    Some((num(&rows[n - 1].updated), last))
+}
+
+// spec: delegation-kit/SPEC.md §Trend reporter — the combine step: one line per stamped account,
+// its newest weekly segment's last smoothed pct and headroom, then the count at or over the
+// ceiling. Advisory and summing nothing; a log with fewer than two stamped accounts prints none.
+fn combine(weekly: &[(String, Option<(f64, f64)>)], pause7: &str, out: &mut String) {
+    if weekly.len() < 2 {
+        return;
+    }
+    let ceiling = num(pause7);
+    out.push_str("\ncombined accounts (advisory; nothing summed, the pause stays per account):\n");
+    let mut over = 0usize;
+    for (acct, newest) in weekly {
+        match newest {
+            Some((_, pct)) => {
+                if *pct >= ceiling {
+                    over += 1;
+                }
+                out.push_str(&format!(
+                    "  account {}: weekly {:.1}%, headroom {:.1}% to the {}% ceiling\n",
+                    acct,
+                    pct,
+                    ceiling - pct,
+                    pause7
+                ));
+            }
+            None => out.push_str(&format!("  account {}: weekly -, headroom -\n", acct)),
+        }
+    }
+    out.push_str(&format!(
+        "accounts: {}, at or over the weekly ceiling: {}\n",
+        weekly.len(),
+        over
+    ));
 }
 
 // spec: delegation-kit/SPEC.md §Trend reporter — the segment tuple, compared as the upstream
@@ -322,15 +357,34 @@ pub fn emit(args: &[String]) -> Result<String, String> {
 
     let mut report = String::new();
     let mut last_acct: Option<String> = None;
+    let mut weekly: Vec<(String, Option<(f64, f64)>)> = Vec::new();
     let mut seg: Vec<&Rec> = Vec::new();
+    let mut close = |seg: &[&Rec], last_acct: &mut Option<String>, report: &mut String| {
+        let summary = flush(seg, &pause7, last_acct, report);
+        let Some(first) = seg.first() else { return };
+        if first.acct == ABSENT {
+            return;
+        }
+        if weekly.last().map(|(a, _)| a != &first.acct).unwrap_or(true) {
+            weekly.push((first.acct.clone(), None));
+        }
+        if first.axis == "7d" {
+            if let Some(slot) = weekly.last_mut() {
+                if slot.1.map_or(true, |(newest, _)| summary.is_some_and(|(u, _)| u >= newest)) {
+                    slot.1 = summary;
+                }
+            }
+        }
+    };
     for r in &recs {
         if !seg.is_empty() && segment_key(seg[0]) != segment_key(r) {
-            flush(&seg, &pause7, &mut last_acct, &mut report);
+            close(&seg, &mut last_acct, &mut report);
             seg.clear();
         }
         seg.push(r);
     }
-    flush(&seg, &pause7, &mut last_acct, &mut report);
+    close(&seg, &mut last_acct, &mut report);
+    combine(&weekly, &pause7, &mut report);
 
     Ok(format!(
         "usage-trend: {} axis-record(s) across the 5h/weekly segments\n{}\n",

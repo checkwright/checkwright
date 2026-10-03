@@ -1,44 +1,54 @@
 # usage-verdict decision table — columns (tab-separated):
-#   verdict  exit  pct  age_off  reset_off  cred_age  pct_7d  reset7d_off  append  axis  desc
+#   verdict  exit  pct  age_off  reset_off  cred_age  pct_7d  reset7d_off  account  live  append  axis  desc
 # Offsets are seconds from *now* (static fixtures would age into permanent STALE).
 # pct_7d '-' omits the seven_day keys (a three-line snapshot — today's behavior).
+# account is the snapshot's account key and live the oauthAccount.accountUuid the case
+# writes into a fixture account config; '-' omits each.
 # append is the sample-line count the run must leave in the history log (0 or 1);
 # axis ('-' / 5h / 7d) asserts which window a PAUSE names. # and blank lines ignored.
 # Every verdict branch and both pause axes carry a firing and a non-firing case
 # (delegation-kit/SPEC.md §Testing).
-# Defaults under test: PAUSE_PCT=80, PAUSE_PCT_7D=95, STALE_AGE=600, LOGIN_WINDOW=600.
+# Defaults under test: PAUSE_PCT=80, PAUSE_PCT_7D=95, STALE_AGE=600, LOGIN_WINDOW=600, LOGIN_SETTLE=90.
 
 # OK — under threshold, fresh reading, live window
-OK	0	40	0	3600	-	-	0	1	-	integer under threshold
-OK	0	28.999	0	3600	-	-	0	1	-	fractional under threshold (non-firing PAUSE)
-OK	0	40	0	3600	-	30	500000	1	-	weekly present but comfortable — neither axis fires
-OK	0	40	0	3600	-	90	500000	1	-	weekly between the split thresholds (80..95) — the looser weekly default does not fire
-OK	0	40	0	3600	-	99	-100	1	-	dead weekly window does not pause (a high 7d pct from a rolled window)
-OK	0	79.999	0	3600	-	-	0	1	-	just under the 5h threshold — the at-or-over boundary's non-firing side
-OK	0	40	0	3600	-	94.999	500000	1	-	just under the weekly threshold — the at-or-over boundary's non-firing side
+OK	0	40	0	3600	-	-	0	-	-	1	-	integer under threshold
+OK	0	28.999	0	3600	-	-	0	-	-	1	-	fractional under threshold (non-firing PAUSE)
+OK	0	40	0	3600	-	30	500000	-	-	1	-	weekly present but comfortable — neither axis fires
+OK	0	40	0	3600	-	90	500000	-	-	1	-	weekly between the split thresholds (80..95) — the looser weekly default does not fire
+OK	0	40	0	3600	-	99	-100	-	-	1	-	dead weekly window does not pause (a high 7d pct from a rolled window)
+OK	0	79.999	0	3600	-	-	0	-	-	1	-	just under the 5h threshold — the at-or-over boundary's non-firing side
+OK	0	40	0	3600	-	94.999	500000	-	-	1	-	just under the weekly threshold — the at-or-over boundary's non-firing side
 
 # PAUSE (5h) — at or over threshold, fresh, live window, no recent login
-PAUSE	1	95	0	3600	-	-	0	1	5h	integer over the 5h threshold
-PAUSE	1	82.5	0	3600	-	-	0	1	5h	fractional over 5h (the float-compare regression)
-PAUSE	1	80.9	0	3600	-	-	0	1	5h	fractional just over the 5h boundary (int truncation would miss)
-PAUSE	1	80	0	3600	-	-	0	1	5h	exactly at the 5h threshold pauses (at-or-over: the boundary reading is judged at the limit)
-PAUSE	1	95	0	3600	99999	-	0	1	5h	over 5h with an old login (no lag reroute)
+PAUSE	1	95	0	3600	-	-	0	-	-	1	5h	integer over the 5h threshold
+PAUSE	1	82.5	0	3600	-	-	0	-	-	1	5h	fractional over 5h (the float-compare regression)
+PAUSE	1	80.9	0	3600	-	-	0	-	-	1	5h	fractional just over the 5h boundary (int truncation would miss)
+PAUSE	1	80	0	3600	-	-	0	-	-	1	5h	exactly at the 5h threshold pauses (at-or-over: the boundary reading is judged at the limit)
+PAUSE	1	95	0	3600	99999	-	0	-	-	1	5h	over 5h with an old login (no lag reroute)
 
 # PAUSE (7-day) — the weekly axis fires while 5h sits comfortable, and dominates when both fire
-PAUSE	1	40	0	3600	-	96	500000	1	7d	weekly over while 5h comfortable -> PAUSE names the 7-day axis
-PAUSE	1	95	0	3600	-	97	500000	1	7d	both axes over -> the costlier weekly axis is named
-PAUSE	1	40	0	3600	-	95	500000	1	7d	exactly at the weekly threshold pauses (at-or-over boundary)
+PAUSE	1	40	0	3600	-	96	500000	-	-	1	7d	weekly over while 5h comfortable -> PAUSE names the 7-day axis
+PAUSE	1	95	0	3600	-	97	500000	-	-	1	7d	both axes over -> the costlier weekly axis is named
+PAUSE	1	40	0	3600	-	95	500000	-	-	1	7d	exactly at the weekly threshold pauses (at-or-over boundary)
 
 # PAUSE — inside the login window the reroute may suppress an OK, never a PAUSE
-PAUSE	1	95	0	3600	60	-	0	1	5h	over 5h with a fresh login -> still PAUSE: a lagging reading must not wave through an expensive dispatch
-PAUSE	1	40	0	3600	60	96	500000	1	7d	weekly over with a fresh login -> still PAUSE (the reroute does not reach either axis)
+PAUSE	1	95	0	3600	60	-	0	-	-	1	5h	over 5h with a fresh login -> still PAUSE: a lagging reading must not wave through an expensive dispatch
+PAUSE	1	40	0	3600	60	96	500000	-	-	1	7d	weekly over with a fresh login -> still PAUSE (the reroute does not reach either axis)
 
 # STALE — post-login lag (the non-blocking outcome only), stale reading, non-numeric fail-closed
-STALE	2	40	0	3600	60	-	0	1	-	under threshold with a fresh login -> STALE: the reroute suppresses the OK, so a lagging pct cannot print a fresh-looking OK
-STALE	2	79.999	0	3600	60	-	0	1	-	just under the 5h threshold with a fresh login -> STALE: the reroute's firing side at the boundary the PAUSE case pins from above
-STALE	2	40	1200	3600	-	-	0	1	-	reading older than STALE_AGE — parsed, so it still logs
-STALE	2	abc	0	3600	-	-	0	0	-	non-numeric pct fails closed and appends nothing (not a parsed sample)
+STALE	2	40	0	3600	60	-	0	-	-	1	-	under threshold with a fresh login -> STALE: the reroute suppresses the OK, so a lagging pct cannot print a fresh-looking OK
+STALE	2	79.999	0	3600	60	-	0	-	-	1	-	just under the 5h threshold with a fresh login -> STALE: the reroute's firing side at the boundary the PAUSE case pins from above
+STALE	2	40	1200	3600	-	-	0	-	-	1	-	reading older than STALE_AGE — parsed, so it still logs
+STALE	2	abc	0	3600	-	-	0	-	-	0	-	non-numeric pct fails closed and appends nothing (not a parsed sample)
 
 # RESET-OK — the 5h window rolled over; the pct is from the dead window
-RESET-OK	0	95	0	-100	-	-	0	1	-	dead 5h window -> RESET-OK (a high pct must not read as PAUSE)
-RESET-OK	0	40	0	-1	-	-	0	1	-	5h window just rolled over
+RESET-OK	0	95	0	-100	-	-	0	-	-	1	-	dead 5h window -> RESET-OK (a high pct must not read as PAUSE)
+RESET-OK	0	40	0	-1	-	-	0	-	-	1	-	5h window just rolled over
+
+# The account-keyed reroute — the live identity against the snapshot's account
+STALE	2	40	0	3600	60	-	0	acctA	acctB	1	-	mismatched account inside the login window -> STALE: the snapshot speaks for another account's windows
+STALE	2	40	0	3600	99999	-	0	acctA	acctB	1	-	mismatched account outside the login window -> STALE: the account arm needs no fresh auth event
+PAUSE	1	95	0	3600	60	-	0	acctA	acctB	1	5h	mismatched account at or over threshold -> still PAUSE (the reroute suppresses an OK only)
+OK	0	40	0	3600	300	-	0	acctA	acctA	1	-	matched account past the settle floor inside the old window -> OK: the settle floor replaces the blanket window
+STALE	2	40	0	3600	60	-	0	acctA	acctA	1	-	matched account within the settle floor -> STALE: the server-fed pct may still lag the login
+STALE	2	40	0	3600	300	-	0	-	acctA	1	-	snapshot without account keeps the blanket window -> STALE inside LOGIN_WINDOW
