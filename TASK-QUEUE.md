@@ -60,14 +60,6 @@ delegation-kit/SPEC.md's sections no brevity slice has passed — the preamble, 
 
 **Cost while deferred:** paid by every session and adopter that reads those contracts. Filed 2026-10-04 as a split at scope. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling).
 
-### foreign-resume-session-edges
-
-delegation-kit/SPEC.md §Resuming a session misstates two edges. (1) It says a sweep session's `change.patch` is always the session's whole change, but a `FAILED` resume turn returns before regenerating it (native/src/emit/foreign_run.rs, the `outcome` check ahead of `write_patch`), so a session closed after a failed sweep turn keeps a patch missing that turn while `--close` removes the clone. (2) Nothing serializes commands sharing a key: two resumes, or a resume and `--close`, can rotate one report, write one turn or remove a running turn's clone, and the section states no one-writer-per-key rule.
-
-**Deliverable:** the patch regenerated on every spawned sweep turn, `FAILED` included, with a fixture; and for (2) an honest limit naming the dispatcher as the key's one writer, operator direction 2026-10-04, lead-relayed (not a ruling): a per-key lock is not built.
-
-**Cost while deferred:** a dispatcher applying a closed session's patch silently loses a failed turn's change. Filed 2026-10-04 to the gap inbox by delegation-transport-pass' close second-vendor review; promoted at the next scope: →fix fails because (2) was a shape choice between a stated limit and new lock mechanism, →forward because no recorded ruling is touched. Re-verified: the resume path returns on `outcome`'s error before `write_patch`, and `grep -i lock` over foreign_run.rs finds no lock. Owner lookup: `foreign-resume`, `change.patch`, `one-writer`, `per key` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §Resuming a session.
-
 ## Deferred
 
 ### foreign-project-critique
@@ -1277,4 +1269,5 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 ## Done
 
 - usage-trend-suspect-endpoint
+- foreign-resume-session-edges
 

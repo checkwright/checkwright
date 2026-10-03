@@ -302,7 +302,7 @@ fn spawn(s: &Spawn) -> Result<Option<i32>, String> {
 }
 
 // spec: delegation-kit/SPEC.md §The foreign-vendor run — the turn's outcome once the shape held:
-// a timeout or a non-zero exit fails, and a sweep's `OK` writes its patch
+// a timeout or a non-zero exit fails
 fn outcome(status: Option<i32>, timeout: u64) -> Result<(), String> {
     match status {
         None => Err(format!("timeout after {}s", timeout)),
@@ -624,14 +624,24 @@ fn foreign_resume(cfg: &Config, key: &str, prompt: &str) -> Verdict {
         let _ = std::fs::remove_file(&session_path);
         return t.line(&format!("REFUSED ({}) — session ended, clone kept at {}", why, tree.display()), 1);
     }
+    // spec: delegation-kit/SPEC.md §Resuming a session — every spawned sweep turn regenerates the
+    // patch, a failed one included, so a session closed after it keeps that turn's change
+    let patched = if next.sweep {
+        write_patch(&tree, &next.base, &dir.join("change.patch"))
+            .map(|p| t.patch = p)
+            .map_err(|e| format!("the sweep's change is unreadable: {}", e))
+    } else {
+        Ok(())
+    };
     if let Err(why) = outcome(status, cfg.timeout) {
+        let why = match patched {
+            Err(unread) => format!("{}; and {}", why, unread),
+            Ok(()) => why,
+        };
         return advance(&t, &why);
     }
-    if next.sweep {
-        match write_patch(&tree, &next.base, &dir.join("change.patch")) {
-            Ok(p) => t.patch = p,
-            Err(e) => return advance(&t, &format!("the sweep's change is unreadable: {}", e)),
-        }
+    if let Err(why) = patched {
+        return advance(&t, &why);
     }
     if let Err(e) = std::fs::write(&session_path, next.render()) {
         return t.failed(&format!("cannot advance {}: {}", session_path.display(), e));
@@ -1019,6 +1029,25 @@ mod tests {
         let patch = r.run_dir().join("change.patch");
         assert!(v.line.contains(&format!("mode=sweep key=prompt turn=2 exit=0 report={} patch={} -> OK", r.run_dir().join("report.txt").display(), patch.display())), "{}", v.line);
         let body = String::from_utf8_lossy(&std::fs::read(&patch).expect("the patch")).into_owned();
+        assert!(body.contains("tracked.cfg") && body.contains("new.cfg"), "{}", body);
+        git(&r.root.join("src"), &["apply", "--check", patch.to_str().unwrap_or_default()]).expect("the patch applies cleanly");
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — resume: a failed sweep turn still regenerates the patch,
+    // so the session closed after it keeps that turn's change
+    #[test]
+    fn a_failed_sweep_turn_still_regenerates_the_patch() {
+        let r = Repo::new("resume-sweep-failed");
+        let open = ["s=bash", "s=-c", "s=git config --file tracked.cfg a.b 2 && echo 'session id: w1'"];
+        let resume = ["s=bash", "s=-c", "s=git config --file new.cfg c.d 3; exit 3", "s=@SESSION_ID@"];
+        let cfg = r.session_cfg(&open, &resume, MARKER, 60);
+        assert_eq!(foreign_run(&cfg, &r.args("s", true)).code, 0);
+        let v = foreign_resume(&cfg, "prompt", "answer.md");
+        assert_eq!(v.code, 2, "{}", v.line);
+        let patch = r.run_dir().join("change.patch");
+        assert!(v.line.contains(&format!("turn=2 exit=3 report={} patch={} -> FAILED (the adapter exited 3)", r.run_dir().join("report.txt").display(), patch.display())), "{}", v.line);
+        assert_eq!(foreign_close(&cfg, "prompt").code, 0);
+        let body = String::from_utf8_lossy(&std::fs::read(&patch).expect("close keeps the patch")).into_owned();
         assert!(body.contains("tracked.cfg") && body.contains("new.cfg"), "{}", body);
         git(&r.root.join("src"), &["apply", "--check", patch.to_str().unwrap_or_default()]).expect("the patch applies cleanly");
     }

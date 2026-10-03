@@ -783,7 +783,7 @@ It is an `Arm::Run` row that spawns a consumer's program which may reach the net
 
 `bash gate-sdk/bin/run-gates.sh --foreign-resume <key> <prompt-file>` runs the next turn of the session under `<GATE_SDK_TMP_DIR>/foreign/<key>/`. It reads `session.txt`, spawns the adapter's resume form from `DELEGATION_KIT_FOREIGN_RESUME` as **The spawn** does an open, in the kept clone with the prompt file on standard input, and bounds it by `DELEGATION_KIT_FOREIGN_TIMEOUT`. Before the spawn, the previous turn's `report.txt` and `stderr.txt` move to `report.<n>.txt` and `stderr.<n>.txt`, `<n>` the turn they came from, so every turn's return survives. A new `--foreign-run` under a free key clears the rotated reports a closed session left.
 
-**The shape** check runs against `refs.txt` from the open and, in `sweep` mode, regenerates `change.patch` against the session's `base`, so the patch is always the session's whole change. Then:
+**The shape** check runs against `refs.txt` from the open and, in `sweep` mode, regenerates `change.patch` against the session's `base` after every spawned turn, a `FAILED` one included, so the patch is always the session's whole change. Then:
 
 - **`OK`** — the turn counter advances, and the line carries the resumable clause again.
 - **`REFUSED`** — the session ends. `session.txt` is removed, so nothing can resume it, and the clone stays as a refusal's evidence.
@@ -792,6 +792,8 @@ It is an `Arm::Run` row that spawns a consumer's program which may reach the net
 The line is `foreign-resume: adapter=<adapter> mode=<mode> key=<key> turn=<n> exit=<status> report=<path|none> patch=<path|none> -> <VERDICT>`, on the run's exit codes. A field the arm could not read before the spawn reads `-`.
 
 `--foreign-resume <key> --close` ends a session the dispatcher is done with. It removes the clone, `session.txt` and `refs.txt`, keeps every report and the patch, and prints `foreign-resume: key=<key> -> CLOSED` at exit 0. A key with no open session is `FAILED` at exit 2. A session never closed is reclaimed with the scratch dir at the consumer's work-unit boundary. A malformed argv is a shape refusal at exit 2, and `--` ends option processing. It is an `Arm::Run` row with `--foreign-run`'s grounds and declared knobs.
+
+**Honest limit: the dispatcher is a key's one writer.** Nothing serializes commands sharing a key, so two resumes, or a resume and `--close`, running together can rotate one report, write one turn or remove a running turn's clone. The dispatcher runs one command per key at a time; the kit builds no lock.
 
 ## Layout and configuration
 
@@ -958,7 +960,7 @@ A member with no live tree corpus, whose input is a crafted snapshot or processe
 The session rows run stub resume forms the same way:
 
 - **Open.** A resumable adapter's `OK` keeps the clone and writes `session.txt` and `refs.txt`. A marker in standard output, and one only in standard error, each record the id. A resume form carrying `@SESSION_ID@` with no id captured opens no session and removes the clone, and a form without it opens one recording `-`.
-- **Resume.** `@SESSION_ID@` and `@PROMPT_FILE@` are substituted. The previous turn's report is rotated, and the turn counter advances. A sweep's patch covers the session's whole change across two turns.
+- **Resume.** `@SESSION_ID@` and `@PROMPT_FILE@` are substituted. The previous turn's report is rotated, and the turn counter advances. A sweep's patch covers the session's whole change across two turns, a failed turn's included.
 - **The resume verdicts.** A resume whose stub commits is `REFUSED` and removes `session.txt`. A non-zero resume is `FAILED` and keeps the session. A resume of an unknown key fails without a spawn.
 - **Close and collision.** `--close` keeps every report, a second `--close` fails, and a new open clears the rotated reports. A new `--foreign-run` under an open session's key fails.
 - The resume argv shape, and `session.txt` reading back what it wrote.
