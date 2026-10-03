@@ -13,3 +13,10 @@
 - rev: 470763a3a16d899ed7fcd1c1443ac6d33d83636a
 - finding: No entry aggregates more than 3 inbound edges (design-partner-preview 3; heterogeneous-agent-delegation, plugin-harness-reach, companion-toolkit-profile, benchmark-ab-experiment 2). No deferred entry reaches the recurrence threshold of 2 dates. Tier one: spec-brevity-residue (session/high, delegation-kit) leads; heterogeneous-agent-delegation (iteration/low, delegation-kit, roadmap now) joins on surface; audit-trigger-mirror-component (lifecycle-kit) and manual-operation-spend-channel (drift-kit) lead later sets. Delegation-kit board rows: heterogeneous-agent-delegation, foreign-vendor-critique, background-credential-swap-support, fan-width-unenforced. Supersession: foreign-vendor-critique reshaped by heterogeneous-agent-delegation's next slice (adapter-to-tier mapping); the rest independent.
 - inferred: per-entry supersession was read by grep over names, not by an oracle
+
+## 2026-10-03 build — Which surfaces cite into delegation-kit/SPEC.md's turn-end liveness hook section, and which of its facts do they rely on?
+- corpus: .
+- oracle: git grep -n -E 'turn-end liveness hook|Attribution was weighed|What .background_tasks. carries|The probe is asymmetric'
+- rev: 3753fc14fab3fd149232ac9210f11c9e49d27b40
+- finding: Read outside delegation-kit/SPEC.md and its docs mirror. External cites land on the section headings only; no italic paragraph-lead cite exists outside the section. Facts relied on: Stop unregistered (lifecycle-kit), own-axis refusal, view a supplement and corrupt divergence (guard-kit), exit 2 with stderr reason (README), emptied knob reads the compiled gate (smoke), sources no kit lib, advisory log reason, typed bounded error and wall-clock bound (proc.rs), and the stop_liveness.rs spec: tags (field order, open record, glob after reader, exit-2 split, refuse-once, task-view ownership, helper test, keys sorted, executability predicate, spawned default, three-way message, stub written in a child).
+- inferred: none
