@@ -20,7 +20,7 @@ an on-demand critique of the project's strategic weaknesses, run on the top fore
 
 **Deliverable:** the on-demand trigger, the critique prompt, the reflection pass's contract and the SWOT's home, model literals in consumer config. The spec question is the reflection's write path, since work enters only through scope (doctrine-kit/DOCTRINE.md, Scope-gated intake).
 
-**Cost while deferred:** nil while the operator holds no foreign credit to run it; after, strategic weaknesses surface only through the operator's own reading. Filed 2026-10-03 to the gap inbox by delegation-transport-pass' lead; promoted at its close: →fix fails because trigger, reflection and SWOT surface are new mechanism no amendment settled, →forward because the direction is given. Re-verified: no tracked prose names a SWOT or an on-demand foreign critique. Owner lookup: `SWOT`, `critique`, `strategic`, `reflection` in this file — foreign-vendor-critique, Done, DISTINCT (its close review landed); owner delegation-kit/SPEC.md §The foreign-vendor run, the SWOT's home open.
+**Cost while deferred:** nil while the operator holds no foreign credit to run it; after, strategic weaknesses surface only through the operator's own reading. Filed 2026-10-03 to the gap inbox by delegation-transport-pass' lead; promoted at its close: →fix fails because trigger, reflection and SWOT surface are new mechanism no amendment settled, →forward because the direction is given. Re-verified: no tracked prose names a SWOT or an on-demand foreign critique. Owner lookup: `SWOT`, `critique`, `strategic`, `reflection` in this file — foreign-vendor-critique, DISTINCT (its close review landed this iteration); owner delegation-kit/SPEC.md §The foreign-vendor run, the SWOT's home open.
 
 ### stage-executor-binding
 
@@ -152,13 +152,13 @@ hosted attestation. The team/paid rung: gates verified server-side by a party th
 
 [cost: iteration/low] [surface: delegation-kit] [roadmap: now/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
 
-foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent. It cashes the public no-lock-in claim — governance enforced at the git/gate boundary, not by trusting the author; the verification substrate and the shared git-index/HEAD serialization are already agent-neutral. *Remaining, worst-first:* (3) **budget oracle** — N vendor-keyed oracles, the credential-swap entries' seam, fed by the vendors' JSONL token-usage events; (4) **stage-contract expression** — the stage-skill prose is not vendor-neutral, and a foreign stage session has no stamp path, since it commits nothing and has no transcript the stamp protocol reads.
+foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent. It cashes the public no-lock-in claim — governance enforced at the git/gate boundary, not by trusting the author; the verification substrate and the shared git-index/HEAD serialization are already agent-neutral. *Remaining, worst-first:* (3) **budget oracle** — N vendor-keyed oracles beside the account-keyed verdict (delegation-kit/SPEC.md §usage-verdict), fed by the vendors' JSONL token-usage events; (4) **stage-contract expression** — the stage-skill prose is not vendor-neutral, and a foreign stage session has no stamp path, since it commits nothing and has no transcript the stamp protocol reads.
 
 **Slices landed**, each in delegation-kit/SPEC.md §The foreign-vendor run and each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); then (2) the dispatch transport with (1) the escalation resume model riding it, `--foreign-resume` continuing a vendor-held session in its kept clone, a permission request travelling as an escalation in the report, and no adapter binding to a tier class (delegation-transport-pass, 2026-10-03). **Next slice:** (3) the budget oracle or (4) stage-contract expression. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
 
-**Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, the pattern the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service), [plugin-harness-reach](#plugin-harness-reach) and the credential-swap entries.
+**Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, the pattern the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service) and [plugin-harness-reach](#plugin-harness-reach).
 
-**Demand attested (2026-07-23):** the operator holds three foreign-vendor subscriptions and wants read-heavy delegation routed to them for budget headroom. **Its citers** ([companion-toolkit-profile](#companion-toolkit-profile), the credential-swap entries) block on none of it.
+**Demand attested (2026-07-23):** the operator holds three foreign-vendor subscriptions and wants read-heavy delegation routed to them for budget headroom. **Its citer** [companion-toolkit-profile](#companion-toolkit-profile) blocks on none of it.
 
 **Attribution, operator direction 2026-09-30, lead-relayed (not a ruling):** foreign harnesses' commit trailers off and the method stated in one place, the README, held by construction (foreign work lands in the delegating session's commit); a harness setting change takes the operator's confirmation.
 
@@ -1245,9 +1245,4 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 A balanced Liquid token a docs page means literally parses and renders blank, and neither check-docs-liquid-parse nor check-docs-render-fidelity sees the loss; no live page carries it, and the fix is a render-side assertion or a token scan outside raw blocks (site-kit/SPEC.md §check-docs-liquid-parse).
 
 ## Done
-
-- background-credential-swap-support
-- fan-width-unenforced
-- foreign-vendor-critique
-- delegation-liveness-brevity
 
