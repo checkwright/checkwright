@@ -578,6 +578,16 @@ the binary still names or spawns the bash front end where an adopter meets it: t
 
 **Cost while deferred:** an adopter reading `--help` or the demo meets a command their install may not carry. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' build; promoted at its close: →fix fails because the knob default is a behaviour change across two front ends, →forward because no ruling is owed. Re-verified: grep finds all four sites. `hook-emit-remedy-door` scoped its fix to the hook and emit trees; this is DISTINCT, not a recurrence. Owner lookup: `run-gates.sh`, `DOOR_ROOTS` in this file — none; owner guard-kit/SPEC.md §check-door-binding, with gate-sdk/SPEC.md §run-gates.
 
+### fan-width-unenforced
+
+[cost: event/low] [surface: delegation-kit]
+
+the read-only fan-out bound is a template rule nothing enforces, and no surface a stage session reads says so. delegation-kit/templates/agent-execution.md binds independent read-only units to `≤DELEGATION_KIT_FAN_WIDTH`-wide; `usage-verdict` surfaces the knob as its `width=` field, and `agent-budget-guard` blocks only on its PAUSE status, while `agent-dispatch-guard`'s rules D1 to D6 count nothing in flight. A close session dispatched three concurrent read-only audits under `width=2`.
+
+**Deliverable:** a dispatch-guard rule refusing a read-only dispatch past the bound, with its decision-table row and its degradation row, or the template and §usage-verdict's width paragraph stating the bound as discipline the guard only surfaces; which is spec's, since whether a `PreToolUse` payload can see the in-flight set is unprobed.
+
+**Cost while deferred:** a fan-out past the bound spends more of the window than the knob's loss-bounding invariant allows when the wall fires mid-flight. Lead-observed once, no harm. Filed 2026-10-03 to the gap inbox by guard-ruleset-gate-neutrality-pass' lead, from its close; promoted 2026-10-03 at the next iteration's scope: →fix fails because either branch changes the guard's or the template's asserted behaviour, →forward because no ruling is owed. Re-verified: the guard grades only status 1 as its block, and the dispatch guard's table carries no width rule. Owner lookup: `width`, `FAN_WIDTH`, `fan-out` in this file — none; owner delegation-kit/SPEC.md §usage-verdict, with §The delegation model's dispatch guard.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
