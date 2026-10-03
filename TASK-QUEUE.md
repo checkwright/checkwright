@@ -63,6 +63,16 @@ four kept gate-sdk gates assume this repo's layout, found at gate-sdk-value-pass
 
 **Cost while deferred:** an adopter registering the parity gate meets a refusal it cannot discharge; a nested vendoring drifts template copies unchecked; a renamed pattern file reds; the enforcement page ships dead links. Filed 2026-10-02 to the gap inbox as four bullets at gate-sdk-value-pass' build; promoted at its close as one entry: →fix fails because each changes a shipped gate's verdict, →forward because no ruling is owed. Re-verified at gate_substrate_parity.rs's default and `GATE_SDK_PAYLOAD_WITHHOLD`, template_copy_parity.rs's glob, both `SELF_EXEMPT_PREFIX` constants and enforcement_map.rs's `kit_cell`. Owner lookup: `layout`, `kit roots`, `enforcement-map` in this file — [footprint-arm-publisher-page](#footprint-arm-publisher-page), DISTINCT (another emitter's page); owner gate-sdk/SPEC.md, each gate's section.
 
+### withheld-gate-literal-knobs
+
+[spec: SPEC-withheld-literals.md]
+
+`check-consumer-value-literal` holds only the kit-shipped gates' crate modules. The gates withheld to `scripts/` keep their consumer-value literals: at gate-sdk-value-pass' spec census, over the 26 then withheld, 62 consumer values and 39 borderline rows, 23 of them `const DEFAULT_<NAME>` positional layout defaults. Operator direction 2026-09-27, kept on record for this half by the operator's choice of option C, 2026-10-02, lead-relayed (not a ruling): avoid any hard code in gates, because checkwright benefits from configurable gates itself.
+
+**Deliverable:** the gate's corpus widened to every gate module, and each withheld gate's literal moved to a descriptor-declared knob (gate-sdk/SPEC.md §The declaration cohort, a knob no static kit's prefix owns) or valved with its ground.
+
+**Cost while deferred:** no adopter meets these literals, since a withheld gate never ships. The cost is that this repo's own gates stay unconfigurable, and a new withheld gate's literal reds nowhere. Filed 2026-10-02 at gate-sdk-value-pass' spec on that direction. Owner lookup: `literal`, `withheld` in this file — `consumer-value-literal-gate`, DISTINCT (the kit-shipped half); owner gate-sdk/SPEC.md §The port-candidate criteria.
+
 ## Technical Debt
 
 ### guard-kit-ruleset-brevity
@@ -598,16 +608,6 @@ context-kit's `--emit footprint` arm ships in the binary but prints this site's 
 **Deliverable:** one of two dispositions, chosen at spec: withhold the arm from the README and the payload docs as a publisher tool, or make the preamble and the roster knobs an adopter can set.
 
 **Cost while deferred:** an adopter running a listed tool gets a page about Checkwright. Filed 2026-10-01 to the gap inbox at context-kit-value-pass' build; promoted 2026-10-01 at its close: →fix fails because the choice between the two dispositions is a design call and the second adds knobs, →forward because no ruling is owed. Re-verified: the arm's output opens with the front matter, and the README's tool list carries `--emit footprint`. Owner lookup: `footprint` in this file — none; owner context-kit/SPEC.md §bin/footprint.
-
-### withheld-gate-literal-knobs
-
-[cost: event/low] [surface: gate-sdk]
-
-`check-consumer-value-literal` holds only the kit-shipped gates' crate modules. The gates withheld to `scripts/` keep their consumer-value literals: at gate-sdk-value-pass' spec census, over the 26 then withheld, 62 consumer values and 39 borderline rows, 23 of them `const DEFAULT_<NAME>` positional layout defaults. Operator direction 2026-09-27, kept on record for this half by the operator's choice of option C, 2026-10-02, lead-relayed (not a ruling): avoid any hard code in gates, because checkwright benefits from configurable gates itself.
-
-**Deliverable:** the gate's corpus widened to every gate module, and each withheld gate's literal moved to a descriptor-declared knob (gate-sdk/SPEC.md §The declaration cohort, a knob no static kit's prefix owns) or valved with its ground.
-
-**Cost while deferred:** no adopter meets these literals, since a withheld gate never ships. The cost is that this repo's own gates stay unconfigurable, and a new withheld gate's literal reds nowhere. Filed 2026-10-02 at gate-sdk-value-pass' spec on that direction. Owner lookup: `literal`, `withheld` in this file — `consumer-value-literal-gate`, DISTINCT (the kit-shipped half); owner gate-sdk/SPEC.md §The port-candidate criteria.
 
 ### notification-delivery-probe
 
