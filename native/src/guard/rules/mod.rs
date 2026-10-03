@@ -58,6 +58,12 @@ pub static TABLE: &[Rule] = &[
         views: &[Raw, Sq, SqDqHd, Dequoted],
         test: liveness::bounded_wait,
     },
+    Rule {
+        name: "bounded_write",
+        shells: BASH,
+        views: &[Raw, SqHdq, SqDqHd, Dequoted],
+        test: grants::bounded_write,
+    },
     Rule { name: "allowlist_chain", shells: BASH, views: &[SqDqHd], test: grants::allowlist_chain },
     Rule { name: "git_rewrite", shells: BOTH, views: &[SqDqHd], test: reach::git_rewrite },
     Rule { name: "rm_tracked", shells: BOTH, views: &[Raw, SqDqHd, Dequoted], test: reach::rm_tracked },
@@ -349,6 +355,12 @@ fn ro_invocation_clear(h: &Host, bin: &str, dwords: &str, skel_core: &str, xargs
 // spec: guard-kit/SPEC.md §The generic ruleset — the one declared-forms reader: the dequoted view
 // aligned segment for segment with the skeleton, withheld where the two cannot be aligned.
 fn ro_forms_clear(ctx: &Ctx, c: &Cmd) -> Result<bool, Fault> {
+    ro_forms_clear_except(ctx, c, &[])
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — the same reader with the segments a caller has
+// already read as writes, by their compound-split index, left out.
+fn ro_forms_clear_except(ctx: &Ctx, c: &Cmd, skip: &[usize]) -> Result<bool, Fault> {
     let h = ctx.host();
     let Some(v) = ctx.dequoted(c)? else { return Ok(false) };
     let s = ctx.view(c, SqDqHd)?;
@@ -357,7 +369,10 @@ fn ro_forms_clear(ctx: &Ctx, c: &Cmd) -> Result<bool, Fault> {
     if segs.len() != dsegs.len() {
         return Ok(false);
     }
-    for (seg, dseg) in segs.iter().zip(&dsegs) {
+    for (i, (seg, dseg)) in segs.iter().zip(&dsegs).enumerate() {
+        if skip.contains(&i) {
+            continue;
+        }
         let cw = command_word(seg);
         let bin = head_word(&cw);
         if bin.is_empty() || !on_ro_roster(h, bin) {
@@ -537,10 +552,10 @@ mod tests {
     #[test]
     fn the_table_rows_are_distinct_and_their_views_spell() {
         let mut names: Vec<&str> = TABLE.iter().map(|r| r.name).collect();
-        assert_eq!(names.len(), 29);
+        assert_eq!(names.len(), 30);
         names.sort();
         names.dedup();
-        assert_eq!(names.len(), 29);
+        assert_eq!(names.len(), 30);
         for r in TABLE {
             let mut spelt: Vec<&str> = r.views.iter().map(|v| v.spelling()).collect();
             let n = spelt.len();

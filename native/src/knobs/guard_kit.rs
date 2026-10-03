@@ -34,6 +34,7 @@ pub const KIT: Kit = Kit {
         ),
         Row::keyed("GUARD_KIT_RO_FORMS", &[]),
         Row::indexed("GUARD_KIT_APPEND_BINS", &["cat", "printf", "echo"]),
+        Row::indexed("GUARD_KIT_WRITE_BINS", &["mkdir", "touch", "rm", "rmdir", "mv", "cp", "tee", "find"]),
         Row::indexed("GUARD_KIT_SEARCH_TOOLS", &["Glob", "Grep"]),
         Row::indexed(
             "GUARD_KIT_SCRIPT_INTERPRETERS",

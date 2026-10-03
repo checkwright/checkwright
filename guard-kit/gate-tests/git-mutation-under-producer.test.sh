@@ -122,9 +122,30 @@ want "unparseable-record" "git commit -m done" 0
 printf 'pid=%s run=not-a-record\n' "$live" >"$tmp/scratch/notes.txt"
 want "suffix-bound" "git commit -m done" 0
 
+# --- rule `bounded_write`'s live-record clause: under a relative scratch member, a removal at or
+#     over a live record is withheld while a removal beside it is granted
+printf '.tmp/\n' >>"$tmp/cwd/.gitignore"
+mkdir -p "$tmp/cwd/.tmp"
+printf 'pid=%s run=live-run\n' "$live" >"$tmp/cwd/.tmp/live-run.run"
+printf 'GUARD_KIT_SCRATCH_DIRS[] = .tmp\n' >"$tmp/relative.knobs"
+granted() {  # $1=label $2=command $3=want (allow|withheld)
+    checks=$((checks + 1))
+    local got=withheld
+    (cd "$tmp/cwd" && payload "$2" | GUARD_KIT_KNOB_FILE="$tmp/relative.knobs" GUARD_KIT_LOG="$tmp/friction.log" "$BIN" --hook shell-guard >"$tmp/out" 2>"$tmp/err")
+    grep -qF '"permissionDecision":"allow"' "$tmp/out" && got=allow
+    [[ "$got" == "$3" ]] || {
+        echo "  FAIL [$1]: '$2' was $got, want $3 — $(cat "$tmp/err")"
+        fails=$((fails + 1))
+    }
+}
+granted "write-live-record"  "rm -f .tmp/live-run.run" withheld
+granted "write-live-glob"    "rm -f .tmp/*.run" withheld
+granted "write-beside-live"  "rm -f .tmp/old.txt" allow
+granted "write-over-live"    "touch .tmp/live-run.run" allow
+
 if [[ "$fails" -gt 0 ]]; then
     echo "git-mutation-under-producer.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "git-mutation-under-producer.test: ok ($checks assertions; the write set blocks under a live record on a Bash or a PowerShell call, read-only git and every conservative direction decline)"
+echo "git-mutation-under-producer.test: ok ($checks assertions; the write set blocks under a live record on a Bash or a PowerShell call, read-only git and every conservative direction decline, and rule \`bounded_write\` withholds a removal of a live record)"
 exit 0

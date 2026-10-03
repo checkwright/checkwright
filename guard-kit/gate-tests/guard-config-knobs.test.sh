@@ -31,7 +31,7 @@ payload() {
 # One member call under a knob file, from a scratch checkout: stdout to $tmp/out, stderr to
 # $tmp/err, the exit status echoed — 2 = blocked, 0 = anything else.
 member() {  # $1=config file $2=command
-    (cd "$tmp/cwd" && payload "$2" | GUARD_KIT_KNOB_FILE="$1" GUARD_KIT_LOG="$tmp/friction.log" "$BIN" --hook shell-guard >"$tmp/out" 2>"$tmp/err")
+    (cd "${CWD:-$tmp/cwd}" && payload "$2" | GUARD_KIT_KNOB_FILE="$1" GUARD_KIT_LOG="$tmp/friction.log" "$BIN" --hook shell-guard >"$tmp/out" 2>"$tmp/err")
     echo $?
 }
 
@@ -140,6 +140,19 @@ TOOL=PowerShell want "ps-host-off"    "$tmp/defaults.knobs" "& .tmp/x.ps1" 2 "GU
 TOOL=PowerShell want "ps-host-off-bash-body" "$tmp/defaults.knobs" "& .tmp/x.ps1" 2 "Write the body as a bash script"
 want "ps-host-refused" "$tmp/ps-bad.knobs" "git status" 2 "GUARD_KIT_SCRATCH_POWERSHELL must be empty, or name pwsh or powershell (got 'python3')"
 
+# --- GUARD_KIT_WRITE_BINS: empty turns rule `bounded_write`'s write-utility kind off and leaves its
+#     redirect kind standing; a member the operand grammar has no row for is withheld
+mkdir -p "$tmp/wcwd/.claude"
+git -C "$tmp/wcwd" init -q
+printf '.tmp/\n' >"$tmp/wcwd/.gitignore"
+printf '{"permissions":{"allow":["Bash(git status)"]}}\n' >"$tmp/wcwd/.claude/settings.json"
+printf 'GUARD_KIT_WRITE_BINS =\n' >"$tmp/no-write-bins.knobs"
+printf 'GUARD_KIT_WRITE_BINS[] = shred\n' >"$tmp/shred.knobs"
+CWD="$tmp/wcwd" grants "write-default"        "$tmp/defaults.knobs"      "rm -rf .tmp/old" allow
+CWD="$tmp/wcwd" grants "write-empty-utility"  "$tmp/no-write-bins.knobs" "rm -rf .tmp/old" withheld
+CWD="$tmp/wcwd" grants "write-empty-redirect" "$tmp/no-write-bins.knobs" "git status > .tmp/s.txt" allow
+CWD="$tmp/wcwd" grants "write-unknown-member" "$tmp/shred.knobs"         "shred .tmp/x" withheld
+
 # --- a refused config blocks with the refusal's own text, and no rule runs
 printf 'GUARD_KIT_SEARCH_TOOLS\n' >"$tmp/malformed.knobs"
 want "missing-knob-file"   "$tmp/absent.knobs"    "cat README.md" 2 "GUARD_KIT_KNOB_FILE names $tmp/absent.knobs"
@@ -166,5 +179,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "guard-config-knobs.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "guard-config-knobs.test: ok ($checks assertions; GUARD_KIT_SEARCH_TOOLS fires rules \`find_glob\` and \`git_grep\` on its own member each and leaves them inert when empty, and each firing corrective names its bare fallback; GUARD_KIT_RO_FORMS grants an added roster member only once declared, and a consumer entry replaces the kit's declaration; rule \`git_c_root\`'s arm (d) fires on a respelled path naming the knob's resolved file and not on a differing one; GUARD_KIT_SCRATCH_POWERSHELL steers a PowerShell scratch body to the runner's PowerShell path when set, to a bash body when empty, and refuses a value naming no PowerShell host; the member blocks with the refusal on a missing or malformed knob file and runs no rule; the steer door is gate_native_bin_spelled's spelling)"
+echo "guard-config-knobs.test: ok ($checks assertions; GUARD_KIT_SEARCH_TOOLS fires rules \`find_glob\` and \`git_grep\` on its own member each and leaves them inert when empty, and each firing corrective names its bare fallback; GUARD_KIT_RO_FORMS grants an added roster member only once declared, and a consumer entry replaces the kit's declaration; an empty GUARD_KIT_WRITE_BINS withholds the write utilities and keeps the bounded redirect, and a member the grammar lacks is withheld; rule \`git_c_root\`'s arm (d) fires on a respelled path naming the knob's resolved file and not on a differing one; GUARD_KIT_SCRATCH_POWERSHELL steers a PowerShell scratch body to the runner's PowerShell path when set, to a bash body when empty, and refuses a value naming no PowerShell host; the member blocks with the refusal on a missing or malformed knob file and runs no rule; the steer door is gate_native_bin_spelled's spelling)"
 exit 0

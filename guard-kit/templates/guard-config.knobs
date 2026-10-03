@@ -15,6 +15,9 @@
 # spec: guard-kit/SPEC.md §The generic ruleset — declare the write and execute forms of each read-only roster member you add (rule `ro_pipeline`'s grammar, 'none' when it has none); an undeclared member is withheld, and an entry for a default member replaces the kit's declaration
 # GUARD_KIT_RO_FORMS[md5sum] = none
 
+# spec: guard-kit/SPEC.md §Layout and configuration — the write utilities rule `bounded_write` admits inside a scratch dir (default mkdir touch rm rmdir mv cp tee find); an empty line turns the utility grants off and keeps the bounded redirect
+# GUARD_KIT_WRITE_BINS[] = mkdir
+
 # spec: guard-kit/SPEC.md §Consumer rules — your own rules, as a command the guard runs before its generic ruleset: one argv element per line, spawned without a shell; the kit ships none
 # GUARD_KIT_CONSUMER_RULES_CMD[] = bash
 # GUARD_KIT_CONSUMER_RULES_CMD[] = scripts/guard-rules.sh

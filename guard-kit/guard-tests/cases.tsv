@@ -282,8 +282,8 @@ fallthrough	: > tracked.txt
 allow	cat >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF
 allow	cat > .tmp/journal.md <<'EOF'@NL@line@NL@EOF
 block	cat >> tracked.md <<'EOF'@NL@line@NL@EOF
-fallthrough	rm -rf .tmp/x >> .tmp/journal.md
-block	printf x >> .tmp/journal.md@NL@rm -rf .tmp/x
+fallthrough	rm -rf scratch.txt >> .tmp/journal.md
+block	printf x >> .tmp/journal.md@NL@rm -rf scratch.txt
 # (d)'s region test is `hdq`, not the raw command: a backtick in a QUOTED
 # delimiter's body cannot substitute, so the grant reaches the shape the mandated
 # journal append is always spelled in; an UNQUOTED delimiter leaves the body live
@@ -446,6 +446,45 @@ fallthrough	bash scripts/check-foo.sh <> tracked.md & echo "pid=$! run=foo" > .t
 # in the launch too, so this row pins the verdict rather than the clause alone
 fallthrough	scripts/check-foo.sh $1 > .tmp/foo.log & echo "pid=$! run=foo" > .tmp/foo.run; wait
 
+# rule `bounded_write` — a write whose every target lies strictly inside a scratch dir, gitignored,
+#           holding no tracked path, is granted; the write-utility kind, then a granted command
+#           redirected to a bounded target (rule `allowlist_chain` blocks it otherwise), then a
+#           compound of the three kinds, a removal or a granted command beside an emitter's
+#           append (rule `emitter_write` blocks them otherwise), two removals inside the slot
+#           of the sandbox's 'rm -rf .tmp/*' grant, and a sandbox record naming a dead PID,
+#           which the live-record clause passes
+allow	mkdir -p .tmp/out
+allow	touch .tmp/a.txt
+allow	rm -rf .tmp/old
+allow	rm -f .tmp/*.log
+allow	mv .tmp/a.txt .tmp/b.txt
+allow	cp tracked.md .tmp/copy.md
+allow	grep -n x tracked.md | tee .tmp/hits.txt
+allow	find .tmp/old -name '*.txt' -delete
+allow	git status > .tmp/status.txt 2>&1
+allow	mkdir -p .tmp/d; git status > .tmp/d/s.txt; wc -l .tmp/d/s.txt
+allow	rm -rf .tmp/x >> .tmp/journal.md
+allow	printf x >> .tmp/journal.md@NL@rm -rf .tmp/x
+allow	printf x >> .tmp/journal.md && git status
+allow	rm -rf .tmp/x .tmp/y
+allow	rm -f .tmp/dead-producer.run
+# one refusing row per clause: the scratch member itself and a path outside every member (b); a
+# '..' component and a rooted path (a); a tracked destination (c, d); the operand grammar's
+# withheld forms; an xargs running a write utility (d); a backgrounded write, which rule
+# `background_no_record` blocks first; and a command neither read nor granted (a)
+fallthrough	rm -rf .tmp
+fallthrough	mkdir -p .tmp
+fallthrough	rm -f scratch.txt
+fallthrough	touch .tmp/../x.txt
+fallthrough	touch /tmp/x.txt
+fallthrough	cp .tmp/a.txt tracked.md
+fallthrough	rmdir -p .tmp/a/b
+fallthrough	rm --no-preserve-root -rf .tmp/x
+fallthrough	find -L .tmp -delete
+fallthrough	find .tmp | xargs rm
+block	rm .tmp/x &
+fallthrough	make build > .tmp/b.log
+
 # rule `allowlist_chain` — decorated allowlisted bare lead with an unmatched segment blocked;
 #           chaining steer, redirect steer, and the untouched non-firing cases
 block	git status && rm -rf tmp
@@ -540,15 +579,17 @@ fallthrough	pwsh -c 'Get-Date'
 #           '*/checks/check-*.sh' runner glob: a '..' component, an absolute path,
 #           a second operand outside the slot and a reach behind a stripped wrapper
 #           each block, while a clean slot, a dropped redirect and a declined
-#           backtick fall through. Targets are untracked, so rule `rm_tracked` never answers
+#           backtick fall through. Targets are untracked, so rule `rm_tracked` never answers. A
+#           clean slot's rows carry a statement nothing grants, since rule `bounded_write` grants
+#           a lone bounded removal first
 block	rm -rf .tmp/../scratch.txt
 block	rm -rf .tmp/x scratch.txt
 block	bash ../../evil/checks/check-x.sh
 block	bash /elsewhere/checks/check-x.sh
 block	bash C:/elsewhere/checks/check-x.sh
 block	timeout 5 rm -rf .tmp/../scratch.txt
-fallthrough	rm -rf .tmp/x .tmp/y
-fallthrough	rm -rf .tmp/x 2>/dev/null
+fallthrough	rm -rf .tmp/x .tmp/y; make build
+fallthrough	rm -rf .tmp/x 2>/dev/null; make build
 fallthrough	bash guard-kit/checks/check-x.sh
 fallthrough	rm -rf .tmp/`printf x`/y
 
@@ -560,7 +601,7 @@ fallthrough	rm -rf .tmp/`printf x`/y
 #           compounded write to a target git does not ignore, in or outside the
 #           repository, blocks; a compounded write to a device target does not fire
 block	cat >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF@NL@git status
-block	printf x >> .tmp/journal.md && git status
+block	printf x >> .tmp/journal.md && make build
 allow	cat >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF
 block	printf x >> tracked.md; git status
 block	mkdir -p docs && cat > docs/x.md <<'EOF'@NL@line@NL@EOF

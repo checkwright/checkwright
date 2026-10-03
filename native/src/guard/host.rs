@@ -15,6 +15,7 @@ pub const KNOBS: &[&str] = &[
     "GUARD_KIT_RO_BINS",
     "GUARD_KIT_RO_FORMS",
     "GUARD_KIT_APPEND_BINS",
+    "GUARD_KIT_WRITE_BINS",
     "GUARD_KIT_SEARCH_TOOLS",
     "GUARD_KIT_SCRIPT_INTERPRETERS",
     "GUARD_KIT_WORKTREE_READS",
@@ -41,6 +42,7 @@ pub struct Host {
     pub ro_bins: Vec<String>,
     pub ro_forms: Vec<(String, String)>,
     pub append_bins: Vec<String>,
+    pub write_bins: Vec<String>,
     pub search_tools: Vec<String>,
     pub interpreters: Vec<String>,
     pub worktree_reads: String,
@@ -92,6 +94,7 @@ impl Host {
             ro_bins: list("GUARD_KIT_RO_BINS")?,
             ro_forms: keyed("GUARD_KIT_RO_FORMS")?,
             append_bins: list("GUARD_KIT_APPEND_BINS")?,
+            write_bins: list("GUARD_KIT_WRITE_BINS")?,
             search_tools: list("GUARD_KIT_SEARCH_TOOLS")?,
             interpreters: list("GUARD_KIT_SCRIPT_INTERPRETERS")?,
             worktree_reads: scalar("GUARD_KIT_WORKTREE_READS")?,
@@ -258,6 +261,19 @@ impl Host {
     // spec: guard-kit/SPEC.md §The generic ruleset — the recorded producers still alive, each as the
     // block names it; a record that does not parse, or has no line end, is no record.
     pub fn live_run_records(&self) -> Vec<String> {
+        self.live_runs()
+            .into_iter()
+            .map(|(rec, pid, key)| format!("'{}' (pid {}, recorded in {})", key, pid, rec))
+            .collect()
+    }
+
+    // spec: guard-kit/SPEC.md §The generic ruleset — the paths of the records `live_run_records`
+    // names, for the `bounded_write` rule's live-record clause.
+    pub fn live_run_paths(&self) -> Vec<String> {
+        self.live_runs().into_iter().map(|(rec, _, _)| rec).collect()
+    }
+
+    fn live_runs(&self) -> Vec<(String, String, String)> {
         let mut out = Vec::new();
         for d in self.scratch_homes() {
             let Ok(entries) = walk::list_dir(std::path::Path::new(&d)) else { continue };
@@ -270,7 +286,7 @@ impl Host {
                 let Some((line, _)) = body.split_once('\n') else { continue };
                 let Some((pid, key)) = parse_record(line) else { continue };
                 if matches!(crate::evidence::pid_alive(pid), Ok(true)) {
-                    out.push(format!("'{}' (pid {}, recorded in {})", key, pid, rec));
+                    out.push((rec.clone(), pid.to_string(), key.to_string()));
                 }
             }
         }
