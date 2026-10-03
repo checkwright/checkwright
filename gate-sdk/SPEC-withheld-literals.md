@@ -12,6 +12,8 @@
 
 **Inferred, cannot run before build:** that the real gate's widened findings equal delta 3's table — the census approximates the binary's walk and prune set, and the widened gate exists only once delta 2 lands.
 
+**One unit, by direction.** The amendment is sized well beyond the entry's event/low filing, and whether to split it was put to the operator, who answered 2026-10-03, lead-relayed (a direction, not a ruling): keep it one unit as authored. Deltas 1 to 3 land together because delta 2's widened gate reds on every unconverted literal.
+
 ## What changes
 
 ### (1) A descriptor declares its knobs on `# knob:` lines {design-bearing}
