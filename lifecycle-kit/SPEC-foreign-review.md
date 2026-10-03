@@ -8,7 +8,7 @@
 
 **The spend's authority is the consumer's, stated on the block.** Each live foreign run spends a vendor's budget, and a recurring one spends it at every close without a fresh ask. §The steering vocabulary's grant is iteration-scoped, so it cannot carry a recurring spend. The class's `scope:` carries the authority instead, as the operator's direction, where the review that spends it reads it. A consumer whose operator gives no standing direction asks at each close.
 
-**The review adapter is chosen by name, not by tier class.** The transport slice rules that foreign adapters bind to no tier class, since every reader of delegation-kit's tier binding reads the master harness's model ids (delegation-kit/SPEC-foreign-session.md). So the block names the overlay's review adapter, and the entry's open question, whether foreign adapters map onto the tier classes, is answered there.
+**The review adapter is chosen by name, not by tier class.** The transport slice rules that foreign adapters bind to no tier class, since every reader of delegation-kit's tier binding reads the master harness's model ids (delegation-kit/SPEC.md §The foreign-vendor run). So the block names the overlay's review adapter, and the entry's open question, whether foreign adapters map onto the tier classes, is answered there.
 
 ## What changes
 
@@ -41,7 +41,7 @@ A never-swept class carries `last: never` and stops there, so `check-audit-roste
 
 - **The skip disposition (deltas 1 and 2).** Producer: the closing session at step 8, on an executor's `FAILED` or an unauthorized spend. Consumers: the next close's review, which finds the class still due from its unmoved `last:`, and a reader of the close commit, which names the skip. No new field: the disposition writes nothing on the roster.
 - **The class block (delta 3).** Producer: this repo's tracked roster. Consumers: close step 8, which judges `due:` against `last:`; `check-audit-roster`, which grades the block's grammar; and the closing session, which runs the `scope:`.
-- **The review's executor.** `--foreign-run` in audit mode, configured by the private overlay's review adapter (`scripts/delegation-config.local.knobs`, gitignored). This repo's overlay carries that adapter today, one-shot under the vendor's ephemeral flag, so the producer is reachable and opens no session. The transport slice adds its resumable adapter beside it rather than converting it (delegation-kit/SPEC-foreign-session.md, the resume knobs' producer).
+- **The review's executor.** `--foreign-run` in audit mode, configured by the private overlay's review adapter (`scripts/delegation-config.local.knobs`, gitignored). This repo's overlay carries that adapter today, one-shot under the vendor's ephemeral flag, so the producer is reachable and opens no session. The transport slice added its resumable adapter beside it rather than converting it (delegation-kit/SPEC.md §Layout and configuration, `DELEGATION_KIT_FOREIGN_RESUME`).
 - **The review's findings.** Producer: the foreign report, triaged by the closing session. Consumer: the gap inbox, through `--emit file-gap`, carried to the next scope's intake, since step 8 runs after the drain (close step 2's own rule for a later finding).
 - **The spend authority.** Producer: the operator's direction, landed in the block's `scope:`. Consumer: the closing session, before the run.
 

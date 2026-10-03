@@ -64,6 +64,8 @@ pub const KIT: Kit = Kit {
         Row::indexed("DELEGATION_KIT_STATUSLINE_INBOXES", &[]),
         Row::indexed("DELEGATION_KIT_FOREIGN_ADAPTERS", &[]),
         Row::scalar("DELEGATION_KIT_FOREIGN_TIMEOUT", "1800"),
+        Row::indexed("DELEGATION_KIT_FOREIGN_RESUME", &[]),
+        Row::indexed("DELEGATION_KIT_FOREIGN_SESSION_MARKER", &[]),
         Row::derived("DELEGATION_KIT_GATE_FILES", Shape::Indexed, gate_files, &["GATE_SDK_GATES_DIR"]),
         Row::derived(
             "DELEGATION_KIT_META_PATHS",
@@ -128,26 +130,67 @@ fn validate(v: &Values) -> Vec<String> {
             )),
         }
     }
-    // spec: delegation-kit/SPEC.md §Layout and configuration — each adapter element is
-    // `<adapter>=<word>`, the name within `[a-z0-9-]` and the word non-empty
-    for e in indexed(v, "DELEGATION_KIT_FOREIGN_ADAPTERS").unwrap_or(&[]) {
-        match e.split_once('=') {
-            Some((a, w))
-                if !a.is_empty()
-                    && a.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
-                    && !w.is_empty() => {}
-            _ => errs.push(format!(
-                "DELEGATION_KIT_FOREIGN_ADAPTERS element '{}' is not '<adapter>=<word>' with an adapter name in [a-z0-9-] and a non-empty word",
-                e
-            )),
-        }
-    }
+    errs.extend(foreign_refusals(v));
     // spec: delegation-kit/SPEC.md §The tier binding — the refusals are the matcher module's, so
     // the validator and every reader share one reading of an element
     errs.extend(crate::tier::refusals(indexed(v, "DELEGATION_KIT_TIER_MODEL").unwrap_or(&[])));
     for n in ["DELEGATION_KIT_GATE_FILES", "DELEGATION_KIT_META_PATHS"] {
         if indexed(v, n).is_some_and(|e| e.is_empty()) {
             errs.push(format!("{} is empty", n));
+        }
+    }
+    errs
+}
+
+fn adapter_name(a: &str) -> bool {
+    !a.is_empty() && a.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
+}
+
+// spec: delegation-kit/SPEC.md §Layout and configuration — each adapter, resume and marker element is
+// `<adapter>=<value>`, the name within `[a-z0-9-]` and the value non-empty; a resume form names a
+// configured adapter, a marker is one per adapter, and a form resuming by id has a marker
+fn foreign_refusals(v: &Values) -> Vec<String> {
+    let mut errs: Vec<String> = Vec::new();
+    let mut table = |knob: &str, what: &str| -> Vec<(String, String)> {
+        let mut pairs = Vec::new();
+        for e in indexed(v, knob).unwrap_or(&[]) {
+            match e.split_once('=') {
+                Some((a, w)) if adapter_name(a) && !w.is_empty() => pairs.push((a.to_string(), w.to_string())),
+                _ => errs.push(format!(
+                    "{} element '{}' is not '<adapter>=<{}>' with an adapter name in [a-z0-9-] and a non-empty {}",
+                    knob, e, what, what
+                )),
+            }
+        }
+        pairs
+    };
+    let adapters = table("DELEGATION_KIT_FOREIGN_ADAPTERS", "word");
+    let resume = table("DELEGATION_KIT_FOREIGN_RESUME", "word");
+    let markers = table("DELEGATION_KIT_FOREIGN_SESSION_MARKER", "marker");
+    let mut seen: Vec<&str> = Vec::new();
+    for (a, _) in &resume {
+        if seen.contains(&a.as_str()) {
+            continue;
+        }
+        seen.push(a);
+        if !adapters.iter().any(|(c, _)| c == a) {
+            errs.push(format!(
+                "DELEGATION_KIT_FOREIGN_RESUME names adapter '{}', which DELEGATION_KIT_FOREIGN_ADAPTERS does not configure",
+                a
+            ));
+        }
+        let by_id = resume.iter().any(|(r, w)| r == a && w.contains(crate::emit::foreign_run::SESSION_TOKEN));
+        if by_id && !markers.iter().any(|(m, _)| m == a) {
+            errs.push(format!(
+                "DELEGATION_KIT_FOREIGN_RESUME's form for adapter '{}' carries {} but DELEGATION_KIT_FOREIGN_SESSION_MARKER gives it no marker",
+                a,
+                crate::emit::foreign_run::SESSION_TOKEN
+            ));
+        }
+    }
+    for (i, (a, _)) in markers.iter().enumerate() {
+        if markers[..i].iter().filter(|(m, _)| m == a).count() == 1 {
+            errs.push(format!("DELEGATION_KIT_FOREIGN_SESSION_MARKER gives adapter '{}' more than one marker", a));
         }
     }
     errs
@@ -205,6 +248,37 @@ mod tests {
         }
         for bad in ["0", "", "1.5", "-3"] {
             assert_eq!(run(&[], bad).len(), 1, "timeout '{}' must refuse", bad);
+        }
+    }
+
+    // spec: delegation-kit/SPEC.md §Layout and configuration — the resume and marker tables refuse a
+    // form for an unconfigured adapter, a second marker for one adapter, and a form resuming by id
+    // with no marker, each beside a passing table
+    #[test]
+    fn the_resume_and_marker_tables_refuse_their_broken_shapes() {
+        let run = |resume: &[&str], markers: &[&str]| {
+            let mut v: Values = Values::new();
+            let mut put = |k: &'static str, e: &[&str]| {
+                v.insert(k, (Value::Indexed(e.iter().map(|s| s.to_string()).collect()), Origin::Tracked));
+            };
+            put("DELEGATION_KIT_FOREIGN_ADAPTERS", &["ad=prog", "ad=-"]);
+            put("DELEGATION_KIT_FOREIGN_RESUME", resume);
+            put("DELEGATION_KIT_FOREIGN_SESSION_MARKER", markers);
+            validate(&v)
+        };
+        assert!(run(&["ad=prog", "ad=resume", "ad=@SESSION_ID@"], &["ad=session id:"]).is_empty());
+        assert!(run(&["ad=prog", "ad=--last"], &[]).is_empty(), "a form resuming without an id needs no marker");
+        let cases: &[(&str, &[&str], &[&str])] = &[
+            ("which DELEGATION_KIT_FOREIGN_ADAPTERS does not configure", &["other=prog"], &[]),
+            ("more than one marker", &["ad=prog", "ad=@SESSION_ID@"], &["ad=a:", "ad=b:"]),
+            ("gives it no marker", &["ad=prog", "ad=@SESSION_ID@"], &[]),
+            ("is not '<adapter>=<word>'", &["ad="], &[]),
+            ("is not '<adapter>=<marker>'", &[], &["Ad=x"]),
+        ];
+        for (want, resume, markers) in cases {
+            let errs = run(resume, markers);
+            assert_eq!(errs.len(), 1, "{:?} {:?}: {:?}", resume, markers, errs);
+            assert!(errs[0].contains(want), "{:?} {:?} did not refuse with '{}': {:?}", resume, markers, want, errs);
         }
     }
 

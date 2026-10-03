@@ -10,3 +10,7 @@
 # spec: delegation-kit/SPEC.md §The foreign-vendor run — one `<adapter>=<word>` element per argv word, in order; the kit ships no adapter (each names a vendor's program), so set one in the gitignored `.local` overlay; default empty
 # DELEGATION_KIT_FOREIGN_ADAPTERS[] = <adapter>=<program>
 # DELEGATION_KIT_FOREIGN_ADAPTERS[] = <adapter>=@PROMPT_FILE@
+
+# spec: delegation-kit/SPEC.md §The foreign-vendor run — an adapter's resume form, one `<adapter>=<word>` element per argv word, restating its confinement, and the literal its session id follows in a turn's output; default empty (every adapter one-shot)
+# DELEGATION_KIT_FOREIGN_RESUME[] = <adapter>=@SESSION_ID@
+# DELEGATION_KIT_FOREIGN_SESSION_MARKER[] = <adapter>=<literal>

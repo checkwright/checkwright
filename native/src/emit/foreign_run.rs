@@ -1,5 +1,6 @@
 // spec: delegation-kit/SPEC.md §The foreign-vendor run — one read-only audit or mechanical sweep on
-// a consumer's foreign adapter, in a scratch clone of committed `HEAD`: 0 OK, 1 REFUSED, 2 FAILED.
+// a consumer's foreign adapter, in a scratch clone of committed `HEAD`: 0 OK, 1 REFUSED, 2 FAILED;
+// a resumable adapter's `OK` opens a session `--foreign-resume` continues and closes.
 use crate::proc::{self, ChildEnv, Redirect};
 use crate::programs::{self, Program};
 use crate::walk;
@@ -7,13 +8,19 @@ use std::path::{Path, PathBuf};
 
 pub const KNOBS: &[&str] = &[
     "DELEGATION_KIT_FOREIGN_ADAPTERS",
+    "DELEGATION_KIT_FOREIGN_RESUME",
+    "DELEGATION_KIT_FOREIGN_SESSION_MARKER",
     "DELEGATION_KIT_FOREIGN_TIMEOUT",
     "GATE_SDK_TMP_DIR",
 ];
 
 const USAGE: &str = "usage: --foreign-run <adapter> <prompt-file> [--mode audit|sweep] [--key <key>] [--]\n  runs one unit on the adapter DELEGATION_KIT_FOREIGN_ADAPTERS configures, in a scratch clone of committed HEAD; the key names the run's directory and defaults to the prompt file's stem";
 
+const RESUME_USAGE: &str = "usage: --foreign-resume <key> <prompt-file> [--]\n       --foreign-resume <key> --close\n  runs the next turn of the session a resumable adapter opened under the key, or ends it";
+
 const PROMPT_TOKEN: &str = "@PROMPT_FILE@";
+
+pub const SESSION_TOKEN: &str = "@SESSION_ID@";
 
 // spec: delegation-kit/SPEC.md §The foreign-vendor run — a `GIT_*` location variable inherited from
 // a hook context would point `git -C <clone>` and the adapter back at this repository
@@ -25,6 +32,15 @@ struct Args {
     prompt: String,
     sweep: bool,
     key: String,
+}
+
+// spec: delegation-kit/SPEC.md §The foreign-vendor run — the key is one path component, so the
+// run's directory stays under the scratch dir's `foreign/`
+fn one_component(arm: &str, key: &str) -> Result<(), String> {
+    if key.is_empty() || key == "." || key == ".." || key.contains(['/', '\\']) {
+        return Err(format!("{}: the key '{}' is not one path component", arm, key));
+    }
+    Ok(())
 }
 
 // spec: gate-sdk/SPEC.md §The bin/-tool contract — a dash-led token naming no option is a refusal,
@@ -68,12 +84,46 @@ fn parse(args: &[String]) -> Result<Args, String> {
     let key = key.unwrap_or_else(|| {
         Path::new(prompt).file_stem().map(|s| s.to_string_lossy().into_owned()).unwrap_or_default()
     });
-    // spec: delegation-kit/SPEC.md §The foreign-vendor run — the key is one path component, so the
-    // run's directory stays under the scratch dir's `foreign/`
-    if key.is_empty() || key == "." || key == ".." || key.contains(['/', '\\']) {
-        return Err(format!("foreign-run: the key '{}' is not one path component", key));
-    }
+    one_component("foreign-run", &key)?;
     Ok(Args { adapter: adapter.to_string(), prompt: prompt.to_string(), sweep, key })
+}
+
+#[derive(Debug, PartialEq)]
+struct ResumeArgs {
+    key: String,
+    prompt: Option<String>,
+}
+
+// spec: delegation-kit/SPEC.md §Resuming a session — a key and a prompt file, or a key and `--close`
+fn parse_resume(args: &[String]) -> Result<ResumeArgs, String> {
+    let mut rest: Vec<&str> = Vec::new();
+    let mut close = false;
+    let mut literal = false;
+    for a in args {
+        let a = a.as_str();
+        if literal {
+            rest.push(a);
+        } else if a == "--" {
+            literal = true;
+        } else if a == "--close" {
+            close = true;
+        } else if a.starts_with('-') {
+            return Err(format!(
+                "foreign-resume: unrecognized option: {} — an operand beginning with \"-\" is passed after a \"--\" separator",
+                a
+            ));
+        } else {
+            rest.push(a);
+        }
+    }
+    let (key, prompt) = match (close, &rest[..]) {
+        (true, [key]) => (*key, None),
+        (false, [key, prompt]) => (*key, Some(prompt.to_string())),
+        (true, _) => return Err(format!("foreign-resume: --close takes a key alone (got {} operand(s))", rest.len())),
+        (false, _) => return Err(format!("foreign-resume: takes a key and a prompt file (got {} operand(s))", rest.len())),
+    };
+    one_component("foreign-resume", key)?;
+    Ok(ResumeArgs { key: key.to_string(), prompt })
 }
 
 // spec: delegation-kit/SPEC.md §Layout and configuration — an adapter's argv is its `<adapter>=<word>`
@@ -87,8 +137,25 @@ fn argv_of(adapters: &[String], name: &str) -> Vec<String> {
         .collect()
 }
 
+// spec: delegation-kit/SPEC.md §Layout and configuration — the id is the run of `[A-Za-z0-9._:-]`
+// after the marker's first occurrence, past any blanks, in standard output, else standard error
+fn session_id(marker: &str, streams: &[&Path]) -> Option<String> {
+    streams.iter().find_map(|p| {
+        let text = String::from_utf8_lossy(&std::fs::read(p).ok()?).into_owned();
+        let at = text.find(marker)? + marker.len();
+        let id: String = text[at..]
+            .trim_start_matches([' ', '\t'])
+            .chars()
+            .take_while(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | ':' | '-'))
+            .collect();
+        (!id.is_empty()).then_some(id)
+    })
+}
+
 pub struct Config {
     pub adapters: Vec<String>,
+    pub resume: Vec<String>,
+    pub markers: Vec<String>,
     pub timeout: u64,
     pub repo: String,
     pub base: String,
@@ -108,14 +175,25 @@ struct Run<'a> {
     patch: Option<PathBuf>,
 }
 
+fn show(p: &Option<PathBuf>) -> String {
+    p.as_ref().map_or("none".to_string(), |p| p.display().to_string())
+}
+
+fn mode_name(sweep: bool) -> &'static str {
+    if sweep {
+        "sweep"
+    } else {
+        "audit"
+    }
+}
+
 impl Run<'_> {
     fn line(&self, verdict: &str, code: i32) -> Verdict {
-        let show = |p: &Option<PathBuf>| p.as_ref().map_or("none".to_string(), |p| p.display().to_string());
         Verdict {
             line: format!(
                 "foreign-run: adapter={} mode={} key={} exit={} report={} patch={} -> {}",
                 self.args.adapter,
-                if self.args.sweep { "sweep" } else { "audit" },
+                mode_name(self.args.sweep),
                 self.args.key,
                 self.exit,
                 show(&self.report),
@@ -156,7 +234,7 @@ fn refs(tree: &Path) -> Result<Vec<u8>, String> {
 
 // spec: delegation-kit/SPEC.md §The foreign-vendor run — the tree: a shared, no-checkout clone,
 // detached at committed `HEAD`, with its `origin` removed so nothing in it can push back here
-fn clone(repo: &str, tree: &Path) -> Result<(), String> {
+fn clone(repo: &str, tree: &Path) -> Result<String, String> {
     let head = git(Path::new(repo), &["rev-parse", "--verify", "HEAD^{commit}"])?;
     let head = String::from_utf8_lossy(&head).trim().to_string();
     let t = tree.to_str().ok_or("the clone path is not valid UTF-8")?;
@@ -172,14 +250,146 @@ fn clone(repo: &str, tree: &Path) -> Result<(), String> {
     }
     git(tree, &["checkout", "-q", "--detach", &head])?;
     git(tree, &["remote", "remove", "origin"])?;
-    Ok(())
+    Ok(head)
 }
 
 // spec: delegation-kit/SPEC.md §The foreign-vendor run — a sweep's whole change, untracked files
-// included, as a binary-safe patch against the checked-out commit; an empty change is no patch
-fn change(tree: &Path) -> Result<Vec<u8>, String> {
+// included, as a binary-safe patch against the session's base; an empty change is no patch
+fn write_patch(tree: &Path, base: &str, patch: &Path) -> Result<Option<PathBuf>, String> {
+    let _ = std::fs::remove_file(patch);
     git(tree, &["add", "-A"])?;
-    git(tree, &["diff", "--cached", "--binary", "HEAD"])
+    let body = git(tree, &["diff", "--cached", "--binary", base])?;
+    if body.is_empty() {
+        return Ok(None);
+    }
+    std::fs::write(patch, body).map_err(|e| format!("cannot write {}: {}", patch.display(), e))?;
+    Ok(Some(patch.to_path_buf()))
+}
+
+// spec: delegation-kit/SPEC.md §The foreign-vendor run — the shape, checked after every spawn that
+// started: a moved ref is `committed`, and an audit's unclean status is `audit wrote`
+fn shape(tree: &Path, before: &[u8], sweep: bool) -> Result<(), String> {
+    match refs(tree) {
+        Ok(after) if after != before => return Err("committed".to_string()),
+        Ok(_) => {}
+        Err(e) => return Err(format!("the clone's refs are unreadable: {}", e)),
+    }
+    if !sweep {
+        match git(tree, &["status", "--porcelain", "--untracked-files=all"]) {
+            Ok(s) if !s.is_empty() => return Err("audit wrote".to_string()),
+            Ok(_) => {}
+            Err(e) => return Err(format!("the clone's status is unreadable: {}", e)),
+        }
+    }
+    Ok(())
+}
+
+struct Spawn<'a> {
+    program: Program,
+    words: Vec<String>,
+    tree: &'a Path,
+    prompt: &'a Path,
+    report: &'a Path,
+    stderr: &'a Path,
+    timeout: u64,
+}
+
+fn spawn(s: &Spawn) -> Result<Option<i32>, String> {
+    let args: Vec<&str> = s.words.iter().map(String::as_str).collect();
+    let unset = git_env();
+    let io = Redirect { cwd: s.tree, stdin: s.prompt, stdout: s.report, stderr: s.stderr, unset: &unset };
+    proc::run_bounded_redirected(&s.program, &args, &io, s.timeout)
+}
+
+// spec: delegation-kit/SPEC.md §The foreign-vendor run — the turn's outcome once the shape held:
+// a timeout or a non-zero exit fails, and a sweep's `OK` writes its patch
+fn outcome(status: Option<i32>, timeout: u64) -> Result<(), String> {
+    match status {
+        None => Err(format!("timeout after {}s", timeout)),
+        Some(c) if c != 0 => Err(format!("the adapter exited {}", c)),
+        Some(_) => Ok(()),
+    }
+}
+
+fn substitute(words: &[String], prompt: &str, id: Option<&str>) -> Vec<String> {
+    words
+        .iter()
+        .map(|w| {
+            let w = w.replace(PROMPT_TOKEN, prompt);
+            match id {
+                Some(id) => w.replace(SESSION_TOKEN, id),
+                None => w,
+            }
+        })
+        .collect()
+}
+
+fn resume_clause(key: &str) -> String {
+    format!("OK — resumable: --foreign-resume {} <prompt-file>", key)
+}
+
+// spec: delegation-kit/SPEC.md §The foreign-vendor run — `session.txt`, the binding a resume reads:
+// one line of `adapter= mode= base= turn= id=` fields, `-` for an id no marker produced
+#[derive(Debug, PartialEq)]
+struct Session {
+    adapter: String,
+    sweep: bool,
+    base: String,
+    turn: u32,
+    id: Option<String>,
+}
+
+impl Session {
+    fn render(&self) -> String {
+        format!(
+            "adapter={} mode={} base={} turn={} id={}\n",
+            self.adapter,
+            mode_name(self.sweep),
+            self.base,
+            self.turn,
+            self.id.as_deref().unwrap_or("-")
+        )
+    }
+
+    fn parse(text: &str) -> Result<Session, String> {
+        let field = |name: &str| {
+            text.split_whitespace()
+                .find_map(|f| f.strip_prefix(name).and_then(|r| r.strip_prefix('=')))
+                .filter(|v| !v.is_empty())
+                .ok_or(format!("no {} field", name))
+        };
+        let sweep = match field("mode")? {
+            "audit" => false,
+            "sweep" => true,
+            m => return Err(format!("mode '{}' is neither audit nor sweep", m)),
+        };
+        let turn = field("turn")?;
+        Ok(Session {
+            adapter: field("adapter")?.to_string(),
+            sweep,
+            base: field("base")?.to_string(),
+            turn: turn.parse().map_err(|_| format!("turn '{}' is not a count", turn))?,
+            id: Some(field("id")?).filter(|i| *i != "-").map(str::to_string),
+        })
+    }
+}
+
+// spec: delegation-kit/SPEC.md §Resuming a session — every turn's return survives a new open only
+// as long as its session does: a new run under the key starts from no rotated report
+fn clear_returns(dir: &Path) {
+    for f in ["report.txt", "stderr.txt", "change.patch", "refs.txt"] {
+        let _ = std::fs::remove_file(dir.join(f));
+    }
+    for (name, is_dir) in walk::list_dir(dir).unwrap_or_default() {
+        let rotated = ["report.", "stderr."].iter().any(|p| {
+            name.strip_prefix(p)
+                .and_then(|r| r.strip_suffix(".txt"))
+                .is_some_and(|n| !n.is_empty() && n.bytes().all(|b| b.is_ascii_digit()))
+        });
+        if rotated && !is_dir {
+            let _ = std::fs::remove_file(dir.join(name));
+        }
+    }
 }
 
 fn foreign_run(cfg: &Config, a: &Args) -> Verdict {
@@ -194,8 +404,17 @@ fn foreign_run(cfg: &Config, a: &Args) -> Verdict {
         return run.failed(&format!("cannot read the prompt file {}", prompt.display()));
     }
     let tree = run.dir.join("tree");
-    // spec: delegation-kit/SPEC.md §The foreign-vendor run — a clone an earlier refusal kept is
-    // evidence awaiting inspection, never overwritten
+    let session = run.dir.join("session.txt");
+    // spec: delegation-kit/SPEC.md §The foreign-vendor run — an open session and a clone an earlier
+    // refusal kept are each never overwritten
+    if session.exists() {
+        return run.failed(&format!(
+            "an open session occupies {}; answer it with --foreign-resume {} <prompt-file>, or end it with --foreign-resume {} --close",
+            run.dir.display(),
+            a.key,
+            a.key
+        ));
+    }
     if tree.exists() {
         return run.failed(&format!(
             "a kept clone occupies {}; inspect and remove it, or pass another --key",
@@ -208,13 +427,14 @@ fn foreign_run(cfg: &Config, a: &Args) -> Verdict {
     let report = run.dir.join("report.txt");
     let stderr = run.dir.join("stderr.txt");
     let patch = run.dir.join("change.patch");
-    for f in [&report, &stderr, &patch] {
-        let _ = std::fs::remove_file(f);
-    }
-    if let Err(e) = clone(&cfg.repo, &tree) {
-        let _ = std::fs::remove_dir_all(&tree);
-        return run.failed(&format!("clone: {}", e));
-    }
+    clear_returns(&run.dir);
+    let base = match clone(&cfg.repo, &tree) {
+        Ok(h) => h,
+        Err(e) => {
+            let _ = std::fs::remove_dir_all(&tree);
+            return run.failed(&format!("clone: {}", e));
+        }
+    };
     let before = match refs(&tree) {
         Ok(r) => r,
         Err(e) => {
@@ -223,56 +443,225 @@ fn foreign_run(cfg: &Config, a: &Args) -> Verdict {
         }
     };
     let prompt_abs = prompt.display().to_string();
-    let args: Vec<String> = words.iter().map(|w| w.replace(PROMPT_TOKEN, &prompt_abs)).collect();
-    let args: Vec<&str> = args.iter().map(String::as_str).collect();
-    let adapter = Program::consumer("DELEGATION_KIT_FOREIGN_ADAPTERS", program.replace(PROMPT_TOKEN, &prompt_abs));
-    let unset = git_env();
-    let io = Redirect { cwd: &tree, stdin: &prompt, stdout: &report, stderr: &stderr, unset: &unset };
-    let status = proc::run_bounded_redirected(&adapter, &args, &io, cfg.timeout);
-    let status = match status {
+    let s = Spawn {
+        program: Program::consumer("DELEGATION_KIT_FOREIGN_ADAPTERS", program.replace(PROMPT_TOKEN, &prompt_abs)),
+        words: substitute(words, &prompt_abs, None),
+        tree: &tree,
+        prompt: &prompt,
+        report: &report,
+        stderr: &stderr,
+        timeout: cfg.timeout,
+    };
+    let status = match spawn(&s) {
         Ok(s) => s,
         Err(e) => {
             let _ = std::fs::remove_dir_all(&tree);
             return run.failed(&format!("spawn: {}", e));
         }
     };
-    run.report = Some(report);
+    run.report = Some(report.clone());
     run.exit = status.map_or("timeout".to_string(), |c| c.to_string());
-    // spec: delegation-kit/SPEC.md §The foreign-vendor run — the shape is checked after every run
-    // that started, and a refusal outranks a failure: the kept clone is the evidence either way
-    let refused = |run: &Run, why: &str| {
-        run.line(&format!("REFUSED ({}) — clone kept at {}", why, tree.display()), 1)
-    };
-    match refs(&tree) {
-        Ok(after) if after != before => return refused(&run, "committed"),
-        Ok(_) => {}
-        Err(e) => return refused(&run, &format!("the clone's refs are unreadable: {}", e)),
+    // spec: delegation-kit/SPEC.md §The foreign-vendor run — a refusal outranks a failure: the kept
+    // clone is the evidence either way
+    if let Err(why) = shape(&tree, &before, a.sweep) {
+        return run.line(&format!("REFUSED ({}) — clone kept at {}", why, tree.display()), 1);
     }
-    if !a.sweep {
-        match git(&tree, &["status", "--porcelain", "--untracked-files=all"]) {
-            Ok(s) if !s.is_empty() => return refused(&run, "audit wrote"),
-            Ok(_) => {}
-            Err(e) => return refused(&run, &format!("the clone's status is unreadable: {}", e)),
+    let done = outcome(status, cfg.timeout).and_then(|()| {
+        if a.sweep {
+            run.patch = write_patch(&tree, &base, &patch).map_err(|e| format!("the sweep's change is unreadable: {}", e))?;
+        }
+        Ok(())
+    });
+    if let Err(why) = done {
+        let _ = std::fs::remove_dir_all(&tree);
+        return run.failed(&why);
+    }
+    let form = argv_of(&cfg.resume, &a.adapter);
+    if form.is_empty() {
+        let _ = std::fs::remove_dir_all(&tree);
+        return run.line("OK", 0);
+    }
+    // spec: delegation-kit/SPEC.md §The foreign-vendor run — the cleanup, or the session: a resumable
+    // adapter's `OK` keeps the clone and records the binding beside it
+    let marker = argv_of(&cfg.markers, &a.adapter).into_iter().next();
+    let id = marker.as_deref().and_then(|m| session_id(m, &[&report, &stderr]));
+    let not_resumable = |why: String| {
+        let _ = std::fs::remove_dir_all(&tree);
+        run.line(&format!("OK — not resumable ({})", why), 0)
+    };
+    if id.is_none() && form.iter().any(|w| w.contains(SESSION_TOKEN)) {
+        return not_resumable(format!(
+            "no session id followed the marker '{}' in the turn's output",
+            marker.unwrap_or_default()
+        ));
+    }
+    let binding = Session { adapter: a.adapter.clone(), sweep: a.sweep, base, turn: 1, id };
+    let recorded = std::fs::write(run.dir.join("refs.txt"), &before)
+        .and_then(|()| std::fs::write(&session, binding.render()));
+    if let Err(e) = recorded {
+        let _ = std::fs::remove_file(&session);
+        return not_resumable(format!("cannot record the session: {}", e));
+    }
+    run.line(&resume_clause(&a.key), 0)
+}
+
+struct Turn<'a> {
+    key: &'a str,
+    adapter: String,
+    mode: &'static str,
+    turn: String,
+    exit: String,
+    report: Option<PathBuf>,
+    patch: Option<PathBuf>,
+}
+
+impl Turn<'_> {
+    fn line(&self, verdict: &str, code: i32) -> Verdict {
+        Verdict {
+            line: format!(
+                "foreign-resume: adapter={} mode={} key={} turn={} exit={} report={} patch={} -> {}",
+                self.adapter,
+                self.mode,
+                self.key,
+                self.turn,
+                self.exit,
+                show(&self.report),
+                show(&self.patch),
+                verdict
+            ),
+            code,
         }
     }
-    let verdict = match status {
-        None => run.failed(&format!("timeout after {}s", cfg.timeout)),
-        Some(c) if c != 0 => run.failed(&format!("the adapter exited {}", c)),
-        Some(_) if a.sweep => match change(&tree) {
-            Ok(body) if body.is_empty() => run.line("OK", 0),
-            Ok(body) => match std::fs::write(&patch, body) {
-                Ok(()) => {
-                    run.patch = Some(patch);
-                    run.line("OK", 0)
-                }
-                Err(e) => run.failed(&format!("cannot write {}: {}", patch.display(), e)),
-            },
-            Err(e) => run.failed(&format!("the sweep's change is unreadable: {}", e)),
-        },
-        Some(_) => run.line("OK", 0),
+
+    fn failed(&self, why: &str) -> Verdict {
+        self.line(&format!("FAILED ({})", why), 2)
+    }
+}
+
+// spec: delegation-kit/SPEC.md §Resuming a session — the next turn, in the kept clone and the same
+// vendor session: `OK` and `FAILED` advance the turn and keep the session, `REFUSED` ends it
+fn foreign_resume(cfg: &Config, key: &str, prompt: &str) -> Verdict {
+    let dir = PathBuf::from(&cfg.base).join("foreign").join(key);
+    let session_path = dir.join("session.txt");
+    let mut t = Turn {
+        key,
+        adapter: "-".to_string(),
+        mode: "-",
+        turn: "-".to_string(),
+        exit: "-".to_string(),
+        report: None,
+        patch: None,
     };
-    let _ = std::fs::remove_dir_all(&tree);
-    verdict
+    let Ok(text) = std::fs::read_to_string(&session_path) else {
+        return t.failed(&format!("no open session under {}", dir.display()));
+    };
+    let s = match Session::parse(&text) {
+        Ok(s) => s,
+        Err(e) => return t.failed(&format!("{} is unreadable: {}", session_path.display(), e)),
+    };
+    t.adapter = s.adapter.clone();
+    t.mode = mode_name(s.sweep);
+    t.turn = s.turn.to_string();
+    let prompt = PathBuf::from(walk::abs_against(&cfg.here, prompt));
+    if std::fs::File::open(&prompt).is_err() || !prompt.is_file() {
+        return t.failed(&format!("cannot read the prompt file {}", prompt.display()));
+    }
+    if argv_of(&cfg.adapters, &s.adapter).is_empty() {
+        return t.failed(&format!("no adapter '{}' is configured in DELEGATION_KIT_FOREIGN_ADAPTERS", s.adapter));
+    }
+    let form = argv_of(&cfg.resume, &s.adapter);
+    let Some((program, words)) = form.split_first() else {
+        return t.failed(&format!("adapter '{}' has no resume form in DELEGATION_KIT_FOREIGN_RESUME", s.adapter));
+    };
+    if s.id.is_none() && form.iter().any(|w| w.contains(SESSION_TOKEN)) {
+        return t.failed(&format!("the session recorded no id, and adapter '{}' resumes by id", s.adapter));
+    }
+    let tree = dir.join("tree");
+    if !tree.is_dir() {
+        return t.failed(&format!("the session's clone {} is missing", tree.display()));
+    }
+    let before = match std::fs::read(dir.join("refs.txt")) {
+        Ok(b) => b,
+        Err(e) => return t.failed(&format!("cannot read {}: {}", dir.join("refs.txt").display(), e)),
+    };
+    let report = dir.join("report.txt");
+    let stderr = dir.join("stderr.txt");
+    for (from, stem) in [(&report, "report"), (&stderr, "stderr")] {
+        if from.exists() {
+            if let Err(e) = std::fs::rename(from, dir.join(format!("{}.{}.txt", stem, s.turn))) {
+                return t.failed(&format!("cannot rotate {}: {}", from.display(), e));
+            }
+        }
+    }
+    let next = Session { turn: s.turn + 1, ..s };
+    t.turn = next.turn.to_string();
+    let advance = |t: &Turn, why: &str| {
+        if let Err(e) = std::fs::write(&session_path, next.render()) {
+            return t.failed(&format!("{}; and cannot advance {}: {}", why, session_path.display(), e));
+        }
+        t.failed(why)
+    };
+    let prompt_abs = prompt.display().to_string();
+    let sp = Spawn {
+        program: Program::consumer(
+            "DELEGATION_KIT_FOREIGN_RESUME",
+            substitute(std::slice::from_ref(program), &prompt_abs, next.id.as_deref()).remove(0),
+        ),
+        words: substitute(words, &prompt_abs, next.id.as_deref()),
+        tree: &tree,
+        prompt: &prompt,
+        report: &report,
+        stderr: &stderr,
+        timeout: cfg.timeout,
+    };
+    let status = match spawn(&sp) {
+        Ok(st) => st,
+        Err(e) => return advance(&t, &format!("spawn: {}", e)),
+    };
+    t.report = Some(report.clone());
+    t.exit = status.map_or("timeout".to_string(), |c| c.to_string());
+    if let Err(why) = shape(&tree, &before, next.sweep) {
+        let _ = std::fs::remove_file(&session_path);
+        return t.line(&format!("REFUSED ({}) — session ended, clone kept at {}", why, tree.display()), 1);
+    }
+    if let Err(why) = outcome(status, cfg.timeout) {
+        return advance(&t, &why);
+    }
+    if next.sweep {
+        match write_patch(&tree, &next.base, &dir.join("change.patch")) {
+            Ok(p) => t.patch = p,
+            Err(e) => return advance(&t, &format!("the sweep's change is unreadable: {}", e)),
+        }
+    }
+    if let Err(e) = std::fs::write(&session_path, next.render()) {
+        return t.failed(&format!("cannot advance {}: {}", session_path.display(), e));
+    }
+    t.line(&resume_clause(key), 0)
+}
+
+// spec: delegation-kit/SPEC.md §Resuming a session — `--close` removes the clone and the binding and
+// keeps every report and the patch
+fn foreign_close(cfg: &Config, key: &str) -> Verdict {
+    let dir = PathBuf::from(&cfg.base).join("foreign").join(key);
+    let failed = |why: String| Verdict { line: format!("foreign-resume: key={} -> FAILED ({})", key, why), code: 2 };
+    if !dir.join("session.txt").is_file() {
+        return failed(format!("no open session under {}", dir.display()));
+    }
+    let tree = dir.join("tree");
+    if tree.exists() {
+        if let Err(e) = std::fs::remove_dir_all(&tree) {
+            return failed(format!("cannot remove {}: {}", tree.display(), e));
+        }
+    }
+    for f in ["session.txt", "refs.txt"] {
+        let p = dir.join(f);
+        if p.exists() {
+            if let Err(e) = std::fs::remove_file(&p) {
+                return failed(format!("cannot remove {}: {}", p.display(), e));
+            }
+        }
+    }
+    Verdict { line: format!("foreign-resume: key={} -> CLOSED", key), code: 0 }
 }
 
 fn config() -> Result<Config, String> {
@@ -287,6 +676,8 @@ fn config() -> Result<Config, String> {
     let repo = walk::toplevel_opt()?.ok_or("not inside a git work tree")?;
     Ok(Config {
         adapters: walk::knob_array("DELEGATION_KIT_FOREIGN_ADAPTERS")?,
+        resume: walk::knob_array("DELEGATION_KIT_FOREIGN_RESUME")?,
+        markers: walk::knob_array("DELEGATION_KIT_FOREIGN_SESSION_MARKER")?,
         timeout,
         repo,
         base,
@@ -307,6 +698,24 @@ pub fn run(argv: &[String]) -> i32 {
         Ok(cfg) => foreign_run(&cfg, &a),
         Err(e) => Run { args: &a, dir: PathBuf::new(), exit: "-".to_string(), report: None, patch: None }
             .failed(&format!("config: {}", e)),
+    };
+    println!("{}", v.line);
+    v.code
+}
+
+pub fn resume(argv: &[String]) -> i32 {
+    let a = match parse_resume(argv) {
+        Ok(a) => a,
+        Err(e) => {
+            eprintln!("{}", e);
+            eprintln!("{}", RESUME_USAGE);
+            return 2;
+        }
+    };
+    let v = match (config(), &a.prompt) {
+        (Ok(cfg), Some(p)) => foreign_resume(&cfg, &a.key, p),
+        (Ok(cfg), None) => foreign_close(&cfg, &a.key),
+        (Err(e), _) => Verdict { line: format!("foreign-resume: key={} -> FAILED (config: {})", a.key, e), code: 2 },
     };
     println!("{}", v.line);
     v.code
@@ -334,6 +743,7 @@ mod tests {
             std::fs::create_dir_all(&src).expect("the sandbox must be creatable");
             std::fs::write(src.join("tracked.cfg"), "[a]\n\tb = 1\n").expect("the tracked file");
             std::fs::write(root.join("prompt.md"), "audit the tree\n").expect("the prompt file");
+            std::fs::write(root.join("answer.md"), "the answer\n").expect("the answer file");
             for args in [
                 &["init", "-q"][..],
                 &["add", "tracked.cfg"],
@@ -345,8 +755,14 @@ mod tests {
         }
 
         fn cfg(&self, adapters: &[&str], timeout: u64) -> Config {
+            self.session_cfg(adapters, &[], &[], timeout)
+        }
+
+        fn session_cfg(&self, adapters: &[&str], resume: &[&str], markers: &[&str], timeout: u64) -> Config {
             Config {
                 adapters: strings(adapters),
+                resume: strings(resume),
+                markers: strings(markers),
                 timeout,
                 repo: self.root.join("src").display().to_string(),
                 base: self.root.join("tmp").display().to_string(),
@@ -369,6 +785,14 @@ mod tests {
 
         fn tree_kept(&self) -> bool {
             self.run_dir().join("tree").exists()
+        }
+
+        fn read(&self, name: &str) -> String {
+            String::from_utf8_lossy(&std::fs::read(self.run_dir().join(name)).unwrap_or_default()).into_owned()
+        }
+
+        fn head(&self) -> String {
+            String::from_utf8_lossy(&git(&self.root.join("src"), &["rev-parse", "HEAD"]).expect("HEAD")).trim().to_string()
         }
     }
 
@@ -402,6 +826,7 @@ mod tests {
         let report = std::fs::read(r.run_dir().join("report.txt")).expect("the report");
         assert_eq!(String::from_utf8_lossy(&report), hash_of(&r, b"audit the tree\n"), "stdin carries the prompt");
         assert!(!r.tree_kept(), "the clone is removed on OK");
+        assert!(!r.run_dir().join("session.txt").exists(), "a one-shot adapter opens no session");
     }
 
     // spec: delegation-kit/SPEC.md §Testing — `@PROMPT_FILE@` is substituted with the prompt's
@@ -511,5 +936,136 @@ mod tests {
         let table = strings(&["a=prog", "b=other", "a=--flag", "a=x=y"]);
         assert_eq!(argv_of(&table, "a"), strings(&["prog", "--flag", "x=y"]));
         assert!(argv_of(&table, "c").is_empty());
+    }
+
+    const OPEN_STDOUT: &[&str] = &["s=bash", "s=-c", "s=echo 'session id: abc-1.x'"];
+    const OPEN_STDERR: &[&str] = &["s=bash", "s=-c", "s=echo 'session id:\terr:2' >&2"];
+    const RESUME_ECHO: &[&str] = &["s=bash", "s=-c", "s=printf '%s %s\\n' \"$0\" \"$1\"; cat", "s=@SESSION_ID@", "s=@PROMPT_FILE@"];
+    const MARKER: &[&str] = &["s=session id:"];
+
+    // spec: delegation-kit/SPEC.md §Testing — open: a resumable adapter's `OK` keeps the clone and
+    // writes `session.txt` and `refs.txt`, the id read from standard output or else standard error
+    #[test]
+    fn a_resumable_open_keeps_the_clone_and_records_the_session() {
+        for (tag, open, id) in [("open-out", OPEN_STDOUT, "abc-1.x"), ("open-err", OPEN_STDERR, "err:2")] {
+            let r = Repo::new(tag);
+            let v = foreign_run(&r.session_cfg(open, RESUME_ECHO, MARKER, 60), &r.args("s", false));
+            assert_eq!(v.code, 0, "{}", v.line);
+            assert!(v.line.ends_with("-> OK — resumable: --foreign-resume prompt <prompt-file>"), "{}", v.line);
+            assert!(r.tree_kept(), "an open session keeps its clone");
+            assert_eq!(r.read("session.txt"), format!("adapter=s mode=audit base={} turn=1 id={}\n", r.head(), id));
+            assert!(r.read("refs.txt").starts_with(&r.head()), "{}", r.read("refs.txt"));
+            let again = foreign_run(&r.session_cfg(open, RESUME_ECHO, MARKER, 60), &r.args("s", false));
+            assert_eq!(again.code, 2, "{}", again.line);
+            assert!(again.line.contains("an open session occupies") && again.line.contains("--foreign-resume prompt --close"), "{}", again.line);
+        }
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — open: a form resuming by id with no id captured opens no
+    // session and removes the clone; a form resuming without an id opens one recording `-`
+    #[test]
+    fn an_open_without_its_needed_id_opens_no_session() {
+        let r = Repo::new("no-id");
+        let quiet = ["s=git", "s=status"];
+        let v = foreign_run(&r.session_cfg(&quiet, RESUME_ECHO, MARKER, 60), &r.args("s", false));
+        assert_eq!(v.code, 0, "{}", v.line);
+        assert!(v.line.contains("-> OK — not resumable (no session id followed the marker 'session id:'"), "{}", v.line);
+        assert!(!r.tree_kept() && !r.run_dir().join("session.txt").exists());
+        let last = ["s=bash", "s=-c", "s=cat"];
+        let v = foreign_run(&r.session_cfg(&quiet, &last, &[], 60), &r.args("s", false));
+        assert!(v.line.ends_with("resumable: --foreign-resume prompt <prompt-file>"), "{}", v.line);
+        assert!(r.read("session.txt").ends_with("turn=1 id=-\n"), "{}", r.read("session.txt"));
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — resume: both tokens substituted, the prompt on standard
+    // input, the previous report rotated, the turn advanced; close keeps every report
+    #[test]
+    fn a_resume_continues_the_session_and_close_keeps_its_reports() {
+        let r = Repo::new("resume");
+        let cfg = r.session_cfg(OPEN_STDOUT, RESUME_ECHO, MARKER, 60);
+        assert_eq!(foreign_run(&cfg, &r.args("s", false)).code, 0);
+        let v = foreign_resume(&cfg, "prompt", "answer.md");
+        assert_eq!(v.code, 0, "{}", v.line);
+        assert!(v.line.starts_with("foreign-resume: adapter=s mode=audit key=prompt turn=2 exit=0 report="), "{}", v.line);
+        assert!(v.line.ends_with("patch=none -> OK — resumable: --foreign-resume prompt <prompt-file>"), "{}", v.line);
+        let answer = r.root.join("answer.md").display().to_string();
+        assert_eq!(r.read("report.txt"), format!("abc-1.x {}\nthe answer\n", answer));
+        assert_eq!(r.read("report.1.txt"), "session id: abc-1.x\n", "the open's report is rotated");
+        assert!(r.run_dir().join("stderr.1.txt").is_file());
+        assert!(r.read("session.txt").contains(" turn=2 id=abc-1.x"), "{}", r.read("session.txt"));
+        let closed = foreign_close(&cfg, "prompt");
+        assert_eq!((closed.code, closed.line.as_str()), (0, "foreign-resume: key=prompt -> CLOSED"));
+        assert!(!r.tree_kept() && !r.run_dir().join("session.txt").exists() && !r.run_dir().join("refs.txt").exists());
+        assert!(r.run_dir().join("report.txt").is_file() && r.run_dir().join("report.1.txt").is_file(), "close keeps every report");
+        let again = foreign_close(&cfg, "prompt");
+        assert!(again.code == 2 && again.line.contains("-> FAILED (no open session under"), "{}", again.line);
+        let reopened = foreign_run(&cfg, &r.args("s", false));
+        assert_eq!(reopened.code, 0, "{}", reopened.line);
+        assert!(!r.run_dir().join("report.1.txt").exists(), "a new open starts from no rotated report");
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — resume: a sweep's patch covers the session's whole
+    // change across two turns
+    #[test]
+    fn a_sweep_sessions_patch_is_its_whole_change() {
+        let r = Repo::new("resume-sweep");
+        let open = ["s=bash", "s=-c", "s=git config --file tracked.cfg a.b 2 && echo 'session id: w1'"];
+        let resume = ["s=bash", "s=-c", "s=git config --file new.cfg c.d 3", "s=@SESSION_ID@"];
+        let cfg = r.session_cfg(&open, &resume, MARKER, 60);
+        assert_eq!(foreign_run(&cfg, &r.args("s", true)).code, 0);
+        let v = foreign_resume(&cfg, "prompt", "answer.md");
+        assert_eq!(v.code, 0, "{}", v.line);
+        let patch = r.run_dir().join("change.patch");
+        assert!(v.line.contains(&format!("mode=sweep key=prompt turn=2 exit=0 report={} patch={} -> OK", r.run_dir().join("report.txt").display(), patch.display())), "{}", v.line);
+        let body = String::from_utf8_lossy(&std::fs::read(&patch).expect("the patch")).into_owned();
+        assert!(body.contains("tracked.cfg") && body.contains("new.cfg"), "{}", body);
+        git(&r.root.join("src"), &["apply", "--check", patch.to_str().unwrap_or_default()]).expect("the patch applies cleanly");
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — the resume verdicts: a non-zero resume FAILS and keeps
+    // the session, a committing one is REFUSED and ends it, and an unknown key fails without a spawn
+    #[test]
+    fn the_resume_verdicts() {
+        let r = Repo::new("resume-verdicts");
+        let fail = ["s=bash", "s=-c", "s=exit 3", "s=@SESSION_ID@"];
+        let cfg = r.session_cfg(OPEN_STDOUT, &fail, MARKER, 60);
+        assert_eq!(foreign_run(&cfg, &r.args("s", false)).code, 0);
+        let v = foreign_resume(&cfg, "prompt", "answer.md");
+        assert_eq!(v.code, 2, "{}", v.line);
+        assert!(v.line.contains("turn=2 exit=3") && v.line.ends_with("-> FAILED (the adapter exited 3)"), "{}", v.line);
+        assert!(r.read("session.txt").contains(" turn=2 "), "a failed turn keeps the session and advances");
+        let commit = ["s=git", "s=-c", "s=user.name=t", "s=-c", "s=user.email=t@example.invalid", "s=commit", "s=--allow-empty", "s=-q", "s=-m", "s=@SESSION_ID@"];
+        let cfg = r.session_cfg(OPEN_STDOUT, &commit, MARKER, 60);
+        let v = foreign_resume(&cfg, "prompt", "answer.md");
+        assert_eq!(v.code, 1, "{}", v.line);
+        assert!(v.line.contains("turn=3") && v.line.contains("-> REFUSED (committed) — session ended, clone kept at "), "{}", v.line);
+        assert!(!r.run_dir().join("session.txt").exists() && r.tree_kept());
+        assert!(r.run_dir().join("report.2.txt").is_file(), "the failed turn's report was rotated");
+        let v = foreign_resume(&cfg, "nope", "answer.md");
+        assert_eq!(v.code, 2, "{}", v.line);
+        assert!(v.line.starts_with("foreign-resume: adapter=- mode=- key=nope turn=- exit=- report=none"), "{}", v.line);
+        assert!(v.line.contains("FAILED (no open session under"), "{}", v.line);
+    }
+
+    // spec: delegation-kit/SPEC.md §Resuming a session — the argv shape: a key and a prompt file, or a
+    // key and `--close`, the key one path component, and the `--` escape
+    #[test]
+    fn the_resume_argv_shape_is_held() {
+        assert_eq!(parse_resume(&strings(&["k", "a.md"])), Ok(ResumeArgs { key: "k".into(), prompt: Some("a.md".into()) }));
+        assert_eq!(parse_resume(&strings(&["k", "--close"])), Ok(ResumeArgs { key: "k".into(), prompt: None }));
+        assert_eq!(parse_resume(&strings(&["k", "--", "-a.md"])).map(|a| a.prompt), Ok(Some("-a.md".into())));
+        for bad in [&["k"][..], &["k", "a", "b"], &["--close"], &["k", "a.md", "--close"], &["--help"], &["../k", "a"]] {
+            assert!(parse_resume(&strings(bad)).is_err(), "{:?} must refuse", bad);
+        }
+    }
+
+    // spec: delegation-kit/SPEC.md §The foreign-vendor run — `session.txt` reads back what it wrote,
+    // and a line missing a field is refused
+    #[test]
+    fn the_session_record_round_trips() {
+        let s = Session { adapter: "a".into(), sweep: true, base: "abc".into(), turn: 4, id: None };
+        assert_eq!(Session::parse(&s.render()), Ok(s));
+        assert!(Session::parse("adapter=a mode=audit turn=1 id=-\n").is_err());
+        assert!(Session::parse("adapter=a mode=write base=b turn=1 id=-\n").is_err());
     }
 }

@@ -768,6 +768,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Run(foreign_run::run),
         foreign_run::KNOBS,
     ),
+    // spec: delegation-kit/SPEC.md §Resuming a session — `--foreign-run`'s grounds: it spawns the
+    // adapter's resume form, and its 1 is a refused shape
+    (
+        "--foreign-resume",
+        Arm::Run(foreign_run::resume),
+        foreign_run::KNOBS,
+    ),
     // spec: guard-kit/SPEC.md §scratch-run — an `Arm::Run` on two independent grounds: the runner
     // passes the child's exit code through verbatim, and its stdout must reach the terminal as the
     // child produces it rather than as a string returned at the end.
@@ -1064,6 +1071,7 @@ mod tests {
             "--with-foreign-shells",
             "--price-coverage",
             "--foreign-run",
+            "--foreign-resume",
         ];
         for arm in NETWORK_ARMS {
             assert!(lookup(arm).is_some(), "{} names no arm-table row", arm);
