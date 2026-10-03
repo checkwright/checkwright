@@ -18,6 +18,18 @@ init and update print nothing for a gate whose install disposition moved off zer
 
 **Cost while deferred:** an adopter who edited `gates.list` is not told which kept gates are now house rules they never chose; the release note's `--with-gate` line is the only notice. Filed 2026-10-01 to the gap inbox at install-disposition-pass' build on a lead decision; promoted at its close: →fix fails because the report needs a new lock field, adopter-visible mechanism no amendment settled, →forward because no ruling is owed. Re-verified: the report is fed only by the recipe and `--without-gate` drop sets. Owner lookup: `still.registered`, `kept members`, `kept-registry`, `edited gates.list`, `prior starting set` in this file — none; owner installer/SPEC.md §What init seeds.
 
+### tarball-build-attestation
+
+[spec: SPEC-tarball-attestation.md] [recurrence: 2026-09-25]
+
+the primary install channel carries no build provenance: the Release tarball ships a digest, which proves transfer, and docs/install.md states the tarball "cannot" carry an attestation where the npm package does. A GitHub artifact attestation on the tarball is a workflow step, not a platform limit.
+
+**Deliverable:** the publish workflow attests the tarball, the shell installers verify it where the verifier is present and say so where it is not, and the install page's claim is corrected; installer/SPEC.md §The dependency boundary owns the rule.
+
+**Cost while deferred:** the channel most adopters take is the one with no provenance, on a project whose pitch is verified claims. Filed 2026-07-26; returned from the icebox 2026-09-25 by consult as a trust gap on a public claim. Its observation half, a published Release verifying, split 2026-10-04 at scope to [tarball-attestation-observed](#tarball-attestation-observed), since only a release run produces it.
+
+**Push need (2026-10-04, inside the budget):** one mid-iteration push, for the PowerShell installer's verify leg that no local run reaches; [update-availability-notice](#update-availability-notice) rides the same push if its design lands a Windows-only leg.
+
 ## Technical Debt
 
 ### delegation-kit-tail-brevity
@@ -327,18 +339,6 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes, landing as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes, landing as `installer-install-brevity` and `installer-remainder-brevity`; and, the kit's other sections remaining: drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections, delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope, landing as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope, landing as `queue-kit-gate-brevity`; guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope, landing as `guard-kit-tool-brevity`.
 
 delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes, landing as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as [delegation-kit-tail-brevity](#delegation-kit-tail-brevity).
-
-### tarball-build-attestation
-
-[cost: event/high] [surface: installer] [recurrence: 2026-09-25]
-
-the primary install channel carries no build provenance: the Release tarball ships a digest, which proves transfer, and docs/install.md states the tarball "cannot" carry an attestation where the npm package does. A GitHub artifact attestation on the tarball is a workflow step, not a platform limit.
-
-**Deliverable:** the publish workflow attests the tarball, the shell installers verify it where the verifier is present and say so where it is not, and the install page's claim is corrected; installer/SPEC.md §The dependency boundary owns the rule.
-
-**Cost while deferred:** the channel most adopters take is the one with no provenance, on a project whose pitch is verified claims. Filed 2026-07-26; returned from the icebox 2026-09-25 by consult as a trust gap on a public claim. Its observation half, a published Release verifying, split 2026-10-04 at scope to [tarball-attestation-observed](#tarball-attestation-observed), since only a release run produces it.
-
-**Push need (2026-10-04, inside the budget):** one mid-iteration push, for the PowerShell installer's verify leg that no local run reaches; [update-availability-notice](#update-availability-notice) rides the same push if its design lands a Windows-only leg.
 
 ### tarball-attestation-observed
 
