@@ -3,23 +3,12 @@
 use crate::ere::Ere;
 use crate::fresh;
 use crate::{proc, programs};
+use crate::knobs::gate_sdk::PORTABILITY_PATTERN_FILE;
 use crate::walk;
-
-// spec: gate-sdk/SPEC.md §check-portability-floor — the self-exemption is a *prefix* glob over
-// the basename, on check-tree-terms' precedent: a roster of banned constructs spells them by
-// construction, and the shipped template and a `.local` sibling are exempt beside the file itself
-const SELF_EXEMPT_PREFIX: &str = "portability-patterns";
 
 // spec: gate-sdk/SPEC.md §check-portability-floor — the valve, on the matching line or the one
 // above, in the window `update-target-exempt` and `comment-tier-exempt` already use
 const VALVE: &str = "portability-declared:";
-
-fn self_exempt(path: &str) -> bool {
-    path.rsplit('/')
-        .next()
-        .unwrap_or(path)
-        .starts_with(SELF_EXEMPT_PREFIX)
-}
 
 // spec: gate-sdk/SPEC.md §check-portability-floor — the reason is mandatory, so a line carrying
 // the token with nothing after it is a violation rather than a pass: `None` is *no valve here*
@@ -86,6 +75,10 @@ fn inner(args: &[String]) -> Result<i32, String> {
     let paths = walk::knob_words("GATE_SDK_PORTABILITY_PATHS")?;
 
     let (patterns, files_present) = resolve_patterns(&files)?;
+    // spec: gate-sdk/SPEC.md §check-portability-floor — a pattern file this gate resolved, or the
+    // kit's own starter roster, is self-exempt
+    let exempt = walk::self_exempt_paths(&files, PORTABILITY_PATTERN_FILE)
+        .map_err(|e| format!("check-portability-floor: {}", e))?;
 
     // spec: gate-sdk/SPEC.md §check-portability-floor — a clean verdict that says *nothing is
     // configured* is a different sentence from one that says *nothing was found*, and telling
@@ -138,7 +131,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
     let mut skipped_binary = 0usize;
     let mut ps1_checked = 0usize;
     for path in listing.lines() {
-        if path.is_empty() || self_exempt(path) {
+        if path.is_empty() || exempt.iter().any(|e| e == path) {
             continue;
         }
         let Ok(bytes) = std::fs::read(path) else {
@@ -299,17 +292,6 @@ mod tests {
             valve_reason("# portability-declared: docs/install.md §Requirements"),
             Some("docs/install.md §Requirements")
         );
-    }
-
-    // spec: gate-sdk/SPEC.md §check-portability-floor — the self-exemption is a basename prefix,
-    // so the shipped template and a `.local` sibling are exempt beside the roster itself
-    #[test]
-    fn the_self_exemption_is_a_basename_prefix_and_not_an_exact_name() {
-        assert!(self_exempt("scripts/portability-patterns.list"));
-        assert!(self_exempt("scripts/portability-patterns.local.list"));
-        assert!(self_exempt("gate-sdk/templates/portability-patterns.list"));
-        assert!(!self_exempt("scripts/patterns.list"));
-        assert!(!self_exempt("docs/notes-portability-patterns.list"));
     }
 
     // spec: gate-sdk/SPEC.md §check-portability-floor — the shipped roster's own shapes compile

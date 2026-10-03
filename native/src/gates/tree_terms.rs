@@ -4,20 +4,9 @@ use crate::ere::Ere;
 use crate::fresh;
 use crate::gates::commit_msg::resolve_files;
 use crate::{proc, programs};
+use crate::knobs::gate_sdk::MSG_PATTERN_FILE;
 use crate::walk;
 use std::path::Path;
-
-// spec: gate-sdk/SPEC.md §check-tree-terms — the self-exemption is a *prefix* glob over the
-// basename (`[[ "$base" == msg-patterns* ]]`), so a template and a `.local` sibling are exempt
-// beside the file itself
-const SELF_EXEMPT_PREFIX: &str = "msg-patterns";
-
-fn self_exempt(path: &str) -> bool {
-    path.rsplit('/')
-        .next()
-        .unwrap_or(path)
-        .starts_with(SELF_EXEMPT_PREFIX)
-}
 
 // spec: gate-sdk/SPEC.md §check-tree-terms — a NUL byte is what makes a file binary, the same
 // test `grep` applies before it substitutes a path-only verdict for the matching line
@@ -101,6 +90,18 @@ fn inner(args: &[String]) -> Result<i32, String> {
         }
     }
 
+    // spec: gate-sdk/SPEC.md §check-tree-terms — the pattern files the two knobs name, or the
+    // positional list, and each kit's starter roster
+    let named: Vec<String> = if args.len() > 1 {
+        args[1..].to_vec()
+    } else {
+        let mut n = walk::knob_words("GATE_SDK_MSG_PATTERN_FILES")?;
+        n.extend(walk::knob_words("GATE_SDK_MSG_PATTERN_FILES_LOCAL")?);
+        n
+    };
+    let exempt = walk::self_exempt_paths(&named, MSG_PATTERN_FILE)
+        .map_err(|e| format!("check-tree-terms: {}", e))?;
+
     let prune = walk::prune_dirs().map_err(|e| format!("check-tree-terms: {}", e))?;
     let ls = proc::run(&programs::GIT, &["ls-files", "--", &scanroot])
         .map_err(|e| format!("check-tree-terms: {}", e))?;
@@ -119,7 +120,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
     // per file. A port recompiling per file is the regression the split exists to prevent.
     let mut paths: Vec<&str> = Vec::new();
     for path in listing.lines() {
-        if path.is_empty() || walk::path_pruned(path, &prune) || self_exempt(path) {
+        if path.is_empty() || walk::path_pruned(path, &prune) || exempt.iter().any(|e| e == path) {
             continue;
         }
         if Path::new(path).is_file() {
@@ -224,17 +225,6 @@ mod tests {
             Err(e) => e,
         };
         assert!(format!("{}", err).contains("\\b"));
-    }
-
-    // spec: gate-sdk/SPEC.md §check-tree-terms — the self-exemption is a prefix glob over the
-    // basename, so the `.local` sibling and the shipped template are exempt beside the file
-    #[test]
-    fn the_self_exemption_is_a_basename_prefix_and_not_an_exact_name() {
-        assert!(self_exempt("scripts/msg-patterns.list"));
-        assert!(self_exempt("scripts/msg-patterns.local.list"));
-        assert!(self_exempt("msg-patterns.list"));
-        assert!(!self_exempt("scripts/patterns.list"));
-        assert!(!self_exempt("docs/notes-msg-patterns.list"));
     }
 
     #[test]

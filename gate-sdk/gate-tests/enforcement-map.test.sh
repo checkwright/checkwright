@@ -83,6 +83,15 @@ tmpl="$(GATE_SDK_ENFORCE_SCAN_DIR="$scandir" bash "${EMIT[@]}")"
 assert_has    template-inert "live-surface-alpha" "$tmpl"
 assert_absent template-inert "template-surface-beta" "$tmpl"
 
+# spec: gate-sdk/SPEC.md §enforcement-map — a kit cell links only where the page's directory
+# tracks the kit's page: the default page's docs/ tracks each kit's index.md, and a page knob
+# pointing into an untracked scratch directory writes every kit name as plain text.
+assert_has    kit-page-linked "| [gate-sdk](gate-sdk/index.md) |" "$base"
+mkdir -p "$scratch/page"
+unlinked="$(GATE_SDK_ENFORCEMENT_FILE="$scratch/page/enforcement.md" bash "${EMIT[@]}")"
+assert_has    kit-page-untracked "| gate-sdk |" "$unlinked"
+assert_absent kit-page-untracked "](gate-sdk/index.md)" "$unlinked"
+
 [[ "$fails" -eq 0 ]] || { echo "enforcement-map.test: $fails assertion(s) failed"; exit 1; }
-echo "enforcement-map.test: clean (set-but-missing knobs refuse; unset-with-default-absent sections drop independently; gate registry always present)"
+echo "enforcement-map.test: clean (set-but-missing knobs refuse; unset-with-default-absent sections drop independently; gate registry always present; a kit cell links only a tracked kit page)"
 exit 0

@@ -13,7 +13,10 @@ sb="$(mktemp -d)"
 trap 'rm -rf "$sb"' EXIT
 fails=0
 
-mkdir -p "$sb/repo/widget-kit/templates" "$sb/repo/scripts" "$sb/norepo/scripts"
+# widget-kit carries a kit marker and sits beside the sandbox's own gate-sdk root, so the kit-root
+# derivation finds it as it would a vendored kit.
+mkdir -p "$sb/repo/widget-kit/templates" "$sb/repo/widget-kit/checks" "$sb/repo/gate-sdk" \
+    "$sb/repo/scripts" "$sb/norepo/scripts"
 cat > "$sb/repo/widget-kit/templates/thing.sh" <<'EOF'
 # spec: widget-kit/SPEC.md §thing — the template
 helper_one() { :; }
@@ -30,7 +33,8 @@ git -C "$sb/repo" config user.name t
 
 # --- the default root: entered from a SUBDIRECTORY, so a cwd-relative default would find
 # --- no pair at all and pass vacuously where the toplevel derivation finds one.
-out="$( cd "$sb/repo/scripts" && gate_run check-template-copy-parity "$DIR/checks" 2>&1 )"; rc=$?
+out="$( cd "$sb/repo/scripts" && gate_env GATE_SDK_ROOT="$sb/repo/gate-sdk" \
+    && gate_run check-template-copy-parity "$DIR/checks" 2>&1 )"; rc=$?
 if [[ "$rc" -ne 0 ]]; then
     echo "  FAIL [toplevel-default]: want exit 0, got $rc -- $out"; fails=$((fails + 1))
 elif ! grep -qF '1 template<->copy pair(s)' <<<"$out"; then

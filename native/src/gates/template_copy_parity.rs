@@ -234,10 +234,24 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
     let g = Grammar::new()?;
 
+    // spec: gate-sdk/SPEC.md §check-template-copy-parity — one `templates/*.sh` per kit root
+    // resolved under the scan root; a kit root equal to the scan root is never paired
+    let kit_roots: Vec<String> = walk::kit_roots_under(&walk::abs_against(&walk::cwd()?, &root))?
+        .into_iter()
+        .map(|r| r.trim_end_matches('/').to_string())
+        .filter(|r| !r.is_empty() && r != "." && Path::new(&root).join(r).is_dir())
+        .collect();
+    let mut templates: Vec<String> = kit_roots
+        .iter()
+        .flat_map(|r| walk::glob_entries(&format!("{}/{}/templates/*.sh", root, r)))
+        .collect();
+    templates.sort();
+    templates.dedup();
+
     let mut pairs = 0usize;
     let mut findings: Vec<String> = Vec::new();
 
-    for tpl in walk::glob_entries(&format!("{}/*/templates/*.sh", root)) {
+    for tpl in templates {
         let name = tpl.rsplit('/').next().unwrap_or(&tpl).to_string();
         if name.ends_with("-config.sh") {
             continue;
@@ -318,8 +332,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(1);
     }
     println!(
-        "TEMPLATE-COPY-PARITY: clean ({} template<->copy pair(s) agree on spec: target, template-declared surface present, copy additions declared)",
-        pairs
+        "TEMPLATE-COPY-PARITY: clean ({} template<->copy pair(s) agree on spec: target, template-declared surface present, copy additions declared; {} kit root(s) read)",
+        pairs,
+        kit_roots.len()
     );
     Ok(0)
 }

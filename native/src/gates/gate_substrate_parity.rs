@@ -561,6 +561,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         Some(a) => a.clone(),
         None => walk::knob_scalar("GATE_SDK_GATES_DIR")?,
     };
+    let doc_given = args.get(1).is_some();
     let doc = match args.get(1) {
         Some(a) => a.clone(),
         None => format!(
@@ -573,7 +574,19 @@ fn rule(args: &[String]) -> Result<i32, String> {
     if !Path::new(&list).is_file() {
         return Err(format!("no registry at {}", list));
     }
-    if !Path::new(&doc).is_file() {
+
+    let crate_dir = walk::knob_scalar("GATE_SDK_NATIVE_CRATE")?;
+    let crate_dir = crate_dir.trim_end_matches('/').to_string();
+    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the publishing test is computed once
+    // and read three times: by the conservation doc's absent-doc refusal, assertion B's
+    // consumer-declared scope clause and assertion F's missing-roster arm. One holder, shared with
+    // §check-gate-exemption-tasks' scope rule.
+    let publishing = walk::authoring_tree(&crate_dir);
+
+    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the conservation doc is owed by the
+    // tree that authors the dispositions
+    let doc_present = Path::new(&doc).is_file();
+    if !doc_present && (doc_given || publishing) {
         return Err(format!("conservation doc not found: {}", doc));
     }
     let list_text = read(&list)?;
@@ -587,17 +600,15 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let kit_roots = walk::kit_roots()?;
     let (resolve_dirs, kit_names) = main_rule_dirs(&gates_dir, &kit_roots);
 
-    let section_body = conservation_body(&read(&doc)?);
-    if section_body.is_empty() {
-        return Err(format!("no '{}' section in {}", SECTION, doc));
-    }
-
-    let crate_dir = walk::knob_scalar("GATE_SDK_NATIVE_CRATE")?;
-    let crate_dir = crate_dir.trim_end_matches('/').to_string();
-    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the publishing test is computed once
-    // and read twice: by assertion B's consumer-declared scope clause and assertion F's
-    // missing-roster arm. One holder, shared with §check-gate-exemption-tasks' scope rule.
-    let publishing = walk::authoring_tree(&crate_dir);
+    let section_body = if doc_present {
+        let body = conservation_body(&read(&doc)?);
+        if body.is_empty() {
+            return Err(format!("no '{}' section in {}", SECTION, doc));
+        }
+        Some(body)
+    } else {
+        None
+    };
 
     let mut ctx = Ctx {
         findings: Vec::new(),
@@ -769,7 +780,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         &roster,
         &kit_names,
         publishing,
-        &section_body,
+        section_body.as_deref().unwrap_or(""),
     );
     ctx.findings.extend(verdict.findings);
 
@@ -850,7 +861,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
             continue;
         }
         sensitive += 1;
-        if !section_body.contains(&format!("`{}`", m)) {
+        let Some(body) = &section_body else {
+            continue;
+        };
+        if !body.contains(&format!("`{}`", m)) {
             ctx.findings.push(format!("no recorded disposition: {} is substrate-sensitive (its couples= covers a gate declaration path) but {} does not name it", m, SECTION));
         }
     }
@@ -969,6 +983,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let wf_absent_list = list_or_none(&wf_absent);
     let wf_followed_n = wf_followed.len();
 
+    let dispositioned = if section_body.is_some() {
+        "all dispositioned"
+    } else {
+        "not dispositioned here, the conservation doc being absent in a tree that publishes no crate"
+    };
     let skipped = registry::unresolved_skipped(unresolved);
     if !ctx.findings.is_empty() {
         println!("check-gate-substrate-parity: the gate substrate seam is not conserved{}:", skipped);
@@ -982,7 +1001,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     println!(
-        "GATE-SUBSTRATE-PARITY: clean ({declared} member(s) with one declaration each, {dispatching} of them dispatching to the binary{skipped};{noport_declared} of the {declpaths_shell} shell declaration(s) declare '# no-port:' with a cause and {portuntil_declared} declare '# port-until:' with a slug, neither on any descriptor nor both on one declaration; the tracked shell tree beyond that set {tree_state}, {tree_scanned} file(s) read for header-declaration shape and {tree_declared} of them declaring, counted apart from the declaration set so an empty one stays visible; {portuntil_grounded} of those held declaration(s) reach their ground in one hop, the section their own '# spec:' field names stating the hold; {ndesc} descriptor(s) in parity with the {nsub}-subcommand roster ({in_scope} in scope, {out_of_scope} out of scope — an unvendored kit, or a consumer declaration from another tree), {refonly} reference-only; {unregistered_declared} in-scope subcommand(s) unregistered in {list} with a declared reason and none undeclared, the reverse direction empty; {j_state}; {sensitive} substrate-sensitive member(s) all dispositioned; {impl_scanned} implementation source(s) free of manifest-class annotation; {kit_scanned} kit root(s) scanned for an implementation sibling, crate root {crate_dir} outside every kit root; target roster {roster_state} at {roster_file} with {roster_targets} well-formed target(s); publish workflow(s) read: {wf_read_list}; absent: {wf_absent_list}; {wf_matrix} matrix declaration(s) roster-derived across {wf_jobs} job(s) with one producer per digest, {wf_followed_n} called script(s) read one hop deep)",
+        "GATE-SUBSTRATE-PARITY: clean ({declared} member(s) with one declaration each, {dispatching} of them dispatching to the binary{skipped};{noport_declared} of the {declpaths_shell} shell declaration(s) declare '# no-port:' with a cause and {portuntil_declared} declare '# port-until:' with a slug, neither on any descriptor nor both on one declaration; the tracked shell tree beyond that set {tree_state}, {tree_scanned} file(s) read for header-declaration shape and {tree_declared} of them declaring, counted apart from the declaration set so an empty one stays visible; {portuntil_grounded} of those held declaration(s) reach their ground in one hop, the section their own '# spec:' field names stating the hold; {ndesc} descriptor(s) in parity with the {nsub}-subcommand roster ({in_scope} in scope, {out_of_scope} out of scope — an unvendored kit, or a consumer declaration from another tree), {refonly} reference-only; {unregistered_declared} in-scope subcommand(s) unregistered in {list} with a declared reason and none undeclared, the reverse direction empty; {j_state}; {sensitive} substrate-sensitive member(s) {dispositioned}; {impl_scanned} implementation source(s) free of manifest-class annotation; {kit_scanned} kit root(s) scanned for an implementation sibling, crate root {crate_dir} outside every kit root; target roster {roster_state} at {roster_file} with {roster_targets} well-formed target(s); publish workflow(s) read: {wf_read_list}; absent: {wf_absent_list}; {wf_matrix} matrix declaration(s) roster-derived across {wf_jobs} job(s) with one producer per digest, {wf_followed_n} called script(s) read one hop deep)",
         ndesc = descriptors.len(),
         nsub = roster.len(),
         in_scope = verdict.in_scope,

@@ -56,13 +56,31 @@ fn command_path(cmd: &str) -> String {
     cmd.to_string()
 }
 
-// spec: gate-sdk/SPEC.md §enforcement-map — the kit column links each kit's docs page relative to
-// the emitted page; the (consumer) group owns no kit page and stays plain text
-fn kit_cell(kit: &str) -> String {
-    if kit == "(consumer)" {
+// spec: gate-sdk/SPEC.md §enforcement-map — the kit column links a kit's docs page relative to the
+// emitted page where the page's directory tracks it; a kit with no page, and the (consumer)
+// group, stay plain text
+fn kit_cell(kit: &str, page_tracked: bool) -> String {
+    if kit == "(consumer)" || !page_tracked {
         return kit.to_string();
     }
     format!("[{}]({}/index.md)", kit, kit)
+}
+
+// spec: gate-sdk/SPEC.md §enforcement-map — the kits whose `<kit>/index.md` is tracked beside the
+// page the knob names, the test made at the spot the relative link resolves from
+fn kits_with_tracked_page(m: &EnforcementMap, page: &str) -> Vec<String> {
+    let dir = Path::new(page).parent().map(Path::to_path_buf).unwrap_or_default();
+    let mut kits: Vec<String> = m
+        .sections
+        .iter()
+        .flat_map(|s| s.rows.iter().map(|r| r.kit.clone()))
+        .filter(|k| k != "(consumer)")
+        .collect();
+    kits.sort();
+    kits.dedup();
+    kits.into_iter()
+        .filter(|k| tracked(&dir.join(k).join("index.md").to_string_lossy()))
+        .collect()
 }
 
 fn tracked(path: &str) -> bool {
@@ -489,7 +507,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 
 "#;
 
-pub fn render(m: &EnforcementMap) -> String {
+pub fn render(m: &EnforcementMap, linked: &[String]) -> String {
     let mut out = String::from(HEAD);
     out.push_str(&m.classes);
     out.push_str(MID);
@@ -503,7 +521,7 @@ pub fn render(m: &EnforcementMap) -> String {
         for r in &s.rows {
             out.push_str(&format!(
                 "| {} | {} |\n",
-                kit_cell(&r.kit),
+                kit_cell(&r.kit, linked.contains(&r.kit)),
                 r.cells.join(" | ")
             ));
         }
@@ -513,7 +531,10 @@ pub fn render(m: &EnforcementMap) -> String {
 }
 
 pub fn emit(_args: &[String]) -> Result<String, String> {
-    Ok(render(&measure()?))
+    let m = measure()?;
+    let page = walk::knob_scalar("GATE_SDK_ENFORCEMENT_FILE")?;
+    let linked = kits_with_tracked_page(&m, &page);
+    Ok(render(&m, &linked))
 }
 
 #[cfg(test)]
@@ -528,6 +549,15 @@ mod tests {
         assert_eq!(attribute_kit("canon-kit/kpis/y.sh"), "canon-kit");
         assert_eq!(attribute_kit("scripts/z.sh"), "(consumer)");
         assert_eq!(command_path("env A=1 bash kit/bin/x.sh --flag"), "kit/bin/x.sh");
+    }
+
+    // spec: gate-sdk/SPEC.md §enforcement-map — a kit cell links only where the page's directory
+    // tracks the kit's page; otherwise, and for the (consumer) group, it is plain text
+    #[test]
+    fn a_kit_cell_links_only_a_tracked_kit_page() {
+        assert_eq!(kit_cell("canon-kit", true), "[canon-kit](canon-kit/index.md)");
+        assert_eq!(kit_cell("canon-kit", false), "canon-kit");
+        assert_eq!(kit_cell("(consumer)", true), "(consumer)");
     }
 
     // spec: gate-sdk/SPEC.md §lib/gate.sh — the two arms P1 separates, which a test covering only

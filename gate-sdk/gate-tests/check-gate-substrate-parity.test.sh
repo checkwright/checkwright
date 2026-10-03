@@ -54,13 +54,17 @@ EOF
 # whole case in a subshell and lose every failure it recorded.
 OUT="$tmp/case-output"
 
+# DOC_ARGS is the conservation-doc positional, emptied for a case running on the default doc;
+# CASE_SDK_ROOT re-points the gate-sdk root after the library pins it, so that default can be
+# absent.
+DOC_ARGS=(conservation.md)
 run_case() {  # run_case <label> <sandbox> <want-rc> <substring>
     local label="$1" d="$2" want="$3" substr="$4" rc
     cases=$((cases + 1))
     ( cd "$d" && env GATE_SDK_KIT_DIRS="${KITDIRS:-kitroot}" GATE_SDK_NATIVE_CRATE=crate \
-        GATE_SDK_NATIVE_SRC=impl \
-        bash -c 'source "$1"; gate_run check-gate-substrate-parity "$2" scripts conservation.md' \
-        bash "$DIR/lib/test-hermetic.sh" "$DIR/checks" ) > "$OUT" 2>&1
+        GATE_SDK_NATIVE_SRC=impl CASE_SDK_ROOT="${CASE_SDK_ROOT:-}" \
+        bash -c 'source "$1"; [[ -z "$CASE_SDK_ROOT" ]] || export GATE_SDK_ROOT="$CASE_SDK_ROOT"; gate_run check-gate-substrate-parity "$2" scripts "${@:3}"' \
+        bash "$DIR/lib/test-hermetic.sh" "$DIR/checks" ${DOC_ARGS[@]+"${DOC_ARGS[@]}"} ) > "$OUT" 2>&1
     rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$label]: want exit $want, got $rc --"; sed 's/^/    /' "$OUT"
@@ -246,9 +250,35 @@ run_case smoke-unscoped "$H7" 0 "assertion J out of scope here" \
     && expect_absent smoke-unscoped-quiet "registered nowhere"
 unset KITDIRS
 
+# --- I: the conservation doc is owed by the tree that authors the dispositions ---
+# The gate-sdk root is re-pointed at a directory carrying no SPEC.md, the shape of an installed
+# tree whose payload withholds it. Outside a publishing tree the default doc's absence leaves
+# disposition coverage unasserted and says so; with crate source tracked it is still exit 2; and a
+# doc given as a positional is a steer whose absence is exit 2 in every tree.
+DOC_ARGS=()
+I1="$(make_sandbox doc-absent-consumer)"
+printf 'check-alpha\n' > "$I1/scripts/gates.list"
+CASE_SDK_ROOT="$I1/sdk"
+mkdir -p "$CASE_SDK_ROOT"
+run_case doc-absent-consumer "$I1" 0 'substrate-sensitive member(s) not dispositioned here, the conservation doc being absent in a tree that publishes no crate'
+I2="$(make_sandbox doc-absent-publishing)"
+printf 'check-alpha\n' > "$I2/scripts/gates.list"
+CASE_SDK_ROOT="$I2/sdk"
+mkdir -p "$CASE_SDK_ROOT" "$I2/crate"
+printf 'fn main() {}\n' > "$I2/crate/main.src"
+git -C "$I2" init -q
+git -C "$I2" add crate/main.src
+run_case doc-absent-publishing "$I2" 2 "conservation doc not found: $I2/sdk/SPEC.md"
+unset CASE_SDK_ROOT
+DOC_ARGS=(missing.md)
+I3="$(make_sandbox doc-steer-missing)"
+printf 'check-alpha\n' > "$I3/scripts/gates.list"
+run_case doc-steer-missing "$I3" 2 'conservation doc not found: missing.md'
+DOC_ARGS=(conservation.md)
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-gate-substrate-parity.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-gate-substrate-parity.test.sh: clean (declaration configurations: no descriptors, where the roster half is the only live half; descriptors present with none dispatching and no roster, where assertion F stays quiet; a consumer dispatching with no crate, which is also assertion G's empty shell-declaration corpus reported as a counted zero; and the publishing counterpart, where the same absent roster reds. Assertion G's tree half adds three: every widened clause driven to a finding over tracked shell files in a publishing sandbox, with a well-formed declaration and a below-header token both correctly silent; the same tree out of scope where no crate source is tracked; and the empty corpus outside any repository. Assertion J adds seven: a kit smoke registry covering its owned subcommands, then one omitting a member, registering a foreign one, carrying a stale declaration, carrying no heredoc and carrying two, each red, and the omission out of scope where no crate source is tracked — $cases assertions over 14 sandboxes, with assertion B's roster matrix and J's per-kit comparison held in the crate unit tests beside the rule)"
+echo "check-gate-substrate-parity.test.sh: clean (declaration configurations: no descriptors, where the roster half is the only live half; descriptors present with none dispatching and no roster, where assertion F stays quiet; a consumer dispatching with no crate, which is also assertion G's empty shell-declaration corpus reported as a counted zero; and the publishing counterpart, where the same absent roster reds. Assertion G's tree half adds three: every widened clause driven to a finding over tracked shell files in a publishing sandbox, with a well-formed declaration and a below-header token both correctly silent; the same tree out of scope where no crate source is tracked; and the empty corpus outside any repository. Assertion J adds seven: a kit smoke registry covering its owned subcommands, then one omitting a member, registering a foreign one, carrying a stale declaration, carrying no heredoc and carrying two, each red, and the omission out of scope where no crate source is tracked. The conservation doc adds three: the default doc absent outside a publishing tree, read as coverage not asserted, and the same absence in a publishing tree and a missing positional doc, each exit 2 — $cases assertions over 17 sandboxes, with assertion B's roster matrix and J's per-kit comparison held in the crate unit tests beside the rule)"
 exit 0

@@ -8,21 +8,6 @@
 
 ## New Features
 
-### gate-sdk-layout-assumptions
-
-[spec: SPEC-layout-neutral.md]
-
-four kept gate-sdk gates assume this repo's layout, found at gate-sdk-value-pass' gate audit:
-
-- `check-gate-substrate-parity` defaults its conservation doc to `<GATE_SDK_ROOT>/SPEC.md`, which the payload withholds, so a bare run in an installed tree exits 2. The consumer smoke vendors by copy and masks it.
-- `check-template-copy-parity` globs `<root>/*/templates/*.sh` rather than joining the kit roots, so under a subdirectory vendoring its corpus empties and it reads clean.
-- `check-tree-terms` and `check-portability-floor` exempt their own pattern files by the shipped basename prefix, so a consumer whose pattern-file knob names another file reds on its own roster.
-- `--emit enforcement-map` links each kit to `<kit>/index.md`, this site's docs layout, so an adopter's page ships one dead link per kit.
-
-**Deliverable:** each gate made layout-neutral, with a fixture per change and gate-sdk/SPEC.md's gate sections updated, and a release declaration for each verdict change.
-
-**Cost while deferred:** an adopter registering the parity gate meets a refusal it cannot discharge; a nested vendoring drifts template copies unchecked; a renamed pattern file reds; the enforcement page ships dead links. Filed 2026-10-02 to the gap inbox as four bullets at gate-sdk-value-pass' build; promoted at its close as one entry: →fix fails because each changes a shipped gate's verdict, →forward because no ruling is owed. Re-verified at gate_substrate_parity.rs's default and `GATE_SDK_PAYLOAD_WITHHOLD`, template_copy_parity.rs's glob, both `SELF_EXEMPT_PREFIX` constants and enforcement_map.rs's `kit_cell`. Owner lookup: `layout`, `kit roots`, `enforcement-map` in this file — [footprint-arm-publisher-page](#footprint-arm-publisher-page), DISTINCT (another emitter's page); owner gate-sdk/SPEC.md, each gate's section.
-
 ### withheld-gate-literal-knobs
 
 [spec: SPEC-withheld-literals.md]
@@ -1262,4 +1247,5 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 - guard-kit-ruleset-brevity
 - amendment-manifest-prose-span
 - criterion-five-omit-stale
+- gate-sdk-layout-assumptions
 

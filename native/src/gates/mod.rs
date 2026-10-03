@@ -836,12 +836,13 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — an empty read-root set: the pairing is one
-    // pathname expansion over the root plus a named-file probe per pair, and neither descends
+    // pathname expansion per kit root resolved under the scan root plus a named-file probe per
+    // pair, and neither descends
     (
         "check-template-copy-parity",
         template_copy_parity::run,
         &[],
-        &["GATE_SDK_GATES_DIR"],
+        &["GATE_SDK_GATES_DIR", "GATE_SDK_KIT_DIRS"],
         "gate-sdk",
         &[("git", "")],
     ),
@@ -1815,7 +1816,7 @@ pub const REGISTRY: &[GateEntry] = &[
         value_rollup_fresh::run,
         &[
             (".", "glob:lit:*/SPEC.md", "", ""),
-            ("?", "", "", "dynamic@src/emit/enforcement_map.rs:344 via emit::value_rollup::emit"),
+            ("?", "", "", "dynamic@src/emit/enforcement_map.rs:362 via emit::value_rollup::emit"),
             ("?", "", "", "dynamic@src/emit/footprint.rs:90 via emit::value_rollup::emit"),
         ],
         &[
@@ -1880,7 +1881,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-enforcement-fresh",
         enforcement_fresh::run,
-        &[("?", "", "", "dynamic@src/emit/enforcement_map.rs:344 via emit::enforcement_map::emit")],
+        &[("?", "", "", "dynamic@src/emit/enforcement_map.rs:362 via emit::enforcement_map::emit")],
         &[
             "GATE_SDK_ENFORCEMENT_FILE",
             "GATE_SDK_GATES_DIR",
@@ -2123,8 +2124,8 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-gate-substrate-parity",
         gate_substrate_parity::run,
         &[
-            ("?", "", "", "dynamic@src/gates/gate_substrate_parity.rs:865"),
-            ("?", "", "", "dynamic@src/gates/gate_substrate_parity.rs:890"),
+            ("?", "", "", "dynamic@src/gates/gate_substrate_parity.rs:879"),
+            ("?", "", "", "dynamic@src/gates/gate_substrate_parity.rs:904"),
         ],
         &[
             "GATE_SDK_GATES_DIR",
@@ -2395,6 +2396,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_MSG_PATTERN_FILES_LOCAL",
             "GATE_SDK_PRUNE_DIRS",
             "GATE_SDK_PRUNE_EXTRA_DIRS",
+            "GATE_SDK_KIT_DIRS",
         ],
         "gate-sdk",
         &[("git", "")],
@@ -2408,7 +2410,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-portability-floor",
         portability_floor::run,
         &[],
-        &["GATE_SDK_PORTABILITY_PATTERNS", "GATE_SDK_PORTABILITY_PATHS"],
+        &["GATE_SDK_PORTABILITY_PATTERNS", "GATE_SDK_PORTABILITY_PATHS", "GATE_SDK_KIT_DIRS"],
         "gate-sdk",
         &[("git", "")],
     ),

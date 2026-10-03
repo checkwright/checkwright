@@ -3,7 +3,7 @@
 # and blank lines are ignored. Copy to your gates dir as portability-patterns.list
 # and point GATE_SDK_PORTABILITY_PATHS at the files your install path executes —
 # the corpus is empty by default, so this roster asserts nothing until it is set.
-# Any file named portability-patterns* is self-exempt from the scan.
+# The pattern files this gate resolves are self-exempt.
 #
 # A live use of a construct named here is not a defect to delete: mark the site
 # '# portability-declared: <reason>' on that line or the one above, naming the

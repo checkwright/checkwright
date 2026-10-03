@@ -430,6 +430,29 @@ fn absolutized(here: &str, roots: &[Root]) -> Vec<String> {
         .collect()
 }
 
+// spec: gate-sdk/SPEC.md §check-tree-terms — the self-exempt paths of a pattern gate: each pattern
+// file it resolved and each kit root's starter roster `<kit root>/templates/<starter>`, spelled as
+// `git ls-files` prints a tracked path from the working directory, for a lexical comparison
+pub fn self_exempt_paths(resolved: &[String], starter: &str) -> Result<Vec<String>, String> {
+    let here = cwd()?;
+    let spell = |p: &str| -> String {
+        let abs = abs_against(&here, p);
+        match rel_under(&here, &abs) {
+            Some(r) => r.trim_start_matches(SEPS).to_string(),
+            None => abs,
+        }
+    };
+    let mut out: Vec<String> = resolved.iter().map(|f| spell(f)).collect();
+    for r in kit_roots()? {
+        let r = r.trim_end_matches('/');
+        let base = if r.is_empty() { "." } else { r };
+        out.push(spell(&format!("{}/templates/{}", base, starter)));
+    }
+    out.sort();
+    out.dedup();
+    Ok(out)
+}
+
 // spec: gate-sdk/SPEC.md §The crate's crosser — the crate's only `std::env::current_dir()`, and
 // the crossing itself: the producer's answer converts here, once, so no reader downstream has to
 pub fn cwd() -> Result<String, String> {

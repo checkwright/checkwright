@@ -3,7 +3,7 @@
 # §check-portability-floor). One POSIX ERE per line; '#' comments and blank lines
 # ignored. The corpus it scans is GATE_SDK_PORTABILITY_PATHS in
 # scripts/gate-sdk-config.knobs — the files an adopter's machine actually executes.
-# Files named portability-patterns* are self-exempt from the scan.
+# The pattern files this gate resolves are self-exempt.
 #
 # A live site is marked '# portability-declared: <reason>' on that line or the one
 # above, and the reason names installer/SPEC.md §Requirements, where the dependency

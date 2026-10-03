@@ -6,4 +6,6 @@
 #       is the direction that only B can see: a REMOVAL, not an addition.
 #   C — the copy added `guard_log_fallthrough` and the DELEGATION_KIT_PAUSE_PCT
 #       knob with no `# copy-divergence:` marker naming either.
+# The template sits under vendor/delegation-kit, the kit root the case's knob file
+# names, a nesting a two-level template glob never reached.
 .

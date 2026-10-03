@@ -263,6 +263,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Emit(enforcement_map::emit, Grammar::Flags(&[])),
         &[
             "GATE_SDK_GATES_DIR",
+            "GATE_SDK_ENFORCEMENT_FILE",
             "GATE_SDK_ENFORCE_SCAN_DIR",
             "GATE_SDK_KIT_DIRS",
             "GATE_SDK_PRUNE_DIRS",

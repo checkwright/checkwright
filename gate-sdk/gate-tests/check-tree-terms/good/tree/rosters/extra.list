@@ -1,0 +1,2 @@
+# A roster the gate resolved, named by a path carrying no shipped prefix: it bans /home/bob/projects
+# and spells it, and is self-exempt because the gate was handed it.

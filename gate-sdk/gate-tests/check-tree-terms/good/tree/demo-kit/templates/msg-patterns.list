@@ -1,0 +1,2 @@
+# A kit's starter roster contains, by construction, what it bans: /home/bob/projects.
+# It sits under a declared kit root's templates/, so it is self-exempt by name and never read as content.

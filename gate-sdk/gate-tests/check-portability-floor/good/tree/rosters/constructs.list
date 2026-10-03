@@ -1,0 +1,6 @@
+# banned-construct fixture (POSIX ERE, one per line; '#' + blank ignored), named by a path
+# carrying no shipped prefix and sitting inside the corpus: self-exempt because the gate resolved it
+sort -V
+realpath [^|;]*--
+
+find [^|;]*-printf

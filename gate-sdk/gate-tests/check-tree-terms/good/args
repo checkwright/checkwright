@@ -1,2 +1,2 @@
-# <scan-root> <pattern-file>
-tree patterns.list
+# <scan-root> <pattern-file>...
+tree patterns.list tree/rosters/extra.list

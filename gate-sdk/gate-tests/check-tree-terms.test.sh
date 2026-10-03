@@ -109,6 +109,7 @@ got="$(grep -E '^tree/' <<<"$out")"
 want="$(printf '%s\n' \
     'tree/accounts.txt:1:' \
     'tree/leak.txt:1:' \
+    'tree/msg-patterns.old.list:1:' \
     'tree/multi.txt:1:' \
     'tree/multi.txt:3:' \
     'tree/multi.txt:4:' \

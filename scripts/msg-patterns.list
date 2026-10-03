@@ -1,8 +1,8 @@
 # msg-patterns.list — this repo's tracked generic banned-pattern list (gate-sdk
 # default template, gate-sdk/SPEC.md §check-commit-msg). One grep -E pattern per
 # line; '#' comments and blank lines ignored. Private repo/project/account terms
-# live in the gitignored msg-patterns.local.list, never here. Files named
-# msg-patterns* are self-exempt from check-tree-terms.
+# live in the gitignored msg-patterns.local.list, never here. The pattern files
+# this gate resolves are self-exempt.
 
 # Absolute home paths — leak the local filesystem layout into this public tree.
 /(home|Users)/[A-Za-z0-9._-]+

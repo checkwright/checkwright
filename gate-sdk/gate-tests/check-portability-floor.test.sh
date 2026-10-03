@@ -129,6 +129,7 @@ out="$( cd "$CASES/bad" \
 got="$(grep -E '^tree/' <<<"$out")"
 want="$(printf '%s\n' \
     'tree/empty-reason-verb:5:' \
+    'tree/portability-patterns.notes.list:1:' \
     'tree/too-far-verb:5:' \
     'tree/undeclared-verb:3:' \
     'tree/strings.ps1:2:' \

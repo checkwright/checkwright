@@ -51,16 +51,24 @@ fn graph_vocab(resolve: Resolve) -> Result<Value, String> {
     in_gates_dir(resolve, "graph-vocab.knobs")
 }
 
+// spec: gate-sdk/SPEC.md §check-tree-terms — the default roster's basename, which a kit's own
+// starter roster under `templates/` also carries
+pub const MSG_PATTERN_FILE: &str = "msg-patterns.list";
+
 fn msg_pattern_files(resolve: Resolve) -> Result<Value, String> {
-    in_gates_dir(resolve, "msg-patterns.list")
+    in_gates_dir(resolve, MSG_PATTERN_FILE)
 }
 
 fn msg_pattern_files_local(resolve: Resolve) -> Result<Value, String> {
     in_gates_dir(resolve, "msg-patterns.local.list")
 }
 
+// spec: gate-sdk/SPEC.md §check-portability-floor — the default roster's basename, which a kit's
+// own starter roster under `templates/` also carries
+pub const PORTABILITY_PATTERN_FILE: &str = "portability-patterns.list";
+
 fn portability_patterns(resolve: Resolve) -> Result<Value, String> {
-    in_gates_dir(resolve, "portability-patterns.list")
+    in_gates_dir(resolve, PORTABILITY_PATTERN_FILE)
 }
 
 // spec: gate-sdk/SPEC.md §check-exec-bit — the three kit globs, then the gates directory's own two
