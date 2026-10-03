@@ -12,6 +12,36 @@
 
 ## Deferred
 
+### audit-trigger-mirror-component
+
+[cost: iteration/low] [surface: lifecycle-kit]
+
+`check-stage-entry`'s assertion C reads a generated SPEC mirror (`docs/<kit>/SPEC.md`) as a roster dir, so a single-kit iteration whose amendments name their mirror as a regenerate target reaches two components on that token alone and is refused build entry without an align stamp or a waiver. lifecycle-kit/SPEC.md §check-stage-entry states the behaviour and prices it under C's honest limit, so the over-demand is designed, not a bug.
+
+**Deliverable:** a way for a consumer to declare a generated mirror as the projection of its source component, so the token resolves to the component it mirrors, specified in §check-stage-entry with a fixture over a mirror-naming single-kit amendment; or a ruling that the waiver stays the valve.
+
+**Cost while deferred:** an align dispatch or an operator waiver ask per single-kit iteration whose amendments name their mirror. Filed 2026-10-03 to the gap inbox at guard-kit-write-side-pass' build; promoted at its close: →fix fails because the mirror's resolution is a grammar decision the SPEC settles the other way, →forward because no recorded ruling is reversed. Re-verified: the SPEC's roster-dir paragraph names this exact case. Owner lookup: `mirror`, `assertion C`, `audit-trigger` in this file — none; owner lifecycle-kit/SPEC.md §check-stage-entry.
+
+### grant-slot-escaped-blank
+
+[cost: event/low] [surface: guard-kit]
+
+Rule `grant_path_slot` false-blocks a backslash-escaped blank inside a slot operand: `rm -rf .tmp/x\ y` under a `Bash(rm -rf .tmp/*)` grant blocks, naming `y` as a second operand outside the slot. The dequoted view (`native/src/guard/bash.rs`, `dequoted`) keeps `\ ` as a backslash and a blank rather than a held sentinel, so the shared word split cuts where the shell does not.
+
+**Deliverable:** guard-kit/SPEC.md §The reader and its views states how the dequoted view holds an escaped blank, the reader follows it, and a decision-table row pairs the escaped-blank slot operand with a real second operand.
+
+**Cost while deferred:** a false block on a rare spelling, in the safe direction. Filed 2026-10-03 to the gap inbox at guard-kit-write-side-pass' build (predates the iteration); promoted at its close: →fix fails because the dequoted view is shared by every rule declaring it, so the change is a reader contract with cross-rule reach; →forward because no ruling is owed. Re-verified: the hook blocks that command under this repo's grant. Owner lookup: `escaped`, `backslash`, `grant_path_slot` in this file — none; owner guard-kit/SPEC.md §The reader and its views.
+
+### guard-kit-violation-recipe
+
+[cost: once/low] [surface: guard-kit]
+
+guard-kit registers `check-door-binding` but ships no `smoke/violation.sh`, which gate-sdk/SPEC.md §Consumer smoke makes owed wherever a battery-reddening violation is craftable; the nine other kits each ship one.
+
+**Deliverable:** `guard-kit/smoke/violation.sh` planting a `check-door-binding` violation in the scratch consumer, run green by `--run-consumer-smoke`, and guard-kit/SPEC.md §Testing's smoke paragraph naming it.
+
+**Cost while deferred:** the consumer smoke never proves guard-kit's one gate reds a scratch consumer. Filed 2026-10-03 to the gap inbox at guard-kit-remainder-brevity's build; promoted at its close: →fix fails because a violation recipe is new mechanism; →forward because no ruling is owed. Re-verified: `ls */smoke/violation.sh` lists nine kits and not guard-kit. drift-kit/SPEC.md's stale *as guard-kit does* clause was fixed at the same close. Owner lookup: `violation.sh`, `violation recipe` in this file — none; owner guard-kit/SPEC.md §Testing.
+
 ### amendment-manifest-prose-span
 
 [cost: event/low] [surface: gate-sdk]

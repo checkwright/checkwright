@@ -239,11 +239,29 @@ pub fn rm_tracked_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<String>, Fault> {
         };
         for arg in paths {
             if ctx.host().tracked(&arg) {
-                return Ok(Some(format!("don't delete the git-tracked path '{a}' with a bare '{w}' — use 'git rm -q {a}': it removes the file and stages exactly that deletion in one motion, so no later 'git add -A' is needed to pick it up (which risks staging a concurrent session's foreign path). An '{w}' of an untracked or gitignored path is untouched. If you genuinely need {w}, run it yourself with !<command>.", a = arg, w = word)));
+                return Ok(Some(rm_steer(&arg, word, std::path::Path::new(&arg).is_dir())));
             }
         }
     }
     Ok(None)
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — rule `rm_tracked`'s steer; a directory takes `-r`,
+// without which `git rm` refuses it.
+fn rm_steer(arg: &str, word: &str, dir: bool) -> String {
+    let form = if dir { "git rm -q -r" } else { "git rm -q" };
+    format!("don't delete the git-tracked path '{a}' with a bare '{w}' — use '{f} {a}': it removes the path and stages exactly that deletion in one motion, so no later 'git add -A' is needed to pick it up (which risks staging a concurrent session's foreign path). An '{w}' of an untracked or gitignored path is untouched. If you genuinely need {w}, run it yourself with !<command>.", a = arg, w = word, f = form)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn the_rm_steer_carries_r_for_a_directory_only() {
+        assert!(rm_steer("kit", "rm", true).contains("use 'git rm -q -r kit'"));
+        assert!(rm_steer("a.md", "rm", false).contains("use 'git rm -q a.md'"));
+    }
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `rm_tracked`'s PowerShell deletion commands,

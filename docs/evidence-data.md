@@ -251,3 +251,4 @@
 | gate-sdk-value-pass | sc sp a b v c | 6f/0d | 3 · ≤0d | 21s clean | 148 |
 | companion-tier-delegation-pass | sc sp a b v c | 2f/1d | 1 · ≤0d | 21s clean | 148 |
 | consumer-smoke-driver-pass | sc sp a b v c | 12f/0d | 4 · ≤1d | 21s clean | 149 |
+| guard-kit-write-side-pass | sc sp a b v c | 6f/1d | 3 · ≤0d | 21s clean | 149 |
