@@ -486,7 +486,7 @@ fn loop_span(s: &str) -> Option<Vec<(i32, bool, String)>> {
 // spec: guard-kit/SPEC.md §The generic ruleset — the words one segment keeps once its redirects are
 // dropped: `Err(1)` when none remain, `Err(2)` when the views cannot be aligned or a heredoc opens.
 fn unredirected_words(skel: &str, deq: &str) -> Result<String, u8> {
-    let sw = words(skel);
+    let sw = text::held_words(skel);
     let dw = words(deq);
     if sw.len() != dw.len() {
         return Err(2);
@@ -601,6 +601,7 @@ mod tests {
         assert_eq!(unredirected_words("grep x f > out", "grep x f > out"), Ok("grep x f".to_string()));
         assert_eq!(unredirected_words("> out", "> out"), Err(1));
         assert_eq!(unredirected_words("cat <<EOF", "cat <<EOF"), Err(2));
+        assert_eq!(unredirected_words("rm .tmp/a\\ b > o", "rm .tmp/a\\\x01b > o"), Ok("rm .tmp/a\\\x01b".to_string()));
         assert!(shell_backgrounds("make &"));
         assert!(!shell_backgrounds("a && b 2>&1"));
     }

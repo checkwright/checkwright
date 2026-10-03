@@ -259,11 +259,11 @@ fn redirect_op(w: &str) -> Result<Option<(usize, Redir)>, ()> {
 // spec: guard-kit/SPEC.md §The generic ruleset — one segment read as rule `grant_path_slot` reads
 // it: its command words and its output redirect targets, dequoted with backslashes removed.
 fn write_words(sw: &str, dw: &str) -> Option<(Vec<String>, Vec<String>)> {
-    let (s, d) = (words(sw), words(dw));
+    let (s, d) = (text::held_words(sw), words(dw));
     if s.len() != d.len() {
         return None;
     }
-    let clean = |w: &str| unsentinel(w).replace('\\', "");
+    let clean = |w: &str| unsentinel(&w.replace('\\', ""));
     let (mut cmd, mut out) = (Vec::new(), Vec::new());
     let mut k = 0usize;
     while k < s.len() {
@@ -856,6 +856,10 @@ mod tests {
         assert_eq!(write_words("cat <<EOF", "cat <<EOF"), None);
         let (_, o) = write_words("ls &>>.tmp/a", "ls &>>.tmp/a").unwrap();
         assert_eq!(o, strings(&[".tmp/a"]));
+        let (w, o) = write_words("touch .tmp/a\\ b", "touch .tmp/a\\\x01b").unwrap();
+        assert_eq!((w, o), (strings(&["touch", ".tmp/a b"]), vec![]));
+        let (_, o) = write_words("ls > .tmp/a\\ b", "ls > .tmp/a\\\x01b").unwrap();
+        assert_eq!(o, strings(&[".tmp/a b"]));
     }
 
     // spec: guard-kit/SPEC.md §The generic ruleset — the operand grammar's option walk

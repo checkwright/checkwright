@@ -86,6 +86,30 @@ pub fn words(s: &str) -> Vec<&str> {
     line.split([' ', '\t']).filter(|w| !w.is_empty()).collect()
 }
 
+// spec: guard-kit/SPEC.md §The reader and its views — `words` over a skeleton, a word ending in an
+// odd backslash run joined to what follows its escaped blank, so it pairs with the dequoted view.
+pub fn held_words(s: &str) -> Vec<&str> {
+    let line = s.split('\n').next().unwrap_or("").as_bytes();
+    let mut out = Vec::new();
+    let (mut i, mut start) = (0usize, None);
+    while i < line.len() {
+        let c = line[i];
+        if c == b' ' || c == b'\t' {
+            if let Some(st) = start.take() {
+                out.push(&s[st..i]);
+            }
+            i += 1;
+            continue;
+        }
+        start.get_or_insert(i);
+        i += if c == b'\\' { 2 } else { 1 };
+    }
+    if let Some(st) = start {
+        out.push(&s[st..line.len()]);
+    }
+    out
+}
+
 // spec: guard-kit/SPEC.md §The generic ruleset — an unquoted `for w in $s`: every line split on
 // blanks, glob expansion aside.
 pub fn all_words(s: &str) -> Vec<&str> {
@@ -126,5 +150,15 @@ mod tests {
         assert_eq!(head_word("git\tlog"), "git");
         assert_eq!(chomp("a\n\n"), "a");
         assert_eq!(trim("  a b \n"), "a b");
+    }
+
+    #[test]
+    fn a_skeleton_word_holds_its_escaped_blank() {
+        assert_eq!(held_words("a\\ b c"), vec!["a\\ b", "c"]);
+        assert_eq!(held_words("a\\\\ b"), vec!["a\\\\", "b"]);
+        assert_eq!(held_words("a\\ "), vec!["a\\ "]);
+        assert_eq!(held_words("a\\\nb"), vec!["a\\"]);
+        assert_eq!(held_words("a\\  b"), vec!["a\\ ", "b"]);
+        assert_eq!(held_words("a\\\tb"), vec!["a\\\tb"]);
     }
 }

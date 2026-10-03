@@ -18,16 +18,6 @@
 
 **Cost while deferred:** a false red at amendment authoring for prose that names a manifest key. Filed 2026-10-02 to the gap inbox at consumer-smoke-driver-pass' spec; promoted at its close: →fix fails because which spans count is a grammar decision the SPEC does not settle, →forward because no ruling is owed. Re-verified: an untracked root `SPEC-zzprobe.md` carrying the mid-sentence span turns `check-graph` red on four AMEND-MANIFEST lines. Owner lookup: `# graph:`, `mid-line`, `amendment manifest`, `assertion G` in this file — none; owner gate-sdk/SPEC.md §check-graph.
 
-### grant-slot-escaped-blank
-
-[spec: SPEC-escaped-blank.md]
-
-Rule `grant_path_slot` false-blocks a backslash-escaped blank inside a slot operand: `rm -rf .tmp/x\ y` under a `Bash(rm -rf .tmp/*)` grant blocks, naming `y` as a second operand outside the slot. The dequoted view (`native/src/guard/bash.rs`, `dequoted`) keeps `\ ` as a backslash and a blank rather than a held sentinel, so the shared word split cuts where the shell does not.
-
-**Deliverable:** guard-kit/SPEC.md §The reader and its views states how the dequoted view holds an escaped blank, the reader follows it, and a decision-table row pairs the escaped-blank slot operand with a real second operand.
-
-**Cost while deferred:** a false block on a rare spelling, in the safe direction. Filed 2026-10-03 to the gap inbox at guard-kit-write-side-pass' build (predates the iteration); promoted at its close: →fix fails because the dequoted view is shared by every rule declaring it, so the change is a reader contract with cross-rule reach; →forward because no ruling is owed. Re-verified: the hook blocks that command under this repo's grant. Owner lookup: `escaped`, `backslash`, `grant_path_slot` in this file — none; owner guard-kit/SPEC.md §The reader and its views.
-
 ### criterion-five-omit-stale
 
 [spec: SPEC-criterion-five.md]
@@ -69,7 +59,7 @@ four kept gate-sdk gates assume this repo's layout, found at gate-sdk-value-pass
 
 guard-kit/SPEC.md's §The generic ruleset (its preamble, §The rule roster and §Writing a consumer rule), under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement), about 22.5k of the file's 48.7k words by `wc -w` at this scope, the rule roster 21.0k of it; the last guard-kit section the moves have not passed.
 
-**Deliverable:** the three moves over that section under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading and rule name kept verbatim and every fact another surface cites into it kept, per a citation survey. Applied last, after [grant-slot-escaped-blank](#grant-slot-escaped-blank), whose rule `grant_path_slot` the roster cites at six sites.
+**Deliverable:** the three moves over that section under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading and rule name kept verbatim and every fact another surface cites into it kept, per a citation survey. Applied last, after `grant-slot-escaped-blank`, whose rule `grant_path_slot` the roster cites at six sites.
 
 **Cost while deferred:** paid by every session and adopter that reads the rule roster. Filed 2026-10-03 as a split at guard-ruleset-gate-neutrality-pass' scope. Part of the operator's selection of the unit set, direction 2026-10-03, lead-relayed (not a ruling).
 
@@ -1296,4 +1286,5 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 ## Done
 
 - guard-kit-violation-recipe
+- grant-slot-escaped-blank
 

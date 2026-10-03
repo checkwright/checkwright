@@ -547,9 +547,8 @@ fn scan(cmd: &str, w: Wants) -> Scanned {
     (String::from_utf8_lossy(&out).into_owned(), extents, bodies)
 }
 
-// spec: guard-kit/SPEC.md §The generic ruleset — the dequoted view, walked in lockstep with the
-// `sq dq hd` skeleton, a quoted span's blanks and separators held as sentinels; `None` where the two
-// cannot be aligned.
+// spec: guard-kit/SPEC.md §The reader and its views — the dequoted view; `None` where it and the
+// skeleton cannot be aligned.
 pub fn dequoted(raw: &str) -> Option<String> {
     let skel = skeleton(raw, Wants { sq: true, dq: true, hd: true, hdq: false });
     let s = text::chomp(&skel).as_bytes();
@@ -574,7 +573,12 @@ pub fn dequoted(raw: &str) -> Option<String> {
             if at(s, i, 2) != at(r, j, 2) {
                 return None;
             }
-            out.extend_from_slice(&at(r, j, 2));
+            out.push(b'\\');
+            out.extend(at(r, j + 1, 1).into_iter().map(|b| match b {
+                b' ' => 0x01,
+                b'\t' => 0x02,
+                o => o,
+            }));
             i += 2;
             j += 2;
             continue;
@@ -793,13 +797,16 @@ mod tests {
         );
     }
 
-    // spec: guard-kit/SPEC.md §The generic ruleset — the dequoted view keeps content, drops quote
-    // characters, holds a quoted span's separators as sentinels, and refuses what it cannot align
+    // spec: guard-kit/SPEC.md §The reader and its views — the dequoted view
     #[test]
     fn the_dequoted_view_aligns_with_the_skeleton_or_refuses() {
         assert_eq!(dequoted("grep 'a b' f").as_deref(), Some("grep a\x01b f"));
         assert_eq!(dequoted("echo \"x;y\" | wc").as_deref(), Some("echo x\x03y | wc"));
-        assert_eq!(dequoted("echo a\\ b").as_deref(), Some("echo a\\ b"));
+        assert_eq!(dequoted("rm x\\ y").as_deref(), Some("rm x\\\x01y"));
+        assert_eq!(dequoted("rm x\\\\ y").as_deref(), Some("rm x\\\\ y"));
+        assert_eq!(dequoted("rm x\\\ty").as_deref(), Some("rm x\\\x02y"));
+        assert_eq!(dequoted("rm 'x\\ y'").as_deref(), Some("rm x\\\x01y"));
+        assert_eq!(dequoted("echo a\\;b").as_deref(), Some("echo a\\;b"));
         assert_eq!(dequoted("echo 'open"), None);
         assert_eq!(dequoted("cat <<EOF\nx\nEOF"), None);
         assert_eq!(dequoted("echo 'a\nb'"), None);
