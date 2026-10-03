@@ -48,6 +48,21 @@ gate-sdk/SPEC.md's criterion 5 still prices a port against an omit-and-declare i
 
 **Cost while deferred:** a porting session reads an instrument that no longer exists and a price the install model no longer charges. Filed 2026-10-03 to the gap inbox at consumer-smoke-driver-pass' build; promoted at its close: →fix fails because the stale reach spans a dozen paragraphs and what criterion 5 prices now is a design call, →forward because no ruling is reversed (the installer's own SPEC already retired the outcome). Re-verified: the binary-less leg asserts the refusal (installer/SPEC.md §The consumer smoke, *artifact-less refusal leg*), and `native/src/emit/installer_smoke/profiles.rs` fails any install carrying an omission record. Owner lookup: `criterion 5`, `omission`, `binary-less`, `accept and declare`, `residual`, `artifact-free`, `uncovered` in this file — none; owner gate-sdk/SPEC.md §Porting a gate to the binary substrate.
 
+### gate-sdk-layout-assumptions
+
+[spec: SPEC-layout-neutral.md]
+
+four kept gate-sdk gates assume this repo's layout, found at gate-sdk-value-pass' gate audit:
+
+- `check-gate-substrate-parity` defaults its conservation doc to `<GATE_SDK_ROOT>/SPEC.md`, which the payload withholds, so a bare run in an installed tree exits 2. The consumer smoke vendors by copy and masks it.
+- `check-template-copy-parity` globs `<root>/*/templates/*.sh` rather than joining the kit roots, so under a subdirectory vendoring its corpus empties and it reads clean.
+- `check-tree-terms` and `check-portability-floor` exempt their own pattern files by the shipped basename prefix, so a consumer whose pattern-file knob names another file reds on its own roster.
+- `--emit enforcement-map` links each kit to `<kit>/index.md`, this site's docs layout, so an adopter's page ships one dead link per kit.
+
+**Deliverable:** each gate made layout-neutral, with a fixture per change and gate-sdk/SPEC.md's gate sections updated, and a release declaration for each verdict change.
+
+**Cost while deferred:** an adopter registering the parity gate meets a refusal it cannot discharge; a nested vendoring drifts template copies unchecked; a renamed pattern file reds; the enforcement page ships dead links. Filed 2026-10-02 to the gap inbox as four bullets at gate-sdk-value-pass' build; promoted at its close as one entry: →fix fails because each changes a shipped gate's verdict, →forward because no ruling is owed. Re-verified at gate_substrate_parity.rs's default and `GATE_SDK_PAYLOAD_WITHHOLD`, template_copy_parity.rs's glob, both `SELF_EXEMPT_PREFIX` constants and enforcement_map.rs's `kit_cell`. Owner lookup: `layout`, `kit roots`, `enforcement-map` in this file — [footprint-arm-publisher-page](#footprint-arm-publisher-page), DISTINCT (another emitter's page); owner gate-sdk/SPEC.md, each gate's section.
+
 ## Technical Debt
 
 ### guard-kit-ruleset-brevity
@@ -615,21 +630,6 @@ the binary still names or spawns the bash front end where an adopter meets it: t
 **Deliverable:** each site respelled to the binary door, the knob default's working-directory change (the front end changes to the toplevel, the binary does not) settled in evidence-kit/SPEC.md, and the door roots widened to native/src.
 
 **Cost while deferred:** an adopter reading `--help` or the demo meets a command their install may not carry. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' build; promoted at its close: →fix fails because the knob default is a behaviour change across two front ends, →forward because no ruling is owed. Re-verified: grep finds all four sites. `hook-emit-remedy-door` scoped its fix to the hook and emit trees; this is DISTINCT, not a recurrence. Owner lookup: `run-gates.sh`, `DOOR_ROOTS` in this file — none; owner guard-kit/SPEC.md §check-door-binding, with gate-sdk/SPEC.md §run-gates.
-
-### gate-sdk-layout-assumptions
-
-[cost: event/low] [surface: gate-sdk]
-
-four kept gate-sdk gates assume this repo's layout, found at gate-sdk-value-pass' gate audit:
-
-- `check-gate-substrate-parity` defaults its conservation doc to `<GATE_SDK_ROOT>/SPEC.md`, which the payload withholds, so a bare run in an installed tree exits 2. The consumer smoke vendors by copy and masks it.
-- `check-template-copy-parity` globs `<root>/*/templates/*.sh` rather than joining the kit roots, so under a subdirectory vendoring its corpus empties and it reads clean.
-- `check-tree-terms` and `check-portability-floor` exempt their own pattern files by the shipped basename prefix, so a consumer whose pattern-file knob names another file reds on its own roster.
-- `--emit enforcement-map` links each kit to `<kit>/index.md`, this site's docs layout, so an adopter's page ships one dead link per kit.
-
-**Deliverable:** each gate made layout-neutral, with a fixture per change and gate-sdk/SPEC.md's gate sections updated, and a release declaration for each verdict change.
-
-**Cost while deferred:** an adopter registering the parity gate meets a refusal it cannot discharge; a nested vendoring drifts template copies unchecked; a renamed pattern file reds; the enforcement page ships dead links. Filed 2026-10-02 to the gap inbox as four bullets at gate-sdk-value-pass' build; promoted at its close as one entry: →fix fails because each changes a shipped gate's verdict, →forward because no ruling is owed. Re-verified at gate_substrate_parity.rs's default and `GATE_SDK_PAYLOAD_WITHHOLD`, template_copy_parity.rs's glob, both `SELF_EXEMPT_PREFIX` constants and enforcement_map.rs's `kit_cell`. Owner lookup: `layout`, `kit roots`, `enforcement-map` in this file — [footprint-arm-publisher-page](#footprint-arm-publisher-page), DISTINCT (another emitter's page); owner gate-sdk/SPEC.md, each gate's section.
 
 ## Icebox
 
