@@ -156,7 +156,8 @@ fn valid_glob_token(tok: &str) -> bool {
 }
 
 // spec: gate-sdk/SPEC.md §check-graph (assertion G) — the `# graph:` manifests in an amendment
-// body: a fence's own line except under `proto`, and every inline span outside a fence
+// body: a fence's own line except under `proto`, and an inline span outside a fence whose first
+// word is a valued `<key>=<value>`
 fn extract_amend_manifests(text: &str) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     let mut infence = false;
@@ -190,7 +191,10 @@ fn extract_amend_manifests(text: &str) -> Vec<String> {
             rest = &rest[at + "`# graph: ".len()..];
             match rest.find('`') {
                 Some(end) => {
-                    out.push(rest[..end].to_string());
+                    let span = &rest[..end];
+                    if valued_first_word(span) {
+                        out.push(span.to_string());
+                    }
                     rest = &rest[end + 1..];
                 }
                 None => break,
@@ -198,6 +202,13 @@ fn extract_amend_manifests(text: &str) -> Vec<String> {
         }
     }
     out
+}
+
+fn valued_first_word(span: &str) -> bool {
+    matches!(
+        span.split_whitespace().next().and_then(|w| w.split_once('=')),
+        Some((k, v)) if !k.is_empty() && !v.is_empty()
+    )
 }
 
 fn validate_amend_manifest(file: &str, span: &str, errors: &mut Vec<String>) {
@@ -868,5 +879,28 @@ mod tests {
         assert_eq!(got.len(), 2);
         assert!(got[0].starts_with("couples=y"));
         assert!(got[1].starts_with("couples=z"));
+    }
+
+    // spec: gate-sdk/SPEC.md §check-graph (Which amendment-body spans are manifests)
+    #[test]
+    fn the_amendment_extractor_keeps_an_inline_span_only_with_a_valued_first_word() {
+        let cases: &[(&str, &[&str])] = &[
+            ("names `# graph: couples=` mid-sentence\n", &[]),
+            ("the `# graph: dir= key` sets the tier\n", &[]),
+            ("the `# graph: header` opens a span\n", &[]),
+            (
+                "it carries `# graph: couples=a/*.md dir=one valve=none tier=precommit` today\n",
+                &["couples=a/*.md dir=one valve=none tier=precommit"],
+            ),
+            ("as `# graph: mode=partial bogus=1` shows\n", &["mode=partial bogus=1"]),
+            (
+                "`# graph: couples=` then `# graph: tier=precommit dir=one`\n",
+                &["tier=precommit dir=one"],
+            ),
+            ("```bash\n# graph: couples= dir=one\n```\n", &["couples= dir=one"]),
+        ];
+        for (text, want) in cases {
+            assert_eq!(extract_amend_manifests(text), *want, "{text}");
+        }
     }
 }

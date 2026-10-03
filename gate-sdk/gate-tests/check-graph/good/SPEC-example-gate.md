@@ -33,7 +33,9 @@ assertion G returns without a finding:
 ```
 
 A prose mention of the `# graph:` concept, with `couples=` named separately, is
-not a manifest and must not be extracted at all.
+not a manifest and must not be extracted at all. Nor is a span opening with the
+header whose first word is a bare key, so a sentence may name `# graph: couples=`
+and `# graph: dir= one or bi` mid-sentence without meeting the required keys.
 
 ```proto
 // A `# graph: couples=bogus dir=mono` line inside a proto fence is illustrative

@@ -8,16 +8,6 @@
 
 ## New Features
 
-### amendment-manifest-prose-span
-
-[spec: SPEC-manifest-span.md]
-
-`check-graph`'s amendment-manifest reader (`native/src/gates/graph.rs`, the inline-span loop beside `validate_amend_manifest`) takes every backticked span opening `# graph: ` on any `SPEC-*.md` line as a manifest, so a prose sentence naming a manifest key mid-paragraph reds assertion G for missing `dir=`/`valve=`/`tier=` and an empty `couples=`. An amendment author must rephrase around the token.
-
-**Deliverable:** gate-sdk/SPEC.md §check-graph states which spans are manifests, so a mid-sentence mention is told apart from an embedded manifest, and the reader follows it, with a bad/good fixture pair over a mid-sentence mention.
-
-**Cost while deferred:** a false red at amendment authoring for prose that names a manifest key. Filed 2026-10-02 to the gap inbox at consumer-smoke-driver-pass' spec; promoted at its close: →fix fails because which spans count is a grammar decision the SPEC does not settle, →forward because no ruling is owed. Re-verified: an untracked root `SPEC-zzprobe.md` carrying the mid-sentence span turns `check-graph` red on four AMEND-MANIFEST lines. Owner lookup: `# graph:`, `mid-line`, `amendment manifest`, `assertion G` in this file — none; owner gate-sdk/SPEC.md §check-graph.
-
 ### criterion-five-omit-stale
 
 [spec: SPEC-criterion-five.md]
@@ -1280,4 +1270,5 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 - guard-kit-violation-recipe
 - grant-slot-escaped-blank
 - guard-kit-ruleset-brevity
+- amendment-manifest-prose-span
 

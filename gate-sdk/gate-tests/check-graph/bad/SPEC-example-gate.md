@@ -12,6 +12,7 @@ until build re-typed the manifest into a real gate.
 - [ ] `check-example-gate.sh` carries the legacy tokens
       (`# graph: couples=gate-tests,check-*.sh dir=mono valve=no-fixture tier=precommit`);
       registered in `gates.list`.
+- [ ] `check-nightly-gate.sh` declares `# graph: couples=docs/nightly.md dir=one valve=none tier=nightly` mid-sentence, a valued first key, so it is read and its tier reds.
 
 The remaining five are fenced, so the fenced extraction path reds as well as the
 inline one; the third names a knob whose row is a word list, the fourth roots
