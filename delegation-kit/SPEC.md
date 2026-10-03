@@ -781,9 +781,9 @@ It is an `Arm::Run` row that spawns a consumer's program which may reach the net
 
 ### Resuming a session
 
-`bash gate-sdk/bin/run-gates.sh --foreign-resume <key> <prompt-file>` runs the next turn of the session under `<GATE_SDK_TMP_DIR>/foreign/<key>/`. It reads `session.txt`, spawns the adapter's resume form from `DELEGATION_KIT_FOREIGN_RESUME` exactly as step 2 spawns an open, in the kept clone with the prompt file on standard input, and bounds it by `DELEGATION_KIT_FOREIGN_TIMEOUT`. Before the spawn, the previous turn's `report.txt` and `stderr.txt` move to `report.<n>.txt` and `stderr.<n>.txt`, `<n>` the turn they came from, so every turn's return survives. A new `--foreign-run` under a free key clears the rotated reports a closed session left.
+`bash gate-sdk/bin/run-gates.sh --foreign-resume <key> <prompt-file>` runs the next turn of the session under `<GATE_SDK_TMP_DIR>/foreign/<key>/`. It reads `session.txt`, spawns the adapter's resume form from `DELEGATION_KIT_FOREIGN_RESUME` as **The spawn** does an open, in the kept clone with the prompt file on standard input, and bounds it by `DELEGATION_KIT_FOREIGN_TIMEOUT`. Before the spawn, the previous turn's `report.txt` and `stderr.txt` move to `report.<n>.txt` and `stderr.<n>.txt`, `<n>` the turn they came from, so every turn's return survives. A new `--foreign-run` under a free key clears the rotated reports a closed session left.
 
-The shape check is step 3's, run against `refs.txt` from the open and, in `sweep` mode, regenerating `change.patch` against the session's `base`, so the patch is always the session's whole change. Then:
+**The shape** check runs against `refs.txt` from the open and, in `sweep` mode, regenerates `change.patch` against the session's `base`, so the patch is always the session's whole change. Then:
 
 - **`OK`** — the turn counter advances, and the line carries the resumable clause again.
 - **`REFUSED`** — the session ends. `session.txt` is removed, so nothing can resume it, and the clone stays as a refusal's evidence.
