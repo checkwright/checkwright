@@ -41,6 +41,12 @@ The extractor's unit test gains rows: a bare first key (dropped), a bare key the
 
 `docs/gate-sdk/SPEC.md` is regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write` in the commit landing delta 1.
 
+### (5) The release declaration {mechanical}
+
+`.workflow/release-declarations.md`, under Behavior changes, in the commit landing delta 2. **Not yet applied.**
+
+> - **gate-sdk `check-graph`, assertion G** — an inline span in a `SPEC-*.md` amendment is read as a manifest only when its first word after the manifest header is a `<key>=<value>` pair with a value, so a sentence naming a bare key no longer reds for the four required keys. Nothing to do; an inline manifest meant to be held leads with a valued key.
+
 ## Producers and consumers
 
 - **The kept and dropped spans.** Producer: an amendment author writing a `SPEC-*.md` anywhere under the scan root, read by `amendment_findings` over the shared pruned walk. Enabling configuration: `check-graph` is a `gates.list` member here and in every consumer taking gate-sdk's registry; assertion G runs in the whole-tree arm and in `--amend-only` alike. Consumer: `validate_amend_manifest`, by direct call. No field, state or knob is added.
@@ -55,6 +61,7 @@ Roster by `grep -n "amendment body\|amendment manifest\|embedded in a" gate-sdk/
 - `native/src/gates/graph.rs` — `extract_amend_manifests` and its unit test (delta 2).
 - `gate-sdk/gate-tests/check-graph/good/SPEC-example-gate.md`, `gate-sdk/gate-tests/check-graph/bad/SPEC-example-gate.md` and `bad/expect.txt` (delta 3).
 - `docs/gate-sdk/SPEC.md` — the regenerated mirror (delta 4).
+- `.workflow/release-declarations.md` — one Behavior changes bullet (delta 5).
 
 ## Retired spellings
 

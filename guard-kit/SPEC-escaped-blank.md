@@ -55,6 +55,12 @@ In §The generic ruleset's rule roster, two sentences gain the escaped blank: ru
 
 `docs/guard-kit/SPEC.md` is regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write` in the commit landing delta 4.
 
+### (6) The release declaration {mechanical}
+
+`.workflow/release-declarations.md`, under Behavior changes, in the commit landing delta 1. **Not yet applied.**
+
+> - **guard-kit shell guard, the bash reader's dequoted view** — a blank or tab after an odd run of backslashes stays inside its word, as the shell reads it, so a slot operand spelled `x\ y` is one operand and rule `grant_path_slot` no longer blocks it, rule `bounded_write` grants a bounded target so spelled, and rule `commit_only_paths` reads `git commit -m fix\ it` as a pathless commit. Nothing to do.
+
 ## Producers and consumers
 
 - **The held escaped blank.** Producer: `dequoted`, on every bash command whose view a rule declares. Enabling configuration: none, since the reader runs wherever the shell-guard member is wired (this repo's `.claude/settings.json`, and every adopter merging guard-kit's settings template). Consumers: the readers delta 1 lists, each through the engine's context. Red condition per reader (point 5): one comparing a word to text now meets `0x01` inside a word where it met two words; each either restores sentinels before comparing (`unsentinel`, or the sentinel replacement in `slot_segment` and `slot_capture`) or tests only a word's head or flag shape, which a held blank inside a word cannot forge.
@@ -70,6 +76,7 @@ Roster by `grep -rn "dequoted(" native/src/guard`, `grep -rn "words(" native/src
 - `guard-kit/guard-tests/cases.tsv` — rules `bounded_write`'s, `grant_path_slot`'s and `commit_only_paths`'s sections (delta 3).
 - `guard-kit/SPEC.md` — §The reader and its views, and rules `sed_file`'s and `grant_path_slot`'s roster sentences (delta 4).
 - `docs/guard-kit/SPEC.md` — the regenerated mirror (delta 5).
+- `.workflow/release-declarations.md` — one Behavior changes bullet (delta 6).
 
 ## Retired spellings
 
