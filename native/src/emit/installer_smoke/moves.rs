@@ -514,10 +514,11 @@ pub(super) fn selection(state: &mut Run) -> Step {
     commit_all(&sc, "chore: keep the registry", "selection arm: committing the edited registry failed")?;
     let retire = format!("retire: {}", gate);
     let o = init_ok(state, &sc, &["init", "--no-selection"], "selection arm: a kept --no-selection run failed")?;
-    if !o.contains(&retire) {
+    let named = format!("{} — init's registry no longer starts it (# install: on-surface)", retire);
+    if !o.lines().any(|l| l.trim() == named) {
         return Err(fail(format!(
             "selection arm: a kept registry still registering {} after --no-selection printed no '{}' line",
-            gate, retire
+            gate, named
         )));
     }
     if !std::fs::read_to_string(&list).unwrap_or_default().lines().any(|l| l == gate) {
