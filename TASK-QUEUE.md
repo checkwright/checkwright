@@ -8,20 +8,6 @@
 
 ## New Features
 
-### bash-reader-escaped-pipe
-
-[spec: SPEC-escaped-pipe.md]
-
-guard-kit's bash reader still cuts its compound, statement and pipe splits at an escaped `|` (native/src/guard/bash.rs pins `a \| b` as two segments) and, per its filer, at a backslash before a newline. An extra segment only withholds a grant, so the split errs conservative.
-
-**Deliverable:** the harness matcher's reading of both measured, then the splits matched to it with decision-table rows, as the escaped `;` was.
-
-Measured at spec: the harness's matcher splits at neither shape, and at both after an even backslash run (the amendment records the probe). Re-verified 2026-10-03 at scope: the reader cuts at a backslash-newline too, since `escaped()` in native/src/guard/bash.rs exempts the `;` separator alone.
-
-**Selected 2026-10-03 for guard-kit-write-side-pass, operator direction lead-relayed (not a ruling):** a feature, the spec stage's to author and promote; first in order, since [compound-read-classifier-reach](#compound-read-classifier-reach) reads its splits; its need the closing push alone.
-
-**Cost while deferred:** a call carrying either shape may cost a permission decision a grant would have taken. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' build; promoted at its close: →fix fails because the target behaviour is unmeasured, →forward because no ruling is owed. `bash-reader-escaped-separator` fixed the escaped `;` alone; DISTINCT, not a recurrence. Owner lookup: `escaped`, `backslash` in this file — none live; owner guard-kit/SPEC.md §The reader and its views.
-
 ### compound-read-classifier-reach
 
 [spec: SPEC-compound-read.md]
@@ -32,7 +18,7 @@ a read-shaped compound or redirected call still falls to the classifier. `side-e
 
 **Cost while deferred:** the classifier keeps deciding most read-shaped calls, with its occasional false positives. Filed 2026-09-30 to the gap inbox by guard-kit-steering's lead; promoted at its close: →fix fails because widening a grant is new mechanism, →forward because the direction is given. Owner lookup: `ro_pipeline`, `compound`, `redirect` in this file — [write-side-steering](#write-side-steering), overlapping on the redirect only; owner guard-kit/SPEC.md §The rule roster, rule `ro_pipeline`.
 
-**Selected 2026-10-03 for guard-kit-write-side-pass, operator direction lead-relayed (not a ruling):** a feature, the spec stage's to author and promote; third in order, after [bash-reader-escaped-pipe](#bash-reader-escaped-pipe), whose splits it reads, and [write-side-steering](#write-side-steering); its need the closing push alone.
+**Selected 2026-10-03 for guard-kit-write-side-pass, operator direction lead-relayed (not a ruling):** a feature, the spec stage's to author and promote; third in order, after `bash-reader-escaped-pipe`, whose splits it reads, and [write-side-steering](#write-side-steering); its need the closing push alone.
 
 ### write-side-steering
 
@@ -44,7 +30,7 @@ a shell write that falls through the guard (a `tee` to a file, `find -delete`, a
 
 **Cost while deferred:** write-shaped calls keep costing classifier decisions and false-positive stalls. Filed 2026-09-30 to the gap inbox by guard-kit-steering's lead on an operator question; promoted at its close: →fix fails because each rung is new mechanism, →forward because no ruling is owed. Re-verified: no queue entry names write arms. DISTINCT from `side-effect-free-read-arms`, done, which covered reads. Owner lookup: `write-side`, `bounded write`, `tee` in this file — only [manual-operation-spend-channel](#manual-operation-spend-channel), DISTINCT (a spend meter), and the icebox's interpreter-grant-redirect-residue, DISTINCT (an interpreter grant's redirected shapes); owner guard-kit/SPEC.md §The rule roster.
 
-**Selected 2026-10-03 for guard-kit-write-side-pass, operator direction lead-relayed (not a ruling):** a feature, the spec stage's to author and promote; second in order, after [bash-reader-escaped-pipe](#bash-reader-escaped-pipe), and ahead of [compound-read-classifier-reach](#compound-read-classifier-reach), whose redirect half rides its bounds test.
+**Selected 2026-10-03 for guard-kit-write-side-pass, operator direction lead-relayed (not a ruling):** a feature, the spec stage's to author and promote; second in order, after `bash-reader-escaped-pipe`, and ahead of [compound-read-classifier-reach](#compound-read-classifier-reach), whose redirect half rides its bounds test.
 
 **Push need (2026-10-03, inside the budget):** the closing push alone, 1 against a budget of one to two. The spec stage found that the bounds test reads relative path words only and composes no root, so nothing passes through the path-dialect layer (the amendment's delta 1).
 
@@ -56,7 +42,7 @@ a shell write that falls through the guard (a `tee` to a file, `find -delete`, a
 
 guard-kit/SPEC.md's preamble, §Layout and configuration, §Testing and §Out of scope, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement), about 8.9k of the file's 48.1k words by `wc -w` at this scope; §The generic ruleset stays on the parent until the rule entries that rewrite it land.
 
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. Applied last, after [bash-reader-escaped-pipe](#bash-reader-escaped-pipe), [write-side-steering](#write-side-steering) and [compound-read-classifier-reach](#compound-read-classifier-reach) merge, since their decision-table cases may edit §Testing.
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. Applied last, after `bash-reader-escaped-pipe`, [write-side-steering](#write-side-steering) and [compound-read-classifier-reach](#compound-read-classifier-reach) merge, since their decision-table cases may edit §Testing.
 
 **Cost while deferred:** paid by every session and adopter that reads an unpassed guard-kit section. Filed 2026-10-03 as a split at guard-kit-write-side-pass' scope. Part of the operator's selection of the unit set, direction 2026-10-03, lead-relayed (not a ruling).
 
@@ -1316,4 +1302,6 @@ Whether a live queue entry should cite shipped mechanism by a stable anchor (a S
 A balanced Liquid token a docs page means literally parses and renders blank, and neither check-docs-liquid-parse nor check-docs-render-fidelity sees the loss; no live page carries it, and the fix is a render-side assertion or a token scan outside raw blocks (site-kit/SPEC.md §check-docs-liquid-parse).
 
 ## Done
+
+- bash-reader-escaped-pipe
 

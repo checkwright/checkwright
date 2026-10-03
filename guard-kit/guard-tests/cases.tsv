@@ -301,6 +301,10 @@ block	cat > tracked.md <<'EOF'@NL@line@NL@EOF
 # append-only split protects, and neither is a path git check-ignore can answer
 allow	printf 'x@NL@' >> .tmp/journal.md 2>/dev/null
 allow	cat >> .tmp/journal.md 2>&1
+# a continued line is one statement, as the shell reads it; a continued heredoc opener puts what
+# follows on the command line, ahead of the body, and the residue test refuses it
+allow	printf x \@NL@>> .tmp/j.md
+fallthrough	cat >> .tmp/j.md <<'EOF' \@NL@; touch x@NL@EOF
 
 # rule `ro_pipeline` — read-only pipeline auto-allow; a non-roster segment falls through
 allow	grep -rn foo src | head
@@ -310,6 +314,15 @@ fallthrough	grep foo file | md5sum
 # in the skeleton and declines; an even backslash run is a real break besides
 fallthrough	grep foo a\;b
 fallthrough	grep foo a\\;b
+# an escaped '|' and a backslash-newline are no break either, so each call below is one read; an
+# even run is a literal backslash and then a real break, here before a segment off the roster. The
+# dequoted view reads a quoted backslash as an escape the skeleton never carries, so the declared-forms
+# reader withholds on the split-count mismatch
+allow	grep foo a \| b
+fallthrough	grep foo a \\| md5sum
+allow	grep -c foo tracked.md \@NL@scratch.txt
+fallthrough	grep -c foo tracked.md \\@NL@md5sum scratch.txt
+fallthrough	grep foo 'a\' | sort -o out.txt
 # the sed and awk program discriminator: a program the static check clears is read-only (a redirect
 # glyph inside an awk string is skipped); an output redirect, a written file, a system() call, a
 # command piped into getline and a program file withhold
