@@ -4,4 +4,4 @@
 
 ---
 
-— scope acf950bf 2026-10-03 5343c5ab
+delegation-transport-pass scope acf950bf 2026-10-03 5343c5ab
