@@ -40,7 +40,7 @@ guard-kit registers `check-door-binding` but ships no `smoke/violation.sh`, whic
 
 **Deliverable:** `guard-kit/smoke/violation.sh` planting a `check-door-binding` violation in the scratch consumer, run green by `--run-consumer-smoke`, and guard-kit/SPEC.md §Testing's smoke paragraph naming it.
 
-**Cost while deferred:** the consumer smoke never proves guard-kit's one gate reds a scratch consumer. Filed 2026-10-03 to the gap inbox at guard-kit-remainder-brevity's build; promoted at its close: →fix fails because a violation recipe is new mechanism; →forward because no ruling is owed. Re-verified: `ls */smoke/violation.sh` lists nine kits and not guard-kit. drift-kit/SPEC.md's stale *as guard-kit does* clause was fixed at the same close. Owner lookup: `violation.sh`, `violation recipe` in this file — none; owner guard-kit/SPEC.md §Testing.
+**Cost while deferred:** the consumer smoke never proves guard-kit's one gate reds a scratch consumer. Filed 2026-10-03 to the gap inbox at guard-kit-write-side-pass' build; promoted at its close: →fix fails because a violation recipe is new mechanism; →forward because no ruling is owed. Re-verified: `ls */smoke/violation.sh` lists nine kits and not guard-kit. drift-kit/SPEC.md's stale *as guard-kit does* clause was fixed at the same close. Owner lookup: `violation.sh`, `violation recipe` in this file — none; owner guard-kit/SPEC.md §Testing.
 
 ### amendment-manifest-prose-span
 
