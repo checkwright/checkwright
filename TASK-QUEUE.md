@@ -36,6 +36,34 @@ first-class support for swapping the Anthropic OAuth credential out from under i
 
 **Seam:** all four are generic delegation-kit mechanism — the account-id is already on the `usage.txt` contract; nothing consumer-specific is added. This is the budget-oracle prerequisite cluster heterogeneous-agent-delegation cross-references. Surfaced 2026-07-17 in the release-in-lifecycle session (kfric plus one operator-raised refinement).
 
+### heterogeneous-agent-delegation
+
+[spec: SPEC-foreign-session.md] [roadmap: now/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
+
+foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent. It cashes the public no-lock-in claim — governance enforced at the git/gate boundary, not by trusting the author; the verification substrate and the shared git-index/HEAD serialization are already agent-neutral. *Remaining, worst-first:* (1) the **escalation resume model**, plumbing of (2); (2) **dispatch transport** — today the harness `Agent`/`SendMessage`/task-notification; a foreign agent needs a transport-neutral "open / prompt / permission-request / resume" handoff over each vendor's **machine plane, never its TUI** (a screen relay yields frames not turn events and bets on the least-stable surface); (3) **budget oracle** — N vendor-keyed oracles, the credential-swap entries' seam, fed by the vendors' JSONL token-usage events; (4) **stage-contract expression** — the stage-skill prose is not vendor-neutral.
+
+**First slice landed 2026-09-30 (delegation-tier-binding):** the foreign-CLI executor, delegation-kit/SPEC.md §The foreign-vendor run — `--foreign-run` runs a read-only audit or mechanical sweep in a scratch clone, returning a report and a patch, adapters as consumer config. Live acceptance, operator direction 2026-09-30 lead-relayed (not a ruling): one read-only audit through the codex CLI, `codex exec --sandbox read-only --ephemeral --color never -`, returned OK; the spec's "one vendor CLI installed" premise was wrong (two are), and the operator chose codex. **Next slice:** (2), with (1) riding it. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
+
+**Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, the pattern the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service), [plugin-harness-reach](#plugin-harness-reach) and the credential-swap entries.
+
+**Demand attested (2026-07-23):** the operator holds three foreign-vendor subscriptions and wants read-heavy delegation routed to them for budget headroom. **Its citers** ([companion-toolkit-profile](#companion-toolkit-profile), the credential-swap entries) block on none of it.
+
+**Attribution, operator direction 2026-09-30, lead-relayed (not a ruling):** foreign harnesses' commit trailers off and the method stated in one place, the README, held by construction (foreign work lands in the delegating session's commit); a harness setting change takes the operator's confirmation.
+
+**Design memory (2026-07-25, 2026-08-02):** a TUI relay buys no resume or token efficiency — both live in the vendor's session store, so interactive-vs-headless is rendering, not state; headless warm-resume by session id and JSONL turn events ship on the installed binaries probed. The machine profile (context-kit/SPEC.md §bin/env-probe, local-only) owns which CLIs and how.
+
+**Cost while deferred:** stage-level work still bills one vendor's budget while three subscriptions are held, and this design memory ages against fast-moving CLIs. Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question).
+
+### foreign-vendor-critique
+
+[spec: SPEC-foreign-review.md]
+
+a consumer's use of the foreign-vendor run (delegation-kit/SPEC.md §The foreign-vendor run) for critique alongside the deterministic gates. Operator direction 2026-09-30, lead-relayed, not a ruling; the uses are candidates. Two adapters sit in the gitignored local overlay, each pinning its model and effort in argv so a run never follows the vendor CLI's last-switched model: a review adapter for typical work, and an expert adapter for top-expertise work. Candidate uses: work review, for example at iteration close; strategic consultation, for example a SWOT or an architecture discussion.
+
+**Why design-pending:** a close-stage review hook is new stage mechanism; each live run takes an operator grant, and a standing grant for a recurring review is the operator's to give; whether foreign adapters map onto `DELEGATION_KIT_TIER_MODEL`'s classes belongs to [heterogeneous-agent-delegation](#heterogeneous-agent-delegation)'s next slice. The foreign subscription's budget is small beside the primary harness's, so an exhausted foreign budget never blocks an iteration — a review degrades to skipped-with-notice — while a strategic consultation may wait for the limit to reset. Distinct from that entry, which owns transport and the adapter seam; this one is a consumer's use of it. Vendor model literals stay in consumer config (gate-sdk/SPEC.md §The provenance seam).
+
+**Cost while deferred:** a second-vendor reading of the iteration's work is foregone, and the deterministic gates stay the only critique. Filed 2026-09-30 to the gap inbox by the lead; promoted at delegation-tier-binding's close: →fix fails because the hook is new mechanism, →forward because the direction is already given and only its per-run grants are the operator's. Owner lookup: `critique`, `foreign-run`, `review adapter` in this file — only heterogeneous-agent-delegation, whose subject is transport; owner delegation-kit/SPEC.md §The foreign-vendor run.
+
 ## Technical Debt
 
 ### delegation-liveness-brevity
@@ -120,16 +148,6 @@ init and update print nothing for a gate whose install disposition moved off zer
 
 **Cost while deferred:** a `prose` or `full` install over a document citing `§3` reds a defect-class gate on content that is not wrong, which the install-disposition amendment states as the gate's honest limit. Filed 2026-10-01 at install-disposition-pass's align: the probe reddened both heading shapes; →fix fails because narrowing changes the gate's asserted behavior, an envelope change.
 
-### foreign-vendor-critique
-
-[cost: event/low] [surface: delegation-kit]
-
-a consumer's use of the foreign-vendor run (delegation-kit/SPEC.md §The foreign-vendor run) for critique alongside the deterministic gates. Operator direction 2026-09-30, lead-relayed, not a ruling; the uses are candidates. Two adapters sit in the gitignored local overlay, each pinning its model and effort in argv so a run never follows the vendor CLI's last-switched model: a review adapter for typical work, and an expert adapter for top-expertise work. Candidate uses: work review, for example at iteration close; strategic consultation, for example a SWOT or an architecture discussion.
-
-**Why design-pending:** a close-stage review hook is new stage mechanism; each live run takes an operator grant, and a standing grant for a recurring review is the operator's to give; whether foreign adapters map onto `DELEGATION_KIT_TIER_MODEL`'s classes belongs to [heterogeneous-agent-delegation](#heterogeneous-agent-delegation)'s next slice. The foreign subscription's budget is small beside the primary harness's, so an exhausted foreign budget never blocks an iteration — a review degrades to skipped-with-notice — while a strategic consultation may wait for the limit to reset. Distinct from that entry, which owns transport and the adapter seam; this one is a consumer's use of it. Vendor model literals stay in consumer config (gate-sdk/SPEC.md §The provenance seam).
-
-**Cost while deferred:** a second-vendor reading of the iteration's work is foregone, and the deterministic gates stay the only critique. Filed 2026-09-30 to the gap inbox by the lead; promoted at delegation-tier-binding's close: →fix fails because the hook is new mechanism, →forward because the direction is already given and only its per-run grants are the operator's. Owner lookup: `critique`, `foreign-run`, `review adapter` in this file — only heterogeneous-agent-delegation, whose subject is transport; owner delegation-kit/SPEC.md §The foreign-vendor run.
-
 ### spec-pointer-unstated-literal
 
 [cost: event/low] [surface: native]
@@ -171,24 +189,6 @@ a controlled A/B trial.
 hosted attestation. The team/paid rung: gates verified server-side by a party the committing agents cannot touch — hosted gate runs as a neutral attestation, cross-repo drift dashboards, maintained rulesets. A service, not code: cloning the kits does not clone the neutrality or the ops. Demand-gated — this entry is the public roadmap marker, not a scaffold; hosting and sequencing decisions are on record in the operator's local brief, and multi-operator-semantics is its prerequisite mechanism. Surfaced 2026-07-07.
 
 **Cost while deferred:** zero — this is a service rather than tree mechanism, so nothing rots; the residue is that gate runs stay self-attested, which binds only when a party the committing agents cannot touch is asked to trust them.
-
-### heterogeneous-agent-delegation
-
-[cost: iteration/low] [surface: delegation-kit] [roadmap: now/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
-
-foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent. It cashes the public no-lock-in claim — governance enforced at the git/gate boundary, not by trusting the author; the verification substrate and the shared git-index/HEAD serialization are already agent-neutral. *Remaining, worst-first:* (1) the **escalation resume model**, plumbing of (2); (2) **dispatch transport** — today the harness `Agent`/`SendMessage`/task-notification; a foreign agent needs a transport-neutral "open / prompt / permission-request / resume" handoff over each vendor's **machine plane, never its TUI** (a screen relay yields frames not turn events and bets on the least-stable surface); (3) **budget oracle** — N vendor-keyed oracles, the credential-swap entries' seam, fed by the vendors' JSONL token-usage events; (4) **stage-contract expression** — the stage-skill prose is not vendor-neutral.
-
-**First slice landed 2026-09-30 (delegation-tier-binding):** the foreign-CLI executor, delegation-kit/SPEC.md §The foreign-vendor run — `--foreign-run` runs a read-only audit or mechanical sweep in a scratch clone, returning a report and a patch, adapters as consumer config. Live acceptance, operator direction 2026-09-30 lead-relayed (not a ruling): one read-only audit through the codex CLI, `codex exec --sandbox read-only --ephemeral --color never -`, returned OK; the spec's "one vendor CLI installed" premise was wrong (two are), and the operator chose codex. **Next slice:** (2), with (1) riding it. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
-
-**Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, the pattern the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service), [plugin-harness-reach](#plugin-harness-reach) and the credential-swap entries.
-
-**Demand attested (2026-07-23):** the operator holds three foreign-vendor subscriptions and wants read-heavy delegation routed to them for budget headroom. **Its citers** ([companion-toolkit-profile](#companion-toolkit-profile), the credential-swap entries) block on none of it.
-
-**Attribution, operator direction 2026-09-30, lead-relayed (not a ruling):** foreign harnesses' commit trailers off and the method stated once in the README, held by construction (foreign work lands in the delegating session's commit); a harness setting change waits on operator confirmation.
-
-**Design memory (2026-07-25, 2026-08-02):** a TUI relay buys no resume or token efficiency — both live in the vendor's session store, so interactive-vs-headless is rendering, not state; headless warm-resume by session id and JSONL turn events ship on the installed binaries probed. The machine profile (context-kit/SPEC.md §bin/env-probe, local-only) owns which CLIs and how.
-
-**Cost while deferred:** stage-level work still bills one vendor's budget while three subscriptions are held, and this design memory ages against fast-moving CLIs. Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question).
 
 ### companion-toolkit-profile
 

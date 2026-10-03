@@ -16,7 +16,7 @@
 
 ### (1) The login reroute is keyed on the account where both identities are readable
 
-§usage-verdict's failure mode 3 and its two sub-paragraphs gain an account-keyed arm, and `DELEGATION_KIT_LOGIN_SETTLE` joins the table {design-bearing} {user-facing: the entry's deliverable (a) and (d), selected by operator direction 2026-10-03}. **Not yet applied.**
+§usage-verdict's failure mode 3 and its two sub-paragraphs gain an account-keyed arm, and `DELEGATION_KIT_LOGIN_SETTLE` joins the table {design-bearing} {user-facing: envelope the entry's deliverable (a)-(d), the unit selected by operator direction 2026-10-03; the STALE wording, no account id in the line and the 90s default are spec's calibration}. **Not yet applied.**
 
 The verdict reads the **live identity**, the account config's `oauthAccount.accountUuid`, through the reader's existing empty-means-derive fill of `DELEGATION_KIT_ACCOUNT_CONFIG`. It compares that identity with the snapshot's `account`. Where both are present:
 
@@ -41,7 +41,7 @@ The check order's `login-STALE` step reads the identity first, so the order beco
 
 ### (2) The roll witness reads the snapshot's own account
 
-§usage-verdict's roll-witness paragraph: the first witness reads the newest `DELEGATION_KIT_USAGE_HISTORY` sample **whose `account` equals the snapshot's**, and the newest sample of all only where the snapshot carries no `account` {mechanical} {user-facing: the entry's deliverable (b), selected by operator direction 2026-10-03}. **Not yet applied.** The witness bullet's replacement text:
+§usage-verdict's roll-witness paragraph: the first witness reads the newest `DELEGATION_KIT_USAGE_HISTORY` sample **whose `account` equals the snapshot's**, and the newest sample of all only where the snapshot carries no `account` {mechanical} {user-facing: envelope the entry's deliverable (a)-(d), the unit selected by operator direction 2026-10-03; the per-account partition is spec's calibration}. **Not yet applied.** The witness bullet's replacement text:
 
 > - the snapshot's `five_hour_resets_at` differs from the `resets_at` of the newest sample for the snapshot's account (the boundary moved); a snapshot carrying no `account` reads the newest sample of all;
 
@@ -49,7 +49,7 @@ The fall-open list gains "no sample for the snapshot's account", so a first read
 
 ### (3) The trend reporter closes with a cross-account view
 
-§Trend reporter's step 3 gains a closing block {design-bearing} {user-facing: the entry's deliverable (c), selected by operator direction 2026-10-03}. **Not yet applied.** Where the log carries two or more distinct `account` values:
+§Trend reporter's step 3 gains a closing block {design-bearing} {user-facing: envelope the entry's deliverable (a)-(d), the unit selected by operator direction 2026-10-03; the advisory-only block, with no aggregate PAUSE, is spec's calibration}. **Not yet applied.** Where the log carries two or more distinct `account` values:
 
 > 4. **Combine** the accounts after the per-segment report: one line per account, its newest weekly segment's last smoothed pct and its headroom against `DELEGATION_KIT_PAUSE_PCT_7D`, then `accounts: <n>, at or over the weekly ceiling: <k>`. A rotating operator reads the combined position there. The view is advisory and sums nothing: accounts may differ in tier, so a sum would add different denominators, and the pause decision stays per account. An account with no weekly segment prints `-` for both values.
 
