@@ -12,6 +12,28 @@
 
 ## Deferred
 
+### foreign-project-critique
+
+[cost: event/low] [surface: delegation-kit]
+
+an on-demand critique of the project's strategic weaknesses, run on the top foreign tier (a consumer's expert adapter on `--foreign-run`), then a reflection pass on this harness's top tier that turns its findings into queue and SWOT updates. Operator direction 2026-10-03, lead-relayed (not a ruling). The close-time second-vendor review (`.workflow/audit-roster.txt`) reads one iteration's range and is distinct.
+
+**Deliverable:** the on-demand trigger, the critique prompt, the reflection pass's contract and the SWOT's home, model literals in consumer config. The spec question is the reflection's write path, since work enters only through scope (doctrine-kit/DOCTRINE.md, Scope-gated intake).
+
+**Cost while deferred:** nil while the operator holds no foreign credit to run it; after, strategic weaknesses surface only through the operator's own reading. Filed 2026-10-03 to the gap inbox by delegation-transport-pass' lead; promoted at its close: →fix fails because trigger, reflection and SWOT surface are new mechanism no amendment settled, →forward because the direction is given. Re-verified: no tracked prose names a SWOT or an on-demand foreign critique. Owner lookup: `SWOT`, `critique`, `strategic`, `reflection` in this file — foreign-vendor-critique, Done, DISTINCT (its close review landed); owner delegation-kit/SPEC.md §The foreign-vendor run, the SWOT's home open.
+
+### stage-executor-binding
+
+[cost: event/low] [surface: delegation-kit]
+
+a per-stage executor binding as consumer config: a consumer picks the harness and model for each stage, say every stage on the master harness and align on a foreign coding agent at a chosen model and effort, offered as a consumer-selectable set with today's all-master-harness posture one member. It extends `DELEGATION_KIT_TIER_MODEL`'s per-class binding to a per-stage executor. Operator direction 2026-10-03, lead-relayed (not a ruling).
+
+**Gated on** [heterogeneous-agent-delegation](#heterogeneous-agent-delegation)'s item (4), stage-contract expression, without which no stage runs on a foreign agent.
+
+**Deliverable:** the stage-to-executor knob, its validator and the lead's dispatch-time read, in delegation-kit/SPEC.md §The tier binding, with fixtures.
+
+**Cost while deferred:** nil while item (4) is open and the operator holds no foreign credit; after, a consumer has no declarative way to put a stage on a foreign agent. Filed 2026-10-03 to the gap inbox by delegation-transport-pass' lead; promoted at its close: →fix fails because the knob is a new name and its prerequisite is unlanded, →forward because the direction is given. Re-verified: the knob roster carries no stage- or executor-keyed delegation-kit knob. Owner lookup: `per-stage`, `executor`, `TIER_MODEL` in this file — heterogeneous-agent-delegation, DISTINCT (item (4) lets a stage run foreign; this chooses which); owner delegation-kit/SPEC.md §The tier binding.
+
 ### guard-quoted-operand-words
 
 [cost: event/low] [surface: guard-kit]
@@ -270,7 +292,7 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 [roadmap: now/adoption] [cost: session/high] [surface: delegation-kit] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order, by size: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; lifecycle-kit, installer and guard-kit are finished or split out (the slices below); what remains starts at delegation-kit (43.9k), canon-kit (39.1k), queue-kit (26.5k), drift-kit (22.1k), context-kit (19.8k), evidence-kit (14.9k), site-kit (9.5k), then doctrine-kit's DOCTRINE.md and SPEC.md. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling): a slice has landed at each recent scope; the per-kit slices stay off the roadmap.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; lifecycle-kit, installer and guard-kit are finished or split out (the slices below); what remains starts at delegation-kit, canon-kit, queue-kit, drift-kit, context-kit, evidence-kit, site-kit, then doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling): a slice has landed at each recent scope; the per-kit slices stay off the roadmap.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
