@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### guard-kit-remainder-brevity
-
-guard-kit/SPEC.md's preamble, §Layout and configuration, §Testing and §Out of scope, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement), about 8.9k of the file's 48.1k words by `wc -w` at this scope; §The generic ruleset stays on the parent until the rule entries that rewrite it land.
-
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey. Applied last, after `bash-reader-escaped-pipe`, `write-side-steering` and `compound-read-classifier-reach` merge, since their decision-table cases may edit §Testing.
-
-**Cost while deferred:** paid by every session and adopter that reads an unpassed guard-kit section. Filed 2026-10-03 as a split at guard-kit-write-side-pass' scope. Part of the operator's selection of the unit set, direction 2026-10-03, lead-relayed (not a ruling).
-
 ## Deferred
 
 ### amendment-manifest-prose-span
@@ -306,7 +298,7 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes, landing as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes, landing as `installer-install-brevity` and `installer-remainder-brevity`; and, the kit's other sections remaining: drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections, delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope, landing as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope, landing as `queue-kit-gate-brevity`; guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope, landing as `guard-kit-tool-brevity`.
 
-delegation-kit's §The delegation model and installer's §The consumer smoke left 2026-10-02 at the companion-tier-delegation-pass and consumer-smoke-driver-pass scopes, landing as `delegation-kit-model-brevity` and `installer-smoke-brevity`; guard-kit's preamble, §Layout and configuration, §Testing and §Out of scope left 2026-10-03 at guard-kit-write-side-pass' scope, landing as [guard-kit-remainder-brevity](#guard-kit-remainder-brevity).
+delegation-kit's §The delegation model and installer's §The consumer smoke left 2026-10-02 at the companion-tier-delegation-pass and consumer-smoke-driver-pass scopes, landing as `delegation-kit-model-brevity` and `installer-smoke-brevity`; guard-kit's preamble, §Layout and configuration, §Testing and §Out of scope left 2026-10-03 at guard-kit-write-side-pass' scope, landing as `guard-kit-remainder-brevity`.
 
 ### tarball-build-attestation
 
@@ -1278,4 +1270,5 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 - bash-reader-escaped-pipe
 - write-side-steering
 - compound-read-classifier-reach
+- guard-kit-remainder-brevity
 
