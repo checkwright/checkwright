@@ -1297,8 +1297,3 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 
 ## Done
 
-- bash-reader-escaped-pipe
-- write-side-steering
-- compound-read-classifier-reach
-- guard-kit-remainder-brevity
-
