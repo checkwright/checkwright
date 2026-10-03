@@ -4,13 +4,4 @@
 
 ---
 
-delegation-transport-pass scope acf950bf 2026-10-03 5343c5ab
-delegation-transport-pass spec aa35fa93 2026-10-03 79d06fdf
-delegation-transport-pass align ad1c69c2 2026-10-03 c6c53cdc
-delegation-transport-pass align a78ab01e 2026-10-03 e84df4a1
-delegation-transport-pass build a6d50615 2026-10-03 c4ded3c9
-delegation-transport-pass build ae5006ad 2026-10-03 d8ad0b29
-delegation-transport-pass build a980bb68 2026-10-03 db7fc8da
-delegation-transport-pass build a526a8f0 2026-10-03 d818fd2b
-delegation-transport-pass validate a3c80829 2026-10-03 bb4aec63
-delegation-transport-pass close ac7f95f3 2026-10-03 b22016a2
+— scope ab1b020b 2026-10-04 b557eafd
