@@ -77,7 +77,7 @@ Registration matches `--foreign-run`'s:
 
 ### (4) §The foreign-vendor run states the transport model and its limits
 
-§The foreign-vendor run gains the transport model, and its honest limits are rewritten {design-bearing}. **Not yet applied.** After the section's second paragraph:
+§The foreign-vendor run gains the transport model, and its honest limits are rewritten {design-bearing} {user-facing: envelope the entry's next slice, (2) with (1) riding it, the unit selected by operator direction 2026-10-03; the permission request carried as an escalation in the report, with no approval prompt relayed, is spec's calibration}. **Not yet applied.** After the section's second paragraph:
 
 > **A resumable session is one process per turn, its conversation held by the vendor.** A vendor's headless mode exits at its turn end and keeps the conversation in its own session store, which its resume form continues. So the kit holds no conversation, only the binding beside the clone. **A permission request travels as an escalation.** The adapter pins a policy that never prompts, an action it refuses reaches the agent as a failure, and the agent reports it at its turn end like any open question. A widening is a new run under an adapter configured wider, never a flag a resume adds. **The report is the escalation channel, and the kit classifies none.** Whether a turn ended on a result or a question is the dispatcher's reading. The dispatcher answers a question with `--foreign-resume`, and the agent continues in the same clone and the same vendor session.
 
