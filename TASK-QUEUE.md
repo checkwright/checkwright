@@ -1252,11 +1252,3 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 
 ## Done
 
-- guard-kit-violation-recipe
-- grant-slot-escaped-blank
-- guard-kit-ruleset-brevity
-- amendment-manifest-prose-span
-- criterion-five-omit-stale
-- gate-sdk-layout-assumptions
-- withheld-gate-literal-knobs
-
