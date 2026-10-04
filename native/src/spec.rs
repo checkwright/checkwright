@@ -211,37 +211,75 @@ pub fn manifest_files(root: &str) -> Result<Vec<PathBuf>, String> {
         // consumer-value-exempt: the default branch's file name; CANON_KIT_MANIFEST_FILES replaces the branch
         out.extend(walk::find_named(rootp, &["CLAUDE.md"])?);
     }
+    let tracked = Tracked::at(root)?;
+    let mut out: Vec<PathBuf> = out.into_iter().filter(|f| tracked.keeps(root, f)).collect();
     let prose_globs = knob_array("CANON_KIT_PROSE_SURFACE_GLOBS")?;
     if !prose_globs.is_empty() {
         for f in walk::glob_corpus(rootp, &prose_globs)? {
-            if f.is_file() && slot_free(&f)? {
+            if f.is_file() && tracked.keeps(root, &f) && slot_free(&f)? {
                 out.push(f);
             }
         }
     }
-    tracked_only(root, out)
+    Ok(out)
 }
 
 // spec: canon-kit/SPEC.md §The shared spec adapters — the manifest set is the tracked set inside a
-// work tree and the walk outside one
-fn tracked_only(root: &str, files: Vec<PathBuf>) -> Result<Vec<PathBuf>, String> {
-    if walk::toplevel_in_opt(root)?.is_none() {
-        return Ok(files);
+// work tree and the walk outside one; `None` is the walk
+struct Tracked(Option<std::collections::HashSet<Vec<u8>>>);
+
+impl Tracked {
+    fn at(root: &str) -> Result<Tracked, String> {
+        if walk::toplevel_in_opt(root)?.is_none() {
+            return match repository_mark(root) {
+                None => Ok(Tracked(None)),
+                Some(mark) => Err(format!(
+                    "git answers no work tree at {} though {} marks a repository — a refused or broken repository is not walked, so the tracked set is unknown (`git -C {} status` prints git's reason)",
+                    root,
+                    mark.display(),
+                    root
+                )),
+            };
+        }
+        let listed = crate::proc::run(&programs::GIT, &["-C", root, "ls-files", "-z"])?;
+        let raw = match listed.stdout() {
+            Some(o) => o,
+            None => return Err(format!("git ls-files failed in {} — the tracked set is unknown", root)),
+        };
+        Ok(Tracked(Some(raw.split(|b| *b == 0).filter(|s| !s.is_empty()).map(<[u8]>::to_vec).collect())))
     }
-    let listed = crate::proc::run(&programs::GIT, &["-C", root, "ls-files", "-z"])?;
-    let raw = match listed.stdout() {
-        Some(o) => String::from_utf8_lossy(o).into_owned(),
-        None => return Err(format!("git ls-files failed in {} — the tracked set is unknown", root)),
-    };
-    let tracked: std::collections::HashSet<&str> = raw.split('\0').filter(|s| !s.is_empty()).collect();
-    Ok(files
-        .into_iter()
-        .filter(|f| {
-            let p = f.display().to_string();
-            let rel = strip_dot_slash(walk::rel_under(root, &p).unwrap_or(&p)).replace('\\', "/");
-            tracked.contains(rel.as_str())
-        })
-        .collect())
+
+    // spec: canon-kit/SPEC.md §The shared spec adapters — byte-exact against the index, the
+    // separator folded only where `\` is one
+    fn keeps(&self, root: &str, f: &Path) -> bool {
+        let Some(set) = &self.0 else { return true };
+        let p = f.display().to_string();
+        let rel = strip_dot_slash(walk::rel_under(root, &p).unwrap_or(&p));
+        let rel = if cfg!(windows) { rel.replace('\\', "/") } else { rel };
+        set.contains(rel.as_bytes())
+    }
+}
+
+// spec: canon-kit/SPEC.md §The shared spec adapters — a `.git` entry at the scan root or above,
+// ascending no further than git's own discovery would, or a `GIT_DIR` naming one outright
+fn repository_mark(root: &str) -> Option<PathBuf> {
+    if let Some(d) = std::env::var_os("GIT_DIR").filter(|d| !d.is_empty()) {
+        return Some(PathBuf::from(d));
+    }
+    let ceilings: Vec<String> = std::env::var_os("GIT_CEILING_DIRECTORIES")
+        .map(|v| std::env::split_paths(&v).map(|c| walk::normalize_abs(&c.display().to_string())).collect())
+        .unwrap_or_default();
+    let start = PathBuf::from(abs(root));
+    for (i, dir) in start.ancestors().enumerate() {
+        if i > 0 && ceilings.contains(&walk::normalize_abs(&dir.display().to_string())) {
+            return None;
+        }
+        let mark = walk::child(dir, ".git");
+        if mark.symlink_metadata().is_ok() {
+            return Some(mark);
+        }
+    }
+    None
 }
 
 // spec: canon-kit/SPEC.md §The shared spec adapters — `_spec_comment_surface`: the governed-source corpus
@@ -1838,6 +1876,131 @@ mod tests {
         knobs.remove("GATE_SDK_GATES_DIR");
         crate::knobs::reset(&knobs);
         let _ = std::fs::remove_dir_all(&d);
+    }
+
+    fn finder_sandbox(env: &crate::knobenv::KnobEnv, tag: &str, knobs: &str) -> (PathBuf, PathBuf) {
+        let d = std::env::temp_dir().join(format!("checkwright-finder-{}.{}", tag, std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        let (gates, tree) = (d.join("gates"), d.join("tree"));
+        std::fs::create_dir_all(&gates).expect("scratch");
+        std::fs::create_dir_all(&tree).expect("scratch");
+        std::fs::write(gates.join("canon-config.knobs"), knobs).expect("write");
+        env.set("GATE_SDK_GATES_DIR", &gates.display().to_string());
+        for k in ["CANON_KIT_KNOB_FILE", "CANON_KIT_MANIFEST_FILES", "CANON_KIT_PROSE_SURFACE_GLOBS", "CANON_KIT_SCAN_KIT_ROOTS"] {
+            env.remove(k);
+        }
+        crate::knobs::reset(env);
+        (d, tree)
+    }
+
+    fn finder_done(env: &crate::knobenv::KnobEnv, d: &Path) {
+        env.remove("GATE_SDK_GATES_DIR");
+        crate::knobs::reset(env);
+        let _ = std::fs::remove_dir_all(d);
+    }
+
+    fn git_in(tree: &Path, args: &[&str]) {
+        let dir = tree.display().to_string();
+        let mut all = vec!["-C", dir.as_str()];
+        all.extend_from_slice(args);
+        let c = crate::proc::run(&programs::GIT, &all).expect("git spawns");
+        assert!(c.stdout().is_some(), "git {:?} failed: {:?}", args, c.failure_report());
+    }
+
+    fn found(tree: &Path) -> Result<Vec<String>, String> {
+        let root = tree.display().to_string();
+        let mut rel: Vec<String> = manifest_files(&root)?
+            .iter()
+            .map(|p| {
+                let p = p.display().to_string();
+                walk::rel_under(&root, &p).unwrap_or(&p).to_string()
+            })
+            .collect();
+        rel.sort();
+        Ok(rel)
+    }
+
+    // spec: canon-kit/SPEC.md §The shared spec adapters — git refusing a directory a `.git` entry
+    // marks is no answer: the finder errs there, walks where nothing marks one, and stops its
+    // ascent where git's own discovery stops
+    #[test]
+    fn a_repository_git_cannot_answer_for_is_refused_rather_than_walked() {
+        let env = crate::knobenv::lock();
+        let (d, tree) = finder_sandbox(&env, "refused", "");
+        std::fs::create_dir_all(tree.join("sub")).expect("scratch");
+        std::fs::write(tree.join("sub/README.md"), "# r\n").expect("write");
+        let sub = tree.join("sub");
+        assert_eq!(found(&sub), Ok(vec!["README.md".to_string()]), "no repository: the walk stands");
+        std::fs::write(tree.join(".git"), format!("gitdir: {}\n", tree.join("absent").display())).expect("write");
+        let refused = found(&sub).expect_err("a broken repository above the scan root was walked");
+        assert!(refused.contains("marks a repository"), "{}", refused);
+        env.set("GIT_CEILING_DIRECTORIES", &tree.display().to_string());
+        assert_eq!(found(&sub), Ok(vec!["README.md".to_string()]), "a ceiling git honours hides the mark");
+        env.remove("GIT_CEILING_DIRECTORIES");
+        finder_done(&env, &d);
+    }
+
+    // spec: canon-kit/SPEC.md §The shared spec adapters — the separator fold's witness on the host
+    // where it runs: a nested tracked manifest is kept, a nested untracked one dropped
+    #[test]
+    fn a_nested_manifest_joins_the_set_only_when_tracked() {
+        let env = crate::knobenv::lock();
+        let (d, tree) = finder_sandbox(&env, "nested", "");
+        for f in ["kept/README.md", "dropped/README.md"] {
+            std::fs::create_dir_all(tree.join(f).parent().expect("parent")).expect("scratch");
+            std::fs::write(tree.join(f), "# r\n").expect("write");
+        }
+        git_in(&tree, &["init", "-q"]);
+        git_in(&tree, &["add", "kept/README.md"]);
+        assert_eq!(found(&tree), Ok(vec!["kept/README.md".to_string()]));
+        finder_done(&env, &d);
+    }
+
+    // spec: canon-kit/SPEC.md §The shared spec adapters — a POSIX name holding a backslash is not
+    // the tracked path it would spell once folded, and a name the index holds in non-UTF-8 bytes
+    // matches no walked name its lossy decoding would spell
+    #[cfg(unix)]
+    #[test]
+    fn the_tracked_set_matches_the_index_byte_exact() {
+        use std::os::unix::ffi::OsStrExt;
+        let env = crate::knobenv::lock();
+        let (d, tree) = finder_sandbox(&env, "bytes", "");
+        std::fs::create_dir_all(tree.join("a")).expect("scratch");
+        std::fs::write(tree.join("a/README.md"), "# r\n").expect("write");
+        std::fs::write(tree.join("a\\README.md"), "# r\n").expect("write");
+        git_in(&tree, &["init", "-q"]);
+        git_in(&tree, &["add", "a/README.md"]);
+        let raw = tree.join(std::ffi::OsStr::from_bytes(b"\xff"));
+        if std::fs::create_dir_all(&raw).is_ok() {
+            std::fs::write(raw.join("README.md"), "# r\n").expect("write");
+            std::fs::create_dir_all(tree.join("\u{FFFD}")).expect("scratch");
+            std::fs::write(tree.join("\u{FFFD}/README.md"), "# r\n").expect("write");
+            git_in(&tree, &["add", "."]);
+            git_in(&tree, &["rm", "-q", "--cached", "a\\README.md", "\u{FFFD}/README.md"]);
+        }
+        assert_eq!(found(&tree), Ok(vec!["a/README.md".to_string()]));
+        finder_done(&env, &d);
+    }
+
+    // spec: canon-kit/SPEC.md §The shared spec adapters — the tracked filter runs before the
+    // prose-surface fold reads a candidate, so an unreadable untracked one never fails the finder
+    #[cfg(unix)]
+    #[test]
+    fn an_untracked_prose_candidate_is_never_read() {
+        use std::os::unix::fs::PermissionsExt;
+        let env = crate::knobenv::lock();
+        let (d, tree) = finder_sandbox(&env, "unread", "CANON_KIT_PROSE_SURFACE_GLOBS[] = notes/*.md\n");
+        std::fs::create_dir_all(tree.join("notes")).expect("scratch");
+        std::fs::write(tree.join("notes/kept.md"), "prose\n").expect("write");
+        std::fs::write(tree.join("notes/locked.md"), "prose\n").expect("write");
+        git_in(&tree, &["init", "-q"]);
+        git_in(&tree, &["add", "notes/kept.md"]);
+        let locked = tree.join("notes/locked.md");
+        std::fs::set_permissions(&locked, std::fs::Permissions::from_mode(0o000)).expect("chmod");
+        let result = found(&tree);
+        std::fs::set_permissions(&locked, std::fs::Permissions::from_mode(0o644)).expect("chmod");
+        assert_eq!(result, Ok(vec!["notes/kept.md".to_string()]));
+        finder_done(&env, &d);
     }
 
     // spec: canon-kit/SPEC.md §check-manifest-count — the tens are not consecutive with the
