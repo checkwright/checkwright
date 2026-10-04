@@ -6,3 +6,4 @@
 
 queue-kit-format-native-pass scope a226a11c 2026-10-04 468c14464
 queue-kit-format-native-pass spec ad4de5fa 2026-10-04 c33b3efb6
+queue-kit-format-native-pass align a1b28181 2026-10-04 2fb509409
