@@ -352,7 +352,7 @@ the crates.io reservation page still carries the retired methodology description
 
 **Deliverable:** the reservation crate republished by the operator, and the live page reading the product statement.
 
-**Close obligation (2026-10-04, operator direction lead-relayed, not a ruling):** offered to the operator at installer-trust-pass' close as an operator-only registry write. Answered there: republish, with `reserve/crates/Cargo.toml` bumped to `0.0.1`, and a grant for the close session to attempt one `cargo publish` after a green closing push, a dry run first and no workaround; on failure the operator publishes.
+**Close obligation (2026-10-04, operator direction lead-relayed, not a ruling):** offered to the operator at installer-trust-pass' close as an operator-only registry write. Answered there: republish, with `reserve/crates/Cargo.toml` bumped to `0.0.1`, and a grant for the close session to attempt one `cargo publish` after a green closing push, a dry run first and no workaround; on failure the operator publishes. The dry run packaged `0.0.1` clean; the one attempt failed with crates.io's `403 Forbidden: authentication failed`, and `max_version` stayed `0.0.0`, so the publish is the operator's.
 
 **Cost while deferred:** a reader searching crates.io meets a second product description, the one `one-product-statement` removed everywhere else. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's build; promoted 2026-09-27 at its close: →fix fails because the write is operator-only. Re-verified: the crates.io API returns the retired description at `max_version` 0.0.0. Owner lookup: `crates.io`, `reserve`, `republish` in this file — none; owner installer/SPEC.md §The dependency boundary.
 
