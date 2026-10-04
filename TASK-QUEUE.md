@@ -526,6 +526,26 @@ the native Windows install-smoke legs run every `--installer-smoke` arm serially
 
 **Cost while deferred:** on a host refusing ownership or with broken metadata, each caller's fail-open is unmeasured. Filed 2026-10-04 to the gap inbox by canon-kit-tail-installer-pass' build; promoted at its close: →fix fails because the crosser's contract widens and about 20 callers' verdicts across several kits need re-reading, →forward because no ruling is owed. Re-verified: `toplevel_args` maps any non-zero exit to `None`; 21 call sites outside walk.rs. Not a recurrence of `finder-tracked-filter-edges`, which closed one finder alone. Owner lookup: `toplevel`, `safe.directory`, `crosser` in this file — [worktree-memory-dir-key](#worktree-memory-dir-key), DISTINCT (a worktree's toplevel, not a refused one); owner gate-sdk/SPEC.md §The crate's crosser.
 
+### spec-mark-symlink-ascent
+
+[cost: event/low] [surface: native]
+
+`repository_mark` (native/src/spec.rs) ascends the lexically absolutized scan root for a `.git` entry and never resolves a symlink, while git discovers through the physical directory. A scan root whose path traverses a symlink into a repository git refuses (a `safe.directory` refusal, broken metadata) finds no mark and is walked unfiltered, grading untracked manifests with no notice, against canon-kit/SPEC.md §The shared spec adapters, where a marked root git refuses exits 2. The process working directory is physical, so only a root argument spelled through a symlink reaches it.
+
+**Deliverable:** the ascent finding the mark git's discovery finds, with a crate test over a symlinked root into a refused repository.
+
+**Cost while deferred:** a canon-kit gate given such a root grades untracked files silently. Filed 2026-10-04 to the gap inbox by canon-kit-tail-installer-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because it is crate work with a new test. Re-verified by source read: `abs` is `walk::abs_against` over `cwd()`, lexical, and the ascent is `Path::ancestors`; the end-to-end repro was not re-run. Owner lookup: `repository_mark`, `symlink`, `physical` in this file — [toplevel-refusal-fail-open](#toplevel-refusal-fail-open), DISTINCT (its git answer is folded, here the mark itself misses), and the icebox's walk-entry-model-unstated, DISTINCT (a walk's entries, not the root's ascent); owner canon-kit/SPEC.md §The shared spec adapters.
+
+### walk-child-posix-backslash
+
+[cost: event/low] [surface: native]
+
+`walk::child` (native/src/walk.rs) reads a trailing `\` on the parent as a separator on every host, so on POSIX a directory whose name ends in a literal backslash is joined without the `/`: `a\` and `README.md` give `a\README.md`, a path that does not exist, and every crate walk descending through it stats the wrong path. canon-kit/SPEC.md §The shared spec adapters says a POSIX name holding a backslash is its own path.
+
+**Deliverable:** the backslash fold kept to Windows in `child`, with a crate test descending a backslash-ending directory on POSIX; gate-sdk/SPEC.md §The path-dialect contract states the join.
+
+**Cost while deferred:** a tracked tree holding such a directory is walked wrong by every crate walk. Filed 2026-10-04 to the gap inbox by canon-kit-tail-installer-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because it is crate work with a new test. Re-verified by source read: `child` tests `ends_with('\\')` unconditionally; `finder-tracked-filter-edges`' test covers a backslash in a file name only. Owner lookup: `walk::child`, `backslash` in this file — none; owner gate-sdk/SPEC.md §The path-dialect contract, with canon-kit/SPEC.md §The shared spec adapters.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
