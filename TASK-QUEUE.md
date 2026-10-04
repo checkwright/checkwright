@@ -496,6 +496,16 @@ the native Windows install-smoke legs run every `--installer-smoke` arm serially
 
 **Cost while deferred:** every push waits about 14 minutes on one leg, and a close spends one to two pushes. Filed 2026-10-04 to the gap inbox by canon-kit-tail-installer-pass' lead on an operator direction to file it as a speed-up; promoted at its close: →fix fails because the split needs a push to witness, →forward because the direction is given. Re-verified: the run's per-job and per-step timings. Owner lookup: install-smoke, `pwsh`, `long pole` in this file — [install-smoke-sh-matrix](#install-smoke-sh-matrix), DISTINCT (unix legs' YAML duplication, not wall-clock); owner installer/SPEC.md §The consumer smoke.
 
+### front-end-nested-toplevel
+
+[cost: event/low] [surface: gate-sdk]
+
+the front ends change to git's toplevel before the binary runs (the `cd` in gate-sdk/bin/run-gates.sh, the toplevel read in run-gates.ps1), and so do the plugin hook shim (plugin/hooks/hooks.json) and context-kit/templates/session-context.sh. Inside a broken nested checkout (a `.git` directory with a garbage HEAD, an empty one, a dangling `.git` symlink) git skips the nested repository and answers the enclosing toplevel at exit 0, so the run executes the enclosing repository's battery with no notice: the crate sees an empty `--show-prefix` and the crosser's nested refusal never fires. gate-sdk/SPEC.md §The crate's crosser states this as its honest limit.
+
+**Deliverable:** each front end and shim refuses where git's answered prefix crosses a `.git` entry beneath the toplevel (the crosser's nested mark, held in the shell and PowerShell twins with front-end parity), or hands the crate the starting directory so the crosser reads it; the honest-limit sentence is removed and §run-gates states the refusal.
+
+**Cost while deferred:** a run started in a rare tree shape reports the enclosing repository's verdict as its own. Filed 2026-10-04 to the gap inbox by queue-kit-arms-crosser-pass' spec, which declined to widen its amendment; promoted at its close: →fix fails because the sh/ps1 twins, the plugin shim and the session-context template each need the mark walk under front-end parity, a contract change to §run-gates witnessed on the Windows legs, →forward because no ruling is owed. Re-verified: with an empty `.git` directory in a subdirectory of a fresh repository, `git rev-parse --show-toplevel --show-prefix` there answers the outer toplevel and the subdirectory prefix at exit 0, and run-gates.sh checks its mark only on a failed lookup. The bullet's pointer to the amendment file is replaced by §The crate's crosser, where it merged. Not a recurrence of `nested-broken-repo-toplevel`, which closed the crate side. Owner lookup: `toplevel`, `front end`, `session-context` in this file — none live; owner gate-sdk/SPEC.md §run-gates.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
