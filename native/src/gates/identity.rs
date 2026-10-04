@@ -251,13 +251,16 @@ pub fn run(_args: &[String]) -> i32 {
             println!("IDENTITY: clean (CI context — not a committing clone; identity guard skipped)");
             return 0;
         }
-        let in_repo = proc::run(&programs::GIT, &["rev-parse", "--git-dir"])
-            .ok()
-            .and_then(|c| c.stdout().map(|_| ()))
-            .is_some();
-        if !in_repo {
-            eprintln!("check-identity: not a git repository — cannot verify identity");
-            return 2;
+        match crate::walk::toplevel_opt() {
+            Ok(Some(_)) => {}
+            Ok(None) => {
+                eprintln!("check-identity: not a git repository — cannot verify identity");
+                return 2;
+            }
+            Err(e) => {
+                eprintln!("check-identity: {}", e);
+                return 2;
+            }
         }
     }
 

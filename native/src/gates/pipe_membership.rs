@@ -1,7 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-pipe-membership — no set producer feeds a short-circuiting reader
 // in a shell file under `pipefail`
 use crate::gates::path_dialect::shell_split;
-use crate::{proc, programs, walk};
+use crate::walk;
 use std::path::Path;
 
 const NAME: &str = "check-pipe-membership";
@@ -224,10 +224,7 @@ fn scan(path: &str, text: &str, t: &mut Tally, findings: &mut Vec<String>) {
 fn rule(_args: &[String]) -> Result<i32, String> {
     // spec: gate-sdk/SPEC.md §Fail-closed contract — the tracked corpus degrades to empty outside a
     // work tree, so the repository is probed first and an absent one refuses
-    let inside = proc::run(&programs::GIT, &["rev-parse", "--is-inside-work-tree"])
-        .map(|c| c.stdout().is_some())
-        .unwrap_or(false);
-    if !inside {
+    if walk::toplevel_opt()?.is_none() {
         return Err("not a git repository — the tracked shell corpus cannot be resolved".into());
     }
     let shell = walk::tracked_shell_tree()?;

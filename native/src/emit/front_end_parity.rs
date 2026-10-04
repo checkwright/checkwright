@@ -146,6 +146,19 @@ const CORPUS: &[Case] = &[
         expect_stdout: Stdout::Unchecked,
         linked: Linked::No,
     },
+    Case {
+        name: "a repository git refuses",
+        in_repo: false,
+        argv: &["--emit", "knob-values"],
+        env: &[],
+        files: &[(".git", "gitdir: absent\n")],
+        runnable_bin: false,
+        stdin: "",
+        expect_code: 2,
+        expect_text: "run-gates: git refuses the repository marked here",
+        expect_stdout: Stdout::Unchecked,
+        linked: Linked::No,
+    },
     absent("binary absent, leading --emit", &[], &[], ABSENT),
     Case {
         name: "binary absent, leading --hook",
@@ -442,8 +455,8 @@ fn inherited_knobs() -> Vec<String> {
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — a case's scratch: a fresh repository vendoring the tree's own
-// `gate-sdk/bin/` and `gate-sdk/lib/`, run by relative path as a user types it; the outside case
-// runs the tree's own pair from a directory no repository contains
+// `gate-sdk/bin/` and `gate-sdk/lib/`, run by relative path as a user types it; the outside cases
+// run the tree's own pair from a directory no repository contains, holding only the case's files
 fn prepare(
     case: &Case,
     dir: &Path,
@@ -454,6 +467,9 @@ fn prepare(
 ) -> Result<(String, String), String> {
     std::fs::create_dir_all(dir).map_err(|e| format!("cannot create {}: {}", dir.display(), e))?;
     if !case.in_repo {
+        for (rel, body) in case.files {
+            write(&dir.join(rel), body)?;
+        }
         return Ok((
             forward_slashed(stub.display().to_string()),
             forward_slashed(twin.display().to_string()),

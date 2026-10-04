@@ -1970,6 +1970,37 @@ mod tests {
         );
     }
 
+    // spec: gate-sdk/SPEC.md §The crate's crosser — a repository probe is the crosser's: git's own
+    // `--git-dir` and `--is-inside-work-tree` read a refused repository as none, and answer the
+    // enclosing one at exit 0 where git skipped a nested repository
+    #[test]
+    fn no_module_outside_this_one_probes_for_a_repository() {
+        let _knobs = crate::knobenv::lock();
+        let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+        let files = find_files(&src, &["rs"]).expect("cannot enumerate the crate's sources");
+        let mut offenders: Vec<String> = Vec::new();
+        for f in &files {
+            if f.file_name().and_then(|n| n.to_str()) == Some("walk.rs") {
+                continue;
+            }
+            let text = fs::read_to_string(f)
+                .unwrap_or_else(|e| panic!("cannot read {}: {}", f.display(), e));
+            for (i, line) in text.lines().enumerate() {
+                if line.contains("\"rev-parse\"")
+                    && (line.contains("\"--git-dir\"") || line.contains("\"--is-inside-work-tree\""))
+                {
+                    offenders.push(format!("{}:{}", f.display(), i + 1));
+                }
+            }
+        }
+        assert!(
+            offenders.is_empty(),
+            "a repository probe outside walk.rs reads a repository git refuses as none: {:?} — \
+             ask walk::toplevel_opt or walk::toplevel_in_opt, degrading on Ok(None) alone",
+            offenders
+        );
+    }
+
     // spec: gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency — one entry
     // per crate in the resolved graph, with the clause of the dependency bar it was admitted
     // under

@@ -38,16 +38,16 @@ pub fn run(args: &[String]) -> i32 {
             }
         },
         None => {
-            let probe = match proc::run(&programs::GIT, &["rev-parse", "--git-dir"]) {
-                Ok(c) => c,
+            match crate::walk::toplevel_opt() {
+                Ok(Some(_)) => {}
+                Ok(None) => {
+                    eprintln!("check-exec-bit: not a git repository — cannot read index modes");
+                    return 2;
+                }
                 Err(e) => {
                     eprintln!("check-exec-bit: {}", e);
                     return 2;
                 }
-            };
-            if probe.stdout().is_none() {
-                eprintln!("check-exec-bit: not a git repository — cannot read index modes");
-                return 2;
             }
             let ls = match proc::run(&programs::GIT, &["ls-files", "-s"]) {
                 Ok(c) => c,

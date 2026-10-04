@@ -80,12 +80,16 @@ pub fn run(args: &[String]) -> i32 {
                 return 2;
             }
         };
-        let in_repo = proc::run(&programs::GIT, &["rev-parse", "--git-dir"])
-            .map(|c| c.stdout().is_some())
-            .unwrap_or(false);
-        if !in_repo {
-            println!("LESSON-DISPOSITION: clean (no git repository — no HEAD baseline to compare)");
-            return 0;
+        match walk::toplevel_opt() {
+            Ok(Some(_)) => {}
+            Ok(None) => {
+                println!("LESSON-DISPOSITION: clean (no git repository — no HEAD baseline to compare)");
+                return 0;
+            }
+            Err(e) => {
+                eprintln!("check-lesson-disposition: {}", e);
+                return 2;
+            }
         }
         let spec = format!("HEAD:{}", queue);
         let shown = match proc::run(&programs::GIT, &["show", &spec]) {

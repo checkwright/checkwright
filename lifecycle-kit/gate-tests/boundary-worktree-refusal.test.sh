@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the iteration-boundary linked-worktree refusal end-to-end through a sandboxed enter-stage on a real git checkout: a boundary entry with a linked worktree present refuses and writes nothing, --simulate relays the same refusal, the same tree with the worktree reaped enters cleanly, LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK=0 turns it off, a non-git tree skips the check rather than failing on it; and the liveness classification: each of the four class readings, the empty-knob default that classifies nothing, the loss report on a residue path and on a live one, the live class's loss-gated reap remedy in place of a wait on a pid that does not establish a holder, the mid-iteration advisory that reports orphans without refusing, and a malformed pattern refused as config
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the iteration-boundary linked-worktree refusal end-to-end through a sandboxed enter-stage on a real git checkout: a boundary entry with a linked worktree present refuses and writes nothing, --simulate relays the same refusal, the same tree with the worktree reaped enters cleanly, LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK=0 turns it off, a non-git tree skips the check rather than failing on it while a repository git refuses refuses the entry; and the liveness classification: each of the four class readings, the empty-knob default that classifies nothing, the loss report on a residue path and on a live one, the live class's loss-gated reap remedy in place of a wait on a pid that does not establish a holder, the mid-iteration advisory that reports orphans without refusing, and a malformed pattern refused as config
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -209,6 +209,15 @@ seed "$nogit"
 out="$(run_enter "$nogit" --simulate scope)"; rc=$?
 [[ "$rc" -eq 0 ]] || note nogit "a non-git tree failed the worktree check instead of skipping it: $out"
 
+# --- a repository git refuses is no non-git tree: the entry refuses and writes nothing ---
+refused="$SANDBOX/refused"
+seed "$refused"
+printf 'gitdir: %s/absent\n' "$refused" >"$refused/.git"
+before="$(state_of "$refused")"
+out="$(run_enter "$refused" scope)"; rc=$?
+[[ "$rc" -eq 2 && "$out" == *"marks a repository"* ]] || note refused "a refused repository skipped the worktree check (want exit 2 naming the mark): rc=$rc $out"
+[[ "$(state_of "$refused")" == "$before" ]] || note refused-write "the refused entry wrote the state file"
+
 [[ "$fails" -eq 0 ]] || { echo "boundary-worktree-refusal.test: $fails assertion(s) failed"; exit 1; }
-echo "boundary-worktree-refusal.test: clean (the boundary refuses on a linked worktree and writes nothing, --simulate relays it, the knob disables it, a reaped tree passes, a non-git tree skips; four class readings, the empty-knob default, the loss report on both a residue and a live path, the live class's loss-gated remedy, the mid-iteration advisory live and orphaned, and two malformed patterns refused as config)"
+echo "boundary-worktree-refusal.test: clean (the boundary refuses on a linked worktree and writes nothing, --simulate relays it, the knob disables it, a reaped tree passes, a non-git tree skips, a refused repository refuses writing nothing; four class readings, the empty-knob default, the loss report on both a residue and a live path, the live class's loss-gated remedy, the mid-iteration advisory live and orphaned, and two malformed patterns refused as config)"
 exit 0

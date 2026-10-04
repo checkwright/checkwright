@@ -11,9 +11,34 @@ SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=../lib/gate.sh
 source "$SDK/lib/gate.sh"
 
+# spec: gate-sdk/SPEC.md §run-gates — the crosser's repository mark, held here because the crate runs after this stub's cd: a non-empty GIT_DIR, or a .git entry at the physical working directory or above, the ascent stopping where GIT_CEILING_DIRECTORIES stops git's own
+_run_gates_marked() {
+    [[ -n "${GIT_DIR:-}" ]] && return 0
+    local sep=: d c n=0
+    local -a ceil=()
+    case "${OSTYPE:-}" in msys* | cygwin* | win32*) sep=';' ;; esac
+    IFS="$sep" read -r -a ceil <<<"${GIT_CEILING_DIRECTORIES:-}"
+    d="$(pwd -P)"
+    while :; do
+        if ((n > 0)); then
+            for c in "${ceil[@]}"; do
+                [[ -n "$c" && "$d" == "$(cd "$c" 2>/dev/null && pwd -P)" ]] && return 1
+            done
+        fi
+        [[ -e "$d/.git" || -L "$d/.git" ]] && return 0
+        [[ -z "$d" || "$d" == / ]] && return 1
+        d="$(dirname "$d")"
+        n=$((n + 1))
+    done
+}
+
 # spec: gate-sdk/SPEC.md §run-gates — the refusal is the stub's own line alone, and a failed lookup hands `cd` a path that is never a directory rather than an empty one: bash before 5.3 takes `cd ""` as a silent success
 cd "$(git rev-parse --show-toplevel 2>/dev/null || echo /dev/null)" 2>/dev/null || {
-    echo "run-gates: not inside a git repository" >&2
+    if _run_gates_marked; then
+        echo "run-gates: git refuses the repository marked here (GIT_DIR, or a .git entry here or above); git status prints its reason" >&2
+    else
+        echo "run-gates: not inside a git repository" >&2
+    fi
     exit 2
 }
 

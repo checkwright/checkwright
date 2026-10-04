@@ -15,14 +15,14 @@ pub fn run(args: &[String]) -> i32 {
         eprintln!("check-workflow-tiering: not a directory: {}", root);
         return 2;
     }
-    let probe = match proc::run(&programs::GIT, &["-C", root, "rev-parse", "--git-dir"]) {
-        Ok(c) => c,
+    let top = match walk::toplevel_in_opt(root) {
+        Ok(t) => t,
         Err(e) => {
             eprintln!("check-workflow-tiering: {}", e);
             return 2;
         }
     };
-    if probe.stdout().is_none() {
+    if top.is_none() {
         eprintln!(
             "check-workflow-tiering: {} is not a git repository — the tracked/ignored partition is unreadable",
             root

@@ -87,14 +87,16 @@ fn install(args: &[String]) -> Result<(), String> {
 }
 
 // spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — the driver-config step is the
-// `--install-hooks` per-clone opt-in class: a non-repo cwd degrades to a printed skip on stderr
-// at exit 0, never a hard failure, because the recorded honest limit depends on it failing soft
+// `--install-hooks` per-clone opt-in class: no repository, or a refused one, is a skip naming its
+// cause on stderr at exit 0, since the recorded honest limit depends on it failing soft
 fn register_driver() {
-    let inside = proc::run(&programs::GIT, &["rev-parse", "--git-dir"])
-        .map(|c| c.stdout().is_some())
-        .unwrap_or(false);
-    if !inside {
-        eprintln!("install-lifecycle: not a git repository — skipped the merge.iteration-scoped driver (the .gitattributes attribute stays inert until 'git config merge.iteration-scoped.driver true' is run in a clone)");
+    let cause = match crate::walk::toplevel_opt() {
+        Ok(Some(_)) => None,
+        Ok(None) => Some("not a git repository".to_string()),
+        Err(e) => Some(e),
+    };
+    if let Some(cause) = cause {
+        eprintln!("install-lifecycle: {} — skipped the merge.iteration-scoped driver (the .gitattributes attribute stays inert until 'git config merge.iteration-scoped.driver true' is run in a clone)", cause);
         return;
     }
     match proc::run(&programs::GIT, &["config", "merge.iteration-scoped.driver", "true"]) {

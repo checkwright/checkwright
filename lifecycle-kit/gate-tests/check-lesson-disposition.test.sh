@@ -2,7 +2,9 @@
 # Behavioral test of check-lesson-disposition — the scenarios the one
 # good/bad pair cannot hold: (A) a malformed disposition line reds on grammar;
 # (B) a Lessons entry still present in the worktree is not a removal, so it
-# needs no stamp; (C) a stored prefix matches a longer lead line (prefix join).
+# needs no stamp; (C) a stored prefix matches a longer lead line (prefix join);
+# (D-F) bare mode is clean outside a repository and exit 2 in one git refuses,
+# a nested one git skips included.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -47,9 +49,32 @@ EOF
 printf '# contract: lesson-disposition v1\ndemo lesson task new-slug — **alpha-lesson**\n' >"$SANDBOX/evid-prefix.txt"
 check_case "C prefix-join" 0 "clean" "$SANDBOX/head.md" "$SANDBOX/work-cleared.md" "$SANDBOX/evid-prefix.txt"
 
+bare_case() {  # $1=label  $2=sandbox cwd  $3=want-rc  $4=want-substring
+    local out rc
+    out="$(cd "$2" && gate_run check-lesson-disposition "$DIR/checks" 2>&1)"; rc=$?
+    if [[ "$rc" -ne "$3" ]] || ! grep -qF -- "$4" <<<"$out"; then
+        echo "  FAIL [$1]: want exit $3 carrying '$4', got $rc -- $out"; fails=$((fails + 1))
+    fi
+}
+
+# D: bare mode outside a repository has no HEAD baseline — clean.
+mkdir -p "$SANDBOX/none"
+bare_case "D no-repository" "$SANDBOX/none" 0 "no git repository"
+
+# E: bare mode in a repository git refuses is the crosser's refusal, never that clean answer.
+mkdir -p "$SANDBOX/refused"
+printf 'gitdir: %s/absent\n' "$SANDBOX/refused" >"$SANDBOX/refused/.git"
+bare_case "E refused-repository" "$SANDBOX/refused" 2 "marks a repository"
+
+# F: a nested repository git skips is refused too, though git answers the enclosing one at exit 0.
+git init -q "$SANDBOX/outer"
+mkdir -p "$SANDBOX/outer/inner/.git"
+printf 'garbage\n' >"$SANDBOX/outer/inner/.git/HEAD"
+bare_case "F nested-skipped-repository" "$SANDBOX/outer/inner" 2 "marks a repository beneath it"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-lesson-disposition.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-lesson-disposition.test.sh: clean (malformed-grammar + still-present + prefix-join, 3 cases)"
+echo "check-lesson-disposition.test.sh: clean (malformed-grammar + still-present + prefix-join + no-repository + refused + nested-skipped, 6 cases)"
 exit 0

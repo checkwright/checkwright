@@ -22,8 +22,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
     let docs_knob = walk::knob_scalar("SITE_KIT_DOCS_DIR")?;
     let docs = fresh::strip_trailing_slash(fresh::positional(args, 0, &docs_knob)).to_string();
 
-    let probe = proc::run(&programs::GIT, &["rev-parse", "--git-dir"])?;
-    if probe.stdout().is_none() {
+    if walk::toplevel_opt()?.is_none() {
         return Err("not a git repository — cannot enumerate tracked pages".to_string());
     }
     if !fresh::is_dir(&docs) {

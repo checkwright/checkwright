@@ -17,8 +17,7 @@ pub fn run(args: &[String]) -> i32 {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let probe = proc::run(&programs::GIT, &["rev-parse", "--git-dir"])?;
-    if probe.stdout().is_none() {
+    if crate::walk::toplevel_opt()?.is_none() {
         return Err("not a git repository — cannot verify tracked targets".to_string());
     }
 

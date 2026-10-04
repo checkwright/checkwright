@@ -9,7 +9,8 @@
 # — plus the corpus-match probe (a pathspec matching a path at rev, and one
 # matching none), the widened arm over git-object-shaped tokens in the OTHER four
 # fields, which the hermetic pair cannot reach for the same reason, and its valve;
-# plus the two inert shapes (no record at all, a header-only record).
+# plus the two inert shapes (no record at all, a header-only record), and a
+# repository git refuses, which exits 2 rather than degrading to grammar only.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -134,9 +135,15 @@ write_token_record "$noreason" "$noreason_sha" "four of them, as of deadbeef1." 
 check_case "valve-no-reason" "$noreason" 1 "valve carries no reason"
 check_case "valve-no-reason-still-probes" "$noreason" 1 "token names no object in this repository"
 
+# --- bare mode in a repository git refuses: the crosser's refusal, never a grammar-only pass ---
+refused="$SANDBOX/refused"; mkdir -p "$refused"
+printf 'gitdir: %s/absent\n' "$refused" >"$refused/.git"
+write_record "$refused" "$(printf 'a%.0s' {1..40})"
+check_case "refused-repository" "$refused" 2 "marks a repository"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-survey-record.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-survey-record.test.sh: clean (rev-exists + rev-unknown probe arms, the corpus-match probe matching and not, the widened non-rev token arm resolvable and not and over the inferred field, the valve and a reasonless valve that does not exempt, absent-record and header-only inert shapes, 12 cases)"
+echo "check-survey-record.test.sh: clean (rev-exists + rev-unknown probe arms, the corpus-match probe matching and not, the widened non-rev token arm resolvable and not and over the inferred field, the valve and a reasonless valve that does not exempt, absent-record and header-only inert shapes, a refused repository, 13 cases)"
 exit 0

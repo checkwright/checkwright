@@ -29,9 +29,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
 
     // spec: gate-sdk/SPEC.md §check-tree-terms — the tracked set is the subject, so a non-repo
     // cwd is fail-closed before anything else: there is no listing to be clean about
-    let probe = proc::run(&programs::GIT, &["rev-parse", "--git-dir"])
-        .map_err(|e| format!("check-tree-terms: {}", e))?;
-    if probe.stdout().is_none() {
+    if crate::walk::toplevel_opt().map_err(|e| format!("check-tree-terms: {}", e))?.is_none() {
         return Err(
             "check-tree-terms: not a git repository — cannot enumerate tracked files".into(),
         );

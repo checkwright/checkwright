@@ -44,9 +44,9 @@ pub fn run(args: &[String]) -> i32 {
 
     // spec: gate-sdk/SPEC.md §check-root-tiering — the tracked set is the subject, so a
     // non-repo cwd is fail-closed: there is no listing to be clean about
-    match proc::run(&programs::GIT, &["rev-parse", "--git-dir"]) {
-        Ok(c) if c.stdout().is_some() => {}
-        Ok(_) => {
+    match crate::walk::toplevel_opt() {
+        Ok(Some(_)) => {}
+        Ok(None) => {
             eprintln!(
                 "check-root-tiering: not a git repository — cannot enumerate tracked root entries"
             );

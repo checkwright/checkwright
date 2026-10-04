@@ -125,11 +125,7 @@ fn tree() -> Result<String, String> {
     // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the shared corpus rule degrades to an
     // empty corpus where git cannot answer, deliberately and on a monotonicity ground for its other
     // reader; this arm absorbs the divergence by probing first rather than printing `0 owed`.
-    let repo = matches!(
-        crate::proc::run(&programs::GIT, &["rev-parse", "--git-dir"]),
-        Ok(ref c) if c.stdout().is_some()
-    );
-    if !repo {
+    if walk::toplevel_opt()?.is_none() {
         return Err(
             "--tree: not a git repository — this arm's corpus is the tracked shell tree".to_string(),
         );

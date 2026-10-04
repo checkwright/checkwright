@@ -1454,7 +1454,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-close-surfaces",
         close_surfaces::run,
-        &[("?", "", "", "dynamic@src/emit/close_surfaces.rs:265 via emit::close_surfaces::derive")],
+        &[("?", "", "", "dynamic@src/emit/close_surfaces.rs:264 via emit::close_surfaces::derive")],
         &[
             "GATE_SDK_KIT_DIRS",
             "GATE_SDK_PRUNE_DIRS",
@@ -2510,7 +2510,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-path-dialect",
         path_dialect::run,
-        &[("?", "", "", "dynamic@src/gates/path_dialect.rs:620")],
+        &[("?", "", "", "dynamic@src/gates/path_dialect.rs:616")],
         &["GATE_SDK_NATIVE_SRC", "GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS"],
         "gate-sdk",
         &[("git", "")],

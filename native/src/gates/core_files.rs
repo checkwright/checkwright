@@ -85,16 +85,16 @@ pub fn run(args: &[String]) -> i32 {
         }
     };
 
-    let probe = match proc::run(&programs::GIT, &["rev-parse", "--git-dir"]) {
-        Ok(c) => c,
+    match crate::walk::toplevel_opt() {
+        Ok(Some(_)) => {}
+        Ok(None) => {
+            eprintln!("check-core-files: not a git repository — cannot verify tracked status");
+            return 2;
+        }
         Err(e) => {
             eprintln!("check-core-files: {}", e);
             return 2;
         }
-    };
-    if probe.stdout().is_none() {
-        eprintln!("check-core-files: not a git repository — cannot verify tracked status");
-        return 2;
     }
 
     let (mut missing, mut untracked) = (Vec::new(), Vec::new());

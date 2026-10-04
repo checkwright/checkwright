@@ -78,7 +78,7 @@ pub fn run(args: &[String]) -> i32 {
         },
     };
 
-    match git_capture(&["rev-parse", "--git-dir"]) {
+    match crate::walk::toplevel_opt() {
         Err(e) => {
             eprintln!("check-task-conservation: {}", e);
             return 2;

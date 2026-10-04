@@ -32,10 +32,36 @@ function Write-StubLine {
 $onWindows = [System.IO.Path]::DirectorySeparatorChar -eq '\'
 $SDK = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).ProviderPath
 
+# spec: gate-sdk/SPEC.md §run-gates — the stub's repository mark, held here as there: a non-empty GIT_DIR, or a .git entry at the working directory or above, the ascent stopping where GIT_CEILING_DIRECTORIES stops git's own
+function Test-RepositoryMark {
+    if ($env:GIT_DIR) { return $true }
+    $ceilings = @()
+    if ($env:GIT_CEILING_DIRECTORIES) {
+        foreach ($c in $env:GIT_CEILING_DIRECTORIES.Split([System.IO.Path]::PathSeparator)) {
+            if (-not $c) { continue }
+            $r = Resolve-Path -LiteralPath $c -ErrorAction SilentlyContinue
+            if ($r) { $ceilings += $r.ProviderPath.TrimEnd('\', '/') }
+        }
+    }
+    $d = (Get-Location).ProviderPath
+    $n = 0
+    while ($d) {
+        if ($n -gt 0 -and ($ceilings -contains $d.TrimEnd('\', '/'))) { return $false }
+        if (Get-Item -LiteralPath (Join-Path $d '.git') -Force -ErrorAction SilentlyContinue) { return $true }
+        $d = Split-Path -Parent $d
+        $n++
+    }
+    return $false
+}
+
 $top = $null
 try { $top = & git rev-parse --show-toplevel 2>$null } catch { $top = $null }
 if (-not $top -or -not (Test-Path -LiteralPath $top -PathType Container)) {
-    Write-StubError 'run-gates: not inside a git repository'
+    if (Test-RepositoryMark) {
+        Write-StubError 'run-gates: git refuses the repository marked here (GIT_DIR, or a .git entry here or above); git status prints its reason'
+    } else {
+        Write-StubError 'run-gates: not inside a git repository'
+    }
     exit 2
 }
 Set-Location -LiteralPath $top

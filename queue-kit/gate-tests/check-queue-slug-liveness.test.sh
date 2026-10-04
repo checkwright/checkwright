@@ -92,9 +92,18 @@ expect stale-status-reds empty.knobs 1 "ice-task says (deferred) but is Icebox"
 printf '%s\n\nNote: `ice-task` (icebox), `old-task` (retired), `tool-name` (done) and `nothing` (done).\n' "$queue" >"$sb/TASK-QUEUE.md"
 expect accurate-status-clean empty.knobs 0 "QUEUE-SLUG-LIVENESS: clean"
 
+# a repository git refuses has no history to read, and an empty retired set would pass the citation
+printf '%s\n' "$queue" >"$sb/TASK-QUEUE.md"
+printf '# page\n\nThe pending `old-task` work.\n' >"$sb/docs/page.md"
+mv "$sb/.git" "$sb/.git-saved"
+printf 'gitdir: %s/absent\n' "$sb" >"$sb/.git"
+expect refused-repository-exits-2 cite.knobs 2 "marks a repository"
+rm "$sb/.git"
+mv "$sb/.git-saved" "$sb/.git"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-queue-slug-liveness.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-queue-slug-liveness.test.sh: clean (retired set from the scratch repo's own history: the empty knob skips, a retired citation reds, a live name and a reasoned valve clear, a reasonless valve reds, a stale status reds and accurate ones clear, 7 cases)"
+echo "check-queue-slug-liveness.test.sh: clean (retired set from the scratch repo's own history: the empty knob skips, a retired citation reds, a live name and a reasoned valve clear, a reasonless valve reds, a stale status reds and accurate ones clear, a refused repository exits 2, 8 cases)"
 exit 0

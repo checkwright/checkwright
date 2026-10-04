@@ -1091,7 +1091,7 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String], declared: Option<&str>) -> Result<
 
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the iteration-boundary linked-worktree
     // refusal: at an iteration boundary no linked worktree should be live.
-    if first && c.worktree_check == "1" && inside_git() {
+    if first && c.worktree_check == "1" && inside_git()? {
         let rows = worktree_scan(c.worktree_re.as_ref());
         if !rows.is_empty() {
             let mut lines: Vec<String> = Vec::new();
@@ -1185,7 +1185,7 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String], declared: Option<&str>) -> Result<
 
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the mid-iteration worktree advisory: the
     // same scan away from the boundary, orphaned paths only and never a refusal.
-    if !first && c.worktree_check == "1" && inside_git() {
+    if !first && c.worktree_check == "1" && inside_git()? {
         let adv: Vec<String> = worktree_scan(c.worktree_re.as_ref())
             .iter()
             .filter(|r| matches!(r.class, Class::Orphaned))
@@ -1796,10 +1796,8 @@ struct Row {
     head: String,
 }
 
-fn inside_git() -> bool {
-    proc::run(&programs::GIT, &["rev-parse", "--git-dir"])
-        .map(|c| c.stdout().is_some())
-        .unwrap_or(false)
+fn inside_git() -> Result<bool, String> {
+    Ok(crate::walk::toplevel_opt()?.is_some())
 }
 
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the linked-worktree scan: one porcelain parse

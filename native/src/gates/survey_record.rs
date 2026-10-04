@@ -255,10 +255,13 @@ pub fn run(args: &[String]) -> i32 {
                 );
                 return 0;
             }
-            let in_repo = proc::run(&programs::GIT, &["rev-parse", "--git-dir"])
-                .map(|c| c.stdout().is_some())
-                .unwrap_or(false);
-            (p, in_repo)
+            match walk::toplevel_opt() {
+                Ok(t) => (p, t.is_some()),
+                Err(e) => {
+                    eprintln!("check-survey-record: {}", e);
+                    return 2;
+                }
+            }
         }
     };
     let text = match std::fs::read(&record) {

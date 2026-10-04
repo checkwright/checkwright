@@ -49,7 +49,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     // it is settled from one history pass before a blob is read.
     let text = std::fs::read_to_string(&file).unwrap_or_default();
     let live = queue::live_slugs(&text, &sec_cfg);
-    if !live.contains(&slug) && !queue::retired_set(&file, &live).contains(&slug) {
+    if !live.contains(&slug) && !queue::retired_set(&file, &live)?.contains(&slug) {
         return Err(format!("not a live or retired slug: {}", slug));
     }
 

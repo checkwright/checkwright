@@ -515,10 +515,11 @@ pub fn live_slugs(text: &str, sec: &Sections) -> Vec<String> {
 }
 
 // spec: queue-kit/SPEC.md §The shared queue adapters — the retired set, derived from the queue
-// file's own history; every degradation §The queue-edges arm declares yields the empty set
-pub fn retired_set(file: &str, live: &[String]) -> Vec<String> {
+// file's own history; every degradation §The queue-edges arm declares yields the empty set, and a
+// repository git refuses is the crosser's error rather than one
+pub fn retired_set(file: &str, live: &[String]) -> Result<Vec<String>, String> {
     if !crate::proc::on_path(&programs::GIT) {
-        return Vec::new();
+        return Ok(Vec::new());
     }
     let path = std::path::Path::new(file);
     let dir = match path.parent().map(|p| p.to_string_lossy().into_owned()) {
@@ -526,18 +527,17 @@ pub fn retired_set(file: &str, live: &[String]) -> Vec<String> {
         _ => ".".to_string(),
     };
     let Some(base) = path.file_name().map(|b| b.to_string_lossy().into_owned()) else {
-        return Vec::new();
+        return Ok(Vec::new());
     };
-    match crate::proc::run(&programs::GIT, &["-C", &dir, "rev-parse", "--is-inside-work-tree"]) {
-        Ok(c) if c.stdout().is_some() => {}
-        _ => return Vec::new(),
+    if crate::walk::toplevel_in_opt(&dir)?.is_none() {
+        return Ok(Vec::new());
     }
     let log = match crate::proc::run(&programs::GIT, &["-C", &dir, "log", "-p", "--format=", "--", &base]) {
         Ok(c) => match c.stdout() {
             Some(o) => String::from_utf8_lossy(o).into_owned(),
-            None => return Vec::new(),
+            None => return Ok(Vec::new()),
         },
-        Err(_) => return Vec::new(),
+        Err(_) => return Ok(Vec::new()),
     };
     let mut out: Vec<String> = Vec::new();
     for line in log.lines() {
@@ -553,7 +553,7 @@ pub fn retired_set(file: &str, live: &[String]) -> Vec<String> {
             }
         }
     }
-    out
+    Ok(out)
 }
 
 // spec: queue-kit/SPEC.md §The shared queue adapters — one revision of the queue file on the history
@@ -639,7 +639,7 @@ pub fn transitions(file: &str, slug: &str, sec: &Sections) -> Result<Vec<Transit
     let live = live_slugs(&text, sec);
     let known = live.iter().any(|s| s == slug)
         || done_slugs(&text, sec).iter().any(|s| s == slug)
-        || retired_set(file, &live).iter().any(|s| s == slug);
+        || retired_set(file, &live)?.iter().any(|s| s == slug);
     if !known {
         return Err(format!("not a live or retired slug: {}", slug));
     }

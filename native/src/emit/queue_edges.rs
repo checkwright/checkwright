@@ -45,7 +45,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         std::fs::read_to_string(&file).map_err(|e| format!("file not found: {}: {}", file, e))?;
     let sec = Sections::active_and_deferred()?;
     let live = queue::live_slugs(&text, &sec);
-    let retired = queue::retired_set(&file, &live);
+    let retired = queue::retired_set(&file, &live)?;
 
     // spec: queue-kit/SPEC.md §The queue-edges arm — a slug that is neither live nor retired is a
     // caller error, not an empty set: silence has to mean "no inbound edges" and nothing else.

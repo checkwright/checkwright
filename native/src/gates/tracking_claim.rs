@@ -28,8 +28,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     if !Path::new(root).is_dir() {
         return Err(format!("not a directory: {}", root));
     }
-    let probe = proc::run(&programs::GIT, &["-C", root, "rev-parse", "--git-dir"])?;
-    if probe.stdout().is_none() {
+    if crate::walk::toplevel_in_opt(root)?.is_none() {
         return Err(format!(
             "{} is not a git repository — a tracking claim is unverifiable",
             root

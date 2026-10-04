@@ -55,9 +55,8 @@ fn inner(args: &[String]) -> Result<i32, String> {
     let scanroot = fresh::strip_trailing_slash(fresh::positional(args, 0, &scan_knob)).to_string();
     let cname = fresh::positional(args, 1, &cname_knob).to_string();
 
-    let probe = proc::run(&programs::GIT, &["rev-parse", "--git-dir"])
-        .map_err(|e| format!("check-docs-cname-parity: {}", e))?;
-    if probe.stdout().is_none() {
+    let top = crate::walk::toplevel_opt().map_err(|e| format!("check-docs-cname-parity: {}", e))?;
+    if top.is_none() {
         return Err(
             "check-docs-cname-parity: not a git repository — cannot enumerate tracked files".into(),
         );

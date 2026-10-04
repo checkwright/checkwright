@@ -185,8 +185,7 @@ struct Declared {
 // spec: canon-kit/SPEC.md §check-amendment-retired-spelling — the reconciliation corpus:
 // `git ls-files` minus the amendment set, minus the configured exclusion
 fn corpus(root: &str, amendments: &[String]) -> Result<Vec<String>, String> {
-    let probe = proc::run(&programs::GIT, &["rev-parse", "--git-dir"])?;
-    if probe.stdout().is_none() {
+    if crate::walk::toplevel_opt()?.is_none() {
         return Err("not a git repository — cannot enumerate the reconciliation corpus".into());
     }
     let ls = proc::run(&programs::GIT, &["ls-files", "--", root])?;

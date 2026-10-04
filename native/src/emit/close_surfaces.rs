@@ -13,8 +13,7 @@ pub fn base(args: &[String]) -> Result<String, String> {
     match args.first().filter(|a| !a.is_empty()) {
         Some(a) => {
             let root = if a.len() > 1 { a.trim_end_matches('/') } else { a.as_str() };
-            let probe = proc::run(&programs::GIT, &["-C", root, "rev-parse", "--git-dir"])?;
-            if probe.stdout().is_none() {
+            if crate::walk::toplevel_in_opt(root)?.is_none() {
                 return Err(not_a_repo());
             }
             Ok(root.to_string())

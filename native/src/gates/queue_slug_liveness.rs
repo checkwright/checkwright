@@ -98,9 +98,9 @@ fn slug_sections(text: &str, sec: &queue::Sections) -> Vec<(String, String)> {
 fn status_findings(
     text: &str,
     sec: &queue::Sections,
-    retired: &dyn Fn() -> Vec<String>,
+    retired: &dyn Fn() -> Result<Vec<String>, String>,
     qpath: &Path,
-) -> Vec<String> {
+) -> Result<Vec<String>, String> {
     let vocab = status_vocabulary(sec);
     let mut cands: Vec<(usize, &str, &str)> = Vec::new();
     for (i, line) in text.lines().enumerate() {
@@ -122,10 +122,10 @@ fn status_findings(
         }
     }
     if cands.is_empty() {
-        return Vec::new();
+        return Ok(Vec::new());
     }
     let homes = slug_sections(text, sec);
-    let retired = retired();
+    let retired = retired()?;
     let mut out = Vec::new();
     for (ln, slug, word) in cands {
         let home = homes.iter().find(|(s, _)| s == slug).map(|(_, n)| n.as_str());
@@ -152,7 +152,7 @@ fn status_findings(
             ));
         }
     }
-    out
+    Ok(out)
 }
 
 fn surface_files(root: &Path, knob: &str) -> Result<Vec<PathBuf>, String> {
@@ -217,7 +217,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let qtext = read(&qpath)?;
     let live = queue::live_slugs(&qtext, &sec);
     let qfile = qpath.display().to_string();
-    let cell: std::cell::OnceCell<Vec<String>> = std::cell::OnceCell::new();
+    let cell: std::cell::OnceCell<Result<Vec<String>, String>> = std::cell::OnceCell::new();
     let retired = || cell.get_or_init(|| queue::retired_set(&qfile, &live)).clone();
 
     let mut dead: Vec<String> = Vec::new();
@@ -235,7 +235,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     let mut stale: Vec<String> = Vec::new();
     if !cites.is_empty() {
-        let ret = retired();
+        let ret = retired()?;
         if !ret.is_empty() {
             let stems = queue::tracked_stems(&qfile);
             for f in &cites {
@@ -255,7 +255,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    let status = status_findings(&qtext, &sec, &retired, &qpath);
+    let status = status_findings(&qtext, &sec, &retired, &qpath)?;
 
     if !dead.is_empty() {
         println!("check-queue-slug-liveness: link into the queue claims membership but names no live task:");
@@ -336,11 +336,11 @@ mod tests {
     #[test]
     fn a_status_parenthetical_agrees_with_the_slug_section() {
         let q = "## New Features\n\n### a-live\n\nx\n\n## Deferred\n\n### b-def\n\ncites [c-ice](#c-ice) (icebox), `b-def` (deferred), [a-live](#a-live) (deferred), `d-done` (retired), `gone` (retired), `x-none` (done), `d-done` (landed 2026)\n\n## Icebox\n\n### c-ice\n\ny\n\n## Done\n\n- d-done\n";
-        let ret = || vec!["d-done".to_string(), "gone".to_string()];
-        let out = status_findings(q, &sec(), &ret, Path::new("Q.md"));
+        let ret = || Ok(vec!["d-done".to_string(), "gone".to_string()]);
+        let out = status_findings(q, &sec(), &ret, Path::new("Q.md")).expect("status");
         assert_eq!(out, vec!["Q.md:11:a-live says (deferred) but is New Features".to_string()]);
         let q2 = "## Deferred\n\n### b-def\n\n`d-done` (icebox) and `gone` (done)\n\n## Done\n\n- d-done\n";
-        let out = status_findings(q2, &sec(), &ret, Path::new("Q.md"));
+        let out = status_findings(q2, &sec(), &ret, Path::new("Q.md")).expect("status");
         assert_eq!(
             out,
             vec![
