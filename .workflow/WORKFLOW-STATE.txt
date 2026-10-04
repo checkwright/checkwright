@@ -5,3 +5,4 @@
 ---
 
 canon-kit-reach-pass scope a4e7887b 2026-10-04 e67f6b22
+canon-kit-reach-pass build a1a096ca 2026-10-04 91b80c05
