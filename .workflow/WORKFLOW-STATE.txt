@@ -5,3 +5,4 @@
 ---
 
 canon-kit-tail-installer-pass scope a470d63d 2026-10-04 9beb19046
+canon-kit-tail-installer-pass build a9ff482d 2026-10-04 3e53b71d4
