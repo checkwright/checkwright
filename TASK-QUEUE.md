@@ -342,20 +342,6 @@ queue provenance prose restates what `git log` answers; the ruled sweep is small
 
 **Cost while deferred:** low; paid by every reader of those entries. Filed 2026-09-09; returned from the icebox 2026-09-25 by consult, the count re-run.
 
-### crates-reservation-republish
-
-[cost: event/low] [surface: installer]
-
-the crates.io reservation page still carries the retired methodology description, because `reserve/crates/` was regenerated to the product statement but never republished. The republish is a registry write only the operator makes.
-
-**Inferred, not run:** crates.io versions are immutable, so the new description ships only as a new version (`0.0.1`), not over `0.0.0`.
-
-**Deliverable:** the reservation crate republished by the operator, and the live page reading the product statement.
-
-**Close obligation (2026-10-04, operator direction lead-relayed, not a ruling):** offered to the operator at installer-trust-pass' close as an operator-only registry write. Answered there: republish, with `reserve/crates/Cargo.toml` bumped to `0.0.1`, and a grant for the close session to attempt one `cargo publish` after a green closing push, a dry run first and no workaround; on failure the operator publishes. The dry run packaged `0.0.1` clean; the one attempt failed with crates.io's `403 Forbidden: authentication failed`, and `max_version` stayed `0.0.0`, so the publish is the operator's.
-
-**Cost while deferred:** a reader searching crates.io meets a second product description, the one `one-product-statement` removed everywhere else. Filed 2026-09-27 to the gap inbox by gate-sdk-tail-docs-standard's build; promoted 2026-09-27 at its close: →fix fails because the write is operator-only. Re-verified: the crates.io API returns the retired description at `max_version` 0.0.0. Owner lookup: `crates.io`, `reserve`, `republish` in this file — none; owner installer/SPEC.md §The dependency boundary.
-
 ### manual-operation-spend-channel
 
 [cost: iteration/low] [surface: drift-kit]
@@ -541,6 +527,36 @@ the binary still names or spawns the bash front end where an adopter meets it: t
 **Deliverable:** each site respelled to the binary door, the knob default's working-directory change (the front end changes to the toplevel, the binary does not) settled in evidence-kit/SPEC.md, and the door roots widened to native/src.
 
 **Cost while deferred:** an adopter reading `--help` or the demo meets a command their install may not carry. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' build; promoted at its close: →fix fails because the knob default is a behaviour change across two front ends, →forward because no ruling is owed. Re-verified: grep finds all four sites. `hook-emit-remedy-door` scoped its fix to the hook and emit trees; this is DISTINCT, not a recurrence. Owner lookup: `run-gates.sh`, `DOOR_ROOTS` in this file — none; owner guard-kit/SPEC.md §check-door-binding, with gate-sdk/SPEC.md §run-gates.
+
+### update-notice-probe-contract
+
+[cost: session/low] [surface: installer]
+
+the update notice's probe and cache break four stated properties. (1) installer/SPEC.md §The update notice says a failed probe writes nothing so the next read probes again, and its honest limit says the upstream sees the adopter at most once per interval; `native/src/emit/update_notice.rs` records no failed attempt, so an unreachable upstream is probed at every bare `doctor` and every session start. (2) The `checkwright-update-check` line holds a time and a version and no upstream, so a changed `GATE_SDK_UPDATE_UPSTREAM`, or worktrees of one common dir under different upstreams, read another upstream's version and skip the probe for up to an interval. (3) `run_bounded_capture` in `native/src/proc.rs` kills the spawned git, and `git ls-remote` over https runs a remote helper, and any credential helper, that may outlive it, so network activity can run past `GATE_SDK_UPDATE_TIMEOUT`; **inferred, not run**. (4) `uninstall` leaves the cache by design, a write path with no reclaim.
+
+**Deliverable:** the attempt recorded or the limit restated, the cache keyed on its upstream, the bound extended to the process tree or stated as delegation-kit's foreign run states its kill, and the cache reclaimed by `uninstall` or its orphan stated as an honest limit; §The update notice and the module's tests updated.
+
+**Cost while deferred:** where the upstream is unreachable, every session start and bare `doctor` makes an outbound attempt and can wait up to the timeout; the notice is unreleased, so the next release cut publishes it as is. Filed 2026-10-04 to the gap inbox as four bullets by installer-trust-pass' close, its second-vendor review and runtime-artifact check; promoted together 2026-10-04 at the next iteration's scope, all four being one section's cache and probe contract in one module: →fix fails because recording, keying and reclaiming each change stated behavior, →forward because no ruling is owed. Re-verified: the cache is written only after a successful probe, its line has two fields, and the SPEC's `uninstall` sentence. Owner lookup: `update notice`, `update-check`, `UPDATE_` in this file — [installer-smoke-live-upstream](#installer-smoke-live-upstream), DISTINCT (the smoke's own probes; reshaped, since a recorded attempt cuts them to one per interval); owner installer/SPEC.md §The update notice.
+
+### install-attestation-binding
+
+[cost: event/high] [surface: installer]
+
+the one-line installers' attestation check binds the publisher, not the release, and downgrades silently at readiness. `docs/install.sh` and `docs/install.ps1` run `gh attestation verify` with `--repo` and `--signer-workflow` only, so an older attested tarball served under a newer version's name, its digest matching, passes; `gh` offers `--source-ref` and `--source-digest` to bind the tag. Both scripts also read any failing `gh attestation verify --help` or `gh auth status` as no verifier and proceed digest-only, so an auth or API outage at readiness skips a check a failure during verify would refuse on. installer/SPEC.md §The dependency boundary states the four outcomes and neither limit, and the CI stub `gh` accepts every call, so no witness sees either.
+
+**Deliverable:** the verify bound to the release's tag in both scripts, the stub asserting the flags it receives, and the readiness downgrade narrowed to an absent or signed-out `gh` or stated as an honest limit; §The dependency boundary updated.
+
+**Cost while deferred:** once an attested release is published, every install accepts another release's attested tarball, and a readiness outage drops the check unannounced; the pinned release predates the scripts' attestation floor, so the cost starts at the next cut. Filed 2026-10-04 to the gap inbox as two bullets by installer-trust-pass' close, its second-vendor review; promoted together 2026-10-04 at the next iteration's scope, both being the scripts' verify contract: →fix fails because a bound verify refuses what passes today, an envelope change, →forward because no ruling is owed. Re-verified: both flags and the readiness chain in both scripts, and `gh attestation verify --help` lists `--source-ref` and `--source-digest`. Owner lookup: `attestation`, `source-ref`, `signer-workflow` in this file — [tarball-attestation-observed](#tarball-attestation-observed), DISTINCT (observes the step; reshaped, its observation then exercising the bound verify), and [hosted-attestation-service](#hosted-attestation-service), DISTINCT; owner installer/SPEC.md §The dependency boundary.
+
+### release-section-collision
+
+[cost: event/low] [surface: gate-sdk]
+
+`GATE_SDK_RELEASE_SECTION_ALIASES`'s validator (`refusals` in `native/src/release_sections.rs`) reds an alias naming a heading the roster already gives, on the ground that the section would read under two roles, but admits two roster roles given one heading and one alias heading given to two roles, which fall to the same ground. gate-sdk/SPEC.md's entry for the knob lists the narrower refusal set.
+
+**Deliverable:** the refusal widened to every heading reached under two roles, across the roster and the aliases, a validator test per case, and the knob entry's refusal list updated.
+
+**Cost while deferred:** a consumer giving two roles one heading gets a note whose section the upgrade contract reads under either role, unrefused. Filed 2026-10-04 to the gap inbox by installer-trust-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because a widened refusal reds configurations accepted today, →forward because no ruling is owed. Re-verified: `refusals` checks a repeated role, and an alias against the roster's headings only. Owner lookup: `RELEASE_SECTION`, `two roles`, `alias` in this file — none; owner gate-sdk/SPEC.md §Layout and configuration.
 
 ## Icebox
 
@@ -1219,4 +1235,6 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 Ported gate and emit modules carry spec: comments citing a section for a literal or a port note the section does not state, so a reader following the pointer finds no support for it; a crate-wide sweep would retag, delete or relocate each, and a new instance returns the entry.
 
 ## Done
+
+- crates-reservation-republish
 
