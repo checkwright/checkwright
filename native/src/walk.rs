@@ -504,11 +504,14 @@ fn toplevel_args(dir: Option<&str>) -> Result<Option<String>, String> {
 // none, so a non-zero exit is classified by the mark at the anchor alone
 fn refused_or_absent(dir: Option<&str>) -> Result<Option<String>, String> {
     let Ok(here) = cwd() else { return Ok(None) };
-    let anchor = abs_against(&here, dir.unwrap_or("."));
-    if !Path::new(&anchor).is_dir() {
-        return Ok(None);
-    }
-    match repository_mark(&anchor) {
+    let operand = dir.unwrap_or(".");
+    let Some(start) = physical(operand).filter(|p| Path::new(p).is_dir()) else { return Ok(None) };
+    let anchor = match operand {
+        "." => here,
+        d if path_root(d).is_some() => d.to_string(),
+        d => child(Path::new(&here), d).display().to_string(),
+    };
+    match repository_mark(&start) {
         None => Ok(None),
         Some(mark) => Err(format!(
             "git answers no work tree at {} though {} marks a repository — a refused or broken repository is not read as outside one (`git -C {} status` prints git's reason)",
@@ -522,17 +525,15 @@ fn refused_or_absent(dir: Option<&str>) -> Result<Option<String>, String> {
 // spec: gate-sdk/SPEC.md §The crate's crosser — a `.git` entry of any type at the anchor or above,
 // ascending the physical path no further than git's own discovery would, or a `GIT_DIR` naming one
 // outright
-fn repository_mark(anchor: &str) -> Option<PathBuf> {
+fn repository_mark(start: &str) -> Option<PathBuf> {
     if let Some(d) = std::env::var_os("GIT_DIR").filter(|d| !d.is_empty()) {
         return Some(PathBuf::from(d));
     }
-    let physical = |p: &str| canonicalize(p).map_or_else(|| normalize_abs(p), |c| normalize_abs(strip_extended_prefix(&c)));
     let ceilings: Vec<String> = std::env::var_os("GIT_CEILING_DIRECTORIES")
-        .map(|v| std::env::split_paths(&v).map(|c| physical(&c.display().to_string())).collect())
+        .map(|v| std::env::split_paths(&v).map(|c| c.display().to_string()).map(|c| physical(&c).unwrap_or(c)).collect())
         .unwrap_or_default();
-    let start = physical(anchor);
-    for (i, dir) in Path::new(&start).ancestors().enumerate() {
-        if i > 0 && ceilings.contains(&normalize_abs(&dir.display().to_string())) {
+    for (i, dir) in Path::new(start).ancestors().enumerate() {
+        if i > 0 && ceilings.iter().any(|c| Path::new(c) == dir) {
             return None;
         }
         let mark = child(dir, ".git");
@@ -541,6 +542,14 @@ fn repository_mark(anchor: &str) -> Option<PathBuf> {
         }
     }
     None
+}
+
+// spec: gate-sdk/SPEC.md §The crate's crosser — the anchor resolved physically with no lexical step
+// first; `\` folds on Windows alone, where it separates, since on POSIX it is a name byte
+fn physical(p: &str) -> Option<String> {
+    let c = canonicalize(p)?;
+    let c = strip_extended_prefix(&c);
+    Some(if cfg!(windows) { normalize_abs(c) } else { c.to_string() })
 }
 
 // spec: gate-sdk/SPEC.md §The crate's crosser — the main checkout's root when the working directory
@@ -1388,6 +1397,36 @@ mod tests {
         env.set("GIT_CEILING_DIRECTORIES", &repo.display().to_string());
         assert_eq!(toplevel_in_opt(&at), Ok(None), "a ceiling at the physical repository hides its mark");
         env.remove("GIT_CEILING_DIRECTORIES");
+        if let Some(v) = inherited {
+            env.set("GIT_DIR", &v);
+        }
+        let _ = std::fs::remove_dir_all(&d);
+    }
+
+    // spec: gate-sdk/SPEC.md §The crate's crosser — the anchor is resolved physically with no lexical
+    // step first: a `..` after a symlink climbs the target's parent, and a POSIX name may carry `\`
+    #[cfg(unix)]
+    #[test]
+    fn an_anchor_is_resolved_physically_before_the_mark_search() {
+        let env = crate::knobenv::lock();
+        let inherited = std::env::var("GIT_DIR").ok();
+        env.remove("GIT_DIR");
+        env.remove("GIT_CEILING_DIRECTORIES");
+        let d = std::env::temp_dir().join(format!("walk-toplevel-physical-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        let (repo, outside) = (d.join("repo"), d.join("outside"));
+        std::fs::create_dir_all(repo.join("sub")).expect("scratch");
+        std::fs::create_dir_all(repo.join(r"a\b")).expect("scratch");
+        std::fs::create_dir_all(&outside).expect("scratch");
+        std::fs::write(repo.join(".git"), format!("gitdir: {}\n", d.join("absent").display())).expect("write");
+        std::os::unix::fs::symlink(repo.join("sub"), outside.join("link")).expect("symlink");
+        let up = format!("{}/link/..", outside.display());
+        let refused = toplevel_in_opt(&up).expect_err("a symlink-then-`..` operand into a refused repository read as none");
+        assert!(refused.contains(&format!("at {} though", up)), "{}", refused);
+        assert!(refused.contains("marks a repository"), "{}", refused);
+        let named = format!(r"{}/a\b", repo.display());
+        let refused = toplevel_in_opt(&named).expect_err("a backslash-bearing name in a refused repository read as none");
+        assert!(refused.contains("marks a repository"), "{}", refused);
         if let Some(v) = inherited {
             env.set("GIT_DIR", &v);
         }
