@@ -119,9 +119,9 @@ pub fn queue_source(payload: &Path, kits: &[String]) -> Option<String> {
     Some(if tpl.is_empty() { "-".to_string() } else { tpl })
 }
 
-// spec: installer/SPEC.md §What init seeds — the fallback carries every
-// `QUEUE_KIT_REQUIRED_SECTIONS` heading at that knob's default, rendered from the kit's table: the
-// section floor is not registered at install, so a skeleton missing one reds on the day they register it.
+// spec: installer/SPEC.md §What init seeds — the fallback carries the whole required set at the
+// kit's defaults, composed by the section floor's own rule: that floor is not
+// registered at install, so a skeleton missing one reds on the day they register it.
 pub fn write_queue(src: &str, root: &Path, queue_file: &str) -> Result<(), String> {
     let dest = root.join(queue_file);
     if src != "-" {
@@ -129,15 +129,19 @@ pub fn write_queue(src: &str, root: &Path, queue_file: &str) -> Result<(), Strin
             .map(|_| ())
             .map_err(|e| format!("cannot write {}: {}", queue_file, e));
     }
+    std::fs::write(&dest, skeleton(queue_file)).map_err(|e| format!("cannot write {}: {}", queue_file, e))
+}
+
+fn skeleton(queue_file: &str) -> String {
     let mut body = format!("# {}\n", queue_file);
-    for sec in crate::knobs::queue_kit::REQUIRED_SECTIONS {
+    for sec in crate::knobs::queue_kit::default_required_set() {
         body.push_str(&format!("\n## {}\n", sec));
         if sec.ends_with(':') {
             body.truncate(body.len() - 1);
             body.push_str(" —\n\n---\n");
         }
     }
-    std::fs::write(&dest, body).map_err(|e| format!("cannot write {}: {}", queue_file, e))
+    body
 }
 
 // spec: installer/SPEC.md §What init seeds — this asks whether the agent file must *exist* for a
@@ -240,6 +244,22 @@ mod tests {
     // this prefix rather than written out, because assertion C holds this file free of literal gate
     // names and a test corpus spelling one out is indistinguishable to it from a roster.
     const PREFIX: &str = "check";
+
+    #[test]
+    fn the_skeleton_carries_every_required_heading_at_the_defaults_in_order() {
+        let heads: Vec<String> = skeleton("Q.md").lines().filter(|l| l.starts_with("## ")).map(String::from).collect();
+        assert_eq!(
+            heads,
+            [
+                "## Iteration: —",
+                "## New Features",
+                "## Technical Debt",
+                "## Deferred",
+                "## Done",
+                "## Lessons Learned"
+            ]
+        );
+    }
 
     // spec: gate-sdk/SPEC.md §The install disposition — the declaration is read off the gate's own
     // header, first line wins, and a header that declares none reads empty rather than defaulting.

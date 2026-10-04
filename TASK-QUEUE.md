@@ -10,19 +10,11 @@
 
 ## Technical Debt
 
-### required-sections-literal
-
-`QUEUE_KIT_REQUIRED_SECTIONS`'s default (`native/src/knobs/queue_kit.rs`, `REQUIRED_SECTIONS`) re-lists as literals the names the active, deferred and done section knobs own, plus `Lessons Learned`; only the icebox is composed in (`native/src/queue.rs`, `required_sections`). An adopter renaming a section through its own knob, or dropping the optional Lessons channel, must restate the whole required list, or `check-queue-sections` reds on the old name.
-
-**Deliverable:** the default composed from the section knobs (Lessons Learned only while the lesson channel is on), with a fixture renaming the deferred section through its knob alone, queue-kit/SPEC.md §Layout and configuration updated, and a release declaration for the changed default.
-
-**Cost while deferred:** a second copy of each section name a renaming adopter must keep in step; this repo already restates the list in `scripts/queue-config.knobs` to drop Lessons Learned. Filed 2026-10-01 to the gap inbox at lifecycle-queue-value-pass' build; promoted at its close: →fix fails because it changes a shipped knob's default, adopter-visible semantics no amendment settled, →forward because no ruling is owed. Re-verified: the literal list and the icebox-only composition read as filed. Owner lookup: `REQUIRED_SECTIONS`, `required list` in this file — none; owner queue-kit/SPEC.md §Layout and configuration.
-
 ### queue-kit-format-brevity
 
 queue-kit/SPEC.md's format half, which no brevity slice has passed: §The queue format with §Queue and backlog, §The icebox tier, §<slug> and §The tag algebra, plus §Layout and configuration, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): about 9.2k of the file's 36k words at this scope, and 52 of its 94 `check-prose-bounds` findings with the ceiling knob emptied.
 
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey; the file's ceiling row re-stamped. Applied last, after [required-sections-literal](#required-sections-literal) edits §Layout and configuration.
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey; the file's ceiling row re-stamped. Applied last, after `required-sections-literal` edits §Layout and configuration.
 
 **Cost while deferred:** paid by every session and adopter that reads the queue grammar. Filed 2026-10-04 as a split at scope. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling); the arms half stays with the parent.
 
@@ -1194,4 +1186,5 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 - spec-mark-symlink-ascent
 - walk-child-posix-backslash
 - front-end-door-residue
+- required-sections-literal
 

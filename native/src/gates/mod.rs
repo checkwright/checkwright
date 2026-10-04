@@ -297,7 +297,10 @@ pub const REGISTRY: &[GateEntry] = &[
         &[
             "QUEUE_KIT_QUEUE_FILE",
             "QUEUE_KIT_REQUIRED_SECTIONS",
+            "QUEUE_KIT_ACTIVE_SECTIONS",
+            "QUEUE_KIT_DEFERRED_SECTION",
             "QUEUE_KIT_ICEBOX_SECTION",
+            "QUEUE_KIT_DONE_SECTION",
         ],
         "queue-kit",
         &[],

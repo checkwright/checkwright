@@ -11,15 +11,26 @@ pub fn knob_scalar(name: &str) -> Result<String, String> {
     crate::walk::knob_scalar(name)
 }
 
-// spec: queue-kit/SPEC.md §The shared queue adapters — the required set composed in the reader:
-// a configured icebox joins it unless already named, so a consumer setting the list keeps the append
 pub fn required_sections() -> Result<Vec<String>, String> {
-    let mut out = knob_array("QUEUE_KIT_REQUIRED_SECTIONS")?;
-    let icebox = knob_scalar("QUEUE_KIT_ICEBOX_SECTION")?;
-    if !icebox.is_empty() && !out.contains(&icebox) {
-        out.push(icebox);
+    let s = Sections::with_done()?;
+    let mut named = s.task_sections();
+    named.push(s.done.as_str());
+    Ok(compose_required(&knob_array("QUEUE_KIT_REQUIRED_SECTIONS")?, &named))
+}
+
+// spec: queue-kit/SPEC.md §The shared queue adapters — the required set composed in the reader:
+// every section knob's name joins the configured list unless already named, so a consumer setting
+// the list keeps the union; the list's titled entries lead and its other entries trail
+pub fn compose_required<S: AsRef<str>>(knob: &[String], named: &[S]) -> Vec<String> {
+    let (titled, rest): (Vec<&String>, Vec<&String>) = knob.iter().partition(|e| e.ends_with(':'));
+    let mut out: Vec<String> = Vec::new();
+    let names = named.iter().map(|n| n.as_ref()).filter(|n| !n.is_empty());
+    for e in titled.into_iter().map(String::as_str).chain(names).chain(rest.into_iter().map(String::as_str)) {
+        if !out.iter().any(|o| o == e) {
+            out.push(e.to_string());
+        }
     }
-    Ok(out)
+    out
 }
 
 // spec: queue-kit/SPEC.md §The shared queue adapters — the section vocabulary every derived
@@ -897,6 +908,16 @@ impl DeferMarks {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn the_required_set_unions_the_section_names_into_the_list() {
+        let knob = |v: &[&str]| v.iter().map(|s| s.to_string()).collect::<Vec<String>>();
+        let renamed = compose_required(&knob(&["Iteration:", "Lessons Learned"]), &["Now", "Backlog", "Icebox", "Done"]);
+        assert_eq!(renamed, ["Iteration:", "Now", "Backlog", "Icebox", "Done", "Lessons Learned"]);
+        let restated = compose_required(&knob(&["Iteration:", "Now", "Done"]), &["Now", "Backlog", "", "Done"]);
+        assert_eq!(restated, ["Iteration:", "Now", "Backlog", "Done"]);
+        assert_eq!(compose_required(&[], &["Now", "Backlog", "Done"]), ["Now", "Backlog", "Done"]);
+    }
 
     // spec: queue-kit/SPEC.md §The queue format — Surfaced outranks Filed wherever each sits, and the
     // spellings the definition does not name (lowercase, a word between, a wrapped date) resolve none

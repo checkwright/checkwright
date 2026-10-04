@@ -1,0 +1,2 @@
+# spec: queue-kit/SPEC.md §Layout and configuration — the deferred section renamed through its own knob alone; the required set follows it
+QUEUE_KIT_DEFERRED_SECTION = Backlog

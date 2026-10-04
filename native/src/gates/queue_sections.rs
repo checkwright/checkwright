@@ -63,7 +63,8 @@ pub fn run(args: &[String]) -> i32 {
             println!("  duplicate: ## {}", s);
         }
         println!("  help: restore the heading (spelled exactly), or remove the duplicate. The");
-        println!("        required set is QUEUE_KIT_REQUIRED_SECTIONS (queue-config.knobs).");
+        println!("        required set is QUEUE_KIT_REQUIRED_SECTIONS plus every section knob's name");
+        println!("        (queue-config.knobs).");
         return 1;
     }
 

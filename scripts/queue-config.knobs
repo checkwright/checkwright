@@ -16,10 +16,6 @@ QUEUE_KIT_ICEBOX_SECTION = Icebox
 QUEUE_KIT_ICEBOX_AGE_DAYS = 7
 # spec: queue-kit/SPEC.md §Layout and configuration — the policy calibrations this repo relies on, bound at the values its gates are green at so a kit default's move moves no verdict here (Policy-as-choice); QUEUE_KIT_WRAP_BUDGET stays inherited because its one reader, check-queue-wrap, is unregistered here
 QUEUE_KIT_REQUIRED_SECTIONS[] = Iteration:
-QUEUE_KIT_REQUIRED_SECTIONS[] = New Features
-QUEUE_KIT_REQUIRED_SECTIONS[] = Technical Debt
-QUEUE_KIT_REQUIRED_SECTIONS[] = Deferred
-QUEUE_KIT_REQUIRED_SECTIONS[] = Done
 QUEUE_KIT_ATTEND_CAP = 3
 QUEUE_KIT_ENTRY_CAP = 4300cp
 QUEUE_KIT_ENTRY_CREDIT_MAX = 2150cp

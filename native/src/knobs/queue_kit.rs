@@ -5,23 +5,28 @@ fn queue_file(resolve: Resolve) -> Result<Value, String> {
     resolve("GATE_SDK_QUEUE_FILE").map(|(v, _)| v)
 }
 
-pub const REQUIRED_SECTIONS: &[&str] = &[
-    "Iteration:",
-    "New Features",
-    "Technical Debt",
-    "Deferred",
-    "Done",
-    "Lessons Learned",
-];
+pub const REQUIRED_SECTIONS: &[&str] = &["Iteration:", "Lessons Learned"];
+pub const ACTIVE_SECTIONS: &[&str] = &["New Features", "Technical Debt"];
+pub const DEFERRED_SECTION: &str = "Deferred";
+pub const DONE_SECTION: &str = "Done";
+
+// spec: installer/SPEC.md §What init seeds — the required set at every default, composed by the
+// reader's own rule, so the skeleton carries each heading the section floor demands
+pub fn default_required_set() -> Vec<String> {
+    let knob: Vec<String> = REQUIRED_SECTIONS.iter().map(|s| s.to_string()).collect();
+    let mut named: Vec<&str> = ACTIVE_SECTIONS.to_vec();
+    named.extend([DEFERRED_SECTION, DONE_SECTION]);
+    crate::queue::compose_required(&knob, &named)
+}
 
 pub const KIT: Kit = Kit {
     root: "queue-kit",
     rows: &[
         Row::derived("QUEUE_KIT_QUEUE_FILE", Shape::Scalar, queue_file, &["GATE_SDK_QUEUE_FILE"]),
-        Row::indexed("QUEUE_KIT_ACTIVE_SECTIONS", &["New Features", "Technical Debt"]),
-        Row::scalar("QUEUE_KIT_DEFERRED_SECTION", "Deferred"),
+        Row::indexed("QUEUE_KIT_ACTIVE_SECTIONS", ACTIVE_SECTIONS),
+        Row::scalar("QUEUE_KIT_DEFERRED_SECTION", DEFERRED_SECTION),
         Row::scalar("QUEUE_KIT_ICEBOX_SECTION", ""),
-        Row::scalar("QUEUE_KIT_DONE_SECTION", "Done"),
+        Row::scalar("QUEUE_KIT_DONE_SECTION", DONE_SECTION),
         Row::scalar("QUEUE_KIT_WRAP_BUDGET", "100"),
         Row::scalar("QUEUE_KIT_ENTRY_CAP", "4300cp"),
         Row::scalar("QUEUE_KIT_ENTRY_CREDIT_MAX", "2150cp"),
@@ -104,9 +109,6 @@ fn validate(v: &Values) -> Vec<String> {
         if empty(n) {
             errs.push(format!("{} is empty", n));
         }
-    }
-    if empty_list("QUEUE_KIT_REQUIRED_SECTIONS") && empty("QUEUE_KIT_ICEBOX_SECTION") {
-        errs.push("QUEUE_KIT_REQUIRED_SECTIONS is empty".to_string());
     }
     if empty("QUEUE_KIT_ROADMAP_MARKER") {
         errs.push("QUEUE_KIT_ROADMAP_MARKER is empty".to_string());
