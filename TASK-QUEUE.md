@@ -506,6 +506,26 @@ the binary still names or spawns the bash front end where an adopter meets it: t
 
 **Cost while deferred:** a consumer giving two roles one heading gets a note whose section the upgrade contract reads under either role, unrefused. Filed 2026-10-04 to the gap inbox by installer-trust-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because a widened refusal reds configurations accepted today, →forward because no ruling is owed. Re-verified: `refusals` checks a repeated role, and an alias against the roster's headings only. Owner lookup: `RELEASE_SECTION`, `two roles`, `alias` in this file — none; owner gate-sdk/SPEC.md §Layout and configuration.
 
+### pwsh-install-smoke-split
+
+[cost: iteration/high] [surface: .github]
+
+the native Windows install-smoke legs run every `--installer-smoke` arm serially in one step, about 25 arms (four profiles, six companion recipes, four masked-PATH arms, plan parity, three upgrade repacks), each a full init, battery and uninstall. On gates run 37200932932 the aarch64 leg ran 24.5 minutes, 19.5 of them in that step, and the x86_64 leg 11; every other job finished by minute 14 of the 28-minute run.
+
+**Deliverable:** the pwsh legs' arms split across parallel matrix jobs, or the arm roster partitioned per leg, so no one leg holds the run; the native Windows leg's paragraph in installer/SPEC.md §The consumer smoke states the split.
+
+**Cost while deferred:** every push waits about 14 minutes on one leg, and a close spends one to two pushes. Filed 2026-10-04 to the gap inbox by canon-kit-tail-installer-pass' lead on an operator direction to file it as a speed-up; promoted at its close: →fix fails because the split needs a push to witness, →forward because the direction is given. Re-verified: the run's per-job and per-step timings. Owner lookup: install-smoke, `pwsh`, `long pole` in this file — [install-smoke-sh-matrix](#install-smoke-sh-matrix), DISTINCT (unix legs' YAML duplication, not wall-clock); owner installer/SPEC.md §The consumer smoke.
+
+### toplevel-refusal-fail-open
+
+[cost: event/low] [surface: native]
+
+`walk::toplevel_args` (native/src/walk.rs) folds every non-zero `git rev-parse --show-toplevel`, a `safe.directory` refusal or broken repository metadata included, into the absent answer, so its 21 `toplevel_opt`/`toplevel_in_opt` call sites (close_surfaces, queue_verbs, file_survey, md_index, pub_index, memory_off, battery_roster, smoke_entry_guard, ruling_staleness and installer among them) read a refused repository as outside a work tree. gate-sdk/SPEC.md §The crate's crosser names two refusals, a dead `git` and outside a work tree, and no third.
+
+**Deliverable:** a third refusal kept apart in the crosser, or the `.git`-entry mark `finder-tracked-filter-edges` placed in native/src/spec.rs moved into walk.rs, with each caller's verdict re-read and §The crate's crosser stating the third answer.
+
+**Cost while deferred:** on a host refusing ownership or with broken metadata, each caller's fail-open is unmeasured. Filed 2026-10-04 to the gap inbox by canon-kit-tail-installer-pass' build; promoted at its close: →fix fails because the crosser's contract widens and about 20 callers' verdicts across several kits need re-reading, →forward because no ruling is owed. Re-verified: `toplevel_args` maps any non-zero exit to `None`; 21 call sites outside walk.rs. Not a recurrence of `finder-tracked-filter-edges`, which closed one finder alone. Owner lookup: `toplevel`, `safe.directory`, `crosser` in this file — [worktree-memory-dir-key](#worktree-memory-dir-key), DISTINCT (a worktree's toplevel, not a refused one); owner gate-sdk/SPEC.md §The crate's crosser.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
