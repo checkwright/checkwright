@@ -573,14 +573,22 @@ impl Tree {
     }
 
     #[cfg(windows)]
-    fn spawn(mut cmd: Command) -> std::io::Result<Tree> {
+    fn spawn(cmd: Command) -> std::io::Result<Tree> {
+        // spec: gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency — sound
+        // because the call takes null attributes and returns a handle the tree closes itself
+        Tree::joined(cmd, || unsafe { kernel32::CreateJobObjectW(std::ptr::null_mut(), std::ptr::null()) })
+    }
+
+    // spec: installer/SPEC.md §The update notice — a job that cannot be made or joined leaves the
+    // child-only kill and never refuses the spawn; `make_job` is the seam its test forces a null through
+    #[cfg(windows)]
+    fn joined(mut cmd: Command, make_job: impl FnOnce() -> kernel32::Handle) -> std::io::Result<Tree> {
         use std::os::windows::io::AsRawHandle;
         let child = cmd.spawn()?;
         // spec: gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency — sound
-        // because the calls take null attributes, the child's own live handle and a job handle the
-        // tree closes itself; a job that cannot be made or joined leaves the child-only kill
+        // because the calls take the child's own live handle and a job handle the tree closes itself
         let job = unsafe {
-            let job = kernel32::CreateJobObjectW(std::ptr::null_mut(), std::ptr::null());
+            let job = make_job();
             if !job.is_null() && kernel32::AssignProcessToJobObject(job, child.as_raw_handle() as kernel32::Handle) == 0 {
                 kernel32::CloseHandle(job);
                 std::ptr::null_mut()
@@ -1316,6 +1324,27 @@ pub(crate) mod tests {
         std::thread::sleep(std::time::Duration::from_secs(4));
         assert!(!dir.join("killed").exists(), "the grandchild outlived the bound and wrote");
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: installer/SPEC.md §The update notice — a job that could not be made still spawns, and
+    // the child-only kill still ends the child inside the bound
+    #[cfg(windows)]
+    #[test]
+    fn a_tree_without_a_job_still_kills_its_child() {
+        let mut cmd = Command::new(spawn_target(BASH.invocation()).expect("bash resolves").as_ref());
+        cmd.args(["-c", "sleep 30"])
+            .stdin(std::process::Stdio::null())
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null());
+        let mut tree = Tree::joined(cmd, std::ptr::null_mut).expect("a missing job refused the spawn");
+        assert!(tree.job.is_null(), "the forced null job was replaced");
+        let started = std::time::Instant::now();
+        tree.kill();
+        assert!(
+            tree.child.try_wait().expect("the child is waitable").is_some(),
+            "the child-only kill left the child running"
+        );
+        assert!(started.elapsed() < std::time::Duration::from_secs(10), "the kill waited out the child");
     }
 
     // spec: gate-sdk/SPEC.md §Fail-closed contract — the wrapper is exercised directly,
