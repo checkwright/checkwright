@@ -20,14 +20,6 @@ canon-kit's manifest-set finder fails open and mis-matches paths at its edges. (
 
 **Push need (2026-10-04, inside the budget):** the iteration's one mid-iteration push, since the Windows-only separator fold runs first on the crate-tests-windows leg; the same push serves [windows-job-kill-fallback](#windows-job-kill-fallback) and [attest-stub-argv-exactness](#attest-stub-argv-exactness).
 
-### canon-kit-reach-overstatement
-
-canon-kit/SPEC.md states two canon-kit-reach-pass landings wider than the code. §The shared spec adapters' tracked-set bullet grounds the set in what a commit carries, yet the index decides only membership and the gates read working-tree contents, and it leaves unstated that a sparse checkout's absent tracked manifests and a submodule's files never join the set. §check-spec-pointer's section-number mark is any opening digit, while `spec_pointer.rs` tests `is_ascii_digit`, so a bare `§٣` still fires. `.workflow/release-declarations.md`'s two bullets repeat both wordings.
-
-**Deliverable:** both sections and both declaration bullets restated to what the code does, or the digit test widened to the stated mark with a fixture; which one is the unit's call.
-
-**Cost while deferred:** a reader of either section, or of the next release note, trusts a guarantee the gate does not give. Filed 2026-10-04 to the gap inbox by canon-kit-reach-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the digit half chooses between narrowing the SPEC and widening the gate, and the tracked-set half is reshaped by [finder-tracked-filter-edges](#finder-tracked-filter-edges), which goes first; →forward because no ruling is owed. Re-verified by source read: the bullet's wording and the ASCII test. Owner lookup: `is_ascii_digit`, `section-number`, `sparse`, `submodule` in this file and the disposed-findings record — none; owner canon-kit/SPEC.md §The shared spec adapters, with §check-spec-pointer. Promoted 2026-10-04 at canon-kit-tail-installer-pass' scope as debt, adding no name either way. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling).
-
 ### windows-job-kill-fallback
 
 the bounded capture's tree kill on Windows falls back to a child-only kill when `CreateJobObjectW` or `AssignProcessToJobObject` fails: `Tree::spawn` in `native/src/proc.rs` keeps a null job and returns a successful spawn, which only its own comment states. installer/SPEC.md §The update notice says the probe joins a job object and the job is terminated, and its honest limits name only the spawn-to-assignment window.
@@ -1231,4 +1223,5 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 ## Done
 
 - notice-cache-concurrency
+- canon-kit-reach-overstatement
 
