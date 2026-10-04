@@ -158,14 +158,14 @@ The kit's table validator checks the machine: unknown stages in the map, a waive
 
 **Knob-rename compat.** A rename carries two obligations, each with its own threshold:
 
-- **Declaration — owed from the first release tag, unconditionally.** A tagged release is a distribution, so from the first tag a rename owes a Renamed knobs declaration on the release declaration surface, and so in the note.
+- **Declaration — owed from the first release tag, unconditionally.** A tagged release is a distribution, so from the first tag a rename owes a Knob changes declaration on the release declaration surface, and so in the note.
 - **Compat shim and deprecation window — owed from the project's declared general-availability posture onward, never from a tag.** While a project declares itself pre-general-availability, a knob rename carries no read-the-old-name shim, no deprecation window and no queue-bound deprecation marker. The declaration is still owed, so an early consumer is told what moved.
 
 The observable is a declared posture rather than an adoption count, because the obligation is normative: a migration path is owed because stability was promised, not because users were counted. "The first observed external install" is rejected, since it cannot be falsified from the tree and turns on a fact outside the project's control. A tag measures distribution where the obligation tracks promise, so it is no proxy either. **Fail-safe direction:** a project declaring no stability posture is treated as **past** the threshold, so silence grants no permanent exemption. Only an explicit pre-GA declaration opens the window.
 
 The clause is knob-scoped, on three grounds:
 
-1. **The mechanism it points at is knob-shaped.** The queue-bound deprecation markers and the release note's `Renamed knobs` section, with its `old → new` / `old → ∅` grammar, are specific to config names.
+1. **The mechanism it points at is knob-shaped.** The queue-bound deprecation markers and the release note's `Knob changes` section, with its `old → new` / `old → ∅` grammar, are specific to config names.
 2. **No class is left without a home.** A gate, file or directory rename fits the release note's `Behavior changes` section, whose bullet lead is the changed surface's name (script, knob, template, or file). No note grammar sentence yet routes non-knob renames there, so this is a structural inference rather than an established convention.
 3. **Widening it would restate a neighbour.** A general "any governed name" rule is doctrine-tier, and a kit SPEC settling it would duplicate whatever lands there.
 

@@ -1,7 +1,9 @@
-// spec: installer/SPEC.md §Versioning — the derivable bump floor: a release note declaring
-// tightened gates or renamed knobs, or inheriting an outstanding deferred release's floor, may
+// spec: installer/SPEC.md §Versioning — the derivable bump floor: a release note carrying a bullet
+// in any declaration-bearing section, or inheriting an outstanding deferred release's floor, may
 // not ride a patch-only bump over its predecessor
 use crate::declaration;
+use crate::release_sections;
+use crate::spec;
 use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
@@ -12,12 +14,12 @@ const GRAMMAR: &str = "<major>.<minor>.<patch>, each a run of ASCII digits";
 // rather than reproduced from `sort -V`, whose prerelease order contradicts the semver line this
 // gate's own subject is; a token outside the grammar is a refusal, never a guessed order.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-struct Version(u64, u64, u64);
+pub(crate) struct Version(u64, u64, u64);
 
 // spec: gate-sdk/SPEC.md §The declaration cohort — the refusal names the token, the file or
 // disposition line it came from, and the grammar: a refusal whose text does not name where the
 // token came from sends its reader to the wrong file.
-fn parse_version(token: &str, source: &str) -> Result<Version, String> {
+pub(crate) fn parse_version(token: &str, source: &str) -> Result<Version, String> {
     let fields: Vec<&str> = token.split('.').collect();
     if fields.len() == 3 {
         let mut n = [0u64; 3];
@@ -208,47 +210,53 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let newest = &rows[rows.len() - 1];
     let prev = &rows[rows.len() - 2];
 
-    // spec: installer/SPEC.md §The upgrade contract — the In brief presence assertion binds a note
-    // under composition; a note published before the section existed is history and is not
+    // spec: installer/SPEC.md §The upgrade contract — roster presence binds a note under
+    // composition, under each section's own heading; a tagged note is history and is not
     // retro-fitted
     let tag = format!("refs/tags/v{}", newest.raw);
     let under_composition = proc::run(&programs::GIT, &["rev-parse", "-q", "--verify", &tag])?.code() != Some(0);
     let text = read_text(&newest.file)?;
-    let in_brief_state = if under_composition {
-        // consumer-value-exempt: a release-note section, the note grammar installer/SPEC.md §The upgrade contract owns
-        if declaration::section_bullets(&text, "In brief").is_none() {
-            return Err(format!("newest note {} is under composition (v{} carries no tag) and has no 'In brief' section — the 30-second human read is a fixed section, not optional (installer/SPEC.md §The upgrade contract owns the note grammar)", newest.file, newest.raw));
+    let roster = release_sections::roster()?;
+    let roster_state = if under_composition {
+        for s in &roster {
+            if declaration::section_bullets(&text, &[s.heading.as_str()]).is_none() {
+                return Err(format!("newest note {} is under composition (v{} carries no tag) and has no '{}' section — every roster section is fixed on a note under composition, not optional (installer/SPEC.md §The upgrade contract owns the note grammar)", newest.file, newest.raw, s.heading));
+            }
         }
         "asserted"
     } else {
         "dormant"
     };
 
-    // spec: installer/SPEC.md §The upgrade contract — every fixed section must be present, and the
-    // declaration-bearing ones derive the floor, where non-empty = at least one bullet
-    let count = |section: &str| -> Result<usize, String> {
-        declaration::section_bullets(&text, section)
-            .map(|b| b.len())
-            .ok_or_else(|| format!("newest note {} has no '{}' section — the floor cannot be derived (installer/SPEC.md §The upgrade contract owns the note grammar)", newest.file, section))
-    };
-    // consumer-value-exempt: a release-note section, the note grammar installer/SPEC.md §The upgrade contract owns
-    let tg = count("Tightened gates")?;
-    // consumer-value-exempt: a release-note section, the note grammar installer/SPEC.md §The upgrade contract owns
-    let rk = count("Renamed knobs")?;
-    // consumer-value-exempt: a release-note section, the note grammar installer/SPEC.md §The upgrade contract owns
-    let bc = count("Behavior changes")?;
+    // spec: installer/SPEC.md §The upgrade contract — the declaration-bearing sections derive the
+    // floor, where non-empty = at least one bullet, a section found by an alias counts and one
+    // absent from a tagged note counts zero
+    let counts: Vec<(&release_sections::Section, usize)> = roster
+        .iter()
+        .filter(|s| s.role.declaration_bearing())
+        .map(|s| (s, declaration::section_bullets(&text, &s.names()).map(|b| b.len()).unwrap_or(0)))
+        .collect();
+
+    if under_composition {
+        let findings = table_findings(&text, &roster, &counts);
+        if !findings.is_empty() {
+            println!("check-release-bump: newest note {} (v{}, under composition) carries no summary table that agrees with its sections:", newest.file, newest.raw);
+            for f in findings {
+                println!("  {}", f);
+            }
+            println!("  help: the brief section opens with this table, one row per declaration-bearing section in roster order, each Entries cell that section's bullet count (installer/SPEC.md §The upgrade contract):");
+            for line in expected_table(&counts) {
+                println!("    {}", line);
+            }
+            return Ok(1);
+        }
+    }
 
     let patch_only = newest.version.0 == prev.version.0 && newest.version.1 == prev.version.1;
-    if patch_only && (tg > 0 || rk > 0 || bc > 0 || floor.is_some()) {
+    if patch_only && (counts.iter().any(|(_, n)| *n > 0) || floor.is_some()) {
         println!("check-release-bump: v{} is a patch-only bump over v{}, but its note carries phase-B work (installer/SPEC.md §Versioning — the floor is minor):", newest.raw, prev.raw);
-        if tg > 0 {
-            println!("  {}: {} tightened-gate bullet(s)", newest.file, tg);
-        }
-        if rk > 0 {
-            println!("  {}: {} renamed-knob bullet(s)", newest.file, rk);
-        }
-        if bc > 0 {
-            println!("  {}: {} behavior-change bullet(s)", newest.file, bc);
+        for (s, n) in counts.iter().filter(|(_, n)| *n > 0) {
+            println!("  {}: {} bullet(s) under '{}'", newest.file, n, s.heading);
         }
         if let Some(f) = floor {
             println!("  {}: an outstanding deferred release (v{}) whose unconsumed criteria this note inherits", disposition, f.1);
@@ -258,7 +266,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     // spec: installer/SPEC.md §Versioning — the floor's second input binds the next qualifying note
-    // numerically, gated on under_composition (the In brief assertion's own "not retro-fitted
+    // numerically, gated on under_composition (the roster assertion's own "not retro-fitted
     // against history" rule).
     if under_composition {
         if let Some(f) = floor {
@@ -275,14 +283,68 @@ fn rule(args: &[String]) -> Result<i32, String> {
         None => String::new(),
     };
     println!(
-        "RELEASE-BUMP: clean (newest note v{} holds the derivable floor over v{}{}; {} note(s); In brief presence {})",
+        "RELEASE-BUMP: clean (newest note v{} holds the derivable floor over v{}{}; {} note(s); section roster and summary table {})",
         newest.raw,
         prev.raw,
         inheriting,
         rows.len(),
-        in_brief_state
+        roster_state
     );
     Ok(0)
+}
+
+const TABLE_HEADER: [&str; 3] = ["Section", "Entries", "Who acts"];
+
+fn cells(line: &str) -> Vec<String> {
+    let body = line.trim();
+    let body = body.strip_prefix('|').unwrap_or(body);
+    let body = body.strip_suffix('|').unwrap_or(body);
+    body.split('|').map(|c| c.trim().to_string()).collect()
+}
+
+fn link(s: &release_sections::Section) -> String {
+    format!("[{}](#{})", s.heading, spec::anchor_slug(&s.heading))
+}
+
+fn expected_table(counts: &[(&release_sections::Section, usize)]) -> Vec<String> {
+    let mut out = vec![format!("| {} |", TABLE_HEADER.join(" | ")), "|---|---|---|".to_string()];
+    out.extend(counts.iter().map(|(s, n)| format!("| {} | {} | <who acts> |", link(s), n)));
+    out
+}
+
+// spec: installer/SPEC.md §The upgrade contract — the summary table under the brief section: its
+// header, its row set equal to the declaration-bearing roles in roster order, each link naming its
+// section's anchor and each count that section's bullets; the audience cell is not read
+fn table_findings(
+    text: &str,
+    roster: &[release_sections::Section],
+    counts: &[(&release_sections::Section, usize)],
+) -> Vec<String> {
+    let Some(brief) = release_sections::find(roster, release_sections::Role::Brief) else {
+        return Vec::new();
+    };
+    let lines = declaration::section_lines(text, &[brief.heading.as_str()]).unwrap_or_default();
+    let rows: Vec<Vec<String>> = lines.iter().filter(|l| l.trim_start().starts_with('|')).map(|l| cells(l)).collect();
+    if rows.len() < 2 || rows[0] != TABLE_HEADER {
+        return vec![format!("'{}' carries no table under the header | {} |", brief.heading, TABLE_HEADER.join(" | "))];
+    }
+    let body = &rows[2..];
+    let mut out = Vec::new();
+    if body.len() != counts.len() {
+        out.push(format!("the table holds {} row(s) for {} declaration-bearing section(s)", body.len(), counts.len()));
+    }
+    for (i, (s, n)) in counts.iter().enumerate() {
+        let Some(row) = body.get(i) else { break };
+        let want = link(s);
+        if row.first().map(String::as_str) != Some(want.as_str()) {
+            out.push(format!("row {}: Section cell '{}' is not {}", i + 1, row.first().map(String::as_str).unwrap_or(""), want));
+        }
+        let got = row.get(1).map(String::as_str).unwrap_or("");
+        if got.parse::<usize>().ok() != Some(*n) {
+            out.push(format!("row {}: Entries cell '{}' is not the {} bullet(s) '{}' holds", i + 1, got, n, s.heading));
+        }
+    }
+    out
 }
 
 #[cfg(test)]

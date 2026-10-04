@@ -16,7 +16,8 @@ fails=0
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
-# $1=dir  $2=version  $3=tightened-gates body  $4=renamed-knobs body  $5=behavior-changes body
+# $1=dir  $2=version  $3=gates body  $4=knob-changes body  $5=behavior-changes body
+# $6=platforms body
 write_note() {
     mkdir -p "$1/posts"
     cat >"$1/posts/note-$2.md" <<EOF
@@ -30,18 +31,39 @@ release: v$2
 
 - Fixture note.
 
-## Tightened gates
+## New and tightened gates
 
 $3
 
-## Renamed knobs
+## Knob changes
 
 ${4:-None.}
+
+## Gate-authoring changes
+
+None.
+
+## Platforms
+
+${6:-None.}
 
 ## Behavior changes
 
 ${5:-None.}
 EOF
+}
+
+# $1=file  $2.. = platforms rows, each `<triple> <minimum> <status>`
+write_page() {
+    local row t m s
+    {
+        printf '# Install\n\n<!-- platforms:begin -->\n\n| System | Minimum | Binary | Status |\n|---|---|---|---|\n'
+        for row in "${@:2}"; do
+            read -r t m s <<<"$row"
+            printf '| %s | %s | `%s` | %s |\n' "$t" "$m" "$t" "$s"
+        done
+        printf '\n<!-- platforms:end -->\n'
+    } >"$1"
 }
 
 # $1=dir  $2=surface body below the header (empty => header only, the drained surface)
@@ -53,9 +75,15 @@ write_surface() {
 }
 
 # $1=label $2=dir $3=want-rc $4=want-substring
+# The page pair defaults to two block-less pages, the empty diff a `None` Platforms equals;
+# $5=`git` drops the base page, so arm P resolves the previous release through the tags.
 check_case() {
     local out rc
-    out="$(cd "$2" && gate_run check-release-declaration-parity "$GATES_DIR" posts release-declarations.md 2>&1)"; rc=$?
+    [[ -f "$2/install.md" ]] || : >"$2/install.md"
+    [[ -f "$2/base-install.md" ]] || : >"$2/base-install.md"
+    local base="base-install.md"
+    [[ "${5:-}" == git ]] && base=""
+    out="$(cd "$2" && gate_run check-release-declaration-parity "$GATES_DIR" posts release-declarations.md install.md $base 2>&1)"; rc=$?
     if [[ "$rc" -ne "$3" ]]; then
         echo "  FAIL [$1]: want exit $3, got $rc -- $out"; fails=$((fails + 1)); return
     fi
@@ -72,7 +100,7 @@ write_surface "$a" '## Tightened gates
 
 - `check-alpha`
 - `check-beta`'
-check_case "dropped-name-direction" "$a" 1 "Tightened gates: on the surface, missing from the note"
+check_case "dropped-name-direction" "$a" 1 "New and tightened gates: on the surface, missing from the note"
 
 # B — a name in the note and missing from the surface: declares a gate that never
 # tightened. Containment in one direction only would miss this entirely.
@@ -82,7 +110,7 @@ write_note "$b" "99.1.0" '- `check-alpha` — landed new.
 write_surface "$b" '## Tightened gates
 
 - `check-alpha`'
-check_case "added-name-direction" "$b" 1 "Tightened gates: in the note, missing from the surface"
+check_case "added-name-direction" "$b" 1 "New and tightened gates: in the note, missing from the surface"
 
 # C — equal sets in every section, the surface's sections in a different order
 # from the note's: clean, since order carries no meaning.
@@ -114,7 +142,7 @@ write_note "$e" "99.1.0" 'None.'
 write_surface "$e" '## Renamed knobs
 
 - `KIT_OLD` → `KIT_NEW`'
-check_case "knob-dropped-direction" "$e" 1 "Renamed knobs: on the surface, missing from the note"
+check_case "knob-dropped-direction" "$e" 1 "Knob changes: on the surface, missing from the note"
 
 # F — a behavior change in the note the surface never held: close reconstructed it
 # instead of the landing session declaring it.
@@ -190,7 +218,7 @@ None.
 None.
 EOF
 write_surface "$l" ''
-check_case "note-missing-section" "$l" 2 "has no 'Renamed knobs' section"
+check_case "note-missing-section" "$l" 2 "has no 'Knob changes' section"
 
 m="$tmp/unparseable"
 write_note "$m" "99.1.0" '- **check-alpha** — bolded, which is not the canonical spelling.'
@@ -206,9 +234,58 @@ write_surface "$n" '## Behavior changes
 - kit/bin/tool.sh — no bolded lead, so no token.'
 check_case "surface-section-unparseable" "$n" 2 "carries unreadable bullet(s)"
 
+# --- arm P against real tags: the previous release's page through git ---------
+# $1=dir — a repository whose v99.0.0 page joins alpha at v1 and holds gamma
+mkplatforms() {
+    mkgit "$1"
+    write_page "$1/install.md" "alpha-unknown-os v1 joined" "gamma-unknown-os v1 held:runner"
+    git -C "$1" add install.md
+    git -C "$1" commit -qm page
+    git -C "$1" tag -a v99.0.0 -m v99.0.0
+    write_page "$1/install.md" "alpha-unknown-os v2 joined" "beta-unknown-os v1 joined" "gamma-unknown-os v1 held:runner"
+    write_surface "$1" ''
+}
+
+# P — the note's Platforms equals the diff since the previous tag: clean.
+p="$tmp/platforms-equal"
+mkplatforms "$p"
+write_note "$p" "99.1.0" 'None.' '' '' '- `alpha-unknown-os` — Minimum moved.
+- `beta-unknown-os` — added.'
+check_case "platforms-equal-via-tag" "$p" 0 "Platforms equals the platforms-table diff of install.md against v99.0.0" git
+
+# Q — the note states None where the table moved: red, and the derived bullets print.
+q="$tmp/platforms-none"
+mkplatforms "$q"
+write_note "$q" "99.1.0" 'None.'
+check_case "platforms-dropped-via-tag" "$q" 1 "Platforms: in the platforms-table diff, missing from the note" git
+check_case "platforms-derivation-printed" "$q" 1 '- `alpha-unknown-os` — Minimum v1 → v2' git
+
+# R — a triple the table never moved, announced in the note: red the other way.
+r="$tmp/platforms-added"
+mkplatforms "$r"
+write_note "$r" "99.1.0" 'None.' '' '' '- `alpha-unknown-os` — Minimum moved.
+- `beta-unknown-os` — added.
+- `gamma-unknown-os` — joined, says the note.'
+check_case "platforms-unmoved-in-note" "$r" 1 "Platforms: in the note, missing from the platforms-table diff" git
+
+# S — no tag below the note: the previous page is the empty table, so every row is added.
+s="$tmp/platforms-first"
+mkgit "$s"
+write_page "$s/install.md" "alpha-unknown-os v1 joined"
+write_surface "$s" ''
+write_note "$s" "99.1.0" 'None.' '' '' '- `alpha-unknown-os` — added.'
+check_case "platforms-first-release" "$s" 0 "against no previous release" git
+
+# T — a tag outside the version grammar is refused rather than ordered by guess.
+t="$tmp/platforms-rc"
+mkplatforms "$t"
+git -C "$t" tag -a v99.1.0-rc1 -m rc
+write_note "$t" "99.1.0" 'None.'
+check_case "platforms-prerelease-tag-refused" "$t" 2 "is outside the grammar this gate orders" git
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-release-declaration-parity.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-release-declaration-parity.test: ok (each direction of the set inequality reds in isolation, in Tightened gates and in each prose section; equal sets in any section order and both-empty sets pass; the arming predicate resolves real tags, going dormant once tagged and arming before; two untagged notes refuse and a post without a release: key is not counted; a headerless surface, an absent note section, and an unparseable note or surface section each fail closed)"
+echo "check-release-declaration-parity.test: ok (each direction of the set inequality reds in isolation, in the gates section and in each prose section; equal sets in any section order and both-empty sets pass; the arming predicate resolves real tags, going dormant once tagged and arming before; two untagged notes refuse and a post without a release: key is not counted; a headerless surface, an absent note section, and an unparseable note or surface section each fail closed; arm P resolves the previous release through the tags, passes a Platforms section equal to the table's diff, reds and prints the derived bullets in either direction, reads no prior tag as the empty table, and refuses a tag outside the version grammar)"
 exit 0

@@ -1,6 +1,6 @@
 // spec: gate-sdk/SPEC.md §Layout and configuration — gate-sdk's static knob table: every layout and
 // consumer knob its library defaulted, the locators and execution settings it refuses in a file
-use super::{scalar, Kit, Resolve, Row, Shape, Value, Values};
+use super::{indexed, scalar, Kit, Resolve, Row, Shape, Value, Values};
 
 fn input_scalar(resolve: Resolve, name: &str) -> Result<String, String> {
     resolve(name).map(|(v, _)| v.wire())
@@ -109,10 +109,17 @@ fn native_bin(_resolve: Resolve) -> Result<Value, String> {
 // spec: installer/SPEC.md §The update notice — the interval takes its three values only, so a
 // misspelt `off` refuses rather than reads as the default
 fn validate(v: &Values) -> Vec<String> {
-    match scalar(v, "GATE_SDK_UPDATE_CHECK").filter(|s| !matches!(*s, "off" | "daily" | "weekly")) {
+    let mut errs = match scalar(v, "GATE_SDK_UPDATE_CHECK").filter(|s| !matches!(*s, "off" | "daily" | "weekly")) {
         Some(s) => vec![format!("GATE_SDK_UPDATE_CHECK must be off|daily|weekly (got '{}')", s)],
         None => Vec::new(),
-    }
+    };
+    // spec: installer/SPEC.md §The upgrade contract — the refusals are the roster module's, so the
+    // validator and every reader share one reading of an element
+    errs.extend(crate::release_sections::refusals(
+        indexed(v, crate::release_sections::SECTIONS_KNOB).unwrap_or(&[]),
+        indexed(v, crate::release_sections::ALIASES_KNOB).unwrap_or(&[]),
+    ));
+    errs
 }
 
 const GATES: &[&str] = &["GATE_SDK_GATES_DIR"];
@@ -196,6 +203,18 @@ pub const KIT: Kit = Kit {
         Row::scalar("GATE_SDK_UPDATE_CHECK", "weekly").empty_takes_default(),
         Row::scalar("GATE_SDK_UPDATE_UPSTREAM", ""),
         Row::scalar("GATE_SDK_UPDATE_TIMEOUT", "5").empty_takes_default(),
+        Row::indexed(
+            "GATE_SDK_RELEASE_SECTIONS",
+            &[
+                "brief: In brief",
+                "gates: New and tightened gates",
+                "knobs: Knob changes",
+                "authoring: Gate-authoring changes",
+                "platforms: Platforms",
+                "behavior: Behavior changes",
+            ],
+        ),
+        Row::indexed("GATE_SDK_RELEASE_SECTION_ALIASES", &["gates: Tightened gates", "knobs: Renamed knobs"]),
     ],
     validate: Some(("gate-sdk config", validate)),
     open_family: false,

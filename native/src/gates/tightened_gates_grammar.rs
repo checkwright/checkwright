@@ -1,14 +1,12 @@
-// spec: installer/SPEC.md §The upgrade contract — every release note's Tightened-gates section
-// resolves to an explicit `None` or to a non-empty set of backticked bare gate names; a
+// spec: installer/SPEC.md §The upgrade contract — every release note's gates section, under its
+// roster heading or an alias, resolves to an explicit `None` or to a non-empty set of backticked bare gate names; a
 // non-`none` section yielding no tokens is the silently-empty declaration the smoke cannot see
 use crate::declaration;
 use crate::declaration::{SectionVerdict, TokenRule};
 use crate::gates::release_bump::read_text;
+use crate::release_sections;
 use crate::walk;
 use std::path::Path;
-
-// consumer-value-exempt: a release-note section, the note grammar installer/SPEC.md §The upgrade contract owns
-const SECTION: &str = "Tightened gates";
 
 // spec: gate-sdk/SPEC.md §lib/declaration.sh — `^release:[[:space:]]+v`, the gate's own literal
 // shape, so it is matched directly rather than compiled
@@ -39,6 +37,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
     if !Path::new(posts).is_dir() {
         return Err(format!("posts dir not found: {}", posts));
     }
+    let roster = release_sections::roster()?;
+    let Some(gates) = release_sections::find(&roster, release_sections::Role::Gates) else {
+        println!("TIGHTENED-GATES-GRAMMAR: clean (the release-section roster carries no gates role, so no section is read)");
+        return Ok(0);
+    };
+    let names = gates.names();
+    let section = gates.heading.as_str();
 
     let mut errors: Vec<String> = Vec::new();
     let (mut notes, mut tokens, mut none) = (0usize, 0usize, 0usize);
@@ -49,26 +54,26 @@ fn rule(args: &[String]) -> Result<i32, String> {
             continue;
         }
         notes += 1;
-        match declaration::section_tokens(&text, SECTION, TokenRule::GateName) {
+        match declaration::section_tokens(&text, &names, TokenRule::GateName) {
             SectionVerdict::ExplicitNone => none += 1,
             SectionVerdict::Tokens(t) => tokens += t.len(),
             SectionVerdict::Unparsed(b) if b.is_empty() => errors.push(format!(
                 "{}: '{}' is not `None` and yields no lead token at all — the parse resolves to an empty allowed-red set the note contradicts",
-                path, SECTION
+                path, section
             )),
             SectionVerdict::Unparsed(b) => {
                 for line in b {
                     errors.push(format!(
                         "{}: '{}' bullet's lead token is unreadable: {}",
                         path,
-                        SECTION,
+                        section,
                         line.chars().take(72).collect::<String>()
                     ));
                 }
             }
             SectionVerdict::Absent => errors.push(format!(
                 "{}: no '{}' section — every release note carries the fixed sections its note grammar rosters",
-                path, SECTION
+                path, section
             )),
         }
     }
@@ -83,12 +88,12 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let surface_read = Path::new(&surface).is_file();
     if surface_read {
         let text = read_text(&surface)?;
-        if let SectionVerdict::Unparsed(b) = declaration::section_tokens(&text, SECTION, TokenRule::GateName) {
+        if let SectionVerdict::Unparsed(b) = declaration::section_tokens(&text, &names, TokenRule::GateName) {
             for line in b.iter().filter(|l| l.trim_start().starts_with(['-', '*'])) {
                 errors.push(format!(
                     "{}: '{}' bullet's lead token is unreadable: {}",
                     surface,
-                    SECTION,
+                    section,
                     line.chars().take(72).collect::<String>()
                 ));
             }
@@ -105,7 +110,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for e in &errors {
             println!("  {}", e);
         }
-        println!("  help: a Tightened-gates bullet's lead token is a backticked, unbolded bare gate name directly after the bullet marker (- `check-foo` — …); strip any bold emphasis and add the backticks. A release that tightened nothing states a bare \"None.\" body instead. installer/SPEC.md §The upgrade contract owns the grammar; a mechanical consumer reads these tokens as the release's allowed-red set, so a section that parses to nothing disarms it silently.");
+        println!("  help: a '{}' bullet's lead token is a backticked, unbolded bare gate name directly after the bullet marker (- `check-foo` — …); strip any bold emphasis and add the backticks. A release that landed or tightened no gate states a bare \"None.\" body instead. installer/SPEC.md §The upgrade contract owns the grammar; a mechanical consumer reads these tokens as the release's allowed-red set, so a section that parses to nothing disarms it silently.", section);
         return Ok(1);
     }
     println!(

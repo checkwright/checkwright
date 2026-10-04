@@ -7,6 +7,7 @@ use crate::ere::Ere;
 use crate::installer::{recipe, GATES_DIR};
 use crate::proc::{self, Sink, Stderr};
 use crate::programs;
+use crate::release_sections;
 use crate::walk;
 use std::path::Path;
 
@@ -19,10 +20,11 @@ pub const KNOBS: &[&str] = &[
     "GATE_SDK_TMP_DIR",
     "GATE_SDK_WORKFLOW_DIR",
     "GATE_SDK_NATIVE_BIN",
+    "GATE_SDK_RELEASE_SECTIONS",
+    "GATE_SDK_RELEASE_SECTION_ALIASES",
 ];
 
 const NAME: &str = "upgrade-smoke";
-const SECTION: &str = "Tightened gates";
 const SURFACE: &str = "release-declarations.md";
 
 // spec: gate-sdk/SPEC.md §upgrade-smoke — the exit-status contract as a type, so a finding cannot
@@ -201,14 +203,14 @@ fn smoke() -> Result<String, Fail> {
     let undeclared: Vec<&String> = red.iter().filter(|g| !allowed.contains(g)).collect();
     if !undeclared.is_empty() {
         let mut r = one(format!(
-            "{}: FAIL — gate(s) went red that TO's Tightened-gates declaration does not name:",
+            "{}: FAIL — gate(s) went red that TO's gates-section declaration does not name:",
             NAME
         ));
         for g in &undeclared {
             r.push(format!("  {}", g));
         }
         r.push(format!(
-            "  each red must be named in {} — a bullet in the Tightened gates section of the note or of the release declaration surface — or the tree fixed (installer/SPEC.md §The upgrade contract).",
+            "  each red must be named in {} — a bullet in the gates section of the note or of the release declaration surface — or the tree fixed (installer/SPEC.md §The upgrade contract).",
             decl_src
         ));
         return Err(finding(r));
@@ -767,22 +769,34 @@ fn commit_phase_a(consumer: &str, to: &str) -> Result<(), Fail> {
 // spec: gate-sdk/SPEC.md §upgrade-smoke — the declaration resolves on two arms, read **in crate**
 // through `native/src/declaration.rs`: a tagged TO from its note, an untagged TO from the release
 // declaration surface in TO's own tree.
+// spec: gate-sdk/SPEC.md §upgrade-smoke — the gates role's name set resolves in the invoking tree,
+// so an archived note is read under today's heading and aliases; a roster without the role
+// declares nothing
+fn gates_section() -> Result<Option<release_sections::Section>, Fail> {
+    let roster = release_sections::roster().map_err(|e| broken(one(format!("{}: {}", NAME, e))))?;
+    Ok(roster.into_iter().find(|s| s.role == release_sections::Role::Gates))
+}
+
 fn declared_set(repo: &str, to: &str, to_tree: &str) -> Result<(String, Vec<String>), Fail> {
     let ver = points_at(repo, to);
     let workflow = knob("GATE_SDK_WORKFLOW_DIR")?;
     let decl_file = format!("{}/{}/{}", to_tree, workflow, SURFACE);
+    let Some(section) = gates_section()? else {
+        return Ok((String::new(), Vec::new()));
+    };
+    let names = section.names();
 
     let mut tokens: Vec<String> = Vec::new();
     let mut src = String::new();
     if !ver.is_empty() {
         if let Some(note) = release_note(to_tree, &ver)? {
             src = note.clone();
-            match declaration::section_tokens(&read(&note)?, SECTION, TokenRule::GateName) {
+            match declaration::section_tokens(&read(&note)?, &names, TokenRule::GateName) {
                 SectionVerdict::Absent => {
                     return Err(finding(vec![
                         format!(
                             "{}: FAIL — TO ({}) resolves note {}, which carries no '{}' section:",
-                            NAME, ver, note, SECTION
+                            NAME, ver, note, section.heading
                         ),
                         "  every release note carries the fixed sections its note grammar rosters (installer/SPEC.md §The upgrade contract).".to_string(),
                     ]))
@@ -798,7 +812,7 @@ fn declared_set(repo: &str, to: &str, to_tree: &str) -> Result<(String, Vec<Stri
         src = decl_file.clone();
         // spec: gate-sdk/SPEC.md §lib/declaration.sh — the surface verdict: an absent, `None` or
         // bullet-less section is the empty set, and only an unreadable bullet is a finding
-        match declaration::section_tokens(&read(&decl_file)?, SECTION, TokenRule::GateName) {
+        match declaration::section_tokens(&read(&decl_file)?, &names, TokenRule::GateName) {
             SectionVerdict::Tokens(t) => tokens = t,
             SectionVerdict::Unparsed(bad) if !bad.is_empty() => {
                 return Err(unparsed(to, &src, &bad))
@@ -815,7 +829,7 @@ fn declared_set(repo: &str, to: &str, to_tree: &str) -> Result<(String, Vec<Stri
 
 fn unparsed(named: &str, src: &str, bad: &[String]) -> Fail {
     let mut r = one(format!(
-        "{}: FAIL — TO ({})'s Tightened-gates declaration does not parse, so it would resolve to a silently empty allowed-red set — {}:",
+        "{}: FAIL — TO ({})'s gates-section declaration does not parse, so it would resolve to a silently empty allowed-red set — {}:",
         NAME, named, src
     ));
     // spec: gate-sdk/SPEC.md §upgrade-smoke — the finding list is printed as the shell holder
@@ -903,7 +917,7 @@ fn no_declaration(repo: &str, to: &str, red: &[String]) -> Result<Fail, Fail> {
     let ver = points_at(repo, to);
     let named = if ver.is_empty() { to } else { &ver };
     let mut r = one(format!(
-        "{}: FAIL — TO ({}) reddened gate(s) but declares no Tightened-gates set anywhere:",
+        "{}: FAIL — TO ({}) reddened gate(s) but declares no gates-section set anywhere:",
         NAME, named
     ));
     for g in red {
@@ -917,7 +931,7 @@ fn no_declaration(repo: &str, to: &str, red: &[String]) -> Result<Fail, Fail> {
     } else {
         let workflow = knob("GATE_SDK_WORKFLOW_DIR")?;
         r.push(format!(
-            "  an untagged TO reads the Tightened-gates section of {}/{}, which TO's tree does not carry; the session that lands or tightens a gate appends its bullet there (gate-sdk/SPEC.md §upgrade-smoke).",
+            "  an untagged TO reads the gates section of {}/{}, which TO's tree does not carry; the session that lands or tightens a gate appends its bullet there (gate-sdk/SPEC.md §upgrade-smoke).",
             workflow, SURFACE
         ));
     }

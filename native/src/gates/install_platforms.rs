@@ -38,21 +38,22 @@ pub fn run(args: &[String]) -> i32 {
     }
 }
 
-enum State {
+#[derive(PartialEq)]
+pub(crate) enum State {
     Joined,
     Held(String),
     Unreadable(String),
 }
 
-struct Decl {
-    triple: String,
-    state: State,
-    minimum: String,
+pub(crate) struct Decl {
+    pub(crate) triple: String,
+    pub(crate) state: State,
+    pub(crate) minimum: String,
 }
 
 // spec: docs/site-architecture.md §Generated projections and their freshness gates — a row carries
 // a backticked run, its first the triple, the Minimum its second cell and the state its last cell
-fn declarations(text: &str) -> Vec<Decl> {
+pub(crate) fn declarations(text: &str) -> Vec<Decl> {
     let mut inb = false;
     let mut out: Vec<Decl> = Vec::new();
     for line in text.lines() {

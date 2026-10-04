@@ -20,16 +20,6 @@ the primary install channel carries no build provenance: the Release tarball shi
 
 **Push need (2026-10-04, inside the budget):** one mid-iteration push, for the PowerShell installer's verify leg that no local run reaches; `update-availability-notice` rides the same push if its design lands a Windows-only leg.
 
-### release-note-section-set-derivation
-
-[spec: SPEC-release-sections.md] [recurrence: 2026-09-27]
-
-release notes serve human upgraders poorly, and their section set is crate literals. A note (installer/SPEC.md §The upgrade contract) has one human section, In brief, then declaration-bearing sections a mechanical consumer reconciles; the v0.26.0 note is 34,527 words against v0.25.0's 1,058. The section names are string literals in the release gates, the declaration parser and the upgrade smoke, so a rename is a crate edit, a new section is added by copying a call, and no gate asserts the gates' set equals the page's. Operator directions, 2026-09-27 (lead session): add sections for adopters with custom gates, whose reconcile differs; put a summary table at the top linking to the detail; reconsider the names, since "Tightened gates" also holds new gates, "Renamed knobs" also carries removals and new knobs have no section; and no hard code in gates. An operator question the same day asked where new platform support goes: this iteration's musl switch was declared as two Behavior changes bullets.
-
-**Deliverable:** a note structure with a linked summary table, audience-keyed sections and a Platforms section derived from the diff of docs/install.md's gated platforms table between two releases, its section set one knob-owned roster every reader derives from. The lead tokens are machine-read over a historical corpus the upgrade smoke resolves at any FROM/TO, so a rename owes an alias window or a note-corpus migration.
-
-**Cost while deferred:** every release ships a note a human must read whole to act on, custom-gate adopters are not told what applies to them, and a platform change hides in Behavior changes. Filed 2026-08-01 at close; iceboxed 2026-09-11 as dormant; re-filed 2026-09-27 to the gap inbox as two bullets (readability, a Platforms section) by platform-prerequisite-floors' lead, and returned at its close on a judged recurrence: →fix fails because the redesign renames machine-read tokens. Re-verified: `wc -w` over the two notes, and the literals in `native/src/gates/release_bump.rs`, `tightened_gates_grammar.rs`, `release_change_declared.rs`, `native/src/declaration.rs` and `native/src/emit/upgrade_smoke.rs`. `removed-knob-docs-cmd-valve`, done, is DISTINCT. Owner: installer/SPEC.md §The upgrade contract, RELEASING.md.
-
 ## Technical Debt
 
 ## Deferred
@@ -1245,4 +1235,5 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 - delegation-kit-tail-brevity
 - kept-gate-disposition-report
 - update-availability-notice
+- release-note-section-set-derivation
 

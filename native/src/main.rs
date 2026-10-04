@@ -28,6 +28,7 @@ mod proc;
 mod programs;
 mod queue;
 mod registry;
+mod release_sections;
 mod runner;
 mod sarif;
 mod section;

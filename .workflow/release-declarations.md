@@ -1,6 +1,6 @@
-# contract: gate-sdk/SPEC.md §upgrade-smoke — the accumulating release declaration surface; the note's three declaration-bearing sections in the note's grammar, appended by the session landing a kit-shipped change or the one discovering its omission, composed into the release note and drained to this header at the tag.
+# contract: gate-sdk/SPEC.md §upgrade-smoke — the accumulating release declaration surface; the note's declaration-bearing sections in the note's grammar, Platforms excepted since composition derives it, appended by the session landing a kit-shipped change or the one discovering its omission, composed into the release note and drained to this header at the tag.
 
-## Tightened gates
+## New and tightened gates
 
 - `check-agent-tier-explicit` — gains assertion B, armed only once you set the new `DELEGATION_KIT_TIER_MODEL` binding: each agent definition then carries `tier: <class>` with the `model:` that class is bound to, or states `model: inherit` with no `tier:`. Nothing to do while the binding stays empty; once you bind it, declare each definition's `tier:` and run `--emit agent-tiers --write`.
 - `check-rule-citation` — leaves delegation-kit (Behavior changes), so a `gates.list` line still naming it, which the kit README's roster had you add, resolves nowhere and reds. Drop the line; `init` never registered it.
@@ -25,6 +25,11 @@
 - `check-tree-terms` — a file is self-exempt when it is a pattern file the two pattern knobs resolve to or the kit's starter roster, rather than any name beginning `msg-patterns`, so a tracked `msg-patterns` file no knob names is scanned and reds on a banned shape in it. Point the knob at each roster you keep, or remove the stray file.
 - `check-portability-floor` — the same change over `GATE_SDK_PORTABILITY_PATTERNS` and the `portability-patterns` prefix. Nothing to do unless a stray file of that name sits in your corpus.
 - `check-enforcement-fresh` — reds a committed enforcement page linking `<kit>/index.md` for a kit whose page your tree does not track, since the emitter now writes that kit as plain text. Regenerate with `--emit enforcement-map`.
+
+## Knob changes
+
+- `GATE_SDK_RELEASE_SECTIONS` — new: the release note's section roster, one `<role>: <heading>` element per section in note order over the roles `brief`, `gates`, `knobs`, `authoring`, `platforms` and `behavior`, defaulting to In brief, New and tightened gates, Knob changes, Gate-authoring changes, Platforms and Behavior changes. Nothing to do.
+- `GATE_SDK_RELEASE_SECTION_ALIASES` — new: former headings a section is still read under, in the same grammar, defaulting to `gates: Tightened gates` and `knobs: Renamed knobs`. Nothing to do.
 
 ## Behavior changes
 
@@ -106,3 +111,6 @@
 - **delegation-kit `--foreign-resume`, delegation-kit/templates/agent-execution.md** — a sweep session's resume turn that ends `FAILED` after its spawn still regenerates `change.patch`, so the patch a closed session keeps carries that turn's change, and the line names it; the template's foreign-run bullet adds that nothing else runs under a key while a turn runs, since the kit serializes no commands sharing a key. Nothing to do.
 - **checkwright init, update** — a kept `gates.list` now reports each gate `init` no longer registers there as a `retire:` line naming its `# install:` disposition, a gate moved off `zero-config` among them, read off the registry `init` last wrote. Remove the line, or keep the gate with `--with-gate`.
 - **checkwright init, doctor, `--emit update-notice`** — an installed tree now checks for a newer Checkwright release: new knobs `GATE_SDK_UPDATE_CHECK` (`off`, `daily` or `weekly`, default `weekly`), `GATE_SDK_UPDATE_UPSTREAM` (written by `init` from the package's repository) and `GATE_SDK_UPDATE_TIMEOUT` (default `5`). At most once per interval it runs `git ls-remote --tags` against the upstream, which shows that host your IP address; bare `doctor` gains a `latest` line and `init` states the check. context-kit/templates/session-context.sh gains step 10, which prints the notice. Nothing to do, or set `GATE_SDK_UPDATE_CHECK = off` in your gates directory's `gate-sdk-config.knobs`; copy step 10 into an edited session-context copy by hand.
+- **release notes, `--upgrade-smoke`** — a note now carries six sections, In brief, New and tightened gates, Knob changes, Gate-authoring changes, Platforms and Behavior changes, and In brief opens with a table linking each declaration-bearing section beside its entry count and who acts on it. New and tightened gates was Tightened gates and Knob changes was Renamed knobs; both former headings stay readable for good, so `--upgrade-smoke` reads a gates section under either name at any FROM and TO, resolving the names in your tree. Nothing to do; a consumer reading notes by heading reads either spelling.
+- **lifecycle-kit/templates/stages/build.md** — the paragraph on declaring what a vendoring consumer will meet also triggers on a knob a unit adds and on a change to the gate-authoring contract (the gate library, the descriptor grammar, the skeleton or the runner's member contract). No slot is added or renamed. Nothing to do.
+- **lifecycle-kit/templates/upgrade.md** — step 2 names the New and tightened gates and Knob changes sections and adds reading Gate-authoring changes if you write or shadow gates. No slot is added or renamed. Nothing to do.

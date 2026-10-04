@@ -287,7 +287,7 @@ An upgrade has two phases:
 1. Run `checkwright update` from the new version, then run the commands it prints. If a kit now ships a `.knobs` config in place of a `*-config.sh`, move your settings into the `.knobs` file and delete the old one.
 2. Run the full battery. The gates that go red are your worklist. The release note says why each one moved.
 
-Every release note opens with **In brief**: a few plain bullets on what you get and whether you must act. Its **Tightened gates**, **Renamed knobs** and **Behavior changes** sections list what you reconcile. Each says "None." when there is nothing. All notes are on the [releases page](releases.md). The bump rules and the note grammar: [Versioning](installer/SPEC.md#versioning) and [The upgrade contract](installer/SPEC.md#the-upgrade-contract).
+Every release note opens with **In brief**: a table linking each section below with its entry count and who acts on it, then a few plain bullets on what you get and whether you must act. Its **New and tightened gates**, **Knob changes**, **Gate-authoring changes**, **Platforms** and **Behavior changes** sections list what you reconcile. Each says "None." when there is nothing. All notes are on the [releases page](releases.md). The bump rules and the note grammar: [Versioning](installer/SPEC.md#versioning) and [The upgrade contract](installer/SPEC.md#the-upgrade-contract).
 
 An installed tree checks for a newer release once a week with `git ls-remote`, which shows the upstream host your IP address, and `doctor` and the session-context hook say when one exists. Set `GATE_SDK_UPDATE_CHECK = off` in your gates directory's `gate-sdk-config.knobs` to turn it off.
 

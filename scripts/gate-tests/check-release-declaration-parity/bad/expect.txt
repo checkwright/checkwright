@@ -1,5 +1,7 @@
-declare different sets
-Tightened gates: on the surface, missing from the note
-Tightened gates: in the note, missing from the surface
-Renamed knobs: on the surface, missing from the note
+and the sets it is composed from disagree
+New and tightened gates: on the surface, missing from the note
+New and tightened gates: in the note, missing from the surface
+Knob changes: on the surface, missing from the note
 Behavior changes: in the note, missing from the surface
+Platforms: in the platforms-table diff, missing from the note
+- `beta-unknown-os` — added: Minimum Beta 1, Status joined

@@ -1,15 +1,14 @@
 // spec: gate-sdk/SPEC.md §check-release-change-declared — every kit `bin/` path removed and every
 // template `init` claims changed since the nearest reachable `v*` tag is named on the release
-// declaration surface's Behavior-changes section
+// declaration surface's behavior or gate-authoring section
 use crate::declaration;
+use crate::release_sections;
 use crate::installer::{recipe, GATES_DIR};
 use crate::walk;
 use crate::{proc, programs};
 use std::path::Path;
 
 const NAME: &str = "check-release-change-declared";
-// consumer-value-exempt: a release-note section, the note grammar installer/SPEC.md §The upgrade contract owns
-const SECTION: &str = "Behavior changes";
 
 pub fn run(args: &[String]) -> i32 {
     match rule(args) {
@@ -261,7 +260,17 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    let bullets: Vec<&str> = declaration::section_bullets(&surface, SECTION)
+    // spec: gate-sdk/SPEC.md §check-release-change-declared — a behavior or gate-authoring bullet is
+    // the declaration, either role under its heading or an alias
+    let roster = release_sections::roster()?;
+    let accepting: Vec<&release_sections::Section> = roster
+        .iter()
+        .filter(|s| matches!(s.role, release_sections::Role::Behavior | release_sections::Role::Authoring))
+        .collect();
+    let label = accepting.iter().map(|s| format!("'{}'", s.heading)).collect::<Vec<_>>().join(" or ");
+    let names: Vec<&str> = accepting.iter().flat_map(|s| s.names()).collect();
+    let gates = release_sections::find(&roster, release_sections::Role::Gates).map(|s| s.heading.as_str()).unwrap_or("gates");
+    let bullets: Vec<&str> = declaration::section_bullets(&surface, &names)
         .unwrap_or_default()
         .into_iter()
         .filter(|l| l.starts_with("- ") || l.starts_with("* "))
@@ -270,17 +279,17 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     if !missing.is_empty() {
         println!(
-            "{}: {} kit-shipped change(s) since {} are not named in {}'s '{}' section:",
+            "{}: {} kit-shipped change(s) since {} are not named in {}'s {} section:",
             NAME,
             missing.len(),
             base,
             decl_file,
-            SECTION
+            label
         );
         for (p, class) in &missing {
             match class {
-                Class::Removed => println!("  {} — class R, a removed kit tool: add a Behavior-changes bullet naming this path and what replaced it", p),
-                Class::Template => println!("  {} — class T, a changed template `init` claims: add a Behavior-changes bullet naming this path, and a Tightened-gates bullet for each gate the change can red", p),
+                Class::Removed => println!("  {} — class R, a removed kit tool: add a {} bullet naming this path and what replaced it", p, label),
+                Class::Template => println!("  {} — class T, a changed template `init` claims: add a {} bullet naming this path, and a '{}' bullet for each gate the change can red", p, label, gates),
             }
         }
         println!("  help: append the bullet(s) to {} in this commit — the session that finds an undeclared kit-shipped change declares it (gate-sdk/SPEC.md §upgrade-smoke)", decl_file);
@@ -289,12 +298,12 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     let removed = subjects.iter().filter(|(_, c)| *c == Class::Removed).count();
     println!(
-        "RELEASE-CHANGE-DECLARED: clean ({} removed kit tool path(s) and {} changed claimed template(s) since {}, each named in {}'s '{}' section)",
+        "RELEASE-CHANGE-DECLARED: clean ({} removed kit tool path(s) and {} changed claimed template(s) since {}, each named in {}'s {} section)",
         removed,
         subjects.len() - removed,
         base,
         decl_file,
-        SECTION
+        label
     );
     Ok(0)
 }

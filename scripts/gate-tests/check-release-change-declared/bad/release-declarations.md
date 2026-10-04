@@ -1,8 +1,8 @@
 # contract: gate-sdk/SPEC.md §upgrade-smoke — fixture surface.
 
-## Tightened gates
+## New and tightened gates
 
-- `check-alpha` — names `alpha-kit/bin/gone.sh`, but outside Behavior changes, which is no declaration.
+- `check-alpha` — names `alpha-kit/bin/gone.sh`, but outside the behavior and gate-authoring sections, which is no declaration.
 
 ## Behavior changes
 

@@ -48,16 +48,18 @@ fn is_container_heading(line: &str) -> bool {
 // spec: gate-sdk/SPEC.md §lib/declaration.sh — `^##[[:space:]]+<name>[[:space:]]*$`, with the
 // name matched literally where the shell holder interpolates it into an ERE: the two agree for
 // every name without an ERE metacharacter, which a fixed heading in a governed grammar is.
-fn heading_names(line: &str, section: &str) -> bool {
+// spec: gate-sdk/SPEC.md §lib/declaration.sh — a section arrives as its name set, a heading and its
+// aliases, and a container heading opens it when it names any member
+fn heading_names(line: &str, names: &[&str]) -> bool {
     let rest = &line[2..];
     let named = skip_blanks(rest);
     if named.len() == rest.len() {
         return false;
     }
-    match named.strip_prefix(section) {
+    names.iter().any(|n| match named.strip_prefix(n) {
         Some(tail) => !has_content(tail),
         None => false,
-    }
+    })
 }
 
 // spec: gate-sdk/SPEC.md §lib/declaration.sh — `^[[:space:]]*[-*][[:space:]]+`, the container's
@@ -151,10 +153,9 @@ fn opens_with_none(line: &str) -> bool {
     }
 }
 
-// spec: gate-sdk/SPEC.md §lib/declaration.sh — the container arm alone, for the caller that needs
-// bullets without the token predicate. `None` is *the section is absent*, which the shell holder
-// reports as a status rather than as a value.
-pub fn section_bullets<'a>(text: &'a str, section: &str) -> Option<Vec<&'a str>> {
+// spec: gate-sdk/SPEC.md §lib/declaration.sh — every line the container holds, for the caller that
+// reads a section's non-bullet grammar. `None` is *the section is absent*.
+pub fn section_lines<'a>(text: &'a str, section: &[&str]) -> Option<Vec<&'a str>> {
     let mut found = false;
     let mut inside = false;
     let mut out: Vec<&str> = Vec::new();
@@ -164,7 +165,7 @@ pub fn section_bullets<'a>(text: &'a str, section: &str) -> Option<Vec<&'a str>>
             found |= inside;
             continue;
         }
-        if inside && bullet_body(line).is_some() {
+        if inside {
             out.push(line);
         }
     }
@@ -175,7 +176,14 @@ pub fn section_bullets<'a>(text: &'a str, section: &str) -> Option<Vec<&'a str>>
     }
 }
 
-fn section_is_none(text: &str, section: &str) -> bool {
+// spec: gate-sdk/SPEC.md §lib/declaration.sh — the container arm alone, for the caller that needs
+// bullets without the token predicate. `None` is *the section is absent*, which the shell holder
+// reports as a status rather than as a value.
+pub fn section_bullets<'a>(text: &'a str, section: &[&str]) -> Option<Vec<&'a str>> {
+    section_lines(text, section).map(|l| l.into_iter().filter(|l| bullet_body(l).is_some()).collect())
+}
+
+fn section_is_none(text: &str, section: &[&str]) -> bool {
     let mut found = false;
     let mut inside = false;
     let mut seen = false;
@@ -207,7 +215,7 @@ pub enum SectionVerdict {
     Unparsed(Vec<String>),
 }
 
-pub fn section_tokens(text: &str, section: &str, rule: TokenRule) -> SectionVerdict {
+pub fn section_tokens(text: &str, section: &[&str], rule: TokenRule) -> SectionVerdict {
     let bullets = match section_bullets(text, section) {
         None => return SectionVerdict::Absent,
         Some(b) => b,
@@ -276,14 +284,14 @@ None of the above reaches a vendored tree that shadows it.
 ";
 
     fn gate_tokens(section: &str) -> SectionVerdict {
-        section_tokens(CORPUS, section, TokenRule::GateName)
+        section_tokens(CORPUS, &[section], TokenRule::GateName)
     }
 
     #[test]
     fn the_container_arm_reports_absence_as_a_value_and_collects_across_subheadings() {
-        assert!(section_bullets(CORPUS, "Missing").is_none());
-        assert_eq!(section_bullets(CORPUS, "Alpha").expect("absent").len(), 3);
-        assert_eq!(section_bullets(CORPUS, "Gamma").expect("absent").len(), 0);
+        assert!(section_bullets(CORPUS, &["Missing"]).is_none());
+        assert_eq!(section_bullets(CORPUS, &["Alpha"]).expect("absent").len(), 3);
+        assert_eq!(section_bullets(CORPUS, &["Gamma"]).expect("absent").len(), 0);
     }
 
     #[test]
@@ -355,6 +363,19 @@ None of the above reaches a vendored tree that shadows it.
         assert!(!is_token(""));
     }
 
+    // spec: gate-sdk/SPEC.md §lib/declaration.sh — a section is its name set, so a container under
+    // either name opens it and a name outside the set leaves it absent
+    #[test]
+    fn a_section_opens_under_any_name_in_its_set() {
+        let text = "## Former\n\n- `one`\n\n## Other\n\n- `two`\n";
+        match section_tokens(text, &["Current", "Former"], TokenRule::GateName) {
+            SectionVerdict::Tokens(t) => assert_eq!(t, vec!["one"]),
+            _ => panic!("a container under an alias did not open the section"),
+        }
+        assert!(section_bullets(text, &["Current"]).is_none());
+        assert_eq!(section_lines(text, &["Other"]).expect("absent"), vec!["", "- `two`"]);
+    }
+
     // spec: gate-sdk/SPEC.md §lib/declaration.sh — a drained surface is its header line alone, so
     // every section reads `Absent`, which the surface's readers take as the empty set
     #[test]
@@ -362,14 +383,14 @@ None of the above reaches a vendored tree that shadows it.
         let drained = "# contract: x.md §y\n";
         for rule in [TokenRule::GateName, TokenRule::Backticked, TokenRule::Bolded] {
             assert!(matches!(
-                section_tokens(drained, "Alpha", rule),
+                section_tokens(drained, &["Alpha"], rule),
                 SectionVerdict::Absent
             ));
         }
     }
 
     const PROSE: &str = "\
-## Renamed knobs
+## Knob changes
 
 - `KIT_OLD_KNOB` → `KIT_NEW_KNOB` — renamed.
 - `[tag:]` → ∅ — removed.
@@ -385,7 +406,7 @@ None of the above reaches a vendored tree that shadows it.
 
     #[test]
     fn the_prose_sections_take_their_own_lead_rules() {
-        match section_tokens(PROSE, "Renamed knobs", TokenRule::Backticked) {
+        match section_tokens(PROSE, &["Knob changes"], TokenRule::Backticked) {
             SectionVerdict::Unparsed(b) => {
                 assert_eq!(b[0], "KIT_OLD_KNOB");
                 assert_eq!(b[1], "[tag:]");
@@ -394,7 +415,7 @@ None of the above reaches a vendored tree that shadows it.
             }
             _ => panic!("a bolded knob lead resolved"),
         }
-        match section_tokens(PROSE, "Behavior changes", TokenRule::Bolded) {
+        match section_tokens(PROSE, &["Behavior changes"], TokenRule::Bolded) {
             SectionVerdict::Unparsed(b) => {
                 assert_eq!(b[0], "`kit/bin/tool.sh`");
                 assert_eq!(b[1], "a surface phrase");
@@ -407,11 +428,11 @@ None of the above reaches a vendored tree that shadows it.
         // spec: gate-sdk/SPEC.md §lib/declaration.sh — the gate-name predicate refuses the
         // underscore and bracket a knob lead legitimately carries, which is why the rule is per section
         assert!(matches!(
-            section_tokens(PROSE, "Renamed knobs", TokenRule::GateName),
+            section_tokens(PROSE, &["Knob changes"], TokenRule::GateName),
             SectionVerdict::Unparsed(_)
         ));
-        let clean = "## Renamed knobs\n\n- `KIT_OLD` → `KIT_NEW`\n";
-        match section_tokens(clean, "Renamed knobs", TokenRule::Backticked) {
+        let clean = "## Knob changes\n\n- `KIT_OLD` → `KIT_NEW`\n";
+        match section_tokens(clean, &["Knob changes"], TokenRule::Backticked) {
             SectionVerdict::Tokens(t) => assert_eq!(t, vec!["KIT_OLD"]),
             _ => panic!("a canonical knob lead did not resolve"),
         }
