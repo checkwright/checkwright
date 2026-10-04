@@ -5,3 +5,4 @@
 ---
 
 installer-notice-attest-pass scope aaeae20b 2026-10-04 3358b3ff
+installer-notice-attest-pass build a18e33b0 2026-10-04 ad359eb8
