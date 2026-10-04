@@ -536,6 +536,26 @@ the one-line installers' attestation check binds the publisher, not the release,
 
 **Cost while deferred:** a consumer giving two roles one heading gets a note whose section the upgrade contract reads under either role, unrefused. Filed 2026-10-04 to the gap inbox by installer-trust-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because a widened refusal reds configurations accepted today, →forward because no ruling is owed. Re-verified: `refusals` checks a repeated role, and an alias against the roster's headings only. Owner lookup: `RELEASE_SECTION`, `two roles`, `alias` in this file — none; owner gate-sdk/SPEC.md §Layout and configuration.
 
+### finder-tracked-filter-edges
+
+[cost: event/low] [surface: canon-kit]
+
+canon-kit's manifest-set finder fails open and mis-matches paths at its edges. (1) `toplevel_args` in `native/src/walk.rs` maps any failed `git rev-parse` (a `safe.directory` ownership refusal, broken repository metadata) to no work tree, so `tracked_only` in `native/src/spec.rs` returns the unfiltered walk inside a real work tree and grades untracked READMEs again with no notice; canon-kit/SPEC.md §The shared spec adapters authorizes the walk only outside a work tree. (2) `tracked_only` decodes `git ls-files -z` with `from_utf8_lossy` and rewrites every backslash to `/`, so a non-UTF-8 name, or a POSIX name holding a literal backslash, can match the wrong tracked entry or none. (3) The `CANON_KIT_PROSE_SURFACE_GLOBS` branch reads each candidate (`slot_free`) before the tracked filter, so an unreadable untracked file still fails the finder.
+
+**Deliverable:** a failed probe inside a work tree told apart from no work tree, and refused rather than walked; tracked paths matched byte-exact on unix and separator-folded only on Windows; the tracked filter applied before any candidate read; a fixture or unit test per case, and §The shared spec adapters stating each.
+
+**Cost while deferred:** a host whose `git` refuses the repository grades untracked files silently, and the edge names misgrade; all three need an unusual host or name. **Inferred, not run:** that (2) and (3) misgrade on a real corpus — no fixture reproduces them yet. Filed 2026-10-04 to the gap inbox as two bullets by canon-kit-reach-pass' close, its second-vendor review; promoted together 2026-10-04 at the next iteration's scope, all being the one finder's tracked filter: →fix fails because refusing a failed probe reds runs that pass today and each case owes a fixture, →forward because no ruling is owed. Re-verified by source read: `toplevel_args` filters a failed probe to `None`, and `tracked_only` decodes lossily and rewrites backslashes. Owner lookup: `tracked_only`, `toplevel_args`, `safe.directory`, `from_utf8_lossy`, `slot_free` in this file and the disposed-findings record — none; owner canon-kit/SPEC.md §The shared spec adapters.
+
+### canon-kit-reach-overstatement
+
+[cost: event/low] [surface: canon-kit]
+
+canon-kit/SPEC.md states two canon-kit-reach-pass landings wider than the code. §The shared spec adapters' tracked-set bullet grounds the set in what a commit carries, yet the index decides only membership and the gates read working-tree contents, and it leaves unstated that a sparse checkout's absent tracked manifests and a submodule's files never join the set. §check-spec-pointer's section-number mark is any opening digit, while `spec_pointer.rs` tests `is_ascii_digit`, so a bare `§٣` still fires. `.workflow/release-declarations.md`'s two bullets repeat both wordings.
+
+**Deliverable:** both sections and both declaration bullets restated to what the code does, or the digit test widened to the stated mark with a fixture; which one is the unit's call.
+
+**Cost while deferred:** a reader of either section, or of the next release note, trusts a guarantee the gate does not give. Filed 2026-10-04 to the gap inbox by canon-kit-reach-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the digit half chooses between narrowing the SPEC and widening the gate, and the tracked-set half is reshaped by [finder-tracked-filter-edges](#finder-tracked-filter-edges), which goes first; →forward because no ruling is owed. Re-verified by source read: the bullet's wording and the ASCII test. Owner lookup: `is_ascii_digit`, `section-number`, `sparse`, `submodule` in this file and the disposed-findings record — none; owner canon-kit/SPEC.md §The shared spec adapters, with §check-spec-pointer.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
