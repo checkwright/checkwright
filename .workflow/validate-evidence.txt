@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+canon-kit-tail-installer-pass gates sha256=a7d9a71ced8e860c968955412cf7a09c76c4e121959a7d9ab62f04039c227c40 pass=149 fail=0 ignore=0 verdict=clean 2026-10-04
+canon-kit-tail-installer-pass gate_sdk sha256=5dd4867ce7d597e3acd2fa303c310f044a08712faa3896899ea2832d543a3848 pass=1 fail=0 ignore=0 verdict=clean 2026-10-04
+canon-kit-tail-installer-pass canon_kit sha256=9ded695f71c62d1a057f2305280bdec741e5de304cdaa10f982c496574b48323 pass=1 fail=0 ignore=0 verdict=clean 2026-10-04
+canon-kit-tail-installer-pass context_kit sha256=a72a655fbdc2336af37022b95846efa73ffc06864ae2241f7ed48d2867d96cc0 pass=1 fail=0 ignore=0 verdict=clean 2026-10-04
+canon-kit-tail-installer-pass delegation_kit sha256=e8b7dacc5b3a03c2084bd61274ee3c701400be4001eeaafa4126bc7f4b710363 pass=1 fail=0 ignore=0 verdict=clean 2026-10-04
+canon-kit-tail-installer-pass doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-10-04
+canon-kit-tail-installer-pass evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-10-04
+canon-kit-tail-installer-pass guard_kit sha256=01d94b4120e133665e01946fe44d31a730d2c6cdfd1570e5ce6b96a7a1b30e1b pass=1 fail=0 ignore=0 verdict=clean 2026-10-04
+canon-kit-tail-installer-pass lifecycle_kit sha256=cbaa0819e63f67af3b143f07598bd56276d7d56e708e4cdb2bfc407d03bca40f pass=1 fail=0 ignore=0 verdict=clean 2026-10-04
+canon-kit-tail-installer-pass queue_kit sha256=254333a369dea6280bbb8ede558b56de8b5fcfb334b35f4cf49256502e871743 pass=1 fail=0 ignore=0 verdict=clean 2026-10-04
+canon-kit-tail-installer-pass site_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-10-04
+canon-kit-tail-installer-pass scripts sha256=49dacb217bc9bf8c6be056cfe56c9b86206a045896bf399678cdc401a89e2bde pass=1 fail=0 ignore=0 verdict=clean 2026-10-04
+canon-kit-tail-installer-pass guard_tests sha256=771d271b131828a94e1300cbc8e3b855bdc9b02b16492a71f5d14f640e5468f2 pass=1 fail=0 ignore=0 verdict=clean 2026-10-04
+canon-kit-tail-installer-pass demo sha256=7e671f31be64372fddb09cd00dd4ae2edd3247ebbd1459834e4188a81ad34b9d pass=1 fail=0 ignore=0 verdict=clean 2026-10-04
+canon-kit-tail-installer-pass installer_smoke sha256=179164d0a61e0c0607e8c4404ea6df40b4ae73684a969a91beff61b03e70f7b5 pass=28 fail=0 ignore=0 verdict=clean 2026-10-04
+canon-kit-tail-installer-pass consumer_smoke sha256=c2be1ba3e7a2144f61914739b52f608d5755a13d0d394d3cc756d3e651c6fbb1 pass=1 fail=0 ignore=0 verdict=clean 2026-10-04
+canon-kit-tail-installer-pass upgrade sha256=77c7709d16952be5150a43fbfdb89f3b3b694b6e0512262e075bf3c708e63a73 pass=1 fail=0 ignore=0 verdict=clean 2026-10-04
+canon-kit-tail-installer-pass agents_md_smoke sha256=3d5e0c8067c2a315040656611a4f9d05f8778972e4e66ce6d4ca0070664ef710 pass=1 fail=0 ignore=0 verdict=clean 2026-10-04
+canon-kit-tail-installer-pass index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-10-04
+canon-kit-tail-installer-pass native_crate sha256=14ecf47d1a7ca916ab00eca7fddc5d0c6e5d7aa767eb433ce2e88511fb231177 pass=1 fail=0 ignore=0 verdict=clean 2026-10-04
+canon-kit-tail-installer-pass projection_witness sha256=6ccc1f75e99568165f3b2212ff782d2912a9b8ce1cab5de447ca205be36c1cfc pass=1 fail=0 ignore=0 verdict=clean 2026-10-04
