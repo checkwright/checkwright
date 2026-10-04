@@ -103,6 +103,6 @@
 6170cp lifecycle-kit/templates/stages/validate.md
 2830cp lifecycle-kit/templates/upgrade.md
 15010cp plugin/SPEC.md
-171833cp queue-kit/SPEC.md
+159411cp queue-kit/SPEC.md
 1392cp queue-kit/templates/TASK-QUEUE.md
 62216cp site-kit/SPEC.md
