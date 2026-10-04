@@ -143,6 +143,14 @@ pub(super) fn stem_is(stem: &str, name: &str) -> bool {
     name.split('.').next().unwrap_or(name).to_lowercase() == stem
 }
 
+// spec: installer/SPEC.md §The consumer smoke — the jq-less arm reads the verb's own words, its
+// consumer's directory name struck first
+pub(super) fn names_jq(said: &str, consumer: &str) -> bool {
+    let own = Path::new(consumer).file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
+    let words = if own.is_empty() { said.to_string() } else { said.replace(&own, "") };
+    words.contains("jq")
+}
+
 // spec: installer/SPEC.md §The consumer smoke — an absence mask derived from the live PATH: a
 // directory carrying the masked program is replaced by a farm of links to its other programs, and
 // every other directory kept verbatim after it
@@ -344,7 +352,7 @@ pub(super) fn jq_less(state: &mut Run) -> Step {
                 m.reported_code()
             )));
         }
-        if out(&m).contains("jq") {
+        if names_jq(&out(&m), c) {
             return Err(failed(&m, format!(
                 "doctor ({}) named jq — a contributor member is skipped outright, so an adopter is told about a program nothing they install runs",
                 label
@@ -411,7 +419,7 @@ pub(super) fn jq_less(state: &mut Run) -> Step {
                 m.reported_code()
             )));
         }
-        if out(&m).contains("jq") {
+        if names_jq(&out(&m), &c) {
             return Err(failed(&m, format!(
                 "{} ran on a jq-less machine but mentioned jq — the verb still has an opinion about a program it no longer uses",
                 label
@@ -570,6 +578,16 @@ mod tests {
         assert!(stem_is("jq", "jq.cmd"));
         assert!(!stem_is("jq", "jqx"));
         assert!(!stem_is("bash", "bashbug"));
+    }
+
+    // spec: installer/SPEC.md §The consumer smoke — a path under the arm's own consumer is no
+    // mention of jq, under either separator, while the verb's own word still is
+    #[test]
+    fn the_jq_read_strikes_the_consumers_own_name() {
+        let c = "/tmp/installer-smoke.1.2/consumer-jq-less.3";
+        assert!(!names_jq("would remove /tmp/installer-smoke.1.2/consumer-jq-less.3/x\n", c));
+        assert!(!names_jq(r"would remove C:\t\installer-smoke.1.2\consumer-jq-less.3\x", c));
+        assert!(names_jq("jq not found on PATH\n", c));
     }
 
     // spec: installer/SPEC.md §The consumer smoke — the Windows column's mask: a directory holding a

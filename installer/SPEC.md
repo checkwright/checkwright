@@ -967,6 +967,8 @@ A contributor's host carries the toolchain the binary was built with, so no othe
 - **The installed guard answers a payload**: fed a read-only command, the wired member, `--hook shell-guard` on the gate binary, exits 0 with an allow envelope on the `jq`-less `PATH`. An allow is a payload read and a render, neither the front end's absent-binary decline nor an empty stdout.
 - **`diff` and `uninstall --dry-run`** run no `doctor` precondition, so they read the minimum's manifest and reach their answer. Each must **exit 0** and say nothing about `jq`, the positive evidence that the read itself is `jq`-free.
 
+*Names `jq` nowhere* reads the verb's own words: the arm strikes its consumer's directory name, which carries `jq`, from the output first.
+
 **This mask is by absence, a different instrument from the other two.** The Node-free and toolchain-free arms ask whether the payload ever *reaches* a program, so a shim that fails loudly and names itself is the right tool. This arm asks what a machine *without* `jq` is told, and a shim is a `jq` that is present. So on a unix host the arm builds a directory of links to every program on `PATH` except `jq` and runs the verbs against that; the native Windows spelling is the host table's below. The farm is one helper shared with the `bash`-less arm below:
 
 - **It is derived from the live `PATH`**, never from a maintained list of the programs these verbs happen to use, so it cannot fall out of date.
