@@ -8,18 +8,6 @@
 
 ## New Features
 
-### nested-broken-repo-toplevel
-
-[spec: SPEC-nested-repo-refusal.md]
-
-git's discovery skips a nested repository whose metadata is broken (an invalid `HEAD`) and answers `rev-parse --show-toplevel` with the enclosing repository's toplevel at exit 0, so the crate's crosser and canon-kit's tracked-set finder grade the inner tree as the outer repository's, its files untracked there and silently dropped.
-
-**Deliverable:** the crosser detects a `.git` entry between the probed directory and the toplevel git answered and refuses with that cause, a test per shape (broken inner `HEAD`, valid inner repository), and gate-sdk/SPEC.md §The crate's crosser stating the refusal.
-
-**Selected 2026-10-04** for queue-kit-arms-crosser-pass, operator direction lead-relayed (not a ruling). Feature-shaped by scope's triage: an exit-0 toplevel answer turning refused changes the crosser's contract, so the spec stage authors its amendment and promotes it, and it lands after [crosser-anchor-lexical-ascent](#crosser-anchor-lexical-ascent), a neighbouring edit in `walk.rs`; its detection reads git's own `--show-prefix`, not that unit's anchor (measured at spec).
-
-**Cost while deferred:** a broken nested checkout reads as an ignored subdirectory with no notice. Filed 2026-10-04 to the gap inbox by queue-kit-format-native-pass' spec; promoted at its close: →fix fails because the detection is new crosser mechanism with a refusal to design, →forward because no ruling is owed. Re-verified on git 2.55: an inner repository with a garbage `HEAD` answers the outer toplevel, exit 0. Owner lookup: `nested`, `enclosing`, `broken metadata` in this file — none; toplevel-refusal-fail-open, done, classified a non-zero answer, DISTINCT. Owner gate-sdk/SPEC.md §The crate's crosser.
-
 ## Technical Debt
 
 ### crosser-anchor-lexical-ascent
@@ -1231,4 +1219,6 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 Ported gate and emit modules carry spec: comments citing a section for a literal or a port note the section does not state, so a reader following the pointer finds no support for it; a crate-wide sweep would retag, delete or relocate each, and a new instance returns the entry.
 
 ## Done
+
+- nested-broken-repo-toplevel
 

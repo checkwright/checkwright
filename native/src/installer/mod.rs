@@ -225,7 +225,7 @@ pub fn required_root(absent_help: &str) -> Result<PathBuf, Refusal> {
         Ok(None) => Err(refuse("not inside a git work tree", absent_help, 2)),
         Err(cause) => Err(refuse(
             cause,
-            "git cannot answer for this repository, so the verb has no root to act on. Repair git's access to it (`git status` prints git's reason), then run the verb again.",
+            "git cannot answer for this repository, so the verb has no root to act on. Repair git's access to it (the command the cause names prints git's reason), then run the verb again.",
             2,
         )),
     }

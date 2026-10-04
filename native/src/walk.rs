@@ -492,12 +492,39 @@ pub fn toplevel_in_opt(dir: &str) -> Result<Option<String>, String> {
 
 fn toplevel_args(dir: Option<&str>) -> Result<Option<String>, String> {
     let mut args: Vec<&str> = dir.map(|d| vec!["-C", d]).unwrap_or_default();
-    args.extend_from_slice(&["rev-parse", "--show-toplevel"]);
+    args.extend_from_slice(&["rev-parse", "--show-toplevel", "--show-prefix"]);
     let c = crate::proc::run(&programs::GIT, &args)?;
     let Some(out) = c.stdout() else { return refused_or_absent(dir) };
-    Ok(Some(String::from_utf8_lossy(out).trim().to_string())
-        .filter(|s| !s.is_empty())
-        .map(|s| normalize_abs(&s)))
+    let out = String::from_utf8_lossy(out);
+    let mut lines = out.lines();
+    let Some(top) = lines.next().map(str::trim).filter(|s| !s.is_empty()).map(normalize_abs) else {
+        return Ok(None);
+    };
+    let prefix = lines.next().unwrap_or("");
+    match nested_mark(&top, prefix) {
+        None => Ok(Some(top)),
+        Some(mark) => Err(format!(
+            "git answers the toplevel {} at {}, though {} marks a repository beneath it — git skips a repository it cannot read and answers the enclosing one, which is not read as this tree's (`git --git-dir={} status` prints git's reason)",
+            top,
+            child(Path::new(&top), prefix.trim_end_matches('/')).display(),
+            mark.display(),
+            mark.display()
+        )),
+    }
+}
+
+// spec: gate-sdk/SPEC.md §The crate's crosser — a `.git` entry of any type on git's own prefix
+// beneath the toplevel it answered, nearest the anchor first; under a `GIT_DIR` git discovers
+// nothing, so nothing was skipped
+fn nested_mark(top: &str, prefix: &str) -> Option<PathBuf> {
+    if std::env::var_os("GIT_DIR").is_some_and(|d| !d.is_empty()) {
+        return None;
+    }
+    let runs: Vec<&str> = prefix.split('/').filter(|s| !s.is_empty()).collect();
+    (1..=runs.len()).rev().find_map(|n| {
+        let mark = child(Path::new(top), &format!("{}/.git", runs[..n].join("/")));
+        mark.symlink_metadata().is_ok().then_some(mark)
+    })
 }
 
 // spec: gate-sdk/SPEC.md §The crate's crosser — git's stderr cannot tell a broken repository from
@@ -1427,6 +1454,76 @@ mod tests {
         let named = format!(r"{}/a\b", repo.display());
         let refused = toplevel_in_opt(&named).expect_err("a backslash-bearing name in a refused repository read as none");
         assert!(refused.contains("marks a repository"), "{}", refused);
+        if let Some(v) = inherited {
+            env.set("GIT_DIR", &v);
+        }
+        let _ = std::fs::remove_dir_all(&d);
+    }
+
+    fn git_init(dir: &Path) {
+        let d = dir.display().to_string();
+        let c = crate::proc::run(&programs::GIT, &["init", "-q", d.as_str()]).expect("git spawns");
+        assert!(c.stdout().is_some(), "git init failed: {:?}", c.failure_report());
+    }
+
+    // spec: gate-sdk/SPEC.md §The crate's crosser — a zero exit whose prefix crosses a `.git` entry
+    // beneath the answered toplevel is refused: git skipped a repository it cannot read
+    #[test]
+    fn a_repository_git_skips_beneath_the_toplevel_is_refused() {
+        let env = crate::knobenv::lock();
+        let inherited = std::env::var("GIT_DIR").ok();
+        env.remove("GIT_DIR");
+        env.remove("GIT_CEILING_DIRECTORIES");
+        let d = std::env::temp_dir().join(format!("walk-toplevel-nested-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        let (outer, inner) = (d.join("outer"), d.join("outer").join("inner"));
+        std::fs::create_dir_all(inner.join("sub")).expect("scratch");
+        git_init(&outer);
+        let (top, at) = (normalize_abs(&outer.display().to_string()), normalize_abs(&inner.join("sub").display().to_string()));
+        std::fs::create_dir_all(inner.join(".git")).expect("scratch");
+        std::fs::write(inner.join(".git").join("HEAD"), "garbage\n").expect("write");
+        let refused = toplevel_in_opt(&at).expect_err("a skipped broken repository read as the enclosing one");
+        assert!(refused.contains("inner/.git marks a repository beneath it"), "{}", refused);
+        assert!(refused.contains("--git-dir="), "{}", refused);
+        assert_eq!(toplevel_in(&at), Err(refused.clone()), "the refusal is not folded into the absent sentence");
+        std::fs::remove_file(inner.join(".git").join("HEAD")).expect("empty");
+        let empty = toplevel_in_opt(&at).expect_err("an empty .git directory read as the enclosing repository");
+        assert!(empty.contains("marks a repository beneath it"), "{}", empty);
+        std::fs::remove_dir_all(inner.join(".git")).expect("unmark");
+        git_init(&inner);
+        let valid = toplevel_in_opt(&at);
+        assert!(matches!(&valid, Ok(Some(t)) if t.ends_with("/inner")), "a valid inner repository answers itself: {:?}", valid);
+        std::fs::remove_dir_all(inner.join(".git")).expect("unmark");
+        std::fs::create_dir_all(inner.join(".git")).expect("scratch");
+        std::fs::write(inner.join(".git").join("HEAD"), "garbage\n").expect("write");
+        let at_top = toplevel_in_opt(&top);
+        assert!(matches!(&at_top, Ok(Some(t)) if t.ends_with("/outer")), "the mark is not on the prefix: {:?}", at_top);
+        env.set("GIT_DIR", &outer.join(".git").display().to_string());
+        assert!(matches!(toplevel_in_opt(&at), Ok(Some(_))), "under a GIT_DIR git discovers nothing");
+        match inherited {
+            Some(v) => env.set("GIT_DIR", &v),
+            None => env.remove("GIT_DIR"),
+        }
+        let _ = std::fs::remove_dir_all(&d);
+    }
+
+    // spec: gate-sdk/SPEC.md §The crate's crosser — the third skipped shape, a `.git` symlink naming
+    // nothing; Windows symlink creation needs a privilege a test cannot assume
+    #[cfg(unix)]
+    #[test]
+    fn a_dangling_git_symlink_beneath_the_toplevel_is_refused() {
+        let env = crate::knobenv::lock();
+        let inherited = std::env::var("GIT_DIR").ok();
+        env.remove("GIT_DIR");
+        env.remove("GIT_CEILING_DIRECTORIES");
+        let d = std::env::temp_dir().join(format!("walk-toplevel-dangling-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        let (outer, inner) = (d.join("outer"), d.join("outer").join("inner"));
+        std::fs::create_dir_all(&inner).expect("scratch");
+        git_init(&outer);
+        std::os::unix::fs::symlink(d.join("absent"), inner.join(".git")).expect("symlink");
+        let refused = toplevel_in_opt(&normalize_abs(&inner.display().to_string())).expect_err("a dangling .git symlink read as the enclosing repository");
+        assert!(refused.contains("inner/.git marks a repository beneath it"), "{}", refused);
         if let Some(v) = inherited {
             env.set("GIT_DIR", &v);
         }

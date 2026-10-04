@@ -1907,6 +1907,12 @@ mod tests {
         env.set("GIT_CEILING_DIRECTORIES", &tree.display().to_string());
         assert_eq!(found(&sub), Ok(vec!["README.md".to_string()]), "a ceiling git honours hides the mark");
         env.remove("GIT_CEILING_DIRECTORIES");
+        std::fs::remove_file(tree.join(".git")).expect("unmark");
+        git_in(&tree, &["init", "-q"]);
+        std::fs::create_dir_all(sub.join(".git")).expect("scratch");
+        std::fs::write(sub.join(".git/HEAD"), "garbage\n").expect("write");
+        let skipped = found(&sub).expect_err("a nested broken repository read as the enclosing one's empty set");
+        assert!(skipped.contains("marks a repository beneath it"), "{}", skipped);
         finder_done(&env, &d);
     }
 
