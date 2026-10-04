@@ -119,6 +119,7 @@ The roster's probe: `grep -rn "two refusals\|outside a work tree\|toplevel_opt\|
 - lifecycle-kit/SPEC.md §check-stage-evidence, inertness (a) (delta 3).
 - queue-kit/SPEC.md §The queue-history arm, Exit; §The roadmap-lag arm, Degradations (delta 3).
 - installer/SPEC.md §update, the fall-through sentence and the refusal roster (delta 3).
+- docs/install.md, the sentence "`init` refuses outside a git work tree, on a dirty worktree …": it names the refused repository beside the work-tree case (delta 3, the installer row). Found at align from the tree; hand-authored, so not a mirror.
 - `.workflow/release-declarations.md` (delta 5).
 - The on-site SPEC mirrors `docs/gate-sdk/SPEC.md`, `docs/canon-kit/SPEC.md`, `docs/lifecycle-kit/SPEC.md`, `docs/queue-kit/SPEC.md` and `docs/installer/SPEC.md`, regenerated with `--emit docs-mirror --write` (all deltas).
 
