@@ -1,7 +1,9 @@
-# spec: evidence-kit/SPEC.md §check-battery-roster — fixture consumer config: three suites, one env-prefixed, so the pair exercises the invocation normalization the parity compare runs on
+# spec: evidence-kit/SPEC.md §check-battery-roster — fixture consumer config: four suites, one env-prefixed and one on the binary door, so the pair exercises the invocation normalization the parity compare runs on and a path-led command word
 EVIDENCE_KIT_SUITES[] = alpha
 EVIDENCE_KIT_SUITES[] = beta
 EVIDENCE_KIT_SUITES[] = gamma
+EVIDENCE_KIT_SUITES[] = door
 EVIDENCE_KIT_RUN_alpha = bash bin/run-alpha.sh
 EVIDENCE_KIT_RUN_beta = env FIXTURE_VERBOSE=1 bash bin/run-beta.sh
 EVIDENCE_KIT_RUN_gamma = bash bin/run-gamma.sh --deep
+EVIDENCE_KIT_RUN_door = ./bin/cw --run-gate-tests door/gate-tests

@@ -1451,13 +1451,16 @@ mod tests {
         let kit = fixture_tree(&env, &s);
         env.remove("EVIDENCE_KIT_RUN_probe_kit");
         env.remove("EVIDENCE_KIT_RUN_demo");
+        env.set("GATE_SDK_NATIVE_BIN", "bin/cw");
+        reset(&env);
         let get = |n: &str| {
             family("EVIDENCE_KIT_RUN_").expect("the family reads").into_iter().find(|(k, _)| k == n).map(|(_, v)| v)
         };
         assert_eq!(
             get("EVIDENCE_KIT_RUN_probe_kit").as_deref(),
-            Some(format!("bash sdk/bin/run-gates.sh --run-gate-tests {0}/gate-tests {0}/checks", kit).as_str())
+            Some(format!("./bin/cw --run-gate-tests {0}/gate-tests {0}/checks", kit).as_str())
         );
+        env.remove("GATE_SDK_NATIVE_BIN");
         assert_eq!(get("EVIDENCE_KIT_RUN_ID"), None, "a declared row is never a member");
         s.write("evidence-config.knobs", "EVIDENCE_KIT_RUN_demo = from-file\nEVIDENCE_KIT_RUN_probe_kit = replaced\n");
         reset(&env);

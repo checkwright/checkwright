@@ -1,6 +1,6 @@
 # spec: evidence-kit/SPEC.md §Layout and configuration — this repo's evidence-kit consumer knob file; set only what this repo overrides beyond the kit defaults
 EVIDENCE_KIT_SUITES[] = gates
-# spec: evidence-kit/SPEC.md §Layout and configuration — the per-kit fixture suites, derived from the gate-tests dirs on disk with their run members, so a new kit's fixtures enrol with no edit here; the suites below have no gate-tests dir and stay hand-listed
+# spec: evidence-kit/SPEC.md §Layout and configuration — the per-kit fixture suites, derived from the gate-tests dirs on disk, so a new kit's fixtures enrol with no edit here; their run members are pinned below; the suites after this line have no gate-tests dir and stay hand-listed
 EVIDENCE_KIT_SUITES[] <- EVIDENCE_KIT_FIXTURE_SUITES
 EVIDENCE_KIT_SUITES[] = guard_tests
 EVIDENCE_KIT_SUITES[] = demo
@@ -19,6 +19,19 @@ EVIDENCE_KIT_RUN_gates = env GATE_SDK_VERBOSE=1 bash gate-sdk/bin/run-gates.sh
 
 # spec: evidence-kit/SPEC.md §Layout and configuration — per-arm scenarios for the installer smoke; the arm roster is the one the log declares at its head, and the suite's fail-fast shape is what turns an early abort into a red on every arm behind it rather than a hidden one
 EVIDENCE_KIT_PARSER_installer_smoke = bash gate-sdk/bin/run-gates.sh --emit parse-smoke-log
+
+# spec: evidence-kit/SPEC.md §check-battery-roster — the fixture suites' members pinned to the front end: the README register is contributor-facing and a pasted fence must head on a tracked path, which this tree's untracked binary is not; a new kit's suite takes the binary-door default until pinned here, and check-battery-roster's assertion A reds it in the README until then
+EVIDENCE_KIT_RUN_gate_sdk = bash gate-sdk/bin/run-gates.sh --run-gate-tests gate-sdk/gate-tests gate-sdk/checks
+EVIDENCE_KIT_RUN_canon_kit = bash gate-sdk/bin/run-gates.sh --run-gate-tests canon-kit/gate-tests canon-kit/checks
+EVIDENCE_KIT_RUN_context_kit = bash gate-sdk/bin/run-gates.sh --run-gate-tests context-kit/gate-tests context-kit/checks
+EVIDENCE_KIT_RUN_delegation_kit = bash gate-sdk/bin/run-gates.sh --run-gate-tests delegation-kit/gate-tests delegation-kit/checks
+EVIDENCE_KIT_RUN_doctrine_kit = bash gate-sdk/bin/run-gates.sh --run-gate-tests doctrine-kit/gate-tests doctrine-kit/checks
+EVIDENCE_KIT_RUN_evidence_kit = bash gate-sdk/bin/run-gates.sh --run-gate-tests evidence-kit/gate-tests evidence-kit/checks
+EVIDENCE_KIT_RUN_guard_kit = bash gate-sdk/bin/run-gates.sh --run-gate-tests guard-kit/gate-tests guard-kit/checks
+EVIDENCE_KIT_RUN_lifecycle_kit = bash gate-sdk/bin/run-gates.sh --run-gate-tests lifecycle-kit/gate-tests lifecycle-kit/checks
+EVIDENCE_KIT_RUN_queue_kit = bash gate-sdk/bin/run-gates.sh --run-gate-tests queue-kit/gate-tests queue-kit/checks
+EVIDENCE_KIT_RUN_site_kit = bash gate-sdk/bin/run-gates.sh --run-gate-tests site-kit/gate-tests site-kit/checks
+EVIDENCE_KIT_RUN_scripts = bash gate-sdk/bin/run-gates.sh --run-gate-tests scripts/gate-tests
 
 EVIDENCE_KIT_RUN_guard_tests = bash gate-sdk/bin/run-gates.sh --run-guard-tests
 EVIDENCE_KIT_RUN_demo = bash gate-sdk/bin/run-gates.sh --run-demo

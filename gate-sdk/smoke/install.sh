@@ -128,11 +128,11 @@ rm -rf "$q"
 # refusal, on the precedent that rule names: no gate reads it, so these two legs are what keeps
 # `--help` from falling back through to the gates-dir positional
 out="$(bash "$SDK/bin/run-gates.sh" --help 2>/dev/null)" || { echo "smoke(--help): a help request did not exit 0" >&2; exit 1; }
-grep -q '^usage: run-gates.sh' <<<"$out" || { echo "smoke(--help): usage did not reach stdout" >&2; exit 1; }
+grep -q '^usage: --run' <<<"$out" || { echo "smoke(--help): usage did not reach stdout" >&2; exit 1; }
 
 if err="$(bash "$SDK/bin/run-gates.sh" --smoke-nope 2>&1 >/dev/null)"; then echo "smoke(refusal): an unrecognized option was not refused" >&2; exit 1; fi
 grep -q 'unrecognized option: --smoke-nope' <<<"$err" || { echo "smoke(refusal): refusal did not name the option" >&2; exit 1; }
-grep -q '^usage: run-gates.sh' <<<"$err" || { echo "smoke(refusal): usage did not reach stderr" >&2; exit 1; }
+grep -q '^usage: --run' <<<"$err" || { echo "smoke(refusal): usage did not reach stderr" >&2; exit 1; }
 
 # spec: gate-sdk/SPEC.md §The bin/-tool contract — the help half binds `build-native.sh` too, and
 # answers before the crate is probed: this scratch consumer carries no crate and, where the host has

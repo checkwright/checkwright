@@ -1,1 +1,2 @@
 suite 'beta' is absent from the battery-roster block
+roster line runs no configured suite: './bin/cw --run-gate-tests stale/gate-tests'

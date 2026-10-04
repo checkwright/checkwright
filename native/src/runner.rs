@@ -19,29 +19,29 @@ const TOOL: &str = "run-gates";
 // spec: gate-sdk/SPEC.md §run-gates — the one usage text, the stdout body of a help request and the
 // stderr body of an unrecognized-option refusal, per §The bin/-tool contract. It lives beside the
 // arm table it describes, because it grows by a paragraph per configured arm.
-pub const USAGE: &str = r#"usage: run-gates.sh [gates-dir]                run every registered gate
-       run-gates.sh --only <name> [<name>...]  run only the named gates
-       run-gates.sh --only <name> -- <arg>...  run one named gate, forwarding <arg>...
-       run-gates.sh --for <path> [<path>...]   run only gates coupling to those paths
-       run-gates.sh --emit <arm> [args...]     dispatch a ported non-gate emitter arm
-       run-gates.sh --hook <member>            dispatch a harness hook member, payload on stdin
-       run-gates.sh --statusline               render the harness status line, payload on stdin
-       run-gates.sh --usage-poll               refresh the usage snapshot from its source
-       run-gates.sh --usage-verdict [paths]    budget verdict: 0 OK/RESET-OK, 1 PAUSE, 2 STALE
-       run-gates.sh --model-verdict [--expect <class>] [transcript]  running-model verdict: 0 READ/OK, 1 BELOW/UNBOUND, 2 UNKNOWN
-       run-gates.sh --foreign-run <adapter> <prompt-file> [--mode audit|sweep] [--key <key>]  one unit on a foreign adapter: 0 OK, 1 REFUSED, 2 FAILED
-       run-gates.sh --foreign-resume <key> <prompt-file> | <key> --close  the next turn of a foreign session, or its end: 0 OK/CLOSED, 1 REFUSED, 2 FAILED
-       run-gates.sh --lesson-sink <tag>        route a lesson body on stdin to its sink
-       run-gates.sh --queue <verb> <slug> [args]  move or stamp one queue entry, then run the queue's gates
-       run-gates.sh --upgrade-smoke            prove the FROM->TO kit upgrade in scratch
-       run-gates.sh --run-consumer-smoke [args] prove the kits install into a scratch consumer
-       run-gates.sh --install-lifecycle [file] install the lifecycle resident surfaces
-       run-gates.sh --install-hooks            wire this clone's core.hooksPath (per-clone opt-in)
-       run-gates.sh --enter-stage <stage>      stamp a stage entry (or --rename an iteration)
-       run-gates.sh --wait-probe <sub> [args]  the wait-primitive probe: 'sweep' is the reproducer
-       run-gates.sh --run-validate             run the codified validate spine over the roster
-       run-gates.sh --diff-baseline <group>... diff captured logs against the baseline slice
-       run-gates.sh -h | --help                this text, on stdout, exit 0
+pub const USAGE: &str = r#"usage: --run [gates-dir]                       run every registered gate
+       --only <name> [<name>...]               run only the named gates
+       --only <name> -- <arg>...               run one named gate, forwarding <arg>...
+       --for <path> [<path>...]                run only gates coupling to those paths
+       --emit <arm> [args...]                  dispatch a ported non-gate emitter arm
+       --hook <member>                         dispatch a harness hook member, payload on stdin
+       --statusline                            render the harness status line, payload on stdin
+       --usage-poll                            refresh the usage snapshot from its source
+       --usage-verdict [paths]                 budget verdict: 0 OK/RESET-OK, 1 PAUSE, 2 STALE
+       --model-verdict [--expect <class>] [transcript]  running-model verdict: 0 READ/OK, 1 BELOW/UNBOUND, 2 UNKNOWN
+       --foreign-run <adapter> <prompt-file> [--mode audit|sweep] [--key <key>]  one unit on a foreign adapter: 0 OK, 1 REFUSED, 2 FAILED
+       --foreign-resume <key> <prompt-file> | <key> --close  the next turn of a foreign session, or its end: 0 OK/CLOSED, 1 REFUSED, 2 FAILED
+       --lesson-sink <tag>                     route a lesson body on stdin to its sink
+       --queue <verb> <slug> [args]            move or stamp one queue entry, then run the queue's gates
+       --upgrade-smoke                         prove the FROM->TO kit upgrade in scratch
+       --run-consumer-smoke [args]             prove the kits install into a scratch consumer
+       --install-lifecycle [file]              install the lifecycle resident surfaces
+       --install-hooks                         wire this clone's core.hooksPath (per-clone opt-in)
+       --enter-stage <stage>                   stamp a stage entry (or --rename an iteration)
+       --wait-probe <sub> [args]               the wait-primitive probe: 'sweep' is the reproducer
+       --run-validate                          run the codified validate spine over the roster
+       --diff-baseline <group>...              diff captured logs against the baseline slice
+       --run -h | --help                       this text, on stdout, exit 0
 
   --only  runs the named members in registry order whatever order they were
           typed; duplicates collapse. A name unknown to the registry is a
@@ -171,8 +171,9 @@ pub const USAGE: &str = r#"usage: run-gates.sh [gates-dir]                run ev
   --      ends option processing, so a gates-dir spelled with a leading dash
           is still reachable.
 
-The battery itself is the binary's `--run` arm; run-gates.sh locates the
-binary and execs it.
+Each form is an argument list for the gate binary, the battery its `--run`
+arm; a leading --only or --for reaches that arm unnamed. The pre-build front
+end takes the same forms, and a bare [gates-dir] or -h there as well.
 
 GATE_SDK_VERBOSE (any non-empty value) restores the per-gate banner roll the
 quiet-green output contract suppresses; GATE_SDK_JOBS sets the worker count
@@ -973,10 +974,13 @@ fn steer(arg: &str, configured_dir: &str) {
     let Ok(text) = std::fs::read_to_string(&default_list) else {
         return;
     };
-    if registry::members(&text).iter().any(|m| m == arg) {
+    if !registry::members(&text).iter().any(|m| m == arg) {
+        return;
+    }
+    if let Ok(door) = gates::door_command(&format!("--only {}", arg)) {
         eprintln!(
-            "{}: '{}' is a gate registered in {}, not a gates dir — run it with: run-gates.sh --only {}",
-            TOOL, arg, default_list, arg
+            "{}: '{}' is a gate registered in {}, not a gates dir — run it with: {}",
+            TOOL, arg, default_list, door
         );
     }
 }

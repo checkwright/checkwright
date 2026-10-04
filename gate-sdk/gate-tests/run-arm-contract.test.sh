@@ -84,14 +84,21 @@ assert_has for-empty 'run-gates: --for needs at least one path' "$out"
 # spec: gate-sdk/SPEC.md §The bin/-tool contract — help on stdout at exit 0, an unrecognized leading-dash first argument as usage on stderr at exit 2
 battery --help > "$scratch/h.out" 2> "$scratch/h.err"; rc=$?
 assert_rc help "$rc" 0
-assert_has help 'usage: run-gates.sh' "$(<"$scratch/h.out")"
+assert_has help 'usage: --run' "$(<"$scratch/h.out")"
 [[ -s "$scratch/h.err" ]] && { echo "FAIL [help]: the help arm wrote to stderr"; fails=$((fails + 1)); }
 
 battery --nope > "$scratch/u.out" 2> "$scratch/u.err"; rc=$?
 assert_rc unrecognized "$rc" 2
 assert_has    unrecognized 'run-gates: unrecognized option: --nope' "$(<"$scratch/u.err")"
-assert_has    unrecognized 'usage: run-gates.sh'                    "$(<"$scratch/u.err")"
+assert_has    unrecognized 'usage: --run'                    "$(<"$scratch/u.err")"
 [[ -s "$scratch/u.out" ]] && { echo "FAIL [unrecognized]: the refusal wrote to stdout"; fails=$((fails + 1)); }
+
+# spec: gate-sdk/SPEC.md §run-gates — a gates-dir that is really a gate name steers to --only on the binary door
+out="$(merged g_pass)"; rc=$?
+assert_rc     steer "$rc" 2
+assert_has    steer "run-gates: 'g_pass' is a gate registered in $scratch/gates.list, not a gates dir — run it with: " "$out"
+assert_has    steer ' --only g_pass' "$out"
+assert_absent steer 'run-gates.sh --only' "$out"
 
 # spec: gate-sdk/SPEC.md §run-gates — an ungoverned path is a fact, not a failure: a note on stdout at exit 0
 mk_gate g_narrow 0
@@ -186,5 +193,5 @@ assert_has    emit-miss 'gate-sdk/SPEC.md §The non-gate arm owns the arm contra
 assert_absent emit-miss 'check-shellcheck'                                       "$out"
 
 [[ "$fails" -eq 0 ]] || { echo "run-arm-contract.test: $fails assertion(s) failed"; exit 1; }
-echo "run-arm-contract.test: clean (the three FAIL tails, the exact green phrase, the omission line beside the summary and not in it, the four argv refusals, the --only argv channel forwarded on a single-member selection and refused on a two-member one, the sole-name widening selected/refused/bounded, two default runs and a serial run byte-identical, and a mistyped --emit arm answered with the arm roster and no gate name)"
+echo "run-arm-contract.test: clean (the three FAIL tails, the exact green phrase, the omission line beside the summary and not in it, the four argv refusals, the gates-dir steer onto the binary door, the --only argv channel forwarded on a single-member selection and refused on a two-member one, the sole-name widening selected/refused/bounded, two default runs and a serial run byte-identical, and a mistyped --emit arm answered with the arm roster and no gate name)"
 exit 0

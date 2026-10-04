@@ -59,14 +59,14 @@ fn fixture_suites(resolve: Resolve) -> Result<Value, String> {
 }
 
 // spec: evidence-kit/SPEC.md §Layout and configuration — one run member per fixture suite, the
-// fixture runner over its tests dir and, where one exists, its checks dir
+// fixture runner over its tests dir and, where one exists, its checks dir, on the binary door
 fn run_members(resolve: Resolve) -> Result<Vec<(String, String)>, String> {
-    let (root, origin) = input_scalar(resolve, "GATE_SDK_ROOT")?;
-    let root = if origin == Origin::Placeholder { root } else { crate::walk::spelled_here(&root)? };
+    let (bin, _) = input_scalar(resolve, "GATE_SDK_NATIVE_BIN")?;
+    let door = crate::installer::init::command_token(&bin);
     Ok(suites(resolve)?
         .into_iter()
         .map(|(s, tests, checks)| {
-            let mut cmd = format!("bash {}/bin/run-gates.sh --run-gate-tests {}", root, tests);
+            let mut cmd = format!("{} --run-gate-tests {}", door, tests);
             if !checks.is_empty() {
                 cmd.push(' ');
                 cmd.push_str(&checks);
@@ -107,7 +107,7 @@ pub const KIT: Kit = Kit {
         Family {
             prefix: "EVIDENCE_KIT_RUN_",
             derive: Some(run_members),
-            inputs: &["GATE_SDK_ROOT", "GATE_SDK_KIT_DIRS", "GATE_SDK_GATES_DIR"],
+            inputs: &["GATE_SDK_ROOT", "GATE_SDK_KIT_DIRS", "GATE_SDK_GATES_DIR", "GATE_SDK_NATIVE_BIN"],
         },
         Family { prefix: "EVIDENCE_KIT_PARSER_", derive: None, inputs: &[] },
     ],

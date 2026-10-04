@@ -30,16 +30,17 @@ fn normalize_line(raw: &str) -> String {
     out
 }
 
-// spec: evidence-kit/SPEC.md §check-battery-roster — a roster line is a lowercase-led command
-// word followed by at least one more word, which is what `^[a-z][a-z0-9_-]* ` selects
+// spec: evidence-kit/SPEC.md §check-battery-roster — a roster line is a command word followed by
+// at least one more word: a lowercase-led word `^[a-z][a-z0-9_-]*`, or a door spelling, which is
+// what the command speller hands back unchanged
 fn is_roster_line(line: &str) -> bool {
-    let Some(rest) = line.strip_prefix(|c: char| c.is_ascii_lowercase()) else {
+    let Some((word, _)) = line.split_once(' ') else {
         return false;
     };
-    let tail = rest.trim_start_matches(|c: char| {
-        c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_' || c == '-'
-    });
-    tail.starts_with(' ')
+    let mut cs = word.chars();
+    let lower = cs.next().is_some_and(|c| c.is_ascii_lowercase())
+        && cs.all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_' || c == '-');
+    lower || crate::gates::door_spelling(word) == word
 }
 
 // spec: evidence-kit/SPEC.md §check-battery-roster — a suite's documented invocation is its run
@@ -220,6 +221,20 @@ mod tests {
         assert!(!is_roster_line("```bash"));
         assert!(!is_roster_line("Run the suites"));
         assert!(!is_roster_line(""));
+    }
+
+    // spec: evidence-kit/SPEC.md §check-battery-roster — the binary door is a command word in every
+    // spelling the command speller returns unchanged, a drive-rooted one included; a bare relative
+    // path or an uppercase-led word is not
+    #[test]
+    fn a_door_spelled_command_word_is_a_roster_line() {
+        assert!(is_roster_line("./scripts/checkwright-gates --run-gate-tests a/gate-tests"));
+        assert!(is_roster_line("../bin/checkwright-gates --run"));
+        assert!(is_roster_line("/opt/cw/checkwright-gates --run"));
+        assert!(is_roster_line("C:/cw/checkwright-gates.exe --run"));
+        assert!(!is_roster_line("./scripts/checkwright-gates"));
+        assert!(!is_roster_line("scripts/checkwright-gates --run"));
+        assert!(!is_roster_line("Scripts/run --x"));
     }
 
     // spec: evidence-kit/SPEC.md §check-battery-roster — both prefix spellings normalize away,

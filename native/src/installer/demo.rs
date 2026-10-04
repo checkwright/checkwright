@@ -61,7 +61,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(p) => p,
         Err(mut r) => {
             r.help.push_str(
-                " From a source checkout, the contributor's walkthrough is `run-gates.sh --run-demo`.",
+                " From a source checkout, the contributor's walkthrough is the gate binary's `--run-demo` arm.",
             );
             return super::finish("demo", Err(r));
         }

@@ -2598,7 +2598,13 @@ const _: () = {
 // `GATE_SDK_NATIVE_BIN` resolves, spelled as a command by the installer's one spelling function
 pub fn door_command(args: &str) -> Result<String, String> {
     let bin = crate::walk::knob_scalar("GATE_SDK_NATIVE_BIN")?;
-    Ok(format!("{} {}", crate::installer::init::command_token(&bin), args))
+    Ok(format!("{} {}", door_spelling(&bin), args))
+}
+
+// spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_native_bin_spelled`'s rule for a gate to read, so a
+// gate asking whether a word is a door spelling reaches the installer's speller through this module
+pub fn door_spelling(bin: &str) -> String {
+    crate::installer::init::command_token(bin)
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — the same door for a gate answering in `i32`: a knob read that
