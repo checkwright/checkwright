@@ -8,18 +8,6 @@
 
 ## New Features
 
-### tarball-build-attestation
-
-[spec: installer/SPEC.md] [recurrence: 2026-09-25]
-
-the primary install channel carries no build provenance: the Release tarball ships a digest, which proves transfer, and docs/install.md states the tarball "cannot" carry an attestation where the npm package does. A GitHub artifact attestation on the tarball is a workflow step, not a platform limit.
-
-**Deliverable:** the publish workflow attests the tarball, the shell installers verify it where the verifier is present and say so where it is not, and the install page's claim is corrected; installer/SPEC.md §The dependency boundary owns the rule.
-
-**Cost while deferred:** the channel most adopters take is the one with no provenance, on a project whose pitch is verified claims. Filed 2026-07-26; returned from the icebox 2026-09-25 by consult as a trust gap on a public claim. Its observation half, a published Release verifying, split 2026-10-04 at scope to [tarball-attestation-observed](#tarball-attestation-observed), since only a release run produces it.
-
-**Push need (2026-10-04, inside the budget):** one mid-iteration push, for the PowerShell installer's verify leg that no local run reaches; `update-availability-notice` rides the same push if its design lands a Windows-only leg.
-
 ## Technical Debt
 
 ## Deferred
@@ -310,7 +298,7 @@ delegation-kit's §The delegation model, installer's §The consumer smoke, guard
 
 [cost: event/low] [surface: installer] [observed-by: publish]
 
-the observation half of [tarball-build-attestation](#tarball-build-attestation): the first Release cut after that entry lands carries an artifact attestation on its tarball, and a shell installer run against that Release verifies it where the verifier is present.
+the observation half of `tarball-build-attestation`: the first Release cut after that entry lands carries an artifact attestation on its tarball, and a shell installer run against that Release verifies it where the verifier is present.
 
 **Deliverable:** that observation, read off the `publish` run and one install from the published Release, with any defect it shows filed.
 
@@ -1236,4 +1224,5 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 - kept-gate-disposition-report
 - update-availability-notice
 - release-note-section-set-derivation
+- tarball-build-attestation
 
