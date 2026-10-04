@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: canon-kit-reach-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,32 @@
 ## New Features
 
 ## Technical Debt
+
+### manifest-finder-untracked-walk
+
+canon-kit/SPEC.md §check-md-refs says the scan runs over tracked sources only, but the shared manifest-set finder (`native/src/spec.rs`, `manifest_files`) walks the disk, so an untracked `vendor/lib/README.md` in an adopter tree is scanned: a link to an absent file reds `check-md-refs`, and a 'Previously' line reds `check-manifest-temporal`. Every manifest-set gate shares the finder.
+
+**Deliverable:** the finder takes the tracked set, or each member's SPEC states the walk — a per-member call, since some fixture cases run outside a git repository — with a fixture case carrying an untracked manifest.
+
+**Cost while deferred:** an adopter's untracked vendored or generated READMEs red defect-class gates on content they never authored. Filed 2026-10-01 to the gap inbox at install-disposition-pass' spec; promoted at its close: →fix fails because the finder feeds every manifest-set member and the tracked-versus-walk choice is per member, →forward because the SPEC already rules md-refs' side. Re-verified: a nested probe repo with a committed `CLAUDE.md` and an untracked `vendor/lib/README.md` linking `absent.md` turns `check-md-refs` from clean to exit 1. Owner lookup: `manifest set`, `find_named`, `untracked.*README`, `tracked sources`, `tracked set` in this file — none; owner canon-kit/SPEC.md §The shared spec adapters. Promoted 2026-10-04 at canon-kit-reach-pass' scope as debt, the per-member call stated in each member's own section and adding no name; re-verified: `manifest_files` still walks the disk through `walk::find_named`. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling).
+
+### spec-pointer-bare-section-mark
+
+`check-spec-pointer`'s unqualified prose-citation form reads a bare `§N` (or `§2.1`) in adopter prose as a heading citation and reds "§heading in no governed file", under `## 3. Terms` as under `## Terms`, for documents that use `§` as a section-number mark. Operator direction 2026-10-01, lead-relayed (not a `/consult` ruling): state the limit, file the narrowing.
+
+How many adopter documents carry a bare `§N` outside legal-style text is unmeasured: no adopter corpus is in reach, and the narrowing does not turn on the count.
+
+**Deliverable:** a fragment opening with a digit, a bare section number, never fires in the unqualified form (native/src/gates/spec_pointer.rs, the fragment-opening rule), with a `good/` fixture line and canon-kit/SPEC.md §check-spec-pointer's carve-out sentence and honest limit updated.
+
+**Cost while deferred:** a `prose` or `full` install over a document citing `§3` reds a defect-class gate on content that is not wrong, which the install-disposition amendment states as the gate's honest limit. Filed 2026-10-01 at install-disposition-pass's align: the probe reddened both heading shapes; →fix fails because narrowing changes the gate's asserted behavior, an envelope change. Promoted 2026-10-04 at canon-kit-reach-pass' scope as debt, the narrowing settled by the direction above; re-verified: the fragment-opening rule still admits a digit. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling).
+
+### canon-kit-claim-brevity
+
+canon-kit/SPEC.md's claim-gate sections, §check-provenance-seam through §check-surface-duplication, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): about 9.5k of the file's 40.1k words by `wc -w` at this scope, and 55 of its 96 `check-prose-bounds` findings with the ceiling knob emptied.
+
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey; the file's ceiling row re-stamped. Applied last, after manifest-finder-untracked-walk, whose per-member statements may land in §check-prose-enum and §check-knob-citation.
+
+**Cost while deferred:** paid by every session and adopter that reads those contracts. Filed 2026-10-04 as a split at scope. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling).
 
 ## Deferred
 
@@ -83,28 +109,6 @@ A build session ran `git stash` / `git stash pop` on the shared checkout to rebu
 **Deliverable:** the default composed from the section knobs (Lessons Learned only while the lesson channel is on), with a fixture renaming the deferred section through its knob alone, queue-kit/SPEC.md §Layout and configuration updated, and a release declaration for the changed default.
 
 **Cost while deferred:** a second copy of each section name a renaming adopter must keep in step; this repo already restates the list in `scripts/queue-config.knobs` to drop Lessons Learned. Filed 2026-10-01 to the gap inbox at lifecycle-queue-value-pass' build; promoted at its close: →fix fails because it changes a shipped knob's default, adopter-visible semantics no amendment settled, →forward because no ruling is owed. Re-verified: the literal list and the icebox-only composition read as filed. Owner lookup: `REQUIRED_SECTIONS`, `required list` in this file — none; owner queue-kit/SPEC.md §Layout and configuration.
-
-### manifest-finder-untracked-walk
-
-[cost: event/low] [surface: canon-kit]
-
-canon-kit/SPEC.md §check-md-refs says the scan runs over tracked sources only, but the shared manifest-set finder (`native/src/spec.rs`, `manifest_files`) walks the disk, so an untracked `vendor/lib/README.md` in an adopter tree is scanned: a link to an absent file reds `check-md-refs`, and a 'Previously' line reds `check-manifest-temporal`. Every manifest-set gate shares the finder.
-
-**Deliverable:** the finder takes the tracked set, or each member's SPEC states the walk — a per-member call, since some fixture cases run outside a git repository — with a fixture case carrying an untracked manifest.
-
-**Cost while deferred:** an adopter's untracked vendored or generated READMEs red defect-class gates on content they never authored. Filed 2026-10-01 to the gap inbox at install-disposition-pass' spec; promoted at its close: →fix fails because the finder feeds every manifest-set member and the tracked-versus-walk choice is per member, →forward because the SPEC already rules md-refs' side. Re-verified: a nested probe repo with a committed `CLAUDE.md` and an untracked `vendor/lib/README.md` linking `absent.md` turns `check-md-refs` from clean to exit 1. Owner lookup: `manifest set`, `find_named`, `untracked.*README`, `tracked sources`, `tracked set` in this file — none; owner canon-kit/SPEC.md §The shared spec adapters.
-
-### spec-pointer-bare-section-mark
-
-[cost: event/low] [surface: canon-kit]
-
-`check-spec-pointer`'s unqualified prose-citation form reads a bare `§N` (or `§2.1`) in adopter prose as a heading citation and reds "§heading in no governed file", under `## 3. Terms` as under `## Terms`, for documents that use `§` as a section-number mark. Operator direction 2026-10-01, lead-relayed (not a `/consult` ruling): state the limit, file the narrowing.
-
-**Inferred, not run:** how many adopter documents carry a bare `§N` outside legal-style text.
-
-**Deliverable:** a fragment opening with a digit, a bare section number, never fires in the unqualified form (native/src/gates/spec_pointer.rs, the fragment-opening rule), with a `good/` fixture line and canon-kit/SPEC.md §check-spec-pointer's carve-out sentence and honest limit updated.
-
-**Cost while deferred:** a `prose` or `full` install over a document citing `§3` reds a defect-class gate on content that is not wrong, which the install-disposition amendment states as the gate's honest limit. Filed 2026-10-01 at install-disposition-pass's align: the probe reddened both heading shapes; →fix fails because narrowing changes the gate's asserted behavior, an envelope change.
 
 ### config-variant-battery-harness
 
@@ -278,9 +282,9 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 ### spec-brevity-residue
 
-[roadmap: now/adoption] [cost: session/high] [surface: delegation-kit] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
+[roadmap: now/adoption] [cost: session/high] [surface: canon-kit] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices, as `gate-sdk-framework-brevity`, `gate-sdk-remainder-brevity`, `gate-sdk-porting-brevity`, `gate-sdk-native-brevity`, `gate-sdk-runner-brevity`, `gate-sdk-meta-gate-brevity`, `gate-sdk-tooling-brevity` and `gate-sdk-tail-brevity`; lifecycle-kit, installer, guard-kit and delegation-kit are finished or split out (the slices below); what remains starts at canon-kit, queue-kit, drift-kit, context-kit, evidence-kit, site-kit, then doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling): a slice has landed at each recent scope; the per-kit slices stay off the roadmap.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices (below); lifecycle-kit, installer, guard-kit and delegation-kit are finished or split out (the slices below); what remains starts at canon-kit, queue-kit, drift-kit, context-kit, evidence-kit, site-kit, then doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling): a slice has landed at each recent scope; the per-kit slices stay off the roadmap.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
@@ -290,7 +294,7 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes, landing as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes, landing as `installer-install-brevity` and `installer-remainder-brevity`; and, the kit's other sections remaining: drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections, delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope, landing as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope, landing as `queue-kit-gate-brevity`; guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope, landing as `guard-kit-tool-brevity`.
 
-delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes, landing as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as `delegation-kit-tail-brevity`.
+delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes, landing as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as `delegation-kit-tail-brevity`; canon-kit's claim-gate sections left 2026-10-04 at canon-kit-reach-pass' scope as [canon-kit-claim-brevity](#canon-kit-claim-brevity).
 
 ### tarball-attestation-observed
 
