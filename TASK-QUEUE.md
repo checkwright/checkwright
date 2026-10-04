@@ -38,14 +38,6 @@ the bounded capture's tree kill on Windows falls back to a child-only kill when 
 
 **Push need (2026-10-04, inside the budget):** the mid-iteration push [finder-tracked-filter-edges](#finder-tracked-filter-edges) records, since its test runs only on the Windows crate-tests leg.
 
-### notice-cache-concurrency
-
-the update notice's cache is read, probed and rewritten with no lock and a non-atomic `std::fs::write` (`reading()` in `native/src/emit/update_notice.rs`), and that write and uninstall's cache `remove_file` (`native/src/installer/uninstall.rs`) discard their errors. Concurrent `doctor` or session-hook reads, or worktrees sharing the cache, can each probe, a reader can see a truncated record, an unwritable git directory probes on every read, and uninstall can leave the cache. installer/SPEC.md §The update notice ("one attempt per interval, never one per read", "every attempt rewrites the file") and §uninstall ("deletes it") state all three unconditionally.
-
-**Deliverable:** the record written whole (a sibling temp file renamed over it), the write and the removal failures surfaced or stated, and the concurrent-probe case stated among §The update notice's honest limits beside the shared-worktree one, with a test per case. Scope's triage, 2026-10-04: the debt shape, since a lock file is a new name serializing an extra `ls-remote`, a cost the SPEC already accepts for worktrees.
-
-**Cost while deferred:** a reader can parse a torn record, a read-only `.git` probes the network on every read against a stated once-per-interval bound, and an uninstall that reports clean can leave a file behind. Filed 2026-10-04 to the gap inbox by installer-notice-attest-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the concurrency half chooses between a new lock and a narrowed SPEC, →forward because no ruling is owed. Re-verified by source read: `let _ = std::fs::write(&cache, …)` and `let _ = std::fs::remove_file(cache)`. Owner lookup: `update notice`, `cache`, `atomic`, `remove_file` in this file and the disposed-findings record — none; owner installer/SPEC.md §The update notice, with §uninstall. Promoted 2026-10-04 at canon-kit-tail-installer-pass' scope as debt in the shape above, adding no name. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling); the shape was not part of that selection.
-
 ### attest-stub-argv-exactness
 
 the Linux attestation stub in `.github/workflows/gates.yml` compares the verify's flags as the flattened `"$*"`, so the six flags passed as one argument still pass, and its readiness case matches `auth token` alone, accepting any `--hostname` where both bootstraps pass `--hostname github.com`. installer/SPEC.md §Requirements' attestation witness claims a verify whose arguments after the file are not exactly the three flags fails, and any other call fails. The Windows `gh.cmd` stub compares positional arguments and refuses an extra one.
@@ -1237,4 +1229,6 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 Ported gate and emit modules carry spec: comments citing a section for a literal or a port note the section does not state, so a reader following the pointer finds no support for it; a crate-wide sweep would retag, delete or relocate each, and a new instance returns the entry.
 
 ## Done
+
+- notice-cache-concurrency
 
