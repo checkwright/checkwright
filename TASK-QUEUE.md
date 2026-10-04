@@ -506,6 +506,36 @@ the front ends change to git's toplevel before the binary runs (the `cd` in gate
 
 **Cost while deferred:** a run started in a rare tree shape reports the enclosing repository's verdict as its own. Filed 2026-10-04 to the gap inbox by queue-kit-arms-crosser-pass' spec, which declined to widen its amendment; promoted at its close: →fix fails because the sh/ps1 twins, the plugin shim and the session-context template each need the mark walk under front-end parity, a contract change to §run-gates witnessed on the Windows legs, →forward because no ruling is owed. Re-verified: with an empty `.git` directory in a subdirectory of a fresh repository, `git rev-parse --show-toplevel --show-prefix` there answers the outer toplevel and the subdirectory prefix at exit 0, and run-gates.sh checks its mark only on a failed lookup. The bullet's pointer to the amendment file is replaced by §The crate's crosser, where it merged. Not a recurrence of `nested-broken-repo-toplevel`, which closed the crate side. Owner lookup: `toplevel`, `front end`, `session-context` in this file — none live; owner gate-sdk/SPEC.md §run-gates.
 
+### crosser-nested-mark-env
+
+[cost: event/low] [surface: native]
+
+`nested_mark` in `native/src/walk.rs` refuses a valid repository under `GIT_WORK_TREE`: with `GIT_DIR` unset and `GIT_WORK_TREE` naming a directory above the discovered repository, git answers that directory as toplevel and the repository's own directory as prefix at exit 0, so the scan finds the repository's `.git` and every crosser caller exits 2. Its other exception, no mark under a non-empty `GIT_DIR`, is carried by the code comment and its test alone; gate-sdk/SPEC.md §The crate's crosser states the zero-exit refusal with none.
+
+**Deliverable:** the nested check telling the repository git selected (its `--git-dir` answer) from a skipped mark, a test under `GIT_WORK_TREE`, and both exceptions stated in §The crate's crosser.
+
+**Cost while deferred:** a run under a `GIT_WORK_TREE` above the repository is refused outright. Filed 2026-10-05 to the gap inbox as two bullets by queue-kit-arms-crosser-pass' close, its second-vendor review; promoted together at the next iteration's scope: →fix fails because the selected-repository read changes a crosser verdict with a test, →forward because no ruling is owed. Re-verified: a fresh repository at `.tmp/wtprobe/inner` under `GIT_WORK_TREE=..` answers `.tmp/wtprobe` and `inner/` at exit 0, and `--emit close-surfaces` there refuses naming `inner/.git`. Owner lookup: `nested_mark`, `GIT_WORK_TREE`, `GIT_DIR` in this file — none; owner gate-sdk/SPEC.md §The crate's crosser.
+
+### crosser-git-fidelity-edges
+
+[cost: event/low] [surface: native]
+
+two crosser edges against git. `toplevel_args` in `native/src/walk.rs` reads the toplevel and prefix answer with `lines()`, so a path component holding a newline truncates the prefix and can hide a skipped mark (static reading, untested). `repository_mark`'s ceiling stop canonicalizes a relative `GIT_CEILING_DIRECTORIES` entry where git ignores it, and gate-sdk/bin/run-gates.sh's own mark walk repeats that.
+
+**Deliverable:** the answer split as git delimits it, and a relative ceiling entry skipped in the crate and the front end alike, a test per edge.
+
+**Cost while deferred:** a rare path or env shape grades a repository differently from git. Filed 2026-10-05 to the gap inbox by queue-kit-arms-crosser-pass' close, its second-vendor review; promoted at the next iteration's scope: →fix fails because each edge owes a test and the ceiling half spans the crate and a front end, →forward because no ruling is owed. Re-verified: `GIT_CEILING_DIRECTORIES=..` from `.tmp/wtprobe/inner/sub` still answers `.tmp/wtprobe/inner`. Owner lookup: `CEILING`, `lines()`, `newline` in this file — none; owner gate-sdk/SPEC.md §The crate's crosser and §run-gates.
+
+### docs-code-block-copy-wrap
+
+[cost: event/low] [surface: docs]
+
+docs-site code blocks carry no copy-to-clipboard button and do not wrap: docs/_layouts/default.html sets `white-space: pre-wrap` on `.markdown-body pre`, but jekyll-theme-primer sets `white-space: pre` on `pre > code`, inside which every fenced block renders, so the layout's rule never reaches the text. No page-authoring rule holds a code block runnable on its own. Operator direction 2026-10-05, lead-relayed (not a ruling).
+
+**Deliverable:** a copy button in layout script (`docs/assets/search.js` is the precedent), a wrap rule targeting `pre > code` and any `.highlight` variant, checked on a local render, and a page-authoring rule in docs/site-architecture.md, gate-held where possible: every block runs on its own, sequential commands split or joined with `&&`. docs/install.md's remedy blocks are run verbatim by install-smoke legs, so their shape is load-bearing.
+
+**Cost while deferred:** a reader copies commands by hand selection, long lines scroll, and a multi-command block pasted whole can run half. Filed 2026-10-05 to the gap inbox as two bullets by queue-kit-arms-crosser-pass' lead, the second correcting the first's wrap premise; promoted together at the next iteration's scope: →fix fails because the button and the rule are new names, →forward because the direction is given. Re-verified: the layout's `pre-wrap` rule and `assets/` holding only `search.js` and the logo. Owner lookup: `clipboard`, `code block`, `pre-wrap` in this file — none; owner docs/site-architecture.md §Page-authoring rules, site-kit for any gate.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
