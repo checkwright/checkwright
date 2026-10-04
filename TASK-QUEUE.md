@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: queue-kit-format-native-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,52 @@
 ## New Features
 
 ## Technical Debt
+
+### required-sections-literal
+
+`QUEUE_KIT_REQUIRED_SECTIONS`'s default (`native/src/knobs/queue_kit.rs`, `REQUIRED_SECTIONS`) re-lists as literals the names the active, deferred and done section knobs own, plus `Lessons Learned`; only the icebox is composed in (`native/src/queue.rs`, `required_sections`). An adopter renaming a section through its own knob, or dropping the optional Lessons channel, must restate the whole required list, or `check-queue-sections` reds on the old name.
+
+**Deliverable:** the default composed from the section knobs (Lessons Learned only while the lesson channel is on), with a fixture renaming the deferred section through its knob alone, queue-kit/SPEC.md §Layout and configuration updated, and a release declaration for the changed default.
+
+**Cost while deferred:** a second copy of each section name a renaming adopter must keep in step; this repo already restates the list in `scripts/queue-config.knobs` to drop Lessons Learned. Filed 2026-10-01 to the gap inbox at lifecycle-queue-value-pass' build; promoted at its close: →fix fails because it changes a shipped knob's default, adopter-visible semantics no amendment settled, →forward because no ruling is owed. Re-verified: the literal list and the icebox-only composition read as filed. Owner lookup: `REQUIRED_SECTIONS`, `required list` in this file — none; owner queue-kit/SPEC.md §Layout and configuration.
+
+### walk-child-posix-backslash
+
+`walk::child` (native/src/walk.rs) reads a trailing `\` on the parent as a separator on every host, so on POSIX a directory whose name ends in a literal backslash is joined without the `/`: `a\` and `README.md` give `a\README.md`, a path that does not exist, and every crate walk descending through it stats the wrong path. canon-kit/SPEC.md §The shared spec adapters says a POSIX name holding a backslash is its own path.
+
+**Deliverable:** the backslash fold kept to Windows in `child`, with a crate test descending a backslash-ending directory on POSIX; gate-sdk/SPEC.md §The path-dialect contract states the join.
+
+**Push need (2026-10-04, inside the budget):** the mid-iteration push [front-end-door-residue](#front-end-door-residue) spends: the fold's Windows arm runs only in the Windows crate-test legs.
+
+**Cost while deferred:** a tracked tree holding such a directory is walked wrong by every crate walk. Filed 2026-10-04 to the gap inbox by canon-kit-tail-installer-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because it is crate work with a new test. Re-verified by source read: `child` tests `ends_with('\\')` unconditionally; `finder-tracked-filter-edges`' test covers a backslash in a file name only. Owner lookup: `walk::child`, `backslash` in this file — none; owner gate-sdk/SPEC.md §The path-dialect contract, with canon-kit/SPEC.md §The shared spec adapters.
+
+### front-end-door-residue
+
+the binary still names or spawns the bash front end where an adopter meets it: the `--help` text (native/src/runner.rs `USAGE`, pinned across both front ends), the runner's `--only` steer for a gate passed as a gates dir, installer/demo.rs's walkthrough line, and `EVIDENCE_KIT_RUN_<suite>`'s default in native/src/knobs/evidence_kit.rs. Widening `GUARD_KIT_DOOR_ROOTS` from the gates, hook and emit trees to all of native/src reds exactly these.
+
+**Deliverable:** each site respelled to the binary door, the knob default's working-directory change (the front end changes to the toplevel, the binary does not) settled in evidence-kit/SPEC.md, and the door roots widened to native/src.
+
+**Push need (2026-10-04, inside the budget):** the one mid-iteration push, shared with [walk-child-posix-backslash](#walk-child-posix-backslash): `gate-sdk/bin/run-gates.ps1` pins the usage text, and its parity is compared only on a host carrying pwsh, which no local run has.
+
+**Cost while deferred:** an adopter reading `--help` or the demo meets a command their install may not carry. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' build; promoted at its close: →fix fails because the knob default is a behaviour change across two front ends, →forward because no ruling is owed. Re-verified: grep finds all four sites. `hook-emit-remedy-door` scoped its fix to the hook and emit trees; this is DISTINCT, not a recurrence. Owner lookup: `run-gates.sh`, `DOOR_ROOTS` in this file — none; owner guard-kit/SPEC.md §check-door-binding, with gate-sdk/SPEC.md §run-gates.
+
+### spec-mark-symlink-ascent
+
+`repository_mark` (native/src/spec.rs) ascends the lexically absolutized scan root for a `.git` entry and never resolves a symlink, while git discovers through the physical directory. A scan root whose path traverses a symlink into a repository git refuses (a `safe.directory` refusal, broken metadata) finds no mark and is walked unfiltered, grading untracked manifests with no notice, against canon-kit/SPEC.md §The shared spec adapters, where a marked root git refuses exits 2. The process working directory is physical, so only a root argument spelled through a symlink reaches it.
+
+**Deliverable:** the ascent finding the mark git's discovery finds, with a crate test over a symlinked root into a refused repository.
+
+**Order:** after [toplevel-refusal-fail-open](#toplevel-refusal-fail-open), whose deliverable may move the mark into walk.rs; the fix lands in the mark where that leaves it.
+
+**Cost while deferred:** a canon-kit gate given such a root grades untracked files silently. Filed 2026-10-04 to the gap inbox by canon-kit-tail-installer-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because it is crate work with a new test. Re-verified by source read: `abs` is `walk::abs_against` over `cwd()`, lexical, and the ascent is `Path::ancestors`; the end-to-end repro was not re-run. Owner lookup: `repository_mark`, `symlink`, `physical` in this file — [toplevel-refusal-fail-open](#toplevel-refusal-fail-open), DISTINCT (its git answer is folded, here the mark itself misses), and the icebox's walk-entry-model-unstated, DISTINCT (a walk's entries, not the root's ascent); owner canon-kit/SPEC.md §The shared spec adapters.
+
+### queue-kit-format-brevity
+
+queue-kit/SPEC.md's format half, which no brevity slice has passed: §The queue format with §Queue and backlog, §The icebox tier, §<slug> and §The tag algebra, plus §Layout and configuration, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): about 9.2k of the file's 36k words at this scope, and 52 of its 94 `check-prose-bounds` findings with the ceiling knob emptied.
+
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey; the file's ceiling row re-stamped. Applied last, after [required-sections-literal](#required-sections-literal) edits §Layout and configuration.
+
+**Cost while deferred:** paid by every session and adopter that reads the queue grammar. Filed 2026-10-04 as a split at scope. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling); the arms half stays with the parent.
 
 ## Deferred
 
@@ -63,16 +109,6 @@ A build session ran `git stash` / `git stash pop` on the shared checkout to rebu
 **Deliverable:** a way for a consumer to declare a generated mirror as the projection of its source component, so the token resolves to the component it mirrors, specified in §check-stage-entry with a fixture over a mirror-naming single-kit amendment; or a ruling that the waiver stays the valve.
 
 **Cost while deferred:** an align dispatch or an operator waiver ask per single-kit iteration whose amendments name their mirror. Filed 2026-10-03 to the gap inbox at guard-kit-write-side-pass' build; promoted at its close: →fix fails because the mirror's resolution is a grammar decision the SPEC settles the other way, →forward because no recorded ruling is reversed. Re-verified: the SPEC's roster-dir paragraph names this exact case. Owner lookup: `mirror`, `assertion C`, `audit-trigger` in this file — none; owner lifecycle-kit/SPEC.md §check-stage-entry.
-
-### required-sections-literal
-
-[cost: event/low] [surface: queue-kit]
-
-`QUEUE_KIT_REQUIRED_SECTIONS`'s default (`native/src/knobs/queue_kit.rs`, `REQUIRED_SECTIONS`) re-lists as literals the names the active, deferred and done section knobs own, plus `Lessons Learned`; only the icebox is composed in (`native/src/queue.rs`, `required_sections`). An adopter renaming a section through its own knob, or dropping the optional Lessons channel, must restate the whole required list, or `check-queue-sections` reds on the old name.
-
-**Deliverable:** the default composed from the section knobs (Lessons Learned only while the lesson channel is on), with a fixture renaming the deferred section through its knob alone, queue-kit/SPEC.md §Layout and configuration updated, and a release declaration for the changed default.
-
-**Cost while deferred:** a second copy of each section name a renaming adopter must keep in step; this repo already restates the list in `scripts/queue-config.knobs` to drop Lessons Learned. Filed 2026-10-01 to the gap inbox at lifecycle-queue-value-pass' build; promoted at its close: →fix fails because it changes a shipped knob's default, adopter-visible semantics no amendment settled, →forward because no ruling is owed. Re-verified: the literal list and the icebox-only composition read as filed. Owner lookup: `REQUIRED_SECTIONS`, `required list` in this file — none; owner queue-kit/SPEC.md §Layout and configuration.
 
 ### config-variant-battery-harness
 
@@ -256,9 +292,9 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
-Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes, landing as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes, landing as `installer-install-brevity` and `installer-remainder-brevity`; and, the kit's other sections remaining: drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections, delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope, landing as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope, landing as `queue-kit-gate-brevity`; guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope, landing as `guard-kit-tool-brevity`.
+Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes, landing as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes, landing as `installer-install-brevity` and `installer-remainder-brevity`; drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections, delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope, landing as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope, landing as `queue-kit-gate-brevity`; guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope, landing as `guard-kit-tool-brevity`.
 
-delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes, landing as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as `delegation-kit-tail-brevity`; canon-kit's claim-gate sections left 2026-10-04 at canon-kit-reach-pass' scope as `canon-kit-claim-brevity`, and its rest at canon-kit-tail-installer-pass' as `canon-kit-tail-brevity`.
+delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes, landing as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as `delegation-kit-tail-brevity`; canon-kit's claim-gate sections left 2026-10-04 at canon-kit-reach-pass' scope as `canon-kit-claim-brevity`, and its rest at canon-kit-tail-installer-pass' as `canon-kit-tail-brevity`; queue-kit's format half at queue-kit-format-native-pass' as [queue-kit-format-brevity](#queue-kit-format-brevity).
 
 ### tarball-attestation-observed
 
@@ -486,16 +522,6 @@ the delivery rule under `lead-notification-wake-race`'s remedy, unprobed: does a
 
 **Cost while deferred:** the lead's wait clause rests on an inferred mechanism; if it is wrong, a stall still costs hours of idle wall-clock until the operator wakes the lead. Filed 2026-10-02 as a split at companion-tier-delegation-pass' scope, operator direction lead-relayed (not a ruling).
 
-### front-end-door-residue
-
-[cost: event/low] [surface: native]
-
-the binary still names or spawns the bash front end where an adopter meets it: the `--help` text (native/src/runner.rs `USAGE`, pinned across both front ends), the runner's `--only` steer for a gate passed as a gates dir, installer/demo.rs's walkthrough line, and `EVIDENCE_KIT_RUN_<suite>`'s default in native/src/knobs/evidence_kit.rs. Widening `GUARD_KIT_DOOR_ROOTS` from the gates, hook and emit trees to all of native/src reds exactly these.
-
-**Deliverable:** each site respelled to the binary door, the knob default's working-directory change (the front end changes to the toplevel, the binary does not) settled in evidence-kit/SPEC.md, and the door roots widened to native/src.
-
-**Cost while deferred:** an adopter reading `--help` or the demo meets a command their install may not carry. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' build; promoted at its close: →fix fails because the knob default is a behaviour change across two front ends, →forward because no ruling is owed. Re-verified: grep finds all four sites. `hook-emit-remedy-door` scoped its fix to the hook and emit trees; this is DISTINCT, not a recurrence. Owner lookup: `run-gates.sh`, `DOOR_ROOTS` in this file — none; owner guard-kit/SPEC.md §check-door-binding, with gate-sdk/SPEC.md §run-gates.
-
 ### release-section-collision
 
 [cost: event/low] [surface: gate-sdk]
@@ -524,27 +550,9 @@ the native Windows install-smoke legs run every `--installer-smoke` arm serially
 
 **Deliverable:** a third refusal kept apart in the crosser, or the `.git`-entry mark `finder-tracked-filter-edges` placed in native/src/spec.rs moved into walk.rs, with each caller's verdict re-read and §The crate's crosser stating the third answer.
 
+**Selected 2026-10-04** for queue-kit-format-native-pass, operator direction lead-relayed (not a ruling). Feature-shaped by scope's triage: a third crosser refusal is a contract about 20 callers in several kits honor, so the spec stage authors its amendment and promotes it, and it lands before [spec-mark-symlink-ascent](#spec-mark-symlink-ascent).
+
 **Cost while deferred:** on a host refusing ownership or with broken metadata, each caller's fail-open is unmeasured. Filed 2026-10-04 to the gap inbox by canon-kit-tail-installer-pass' build; promoted at its close: →fix fails because the crosser's contract widens and about 20 callers' verdicts across several kits need re-reading, →forward because no ruling is owed. Re-verified: `toplevel_args` maps any non-zero exit to `None`; 21 call sites outside walk.rs. Not a recurrence of `finder-tracked-filter-edges`, which closed one finder alone. Owner lookup: `toplevel`, `safe.directory`, `crosser` in this file — [worktree-memory-dir-key](#worktree-memory-dir-key), DISTINCT (a worktree's toplevel, not a refused one); owner gate-sdk/SPEC.md §The crate's crosser.
-
-### spec-mark-symlink-ascent
-
-[cost: event/low] [surface: native]
-
-`repository_mark` (native/src/spec.rs) ascends the lexically absolutized scan root for a `.git` entry and never resolves a symlink, while git discovers through the physical directory. A scan root whose path traverses a symlink into a repository git refuses (a `safe.directory` refusal, broken metadata) finds no mark and is walked unfiltered, grading untracked manifests with no notice, against canon-kit/SPEC.md §The shared spec adapters, where a marked root git refuses exits 2. The process working directory is physical, so only a root argument spelled through a symlink reaches it.
-
-**Deliverable:** the ascent finding the mark git's discovery finds, with a crate test over a symlinked root into a refused repository.
-
-**Cost while deferred:** a canon-kit gate given such a root grades untracked files silently. Filed 2026-10-04 to the gap inbox by canon-kit-tail-installer-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because it is crate work with a new test. Re-verified by source read: `abs` is `walk::abs_against` over `cwd()`, lexical, and the ascent is `Path::ancestors`; the end-to-end repro was not re-run. Owner lookup: `repository_mark`, `symlink`, `physical` in this file — [toplevel-refusal-fail-open](#toplevel-refusal-fail-open), DISTINCT (its git answer is folded, here the mark itself misses), and the icebox's walk-entry-model-unstated, DISTINCT (a walk's entries, not the root's ascent); owner canon-kit/SPEC.md §The shared spec adapters.
-
-### walk-child-posix-backslash
-
-[cost: event/low] [surface: native]
-
-`walk::child` (native/src/walk.rs) reads a trailing `\` on the parent as a separator on every host, so on POSIX a directory whose name ends in a literal backslash is joined without the `/`: `a\` and `README.md` give `a\README.md`, a path that does not exist, and every crate walk descending through it stats the wrong path. canon-kit/SPEC.md §The shared spec adapters says a POSIX name holding a backslash is its own path.
-
-**Deliverable:** the backslash fold kept to Windows in `child`, with a crate test descending a backslash-ending directory on POSIX; gate-sdk/SPEC.md §The path-dialect contract states the join.
-
-**Cost while deferred:** a tracked tree holding such a directory is walked wrong by every crate walk. Filed 2026-10-04 to the gap inbox by canon-kit-tail-installer-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because it is crate work with a new test. Re-verified by source read: `child` tests `ends_with('\\')` unconditionally; `finder-tracked-filter-edges`' test covers a backslash in a file name only. Owner lookup: `walk::child`, `backslash` in this file — none; owner gate-sdk/SPEC.md §The path-dialect contract, with canon-kit/SPEC.md §The shared spec adapters.
 
 ## Icebox
 
