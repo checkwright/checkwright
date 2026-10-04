@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: queue-kit-arms-crosser-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,52 @@
 ## New Features
 
 ## Technical Debt
+
+### crosser-anchor-lexical-ascent
+
+the crosser's refusal classifier normalizes its anchor lexically before the physical ascent: `refused_or_absent` in `native/src/walk.rs` calls `abs_against`, whose `normalize_abs` collapses `..` and splits on `\` on every host, before `repository_mark` canonicalizes. A `-C` operand like `<symlink>/..` into a refused repository, or a POSIX directory name carrying a backslash, starts the mark search from the wrong directory and reads as outside a work tree, and `Tracked::at` in `native/src/spec.rs` then walks unfiltered. gate-sdk/SPEC.md §The crate's crosser promises the physical path.
+
+**Deliverable:** the anchor joined without lexical collapse and resolved physically before the mark search, a test per shape (a symlink-then-`..` operand, a backslash-bearing POSIX name).
+
+**Push need (2026-10-04, inside the budget):** the one mid-iteration push, shared with [repo-probe-refusal-blind](#repo-probe-refusal-blind): the anchor's Windows join and `canonicalize` arm runs only in the Windows crate-test legs.
+
+**Cost while deferred:** a refused repository reached through such an operand is graded as no repository and its tree walked unfiltered. Filed 2026-10-04 to the gap inbox by queue-kit-format-native-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the classifier's anchor spans two crosser functions with a test per shape, →forward because no ruling is owed. Re-verified by source read: `refused_or_absent` builds the anchor through `abs_against` before `repository_mark`'s `canonicalize`. Owner lookup: `refused_or_absent`, `abs_against`, `lexical` in this file — none; [repo-probe-refusal-blind](#repo-probe-refusal-blind), DISTINCT (probes that bypass the classifier). Owner gate-sdk/SPEC.md §The crate's crosser.
+
+### repo-probe-refusal-blind
+
+repository probes that bypass the crate's crosser read a repository git refuses (`safe.directory`, broken metadata) as no repository: the `rev-parse --git-dir` and `--is-inside-work-tree` probes in `native/src/gates/lesson_disposition.rs`, `gates/task_conservation.rs`, `gates/survey_record.rs`, `emit/install_lifecycle.rs`, `emit/enter_stage.rs` and `queue.rs`, and both front ends' `not inside a git repository` refusal, which names the wrong cause.
+
+**Deliverable:** each probe routed through the crosser's refusal classification or given its own, a refused-repository test per gate that would otherwise pass, and the front ends naming git's refusal.
+
+**Order:** after [crosser-anchor-lexical-ascent](#crosser-anchor-lexical-ascent), whose fix corrects the classifier's anchor these probes route through.
+
+**Push need (2026-10-04, inside the budget):** the one mid-iteration push, shared with [crosser-anchor-lexical-ascent](#crosser-anchor-lexical-ascent): `gate-sdk/bin/run-gates.ps1`'s refusal runs only on a host carrying pwsh, which no local run has.
+
+**Cost while deferred:** `check-lesson-disposition` and `check-task-conservation` pass clean in a refused repository through the binary door. Filed 2026-10-04 to the gap inbox by queue-kit-format-native-pass' spec caller survey; promoted at its close: →fix fails because the sweep spans six modules and two front ends with a test each, →forward because no ruling is owed. Re-verified by grep: every cited probe present, `queue.rs`'s at a moved line. Owner lookup: `safe.directory`, `--git-dir`, `is-inside-work-tree` in this file — none; toplevel-refusal-fail-open, done, re-read only `walk::toplevel*` callers, DISTINCT; nested-broken-repo-toplevel, DISTINCT (git answers a wrong toplevel). Owner gate-sdk/SPEC.md §The crate's crosser.
+
+### run-door-subdir-rebind
+
+`EVIDENCE_KIT_RUN_<suite>`'s derived member spells its tests and checks dirs relative to the working directory but takes its door from `GATE_SDK_NATIVE_BIN`'s repository-relative default (`run_members` in `native/src/knobs/evidence_kit.rs`, `host_native_bin` in `knobs/gate_sdk.rs`), so `--run-validate` invoked on the binary from a subdirectory runs a door that does not resolve there. The front end changes to the toplevel first, so only the binary door is exposed, and evidence-kit/SPEC.md §Layout and configuration states the working-directory run without the door's rebinding.
+
+**Deliverable:** the derived member's door and dirs spelled against one base, a test running a suite from a subdirectory through the binary door, and the SPEC's paragraph stating the rebinding.
+
+**Cost while deferred:** a validate run started from a subdirectory on the binary fails on a door that does not resolve. Filed 2026-10-04 to the gap inbox by queue-kit-format-native-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the base choice is a derivation contract with a test, →forward because no ruling is owed. Re-verified by source read: `run_members` takes the door from the knob's repository-relative default. Owner lookup: `run_members`, `EVIDENCE_KIT_RUN`, `subdirectory` in this file — none; owner evidence-kit/SPEC.md §Layout and configuration.
+
+### section-knob-colon-prefix
+
+`check-queue-sections` prefix-matches every required name ending in `:` (`matches` in `native/src/gates/queue_sections.rs`), and the section knobs' names join that set by derivation (`compose_required` in `native/src/queue.rs`), so a section knob named with a trailing colon (an active section `Now:`) is satisfied by `## Now: anything` while `Sections::is_task` matches only the exact name, leaving section-scoped gates open. queue-kit/SPEC.md §Layout and configuration promises the derivation closes that fail-open class.
+
+**Deliverable:** derived names matched exactly, or a section knob value ending in `:` refused by the validator; the choice is the unit's, a fixture per case either way.
+
+**Cost while deferred:** a colon-named section knob leaves every section-scoped gate reading no task. Filed 2026-10-04 to the gap inbox by queue-kit-format-native-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the remedy is a matcher-or-refusal choice with fixtures, →forward because no ruling is owed. Re-verified by source read: `matches` prefix-tests any `:`-ended name, `compose_required` admits knob names unchanged. Owner lookup: `trailing colon`, `prefix-match`, `queue_sections` in this file — none; owner queue-kit/SPEC.md §Layout and configuration.
+
+### queue-kit-arms-brevity
+
+queue-kit/SPEC.md's arms half, which no brevity slice has passed: §Per-component contracts with §The shared queue adapters, the queue-index, queue-counts, queue-edges, queue-history, queue-migrate, roadmap, roadmap-lag and lesson-sink arms and §The queue verbs, plus §templates/ and §Out of scope, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): about 10.4k of the file's 27.6k words at this scope, and all 42 of its `check-prose-bounds` findings with the ceiling knob emptied.
+
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey; the file's ceiling row re-stamped. Applied last, after [section-knob-colon-prefix](#section-knob-colon-prefix).
+
+**Cost while deferred:** paid by every session and adopter that reads the queue arms. Filed 2026-10-04 as a split at scope. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling); with it queue-kit leaves the parent.
 
 ## Deferred
 
@@ -238,7 +284,7 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 [roadmap: now/adoption] [cost: session/high] [surface: queue-kit] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices (below); lifecycle-kit, installer, guard-kit, delegation-kit and canon-kit are finished or split out (the slices below); what remains starts at queue-kit, drift-kit, context-kit, evidence-kit, site-kit, then doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling): a slice has landed at each recent scope; the per-kit slices stay off the roadmap.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices (below); lifecycle-kit, installer, guard-kit, delegation-kit, canon-kit and queue-kit are finished or split out (the slices below); what remains starts at drift-kit, context-kit, evidence-kit, site-kit, then doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling): a slice has landed at each recent scope; the per-kit slices stay off the roadmap.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
@@ -246,9 +292,9 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 **Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
 
-Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes, landing as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes, landing as `installer-install-brevity` and `installer-remainder-brevity`; drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections, delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope, landing as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope, landing as `queue-kit-gate-brevity`; guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope, landing as `guard-kit-tool-brevity`.
+Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes as `installer-install-brevity` and `installer-remainder-brevity`; drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope as `drift-kit-measurement-brevity`; guard-kit's front sections, delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope as `queue-kit-gate-brevity`; guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope as `guard-kit-tool-brevity`.
 
-delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes, landing as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as `delegation-kit-tail-brevity`; canon-kit's claim-gate sections left 2026-10-04 at canon-kit-reach-pass' scope as `canon-kit-claim-brevity`, and its rest at canon-kit-tail-installer-pass' as `canon-kit-tail-brevity`; queue-kit's format half at queue-kit-format-native-pass' as `queue-kit-format-brevity`.
+delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as `delegation-kit-tail-brevity`; canon-kit's claim-gate sections left 2026-10-04 at canon-kit-reach-pass' scope as `canon-kit-claim-brevity`, and its rest at canon-kit-tail-installer-pass' as `canon-kit-tail-brevity`; queue-kit's format half at queue-kit-format-native-pass' as `queue-kit-format-brevity`, its arms half at queue-kit-arms-crosser-pass' as [queue-kit-arms-brevity](#queue-kit-arms-brevity).
 
 ### tarball-attestation-observed
 
@@ -504,47 +550,9 @@ git's discovery skips a nested repository whose metadata is broken (an invalid `
 
 **Deliverable:** the crosser detects a `.git` entry between the probed directory and the toplevel git answered and refuses with that cause, a test per shape (broken inner `HEAD`, valid inner repository), and gate-sdk/SPEC.md §The crate's crosser stating the refusal.
 
+**Selected 2026-10-04** for queue-kit-arms-crosser-pass, operator direction lead-relayed (not a ruling). Feature-shaped by scope's triage: an exit-0 toplevel answer turning refused changes the crosser's contract, so the spec stage authors its amendment and promotes it, and it lands after [crosser-anchor-lexical-ascent](#crosser-anchor-lexical-ascent), whose anchor its detection ascends from.
+
 **Cost while deferred:** a broken nested checkout reads as an ignored subdirectory with no notice. Filed 2026-10-04 to the gap inbox by queue-kit-format-native-pass' spec; promoted at its close: →fix fails because the detection is new crosser mechanism with a refusal to design, →forward because no ruling is owed. Re-verified on git 2.55: an inner repository with a garbage `HEAD` answers the outer toplevel, exit 0. Owner lookup: `nested`, `enclosing`, `broken metadata` in this file — none; toplevel-refusal-fail-open, done, classified a non-zero answer, DISTINCT. Owner gate-sdk/SPEC.md §The crate's crosser.
-
-### repo-probe-refusal-blind
-
-[cost: event/low] [surface: native]
-
-repository probes that bypass the crate's crosser read a repository git refuses (`safe.directory`, broken metadata) as no repository: the `rev-parse --git-dir` and `--is-inside-work-tree` probes in `native/src/gates/lesson_disposition.rs`, `gates/task_conservation.rs`, `gates/survey_record.rs`, `emit/install_lifecycle.rs`, `emit/enter_stage.rs` and `queue.rs`, and both front ends' `not inside a git repository` refusal, which names the wrong cause.
-
-**Deliverable:** each probe routed through the crosser's refusal classification or given its own, a refused-repository test per gate that would otherwise pass, and the front ends naming git's refusal.
-
-**Cost while deferred:** `check-lesson-disposition` and `check-task-conservation` pass clean in a refused repository through the binary door. Filed 2026-10-04 to the gap inbox by queue-kit-format-native-pass' spec caller survey; promoted at its close: →fix fails because the sweep spans six modules and two front ends with a test each, →forward because no ruling is owed. Re-verified by grep: every cited probe present, `queue.rs`'s at a moved line. Owner lookup: `safe.directory`, `--git-dir`, `is-inside-work-tree` in this file — none; toplevel-refusal-fail-open, done, re-read only `walk::toplevel*` callers, DISTINCT; nested-broken-repo-toplevel, DISTINCT (git answers a wrong toplevel). Owner gate-sdk/SPEC.md §The crate's crosser.
-
-### crosser-anchor-lexical-ascent
-
-[cost: event/low] [surface: native]
-
-the crosser's refusal classifier normalizes its anchor lexically before the physical ascent: `refused_or_absent` in `native/src/walk.rs` calls `abs_against`, whose `normalize_abs` collapses `..` and splits on `\` on every host, before `repository_mark` canonicalizes. A `-C` operand like `<symlink>/..` into a refused repository, or a POSIX directory name carrying a backslash, starts the mark search from the wrong directory and reads as outside a work tree, and `Tracked::at` in `native/src/spec.rs` then walks unfiltered. gate-sdk/SPEC.md §The crate's crosser promises the physical path.
-
-**Deliverable:** the anchor joined without lexical collapse and resolved physically before the mark search, a test per shape (a symlink-then-`..` operand, a backslash-bearing POSIX name).
-
-**Cost while deferred:** a refused repository reached through such an operand is graded as no repository and its tree walked unfiltered. Filed 2026-10-04 to the gap inbox by queue-kit-format-native-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the classifier's anchor spans two crosser functions with a test per shape, →forward because no ruling is owed. Re-verified by source read: `refused_or_absent` builds the anchor through `abs_against` before `repository_mark`'s `canonicalize`. Owner lookup: `refused_or_absent`, `abs_against`, `lexical` in this file — none; [repo-probe-refusal-blind](#repo-probe-refusal-blind), DISTINCT (probes that bypass the classifier). Owner gate-sdk/SPEC.md §The crate's crosser.
-
-### run-door-subdir-rebind
-
-[cost: event/low] [surface: native]
-
-`EVIDENCE_KIT_RUN_<suite>`'s derived member spells its tests and checks dirs relative to the working directory but takes its door from `GATE_SDK_NATIVE_BIN`'s repository-relative default (`run_members` in `native/src/knobs/evidence_kit.rs`, `host_native_bin` in `knobs/gate_sdk.rs`), so `--run-validate` invoked on the binary from a subdirectory runs a door that does not resolve there. The front end changes to the toplevel first, so only the binary door is exposed, and evidence-kit/SPEC.md §Layout and configuration states the working-directory run without the door's rebinding.
-
-**Deliverable:** the derived member's door and dirs spelled against one base, a test running a suite from a subdirectory through the binary door, and the SPEC's paragraph stating the rebinding.
-
-**Cost while deferred:** a validate run started from a subdirectory on the binary fails on a door that does not resolve. Filed 2026-10-04 to the gap inbox by queue-kit-format-native-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the base choice is a derivation contract with a test, →forward because no ruling is owed. Re-verified by source read: `run_members` takes the door from the knob's repository-relative default. Owner lookup: `run_members`, `EVIDENCE_KIT_RUN`, `subdirectory` in this file — none; owner evidence-kit/SPEC.md §Layout and configuration.
-
-### section-knob-colon-prefix
-
-[cost: event/low] [surface: queue-kit]
-
-`check-queue-sections` prefix-matches every required name ending in `:` (`matches` in `native/src/gates/queue_sections.rs`), and the section knobs' names join that set by derivation (`compose_required` in `native/src/queue.rs`), so a section knob named with a trailing colon (an active section `Now:`) is satisfied by `## Now: anything` while `Sections::is_task` matches only the exact name, leaving section-scoped gates open. queue-kit/SPEC.md §Layout and configuration promises the derivation closes that fail-open class.
-
-**Deliverable:** derived names matched exactly, or a section knob value ending in `:` refused by the validator; the choice is the unit's, a fixture per case either way.
-
-**Cost while deferred:** a colon-named section knob leaves every section-scoped gate reading no task. Filed 2026-10-04 to the gap inbox by queue-kit-format-native-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the remedy is a matcher-or-refusal choice with fixtures, →forward because no ruling is owed. Re-verified by source read: `matches` prefix-tests any `:`-ended name, `compose_required` admits knob names unchanged. Owner lookup: `trailing colon`, `prefix-match`, `queue_sections` in this file — none; owner queue-kit/SPEC.md §Layout and configuration.
 
 ## Icebox
 
