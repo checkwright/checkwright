@@ -1,6 +1,7 @@
 invariant A: the twins disagree
+invariant A: the twins' attestation floors disagree — install.sh floors at 0.20.1 and install.ps1 at 0.21.1
 invariant B: install.sh pins 0.20.0, and the newest release is v0.21.0
-invariant C: install.sh:10: 'checkwright-{version}.tar.gz' is no asset of the pinned release
+invariant C: install.sh:12: 'checkwright-{version}.tar.gz' is no asset of the pinned release
 invariant C: install.md spells no asset name
 invariant C: the fetched asset 'checkwright-{version}.tgz' has no 'checkwright-{version}.tgz.sha256' sidecar
 invariant D: install.md's commit-cost block was measured at v0.19.0, and the pin is 0.20.0

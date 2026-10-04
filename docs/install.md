@@ -58,6 +58,7 @@ The install itself and the optional docs gates need these as well. `doctor` does
 | Windows PowerShell | 5.1 | required to install on Windows | the one-line install, the install block and the bootstrap run under it; its `Get-FileHash` checks the digests |
 | `tar.exe` | Windows 10 version 1803 | required to install on Windows | the install block unpacks the tarball with `System32\tar.exe` |
 | Git for Windows | `git` and `bash` at the floors above | required to install on Windows | it supplies `git`, and the sh it bundles, which runs the pre-commit hook; `bash` where a row above owes it |
+| `gh` | any carrying `gh attestation` | optional: to check the build attestation | the one-line install runs `gh attestation verify` when `gh` is signed in, and says so when it is not |
 | Node | 8.2 | optional: only to install with npx | the first Node to bundle an npm carrying `npx` |
 | Ruby | 2.3 | optional: only if you register site-kit's docs gates | the two gems below need it |
 | `kramdown-parser-gfm` | any | optional: only if you register site-kit's docs gates | `check-docs-render-fidelity` re-renders every page through it |
@@ -91,7 +92,7 @@ There is no supported path today: a compiled gate is a subcommand of the publish
 
 <!-- install-primary: tarball -->
 
-Run the one line for your system from your repository's root, in a new project or an existing one with every change committed: `init` makes one commit and refuses a dirty worktree. The line downloads the newest Release tarball, checks it against its published digest, unpacks it outside your repository and runs `init`, with no runtime to install first. A step-by-step form sits under each line. For it, pick a version from the [releases](https://github.com/checkwright/checkwright/releases) page and put it in place of `X.Y.Z` on its first line. With Node, `npx checkwright init` does the same ([With Node](#with-node)).
+Run the one line for your system from your repository's root, in a new project or an existing one with every change committed: `init` makes one commit and refuses a dirty worktree. The line downloads the newest Release tarball, checks it against its published digest and, where `gh` is installed and signed in, against its build attestation, unpacks it outside your repository and runs `init`, with no runtime to install first. A step-by-step form sits under each line. For it, pick a version from the [releases](https://github.com/checkwright/checkwright/releases) page and put it in place of `X.Y.Z` on its first line. With Node, `npx checkwright init` does the same ([With Node](#with-node)).
 
 Pick your route:
 
@@ -140,6 +141,12 @@ v=X.Y.Z
 cw="$(mktemp -d)"   # unpack outside the repository
 curl -fsSLo "$cw/checkwright-$v.tgz" "https://github.com/checkwright/checkwright/releases/download/v$v/checkwright-$v.tgz"
 curl -fsSLo "$cw/checkwright-$v.tgz.sha256" "https://github.com/checkwright/checkwright/releases/download/v$v/checkwright-$v.tgz.sha256"
+```
+
+Where `gh` is installed and signed in, check the build attestation too:
+
+```sh
+gh attestation verify "$cw/checkwright-$v.tgz" --repo checkwright/checkwright
 ```
 
 Then verify, extract and run `init` from your repository root:
@@ -204,6 +211,12 @@ Invoke-WebRequest $url -OutFile "$cw\checkwright-$v.tgz" -UseBasicParsing
 Invoke-WebRequest "$url.sha256" -OutFile "$cw\checkwright-$v.tgz.sha256" -UseBasicParsing
 ```
 
+With `gh` signed in, check the attestation as on macOS and Linux:
+
+```powershell
+gh attestation verify "$cw\checkwright-$v.tgz" --repo checkwright/checkwright
+```
+
 Then check the digest, unpack, and run `init`, still from your repository root:
 
 <!-- windows-install:begin -->
@@ -223,7 +236,7 @@ Verify as above. To uninstall, run the `init` line with `uninstall` in place of 
 
 ### With Node
 
-`npx checkwright init` runs the same `init` from the npm package, and it carries a build attestation the tarball cannot ([installer/SPEC.md](installer/SPEC.md#the-dependency-boundary)). `init` verifies the gate binary with `sha256sum` or `shasum`, and refuses without one. It needs Node 8.2 or later ([Requirements](#requirements)).
+`npx checkwright init` runs the same `init` from the npm package, which carries npm's provenance attestation as the tarball carries a GitHub build attestation ([installer/SPEC.md](installer/SPEC.md#the-dependency-boundary)). `init` verifies the gate binary with `sha256sum` or `shasum`, and refuses without one. It needs Node 8.2 or later ([Requirements](#requirements)).
 
 ### From a plugin marketplace
 

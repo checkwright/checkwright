@@ -10,7 +10,7 @@
 
 ### tarball-build-attestation
 
-[spec: SPEC-tarball-attestation.md] [recurrence: 2026-09-25]
+[spec: installer/SPEC.md] [recurrence: 2026-09-25]
 
 the primary install channel carries no build provenance: the Release tarball ships a digest, which proves transfer, and docs/install.md states the tarball "cannot" carry an attestation where the npm package does. A GitHub artifact attestation on the tarball is a workflow step, not a platform limit.
 

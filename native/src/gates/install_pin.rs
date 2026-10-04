@@ -1,6 +1,6 @@
-// spec: installer/SPEC.md §The hosted install pin — the two hosted install scripts carry one pin
-// each, the pins agree (A), the pin is the newest release (B), and every fetch surface spells only
-// the pinned release's asset names (C), and the install page's commit-cost figure is the pin's (D)
+// spec: installer/SPEC.md §The hosted install pin — the twins' pins and floors agree (A), the pin
+// is the newest release (B), every fetch surface spells only the pinned release's asset names (C),
+// and the install page's commit-cost figure is the pin's (D)
 use super::release_assets::{declaration, DEFAULT_DOC};
 use super::release_channel_parity::newest_tag;
 use crate::{fresh, proc, programs};
@@ -30,6 +30,16 @@ pub(crate) fn is_triple(v: &str) -> bool {
 // on the script's pin variable and an `=`; exactly one such line is admissible, and it must be the
 // single-quoted triple
 pub(crate) fn pin_of(path: &str, text: &str, name: &str) -> Result<String, String> {
+    triple_line(path, text, name, "pin", "the hosted install's version")
+}
+
+// spec: installer/SPEC.md §The hosted install pin — the floor line takes the pin line's grammar
+// under the floor variable's name
+fn floor_of(path: &str, text: &str, name: &str) -> Result<String, String> {
+    triple_line(path, text, name, "floor", "the attestation floor")
+}
+
+fn triple_line(path: &str, text: &str, name: &str, kind: &str, subject: &str) -> Result<String, String> {
     let lines: Vec<(usize, &str)> = fresh::file_lines(text)
         .into_iter()
         .enumerate()
@@ -43,17 +53,18 @@ pub(crate) fn pin_of(path: &str, text: &str, name: &str) -> Result<String, Strin
         [one] => *one,
         [] => {
             return Err(format!(
-                "{} carries no '{}' pin line — the hosted install's version cannot be established (installer/SPEC.md §The hosted install pin)",
-                path, name
+                "{} carries no '{}' {} line — {} cannot be established (installer/SPEC.md §The hosted install pin)",
+                path, name, kind, subject
             ))
         }
         many => {
             let shown: Vec<String> = many.iter().map(|(n, l)| format!("{}:{}", n, l)).collect();
             return Err(format!(
-                "{} carries {} '{}' pin lines; exactly one is admissible:\n{}",
+                "{} carries {} '{}' {} lines; exactly one is admissible:\n{}",
                 path,
                 many.len(),
                 name,
+                kind,
                 shown.join("\n")
             ));
         }
@@ -67,8 +78,8 @@ pub(crate) fn pin_of(path: &str, text: &str, name: &str) -> Result<String, Strin
         .filter(|v| is_triple(v))
         .ok_or_else(|| {
             format!(
-                "{}:{}: the pin is not a single-quoted <major>.<minor>.<patch>: {}",
-                path, lineno, line
+                "{}:{}: the {} is not a single-quoted <major>.<minor>.<patch>: {}",
+                path, lineno, kind, line
             )
         })?;
     Ok(value.to_string())
@@ -275,6 +286,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let md_text = fresh::read_captured(install_md)?;
     let sh_pin = pin_of(install_sh, &sh_text, "pin")?;
     let ps_pin = pin_of(install_ps1, &ps_text, "$pin")?;
+    let sh_floor = floor_of(install_sh, &sh_text, "attest_from")?;
+    let ps_floor = floor_of(install_ps1, &ps_text, "$attestFrom")?;
     let cost_version = commit_cost_version(install_md, &md_text)?;
 
     let mut findings: Vec<String> = Vec::new();
@@ -282,6 +295,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
         findings.push(format!(
             "  invariant A: the twins disagree — {} pins {} and {} pins {}",
             install_sh, sh_pin, install_ps1, ps_pin
+        ));
+    }
+    let floor_red = sh_floor != ps_floor;
+    if floor_red {
+        findings.push(format!(
+            "  invariant A: the twins' attestation floors disagree — {} floors at {} and {} at {}",
+            install_sh, sh_floor, install_ps1, ps_floor
         ));
     }
 
@@ -311,7 +331,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
         Some(bare)
     };
-    let ab_red = !findings.is_empty();
+    let ab_red = findings.iter().any(|f| !f.contains("attestation floors"));
 
     let c_state = match pinned_declaration(pinned_doc, &sh_pin)? {
         None => None,
@@ -339,6 +359,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
         if ab_red {
             println!("  help: set both scripts' pin line to the newest release tag, in the commit after that tag — RELEASING.md step 4 moves it with the release declaration surface's drain.");
         }
+        if floor_red {
+            println!("  help: set both scripts' floor line to the one value the commit landing the attestation check gave it — the floor never moves after landing.");
+        }
         if findings.iter().any(|f| f.contains("invariant C")) {
             println!("  help: spell the pinned release's asset names on every fetch surface, or, in the commit moving the pin, the new release's names.");
         }
@@ -359,8 +382,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
         ),
     };
     println!(
-        "INSTALL-PIN: clean (both scripts pin {}; {}; {}; the commit-cost figure measured at v{})",
-        sh_pin, b_note, c_note, cost_version
+        "INSTALL-PIN: clean (both scripts pin {} and floor attestation at {}; {}; {}; the commit-cost figure measured at v{})",
+        sh_pin, sh_floor, b_note, c_note, cost_version
     );
     Ok(0)
 }
@@ -395,6 +418,22 @@ mod tests {
         assert!(pin_of("s", "pin='1.2.3'\npin='1.2.4'\n", "pin").is_err());
         assert!(pin_of("s", "pin=\"1.2.3\"\n", "pin").is_err());
         assert!(pin_of("p", "$pin = 'v1.2.3'\n", "$pin").is_err());
+    }
+
+    // spec: installer/SPEC.md §The hosted install pin — a floor line takes the pin grammar under its
+    // own name, never read as the pin, and a missing, duplicated or malformed one fails closed
+    #[test]
+    fn a_floor_line_is_read_beside_the_pin_and_fails_closed_alone() {
+        let sh = "f() {\n    pin='1.2.3'\n    attest_from='1.2.4'\n}\n";
+        assert_eq!(pin_of("s", sh, "pin"), Ok("1.2.3".to_string()));
+        assert_eq!(floor_of("s", sh, "attest_from"), Ok("1.2.4".to_string()));
+        let ps = "    $pin = '1.2.3'\n    $attestFrom = '1.2.4'\n";
+        assert_eq!(pin_of("p", ps, "$pin"), Ok("1.2.3".to_string()));
+        assert_eq!(floor_of("p", ps, "$attestFrom"), Ok("1.2.4".to_string()));
+        let missing = floor_of("s", "pin='1.2.3'\n", "attest_from").unwrap_err();
+        assert!(missing.contains("no 'attest_from' floor line"), "{}", missing);
+        assert!(floor_of("s", "attest_from='1.2.4'\nattest_from='1.2.5'\n", "attest_from").is_err());
+        assert!(floor_of("p", "$attestFrom = 'v1.2.4'\n", "$attestFrom").is_err());
     }
 
     // spec: installer/SPEC.md §The hosted install pin — invariant D's exit-2 set: a missing or

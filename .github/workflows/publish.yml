@@ -86,6 +86,9 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
+      # spec: installer/SPEC.md §The dependency boundary — the attest step mints through GitHub's OIDC issuer
+      id-token: write
+      attestations: write
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
@@ -159,6 +162,11 @@ jobs:
 
           bash gate-sdk/bin/run-gates.sh --only check-release-assets -- --dist "$out" "$version"
 
+      # spec: installer/SPEC.md §The dependency boundary — the job that produced the tarball's bytes attests them
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: ${{ runner.temp }}/dist/checkwright-*.tgz
+
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: installer-package
@@ -208,6 +216,7 @@ jobs:
     # spec: RELEASING.md §The procedure — step 5: the primary channel, held behind no approval
     permissions:
       contents: write
+      attestations: read
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
@@ -270,6 +279,10 @@ jobs:
           fi
           name="$(basename "${tarballs[0]}")"
           assets=("dist/$name" "dist/$name.sha256")
+
+          # spec: installer/SPEC.md §The dependency boundary — no Release exists for a tarball that fails its own attestation
+          gh attestation verify "dist/$name" --repo "$GH_REPO" \
+            --signer-workflow "$GH_REPO/.github/workflows/publish.yml"
 
           # spec: gate-sdk/SPEC.md §Consumer payload — the per-target archives, a digest source outside the payload
           for f in dist/*; do

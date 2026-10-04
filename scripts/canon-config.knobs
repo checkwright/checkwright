@@ -138,11 +138,12 @@ CANON_KIT_COMMENT_ACTIONS = on
 # spec: docs/site-architecture.md §Page-authoring rules
 CANON_KIT_SPEC_POINTER_TITLE_ONCE = on
 
-# comment-tier-exempt: the programs this repo's shell fences name beyond the bundled generic utility set — the crate toolchain its contributor battery runs, the fetch and checksum tools its install recipes use, and the package manager one platform's install recipe names, the npm runner the one-command install uses, and the Spec Kit CLI the companion extension installs through; a tree's toolchain is its own vocabulary, never a kit literal (the provenance seam)
+# comment-tier-exempt: the programs this repo's shell fences name beyond the bundled generic utility set — the crate toolchain its contributor battery runs, the fetch, checksum and attestation tools its install recipes use, and the package manager one platform's install recipe names, the npm runner the one-command install uses, and the Spec Kit CLI the companion extension installs through; a tree's toolchain is its own vocabulary, never a kit literal (the provenance seam)
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = cargo
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = curl
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = sha256sum
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = shasum
+CANON_KIT_FENCE_PROGRAMS_EXTRA[] = gh
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = brew
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = npx
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = specify

@@ -1685,7 +1685,7 @@ Per-artifact sidecars are used rather than a combined `SHA256SUMS` or a JSON man
 
 <!-- release-assets: checkwright-{version}.tgz checkwright-{version}.tgz.sha256 checkwright-gates-{version}-{target}.tar.gz checkwright-companion-{version}.zip checkwright-companion-{version}.zip.sha256 -->
 
-**What the digest proves, at its honest bound.** It is a transfer- and substitution-integrity claim: the artifact in the payload is byte-identical to the one the release built. It is **not** evidence the build host was uncompromised. What that floor does not provide is a reproducible build, and a build attestation is the outstanding ground: the checksum proves transfer only. Withholding the sources changes what that attestation is worth: with sources withheld it is the consumer's only remaining basis for trust.
+**What the digest proves, at its honest bound.** It is a transfer- and substitution-integrity claim: the artifact in the payload is byte-identical to the one the release built. It is **not** evidence the build host was uncompromised. What that floor does not provide is a reproducible build: the build attestation on the tarball (installer/SPEC.md §The dependency boundary) names which workflow built it, and a reproducible build stays the outstanding ground. Withholding the sources changes what that attestation is worth: with sources withheld it is the consumer's only remaining basis for trust.
 
 **The bound that puts on prose is exact:** a governed surface may say *verified against a published digest* and may **not** say *reproducible*. Those are claims about two different properties, and the weaker is the only one this floor earns.
 
