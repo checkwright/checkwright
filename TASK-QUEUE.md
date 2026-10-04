@@ -12,6 +12,16 @@
 
 ## Deferred
 
+### installer-smoke-live-upstream
+
+[cost: iteration/low] [surface: installer]
+
+the installer smoke's scratch consumers probe the real upstream. `init` writes `GATE_SDK_UPDATE_UPSTREAM` into the consumer's seam knobs from the package's `repository.url`, and the scrub (installer/SPEC.md §The consumer smoke) strips only inherited environment, so every bare `doctor` in a fresh consumer runs `git ls-remote` against the project's public repository, bounded by `GATE_SDK_UPDATE_TIMEOUT`. No leg asserts the `latest` line.
+
+**Deliverable:** one of two fixes, which differ in coverage: the scratch consumers' environment sets `GATE_SDK_UPDATE_CHECK = off`, silencing the probe, or the smoke points the upstream at a scratch bare repository carrying a newer tag, so the notice and `doctor`'s `latest` reading are witnessed offline. Either states the rule in §The consumer smoke.
+
+**Cost while deferred:** every installer-smoke run makes an outbound call per bare `doctor` and can wait up to the timeout on each when offline, and stays green either way, so the probe is exercised against a live host but never asserted. Filed 2026-10-04 to the gap inbox by installer-trust-pass' build; promoted at its close: →fix fails because the two fixes set the smoke's assertion envelope differently and span its drivers, its SPEC section and a full smoke run; →forward because no ruling is owed. Re-verified: the seam line in `native/src/install.rs`, the env-only scrub in `native/src/emit/installer_smoke/mod.rs`, and no `latest` read under `native/src/emit/installer_smoke/`. Owner lookup: `ls-remote`, `UPDATE_CHECK`, `upstream`, `doctor`, `network`, `offline` in this file and the disposed-findings record — none; owner installer/SPEC.md §The consumer smoke.
+
 ### foreign-project-critique
 
 [cost: event/low] [surface: delegation-kit]
@@ -454,7 +464,7 @@ an OpenSpec change delta that disagrees with its base spec passes the battery an
 
 docs/releases.md renders its derived note list as a bare list of version links, which repeats the nav: the page carries `nav_children_key: release`, so the nav already lists every note. Operator question, 2026-09-29, lead-relayed: a stats table instead.
 
-**Deliverable:** a derived table whose columns answer an upgrader, above all whether a release needs action on upgrade (it carries Tightened gates or Renamed knobs entries); also version, date, bump class and per-section counts. The note composer writes the counts and the action flag as front-matter keys and a gate holds them equal to the note's sections; parsing sections in Liquid at render time is refused as fragile.
+**Deliverable:** a derived table whose columns answer an upgrader, above all whether a release needs action on upgrade (its `gates` or `knobs` role section carries entries, roles per installer/SPEC.md §The upgrade contract); also version, date, bump class and per-section counts, which each note's In brief summary table already states. The note composer writes the counts and the action flag as front-matter keys and a gate holds them equal to the note's sections; parsing sections in Liquid at render time is refused as fragile.
 
 **Cost while deferred:** a reader skipping several versions opens each note to learn which need action. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead, at the operator's leave; promoted at its close: →fix fails because the keys are new grammar on the notes, →forward because no ruling is owed. Re-verified: the page's `<ul>` loop and 29 notes carrying `release:`. Owner lookup: `releases.md`, `front-matter` in this file — none; owner docs/site-architecture.md, with installer/SPEC.md §The upgrade contract for the keys.
 
