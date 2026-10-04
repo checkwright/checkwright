@@ -1194,10 +1194,3 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 
 ## Done
 
-- toplevel-refusal-fail-open
-- spec-mark-symlink-ascent
-- walk-child-posix-backslash
-- front-end-door-residue
-- required-sections-literal
-- queue-kit-format-brevity
-
