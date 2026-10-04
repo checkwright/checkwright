@@ -1,2 +1,2 @@
-# graph: couples=docs/posts/*.md,.workflow/release-declarations.md dir=one valve=none tier=precommit
-# spec: installer/SPEC.md §The upgrade contract — while a release note is under composition each declaration-bearing section's token set equals the release declaration surface it was composed from, both directions
+# graph: couples=docs/posts/*.md,docs/install.md,.workflow/release-declarations.md dir=one valve=none tier=precommit
+# spec: installer/SPEC.md §The upgrade contract — while a release note is under composition each surface-declared section's token set equals the release declaration surface it was composed from, and its Platforms section the platforms-table diff since the previous release, both directions
