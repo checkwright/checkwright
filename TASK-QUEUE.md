@@ -1204,7 +1204,3 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 
 ## Done
 
-- update-notice-probe-contract
-- install-attestation-binding
-- installer-smoke-live-upstream
-
