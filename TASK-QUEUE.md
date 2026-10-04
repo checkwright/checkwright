@@ -18,26 +18,6 @@
 
 **Cost while deferred:** a second copy of each section name a renaming adopter must keep in step; this repo already restates the list in `scripts/queue-config.knobs` to drop Lessons Learned. Filed 2026-10-01 to the gap inbox at lifecycle-queue-value-pass' build; promoted at its close: →fix fails because it changes a shipped knob's default, adopter-visible semantics no amendment settled, →forward because no ruling is owed. Re-verified: the literal list and the icebox-only composition read as filed. Owner lookup: `REQUIRED_SECTIONS`, `required list` in this file — none; owner queue-kit/SPEC.md §Layout and configuration.
 
-### walk-child-posix-backslash
-
-`walk::child` (native/src/walk.rs) reads a trailing `\` on the parent as a separator on every host, so on POSIX a directory whose name ends in a literal backslash is joined without the `/`: `a\` and `README.md` give `a\README.md`, a path that does not exist, and every crate walk descending through it stats the wrong path. canon-kit/SPEC.md §The shared spec adapters says a POSIX name holding a backslash is its own path.
-
-**Deliverable:** the backslash fold kept to Windows in `child`, with a crate test descending a backslash-ending directory on POSIX; gate-sdk/SPEC.md §The path-dialect contract states the join.
-
-**Push need (2026-10-04, inside the budget):** the mid-iteration push [front-end-door-residue](#front-end-door-residue) spends: the fold's Windows arm runs only in the Windows crate-test legs.
-
-**Cost while deferred:** a tracked tree holding such a directory is walked wrong by every crate walk. Filed 2026-10-04 to the gap inbox by canon-kit-tail-installer-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because it is crate work with a new test. Re-verified by source read: `child` tests `ends_with('\\')` unconditionally; `finder-tracked-filter-edges`' test covers a backslash in a file name only. Owner lookup: `walk::child`, `backslash` in this file — none; owner gate-sdk/SPEC.md §The path-dialect contract, with canon-kit/SPEC.md §The shared spec adapters.
-
-### front-end-door-residue
-
-the binary still names or spawns the bash front end where an adopter meets it: the `--help` text (native/src/runner.rs `USAGE`, pinned across both front ends), the runner's `--only` steer for a gate passed as a gates dir, installer/demo.rs's walkthrough line, and `EVIDENCE_KIT_RUN_<suite>`'s default in native/src/knobs/evidence_kit.rs. Widening `GUARD_KIT_DOOR_ROOTS` from the gates, hook and emit trees to all of native/src reds exactly these.
-
-**Deliverable:** each site respelled to the binary door, the knob default's working-directory change (the front end changes to the toplevel, the binary does not) settled in evidence-kit/SPEC.md, and the door roots widened to native/src.
-
-**Push need (2026-10-04, inside the budget):** the one mid-iteration push, shared with [walk-child-posix-backslash](#walk-child-posix-backslash): `gate-sdk/bin/run-gates.ps1` pins the usage text, and its parity is compared only on a host carrying pwsh, which no local run has.
-
-**Cost while deferred:** an adopter reading `--help` or the demo meets a command their install may not carry. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' build; promoted at its close: →fix fails because the knob default is a behaviour change across two front ends, →forward because no ruling is owed. Re-verified: grep finds all four sites. `hook-emit-remedy-door` scoped its fix to the hook and emit trees; this is DISTINCT, not a recurrence. Owner lookup: `run-gates.sh`, `DOOR_ROOTS` in this file — none; owner guard-kit/SPEC.md §check-door-binding, with gate-sdk/SPEC.md §run-gates.
-
 ### queue-kit-format-brevity
 
 queue-kit/SPEC.md's format half, which no brevity slice has passed: §The queue format with §Queue and backlog, §The icebox tier, §<slug> and §The tag algebra, plus §Layout and configuration, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): about 9.2k of the file's 36k words at this scope, and 52 of its 94 `check-prose-bounds` findings with the ceiling knob emptied.
@@ -1212,4 +1192,6 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 
 - toplevel-refusal-fail-open
 - spec-mark-symlink-ascent
+- walk-child-posix-backslash
+- front-end-door-residue
 
