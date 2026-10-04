@@ -1,8 +1,1 @@
 # contract: lifecycle-kit/SPEC.md §The survey record — carried surveys, one block per survey; boundary-truncated, cited only behind a passing witness.
-
-## 2026-10-04 scope — Which deferred entries rank into this iteration's unit set, and does any carry aggregated inbound weight?
-- corpus: TASK-QUEUE.md
-- oracle: bash gate-sdk/bin/run-gates.sh --emit queue-edges
-- rev: 6cb931c992325afd48a41991f1ff4125b9b20895
-- finding: No entry aggregates more than 3 inbound edges (design-partner-preview 3); none reaches the recurrence threshold of 2 dates. Tier one: spec-brevity-residue (session/high, canon-kit; its next slice canon-kit/SPEC.md from check-comment-tier on, 41 findings) and update-notice-probe-contract (session/low, installer), which the last scope's survey named lead of the next set; iteration/low installer-smoke-live-upstream, audit-trigger-mirror-component, heterogeneous-agent-delegation, manual-operation-spend-channel. Board rows: gate-sdk 7, installer 5, canon-kit 3 after this drain. Supersession: installer-smoke-live-upstream reshaped by update-notice-probe-contract (goes after); tarball-attestation-observed reshaped by install-attestation-binding; canon-kit-reach-overstatement reshaped by finder-tracked-filter-edges; no deferred or icebox entry names install.sh, install.ps1, update_notice, GATE_SDK_UPDATE_, tracked_only or toplevel_args otherwise. Push need: install-attestation-binding adds assertions to the gates.yml attestation stub legs and edits install.ps1, which no local run reaches (no pwsh here), so one mid-iteration push; canon-kit units need only the closing push.
-- inferred: per-entry supersession was read by grep over deliverable names, not by an oracle; push need judged from each deliverable's legs
