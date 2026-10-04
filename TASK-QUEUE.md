@@ -10,36 +10,6 @@
 
 ## Technical Debt
 
-### finder-tracked-filter-edges
-
-canon-kit's manifest-set finder fails open and mis-matches paths at its edges. (1) `toplevel_args` in `native/src/walk.rs` maps any failed `git rev-parse` (a `safe.directory` ownership refusal, broken repository metadata) to no work tree, so `tracked_only` in `native/src/spec.rs` returns the unfiltered walk inside a real work tree and grades untracked READMEs again with no notice; canon-kit/SPEC.md §The shared spec adapters authorizes the walk only outside a work tree. (2) `tracked_only` decodes `git ls-files -z` with `from_utf8_lossy` and rewrites every backslash to `/`, so a non-UTF-8 name, or a POSIX name holding a literal backslash, can match the wrong tracked entry or none. (3) The `CANON_KIT_PROSE_SURFACE_GLOBS` branch reads each candidate (`slot_free`) before the tracked filter, so an unreadable untracked file still fails the finder.
-
-**Deliverable:** a failed probe inside a work tree told apart from no work tree, and refused rather than walked; tracked paths matched byte-exact on unix and separator-folded only on Windows; the tracked filter applied before any candidate read; a fixture or unit test per case, and §The shared spec adapters stating each.
-
-**Cost while deferred:** a host whose `git` refuses the repository grades untracked files silently, and the edge names misgrade; all three need an unusual host or name. Whether (2) and (3) misgrade on an adopter corpus is unmeasured: none is in reach, and the fix does not turn on it, since each case owes the fixture that reproduces it. Filed 2026-10-04 to the gap inbox as two bullets by canon-kit-reach-pass' close, its second-vendor review; promoted together 2026-10-04 at the next iteration's scope, all being the one finder's tracked filter: →fix fails because refusing a failed probe reds runs that pass today and each case owes a fixture, →forward because no ruling is owed. Re-verified by source read: `toplevel_args` filters a failed probe to `None`, and `tracked_only` decodes lossily and rewrites backslashes. Owner lookup: `tracked_only`, `toplevel_args`, `safe.directory`, `from_utf8_lossy`, `slot_free` in this file and the disposed-findings record — none; owner canon-kit/SPEC.md §The shared spec adapters. Promoted 2026-10-04 at canon-kit-tail-installer-pass' scope as debt, adding no name; its unrun marker named no command and its subject is out of reach, so it is restated as an unmeasured limit. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling).
-
-**Push need (2026-10-04, inside the budget):** the iteration's one mid-iteration push, since the Windows-only separator fold runs first on the crate-tests-windows leg; the same push serves [windows-job-kill-fallback](#windows-job-kill-fallback) and [attest-stub-argv-exactness](#attest-stub-argv-exactness).
-
-### windows-job-kill-fallback
-
-the bounded capture's tree kill on Windows falls back to a child-only kill when `CreateJobObjectW` or `AssignProcessToJobObject` fails: `Tree::spawn` in `native/src/proc.rs` keeps a null job and returns a successful spawn, which only its own comment states. installer/SPEC.md §The update notice says the probe joins a job object and the job is terminated, and its honest limits name only the spawn-to-assignment window.
-
-**Deliverable:** either the spawn refused when the job cannot be made or joined, or the weaker bound stated among §The update notice's honest limits; a test of the chosen branch, which only the Windows crate-tests leg runs.
-
-**Cost while deferred:** on a Windows host refusing job objects, an expired probe leaves git's remote and credential helpers running while the SPEC promises they are killed. Filed 2026-10-04 to the gap inbox by installer-notice-attest-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because refusing the spawn changes a verdict and either branch owes a Windows-only witness, →forward because no ruling is owed. Re-verified by source read: a failed assignment closes the job and keeps the null handle. Owner lookup: `CreateJobObject`, `job object`, `Tree::spawn` in this file and the disposed-findings record — none; owner installer/SPEC.md §The update notice. Promoted 2026-10-04 at canon-kit-tail-installer-pass' scope as debt, adding no name either way. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling).
-
-**Push need (2026-10-04, inside the budget):** the mid-iteration push [finder-tracked-filter-edges](#finder-tracked-filter-edges) records, since its test runs only on the Windows crate-tests leg.
-
-### attest-stub-argv-exactness
-
-the Linux attestation stub in `.github/workflows/gates.yml` compares the verify's flags as the flattened `"$*"`, so the six flags passed as one argument still pass, and its readiness case matches `auth token` alone, accepting any `--hostname` where both bootstraps pass `--hostname github.com`. installer/SPEC.md §Requirements' attestation witness claims a verify whose arguments after the file are not exactly the three flags fails, and any other call fails. The Windows `gh.cmd` stub compares positional arguments and refuses an extra one.
-
-**Deliverable:** the Linux stub comparing the argument count and each argument, the readiness case pinned to `--hostname github.com` in both stubs, and the witness paragraph stating what each stub asserts.
-
-**Cost while deferred:** a bootstrap regression joining the verify flags into one word, or dropping the hostname pin, passes the witness on Linux. Filed 2026-10-04 to the gap inbox by installer-notice-attest-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the change runs only on a pushed `gates` leg, →forward because no ruling is owed. Re-verified by source read: the stub's `[ "$*" = "$want" ]` and its `'auth token'` case. Owner lookup: `stub`, `auth token`, `--hostname` in this file and the disposed-findings record — none; owner installer/SPEC.md §Requirements. Promoted 2026-10-04 at canon-kit-tail-installer-pass' scope as debt, adding no name. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling).
-
-**Push need (2026-10-04, inside the budget):** the mid-iteration push [finder-tracked-filter-edges](#finder-tracked-filter-edges) records, since the stub runs only on the pushed `gates` install-smoke legs.
-
 ## Deferred
 
 ### foreign-project-critique
@@ -1217,4 +1187,7 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 - notice-cache-concurrency
 - canon-kit-reach-overstatement
 - canon-kit-tail-brevity
+- windows-job-kill-fallback
+- attest-stub-argv-exactness
+- finder-tracked-filter-edges
 
