@@ -420,12 +420,62 @@ pub(super) fn install(state: &mut Run) -> Step {
         .ok_or_else(|| fail(format!("the installed package's manifest names no version: {}", manifest)))?;
     let name = Path::new(&state.tarball).file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
     say(&format!("installed {} from {}", version, name));
+    scratch_upstream(state)
+}
+
+// spec: installer/SPEC.md §The consumer smoke — one release tag a major version above the packed
+// one, so it sorts above every version the upgrade arm derives
+fn next_major(v: &str) -> String {
+    let major = v.split(['.', '-', '+']).next().and_then(|m| m.parse::<u64>().ok()).unwrap_or(0);
+    format!("{}.0.0", major + 1)
+}
+
+fn git_line(args: &[&str], input: &[u8]) -> Result<String, Outcome> {
+    let done = proc::run_with_stdin(&programs::GIT, args, input).map_err(refuse)?;
+    match done.stdout() {
+        Some(out) => Ok(text(out).trim().to_string()),
+        None => Err(refuse(format!(
+            "could not build the scratch upstream: git {}: {}",
+            args.join(" "),
+            done.failure_report().unwrap_or_default()
+        ))),
+    }
+}
+
+// spec: installer/SPEC.md §The consumer smoke — the scratch upstream: a bare repository carrying the
+// newer release tag, named as every scrubbed spawn's update-check upstream before the first consumer
+fn scratch_upstream(state: &mut Run) -> Step {
+    let bare = format!("{}/update-upstream.git", state.scratch);
+    state.latest = next_major(&state.version);
+    git_line(&["init", "-q", "--bare", &bare], b"")?;
+    let tree = git_line(&["-C", &bare, "mktree"], b"")?;
+    let id = ["-c", "user.name=installer-smoke", "-c", "user.email=installer-smoke@example.invalid"];
+    let commit = git_line(&[&["-C", &bare][..], &id, &["commit-tree", &tree, "-m", "seed"]].concat(), b"")?;
+    git_line(&["-C", &bare, "update-ref", &format!("refs/tags/v{}", state.latest), &commit], b"")?;
+    if super::UPSTREAM.set(bare).is_err() {
+        return Err(refuse("the scratch upstream was already set — the install arm ran twice in one process"));
+    }
+    say(&format!(
+        "update check: every consumer probes a scratch upstream carrying v{}, never a live host",
+        state.latest
+    ));
     Ok(())
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: installer/SPEC.md §The consumer smoke — the scratch upstream's tag sorts above the packed
+    // version and both patch hops, the fallback version included
+    #[test]
+    fn the_scratch_upstream_tag_is_a_major_above() {
+        assert_eq!(next_major("0.9.14"), "1.0.0");
+        assert_eq!(next_major("3.0.0"), "4.0.0");
+        assert_eq!(next_major("0.0.0-smoke"), "1.0.0");
+        let hop = super::super::upgrade::next_patch(&super::super::upgrade::next_patch("0.9.14"));
+        assert!(super::super::upgrade::upgrades(&hop, &next_major("0.9.14")));
+    }
 
     // spec: installer/SPEC.md §The consumer smoke — the sidecar is the host hasher's line shape
     // over the staged bytes, so pack's verification reads it as it reads a producer's

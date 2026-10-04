@@ -118,6 +118,7 @@ pub(super) struct Run {
     up2_version: String,
     up: String,
     up2: String,
+    latest: String,
 }
 
 impl Drop for Run {
@@ -165,9 +166,26 @@ fn smoke(state: &mut Run) -> Step {
     Ok(())
 }
 
+// spec: installer/SPEC.md §The consumer smoke — the scratch upstream the install arm made, which
+// every scrubbed spawn names as the update check's upstream
+static UPSTREAM: std::sync::OnceLock<String> = std::sync::OnceLock::new();
+
+const UPSTREAM_KNOB: &str = "GATE_SDK_UPDATE_UPSTREAM";
+
+// spec: installer/SPEC.md §The consumer smoke — the run-wide value first, so an arm's own value for
+// the same name still wins
+fn with_upstream(set: &[(String, String)]) -> Vec<(String, String)> {
+    UPSTREAM
+        .get()
+        .map(|u| (UPSTREAM_KNOB.to_string(), u.clone()))
+        .into_iter()
+        .chain(set.iter().cloned())
+        .collect()
+}
+
 // spec: installer/SPEC.md §The consumer smoke — a spawn into a scratch consumer, an extracted
 // package or a throwaway copy of either runs under the invoking environment less every name a
-// static kit's prefix owns, plus the values the arm sets for that call
+// static kit's prefix owns, plus the scratch upstream and the values the arm sets for that call
 fn in_consumer(
     program: &Program,
     args: &[&str],
@@ -185,8 +203,9 @@ fn in_consumer_fed(
     input: &[u8],
 ) -> Result<proc::Completed, Outcome> {
     let unset = crate::knobs::inherited_under_static_prefixes();
+    let set = with_upstream(set);
     let child = proc::ChildEnv {
-        set,
+        set: &set,
         unset: &unset,
         cwd: Some(std::path::Path::new(cwd)),
     };
@@ -197,7 +216,7 @@ fn in_consumer_fed(
 // every verb's verdict is read from
 fn merged_in(program: &Program, args: &[&str], set: &[(String, String)], cwd: &str) -> Result<proc::Merged, Outcome> {
     let unset = crate::knobs::inherited_under_static_prefixes();
-    proc::run_merged_scrubbed(program, args, set, std::path::Path::new(cwd), &unset).map_err(refuse)
+    proc::run_merged_scrubbed(program, args, &with_upstream(set), std::path::Path::new(cwd), &unset).map_err(refuse)
 }
 
 fn text(bytes: &[u8]) -> String {

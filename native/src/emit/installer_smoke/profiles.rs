@@ -734,10 +734,31 @@ fn doctor(state: &mut Run, profile: &str, c: &str) -> Step {
         .iter()
         .any(|l| l.strip_prefix("  bash ").is_some_and(|r| r.trim_start().starts_with("not probed")));
     state.owes_bash.insert(profile.to_string(), bash_row && !unprobed);
+    let latest = format!("  latest       v{} available — run update", state.latest);
+    if !said.contains(&latest) {
+        return Err(failed(&m, format!(
+            "{}: doctor's latest line did not read v{} off the scratch upstream as available",
+            profile, state.latest
+        )));
+    }
     say(&format!(
-        "doctor: clean, reports the installed profile and {} disarmed member(s)",
-        disarmed.len()
+        "doctor: clean, reports the installed profile, {} disarmed member(s) and v{} available",
+        disarmed.len(),
+        state.latest
     ));
+    update_notice(state, profile, c)
+}
+
+// spec: installer/SPEC.md §The update notice — the arm the session-context hook runs prints its
+// line through the consumer's own front end, naming the scratch upstream's release and the installed
+fn update_notice(state: &Run, profile: &str, c: &str) -> Step {
+    let m = state.front_end(c, &["--emit", "update-notice"])?;
+    let want = format!("checkwright v{} is available; this tree has v{}.", state.latest, state.version);
+    let said = lines::of("the update notice", m.output());
+    if !m.succeeded() || !said.iter().any(|l| l.starts_with(&want)) {
+        return Err(failed(&m, format!("{}: the update-notice arm did not print '{}'", profile, want)));
+    }
+    say("update notice: printed through the consumer's front end");
     Ok(())
 }
 
