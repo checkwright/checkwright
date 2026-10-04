@@ -4,4 +4,4 @@
 
 ---
 
-— scope a470d63d 2026-10-04 9beb19046
+canon-kit-tail-installer-pass scope a470d63d 2026-10-04 9beb19046

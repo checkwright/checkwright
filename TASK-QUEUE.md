@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: canon-kit-tail-installer-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,60 @@
 ## New Features
 
 ## Technical Debt
+
+### finder-tracked-filter-edges
+
+canon-kit's manifest-set finder fails open and mis-matches paths at its edges. (1) `toplevel_args` in `native/src/walk.rs` maps any failed `git rev-parse` (a `safe.directory` ownership refusal, broken repository metadata) to no work tree, so `tracked_only` in `native/src/spec.rs` returns the unfiltered walk inside a real work tree and grades untracked READMEs again with no notice; canon-kit/SPEC.md §The shared spec adapters authorizes the walk only outside a work tree. (2) `tracked_only` decodes `git ls-files -z` with `from_utf8_lossy` and rewrites every backslash to `/`, so a non-UTF-8 name, or a POSIX name holding a literal backslash, can match the wrong tracked entry or none. (3) The `CANON_KIT_PROSE_SURFACE_GLOBS` branch reads each candidate (`slot_free`) before the tracked filter, so an unreadable untracked file still fails the finder.
+
+**Deliverable:** a failed probe inside a work tree told apart from no work tree, and refused rather than walked; tracked paths matched byte-exact on unix and separator-folded only on Windows; the tracked filter applied before any candidate read; a fixture or unit test per case, and §The shared spec adapters stating each.
+
+**Cost while deferred:** a host whose `git` refuses the repository grades untracked files silently, and the edge names misgrade; all three need an unusual host or name. Whether (2) and (3) misgrade on an adopter corpus is unmeasured: none is in reach, and the fix does not turn on it, since each case owes the fixture that reproduces it. Filed 2026-10-04 to the gap inbox as two bullets by canon-kit-reach-pass' close, its second-vendor review; promoted together 2026-10-04 at the next iteration's scope, all being the one finder's tracked filter: →fix fails because refusing a failed probe reds runs that pass today and each case owes a fixture, →forward because no ruling is owed. Re-verified by source read: `toplevel_args` filters a failed probe to `None`, and `tracked_only` decodes lossily and rewrites backslashes. Owner lookup: `tracked_only`, `toplevel_args`, `safe.directory`, `from_utf8_lossy`, `slot_free` in this file and the disposed-findings record — none; owner canon-kit/SPEC.md §The shared spec adapters. Promoted 2026-10-04 at canon-kit-tail-installer-pass' scope as debt, adding no name; its unrun marker named no command and its subject is out of reach, so it is restated as an unmeasured limit. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling).
+
+**Push need (2026-10-04, inside the budget):** the iteration's one mid-iteration push, since the Windows-only separator fold runs first on the crate-tests-windows leg; the same push serves [windows-job-kill-fallback](#windows-job-kill-fallback) and [attest-stub-argv-exactness](#attest-stub-argv-exactness).
+
+### canon-kit-reach-overstatement
+
+canon-kit/SPEC.md states two canon-kit-reach-pass landings wider than the code. §The shared spec adapters' tracked-set bullet grounds the set in what a commit carries, yet the index decides only membership and the gates read working-tree contents, and it leaves unstated that a sparse checkout's absent tracked manifests and a submodule's files never join the set. §check-spec-pointer's section-number mark is any opening digit, while `spec_pointer.rs` tests `is_ascii_digit`, so a bare `§٣` still fires. `.workflow/release-declarations.md`'s two bullets repeat both wordings.
+
+**Deliverable:** both sections and both declaration bullets restated to what the code does, or the digit test widened to the stated mark with a fixture; which one is the unit's call.
+
+**Cost while deferred:** a reader of either section, or of the next release note, trusts a guarantee the gate does not give. Filed 2026-10-04 to the gap inbox by canon-kit-reach-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the digit half chooses between narrowing the SPEC and widening the gate, and the tracked-set half is reshaped by [finder-tracked-filter-edges](#finder-tracked-filter-edges), which goes first; →forward because no ruling is owed. Re-verified by source read: the bullet's wording and the ASCII test. Owner lookup: `is_ascii_digit`, `section-number`, `sparse`, `submodule` in this file and the disposed-findings record — none; owner canon-kit/SPEC.md §The shared spec adapters, with §check-spec-pointer. Promoted 2026-10-04 at canon-kit-tail-installer-pass' scope as debt, adding no name either way. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling).
+
+### windows-job-kill-fallback
+
+the bounded capture's tree kill on Windows falls back to a child-only kill when `CreateJobObjectW` or `AssignProcessToJobObject` fails: `Tree::spawn` in `native/src/proc.rs` keeps a null job and returns a successful spawn, which only its own comment states. installer/SPEC.md §The update notice says the probe joins a job object and the job is terminated, and its honest limits name only the spawn-to-assignment window.
+
+**Deliverable:** either the spawn refused when the job cannot be made or joined, or the weaker bound stated among §The update notice's honest limits; a test of the chosen branch, which only the Windows crate-tests leg runs.
+
+**Cost while deferred:** on a Windows host refusing job objects, an expired probe leaves git's remote and credential helpers running while the SPEC promises they are killed. Filed 2026-10-04 to the gap inbox by installer-notice-attest-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because refusing the spawn changes a verdict and either branch owes a Windows-only witness, →forward because no ruling is owed. Re-verified by source read: a failed assignment closes the job and keeps the null handle. Owner lookup: `CreateJobObject`, `job object`, `Tree::spawn` in this file and the disposed-findings record — none; owner installer/SPEC.md §The update notice. Promoted 2026-10-04 at canon-kit-tail-installer-pass' scope as debt, adding no name either way. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling).
+
+**Push need (2026-10-04, inside the budget):** the mid-iteration push [finder-tracked-filter-edges](#finder-tracked-filter-edges) records, since its test runs only on the Windows crate-tests leg.
+
+### notice-cache-concurrency
+
+the update notice's cache is read, probed and rewritten with no lock and a non-atomic `std::fs::write` (`reading()` in `native/src/emit/update_notice.rs`), and that write and uninstall's cache `remove_file` (`native/src/installer/uninstall.rs`) discard their errors. Concurrent `doctor` or session-hook reads, or worktrees sharing the cache, can each probe, a reader can see a truncated record, an unwritable git directory probes on every read, and uninstall can leave the cache. installer/SPEC.md §The update notice ("one attempt per interval, never one per read", "every attempt rewrites the file") and §uninstall ("deletes it") state all three unconditionally.
+
+**Deliverable:** the record written whole (a sibling temp file renamed over it), the write and the removal failures surfaced or stated, and the concurrent-probe case stated among §The update notice's honest limits beside the shared-worktree one, with a test per case. Scope's triage, 2026-10-04: the debt shape, since a lock file is a new name serializing an extra `ls-remote`, a cost the SPEC already accepts for worktrees.
+
+**Cost while deferred:** a reader can parse a torn record, a read-only `.git` probes the network on every read against a stated once-per-interval bound, and an uninstall that reports clean can leave a file behind. Filed 2026-10-04 to the gap inbox by installer-notice-attest-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the concurrency half chooses between a new lock and a narrowed SPEC, →forward because no ruling is owed. Re-verified by source read: `let _ = std::fs::write(&cache, …)` and `let _ = std::fs::remove_file(cache)`. Owner lookup: `update notice`, `cache`, `atomic`, `remove_file` in this file and the disposed-findings record — none; owner installer/SPEC.md §The update notice, with §uninstall. Promoted 2026-10-04 at canon-kit-tail-installer-pass' scope as debt in the shape above, adding no name. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling); the shape was not part of that selection.
+
+### attest-stub-argv-exactness
+
+the Linux attestation stub in `.github/workflows/gates.yml` compares the verify's flags as the flattened `"$*"`, so the six flags passed as one argument still pass, and its readiness case matches `auth token` alone, accepting any `--hostname` where both bootstraps pass `--hostname github.com`. installer/SPEC.md §Requirements' attestation witness claims a verify whose arguments after the file are not exactly the three flags fails, and any other call fails. The Windows `gh.cmd` stub compares positional arguments and refuses an extra one.
+
+**Deliverable:** the Linux stub comparing the argument count and each argument, the readiness case pinned to `--hostname github.com` in both stubs, and the witness paragraph stating what each stub asserts.
+
+**Cost while deferred:** a bootstrap regression joining the verify flags into one word, or dropping the hostname pin, passes the witness on Linux. Filed 2026-10-04 to the gap inbox by installer-notice-attest-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the change runs only on a pushed `gates` leg, →forward because no ruling is owed. Re-verified by source read: the stub's `[ "$*" = "$want" ]` and its `'auth token'` case. Owner lookup: `stub`, `auth token`, `--hostname` in this file and the disposed-findings record — none; owner installer/SPEC.md §Requirements. Promoted 2026-10-04 at canon-kit-tail-installer-pass' scope as debt, adding no name. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling).
+
+**Push need (2026-10-04, inside the budget):** the mid-iteration push [finder-tracked-filter-edges](#finder-tracked-filter-edges) records, since the stub runs only on the pushed `gates` install-smoke legs.
+
+### canon-kit-tail-brevity
+
+canon-kit/SPEC.md's 22 sections no brevity slice has passed: §Per-component contracts, §check-pendency-contradiction, and §check-todo-task-liveness through §Out of scope less the passed §check-md-refs and §check-prose-tells, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): about 12.5k of the file's 38.9k words at this scope, and all 41 of its `check-prose-bounds` findings with the ceiling knob emptied.
+
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey; the file's ceiling row re-stamped, and canon-kit then finished. Applied last; no other unit in the set edits these sections.
+
+**Cost while deferred:** paid by every session and adopter that reads those contracts. Filed 2026-10-04 as a split at scope. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling), unsplit at §check-md-unwrapped.
 
 ## Deferred
 
@@ -246,9 +300,9 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 ### spec-brevity-residue
 
-[roadmap: now/adoption] [cost: session/high] [surface: canon-kit] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
+[roadmap: now/adoption] [cost: session/high] [surface: queue-kit] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices (below); lifecycle-kit, installer, guard-kit and delegation-kit are finished or split out (the slices below); what remains starts at canon-kit, queue-kit, drift-kit, context-kit, evidence-kit, site-kit, then doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling): a slice has landed at each recent scope; the per-kit slices stay off the roadmap.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices (below); lifecycle-kit, installer, guard-kit, delegation-kit and canon-kit are finished or split out (the slices below); what remains starts at queue-kit, drift-kit, context-kit, evidence-kit, site-kit, then doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling): a slice has landed at each recent scope; the per-kit slices stay off the roadmap.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
@@ -258,7 +312,7 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes, landing as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes, landing as `installer-install-brevity` and `installer-remainder-brevity`; and, the kit's other sections remaining: drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope, landing as `drift-kit-measurement-brevity`; guard-kit's front sections, delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes, landing as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope, landing as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope, landing as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope, landing as `queue-kit-gate-brevity`; guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope, landing as `guard-kit-tool-brevity`.
 
-delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes, landing as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as `delegation-kit-tail-brevity`; canon-kit's claim-gate sections left 2026-10-04 at canon-kit-reach-pass' scope as `canon-kit-claim-brevity`.
+delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes, landing as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as `delegation-kit-tail-brevity`; canon-kit's claim-gate sections left 2026-10-04 at canon-kit-reach-pass' scope as `canon-kit-claim-brevity`, and its rest at canon-kit-tail-installer-pass' as [canon-kit-tail-brevity](#canon-kit-tail-brevity).
 
 ### tarball-attestation-observed
 
@@ -505,56 +559,6 @@ the binary still names or spawns the bash front end where an adopter meets it: t
 **Deliverable:** the refusal widened to every heading reached under two roles, across the roster and the aliases, a validator test per case, and the knob entry's refusal list updated.
 
 **Cost while deferred:** a consumer giving two roles one heading gets a note whose section the upgrade contract reads under either role, unrefused. Filed 2026-10-04 to the gap inbox by installer-trust-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because a widened refusal reds configurations accepted today, →forward because no ruling is owed. Re-verified: `refusals` checks a repeated role, and an alias against the roster's headings only. Owner lookup: `RELEASE_SECTION`, `two roles`, `alias` in this file — none; owner gate-sdk/SPEC.md §Layout and configuration.
-
-### finder-tracked-filter-edges
-
-[cost: event/low] [surface: canon-kit]
-
-canon-kit's manifest-set finder fails open and mis-matches paths at its edges. (1) `toplevel_args` in `native/src/walk.rs` maps any failed `git rev-parse` (a `safe.directory` ownership refusal, broken repository metadata) to no work tree, so `tracked_only` in `native/src/spec.rs` returns the unfiltered walk inside a real work tree and grades untracked READMEs again with no notice; canon-kit/SPEC.md §The shared spec adapters authorizes the walk only outside a work tree. (2) `tracked_only` decodes `git ls-files -z` with `from_utf8_lossy` and rewrites every backslash to `/`, so a non-UTF-8 name, or a POSIX name holding a literal backslash, can match the wrong tracked entry or none. (3) The `CANON_KIT_PROSE_SURFACE_GLOBS` branch reads each candidate (`slot_free`) before the tracked filter, so an unreadable untracked file still fails the finder.
-
-**Deliverable:** a failed probe inside a work tree told apart from no work tree, and refused rather than walked; tracked paths matched byte-exact on unix and separator-folded only on Windows; the tracked filter applied before any candidate read; a fixture or unit test per case, and §The shared spec adapters stating each.
-
-**Cost while deferred:** a host whose `git` refuses the repository grades untracked files silently, and the edge names misgrade; all three need an unusual host or name. **Inferred, not run:** that (2) and (3) misgrade on a real corpus — no fixture reproduces them yet. Filed 2026-10-04 to the gap inbox as two bullets by canon-kit-reach-pass' close, its second-vendor review; promoted together 2026-10-04 at the next iteration's scope, all being the one finder's tracked filter: →fix fails because refusing a failed probe reds runs that pass today and each case owes a fixture, →forward because no ruling is owed. Re-verified by source read: `toplevel_args` filters a failed probe to `None`, and `tracked_only` decodes lossily and rewrites backslashes. Owner lookup: `tracked_only`, `toplevel_args`, `safe.directory`, `from_utf8_lossy`, `slot_free` in this file and the disposed-findings record — none; owner canon-kit/SPEC.md §The shared spec adapters.
-
-### canon-kit-reach-overstatement
-
-[cost: event/low] [surface: canon-kit]
-
-canon-kit/SPEC.md states two canon-kit-reach-pass landings wider than the code. §The shared spec adapters' tracked-set bullet grounds the set in what a commit carries, yet the index decides only membership and the gates read working-tree contents, and it leaves unstated that a sparse checkout's absent tracked manifests and a submodule's files never join the set. §check-spec-pointer's section-number mark is any opening digit, while `spec_pointer.rs` tests `is_ascii_digit`, so a bare `§٣` still fires. `.workflow/release-declarations.md`'s two bullets repeat both wordings.
-
-**Deliverable:** both sections and both declaration bullets restated to what the code does, or the digit test widened to the stated mark with a fixture; which one is the unit's call.
-
-**Cost while deferred:** a reader of either section, or of the next release note, trusts a guarantee the gate does not give. Filed 2026-10-04 to the gap inbox by canon-kit-reach-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the digit half chooses between narrowing the SPEC and widening the gate, and the tracked-set half is reshaped by [finder-tracked-filter-edges](#finder-tracked-filter-edges), which goes first; →forward because no ruling is owed. Re-verified by source read: the bullet's wording and the ASCII test. Owner lookup: `is_ascii_digit`, `section-number`, `sparse`, `submodule` in this file and the disposed-findings record — none; owner canon-kit/SPEC.md §The shared spec adapters, with §check-spec-pointer.
-
-### windows-job-kill-fallback
-
-[cost: event/low] [surface: installer]
-
-the bounded capture's tree kill on Windows falls back to a child-only kill when `CreateJobObjectW` or `AssignProcessToJobObject` fails: `Tree::spawn` in `native/src/proc.rs` keeps a null job and returns a successful spawn, which only its own comment states. installer/SPEC.md §The update notice says the probe joins a job object and the job is terminated, and its honest limits name only the spawn-to-assignment window.
-
-**Deliverable:** either the spawn refused when the job cannot be made or joined, or the weaker bound stated among §The update notice's honest limits; a test of the chosen branch, which only the Windows crate-tests leg runs.
-
-**Cost while deferred:** on a Windows host refusing job objects, an expired probe leaves git's remote and credential helpers running while the SPEC promises they are killed. Filed 2026-10-04 to the gap inbox by installer-notice-attest-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because refusing the spawn changes a verdict and either branch owes a Windows-only witness, →forward because no ruling is owed. Re-verified by source read: a failed assignment closes the job and keeps the null handle. Owner lookup: `CreateJobObject`, `job object`, `Tree::spawn` in this file and the disposed-findings record — none; owner installer/SPEC.md §The update notice.
-
-### notice-cache-concurrency
-
-[cost: event/low] [surface: installer]
-
-the update notice's cache is read, probed and rewritten with no lock and a non-atomic `std::fs::write` (`reading()` in `native/src/emit/update_notice.rs`), and that write and uninstall's cache `remove_file` (`native/src/installer/uninstall.rs`) discard their errors. Concurrent `doctor` or session-hook reads, or worktrees sharing the cache, can each probe, a reader can see a truncated record, an unwritable git directory probes on every read, and uninstall can leave the cache. installer/SPEC.md §The update notice ("one attempt per interval, never one per read", "every attempt rewrites the file") and §uninstall ("deletes it") state all three unconditionally.
-
-**Deliverable:** the record written whole (a sibling temp file renamed over it), the write and the removal failures surfaced or stated, and the concurrent-probe case either serialized or stated as an honest limit, with a test per case. A lock file adds a name, so taking it makes this a feature and spec's to author; the debt shape states the race.
-
-**Cost while deferred:** a reader can parse a torn record, a read-only `.git` probes the network on every read against a stated once-per-interval bound, and an uninstall that reports clean can leave a file behind. Filed 2026-10-04 to the gap inbox by installer-notice-attest-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the concurrency half chooses between a new lock and a narrowed SPEC, →forward because no ruling is owed. Re-verified by source read: `let _ = std::fs::write(&cache, …)` and `let _ = std::fs::remove_file(cache)`. Owner lookup: `update notice`, `cache`, `atomic`, `remove_file` in this file and the disposed-findings record — none; owner installer/SPEC.md §The update notice, with §uninstall.
-
-### attest-stub-argv-exactness
-
-[cost: event/low] [surface: installer]
-
-the Linux attestation stub in `.github/workflows/gates.yml` compares the verify's flags as the flattened `"$*"`, so the six flags passed as one argument still pass, and its readiness case matches `auth token` alone, accepting any `--hostname` where both bootstraps pass `--hostname github.com`. installer/SPEC.md §Requirements' attestation witness claims a verify whose arguments after the file are not exactly the three flags fails, and any other call fails. The Windows `gh.cmd` stub compares positional arguments and refuses an extra one.
-
-**Deliverable:** the Linux stub comparing the argument count and each argument, the readiness case pinned to `--hostname github.com` in both stubs, and the witness paragraph stating what each stub asserts.
-
-**Cost while deferred:** a bootstrap regression joining the verify flags into one word, or dropping the hostname pin, passes the witness on Linux. Filed 2026-10-04 to the gap inbox by installer-notice-attest-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the change runs only on a pushed `gates` leg, →forward because no ruling is owed. Re-verified by source read: the stub's `[ "$*" = "$want" ]` and its `'auth token'` case. Owner lookup: `stub`, `auth token`, `--hostname` in this file and the disposed-findings record — none; owner installer/SPEC.md §Requirements.
 
 ## Icebox
 
