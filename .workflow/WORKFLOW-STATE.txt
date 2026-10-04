@@ -12,3 +12,4 @@ installer-trust-pass build aedaa64d 2026-10-04 2bae57ae
 installer-trust-pass build aff85e5a 2026-10-04 59677a46
 installer-trust-pass build a685345b 2026-10-04 d11ab620
 installer-trust-pass validate ace6d718 2026-10-04 ed1292b1
+installer-trust-pass close afb65c6f 2026-10-04 8fac0470
