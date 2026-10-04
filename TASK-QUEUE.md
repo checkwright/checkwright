@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### spec-pointer-bare-section-mark
-
-`check-spec-pointer`'s unqualified prose-citation form reads a bare `§N` (or `§2.1`) in adopter prose as a heading citation and reds "§heading in no governed file", under `## 3. Terms` as under `## Terms`, for documents that use `§` as a section-number mark. Operator direction 2026-10-01, lead-relayed (not a `/consult` ruling): state the limit, file the narrowing.
-
-How many adopter documents carry a bare `§N` outside legal-style text is unmeasured: no adopter corpus is in reach, and the narrowing does not turn on the count.
-
-**Deliverable:** a fragment opening with a digit, a bare section number, never fires in the unqualified form (native/src/gates/spec_pointer.rs, the fragment-opening rule), with a `good/` fixture line and canon-kit/SPEC.md §check-spec-pointer's carve-out sentence and honest limit updated.
-
-**Cost while deferred:** a `prose` or `full` install over a document citing `§3` reds a defect-class gate on content that is not wrong, which the install-disposition amendment states as the gate's honest limit. Filed 2026-10-01 at install-disposition-pass's align: the probe reddened both heading shapes; →fix fails because narrowing changes the gate's asserted behavior, an envelope change. Promoted 2026-10-04 at canon-kit-reach-pass' scope as debt, the narrowing settled by the direction above; re-verified: the fragment-opening rule still admits a digit. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling).
-
 ### canon-kit-claim-brevity
 
 canon-kit/SPEC.md's claim-gate sections, §check-provenance-seam through §check-surface-duplication, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): about 9.5k of the file's 40.1k words by `wc -w` at this scope, and 55 of its 96 `check-prose-bounds` findings with the ceiling knob emptied.
@@ -1234,4 +1224,5 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 
 - crates-reservation-republish
 - manifest-finder-untracked-walk
+- spec-pointer-bare-section-mark
 

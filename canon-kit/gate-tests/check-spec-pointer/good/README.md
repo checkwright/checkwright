@@ -19,3 +19,5 @@ none of them. So does a link-wrapped citation,
 [the widget spec](SPEC-widget.md) §The widget contract, and a quoted path,
 `SPEC-widget.md` §The widget contract. Prose about the grammar writes the
 placeholder §<heading>, and a `§` quoted inside a code span is the mark itself.
+A document numbering its sections writes §3 or §2.1 as a section-number mark,
+which no heading here carries and which never fires.

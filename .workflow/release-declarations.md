@@ -25,6 +25,7 @@
 - `check-tree-terms` — a file is self-exempt when it is a pattern file the two pattern knobs resolve to or the kit's starter roster, rather than any name beginning `msg-patterns`, so a tracked `msg-patterns` file no knob names is scanned and reds on a banned shape in it. Point the knob at each roster you keep, or remove the stray file.
 - `check-portability-floor` — the same change over `GATE_SDK_PORTABILITY_PATTERNS` and the `portability-patterns` prefix. Nothing to do unless a stray file of that name sits in your corpus.
 - `check-md-refs`, `check-manifest-temporal` and every other gate reading canon-kit's manifest set — inside a git work tree the set is now git's tracked set, the index included, so an untracked `README.md`, `CLAUDE.md` or `SPEC.md`, a vendored library's or a generated one, is no longer graded. Nothing to do; stage a new manifest file before the battery can grade it.
+- `check-spec-pointer` and `check-citation-link` — a `§` with no path whose text opens with a digit (`§3`, `§2.1`) is a section-number mark, no longer a section citation, so a document numbering its sections stops redding. Nothing to do; cite a heading that opens with a digit by its path to keep it checked.
 - `check-enforcement-fresh` — reds a committed enforcement page linking `<kit>/index.md` for a kit whose page your tree does not track, since the emitter now writes that kit as plain text. Regenerate with `--emit enforcement-map`.
 
 ## Knob changes

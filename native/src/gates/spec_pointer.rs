@@ -486,9 +486,9 @@ pub(crate) fn sites(joined: &str) -> Vec<Site> {
         let link = if path.is_none() { link_target(b, gap) } else { None };
         // spec: canon-kit/SPEC.md §check-spec-pointer — a fragment not opening with a letter, a
         // digit or a backtick is a placeholder or the mark itself, and so is a § quoted inside a
-        // code span
+        // code span; with no path, one opening with a digit is a section-number mark
         let in_span = b[..at].iter().filter(|&&c| c == b'`').count() % 2 == 1;
-        let bare = !in_span && opens_heading(&frag);
+        let bare = !in_span && opens_heading(&frag) && !frag.starts_with(|c: char| c.is_ascii_digit());
         out.push(Site {
             at,
             frag,
