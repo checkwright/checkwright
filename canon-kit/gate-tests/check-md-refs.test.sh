@@ -18,6 +18,9 @@
 #    check-spec-dod-singleton.test.sh carries the same prune's canonical-spec
 #    half; these cases are its mirror on the README finder.
 #
+# 3. The finder's tracked set. Its two cases differ only in whether one README
+#    is in the index, over the same tree, so they share the prune tree above.
+#
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
@@ -126,9 +129,22 @@ prune_case "prune-default" 0 "clean (1 doc(s)" GATE_SDK_KIT_DIRS=vendored-kit
 prune_case "scan-kit-roots" 1 "vendored-kit/README.md" \
     GATE_SDK_KIT_DIRS=vendored-kit CANON_KIT_SCAN_KIT_ROOTS=1
 
+# An adopter's untracked vendored README links a file that is absent. The
+# finder keeps git's tracked set, so the file is never scanned and the doc
+# count stays at the consumer's one.
+mkdir -p "$PRUNE_SB/vendor/lib"
+printf '# lib\n\nSee [the notes](absent.md).\n' >"$PRUNE_SB/vendor/lib/README.md"
+prune_case "untracked-unscanned" 0 "clean (1 doc(s)" GATE_SDK_KIT_DIRS=vendored-kit
+
+# Staged, the same README is the consumer's to answer for: the index is what a
+# commit carries, so the dangle reds. A finder reading HEAD rather than the
+# index passes the case above and fails this one.
+git -C "$PRUNE_SB" add vendor/lib/README.md
+prune_case "staged-scanned" 1 "vendor/lib/README.md" GATE_SDK_KIT_DIRS=vendored-kit
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-md-refs.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-md-refs.test.sh: clean (self-repo pass: git@/https identity, dangle, bad anchor, no-origin skip, ref knob; README-finder kit-root prune: default + knob re-include — 8 cases)"
+echo "check-md-refs.test.sh: clean (self-repo pass: git@/https identity, dangle, bad anchor, no-origin skip, ref knob; README-finder kit-root prune: default + knob re-include; tracked set: untracked unscanned, staged scanned — 10 cases)"
 exit 0

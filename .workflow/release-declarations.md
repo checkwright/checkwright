@@ -24,6 +24,7 @@
 - `check-template-copy-parity` — pairs each kit root's `templates/*.sh` (the roots `GATE_SDK_KIT_DIRS` names or the derivation finds) rather than `<root>/*/templates/*.sh`, so a subdirectory vendoring's copies are now compared and a divergent one reds; a top-level directory with templates and no kit marker is no longer paired. Re-copy the template, or declare `# copy-divergence: <reason>` per finding.
 - `check-tree-terms` — a file is self-exempt when it is a pattern file the two pattern knobs resolve to or the kit's starter roster, rather than any name beginning `msg-patterns`, so a tracked `msg-patterns` file no knob names is scanned and reds on a banned shape in it. Point the knob at each roster you keep, or remove the stray file.
 - `check-portability-floor` — the same change over `GATE_SDK_PORTABILITY_PATTERNS` and the `portability-patterns` prefix. Nothing to do unless a stray file of that name sits in your corpus.
+- `check-md-refs`, `check-manifest-temporal` and every other gate reading canon-kit's manifest set — inside a git work tree the set is now git's tracked set, the index included, so an untracked `README.md`, `CLAUDE.md` or `SPEC.md`, a vendored library's or a generated one, is no longer graded. Nothing to do; stage a new manifest file before the battery can grade it.
 - `check-enforcement-fresh` — reds a committed enforcement page linking `<kit>/index.md` for a kit whose page your tree does not track, since the emitter now writes that kit as plain text. Regenerate with `--emit enforcement-map`.
 
 ## Knob changes

@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### manifest-finder-untracked-walk
-
-canon-kit/SPEC.md §check-md-refs says the scan runs over tracked sources only, but the shared manifest-set finder (`native/src/spec.rs`, `manifest_files`) walks the disk, so an untracked `vendor/lib/README.md` in an adopter tree is scanned: a link to an absent file reds `check-md-refs`, and a 'Previously' line reds `check-manifest-temporal`. Every manifest-set gate shares the finder.
-
-**Deliverable:** the finder takes the tracked set, or each member's SPEC states the walk — a per-member call, since some fixture cases run outside a git repository — with a fixture case carrying an untracked manifest.
-
-**Cost while deferred:** an adopter's untracked vendored or generated READMEs red defect-class gates on content they never authored. Filed 2026-10-01 to the gap inbox at install-disposition-pass' spec; promoted at its close: →fix fails because the finder feeds every manifest-set member and the tracked-versus-walk choice is per member, →forward because the SPEC already rules md-refs' side. Re-verified: a nested probe repo with a committed `CLAUDE.md` and an untracked `vendor/lib/README.md` linking `absent.md` turns `check-md-refs` from clean to exit 1. Owner lookup: `manifest set`, `find_named`, `untracked.*README`, `tracked sources`, `tracked set` in this file — none; owner canon-kit/SPEC.md §The shared spec adapters. Promoted 2026-10-04 at canon-kit-reach-pass' scope as debt, the per-member call stated in each member's own section and adding no name; re-verified: `manifest_files` still walks the disk through `walk::find_named`. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling).
-
 ### spec-pointer-bare-section-mark
 
 `check-spec-pointer`'s unqualified prose-citation form reads a bare `§N` (or `§2.1`) in adopter prose as a heading citation and reds "§heading in no governed file", under `## 3. Terms` as under `## Terms`, for documents that use `§` as a section-number mark. Operator direction 2026-10-01, lead-relayed (not a `/consult` ruling): state the limit, file the narrowing.
@@ -1241,4 +1233,5 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 ## Done
 
 - crates-reservation-republish
+- manifest-finder-untracked-walk
 

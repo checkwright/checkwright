@@ -485,6 +485,10 @@ pub fn toplevel_opt() -> Result<Option<String>, String> {
     toplevel_args(&[])
 }
 
+pub fn toplevel_in_opt(dir: &str) -> Result<Option<String>, String> {
+    toplevel_args(&["-C", dir])
+}
+
 fn toplevel_args(anchor: &[&str]) -> Result<Option<String>, String> {
     let mut args: Vec<&str> = anchor.to_vec();
     args.extend_from_slice(&["rev-parse", "--show-toplevel"]);

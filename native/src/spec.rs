@@ -219,7 +219,29 @@ pub fn manifest_files(root: &str) -> Result<Vec<PathBuf>, String> {
             }
         }
     }
-    Ok(out)
+    tracked_only(root, out)
+}
+
+// spec: canon-kit/SPEC.md §The shared spec adapters — the manifest set is the tracked set inside a
+// work tree and the walk outside one
+fn tracked_only(root: &str, files: Vec<PathBuf>) -> Result<Vec<PathBuf>, String> {
+    if walk::toplevel_in_opt(root)?.is_none() {
+        return Ok(files);
+    }
+    let listed = crate::proc::run(&programs::GIT, &["-C", root, "ls-files", "-z"])?;
+    let raw = match listed.stdout() {
+        Some(o) => String::from_utf8_lossy(o).into_owned(),
+        None => return Err(format!("git ls-files failed in {} — the tracked set is unknown", root)),
+    };
+    let tracked: std::collections::HashSet<&str> = raw.split('\0').filter(|s| !s.is_empty()).collect();
+    Ok(files
+        .into_iter()
+        .filter(|f| {
+            let p = f.display().to_string();
+            let rel = strip_dot_slash(walk::rel_under(root, &p).unwrap_or(&p)).replace('\\', "/");
+            tracked.contains(rel.as_str())
+        })
+        .collect())
 }
 
 // spec: canon-kit/SPEC.md §The shared spec adapters — `_spec_comment_surface`: the governed-source corpus
