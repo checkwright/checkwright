@@ -38,16 +38,6 @@ the binary still names or spawns the bash front end where an adopter meets it: t
 
 **Cost while deferred:** an adopter reading `--help` or the demo meets a command their install may not carry. Filed 2026-10-02 to the gap inbox at gate-sdk-value-pass' build; promoted at its close: →fix fails because the knob default is a behaviour change across two front ends, →forward because no ruling is owed. Re-verified: grep finds all four sites. `hook-emit-remedy-door` scoped its fix to the hook and emit trees; this is DISTINCT, not a recurrence. Owner lookup: `run-gates.sh`, `DOOR_ROOTS` in this file — none; owner guard-kit/SPEC.md §check-door-binding, with gate-sdk/SPEC.md §run-gates.
 
-### spec-mark-symlink-ascent
-
-`repository_mark` (native/src/spec.rs) ascends the lexically absolutized scan root for a `.git` entry and never resolves a symlink, while git discovers through the physical directory. A scan root whose path traverses a symlink into a repository git refuses (a `safe.directory` refusal, broken metadata) finds no mark and is walked unfiltered, grading untracked manifests with no notice, against canon-kit/SPEC.md §The shared spec adapters, where a marked root git refuses exits 2. The process working directory is physical, so only a root argument spelled through a symlink reaches it.
-
-**Deliverable:** the ascent finding the mark git's discovery finds, with a crate test over a symlinked root into a refused repository.
-
-**Order:** after `toplevel-refusal-fail-open`, whose amendment moves the mark into walk.rs; the fix lands there.
-
-**Cost while deferred:** a canon-kit gate given such a root grades untracked files silently. Filed 2026-10-04 to the gap inbox by canon-kit-tail-installer-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because it is crate work with a new test. Re-verified by source read: `abs` is `walk::abs_against` over `cwd()`, lexical, and the ascent is `Path::ancestors`; the end-to-end repro was not re-run. Owner lookup: `repository_mark`, `symlink`, `physical` in this file — `toplevel-refusal-fail-open`, DISTINCT (its git answer is folded, here the mark itself misses), and the icebox's walk-entry-model-unstated, DISTINCT (a walk's entries, not the root's ascent); owner canon-kit/SPEC.md §The shared spec adapters.
-
 ### queue-kit-format-brevity
 
 queue-kit/SPEC.md's format half, which no brevity slice has passed: §The queue format with §Queue and backlog, §The icebox tier, §<slug> and §The tag algebra, plus §Layout and configuration, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): about 9.2k of the file's 36k words at this scope, and 52 of its 94 `check-prose-bounds` findings with the ceiling knob emptied.
@@ -1221,4 +1211,5 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 ## Done
 
 - toplevel-refusal-fail-open
+- spec-mark-symlink-ascent
 
