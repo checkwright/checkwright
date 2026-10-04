@@ -18,17 +18,7 @@ the primary install channel carries no build provenance: the Release tarball shi
 
 **Cost while deferred:** the channel most adopters take is the one with no provenance, on a project whose pitch is verified claims. Filed 2026-07-26; returned from the icebox 2026-09-25 by consult as a trust gap on a public claim. Its observation half, a published Release verifying, split 2026-10-04 at scope to [tarball-attestation-observed](#tarball-attestation-observed), since only a release run produces it.
 
-**Push need (2026-10-04, inside the budget):** one mid-iteration push, for the PowerShell installer's verify leg that no local run reaches; [update-availability-notice](#update-availability-notice) rides the same push if its design lands a Windows-only leg.
-
-### update-availability-notice
-
-[spec: SPEC-update-notice.md]
-
-nothing tells an installed consumer a newer Checkwright release exists, so an upgrade happens only when the adopter thinks to run `update`. Operator direction 2026-09-29, lead-relayed (not a ruling): add one. The lead's proposed shape, for spec to challenge: an advisory line from the session-context hook (every profile and agent session) and the same reading in `doctor`; the probe `git ls-remote --tags` on the upstream (git is the one floor), compared with the manifest's recorded version, cached in gitignored scratch under a consumer-selectable interval set with off among it, bounded by a timeout, silent offline or on failure. The operator's seeded default is weekly; the probe discloses the adopter's IP to the host each interval, so `init` states it is on and how to turn it off.
-
-**Deliverable:** that notice, or spec's challenge to its shape; the zero-code interim is a docs pointer to `npm outdated` and GitHub release watching.
-
-**Cost while deferred:** an adopter runs a stale release unknowingly, paid at each release. Filed 2026-09-29 to the gap inbox by preview-readiness' lead; promoted 2026-09-30 at its close: →fix fails because the notice is new mechanism with a knob, →forward because the direction is given. Re-verified: no `ls-remote` probe or newer-release notice in installer/SPEC.md, context-kit/SPEC.md or `native/src`. Owner lookup: `update notice`, `newer release`, `outdated` in this file — none; owner installer/SPEC.md §The upgrade contract, with context-kit/SPEC.md for the hook. Surface also context-kit.
+**Push need (2026-10-04, inside the budget):** one mid-iteration push, for the PowerShell installer's verify leg that no local run reaches; `update-availability-notice` rides the same push if its design lands a Windows-only leg.
 
 ### release-note-section-set-derivation
 
@@ -1254,4 +1244,5 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 - foreign-resume-session-edges
 - delegation-kit-tail-brevity
 - kept-gate-disposition-report
+- update-availability-notice
 
