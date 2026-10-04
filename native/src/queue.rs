@@ -1105,8 +1105,6 @@ mod tests {
         assert_eq!(blocked_by("[blocked-by: ] [blocked-by: d]"), vec!["d"]);
     }
 
-    // spec: queue-kit/SPEC.md §The queue format — the counted unit is the column-0 bullet, so an
-    // indented sub-task bullet is body to every reader of this adapter
     #[test]
     fn a_top_level_bullet_is_the_column_zero_one() {
         assert!(is_top_level_bullet("- **a** — x"));

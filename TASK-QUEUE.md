@@ -226,7 +226,7 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 **The column axis was witnessed three times before the wrap limit left.** 2026-09-01: `/spec` blocked — `native-gate-port-remaining-corpus`'s lead line could not hold two `spec:` refs under 100 columns. 2026-09-03: the wall forced minting a second host, `drift-kit-bin-port-residue`, for an encoding reason. 2026-09-04: four cuts wanted four refs against a base that held one; four per-cut entries taken instead.
 
-**The gain is the ENCODING, not the list, and the entry says so because the format already has the list.** queue-kit/SPEC.md §The tag algebra, the `recurrence:` declaration paragraph, defines `recurrence: <slug> <YYYY-MM-DD> [<YYYY-MM-DD>…]`, multiple dates on one line today. **A second interaction dissolves with it.** queue-kit/SPEC.md §The tag algebra, the self-naming-slug paragraph, grounds the field partly in `check-queue-hygiene` rejecting exact-duplicate lines, naming same-day recurrence on two entries as "exactly the case the declaration exists to record". Under a minute-bearing stamp those two lines stop colliding at all, so one of that field's two stated grounds is retired by the encoding rather than argued against.
+**The gain is the ENCODING, not the list:** the recurrence field is already an array (queue-kit/SPEC.md §The tag algebra), and the duplicate axis exempts tag lines (§check-queue-hygiene), so only same-day discrimination is left to buy.
 
 **The costs, probed rather than listed, because a reader meeting this cold should price it.** Date stamps span `recurrence:` and `ruled:` declarations, filed-prose provenance lines, gap-inbox bullets, survey-record headings and WORKFLOW-STATE stamps; the evidence manifest's trailing date field is OPTIONAL and so is not a cost, correcting the relayed picture. FOUR crate gates carry a date predicate (`stage_evidence.rs`, `stage_entry.rs`, `gap_inbox_neutrality.rs`, `evidence_manifest.rs`, the first two spelling their own `is_date`), and SEVEN shell tools stamp `date +%F` outside fixtures and smoke, none of which stamps a time today. `YY` also drops the century, a deliberate trade rather than an oversight to find later.
 
@@ -495,6 +495,26 @@ the native Windows install-smoke legs run every `--installer-smoke` arm serially
 **Deliverable:** the pwsh legs' arms split across parallel matrix jobs, or the arm roster partitioned per leg, so no one leg holds the run; the native Windows leg's paragraph in installer/SPEC.md §The consumer smoke states the split.
 
 **Cost while deferred:** every push waits about 14 minutes on one leg, and a close spends one to two pushes. Filed 2026-10-04 to the gap inbox by canon-kit-tail-installer-pass' lead on an operator direction to file it as a speed-up; promoted at its close: →fix fails because the split needs a push to witness, →forward because the direction is given. Re-verified: the run's per-job and per-step timings. Owner lookup: install-smoke, `pwsh`, `long pole` in this file — [install-smoke-sh-matrix](#install-smoke-sh-matrix), DISTINCT (unix legs' YAML duplication, not wall-clock); owner installer/SPEC.md §The consumer smoke.
+
+### nested-broken-repo-toplevel
+
+[cost: event/low] [surface: native]
+
+git's discovery skips a nested repository whose metadata is broken (an invalid `HEAD`) and answers `rev-parse --show-toplevel` with the enclosing repository's toplevel at exit 0, so the crate's crosser and canon-kit's tracked-set finder grade the inner tree as the outer repository's, its files untracked there and silently dropped.
+
+**Deliverable:** the crosser detects a `.git` entry between the probed directory and the toplevel git answered and refuses with that cause, a test per shape (broken inner `HEAD`, valid inner repository), and gate-sdk/SPEC.md §The crate's crosser stating the refusal.
+
+**Cost while deferred:** a broken nested checkout reads as an ignored subdirectory with no notice. Filed 2026-10-04 to the gap inbox by queue-kit-format-native-pass' spec; promoted at its close: →fix fails because the detection is new crosser mechanism with a refusal to design, →forward because no ruling is owed. Re-verified on git 2.55: an inner repository with a garbage `HEAD` answers the outer toplevel, exit 0. Owner lookup: `nested`, `enclosing`, `broken metadata` in this file — none; toplevel-refusal-fail-open, done, classified a non-zero answer, DISTINCT. Owner gate-sdk/SPEC.md §The crate's crosser.
+
+### repo-probe-refusal-blind
+
+[cost: event/low] [surface: native]
+
+repository probes that bypass the crate's crosser read a repository git refuses (`safe.directory`, broken metadata) as no repository: the `rev-parse --git-dir` and `--is-inside-work-tree` probes in `native/src/gates/lesson_disposition.rs`, `gates/task_conservation.rs`, `gates/survey_record.rs`, `emit/install_lifecycle.rs`, `emit/enter_stage.rs` and `queue.rs`, and both front ends' `not inside a git repository` refusal, which names the wrong cause.
+
+**Deliverable:** each probe routed through the crosser's refusal classification or given its own, a refused-repository test per gate that would otherwise pass, and the front ends naming git's refusal.
+
+**Cost while deferred:** `check-lesson-disposition` and `check-task-conservation` pass clean in a refused repository through the binary door. Filed 2026-10-04 to the gap inbox by queue-kit-format-native-pass' spec caller survey; promoted at its close: →fix fails because the sweep spans six modules and two front ends with a test each, →forward because no ruling is owed. Re-verified by grep: every cited probe present, `queue.rs`'s at a moved line. Owner lookup: `safe.directory`, `--git-dir`, `is-inside-work-tree` in this file — none; toplevel-refusal-fail-open, done, re-read only `walk::toplevel*` callers, DISTINCT; nested-broken-repo-toplevel, DISTINCT (git answers a wrong toplevel). Owner gate-sdk/SPEC.md §The crate's crosser.
 
 ## Icebox
 
