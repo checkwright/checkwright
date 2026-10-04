@@ -10,24 +10,6 @@
 
 ## Technical Debt
 
-### update-notice-probe-contract
-
-the update notice's probe and cache break four stated properties. (1) installer/SPEC.md §The update notice says a failed probe writes nothing so the next read probes again, and its honest limit says the upstream sees the adopter at most once per interval; `native/src/emit/update_notice.rs` records no failed attempt, so an unreachable upstream is probed at every bare `doctor` and every session start. (2) The `checkwright-update-check` line holds a time and a version and no upstream, so a changed `GATE_SDK_UPDATE_UPSTREAM`, or worktrees of one common dir under different upstreams, read another upstream's version and skip the probe for up to an interval. (3) `run_bounded_capture` in `native/src/proc.rs` kills the spawned git, and `git ls-remote` over https runs a remote helper, and any credential helper, that may outlive it, so network activity can run past `GATE_SDK_UPDATE_TIMEOUT`; probed 2026-10-04 at scope: a `git ls-remote` over https to an unroutable host, its git alone killed at 3s, left an intermediate git and its `git-remote-http` alive and reparented. (4) `uninstall` leaves the cache by design, a write path with no reclaim.
-
-**Deliverable:** the attempt recorded or the limit restated, the cache keyed on its upstream, the bound extended to the process tree or stated as delegation-kit's foreign run states its kill, and the cache reclaimed by `uninstall` or its orphan stated as an honest limit; §The update notice and the module's tests updated.
-
-**Cost while deferred:** where the upstream is unreachable, every session start and bare `doctor` makes an outbound attempt and can wait up to the timeout; the notice is unreleased, so the next release cut publishes it as is. Filed 2026-10-04 to the gap inbox as four bullets by installer-trust-pass' close, its second-vendor review and runtime-artifact check; promoted together 2026-10-04 at the next iteration's scope, all four being one section's cache and probe contract in one module: →fix fails because recording, keying and reclaiming each change stated behavior, →forward because no ruling is owed. Re-verified: the cache is written only after a successful probe, its line has two fields, and the SPEC's `uninstall` sentence. Owner lookup: `update notice`, `update-check`, `UPDATE_` in this file — [installer-smoke-live-upstream](#installer-smoke-live-upstream), DISTINCT (the smoke's own probes; reshaped, since a recorded attempt cuts them to one per interval); owner installer/SPEC.md §The update notice.
-
-### install-attestation-binding
-
-the one-line installers' attestation check binds the publisher, not the release, and downgrades silently at readiness. `docs/install.sh` and `docs/install.ps1` run `gh attestation verify` with `--repo` and `--signer-workflow` only, so an older attested tarball served under a newer version's name, its digest matching, passes; `gh` offers `--source-ref` and `--source-digest` to bind the tag. Both scripts also read any failing `gh attestation verify --help` or `gh auth status` as no verifier and proceed digest-only, so an auth or API outage at readiness skips a check a failure during verify would refuse on. installer/SPEC.md §The dependency boundary states the four outcomes and neither limit, and the CI stub `gh` accepts every call, so no witness sees either.
-
-**Deliverable:** the verify bound to the release's tag in both scripts, the stub asserting the flags it receives, and the readiness downgrade narrowed to an absent or signed-out `gh` or stated as an honest limit; §The dependency boundary updated.
-
-**Push need (2026-10-04, inside the budget):** one mid-iteration push — the stub legs in `.github/workflows/gates.yml` and `docs/install.ps1` run on no local host; a Windows process-tree bound under [update-notice-probe-contract](#update-notice-probe-contract) rides the same push.
-
-**Cost while deferred:** once an attested release is published, every install accepts another release's attested tarball, and a readiness outage drops the check unannounced; the pinned release predates the scripts' attestation floor, so the cost starts at the next cut. Filed 2026-10-04 to the gap inbox as two bullets by installer-trust-pass' close, its second-vendor review; promoted together 2026-10-04 at the next iteration's scope, both being the scripts' verify contract: →fix fails because a bound verify refuses what passes today, an envelope change, →forward because no ruling is owed. Re-verified: both flags and the readiness chain in both scripts, and `gh attestation verify --help` lists `--source-ref` and `--source-digest`. Owner lookup: `attestation`, `source-ref`, `signer-workflow` in this file — [tarball-attestation-observed](#tarball-attestation-observed), DISTINCT (observes the step; reshaped, its observation then exercising the bound verify), and [hosted-attestation-service](#hosted-attestation-service), DISTINCT; owner installer/SPEC.md §The dependency boundary.
-
 ### installer-smoke-live-upstream
 
 the installer smoke's scratch consumers probe the real upstream. `init` writes `GATE_SDK_UPDATE_UPSTREAM` into the consumer's seam knobs from the package's `repository.url`, and the scrub (installer/SPEC.md §The consumer smoke) strips only inherited environment, so every bare `doctor` in a fresh consumer runs `git ls-remote` against the project's public repository, bounded by `GATE_SDK_UPDATE_TIMEOUT`. No leg asserts the `latest` line.
@@ -1229,4 +1211,7 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 Ported gate and emit modules carry spec: comments citing a section for a literal or a port note the section does not state, so a reader following the pointer finds no support for it; a crate-wide sweep would retag, delete or relocate each, and a new instance returns the entry.
 
 ## Done
+
+- update-notice-probe-contract
+- install-attestation-binding
 
