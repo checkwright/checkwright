@@ -354,8 +354,8 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
     // spec: installer/SPEC.md §uninstall — either disposition leaves no `version`, so the update
     // notice's cache answers nothing here any more and is reclaimed; a sibling worktree's install
     // that shared it probes once to rewrite it
-    if let Some(cache) = crate::emit::update_notice::cache_path(&root) {
-        let _ = std::fs::remove_file(cache);
+    if let Some(left) = crate::emit::update_notice::cache_path(&root).and_then(|c| reclaim_cache(&c)) {
+        println!("\n{}", left);
     }
     if keep.is_empty() {
         std::fs::remove_file(&lock_path)
@@ -452,6 +452,20 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
     Ok(0)
 }
 
+// spec: installer/SPEC.md §uninstall — a cache already gone is no failure; one that cannot be
+// deleted is reported, never a refusal, since the removal it trails has already run
+fn reclaim_cache(cache: &std::path::Path) -> Option<String> {
+    match std::fs::remove_file(cache) {
+        Ok(()) => None,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
+        Err(e) => Some(format!(
+            "could not delete the update check's cache, {}: {}\n  help: it is untracked and answers nothing here any more, so delete it yourself.",
+            cache.display(),
+            e
+        )),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -468,6 +482,25 @@ mod tests {
         assert_eq!(lines.len(), 2);
         assert!(lines[0].contains("checkwright.lock") && lines[0].ends_with("1 file(s)"));
         assert!(lines[1].contains("gate-sdk/") && lines[1].ends_with("2 file(s)"));
+    }
+
+    // spec: installer/SPEC.md §uninstall — a deleted or absent cache is silent, and one that cannot
+    // be deleted is reported with its path
+    #[test]
+    fn a_cache_that_cannot_be_deleted_is_reported() {
+        let dir = std::env::temp_dir().join(format!("cw-uninstall-cache-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("scratch");
+        let cache = dir.join(crate::emit::update_notice::CACHE_FILE);
+        std::fs::write(&cache, "1 1.0.0 u\n").expect("cache");
+        assert_eq!(reclaim_cache(&cache), None);
+        assert!(!cache.exists(), "the cache survived its deletion");
+        assert_eq!(reclaim_cache(&cache), None, "an absent cache was reported");
+        std::fs::create_dir_all(cache.join("held")).expect("an undeletable cache");
+        let left = reclaim_cache(&cache).expect("a failed deletion was not reported");
+        assert!(left.starts_with("could not delete the update check's cache, "), "{}", left);
+        assert!(left.contains(&cache.display().to_string()), "{}", left);
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     fn row(p: &str, recorded: &str, now: Option<&str>) -> Row {

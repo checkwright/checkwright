@@ -1,5 +1,6 @@
 // spec: installer/SPEC.md §The update notice — one line when the upstream's newest release tag is
-// above the release the lock records, probed at most once per interval, silent on any failure
+// above the release the lock records, probed once per interval where its record stores, silent on
+// any failure
 // spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Emit`: its exit grammar is the collapse, 0
 // always and 2 for a usage error, and it declares the three knobs it reads
 use crate::installer::lock;
@@ -121,7 +122,9 @@ pub fn reading(root: &Path, s: &Settings, now: u64) -> Reading {
         Some(r) => r.newest,
         None => {
             let probed = probe(&s.upstream, s.timeout);
-            let _ = std::fs::write(&cache, record(now, probed.as_deref(), &s.upstream));
+            // spec: installer/SPEC.md §The update notice — a record that cannot be stored is dropped
+            // as silently as any other failure; the probe on every read it costs is a stated limit
+            let _ = store(&cache, &record(now, probed.as_deref(), &s.upstream));
             probed
         }
     };
@@ -148,6 +151,24 @@ const FAILED: &str = "-";
 
 fn record(at: u64, newest: Option<&str>, upstream: &str) -> String {
     format!("{} {} {}\n", at, newest.unwrap_or(FAILED), upstream)
+}
+
+static STORE_SEQ: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
+// spec: installer/SPEC.md §The update notice — the record is written whole: a sibling temporary
+// file renamed over it, so a concurrent read meets the old record or the new, never a torn one
+fn store(cache: &Path, text: &str) -> std::io::Result<()> {
+    let tmp = cache.with_file_name(format!(
+        "{}.{}.{}.tmp",
+        CACHE_FILE,
+        std::process::id(),
+        STORE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+    ));
+    let stored = std::fs::write(&tmp, text).and_then(|()| std::fs::rename(&tmp, cache));
+    if stored.is_err() {
+        let _ = std::fs::remove_file(&tmp);
+    }
+    stored
 }
 
 fn parse_cache(text: &str) -> Option<Record> {
@@ -327,5 +348,78 @@ mod tests {
         for d in [up, bare, tree, lonely] {
             let _ = std::fs::remove_dir_all(&d);
         }
+    }
+
+    fn entries(dir: &Path) -> Vec<String> {
+        crate::walk::list_dir(dir).expect("scratch readable").into_iter().map(|(name, _)| name).collect()
+    }
+
+    // spec: installer/SPEC.md §The update notice — a store replaces the record whole and leaves no
+    // temporary beside it, and a store that fails leaves none either
+    #[test]
+    fn a_store_replaces_the_record_and_leaves_no_temporary() {
+        let dir = scratch("store");
+        let cache = dir.join(CACHE_FILE);
+        std::fs::write(&cache, "1 1.0.0 old\n").expect("old record");
+        store(&cache, &record(2, Some("2.0.0"), "new")).expect("store");
+        assert_eq!(std::fs::read_to_string(&cache).expect("record"), "2 2.0.0 new\n");
+        assert_eq!(entries(&dir), vec![CACHE_FILE.to_string()]);
+
+        let blocked = scratch("store-blocked");
+        let cache = blocked.join(CACHE_FILE);
+        std::fs::create_dir_all(cache.join("held")).expect("a directory where the record goes");
+        assert!(store(&cache, &record(3, None, "u")).is_err(), "a record stored over a directory");
+        assert_eq!(entries(&blocked), vec![CACHE_FILE.to_string()], "a failed store left its temporary");
+        for d in [dir, blocked] {
+            let _ = std::fs::remove_dir_all(&d);
+        }
+    }
+
+    // spec: installer/SPEC.md §The update notice — a record that cannot be stored still answers its
+    // read, and the next read probes again rather than reading a record
+    #[test]
+    fn an_unstorable_record_probes_on_every_read() {
+        let up = scratch("unstorable-upstream");
+        git(&up, &["init", "-q"]);
+        git(&up, &["-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--allow-empty", "-m", "seed"]);
+        git(&up, &["tag", "v9.0.0"]);
+        let up_s = up.to_string_lossy().into_owned();
+        let tree = scratch("unstorable");
+        installed_tree(&tree, "1.0.0");
+        std::fs::create_dir_all(tree.join(".git").join(CACHE_FILE).join("held")).expect("block the record");
+        let first = line(&reading(&tree, &settings("weekly", &up_s), 1_000));
+        assert!(first.starts_with("checkwright v9.0.0 is available"), "{}", first);
+        let _ = std::fs::remove_dir_all(&up);
+        assert_eq!(reading(&tree, &settings("weekly", &up_s), 1_001), Reading::Unknown, "the second read did not probe");
+        let _ = std::fs::remove_dir_all(&tree);
+    }
+
+    // spec: installer/SPEC.md §The update notice — stores racing a reader never show it a torn record
+    #[test]
+    fn a_concurrent_reader_never_meets_a_torn_record() {
+        let dir = scratch("race");
+        let cache = dir.join(CACHE_FILE);
+        let upstream = "u".repeat(4096);
+        store(&cache, &record(0, Some("1.0.0"), &upstream)).expect("seed record");
+        let parsed = std::thread::scope(|s| {
+            for w in 0..2u64 {
+                let (cache, upstream) = (&cache, &upstream);
+                s.spawn(move || {
+                    for i in 0..300u64 {
+                        let _ = store(cache, &record(w * 1_000 + i, Some("2.0.0"), upstream));
+                    }
+                });
+            }
+            let mut parsed = 0;
+            for _ in 0..2_000 {
+                if let Ok(text) = std::fs::read_to_string(&cache) {
+                    assert!(parse_cache(&text).is_some(), "a reader met a torn record of {} bytes", text.len());
+                    parsed += 1;
+                }
+            }
+            parsed
+        });
+        assert!(parsed > 0, "no read succeeded, so the race proves nothing");
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }
