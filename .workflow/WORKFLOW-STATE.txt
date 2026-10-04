@@ -5,3 +5,4 @@
 ---
 
 drift-kit-tail-crosser-pass scope a4d99e8d 2026-10-05 6cbce5dfc
+drift-kit-tail-crosser-pass spec abc1d0a6 2026-10-05 46df0b05e
