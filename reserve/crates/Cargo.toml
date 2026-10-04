@@ -1,6 +1,6 @@
 [package]
 name = "checkwright"
-version = "0.0.0"
+version = "0.0.1"
 edition = "2021"
 description = "Deterministic verification for coding-agent delivery. Checkwright is the verification layer under agent orchestration: spec drift, skipped stages, and unsupported done claims become failing checks before a merge, instead of review findings after one."
 license = "Apache-2.0"
