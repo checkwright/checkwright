@@ -10,28 +10,6 @@
 
 ## Technical Debt
 
-### crosser-anchor-lexical-ascent
-
-the crosser's refusal classifier normalizes its anchor lexically before the physical ascent: `refused_or_absent` in `native/src/walk.rs` calls `abs_against`, whose `normalize_abs` collapses `..` and splits on `\` on every host, before `repository_mark` canonicalizes. A `-C` operand like `<symlink>/..` into a refused repository, or a POSIX directory name carrying a backslash, starts the mark search from the wrong directory and reads as outside a work tree, and `Tracked::at` in `native/src/spec.rs` then walks unfiltered. gate-sdk/SPEC.md §The crate's crosser promises the physical path.
-
-**Deliverable:** the anchor joined without lexical collapse and resolved physically before the mark search, a test per shape (a symlink-then-`..` operand, a backslash-bearing POSIX name).
-
-**Push need (2026-10-04, inside the budget):** the one mid-iteration push, shared with [repo-probe-refusal-blind](#repo-probe-refusal-blind): the anchor's Windows join and `canonicalize` arm runs only in the Windows crate-test legs.
-
-**Cost while deferred:** a refused repository reached through such an operand is graded as no repository and its tree walked unfiltered. Filed 2026-10-04 to the gap inbox by queue-kit-format-native-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the classifier's anchor spans two crosser functions with a test per shape, →forward because no ruling is owed. Re-verified by source read: `refused_or_absent` builds the anchor through `abs_against` before `repository_mark`'s `canonicalize`. Owner lookup: `refused_or_absent`, `abs_against`, `lexical` in this file — none; [repo-probe-refusal-blind](#repo-probe-refusal-blind), DISTINCT (probes that bypass the classifier). Owner gate-sdk/SPEC.md §The crate's crosser.
-
-### repo-probe-refusal-blind
-
-repository probes that bypass the crate's crosser read a repository git refuses (`safe.directory`, broken metadata) as no repository: the `rev-parse --git-dir` and `--is-inside-work-tree` probes in `native/src/gates/lesson_disposition.rs`, `gates/task_conservation.rs`, `gates/survey_record.rs`, `emit/install_lifecycle.rs`, `emit/enter_stage.rs` and `queue.rs`, and both front ends' `not inside a git repository` refusal, which names the wrong cause.
-
-**Deliverable:** each probe routed through the crosser's refusal classification or given its own, a refused-repository test per gate that would otherwise pass, and the front ends naming git's refusal.
-
-**Order:** after [crosser-anchor-lexical-ascent](#crosser-anchor-lexical-ascent), whose fix corrects the classifier's anchor these probes route through.
-
-**Push need (2026-10-04, inside the budget):** the one mid-iteration push, shared with [crosser-anchor-lexical-ascent](#crosser-anchor-lexical-ascent): `gate-sdk/bin/run-gates.ps1`'s refusal runs only on a host carrying pwsh, which no local run has.
-
-**Cost while deferred:** `check-lesson-disposition` and `check-task-conservation` pass clean in a refused repository through the binary door. Filed 2026-10-04 to the gap inbox by queue-kit-format-native-pass' spec caller survey; promoted at its close: →fix fails because the sweep spans six modules and two front ends with a test each, →forward because no ruling is owed. Re-verified by grep: every cited probe present, `queue.rs`'s at a moved line. Owner lookup: `safe.directory`, `--git-dir`, `is-inside-work-tree` in this file — none; toplevel-refusal-fail-open, done, re-read only `walk::toplevel*` callers, DISTINCT; nested-broken-repo-toplevel, DISTINCT (git answers a wrong toplevel). Owner gate-sdk/SPEC.md §The crate's crosser.
-
 ### run-door-subdir-rebind
 
 `EVIDENCE_KIT_RUN_<suite>`'s derived member spells its tests and checks dirs relative to the working directory but takes its door from `GATE_SDK_NATIVE_BIN`'s repository-relative default (`run_members` in `native/src/knobs/evidence_kit.rs`, `host_native_bin` in `knobs/gate_sdk.rs`), so `--run-validate` invoked on the binary from a subdirectory runs a door that does not resolve there. The front end changes to the toplevel first, so only the binary door is exposed, and evidence-kit/SPEC.md §Layout and configuration states the working-directory run without the door's rebinding.
@@ -1221,4 +1199,6 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 ## Done
 
 - nested-broken-repo-toplevel
+- crosser-anchor-lexical-ascent
+- repo-probe-refusal-blind
 
