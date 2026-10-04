@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: drift-kit-tail-crosser-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,40 @@
 ## New Features
 
 ## Technical Debt
+
+### crosser-nested-mark-env
+
+`nested_mark` in `native/src/walk.rs` refuses a valid repository under `GIT_WORK_TREE`: with `GIT_DIR` unset and `GIT_WORK_TREE` naming a directory above the discovered repository, git answers that directory as toplevel and the repository's own directory as prefix at exit 0, so the scan finds the repository's `.git` and every crosser caller exits 2. Its other exception, no mark under a non-empty `GIT_DIR`, is carried by the code comment and its test alone; gate-sdk/SPEC.md §The crate's crosser states the zero-exit refusal with none.
+
+**Deliverable:** the nested check telling the repository git selected (its `--git-dir` answer) from a skipped mark, a test under `GIT_WORK_TREE`, and both exceptions stated in §The crate's crosser.
+
+**Cost while deferred:** a run under a `GIT_WORK_TREE` above the repository is refused outright. Filed 2026-10-05 to the gap inbox as two bullets by queue-kit-arms-crosser-pass' close, its second-vendor review; promoted together at the next iteration's scope: →fix fails because the selected-repository read changes a crosser verdict with a test, →forward because no ruling is owed. Re-verified: a fresh repository at `.tmp/wtprobe/inner` under `GIT_WORK_TREE=..` answers `.tmp/wtprobe` and `inner/` at exit 0, and `--emit close-surfaces` there refuses naming `inner/.git`. Owner lookup: `nested_mark`, `GIT_WORK_TREE`, `GIT_DIR` in this file — none; owner gate-sdk/SPEC.md §The crate's crosser.
+
+### crosser-git-fidelity-edges
+
+two crosser edges against git. `toplevel_args` in `native/src/walk.rs` reads the toplevel and prefix answer with `lines()`, so a path component holding a newline truncates the prefix and can hide a skipped mark (static reading, untested). `repository_mark`'s ceiling stop canonicalizes a relative `GIT_CEILING_DIRECTORIES` entry where git ignores it, and gate-sdk/bin/run-gates.sh's own mark walk repeats that.
+
+**Deliverable:** the answer split as git delimits it, and a relative ceiling entry skipped in the crate and the front end alike, a test per edge.
+
+**Cost while deferred:** a rare path or env shape grades a repository differently from git. Filed 2026-10-05 to the gap inbox by queue-kit-arms-crosser-pass' close, its second-vendor review; promoted at the next iteration's scope: →fix fails because each edge owes a test and the ceiling half spans the crate and a front end, →forward because no ruling is owed. Re-verified: `GIT_CEILING_DIRECTORIES=..` from `.tmp/wtprobe/inner/sub` still answers `.tmp/wtprobe/inner`. Owner lookup: `CEILING`, `lines()`, `newline` in this file — none; owner gate-sdk/SPEC.md §The crate's crosser and §run-gates.
+
+### pwsh-install-smoke-split
+
+the native Windows install-smoke legs run every `--installer-smoke` arm serially in one step, about 25 arms (four profiles, six companion recipes, four masked-PATH arms, plan parity, three upgrade repacks), each a full init, battery and uninstall. On gates run 37200932932 the aarch64 leg ran 24.5 minutes, 19.5 of them in that step, and the x86_64 leg 11; every other job finished by minute 14 of the 28-minute run.
+
+**Deliverable:** the pwsh legs' arms split across parallel matrix jobs, or the arm roster partitioned per leg, so no one leg holds the run; the native Windows leg's paragraph in installer/SPEC.md §The consumer smoke states the split.
+
+**Push need (2026-10-05, inside the budget):** the one mid-iteration push, shared with [front-end-nested-toplevel](#front-end-nested-toplevel): the split runs only on the CI Windows legs.
+
+**Cost while deferred:** every push waits about 14 minutes on one leg, and a close spends one to two pushes. Filed 2026-10-04 to the gap inbox by canon-kit-tail-installer-pass' lead on an operator direction to file it as a speed-up; promoted at its close: →fix fails because the split needs a push to witness, →forward because the direction is given. Re-verified: the run's per-job and per-step timings. Owner lookup: install-smoke, `pwsh`, `long pole` in this file — [install-smoke-sh-matrix](#install-smoke-sh-matrix), DISTINCT (unix legs' YAML duplication, not wall-clock); owner installer/SPEC.md §The consumer smoke.
+
+### drift-kit-tail-brevity
+
+drift-kit/SPEC.md's sections no brevity slice has passed: the preamble, §The report skeleton through §The overhead meter, §The price-coverage arm, §The `/economics` skill, §Layout and configuration, §Testing and §Out of scope, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): about 11.6k of the file's 20.9k words at this scope, and all 68 of its `check-prose-bounds` findings with the ceiling knob emptied.
+
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey; the file's ceiling row re-stamped. Applied last, after [manual-operation-spend-channel](#manual-operation-spend-channel)'s amendment merges, so no section is passed twice.
+
+**Cost while deferred:** paid by every session and adopter that reads those drift-kit sections. Filed 2026-10-05 as a split at scope. Part of the operator's selection of the unit set, direction 2026-10-05, lead-relayed (not a ruling); with it drift-kit leaves the parent.
 
 ## Deferred
 
@@ -238,7 +272,7 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 [roadmap: now/adoption] [cost: session/high] [surface: drift-kit] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices (below); lifecycle-kit, installer, guard-kit, delegation-kit, canon-kit and queue-kit are finished or split out (the slices below); what remains starts at drift-kit, context-kit, evidence-kit, site-kit, then doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling): a slice has landed at each recent scope; the per-kit slices stay off the roadmap.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices (below); lifecycle-kit, installer, guard-kit, delegation-kit, canon-kit, queue-kit and drift-kit are finished or split out (the slices below); what remains starts at context-kit, evidence-kit, site-kit, then doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling): a slice has landed at each recent scope; the per-kit slices stay off the roadmap.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
@@ -248,7 +282,7 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes as `installer-install-brevity` and `installer-remainder-brevity`; drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope as `drift-kit-measurement-brevity`; guard-kit's front sections, delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope as `queue-kit-gate-brevity`; guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope as `guard-kit-tool-brevity`.
 
-delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as `delegation-kit-tail-brevity`; canon-kit's claim-gate sections left 2026-10-04 at canon-kit-reach-pass' scope as `canon-kit-claim-brevity`, and its rest at canon-kit-tail-installer-pass' as `canon-kit-tail-brevity`; queue-kit's format half at queue-kit-format-native-pass' as `queue-kit-format-brevity`, its arms half at queue-kit-arms-crosser-pass' as `queue-kit-arms-brevity`.
+delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as `delegation-kit-tail-brevity`; canon-kit's claim-gate sections and rest left 2026-10-04 at the next two scopes as `canon-kit-claim-brevity` and `canon-kit-tail-brevity`; queue-kit's format and arms halves at the two after as `queue-kit-format-brevity` and `queue-kit-arms-brevity`; drift-kit's rest at drift-kit-tail-crosser-pass' as [drift-kit-tail-brevity](#drift-kit-tail-brevity).
 
 ### tarball-attestation-observed
 
@@ -307,6 +341,8 @@ queue provenance prose restates what `git log` answers; the ruled sweep is small
 no measurement channel attributes a session's spend to repeated manual operations, so the close economics pass cannot surface a tooling opportunity. The stage-economics log prices spend per stage and tier, the overhead meter measures always-loaded bytes, prompt-friction sees only Bash calls that prompt (so Edit and Write queue edits are invisible to it), and knowledge-friction is self-reported. `queue-write-side-verb`'s evidence came from an ad-hoc look at `.tmp/`. Operator expectation, 2026-09-27 (lead session): the economics analysis every close runs should surface such opportunities.
 
 **Deliverable:** a channel attributing repeated manual operations (tool-call shapes, hand edits of one surface) to sessions, and a close economics read listing the top candidates.
+
+**Selected 2026-10-05** for drift-kit-tail-crosser-pass, operator direction lead-relayed (not a ruling). A feature, so the spec stage authors its amendment and promotes it, before [drift-kit-tail-brevity](#drift-kit-tail-brevity) passes drift-kit.
 
 **Cost while deferred:** tooling gaps surface only by chance and repeated manual work stays unpriced. Filed 2026-09-27 to the gap inbox by platform-prerequisite-floors' lead; promoted at its close: →fix fails because the channel is new mechanism. Re-verified: `.workflow/knowledge-friction.log` holds no line at this close. Owner lookup: `economics`, `tooling opportunit`, `repeated` in this file — [build-stage-tier-economics](#build-stage-tier-economics) and [queue-tier-label-correction-cost](#queue-tier-label-correction-cost), DISTINCT (tier pricing); owner drift-kit/SPEC.md §The stage-economics meter.
 
@@ -486,16 +522,6 @@ the delivery rule under `lead-notification-wake-race`'s remedy, unprobed: does a
 
 **Cost while deferred:** a consumer giving two roles one heading gets a note whose section the upgrade contract reads under either role, unrefused. Filed 2026-10-04 to the gap inbox by installer-trust-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because a widened refusal reds configurations accepted today, →forward because no ruling is owed. Re-verified: `refusals` checks a repeated role, and an alias against the roster's headings only. Owner lookup: `RELEASE_SECTION`, `two roles`, `alias` in this file — none; owner gate-sdk/SPEC.md §Layout and configuration.
 
-### pwsh-install-smoke-split
-
-[cost: iteration/high] [surface: .github]
-
-the native Windows install-smoke legs run every `--installer-smoke` arm serially in one step, about 25 arms (four profiles, six companion recipes, four masked-PATH arms, plan parity, three upgrade repacks), each a full init, battery and uninstall. On gates run 37200932932 the aarch64 leg ran 24.5 minutes, 19.5 of them in that step, and the x86_64 leg 11; every other job finished by minute 14 of the 28-minute run.
-
-**Deliverable:** the pwsh legs' arms split across parallel matrix jobs, or the arm roster partitioned per leg, so no one leg holds the run; the native Windows leg's paragraph in installer/SPEC.md §The consumer smoke states the split.
-
-**Cost while deferred:** every push waits about 14 minutes on one leg, and a close spends one to two pushes. Filed 2026-10-04 to the gap inbox by canon-kit-tail-installer-pass' lead on an operator direction to file it as a speed-up; promoted at its close: →fix fails because the split needs a push to witness, →forward because the direction is given. Re-verified: the run's per-job and per-step timings. Owner lookup: install-smoke, `pwsh`, `long pole` in this file — [install-smoke-sh-matrix](#install-smoke-sh-matrix), DISTINCT (unix legs' YAML duplication, not wall-clock); owner installer/SPEC.md §The consumer smoke.
-
 ### front-end-nested-toplevel
 
 [cost: event/low] [surface: gate-sdk]
@@ -504,27 +530,11 @@ the front ends change to git's toplevel before the binary runs (the `cd` in gate
 
 **Deliverable:** each front end and shim refuses where git's answered prefix crosses a `.git` entry beneath the toplevel (the crosser's nested mark, held in the shell and PowerShell twins with front-end parity), or hands the crate the starting directory so the crosser reads it; the honest-limit sentence is removed and §run-gates states the refusal.
 
+**Selected 2026-10-05** for drift-kit-tail-crosser-pass, operator direction lead-relayed (not a ruling). Feature-shaped (a front-end refusal is a §run-gates contract change), so the spec stage authors and promotes it, after [crosser-git-fidelity-edges](#crosser-git-fidelity-edges), whose ceiling fix its twins copy.
+
+**Push need (2026-10-05, inside the budget):** the one mid-iteration push, shared with [pwsh-install-smoke-split](#pwsh-install-smoke-split): run-gates.ps1's twin runs only on the CI Windows legs.
+
 **Cost while deferred:** a run started in a rare tree shape reports the enclosing repository's verdict as its own. Filed 2026-10-04 to the gap inbox by queue-kit-arms-crosser-pass' spec, which declined to widen its amendment; promoted at its close: →fix fails because the sh/ps1 twins, the plugin shim and the session-context template each need the mark walk under front-end parity, a contract change to §run-gates witnessed on the Windows legs, →forward because no ruling is owed. Re-verified: with an empty `.git` directory in a subdirectory of a fresh repository, `git rev-parse --show-toplevel --show-prefix` there answers the outer toplevel and the subdirectory prefix at exit 0, and run-gates.sh checks its mark only on a failed lookup. The bullet's pointer to the amendment file is replaced by §The crate's crosser, where it merged. Not a recurrence of `nested-broken-repo-toplevel`, which closed the crate side. Owner lookup: `toplevel`, `front end`, `session-context` in this file — none live; owner gate-sdk/SPEC.md §run-gates.
-
-### crosser-nested-mark-env
-
-[cost: event/low] [surface: native]
-
-`nested_mark` in `native/src/walk.rs` refuses a valid repository under `GIT_WORK_TREE`: with `GIT_DIR` unset and `GIT_WORK_TREE` naming a directory above the discovered repository, git answers that directory as toplevel and the repository's own directory as prefix at exit 0, so the scan finds the repository's `.git` and every crosser caller exits 2. Its other exception, no mark under a non-empty `GIT_DIR`, is carried by the code comment and its test alone; gate-sdk/SPEC.md §The crate's crosser states the zero-exit refusal with none.
-
-**Deliverable:** the nested check telling the repository git selected (its `--git-dir` answer) from a skipped mark, a test under `GIT_WORK_TREE`, and both exceptions stated in §The crate's crosser.
-
-**Cost while deferred:** a run under a `GIT_WORK_TREE` above the repository is refused outright. Filed 2026-10-05 to the gap inbox as two bullets by queue-kit-arms-crosser-pass' close, its second-vendor review; promoted together at the next iteration's scope: →fix fails because the selected-repository read changes a crosser verdict with a test, →forward because no ruling is owed. Re-verified: a fresh repository at `.tmp/wtprobe/inner` under `GIT_WORK_TREE=..` answers `.tmp/wtprobe` and `inner/` at exit 0, and `--emit close-surfaces` there refuses naming `inner/.git`. Owner lookup: `nested_mark`, `GIT_WORK_TREE`, `GIT_DIR` in this file — none; owner gate-sdk/SPEC.md §The crate's crosser.
-
-### crosser-git-fidelity-edges
-
-[cost: event/low] [surface: native]
-
-two crosser edges against git. `toplevel_args` in `native/src/walk.rs` reads the toplevel and prefix answer with `lines()`, so a path component holding a newline truncates the prefix and can hide a skipped mark (static reading, untested). `repository_mark`'s ceiling stop canonicalizes a relative `GIT_CEILING_DIRECTORIES` entry where git ignores it, and gate-sdk/bin/run-gates.sh's own mark walk repeats that.
-
-**Deliverable:** the answer split as git delimits it, and a relative ceiling entry skipped in the crate and the front end alike, a test per edge.
-
-**Cost while deferred:** a rare path or env shape grades a repository differently from git. Filed 2026-10-05 to the gap inbox by queue-kit-arms-crosser-pass' close, its second-vendor review; promoted at the next iteration's scope: →fix fails because each edge owes a test and the ceiling half spans the crate and a front end, →forward because no ruling is owed. Re-verified: `GIT_CEILING_DIRECTORIES=..` from `.tmp/wtprobe/inner/sub` still answers `.tmp/wtprobe/inner`. Owner lookup: `CEILING`, `lines()`, `newline` in this file — none; owner gate-sdk/SPEC.md §The crate's crosser and §run-gates.
 
 ### docs-code-block-copy-wrap
 
@@ -533,6 +543,8 @@ two crosser edges against git. `toplevel_args` in `native/src/walk.rs` reads the
 docs-site code blocks carry no copy-to-clipboard button and do not wrap: docs/_layouts/default.html sets `white-space: pre-wrap` on `.markdown-body pre`, but jekyll-theme-primer sets `white-space: pre` on `pre > code`, inside which every fenced block renders, so the layout's rule never reaches the text. No page-authoring rule holds a code block runnable on its own. Operator direction 2026-10-05, lead-relayed (not a ruling).
 
 **Deliverable:** a copy button in layout script (`docs/assets/search.js` is the precedent), a wrap rule targeting `pre > code` and any `.highlight` variant, checked on a local render, and a page-authoring rule in docs/site-architecture.md, gate-held where possible: every block runs on its own, sequential commands split or joined with `&&`. docs/install.md's remedy blocks are run verbatim by install-smoke legs, so their shape is load-bearing.
+
+**Selected 2026-10-05** for drift-kit-tail-crosser-pass, operator direction lead-relayed (not a ruling); a feature, so the spec stage authors and promotes it.
 
 **Cost while deferred:** a reader copies commands by hand selection, long lines scroll, and a multi-command block pasted whole can run half. Filed 2026-10-05 to the gap inbox as two bullets by queue-kit-arms-crosser-pass' lead, the second correcting the first's wrap premise; promoted together at the next iteration's scope: →fix fails because the button and the rule are new names, →forward because the direction is given. Re-verified: the layout's `pre-wrap` rule and `assets/` holding only `search.js` and the logo. Owner lookup: `clipboard`, `code block`, `pre-wrap` in this file — none; owner docs/site-architecture.md §Page-authoring rules, site-kit for any gate.
 
