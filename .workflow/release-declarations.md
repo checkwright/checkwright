@@ -41,6 +41,7 @@
 - `GATE_SDK_RELEASE_SECTION_ALIASES` — new: former headings a section is still read under, in the same grammar, defaulting to `gates: Tightened gates` and `knobs: Renamed knobs`. Nothing to do.
 - `EVIDENCE_KIT_RUN_<suite>` — a derived fixture-suite member now runs the gate binary `GATE_SDK_NATIVE_BIN` names, `<door> --run-gate-tests <tests-dir> [<checks-dir>]`, where it ran `bash <gate-sdk>/bin/run-gates.sh --run-gate-tests …`, and runs in the working directory `--run-validate` runs in rather than at the toplevel. If your runner doc's battery-roster block lists a derived suite, respell its line to the new command, or `check-battery-roster` reds; a member you set yourself is unchanged.
 - `QUEUE_KIT_REQUIRED_SECTIONS` — now holds only the headings no section knob names, defaulting to `Iteration:` and `Lessons Learned`; the section knobs' names join the set by derivation (New and tightened gates). A binding restating the whole list keeps working. To drop the lesson channel, bind `QUEUE_KIT_REQUIRED_SECTIONS[] = Iteration:` alone; the knob may now be bound empty, which also drops the iteration header from the floor.
+- `QUEUE_KIT_ACTIVE_SECTIONS`, `QUEUE_KIT_DEFERRED_SECTION`, `QUEUE_KIT_ICEBOX_SECTION` and `QUEUE_KIT_DONE_SECTION` — a value ending in `:` is now malformed config, so every queue-kit gate and arm exits 2 naming the knob, where `check-queue-sections` prefix-matched the name and passed while every section-scoped gate read no task under it. Drop the trailing `:` and name the heading exactly.
 
 ## Behavior changes
 

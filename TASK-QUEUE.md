@@ -10,19 +10,11 @@
 
 ## Technical Debt
 
-### section-knob-colon-prefix
-
-`check-queue-sections` prefix-matches every required name ending in `:` (`matches` in `native/src/gates/queue_sections.rs`), and the section knobs' names join that set by derivation (`compose_required` in `native/src/queue.rs`), so a section knob named with a trailing colon (an active section `Now:`) is satisfied by `## Now: anything` while `Sections::is_task` matches only the exact name, leaving section-scoped gates open. queue-kit/SPEC.md §Layout and configuration promises the derivation closes that fail-open class.
-
-**Deliverable:** derived names matched exactly, or a section knob value ending in `:` refused by the validator; the choice is the unit's, a fixture per case either way.
-
-**Cost while deferred:** a colon-named section knob leaves every section-scoped gate reading no task. Filed 2026-10-04 to the gap inbox by queue-kit-format-native-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the remedy is a matcher-or-refusal choice with fixtures, →forward because no ruling is owed. Re-verified by source read: `matches` prefix-tests any `:`-ended name, `compose_required` admits knob names unchanged. Owner lookup: `trailing colon`, `prefix-match`, `queue_sections` in this file — none; owner queue-kit/SPEC.md §Layout and configuration.
-
 ### queue-kit-arms-brevity
 
 queue-kit/SPEC.md's arms half, which no brevity slice has passed: §Per-component contracts with §The shared queue adapters, the queue-index, queue-counts, queue-edges, queue-history, queue-migrate, roadmap, roadmap-lag and lesson-sink arms and §The queue verbs, plus §templates/ and §Out of scope, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): about 10.4k of the file's 27.6k words at this scope, and all 42 of its `check-prose-bounds` findings with the ceiling knob emptied.
 
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey; the file's ceiling row re-stamped. Applied last, after [section-knob-colon-prefix](#section-knob-colon-prefix).
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey; the file's ceiling row re-stamped. Applied last, after `section-knob-colon-prefix`.
 
 **Cost while deferred:** paid by every session and adopter that reads the queue arms. Filed 2026-10-04 as a split at scope. Part of the operator's selection of the unit set, direction 2026-10-04, lead-relayed (not a ruling); with it queue-kit leaves the parent.
 
@@ -1194,4 +1186,5 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 - crosser-anchor-lexical-ascent
 - repo-probe-refusal-blind
 - run-door-subdir-rebind
+- section-knob-colon-prefix
 

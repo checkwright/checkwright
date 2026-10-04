@@ -68,7 +68,8 @@ fn positive(v: &str) -> bool {
 }
 
 // spec: queue-kit/SPEC.md §Layout and configuration — a broken grammar gates nothing: emptiness,
-// positive integers, the icebox apart from the deferred section, and the roadmap vocabulary as a pair
+// positive integers, the icebox apart from the deferred section, no section name ending in `:`,
+// and the roadmap vocabulary as a pair
 fn validate(v: &Values) -> Vec<String> {
     let mut errs: Vec<String> = Vec::new();
     let empty_list = |n: &str| indexed(v, n).is_some_and(|e| e.is_empty());
@@ -104,6 +105,16 @@ fn validate(v: &Values) -> Vec<String> {
     }
     if scalar(v, "QUEUE_KIT_ICEBOX_SECTION") == scalar(v, "QUEUE_KIT_DEFERRED_SECTION") {
         errs.push("QUEUE_KIT_ICEBOX_SECTION must not name the deferred section".to_string());
+    }
+    let active = indexed(v, "QUEUE_KIT_ACTIVE_SECTIONS").unwrap_or(&[]).iter().map(|s| ("QUEUE_KIT_ACTIVE_SECTIONS", s.as_str()));
+    let single = ["QUEUE_KIT_DEFERRED_SECTION", "QUEUE_KIT_ICEBOX_SECTION", "QUEUE_KIT_DONE_SECTION"]
+        .into_iter()
+        .filter_map(|n| scalar(v, n).map(|s| (n, s)));
+    for (n, s) in active.chain(single).filter(|(_, s)| s.ends_with(':')) {
+        errs.push(format!(
+            "{} names '{}', ending in ':', the required list's prefix mark — a section knob names one exact heading",
+            n, s
+        ));
     }
     for n in ["QUEUE_KIT_PRECONDITION_REGEX", "QUEUE_KIT_PRECONDITION_PAST_REGEX"] {
         if empty(n) {
