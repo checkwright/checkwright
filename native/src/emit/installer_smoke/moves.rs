@@ -201,7 +201,7 @@ pub(super) fn seam(state: &mut Run) -> Step {
 
 // spec: installer/SPEC.md §The consumer smoke — the protection branch: diff exits 1 naming both
 // edits, uninstall keeps and reports them and removes every other recorded file, the tampered
-// binary included, leaving a residual manifest of schema and the survivors at init's hashes
+// binary and a planted update-check cache included, leaving the residual manifest
 fn protection(state: &Run, sc: &str, edited: &[String], init_hash: &[String], want: &[String], bin: &str) -> Step {
     let roster = Lock::of(sc)?.keys();
     if roster.len() <= edited.len() {
@@ -221,9 +221,16 @@ fn protection(state: &Run, sc: &str, edited: &[String], init_hash: &[String], wa
         return Err(failed(&m, format!("diff reported drift without naming {}", f)));
     }
     say(&format!("diff: {}, naming {}", first_starting(&out(&m), "DIFF:"), edited.join(" ")));
+    let cache = format!("{}/.git/{}", sc, crate::emit::update_notice::CACHE_FILE);
+    std::fs::write(&cache, "0 - planted\n").map_err(|e| fail(format!("could not plant the update check's cache: {}", e)))?;
     let m = cw(state, sc, &["uninstall"])?;
     if !m.succeeded() {
         return Err(failed(&m, format!("uninstall exited {} on the seam arm's consumer", m.reported_code())));
+    }
+    if Path::new(&cache).exists() {
+        return Err(fail(
+            "uninstall left the update check's cache in the clone's git directory — the manifest it answered for carries no version any more",
+        ));
     }
     for (i, f) in edited.iter().enumerate() {
         if hash_in(sc, f)? != want[i] {

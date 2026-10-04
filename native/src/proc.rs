@@ -556,6 +556,88 @@ pub fn run_bounded(program: &Program, args: &[&str], secs: u64) -> Result<Option
     }
 }
 
+// spec: installer/SPEC.md §The update notice — the bound reaches the child's process tree, a unix
+// process group or a Windows job object
+struct Tree {
+    child: std::process::Child,
+    #[cfg(windows)]
+    job: kernel32::Handle,
+}
+
+impl Tree {
+    #[cfg(unix)]
+    fn spawn(mut cmd: Command) -> std::io::Result<Tree> {
+        use std::os::unix::process::CommandExt;
+        cmd.process_group(0);
+        Ok(Tree { child: cmd.spawn()? })
+    }
+
+    #[cfg(windows)]
+    fn spawn(mut cmd: Command) -> std::io::Result<Tree> {
+        use std::os::windows::io::AsRawHandle;
+        let child = cmd.spawn()?;
+        // spec: gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency — sound
+        // because the calls take null attributes, the child's own live handle and a job handle the
+        // tree closes itself; a job that cannot be made or joined leaves the child-only kill
+        let job = unsafe {
+            let job = kernel32::CreateJobObjectW(std::ptr::null_mut(), std::ptr::null());
+            if !job.is_null() && kernel32::AssignProcessToJobObject(job, child.as_raw_handle() as kernel32::Handle) == 0 {
+                kernel32::CloseHandle(job);
+                std::ptr::null_mut()
+            } else {
+                job
+            }
+        };
+        Ok(Tree { child, job })
+    }
+
+    // spec: gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency — the group is
+    // the unreaped child's own pid, so it names no reused process
+    fn kill(&mut self) {
+        #[cfg(unix)]
+        unsafe {
+            libc::kill(-(self.child.id() as libc::pid_t), libc::SIGKILL);
+        }
+        #[cfg(windows)]
+        unsafe {
+            if !self.job.is_null() {
+                kernel32::TerminateJobObject(self.job, 1);
+            }
+        }
+        let _ = self.child.kill();
+        let _ = self.child.wait();
+    }
+}
+
+#[cfg(windows)]
+impl Drop for Tree {
+    fn drop(&mut self) {
+        if !self.job.is_null() {
+            unsafe {
+                kernel32::CloseHandle(self.job);
+            }
+        }
+    }
+}
+
+#[cfg(windows)]
+pub(crate) mod kernel32 {
+    pub type Handle = *mut core::ffi::c_void;
+    pub const PROCESS_QUERY_LIMITED_INFORMATION: u32 = 0x1000;
+    pub const STILL_ACTIVE: u32 = 259;
+    pub const ERROR_ACCESS_DENIED: i32 = 5;
+
+    #[link(name = "kernel32")]
+    extern "system" {
+        pub fn OpenProcess(access: u32, inherit: i32, pid: u32) -> Handle;
+        pub fn GetExitCodeProcess(process: Handle, code: *mut u32) -> i32;
+        pub fn CloseHandle(handle: Handle) -> i32;
+        pub fn CreateJobObjectW(attributes: *mut core::ffi::c_void, name: *const u16) -> Handle;
+        pub fn AssignProcessToJobObject(job: Handle, process: Handle) -> i32;
+        pub fn TerminateJobObject(job: Handle, code: u32) -> i32;
+    }
+}
+
 // spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — `run_bounded` for a caller that needs
 // the child's *output* and not only its code. Capture goes to a file, not a pipe: a poll loop and a
 // filled pipe buffer deadlock each other. `Ok(None)` is the bound expiring.
@@ -579,20 +661,19 @@ pub fn run_bounded_capture(
         MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
     ));
     let out = std::fs::File::create(&capture).map_err(spawn_err)?;
-    let mut child = Command::new(spawn_target(program.invocation())?.as_ref())
-        .args(args)
+    let mut cmd = Command::new(spawn_target(program.invocation())?.as_ref());
+    cmd.args(args)
         .envs(env.iter().copied())
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::from(out))
-        .stderr(std::process::Stdio::null())
-        .spawn()
-        .map_err(|e| {
-            let _ = std::fs::remove_file(&capture);
-            spawn_err(e)
-        })?;
+        .stderr(std::process::Stdio::null());
+    let mut tree = Tree::spawn(cmd).map_err(|e| {
+        let _ = std::fs::remove_file(&capture);
+        spawn_err(e)
+    })?;
     let deadline = std::time::Instant::now() + std::time::Duration::from_secs(secs);
     let outcome = loop {
-        match child.try_wait() {
+        match tree.child.try_wait() {
             Ok(Some(status)) => break Some(exit_code(&status)),
             Ok(None) => {}
             Err(e) => {
@@ -601,8 +682,7 @@ pub fn run_bounded_capture(
             }
         }
         if std::time::Instant::now() >= deadline {
-            let _ = child.kill();
-            let _ = child.wait();
+            tree.kill();
             break None;
         }
         std::thread::sleep(std::time::Duration::from_millis(25));
@@ -1216,6 +1296,26 @@ pub(crate) mod tests {
         assert_eq!(name_of(&suffixed), "git");
         assert_eq!(name_of("git"), "git");
         assert_eq!(name_of("git.exe"), "git.exe", "a bare name is noted as passed");
+    }
+
+    // spec: installer/SPEC.md §The update notice — an expired bound kills the grandchild with the
+    // child: a backgrounded writer the child started never writes once the bound has fired, while
+    // the same writer under a bound it fits inside does
+    #[test]
+    fn an_expired_bound_kills_the_process_tree() {
+        let dir = std::env::temp_dir().join(format!("cw-bounded-tree-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("scratch");
+        let marker = |name: &str| dir.join(name).to_string_lossy().replace('\\', "/");
+        let script = |delay: u32, name: &str| format!("(sleep {}; echo late > '{}') & wait", delay, marker(name));
+        let fits = run_bounded_capture(&BASH, &["-c", &script(1, "fits")], 30, &[]).expect("bash spawns");
+        assert_eq!(fits.map(|(code, _)| code), Some(0));
+        assert!(dir.join("fits").exists(), "the control writer never wrote, so the kill case proves nothing");
+        let expired = run_bounded_capture(&BASH, &["-c", &script(3, "killed")], 1, &[]).expect("bash spawns");
+        assert!(expired.is_none(), "the bound did not expire");
+        std::thread::sleep(std::time::Duration::from_secs(4));
+        assert!(!dir.join("killed").exists(), "the grandchild outlived the bound and wrote");
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     // spec: gate-sdk/SPEC.md §Fail-closed contract — the wrapper is exercised directly,

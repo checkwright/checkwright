@@ -304,6 +304,9 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
             );
             print!("{}", residual(&keep));
         }
+        if let Some(cache) = crate::emit::update_notice::cache_path(&root).filter(|c| c.is_file()) {
+            println!("\nwould delete the update check's cache, {}.", cache.display());
+        }
         if !hooks_line.is_empty() {
             println!("\nwould print this for you to run yourself:\n  {}", hooks_line);
         }
@@ -345,6 +348,12 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
         trimmed = true;
     }
 
+    // spec: installer/SPEC.md §uninstall — either disposition leaves no `version`, so the update
+    // notice's cache answers nothing here any more and is reclaimed; a sibling worktree's install
+    // that shared it probes once to rewrite it
+    if let Some(cache) = crate::emit::update_notice::cache_path(&root) {
+        let _ = std::fs::remove_file(cache);
+    }
     if keep.is_empty() {
         std::fs::remove_file(&lock_path)
             .map_err(|e| refuse(format!("could not remove {}: {}", lock::FILE, e), "", 2))?;

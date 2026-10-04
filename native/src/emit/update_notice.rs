@@ -83,8 +83,8 @@ pub fn now() -> u64 {
 }
 
 // spec: installer/SPEC.md §The update notice — the cache lives in the clone's common git directory,
-// shared by every worktree and outside the scratch sweep
-fn cache_path(root: &Path) -> Option<PathBuf> {
+// shared by every worktree and outside the scratch sweep; `uninstall` reclaims it
+pub(crate) fn cache_path(root: &Path) -> Option<PathBuf> {
     let r = root.to_string_lossy().into_owned();
     let out = proc::run(&programs::GIT, &["-C", &r, "rev-parse", "--git-common-dir"]).ok()?;
     let dir = String::from_utf8_lossy(out.stdout()?).trim().to_string();
@@ -113,16 +113,20 @@ pub fn reading(root: &Path, s: &Settings, now: u64) -> Reading {
     let Some(cache) = cache_path(root) else {
         return Reading::Unknown;
     };
-    let cached = std::fs::read_to_string(&cache).ok().and_then(|t| parse_cache(&t));
-    let newest = match cached.filter(|(at, _)| fresh(*at, now, interval)) {
-        Some((_, v)) => v,
-        None => match probe(&s.upstream, s.timeout) {
-            Some(v) => {
-                let _ = std::fs::write(&cache, format!("{} {}\n", now, v));
-                v
-            }
-            None => return Reading::Unknown,
-        },
+    let cached = std::fs::read_to_string(&cache)
+        .ok()
+        .and_then(|t| parse_cache(&t))
+        .filter(|r| fresh(r.at, now, interval) && r.upstream == s.upstream);
+    let found = match cached {
+        Some(r) => r.newest,
+        None => {
+            let probed = probe(&s.upstream, s.timeout);
+            let _ = std::fs::write(&cache, record(now, probed.as_deref(), &s.upstream));
+            probed
+        }
+    };
+    let Some(newest) = found else {
+        return Reading::Unknown;
     };
     if toolfloor::floor_met(&newest, &installed) == Some(false) {
         Reading::Newer { newest, installed }
@@ -131,11 +135,32 @@ pub fn reading(root: &Path, s: &Settings, now: u64) -> Reading {
     }
 }
 
-fn parse_cache(text: &str) -> Option<(u64, String)> {
-    let mut f = text.split_whitespace();
-    let at = f.next()?.parse::<u64>().ok()?;
-    let v = f.next()?;
-    release(v).map(|_| (at, v.to_string()))
+// spec: installer/SPEC.md §The update notice — one line: the attempt's time, the newest version or
+// `-` for a failed attempt, and the upstream probed, so a record of another upstream is due
+#[derive(Debug, PartialEq)]
+struct Record {
+    at: u64,
+    newest: Option<String>,
+    upstream: String,
+}
+
+const FAILED: &str = "-";
+
+fn record(at: u64, newest: Option<&str>, upstream: &str) -> String {
+    format!("{} {} {}\n", at, newest.unwrap_or(FAILED), upstream)
+}
+
+fn parse_cache(text: &str) -> Option<Record> {
+    let line = text.lines().next()?;
+    let (at, rest) = line.split_once(' ')?;
+    let (v, upstream) = rest.split_once(' ')?;
+    let newest = match v {
+        FAILED => None,
+        v => Some(release(v).map(|_| v.to_string())?),
+    };
+    let upstream = upstream.trim();
+    (!upstream.is_empty()).then_some(())?;
+    Some(Record { at: at.parse::<u64>().ok()?, newest, upstream: upstream.to_string() })
 }
 
 // spec: installer/SPEC.md §The update notice — a probe is due when the record is older than the
@@ -220,12 +245,23 @@ mod tests {
         assert_eq!(newest(refs), Some("0.10.0".to_string()));
     }
 
-    // spec: installer/SPEC.md §The update notice — absent, old and future records are stale
+    // spec: installer/SPEC.md §The update notice — absent, old and future records are stale, and a
+    // record naming no upstream, the earlier two-field shape, is unreadable and so due
     #[test]
     fn the_staleness_rule() {
         assert_eq!(parse_cache(""), None);
-        assert_eq!(parse_cache("x 1.0.0"), None);
-        assert_eq!(parse_cache("100 1.0.0\n"), Some((100, "1.0.0".to_string())));
+        assert_eq!(parse_cache("x 1.0.0 u"), None);
+        assert_eq!(parse_cache("100 1.0.0\n"), None);
+        assert_eq!(parse_cache("100 1.0.0-rc1 u\n"), None);
+        let up = "https://example.invalid/a b.git";
+        assert_eq!(
+            parse_cache(&record(100, Some("1.0.0"), up)),
+            Some(Record { at: 100, newest: Some("1.0.0".to_string()), upstream: up.to_string() })
+        );
+        assert_eq!(
+            parse_cache(&record(100, None, up)),
+            Some(Record { at: 100, newest: None, upstream: up.to_string() })
+        );
         assert!(fresh(100, 150, 86_400));
         assert!(!fresh(100, 100 + 86_400, 86_400));
         assert!(!fresh(200, 100, 86_400));
@@ -241,16 +277,17 @@ mod tests {
         git(&dir, &["init", "-q"]);
         assert_eq!(reading(&dir, &settings("weekly", "x"), 0), Reading::NoInstall);
         installed_tree(&dir, "1.0.0");
-        std::fs::write(dir.join(".git").join(CACHE_FILE), "50 2.0.0\n").expect("cache");
+        std::fs::write(dir.join(".git").join(CACHE_FILE), "50 2.0.0 x\n").expect("cache");
         let fresh_newer = reading(&dir, &settings("weekly", "x"), 100);
         assert!(line(&fresh_newer).starts_with("checkwright v2.0.0 is available; this tree has v1.0.0."), "{:?}", fresh_newer);
-        std::fs::write(dir.join(".git").join(CACHE_FILE), "50 1.0.0\n").expect("cache");
+        std::fs::write(dir.join(".git").join(CACHE_FILE), "50 1.0.0 x\n").expect("cache");
         assert_eq!(line(&reading(&dir, &settings("weekly", "x"), 100)), "");
         let _ = std::fs::remove_dir_all(&dir);
     }
 
     // spec: installer/SPEC.md §The update notice — a real probe by path finds the newest tag and
-    // caches it; an unreachable upstream prints nothing and writes nothing
+    // caches it keyed on its upstream; an unreachable upstream prints nothing and records the attempt,
+    // so no read inside the interval probes it again
     #[test]
     fn a_probe_reads_the_upstream_and_an_unreachable_one_is_silent() {
         let up = scratch("upstream");
@@ -267,14 +304,26 @@ mod tests {
         installed_tree(&tree, "1.0.0");
         let printed = line(&reading(&tree, &settings("daily", &bare_s), 1_000));
         assert!(printed.starts_with("checkwright v9.0.0 is available; this tree has v1.0.0."), "{}", printed);
-        let cached = std::fs::read_to_string(tree.join(".git").join(CACHE_FILE)).expect("cache written");
-        assert_eq!(cached, "1000 9.0.0\n");
+        let cache = tree.join(".git").join(CACHE_FILE);
+        let cached = std::fs::read_to_string(&cache).expect("cache written");
+        assert_eq!(cached, format!("1000 9.0.0 {}\n", bare_s));
+
+        std::fs::write(&cache, "1000 2.0.0 another-upstream\n").expect("cache");
+        let rekeyed = line(&reading(&tree, &settings("daily", &bare_s), 1_001));
+        assert!(rekeyed.starts_with("checkwright v9.0.0 is available"), "{}", rekeyed);
+        assert_eq!(std::fs::read_to_string(&cache).expect("cache"), format!("1001 9.0.0 {}\n", bare_s));
 
         let lonely = scratch("lonely");
         installed_tree(&lonely, "1.0.0");
-        let gone = lonely.join("no-such-upstream").to_string_lossy().into_owned();
-        assert_eq!(reading(&lonely, &settings("weekly", &gone), 1_000), Reading::Unknown);
-        assert!(!lonely.join(".git").join(CACHE_FILE).exists());
+        let gone = lonely.join("no-such-upstream");
+        let gone_s = gone.to_string_lossy().into_owned();
+        let lonely_cache = lonely.join(".git").join(CACHE_FILE);
+        assert_eq!(reading(&lonely, &settings("weekly", &gone_s), 1_000), Reading::Unknown);
+        assert_eq!(std::fs::read_to_string(&lonely_cache).expect("attempt recorded"), format!("1000 - {}\n", gone_s));
+        assert!(proc::run(&programs::GIT, &["clone", "-q", "--bare", &up_s, &gone_s]).expect("clone").stdout().is_some());
+        assert_eq!(reading(&lonely, &settings("weekly", &gone_s), 2_000), Reading::Unknown);
+        let due = line(&reading(&lonely, &settings("weekly", &gone_s), 1_000 + 604_800));
+        assert!(due.starts_with("checkwright v9.0.0 is available"), "{}", due);
         for d in [up, bare, tree, lonely] {
             let _ = std::fs::remove_dir_all(&d);
         }

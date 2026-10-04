@@ -365,19 +365,7 @@ fn signal_zero(pid: &str) -> Result<bool, PidProbe> {
 }
 
 #[cfg(windows)]
-mod kernel32 {
-    pub type Handle = *mut core::ffi::c_void;
-    pub const PROCESS_QUERY_LIMITED_INFORMATION: u32 = 0x1000;
-    pub const STILL_ACTIVE: u32 = 259;
-    pub const ERROR_ACCESS_DENIED: i32 = 5;
-
-    #[link(name = "kernel32")]
-    extern "system" {
-        pub fn OpenProcess(access: u32, inherit: i32, pid: u32) -> Handle;
-        pub fn GetExitCodeProcess(process: Handle, code: *mut u32) -> i32;
-        pub fn CloseHandle(handle: Handle) -> i32;
-    }
-}
+use crate::proc::kernel32;
 
 // spec: evidence-kit/SPEC.md §The producer-liveness lock — the native leg, run first: a process that
 // opens and has not exited, or whose exit code cannot be read, is held, and so is one the open is
