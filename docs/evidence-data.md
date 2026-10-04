@@ -255,3 +255,4 @@
 | guard-ruleset-gate-neutrality-pass | sc sp a b v c | 12f/0d | 6 · ≤0d | 21s clean | 149 |
 | delegation-transport-pass | sc sp a b v c | 3f/0d | 4 · ≤0d | 21s clean | 149 |
 | installer-trust-pass | sc sp a b v c | 8f/3d | 4 · ≤0d | 21s clean | 149 |
+| canon-kit-reach-pass | sc · · b v c | 0f/2d | 0 | 21s clean | 149 |

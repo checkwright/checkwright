@@ -1214,8 +1214,3 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 
 ## Done
 
-- crates-reservation-republish
-- manifest-finder-untracked-walk
-- spec-pointer-bare-section-mark
-- canon-kit-claim-brevity
-
