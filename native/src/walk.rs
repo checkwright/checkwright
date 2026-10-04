@@ -1059,7 +1059,7 @@ pub fn child(dir: &Path, name: &str) -> PathBuf {
     if d.is_empty() {
         return PathBuf::from(name);
     }
-    if d.ends_with('/') || d.ends_with('\\') {
+    if d.ends_with('/') || (cfg!(windows) && d.ends_with('\\')) {
         return PathBuf::from(format!("{}{}", d, name));
     }
     PathBuf::from(format!("{}/{}", d, name))
@@ -1779,6 +1779,26 @@ mod tests {
         assert_eq!(child(Path::new("/srv/repo"), "kit").display().to_string(), "/srv/repo/kit");
         assert_eq!(child(Path::new("/"), "kit").display().to_string(), "/kit");
         assert_eq!(child(Path::new(""), "kit").display().to_string(), "kit");
+    }
+
+    // spec: gate-sdk/SPEC.md §Porting to Rust does not retire dialect exposure — a trailing `\`
+    // folds as a separator on Windows alone, so a POSIX walk descends a directory whose name ends
+    // in one and stats a path that exists
+    #[test]
+    fn a_trailing_backslash_is_a_separator_on_windows_alone() {
+        if cfg!(windows) {
+            assert_eq!(child(Path::new("C:\\"), "kit").display().to_string(), "C:\\kit");
+            return;
+        }
+        assert_eq!(child(Path::new("a\\"), "README.md").display().to_string(), "a\\/README.md");
+        let d = child(&std::env::temp_dir(), &format!("walk-child-backslash-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&d);
+        let file = PathBuf::from(format!("{}/a\\/README.md", d.display()));
+        fs::create_dir_all(file.parent().expect("parent")).expect("scratch");
+        fs::write(&file, "x\n").expect("write");
+        let found = find_files(&d, &["md"]).expect("walk");
+        let _ = fs::remove_dir_all(&d);
+        assert_eq!(found, vec![file]);
     }
 
     // spec: gate-sdk/SPEC.md §check-reads-couples — unit test B: a walk outside this file
