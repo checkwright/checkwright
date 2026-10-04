@@ -41,10 +41,14 @@ pub fn run(args: &[String]) -> i32 {
         return 2;
     }
 
-    let repo_root = match walk::toplevel().ok() {
-        Some(r) => r,
-        None => {
+    let repo_root = match walk::toplevel_opt() {
+        Ok(Some(r)) => r,
+        Ok(None) => {
             eprintln!("check-kit-enum: not a git repository — cannot test tracked kit files");
+            return 2;
+        }
+        Err(e) => {
+            eprintln!("check-kit-enum: {}", e);
             return 2;
         }
     };

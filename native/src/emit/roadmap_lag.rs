@@ -104,7 +104,7 @@ fn locate(file: &str) -> Result<(String, String), String> {
     }
     let abs = walk::abs_against(&walk::cwd()?, &walk::cross_arg(file));
     let dir = std::path::Path::new(&abs).parent().map(|d| d.to_string_lossy().into_owned()).unwrap_or_default();
-    let top = walk::toplevel_in(&dir).map_err(|_| format!("{} is in no git work tree", file))?;
+    let top = walk::toplevel_in_opt(&dir)?.ok_or_else(|| format!("{} is in no git work tree", file))?;
     let rel = walk::rel_under(&top, &abs)
         .ok_or_else(|| format!("{} is outside its work tree {}", file, top))?
         .to_string();

@@ -237,7 +237,9 @@ fn smoke() -> Result<String, Fail> {
 fn resolve_repo() -> Result<String, Fail> {
     let mut repo = knob("GATE_SDK_UPGRADE_REPO")?;
     if repo.is_empty() {
-        repo = walk::toplevel_opt().unwrap_or(None).unwrap_or_default();
+        repo = walk::toplevel_opt()
+            .map_err(|e| broken(one(format!("{}: {}", NAME, e))))?
+            .unwrap_or_default();
     }
     if repo.is_empty() || !is_toplevel(&repo) {
         let shown = if repo.is_empty() { "<unset>" } else { &repo };

@@ -129,7 +129,7 @@ The `--dry-run`s do not stand in for it: they answer *what would this payload ch
 
 **Three preconditions, each refusing rather than warning**, and each checked before a single file is written, since a partial install is the outcome none may produce:
 
-- **You are inside a git work tree.** The vendored source is meant to be committed, which is what makes it auditable.
+- **You are inside a git work tree.** The vendored source is meant to be committed, which is what makes it auditable. A repository git refuses is refused with the crosser's sentence as the cause ([gate-sdk/SPEC.md §The crate's crosser](../gate-sdk/SPEC.md#the-crates-crosser)) and a remedy naming repair of git's access, never `git init`; `diff` and `uninstall` refuse it the same way.
 - **The worktree is clean.** `init` makes one commit, and a dirty tree would fold your work into it. A clean start also attributes a run's residue: anything dirty at a recorded path when the run ends was written by that run, which lets a no-op run commit what it rewrote. `--no-commit` is the valve. It stages the files and leaves the commit to you, waiving the precondition and that attribution with it.
 - **`doctor` passes.** It holds you to the floor the selected kit set owes, the tools the vendored battery runs, never one that only builds Checkwright ([§doctor](#doctor)). `init` resolves the kit set first and refuses at exit 2 one resolving to no kit or a selection it cannot honour, since the kit set is half of what `doctor` reads. A machine below the floor is refused before any write, never halfway through.
 
@@ -496,9 +496,9 @@ A third exit status, `2`, means the question could not be answered, not that the
 
 A second `init` already upgrades: it compares the recorded version against the payload's, re-reads the profile from the manifest when none is passed, and re-applies the payload around every file you have edited. So `update` is a **name**, not a second mechanism free to drift from the first, and the name is the one an adopter looks for.
 
-It checks existence and no more. An unreadable schema, a stale downgrade and a below-contract toolchain are each `init`'s own precondition, one call away. Outside a git work tree it falls through to `init`'s refusal, which names the accurate remedy, rather than misreporting an absent manifest.
+It checks existence and no more. An unreadable schema, a stale downgrade and a below-contract toolchain are each `init`'s own precondition, one call away. Outside a git work tree, or in a repository git refuses, it falls through to `init`'s refusal, which names the accurate remedy, rather than misreporting an absent manifest.
 
-**Most of what you see comes from `init` and says so.** The one refusal `update` owns is prefixed `checkwright update:`. Every other refusal (not a git work tree, an unknown schema, a dirty worktree, a stale downgrade, a below-contract toolchain) arrives prefixed **`checkwright init:`**, and the success path reports `INIT:`, because `init` produced the line. A refusal raised inside a shared module surfaces through the calling verb's refusal shape, carrying that verb's prefix, `help:` line and exit code. So a `checkwright init:` line answering a command typed as `update` is the design, not a bug.
+**Most of what you see comes from `init` and says so.** The one refusal `update` owns is prefixed `checkwright update:`. Every other refusal (not a git work tree, a repository git refuses, an unknown schema, a dirty worktree, a stale downgrade, a below-contract toolchain) arrives prefixed **`checkwright init:`**, and the success path reports `INIT:`, because `init` produced the line. A refusal raised inside a shared module surfaces through the calling verb's refusal shape, carrying that verb's prefix, `help:` line and exit code. So a `checkwright init:` line answering a command typed as `update` is the design, not a bug.
 
 ### The update notice
 

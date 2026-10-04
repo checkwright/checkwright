@@ -635,7 +635,7 @@ pub fn transitions(file: &str, slug: &str, sec: &Sections) -> Result<Vec<Transit
     if !crate::proc::on_path(&programs::GIT) {
         return Ok(Vec::new());
     }
-    let Some(top) = crate::walk::toplevel_opt().ok().flatten() else {
+    let Some(top) = crate::walk::toplevel_opt()? else {
         return Ok(Vec::new());
     };
     let mut out: Vec<Transition> = Vec::new();

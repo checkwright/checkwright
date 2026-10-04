@@ -222,7 +222,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             // spec: gate-sdk/SPEC.md §check-template-copy-parity — the root defaults to the git
             // toplevel, a derivation no injected fixture case can reach, so a sibling harness
             // drives it against the live tree instead
-            match walk::toplevel().ok() {
+            match walk::toplevel_opt()? {
                 Some(r) => r,
                 None => return Err("not a git repository and no root given".to_string()),
             }

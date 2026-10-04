@@ -153,10 +153,14 @@ pub fn run(args: &[String]) -> i32 {
     // against the invoking directory, which §lib/gate.sh owns as the one place that anchor is set
     let root = match args.first() {
         Some(r) if !r.is_empty() => r.clone(),
-        _ => match fresh::toplevel() {
-            Ok(t) => t,
-            Err(_) => {
+        _ => match walk::toplevel_opt() {
+            Ok(Some(t)) => t,
+            Ok(None) => {
                 eprintln!("check-install-disposition: not a git repository and no root argument");
+                return 2;
+            }
+            Err(e) => {
+                eprintln!("check-install-disposition: {}", e);
                 return 2;
             }
         },

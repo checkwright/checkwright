@@ -8,18 +8,6 @@
 
 ## New Features
 
-### toplevel-refusal-fail-open
-
-[spec: SPEC-toplevel-refusal.md]
-
-`walk::toplevel_args` (native/src/walk.rs) folds every non-zero `git rev-parse --show-toplevel`, a `safe.directory` refusal or broken repository metadata included, into the absent answer, so its 21 `toplevel_opt`/`toplevel_in_opt` call sites (close_surfaces, queue_verbs, file_survey, md_index, pub_index, memory_off, battery_roster, smoke_entry_guard, ruling_staleness and installer among them) read a refused repository as outside a work tree. gate-sdk/SPEC.md §The crate's crosser names two refusals, a dead `git` and outside a work tree, and no third.
-
-**Deliverable:** the `.git`-entry mark `finder-tracked-filter-edges` placed in native/src/spec.rs moved into walk.rs and read by the crosser as a third refusal in its error arm, each caller's verdict re-read, and §The crate's crosser stating the third answer, per the amendment.
-
-**Selected 2026-10-04** for queue-kit-format-native-pass, operator direction lead-relayed (not a ruling). Feature-shaped by scope's triage: a third crosser refusal is a contract about 20 callers in several kits honor, so the spec stage authors its amendment and promotes it, and it lands before [spec-mark-symlink-ascent](#spec-mark-symlink-ascent).
-
-**Cost while deferred:** on a host refusing ownership or with broken metadata, each caller's fail-open is unmeasured. Filed 2026-10-04 to the gap inbox by canon-kit-tail-installer-pass' build; promoted at its close: →fix fails because the crosser's contract widens and about 20 callers' verdicts across several kits need re-reading, →forward because no ruling is owed. Re-verified: `toplevel_args` maps any non-zero exit to `None`; 21 call sites outside walk.rs. Not a recurrence of `finder-tracked-filter-edges`, which closed one finder alone. Owner lookup: `toplevel`, `safe.directory`, `crosser` in this file — [worktree-memory-dir-key](#worktree-memory-dir-key), DISTINCT (a worktree's toplevel, not a refused one); owner gate-sdk/SPEC.md §The crate's crosser.
-
 ## Technical Debt
 
 ### required-sections-literal
@@ -56,9 +44,9 @@ the binary still names or spawns the bash front end where an adopter meets it: t
 
 **Deliverable:** the ascent finding the mark git's discovery finds, with a crate test over a symlinked root into a refused repository.
 
-**Order:** after [toplevel-refusal-fail-open](#toplevel-refusal-fail-open), whose amendment moves the mark into walk.rs; the fix lands there.
+**Order:** after `toplevel-refusal-fail-open`, whose amendment moves the mark into walk.rs; the fix lands there.
 
-**Cost while deferred:** a canon-kit gate given such a root grades untracked files silently. Filed 2026-10-04 to the gap inbox by canon-kit-tail-installer-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because it is crate work with a new test. Re-verified by source read: `abs` is `walk::abs_against` over `cwd()`, lexical, and the ascent is `Path::ancestors`; the end-to-end repro was not re-run. Owner lookup: `repository_mark`, `symlink`, `physical` in this file — [toplevel-refusal-fail-open](#toplevel-refusal-fail-open), DISTINCT (its git answer is folded, here the mark itself misses), and the icebox's walk-entry-model-unstated, DISTINCT (a walk's entries, not the root's ascent); owner canon-kit/SPEC.md §The shared spec adapters.
+**Cost while deferred:** a canon-kit gate given such a root grades untracked files silently. Filed 2026-10-04 to the gap inbox by canon-kit-tail-installer-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because it is crate work with a new test. Re-verified by source read: `abs` is `walk::abs_against` over `cwd()`, lexical, and the ascent is `Path::ancestors`; the end-to-end repro was not re-run. Owner lookup: `repository_mark`, `symlink`, `physical` in this file — `toplevel-refusal-fail-open`, DISTINCT (its git answer is folded, here the mark itself misses), and the icebox's walk-entry-model-unstated, DISTINCT (a walk's entries, not the root's ascent); owner canon-kit/SPEC.md §The shared spec adapters.
 
 ### queue-kit-format-brevity
 
@@ -1231,4 +1219,6 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 Ported gate and emit modules carry spec: comments citing a section for a literal or a port note the section does not state, so a reader following the pointer finds no support for it; a crate-wide sweep would retag, delete or relocate each, and a new instance returns the entry.
 
 ## Done
+
+- toplevel-refusal-fail-open
 

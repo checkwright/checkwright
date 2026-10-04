@@ -1075,7 +1075,7 @@ Every data line's iteration must be the current one, so a stale line from a prio
 
 **Four inertness conditions, all stated, because an unstated one reads as coverage.** The assertion does not run when
 
-- **(a)** the state file's directory lies in no git work tree, or in a different one from the configured surfaces, such as a vendored tree under test or a sandbox;
+- **(a)** git answers that the state file's directory lies in no work tree, or in a different one from the configured surfaces, such as a vendored tree under test or a sandbox. A repository git refuses, or a dead `git`, is no such answer and exits 2 ([gate-sdk/SPEC.md §The crate's crosser](../gate-sdk/SPEC.md#the-crates-crosser));
 - **(b)** the file handed to the gate is not *this* work tree's own configured state file, its repo-root-relative path not being `LIFECYCLE_KIT_STATE_FILE`. Being inside a work tree is not the discriminator: a `gate-tests/` fixture tree sits inside the repo, and firing there would assert a recorded head against a history the fixture's stamps were never taken in. This also keeps the argument mode fixture-capable at no cost to the assertion;
 - **(c)** the state file is not tracked in `HEAD`, since there is then no prior version to diff against and "newly introduced" is unanswerable rather than false, as at a consumer's first state-file commit;
 - **(d)** no stamp is newly introduced, which is every battery run that stamps nothing.

@@ -34,7 +34,7 @@ pub fn run(args: &[String]) -> i32 {
 // spec: installer/SPEC.md §update — an unresolvable root is not this verb's to own either, so it
 // falls through to init's own refusal, which already names the accurate remedy.
 fn precondition() -> Result<(), Refusal> {
-    let Some(root) = super::repo_root() else {
+    let Ok(Some(root)) = super::repo_root() else {
         return Ok(());
     };
     if lock::path(&root).is_file() {

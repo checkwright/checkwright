@@ -236,7 +236,10 @@ fn binary() -> Result<String, String> {
     // spec: gate-sdk/SPEC.md §check-kit-roots-dialect — the knob's default is repo-root-relative
     // like every other, so it resolves against the toplevel rather than the cwd: every child runs
     // inside a vendoring, and this gate's own fixture cases run from a case dir
-    let anchor = walk::toplevel().or_else(|_| walk::cwd())?;
+    let anchor = match walk::toplevel_opt()? {
+        Some(top) => top,
+        None => walk::cwd()?,
+    };
     let bin = walk::abs_against(&anchor, &walk::knob_scalar("GATE_SDK_NATIVE_BIN")?);
     if !proc::is_executable(Path::new(&bin)) {
         return Err(format!(

@@ -492,18 +492,16 @@ fn spec_target<'a>(after: &'a str, leaf: &'a str, packed: &'a [String]) -> Optio
 // second
 fn resolve_root(named: &str) -> Result<String, Refusal> {
     if named.is_empty() {
-        return walk::toplevel_opt()
-            .ok()
-            .flatten()
-            .ok_or_else(|| {
-                refuse("not inside a git work tree — the payload's commit stamp has no source.")
-            });
+        return walk::toplevel_opt().map_err(refuse)?.ok_or_else(|| {
+            refuse("not inside a git work tree — the payload's commit stamp has no source.")
+        });
     }
     if !std::path::Path::new(named).is_dir() {
         return Err(refuse(format!("--root is not a directory: {}", named)));
     }
-    let top = walk::toplevel_in(named)
-        .map_err(|_| refuse(format!("--root is not inside a git work tree: {}", named)))?;
+    let top = walk::toplevel_in_opt(named)
+        .map_err(refuse)?
+        .ok_or_else(|| refuse(format!("--root is not inside a git work tree: {}", named)))?;
     let here = walk::canonicalize(named)
         .ok_or_else(|| refuse(format!("--root is not a directory: {}", named)))?;
     let there = walk::canonicalize(&top).unwrap_or_else(|| top.clone());

@@ -5,13 +5,6 @@ use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
-// spec: gate-sdk/SPEC.md §check-kit-registration — the docs resolve relative to the git
-// toplevel, so the toplevel is resolved before either knob is read and a non-repo cwd is the
-// misconfiguration exit rather than a doc-not-found one
-fn toplevel() -> Option<String> {
-    walk::toplevel().ok()
-}
-
 fn read_doc(path: &str) -> Result<String, String> {
     std::fs::read(path)
         .map(|b| String::from_utf8_lossy(&b).into_owned())
@@ -32,13 +25,20 @@ pub fn run(args: &[String]) -> i32 {
 }
 
 fn rule(args: &[String], stdout: &mut Vec<String>, stderr: &mut Vec<String>) -> i32 {
-    let repo_root = match toplevel() {
-        Some(r) => r,
-        None => {
+    // spec: gate-sdk/SPEC.md §check-kit-registration — the docs resolve relative to the git
+    // toplevel, so the toplevel is resolved before either knob is read and a non-repo cwd is the
+    // misconfiguration exit rather than a doc-not-found one
+    let repo_root = match walk::toplevel_opt() {
+        Ok(Some(r)) => r,
+        Ok(None) => {
             stderr.push(
                 "check-kit-registration: not a git repository — cannot test tracked kit files"
                     .to_string(),
             );
+            return 2;
+        }
+        Err(e) => {
+            stderr.push(format!("check-kit-registration: {}", e));
             return 2;
         }
     };

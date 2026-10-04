@@ -213,8 +213,22 @@ pub fn package(verb_action: &str) -> Result<Package, Refusal> {
 // spec: installer/SPEC.md §init — the repository every verb's preconditions are about, taken
 // through the crate's own crosser so the root is in one dialect (gate-sdk/SPEC.md §The crate's
 // crosser) rather than in whichever one the host's git answers in.
-pub fn repo_root() -> Option<PathBuf> {
-    walk::toplevel_opt().ok().flatten().map(PathBuf::from)
+pub fn repo_root() -> Result<Option<PathBuf>, String> {
+    Ok(walk::toplevel_opt()?.map(PathBuf::from))
+}
+
+// spec: installer/SPEC.md §init — a verb needing the repository refuses outside a work tree with
+// its own help, and in a repository git refuses with the crosser's sentence and a repair remedy
+pub fn required_root(absent_help: &str) -> Result<PathBuf, Refusal> {
+    match repo_root() {
+        Ok(Some(root)) => Ok(root),
+        Ok(None) => Err(refuse("not inside a git work tree", absent_help, 2)),
+        Err(cause) => Err(refuse(
+            cause,
+            "git cannot answer for this repository, so the verb has no root to act on. Repair git's access to it (`git status` prints git's reason), then run the verb again.",
+            2,
+        )),
+    }
 }
 
 pub fn git_capture(root: &Path, args: &[&str]) -> Result<String, String> {

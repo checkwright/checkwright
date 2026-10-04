@@ -231,15 +231,7 @@ struct Tracked(Option<std::collections::HashSet<Vec<u8>>>);
 impl Tracked {
     fn at(root: &str) -> Result<Tracked, String> {
         if walk::toplevel_in_opt(root)?.is_none() {
-            return match repository_mark(root) {
-                None => Ok(Tracked(None)),
-                Some(mark) => Err(format!(
-                    "git answers no work tree at {} though {} marks a repository — a refused or broken repository is not walked, so the tracked set is unknown (`git -C {} status` prints git's reason)",
-                    root,
-                    mark.display(),
-                    root
-                )),
-            };
+            return Ok(Tracked(None));
         }
         let listed = crate::proc::run(&programs::GIT, &["-C", root, "ls-files", "-z"])?;
         let raw = match listed.stdout() {
@@ -258,28 +250,6 @@ impl Tracked {
         let rel = if cfg!(windows) { rel.replace('\\', "/") } else { rel };
         set.contains(rel.as_bytes())
     }
-}
-
-// spec: canon-kit/SPEC.md §The shared spec adapters — a `.git` entry at the scan root or above,
-// ascending no further than git's own discovery would, or a `GIT_DIR` naming one outright
-fn repository_mark(root: &str) -> Option<PathBuf> {
-    if let Some(d) = std::env::var_os("GIT_DIR").filter(|d| !d.is_empty()) {
-        return Some(PathBuf::from(d));
-    }
-    let ceilings: Vec<String> = std::env::var_os("GIT_CEILING_DIRECTORIES")
-        .map(|v| std::env::split_paths(&v).map(|c| walk::normalize_abs(&c.display().to_string())).collect())
-        .unwrap_or_default();
-    let start = PathBuf::from(abs(root));
-    for (i, dir) in start.ancestors().enumerate() {
-        if i > 0 && ceilings.contains(&walk::normalize_abs(&dir.display().to_string())) {
-            return None;
-        }
-        let mark = walk::child(dir, ".git");
-        if mark.symlink_metadata().is_ok() {
-            return Some(mark);
-        }
-    }
-    None
 }
 
 // spec: canon-kit/SPEC.md §The shared spec adapters — `_spec_comment_surface`: the governed-source corpus

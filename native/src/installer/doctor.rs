@@ -276,6 +276,8 @@ fn toolchain_block(
 // report run outside a work tree names the same dialect one run inside it does.
 fn here() -> std::path::PathBuf {
     super::repo_root()
+        .ok()
+        .flatten()
         .or_else(|| crate::walk::cwd().ok().map(std::path::PathBuf::from))
         .unwrap_or_else(|| std::path::PathBuf::from("."))
 }

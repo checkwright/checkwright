@@ -164,8 +164,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
         );
         return Ok(0);
     }
-    let top = walk::toplevel()
-        .map_err(|_| "not a git repository — cannot resolve tracked paths".to_string())?;
+    let top = walk::toplevel_opt()?
+        .ok_or_else(|| "not a git repository — cannot resolve tracked paths".to_string())?;
     let files: Vec<String> = if !args.is_empty() {
         args.to_vec()
     } else {

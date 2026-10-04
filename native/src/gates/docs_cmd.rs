@@ -31,8 +31,8 @@ enum Token {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let top = walk::toplevel()
-        .map_err(|_| "not a git repository — cannot verify tracked paths/knobs".to_string())?;
+    let top = walk::toplevel_opt()?
+        .ok_or_else(|| "not a git repository — cannot verify tracked paths/knobs".to_string())?;
 
     let exclude = spec::knob_array_pub("CANON_KIT_MDREF_EXCLUDE")?;
     let files: Vec<String> = if !args.is_empty() {

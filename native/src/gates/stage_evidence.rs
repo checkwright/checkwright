@@ -95,8 +95,8 @@ fn provenance(
     };
     // spec: lifecycle-kit/SPEC.md §check-stage-evidence — inertness (a): no work tree holding
     // the state file, or a different one from the work tree the configured surfaces resolve
-    // against — a vendored tree under test, a sandbox fixture
-    let (Ok(root_s), Ok(root_c)) = (walk::toplevel_in(&dir), walk::toplevel()) else {
+    // against — a vendored tree under test, a sandbox fixture; a crosser error is no such answer
+    let (Some(root_s), Some(root_c)) = (walk::toplevel_in_opt(&dir)?, walk::toplevel_opt()?) else {
         return inert;
     };
     if root_s != root_c {

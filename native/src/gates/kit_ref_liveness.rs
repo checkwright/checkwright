@@ -148,10 +148,12 @@ fn prefix_of(root: &str) -> String {
 
 fn rule(args: &[String]) -> Result<i32, String> {
     let scanroot = fresh::positional(args, 0, ".");
-    let top = fresh::toplevel().map_err(|_| {
-        "check-kit-ref-liveness: not a git repository — cannot enumerate tracked paths/knobs"
-            .to_string()
-    })?;
+    let top = walk::toplevel_opt()
+        .map_err(|e| format!("check-kit-ref-liveness: {}", e))?
+        .ok_or_else(|| {
+            "check-kit-ref-liveness: not a git repository — cannot enumerate tracked paths/knobs"
+                .to_string()
+        })?;
 
     let mut live: HashSet<String> = HashSet::new();
     let mut roots: Vec<String> = Vec::new();

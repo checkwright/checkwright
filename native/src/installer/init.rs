@@ -361,13 +361,9 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     // spec: installer/SPEC.md §init — the three preconditions all refuse rather than warn, and
     // all three are checked before any file is written: a partial install is the outcome none of
     // them may produce.
-    let root = super::repo_root().ok_or_else(|| {
-        refuse(
-            "not inside a git work tree",
-            "the vendored source is meant to be committed, which is what makes it auditable. Run 'git init' first, or run init inside the repository you want governed.",
-            2,
-        )
-    })?;
+    let root = super::required_root(
+        "the vendored source is meant to be committed, which is what makes it auditable. Run 'git init' first, or run init inside the repository you want governed.",
+    )?;
 
     // spec: installer/SPEC.md §init — the clean-worktree precondition exists so the one commit
     // init makes is exactly what it vendored; --no-commit is its valve, because an operator staging

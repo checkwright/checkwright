@@ -14,13 +14,6 @@ pub fn fail_closed(what: &str, code: Option<i32>) -> String {
     )
 }
 
-// spec: gate-sdk/SPEC.md §The consumer remainder cohort — the emitter anchor. The shell forms
-// anchor at their own script's directory, which a compiled subcommand cannot recover; each of
-// these members is consumer-declared and sat one level under the toplevel, so the two agree.
-pub fn toplevel() -> Result<String, String> {
-    crate::walk::toplevel().map_err(|e| format!("{} — the emitter anchor cannot be resolved", e))
-}
-
 // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the tree side of the source stamp, in the
 // one runtime helper both its readers call. `None` where git cannot answer, so a caller fails
 // closed rather than comparing against an empty string.

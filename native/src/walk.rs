@@ -476,27 +476,68 @@ pub fn toplevel() -> Result<String, String> {
 // Two callers compare a `-C` answer against a bare one, so both sides must cross or the compare
 // is between dialects rather than between directories.
 pub fn toplevel_in(dir: &str) -> Result<String, String> {
-    toplevel_args(&["-C", dir])?.ok_or_else(|| "not a git repository".to_string())
+    toplevel_args(Some(dir))?.ok_or_else(|| "not a git repository".to_string())
 }
 
-// spec: gate-sdk/SPEC.md §The crate's crosser — the producer's two refusals kept apart, for the
-// callers that report a dead `git` differently from a directory outside a work tree
+// spec: gate-sdk/SPEC.md §The crate's crosser — the producer's three refusals kept apart, for the
+// callers that report a dead `git` and a refused repository differently from a directory outside
+// a work tree
 pub fn toplevel_opt() -> Result<Option<String>, String> {
-    toplevel_args(&[])
+    toplevel_args(None)
 }
 
 pub fn toplevel_in_opt(dir: &str) -> Result<Option<String>, String> {
-    toplevel_args(&["-C", dir])
+    toplevel_args(Some(dir))
 }
 
-fn toplevel_args(anchor: &[&str]) -> Result<Option<String>, String> {
-    let mut args: Vec<&str> = anchor.to_vec();
+fn toplevel_args(dir: Option<&str>) -> Result<Option<String>, String> {
+    let mut args: Vec<&str> = dir.map(|d| vec!["-C", d]).unwrap_or_default();
     args.extend_from_slice(&["rev-parse", "--show-toplevel"]);
     let c = crate::proc::run(&programs::GIT, &args)?;
-    Ok(c.stdout()
-        .map(|o| String::from_utf8_lossy(o).trim().to_string())
+    let Some(out) = c.stdout() else { return refused_or_absent(dir) };
+    Ok(Some(String::from_utf8_lossy(out).trim().to_string())
         .filter(|s| !s.is_empty())
         .map(|s| normalize_abs(&s)))
+}
+
+// spec: gate-sdk/SPEC.md §The crate's crosser — git's stderr cannot tell a broken repository from
+// none, so a non-zero exit is classified by the mark at the anchor alone
+fn refused_or_absent(dir: Option<&str>) -> Result<Option<String>, String> {
+    let Ok(here) = cwd() else { return Ok(None) };
+    let anchor = abs_against(&here, dir.unwrap_or("."));
+    if !Path::new(&anchor).is_dir() {
+        return Ok(None);
+    }
+    match repository_mark(&anchor) {
+        None => Ok(None),
+        Some(mark) => Err(format!(
+            "git answers no work tree at {} though {} marks a repository — a refused or broken repository is not read as outside one (`git -C {} status` prints git's reason)",
+            anchor,
+            mark.display(),
+            anchor
+        )),
+    }
+}
+
+// spec: gate-sdk/SPEC.md §The crate's crosser — a `.git` entry of any type at the anchor or above,
+// ascending no further than git's own discovery would, or a `GIT_DIR` naming one outright
+fn repository_mark(anchor: &str) -> Option<PathBuf> {
+    if let Some(d) = std::env::var_os("GIT_DIR").filter(|d| !d.is_empty()) {
+        return Some(PathBuf::from(d));
+    }
+    let ceilings: Vec<String> = std::env::var_os("GIT_CEILING_DIRECTORIES")
+        .map(|v| std::env::split_paths(&v).map(|c| normalize_abs(&c.display().to_string())).collect())
+        .unwrap_or_default();
+    for (i, dir) in Path::new(anchor).ancestors().enumerate() {
+        if i > 0 && ceilings.contains(&normalize_abs(&dir.display().to_string())) {
+            return None;
+        }
+        let mark = child(dir, ".git");
+        if mark.symlink_metadata().is_ok() {
+            return Some(mark);
+        }
+    }
+    None
 }
 
 // spec: gate-sdk/SPEC.md §The crate's crosser — the main checkout's root when the working directory
@@ -1286,6 +1327,40 @@ pub fn fixture_case_dirs(gate: &str) -> Vec<PathBuf> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: gate-sdk/SPEC.md §The crate's crosser — a non-zero exit at a marked anchor is the
+    // refused answer under every form, at an unmarked or missing one the absent answer
+    #[test]
+    fn a_repository_git_refuses_is_kept_apart_from_outside_a_work_tree() {
+        let env = crate::knobenv::lock();
+        let inherited = std::env::var("GIT_DIR").ok();
+        env.remove("GIT_DIR");
+        env.remove("GIT_CEILING_DIRECTORIES");
+        let d = std::env::temp_dir().join(format!("walk-toplevel-refusal-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        let sub = d.join("sub");
+        std::fs::create_dir_all(&sub).expect("scratch");
+        let (top, at) = (normalize_abs(&d.display().to_string()), normalize_abs(&sub.display().to_string()));
+        assert_eq!(toplevel_in_opt(&at), Ok(None), "an unmarked directory is outside a work tree");
+        std::fs::write(d.join(".git"), format!("gitdir: {}\n", d.join("absent").display())).expect("write");
+        let refused = toplevel_in_opt(&at).expect_err("a broken repository read as none");
+        assert!(refused.contains(&format!("at {} though", at)), "{}", refused);
+        assert!(refused.contains(".git marks a repository"), "{}", refused);
+        assert_eq!(toplevel_in(&at), Err(refused.clone()), "the refusal is not folded into the absent sentence");
+        assert_eq!(toplevel_in_opt(&format!("{}/missing", at)), Ok(None), "a -C anchor that is no directory");
+        env.set("GIT_CEILING_DIRECTORIES", &top);
+        assert_eq!(toplevel_in_opt(&at), Ok(None), "a ceiling git honours hides the mark");
+        env.remove("GIT_CEILING_DIRECTORIES");
+        std::fs::remove_file(d.join(".git")).expect("unmark");
+        env.set("GIT_DIR", &d.join("absent").display().to_string());
+        let named = toplevel_in_opt(&at).expect_err("a GIT_DIR naming nothing read as none");
+        assert!(named.contains("marks a repository"), "{}", named);
+        match inherited {
+            Some(v) => env.set("GIT_DIR", &v),
+            None => env.remove("GIT_DIR"),
+        }
+        let _ = std::fs::remove_dir_all(&d);
+    }
 
     // spec: gate-sdk/SPEC.md §The crate's crosser — linked only when the two dirs differ and the
     // common dir's leaf is `.git`; a bare repository's worktree and the main checkout itself are not

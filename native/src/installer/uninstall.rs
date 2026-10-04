@@ -107,13 +107,9 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
     // spec: installer/SPEC.md §init — every precondition refuses rather than warns and all of
     // them are checked before anything is removed, for init's own reason: a partial removal is the
     // outcome none of them may produce.
-    let root = super::repo_root().ok_or_else(|| {
-        refuse(
-            "not inside a git work tree",
-            "uninstall stages and commits the removal the same way init committed the install, so it needs the repository it is reversing.",
-            2,
-        )
-    })?;
+    let root = super::required_root(
+        "uninstall stages and commits the removal the same way init committed the install, so it needs the repository it is reversing.",
+    )?;
     let lock_path = lock::path(&root);
     if !lock_path.is_file() {
         return Err(refuse(

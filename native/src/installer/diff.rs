@@ -29,13 +29,9 @@ fn compare() -> Result<i32, Refusal> {
     // spec: installer/SPEC.md §init — every precondition refuses rather than warns, and is
     // checked before anything is compared: diff's subject is exactly the roster init recorded, so
     // it needs the repository that roster is in.
-    let root = super::repo_root().ok_or_else(|| {
-        refuse(
-            "not inside a git work tree",
-            "diff compares the tree against the manifest init committed there, so it needs the repository that manifest is in.",
-            2,
-        )
-    })?;
+    let root = super::required_root(
+        "diff compares the tree against the manifest init committed there, so it needs the repository that manifest is in.",
+    )?;
     let path = lock::path(&root);
     if !path.is_file() {
         return Err(refuse(
