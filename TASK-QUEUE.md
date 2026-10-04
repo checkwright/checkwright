@@ -236,7 +236,7 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 ### spec-brevity-residue
 
-[roadmap: now/adoption] [cost: session/high] [surface: queue-kit] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
+[roadmap: now/adoption] [cost: session/high] [surface: drift-kit] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
 
 the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices (below); lifecycle-kit, installer, guard-kit, delegation-kit, canon-kit and queue-kit are finished or split out (the slices below); what remains starts at drift-kit, context-kit, evidence-kit, site-kit, then doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling): a slice has landed at each recent scope; the per-kit slices stay off the roadmap.
 
@@ -1183,11 +1183,4 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 Ported gate and emit modules carry spec: comments citing a section for a literal or a port note the section does not state, so a reader following the pointer finds no support for it; a crate-wide sweep would retag, delete or relocate each, and a new instance returns the entry.
 
 ## Done
-
-- nested-broken-repo-toplevel
-- crosser-anchor-lexical-ascent
-- repo-probe-refusal-blind
-- run-door-subdir-rebind
-- section-knob-colon-prefix
-- queue-kit-arms-brevity
 
