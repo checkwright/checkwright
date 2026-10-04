@@ -1204,10 +1204,3 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 
 ## Done
 
-- notice-cache-concurrency
-- canon-kit-reach-overstatement
-- canon-kit-tail-brevity
-- windows-job-kill-fallback
-- attest-stub-argv-exactness
-- finder-tracked-filter-edges
-
