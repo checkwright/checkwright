@@ -9,3 +9,4 @@ installer-trust-pass spec a9d19c03 2026-10-04 9f8a86d1
 installer-trust-pass align a3fc4fdb 2026-10-04 403a76fb
 installer-trust-pass build a5085d61 2026-10-04 41f9a931
 installer-trust-pass build aedaa64d 2026-10-04 2bae57ae
+installer-trust-pass build aff85e5a 2026-10-04 59677a46
