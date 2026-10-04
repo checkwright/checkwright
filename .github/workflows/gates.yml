@@ -281,15 +281,19 @@ jobs:
           for verdict in pass fail; do
             cat > "$stubs/$verdict/gh" <<'STUB'
           #!/bin/sh
-          case "$1 $2" in
-            'auth token') echo stub-token; exit 0 ;;
-            'auth status') echo 'stub gh: auth status reaches the API, which this stub reads as down' >&2; exit 1 ;;
-            'attestation verify') [ "$3" = --help ] && exit 0 ;;
-            *) echo "stub gh: unexpected call: $*" >&2; exit 3 ;;
+          unexpected() { echo "stub gh: unexpected call of $# argument(s): $*" >&2; exit 3; }
+          case "$#:$1:$2" in
+            4:auth:token) [ "$3" = --hostname ] && [ "$4" = github.com ] || unexpected "$@"; echo stub-token; exit 0 ;;
+            *:auth:status) echo 'stub gh: auth status reaches the API, which this stub reads as down' >&2; exit 1 ;;
+            3:attestation:verify) [ "$3" = --help ] || unexpected "$@"; exit 0 ;;
+            9:attestation:verify) ;;
+            *) unexpected "$@" ;;
           esac
           file="$3"; shift 3
-          want='--repo checkwright/checkwright --signer-workflow checkwright/checkwright/.github/workflows/publish.yml --source-ref refs/tags/v99.0.0'
-          [ "$*" = "$want" ] || { echo "stub gh: verify flags were '$*', want '$want'" >&2; exit 3; }
+          for want in --repo checkwright/checkwright --signer-workflow checkwright/checkwright/.github/workflows/publish.yml --source-ref refs/tags/v99.0.0; do
+            [ "$1" = "$want" ] || { echo "stub gh: verify argument '$1', want '$want'" >&2; exit 3; }
+            shift
+          done
           STUB
             if [ "$verdict" = fail ]; then
               printf 'echo "stub gh: no attestation for $file" >&2; exit 1\n' >> "$stubs/$verdict/gh"
@@ -1058,10 +1062,10 @@ jobs:
           New-Item -ItemType Directory -Force -Path "$stubs\pass", "$stubs\fail" | Out-Null
           $stubBody = @(
               '@echo off',
-              'if "%1 %2"=="auth token" (echo stub-token& exit 0)',
+              'if "%1 %2 %3 %4"=="auth token --hostname github.com" if "%5"=="" (echo stub-token& exit 0)',
               'if "%1 %2"=="auth status" (echo stub gh: auth status reaches the API, which this stub reads as down 1>&2& exit 1)',
               'if not "%1 %2"=="attestation verify" (echo stub gh: unexpected call: %* 1>&2& exit 3)',
-              'if "%3"=="--help" exit 0',
+              'if "%3"=="--help" if "%4"=="" exit 0',
               'set "file=%~3"',
               'shift',
               'shift',
