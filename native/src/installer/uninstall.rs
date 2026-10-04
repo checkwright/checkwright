@@ -304,8 +304,11 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
             );
             print!("{}", residual(&keep));
         }
-        if let Some(cache) = crate::emit::update_notice::cache_path(&root).filter(|c| c.is_file()) {
-            println!("\nwould delete the update check's cache, {}.", cache.display());
+        if crate::emit::update_notice::cache_path(&root).is_some_and(|c| c.is_file()) {
+            println!(
+                "\nwould delete the update check's cache, {} in this clone's git directory.",
+                crate::emit::update_notice::CACHE_FILE
+            );
         }
         if !hooks_line.is_empty() {
             println!("\nwould print this for you to run yourself:\n  {}", hooks_line);
