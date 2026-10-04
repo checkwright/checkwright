@@ -146,7 +146,7 @@ curl -fsSLo "$cw/checkwright-$v.tgz.sha256" "https://github.com/checkwright/chec
 Where `gh` is installed and signed in, check the build attestation too; a release older than attestation fails it:
 
 ```sh
-gh attestation verify "$cw/checkwright-$v.tgz" --repo checkwright/checkwright
+gh attestation verify "$cw/checkwright-$v.tgz" --repo checkwright/checkwright --source-ref "refs/tags/v$v"
 ```
 
 Then verify, extract and run `init` from your repository root:
@@ -214,7 +214,7 @@ Invoke-WebRequest "$url.sha256" -OutFile "$cw\checkwright-$v.tgz.sha256" -UseBas
 Check the attestation as on macOS and Linux:
 
 ```powershell
-gh attestation verify "$cw\checkwright-$v.tgz" --repo checkwright/checkwright
+gh attestation verify "$cw\checkwright-$v.tgz" --repo checkwright/checkwright --source-ref "refs/tags/v$v"
 ```
 
 Then check the digest, unpack, and run `init`, still from your repository root:

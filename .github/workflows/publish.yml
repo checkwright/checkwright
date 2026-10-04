@@ -282,7 +282,8 @@ jobs:
 
           # spec: installer/SPEC.md §The dependency boundary — no Release exists for a tarball that fails its own attestation
           gh attestation verify "dist/$name" --repo "$GH_REPO" \
-            --signer-workflow "$GH_REPO/.github/workflows/publish.yml"
+            --signer-workflow "$GH_REPO/.github/workflows/publish.yml" \
+            --source-ref "refs/tags/$TAG"
 
           # spec: gate-sdk/SPEC.md §Consumer payload — the per-target archives, a digest source outside the payload
           for f in dist/*; do

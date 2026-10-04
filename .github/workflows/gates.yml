@@ -275,11 +275,29 @@ jobs:
             cp "${placed[0]}" "$work/serve/v$sv/checkwright-$sv.tgz"
             printf '%s  %s\n' "$hex" "checkwright-$sv.tgz" > "$work/serve/v$sv/checkwright-$sv.tgz.sha256"
           done
+          # spec: installer/SPEC.md §Requirements — the stub fails `auth status`, refuses any call the scripts do not make, and asserts the verify's whole argv
           stubs="$work/gh-stubs"
           mkdir -p "$stubs/pass" "$stubs/fail"
-          printf '#!/bin/sh\nexit 0\n' > "$stubs/pass/gh"
-          printf '#!/bin/sh\nif [ "$1 $2" = "attestation verify" ] && [ "$3" != --help ]; then echo "stub gh: no attestation for $3" >&2; exit 1; fi\nexit 0\n' > "$stubs/fail/gh"
-          chmod +x "$stubs/pass/gh" "$stubs/fail/gh"
+          for verdict in pass fail; do
+            cat > "$stubs/$verdict/gh" <<'STUB'
+          #!/bin/sh
+          case "$1 $2" in
+            'auth token') echo stub-token; exit 0 ;;
+            'auth status') echo 'stub gh: auth status reaches the API, which this stub reads as down' >&2; exit 1 ;;
+            'attestation verify') [ "$3" = --help ] && exit 0 ;;
+            *) echo "stub gh: unexpected call: $*" >&2; exit 3 ;;
+          esac
+          file="$3"; shift 3
+          want='--repo checkwright/checkwright --signer-workflow checkwright/checkwright/.github/workflows/publish.yml --source-ref refs/tags/v99.0.0'
+          [ "$*" = "$want" ] || { echo "stub gh: verify flags were '$*', want '$want'" >&2; exit 3; }
+          STUB
+            if [ "$verdict" = fail ]; then
+              printf 'echo "stub gh: no attestation for $file" >&2; exit 1\n' >> "$stubs/$verdict/gh"
+            else
+              printf 'exit 0\n' >> "$stubs/$verdict/gh"
+            fi
+            chmod +x "$stubs/$verdict/gh"
+          done
           attest() {
             local label="$1" sv="$2" lead="$3" dir="$work/attest-$1"
             mkdir -p "$dir"
@@ -314,7 +332,7 @@ jobs:
           [ ! -e "$work/attest-stub-fail/checkwright.lock" ] \
             || { echo "::error::the stub-fail arm refused and still wrote checkwright.lock"; exit 1; }
           attest runner-path 99.0.0 ''
-          expect_line runner-path 'checkwright install: build attestation not checked (gh is not installed or not signed in); to check it: gh attestation verify checkwright-99.0.0.tgz --repo checkwright/checkwright'
+          expect_line runner-path 'checkwright install: build attestation not checked (gh is not installed or not signed in); to check it: gh attestation verify checkwright-99.0.0.tgz --repo checkwright/checkwright --source-ref refs/tags/v99.0.0'
           expect_lock runner-path
           echo "the one-liner printed each attestation outcome: below the floor, verified, refused, and unchecked"
 
@@ -1035,14 +1053,24 @@ jobs:
               [IO.File]::WriteAllText("$d\checkwright-$sv.tgz.sha256", "$hex  checkwright-$sv.tgz`n")
           }
           Copy-Item -LiteralPath docs\install.ps1 -Destination "$serve\install.ps1"
+          # spec: installer/SPEC.md §Requirements — the stub fails `auth status`, refuses any call the scripts do not make, and asserts the verify's whole argv
           $stubs = Join-Path $env:PWSH_SCRATCH 'gh-stubs'
           New-Item -ItemType Directory -Force -Path "$stubs\pass", "$stubs\fail" | Out-Null
-          Set-Content -LiteralPath "$stubs\pass\gh.cmd" -Encoding Ascii -Value '@exit 0'
-          Set-Content -LiteralPath "$stubs\fail\gh.cmd" -Encoding Ascii -Value @(
+          $stubBody = @(
               '@echo off',
-              'if "%1 %2"=="attestation verify" if not "%3"=="--help" (echo stub gh: no attestation for %3 1>&2 & exit 1)',
-              'exit 0'
+              'if "%1 %2"=="auth token" (echo stub-token& exit 0)',
+              'if "%1 %2"=="auth status" (echo stub gh: auth status reaches the API, which this stub reads as down 1>&2& exit 1)',
+              'if not "%1 %2"=="attestation verify" (echo stub gh: unexpected call: %* 1>&2& exit 3)',
+              'if "%3"=="--help" exit 0',
+              'set "file=%~3"',
+              'shift',
+              'shift',
+              'shift',
+              'if not "%1 %2 %3 %4 %5 %6"=="--repo checkwright/checkwright --signer-workflow checkwright/checkwright/.github/workflows/publish.yml --source-ref refs/tags/v99.0.0" (echo stub gh: verify flags were %1 %2 %3 %4 %5 %6 1>&2& exit 3)',
+              'if not "%7"=="" (echo stub gh: verify carried an extra argument %7 1>&2& exit 3)'
           )
+          Set-Content -LiteralPath "$stubs\pass\gh.cmd" -Encoding Ascii -Value ($stubBody + 'exit 0')
+          Set-Content -LiteralPath "$stubs\fail\gh.cmd" -Encoding Ascii -Value ($stubBody + '(echo stub gh: no attestation for %file% 1>&2& exit 1)')
           $base = 'http://127.0.0.1:8734'
           $srv = Start-Process -FilePath python -ArgumentList '-m', 'http.server', '8734', '--bind', '127.0.0.1', '--directory', $serve -PassThru -WindowStyle Hidden
           $script:fails = 0
@@ -1096,7 +1124,7 @@ jobs:
               $want = "checkwright install: verify failed: checkwright-99.0.0.tgz carries no build attestation from checkwright/checkwright's publish workflow"
               Check "a failing gh: the refusal line, a throw and no lock" ($r.Err.Contains($want) -and $r.Code -ne 0 -and -not $r.Lock) "exit $($r.Code), lock $($r.Lock)"
               $r = Invoke-Arm 'runner-path' '99.0.0' ''
-              $want = 'checkwright install: build attestation not checked (gh is not installed or not signed in); to check it: gh attestation verify checkwright-99.0.0.tgz --repo checkwright/checkwright'
+              $want = 'checkwright install: build attestation not checked (gh is not installed or not signed in); to check it: gh attestation verify checkwright-99.0.0.tgz --repo checkwright/checkwright --source-ref refs/tags/v99.0.0'
               Check "the runner's own PATH and no token: the unchecked line, exit 0 and a lock" ($r.Err.Contains($want) -and $r.Code -eq 0 -and $r.Lock) "exit $($r.Code), lock $($r.Lock)"
           } finally { Stop-Process -Id $srv.Id -Force -ErrorAction SilentlyContinue }
           if ($script:fails -ne 0) { exit 1 }

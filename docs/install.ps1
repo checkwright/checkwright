@@ -66,14 +66,14 @@ function Install-Checkwright {
             if ($gh) {
                 & $gh.Source attestation verify --help *> $null
                 if ($LASTEXITCODE -eq 0) {
-                    & $gh.Source auth status --hostname github.com *> $null
+                    & $gh.Source auth token --hostname github.com *> $null
                     $ghReady = ($LASTEXITCODE -eq 0)
                 }
             }
             if (-not $ghReady) {
-                [Console]::Error.WriteLine("checkwright install: build attestation not checked (gh is not installed or not signed in); to check it: gh attestation verify $tgz --repo checkwright/checkwright")
+                [Console]::Error.WriteLine("checkwright install: build attestation not checked (gh is not installed or not signed in); to check it: gh attestation verify $tgz --repo checkwright/checkwright --source-ref refs/tags/v$version")
             } else {
-                $ghOut = & $gh.Source attestation verify (Join-Path $dir $tgz) --repo checkwright/checkwright --signer-workflow checkwright/checkwright/.github/workflows/publish.yml 2>&1
+                $ghOut = & $gh.Source attestation verify (Join-Path $dir $tgz) --repo checkwright/checkwright --signer-workflow checkwright/checkwright/.github/workflows/publish.yml --source-ref "refs/tags/v$version" 2>&1
                 if ($LASTEXITCODE -ne 0) {
                     $ghOut | ForEach-Object { [Console]::Error.WriteLine("$_") }
                     throw "checkwright install: verify failed: $tgz carries no build attestation from checkwright/checkwright's publish workflow"

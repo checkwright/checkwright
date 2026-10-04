@@ -61,16 +61,17 @@ checkwright_install() {
         printf 'checkwright install: v%s predates build attestation; checked against its digest only\n' "$cw_version" >&2
     elif command -v gh >/dev/null 2>&1 \
         && gh attestation verify --help >/dev/null 2>&1 \
-        && gh auth status --hostname github.com >/dev/null 2>&1; then
+        && gh auth token --hostname github.com >/dev/null 2>&1; then
         cw_gh="$(gh attestation verify "$cw_dir/$cw_tgz" --repo checkwright/checkwright \
-            --signer-workflow checkwright/checkwright/.github/workflows/publish.yml 2>&1)" || {
+            --signer-workflow checkwright/checkwright/.github/workflows/publish.yml \
+            --source-ref "refs/tags/v$cw_version" 2>&1)" || {
             printf '%s\n' "$cw_gh" >&2
             printf "checkwright install: verify failed: %s carries no build attestation from checkwright/checkwright's publish workflow\n" "$cw_tgz" >&2
             exit 2
         }
         printf 'checkwright install: build attestation verified\n' >&2
     else
-        printf 'checkwright install: build attestation not checked (gh is not installed or not signed in); to check it: gh attestation verify %s --repo checkwright/checkwright\n' "$cw_tgz" >&2
+        printf 'checkwright install: build attestation not checked (gh is not installed or not signed in); to check it: gh attestation verify %s --repo checkwright/checkwright --source-ref refs/tags/v%s\n' "$cw_tgz" "$cw_version" >&2
     fi
 
     (cd "$cw_dir" && tar -xzf "$cw_tgz") || {
