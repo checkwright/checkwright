@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### run-door-subdir-rebind
-
-`EVIDENCE_KIT_RUN_<suite>`'s derived member spells its tests and checks dirs relative to the working directory but takes its door from `GATE_SDK_NATIVE_BIN`'s repository-relative default (`run_members` in `native/src/knobs/evidence_kit.rs`, `host_native_bin` in `knobs/gate_sdk.rs`), so `--run-validate` invoked on the binary from a subdirectory runs a door that does not resolve there. The front end changes to the toplevel first, so only the binary door is exposed, and evidence-kit/SPEC.md §Layout and configuration states the working-directory run without the door's rebinding.
-
-**Deliverable:** the derived member's door and dirs spelled against one base, a test running a suite from a subdirectory through the binary door, and the SPEC's paragraph stating the rebinding.
-
-**Cost while deferred:** a validate run started from a subdirectory on the binary fails on a door that does not resolve. Filed 2026-10-04 to the gap inbox by queue-kit-format-native-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the base choice is a derivation contract with a test, →forward because no ruling is owed. Re-verified by source read: `run_members` takes the door from the knob's repository-relative default. Owner lookup: `run_members`, `EVIDENCE_KIT_RUN`, `subdirectory` in this file — none; owner evidence-kit/SPEC.md §Layout and configuration.
-
 ### section-knob-colon-prefix
 
 `check-queue-sections` prefix-matches every required name ending in `:` (`matches` in `native/src/gates/queue_sections.rs`), and the section knobs' names join that set by derivation (`compose_required` in `native/src/queue.rs`), so a section knob named with a trailing colon (an active section `Now:`) is satisfied by `## Now: anything` while `Sections::is_task` matches only the exact name, leaving section-scoped gates open. queue-kit/SPEC.md §Layout and configuration promises the derivation closes that fail-open class.
@@ -1201,4 +1193,5 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 - nested-broken-repo-toplevel
 - crosser-anchor-lexical-ascent
 - repo-probe-refusal-blind
+- run-door-subdir-rebind
 
