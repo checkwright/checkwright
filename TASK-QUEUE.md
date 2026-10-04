@@ -526,6 +526,36 @@ canon-kit/SPEC.md states two canon-kit-reach-pass landings wider than the code. 
 
 **Cost while deferred:** a reader of either section, or of the next release note, trusts a guarantee the gate does not give. Filed 2026-10-04 to the gap inbox by canon-kit-reach-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the digit half chooses between narrowing the SPEC and widening the gate, and the tracked-set half is reshaped by [finder-tracked-filter-edges](#finder-tracked-filter-edges), which goes first; →forward because no ruling is owed. Re-verified by source read: the bullet's wording and the ASCII test. Owner lookup: `is_ascii_digit`, `section-number`, `sparse`, `submodule` in this file and the disposed-findings record — none; owner canon-kit/SPEC.md §The shared spec adapters, with §check-spec-pointer.
 
+### windows-job-kill-fallback
+
+[cost: event/low] [surface: installer]
+
+the bounded capture's tree kill on Windows falls back to a child-only kill when `CreateJobObjectW` or `AssignProcessToJobObject` fails: `Tree::spawn` in `native/src/proc.rs` keeps a null job and returns a successful spawn, which only its own comment states. installer/SPEC.md §The update notice says the probe joins a job object and the job is terminated, and its honest limits name only the spawn-to-assignment window.
+
+**Deliverable:** either the spawn refused when the job cannot be made or joined, or the weaker bound stated among §The update notice's honest limits; a test of the chosen branch, which only the Windows crate-tests leg runs.
+
+**Cost while deferred:** on a Windows host refusing job objects, an expired probe leaves git's remote and credential helpers running while the SPEC promises they are killed. Filed 2026-10-04 to the gap inbox by installer-notice-attest-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because refusing the spawn changes a verdict and either branch owes a Windows-only witness, →forward because no ruling is owed. Re-verified by source read: a failed assignment closes the job and keeps the null handle. Owner lookup: `CreateJobObject`, `job object`, `Tree::spawn` in this file and the disposed-findings record — none; owner installer/SPEC.md §The update notice.
+
+### notice-cache-concurrency
+
+[cost: event/low] [surface: installer]
+
+the update notice's cache is read, probed and rewritten with no lock and a non-atomic `std::fs::write` (`reading()` in `native/src/emit/update_notice.rs`), and that write and uninstall's cache `remove_file` (`native/src/installer/uninstall.rs`) discard their errors. Concurrent `doctor` or session-hook reads, or worktrees sharing the cache, can each probe, a reader can see a truncated record, an unwritable git directory probes on every read, and uninstall can leave the cache. installer/SPEC.md §The update notice ("one attempt per interval, never one per read", "every attempt rewrites the file") and §uninstall ("deletes it") state all three unconditionally.
+
+**Deliverable:** the record written whole (a sibling temp file renamed over it), the write and the removal failures surfaced or stated, and the concurrent-probe case either serialized or stated as an honest limit, with a test per case. A lock file adds a name, so taking it makes this a feature and spec's to author; the debt shape states the race.
+
+**Cost while deferred:** a reader can parse a torn record, a read-only `.git` probes the network on every read against a stated once-per-interval bound, and an uninstall that reports clean can leave a file behind. Filed 2026-10-04 to the gap inbox by installer-notice-attest-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the concurrency half chooses between a new lock and a narrowed SPEC, →forward because no ruling is owed. Re-verified by source read: `let _ = std::fs::write(&cache, …)` and `let _ = std::fs::remove_file(cache)`. Owner lookup: `update notice`, `cache`, `atomic`, `remove_file` in this file and the disposed-findings record — none; owner installer/SPEC.md §The update notice, with §uninstall.
+
+### attest-stub-argv-exactness
+
+[cost: event/low] [surface: installer]
+
+the Linux attestation stub in `.github/workflows/gates.yml` compares the verify's flags as the flattened `"$*"`, so the six flags passed as one argument still pass, and its readiness case matches `auth token` alone, accepting any `--hostname` where both bootstraps pass `--hostname github.com`. installer/SPEC.md §Requirements' attestation witness claims a verify whose arguments after the file are not exactly the three flags fails, and any other call fails. The Windows `gh.cmd` stub compares positional arguments and refuses an extra one.
+
+**Deliverable:** the Linux stub comparing the argument count and each argument, the readiness case pinned to `--hostname github.com` in both stubs, and the witness paragraph stating what each stub asserts.
+
+**Cost while deferred:** a bootstrap regression joining the verify flags into one word, or dropping the hostname pin, passes the witness on Linux. Filed 2026-10-04 to the gap inbox by installer-notice-attest-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because the change runs only on a pushed `gates` leg, →forward because no ruling is owed. Re-verified by source read: the stub's `[ "$*" = "$want" ]` and its `'auth token'` case. Owner lookup: `stub`, `auth token`, `--hostname` in this file and the disposed-findings record — none; owner installer/SPEC.md §Requirements.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
