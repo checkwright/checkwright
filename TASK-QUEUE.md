@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### installer-smoke-live-upstream
-
-the installer smoke's scratch consumers probe the real upstream. `init` writes `GATE_SDK_UPDATE_UPSTREAM` into the consumer's seam knobs from the package's `repository.url`, and the scrub (installer/SPEC.md §The consumer smoke) strips only inherited environment, so every bare `doctor` in a fresh consumer runs `git ls-remote` against the project's public repository, bounded by `GATE_SDK_UPDATE_TIMEOUT`. No leg asserts the `latest` line.
-
-**Deliverable:** one of two fixes, which differ in coverage: the scratch consumers' environment sets `GATE_SDK_UPDATE_CHECK = off`, silencing the probe, or the smoke points the upstream at a scratch bare repository carrying a newer tag, so the notice and `doctor`'s `latest` reading are witnessed offline. Either states the rule in §The consumer smoke.
-
-**Cost while deferred:** every installer-smoke run makes an outbound call per bare `doctor` and can wait up to the timeout on each when offline, and stays green either way, so the probe is exercised against a live host but never asserted. Filed 2026-10-04 to the gap inbox by installer-trust-pass' build; promoted at its close: →fix fails because the two fixes set the smoke's assertion envelope differently and span its drivers, its SPEC section and a full smoke run; →forward because no ruling is owed. Re-verified: the seam line in `native/src/install.rs`, the env-only scrub in `native/src/emit/installer_smoke/mod.rs`, and no `latest` read under `native/src/emit/installer_smoke/`. Owner lookup: `ls-remote`, `UPDATE_CHECK`, `upstream`, `doctor`, `network`, `offline` in this file and the disposed-findings record — none; owner installer/SPEC.md §The consumer smoke.
-
 ## Deferred
 
 ### foreign-project-critique
@@ -1214,4 +1206,5 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 
 - update-notice-probe-contract
 - install-attestation-binding
+- installer-smoke-live-upstream
 
