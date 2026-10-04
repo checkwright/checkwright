@@ -290,7 +290,7 @@ fn dispatch(oracle: &str, timeout: u64) -> Band {
     if let Some(prose) = manual_prose(oracle) {
         return Band::Manual(prose);
     }
-    match proc::run_bounded_capture(&programs::BASH, &["-c", oracle], timeout) {
+    match proc::run_bounded_capture(&programs::BASH, &["-c", oracle], timeout, &[]) {
         Err(e) => Band::DispatchFailure(e),
         Ok(None) => Band::DispatchFailure(format!("exceeded the {}s bound", timeout)),
         Ok(Some((code, bytes))) => {

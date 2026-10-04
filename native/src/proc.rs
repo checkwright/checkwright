@@ -563,6 +563,7 @@ pub fn run_bounded_capture(
     program: &Program,
     args: &[&str],
     secs: u64,
+    env: &[(&str, &str)],
 ) -> Result<Option<(i32, Vec<u8>)>, String> {
     #[cfg(test)]
     recorder::note(program.invocation());
@@ -580,6 +581,7 @@ pub fn run_bounded_capture(
     let out = std::fs::File::create(&capture).map_err(spawn_err)?;
     let mut child = Command::new(spawn_target(program.invocation())?.as_ref())
         .args(args)
+        .envs(env.iter().copied())
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::from(out))
         .stderr(std::process::Stdio::null())

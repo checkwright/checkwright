@@ -8,7 +8,7 @@ use crate::installer::lock::hash as lock_hash;
 use serde_json::Value;
 use std::path::{Path, PathBuf};
 
-const USAGE: &str = "  usage: checkwright-gates --install place-artifact --root <dir> --src <file> --dest <path> --seam <path> --target <triple> --digest <sha256> [--lock <path>] [--kits <kit>[ <kit>…]] [--spec-base-url <url>] [--force] [--dry-run]
+const USAGE: &str = "  usage: checkwright-gates --install place-artifact --root <dir> --src <file> --dest <path> --seam <path> --target <triple> --digest <sha256> [--lock <path>] [--kits <kit>[ <kit>…]] [--spec-base-url <url>] [--upstream <url>] [--force] [--dry-run]
          checkwright-gates --install queue-source --payload <dir> --kits <kit>[,<kit>…]";
 
 // spec: installer/SPEC.md §The install boundary — the closed op set an unknown `<op>` is refused
@@ -312,11 +312,12 @@ pub fn place(p: &Placement, recorded: &Recorded) -> Result<Vec<String>, String> 
 
 // spec: installer/SPEC.md §The gate binary — the seam's declared lines, built once for both
 // callers; an empty value is omitted rather than written blank
-pub fn declared_lines(kits: &str, spec_base_url: &str) -> Vec<(String, String)> {
+pub fn declared_lines(kits: &str, spec_base_url: &str, upstream: &str) -> Vec<(String, String)> {
     let mut out = Vec::new();
     for (name, value) in [
         ("GATE_SDK_KIT_DIRS", kits.trim()),
         ("GATE_SDK_SPEC_BASE_URL", spec_base_url.trim()),
+        ("GATE_SDK_UPDATE_UPSTREAM", upstream.trim()),
     ] {
         if !value.is_empty() {
             out.push((name.to_string(), value.to_string()));
@@ -328,7 +329,7 @@ pub fn declared_lines(kits: &str, spec_base_url: &str) -> Vec<(String, String)> 
 fn place_artifact(args: &[String]) -> i32 {
     let parsed = match parse(
         args,
-        &["root", "src", "dest", "seam", "target", "digest", "lock", "kits", "spec-base-url"],
+        &["root", "src", "dest", "seam", "target", "digest", "lock", "kits", "spec-base-url", "upstream"],
         &["force", "dry-run"],
     ) {
         Ok(a) => a,
@@ -342,12 +343,13 @@ fn place_artifact(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => return usage_error(&format!("place-artifact: {}", e)),
     };
-    // spec: installer/SPEC.md §The install boundary — the two declared-line keys are optional and
+    // spec: installer/SPEC.md §The install boundary — the declared-line keys are optional and
     // omitting one omits its knob rather than writing a blank: an empty `GATE_SDK_KIT_DIRS` means
     // *derive the set*, so a placeholder line would assert a configuration nobody asked for.
     let declared = declared_lines(
         parsed.get("kits").unwrap_or_default(),
         parsed.get("spec-base-url").unwrap_or_default(),
+        parsed.get("upstream").unwrap_or_default(),
     );
     let placement = Placement {
         root: PathBuf::from(&resolved[0]),
@@ -537,7 +539,7 @@ mod tests {
     // survives, and an empty value is omitted rather than written blank.
     #[test]
     fn a_declared_line_is_owned_replaced_and_omitted_when_empty() {
-        let declared = declared_lines("gate-sdk canon-kit", "https://example.test");
+        let declared = declared_lines("gate-sdk canon-kit", "https://example.test", "");
         assert_eq!(
             declared,
             vec![
@@ -545,10 +547,13 @@ mod tests {
                 ("GATE_SDK_SPEC_BASE_URL".to_string(), "https://example.test".to_string()),
             ]
         );
-        assert_eq!(declared_lines("  ", ""), Vec::new());
+        assert_eq!(declared_lines("  ", "", ""), Vec::new());
         assert_eq!(
-            declared_lines("gate-sdk", ""),
-            vec![("GATE_SDK_KIT_DIRS".to_string(), "gate-sdk".to_string())]
+            declared_lines("gate-sdk", "", "https://example.test/up.git"),
+            vec![
+                ("GATE_SDK_KIT_DIRS".to_string(), "gate-sdk".to_string()),
+                ("GATE_SDK_UPDATE_UPSTREAM".to_string(), "https://example.test/up.git".to_string()),
+            ]
         );
 
         let existing = "GATE_SDK_TMP_DIR = .scratch\nGATE_SDK_KIT_DIRS = stale one\nGATE_SDK_NATIVE_BIN = old\n";

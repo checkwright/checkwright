@@ -107,6 +107,9 @@ The kit set defaults to gate-sdk plus every sibling directory holding a `checks/
 - `GATE_SDK_PAYLOAD_LICENSE` (default `LICENSE`): the repo-root-relative license file the packer places at the package root and in every packed kit root ([installer/SPEC.md §The packer](../installer/SPEC.md#the-packer)), so a redistributed kit carries its license text. **Explicitly empty** places nothing; a value naming no file tracked at the packed commit is a refusal.
 - `GATE_SDK_PAYLOAD_RECIPES` (keyed, default empty): each pair names a payload recipe and the repo-relative directory it is packed from. The packer places each directory's tracked files at `recipes/<name>/` in the package root ([installer/SPEC.md §The packer](../installer/SPEC.md#the-packer)). A name is `[a-z0-9][a-z0-9-]*`, since an adopter types it and a directory carries it. Empty packs no recipe.
 - `GATE_SDK_SPEC_BASE_URL` (default **empty**): where this project publishes the SPEC sections its shipped `# spec:` pointers name ([§Consumer payload](#consumer-payload), [§run-gates](#run-gates)). Empty means *resolve in the tree*, the live configuration for any tree holding the SPEC files, a hand-vendored one included. The value is the publisher's own and never a kit literal, so it sits in the publisher's own knob file beside `GATE_SDK_GRAPH_EXTERNAL_REFS`, which carries the same host for the same reason.
+- `GATE_SDK_UPDATE_CHECK` (default `weekly`): how often an installed tree probes its upstream for a newer release, one of `off`, `daily` or `weekly`; the validator refuses any other value ([installer/SPEC.md §The update notice](../installer/SPEC.md#the-update-notice)).
+- `GATE_SDK_UPDATE_UPSTREAM` (default **empty**): the git URL that probe reads, written by `init`. Empty means no check.
+- `GATE_SDK_UPDATE_TIMEOUT` (default `5`): the probe's bound in whole seconds.
 
 *The native binary:*
 

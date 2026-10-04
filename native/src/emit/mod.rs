@@ -75,6 +75,7 @@ pub mod run_validate;
 pub mod scratch_run;
 pub mod session_id;
 pub mod trajectory;
+pub mod update_notice;
 pub mod upgrade_smoke;
 pub mod usage_trend;
 pub mod value_rollup;
@@ -678,6 +679,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-baseline-claims",
         Arm::Emit(baseline_claims::emit, Grammar::Flags(&[])),
         baseline_claims::KNOBS,
+    ),
+    // spec: installer/SPEC.md §The update notice — read by doctor in process and by the
+    // session-context hook's step 10
+    (
+        "--emit-update-notice",
+        Arm::Emit(update_notice::emit, Grammar::Flags(&[])),
+        update_notice::KNOBS,
     ),
     // spec: evidence-kit/SPEC.md §Layout and configuration — the two parser adapters, reached as
     // the *value* of `EVIDENCE_KIT_PARSER_<suite>` rather than as a named adapter spec: gate-

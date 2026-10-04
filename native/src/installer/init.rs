@@ -487,9 +487,13 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         .into_owned();
     let artifact_dest = format!("{}/{}", GATES_DIR, artifact_name);
     let seam = format!("{}/{}", GATES_DIR, payload_recipe::PLACEMENT_SEAM);
+    // spec: installer/SPEC.md §The update notice — the upstream an installed tree probes is the
+    // package's own repository URL, so the crate carries no project URL
+    let upstream = read_package_field(pkg, &["repository", "url"]);
     let declared = install::declared_lines(
         &kits.join(" "),
         &read_package_field(pkg, &["checkwright", "spec_base_url"]),
+        upstream.strip_prefix("git+").unwrap_or(&upstream),
     );
     let seam_add = payload_recipe::lines_for(&recipes, payload_recipe::PLACEMENT_SEAM);
     let seam_retire = payload_recipe::lines_for(&prior_recipes, payload_recipe::PLACEMENT_SEAM);
@@ -546,7 +550,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         gates,
         derived,
     };
-    let verdict = super::doctor::diagnose(Some(&selection));
+    let verdict = super::doctor::diagnose(Some(&selection), super::doctor::Caller::Init);
     if verdict.code != 0 {
         eprint!("{}{}", verdict.out, verdict.err);
         return Err(refuse(
@@ -950,6 +954,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         }
         println!("  help: review the differences; re-run with --force to take the packaged version.\n");
     }
+    update_check_statement(&root);
 
     super::git_batched(&root, &["add"], &stage)
         .map_err(|e| refuse(format!("could not stage the vendored files: {}", e), "", 2))?;
@@ -1024,6 +1029,22 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     println!("  {} --install-hooks   # opt this clone into the generated pre-commit hook", front);
     println!("  {} --run             # the battery, green on what was just vendored", front);
     Ok(0)
+}
+
+// spec: installer/SPEC.md §The update notice — the check is stated on every run that leaves it on,
+// read off the seam this run wrote, since that is what the installed tree will resolve
+fn update_check_statement(root: &Path) {
+    let gates = root.join(GATES_DIR).display().to_string();
+    let s = crate::emit::update_notice::Settings::resolve(|k| crate::knobs::wire_in(&gates, k));
+    if s.on() {
+        println!(
+            "update check: {}, with git ls-remote against {}, which shows that host your IP address; set GATE_SDK_UPDATE_CHECK = off in {}/{} to turn it off.\n",
+            s.interval_word,
+            s.upstream,
+            GATES_DIR,
+            payload_recipe::PLACEMENT_SEAM
+        );
+    }
 }
 
 // spec: installer/SPEC.md §init — every host is told to run the binary init placed, by its

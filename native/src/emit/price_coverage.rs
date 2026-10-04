@@ -153,7 +153,7 @@ fn page(table: &str) -> Result<String, String> {
         .ok_or_else(|| "DRIFT_KIT_PRICE_PAGE_TIMEOUT is not a positive integer".to_string())?;
     let program = Program::consumer("DRIFT_KIT_PRICE_PAGE_CMD", cmd[0].as_str());
     let rest: Vec<&str> = cmd[1..].iter().map(String::as_str).collect();
-    let body = match proc::run_bounded_capture(&program, &rest, secs) {
+    let body = match proc::run_bounded_capture(&program, &rest, secs, &[]) {
         Err(e) => {
             let cause = e.split(" — ").next().unwrap_or(&e).to_string();
             return Ok(format!("n/a (fetch failed: {})", cause));

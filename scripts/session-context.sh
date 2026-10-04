@@ -159,4 +159,9 @@ if [[ -f "$ENV_PROFILE_FILE" ]]; then
     echo "Local env profile ($ENV_PROFILE_FILE) — adapt commands to this box:"
     cat "$ENV_PROFILE_FILE" 2>/dev/null || true
 fi
+
+# spec: context-kit/SPEC.md §The session-context hook — step 10 update notice
+if [[ -x "$NATIVE_BIN" ]]; then
+    "$NATIVE_BIN" --emit update-notice 2>/dev/null || true
+fi
 echo "────────────────────────────────────────────────────────────────────────"

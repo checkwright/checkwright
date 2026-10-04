@@ -1,6 +1,6 @@
 // spec: gate-sdk/SPEC.md §Layout and configuration — gate-sdk's static knob table: every layout and
 // consumer knob its library defaulted, the locators and execution settings it refuses in a file
-use super::{Kit, Resolve, Row, Shape, Value};
+use super::{scalar, Kit, Resolve, Row, Shape, Value, Values};
 
 fn input_scalar(resolve: Resolve, name: &str) -> Result<String, String> {
     resolve(name).map(|(v, _)| v.wire())
@@ -106,6 +106,15 @@ fn native_bin(_resolve: Resolve) -> Result<Value, String> {
     Ok(Value::Scalar(host_native_bin()))
 }
 
+// spec: installer/SPEC.md §The update notice — the interval takes its three values only, so a
+// misspelt `off` refuses rather than reads as the default
+fn validate(v: &Values) -> Vec<String> {
+    match scalar(v, "GATE_SDK_UPDATE_CHECK").filter(|s| !matches!(*s, "off" | "daily" | "weekly")) {
+        Some(s) => vec![format!("GATE_SDK_UPDATE_CHECK must be off|daily|weekly (got '{}')", s)],
+        None => Vec::new(),
+    }
+}
+
 const GATES: &[&str] = &["GATE_SDK_GATES_DIR"];
 const CRATE: &[&str] = &["GATE_SDK_NATIVE_CRATE"];
 
@@ -184,8 +193,11 @@ pub const KIT: Kit = Kit {
             .empty_takes_default().words(),
         Row::indexed("GATE_SDK_JOB_REF_PATTERNS", &[]),
         Row::scalar("GATE_SDK_ASSERTION_STRENGTH_WINDOW", "8"),
+        Row::scalar("GATE_SDK_UPDATE_CHECK", "weekly").empty_takes_default(),
+        Row::scalar("GATE_SDK_UPDATE_UPSTREAM", ""),
+        Row::scalar("GATE_SDK_UPDATE_TIMEOUT", "5").empty_takes_default(),
     ],
-    validate: None,
+    validate: Some(("gate-sdk config", validate)),
     open_family: false,
     families: &[],
     retired: &[("GATE_SDK_GRAPH_THEME", "GATE_SDK_GRAPH_THEME_DIR")],
@@ -223,6 +235,19 @@ mod tests {
             Value::Scalar(s) => s,
             v => v.wire(),
         }
+    }
+
+    // spec: installer/SPEC.md §The update notice — a misspelt interval refuses rather than defaults
+    #[test]
+    fn the_update_interval_takes_its_three_values_only() {
+        let env = knobenv::lock();
+        for (value, ok) in [("off", true), ("daily", true), ("weekly", true), ("of", false)] {
+            env.set("GATE_SDK_UPDATE_CHECK", value);
+            reset(&env);
+            assert_eq!(resolve("GATE_SDK_UPDATE_CHECK").is_ok(), ok, "{}", value);
+        }
+        env.remove("GATE_SDK_UPDATE_CHECK");
+        reset(&env);
     }
 
     // spec: gate-sdk/SPEC.md §lib/gate.sh — the pre-binary accessors are a second holder of six values,

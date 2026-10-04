@@ -314,7 +314,27 @@ fn installed_selection(root: &std::path::Path) -> Option<Selection> {
     })
 }
 
-pub fn diagnose(selection: Option<&Selection>) -> Report {
+// spec: installer/SPEC.md §doctor — who asked: the bare verb renders the update reading, and init's
+// precondition, which shares the installed selection's shape, renders none
+#[derive(Clone, Copy, PartialEq)]
+pub enum Caller {
+    Bare,
+    Init,
+}
+
+// spec: installer/SPEC.md §The update notice — doctor's rendering of every reading the arm can take
+fn latest_line(r: &crate::emit::update_notice::Reading) -> String {
+    use crate::emit::update_notice::Reading;
+    match r {
+        Reading::Newer { newest, .. } => format!("v{} available — run update", newest),
+        Reading::Current { newest } => format!("v{}, current", newest),
+        Reading::Off => "not checked — GATE_SDK_UPDATE_CHECK is off".to_string(),
+        Reading::NoUpstream => "not checked — no upstream recorded".to_string(),
+        Reading::NoInstall | Reading::Unknown => "unknown — the last check could not reach the upstream".to_string(),
+    }
+}
+
+pub fn diagnose(selection: Option<&Selection>, caller: Caller) -> Report {
     let mut out = String::new();
     let mut err = String::new();
     let mut artifact_finding = String::new();
@@ -368,6 +388,16 @@ pub fn diagnose(selection: Option<&Selection>) -> Report {
         } else {
             out.push_str("\ninstalled\n");
             let _ = writeln!(out, "  {:<12} {}", "version", version);
+            if caller == Caller::Bare {
+                let reading = match tree_decl_dirs(&root) {
+                    Some((gates, _)) => {
+                        let s = crate::emit::update_notice::Settings::resolve(|k| crate::knobs::wire_in(&gates, k));
+                        crate::emit::update_notice::reading(&root, &s, crate::emit::update_notice::now())
+                    }
+                    None => crate::emit::update_notice::Reading::Unknown,
+                };
+                let _ = writeln!(out, "  {:<12} {}", "latest", latest_line(&reading));
+            }
             let _ = writeln!(out, "  {:<12} {}", "commit", manifest.field("commit"));
             let _ = writeln!(out, "  {:<12} {}", "profile", manifest.field("profile"));
             let _ = writeln!(out, "  {:<12} {}", "kits", manifest.field("kits"));
@@ -462,7 +492,7 @@ pub fn run(args: &[String]) -> i32 {
     if let Some(outcome) = super::help_only(args, USAGE) {
         return super::finish("doctor", outcome);
     }
-    let r = diagnose(installed_selection(&here()).as_ref());
+    let r = diagnose(installed_selection(&here()).as_ref(), Caller::Bare);
     print!("{}", r.out);
     if !r.err.is_empty() {
         eprint!("{}", r.err);
