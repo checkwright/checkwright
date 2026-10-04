@@ -8,6 +8,18 @@
 
 ## New Features
 
+### nested-broken-repo-toplevel
+
+[spec: SPEC-nested-repo-refusal.md]
+
+git's discovery skips a nested repository whose metadata is broken (an invalid `HEAD`) and answers `rev-parse --show-toplevel` with the enclosing repository's toplevel at exit 0, so the crate's crosser and canon-kit's tracked-set finder grade the inner tree as the outer repository's, its files untracked there and silently dropped.
+
+**Deliverable:** the crosser detects a `.git` entry between the probed directory and the toplevel git answered and refuses with that cause, a test per shape (broken inner `HEAD`, valid inner repository), and gate-sdk/SPEC.md §The crate's crosser stating the refusal.
+
+**Selected 2026-10-04** for queue-kit-arms-crosser-pass, operator direction lead-relayed (not a ruling). Feature-shaped by scope's triage: an exit-0 toplevel answer turning refused changes the crosser's contract, so the spec stage authors its amendment and promotes it, and it lands after [crosser-anchor-lexical-ascent](#crosser-anchor-lexical-ascent), a neighbouring edit in `walk.rs`; its detection reads git's own `--show-prefix`, not that unit's anchor (measured at spec).
+
+**Cost while deferred:** a broken nested checkout reads as an ignored subdirectory with no notice. Filed 2026-10-04 to the gap inbox by queue-kit-format-native-pass' spec; promoted at its close: →fix fails because the detection is new crosser mechanism with a refusal to design, →forward because no ruling is owed. Re-verified on git 2.55: an inner repository with a garbage `HEAD` answers the outer toplevel, exit 0. Owner lookup: `nested`, `enclosing`, `broken metadata` in this file — none; toplevel-refusal-fail-open, done, classified a non-zero answer, DISTINCT. Owner gate-sdk/SPEC.md §The crate's crosser.
+
 ## Technical Debt
 
 ### crosser-anchor-lexical-ascent
@@ -541,18 +553,6 @@ the native Windows install-smoke legs run every `--installer-smoke` arm serially
 **Deliverable:** the pwsh legs' arms split across parallel matrix jobs, or the arm roster partitioned per leg, so no one leg holds the run; the native Windows leg's paragraph in installer/SPEC.md §The consumer smoke states the split.
 
 **Cost while deferred:** every push waits about 14 minutes on one leg, and a close spends one to two pushes. Filed 2026-10-04 to the gap inbox by canon-kit-tail-installer-pass' lead on an operator direction to file it as a speed-up; promoted at its close: →fix fails because the split needs a push to witness, →forward because the direction is given. Re-verified: the run's per-job and per-step timings. Owner lookup: install-smoke, `pwsh`, `long pole` in this file — [install-smoke-sh-matrix](#install-smoke-sh-matrix), DISTINCT (unix legs' YAML duplication, not wall-clock); owner installer/SPEC.md §The consumer smoke.
-
-### nested-broken-repo-toplevel
-
-[cost: event/low] [surface: native]
-
-git's discovery skips a nested repository whose metadata is broken (an invalid `HEAD`) and answers `rev-parse --show-toplevel` with the enclosing repository's toplevel at exit 0, so the crate's crosser and canon-kit's tracked-set finder grade the inner tree as the outer repository's, its files untracked there and silently dropped.
-
-**Deliverable:** the crosser detects a `.git` entry between the probed directory and the toplevel git answered and refuses with that cause, a test per shape (broken inner `HEAD`, valid inner repository), and gate-sdk/SPEC.md §The crate's crosser stating the refusal.
-
-**Selected 2026-10-04** for queue-kit-arms-crosser-pass, operator direction lead-relayed (not a ruling). Feature-shaped by scope's triage: an exit-0 toplevel answer turning refused changes the crosser's contract, so the spec stage authors its amendment and promotes it, and it lands after [crosser-anchor-lexical-ascent](#crosser-anchor-lexical-ascent), whose anchor its detection ascends from.
-
-**Cost while deferred:** a broken nested checkout reads as an ignored subdirectory with no notice. Filed 2026-10-04 to the gap inbox by queue-kit-format-native-pass' spec; promoted at its close: →fix fails because the detection is new crosser mechanism with a refusal to design, →forward because no ruling is owed. Re-verified on git 2.55: an inner repository with a garbage `HEAD` answers the outer toplevel, exit 0. Owner lookup: `nested`, `enclosing`, `broken metadata` in this file — none; toplevel-refusal-fail-open, done, classified a non-zero answer, DISTINCT. Owner gate-sdk/SPEC.md §The crate's crosser.
 
 ## Icebox
 
