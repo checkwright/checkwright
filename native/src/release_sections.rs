@@ -87,18 +87,39 @@ pub fn refusals(sections: &[String], aliases: &[String]) -> Vec<String> {
                 if seen.iter().any(|(x, _)| *x == r) {
                     errs.push(format!("{} gives role '{}' twice", SECTIONS_KNOB, role_name(r)));
                 }
+                if let Some((x, _)) = seen.iter().find(|(x, y)| *x != r && *y == h) {
+                    errs.push(format!(
+                        "{} gives heading '{}' to roles '{}' and '{}', so the section would read under two roles",
+                        SECTIONS_KNOB,
+                        h,
+                        role_name(*x),
+                        role_name(r)
+                    ));
+                }
                 seen.push((r, h));
             }
             Err(m) => errs.push(format!("{} {}", SECTIONS_KNOB, m)),
         }
     }
+    let mut aliased: Vec<(Role, String)> = Vec::new();
     for e in aliases {
         match element(e) {
             Ok((_, h)) if seen.iter().any(|(_, x)| *x == h) => errs.push(format!(
                 "{} element '{}' names a heading {} already gives, so the section would read under two roles",
                 ALIASES_KNOB, e, SECTIONS_KNOB
             )),
-            Ok(_) => {}
+            Ok((r, h)) => {
+                if let Some((x, _)) = aliased.iter().find(|(x, y)| *x != r && *y == h) {
+                    errs.push(format!(
+                        "{} gives heading '{}' to roles '{}' and '{}', so the section would read under two roles",
+                        ALIASES_KNOB,
+                        h,
+                        role_name(*x),
+                        role_name(r)
+                    ));
+                }
+                aliased.push((r, h));
+            }
             Err(m) => errs.push(format!("{} {}", ALIASES_KNOB, m)),
         }
     }
@@ -169,5 +190,27 @@ mod tests {
         one(&[], &["gates:"], "empty heading");
         one(&["gates: G", "knobs: K"], &["gates: K"], "already gives");
         assert!(refusals(&v(&["gates: G"]), &v(&["gates: H"])).is_empty());
+    }
+
+    #[test]
+    fn a_heading_reached_under_two_roles_is_refused_wherever_it_is_given() {
+        let one = |s: &[&str], a: &[&str], needle: &str| {
+            let e = refusals(&v(s), &v(a));
+            assert_eq!(e.len(), 1, "{:?} is not the one refusal owed", e);
+            assert!(e[0].contains(needle), "{:?} lacks {}", e, needle);
+            assert!(parse(&v(s), &v(a)).is_err());
+        };
+        one(
+            &["gates: G", "knobs: G"],
+            &[],
+            "GATE_SDK_RELEASE_SECTIONS gives heading 'G' to roles 'gates' and 'knobs'",
+        );
+        one(
+            &["gates: G", "knobs: K"],
+            &["gates: Old", "knobs: Old"],
+            "GATE_SDK_RELEASE_SECTION_ALIASES gives heading 'Old' to roles 'gates' and 'knobs'",
+        );
+        one(&["gates: G", "knobs: K"], &["knobs: G"], "already gives");
+        assert!(refusals(&v(&["gates: G", "knobs: K"]), &v(&["gates: Old", "gates: Old"])).is_empty());
     }
 }

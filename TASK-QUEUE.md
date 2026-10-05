@@ -30,14 +30,6 @@
 
 **Cost while deferred:** a reader following a directive to its section finds the behaviour unstated and reads the code as the contract. Filed 2026-10-05 to the gap inbox at evidence-front-install-split-pass' build; promoted at its close, which re-pointed the bullet's three SPEC-to-SPEC citations inline: →fix fails for the directives because each of 25 sites is a choice between growing a section the brevity pass just cut and narrowing a directive, →forward because no ruling is owed. Re-verified: the five files carry 59 evidence-kit directives, and §The evidence adapters names two no-cursor shapes where `state_stage`'s directive claims three. Owner lookup: `directive`, `unstated`, `spec-pointer` in this file — [trajectory-limits-unstated](#trajectory-limits-unstated), DISTINCT (a SPEC claim the arm does not meet, the reverse direction); owner evidence-kit/SPEC.md §The evidence adapters. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling); lands last of the three evidence-kit units, whose edits rewrite sections its directives cite.
 
-### release-section-collision
-
-`GATE_SDK_RELEASE_SECTION_ALIASES`'s validator (`refusals` in `native/src/release_sections.rs`) reds an alias naming a heading the roster already gives, on the ground that the section would read under two roles, but admits two roster roles given one heading and one alias heading given to two roles, which fall to the same ground. gate-sdk/SPEC.md's entry for the knob lists the narrower refusal set.
-
-**Deliverable:** the refusal widened to every heading reached under two roles, across the roster and the aliases, a validator test per case, and the knob entry's refusal list updated.
-
-**Cost while deferred:** a consumer giving two roles one heading gets a note whose section the upgrade contract reads under either role, unrefused. Filed 2026-10-04 to the gap inbox by installer-trust-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because a widened refusal reds configurations accepted today, →forward because no ruling is owed. Re-verified: `refusals` checks a repeated role, and an alias against the roster's headings only. Owner lookup: `RELEASE_SECTION`, `two roles`, `alias` in this file — none; owner gate-sdk/SPEC.md §Layout and configuration. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
-
 ## Deferred
 
 ### foreign-project-critique
@@ -1241,4 +1233,5 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 ## Done
 
 - evidence-kit-tail-brevity
+- release-section-collision
 

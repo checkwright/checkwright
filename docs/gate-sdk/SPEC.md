@@ -111,7 +111,7 @@ The kit set defaults to gate-sdk plus every sibling directory holding a `checks/
 - `GATE_SDK_UPDATE_UPSTREAM` (default **empty**): the git URL that probe reads, written by `init`. Empty means no check.
 - `GATE_SDK_UPDATE_TIMEOUT` (default `5`): the probe's bound in whole seconds.
 - `GATE_SDK_RELEASE_SECTIONS` (array, default `brief: In brief`, `gates: New and tightened gates`, `knobs: Knob changes`, `authoring: Gate-authoring changes`, `platforms: Platforms`, `behavior: Behavior changes`): the release note's section roster, one `<role>: <heading>` element per section in note order. The roles and what each fixes are [installer/SPEC.md §The upgrade contract](../installer/SPEC.md#the-upgrade-contract)'s.
-- `GATE_SDK_RELEASE_SECTION_ALIASES` (array, default `gates: Tightened gates`, `knobs: Renamed knobs`): former headings a section is still read under, in the same element grammar. The validator refuses an unknown role, a role the roster gives twice, an empty heading and an alias heading equal to a roster heading.
+- `GATE_SDK_RELEASE_SECTION_ALIASES` (array, default `gates: Tightened gates`, `knobs: Renamed knobs`): former headings a section is still read under, in the same element grammar. The validator refuses an unknown role, a role the roster gives twice, an empty heading, an alias heading equal to a roster heading, and a heading either knob gives to more than one role.
 
 *The native binary:*
 
