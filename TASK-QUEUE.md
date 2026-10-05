@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: evidence-tail-liveness-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,42 @@
 ## New Features
 
 ## Technical Debt
+
+### evidence-kit-tail-brevity
+
+evidence-kit/SPEC.md's tail, the last of the file no brevity slice has passed: §check-evidence-baseline, §check-evidence-manifest, §check-battery-roster, §check-producer-liveness, §lifecycle-kit integration and §Producers and consumers, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): about 7.0k words at this scope and the file's whole ceiling row of 59 `check-prose-bounds` findings.
+
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey; the file's ceiling row re-stamped. Lands first: [liveness-windows-misread](#liveness-windows-misread) and [evidence-directive-unstated](#evidence-directive-unstated) write into sections it passes.
+
+**Cost while deferred:** paid by every session and adopter that reads those evidence-kit sections. Filed 2026-10-06 as a split at scope. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
+
+### liveness-windows-misread
+
+`crate-tests-windows` x86_64's producer-liveness step misread row (b) once (gates run 37279844257): the record named pid 2688, pid-only ground truth read it gone immediately before and after the gate's read, and the gate read it held and exited 1; the next run was green with that code unchanged. evidence-kit/SPEC.md §The producer-liveness lock accepts PID reuse as a fail-closed residual, and the step already brackets the gate's read to admit it, so whatever held 2688 lived only inside that read.
+
+**Inferred, cannot run before build:** that the holder was the gate's own process, issued the recycled pid at spawn — its witness is the pid-logging re-run on the CI Windows leg, which this entry's build adds. Run at scope 2026-10-06: `native/src/gates/producer_liveness.rs` reads the process id in its tests alone, so the gate excludes no pid from a held reading.
+
+**Push need (2026-10-06, inside the budget):** the iteration's one mid-iteration push: the pid-logging witness runs only on the CI Windows leg. One push may not reproduce a misread seen once; the own-pid exclusion stands without it.
+
+**Deliverable:** the holder identified, by a re-run logging the gate's own pid beside the record's; then the gate excluding its own pid from a held reading, stated in that section, or the step's verdict admitting the window.
+
+**Cost while deferred:** an intermittent red on an unrelated push, spending a hotfix push to re-run. Filed 2026-10-05 to the gap inbox at drift-kit-tail-crosser-pass' build; promoted at its close: →fix fails because the cause is unobserved and either remedy changes a contract or a witness, →forward because no ruling is owed. Re-verified off the run's log: rows (a), (bp) and (c) read held then free, and (b) read gone around the gate with the gate at 1. One premise narrowed: the bullet's reuse inside the read window is a holder both brackets missed. Owner lookup: `liveness`, `pid`, `reuse` in this file — none; owner evidence-kit/SPEC.md §The producer-liveness lock. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling); lands after [evidence-kit-tail-brevity](#evidence-kit-tail-brevity).
+
+### evidence-directive-unstated
+
+`spec:` directives in five crate modules attribute to an evidence-kit/SPEC.md section a fact that section does not state, each stale before the kit's front-half brevity pass. An audit at this filing judged 59 directives and flagged 25: `native/src/evidence.rs` 13 (a third no-cursor shape against the section's two, the run key's `None` as the guards' exit 2, the consumer arm keeping stdout whatever the status, the lock record's exact grammar, the queue-iteration and state-line shapes, the never-named key, a final unterminated line), `native/src/gates/evidence_manifest.rs` 4 (the eight-field split, the date shape, readers swallowing their own failure), `native/src/gates/producer_liveness.rs` 4 (absent as free under the lock section, unreadable as corrupt, a non-numeric and an over-wide pid dead), `native/src/emit/parse_gates_log.rs` 2 (a missing log failing closed, a tail-less log as the run failure) and `native/src/emit/parse_smoke_log.rs` 2 (first reach wins, the exit 2 naming the driver).
+
+**Deliverable:** each flagged directive closed one of three ways, the choice per site: the fact stated in the cited section, the citation re-pointed to the section that states it, or the directive trimmed to what its section states. The audit's counts are a floor to re-derive, since it was one read and inferred per site.
+
+**Cost while deferred:** a reader following a directive to its section finds the behaviour unstated and reads the code as the contract. Filed 2026-10-05 to the gap inbox at evidence-front-install-split-pass' build; promoted at its close, which re-pointed the bullet's three SPEC-to-SPEC citations inline: →fix fails for the directives because each of 25 sites is a choice between growing a section the brevity pass just cut and narrowing a directive, →forward because no ruling is owed. Re-verified: the five files carry 59 evidence-kit directives, and §The evidence adapters names two no-cursor shapes where `state_stage`'s directive claims three. Owner lookup: `directive`, `unstated`, `spec-pointer` in this file — [trajectory-limits-unstated](#trajectory-limits-unstated), DISTINCT (a SPEC claim the arm does not meet, the reverse direction); owner evidence-kit/SPEC.md §The evidence adapters. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling); lands last of the three evidence-kit units, whose edits rewrite sections its directives cite.
+
+### release-section-collision
+
+`GATE_SDK_RELEASE_SECTION_ALIASES`'s validator (`refusals` in `native/src/release_sections.rs`) reds an alias naming a heading the roster already gives, on the ground that the section would read under two roles, but admits two roster roles given one heading and one alias heading given to two roles, which fall to the same ground. gate-sdk/SPEC.md's entry for the knob lists the narrower refusal set.
+
+**Deliverable:** the refusal widened to every heading reached under two roles, across the roster and the aliases, a validator test per case, and the knob entry's refusal list updated.
+
+**Cost while deferred:** a consumer giving two roles one heading gets a note whose section the upgrade contract reads under either role, unrefused. Filed 2026-10-04 to the gap inbox by installer-trust-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because a widened refusal reds configurations accepted today, →forward because no ruling is owed. Re-verified: `refusals` checks a repeated role, and an alias against the roster's headings only. Owner lookup: `RELEASE_SECTION`, `two roles`, `alias` in this file — none; owner gate-sdk/SPEC.md §Layout and configuration. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
 
 ## Deferred
 
@@ -238,7 +274,7 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 [roadmap: now/adoption] [cost: session/high] [surface: evidence-kit] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices (below); the eight kits after it are finished or split out (the slices below); what remains starts at evidence-kit's tail, site-kit, then doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling); the per-kit slices stay off the roadmap.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices (below); the eight kits after it are finished or split out (the slices below); what remains is site-kit, then doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling); the per-kit slices stay off the roadmap.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
@@ -250,7 +286,7 @@ Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-ki
 
 delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as `delegation-kit-tail-brevity`; canon-kit's claim-gate sections and rest left 2026-10-04 at the next two scopes as `canon-kit-claim-brevity` and `canon-kit-tail-brevity`; queue-kit's halves, then drift-kit's and context-kit's rests, at the four after as `queue-kit-format-brevity`, `queue-kit-arms-brevity`, `drift-kit-tail-brevity` and `context-kit-tail-brevity`.
 
-evidence-kit's front half left 2026-10-05 at evidence-front-install-split-pass' scope as `evidence-kit-front-brevity`.
+evidence-kit's halves left 2026-10-05 and 10-06 at successive scopes as `evidence-kit-front-brevity` and [evidence-kit-tail-brevity](#evidence-kit-tail-brevity).
 
 ### tarball-attestation-observed
 
@@ -448,16 +484,6 @@ the delivery rule under `lead-notification-wake-race`'s remedy, unprobed: does a
 
 **Cost while deferred:** the lead's wait clause rests on an inferred mechanism; if it is wrong, a stall still costs hours of idle wall-clock until the operator wakes the lead. Filed 2026-10-02 as a split at companion-tier-delegation-pass' scope, operator direction lead-relayed (not a ruling).
 
-### release-section-collision
-
-[cost: event/low] [surface: gate-sdk]
-
-`GATE_SDK_RELEASE_SECTION_ALIASES`'s validator (`refusals` in `native/src/release_sections.rs`) reds an alias naming a heading the roster already gives, on the ground that the section would read under two roles, but admits two roster roles given one heading and one alias heading given to two roles, which fall to the same ground. gate-sdk/SPEC.md's entry for the knob lists the narrower refusal set.
-
-**Deliverable:** the refusal widened to every heading reached under two roles, across the roster and the aliases, a validator test per case, and the knob entry's refusal list updated.
-
-**Cost while deferred:** a consumer giving two roles one heading gets a note whose section the upgrade contract reads under either role, unrefused. Filed 2026-10-04 to the gap inbox by installer-trust-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because a widened refusal reds configurations accepted today, →forward because no ruling is owed. Re-verified: `refusals` checks a repeated role, and an alias against the roster's headings only. Owner lookup: `RELEASE_SECTION`, `two roles`, `alias` in this file — none; owner gate-sdk/SPEC.md §Layout and configuration.
-
 ### windows-cfg-msrv-lint-local
 
 [cost: event/low] [surface: gate-sdk]
@@ -467,18 +493,6 @@ crate code under `cfg(not(unix))` is linted at the MSRV only by `native-artifact
 **Deliverable:** a contributor-side catch before the push: an opt-in cross-target clippy in `check-crate-arms` where the Windows target is installed, or a pre-push tool. Which, and how it degrades without `rustup`, is spec's: gate-sdk/SPEC.md §check-crate-arms rules the compile-only Windows check no gate, since it needs `rustup` and network.
 
 **Cost while deferred:** a red push and a hotfix push per such slip. Filed 2026-10-05 to the gap inbox at that iteration's build; promoted at its close: →fix fails because a local cross-target lint is new mechanism, →forward because no ruling is owed. Re-verified: the `gates` job runs `cargo check --target x86_64-pc-windows-msvc`, and the only clippy on a Windows target is `native-artifacts`'. One premise fell: the bullet's candidate catcher, a cross-target clippy in the `gates` job, still lands on the push and so saves no red push. Owner lookup: `MSRV`, `clippy`, `cfg(not(unix))` in this file — msrv-move-clippy-arm-coupling (Icebox), DISTINCT (a floor move un-suppressing lints); owner gate-sdk/SPEC.md §check-crate-arms.
-
-### liveness-windows-misread
-
-[cost: event/low] [surface: evidence-kit]
-
-`crate-tests-windows` x86_64's producer-liveness step misread row (b) once (gates run 37279844257): the record named pid 2688, pid-only ground truth read it gone immediately before and after the gate's read, and the gate read it held and exited 1; the next run was green with that code unchanged. evidence-kit/SPEC.md §The producer-liveness lock accepts PID reuse as a fail-closed residual, and the step already brackets the gate's read to admit it, so whatever held 2688 lived only inside that read.
-
-**Inferred, not run:** that the holder was the gate's own process, issued the recycled pid at spawn; `native/src/gates/producer_liveness.rs` does not exclude the reader's own pid.
-
-**Deliverable:** the holder identified, by a re-run logging the gate's own pid beside the record's; then the gate excluding its own pid from a held reading, stated in that section, or the step's verdict admitting the window.
-
-**Cost while deferred:** an intermittent red on an unrelated push, spending a hotfix push to re-run. Filed 2026-10-05 to the gap inbox at drift-kit-tail-crosser-pass' build; promoted at its close: →fix fails because the cause is unobserved and either remedy changes a contract or a witness, →forward because no ruling is owed. Re-verified off the run's log: rows (a), (bp) and (c) read held then free, and (b) read gone around the gate with the gate at 1. One premise narrowed: the bullet's reuse inside the read window is a holder both brackets missed. Owner lookup: `liveness`, `pid`, `reuse` in this file — none; owner evidence-kit/SPEC.md §The producer-liveness lock.
 
 ### journal-append-arm
 
@@ -520,16 +534,6 @@ drift-kit/SPEC.md §The published-evidence extractor says the extractor "states 
 
 **Cost while deferred:** a reader trusting the SPEC believes the published evidence carries its own caveats, and it carries none. Filed 2026-10-05 to the gap inbox at context-kit-tail-publisher-pass' build; promoted at its close: →fix fails because choosing between the arm stating the limits and the SPEC dropping the claim changes asserted behaviour, and the self-referential framing it qualifies is on record; →forward because no ruling is owed for the first branch. Re-verified: the `--human` branch of `emit` pushes the two header lines alone, and no `docs/` page outside the SPEC mirrors names an ungoverned baseline. Owner lookup: `ungoverned`, `framing page`, `trajectory` in this file — benchmark-ab-experiment, DISTINCT (the controlled experiment itself); owner drift-kit/SPEC.md §The published-evidence extractor.
 
-### evidence-directive-unstated
-
-[cost: event/low] [surface: evidence-kit]
-
-`spec:` directives in five crate modules attribute to an evidence-kit/SPEC.md section a fact that section does not state, each stale before the kit's front-half brevity pass. An audit at this filing judged 59 directives and flagged 25: `native/src/evidence.rs` 13 (a third no-cursor shape against the section's two, the run key's `None` as the guards' exit 2, the consumer arm keeping stdout whatever the status, the lock record's exact grammar, the queue-iteration and state-line shapes, the never-named key, a final unterminated line), `native/src/gates/evidence_manifest.rs` 4 (the eight-field split, the date shape, readers swallowing their own failure), `native/src/gates/producer_liveness.rs` 4 (absent as free under the lock section, unreadable as corrupt, a non-numeric and an over-wide pid dead), `native/src/emit/parse_gates_log.rs` 2 (a missing log failing closed, a tail-less log as the run failure) and `native/src/emit/parse_smoke_log.rs` 2 (first reach wins, the exit 2 naming the driver).
-
-**Deliverable:** each flagged directive closed one of three ways, the choice per site: the fact stated in the cited section, the citation re-pointed to the section that states it, or the directive trimmed to what its section states. The audit's counts are a floor to re-derive, since it was one read and inferred per site.
-
-**Cost while deferred:** a reader following a directive to its section finds the behaviour unstated and reads the code as the contract. Filed 2026-10-05 to the gap inbox at evidence-front-install-split-pass' build; promoted at its close, which re-pointed the bullet's three SPEC-to-SPEC citations inline: →fix fails for the directives because each of 25 sites is a choice between growing a section the brevity pass just cut and narrowing a directive, →forward because no ruling is owed. Re-verified: the five files carry 59 evidence-kit directives, and §The evidence adapters names two no-cursor shapes where `state_stage`'s directive claims three. Owner lookup: `directive`, `unstated`, `spec-pointer` in this file — [trajectory-limits-unstated](#trajectory-limits-unstated), DISTINCT (a SPEC claim the arm does not meet, the reverse direction); owner evidence-kit/SPEC.md §The evidence adapters.
-
 ### fence-closer-length
 
 [cost: event/low] [surface: canon-kit]
@@ -551,6 +555,16 @@ docs/requirements.md's toolchain row owes bash 4.3 wherever a profile includes c
 **Deliverable:** each kit-shipped file a host runs with bash ported to an arm of the gate binary or given a PowerShell twin, per file, and the toolchain row narrowed to what still owes bash; whether guard-kit's place in the row survives is part of it.
 
 **Cost while deferred:** a Windows adopter on those profiles needs bash. Filed 2026-10-05 to the gap inbox by evidence-front-install-split-pass' lead; promoted at the next scope: →fix fails because each port is new mechanism, →forward because the direction is given. Re-verified by `git ls-files`: outside smoke and fixtures the three kits track context-kit/templates/session-context.sh and drift-kit/templates/kpi-deprecated-surface.sh, and guard-kit tracks no such file. Owner lookup: `session-context.sh`, `kpi-deprecated-surface`, `Git for Windows` in this file — the two entries above, DISTINCT (neither names the kit-shipped files); owner gate-sdk/SPEC.md §The adopter constraints, and each kit SPEC for its file.
+
+### install-windows-stop-restore
+
+[cost: event/low] [surface: docs]
+
+docs/manual-install.md's Windows download fence is dot-sourced and sets `$ErrorActionPreference = 'Stop'`, so the preference stays in the adopter's PowerShell session after the install. Operator direction 2026-10-06, lead-relayed (not a ruling): restore it.
+
+**Deliverable:** the adopter's error preference saved and restored, by try/finally or its equivalent, witnessed by the install-smoke legs that read the marked blocks. The page says the preference holds "here and below", so the later Windows blocks rely on it: each keeps its own stop policy, or the restore lands after the last of them. Whether `$ProgressPreference`, set the same way, is restored too is part of it. Owner docs/manual-install.md, its recipe shape installer/SPEC.md's.
+
+**Cost while deferred:** an adopter's shell keeps a changed error policy after installing. Filed 2026-10-06 to the gap inbox by evidence-front-install-split-pass' lead as an open question, asked at the next scope and filed here on the answer: →fix fails because its witness is a Windows CI leg no local run reaches. Re-verified by reading the fence, which opens on `. {` and sets the preference inside it. Owner lookup: `ErrorActionPreference`, `stop policy`, `try/finally` in this file — none; install-windows-stop-policy, landed last iteration, DISTINCT (it added the preference this restores).
 
 ## Icebox
 
