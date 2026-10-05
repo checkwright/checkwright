@@ -21,7 +21,7 @@ A row is a block line opening with `|` whose first cell is one backticked name. 
 
 ## The install-platforms parity contract
 
-`docs/requirements.md` carries a **second** marker block (`<!-- platforms:begin -->`), and this section is where a reader looks for what holds it, as the section above is for the first. It is hand-authored like its neighbour, and a table like it, one row per **supported platform**:
+`docs/requirements.md` carries the `<!-- platforms:begin -->` marker block, and this section is where a reader looks for what holds it, as the section above is for `toolchain`. It is hand-authored like its neighbour, and a table like it, one row per **supported platform**:
 
 ```text
 | System | Minimum | Binary | Status |

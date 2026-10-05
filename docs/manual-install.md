@@ -44,7 +44,7 @@ To uninstall, `sh "$cw/package/bin/checkwright.sh" uninstall` reverses it in one
 
 ## Windows
 
-Download the release, in PowerShell. Its first line stops this session at a failed command, here and below:
+Download the release, in PowerShell. `$ErrorActionPreference` stops this session on error, here and below:
 
 ```powershell
 . {

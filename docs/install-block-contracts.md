@@ -8,7 +8,7 @@ This page holds the contracts of the install pages' marker blocks and the hosted
 
 ## The prerequisites block
 
-`docs/requirements.md` carries a **third** marker block (`<!-- prerequisites:begin -->`), hand-authored, one row per prerequisite the probe roster does not carry: the install path's tools and the docs gates' renderer and gems ([installer/SPEC.md §Requirements](installer/SPEC.md#requirements) owns why none of them is probed):
+`docs/requirements.md` carries the `<!-- prerequisites:begin -->` marker block, hand-authored, one row per prerequisite the probe roster does not carry: the install path's tools and the docs gates' renderer and gems ([installer/SPEC.md §Requirements](installer/SPEC.md#requirements) owns why none of them is probed):
 
 ```text
 | Tool | Minimum | Needed for | Why |
@@ -21,7 +21,7 @@ A row is a block line opening with `|` past the header, and not the delimiter ro
 
 ## The commit-cost block
 
-`docs/requirements.md`'s What a commit costs section carries a fourth marker block (`<!-- commit-cost:begin -->`), one sentence written from `--measure-commit`'s output at each release (RELEASING.md step 4) and held to the pin by `check-install-pin` invariant D, whose section the hosted install scripts section below links. It is measured rather than derived: the figure is one host's, so no gate re-runs it.
+`docs/requirements.md`'s What a commit costs section carries the `<!-- commit-cost:begin -->` marker block, one sentence written from `--measure-commit`'s output at each release (RELEASING.md step 4) and held to the pin by `check-install-pin` invariant D, whose section the hosted install scripts section below links. It is measured rather than derived: the figure is one host's, so no gate re-runs it.
 
 ## The remedy blocks
 
@@ -29,7 +29,7 @@ A row is a block line opening with `|` past the header, and not the delimiter ro
 
 ## The install blocks
 
-Each of `docs/manual-install.md`'s OS sections splits its recipe at the network into a fetch fence and a marked install block, hand-authored. Every leg reads raw lines. The pair `unix-install:begin` and `unix-install:end` holds one `sh` fence; its reader is `install-smoke-sh-linux`, which places the tarball its consumer smoke packed, with a `sha256sum`-format digest, where the fetch fence would have put them. The leg then sets `v` and `cw` and runs the body under `sh` from a clean scratch consumer's root. The pair `windows-install:begin` and `windows-install:end` holds one `powershell` fence; its reader is `install-smoke-pwsh-windows`, which does the same under `pwsh`, the body's own last line starting Windows PowerShell 5.1. Each leg reds by name on an empty extraction and asserts exit 0 and a `checkwright.lock` in the consumer; the contract is the remedy blocks' own, so no gate holds either block and a red arrives at push. Only the download is stood in for. **The fetch fences have no reader**: they are left to the release, the one thing that can serve them.
+Each of `docs/manual-install.md`'s OS sections splits its recipe at the network into a fetch fence and a marked install block, hand-authored. Every leg reads raw lines. The pair `unix-install:begin` and `unix-install:end` holds one `sh` fence; its reader is `install-smoke-sh-linux`, which places the tarball its consumer smoke packed, with a `sha256sum`-format digest, where the fetch fence would have put them. The leg then sets `v` and `cw` and runs the body under `sh` from a clean scratch consumer's root. The pair `windows-install:begin` and `windows-install:end` holds one `powershell` fence; its reader is `install-smoke-pwsh-windows`, which does the same under `pwsh`, the body's own `powershell` line starting Windows PowerShell 5.1. Each leg reds by name on an empty extraction and asserts exit 0 and a `checkwright.lock` in the consumer; the contract is the remedy blocks' own, so no gate holds either block and a red arrives at push. Only the download is stood in for. **The fetch fences have no reader**: they are left to the release, the one thing that can serve them.
 
 ## The toolkit install lines
 
