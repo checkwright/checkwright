@@ -83,7 +83,8 @@ enum Linked {
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — what `sub/.git` holds beneath the case's repository: the
-// shapes git skips at exit 0, and a valid repository as the control
+// shapes git skips at exit 0, and as controls a valid repository, reached directly or through
+// each indirection the corpus names, an indirect one naming a sibling `store`
 #[derive(Clone, Copy, PartialEq)]
 enum Nested {
     None,
@@ -91,11 +92,17 @@ enum Nested {
     GarbageHead,
     Repo,
     DanglingLink,
+    Gitfile,
+    RepoLink,
+    GitfileViaLink,
+    StartViaLink,
 }
 
 const ABSENT: &str = "is absent or not executable";
 const SKIPPED: &str = "run-gates: git skipped the repository a .git entry marks";
 const DEEP: &str = "sub/deep";
+const VIA_DEEP: &str = "via/deep";
+const ABOVE: &[(&str, &str)] = &[("GIT_WORK_TREE", "../..")];
 const CEILING: &str = "GIT_CEILING_DIRECTORIES";
 const LOCAL: &str = "scripts/gate-sdk-config.local.knobs";
 const TRACKED: &str = "scripts/gate-sdk-config.knobs";
@@ -254,10 +261,11 @@ const CORPUS: &[Case] = &[
         ABSENT,
     ),
     nested("a valid nested repository, the control", Nested::Repo, &[], 2, ABSENT),
+    nested("a valid nested repository a GIT_WORK_TREE above it selects", Nested::Repo, ABOVE, 2, ABSENT),
     nested(
-        "a valid nested repository a GIT_WORK_TREE above it selects",
-        Nested::Repo,
-        &[("GIT_WORK_TREE", "../..")],
+        "a nested CRLF gitfile naming the repository a GIT_WORK_TREE above it selects",
+        Nested::Gitfile,
+        ABOVE,
         2,
         ABSENT,
     ),
@@ -404,7 +412,28 @@ const CORPUS: &[Case] = &[
     },
 ];
 
-const UNIX_CORPUS: &[Case] = &[nested("a dangling nested .git symlink git skips", Nested::DanglingLink, &[], 2, SKIPPED)];
+const UNIX_CORPUS: &[Case] = &[
+    nested("a dangling nested .git symlink git skips", Nested::DanglingLink, &[], 2, SKIPPED),
+    nested(
+        "a nested .git symlink naming the repository a GIT_WORK_TREE above it selects",
+        Nested::RepoLink,
+        ABOVE,
+        2,
+        ABSENT,
+    ),
+    nested(
+        "a nested gitfile through a symlinked directory naming the selected repository",
+        Nested::GitfileViaLink,
+        ABOVE,
+        2,
+        ABSENT,
+    ),
+    Case {
+        name: "a starting directory reached through a symlink, its repository selected from above",
+        start: VIA_DEEP,
+        ..nested("", Nested::StartViaLink, ABOVE, 2, ABSENT)
+    },
+];
 
 fn corpus() -> Vec<&'static Case> {
     let unix: &[Case] = if cfg!(unix) { UNIX_CORPUS } else { &[] };
@@ -582,8 +611,9 @@ fn prepare(
     exe: &Path,
 ) -> Result<(String, String), String> {
     let start = dir.join(case.start);
-    std::fs::create_dir_all(&start).map_err(|e| format!("cannot create {}: {}", start.display(), e))?;
+    let made = |p: &Path| std::fs::create_dir_all(p).map_err(|e| format!("cannot create {}: {}", p.display(), e));
     if !case.in_repo {
+        made(&start)?;
         for (rel, body) in case.files {
             write(&dir.join(rel), body)?;
         }
@@ -612,6 +642,7 @@ fn prepare(
         write(&dir.join(rel), body)?;
     }
     nest(&dir.join("sub"), case.nested)?;
+    made(&start)?;
     if !case.start.is_empty() {
         let bin = dir.join("gate-sdk").join("bin");
         return Ok((
@@ -628,24 +659,45 @@ fn prepare(
 fn nest(sub: &Path, nested: Nested) -> Result<(), String> {
     let mark = sub.join(".git");
     let made = |r: std::io::Result<()>| r.map_err(|e| format!("cannot make {}: {}", mark.display(), e));
+    if nested != Nested::None {
+        made(std::fs::create_dir_all(sub))?;
+    }
+    let store = sub.with_file_name("store");
     match nested {
         Nested::None => Ok(()),
         Nested::EmptyDir => made(std::fs::create_dir_all(&mark)),
         Nested::GarbageHead => write(&mark.join("HEAD"), "garbage\n"),
         Nested::Repo => git_init(sub),
-        Nested::DanglingLink => made(dangling(&sub.join("absent"), &mark)),
+        Nested::DanglingLink => made(symlink(&sub.join("absent"), &mark)),
+        Nested::Gitfile => {
+            git_init(&store)?;
+            write(&mark, "gitdir: ../store/.git\r\n")
+        }
+        Nested::RepoLink => {
+            git_init(&store)?;
+            made(symlink(Path::new("../store/.git"), &mark))
+        }
+        Nested::GitfileViaLink => {
+            git_init(&store)?;
+            made(symlink(Path::new("store"), &sub.with_file_name("alias")))?;
+            write(&mark, "gitdir: ../alias/.git\n")
+        }
+        Nested::StartViaLink => {
+            git_init(sub)?;
+            made(symlink(Path::new("sub"), &sub.with_file_name("via")))
+        }
     }
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — Windows symlink creation needs a privilege the arm cannot
-// assume, so the dangling-link case joins the corpus on unix alone
+// assume, so the symlink cases join the corpus on unix alone
 #[cfg(unix)]
-fn dangling(target: &Path, link: &Path) -> std::io::Result<()> {
+fn symlink(target: &Path, link: &Path) -> std::io::Result<()> {
     std::os::unix::fs::symlink(target, link)
 }
 
 #[cfg(not(unix))]
-fn dangling(_target: &Path, link: &Path) -> std::io::Result<()> {
+fn symlink(_target: &Path, link: &Path) -> std::io::Result<()> {
     Err(std::io::Error::new(
         std::io::ErrorKind::Other,
         format!("no unprivileged symlink for {}", link.display()),

@@ -545,14 +545,21 @@ fn selected_repository(dir: Option<&str>, mark: &Path) -> bool {
     let out = String::from_utf8_lossy(out);
     let selected = out.strip_suffix('\n').unwrap_or(&out);
     let target = match fs::read_to_string(mark) {
-        Ok(text) => match text.lines().next().and_then(|l| l.strip_prefix("gitdir: ")) {
-            Some(t) if path_root(t.trim_end()).is_some() => PathBuf::from(t.trim_end()),
-            Some(t) => child(mark.parent().unwrap_or(Path::new("")), t.trim_end()),
+        Ok(text) => match gitfile_target(&text) {
+            Some(t) if path_root(t).is_some() => PathBuf::from(t),
+            Some(t) => child(mark.parent().unwrap_or(Path::new("")), t),
             None => return false,
         },
         Err(_) => mark.to_path_buf(),
     };
     matches!((canonicalize(&target), canonicalize(selected)), (Some(a), Some(b)) if a == b)
+}
+
+// spec: gate-sdk/SPEC.md §The crate's crosser — a gitfile's target as git reads it: line endings
+// stripped, any other trailing whitespace kept, since git refuses a target carrying it
+fn gitfile_target(text: &str) -> Option<&str> {
+    let line = text.lines().next()?.strip_prefix("gitdir: ")?;
+    Some(line.trim_end_matches('\r'))
 }
 
 // spec: gate-sdk/SPEC.md §The crate's crosser — git's stderr cannot tell a broken repository from
@@ -1598,6 +1605,19 @@ mod tests {
             env.set("GIT_DIR", &v);
         }
         let _ = std::fs::remove_dir_all(&d);
+    }
+
+    // spec: gate-sdk/SPEC.md §The crate's crosser — the gitfile read strips line endings alone, as
+    // git and the shell twin do
+    #[test]
+    fn a_gitfile_target_keeps_every_trailing_byte_but_its_line_ending() {
+        assert_eq!(gitfile_target("gitdir: ../s/.git\n"), Some("../s/.git"));
+        assert_eq!(gitfile_target("gitdir: ../s/.git\r\n"), Some("../s/.git"));
+        assert_eq!(gitfile_target("gitdir: ../s/.git\r\r\n"), Some("../s/.git"));
+        assert_eq!(gitfile_target("gitdir: ../s/.git \n"), Some("../s/.git "));
+        assert_eq!(gitfile_target("gitdir: ../s/.git\t"), Some("../s/.git\t"));
+        assert_eq!(gitfile_target("gitdir:../s/.git\n"), None);
+        assert_eq!(gitfile_target(""), None);
     }
 
     // spec: gate-sdk/SPEC.md §The crate's crosser — the answer splits as git delimits it, so a

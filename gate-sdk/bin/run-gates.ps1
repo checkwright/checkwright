@@ -68,12 +68,47 @@ function Test-Entry {
     return $false
 }
 
+# spec: gate-sdk/SPEC.md §run-gates — a git directory's physical path, every symbolic link and junction on it resolved one component at a time, which the stub's `cd … && pwd -P` and the crate's canonicalize compare and Resolve-Path alone does not; $null where it does not resolve
 function Resolve-GitDir {
     param([string] $Path)
     if (-not $Path) { return $null }
     $r = Resolve-Path -LiteralPath $Path -ErrorAction SilentlyContinue
     if (-not $r) { return $null }
-    return $r.ProviderPath.TrimEnd([char[]]@('/', '\'))
+    $seps = [char[]]@([System.IO.Path]::DirectorySeparatorChar, [System.IO.Path]::AltDirectorySeparatorChar)
+    $full = [string] $r.ProviderPath
+    $cur = [System.IO.Path]::GetPathRoot($full)
+    $todo = New-Object 'System.Collections.Generic.List[string]'
+    $todo.AddRange([string[]] $full.Substring($cur.Length).Split($seps, [StringSplitOptions]::RemoveEmptyEntries))
+    $hops = 0
+    while ($todo.Count -gt 0) {
+        $name = $todo[0]
+        $todo.RemoveAt(0)
+        if ($name -ceq '.') { continue }
+        if ($name -ceq '..') {
+            $up = Split-Path -Parent $cur
+            if ($up) { $cur = $up }
+            continue
+        }
+        $next = Join-Path $cur $name
+        $item = Get-Item -LiteralPath $next -Force -ErrorAction SilentlyContinue
+        if (-not $item) { return $null }
+        $kind = $item.PSObject.Properties['LinkType']
+        if ($kind -and (@('SymbolicLink', 'Junction') -ccontains [string] $kind.Value)) {
+            $hops++
+            if ($hops -gt 40) { return $null }
+            $target = [string] (@($item.Target) | Select-Object -First 1)
+            if (-not $target) { return $null }
+            $root = ''
+            if ([System.IO.Path]::IsPathRooted($target)) {
+                $root = [System.IO.Path]::GetPathRoot($target)
+                $cur = $root
+            }
+            $todo.InsertRange(0, [string[]] $target.Substring($root.Length).Split($seps, [StringSplitOptions]::RemoveEmptyEntries))
+            continue
+        }
+        $cur = $next
+    }
+    return $cur.TrimEnd($seps)
 }
 
 # spec: gate-sdk/SPEC.md §lib/gate.sh — gate_skipped_mark, re-held here because the library is bash

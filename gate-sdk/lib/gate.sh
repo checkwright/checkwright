@@ -104,7 +104,7 @@ gate_skipped_mark() {  # <top> <prefix>
                 t=''
                 if [[ "$line" == "gitdir: "* ]]; then
                     t="${line#gitdir: }"
-                    t="${t%$'\r'}"
+                    while [[ "$t" == *$'\r' ]]; do t="${t%$'\r'}"; done
                     gate_path_rooted "$t" || t="$top/$run/$t"
                 fi
             fi
