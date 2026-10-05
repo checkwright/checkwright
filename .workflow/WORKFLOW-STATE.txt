@@ -9,3 +9,4 @@ drift-kit-tail-crosser-pass spec abc1d0a6 2026-10-05 46df0b05e
 drift-kit-tail-crosser-pass align a636f0b7 2026-10-05 a0f990825
 drift-kit-tail-crosser-pass build a207666b 2026-10-05 3b27ca155
 drift-kit-tail-crosser-pass build ad22dfd2 2026-10-05 df4aa8de9
+drift-kit-tail-crosser-pass build aa2263fb 2026-10-05 6d8b545b3
