@@ -230,6 +230,7 @@ Then check the digest, unpack, and run `init`, still from your repository root:
   $want = (Get-Content -Raw "$cw\checkwright-$v.tgz.sha256").Split(' ')[0]
   if ((Get-FileHash "$cw\checkwright-$v.tgz" -Algorithm SHA256).Hash -ne $want) { throw 'checksum mismatch: download both files again' }
   & "$env:SystemRoot\System32\tar.exe" -xzf "$cw\checkwright-$v.tgz" -C $cw
+  if ($LASTEXITCODE -ne 0) { throw 'tar.exe could not unpack the tarball: download it again' }
   powershell -NoProfile -ExecutionPolicy Bypass -File "$cw\package\bin\checkwright.ps1" init
 }
 ```
