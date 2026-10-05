@@ -30,7 +30,8 @@ function Write-StubLine {
 }
 
 $onWindows = [System.IO.Path]::DirectorySeparatorChar -eq '\'
-$SDK = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).ProviderPath
+$cmp = if ($onWindows) { [StringComparison]::OrdinalIgnoreCase } else { [StringComparison]::Ordinal }
+$SDK =(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).ProviderPath
 
 # spec: gate-sdk/SPEC.md §run-gates — the stub's repository mark, held here as there: a non-empty GIT_DIR, or a .git entry at the working directory or above, the ascent stopping where GIT_CEILING_DIRECTORIES stops git's own, which ignores a relative entry
 function Test-RepositoryMark {
@@ -54,15 +55,90 @@ function Test-RepositoryMark {
     return $false
 }
 
+# spec: gate-sdk/SPEC.md §lib/gate.sh — an entry of any type, a dangling link included, which Get-Item does not report on every host
+function Test-Entry {
+    param([string] $Path)
+    if (Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue) { return $true }
+    try {
+        $fi = New-Object System.IO.FileInfo($Path)
+        if ($fi.Exists -or [System.IO.Directory]::Exists($Path)) { return $true }
+        $lt = $fi.PSObject.Properties['LinkTarget']
+        if ($lt -and $lt.Value) { return $true }
+    } catch { }
+    return $false
+}
+
+function Resolve-GitDir {
+    param([string] $Path)
+    if (-not $Path) { return $null }
+    $r = Resolve-Path -LiteralPath $Path -ErrorAction SilentlyContinue
+    if (-not $r) { return $null }
+    return $r.ProviderPath.TrimEnd([char[]]@('/', '\'))
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — gate_skipped_mark, re-held here because the library is bash
+function Get-SkippedMark {
+    param([string] $Top, [string] $Prefix)
+    if ($env:GIT_DIR) { return $null }
+    $runs = @($Prefix.Split('/') | Where-Object { $_ })
+    for ($n = $runs.Count; $n -ge 1; $n--) {
+        $run = ($runs[0..($n - 1)]) -join '/'
+        $mark = "$Top/$run/.git"
+        if (-not (Test-Entry $mark)) { continue }
+        $target = $mark
+        if (Test-Path -LiteralPath $mark -PathType Leaf) {
+            $target = $null
+            $line = @(Get-Content -LiteralPath $mark -TotalCount 1 -ErrorAction SilentlyContinue)
+            if ($line.Count -gt 0 -and ([string] $line[0]).StartsWith('gitdir: ')) {
+                $target = ([string] $line[0]).Substring(8)
+                if ($target -cnotmatch '^([/\\]|[A-Za-z]:[/\\])') { $target = "$Top/$run/$target" }
+            }
+        }
+        $selected = $null
+        try { $selected = Resolve-GitDir ([string] (& git rev-parse --absolute-git-dir 2>$null)) } catch { $selected = $null }
+        $resolved = if ($target) { Resolve-GitDir $target } else { $null }
+        if ($selected -and $resolved -and [string]::Equals($selected, $resolved, $cmp)) { return $null }
+        return $mark
+    }
+    return $null
+}
+
+# spec: gate-sdk/SPEC.md §run-gates — the stub's fail-open set on its one declaration line, held to the crate by check-front-end-fail-open and read off the leading token before the lookup and the grammar below
+$argv = @($args)
+$lead = if ($argv.Count -gt 0) { [string] $argv[0] } else { '' }
+$unavailable = 2
+$FailOpenArms = @('--hook', '--statusline')
+if ($FailOpenArms -ccontains $lead) { $unavailable = 0 }
+
+# spec: gate-sdk/SPEC.md §The harness-integration arm — a tree whose repository git refuses or skips runs no binary, so a fail-open arm declines there as on an absent binary
+function Exit-Refused {
+    param([string] $Line)
+    Write-StubError $Line
+    if ($lead -ceq '--hook') {
+        Write-StubLine -Text '{"systemMessage":"run-gates: git refuses or skips the repository this session stands in, so every hook guard in this tree is off and each guarded call is allowed. git status prints its reason, or git --git-dir=<that .git> status for a skipped one"}'
+    }
+    exit $unavailable
+}
+
+# spec: gate-sdk/SPEC.md §run-gates — the one lookup, split as the crate splits it (§The crate's crosser); the mark test runs before the directory changes
+$answer = $null
+try { $answer = @(& git rev-parse --show-toplevel --show-prefix 2>$null) } catch { $answer = $null }
+if ($answer -and $LASTEXITCODE -ne 0) { $answer = $null }
 $top = $null
-try { $top = & git rev-parse --show-toplevel 2>$null } catch { $top = $null }
+if ($answer) {
+    $text = $answer -join "`n"
+    $at = $text.IndexOf("`n")
+    $top = if ($at -ge 0) { $text.Substring(0, $at) } else { $text }
+    $prefix = if ($at -ge 0) { $text.Substring($at + 1).TrimEnd("`n") } else { '' }
+    if ($top -and (Get-SkippedMark -Top $top -Prefix $prefix)) {
+        Exit-Refused 'run-gates: git skipped the repository a .git entry marks between here and the toplevel it answered, and answered the enclosing one; git --git-dir=<that .git> status prints its reason'
+    }
+}
 if (-not $top -or -not (Test-Path -LiteralPath $top -PathType Container)) {
     if (Test-RepositoryMark) {
-        Write-StubError 'run-gates: git refuses the repository marked here (GIT_DIR, or a .git entry here or above); git status prints its reason'
-    } else {
-        Write-StubError 'run-gates: not inside a git repository'
+        Exit-Refused 'run-gates: git refuses the repository marked here (GIT_DIR, or a .git entry here or above); git status prints its reason'
     }
-    exit 2
+    Exit-Refused 'run-gates: not inside a git repository'
 }
 Set-Location -LiteralPath $top
 $here = (Get-Location).ProviderPath
@@ -70,7 +146,6 @@ $here = (Get-Location).ProviderPath
 
 # spec: gate-sdk/SPEC.md §Layout and configuration — the gate-sdk root locator, relative when the root lies under the repository root, as the stub exports it
 $sep = [System.IO.Path]::DirectorySeparatorChar
-$cmp = if ($onWindows) { [StringComparison]::OrdinalIgnoreCase } else { [StringComparison]::Ordinal }
 $prefix = $here.TrimEnd($sep) + $sep
 if ($SDK.StartsWith($prefix, $cmp)) {
     $env:GATE_SDK_ROOT = $SDK.Substring($prefix.Length).Replace('\', '/')
@@ -124,13 +199,6 @@ function Get-NativeBinSpelled {
 # spec: gate-sdk/SPEC.md §lib/gate.sh — gate_exe_suffix's host half
 $exeSuffix = if ($onWindows) { '.exe' } else { '' }
 
-# spec: gate-sdk/SPEC.md §run-gates — the stub's fail-open set on its one declaration line, held to the crate by check-front-end-fail-open and read off the leading token before the grammar below rewrites it
-$argv = @($args)
-$lead = if ($argv.Count -gt 0) { [string] $argv[0] } else { '' }
-$unavailable = 2
-$FailOpenArms = @('--hook', '--statusline')
-if ($FailOpenArms -ccontains $lead) { $unavailable = 0 }
-
 # spec: gate-sdk/SPEC.md §run-gates — the stub's residual argv grammar, case for case
 switch -CaseSensitive -Regex ($lead) {
     '^(-h|--help)$' { $argv = @('--run') + $argv; break }
@@ -153,14 +221,6 @@ function Test-Runnable {
         if ($mode -and $mode.Value -notmatch 'x') { return $false }
     }
     return $true
-}
-
-function Resolve-GitDir {
-    param([string] $Path)
-    if (-not $Path) { return $null }
-    $r = Resolve-Path -LiteralPath $Path -ErrorAction SilentlyContinue
-    if (-not $r) { return $null }
-    return $r.ProviderPath.TrimEnd([char[]]@('/', '\'))
 }
 
 # spec: gate-sdk/SPEC.md §lib/gate.sh — _gate_main_checkout_bin: inside a linked worktree whose common dir is <main>/.git, the main checkout's own resolution of the knob, rooted; $null otherwise

@@ -4,7 +4,17 @@
 
 set -uo pipefail
 
-cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null || exit 0
+# spec: context-kit/SPEC.md §The session-context hook (template) — at the git toplevel, else here where git answers none or skips a nested repository; the library path is consumer layout, retarget it to yours [EDIT ME]
+# spec: gate-sdk/SPEC.md §The path-dialect contract — recorded verdict: the toplevel is only opened, by the source, the mark test and the cd, never compared as a string
+answer="$(git rev-parse --show-toplevel --show-prefix 2>/dev/null)" || answer=""
+top="${answer%%$'\n'*}"
+prefix=""
+[[ "$answer" == *$'\n'* ]] && prefix="${answer#*$'\n'}"
+# shellcheck source=/dev/null
+[[ -n "$top" && -f "$top/gate-sdk/lib/gate.sh" ]] && source "$top/gate-sdk/lib/gate.sh"
+if [[ -n "$top" ]] && ! { declare -F gate_skipped_mark >/dev/null && gate_skipped_mark "$top" "$prefix" >/dev/null; }; then
+    cd "$top" 2>/dev/null || exit 0
+fi
 
 # spec: context-kit/SPEC.md §The session-context hook — consumer layout: the vendored gate-sdk library and a governed queue file, retarget to yours [EDIT ME]. The queue index and the three index arms are arms of the gate binary GATE_SDK_NATIVE_BIN names, spelled as a command by gate-sdk's own accessor; this hook already runs at the git toplevel, where each arm reads a consumer's section and cap overrides itself (gate-sdk/SPEC.md §The non-gate arm). The library is sourced rather than subshelled because it defines functions and runs nothing, so no read of it can fail a session.
 NATIVE_BIN=""

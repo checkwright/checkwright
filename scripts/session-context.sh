@@ -4,7 +4,17 @@
 
 set -uo pipefail
 
-cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null || exit 0
+# spec: context-kit/SPEC.md §The session-context hook (template) — at the git toplevel, else here where git answers none or skips a nested repository
+# spec: gate-sdk/SPEC.md §The path-dialect contract — recorded verdict: the toplevel is only opened, by the source, the mark test and the cd, never compared as a string
+answer="$(git rev-parse --show-toplevel --show-prefix 2>/dev/null)" || answer=""
+top="${answer%%$'\n'*}"
+prefix=""
+[[ "$answer" == *$'\n'* ]] && prefix="${answer#*$'\n'}"
+# shellcheck source=/dev/null
+[[ -n "$top" && -f "$top/gate-sdk/lib/gate.sh" ]] && source "$top/gate-sdk/lib/gate.sh"
+if [[ -n "$top" ]] && ! { declare -F gate_skipped_mark >/dev/null && gate_skipped_mark "$top" "$prefix" >/dev/null; }; then
+    cd "$top" 2>/dev/null || exit 0
+fi
 
 NATIVE_BIN=""                                     # the gate binary: the queue surface, the index arms and the verdict
 # shellcheck source=/dev/null

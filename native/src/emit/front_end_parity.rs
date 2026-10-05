@@ -19,6 +19,7 @@ struct Case {
     name: &'static str,
     in_repo: bool,
     start: &'static str,
+    nested: Nested,
     argv: &'static [&'static str],
     env: &'static [(&'static str, &'static str)],
     files: &'static [(&'static str, &'static str)],
@@ -81,7 +82,20 @@ enum Linked {
     MainBare,
 }
 
+// spec: gate-sdk/SPEC.md §run-gates — what `sub/.git` holds beneath the case's repository: the
+// shapes git skips at exit 0, and a valid repository as the control
+#[derive(Clone, Copy, PartialEq)]
+enum Nested {
+    None,
+    EmptyDir,
+    GarbageHead,
+    Repo,
+    DanglingLink,
+}
+
 const ABSENT: &str = "is absent or not executable";
+const SKIPPED: &str = "run-gates: git skipped the repository a .git entry marks";
+const DEEP: &str = "sub/deep";
 const CEILING: &str = "GIT_CEILING_DIRECTORIES";
 const LOCAL: &str = "scripts/gate-sdk-config.local.knobs";
 const TRACKED: &str = "scripts/gate-sdk-config.knobs";
@@ -96,6 +110,7 @@ const fn absent(
         name,
         in_repo: true,
         start: "",
+        nested: Nested::None,
         argv: &["--emit", "knob-values"],
         env,
         files,
@@ -118,6 +133,7 @@ const fn grammar(
         name,
         in_repo: true,
         start: "",
+        nested: Nested::None,
         argv,
         env: &[],
         files: &[],
@@ -130,17 +146,42 @@ const fn grammar(
     }
 }
 
-const QUESTION: &str = "{\"tool_input\":{\"to\":\"main\",\"message\":\"Question only\"}}\n";
+const fn nested(
+    name: &'static str,
+    nested: Nested,
+    env: &'static [(&'static str, &'static str)],
+    expect_code: i32,
+    expect_text: &'static str,
+) -> Case {
+    Case {
+        name,
+        in_repo: true,
+        start: DEEP,
+        nested,
+        argv: &["--emit", "knob-values"],
+        env,
+        files: &[],
+        runnable_bin: false,
+        stdin: "",
+        expect_code,
+        expect_text,
+        expect_stdout: Stdout::Unchecked,
+        linked: Linked::No,
+    }
+}
+
+const QUESTION: &str ="{\"tool_input\":{\"to\":\"main\",\"message\":\"Question only\"}}\n";
 const ESCALATION_ADVICE: &str = "Options Recommendation Evidence";
 
 // spec: gate-sdk/SPEC.md §run-gates — the corpus: each exit path, each precedence tier of
 // `GATE_SDK_NATIVE_BIN`, a backslash-rooted value, each residual-grammar form, forwarded stdin,
-// and the linked-worktree resolution on a hand-built layout
+// the linked-worktree resolution on a hand-built layout, and the nested repository git skips
 const CORPUS: &[Case] = &[
     Case {
         name: "outside a repository",
         in_repo: false,
         start: "",
+        nested: Nested::None,
         argv: &["--emit", "knob-values"],
         env: &[],
         files: &[],
@@ -155,6 +196,7 @@ const CORPUS: &[Case] = &[
         name: "a repository git refuses",
         in_repo: false,
         start: "",
+        nested: Nested::None,
         argv: &["--emit", "knob-values"],
         env: &[],
         files: &[(".git", "gitdir: absent\n")],
@@ -169,6 +211,7 @@ const CORPUS: &[Case] = &[
         name: "a repository git refuses above a relative ceiling git ignores",
         in_repo: false,
         start: "sub",
+        nested: Nested::None,
         argv: &["--emit", "knob-values"],
         env: &[(CEILING, "..")],
         files: &[(".git", "gitdir: absent\n")],
@@ -179,6 +222,45 @@ const CORPUS: &[Case] = &[
         expect_stdout: Stdout::Unchecked,
         linked: Linked::No,
     },
+    Case {
+        name: "a repository git refuses, leading --hook",
+        in_repo: false,
+        start: "",
+        nested: Nested::None,
+        argv: &["--hook", "escalation-guard"],
+        env: &[],
+        files: &[(".git", "gitdir: absent\n")],
+        runnable_bin: false,
+        stdin: QUESTION,
+        expect_code: 0,
+        expect_text: "run-gates: git refuses the repository marked here",
+        expect_stdout: Stdout::SystemMessage,
+        linked: Linked::No,
+    },
+    nested("an empty nested .git directory git skips", Nested::EmptyDir, &[], 2, SKIPPED),
+    Case {
+        name: "an empty nested .git directory git skips, leading --hook",
+        argv: &["--hook", "escalation-guard"],
+        stdin: QUESTION,
+        expect_stdout: Stdout::SystemMessage,
+        ..nested("", Nested::EmptyDir, &[], 0, SKIPPED)
+    },
+    nested("a nested .git holding a garbage HEAD git skips", Nested::GarbageHead, &[], 2, SKIPPED),
+    nested(
+        "an empty nested .git directory under a GIT_DIR, which discovers nothing",
+        Nested::EmptyDir,
+        &[("GIT_DIR", "../../.git")],
+        2,
+        ABSENT,
+    ),
+    nested("a valid nested repository, the control", Nested::Repo, &[], 2, ABSENT),
+    nested(
+        "a valid nested repository a GIT_WORK_TREE above it selects",
+        Nested::Repo,
+        &[("GIT_WORK_TREE", "../..")],
+        2,
+        ABSENT,
+    ),
     absent("binary absent, leading --emit", &[], &[], ABSENT),
     Case {
         name: "binary absent, leading --hook",
@@ -322,6 +404,13 @@ const CORPUS: &[Case] = &[
     },
 ];
 
+const UNIX_CORPUS: &[Case] = &[nested("a dangling nested .git symlink git skips", Nested::DanglingLink, &[], 2, SKIPPED)];
+
+fn corpus() -> Vec<&'static Case> {
+    let unix: &[Case] = if cfg!(unix) { UNIX_CORPUS } else { &[] };
+    CORPUS.iter().chain(unix).collect()
+}
+
 // spec: gate-sdk/SPEC.md §run-gates — the scratch root is removed on every exit path
 struct Scratch(PathBuf);
 
@@ -374,7 +463,8 @@ fn check() -> Result<bool, String> {
     let scratch = Scratch(scratch_root()?);
     let unset = inherited_knobs();
     let mut clean = true;
-    for (i, case) in CORPUS.iter().enumerate() {
+    let cases = corpus();
+    for (i, case) in cases.iter().enumerate() {
         let dir = scratch.0.join(format!("case-{:02}", i));
         let (stub_arg, twin_arg) = prepare(case, &dir, &sdk, &stub, &twin, Path::new(&exe))?;
         let mut ceiling = forward_slashed(scratch.0.display().to_string());
@@ -429,7 +519,7 @@ fn check() -> Result<bool, String> {
         println!(
             "{}: clean — {} cases, both front-ends identical after CRLF becomes LF, the twin under {}",
             VERDICT,
-            CORPUS.len(),
+            cases.len(),
             names.join(" and ")
         );
     }
@@ -521,6 +611,7 @@ fn prepare(
     for (rel, body) in case.files {
         write(&dir.join(rel), body)?;
     }
+    nest(&dir.join("sub"), case.nested)?;
     if !case.start.is_empty() {
         let bin = dir.join("gate-sdk").join("bin");
         return Ok((
@@ -532,6 +623,30 @@ fn prepare(
         "gate-sdk/bin/run-gates.sh".to_string(),
         "gate-sdk/bin/run-gates.ps1".to_string(),
     ))
+}
+
+fn nest(sub: &Path, nested: Nested) -> Result<(), String> {
+    let mark = sub.join(".git");
+    let made = |r: std::io::Result<()>| r.map_err(|e| format!("cannot make {}: {}", mark.display(), e));
+    match nested {
+        Nested::None => Ok(()),
+        Nested::EmptyDir => made(std::fs::create_dir_all(&mark)),
+        Nested::GarbageHead => write(&mark.join("HEAD"), "garbage\n"),
+        Nested::Repo => git_init(sub),
+        Nested::DanglingLink => made(dangling(&sub.join("absent"), &mark)),
+    }
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — Windows symlink creation needs a privilege the arm cannot
+// assume, so the dangling-link case joins the corpus on unix alone
+#[cfg(unix)]
+fn dangling(target: &Path, link: &Path) -> std::io::Result<()> {
+    std::os::unix::fs::symlink(target, link)
+}
+
+#[cfg(not(unix))]
+fn dangling(_target: &Path, link: &Path) -> std::io::Result<()> {
+    Err(std::io::Error::other(format!("no unprivileged symlink for {}", link.display())))
 }
 
 fn git_init(dir: &Path) -> Result<(), String> {
@@ -719,10 +834,10 @@ mod tests {
     // run's case line points at exactly one member
     #[test]
     fn every_case_carries_a_distinct_name() {
-        let mut names: Vec<&str> = CORPUS.iter().map(|c| c.name).collect();
+        let mut names: Vec<&str> = CORPUS.iter().chain(UNIX_CORPUS).map(|c| c.name).collect();
         assert!(names.iter().all(|n| !n.is_empty()));
         names.sort_unstable();
         names.dedup();
-        assert_eq!(names.len(), CORPUS.len());
+        assert_eq!(names.len(), CORPUS.len() + UNIX_CORPUS.len());
     }
 }

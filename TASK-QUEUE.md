@@ -34,7 +34,7 @@ docs-site code blocks carry no copy-to-clipboard button and do not wrap: docs/_l
 
 ### front-end-nested-toplevel
 
-[spec: SPEC-front-end-nested.md]
+[spec: gate-sdk/SPEC.md]
 
 the front ends change to git's toplevel before the binary runs (the `cd` in gate-sdk/bin/run-gates.sh, the toplevel read in run-gates.ps1), and so do the plugin hook shim (plugin/hooks/hooks.json) and context-kit/templates/session-context.sh. Inside a broken nested checkout (a `.git` directory with a garbage HEAD, an empty one, a dangling `.git` symlink) git skips the nested repository and answers the enclosing toplevel at exit 0, so the run executes the enclosing repository's battery with no notice: the crate sees an empty `--show-prefix` and the crosser's nested refusal never fires. gate-sdk/SPEC.md §The crate's crosser states this as its honest limit.
 
