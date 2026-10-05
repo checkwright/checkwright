@@ -1210,10 +1210,3 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 
 ## Done
 
-- fence-reader-list-item
-- crosser-twin-identity-edges
-- install-tar-exit-check
-- footprint-arm-publisher-page
-- context-kit-tail-brevity
-- drift-kit-publisher-wiring
-
