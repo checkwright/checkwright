@@ -40,21 +40,13 @@ the front ends change to git's toplevel before the binary runs (the `cd` in gate
 
 **Deliverable:** each front end and shim refuses where git's answered prefix crosses a `.git` entry beneath the toplevel (the crosser's nested mark, held in the shell and PowerShell twins with front-end parity), or hands the crate the starting directory so the crosser reads it; the honest-limit sentence is removed and §run-gates states the refusal.
 
-**Selected 2026-10-05** for drift-kit-tail-crosser-pass, operator direction lead-relayed (not a ruling). Feature-shaped (a front-end refusal is a §run-gates contract change), so the spec stage authors and promotes it, after [crosser-git-fidelity-edges](#crosser-git-fidelity-edges), whose ceiling fix its twins copy.
+**Selected 2026-10-05** for drift-kit-tail-crosser-pass, operator direction lead-relayed (not a ruling). Feature-shaped (a front-end refusal is a §run-gates contract change), so the spec stage authors and promotes it, after `crosser-git-fidelity-edges`, whose ceiling fix its twins copy.
 
 **Push need (2026-10-05, inside the budget):** the one mid-iteration push, shared with [pwsh-install-smoke-split](#pwsh-install-smoke-split): run-gates.ps1's twin runs only on the CI Windows legs.
 
 **Cost while deferred:** a run started in a rare tree shape reports the enclosing repository's verdict as its own. Filed 2026-10-04 to the gap inbox by queue-kit-arms-crosser-pass' spec, which declined to widen its amendment; promoted at its close: →fix fails because the sh/ps1 twins, the plugin shim and the session-context template each need the mark walk under front-end parity, a contract change to §run-gates witnessed on the Windows legs, →forward because no ruling is owed. Re-verified: with an empty `.git` directory in a subdirectory of a fresh repository, `git rev-parse --show-toplevel --show-prefix` there answers the outer toplevel and the subdirectory prefix at exit 0, and run-gates.sh checks its mark only on a failed lookup. The bullet's pointer to the amendment file is replaced by §The crate's crosser, where it merged. Not a recurrence of `nested-broken-repo-toplevel`, which closed the crate side. Owner lookup: `toplevel`, `front end`, `session-context` in this file — none live; owner gate-sdk/SPEC.md §run-gates.
 
 ## Technical Debt
-
-### crosser-git-fidelity-edges
-
-two crosser edges against git. `toplevel_args` in `native/src/walk.rs` reads the toplevel and prefix answer with `lines()`, so a path component holding a newline truncates the prefix and can hide a skipped mark (static reading, untested). `repository_mark`'s ceiling stop canonicalizes a relative `GIT_CEILING_DIRECTORIES` entry where git ignores it, and gate-sdk/bin/run-gates.sh's own mark walk repeats that.
-
-**Deliverable:** the answer split as git delimits it, and a relative ceiling entry skipped in the crate and the front end alike, a test per edge.
-
-**Cost while deferred:** a rare path or env shape grades a repository differently from git. Filed 2026-10-05 to the gap inbox by queue-kit-arms-crosser-pass' close, its second-vendor review; promoted at the next iteration's scope: →fix fails because each edge owes a test and the ceiling half spans the crate and a front end, →forward because no ruling is owed. Re-verified: `GIT_CEILING_DIRECTORIES=..` from `.tmp/wtprobe/inner/sub` still answers `.tmp/wtprobe/inner`. Owner lookup: `CEILING`, `lines()`, `newline` in this file — none; owner gate-sdk/SPEC.md §The crate's crosser and §run-gates.
 
 ### pwsh-install-smoke-split
 
@@ -1219,4 +1211,5 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 ## Done
 
 - crosser-nested-mark-env
+- crosser-git-fidelity-edges
 

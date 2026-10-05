@@ -18,6 +18,7 @@ const VERDICT: &str = "FRONT-END-PARITY";
 struct Case {
     name: &'static str,
     in_repo: bool,
+    start: &'static str,
     argv: &'static [&'static str],
     env: &'static [(&'static str, &'static str)],
     files: &'static [(&'static str, &'static str)],
@@ -81,6 +82,7 @@ enum Linked {
 }
 
 const ABSENT: &str = "is absent or not executable";
+const CEILING: &str = "GIT_CEILING_DIRECTORIES";
 const LOCAL: &str = "scripts/gate-sdk-config.local.knobs";
 const TRACKED: &str = "scripts/gate-sdk-config.knobs";
 
@@ -93,6 +95,7 @@ const fn absent(
     Case {
         name,
         in_repo: true,
+        start: "",
         argv: &["--emit", "knob-values"],
         env,
         files,
@@ -114,6 +117,7 @@ const fn grammar(
     Case {
         name,
         in_repo: true,
+        start: "",
         argv,
         env: &[],
         files: &[],
@@ -136,6 +140,7 @@ const CORPUS: &[Case] = &[
     Case {
         name: "outside a repository",
         in_repo: false,
+        start: "",
         argv: &["--emit", "knob-values"],
         env: &[],
         files: &[],
@@ -149,8 +154,23 @@ const CORPUS: &[Case] = &[
     Case {
         name: "a repository git refuses",
         in_repo: false,
+        start: "",
         argv: &["--emit", "knob-values"],
         env: &[],
+        files: &[(".git", "gitdir: absent\n")],
+        runnable_bin: false,
+        stdin: "",
+        expect_code: 2,
+        expect_text: "run-gates: git refuses the repository marked here",
+        expect_stdout: Stdout::Unchecked,
+        linked: Linked::No,
+    },
+    Case {
+        name: "a repository git refuses above a relative ceiling git ignores",
+        in_repo: false,
+        start: "sub",
+        argv: &["--emit", "knob-values"],
+        env: &[(CEILING, "..")],
         files: &[(".git", "gitdir: absent\n")],
         runnable_bin: false,
         stdin: "",
@@ -357,18 +377,24 @@ fn check() -> Result<bool, String> {
     for (i, case) in CORPUS.iter().enumerate() {
         let dir = scratch.0.join(format!("case-{:02}", i));
         let (stub_arg, twin_arg) = prepare(case, &dir, &sdk, &stub, &twin, Path::new(&exe))?;
-        let mut set: Vec<(String, String)> = vec![(
-            "GIT_CEILING_DIRECTORIES".to_string(),
-            forward_slashed(scratch.0.display().to_string()),
-        )];
-        set.extend(case.env.iter().map(|(k, v)| (k.to_string(), v.to_string())));
+        let mut ceiling = forward_slashed(scratch.0.display().to_string());
+        let mut set: Vec<(String, String)> = Vec::new();
+        for (k, v) in case.env {
+            if *k == CEILING {
+                ceiling = format!("{}{}{}", v, if cfg!(windows) { ';' } else { ':' }, ceiling);
+            } else {
+                set.push((k.to_string(), v.to_string()));
+            }
+        }
+        set.push((CEILING.to_string(), ceiling));
         if case.runnable_bin {
             set.push(("GATE_SDK_NATIVE_BIN".to_string(), exe.clone()));
         }
+        let start = if case.start.is_empty() { dir.clone() } else { dir.join(case.start) };
         let env = ChildEnv {
             set: &set,
             unset: &unset,
-            cwd: Some(&dir),
+            cwd: Some(&start),
         };
         let mut bash_argv: Vec<&str> = vec![stub_arg.as_str()];
         bash_argv.extend(case.argv);
@@ -455,8 +481,8 @@ fn inherited_knobs() -> Vec<String> {
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — a case's scratch: a fresh repository vendoring the tree's own
-// `gate-sdk/bin/` and `gate-sdk/lib/`, run by relative path as a user types it; the outside cases
-// run the tree's own pair from a directory no repository contains, holding only the case's files
+// `gate-sdk/bin/` and `gate-sdk/lib/`, by relative path, absolute from a starting subdirectory;
+// an outside case runs the tree's own pair where no repository is, holding only the case's files
 fn prepare(
     case: &Case,
     dir: &Path,
@@ -465,7 +491,8 @@ fn prepare(
     twin: &Path,
     exe: &Path,
 ) -> Result<(String, String), String> {
-    std::fs::create_dir_all(dir).map_err(|e| format!("cannot create {}: {}", dir.display(), e))?;
+    let start = dir.join(case.start);
+    std::fs::create_dir_all(&start).map_err(|e| format!("cannot create {}: {}", start.display(), e))?;
     if !case.in_repo {
         for (rel, body) in case.files {
             write(&dir.join(rel), body)?;
@@ -493,6 +520,13 @@ fn prepare(
     }
     for (rel, body) in case.files {
         write(&dir.join(rel), body)?;
+    }
+    if !case.start.is_empty() {
+        let bin = dir.join("gate-sdk").join("bin");
+        return Ok((
+            forward_slashed(bin.join("run-gates.sh").display().to_string()),
+            forward_slashed(bin.join("run-gates.ps1").display().to_string()),
+        ));
     }
     Ok((
         "gate-sdk/bin/run-gates.sh".to_string(),

@@ -32,13 +32,13 @@ function Write-StubLine {
 $onWindows = [System.IO.Path]::DirectorySeparatorChar -eq '\'
 $SDK = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).ProviderPath
 
-# spec: gate-sdk/SPEC.md §run-gates — the stub's repository mark, held here as there: a non-empty GIT_DIR, or a .git entry at the working directory or above, the ascent stopping where GIT_CEILING_DIRECTORIES stops git's own
+# spec: gate-sdk/SPEC.md §run-gates — the stub's repository mark, held here as there: a non-empty GIT_DIR, or a .git entry at the working directory or above, the ascent stopping where GIT_CEILING_DIRECTORIES stops git's own, which ignores a relative entry
 function Test-RepositoryMark {
     if ($env:GIT_DIR) { return $true }
     $ceilings = @()
     if ($env:GIT_CEILING_DIRECTORIES) {
         foreach ($c in $env:GIT_CEILING_DIRECTORIES.Split([System.IO.Path]::PathSeparator)) {
-            if (-not $c) { continue }
+            if ($c -cnotmatch '^([/\\]|[A-Za-z]:[/\\])') { continue }
             $r = Resolve-Path -LiteralPath $c -ErrorAction SilentlyContinue
             if ($r) { $ceilings += $r.ProviderPath.TrimEnd('\', '/') }
         }

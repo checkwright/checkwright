@@ -11,7 +11,7 @@ SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=../lib/gate.sh
 source "$SDK/lib/gate.sh"
 
-# spec: gate-sdk/SPEC.md §run-gates — the crosser's repository mark, held here because the crate runs after this stub's cd: a non-empty GIT_DIR, or a .git entry at the physical working directory or above, the ascent stopping where GIT_CEILING_DIRECTORIES stops git's own
+# spec: gate-sdk/SPEC.md §run-gates — the crosser's repository mark, held here because the crate runs after this stub's cd: a non-empty GIT_DIR, or a .git entry at the physical working directory or above, the ascent stopping where GIT_CEILING_DIRECTORIES stops git's own, which ignores a relative entry
 _run_gates_marked() {
     [[ -n "${GIT_DIR:-}" ]] && return 0
     local sep=: d c n=0
@@ -22,7 +22,7 @@ _run_gates_marked() {
     while :; do
         if ((n > 0)); then
             for c in "${ceil[@]}"; do
-                [[ -n "$c" && "$d" == "$(cd "$c" 2>/dev/null && pwd -P)" ]] && return 1
+                gate_path_rooted "$c" && [[ "$d" == "$(cd "$c" 2>/dev/null && pwd -P)" ]] && return 1
             done
         fi
         [[ -e "$d/.git" || -L "$d/.git" ]] && return 0

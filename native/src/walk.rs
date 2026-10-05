@@ -496,11 +496,10 @@ fn toplevel_args(dir: Option<&str>) -> Result<Option<String>, String> {
     let c = crate::proc::run(&programs::GIT, &args)?;
     let Some(out) = c.stdout() else { return refused_or_absent(dir) };
     let out = String::from_utf8_lossy(out);
-    let mut lines = out.lines();
-    let Some(top) = lines.next().map(str::trim).filter(|s| !s.is_empty()).map(normalize_abs) else {
+    let (top, prefix) = split_answer(&out);
+    let Some(top) = Some(top.trim()).filter(|s| !s.is_empty()).map(normalize_abs) else {
         return Ok(None);
     };
-    let prefix = lines.next().unwrap_or("");
     match nested_mark(dir, &top, prefix) {
         None => Ok(Some(top)),
         Some(mark) => Err(format!(
@@ -511,6 +510,14 @@ fn toplevel_args(dir: Option<&str>) -> Result<Option<String>, String> {
             mark.display()
         )),
     }
+}
+
+// spec: gate-sdk/SPEC.md §The crate's crosser — git ends each answer with one newline and quotes
+// neither, so the toplevel ends at the first and the prefix, last, runs to its own terminator
+fn split_answer(out: &str) -> (&str, &str) {
+    let (top, rest) = out.split_once('\n').unwrap_or((out, ""));
+    let rest = rest.strip_suffix('\n').unwrap_or(rest);
+    (top, rest.strip_suffix('\r').unwrap_or(rest))
 }
 
 // spec: gate-sdk/SPEC.md §The crate's crosser — the nearest `.git` entry of any type on git's own
@@ -578,7 +585,13 @@ fn repository_mark(start: &str) -> Option<PathBuf> {
         return Some(PathBuf::from(d));
     }
     let ceilings: Vec<String> = std::env::var_os("GIT_CEILING_DIRECTORIES")
-        .map(|v| std::env::split_paths(&v).map(|c| c.display().to_string()).map(|c| physical(&c).unwrap_or(c)).collect())
+        .map(|v| {
+            std::env::split_paths(&v)
+                .map(|c| c.display().to_string())
+                .filter(|c| path_root(c).is_some())
+                .map(|c| physical(&c).unwrap_or(c))
+                .collect()
+        })
         .unwrap_or_default();
     for (i, dir) in Path::new(start).ancestors().enumerate() {
         if i > 0 && ceilings.iter().any(|c| Path::new(c) == dir) {
@@ -1581,6 +1594,68 @@ mod tests {
         let gitfile = toplevel_in_opt(&at);
         assert!(matches!(&gitfile, Ok(Some(t)) if t.ends_with("/outer")), "a gitfile naming the selected repository read as skipped: {:?}", gitfile);
         env.remove("GIT_WORK_TREE");
+        if let Some(v) = inherited {
+            env.set("GIT_DIR", &v);
+        }
+        let _ = std::fs::remove_dir_all(&d);
+    }
+
+    // spec: gate-sdk/SPEC.md §The crate's crosser — the answer splits as git delimits it, so a
+    // newline in a prefix component stays in the prefix
+    #[test]
+    fn the_answer_splits_at_the_toplevels_newline_and_the_prefixs_terminator() {
+        assert_eq!(split_answer("/r\na\nb/c/\n"), ("/r", "a\nb/c/"));
+        assert_eq!(split_answer("/r\n\n"), ("/r", ""));
+        assert_eq!(split_answer("C:/r\r\nsub/\r\n"), ("C:/r\r", "sub/"));
+        assert_eq!(split_answer("/r"), ("/r", ""));
+    }
+
+    // spec: gate-sdk/SPEC.md §The crate's crosser — a skipped mark beneath a newline-bearing
+    // component is found; Windows admits no newline in a name
+    #[cfg(unix)]
+    #[test]
+    fn a_skipped_mark_beneath_a_newline_bearing_component_is_refused() {
+        let env = crate::knobenv::lock();
+        let inherited = std::env::var("GIT_DIR").ok();
+        env.remove("GIT_DIR");
+        env.remove("GIT_CEILING_DIRECTORIES");
+        let d = std::env::temp_dir().join(format!("walk-toplevel-newline-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        let (outer, inner) = (d.join("outer"), d.join("outer").join("a\nb"));
+        std::fs::create_dir_all(inner.join(".git")).expect("scratch");
+        std::fs::create_dir_all(inner.join("sub")).expect("scratch");
+        git_init(&outer);
+        let at = normalize_abs(&inner.join("sub").display().to_string());
+        let refused = toplevel_in_opt(&at).expect_err("a mark beneath a newline-bearing component read as the enclosing repository");
+        assert!(refused.contains("a\nb/.git marks a repository beneath it"), "{}", refused);
+        if let Some(v) = inherited {
+            env.set("GIT_DIR", &v);
+        }
+        let _ = std::fs::remove_dir_all(&d);
+    }
+
+    // spec: gate-sdk/SPEC.md §The crate's crosser — git ignores a relative ceiling entry, so the
+    // mark's ascent passes it
+    #[test]
+    fn a_relative_ceiling_entry_stops_no_ascent() {
+        let env = crate::knobenv::lock();
+        let inherited = std::env::var("GIT_DIR").ok();
+        env.remove("GIT_DIR");
+        let d = std::env::temp_dir().join(format!("walk-toplevel-ceiling-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        let sub = d.join("sub");
+        std::fs::create_dir_all(&sub).expect("scratch");
+        std::fs::write(d.join(".git"), format!("gitdir: {}\n", d.join("absent").display())).expect("write");
+        let (top, at) = (normalize_abs(&d.display().to_string()), normalize_abs(&sub.display().to_string()));
+        let rel = relative_to(&cwd().expect("cwd"), &top);
+        if path_root(&rel).is_none() {
+            env.set("GIT_CEILING_DIRECTORIES", &rel);
+            let refused = toplevel_in_opt(&at).expect_err("a relative ceiling git ignores hid the mark");
+            assert!(refused.contains("marks a repository"), "{}", refused);
+        }
+        env.set("GIT_CEILING_DIRECTORIES", &top);
+        assert_eq!(toplevel_in_opt(&at), Ok(None), "an absolute ceiling still hides the mark");
+        env.remove("GIT_CEILING_DIRECTORIES");
         if let Some(v) = inherited {
             env.set("GIT_DIR", &v);
         }
