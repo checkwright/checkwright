@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: evidence-front-install-split-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,36 @@
 ## New Features
 
 ## Technical Debt
+
+### evidence-kit-front-brevity
+
+evidence-kit/SPEC.md's front half, which no brevity slice has passed: the preamble, §Layout and configuration, and §Per-component contracts from The evidence adapters through The baseline-claims arm (Baseline manifest, Evidence manifest, The producer-liveness lock, bin/run-validate.sh, bin/diff-baseline.sh), under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): about 8.5k of the file's 15.4k words at this scope, and 60 of its 119 `check-prose-bounds` findings with the ceiling knob emptied.
+
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey; the file's ceiling row re-stamped. [liveness-windows-misread](#liveness-windows-misread) later writes into §The producer-liveness lock, which this slice passes first.
+
+**Cost while deferred:** paid by every session and adopter that reads those evidence-kit sections. Filed 2026-10-05 as a split at scope. Part of the operator's selection of the unit set, direction 2026-10-05, lead-relayed (not a ruling).
+
+### twin-gitdir-dotdot-fold
+
+`gate-sdk/bin/run-gates.ps1`'s `Resolve-GitDir` calls `Resolve-Path` on the whole path before its per-component physical walk. `Resolve-Path` folds a `..` lexically, so a gitfile target `alias/..`, `alias` a symbolic link, loses the physical meaning the shell stub's `cd … && pwd -P` and the crate's canonicalize keep, and the twin can call the selected repository skipped. The parity corpus (`native/src/emit/front_end_parity.rs`) carries no symlink-then-dotdot target.
+
+**Cannot run here:** no PowerShell on the authoring host; the parity case this entry adds, run on the CI Windows legs, is its first witness.
+
+**Deliverable:** the twin resolving each component physically before it folds a `..`, and a symlink-then-dotdot gitfile target in the parity corpus. Owner gate-sdk/SPEC.md §run-gates.
+
+**Cost while deferred:** a false nested-repository refusal on Windows for that layout alone. Filed 2026-10-05 to the gap inbox by context-kit-tail-publisher-pass' close (its second-vendor review); promoted at the next scope: →fix fails because its witness is a Windows CI leg no local run reaches, →forward because no ruling is owed. Re-verified: `Resolve-GitDir` opens on `Resolve-Path -LiteralPath $Path` ahead of the walk. Owner lookup: `Resolve-Path`, `Resolve-GitDir`, `gitfile`, `symlink` in this file — none; crosser-twin-identity-edges, landed last iteration, DISTINCT (it added the walk this bullet reviews). Part of the operator's selection of the unit set, direction 2026-10-05, lead-relayed (not a ruling).
+
+**Push need (2026-10-05, inside the budget):** the iteration's one mid-iteration push, shared with [install-windows-stop-policy](#install-windows-stop-policy) and [install-page-split](#install-page-split): the PowerShell twin and its parity case run only on the CI Windows legs.
+
+### install-windows-stop-policy
+
+Two of docs/install.md's Windows blocks run on past a failure. The step-by-step download block sets no stop policy, so a failed `New-Item` or first `Invoke-WebRequest` is non-terminating and the later commands run. The `windows-remedy` block uses `git --exec-path`'s output without testing its exit, so a missing git writes a wrong `PATH` entry for the user.
+
+**Deliverable:** each block stopping at its first failure, by a stop policy or a tested exit with a throw, on canon-kit/SPEC.md §check-fence-paste-unit's honest limit, witnessed by the install-smoke legs that read the marked blocks. Owner docs/install.md, its recipe shape installer/SPEC.md's.
+
+**Cost while deferred:** a Windows adopter whose download or git probe fails gets a later, confusing error in place of the first one; the `windows-install` block's digest test catches a missing download at the latest. Filed 2026-10-05 to the gap inbox by context-kit-tail-publisher-pass' close (its second-vendor review); promoted at the next scope: →fix fails because its witness is a Windows CI leg no local run reaches, →forward because no ruling is owed. Re-verified by reading both blocks. Owner lookup: `stop policy`, `ErrorActionPreference`, `exec-path`, `non-terminating` in this file — none; install-tar-exit-check, landed last iteration, DISTINCT (the `windows-install` block's `tar.exe` exit alone); install-page-split moves the blocks' readers, independent. Part of the operator's selection of the unit set, direction 2026-10-05, lead-relayed (not a ruling); lands before [install-page-split](#install-page-split) relocates the blocks.
+
+**Push need (2026-10-05, inside the budget):** the iteration's one mid-iteration push, shared with [twin-gitdir-dotdot-fold](#twin-gitdir-dotdot-fold): the witnessing install-smoke legs run only on CI Windows hosts.
 
 ## Deferred
 
@@ -238,7 +268,7 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 [roadmap: now/adoption] [cost: session/high] [surface: evidence-kit] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices (below); lifecycle-kit, installer, guard-kit, delegation-kit, canon-kit, queue-kit, drift-kit and context-kit are finished or split out (the slices below); what remains starts at evidence-kit, site-kit, then doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling): a slice has landed at each recent scope; the per-kit slices stay off the roadmap.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices (below); the eight kits after it are finished or split out (the slices below); what remains starts at evidence-kit's tail, site-kit, then doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling); the per-kit slices stay off the roadmap.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
@@ -248,7 +278,9 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes as `installer-install-brevity` and `installer-remainder-brevity`; drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope as `drift-kit-measurement-brevity`; guard-kit's front sections, delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope as `queue-kit-gate-brevity`; guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope as `guard-kit-tool-brevity`.
 
-delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as `delegation-kit-tail-brevity`; canon-kit's claim-gate sections and rest left 2026-10-04 at the next two scopes as `canon-kit-claim-brevity` and `canon-kit-tail-brevity`; queue-kit's format and arms halves at the two after as `queue-kit-format-brevity` and `queue-kit-arms-brevity`; drift-kit's and context-kit's rests at the next two as `drift-kit-tail-brevity` and `context-kit-tail-brevity`.
+delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as `delegation-kit-tail-brevity`; canon-kit's claim-gate sections and rest left 2026-10-04 at the next two scopes as `canon-kit-claim-brevity` and `canon-kit-tail-brevity`; queue-kit's halves, then drift-kit's and context-kit's rests, at the four after as `queue-kit-format-brevity`, `queue-kit-arms-brevity`, `drift-kit-tail-brevity` and `context-kit-tail-brevity`.
+
+evidence-kit's front half left 2026-10-05 at evidence-front-install-split-pass' scope as [evidence-kit-front-brevity](#evidence-kit-front-brevity).
 
 ### tarball-attestation-observed
 
@@ -466,6 +498,10 @@ docs/install.md runs 320 lines and the operator finds it too long to read: they 
 
 **Cost while deferred:** every install reader meets a 320-line page. Filed 2026-10-05 to the gap inbox by drift-kit-tail-crosser-pass' lead, after scope's intake drain; promoted at its close: →fix fails because the split moves load-bearing readers and the length gate is new mechanism, →forward because the direction is given. Re-verified: `wc -l` reads 320 (314 at filing), the ceiling row 21308cp, and site-architecture.md states no length rule. Owner lookup: `install.md`, `page-authoring`, `split` in this file — site-video-poster-rule, DISTINCT (video embeds); docs-code-block-copy-wrap, landed this iteration, DISTINCT (code-block copy and wrap); owner docs/site-architecture.md §Page-authoring rules.
 
+**Selected 2026-10-05 for evidence-front-install-split-pass,** operator direction given through the lead session (not a ruling), over scope's debt-only recommendation; the spec stage authors its amendment and promotes it. Applied after [install-windows-stop-policy](#install-windows-stop-policy), so the blocks move once edited. An amendment spanning docs and site-kit meets `check-stage-entry` assertion C.
+
+**Push need (2026-10-05, inside the budget):** the mid-iteration push [twin-gitdir-dotdot-fold](#twin-gitdir-dotdot-fold) spends, since the re-pointed install-smoke legs run only on CI.
+
 ### windows-cfg-msrv-lint-local
 
 [cost: event/low] [surface: gate-sdk]
@@ -527,28 +563,6 @@ drift-kit/SPEC.md §The published-evidence extractor says the extractor "states 
 **Deliverable:** the two limits stated where a reader of the published evidence meets them, either in the arm's output or on a framing page around the committed projection, or the SPEC's two claims narrowed to what the arm prints; which one is spec's.
 
 **Cost while deferred:** a reader trusting the SPEC believes the published evidence carries its own caveats, and it carries none. Filed 2026-10-05 to the gap inbox at context-kit-tail-publisher-pass' build; promoted at its close: →fix fails because choosing between the arm stating the limits and the SPEC dropping the claim changes asserted behaviour, and the self-referential framing it qualifies is on record; →forward because no ruling is owed for the first branch. Re-verified: the `--human` branch of `emit` pushes the two header lines alone, and no `docs/` page outside the SPEC mirrors names an ungoverned baseline. Owner lookup: `ungoverned`, `framing page`, `trajectory` in this file — benchmark-ab-experiment, DISTINCT (the controlled experiment itself); owner drift-kit/SPEC.md §The published-evidence extractor.
-
-### twin-gitdir-dotdot-fold
-
-[cost: event/low] [surface: gate-sdk]
-
-`gate-sdk/bin/run-gates.ps1`'s `Resolve-GitDir` calls `Resolve-Path` on the whole path before its per-component physical walk. `Resolve-Path` folds a `..` lexically, so a gitfile target `alias/..`, `alias` a symbolic link, loses the physical meaning the shell stub's `cd … && pwd -P` and the crate's canonicalize keep, and the twin can call the selected repository skipped. The parity corpus (`native/src/emit/front_end_parity.rs`) carries no symlink-then-dotdot target.
-
-**Cannot run here:** no PowerShell on the authoring host; the parity case this entry adds, run on the CI Windows legs, is its first witness.
-
-**Deliverable:** the twin resolving each component physically before it folds a `..`, and a symlink-then-dotdot gitfile target in the parity corpus. Owner gate-sdk/SPEC.md §run-gates.
-
-**Cost while deferred:** a false nested-repository refusal on Windows for that layout alone. Filed 2026-10-05 to the gap inbox by context-kit-tail-publisher-pass' close (its second-vendor review); promoted at the next scope: →fix fails because its witness is a Windows CI leg no local run reaches, →forward because no ruling is owed. Re-verified: `Resolve-GitDir` opens on `Resolve-Path -LiteralPath $Path` ahead of the walk. Owner lookup: `Resolve-Path`, `Resolve-GitDir`, `gitfile`, `symlink` in this file — none; crosser-twin-identity-edges, landed last iteration, DISTINCT (it added the walk this bullet reviews).
-
-### install-windows-stop-policy
-
-[cost: event/low] [surface: docs]
-
-Two of docs/install.md's Windows blocks run on past a failure. The step-by-step download block sets no stop policy, so a failed `New-Item` or first `Invoke-WebRequest` is non-terminating and the later commands run. The `windows-remedy` block uses `git --exec-path`'s output without testing its exit, so a missing git writes a wrong `PATH` entry for the user.
-
-**Deliverable:** each block stopping at its first failure, by a stop policy or a tested exit with a throw, on canon-kit/SPEC.md §check-fence-paste-unit's honest limit, witnessed by the install-smoke legs that read the marked blocks. Owner docs/install.md, its recipe shape installer/SPEC.md's.
-
-**Cost while deferred:** a Windows adopter whose download or git probe fails gets a later, confusing error in place of the first one; the `windows-install` block's digest test catches a missing download at the latest. Filed 2026-10-05 to the gap inbox by context-kit-tail-publisher-pass' close (its second-vendor review); promoted at the next scope: →fix fails because its witness is a Windows CI leg no local run reaches, →forward because no ruling is owed. Re-verified by reading both blocks. Owner lookup: `stop policy`, `ErrorActionPreference`, `exec-path`, `non-terminating` in this file — none; install-tar-exit-check, landed last iteration, DISTINCT (the `windows-install` block's `tar.exe` exit alone); install-page-split moves the blocks' readers, independent.
 
 ## Icebox
 
