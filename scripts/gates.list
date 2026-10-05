@@ -104,6 +104,7 @@ check-docs-page-repeat
 check-citation-link
 check-fence-command-head
 check-fence-run
+check-fence-paste-unit
 check-install-toolchain
 check-install-platforms
 check-install-claim

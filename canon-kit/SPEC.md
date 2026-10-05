@@ -167,6 +167,7 @@ Knobs:
 - `CANON_KIT_PAGE_REPEAT_PAGES` — the pages `check-docs-page-repeat` holds, an array of globs, empty by default.
 - `CANON_KIT_PAGE_REPEAT_MIN_WORDS` — default `8`: the shortest sentence `check-docs-page-repeat`'s arm B counts.
 - `CANON_KIT_CITATION_LINK_PAGES` — the pages `check-citation-link` holds, an array of globs, empty by default.
+- `CANON_KIT_FENCE_PASTE_PAGES` — default empty: the globs naming each page `check-fence-paste-unit` reads.
 - `CANON_KIT_TASK_LIST_GLOBS` — globs naming the task lists `check-task-path-claim` and `check-task-label-resolution` read, default empty. `CANON_KIT_TASK_LABEL_CITES` and `CANON_KIT_TASK_LABEL_DEFINES` — keyed, default empty: per label family, the one-group ERE that cites a label and the one that defines it. The table validator holds the two to one key set and each value to the one-group shape (§check-task-label-resolution).
 - `CANON_KIT_FENCE_PROGRAMS` — array of program names a shell fence may start a command with, default a bundled generic utility set (`cat`, `grep`, `git`, …; `--emit knob-roster` prints it whole). Read by `check-fence-command-head`. The toolchain a tree's recipes name, a compiler, a fetch tool or a package manager, rides the extra.
 - `CANON_KIT_FENCE_RUN_PROGRAMS` — array of program names a fence `check-fence-run` executes may start a command with, default `("git")`. It is the whole set, not an extra over `CANON_KIT_FENCE_PROGRAMS`: every name in it runs with the scratch's network reach, so the default admits only the one program the fixed environment confines to local protocols. It is a vocabulary rather than a walk filter, so it takes no `knob:` couples token, on the fence-program pair's own ground.
@@ -1021,6 +1022,21 @@ A red head is reported and its fence is not executed. The pass is what makes *no
 **Red** is a fence whose exit status differs from the declared one, naming the doc, the fence's opening line, both statuses and the last twenty lines of its merged output. A static-pass red names the doc, the line, the head and the rule it failed; a marker red, the doc, the line and the defect. The clean line counts docs, marked fences, executed commands and scratches, so a tree with no marked fence prints `0 marked fence(s)`. A failed copy, a missing `bash` or a failed `git init` exits 2.
 
 **On a host with no `bash`, and on Windows.** The gate spawns `bash` only when a marked fence passes the static pass. With zero markers it spawns nothing and is clean on every host, so marking a fence, a `bash` fence by its own info string, is the act that takes the interpreter dependency. The bash audience's third `derived` arm records that spawn (context-kit/SPEC.md §bin/env-probe), calling this gate's corpus and marker functions rather than copies.
+
+### check-fence-paste-unit
+
+Invariant: on a declared page, every shell fence is one paste, and every PowerShell fence of more than one statement is one script block. A reader copies a fence whole, and a pasted sequence keeps running past a failed step. `check-fence-command-head` shows each head can run and `check-fence-run` runs what a doc marks; neither asks whether the fence stops where a step fails.
+
+- **Corpus:** files matching `CANON_KIT_FENCE_PASTE_PAGES`, an array of globs expanded like every canon-kit glob knob, default empty. An empty expansion is a clean `0 page(s)`.
+- **A shell fence** is a `bash`, `sh` or `shell` fence, the set `check-fence-command-head` reads, scanned by the crate's shell scanner. Its **top-level lists** are the runs of commands that a newline, `;` or `&` separates outside every subshell, group, compound command and substitution; `&&`, `||`, `|` and a line continuation join commands into one list, and a compound command is one command whatever it holds. A heredoc body is data.
+- **Arm A — a list a failure does not stop.** Every top-level list but the last must be a **bare assignment**: every word a `NAME=value` whose value carries no command substitution. Any other list followed by a further one is a finding, since its failure leaves the next one running.
+- **A PowerShell fence** is a `powershell`, `pwsh` or `ps1` fence. Its statement lines are its non-blank lines whose first non-blank character is not `#`.
+- **Arm B — an unwrapped PowerShell sequence.** A fence of two or more statement lines must open with the line `. {` and close with the line `}`, its first and last statement lines. Windows PowerShell 5.1 has no `&&`, and the dot-sourced block stops at a terminating error while keeping the variables it sets for a later block.
+- **Valve: the info string.** A fence shown for reading takes another language (`text`, `console`), as for `check-fence-command-head`; there is no line marker.
+
+**Red** names the page, the fence's opening line and, for arm A, the line of the list a failure would not stop. Arm A's `help:` line is *join the commands with `&&`, or split the block into one per step*; arm B's, *wrap the statements as `. { … }`*. The clean line counts pages, shell fences and PowerShell fences, so an armed corpus with no fence reads zero rather than passing unseen. **Exit 2:** an unreadable page. `tier=precommit`, `install: zero-config`, armed by `CANON_KIT_FENCE_PASTE_PAGES`.
+
+**Honest limits.** A native program's non-zero exit is no terminating error under Windows PowerShell 5.1, so arm B's block runs on past it; a step a later one depends on is checked in the block itself, with a `throw` where it fails. Arm A reads the separators, not the commands: a joined list whose commands do not depend on each other passes, and whether a sequence should be joined or split is review's.
 
 ### check-install-claim
 

@@ -16,13 +16,13 @@ The steps are the kit README's [Install](README.md#install) section. `checkwrigh
 
 ## Quick start
 
-Run these arms as the kit [README](README.md#use) spells them, PowerShell included:
+Run these arms as the kit [README](README.md#use) spells them, PowerShell included; `queue-index` lists the selectable work:
 
 <!-- fence-runnable -->
 ```sh
 gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
-"$gates" --emit queue-index    # list selectable work
-"$gates" --run-gate-tests queue-kit/gate-tests queue-kit/checks
+"$gates" --emit queue-index \
+  && "$gates" --run-gate-tests queue-kit/gate-tests queue-kit/checks
 ```
 
 ## Contracts

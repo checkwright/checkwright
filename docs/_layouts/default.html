@@ -98,6 +98,13 @@
     .site-content .markdown-body code { background: var(--ck-code-bg); }
     .site-content .markdown-body pre { border: 1px solid var(--ck-border);
       white-space: pre-wrap; overflow-wrap: break-word; }
+    .site-content .markdown-body pre > code { white-space: pre-wrap; overflow-wrap: anywhere; }
+    .site-content .markdown-body pre.ck-copyable { position: relative; padding-right: 4.75rem; }
+    .ck-copy { position: absolute; top: 0.4rem; right: 0.4rem; padding: 0.15rem 0.55rem;
+      font: inherit; font-size: 0.75rem; line-height: 1.4; cursor: pointer;
+      color: var(--ck-muted); background: var(--ck-code-bg);
+      border: 1px solid var(--ck-border); border-radius: 6px; }
+    .ck-copy:hover, .ck-copy:focus-visible { color: var(--ck-fg); border-color: var(--ck-muted); }
     /* Table colors over Primer's: Primer hardcodes light cell/row backgrounds,
        which collide with the light text the dark theme sets on .markdown-body —
        light-on-light, unreadable. Remap to theme vars so tables track the palette
@@ -228,5 +235,6 @@
   </script>
   <script>window.CK_SEARCH_URL = {{ '/search.json' | relative_url | jsonify }};</script>
   <script src="{{ '/assets/search.js' | relative_url }}"></script>
+  <script src="{{ '/assets/code-copy.js' | relative_url }}"></script>
 </body>
 </html>

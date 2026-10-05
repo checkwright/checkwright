@@ -1,0 +1,4 @@
+# graph: couples=knob:CANON_KIT_FENCE_PASTE_PAGES dir=one valve=none tier=precommit
+# install: zero-config
+# armed-by: CANON_KIT_FENCE_PASTE_PAGES
+# spec: canon-kit/SPEC.md §check-fence-paste-unit — on a page CANON_KIT_FENCE_PASTE_PAGES declares, every shell fence is one paste, and every PowerShell fence of more than one statement is one script block

@@ -116,9 +116,9 @@ On macOS, stock bash is 3.2, below the floor. If your profile owes `bash` (Requi
 <!-- macos-remedy:begin -->
 
 ```sh
-brew install bash
-echo "export PATH=\"$(brew --prefix)/bin:\$PATH\"" >> ~/.zprofile
-export PATH="$(brew --prefix)/bin:$PATH"
+brew install bash \
+  && echo "export PATH=\"$(brew --prefix)/bin:\$PATH\"" >> ~/.zprofile \
+  && export PATH="$(brew --prefix)/bin:$PATH"
 ```
 
 <!-- macos-remedy:end -->
@@ -134,13 +134,13 @@ The script is `docs/install.sh` in this repository; read it at <https://checkwri
 <details markdown="1">
 <summary>Step by step</summary>
 
-Download the release:
+Download the release into a scratch directory, so it unpacks outside the repository:
 
 ```sh
 v=X.Y.Z
-cw="$(mktemp -d)"   # unpack outside the repository
-curl -fsSLo "$cw/checkwright-$v.tgz" "https://github.com/checkwright/checkwright/releases/download/v$v/checkwright-$v.tgz"
-curl -fsSLo "$cw/checkwright-$v.tgz.sha256" "https://github.com/checkwright/checkwright/releases/download/v$v/checkwright-$v.tgz.sha256"
+cw="$(mktemp -d)" \
+  && curl -fsSLo "$cw/checkwright-$v.tgz" "https://github.com/checkwright/checkwright/releases/download/v$v/checkwright-$v.tgz" \
+  && curl -fsSLo "$cw/checkwright-$v.tgz.sha256" "https://github.com/checkwright/checkwright/releases/download/v$v/checkwright-$v.tgz.sha256"
 ```
 
 Where `gh` is installed and signed in, check the build attestation too; a release older than attestation fails it:
@@ -156,8 +156,8 @@ Then verify, extract and run `init` from your repository root:
 ```sh
 ( cd "$cw" \
   && { sha256sum -c "checkwright-$v.tgz.sha256" || shasum -a 256 -c "checkwright-$v.tgz.sha256"; } \
-  && tar -xzf "checkwright-$v.tgz" )
-sh "$cw/package/bin/checkwright.sh" init   # from your repository root
+  && tar -xzf "checkwright-$v.tgz" ) \
+  && sh "$cw/package/bin/checkwright.sh" init
 ```
 
 <!-- unix-install:end -->
@@ -181,9 +181,11 @@ Run this block in PowerShell first. It puts Git's `usr\bin` and `bin` on your `P
 <!-- windows-remedy:begin -->
 
 ```powershell
-$git = Split-Path (Split-Path (Split-Path ((git --exec-path) -replace '/', '\')))
-[Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + ";$git\usr\bin;$git\bin", 'User')
-$env:PATH = "$git\usr\bin;$git\bin;$env:PATH"
+. {
+  $git = Split-Path (Split-Path (Split-Path ((git --exec-path) -replace '/', '\')))
+  [Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + ";$git\usr\bin;$git\bin", 'User')
+  $env:PATH = "$git\usr\bin;$git\bin;$env:PATH"
+}
 ```
 
 <!-- windows-remedy:end -->
@@ -202,13 +204,15 @@ The script is `docs/install.ps1` in this repository; read it at <https://checkwr
 Download the release, in PowerShell:
 
 ```powershell
-$v = 'X.Y.Z'
-$cw = Join-Path ([IO.Path]::GetTempPath()) ([IO.Path]::GetRandomFileName())
-New-Item -ItemType Directory $cw | Out-Null
-$ProgressPreference = 'SilentlyContinue'
-$url = "https://github.com/checkwright/checkwright/releases/download/v$v/checkwright-$v.tgz"
-Invoke-WebRequest $url -OutFile "$cw\checkwright-$v.tgz" -UseBasicParsing
-Invoke-WebRequest "$url.sha256" -OutFile "$cw\checkwright-$v.tgz.sha256" -UseBasicParsing
+. {
+  $v = 'X.Y.Z'
+  $cw = Join-Path ([IO.Path]::GetTempPath()) ([IO.Path]::GetRandomFileName())
+  New-Item -ItemType Directory $cw | Out-Null
+  $ProgressPreference = 'SilentlyContinue'
+  $url = "https://github.com/checkwright/checkwright/releases/download/v$v/checkwright-$v.tgz"
+  Invoke-WebRequest $url -OutFile "$cw\checkwright-$v.tgz" -UseBasicParsing
+  Invoke-WebRequest "$url.sha256" -OutFile "$cw\checkwright-$v.tgz.sha256" -UseBasicParsing
+}
 ```
 
 Check the attestation as on macOS and Linux:
@@ -222,10 +226,12 @@ Then check the digest, unpack, and run `init`, still from your repository root:
 <!-- windows-install:begin -->
 
 ```powershell
-$want = (Get-Content -Raw "$cw\checkwright-$v.tgz.sha256").Split(' ')[0]
-if ((Get-FileHash "$cw\checkwright-$v.tgz" -Algorithm SHA256).Hash -ne $want) { throw 'checksum mismatch: download both files again' }
-& "$env:SystemRoot\System32\tar.exe" -xzf "$cw\checkwright-$v.tgz" -C $cw
-powershell -NoProfile -ExecutionPolicy Bypass -File "$cw\package\bin\checkwright.ps1" init
+. {
+  $want = (Get-Content -Raw "$cw\checkwright-$v.tgz.sha256").Split(' ')[0]
+  if ((Get-FileHash "$cw\checkwright-$v.tgz" -Algorithm SHA256).Hash -ne $want) { throw 'checksum mismatch: download both files again' }
+  & "$env:SystemRoot\System32\tar.exe" -xzf "$cw\checkwright-$v.tgz" -C $cw
+  powershell -NoProfile -ExecutionPolicy Bypass -File "$cw\package\bin\checkwright.ps1" init
+}
 ```
 
 <!-- windows-install:end -->

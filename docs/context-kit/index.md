@@ -20,8 +20,12 @@ Run these arms as the kit [README](README.md#use) spells them, PowerShell includ
 
 ```sh
 gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
-"$gates" --emit md-index <file.md>          # outline before body
-"$gates" --emit pub-index <component>/src/  # public API surface
+"$gates" --emit md-index <file.md>   # outline before body
+```
+
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
+"$gates" --emit pub-index <component>/src/   # public API surface
 ```
 
 ## Contracts

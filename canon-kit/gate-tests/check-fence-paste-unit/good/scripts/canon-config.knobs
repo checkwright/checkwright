@@ -1,0 +1,2 @@
+# spec: canon-kit/SPEC.md §check-fence-paste-unit — fixture consumer config: every page under site/ is declared
+CANON_KIT_FENCE_PASTE_PAGES[] = site/*.md

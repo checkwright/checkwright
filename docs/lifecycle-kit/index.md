@@ -20,7 +20,11 @@ Run these arms as the kit [README](README.md#use) spells them, PowerShell includ
 
 ```sh
 gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
-"$gates" --enter-stage <stage>          # stamp a stage entry (the transition itself)
+"$gates" --enter-stage <stage>   # stamp a stage entry (the transition itself)
+```
+
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --run-gate-tests lifecycle-kit/gate-tests lifecycle-kit/checks
 ```
 

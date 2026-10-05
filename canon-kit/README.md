@@ -30,6 +30,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required); the queue-facing gate
    check-citation-link          # needs declared pages (every section citation links its section)
    check-fence-command-head     # every shell-fence command starts with a word that can run
    check-fence-run              # every shell fence marked runnable runs and exits as declared
+   check-fence-paste-unit       # needs declared pages (every code block is one paste)
    check-knob-citation          # knob values stated only in the owning SPEC
    check-knob-default-coupling  # source knob defaults agree with the owning SPEC
    check-manifest-count         # no bare cardinal over a governed collection

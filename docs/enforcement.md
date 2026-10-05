@@ -116,6 +116,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | [canon-kit](canon-kit/index.md) | check-docs-page-repeat | precommit |
 | [canon-kit](canon-kit/index.md) | check-citation-link | precommit |
 | [canon-kit](canon-kit/index.md) | check-fence-command-head | precommit |
+| [canon-kit](canon-kit/index.md) | check-fence-paste-unit | precommit |
 | (consumer) | check-install-toolchain | precommit |
 | (consumer) | check-install-platforms | precommit |
 | [canon-kit](canon-kit/index.md) | check-install-claim | precommit |

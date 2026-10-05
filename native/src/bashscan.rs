@@ -22,6 +22,27 @@ pub struct Token {
     pub operands: Vec<String>,
 }
 
+// spec: canon-kit/SPEC.md §check-fence-paste-unit — what put a command-position word there: a list
+// separator, an operator joining it to the command before, or a construct it sits inside
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Sep {
+    Start,
+    Newline,
+    Semi,
+    Amp,
+    Joined,
+    Inner,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Placed {
+    pub word: String,
+    pub line: usize,
+    pub sep: Sep,
+    pub top: bool,
+    pub bare_assignment: bool,
+}
+
 // spec: gate-sdk/SPEC.md §port-blockers — `command -v <prog>` is this tree's convention for
 // announcing exactly this dependency, so a guarded program is a requirement with no inference.
 const PROBE_FLAGS: [&str; 4] = ["-v", "-V", "-p", "-P"];
@@ -42,11 +63,21 @@ struct Frame {
     wcmd: bool,
     wline: usize,
     pending: Option<usize>,
+    wsub: bool,
+    tick: bool,
+    sep: Option<Sep>,
+    wsep: Option<Sep>,
 }
 
 #[derive(Default)]
 struct Scan {
     out: Vec<Token>,
+    placed: Vec<Placed>,
+    pair_ticks: bool,
+    sep: Option<Sep>,
+    depth: usize,
+    wsub: bool,
+    wsep: Option<Sep>,
     cmdpos: bool,
     sq: bool,
     dq: bool,
@@ -80,8 +111,50 @@ impl Scan {
             self.word.clear();
             self.wcmd = self.cmdpos;
             self.wline = self.line;
+            self.wsub = false;
+            self.wsep = self.sep;
         }
         self.word.extend_from_slice(bytes);
+    }
+
+    fn top(&self) -> bool {
+        self.stack.is_empty() && self.depth == 0 && self.case_state.is_empty()
+    }
+
+    // spec: canon-kit/SPEC.md §check-fence-paste-unit — a compound command is one command whatever
+    // it holds, so its opener is placed where it stands and everything up to its closer sits inside
+    fn place(&mut self, word: &str, line: usize, bare_assignment: bool, sep: Option<Sep>) {
+        self.placed.push(Placed {
+            word: word.to_string(),
+            line,
+            sep: sep.unwrap_or(Sep::Start),
+            top: self.top(),
+            bare_assignment,
+        });
+        self.sep = Some(Sep::Inner);
+        match word {
+            "if" | "while" | "until" | "for" | "select" => self.depth += 1,
+            "fi" | "done" => self.depth = self.depth.saturating_sub(1),
+            _ => {}
+        }
+    }
+
+    fn substitution(&mut self, opener: &[u8]) {
+        self.addc(opener);
+        self.wsub = true;
+        self.push();
+        if let Some(f) = self.stack.last_mut() {
+            f.tick = opener == b"`";
+        }
+        self.cmdpos = true;
+        self.sep = Some(Sep::Inner);
+    }
+
+    // spec: canon-kit/SPEC.md §check-fence-paste-unit — the placement scan pairs a closing backtick
+    // with its opener, so the text after a backtick substitution is back at top level; the head scan
+    // keeps its own reading, whose output its callers hold
+    fn closes_tick(&self) -> bool {
+        self.pair_ticks && self.stack.last().is_some_and(|f| f.tick)
     }
 
     // spec: gate-sdk/SPEC.md §port-blockers — inside `[[ … ]]` the scan tracks state and emits
@@ -112,6 +185,8 @@ impl Scan {
         }
         if self.wcmd {
             self.probe = 0;
+            let bare = is_assignment(&w) && !self.wsub;
+            self.place(&w, self.wline, bare, self.wsep);
             self.classify(&w);
         } else if w == "in" && self.case_state.last() == Some(&1) {
             *self.case_state.last_mut().expect("case level checked above") = 2;
@@ -205,6 +280,10 @@ impl Scan {
             wcmd: self.wcmd,
             wline: self.wline,
             pending: self.pending.take(),
+            wsub: self.wsub,
+            tick: false,
+            sep: self.sep,
+            wsep: self.wsep,
         });
         self.dq = false;
         self.inword = false;
@@ -219,6 +298,9 @@ impl Scan {
                 self.wcmd = f.wcmd;
                 self.wline = f.wline;
                 self.pending = f.pending;
+                self.wsub = f.wsub;
+                self.sep = f.sep;
+                self.wsep = f.wsep;
             }
             None => self.dq = false,
         }
@@ -362,8 +444,19 @@ pub fn command_words(text: &str) -> Vec<Token> {
 // spec: canon-kit/SPEC.md §check-fence-command-head — every word the scan reached in command
 // position, whatever its shape, so a word that names no program is visible rather than dropped
 pub fn command_heads(text: &str) -> Vec<Token> {
+    scan(text, false).out
+}
+
+// spec: canon-kit/SPEC.md §check-fence-paste-unit — every command-position word, assignments and
+// compound openers included, with the separator that placed it and whether it sits at top level
+pub fn command_placements(text: &str) -> Vec<Placed> {
+    scan(text, true).placed
+}
+
+fn scan(text: &str, pair_ticks: bool) -> Scan {
     let mut s = Scan {
         cmdpos: true,
+        pair_ticks,
         ..Scan::default()
     };
     let mut cont = false;
@@ -419,16 +512,12 @@ pub fn command_heads(text: &str) -> Vec<Token> {
                     continue;
                 }
                 if c == b'$' && at(b, i + 1) == b'(' {
-                    s.addc(b"$(");
-                    s.push();
-                    s.cmdpos = true;
+                    s.substitution(b"$(");
                     i += 2;
                     continue;
                 }
                 if c == b'`' {
-                    s.addc(b"`");
-                    s.push();
-                    s.cmdpos = true;
+                    s.substitution(b"`");
                     i += 1;
                     continue;
                 }
@@ -523,9 +612,7 @@ pub fn command_heads(text: &str) -> Vec<Token> {
                 continue;
             }
             if c == b'$' && at(b, i + 1) == b'(' {
-                s.addc(b"$(");
-                s.push();
-                s.cmdpos = true;
+                s.substitution(b"$(");
                 i += 2;
                 continue;
             }
@@ -533,24 +620,41 @@ pub fn command_heads(text: &str) -> Vec<Token> {
                 s.endword();
                 s.push();
                 s.cmdpos = true;
+                s.sep = Some(Sep::Inner);
                 i += 2;
                 continue;
             }
-            if c == b'`' {
+            if c == b'`' && s.closes_tick() {
+                s.endword();
+                s.pop();
                 s.addc(b"`");
-                s.push();
-                s.cmdpos = true;
+                s.cmdpos = false;
+                i += 1;
+                continue;
+            }
+            if c == b'`' {
+                s.substitution(b"`");
                 i += 1;
                 continue;
             }
             if c == b'(' && at(b, i + 1) == b'(' && !s.inword {
+                if s.cmdpos {
+                    s.place("((", s.line, false, s.sep);
+                }
                 i = skip_balanced(b, i + 2, b'(', b')', false);
                 s.cmdpos = false;
                 continue;
             }
             if c == b'(' && s.inword && s.word.last() == Some(&b'=') {
                 s.endword();
-                i = skip_balanced(b, i + 1, b'(', b')', true);
+                let j = skip_balanced(b, i + 1, b'(', b')', true);
+                let body = &b[i..j];
+                if body.windows(2).any(|w| w == b"$(") || body.contains(&b'`') {
+                    if let Some(last) = s.placed.last_mut() {
+                        last.bare_assignment = false;
+                    }
+                }
+                i = j;
                 s.cmdpos = true;
                 continue;
             }
@@ -561,21 +665,29 @@ pub fn command_heads(text: &str) -> Vec<Token> {
                     *s.case_state.last_mut().expect("case level checked above") = 2;
                 }
                 s.cmdpos = !s.in_case();
+                s.sep = Some(Sep::Inner);
                 i += 2;
                 continue;
             }
             if c == b';' || c == b'&' || c == b'|' {
                 s.endword();
                 s.cmdpos = !s.in_case();
+                s.sep = Some(separator(b, i));
                 i += 1;
                 continue;
             }
             if c == b'{' || c == b'(' {
                 s.endword();
+                if s.cmdpos {
+                    s.place(if c == b'(' { "(" } else { "{" }, s.line, false, s.sep);
+                }
                 if c == b'(' {
                     s.push();
+                } else {
+                    s.depth += 1;
                 }
                 s.cmdpos = true;
+                s.sep = Some(Sep::Inner);
                 i += 1;
                 continue;
             }
@@ -592,6 +704,7 @@ pub fn command_heads(text: &str) -> Vec<Token> {
                         *st = 3;
                     }
                     s.cmdpos = true;
+                    s.sep = Some(Sep::Inner);
                 } else {
                     s.pop();
                     s.cmdpos = false;
@@ -601,7 +714,9 @@ pub fn command_heads(text: &str) -> Vec<Token> {
             }
             if c == b'}' {
                 s.endword();
+                s.depth = s.depth.saturating_sub(1);
                 s.cmdpos = true;
+                s.sep = Some(Sep::Inner);
                 i += 1;
                 continue;
             }
@@ -621,10 +736,27 @@ pub fn command_heads(text: &str) -> Vec<Token> {
         }
         if !s.sq && !s.dq && !cont {
             s.cmdpos = !s.in_case();
+            if s.sep != Some(Sep::Joined) {
+                s.sep = Some(Sep::Newline);
+            }
         }
         cont = false;
     }
-    s.out
+    s
+}
+
+// spec: canon-kit/SPEC.md §check-fence-paste-unit — `&&`, `||`, `|` and `|&` join a command to the one
+// before it, and an `&` beside a redirection (`2>&1`, `&>`) belongs to that redirection
+fn separator(b: &[u8], i: usize) -> Sep {
+    let prev = if i > 0 { b[i - 1] } else { 0 };
+    let next = at(b, i + 1);
+    match b[i] {
+        b';' => Sep::Semi,
+        b'|' => Sep::Joined,
+        _ if next == b'&' || prev == b'&' || prev == b'|' => Sep::Joined,
+        _ if prev == b'>' || prev == b'<' || next == b'>' => Sep::Inner,
+        _ => Sep::Amp,
+    }
 }
 
 #[cfg(test)]
@@ -750,6 +882,33 @@ mod tests {
         assert_eq!(toks.len(), 2);
         assert_eq!(toks[0].line, 1);
         assert_eq!(toks[1].line, 3);
+    }
+
+    // spec: canon-kit/SPEC.md §check-fence-paste-unit — each placement carries the separator that
+    // put it there and whether it sits at top level; a closed backtick substitution is left behind
+    #[test]
+    fn a_placement_carries_its_separator_its_level_and_its_assignment_shape() {
+        let got: Vec<(String, Sep, bool, bool)> =
+            command_placements("v=1 a && b; c\n( d )\nw=`e` f\n")
+                .into_iter()
+                .map(|p| (p.word, p.sep, p.top, p.bare_assignment))
+                .collect();
+        let want = [
+            ("v=1", Sep::Start, true, true),
+            ("a", Sep::Inner, true, false),
+            ("b", Sep::Joined, true, false),
+            ("c", Sep::Semi, true, false),
+            ("(", Sep::Newline, true, false),
+            ("d", Sep::Inner, false, false),
+            ("e", Sep::Inner, false, false),
+            ("w=``", Sep::Newline, true, false),
+            ("f", Sep::Inner, true, false),
+        ];
+        let want: Vec<(String, Sep, bool, bool)> = want
+            .iter()
+            .map(|(w, s, t, b)| (w.to_string(), *s, *t, *b))
+            .collect();
+        assert_eq!(got, want);
     }
 
     // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — a command carries its own operands and

@@ -30,6 +30,7 @@ pub mod docs_liquid_parse;
 pub mod docs_page_repeat;
 pub mod docs_restatement_parity;
 pub mod fence_command_head;
+pub mod fence_paste_unit;
 pub mod fence_run;
 pub mod gate_assertions;
 pub mod gate_exemption_tasks;
@@ -764,6 +765,19 @@ pub const REGISTRY: &[GateEntry] = &[
         ],
         "canon-kit",
         &[("bash", ""), ("git", "")],
+    ),
+    // spec: canon-kit/SPEC.md §check-fence-paste-unit — the page corpus is the knob's glob walk
+    (
+        "check-fence-paste-unit",
+        fence_paste_unit::run,
+        &[(".", "glob:knob:CANON_KIT_FENCE_PASTE_PAGES", "", "")],
+        &[
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+            "CANON_KIT_FENCE_PASTE_PAGES",
+        ],
+        "canon-kit",
+        &[],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — `?` for the reason spelled out at
     // check-spec-fence-balance below: the walk root does not bound the read set

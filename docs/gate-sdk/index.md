@@ -20,8 +20,8 @@ Run these arms as the kit README spells them, PowerShell included:
 
 ```sh
 gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
-"$gates" --run-gate-tests gate-sdk/gate-tests gate-sdk/checks
-"$gates" --install-hooks       # opt this clone into the hook
+"$gates" --run-gate-tests gate-sdk/gate-tests gate-sdk/checks \
+  && "$gates" --install-hooks   # opt this clone into the hook
 ```
 
 ## Contracts

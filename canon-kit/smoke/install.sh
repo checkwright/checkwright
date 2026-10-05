@@ -22,6 +22,7 @@ check-docs-link-convention
 check-docs-page-repeat
 check-docs-restatement-parity
 check-fence-command-head
+check-fence-paste-unit
 check-fence-run
 check-install-claim
 check-knob-citation

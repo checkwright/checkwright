@@ -22,7 +22,7 @@ no measurement channel attributes a session's spend to repeated manual operation
 
 ### docs-code-block-copy-wrap
 
-[spec: SPEC-code-blocks.md]
+[spec: docs/site-architecture.md]
 
 docs-site code blocks carry no copy-to-clipboard button and do not wrap: docs/_layouts/default.html sets `white-space: pre-wrap` on `.markdown-body pre`, but jekyll-theme-primer sets `white-space: pre` on `pre > code`, inside which every fenced block renders, so the layout's rule never reaches the text. No page-authoring rule holds a code block runnable on its own. Operator direction 2026-10-05, lead-relayed (not a ruling).
 

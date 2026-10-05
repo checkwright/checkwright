@@ -118,7 +118,7 @@ pub(crate) fn tracked_files(top: &str) -> Result<HashSet<String>, String> {
 
 // spec: canon-kit/SPEC.md §check-fence-command-head — a fence toggles on the shared fence shape, and
 // its info string's first word, case-folded, is its language
-pub(crate) fn shell_fences(text: &str) -> Vec<(usize, String)> {
+pub(crate) fn fences_of(text: &str, langs: &[&str]) -> Vec<(usize, String)> {
     let mut out = Vec::new();
     let mut open: Option<(usize, bool, String)> = None;
     for (idx, raw) in text.lines().enumerate() {
@@ -129,7 +129,7 @@ pub(crate) fn shell_fences(text: &str) -> Vec<(usize, String)> {
                 None => {
                     let info = raw.trim_start().trim_start_matches('`').trim();
                     let lang = info.split_whitespace().next().unwrap_or("").to_ascii_lowercase();
-                    open = Some((idx + 1, SHELL_LANGS.contains(&lang.as_str()), String::new()));
+                    open = Some((idx + 1, langs.contains(&lang.as_str()), String::new()));
                 }
             }
             continue;
@@ -140,6 +140,10 @@ pub(crate) fn shell_fences(text: &str) -> Vec<(usize, String)> {
         }
     }
     out
+}
+
+pub(crate) fn shell_fences(text: &str) -> Vec<(usize, String)> {
+    fences_of(text, &SHELL_LANGS)
 }
 
 fn judge_fence(

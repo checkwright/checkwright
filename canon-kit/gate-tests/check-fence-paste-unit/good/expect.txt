@@ -1,0 +1,1 @@
+FENCE-PASTE-UNIT: clean (1 page(s); 3 shell fence(s); 2 PowerShell fence(s))
