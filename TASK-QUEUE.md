@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### evidence-kit-front-brevity
-
-evidence-kit/SPEC.md's front half, which no brevity slice has passed: the preamble, §Layout and configuration, and §Per-component contracts from The evidence adapters through The baseline-claims arm (Baseline manifest, Evidence manifest, The producer-liveness lock, bin/run-validate.sh, bin/diff-baseline.sh), under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): about 8.5k of the file's 15.4k words at this scope, and 60 of its 119 `check-prose-bounds` findings with the ceiling knob emptied.
-
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey; the file's ceiling row re-stamped. [liveness-windows-misread](#liveness-windows-misread) later writes into §The producer-liveness lock, which this slice passes first.
-
-**Cost while deferred:** paid by every session and adopter that reads those evidence-kit sections. Filed 2026-10-05 as a split at scope. Part of the operator's selection of the unit set, direction 2026-10-05, lead-relayed (not a ruling).
-
 ## Deferred
 
 ### foreign-project-critique
@@ -258,7 +250,7 @@ Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-ki
 
 delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as `delegation-kit-tail-brevity`; canon-kit's claim-gate sections and rest left 2026-10-04 at the next two scopes as `canon-kit-claim-brevity` and `canon-kit-tail-brevity`; queue-kit's halves, then drift-kit's and context-kit's rests, at the four after as `queue-kit-format-brevity`, `queue-kit-arms-brevity`, `drift-kit-tail-brevity` and `context-kit-tail-brevity`.
 
-evidence-kit's front half left 2026-10-05 at evidence-front-install-split-pass' scope as [evidence-kit-front-brevity](#evidence-kit-front-brevity).
+evidence-kit's front half left 2026-10-05 at evidence-front-install-split-pass' scope as `evidence-kit-front-brevity`.
 
 ### tarball-attestation-observed
 
@@ -1213,4 +1205,5 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 - twin-gitdir-dotdot-fold
 - install-windows-stop-policy
 - install-page-split
+- evidence-kit-front-brevity
 

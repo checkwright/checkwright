@@ -4,9 +4,8 @@
 # registered gate, and because what is under test is an argument grammar plus a
 # refusal rather than a verdict over a tree.
 #
-# spec: evidence-kit/SPEC.md §bin/diff-baseline.sh — driven through the front end since the
-# 2026-09-04 port, which is also where the `-h`/`--help` arm now lives; cases G, H and I are the
-# three behaviours the port ADDS, so they are asserted rather than carried over.
+# spec: evidence-kit/SPEC.md §bin/diff-baseline.sh — driven through the front end, which is
+# also where the `-h`/`--help` arm lives; cases G, H and I are the three argv-shape behaviours.
 #
 # The defect it pins: the tool used to hand the parser a hardcoded 0, so an
 # exit-code suite reported pass for every log it was ever handed and the tool
