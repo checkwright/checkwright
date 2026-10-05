@@ -52,6 +52,7 @@
 ## Gate-authoring changes
 
 - **`lib/gate.sh`, `gate_skipped_mark <top> <prefix>`** — a new accessor: given the toplevel and prefix git answered from the working directory, it prints the nearest `.git` entry along the prefix git skipped and returns 0, or returns 1 where git skipped none. Nothing to do; a script of yours that changes to git's toplevel can ask it first.
+- **`lib/test-hermetic.sh`** — now heads `GIT_CEILING_DIRECTORIES` with the system temp dir, resolved physically, so a stray `.git` in `${TMPDIR:-/tmp}` no longer marks a bespoke test's `mktemp` sandbox as inside a repository. Nothing to do; a test that needs a repository above its sandbox sets the ceiling itself through `gate_env`.
 
 ## Behavior changes
 
