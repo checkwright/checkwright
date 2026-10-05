@@ -13,3 +13,4 @@ evidence-front-install-split-pass build aca203d2 2026-10-05 4eff9015c
 evidence-front-install-split-pass build a624082d 2026-10-05 acb1ae7d3
 evidence-front-install-split-pass build ae957f36 2026-10-05 e32cb27d7
 evidence-front-install-split-pass validate a00937d2 2026-10-05 67463678b
+evidence-front-install-split-pass close adfbbfdd 2026-10-05 faecaf54b
