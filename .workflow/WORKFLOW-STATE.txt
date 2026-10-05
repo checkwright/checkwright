@@ -8,3 +8,4 @@ context-kit-tail-publisher-pass scope a52e1d29 2026-10-05 f282d9b3a
 context-kit-tail-publisher-pass spec a4022598 2026-10-05 fc18a1dcb
 context-kit-tail-publisher-pass align a3b936bb 2026-10-05 a48f7f46b
 context-kit-tail-publisher-pass build a77cfeeb 2026-10-05 d1aa07fba
+context-kit-tail-publisher-pass build affa4a77 2026-10-05 5f2b56ef0
