@@ -143,8 +143,11 @@ pub fn run(args: &[String]) -> i32 {
     let mut state = Run::default();
     match smoke(&mut state, part) {
         Ok(()) => {
-            let of = part.map(|k| format!("; part {} of {}", k, roster::parts())).unwrap_or_default();
-            println!("{} ({}{})", roster::MARKER, profiles::summary(&state), of);
+            let summary = match part {
+                None => profiles::summary(&state),
+                Some(k) => roster::part_summary(k),
+            };
+            println!("{} ({})", roster::MARKER, summary);
             0
         }
         Err(Outcome::Fail(why)) => {

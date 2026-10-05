@@ -107,6 +107,12 @@ pub(super) fn runs(row: &Row, part: Option<u8>) -> bool {
     }
 }
 
+// spec: installer/SPEC.md §The consumer smoke — a part run's clean line claims only the arms it ran
+pub(super) fn part_summary(k: u8) -> String {
+    let own: Vec<&str> = ARMS.iter().filter(|r| r.part == k).map(|r| r.name).collect();
+    format!("part {} of {}: the setup arms, then {}", k, parts(), own.join(", "))
+}
+
 // spec: installer/SPEC.md §The consumer smoke — `--part <k>/<n>` names one of the roster's parts;
 // a count other than the roster's is refused, so a caller listing parts cannot fall out of step
 pub(super) fn part_arg(args: &[String]) -> Result<Option<u8>, String> {
@@ -283,6 +289,7 @@ mod tests {
         assert!(d.contains(&format!("{}artifact arm\n", ROSTER_LINE)) == (ARMS[ARMS.len() - 1].part == parts()));
         assert!(!d.contains(&format!("{}seed arm\n", ROSTER_LINE)) || parts() == 1);
         assert!(d.ends_with(&format!("{}{}\n", ROSTER_LINE, MARKER)));
+        assert!(part_summary(1).starts_with(&format!("part 1 of {}: the setup arms, then seed arm", parts())));
     }
 
     // spec: installer/SPEC.md §The consumer smoke — every parenthetical renders with no
