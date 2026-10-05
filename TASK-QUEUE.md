@@ -8,6 +8,20 @@
 
 ## New Features
 
+### install-page-split
+
+[spec: SPEC-install-split.md]
+
+docs/install.md runs 320 lines and the operator finds it too long to read: they want it split into sub-pages, and a page-authoring rule, gate-held where possible, that flags an over-long docs page so they need not spot one (operator direction 2026-10-05, lead-relayed, not a ruling). The 2026-09-21 direction set about 150 prose lines around the gated blocks and sanctioned a split without requiring one. `check-surface-ratchet` holds the page at a ceiling row, which stops growth and names no length at which a page splits.
+
+**Deliverable:** the page split into a parent and three sub-pages, every reader of its marked blocks re-pointed (the install-smoke legs, and the parity gates whose default is that path); a page-length rule among the page-authoring rules, held by a canon-kit gate (lead decision 2026-10-05, on site-kit/SPEC.md §Out of scope) that this repo binds at 1,500 words; docs/site-architecture.md split into six pages in this unit, and docs/orchestration.md and docs/positioning.md trimmed under the bound (operator directions 2026-10-05, lead-relayed, not rulings; the amendment marks each).
+
+**Cost while deferred:** every install reader meets a 320-line page. Filed 2026-10-05 to the gap inbox by drift-kit-tail-crosser-pass' lead, after scope's intake drain; promoted at its close: →fix fails because the split moves load-bearing readers and the length gate is new mechanism, →forward because the direction is given. Re-verified at spec: `wc -l` reads 321 (314 at filing), the ceiling row 21401cp, and site-architecture.md states no length rule. Owner lookup: `install.md`, `page-authoring`, `split` in this file — site-video-poster-rule, DISTINCT (video embeds); docs-code-block-copy-wrap, landed this iteration, DISTINCT (code-block copy and wrap); owner docs/site-architecture.md §Page-authoring rules.
+
+**Selected 2026-10-05 for evidence-front-install-split-pass,** operator direction given through the lead session (not a ruling), over scope's debt-only recommendation; the spec stage authors its amendment and promotes it. Applied after [install-windows-stop-policy](#install-windows-stop-policy), so the blocks move once edited. The amendment spans docs, canon-kit and the installer's contracts, so it meets `check-stage-entry` assertion C.
+
+**Push need (2026-10-05, inside the budget):** the mid-iteration push [twin-gitdir-dotdot-fold](#twin-gitdir-dotdot-fold) spends, since the re-pointed install-smoke legs run only on CI.
+
 ## Technical Debt
 
 ### evidence-kit-front-brevity
@@ -487,20 +501,6 @@ the delivery rule under `lead-notification-wake-race`'s remedy, unprobed: does a
 **Deliverable:** the refusal widened to every heading reached under two roles, across the roster and the aliases, a validator test per case, and the knob entry's refusal list updated.
 
 **Cost while deferred:** a consumer giving two roles one heading gets a note whose section the upgrade contract reads under either role, unrefused. Filed 2026-10-04 to the gap inbox by installer-trust-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because a widened refusal reds configurations accepted today, →forward because no ruling is owed. Re-verified: `refusals` checks a repeated role, and an alias against the roster's headings only. Owner lookup: `RELEASE_SECTION`, `two roles`, `alias` in this file — none; owner gate-sdk/SPEC.md §Layout and configuration.
-
-### install-page-split
-
-[cost: event/low] [surface: docs]
-
-docs/install.md runs 320 lines and the operator finds it too long to read: they want it split into sub-pages, and a page-authoring rule, gate-held where possible, that flags an over-long docs page so they need not spot one (operator direction 2026-10-05, lead-relayed, not a ruling). The 2026-09-21 direction set about 150 prose lines around the gated blocks and sanctioned a split without requiring one. `check-surface-ratchet` holds the page at a ceiling row, which stops growth and names no length at which a page splits.
-
-**Deliverable:** the page split into sub-pages, every reader of its marked install blocks re-pointed (the install-smoke legs, and the parity gates whose default is that path); a length rule in docs/site-architecture.md §Page-authoring rules, with a site-kit gate where the rule is mechanical.
-
-**Cost while deferred:** every install reader meets a 320-line page. Filed 2026-10-05 to the gap inbox by drift-kit-tail-crosser-pass' lead, after scope's intake drain; promoted at its close: →fix fails because the split moves load-bearing readers and the length gate is new mechanism, →forward because the direction is given. Re-verified: `wc -l` reads 320 (314 at filing), the ceiling row 21308cp, and site-architecture.md states no length rule. Owner lookup: `install.md`, `page-authoring`, `split` in this file — site-video-poster-rule, DISTINCT (video embeds); docs-code-block-copy-wrap, landed this iteration, DISTINCT (code-block copy and wrap); owner docs/site-architecture.md §Page-authoring rules.
-
-**Selected 2026-10-05 for evidence-front-install-split-pass,** operator direction given through the lead session (not a ruling), over scope's debt-only recommendation; the spec stage authors its amendment and promotes it. Applied after [install-windows-stop-policy](#install-windows-stop-policy), so the blocks move once edited. An amendment spanning docs and site-kit meets `check-stage-entry` assertion C.
-
-**Push need (2026-10-05, inside the budget):** the mid-iteration push [twin-gitdir-dotdot-fold](#twin-gitdir-dotdot-fold) spends, since the re-pointed install-smoke legs run only on CI.
 
 ### windows-cfg-msrv-lint-local
 
