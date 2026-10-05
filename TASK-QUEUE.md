@@ -8,6 +8,18 @@
 
 ## New Features
 
+### footprint-arm-publisher-page
+
+[spec: SPEC-footprint-publisher-arm.md]
+
+context-kit's `--emit footprint` arm ships in the binary but prints this site's page: Jekyll front matter (`nav_parent: value`), the site's own title and regen command, and a kit roster derived from `*/SPEC.md` files the payload withholds. In an adopter's tree it measures nothing of theirs, yet context-kit/README.md lists it among the adopter tools. Its gate, `check-footprint-fresh`, was withheld at `small-kit-value-audit`, which audited gates and did not reach this non-gate arm, so this is DISTINCT from that unit.
+
+**Deliverable:** one of two dispositions, chosen at spec: withhold the arm from the README and the payload docs as a publisher tool, or make the preamble and the roster knobs an adopter can set.
+
+**Selected 2026-10-05** for context-kit-tail-publisher-pass, operator direction lead-relayed (not a ruling). A feature, so the spec stage authors its amendment and promotes it, before [context-kit-tail-brevity](#context-kit-tail-brevity) passes §bin/footprint and §check-footprint-fresh. An amendment naming `docs/context-kit/SPEC.md` as a regenerate target meets `check-stage-entry` assertion C's mirror over-demand ([audit-trigger-mirror-component](#audit-trigger-mirror-component)).
+
+**Cost while deferred:** an adopter running a listed tool gets a page about Checkwright. Filed 2026-10-01 to the gap inbox at context-kit-value-pass' build; promoted 2026-10-01 at its close: →fix fails because the choice between the two dispositions is a design call and the second adds knobs, →forward because no ruling is owed. Re-verified: the arm's output opens with the front matter, and the README's tool list carries `--emit footprint`. Owner lookup: `footprint` in this file — none; owner context-kit/SPEC.md §bin/footprint.
+
 ## Technical Debt
 
 ### context-kit-tail-brevity
@@ -479,18 +491,6 @@ RELEASING.md's numbered procedure steps are cited by position, the shape doctrin
 **Inferred, not run:** the harness's canonical-root keying, read from its bundle; an unauthenticated run writes no memory dir, so the key was never observed.
 
 **Cost while deferred:** a worktree session's memory could accrete where `check-memory-off` never scans. Filed 2026-10-01 to the gap inbox at context-kit-value-pass' spec; promoted 2026-10-01 at its close: →fix fails because the harness behaviour is unobserved and the probe needs an authenticated session, →forward because no ruling is owed. Re-verified: the gate's default derives from the repository toplevel (`git rev-parse --show-toplevel`). Owner lookup: `memory`, `worktree`, `canonical` in this file — none; owner context-kit/SPEC.md §check-memory-off.
-
-### footprint-arm-publisher-page
-
-[cost: event/low] [surface: context-kit]
-
-context-kit's `--emit footprint` arm ships in the binary but prints this site's page: Jekyll front matter (`nav_parent: value`), the site's own title and regen command, and a kit roster derived from `*/SPEC.md` files the payload withholds. In an adopter's tree it measures nothing of theirs, yet context-kit/README.md lists it among the adopter tools. Its gate, `check-footprint-fresh`, was withheld at `small-kit-value-audit`, which audited gates and did not reach this non-gate arm, so this is DISTINCT from that unit.
-
-**Deliverable:** one of two dispositions, chosen at spec: withhold the arm from the README and the payload docs as a publisher tool, or make the preamble and the roster knobs an adopter can set.
-
-**Selected 2026-10-05** for context-kit-tail-publisher-pass, operator direction lead-relayed (not a ruling). A feature, so the spec stage authors its amendment and promotes it, before [context-kit-tail-brevity](#context-kit-tail-brevity) passes §bin/footprint and §check-footprint-fresh. An amendment naming `docs/context-kit/SPEC.md` as a regenerate target meets `check-stage-entry` assertion C's mirror over-demand ([audit-trigger-mirror-component](#audit-trigger-mirror-component)).
-
-**Cost while deferred:** an adopter running a listed tool gets a page about Checkwright. Filed 2026-10-01 to the gap inbox at context-kit-value-pass' build; promoted 2026-10-01 at its close: →fix fails because the choice between the two dispositions is a design call and the second adds knobs, →forward because no ruling is owed. Re-verified: the arm's output opens with the front matter, and the README's tool list carries `--emit footprint`. Owner lookup: `footprint` in this file — none; owner context-kit/SPEC.md §bin/footprint.
 
 ### notification-delivery-probe
 
