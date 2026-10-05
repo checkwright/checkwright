@@ -646,7 +646,10 @@ fn dangling(target: &Path, link: &Path) -> std::io::Result<()> {
 
 #[cfg(not(unix))]
 fn dangling(_target: &Path, link: &Path) -> std::io::Result<()> {
-    Err(std::io::Error::other(format!("no unprivileged symlink for {}", link.display())))
+    Err(std::io::Error::new(
+        std::io::ErrorKind::Other,
+        format!("no unprivileged symlink for {}", link.display()),
+    ))
 }
 
 fn git_init(dir: &Path) -> Result<(), String> {
