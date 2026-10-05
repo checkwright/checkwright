@@ -17,9 +17,6 @@ pub fn run(args: &[String]) -> i32 {
 fn rule(args: &[String]) -> Result<i32, String> {
     let emit_src = args.get(1).map(String::as_str).unwrap_or("");
 
-    // spec: docs/site-architecture.md §Generated projections and their freshness gates — counted
-    // inertness, check-action-pinning's shape for a tree holding none of its subject: the record
-    // is gitignored, so CI, a fresh clone and an adopter's tree have nothing to re-emit from.
     if emit_src.is_empty() {
         let (record, spelled) = crate::emit::install_evidence::record_path()?;
         if record.is_empty() || !Path::new(&record).is_file() {
