@@ -951,9 +951,9 @@ Invariant: no declared page states a relative link target, or a sentence of `CAN
 
 Invariant: no declared page runs past `CANON_KIT_PAGE_LENGTH_MAX_WORDS` words.
 
-- **Corpus:** files matching `CANON_KIT_PAGE_LENGTH_PAGES`, an array of globs expanded like every canon-kit glob knob, default empty, less the files matching `CANON_KIT_PAGE_LENGTH_EXCLUDE`, an array of globs, default empty. An empty expansion is a clean `0 page(s)`.
+- **Corpus:** files matching `CANON_KIT_PAGE_LENGTH_PAGES` less those matching `CANON_KIT_PAGE_LENGTH_EXCLUDE`, each expanded like every canon-kit glob knob. An empty expansion is a clean `0 page(s)`.
 - **The measure** is the page's whitespace-separated tokens on every line after the front-matter block: words, never lines, since unwrapped prose puts a paragraph on one line and a line count reads a long page as short. HTML comments are skipped. Table rows and fenced blocks count, since a reader scrolls them, and a comment marker inside a fenced block is the block's text.
-- **The bound** is `CANON_KIT_PAGE_LENGTH_MAX_WORDS`, a positive integer or `off`, default `off`. Which length is too long is the consumer's calibration. With the bound `off` the gate prints a clean line saying nothing was asserted.
+- **The bound** is `CANON_KIT_PAGE_LENGTH_MAX_WORDS`. Which length is too long is the consumer's calibration. With the bound `off` the gate prints a clean line saying nothing was asserted.
 - **No valve.** A page over the bound is shortened or split. A generated page, whose length is its source's, is left out through `CANON_KIT_PAGE_LENGTH_EXCLUDE`.
 
 **Red** is one finding per page over the bound, naming the page, its count and the bound. The `help:` line is *shorten the page, or split it into a parent and sub-pages*. The clean line counts the pages and names the longest with its count, so the headroom is readable without a red. **Exit 2:** an unreadable page, or a bound that is neither a positive integer nor `off`. `tier=precommit`, `install: zero-config`, armed by `CANON_KIT_PAGE_LENGTH_PAGES`.
