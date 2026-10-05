@@ -8,20 +8,6 @@
 
 ## New Features
 
-### install-page-split
-
-[spec: SPEC-install-split.md]
-
-docs/install.md runs 320 lines and the operator finds it too long to read: they want it split into sub-pages, and a page-authoring rule, gate-held where possible, that flags an over-long docs page so they need not spot one (operator direction 2026-10-05, lead-relayed, not a ruling). The 2026-09-21 direction set about 150 prose lines around the gated blocks and sanctioned a split without requiring one. `check-surface-ratchet` holds the page at a ceiling row, which stops growth and names no length at which a page splits.
-
-**Deliverable:** the page split into a parent and three sub-pages, every reader of its marked blocks re-pointed (the install-smoke legs, and the parity gates whose default is that path); a page-length rule among the page-authoring rules, held by a canon-kit gate (lead decision 2026-10-05, on site-kit/SPEC.md §Out of scope) that this repo binds at 1,500 words; docs/site-architecture.md split into six pages in this unit, and docs/orchestration.md and docs/positioning.md trimmed under the bound (operator directions 2026-10-05, lead-relayed, not rulings; the amendment marks each).
-
-**Cost while deferred:** every install reader meets a 320-line page. Filed 2026-10-05 to the gap inbox by drift-kit-tail-crosser-pass' lead, after scope's intake drain; promoted at its close: →fix fails because the split moves load-bearing readers and the length gate is new mechanism, →forward because the direction is given. Re-verified at spec: `wc -l` reads 321 (314 at filing), the ceiling row 21401cp, and site-architecture.md states no length rule. Owner lookup: `install.md`, `page-authoring`, `split` in this file — site-video-poster-rule, DISTINCT (video embeds); docs-code-block-copy-wrap, landed this iteration, DISTINCT (code-block copy and wrap); owner docs/site-architecture.md §Page-authoring rules.
-
-**Selected 2026-10-05 for evidence-front-install-split-pass,** operator direction given through the lead session (not a ruling), over scope's debt-only recommendation; the spec stage authors its amendment and promotes it. Applied after `install-windows-stop-policy`, so the blocks move once edited. The amendment spans docs, canon-kit and the installer's contracts, so it meets `check-stage-entry` assertion C.
-
-**Push need (2026-10-05, inside the budget):** the mid-iteration push `twin-gitdir-dotdot-fold` spends, since the re-pointed install-smoke legs run only on CI.
-
 ## Technical Debt
 
 ### evidence-kit-front-brevity
@@ -1226,4 +1212,5 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 
 - twin-gitdir-dotdot-fold
 - install-windows-stop-policy
+- install-page-split
 
