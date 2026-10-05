@@ -45,9 +45,9 @@
 3253cp docs/manual-install.md
 3007cp docs/methodology.md
 2550cp docs/openspec.md
-11647cp docs/orchestration.md
+9884cp docs/orchestration.md
 8258cp docs/page-authoring.md
-11086cp docs/positioning.md
+9786cp docs/positioning.md
 1869cp docs/posts/2026-07-09-announcing-checkwright.md
 1034cp docs/posts/2026-07-14-checkwright-v0-1-0.md
 6422cp docs/posts/2026-07-17-checkwright-v0-2-0.md
