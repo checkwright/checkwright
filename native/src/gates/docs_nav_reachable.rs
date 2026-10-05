@@ -199,7 +199,7 @@ fn links_of(path: &str, text: &str) -> Vec<String> {
     out
 }
 
-// spec: docs/site-architecture.md §Page-authoring rules — the nav children of each nav_id, in
+// spec: docs/page-authoring.md §Page-authoring rules — the nav children of each nav_id, in
 // page order, for the overview-as-sibling arm
 fn children_by_id(pages: &[String], fms: &HashMap<String, Fm>) -> Vec<(String, Vec<String>)> {
     let ids: HashSet<&String> = pages.iter().map(|p| &fms[p].id).filter(|i| !i.is_empty()).collect();
@@ -218,7 +218,7 @@ fn children_by_id(pages: &[String], fms: &HashMap<String, Fm>) -> Vec<(String, V
     out
 }
 
-// spec: docs/site-architecture.md §Page-authoring rules — the overview proxy: under three or
+// spec: docs/page-authoring.md §Page-authoring rules — the overview proxy: under three or
 // more siblings, a child every other sibling links and that links every other sibling; two
 // children linking each other are a pair, hence the floor
 fn overviews(kids: &[String], texts: &HashMap<String, String>) -> Vec<String> {

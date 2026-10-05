@@ -420,9 +420,9 @@ graph LR
     n77["*docs/check-graph.html"]
     n78["*docs/enforcement.md"]
     n79["*docs/footprint.md"]
-    n80["*docs/kits.md"]
-    n81["*docs/posts/*.md"]
-    n82["*docs/site-architecture.md"]
+    n80["*docs/generated-projections.md"]
+    n81["*docs/kits.md"]
+    n82["*docs/posts/*.md"]
     n83["*doctrine-kit/DOCTRINE.md"]
     n84["*installer/SPEC.md"]
     n85["*installer/bin/*.sh"]
@@ -1142,7 +1142,7 @@ graph LR
   n58 -->|"check-docs-cmd"| n83
   n58 -->|"check-docs-cmd"| n69
   n58 -->|"check-docs-cmd"| n71
-  n58 -->|"check-docs-cmd"| n81
+  n58 -->|"check-docs-cmd"| n82
   n58 -->|"check-docs-cmd"| n40
   n58 -->|"check-docs-cmd"| n5
   n58 -->|"check-docs-cmd"| n66
@@ -1160,7 +1160,7 @@ graph LR
   n72 -->|"check-docs-cname-parity"| n451
   n72 -->|"check-docs-cname-parity"| n623
   n69 -->|"check-docs-collapsible"| n71
-  n69 -->|"check-docs-collapsible"| n81
+  n69 -->|"check-docs-collapsible"| n82
   n69 -->|"check-docs-collapsible"| n676
   n69 -->|"check-docs-collapsible"| n684
   n69 -->|"check-docs-collapsible"| n481
@@ -1176,13 +1176,13 @@ graph LR
   n225 -->|"check-docs-kit-parity"| n483
   n225 -->|"check-docs-kit-parity"| n451
   n69 -->|"check-docs-link-convention"| n71
-  n69 -->|"check-docs-link-convention"| n81
+  n69 -->|"check-docs-link-convention"| n82
   n69 -->|"check-docs-link-convention"| n669
   n69 -->|"check-docs-link-convention"| n484
   n69 -->|"check-docs-link-convention"| n451
   n69 -->|"check-docs-link-convention"| n630
   n69 -->|"check-docs-liquid-parse"| n71
-  n69 -->|"check-docs-liquid-parse"| n81
+  n69 -->|"check-docs-liquid-parse"| n82
   n69 -->|"check-docs-liquid-parse"| n74
   n69 -->|"check-docs-liquid-parse"| n73
   n69 -->|"check-docs-liquid-parse"| n76
@@ -1208,7 +1208,7 @@ graph LR
   n10 -->|"check-docs-mirror-fresh"| n83
   n10 -->|"check-docs-mirror-fresh"| n69
   n10 -->|"check-docs-mirror-fresh"| n71
-  n10 -->|"check-docs-mirror-fresh"| n81
+  n10 -->|"check-docs-mirror-fresh"| n82
   n10 -->|"check-docs-mirror-fresh"| n40
   n10 -->|"check-docs-mirror-fresh"| n5
   n10 -->|"check-docs-mirror-fresh"| n66
@@ -1238,7 +1238,7 @@ graph LR
   n69 -->|"check-docs-page-repeat"| n535
   n69 -->|"check-docs-page-repeat"| n630
   n69 -->|"check-docs-render-fidelity"| n71
-  n69 -->|"check-docs-render-fidelity"| n81
+  n69 -->|"check-docs-render-fidelity"| n82
   n69 -->|"check-docs-render-fidelity"| n676
   n69 -->|"check-docs-render-fidelity"| n684
   n69 -->|"check-docs-render-fidelity"| n489
@@ -1416,7 +1416,7 @@ graph LR
   n58 -->|"check-fence-command-head"| n83
   n58 -->|"check-fence-command-head"| n69
   n58 -->|"check-fence-command-head"| n71
-  n58 -->|"check-fence-command-head"| n81
+  n58 -->|"check-fence-command-head"| n82
   n58 -->|"check-fence-command-head"| n40
   n58 -->|"check-fence-command-head"| n5
   n58 -->|"check-fence-command-head"| n66
@@ -1452,7 +1452,7 @@ graph LR
   n58 -->|"check-fence-run"| n83
   n58 -->|"check-fence-run"| n69
   n58 -->|"check-fence-run"| n71
-  n58 -->|"check-fence-run"| n81
+  n58 -->|"check-fence-run"| n82
   n58 -->|"check-fence-run"| n40
   n58 -->|"check-fence-run"| n5
   n58 -->|"check-fence-run"| n66
@@ -1810,7 +1810,7 @@ graph LR
   n58 -->|"check-install-claim"| n83
   n58 -->|"check-install-claim"| n69
   n58 -->|"check-install-claim"| n71
-  n58 -->|"check-install-claim"| n81
+  n58 -->|"check-install-claim"| n82
   n58 -->|"check-install-claim"| n40
   n58 -->|"check-install-claim"| n5
   n58 -->|"check-install-claim"| n66
@@ -1969,20 +1969,20 @@ graph LR
   n331 -->|"check-kit-ref-liveness"| n525
   n331 -->|"check-kit-ref-liveness"| n451
   n331 -->|"check-kit-ref-liveness"| n623
-  n80 -->|"check-kit-registration"| n343
-  n80 -->|"check-kit-registration"| n148
-  n80 -->|"check-kit-registration"| n179
-  n80 -->|"check-kit-registration"| n207
-  n80 -->|"check-kit-registration"| n259
-  n80 -->|"check-kit-registration"| n287
-  n80 -->|"check-kit-registration"| n315
-  n80 -->|"check-kit-registration"| n371
-  n80 -->|"check-kit-registration"| n405
-  n80 -->|"check-kit-registration"| n654
-  n80 -->|"check-kit-registration"| n700
-  n80 -->|"check-kit-registration"| n676
-  n80 -->|"check-kit-registration"| n526
-  n80 -->|"check-kit-registration"| n623
+  n81 -->|"check-kit-registration"| n343
+  n81 -->|"check-kit-registration"| n148
+  n81 -->|"check-kit-registration"| n179
+  n81 -->|"check-kit-registration"| n207
+  n81 -->|"check-kit-registration"| n259
+  n81 -->|"check-kit-registration"| n287
+  n81 -->|"check-kit-registration"| n315
+  n81 -->|"check-kit-registration"| n371
+  n81 -->|"check-kit-registration"| n405
+  n81 -->|"check-kit-registration"| n654
+  n81 -->|"check-kit-registration"| n700
+  n81 -->|"check-kit-registration"| n676
+  n81 -->|"check-kit-registration"| n526
+  n81 -->|"check-kit-registration"| n623
   n634 -->|"check-kit-roots-dialect"| n676
   n634 -->|"check-kit-roots-dialect"| n527
   n634 -->|"check-kit-roots-dialect"| n623
@@ -2003,7 +2003,7 @@ graph LR
   n58 -->|"check-knob-citation"| n83
   n58 -->|"check-knob-citation"| n69
   n58 -->|"check-knob-citation"| n71
-  n58 -->|"check-knob-citation"| n81
+  n58 -->|"check-knob-citation"| n82
   n58 -->|"check-knob-citation"| n40
   n58 -->|"check-knob-citation"| n5
   n58 -->|"check-knob-citation"| n66
@@ -2076,7 +2076,7 @@ graph LR
   n58 -->|"check-manifest-count"| n83
   n58 -->|"check-manifest-count"| n69
   n58 -->|"check-manifest-count"| n71
-  n58 -->|"check-manifest-count"| n81
+  n58 -->|"check-manifest-count"| n82
   n58 -->|"check-manifest-count"| n40
   n58 -->|"check-manifest-count"| n5
   n58 -->|"check-manifest-count"| n66
@@ -2103,7 +2103,7 @@ graph LR
   n58 -->|"check-manifest-temporal"| n83
   n58 -->|"check-manifest-temporal"| n69
   n58 -->|"check-manifest-temporal"| n71
-  n58 -->|"check-manifest-temporal"| n81
+  n58 -->|"check-manifest-temporal"| n82
   n58 -->|"check-manifest-temporal"| n40
   n58 -->|"check-manifest-temporal"| n5
   n58 -->|"check-manifest-temporal"| n66
@@ -2131,7 +2131,7 @@ graph LR
   n58 -->|"check-md-refs"| n83
   n58 -->|"check-md-refs"| n69
   n58 -->|"check-md-refs"| n71
-  n58 -->|"check-md-refs"| n81
+  n58 -->|"check-md-refs"| n82
   n58 -->|"check-md-refs"| n40
   n58 -->|"check-md-refs"| n5
   n58 -->|"check-md-refs"| n66
@@ -2177,7 +2177,7 @@ graph LR
   n10 -->|"check-measured-claim"| n83
   n10 -->|"check-measured-claim"| n69
   n10 -->|"check-measured-claim"| n71
-  n10 -->|"check-measured-claim"| n81
+  n10 -->|"check-measured-claim"| n82
   n10 -->|"check-measured-claim"| n6
   n10 -->|"check-measured-claim"| n61
   n10 -->|"check-measured-claim"| n669
@@ -2293,7 +2293,7 @@ graph LR
   n58 -->|"check-payload-claim"| n83
   n58 -->|"check-payload-claim"| n69
   n58 -->|"check-payload-claim"| n71
-  n58 -->|"check-payload-claim"| n81
+  n58 -->|"check-payload-claim"| n82
   n58 -->|"check-payload-claim"| n40
   n58 -->|"check-payload-claim"| n5
   n58 -->|"check-payload-claim"| n66
@@ -2321,7 +2321,7 @@ graph LR
   n58 -->|"check-pendency-contradiction"| n83
   n58 -->|"check-pendency-contradiction"| n69
   n58 -->|"check-pendency-contradiction"| n71
-  n58 -->|"check-pendency-contradiction"| n81
+  n58 -->|"check-pendency-contradiction"| n82
   n58 -->|"check-pendency-contradiction"| n40
   n58 -->|"check-pendency-contradiction"| n5
   n58 -->|"check-pendency-contradiction"| n66
@@ -2446,7 +2446,7 @@ graph LR
   n101 -->|"check-projection-roster"| n391
   n101 -->|"check-projection-roster"| n640
   n101 -->|"check-projection-roster"| n686
-  n101 -->|"check-projection-roster"| n82
+  n101 -->|"check-projection-roster"| n80
   n101 -->|"check-projection-roster"| n669
   n101 -->|"check-projection-roster"| n670
   n101 -->|"check-projection-roster"| n671
@@ -2497,7 +2497,7 @@ graph LR
   n58 -->|"check-prose-enum"| n83
   n58 -->|"check-prose-enum"| n69
   n58 -->|"check-prose-enum"| n71
-  n58 -->|"check-prose-enum"| n81
+  n58 -->|"check-prose-enum"| n82
   n58 -->|"check-prose-enum"| n40
   n58 -->|"check-prose-enum"| n5
   n58 -->|"check-prose-enum"| n66
@@ -2589,7 +2589,7 @@ graph LR
   n61 -->|"check-queue-slug-liveness"| n83
   n61 -->|"check-queue-slug-liveness"| n69
   n61 -->|"check-queue-slug-liveness"| n71
-  n61 -->|"check-queue-slug-liveness"| n81
+  n61 -->|"check-queue-slug-liveness"| n82
   n61 -->|"check-queue-slug-liveness"| n669
   n61 -->|"check-queue-slug-liveness"| n676
   n61 -->|"check-queue-slug-liveness"| n683
@@ -2927,7 +2927,7 @@ graph LR
   n58 -->|"check-spec-fence-balance"| n83
   n58 -->|"check-spec-fence-balance"| n69
   n58 -->|"check-spec-fence-balance"| n71
-  n58 -->|"check-spec-fence-balance"| n81
+  n58 -->|"check-spec-fence-balance"| n82
   n58 -->|"check-spec-fence-balance"| n40
   n58 -->|"check-spec-fence-balance"| n5
   n58 -->|"check-spec-fence-balance"| n66
@@ -2957,7 +2957,7 @@ graph LR
   n58 -->|"check-spec-pointer"| n83
   n58 -->|"check-spec-pointer"| n69
   n58 -->|"check-spec-pointer"| n71
-  n58 -->|"check-spec-pointer"| n81
+  n58 -->|"check-spec-pointer"| n82
   n58 -->|"check-spec-pointer"| n40
   n58 -->|"check-spec-pointer"| n5
   n58 -->|"check-spec-pointer"| n66
@@ -3196,7 +3196,7 @@ graph LR
   n58 -->|"check-tracking-claim"| n83
   n58 -->|"check-tracking-claim"| n69
   n58 -->|"check-tracking-claim"| n71
-  n58 -->|"check-tracking-claim"| n81
+  n58 -->|"check-tracking-claim"| n82
   n58 -->|"check-tracking-claim"| n40
   n58 -->|"check-tracking-claim"| n5
   n58 -->|"check-tracking-claim"| n66
@@ -3252,7 +3252,7 @@ graph LR
   n10 -->|"check-unmarked-claim"| n83
   n10 -->|"check-unmarked-claim"| n69
   n10 -->|"check-unmarked-claim"| n71
-  n10 -->|"check-unmarked-claim"| n81
+  n10 -->|"check-unmarked-claim"| n82
   n10 -->|"check-unmarked-claim"| n6
   n10 -->|"check-unmarked-claim"| n61
   n10 -->|"check-unmarked-claim"| n669

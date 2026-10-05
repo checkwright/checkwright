@@ -183,7 +183,7 @@ jobs:
           echo "installer_smoke exited $rc; the verdict below is the baseline diff, not that status"
           bash gate-sdk/bin/run-gates.sh --diff-baseline installer_smoke "$log" "$rc"
 
-      # spec: docs/site-architecture.md §Generated projections and their freshness gates — the install blocks
+      # spec: docs/install-block-contracts.md §The install blocks — the unix-install block
       - name: run the page's unix-install block against the packed tarball
         shell: bash
         run: |
@@ -912,7 +912,7 @@ jobs:
             || { echo "::error::the manifest records artifact target '$got' where this host is '$PWSH_TARGET'"; exit 1; }
           echo "the POSIX bootstrap installed $minimum here and recorded the $PWSH_TARGET artifact"
 
-      # spec: docs/site-architecture.md §Generated projections and their freshness gates — the install blocks
+      # spec: docs/install-block-contracts.md §The install blocks — the windows-install block
       - name: run the page's windows-install block against the packed tarball
         if: matrix.part == 'bootstrap'
         shell: pwsh
@@ -1218,7 +1218,7 @@ jobs:
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
-      # spec: docs/site-architecture.md §Generated projections and their freshness gates — the declaration's rows
+      # spec: docs/install-parity-contracts.md §The install-platforms parity contract — the declaration's rows
       - name: derive the producer legs from the platform declaration
         id: legs
         run: |
@@ -1232,7 +1232,7 @@ jobs:
               held:*) held=true ;;
               *)
                 echo "platform '$target' declares state '$state', which is neither" >&2
-                echo "'joined' nor 'held: <precondition>' — see docs/site-architecture.md." >&2
+                echo "'joined' nor 'held: <precondition>' — see docs/install-parity-contracts.md." >&2
                 exit 1
                 ;;
             esac

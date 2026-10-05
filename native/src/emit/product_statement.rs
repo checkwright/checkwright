@@ -1,4 +1,4 @@
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the product
+// spec: docs/generated-projections.md §Generated projections and their freshness gates — the product
 // statement: one source, two renderings, five sites, one function the gate calls in process
 use crate::fresh;
 
@@ -15,7 +15,7 @@ pub struct Statement {
     pub summary: String,
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — each key once,
+// spec: docs/generated-projections.md §Generated projections and their freshness gates — each key once,
 // no other key, and no character a rendering would lose
 pub fn parse(path: &str, text: &str) -> Result<Statement, String> {
     let mut found: Vec<(String, String)> = Vec::new();
@@ -69,7 +69,7 @@ pub fn plain(s: &Statement) -> String {
     format!("{} {}", s.category, s.summary).replace('*', "")
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — YAML's
+// spec: docs/generated-projections.md §Generated projections and their freshness gates — YAML's
 // double-quoted scalar, JSON's string and TOML's basic string share the one escape the source admits
 pub fn quoted(v: &str) -> String {
     format!("\"{}\"", v.replace('\\', "\\\\").replace('"', "\\\""))
@@ -94,7 +94,7 @@ fn kind_of(site: &str) -> Result<Kind, String> {
     }
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the text a
+// spec: docs/generated-projections.md §Generated projections and their freshness gates — the text a
 // site carries: the markdown rendering in a block, the plain rendering as a quoted scalar elsewhere
 pub fn expected(site: &str, s: &Statement) -> Result<String, String> {
     Ok(match kind_of(site)? {
@@ -103,7 +103,7 @@ pub fn expected(site: &str, s: &Statement) -> Result<String, String> {
     })
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — a site's slot:
+// spec: docs/generated-projections.md §Generated projections and their freshness gates — a site's slot:
 // the line span `--write` replaces and the text the gate compares; an absent or repeated slot is no
 // place to write, so it refuses
 pub struct Slot {
@@ -178,7 +178,7 @@ fn slot(site: &str, text: &str) -> Result<Slot, String> {
     }
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — a block holds
+// spec: docs/generated-projections.md §Generated projections and their freshness gates — a block holds
 // the rendering between two blank lines, so kramdown reads it as its own paragraph
 pub fn check(site: &str, text: &str, s: &Statement) -> Result<(Slot, String), String> {
     let slot = slot(site, text)?;
@@ -256,7 +256,7 @@ mod tests {
         assert_eq!(plain(&st()), "Cat. A \"quoted\" done back\\slash.");
     }
 
-    // spec: docs/site-architecture.md §Generated projections and their freshness gates — the three
+    // spec: docs/generated-projections.md §Generated projections and their freshness gates — the three
     // escapers are one: backslash first, then the quote
     #[test]
     fn each_scalar_escapes_the_quote_and_the_backslash() {

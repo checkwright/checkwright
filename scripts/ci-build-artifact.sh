@@ -52,7 +52,7 @@ floor_refuse() {
     exit 1
 }
 
-# spec: docs/site-architecture.md §Generated projections and their freshness gates — the row whose first backticked run is the target, and the declared floor token in it
+# spec: docs/install-parity-contracts.md §The install-platforms parity contract — the row whose first backticked run is the target, and the declared floor token in it
 row="$(awk -v t="$target" '
     /^<!-- platforms:begin -->$/ { inb = 1; next }
     /^<!-- platforms:end -->$/   { inb = 0; next }

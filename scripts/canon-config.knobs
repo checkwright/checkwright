@@ -73,11 +73,11 @@ CANON_KIT_PAYLOAD_CLAIM_EXCLUDE[] = docs/posts/*
 # comment-tier-exempt: the site's per-kit index pages, each restating part of the kit README mirrored beside it; which pages restate a source is this site's layout, never a kit literal
 CANON_KIT_RESTATEMENT_PAGES[] = docs/*/index.md
 
-# comment-tier-exempt: the site's hand-authored pages held to one statement per fact within a page (docs/site-architecture.md §Page-authoring rules); the dated posts and the generated SPEC and README mirrors stay out, since a mirror's links are its source's
+# comment-tier-exempt: the site's hand-authored pages held to one statement per fact within a page (docs/page-authoring.md §Page-authoring rules); the dated posts and the generated SPEC and README mirrors stay out, since a mirror's links are its source's
 CANON_KIT_PAGE_REPEAT_PAGES[] = docs/*.md
 CANON_KIT_PAGE_REPEAT_PAGES[] = docs/*/index.md
 
-# comment-tier-exempt: the hand-authored pages whose section citations are links (docs/site-architecture.md §Page-authoring rules): the site pages, the front door, the top-level READMEs and the other root documents GitHub renders; CLAUDE.md and the queue stay out as agent-loaded working surfaces, where links grow every session's read, and the dated posts and generated mirrors stay out
+# comment-tier-exempt: the hand-authored pages whose section citations are links (docs/page-authoring.md §Page-authoring rules): the site pages, the front door, the top-level READMEs and the other root documents GitHub renders; CLAUDE.md and the queue stay out as agent-loaded working surfaces, where links grow every session's read, and the dated posts and generated mirrors stay out
 CANON_KIT_CITATION_LINK_PAGES[] = docs/*.md
 CANON_KIT_CITATION_LINK_PAGES[] = docs/*/index.md
 CANON_KIT_CITATION_LINK_PAGES[] = */README.md
@@ -89,7 +89,7 @@ CANON_KIT_CITATION_LINK_PAGES[] = RELEASING.md
 CANON_KIT_CITATION_LINK_PAGES[] = TRAJECTORY.md
 CANON_KIT_CITATION_LINK_PAGES[] = ROADMAP.md
 
-# comment-tier-exempt: the site's hand-authored pages, whose code blocks a reader copies whole (docs/site-architecture.md §Page-authoring rules); the generated mirrors stay out, their fences being their kit sources'
+# comment-tier-exempt: the site's hand-authored pages, whose code blocks a reader copies whole (docs/page-authoring.md §Page-authoring rules); the generated mirrors stay out, their fences being their kit sources'
 CANON_KIT_FENCE_PASTE_PAGES[] = docs/*.md
 CANON_KIT_FENCE_PASTE_PAGES[] = docs/*/index.md
 
@@ -139,7 +139,7 @@ CANON_KIT_COMMENT_MACHINE[] = consumer-value-exempt:
 # spec: canon-kit/SPEC.md §check-comment-tier
 CANON_KIT_COMMENT_ACTIONS = on
 
-# spec: docs/site-architecture.md §Page-authoring rules
+# spec: docs/page-authoring.md §Page-authoring rules
 CANON_KIT_SPEC_POINTER_TITLE_ONCE = on
 
 # comment-tier-exempt: the programs this repo's shell fences name beyond the bundled generic utility set — the crate toolchain its contributor battery runs, the fetch, checksum and attestation tools its install recipes use, and the package manager one platform's install recipe names, the npm runner the one-command install uses, and the Spec Kit CLI the companion extension installs through; a tree's toolchain is its own vocabulary, never a kit literal (the provenance seam)

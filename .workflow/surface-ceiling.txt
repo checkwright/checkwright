@@ -16,7 +16,7 @@
 6847cp .claude/commands/scope.md
 1155cp .claude/commands/spec.md
 1728cp .claude/commands/validate.md
-12517cp CLAUDE.md
+12476cp CLAUDE.md
 244614cp canon-kit/SPEC.md
 5785cp canon-kit/templates/SPEC-amendment.md
 25807cp companion/SPEC.md
@@ -33,8 +33,11 @@
 1285cp docs/drift-kit/index.md
 1351cp docs/evidence-kit/index.md
 1473cp docs/gate-sdk/index.md
+9645cp docs/generated-projections.md
 1259cp docs/guard-kit/index.md
 5205cp docs/index.md
+7867cp docs/install-block-contracts.md
+8396cp docs/install-parity-contracts.md
 9542cp docs/install.md
 1344cp docs/kits.md
 1458cp docs/lifecycle-kit/index.md
@@ -43,6 +46,7 @@
 3007cp docs/methodology.md
 2550cp docs/openspec.md
 11647cp docs/orchestration.md
+8258cp docs/page-authoring.md
 11086cp docs/positioning.md
 1869cp docs/posts/2026-07-09-announcing-checkwright.md
 1034cp docs/posts/2026-07-14-checkwright-v0-1-0.md
@@ -76,10 +80,11 @@
 6070cp docs/posts/2026-09-28-checkwright-v0-29-0.md
 6814cp docs/posts/2026-09-29-checkwright-v0-30-0.md
 4672cp docs/posts/2026-09-30-checkwright-v0-31-0.md
+6861cp docs/projection-fan-outs.md
 1460cp docs/queue-kit/index.md
 789cp docs/releases.md
 6893cp docs/requirements.md
-44578cp docs/site-architecture.md
+5028cp docs/site-architecture.md
 2412cp docs/site-kit/index.md
 4710cp docs/spec-toolkits.md
 2906cp docs/speckit.md
@@ -93,7 +98,7 @@
 2899cp gate-sdk/templates/adopt.md
 281884cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
-277409cp installer/SPEC.md
+277399cp installer/SPEC.md
 357506cp lifecycle-kit/SPEC.md
 6534cp lifecycle-kit/templates/consult.md
 44666cp lifecycle-kit/templates/lead.md

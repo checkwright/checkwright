@@ -1,4 +1,4 @@
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the
+// spec: docs/generated-projections.md §Generated projections and their freshness gates — the
 // trajectory arm's byte-fresh projection is docs/evidence-data.md
 use crate::fresh;
 use std::path::Path;

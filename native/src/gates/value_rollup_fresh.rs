@@ -1,4 +1,4 @@
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the
+// spec: docs/generated-projections.md §Generated projections and their freshness gates — the
 // value-rollup block in docs/value.md is the byte-fresh projection of the value-rollup join
 use crate::fresh;
 use std::path::Path;
@@ -74,7 +74,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 mod tests {
     use super::*;
 
-    // spec: docs/site-architecture.md §Generated projections and their freshness gates — the
+    // spec: docs/generated-projections.md §Generated projections and their freshness gates — the
     // markers match on the whole line, so an indented or embedded spelling opens nothing
     #[test]
     fn the_block_is_the_lines_strictly_between_whole_line_markers() {

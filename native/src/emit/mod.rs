@@ -277,7 +277,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
             "EVIDENCE_KIT_RUN_*",
         ],
     ),
-    // spec: docs/site-architecture.md §Generated projections and their freshness gates — the join
+    // spec: docs/generated-projections.md §Generated projections and their freshness gates — the join
     // reads both sibling emitters live, so it declares the union of what they read.
     (
         "--emit-value-rollup",
@@ -297,7 +297,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
             value_rollup::PAGE_KNOB,
         ],
     ),
-    // spec: docs/site-architecture.md §Generated projections and their freshness gates — a
+    // spec: docs/generated-projections.md §Generated projections and their freshness gates — a
     // repo-local projection beside the value rollup; its source and sites are this repo's descriptor
     // knobs, which a tree declaring none refuses by name
     (

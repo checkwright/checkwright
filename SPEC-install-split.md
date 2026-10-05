@@ -135,6 +135,8 @@ Text moves; no contract sentence is rewritten except to name a page delta 3 or t
 - **The contract rows name the install pages delta 3 made**: the three Requirements tables and the commit-cost block on `docs/requirements.md`, the remedy blocks on `docs/install.md`, the install blocks on `docs/manual-install.md` with no collapsed region to mention, and the knob delta 4 mints where a row names the page a gate reads.
 - **The new-gate fan-out's closing sentence** points at the page holding the staging-order paragraphs, which is its own.
 
+*Applied.* Word counts: site-architecture 744, page-authoring 1,263, generated-projections 1,274, projection-fan-outs 968, install-parity-contracts 1,327, install-block-contracts 1,194. Two pages carry a `door-contributor:` declaration, generated-projections and projection-fan-outs; site-architecture lost its own, no regeneration command remaining on it. Each fan-out and contract section is headed by its bold lead, the bullet marker dropped and the body de-indented; "the row above/below" cross-references became section or roster-page links, and "here" in the closing paragraphs became "the roster".
+
 ### (7) The site-architecture page's readers follow the sections {mechanical}
 
 - **`docs/site-architecture.md §Generated projections and their freshness gates`** is cited by `# spec:` directives across `native/src`, the local gate descriptors, the two workflows and installer/SPEC.md. Each citation moves to the page and section now holding the row it cites: a projection's freshness gate to `docs/generated-projections.md` under the unchanged heading; the install-toolchain and install-platforms readers to their contract's section of `docs/install-parity-contracts.md`; a reader of a prerequisites, commit-cost, remedy, install or hosted-script contract to that section of `docs/install-block-contracts.md`.
@@ -143,6 +145,8 @@ Text moves; no contract sentence is rewritten except to name a page delta 3 or t
 - **CLAUDE.md** names the roster's home as `docs/generated-projections.md` in §This repo is governed by its own kits. Its Housekeeping line on `docs/` stands: the load-triggered page still leads to every other.
 - **A fixture descriptor** under a `gate-tests/` tree that copies a live descriptor's `# spec:` line follows its live descriptor.
 - **`.workflow/surface-ceiling.txt`** gains a row per new page and a lowered row for `docs/site-architecture.md`.
+
+*Applied.* Beyond the roster: the `# spec:` lines of `gates.yml`'s install-block and platform-declaration steps and its failure message, `site-health.yml`, `scripts/ci-build-artifact.sh` and `scripts/check-install-platforms.gate`; `installer/SPEC.md`'s two citations of the projections section; `scripts/gate-sdk-config.knobs`' gloss. A directive glossing the prerequisites arm (`install_platforms.rs`: a prerequisites row, a system family) points at `docs/install-block-contracts.md §The prerequisites block`, not the platforms contract. CLAUDE.md names the page alone, its heading dropped, since the always-loaded ceiling forbids the growth. The generated pages' H1 is the section's full heading (`Generated projections and their freshness gates`, `Page-authoring rules`) over a shorter `title:`, so the unchanged heading is the page's own.
 
 `check-spec-pointer` resolves every re-pointed citation, and `check-citation-link` and `check-md-refs` every link. Neither tells a citation moved to the wrong row's section from one moved to the right one; the session reads each directive's gloss against the section it names.
 

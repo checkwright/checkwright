@@ -1,4 +1,4 @@
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the
+// spec: docs/generated-projections.md §Generated projections and their freshness gates — the
 // install-evidence arm's byte-fresh projection is docs/install-evidence.md, and the gate is inert
 // on a counted zero where the gitignored record does not resolve to a file.
 use crate::fresh;

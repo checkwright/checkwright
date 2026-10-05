@@ -1,4 +1,4 @@
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the two
+// spec: docs/install-parity-contracts.md §The install-toolchain parity contract — the two
 // toolchain tables hold whole-element parity with the probe roster, each row on its audience's page
 use super::install_docs;
 use crate::fresh;
@@ -8,12 +8,12 @@ use std::path::Path;
 
 const BEGIN: &str = "<!-- toolchain:begin -->";
 const END: &str = "<!-- toolchain:end -->";
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the Version
+// spec: docs/install-parity-contracts.md §The install-toolchain parity contract — the Version
 // cell's floor lead, its field separator, and its spelling for neither axis
 const GE: &str = "≥";
 const SEP: &str = ", ";
 const NEITHER: &str = "any";
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the Needed
+// spec: docs/install-parity-contracts.md §The install-toolchain parity contract — the Needed
 // cell's rendering of each audience, a kit list's lead and its last-pair joiner among them
 const REQUIRED: &str = "required";
 const CONTRIBUTORS: &str = "contributors";
@@ -31,7 +31,7 @@ pub fn run(args: &[String]) -> i32 {
     }
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — no cell
+// spec: docs/install-parity-contracts.md §The install-toolchain parity contract — no cell
 // carries `|`, so a row's cells are its `|`-delimited runs inside the outer pipes, each trimmed
 fn cells(line: &str) -> Vec<String> {
     let body = line.trim();
@@ -40,7 +40,7 @@ fn cells(line: &str) -> Vec<String> {
     body.split('|').map(|c| c.trim().to_string()).collect()
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the first
+// spec: docs/install-parity-contracts.md §The install-toolchain parity contract — the first
 // cell is one backticked name, so the header and delimiter rows are never rows
 fn backticked_name(cell: &str) -> Option<&str> {
     let inner = cell.strip_prefix('`')?.strip_suffix('`')?;
@@ -52,7 +52,7 @@ fn backticked_name(cell: &str) -> Option<&str> {
 
 struct Row {
     name: String,
-    // spec: docs/site-architecture.md §Generated projections and their freshness gates — the
+    // spec: docs/install-parity-contracts.md §The install-toolchain parity contract — the
     // Version and Needed cells as `render` spells them, compared verbatim
     cells: String,
     contributor: bool,
@@ -88,7 +88,7 @@ fn listed_rows(text: &str) -> Vec<Row> {
     out
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the roster
+// spec: docs/install-parity-contracts.md §The install-toolchain parity contract — the roster
 // grammar has one crate-side parser, `toolfloor::parse`, which this gate shares with the env-probe
 // arm rather than holding a second copy the two could disagree about
 // spec: context-kit/SPEC.md §bin/env-probe — a derived audience is resolved before the comparison,
@@ -103,7 +103,7 @@ fn roster_quad(element: &str, derived: &[String]) -> (String, String) {
     )
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the Version
+// spec: docs/install-parity-contracts.md §The install-toolchain parity contract — the Version
 // and Needed cells an element demands
 fn render(quad: &str) -> String {
     let mut it = quad.splitn(4, ':');
@@ -232,8 +232,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut listed_by_name: BTreeMap<String, String> = BTreeMap::new();
     for (page, rows) in [(install_md, &install_rows), (contributing_md, &contributing_rows)] {
         for r in rows {
-            // spec: docs/site-architecture.md §Generated projections and their freshness gates — a
-            // contributors row only in CONTRIBUTING.md, every other row only on the install page
+            // spec: docs/install-parity-contracts.md §The install-toolchain parity contract — a
+            // contributors row only in CONTRIBUTING.md, every other row only on the requirements page
             let home = if r.contributor { contributing_md } else { install_md };
             if page != home {
                 findings.push(format!(
@@ -300,7 +300,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 mod tests {
     use super::*;
 
-    // spec: docs/site-architecture.md §Generated projections and their freshness gates — the
+    // spec: docs/install-parity-contracts.md §The install-toolchain parity contract — the
     // three spellings of an unconstrained member are one member
     #[test]
     fn every_empty_trailing_field_normalizes_to_the_same_quadruple() {
@@ -318,7 +318,7 @@ mod tests {
         );
     }
 
-    // spec: docs/site-architecture.md §Generated projections and their freshness gates — the
+    // spec: docs/install-parity-contracts.md §The install-toolchain parity contract — the
     // header and delimiter rows skipped, each cell trimmed
     #[test]
     fn the_page_side_reads_each_row_off_its_cells() {
@@ -335,7 +335,7 @@ mod tests {
         assert!(!rows[1].contributor);
     }
 
-    // spec: docs/site-architecture.md §Generated projections and their freshness gates — an
+    // spec: docs/install-parity-contracts.md §The install-toolchain parity contract — an
     // optional row states its condition, and a kit list joins its last two names with ` or `
     #[test]
     fn render_spells_the_two_cells_an_element_demands() {

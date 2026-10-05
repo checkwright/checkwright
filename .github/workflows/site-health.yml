@@ -225,7 +225,7 @@ jobs:
             rm -f "$css" "$css_err"
           fi
 
-          # spec: docs/site-architecture.md §Generated projections and their freshness gates
+          # spec: docs/generated-projections.md §Generated projections and their freshness gates
           about_err="$(mktemp)"
           about="$(gh api 'repos/{owner}/{repo}' --jq '.description // ""' 2>"$about_err")"
           about_rc=$?

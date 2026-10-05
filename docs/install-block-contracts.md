@@ -1,0 +1,40 @@
+---
+title: Install block contracts
+---
+
+# Install block contracts
+
+This page holds the contracts of the install pages' marker blocks and the hosted install scripts, each with its readers.
+
+## The prerequisites block
+
+`docs/requirements.md` carries a **third** marker block (`<!-- prerequisites:begin -->`), hand-authored, one row per prerequisite the probe roster does not carry: the install path's tools and the docs gates' renderer and gems ([installer/SPEC.md §Requirements](installer/SPEC.md#requirements) owns why none of them is probed):
+
+```text
+| Tool | Minimum | Needed for | Why |
+|---|---|---|---|
+| <tool> | <floor, or any> | required to install on <systems> | <purpose> |
+| <tool> | <floor, or any> | optional: <condition> | <purpose> |
+```
+
+A row is a block line opening with `|` past the header, and not the delimiter row. No cell carries `|`. Its one reader is **arm F of `check-install-platforms`**, which reds three things: a row whose Minimum cell is empty or `—`; a row whose Needed-for cell opens with neither `required` nor `optional:`; a system family the platform block declares that no row's Needed-for cell names as a word, a family being the first word of a platform row's System cell. A missing or empty block exits 2, as the platform block's own absence does. The arm lives in that gate because the families it is held against are that gate's declarations. The Tool and Why cells, and the Needed-for cell past its prefix and family words, are hand prose no gate reads.
+
+## The commit-cost block
+
+`docs/requirements.md`'s What a commit costs section carries a fourth marker block (`<!-- commit-cost:begin -->`), one sentence written from `--measure-commit`'s output at each release (RELEASING.md step 4) and held to the pin by `check-install-pin` invariant D, whose section the hosted install scripts section below links. It is measured rather than derived: the figure is one host's, so no gate re-runs it.
+
+## The remedy blocks
+
+`docs/install.md`'s two OS sections, [§macOS and Linux](install.md#macos-and-linux) and [§Windows](install.md#windows), each carry one more marker block, hand-authored, read by its platform's install-smoke legs and run verbatim. The HTML-comment pair `macos-remedy:begin` and `macos-remedy:end` holds one `sh` fence; its readers are `install-smoke-sh-macos` and `install-smoke-sh-macos-intel`, and each runs the body in the step's shell and persists the `PATH` entries the body prepended to `$GITHUB_PATH`, then asserts a fresh login shell resolves the ordering. The pair `windows-remedy:begin` and `windows-remedy:end` holds one `powershell` fence; its reader is `install-smoke-pwsh-windows`, which runs the body under PowerShell, the shell a native-Windows adopter types it into, extracting it in PowerShell; the leg then runs `doctor` under the `PATH` a new terminal would compose. In every leg only the fence lines and blank lines are skipped, and an empty extraction reds the leg by name. Every leg reads raw lines, so a wrapper around a block would be invisible to them. **No gate holds either block.** Each is hand-authored source with no emitter, and the binding legs are its enforcement: a malformed block, or one missing a package its platform needs, reds the push that carries it. **Honest limit:** that red arrives at push rather than at commit, since no local battery runs a Mac or a native-Windows host. **Two shapes were refused.** A shared script the legs call would merge the copies the legs once carried, yet would still hold nothing equal to the page. A gate holding the legs' package set to the toolchain list would need a mapping from floor members to Homebrew formulae or Chocolatey packages, and that mapping is neither one-to-one nor derivable, so no surface for it exists. Running the page's own block removes the duplication instead of policing it. A package the page drops leaves the legs on the same run; one the legs need but the page lacks is the adopter's broken path showing up as a red. `scripts/ci-macos-floor.sh` reads nothing here. It is the `native-artifacts` build legs' runner floor, and it answers to what that job executes.
+
+## The install blocks
+
+Each of `docs/manual-install.md`'s OS sections splits its recipe at the network into a fetch fence and a marked install block, hand-authored. Every leg reads raw lines. The pair `unix-install:begin` and `unix-install:end` holds one `sh` fence; its reader is `install-smoke-sh-linux`, which places the tarball its consumer smoke packed, with a `sha256sum`-format digest, where the fetch fence would have put them. The leg then sets `v` and `cw` and runs the body under `sh` from a clean scratch consumer's root. The pair `windows-install:begin` and `windows-install:end` holds one `powershell` fence; its reader is `install-smoke-pwsh-windows`, which does the same under `pwsh`, the body's own last line starting Windows PowerShell 5.1. Each leg reds by name on an empty extraction and asserts exit 0 and a `checkwright.lock` in the consumer; the contract is the remedy blocks' own, so no gate holds either block and a red arrives at push. Only the download is stood in for. **The fetch fences have no reader**: they are left to the release, the one thing that can serve them.
+
+## The toolkit install lines
+
+`docs/openspec.md` and `docs/speckit.md` carry the marker blocks below, hand-authored, each one `text` fence holding one `checkwright init …` line. On `docs/openspec.md` the pair `companion-install:begin` and `companion-install:end` holds the OpenSpec install line. The pair `companion-complement:begin` and `companion-complement:end` holds its `complement` line. The pair `companion-full:begin` and `companion-full:end` holds its `full` line, which adds the lifecycle layer. `docs/speckit.md` carries a `companion-complement` and a `companion-full` block too, holding that toolkit's `complement` and `full` lines. `companion/speckit/commands/install.md` carries the Spec Kit line in a `companion-install` block, the one-line install in an `sh` fence. Its `companion-complement` and `companion-full` blocks take the same `sh` form. Their reader is the consumer smoke's companion arm, which runs each line's words from `init` to its end and reds by name on an absent or empty block ([companion/SPEC.md §Applying a recipe](companion/SPEC.md#applying-a-recipe)). The contract is the install blocks' own: no gate holds a block, and a red arrives with the smoke.
+
+## The hosted install scripts
+
+`docs/install.sh` and `docs/install.ps1` are the one-line install's two scripts ([installer/SPEC.md §The dependency boundary](installer/SPEC.md#the-dependency-boundary)), hand-authored and served verbatim at the site root. `check-install-pin` holds their pin to each other and to the newest tag, holds the asset names they and the install pages' recipes fetch to the pinned release's declaration, and holds the requirements page's commit-cost figure to the pin ([installer/SPEC.md §The hosted install pin](installer/SPEC.md#the-hosted-install-pin)). Their other readers are the install blocks' two legs, each of which serves its script from a local web server beside the packed tarball and pipes it into the shell an adopter would; the CI action, which runs `docs/install.sh` from its own checkout ([installer/SPEC.md §The CI action](installer/SPEC.md#the-ci-action)); and `check-front-door-verbs`, which reads the pin as the tag whose verb and flag tables, profile and recipe rosters and arm table the front door is held to ([installer/SPEC.md §The front door's verbs](installer/SPEC.md#the-front-doors-verbs)), `check-install-platforms` arm G, which reads it as the tag whose roster and page each `joined` row is held to, and `check-plugin-parity`, which holds the plugin marketplace's pin equal to it and reads it as the tag that must carry the plugin package ([plugin/SPEC.md §check-plugin-parity](plugin/SPEC.md#check-plugin-parity)).

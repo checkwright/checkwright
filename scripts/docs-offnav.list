@@ -21,4 +21,9 @@ docs/plugin/README.md
 docs/evidence-data.md
 docs/install-evidence.md
 docs/site-architecture.md
+docs/page-authoring.md
+docs/generated-projections.md
+docs/projection-fan-outs.md
+docs/install-parity-contracts.md
+docs/install-block-contracts.md
 docs/posts/2026-07-09-announcing-checkwright.md

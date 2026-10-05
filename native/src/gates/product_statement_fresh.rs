@@ -1,4 +1,4 @@
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — every
+// spec: docs/generated-projections.md §Generated projections and their freshness gates — every
 // product-statement site carries the rendering the source gives it, compared in process
 use crate::emit::product_statement as ps;
 use crate::fresh;

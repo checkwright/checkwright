@@ -1,4 +1,4 @@
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the
+// spec: docs/generated-projections.md §Generated projections and their freshness gates — the
 // value-rollup block joins the enforcement map's per-kit class counts to the footprint's per-kit
 // token cost. A consumer docs ruling, not kit mechanism: the join axis and column choice live here.
 use crate::emit::enforcement_map;
@@ -9,7 +9,7 @@ pub const PAGE_KNOB: &str = "GATE_LOCAL_VALUE_PAGE";
 const BEGIN: &str = "<!-- value-rollup:begin -->";
 const END: &str = "<!-- value-rollup:end -->";
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the join reads
+// spec: docs/generated-projections.md §Generated projections and their freshness gates — the join reads
 // both emitters live rather than the committed detail pages, so a stale page cannot poison the
 // rollup. It receives their *structured* values, so no rendered markdown is re-parsed.
 struct Join {
@@ -22,7 +22,7 @@ struct Join {
     total_triggered: String,
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the cost
+// spec: docs/generated-projections.md §Generated projections and their freshness gates — the cost
 // cell is the footprint's token figure alone, an absent tier an em dash
 fn token_cell(cp: usize, bytes: usize) -> String {
     if cp == 0 && bytes == 0 {
@@ -79,7 +79,7 @@ fn lookup(pairs: &[(String, String)], kit: &str) -> String {
         .unwrap_or_else(|| "\u{2014}".to_string())
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — kit axis: the
+// spec: docs/generated-projections.md §Generated projections and their freshness gates — kit axis: the
 // footprint roster first, in its order, then any enforcement-only label sorted
 fn axis(j: &Join) -> Vec<String> {
     let mut out = j.kits.clone();

@@ -1,4 +1,4 @@
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the install
+// spec: docs/install-parity-contracts.md §The install-platforms parity contract — the requirements
 // page's platform declaration block, native/targets.list and both bootstraps' host detectors hold
 // lockstep, with each detector's triple count printed
 // spec: installer/SPEC.md §Requirements — arm F holds the page's prerequisites block against the
@@ -17,7 +17,7 @@ use std::path::Path;
 const ROSTER_KNOB: &str = "GATE_LOCAL_TARGETS_ROSTER";
 const BEGIN: &str = "<!-- platforms:begin -->";
 const END: &str = "<!-- platforms:end -->";
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — two join
+// spec: docs/install-parity-contracts.md §The install-platforms parity contract — two join
 // states and no third, the held one carrying its precondition after the colon
 const JOINED: &str = "joined";
 const HELD: &str = "held:";
@@ -52,7 +52,7 @@ pub(crate) struct Decl {
     pub(crate) minimum: String,
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — a row carries
+// spec: docs/install-parity-contracts.md §The install-platforms parity contract — a row carries
 // a backticked run, its first the triple, the Minimum its second cell and the state its last cell
 pub(crate) fn declarations(text: &str) -> Vec<Decl> {
     let mut inb = false;
@@ -98,7 +98,7 @@ struct Prereq {
     needed: String,
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — a row is a
+// spec: docs/install-block-contracts.md §The prerequisites block — a row is a
 // block line opening with `|` past the first, which is the header, and not a delimiter row
 fn prerequisites(text: &str) -> Option<Vec<Prereq>> {
     let mut inb = false;
@@ -134,7 +134,7 @@ fn prerequisites(text: &str) -> Option<Vec<Prereq>> {
     seen.then_some(out)
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — a system
+// spec: docs/install-block-contracts.md §The prerequisites block — a system
 // family is the first word of a platform row's System cell
 fn families(text: &str) -> Vec<String> {
     let mut inb = false;
@@ -193,7 +193,7 @@ fn prerequisite_findings(rows: &[Prereq], families: &[String]) -> Vec<String> {
     findings
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the first
+// spec: docs/install-parity-contracts.md §The install-platforms parity contract — the first
 // backticked run
 fn backticked(line: &str) -> Option<&str> {
     let open = line.find('`')?;
@@ -204,7 +204,7 @@ fn backticked(line: &str) -> Option<&str> {
     Some(&line[open + 1..close])
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — no cell
+// spec: docs/install-parity-contracts.md §The install-platforms parity contract — no cell
 // carries `|`, so a row's cells are its `|`-delimited runs inside the outer pipes, each trimmed
 fn cells(line: &str) -> Vec<String> {
     let body = line.trim();
@@ -344,7 +344,7 @@ struct Pinned {
     page: String,
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — arm G's four
+// spec: docs/install-parity-contracts.md §The install-platforms parity contract — arm G's four
 // inputs from files, or resolved live, where an unresolvable tag leaves the arm dormant
 fn pinned_input(
     args: &[String],
@@ -480,7 +480,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     for d in &decls {
         let on_roster = listed.contains(&d.triple);
-        // spec: docs/site-architecture.md §Generated projections and their freshness gates — a
+        // spec: docs/install-parity-contracts.md §The install-platforms parity contract — a
         // support claim with no OS floor is half a claim
         if d.minimum.is_empty() {
             findings.push(format!("an empty Minimum cell: {}", d.triple));
@@ -649,7 +649,7 @@ mod tests {
 
     const HEAD: &str = "| System | Minimum | Binary | Status |\n|---|---|---|---|\n";
 
-    // spec: docs/site-architecture.md §Generated projections and their freshness gates — the
+    // spec: docs/install-parity-contracts.md §The install-platforms parity contract — the
     // header and delimiter rows carry no backticked run, and a line outside the table is prose
     #[test]
     fn only_a_row_carrying_a_triple_is_a_declaration() {
@@ -664,7 +664,7 @@ mod tests {
         assert!(matches!(d[0].state, State::Joined));
     }
 
-    // spec: docs/site-architecture.md §Generated projections and their freshness gates — an empty
+    // spec: docs/install-parity-contracts.md §The install-platforms parity contract — an empty
     // Minimum cell survives parsing as an empty one, which `rule` reds
     #[test]
     fn an_empty_minimum_cell_stays_empty() {
@@ -672,7 +672,7 @@ mod tests {
         assert!(declarations(&text)[0].minimum.is_empty());
     }
 
-    // spec: docs/site-architecture.md §Generated projections and their freshness gates — a hold
+    // spec: docs/install-parity-contracts.md §The install-platforms parity contract — a hold
     // with no stated cause is how a pile grows silently, so the empty cause survives parsing as an
     // empty one rather than as an absent state
     #[test]
@@ -692,7 +692,7 @@ mod tests {
         }
     }
 
-    // spec: docs/site-architecture.md §Generated projections and their freshness gates — two
+    // spec: docs/install-parity-contracts.md §The install-platforms parity contract — two
     // states and no third, so a third spelling is a finding rather than a silently ignored bullet
     #[test]
     fn a_third_join_state_is_unreadable_rather_than_dropped() {
