@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: context-kit-tail-publisher-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,52 @@
 ## New Features
 
 ## Technical Debt
+
+### context-kit-tail-brevity
+
+context-kit/SPEC.md's sections no brevity slice has passed: the preamble, §The always-loaded meter through §check-footprint-fresh, §Testing and §Out of scope, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): about 10.4k of the file's 19.1k words at this scope, and all 67 of its `check-prose-bounds` findings with the ceiling knob emptied (§Testing 26).
+
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey; the file's ceiling row re-stamped. Applied after [footprint-arm-publisher-page](#footprint-arm-publisher-page)'s amendment merges, so §bin/footprint and §check-footprint-fresh are passed once.
+
+**Cost while deferred:** paid by every session and adopter that reads those context-kit sections. Filed 2026-10-05 as a split at scope. Part of the operator's selection of the unit set, direction 2026-10-05, lead-relayed (not a ruling); with it context-kit leaves the parent.
+
+### drift-kit-publisher-wiring
+
+drift-kit/SPEC.md carries this repo's publisher wiring in a payload SPEC: §The published-evidence extractor's opener ("this repo's own governed trajectory") and its "Consumer wiring (this repo, not kit mechanism)" paragraph (`docs/evidence-data.md`, `check-trajectory-fresh`, its `.gate` file), §The install-evidence projection's matching paragraph (`docs/install-evidence.md`, `check-install-evidence-fresh`), and the `DRIFT_KIT_STAGES` entry's "this repo's `scripts/drift-config.knobs`". Each resolves only in the publisher's tree (gate-sdk/SPEC.md §The provenance seam); `check-provenance-seam` does not read the shape.
+
+**Deliverable:** the paragraphs deleted or respelled generically, the extractor's "consumer freshness gate below" back-reference re-pointed, and the two consumer gates' fixture-pair description kept where docs/site-architecture.md §Generated projections already owns their wiring.
+
+**Cost while deferred:** every adopter reading the two sections meets wiring that is not theirs. Filed 2026-10-05 to the gap inbox by drift-kit-tail-crosser-pass' close (its provenance-seam-residue audit); promoted at the next scope: →fix fails because relocating the fixture-pair description is a placement judgment beside a battery run, →forward because no ruling is owed. Re-verified: all four sites grep at drift-kit/SPEC.md lines 141, 146, 161, 442 and 497. Owner lookup: `Consumer wiring`, `publisher wiring` in this file — none; owner drift-kit/SPEC.md.
+
+### crosser-twin-identity-edges
+
+The crosser's nested-mark twins disagree on two identity edges. `native/src/walk.rs`' gitfile read trims every trailing whitespace off a `gitdir:` target (`trim_end`), where `gate-sdk/lib/gate.sh` `gate_skipped_mark` strips only a CR. `gate-sdk/bin/run-gates.ps1` compares `Resolve-Path` spellings (`Resolve-GitDir`), which resolve no symlink, where the shell and the crate compare physical paths, so a symlinked `.git` or gitdir target can refuse in PowerShell alone. `native/src/emit/front_end_parity.rs` carries no selected nested gitfile and no symlinked starting-directory case.
+
+**Inferred, cannot run before build:** that `run-gates.ps1` refuses a symlinked `.git` or gitdir target the shell and the crate accept — no PowerShell on the authoring host, so the parity case this entry adds, run on the CI Windows legs, is the first witness.
+
+**Push need (2026-10-05, inside the budget):** the one mid-iteration push, shared with [install-tar-exit-check](#install-tar-exit-check): the PowerShell twin and its parity cases run only on the CI Windows legs.
+
+**Deliverable:** the crate's gitfile read stripping CR/LF only, the PowerShell twin comparing resolved physical paths, and both cases added to the parity corpus. Owner gate-sdk/SPEC.md §The crate's crosser and §run-gates' twin.
+
+**Cost while deferred:** a gitfile or symlink layout no parity case reaches can select differently per front end. Filed 2026-10-05 to the gap inbox by drift-kit-tail-crosser-pass' close (its second-vendor review); promoted at the next scope: →fix fails because the PowerShell half needs a Windows leg, →forward because no ruling is owed. Re-verified: one premise settled by probe — git refuses a gitfile whose target carries trailing spaces (exit 128), so the shell twin matches git and the crate accepts what git refuses. Owner lookup: `trim_end`, `Resolve-GitDir`, `gitfile` in this file — none.
+
+### install-tar-exit-check
+
+docs/install.md's `windows-install` block runs System32 `tar.exe` and then the unpacked bootstrap's `init` with no `$LASTEXITCODE` check between, so a failed unpack runs `init` from whatever an earlier extraction left in the package dir, or fails on a missing file. Windows PowerShell 5.1 takes a native non-zero exit as no terminating error, the case canon-kit/SPEC.md §check-fence-paste-unit's honest limit tells a block to check with a throw.
+
+**Deliverable:** a `$LASTEXITCODE` test that throws after `tar.exe`, witnessed by the install-smoke legs that read the marked block.
+
+**Push need (2026-10-05, inside the budget):** the one mid-iteration push, shared with [crosser-twin-identity-edges](#crosser-twin-identity-edges): the witnessing install-smoke legs run only on CI Windows hosts.
+
+**Cost while deferred:** a Windows adopter whose unpack fails gets a misleading `init` result. Filed 2026-10-05 to the gap inbox by drift-kit-tail-crosser-pass' close (its second-vendor review); promoted at the next scope: →fix fails because its witness is a Windows CI leg no local run reaches, →forward because no ruling is owed. Re-verified: lines 232–233 of the block, no check between. Owner lookup: `LASTEXITCODE`, `tar.exe` in this file — none; install-page-split moves the block's readers, independent.
+
+### fence-reader-list-item
+
+The shared fence reader misses a list-item fence: `native/src/gates/fence_command_head.rs` `fences_of` toggles on `spec::is_fence_line`, which a "- ```sh" opening does not meet, so the item's closing fence reads as an opening and every later fence on the page toggles inverted, while kramdown renders the item as a code block. `check-fence-paste-unit`, `check-fence-command-head` and every `fences_of` reader inherit it. No page in `CANON_KIT_FENCE_PASTE_PAGES` carries one today, so the cost is latent.
+
+**Deliverable:** the fence shape read with a list-item marker allowed before the backticks, stated in canon-kit/SPEC.md §check-fence-command-head's fence shape, with a fixture case over a list-item fence followed by a scanned one.
+
+**Cost while deferred:** the first list-item fence silently unscans the rest of its page. Filed 2026-10-05 to the gap inbox by drift-kit-tail-crosser-pass' close (its second-vendor review); promoted at the next scope: →fix fails because the fence shape is a stated grammar the SPEC must widen, →forward because no ruling is owed. Re-verified: `is_fence_line` tests a left-stripped line for a backtick prefix only (`native/src/spec.rs`). Owner lookup: `list-item fence`, `fences_of` in this file — none.
 
 ## Deferred
 
@@ -236,9 +282,9 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 ### spec-brevity-residue
 
-[roadmap: now/adoption] [cost: session/high] [surface: drift-kit] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
+[roadmap: now/adoption] [cost: session/high] [surface: evidence-kit] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices (below); lifecycle-kit, installer, guard-kit, delegation-kit, canon-kit, queue-kit and drift-kit are finished or split out (the slices below); what remains starts at context-kit, evidence-kit, site-kit, then doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling): a slice has landed at each recent scope; the per-kit slices stay off the roadmap.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices (below); lifecycle-kit, installer, guard-kit, delegation-kit, canon-kit, queue-kit, drift-kit and context-kit are finished or split out (the slices below); what remains starts at evidence-kit, site-kit, then doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling): a slice has landed at each recent scope; the per-kit slices stay off the roadmap.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
@@ -248,7 +294,7 @@ the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structu
 
 Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes as `installer-install-brevity` and `installer-remainder-brevity`; drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope as `drift-kit-measurement-brevity`; guard-kit's front sections, delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope as `queue-kit-gate-brevity`; guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope as `guard-kit-tool-brevity`.
 
-delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as `delegation-kit-tail-brevity`; canon-kit's claim-gate sections and rest left 2026-10-04 at the next two scopes as `canon-kit-claim-brevity` and `canon-kit-tail-brevity`; queue-kit's format and arms halves at the two after as `queue-kit-format-brevity` and `queue-kit-arms-brevity`; drift-kit's rest at drift-kit-tail-crosser-pass' as `drift-kit-tail-brevity`.
+delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as `delegation-kit-tail-brevity`; canon-kit's claim-gate sections and rest left 2026-10-04 at the next two scopes as `canon-kit-claim-brevity` and `canon-kit-tail-brevity`; queue-kit's format and arms halves at the two after as `queue-kit-format-brevity` and `queue-kit-arms-brevity`; drift-kit's and context-kit's rests at the next two as `drift-kit-tail-brevity` and [context-kit-tail-brevity](#context-kit-tail-brevity).
 
 ### tarball-attestation-observed
 
@@ -442,6 +488,8 @@ context-kit's `--emit footprint` arm ships in the binary but prints this site's 
 
 **Deliverable:** one of two dispositions, chosen at spec: withhold the arm from the README and the payload docs as a publisher tool, or make the preamble and the roster knobs an adopter can set.
 
+**Selected 2026-10-05** for context-kit-tail-publisher-pass, operator direction lead-relayed (not a ruling). A feature, so the spec stage authors its amendment and promotes it, before [context-kit-tail-brevity](#context-kit-tail-brevity) passes §bin/footprint and §check-footprint-fresh. An amendment naming `docs/context-kit/SPEC.md` as a regenerate target meets `check-stage-entry` assertion C's mirror over-demand ([audit-trigger-mirror-component](#audit-trigger-mirror-component)).
+
 **Cost while deferred:** an adopter running a listed tool gets a page about Checkwright. Filed 2026-10-01 to the gap inbox at context-kit-value-pass' build; promoted 2026-10-01 at its close: →fix fails because the choice between the two dispositions is a design call and the second adds knobs, →forward because no ruling is owed. Re-verified: the arm's output opens with the front matter, and the README's tool list carries `--emit footprint`. Owner lookup: `footprint` in this file — none; owner context-kit/SPEC.md §bin/footprint.
 
 ### notification-delivery-probe
@@ -517,48 +565,6 @@ resume-journal appends are the top hand shape after the gate door in `--emit man
 **Deliverable:** a door-aware sub-key, the door plus its arm word, one key across the door's spellings, in drift-kit/SPEC.md §The manual-operation meter or guard-kit/SPEC.md §scan-prompts; which owner is spec's.
 
 **Cost while deferred:** a repeated arm, the strongest tooling candidate the meter could name, stays invisible. Filed 2026-10-05 to the gap inbox at that iteration's build; promoted at its close: →fix fails because the key is shared with the prompt-friction ranking, so a change reaches two kits, →forward because no ruling is owed. Re-verified: the meter at close ranks the first spelling first and the second seventh; the split across spellings is new at the drain. Owner lookup: `ranking key`, `sub-key`, `manual-op` in this file — none; owner drift-kit/SPEC.md §The manual-operation meter.
-
-### drift-kit-publisher-wiring
-
-[cost: event/low] [surface: drift-kit]
-
-drift-kit/SPEC.md carries this repo's publisher wiring in a payload SPEC: §The published-evidence extractor's opener ("this repo's own governed trajectory") and its "Consumer wiring (this repo, not kit mechanism)" paragraph (`docs/evidence-data.md`, `check-trajectory-fresh`, its `.gate` file), §The install-evidence projection's matching paragraph (`docs/install-evidence.md`, `check-install-evidence-fresh`), and the `DRIFT_KIT_STAGES` entry's "this repo's `scripts/drift-config.knobs`". Each resolves only in the publisher's tree (gate-sdk/SPEC.md §The provenance seam); `check-provenance-seam` does not read the shape.
-
-**Deliverable:** the paragraphs deleted or respelled generically, the extractor's "consumer freshness gate below" back-reference re-pointed, and the two consumer gates' fixture-pair description kept where docs/site-architecture.md §Generated projections already owns their wiring.
-
-**Cost while deferred:** every adopter reading the two sections meets wiring that is not theirs. Filed 2026-10-05 to the gap inbox by drift-kit-tail-crosser-pass' close (its provenance-seam-residue audit); promoted at the next scope: →fix fails because relocating the fixture-pair description is a placement judgment beside a battery run, →forward because no ruling is owed. Re-verified: all four sites grep at drift-kit/SPEC.md lines 141, 146, 161, 442 and 497. Owner lookup: `Consumer wiring`, `publisher wiring` in this file — none; owner drift-kit/SPEC.md.
-
-### crosser-twin-identity-edges
-
-[cost: event/low] [surface: native]
-
-The crosser's nested-mark twins disagree on two identity edges. `native/src/walk.rs`' gitfile read trims every trailing whitespace off a `gitdir:` target (`trim_end`), where `gate-sdk/lib/gate.sh` `gate_skipped_mark` strips only a CR. `gate-sdk/bin/run-gates.ps1` compares `Resolve-Path` spellings (`Resolve-GitDir`), which resolve no symlink, where the shell and the crate compare physical paths, so a symlinked `.git` or gitdir target can refuse in PowerShell alone. `native/src/emit/front_end_parity.rs` carries no selected nested gitfile and no symlinked starting-directory case.
-
-**Inferred, not run:** the PowerShell symlink divergence (pwsh not run).
-
-**Deliverable:** the crate's gitfile read stripping CR/LF only, the PowerShell twin comparing resolved physical paths, and both cases added to the parity corpus. Owner gate-sdk/SPEC.md §The crate's crosser and §run-gates' twin.
-
-**Cost while deferred:** a gitfile or symlink layout no parity case reaches can select differently per front end. Filed 2026-10-05 to the gap inbox by drift-kit-tail-crosser-pass' close (its second-vendor review); promoted at the next scope: →fix fails because the PowerShell half needs a Windows leg, →forward because no ruling is owed. Re-verified: one premise settled by probe — git refuses a gitfile whose target carries trailing spaces (exit 128), so the shell twin matches git and the crate accepts what git refuses. Owner lookup: `trim_end`, `Resolve-GitDir`, `gitfile` in this file — none.
-
-### fence-reader-list-item
-
-[cost: event/low] [surface: native]
-
-The shared fence reader misses a list-item fence: `native/src/gates/fence_command_head.rs` `fences_of` toggles on `spec::is_fence_line`, which a "- ```sh" opening does not meet, so the item's closing fence reads as an opening and every later fence on the page toggles inverted, while kramdown renders the item as a code block. `check-fence-paste-unit`, `check-fence-command-head` and every `fences_of` reader inherit it. No page in `CANON_KIT_FENCE_PASTE_PAGES` carries one today, so the cost is latent.
-
-**Deliverable:** the fence shape read with a list-item marker allowed before the backticks, stated in canon-kit/SPEC.md §check-fence-command-head's fence shape, with a fixture case over a list-item fence followed by a scanned one.
-
-**Cost while deferred:** the first list-item fence silently unscans the rest of its page. Filed 2026-10-05 to the gap inbox by drift-kit-tail-crosser-pass' close (its second-vendor review); promoted at the next scope: →fix fails because the fence shape is a stated grammar the SPEC must widen, →forward because no ruling is owed. Re-verified: `is_fence_line` tests a left-stripped line for a backtick prefix only (`native/src/spec.rs`). Owner lookup: `list-item fence`, `fences_of` in this file — none.
-
-### install-tar-exit-check
-
-[cost: event/low] [surface: docs]
-
-docs/install.md's `windows-install` block runs System32 `tar.exe` and then the unpacked bootstrap's `init` with no `$LASTEXITCODE` check between, so a failed unpack runs `init` from whatever an earlier extraction left in the package dir, or fails on a missing file. Windows PowerShell 5.1 takes a native non-zero exit as no terminating error, the case canon-kit/SPEC.md §check-fence-paste-unit's honest limit tells a block to check with a throw.
-
-**Deliverable:** a `$LASTEXITCODE` test that throws after `tar.exe`, witnessed by the install-smoke legs that read the marked block.
-
-**Cost while deferred:** a Windows adopter whose unpack fails gets a misleading `init` result. Filed 2026-10-05 to the gap inbox by drift-kit-tail-crosser-pass' close (its second-vendor review); promoted at the next scope: →fix fails because its witness is a Windows CI leg no local run reaches, →forward because no ruling is owed. Re-verified: lines 232–233 of the block, no check between. Owner lookup: `LASTEXITCODE`, `tar.exe` in this file — none; install-page-split moves the block's readers, independent.
 
 ## Icebox
 

@@ -4,4 +4,4 @@
 
 ---
 
-— scope a52e1d29 2026-10-05 f282d9b3a
+context-kit-tail-publisher-pass scope a52e1d29 2026-10-05 f282d9b3a
