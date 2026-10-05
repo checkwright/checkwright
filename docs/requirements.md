@@ -54,7 +54,7 @@ The install itself and the optional docs gates need these as well. `doctor` does
 | `sha256sum` or `shasum` | any | required to install on Linux and macOS | the release tarball and the gate binary are checked against their published digests |
 | Windows PowerShell | 5.1 | required to install on Windows | the one-line install, the install block and the bootstrap run under it; its `Get-FileHash` checks the digests |
 | `tar.exe` | Windows 10 version 1803 | required to install on Windows | the install block unpacks the tarball with `System32\tar.exe` |
-| Git for Windows | `git` and `bash` at the floors above | required to install on Windows | it supplies `git`, and the sh it bundles, which runs the pre-commit hook; `bash` where a row above owes it |
+| Git for Windows | `git` at the floor above | required to install on Windows | it supplies `git`, and the sh it bundles, which runs the pre-commit hook; `bash` only where a row above owes it |
 | `gh` | any carrying `gh attestation` | optional: to check the build attestation | the one-line install runs `gh attestation verify` when `gh` is signed in, and says so when it is not |
 | Node | 8.2 | optional: only to install with npx | the first Node to bundle an npm carrying `npx` |
 | Ruby | 2.3 | optional: only if you register site-kit's docs gates | the two gems below need it |

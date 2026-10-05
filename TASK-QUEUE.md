@@ -530,6 +530,28 @@ drift-kit/SPEC.md §The published-evidence extractor says the extractor "states 
 
 **Cost while deferred:** a reader following a directive to its section finds the behaviour unstated and reads the code as the contract. Filed 2026-10-05 to the gap inbox at evidence-front-install-split-pass' build; promoted at its close, which re-pointed the bullet's three SPEC-to-SPEC citations inline: →fix fails for the directives because each of 25 sites is a choice between growing a section the brevity pass just cut and narrowing a directive, →forward because no ruling is owed. Re-verified: the five files carry 59 evidence-kit directives, and §The evidence adapters names two no-cursor shapes where `state_stage`'s directive claims three. Owner lookup: `directive`, `unstated`, `spec-pointer` in this file — [trajectory-limits-unstated](#trajectory-limits-unstated), DISTINCT (a SPEC claim the arm does not meet, the reverse direction); owner evidence-kit/SPEC.md §The evidence adapters.
 
+### fence-closer-length
+
+[cost: event/low] [surface: canon-kit]
+
+`spec::is_fence_line` (`native/src/spec.rs`) reads any line opening on three backticks as a fence line, whatever its length, and `check-docs-page-length`'s `page_words` (`native/src/gates/docs_page_length.rs`) flips its fence state on each. Inside a four-backtick block a three-backtick line therefore closes the scanner's fence, and a following comment-shaped line is skipped as an HTML comment though the page renders it; canon-kit/SPEC.md §check-docs-page-length says a comment marker inside a fenced block is the block's text. The same reader leaves a page opening on `---` with no closing `---` at zero words.
+
+**Inferred, not run:** both miscounts, read off the source by two sessions; no page was run through the gate.
+
+**Deliverable:** the fence reader matching a closer to its opener's length, or the limit stated in the section, and the unclosed front matter ruled either way. It is the reader [fence-toggle-list-item](#fence-toggle-list-item) rewrites, so the two land as one reader change.
+
+**Cost while deferred:** latent while no governed page nests a shorter fence in a longer one; a page that does is under-counted. Filed 2026-10-05 to the gap inbox by evidence-front-install-split-pass' close (its second-vendor review); promoted at the next scope: →fix fails because the reader is shared by every toggle parser, →forward because no ruling is owed. Re-verified: `is_fence_line` tests a three-backtick prefix alone, and `page_words` toggles on it and ends front matter only on a second `---`. Owner lookup: `is_fence_line`, `page_words`, `page-length`, `closer` in this file — fence-toggle-list-item, DISTINCT (the list-item opener, this is the closer's length); owner canon-kit/SPEC.md §check-docs-page-length.
+
+### windows-kit-bash-files
+
+[cost: event/high] [surface: gate-sdk]
+
+docs/requirements.md's toolchain row owes bash 4.3 wherever a profile includes context-kit, drift-kit or guard-kit, each said to ship a file the host runs with bash; on native Windows that is Git for Windows' bash, although install and battery run under PowerShell. Operator direction 2026-10-05, lead session (not a ruling): eliminate the sh and bash dependency on Windows where possible, as one goal with [native-executable-git-hooks](#native-executable-git-hooks) (the hook's sh) and [custom-gate-substrates](#custom-gate-substrates) (gate authoring). The operator recalls the Git for Windows shell as a significant slowdown, which no run here measured.
+
+**Deliverable:** each kit-shipped file a host runs with bash ported to an arm of the gate binary or given a PowerShell twin, per file, and the toolchain row narrowed to what still owes bash; whether guard-kit's place in the row survives is part of it.
+
+**Cost while deferred:** a Windows adopter on those profiles needs bash. Filed 2026-10-05 to the gap inbox by evidence-front-install-split-pass' lead; promoted at the next scope: →fix fails because each port is new mechanism, →forward because the direction is given. Re-verified by `git ls-files`: outside smoke and fixtures the three kits track context-kit/templates/session-context.sh and drift-kit/templates/kpi-deprecated-surface.sh, and guard-kit tracks no such file. Owner lookup: `session-context.sh`, `kpi-deprecated-surface`, `Git for Windows` in this file — the two entries above, DISTINCT (neither names the kit-shipped files); owner gate-sdk/SPEC.md §The adopter constraints, and each kit SPEC for its file.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
