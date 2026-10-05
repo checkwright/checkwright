@@ -85,7 +85,8 @@ pub fn scan(text: &str) -> (Vec<Marked>, Vec<(usize, String)>) {
     let mut bad = Vec::new();
     let mut in_fence = false;
     for (idx, raw) in lines.iter().enumerate() {
-        if spec::is_fence_line(raw) {
+        let delimits = if in_fence { spec::is_fence_line(raw) } else { fch::fence_opening(raw).is_some() };
+        if delimits {
             in_fence = !in_fence;
             continue;
         }

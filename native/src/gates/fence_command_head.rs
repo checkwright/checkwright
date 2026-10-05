@@ -116,23 +116,25 @@ pub(crate) fn tracked_files(top: &str) -> Result<HashSet<String>, String> {
     }
 }
 
-// spec: canon-kit/SPEC.md §check-fence-command-head — a fence toggles on the shared fence shape, and
-// its info string's first word, case-folded, is its language
+// spec: canon-kit/SPEC.md §check-fence-command-head — a fence opens on the fence shape and closes on
+// the shared fence line, and its info string's first word, case-folded, is its language
 pub(crate) fn fences_of(text: &str, langs: &[&str]) -> Vec<(usize, String)> {
     let mut out = Vec::new();
     let mut open: Option<(usize, bool, String)> = None;
     for (idx, raw) in text.lines().enumerate() {
-        if spec::is_fence_line(raw) {
-            match open.take() {
-                Some((ln, true, body)) => out.push((ln, body)),
-                Some(_) => {}
-                None => {
-                    let info = raw.trim_start().trim_start_matches('`').trim();
-                    let lang = info.split_whitespace().next().unwrap_or("").to_ascii_lowercase();
-                    open = Some((idx + 1, langs.contains(&lang.as_str()), String::new()));
-                }
+        if open.is_some() && spec::is_fence_line(raw) {
+            if let Some((ln, true, body)) = open.take() {
+                out.push((ln, body));
             }
             continue;
+        }
+        if open.is_none() {
+            if let Some(fence) = fence_opening(raw) {
+                let info = fence.trim_start_matches('`').trim();
+                let lang = info.split_whitespace().next().unwrap_or("").to_ascii_lowercase();
+                open = Some((idx + 1, langs.contains(&lang.as_str()), String::new()));
+                continue;
+            }
         }
         if let Some((_, _, body)) = open.as_mut() {
             body.push_str(raw);
@@ -140,6 +142,24 @@ pub(crate) fn fences_of(text: &str, langs: &[&str]) -> Vec<(usize, String)> {
         }
     }
     out
+}
+
+// spec: canon-kit/SPEC.md §check-fence-command-head — the fence shape: the backtick run and info
+// string after leading blanks, or after a list-item marker and its blank
+pub(crate) fn fence_opening(raw: &str) -> Option<&str> {
+    if spec::is_fence_line(raw) {
+        return Some(raw.trim_start());
+    }
+    let t = raw.trim_start_matches([' ', '\t']);
+    let digits = t.bytes().take_while(u8::is_ascii_digit).count();
+    let marker = match t.as_bytes().get(digits) {
+        Some(b'-' | b'*' | b'+') if digits == 0 => 1,
+        Some(b'.') if digits > 0 => digits + 1,
+        _ => return None,
+    };
+    let rest = &t[marker..];
+    let body = rest.trim_start_matches([' ', '\t']);
+    (body.len() < rest.len() && body.starts_with("```")).then_some(body)
 }
 
 pub(crate) fn shell_fences(text: &str) -> Vec<(usize, String)> {
@@ -408,5 +428,29 @@ mod tests {
         let text = "```bash\na\n```\n```text\nb\n```\n```sh\nc\n```\n";
         let f = shell_fences(text);
         assert_eq!(f, vec![(1, "a\n".to_string()), (7, "c\n".to_string())]);
+    }
+
+    // spec: canon-kit/SPEC.md §check-fence-command-head — a list-item fence opens a fence, so the
+    // fences after it keep their sense
+    #[test]
+    fn a_list_item_fence_leaves_the_later_fences_in_step() {
+        let text = "- ```sh\n  a\n  ```\n\nprose\n\n```bash\nb\n```\n1. ```bash\n   c\n   ```\n+ ```sh\n  d\n  ```\n";
+        let f = shell_fences(text);
+        assert_eq!(
+            f,
+            vec![
+                (1, "  a\n".to_string()),
+                (7, "b\n".to_string()),
+                (10, "   c\n".to_string()),
+                (13, "  d\n".to_string())
+            ]
+        );
+        assert_eq!(fence_opening("  * ```bash x"), Some("```bash x"));
+        assert_eq!(fence_opening("12.\t```sh"), Some("```sh"));
+        assert_eq!(fence_opening("-```sh"), None);
+        assert_eq!(fence_opening("- text ```sh"), None);
+        assert_eq!(fence_opening("1```sh"), None);
+        assert_eq!(fence_opening("1) ```sh"), None);
+        assert_eq!(shell_fences("```text\n- ```sh\nx\n```\n"), Vec::<(usize, String)>::new());
     }
 }

@@ -60,14 +60,6 @@ docs/install.md's `windows-install` block runs System32 `tar.exe` and then the u
 
 **Cost while deferred:** a Windows adopter whose unpack fails gets a misleading `init` result. Filed 2026-10-05 to the gap inbox by drift-kit-tail-crosser-pass' close (its second-vendor review); promoted at the next scope: →fix fails because its witness is a Windows CI leg no local run reaches, →forward because no ruling is owed. Re-verified: lines 232–233 of the block, no check between. Owner lookup: `LASTEXITCODE`, `tar.exe` in this file — none; install-page-split moves the block's readers, independent.
 
-### fence-reader-list-item
-
-The shared fence reader misses a list-item fence: `native/src/gates/fence_command_head.rs` `fences_of` toggles on `spec::is_fence_line`, which a "- ```sh" opening does not meet, so the item's closing fence reads as an opening and every later fence on the page toggles inverted, while kramdown renders the item as a code block. `check-fence-paste-unit`, `check-fence-command-head` and every `fences_of` reader inherit it. No page in `CANON_KIT_FENCE_PASTE_PAGES` carries one today, so the cost is latent.
-
-**Deliverable:** the fence shape read with a list-item marker allowed before the backticks, stated in canon-kit/SPEC.md §check-fence-command-head's fence shape, with a fixture case over a list-item fence followed by a scanned one.
-
-**Cost while deferred:** the first list-item fence silently unscans the rest of its page. Filed 2026-10-05 to the gap inbox by drift-kit-tail-crosser-pass' close (its second-vendor review); promoted at the next scope: →fix fails because the fence shape is a stated grammar the SPEC must widen, →forward because no ruling is owed. Re-verified: `is_fence_line` tests a left-stripped line for a backtick prefix only (`native/src/spec.rs`). Owner lookup: `list-item fence`, `fences_of` in this file — none.
-
 ## Deferred
 
 ### foreign-project-critique
@@ -1247,4 +1239,6 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 No rule holds a docs video to a local poster linking out, so a first embed adds a third-party request.
 
 ## Done
+
+- fence-reader-list-item
 

@@ -34,6 +34,12 @@ case "$1" in
 esac
 ```
 
+A fence opening on a list item's marker is read like any other:
+
+1. ```sh
+   git status
+   ```
+
 A fence of another language is not read:
 
 ```text

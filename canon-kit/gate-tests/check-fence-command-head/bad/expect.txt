@@ -3,3 +3,5 @@ doc.md:7: '--emit' is a flag
 doc.md:13: '$' is a copied shell prompt
 doc.md:14: 'widgetctl' names no builtin
 doc.md:15: 'bin/ghost.sh' is a path the repository does not track
+doc.md:21: '--item-flag' is a flag
+doc.md:25: '--after-flag' is a flag

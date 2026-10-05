@@ -14,3 +14,13 @@ $ git status
 widgetctl up
 bin/ghost.sh
 ```
+
+A list-item fence, and the scanned fence after it:
+
+- ```sh
+  --item-flag
+  ```
+
+```bash
+--after-flag
+```
