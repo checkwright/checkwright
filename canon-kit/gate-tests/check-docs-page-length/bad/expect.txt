@@ -1,0 +1,2 @@
+check-docs-page-length: 1 page(s) past 20 word(s):
+  site/page.md: 24 word(s), the bound is 20

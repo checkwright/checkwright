@@ -1,0 +1,4 @@
+# spec: canon-kit/SPEC.md §check-docs-page-length — fixture consumer config: every page under site/ is declared, the generated one left out
+CANON_KIT_PAGE_LENGTH_PAGES[] = site/*.md
+CANON_KIT_PAGE_LENGTH_EXCLUDE[] = site/generated.md
+CANON_KIT_PAGE_LENGTH_MAX_WORDS = 20

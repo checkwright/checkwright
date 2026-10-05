@@ -17,7 +17,7 @@
 1155cp .claude/commands/spec.md
 1728cp .claude/commands/validate.md
 12517cp CLAUDE.md
-242672cp canon-kit/SPEC.md
+244614cp canon-kit/SPEC.md
 5785cp canon-kit/templates/SPEC-amendment.md
 25770cp companion/SPEC.md
 112950cp context-kit/SPEC.md
@@ -76,7 +76,7 @@
 4672cp docs/posts/2026-09-30-checkwright-v0-31-0.md
 1460cp docs/queue-kit/index.md
 789cp docs/releases.md
-43934cp docs/site-architecture.md
+44578cp docs/site-architecture.md
 2412cp docs/site-kit/index.md
 4706cp docs/spec-toolkits.md
 2912cp docs/speckit.md

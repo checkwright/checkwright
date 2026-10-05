@@ -23,7 +23,7 @@ It spans the site (`docs/`), canon-kit (the gate), the installer's contracts (in
 
 ### (1) The page-length rule {mechanical} {user-facing: D1 and D2 — a docs page past the bound is split or shortened; D6 — shortening is an admitted remedy}
 
-A new bold-lead paragraph among the page-authoring rules, after **Code blocks**, on the page delta 6 moves those rules to. *Not yet applied.*
+A new bold-lead paragraph among the page-authoring rules, after **Code blocks**, on the page delta 6 moves those rules to. *Applied, on `docs/site-architecture.md`, where the rules sit until delta 6 moves them.*
 
 > **Page length.** A page is short enough to read through. A page past `CANON_KIT_PAGE_LENGTH_MAX_WORDS` words is shortened, or split into a parent and sub-pages. The parent keeps the path every reader takes and links each sub-page once. A sub-page takes one subject a reader can skip: a reference table, a manual alternative, upkeep. A sub-page is a nav child of its parent where the parent is on the menu, and off-nav where the parent is. A generated page is left out, its length being its source's. `check-docs-page-length` holds the bound over the pages `CANON_KIT_PAGE_LENGTH_PAGES` names. Which subject moves to which sub-page is review's.
 
@@ -31,7 +31,7 @@ The bound's value stays in `scripts/canon-config.knobs` and the paragraph cites 
 
 ### (2) check-docs-page-length {design-bearing} {user-facing: D1 — a gate holds the rule; D2 — it measures words; L1 — canon-kit ships it}
 
-A new canon-kit gate, born native: `canon-kit/checks/check-docs-page-length.gate` (`precommit`, binary-dispatched, `install: zero-config`, `armed-by: CANON_KIT_PAGE_LENGTH_PAGES`), its rule in `native/src/gates/docs_page_length.rs`, with a `good/` and `bad/` fixture pair. A new section in canon-kit/SPEC.md, after §check-docs-page-repeat. *Not yet applied.*
+A new canon-kit gate, born native: `canon-kit/checks/check-docs-page-length.gate` (`precommit`, binary-dispatched, `install: zero-config`, `armed-by: CANON_KIT_PAGE_LENGTH_PAGES`), its rule in `native/src/gates/docs_page_length.rs`, with a `good/` and `bad/` fixture pair. A new section in canon-kit/SPEC.md, after §check-docs-page-repeat. *Applied, unregistered: `scripts/gates.list` carries its `# unregistered:` line until delta 9 registers it. The landed section adds that a comment marker inside a fenced block is the block's text.*
 
 > ### check-docs-page-length
 >
@@ -46,7 +46,7 @@ A new canon-kit gate, born native: `canon-kit/checks/check-docs-page-length.gate
 >
 > **Honest limits.** A word count is not reading time (§check-prose-bounds). A split moves length and removes none, and what goes on which page is review's. A page whose words sit in comments passes.
 
-The knob rows join canon-kit/SPEC.md §Layout and configuration after `CANON_KIT_PAGE_REPEAT_PAGES`. *Not yet applied.*
+The knob rows join canon-kit/SPEC.md §Layout and configuration after `CANON_KIT_PAGE_REPEAT_PAGES`. *Applied, reworded as one row under `check-prose-bounds`' repeated-phrase arm.*
 
 > - `CANON_KIT_PAGE_LENGTH_PAGES` — the pages `check-docs-page-length` holds, an array of globs, empty by default. `CANON_KIT_PAGE_LENGTH_EXCLUDE` — an array of globs dropped from that set, empty by default. `CANON_KIT_PAGE_LENGTH_MAX_WORDS` — the bound, a positive integer or `off`, default `off`.
 

@@ -166,6 +166,7 @@ Knobs:
 - `CANON_KIT_RESTATEMENT_PAGES` — array of globs, default empty: the pages `check-docs-restatement-parity` holds to the `README.md` beside each.
 - `CANON_KIT_PAGE_REPEAT_PAGES` — the pages `check-docs-page-repeat` holds, an array of globs, empty by default.
 - `CANON_KIT_PAGE_REPEAT_MIN_WORDS` — default `8`: the shortest sentence `check-docs-page-repeat`'s arm B counts.
+- `CANON_KIT_PAGE_LENGTH_PAGES` / `CANON_KIT_PAGE_LENGTH_EXCLUDE` — arrays of globs, default empty: the pages `check-docs-page-length` measures, less the excluded ones. `CANON_KIT_PAGE_LENGTH_MAX_WORDS` — default `off`: its bound, a positive integer or `off`.
 - `CANON_KIT_CITATION_LINK_PAGES` — the pages `check-citation-link` holds, an array of globs, empty by default.
 - `CANON_KIT_FENCE_PASTE_PAGES` — default empty: the globs naming each page `check-fence-paste-unit` reads.
 - `CANON_KIT_TASK_LIST_GLOBS` — globs naming the task lists `check-task-path-claim` and `check-task-label-resolution` read, default empty. `CANON_KIT_TASK_LABEL_CITES` and `CANON_KIT_TASK_LABEL_DEFINES` — keyed, default empty: per label family, the one-group ERE that cites a label and the one that defines it. The table validator holds the two to one key set and each value to the one-group shape (§check-task-label-resolution).
@@ -945,6 +946,19 @@ Invariant: no declared page states a relative link target, or a sentence of `CAN
 **Red** is one finding per later occurrence, naming the page, its line, the first occurrence's line and the repeated target or sentence. Each arm carries its own `help:` line. A link's is *link the first mention and make the later one plain text or an in-page anchor*. A sentence's is *state it once and point back to it*. The clean line counts pages, links and sentences. **Exit 2:** an unreadable page, or a `CANON_KIT_PAGE_REPEAT_MIN_WORDS` that is not a positive integer. `tier=precommit`, `install: zero-config`, armed by `CANON_KIT_PAGE_REPEAT_PAGES`.
 
 **Deliberately not asserted: a page-grain link rule, or a repeat across pages.** A page citing several sections of one README downward is the anchored shape §check-docs-link-convention requires, so the grain is the target, fragment included. A restatement across pages is usually a paraphrase, which no scanner decides.
+
+### check-docs-page-length
+
+Invariant: no declared page runs past `CANON_KIT_PAGE_LENGTH_MAX_WORDS` words.
+
+- **Corpus:** files matching `CANON_KIT_PAGE_LENGTH_PAGES`, an array of globs expanded like every canon-kit glob knob, default empty, less the files matching `CANON_KIT_PAGE_LENGTH_EXCLUDE`, an array of globs, default empty. An empty expansion is a clean `0 page(s)`.
+- **The measure** is the page's whitespace-separated tokens on every line after the front-matter block. HTML comments are skipped. Table rows and fenced blocks count, since a reader scrolls them, and a comment marker inside a fenced block is the block's text.
+- **The bound** is `CANON_KIT_PAGE_LENGTH_MAX_WORDS`, a positive integer or `off`, default `off`. Which length is too long is the consumer's calibration. With the bound `off` the gate prints a clean line saying nothing was asserted.
+- **No valve.** A page over the bound is shortened or split. A generated page, whose length is its source's, is left out through `CANON_KIT_PAGE_LENGTH_EXCLUDE`.
+
+**Red** is one finding per page over the bound, naming the page, its count and the bound. The `help:` line is *shorten the page, or split it into a parent and sub-pages*. The clean line counts the pages and names the longest with its count, so the headroom is readable without a red. **Exit 2:** an unreadable page, or a bound that is neither a positive integer nor `off`. `tier=precommit`, `install: zero-config`, armed by `CANON_KIT_PAGE_LENGTH_PAGES`.
+
+**Honest limits.** A word count is not reading time (§check-prose-bounds). A split moves length and removes none, and what goes on which page is review's. A page whose words sit in comments passes.
 
 ### check-citation-link
 
