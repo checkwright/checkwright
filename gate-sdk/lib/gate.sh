@@ -90,6 +90,35 @@ gate_path_rooted() {  # <path> — 0 when rooted in either dialect, walk::path_r
     return 1
 }
 
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the crosser's nested mark from the starting directory: the nearest .git entry of any type along the prefix's leading runs beneath <top>, printed; returns 1 emitting nothing where there is none, under a non-empty GIT_DIR, or where the entry is the repository git selected
+gate_skipped_mark() {  # <top> <prefix>
+    local top="$1" run="${2%/}" m t line g
+    [[ -n "${GIT_DIR:-}" ]] && return 1
+    while [[ -n "$run" ]]; do
+        m="$top/$run/.git"
+        if [[ -e "$m" || -L "$m" ]]; then
+            t="$m"
+            if [[ -f "$m" ]]; then
+                line=''
+                IFS= read -r line <"$m" || true
+                t=''
+                if [[ "$line" == "gitdir: "* ]]; then
+                    t="${line#gitdir: }"
+                    t="${t%$'\r'}"
+                    gate_path_rooted "$t" || t="$top/$run/$t"
+                fi
+            fi
+            g="$( { cd "$(git rev-parse --absolute-git-dir 2>/dev/null || echo /dev/null)" && pwd -P; } 2>/dev/null )"
+            [[ -n "$t" && -n "$g" && "$g" == "$( { cd "$t" && pwd -P; } 2>/dev/null )" ]] && return 1
+            printf '%s\n' "$m"
+            return 0
+        fi
+        [[ "$run" == */* ]] || return 1
+        run="${run%/*}"
+    done
+    return 1
+}
+
 # spec: gate-sdk/SPEC.md §lib/gate.sh — GATE_SDK_NATIVE_BIN's value as a COMMAND TOKEN rather than as a path: a relative value takes the `./` prefix, because a token carrying no `.` or `/` anchor is a PATH lookup to sh and no command at all to PowerShell. An already-anchored value — rooted by gate_path_rooted, or already `./` or `../` — is returned unchanged, so the prefix is applied once and never twice
 gate_native_bin_spelled() {
     local b
