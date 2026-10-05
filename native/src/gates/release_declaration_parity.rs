@@ -2,7 +2,8 @@
 // each surface-declared section, and the platforms-table diff in Platforms, both directions
 use crate::declaration;
 use crate::declaration::{SectionVerdict, TokenRule};
-use crate::gates::install_platforms::{declarations, Decl, State};
+use crate::gates::install_docs;
+use crate::gates::install_platforms::{declarations, platforms_page, Decl, State};
 use crate::gates::release_bump::{front_matter_release, parse_version, read_text, Version};
 use crate::release_sections::{self, Role, Section};
 use crate::{proc, programs};
@@ -88,18 +89,34 @@ fn previous_tag(note_v: &str) -> Result<Option<String>, String> {
     Ok(best.map(|(_, t)| t))
 }
 
-// spec: installer/SPEC.md §The upgrade contract — the page at the previous release, a page or a tag
-// absent there reading as the empty table
-fn page_at(tag: &str, page: &str) -> Result<String, String> {
-    let spec = format!("{}:{}", tag, page.trim_start_matches("./"));
-    if proc::run(&programs::GIT, &["cat-file", "-e", &spec])?.code() != Some(0) {
-        return Ok(String::new());
+// spec: installer/SPEC.md §The upgrade contract — the install pages at the previous release, a page
+// or a tag absent there reading as the empty table
+fn pages_at(tag: &str, pages: &[String]) -> Result<Vec<install_docs::Member>, String> {
+    let mut out = Vec::new();
+    for page in pages {
+        let spec = format!("{}:{}", tag, page.trim_start_matches("./"));
+        if proc::run(&programs::GIT, &["cat-file", "-e", &spec])?.code() != Some(0) {
+            continue;
+        }
+        let done = proc::run(&programs::GIT, &["cat-file", "blob", &spec])?;
+        match done.stdout() {
+            Some(b) => out.push(install_docs::Member {
+                path: page.clone(),
+                text: String::from_utf8_lossy(b).into_owned(),
+            }),
+            None => return Err(format!("git cat-file blob {} failed, so the previous platforms table is unreadable; treating as failure (not clean)", spec)),
+        }
     }
-    let done = proc::run(&programs::GIT, &["cat-file", "blob", &spec])?;
-    match done.stdout() {
-        Some(b) => Ok(String::from_utf8_lossy(b).into_owned()),
-        None => Err(format!("git cat-file blob {} failed, so the previous platforms table is unreadable; treating as failure (not clean)", spec)),
-    }
+    Ok(out)
+}
+
+// spec: installer/SPEC.md §The upgrade contract — the table of the one page carrying the block, and
+// the empty table where none does
+fn table_of(pages: &[install_docs::Member]) -> Result<(Option<String>, String), String> {
+    Ok(match platforms_page(pages)? {
+        Some(m) => (Some(m.path.clone()), m.text.clone()),
+        None => (None, String::new()),
+    })
 }
 
 // spec: installer/SPEC.md §The upgrade contract — a triple is changed when it was added, removed,
@@ -221,12 +238,14 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // the tree and the fourth stands in for its previous release's copy, so a fixture holds a base.
     let mut derived: Option<(String, BTreeMap<String, String>)> = None;
     if let Some(s) = release_sections::find(&roster, Role::Platforms) {
-        let page = crate::fresh::positional_or_knob(args, 2, "GATE_LOCAL_INSTALL_PAGE")?;
-        let now = read_text(&page)?;
+        let page_paths = install_docs::paths(args, 2)?;
+        let pages = install_docs::read(&page_paths, "install page not found")?;
+        let (carrier, now) = table_of(&pages)?;
+        let page = carrier.unwrap_or_else(|| install_docs::names(&pages));
         let (base_name, base) = match args.get(3).filter(|a| !a.is_empty()) {
             Some(b) => (b.clone(), read_text(b)?),
             None => match previous_tag(note_v)? {
-                Some(t) => (t.clone(), page_at(&t, &page)?),
+                Some(t) => (t.clone(), table_of(&pages_at(&t, &page_paths)?)?.1),
                 None => ("no previous release".to_string(), String::new()),
             },
         };

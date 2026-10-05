@@ -10,13 +10,13 @@ What it is not: a dependency channel. Nothing resolves at your build time and th
 
 ## Before you run it
 
-Each transport carries its own requirement, and each belongs to the delivery path alone. The install page's prerequisites block lists each transport's tools and their floors, per system. The gate battery this vendors uses none of them, and no delivery-path tool joins the toolchain roster.
+Each transport carries its own requirement, and each belongs to the delivery path alone. The Requirements page's prerequisites block lists each transport's tools and their floors, per system. The gate battery this vendors uses none of them, and no delivery-path tool joins the toolchain roster.
 
-The toolchain the battery *does* assert, with its version floors, is on the install page. `checkwright doctor` renders it as an exit status and `init` gates on that before any file is written, so a machine below the floor is refused rather than half-installed.
+The toolchain the battery *does* assert, with its version floors, is on the Requirements page. `checkwright doctor` renders it as an exit status and `init` gates on that before any file is written, so a machine below the floor is refused rather than half-installed.
 
 ## Quick start
 
-From your repository's root, in a new project or an existing one with every change committed, run the one line for your system on the install page: [macOS and Linux](https://checkwright.dev/install.html#macos-and-linux) or [Windows](https://checkwright.dev/install.html#windows). The Release tarball recipe below it is the step-by-step alternative. Either unpacks outside the repository, because `init` refuses a worktree that is not clean.
+From your repository's root, in a new project or an existing one with every change committed, run the one line for your system on the install page: [macOS and Linux](https://checkwright.dev/install.html#macos-and-linux) or [Windows](https://checkwright.dev/install.html#windows). The Release tarball recipe on the [Manual steps](https://checkwright.dev/manual-install.html) page is the step-by-step alternative. Either unpacks outside the repository, because `init` refuses a worktree that is not clean.
 
 With Node already present the same install is one command, `npx checkwright init` — same payload, same `init`, same `checkwright.lock`; only the fetch differs. `npx checkwright init --profile prose` picks a profile ([Choosing a profile](#choosing-a-profile) below), and `npx checkwright demo` shows the adoption arc in a scratch repository first, without touching yours ([what it runs](https://checkwright.dev/install.html#install)).
 

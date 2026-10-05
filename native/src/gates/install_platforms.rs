@@ -5,6 +5,7 @@
 // system families the platform block declares
 // spec: installer/SPEC.md §The front door's verbs — arm G holds each `joined` row to the pinned
 // release, admitting an unserved row as pending while this iteration will release
+use super::install_docs::{self, Member};
 use super::pinned_release;
 use crate::fresh;
 use crate::registry;
@@ -347,7 +348,7 @@ struct Pinned {
 // inputs from files, or resolved live, where an unresolvable tag leaves the arm dormant
 fn pinned_input(
     args: &[String],
-    install_md: &str,
+    page_paths: &[String],
     roster: &str,
 ) -> Result<Option<(Pinned, String, String)>, String> {
     if args.len() == 8 {
@@ -366,7 +367,7 @@ fn pinned_input(
     };
     let p = Pinned {
         roster: roster_triples(&pinned_release::show_at(&tag, roster)?),
-        page: pinned_release::show_at(&tag, install_md)?,
+        page: platforms_page(&install_docs::at_tag(&tag, page_paths)?)?.map(|m| m.text.clone()).unwrap_or_default(),
         label: tag,
     };
     let (disposition, queue) = pinned_release::live_paths()?;
@@ -409,33 +410,37 @@ fn unserved(decls: &[Decl], pinned: &Pinned) -> (Vec<(String, String)>, bool) {
     (out, minimum_live)
 }
 
+// spec: installer/SPEC.md §The hosted install pin — the one install page carrying the platforms block
+pub(crate) fn platforms_page(pages: &[Member]) -> Result<Option<&Member>, String> {
+    install_docs::carrier(pages, "a platforms block", |t| t.contains(BEGIN))
+}
+
 fn rule(args: &[String]) -> Result<i32, String> {
-    let install_md = fresh::positional_or_knob(args, 0, "GATE_LOCAL_INSTALL_PAGE")?;
+    let page_paths = install_docs::paths(args, 0)?;
     let roster = fresh::positional_or_knob(args, 1, ROSTER_KNOB)?;
     // spec: installer/SPEC.md §The gate binary — the two hand-kept host detectors, read as the
     // OWNERS of their triple sets rather than against a roster comment beside them, which would be
     // the second copy this whole binding exists to refuse
     let bash_path = fresh::positional_or_knob(args, 2, "GATE_LOCAL_BOOTSTRAP_SH")?;
     let pwsh_path = fresh::positional_or_knob(args, 3, "GATE_LOCAL_BOOTSTRAP_PS1")?;
-    let (install_md, roster) = (install_md.as_str(), roster.as_str());
+    let roster = roster.as_str();
     let (bash_path, pwsh_path) = (bash_path.as_str(), pwsh_path.as_str());
-    let pinned = pinned_input(args, install_md, roster)?;
+    let pinned = pinned_input(args, &page_paths, roster)?;
 
-    if !Path::new(install_md).is_file() {
-        return Err(format!("install page not found: {}", install_md));
-    }
+    let pages = install_docs::read(&page_paths, "install page not found")?;
     if !Path::new(roster).is_file() {
         return Err(format!("target roster not found: {}", roster));
     }
-    let install_text = fresh::read_captured(install_md)?;
-    if !install_text.contains(BEGIN) {
+    let Some(platforms) = platforms_page(&pages)? else {
         return Err(format!(
             "no platform marker block ({}) in {}",
-            BEGIN, install_md
+            BEGIN,
+            install_docs::names(&pages)
         ));
-    }
+    };
+    let (install_md, install_text) = (platforms.path.as_str(), platforms.text.as_str());
 
-    let decls = declarations(&install_text);
+    let decls = declarations(install_text);
     if decls.is_empty() {
         return Err(format!(
             "marker block present but no '| <system> | <minimum> | `<triple>` | <state> |' rows in {}",
@@ -445,16 +450,19 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     // spec: installer/SPEC.md §Requirements — a missing or empty prerequisites block is a check
     // that could not run, as the platform block's own absence is
-    let prereqs = prerequisites(&install_text).ok_or_else(|| {
-        format!(
-            "no prerequisites marker block ({}) in {}",
-            PREREQ_BEGIN, install_md
-        )
-    })?;
+    let prereq_page = install_docs::carrier(&pages, "a prerequisites block", |t| t.lines().any(|l| l == PREREQ_BEGIN))?
+        .ok_or_else(|| {
+            format!(
+                "no prerequisites marker block ({}) in {}",
+                PREREQ_BEGIN,
+                install_docs::names(&pages)
+            )
+        })?;
+    let prereqs = prerequisites(&prereq_page.text).unwrap_or_default();
     if prereqs.is_empty() {
         return Err(format!(
             "prerequisites block present but no '| <tool> | <minimum> | <needed for> | <why> |' rows in {}",
-            install_md
+            prereq_page.path
         ));
     }
 
@@ -546,7 +554,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    let declared_families = families(&install_text);
+    let declared_families = families(install_text);
     findings.extend(prerequisite_findings(&prereqs, &declared_families));
 
     // spec: installer/SPEC.md §The front door's verbs — arm G's finding is admitted as pending

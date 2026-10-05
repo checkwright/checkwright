@@ -24,12 +24,12 @@
 #
 # That is *produced and exercised* with no host-built stand-in anywhere in it.
 # On that observation, three edits and nothing else: this file gains <T>'s line,
-# native/runners.list already names its runner, and docs/install.md
+# native/runners.list already names its runner, and docs/requirements.md
 # §Requirements' platform declaration flips <T> from `held` to `joined`. Those
 # three move together or not at all. What that sentence does not say is what
 # lands FIRST, and a reader supplying the natural order gets it backwards: the
 # `held` DECLARATION is what creates <T>'s producer leg — gates.yml's roster job
-# parses docs/install.md and only then looks the runner up, refusing loudly on an
+# parses docs/requirements.md and only then looks the runner up, refusing loudly on an
 # unmapped target — so the declaration and the runner mapping land in one commit,
 # well before the observation, and a runners.list line alone creates nothing.
 #
@@ -69,7 +69,7 @@
 #     has ever executed. `native-artifacts` therefore builds each target on that
 #     target's own platform (native/runners.list). The musl build on its own
 #     architecture's Linux runner is within the rule: that runner executes it.
-#   - WSL is Linux and resolves to this same target, so docs/install.md
+#   - WSL is Linux and resolves to this same target, so docs/requirements.md
 #     §Requirements' Windows-through-WSL route is served by the Linux line and
 #     keeps being served by it. That route is a CHOICE beside native Windows
 #     rather than a substitute for it, now that the native line is here.
@@ -106,7 +106,7 @@
 # path — rather than the dead code the vacuous-green class exists to refuse —
 # is the DECLARED-AND-HELD platform plus the UNDECLARED COMPLEMENT, never the
 # roster's size: a host on a held platform meets the refusal as one whose
-# artifact is not yet published, and every host outside docs/install.md
+# artifact is not yet published, and every host outside docs/requirements.md
 # §Requirements' declaration block meets it as one the page never declared. A
 # target joins only on the observation above, and never beyond what that
 # section already states.

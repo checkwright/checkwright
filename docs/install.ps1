@@ -1,4 +1,4 @@
-# spec: installer/SPEC.md §The dependency boundary — the one-line install's PowerShell twin of docs/install.sh: docs/install.md's Windows recipe for one pinned release, and nothing else
+# spec: installer/SPEC.md §The dependency boundary — the one-line install's PowerShell twin of docs/install.sh: docs/manual-install.md's Windows recipe for one pinned release, and nothing else
 # spec: installer/SPEC.md §The hosted install pin — `$pin` is the only version this script installs and `$attestFrom` its attestation floor, both held to docs/install.sh by check-install-pin, the pin to the newest tag too
 #
 # usage: irm https://checkwright.dev/install.ps1 | iex

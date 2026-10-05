@@ -1,6 +1,7 @@
 // spec: installer/SPEC.md §The hosted install pin — the twins' pins and floors agree (A), the pin
 // is the newest release (B), every fetch surface spells only the pinned release's asset names (C),
-// and the install page's commit-cost figure is the pin's (D)
+// and the install pages' commit-cost figure is the pin's (D)
+use super::install_docs::{self, Member};
 use super::release_assets::{declaration, DEFAULT_DOC};
 use super::release_channel_parity::newest_tag;
 use crate::{fresh, proc, programs};
@@ -184,23 +185,36 @@ fn commit_cost_version(path: &str, text: &str) -> Result<String, String> {
     Ok(version.to_string())
 }
 
+// spec: installer/SPEC.md §The hosted install pin — invariant D counts the block across the install
+// pages: the one member carrying a marker line is read, and no carrier reads as the absent block
+fn commit_cost(pages: &[Member]) -> Result<(&str, String), String> {
+    let carries = |t: &str| fresh::file_lines(t).iter().any(|l| l.trim() == COST_BEGIN || l.trim() == COST_END);
+    match install_docs::carrier(pages, "a commit-cost block", carries)? {
+        Some(m) => Ok((m.path.as_str(), commit_cost_version(&m.path, &m.text)?)),
+        None => Err(commit_cost_version(&install_docs::names(pages), "").unwrap_err()),
+    }
+}
+
 // spec: installer/SPEC.md §The hosted install pin — invariant C's findings over the three fetch
-// surfaces: an undeclared token, a surface with none, and a matched non-sidecar template whose
-// `.sha256` sidecar the pinned declaration lacks
-fn invariant_c(surfaces: &[(&str, String)], templates: &[&str], pinned: &str) -> (Vec<String>, usize) {
+// surfaces, the install pages read as one: an undeclared token, named on its file, a surface with
+// none, and a matched non-sidecar template whose `.sha256` sidecar the pinned declaration lacks
+fn invariant_c(surfaces: &[Vec<(&str, &str)>], templates: &[&str], pinned: &str) -> (Vec<String>, usize) {
     let mut findings = Vec::new();
     let mut matched: Vec<&str> = Vec::new();
     let mut count = 0;
-    for (path, text) in surfaces {
-        let tokens = asset_tokens(text);
+    for files in surfaces {
+        let tokens: Vec<(&str, usize, String)> = files
+            .iter()
+            .flat_map(|(path, text)| asset_tokens(text).into_iter().map(move |(line, token)| (*path, line, token)))
+            .collect();
         if tokens.is_empty() {
             findings.push(format!(
                 "  invariant C: {} spells no asset name, so what it fetches cannot be held to the declaration",
-                path
+                files.iter().map(|(path, _)| *path).collect::<Vec<&str>>().join(", ")
             ));
         }
         count += tokens.len();
-        for (line, token) in &tokens {
+        for (path, line, token) in &tokens {
             match templates.iter().find(|t| **t == token.as_str()) {
                 Some(t) => {
                     if !matched.contains(t) {
@@ -271,24 +285,24 @@ fn pinned_declaration(doc_arg: Option<&str>, pin: &str) -> Result<Option<(String
 fn rule(args: &[String]) -> Result<i32, String> {
     let install_sh = fresh::positional_or_knob(args, 0, "GATE_LOCAL_INSTALL_SH")?;
     let install_ps1 = fresh::positional_or_knob(args, 1, "GATE_LOCAL_INSTALL_PS1")?;
-    let install_md = fresh::positional_or_knob(args, 2, "GATE_LOCAL_INSTALL_PAGE")?;
-    let (install_sh, install_ps1, install_md) = (install_sh.as_str(), install_ps1.as_str(), install_md.as_str());
+    let page_paths = install_docs::paths(args, 2)?;
+    let (install_sh, install_ps1) = (install_sh.as_str(), install_ps1.as_str());
     let pinned_doc = args.get(3).map(String::as_str).filter(|a| !a.is_empty());
     let version_arg = args.get(4).map(String::as_str).unwrap_or("");
 
-    for p in [install_sh, install_ps1, install_md] {
+    for p in [install_sh, install_ps1] {
         if !Path::new(p).is_file() {
             return Err(format!("not found: {}", p));
         }
     }
+    let pages = install_docs::read(&page_paths, "not found")?;
     let sh_text = fresh::read_captured(install_sh)?;
     let ps_text = fresh::read_captured(install_ps1)?;
-    let md_text = fresh::read_captured(install_md)?;
     let sh_pin = pin_of(install_sh, &sh_text, "pin")?;
     let ps_pin = pin_of(install_ps1, &ps_text, "$pin")?;
     let sh_floor = floor_of(install_sh, &sh_text, "attest_from")?;
     let ps_floor = floor_of(install_ps1, &ps_text, "$attestFrom")?;
-    let cost_version = commit_cost_version(install_md, &md_text)?;
+    let (cost_page, cost_version) = commit_cost(&pages)?;
 
     let mut findings: Vec<String> = Vec::new();
     if sh_pin != ps_pin {
@@ -337,7 +351,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
         None => None,
         Some((source, templates)) => {
             let templates: Vec<&str> = templates.iter().map(String::as_str).collect();
-            let surfaces = [(install_sh, sh_text), (install_ps1, ps_text), (install_md, md_text)];
+            let surfaces = [
+                vec![(install_sh, sh_text.as_str())],
+                vec![(install_ps1, ps_text.as_str())],
+                pages.iter().map(|m| (m.path.as_str(), m.text.as_str())).collect(),
+            ];
             let (c_findings, count) = invariant_c(&surfaces, &templates, &sh_pin);
             findings.extend(c_findings);
             Some((source, count))
@@ -347,7 +365,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     if d_red {
         findings.push(format!(
             "  invariant D: {}'s commit-cost block was measured at v{}, and the pin is {}",
-            install_md, cost_version, sh_pin
+            cost_page, cost_version, sh_pin
         ));
     }
 
@@ -474,22 +492,22 @@ mod tests {
     fn invariant_c_names_an_undeclared_token_an_empty_surface_and_a_missing_sidecar() {
         let full = ["checkwright-{version}.tgz", "checkwright-{version}.tgz.sha256"];
         let ok = [
-            ("s", "x checkwright-$v.tgz\n".to_string()),
-            ("m", "checkwright-$v.tgz checkwright-$v.tgz.sha256\n".to_string()),
+            vec![("s", "x checkwright-$v.tgz\n")],
+            vec![("m", "checkwright-$v.tgz checkwright-$v.tgz.sha256\n"), ("n", "no names here\n")],
         ];
         let (f, n) = invariant_c(&ok, &full, "1.0.0");
         assert!(f.is_empty(), "{:?}", f);
         assert_eq!(n, 3);
 
         let bad = [
-            ("s", "checkwright-$v.tar.gz\n".to_string()),
-            ("m", "no names here\n".to_string()),
-            ("p", "checkwright-$v.tgz\n".to_string()),
+            vec![("s", "checkwright-$v.tar.gz\n")],
+            vec![("m", "no names here\n"), ("n", "nor here\n")],
+            vec![("p", "checkwright-$v.tgz\n")],
         ];
         let (f, _) = invariant_c(&bad, &["checkwright-{version}.tgz"], "1.0.0");
         assert_eq!(f.len(), 3, "{:?}", f);
         assert!(f[0].contains("no asset of the pinned release"));
-        assert!(f[1].contains("spells no asset name"));
+        assert!(f[1].contains("m, n spells no asset name"), "{}", f[1]);
         assert!(f[2].contains("no 'checkwright-{version}.tgz.sha256' sidecar"));
     }
 

@@ -114,7 +114,7 @@ check-template-registry-parity
 
 ## Requirements
 
-The toolchain contract is the table in [`docs/install.md` §Requirements](https://github.com/checkwright/checkwright/blob/master/docs/install.md#requirements), with the contributor's rows in `CONTRIBUTING.md`: the roster and each pinned floor. The constructs that force each floor are [installer/SPEC.md §Requirements](https://github.com/checkwright/checkwright/blob/master/installer/SPEC.md#requirements)'. `check-install-toolchain` holds both tables to `native/src/toolfloor.rs`, the roster's owner, so the requirement has one statement and no copy.
+The toolchain contract is the table in [`docs/requirements.md` §Installing and running the shipped gates](https://github.com/checkwright/checkwright/blob/master/docs/requirements.md#installing-and-running-the-shipped-gates), with the contributor's rows in `CONTRIBUTING.md`: the roster and each pinned floor. The constructs that force each floor are [installer/SPEC.md §Requirements](https://github.com/checkwright/checkwright/blob/master/installer/SPEC.md#requirements)'. `check-install-toolchain` holds both tables to `native/src/toolfloor.rs`, the roster's owner, so the requirement has one statement and no copy.
 
 ## License
 

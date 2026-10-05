@@ -1,3 +1,3 @@
-# graph: couples=docs/posts/*.md,docs/install.md,.workflow/release-disposition.txt dir=one valve=none tier=precommit
+# graph: couples=docs/posts/*.md,docs/install.md,docs/requirements.md,docs/manual-install.md,docs/maintenance.md,.workflow/release-disposition.txt dir=one valve=none tier=precommit
 # spec: installer/SPEC.md §Versioning — the derivable bump floor: a release note carrying a bullet in any declaration-bearing section, or inheriting an outstanding deferred release's floor, may not ride a patch-only bump over its predecessor
 # knob: GATE_LOCAL_RELEASE_POSTS_DIR = docs/posts

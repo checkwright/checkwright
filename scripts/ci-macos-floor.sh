@@ -12,7 +12,7 @@ if [ -z "${GITHUB_PATH:-}" ]; then
     exit 2
 fi
 
-# spec: docs/install.md §Requirements — the declared bash floor, installed rather than worked around; the stock interpreter is 3.2 and gate-sdk/lib/gate.sh's knob defaults use a 4.2 unary
+# spec: docs/requirements.md §Installing and running the shipped gates — the declared bash floor, installed rather than worked around; the stock interpreter is 3.2 and gate-sdk/lib/gate.sh's knob defaults use a 4.2 unary
 brew install bash coreutils gawk
 
 prefix="$(brew --prefix)"

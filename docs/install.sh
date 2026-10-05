@@ -1,5 +1,5 @@
 #!/bin/sh
-# spec: installer/SPEC.md §The dependency boundary — the one-line install: docs/install.md's recipe for one pinned release, and nothing else
+# spec: installer/SPEC.md §The dependency boundary — the one-line install: docs/manual-install.md's recipe for one pinned release, and nothing else
 # spec: installer/SPEC.md §The hosted install pin — `pin` is the only version this script installs and `attest_from` its attestation floor, both held to docs/install.ps1 by check-install-pin, the pin to the newest tag too
 # no-port: installer/SPEC.md §The install boundary — this file's whole body is `bootstrap`-disposition steps: it fetches, verifies and unpacks the first artifact and hands off to its bootstrap, which the binary cannot do for itself
 #

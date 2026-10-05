@@ -16,7 +16,7 @@ Then, in a clean worktree, ask your agent to run the extension's install command
 
 The Spec Kit recipe prunes `.specify/`, whose scripts are Spec Kit's own, governs the markdown under `specs/`, admits `Task:` as a command, the first word of each line in the task list's example block, and points the task gates at each feature's `tasks.md`, a `[USn]` label resolving to the `### User Story n` heading in the `spec.md` beside it.
 
-The install command runs your system's line from the [install page](install.md#install), and that page's [Requirements](install.md#requirements) apply.
+The install command runs your system's line from the [install page](install.md#install), and the install's [Requirements](requirements.md) apply.
 
 **Every kit Spec Kit does not replace.** Ask the install command for `complement`, or run your system's line from the install page with:
 

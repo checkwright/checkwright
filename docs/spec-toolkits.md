@@ -20,7 +20,7 @@ With the recipe applied, four kinds of defect in your specs fail CI, and a pre-c
 
 A citation's path is read from the repository root, so write `specs/001-login/spec.md §Assumptions`, not `spec.md §Assumptions`. The second form is skipped rather than checked. <!-- citation-link-exempt: examples of the two citation forms, not citations -->
 
-`git commit --no-verify` skips the hook, so the guarantee is CI: `init` commits a workflow that runs the battery, and once its check is required, a red battery blocks the merge ([Requiring the CI check](install.md#requiring-the-ci-check)).
+`git commit --no-verify` skips the hook, so the guarantee is CI: `init` commits a workflow that runs the battery, and once its check is required, a red battery blocks the merge ([Requiring the CI check](maintenance.md#requiring-the-ci-check)).
 
 ## What the gates check against your code
 

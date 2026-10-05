@@ -1,5 +1,6 @@
 // spec: docs/site-architecture.md §Generated projections and their freshness gates — the two
 // toolchain tables hold whole-element parity with the probe roster, each row on its audience's page
+use super::install_docs;
 use crate::fresh;
 use crate::toolfloor::{CONTRIBUTOR, KIT_JOIN, REGISTERED};
 use std::collections::BTreeMap;
@@ -170,9 +171,22 @@ fn page_rows(page: &str) -> Result<Vec<Row>, String> {
     Ok(listed_rows(&text))
 }
 
+// spec: installer/SPEC.md §The hosted install pin — the install page carrying the toolchain block
+// is the home of every non-contributor row
+fn install_rows(args: &[String]) -> Result<(String, Vec<Row>), String> {
+    let pages = install_docs::read(&install_docs::paths(args, 0)?, "toolchain page not found")?;
+    match install_docs::carrier(&pages, "a toolchain block", |t| t.contains(BEGIN))? {
+        Some(m) => Ok((m.path.clone(), listed_rows(&m.text))),
+        None => Err(format!(
+            "no toolchain marker block ({}) in {}",
+            BEGIN,
+            install_docs::names(&pages)
+        )),
+    }
+}
+
 fn rule(args: &[String]) -> Result<i32, String> {
-    let install_md = fresh::positional_or_knob(args, 0, "GATE_LOCAL_INSTALL_PAGE")?;
-    let install_rows = page_rows(&install_md)?;
+    let (install_md, install_rows) = install_rows(args)?;
     let contributing_md = fresh::positional_or_knob(args, 1, "GATE_LOCAL_CONTRIBUTING_FILE")?;
     let contributing_rows = page_rows(&contributing_md)?;
     let (install_md, contributing_md) = (install_md.as_str(), contributing_md.as_str());

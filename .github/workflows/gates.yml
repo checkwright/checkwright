@@ -200,12 +200,12 @@ jobs:
             $0 == "<!-- unix-install:end -->" { f = 0 }
             f && NF && $0 !~ /^```/ { print }
             $0 == "<!-- unix-install:begin -->" { f = 1 }
-          ' docs/install.md)"
+          ' docs/manual-install.md)"
           if [ -z "$block" ]; then
-            echo "::error::docs/install.md carries no unix-install block; this leg runs the page's install and has none to run"
+            echo "::error::docs/manual-install.md carries no unix-install block; this leg runs the page's install and has none to run"
             exit 1
           fi
-          printf '== docs/install.md unix-install block ==\n%s\n' "$block"
+          printf '== docs/manual-install.md unix-install block ==\n%s\n' "$block"
           git -C "$work/consumer" init -q
           git -C "$work/consumer" config user.email 'smoke@example.invalid'
           git -C "$work/consumer" config user.name 'page install smoke'
@@ -919,24 +919,24 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) { $PSNativeCommandUseErrorActionPreference = $false }
-          function Get-PageBlock([string] $name) {
+          function Get-PageBlock([string] $name, [string] $page) {
               $body = @()
               $inBlock = $false
-              foreach ($line in (Get-Content -LiteralPath docs/install.md)) {
+              foreach ($line in (Get-Content -LiteralPath $page)) {
                   if ($line -eq "<!-- ${name}:end -->") { $inBlock = $false }
                   if ($inBlock -and $line.Trim() -and $line -notmatch '^```') { $body += $line }
                   if ($line -eq "<!-- ${name}:begin -->") { $inBlock = $true }
               }
               if ($body.Count -eq 0) {
-                  Write-Host "::error::docs/install.md carries no $name block; this leg runs the page's block and has none to run"
+                  Write-Host "::error::$page carries no $name block; this leg runs the page's block and has none to run"
                   exit 1
               }
-              Write-Host "== docs/install.md $name block =="
+              Write-Host "== $page $name block =="
               $body | ForEach-Object { Write-Host $_ }
               return ($body -join "`n")
           }
-          $remedy = Get-PageBlock 'windows-remedy'
-          $install = Get-PageBlock 'windows-install'
+          $remedy = Get-PageBlock 'windows-remedy' 'docs/install.md'
+          $install = Get-PageBlock 'windows-install' 'docs/manual-install.md'
           Invoke-Expression $remedy | Out-Host
           $v = $env:PWSH_VERSION
           $cw = Join-Path $env:PWSH_SCRATCH 'page-install'
@@ -1237,7 +1237,7 @@ jobs:
                 ;;
             esac
             runner="$(gate_native_runner "$target")" || {
-              echo "platform '$target' is declared on the install page with no runner" >&2
+              echo "platform '$target' is declared on docs/requirements.md with no runner" >&2
               echo "mapping — add one to $(gate_native_runners_file), or stop declaring it." >&2
               exit 1
             }
@@ -1259,7 +1259,7 @@ jobs:
               gsub(/^[ \t]+|[ \t]+$/, "", s)
               print t "\t" s
             }
-          ' docs/install.md)
+          ' docs/requirements.md)
           if [ "$legs" = '[]' ]; then
             echo "the platform declaration resolved to no platform — the block is" >&2
             echo "absent or empty, and a producer with no leg measures nothing." >&2
@@ -1804,7 +1804,7 @@ jobs:
                    shasum tar npm node cargo rustc rustup shellcheck ruby brew; do
             printf '%-11s %s\n' "$t" "$(command -v "$t" 2>/dev/null || echo '<MISSING>')"
           done
-          echo "== flavours, against the POSIX floor docs/install.md asserts =="
+          echo "== flavours, against the POSIX floor docs/requirements.md asserts =="
           for t in awk sed sort grep find tar; do
             printf '%-6s %s\n' "$t" "$("$t" --version 2>&1 | head -n1)"
           done
@@ -1962,7 +1962,7 @@ jobs:
                    shasum tar npm node cargo rustc rustup shellcheck ruby brew; do
             printf '%-11s %s\n' "$t" "$(command -v "$t" 2>/dev/null || echo '<MISSING>')"
           done
-          echo "== flavours, against the POSIX floor docs/install.md asserts =="
+          echo "== flavours, against the POSIX floor docs/requirements.md asserts =="
           for t in awk sed sort grep find tar; do
             printf '%-6s %s\n' "$t" "$("$t" --version 2>&1 | head -n1)"
           done
@@ -2065,7 +2065,7 @@ jobs:
                    shasum tar npm node cargo rustc rustup shellcheck ruby; do
             printf '%-11s %s\n' "$t" "$(command -v "$t" 2>/dev/null || echo '<MISSING>')"
           done
-          echo "== flavours, against the POSIX floor docs/install.md asserts =="
+          echo "== flavours, against the POSIX floor docs/requirements.md asserts =="
           for t in awk sed sort grep find tar; do
             printf '%-6s %s\n' "$t" "$("$t" --version 2>&1 | head -n1)"
           done

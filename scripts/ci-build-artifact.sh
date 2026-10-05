@@ -45,7 +45,7 @@ mkdir -p "$out"
 cp "$crate/target/$target/release/$binary" "$out/$binary"
 
 # spec: gate-sdk/SPEC.md §Consumer payload — the artifact's OS floor is measured and held equal to the floor the platforms table declares for its target, before any digest exists, so a refused artifact never gets a sidecar
-platforms_page=docs/install.md
+platforms_page=docs/requirements.md
 
 floor_refuse() {
     printf 'floor %s: %s\n' "$target" "$1" >&2

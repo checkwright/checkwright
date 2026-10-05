@@ -1,5 +1,6 @@
 // spec: installer/SPEC.md §Versioning — the declared release channel agrees with the publish
 // workflow's prerelease posture (A) and with the project's own version line (B)
+use super::install_docs;
 use crate::fresh;
 use crate::{proc, programs};
 use std::path::Path;
@@ -62,7 +63,7 @@ fn semver_major(v: &str) -> Option<u64> {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let install_md = fresh::positional_or_knob(args, 0, "GATE_LOCAL_INSTALL_PAGE")?;
+    let page_paths = install_docs::paths(args, 0)?;
     let publish_yml = match args.get(1).filter(|a| !a.is_empty()) {
         Some(a) => a.clone(),
         None => crate::walk::knob_words("GATE_SDK_NATIVE_PUBLISH_WORKFLOW")?
@@ -70,41 +71,50 @@ fn rule(args: &[String]) -> Result<i32, String> {
             .next()
             .ok_or("GATE_SDK_NATIVE_PUBLISH_WORKFLOW names no workflow")?,
     };
-    let (install_md, publish_yml) = (install_md.as_str(), publish_yml.as_str());
+    let publish_yml = publish_yml.as_str();
     let version_arg = args.get(2).map(String::as_str).unwrap_or("");
 
-    if !Path::new(install_md).is_file() {
-        return Err(format!("not found: {}", install_md));
-    }
+    let pages = install_docs::read(&page_paths, "not found")?;
     if !Path::new(publish_yml).is_file() {
         return Err(format!("not found: {}", publish_yml));
     }
 
-    let install_text = fresh::read_captured(install_md)?;
-    let decls: Vec<String> = fresh::file_lines(&install_text)
+    // spec: installer/SPEC.md §Versioning — one declaration line across the install pages, each
+    // line named on its page where the set holds more than one
+    let several = pages.len() > 1;
+    let decls: Vec<(usize, String)> = pages
         .iter()
         .enumerate()
-        .filter(|(_, l)| l.starts_with("Release channel:"))
-        .map(|(n, l)| format!("{}:{}", n + 1, l))
+        .flat_map(|(m, page)| {
+            fresh::file_lines(&page.text)
+                .into_iter()
+                .enumerate()
+                .filter(|(_, l)| l.starts_with("Release channel:"))
+                .map(move |(n, l)| {
+                    let at = if several { format!("{}:", page.path) } else { String::new() };
+                    (m, format!("{}{}:{}", at, n + 1, l))
+                })
+        })
         .collect();
 
     if decls.is_empty() {
         return Err(format!(
             "{} carries no 'Release channel:' declaration line — the channel cannot be established (installer/SPEC.md §Versioning owns the declaration)",
-            install_md
+            install_docs::names(&pages)
         ));
     }
     if decls.len() > 1 {
         eprintln!(
             "check-release-channel-parity: {} carries {} 'Release channel:' declaration lines; exactly one is admissible:",
-            install_md,
+            install_docs::names(&pages),
             decls.len()
         );
-        eprintln!("{}", decls.join("\n"));
+        eprintln!("{}", decls.iter().map(|(_, l)| l.as_str()).collect::<Vec<&str>>().join("\n"));
         return Ok(2);
     }
+    let (install_md, install_text) = (pages[decls[0].0].path.as_str(), pages[decls[0].0].text.as_str());
 
-    let channels: Vec<&str> = fresh::file_lines(&install_text)
+    let channels: Vec<&str> = fresh::file_lines(install_text)
         .iter()
         .filter_map(|l| declared_channel(l))
         .collect();

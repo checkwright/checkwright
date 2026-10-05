@@ -80,6 +80,7 @@ pub mod hook_exec_bit;
 pub mod identity;
 pub mod install_claim;
 pub mod install_disposition;
+pub mod install_docs;
 pub mod kit_registration;
 pub mod kit_roots_dialect;
 pub mod knob_citation;
@@ -1635,8 +1636,8 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-release-declaration-parity",
         release_declaration_parity::run,
-        &[("?", "", "", "dynamic@src/gates/release_declaration_parity.rs:155")],
-        &["GATE_LOCAL_RELEASE_POSTS_DIR", "GATE_SDK_RELEASE_SECTIONS", "GATE_SDK_RELEASE_SECTION_ALIASES", "GATE_LOCAL_INSTALL_PAGE"],
+        &[("?", "", "", "dynamic@src/gates/release_declaration_parity.rs:172")],
+        &["GATE_LOCAL_RELEASE_POSTS_DIR", "GATE_SDK_RELEASE_SECTIONS", "GATE_SDK_RELEASE_SECTION_ALIASES", "GATE_LOCAL_INSTALL_DOCS"],
         "-",
         &[("git", "")],
     ),
@@ -1726,7 +1727,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-install-toolchain",
         install_toolchain::run,
         &[("?", "", "", "dynamic@src/toolfloor.rs:165 via toolfloor::derived_kit_audience_here")],
-        &["GATE_SDK_KIT_DIRS", "GATE_SDK_NATIVE_SRC", "GATE_LOCAL_INSTALL_PAGE", "GATE_LOCAL_CONTRIBUTING_FILE"],
+        &["GATE_SDK_KIT_DIRS", "GATE_SDK_NATIVE_SRC", "GATE_LOCAL_INSTALL_DOCS", "GATE_LOCAL_CONTRIBUTING_FILE"],
         "-",
         &[("git", "")],
     ),
@@ -1738,7 +1739,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &[
             "QUEUE_KIT_QUEUE_FILE",
-            "GATE_LOCAL_INSTALL_PAGE",
+            "GATE_LOCAL_INSTALL_DOCS",
             "GATE_LOCAL_TARGETS_ROSTER",
             "GATE_LOCAL_BOOTSTRAP_SH",
             "GATE_LOCAL_BOOTSTRAP_PS1",
@@ -1797,7 +1798,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-release-channel-parity",
         release_channel_parity::run,
         &[],
-        &["GATE_LOCAL_INSTALL_PAGE", "GATE_SDK_NATIVE_PUBLISH_WORKFLOW"],
+        &["GATE_LOCAL_INSTALL_DOCS", "GATE_SDK_NATIVE_PUBLISH_WORKFLOW"],
         "-",
         &[("git", "")],
     ),
@@ -1805,7 +1806,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-install-pin",
         install_pin::run,
         &[],
-        &["GATE_LOCAL_INSTALL_SH", "GATE_LOCAL_INSTALL_PS1", "GATE_LOCAL_INSTALL_PAGE"],
+        &["GATE_LOCAL_INSTALL_SH", "GATE_LOCAL_INSTALL_PS1", "GATE_LOCAL_INSTALL_DOCS"],
         "-",
         &[("git", "")],
     ),
