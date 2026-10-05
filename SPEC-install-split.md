@@ -69,6 +69,7 @@ Measured by line range on today's page: the parent about 1,230 words, Requiremen
 
 - **Each OS section on the parent ends with one link** to its section of the Manual steps page, in place of the collapsed region.
 - **Anchors that stay on the parent**, because a page outside this tree's reach links them: `#install`, `#try-it-first`, `#macos-and-linux`, `#windows`, `#from-a-plugin-marketplace`, `#choosing-a-profile` and `#requirements`. installer/README.md, which ships in every released payload, links three of them by URL; gate-sdk/README.md, vendored into adopter trees, links `#requirements`; one dated post links `#from-a-plugin-marketplace`.
+- **Two in-page links on the parent change target.** `[Writing your own shell gates](#writing-your-own-shell-gates)` in the Windows section becomes a link to that section of the Requirements page, and `[Managing](#managing)` a link to the Maintenance page's section, since each fragment dangles once its section moves. `check-md-refs` reds each.
 - **The agent prompt** under With another coding agent keeps its two `install.html` URLs, whose anchors stay.
 - **No sub-page is a hub.** `check-docs-nav-reachable` reds a child that every sibling links and that links each of them. Requirements links no sibling; the other two link Requirements and not each other.
 - **`check-install-claim`** scans any section whose heading opens *Install*. *Installing and running the shipped gates* is scanned today and moves with its body, so its first transport line is unchanged. No new heading under a `##` opens with that word; the H1s are not scanned.
@@ -91,7 +92,7 @@ So the knob becomes an array, `GATE_LOCAL_INSTALL_DOCS[]`, declared on `scripts/
 - **`check-install-toolchain`'s placement rule** names the member carrying the `toolchain` block as the home of a non-contributor row.
 - **A finding names the member** the block or line was read from, never the set.
 - **The positional forms are unchanged.** A positional page is one file and wins over the knob, so every fixture `args` file and bespoke test keeps passing one page.
-- **Each of the five descriptors couples `knob:GATE_LOCAL_INSTALL_DOCS`** in place of the literal page. `scripts/check-release-bump.gate` and `scripts/check-tightened-gates-grammar.gate` couple the page and read no install-page knob; each takes the same couple, so an edit to any member still triggers it.
+- **Each of the five descriptors couples `knob:GATE_LOCAL_INSTALL_DOCS`** in place of the literal page. `scripts/check-release-bump.gate` and `scripts/check-tightened-gates-grammar.gate` couple the page and read no install-page knob; a `knob:` token is admissible only where the gate's registry row in `native/src/gates/mod.rs` declares the knob (gate-sdk/SPEC.md §The `# graph:` manifest). Each therefore couples the four member paths literally, so an edit to any member still triggers it, and neither registry row gains the knob.
 
 **Refused: one knob per block.** It leaves the two tag reads pointing at a path the pinned tag lacks, and needs a former-path knob to answer them. **Refused: leaving the gate-read blocks on `docs/install.md`.** They are most of the page's length.
 
