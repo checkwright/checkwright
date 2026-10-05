@@ -317,7 +317,7 @@ pub struct Tally {
 
 // spec: guard-kit/SPEC.md §scan-prompts — a PowerShell line's key: its first segment's first word
 // as the PowerShell reader splits it, lowercased because PowerShell command names ignore case.
-fn powershell_key(line: &str) -> String {
+pub fn powershell_key(line: &str) -> String {
     use guard::reader::Reader;
     let ps = guard::powershell::PowerShell;
     let skel = ps.view(line, guard::reader::View::SqDqHd).unwrap_or_default();

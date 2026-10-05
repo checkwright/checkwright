@@ -8,25 +8,13 @@
 
 ## New Features
 
-### manual-operation-spend-channel
-
-[spec: SPEC-manual-ops.md]
-
-no measurement channel attributes a session's spend to repeated manual operations, so the close economics pass cannot surface a tooling opportunity. The stage-economics log prices spend per stage and tier, the overhead meter measures always-loaded bytes, prompt-friction sees only Bash calls that prompt (so Edit and Write queue edits are invisible to it), and knowledge-friction is self-reported. `queue-write-side-verb`'s evidence came from an ad-hoc look at `.tmp/`. Operator expectation, 2026-09-27 (lead session): the economics analysis every close runs should surface such opportunities.
-
-**Deliverable:** a channel attributing repeated manual operations (tool-call shapes, hand edits of one surface) to sessions, and a close economics read listing the top candidates.
-
-**Selected 2026-10-05** for drift-kit-tail-crosser-pass, operator direction lead-relayed (not a ruling). A feature, so the spec stage authors its amendment and promotes it, before [drift-kit-tail-brevity](#drift-kit-tail-brevity) passes drift-kit.
-
-**Cost while deferred:** tooling gaps surface only by chance and repeated manual work stays unpriced. Filed 2026-09-27 to the gap inbox by platform-prerequisite-floors' lead; promoted at its close: →fix fails because the channel is new mechanism. Re-verified: `.workflow/knowledge-friction.log` holds no line at this close. Owner lookup: `economics`, `tooling opportunit`, `repeated` in this file — [build-stage-tier-economics](#build-stage-tier-economics) and [queue-tier-label-correction-cost](#queue-tier-label-correction-cost), DISTINCT (tier pricing); owner drift-kit/SPEC.md §The stage-economics meter.
-
 ## Technical Debt
 
 ### drift-kit-tail-brevity
 
 drift-kit/SPEC.md's sections no brevity slice has passed: the preamble, §The report skeleton through §The overhead meter, §The price-coverage arm, §The `/economics` skill, §Layout and configuration, §Testing and §Out of scope, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): about 11.6k of the file's 20.9k words at this scope, and all 68 of its `check-prose-bounds` findings with the ceiling knob emptied.
 
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey; the file's ceiling row re-stamped. Applied last, after [manual-operation-spend-channel](#manual-operation-spend-channel)'s amendment merges, so no section is passed twice.
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey; the file's ceiling row re-stamped. Applied last, after `manual-operation-spend-channel`'s amendment merges, so no section is passed twice.
 
 **Cost while deferred:** paid by every session and adopter that reads those drift-kit sections. Filed 2026-10-05 as a split at scope. Part of the operator's selection of the unit set, direction 2026-10-05, lead-relayed (not a ruling); with it drift-kit leaves the parent.
 
@@ -1179,4 +1167,5 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 - front-end-nested-toplevel
 - docs-code-block-copy-wrap
 - pwsh-install-smoke-split
+- manual-operation-spend-channel
 

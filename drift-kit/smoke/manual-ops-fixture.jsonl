@@ -1,0 +1,7 @@
+{"type":"assistant","cwd":"/mo-root","message":{"id":"m1","model":"test-model","content":[{"type":"tool_use","id":"t1","name":"Bash","input":{"command":"git status"}}],"usage":{"input_tokens":1}}}
+{"type":"assistant","cwd":"/mo-root","message":{"id":"m1","model":"test-model","content":[{"type":"tool_use","id":"t1","name":"Bash","input":{"command":"git status"}}],"usage":{"input_tokens":1}}}
+{"type":"assistant","cwd":"/mo-root","message":{"id":"m2","model":"test-model","content":[{"type":"tool_use","id":"t2","name":"Bash","input":{"command":"git status --short"}},{"type":"tool_use","id":"t3","name":"Edit","input":{"file_path":"/mo-root/zeta.md","old_string":"a","new_string":"b"}}],"usage":{"input_tokens":1}}}
+{"type":"assistant","cwd":"/mo-root","message":{"id":"m3","model":"test-model","content":[{"type":"tool_use","id":"t4","name":"Bash","input":{"command":"ls -la"}},{"type":"tool_use","id":"t5","name":"Write","input":{"file_path":"/elsewhere/secret.txt","content":"x"}}],"usage":{"input_tokens":1}}}
+{"type":"assistant","cwd":"/mo-root","message":{"id":"m4","model":"test-model","content":[{"type":"tool_use","id":"t6","name":"Bash","input":{"command":"echo SECRET-COMMAND-TEXT > out.txt"}},{"type":"tool_use","id":"t7","name":"Read","input":{"file_path":"/mo-root/zeta.md"}}],"usage":{"input_tokens":1}}}
+{"type":"user","cwd":"/mo-root","message":{"content":[{"type":"tool_result","tool_use_id":"t6","content":"ok"}]}}
+not a json line {"type":"tool_use","id":"t9","name":"Bash"

@@ -66,6 +66,10 @@ fn stage_economics_log(resolve: Resolve) -> Result<Value, String> {
     under(resolve, "DRIFT_KIT_METRIC_DIR", "stage-economics-log.txt")
 }
 
+fn manual_ops_log(resolve: Resolve) -> Result<Value, String> {
+    under(resolve, "DRIFT_KIT_METRIC_DIR", "manual-ops-log.txt")
+}
+
 fn install_record(resolve: Resolve) -> Result<Value, String> {
     under(resolve, "DRIFT_KIT_METRIC_DIR", "install-observations.log")
 }
@@ -117,6 +121,9 @@ pub const KIT: Kit = Kit {
         Row::derived("DRIFT_KIT_STATE_FILE", Shape::Scalar, state_file, &["GATE_SDK_WORKFLOW_DIR"]),
         Row::scalar("DRIFT_KIT_SUPERVISION_LABEL", "supervision"),
         Row::scalar("DRIFT_KIT_FANOUT_SUFFIX", "+fanout"),
+        Row::derived("DRIFT_KIT_MANUAL_OPS_LOG", Shape::Scalar, manual_ops_log, &["DRIFT_KIT_METRIC_DIR"]),
+        Row::indexed("DRIFT_KIT_MANUAL_OPS_IGNORE", &[]),
+        Row::scalar("DRIFT_KIT_MANUAL_OPS_TOP", "10"),
         Row::derived("DRIFT_KIT_PRICE_TABLE", Shape::Scalar, price_table, &["GATE_SDK_GATES_DIR"]),
         Row::scalar("DRIFT_KIT_PRICE_COVERAGE_DAYS", "7"),
         Row::indexed("DRIFT_KIT_PRICE_PAGE_CMD", &[]),
@@ -135,8 +142,8 @@ pub const KIT: Kit = Kit {
 };
 
 // spec: drift-kit/SPEC.md §Layout and configuration — the registry a consumer set to a path that is
-// absent is adopted-but-broken; an empty value stays the not-adopted answer. The two price-coverage
-// integers refuse a value outside their stated shape.
+// absent is adopted-but-broken; an empty value stays the not-adopted answer. The integer knobs
+// refuse a value outside their stated shape.
 fn validate(v: &Values) -> Vec<String> {
     let mut errs: Vec<String> = set_but_missing(v, "DRIFT_KIT_KPIS_FILE").into_iter().collect();
     let digits = |s: &str| !s.is_empty() && s.bytes().all(|b| b.is_ascii_digit());
@@ -146,6 +153,9 @@ fn validate(v: &Values) -> Vec<String> {
     let positive = |s: &str| digits(s) && !s.bytes().all(|b| b == b'0');
     if let Some(s) = scalar(v, "DRIFT_KIT_PRICE_PAGE_TIMEOUT").filter(|s| !positive(s)) {
         errs.push(format!("DRIFT_KIT_PRICE_PAGE_TIMEOUT '{}' is not a positive integer", s));
+    }
+    if let Some(s) = scalar(v, "DRIFT_KIT_MANUAL_OPS_TOP").filter(|s| !positive(s)) {
+        errs.push(format!("DRIFT_KIT_MANUAL_OPS_TOP '{}' is not a positive integer", s));
     }
     errs
 }

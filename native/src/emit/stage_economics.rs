@@ -281,6 +281,14 @@ fn redated(line: &str, dates: &StampDates, supervision: &str, suffix: &str) -> O
     Some(format!("{} {}", date, rest))
 }
 
+// spec: drift-kit/SPEC.md §The manual-operation meter — one transcript's row-key assignment, as the
+// passes below make it: the iterations it bills to and its stage-or-role value
+pub struct Attributed {
+    pub transcript: String,
+    pub iterations: Vec<String>,
+    pub row: String,
+}
+
 struct Run {
     today: String,
     log: String,
@@ -293,12 +301,22 @@ struct Run {
     incomplete: bool,
     kept: Vec<String>,
     dates: StampDates,
+    writes: bool,
+    billed: Vec<Attributed>,
 }
 
 impl Run {
     fn say(&mut self, line: &str) {
         self.out.push_str(line);
         self.out.push('\n');
+    }
+
+    fn bill(&mut self, transcript: &str, iterations: &[String], row: &str) {
+        self.billed.push(Attributed {
+            transcript: transcript.to_string(),
+            iterations: iterations.to_vec(),
+            row: row.to_string(),
+        });
     }
 
     // spec: drift-kit/SPEC.md §The stage-economics meter — the log's dedup key is the
@@ -365,9 +383,9 @@ fn knob(name: &str) -> Result<String, String> {
     crate::walk::knob_scalar(name)
 }
 
-pub fn emit(_args: &[String]) -> Result<String, String> {
-    let state_file = knob("DRIFT_KIT_STATE_FILE")?;
-    let price_table = knob("DRIFT_KIT_PRICE_TABLE")?;
+// spec: drift-kit/SPEC.md §The overhead meter — the shared sessions inputs, drift-kit's own knob
+// resolved and handed in
+pub fn inputs() -> Result<crate::sessions::Inputs, String> {
     let var = |n: &str| std::env::var(n).unwrap_or_default();
     let pwd = var("PWD");
     let here = if pwd.is_empty() {
@@ -375,36 +393,65 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
     } else {
         pwd
     };
-    let mut r = Run {
+    Ok(crate::sessions::Inputs {
+        session_id: String::new(),
+        harness_id: String::new(),
+        child: String::new(),
+        sessions_dir: knob("DRIFT_KIT_SESSIONS_DIR")?,
+        config_home: var("CLAUDE_CONFIG_DIR"),
+        home: var(crate::sessions::HOME_VAR),
+        here,
+    })
+}
+
+fn run(writes: bool) -> Result<Run, String> {
+    Ok(Run {
         today: super::kpi::today_iso(),
-        log: knob("DRIFT_KIT_STAGE_ECONOMICS_LOG")?,
+        log: if writes {
+            knob("DRIFT_KIT_STAGE_ECONOMICS_LOG")?
+        } else {
+            String::new()
+        },
         supervision: knob("DRIFT_KIT_SUPERVISION_LABEL")?,
         fanout_suffix: knob("DRIFT_KIT_FANOUT_SUFFIX")?,
-        prices: match std::fs::read_to_string(&price_table) {
-            Ok(t) => Prices::parse(&t),
-            Err(_) => Prices::default(),
-        },
-        inputs: crate::sessions::Inputs {
-            session_id: String::new(),
-            harness_id: String::new(),
-            child: String::new(),
-            sessions_dir: knob("DRIFT_KIT_SESSIONS_DIR")?,
-            config_home: var("CLAUDE_CONFIG_DIR"),
-            home: var(crate::sessions::HOME_VAR),
-            here,
-        },
+        prices: Prices::default(),
+        inputs: inputs()?,
         out: String::new(),
         rows: 0,
         incomplete: false,
         kept: Vec::new(),
         dates: StampDates::default(),
-    };
+        writes,
+        billed: Vec::new(),
+    })
+}
+
+pub fn emit(_args: &[String]) -> Result<String, String> {
+    let state_file = knob("DRIFT_KIT_STATE_FILE")?;
+    let price_table = knob("DRIFT_KIT_PRICE_TABLE")?;
+    let mut r = run(true)?;
+    if let Ok(t) = std::fs::read_to_string(&price_table) {
+        r.prices = Prices::parse(&t);
+    }
     if let Ok(b) = std::fs::read(crate::walk::capture_path(&r.log)) {
         r.kept = String::from_utf8_lossy(&b)
             .lines()
             .map(str::to_string)
             .collect();
     }
+    measure(&mut r, &state_file, &price_table)
+}
+
+// spec: drift-kit/SPEC.md §The manual-operation meter — the meter's own attribution, run with no
+// price table, no log read and no log write, its report discarded
+pub fn attribution() -> Result<Vec<Attributed>, String> {
+    let state_file = knob("DRIFT_KIT_STATE_FILE")?;
+    let mut r = run(false)?;
+    measure(&mut r, &state_file, "")?;
+    Ok(r.billed)
+}
+
+fn measure(r: &mut Run, state_file: &str, price_table: &str) -> Result<String, String> {
     let mut head = String::new();
     if !std::path::Path::new(&state_file).is_file() {
         head.push_str(&format!(
@@ -434,7 +481,7 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
     let mut sessions: Ordered<(String, String)> = Ordered::default();
     let mut yielded: HashMap<String, String> = HashMap::new();
     let (mut label_collision, mut suffix_collision, mut stamps) = (false, false, 0usize);
-    for line in crate::history::stamp_lines(&state_file) {
+    for line in crate::history::stamp_lines(state_file) {
         let f: Vec<&str> = line.split_whitespace().collect();
         if f.is_empty() || f[0].starts_with('#') || f[0] == "---" || f.len() < 3 {
             continue;
@@ -495,6 +542,7 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
             continue;
         };
         attributed.insert(transcript.clone());
+        r.bill(&transcript, std::slice::from_ref(&iter), &stage);
         // spec: drift-kit/SPEC.md §The stage-economics meter — a stage anchors on the stamp
         // resolving, not on a row being emitted: a stamped stage whose transcript carries no usage
         // is still a real, placeable (iteration, stage) for its subtree.
@@ -568,7 +616,7 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
     }
 
     supervision_pass(
-        &mut r,
+        r,
         &leads,
         &dispatch,
         label_collision,
@@ -577,7 +625,7 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
         &mut unmatched,
     );
     let (fanout_rows, fanout_unresolved, fanout_no_meta) =
-        fanout_pass(&mut r, suffix_collision, &mut attributed, &anchors);
+        fanout_pass(r, suffix_collision, &mut attributed, &anchors);
 
     if fanout_no_meta {
         r.say(
@@ -660,7 +708,7 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
 
     // spec: drift-kit/SPEC.md §The stage-economics meter — the log is touched only where a row was
     // emitted, so a run that priced nothing neither creates nor rewrites it.
-    if rows > 0 {
+    if rows > 0 && r.writes {
         let at = crate::walk::capture_path(&log);
         if let Some(dir) = std::path::Path::new(&at).parent() {
             let _ = std::fs::create_dir_all(dir);
@@ -747,6 +795,7 @@ fn supervision_pass(
             }
         }
         attributed.insert(lead_path.clone());
+        r.bill(&lead_path, &iters, &label);
         anchors.insert_new(
             &lead_path,
             Anchor {
@@ -875,6 +924,11 @@ fn fanout_pass(
             continue;
         };
         attributed.insert(f.clone());
+        if let Some(a) = anchors.get(&anchor) {
+            let row = format!("{}{}", a.label, r.fanout_suffix);
+            let iters = a.iters.clone();
+            r.bill(&f, &iters, &row);
+        }
         for (model, t) in r.usage(&f) {
             let key = format!("{}\u{1}{}", anchor, model);
             if fanout.insert_new(&key, t) {
@@ -1124,6 +1178,8 @@ mod tests {
                 "2025-01-01 c build m in=9".to_string(),
             ],
             dates: StampDates::default(),
+            writes: true,
+            billed: Vec::new(),
         };
         let t = Tokens {
             input: 1,

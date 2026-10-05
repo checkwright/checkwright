@@ -8,3 +8,14 @@ DRIFT_KIT_PRICE_PAGE_CMD[] = curl
 DRIFT_KIT_PRICE_PAGE_CMD[] = -fsSL
 DRIFT_KIT_PRICE_PAGE_CMD[] = https://platform.claude.com/docs/en/about-claude/pricing.md
 DRIFT_KIT_PRICE_PAGE_SECTION = ## Model pricing
+# spec: drift-kit/SPEC.md §The manual-operation meter — this repo's ordinary work: its read-only inspection shapes and its gate runner, each spelled as the ranking key spells it
+DRIFT_KIT_MANUAL_OPS_IGNORE[] = grep
+DRIFT_KIT_MANUAL_OPS_IGNORE[] = git grep
+DRIFT_KIT_MANUAL_OPS_IGNORE[] = git status
+DRIFT_KIT_MANUAL_OPS_IGNORE[] = git log
+DRIFT_KIT_MANUAL_OPS_IGNORE[] = git diff
+DRIFT_KIT_MANUAL_OPS_IGNORE[] = git show
+DRIFT_KIT_MANUAL_OPS_IGNORE[] = ls
+DRIFT_KIT_MANUAL_OPS_IGNORE[] = wc
+DRIFT_KIT_MANUAL_OPS_IGNORE[] = find
+DRIFT_KIT_MANUAL_OPS_IGNORE[] = bash gate-sdk/bin/run-gates.sh

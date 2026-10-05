@@ -909,3 +909,60 @@ for ileak in i1 i2 a-profile b-profile a-floor b-floor; do
 done
 [[ "$(iev)" == "$ifull" ]] \
     || fail "two emissions over one unchanged record differed, so a byte-comparing freshness gate would flap rather than assert"
+
+# spec: drift-kit/SPEC.md §Testing — the manual-operation meter through its arm over its own
+# sessions dir, state file and log: two stamped sessions, one the fixture's, whose keys tie on calls
+# and differ on sessions, an edit off the repository and a command whose text must never be logged.
+modir="$work/mo-sessions"; mkdir -p "$modir"
+cp "$SMOKE_KIT_ROOT/smoke/manual-ops-fixture.jsonl" "$modir/agent-mopsaaaa1111.jsonl"
+cat > "$modir/agent-mopsbbbb2222.jsonl" <<'EOF'
+{"type":"assistant","cwd":"/mo-root","message":{"id":"b1","model":"test-model","content":[{"type":"tool_use","id":"u1","name":"Edit","input":{"file_path":"/mo-root/zeta.md"}}],"usage":{"input_tokens":1}}}
+EOF
+printf 'smoke spec mopsbbbb 2025-01-01 none\nsmoke build mopsaaaa 2025-01-02 none\n' > "$work/mo-state.txt"
+molog="$work/mo-log.txt"
+mops() { DRIFT_KIT_STATE_FILE="${MO_STATE:-$work/mo-state.txt}" DRIFT_KIT_SESSIONS_DIR="${MO_DIR:-$modir}" \
+    DRIFT_KIT_MANUAL_OPS_LOG="$molog" bash "$DRIFT_ARM" --emit manual-ops; }
+
+set +e
+moout="$(mops)"; morc=$?
+set -e
+[[ "$morc" -eq 0 ]] || fail "manual-ops exited $morc (advisory tool must exit 0)"
+mowant="  2 2 1 edit zeta.md [build,spec]
+  2 1 1 shell git status [build]
+  1 1 1 edit (outside) [build]
+  1 1 1 shell echo > [build]
+  1 1 1 shell ls [build]"
+[[ "$(grep -E '^  [0-9]+ ' <<<"$moout")" == "$mowant" ]] \
+    || fail "manual-ops ranking lines or order wrong (calls, then sessions, then key): $moout"
+grep -q '^manual-ops: smoke — 7 call(s) in 2 transcript(s)$' <<<"$moout" \
+    || fail "manual-ops counted a repeated block id, an unparseable line or another tool: $moout"
+[[ "$(cat "$molog")" == "$(printf 'smoke edit zeta.md\nsmoke shell git status\nsmoke edit (outside)\nsmoke shell echo >\nsmoke shell ls')" ]] \
+    || fail "the manual-ops log does not hold <iteration> <kind> <key> per printed key: $(cat "$molog")"
+if grep -q 'SECRET-COMMAND-TEXT\|/elsewhere' "$molog" || grep -q 'SECRET-COMMAND-TEXT\|/elsewhere' <<<"$moout"; then
+    fail "manual-ops printed or logged command text or an off-repository path"
+fi
+cp "$molog" "$work/mo-log.first"
+mops >/dev/null
+cmp -s "$work/mo-log.first" "$molog" || fail "a manual-ops re-run over unchanged inputs was not byte-identical: $(cat "$molog")"
+printf 'older edit zeta.md\n' > "$molog"
+grep -q '^  2 2 2 edit zeta.md ' <<<"$(mops)" \
+    || fail "a key logged under another iteration did not raise <iterations> to 2"
+[[ "$(sed -n 1p "$molog")" == 'older edit zeta.md' ]] || fail "the re-run moved another iteration's log line"
+
+# spec: drift-kit/SPEC.md §The manual-operation meter — the ignore set through a knob file, since an
+# indexed knob takes no environment override, and the top bound through the environment
+printf 'DRIFT_KIT_MANUAL_OPS_IGNORE[] = git status\n' > "$work/mo.knobs"
+moig="$(DRIFT_KIT_KNOB_FILE="$work/mo.knobs" mops)"
+if grep -q ' shell git status ' <<<"$moig"; then fail "an ignored key was printed: $moig"; fi
+grep -q ' edit zeta.md ' <<<"$moig" || fail "the ignore set dropped a key it does not name: $moig"
+[[ "$(DRIFT_KIT_MANUAL_OPS_TOP=2 mops | grep -cE '^  [0-9]+ ')" -eq 2 ]] \
+    || fail "DRIFT_KIT_MANUAL_OPS_TOP did not bound the ranking"
+
+# spec: drift-kit/SPEC.md §The manual-operation meter — no stamp, or no sessions dir: a 0-exit
+# notice and no log written
+rm -f "$molog"; : > "$work/mo-empty-state.txt"
+grep -q '^manual-ops: no stamp in ' <<<"$(MO_STATE="$work/mo-empty-state.txt" mops)" \
+    || fail "manual-ops with no stamp did not print its notice"
+grep -q '^manual-ops: no sessions dir ' <<<"$(MO_DIR="$work/no-such-sessions" mops)" \
+    || fail "manual-ops with no sessions dir did not print its notice"
+[[ ! -e "$molog" ]] || fail "a manual-ops notice run wrote the log"

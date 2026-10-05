@@ -38,6 +38,7 @@ pub mod installer_smoke;
 pub mod kfric;
 pub mod kpi;
 pub mod lesson_sink;
+pub mod manual_ops;
 pub mod md_index;
 pub mod md_section;
 pub mod md_unwrap;
@@ -603,6 +604,14 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-stage-economics",
         Arm::Emit(stage_economics::emit, Grammar::Flags(&[])),
         stage_economics::KNOBS,
+    ),
+    // spec: drift-kit/SPEC.md §The manual-operation meter — an `Arm::Emit` on the stage-economics
+    // meter's own test; its roster is its three knobs, the log's metric dir, and the four the
+    // meter's attribution reads.
+    (
+        "--emit-manual-ops",
+        Arm::Emit(manual_ops::emit, Grammar::Parsed(manual_ops::USAGE)),
+        manual_ops::KNOBS,
     ),
     // spec: drift-kit/SPEC.md §The queue-flow arm — an `Arm::Emit` because exit is always 0 bar a
     // usage error, so no `1` is load-bearing; its roster is the KPI's pool knobs plus the state
