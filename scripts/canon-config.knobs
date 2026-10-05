@@ -77,6 +77,15 @@ CANON_KIT_RESTATEMENT_PAGES[] = docs/*/index.md
 CANON_KIT_PAGE_REPEAT_PAGES[] = docs/*.md
 CANON_KIT_PAGE_REPEAT_PAGES[] = docs/*/index.md
 
+# comment-tier-exempt: the same hand-authored pages held to a word bound (docs/page-authoring.md §Page-authoring rules); the generated pages stay out, a generated page's length being its source's, and the number is this site's calibration
+CANON_KIT_PAGE_LENGTH_PAGES[] = docs/*.md
+CANON_KIT_PAGE_LENGTH_PAGES[] = docs/*/index.md
+CANON_KIT_PAGE_LENGTH_EXCLUDE[] = docs/evidence-data.md
+CANON_KIT_PAGE_LENGTH_EXCLUDE[] = docs/enforcement.md
+CANON_KIT_PAGE_LENGTH_EXCLUDE[] = docs/footprint.md
+CANON_KIT_PAGE_LENGTH_EXCLUDE[] = docs/install-evidence.md
+CANON_KIT_PAGE_LENGTH_MAX_WORDS = 1500
+
 # comment-tier-exempt: the hand-authored pages whose section citations are links (docs/page-authoring.md §Page-authoring rules): the site pages, the front door, the top-level READMEs and the other root documents GitHub renders; CLAUDE.md and the queue stay out as agent-loaded working surfaces, where links grow every session's read, and the dated posts and generated mirrors stay out
 CANON_KIT_CITATION_LINK_PAGES[] = docs/*.md
 CANON_KIT_CITATION_LINK_PAGES[] = docs/*/index.md

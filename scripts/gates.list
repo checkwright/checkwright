@@ -101,6 +101,7 @@ check-docs-liquid-parse
 check-docs-cmd
 check-docs-restatement-parity
 check-docs-page-repeat
+check-docs-page-length
 check-citation-link
 check-fence-command-head
 check-fence-run
@@ -159,5 +160,4 @@ check-door-binding
 # (gate-sdk/SPEC.md §check-gate-substrate-parity, assertion I).
 # unregistered: check-queue-wrap — this tree keeps its queue unwrapped under check-md-unwrapped, and the wrap gate is the hard-wrapping consumer's alternative
 # unregistered: check-surface-duplication — this tree declares no glossary, for the provenance-seam reason, and the member exits 2 without one
-# unregistered: check-docs-page-length — this tree binds no CANON_KIT_PAGE_LENGTH_PAGES, and the member registers with its binding
 # unregistered: check-producer-liveness — this repo's gates suite is the battery --run-validate itself invokes, so a registered liveness gate would red every validate run against its own lock
