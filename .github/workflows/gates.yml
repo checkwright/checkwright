@@ -491,7 +491,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJSON(needs.native-artifacts-roster.outputs.pwsh_legs) }}
+        include: ${{ fromJSON(needs.native-artifacts-roster.outputs.pwsh_parts) }}
     runs-on: ${{ matrix.runner }}
     continue-on-error: ${{ matrix.held }}
     timeout-minutes: 60
@@ -568,6 +568,7 @@ jobs:
 
       # spec: installer/SPEC.md §The install boundary — each step asserted on the observable that distinguishes it
       - name: drive the PowerShell bootstrap through its five steps and a whole init
+        if: matrix.part == 'bootstrap'
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -756,6 +757,7 @@ jobs:
       # spec: gate-sdk/SPEC.md §gen-pre-commit — the handoff hooks on native Windows; this is the oracle
       # comment-tier-exempt: the system directory is spared, its bash.exe being the WSL launcher
       - name: commit through the generated hooks with no bash on PATH
+        if: matrix.part == 'bootstrap'
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -843,6 +845,7 @@ jobs:
 
       # spec: gate-sdk/SPEC.md §gen-pre-commit — the standing witness that the hook needs the sh Git for Windows bundles
       - name: probe whether git runs the handoff hook with its bundled sh renamed away
+        if: matrix.part == 'bootstrap'
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -888,6 +891,7 @@ jobs:
 
       # spec: installer/SPEC.md §Platform resolution — the POSIX half's witness on this Windows host
       - name: the POSIX bootstrap installs the lattice minimum on this Windows host
+        if: matrix.part == 'bootstrap'
         shell: bash
         run: |
           set -uo pipefail
@@ -910,6 +914,7 @@ jobs:
 
       # spec: docs/site-architecture.md §Generated projections and their freshness gates — the install blocks
       - name: run the page's windows-install block against the packed tarball
+        if: matrix.part == 'bootstrap'
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -958,6 +963,7 @@ jobs:
 
       # spec: installer/SPEC.md §Requirements — the install blocks' witness, irm | iex under PowerShell 5.1
       - name: run the hosted one-liner against the packed tarball
+        if: matrix.part == 'bootstrap'
         shell: powershell
         run: |
           $ErrorActionPreference = 'Stop'
@@ -1033,6 +1039,7 @@ jobs:
 
       # spec: installer/SPEC.md §Requirements — the attestation check's four outcomes, over the same tarball served below the floor and above it
       - name: the hosted one-liner prints each attestation outcome
+        if: matrix.part == 'bootstrap'
         shell: powershell
         run: |
           $ErrorActionPreference = 'Stop'
@@ -1136,7 +1143,7 @@ jobs:
 
       # spec: installer/SPEC.md §The dependency boundary — the live one-liner reads as text under 5.1
       - name: the live one-liner reads as text under Windows PowerShell 5.1
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && matrix.part == 'bootstrap' }}
         shell: powershell
         run: |
           $ErrorActionPreference = 'Stop'
@@ -1181,14 +1188,17 @@ jobs:
           Write-Host "5.1 reads the live one-liner as a string that parses, changed on comment lines only"
 
       # spec: installer/SPEC.md §The consumer smoke — each platform leg steers the roster at its host
-      - name: install smoke on a native Windows host
+      # spec: installer/SPEC.md §The consumer smoke — a smoke entry runs the setup arms and its part
+      - name: install smoke on a native Windows host, one part of the roster
+        if: matrix.part != 'bootstrap'
         shell: pwsh
         env:
           GATE_SDK_NATIVE_TARGETS_FILE: ${{ env.PWSH_ROSTER }}
           INSTALLER_SMOKE_TMP_DIR: ${{ env.PWSH_SCRATCH }}
           INSTALLER_SMOKE_ARTIFACTS_DIR: ${{ env.PWSH_ARTIFACTS }}
+          PWSH_SMOKE_PART: ${{ matrix.part }}
         run: |
-          ./gate-sdk/bin/run-gates.ps1 --installer-smoke
+          ./gate-sdk/bin/run-gates.ps1 --installer-smoke --part $env:PWSH_SMOKE_PART
           exit $LASTEXITCODE
 
   # spec: gate-sdk/SPEC.md §Consumer payload — the release-shaped producer: one build body, no cross-build
@@ -1202,6 +1212,8 @@ jobs:
       # spec: installer/SPEC.md §The consumer smoke — the per-target index a job-level expression reads
       index: ${{ steps.legs.outputs.index }}
       pwsh_legs: ${{ steps.legs.outputs.pwsh_legs }}
+      # spec: installer/SPEC.md §The consumer smoke — the native Windows leg's entries, its bootstrap steps and each smoke part
+      pwsh_parts: ${{ steps.legs.outputs.pwsh_parts }}
       unix_legs: ${{ steps.legs.outputs.unix_legs }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
@@ -1259,6 +1271,10 @@ jobs:
             echo "bootstrap's leg has no host to run on." >&2
             exit 1
           fi
+          # spec: installer/SPEC.md §The consumer smoke — the count is the smoke roster's, which refuses any other
+          smoke_parts=3
+          pwsh_parts="$(jq -c --argjson n "$smoke_parts" \
+            '[.[] as $leg | (["bootstrap"] + [range(1; $n + 1) | "\(.)/\($n)"])[] | $leg + {part: .}]' <<<"$pwsh_legs")"
           # spec: gate-sdk/SPEC.md §check-crate-arms — the battery's own triple is this image's rustc host, never a literal
           battery_host="$(rustc -vV | awk '/^host:/{print $2}')"
           if [ -z "$battery_host" ]; then
@@ -1272,11 +1288,13 @@ jobs:
             echo "legs=$legs"
             echo "index=$index"
             echo "pwsh_legs=$pwsh_legs"
+            echo "pwsh_parts=$pwsh_parts"
             echo "unix_legs=$unix_legs"
           } >> "$GITHUB_OUTPUT"
           echo "producer legs: $legs"
           echo "declaration index: $index"
           echo "pwsh legs: $pwsh_legs"
+          echo "pwsh entries: $pwsh_parts"
           echo "unix legs (battery host $battery_host excluded): $unix_legs"
 
   # spec: installer/SPEC.md §The consumer smoke — a joined producer leg binds, a held one measures

@@ -30,7 +30,7 @@ pub const KNOBS: &[&str] = &[
 
 const NAME: &str = "installer-smoke";
 const VERDICT: &str = "INSTALLER-SMOKE";
-const USAGE: &str = "usage: --installer-smoke";
+const USAGE: &str = "usage: --installer-smoke [--part <k>/<n>]";
 
 // spec: installer/SPEC.md §The consumer smoke — the three exit classes as a type, so a finding about
 // the payload cannot be raised on a precondition's spelling or the reverse
@@ -133,14 +133,18 @@ impl Drop for Run {
 }
 
 pub fn run(args: &[String]) -> i32 {
-    if let Some(a) = args.first() {
-        eprintln!("{}: unknown argument: {}; {}", NAME, a, USAGE);
-        return 2;
-    }
+    let part = match roster::part_arg(args) {
+        Ok(p) => p,
+        Err(why) => {
+            eprintln!("{}: {}; {}", NAME, why, USAGE);
+            return 2;
+        }
+    };
     let mut state = Run::default();
-    match smoke(&mut state) {
+    match smoke(&mut state, part) {
         Ok(()) => {
-            println!("{} ({})", roster::MARKER, profiles::summary(&state));
+            let of = part.map(|k| format!("; part {} of {}", k, roster::parts())).unwrap_or_default();
+            println!("{} ({}{})", roster::MARKER, profiles::summary(&state), of);
             0
         }
         Err(Outcome::Fail(why)) => {
@@ -156,10 +160,10 @@ pub fn run(args: &[String]) -> i32 {
 
 // spec: installer/SPEC.md §The consumer smoke — the roster is declared first, from the table the
 // headers are printed from, then the preflight, then each arm under its header in table order
-fn smoke(state: &mut Run) -> Step {
-    roster::declare();
+fn smoke(state: &mut Run, part: Option<u8>) -> Step {
+    roster::declare(part);
     roster::preflight(state)?;
-    for row in roster::ARMS {
+    for row in roster::ARMS.iter().filter(|r| roster::runs(r, part)) {
         println!("{}", roster::header(row, state));
         (row.arm)(state)?;
     }
