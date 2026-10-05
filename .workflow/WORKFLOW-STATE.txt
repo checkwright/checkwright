@@ -4,10 +4,4 @@
 
 ---
 
-context-kit-tail-publisher-pass scope a52e1d29 2026-10-05 f282d9b3a
-context-kit-tail-publisher-pass spec a4022598 2026-10-05 fc18a1dcb
-context-kit-tail-publisher-pass align a3b936bb 2026-10-05 a48f7f46b
-context-kit-tail-publisher-pass build a77cfeeb 2026-10-05 d1aa07fba
-context-kit-tail-publisher-pass build affa4a77 2026-10-05 5f2b56ef0
-context-kit-tail-publisher-pass validate ab81da5f 2026-10-05 9ce8801da
-context-kit-tail-publisher-pass close a09f13b6 2026-10-05 c9589e462
+— scope a8238f73 2026-10-05 8f5628e31
