@@ -68,17 +68,19 @@ function Test-Entry {
     return $false
 }
 
-# spec: gate-sdk/SPEC.md §run-gates — a git directory's physical path, every symbolic link and junction on it resolved one component at a time, which the stub's `cd … && pwd -P` and the crate's canonicalize compare and Resolve-Path alone does not; $null where it does not resolve
+# spec: gate-sdk/SPEC.md §run-gates — a git directory's physical path, every symbolic link and junction on it resolved one component at a time before a `..` past it is taken, which the stub's `cd … && pwd -P` and the crate's canonicalize compare and Resolve-Path, folding a `..` lexically and following no link, does not; $null where it does not resolve
 function Resolve-GitDir {
     param([string] $Path)
     if (-not $Path) { return $null }
-    $r = Resolve-Path -LiteralPath $Path -ErrorAction SilentlyContinue
-    if (-not $r) { return $null }
     $seps = [char[]]@([System.IO.Path]::DirectorySeparatorChar, [System.IO.Path]::AltDirectorySeparatorChar)
-    $full = [string] $r.ProviderPath
-    $cur = [System.IO.Path]::GetPathRoot($full)
+    $base = (Get-Location).ProviderPath
+    try {
+        $full = if ([System.IO.Path]::IsPathRooted($Path)) { $Path } else { $base + [System.IO.Path]::DirectorySeparatorChar + $Path }
+        $root = [System.IO.Path]::GetPathRoot($full)
+    } catch { return $null }
+    $cur = if ($root.TrimEnd($seps)) { $root } else { [System.IO.Path]::GetPathRoot($base) }
     $todo = New-Object 'System.Collections.Generic.List[string]'
-    $todo.AddRange([string[]] $full.Substring($cur.Length).Split($seps, [StringSplitOptions]::RemoveEmptyEntries))
+    $todo.AddRange([string[]] $full.Substring($root.Length).Split($seps, [StringSplitOptions]::RemoveEmptyEntries))
     $hops = 0
     while ($todo.Count -gt 0) {
         $name = $todo[0]
