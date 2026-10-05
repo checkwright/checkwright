@@ -71,7 +71,7 @@ scripts/drift-config.knobs binds `DRIFT_KIT_MANUAL_OPS_IGNORE` to this repositor
 - **The attribution** (delta 1): the stage-economics meter's transcript-to-row-key assignment, which `native/src/emit/stage_economics.rs` computes inside its passes (`supervision_pass`, `fanout_pass`) today. It is exposed for this arm's call and the meter keeps its output, which drift-kit/smoke/install.sh's stage-economics fixtures hold.
 - **The shell key** (delta 1): `ranking_key` in `native/src/emit/scan_prompts.rs`, called unchanged; guard-kit's contract is read, not changed.
 - **The knobs** (delta 3): read by the arm; their roster readers are `--emit knob-roster`, which `check-knob-citation` resolves knob citations against and `check-knob-default-coupling` couples a scalar default through, and the table validator.
-- **Roster-holding readers of the new arm**, each red when it is missing: the `ARMS` table's own unit test, which resolves each row to its file and reds a file with no test module (gate-sdk/SPEC.md §The non-gate arm); this repository's `check-crate-arms`, which runs the crate's tests; and `check-reads-couples` and `check-gate-substrate-parity`, which read a row's declared knobs. drift-kit/README.md's arm list is hand prose no gate holds, and `.workflow/release-declarations.md` takes the arm and its knobs under its *Behavior changes* and *Knob changes* sections. The on-site mirrors of drift-kit's SPEC and README regenerate by the command their freshness gate prints. The arm writes under `.metric/`, already gitignored and outside the close-surface roster, so no `.gitignore` line and no `close-surface:` declaration is owed.
+- **Roster-holding readers of the new arm**, each red when it is missing: the `ARMS` table's own unit test, which resolves each row to its file and reds a file with no test module (gate-sdk/SPEC.md §The non-gate arm); this repository's `check-crate-arms`, which runs the crate's tests; and `check-reads-couples` and `check-gate-substrate-parity`, which read a row's declared knobs. drift-kit/README.md's arm list and `/economics` sentence are hand prose no gate holds, and `.workflow/release-declarations.md` takes the arm and its knobs under its *Behavior changes* and *Knob changes* sections. The on-site mirrors of drift-kit's SPEC and README regenerate by the command their freshness gate prints. The arm writes under `.metric/`, already gitignored and outside the close-surface roster, so no `.gitignore` line and no `close-surface:` declaration is owed.
 - **Corpus narrowing:** none.
 
 ## Existing sections updated
@@ -82,8 +82,8 @@ scripts/drift-config.knobs binds `DRIFT_KIT_MANUAL_OPS_IGNORE` to this repositor
 - `native/src/knobs/drift_kit.rs` — the three rows and the integer validator (delta 3).
 - drift-kit/smoke/install.sh and `drift-kit/smoke/manual-ops-fixture.jsonl`, new (delta 4).
 - .claude/commands/close.md, scripts/drift-config.knobs (delta 5).
-- drift-kit/README.md's arm list, `.workflow/release-declarations.md`, and the drift-kit SPEC and README mirrors (all deltas).
-- `.workflow/surface-ceiling.txt` — drift-kit/SPEC.md's row re-stamped where the merge grows it past its ceiling, before `drift-kit-tail-brevity` passes the file and re-stamps it again (all deltas).
+- drift-kit/README.md's arm list and its `/economics` sentence, which names the two-step chain `overhead-meter → stage-economics` and takes the third step (delta 2), `.workflow/release-declarations.md`, and the drift-kit SPEC and README mirrors (all deltas).
+- `.workflow/surface-ceiling.txt` — the rows of drift-kit/templates/economics.md (delta 2) and .claude/commands/close.md (delta 5) re-stamped where they grow, and drift-kit/SPEC.md's row re-stamped where the merge grows it past its ceiling, before `drift-kit-tail-brevity` passes the file and re-stamps it again (all deltas).
 
 ## Retired spellings
 

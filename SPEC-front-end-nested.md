@@ -82,6 +82,7 @@ A `#[cfg(unix)]` case carries the dangling `.git` symlink. The parity arm alread
 - plugin/SPEC.md §The guards (delta 4).
 - `native/src/emit/front_end_parity.rs` (delta 5).
 - The on-site mirrors of gate-sdk's, context-kit's and plugin's SPECs (all deltas).
+- `.workflow/surface-ceiling.txt` — the rows of gate-sdk/SPEC.md, context-kit/SPEC.md and plugin/SPEC.md re-stamped where a delta grows them past their ceilings (all deltas).
 
 ## Retired spellings
 
