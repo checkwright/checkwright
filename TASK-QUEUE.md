@@ -8,25 +8,13 @@
 
 ## New Features
 
-### footprint-arm-publisher-page
-
-[spec: SPEC-footprint-publisher-arm.md]
-
-context-kit's `--emit footprint` arm ships in the binary but prints this site's page: Jekyll front matter (`nav_parent: value`), the site's own title and regen command, and a kit roster derived from `*/SPEC.md` files the payload withholds. In an adopter's tree it measures nothing of theirs, yet context-kit/README.md lists it among the adopter tools. Its gate, `check-footprint-fresh`, was withheld at `small-kit-value-audit`, which audited gates and did not reach this non-gate arm, so this is DISTINCT from that unit.
-
-**Deliverable:** one of two dispositions, chosen at spec: withhold the arm from the README and the payload docs as a publisher tool, or make the preamble and the roster knobs an adopter can set.
-
-**Selected 2026-10-05** for context-kit-tail-publisher-pass, operator direction lead-relayed (not a ruling). A feature, so the spec stage authors its amendment and promotes it, before [context-kit-tail-brevity](#context-kit-tail-brevity) passes §bin/footprint and §check-footprint-fresh. An amendment naming `docs/context-kit/SPEC.md` as a regenerate target meets `check-stage-entry` assertion C's mirror over-demand ([audit-trigger-mirror-component](#audit-trigger-mirror-component)).
-
-**Cost while deferred:** an adopter running a listed tool gets a page about Checkwright. Filed 2026-10-01 to the gap inbox at context-kit-value-pass' build; promoted 2026-10-01 at its close: →fix fails because the choice between the two dispositions is a design call and the second adds knobs, →forward because no ruling is owed. Re-verified: the arm's output opens with the front matter, and the README's tool list carries `--emit footprint`. Owner lookup: `footprint` in this file — none; owner context-kit/SPEC.md §bin/footprint.
-
 ## Technical Debt
 
 ### context-kit-tail-brevity
 
 context-kit/SPEC.md's sections no brevity slice has passed: the preamble, §The always-loaded meter through §check-footprint-fresh, §Testing and §Out of scope, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): about 10.4k of the file's 19.1k words at this scope, and all 67 of its `check-prose-bounds` findings with the ceiling knob emptied (§Testing 26).
 
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey; the file's ceiling row re-stamped. Applied after [footprint-arm-publisher-page](#footprint-arm-publisher-page)'s amendment merges, so §bin/footprint and §check-footprint-fresh are passed once.
+**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey; the file's ceiling row re-stamped. Applied after `footprint-arm-publisher-page`'s amendment merges, so §bin/footprint and §check-footprint-fresh are passed once.
 
 **Cost while deferred:** paid by every session and adopter that reads those context-kit sections. Filed 2026-10-05 as a split at scope. Part of the operator's selection of the unit set, direction 2026-10-05, lead-relayed (not a ruling); with it context-kit leaves the parent.
 
@@ -1221,4 +1209,5 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 - fence-reader-list-item
 - crosser-twin-identity-edges
 - install-tar-exit-check
+- footprint-arm-publisher-page
 

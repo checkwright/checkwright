@@ -211,7 +211,9 @@ The meter lives here, not in drift-kit's collator, because the *metric* is conte
 
 ## bin/footprint
 
-The footprint emitter publishes the kits' measured context footprint — the adoption-cost evidence a consumer weighs before vendoring, the concrete form of the token-economics positioning. Where the meter reads one consumer's live always-loaded total, this reads the tracked kit surfaces and attributes the cost per kit, split by when it lands.
+The footprint emitter publishes the kits' measured context footprint, attributed per kit and split by when the cost lands: the adoption-cost evidence a consumer weighs before vendoring, the concrete form of the token-economics positioning. Where the meter reads one consumer's live always-loaded total, this reads the tracked kit surfaces.
+
+**It is the publisher's own arm, and no adopter-facing surface lists it.** It prints the publisher's page, front matter and regeneration command included, over a roster derived from the `SPEC.md` files the payload withholds (gate-sdk/SPEC.md §Consumer payload). In an adopter's tree it gives no vendored kit a row, and gives one to any directory of theirs carrying a `SPEC.md`. The arm stays in the binary because §check-footprint-fresh and the value rollup call its library function in process. An adopter reads its own context cost off the meter. Knobs for the page head and the roster are refused: they would buy an adopter load-triggered figures the published page already prints, a kit's templates shipping byte for byte, and an always-loaded share the meter already counts.
 
 The measured set is **derived, not maintained**: every top-level directory carrying a `SPEC.md`. No knob names it and nothing tests for kit-hood, so a directory joins the page by acquiring a `SPEC.md` — which makes a measured row a statement about that directory's context cost and never a claim that it is a kit. A directory that ships no always-loaded block and no `templates/` tree scores an empty tier in both columns and is reported at that, rather than filtered out: the derivation has one rule and a suppression would be a second.
 
@@ -376,7 +378,7 @@ Fail-closed (exit 2) when it cannot read what is present to check: a local setti
 
 ## check-footprint-fresh
 
-**It is the publisher's own gate and does not ship.** Its subject is the publisher's footprint page, and its kit roster derives from `*/SPEC.md` files the payload withholds (gate-sdk/SPEC.md §Consumer payload), so an adopter's tree holds nothing it could measure. The descriptor and its fixture pair sit in the publisher's gates dir; the rule stays in the crate.
+**It is the publisher's own gate and does not ship**, on §bin/footprint's ground: its subject is that arm's page. The descriptor and its fixture pair sit in the publisher's gates dir; the rule stays in the crate.
 
 `check-footprint-fresh` (hermetic, `precommit`) byte-compares the committed footprint page (`CONTEXT_KIT_FOOTPRINT_FILE`) against the footprint emitter, the `check-docs-mirror-fresh`/`check-trajectory-fresh` posture: a generated, freshness-gated projection is Derivation-first's sanctioned copy, so the maintainer re-runs the emitter after any change to a measured surface and a stale page reddens the battery. Its `# graph:` manifest couples the measured surfaces — the configured agent file and each kit's `templates/` tree — and the `*/SPEC.md` glob the kit roster derives from, so an edit to what the page counts, or a kit arriving or leaving, re-fires the gate.
 

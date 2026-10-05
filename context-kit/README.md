@@ -1,6 +1,6 @@
 # context-kit
 
-Token-economics-aware context management for stateless agent sessions: an index-first reading toolset, a session-start hook that assembles a compact brief, a meter that tracks the always-loaded surface against a committed baseline, one gate over its governed always-loaded sections, a per-kit token-footprint projection, a close-stage brevity pass that reacts to the meter's delta, and a memory-off gate pair (settings pins plus a local memory-dir scan) that keeps the harness's ungoverned auto-memory surface disabled.
+Token-economics-aware context management for stateless agent sessions: an index-first reading toolset, a session-start hook that assembles a compact brief, a meter that tracks the always-loaded surface against a committed baseline, one gate over its governed always-loaded sections, a close-stage brevity pass that reacts to the meter's delta, and a memory-off gate pair (settings pins plus a local memory-dir scan) that keeps the harness's ungoverned auto-memory surface disabled.
 
 Why: a stateless session pays for context twice. The *on-demand* cost is opening a whole SPEC or source file when one section was needed — the index tools cut that ("index, then read the one you need"). The *standing* cost is the always-loaded surface (the instructions file, the session-start hook output) where every added line is a recurring per-session tax that grows silently, because no single session sees the trend — the meter, the gate, and the close-stage pass make that growth visible and actionable. See [SPEC.md](SPEC.md) for the full contracts.
 
@@ -43,7 +43,6 @@ gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --emit pub-index [paths…]           # public API surface (per-language extractors; ships rust, ts)
 "$gates" --emit always-loaded                 # standing surface vs baseline (one line)
 "$gates" --emit always-loaded --update-baseline   # a close-stage act
-"$gates" --emit footprint     # per-kit token footprint (the committed page)
 "$gates" --emit env-probe     # re-probe the local machine profile (ENV.local.md)
 ```
 
