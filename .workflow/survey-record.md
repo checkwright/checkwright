@@ -1,1 +1,15 @@
 # contract: lifecycle-kit/SPEC.md §The survey record — carried surveys, one block per survey; boundary-truncated, cited only behind a passing witness.
+
+## 2026-10-05 scope — Which deferred entries rank first for this iteration, and what do their inbound citations and supersession pairings say?
+- corpus: TASK-QUEUE.md
+- oracle: bash gate-sdk/bin/run-gates.sh --emit queue-edges
+- rev: d37b83306df40b066071e3b0a983d2086671bf7f
+- finding: Tier one: spec-brevity-residue (session/high, roadmap now, evidence-kit next in its order) leads; audit-trigger-mirror-component (iteration/low, lifecycle-kit) and heterogeneous-agent-delegation (iteration/low, delegation-kit, roadmap now) follow, neither on the lead's surface and both features, so neither joins a debt set. No deferred entry reaches the recurrence threshold of 2 (max one date). Tier two roadmap rows design-partner-preview and companion-toolkit-profile wait on operator hours or an observed install, no stage work; tarball-attestation-observed waits on a release run. Inbound edges: design-partner-preview 3; heterogeneous-agent-delegation, plugin-harness-reach, companion-toolkit-profile, benchmark-ab-experiment 2 each; no shortlisted candidate argues from a retired premise, and spec-brevity-residue's retired edges are its own slice list. Board rows by surface after the drain: gate-sdk 9, drift-kit 5, lifecycle-kit, docs and delegation-kit 4 each, evidence-kit 3, six surfaces 2 each, six 1 each. evidence-kit rows beside the lead: liveness-windows-misread (its remedy changes the lock's stated residual, so an amendment) and hosted-attestation-service (roadmap later). Supersession grep over evidence-kit/SPEC.md, run-gates.ps1, front_end_parity, docs/install.md and its marked blocks: liveness-windows-misread writes into the lock section the front slice passes (order only); install-page-split relocates the blocks install-windows-stop-policy edits (independent); native-executable-git-hooks and install-smoke-sh-matrix touch neither deliverable.
+- inferred: none
+
+## 2026-10-05 scope — How large is evidence-kit/SPEC.md's brevity remainder, and where does it split?
+- corpus: evidence-kit/SPEC.md
+- oracle: CANON_KIT_PROSE_BOUND_CEILING_FILE= bash gate-sdk/bin/run-gates.sh --only check-prose-bounds
+- rev: d37b83306df40b066071e3b0a983d2086671bf7f
+- finding: No brevity slice has passed any section. The file is about 15.4k words by wc -w with 119 check-prose-bounds findings, half again the largest slice an iteration has passed whole, so it takes two. Front: the preamble, Layout and configuration, and Per-component contracts from The evidence adapters through The baseline-claims arm (Baseline manifest, Evidence manifest, The producer-liveness lock, bin/run-validate.sh, bin/diff-baseline.sh), about 8.5k words and 60 findings. Tail: check-evidence-baseline, check-evidence-manifest, check-battery-roster, check-producer-liveness, lifecycle-kit integration and Producers and consumers, about 7.0k words and 59 findings.
+- inferred: none
