@@ -76,7 +76,7 @@
 4672cp docs/posts/2026-09-30-checkwright-v0-31-0.md
 1460cp docs/queue-kit/index.md
 789cp docs/releases.md
-43913cp docs/site-architecture.md
+43963cp docs/site-architecture.md
 2412cp docs/site-kit/index.md
 4706cp docs/spec-toolkits.md
 2912cp docs/speckit.md
@@ -86,7 +86,7 @@
 2698cp drift-kit/templates/close-knowledge.md
 4257cp drift-kit/templates/economics.md
 97080cp evidence-kit/SPEC.md
-955642cp gate-sdk/SPEC.md
+955958cp gate-sdk/SPEC.md
 2899cp gate-sdk/templates/adopt.md
 281884cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md

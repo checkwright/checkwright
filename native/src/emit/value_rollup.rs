@@ -22,8 +22,8 @@ struct Join {
     total_triggered: String,
 }
 
-// spec: context-kit/SPEC.md §bin/footprint — the rollup's cost columns are the token figure alone,
-// the `~<n>t` the footprint cell carries; an absent tier stays an em dash
+// spec: docs/site-architecture.md §Generated projections and their freshness gates — the cost
+// cell is the footprint's token figure alone, an absent tier an em dash
 fn token_cell(cp: usize, bytes: usize) -> String {
     if cp == 0 && bytes == 0 {
         return "\u{2014}".to_string();

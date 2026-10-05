@@ -490,7 +490,7 @@ crate code under `cfg(not(unix))` is linted at the MSRV only by `native-artifact
 
 ### journal-append-arm
 
-[cost: event/low] [surface: delegation-kit]
+[cost: event/low] [surface: delegation-kit] [recurrence: 2026-10-05]
 
 resume-journal appends are the top hand shape after the gate door in `--emit manual-ops`' first rankings: `printf >>` 47 calls in 6 sessions and `cat >>` 24 in 5 at drift-kit-tail-crosser-pass, every stage. Each spells the path `--enter-stage` printed, and the shell guard splits the write from any other command, so each append is its own call.
 
@@ -507,6 +507,26 @@ resume-journal appends are the top hand shape after the gate door in `--emit man
 **Deliverable:** a door-aware sub-key, the door plus its arm word, one key across the door's spellings, in drift-kit/SPEC.md §The manual-operation meter or guard-kit/SPEC.md §scan-prompts; which owner is spec's.
 
 **Cost while deferred:** a repeated arm, the strongest tooling candidate the meter could name, stays invisible. Filed 2026-10-05 to the gap inbox at that iteration's build; promoted at its close: →fix fails because the key is shared with the prompt-friction ranking, so a change reaches two kits, →forward because no ruling is owed. Re-verified: the meter at close ranks the first spelling first and the second seventh; the split across spellings is new at the drain. Owner lookup: `ranking key`, `sub-key`, `manual-op` in this file — none; owner drift-kit/SPEC.md §The manual-operation meter.
+
+### fence-toggle-list-item
+
+[cost: event/low] [surface: canon-kit]
+
+the toggle fence parsers keyed on `spec::is_fence_line` (`native/src/spec.rs`: `docs_mirror`, `manifest_temporal`, `spec_pointer`, `citation_link`, `prose_tells`, `task_path_claim` and the rest, 17 modules) and `check-spec-fence-balance` read a list-item fence opener (`- ```sh`) as no delimiter, while `fence_opening` (`native/src/gates/fence_command_head.rs`) and `check-fence-run` read it as kramdown renders it. An odd count of list-item fences in a manifest-set file reds the balance gate with a misleading "close the unbalanced fence"; an even count passes it and inverts every toggle parser's span between them, so those gates scan fence bodies as prose and skip the prose between.
+
+**Deliverable:** one fence-line reader taking the list-item opener and its indented closer, shared by every toggle parser and the balance gate, with a list-item fence case in each affected gate's fixtures; canon-kit/SPEC.md §The shared spec adapters and §check-spec-fence-balance state the shape.
+
+**Cost while deferred:** latent while no governed doc carries a list-item fence; the first adopter writing one meets a false balance red or silently unscanned prose. Filed 2026-10-05 to the gap inbox at context-kit-tail-publisher-pass' build; promoted at its close: →fix fails because the reader is shared by 17 gate modules whose fixtures each owe a case, and its directive binds it to the awk driver's fence shape, so a change is a cross-gate reader contract; →forward because no ruling is owed. Re-verified: `is_fence_line` strips leading blanks only, and `fence_opening` strips a list-item marker too. Owner lookup: `list-item`, `is_fence_line`, `fence balance` in this file — fence-reader-list-item, landed this iteration, DISTINCT (its deliverable named the `fences_of` readers alone); owner canon-kit/SPEC.md §check-spec-fence-balance.
+
+### trajectory-limits-unstated
+
+[cost: event/low] [surface: drift-kit]
+
+drift-kit/SPEC.md §The published-evidence extractor says the extractor "states plainly that no controlled ungoverned baseline exists", and that the knowledge-friction exclusion is "stated as a limitation on the framing page". `native/src/emit/trajectory.rs` prints neither: its `--human` header is two lines naming neither limit, and no framing page exists, since `docs/evidence-data.md` is the bare table.
+
+**Deliverable:** the two limits stated where a reader of the published evidence meets them, either in the arm's output or on a framing page around the committed projection, or the SPEC's two claims narrowed to what the arm prints; which one is spec's.
+
+**Cost while deferred:** a reader trusting the SPEC believes the published evidence carries its own caveats, and it carries none. Filed 2026-10-05 to the gap inbox at context-kit-tail-publisher-pass' build; promoted at its close: →fix fails because choosing between the arm stating the limits and the SPEC dropping the claim changes asserted behaviour, and the self-referential framing it qualifies is on record; →forward because no ruling is owed for the first branch. Re-verified: the `--human` branch of `emit` pushes the two header lines alone, and no `docs/` page outside the SPEC mirrors names an ungoverned baseline. Owner lookup: `ungoverned`, `framing page`, `trajectory` in this file — benchmark-ab-experiment, DISTINCT (the controlled experiment itself); owner drift-kit/SPEC.md §The published-evidence extractor.
 
 ## Icebox
 
