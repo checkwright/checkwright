@@ -501,7 +501,7 @@ fn toplevel_args(dir: Option<&str>) -> Result<Option<String>, String> {
         return Ok(None);
     };
     let prefix = lines.next().unwrap_or("");
-    match nested_mark(&top, prefix) {
+    match nested_mark(dir, &top, prefix) {
         None => Ok(Some(top)),
         Some(mark) => Err(format!(
             "git answers the toplevel {} at {}, though {} marks a repository beneath it — git skips a repository it cannot read and answers the enclosing one, which is not read as this tree's (`git --git-dir={} status` prints git's reason)",
@@ -513,18 +513,39 @@ fn toplevel_args(dir: Option<&str>) -> Result<Option<String>, String> {
     }
 }
 
-// spec: gate-sdk/SPEC.md §The crate's crosser — a `.git` entry of any type on git's own prefix
-// beneath the toplevel it answered, nearest the anchor first; under a `GIT_DIR` git discovers
-// nothing, so nothing was skipped
-fn nested_mark(top: &str, prefix: &str) -> Option<PathBuf> {
+// spec: gate-sdk/SPEC.md §The crate's crosser — the nearest `.git` entry of any type on git's own
+// prefix beneath the toplevel it answered, unless it is the repository git selected; under a
+// `GIT_DIR` git discovers nothing, so nothing was skipped
+fn nested_mark(dir: Option<&str>, top: &str, prefix: &str) -> Option<PathBuf> {
     if std::env::var_os("GIT_DIR").is_some_and(|d| !d.is_empty()) {
         return None;
     }
     let runs: Vec<&str> = prefix.split('/').filter(|s| !s.is_empty()).collect();
-    (1..=runs.len()).rev().find_map(|n| {
+    let mark = (1..=runs.len()).rev().find_map(|n| {
         let mark = child(Path::new(top), &format!("{}/.git", runs[..n].join("/")));
         mark.symlink_metadata().is_ok().then_some(mark)
-    })
+    })?;
+    (!selected_repository(dir, &mark)).then_some(mark)
+}
+
+// spec: gate-sdk/SPEC.md §The crate's crosser — git's `--absolute-git-dir` answer is the repository
+// it selected, which a `GIT_WORK_TREE` above it puts on the prefix; asked only once a mark is found
+fn selected_repository(dir: Option<&str>, mark: &Path) -> bool {
+    let mut args: Vec<&str> = dir.map(|d| vec!["-C", d]).unwrap_or_default();
+    args.extend_from_slice(&["rev-parse", "--absolute-git-dir"]);
+    let Ok(c) = crate::proc::run(&programs::GIT, &args) else { return false };
+    let Some(out) = c.stdout() else { return false };
+    let out = String::from_utf8_lossy(out);
+    let selected = out.strip_suffix('\n').unwrap_or(&out);
+    let target = match fs::read_to_string(mark) {
+        Ok(text) => match text.lines().next().and_then(|l| l.strip_prefix("gitdir: ")) {
+            Some(t) if path_root(t.trim_end()).is_some() => PathBuf::from(t.trim_end()),
+            Some(t) => child(mark.parent().unwrap_or(Path::new("")), t.trim_end()),
+            None => return false,
+        },
+        Err(_) => mark.to_path_buf(),
+    };
+    matches!((canonicalize(&target), canonicalize(selected)), (Some(a), Some(b)) if a == b)
 }
 
 // spec: gate-sdk/SPEC.md §The crate's crosser — git's stderr cannot tell a broken repository from
@@ -1524,6 +1545,42 @@ mod tests {
         std::os::unix::fs::symlink(d.join("absent"), inner.join(".git")).expect("symlink");
         let refused = toplevel_in_opt(&normalize_abs(&inner.display().to_string())).expect_err("a dangling .git symlink read as the enclosing repository");
         assert!(refused.contains("inner/.git marks a repository beneath it"), "{}", refused);
+        if let Some(v) = inherited {
+            env.set("GIT_DIR", &v);
+        }
+        let _ = std::fs::remove_dir_all(&d);
+    }
+
+    // spec: gate-sdk/SPEC.md §The crate's crosser — a `GIT_WORK_TREE` above the repository git
+    // selected puts that repository's `.git` on the prefix, a directory or a gitfile; it is no mark
+    #[test]
+    fn the_repository_git_selected_under_a_work_tree_above_it_is_not_refused() {
+        let env = crate::knobenv::lock();
+        let inherited = std::env::var("GIT_DIR").ok();
+        env.remove("GIT_DIR");
+        env.remove("GIT_CEILING_DIRECTORIES");
+        let d = std::env::temp_dir().join(format!("walk-toplevel-worktree-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        let (outer, inner) = (d.join("outer"), d.join("outer").join("inner"));
+        std::fs::create_dir_all(inner.join("sub")).expect("scratch");
+        git_init(&inner);
+        let at = normalize_abs(&inner.join("sub").display().to_string());
+        env.set("GIT_WORK_TREE", &outer.display().to_string());
+        let selected = toplevel_in_opt(&at);
+        assert!(matches!(&selected, Ok(Some(t)) if t.ends_with("/outer")), "the selected repository read as skipped: {:?}", selected);
+        std::fs::create_dir_all(inner.join("sub").join(".git")).expect("scratch");
+        let skipped = toplevel_in_opt(&at).expect_err("a broken repository nearer than the selected one read as none");
+        assert!(skipped.contains("sub/.git marks a repository beneath it"), "{}", skipped);
+        std::fs::remove_dir_all(inner.join("sub").join(".git")).expect("unmark");
+        std::fs::remove_dir_all(inner.join(".git")).expect("unmark");
+        env.remove("GIT_WORK_TREE");
+        let (sep, inner_s) = (d.join("sep").display().to_string(), inner.display().to_string());
+        let c = crate::proc::run(&programs::GIT, &["init", "-q", "--separate-git-dir", sep.as_str(), inner_s.as_str()]).expect("git spawns");
+        assert!(c.stdout().is_some(), "git init failed: {:?}", c.failure_report());
+        env.set("GIT_WORK_TREE", &outer.display().to_string());
+        let gitfile = toplevel_in_opt(&at);
+        assert!(matches!(&gitfile, Ok(Some(t)) if t.ends_with("/outer")), "a gitfile naming the selected repository read as skipped: {:?}", gitfile);
+        env.remove("GIT_WORK_TREE");
         if let Some(v) = inherited {
             env.set("GIT_DIR", &v);
         }

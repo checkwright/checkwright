@@ -48,14 +48,6 @@ the front ends change to git's toplevel before the binary runs (the `cd` in gate
 
 ## Technical Debt
 
-### crosser-nested-mark-env
-
-`nested_mark` in `native/src/walk.rs` refuses a valid repository under `GIT_WORK_TREE`: with `GIT_DIR` unset and `GIT_WORK_TREE` naming a directory above the discovered repository, git answers that directory as toplevel and the repository's own directory as prefix at exit 0, so the scan finds the repository's `.git` and every crosser caller exits 2. Its other exception, no mark under a non-empty `GIT_DIR`, is carried by the code comment and its test alone; gate-sdk/SPEC.md §The crate's crosser states the zero-exit refusal with none.
-
-**Deliverable:** the nested check telling the repository git selected (its `--git-dir` answer) from a skipped mark, a test under `GIT_WORK_TREE`, and both exceptions stated in §The crate's crosser.
-
-**Cost while deferred:** a run under a `GIT_WORK_TREE` above the repository is refused outright. Filed 2026-10-05 to the gap inbox as two bullets by queue-kit-arms-crosser-pass' close, its second-vendor review; promoted together at the next iteration's scope: →fix fails because the selected-repository read changes a crosser verdict with a test, →forward because no ruling is owed. Re-verified: a fresh repository at `.tmp/wtprobe/inner` under `GIT_WORK_TREE=..` answers `.tmp/wtprobe` and `inner/` at exit 0, and `--emit close-surfaces` there refuses naming `inner/.git`. Owner lookup: `nested_mark`, `GIT_WORK_TREE`, `GIT_DIR` in this file — none; owner gate-sdk/SPEC.md §The crate's crosser.
-
 ### crosser-git-fidelity-edges
 
 two crosser edges against git. `toplevel_args` in `native/src/walk.rs` reads the toplevel and prefix answer with `lines()`, so a path component holding a newline truncates the prefix and can hide a skipped mark (static reading, untested). `repository_mark`'s ceiling stop canonicalizes a relative `GIT_CEILING_DIRECTORIES` entry where git ignores it, and gate-sdk/bin/run-gates.sh's own mark walk repeats that.
@@ -1225,4 +1217,6 @@ A balanced Liquid token a docs page means literally parses and renders blank, an
 Ported gate and emit modules carry spec: comments citing a section for a literal or a port note the section does not state, so a reader following the pointer finds no support for it; a crate-wide sweep would retag, delete or relocate each, and a new instance returns the entry.
 
 ## Done
+
+- crosser-nested-mark-env
 
