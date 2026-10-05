@@ -182,7 +182,9 @@ Run this block in PowerShell first. It puts Git's `usr\bin` and `bin` on your `P
 
 ```powershell
 . {
-  $git = Split-Path (Split-Path (Split-Path ((git --exec-path) -replace '/', '\')))
+  $exec = if (Get-Command git -ErrorAction SilentlyContinue) { git --exec-path }
+  if (-not $exec -or $LASTEXITCODE -ne 0) { throw 'git --exec-path named no directory: install Git for Windows, then run this block again' }
+  $git = Split-Path (Split-Path (Split-Path ($exec -replace '/', '\')))
   [Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + ";$git\usr\bin;$git\bin", 'User')
   $env:PATH = "$git\usr\bin;$git\bin;$env:PATH"
 }
@@ -201,10 +203,11 @@ The script is `docs/install.ps1` in this repository; read it at <https://checkwr
 <details markdown="1">
 <summary>Step by step</summary>
 
-Download the release, in PowerShell:
+Download the release, in PowerShell. Its first line stops this session at a failed command, here and below:
 
 ```powershell
 . {
+  $ErrorActionPreference = 'Stop'
   $v = 'X.Y.Z'
   $cw = Join-Path ([IO.Path]::GetTempPath()) ([IO.Path]::GetRandomFileName())
   New-Item -ItemType Directory $cw | Out-Null
