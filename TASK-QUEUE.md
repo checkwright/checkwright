@@ -38,28 +38,6 @@ drift-kit/SPEC.md carries this repo's publisher wiring in a payload SPEC: §The 
 
 **Cost while deferred:** every adopter reading the two sections meets wiring that is not theirs. Filed 2026-10-05 to the gap inbox by drift-kit-tail-crosser-pass' close (its provenance-seam-residue audit); promoted at the next scope: →fix fails because relocating the fixture-pair description is a placement judgment beside a battery run, →forward because no ruling is owed. Re-verified: all four sites grep at drift-kit/SPEC.md lines 141, 146, 161, 442 and 497. Owner lookup: `Consumer wiring`, `publisher wiring` in this file — none; owner drift-kit/SPEC.md.
 
-### crosser-twin-identity-edges
-
-The crosser's nested-mark twins disagree on two identity edges. `native/src/walk.rs`' gitfile read trims every trailing whitespace off a `gitdir:` target (`trim_end`), where `gate-sdk/lib/gate.sh` `gate_skipped_mark` strips only a CR. `gate-sdk/bin/run-gates.ps1` compares `Resolve-Path` spellings (`Resolve-GitDir`), which resolve no symlink, where the shell and the crate compare physical paths, so a symlinked `.git` or gitdir target can refuse in PowerShell alone. `native/src/emit/front_end_parity.rs` carries no selected nested gitfile and no symlinked starting-directory case.
-
-**Inferred, cannot run before build:** that `run-gates.ps1` refuses a symlinked `.git` or gitdir target the shell and the crate accept — no PowerShell on the authoring host, so the parity case this entry adds, run on the CI Windows legs, is the first witness.
-
-**Push need (2026-10-05, inside the budget):** the one mid-iteration push, shared with [install-tar-exit-check](#install-tar-exit-check): the PowerShell twin and its parity cases run only on the CI Windows legs.
-
-**Deliverable:** the crate's gitfile read stripping CR/LF only, the PowerShell twin comparing resolved physical paths, and both cases added to the parity corpus. Owner gate-sdk/SPEC.md §The crate's crosser and §run-gates' twin.
-
-**Cost while deferred:** a gitfile or symlink layout no parity case reaches can select differently per front end. Filed 2026-10-05 to the gap inbox by drift-kit-tail-crosser-pass' close (its second-vendor review); promoted at the next scope: →fix fails because the PowerShell half needs a Windows leg, →forward because no ruling is owed. Re-verified: one premise settled by probe — git refuses a gitfile whose target carries trailing spaces (exit 128), so the shell twin matches git and the crate accepts what git refuses. Owner lookup: `trim_end`, `Resolve-GitDir`, `gitfile` in this file — none.
-
-### install-tar-exit-check
-
-docs/install.md's `windows-install` block runs System32 `tar.exe` and then the unpacked bootstrap's `init` with no `$LASTEXITCODE` check between, so a failed unpack runs `init` from whatever an earlier extraction left in the package dir, or fails on a missing file. Windows PowerShell 5.1 takes a native non-zero exit as no terminating error, the case canon-kit/SPEC.md §check-fence-paste-unit's honest limit tells a block to check with a throw.
-
-**Deliverable:** a `$LASTEXITCODE` test that throws after `tar.exe`, witnessed by the install-smoke legs that read the marked block.
-
-**Push need (2026-10-05, inside the budget):** the one mid-iteration push, shared with [crosser-twin-identity-edges](#crosser-twin-identity-edges): the witnessing install-smoke legs run only on CI Windows hosts.
-
-**Cost while deferred:** a Windows adopter whose unpack fails gets a misleading `init` result. Filed 2026-10-05 to the gap inbox by drift-kit-tail-crosser-pass' close (its second-vendor review); promoted at the next scope: →fix fails because its witness is a Windows CI leg no local run reaches, →forward because no ruling is owed. Re-verified: lines 232–233 of the block, no check between. Owner lookup: `LASTEXITCODE`, `tar.exe` in this file — none; install-page-split moves the block's readers, independent.
-
 ## Deferred
 
 ### foreign-project-critique
@@ -1241,4 +1219,6 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 ## Done
 
 - fence-reader-list-item
+- crosser-twin-identity-edges
+- install-tar-exit-check
 
