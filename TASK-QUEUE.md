@@ -1212,8 +1212,3 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 
 ## Done
 
-- twin-gitdir-dotdot-fold
-- install-windows-stop-policy
-- install-page-split
-- evidence-kit-front-brevity
-
