@@ -476,6 +476,58 @@ the delivery rule under `lead-notification-wake-race`'s remedy, unprobed: does a
 
 **Cost while deferred:** a consumer giving two roles one heading gets a note whose section the upgrade contract reads under either role, unrefused. Filed 2026-10-04 to the gap inbox by installer-trust-pass' close, its second-vendor review; promoted 2026-10-04 at the next iteration's scope: →fix fails because a widened refusal reds configurations accepted today, →forward because no ruling is owed. Re-verified: `refusals` checks a repeated role, and an alias against the roster's headings only. Owner lookup: `RELEASE_SECTION`, `two roles`, `alias` in this file — none; owner gate-sdk/SPEC.md §Layout and configuration.
 
+### install-page-split
+
+[cost: event/low] [surface: docs]
+
+docs/install.md runs 320 lines and the operator finds it too long to read: they want it split into sub-pages, and a page-authoring rule, gate-held where possible, that flags an over-long docs page so they need not spot one (operator direction 2026-10-05, lead-relayed, not a ruling). The 2026-09-21 direction set about 150 prose lines around the gated blocks and sanctioned a split without requiring one. `check-surface-ratchet` holds the page at a ceiling row, which stops growth and names no length at which a page splits.
+
+**Deliverable:** the page split into sub-pages, every reader of its marked install blocks re-pointed (the install-smoke legs, and the parity gates whose default is that path); a length rule in docs/site-architecture.md §Page-authoring rules, with a site-kit gate where the rule is mechanical.
+
+**Cost while deferred:** every install reader meets a 320-line page. Filed 2026-10-05 to the gap inbox by drift-kit-tail-crosser-pass' lead, after scope's intake drain; promoted at its close: →fix fails because the split moves load-bearing readers and the length gate is new mechanism, →forward because the direction is given. Re-verified: `wc -l` reads 320 (314 at filing), the ceiling row 21308cp, and site-architecture.md states no length rule. Owner lookup: `install.md`, `page-authoring`, `split` in this file — site-video-poster-rule, DISTINCT (video embeds); docs-code-block-copy-wrap, landed this iteration, DISTINCT (code-block copy and wrap); owner docs/site-architecture.md §Page-authoring rules.
+
+### windows-cfg-msrv-lint-local
+
+[cost: event/low] [surface: gate-sdk]
+
+crate code under `cfg(not(unix))` is linted at the MSRV only by `native-artifacts`' Windows clippy legs: `check-crate-arms` lints the host target, and the `gates` job's Windows step is `cargo check`, which carries no `incompatible_msrv` lint. An `io::Error::other` (Rust 1.74, MSRV 1.71) in `front_end_parity.rs` reached a push at drift-kit-tail-crosser-pass and cost a hotfix push (gates run 37279844257).
+
+**Deliverable:** a contributor-side catch before the push: an opt-in cross-target clippy in `check-crate-arms` where the Windows target is installed, or a pre-push tool. Which, and how it degrades without `rustup`, is spec's: gate-sdk/SPEC.md §check-crate-arms rules the compile-only Windows check no gate, since it needs `rustup` and network.
+
+**Cost while deferred:** a red push and a hotfix push per such slip. Filed 2026-10-05 to the gap inbox at that iteration's build; promoted at its close: →fix fails because a local cross-target lint is new mechanism, →forward because no ruling is owed. Re-verified: the `gates` job runs `cargo check --target x86_64-pc-windows-msvc`, and the only clippy on a Windows target is `native-artifacts`'. One premise fell: the bullet's candidate catcher, a cross-target clippy in the `gates` job, still lands on the push and so saves no red push. Owner lookup: `MSRV`, `clippy`, `cfg(not(unix))` in this file — msrv-move-clippy-arm-coupling (Icebox), DISTINCT (a floor move un-suppressing lints); owner gate-sdk/SPEC.md §check-crate-arms.
+
+### liveness-windows-misread
+
+[cost: event/low] [surface: evidence-kit]
+
+`crate-tests-windows` x86_64's producer-liveness step misread row (b) once (gates run 37279844257): the record named pid 2688, pid-only ground truth read it gone immediately before and after the gate's read, and the gate read it held and exited 1; the next run was green with that code unchanged. evidence-kit/SPEC.md §The producer-liveness lock accepts PID reuse as a fail-closed residual, and the step already brackets the gate's read to admit it, so whatever held 2688 lived only inside that read.
+
+**Inferred, not run:** that the holder was the gate's own process, issued the recycled pid at spawn; `native/src/gates/producer_liveness.rs` does not exclude the reader's own pid.
+
+**Deliverable:** the holder identified, by a re-run logging the gate's own pid beside the record's; then the gate excluding its own pid from a held reading, stated in that section, or the step's verdict admitting the window.
+
+**Cost while deferred:** an intermittent red on an unrelated push, spending a hotfix push to re-run. Filed 2026-10-05 to the gap inbox at drift-kit-tail-crosser-pass' build; promoted at its close: →fix fails because the cause is unobserved and either remedy changes a contract or a witness, →forward because no ruling is owed. Re-verified off the run's log: rows (a), (bp) and (c) read held then free, and (b) read gone around the gate with the gate at 1. One premise narrowed: the bullet's reuse inside the read window is a holder both brackets missed. Owner lookup: `liveness`, `pid`, `reuse` in this file — none; owner evidence-kit/SPEC.md §The producer-liveness lock.
+
+### journal-append-arm
+
+[cost: event/low] [surface: delegation-kit]
+
+resume-journal appends are the top hand shape after the gate door in `--emit manual-ops`' first rankings: `printf >>` 47 calls in 6 sessions and `cat >>` 24 in 5 at drift-kit-tail-crosser-pass, every stage. Each spells the path `--enter-stage` printed, and the shell guard splits the write from any other command, so each append is its own call.
+
+**Deliverable:** an append arm writing its operand or stdin to the journal the session's own stamp names, so no session spells the path; homed in delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps, with the agent-execution template's journal bullet citing it.
+
+**Cost while deferred:** a tool call and a spelled path per journal line, in every stage session. Filed 2026-10-05 to the gap inbox at that iteration's build, off the meter's first run; promoted at its close: →fix fails because the arm is a new governed name, →forward because no ruling is owed. Re-verified: the meter at close ranks `printf >>` second and `cat >>` sixth; the filer's delegation-transport-pass count (`cat >>` 57 in 9) is carried, not re-run. Owner lookup: `journal`, `append` in this file — none; owner that section.
+
+### manual-ops-door-subkey
+
+[cost: event/low] [surface: drift-kit]
+
+`--emit manual-ops` keys a shell call by guard-kit's ranking key, which sub-keys only its multi-command set, so every arm called through the gate binary folds into one key, and two spellings of the binary split it: `./native/target/release/checkwright-gates` 61 calls in 5 sessions and `native/target/release/checkwright-gates` 24 in 1 at drift-kit-tail-crosser-pass, rewrite, scratch-run and emit arms alike. The meter cannot say which arm is repeated. That close ignored both spellings as the door, as `bash gate-sdk/bin/run-gates.sh` already was; the per-arm signal is this entry's.
+
+**Deliverable:** a door-aware sub-key, the door plus its arm word, one key across the door's spellings, in drift-kit/SPEC.md §The manual-operation meter or guard-kit/SPEC.md §scan-prompts; which owner is spec's.
+
+**Cost while deferred:** a repeated arm, the strongest tooling candidate the meter could name, stays invisible. Filed 2026-10-05 to the gap inbox at that iteration's build; promoted at its close: →fix fails because the key is shared with the prompt-friction ranking, so a change reaches two kits, →forward because no ruling is owed. Re-verified: the meter at close ranks the first spelling first and the second seventh; the split across spellings is new at the drain. Owner lookup: `ranking key`, `sub-key`, `manual-op` in this file — none; owner drift-kit/SPEC.md §The manual-operation meter.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
