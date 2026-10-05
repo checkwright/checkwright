@@ -76,13 +76,13 @@
 4672cp docs/posts/2026-09-30-checkwright-v0-31-0.md
 1460cp docs/queue-kit/index.md
 789cp docs/releases.md
-43506cp docs/site-architecture.md
+43913cp docs/site-architecture.md
 2412cp docs/site-kit/index.md
 4706cp docs/spec-toolkits.md
 2912cp docs/speckit.md
 2524cp docs/value.md
 35460cp doctrine-kit/SPEC.md
-125882cp drift-kit/SPEC.md
+124981cp drift-kit/SPEC.md
 2698cp drift-kit/templates/close-knowledge.md
 4257cp drift-kit/templates/economics.md
 97080cp evidence-kit/SPEC.md

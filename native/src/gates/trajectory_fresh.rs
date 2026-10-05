@@ -1,5 +1,5 @@
-// spec: drift-kit/SPEC.md §The published-evidence extractor — docs/evidence-data.md is the
-// byte-fresh projection of trajectory.sh --emit
+// spec: docs/site-architecture.md §Generated projections and their freshness gates — the
+// trajectory arm's byte-fresh projection is docs/evidence-data.md
 use crate::fresh;
 use std::path::Path;
 

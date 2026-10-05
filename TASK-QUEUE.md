@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### drift-kit-publisher-wiring
-
-drift-kit/SPEC.md carries this repo's publisher wiring in a payload SPEC: §The published-evidence extractor's opener ("this repo's own governed trajectory") and its "Consumer wiring (this repo, not kit mechanism)" paragraph (`docs/evidence-data.md`, `check-trajectory-fresh`, its `.gate` file), §The install-evidence projection's matching paragraph (`docs/install-evidence.md`, `check-install-evidence-fresh`), and the `DRIFT_KIT_STAGES` entry's "this repo's `scripts/drift-config.knobs`". Each resolves only in the publisher's tree (gate-sdk/SPEC.md §The provenance seam); `check-provenance-seam` does not read the shape.
-
-**Deliverable:** the paragraphs deleted or respelled generically, the extractor's "consumer freshness gate below" back-reference re-pointed, and the two consumer gates' fixture-pair description kept where docs/site-architecture.md §Generated projections already owns their wiring.
-
-**Cost while deferred:** every adopter reading the two sections meets wiring that is not theirs. Filed 2026-10-05 to the gap inbox by drift-kit-tail-crosser-pass' close (its provenance-seam-residue audit); promoted at the next scope: →fix fails because relocating the fixture-pair description is a placement judgment beside a battery run, →forward because no ruling is owed. Re-verified: all four sites grep at drift-kit/SPEC.md lines 141, 146, 161, 442 and 497. Owner lookup: `Consumer wiring`, `publisher wiring` in this file — none; owner drift-kit/SPEC.md.
-
 ## Deferred
 
 ### foreign-project-critique
@@ -1203,4 +1195,5 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 - install-tar-exit-check
 - footprint-arm-publisher-page
 - context-kit-tail-brevity
+- drift-kit-publisher-wiring
 
