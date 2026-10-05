@@ -69,7 +69,7 @@ The log arrives **last**, after everything the knob value spells, which §The ev
 - **A hazard with no oracle.** A header printed *after* the completion line would silently become the marker and demote the real one to an arm, so the driver carries the clause beside its clean line too.
 - **Fail-closed.** Fewer than two headers, or roster lines, cannot yield an arm and a marker, so a header shape the derivation cannot read is exit 2, as is a log declaring no roster. `--run-validate`'s produced-no-result guard stands behind it.
 
-**The suite's fail-fast shape is what makes per-arm rows assert.** The smoke exits at its first failure, so arms behind that point never print, and §Baseline manifest's directional rule reds a baselined `pass` scenario that is red **or absent**. An early abort therefore reds every arm behind it instead of hiding them.
+**The suite's fail-fast shape is what makes per-arm rows assert.** The smoke exits at its first failure, so arms behind that point never print, and §bin/diff-baseline.sh's directional rule reds a baselined `pass` scenario that is red **or absent**. An early abort reds every arm behind it instead of hiding them.
 
 **The attribution leans on fail-fast, not on the verdict, and that is its honest limit.** An arm is judged failed when the log reaches its header and neither a later header nor the run's own clean line follows. A smoke that gained a *non-fatal* failure path would read that arm as passing. The suite's verdict would still be right, because the arms behind a real abort are absent either way, and the blame would be wrong.
 

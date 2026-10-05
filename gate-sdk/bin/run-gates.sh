@@ -22,7 +22,7 @@ _run_gates_marked() {
     while :; do
         if ((n > 0)); then
             for c in "${ceil[@]}"; do
-                gate_path_rooted "$c" && [[ "$d" == "$(cd "$c" 2>/dev/null && pwd -P)" ]] && return 1
+                gate_path_rooted "$c" && [[ "$d" == "$(cd -P "$c" 2>/dev/null && pwd -P)" ]] && return 1
             done
         fi
         [[ -e "$d/.git" || -L "$d/.git" ]] && return 0

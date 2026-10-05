@@ -96,6 +96,7 @@ enum Nested {
     RepoLink,
     GitfileViaLink,
     GitfileLinkThenParent,
+    GitfileLinkParentFoldsToDir,
     StartViaLink,
 }
 
@@ -436,6 +437,13 @@ const UNIX_CORPUS: &[Case] = &[
         2,
         ABSENT,
     ),
+    nested(
+        "a nested gitfile whose symlink's physical parent folds lexically to a directory",
+        Nested::GitfileLinkParentFoldsToDir,
+        ABOVE,
+        2,
+        ABSENT,
+    ),
     Case {
         name: "a starting directory reached through a symlink, its repository selected from above",
         start: VIA_DEEP,
@@ -694,6 +702,11 @@ fn nest(sub: &Path, nested: Nested) -> Result<(), String> {
             git_init(&store)?;
             made(symlink(Path::new("../store/.git"), &sub.join("alias")))?;
             write(&mark, "gitdir: alias/../.git\n")
+        }
+        Nested::GitfileLinkParentFoldsToDir => {
+            git_init(&store)?;
+            made(symlink(Path::new("../store/.git/objects"), &sub.join("alias")))?;
+            write(&mark, "gitdir: alias/..\n")
         }
         Nested::StartViaLink => {
             git_init(sub)?;

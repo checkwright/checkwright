@@ -30,3 +30,4 @@ DRIFT_KIT_MANUAL_OPS_IGNORE[] = ./native/target/release/checkwright-gates >
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = sed
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = mkdir
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = gh run
+DRIFT_KIT_MANUAL_OPS_IGNORE[] = awk

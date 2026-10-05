@@ -22,7 +22,7 @@ unset GATE_SDK_TMP_DIR GATE_SDK_WORKFLOW_DIR
 # spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the system temp dir heads the git ceiling list
 _th_sep=:
 case "${OSTYPE:-}" in msys* | cygwin* | win32*) _th_sep=';' ;; esac
-_th_tmp="$(cd "${TMPDIR:-/tmp}" && pwd -P)"
+_th_tmp="$(cd -P "${TMPDIR:-/tmp}" && pwd -P)"
 export GIT_CEILING_DIRECTORIES="${_th_tmp}${GIT_CEILING_DIRECTORIES:+${_th_sep}${GIT_CEILING_DIRECTORIES}}"
 GATE_SDK_TEST_LIB_DIR="$(cd "${BASH_SOURCE[0]%/*}" && pwd)"
 # spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the gate-sdk root locator, absolute from this library's own anchor, because a suite drives its subject from a sandbox cwd the default cannot reach

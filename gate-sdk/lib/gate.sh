@@ -108,8 +108,8 @@ gate_skipped_mark() {  # <top> <prefix>
                     gate_path_rooted "$t" || t="$top/$run/$t"
                 fi
             fi
-            g="$( { cd "$(git rev-parse --absolute-git-dir 2>/dev/null || echo /dev/null)" && pwd -P; } 2>/dev/null )"
-            [[ -n "$t" && -n "$g" && "$g" == "$( { cd "$t" && pwd -P; } 2>/dev/null )" ]] && return 1
+            g="$( { cd -P "$(git rev-parse --absolute-git-dir 2>/dev/null || echo /dev/null)" && pwd -P; } 2>/dev/null )"
+            [[ -n "$t" && -n "$g" && "$g" == "$( { cd -P "$t" && pwd -P; } 2>/dev/null )" ]] && return 1
             printf '%s\n' "$m"
             return 0
         fi
@@ -136,8 +136,8 @@ gate_native_bin_spelled() {
 # spec: gate-sdk/SPEC.md §lib/gate.sh — inside a linked worktree whose common dir is <main>/.git, the main checkout's own resolution of the knob, rooted; returns 1 emitting nothing anywhere else
 _gate_main_checkout_bin() {
     local git_dir common main b
-    git_dir="$( { cd "$(git rev-parse --git-dir 2>/dev/null || echo /dev/null)" && pwd -P; } 2>/dev/null )"
-    common="$( { cd "$(git rev-parse --git-common-dir 2>/dev/null || echo /dev/null)" && pwd -P; } 2>/dev/null )"
+    git_dir="$( { set -P; cd "$(git rev-parse --git-dir 2>/dev/null || echo /dev/null)" && pwd -P; } 2>/dev/null )"
+    common="$( { set -P; cd "$(git rev-parse --git-common-dir 2>/dev/null || echo /dev/null)" && pwd -P; } 2>/dev/null )"
     [[ -n "$common" && "$git_dir" != "$common" && "${common##*/}" == .git ]] || return 1
     main="${common%/*}"
     b="$(cd "$main" && gate_native_bin)"
