@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### evidence-kit-tail-brevity
-
-evidence-kit/SPEC.md's tail, the last of the file no brevity slice has passed: §check-evidence-baseline, §check-evidence-manifest, §check-battery-roster, §check-producer-liveness, §lifecycle-kit integration and §Producers and consumers, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): about 7.0k words at this scope and the file's whole ceiling row of 59 `check-prose-bounds` findings.
-
-**Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey; the file's ceiling row re-stamped. Lands first: [liveness-windows-misread](#liveness-windows-misread) and [evidence-directive-unstated](#evidence-directive-unstated) write into sections it passes.
-
-**Cost while deferred:** paid by every session and adopter that reads those evidence-kit sections. Filed 2026-10-06 as a split at scope. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
-
 ### liveness-windows-misread
 
 `crate-tests-windows` x86_64's producer-liveness step misread row (b) once (gates run 37279844257): the record named pid 2688, pid-only ground truth read it gone immediately before and after the gate's read, and the gate read it held and exited 1; the next run was green with that code unchanged. evidence-kit/SPEC.md §The producer-liveness lock accepts PID reuse as a fail-closed residual, and the step already brackets the gate's read to admit it, so whatever held 2688 lived only inside that read.
@@ -28,7 +20,7 @@ evidence-kit/SPEC.md's tail, the last of the file no brevity slice has passed: �
 
 **Deliverable:** the holder identified, by a re-run logging the gate's own pid beside the record's; then the gate excluding its own pid from a held reading, stated in that section, or the step's verdict admitting the window.
 
-**Cost while deferred:** an intermittent red on an unrelated push, spending a hotfix push to re-run. Filed 2026-10-05 to the gap inbox at drift-kit-tail-crosser-pass' build; promoted at its close: →fix fails because the cause is unobserved and either remedy changes a contract or a witness, →forward because no ruling is owed. Re-verified off the run's log: rows (a), (bp) and (c) read held then free, and (b) read gone around the gate with the gate at 1. One premise narrowed: the bullet's reuse inside the read window is a holder both brackets missed. Owner lookup: `liveness`, `pid`, `reuse` in this file — none; owner evidence-kit/SPEC.md §The producer-liveness lock. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling); lands after [evidence-kit-tail-brevity](#evidence-kit-tail-brevity).
+**Cost while deferred:** an intermittent red on an unrelated push, spending a hotfix push to re-run. Filed 2026-10-05 to the gap inbox at drift-kit-tail-crosser-pass' build; promoted at its close: →fix fails because the cause is unobserved and either remedy changes a contract or a witness, →forward because no ruling is owed. Re-verified off the run's log: rows (a), (bp) and (c) read held then free, and (b) read gone around the gate with the gate at 1. One premise narrowed: the bullet's reuse inside the read window is a holder both brackets missed. Owner lookup: `liveness`, `pid`, `reuse` in this file — none; owner evidence-kit/SPEC.md §The producer-liveness lock. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling); lands after `evidence-kit-tail-brevity`.
 
 ### evidence-directive-unstated
 
@@ -286,7 +278,7 @@ Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-ki
 
 delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as `delegation-kit-tail-brevity`; canon-kit's claim-gate sections and rest left 2026-10-04 at the next two scopes as `canon-kit-claim-brevity` and `canon-kit-tail-brevity`; queue-kit's halves, then drift-kit's and context-kit's rests, at the four after as `queue-kit-format-brevity`, `queue-kit-arms-brevity`, `drift-kit-tail-brevity` and `context-kit-tail-brevity`.
 
-evidence-kit's halves left 2026-10-05 and 10-06 at successive scopes as `evidence-kit-front-brevity` and [evidence-kit-tail-brevity](#evidence-kit-tail-brevity).
+evidence-kit's halves left 2026-10-05 and 10-06 at successive scopes as `evidence-kit-front-brevity` and `evidence-kit-tail-brevity`.
 
 ### tarball-attestation-observed
 
@@ -1247,4 +1239,6 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 No rule holds a docs video to a local poster linking out, so a first embed adds a third-party request.
 
 ## Done
+
+- evidence-kit-tail-brevity
 
