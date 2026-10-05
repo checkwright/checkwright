@@ -318,26 +318,41 @@ pub enum PidProbe {
 // `kill(2)` reads EPERM as held and ESRCH as gone; on Windows the native leg asks first and the MSYS
 // legs answer behind it; gate-sdk/SPEC.md §Fail-closed contract owns the per-platform route.
 pub fn pid_alive(pid: &str) -> Result<bool, PidProbe> {
+    pid_held_through(pid).map(|leg| leg.is_some())
+}
+
+// spec: evidence-kit/SPEC.md §The producer-liveness lock — the same predicate, naming the leg that
+// answered held for the one reader that prints it
+pub fn pid_held_through(pid: &str) -> Result<Option<&'static str>, PidProbe> {
+    pid_held_for_reader(pid, std::process::id())
+}
+
+// spec: evidence-kit/SPEC.md §The producer-liveness lock — the reader's own pid is never a held
+// reading; the reader is a parameter so a test can ask as a process it is not.
+pub(crate) fn pid_held_for_reader(pid: &str, reader: u32) -> Result<Option<&'static str>, PidProbe> {
     if pid.is_empty() || pid.starts_with('0') || !pid.bytes().all(|b| b.is_ascii_digit()) {
-        return Ok(false);
+        return Ok(None);
     }
-    signal_zero(pid)
+    signal_zero(pid, reader)
 }
 
 #[cfg(unix)]
-fn signal_zero(pid: &str) -> Result<bool, PidProbe> {
+fn signal_zero(pid: &str, reader: u32) -> Result<Option<&'static str>, PidProbe> {
     let Ok(n) = pid.parse::<libc::pid_t>() else {
-        return Ok(false);
+        return Ok(None);
     };
+    if u32::try_from(n) == Ok(reader) {
+        return Ok(None);
+    }
     // spec: gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency — sound because
     // `kill` takes two integers and touches no memory this crate owns
     if unsafe { libc::kill(n, 0) } == 0 {
-        return Ok(true);
+        return Ok(Some("kill(2)"));
     }
     let err = std::io::Error::last_os_error();
     match err.raw_os_error() {
-        Some(libc::EPERM) => Ok(true),
-        Some(libc::ESRCH) => Ok(false),
+        Some(libc::EPERM) => Ok(Some("kill(2), EPERM")),
+        Some(libc::ESRCH) => Ok(None),
         _ => Err(PidProbe::Unanswered(format!(
             "kill(2) could not answer for pid {pid}: {err}"
         ))),
@@ -345,15 +360,16 @@ fn signal_zero(pid: &str) -> Result<bool, PidProbe> {
 }
 
 #[cfg(not(unix))]
-fn signal_zero(pid: &str) -> Result<bool, PidProbe> {
+#[cfg_attr(not(windows), allow(unused_variables))]
+fn signal_zero(pid: &str, reader: u32) -> Result<Option<&'static str>, PidProbe> {
     #[cfg(windows)]
-    if windows_pid_held(pid) {
-        return Ok(true);
+    if native_leg_held(pid, reader) {
+        return Ok(Some("the native leg"));
     }
     let signalled = crate::proc::run(&programs::BASH, &["-c", "kill -0 \"$1\"", "bash", pid])
         .map_err(PidProbe::Unanswered)?;
     if signalled.code() == Some(0) {
-        return Ok(true);
+        return Ok(Some("the kill -0 leg"));
     }
     // spec: gate-sdk/SPEC.md §Fail-closed contract — the probe sits *here*, on the fallback leg,
     // because that is the only leg that reaches the program: a `kill -0` that answers never does.
@@ -361,7 +377,14 @@ fn signal_zero(pid: &str) -> Result<bool, PidProbe> {
         return Err(PidProbe::PsAbsent);
     }
     let listed = crate::proc::run(&programs::PS, &["-p", pid]).map_err(PidProbe::Unanswered)?;
-    Ok(listed.code() == Some(0))
+    Ok((listed.code() == Some(0)).then_some("the ps -p leg"))
+}
+
+// spec: evidence-kit/SPEC.md §The producer-liveness lock — the reader's own Windows pid skips this
+// leg alone: a record may name an MSYS pid of the same number, which the legs behind still answer.
+#[cfg(windows)]
+fn native_leg_held(pid: &str, reader: u32) -> bool {
+    pid.parse::<u32>().ok() != Some(reader) && windows_pid_held(pid)
 }
 
 #[cfg(windows)]
@@ -424,5 +447,15 @@ mod tests {
     fn the_native_leg_reads_a_windows_pid() {
         assert!(windows_pid_held(&std::process::id().to_string()));
         assert!(!windows_pid_held("2147483646"));
+    }
+
+    // spec: evidence-kit/SPEC.md §The producer-liveness lock — the reader's own pid is never held
+    // through the native leg, and the same pid asked by any other reader is
+    #[cfg(windows)]
+    #[test]
+    fn the_native_leg_skips_the_readers_own_pid() {
+        let own = std::process::id();
+        assert!(!native_leg_held(&own.to_string(), own));
+        assert!(native_leg_held(&own.to_string(), own.wrapping_add(1)));
     }
 }

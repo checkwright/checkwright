@@ -191,12 +191,20 @@ Uncommitted, under `EVIDENCE_KIT_LOCK_FILE`. A stage stamp proves invocation and
 
 The native leg exists because a Windows record names a pid in one of two namespaces: an MSYS shell's, from a Git Bash launch, or Windows's own, from a PowerShell launch. The MSYS legs read a live Windows pid as gone, which the native-Windows leg's liveness step measured. Reading `/proc` to confirm process *identity* is refused separately: it is unportable, and the OS-reach constraint ([gate-sdk/SPEC.md §The adopter constraints](../gate-sdk/SPEC.md#the-adopter-constraints)) makes a Linux-only predicate a cost.
 
+**A reader's own pid is never a held reading.** No reader is the producer its record names: the writer reads before it claims, and its release compares pids without the predicate. A record naming the reader's own pid therefore names a recycled id, and the producer it recorded is gone.
+
+- **unix.** One namespace, so the predicate answers gone without a probe.
+- **Windows.** The reader's pid is Windows's own, while a record may name an MSYS pid of the same number. Only the native leg is skipped, and the MSYS legs still answer.
+
 **On a non-unix build an absent `ps` leaves the predicate unable to answer, and every reader, the writer's own claim included, refuses rather than reads free.** `ps` is reached only when the native leg and `kill -0` both read gone. Without the fallback, a process that exists but cannot be signalled is indistinguishable from one that is gone. Reading the unanswerable case as free would restore the false free the fallback closes. The refusal takes the guards' exit 2 wherever the reader has one.
 
 **PID reuse is a named, accepted residual.** A recycled PID yields a false *held* reading, which refuses a stage entry that could have proceeded. That direction fails closed and costs one file deletion to clear, against a defect that would cost the next session an evidence file changing underneath it. Two further cases are instances of the same residual, with the same direction and clearance:
 
 - the writer's own refusal reads the identical predicate, so a recycled PID makes `--run-validate` over-refuse;
-- on Windows, an MSYS pid that numerically matches a live Windows process reads held through the native leg.
+- on Windows, an MSYS pid that numerically matches a live Windows process reads held through the native leg;
+- on Windows, each MSYS leg is a spawned process holding an MSYS pid of its own for the length of its probe, so a record naming that pid reads held through that leg.
+
+The reader's own pid is the one recycling the residual does not cover (above).
 
 **The claim is atomic create-exclusive, never check-then-write**, and the asserted property is two-part: it succeeds for exactly one producer, *and* the record publishes whole. The idiom builds the record in a temp file under the same scratch dir, then `ln` it into place, which fails if the target exists. `mkdir` and a `set -C` redirect are atomic on the first half only: each leaves a window where the lock exists and its record does not. Because the record publishes whole, a reader never interprets a partial lock or an empty one, so an unparseable lock is corruption and fails closed rather than reading free.
 
@@ -430,8 +438,8 @@ Config: `EVIDENCE_KIT_RUNNER_DOC` ([§Layout and configuration](#layout-and-conf
 
 Invariant: no stage entry while the evidence producer is still running. `checks/check-producer-liveness.gate` declares it, with its rule in `native/src/gates/producer_liveness.rs` and the two library readers it shares with the `--run-validate` arm in `native/src/evidence.rs`. It reads `EVIDENCE_KIT_LOCK_FILE`:
 
-- **green** when the lock is absent or names a dead PID;
-- **red** when it names a live one, printing the blocking run key, so the operator can tell *wait for that run* from *reclaim a lock whose owner is gone*;
+- **green** when the lock is absent or names a dead PID, the clean line saying so where that PID is the reader's own ([§The producer-liveness lock](#the-producer-liveness-lock));
+- **red** when it names a live one, printing the blocking run key, so the operator can tell *wait for that run* from *reclaim a lock whose owner is gone*. On a non-unix build the red line also names the leg that answered and the reader's pid: a held reading there has three legs over two pid namespaces, and only the line can say which one a recycled id reached;
 - **exit 2** when the lock does not parse. The claim publishes the record whole ([§The producer-liveness lock](#the-producer-liveness-lock)), so an unparseable lock is corruption and never a free reading.
 
 The descriptor couples only `knob:EVIDENCE_KIT_LOCK_FILE`: set mode's directory is the invoker's argument. A consumer's scratch directory is gitignored, so no commit stages a record for a trigger to see.

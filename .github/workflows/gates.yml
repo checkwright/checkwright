@@ -1558,6 +1558,21 @@ jobs:
             echo "(d) $d truth=$(truth "${tpid[b]}") gate=${gd2[$d]}"
           done
 
+          echo "== row (f): repeated reads of the stopped records, logging each one a recycled pid reached =="
+          # spec: evidence-kit/SPEC.md §The producer-liveness lock — a witness, never a verdict: a reader's own pid reads gone, and a held read names its leg
+          own_reads=0; held_reads=0
+          for _ in $(seq 1 12); do
+            for r in b bp c; do
+              fout="$("$bin" check-producer-liveness "$rec/$r.run" 2>&1)"; frc=$?
+              if [[ "$fout" == *"reader's own pid"* ]]; then
+                own_reads=$((own_reads + 1)); echo "($r) own pid: $fout"
+              elif [[ "$frc" -ne 0 ]]; then
+                held_reads=$((held_reads + 1)); echo "($r) exit $frc: $fout"
+              fi
+            done
+          done
+          echo "(f) 36 reads: $own_reads named the reader's own pid, $held_reads were not clean"
+
           echo "== row (e): a job's process once its session exits =="
           # shellcheck disable=SC2016
           write_e='Start-Job { Set-Content -NoNewline -Path %s -Value "$PID"; Start-Sleep 300 } | Out-Null; Start-Sleep 10'

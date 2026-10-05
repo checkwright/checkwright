@@ -23,7 +23,7 @@ enum Verdict {
     Corrupt,
     Free,
     Dead { pid: String, run_key: String },
-    Live { pid: String, run_key: String },
+    Live { pid: String, run_key: String, leg: &'static str },
 }
 
 fn verdict(path: &std::path::Path) -> Result<Verdict, PidProbe> {
@@ -31,12 +31,33 @@ fn verdict(path: &std::path::Path) -> Result<Verdict, PidProbe> {
         LockRead::Corrupt => Ok(Verdict::Corrupt),
         LockRead::Absent => Ok(Verdict::Free),
         LockRead::Held { pid, run_key } => {
-            if evidence::pid_alive(&pid)? {
-                Ok(Verdict::Live { pid, run_key })
-            } else {
-                Ok(Verdict::Dead { pid, run_key })
+            match evidence::pid_held_through(&pid)? {
+                Some(leg) => Ok(Verdict::Live { pid, run_key, leg }),
+                None => Ok(Verdict::Dead { pid, run_key }),
             }
         }
+    }
+}
+
+// spec: evidence-kit/SPEC.md §check-producer-liveness — the red line's witness clause: a non-unix
+// build has three legs over two pid namespaces, so it names the leg that answered and the reader
+#[cfg(not(unix))]
+fn witness(leg: &str) -> String {
+    format!(" — read held through {} by reader pid {}", leg, std::process::id())
+}
+
+#[cfg(unix)]
+fn witness(_leg: &str) -> String {
+    String::new()
+}
+
+// spec: evidence-kit/SPEC.md §check-producer-liveness — a dead record naming the reader's own pid
+// says so: that pid was recycled into this very read
+fn dead_pid(pid: &str) -> String {
+    if pid == std::process::id().to_string() {
+        format!("this reader's own pid {}, a recycled id,", pid)
+    } else {
+        format!("dead pid {}", pid)
     }
 }
 
@@ -64,9 +85,13 @@ fn set_mode(lock: &str) -> i32 {
             Err(e) => return probe_failed(e),
             Ok(Verdict::Corrupt) => corrupt.push(rec.clone()),
             Ok(Verdict::Free) | Ok(Verdict::Dead { .. }) => {}
-            Ok(Verdict::Live { pid, run_key }) => blocking.push(format!(
-                "{}: {}: the producer for run key '{}' is still running (pid {})",
-                NAME, rec, run_key, pid
+            Ok(Verdict::Live { pid, run_key, leg }) => blocking.push(format!(
+                "{}: {}: the producer for run key '{}' is still running (pid {}){}",
+                NAME,
+                rec,
+                run_key,
+                pid,
+                witness(leg)
             )),
         }
     }
@@ -123,18 +148,24 @@ fn path_mode(lock: &str) -> i32 {
             );
             0
         }
-        Ok(Verdict::Live { pid, run_key }) => {
+        Ok(Verdict::Live { pid, run_key, leg }) => {
             println!(
-                "{}: {}: the evidence producer for run key '{}' is still running (pid {})",
-                NAME, lock, run_key, pid
+                "{}: {}: the evidence producer for run key '{}' is still running (pid {}){}",
+                NAME,
+                lock,
+                run_key,
+                pid,
+                witness(leg)
             );
             println!("  help: wait for that --run-validate run to finish — it is still writing the evidence manifest, so anything read now can change underneath you; if pid {} is gone, the lock is stale and deleting {} clears it", pid, lock);
             1
         }
         Ok(Verdict::Dead { pid, run_key }) => {
             println!(
-                "PRODUCER-LIVENESS: clean (lock at {} names dead pid {} for run key '{}' — no producer in flight)",
-                lock, pid, run_key
+                "PRODUCER-LIVENESS: clean (lock at {} names {} for run key '{}' — no producer in flight)",
+                lock,
+                dead_pid(&pid),
+                run_key
             );
             0
         }
@@ -237,18 +268,35 @@ mod tests {
     }
 
     // spec: evidence-kit/SPEC.md §check-producer-liveness — the liveness leg answers for a process
-    // this test owns, the arm the fixture pair can only reach as init
+    // this test owns, the arm the fixture pair can only reach as init; it asks as another reader,
+    // since a reader's own pid is never held
     #[test]
     fn the_liveness_leg_answers_for_a_live_process_and_a_dead_one() {
+        let own = std::process::id();
         assert!(
-            evidence::pid_alive(&std::process::id().to_string())
-                .expect("the pid probe could not answer"),
-            "the probe read this very process as dead"
+            evidence::pid_held_for_reader(&own.to_string(), own.wrapping_add(1))
+                .expect("the pid probe could not answer")
+                .is_some(),
+            "the probe read this very process as dead to another reader"
         );
         assert!(
             !evidence::pid_alive("2147483646").expect("the pid probe could not answer"),
             "the probe read a pid past the system maximum as alive"
         );
+    }
+
+    // spec: evidence-kit/SPEC.md §The producer-liveness lock — a record naming the reader's own pid
+    // is a recycled id and reads gone, where the same pid reads held to any other reader
+    #[cfg(unix)]
+    #[test]
+    fn the_readers_own_pid_is_never_a_held_reading() {
+        let own = std::process::id().to_string();
+        assert!(
+            !evidence::pid_alive(&own).expect("the pid probe could not answer"),
+            "the probe read its own reader as a live producer"
+        );
+        assert_eq!(dead_pid(&own), format!("this reader's own pid {}, a recycled id,", own));
+        assert_eq!(dead_pid("2147483646"), "dead pid 2147483646");
     }
 
     // spec: evidence-kit/SPEC.md §The producer-liveness lock — EPERM is held: init exists under
