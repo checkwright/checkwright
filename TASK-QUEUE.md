@@ -18,9 +18,9 @@ docs/install.md runs 320 lines and the operator finds it too long to read: they 
 
 **Cost while deferred:** every install reader meets a 320-line page. Filed 2026-10-05 to the gap inbox by drift-kit-tail-crosser-pass' lead, after scope's intake drain; promoted at its close: →fix fails because the split moves load-bearing readers and the length gate is new mechanism, →forward because the direction is given. Re-verified at spec: `wc -l` reads 321 (314 at filing), the ceiling row 21401cp, and site-architecture.md states no length rule. Owner lookup: `install.md`, `page-authoring`, `split` in this file — site-video-poster-rule, DISTINCT (video embeds); docs-code-block-copy-wrap, landed this iteration, DISTINCT (code-block copy and wrap); owner docs/site-architecture.md §Page-authoring rules.
 
-**Selected 2026-10-05 for evidence-front-install-split-pass,** operator direction given through the lead session (not a ruling), over scope's debt-only recommendation; the spec stage authors its amendment and promotes it. Applied after [install-windows-stop-policy](#install-windows-stop-policy), so the blocks move once edited. The amendment spans docs, canon-kit and the installer's contracts, so it meets `check-stage-entry` assertion C.
+**Selected 2026-10-05 for evidence-front-install-split-pass,** operator direction given through the lead session (not a ruling), over scope's debt-only recommendation; the spec stage authors its amendment and promotes it. Applied after `install-windows-stop-policy`, so the blocks move once edited. The amendment spans docs, canon-kit and the installer's contracts, so it meets `check-stage-entry` assertion C.
 
-**Push need (2026-10-05, inside the budget):** the mid-iteration push [twin-gitdir-dotdot-fold](#twin-gitdir-dotdot-fold) spends, since the re-pointed install-smoke legs run only on CI.
+**Push need (2026-10-05, inside the budget):** the mid-iteration push `twin-gitdir-dotdot-fold` spends, since the re-pointed install-smoke legs run only on CI.
 
 ## Technical Debt
 
@@ -31,28 +31,6 @@ evidence-kit/SPEC.md's front half, which no brevity slice has passed: the preamb
 **Deliverable:** the three moves over those sections under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into them kept, per a citation survey; the file's ceiling row re-stamped. [liveness-windows-misread](#liveness-windows-misread) later writes into §The producer-liveness lock, which this slice passes first.
 
 **Cost while deferred:** paid by every session and adopter that reads those evidence-kit sections. Filed 2026-10-05 as a split at scope. Part of the operator's selection of the unit set, direction 2026-10-05, lead-relayed (not a ruling).
-
-### twin-gitdir-dotdot-fold
-
-`gate-sdk/bin/run-gates.ps1`'s `Resolve-GitDir` calls `Resolve-Path` on the whole path before its per-component physical walk. `Resolve-Path` folds a `..` lexically, so a gitfile target `alias/..`, `alias` a symbolic link, loses the physical meaning the shell stub's `cd … && pwd -P` and the crate's canonicalize keep, and the twin can call the selected repository skipped. The parity corpus (`native/src/emit/front_end_parity.rs`) carries no symlink-then-dotdot target.
-
-**Cannot run here:** no PowerShell on the authoring host; the parity case this entry adds, run on the CI Windows legs, is its first witness.
-
-**Deliverable:** the twin resolving each component physically before it folds a `..`, and a symlink-then-dotdot gitfile target in the parity corpus. Owner gate-sdk/SPEC.md §run-gates.
-
-**Cost while deferred:** a false nested-repository refusal on Windows for that layout alone. Filed 2026-10-05 to the gap inbox by context-kit-tail-publisher-pass' close (its second-vendor review); promoted at the next scope: →fix fails because its witness is a Windows CI leg no local run reaches, →forward because no ruling is owed. Re-verified: `Resolve-GitDir` opens on `Resolve-Path -LiteralPath $Path` ahead of the walk. Owner lookup: `Resolve-Path`, `Resolve-GitDir`, `gitfile`, `symlink` in this file — none; crosser-twin-identity-edges, landed last iteration, DISTINCT (it added the walk this bullet reviews). Part of the operator's selection of the unit set, direction 2026-10-05, lead-relayed (not a ruling).
-
-**Push need (2026-10-05, inside the budget):** the iteration's one mid-iteration push, shared with [install-windows-stop-policy](#install-windows-stop-policy) and [install-page-split](#install-page-split): the PowerShell twin and its parity case run only on the CI Windows legs.
-
-### install-windows-stop-policy
-
-Two of docs/install.md's Windows blocks run on past a failure. The step-by-step download block sets no stop policy, so a failed `New-Item` or first `Invoke-WebRequest` is non-terminating and the later commands run. The `windows-remedy` block uses `git --exec-path`'s output without testing its exit, so a missing git writes a wrong `PATH` entry for the user.
-
-**Deliverable:** each block stopping at its first failure, by a stop policy or a tested exit with a throw, on canon-kit/SPEC.md §check-fence-paste-unit's honest limit, witnessed by the install-smoke legs that read the marked blocks. Owner docs/install.md, its recipe shape installer/SPEC.md's.
-
-**Cost while deferred:** a Windows adopter whose download or git probe fails gets a later, confusing error in place of the first one; the `windows-install` block's digest test catches a missing download at the latest. Filed 2026-10-05 to the gap inbox by context-kit-tail-publisher-pass' close (its second-vendor review); promoted at the next scope: →fix fails because its witness is a Windows CI leg no local run reaches, →forward because no ruling is owed. Re-verified by reading both blocks. Owner lookup: `stop policy`, `ErrorActionPreference`, `exec-path`, `non-terminating` in this file — none; install-tar-exit-check, landed last iteration, DISTINCT (the `windows-install` block's `tar.exe` exit alone); install-page-split moves the blocks' readers, independent. Part of the operator's selection of the unit set, direction 2026-10-05, lead-relayed (not a ruling); lands before [install-page-split](#install-page-split) relocates the blocks.
-
-**Push need (2026-10-05, inside the budget):** the iteration's one mid-iteration push, shared with [twin-gitdir-dotdot-fold](#twin-gitdir-dotdot-fold): the witnessing install-smoke legs run only on CI Windows hosts.
 
 ## Deferred
 
@@ -1245,4 +1223,7 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 No rule holds a docs video to a local poster linking out, so a first embed adds a third-party request.
 
 ## Done
+
+- twin-gitdir-dotdot-fold
+- install-windows-stop-policy
 
