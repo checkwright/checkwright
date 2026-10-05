@@ -82,7 +82,7 @@
 2912cp docs/speckit.md
 2524cp docs/value.md
 35460cp doctrine-kit/SPEC.md
-139878cp drift-kit/SPEC.md
+125918cp drift-kit/SPEC.md
 2698cp drift-kit/templates/close-knowledge.md
 4286cp drift-kit/templates/economics.md
 97080cp evidence-kit/SPEC.md

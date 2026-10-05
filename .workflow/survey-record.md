@@ -13,3 +13,10 @@
 - rev: 79c427d3e613063d757b08155e5e37b3ec5c0708
 - finding: Passed: the measurement sections (drift-kit-measurement-brevity): Bundled KPIs, The stage-economics meter, The install-observation record, The install-evidence projection, 9.3k words by md-section word count. Unpassed: the preamble, The report skeleton, The extensibility contract, The KPI plugin contract, The knowledge-friction loop, The published-evidence extractor, The queue-flow arm, The overhead meter, The price-coverage arm, The /economics skill, Layout and configuration, Testing and Out of scope, about 11.6k of 20.9k words, carrying all 68 of the file's check-prose-bounds findings (Testing 19, knowledge-friction loop 15, overhead meter 9, Layout and configuration 8, published-evidence extractor 6, report skeleton 3, Out of scope 3, KPI plugin contract 2, preamble, queue-flow arm and /economics skill 1 each). One slice passes it whole.
 - inferred: none
+
+## 2026-10-05 build — Which surfaces cite into drift-kit/SPEC.md's unpassed sections, and what facts do they rely on?
+- corpus: .
+- oracle: git grep -n drift-kit/SPEC.md
+- rev: fce1ecbc4b203488b1ac22d98274d0f7af5f87c9
+- finding: No stale citation; the docs mirrors and intra-file section-sign citations read beside the grep. Facts other surfaces rely on, all kept: the extensibility contract recording the port moving the kit's own members and leaving consumer resolution untouched, the collator's prefix family, the kfric arm's exit-2 shape refusal with no per-arm help, its three log states, the narrow-sensor seam, the drain-not-capture check, the one always-loaded bullet, the overhead meter's per-FAIL invariant-line gate marker and close-stamp invocation, the smoke's no-port ground, and the overhead section's empty port-owed set.
+- inferred: the per-fact grouping of multi-line spec comments reads their first-line clauses
