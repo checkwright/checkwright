@@ -10,18 +10,6 @@
 
 ## Technical Debt
 
-### liveness-windows-misread
-
-`crate-tests-windows` x86_64's producer-liveness step misread row (b) once (gates run 37279844257): the record named pid 2688, pid-only ground truth read it gone immediately before and after the gate's read, and the gate read it held and exited 1; the next run was green with that code unchanged. evidence-kit/SPEC.md §The producer-liveness lock accepts PID reuse as a fail-closed residual, and the step already brackets the gate's read to admit it, so whatever held 2688 lived only inside that read.
-
-**Inferred, cannot run before build:** that the holder was the gate's own process, issued the recycled pid at spawn — its witness is the pid-logging re-run on the CI Windows leg, which this entry's build adds. Run at scope 2026-10-06: `native/src/gates/producer_liveness.rs` reads the process id in its tests alone, so the gate excludes no pid from a held reading.
-
-**Push need (2026-10-06, inside the budget):** the iteration's one mid-iteration push: the pid-logging witness runs only on the CI Windows leg. One push may not reproduce a misread seen once; the own-pid exclusion stands without it.
-
-**Deliverable:** the holder identified, by a re-run logging the gate's own pid beside the record's; then the gate excluding its own pid from a held reading, stated in that section, or the step's verdict admitting the window.
-
-**Cost while deferred:** an intermittent red on an unrelated push, spending a hotfix push to re-run. Filed 2026-10-05 to the gap inbox at drift-kit-tail-crosser-pass' build; promoted at its close: →fix fails because the cause is unobserved and either remedy changes a contract or a witness, →forward because no ruling is owed. Re-verified off the run's log: rows (a), (bp) and (c) read held then free, and (b) read gone around the gate with the gate at 1. One premise narrowed: the bullet's reuse inside the read window is a holder both brackets missed. Owner lookup: `liveness`, `pid`, `reuse` in this file — none; owner evidence-kit/SPEC.md §The producer-liveness lock. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling); lands after `evidence-kit-tail-brevity`.
-
 ### evidence-directive-unstated
 
 `spec:` directives in five crate modules attribute to an evidence-kit/SPEC.md section a fact that section does not state, each stale before the kit's front-half brevity pass. An audit at this filing judged 59 directives and flagged 25: `native/src/evidence.rs` 13 (a third no-cursor shape against the section's two, the run key's `None` as the guards' exit 2, the consumer arm keeping stdout whatever the status, the lock record's exact grammar, the queue-iteration and state-line shapes, the never-named key, a final unterminated line), `native/src/gates/evidence_manifest.rs` 4 (the eight-field split, the date shape, readers swallowing their own failure), `native/src/gates/producer_liveness.rs` 4 (absent as free under the lock section, unreadable as corrupt, a non-numeric and an over-wide pid dead), `native/src/emit/parse_gates_log.rs` 2 (a missing log failing closed, a tail-less log as the run failure) and `native/src/emit/parse_smoke_log.rs` 2 (first reach wins, the exit 2 naming the driver).
@@ -1234,4 +1222,5 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 
 - evidence-kit-tail-brevity
 - release-section-collision
+- liveness-windows-misread
 
