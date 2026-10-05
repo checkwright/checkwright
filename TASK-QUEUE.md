@@ -20,6 +20,18 @@ no measurement channel attributes a session's spend to repeated manual operation
 
 **Cost while deferred:** tooling gaps surface only by chance and repeated manual work stays unpriced. Filed 2026-09-27 to the gap inbox by platform-prerequisite-floors' lead; promoted at its close: →fix fails because the channel is new mechanism. Re-verified: `.workflow/knowledge-friction.log` holds no line at this close. Owner lookup: `economics`, `tooling opportunit`, `repeated` in this file — [build-stage-tier-economics](#build-stage-tier-economics) and [queue-tier-label-correction-cost](#queue-tier-label-correction-cost), DISTINCT (tier pricing); owner drift-kit/SPEC.md §The stage-economics meter.
 
+### docs-code-block-copy-wrap
+
+[spec: SPEC-code-blocks.md]
+
+docs-site code blocks carry no copy-to-clipboard button and do not wrap: docs/_layouts/default.html sets `white-space: pre-wrap` on `.markdown-body pre`, but jekyll-theme-primer sets `white-space: pre` on `pre > code`, inside which every fenced block renders, so the layout's rule never reaches the text. No page-authoring rule holds a code block runnable on its own. Operator direction 2026-10-05, lead-relayed (not a ruling).
+
+**Deliverable:** a copy button in layout script (`docs/assets/search.js` is the precedent), a wrap rule targeting `pre > code` and any `.highlight` variant, checked on a local render, and a page-authoring rule in docs/site-architecture.md, gate-held where possible: every block runs on its own, sequential commands split or joined with `&&`. docs/install.md's remedy blocks are run verbatim by install-smoke legs, so their shape is load-bearing.
+
+**Selected 2026-10-05** for drift-kit-tail-crosser-pass, operator direction lead-relayed (not a ruling); a feature, so the spec stage authors and promotes it.
+
+**Cost while deferred:** a reader copies commands by hand selection, long lines scroll, and a multi-command block pasted whole can run half. Filed 2026-10-05 to the gap inbox as two bullets by queue-kit-arms-crosser-pass' lead, the second correcting the first's wrap premise; promoted together at the next iteration's scope: →fix fails because the button and the rule are new names, →forward because the direction is given. Re-verified: the layout's `pre-wrap` rule and `assets/` holding only `search.js` and the logo. Owner lookup: `clipboard`, `code block`, `pre-wrap` in this file — none; owner docs/site-architecture.md §Page-authoring rules, site-kit for any gate.
+
 ## Technical Debt
 
 ### crosser-nested-mark-env
@@ -535,18 +547,6 @@ the front ends change to git's toplevel before the binary runs (the `cd` in gate
 **Push need (2026-10-05, inside the budget):** the one mid-iteration push, shared with [pwsh-install-smoke-split](#pwsh-install-smoke-split): run-gates.ps1's twin runs only on the CI Windows legs.
 
 **Cost while deferred:** a run started in a rare tree shape reports the enclosing repository's verdict as its own. Filed 2026-10-04 to the gap inbox by queue-kit-arms-crosser-pass' spec, which declined to widen its amendment; promoted at its close: →fix fails because the sh/ps1 twins, the plugin shim and the session-context template each need the mark walk under front-end parity, a contract change to §run-gates witnessed on the Windows legs, →forward because no ruling is owed. Re-verified: with an empty `.git` directory in a subdirectory of a fresh repository, `git rev-parse --show-toplevel --show-prefix` there answers the outer toplevel and the subdirectory prefix at exit 0, and run-gates.sh checks its mark only on a failed lookup. The bullet's pointer to the amendment file is replaced by §The crate's crosser, where it merged. Not a recurrence of `nested-broken-repo-toplevel`, which closed the crate side. Owner lookup: `toplevel`, `front end`, `session-context` in this file — none live; owner gate-sdk/SPEC.md §run-gates.
-
-### docs-code-block-copy-wrap
-
-[cost: event/low] [surface: docs]
-
-docs-site code blocks carry no copy-to-clipboard button and do not wrap: docs/_layouts/default.html sets `white-space: pre-wrap` on `.markdown-body pre`, but jekyll-theme-primer sets `white-space: pre` on `pre > code`, inside which every fenced block renders, so the layout's rule never reaches the text. No page-authoring rule holds a code block runnable on its own. Operator direction 2026-10-05, lead-relayed (not a ruling).
-
-**Deliverable:** a copy button in layout script (`docs/assets/search.js` is the precedent), a wrap rule targeting `pre > code` and any `.highlight` variant, checked on a local render, and a page-authoring rule in docs/site-architecture.md, gate-held where possible: every block runs on its own, sequential commands split or joined with `&&`. docs/install.md's remedy blocks are run verbatim by install-smoke legs, so their shape is load-bearing.
-
-**Selected 2026-10-05** for drift-kit-tail-crosser-pass, operator direction lead-relayed (not a ruling); a feature, so the spec stage authors and promotes it.
-
-**Cost while deferred:** a reader copies commands by hand selection, long lines scroll, and a multi-command block pasted whole can run half. Filed 2026-10-05 to the gap inbox as two bullets by queue-kit-arms-crosser-pass' lead, the second correcting the first's wrap premise; promoted together at the next iteration's scope: →fix fails because the button and the rule are new names, →forward because the direction is given. Re-verified: the layout's `pre-wrap` rule and `assets/` holding only `search.js` and the logo. Owner lookup: `clipboard`, `code block`, `pre-wrap` in this file — none; owner docs/site-architecture.md §Page-authoring rules, site-kit for any gate.
 
 ## Icebox
 
