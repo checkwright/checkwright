@@ -37,7 +37,9 @@ The build's first act on this amendment is to run the harness facts deltas 2 and
 
 Fact (c) renames the copy, so no standing hook is disturbed. Fact (d) repeats the first call from a session in a linked worktree, where the copy does not exist. The overlay's `hooks` key is removed once both halves are recorded.
 
-**Who supplies the Windows half: decided at build** (operator direction 2026-10-06, lead-relayed, not a ruling). The gate below stands as written and the queue is unchanged; the build session settles the supplier when it reaches the witness.
+**Who supplies the Windows half: nobody this iteration** (operator direction 2026-10-07, lead-relayed, not a ruling). The Windows half stays unrun, so the gate below takes its second branch as written: deltas 2 and 3 do not land, and guard-kit and context-kit stay in the bash row. The overlay block was applied by the lead on an operator grant of 2026-10-07, and the lead removes it once the unix half is recorded.
+
+**What lands this batch** (lead decision 2026-10-07): deltas 4, 5, 6 and 8 with the member wired through the front end, delta 7 in its narrower result, then the iteration's push. The unix half is run and recorded all the same, as evidence the deferred rewire will need. The queue disposition of deltas 2 and 3 goes back to the lead as an escalation, and no queue entry is written for them before it is ruled.
 
 **The gate it sets.**
 
