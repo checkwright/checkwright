@@ -64,14 +64,13 @@ pub(crate) const CARRIED: &str = "close-surfaces.txt";
 // reason); the lead token is matched full-line, which needs no regex
 pub(crate) fn declaration_lines(text: &str) -> Vec<&str> {
     let mut out: Vec<&str> = Vec::new();
-    let mut fence = false;
+    let mut fence = crate::spec::Fence::default();
     for line in text.lines() {
         let t = line.trim_start_matches(WS);
-        if t.starts_with("```") {
-            fence = !fence;
+        if fence.delimits(line) {
             continue;
         }
-        if fence {
+        if fence.is_open() {
             continue;
         }
         if let Some(rest) = t.strip_prefix("close-surface:") {

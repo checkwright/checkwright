@@ -70,14 +70,13 @@ fn strip_links(s: &str) -> String {
 // below the heading that is outside a fence and is neither a heading nor a `---` rule; emphasis and
 // code marks are stripped and the text is cut at the first `.`, `!` or `?`, else at 120 characters.
 fn first_sentence(lines: &[&str], from: usize) -> String {
-    let mut in_fence = false;
+    let mut in_fence = crate::spec::Fence::with_tilde();
     for line in lines.iter().skip(from) {
         let l = line.trim_matches([' ', '\t']);
-        if l.starts_with("```") || l.starts_with("~~~") {
-            in_fence = !in_fence;
+        if in_fence.delimits(line) {
             continue;
         }
-        if in_fence {
+        if in_fence.is_open() {
             continue;
         }
         if heading_level(l) > 0 || l.starts_with("---") {

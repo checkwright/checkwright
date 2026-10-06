@@ -18,6 +18,13 @@ A fence must read as neither a delta heading nor a declared spelling:
 - `fenced-spelling` — retired by delta 9, and invisible to every arm
 ```
 
+The same block as a list item:
+
+- ```
+  ### (9) not a heading
+  - `fenced-spelling` — retired by delta 9, and invisible to every arm
+  ```
+
 ## Existing sections updated
 
 - `component/SPEC.md` §One — a surface the roster names, which is what makes the

@@ -1,2 +1,5 @@
-check-docs-page-length: 1 page(s) past 20 word(s):
+check-docs-page-length: 4 page(s) past 20 word(s):
+  site/item.md: 25 word(s), the bound is 20
+  site/nested.md: 26 word(s), the bound is 20
   site/page.md: 24 word(s), the bound is 20
+  site/unclosed.md: 25 word(s), the bound is 20

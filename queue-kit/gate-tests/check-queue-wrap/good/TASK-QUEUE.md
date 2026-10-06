@@ -24,6 +24,10 @@ a nested unit of beta.
 
 collapse the duplicated log lines.
 
+- ```text
+  a line inside a list-item fence is a quoted log line and is never measured, however far past the budget it happens to run
+  ```
+
 ## Deferred
 
 ### gamma-feature

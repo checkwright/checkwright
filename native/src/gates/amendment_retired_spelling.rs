@@ -60,7 +60,7 @@ fn scan(text: &str) -> Scan {
         roster_paths: Vec::new(),
         bullets: Vec::new(),
     };
-    let mut fence = false;
+    let mut fence = spec::Fence::default();
     let mut sec = Sec::Other;
     let mut i = 0usize;
     while i < lines.len() {
@@ -68,12 +68,11 @@ fn scan(text: &str) -> Scan {
         // spec: canon-kit/SPEC.md §check-amendment-retired-spelling — a fenced block is skipped
         // whole, on §check-amendment-update-target's ground: an embedded wire-contract delta is
         // grammar being shown rather than a bullet being declared
-        if spec::is_fence_line(raw) {
-            fence = !fence;
+        if fence.delimits(raw) {
             i += 1;
             continue;
         }
-        if fence {
+        if fence.is_open() {
             i += 1;
             continue;
         }
@@ -130,7 +129,7 @@ fn scan(text: &str) -> Scan {
                         j += 1;
                         continue;
                     }
-                    if spec::is_fence_line(l) || !(l.starts_with(' ') || l.starts_with('\t')) {
+                    if spec::fence_opening(l).is_some() || !(l.starts_with(' ') || l.starts_with('\t')) {
                         break;
                     }
                     para.add(j + 1, l);

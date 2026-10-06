@@ -115,14 +115,13 @@ fn extract(files: &[String]) -> Result<Vec<Claim>, String> {
     for f in files {
         let text = spec::read_text(Path::new(f))?;
         let mut para: Vec<(usize, String)> = Vec::new();
-        let mut fence = false;
+        let mut fence = spec::Fence::default();
         for (idx, raw) in text.lines().enumerate() {
-            if spec::is_fence_line(raw) {
+            if fence.delimits(raw) {
                 flush(f, &mut para, &mut out);
-                fence = !fence;
                 continue;
             }
-            if fence || spec::is_blank(raw) {
+            if fence.is_open() ||spec::is_blank(raw) {
                 flush(f, &mut para, &mut out);
                 continue;
             }

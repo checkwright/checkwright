@@ -11,3 +11,9 @@
 ```text
 - [x] T006 An example task naming docs/absent.md
 ```
+
+The same block as a list item:
+
+- ```text
+  - [x] T006 An example task naming docs/absent.md
+  ```

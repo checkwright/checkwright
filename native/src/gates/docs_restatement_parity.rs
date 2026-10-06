@@ -98,13 +98,12 @@ fn sibling(page: &str) -> String {
 // code alone, inline spans and fenced lines; prose outside code is a narrative mention
 fn page_tokens(text: &str, prefixes: &[String]) -> Vec<(usize, String)> {
     let mut out: Vec<(usize, String)> = Vec::new();
-    let mut fenced = false;
+    let mut fenced = spec::Fence::default();
     for (i, raw) in text.lines().enumerate() {
-        if spec::is_fence_line(raw) {
-            fenced = !fenced;
+        if fenced.delimits(raw) {
             continue;
         }
-        let spans: Vec<String> = if fenced {
+        let spans: Vec<String> = if fenced.is_open() {
             vec![raw.to_string()]
         } else {
             inline_code_spans(raw)

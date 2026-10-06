@@ -204,11 +204,6 @@ fn active_entry_lines(text: &str, sections: &[String]) -> Vec<bool> {
     out
 }
 
-fn is_fence(line: &str) -> bool {
-    let t = line.trim_start_matches([' ', '\t']);
-    t.starts_with("```") || t.starts_with("~~~")
-}
-
 // spec: lifecycle-kit/SPEC.md §check-stage-entry — a code span is a backtick run and the next run
 // of the same length on that line; an unclosed run is literal
 fn code_spans(s: &str) -> Vec<(usize, usize)> {
@@ -273,13 +268,12 @@ struct MarkerScan {
 // marker lands in exactly one set.
 fn scan_markers(text: &str, in_scope: &dyn Fn(usize) -> bool) -> MarkerScan {
     let lines: Vec<&str> = text.lines().collect();
-    let (mut scan, mut fenced) = (MarkerScan::default(), false);
+    let (mut scan, mut fenced) = (MarkerScan::default(), crate::spec::Fence::with_tilde());
     for (i, line) in lines.iter().enumerate() {
-        if is_fence(line) {
-            fenced = !fenced;
+        if fenced.delimits(line) {
             continue;
         }
-        if fenced || !in_scope(i) {
+        if fenced.is_open() || !in_scope(i) {
             continue;
         }
         match inferred_marker(line) {
@@ -294,7 +288,7 @@ fn scan_markers(text: &str, in_scope: &dyn Fn(usize) -> bool) -> MarkerScan {
                 let mut bad = !bare_spellings(line).is_empty();
                 // spec: lifecycle-kit/SPEC.md §check-stage-entry — a split spelling starts on this
                 // line and ends on the next, read joined by one space
-                if let Some(next) = lines.get(i + 1).filter(|n| !is_fence(n) && in_scope(i + 1)) {
+                if let Some(next) = lines.get(i + 1).filter(|n| !crate::spec::Fence::with_tilde().delimits(n) && in_scope(i + 1)) {
                     let joined = format!("{} {}", line, next);
                     bad |= bare_spellings(&joined).iter().any(|at| {
                         let len = if joined[*at..].starts_with(NOT_RUN) { NOT_RUN.len() } else { CANNOT_RUN.len() };
@@ -728,6 +722,12 @@ mod tests {
                 carried: 1,
                 ..Default::default()
             }
+        );
+        let item = "- ```\n  **Inferred, not run:** a — `c`\n  ```\n````\n```\n**Inferred, not run:** b — `c`\n````\n**Inferred, not run:** d — `c`\n";
+        assert_eq!(
+            scan_markers(item, &|_| true).residue,
+            vec!["8: **Inferred, not run:** d — `c`".to_string()],
+            "a list-item fence and a longer fence both hold their markers"
         );
     }
 

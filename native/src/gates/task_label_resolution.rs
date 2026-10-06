@@ -178,13 +178,12 @@ fn scan(text: &str, families: &[Family], defined: &[BTreeSet<String>]) -> Scan {
         findings: Vec::new(),
         tally: Tally::default(),
     };
-    let mut fence = false;
+    let mut fence = spec::Fence::default();
     for (i, line) in raw.iter().enumerate() {
-        if spec::is_fence_line(line) {
-            fence = !fence;
+        if fence.delimits(line) {
             continue;
         }
-        if fence {
+        if fence.is_open() {
             continue;
         }
         let valve = [Some(i), i.checked_sub(1)]

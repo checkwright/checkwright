@@ -29,3 +29,11 @@ curl -fsSL https://example.invalid/install.sh
 ```
 
 Prose may name the marker, `<!-- fence-runnable -->`, without marking anything.
+
+A marker-shaped line inside a longer fence is the block's text, and the shorter run closes nothing:
+
+````md
+```
+<!-- fence-runable -->
+```
+````

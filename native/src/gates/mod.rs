@@ -1304,7 +1304,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-door-binding",
         door_binding::run,
-        &[("?", "", "", "dynamic@src/gates/door_binding.rs:277")],
+        &[("?", "", "", "dynamic@src/gates/door_binding.rs:273")],
         &["GATE_SDK_KIT_DIRS", "GUARD_KIT_DOOR_ROOTS"],
         "guard-kit",
         &[("git", "")],
@@ -1485,7 +1485,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-close-surfaces",
         close_surfaces::run,
-        &[("?", "", "", "dynamic@src/emit/close_surfaces.rs:264 via emit::close_surfaces::derive")],
+        &[("?", "", "", "dynamic@src/emit/close_surfaces.rs:263 via emit::close_surfaces::derive")],
         &[
             "GATE_SDK_KIT_DIRS",
             "GATE_SDK_PRUNE_DIRS",

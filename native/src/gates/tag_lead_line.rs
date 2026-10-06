@@ -111,14 +111,13 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
-    let mut fence = false;
+    let mut fence = crate::spec::Fence::default();
     for (i, line) in lines.iter().enumerate() {
         let t = line.trim_start_matches([' ', '\t']);
-        if t.starts_with("```") {
-            fence = !fence;
+        if fence.delimits(line) {
             continue;
         }
-        if fence || t.starts_with('|') {
+        if fence.is_open() || t.starts_with('|') {
             continue;
         }
         let Some((leadfnr, leadcls)) = &lead[i] else { continue };

@@ -1,5 +1,9 @@
 # Fixture guard spec
 
+- ```text
+  a list-item fence closes on its indented line, so the roster below is still read
+  ```
+
 ## The generic ruleset
 
 Prose cites rule `omega`, which no item carries, and rule 2 by number, and rule-5 hyphenated, and rules (3, 4) parenthesized.

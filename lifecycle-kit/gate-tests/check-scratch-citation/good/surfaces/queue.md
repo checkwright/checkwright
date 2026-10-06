@@ -29,3 +29,9 @@
 - **exempt-dead-citation** — the escape hatch: a surface quoting a dead citation verbatim in order to
   describe it. scratch-citation-exempt: this entry documents the defect and must quote it
   `prose-profile` ended "Full finding and its two-command witness: `.workflow/survey-record.md`".
+
+- **quoted-in-a-list-item-fence** — a dead citation shown as an example block is a specimen.
+
+  - ```text
+    Full finding and its two-command witness: `.workflow/survey-record.md`
+    ```

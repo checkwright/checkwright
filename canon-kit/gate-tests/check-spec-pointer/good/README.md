@@ -21,3 +21,9 @@ none of them. So does a link-wrapped citation,
 placeholder §<heading>, and a `§` quoted inside a code span is the mark itself.
 A document numbering its sections writes §3 or §2.1 as a section-number mark,
 which no heading here carries and which never fires.
+
+A citation quoted in a list-item fence is an example and is never resolved:
+
+- ```
+  SPEC-widget.md §The heading nobody wrote
+  ```

@@ -1,2 +1,3 @@
 '--run-fixtures' occurs nowhere in kit/README.md
 'WIDGET_KIT_RETIRED_KNOB' occurs nowhere in kit/README.md
+'--run-listed-nowhere' occurs nowhere in kit/README.md

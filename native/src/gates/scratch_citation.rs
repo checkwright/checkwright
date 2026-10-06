@@ -179,16 +179,15 @@ pub fn run(args: &[String]) -> i32 {
         let lines: Vec<&str> = text.lines().collect();
         let mut hits: Vec<(usize, &'static str, usize)> = Vec::new();
         let mut para = Para::new();
-        let mut fence = false;
+        let mut fence = crate::spec::Fence::default();
         for (idx, raw) in lines.iter().enumerate() {
             let lead = raw.trim_start_matches(is_space);
-            if lead.starts_with("```") {
+            if fence.delimits(raw) {
                 scan_para(&para, &tchars, &mut hits);
                 para.reset();
-                fence = !fence;
                 continue;
             }
-            if fence || lead.is_empty() {
+            if fence.is_open() || lead.is_empty() {
                 scan_para(&para, &tchars, &mut hits);
                 para.reset();
                 continue;

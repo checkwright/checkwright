@@ -15,3 +15,10 @@ echo current-behavior-only
 ```
 
 The report lists each rule and its owner.
+
+The same block as a list item:
+
+- ```sh
+  # a fenced example may quote a marker: previously, no longer, used to be
+  echo current-behavior-only
+  ```

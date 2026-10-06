@@ -10,6 +10,13 @@ Run the one-line install first.
 echo step
 ```
 
+The same block as a list item:
+
+- ```sh
+  # a comment line, not a heading
+  echo step
+  ```
+
 | Step | Command |
 | --- | --- |
 | one | `echo one` |

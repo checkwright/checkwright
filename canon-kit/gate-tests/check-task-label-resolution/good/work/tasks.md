@@ -6,3 +6,9 @@
 ```text
 - [ ] T003 [US9] An example task citing an undefined story
 ```
+
+The same block as a list item:
+
+- ```text
+  - [ ] T003 [US9] An example task citing an undefined story
+  ```

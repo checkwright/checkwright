@@ -135,17 +135,15 @@ fn rule(args: &[String]) -> Result<i32, String> {
 fn collect(file: &str, text: &str, span: Span, markers: &mut Vec<Marker>, errs: &mut Vec<String>) {
     let lines: Vec<&str> = text.lines().collect();
     let exempt = |i: usize| lines[i].contains(EXEMPT) || (i > 0 && lines[i - 1].contains(EXEMPT));
-    let mut fence = false;
+    let mut fence = spec::Fence::default();
     let mut head: Option<usize> = None;
     let mut body: Vec<usize> = Vec::new();
     for (i, raw) in lines.iter().enumerate() {
-        let fl = spec::is_fence_line(raw);
-        let full = !fence && !fl && raw.trim().starts_with(spec::MEASURED_MARKER);
-        if fl || fence || full || spec::is_blank(raw) {
+        let fl = fence.delimits(raw);
+        let full = !fence.is_open() && !fl && raw.trim().starts_with(spec::MEASURED_MARKER);
+        if fl || fence.is_open() || full || spec::is_blank(raw) {
             block(file, &lines, head.take(), &std::mem::take(&mut body), span, &exempt, markers, errs);
-            if fl {
-                fence = !fence;
-            } else if full {
+            if full {
                 head = Some(i);
             }
             continue;

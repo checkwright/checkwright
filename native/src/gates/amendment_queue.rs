@@ -185,14 +185,13 @@ fn citation_tokens(line: &str, glob: &str) -> Vec<String> {
 // inline or spanning lines, and reads every other line of the amendment body
 fn amendment_citations(body: &str, glob: &str) -> Vec<(usize, String)> {
     let mut out: Vec<(usize, String)> = Vec::new();
-    let mut fence = false;
+    let mut fence = crate::spec::Fence::default();
     let mut comment = false;
     for (idx, line) in body.lines().enumerate() {
-        if !comment && line.trim_start().starts_with("```") {
-            fence = !fence;
+        if !comment && fence.delimits(line) {
             continue;
         }
-        if fence {
+        if fence.is_open() {
             continue;
         }
         let mut visible = String::new();

@@ -58,11 +58,12 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut cur = Section::default();
     for f in &specs {
         flush(&mut cur, &mut findings, density);
-        let mut in_fence = false;
+        let mut fence = spec::Fence::default();
         for (idx, raw) in spec::read_text(Path::new(f))?.lines().enumerate() {
             let fnr = idx + 1;
-            if raw.starts_with("```") {
-                in_fence = !in_fence;
+            let delimits = fence.delimits(raw);
+            let in_fence = fence.is_open();
+            if delimits {
                 if !cur.heading.is_empty() {
                     cur.body_nonblank += 1;
                     cur.fenced_nonblank += 1;

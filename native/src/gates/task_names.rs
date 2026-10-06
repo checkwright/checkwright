@@ -16,17 +16,8 @@ fn single_backtick_slugs(line: &str) -> Vec<&str> {
 
 // spec: queue-kit/SPEC.md §check-task-names — a fence line toggles the window no reference is read in
 fn fenced_lines(lines: &[&str]) -> Vec<bool> {
-    let mut inside = false;
-    lines
-        .iter()
-        .map(|l| {
-            if l.trim_start().starts_with("```") {
-                inside = !inside;
-                return true;
-            }
-            inside
-        })
-        .collect()
+    let mut fence = crate::spec::Fence::default();
+    lines.iter().map(|l| fence.delimits(l) || fence.is_open()).collect()
 }
 
 // spec: queue-kit/SPEC.md §check-task-names — every `[blocked-by: <slug>]` on the line, in

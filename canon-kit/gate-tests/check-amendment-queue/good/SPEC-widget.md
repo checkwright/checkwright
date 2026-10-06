@@ -11,3 +11,9 @@ Arm (e)'s passing half: this file cites itself as SPEC-widget.md, names a placeh
 ```
 see SPEC-merged.md
 ```
+
+The same block as a list item:
+
+- ```
+  see SPEC-merged.md
+  ```

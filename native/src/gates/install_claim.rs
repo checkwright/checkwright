@@ -1,7 +1,7 @@
 // spec: canon-kit/SPEC.md §check-install-claim — exactly one governed doc declares the
 // primary install transport, and no scanned install section leads with a different one; the
 // transport vocabulary is the consumer's command knob's output, never a crate literal
-use crate::spec::{self, compile_pattern as compile, declared_id, governed_docs, skip_space};
+use crate::spec::{self, compile_pattern as compile, declared_id, governed_docs};
 use std::path::Path;
 
 pub fn run(args: &[String]) -> i32 {
@@ -95,18 +95,17 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut scanned = 0usize;
     for f in &files {
         let text = spec::read_text(Path::new(f))?;
-        let mut fence = false;
+        let mut fence = spec::Fence::with_tilde();
         let mut inscope = false;
         let mut settled = false;
         let mut sect_name = String::new();
         let mut sect_fnr = 0usize;
         for (idx, raw) in text.lines().enumerate() {
             let fnr = idx + 1;
-            if is_fence(raw) {
-                fence = !fence;
+            if fence.delimits(raw) {
                 continue;
             }
-            if !fence {
+            if !fence.is_open() {
                 if let Some((_, end)) = head_re.find(raw) {
                     let head = rtrim_space(&raw[end..]);
                     inscope = sect.is_match(head);
@@ -176,14 +175,6 @@ fn rule(args: &[String]) -> Result<i32, String> {
 // spec: canon-kit/SPEC.md §check-install-claim — `^#{2,6}[[:space:]]+`, the kit's own heading
 // grammar, compiled through the engine because delta (5) makes its span the production reader
 const HEADING_RE: &str = "^#{2,6}[[:space:]]+";
-
-// spec: canon-kit/SPEC.md §check-install-claim — this member's fence test admits `~~~` beside
-// the backtick form, so it is its own rather than the manifest walk's
-pub fn is_fence(line: &str) -> bool {
-    let b = line.as_bytes();
-    let i = skip_space(b, 0);
-    b[i..].starts_with(b"```") || b[i..].starts_with(b"~~~")
-}
 
 fn rtrim_space(s: &str) -> &str {
     let b = s.as_bytes();

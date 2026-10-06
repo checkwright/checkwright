@@ -101,26 +101,25 @@ fn read_page(page: &str) -> Result<String, String> {
 }
 
 // spec: canon-kit/SPEC.md §check-docs-page-length — the measure: whitespace-separated tokens after
-// the front-matter block, HTML comments skipped outside a fence, table rows and fenced blocks counted
+// the front-matter block, HTML comments skipped outside a fence, table rows and fenced blocks
+// counted; an opening `---` nothing closes delimits no block, so the page counts whole
 fn page_words(text: &str) -> usize {
     let raw: Vec<&str> = text.lines().collect();
-    let mut front = raw.first().map(|l| l.trim_end() == "---").unwrap_or(false);
-    let mut fence = false;
+    let rule = |l: &str| l.trim_end() == "---";
+    let body = if raw.first().is_some_and(|l| rule(l)) {
+        raw.iter().skip(1).position(|l| rule(l)).map_or(0, |close| close + 2)
+    } else {
+        0
+    };
+    let mut fence = spec::Fence::default();
     let mut comment = false;
     let mut words = 0usize;
-    for (i, line) in raw.iter().enumerate() {
-        if front {
-            if i > 0 && line.trim_end() == "---" {
-                front = false;
-            }
-            continue;
-        }
-        if !comment && spec::is_fence_line(line) {
-            fence = !fence;
+    for line in &raw[body..] {
+        if !comment && fence.delimits(line) {
             words += line.split_whitespace().count();
             continue;
         }
-        if fence {
+        if fence.is_open() {
             words += line.split_whitespace().count();
             continue;
         }
@@ -165,6 +164,17 @@ mod tests {
     #[test]
     fn a_page_with_no_front_matter_counts_from_its_first_line() {
         assert_eq!(page_words("one two\n---\nthree\n"), 4);
+    }
+
+    #[test]
+    fn an_unclosed_front_matter_rule_delimits_no_block() {
+        assert_eq!(page_words("---\ntitle: counted\n\none two\n"), 5);
+    }
+
+    #[test]
+    fn a_shorter_run_inside_a_longer_fence_is_the_blocks_text() {
+        let page = "````md\n```\n<!-- one two three -->\n```\n````\nfour <!-- skipped --> five\n";
+        assert_eq!(page_words(page), 11);
     }
 
     // spec: canon-kit/SPEC.md §check-docs-page-length — both exit-2 paths, which a `bad/` fixture

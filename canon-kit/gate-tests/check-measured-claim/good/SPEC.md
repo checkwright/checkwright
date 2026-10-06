@@ -29,3 +29,9 @@ documents the marker grammar avoids naming a key nobody emits.
 ```
 
 A fenced block is grammar being shown, never a claim being made.
+
+The same block as a list item:
+
+- ```
+  <!-- measured: also-never-emitted=1 -->
+  ```

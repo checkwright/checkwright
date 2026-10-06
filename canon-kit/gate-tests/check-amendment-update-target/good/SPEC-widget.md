@@ -19,6 +19,13 @@ must read as neither a delta heading nor an update target:
 - **not/a/target.md** — and no citation anywhere in it
 ```
 
+The same block as a list item:
+
+- ```
+  ### (9) not a heading
+  - **not/a/target.md** — and no citation anywhere in it
+  ```
+
 ### (3) The third delta
 
 Body prose.

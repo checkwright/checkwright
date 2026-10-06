@@ -22,3 +22,11 @@ The fail-open arms need no declaration anywhere, the exemption keying on the arm
 
 And a subject-position mention is not a door at all: `run-gates.sh` runs gates,
 not tests.
+
+Fence scope reaches a block a list item opens, closed on its indented line:
+
+<!-- door-contributor: the contributor battery register, as a list item -->
+- ```bash
+  bash gate-sdk/bin/run-gates.sh --run-gate-tests beta-kit/gate-tests
+  bash gate-sdk/bin/run-gates.sh --run-guard-tests
+  ```

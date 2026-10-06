@@ -28,6 +28,10 @@ a nested unit of beta, its own tag line its lead rather than a body line of its 
 
 collapse the duplicated log lines. a continuation mentioning [drain-exempt: whatever] is tolerated (lead carries the class).
 
+- ```text
+  a tag quoted in a list-item fence, [blocked-by: alpha-feature], is an example.
+  ```
+
 ### watch-the-run
 
 [observed-by: ci-run]

@@ -161,15 +161,14 @@ fn rewrite_line(ctx: &Ctx, srcdir: &str, line: &str) -> String {
 fn prose_mask(lines: &[&str]) -> Vec<String> {
     let blank = |l: &str| " ".repeat(l.len());
     let mut out: Vec<String> = Vec::new();
-    let mut fence = false;
+    let mut fence = spec::Fence::default();
     let mut comment = false;
     for line in lines {
-        if !comment && spec::is_fence_line(line) {
-            fence = !fence;
+        if !comment && fence.delimits(line) {
             out.push(blank(line));
             continue;
         }
-        if fence || (!comment && spec::prose_heading_level(line) > 0) {
+        if fence.is_open() || (!comment && spec::prose_heading_level(line) > 0) {
             out.push(blank(line));
             continue;
         }

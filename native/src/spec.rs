@@ -743,7 +743,7 @@ pub fn walk_prose_multi(
     let mut curfile = String::new();
     for f in files {
         let text = read_text(Path::new(f))?;
-        let mut fence = false;
+        let mut fence = Fence::default();
         let mut prev = String::new();
         let mut first = true;
         for (idx, raw) in text.lines().enumerate() {
@@ -753,19 +753,18 @@ pub fn walk_prose_multi(
                 // *previous* file's paragraph, so it still reports under that file's name
                 sink.on_pflush(&curfile, &para);
                 para.reset();
-                fence = false;
+                fence.reset();
                 prev = String::new();
                 first = false;
             }
             curfile = f.clone();
-            if is_fence_line(raw) {
+            if fence.delimits(raw) {
                 sink.on_pflush(&curfile, &para);
                 para.reset();
-                fence = !fence;
                 prev = raw.to_string();
                 continue;
             }
-            if fence || marked(raw) || marked(&prev) || is_blank(raw) {
+            if fence.is_open() || marked(raw) || marked(&prev) || is_blank(raw) {
                 sink.on_pflush(&curfile, &para);
                 para.reset();
                 prev = raw.to_string();
@@ -894,10 +893,80 @@ pub fn word_count(s: &str) -> usize {
     s.split([' ', '\t']).filter(|w| !w.is_empty()).count()
 }
 
-// spec: canon-kit/SPEC.md §The shared spec adapters — the fence and blank-line shapes the awk driver
-// tests, byte-wise on POSIX space as awk matches them
-pub fn is_fence_line(line: &str) -> bool {
-    lstrip_space(line.as_bytes()).starts_with(b"```")
+// spec: canon-kit/SPEC.md §The shared spec adapters — the fence reader: one state every fence
+// toggle steps, so no two parsers disagree on where a block ends
+#[derive(Clone, Copy, Default)]
+pub struct Fence {
+    tilde: bool,
+    open: Option<(u8, usize)>,
+}
+
+impl Fence {
+    pub fn with_tilde() -> Fence {
+        Fence { tilde: true, open: None }
+    }
+
+    pub fn is_open(&self) -> bool {
+        self.open.is_some()
+    }
+
+    pub fn reset(&mut self) {
+        self.open = None;
+    }
+
+    // spec: canon-kit/SPEC.md §The shared spec adapters — true on a delimiter line, which the
+    // call consumes: an opener while closed, a run of the opener's character at least its
+    // length while open
+    pub fn delimits(&mut self, line: &str) -> bool {
+        match self.open {
+            None => {
+                self.open = fence_run(fence_text(line, self.tilde));
+                self.open.is_some()
+            }
+            Some((c, n)) => {
+                let t = lstrip_space(line.as_bytes());
+                let closes = t.iter().take_while(|&&b| b == c).count() >= n;
+                if closes {
+                    self.open = None;
+                }
+                closes
+            }
+        }
+    }
+}
+
+fn fence_run(t: &str) -> Option<(u8, usize)> {
+    let c = *t.as_bytes().first()?;
+    Some((c, t.bytes().take_while(|&b| b == c).count()))
+}
+
+// spec: canon-kit/SPEC.md §The shared spec adapters — the opener: the run and info string after
+// leading blanks, or after a list-item marker and its blank
+pub fn fence_opening(raw: &str) -> Option<&str> {
+    let t = fence_text(raw, false);
+    (!t.is_empty()).then_some(t)
+}
+
+fn fence_text(raw: &str, tilde: bool) -> &str {
+    let runs = |s: &str| s.starts_with("```") || (tilde && s.starts_with("~~~"));
+    let lead = lstrip_space(raw.as_bytes()).len();
+    let t = &raw[raw.len() - lead..];
+    if runs(t) {
+        return t;
+    }
+    let digits = t.bytes().take_while(u8::is_ascii_digit).count();
+    let marker = match t.as_bytes().get(digits) {
+        Some(b'-' | b'*' | b'+') if digits == 0 => 1,
+        Some(b'.') if digits > 0 => digits + 1,
+        _ => return "",
+    };
+    let rest = &t[marker..];
+    let body = rest.trim_start_matches([' ', '\t']);
+    if body.len() < rest.len() && runs(body) {
+        body
+    } else {
+        ""
+    }
 }
 
 pub fn is_blank(line: &str) -> bool {
@@ -1703,6 +1772,38 @@ fn delimited(b: &[u8], d: u8, nonempty: bool) -> Option<(usize, usize)> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn fenced(text: &str, mut fence: Fence) -> Vec<bool> {
+        text.lines().map(|l| fence.delimits(l) || fence.is_open()).collect()
+    }
+
+    #[test]
+    fn the_opener_follows_leading_blanks_or_a_list_item_marker_and_its_blank() {
+        assert_eq!(fence_opening("  ```sh"), Some("```sh"));
+        assert_eq!(fence_opening("  * ```bash x"), Some("```bash x"));
+        assert_eq!(fence_opening("12.\t```sh"), Some("```sh"));
+        assert_eq!(fence_opening("-```sh"), None);
+        assert_eq!(fence_opening("- text ```sh"), None);
+        assert_eq!(fence_opening("1```sh"), None);
+        assert_eq!(fence_opening("1) ```sh"), None);
+        assert_eq!(fence_opening("~~~"), None);
+    }
+
+    #[test]
+    fn a_closer_is_a_run_at_least_the_openers_length_and_never_a_list_item() {
+        let f = Fence::default();
+        assert_eq!(fenced("- ```sh\n  a\n  ```\nb\n", f), [true, true, true, false]);
+        assert_eq!(fenced("````\n```\n- ````\n`````x\nb\n", f), [true, true, true, true, false]);
+        assert_eq!(fenced("```\n- ```\n```\nb\n", f), [true, true, true, false]);
+    }
+
+    #[test]
+    fn the_tilde_reader_closes_a_fence_on_its_own_character_only() {
+        let t = Fence::with_tilde();
+        assert_eq!(fenced("~~~\n```\n~~~\nb\n", t), [true, true, true, false]);
+        assert_eq!(fenced("- ~~~\n  ```\n  ~~~~\nb\n", t), [true, true, true, false]);
+        assert_eq!(fenced("~~~\nb\n", Fence::default()), [false, false]);
+    }
 
     // spec: canon-kit/SPEC.md §check-md-refs — the three shapes a collapsing slug got wrong: an em
     // dash between spaces, a dropped `#`, and a leading dropped `§`

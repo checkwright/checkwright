@@ -106,11 +106,6 @@ fn decl_alone(line: &str) -> bool {
     t.starts_with("<!--") && t.ends_with("-->") && decl_reason(t).is_some()
 }
 
-fn is_fence(line: &str) -> bool {
-    let t = line.trim_start_matches([' ', '\t']);
-    t.starts_with("```") || t.starts_with("~~~")
-}
-
 // spec: guard-kit/SPEC.md §check-door-binding — the two declaration scopes resolved over one file:
 // whole-file when a standalone declaration stands before the first `#` heading, and the fenced
 // block a standalone declaration immediately precedes
@@ -150,12 +145,13 @@ fn scopes(lines: &[&str]) -> Scopes {
             continue;
         };
         let open = i + 1 + off;
-        if !is_fence(lines[open]) {
+        let mut fence = crate::spec::Fence::with_tilde();
+        if !fence.delimits(lines[open]) {
             continue;
         }
         let close = lines[open + 1..]
             .iter()
-            .position(|n| is_fence(n))
+            .position(|n| fence.delimits(n))
             .map(|k| open + 1 + k)
             .unwrap_or(lines.len().saturating_sub(1));
         s.spans.push((open, close));

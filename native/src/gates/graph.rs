@@ -160,24 +160,20 @@ fn valid_glob_token(tok: &str) -> bool {
 // word is a valued `<key>=<value>`
 fn extract_amend_manifests(text: &str) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
-    let mut infence = false;
+    let mut fence = crate::spec::Fence::default();
     let mut flang = String::new();
     for line in text.lines() {
-        if line.trim_start().starts_with("```") {
-            if infence {
-                infence = false;
-                flang.clear();
-            } else {
-                infence = true;
-                let t = line.trim_start().trim_start_matches('`');
-                flang = t
-                    .chars()
-                    .take_while(|c| c.is_ascii_alphanumeric() || *c == '_' || *c == '-')
-                    .collect();
-            }
+        let opener = if fence.is_open() { None } else { crate::spec::fence_opening(line) };
+        if fence.delimits(line) {
+            flang = opener
+                .unwrap_or("")
+                .trim_start_matches('`')
+                .chars()
+                .take_while(|c| c.is_ascii_alphanumeric() || *c == '_' || *c == '-')
+                .collect();
             continue;
         }
-        if infence {
+        if fence.is_open() {
             if flang == "proto" {
                 continue;
             }

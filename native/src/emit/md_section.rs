@@ -29,17 +29,12 @@ fn heading_text(line: &str) -> String {
 // fence-aware contract reuse `section::sections` rather than widen it for its other callers.
 fn fence_mask<'a>(lines: &[&'a str]) -> Vec<&'a str> {
     let mut out: Vec<&str> = Vec::with_capacity(lines.len());
-    let mut in_fence = false;
+    let mut fence = crate::spec::Fence::with_tilde();
     for line in lines {
-        let l = line.trim_start_matches([' ', '\t']);
-        let marker = l.starts_with("```") || l.starts_with("~~~");
-        if marker || in_fence {
+        if fence.delimits(line) || fence.is_open() {
             out.push("");
         } else {
             out.push(line);
-        }
-        if marker {
-            in_fence = !in_fence;
         }
     }
     out

@@ -9,3 +9,7 @@ followed.
 gates --run-fixtures widget/gate-tests
 WIDGET_KIT_RETIRED_KNOB=1 gates --emit graph
 ```
+
+- ```bash
+  gates --run-listed-nowhere
+  ```

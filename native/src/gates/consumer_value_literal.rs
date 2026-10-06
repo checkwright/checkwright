@@ -204,15 +204,13 @@ fn index_headings(files: &[String]) -> Result<Headings, String> {
     };
     for f in files {
         let text = read(f)?;
-        let mut fenced = false;
+        let mut fenced = crate::spec::Fence::with_tilde();
         for raw in text.lines() {
             let line = raw.trim_end();
-            let t = line.trim_start();
-            if t.starts_with("```") || t.starts_with("~~~") {
-                fenced = !fenced;
+            if fenced.delimits(line) {
                 continue;
             }
-            if fenced {
+            if fenced.is_open() {
                 continue;
             }
             let Some(body) = heading(line) else { continue };

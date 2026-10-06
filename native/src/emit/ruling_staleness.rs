@@ -93,14 +93,13 @@ impl Band {
 // the grammar stays quotable in the surface that specifies it.
 fn body_lines(text: &str) -> Vec<(usize, &str)> {
     let mut out: Vec<(usize, &str)> = Vec::new();
-    let mut fence = false;
+    let mut fence = crate::spec::Fence::default();
     for (i, line) in text.lines().enumerate() {
         let t = line.trim_start_matches(WS);
-        if t.starts_with("```") {
-            fence = !fence;
+        if fence.delimits(line) {
             continue;
         }
-        if !fence {
+        if !fence.is_open() {
             out.push((i + 1, t));
         }
     }

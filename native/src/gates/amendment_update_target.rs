@@ -52,7 +52,7 @@ fn scan(text: &str) -> Scan {
         has_what: false,
         has_updated: false,
     };
-    let mut fence = false;
+    let mut fence = spec::Fence::default();
     let mut sec = Sec::Other;
     let mut i = 0usize;
     while i < lines.len() {
@@ -60,12 +60,11 @@ fn scan(text: &str) -> Scan {
         // spec: canon-kit/SPEC.md §check-amendment-update-target — a fenced block is skipped
         // whole: the template sanctions an embedded wire-contract delta, whose content must not
         // read as a heading or an update target
-        if spec::is_fence_line(raw) {
-            fence = !fence;
+        if fence.delimits(raw) {
             i += 1;
             continue;
         }
-        if fence {
+        if fence.is_open() {
             i += 1;
             continue;
         }
@@ -113,7 +112,7 @@ fn scan(text: &str) -> Scan {
                         j += 1;
                         continue;
                     }
-                    if spec::is_fence_line(l) || !(l.starts_with(' ') || l.starts_with('\t')) {
+                    if spec::fence_opening(l).is_some() || !(l.starts_with(' ') || l.starts_with('\t')) {
                         break;
                     }
                     para.add(j + 1, l);

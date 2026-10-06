@@ -24,6 +24,10 @@ a nested unit of beta.
 
 collapse the duplicated log lines.
 
+- ```text
+  a reference quoted in a list-item fence, `beta-feature` or (#gone-task), is an example.
+  ```
+
 ### none-left-over
 
 a slug that only starts with a placeholder token.

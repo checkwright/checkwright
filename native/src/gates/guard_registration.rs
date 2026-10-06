@@ -368,7 +368,7 @@ fn name_tokens(body: &str) -> (Option<String>, usize) {
 fn roster(text: &str, path: &str) -> Result<Vec<Item>, String> {
     let mut inside = false;
     let mut found = false;
-    let mut fence = false;
+    let mut fence = crate::spec::Fence::default();
     let mut items: Vec<Item> = Vec::new();
     let mut open: Option<(usize, String)> = None;
     let close = |(line, body): (usize, String)| {
@@ -376,10 +376,8 @@ fn roster(text: &str, path: &str) -> Result<Vec<Item>, String> {
         Item { line, name, tokens, body }
     };
     for (n, line) in text.lines().enumerate() {
-        if line.trim_start().starts_with("```") {
-            fence = !fence;
-        }
-        if !fence {
+        fence.delimits(line);
+        if !fence.is_open() {
             if let Some(h) = heading(line) {
                 if inside {
                     break;

@@ -91,32 +91,15 @@ fn is_spec_name(path: &str, spec_name: &str, amendment_glob: &str) -> bool {
     b == spec_name || walk::pattern_match(amendment_glob, b)
 }
 
-// spec: canon-kit/SPEC.md §check-spec-embedded-source — the opening fence carries a bare
-// alphabetic info string and nothing else; anything richer is not an opener at all
-fn fence_open(line: &str) -> Option<String> {
-    let t = line.trim_start_matches(|c: char| c.is_ascii_whitespace());
-    let rest = t.strip_prefix("```")?;
-    let rest = rest.trim_start_matches(|c: char| c.is_ascii_whitespace());
-    let mut i = 0usize;
-    let b = rest.as_bytes();
-    while i < b.len() && (b[i].is_ascii_alphabetic() || b[i] == b'+') {
-        i += 1;
-    }
-    let lang = &rest[..i];
-    if !rest[i..]
-        .chars()
-        .all(|c: char| c.is_ascii_whitespace())
-    {
-        return None;
-    }
-    Some(lang.to_ascii_lowercase())
-}
-
-fn fence_close(line: &str) -> bool {
-    let t = line.trim_start_matches(|c: char| c.is_ascii_whitespace());
-    match t.strip_prefix("```") {
-        Some(rest) => rest.chars().all(|c: char| c.is_ascii_whitespace()),
-        None => false,
+// spec: canon-kit/SPEC.md §check-spec-embedded-source — a block's language is a bare alphabetic
+// info string and nothing else; a richer opener still opens its block, which then has no
+// language and is never judged
+fn block_lang(opener: &str) -> String {
+    let info = opener.trim_start_matches('`').trim_matches(|c: char| c.is_ascii_whitespace());
+    if info.bytes().all(|c| c.is_ascii_alphabetic() || c == b'+') {
+        info.to_ascii_lowercase()
+    } else {
+        String::new()
     }
 }
 
@@ -221,11 +204,14 @@ fn rule(args: &[String]) -> Result<i32, String> {
         let mut block: Option<Block> = None;
         let mut skipblock = false;
         let mut lastnb = String::new();
+        let mut fence = spec::Fence::default();
         for (idx0, line) in text.lines().enumerate() {
             let fnr = idx0 + 1;
+            let opener = if fence.is_open() { None } else { spec::fence_opening(line) };
+            let delimits = fence.delimits(line);
             match block.as_mut() {
                 None => {
-                    if let Some(lang) = fence_open(line) {
+                    if let Some(lang) = opener.map(block_lang) {
                         skipblock = lastnb.contains("spec-embedded-source-exempt:");
                         let kind = l.lang2kind.get(&lang).cloned().unwrap_or_default();
                         block = Some(Block {
@@ -242,7 +228,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
                     }
                 }
                 Some(b) => {
-                    if fence_close(line) {
+                    if delimits {
                         if !skipblock {
                             if let Some(hit) = emit_block(
                                 b, f, &idx, &fkind, &candidates, minlines, threshold, &wirekind,

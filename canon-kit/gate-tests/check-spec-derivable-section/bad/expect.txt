@@ -1,1 +1,2 @@
-fenced (banned heading
+section "Directory Structure"
+section "Public API"

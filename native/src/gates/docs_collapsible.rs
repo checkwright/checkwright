@@ -181,7 +181,7 @@ fn scan(text: &str) -> Scan {
     };
     let mut stack: Vec<Open> = Vec::new();
     let mut front = raw.first().map(|l| l.trim_end() == "---").unwrap_or(false);
-    let mut fence = false;
+    let mut fence = crate::spec::Fence::default();
     let mut comment = false;
     let mut prev = "";
     for (i, line) in raw.iter().enumerate() {
@@ -191,12 +191,11 @@ fn scan(text: &str) -> Scan {
             }
             continue;
         }
-        if !comment && crate::spec::is_fence_line(line) {
-            fence = !fence;
+        if !comment && fence.delimits(line) {
             prev = "";
             continue;
         }
-        if fence {
+        if fence.is_open() {
             continue;
         }
         // spec: site-kit/SPEC.md §check-docs-collapsible — an HTML comment is not markup

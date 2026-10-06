@@ -25,6 +25,12 @@ text and is validated:
 # graph: couples=scripts/gen.sh dir=one valve=none tier=precommit mode=staged
 ```
 
+The same block as a list item:
+
+- ```sh
+  # graph: couples=scripts/gen.sh dir=one valve=none tier=precommit mode=staged
+  ```
+
 A `# graph:` span naming no key at all is a cross-reference, not a manifest, and
 assertion G returns without a finding:
 

@@ -135,16 +135,15 @@ fn scan(text: &str, exists: &dyn Fn(&str) -> bool) -> Scan {
         findings: Vec::new(),
         tally: Tally::default(),
     };
-    let mut fence = false;
+    let mut fence = spec::Fence::default();
     let mut i = 0usize;
     while i < raw.len() {
         let line = raw[i];
-        if spec::is_fence_line(line) {
-            fence = !fence;
+        if fence.delimits(line) {
             i += 1;
             continue;
         }
-        let Some(indent) = (!fence).then(|| ticked(line)).flatten() else {
+        let Some(indent) = (!fence.is_open()).then(|| ticked(line)).flatten() else {
             i += 1;
             continue;
         };
@@ -154,7 +153,7 @@ fn scan(text: &str, exists: &dyn Fn(&str) -> bool) -> Scan {
         while j < raw.len() {
             let next = raw[j];
             let lead = next.len() - next.trim_start_matches([' ', '\t']).len();
-            if spec::is_blank(next) || lead <= indent || spec::is_list_item(next) || spec::is_fence_line(next) {
+            if spec::is_blank(next) || lead <= indent || spec::is_list_item(next) || spec::fence_opening(next).is_some() {
                 break;
             }
             body.push(next);

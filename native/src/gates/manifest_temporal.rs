@@ -153,7 +153,7 @@ impl TemporalValve {
     // on the line directly above
     pub(crate) fn lines<'a>(&self, text: &'a str) -> Vec<ValvedLine<'a>> {
         let mut out = Vec::new();
-        let mut in_fence = false;
+        let mut in_fence = spec::Fence::default();
         let mut exempt = false;
         let mut exempt_level = 0usize;
         let mut prev: &str = "";
@@ -161,12 +161,11 @@ impl TemporalValve {
             let ln = idx + 1;
             let marked = raw.contains(EXEMPT_MARKER) || prev.contains(EXEMPT_MARKER);
             prev = raw;
-            if spec::is_fence_line(raw) {
-                in_fence = !in_fence;
+            if in_fence.delimits(raw) {
                 out.push(ValvedLine { ln, raw, kind: LineKind::Fence, valved: false });
                 continue;
             }
-            if in_fence {
+            if in_fence.is_open() {
                 out.push(ValvedLine { ln, raw, kind: LineKind::Fenced, valved: false });
                 continue;
             }

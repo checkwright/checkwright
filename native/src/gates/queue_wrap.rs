@@ -8,10 +8,6 @@ fn cplen(s: &str) -> usize {
     s.chars().count()
 }
 
-fn is_fence(line: &str) -> bool {
-    line.trim_start_matches([' ', '\t']).starts_with("```")
-}
-
 fn is_table_row(line: &str) -> bool {
     line.trim_start_matches([' ', '\t']).starts_with('|')
 }
@@ -56,7 +52,7 @@ fn scan(
     root_has: &dyn Fn(&str) -> bool,
 ) -> Vec<(usize, usize, String)> {
     let mut over: Vec<(usize, usize, String)> = Vec::new();
-    let mut fence = false;
+    let mut fence = crate::spec::Fence::default();
     let mut in_deferred = false;
     // spec: queue-kit/SPEC.md §check-queue-wrap — the discounted line is a deferred entry's tag
     // line: the first non-blank line under its `###` heading, when it holds only tags
@@ -65,11 +61,10 @@ fn scan(
         if queue::is_section_line(line) {
             in_deferred = queue::heading_name(line) == Some(deferred);
         }
-        if is_fence(line) {
-            fence = !fence;
+        if fence.delimits(line) {
             continue;
         }
-        if fence || is_table_row(line) {
+        if fence.is_open() || is_table_row(line) {
             continue;
         }
         let tag_line = after_heading && queue::is_tag_line(line);
@@ -187,10 +182,7 @@ mod tests {
     }
 
     #[test]
-    fn fences_and_table_rows_are_recognised_with_leading_space() {
-        assert!(is_fence("```bash"));
-        assert!(is_fence("   ```"));
-        assert!(!is_fence("x ```"));
+    fn table_rows_are_recognised_with_leading_space() {
         assert!(is_table_row("  | a | b |"));
         assert!(!is_table_row("a | b"));
     }

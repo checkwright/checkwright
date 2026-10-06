@@ -443,7 +443,8 @@ fn g_absence(file: &str, text: &str, vocab: &Absence) -> Vec<String> {
         }
     };
     let mut front = raw.first().is_some_and(|l| l.trim_end() == "---");
-    let (mut fence, mut gen, mut comment) = (false, false, false);
+    let mut fence = spec::Fence::default();
+    let (mut gen, mut comment) = (false, false);
     let mut cur: Option<AbsenceSection> = None;
     for (i, line) in raw.iter().enumerate() {
         let marked = line.contains(EXEMPT);
@@ -464,11 +465,22 @@ fn g_absence(file: &str, text: &str, vocab: &Absence) -> Vec<String> {
             comment = !line.contains("-->");
             continue;
         }
-        if !fence && spec::is_gen_marker(line, ":begin") {
+        // spec: canon-kit/SPEC.md §The shared spec adapters — the fence is stepped on every line,
+        // a block above the first heading included, or its closer would read as an opener
+        if fence.delimits(line) {
+            if let Some(s) = cur.as_mut() {
+                s.code = true;
+            }
+            continue;
+        }
+        if fence.is_open() {
+            continue;
+        }
+        if spec::is_gen_marker(line, ":begin") {
             gen = true;
             continue;
         }
-        if !fence && spec::prose_heading_level(line) > 0 {
+        if spec::prose_heading_level(line) > 0 {
             flush(cur.take());
             let above = i > 0 && raw[i - 1].contains(EXEMPT);
             cur = Some(AbsenceSection {
@@ -481,14 +493,6 @@ fn g_absence(file: &str, text: &str, vocab: &Absence) -> Vec<String> {
             continue;
         }
         let Some(s) = cur.as_mut() else { continue };
-        if spec::is_fence_line(line) {
-            fence = !fence;
-            s.code = true;
-            continue;
-        }
-        if fence {
-            continue;
-        }
         let t = line.trim();
         if t.is_empty() {
             s.gap = true;

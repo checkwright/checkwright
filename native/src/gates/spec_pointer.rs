@@ -420,15 +420,14 @@ impl Para {
 // spec: canon-kit/SPEC.md §check-spec-pointer — the blank-line paragraph join, fenced code skipped
 pub(crate) fn paragraphs(text: &str) -> Vec<Para> {
     let mut out: Vec<Para> = Vec::new();
-    let mut fence = false;
+    let mut fence = spec::Fence::default();
     let mut para: Vec<(usize, &str)> = Vec::new();
     for (idx, raw) in text.lines().enumerate() {
-        if spec::is_fence_line(raw) {
+        if fence.delimits(raw) {
             join_para(&mut para, &mut out);
-            fence = !fence;
             continue;
         }
-        if fence || spec::is_blank(raw) {
+        if fence.is_open() ||spec::is_blank(raw) {
             join_para(&mut para, &mut out);
             continue;
         }
@@ -639,16 +638,15 @@ impl HeadingCache {
         if !self.files.contains_key(file) {
             let text = spec::read_text(Path::new(file))?;
             let markdown = file.ends_with(".md");
-            let mut fence = false;
+            let mut fence = spec::Fence::default();
             let mut v: Vec<Heading> = Vec::new();
             for (idx, line) in text.lines().enumerate() {
                 // spec: canon-kit/SPEC.md §check-spec-pointer — a fenced line of a markdown file is
                 // never a heading
-                if markdown && spec::is_fence_line(line) {
-                    fence = !fence;
+                if markdown && fence.delimits(line) {
                     continue;
                 }
-                if fence {
+                if fence.is_open() {
                     continue;
                 }
                 if let Some(h) = heading_text(line) {

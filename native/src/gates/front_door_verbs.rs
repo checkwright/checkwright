@@ -309,14 +309,12 @@ fn flag_table(text: &str) -> Option<Vec<Pair>> {
 // line of a fenced block
 fn code_texts(text: &str) -> Vec<(usize, &str)> {
     let mut out = Vec::new();
-    let mut fenced = false;
+    let mut fenced = crate::spec::Fence::with_tilde();
     for (i, line) in text.lines().enumerate() {
-        let t = line.trim_start();
-        if t.starts_with("```") || t.starts_with("~~~") {
-            fenced = !fenced;
+        if fenced.delimits(line) {
             continue;
         }
-        if fenced {
+        if fenced.is_open() {
             out.push((i + 1, line));
             continue;
         }
@@ -334,14 +332,13 @@ fn code_texts(text: &str) -> Vec<(usize, &str)> {
 // flag, `--emit <name>` read as `--emit-<name>`
 fn advertised_arms(page: &str, text: &str, flags: &BTreeSet<String>, checkout: (&str, &str)) -> Vec<(usize, String)> {
     let mut out = Vec::new();
-    let (mut fenced, mut in_checkout) = (false, false);
+    let (mut fenced, mut in_checkout) = (crate::spec::Fence::with_tilde(), false);
     for (i, line) in text.lines().enumerate() {
         let t = line.trim_start();
-        if t.starts_with("```") || t.starts_with("~~~") {
-            fenced = !fenced;
+        if fenced.delimits(line) {
             continue;
         }
-        if fenced {
+        if fenced.is_open() {
             continue;
         }
         if t.starts_with("# ") || t.starts_with("## ") {

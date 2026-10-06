@@ -25,3 +25,9 @@ It's worth noting that this generated line — held out — by its marker pair �
 
 <!-- prose-tell-exempt: a deliberate dash cluster kept to demonstrate the valve -->
 This kept line leans on the em-dash — again — and once more — yet the valve holds it clean.
+
+A tell quoted in a list-item fence is a specimen:
+
+- ```
+  It is worth noting that the pipeline runs green — every time — without fail — really.
+  ```

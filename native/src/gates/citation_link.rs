@@ -124,7 +124,7 @@ pub(crate) fn prose_only(text: &str) -> String {
     let mut out: Vec<String> = Vec::new();
     let raw: Vec<&str> = text.lines().collect();
     let mut front = raw.first().map(|l| l.trim_end() == "---").unwrap_or(false);
-    let mut fence = false;
+    let mut fence = spec::Fence::default();
     let mut comment = false;
     let mut gen = false;
     for (i, line) in raw.iter().enumerate() {
@@ -140,17 +140,16 @@ pub(crate) fn prose_only(text: &str) -> String {
             out.push(String::new());
             continue;
         }
-        if !comment && !fence && spec::is_gen_marker(line, ":begin") {
+        if !comment && !fence.is_open() && spec::is_gen_marker(line, ":begin") {
             gen = true;
             out.push(String::new());
             continue;
         }
-        if !comment && spec::is_fence_line(line) {
-            fence = !fence;
+        if !comment && fence.delimits(line) {
             out.push(line.to_string());
             continue;
         }
-        if fence {
+        if fence.is_open() {
             out.push(line.to_string());
             continue;
         }

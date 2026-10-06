@@ -1,5 +1,9 @@
 # widget
 
+- ```text
+  a list-item fence closes on its indented line, so the section below is still read
+  ```
+
 ## Quick start
 
 `npx widget init` vendors a profile into a clean repository and commits it. The

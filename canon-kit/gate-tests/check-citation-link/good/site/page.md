@@ -30,3 +30,9 @@ An emitter wrote kit/SPEC.md §A generated citation here.
 ## Choosing a profile
 
 Here kit/SPEC.md §Requirements, then kit/SPEC.md §Requirements again.
+
+The same block as a list item:
+
+- ```text
+  kit/SPEC.md §A fenced citation
+  ```

@@ -18,3 +18,12 @@ lib/
 ## Behaviour
 
 A widget is processed once, in arrival order.
+
+## Public API
+
+- ```rust
+  pub fn one();
+  pub fn two();
+  pub fn three();
+  pub fn four();
+  ```

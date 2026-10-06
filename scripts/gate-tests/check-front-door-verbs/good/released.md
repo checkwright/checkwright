@@ -4,6 +4,12 @@
 curl -fsSL https://example.test/install.sh | sh -s -- doctor
 ```
 
+The same block as a list item:
+
+- ```sh
+  curl -fsSL https://example.test/install.sh | sh -s -- doctor
+  ```
+
 ```powershell
 & ([scriptblock]::Create((irm https://example.test/install.ps1))) diff
 ```

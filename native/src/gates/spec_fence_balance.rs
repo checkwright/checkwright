@@ -36,37 +36,52 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
         scanned += 1;
         let text = spec::read_text(Path::new(f))?;
-        let n = text.lines().filter(|l| is_fence(l)).count();
-        if n % 2 != 0 {
-            bad.push(format!("{} ({} fence delimiters — odd)", f, n));
+        if let Some(ln) = unclosed(&text) {
+            bad.push(format!("{}:{} (the fence opened here is never closed)", f, ln));
         }
     }
 
     if !bad.is_empty() {
-        println!("check-spec-fence-balance: markdown file(s) with an odd fence-delimiter count —");
+        println!("check-spec-fence-balance: markdown file(s) ending inside an open code fence —");
         println!("the fence-skipping parsers (embedded-source, tag-lead-line, the queue scanners)");
-        println!("toggle a fence flag; an odd count desyncs it and the rest of the file fails open:");
+        println!("step one fence reader; an unclosed fence reads the rest of the file as its body,");
+        println!("so every later finding fails open:");
         for b in &bad {
             println!("  {}", b);
         }
-        println!("  help: close the unbalanced code fence, or delete the stray delimiter line.");
+        println!("  help: close the fence with a backtick run at least as long as its opener's, or delete the stray opener.");
         return Ok(1);
     }
 
     println!(
-        "SPEC-FENCE-BALANCE: clean ({} governed markdown file(s), all even fence counts)",
+        "SPEC-FENCE-BALANCE: clean ({} governed markdown file(s), every fence closed)",
         scanned
     );
     Ok(0)
 }
 
-// spec: canon-kit/SPEC.md §check-spec-fence-balance — the fence delimiter counted, on POSIX
-// space byte-wise as grep matches it
-pub fn is_fence(line: &str) -> bool {
-    let b = line.as_bytes();
-    let mut i = 0usize;
-    while i < b.len() && matches!(b[i], b' ' | b'\t' | b'\x0b' | b'\x0c' | b'\r') {
-        i += 1;
+// spec: canon-kit/SPEC.md §check-spec-fence-balance — the line of the opener the shared fence
+// reader leaves open at the file's end
+fn unclosed(text: &str) -> Option<usize> {
+    let mut fence = spec::Fence::default();
+    let mut opened = 0usize;
+    for (idx, line) in text.lines().enumerate() {
+        if fence.delimits(line) && fence.is_open() {
+            opened = idx + 1;
+        }
     }
-    b[i..].starts_with(b"```")
+    fence.is_open().then_some(opened)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_list_item_fence_and_a_longer_fence_are_balanced_and_a_stray_opener_is_not() {
+        assert_eq!(unclosed("- ```sh\n  a\n  ```\ntext\n"), None);
+        assert_eq!(unclosed("````\n```\n````\n"), None);
+        assert_eq!(unclosed("```\na\n```\n\n- ```sh\n  a\n"), Some(5));
+        assert_eq!(unclosed("````\n```\n"), Some(1));
+    }
 }

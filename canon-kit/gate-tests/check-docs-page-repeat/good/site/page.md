@@ -22,3 +22,9 @@ Run the gate before every single commit you make here.
 Run the gate before every single commit you make here.
 
 This sentence has exactly seven words here. This sentence has exactly seven words here.
+
+The same block as a list item:
+
+- ```sh
+  # a fence may repeat: see [install](guide.md#install)
+  ```

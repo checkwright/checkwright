@@ -198,7 +198,7 @@ fn scan(text: &str, min_words: usize) -> Scan {
 fn prose_lines(raw: &[&str]) -> Vec<(usize, String)> {
     let mut out: Vec<(usize, String)> = Vec::new();
     let mut front = raw.first().map(|l| l.trim_end() == "---").unwrap_or(false);
-    let mut fence = false;
+    let mut fence = spec::Fence::default();
     let mut comment = false;
     for (i, line) in raw.iter().enumerate() {
         if front {
@@ -207,11 +207,10 @@ fn prose_lines(raw: &[&str]) -> Vec<(usize, String)> {
             }
             continue;
         }
-        if !comment && spec::is_fence_line(line) {
-            fence = !fence;
+        if !comment && fence.delimits(line) {
             continue;
         }
-        if fence {
+        if fence.is_open() {
             continue;
         }
         let mut kept = String::new();
