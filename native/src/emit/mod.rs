@@ -35,6 +35,7 @@ pub mod install_evidence;
 pub mod install_hooks;
 pub mod install_lifecycle;
 pub mod installer_smoke;
+pub mod journal;
 pub mod kfric;
 pub mod kpi;
 pub mod lesson_sink;
@@ -557,6 +558,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-file-gap",
         Arm::Emit(file_gap::emit, Grammar::Parsed(file_gap::USAGE)),
         file_gap::KNOBS,
+    ),
+    // spec: lifecycle-kit/SPEC.md §The journal arm — the resume-journal append, a `Parsed` member
+    // on `--emit-file-gap`'s argv-shape split, with standard input where no text is given.
+    (
+        "--emit-journal",
+        Arm::Emit(journal::emit, Grammar::Parsed(journal::USAGE)),
+        journal::KNOBS,
     ),
     // spec: lifecycle-kit/SPEC.md §The consult inbox — the consult-owed capture affordance, a
     // sibling of `--emit-file-gap` on the same argv-shape split.

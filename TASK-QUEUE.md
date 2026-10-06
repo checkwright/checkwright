@@ -8,16 +8,6 @@
 
 ## New Features
 
-### journal-append-arm
-
-[spec: SPEC-journal-arm.md] [recurrence: 2026-10-05]
-
-resume-journal appends are the top hand shape after the gate door in `--emit manual-ops`' first rankings: `printf >>` 47 calls in 6 sessions and `cat >>` 24 in 5 at drift-kit-tail-crosser-pass, every stage. Each spells the path `--enter-stage` printed, and the shell guard splits the write from any other command, so each append is its own call.
-
-**Deliverable:** an append arm writing its operand or stdin to the journal the session's own stamp names, so no session spells the path; homed in delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps, with the agent-execution template's journal bullet citing it. Authored at spec with the arm homed in lifecycle-kit, which owns the path, and that section and bullet citing it: a spec decision on the owning section's own text, stated in the amendment, not a ruling.
-
-**Cost while deferred:** a tool call and a spelled path per journal line, in every stage session. Filed 2026-10-05 to the gap inbox at that iteration's build, off the meter's first run; promoted at its close: →fix fails because the arm is a new governed name, →forward because no ruling is owed. Re-verified: the meter at close ranks `printf >>` second and `cat >>` sixth; the filer's delegation-transport-pass count (`cat >>` 57 in 9) is carried, not re-run. Owner lookup: `journal`, `append` in this file — none; owner that section. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling). A feature, authored at spec.
-
 ## Technical Debt
 
 ### spec-brevity-residue
@@ -1191,4 +1181,5 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 ## Done
 
 - audit-trigger-mirror-component
+- journal-append-arm
 

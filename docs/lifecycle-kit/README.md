@@ -81,6 +81,7 @@ gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --emit file-gap "<gap>"   # route a work-shaped finding to the gap inbox
 "$gates" --emit file-consult "<item>"   # route a ruling to reconsider or a request for advice to the consult inbox
 "$gates" --emit file-survey "<question>" "<corpus>" "<oracle>" "<inferred>" "<finding>"
+"$gates" --emit journal "<finding>"   # append to the resume journal of the stage you entered
 "$gates" --emit cite-survey "<heading-substring>"   # one carried survey, inline-ready
 "$gates" --emit session-id                       # the canonical stamp id, by the derivation order
 "$gates" --emit ruling-staleness ["<ruling name>"…]  # fired conditions, undeclared ones, citing sites

@@ -196,6 +196,15 @@ pub fn stamp_stage(line: &str) -> &str {
     line.split_whitespace().nth(1).unwrap_or("")
 }
 
+// spec: lifecycle-kit/SPEC.md §The stage-machine adapters — the caller-stage read: a session's stage
+// is its last stamp's, so a waiver line carrying its id is not a stage it entered
+pub fn caller_stage(text: &str, id: &str, stages: &[String]) -> Option<String> {
+    data_lines(text)
+        .into_iter()
+        .rfind(|l| l.split_whitespace().nth(2) == Some(id) && stage_known(stages, stamp_stage(l)))
+        .map(|l| stamp_stage(l).to_string())
+}
+
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the subjects the writer prints, one per
 // stamp-writing path, each scoped to the stage the gate will read off the added stamp
 pub fn entry_subject(stage: &str) -> String {
@@ -271,6 +280,17 @@ pub fn header_only(text: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: lifecycle-kit/SPEC.md §The stage-machine adapters — the caller's stage is its last
+    // stamp's, a waiver line carrying its id is skipped, and an unstamped id has none
+    #[test]
+    fn a_callers_stage_is_its_last_stamp_and_a_waiver_line_is_not_one() {
+        let stages: Vec<String> = ["scope", "spec", "align", "build"].iter().map(|s| s.to_string()).collect();
+        let state = "# c\n\n---\n\ndemo scope aaaaaaaa 2026-06-01 none\ndemo spec aaaaaaaa 2026-06-01 none\ndemo align-waived aaaaaaaa 2026-06-02 none\ndemo build bbbbbbbb 2026-06-02 none\n";
+        assert_eq!(caller_stage(state, "aaaaaaaa", &stages).as_deref(), Some("spec"));
+        assert_eq!(caller_stage(state, "bbbbbbbb", &stages).as_deref(), Some("build"));
+        assert_eq!(caller_stage(state, "cccccccc", &stages), None);
+    }
 
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — a discharge removes one line naming the
     // stage, never every such line, and leaves a marker naming no such line alone

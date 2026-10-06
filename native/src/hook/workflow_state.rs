@@ -63,7 +63,7 @@ fn superseded_stage(payload: Option<&Value>, agent_type: &str, id: &str, state_t
         Ok(s) => s,
         Err(e) => return hook::decline(NAME, &format!("the superseded-stage rule could not resolve LIFECYCLE_KIT_STAGES ({})", e), payload),
     };
-    let Some(own) = caller_stage(state_text, id, &stages) else { return 0 };
+    let Some(own) = crate::stages::caller_stage(state_text, id, &stages) else { return 0 };
     let cursor = crate::stages::current_stage(state_text);
     if own == cursor {
         return 0;
@@ -87,18 +87,6 @@ fn stamped(state_text: &str, id: &str) -> bool {
     crate::stages::data_lines(state_text)
         .iter()
         .any(|l| l.split_whitespace().nth(2) == Some(id))
-}
-
-// spec: lifecycle-kit/SPEC.md §check-dispatch-entry — the caller's stage is its last stamp's, so a
-// waiver line carrying its id is not a stage it entered
-fn caller_stage(state_text: &str, id: &str, stages: &[String]) -> Option<String> {
-    crate::stages::data_lines(state_text)
-        .into_iter()
-        .rfind(|l| {
-            l.split_whitespace().nth(2) == Some(id)
-                && crate::stages::stage_known(stages, crate::stages::stamp_stage(l))
-        })
-        .map(|l| crate::stages::stamp_stage(l).to_string())
 }
 
 // spec: lifecycle-kit/SPEC.md §check-dispatch-entry — a `..` component is never inside the scratch
@@ -225,17 +213,6 @@ mod tests {
         assert!(stamped(state, &crate::sessions::normalize("a94d72dcd2db52dbf")));
         assert!(!stamped(state, &crate::sessions::normalize("b1b2b3b4c5c6c7c8d")));
         assert!(!stamped("# x b1b2b3b4\n\n---\n", "b1b2b3b4"));
-    }
-
-    // spec: lifecycle-kit/SPEC.md §check-dispatch-entry — the caller's stage is its last stamp's,
-    // a waiver line carrying its id is skipped, and an unstamped id has none
-    #[test]
-    fn a_callers_stage_is_its_last_stamp_and_a_waiver_line_is_not_one() {
-        let stages: Vec<String> = ["scope", "spec", "align", "build"].iter().map(|s| s.to_string()).collect();
-        let state = "# c\n\n---\n\ndemo scope aaaaaaaa 2026-06-01 none\ndemo spec aaaaaaaa 2026-06-01 none\ndemo align-waived aaaaaaaa 2026-06-02 none\ndemo build bbbbbbbb 2026-06-02 none\n";
-        assert_eq!(caller_stage(state, "aaaaaaaa", &stages).as_deref(), Some("spec"));
-        assert_eq!(caller_stage(state, "bbbbbbbb", &stages).as_deref(), Some("build"));
-        assert_eq!(caller_stage(state, "cccccccc", &stages), None);
     }
 
     // spec: lifecycle-kit/SPEC.md §check-dispatch-entry — a path inside the scratch dir is under it

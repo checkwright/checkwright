@@ -1447,7 +1447,7 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String], declared: Option<&str>) -> Result<
     }
     if !journal.is_empty() {
         println!(
-            "  note: resume journal opened at {} — land your findings there as you confirm them; \
+            "  note: resume journal opened at {} — append each finding as you confirm it with --emit journal \"<finding>\"; \
              your stage template's last step owns what it owes at the end.",
             journal
         );
