@@ -236,7 +236,7 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 ### spec-brevity-residue
 
-[roadmap: now/adoption] [cost: session/high] [surface: evidence-kit] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
+[roadmap: now/adoption] [cost: session/high] [surface: site-kit] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
 
 the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices (below); the eight kits after it are finished or split out (the slices below); what remains is site-kit, then doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling); the per-kit slices stay off the roadmap.
 
@@ -314,7 +314,7 @@ an adopter writes a custom gate in shell only. The registry resolves a member as
 
 ### plugin-harness-reach
 
-[cost: event/low] [surface: plugin]
+[cost: event/low] [surface: plugin] [not-icebox-eligible: 2026-10-06 filed on the operator direction of 2026-09-28 its body carries; evicting it would compress that direction away]
 
 the harness plugin package reaches Claude Code only in its tested and guarded parts. plugin/SPEC.md reads the portable `plugin.json` and `skills/` as loading on any Agent Plugins 1.0 client off the standard alone, since only Claude Code's install is run; the guards ride `hooks/hooks.json`, outside the standard's portable core, so no other client runs them; the marketplace file is Claude Code's format. No queue entry names another harness. **Inferred, not run:** which harnesses adopt Agent Plugins 1.0. **Operator-supplied, unverified:** Meta's coding harness "seems to be named Muse Code". **Harness priority, operator direction, 2026-09-28:** tier 1 Claude Code and Codex; tier 2 Muse Code, Antigravity and Cursor.
 
@@ -324,7 +324,7 @@ the harness plugin package reaches Claude Code only in its tested and guarded pa
 
 ### verify-workflow-decoupling
 
-[cost: event/low] [surface: installer]
+[cost: event/low] [surface: installer] [not-icebox-eligible: 2026-10-06 holds the operator's stated aim of 2026-09-28 and the ruling it waits on; evicting it would compress the question away]
 
 the operator states that verification and workflow are fully decoupled, each shippable without the other; the tree shows one direction only. Verification without the workflow holds: `installer/profiles.list`'s starter profile is gate-sdk alone and prose is gate-sdk plus canon-kit, and the companion recipes gate another toolkit's workflow. The workflow without verification is not shipped: every profile carrying lifecycle-kit carries gate-sdk, forced in because without it there is no runner, hook generator or registry; `--enter-stage` is an arm of the gate binary; the delegation profile's comment reads "Vendored is not yet enforced"; docs/kits.md orders the roster as "each kit assumes the machinery of the ones above it". The operator's stated aim (2026-09-28, lead session; an aim, not a /consult objective): a competitive offering that is loosely coupled, composable, configurable and efficient.
 
@@ -1211,9 +1211,4 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 No rule holds a docs video to a local poster linking out, so a first embed adds a third-party request.
 
 ## Done
-
-- evidence-kit-tail-brevity
-- release-section-collision
-- liveness-windows-misread
-- evidence-directive-unstated
 
