@@ -1,12 +1,13 @@
 # SPEC amendment: the kit-shipped bash files
 
-Pairs `windows-kit-bash-files`. Sited at the repository root because it changes gate-sdk's, guard-kit's, context-kit's and drift-kit's contracts together.
+Pairs `windows-kit-bash-files`. Sited at the repository root because it changes gate-sdk's, guard-kit's, context-kit's, drift-kit's and lifecycle-kit's contracts together.
 
 **Directions this amendment executes** (operator direction 2026-10-06, lead-relayed, none a ruling):
 
 - **The wiring.** Rewire the shipped harness hook wiring to the exec form naming the binary directly, now. The option was chosen with its costs stated: it retires the front end's fail-open stub for that wiring, it contradicts gate-sdk/SPEC.md §The adopter constraints' sentence that a fail-open harness value keeps a script door permanently, it rests on harness facts nobody has run, and it needs a minimum harness version. The amendment owes a way for those facts to be witnessed before the wiring is relied on; delta 1 is that way.
 - **`session-context.sh`.** Port it to a `--hook session-context` member, its `[EDIT ME]` gaps moving to context-kit config.
 - **`kpi-deprecated-surface.sh`.** Port it to a built-in drift-kit member, reversing the file's recorded `# no-port:` declaration.
+- **The consult-inbox line.** Given at align, on the audit's question: mint a consult-count arm in this entry and register it as a brief command, so the line this repository's copy printed stays in the brief. It widens the entry by one lifecycle-kit arm; delta 5 carries it.
 
 **What the survey established, which the entry's own re-verification did not.** The bash row's kit list is derived (context-kit/SPEC.md §bin/env-probe). guard-kit is in it through its settings template, whose three hook commands lead with a `bash` word, and through no tracked bash file. context-kit is in it twice, by its template's shebang and by its settings template. So a kit leaves the row when its wiring stops spawning bash, and porting a file alone moves only drift-kit.
 
@@ -85,15 +86,22 @@ The members were enumerated by `grep -n 'EDIT ME' context-kit/templates/session-
 | which directories are components, in step 2 | `CONTEXT_KIT_BRIEF_COMPONENT_MARK`, a directory name, default `src`; empty turns the step off |
 | which stages draw which nudge, in step 4 | `CONTEXT_KIT_BRIEF_NUDGES`, keyed by stage, each value a tracked text file printed verbatim; default empty |
 | the index footer, in step 7 | `CONTEXT_KIT_BRIEF_FOOTER_FILE`, a tracked text file printed verbatim; default empty, which prints the built-in footer naming the three index arms, its public-surface line spelled with the configured component mark and omitted when that mark is empty |
-| a step the consumer added | `CONTEXT_KIT_BRIEF_COMMANDS`, indexed, each element run on step 8's rule after the drift line, its stdout printed with a blank line after it, silent when it prints nothing or fails |
+| a step the consumer added | `CONTEXT_KIT_BRIEF_COMMANDS`, indexed, each element run on step 8's rule after the drift line, its stdout printed with a blank line after it whatever status it exits, since a verdict arm reports through its status and its line is the point; silent when it prints nothing or cannot be started |
 
 - **Three names the template read from the environment gain table rows** with their existing defaults: `CONTEXT_KIT_DRIFT_REPORT`, `CONTEXT_KIT_STAGE_RULES` and `CONTEXT_KIT_SESSION_ROLE_FILE`. A compiled member refuses a name its table does not declare. drift-kit's two statements that the trend knob's default lives in the template or the hook copy, in its README's wiring step and in drift-kit/SPEC.md §The report skeleton, are restated to the knob.
 - **The delegation nudge ships as `templates/nudge-delegation.md`**, the exemplar a consumer copies and keys to its stages. The kit default prints no nudge.
-- **This repository's copy held five values beyond its template.** Four move to its context-kit knob file in the deleting commit and one leaves:
+- **This repository's copy held five values beyond its template**, and each moves to its context-kit knob file in the deleting commit:
   - the drift arm name and the stage-rules command, as those two knobs, the command written in its `--emit` form;
   - the reworded delegation nudge, as a nudge file keyed to the three stages it printed on;
   - the budget line, as a brief command running `--usage-verdict`, printed as that arm prints it and without the copy's label;
-  - the consult-inbox count has no satisfying value, since no arm prints it. It leaves the brief, and the build files the missing arm as a gap.
+  - the consult-inbox count, as a brief command running the arm below (operator direction 2026-10-06, lead-relayed, not a ruling: mint the arm in this entry so the line stays in the brief). No value leaves.
+- **A brief command takes no stage argument.** It is split and dispatched as step 8 splits and dispatches, and nothing is appended: an arm reading positionals, `--usage-verdict` among them, would take an appended stage as an operand.
+- **lifecycle-kit gains `--emit consult-count`**, the one arm that reads the consult inbox for a count. {user-facing: operator direction 2026-10-06, lead-relayed — mint the consult-count arm now, registered as a brief command}
+  - It reads `LIFECYCLE_KIT_CONSULT_INBOX_FILE` and declares that knob alone. It counts the bullets the inbox grammar defines (lifecycle-kit/SPEC.md §The consult inbox) and takes the oldest from the first bullet's date.
+  - With one bullet or more it prints one line, `Consult inbox: <n> item(s) owed to /consult, oldest <date>.`, `undated` standing for a first bullet carrying no date. That is the line this repository's copy printed.
+  - With no inbox file or no bullet it prints nothing. Both exit 0, so a brief command stays silent on an empty inbox by its own rule.
+  - It takes no argument, and one is a usage refusal at exit 2. It writes nothing.
+  - lifecycle-kit/SPEC.md §The consult inbox states it beside the filing affordance, and the kit README's command list gains its line.
 
 ### (6) `kpi-deprecated-surface` becomes a bundled member
 
@@ -136,6 +144,7 @@ gate-sdk/SPEC.md §The harness-template port disposition is rewritten to the dec
 - **The refused-repository decline (delta 3).** Producer: the `--hook` arm, on git's own answer. Consumer: the session or the operator through the envelope `hook::decline` chooses.
 - **The `session-context` member (delta 4).** Producer: the harness's session-start event, enabled by the registration the session-start template ships. Consumer: the session, reading stdout. Roster-holding readers of the minted member name: the crate's member table and its owner test, and through it `check-settings-paths`, the enforcement map and the generated enforcement page.
 - **Each minted knob (delta 5)** is read by the member at the one step its row names. Roster-holding readers: context-kit's table and its arm-knob test, context-kit/SPEC.md §Layout and configuration, and `check-knob-default-coupling`.
+- **The `consult-count` arm (delta 5).** Producer: the `session-context` member, enabled by the brief-command element this repository's context-kit knob file sets; a session may also run it by hand. Consumer: the session, reading the brief. Its one field, the printed line, is read there. Roster-holding readers of the minted arm name: the crate's arm table with its arm-knob test, lifecycle-kit/SPEC.md §The consult inbox, and the kit README's command list.
 - **`templates/nudge-delegation.md` (delta 5).** Producer: the kit. Consumer: an adopter, by copy; the member reads only the path a consumer's knob names.
 - **The built-in KPI (delta 6).** Producer: the drift report's registry walk, enabled by the line in `templates/kpis.list`. Consumer: the report's reader, and the brief's drift line. Roster-holding readers of the member name: `templates/kpis.list` with `check-template-registry-parity`, drift-kit/SPEC.md §Bundled KPIs, and the kit smoke's per-member row assertion. This repository's reader is its release-sweep binding, through its own `kpis.list`.
 - **Narrowed corpora, each reader's red condition.**
@@ -154,7 +163,6 @@ Produced by `git grep -l -F` over the tracked tree for the two spellings under �
 - `native/src/gates/plugin_parity.rs` — the rendering function and its unit test (delta 2).
 - `native/src/gates/settings_paths.rs` — the suffix-less candidate (delta 2).
 - `native/src/gates/mod.rs` — the knob roster on `check-settings-paths`' row (delta 2).
-- `native/src/emit/mod.rs` — the enforcement map arm's knob roster (delta 2).
 - `guard-kit/README.md` (delta 2)
 - `guard-kit/smoke/install.sh` (delta 2)
 - `gate-sdk/SPEC.md` — §The adopter constraints' interpreter-surface bullet and §The harness-integration arm's fail-open paragraphs (delta 3); §run-gates' statement of who reaches the stub (delta 3); §The harness-integration arm's registration grammar (delta 2); §The non-gate arm's `knob-values` paragraph, which names the example plugin as a reader (delta 6); §The harness-template port disposition and §check-template-registry-parity (delta 8).
@@ -165,7 +173,10 @@ Produced by `git grep -l -F` over the tracked tree for the two spellings under �
 - `context-kit/templates/session-context.sh` — deleted (delta 4).
 - `scripts/session-context.sh` — deleted (delta 4).
 - `context-kit/templates/nudge-delegation.md` — new (delta 5).
-- `scripts/context-config.knobs` — this repository's four moved values (delta 5).
+- `scripts/context-config.knobs` — this repository's five moved values (delta 5).
+- `lifecycle-kit/SPEC.md` — §The consult inbox gains the count arm (delta 5); each published hook registration (delta 2).
+- `lifecycle-kit/README.md` — the command list gains the arm (delta 5); its hook registration (delta 2).
+- `native/src/emit/mod.rs` — the arm table's `consult-count` row, beside its new module (delta 5); the enforcement map arm's knob roster (delta 2).
 - `native/src/knobs/context_kit.rs` — the minted rows and the three names gaining one (delta 5).
 - `doctrine-kit/SPEC.md` — §stage-rules' surfacing-seam paragraph (deltas 4 and 5).
 - `drift-kit/SPEC.md` — §Out of scope, §Bundled KPIs, the layout listing and the registry paragraph (delta 6); §The report skeleton's clause that the trend knob is wired in the template (delta 5).
@@ -179,8 +190,6 @@ Produced by `git grep -l -F` over the tracked tree for the two spellings under �
 - `delegation-kit/SPEC.md` — each published hook registration (delta 2).
 - `delegation-kit/README.md` (delta 2)
 - `delegation-kit/smoke/install.sh` (delta 2)
-- `lifecycle-kit/SPEC.md` — each published hook registration (delta 2).
-- `lifecycle-kit/README.md` (delta 2)
 - `installer/SPEC.md` — §The update notice's honest limit on a consumer copy of the template (delta 4); §Requirements' bash bullets (delta 7).
 - `docs/requirements.md` — the bash row and the Git for Windows row (delta 7).
 - `native/src/hook/mod.rs` — the member row and the registration parser (deltas 2 and 4).
@@ -206,8 +215,8 @@ Produced by `git grep -l -F` over the tracked tree for the two spellings under �
 - `docs/guard-kit/README.md` — mirror, regenerated (delta 2).
 - `docs/delegation-kit/SPEC.md` — mirror, regenerated (delta 2).
 - `docs/delegation-kit/README.md` — mirror, regenerated (delta 2).
-- `docs/lifecycle-kit/SPEC.md` — mirror, regenerated (delta 2).
-- `docs/lifecycle-kit/README.md` — mirror, regenerated (delta 2).
+- `docs/lifecycle-kit/SPEC.md` — mirror, regenerated (deltas 2 and 5).
+- `docs/lifecycle-kit/README.md` — mirror, regenerated (deltas 2 and 5).
 - `docs/posts/2026-09-26-checkwright-v0-26-0.md` — a dated release post, left standing as history (deltas 4 and 6).
 - `docs/posts/2026-09-28-checkwright-v0-27-0.md` — a dated release post, left standing as history (delta 4).
 

@@ -30,6 +30,8 @@ docs/requirements.md's toolchain row owes bash 4.3 wherever a profile includes c
 
 **Taken into windows-shell-floor-pass, operator direction 2026-10-06, lead-relayed (not a ruling). Push need (2026-10-06, inside the budget):** the iteration's one mid-iteration push, since the ported arms first run on Windows remotely.
 
+**Widened at align, operator direction 2026-10-06, lead-relayed (not a ruling):** a lifecycle-kit `--emit consult-count` arm lands in this entry and is registered as a brief command, so this repository's consult-inbox line stays in the session brief once the copy is deleted. SPEC-windows-bash-files.md delta 5 carries it.
+
 **Cost while deferred:** a Windows adopter on those profiles needs bash. Filed 2026-10-05 by evidence-front-install-split-pass' lead. Re-verified by `git ls-files`: outside smoke and fixtures the three kits track context-kit/templates/session-context.sh and drift-kit/templates/kpi-deprecated-surface.sh, and guard-kit tracks no such file. Owner lookup: `session-context.sh`, `kpi-deprecated-surface`, `Git for Windows` in this file — the two entries above, DISTINCT (neither names the kit-shipped files); owner gate-sdk/SPEC.md §The adopter constraints, and each kit SPEC for its file.
 
 ## Technical Debt
