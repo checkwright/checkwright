@@ -6,3 +6,4 @@
 
 windows-shell-floor-pass scope aea6ddb6 2026-10-06 1c441c078
 windows-shell-floor-pass spec ab78e89e 2026-10-06 9ba12f4a7
+windows-shell-floor-pass align aa151943 2026-10-06 c96c8ca24
