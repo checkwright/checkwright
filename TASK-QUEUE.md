@@ -48,18 +48,6 @@ docs/manual-install.md's Windows download fence is dot-sourced and sets `$ErrorA
 
 **Cost while deferred:** an adopter's shell keeps a changed error policy after installing. Filed 2026-10-06 by evidence-front-install-split-pass' lead. Re-verified by reading the fence, which opens on `. {` and sets the preference inside it. Owner lookup: `ErrorActionPreference`, `stop policy`, `try/finally` in this file — none; install-windows-stop-policy, landed last iteration, DISTINCT (it added the preference this restores).
 
-### mirror-fold-absent-mirror
-
-`check-stage-entry`'s mirror fold counts a body token under `LIFECYCLE_KIT_MIRROR_ROOT` as its suffix whenever that suffix is a roster dir, without testing that the mirror path exists, while the knob's row in lifecycle-kit/SPEC.md says a root under which no roster dir sits folds nothing. With the root set and no mirror generated, a token naming `<root>/<dir>` still folds to `<dir>` and can add a component.
-
-**Deliverable:** the knob row restated to what the fold does, or the fold narrowed to an existing mirror, with a fixture for the absent-mirror case; which one is spec's.
-
-**Run at build, 2026-10-06:** with the root set, roster dirs `a/` and `b/` and no `site/b/`, an amendment in `a/` naming `site/b/SPEC.md` exits 1 on `references 2 components: a b`; the fold tests roster membership and no path, as inferred.
-
-**Lead decision, 2026-10-06 (not the operator's direction; revisable at a later scope or spec):** the knob row is restated to what the fold does, no gate verdict changes, and the fixture pins the absent-mirror case as it behaves. Ground: §check-stage-entry owns the fold and the row cites it, so the row yields. Constraint: the row and that section must not disagree, and the over-demand cost below is answered in the section.
-
-**Cost while deferred:** a consumer setting the root before generating a mirror can be asked for an audit stamp its amendment does not owe. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' close, off its second-vendor review; carried over the boundary and promoted at the next scope. Owner lookup: `MIRROR_ROOT`, `mirror fold`, `fold_mirror` in this file and the disposed-findings record — none; owner lifecycle-kit/SPEC.md §Layout and configuration, with §check-stage-entry.
-
 ### harness-sweep-inexact-prose
 
 three sentences the harness-naming sweep left or made inexact. gate-sdk/SPEC.md §The adopter constraints calls the project-directory variable a knob beside the settings file and the agent-skill directory, and no knob names it: guard-kit/SPEC.md §The shell guard declares it a binding the wiring templates carry. guard-kit/SPEC.md's smoke paragraph says the install merges hook wiring into the file `GUARD_KIT_SETTINGS` names, while guard-kit/smoke/install.sh writes the default path literally and reads no knob. drift-kit/SPEC.md's `kpi-settings-local` bullet names the local overlay by path where the arm resolves `GUARD_KIT_SETTINGS_LOCAL`.
@@ -1194,4 +1182,5 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 
 - stage-tier-line-unread
 - journal-arm-spec-departures
+- mirror-fold-absent-mirror
 

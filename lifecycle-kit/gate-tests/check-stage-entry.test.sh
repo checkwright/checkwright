@@ -299,14 +299,15 @@ cp "$c5/.workflow/WORKFLOW-STATE.txt" "$c7/.workflow/"
 check_case "C7 path-glob-archived-not-counted" "$c7" 0 "STAGE-ENTRY: clean"
 unset LIFECYCLE_KIT_AMENDMENT_GLOB
 
-# C8–C12: the mirror fold. One tree — roster dirs a/ and b/, their mirrors site/a/
+# C8–C14: the mirror fold. One tree — roster dirs a/ and b/, their mirrors site/a/
 # and site/b/, a roster dir site/extra/ mirroring nothing, one amendment in a/.
-mirror_case() {  # $1=label  $2=knob value ("" = unset)  $3=body token  $4=want-rc  $5=want-substring
+mirror_case() {  # $1=label  $2=knob value ("" = unset)  $3=body token  $4=want-rc  $5=want-substring  $6=a dir removed from the tree (optional)
     local d="$SANDBOX/m" out rc
     rm -rf "$d"; build_queue "$d"
     mkdir -p "$d/.workflow" "$d/a" "$d/b" "$d/site/a" "$d/site/b" "$d/site/extra"
     : >"$d/a/SPEC.md"; : >"$d/b/SPEC.md"
     : >"$d/site/a/SPEC.md"; : >"$d/site/b/SPEC.md"; : >"$d/site/extra/SPEC.md"
+    [[ -n "${6:-}" ]] && rm -r "${d:?}/$6"
     printf 'regenerate %s after the merge\n' "$3" >"$d/a/SPEC-foo.md"
     cp "$c5/.workflow/WORKFLOW-STATE.txt" "$d/.workflow/"
     if [[ -n "$2" ]]; then
@@ -327,6 +328,8 @@ mirror_case "C9 mirror-declared-folds" site site/a/SPEC.md 0 "STAGE-ENTRY: clean
 mirror_case "C10 mirror-root-trailing-slash" site/ site/a/SPEC.md 0 "STAGE-ENTRY: clean"
 mirror_case "C11 mirror-of-another-component-adds-it" site site/b/SPEC.md 1 "references 2 components: a b"
 mirror_case "C12 unmirrored-dir-under-root-stays" site site/extra/SPEC.md 1 "references 2 components: a site/extra"
+mirror_case "C13 absent-mirror-of-another-component-still-adds-it" site site/b/SPEC.md 1 "references 2 components: a b" site/b
+mirror_case "C14 absent-mirror-undeclared-adds-nothing" "" site/b/SPEC.md 0 "STAGE-ENTRY: clean" site/b
 
 # --- assertion D: a build entry refuses an amendment still carrying an unrun inferred-claim marker ---
 
