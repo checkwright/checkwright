@@ -1,10 +1,10 @@
 {
-  "//": "context-kit SessionStart wiring — merge into .claude/settings.json. Assumes session-context.sh was copied into your gates dir (default scripts/). The hook assembles the session brief and always exits 0.",
+  "//": "context-kit SessionStart wiring — merge into .claude/settings.json. The hook is the gate binary's session-context member: it assembles the session brief and always exits 0. Retarget the front-end path if gate-sdk is vendored elsewhere; the brief's layout judgments are context-kit knobs (CONTEXT_KIT_BRIEF_*), never an edited script.",
   "hooks": {
     "SessionStart": [
       {
         "hooks": [
-          { "type": "command", "command": "bash \"${CLAUDE_PROJECT_DIR}/scripts/session-context.sh\"" }
+          { "type": "command", "command": "bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook session-context" }
         ]
       }
     ]

@@ -82,6 +82,9 @@ total_rows="$(awk '/^--- Lead/{f=1} /^Read trend/{f=0} f && /^  [^ ]/{c++} END{p
 
 grep -q 'kpi-does-not-exist.*n/a' <<<"$out" || fail "missing plugin did not yield a visible n/a row"
 
+rows Lead <<<"$out" | grep -q 'deprecated surface.*n/a (no CANON_KIT_DEPRECATION_MARKERS roster)' \
+    || fail "kpi-deprecated-surface did not render its n/a row in a consumer with no marker roster"
+
 awk '/^--- Lag/{f=1;next} /^Read trend/{f=0} f' <<<"$out" | grep -q 'knowledge friction.*n/a' \
     || fail "kpi-knowledge-friction did not render an n/a row under the Lag section (log absent in the throwaway consumer)"
 

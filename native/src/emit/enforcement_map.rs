@@ -424,7 +424,8 @@ const CLASS_OWNERS: [(&str, &str, &str); 6] = [
     ("drift-kit/SPEC.md", "the-kpi-plugin-contract", "The KPI plugin contract"),
     // consumer-value-exempt: a kit SPEC's own section title, the class owner's citation
     ("guard-kit/SPEC.md", "the-shell-guard", "The shell guard"),
-    ("context-kit/SPEC.md", "the-session-context-hook-template", "The session-context hook"),
+    // consumer-value-exempt: a kit SPEC's own section title, the class owner's citation
+    ("context-kit/SPEC.md", "the-session-context-hook", "The session-context hook"),
     // consumer-value-exempt: a kit SPEC's own section title, the class owner's citation
     ("evidence-kit/SPEC.md", "baseline-manifest", "Baseline manifest"),
     // consumer-value-exempt: a kit SPEC's own section title, the class owner's citation

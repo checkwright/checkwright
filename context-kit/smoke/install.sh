@@ -29,7 +29,6 @@ check-settings-paths
 EOF
 
 cp "$SMOKE_KIT_ROOT/templates/context-config.knobs" scripts/context-config.knobs
-cp "$SMOKE_KIT_ROOT/templates/session-context.sh" scripts/session-context.sh
 
 mkdir -p .claude
 if [[ -f .claude/settings.json ]]; then
@@ -54,7 +53,7 @@ qtpl="$SMOKE_KIT_ROOT/../queue-kit/templates/TASK-QUEUE.md"
 
 bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html
 
-hook_out="$(bash scripts/session-context.sh 2>/dev/null)"; rc=$?
+hook_out="$(bash "$SDK/bin/run-gates.sh" --hook session-context </dev/null 2>/dev/null)"; rc=$?
 if [[ "$rc" -ne 0 ]]; then
     echo "context-kit/smoke/install.sh: session-context hook exited $rc (want 0)" >&2
     exit 1
@@ -75,7 +74,7 @@ fi
 mkdir -p .tmp
 printf -- '---\nsmoke-iteration build smoke0001 2000-01-01 0000000\n' > .tmp/smoke-state.txt
 rules_out="$(CONTEXT_KIT_STATE_FILE=.tmp/smoke-state.txt CONTEXT_KIT_STAGE_RULES=no-such-stage-rules-command \
-    bash scripts/session-context.sh </dev/null 2>/dev/null)"; rc=$?
+    bash "$SDK/bin/run-gates.sh" --hook session-context </dev/null 2>/dev/null)"; rc=$?
 rm -f .tmp/smoke-state.txt
 if [[ "$rc" -ne 0 ]] || ! grep -q 'craft rules unavailable: the CONTEXT_KIT_STAGE_RULES command exited 127' <<<"$rules_out"; then
     echo "context-kit/smoke/install.sh: a broken stage-rules command was not reported (exit $rc)" >&2

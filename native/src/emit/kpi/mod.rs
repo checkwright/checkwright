@@ -4,6 +4,7 @@
 pub mod always_loaded;
 pub mod amendment_age;
 pub mod deferred_age;
+pub mod deprecated_surface;
 pub mod gate_backlog;
 pub mod gate_runtime;
 pub mod incident_recurrence;
@@ -56,6 +57,7 @@ pub const BUILTINS: &[(&str, Member)] = &[
     ("kpi-always-loaded", always_loaded::run),
     ("kpi-amendment-age", amendment_age::run),
     ("kpi-deferred-age", deferred_age::run),
+    ("kpi-deprecated-surface", deprecated_surface::run),
     ("kpi-gate-backlog", gate_backlog::run),
     ("kpi-gate-runtime", gate_runtime::run),
     ("kpi-incident-recurrence", incident_recurrence::run),
@@ -300,7 +302,7 @@ mod tests {
         }
         assert!(lookup("kpi-always-loaded.sh").is_none());
         assert!(lookup("always-loaded").is_none());
-        assert_eq!(BUILTINS.len(), 14, "the bundled set moved without its roster");
+        assert_eq!(BUILTINS.len(), 15, "the bundled set moved without its roster");
     }
 
     // spec: drift-kit/SPEC.md §Bundled KPIs — the section walk resets on any heading, which is what

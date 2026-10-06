@@ -8,6 +8,7 @@ pub mod dispatch;
 pub mod escalation;
 pub mod model_verdict;
 pub mod poll;
+pub mod session_context;
 pub mod shell_guard;
 pub mod statusline;
 pub mod stop_liveness;
@@ -73,6 +74,12 @@ pub const HOOKS: &[(&str, HookFn, &[&str], &str)] = &[
         "delegation-kit",
     ),
     ("escalation-guard", |p| escalation::run(p.value()), &[], "guard-kit"),
+    (
+        "session-context",
+        session_context::run,
+        session_context::KNOBS,
+        "context-kit",
+    ),
     ("shell-guard", shell_guard::run, crate::guard::host::KNOBS, "guard-kit"),
     (
         "wakeup-guard",
@@ -361,6 +368,7 @@ mod tests {
             ("agent-dispatch-guard", include_str!("dispatch.rs")),
             ("subagent-stop-liveness", include_str!("stop_liveness.rs")),
             ("escalation-guard", include_str!("escalation.rs")),
+            ("session-context", include_str!("session_context.rs")),
             ("shell-guard", include_str!("shell_guard.rs")),
             ("wakeup-guard", include_str!("wakeup.rs")),
             ("workflow-state-guard", include_str!("workflow_state.rs")),

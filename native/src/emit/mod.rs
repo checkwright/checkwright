@@ -20,6 +20,7 @@ pub mod enter_stage;
 pub mod entry_history;
 pub mod enum_sets;
 pub mod env_probe;
+pub mod consult_count;
 pub mod file_consult;
 pub mod file_gap;
 pub mod file_install;
@@ -565,6 +566,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-file-consult",
         Arm::Emit(file_consult::emit, Grammar::Parsed(file_consult::USAGE)),
         file_consult::KNOBS,
+    ),
+    // spec: lifecycle-kit/SPEC.md §The consult inbox — the count the session brief prints, a table
+    // member because it reads the inbox knob
+    (
+        "--emit-consult-count",
+        Arm::Emit(consult_count::emit, Grammar::Flags(&[])),
+        consult_count::KNOBS,
     ),
     // spec: drift-kit/SPEC.md §The knowledge-friction loop — the capture affordance, riding the same
     // argv-shape split as `--emit-file-survey`: the refusal and the `--` escape cross the port with

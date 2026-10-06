@@ -8,7 +8,7 @@ This file ships in the installer payload; what that payload withholds, and where
 
 ## Install
 
-Vendor the kit beside [gate-sdk](../gate-sdk/) (required); the meter's default hook approximation and the session-context template also expect [queue-kit](../queue-kit/). Then:
+Vendor the kit beside [gate-sdk](../gate-sdk/) (required); the meter's default hook approximation and the session-context hook also expect [queue-kit](../queue-kit/). Then:
 
 1. Register the gates — add to your `gates.list`:
 
@@ -24,7 +24,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required); the meter's default h
 
    They resolve through gate-sdk's registry path (your gates dir first, then each kit's `checks/`), and the pre-commit hook runs those their `# graph:` manifests trigger, read at commit. `--install-hooks` on the gate binary `GATE_SDK_NATIVE_BIN` names places both hooks in a clone once, and a gate registered later is reached with no re-install. Two of them wait on a step of yours: `check-settings-pins` skips clean until you create `settings-pins.conf` naming the settings keys to hold, such as the auto-memory-disabling ones ([SPEC.md §check-settings-pins](SPEC.md#check-settings-pins)); and `check-surface-ratchet` arms once you commit the ceilings `--emit always-loaded --ceiling` stamps ([SPEC.md §The surface ratchet](SPEC.md#the-surface-ratchet)).
 
-2. Wire the session-start hook — copy `templates/session-context.sh` into your gates dir, edit its `[EDIT ME]` sections (layout judgment, not mechanism), and merge `templates/settings-sessionstart.json` into your harness settings file (`CONTEXT_KIT_SETTINGS_FILE`).
+2. Wire the session-start hook — merge `templates/settings-sessionstart.json` into your harness settings file (`CONTEXT_KIT_SETTINGS_FILE`). The brief's layout judgments are the `CONTEXT_KIT_BRIEF_*` knobs, set in your knob file.
 
 3. Set the baseline — run `--emit always-loaded --update-baseline` on the gate binary `GATE_SDK_NATIVE_BIN` names and commit `.workflow/always-loaded-baseline.txt`.
 

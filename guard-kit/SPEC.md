@@ -1122,7 +1122,7 @@ Arm (c)'s outside-repository and device-target compounds lead with `make build` 
 
 **The shell guard's price is measured** on a `git status` payload over ten calls each: 8 ms per call through the front end with no consumer stage, and 1 ms for the member alone. With this repo's consumer command it is 13 to 14 ms through the front end and 7 ms for the member alone, the consumer command's own spawn.
 
-`smoke/install.sh` installs into the scratch consumer: the config template into the gates dir, hook wiring merged into the settings file (`GUARD_KIT_SETTINGS`), log paths gitignored. The install then verifies itself:
+`smoke/install.sh` installs into the scratch consumer: the config template into the gates dir, hook wiring merged into the settings file at its default path, log paths gitignored. The install then verifies itself:
 
 - It drives one crafted payload through the wired member, `--hook shell-guard` on the gate binary, asserting a block carrying rule `cd_compound`'s steer, since a knob read the binary refuses blocks too.
 - It asserts the merged wiring's `Bash|PowerShell` matcher group and drives a `PowerShell` payload, `Set-Location deploy; Get-ChildItem`, through the same member, asserting the same rule's block.

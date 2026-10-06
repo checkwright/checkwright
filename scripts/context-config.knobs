@@ -43,6 +43,15 @@ CONTEXT_KIT_RATCHET_PATHS[] = :(exclude)docs/install-evidence.md
 # comment-tier-exempt: every component SPEC, so its growth between brevity passes shows in the growing commit; the docs/ mirrors and gate-tests/ fixtures are excluded above
 CONTEXT_KIT_RATCHET_PATHS[] = */SPEC.md
 
+# spec: context-kit/SPEC.md §The session-context hook — this repo's session brief: the drift trend, the craft-rule router, the delegation nudge on the stages that delegate, and two lines of its own
+CONTEXT_KIT_DRIFT_REPORT = drift-report
+CONTEXT_KIT_STAGE_RULES = --emit stage-rules
+CONTEXT_KIT_BRIEF_NUDGES[scope] = scripts/brief-nudge-delegation.txt
+CONTEXT_KIT_BRIEF_NUDGES[align] = scripts/brief-nudge-delegation.txt
+CONTEXT_KIT_BRIEF_NUDGES[build] = scripts/brief-nudge-delegation.txt
+CONTEXT_KIT_BRIEF_COMMANDS[] = --usage-verdict
+CONTEXT_KIT_BRIEF_COMMANDS[] = --emit consult-count
+
 # spec: context-kit/SPEC.md §Layout and configuration — the policy calibrations this repo relies on, bound at the values its gates are green at so a kit default's move moves no verdict here (Policy-as-choice)
 CONTEXT_KIT_BREVITY_CAP = 330
 CONTEXT_KIT_BREVITY_POINTER_RE = §

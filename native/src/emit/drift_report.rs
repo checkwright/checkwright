@@ -23,6 +23,15 @@ pub const KNOBS: &[&str] = &[
     "CONTEXT_KIT_SURFACES",
     "CONTEXT_KIT_HOOK_CMD",
     "CONTEXT_KIT_BASELINE_FILE",
+    // spec: drift-kit/SPEC.md §Bundled KPIs — what `kpi-deprecated-surface` reads in process: the
+    // marker roster, and the comment surface's own reads through canon-kit's shared function
+    "CANON_KIT_DEPRECATION_MARKERS",
+    "CANON_KIT_COMMENT_SURFACE",
+    "CANON_KIT_COMMENT_ACTIONS",
+    "CANON_KIT_SCAN_KIT_ROOTS",
+    "GATE_SDK_PRUNE_DIRS",
+    "GATE_SDK_PRUNE_EXTRA_DIRS",
+    "GATE_SDK_WORKFLOW_DIR",
 ];
 
 const HEADER: &str = "=== Drift KPIs (advisory — trend, not level) ===";

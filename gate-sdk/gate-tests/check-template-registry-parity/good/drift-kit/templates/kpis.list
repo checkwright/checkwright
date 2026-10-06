@@ -4,6 +4,7 @@
 kpi-always-loaded
 kpi-amendment-age
 kpi-deferred-age
+kpi-deprecated-surface
 kpi-gate-backlog
 kpi-gate-runtime
 kpi-incident-recurrence

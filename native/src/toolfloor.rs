@@ -551,10 +551,10 @@ mod tests {
             "the floor-holder joined the audience, which makes the member unconditional: {:?}",
             derived
         );
-        for owed in ["context-kit", "drift-kit", "guard-kit"] {
+        for owed in ["context-kit", "guard-kit"] {
             assert!(derived.iter().any(|k| k == owed), "{} left the audience: {:?}", owed, derived);
         }
-        for clear in ["delegation-kit", "lifecycle-kit", "canon-kit", "queue-kit"] {
+        for clear in ["drift-kit", "delegation-kit", "lifecycle-kit", "canon-kit", "queue-kit"] {
             assert!(derived.iter().all(|k| k != clear), "{} joined the audience: {:?}", clear, derived);
         }
     }

@@ -25,6 +25,10 @@ fn ceiling_file(resolve: Resolve) -> Result<Value, String> {
     in_workflow_dir(resolve, "surface-ceiling.txt")
 }
 
+fn session_role_file(resolve: Resolve) -> Result<Value, String> {
+    input_scalar(resolve, "GATE_SDK_TMP_DIR").map(|(d, _)| Value::Scalar(format!("{}/session-role", d)))
+}
+
 fn settings_pins(resolve: Resolve) -> Result<Value, String> {
     in_gates_dir(resolve, "settings-pins.conf")
 }
@@ -88,6 +92,18 @@ pub const KIT: Kit = Kit {
         ),
         Row::derived("CONTEXT_KIT_PUB_LANG_DIR", Shape::Scalar, pub_lang_dir, &["GATE_SDK_GATES_DIR"]),
         Row::indexed("CONTEXT_KIT_PUB_LANGS", &[]),
+        Row::scalar("CONTEXT_KIT_DRIFT_REPORT", ""),
+        Row::scalar("CONTEXT_KIT_STAGE_RULES", ""),
+        Row::derived(
+            "CONTEXT_KIT_SESSION_ROLE_FILE",
+            Shape::Scalar,
+            session_role_file,
+            &["GATE_SDK_TMP_DIR"],
+        ),
+        Row::scalar("CONTEXT_KIT_BRIEF_COMPONENT_MARK", "src"),
+        Row::keyed("CONTEXT_KIT_BRIEF_NUDGES", &[]),
+        Row::scalar("CONTEXT_KIT_BRIEF_FOOTER_FILE", ""),
+        Row::indexed("CONTEXT_KIT_BRIEF_COMMANDS", &[]),
     ],
     validate: Some(("context config", validate)),
     open_family: false,

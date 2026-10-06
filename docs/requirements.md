@@ -35,7 +35,7 @@ The tools each shipped gate runs. `required` binds every install. An `optional` 
 
 | Tool | Version | Needed | Why |
 |---|---|---|---|
-| `bash` | ≥ 4.3 | optional: if your profile includes context-kit, drift-kit or guard-kit | each ships a file your host runs with bash, and the gate library uses a nameref (`local -n`) |
+| `bash` | ≥ 4.3 | optional: if your profile includes context-kit or guard-kit | each ships hook wiring the harness runs with bash, and the gate library uses a nameref (`local -n`) |
 | `git` | ≥ 2.15 | required | the gates read tracked files and the hooks fire at commit time; `check-docs-cmd` reads `rev-parse --is-shallow-repository` |
 | `curl` | ≥ 5.9 | optional: if your profile includes delegation-kit | its usage poller (`--usage-poll`) fetches its source with `curl -fsS`, and `-S` arrived in 5.9 |
 | `shellcheck` | ≥ 0.6 | optional: if you register a gate that runs it | `check-shellcheck` and `check-action-run-shell` run [ShellCheck](https://www.shellcheck.net/) with `-S warning` once you register them |
