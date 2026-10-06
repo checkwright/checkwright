@@ -18,16 +18,6 @@ kit prose couples to the master harness. The kit SPECs and READMEs (guard-kit, l
 
 **Cost while deferred:** an adopter on another harness reads every hook contract as bound to Claude Code. Filed 2026-09-30 to the gap inbox by guard-kit-steering's lead; promoted at its close: →fix fails because the sweep spans five kits, →forward because the direction is given. Owner lookup: `CLAUDE_PROJECT_DIR`, `master harness`, `Codex` in this file — [plugin-harness-reach](#plugin-harness-reach), DISTINCT (the plugin package on other harnesses), and [heterogeneous-agent-delegation](#heterogeneous-agent-delegation), DISTINCT (a master harness delegating to other vendors, where this is the master harness swapped); owner gate-sdk/SPEC.md §The adopter constraints. Re-verified at scope 2026-10-06 by `git grep`: the variable sits in the SPEC or README of each of the five kits named, fourteen sites in eight files. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
 
-### queue-provenance-restates-git-history
-
-[recurrence: 2026-09-25] [not-icebox-eligible: 2026-10-03 returned from the icebox by consult 2026-09-25; evicting it would reverse that consult]
-
-queue provenance prose restates what `git log` answers; the ruled sweep is small, ten route-phrase hits remaining when re-counted.
-
-**Deliverable:** the ten sites cut to the fact the entry needs, and the writing rule at queue-kit/SPEC.md §The queue format.
-
-**Cost while deferred:** low; paid by every reader of those entries. Filed 2026-09-09; returned from the icebox 2026-09-25 by consult, the count re-run. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
-
 ## Deferred
 
 ### foreign-project-critique
@@ -38,7 +28,7 @@ an on-demand critique of the project's strategic weaknesses, run on the top fore
 
 **Deliverable:** the on-demand trigger, the critique prompt, the reflection pass's contract and the SWOT's home, model literals in consumer config. The spec question is the reflection's write path, since work enters only through scope (doctrine-kit/DOCTRINE.md, Scope-gated intake).
 
-**Cost while deferred:** nil while the operator holds no foreign credit to run it; after, strategic weaknesses surface only through the operator's own reading. Filed 2026-10-03 to the gap inbox by delegation-transport-pass' lead; promoted at its close: →fix fails because trigger, reflection and SWOT surface are new mechanism no amendment settled, →forward because the direction is given. Re-verified: no tracked prose names a SWOT or an on-demand foreign critique. Owner lookup: `SWOT`, `critique`, `strategic`, `reflection` in this file — foreign-vendor-critique, DISTINCT (its close review landed this iteration); owner delegation-kit/SPEC.md §The foreign-vendor run, the SWOT's home open.
+**Cost while deferred:** nil while the operator holds no foreign credit to run it; after, strategic weaknesses surface only through the operator's own reading. Filed 2026-10-03 by delegation-transport-pass' lead. Re-verified: no tracked prose names a SWOT or an on-demand foreign critique. Owner lookup: `SWOT`, `critique`, `strategic`, `reflection` in this file — foreign-vendor-critique, DISTINCT (its close review landed this iteration); owner delegation-kit/SPEC.md §The foreign-vendor run, the SWOT's home open.
 
 ### stage-executor-binding
 
@@ -50,7 +40,7 @@ a per-stage executor binding as consumer config: a consumer picks the harness an
 
 **Deliverable:** the stage-to-executor knob, its validator and the lead's dispatch-time read, in delegation-kit/SPEC.md §The tier binding, with fixtures.
 
-**Cost while deferred:** nil while item (4) is open and the operator holds no foreign credit; after, a consumer has no declarative way to put a stage on a foreign agent. Filed 2026-10-03 to the gap inbox by delegation-transport-pass' lead; promoted at its close: →fix fails because the knob is a new name and its prerequisite is unlanded, →forward because the direction is given. Re-verified: the knob roster carries no stage- or executor-keyed delegation-kit knob. Owner lookup: `per-stage`, `executor`, `TIER_MODEL` in this file — heterogeneous-agent-delegation, DISTINCT (item (4) lets a stage run foreign; this chooses which); owner delegation-kit/SPEC.md §The tier binding.
+**Cost while deferred:** nil while item (4) is open and the operator holds no foreign credit; after, a consumer has no declarative way to put a stage on a foreign agent. Filed 2026-10-03 by delegation-transport-pass' lead. Re-verified: the knob roster carries no stage- or executor-keyed delegation-kit knob. Owner lookup: `per-stage`, `executor`, `TIER_MODEL` in this file — heterogeneous-agent-delegation, DISTINCT (item (4) lets a stage run foreign; this chooses which); owner delegation-kit/SPEC.md §The tier binding.
 
 ### guard-quoted-operand-words
 
@@ -60,7 +50,7 @@ Two rules read a command word without its quoting. Rule `rm_tracked`'s bash arm 
 
 **Deliverable:** each word read with its quoting known: the skeleton's held word beside the dequoted one, or a reader-owned word that carries it. The tracked test takes a quoted operand literally (`:(literal)`) and an unquoted one as the glob the shell expands. Both steers print the shell's own word. Each rule gets a decision-table row (a quoted tracked operand, a blank-bearing name, a single-quoted regex backslash), and guard-kit/SPEC.md §The reader and its views states the contract.
 
-**Cost while deferred:** a quoted `rm` of a tracked path deletes unstaged, outside the block's steer; a `find_exec` steer naming an escaped blank cannot be followed as printed. Filed 2026-10-03 to the gap inbox as two bullets at guard-ruleset-gate-neutrality-pass' spec; promoted together at its close: →fix fails because an exact word needs per-word quoting provenance that no rule consumes yet, and stripping backslashes, as rule `grant_path_slot` does, breaks the common single-quoted regex steer. That makes it a reader contract with cross-rule reach, the escaped-blank precedent's ground. →forward fails because no ruling is owed. Re-verified by hook probe: both steers as quoted above, and the `rm_tracked` premise widened from blank-bearing names to every quoted operand. Owner lookup: `shell_word`, `quoted operand`, `rm_tracked`, `exact word` in this file — none; owner guard-kit/SPEC.md §The reader and its views.
+**Cost while deferred:** a quoted `rm` of a tracked path deletes unstaged, outside the block's steer; a `find_exec` steer naming an escaped blank cannot be followed as printed. Filed 2026-10-03 by guard-ruleset-gate-neutrality-pass' spec. An exact word needs per-word quoting provenance that no rule consumes yet, and stripping backslashes, as rule `grant_path_slot` does, breaks the common single-quoted regex steer. That makes it a reader contract with cross-rule reach, the escaped-blank precedent's ground. Re-verified by hook probe: both steers as quoted above, and the `rm_tracked` premise widened from blank-bearing names to every quoted operand. Owner lookup: `shell_word`, `quoted operand`, `rm_tracked`, `exact word` in this file — none; owner guard-kit/SPEC.md §The reader and its views.
 
 ### shared-tree-stash-steer
 
@@ -70,7 +60,7 @@ A build session ran `git stash` / `git stash pop` on the shared checkout to rebu
 
 **Deliverable:** a steer from a worktree-rewriting `git stash` on the main checkout to `git worktree add` under the scratch dir, either as a guard-kit block with its decision-table rows or as a delegation-kit/templates/agent-execution.md bullet; choosing between them is the unit's spec question.
 
-**Cost while deferred:** a concurrent session's uncommitted edits or staged paths can vanish or be re-applied under it. Lead-observed once, with the tree intact; the frequency is **inferred, not run**. Filed 2026-10-03 to the gap inbox by the lead at guard-ruleset-gate-neutrality-pass' build; promoted at its close: →fix fails because both shapes add adopter-visible semantics that no amendment settled, a new block verdict or a new standing instruction. →forward fails because no ruling is owed. Re-verified: `stash` sits only in the live-producer act set, and no template text names stash or a before/after probe. Owner lookup: `stash`, `before/after`, `throwaway` in this file — none; owner guard-kit/SPEC.md §The rule roster.
+**Cost while deferred:** a concurrent session's uncommitted edits or staged paths can vanish or be re-applied under it. Lead-observed once, with the tree intact; the frequency is **inferred, not run**. Filed 2026-10-03 by the lead at guard-ruleset-gate-neutrality-pass' build. Re-verified: `stash` sits only in the live-producer act set, and no template text names stash or a before/after probe. Owner lookup: `stash`, `before/after`, `throwaway` in this file — none; owner guard-kit/SPEC.md §The rule roster.
 
 ### config-variant-battery-harness
 
@@ -134,7 +124,7 @@ the interop rung's submission half. The build half landed at companion-catalog-e
 
 **Push need (2026-09-27, inside the budget):** the release tag push beside the closing push, since the submission needs the extension on a published tag; close's release policy decides the cut.
 
-**Cost while deferred:** the extension installs only from a Release URL a reader must already hold, so a Spec Kit user browsing the catalog, where adopters find enforcement extensions, does not find it. Surfaced 2026-08-02 at close; demoted 2026-09-27 at companion-catalog-extension's build, on its amendment's Definition of Done; survey correction (2), a lifecycle stage machine over a foreign workflow, went to the gap inbox.
+**Cost while deferred:** the extension installs only from a Release URL a reader must already hold, so a Spec Kit user browsing the catalog, where adopters find enforcement extensions, does not find it. Surfaced 2026-08-02 at close.
 
 ### design-partner-preview
 
@@ -194,13 +184,13 @@ a gate-authoring SDK. `.gate` as the substrate-neutral surface. **Operator-surfa
 
 [cost: event/low] [surface: gate-sdk]
 
-`check-gate-tamper`'s exemption reader has no implementation-side equivalent. Split 2026-08-09 at scope by operator ruling from `gate-tamper-roster-native-reach` (since retired), when that entry narrowed to its meta-path-roster half and promoted; this is the exemption half, unchanged in substance. That entry was itself split 2026-08-02 from `native-gate-meta-layer-reach`, so this is the second narrowing of one original gap. `extract_exemptions()` parses a shell `# exception-list:` array literal, so a ported gate's Rust module can carry no exemption the gate is able to read.
+`check-gate-tamper`'s exemption reader has no implementation-side equivalent. Split 2026-08-09 at scope by operator ruling from an entry that kept its meta-path-roster half; this is the exemption half, unchanged in substance. `extract_exemptions()` parses a shell `# exception-list:` array literal, so a ported gate's Rust module can carry no exemption the gate is able to read.
 
 **Why design-pending:** it wants the ruling [gate-authoring-sdk-surface](#gate-authoring-sdk-surface) holds — whether a meta-gate reads a substrate-neutral descriptor or learns each substrate — and that entry is horizon-set to ecosystem work, so this one waits.
 
 **The coupling was checked at the split rather than inherited.** It is true of this half and was not true of the roster half: which paths a tamper roster covers is configuration, where how a meta-gate reads an exemption across substrates is exactly the substrate-neutrality question the SDK entry holds.
 
-**Cost while deferred:** zero until a ported gate needs an exemption; no first-cohort member carries an exemption list, which gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate records in its `check-gate-tamper` row. Filed 2026-08-02 at close from the gap inbox; found by build. Split out 2026-08-09 at scope.
+**Cost while deferred:** zero until a ported gate needs an exemption; no first-cohort member carries an exemption list, which gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate records in its `check-gate-tamper` row. Filed 2026-08-02 at close; found by build.
 
 ### site-health-issue-venue-unwanted
 
@@ -260,7 +250,7 @@ CONTRIBUTING.md promises an inbound issue or pull request a disposition within o
 
 **Deliverable:** either the cap carried on the public promise or a lane that honours it, and the disposition record named; CONTRIBUTING.md and the scope binding agree.
 
-**Cost while deferred:** the first contributor past the cap reads a promise the tree breaks. Filed 2026-07-31; returned from the icebox 2026-09-25 by consult, the promise and the cap re-read.
+**Cost while deferred:** the first contributor past the cap reads a promise the tree breaks. Filed 2026-07-31; the promise and the cap re-read 2026-09-25 by consult.
 
 ### custom-gate-substrates
 
@@ -270,7 +260,7 @@ an adopter writes a custom gate in shell only. The registry resolves a member as
 
 **Deliverable:** the registry resolving further substrates under the output, fail-closed, fixture-pair and self-lint contracts: `.ps1` resolution in the registry and the runner, which the hook's `--git-hook` arm dispatches through, with a PowerShell lint counterpart to `check-shellcheck`; a Rust path, as an adopter-built executable the registry dispatches or an extension crate; and the install page's prerequisites per substrate. Whether one executable-dispatch shape serves both is spec's.
 
-**Cost while deferred:** a native-Windows adopter authoring a gate takes on a bash dependency and a second shell dialect, and one wanting a typed, testable gate must write shell or fork. Filed 2026-09-27 to the gap inbox as two bullets by platform-prerequisite-floors' lead, merged here at its close because both ask which substrates the registry resolves beyond `.sh` and `.gate`: →fix fails because each substrate is new mechanism. The Rust bullet's premise, that an adopter cannot write a Rust gate at all, is corrected to the relayed direction above. Re-verified: `registry::resolve` tries `sh` then `gate` per dir and nothing else. Owner lookup: `ps1`, `PowerShell`, `custom gate`, `Rust gate`, `consumer crate` in this file — none; owner gate-sdk/SPEC.md §lib/gate.sh and §The port-candidate criteria.
+**Cost while deferred:** a native-Windows adopter authoring a gate takes on a bash dependency and a second shell dialect, and one wanting a typed, testable gate must write shell or fork. Filed 2026-09-27 by platform-prerequisite-floors' lead. Re-verified: `registry::resolve` tries `sh` then `gate` per dir and nothing else. Owner lookup: `ps1`, `PowerShell`, `custom gate`, `Rust gate`, `consumer crate` in this file — none; owner gate-sdk/SPEC.md §lib/gate.sh and §The port-candidate criteria.
 
 ### plugin-harness-reach
 
@@ -280,7 +270,7 @@ the harness plugin package reaches Claude Code only in its tested and guarded pa
 
 **Deliverable:** (1) the skills load verified on the codex and Antigravity CLIs; (2) a survey of which harnesses read Agent Plugins 1.0 and their catalogs; (3) per-harness guard wiring where a harness has a hook surface.
 
-**Cost while deferred:** an adopter on another harness gets unverified skills and no guards. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' lead on an operator direction to file it for promotion; promoted at its close. Re-verified: plugin/SPEC.md states the portable core and that only Claude Code's install is run. Owner lookup: `Agent Plugins`, `codex`, `Cursor`, `Antigravity` in this file — none; owner plugin/SPEC.md.
+**Cost while deferred:** an adopter on another harness gets unverified skills and no guards. Filed 2026-09-28 by plugin-marketplace-queue-verbs' lead on an operator direction. Re-verified: plugin/SPEC.md states the portable core and that only Claude Code's install is run. Owner lookup: `Agent Plugins`, `codex`, `Cursor`, `Antigravity` in this file — none; owner plugin/SPEC.md.
 
 ### verify-workflow-decoupling
 
@@ -290,7 +280,7 @@ the operator states that verification and workflow are fully decoupled, each shi
 
 **Deliverable:** a ruling on whether the gate binary is verification or substrate both halves share; if the decoupling then holds, the front door and docs/kits.md state it, and a workflow-only profile is weighed.
 
-**Cost while deferred:** the front door neither claims nor refutes a decoupling the operator believes in, and docs/kits.md reads as a dependency chain. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' lead; promoted at its close: →fix fails because the classification is a design ruling with no direction behind it. Re-verified: the three profiles' rows and comments in `installer/profiles.list`, and docs/kits.md line 13. Owner lookup: `decoupl`, `profiles.list`, `workflow-only` in this file — none; owner installer/SPEC.md §Profiles, with docs/kits.md.
+**Cost while deferred:** the front door neither claims nor refutes a decoupling the operator believes in, and docs/kits.md reads as a dependency chain. Filed 2026-09-28 by plugin-marketplace-queue-verbs' lead. Re-verified: the three profiles' rows and comments in `installer/profiles.list`, and docs/kits.md line 13. Owner lookup: `decoupl`, `profiles.list`, `workflow-only` in this file — none; owner installer/SPEC.md §Profiles, with docs/kits.md.
 
 ### plugin-front-matter-yaml
 
@@ -300,7 +290,7 @@ the operator states that verification and workflow are fully decoupled, each shi
 
 **Deliverable:** the leg's oracles runnable locally before a package change commits, or the reader refusing what a YAML plain scalar cannot carry, with a `bad/` fixture holding the `: ` case.
 
-**Cost while deferred:** a front-matter slip is caught only by a push, which spends a hotfix from the budget. Filed 2026-09-28 to the gap inbox by plugin-marketplace-queue-verbs' close; promoted 2026-09-28 at the next iteration's scope: →fix fails because a stricter reader changes a shipped gate's verdict. Re-verified: the reader above, and `.github/workflows/gates.yml` installs `skills-ref` in CI only. Owner lookup: `front matter`, `skills-ref`, `yaml` in this file — only the icebox's template-copy-parity-yaml-widening, DISTINCT (template copies); owner plugin/SPEC.md §check-plugin-parity.
+**Cost while deferred:** a front-matter slip is caught only by a push, which spends a hotfix from the budget. Filed 2026-09-28 by plugin-marketplace-queue-verbs' close. Re-verified: the reader above, and `.github/workflows/gates.yml` installs `skills-ref` in CI only. Owner lookup: `front matter`, `skills-ref`, `yaml` in this file — only the icebox's template-copy-parity-yaml-widening, DISTINCT (template copies); owner plugin/SPEC.md §check-plugin-parity.
 
 ### native-executable-git-hooks
 
@@ -310,7 +300,7 @@ the generated pre-commit and commit-msg hooks start through a shell on every OS:
 
 **Deliverable:** (1) a probe of whether git's hook lookup starts a native executable directly on each OS (the Windows `.exe` lookup inferred from git's source, never run); (2) where a native hook lives, since a per-platform binary cannot be the tracked text hook scripts/git-hooks/ holds: hooks installed untracked with the generated-projection contract and its freshness gate re-pointed at the installer, or a tracked shim kept, which is the shell this removes; (3) the per-commit start cost per OS.
 
-**Cost while deferred:** every commit on Windows starts an emulated-or-bundled shell. Filed 2026-09-29 to the gap inbox by native-hook-customer-legs' lead; promoted 2026-09-29 at its close: →fix fails because the probe is unrun and the home undecided, →forward because the direction is given. Re-verified: scripts/git-hooks/pre-commit opens `#!/bin/sh`. Not a recurrence of `native-hook-dispatch`, which removed the bash dependency. Owner lookup: `native executable`, `hook shim` in this file — none; owner gate-sdk/SPEC.md, with installer/SPEC.md for an untracked install.
+**Cost while deferred:** every commit on Windows starts an emulated-or-bundled shell. Filed 2026-09-29 by native-hook-customer-legs' lead. Re-verified: scripts/git-hooks/pre-commit opens `#!/bin/sh`. Not a recurrence of `native-hook-dispatch`, which removed the bash dependency. Owner lookup: `native executable`, `hook shim` in this file — none; owner gate-sdk/SPEC.md, with installer/SPEC.md for an untracked install.
 
 ### openspec-delta-base-agreement
 
@@ -330,7 +320,7 @@ an OpenSpec change delta that disagrees with its base spec passes the battery an
 
 **Deliverable:** one install-smoke-sh matrix over `unix_legs` less the baseline triple, the remedy step conditioned on the runner OS being macOS; `install-smoke-sh-linux` stays its own job for its baseline diff and foreign-host containers. **Inferred, not probed:** that nothing reds a declared triple with no smoke leg.
 
-**Cost while deferred:** triplicated YAML held in step by nobody, and a new unix triple needs a hand-written smoke job. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead on an operator question; promoted at its close: →fix fails because the rewrite needs a push to witness, →forward because no ruling is owed. Re-verified: the three job keys and the `unix_legs` output in gates.yml. Owner lookup: `install-smoke-sh`, `unix_legs` in this file — none; owner installer/SPEC.md §The consumer smoke.
+**Cost while deferred:** triplicated YAML held in step by nobody, and a new unix triple needs a hand-written smoke job. Filed 2026-09-29 by companion-technical-gates' lead on an operator question. The rewrite needs a push to witness. Re-verified: the three job keys and the `unix_legs` output in gates.yml. Owner lookup: `install-smoke-sh`, `unix_legs` in this file — none; owner installer/SPEC.md §The consumer smoke.
 
 ### releases-page-table
 
@@ -340,7 +330,7 @@ docs/releases.md renders its derived note list as a bare list of version links, 
 
 **Deliverable:** a derived table whose columns answer an upgrader, above all whether a release needs action on upgrade (its `gates` or `knobs` role section carries entries, roles per installer/SPEC.md §The upgrade contract); also version, date, bump class and per-section counts, which each note's In brief summary table already states. The note composer writes the counts and the action flag as front-matter keys and a gate holds them equal to the note's sections; parsing sections in Liquid at render time is refused as fragile.
 
-**Cost while deferred:** a reader skipping several versions opens each note to learn which need action. Filed 2026-09-29 to the gap inbox by companion-technical-gates' lead, at the operator's leave; promoted at its close: →fix fails because the keys are new grammar on the notes, →forward because no ruling is owed. Re-verified: the page's `<ul>` loop and 29 notes carrying `release:`. Owner lookup: `releases.md`, `front-matter` in this file — none; owner docs/site-architecture.md, with installer/SPEC.md §The upgrade contract for the keys.
+**Cost while deferred:** a reader skipping several versions opens each note to learn which need action. Filed 2026-09-29 by companion-technical-gates' lead, at the operator's leave. Re-verified: the page's `<ul>` loop and 29 notes carrying `release:`. Owner lookup: `releases.md`, `front-matter` in this file — none; owner docs/site-architecture.md, with installer/SPEC.md §The upgrade contract for the keys.
 
 ### docs-chrome-page-repeat
 
@@ -350,7 +340,7 @@ docs/releases.md renders its derived note list as a bare list of version links, 
 
 **Deliverable:** an arm prefixing the layout's and includes' literal text nodes (Liquid excluded) to every page's corpus, so a sentence of eight words or more or a link target stated in both reds; or a boundary note refusing it.
 
-**Cost while deferred:** the next chrome addition can duplicate a page statement unseen until a reader finds it. Filed 2026-09-29 to the gap inbox by companion-adoption-landing's build; promoted at its close: →fix fails because the arm is new mechanism with a false-positive risk to calibrate, →forward because no ruling is owed. Re-verified: canon-kit/SPEC.md §check-docs-page-repeat reads each `CANON_KIT_PAGE_REPEAT_PAGES` page alone and deliberately asserts no repeat across pages, so the arm must weigh that boundary. Owner lookup: `page-repeat`, `_layouts`, `chrome` in this file — [site-video-poster-rule](#site-video-poster-rule), DISTINCT (embeds); owner canon-kit/SPEC.md §check-docs-page-repeat, with docs/page-authoring.md §Page-authoring rules. Surface also canon-kit.
+**Cost while deferred:** the next chrome addition can duplicate a page statement unseen until a reader finds it. Filed 2026-09-29 by companion-adoption-landing's build. Re-verified: canon-kit/SPEC.md §check-docs-page-repeat reads each `CANON_KIT_PAGE_REPEAT_PAGES` page alone and deliberately asserts no repeat across pages, so the arm must weigh that boundary. Owner lookup: `page-repeat`, `_layouts`, `chrome` in this file — [site-video-poster-rule](#site-video-poster-rule), DISTINCT (embeds); owner canon-kit/SPEC.md §check-docs-page-repeat, with docs/page-authoring.md §Page-authoring rules. Surface also canon-kit.
 
 ### front-door-rehearsal-rule
 
@@ -360,7 +350,7 @@ the front-door rehearsal belongs in the methodology, operator direction 2026-09-
 
 **Deliverable, three layers:** (1) a generic kit rule, before an audience-facing event rehearse the published front door from a clean seat and file what it finds, the container, platform and route set being consumer config (doctrine-kit or lifecycle-kit's release step, per the provenance seam); (2) here, a post-publish job in `.github/workflows/publish.yml` installing the just-published Release on clean runners (init, hooks on, a first red, an upgrade from the previous release, a hooked profile move), reaching the macOS and Windows runners a container cannot; (3) a manual agent-walked rehearsal of the routes CI cannot drive (the adoption prompt, the plugin marketplace, the Spec Kit extension), before audience events only, a catalog submission or a partner install, per the operator.
 
-**Cost while deferred:** each audience event risks a front-door defect only a clean-seat install would show; the one-off left macOS, native Windows, arm64 Linux, WSL and the npx, plugin, PowerShell and agent-prompt routes unrehearsed. Filed 2026-09-29 to the gap inbox by preview-readiness' lead; promoted 2026-09-30 at its close: →fix fails because each layer is new mechanism, →forward because the direction is given. Re-verified: `publish.yml` runs roster, build, pack, npm and release and installs nothing after publishing. Owner lookup: `rehears`, `post-publish`, `clean seat` in this file — [design-partner-preview](#design-partner-preview), DISTINCT (the observed install this precedes); owner RELEASING.md for layer 2, the kit rule's home open. Surface also doctrine-kit.
+**Cost while deferred:** each audience event risks a front-door defect only a clean-seat install would show; the one-off left macOS, native Windows, arm64 Linux, WSL and the npx, plugin, PowerShell and agent-prompt routes unrehearsed. Filed 2026-09-29 by preview-readiness' lead. Re-verified: `publish.yml` runs roster, build, pack, npm and release and installs nothing after publishing. Owner lookup: `rehears`, `post-publish`, `clean seat` in this file — [design-partner-preview](#design-partner-preview), DISTINCT (the observed install this precedes); owner RELEASING.md for layer 2, the kit rule's home open. Surface also doctrine-kit.
 
 ### worktree-memory-dir-key
 
@@ -372,7 +362,7 @@ the front-door rehearsal belongs in the methodology, operator direction 2026-09-
 
 **Inferred, not run:** the harness's canonical-root keying, read from its bundle; an unauthenticated run writes no memory dir, so the key was never observed.
 
-**Cost while deferred:** a worktree session's memory could accrete where `check-memory-off` never scans. Filed 2026-10-01 to the gap inbox at context-kit-value-pass' spec; promoted 2026-10-01 at its close: →fix fails because the harness behaviour is unobserved and the probe needs an authenticated session, →forward because no ruling is owed. Re-verified: the gate's default derives from the repository toplevel (`git rev-parse --show-toplevel`). Owner lookup: `memory`, `worktree`, `canonical` in this file — none; owner context-kit/SPEC.md §check-memory-off.
+**Cost while deferred:** a worktree session's memory could accrete where `check-memory-off` never scans. Filed 2026-10-01 by context-kit-value-pass' spec. Re-verified: the gate's default derives from the repository toplevel (`git rev-parse --show-toplevel`). Owner lookup: `memory`, `worktree`, `canonical` in this file — none; owner context-kit/SPEC.md §check-memory-off.
 
 ### notification-delivery-probe
 
@@ -394,7 +384,7 @@ crate code under `cfg(not(unix))` is linted at the MSRV only by `native-artifact
 
 **Deliverable:** a contributor-side catch before the push: an opt-in cross-target clippy in `check-crate-arms` where the Windows target is installed, or a pre-push tool. Which, and how it degrades without `rustup`, is spec's: gate-sdk/SPEC.md §check-crate-arms rules the compile-only Windows check no gate, since it needs `rustup` and network.
 
-**Cost while deferred:** a red push and a hotfix push per such slip. Filed 2026-10-05 to the gap inbox at that iteration's build; promoted at its close: →fix fails because a local cross-target lint is new mechanism, →forward because no ruling is owed. Re-verified: the `gates` job runs `cargo check --target x86_64-pc-windows-msvc`, and the only clippy on a Windows target is `native-artifacts`'. One premise fell: the bullet's candidate catcher, a cross-target clippy in the `gates` job, still lands on the push and so saves no red push. Owner lookup: `MSRV`, `clippy`, `cfg(not(unix))` in this file — msrv-move-clippy-arm-coupling (Icebox), DISTINCT (a floor move un-suppressing lints); owner gate-sdk/SPEC.md §check-crate-arms.
+**Cost while deferred:** a red push and a hotfix push per such slip. Filed 2026-10-05 by that iteration's build. Re-verified: the `gates` job runs `cargo check --target x86_64-pc-windows-msvc`, and the only clippy on a Windows target is `native-artifacts`'. One premise fell: the candidate catcher, a cross-target clippy in the `gates` job, still lands on the push and so saves no red push. Owner lookup: `MSRV`, `clippy`, `cfg(not(unix))` in this file — msrv-move-clippy-arm-coupling (Icebox), DISTINCT (a floor move un-suppressing lints); owner gate-sdk/SPEC.md §check-crate-arms.
 
 ### manual-ops-door-subkey
 
@@ -404,7 +394,7 @@ crate code under `cfg(not(unix))` is linted at the MSRV only by `native-artifact
 
 **Deliverable:** a door-aware sub-key, the door plus its arm word, one key across the door's spellings, in drift-kit/SPEC.md §The manual-operation meter or guard-kit/SPEC.md §scan-prompts; which owner is spec's.
 
-**Cost while deferred:** a repeated arm, the strongest tooling candidate the meter could name, stays invisible. Filed 2026-10-05 to the gap inbox at that iteration's build; promoted at its close: →fix fails because the key is shared with the prompt-friction ranking, so a change reaches two kits, →forward because no ruling is owed. Re-verified: the meter at close ranks the first spelling first and the second seventh; the split across spellings is new at the drain. Owner lookup: `ranking key`, `sub-key`, `manual-op` in this file — none; owner drift-kit/SPEC.md §The manual-operation meter.
+**Cost while deferred:** a repeated arm, the strongest tooling candidate the meter could name, stays invisible. Filed 2026-10-05 by that iteration's build. Re-verified: the meter at close ranks the first spelling first and the second seventh; the split across spellings is new at the drain. Owner lookup: `ranking key`, `sub-key`, `manual-op` in this file — none; owner drift-kit/SPEC.md §The manual-operation meter.
 
 ### trajectory-limits-unstated
 
@@ -414,7 +404,7 @@ drift-kit/SPEC.md §The published-evidence extractor says the extractor "states 
 
 **Deliverable:** the two limits stated where a reader of the published evidence meets them, either in the arm's output or on a framing page around the committed projection, or the SPEC's two claims narrowed to what the arm prints; which one is spec's.
 
-**Cost while deferred:** a reader trusting the SPEC believes the published evidence carries its own caveats, and it carries none. Filed 2026-10-05 to the gap inbox at context-kit-tail-publisher-pass' build; promoted at its close: →fix fails because choosing between the arm stating the limits and the SPEC dropping the claim changes asserted behaviour, and the self-referential framing it qualifies is on record; →forward because no ruling is owed for the first branch. Re-verified: the `--human` branch of `emit` pushes the two header lines alone, and no `docs/` page outside the SPEC mirrors names an ungoverned baseline. Owner lookup: `ungoverned`, `framing page`, `trajectory` in this file — benchmark-ab-experiment, DISTINCT (the controlled experiment itself); owner drift-kit/SPEC.md §The published-evidence extractor.
+**Cost while deferred:** a reader trusting the SPEC believes the published evidence carries its own caveats, and it carries none. Filed 2026-10-05 by context-kit-tail-publisher-pass' build. Re-verified: the `--human` branch of `emit` pushes the two header lines alone, and no `docs/` page outside the SPEC mirrors names an ungoverned baseline. Owner lookup: `ungoverned`, `framing page`, `trajectory` in this file — benchmark-ab-experiment, DISTINCT (the controlled experiment itself); owner drift-kit/SPEC.md §The published-evidence extractor.
 
 ### windows-kit-bash-files
 
@@ -424,7 +414,7 @@ docs/requirements.md's toolchain row owes bash 4.3 wherever a profile includes c
 
 **Deliverable:** each kit-shipped file a host runs with bash ported to an arm of the gate binary or given a PowerShell twin, per file, and the toolchain row narrowed to what still owes bash; whether guard-kit's place in the row survives is part of it.
 
-**Cost while deferred:** a Windows adopter on those profiles needs bash. Filed 2026-10-05 to the gap inbox by evidence-front-install-split-pass' lead; promoted at the next scope: →fix fails because each port is new mechanism, →forward because the direction is given. Re-verified by `git ls-files`: outside smoke and fixtures the three kits track context-kit/templates/session-context.sh and drift-kit/templates/kpi-deprecated-surface.sh, and guard-kit tracks no such file. Owner lookup: `session-context.sh`, `kpi-deprecated-surface`, `Git for Windows` in this file — the two entries above, DISTINCT (neither names the kit-shipped files); owner gate-sdk/SPEC.md §The adopter constraints, and each kit SPEC for its file.
+**Cost while deferred:** a Windows adopter on those profiles needs bash. Filed 2026-10-05 by evidence-front-install-split-pass' lead. Re-verified by `git ls-files`: outside smoke and fixtures the three kits track context-kit/templates/session-context.sh and drift-kit/templates/kpi-deprecated-surface.sh, and guard-kit tracks no such file. Owner lookup: `session-context.sh`, `kpi-deprecated-surface`, `Git for Windows` in this file — the two entries above, DISTINCT (neither names the kit-shipped files); owner gate-sdk/SPEC.md §The adopter constraints, and each kit SPEC for its file.
 
 ### install-windows-stop-restore
 
@@ -434,7 +424,7 @@ docs/manual-install.md's Windows download fence is dot-sourced and sets `$ErrorA
 
 **Deliverable:** the adopter's error preference saved and restored, by try/finally or its equivalent, witnessed by the install-smoke legs that read the marked blocks. The page says the preference holds "here and below", so the later Windows blocks rely on it: each keeps its own stop policy, or the restore lands after the last of them. Whether `$ProgressPreference`, set the same way, is restored too is part of it. Owner docs/manual-install.md, its recipe shape installer/SPEC.md's.
 
-**Cost while deferred:** an adopter's shell keeps a changed error policy after installing. Filed 2026-10-06 to the gap inbox by evidence-front-install-split-pass' lead as an open question, asked at the next scope and filed here on the answer: →fix fails because its witness is a Windows CI leg no local run reaches. Re-verified by reading the fence, which opens on `. {` and sets the preference inside it. Owner lookup: `ErrorActionPreference`, `stop policy`, `try/finally` in this file — none; install-windows-stop-policy, landed last iteration, DISTINCT (it added the preference this restores).
+**Cost while deferred:** an adopter's shell keeps a changed error policy after installing. Filed 2026-10-06 by evidence-front-install-split-pass' lead. Re-verified by reading the fence, which opens on `. {` and sets the preference inside it. Owner lookup: `ErrorActionPreference`, `stop policy`, `try/finally` in this file — none; install-windows-stop-policy, landed last iteration, DISTINCT (it added the preference this restores).
 
 ### site-health-probe-unexecuted
 
@@ -444,7 +434,7 @@ site-kit/templates/site-health.yml's probe step is linted by the `check-action-*
 
 **Deliverable:** a tracked site-kit test that extracts the probe step's run block and runs it under PATH stubs for `curl`, `gh` and `sleep`, over a healthy set, one and two transient failures, a persistent failure and `force_fail`.
 
-**Cost while deferred:** a regression in the resample loop or an arm's zero case ships to every copier unseen. Filed 2026-10-06 to the gap inbox at site-fence-release-cites-pass' build; promoted at its close: →fix fails because the harness is new test mechanism whose extraction shape a drain commit cannot settle, →forward because no ruling is owed. Re-verified: no tracked `.sh` names `site-health` but site-kit/smoke/install.sh, which copies the template and runs none of it. Owner lookup: `site-health`, `resampl`, `PATH stub` in this file and the disposed-findings record — [site-health-issue-venue-unwanted](#site-health-issue-venue-unwanted), DISTINCT (the issue step's venue); owner site-kit/SPEC.md §templates/site-health.yml.
+**Cost while deferred:** a regression in the resample loop or an arm's zero case ships to every copier unseen. Filed 2026-10-06 by site-fence-release-cites-pass' build. Re-verified: no tracked `.sh` names `site-health` but site-kit/smoke/install.sh, which copies the template and runs none of it. Owner lookup: `site-health`, `resampl`, `PATH stub` in this file and the disposed-findings record — [site-health-issue-venue-unwanted](#site-health-issue-venue-unwanted), DISTINCT (the issue step's venue); owner site-kit/SPEC.md §templates/site-health.yml.
 
 **Inferred, not run:** that the loop passed those five cases under a scratch harness at its build, which no tracked file carries.
 
@@ -456,7 +446,7 @@ a citation naming a numbered step by its bold title (RELEASING.md §The procedur
 
 **Deliverable:** a holder for the title, either a title-resolution arm on `check-spec-pointer` or the cited steps made headings; which one is spec's, and so is whether a prefix resolves: .github/workflows/publish.yml cites *Watch the publish workflow* for a title that runs on to *both channels*, and .claude/agents/stage-session.md cites *Tier each batch* for a longer one (read 2026-10-06 at this entry's filing close, off its second-vendor review).
 
-**Cost while deferred:** one reworded title in RELEASING.md mis-names its citations, a gate's printed remedy among them. Filed 2026-10-06 to the gap inbox at site-fence-release-cites-pass' build; promoted at its close: →fix fails because either holder is new mechanism or a restructure of a governed procedure, →forward because no ruling is owed. Re-verified by grep: eight lines cite a step of the two files by title. Owner lookup: `bold title`, `step title`, `title-resolution` in this file and the disposed-findings record — none; release-step-number-cites, landed this iteration, DISTINCT (it moved the citations off the step's number, and this is the title's own drift, so no recurrence).
+**Cost while deferred:** one reworded title in RELEASING.md mis-names its citations, a gate's printed remedy among them. Filed 2026-10-06 by site-fence-release-cites-pass' build. Re-verified by grep: eight lines cite a step of the two files by title. Owner lookup: `bold title`, `step title`, `title-resolution` in this file and the disposed-findings record — none; release-step-number-cites, landed this iteration, DISTINCT (it moved the citations off the step's number, and this is the title's own drift, so no recurrence).
 
 **Inferred, not run:** that neither gate reads past the heading; no fixture rewording a cited title was run.
 
@@ -468,7 +458,7 @@ four front-matter readers read an opening `---` that nothing closes as front mat
 
 **Deliverable:** one shared front-matter span reader beside the fence reader, the four gates on it, a fixture row per gate, each SPEC section stating the reading, and the release declaration.
 
-**Cost while deferred:** a page with a broken front-matter block passes each of the four unread. Filed 2026-10-06 to the gap inbox at site-fence-release-cites-pass' build; promoted at its close: →fix fails because it changes the asserted behaviour of four shipped gates across two kits, which wants a validate pass and a declaration; →forward because the reading is decided. Re-verified by reading the four modules: each opens its front-matter state on a first-line `---` and clears it only on a later one. Owner lookup: `front matter`, `front_matter`, `prose_only` in this file and the disposed-findings record — [plugin-front-matter-yaml](#plugin-front-matter-yaml), DISTINCT (the plugin gate's YAML key reader).
+**Cost while deferred:** a page with a broken front-matter block passes each of the four unread. Filed 2026-10-06 by site-fence-release-cites-pass' build. Re-verified by reading the four modules: each opens its front-matter state on a first-line `---` and clears it only on a later one. Owner lookup: `front matter`, `front_matter`, `prose_only` in this file and the disposed-findings record — [plugin-front-matter-yaml](#plugin-front-matter-yaml), DISTINCT (the plugin gate's YAML key reader).
 
 ### site-health-resample-knobs
 
@@ -478,7 +468,7 @@ site-kit/templates/site-health.yml's resample loop sets its attempt count and it
 
 **Deliverable:** both lifted into the probe step's env block, one attempt meaning off, the SPEC section stating the set; a feature, since each is a new name on the template's config surface.
 
-**Cost while deferred:** a copier wanting another bound, or no resample, edits the probe body. Filed 2026-10-06 to the gap inbox by site-fence-release-cites-pass' close audit, after its drain; promoted at the next iteration's scope: →fix fails because the two env names are new governed names, →forward because no ruling is owed. Re-verified: the run body assigns `attempts=3` beside a pause, and the SPEC's resample paragraph states the ownership. Owner lookup: `site-health`, `resampl`, `attempts`, `pause` in this file and the disposed-findings record — [site-health-probe-unexecuted](#site-health-probe-unexecuted), DISTINCT (the loop's missing oracle, which this reshapes: its cases would read the knobs); [site-health-issue-venue-unwanted](#site-health-issue-venue-unwanted), DISTINCT (the issue step's venue).
+**Cost while deferred:** a copier wanting another bound, or no resample, edits the probe body. Filed 2026-10-06 by site-fence-release-cites-pass' close audit. Re-verified: the run body assigns `attempts=3` beside a pause, and the SPEC's resample paragraph states the ownership. Owner lookup: `site-health`, `resampl`, `attempts`, `pause` in this file and the disposed-findings record — [site-health-probe-unexecuted](#site-health-probe-unexecuted), DISTINCT (the loop's missing oracle, which this reshapes: its cases would read the knobs); [site-health-issue-venue-unwanted](#site-health-issue-venue-unwanted), DISTINCT (the issue step's venue).
 
 ## Icebox
 
@@ -1165,4 +1155,5 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 - audit-trigger-mirror-component
 - journal-append-arm
 - spec-brevity-residue
+- queue-provenance-restates-git-history
 
