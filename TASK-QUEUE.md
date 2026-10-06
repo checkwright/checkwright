@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### site-kit-brevity
-
-site-kit/SPEC.md whole, the next file no brevity slice has passed, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): about 9.9k words at this scope and the file's ceiling row of 49 `check-prose-bounds` findings.
-
-**Deliverable:** the three moves over the file under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into it kept, per a citation survey; the file's ceiling row re-stamped. Lands after `site-health-probe-no-retry-on-transient`, which writes into §templates/site-health.yml.
-
-**Cost while deferred:** paid by every session and adopter that reads site-kit's SPEC. Filed 2026-10-06 as a split at scope. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
-
 ### release-drain-ordering-contradiction
 
 [recurrence: 2026-09-25] [not-icebox-eligible: 2026-10-03 returned from the icebox by consult 2026-09-25; evicting it would reverse that consult]
@@ -294,7 +286,7 @@ Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-ki
 
 delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as `delegation-kit-tail-brevity`; canon-kit's claim-gate sections and rest left 2026-10-04 at the next two scopes as `canon-kit-claim-brevity` and `canon-kit-tail-brevity`; queue-kit's halves, then drift-kit's and context-kit's rests, at the four after as `queue-kit-format-brevity`, `queue-kit-arms-brevity`, `drift-kit-tail-brevity` and `context-kit-tail-brevity`.
 
-evidence-kit's halves left 2026-10-05 and 10-06 at successive scopes as `evidence-kit-front-brevity` and `evidence-kit-tail-brevity`; site-kit left 2026-10-06 as [site-kit-brevity](#site-kit-brevity).
+evidence-kit's halves left 2026-10-05 and 10-06 at successive scopes as `evidence-kit-front-brevity` and `evidence-kit-tail-brevity`; site-kit left 2026-10-06 as `site-kit-brevity`.
 
 ### tarball-attestation-observed
 
@@ -1205,4 +1197,5 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 ## Done
 
 - site-health-probe-no-retry-on-transient
+- site-kit-brevity
 

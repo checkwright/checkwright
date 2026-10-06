@@ -283,7 +283,7 @@ URL extraction is **scheme-anchored over the whole body text**, never markdown-l
 The tag list comes from the **API, paginated**, never from `git tag`. `actions/checkout` defaults to `fetch-depth: 1` and fetches no tags, so a `git tag`-driven arm finds zero released notes and reports green forever. Two properties of the call are load-bearing:
 
 - `gh api --paginate` discharges the paging with no manual page loop;
-- it *concatenates* the pages' arrays, so `--jq 'length'` returns the last page's length and not the total. The count is taken by streaming the elements.
+- it *concatenates* the pages' arrays, so `--jq 'length'` returns the last page's length and not the total. The count is taken by streaming the elements. No run confirms the paging until a consumer passes its first page.
 
 A per-note Release-by-tag lookup cannot replace the tag list. A 404 there cannot distinguish a tag that was never pushed, a legitimate skip for a note whose release is deferred, from a tag whose Release is missing, a real finding. Conflating them either reds every deferred note or hides a missing Release.
 
