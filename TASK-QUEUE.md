@@ -512,6 +512,16 @@ four front-matter readers read an opening `---` that nothing closes as front mat
 
 **Cost while deferred:** a page with a broken front-matter block passes each of the four unread. Filed 2026-10-06 to the gap inbox at site-fence-release-cites-pass' build; promoted at its close: →fix fails because it changes the asserted behaviour of four shipped gates across two kits, which wants a validate pass and a declaration; →forward because the reading is decided. Re-verified by reading the four modules: each opens its front-matter state on a first-line `---` and clears it only on a later one. Owner lookup: `front matter`, `front_matter`, `prose_only` in this file and the disposed-findings record — [plugin-front-matter-yaml](#plugin-front-matter-yaml), DISTINCT (the plugin gate's YAML key reader).
 
+### site-health-resample-knobs
+
+[cost: event/low] [surface: site-kit]
+
+site-kit/templates/site-health.yml's resample loop sets its attempt count and its pause as literals in the probe step's run body, outside the step's env block that holds the template's other knobs, and site-kit/SPEC.md §templates/site-health.yml says the template owns both as literals. doctrine-kit/DOCTRINE.md Policy-as-choice asks a calibration to ship as a consumer-selectable set, off among it.
+
+**Deliverable:** both lifted into the probe step's env block, one attempt meaning off, the SPEC section stating the set; a feature, since each is a new name on the template's config surface.
+
+**Cost while deferred:** a copier wanting another bound, or no resample, edits the probe body. Filed 2026-10-06 to the gap inbox by site-fence-release-cites-pass' close audit, after its drain; promoted at the next iteration's scope: →fix fails because the two env names are new governed names, →forward because no ruling is owed. Re-verified: the run body assigns `attempts=3` beside a pause, and the SPEC's resample paragraph states the ownership. Owner lookup: `site-health`, `resampl`, `attempts`, `pause` in this file and the disposed-findings record — [site-health-probe-unexecuted](#site-health-probe-unexecuted), DISTINCT (the loop's missing oracle, which this reshapes: its cases would read the knobs); [site-health-issue-venue-unwanted](#site-health-issue-venue-unwanted), DISTINCT (the issue step's venue).
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).

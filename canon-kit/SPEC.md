@@ -256,7 +256,7 @@ Each gate below owns its section: the assertion, its fixture pair, and the reaso
   - It **closes** on the next line whose first non-blank text is a backtick run at least as long as the opener's. A shorter run is the block's text, and a list-item marker never closes a fence.
   - A reader admitting `~~~` reads tildes on the same shape, and a fence closes only on its opener's character.
   - `fence_opening` is the opener test alone, for a reader asking whether one line would open a fence.
-  - **Honest limits:** a closer may carry trailing text, and an opener indented four or more columns still opens. A renderer reads neither that way.
+  - **Honest limits:** a closer may carry trailing text, an opener indented four or more columns still opens, and one in a block quote does not. A renderer reads none of them that way.
 - **The manifest-prose walk** `walk_prose`, the driver the prose-scanning members share: it tracks fences on the fence reader, resets the paragraph at a blank line, and hands each line and each flushed paragraph to the member's sink. Its **shared exempt window** is the flagged line or the one above: a member's valve marker, a kit literal matched as a substring, on either suppresses the finding at that site. The per-site valves citing this section ride that window.
 - **The prose unit and the sentence split** that §check-prose-tells and §check-prose-bounds share: the list-item, heading, table-row and generated-region-marker line tests that cut a block into units. A sentence closes at a run of `.`, `!` or `?` followed by whitespace or the span's end.
 
