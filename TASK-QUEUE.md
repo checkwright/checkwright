@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### release-drain-ordering-contradiction
-
-[recurrence: 2026-09-25] [not-icebox-eligible: 2026-10-03 returned from the icebox by consult 2026-09-25; evicting it would reverse that consult]
-
-RELEASING.md's step-4 opener bundles the drain and the close stamp as one commit, and the step's body separates them; a public runbook that contradicts itself.
-
-**Deliverable:** the opener rewritten to the body's order.
-
-**Cost while deferred:** a release session follows whichever half it reads first. Filed 2026-08-06; returned from the icebox 2026-09-25 by consult, the step re-read. Re-verified at scope 2026-10-06: the opener names one drain-and-stamp commit, and the step's second paragraph lands the drain after the tag. Lands before [release-step-number-cites](#release-step-number-cites), which names this step by its title. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
-
 ### release-step-number-cites
 
 RELEASING.md's numbered procedure steps are cited by position, the shape doctrine-kit/DOCTRINE.md Derivation-first names: inside RELEASING.md itself, and from outside it as "RELEASING.md step N" in gate-sdk/SPEC.md, installer/SPEC.md (three sites), docs/site-architecture.md, .claude/commands/close.md, `native/src/gates/install_pin.rs`'s two printed remedies and scripts/guard-config.knobs. Every number is correct today, since the list was re-linked, not reordered.
@@ -1198,4 +1188,5 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 
 - site-health-probe-no-retry-on-transient
 - site-kit-brevity
+- release-drain-ordering-contradiction
 
