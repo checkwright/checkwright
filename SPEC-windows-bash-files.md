@@ -29,6 +29,8 @@ The build's first act on this amendment is to run the harness facts deltas 2 and
 
 **How it is run.** The session prepares a diff adding one exec-form registration of an existing member beside the standing shell-form ones, and the operator applies it: the settings file is operator-owned (guard-kit/SPEC.md §compare-settings-allow), and a `hooks[]` edit arms in the running session. The unix half runs in that session. The Windows half needs a native Windows host running the harness; no workflow leg runs a harness, so it is an operator-observed run. The witness names the harness version it ran on, which becomes the stated minimum of delta 2.
 
+**Who supplies the Windows half: decided at build** (operator direction 2026-10-06, lead-relayed, not a ruling). The gate below stands as written and the queue is unchanged; the build session settles the supplier when it reaches the witness.
+
 **The gate it sets.**
 
 - **Every fact holds on both hosts:** deltas 2 and 3 land, and delta 4's wiring takes the exec form.
