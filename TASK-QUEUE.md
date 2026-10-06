@@ -8,6 +8,30 @@
 
 ## New Features
 
+### native-executable-git-hooks
+
+[spec: SPEC-native-git-hooks.md]
+
+the generated pre-commit and commit-msg hooks start through a shell on every OS: each is two lines of POSIX sh that exec the gate binary, and on Windows git needs Git for Windows' bundled sh to start it, emulated on Arm (the delta-6 probe, CI Windows x64 and arm64, 2026-09-29). Operator direction, 2026-09-29, lead-relayed (not a ruling): explore a hook git starts as a native executable, one shape on every OS, never a Windows-only exception.
+
+**Deliverable:** (1) a probe of whether git's hook lookup starts a native executable directly on each OS (the Windows `.exe` lookup inferred from git's source, never run); (2) where a native hook lives, since a per-platform binary cannot be the tracked text hook scripts/git-hooks/ holds: hooks installed untracked with the generated-projection contract and its freshness gate re-pointed at the installer, or a tracked shim kept, which is the shell this removes; (3) the per-commit start cost per OS.
+
+**Taken whole into windows-shell-floor-pass, operator direction 2026-10-06, lead-relayed (not a ruling):** all three deliverables; a probe-only cut was offered and not chosen. **Push need (2026-10-06, inside the budget):** the iteration's one mid-iteration push, shared with [windows-kit-bash-files](#windows-kit-bash-files), since only the Windows runners run the probe.
+
+**Cost while deferred:** every commit on Windows starts an emulated-or-bundled shell. Filed 2026-09-29 by native-hook-customer-legs' lead. Re-verified: scripts/git-hooks/pre-commit opens `#!/bin/sh`. Not a recurrence of `native-hook-dispatch`, which removed the bash dependency. Owner lookup: `native executable`, `hook shim` in this file — none; owner gate-sdk/SPEC.md, with installer/SPEC.md for an untracked install.
+
+### windows-kit-bash-files
+
+[spec: SPEC-windows-bash-files.md]
+
+docs/requirements.md's toolchain row owes bash 4.3 wherever a profile includes context-kit, drift-kit or guard-kit, each said to ship a file the host runs with bash; on native Windows that is Git for Windows' bash, although install and battery run under PowerShell. Operator direction 2026-10-05, lead session (not a ruling): eliminate the sh and bash dependency on Windows where possible, as one goal with [native-executable-git-hooks](#native-executable-git-hooks) (the hook's sh) and [custom-gate-substrates](#custom-gate-substrates) (gate authoring). The operator recalls the Git for Windows shell as a significant slowdown, which no run here measured.
+
+**Deliverable:** each kit-shipped file a host runs with bash ported to an arm of the gate binary or given a PowerShell twin, per file, and the toolchain row narrowed to what still owes bash; whether guard-kit's place in the row survives is part of it.
+
+**Taken into windows-shell-floor-pass, operator direction 2026-10-06, lead-relayed (not a ruling). Push need (2026-10-06, inside the budget):** the iteration's one mid-iteration push, since the ported arms first run on Windows remotely.
+
+**Cost while deferred:** a Windows adopter on those profiles needs bash. Filed 2026-10-05 by evidence-front-install-split-pass' lead. Re-verified by `git ls-files`: outside smoke and fixtures the three kits track context-kit/templates/session-context.sh and drift-kit/templates/kpi-deprecated-surface.sh, and guard-kit tracks no such file. Owner lookup: `session-context.sh`, `kpi-deprecated-surface`, `Git for Windows` in this file — the two entries above, DISTINCT (neither names the kit-shipped files); owner gate-sdk/SPEC.md §The adopter constraints, and each kit SPEC for its file.
+
 ## Technical Debt
 
 ### install-windows-stop-restore
@@ -332,18 +356,6 @@ the operator states that verification and workflow are fully decoupled, each shi
 
 **Cost while deferred:** a front-matter slip is caught only by a push, which spends a hotfix from the budget. Filed 2026-09-28 by plugin-marketplace-queue-verbs' close. Re-verified: the reader above, and `.github/workflows/gates.yml` installs `skills-ref` in CI only. Owner lookup: `front matter`, `skills-ref`, `yaml` in this file — only the icebox's template-copy-parity-yaml-widening, DISTINCT (template copies); owner plugin/SPEC.md §check-plugin-parity.
 
-### native-executable-git-hooks
-
-[cost: event/high] [surface: gate-sdk]
-
-the generated pre-commit and commit-msg hooks start through a shell on every OS: each is two lines of POSIX sh that exec the gate binary, and on Windows git needs Git for Windows' bundled sh to start it, emulated on Arm (the delta-6 probe, CI Windows x64 and arm64, 2026-09-29). Operator direction, 2026-09-29, lead-relayed (not a ruling): explore a hook git starts as a native executable, one shape on every OS, never a Windows-only exception.
-
-**Deliverable:** (1) a probe of whether git's hook lookup starts a native executable directly on each OS (the Windows `.exe` lookup inferred from git's source, never run); (2) where a native hook lives, since a per-platform binary cannot be the tracked text hook scripts/git-hooks/ holds: hooks installed untracked with the generated-projection contract and its freshness gate re-pointed at the installer, or a tracked shim kept, which is the shell this removes; (3) the per-commit start cost per OS.
-
-**Taken whole into windows-shell-floor-pass, operator direction 2026-10-06, lead-relayed (not a ruling):** all three deliverables; a probe-only cut was offered and not chosen. **Push need (2026-10-06, inside the budget):** the iteration's one mid-iteration push, shared with [windows-kit-bash-files](#windows-kit-bash-files), since only the Windows runners run the probe.
-
-**Cost while deferred:** every commit on Windows starts an emulated-or-bundled shell. Filed 2026-09-29 by native-hook-customer-legs' lead. Re-verified: scripts/git-hooks/pre-commit opens `#!/bin/sh`. Not a recurrence of `native-hook-dispatch`, which removed the bash dependency. Owner lookup: `native executable`, `hook shim` in this file — none; owner gate-sdk/SPEC.md, with installer/SPEC.md for an untracked install.
-
 ### openspec-delta-base-agreement
 
 [cost: event/low] [surface: companion]
@@ -447,18 +459,6 @@ drift-kit/SPEC.md §The published-evidence extractor says the extractor "states 
 **Deliverable:** the two limits stated where a reader of the published evidence meets them, either in the arm's output or on a framing page around the committed projection, or the SPEC's two claims narrowed to what the arm prints; which one is spec's.
 
 **Cost while deferred:** a reader trusting the SPEC believes the published evidence carries its own caveats, and it carries none. Filed 2026-10-05 by context-kit-tail-publisher-pass' build. Re-verified: the `--human` branch of `emit` pushes the two header lines alone, and no `docs/` page outside the SPEC mirrors names an ungoverned baseline. Owner lookup: `ungoverned`, `framing page`, `trajectory` in this file — benchmark-ab-experiment, DISTINCT (the controlled experiment itself); owner drift-kit/SPEC.md §The published-evidence extractor.
-
-### windows-kit-bash-files
-
-[cost: event/high] [surface: gate-sdk]
-
-docs/requirements.md's toolchain row owes bash 4.3 wherever a profile includes context-kit, drift-kit or guard-kit, each said to ship a file the host runs with bash; on native Windows that is Git for Windows' bash, although install and battery run under PowerShell. Operator direction 2026-10-05, lead session (not a ruling): eliminate the sh and bash dependency on Windows where possible, as one goal with [native-executable-git-hooks](#native-executable-git-hooks) (the hook's sh) and [custom-gate-substrates](#custom-gate-substrates) (gate authoring). The operator recalls the Git for Windows shell as a significant slowdown, which no run here measured.
-
-**Deliverable:** each kit-shipped file a host runs with bash ported to an arm of the gate binary or given a PowerShell twin, per file, and the toolchain row narrowed to what still owes bash; whether guard-kit's place in the row survives is part of it.
-
-**Taken into windows-shell-floor-pass, operator direction 2026-10-06, lead-relayed (not a ruling). Push need (2026-10-06, inside the budget):** the iteration's one mid-iteration push, since the ported arms first run on Windows remotely.
-
-**Cost while deferred:** a Windows adopter on those profiles needs bash. Filed 2026-10-05 by evidence-front-install-split-pass' lead. Re-verified by `git ls-files`: outside smoke and fixtures the three kits track context-kit/templates/session-context.sh and drift-kit/templates/kpi-deprecated-surface.sh, and guard-kit tracks no such file. Owner lookup: `session-context.sh`, `kpi-deprecated-surface`, `Git for Windows` in this file — the two entries above, DISTINCT (neither names the kit-shipped files); owner gate-sdk/SPEC.md §The adopter constraints, and each kit SPEC for its file.
 
 ### site-health-probe-unexecuted
 
