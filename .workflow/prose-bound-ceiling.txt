@@ -1,6 +1,0 @@
-# contract: canon-kit/SPEC.md §check-prose-bounds — <findings> <path>
-46 doctrine-kit/DOCTRINE.md
-43 doctrine-kit/SPEC.md
-21 gate-sdk/SPEC.md
-1 installer/SPEC.md
-1 lifecycle-kit/SPEC.md

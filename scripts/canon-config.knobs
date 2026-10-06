@@ -197,11 +197,10 @@ CANON_KIT_UNWRAP_DECLARATION_LEADS[] = ruling:
 CANON_KIT_UNWRAP_DECLARATION_LEADS[] = discharge:
 CANON_KIT_UNWRAP_DECLARATION_LEADS[] = close-surface:
 
-# comment-tier-exempt: this repo bounds its specification tier and its always-loaded agent file, held at a committed ceiling while the brevity pass drains the residue — consumer editorial scope, never a kit literal (the provenance seam)
+# comment-tier-exempt: this repo bounds its specification tier and its always-loaded agent file, under no ceiling so every finding is red — consumer editorial scope, never a kit literal (the provenance seam)
 CANON_KIT_PROSE_BOUND_GLOBS[] = */SPEC.md
 CANON_KIT_PROSE_BOUND_GLOBS[] = doctrine-kit/DOCTRINE.md
 CANON_KIT_PROSE_BOUND_GLOBS[] = CLAUDE.md
-CANON_KIT_PROSE_BOUND_CEILING_FILE = .workflow/prose-bound-ceiling.txt
 
 # spec: canon-kit/SPEC.md §Layout and configuration — the policy calibrations this repo relies on, bound at the values its gates are green at so a kit default's move moves no verdict here: the kit's author is a consumer that binds its own (Policy-as-choice). CANON_KIT_SEAM_AUTHORITY_MARKERS stays inherited because its default member `lead, ` ends in a blank a knob file cannot express
 CANON_KIT_COMMENT_RUN_CAP = 3
