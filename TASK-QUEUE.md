@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: site-fence-release-cites-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,60 @@
 ## New Features
 
 ## Technical Debt
+
+### site-health-probe-no-retry-on-transient
+
+[recurrence: 2026-09-25]
+
+the shipped `site-kit/templates/site-health.yml` takes one curl sample and files an issue on a single non-200; a transient is a wrong red on a public tracker. Sibling of [site-health-issue-venue-unwanted](#site-health-issue-venue-unwanted), whose subject is the venue; this one is the sample.
+
+**Deliverable:** a bounded retry before the failure path, in the template and the copy.
+
+**Cost while deferred:** one transient files a public issue. Filed 2026-08-27; returned from the icebox 2026-09-25 by consult, the template re-read. Re-verified at scope 2026-10-06: the apex probe is one `curl -m 20` sample. Filed as debt, the bound a template literal as the probe's timeout is; a knob for it is a new name and returns the unit to scope. Its bash first runs on the scheduled probe after the closing push. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
+
+### site-kit-brevity
+
+site-kit/SPEC.md whole, the next file no brevity slice has passed, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): about 9.9k words at this scope and the file's ceiling row of 49 `check-prose-bounds` findings.
+
+**Deliverable:** the three moves over the file under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into it kept, per a citation survey; the file's ceiling row re-stamped. Lands after [site-health-probe-no-retry-on-transient](#site-health-probe-no-retry-on-transient), which writes into §templates/site-health.yml.
+
+**Cost while deferred:** paid by every session and adopter that reads site-kit's SPEC. Filed 2026-10-06 as a split at scope. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
+
+### release-drain-ordering-contradiction
+
+[recurrence: 2026-09-25] [not-icebox-eligible: 2026-10-03 returned from the icebox by consult 2026-09-25; evicting it would reverse that consult]
+
+RELEASING.md's step-4 opener bundles the drain and the close stamp as one commit, and the step's body separates them; a public runbook that contradicts itself.
+
+**Deliverable:** the opener rewritten to the body's order.
+
+**Cost while deferred:** a release session follows whichever half it reads first. Filed 2026-08-06; returned from the icebox 2026-09-25 by consult, the step re-read. Re-verified at scope 2026-10-06: the opener names one drain-and-stamp commit, and the step's second paragraph lands the drain after the tag. Lands before [release-step-number-cites](#release-step-number-cites), which names this step by its title. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
+
+### release-step-number-cites
+
+RELEASING.md's numbered procedure steps are cited by position, the shape doctrine-kit/DOCTRINE.md Derivation-first names: inside RELEASING.md itself, and from outside it as "RELEASING.md step N" in gate-sdk/SPEC.md, installer/SPEC.md (three sites), docs/site-architecture.md, .claude/commands/close.md, `native/src/gates/install_pin.rs`'s two printed remedies and scripts/guard-config.knobs. Every number is correct today, since the list was re-linked, not reordered.
+
+**Deliverable:** each citation names the step by its bold title or a heading, never its number.
+
+**Cost while deferred:** a step inserted or reordered in RELEASING.md mis-points about fifteen citations, several in shipped kit SPECs and a gate's printed remedy. Filed 2026-09-30 to the gap inbox by canon-kit-value-pass' close positional-reference sweep, outside its range corpus; promoted 2026-09-30 at the next iteration's scope: →fix fails because the sweep reaches a gate's printed remedy, owing the native build and the battery. Re-verified: a grep for `RELEASING.md step <n>` hits every site named above. Owner lookup: `positional`, `step number`, `RELEASING.md step` in this file — none; owner RELEASING.md, with doctrine-kit/DOCTRINE.md Derivation-first. Surface also installer. Re-verified at scope 2026-10-06, the site list widened: `§The procedure — step N` directives also sit in .github/workflows/publish.yml (five) and .github/workflows/site-health.yml (one), so the build's grep takes that spelling too. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
+
+### fence-toggle-list-item
+
+the toggle fence parsers keyed on `spec::is_fence_line` (`native/src/spec.rs`: `docs_mirror`, `manifest_temporal`, `spec_pointer`, `citation_link`, `prose_tells`, `task_path_claim` and the rest, 17 modules) and `check-spec-fence-balance` read a list-item fence opener (`- ```sh`) as no delimiter, while `fence_opening` (`native/src/gates/fence_command_head.rs`) and `check-fence-run` read it as kramdown renders it. An odd count of list-item fences in a manifest-set file reds the balance gate with a misleading "close the unbalanced fence"; an even count passes it and inverts every toggle parser's span between them, so those gates scan fence bodies as prose and skip the prose between.
+
+**Deliverable:** one fence-line reader taking the list-item opener and its indented closer, shared by every toggle parser and the balance gate, with a list-item fence case in each affected gate's fixtures; canon-kit/SPEC.md §The shared spec adapters and §check-spec-fence-balance state the shape.
+
+**Cost while deferred:** latent while no governed doc carries a list-item fence; the first adopter writing one meets a false balance red or silently unscanned prose. Filed 2026-10-05 to the gap inbox at context-kit-tail-publisher-pass' build; promoted at its close: →fix fails because the reader is shared by 17 gate modules whose fixtures each owe a case, and its directive binds it to the awk driver's fence shape, so a change is a cross-gate reader contract; →forward because no ruling is owed. Re-verified: `is_fence_line` strips leading blanks only, and `fence_opening` strips a list-item marker too. Owner lookup: `list-item`, `is_fence_line`, `fence balance` in this file — fence-reader-list-item, landed this iteration, DISTINCT (its deliverable named the `fences_of` readers alone); owner canon-kit/SPEC.md §check-spec-fence-balance. Filed as debt at scope 2026-10-06: canon-kit/SPEC.md §check-fence-command-head's fence shape already states the list-item opener, so the toggle readers converge on it. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
+
+### fence-closer-length
+
+`spec::is_fence_line` (`native/src/spec.rs`) reads any line opening on three backticks as a fence line, whatever its length, and `check-docs-page-length`'s `page_words` (`native/src/gates/docs_page_length.rs`) flips its fence state on each. Inside a four-backtick block a three-backtick line therefore closes the scanner's fence, and a following comment-shaped line is skipped as an HTML comment though the page renders it; canon-kit/SPEC.md §check-docs-page-length says a comment marker inside a fenced block is the block's text. The same reader leaves a page opening on `---` with no closing `---` at zero words.
+
+Run at scope 2026-10-06, a scratch fixture through `--run-gate-tests`: a page whose four-backtick block holds a three-backtick line and a 28-token comment line read 5 words, and a 30-word page opening on an unclosed `---` read fewer.
+
+**Deliverable:** the fence reader matching a closer to its opener's length, or the limit stated in the section, and the unclosed front matter ruled either way. It is the reader [fence-toggle-list-item](#fence-toggle-list-item) rewrites, so the two land as one reader change.
+
+**Cost while deferred:** latent while no governed page nests a shorter fence in a longer one; a page that does is under-counted. Filed 2026-10-05 to the gap inbox by evidence-front-install-split-pass' close (its second-vendor review); promoted at the next scope: →fix fails because the reader is shared by every toggle parser, →forward because no ruling is owed. Re-verified: `is_fence_line` tests a three-backtick prefix alone, and `page_words` toggles on it and ends front matter only on a second `---`. Owner lookup: `is_fence_line`, `page_words`, `page-length`, `closer` in this file — fence-toggle-list-item, DISTINCT (the list-item opener, this is the closer's length); owner canon-kit/SPEC.md §check-docs-page-length. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
 
 ## Deferred
 
@@ -238,7 +292,7 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 [roadmap: now/adoption] [cost: session/high] [surface: site-kit] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
 
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices (below); the eight kits after it are finished or split out (the slices below); what remains is site-kit, then doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling); the per-kit slices stay off the roadmap.
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices (below); the eight kits after it are finished or split out (the slices below); what remains is doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling); the per-kit slices stay off the roadmap.
 
 **Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
 
@@ -250,7 +304,7 @@ Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-ki
 
 delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as `delegation-kit-tail-brevity`; canon-kit's claim-gate sections and rest left 2026-10-04 at the next two scopes as `canon-kit-claim-brevity` and `canon-kit-tail-brevity`; queue-kit's halves, then drift-kit's and context-kit's rests, at the four after as `queue-kit-format-brevity`, `queue-kit-arms-brevity`, `drift-kit-tail-brevity` and `context-kit-tail-brevity`.
 
-evidence-kit's halves left 2026-10-05 and 10-06 at successive scopes as `evidence-kit-front-brevity` and `evidence-kit-tail-brevity`.
+evidence-kit's halves left 2026-10-05 and 10-06 at successive scopes as `evidence-kit-front-brevity` and `evidence-kit-tail-brevity`; site-kit left 2026-10-06 as [site-kit-brevity](#site-kit-brevity).
 
 ### tarball-attestation-observed
 
@@ -271,26 +325,6 @@ CONTRIBUTING.md promises an inbound issue or pull request a disposition within o
 **Deliverable:** either the cap carried on the public promise or a lane that honours it, and the disposition record named; CONTRIBUTING.md and the scope binding agree.
 
 **Cost while deferred:** the first contributor past the cap reads a promise the tree breaks. Filed 2026-07-31; returned from the icebox 2026-09-25 by consult, the promise and the cap re-read.
-
-### site-health-probe-no-retry-on-transient
-
-[cost: event/low] [surface: site-kit] [recurrence: 2026-09-25]
-
-the shipped `site-kit/templates/site-health.yml` takes one curl sample and files an issue on a single non-200; a transient is a wrong red on a public tracker. Sibling of [site-health-issue-venue-unwanted](#site-health-issue-venue-unwanted), whose subject is the venue; this one is the sample.
-
-**Deliverable:** a bounded retry before the failure path, in the template and the copy.
-
-**Cost while deferred:** one transient files a public issue. Filed 2026-08-27; returned from the icebox 2026-09-25 by consult, the template re-read.
-
-### release-drain-ordering-contradiction
-
-[cost: event/low] [surface: RELEASING.md] [recurrence: 2026-09-25] [not-icebox-eligible: 2026-10-03 returned from the icebox by consult 2026-09-25; evicting it would reverse that consult]
-
-RELEASING.md's step-4 opener bundles the drain and the close stamp as one commit, and the step's body separates them; a public runbook that contradicts itself.
-
-**Deliverable:** the opener rewritten to the body's order.
-
-**Cost while deferred:** a release session follows whichever half it reads first. Filed 2026-08-06; returned from the icebox 2026-09-25 by consult, the step re-read.
 
 ### queue-provenance-restates-git-history
 
@@ -414,16 +448,6 @@ kit prose couples to the master harness. The kit SPECs and READMEs (guard-kit, l
 
 **Cost while deferred:** an adopter on another harness reads every hook contract as bound to Claude Code. Filed 2026-09-30 to the gap inbox by guard-kit-steering's lead; promoted at its close: →fix fails because the sweep spans five kits, →forward because the direction is given. Owner lookup: `CLAUDE_PROJECT_DIR`, `master harness`, `Codex` in this file — [plugin-harness-reach](#plugin-harness-reach), DISTINCT (the plugin package on other harnesses), and [heterogeneous-agent-delegation](#heterogeneous-agent-delegation), DISTINCT (a master harness delegating to other vendors, where this is the master harness swapped); owner gate-sdk/SPEC.md §The adopter constraints.
 
-### release-step-number-cites
-
-[cost: event/low] [surface: RELEASING.md]
-
-RELEASING.md's numbered procedure steps are cited by position, the shape doctrine-kit/DOCTRINE.md Derivation-first names: inside RELEASING.md itself, and from outside it as "RELEASING.md step N" in gate-sdk/SPEC.md, installer/SPEC.md (three sites), docs/site-architecture.md, .claude/commands/close.md, `native/src/gates/install_pin.rs`'s two printed remedies and scripts/guard-config.knobs. Every number is correct today, since the list was re-linked, not reordered.
-
-**Deliverable:** each citation names the step by its bold title or a heading, never its number.
-
-**Cost while deferred:** a step inserted or reordered in RELEASING.md mis-points about fifteen citations, several in shipped kit SPECs and a gate's printed remedy. Filed 2026-09-30 to the gap inbox by canon-kit-value-pass' close positional-reference sweep, outside its range corpus; promoted 2026-09-30 at the next iteration's scope: →fix fails because the sweep reaches a gate's printed remedy, owing the native build and the battery. Re-verified: a grep for `RELEASING.md step <n>` hits every site named above. Owner lookup: `positional`, `step number`, `RELEASING.md step` in this file — none; owner RELEASING.md, with doctrine-kit/DOCTRINE.md Derivation-first. Surface also installer.
-
 ### worktree-memory-dir-key
 
 [cost: event/low] [surface: context-kit]
@@ -478,16 +502,6 @@ resume-journal appends are the top hand shape after the gate door in `--emit man
 
 **Cost while deferred:** a repeated arm, the strongest tooling candidate the meter could name, stays invisible. Filed 2026-10-05 to the gap inbox at that iteration's build; promoted at its close: →fix fails because the key is shared with the prompt-friction ranking, so a change reaches two kits, →forward because no ruling is owed. Re-verified: the meter at close ranks the first spelling first and the second seventh; the split across spellings is new at the drain. Owner lookup: `ranking key`, `sub-key`, `manual-op` in this file — none; owner drift-kit/SPEC.md §The manual-operation meter.
 
-### fence-toggle-list-item
-
-[cost: event/low] [surface: canon-kit]
-
-the toggle fence parsers keyed on `spec::is_fence_line` (`native/src/spec.rs`: `docs_mirror`, `manifest_temporal`, `spec_pointer`, `citation_link`, `prose_tells`, `task_path_claim` and the rest, 17 modules) and `check-spec-fence-balance` read a list-item fence opener (`- ```sh`) as no delimiter, while `fence_opening` (`native/src/gates/fence_command_head.rs`) and `check-fence-run` read it as kramdown renders it. An odd count of list-item fences in a manifest-set file reds the balance gate with a misleading "close the unbalanced fence"; an even count passes it and inverts every toggle parser's span between them, so those gates scan fence bodies as prose and skip the prose between.
-
-**Deliverable:** one fence-line reader taking the list-item opener and its indented closer, shared by every toggle parser and the balance gate, with a list-item fence case in each affected gate's fixtures; canon-kit/SPEC.md §The shared spec adapters and §check-spec-fence-balance state the shape.
-
-**Cost while deferred:** latent while no governed doc carries a list-item fence; the first adopter writing one meets a false balance red or silently unscanned prose. Filed 2026-10-05 to the gap inbox at context-kit-tail-publisher-pass' build; promoted at its close: →fix fails because the reader is shared by 17 gate modules whose fixtures each owe a case, and its directive binds it to the awk driver's fence shape, so a change is a cross-gate reader contract; →forward because no ruling is owed. Re-verified: `is_fence_line` strips leading blanks only, and `fence_opening` strips a list-item marker too. Owner lookup: `list-item`, `is_fence_line`, `fence balance` in this file — fence-reader-list-item, landed this iteration, DISTINCT (its deliverable named the `fences_of` readers alone); owner canon-kit/SPEC.md §check-spec-fence-balance.
-
 ### trajectory-limits-unstated
 
 [cost: event/low] [surface: drift-kit]
@@ -497,18 +511,6 @@ drift-kit/SPEC.md §The published-evidence extractor says the extractor "states 
 **Deliverable:** the two limits stated where a reader of the published evidence meets them, either in the arm's output or on a framing page around the committed projection, or the SPEC's two claims narrowed to what the arm prints; which one is spec's.
 
 **Cost while deferred:** a reader trusting the SPEC believes the published evidence carries its own caveats, and it carries none. Filed 2026-10-05 to the gap inbox at context-kit-tail-publisher-pass' build; promoted at its close: →fix fails because choosing between the arm stating the limits and the SPEC dropping the claim changes asserted behaviour, and the self-referential framing it qualifies is on record; →forward because no ruling is owed for the first branch. Re-verified: the `--human` branch of `emit` pushes the two header lines alone, and no `docs/` page outside the SPEC mirrors names an ungoverned baseline. Owner lookup: `ungoverned`, `framing page`, `trajectory` in this file — benchmark-ab-experiment, DISTINCT (the controlled experiment itself); owner drift-kit/SPEC.md §The published-evidence extractor.
-
-### fence-closer-length
-
-[cost: event/low] [surface: canon-kit]
-
-`spec::is_fence_line` (`native/src/spec.rs`) reads any line opening on three backticks as a fence line, whatever its length, and `check-docs-page-length`'s `page_words` (`native/src/gates/docs_page_length.rs`) flips its fence state on each. Inside a four-backtick block a three-backtick line therefore closes the scanner's fence, and a following comment-shaped line is skipped as an HTML comment though the page renders it; canon-kit/SPEC.md §check-docs-page-length says a comment marker inside a fenced block is the block's text. The same reader leaves a page opening on `---` with no closing `---` at zero words.
-
-**Inferred, not run:** both miscounts, read off the source by two sessions; no page was run through the gate.
-
-**Deliverable:** the fence reader matching a closer to its opener's length, or the limit stated in the section, and the unclosed front matter ruled either way. It is the reader [fence-toggle-list-item](#fence-toggle-list-item) rewrites, so the two land as one reader change.
-
-**Cost while deferred:** latent while no governed page nests a shorter fence in a longer one; a page that does is under-counted. Filed 2026-10-05 to the gap inbox by evidence-front-install-split-pass' close (its second-vendor review); promoted at the next scope: →fix fails because the reader is shared by every toggle parser, →forward because no ruling is owed. Re-verified: `is_fence_line` tests a three-backtick prefix alone, and `page_words` toggles on it and ends front matter only on a second `---`. Owner lookup: `is_fence_line`, `page_words`, `page-length`, `closer` in this file — fence-toggle-list-item, DISTINCT (the list-item opener, this is the closer's length); owner canon-kit/SPEC.md §check-docs-page-length.
 
 ### windows-kit-bash-files
 
