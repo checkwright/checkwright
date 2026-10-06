@@ -1,4 +1,3 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
-evidence-tail-liveness-pass release deferred:v0.32.0 — a minor at the outstanding v0.32.0 floor, held: no release trigger fired. Elapsed time is dormant under the preview channel; the batch carries no decommission, no new gate and no front-door or plugin surface the pinned release lacks; its fixes (a reader's own pid never reading as a held producer, the baseline diff reading a final unterminated line, a release-note heading refused under two roles) harden behaviour with no vulnerability or compromised artifact waiting on a tag; no operator direction to cut.
