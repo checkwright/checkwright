@@ -810,11 +810,11 @@ fn rooted_paths(token: &str, kind: &str) -> Result<Vec<String>, String> {
         return Err(refuse(format!("'{}' is not a literal glob", glob)));
     }
     let roots = if crate::knobs::is_words(name) {
-        crate::walk::knob_words(name).map_err(&refuse)?
+        crate::walk::knob_words(name).map_err(refuse)?
     } else {
-        vec![crate::walk::knob_scalar(name).map_err(&refuse)?]
+        vec![crate::walk::knob_scalar(name).map_err(refuse)?]
     };
-    roots.iter().map(|r| rooted_join(name, r, glob).map_err(&refuse)).collect()
+    roots.iter().map(|r| rooted_join(name, r, glob).map_err(refuse)).collect()
 }
 
 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — one root's terms: a trailing `/` trimmed, a
