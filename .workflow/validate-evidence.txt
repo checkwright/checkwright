@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+evidence-tail-liveness-pass gates sha256=8984b9ad3aa15ad528df9b92aa6d6e2543de00f8bce3aa56d45676dc23f2b9f1 pass=151 fail=0 ignore=0 verdict=clean 2026-10-06
+evidence-tail-liveness-pass gate_sdk sha256=5dd4867ce7d597e3acd2fa303c310f044a08712faa3896899ea2832d543a3848 pass=1 fail=0 ignore=0 verdict=clean 2026-10-06
+evidence-tail-liveness-pass canon_kit sha256=94adc56304517c48e98925ef1b60184e537116f84dcc77387eb157e8108c8d50 pass=1 fail=0 ignore=0 verdict=clean 2026-10-06
+evidence-tail-liveness-pass context_kit sha256=a72a655fbdc2336af37022b95846efa73ffc06864ae2241f7ed48d2867d96cc0 pass=1 fail=0 ignore=0 verdict=clean 2026-10-06
+evidence-tail-liveness-pass delegation_kit sha256=e8b7dacc5b3a03c2084bd61274ee3c701400be4001eeaafa4126bc7f4b710363 pass=1 fail=0 ignore=0 verdict=clean 2026-10-06
+evidence-tail-liveness-pass doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-10-06
+evidence-tail-liveness-pass evidence_kit sha256=c62871f8123949178b90372d234262f4c133b06c830e8faa9bbb9af4d2767fea pass=1 fail=0 ignore=0 verdict=clean 2026-10-06
+evidence-tail-liveness-pass guard_kit sha256=01d94b4120e133665e01946fe44d31a730d2c6cdfd1570e5ce6b96a7a1b30e1b pass=1 fail=0 ignore=0 verdict=clean 2026-10-06
+evidence-tail-liveness-pass lifecycle_kit sha256=cbaa0819e63f67af3b143f07598bd56276d7d56e708e4cdb2bfc407d03bca40f pass=1 fail=0 ignore=0 verdict=clean 2026-10-06
+evidence-tail-liveness-pass queue_kit sha256=a4c89486a636a6d9c43ded5bbbb06f21bd7c7b3db7a8a330bdcf89eb952b9f7d pass=1 fail=0 ignore=0 verdict=clean 2026-10-06
+evidence-tail-liveness-pass site_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-10-06
+evidence-tail-liveness-pass scripts sha256=49dacb217bc9bf8c6be056cfe56c9b86206a045896bf399678cdc401a89e2bde pass=1 fail=0 ignore=0 verdict=clean 2026-10-06
+evidence-tail-liveness-pass guard_tests sha256=771d271b131828a94e1300cbc8e3b855bdc9b02b16492a71f5d14f640e5468f2 pass=1 fail=0 ignore=0 verdict=clean 2026-10-06
+evidence-tail-liveness-pass demo sha256=13ce5cd55545a18f8a882421e83b8e72dc22e12b70b0030b7e6670404acacf21 pass=1 fail=0 ignore=0 verdict=clean 2026-10-06
+evidence-tail-liveness-pass installer_smoke sha256=9b7334d7386a35486a04424f0d512be5e2fc5437151667f5e235d32f5b1dfefa pass=28 fail=0 ignore=0 verdict=clean 2026-10-06
+evidence-tail-liveness-pass consumer_smoke sha256=2ba01490d1399b21fb7e0c513d4a935ae1e9aeb1f1c8c661af61eedbaec0504b pass=1 fail=0 ignore=0 verdict=clean 2026-10-06
+evidence-tail-liveness-pass upgrade sha256=79a335d23615f4521fe6681fa86416f743e046a6480f46e838c3ba3dddaf32fe pass=1 fail=0 ignore=0 verdict=clean 2026-10-06
+evidence-tail-liveness-pass agents_md_smoke sha256=f789a44382b266b944a87848f3703a01f6a418d5a7853a00f81ab80c0e20860b pass=1 fail=0 ignore=0 verdict=clean 2026-10-06
+evidence-tail-liveness-pass index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-10-06
+evidence-tail-liveness-pass native_crate sha256=5f267dd28c790babe50623599f2785e465416ffb9315e4b4aba8858b0d4770ff pass=1 fail=0 ignore=0 verdict=clean 2026-10-06
+evidence-tail-liveness-pass projection_witness sha256=3a1660504b79fd491992fe9bf2b7d05befcd9b23e227efc75dad457e85573fad pass=1 fail=0 ignore=0 verdict=clean 2026-10-06
