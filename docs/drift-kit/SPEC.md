@@ -454,7 +454,7 @@ No row keyed to a single install is ever emitted.
 
 `/economics` is the customer-facing post-iteration narrative. Run at close, it chains `--emit overhead-meter` → `--emit stage-economics` → `--emit manual-ops` into one report answering "what did this iteration cost, where, and was the model posture worth it". `stage-economics` is the sole cost-attribution surface, pricing per-transcript, per-stage, per-model token draw (the token SSOT); `overhead-meter` contributes the governance share, not a cost figure, and `manual-ops` the tooling candidates. The narrative excludes delegation-kit's usage-trend budget-%: that rate-window footprint is account-wide, confounded by overlapping sessions and by a second operator on the same account, so beside the per-transcript token SSOT it is a confounded number a reader could over-trust as this iteration's cost.
 
-It ships as the skill template `templates/economics.md`, materialized in the consumer as the copy `.claude/commands/economics.md`, the template↔consumer-copy split the guard/hook skills use; its one bound slot is the consumer's model posture. It is not a lifecycle stage (it moves no cursor, stamps nothing), so it is outside `check-stage-skill-coverage`'s stage roster; it is a reporting ritual the close skill may invoke, never a gate.
+It ships as the skill template `templates/economics.md`, materialized as a copy in the consumer's agent-skill directory, the template↔consumer-copy split the guard/hook skills use; its one bound slot is the consumer's model posture. It is not a lifecycle stage (it moves no cursor, stamps nothing), so it is outside `check-stage-skill-coverage`'s stage roster; it is a reporting ritual the close skill may invoke, never a gate.
 
 ## Layout and configuration
 

@@ -25,7 +25,7 @@ The lead takes one of two postures; which one — and the model tier each sessio
 
 Under either posture the lead dispatches a stage session as a **background agent** whose prompt is that stage's ordinary skill invocation (`/build`, `/validate`, …); the stage session executes its stage skill unchanged. Every lifecycle-state write — the entry stamp, commits, evidence — happens **in the stage session**, never in the lead.
 
-Dispatch mechanics are delegation-kit's, unchanged: dispatch in the background with notification, honor the per-dispatch budget guard, and verify after any agent commit. The guard blocks only on PAUSE (STALE and OK advise); a deliberate override rides the `.claude/settings.local.json` env block — delegation-kit/SPEC.md §The delegation model. Load `/agent-execution` for the protocol and follow it there — it is not restated here.
+Dispatch mechanics are delegation-kit's, unchanged: dispatch in the background with notification, honor the per-dispatch budget guard, and verify after any agent commit. The guard blocks only on PAUSE (STALE and OK advise); a deliberate override rides the local settings overlay's env block — delegation-kit/SPEC.md §The delegation model. Load `/agent-execution` for the protocol and follow it there — it is not restated here.
 
 **When the dispatched stage is the evidence-producing stage, the lead's verify is a read of the committed evidence — never a re-run of the producer.** This is the lifecycle instance of delegation-kit's no-producer-re-run rule (delegation-kit/SPEC.md §Verify after every agent commit, which owns the generic rule and the harm each misroute does). Read the manifest the stage committed and judge it.
 

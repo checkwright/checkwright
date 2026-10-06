@@ -24,7 +24,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required); the meter's default h
 
    They resolve through gate-sdk's registry path (your gates dir first, then each kit's `checks/`), and the pre-commit hook runs those their `# graph:` manifests trigger, read at commit. `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names writes that hook once, and again only to add the commit-msg hook when a first `tier=commit-msg` gate is registered. Two of them wait on a step of yours: `check-settings-pins` skips clean until you create `settings-pins.conf` naming the settings keys to hold, such as the auto-memory-disabling ones ([SPEC.md §check-settings-pins](SPEC.md#check-settings-pins)); and `check-surface-ratchet` arms once you commit the ceilings `--emit always-loaded --ceiling` stamps ([SPEC.md §The surface ratchet](SPEC.md#the-surface-ratchet)).
 
-2. Wire the session-start hook — copy `templates/session-context.sh` into your gates dir, edit its `[EDIT ME]` sections (layout judgment, not mechanism), and merge `templates/settings-sessionstart.json` into `.claude/settings.json`.
+2. Wire the session-start hook — copy `templates/session-context.sh` into your gates dir, edit its `[EDIT ME]` sections (layout judgment, not mechanism), and merge `templates/settings-sessionstart.json` into your harness settings file (`CONTEXT_KIT_SETTINGS_FILE`).
 
 3. Set the baseline — run `--emit always-loaded --update-baseline` on the gate binary `GATE_SDK_NATIVE_BIN` names and commit `.workflow/always-loaded-baseline.txt`.
 

@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### kit-prose-harness-coupling
-
-kit prose couples to the master harness. The kit SPECs and READMEs (guard-kit, lifecycle-kit, delegation-kit, context-kit, plugin) name Claude Code's `CLAUDE_PROJECT_DIR` as the hook anchor, so a customer running another master harness reads a contract bound to one vendor. Operator direction 2026-09-30, lead session (not a ruling): the Claude binding belongs only on the Claude adapter surfaces (guard-kit/templates/settings-hooks.json, the plugin, and the settings and plugin-parity readers of those files); generic prose names the harness's project-dir variable and gives Claude Code's as one binding.
-
-**Deliverable:** that sweep, extended to every other Claude-only name in kit prose.
-
-**Cost while deferred:** an adopter on another harness reads every hook contract as bound to Claude Code. Filed 2026-09-30 to the gap inbox by guard-kit-steering's lead; promoted at its close: →fix fails because the sweep spans five kits, →forward because the direction is given. Owner lookup: `CLAUDE_PROJECT_DIR`, `master harness`, `Codex` in this file — [plugin-harness-reach](#plugin-harness-reach), DISTINCT (the plugin package on other harnesses), and [heterogeneous-agent-delegation](#heterogeneous-agent-delegation), DISTINCT (a master harness delegating to other vendors, where this is the master harness swapped); owner gate-sdk/SPEC.md §The adopter constraints. Re-verified at scope 2026-10-06 by `git grep`: the variable sits in the SPEC or README of each of the five kits named, fourteen sites in eight files. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
-
 ## Deferred
 
 ### foreign-project-critique
@@ -1156,4 +1148,5 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 - journal-append-arm
 - spec-brevity-residue
 - queue-provenance-restates-git-history
+- kit-prose-harness-coupling
 
