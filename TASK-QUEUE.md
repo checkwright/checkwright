@@ -8,16 +8,6 @@
 
 ## New Features
 
-### audit-trigger-mirror-component
-
-[spec: SPEC-mirror-component.md]
-
-`check-stage-entry`'s assertion C reads a generated SPEC mirror (`docs/<kit>/SPEC.md`) as a roster dir, so a single-kit iteration whose amendments name their mirror as a regenerate target reaches two components on that token alone and is refused build entry without an align stamp or a waiver. lifecycle-kit/SPEC.md §check-stage-entry states the behaviour and prices it under C's honest limit, so the over-demand is designed, not a bug.
-
-**Deliverable:** a way for a consumer to declare a generated mirror as the projection of its source component, so the token resolves to the component it mirrors, specified in §check-stage-entry with a fixture over a mirror-naming single-kit amendment; or a ruling that the waiver stays the valve.
-
-**Cost while deferred:** an align dispatch or an operator waiver ask per single-kit iteration whose amendments name their mirror. Filed 2026-10-03 to the gap inbox at guard-kit-write-side-pass' build; promoted at its close: →fix fails because the mirror's resolution is a grammar decision the SPEC settles the other way, →forward because no recorded ruling is reversed. Re-verified: the SPEC's roster-dir paragraph names this exact case. Owner lookup: `mirror`, `assertion C`, `audit-trigger` in this file — none; owner lifecycle-kit/SPEC.md §check-stage-entry. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling). A feature, authored at spec.
-
 ### journal-append-arm
 
 [spec: SPEC-journal-arm.md] [recurrence: 2026-10-05]
@@ -1199,4 +1189,6 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 No rule holds a docs video to a local poster linking out, so a first embed adds a third-party request.
 
 ## Done
+
+- audit-trigger-mirror-component
 

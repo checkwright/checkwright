@@ -246,7 +246,7 @@ demo-iteration scope aaaaaaaa 2026-06-01 none
 demo-iteration build bbbbbbbb 2026-06-02 none
 EOF
 check_case "C3 single-amendment-cross-component" "$c3" 1 "cross-component amendment signal"
-check_case "C3 help-respell-not-a-remedy" "$c3" 1 "Respelling a body token so it stops resolving (a generated mirror named in prose, say) is not a remedy: the token is the amendment's reach"
+check_case "C3 help-respell-not-a-remedy" "$c3" 1 "Respelling a body token so it stops resolving is not a remedy: the token is the amendment's reach. A generated mirror of a roster file is declared with LIFECYCLE_KIT_MIRROR_ROOT, which counts it as the component it mirrors"
 
 # C4 (good): a single-component amendment (own dir only) — no signal.
 c4="$SANDBOX/c4"
@@ -298,6 +298,35 @@ mkdir -p "$c7/.workflow" "$c7/changes/c1/specs/alpha" "$c7/changes/archive/c0/sp
 cp "$c5/.workflow/WORKFLOW-STATE.txt" "$c7/.workflow/"
 check_case "C7 path-glob-archived-not-counted" "$c7" 0 "STAGE-ENTRY: clean"
 unset LIFECYCLE_KIT_AMENDMENT_GLOB
+
+# C8–C12: the mirror fold. One tree — roster dirs a/ and b/, their mirrors site/a/
+# and site/b/, a roster dir site/extra/ mirroring nothing, one amendment in a/.
+mirror_case() {  # $1=label  $2=knob value ("" = unset)  $3=body token  $4=want-rc  $5=want-substring
+    local d="$SANDBOX/m" out rc
+    rm -rf "$d"; build_queue "$d"
+    mkdir -p "$d/.workflow" "$d/a" "$d/b" "$d/site/a" "$d/site/b" "$d/site/extra"
+    : >"$d/a/SPEC.md"; : >"$d/b/SPEC.md"
+    : >"$d/site/a/SPEC.md"; : >"$d/site/b/SPEC.md"; : >"$d/site/extra/SPEC.md"
+    printf 'regenerate %s after the merge\n' "$3" >"$d/a/SPEC-foo.md"
+    cp "$c5/.workflow/WORKFLOW-STATE.txt" "$d/.workflow/"
+    if [[ -n "$2" ]]; then
+        out="$(cd "$d" && gate_env LIFECYCLE_KIT_MIRROR_ROOT="$2" && gate_run check-stage-entry "$DIR/checks" 2>&1)"; rc=$?
+    else
+        out="$(cd "$d" && gate_run check-stage-entry "$DIR/checks" 2>&1)"; rc=$?
+    fi
+    if [[ "$rc" -ne "$4" ]]; then
+        echo "  FAIL [$1]: want exit $4, got $rc -- $out"; fails=$((fails + 1)); return
+    fi
+    if ! grep -qF -- "$5" <<<"$out"; then
+        echo "  FAIL [$1]: exit $rc OK but output lacks '$5':"; printf '    %s\n' "$out"
+        fails=$((fails + 1))
+    fi
+}
+mirror_case "C8 mirror-undeclared-is-a-component" "" site/a/SPEC.md 1 "references 2 components: a site/a"
+mirror_case "C9 mirror-declared-folds" site site/a/SPEC.md 0 "STAGE-ENTRY: clean"
+mirror_case "C10 mirror-root-trailing-slash" site/ site/a/SPEC.md 0 "STAGE-ENTRY: clean"
+mirror_case "C11 mirror-of-another-component-adds-it" site site/b/SPEC.md 1 "references 2 components: a b"
+mirror_case "C12 unmirrored-dir-under-root-stays" site site/extra/SPEC.md 1 "references 2 components: a site/extra"
 
 # --- assertion D: a build entry refuses an amendment still carrying an unrun inferred-claim marker ---
 
@@ -396,5 +425,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-stage-entry.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-stage-entry.test.sh: clean (assertion B queue-empty + drain-exempt model + observed-by refusal branch + assertion C cross-component align/waiver + templates-stub exclusion + path-shaped amendment glob + assertion D inferred-claim residue over amendments and active queue entries + assertion E marker grammar at every cursor, 22 scenarios)"
+echo "check-stage-entry.test.sh: clean (assertion B queue-empty + drain-exempt model + observed-by refusal branch + assertion C cross-component align/waiver + templates-stub exclusion + path-shaped amendment glob + mirror fold + assertion D inferred-claim residue over amendments and active queue entries + assertion E marker grammar at every cursor, 27 scenarios)"
 exit 0

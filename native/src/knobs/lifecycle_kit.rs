@@ -84,6 +84,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("LIFECYCLE_KIT_AMENDMENT_GLOB", "SPEC-*.md"),
         Row::scalar("LIFECYCLE_KIT_ROSTER_BASENAME", "SPEC.md"),
         Row::indexed("LIFECYCLE_KIT_CONTRACT_TOKENS", &["SPEC.md", "proto/"]),
+        Row::scalar("LIFECYCLE_KIT_MIRROR_ROOT", ""),
         Row::scalar("LIFECYCLE_KIT_SKILLS_DIR", ".claude/commands"),
         Row::scalar("LIFECYCLE_KIT_SESSION_BOUNDARY", "stage"),
         Row::scalar("LIFECYCLE_KIT_AGENT_FILE", "CLAUDE.md"),

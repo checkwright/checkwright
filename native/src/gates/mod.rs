@@ -1473,6 +1473,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "LIFECYCLE_KIT_ROSTER_BASENAME",
             "LIFECYCLE_KIT_AMENDMENT_GLOB",
             "LIFECYCLE_KIT_CONTRACT_TOKENS",
+            "LIFECYCLE_KIT_MIRROR_ROOT",
             "GATE_SDK_PRUNE_DIRS",
             "GATE_SDK_PRUNE_EXTRA_DIRS",
         ],

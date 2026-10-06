@@ -98,6 +98,7 @@ struct Knobs {
     roster_basename: String,
     amendment_glob: String,
     contract_tokens: Vec<String>,
+    mirror_root: String,
 }
 
 fn knobs(args: &[String]) -> Result<Knobs, String> {
@@ -115,6 +116,7 @@ fn knobs(args: &[String]) -> Result<Knobs, String> {
         roster_basename: walk::knob_scalar("LIFECYCLE_KIT_ROSTER_BASENAME")?,
         amendment_glob: walk::knob_scalar("LIFECYCLE_KIT_AMENDMENT_GLOB")?,
         contract_tokens: walk::knob_array("LIFECYCLE_KIT_CONTRACT_TOKENS")?,
+        mirror_root: walk::knob_scalar("LIFECYCLE_KIT_MIRROR_ROOT")?,
     })
 }
 
@@ -304,6 +306,19 @@ fn scan_markers(text: &str, in_scope: &dyn Fn(usize) -> bool) -> MarkerScan {
     scan
 }
 
+// spec: lifecycle-kit/SPEC.md §check-stage-entry — the mirror fold: `<root>/<dir>` counts as `<dir>`
+// where `<dir>` is a roster dir, and every other candidate is unchanged.
+fn fold_mirror(root: &str, roster: &[String], d: String) -> String {
+    let root = root.trim_end_matches('/');
+    if root.is_empty() {
+        return d;
+    }
+    match d.strip_prefix(root).and_then(|r| r.strip_prefix('/')) {
+        Some(src) if roster.iter().any(|r| r == src) => src.to_string(),
+        _ => d,
+    }
+}
+
 // spec: lifecycle-kit/SPEC.md §check-stage-entry — assertion C's signal, or None.
 fn audit_signal(k: &Knobs, rel: &[String]) -> Result<Option<String>, String> {
     let base = |p: &str| basename(p).to_string();
@@ -370,6 +385,7 @@ fn audit_signal(k: &Knobs, rel: &[String]) -> Result<Option<String>, String> {
                         d = s.to_string();
                     }
                 }
+                let d = fold_mirror(&k.mirror_root, &roster, d);
                 if roster.contains(&d) && !comps.contains(&d) {
                     comps.push(d);
                 }
@@ -634,7 +650,7 @@ pub fn run(args: &[String]) -> i32 {
             println!("  {}", e);
         }
         if c_fired {
-            println!("  help: a cross-component {} entry must run /{} (stamps '{} {} <session> <date> <head>'), or — on an explicit user ruling, never self-issued by the entering session — the dispatcher declares the waiver with '--enter-stage --dispatch {} --waive <the ruling>' and this entry then records its '{} {} <session> <date> <head>' line in {}. Respelling a body token so it stops resolving (a generated mirror named in prose, say) is not a remedy: the token is the amendment's reach", k.audit_entry_stage, k.audit_stage, iter, k.audit_stage, k.audit_entry_stage, iter, k.waiver, k.state_name);
+            println!("  help: a cross-component {} entry must run /{} (stamps '{} {} <session> <date> <head>'), or — on an explicit user ruling, never self-issued by the entering session — the dispatcher declares the waiver with '--enter-stage --dispatch {} --waive <the ruling>' and this entry then records its '{} {} <session> <date> <head>' line in {}. Respelling a body token so it stops resolving is not a remedy: the token is the amendment's reach. A generated mirror of a roster file is declared with LIFECYCLE_KIT_MIRROR_ROOT, which counts it as the component it mirrors", k.audit_entry_stage, k.audit_stage, iter, k.audit_stage, k.audit_entry_stage, iter, k.waiver, k.state_name);
         } else if ab_fired {
             println!("  help: a stage entry re-verifies the prior stage's static exit — invoke the predecessor skill (it stamps {}) and drain the active queue before entering {}", k.state_name, k.drain);
         }
@@ -798,6 +814,18 @@ mod tests {
 
     // spec: lifecycle-kit/SPEC.md §check-stage-entry — `grep -oE` takes every non-overlapping
     // match on the line, not the first: a body naming two components must yield both
+    #[test]
+    fn the_mirror_fold_resolves_only_a_roster_dir_under_the_declared_root() {
+        let roster: Vec<String> = ["a", "b", "site/a", "site/extra"].iter().map(|s| s.to_string()).collect();
+        let fold = |root: &str, d: &str| fold_mirror(root, &roster, d.to_string());
+        assert_eq!(fold("", "site/a"), "site/a");
+        assert_eq!(fold("site", "site/a"), "a");
+        assert_eq!(fold("site/", "site/b"), "b");
+        assert_eq!(fold("site", "site/extra"), "site/extra");
+        assert_eq!(fold("site", "sitex/a"), "sitex/a");
+        assert_eq!(fold("site", "a"), "a");
+    }
+
     #[test]
     fn every_contract_token_on_a_line_is_taken_not_just_the_first() {
         let re = Ere::compile("[a-z0-9][a-z0-9/_-]*/(SPEC\\.md|proto/)").expect("compiles");
