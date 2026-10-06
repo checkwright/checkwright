@@ -1375,16 +1375,16 @@ mod tests {
         let knobs = crate::knobenv::lock();
         let d = scratch_corpus(&knobs, "knobpaths", "");
         knobs.remove("GATE_SDK_ENFORCEMENT_FILE");
-        knobs.remove("GATE_SDK_HOOKS_DIR");
+        knobs.remove("GATE_SDK_GRAPH_THEME_DIR");
         std::fs::write(
             d.join("gate-sdk-config.knobs"),
-            "GATE_SDK_ENFORCEMENT_FILE = site/enforcement.md\nGATE_SDK_HOOKS_DIR = ./hooks/\n",
+            "GATE_SDK_ENFORCEMENT_FILE = site/enforcement.md\nGATE_SDK_GRAPH_THEME_DIR = ./theme/\n",
         )
         .expect("write");
         crate::knobs::reset(&knobs);
         assert_eq!(knob_paths("docs/x.md").unwrap(), vec!["docs/x.md".to_string()]);
         assert_eq!(knob_paths("knob:GATE_SDK_ENFORCEMENT_FILE").unwrap(), vec!["site/enforcement.md".to_string()]);
-        assert_eq!(knob_paths("knob:GATE_SDK_HOOKS_DIR/pre-commit").unwrap(), vec!["hooks/pre-commit".to_string()]);
+        assert_eq!(knob_paths("knob:GATE_SDK_GRAPH_THEME_DIR/base.css").unwrap(), vec!["theme/base.css".to_string()]);
         assert!(knob_paths("kit:templates/*.md").is_err());
         assert!(knob_paths("knob:PROBE_ABSENT").is_err());
         knobs.remove("QUEUE_KIT_ROADMAP_FILE");

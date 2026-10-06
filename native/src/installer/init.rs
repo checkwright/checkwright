@@ -608,14 +608,12 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     let _ = std::fs::create_dir_all(root.join(GATES_DIR));
     let _ = std::fs::create_dir_all(root.join(".workflow"));
     let gates_list = format!("{}/gates.list", GATES_DIR);
-    let registry = if claim(&root, &gates_list, &prior, f.force, &mut r) {
-        let text = planned_registry.clone();
+    if claim(&root, &gates_list, &prior, f.force, &mut r) {
         if !f.dry {
-            std::fs::write(root.join(&gates_list), &text)
+            std::fs::write(root.join(&gates_list), &planned_registry)
                 .map_err(|e| refuse(format!("could not write {}: {}", gates_list, e), "", 2))?;
         }
         r.record(&gates_list, None);
-        text
     } else {
         let kept = std::fs::read_to_string(root.join(&gates_list)).unwrap_or_default();
         let wanted = crate::registry::members(&planned_registry).iter().map(|m| m.trim().to_string()).collect::<Vec<_>>();
@@ -626,8 +624,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
             &payload_recipe::still_registered(&kept, &dropped),
             &retired_members(&root, prior.get(&gates_list), &kept, &planned_registry, &dropped),
         );
-        kept
-    };
+    }
 
     for kit in &kits {
         let kit_payload = pkg.payload.join(kit);
@@ -725,8 +722,8 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     }
 
     // spec: installer/SPEC.md §The gate binary — the write comes after every config seam and
-    // before the hook is generated: the generator resolves each member's argv and a `.gate` member
-    // resolves to this binary, so the knob must name it and the file must be there.
+    // before the generation step, which spawns this binary: the knob must name it and the file
+    // must be there.
     // spec: installer/SPEC.md §The install boundary — the placement is the `--install
     // place-artifact` op called in-process: one derivation, two callers, this arm and that flag.
     // spec: installer/SPEC.md §What init seeds — the vendored tree's kit-root set is DECLARED and
@@ -782,34 +779,15 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         }
     }
 
-    // spec: installer/SPEC.md §init — the generated projections are produced by the vendored
-    // tools themselves, never restated by the installer: the hook generator and the graph emitter
-    // are gate-sdk's, so a consumer's artifacts are the ones their own gate-sdk makes.
-    let hooks_dir = knob_at(&root, "GATE_SDK_HOOKS_DIR")?;
+    // spec: installer/SPEC.md §init — the generated projection is produced by the vendored tool
+    // itself, never restated by the installer: the graph emitter is gate-sdk's, so a consumer's
+    // artifact is the one their own gate-sdk makes.
     let graph = knob_at(&root, "GATE_SDK_GRAPH_ARTIFACT")?;
-    let mut generated = vec![format!("{}/pre-commit", hooks_dir), graph.clone()];
     if !f.dry {
-        run_vendored(&root, &artifact_dest, &["--emit", "git-hooks", "--write"], None)?;
         run_vendored(&root, &artifact_dest, &["--emit", "graph"], Some(&root.join(&graph)))?;
     }
-    // spec: installer/SPEC.md §init — the dry plan asks the generator's own conditional of the
-    // registry this run leaves and the kit sources it vendors, in the battery's resolve order.
-    let msg_hook = format!("{}/commit-msg", hooks_dir);
-    let owes_msg = if f.dry {
-        let mut dirs = vec![root.join(GATES_DIR).to_string_lossy().into_owned()];
-        dirs.extend(kits.iter().map(|k| pkg.payload.join(k).join("checks").to_string_lossy().into_owned()));
-        crate::emit::git_hooks::owes_commit_msg(&registry, &dirs)
-    } else {
-        root.join(&msg_hook).is_file()
-    };
-    if owes_msg {
-        generated.push(msg_hook);
-    }
-    for g in &generated {
-        if !f.dry && !root.join(g).is_file() {
-            continue;
-        }
-        if let Some(p) = in_tree(&root, g) {
+    if f.dry || root.join(&graph).is_file() {
+        if let Some(p) = in_tree(&root, &graph) {
             r.record(&p, None);
         }
     }
@@ -1022,7 +1000,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     // reflowing these lines reds that arm instead of silently un-covering the pair.
     let front = follow_up_front_end(&artifact_dest);
     println!("\nnext:");
-    println!("  {} --install-hooks   # opt this clone into the generated pre-commit hook", front);
+    println!("  {} --install-hooks   # place the pre-commit and commit-msg hooks in this clone", front);
     println!("  {} --run             # the battery, green on what was just vendored", front);
     Ok(0)
 }
@@ -1188,13 +1166,13 @@ mod tests {
         std::fs::remove_dir_all(&dir).ok();
     }
 
-    // spec: installer/SPEC.md §init — a re-run writes and records each projection where the
+    // spec: installer/SPEC.md §init — a re-run writes and records the projection where the
     // consumer's knob file puts it, the payload's layout answering only while no file sets one
     #[test]
     fn a_projection_lands_at_the_consumers_knob_and_owns_only_a_tree_path() {
         let env = crate::knobenv::lock();
-        let knobs = ["GATE_SDK_GRAPH_ARTIFACT", "GATE_SDK_HOOKS_DIR"];
-        for n in ["GATE_SDK_GATES_DIR", "GATE_SDK_KNOB_FILE", "GATE_SDK_CONFIG_FILE"].iter().chain(&knobs) {
+        let knob = "GATE_SDK_GRAPH_ARTIFACT";
+        for n in ["GATE_SDK_GATES_DIR", "GATE_SDK_KNOB_FILE", "GATE_SDK_CONFIG_FILE", knob] {
             env.remove(n);
         }
         let root = std::env::temp_dir().join(format!("cw-init-knob-{}", std::process::id()));
@@ -1202,17 +1180,14 @@ mod tests {
         std::fs::create_dir_all(root.join(GATES_DIR)).expect("cannot make the scratch gates dir");
         let at = |k: &str| knob_at(&root, k).ok();
 
-        for k in knobs {
-            let default = at(k).unwrap_or_else(|| panic!("{} did not resolve", k));
-            assert!(crate::walk::under(GATES_DIR, &default), "{} defaulted to {}", k, default);
-        }
+        let default = at(knob).unwrap_or_else(|| panic!("{} did not resolve", knob));
+        assert!(crate::walk::under(GATES_DIR, &default), "{} defaulted to {}", knob, default);
         std::fs::write(
             root.join(GATES_DIR).join("gate-sdk-config.knobs"),
-            "GATE_SDK_GRAPH_ARTIFACT = docs/graph.html\nGATE_SDK_HOOKS_DIR = .githooks\n",
+            "GATE_SDK_GRAPH_ARTIFACT = docs/graph.html\n",
         )
         .expect("cannot write the scratch knob file");
-        assert_eq!(at(knobs[0]), Some("docs/graph.html".to_string()));
-        assert_eq!(at(knobs[1]), Some(".githooks".to_string()));
+        assert_eq!(at(knob), Some("docs/graph.html".to_string()));
 
         assert_eq!(in_tree(&root, "docs/graph.html"), Some("docs/graph.html".to_string()));
         let inside = root.join("docs").join("graph.html").to_string_lossy().into_owned();

@@ -8,7 +8,7 @@ nav_child_order: 1
 
 A self-testing lint framework for the prose, spec, and config surfaces conventional linters ignore. gate-sdk is the foundation the other kits build on: they ship their checks as gates that register into its runner, and its meta-gates hold those gates to a fixed shape.
 
-A gate is a small script that scans a surface, emits one machine-keyable success line or names each finding with a remedy, and fails the commit when it finds a violation. gate-sdk supplies the runner, the golden-fixture test harness, the `# graph:` coupling manifests, and a generated pre-commit hook.
+A gate is a small script that scans a surface, emits one machine-keyable success line or names each finding with a remedy, and fails the commit when it finds a violation. gate-sdk supplies the runner, the golden-fixture test harness, the `# graph:` coupling manifests, and a pre-commit hook.
 
 ## Install
 

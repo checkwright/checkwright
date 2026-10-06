@@ -92,7 +92,7 @@ fn walkthrough(scratch: &mut Scratch) -> Outcome {
         say(&format!("vendor + install: {}", kit));
         step!(install(&consumer, &kit));
     }
-    say("→ gates.list written, pre-commit hook generated. The consumer is governed.");
+    say("→ gates.list written. The consumer is governed; --install-hooks places its hooks.");
 
     banner("ACT 2 — A clean commit passes the battery");
     say("With the kits installed and zero further config, the gate battery is green.");

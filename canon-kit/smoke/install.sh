@@ -78,5 +78,4 @@ if [[ ! -f docs/index.md ]]; then
     printf '# Smoke consumer\n' > docs/index.md
 fi
 
-bash "$SDK/bin/run-gates.sh" --emit git-hooks --write >/dev/null
 bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html

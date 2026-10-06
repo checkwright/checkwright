@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 # Behavioral test of check-graph's whole-registry path — assertions A (manifest
 # well-formedness), B (couples<->trigger parity), C (the cycle-valve rule),
-# D (pre-commit + commit-msg hook freshness), E (graph-artifact freshness) and
-# F (emitted asset hrefs resolve), and the retired `gen=` field. None is
-# reachable from the good/bad pair: the pair's cwd is a case dir and a `good/`
-# case must exit 0, while D and E always run on the full path, so satisfying D
-# from a case dir would need a committed byte-copy of the real repo's generated
-# hook inside gate-tests/.
+# E (graph-artifact freshness) and F (emitted asset hrefs resolve), and the
+# retired `gen=` field. None is reachable from the good/bad pair: the pair's
+# cwd is a case dir and a `good/` case must exit 0, while E always runs on the
+# full path, so satisfying E from a case dir would need a committed byte-copy of
+# a generated artifact inside gate-tests/.
 # So the corpus is a mini-consumer tree built here and thrown away: the port
 # cannot add or remove a file in it, which is the property criterion 4 asks of a
 # gate-source auditor's oracle (gate-sdk/SPEC.md §The port-candidate criteria).
@@ -28,7 +27,7 @@ fails=0
 rc=0
 out=""
 
-# the mini-consumer's own kit set, so member resolution and the emitted hook stay
+# the mini-consumer's own kit set, so member resolution and the emitted graph stay
 # inside the sandbox instead of reaching this repo's kits
 export GATE_SDK_KIT_DIRS="$repo"
 
@@ -51,13 +50,12 @@ check-epsilon
 LIST
     # B branch 2 (exact token) and branch 4 (a `*.<ext>` trigger over a globbed couple)
     member check-alpha 'couples=scripts/gates.list,scripts/*.sh trigger=scripts/gates.list,*.sh dir=one valve=none tier=precommit'
-    # B branch 1 (a `*` trigger covers everything); tier=commit-msg drives D's second hook
+    # B branch 1 (a `*` trigger covers everything); a tier=commit-msg member
     member check-beta 'couples=docs/site.md trigger=* dir=one valve=none tier=commit-msg'
     # C branch 1: a dir=bi member spanning a leading and a lagging surface takes PROPOSED
     member check-gamma 'couples=SPEC.md,scripts/*.sh dir=bi valve=PROPOSED tier=precommit'
     # the `.gate` declaration spelling, so assertion A resolves and reads a
-    # descriptor's manifest; tier=align-only keeps it out of both hooks, so the
-    # sandbox needs no binary to generate them. C branch 2: a leading surface with
+    # descriptor's manifest; tier=align-only. C branch 2: a leading surface with
     # no lagging one takes either valve
     printf '# graph: %s\n' 'couples=SPEC.md dir=bi valve=none tier=align-only' \
         >"$repo/scripts/check-delta.gate"
@@ -77,8 +75,7 @@ GRAPH_LAYERS[] = surfaces:governed surfaces
 VOCAB
 }
 
-regen() {  # regen() -> rewrite both hooks and the graph artifact from the manifests
-    ( cd "$repo" && bash "$DIR/bin/run-gates.sh" --emit git-hooks --write >/dev/null 2>&1 ) || return 1
+regen() {  # regen() -> rewrite the graph artifact from the manifests
     ( cd "$repo" && bash "$DIR/bin/run-gates.sh" --emit graph >scripts/CHECK-GRAPH.html 2>/dev/null ) || return 1
 }
 
@@ -106,7 +103,7 @@ want_green() {  # want_green() <label> [substring]
 
 # --- baseline: five members, both spellings, every B and C branch, clean --------
 seed
-regen || { echo "  FAIL [baseline]: could not generate the sandbox hooks/artifact"; fails=$((fails + 1)); }
+regen || { echo "  FAIL [baseline]: could not generate the sandbox artifact"; fails=$((fails + 1)); }
 run; want_green baseline
 
 # --- assertion A: manifest well-formedness -------------------------------------
@@ -147,19 +144,6 @@ member check-epsilon 'couples=docs/site.md trigger=docs/*.md dir=bi valve=PROPOS
 regen || true; run
 want_red c-no-leading "check-epsilon is a dir=bi bijection with no leading design surface"
 
-# --- assertion D: both generated hooks -----------------------------------------
-seed; regen || true
-printf '# hand-edited\n' >>"$repo/scripts/git-hooks/pre-commit"
-run; want_red d-hook-stale "scripts/git-hooks/pre-commit is not its emitter's handoff"
-
-seed; regen || true
-rm -f "$repo/scripts/git-hooks/pre-commit"
-run; want_red d-hook-absent "scripts/git-hooks/pre-commit does not exist"
-
-seed; regen || true
-printf '# hand-edited\n' >>"$repo/scripts/git-hooks/commit-msg"
-run; want_red d-msg-hook-stale "scripts/git-hooks/commit-msg is not its emitter's handoff"
-
 # --- assertion E: the graph artifact -------------------------------------------
 seed; regen || true
 printf '<!-- hand-edited -->\n' >>"$repo/scripts/CHECK-GRAPH.html"
@@ -198,5 +182,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-graph-tree.test: $fails case(s) failed"
     exit 1
 fi
-echo "check-graph-tree.test: ok (constructed consumer tree: A/B/C/D/E/F, both declaration spellings, 4 parity branches, 3 cycle-valve branches, the retired gen= field, 16 cases)"
+echo "check-graph-tree.test: ok (constructed consumer tree: A/B/C/E/F, both declaration spellings, 4 parity branches, 3 cycle-valve branches, the retired gen= field, 13 cases)"
 exit 0

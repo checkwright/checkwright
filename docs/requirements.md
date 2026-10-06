@@ -54,7 +54,7 @@ The install itself and the optional docs gates need these as well. `doctor` does
 | `sha256sum` or `shasum` | any | required to install on Linux and macOS | the release tarball and the gate binary are checked against their published digests |
 | Windows PowerShell | 5.1 | required to install on Windows | the one-line install, the install block and the bootstrap run under it; its `Get-FileHash` checks the digests |
 | `tar.exe` | Windows 10 version 1803 | required to install on Windows | the install block unpacks the tarball with `System32\tar.exe` |
-| Git for Windows | `git` at the floor above | required to install on Windows | it supplies `git`, and the sh it bundles, which runs the pre-commit hook; `bash` only where a row above owes it |
+| Git for Windows | `git` at the floor above | required to install on Windows | it supplies `git`; `bash` only where a row above owes it |
 | `gh` | any carrying `gh attestation` | optional: to check the build attestation | the one-line install runs `gh attestation verify` when `gh` is signed in, and says so when it is not |
 | Node | 8.2 | optional: only to install with npx | the first Node to bundle an npm carrying `npx` |
 | Ruby | 2.3 | optional: only if you register site-kit's docs gates | the two gems below need it |
@@ -75,7 +75,7 @@ On `linux x86_64` with `14` logical CPUs, the hook ran `49` pre-commit gates ove
 
 <!-- commit-cost:end -->
 
-To measure your own repository, run the gate binary with `--measure-commit`. It stages nothing and times the same run over every tracked file. Two costs sit outside the figure. First, the hook starts through `sh`, whose start cost is unmeasured; on Windows that is the `sh` Git for Windows bundles, which runs emulated on Arm. Second, a gate you register yourself adds its own time.
+To measure your own repository, run the gate binary with `--measure-commit`. It stages nothing and times the same run over every tracked file. Two costs sit outside the figure. First, the hook's own start: git starts it with no shell on any OS, and the `gates` workflow's probe step prints what that costs on each OS and architecture. Second, a gate you register yourself adds its own time.
 
 ## Writing your own shell gates
 

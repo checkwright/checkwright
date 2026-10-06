@@ -1,8 +1,10 @@
-// spec: gate-sdk/SPEC.md §install-hooks — the per-clone hook opt-in: wire core.hooksPath at this
-// clone, verify the git identity once, and report what the wiring enabled.
+// spec: gate-sdk/SPEC.md §install-hooks — the per-clone hook opt-in: place both hooks in the
+// clone's git directory, point core.hooksPath at them, verify the git identity once, and report
+// what was placed.
 // spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Run` because the contract is three-state and
 // every code is load-bearing: `check-identity`'s 1 propagates through, and an emitting arm cannot
 // carry it.
+use super::hook_launcher;
 use crate::{proc, programs};
 use crate::registry;
 use crate::walk;
@@ -11,7 +13,6 @@ use std::path::Path;
 // spec: gate-sdk/SPEC.md §install-hooks — this arm's own names, then those its registry-resolved
 // callee declares
 pub const KNOBS: &[&str] = &[
-    "GATE_SDK_HOOKS_DIR",
     "GATE_SDK_GATES_DIR",
     "GATE_SDK_KIT_DIRS",
     "GATE_SDK_NATIVE_BIN",
@@ -47,20 +48,21 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
         return Err(format!("takes no arguments (got: {})\n{}", a, USAGE));
     }
 
-    // spec: gate-sdk/SPEC.md §install-hooks — both knobs are resolved before any wiring, the order
-    // the shell form read them in, so a configuration failure refuses without half-installing.
-    let hooks_dir = walk::knob_scalar("GATE_SDK_HOOKS_DIR")?;
+    // spec: gate-sdk/SPEC.md §install-hooks — both knobs and the hooks directory are resolved
+    // before any write, so a configuration failure refuses without half-installing.
+    let bin = walk::knob_scalar("GATE_SDK_NATIVE_BIN")?;
     let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
-    if !Path::new(&hooks_dir).is_dir() {
+    if !Path::new(&bin).is_file() {
         return Err(format!(
-            "no hooks dir at {} — generate the pre-commit hook first:\n  {}",
-            hooks_dir,
-            crate::gates::door_command("--emit git-hooks --write")?
+            "no gate binary at {} — place or build the binary GATE_SDK_NATIVE_BIN names first",
+            bin
         ));
     }
+    let hooks_dir = hook_launcher::hooks_dir(Path::new(&walk::cwd()?))
+        .ok_or_else(|| "not inside a git repository — there is no clone to place the hooks in".to_string())?;
 
-    chmod_hooks(&hooks_dir);
-    config("core.hooksPath", &hooks_dir);
+    place(Path::new(&bin), &hooks_dir)?;
+    config("core.hooksPath", &hooks_dir.display().to_string());
     // spec: gate-sdk/SPEC.md §install-hooks — the blame guard stays a file-existence test, so a
     // consumer without the file gets the same one-line output it always got.
     if Path::new(".git-blame-ignore-revs").is_file() {
@@ -73,7 +75,7 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
     let identity_rc = identity_rung(&gates_dir);
 
     println!("Active hooks:");
-    for (name, _) in listing(&hooks_dir) {
+    for (name, _) in walk::list_dir(&hooks_dir).unwrap_or_default() {
         println!("  {}", name);
     }
     println!();
@@ -81,18 +83,26 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
     Ok(identity_rc)
 }
 
-// spec: gate-sdk/SPEC.md §check-hook-exec-bit — a per-clone convenience rather than an assertion:
-// that gate's subject is the *committed* mode, which this cannot repair, so one entry failing to
-// chmod does not fail the opt-in.
-fn chmod_hooks(dir: &str) {
-    for (name, _) in listing(dir) {
-        let _ = crate::install::make_executable(&Path::new(dir).join(&name));
+// spec: gate-sdk/SPEC.md §install-hooks — each served hook is a hard link to the binary under the
+// hook's name, a copy where the link cannot be made, replaced on a re-run
+fn place(bin: &Path, dir: &Path) -> Result<(), String> {
+    std::fs::create_dir_all(dir).map_err(|e| format!("cannot create {}: {}", dir.display(), e))?;
+    for hook in hook_launcher::SERVED {
+        let dst = dir.join(hook_launcher::file_name(hook));
+        if dst.symlink_metadata().is_ok() {
+            std::fs::remove_file(&dst).map_err(|e| format!("cannot replace {}: {}", dst.display(), e))?;
+        }
+        if std::fs::hard_link(bin, &dst).is_err() {
+            std::fs::copy(bin, &dst)
+                .map_err(|e| format!("cannot place {} from {}: {}", dst.display(), bin.display(), e))?;
+        }
+        crate::install::make_executable(&dst)?;
     }
+    Ok(())
 }
 
-// spec: gate-sdk/SPEC.md §install-hooks — the per-clone git-config writes degrade soft outside a
-// repository, the shape the sibling per-clone installer already rules for its own driver step,
-// rather than crashing the opt-in.
+// spec: gate-sdk/SPEC.md §install-hooks — a per-clone git-config write that fails is reported,
+// the shape the sibling per-clone installer rules for its own driver step, never a crash.
 fn config(key: &str, value: &str) {
     match proc::run(&programs::GIT, &["config", key, value]) {
         Ok(c) if c.stdout().is_some() => println!("Installed: {} = {}", key, value),
@@ -103,13 +113,6 @@ fn config(key: &str, value: &str) {
         ),
         Err(e) => eprintln!("install-hooks: {}", e),
     }
-}
-
-// spec: gate-sdk/SPEC.md §install-hooks — `ls -1 | sed 's/^/  /'`, the opt-in's receipt: the only
-// place a session sees which hooks the wiring just enabled, so its shape is preserved and its
-// order is `list_dir`'s sort, which is the order `ls` printed.
-fn listing(dir: &str) -> Vec<(String, bool)> {
-    walk::list_dir(Path::new(dir)).unwrap_or_default()
 }
 
 // spec: gate-sdk/SPEC.md §install-hooks — the apply-and-verify rung. The gate is resolved through
@@ -192,5 +195,32 @@ mod tests {
             let err = dispatch(&args).expect_err("a positional must refuse");
             assert!(err.contains("got: foo") && err.contains(USAGE), "{}", err);
         }
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — both served hooks are placed whatever the registry
+    // holds, each the binary's bytes, and a re-run replaces a file already there
+    #[test]
+    fn both_hooks_are_placed_and_a_rerun_replaces_them() {
+        let d = std::env::temp_dir().join(format!("checkwright-install-hooks.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(&d).expect("scratch");
+        let (bin, hooks) = (d.join("bin"), d.join("git/gate-hooks"));
+        std::fs::write(&bin, "one").expect("binary");
+        place(&bin, &hooks).expect("first placement");
+        let names: Vec<String> = walk::list_dir(&hooks).expect("lists").into_iter().map(|(n, _)| n).collect();
+        std::fs::remove_file(&bin).expect("the update's unlink");
+        std::fs::write(&bin, "two").expect("the updated binary");
+        let stale = std::fs::read_to_string(hooks.join(hook_launcher::file_name("pre-commit"))).expect("reads");
+        place(&bin, &hooks).expect("second placement");
+        let fresh: Vec<String> = hook_launcher::SERVED
+            .iter()
+            .map(|h| std::fs::read_to_string(hooks.join(hook_launcher::file_name(h))).expect("reads"))
+            .collect();
+        let executable = crate::proc::is_executable(&hooks.join(hook_launcher::file_name("commit-msg")));
+        let _ = std::fs::remove_dir_all(&d);
+        assert_eq!(names, vec![hook_launcher::file_name("commit-msg"), hook_launcher::file_name("pre-commit")]);
+        assert_eq!(stale, "one", "a replaced binary must leave the placed hook as it was");
+        assert_eq!(fresh, vec!["two".to_string(), "two".to_string()]);
+        assert!(executable);
     }
 }

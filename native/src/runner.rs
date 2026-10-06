@@ -36,7 +36,7 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
        --upgrade-smoke                         prove the FROM->TO kit upgrade in scratch
        --run-consumer-smoke [args]             prove the kits install into a scratch consumer
        --install-lifecycle [file]              install the lifecycle resident surfaces
-       --install-hooks                         wire this clone's core.hooksPath (per-clone opt-in)
+       --install-hooks                         place this clone's git hooks (per-clone opt-in)
        --enter-stage <stage>                   stamp a stage entry (or --rename an iteration)
        --wait-probe <sub> [args]               the wait-primitive probe: 'sweep' is the reproducer
        --run-validate                          run the codified validate spine over the roster
@@ -54,7 +54,7 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
           gate, which requires the selection to resolve to exactly one member:
           two or more with a `--` is a refusal, never a broadcast.
   --for   selects by coupling: every gate whose effective trigger matches one
-          of the given repo-relative paths. The generated hooks' --git-hook
+          of the given repo-relative paths. The placed hooks' --git-hook
           arm calls the same selector. A path no gate couples to is a note,
           not a failure.
   --emit  dispatches the named non-gate arm of the native binary, handing it
@@ -124,14 +124,15 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
           config. The optional positional is the agent file to write into,
           overriding LIFECYCLE_KIT_AGENT_FILE. Idempotent; exit 2 when the agent
           file is absent or a marker pair is malformed, and unavailable is 2.
-  --install-hooks  points this clone's core.hooksPath at the generated hooks dir,
-          sets blame.ignoreRevsFile where that file exists, makes the hooks
-          executable and runs check-identity once so a fresh clone learns of a
-          wrong-identity mapping before its first commit. The gate is resolved
-          through the registry, so a consumer shadow still wins; a consumer
-          without it is skipped. Takes no argument. Exit 0 wired and verified,
-          1 the identity gate's own finding, 2 no hooks dir or an
-          uninterpretable manifest; unavailable is 2.
+  --install-hooks  places the pre-commit and commit-msg hooks, each the gate
+          binary under the hook's name, in gate-hooks under this clone's git
+          directory and points core.hooksPath there, sets blame.ignoreRevsFile
+          where that file exists, and runs check-identity once so a fresh clone
+          learns of a wrong-identity mapping before its first commit. The gate
+          is resolved through the registry, so a consumer shadow still wins; a
+          consumer without it is skipped. Takes no argument. Exit 0 placed and
+          verified, 1 the identity gate's own finding, 2 no gate binary, no
+          repository or an uninterpretable manifest; unavailable is 2.
   --enter-stage  appends the invocation stamp that IS a stage transition, after
           running the entry pre-flight; `--simulate` runs everything up to the
           write and writes nothing, `--rename <name>` renames the iteration

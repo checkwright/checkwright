@@ -40,7 +40,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    ```
    <!-- gate-roster:end -->
 
-   The pre-commit hook runs the gates their `# graph:` manifests trigger, read at commit; `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names writes it once, and again only to add the commit-msg hook when a first `tier=commit-msg` gate is registered.
+   The pre-commit hook runs the gates their `# graph:` manifests trigger, read at commit; `--install-hooks` on the gate binary `GATE_SDK_NATIVE_BIN` names places both hooks in a clone once, and a gate registered later is reached with no re-install.
 
 3. Edit the digest — to drop a rule your project does not keep resident, declare the trim in place: `<!-- doctrine-digest-trim: <rule name> — <reason> -->` inside the digest section. The gate holds the digest in per-rule lockstep with the doctrine modulo declared trims, so a silent omission stays red; point `DOCTRINE_KIT_DIGEST_SECTION` at your heading if it is not `## Delivery doctrine`. The declaration survives the next run: the installer reads your block before it rewrites it and carries each declared marker back into the trimmed rule's position, so re-vendoring never restores a rule you removed. That is the only customization it preserves — see [SPEC.md](SPEC.md#install-doctrine) for the bound and the two findings it reports.
 

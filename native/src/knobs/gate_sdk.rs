@@ -19,10 +19,6 @@ fn in_crate(resolve: Resolve, base: &str) -> Result<Value, String> {
     crate_root(resolve).map(|c| Value::Scalar(format!("{}/{}", c, base)))
 }
 
-fn hooks_dir(resolve: Resolve) -> Result<Value, String> {
-    in_gates_dir(resolve, "git-hooks")
-}
-
 fn root_allowlist(resolve: Resolve) -> Result<Value, String> {
     in_gates_dir(resolve, "root-allowlist.list")
 }
@@ -156,7 +152,6 @@ pub const KIT: Kit = Kit {
         Row::scalar("GATE_SDK_GRAPH_MAX_EDGES", "100000").empty_takes_default(),
         Row::scalar("GATE_SDK_NATIVE_CRATE", "native").empty_takes_default(),
         Row::scalar("GATE_SDK_NATIVE_PUBLISH_WORKFLOW", ".github/workflows/publish.yml").empty_takes_default().words(),
-        Row::derived("GATE_SDK_HOOKS_DIR", Shape::Scalar, hooks_dir, GATES),
         Row::derived("GATE_SDK_ROOT_ALLOWLIST", Shape::Scalar, root_allowlist, GATES),
         Row::derived("GATE_SDK_CORE_FILES_FILE", Shape::Scalar, core_files_file, GATES),
         Row::derived("GATE_SDK_IDENTITY_FILE", Shape::Scalar, identity_file, GATES).empty_takes_default(),

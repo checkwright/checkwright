@@ -136,7 +136,7 @@ pub fn check(pkg_root: &Path, root: &Path, kits: &[String], s: &Selection) -> Re
         return Err(refuse(
             format!("{} cannot be removed: every profile carries it", k),
             format!(
-                "it is the runner, the hook generator and the registry every other kit's gates resolve through; kits a selection may remove: {} ",
+                "it is the runner, the git hooks and the registry every other kit's gates resolve through; kits a selection may remove: {} ",
                 payload.iter().filter(|k| !floor.contains(k)).cloned().collect::<Vec<_>>().join(" ")
             ),
             2,

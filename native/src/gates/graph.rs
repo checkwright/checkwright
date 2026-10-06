@@ -1,7 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-graph — the `# graph:` manifest on every gates.list member is
-// well-formed and consistent, and the generated hooks and the coupling-graph artifact are the
-// faithful projections of those manifests.
-use crate::emit::git_hooks;
+// well-formed and consistent, and the coupling-graph artifact is the faithful projection of those
+// manifests.
 use crate::emit::graph as proj;
 use crate::registry;
 use crate::walk;
@@ -444,12 +443,6 @@ fn read_stripped(p: &str) -> Result<String, String> {
     std::fs::read_to_string(p).map_err(|e| format!("cannot read {}: {}", p, e))
 }
 
-// spec: gate-sdk/SPEC.md §check-graph — the cause as a finding suffix: present it on one line so a
-// CI log reader sees it beside the verdict
-fn because(cause: &str) -> String {
-    format!(" — it said: {}", cause.replace('\n', " | "))
-}
-
 fn rule(args: &[String]) -> Result<i32, String> {
     let cfg = proj::Config::resolve()?;
 
@@ -718,37 +711,6 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    // assertion D: each committed hook is its emitter's handoff to the `--git-hook` arm
-    let regen = format!("regenerate: {}", super::door_command("--emit git-hooks --write")?);
-    let root = walk::cwd()?;
-    let hooks_dir = walk::knob_scalar("GATE_SDK_HOOKS_DIR")?;
-    let hook = format!("{}/pre-commit", hooks_dir.trim_end_matches('/'));
-    if !Path::new(&hook).is_file() {
-        errors.push(format!("ARTIFACT: {} does not exist; {}", hook, regen));
-    } else {
-        match git_hooks::pre_commit() {
-            Err(ref cause) => errors.push(format!("ARTIFACT: the pre-commit hook emission failed; fix it before trusting the hook{}", because(cause))),
-            Ok(ref e) => {
-                if e.trim_end_matches('\n') != read_stripped(&hook)?.trim_end_matches('\n') {
-                    errors.push(format!("ARTIFACT: {} is not its emitter's handoff to the gate binary's --git-hook arm; {}", hook, regen));
-                }
-            }
-        }
-    }
-
-    // assertion D (commit-msg surface)
-    let msg_hook = format!("{}/commit-msg", hooks_dir.trim_end_matches('/'));
-    match git_hooks::commit_msg(&root, &cfg.gates_dir) {
-        Err(ref cause) => errors.push(format!("ARTIFACT: the commit-msg hook emission failed; fix it before trusting the hook{}", because(cause))),
-        Ok(None) => {}
-        Ok(Some(_)) if !Path::new(&msg_hook).is_file() => errors.push(format!("ARTIFACT: {} does not exist but a tier=commit-msg gate is registered; {}", msg_hook, regen)),
-        Ok(Some(ref e)) => {
-            if e.trim_end_matches('\n') != read_stripped(&msg_hook)?.trim_end_matches('\n') {
-                errors.push(format!("ARTIFACT: {} is not its emitter's handoff to the gate binary's --git-hook arm; {}", msg_hook, regen));
-            }
-        }
-    }
-
     // assertion E: the coupling-graph artifact matches the emitter
     let members = proj::projected_members(&cfg)?;
     let emitted = proj::render(&cfg, &members);
@@ -800,10 +762,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for e in &errors {
             println!("  {}", e);
         }
-        println!("  help: fix the '# graph:' manifest / gates.list-membership / hook-trigger mismatch (or the malformed amendment-body manifest), then regenerate the hook and graph artifacts");
+        println!("  help: fix the '# graph:' manifest / gates.list-membership / hook-trigger mismatch (or the malformed amendment-body manifest), then regenerate the graph artifact");
         return Ok(1);
     }
-    println!("CHECK-GRAPH: clean ({} gates{}; manifests well-formed, couples<->trigger parity, cycle valves, the generated pre-commit hook + CHECK-GRAPH.html artifacts fresh, emitted asset hrefs resolve, external refs allowlisted, edge count within the render cap, and amendment-body manifests valid)", checks.len() - unresolved, skipped);
+    println!("CHECK-GRAPH: clean ({} gates{}; manifests well-formed, couples<->trigger parity, cycle valves, the CHECK-GRAPH.html artifact fresh, emitted asset hrefs resolve, external refs allowlisted, edge count within the render cap, and amendment-body manifests valid)", checks.len() - unresolved, skipped);
     Ok(0)
 }
 

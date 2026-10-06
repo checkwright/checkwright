@@ -32,7 +32,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    ```
    <!-- gate-roster:end -->
 
-   The pre-commit hook runs the gates their `# graph:` manifests trigger, read at commit; `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names writes it once, and again only to add the commit-msg hook when a first `tier=commit-msg` gate is registered. `check-docs-render-fidelity` needs ruby plus the kramdown-parser-gfm gem (the Pages parser), and `check-docs-liquid-parse` needs ruby with the `liquid` gem; a consumer without a published docs site simply omits both, and one whose host runs no Liquid omits the second.
+   The pre-commit hook runs the gates their `# graph:` manifests trigger, read at commit; `--install-hooks` on the gate binary `GATE_SDK_NATIVE_BIN` names places both hooks in a clone once, and a gate registered later is reached with no re-install. `check-docs-render-fidelity` needs ruby plus the kramdown-parser-gfm gem (the Pages parser), and `check-docs-liquid-parse` needs ruby with the `liquid` gem; a consumer without a published docs site simply omits both, and one whose host runs no Liquid omits the second.
 
 2. Establish the host source of truth — a CNAME file holding exactly one host line, at the path `SITE_KIT_CNAME` names (site-kit/SPEC.md owns its fallback).
 

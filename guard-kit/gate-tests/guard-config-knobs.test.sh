@@ -94,19 +94,19 @@ want "fallback-find"      "$tmp/defaults.knobs"        "find lib -type f" 2 "fin
 want "fallback-git-grep"  "$tmp/defaults.knobs"        "git grep foo" 2 "grep -rn <pattern> <path>"
 
 # --- rule `git_c_root`'s arm (d): a respelled path names the same file as the knob's resolved value and still
-#     fires, since the generated hooks bake the text; a differing file falls through
+#     fires with the same steer; a differing file falls through
 printf 'GUARD_KIT_SETTINGS = %s/settings.json\n' "$tmp" >"$tmp/settings-path.knobs"
 : >"$tmp/settings.json"
 : >"$tmp/other.json"
 k="$tmp/settings-path.knobs"
 want "knob-echo-verbatim"   "$k" "GUARD_KIT_SETTINGS=$tmp/settings.json make build" 2 "Run it without the prefix: make build"
-want "knob-echo-same-file"  "$k" "GUARD_KIT_SETTINGS=$tmp/./settings.json make build" 2 "check-graph"
+want "knob-echo-same-file"  "$k" "GUARD_KIT_SETTINGS=$tmp/./settings.json make build" 2 "Run it without the prefix: make build"
 want "knob-echo-other-file" "$k" "GUARD_KIT_SETTINGS=$tmp/other.json make build" 0
 # a value spelling a placeholder's letters is read as written, so it is steered like any other
 mkdir -p "$tmp/SQ"
 : >"$tmp/SQ/settings.json"
 printf 'GUARD_KIT_SETTINGS = %s/SQ/settings.json\n' "$tmp" >"$tmp/letters-path.knobs"
-want "knob-echo-letters"    "$tmp/letters-path.knobs" "GUARD_KIT_SETTINGS=$tmp/SQ/./settings.json make build" 2 "check-graph"
+want "knob-echo-letters"    "$tmp/letters-path.knobs" "GUARD_KIT_SETTINGS=$tmp/SQ/./settings.json make build" 2 "Run it without the prefix: make build"
 
 # --- rules `ro_pipeline` and `allowlist_chain` read an entry whose only '*' is a closing ' *' as granting its bare head, which
 #     the harness does: a decorated bare head takes rule `allowlist_chain`'s steer and a read-only tail rule `ro_pipeline`'s

@@ -1825,7 +1825,7 @@ mod tests {
         let r = roster().expect("renders");
         assert!(r.contains("LIFECYCLE_KIT_STATE_FILE\tscalar\t.workflow/WORKFLOW-STATE.txt\n"), "{}", r);
         assert!(r.contains("LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS\tindexed\tTASK-QUEUE.md\n"), "{}", r);
-        assert!(r.contains("GATE_SDK_HOOKS_DIR\tscalar\t${GATE_SDK_GATES_DIR}/git-hooks\n"), "{}", r);
+        assert!(r.contains("GATE_SDK_ROOT_ALLOWLIST\tscalar\t${GATE_SDK_GATES_DIR}/root-allowlist.list\n"), "{}", r);
         assert!(r.contains("LIFECYCLE_KIT_PREDECESSOR\tkeyed\talign=scope\n"), "{}", r);
     }
 

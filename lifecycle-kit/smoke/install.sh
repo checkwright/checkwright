@@ -100,7 +100,6 @@ EOF
 fi
 bash "$SDK/bin/run-gates.sh" --install-lifecycle >/dev/null
 
-bash "$SDK/bin/run-gates.sh" --emit git-hooks --write >/dev/null
 bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html
 
 # spec: gate-sdk/SPEC.md §Consumer smoke — pinned after the artifacts above, never before them

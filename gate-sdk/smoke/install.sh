@@ -32,7 +32,6 @@ check-assertion-strength
 check-commit-subject
 check-core-files
 check-exec-bit
-check-hook-exec-bit
 check-identity
 check-kit-enum
 check-path-dialect
@@ -73,7 +72,6 @@ cat > .workflow/release-declarations.md <<'EOF'
 # contract: gate-sdk/SPEC.md §upgrade-smoke — the accumulating release declaration surface; the note's declaration-bearing sections in the note's grammar, Platforms excepted since composition derives it, appended by the session landing a kit-shipped change or the one discovering its omission, composed into the release note and drained to this header at the tag.
 EOF
 
-bash "$SDK/bin/run-gates.sh" --emit git-hooks --write >/dev/null
 bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html
 
 # spec: gate-sdk/SPEC.md §run-gates — quiet green, loud red: green is one summary line, red prints verbatim, GATE_SDK_VERBOSE restores the banner roll
@@ -140,14 +138,17 @@ grep -q '^usage: --run' <<<"$err" || { echo "smoke(refusal): usage did not reach
 out="$(bash "$SDK/bin/build-native.sh" --help 2>/dev/null)" || { echo "smoke(build-native --help): a help request did not exit 0" >&2; exit 1; }
 grep -q '^usage: build-native.sh' <<<"$out" || { echo "smoke(build-native --help): usage did not reach stdout" >&2; exit 1; }
 
-# spec: gate-sdk/SPEC.md §gen-pre-commit — the emitted hook's capture wrapper: green is one summary line, a red gate's output reprints verbatim
+# spec: gate-sdk/SPEC.md §git-hook — the placed hook's capture wrapper: green is one summary line, a red gate's output reprints verbatim; the opt-in is undone after, so the commits the driver makes later run no hook
+bash "$SDK/bin/run-gates.sh" --install-hooks >/dev/null || { echo "smoke(hook): --install-hooks failed" >&2; exit 1; }
+hook="$(git config --get core.hooksPath)/pre-commit$( source "$SDK/lib/gate.sh" >/dev/null 2>&1; gate_exe_suffix )"
+[[ -x "$hook" ]] || { echo "smoke(hook): --install-hooks placed no executable $hook" >&2; exit 1; }
 cat > scripts/smoke-hook-probe.sh <<'EOF'
 #!/usr/bin/env bash
 set -uo pipefail
 echo "probe"
 EOF
 git add scripts/smoke-hook-probe.sh
-out="$(env -u GATE_SDK_VERBOSE bash scripts/git-hooks/pre-commit)" || { echo "smoke(hook): green hook run failed" >&2; exit 1; }
+out="$(env -u GATE_SDK_VERBOSE "$hook")" || { echo "smoke(hook): green hook run failed" >&2; exit 1; }
 grep -qE 'pre-commit: [0-9]+ gate\(s\) passed\.' <<<"$out" || { echo "smoke(hook): green hook summary missing" >&2; exit 1; }
 if grep -q ': clean' <<<"$out"; then echo "smoke(hook): green hook printed gate output" >&2; exit 1; fi
 
@@ -158,11 +159,13 @@ unused_var="never read"
 echo "probe"
 EOF
 git add scripts/smoke-hook-probe.sh
-if out="$(env -u GATE_SDK_VERBOSE bash scripts/git-hooks/pre-commit 2>&1)"; then echo "smoke(hook): red hook run passed" >&2; exit 1; fi
+if out="$(env -u GATE_SDK_VERBOSE "$hook" 2>&1)"; then echo "smoke(hook): red hook run passed" >&2; exit 1; fi
 grep -q 'pre-commit: check-shellcheck failed' <<<"$out" || { echo "smoke(hook): red hook did not name the gate" >&2; exit 1; }
 grep -q 'unused_var' <<<"$out" || { echo "smoke(hook): red hook output not verbatim" >&2; exit 1; }
 git reset -q -- scripts/smoke-hook-probe.sh
 rm scripts/smoke-hook-probe.sh
+git config --unset core.hooksPath
+rm -rf "${hook%/*}"
 
 # spec: gate-sdk/SPEC.md §measure-commit — the kit smoke's cases, over a stub registry because this
 # consumer is uncommitted until every kit has installed
@@ -352,6 +355,5 @@ if grep -q ' owed' <<<"$out"; then
 fi
 rm -rf "$nogit"
 
-# spec: gate-sdk/SPEC.md §Consumer smoke — the leg's last act: its artifacts describe every vendored kit root, the tree the battery reads, so they are regenerated outside this leg's narrowing once the narrowed hook exercise above is done
-env -u GATE_SDK_KIT_DIRS bash "$SDK/bin/run-gates.sh" --emit git-hooks --write >/dev/null
+# spec: gate-sdk/SPEC.md §Consumer smoke — the leg's last act: its graph artifact describes every vendored kit root, the tree the battery reads, so it is regenerated outside this leg's narrowing once the narrowed hook exercise above is done
 env -u GATE_SDK_KIT_DIRS bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html

@@ -42,7 +42,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    ```
    <!-- gate-roster:end -->
 
-   They resolve through gate-sdk's registry path (your gates dir first, then each kit's `checks/`), and the hooks run those their `# graph:` manifests trigger, read at commit (`check-stamp-subject` and `check-dispatch-entry` in the commit-msg hook). `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names writes the pre-commit hook once, and again only to add the commit-msg hook when a first `tier=commit-msg` gate is registered.
+   They resolve through gate-sdk's registry path (your gates dir first, then each kit's `checks/`), and the hooks run those their `# graph:` manifests trigger, read at commit (`check-stamp-subject` and `check-dispatch-entry` in the commit-msg hook). `--install-hooks` on the gate binary `GATE_SDK_NATIVE_BIN` names places both hooks in a clone once, and a gate registered later is reached with no re-install.
 
 2. Give the queue file its header and each evidence file its skeleton — the stage-stamp file and the lesson-disposition file (`LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, both boundary-reset to their header). The queue header line:
 

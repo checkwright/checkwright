@@ -46,7 +46,8 @@ pub(super) fn hooked_move(state: &mut Run) -> Step {
         return Err(failed(&m, "the hooked move arm could not install the hooks"));
     }
     let hooks = git_out(&hc, &["config", "core.hooksPath"]).unwrap_or_default().trim().to_string();
-    if hooks.is_empty() || !crate::proc::is_executable(Path::new(&format!("{}/{}/pre-commit", hc, hooks))) {
+    let placed = Path::new(&hooks).join(crate::emit::hook_launcher::file_name("pre-commit"));
+    if hooks.is_empty() || !crate::proc::is_executable(&placed) {
         return Err(fail(
             "the hooked move arm's consumer has no executable pre-commit hook after --install-hooks, so its commits below are judged by nothing",
         ));

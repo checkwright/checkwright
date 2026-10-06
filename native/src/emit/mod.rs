@@ -29,7 +29,7 @@ pub mod foreign_run;
 pub mod foreign_shells;
 pub mod front_end_parity;
 pub mod git_hook;
-pub mod git_hooks;
+pub mod hook_launcher;
 pub mod graph;
 pub mod install_evidence;
 pub mod install_hooks;
@@ -384,13 +384,6 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
             // for them, read off the descriptor corpus.
             crate::registry::EVERY_COUPLES_KNOB,
         ],
-    ),
-    // spec: gate-sdk/SPEC.md §gen-pre-commit — an `Arm::Emit` whose operand names the hook, and
-    // whose `--write` operand writes both, on `--emit-docs-mirror`'s precedent
-    (
-        "--emit-git-hooks",
-        Arm::Emit(git_hooks::emit, Grammar::Parsed(git_hooks::USAGE)),
-        git_hooks::KNOBS,
     ),
     // spec: queue-kit/SPEC.md §The queue-index arm — the class's first *query* member as well as a
     // generator, and configured: a hardcoded flag would hide its reads from the knob-file derivation
@@ -859,7 +852,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         install_hooks::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §git-hook — an `Arm::Run` because its 1, a member's red, is the status
-    // git refuses the commit on; its caller is git through the generated hooks, so it is no
+    // git refuses the commit on; its caller is git through the placed hooks, so it is no
     // harness-integration arm and does not fail open
     (
         "--git-hook",

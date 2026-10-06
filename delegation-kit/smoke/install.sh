@@ -81,5 +81,4 @@ if [[ "$(grep -c . "$sp/probe.log")" -ne 1 ]]; then
 fi
 rm -rf "$sp"
 
-bash "$SDK/bin/run-gates.sh" --emit git-hooks --write >/dev/null
 bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html

@@ -6,4 +6,4 @@ set -euo pipefail
 
 echo "check-door-binding"
 
-printf '\n%s\n' 'Regenerate the hooks: `bash gate-sdk/bin/run-gates.sh --emit git-hooks --write`.' >> "$SMOKE_KIT_ROOT/README.md"
+printf '\n%s\n' 'Regenerate the graph: `bash gate-sdk/bin/run-gates.sh --emit graph`.' >> "$SMOKE_KIT_ROOT/README.md"

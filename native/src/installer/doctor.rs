@@ -336,6 +336,15 @@ fn latest_line(r: &crate::emit::update_notice::Reading) -> String {
     }
 }
 
+// spec: installer/SPEC.md §doctor — the hook state on one line, none of it a failure
+fn hooks_line(opted_in: bool, missing: &[String]) -> String {
+    match (opted_in, missing.is_empty()) {
+        (false, _) => "not opted in".to_string(),
+        (true, true) => "opted in, both hooks present".to_string(),
+        (true, false) => format!("opted in, {} missing — run --install-hooks", missing.join(" and ")),
+    }
+}
+
 pub fn diagnose(selection: Option<&Selection>, caller: Caller) -> Report {
     let mut out = String::new();
     let mut err = String::new();
@@ -454,6 +463,11 @@ pub fn diagnose(selection: Option<&Selection>, caller: Caller) -> Report {
                     }
                 }
             }
+
+            let hooks = crate::emit::hook_launcher::hooks_dir(&root);
+            let opted = hooks.as_deref().is_some_and(|d| crate::emit::hook_launcher::opted_in(&root, d));
+            let gone = hooks.as_deref().map(crate::emit::hook_launcher::missing).unwrap_or_default();
+            let _ = writeln!(out, "  {:<12} {}", "hooks", hooks_line(opted, &gone));
 
             if !list.is_empty() {
                 if let Ok(text) = std::fs::read_to_string(root.join(&list)) {
@@ -672,6 +686,18 @@ mod tests {
 
     // spec: installer/SPEC.md §The verbs — `--help` answers on its own and an unknown argument is
     // a usage refusal rather than an ignored token.
+    // spec: installer/SPEC.md §doctor — the three hook states, the missing one naming its remedy
+    #[test]
+    fn the_hook_line_names_each_state_and_the_remedy_for_a_missing_hook() {
+        assert_eq!(hooks_line(false, &[]), "not opted in");
+        assert_eq!(hooks_line(false, &["pre-commit".to_string()]), "not opted in");
+        assert_eq!(hooks_line(true, &[]), "opted in, both hooks present");
+        assert_eq!(
+            hooks_line(true, &["commit-msg".to_string()]),
+            "opted in, commit-msg missing — run --install-hooks"
+        );
+    }
+
     #[test]
     fn help_answers_and_an_unknown_argument_refuses() {
         assert_eq!(run(&["--help".to_string()]), 0);

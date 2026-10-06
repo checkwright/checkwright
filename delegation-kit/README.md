@@ -19,7 +19,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    ```
    <!-- gate-roster:end -->
 
-   They resolve through gate-sdk's registry path and the pre-commit hook runs those their `# graph:` manifests trigger, read at commit. `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names writes that hook once, and again only to add the commit-msg hook when a first `tier=commit-msg` gate is registered.
+   They resolve through gate-sdk's registry path and the pre-commit hook runs those their `# graph:` manifests trigger, read at commit. `--install-hooks` on the gate binary `GATE_SDK_NATIVE_BIN` names places both hooks in a clone once, and a gate registered later is reached with no re-install.
 
 2. Bind the protocol skill and add its resident pointer:
    - Create `agent-execution.md` in your agent-skill directory as a binding shim naming `templates/agent-execution.md` and binding its two slots — the shared-file roster and the validate battery ([SPEC.md §One template, a resident pointer](SPEC.md#one-template-a-resident-pointer)).

@@ -21,7 +21,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    ```
    <!-- gate-roster:end -->
 
-   The pre-commit hook runs the gates their `# graph:` manifests trigger, read at commit; `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names writes it once, and again only to add the commit-msg hook when a first `tier=commit-msg` gate is registered.
+   The pre-commit hook runs the gates their `# graph:` manifests trigger, read at commit; `--install-hooks` on the gate binary `GATE_SDK_NATIVE_BIN` names places both hooks in a clone once, and a gate registered later is reached with no re-install.
 
 2. Seed the two surfaces — `.workflow/validate-baseline.txt`:
 

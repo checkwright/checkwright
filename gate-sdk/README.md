@@ -5,15 +5,15 @@ A self-testing lint framework for the surfaces conventional linters ignore: mark
 A **gate** is a small program checking one invariant across one or more governed surfaces. The kit ships the machinery that keeps a gate family honest:
 
 - `lib/gate.sh` — the one sourced helper: the `fail_closed` wrapper (a crashed parser must never read as "clean"), the fixture-tree prune adapters, and the registry/resolution helpers.
-- `bin/run-gates.sh` — the aggregate battery: every gate in your `gates.list`, one shot, per-gate timings. Two selectors narrow it without losing the knob files or the output contract: `--only <name>...` runs the gates you name (in registry order; an unregistered name is a refusal), and `--for <path>...` runs the gates coupling to the paths you name, exactly as the generated hook would. On a native-Windows host with no bash on `PATH`, its PowerShell twin `bin/run-gates.ps1` takes the same arguments.
+- `bin/run-gates.sh` — the aggregate battery: every gate in your `gates.list`, one shot, per-gate timings. Two selectors narrow it without losing the knob files or the output contract: `--only <name>...` runs the gates you name (in registry order; an unregistered name is a refusal), and `--for <path>...` runs the gates coupling to the paths you name, exactly as the pre-commit hook would. On a native-Windows host with no bash on `PATH`, its PowerShell twin `bin/run-gates.ps1` takes the same arguments.
 - the `--run-gate-tests` arm — the golden-fixture runner: every gate proves it accepts a `good/` case and rejects a `bad/` case with the right error text.
 - the `--run-consumer-smoke` arm — the end-to-end check no fixture makes: builds a fresh scratch consumer, runs each vendored kit's `smoke/` installer, and asserts the battery is green under zero config (then red on each kit's crafted violation). Each kit ships a `smoke/` directory to join the party.
-- the `--emit git-hooks` and `--install-hooks` arms — the `pre-commit` and `commit-msg` hooks *generated* from per-gate `# graph:` coupling manifests (`tier=precommit` vs `tier=commit-msg`); adding a gate to a hook is manifest-only, so hook membership cannot drift. A manifest's trigger reach is read with `--for`, never off the field ([SPEC.md §Reading a `couples=` field's reach](SPEC.md#reading-a-couples-fields-reach)).
+- the `--install-hooks` arm — places the `pre-commit` and `commit-msg` hooks in a clone, each the gate binary under the hook's name, which git starts with no shell; what a hook runs is read at commit from per-gate `# graph:` coupling manifests (`tier=precommit` vs `tier=commit-msg`), so adding a gate to a hook is manifest-only and hook membership cannot drift. A manifest's trigger reach is read with `--for`, never off the field ([SPEC.md §Reading a `couples=` field's reach](SPEC.md#reading-a-couples-fields-reach)).
 - `bin/build-native.sh` — the one spelling of the crate build for the binary substrate: resolves the crate from `GATE_SDK_NATIVE_CRATE`, passes trailing arguments to cargo (so a per-target build reuses it), and returns cargo's own exit code. Every reader of that command cites this script rather than copying it.
-- `checks/` — the meta-gates that hold the family to its own standard: ShellCheck self-lint, the output contract, the fail-closed contract, fixture coverage, SPEC↔code assertion coupling, exemption-list hygiene, and manifest / hook / graph-artifact freshness (`check-graph`).
+- `checks/` — the meta-gates that hold the family to its own standard: ShellCheck self-lint, the output contract, the fail-closed contract, fixture coverage, SPEC↔code assertion coupling, exemption-list hygiene, and manifest / graph-artifact freshness (`check-graph`).
 - `templates/check-skeleton.sh` — the copy-paste skeleton a new gate starts from; `templates/gates-workflow.yml` — the CI workflow a consumer copies to `.github/workflows/gates.yml`; `templates/adopt.md` — the walk an agent follows after `init`: knobs fitted to your layout, first reds triaged.
 
-Enforcement runs in three concentric tiers, each an outer backstop for the one inside it: the generated `pre-commit` hook, the local and bypassable inner tier; `run-gates.sh`'s pre-push full battery, whole-tree before the work leaves the machine; and the CI workflow, the server-side backstop that catches a `--no-verify` or a clone that never opted in. Only CI is a guarantee — see [SPEC.md §Enforcement tiers](SPEC.md#enforcement-tiers) for the full definition, including the deferred hosted-attestation rung beyond these three (so CI cannot be edited away in the same change) that is out of scope here.
+Enforcement runs in three concentric tiers, each an outer backstop for the one inside it: the `pre-commit` hook, the local and bypassable inner tier; `run-gates.sh`'s pre-push full battery, whole-tree before the work leaves the machine; and the CI workflow, the server-side backstop that catches a `--no-verify` or a clone that never opted in. Only CI is a guarantee — see [SPEC.md §Enforcement tiers](SPEC.md#enforcement-tiers) for the full definition, including the deferred hosted-attestation rung beyond these three (so CI cannot be edited away in the same change) that is out of scope here.
 
 The design contracts, the manifest grammar, and each component's full contract live in [SPEC.md](SPEC.md).
 
@@ -43,11 +43,10 @@ Then run these arms with the gate binary `GATE_SDK_NATIVE_BIN` names, where `ini
 
 ```sh
 gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
-"$gates" --emit git-hooks --write          # generate the hooks
 "$gates" --emit graph > scripts/CHECK-GRAPH.html   # the coupling graph
 "$gates" --emit enforcement-map > docs/enforcement.md # the enforcement map (regenerate on any class-registry change)
 "$gates" --emit port-blockers --tree        # the port report over the tracked shell tree
-"$gates" --install-hooks                    # opt in this clone
+"$gates" --install-hooks                    # place the hooks in this clone
 
 "$gates" --run                              # the full battery
 "$gates" --only check-graph                 # one gate's verdict
@@ -85,7 +84,6 @@ check-readme-roster
 check-smoke-entry-guard
 check-core-files
 check-identity
-check-hook-exec-bit
 check-exec-bit
 check-root-tiering
 check-workflow-tiering

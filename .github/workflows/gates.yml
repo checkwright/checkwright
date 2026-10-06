@@ -93,8 +93,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      # spec: gate-sdk/SPEC.md §gen-pre-commit — each hook is two lines of POSIX sh; this names the /bin/sh they run under
-      - name: name the shell the hooks run under
+      # spec: installer/SPEC.md §Implementation — the unix bootstrap is POSIX sh; this names the /bin/sh it runs under
+      - name: name the shell the unix bootstrap runs under
         shell: bash
         run: readlink -f /bin/sh
 
@@ -129,6 +129,69 @@ jobs:
           chmod +x "$dest"
           [[ -x "$dest" ]] || { echo "could not place the producer's $host artifact at $dest"; exit 1; }
           echo "SMOKE_ARTIFACTS=$art" >> "$GITHUB_ENV"
+
+      # spec: installer/SPEC.md §The consumer smoke — git starts a copy of the gate binary named for the hook, with no interpreter
+      - name: git starts a native pre-commit hook
+        shell: bash
+        run: |
+          set -euo pipefail
+          source gate-sdk/lib/gate.sh
+          bin="$PWD/$(gate_native_bin)"
+          t="$RUNNER_TEMP/native-hook"
+          rm -rf "$t"
+          mkdir -p "$t/repo/scripts" "$t/hooks"
+          cp "$bin" "$t/hooks/pre-commit"
+          chmod +x "$t/hooks/pre-commit"
+          printf 'check-pipe-membership\n' > "$t/repo/scripts/gates.list"
+          printf 'GATE_SDK_NATIVE_BIN = %s\nGATE_SDK_KIT_DIRS = %s\n' "$bin" "$PWD/gate-sdk" > "$t/repo/scripts/gate-sdk-config.knobs"
+          cd "$t/repo"
+          git init -q .
+          git config user.email probe@example.invalid
+          git config user.name probe
+          git config core.hooksPath "$t/hooks"
+          git add -A
+          git commit -q --no-verify -m 'chore: seed'
+          printf 'probe\n' > clean.txt
+          git add clean.txt
+          out="$(git commit -m 'docs: a clean change' 2>&1)" || { echo "::error::git did not land a clean commit through a native pre-commit hook: $out"; exit 1; }
+          grep -q 'pre-commit: [0-9]* gate(s) passed' <<<"$out" || { echo "::error::the clean commit landed without the native hook's summary line, so git did not start it: $out"; exit 1; }
+          printf '%s\n' '#!/usr/bin/env bash' 'set -o pipefail' 'names=(a b c)' 'if printf "%s\n" "${names[@]}" | grep -q b; then echo found; fi' > violation.sh
+          git add violation.sh
+          if out="$(git commit -m 'chore: a pipeline that can lose its match' 2>&1)"; then echo "::error::a violating commit landed through the native hook: $out"; exit 1; fi
+          grep -q 'check-pipe-membership failed' <<<"$out" || { echo "::error::the refusal does not name the gate: $out"; exit 1; }
+          git reset -q --hard HEAD
+          echo "git started a native pre-commit hook with no interpreter: a clean commit landed and a violating one was refused by check-pipe-membership"
+
+      # spec: installer/SPEC.md §The consumer smoke — probe steps report and never fail; the hook's start cost, native against a sh handoff
+      - name: probe what a hook start costs
+        if: ${{ !cancelled() }}
+        shell: bash
+        run: |
+          set +e
+          source gate-sdk/lib/gate.sh
+          bin="$PWD/$(gate_native_bin)"
+          t="$RUNNER_TEMP/native-hook"
+          mkdir -p "$t/sh-hooks"
+          printf '#!/bin/sh\nexec %s --git-hook pre-commit\n' "$bin" > "$t/sh-hooks/pre-commit"
+          chmod +x "$t/sh-hooks/pre-commit"
+          cd "$t/repo" || exit 0
+          median() {
+            local hook="$1" i a b
+            for ((i = 0; i < 101; i++)); do
+              a="${EPOCHREALTIME/[.,]/}"
+              "$hook" > /dev/null 2>&1
+              b="${EPOCHREALTIME/[.,]/}"
+              echo "$((b - a))"
+            done | sort -n | sed -n '51p'
+          }
+          if [ -z "${EPOCHREALTIME:-}" ]; then
+            echo "this bash carries no EPOCHREALTIME, so the start cost is unmeasured on this leg"
+            exit 0
+          fi
+          echo "host: $(uname -s) $(uname -m)"
+          echo "native hook start: $(median "$t/hooks/pre-commit") us, median of 101 with nothing staged"
+          echo "sh handoff start:  $(median "$t/sh-hooks/pre-commit") us, median of 101 with nothing staged"
+          exit 0
 
       # spec: installer/SPEC.md §The consumer smoke — the static artifact serves a musl host and a glibc host below the glibc floor, and the glibc artifact runs on neither, the premise selection's fallback rests on
       - name: run both x86_64 Linux artifacts on a musl host and on a glibc 2.36 host
@@ -560,6 +623,7 @@ jobs:
             echo "PWSH_SCRATCH=$(cygpath -w "$tmp")"
             echo "PWSH_TARGET=$host"
             echo "PWSH_BIN=$bin"
+            echo "PWSH_GATE_BIN=$(cygpath -m "$PWD/$dest")"
             echo "PWSH_TARBALL=$(cygpath -w "${tarballs[0]}")"
             echo "PWSH_VERSION=$version"
             echo "PWSH_ARTIFACTS=$(cygpath -w "$art")"
@@ -754,9 +818,116 @@ jobs:
           if ($script:fails -gt 0) { Write-Host "$($script:fails) assertion(s) failed"; exit 1 }
           Write-Host "the PowerShell bootstrap answered all five steps and carried an install end to end"
 
-      # spec: gate-sdk/SPEC.md §gen-pre-commit — the handoff hooks on native Windows; this is the oracle
+      # spec: installer/SPEC.md §The consumer smoke — git starts a copy of the gate binary named for the hook, with no interpreter, and again with the bundled sh renamed away
+      - name: git starts a native pre-commit hook
+        if: matrix.part == 'bootstrap'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (Test-Path Variable:PSNativeCommandArgumentPassing) { $PSNativeCommandArgumentPassing = 'Standard' }
+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) { $PSNativeCommandUseErrorActionPreference = $false }
+          $bin = $env:PWSH_GATE_BIN
+          $t = Join-Path $env:PWSH_SCRATCH 'native-hook'
+          if (Test-Path -LiteralPath $t) { Remove-Item -LiteralPath $t -Recurse -Force }
+          $repo = Join-Path $t 'repo'
+          $hooks = Join-Path $t 'hooks'
+          New-Item -ItemType Directory -Force -Path (Join-Path $repo 'scripts'), $hooks | Out-Null
+          Copy-Item -LiteralPath $bin -Destination (Join-Path $hooks 'pre-commit.exe')
+          $kit = (Join-Path $env:GITHUB_WORKSPACE 'gate-sdk') -replace '\\', '/'
+          [IO.File]::WriteAllText((Join-Path $repo 'scripts/gates.list'), "check-pipe-membership`n")
+          [IO.File]::WriteAllText((Join-Path $repo 'scripts/gate-sdk-config.knobs'), "GATE_SDK_NATIVE_BIN = $bin`nGATE_SDK_KIT_DIRS = $kit`n")
+          $script:fails = 0
+          function Check([string] $label, [object] $cond, [string] $detail) {
+              if ($cond) { Write-Host "ok   $label" }
+              else { Write-Host "BAD  $label -- $detail"; $script:fails++ }
+          }
+          git -C $repo init -q .
+          git -C $repo config user.email probe@example.invalid
+          git -C $repo config user.name probe
+          git -C $repo config core.hooksPath ($hooks -replace '\\', '/')
+          git -C $repo add -A
+          git -C $repo commit -q --no-verify -m 'chore: seed'
+          function Both([string] $when, [string] $tag) {
+              $head = git -C $repo rev-parse HEAD
+              [IO.File]::WriteAllText((Join-Path $repo "clean-$tag.txt"), "probe`n")
+              git -C $repo add "clean-$tag.txt"
+              $out = (& git -C $repo commit -m "docs: a clean change, $tag" 2>&1) -join "`n"
+              $code = $LASTEXITCODE
+              Check "$when, the clean commit landed" ($code -eq 0 -and (git -C $repo rev-parse HEAD) -ne $head) "exit $code -- $out"
+              Check "$when, git started the native hook, which printed its passed line" ($out -match 'pre-commit: \d+ gate\(s\) passed') "$out"
+              $head = git -C $repo rev-parse HEAD
+              [IO.File]::WriteAllText((Join-Path $repo "violation-$tag.sh"),
+                  ('#!/usr/bin/env bash' + "`n" + 'set -o pipefail' + "`n" + 'names=(a b c)' + "`n" + 'if printf "%s\n" "${names[@]}" | grep -q b; then echo found; fi' + "`n"))
+              git -C $repo add "violation-$tag.sh"
+              $out = (& git -C $repo commit -m "chore: a pipeline that can lose its match, $tag" 2>&1) -join "`n"
+              $code = $LASTEXITCODE
+              Check "$when, the violating commit was refused" ($code -ne 0 -and (git -C $repo rev-parse HEAD) -eq $head) "exit $code -- $out"
+              Check "$when, the refusal names the gate that owns the violation" ($out -match 'check-pipe-membership failed') "$out"
+              git -C $repo reset -q --hard HEAD
+          }
+          Write-Host "== a copy of the gate binary named pre-commit.exe under a scratch core.hooksPath =="
+          Both 'with the bundled sh in place' 'sh'
+          $gitRoot = Split-Path (Split-Path (Split-Path (& git --exec-path)))
+          $shells = @(Get-ChildItem -LiteralPath $gitRoot -Recurse -Filter 'sh.exe' -File -ErrorAction SilentlyContinue)
+          if ($shells.Count -eq 0) { Write-Host "::error::no sh.exe under $gitRoot, so there is nothing to rename away"; exit 1 }
+          $renamed = New-Object System.Collections.Generic.List[string]
+          try {
+              foreach ($s in $shells) {
+                  Rename-Item -LiteralPath $s.FullName -NewName ($s.Name + '.probe-away')
+                  $renamed.Add($s.FullName)
+                  Write-Host "  renamed away $($s.FullName)"
+              }
+              Both 'with every bundled sh.exe renamed away' 'nosh'
+          } finally {
+              foreach ($p in $renamed) { Rename-Item -LiteralPath ($p + '.probe-away') -NewName (Split-Path $p -Leaf) }
+              Write-Host "restored $($renamed.Count) sh.exe"
+          }
+          if ($script:fails -gt 0) { Write-Host "::error::git did not start a native pre-commit.exe as the pre-commit hook: $($script:fails) assertion(s) failed"; exit 1 }
+          Write-Host "git started a native pre-commit.exe with no interpreter, the bundled sh present and renamed away alike"
+
+      # spec: installer/SPEC.md §The consumer smoke — probe steps report and never fail; the hook's start cost, native against a sh handoff
+      - name: probe what a hook start costs
+        if: ${{ !cancelled() && matrix.part == 'bootstrap' }}
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Continue'
+          try {
+              $bin = $env:PWSH_GATE_BIN
+              $t = Join-Path $env:PWSH_SCRATCH 'native-hook'
+              $repo = Join-Path $t 'repo'
+              $native = Join-Path $t 'hooks/pre-commit.exe'
+              $shHook = ((Join-Path $t 'sh-hooks/pre-commit') -replace '\\', '/')
+              New-Item -ItemType Directory -Force -Path (Join-Path $t 'sh-hooks') | Out-Null
+              [IO.File]::WriteAllText($shHook, "#!/bin/sh`nexec '$bin' --git-hook pre-commit`n")
+              $gitRoot = Split-Path (Split-Path (Split-Path (& git --exec-path)))
+              $sh = Join-Path $gitRoot 'bin/sh.exe'
+              function Median([scriptblock] $run) {
+                  $s = New-Object System.Collections.Generic.List[double]
+                  for ($i = 0; $i -lt 101; $i++) {
+                      $w = [Diagnostics.Stopwatch]::StartNew()
+                      & $run *> $null
+                      $w.Stop()
+                      $s.Add($w.Elapsed.TotalMilliseconds * 1000)
+                  }
+                  $s.Sort()
+                  [int] $s[50]
+              }
+              Push-Location $repo
+              try {
+                  Write-Host "host: Windows $env:PROCESSOR_ARCHITECTURE, target $env:PWSH_TARGET"
+                  Write-Host "native hook start: $(Median { & $native }) us, median of 101 with nothing staged"
+                  if (Test-Path -LiteralPath $sh -PathType Leaf) {
+                      Write-Host "sh handoff start:  $(Median { & $sh $shHook }) us, median of 101 with nothing staged, through $sh"
+                  } else {
+                      Write-Host "no sh.exe at $sh, so the sh handoff is unmeasured on this leg"
+                  }
+              } finally { Pop-Location }
+          } catch { Write-Host "the probe could not run: $_" }
+          exit 0
+
+      # spec: gate-sdk/SPEC.md §git-hook — the placed hooks on native Windows; this is the oracle
       # comment-tier-exempt: the system directory is spared, its bash.exe being the WSL launcher
-      - name: commit through the generated hooks with no bash on PATH
+      - name: commit through the placed hooks with no bash on PATH
         if: matrix.part == 'bootstrap'
         shell: pwsh
         run: |
@@ -820,11 +991,11 @@ jobs:
               Check "the printed '$($hooksLine -join ' ')' wired the hooks" `
                     ($icode -eq 0 -and (git config --get core.hooksPath)) "exit $icode -- $iout"
 
-              Write-Host "== step 3: a clean change commits through the handoff hook git runs itself =="
+              Write-Host "== step 3: a clean change commits through the placed hook git starts itself =="
               $head = git rev-parse HEAD
               [IO.File]::WriteAllText((Join-Path $consumer 'hooks-probe.txt'), "probe`n")
               git add hooks-probe.txt
-              $cout = (& git commit -m 'docs: probe the generated hooks' 2>&1) -join "`n"
+              $cout = (& git commit -m 'docs: probe the placed hooks' 2>&1) -join "`n"
               $ccode = $LASTEXITCODE
               Check "the clean commit landed" ($ccode -eq 0 -and (git rev-parse HEAD) -ne $head) "exit $ccode -- $cout"
               Check "the pre-commit hook ran and printed its passed line" ($cout -match 'pre-commit: \d+ gate\(s\) passed') "$cout"
@@ -841,10 +1012,10 @@ jobs:
           } finally { Pop-Location }
 
           if ($script:fails -gt 0) { Write-Host "$($script:fails) assertion(s) failed"; exit 1 }
-          Write-Host "git ran the handoff hooks with no bash on PATH, and they both passed and refused"
+          Write-Host "git ran the placed hooks with no bash on PATH, and they both passed and refused"
 
-      # spec: gate-sdk/SPEC.md §gen-pre-commit — the standing witness that the hook needs the sh Git for Windows bundles
-      - name: probe whether git runs the handoff hook with its bundled sh renamed away
+      # spec: gate-sdk/SPEC.md §git-hook — the standing witness that the placed hook starts with the sh Git for Windows bundles renamed away
+      - name: commit through the placed hook with the bundled sh renamed away
         if: matrix.part == 'bootstrap'
         shell: pwsh
         run: |
@@ -855,10 +1026,10 @@ jobs:
           $gitRoot = Split-Path (Split-Path (Split-Path (& git --exec-path)))
           Write-Host "Git for Windows install root: $gitRoot"
           $shells = @(Get-ChildItem -LiteralPath $gitRoot -Recurse -Filter 'sh.exe' -File -ErrorAction SilentlyContinue)
-          if ($shells.Count -eq 0) { Write-Host "::error::no sh.exe under $gitRoot, so the probe has nothing to rename away"; exit 1 }
-          $hook = Join-Path $consumer ((git -C $consumer config --get core.hooksPath) + '/pre-commit')
-          Write-Host "== the hook under probe: $hook =="
-          Get-Content -LiteralPath $hook | ForEach-Object { Write-Host "  | $_" }
+          if ($shells.Count -eq 0) { Write-Host "::error::no sh.exe under $gitRoot, so the witness has nothing to rename away"; exit 1 }
+          $hook = (git -C $consumer config --get core.hooksPath) + '/pre-commit.exe'
+          Write-Host "== the hook under witness: $hook =="
+          if (-not (Test-Path -LiteralPath $hook -PathType Leaf)) { Write-Host "::error::core.hooksPath names no pre-commit.exe at $hook, so no placed hook is under witness"; exit 1 }
           git -C $consumer reset -q --hard HEAD
           $head = git -C $consumer rev-parse HEAD
           $renamed = New-Object System.Collections.Generic.List[string]
@@ -880,14 +1051,14 @@ jobs:
           }
           Write-Host "== git commit exited $code =="
           Write-Host $out
-          $ran = $out -match 'gate\(s\) passed|failed \(see above\)'
+          $ran = $out -match 'pre-commit: \d+ gate\(s\) passed'
           Write-Host "the hook ran with the bundled sh renamed away: $(if ($ran) { 'yes' } else { 'no' })"
           git -C $consumer reset -q --hard $head
-          if ($ran -or $code -eq 0) {
-              Write-Host "::error::git ran the handoff hook, or landed the commit, with every bundled sh.exe renamed away, so the hook's form on native Windows is an open question"
+          if (-not $ran -or $code -ne 0) {
+              Write-Host "::error::the placed hook could not start without sh: with every bundled sh.exe renamed away the commit exited $code and the pre-commit hook $(if ($ran) { 'printed' } else { 'did not print' }) its passed line"
               exit 1
           }
-          Write-Host "git could not start the handoff hook without the sh it bundles, and refused the commit"
+          Write-Host "git started the placed hook with the sh it bundles renamed away, and the commit landed"
 
       # spec: installer/SPEC.md §Platform resolution — the POSIX half's witness on this Windows host
       - name: the POSIX bootstrap installs the lattice minimum on this Windows host
@@ -1872,6 +2043,69 @@ jobs:
           [[ -x "$dest" ]] || { echo "could not place the producer's $host artifact at $dest"; exit 1; }
           echo "SMOKE_ARTIFACTS=$art" >> "$GITHUB_ENV"
 
+      # spec: installer/SPEC.md §The consumer smoke — git starts a copy of the gate binary named for the hook, with no interpreter
+      - name: git starts a native pre-commit hook
+        shell: bash
+        run: |
+          set -euo pipefail
+          source gate-sdk/lib/gate.sh
+          bin="$PWD/$(gate_native_bin)"
+          t="$RUNNER_TEMP/native-hook"
+          rm -rf "$t"
+          mkdir -p "$t/repo/scripts" "$t/hooks"
+          cp "$bin" "$t/hooks/pre-commit"
+          chmod +x "$t/hooks/pre-commit"
+          printf 'check-pipe-membership\n' > "$t/repo/scripts/gates.list"
+          printf 'GATE_SDK_NATIVE_BIN = %s\nGATE_SDK_KIT_DIRS = %s\n' "$bin" "$PWD/gate-sdk" > "$t/repo/scripts/gate-sdk-config.knobs"
+          cd "$t/repo"
+          git init -q .
+          git config user.email probe@example.invalid
+          git config user.name probe
+          git config core.hooksPath "$t/hooks"
+          git add -A
+          git commit -q --no-verify -m 'chore: seed'
+          printf 'probe\n' > clean.txt
+          git add clean.txt
+          out="$(git commit -m 'docs: a clean change' 2>&1)" || { echo "::error::git did not land a clean commit through a native pre-commit hook: $out"; exit 1; }
+          grep -q 'pre-commit: [0-9]* gate(s) passed' <<<"$out" || { echo "::error::the clean commit landed without the native hook's summary line, so git did not start it: $out"; exit 1; }
+          printf '%s\n' '#!/usr/bin/env bash' 'set -o pipefail' 'names=(a b c)' 'if printf "%s\n" "${names[@]}" | grep -q b; then echo found; fi' > violation.sh
+          git add violation.sh
+          if out="$(git commit -m 'chore: a pipeline that can lose its match' 2>&1)"; then echo "::error::a violating commit landed through the native hook: $out"; exit 1; fi
+          grep -q 'check-pipe-membership failed' <<<"$out" || { echo "::error::the refusal does not name the gate: $out"; exit 1; }
+          git reset -q --hard HEAD
+          echo "git started a native pre-commit hook with no interpreter: a clean commit landed and a violating one was refused by check-pipe-membership"
+
+      # spec: installer/SPEC.md §The consumer smoke — probe steps report and never fail; the hook's start cost, native against a sh handoff
+      - name: probe what a hook start costs
+        if: ${{ !cancelled() }}
+        shell: bash
+        run: |
+          set +e
+          source gate-sdk/lib/gate.sh
+          bin="$PWD/$(gate_native_bin)"
+          t="$RUNNER_TEMP/native-hook"
+          mkdir -p "$t/sh-hooks"
+          printf '#!/bin/sh\nexec %s --git-hook pre-commit\n' "$bin" > "$t/sh-hooks/pre-commit"
+          chmod +x "$t/sh-hooks/pre-commit"
+          cd "$t/repo" || exit 0
+          median() {
+            local hook="$1" i a b
+            for ((i = 0; i < 101; i++)); do
+              a="${EPOCHREALTIME/[.,]/}"
+              "$hook" > /dev/null 2>&1
+              b="${EPOCHREALTIME/[.,]/}"
+              echo "$((b - a))"
+            done | sort -n | sed -n '51p'
+          }
+          if [ -z "${EPOCHREALTIME:-}" ]; then
+            echo "this bash carries no EPOCHREALTIME, so the start cost is unmeasured on this leg"
+            exit 0
+          fi
+          echo "host: $(uname -s) $(uname -m)"
+          echo "native hook start: $(median "$t/hooks/pre-commit") us, median of 101 with nothing staged"
+          echo "sh handoff start:  $(median "$t/sh-hooks/pre-commit") us, median of 101 with nothing staged"
+          exit 0
+
       # spec: installer/SPEC.md §The consumer smoke — each platform leg steers the roster at its host
       - name: install smoke on a macOS host
         shell: bash
@@ -2030,6 +2264,69 @@ jobs:
           [[ -x "$dest" ]] || { echo "could not place the producer's $host artifact at $dest"; exit 1; }
           echo "SMOKE_ARTIFACTS=$art" >> "$GITHUB_ENV"
 
+      # spec: installer/SPEC.md §The consumer smoke — git starts a copy of the gate binary named for the hook, with no interpreter
+      - name: git starts a native pre-commit hook
+        shell: bash
+        run: |
+          set -euo pipefail
+          source gate-sdk/lib/gate.sh
+          bin="$PWD/$(gate_native_bin)"
+          t="$RUNNER_TEMP/native-hook"
+          rm -rf "$t"
+          mkdir -p "$t/repo/scripts" "$t/hooks"
+          cp "$bin" "$t/hooks/pre-commit"
+          chmod +x "$t/hooks/pre-commit"
+          printf 'check-pipe-membership\n' > "$t/repo/scripts/gates.list"
+          printf 'GATE_SDK_NATIVE_BIN = %s\nGATE_SDK_KIT_DIRS = %s\n' "$bin" "$PWD/gate-sdk" > "$t/repo/scripts/gate-sdk-config.knobs"
+          cd "$t/repo"
+          git init -q .
+          git config user.email probe@example.invalid
+          git config user.name probe
+          git config core.hooksPath "$t/hooks"
+          git add -A
+          git commit -q --no-verify -m 'chore: seed'
+          printf 'probe\n' > clean.txt
+          git add clean.txt
+          out="$(git commit -m 'docs: a clean change' 2>&1)" || { echo "::error::git did not land a clean commit through a native pre-commit hook: $out"; exit 1; }
+          grep -q 'pre-commit: [0-9]* gate(s) passed' <<<"$out" || { echo "::error::the clean commit landed without the native hook's summary line, so git did not start it: $out"; exit 1; }
+          printf '%s\n' '#!/usr/bin/env bash' 'set -o pipefail' 'names=(a b c)' 'if printf "%s\n" "${names[@]}" | grep -q b; then echo found; fi' > violation.sh
+          git add violation.sh
+          if out="$(git commit -m 'chore: a pipeline that can lose its match' 2>&1)"; then echo "::error::a violating commit landed through the native hook: $out"; exit 1; fi
+          grep -q 'check-pipe-membership failed' <<<"$out" || { echo "::error::the refusal does not name the gate: $out"; exit 1; }
+          git reset -q --hard HEAD
+          echo "git started a native pre-commit hook with no interpreter: a clean commit landed and a violating one was refused by check-pipe-membership"
+
+      # spec: installer/SPEC.md §The consumer smoke — probe steps report and never fail; the hook's start cost, native against a sh handoff
+      - name: probe what a hook start costs
+        if: ${{ !cancelled() }}
+        shell: bash
+        run: |
+          set +e
+          source gate-sdk/lib/gate.sh
+          bin="$PWD/$(gate_native_bin)"
+          t="$RUNNER_TEMP/native-hook"
+          mkdir -p "$t/sh-hooks"
+          printf '#!/bin/sh\nexec %s --git-hook pre-commit\n' "$bin" > "$t/sh-hooks/pre-commit"
+          chmod +x "$t/sh-hooks/pre-commit"
+          cd "$t/repo" || exit 0
+          median() {
+            local hook="$1" i a b
+            for ((i = 0; i < 101; i++)); do
+              a="${EPOCHREALTIME/[.,]/}"
+              "$hook" > /dev/null 2>&1
+              b="${EPOCHREALTIME/[.,]/}"
+              echo "$((b - a))"
+            done | sort -n | sed -n '51p'
+          }
+          if [ -z "${EPOCHREALTIME:-}" ]; then
+            echo "this bash carries no EPOCHREALTIME, so the start cost is unmeasured on this leg"
+            exit 0
+          fi
+          echo "host: $(uname -s) $(uname -m)"
+          echo "native hook start: $(median "$t/hooks/pre-commit") us, median of 101 with nothing staged"
+          echo "sh handoff start:  $(median "$t/sh-hooks/pre-commit") us, median of 101 with nothing staged"
+          exit 0
+
       # spec: installer/SPEC.md §The consumer smoke — each platform leg steers the roster at its host
       - name: install smoke on an Intel macOS host
         shell: bash
@@ -2124,6 +2421,69 @@ jobs:
           chmod +x "$dest"
           [[ -x "$dest" ]] || { echo "could not place the producer's $host artifact at $dest"; exit 1; }
           echo "SMOKE_ARTIFACTS=$art" >> "$GITHUB_ENV"
+
+      # spec: installer/SPEC.md §The consumer smoke — git starts a copy of the gate binary named for the hook, with no interpreter
+      - name: git starts a native pre-commit hook
+        shell: bash
+        run: |
+          set -euo pipefail
+          source gate-sdk/lib/gate.sh
+          bin="$PWD/$(gate_native_bin)"
+          t="$RUNNER_TEMP/native-hook"
+          rm -rf "$t"
+          mkdir -p "$t/repo/scripts" "$t/hooks"
+          cp "$bin" "$t/hooks/pre-commit"
+          chmod +x "$t/hooks/pre-commit"
+          printf 'check-pipe-membership\n' > "$t/repo/scripts/gates.list"
+          printf 'GATE_SDK_NATIVE_BIN = %s\nGATE_SDK_KIT_DIRS = %s\n' "$bin" "$PWD/gate-sdk" > "$t/repo/scripts/gate-sdk-config.knobs"
+          cd "$t/repo"
+          git init -q .
+          git config user.email probe@example.invalid
+          git config user.name probe
+          git config core.hooksPath "$t/hooks"
+          git add -A
+          git commit -q --no-verify -m 'chore: seed'
+          printf 'probe\n' > clean.txt
+          git add clean.txt
+          out="$(git commit -m 'docs: a clean change' 2>&1)" || { echo "::error::git did not land a clean commit through a native pre-commit hook: $out"; exit 1; }
+          grep -q 'pre-commit: [0-9]* gate(s) passed' <<<"$out" || { echo "::error::the clean commit landed without the native hook's summary line, so git did not start it: $out"; exit 1; }
+          printf '%s\n' '#!/usr/bin/env bash' 'set -o pipefail' 'names=(a b c)' 'if printf "%s\n" "${names[@]}" | grep -q b; then echo found; fi' > violation.sh
+          git add violation.sh
+          if out="$(git commit -m 'chore: a pipeline that can lose its match' 2>&1)"; then echo "::error::a violating commit landed through the native hook: $out"; exit 1; fi
+          grep -q 'check-pipe-membership failed' <<<"$out" || { echo "::error::the refusal does not name the gate: $out"; exit 1; }
+          git reset -q --hard HEAD
+          echo "git started a native pre-commit hook with no interpreter: a clean commit landed and a violating one was refused by check-pipe-membership"
+
+      # spec: installer/SPEC.md §The consumer smoke — probe steps report and never fail; the hook's start cost, native against a sh handoff
+      - name: probe what a hook start costs
+        if: ${{ !cancelled() }}
+        shell: bash
+        run: |
+          set +e
+          source gate-sdk/lib/gate.sh
+          bin="$PWD/$(gate_native_bin)"
+          t="$RUNNER_TEMP/native-hook"
+          mkdir -p "$t/sh-hooks"
+          printf '#!/bin/sh\nexec %s --git-hook pre-commit\n' "$bin" > "$t/sh-hooks/pre-commit"
+          chmod +x "$t/sh-hooks/pre-commit"
+          cd "$t/repo" || exit 0
+          median() {
+            local hook="$1" i a b
+            for ((i = 0; i < 101; i++)); do
+              a="${EPOCHREALTIME/[.,]/}"
+              "$hook" > /dev/null 2>&1
+              b="${EPOCHREALTIME/[.,]/}"
+              echo "$((b - a))"
+            done | sort -n | sed -n '51p'
+          }
+          if [ -z "${EPOCHREALTIME:-}" ]; then
+            echo "this bash carries no EPOCHREALTIME, so the start cost is unmeasured on this leg"
+            exit 0
+          fi
+          echo "host: $(uname -s) $(uname -m)"
+          echo "native hook start: $(median "$t/hooks/pre-commit") us, median of 101 with nothing staged"
+          echo "sh handoff start:  $(median "$t/sh-hooks/pre-commit") us, median of 101 with nothing staged"
+          exit 0
 
       # spec: installer/SPEC.md §The consumer smoke — each platform leg steers the roster at its host
       - name: install smoke on an arm64 Linux host

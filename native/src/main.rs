@@ -141,6 +141,13 @@ fn adopter_usage() {
 }
 
 fn main() {
+    // spec: gate-sdk/SPEC.md §git-hook — the start name is read ahead of the argument parse: under
+    // a served hook's name the process is that hook's launcher and git's operands are not arms
+    let mut started = std::env::args();
+    if let Some(hook) = started.next().as_deref().and_then(emit::hook_launcher::served) {
+        exit(emit::hook_launcher::launch(hook, &started.collect::<Vec<String>>()));
+    }
+
     let argv: Vec<String> = normalize(std::env::args().skip(1).collect());
 
     let first = match argv.first() {

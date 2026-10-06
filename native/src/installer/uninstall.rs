@@ -149,7 +149,6 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
         .split_whitespace()
         .map(String::from)
         .collect();
-    let gates_list = manifest.own_file(&format!("{}/gates.list", GATES_DIR));
 
     let entries: Vec<(String, String, bool)> = manifest
         .files()
@@ -197,22 +196,13 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
     let trim_agent = keep.iter().any(|(p, _)| p == AGENT_FILE)
         && kits.iter().any(|k| k == "doctrine-kit");
 
-    // spec: installer/SPEC.md §uninstall — the hook opt-in is reported, not rewritten: git config
-    // is outside the ownership roster, and a `core.hooksPath` naming a directory that no longer
-    // exists is inert rather than breaking.
-    let mut hooks_line = String::new();
-    if let Ok(hp) = super::git_capture(&root, &["config", "--get", "core.hooksPath"]) {
-        let hp = hp.trim();
-        if let Some((gates_dir, _)) = gates_list.rsplit_once('/') {
-            // spec: gate-sdk/SPEC.md §Porting to Rust does not retire dialect exposure — the
-            // hooksPath is git's own `/`-spelled value and the root a `Path::display()` one, so
-            // the two are compared by component rather than by a composed prefix
-            let rel = crate::walk::rel_under(&root.display().to_string(), hp).unwrap_or(hp);
-            if !hp.is_empty() && crate::walk::at_or_under(gates_dir, rel) {
-                hooks_line = "git config --unset core.hooksPath".to_string();
-            }
-        }
-    }
+    // spec: installer/SPEC.md §uninstall — the placed hooks directory is this tool's own and is
+    // removed; the opt-in is reported, not rewritten, git config being outside the ownership roster
+    let hooks_dir = crate::emit::hook_launcher::hooks_dir(&root).filter(|d| d.is_dir());
+    let hooks_line = match &hooks_dir {
+        Some(d) if crate::emit::hook_launcher::opted_in(&root, d) => "git config --unset core.hooksPath",
+        _ => "",
+    };
 
     // spec: installer/SPEC.md §uninstall — a run with nothing to remove says so and exits 0: the
     // install is still there, so narrowing the manifest here would disown an install that has not
@@ -306,6 +296,9 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
                 crate::emit::update_notice::CACHE_FILE
             );
         }
+        if hooks_dir.is_some() {
+            println!("\nwould remove the placed git hooks, {} in this clone's git directory.", crate::emit::hook_launcher::DIR);
+        }
         if !hooks_line.is_empty() {
             println!("\nwould print this for you to run yourself:\n  {}", hooks_line);
         }
@@ -352,6 +345,12 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
     // that shared it probes once to rewrite it
     if let Some(left) = crate::emit::update_notice::cache_path(&root).and_then(|c| reclaim_cache(&c)) {
         println!("\n{}", left);
+    }
+    if let Some(d) = &hooks_dir {
+        match std::fs::remove_dir_all(d) {
+            Ok(()) => println!("\nremoved the placed git hooks, {} in this clone's git directory.", crate::emit::hook_launcher::DIR),
+            Err(e) => println!("\nthe placed git hooks at {} could not be removed ({}) — delete that directory yourself.", d.display(), e),
+        }
     }
     if keep.is_empty() {
         std::fs::remove_file(&lock_path)
@@ -441,7 +440,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
 
     if !hooks_line.is_empty() {
         println!(
-            "\nthis clone still points at the hooks directory that was just removed. Undo that yourself with:\n  {}",
+            "\nthis clone's core.hooksPath still names the hooks directory that was just removed. Undo that yourself with:\n  {}",
             hooks_line
         );
     }

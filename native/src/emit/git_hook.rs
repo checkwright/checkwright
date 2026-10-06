@@ -1,5 +1,5 @@
-// spec: gate-sdk/SPEC.md §git-hook — the arm each generated git hook hands off to: the triggered
-// subset of the registry at commit time, run serially to the first failure
+// spec: gate-sdk/SPEC.md §git-hook — the arm each placed git hook starts: the triggered subset of
+// the registry at commit time, run serially to the first failure
 use crate::runner::{self, Dispatch, Selected};
 use crate::{proc, programs, registry, walk};
 use std::path::{Path, PathBuf};
@@ -164,6 +164,11 @@ fn run_over(hook: &Hook, paths: &[String]) -> Result<(i32, String, usize), Strin
         Hook::PreCommit => precommit_selection(&members, &resolve_dirs, &walk::kit_roots()?, paths, Path::new("."))?,
         Hook::CommitMsg(file) => commit_msg_selection(&members, &resolve_dirs, file),
     };
+    // spec: gate-sdk/SPEC.md §git-hook — a registry with no `tier=commit-msg` member exits 0
+    // printing nothing, the summary line included
+    if matches!(hook, Hook::CommitMsg(_)) && selected.is_empty() {
+        return Ok((0, String::new(), 0));
+    }
     let self_exe = std::env::current_exe()
         .map_err(|e| format!("cannot resolve this binary's own path: {}", e))?
         .display()
@@ -418,6 +423,76 @@ mod tests {
             own(&[("check-absent", &[]), ("check-pre", &[]), ("check-staged", &["src/a.rs"])])
         );
         assert_eq!(gone_only.expect("selects"), own(&[("check-absent", &[]), ("check-pre", &[])]));
+    }
+
+    // spec: gate-sdk/SPEC.md §check-crate-arms — both hooks select under every shipped install
+    // profile's kit set, set through a knob file in a scratch gates dir; a tree without the
+    // installer's profile roster has nothing to hold
+    #[test]
+    fn both_hooks_select_under_every_install_profile() {
+        let repo = Path::new(env!("CARGO_MANIFEST_DIR")).parent().expect("repo root").to_path_buf();
+        let Ok(roster) = std::fs::read_to_string(repo.join("installer/profiles.list")) else {
+            return;
+        };
+        let mut profiles: Vec<(String, Vec<String>)> = Vec::new();
+        for line in roster.lines().filter(|l| !l.trim().is_empty() && !l.starts_with('#')) {
+            let (p, kit) = line.split_once('\t').expect("a `<profile><TAB><kit>` row");
+            match profiles.iter_mut().find(|(n, _)| n == p) {
+                Some((_, kits)) => kits.push(kit.to_string()),
+                None => profiles.push((p.to_string(), vec![kit.to_string()])),
+            }
+        }
+        assert!(!profiles.is_empty(), "no profile parsed from installer/profiles.list");
+        let mut full: Vec<String> = walk::list_dir(&repo)
+            .expect("repo root")
+            .into_iter()
+            .map(|(n, _)| n)
+            .filter(|n| repo.join(n).join("checks").is_dir() || repo.join(n).join("smoke").is_dir())
+            .collect();
+        full.sort();
+        profiles.push(("full".to_string(), full));
+
+        let env = crate::knobenv::lock();
+        let d = std::env::temp_dir().join(format!("checkwright-hook-profiles.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(&d).expect("scratch");
+        let text = std::fs::read_to_string(repo.join("scripts/gates.list")).expect("registry");
+        let members = first_seen(&text);
+        let saved: Vec<(&str, Option<String>)> = ["GATE_SDK_GATES_DIR", "GATE_SDK_KIT_DIRS", "GATE_SDK_ROOT"]
+            .into_iter()
+            .map(|k| (k, std::env::var(k).ok()))
+            .collect();
+        let gates_dir = d.display().to_string();
+        env.set("GATE_SDK_GATES_DIR", &gates_dir);
+        env.remove("GATE_SDK_KIT_DIRS");
+        env.set("GATE_SDK_ROOT", &repo.join("gate-sdk").display().to_string());
+        let staged: Vec<String> = ["README.md", "scripts/gates.list", "native/src/main.rs"].iter().map(|s| s.to_string()).collect();
+        let mut failed: Vec<String> = Vec::new();
+        for (name, kits) in &profiles {
+            let dirs: Vec<String> = kits.iter().map(|k| repo.join(k).display().to_string()).collect();
+            std::fs::write(d.join("gate-sdk-config.knobs"), format!("GATE_SDK_KIT_DIRS = {}\n", dirs.join(" ")))
+                .expect("knob file");
+            crate::knobs::reset(&env);
+            let selected = walk::kit_roots_abs().and_then(|roots| {
+                let resolve_dirs = registry::resolve_dirs(&gates_dir, &roots);
+                let pre = precommit_selection(&members, &resolve_dirs, &roots, &staged, &repo)?;
+                Ok(pre.len() + commit_msg_selection(&members, &resolve_dirs, "m").len())
+            });
+            match selected {
+                Ok(0) => failed.push(format!("{}: nothing selected", name)),
+                Ok(_) => {}
+                Err(e) => failed.push(format!("{}: {}", name, e)),
+            }
+        }
+        for (k, v) in saved {
+            match v {
+                Some(v) => env.set(k, &v),
+                None => env.remove(k),
+            }
+        }
+        crate::knobs::reset(&env);
+        let _ = std::fs::remove_dir_all(&d);
+        assert!(failed.is_empty(), "the hooks do not select under: {:?}", failed);
     }
 
     // spec: gate-sdk/SPEC.md §git-hook — the first failure stops the run with the uniform failure

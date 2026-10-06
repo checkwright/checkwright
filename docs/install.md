@@ -64,7 +64,7 @@ This is the native Windows route. Under WSL, take [macOS and Linux](#macos-and-l
 
 **You need** the tools [Requirements](#requirements) lists for installing on Windows, where the minimum Windows version is stated too. Git for Windows' bash is also what runs any shell gate you write ([Writing your own shell gates](requirements.md#writing-your-own-shell-gates)).
 
-The pre-commit hook needs no `bash` on your `PATH`: git runs it through the sh Git for Windows bundles, and it hands off to the gate binary. The battery needs no shell: run the gate binary with `--run`, or `gate-sdk/bin/run-gates.ps1` from PowerShell. On Windows on Arm, Git for Windows' sh runs under emulation, so each commit pays one emulated start.
+The pre-commit hook needs no shell: it is the gate binary under the hook's name, and git starts it directly. The battery needs none either: run the gate binary with `--run`, or `gate-sdk/bin/run-gates.ps1` from PowerShell.
 
 Run this block in PowerShell first. It puts Git's `usr\bin` and `bin` on your `PATH`, for this session and every later one:
 

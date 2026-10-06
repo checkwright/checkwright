@@ -683,19 +683,6 @@ fn stage_all(consumer: &str) -> Result<(), Fail> {
 // been judged, and the artifact's path is resolved against the **consumer's** knob files rather than
 // this process's, because the host's value is a different tree's.
 fn regenerate(consumer: &str, to: &str) -> Result<(), Fail> {
-    let hook = bash(
-        // door-contributor: a source-clone smoke drives the vendored front end on purpose; executed, never printed
-        r#"cd "$1" && export GATE_SDK_ROOT="$1/gate-sdk" && exec bash gate-sdk/bin/run-gates.sh --emit git-hooks --write >/dev/null"#,
-        &[consumer],
-        Stderr::Inherit,
-    )?;
-    if hook.code() != 0 {
-        return Err(broken(one(format!(
-            "{}: phase A hook regeneration failed at TO ({})",
-            NAME, to
-        ))));
-    }
-
     let resolved = bash(
         // door-contributor: a source-clone smoke drives the vendored front end on purpose; executed, never printed
         r#"cd "$1" && export GATE_SDK_ROOT="$1/gate-sdk" && exec bash gate-sdk/bin/run-gates.sh --emit knob-values GATE_SDK_GRAPH_ARTIFACT"#,

@@ -407,7 +407,7 @@ Calibration: `QUEUE_KIT_ROADMAP_FILE` empty is a clean skip, the no-op for a con
 
 **The fixture pair proves the comparator and the two-argument plumbing, never the emission.** Both cases steer assertion A off the live emitter, so the pair would pass an arm with no implementation. The emission's projection rules are driven by the roadmap arm's behavioral test, `gate-tests/roadmap.test.sh`.
 
-The declaration is `checks/check-roadmap-fresh.gate` — hermetic, `precommit`, binary-dispatched. Its `couples=` names every crate module the gate reaches transitively, including the emit module and the two it shares with the emit side. The generated hook's `staged_matches` trigger is derived from that field, so an omitted module leaves the gate registered and green while the page it holds goes stale at commit time.
+The declaration is `checks/check-roadmap-fresh.gate` — hermetic, `precommit`, binary-dispatched. Its `couples=` names every crate module the gate reaches transitively, including the emit module and the two it shares with the emit side. The pre-commit hook's trigger is derived from that field, so an omitted module leaves the gate registered and green while the page it holds goes stale at commit time.
 
 ### The roadmap-lag arm
 

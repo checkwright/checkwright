@@ -28,7 +28,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    ```
    <!-- gate-roster:end -->
 
-   `check-queue-wrap` is for a queue you hard-wrap; if you keep it unwrapped, one line per paragraph as the template ships, leave it out and register canon-kit's `check-md-unwrapped` instead. They resolve through gate-sdk's registry path (your gates dir first, then each kit's `checks/`), and the pre-commit hook runs those their `# graph:` manifests trigger, read at commit. `--emit git-hooks --write` on the gate binary `GATE_SDK_NATIVE_BIN` names writes that hook once, and again only to add the commit-msg hook when a first `tier=commit-msg` gate is registered.
+   `check-queue-wrap` is for a queue you hard-wrap; if you keep it unwrapped, one line per paragraph as the template ships, leave it out and register canon-kit's `check-md-unwrapped` instead. They resolve through gate-sdk's registry path (your gates dir first, then each kit's `checks/`), and the pre-commit hook runs those their `# graph:` manifests trigger, read at commit. `--install-hooks` on the gate binary `GATE_SDK_NATIVE_BIN` names places both hooks in a clone once, and a gate registered later is reached with no re-install.
 
 2. Give your queue file the section skeleton — copy `templates/TASK-QUEUE.md` and fill it in (it shows one example entry per grammar shape). The default sections are `New Features` / `Technical Debt` (active), `Deferred`, `Done` — plus an optional `Icebox` tier between the last two for backlogs whose carry weight has become the problem, off by default (`QUEUE_KIT_ICEBOX_SECTION`).
 

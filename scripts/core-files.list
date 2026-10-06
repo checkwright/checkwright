@@ -51,7 +51,6 @@ scripts/gates.list
 scripts/gate-sdk-config.knobs
 scripts/graph-vocab.knobs
 scripts/identity.conf
-scripts/git-hooks/pre-commit
 docs/check-graph.html
 
 # Derived per kit root: each kit's canonical contract and its entry-point README.

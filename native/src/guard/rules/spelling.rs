@@ -116,12 +116,8 @@ fn knob_echo(raw: &str, seg: &str) -> Option<Verdict> {
             continue;
         }
         let Some(resolved) = knob_scalar_value(name) else { continue };
-        let mut respelt = String::new();
-        if val != resolved {
-            if !(std::path::Path::new(val).exists() && same_file(val, &resolved)) {
-                continue;
-            }
-            respelt = format!(" '{}' names the same file as '{}' but is not its text, and the generated hooks bake the knob's text, so the battery it prefixes reds check-graph on a stale hook.", val, resolved);
+        if val != resolved && !(std::path::Path::new(val).exists() && same_file(val, &resolved)) {
+            continue;
         }
         let w: String = if shape == "export" && asg.len() == 1 { trim(seg).to_string() } else { w0.to_string() };
         let (mut pre, mut post) = match raw.find(&w) {
@@ -147,7 +143,7 @@ fn knob_echo(raw: &str, seg: &str) -> Option<Verdict> {
             let p = p.strip_suffix(';').unwrap_or(p);
             pre = trim_end(p).to_string();
         }
-        return Some(Verdict::Block(format!("drop the '{w}' prefix — {name} already resolves to '{resolved}', so the prefix buys nothing, and the matcher cannot see past an assignment or an export, so it costs an out-of-band permission decision.{respelt} Run it without the prefix: {pre}{post}")));
+        return Some(Verdict::Block(format!("drop the '{w}' prefix — {name} already resolves to '{resolved}', so the prefix buys nothing, and the matcher cannot see past an assignment or an export, so it costs an out-of-band permission decision. Run it without the prefix: {pre}{post}")));
     }
     None
 }

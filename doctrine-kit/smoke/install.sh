@@ -211,5 +211,4 @@ cat >> scripts/gates.list <<'EOF'
 check-doctrine-registration
 EOF
 
-bash "$SDK/bin/run-gates.sh" --emit git-hooks --write >/dev/null
 bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html

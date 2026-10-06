@@ -51,9 +51,8 @@ if jq -e '[.permissions.allow[] | select(test("@GATE_SDK_NATIVE_BIN@"))] | lengt
     exit 1
 fi
 
-# spec: gate-sdk/SPEC.md §gen-pre-commit — the generated artifacts carry a row per registered gate,
-# so registering one above leaves them stale until they are re-emitted
-"$door" --emit-git-hooks --write >/dev/null
+# spec: gate-sdk/SPEC.md §check-graph — the graph artifact carries a row per registered gate, so
+# registering one above leaves it stale until it is re-emitted
 "$door" --emit-graph > scripts/CHECK-GRAPH.html
 
 # spec: guard-kit/SPEC.md §The recommended allowlist — a union into permissions.allow, never a replacement

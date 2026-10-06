@@ -76,7 +76,6 @@ pub mod value_rollup_fresh;
 pub mod product_statement_fresh;
 pub mod license_line;
 pub mod gap_inbox_neutrality;
-pub mod hook_exec_bit;
 pub mod identity;
 pub mod install_claim;
 pub mod install_disposition;
@@ -2022,16 +2021,8 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
     ),
     // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — the first
-    // budget batch's remaining four members: a `?` for a positional scan root the shell parser calls
-    // undecidable, an empty set for named-file readers and for a `git ls-files` mode-bit reader.
-    (
-        "check-hook-exec-bit",
-        hook_exec_bit::run,
-        &[],
-        &["GATE_SDK_HOOKS_DIR"],
-        "gate-sdk",
-        &[("git", "")],
-    ),
+    // budget batch's remaining three members: a `?` for a positional scan root the shell parser calls
+    // undecidable, an empty set for named-file readers.
     (
         "check-agent-tier-explicit",
         agent_tier_explicit::run,
@@ -2160,8 +2151,6 @@ pub const REGISTRY: &[GateEntry] = &[
     // the reason its shell original was classified `?`: assertion G's scan root is the member's own
     // first argument with a default, the variable-first-argument shape §check-reads-couples calls
     // undecidable.
-    // spec: gate-sdk/SPEC.md §gen-pre-commit — no declared requirement, by spawn census: assertion D
-    // computes both hooks in process and takes its root from the working directory.
     (
         "check-graph",
         graph::run,
@@ -2170,7 +2159,6 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_DIRS",
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "GATE_SDK_GATES_DIR",
-            "GATE_SDK_HOOKS_DIR",
             "GATE_SDK_NATIVE_BIN",
             "GATE_SDK_KIT_DIRS",
             "GATE_SDK_GRAPH_ARTIFACT",
@@ -3024,7 +3012,7 @@ mod tests {
                     case.display()
                 );
                 // spec: gate-sdk/SPEC.md §check-reads-couples — a declared root names the *deployed*
-                // invocation's root, which the generated hook dispatches with no trailing argv; a
+                // invocation's root, which the pre-commit hook dispatches with no trailing argv; a
                 // case passing a positional relocates that same walk to a case-local anchor
                 let relocated = relocations(&case_args(&case));
                 // spec: gate-sdk/SPEC.md §The path-dialect contract — `./docs` and `docs` are one
@@ -3461,7 +3449,7 @@ mod tests {
         }
         // spec: gate-sdk/SPEC.md §check-reads-couples — the positional-root helper and the four
         // hand-spelled argv idioms beside it: an argument whose default is a literal resolves to
-        // that literal, because the generated hook dispatches with no trailing argv
+        // that literal, because the pre-commit hook dispatches with no trailing argv
         for p in ["fresh::positional(", "positional("] {
             if let Some(rest) = e.strip_prefix(p) {
                 let mut args = rest;
