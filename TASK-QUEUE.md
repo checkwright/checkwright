@@ -46,18 +46,6 @@ docs/manual-install.md's Windows download fence is dot-sourced and sets `$ErrorA
 
 **Cost while deferred:** an adopter's shell keeps a changed error policy after installing. Filed 2026-10-06 by evidence-front-install-split-pass' lead. Re-verified by reading the fence, which opens on `. {` and sets the preference inside it. Owner lookup: `ErrorActionPreference`, `stop policy`, `try/finally` in this file — none; install-windows-stop-policy, landed last iteration, DISTINCT (it added the preference this restores).
 
-### journal-arm-spec-departures
-
-the journal arm departs from lifecycle-kit/SPEC.md §The journal arm in three places. (1) The entry's opener writes the journal at the pattern relative to the working directory while the arm anchors it at the repository root, so the two name different files when the binary is called directly from a subdirectory; calls through the front end agree, since it changes directory first. (2) An absent state file fails the arm's read before the refusal that names the caller's id and the `--enter-stage` remedy. (3) Standard input is decoded lossily, so a non-UTF-8 byte is replaced where the section says the text lands verbatim.
-
-**Deliverable:** one anchor for both writers, the refusal on an absent state file, and either a stated encoding bound or a byte-preserving append, with a test case each.
-
-**Run at this scope, 2026-10-06:** (2) the arm under a state-file knob naming an absent file exits 2 on `cannot read`, with no caller id and no remedy; (3) a `\377` byte on standard input lands as U+FFFD in the journal.
-
-**Inferred, cannot run before build:** (1), the two anchors, read off `native/src/emit/journal.rs` and `native/src/emit/enter_stage.rs` — it needs the opener started from a subdirectory of a scratch repository, the test case this entry delivers.
-
-**Cost while deferred:** a direct binary call from a subdirectory journals to a file the next entry cannot find, and a caller with no state file reads an I/O failure where the remedy belongs. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' close, off its second-vendor review; carried over the boundary and promoted at the next scope. Owner lookup: `journal arm`, `emit journal`, `lossy`, `non-UTF` in this file and the disposed-findings record — none; owner lifecycle-kit/SPEC.md §The journal arm.
-
 ### mirror-fold-absent-mirror
 
 `check-stage-entry`'s mirror fold counts a body token under `LIFECYCLE_KIT_MIRROR_ROOT` as its suffix whenever that suffix is a roster dir, without testing that the mirror path exists, while the knob's row in lifecycle-kit/SPEC.md says a root under which no roster dir sits folds nothing. With the root set and no mirror generated, a token naming `<root>/<dir>` still folds to `<dir>` and can add a component.
@@ -1201,4 +1189,5 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 ## Done
 
 - stage-tier-line-unread
+- journal-arm-spec-departures
 

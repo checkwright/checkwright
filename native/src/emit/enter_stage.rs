@@ -941,14 +941,15 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String], declared: Option<&str>) -> Result<
         let pred_stage = stages::current_stage(&state_text);
         if !pred_stage.is_empty() {
             let pred_journal = journal_path(&c.journal_pattern, &pred_stage);
+            let pred_file = repo_anchored(&pred_journal)?;
             // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — three-way, because the opener made
             // unwritten a state distinct from absent: absent means this tool never ran for that
             // stage, unwritten means it ran and the session did not
-            let why = if !Path::new(&pred_journal).is_file() {
+            let why = if !Path::new(&pred_file).is_file() {
                 Some("does not exist")
-            } else if std::fs::metadata(&pred_journal).map(|m| m.len()).unwrap_or(0) == 0 {
+            } else if std::fs::metadata(&pred_file).map(|m| m.len()).unwrap_or(0) == 0 {
                 Some("is empty")
-            } else if !journal_written(&pred_journal) {
+            } else if !journal_written(&pred_file) {
                 Some(
                     "carries only this tool's own opening line(s) — it was opened at that stage's \
                      entry and never written into",
@@ -1344,7 +1345,9 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String], declared: Option<&str>) -> Result<
     let mut journal = String::new();
     if c.journal_require == "1" {
         let p = journal_path(&c.journal_pattern, &stage);
-        match journal_open(&p, &stage, &stamp_iter, &id, &today, &head_at) {
+        let opened =
+            repo_anchored(&p).and_then(|f| journal_open(&f, &stage, &stamp_iter, &id, &today, &head_at));
+        match opened {
             Ok(()) => journal = p,
             Err(_) => {
                 eprintln!(
@@ -1983,6 +1986,16 @@ fn non_root_preserve(preserve: &[String]) -> Vec<String> {
 // predecessor's must name one file or the assertion reads a file nobody wrote
 pub fn journal_path(pattern: &str, stage: &str) -> String {
     pattern.replace("<stage>", stage)
+}
+
+// spec: lifecycle-kit/SPEC.md §The stage-machine adapters — the derivation's one anchor: every
+// reader resolves the spelled path here, or a call from a subdirectory names a second file
+pub fn repo_anchored(spelled: &str) -> Result<String, String> {
+    let root = match crate::walk::toplevel_opt()? {
+        Some(t) => t,
+        None => crate::walk::cwd()?,
+    };
+    Ok(crate::walk::abs_against(&root, spelled))
 }
 
 // spec: lifecycle-kit/SPEC.md §The state machine — the opening line's fixed lead, spelled once
