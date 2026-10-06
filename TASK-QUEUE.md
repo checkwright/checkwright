@@ -8,6 +8,26 @@
 
 ## New Features
 
+### audit-trigger-mirror-component
+
+[spec: SPEC-mirror-component.md]
+
+`check-stage-entry`'s assertion C reads a generated SPEC mirror (`docs/<kit>/SPEC.md`) as a roster dir, so a single-kit iteration whose amendments name their mirror as a regenerate target reaches two components on that token alone and is refused build entry without an align stamp or a waiver. lifecycle-kit/SPEC.md §check-stage-entry states the behaviour and prices it under C's honest limit, so the over-demand is designed, not a bug.
+
+**Deliverable:** a way for a consumer to declare a generated mirror as the projection of its source component, so the token resolves to the component it mirrors, specified in §check-stage-entry with a fixture over a mirror-naming single-kit amendment; or a ruling that the waiver stays the valve.
+
+**Cost while deferred:** an align dispatch or an operator waiver ask per single-kit iteration whose amendments name their mirror. Filed 2026-10-03 to the gap inbox at guard-kit-write-side-pass' build; promoted at its close: →fix fails because the mirror's resolution is a grammar decision the SPEC settles the other way, →forward because no recorded ruling is reversed. Re-verified: the SPEC's roster-dir paragraph names this exact case. Owner lookup: `mirror`, `assertion C`, `audit-trigger` in this file — none; owner lifecycle-kit/SPEC.md §check-stage-entry. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling). A feature, authored at spec.
+
+### journal-append-arm
+
+[spec: SPEC-journal-arm.md] [recurrence: 2026-10-05]
+
+resume-journal appends are the top hand shape after the gate door in `--emit manual-ops`' first rankings: `printf >>` 47 calls in 6 sessions and `cat >>` 24 in 5 at drift-kit-tail-crosser-pass, every stage. Each spells the path `--enter-stage` printed, and the shell guard splits the write from any other command, so each append is its own call.
+
+**Deliverable:** an append arm writing its operand or stdin to the journal the session's own stamp names, so no session spells the path; homed in delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps, with the agent-execution template's journal bullet citing it. Authored at spec with the arm homed in lifecycle-kit, which owns the path, and that section and bullet citing it: a spec decision on the owning section's own text, stated in the amendment, not a ruling.
+
+**Cost while deferred:** a tool call and a spelled path per journal line, in every stage session. Filed 2026-10-05 to the gap inbox at that iteration's build, off the meter's first run; promoted at its close: →fix fails because the arm is a new governed name, →forward because no ruling is owed. Re-verified: the meter at close ranks `printf >>` second and `cat >>` sixth; the filer's delegation-transport-pass count (`cat >>` 57 in 9) is carried, not re-run. Owner lookup: `journal`, `append` in this file — none; owner that section. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling). A feature, authored at spec.
+
 ## Technical Debt
 
 ### spec-brevity-residue
@@ -89,16 +109,6 @@ A build session ran `git stash` / `git stash pop` on the shared checkout to rebu
 **Deliverable:** a steer from a worktree-rewriting `git stash` on the main checkout to `git worktree add` under the scratch dir, either as a guard-kit block with its decision-table rows or as a delegation-kit/templates/agent-execution.md bullet; choosing between them is the unit's spec question.
 
 **Cost while deferred:** a concurrent session's uncommitted edits or staged paths can vanish or be re-applied under it. Lead-observed once, with the tree intact; the frequency is **inferred, not run**. Filed 2026-10-03 to the gap inbox by the lead at guard-ruleset-gate-neutrality-pass' build; promoted at its close: →fix fails because both shapes add adopter-visible semantics that no amendment settled, a new block verdict or a new standing instruction. →forward fails because no ruling is owed. Re-verified: `stash` sits only in the live-producer act set, and no template text names stash or a before/after probe. Owner lookup: `stash`, `before/after`, `throwaway` in this file — none; owner guard-kit/SPEC.md §The rule roster.
-
-### audit-trigger-mirror-component
-
-[cost: iteration/low] [surface: lifecycle-kit]
-
-`check-stage-entry`'s assertion C reads a generated SPEC mirror (`docs/<kit>/SPEC.md`) as a roster dir, so a single-kit iteration whose amendments name their mirror as a regenerate target reaches two components on that token alone and is refused build entry without an align stamp or a waiver. lifecycle-kit/SPEC.md §check-stage-entry states the behaviour and prices it under C's honest limit, so the over-demand is designed, not a bug.
-
-**Deliverable:** a way for a consumer to declare a generated mirror as the projection of its source component, so the token resolves to the component it mirrors, specified in §check-stage-entry with a fixture over a mirror-naming single-kit amendment; or a ruling that the waiver stays the valve.
-
-**Cost while deferred:** an align dispatch or an operator waiver ask per single-kit iteration whose amendments name their mirror. Filed 2026-10-03 to the gap inbox at guard-kit-write-side-pass' build; promoted at its close: →fix fails because the mirror's resolution is a grammar decision the SPEC settles the other way, →forward because no recorded ruling is reversed. Re-verified: the SPEC's roster-dir paragraph names this exact case. Owner lookup: `mirror`, `assertion C`, `audit-trigger` in this file — none; owner lifecycle-kit/SPEC.md §check-stage-entry. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling). A feature, authored at spec.
 
 ### config-variant-battery-harness
 
@@ -423,16 +433,6 @@ crate code under `cfg(not(unix))` is linted at the MSRV only by `native-artifact
 **Deliverable:** a contributor-side catch before the push: an opt-in cross-target clippy in `check-crate-arms` where the Windows target is installed, or a pre-push tool. Which, and how it degrades without `rustup`, is spec's: gate-sdk/SPEC.md §check-crate-arms rules the compile-only Windows check no gate, since it needs `rustup` and network.
 
 **Cost while deferred:** a red push and a hotfix push per such slip. Filed 2026-10-05 to the gap inbox at that iteration's build; promoted at its close: →fix fails because a local cross-target lint is new mechanism, →forward because no ruling is owed. Re-verified: the `gates` job runs `cargo check --target x86_64-pc-windows-msvc`, and the only clippy on a Windows target is `native-artifacts`'. One premise fell: the bullet's candidate catcher, a cross-target clippy in the `gates` job, still lands on the push and so saves no red push. Owner lookup: `MSRV`, `clippy`, `cfg(not(unix))` in this file — msrv-move-clippy-arm-coupling (Icebox), DISTINCT (a floor move un-suppressing lints); owner gate-sdk/SPEC.md §check-crate-arms.
-
-### journal-append-arm
-
-[cost: event/low] [surface: delegation-kit] [recurrence: 2026-10-05]
-
-resume-journal appends are the top hand shape after the gate door in `--emit manual-ops`' first rankings: `printf >>` 47 calls in 6 sessions and `cat >>` 24 in 5 at drift-kit-tail-crosser-pass, every stage. Each spells the path `--enter-stage` printed, and the shell guard splits the write from any other command, so each append is its own call.
-
-**Deliverable:** an append arm writing its operand or stdin to the journal the session's own stamp names, so no session spells the path; homed in delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps, with the agent-execution template's journal bullet citing it.
-
-**Cost while deferred:** a tool call and a spelled path per journal line, in every stage session. Filed 2026-10-05 to the gap inbox at that iteration's build, off the meter's first run; promoted at its close: →fix fails because the arm is a new governed name, →forward because no ruling is owed. Re-verified: the meter at close ranks `printf >>` second and `cat >>` sixth; the filer's delegation-transport-pass count (`cat >>` 57 in 9) is carried, not re-run. Owner lookup: `journal`, `append` in this file — none; owner that section. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling). A feature, authored at spec.
 
 ### manual-ops-door-subkey
 
