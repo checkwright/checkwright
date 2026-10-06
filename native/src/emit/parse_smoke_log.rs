@@ -1,6 +1,5 @@
-// spec: evidence-kit/SPEC.md §Layout and configuration — the
-// EVIDENCE_KIT_PARSER_installer_smoke adapter: one scenario per arm, the roster a driver's
-// top-level headers or, given the log alone, the log's own `smoke-roster:` head
+// spec: evidence-kit/SPEC.md §Layout and configuration — `parse-smoke-log`: one scenario per arm,
+// the roster a driver's top-level headers or, given the log alone, the log's own `smoke-roster:` head
 // spec: gate-sdk/SPEC.md §The non-gate arm — an empty roster of the *happens to read nothing*
 // kind; the driver is this product's file, so it is an operand rather than a crate literal
 pub const KNOBS: &[&str] = &[];
@@ -85,8 +84,8 @@ fn roster_from_log(log_text: &str) -> Result<(Vec<String>, String), String> {
     Ok((names, marker))
 }
 
-// spec: evidence-kit/SPEC.md §Layout and configuration — an arm's line in the log is its header
-// name alone or followed by its parenthetical; the first reach wins
+// spec: evidence-kit/SPEC.md §Layout and configuration — an arm is reached where the log carries
+// its header name, alone or ahead of its parenthetical
 fn reached(log_text: &str, arms: &[String], marker: &str) -> (Vec<String>, bool) {
     let mut seen: Vec<String> = Vec::new();
     let mut clean = false;
@@ -189,7 +188,7 @@ mod tests {
     }
 
     // spec: evidence-kit/SPEC.md §Layout and configuration — fewer than two headers cannot yield
-    // an arm and a marker: the zero-header refusal reached one case earlier
+    // an arm and a marker
     #[test]
     fn fewer_than_two_headers_fails_closed() {
         assert!(roster("echo hi\n").is_err(), "a header-less driver was accepted");
@@ -272,7 +271,7 @@ mod tests {
     }
 
     // spec: evidence-kit/SPEC.md §Layout and configuration — the driver is an operand with no
-    // crate default, so a missing or unresolvable one is exit 2 naming it
+    // default, so a missing or unresolvable one is exit 2, as an unresolvable log is
     #[test]
     fn a_missing_operand_or_an_unresolvable_one_fails_closed() {
         assert!(emit(&[]).is_err(), "no operand at all was accepted");

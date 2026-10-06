@@ -1,5 +1,5 @@
-// spec: evidence-kit/SPEC.md §Layout and configuration — the EVIDENCE_KIT_PARSER_gates adapter:
-// the verbose run-gates log to one scenario per registered gate
+// spec: evidence-kit/SPEC.md §Layout and configuration — `parse-gates-log`: the verbose run-gates
+// log to one scenario per registered gate
 // spec: gate-sdk/SPEC.md §The non-gate arm — an empty roster of the *happens to read nothing*
 // kind: the log path arrives on argv and the arm resolves no kit knob
 pub const KNOBS: &[&str] = &[];
@@ -43,8 +43,8 @@ pub fn emit(args: &[String]) -> Result<String, String> {
 mod tests {
     use super::*;
 
-    // spec: evidence-kit/SPEC.md §Layout and configuration — per-gate lines off a verbose log,
-    // both FAIL tails read, a differently-shaped line contributing nothing
+    // spec: evidence-kit/SPEC.md §Layout and configuration — the two-space-indented `PASS:` /
+    // `FAIL:` tail and its gate name, and nothing else
     #[test]
     fn both_tails_map_to_a_scenario_and_nothing_else_does() {
         assert_eq!(tail("  PASS: check-foo").as_deref(), Some("check-foo pass"));
@@ -66,8 +66,8 @@ mod tests {
         assert_eq!(tail("===== gates summary ====="), None);
     }
 
-    // spec: evidence-kit/SPEC.md §Layout and configuration — a log with no tails yields no
-    // output, which --run-validate's produced-no-result guard reads as the run failure it is
+    // spec: evidence-kit/SPEC.md §bin/run-validate.sh — a log with no tails yields no output, the
+    // no-parseable-result run failure
     #[test]
     fn a_log_with_no_tails_yields_no_output() {
         let dir = std::env::temp_dir().join("cw-parse-gates-log-notail");
@@ -79,7 +79,7 @@ mod tests {
         std::fs::remove_dir_all(&dir).ok();
     }
 
-    // spec: evidence-kit/SPEC.md §Layout and configuration — a missing log fails closed
+    // spec: evidence-kit/SPEC.md §Layout and configuration — a log that does not resolve is exit 2
     #[test]
     fn a_missing_log_fails_closed() {
         assert!(emit(&[]).is_err(), "no operand at all was accepted");

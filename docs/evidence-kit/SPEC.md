@@ -52,7 +52,7 @@ Knobs, this repo's surface names as defaults:
 
 **The two declared families** are `EVIDENCE_KIT_RUN_<suite>` and `EVIDENCE_KIT_PARSER_<suite>`, the second named to mirror the first ([gate-sdk/SPEC.md §The knob file](../gate-sdk/SPEC.md#the-knob-file)). A family is a *resolution set, never a roster*: the suite roster is `EVIDENCE_KIT_SUITES`, and the family answers *what is this suite's value*. `EVIDENCE_KIT_RUN_ID` is the run-id row and never a member, since a declared row the prefix spells is excluded from its family. So a suite literally named `ID` has no run member and `--run-validate` refuses it.
 
-**Suite granularity is a floor, not a ceiling.** A suite whose runner reports per-case results carries a parser that says so, while its siblings keep the global adapter. The kit ships two parser arms a consumer names in the knob instead of authoring a script, `--emit parse-gates-log` and `--emit parse-smoke-log`. Both declare an empty knob roster and read their operands off argv, so a consumer has no enabling configuration to forget ([gate-sdk/SPEC.md §The non-gate arm](../gate-sdk/SPEC.md#the-non-gate-arm)).
+**Suite granularity is a floor, not a ceiling.** A suite whose runner reports per-case results carries a parser that says so, while its siblings keep the global adapter. The kit ships two parser arms a consumer names in the knob instead of authoring a script, `--emit parse-gates-log` and `--emit parse-smoke-log`. Both declare an empty knob roster and read their operands off argv, so a consumer has no enabling configuration to forget ([gate-sdk/SPEC.md §The non-gate arm](../gate-sdk/SPEC.md#the-non-gate-arm)). A log that does not resolve is exit 2 for either.
 
 **A value naming neither bundled adapter stays a consumer command the tools word-split and spawn** ([§The evidence adapters](#the-evidence-adapters)), so an adopter points the knob anywhere. The shipped arms are reached as such values. Compiling them in as adapters would privilege them over a consumer's own and make the `--emit parse-*` arms unreachable through the path documented here.
 
@@ -90,7 +90,9 @@ The log arrives **last**, after everything the knob value spells, which [§The e
 - the data-line filter;
 - the queue-iteration, run-key and cursor readers, self-contained so the kit reads lifecycle state without a lifecycle-kit dependency.
 
-The two axes come from two surfaces: the queue header names the iteration, and the state file's **last data line** is the stage cursor. The cursor reader answers no stage on both no-cursor shapes, an absent state file and a file truncated to its preamble with no data line yet. A caller reads an empty stage for either.
+The two axes come from two surfaces: the queue header names the iteration, and the state file's **last data line** is the stage cursor. The cursor reader answers no stage on both no-cursor shapes, an absent state file and a file truncated to its preamble with no data line yet. A caller reads an empty stage for either. Both surfaces' shapes are lifecycle-kit's ([lifecycle-kit/SPEC.md §The state machine](../lifecycle-kit/SPEC.md#the-state-machine)).
+
+**The run key** is the queue header's iteration where it names one, else `EVIDENCE_KIT_RUN_ID`. lifecycle-kit's unnamed-iteration placeholder ([lifecycle-kit/SPEC.md §check-stage-evidence](../lifecycle-kit/SPEC.md#check-stage-evidence)) names none, so it never reaches a manifest line, and a run with no key is refused at the guards' exit 2 ([§bin/run-validate.sh](#binrun-validatesh)).
 
 **The parser adapters** map a captured log to `<scenario> <pass|fail|ignore>` lines:
 
@@ -104,11 +106,12 @@ The two axes come from two surfaces: the queue header names the iteration, and t
 
 **Which adapter a suite gets** is the per-suite resolution: `EVIDENCE_KIT_PARSER_<suite>`, else the global `EVIDENCE_KIT_PARSER`. The dispatch sits behind it, so both callers, `--run-validate` and `--diff-baseline`, inherit per-suite parsing. The resolution is a named helper because `--run-validate`'s produced-no-result diagnostic must name the *effective* parser. Naming the global while an override produced the empty result would misreport the guard the per-gate baseline leans on.
 
-**A consumer parser command** binds any value written against it in three ways:
+**A consumer parser command** binds any value written against it in four ways:
 
 - It receives the log path alone, with no suite name and no exit status. A field most parsers never read is not passed, and a consumer needing exit-code semantics for a suite leaves that suite on the global adapter.
 - The value word-splits: the dispatch splits it on whitespace and spawns the words with no shell. So **no argument a value spells may contain a space**, and a value needing to pass one passes a rule that derives it instead.
 - The log path is **appended after everything the value spells**: a value carrying its own operands spells them first and the log arrives last.
+- Its exit status is not read: the scenario lines are its stdout whatever it exits with. A command that prints none, or cannot be spawned, leaves the produced-no-result guard to fail the run ([§bin/run-validate.sh](#binrun-validatesh)).
 
 **A third bare-name adapter beside `exit-code` and `libtest` is refused.** A kit-shipped parser is an `--emit` arm reached through the front-end, the convention [gate-sdk/SPEC.md §The knob file](../gate-sdk/SPEC.md#the-knob-file) names, which is how a parser value reaches `parse-gates-log` and `parse-smoke-log`. A consumer whose parser the kit does not ship keeps authoring a command, and that command extends the set rather than replacing a working default, since `exit-code` is the default.
 
@@ -156,7 +159,7 @@ So an observed set carrying no baseline rows and no observed `fail` produces **n
 
 ### Evidence manifest
 
-Committed, written once per run. The file header is a `# contract: evidence-manifest v1` line, the versioned wire format the deferred hosted-attestation service consumes as its attestation payload. Each data line is `<iteration> <suite> sha256=<log-hash> pass=<n> fail=<n> ignore=<n> verdict=<clean|new-failures> <date>`, and a run supersedes that iteration's prior line for every suite it ran.
+Committed, written once per run. The file header is a `# contract: evidence-manifest v1` line, the versioned wire format the deferred hosted-attestation service consumes as its attestation payload. Each data line is `<iteration> <suite> sha256=<log-hash> pass=<n> fail=<n> ignore=<n> verdict=<clean|new-failures> <date>`, and a run supersedes that iteration's prior line for every suite it ran. `<log-hash>` is 64 lowercase hex characters, each `<n>` is decimal digits, and `<date>` is the `YYYY-MM-DD` digit shape, held as a shape and never parsed as a calendar date.
 
 - The captured log stays uncommitted under the tmp dir. Its digest pins the log the counts came from, and `<suite>` names the suite. Neither pins the command behind that key, so a payload reader that must bind it owes a new format version, never a reinterpretation of `sha256=`.
 - The iteration key scopes the line, so the boundary-truncate knob can clear the manifest at the start of the next iteration.
@@ -177,15 +180,15 @@ The single fold leaves a suite free to sit anywhere in the roster even when its 
 
 Uncommitted, under `EVIDENCE_KIT_LOCK_FILE`. A stage stamp proves invocation and an evidence line proves a green result, but neither can say a producer is *still running*: a file read at an instant cannot carry that. The manifest's own guarantees do not reach it either. [§check-evidence-manifest](#check-evidence-manifest)'s assertion A asserts suite-roster completeness at a close cursor, and the spine's single fold makes a torn read unreachable. The gap is liveness alone, and the lock is the artifact that closes it.
 
-**The record** is one line, `pid=<n> run=<key>`, where `<key>` is the evidence-line key the run-key reader yields. Both fields have named readers and nothing else is carried. A start timestamp is refused: under a PID-liveness stale policy it has no reader.
+**The record** is one line, `pid=<n> run=<key>`, where `<key>` is the evidence-line key the run-key reader yields. `<n>` is a positive decimal with no leading zero, one whitespace byte separates the fields, `<key>` carries no whitespace, and the line ends in a newline. Anything else does not parse, an empty file and an unterminated line included. Both fields have named readers and nothing else is carried. A start timestamp is refused: under a PID-liveness stale policy it has no reader.
 
 **The grammar has a second writer class, so a change to the record shape has both callers in view.** A session that backgrounds a shell child writes a launch-time liveness record in this same one-line form. Whoever arrives after the session dies can then still ask whether the orphan is writing ([delegation-kit/SPEC.md §The delegation model](../delegation-kit/SPEC.md#the-delegation-model) owns that rule). The two writers share the grammar and the predicate below, and nothing else. The atomic create-exclusive claim is this lock's alone, since a launcher recording its own child's PID has no second claimant to exclude.
 
 **The lock is held if and only if the recorded PID is alive**, so a leaked lock self-invalidates. An **age-based TTL is refused**: a long validate run outlives any honest TTL, and a long run is the case the lock exists for. A TTL short enough to reclaim a crashed run promptly declares a healthy long run dead, restoring the false green the lock removes.
 
-**The liveness predicate** is the one all three readers share. A pid is held when any leg says held, and the reading it must never give is a false **free**: a producer running under another uid exists but cannot be signalled.
+**The liveness predicate** is the one all three readers share. A pid is held when any leg says held, and the reading it must never give is a false **free**: a producer running under another uid exists but cannot be signalled. A pid that is not a positive decimal with no leading zero names no process and reads gone before any leg is asked.
 
-- **unix.** Signal 0 is the cheap existence probe: the predicate calls `kill(2)` and reads `EPERM` as held and `ESRCH` as gone.
+- **unix.** Signal 0 is the cheap existence probe: the predicate calls `kill(2)` and reads `EPERM` as held and `ESRCH` as gone. A pid past the width of the platform's pid type reads gone unprobed.
 - **Windows, the native leg, asked first.** It opens the process for limited query. A process that has not exited, or whose exit code cannot be read, is held. An open denied for access is held too, the `EPERM` reading carried over. Any other answer is gone.
 - **Windows, the MSYS legs behind it.** The shell's `kill -0` builtin runs first, whose exit status conflates the two readings. `ps -p` is the fallback, where any evidence of existence means held.
 
@@ -286,7 +289,7 @@ The situational runtime diff, not a precommit gate: it takes captured logs as ar
 
 The split is per-scenario, so a regression and a recovery cannot net to zero. The shared diff returns non-zero the moment a new failure fires, which is also how `--run-validate` derives its verdict.
 
-**The skip channel.** The tool reads the skip side-channel (`EVIDENCE_KIT_SKIP_FILE`, truncated per run) and demotes a self-skipped scenario from pass before the pass/fail branch, so a self-skip cannot masquerade as a pass. The kit ships no producer for the skip file: a *consumer harness* that self-skips a scenario writes it ([§Layout and configuration](#layout-and-configuration)).
+**The skip channel.** The tool reads the skip side-channel (`EVIDENCE_KIT_SKIP_FILE`, truncated per run) and demotes a self-skipped scenario from pass before the pass/fail branch, so a self-skip cannot masquerade as a pass. The kit ships no producer for the skip file: a *consumer harness* that self-skips a scenario writes it ([§Layout and configuration](#layout-and-configuration)). A skip record is a `<suite> <scenario>` line. The reader takes newline-terminated lines only, so a final record with no newline is not read and its scenario keeps its pass.
 
 **Each argument group is `<suite> <logfile> [<status>]`, and the status is optional only where the parser can do without it.** A log-parsing suite derives its scenarios from the log, so the pair form is complete for it. An `exit-code` suite's verdict *is* the status and appears nowhere in the log, so a group naming one without a status is **refused at exit 2** rather than run. Assuming success there would report pass for every log the tool is ever handed, clearing reds it structurally cannot observe. That is the fail-closed reading of [§Baseline manifest](#baseline-manifest)'s rule applied to the tool's own input.
 
@@ -365,7 +368,7 @@ Invariant: the evidence manifest is well-formed and, where lifecycle drives the 
 - **(B) grammar** — every line is the eight-field manifest shape and carries the current iteration. A foreign iteration line means the boundary truncation was skipped.
 - **(C) stamp-coupling** — a validate stamp demands at least one evidence line. It arms only once the cursor has advanced past `validate`, since the entry stamp legitimately precedes the suites.
 
-A red (B) suppresses A and C. An empty cursor disarms A and C entirely, so a consumer running no lifecycle keeps only the grammar floor. Both no-cursor shapes ([§The evidence adapters](#the-evidence-adapters)) disarm at a *declared* early-out. An empty stage falling through two live assertions would read as a green gate in exactly the window where the gate has nothing to say.
+A red (B) suppresses A and C. An empty cursor disarms A and C entirely, so a consumer running no lifecycle keeps only the grammar floor. The cursor is empty when the queue header names no iteration or the state file yields no stage, and an absent or unreadable file of either reads that way rather than refusing. Both no-cursor shapes ([§The evidence adapters](#the-evidence-adapters)) disarm at a *declared* early-out. An empty stage falling through two live assertions would read as a green gate in exactly the window where the gate has nothing to say.
 
 Argument mode `$1 $2 $3` (manifest, queue, state): each positional reaches the rule as argv and overrides its knob there. The good/bad pair carries no `args` and reaches the rule through the three path knobs, the branch the production battery takes. `gate-tests/check-evidence-manifest.test.sh` covers the positional arm and owns the close-entry and stamp-coupling assertions.
 
@@ -440,7 +443,7 @@ Invariant: no stage entry while the evidence producer is still running. `checks/
 
 - **green** when the lock is absent or names a dead PID, the clean line saying so where that PID is the reader's own ([§The producer-liveness lock](#the-producer-liveness-lock));
 - **red** when it names a live one, printing the blocking run key, so the operator can tell *wait for that run* from *reclaim a lock whose owner is gone*. On a non-unix build the red line also names the leg that answered and the reader's pid: a held reading there has three legs over two pid namespaces, and only the line can say which one a recycled id reached;
-- **exit 2** when the lock does not parse. The claim publishes the record whole ([§The producer-liveness lock](#the-producer-liveness-lock)), so an unparseable lock is corruption and never a free reading.
+- **exit 2** when the lock cannot be read or does not parse. The claim publishes the record whole ([§The producer-liveness lock](#the-producer-liveness-lock)), so an unparseable lock is corruption and never a free reading.
 
 The descriptor couples only `knob:EVIDENCE_KIT_LOCK_FILE`: set mode's directory is the invoker's argument. A consumer's scratch directory is gitignored, so no commit stages a record for a trigger to see.
 

@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### evidence-directive-unstated
-
-`spec:` directives in five crate modules attribute to an evidence-kit/SPEC.md section a fact that section does not state, each stale before the kit's front-half brevity pass. An audit at this filing judged 59 directives and flagged 25: `native/src/evidence.rs` 13 (a third no-cursor shape against the section's two, the run key's `None` as the guards' exit 2, the consumer arm keeping stdout whatever the status, the lock record's exact grammar, the queue-iteration and state-line shapes, the never-named key, a final unterminated line), `native/src/gates/evidence_manifest.rs` 4 (the eight-field split, the date shape, readers swallowing their own failure), `native/src/gates/producer_liveness.rs` 4 (absent as free under the lock section, unreadable as corrupt, a non-numeric and an over-wide pid dead), `native/src/emit/parse_gates_log.rs` 2 (a missing log failing closed, a tail-less log as the run failure) and `native/src/emit/parse_smoke_log.rs` 2 (first reach wins, the exit 2 naming the driver).
-
-**Deliverable:** each flagged directive closed one of three ways, the choice per site: the fact stated in the cited section, the citation re-pointed to the section that states it, or the directive trimmed to what its section states. The audit's counts are a floor to re-derive, since it was one read and inferred per site.
-
-**Cost while deferred:** a reader following a directive to its section finds the behaviour unstated and reads the code as the contract. Filed 2026-10-05 to the gap inbox at evidence-front-install-split-pass' build; promoted at its close, which re-pointed the bullet's three SPEC-to-SPEC citations inline: →fix fails for the directives because each of 25 sites is a choice between growing a section the brevity pass just cut and narrowing a directive, →forward because no ruling is owed. Re-verified: the five files carry 59 evidence-kit directives, and §The evidence adapters names two no-cursor shapes where `state_stage`'s directive claims three. Owner lookup: `directive`, `unstated`, `spec-pointer` in this file — [trajectory-limits-unstated](#trajectory-limits-unstated), DISTINCT (a SPEC claim the arm does not meet, the reverse direction); owner evidence-kit/SPEC.md §The evidence adapters. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling); lands last of the three evidence-kit units, whose edits rewrite sections its directives cite.
-
 ## Deferred
 
 ### foreign-project-critique
@@ -1223,4 +1215,5 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 - evidence-kit-tail-brevity
 - release-section-collision
 - liveness-windows-misread
+- evidence-directive-unstated
 

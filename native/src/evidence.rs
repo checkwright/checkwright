@@ -18,9 +18,8 @@ pub fn data_lines(text: &str) -> Vec<&str> {
         .collect()
 }
 
-// spec: evidence-kit/SPEC.md §The evidence adapters — the first `## Iteration:` line with its lead
-// and any residual `[stage:` field stripped. `None` is no header at all, where an empty string is a
-// header with no name.
+// spec: lifecycle-kit/SPEC.md §The state machine — the queue header's iteration, a residual
+// trailing `[stage:` field stripped
 pub fn queue_iteration(text: &str) -> Option<String> {
     let hdr = text.lines().find(|l| l.starts_with("## Iteration:"))?;
     let mut s = hdr.strip_prefix("## Iteration:").unwrap_or(hdr);
@@ -31,8 +30,8 @@ pub fn queue_iteration(text: &str) -> Option<String> {
     })
 }
 
-// spec: evidence-kit/SPEC.md §The evidence adapters — the cursor reader's corpus: every non-blank line
-// below the `---` separator, which is also the set assertion C's validate-stamp scan reads
+// spec: lifecycle-kit/SPEC.md §The state machine — the evidence file's data lines, below its `---`
+// separator
 pub fn state_lines(text: &str) -> Vec<&str> {
     let mut out = Vec::new();
     let mut seen = false;
@@ -50,21 +49,19 @@ pub fn state_lines(text: &str) -> Vec<&str> {
     out
 }
 
-// spec: evidence-kit/SPEC.md §The evidence adapters — the cursor: the last data line's second
-// field. `None` on all three non-zero shapes — absent file, no data line, no second field.
+// spec: evidence-kit/SPEC.md §The evidence adapters — the cursor: the last data line's stage, `None`
+// wherever the reader answers no stage
 pub fn state_stage(text: &str) -> Option<String> {
     let last = state_lines(text).last().copied()?;
     last.split_whitespace().nth(1).map(String::from)
 }
 
-// spec: evidence-kit/SPEC.md §The evidence adapters — the never-named iteration the queue header
-// carries before a run is named; the run key reads it as *no key* rather than as one, so the
-// placeholder never reaches a manifest line.
+// spec: evidence-kit/SPEC.md §The evidence adapters — the unnamed-iteration placeholder, which names
+// no run key
 const UNNAMED: &str = "—";
 
-// spec: evidence-kit/SPEC.md §The evidence adapters — the run key: the queue header's iteration where
-// it names one, else the configured run id. `None` is what the spine turns into the guards' exit 2 —
-// never into a verdict.
+// spec: evidence-kit/SPEC.md §The evidence adapters — the run key; `None` is the no-key case the
+// spine refuses at the guards' exit 2
 pub fn run_key(queue_text: Option<&str>, run_id: &str) -> Option<String> {
     if let Some(iter) = queue_text.and_then(queue_iteration) {
         if !iter.is_empty() && iter != UNNAMED {
@@ -78,8 +75,7 @@ pub fn run_key(queue_text: Option<&str>, run_id: &str) -> Option<String> {
 }
 
 // spec: evidence-kit/SPEC.md §The evidence adapters — the suite's configured run command, looked up
-// in the `EVIDENCE_KIT_RUN_` family by suite, so a suite the family does not carry answers empty and
-// the caller's own guard reports it.
+// in the `EVIDENCE_KIT_RUN_` family by suite
 pub fn suite_cmd(run_family: &[(String, String)], suite: &str) -> String {
     crate::walk::knob_in_family(run_family, suite).unwrap_or_default()
 }
@@ -95,7 +91,7 @@ pub fn parser_for(parser_family: &[(String, String)], suite: &str, global: &str)
 
 // spec: evidence-kit/SPEC.md §The evidence adapters — the parser's three arms: the two bundled
 // adapters and, for any other value, the consumer command word-split and spawned with the log
-// appended last. The consumer arm keeps the child's stdout whatever its status.
+// appended last, its exit status unread
 pub fn parse(
     suite: &str,
     log: &std::path::Path,
@@ -131,9 +127,8 @@ pub fn parse(
     }
 }
 
-// spec: evidence-kit/SPEC.md §The evidence adapters — the `libtest` adapter's awk program: a line whose
-// first field is `test` and which carries a ` ... ` run of the result separator, keyed on the
-// second field and graded by the last. A token that is none of the three ranks is no scenario.
+// spec: evidence-kit/SPEC.md §The evidence adapters — the `libtest` adapter: one scenario per
+// per-test result line
 fn libtest_lines(text: &str) -> Vec<String> {
     let mut out = Vec::new();
     for line in text.lines() {
@@ -154,15 +149,14 @@ fn libtest_lines(text: &str) -> Vec<String> {
     out
 }
 
-// spec: evidence-kit/SPEC.md §bin/diff-baseline.sh — `ek_diff`'s findings and its verdict, the one
-// per-scenario diff both arms share: exactly two printed shapes and no third, and the status is 1
-// the moment a new failure fires, so a recovery-only diff is clean.
+// spec: evidence-kit/SPEC.md §bin/diff-baseline.sh — the shared per-scenario diff's findings and its
+// verdict, non-zero the moment a new failure fires
 pub struct Diff {
     pub findings: Vec<String>,
     pub new_failure: bool,
 }
 
-// spec: evidence-kit/SPEC.md §bin/diff-baseline.sh — `ek_diff`: a baseline `pass` scenario red or
+// spec: evidence-kit/SPEC.md §bin/diff-baseline.sh — a baseline `pass` scenario red or
 // absent is a new failure, a `fail`/`ignore` one observed green an unpromoted recovery, an observed
 // `fail` with no baseline row a new failure; the skip demotion runs before the pass/fail branch.
 pub fn diff(baseline_text: &str, suite: &str, observed_text: &str, skip_text: &str) -> Diff {
@@ -235,9 +229,8 @@ pub fn diff(baseline_text: &str, suite: &str, observed_text: &str, skip_text: &s
     out
 }
 
-// spec: evidence-kit/SPEC.md §The evidence adapters — what bash's `while read` over a redirected file
-// yields: a final line with no terminating newline is read into the variables but the loop body
-// never runs on it, so the adapters see complete lines only and the compiled twin must too.
+// spec: evidence-kit/SPEC.md §bin/diff-baseline.sh — newline-terminated lines only: a final line
+// with no newline is not read
 fn bash_lines(text: &str) -> Vec<&str> {
     match text.rfind('\n') {
         Some(i) => text[..=i].lines().collect(),
@@ -245,18 +238,16 @@ fn bash_lines(text: &str) -> Vec<&str> {
     }
 }
 
-// spec: evidence-kit/SPEC.md §The producer-liveness lock — `ek_lock_read`'s three outcomes as
-// three variants rather than a `Result<Option<_>>`: the helper's 1 and 2 mean opposite things to
-// a caller, and a shape folding either into the other is the reading that section forbids.
+// spec: evidence-kit/SPEC.md §The producer-liveness lock — three outcomes, never two: an
+// unparseable lock is corruption and fails closed rather than reading free
 pub enum LockRead {
     Absent,
     Corrupt,
     Held { pid: String, run_key: String },
 }
 
-// spec: evidence-kit/SPEC.md §The producer-liveness lock — `ek_lock_read`, reproducing
-// `IFS= read -r line <"$lock" || return 2` at the byte level: bash's `read` returns non-zero at
-// EOF with no delimiter, so a record with no trailing newline is corruption, and so is an empty file.
+// spec: evidence-kit/SPEC.md §The producer-liveness lock — the record is one newline-terminated
+// line: an unterminated one does not parse, nor does an empty file
 pub fn lock_read(path: &std::path::Path) -> LockRead {
     if !path.is_file() {
         return LockRead::Absent;
@@ -273,9 +264,7 @@ pub fn lock_read(path: &std::path::Path) -> LockRead {
     }
 }
 
-// spec: evidence-kit/SPEC.md §The producer-liveness lock — the record grammar
-// `^pid=([1-9][0-9]*)[[:space:]]run=([^[:space:]]+)$`, anchored whole: exactly one whitespace
-// byte between the fields, a run key carrying none, and no leading zero on the pid.
+// spec: evidence-kit/SPEC.md §The producer-liveness lock — the record grammar, matched whole
 fn parse_lock_line(line: &[u8]) -> Option<(String, String)> {
     let rest = line.strip_prefix(b"pid=")?;
     let digits = rest
@@ -438,6 +427,28 @@ mod tests {
         assert_eq!(state_stage("h\n---\n"), None);
         assert_eq!(state_stage("h\nit close s3 d\n"), None);
         assert_eq!(state_stage("h\n---\nlonely\n"), None);
+    }
+
+    // spec: evidence-kit/SPEC.md §The evidence adapters — the run key: the header's iteration, else
+    // the run id, and neither the placeholder nor a nameless header is a key
+    #[test]
+    fn the_run_key_is_the_iteration_else_the_run_id_and_never_the_placeholder() {
+        assert_eq!(run_key(Some("## Iteration: alpha\n"), "rid").as_deref(), Some("alpha"));
+        assert_eq!(run_key(Some("## Iteration: —\n"), "rid").as_deref(), Some("rid"));
+        assert_eq!(run_key(Some("## Iteration:\n"), "rid").as_deref(), Some("rid"));
+        assert_eq!(run_key(None, "rid").as_deref(), Some("rid"));
+        assert_eq!(run_key(Some("## Iteration: —\n"), ""), None);
+        assert_eq!(run_key(None, ""), None);
+    }
+
+    // spec: evidence-kit/SPEC.md §bin/diff-baseline.sh — a skip record demotes its pass, and a final
+    // record with no newline is not read
+    #[test]
+    fn a_skip_record_is_read_only_when_newline_terminated() {
+        let base = "s a pass\n";
+        assert!(diff(base, "s", "a pass\n", "").findings.is_empty());
+        assert!(diff(base, "s", "a pass\n", "s a\n").new_failure);
+        assert!(!diff(base, "s", "a pass\n", "s a").new_failure);
     }
 
     // spec: evidence-kit/SPEC.md §The producer-liveness lock — the native leg answers the Windows

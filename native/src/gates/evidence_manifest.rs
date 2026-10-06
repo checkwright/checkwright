@@ -12,9 +12,8 @@ fn knob_or(args: &[String], at: usize, knob: &str) -> Result<String, String> {
     }
 }
 
-// spec: evidence-kit/SPEC.md §Evidence manifest — bash `read -r f1 … f8 rest`: eight
-// whitespace-separated fields with everything past the eighth landing in `rest`, so a short
-// line leaves f8 empty and a long one leaves rest non-empty
+// spec: evidence-kit/SPEC.md §check-evidence-manifest — (B)'s eight-field shape: a short line leaves
+// the eighth empty and a long one leaves a remainder
 fn fields(line: &str) -> (Vec<String>, String) {
     let f: Vec<&str> = line.split_whitespace().collect();
     let at = |i: usize| f.get(i).copied().unwrap_or("").to_string();
@@ -29,8 +28,7 @@ fn is_digits(s: &str) -> bool {
     !s.is_empty() && s.bytes().all(|b| b.is_ascii_digit())
 }
 
-// spec: evidence-kit/SPEC.md §Evidence manifest — `^[0-9]{4}-[0-9]{2}-[0-9]{2}$`, matched
-// digit-wise as the shell's own character class does rather than parsed as a calendar date
+// spec: evidence-kit/SPEC.md §Evidence manifest — the date's digit shape, never a calendar parse
 fn is_date(s: &str) -> bool {
     let b = s.as_bytes();
     if b.len() != 10 {
@@ -77,8 +75,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(1);
     }
 
-    // spec: evidence-kit/SPEC.md §The evidence adapters — both readers swallow their own failure at
-    // the call site (`|| true`), so an absent or headerless file is an empty cursor here
+    // spec: evidence-kit/SPEC.md §check-evidence-manifest — a queue naming no iteration and a state
+    // file yielding no stage are the empty cursor
     let iter = evidence::queue_iteration(&read_or_empty(&queue)).unwrap_or_default();
     let stext = read_or_empty(&state);
     let stage = evidence::state_stage(&stext).unwrap_or_default();
@@ -149,7 +147,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     // spec: evidence-kit/SPEC.md §check-evidence-manifest — an empty cursor disarms A and C
     // here, at the declared early-out, rather than letting an empty stage slip past two live
-    // assertions; the no-cursor window is reachable in normal operation
+    // assertions
     if iter.is_empty() || !Path::new(&state).is_file() || stage.is_empty() {
         println!("EVIDENCE-MANIFEST: clean (grammar holds in {}; no lifecycle state — close-entry/stamp-coupling disarmed)", manifest);
         return Ok(0);
@@ -213,9 +211,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
     Ok(0)
 }
 
-// spec: evidence-kit/SPEC.md §check-evidence-manifest — an unreadable queue or state file is
-// the empty-cursor shape the shell's `2>/dev/null || true` already produces, never a refusal;
-// the manifest itself is guarded by the not-found branch above before it is read
+// spec: evidence-kit/SPEC.md §check-evidence-manifest — an absent or unreadable queue or state file
+// reads as the empty cursor, never a refusal
 fn read_or_empty(path: &str) -> String {
     std::fs::read(path)
         .map(|b| String::from_utf8_lossy(&b).into_owned())

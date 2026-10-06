@@ -18,7 +18,7 @@ fn refuse_absent_ps() -> i32 {
 }
 
 // spec: evidence-kit/SPEC.md §check-producer-liveness — the per-record verdict, shared by both
-// modes because set mode "adds the quantifier" and re-decides nothing else
+// modes: set mode quantifies it and re-decides nothing else
 enum Verdict {
     Corrupt,
     Free,
@@ -173,9 +173,9 @@ fn path_mode(lock: &str) -> i32 {
 }
 
 pub fn run(args: &[String]) -> i32 {
-    // spec: evidence-kit/SPEC.md §check-producer-liveness — `${1:-$EVIDENCE_KIT_LOCK_FILE}`: an
-    // empty first positional takes the knob exactly as an absent one does, and every argument past
-    // the first is ignored, so the entry hook's trailing `<queue> <state>` passes through.
+    // spec: evidence-kit/SPEC.md §check-producer-liveness — the `[lock-file]` positional over the
+    // knob; every argument past the first is ignored, so the entry hook's trailing `<queue> <state>`
+    // passes through
     let lock = match args.first().filter(|a| !a.is_empty()) {
         Some(a) => a.clone(),
         None => match walk::knob_scalar("EVIDENCE_KIT_LOCK_FILE") {
@@ -210,9 +210,7 @@ mod tests {
         d
     }
 
-    // spec: evidence-kit/SPEC.md §The producer-liveness lock — the grammar's negative arms, which
-    // the fixture pair cannot carry: a pair asserts a line's presence and never its absence, and
-    // both cases here have to be *files* whose content is the assertion
+    // spec: evidence-kit/SPEC.md §The producer-liveness lock — the record grammar's negative arms
     #[test]
     fn the_record_grammar_admits_only_a_whole_well_formed_line() {
         let d = scratch("grammar");
@@ -243,9 +241,8 @@ mod tests {
         let _ = std::fs::remove_dir_all(&d);
     }
 
-    // spec: evidence-kit/SPEC.md §The producer-liveness lock — an absent file is the *free*
-    // reading and an unreadable one is corruption, and folding either into the other is the
-    // reading that section forbids
+    // spec: evidence-kit/SPEC.md §check-producer-liveness — an absent lock is green, never the
+    // exit 2 an unreadable or unparseable one takes
     #[test]
     fn an_absent_lock_is_free_and_never_corruption() {
         let d = scratch("absent");
@@ -254,8 +251,8 @@ mod tests {
         let _ = std::fs::remove_dir_all(&d);
     }
 
-    // spec: evidence-kit/SPEC.md §check-producer-liveness — the pid predicate's non-numeric arms,
-    // which never reach a spawn: `ek_pid_alive` returns 1 on them before it probes anything
+    // spec: evidence-kit/SPEC.md §The producer-liveness lock — a pid that is not a positive decimal
+    // reads gone before any leg is asked
     #[test]
     fn a_pid_that_is_not_a_pid_is_dead_without_a_spawn() {
         for bad in ["", "0", "01", "12x", " 12", "abc", "-1"] {
@@ -310,7 +307,8 @@ mod tests {
         );
     }
 
-    // spec: evidence-kit/SPEC.md §The producer-liveness lock — a pid no process can hold is gone
+    // spec: evidence-kit/SPEC.md §The producer-liveness lock — a pid past the pid type's width reads
+    // gone unprobed
     #[cfg(unix)]
     #[test]
     fn a_pid_past_the_pid_width_is_dead() {
