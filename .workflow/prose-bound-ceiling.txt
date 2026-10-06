@@ -4,4 +4,3 @@
 21 gate-sdk/SPEC.md
 1 installer/SPEC.md
 1 lifecycle-kit/SPEC.md
-49 site-kit/SPEC.md
