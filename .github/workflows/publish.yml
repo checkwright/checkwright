@@ -1,4 +1,4 @@
-# spec: RELEASING.md §The procedure — step 5: the tag is the only trigger; one pack, each channel a sibling job
+# spec: RELEASING.md §The procedure — Watch the publish workflow:the tag is the only trigger; one pack, each channel a sibling job
 # spec: gate-sdk/SPEC.md §Consumer payload — the roster-derived matrix, each digest computed once
 name: publish
 
@@ -135,7 +135,7 @@ jobs:
             bash gate-sdk/bin/run-gates.sh --pack-installer \
               --version "$version" --out "$out" --artifacts "$art"
 
-          # spec: RELEASING.md §The procedure — step 5: a stamp that disagrees with the tag is refused
+          # spec: RELEASING.md §The procedure — Watch the publish workflow:a stamp that disagrees with the tag is refused
           tarball="$(ls "$out"/*.tgz)"
           packed="$(tar -xzOf "$tarball" package/package.json | jq -r '.version')"
           if [ "$packed" != "$version" ]; then
@@ -177,7 +177,7 @@ jobs:
   npm:
     needs: pack
     runs-on: ubuntu-24.04
-    # spec: RELEASING.md §The procedure — step 5: the npm job waits on its approval environment
+    # spec: RELEASING.md §The procedure — Watch the publish workflow:the npm job waits on its approval environment
     environment: npm-publish
     permissions:
       contents: read
@@ -213,7 +213,7 @@ jobs:
   release:
     needs: [build, pack]
     runs-on: ubuntu-24.04
-    # spec: RELEASING.md §The procedure — step 5: the primary channel, held behind no approval
+    # spec: RELEASING.md §The procedure — Watch the publish workflow:the primary channel, held behind no approval
     permissions:
       contents: write
       attestations: read
@@ -243,7 +243,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          # spec: RELEASING.md §The procedure — step 6: exactly one note per tag, resolved before the Release exists
+          # spec: RELEASING.md §The procedure — Verify the GitHub Release body:exactly one note per tag, resolved before the Release exists
           apex="$(tr -d '[:space:]' < docs/CNAME)"
           if [ -z "$apex" ]; then
             echo "docs/CNAME is empty — cannot derive the release note's URL" >&2

@@ -30,7 +30,7 @@ jobs:
           ALT_DOMAIN: checkwright.com
           RELEASE_NOTE_GLOB: 'docs/posts/*.md'
           RELEASE_NOTE_TAG_KEY: 'release'
-          # spec: RELEASING.md §The procedure — step 6 writes Release bodies to this bare form
+          # spec: RELEASING.md §The procedure — Verify the GitHub Release body: bodies are written to this bare form
           RELEASE_NOTE_URL_PATH: '/posts/{slug}'
           HIGHLIGHT_CSS_PATH: '/assets/css/style.css'
           HIGHLIGHT_TOKENS_FILE: 'scripts/highlight-tokens.list'

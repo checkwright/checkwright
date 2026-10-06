@@ -375,7 +375,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             println!("{}", f);
         }
         if ab_red {
-            println!("  help: set both scripts' pin line to the newest release tag, in the commit after that tag — RELEASING.md step 4 moves it with the release declaration surface's drain.");
+            println!("  help: set both scripts' pin line to the newest release tag, in the commit after that tag — RELEASING.md §The procedure, 'Tag the stamp commit, then drain the release declaration surface', moves it with that drain.");
         }
         if floor_red {
             println!("  help: set both scripts' floor line to the one value the commit landing the attestation check gave it — the floor never moves after landing.");
@@ -384,7 +384,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             println!("  help: spell the pinned release's asset names on every fetch surface, or, in the commit moving the pin, the new release's names.");
         }
         if d_red {
-            println!("  help: re-measure the pinned release with --measure-commit and rewrite the commit-cost block, in the commit moving the pin — RELEASING.md step 4.");
+            println!("  help: re-measure the pinned release with --measure-commit and rewrite the commit-cost block, in the commit moving the pin — RELEASING.md §The procedure, 'Tag the stamp commit, then drain the release declaration surface'.");
         }
         return Ok(1);
     }

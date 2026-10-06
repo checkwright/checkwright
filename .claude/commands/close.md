@@ -30,7 +30,7 @@ Execute the template at lifecycle-kit/templates/stages/close.md, applying the bi
 - **A plugin package the pinned release lacks.** `check-plugin-parity` assertion E reds a `none` or `deferred:` disposition while the marketplace pins a tag carrying no `plugin/`, so release, or withdraw `.claude-plugin/marketplace.json` in the same close.
 - **The channel's audience arriving** — the launch the private brief's own readiness rule gates. The accumulated `deferred:` floor ships as one release there rather than as a backfilled run of tags nobody read.
 
-Otherwise stamp the disposition line's deferral form (lifecycle-kit/SPEC.md §templates/stages/ — `deferred:vX.Y.Z`, the version the criteria would have shipped as) and let the accumulated declarations ride the next qualifying release. RELEASING.md step 1 composes one note from every declaration since the last tag.
+Otherwise stamp the disposition line's deferral form (lifecycle-kit/SPEC.md §templates/stages/ — `deferred:vX.Y.Z`, the version the criteria would have shipped as) and let the accumulated declarations ride the next qualifying release. RELEASING.md §The procedure, *Author the release-note post — in-iteration*, composes one note from every declaration since the last tag.
 
 *The honest limit.* No gate reds a release cut too soon. Each trigger above is a case where a fast release is correct, so a timing gate would need an override valve covering all of them and would end up policing the valve rather than the cadence. Timing is policy under a mandatory disposition stamp, and that stamp is not nothing: silence is not a disposition.
 

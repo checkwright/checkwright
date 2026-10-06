@@ -39,7 +39,7 @@ installer/action.yml
 # Live-site monitoring (not a gate): the scheduled deployment probe.
 .github/workflows/site-health.yml
 
-# The installer package's publish channel (RELEASING.md §The procedure step 5).
+# The installer package's publish channel (RELEASING.md §The procedure, *Watch the publish workflow — both channels*).
 .github/workflows/publish.yml
 
 # The installer's own entry points (CLAUDE.md §Housekeeping).

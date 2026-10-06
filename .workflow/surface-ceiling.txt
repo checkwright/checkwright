@@ -8,7 +8,7 @@
 1446cp .claude/commands/agent-execution.md
 551cp .claude/commands/align.md
 1135cp .claude/commands/build.md
-8706cp .claude/commands/close.md
+8762cp .claude/commands/close.md
 2355cp .claude/commands/consult.md
 1451cp .claude/commands/economics.md
 5151cp .claude/commands/lead.md
@@ -36,7 +36,7 @@
 9645cp docs/generated-projections.md
 1259cp docs/guard-kit/index.md
 5205cp docs/index.md
-7858cp docs/install-block-contracts.md
+8021cp docs/install-block-contracts.md
 8387cp docs/install-parity-contracts.md
 9542cp docs/install.md
 1344cp docs/kits.md
@@ -94,11 +94,11 @@
 2698cp drift-kit/templates/close-knowledge.md
 4257cp drift-kit/templates/economics.md
 85183cp evidence-kit/SPEC.md
-955989cp gate-sdk/SPEC.md
+956164cp gate-sdk/SPEC.md
 2899cp gate-sdk/templates/adopt.md
 281884cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
-277358cp installer/SPEC.md
+277551cp installer/SPEC.md
 357506cp lifecycle-kit/SPEC.md
 6534cp lifecycle-kit/templates/consult.md
 44666cp lifecycle-kit/templates/lead.md

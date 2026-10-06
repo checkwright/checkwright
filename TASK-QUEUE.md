@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### release-step-number-cites
-
-RELEASING.md's numbered procedure steps are cited by position, the shape doctrine-kit/DOCTRINE.md Derivation-first names: inside RELEASING.md itself, and from outside it as "RELEASING.md step N" in gate-sdk/SPEC.md, installer/SPEC.md (three sites), docs/site-architecture.md, .claude/commands/close.md, `native/src/gates/install_pin.rs`'s two printed remedies and scripts/guard-config.knobs. Every number is correct today, since the list was re-linked, not reordered.
-
-**Deliverable:** each citation names the step by its bold title or a heading, never its number.
-
-**Cost while deferred:** a step inserted or reordered in RELEASING.md mis-points about fifteen citations, several in shipped kit SPECs and a gate's printed remedy. Filed 2026-09-30 to the gap inbox by canon-kit-value-pass' close positional-reference sweep, outside its range corpus; promoted 2026-09-30 at the next iteration's scope: →fix fails because the sweep reaches a gate's printed remedy, owing the native build and the battery. Re-verified: a grep for `RELEASING.md step <n>` hits every site named above. Owner lookup: `positional`, `step number`, `RELEASING.md step` in this file — none; owner RELEASING.md, with doctrine-kit/DOCTRINE.md Derivation-first. Surface also installer. Re-verified at scope 2026-10-06, the site list widened: `§The procedure — step N` directives also sit in .github/workflows/publish.yml (five) and .github/workflows/site-health.yml (one), so the build's grep takes that spelling too. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
-
 ### fence-toggle-list-item
 
 the toggle fence parsers keyed on `spec::is_fence_line` (`native/src/spec.rs`: `docs_mirror`, `manifest_temporal`, `spec_pointer`, `citation_link`, `prose_tells`, `task_path_claim` and the rest, 17 modules) and `check-spec-fence-balance` read a list-item fence opener (`- ```sh`) as no delimiter, while `fence_opening` (`native/src/gates/fence_command_head.rs`) and `check-fence-run` read it as kramdown renders it. An odd count of list-item fences in a manifest-set file reds the balance gate with a misleading "close the unbalanced fence"; an even count passes it and inverts every toggle parser's span between them, so those gates scan fence bodies as prose and skip the prose between.
@@ -1189,4 +1181,5 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 - site-health-probe-no-retry-on-transient
 - site-kit-brevity
 - release-drain-ordering-contradiction
+- release-step-number-cites
 

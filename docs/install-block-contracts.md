@@ -21,7 +21,7 @@ A row is a block line opening with `|` past the header, and not the delimiter ro
 
 ## The commit-cost block
 
-`docs/requirements.md`'s What a commit costs section carries the `<!-- commit-cost:begin -->` marker block, one sentence written from `--measure-commit`'s output at each release (RELEASING.md step 4) and held to the pin by `check-install-pin` invariant D, whose section the hosted install scripts section below links. It is measured rather than derived: the figure is one host's, so no gate re-runs it.
+`docs/requirements.md`'s What a commit costs section carries the `<!-- commit-cost:begin -->` marker block, one sentence written from `--measure-commit`'s output at each release ([`RELEASING.md` §The procedure](https://github.com/checkwright/checkwright/blob/master/RELEASING.md#the-procedure), *Tag the stamp commit, then drain the release declaration surface*) and held to the pin by `check-install-pin` invariant D, whose section the hosted install scripts section below links. It is measured rather than derived: the figure is one host's, so no gate re-runs it.
 
 ## The remedy blocks
 
