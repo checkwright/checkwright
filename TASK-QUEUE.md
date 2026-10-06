@@ -76,14 +76,6 @@ three sentences the harness-naming sweep left or made inexact. gate-sdk/SPEC.md 
 
 **Cost while deferred:** a reader of the adopter constraints looks for a knob that does not exist. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' close, off its second-vendor review; carried over the boundary and promoted at the next scope. Re-verified there by grep: the adopter-constraints sentence, the smoke's literal settings path, and the two arms reading `GUARD_KIT_SETTINGS_LOCAL`. Owner lookup: `GUARD_KIT_SETTINGS`, `kpi-settings-local`, `project-directory` in this file and the disposed-findings record — [harness-literal-catcher-gate](#harness-literal-catcher-gate), DISTINCT (the catcher for sites already generic; these are sites the sweep misstated).
 
-### stage-tier-line-unread
-
-a stage session dispatched on the mechanical class skipped its tier check: doctrine-brevity-journal-arm-pass' align session read a dispatch prompt carrying the line `tier: mechanical` as naming no class to verify and ran no `--model-verdict` after its entry stamp. .claude/agents/stage-session.md's *Verify your tier* bullet opens on "When your dispatch names a class", and .claude/commands/lead.md says every dispatch prompt names its class as `tier: <class>`; the bullet never says that line is the naming. The lead ran the verdict on the session's stamp id afterward and it returned OK, so no wrong-tier work landed.
-
-**Deliverable:** the bullet stating that a `tier:` line in the dispatch is the class it names; debt.
-
-**Cost while deferred:** a wrong-tier dispatch on that class goes unseen until the lead checks by hand. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' lead, off the session's hand-back report; carried over the boundary and promoted at the next scope. A second datum for the next re-judgment of the align tier binding. Owner lookup: `model-verdict`, `tier check`, `align tier` in this file and the disposed-findings record — the record's 2026-10-05 line, DISTINCT (a knob couple the align session missed, discarded as a datum; this one names a deliverable).
-
 ## Deferred
 
 ### foreign-project-critique
@@ -1207,4 +1199,6 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 No rule holds a docs video to a local poster linking out, so a first embed adds a third-party request.
 
 ## Done
+
+- stage-tier-line-unread
 
