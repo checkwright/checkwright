@@ -28,7 +28,14 @@ The build's first act on this amendment is to run the harness facts deltas 2 and
 
 **Inferred, cannot run before build:** each of (a) through (f) — they were relayed from a documentation lookup read through a summarizer, and their subject is a registration no tracked settings file carries until this delta's diff is applied.
 
-**How it is run.** The session prepares a diff adding one exec-form registration of an existing member beside the standing shell-form ones, and the operator applies it: the settings file is operator-owned (guard-kit/SPEC.md §compare-settings-allow), and a `hooks[]` edit arms in the running session. The unix half runs in that session. The Windows half needs a native Windows host running the harness; no workflow leg runs a harness, so it is an operator-observed run. The witness names the harness version it ran on, which becomes the stated minimum of delta 2.
+**How it is run.** The session prepares a diff adding exec-form registrations of existing members beside the standing shell-form ones, and the operator applies it: the settings file is operator-owned (guard-kit/SPEC.md §compare-settings-allow), and a `hooks[]` edit arms in the running session. The unix half runs in that session. The Windows half needs a native Windows host running the harness; no workflow leg runs a harness, so it is an operator-observed run. The witness names the harness version it ran on, which becomes the stated minimum of delta 2.
+
+**The registrations, settled at build.** The binary given no argument exits 2, so a harness that dropped `args` would block every call the matcher takes. The witness therefore rides two matchers no session here uses, in the untracked local settings overlay, each naming a scratch copy of the binary with no executable suffix:
+
+- `agent-budget-guard` on `NotebookEdit`, which advises whatever the payload, its `args` trailing `;`, `touch` and a marker path: a marker that appears means a shell read them.
+- `wakeup-guard` on `EnterWorktree`, which blocks whatever the payload and logs the attempt.
+
+Fact (c) renames the copy, so no standing hook is disturbed. Fact (d) repeats the first call from a session in a linked worktree, where the copy does not exist. The overlay's `hooks` key is removed once both halves are recorded.
 
 **Who supplies the Windows half: decided at build** (operator direction 2026-10-06, lead-relayed, not a ruling). The gate below stands as written and the queue is unchanged; the build session settles the supplier when it reaches the witness.
 
