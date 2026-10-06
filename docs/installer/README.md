@@ -68,7 +68,7 @@ The flags each verb takes, owned by the binary as the verbs are:
 
 `starter`, `delegation`, `prose`, `full`. Not four rungs on one ladder: the profiles are ordered by kit-set containment, so moving to one that contains yours only ever adds, and two that contain neither the other — `delegation` and `prose` — are alternatives rather than steps.
 
-- **`starter`** — the gate SDK on its own: a battery, a generated pre-commit hook, and gates that red on real defects in your tree with no configuration outside your gates directory.
+- **`starter`** — the gate SDK on its own: a battery, a pre-commit hook, and gates that red on real defects in your tree with no configuration outside your gates directory.
 - **`delegation`** — adds every kit whose subject is the agent session itself.
 - **`prose`** — adds canon-kit instead, for a repository whose artifacts are documents rather than code.
 - **`full`** — everything in the payload.

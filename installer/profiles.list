@@ -21,9 +21,9 @@
 # no count to raise here.
 
 # starter — the smallest set that reaches a green battery with a working
-# generated hook and at least one gate that reds on a real consumer defect
+# pre-commit hook and at least one gate that reds on a real consumer defect
 # needing no configuration outside the gates directory. gate-sdk is forced in:
-# without it there is no runner, no hook generator, and no registry for a gate
+# without it there is no runner, no git hooks, and no registry for a gate
 # name to resolve against. It also already satisfies the last clause, through a
 # gate that reads the adopter's own tree rather than the vendored source — a
 # pipeline under `pipefail` that can lose its match to a closed pipe. So any
@@ -57,7 +57,7 @@ delegation	doctrine-kit
 
 # prose — the smallest set that governs a repository whose artifacts are prose,
 # on the floor docs/requirements.md §Installing and running the shipped gates states for it. gate-sdk is forced in for the same reason it is forced in
-# starter: no runner, no hook generator, no registry. canon-kit is the kit whose
+# starter: no runner, no git hooks, no registry. canon-kit is the kit whose
 # subject is authored documents; every other kit's subject is either the agent
 # session — which is delegation's criterion, and why these two are alternatives
 # rather than steps — or a deployed site.
