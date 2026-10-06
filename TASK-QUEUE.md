@@ -44,6 +44,8 @@ docs/manual-install.md's Windows download fence is dot-sourced and sets `$ErrorA
 
 **Push need (2026-10-06, inside the budget):** the iteration's one mid-iteration push, shared with the two Windows features, since only the Windows install-smoke legs run the marked blocks.
 
+**Landed at build, witness owed (2026-10-06):** both Windows blocks save, set and restore the preference, `$ProgressPreference` with it in the fetch fence, and the `install-smoke-pwsh-windows` leg runs the marked block under a non-stopping preference and reds when the block leaves another. Neither has run, no PowerShell being on the build host. After the push, read that leg's step that runs the page's `windows-install` block; on green, `--queue done install-windows-stop-restore`. The fetch fence has no reader, so its restore stays inferred.
+
 **Cost while deferred:** an adopter's shell keeps a changed error policy after installing. Filed 2026-10-06 by evidence-front-install-split-pass' lead. Re-verified by reading the fence, which opens on `. {` and sets the preference inside it. Owner lookup: `ErrorActionPreference`, `stop policy`, `try/finally` in this file — none; install-windows-stop-policy, landed last iteration, DISTINCT (it added the preference this restores).
 
 ### mirror-fold-absent-mirror
@@ -52,7 +54,9 @@ docs/manual-install.md's Windows download fence is dot-sourced and sets `$ErrorA
 
 **Deliverable:** the knob row restated to what the fold does, or the fold narrowed to an existing mirror, with a fixture for the absent-mirror case; which one is spec's.
 
-**Inferred, cannot run before build:** the fold's behaviour, re-read at this scope in `native/src/gates/stage_entry.rs`, where it tests roster membership and no path — every fixture creates the mirror files, so the absent-mirror case this entry delivers is the first run.
+**Run at build, 2026-10-06:** with the root set, roster dirs `a/` and `b/` and no `site/b/`, an amendment in `a/` naming `site/b/SPEC.md` exits 1 on `references 2 components: a b`; the fold tests roster membership and no path, as inferred.
+
+**Lead decision, 2026-10-06 (not the operator's direction; revisable at a later scope or spec):** the knob row is restated to what the fold does, no gate verdict changes, and the fixture pins the absent-mirror case as it behaves. Ground: §check-stage-entry owns the fold and the row cites it, so the row yields. Constraint: the row and that section must not disagree, and the over-demand cost below is answered in the section.
 
 **Cost while deferred:** a consumer setting the root before generating a mirror can be asked for an audit stamp its amendment does not owe. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' close, off its second-vendor review; carried over the boundary and promoted at the next scope. Owner lookup: `MIRROR_ROOT`, `mirror fold`, `fold_mirror` in this file and the disposed-findings record — none; owner lifecycle-kit/SPEC.md §Layout and configuration, with §check-stage-entry.
 
