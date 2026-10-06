@@ -1333,7 +1333,7 @@ The budget arm's first live selection: `--group` reported no takeable group, and
 
 **`check-graph` is ruled out of every budget batch.** It emits a self-contained HTML artifact, so it is a non-gate arm designed before it is ported (§The non-gate arm). A batch whose members must be droppable cannot carry one whose design is a prerequisite for the rest of its own work.
 
-**A kit literal is admitted where it is kit mechanism.** A wire-format version string is one, held to the shell library by a unit test that executes it (evidence-kit/SPEC.md §check-evidence-manifest).
+**A kit literal is admitted where it is kit mechanism.** A wire-format version string is one (evidence-kit/SPEC.md §Evidence manifest).
 
 ### The sixth budget batch
 

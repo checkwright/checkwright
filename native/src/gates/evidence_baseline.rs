@@ -13,17 +13,17 @@ fn knob_or(args: &[String], at: usize, knob: &str) -> Result<String, String> {
     }
 }
 
-// spec: evidence-kit/SPEC.md §check-evidence-baseline — bash `read -r suite scenario status
-// slug rest`: whitespace-separated fields with everything past the fourth landing in `rest`
+// spec: evidence-kit/SPEC.md §check-evidence-baseline — the row shape's four leading fields, with
+// whatever follows the slug kept whole as the one optional fifth token
 fn fields(line: &str) -> (String, String, String, String, String) {
     let f: Vec<&str> = line.split_whitespace().collect();
     let at = |i: usize| f.get(i).copied().unwrap_or("").to_string();
     (at(0), at(1), at(2), at(3), f[4.min(f.len())..].join(" "))
 }
 
-// spec: evidence-kit/SPEC.md §check-evidence-baseline — the queue's `<slug> <section>` walk: a
-// `## ` heading names the section, and an entry heading under it (queue-kit/SPEC.md §The queue
-// format: `### <slug>`, or `#### <slug>` for a sub-task) or a bare line outside every entry claims it
+// spec: evidence-kit/SPEC.md §check-evidence-baseline — blocking-slug liveness reads each queue
+// slug with the section it sits under, so a slug held only by the done section reads stale; the
+// entry and done-line grammar is queue-kit/SPEC.md §The queue format's
 fn queue_entries(text: &str) -> Vec<(String, String)> {
     let shaped = |s: &str| {
         let b = s.as_bytes();
@@ -377,8 +377,8 @@ pub fn run(args: &[String]) -> i32 {
 mod tests {
     use super::*;
 
-    // spec: evidence-kit/SPEC.md §check-evidence-baseline — bash `read`'s field split: the fifth
-    // and later tokens land in `rest`, which is what makes a multi-token slug a grammar error
+    // spec: evidence-kit/SPEC.md §check-evidence-baseline — the row shape: everything past the
+    // slug stays one token, so a row carrying more than the optional fifth is a grammar error
     #[test]
     fn a_fifth_field_lands_in_rest_and_a_short_line_leaves_the_tail_empty() {
         assert_eq!(

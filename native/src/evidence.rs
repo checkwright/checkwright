@@ -161,7 +161,7 @@ pub struct Diff {
 // `fail` with no baseline row a new failure; the skip demotion runs before the pass/fail branch.
 pub fn diff(baseline_text: &str, suite: &str, observed_text: &str, skip_text: &str) -> Diff {
     let mut obs: Vec<(String, String)> = Vec::new();
-    for line in bash_lines(observed_text) {
+    for line in observed_text.lines() {
         let mut f = line.split_whitespace();
         let Some(sc) = f.next() else { continue };
         let st = f.next().unwrap_or("");
@@ -171,7 +171,7 @@ pub fn diff(baseline_text: &str, suite: &str, observed_text: &str, skip_text: &s
         }
     }
     let mut skip: Vec<&str> = Vec::new();
-    for line in bash_lines(skip_text) {
+    for line in skip_text.lines() {
         let mut f = line.split_whitespace();
         if let (Some(f1), Some(f2)) = (f.next(), f.next()) {
             if f1 == suite {
@@ -227,15 +227,6 @@ pub fn diff(baseline_text: &str, suite: &str, observed_text: &str, skip_text: &s
         }
     }
     out
-}
-
-// spec: evidence-kit/SPEC.md §bin/diff-baseline.sh — newline-terminated lines only: a final line
-// with no newline is not read
-fn bash_lines(text: &str) -> Vec<&str> {
-    match text.rfind('\n') {
-        Some(i) => text[..=i].lines().collect(),
-        None => Vec::new(),
-    }
 }
 
 // spec: evidence-kit/SPEC.md §The producer-liveness lock — three outcomes, never two: an
@@ -441,14 +432,16 @@ mod tests {
         assert_eq!(run_key(None, ""), None);
     }
 
-    // spec: evidence-kit/SPEC.md §bin/diff-baseline.sh — a skip record demotes its pass, and a final
-    // record with no newline is not read
+    // spec: evidence-kit/SPEC.md §bin/diff-baseline.sh — a skip record demotes its pass, and an
+    // observed `fail` with no baseline row is a new failure, each with or without a final newline
     #[test]
-    fn a_skip_record_is_read_only_when_newline_terminated() {
+    fn a_final_line_is_read_without_its_newline() {
         let base = "s a pass\n";
         assert!(diff(base, "s", "a pass\n", "").findings.is_empty());
+        assert!(diff(base, "s", "a pass", "").findings.is_empty());
         assert!(diff(base, "s", "a pass\n", "s a\n").new_failure);
-        assert!(!diff(base, "s", "a pass\n", "s a").new_failure);
+        assert!(diff(base, "s", "a pass\n", "s a").new_failure);
+        assert!(diff(base, "s", "a pass\nb fail", "").new_failure);
     }
 
     // spec: evidence-kit/SPEC.md §The producer-liveness lock — the native leg answers the Windows

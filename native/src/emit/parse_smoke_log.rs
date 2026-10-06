@@ -1,7 +1,7 @@
 // spec: evidence-kit/SPEC.md §Layout and configuration — `parse-smoke-log`: one scenario per arm,
 // the roster a driver's top-level headers or, given the log alone, the log's own `smoke-roster:` head
 // spec: gate-sdk/SPEC.md §The non-gate arm — an empty roster of the *happens to read nothing*
-// kind; the driver is this product's file, so it is an operand rather than a crate literal
+// kind; the driver is the consumer's own file, so it is an operand rather than a crate literal
 pub const KNOBS: &[&str] = &[];
 pub const USAGE: &str = "usage: --emit parse-smoke-log [<driver.sh>] <log>";
 

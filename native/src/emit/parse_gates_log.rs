@@ -6,7 +6,7 @@ pub const KNOBS: &[&str] = &[];
 pub const USAGE: &str = "usage: --emit parse-gates-log <log>";
 
 // spec: gate-sdk/SPEC.md §run-gates — the tail grammar this reads is gate-sdk's, and the tails
-// print only under GATE_SDK_VERBOSE, which is why EVIDENCE_KIT_RUN_gates sets it
+// print only under GATE_SDK_VERBOSE
 fn tail(line: &str) -> Option<String> {
     let status = if line.starts_with("  PASS: ") {
         "pass"

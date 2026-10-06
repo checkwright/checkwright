@@ -7,8 +7,8 @@ use std::path::Path;
 const BEGIN: &str = "<!-- battery-roster:begin -->";
 const END: &str = "<!-- battery-roster:end -->";
 
-// spec: evidence-kit/SPEC.md §check-battery-roster — the awk line normalization: drop a trailing
-// `#` annotation, trim spaces/tabs (and a trailing CR), then squeeze runs of them to one space
+// spec: evidence-kit/SPEC.md §check-battery-roster — a trailing `#` annotation is never read, and
+// what remains is whitespace-collapsed
 fn normalize_line(raw: &str) -> String {
     let cut = raw.split('#').next().unwrap_or("");
     let trimmed = cut
@@ -133,8 +133,6 @@ fn inner(args: &[String]) -> Result<i32, String> {
             continue;
         }
         if inside && is_roster_line(&line) {
-            // spec: evidence-kit/SPEC.md §check-battery-roster — a repeated line keeps the last
-            // number, the associative-array assignment the shell form makes
             match roster.iter_mut().find(|(c, _)| *c == line) {
                 Some(slot) => slot.1 = idx + 1,
                 None => roster.push((line, idx + 1)),

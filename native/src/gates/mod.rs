@@ -227,8 +227,8 @@ const SPEC_POINTER_ROOTS: &[RootDecl] = &[
 ];
 
 // spec: evidence-kit/SPEC.md §check-producer-liveness — the unix predicate is one `kill(2)` call
-// and spawns nothing; a non-unix build spawns `bash` for the `kill -0` builtin, on the floor, and
-// `ps` for the fallback leg, the one the report counts.
+// and spawns nothing; a non-unix build spawns `bash` for the `kill -0` builtin and `ps` for the
+// fallback leg, both on the program floor and so uncounted.
 #[cfg(unix)]
 const PRODUCER_LIVENESS_NEEDS: &[(&str, &str)] = &[];
 #[cfg(not(unix))]
@@ -1425,8 +1425,8 @@ pub const REGISTRY: &[GateEntry] = &[
         "evidence-kit",
         &[("bash", ""), ("git", "")],
     ),
-    // spec: evidence-kit/SPEC.md §check-evidence-manifest — three named-file reads and no walk,
-    // so the declared root set is empty and unit test A holds that to executed behavior
+    // spec: gate-sdk/SPEC.md §check-reads-couples — the manifest, the queue and the state file
+    // are read by name, so nothing is walked and the declared root set is empty
     (
         "check-evidence-manifest",
         evidence_manifest::run,

@@ -13,7 +13,7 @@ lifecycle-kit's stage evidence proves a stage was *invoked*; it cannot prove the
 - a committed per-run evidence manifest;
 - a codified run contract.
 
-It is a kit of its own, not a lifecycle-kit extension, because the evidence manifest is a wire contract a future external verifier consumes. Its format is versioned, stable and hashable independent of the state machine, and a consumer that runs no iteration lifecycle can adopt the kit. lifecycle-kit integration is optional and arrives through one generic knob on its side of the seam ([§lifecycle-kit integration](#lifecycle-kit-integration)).
+It is a kit of its own, not a lifecycle-kit extension, because the evidence manifest is a wire contract a future external verifier consumes. Its format is versioned, stable and hashable independent of the state machine, and a consumer that runs no iteration lifecycle can adopt the kit. lifecycle-kit integration is optional and arrives through generic knobs on its side of the seam ([§lifecycle-kit integration](#lifecycle-kit-integration)).
 
 ## Layout and configuration
 
@@ -289,7 +289,7 @@ The situational runtime diff, not a precommit gate: it takes captured logs as ar
 
 The split is per-scenario, so a regression and a recovery cannot net to zero. The shared diff returns non-zero the moment a new failure fires, which is also how `--run-validate` derives its verdict.
 
-**The skip channel.** The tool reads the skip side-channel (`EVIDENCE_KIT_SKIP_FILE`, truncated per run) and demotes a self-skipped scenario from pass before the pass/fail branch, so a self-skip cannot masquerade as a pass. The kit ships no producer for the skip file: a *consumer harness* that self-skips a scenario writes it ([§Layout and configuration](#layout-and-configuration)). A skip record is a `<suite> <scenario>` line. The reader takes newline-terminated lines only, so a final record with no newline is not read and its scenario keeps its pass.
+**The skip channel.** The tool reads the skip side-channel (`EVIDENCE_KIT_SKIP_FILE`, truncated per run) and demotes a self-skipped scenario from pass before the pass/fail branch, so a self-skip cannot masquerade as a pass. The kit ships no producer for the skip file: a *consumer harness* that self-skips a scenario writes it ([§Layout and configuration](#layout-and-configuration)). A skip record is a `<suite> <scenario>` line. A final line is read with or without its newline, in the skip file and in a parser's output alike.
 
 **Each argument group is `<suite> <logfile> [<status>]`, and the status is optional only where the parser can do without it.** A log-parsing suite derives its scenarios from the log, so the pair form is complete for it. An `exit-code` suite's verdict *is* the status and appears nowhere in the log, so a group naming one without a status is **refused at exit 2** rather than run. Assuming success there would report pass for every log the tool is ever handed, clearing reds it structurally cannot observe. That is the fail-closed reading of [§Baseline manifest](#baseline-manifest)'s rule applied to the tool's own input.
 
