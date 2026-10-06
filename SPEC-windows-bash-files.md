@@ -37,6 +37,15 @@ The build's first act on this amendment is to run the harness facts deltas 2 and
 
 Fact (c) renames the copy, so no standing hook is disturbed. Fact (d) repeats the first call from a session in a linked worktree, where the copy does not exist. The overlay's `hooks` key is removed once both halves are recorded.
 
+**The unix half, as run** (harness 2.1.292, Linux x86-64, from a dispatched stage session):
+
+- **(a) held.** A `NotebookEdit` call carried `PreToolUse:NotebookEdit hook additional context: budget verdict (agent-budget-guard): … -> OK`, so the placeholder in `command` was substituted and `args` reached the binary. No marker file appeared. A harness that quoted each element into a shell would look the same.
+- **(b) held for the advise half**, by the same line. **The block half was not observed**: `EnterWorktree` is refused by the tool itself in a dispatched session before any hook runs. A call the tool refuses on its own input never reaches `PreToolUse`, seen three times. The block half is owed a call from a top-level session.
+- **(c) held for its proceed half.** With the copy renamed away the same call went through and carried no advisory. No failed-start notice reached the model channel; what the operator's own view showed was not observed.
+- **(d) held**, relayed by a session isolated in a linked worktree: its `NotebookEdit` carried the same advisory line while its worktree held no copy of the binary, so the placeholder named the main checkout.
+- **The registrations armed in the running session** with no restart.
+- **(e) and (f)** are Windows facts and were not run.
+
 **Who supplies the Windows half: nobody this iteration** (operator direction 2026-10-07, lead-relayed, not a ruling). The Windows half stays unrun, so the gate below takes its second branch as written: deltas 2 and 3 do not land, and guard-kit and context-kit stay in the bash row. The overlay block was applied by the lead on an operator grant of 2026-10-07, and the lead removes it once the unix half is recorded.
 
 **What lands this batch** (lead decision 2026-10-07): deltas 4, 5, 6 and 8 with the member wired through the front end, delta 7 in its narrower result, then the iteration's push. The unix half is run and recorded all the same, as evidence the deferred rewire will need. The queue disposition of deltas 2 and 3 goes back to the lead as an escalation, and no queue entry is written for them before it is ruled.
