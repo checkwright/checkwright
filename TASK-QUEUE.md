@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: windows-shell-floor-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,54 @@
 ## New Features
 
 ## Technical Debt
+
+### install-windows-stop-restore
+
+docs/manual-install.md's Windows download fence is dot-sourced and sets `$ErrorActionPreference = 'Stop'`, so the preference stays in the adopter's PowerShell session after the install. Operator direction 2026-10-06, lead-relayed (not a ruling): restore it.
+
+**Deliverable:** the adopter's error preference saved and restored, by try/finally or its equivalent, witnessed by the install-smoke legs that read the marked blocks. The page says the preference holds "here and below", so the later Windows blocks rely on it: each keeps its own stop policy, or the restore lands after the last of them. Whether `$ProgressPreference`, set the same way, is restored too is part of it. Owner docs/manual-install.md, its recipe shape installer/SPEC.md's.
+
+**Push need (2026-10-06, inside the budget):** the iteration's one mid-iteration push, shared with the two Windows features, since only the Windows install-smoke legs run the marked blocks.
+
+**Cost while deferred:** an adopter's shell keeps a changed error policy after installing. Filed 2026-10-06 by evidence-front-install-split-pass' lead. Re-verified by reading the fence, which opens on `. {` and sets the preference inside it. Owner lookup: `ErrorActionPreference`, `stop policy`, `try/finally` in this file — none; install-windows-stop-policy, landed last iteration, DISTINCT (it added the preference this restores).
+
+### journal-arm-spec-departures
+
+the journal arm departs from lifecycle-kit/SPEC.md §The journal arm in three places. (1) The entry's opener writes the journal at the pattern relative to the working directory while the arm anchors it at the repository root, so the two name different files when the binary is called directly from a subdirectory; calls through the front end agree, since it changes directory first. (2) An absent state file fails the arm's read before the refusal that names the caller's id and the `--enter-stage` remedy. (3) Standard input is decoded lossily, so a non-UTF-8 byte is replaced where the section says the text lands verbatim.
+
+**Deliverable:** one anchor for both writers, the refusal on an absent state file, and either a stated encoding bound or a byte-preserving append, with a test case each.
+
+**Run at this scope, 2026-10-06:** (2) the arm under a state-file knob naming an absent file exits 2 on `cannot read`, with no caller id and no remedy; (3) a `\377` byte on standard input lands as U+FFFD in the journal.
+
+**Inferred, cannot run before build:** (1), the two anchors, read off `native/src/emit/journal.rs` and `native/src/emit/enter_stage.rs` — it needs the opener started from a subdirectory of a scratch repository, the test case this entry delivers.
+
+**Cost while deferred:** a direct binary call from a subdirectory journals to a file the next entry cannot find, and a caller with no state file reads an I/O failure where the remedy belongs. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' close, off its second-vendor review; carried over the boundary and promoted at the next scope. Owner lookup: `journal arm`, `emit journal`, `lossy`, `non-UTF` in this file and the disposed-findings record — none; owner lifecycle-kit/SPEC.md §The journal arm.
+
+### mirror-fold-absent-mirror
+
+`check-stage-entry`'s mirror fold counts a body token under `LIFECYCLE_KIT_MIRROR_ROOT` as its suffix whenever that suffix is a roster dir, without testing that the mirror path exists, while the knob's row in lifecycle-kit/SPEC.md says a root under which no roster dir sits folds nothing. With the root set and no mirror generated, a token naming `<root>/<dir>` still folds to `<dir>` and can add a component.
+
+**Deliverable:** the knob row restated to what the fold does, or the fold narrowed to an existing mirror, with a fixture for the absent-mirror case; which one is spec's.
+
+**Inferred, cannot run before build:** the fold's behaviour, re-read at this scope in `native/src/gates/stage_entry.rs`, where it tests roster membership and no path — every fixture creates the mirror files, so the absent-mirror case this entry delivers is the first run.
+
+**Cost while deferred:** a consumer setting the root before generating a mirror can be asked for an audit stamp its amendment does not owe. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' close, off its second-vendor review; carried over the boundary and promoted at the next scope. Owner lookup: `MIRROR_ROOT`, `mirror fold`, `fold_mirror` in this file and the disposed-findings record — none; owner lifecycle-kit/SPEC.md §Layout and configuration, with §check-stage-entry.
+
+### harness-sweep-inexact-prose
+
+three sentences the harness-naming sweep left or made inexact. gate-sdk/SPEC.md §The adopter constraints calls the project-directory variable a knob beside the settings file and the agent-skill directory, and no knob names it: guard-kit/SPEC.md §The shell guard declares it a binding the wiring templates carry. guard-kit/SPEC.md's smoke paragraph says the install merges hook wiring into the file `GUARD_KIT_SETTINGS` names, while guard-kit/smoke/install.sh writes the default path literally and reads no knob. drift-kit/SPEC.md's `kpi-settings-local` bullet names the local overlay by path where the arm resolves `GUARD_KIT_SETTINGS_LOCAL`.
+
+**Deliverable:** three prose corrections, or the smoke reading the knob in place of the second; debt.
+
+**Cost while deferred:** a reader of the adopter constraints looks for a knob that does not exist. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' close, off its second-vendor review; carried over the boundary and promoted at the next scope. Re-verified there by grep: the adopter-constraints sentence, the smoke's literal settings path, and the two arms reading `GUARD_KIT_SETTINGS_LOCAL`. Owner lookup: `GUARD_KIT_SETTINGS`, `kpi-settings-local`, `project-directory` in this file and the disposed-findings record — [harness-literal-catcher-gate](#harness-literal-catcher-gate), DISTINCT (the catcher for sites already generic; these are sites the sweep misstated).
+
+### stage-tier-line-unread
+
+a stage session dispatched on the mechanical class skipped its tier check: doctrine-brevity-journal-arm-pass' align session read a dispatch prompt carrying the line `tier: mechanical` as naming no class to verify and ran no `--model-verdict` after its entry stamp. .claude/agents/stage-session.md's *Verify your tier* bullet opens on "When your dispatch names a class", and .claude/commands/lead.md says every dispatch prompt names its class as `tier: <class>`; the bullet never says that line is the naming. The lead ran the verdict on the session's stamp id afterward and it returned OK, so no wrong-tier work landed.
+
+**Deliverable:** the bullet stating that a `tier:` line in the dispatch is the class it names; debt.
+
+**Cost while deferred:** a wrong-tier dispatch on that class goes unseen until the lead checks by hand. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' lead, off the session's hand-back report; carried over the boundary and promoted at the next scope. A second datum for the next re-judgment of the align tier binding. Owner lookup: `model-verdict`, `tier check`, `align tier` in this file and the disposed-findings record — the record's 2026-10-05 line, DISTINCT (a knob couple the align session missed, discarded as a datum; this one names a deliverable).
 
 ## Deferred
 
@@ -20,7 +68,7 @@ an on-demand critique of the project's strategic weaknesses, run on the top fore
 
 **Deliverable:** the on-demand trigger, the critique prompt, the reflection pass's contract and the SWOT's home, model literals in consumer config. The spec question is the reflection's write path, since work enters only through scope (doctrine-kit/DOCTRINE.md, Scope-gated intake).
 
-**Cost while deferred:** nil while the operator holds no foreign credit to run it; after, strategic weaknesses surface only through the operator's own reading. Filed 2026-10-03 by delegation-transport-pass' lead. Re-verified: no tracked prose names a SWOT or an on-demand foreign critique. Owner lookup: `SWOT`, `critique`, `strategic`, `reflection` in this file — foreign-vendor-critique, DISTINCT (its close review landed this iteration); owner delegation-kit/SPEC.md §The foreign-vendor run, the SWOT's home open.
+**Cost while deferred:** strategic weaknesses surface only through the operator's own reading. The filing's ground, that this cost was nil while the operator held no foreign credit, lapsed: credit is held (operator answer 2026-10-06, lead-relayed, a fact and no run grant). Filed 2026-10-03 by delegation-transport-pass' lead. Re-verified: no tracked prose names a SWOT or an on-demand foreign critique. Owner lookup: `SWOT`, `critique`, `strategic`, `reflection` in this file — foreign-vendor-critique, DISTINCT (its close review landed this iteration); owner delegation-kit/SPEC.md §The foreign-vendor run, the SWOT's home open.
 
 ### stage-executor-binding
 
@@ -32,7 +80,7 @@ a per-stage executor binding as consumer config: a consumer picks the harness an
 
 **Deliverable:** the stage-to-executor knob, its validator and the lead's dispatch-time read, in delegation-kit/SPEC.md §The tier binding, with fixtures.
 
-**Cost while deferred:** nil while item (4) is open and the operator holds no foreign credit; after, a consumer has no declarative way to put a stage on a foreign agent. Filed 2026-10-03 by delegation-transport-pass' lead. Re-verified: the knob roster carries no stage- or executor-keyed delegation-kit knob. Owner lookup: `per-stage`, `executor`, `TIER_MODEL` in this file — heterogeneous-agent-delegation, DISTINCT (item (4) lets a stage run foreign; this chooses which); owner delegation-kit/SPEC.md §The tier binding.
+**Cost while deferred:** nil while item (4) is open; after, a consumer has no declarative way to put a stage on a foreign agent. The filing's second ground, no foreign credit held, lapsed: credit is held (operator answer 2026-10-06, lead-relayed, a fact and no run grant). Filed 2026-10-03 by delegation-transport-pass' lead. Re-verified: the knob roster carries no stage- or executor-keyed delegation-kit knob. Owner lookup: `per-stage`, `executor`, `TIER_MODEL` in this file — heterogeneous-agent-delegation, DISTINCT (item (4) lets a stage run foreign; this chooses which); owner delegation-kit/SPEC.md §The tier binding.
 
 ### guard-quoted-operand-words
 
@@ -292,6 +340,8 @@ the generated pre-commit and commit-msg hooks start through a shell on every OS:
 
 **Deliverable:** (1) a probe of whether git's hook lookup starts a native executable directly on each OS (the Windows `.exe` lookup inferred from git's source, never run); (2) where a native hook lives, since a per-platform binary cannot be the tracked text hook scripts/git-hooks/ holds: hooks installed untracked with the generated-projection contract and its freshness gate re-pointed at the installer, or a tracked shim kept, which is the shell this removes; (3) the per-commit start cost per OS.
 
+**Taken whole into windows-shell-floor-pass, operator direction 2026-10-06, lead-relayed (not a ruling):** all three deliverables; a probe-only cut was offered and not chosen. **Push need (2026-10-06, inside the budget):** the iteration's one mid-iteration push, shared with [windows-kit-bash-files](#windows-kit-bash-files), since only the Windows runners run the probe.
+
 **Cost while deferred:** every commit on Windows starts an emulated-or-bundled shell. Filed 2026-09-29 by native-hook-customer-legs' lead. Re-verified: scripts/git-hooks/pre-commit opens `#!/bin/sh`. Not a recurrence of `native-hook-dispatch`, which removed the bash dependency. Owner lookup: `native executable`, `hook shim` in this file — none; owner gate-sdk/SPEC.md, with installer/SPEC.md for an untracked install.
 
 ### openspec-delta-base-agreement
@@ -406,17 +456,9 @@ docs/requirements.md's toolchain row owes bash 4.3 wherever a profile includes c
 
 **Deliverable:** each kit-shipped file a host runs with bash ported to an arm of the gate binary or given a PowerShell twin, per file, and the toolchain row narrowed to what still owes bash; whether guard-kit's place in the row survives is part of it.
 
+**Taken into windows-shell-floor-pass, operator direction 2026-10-06, lead-relayed (not a ruling). Push need (2026-10-06, inside the budget):** the iteration's one mid-iteration push, since the ported arms first run on Windows remotely.
+
 **Cost while deferred:** a Windows adopter on those profiles needs bash. Filed 2026-10-05 by evidence-front-install-split-pass' lead. Re-verified by `git ls-files`: outside smoke and fixtures the three kits track context-kit/templates/session-context.sh and drift-kit/templates/kpi-deprecated-surface.sh, and guard-kit tracks no such file. Owner lookup: `session-context.sh`, `kpi-deprecated-surface`, `Git for Windows` in this file — the two entries above, DISTINCT (neither names the kit-shipped files); owner gate-sdk/SPEC.md §The adopter constraints, and each kit SPEC for its file.
-
-### install-windows-stop-restore
-
-[cost: event/low] [surface: docs]
-
-docs/manual-install.md's Windows download fence is dot-sourced and sets `$ErrorActionPreference = 'Stop'`, so the preference stays in the adopter's PowerShell session after the install. Operator direction 2026-10-06, lead-relayed (not a ruling): restore it.
-
-**Deliverable:** the adopter's error preference saved and restored, by try/finally or its equivalent, witnessed by the install-smoke legs that read the marked blocks. The page says the preference holds "here and below", so the later Windows blocks rely on it: each keeps its own stop policy, or the restore lands after the last of them. Whether `$ProgressPreference`, set the same way, is restored too is part of it. Owner docs/manual-install.md, its recipe shape installer/SPEC.md's.
-
-**Cost while deferred:** an adopter's shell keeps a changed error policy after installing. Filed 2026-10-06 by evidence-front-install-split-pass' lead. Re-verified by reading the fence, which opens on `. {` and sets the preference inside it. Owner lookup: `ErrorActionPreference`, `stop policy`, `try/finally` in this file — none; install-windows-stop-policy, landed last iteration, DISTINCT (it added the preference this restores).
 
 ### site-health-probe-unexecuted
 
@@ -481,50 +523,6 @@ kit prose carries the master harness's names where no knob owns them: the hook e
 **Deliverable:** a harness-neutral statement of the hook contract behind a binding table, the kit SPECs citing it; feature-sized, since it restates wire contracts.
 
 **Cost while deferred:** an adopter on another harness reads the hook-member sections as one vendor's protocol, which they are. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' build. Re-verified by grep over the kit SPECs for the event names, payload keys, variables and parameter names: 93 lines, delegation-kit 42, guard-kit 31, context-kit 8, lifecycle-kit 7, gate-sdk 3, drift-kit 1, evidence-kit 1. Owner lookup: `hook contract`, `binding table`, `harness-neutral`, `payload key` in this file and the disposed-findings record — none; [plugin-harness-reach](#plugin-harness-reach), DISTINCT (its per-harness guard wiring would bind against this contract); [harness-literal-catcher-gate](#harness-literal-catcher-gate), DISTINCT (the catcher for sites already generic).
-
-### journal-arm-spec-departures
-
-[cost: event/low] [surface: lifecycle-kit]
-
-the journal arm departs from lifecycle-kit/SPEC.md §The journal arm in three places. (1) The entry's opener writes the journal at the pattern relative to the working directory while the arm anchors it at the repository root, so the two name different files when the binary is called directly from a subdirectory; calls through the front end agree, since it changes directory first. (2) An absent state file fails the arm's read before the refusal that names the caller's id and the `--enter-stage` remedy. (3) Standard input is decoded lossily, so a non-UTF-8 byte is replaced where the section says the text lands verbatim.
-
-**Deliverable:** one anchor for both writers, the refusal on an absent state file, and either a stated encoding bound or a byte-preserving append, with a test case each.
-
-**Inferred, not run:** all three, read off `native/src/emit/journal.rs` and `native/src/emit/enter_stage.rs`.
-
-**Cost while deferred:** a direct binary call from a subdirectory journals to a file the next entry cannot find, and a caller with no state file reads an I/O failure where the remedy belongs. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' close, off its second-vendor review; carried over the boundary and promoted at the next scope. Owner lookup: `journal arm`, `emit journal`, `lossy`, `non-UTF` in this file and the disposed-findings record — none; owner lifecycle-kit/SPEC.md §The journal arm.
-
-### mirror-fold-absent-mirror
-
-[cost: event/low] [surface: lifecycle-kit]
-
-`check-stage-entry`'s mirror fold counts a body token under `LIFECYCLE_KIT_MIRROR_ROOT` as its suffix whenever that suffix is a roster dir, without testing that the mirror path exists, while the knob's row in lifecycle-kit/SPEC.md says a root under which no roster dir sits folds nothing. With the root set and no mirror generated, a token naming `<root>/<dir>` still folds to `<dir>` and can add a component.
-
-**Deliverable:** the knob row restated to what the fold does, or the fold narrowed to an existing mirror, with a fixture for the absent-mirror case; which one is spec's.
-
-**Inferred, not run:** the fold's behaviour, read off its function and call site in `native/src/gates/stage_entry.rs`; every fixture creates the mirror files.
-
-**Cost while deferred:** a consumer setting the root before generating a mirror can be asked for an audit stamp its amendment does not owe. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' close, off its second-vendor review; carried over the boundary and promoted at the next scope. Owner lookup: `MIRROR_ROOT`, `mirror fold`, `fold_mirror` in this file and the disposed-findings record — none; owner lifecycle-kit/SPEC.md §Layout and configuration, with §check-stage-entry.
-
-### harness-sweep-inexact-prose
-
-[cost: event/low] [surface: guard-kit]
-
-three sentences the harness-naming sweep left or made inexact. gate-sdk/SPEC.md §The adopter constraints calls the project-directory variable a knob beside the settings file and the agent-skill directory, and no knob names it: guard-kit/SPEC.md §The shell guard declares it a binding the wiring templates carry. guard-kit/SPEC.md's smoke paragraph says the install merges hook wiring into the file `GUARD_KIT_SETTINGS` names, while guard-kit/smoke/install.sh writes the default path literally and reads no knob. drift-kit/SPEC.md's `kpi-settings-local` bullet names the local overlay by path where the arm resolves `GUARD_KIT_SETTINGS_LOCAL`.
-
-**Deliverable:** three prose corrections, or the smoke reading the knob in place of the second; debt.
-
-**Cost while deferred:** a reader of the adopter constraints looks for a knob that does not exist. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' close, off its second-vendor review; carried over the boundary and promoted at the next scope. Re-verified there by grep: the adopter-constraints sentence, the smoke's literal settings path, and the two arms reading `GUARD_KIT_SETTINGS_LOCAL`. Owner lookup: `GUARD_KIT_SETTINGS`, `kpi-settings-local`, `project-directory` in this file and the disposed-findings record — [harness-literal-catcher-gate](#harness-literal-catcher-gate), DISTINCT (the catcher for sites already generic; these are sites the sweep misstated).
-
-### stage-tier-line-unread
-
-[cost: event/low] [surface: .claude]
-
-a stage session dispatched on the mechanical class skipped its tier check: doctrine-brevity-journal-arm-pass' align session read a dispatch prompt carrying the line `tier: mechanical` as naming no class to verify and ran no `--model-verdict` after its entry stamp. .claude/agents/stage-session.md's *Verify your tier* bullet opens on "When your dispatch names a class", and .claude/commands/lead.md says every dispatch prompt names its class as `tier: <class>`; the bullet never says that line is the naming. The lead ran the verdict on the session's stamp id afterward and it returned OK, so no wrong-tier work landed.
-
-**Deliverable:** the bullet stating that a `tier:` line in the dispatch is the class it names; debt.
-
-**Cost while deferred:** a wrong-tier dispatch on that class goes unseen until the lead checks by hand. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' lead, off the session's hand-back report; carried over the boundary and promoted at the next scope. A second datum for the next re-judgment of the align tier binding. Owner lookup: `model-verdict`, `tier check`, `align tier` in this file and the disposed-findings record — the record's 2026-10-05 line, DISTINCT (a knob couple the align session missed, discarded as a datum; this one names a deliverable).
 
 ## Icebox
 
