@@ -89,7 +89,7 @@
 4710cp docs/spec-toolkits.md
 2906cp docs/speckit.md
 2524cp docs/value.md
-33161cp doctrine-kit/SPEC.md
+33156cp doctrine-kit/SPEC.md
 124971cp drift-kit/SPEC.md
 2698cp drift-kit/templates/close-knowledge.md
 4270cp drift-kit/templates/economics.md
@@ -99,7 +99,7 @@
 282149cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
 277549cp installer/SPEC.md
-362203cp lifecycle-kit/SPEC.md
+362131cp lifecycle-kit/SPEC.md
 6534cp lifecycle-kit/templates/consult.md
 44661cp lifecycle-kit/templates/lead.md
 2100cp lifecycle-kit/templates/release-sweep.md
