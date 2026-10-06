@@ -482,6 +482,50 @@ kit prose carries the master harness's names where no knob owns them: the hook e
 
 **Cost while deferred:** an adopter on another harness reads the hook-member sections as one vendor's protocol, which they are. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' build. Re-verified by grep over the kit SPECs for the event names, payload keys, variables and parameter names: 93 lines, delegation-kit 42, guard-kit 31, context-kit 8, lifecycle-kit 7, gate-sdk 3, drift-kit 1, evidence-kit 1. Owner lookup: `hook contract`, `binding table`, `harness-neutral`, `payload key` in this file and the disposed-findings record — none; [plugin-harness-reach](#plugin-harness-reach), DISTINCT (its per-harness guard wiring would bind against this contract); [harness-literal-catcher-gate](#harness-literal-catcher-gate), DISTINCT (the catcher for sites already generic).
 
+### journal-arm-spec-departures
+
+[cost: event/low] [surface: lifecycle-kit]
+
+the journal arm departs from lifecycle-kit/SPEC.md §The journal arm in three places. (1) The entry's opener writes the journal at the pattern relative to the working directory while the arm anchors it at the repository root, so the two name different files when the binary is called directly from a subdirectory; calls through the front end agree, since it changes directory first. (2) An absent state file fails the arm's read before the refusal that names the caller's id and the `--enter-stage` remedy. (3) Standard input is decoded lossily, so a non-UTF-8 byte is replaced where the section says the text lands verbatim.
+
+**Deliverable:** one anchor for both writers, the refusal on an absent state file, and either a stated encoding bound or a byte-preserving append, with a test case each.
+
+**Inferred, not run:** all three, read off `native/src/emit/journal.rs` and `native/src/emit/enter_stage.rs`.
+
+**Cost while deferred:** a direct binary call from a subdirectory journals to a file the next entry cannot find, and a caller with no state file reads an I/O failure where the remedy belongs. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' close, off its second-vendor review; carried over the boundary and promoted at the next scope. Owner lookup: `journal arm`, `emit journal`, `lossy`, `non-UTF` in this file and the disposed-findings record — none; owner lifecycle-kit/SPEC.md §The journal arm.
+
+### mirror-fold-absent-mirror
+
+[cost: event/low] [surface: lifecycle-kit]
+
+`check-stage-entry`'s mirror fold counts a body token under `LIFECYCLE_KIT_MIRROR_ROOT` as its suffix whenever that suffix is a roster dir, without testing that the mirror path exists, while the knob's row in lifecycle-kit/SPEC.md says a root under which no roster dir sits folds nothing. With the root set and no mirror generated, a token naming `<root>/<dir>` still folds to `<dir>` and can add a component.
+
+**Deliverable:** the knob row restated to what the fold does, or the fold narrowed to an existing mirror, with a fixture for the absent-mirror case; which one is spec's.
+
+**Inferred, not run:** the fold's behaviour, read off its function and call site in `native/src/gates/stage_entry.rs`; every fixture creates the mirror files.
+
+**Cost while deferred:** a consumer setting the root before generating a mirror can be asked for an audit stamp its amendment does not owe. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' close, off its second-vendor review; carried over the boundary and promoted at the next scope. Owner lookup: `MIRROR_ROOT`, `mirror fold`, `fold_mirror` in this file and the disposed-findings record — none; owner lifecycle-kit/SPEC.md §Layout and configuration, with §check-stage-entry.
+
+### harness-sweep-inexact-prose
+
+[cost: event/low] [surface: guard-kit]
+
+three sentences the harness-naming sweep left or made inexact. gate-sdk/SPEC.md §The adopter constraints calls the project-directory variable a knob beside the settings file and the agent-skill directory, and no knob names it: guard-kit/SPEC.md §The shell guard declares it a binding the wiring templates carry. guard-kit/SPEC.md's smoke paragraph says the install merges hook wiring into the file `GUARD_KIT_SETTINGS` names, while guard-kit/smoke/install.sh writes the default path literally and reads no knob. drift-kit/SPEC.md's `kpi-settings-local` bullet names the local overlay by path where the arm resolves `GUARD_KIT_SETTINGS_LOCAL`.
+
+**Deliverable:** three prose corrections, or the smoke reading the knob in place of the second; debt.
+
+**Cost while deferred:** a reader of the adopter constraints looks for a knob that does not exist. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' close, off its second-vendor review; carried over the boundary and promoted at the next scope. Re-verified there by grep: the adopter-constraints sentence, the smoke's literal settings path, and the two arms reading `GUARD_KIT_SETTINGS_LOCAL`. Owner lookup: `GUARD_KIT_SETTINGS`, `kpi-settings-local`, `project-directory` in this file and the disposed-findings record — [harness-literal-catcher-gate](#harness-literal-catcher-gate), DISTINCT (the catcher for sites already generic; these are sites the sweep misstated).
+
+### stage-tier-line-unread
+
+[cost: event/low] [surface: .claude]
+
+a stage session dispatched on the mechanical class skipped its tier check: doctrine-brevity-journal-arm-pass' align session read a dispatch prompt carrying the line `tier: mechanical` as naming no class to verify and ran no `--model-verdict` after its entry stamp. .claude/agents/stage-session.md's *Verify your tier* bullet opens on "When your dispatch names a class", and .claude/commands/lead.md says every dispatch prompt names its class as `tier: <class>`; the bullet never says that line is the naming. The lead ran the verdict on the session's stamp id afterward and it returned OK, so no wrong-tier work landed.
+
+**Deliverable:** the bullet stating that a `tier:` line in the dispatch is the class it names; debt.
+
+**Cost while deferred:** a wrong-tier dispatch on that class goes unseen until the lead checks by hand. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' lead, off the session's hand-back report; carried over the boundary and promoted at the next scope. A second datum for the next re-judgment of the align tier binding. Owner lookup: `model-verdict`, `tier check`, `align tier` in this file and the disposed-findings record — the record's 2026-10-05 line, DISTINCT (a knob couple the align session missed, discarded as a datum; this one names a deliverable).
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
