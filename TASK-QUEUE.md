@@ -8,27 +8,11 @@
 
 ## New Features
 
-### native-executable-git-hooks
-
-[spec: SPEC-native-git-hooks.md]
-
-the generated pre-commit and commit-msg hooks start through a shell on every OS: each is two lines of POSIX sh that exec the gate binary, and on Windows git needs Git for Windows' bundled sh to start it, emulated on Arm (the delta-6 probe, CI Windows x64 and arm64, 2026-09-29). Operator direction, 2026-09-29, lead-relayed (not a ruling): explore a hook git starts as a native executable, one shape on every OS, never a Windows-only exception.
-
-**Deliverable:** (1) a probe of whether git's hook lookup starts a native executable directly on each OS (the Windows `.exe` lookup inferred from git's source, never run); (2) where a native hook lives, since a per-platform binary cannot be the tracked text hook scripts/git-hooks/ holds: hooks installed untracked with the generated-projection contract and its freshness gate re-pointed at the installer, or a tracked shim kept, which is the shell this removes; (3) the per-commit start cost per OS.
-
-**Taken whole into windows-shell-floor-pass, operator direction 2026-10-06, lead-relayed (not a ruling):** all three deliverables; a probe-only cut was offered and not chosen. **Push need (2026-10-06, inside the budget):** the iteration's one mid-iteration push, shared with [windows-kit-bash-files](#windows-kit-bash-files), since only the Windows runners run the probe.
-
-**Merged at build, Windows verdict owed (2026-10-06):** all seven deltas landed and the amendment's content is merged. Its file stays until the push is read, since this entry cannot take Done before then. Run on Linux x86-64: gate-sdk/gate-tests/native-git-hooks.test.sh commits through the placed hooks, and the workflow's assertion step, run by hand, landed a clean commit and refused a violating one. The start cost there was parity, 3331 µs native against 3352 µs through sh, median of 101, the launcher being a second start of the binary. Unrun: every PowerShell step, and Git for Windows starting `pre-commit.exe`.
-
-**After the push, read** on each `install-smoke-pwsh-windows` bootstrap leg the steps `git starts a native pre-commit hook`, `probe what a hook start costs`, `commit through the placed hooks with no bash on PATH` and `commit through the placed hook with the bundled sh renamed away`, and the first two on each unix install-smoke leg. The first step red on a Windows leg is the amendment's red branch. A red in the last two alone, the first green, is a placement or launcher defect to fix. On green: delete the amendment, then `--queue done native-executable-git-hooks`. For validate: `.workflow/validate-baseline.txt` still carries the retired gate's row.
-
-**Cost while deferred:** every commit on Windows starts an emulated-or-bundled shell. Filed 2026-09-29 by native-hook-customer-legs' lead. Re-verified: scripts/git-hooks/pre-commit opens `#!/bin/sh`. Not a recurrence of `native-hook-dispatch`, which removed the bash dependency. Owner lookup: `native executable`, `hook shim` in this file — none; owner gate-sdk/SPEC.md, with installer/SPEC.md for an untracked install.
-
 ### windows-kit-bash-files
 
 [spec: SPEC-windows-bash-files.md]
 
-docs/requirements.md's toolchain row owes bash 4.3 wherever a profile includes context-kit, drift-kit or guard-kit, each said to ship a file the host runs with bash; on native Windows that is Git for Windows' bash, although install and battery run under PowerShell. Operator direction 2026-10-05, lead session (not a ruling): eliminate the sh and bash dependency on Windows where possible, as one goal with [native-executable-git-hooks](#native-executable-git-hooks) (the hook's sh) and [custom-gate-substrates](#custom-gate-substrates) (gate authoring). The operator recalls the Git for Windows shell as a significant slowdown, which no run here measured.
+docs/requirements.md's toolchain row owes bash 4.3 wherever a profile includes context-kit, drift-kit or guard-kit, each said to ship a file the host runs with bash; on native Windows that is Git for Windows' bash, although install and battery run under PowerShell. Operator direction 2026-10-05, lead session (not a ruling): eliminate the sh and bash dependency on Windows where possible, as one goal with `native-executable-git-hooks` (the hook's sh) and [custom-gate-substrates](#custom-gate-substrates) (gate authoring). The operator recalls the Git for Windows shell as a significant slowdown, which no run here measured.
 
 **Deliverable:** each kit-shipped file a host runs with bash ported to an arm of the gate binary or given a PowerShell twin, per file, and the toolchain row narrowed to what still owes bash; whether guard-kit's place in the row survives is part of it.
 
@@ -39,18 +23,6 @@ docs/requirements.md's toolchain row owes bash 4.3 wherever a profile includes c
 **Cost while deferred:** a Windows adopter on those profiles needs bash. Filed 2026-10-05 by evidence-front-install-split-pass' lead. Re-verified by `git ls-files`: outside smoke and fixtures the three kits track context-kit/templates/session-context.sh and drift-kit/templates/kpi-deprecated-surface.sh, and guard-kit tracks no such file. Owner lookup: `session-context.sh`, `kpi-deprecated-surface`, `Git for Windows` in this file — the two entries above, DISTINCT (neither names the kit-shipped files); owner gate-sdk/SPEC.md §The adopter constraints, and each kit SPEC for its file.
 
 ## Technical Debt
-
-### install-windows-stop-restore
-
-docs/manual-install.md's Windows download fence is dot-sourced and sets `$ErrorActionPreference = 'Stop'`, so the preference stays in the adopter's PowerShell session after the install. Operator direction 2026-10-06, lead-relayed (not a ruling): restore it.
-
-**Deliverable:** the adopter's error preference saved and restored, by try/finally or its equivalent, witnessed by the install-smoke legs that read the marked blocks. The page says the preference holds "here and below", so the later Windows blocks rely on it: each keeps its own stop policy, or the restore lands after the last of them. Whether `$ProgressPreference`, set the same way, is restored too is part of it. Owner docs/manual-install.md, its recipe shape installer/SPEC.md's.
-
-**Push need (2026-10-06, inside the budget):** the iteration's one mid-iteration push, shared with the two Windows features, since only the Windows install-smoke legs run the marked blocks.
-
-**Landed at build, witness owed (2026-10-06):** both Windows blocks save, set and restore the preference, `$ProgressPreference` with it in the fetch fence, and the `install-smoke-pwsh-windows` leg runs the marked block under a non-stopping preference and reds when the block leaves another. Neither has run, no PowerShell being on the build host. After the push, read that leg's step that runs the page's `windows-install` block; on green, `--queue done install-windows-stop-restore`. The fetch fence has no reader, so its restore stays inferred.
-
-**Cost while deferred:** an adopter's shell keeps a changed error policy after installing. Filed 2026-10-06 by evidence-front-install-split-pass' lead. Re-verified by reading the fence, which opens on `. {` and sets the preference inside it. Owner lookup: `ErrorActionPreference`, `stop policy`, `try/finally` in this file — none; install-windows-stop-policy, landed last iteration, DISTINCT (it added the preference this restores).
 
 ## Deferred
 
@@ -1180,4 +1152,6 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 - journal-arm-spec-departures
 - mirror-fold-absent-mirror
 - harness-sweep-inexact-prose
+- native-executable-git-hooks
+- install-windows-stop-restore
 
