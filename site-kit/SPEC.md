@@ -339,9 +339,9 @@ The census prints fetched bytes, colour-bearing rules, extracted classes and sna
 
 **The honest limit.** The gate cannot see a theme bump, and this arm sees it on its next scheduled run. Between a bump and that run the live site can show uncovered tokens. The daily schedule bounds how long that lasts, and the pre-bump tree cannot prevent it.
 
-The kit's `smoke/install.sh` installs the template verbatim into the scratch tree as governed surface, and registers the gates that read it. The scratch battery is the union of what each kit's `smoke/install.sh` registers. This kit contributes `check-docs-cname-parity`. Its workflow is linted by the `check-action-*` gates, which gate-sdk's own leg registers beside the workflow template gate-sdk installs. `check-tree-terms` reads the installed file too, for tree terms. So a template regression in the workflow's bash, its action pins, or its `gh` repository context reds the smoke and does not surface at a consumer.
+The kit's `smoke/install.sh` installs the template verbatim into the scratch tree as governed surface, and registers the gates that read it. The scratch battery is the union of what each kit's `smoke/install.sh` registers. This kit's leg registers its docs gates. The workflow is linted by the `check-action-*` gates and read by `check-tree-terms`, which gate-sdk's own leg registers beside the workflow template gate-sdk installs. So a template regression those lints read, in the workflow's action pins, its run steps' declarations or its `gh` repository context, reds the smoke and does not surface at a consumer. The smoke lints the probe's bash and never executes it.
 
-Those four qualify on gate-sdk's leg under the registration accounting's predicate: a gate earns a scratch-battery slot when it reads a surface the install writes (gate-sdk/SPEC.md §Consumer smoke). The predicate binds every kit, and the same section rules on the omissions: what this kit leaves unregistered is decided by the accounting's probe, not by a judgment recorded here.
+Each registration qualifies under the registration accounting's predicate, which binds every kit and rules on the omissions (gate-sdk/SPEC.md §Consumer smoke): what this kit leaves unregistered is decided by the accounting's probe, not by a judgment recorded here.
 
 ## Out of scope
 

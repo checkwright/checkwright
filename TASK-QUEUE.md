@@ -236,7 +236,7 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 ### spec-brevity-residue
 
-[roadmap: now/adoption] [cost: session/high] [surface: site-kit] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
+[roadmap: now/adoption] [cost: session/high] [surface: doctrine-kit] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
 
 the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices (below); the eight kits after it are finished or split out (the slices below); what remains is doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling); the per-kit slices stay off the roadmap.
 
@@ -256,7 +256,7 @@ evidence-kit's halves left 2026-10-05 and 10-06 at successive scopes as `evidenc
 
 [cost: event/low] [surface: installer] [observed-by: publish]
 
-the observation half of `tarball-build-attestation`: the first Release cut after that entry lands carries an artifact attestation on its tarball, and a shell installer run against that Release verifies it where the verifier is present.
+the observation half of `tarball-build-attestation`: the first Release cut after that entry landed carries an artifact attestation on its tarball, and a shell installer run against that Release verifies it where the verifier is present.
 
 **Deliverable:** that observation, read off the `publish` run and one install from the published Release, with any defect it shows filed.
 
@@ -477,6 +477,40 @@ docs/manual-install.md's Windows download fence is dot-sourced and sets `$ErrorA
 **Deliverable:** the adopter's error preference saved and restored, by try/finally or its equivalent, witnessed by the install-smoke legs that read the marked blocks. The page says the preference holds "here and below", so the later Windows blocks rely on it: each keeps its own stop policy, or the restore lands after the last of them. Whether `$ProgressPreference`, set the same way, is restored too is part of it. Owner docs/manual-install.md, its recipe shape installer/SPEC.md's.
 
 **Cost while deferred:** an adopter's shell keeps a changed error policy after installing. Filed 2026-10-06 to the gap inbox by evidence-front-install-split-pass' lead as an open question, asked at the next scope and filed here on the answer: →fix fails because its witness is a Windows CI leg no local run reaches. Re-verified by reading the fence, which opens on `. {` and sets the preference inside it. Owner lookup: `ErrorActionPreference`, `stop policy`, `try/finally` in this file — none; install-windows-stop-policy, landed last iteration, DISTINCT (it added the preference this restores).
+
+### site-health-probe-unexecuted
+
+[cost: event/low] [surface: site-kit]
+
+site-kit/templates/site-health.yml's probe step is linted by the `check-action-*` gates and copied by the kit's smoke, and no tracked oracle executes its bash before a consumer's scheduled run.
+
+**Deliverable:** a tracked site-kit test that extracts the probe step's run block and runs it under PATH stubs for `curl`, `gh` and `sleep`, over a healthy set, one and two transient failures, a persistent failure and `force_fail`.
+
+**Cost while deferred:** a regression in the resample loop or an arm's zero case ships to every copier unseen. Filed 2026-10-06 to the gap inbox at site-fence-release-cites-pass' build; promoted at its close: →fix fails because the harness is new test mechanism whose extraction shape a drain commit cannot settle, →forward because no ruling is owed. Re-verified: no tracked `.sh` names `site-health` but site-kit/smoke/install.sh, which copies the template and runs none of it. Owner lookup: `site-health`, `resampl`, `PATH stub` in this file and the disposed-findings record — [site-health-issue-venue-unwanted](#site-health-issue-venue-unwanted), DISTINCT (the issue step's venue); owner site-kit/SPEC.md §templates/site-health.yml.
+
+**Inferred, not run:** that the loop passed those five cases under a scratch harness at its build, which no tracked file carries.
+
+### step-title-cite-unresolved
+
+[cost: event/low] [surface: canon-kit]
+
+a citation naming a numbered step by its bold title (RELEASING.md §The procedure, *Author the release-note post — in-iteration*, and the same shape citing lifecycle-kit/templates/lead.md) resolves under no gate: `check-spec-pointer` and `check-citation-link` resolve the heading alone, so a reworded step title leaves every citing site stale with the battery green.
+
+**Deliverable:** a holder for the title, either a title-resolution arm on `check-spec-pointer` or the cited steps made headings; which one is spec's.
+
+**Cost while deferred:** one reworded title in RELEASING.md mis-names its citations, a gate's printed remedy among them. Filed 2026-10-06 to the gap inbox at site-fence-release-cites-pass' build; promoted at its close: →fix fails because either holder is new mechanism or a restructure of a governed procedure, →forward because no ruling is owed. Re-verified by grep: eight lines cite a step of the two files by title. Owner lookup: `bold title`, `step title`, `title-resolution` in this file and the disposed-findings record — none; release-step-number-cites, landed this iteration, DISTINCT (it moved the citations off the step's number, and this is the title's own drift, so no recurrence).
+
+**Inferred, not run:** that neither gate reads past the heading; no fixture rewording a cited title was run.
+
+### front-matter-reader-siblings
+
+[cost: event/low] [surface: native]
+
+four front-matter readers read an opening `---` that nothing closes as front matter to the end of the file, so the page is skipped whole: `check-docs-collapsible`, `check-citation-link` (whose reader `check-pendency-contradiction` reads through), `check-docs-page-repeat` and `check-prose-tells` assertion G. `check-docs-page-length` reads it as Jekyll does, an unclosed `---` delimiting no block (canon-kit/SPEC.md §check-docs-page-length).
+
+**Deliverable:** one shared front-matter span reader beside the fence reader, the four gates on it, a fixture row per gate, each SPEC section stating the reading, and the release declaration.
+
+**Cost while deferred:** a page with a broken front-matter block passes each of the four unread. Filed 2026-10-06 to the gap inbox at site-fence-release-cites-pass' build; promoted at its close: →fix fails because it changes the asserted behaviour of four shipped gates across two kits, which wants a validate pass and a declaration; →forward because the reading is decided. Re-verified by reading the four modules: each opens its front-matter state on a first-line `---` and clears it only on a later one. Owner lookup: `front matter`, `front_matter`, `prose_only` in this file and the disposed-findings record — [plugin-front-matter-yaml](#plugin-front-matter-yaml), DISTINCT (the plugin gate's YAML key reader).
 
 ## Icebox
 
@@ -1159,11 +1193,4 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 No rule holds a docs video to a local poster linking out, so a first embed adds a third-party request.
 
 ## Done
-
-- site-health-probe-no-retry-on-transient
-- site-kit-brevity
-- release-drain-ordering-contradiction
-- release-step-number-cites
-- fence-toggle-list-item
-- fence-closer-length
 
