@@ -476,7 +476,7 @@ kit prose outside the adapter surfaces can re-acquire a harness-bound literal wi
 
 [cost: event/low] [surface: guard-kit]
 
-kit prose carries the master harness's names where no knob owns them: the hook event names and matchers, the payload keys, the session and config-home variables (owner lifecycle-kit/SPEC.md §bin/session-id.sh), the dispatch tool's parameter names, and drift-kit's local-settings-overlay path and two measurement commands. gate-sdk/SPEC.md §The adopter constraints declares the hook members' names the shipped binding, so nothing is misstated.
+kit prose carries the master harness's names where no knob owns them: the hook event names and matchers, the payload keys, the session and config-home variables (owner lifecycle-kit/SPEC.md §bin/session-id.sh), the dispatch tool's parameter names, and two of drift-kit's measurement commands. gate-sdk/SPEC.md §The adopter constraints declares the hook members' names the shipped binding, so nothing is misstated.
 
 **Deliverable:** a harness-neutral statement of the hook contract behind a binding table, the kit SPECs citing it; feature-sized, since it restates wire contracts.
 
@@ -1163,10 +1163,4 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 No rule holds a docs video to a local poster linking out, so a first embed adds a third-party request.
 
 ## Done
-
-- audit-trigger-mirror-component
-- journal-append-arm
-- spec-brevity-residue
-- queue-provenance-restates-git-history
-- kit-prose-harness-coupling
 

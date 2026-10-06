@@ -577,7 +577,7 @@ The derived supersede set **is read past the merge-attribute pair**, by `check-s
 
 The **journal-path derivation** is `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN` with `<stage>` expanded (`enter_stage::journal_path`). It is hoisted on the cursor's ground: its readers must name one file, or the assertion checks a path nobody was asked to write. They are `--enter-stage`, at the opener and at the entry assertion, and `--emit journal`, through which the stage session writes ([§The journal arm](#the-journal-arm)). Two members sit beside it: the opener writes the journal's opening line and reports the path it wrote, and the written predicate is what the entry assertion reads. They share the derivation **and** one spelling of the opening line's fixed lead, so the writer and the reader telling the tool's bytes from a session's cannot drift apart ([§bin/enter-stage.sh](#binenter-stagesh)). A second literal would make that drift silent, since a diverged reader passes on every skeleton rather than erroring.
 
-The **caller-stage read**, a session's last stamp's stage (`stages::caller_stage`), is hoisted beside it for its two readers, the workflow-state guard's third rule and that arm.
+The **caller-stage read**, a session's last stamp's stage (`stages::caller_stage`), is hoisted beside it.
 
 **The table validator is fail-closed on shape, not merely on presence.** It runs at the kit's first knob read in a process, collects every finding, and refuses at exit 2 under the kit's malformed-config lead line ([gate-sdk/SPEC.md §The knob file](../gate-sdk/SPEC.md#the-knob-file)). A knob takes an arm wherever a load-time check can refuse a malformed shape:
 
