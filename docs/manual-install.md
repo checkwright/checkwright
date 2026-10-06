@@ -44,18 +44,21 @@ To uninstall, `sh "$cw/package/bin/checkwright.sh" uninstall` reverses it in one
 
 ## Windows
 
-Download the release, in PowerShell. `$ErrorActionPreference` stops this session on error, here and below:
+Download the release, in PowerShell. Each block here stops at its first error, then puts your session's preferences back:
 
 ```powershell
 . {
-  $ErrorActionPreference = 'Stop'
-  $v = 'X.Y.Z'
-  $cw = Join-Path ([IO.Path]::GetTempPath()) ([IO.Path]::GetRandomFileName())
-  New-Item -ItemType Directory $cw | Out-Null
-  $ProgressPreference = 'SilentlyContinue'
-  $url = "https://github.com/checkwright/checkwright/releases/download/v$v/checkwright-$v.tgz"
-  Invoke-WebRequest $url -OutFile "$cw\checkwright-$v.tgz" -UseBasicParsing
-  Invoke-WebRequest "$url.sha256" -OutFile "$cw\checkwright-$v.tgz.sha256" -UseBasicParsing
+  $keep = $ErrorActionPreference, $ProgressPreference
+  try {
+    $ErrorActionPreference = 'Stop'
+    $ProgressPreference = 'SilentlyContinue'
+    $v = 'X.Y.Z'
+    $cw = Join-Path ([IO.Path]::GetTempPath()) ([IO.Path]::GetRandomFileName())
+    New-Item -ItemType Directory $cw | Out-Null
+    $url = "https://github.com/checkwright/checkwright/releases/download/v$v/checkwright-$v.tgz"
+    Invoke-WebRequest $url -OutFile "$cw\checkwright-$v.tgz" -UseBasicParsing
+    Invoke-WebRequest "$url.sha256" -OutFile "$cw\checkwright-$v.tgz.sha256" -UseBasicParsing
+  } finally { $ErrorActionPreference, $ProgressPreference = $keep }
 }
 ```
 
@@ -71,11 +74,15 @@ Then check the digest, unpack, and run `init`, still from your repository root:
 
 ```powershell
 . {
-  $want = (Get-Content -Raw "$cw\checkwright-$v.tgz.sha256").Split(' ')[0]
-  if ((Get-FileHash "$cw\checkwright-$v.tgz" -Algorithm SHA256).Hash -ne $want) { throw 'checksum mismatch: download both files again' }
-  & "$env:SystemRoot\System32\tar.exe" -xzf "$cw\checkwright-$v.tgz" -C $cw
-  if ($LASTEXITCODE -ne 0) { throw 'tar.exe could not unpack the tarball: download it again' }
-  powershell -NoProfile -ExecutionPolicy Bypass -File "$cw\package\bin\checkwright.ps1" init
+  $keep = $ErrorActionPreference
+  try {
+    $ErrorActionPreference = 'Stop'
+    $want = (Get-Content -Raw "$cw\checkwright-$v.tgz.sha256").Split(' ')[0]
+    if ((Get-FileHash "$cw\checkwright-$v.tgz" -Algorithm SHA256).Hash -ne $want) { throw 'checksum mismatch: download both files again' }
+    & "$env:SystemRoot\System32\tar.exe" -xzf "$cw\checkwright-$v.tgz" -C $cw
+    if ($LASTEXITCODE -ne 0) { throw 'tar.exe could not unpack the tarball: download it again' }
+    powershell -NoProfile -ExecutionPolicy Bypass -File "$cw\package\bin\checkwright.ps1" init
+  } finally { $ErrorActionPreference = $keep }
 }
 ```
 

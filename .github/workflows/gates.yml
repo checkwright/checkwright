@@ -950,11 +950,14 @@ jobs:
           git -C $consumer config user.email 'smoke@example.invalid'
           git -C $consumer config user.name 'page install smoke'
           Push-Location $consumer
+          $ErrorActionPreference = 'Continue'
           try {
               Invoke-Expression $install | Out-Host
               $code = $LASTEXITCODE
-          } finally { Pop-Location }
+              $left = "$ErrorActionPreference"
+          } finally { $ErrorActionPreference = 'Stop'; Pop-Location }
           if ($code -ne 0) { Write-Host "::error::the page's windows-install block exited $code"; exit 1 }
+          if ($left -ne 'Continue') { Write-Host "::error::the page's windows-install block left the session's error preference at $left"; exit 1 }
           if (-not (Test-Path -LiteralPath (Join-Path $consumer 'checkwright.lock'))) {
               Write-Host "::error::the page's windows-install block exited 0 but wrote no checkwright.lock"
               exit 1

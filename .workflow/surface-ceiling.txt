@@ -36,13 +36,13 @@
 9645cp docs/generated-projections.md
 1259cp docs/guard-kit/index.md
 5205cp docs/index.md
-8021cp docs/install-block-contracts.md
+8115cp docs/install-block-contracts.md
 8387cp docs/install-parity-contracts.md
 9542cp docs/install.md
 1344cp docs/kits.md
 1458cp docs/lifecycle-kit/index.md
 3156cp docs/maintenance.md
-3252cp docs/manual-install.md
+3505cp docs/manual-install.md
 3007cp docs/methodology.md
 2550cp docs/openspec.md
 9884cp docs/orchestration.md
@@ -98,7 +98,7 @@
 2899cp gate-sdk/templates/adopt.md
 282149cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
-277549cp installer/SPEC.md
+277647cp installer/SPEC.md
 362515cp lifecycle-kit/SPEC.md
 6534cp lifecycle-kit/templates/consult.md
 44661cp lifecycle-kit/templates/lead.md
