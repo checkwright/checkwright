@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: doctrine-brevity-journal-arm-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,42 @@
 ## New Features
 
 ## Technical Debt
+
+### spec-brevity-residue
+
+[roadmap: now/adoption] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
+
+the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices (below); the eight kits after it are finished or split out (the slices below); what remains is doctrine-kit's DOCTRINE.md and SPEC.md and, re-verified at scope 2026-10-06 against `.workflow/prose-bound-ceiling.txt`, the findings three passed SPECs still carry: gate-sdk's in §Porting a gate to the binary substrate, §The decisions this substrate already closed and §The port-candidate criteria, and one each in installer's §The consumer smoke and lifecycle-kit's §Testing. Promoted whole as the final slice: every ceiling row cleared, DOCTRINE.md's rule names kept verbatim for their citers. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling). Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling); the per-kit slices stay off the roadmap.
+
+**Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
+
+**Split ten times, 2026-09-25 to 09-27 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder, porting, native-contracts, runner, meta-gate, tooling and tail slices each left as their own debt entry, all since landed, as did the ninth and tenth, installer's contract and lifecycle-kit's template sections.
+
+**Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
+
+Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes as `installer-install-brevity` and `installer-remainder-brevity`; drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope as `drift-kit-measurement-brevity`; guard-kit's front sections, delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope as `queue-kit-gate-brevity`; guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope as `guard-kit-tool-brevity`.
+
+delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as `delegation-kit-tail-brevity`; canon-kit's claim-gate sections and rest left 2026-10-04 at the next two scopes as `canon-kit-claim-brevity` and `canon-kit-tail-brevity`; queue-kit's halves, then drift-kit's and context-kit's rests, at the four after as `queue-kit-format-brevity`, `queue-kit-arms-brevity`, `drift-kit-tail-brevity` and `context-kit-tail-brevity`.
+
+evidence-kit's halves left 2026-10-05 and 10-06 at successive scopes as `evidence-kit-front-brevity` and `evidence-kit-tail-brevity`; site-kit left 2026-10-06 as `site-kit-brevity`.
+
+### kit-prose-harness-coupling
+
+kit prose couples to the master harness. The kit SPECs and READMEs (guard-kit, lifecycle-kit, delegation-kit, context-kit, plugin) name Claude Code's `CLAUDE_PROJECT_DIR` as the hook anchor, so a customer running another master harness reads a contract bound to one vendor. Operator direction 2026-09-30, lead session (not a ruling): the Claude binding belongs only on the Claude adapter surfaces (guard-kit/templates/settings-hooks.json, the plugin, and the settings and plugin-parity readers of those files); generic prose names the harness's project-dir variable and gives Claude Code's as one binding.
+
+**Deliverable:** that sweep, extended to every other Claude-only name in kit prose.
+
+**Cost while deferred:** an adopter on another harness reads every hook contract as bound to Claude Code. Filed 2026-09-30 to the gap inbox by guard-kit-steering's lead; promoted at its close: →fix fails because the sweep spans five kits, →forward because the direction is given. Owner lookup: `CLAUDE_PROJECT_DIR`, `master harness`, `Codex` in this file — [plugin-harness-reach](#plugin-harness-reach), DISTINCT (the plugin package on other harnesses), and [heterogeneous-agent-delegation](#heterogeneous-agent-delegation), DISTINCT (a master harness delegating to other vendors, where this is the master harness swapped); owner gate-sdk/SPEC.md §The adopter constraints. Re-verified at scope 2026-10-06 by `git grep`: the variable sits in the SPEC or README of each of the five kits named, fourteen sites in eight files. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
+
+### queue-provenance-restates-git-history
+
+[recurrence: 2026-09-25] [not-icebox-eligible: 2026-10-03 returned from the icebox by consult 2026-09-25; evicting it would reverse that consult]
+
+queue provenance prose restates what `git log` answers; the ruled sweep is small, ten route-phrase hits remaining when re-counted.
+
+**Deliverable:** the ten sites cut to the fact the entry needs, and the writing rule at queue-kit/SPEC.md §The queue format.
+
+**Cost while deferred:** low; paid by every reader of those entries. Filed 2026-09-09; returned from the icebox 2026-09-25 by consult, the count re-run. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
 
 ## Deferred
 
@@ -62,7 +98,7 @@ A build session ran `git stash` / `git stash pop` on the shared checkout to rebu
 
 **Deliverable:** a way for a consumer to declare a generated mirror as the projection of its source component, so the token resolves to the component it mirrors, specified in §check-stage-entry with a fixture over a mirror-naming single-kit amendment; or a ruling that the waiver stays the valve.
 
-**Cost while deferred:** an align dispatch or an operator waiver ask per single-kit iteration whose amendments name their mirror. Filed 2026-10-03 to the gap inbox at guard-kit-write-side-pass' build; promoted at its close: →fix fails because the mirror's resolution is a grammar decision the SPEC settles the other way, →forward because no recorded ruling is reversed. Re-verified: the SPEC's roster-dir paragraph names this exact case. Owner lookup: `mirror`, `assertion C`, `audit-trigger` in this file — none; owner lifecycle-kit/SPEC.md §check-stage-entry.
+**Cost while deferred:** an align dispatch or an operator waiver ask per single-kit iteration whose amendments name their mirror. Filed 2026-10-03 to the gap inbox at guard-kit-write-side-pass' build; promoted at its close: →fix fails because the mirror's resolution is a grammar decision the SPEC settles the other way, →forward because no recorded ruling is reversed. Re-verified: the SPEC's roster-dir paragraph names this exact case. Owner lookup: `mirror`, `assertion C`, `audit-trigger` in this file — none; owner lifecycle-kit/SPEC.md §check-stage-entry. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling). A feature, authored at spec.
 
 ### config-variant-battery-harness
 
@@ -234,24 +270,6 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 **Cost while deferred:** low and bounded — every entry needing discrimination keeps buying it with text against the entry budget. Filed 2026-09-01 by close under CLAUDE.md §Housekeeping's operator-directed exception; it rides no cut and is no hotfix.
 
-### spec-brevity-residue
-
-[roadmap: now/adoption] [cost: session/high] [surface: doctrine-kit] [roadmap-summary: Kit SPECs that state their contracts without run-ons, history or restatement.]
-
-the per-SPEC remainder of `spec-tier-brevity-pass`'s three moves (run-on structure, archaeology, restatement), outside the five sections that entry landed. In the filing profile's order: gate-sdk landed in eight slices (below); the eight kits after it are finished or split out (the slices below); what remains is doctrine-kit's DOCTRINE.md and SPEC.md; `.workflow/prose-bound-ceiling.txt` holds each file's live finding count. Horizon `now`, operator direction 2026-09-29, lead-relayed (not a ruling); the per-kit slices stay off the roadmap.
-
-**Deliverable:** the three moves applied SPEC by SPEC in that order, under the gates the first slice landed, `check-prose-bounds` and `check-provenance-seam`'s dated arm; one SPEC, or a batch of the small ones, per iteration, and gate-sdk in slices, since no iteration passes it whole. Not a wholesale cut: a contract sentence stays.
-
-**Split ten times, 2026-09-25 to 09-27 at scope, each on an operator direction lead-relayed (not a /consult ruling):** gate-sdk's framework, remainder, porting, native-contracts, runner, meta-gate, tooling and tail slices each left as their own debt entry, all since landed, as did the ninth and tenth, installer's contract and lifecycle-kit's template sections.
-
-**Cost while deferred:** paid by every session that opens a section not yet passed and every adopter who reads one on the site. Filed 2026-09-25 at scope, split from spec-tier-brevity-pass on an operator direction, lead-relayed; the profile and sampled tables are in that entry's filing commit.
-
-Each on an operator direction lead-relayed (not a /consult ruling): lifecycle-kit's sections above §Per-component contracts, its state-machine tool sections and its remaining sections left 2026-09-28 to 09-29 at the consult-inbox-front-brevity, lifecycle-machine-brevity and native-hook-customer-legs scopes as `lifecycle-kit-front-brevity`, `lifecycle-kit-machine-brevity` and `lifecycle-kit-tail-brevity`; installer's install-surface sections (§The verbs through §The manifest) and its remaining sections other than §The consumer smoke left 2026-09-29 at the companion-technical-gates and companion-adoption-landing scopes as `installer-install-brevity` and `installer-remainder-brevity`; drift-kit's measurement sections left 2026-09-29 at preview-readiness' scope as `drift-kit-measurement-brevity`; guard-kit's front sections, delegation-kit's tier sections and canon-kit's amendment-family sections left 2026-09-30 at the guard-kit-steering, delegation-tier-binding and canon-kit-value-pass scopes as `guard-kit-front-brevity`, `delegation-kit-tier-brevity` and `canon-kit-amendment-brevity`; canon-kit's §Layout and configuration and seven gate sections left 2026-10-01 at install-disposition-pass' scope as `canon-kit-gate-brevity`; context-kit's four feature-edited sections left 2026-10-01 at context-kit-value-pass' scope as `context-kit-feature-brevity`; queue-kit's eleven gate sections left 2026-10-01 at lifecycle-queue-value-pass' scope as `queue-kit-gate-brevity`; guard-kit's tool sections left 2026-10-01 at gate-sdk-value-pass' scope as `guard-kit-tool-brevity`.
-
-delegation-kit's §The delegation model, installer's §The consumer smoke, guard-kit's remainder and §The generic ruleset, and delegation-kit's §The turn-end liveness hook left 2026-10-02 to 10-03 at successive scopes as `delegation-kit-model-brevity`, `installer-smoke-brevity`, `guard-kit-remainder-brevity`, `guard-kit-ruleset-brevity` and `delegation-liveness-brevity`; delegation-kit's rest left 2026-10-04 as `delegation-kit-tail-brevity`; canon-kit's claim-gate sections and rest left 2026-10-04 at the next two scopes as `canon-kit-claim-brevity` and `canon-kit-tail-brevity`; queue-kit's halves, then drift-kit's and context-kit's rests, at the four after as `queue-kit-format-brevity`, `queue-kit-arms-brevity`, `drift-kit-tail-brevity` and `context-kit-tail-brevity`.
-
-evidence-kit's halves left 2026-10-05 and 10-06 at successive scopes as `evidence-kit-front-brevity` and `evidence-kit-tail-brevity`; site-kit left 2026-10-06 as `site-kit-brevity`.
-
 ### tarball-attestation-observed
 
 [cost: event/low] [surface: installer] [observed-by: publish]
@@ -271,16 +289,6 @@ CONTRIBUTING.md promises an inbound issue or pull request a disposition within o
 **Deliverable:** either the cap carried on the public promise or a lane that honours it, and the disposition record named; CONTRIBUTING.md and the scope binding agree.
 
 **Cost while deferred:** the first contributor past the cap reads a promise the tree breaks. Filed 2026-07-31; returned from the icebox 2026-09-25 by consult, the promise and the cap re-read.
-
-### queue-provenance-restates-git-history
-
-[cost: once/low] [surface: TASK-QUEUE.md] [recurrence: 2026-09-25] [not-icebox-eligible: 2026-10-03 returned from the icebox by consult 2026-09-25; evicting it would reverse that consult]
-
-queue provenance prose restates what `git log` answers; the ruled sweep is small, ten route-phrase hits remaining when re-counted.
-
-**Deliverable:** the ten sites cut to the fact the entry needs, and the writing rule at queue-kit/SPEC.md §The queue format.
-
-**Cost while deferred:** low; paid by every reader of those entries. Filed 2026-09-09; returned from the icebox 2026-09-25 by consult, the count re-run.
 
 ### custom-gate-substrates
 
@@ -382,18 +390,6 @@ the front-door rehearsal belongs in the methodology, operator direction 2026-09-
 
 **Cost while deferred:** each audience event risks a front-door defect only a clean-seat install would show; the one-off left macOS, native Windows, arm64 Linux, WSL and the npx, plugin, PowerShell and agent-prompt routes unrehearsed. Filed 2026-09-29 to the gap inbox by preview-readiness' lead; promoted 2026-09-30 at its close: →fix fails because each layer is new mechanism, →forward because the direction is given. Re-verified: `publish.yml` runs roster, build, pack, npm and release and installs nothing after publishing. Owner lookup: `rehears`, `post-publish`, `clean seat` in this file — [design-partner-preview](#design-partner-preview), DISTINCT (the observed install this precedes); owner RELEASING.md for layer 2, the kit rule's home open. Surface also doctrine-kit.
 
-### kit-prose-harness-coupling
-
-[cost: event/high] [surface: gate-sdk]
-
-kit prose couples to the master harness. The kit SPECs and READMEs (guard-kit, lifecycle-kit, delegation-kit, context-kit, plugin) name Claude Code's `CLAUDE_PROJECT_DIR` as the hook anchor, so a customer running another master harness reads a contract bound to one vendor. Operator direction 2026-09-30, lead session (not a ruling): the Claude binding belongs only on the Claude adapter surfaces (guard-kit/templates/settings-hooks.json, the plugin, and the settings and plugin-parity readers of those files); generic prose names the harness's project-dir variable and gives Claude Code's as one binding.
-
-**Deliverable:** that sweep, extended to every other Claude-only name in kit prose.
-
-**Inferred, not run:** the per-SPEC framing the bullet names.
-
-**Cost while deferred:** an adopter on another harness reads every hook contract as bound to Claude Code. Filed 2026-09-30 to the gap inbox by guard-kit-steering's lead; promoted at its close: →fix fails because the sweep spans five kits, →forward because the direction is given. Owner lookup: `CLAUDE_PROJECT_DIR`, `master harness`, `Codex` in this file — [plugin-harness-reach](#plugin-harness-reach), DISTINCT (the plugin package on other harnesses), and [heterogeneous-agent-delegation](#heterogeneous-agent-delegation), DISTINCT (a master harness delegating to other vendors, where this is the master harness swapped); owner gate-sdk/SPEC.md §The adopter constraints.
-
 ### worktree-memory-dir-key
 
 [cost: event/low] [surface: context-kit]
@@ -436,7 +432,7 @@ resume-journal appends are the top hand shape after the gate door in `--emit man
 
 **Deliverable:** an append arm writing its operand or stdin to the journal the session's own stamp names, so no session spells the path; homed in delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps, with the agent-execution template's journal bullet citing it.
 
-**Cost while deferred:** a tool call and a spelled path per journal line, in every stage session. Filed 2026-10-05 to the gap inbox at that iteration's build, off the meter's first run; promoted at its close: →fix fails because the arm is a new governed name, →forward because no ruling is owed. Re-verified: the meter at close ranks `printf >>` second and `cat >>` sixth; the filer's delegation-transport-pass count (`cat >>` 57 in 9) is carried, not re-run. Owner lookup: `journal`, `append` in this file — none; owner that section.
+**Cost while deferred:** a tool call and a spelled path per journal line, in every stage session. Filed 2026-10-05 to the gap inbox at that iteration's build, off the meter's first run; promoted at its close: →fix fails because the arm is a new governed name, →forward because no ruling is owed. Re-verified: the meter at close ranks `printf >>` second and `cat >>` sixth; the filer's delegation-transport-pass count (`cat >>` 57 in 9) is carried, not re-run. Owner lookup: `journal`, `append` in this file — none; owner that section. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling). A feature, authored at spec.
 
 ### manual-ops-door-subkey
 

@@ -4,4 +4,4 @@
 
 ---
 
-— scope afe8c2b6 2026-10-06 ed8361441
+doctrine-brevity-journal-arm-pass scope afe8c2b6 2026-10-06 ed8361441
