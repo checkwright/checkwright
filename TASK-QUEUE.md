@@ -496,7 +496,7 @@ site-kit/templates/site-health.yml's probe step is linted by the `check-action-*
 
 a citation naming a numbered step by its bold title (RELEASING.md §The procedure, *Author the release-note post — in-iteration*, and the same shape citing lifecycle-kit/templates/lead.md) resolves under no gate: `check-spec-pointer` and `check-citation-link` resolve the heading alone, so a reworded step title leaves every citing site stale with the battery green.
 
-**Deliverable:** a holder for the title, either a title-resolution arm on `check-spec-pointer` or the cited steps made headings; which one is spec's.
+**Deliverable:** a holder for the title, either a title-resolution arm on `check-spec-pointer` or the cited steps made headings; which one is spec's, and so is whether a prefix resolves: .github/workflows/publish.yml cites *Watch the publish workflow* for a title that runs on to *both channels*, and .claude/agents/stage-session.md cites *Tier each batch* for a longer one (read 2026-10-06 at this entry's filing close, off its second-vendor review).
 
 **Cost while deferred:** one reworded title in RELEASING.md mis-names its citations, a gate's printed remedy among them. Filed 2026-10-06 to the gap inbox at site-fence-release-cites-pass' build; promoted at its close: →fix fails because either holder is new mechanism or a restructure of a governed procedure, →forward because no ruling is owed. Re-verified by grep: eight lines cite a step of the two files by title. Owner lookup: `bold title`, `step title`, `title-resolution` in this file and the disposed-findings record — none; release-step-number-cites, landed this iteration, DISTINCT (it moved the citations off the step's number, and this is the title's own drift, so no recurrence).
 
