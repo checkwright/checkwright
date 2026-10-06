@@ -10,21 +10,11 @@
 
 ## Technical Debt
 
-### site-health-probe-no-retry-on-transient
-
-[recurrence: 2026-09-25]
-
-the shipped `site-kit/templates/site-health.yml` takes one curl sample and files an issue on a single non-200; a transient is a wrong red on a public tracker. Sibling of [site-health-issue-venue-unwanted](#site-health-issue-venue-unwanted), whose subject is the venue; this one is the sample.
-
-**Deliverable:** a bounded retry before the failure path, in the template and the copy.
-
-**Cost while deferred:** one transient files a public issue. Filed 2026-08-27; returned from the icebox 2026-09-25 by consult, the template re-read. Re-verified at scope 2026-10-06: the apex probe is one `curl -m 20` sample. Filed as debt, the bound a template literal as the probe's timeout is; a knob for it is a new name and returns the unit to scope. Its bash first runs on the scheduled probe after the closing push. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
-
 ### site-kit-brevity
 
 site-kit/SPEC.md whole, the next file no brevity slice has passed, under [spec-brevity-residue](#spec-brevity-residue)'s three moves (run-on structure, archaeology, restatement): about 9.9k words at this scope and the file's ceiling row of 49 `check-prose-bounds` findings.
 
-**Deliverable:** the three moves over the file under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into it kept, per a citation survey; the file's ceiling row re-stamped. Lands after [site-health-probe-no-retry-on-transient](#site-health-probe-no-retry-on-transient), which writes into §templates/site-health.yml.
+**Deliverable:** the three moves over the file under `check-prose-bounds` and `check-provenance-seam`'s dated arm, every heading kept verbatim and every fact another surface cites into it kept, per a citation survey; the file's ceiling row re-stamped. Lands after `site-health-probe-no-retry-on-transient`, which writes into §templates/site-health.yml.
 
 **Cost while deferred:** paid by every session and adopter that reads site-kit's SPEC. Filed 2026-10-06 as a split at scope. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
 
@@ -1213,4 +1203,6 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 No rule holds a docs video to a local poster linking out, so a first embed adds a third-party request.
 
 ## Done
+
+- site-health-probe-no-retry-on-transient
 

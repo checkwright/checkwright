@@ -49,157 +49,171 @@ jobs:
           fi
           echo "apex host: $apex"
 
-          failures=()
+          # spec: site-kit/SPEC.md §templates/site-health.yml — the resample
+          attempts=3
+          pause=30
+          attempt=1
+          while :; do
+            failures=()
 
-          code="$(curl -sS -m 20 -o /dev/null -w '%{http_code}' "https://$apex/")"
-          [ "$code" = 200 ] || failures+=("apex https did not answer 200 (got '$code')")
+            code="$(curl -sS -m 20 -o /dev/null -w '%{http_code}' "https://$apex/")"
+            [ "$code" = 200 ] || failures+=("apex https did not answer 200 (got '$code')")
 
-          read -r code loc < <(curl -sS -m 20 -o /dev/null -w '%{http_code} %{redirect_url}' "https://www.$apex/") || true
-          case "${code}::${loc}" in
-            301::*"//$apex/"*) ;;
-            *) failures+=("www did not 301 to apex (got '$code' -> '$loc')") ;;
-          esac
-
-          read -r code loc < <(curl -sS -m 20 -o /dev/null -w '%{http_code} %{redirect_url}' "http://$apex/") || true
-          case "${code}::${loc}" in
-            301::https://*) ;;
-            *) failures+=("http did not 301 to https (got '$code' -> '$loc')") ;;
-          esac
-
-          # spec: site-kit/SPEC.md §templates/site-health.yml — the ALT_DOMAIN arm; delete it with its env if unused
-          read -r code loc < <(curl -sS -m 20 -o /dev/null -w '%{http_code} %{redirect_url}' "https://$ALT_DOMAIN/install.html") || true
-          case "${code}::${loc}" in
-            301::*"//$apex/install.html"*) ;;
-            *) failures+=("$ALT_DOMAIN did not 301 to apex keeping path (got '$code' -> '$loc')") ;;
-          esac
-
-          expire="$(curl -sSv -m 20 "https://$apex/" 2>&1 >/dev/null | sed -n 's/^\* *expire date: //p' | head -1)"
-          if [ -z "$expire" ]; then
-            failures+=("could not read certificate expiry for $apex")
-          else
-            exp_epoch="$(date -d "$expire" +%s 2>/dev/null)"
-            if [ -z "$exp_epoch" ]; then
-              failures+=("unparseable certificate expiry for $apex: '$expire'")
-            else
-              days=$(( (exp_epoch - $(date +%s)) / 86400 ))
-              [ "$days" -ge 14 ] || failures+=("certificate for $apex expires in $days day(s) (< 14): $expire")
-            fi
-          fi
-
-          # spec: site-kit/SPEC.md §templates/site-health.yml — the release-body arm; delete it with its env if unused
-          notes=()
-          shopt -s nullglob
-          for f in $RELEASE_NOTE_GLOB; do
-            notes+=("$f")
-          done
-          shopt -u nullglob
-          if [ "${#notes[@]}" -eq 0 ]; then
-            failures+=("release-note glob matched nothing: '$RELEASE_NOTE_GLOB' — set the RELEASE_NOTE_* env above, or delete this arm")
-          fi
-
-          # spec: site-kit/SPEC.md §templates/site-health.yml — the tag list comes from the API, paginated
-          tag_err="$(mktemp)"
-          tags="$(gh api --paginate 'repos/{owner}/{repo}/tags' --jq '.[].name' 2>"$tag_err")"
-          tag_rc=$?
-          if [ "$tag_rc" -ne 0 ]; then
-            failures+=("could not read the tag list (gh exit $tag_rc): $(tr '\n' ' ' < "$tag_err")")
-            tags=""
-          fi
-          rm -f "$tag_err"
-          n_tags="$(grep -c . <<<"$tags")"
-
-          n_found="${#notes[@]}"; n_keyed=0; n_released=0; n_checked=0
-          for f in "${notes[@]:-}"; do
-            [ -n "$f" ] || continue
-            tag="$(awk -v key="$RELEASE_NOTE_TAG_KEY" '
-              /^---[[:space:]]*$/ { fm++; next }
-              fm == 1 && index($0, key ":") == 1 {
-                v = substr($0, length(key) + 2); sub(/^[[:space:]]+/, "", v); print v; exit
-              }' "$f")"
-            [ -n "$tag" ] || continue
-            n_keyed=$(( n_keyed + 1 ))
-            grep -Fxq -- "$tag" <<<"$tags" || continue
-            n_released=$(( n_released + 1 ))
-
-            slug="${f##*/}"; slug="${slug%.*}"
-            want="https://$apex${RELEASE_NOTE_URL_PATH//\{slug\}/$slug}"
-
-            rel_err="$(mktemp)"
-            body="$(gh api "repos/{owner}/{repo}/releases/tags/$tag" --jq '.body // ""' 2>"$rel_err")"
-            rel_rc=$?
-            if [ "$rel_rc" -ne 0 ]; then
-              failures+=("$tag: no readable Release for a tag that exists (gh exit $rel_rc): $(tr '\n' ' ' < "$rel_err")")
-              rm -f "$rel_err"
-              continue
-            fi
-            rm -f "$rel_err"
-            n_checked=$(( n_checked + 1 ))
-
-            case "$body" in
-              *"$want"*) ;;
-              *) failures+=("$tag: Release body does not carry the note URL $want") ;;
+            read -r code loc < <(curl -sS -m 20 -o /dev/null -w '%{http_code} %{redirect_url}' "https://www.$apex/") || true
+            case "${code}::${loc}" in
+              301::*"//$apex/"*) ;;
+              *) failures+=("www did not 301 to apex (got '$code' -> '$loc')") ;;
             esac
 
-            while read -r u; do
-              [ -n "$u" ] || continue
-              case "$u" in
-                "https://$apex"|"https://$apex/"*|"http://$apex"|"http://$apex/"*) ;;
-                *) continue ;;
-              esac
-              code="$(curl -sS -m 20 -o /dev/null -w '%{http_code}' "$u")"
-              [ "$code" = 200 ] || failures+=("$tag: Release body URL $u did not answer 200 (got '$code')")
-            done < <(grep -oE 'https?://[^[:space:]<>"]+' <<<"$body" | sed -E 's/[).,;:!?*]+$//' | sort -u)
-          done
+            read -r code loc < <(curl -sS -m 20 -o /dev/null -w '%{http_code} %{redirect_url}' "http://$apex/") || true
+            case "${code}::${loc}" in
+              301::https://*) ;;
+              *) failures+=("http did not 301 to https (got '$code' -> '$loc')") ;;
+            esac
 
-          echo "release-body: $n_found note(s) found, $n_keyed keyed '$RELEASE_NOTE_TAG_KEY:', $n_released released of $n_tags remote tag(s), $n_checked checked"
+            # spec: site-kit/SPEC.md §templates/site-health.yml — the ALT_DOMAIN arm; delete it with its env if unused
+            read -r code loc < <(curl -sS -m 20 -o /dev/null -w '%{http_code} %{redirect_url}' "https://$ALT_DOMAIN/install.html") || true
+            case "${code}::${loc}" in
+              301::*"//$apex/install.html"*) ;;
+              *) failures+=("$ALT_DOMAIN did not 301 to apex keeping path (got '$code' -> '$loc')") ;;
+            esac
 
-          # spec: site-kit/SPEC.md §templates/site-health.yml — the theme-drift arm; delete it with its env if unused
-          if [ -z "${HIGHLIGHT_CSS_PATH:-}${HIGHLIGHT_TOKENS_FILE:-}" ]; then
-            echo "theme-drift: skipped (HIGHLIGHT_CSS_PATH and HIGHLIGHT_TOKENS_FILE unset)"
-          elif [ -z "${HIGHLIGHT_CSS_PATH:-}" ] || [ -z "${HIGHLIGHT_TOKENS_FILE:-}" ]; then
-            failures+=("theme-drift: set both HIGHLIGHT_CSS_PATH and HIGHLIGHT_TOKENS_FILE, or neither")
-          elif [ ! -r "$HIGHLIGHT_TOKENS_FILE" ]; then
-            failures+=("theme-drift: snapshot $HIGHLIGHT_TOKENS_FILE is not a readable tracked file")
-          else
-            css="$(mktemp)"
-            css_err="$(mktemp)"
-            curl -sS -f -m 20 -o "$css" "https://$apex$HIGHLIGHT_CSS_PATH" 2>"$css_err"
-            css_rc=$?
-            if [ "$css_rc" -ne 0 ]; then
-              failures+=("theme-drift: could not fetch https://$apex$HIGHLIGHT_CSS_PATH (curl exit $css_rc): $(tr '\n' ' ' < "$css_err")")
+            expire="$(curl -sSv -m 20 "https://$apex/" 2>&1 >/dev/null | sed -n 's/^\* *expire date: //p' | head -1)"
+            if [ -z "$expire" ]; then
+              failures+=("could not read certificate expiry for $apex")
             else
-              extracted="$(tr '\n' ' ' < "$css" | sed -E 's#/\*([^*]|\*+[^*/])*\*+/##g' | awk '
-                BEGIN { RS = "}" }
-                {
-                  n = split($0, part, "{")
-                  if (n < 2) next
-                  if (part[n] !~ /(^|[;[:space:]])(color|background|background-color)[[:space:]]*:/) next
-                  print "rule"
-                  m = split(part[n - 1], sel, ",")
-                  for (i = 1; i <= m; i++) {
-                    s = sel[i]
-                    gsub(/[[:space:]]+/, " ", s); sub(/^ /, "", s); sub(/ $/, "", s)
-                    if (s ~ /^\.highlight \.[A-Za-z0-9_-]+$/) print "class " substr(s, 12)
-                  }
-                }')"
-              theme="$(sed -n 's/^class //p' <<<"$extracted" | sort -u)"
-              snap="$(grep -v '^[[:space:]]*#' "$HIGHLIGHT_TOKENS_FILE" | tr -d '[:blank:]\r' | grep . | sort -u)"
-              n_theme="$(grep -c . <<<"$theme")"
-              echo "theme-drift: $(wc -c < "$css" | tr -d ' ') byte(s) fetched, $(grep -c '^rule$' <<<"$extracted") colour-bearing rule(s), $n_theme class(es) extracted, $(grep -c . <<<"$snap") in the snapshot"
-              if [ "$n_theme" -eq 0 ]; then
-                failures+=("theme-drift: https://$apex$HIGHLIGHT_CSS_PATH yielded zero .highlight classes — the extraction or the theme's structure broke")
+              exp_epoch="$(date -d "$expire" +%s 2>/dev/null)"
+              if [ -z "$exp_epoch" ]; then
+                failures+=("unparseable certificate expiry for $apex: '$expire'")
               else
-                added="$(comm -23 <(printf '%s\n' "$theme") <(printf '%s\n' "$snap") | paste -sd ' ' -)"
-                removed="$(comm -13 <(printf '%s\n' "$theme") <(printf '%s\n' "$snap") | paste -sd ' ' -)"
-                if [ -n "$added$removed" ]; then
-                  [ -z "$added" ] || failures+=("theme-drift: the theme colours class(es) the snapshot lacks: $added")
-                  [ -z "$removed" ] || failures+=("theme-drift: the snapshot lists class(es) the theme does not colour: $removed")
-                  failures+=("theme-drift: the full new list for $HIGHLIGHT_TOKENS_FILE:"$'\n'"$theme")
-                fi
+                days=$(( (exp_epoch - $(date +%s)) / 86400 ))
+                [ "$days" -ge 14 ] || failures+=("certificate for $apex expires in $days day(s) (< 14): $expire")
               fi
             fi
-            rm -f "$css" "$css_err"
-          fi
+
+            # spec: site-kit/SPEC.md §templates/site-health.yml — the release-body arm; delete it with its env if unused
+            notes=()
+            shopt -s nullglob
+            for f in $RELEASE_NOTE_GLOB; do
+              notes+=("$f")
+            done
+            shopt -u nullglob
+            if [ "${#notes[@]}" -eq 0 ]; then
+              failures+=("release-note glob matched nothing: '$RELEASE_NOTE_GLOB' — set the RELEASE_NOTE_* env above, or delete this arm")
+            fi
+
+            # spec: site-kit/SPEC.md §templates/site-health.yml — the tag list comes from the API, paginated
+            tag_err="$(mktemp)"
+            tags="$(gh api --paginate 'repos/{owner}/{repo}/tags' --jq '.[].name' 2>"$tag_err")"
+            tag_rc=$?
+            if [ "$tag_rc" -ne 0 ]; then
+              failures+=("could not read the tag list (gh exit $tag_rc): $(tr '\n' ' ' < "$tag_err")")
+              tags=""
+            fi
+            rm -f "$tag_err"
+            n_tags="$(grep -c . <<<"$tags")"
+
+            n_found="${#notes[@]}"; n_keyed=0; n_released=0; n_checked=0
+            for f in "${notes[@]:-}"; do
+              [ -n "$f" ] || continue
+              tag="$(awk -v key="$RELEASE_NOTE_TAG_KEY" '
+                /^---[[:space:]]*$/ { fm++; next }
+                fm == 1 && index($0, key ":") == 1 {
+                  v = substr($0, length(key) + 2); sub(/^[[:space:]]+/, "", v); print v; exit
+                }' "$f")"
+              [ -n "$tag" ] || continue
+              n_keyed=$(( n_keyed + 1 ))
+              grep -Fxq -- "$tag" <<<"$tags" || continue
+              n_released=$(( n_released + 1 ))
+
+              slug="${f##*/}"; slug="${slug%.*}"
+              want="https://$apex${RELEASE_NOTE_URL_PATH//\{slug\}/$slug}"
+
+              rel_err="$(mktemp)"
+              body="$(gh api "repos/{owner}/{repo}/releases/tags/$tag" --jq '.body // ""' 2>"$rel_err")"
+              rel_rc=$?
+              if [ "$rel_rc" -ne 0 ]; then
+                failures+=("$tag: no readable Release for a tag that exists (gh exit $rel_rc): $(tr '\n' ' ' < "$rel_err")")
+                rm -f "$rel_err"
+                continue
+              fi
+              rm -f "$rel_err"
+              n_checked=$(( n_checked + 1 ))
+
+              case "$body" in
+                *"$want"*) ;;
+                *) failures+=("$tag: Release body does not carry the note URL $want") ;;
+              esac
+
+              while read -r u; do
+                [ -n "$u" ] || continue
+                case "$u" in
+                  "https://$apex"|"https://$apex/"*|"http://$apex"|"http://$apex/"*) ;;
+                  *) continue ;;
+                esac
+                code="$(curl -sS -m 20 -o /dev/null -w '%{http_code}' "$u")"
+                [ "$code" = 200 ] || failures+=("$tag: Release body URL $u did not answer 200 (got '$code')")
+              done < <(grep -oE 'https?://[^[:space:]<>"]+' <<<"$body" | sed -E 's/[).,;:!?*]+$//' | sort -u)
+            done
+
+            echo "release-body: $n_found note(s) found, $n_keyed keyed '$RELEASE_NOTE_TAG_KEY:', $n_released released of $n_tags remote tag(s), $n_checked checked"
+
+            # spec: site-kit/SPEC.md §templates/site-health.yml — the theme-drift arm; delete it with its env if unused
+            if [ -z "${HIGHLIGHT_CSS_PATH:-}${HIGHLIGHT_TOKENS_FILE:-}" ]; then
+              echo "theme-drift: skipped (HIGHLIGHT_CSS_PATH and HIGHLIGHT_TOKENS_FILE unset)"
+            elif [ -z "${HIGHLIGHT_CSS_PATH:-}" ] || [ -z "${HIGHLIGHT_TOKENS_FILE:-}" ]; then
+              failures+=("theme-drift: set both HIGHLIGHT_CSS_PATH and HIGHLIGHT_TOKENS_FILE, or neither")
+            elif [ ! -r "$HIGHLIGHT_TOKENS_FILE" ]; then
+              failures+=("theme-drift: snapshot $HIGHLIGHT_TOKENS_FILE is not a readable tracked file")
+            else
+              css="$(mktemp)"
+              css_err="$(mktemp)"
+              curl -sS -f -m 20 -o "$css" "https://$apex$HIGHLIGHT_CSS_PATH" 2>"$css_err"
+              css_rc=$?
+              if [ "$css_rc" -ne 0 ]; then
+                failures+=("theme-drift: could not fetch https://$apex$HIGHLIGHT_CSS_PATH (curl exit $css_rc): $(tr '\n' ' ' < "$css_err")")
+              else
+                extracted="$(tr '\n' ' ' < "$css" | sed -E 's#/\*([^*]|\*+[^*/])*\*+/##g' | awk '
+                  BEGIN { RS = "}" }
+                  {
+                    n = split($0, part, "{")
+                    if (n < 2) next
+                    if (part[n] !~ /(^|[;[:space:]])(color|background|background-color)[[:space:]]*:/) next
+                    print "rule"
+                    m = split(part[n - 1], sel, ",")
+                    for (i = 1; i <= m; i++) {
+                      s = sel[i]
+                      gsub(/[[:space:]]+/, " ", s); sub(/^ /, "", s); sub(/ $/, "", s)
+                      if (s ~ /^\.highlight \.[A-Za-z0-9_-]+$/) print "class " substr(s, 12)
+                    }
+                  }')"
+                theme="$(sed -n 's/^class //p' <<<"$extracted" | sort -u)"
+                snap="$(grep -v '^[[:space:]]*#' "$HIGHLIGHT_TOKENS_FILE" | tr -d '[:blank:]\r' | grep . | sort -u)"
+                n_theme="$(grep -c . <<<"$theme")"
+                echo "theme-drift: $(wc -c < "$css" | tr -d ' ') byte(s) fetched, $(grep -c '^rule$' <<<"$extracted") colour-bearing rule(s), $n_theme class(es) extracted, $(grep -c . <<<"$snap") in the snapshot"
+                if [ "$n_theme" -eq 0 ]; then
+                  failures+=("theme-drift: https://$apex$HIGHLIGHT_CSS_PATH yielded zero .highlight classes — the extraction or the theme's structure broke")
+                else
+                  added="$(comm -23 <(printf '%s\n' "$theme") <(printf '%s\n' "$snap") | paste -sd ' ' -)"
+                  removed="$(comm -13 <(printf '%s\n' "$theme") <(printf '%s\n' "$snap") | paste -sd ' ' -)"
+                  if [ -n "$added$removed" ]; then
+                    [ -z "$added" ] || failures+=("theme-drift: the theme colours class(es) the snapshot lacks: $added")
+                    [ -z "$removed" ] || failures+=("theme-drift: the snapshot lists class(es) the theme does not colour: $removed")
+                    failures+=("theme-drift: the full new list for $HIGHLIGHT_TOKENS_FILE:"$'\n'"$theme")
+                  fi
+                fi
+              fi
+              rm -f "$css" "$css_err"
+            fi
+
+            [ "${#failures[@]}" -gt 0 ] || break
+            [ "$attempt" -lt "$attempts" ] || break
+            echo "attempt $attempt of $attempts: ${#failures[@]} probe(s) failed; resampling in ${pause}s"
+            printf '  - %s\n' "${failures[@]}"
+            attempt=$(( attempt + 1 ))
+            sleep "$pause"
+          done
+          echo "probe set settled on attempt $attempt of $attempts"
 
           if [ "$FORCE_FAIL" = true ]; then
             failures+=("synthetic failure (force_fail dispatch input)")
