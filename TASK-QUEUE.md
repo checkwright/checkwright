@@ -52,14 +52,6 @@ docs/manual-install.md's Windows download fence is dot-sourced and sets `$ErrorA
 
 **Cost while deferred:** an adopter's shell keeps a changed error policy after installing. Filed 2026-10-06 by evidence-front-install-split-pass' lead. Re-verified by reading the fence, which opens on `. {` and sets the preference inside it. Owner lookup: `ErrorActionPreference`, `stop policy`, `try/finally` in this file — none; install-windows-stop-policy, landed last iteration, DISTINCT (it added the preference this restores).
 
-### harness-sweep-inexact-prose
-
-three sentences the harness-naming sweep left or made inexact. gate-sdk/SPEC.md §The adopter constraints calls the project-directory variable a knob beside the settings file and the agent-skill directory, and no knob names it: guard-kit/SPEC.md §The shell guard declares it a binding the wiring templates carry. guard-kit/SPEC.md's smoke paragraph says the install merges hook wiring into the file `GUARD_KIT_SETTINGS` names, while guard-kit/smoke/install.sh writes the default path literally and reads no knob. drift-kit/SPEC.md's `kpi-settings-local` bullet names the local overlay by path where the arm resolves `GUARD_KIT_SETTINGS_LOCAL`.
-
-**Deliverable:** three prose corrections, or the smoke reading the knob in place of the second; debt.
-
-**Cost while deferred:** a reader of the adopter constraints looks for a knob that does not exist. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' close, off its second-vendor review; carried over the boundary and promoted at the next scope. Re-verified there by grep: the adopter-constraints sentence, the smoke's literal settings path, and the two arms reading `GUARD_KIT_SETTINGS_LOCAL`. Owner lookup: `GUARD_KIT_SETTINGS`, `kpi-settings-local`, `project-directory` in this file and the disposed-findings record — [harness-literal-catcher-gate](#harness-literal-catcher-gate), DISTINCT (the catcher for sites already generic; these are sites the sweep misstated).
-
 ## Deferred
 
 ### foreign-project-critique
@@ -1187,4 +1179,5 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 - stage-tier-line-unread
 - journal-arm-spec-departures
 - mirror-fold-absent-mirror
+- harness-sweep-inexact-prose
 
