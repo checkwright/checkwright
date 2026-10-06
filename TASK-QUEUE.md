@@ -10,28 +10,6 @@
 
 ## Technical Debt
 
-### fence-toggle-list-item
-
-the toggle fence parsers keyed on `spec::is_fence_line` (`native/src/spec.rs`: `docs_mirror`, `manifest_temporal`, `spec_pointer`, `citation_link`, `prose_tells`, `task_path_claim` and the rest, 17 modules) and `check-spec-fence-balance` read a list-item fence opener (`- ```sh`) as no delimiter, while `fence_opening` (`native/src/gates/fence_command_head.rs`) and `check-fence-run` read it as kramdown renders it. An odd count of list-item fences in a manifest-set file reds the balance gate with a misleading "close the unbalanced fence"; an even count passes it and inverts every toggle parser's span between them, so those gates scan fence bodies as prose and skip the prose between.
-
-**Deliverable:** one fence-line reader taking the list-item opener and its indented closer, shared by every toggle parser and the balance gate, with a list-item fence case in each affected gate's fixtures; canon-kit/SPEC.md §The shared spec adapters and §check-spec-fence-balance state the shape.
-
-**Cost while deferred:** latent while no governed doc carries a list-item fence; the first adopter writing one meets a false balance red or silently unscanned prose. Filed 2026-10-05 to the gap inbox at context-kit-tail-publisher-pass' build; promoted at its close: →fix fails because the reader is shared by 17 gate modules whose fixtures each owe a case, and its directive binds it to the awk driver's fence shape, so a change is a cross-gate reader contract; →forward because no ruling is owed. Re-verified: `is_fence_line` strips leading blanks only, and `fence_opening` strips a list-item marker too. Owner lookup: `list-item`, `is_fence_line`, `fence balance` in this file — fence-reader-list-item, landed this iteration, DISTINCT (its deliverable named the `fences_of` readers alone); owner canon-kit/SPEC.md §check-spec-fence-balance. Filed as debt at scope 2026-10-06: canon-kit/SPEC.md §check-fence-command-head's fence shape already states the list-item opener, so the toggle readers converge on it. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
-
-**Reach, lead decision 2026-10-06 at build (not a ruling):** the 17 was the count of the population the entry had found, no cap. The balance gate must not start passing a file that still desyncs a parser it is specified to guard, so every fence toggle reading the gate's surface (the manifest set plus the queue file) takes the shared reader or at least the list-item opener, `check-spec-embedded-source`'s reader among them. A tilde-admitting reader may keep its own tilde test. A stated limit is admitted only for a reader whose corpus lies outside that surface, established per reader. A guarded reader that cannot be covered is escalated, never landed narrower.
-
-### fence-closer-length
-
-`spec::is_fence_line` (`native/src/spec.rs`) reads any line opening on three backticks as a fence line, whatever its length, and `check-docs-page-length`'s `page_words` (`native/src/gates/docs_page_length.rs`) flips its fence state on each. Inside a four-backtick block a three-backtick line therefore closes the scanner's fence, and a following comment-shaped line is skipped as an HTML comment though the page renders it; canon-kit/SPEC.md §check-docs-page-length says a comment marker inside a fenced block is the block's text. The same reader leaves a page opening on `---` with no closing `---` at zero words.
-
-Run at scope 2026-10-06, a scratch fixture through `--run-gate-tests`: a page whose four-backtick block holds a three-backtick line and a 28-token comment line read 5 words, and a 30-word page opening on an unclosed `---` read fewer.
-
-**Deliverable:** the fence reader matching a closer to its opener's length, or the limit stated in the section, and the unclosed front matter ruled either way. It is the reader [fence-toggle-list-item](#fence-toggle-list-item) rewrites, so the two land as one reader change.
-
-**Cost while deferred:** latent while no governed page nests a shorter fence in a longer one; a page that does is under-counted. Filed 2026-10-05 to the gap inbox by evidence-front-install-split-pass' close (its second-vendor review); promoted at the next scope: →fix fails because the reader is shared by every toggle parser, →forward because no ruling is owed. Re-verified: `is_fence_line` tests a three-backtick prefix alone, and `page_words` toggles on it and ends front matter only on a second `---`. Owner lookup: `is_fence_line`, `page_words`, `page-length`, `closer` in this file — fence-toggle-list-item, DISTINCT (the list-item opener, this is the closer's length); owner canon-kit/SPEC.md §check-docs-page-length. Part of the operator's selection of the unit set, direction 2026-10-06, lead-relayed (not a ruling).
-
-**Unclosed front matter, lead decision 2026-10-06 at build (not a ruling):** an opening `---` that nothing closes is no front matter and the page is counted whole, since an unclosed `---` delimits no block. A declared page this turns red is fixed in this unit. The other front-matter readers stay out of this entry and are filed as a gap.
-
 ## Deferred
 
 ### foreign-project-critique
@@ -1186,4 +1164,6 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 - site-kit-brevity
 - release-drain-ordering-contradiction
 - release-step-number-cites
+- fence-toggle-list-item
+- fence-closer-length
 
