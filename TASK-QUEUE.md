@@ -462,6 +462,26 @@ site-kit/templates/site-health.yml's resample loop sets its attempt count and it
 
 **Cost while deferred:** a copier wanting another bound, or no resample, edits the probe body. Filed 2026-10-06 by site-fence-release-cites-pass' close audit. Re-verified: the run body assigns `attempts=3` beside a pause, and the SPEC's resample paragraph states the ownership. Owner lookup: `site-health`, `resampl`, `attempts`, `pause` in this file and the disposed-findings record — [site-health-probe-unexecuted](#site-health-probe-unexecuted), DISTINCT (the loop's missing oracle, which this reshapes: its cases would read the knobs); [site-health-issue-venue-unwanted](#site-health-issue-venue-unwanted), DISTINCT (the issue step's venue).
 
+### harness-literal-catcher-gate
+
+[cost: event/low] [surface: gate-sdk]
+
+kit prose outside the adapter surfaces can re-acquire a harness-bound literal with the battery green: the sweep that named the hook anchor generically landed with no catcher, against doctrine-kit/DOCTRINE.md Enforcement-first.
+
+**Deliverable:** a gate reading a knob-listed set of harness literals, the project-directory variable first, and red on any outside a knob-listed adapter-surface set (the wiring templates, plugin/, the settings-path reader's SPEC section and each sentence declaring the binding); new mechanism, so it enters through scope.
+
+**Cost while deferred:** an edit to a kit SPEC or README can name one harness's variable where the generic name stood, unread until an adopter on another harness meets it. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' build on an operator direction, lead-relayed (not a ruling). Re-verified by grep over the kit SPECs and READMEs: the variable stands in plugin/SPEC.md, context-kit/SPEC.md's reader section, and one binding sentence each in guard-kit/SPEC.md and delegation-kit/README.md. Owner lookup: `harness literal`, `adapter surface`, `project-directory` in this file and the disposed-findings record — none; [plugin-harness-reach](#plugin-harness-reach), DISTINCT (the plugin's reach on other harnesses); owner gate-sdk/SPEC.md §The adopter constraints.
+
+### hook-contract-harness-neutral
+
+[cost: event/low] [surface: guard-kit]
+
+kit prose carries the master harness's names where no knob owns them: the hook event names and matchers, the payload keys, the session and config-home variables (owner lifecycle-kit/SPEC.md §bin/session-id.sh), the dispatch tool's parameter names, and drift-kit's local-settings-overlay path and two measurement commands. gate-sdk/SPEC.md §The adopter constraints declares the hook members' names the shipped binding, so nothing is misstated.
+
+**Deliverable:** a harness-neutral statement of the hook contract behind a binding table, the kit SPECs citing it; feature-sized, since it restates wire contracts.
+
+**Cost while deferred:** an adopter on another harness reads the hook-member sections as one vendor's protocol, which they are. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' build. Re-verified by grep over the kit SPECs for the event names, payload keys, variables and parameter names: 93 lines, delegation-kit 42, guard-kit 31, context-kit 8, lifecycle-kit 7, gate-sdk 3, drift-kit 1, evidence-kit 1. Owner lookup: `hook contract`, `binding table`, `harness-neutral`, `payload key` in this file and the disposed-findings record — none; [plugin-harness-reach](#plugin-harness-reach), DISTINCT (its per-harness guard wiring would bind against this contract); [harness-literal-catcher-gate](#harness-literal-catcher-gate), DISTINCT (the catcher for sites already generic).
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
