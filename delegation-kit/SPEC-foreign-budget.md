@@ -19,15 +19,16 @@ The foreign-vendor run spends a window nothing reads: §The foreign-vendor run's
 
 **The kit ships no producer**, as it ships no adapter: each one reads a vendor's feed. The values usually live in the gitignored `.local` overlay beside the adapters.
 
-**Sizing a consumer should know.** A vendor with no usage endpoint reports its window only as a by-product of a turn. Its snapshot is then as old as the last turn on that account, and a reading older than `DELEGATION_KIT_STALE_AGE` is budget-unknown (delta 2). The oracle therefore holds across a run of turns and lapses across a gap between them.
+**Sizing a consumer should know.** A vendor with no usage endpoint reports its window only as a by-product of a turn. Its snapshot is then as old as the last turn on that account. An under-threshold reading older than `DELEGATION_KIT_STALE_AGE` is budget-unknown, while an at-or-over one still pauses until its window resets (delta 2). So across a gap the oracle keeps a pause and loses an OK.
 
-### (2) The keyed verdict is the account-keyed rule over an adapter's snapshot {design-bearing} {user-facing: operator direction 2026-10-07 on the queue entry — vendor-keyed oracles beside the account-keyed verdict}
+### (2) The keyed verdict is the account-keyed rule over an adapter's snapshot {design-bearing} {user-facing: operator direction 2026-10-07 on the queue entry — vendor-keyed oracles beside the account-keyed verdict; and operator direction 2026-10-07, lead session, lead-relayed, not a ruling — "Pause axes first (keyed only)": an old at-or-over reading of a window that has not reset still pauses, for the keyed rule only, the account-keyed verdict untouched}
 
 **Not yet applied.** A new subsection of §The foreign-vendor run, citing §usage-verdict for everything it shares.
 
-**One rule, a third caller.** The keyed verdict reads `DELEGATION_KIT_FOREIGN_USAGE`'s snapshot for one adapter through §usage-verdict's parse, its fail-closed readings and its check order, with the differences below and no others. Each difference is an input the account-keyed rule has and a foreign window does not, never a second calibration.
+**One rule, a third caller.** The keyed verdict reads `DELEGATION_KIT_FOREIGN_USAGE`'s snapshot for one adapter through §usage-verdict's parse, its fail-closed readings and its check order, with the differences below and no others.
 
-- **No identity arm.** The post-login reroute, its settle floor and the account-switch STALE read the master harness's credentials file and account config, which say nothing of another vendor's account. The keyed order is parse → RESET-OK → age-STALE → pause axes → OK.
+- **The pause axes precede age-STALE, for the keyed rule only.** The keyed order is parse → RESET-OK → pause axes → age-STALE → OK. An at-or-over reading of a window that has not reset pauses at any age: usage inside one window only rises until its reset, so an old at-or-over reading is still at-or-over, and RESET-OK has already taken the window that died. Age therefore suppresses an OK and never a PAUSE, the asymmetry §usage-verdict's reroute holds. The ground is the feed: a vendor with no usage endpoint reports its window only as a by-product of a turn, so under the account-keyed order most readings after a gap would be budget-unknown and a paused window would be rediscovered by a failed turn. The account-keyed verdict keeps its own order, which a demand-driven refresh makes safe there.
+- **No identity arm.** The post-login reroute, its settle floor and the account-switch STALE read the master harness's credentials file and account config, which say nothing of another vendor's account.
 - **No sample.** The keyed verdict appends nothing to `DELEGATION_KIT_USAGE_HISTORY`. That log's readers group by the master harness's account and read the newest sample as a roll witness, so a foreign sample would be read as the wrong window's boundary.
 - **No `width=` field.** It reports the read-only `Agent` fan-out bound, which a foreign run is not counted under.
 - **The refresh is the adapter's own command.** Where `DELEGATION_KIT_FOREIGN_USAGE_CMD` configures one, it runs before every keyed read, bounded, and fail-soft on §usage-verdict's terms: a non-zero exit, a spawn failure or the bound's expiry leaves the snapshot untouched and the read proceeds on it. `DELEGATION_KIT_REFRESH_CMD` and `DELEGATION_KIT_REFRESH_MIN_AGE` are not read: the keyed read fires once per foreign command, never in a guard's burst.
@@ -67,7 +68,7 @@ The foreign-vendor run spends a window nothing reads: §The foreign-vendor run's
 
 **Not yet applied.**
 
-- §The foreign-vendor run, **No guard fires**: the bullet keeps its first half, that neither `Agent`-tool guard fires and that gating a foreign run behind the master harness's window is refused, and its closing sentence is replaced by a pointer to the keyed verdict. Two limits join it. An adapter with no snapshot is unbudgeted and its line says `OFF`. And the oracle is as fresh as the consumer's producer: a by-product feed lapses to budget-unknown across a gap (delta 1).
+- §The foreign-vendor run, **No guard fires**: the bullet keeps its first half, that neither `Agent`-tool guard fires and that gating a foreign run behind the master harness's window is refused, and its closing sentence is replaced by a pointer to the keyed verdict. Two limits join it. An adapter with no snapshot is unbudgeted and its line says `OFF`. And the oracle is as fresh as the consumer's producer: across a gap a by-product feed keeps a pause and loses an OK (delta 1).
 - §The usage.txt contract: one sentence that the contract also serves a foreign adapter's snapshot, with the axes read by length (delta 1).
 - `templates/agent-execution.md`, the **A foreign-vendor run is mechanical work returned through files** bullet: read an adapter's budget with `--budget` before choosing it, and read a `FAILED (budget: …)` line as a window to wait out, never as a failure to retry at once.
 - `README.md`: the `--budget` form beside the two commands it already lists; `templates/delegation-config.knobs`: the four knobs, commented.
@@ -83,7 +84,7 @@ The foreign-vendor run spends a window nothing reads: §The foreign-vendor run's
 - **Roster-holding readers of a new command seam,** by `git grep -n FOREIGN_ADAPTERS gate-sdk/SPEC.md`: gate-sdk/SPEC.md's two spawn rosters, the network spawners and the consumer-changeable spawns, each of which names what `--foreign-run` and `--foreign-resume` spawn.
 - **No corpus is narrowed and no enumerable corpus is obliged member by member**, so causal-completeness points 5 and 6 bind nothing here.
 
-**Inferred, cannot run before build:** the account-keyed rule's parse and check order can be reached without its identity arms and its sample append through one parameterized function rather than a second copy of the rule — the split is made in `native/src/hook/verdict.rs`, and whether it is clean is read off that function once it is cut.
+**Inferred, cannot run before build:** the account-keyed rule's parse and its checks can be reached in the keyed order, without its identity arms and its sample append, through one parameterized function rather than a second copy of the rule — the split is made in `native/src/hook/verdict.rs`, and whether it is clean is read off that function once it is cut.
 
 ## Existing sections updated
 
@@ -91,7 +92,7 @@ The foreign-vendor run spends a window nothing reads: §The foreign-vendor run's
 - `delegation-kit/SPEC.md` §Layout and configuration — four knob bullets (deltas 1 and 2); §The usage.txt contract — the keyed snapshot sentence (delta 5); §Testing — the cases below (deltas 2, 3 and 4).
 - `native/src/knobs/delegation_kit.rs` — four rows and the validator's refusals (deltas 1 and 2).
 - `native/src/hook/verdict.rs` — the rule reachable without its identity arms and sample (delta 2); `native/src/emit/foreign_run.rs` — the form, the read, the field and the knob roster (deltas 3 and 4).
-- The crate's cases — a stub producer and a stub adapter: a PAUSE that spawns nothing and leaves no clone, a STALE and an OFF that proceed, a producer whose failure leaves the snapshot read as it was, a paused resume whose turn counter holds, and the `--budget` form's line and three exits (deltas 2, 3 and 4).
+- The crate's cases — a stub producer and a stub adapter: a PAUSE that spawns nothing and leaves no clone, an at-or-over reading past the stale age that still pauses beside an under-threshold one that reads STALE, a STALE and an OFF that proceed, a producer whose failure leaves the snapshot read as it was, a paused resume whose turn counter holds, and the `--budget` form's line and three exits (deltas 2, 3 and 4).
 - `gate-sdk/SPEC.md` — the two spawn rosters name `DELEGATION_KIT_FOREIGN_USAGE_CMD` beside what the two arms already spawn (delta 1).
 - `delegation-kit/templates/agent-execution.md`, `delegation-kit/README.md`, `delegation-kit/templates/delegation-config.knobs` (delta 5).
 - `.workflow/release-declarations.md` — a row for the four knobs, the `--budget` form and the new `FAILED (budget: …)` outcome (deltas 1, 2, 3 and 4).
