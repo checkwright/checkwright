@@ -1232,9 +1232,3 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 
 ## Done
 
-- producerless-wait-recurred
-- journal-caller-child-agent
-- journal-fallback-path-relative
-- git-hook-fail-open-residues
-- release-rows-removed-template
-

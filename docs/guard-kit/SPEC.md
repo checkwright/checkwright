@@ -428,7 +428,7 @@ Those rules take the PowerShell reader's segments, quoting and words, and otherw
 
   **It blocks, where the bias is toward passing.** The departure rests on an attested firing, the ground rules `git_mutation_under_producer` and `background_no_record` take. The wait was launched to hold a turn open, rule `bounded_wait`'s arm (A) granted it, and it held its session until it was killed. The wrong block costs one re-issue: a session whose producer is real launches it with its record first, in the spelling rule `background_no_record` names, and the wait then passes. The wrong pass costs a held session for as long as nobody reads the process table.
 
-  **The corrective names the finding and the lawful exits.** A producer is launched first with its liveness record and then waited on, by the marker or by the recorded PID's liveness. An `Agent` child is awaited by its completion notification, which needs no wait loop. The caller is asked and the turn ended. It says that a wait launched to hold a turn open is the finding itself.
+  **The corrective** names those three exits, and says a wait launched to hold a turn open is the finding itself.
 
   **Beyond the shared directions it declines on each of these:**
   - a foreground call, which the foreground ceiling bounds, and which becomes the turn-end hook's subject where the harness moves it to the background ([delegation-kit/SPEC.md §The turn-end liveness hook](../delegation-kit/SPEC.md#the-turn-end-liveness-hook));
@@ -1263,7 +1263,7 @@ The gate takes no knob of its own. It finds guard-kit the way `--run-guard-tests
 
 The gate is registered from this repo's gates dir rather than shipped in a kit `checks/`, because its subject exists only where guard-kit is authored. A consumer's rules are its own command ([§Consumer rules](#consumer-rules)), never a row of the crate's table, so no consumer tree holds an instance to red on. Its fixture pair holds one roster in lockstep over a synthetic table, a two-shell item among it, and one tree firing all four assertions, a shells mismatch among them. The exit-2 cases a one-pair harness cannot hold, a roster absent, a malformed declaration or shells clause and a malformed table line, are the sibling `check-guard-registration.test.sh`.
 
-**What it does not hold, stated:** a *bare* citation outside guard-kit's tree and the guard module (`rule` and a backticked name, with no qualifier) is not read. The qualifier is the discriminator that stops the gate from claiming another kit's rule vocabulary. Since no rule carries a number, a writer who drops the qualifier still names the rule, and a later rename is the only way such a citation can go stale. A list broken by other words is read up to the break: in rules `truncate_scratch`, `bounded_wait`'s arm (B2) and `emitter_write`, the last name is not resolved.
+**What it does not hold, stated:** a *bare* citation outside guard-kit's tree and the guard module (`rule` and a backticked name, with no qualifier) is not read. The qualifier is the discriminator that stops the gate from claiming another kit's rule vocabulary. An amendment minting a rule cites it bare there until the roster carries the name. Since no rule carries a number, a writer who drops the qualifier still names the rule, and a later rename is the only way such a citation can go stale. A list broken by other words is read up to the break: in rules `truncate_scratch`, `bounded_wait`'s arm (B2) and `emitter_write`, the last name is not resolved.
 
 ## Out of scope
 
