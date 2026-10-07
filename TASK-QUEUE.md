@@ -518,9 +518,9 @@ a retired gate-binary arm named in a kit SPEC's code span resolves under no gate
 
 a dispatched session awaiting an `Agent` child it launched has no stated in-turn wait. delegation-kit/templates/agent-execution.md's backgrounding bullet forbids ending the turn to wait, calls condition-waiting the only channel a dispatched role has, and tells the same reader an `Agent` dispatch is awaited by its completion notification and never looked for on disk. Guard-kit rule `wait_no_producer` refuses the device a session reached for in that bind, a backgrounded marker wait nothing could end, and leaves the bind.
 
-**Deliverable:** the wait a dispatched session owes an `Agent` child, stated in that bullet and its operative copies, with the harness behavior it rests on probed first: whether a child's completion notification reaches a dispatched session inside its turn.
+**Deliverable:** the wait a dispatched session owes an `Agent` child, stated in that bullet and its operative copies, with the harness behavior it rests on probed first: what holds a turn open once no other tool call is owed. Observed 2026-10-08 at delegation-wait-journal-pass' close: a child's completion notification reached the dispatching stage session inside its turn, between tool calls, while that session had other work to run.
 
-**Inferred, not run:** that no in-turn channel delivers the notification — read off one transcript, whose session backgrounded an unsatisfiable wait and then looped in the foreground on the child's worktree directory.
+**Inferred, not run:** that a turn with nothing left to run receives it — the one transcript read at filing shows a session that backgrounded an unsatisfiable wait and then looped in the foreground on the child's worktree directory.
 
 **Cost while deferred:** a stage session fanning out read-only children holds a rule against each wait it can spell. Filed 2026-10-07 by delegation-wait-journal-pass' spec.
 
