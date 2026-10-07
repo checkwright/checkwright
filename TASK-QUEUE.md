@@ -8,6 +8,18 @@
 
 ## New Features
 
+### producerless-wait-recurred
+
+[spec: SPEC-producerless-wait.md]
+
+a dispatched session parked a wait nothing could satisfy, after `wait-on-unreachable-condition` landed the clause against it. The first align session of windows-shell-floor-pass, mechanical class, launched `until [ -f .tmp/never-exists-marker ]; do sleep 30; done` 54 seconds after its entry stamp. The wait held the session about fourteen hours, the lead twice calling it harmless, until the operator found and killed it. Operator direction, 2026-10-07, lead session (not a ruling): reporting nothing blocking while a running shell holds a stage session is unacceptable. The lead's half landed at this filing: lifecycle-kit/templates/lead.md reads the process table first, on two named events.
+
+**Deliverable:** a mechanism where the clause failed twice. Candidates: delegation-kit/SPEC.md §The turn-end liveness hook's task-view arm, ruled unconditional because its condition resolves when the task ends, which a producerless loop falsifies; or a guard refusing a wait that names no producer. Which, and whether either is decidable, is spec's. Taken into delegation-wait-journal-pass (operator direction, 2026-10-07, lead-relayed, not a ruling).
+
+**Run at spec, the transcript read:** the session launched the loop to hold its turn open for a dispatched child's notification, delivered its report eleven minutes later, and no model turn follows the refused turn end until the loop was killed. **Spec's choice:** the launch guard, a new guard-kit rule, over the class a launch can decide; the hook's arm keeps its decision and states its limit.
+
+**Cost while deferred:** a held session per occurrence, for as long as nobody reads the process table. Filed 2026-10-07 by windows-shell-floor-pass' lead; found by the operator. Re-verified at this filing's close against the turn-end liveness log it then drained: one `decision=refuse` beside `verdict=green`, 23 seconds after that session's last commit, and no later row for it, so the bullet's claim that the turn ended with the loop running fell. Owner lookup: `waiter`, `never-exists`, `producer`, `process table` in this file and the disposed-findings record — `wait-on-unreachable-condition`, done, the fix this recurred after; [waiter-loop-condition-predicate-gap](#waiter-loop-condition-predicate-gap), DISTINCT (a guard rule over `pgrep` waiters); [turn-end-refusal-used-as-a-busy-wait](#turn-end-refusal-used-as-a-busy-wait), DISTINCT (polling through the refusal).
+
 ## Technical Debt
 
 ### journal-caller-child-agent
@@ -497,18 +509,6 @@ a dated post citing a kit SPEC section by heading reds `check-spec-pointer` when
 **Deliverable:** one rule for a post's section citation, either a valve on the gate's prose-citation pass or a stated duty to repoint; which is spec's, against canon-kit/SPEC.md §check-spec-pointer.
 
 **Cost while deferred:** each section deletion a post cites edits a surface the tree calls immutable. Filed 2026-10-06 by windows-shell-floor-pass' build. Re-verified: the landing commit's diff carries a one-line edit to that post. Owner lookup: `docs/posts`, `check-spec-pointer`, `immutable` in this file and the disposed-findings record — [step-title-cite-unresolved](#step-title-cite-unresolved), DISTINCT (a step title no gate resolves).
-
-### producerless-wait-recurred
-
-[cost: event/high] [surface: delegation-kit]
-
-a dispatched session parked a wait nothing could satisfy, after `wait-on-unreachable-condition` landed the clause against it. The first align session of windows-shell-floor-pass, mechanical class, launched `until [ -f .tmp/never-exists-marker ]; do sleep 30; done` 54 seconds after its entry stamp. The wait held the session about fourteen hours, the lead twice calling it harmless, until the operator found and killed it. Operator direction, 2026-10-07, lead session (not a ruling): reporting nothing blocking while a running shell holds a stage session is unacceptable. The lead's half landed at this filing: lifecycle-kit/templates/lead.md reads the process table first, on two named events.
-
-**Deliverable:** a mechanism where the clause failed twice. Candidates: delegation-kit/SPEC.md §The turn-end liveness hook's task-view arm, ruled unconditional because its condition resolves when the task ends, which a producerless loop falsifies; or a guard refusing a wait that names no producer. Which, and whether either is decidable, is spec's. Taken into delegation-wait-journal-pass (operator direction, 2026-10-07, lead-relayed, not a ruling).
-
-**Inferred, not run:** the session held on the hook's refusal and never ended its turn — read that session's transcript past the refused turn end
-
-**Cost while deferred:** a held session per occurrence, for as long as nobody reads the process table. Filed 2026-10-07 by windows-shell-floor-pass' lead; found by the operator. Re-verified at this filing's close against the turn-end liveness log it then drained: one `decision=refuse` beside `verdict=green`, 23 seconds after that session's last commit, and no later row for it, so the bullet's claim that the turn ended with the loop running fell. Owner lookup: `waiter`, `never-exists`, `producer`, `process table` in this file and the disposed-findings record — `wait-on-unreachable-condition`, done, the fix this recurred after; [waiter-loop-condition-predicate-gap](#waiter-loop-condition-predicate-gap), DISTINCT (a guard rule over `pgrep` waiters); [turn-end-refusal-used-as-a-busy-wait](#turn-end-refusal-used-as-a-busy-wait), DISTINCT (polling through the refusal).
 
 ### exec-form-hook-registration
 
