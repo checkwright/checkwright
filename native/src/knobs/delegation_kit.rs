@@ -21,6 +21,16 @@ fn stop_log(resolve: Resolve) -> Result<Value, String> {
     input_scalar(resolve, "GATE_SDK_WORKFLOW_DIR").map(|d| Value::Scalar(format!("{}/subagent-stop-liveness.log", d)))
 }
 
+// spec: delegation-kit/SPEC.md §Layout and configuration — each keyed threshold defaults to the
+// account-keyed knob it derives from
+fn foreign_pause(resolve: Resolve) -> Result<Value, String> {
+    input_scalar(resolve, "DELEGATION_KIT_PAUSE_PCT").map(Value::Scalar)
+}
+
+fn foreign_pause_long(resolve: Resolve) -> Result<Value, String> {
+    input_scalar(resolve, "DELEGATION_KIT_PAUSE_PCT_7D").map(Value::Scalar)
+}
+
 fn gate_files(resolve: Resolve) -> Result<Value, String> {
     let g = input_scalar(resolve, "GATE_SDK_GATES_DIR")?;
     Ok(Value::Indexed(vec![
@@ -67,6 +77,20 @@ pub const KIT: Kit = Kit {
         Row::scalar("DELEGATION_KIT_FOREIGN_TIMEOUT", "1800"),
         Row::indexed("DELEGATION_KIT_FOREIGN_RESUME", &[]),
         Row::indexed("DELEGATION_KIT_FOREIGN_SESSION_MARKER", &[]),
+        Row::indexed("DELEGATION_KIT_FOREIGN_USAGE", &[]),
+        Row::indexed("DELEGATION_KIT_FOREIGN_USAGE_CMD", &[]),
+        Row::derived(
+            "DELEGATION_KIT_FOREIGN_PAUSE_PCT",
+            Shape::Scalar,
+            foreign_pause,
+            &["DELEGATION_KIT_PAUSE_PCT"],
+        ),
+        Row::derived(
+            "DELEGATION_KIT_FOREIGN_PAUSE_PCT_LONG",
+            Shape::Scalar,
+            foreign_pause_long,
+            &["DELEGATION_KIT_PAUSE_PCT_7D"],
+        ),
         Row::derived("DELEGATION_KIT_GATE_FILES", Shape::Indexed, gate_files, &["GATE_SDK_GATES_DIR"]),
         Row::derived(
             "DELEGATION_KIT_META_PATHS",
@@ -99,7 +123,12 @@ fn numeric(s: &str) -> bool {
 // emptiness of the agent dir and the two path sets
 fn validate(v: &Values) -> Vec<String> {
     let mut errs: Vec<String> = Vec::new();
-    for n in ["DELEGATION_KIT_PAUSE_PCT", "DELEGATION_KIT_PAUSE_PCT_7D"] {
+    for n in [
+        "DELEGATION_KIT_PAUSE_PCT",
+        "DELEGATION_KIT_PAUSE_PCT_7D",
+        "DELEGATION_KIT_FOREIGN_PAUSE_PCT",
+        "DELEGATION_KIT_FOREIGN_PAUSE_PCT_LONG",
+    ] {
         if let Some(s) = scalar(v, n).filter(|s| !numeric(s)) {
             errs.push(format!("{} must be numeric (got '{}')", n, s));
         }
@@ -173,6 +202,8 @@ fn foreign_refusals(v: &Values) -> Vec<String> {
     let adapters = table("DELEGATION_KIT_FOREIGN_ADAPTERS", "word");
     let resume = table("DELEGATION_KIT_FOREIGN_RESUME", "word");
     let markers = table("DELEGATION_KIT_FOREIGN_SESSION_MARKER", "marker");
+    let usage = table("DELEGATION_KIT_FOREIGN_USAGE", "path");
+    let producers = table("DELEGATION_KIT_FOREIGN_USAGE_CMD", "word");
     let mut seen: Vec<&str> = Vec::new();
     for (a, _) in &resume {
         if seen.contains(&a.as_str()) {
@@ -197,6 +228,26 @@ fn foreign_refusals(v: &Values) -> Vec<String> {
     for (i, (a, _)) in markers.iter().enumerate() {
         if markers[..i].iter().filter(|(m, _)| m == a).count() == 1 {
             errs.push(format!("DELEGATION_KIT_FOREIGN_SESSION_MARKER gives adapter '{}' more than one marker", a));
+        }
+    }
+    // spec: delegation-kit/SPEC.md §Layout and configuration — a snapshot is one per configured
+    // adapter, and a producer names an adapter that has one
+    for (i, (a, _)) in usage.iter().enumerate() {
+        match usage[..i].iter().filter(|(u, _)| u == a).count() {
+            0 if !adapters.iter().any(|(c, _)| c == a) => errs.push(format!(
+                "DELEGATION_KIT_FOREIGN_USAGE names adapter '{}', which DELEGATION_KIT_FOREIGN_ADAPTERS does not configure",
+                a
+            )),
+            1 => errs.push(format!("DELEGATION_KIT_FOREIGN_USAGE gives adapter '{}' more than one snapshot", a)),
+            _ => {}
+        }
+    }
+    for (i, (a, _)) in producers.iter().enumerate() {
+        if !producers[..i].iter().any(|(p, _)| p == a) && !usage.iter().any(|(u, _)| u == a) {
+            errs.push(format!(
+                "DELEGATION_KIT_FOREIGN_USAGE_CMD names adapter '{}', which DELEGATION_KIT_FOREIGN_USAGE gives no snapshot",
+                a
+            ));
         }
     }
     errs
@@ -285,6 +336,44 @@ mod tests {
             let errs = run(resume, markers);
             assert_eq!(errs.len(), 1, "{:?} {:?}: {:?}", resume, markers, errs);
             assert!(errs[0].contains(want), "{:?} {:?} did not refuse with '{}': {:?}", resume, markers, want, errs);
+        }
+    }
+
+    // spec: delegation-kit/SPEC.md §Layout and configuration — the snapshot and producer tables refuse
+    // an unconfigured adapter, a second snapshot for one adapter, a producer with no snapshot and a
+    // malformed element, each beside a passing table; the keyed thresholds refuse a non-numeric value
+    #[test]
+    fn the_snapshot_and_producer_tables_refuse_their_broken_shapes() {
+        let run = |usage: &[&str], cmd: &[&str], pct: &str| {
+            let mut v: Values = Values::new();
+            let mut put = |k: &'static str, e: &[&str]| {
+                v.insert(k, (Value::Indexed(e.iter().map(|s| s.to_string()).collect()), Origin::Tracked));
+            };
+            put("DELEGATION_KIT_FOREIGN_ADAPTERS", &["ad=prog", "two=prog"]);
+            put("DELEGATION_KIT_FOREIGN_USAGE", usage);
+            put("DELEGATION_KIT_FOREIGN_USAGE_CMD", cmd);
+            v.insert("DELEGATION_KIT_FOREIGN_PAUSE_PCT", (Value::Scalar(pct.to_string()), Origin::Tracked));
+            v.insert("DELEGATION_KIT_FOREIGN_PAUSE_PCT_LONG", (Value::Scalar("95".to_string()), Origin::Tracked));
+            validate(&v)
+        };
+        assert!(run(&[], &[], "80").is_empty());
+        assert!(
+            run(&["ad=.tmp/u.txt", "two=.tmp/u.txt"], &["ad=prog", "ad=--out=@USAGE_FILE@"], "80.5").is_empty(),
+            "two adapters on one account name one path"
+        );
+        let cases: &[(&str, &[&str], &[&str], &str)] = &[
+            ("which DELEGATION_KIT_FOREIGN_ADAPTERS does not configure", &["other=u.txt"], &[], "80"),
+            ("more than one snapshot", &["ad=u.txt", "ad=v.txt"], &[], "80"),
+            ("is not '<adapter>=<path>'", &["ad="], &[], "80"),
+            ("is not '<adapter>=<path>'", &["noequals"], &[], "80"),
+            ("which DELEGATION_KIT_FOREIGN_USAGE gives no snapshot", &["ad=u.txt"], &["two=prog", "two=x"], "80"),
+            ("is not '<adapter>=<word>'", &["ad=u.txt"], &["ad="], "80"),
+            ("DELEGATION_KIT_FOREIGN_PAUSE_PCT must be numeric", &[], &[], "high"),
+        ];
+        for (want, usage, cmd, pct) in cases {
+            let errs = run(usage, cmd, pct);
+            assert_eq!(errs.len(), 1, "{:?} {:?}: {:?}", usage, cmd, errs);
+            assert!(errs[0].contains(want), "{:?} {:?} did not refuse with '{}': {:?}", usage, cmd, want, errs);
         }
     }
 

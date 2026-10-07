@@ -14,3 +14,14 @@
 # spec: delegation-kit/SPEC.md §The foreign-vendor run — an adapter's resume form, one `<adapter>=<word>` element per argv word, restating its confinement, and the literal its session id follows in a turn's output; default empty (every adapter one-shot)
 # DELEGATION_KIT_FOREIGN_RESUME[] = <adapter>=@SESSION_ID@
 # DELEGATION_KIT_FOREIGN_SESSION_MARKER[] = <adapter>=<literal>
+
+# spec: delegation-kit/SPEC.md §The keyed verdict — an adapter's usage snapshot, one per adapter; default empty (the adapter is unbudgeted)
+# DELEGATION_KIT_FOREIGN_USAGE[] = <adapter>=<path>
+
+# spec: delegation-kit/SPEC.md §The keyed verdict — the argv that writes that snapshot, one `<adapter>=<word>` element per word; the kit ships no producer (each reads a vendor's feed), so set both in the gitignored `.local` overlay; default empty
+# DELEGATION_KIT_FOREIGN_USAGE_CMD[] = <adapter>=<program>
+# DELEGATION_KIT_FOREIGN_USAGE_CMD[] = <adapter>=@USAGE_FILE@
+
+# spec: delegation-kit/SPEC.md §The keyed verdict — the keyed pause thresholds, short window and long; each defaults to the account-keyed knob it derives from
+# DELEGATION_KIT_FOREIGN_PAUSE_PCT = <percent>
+# DELEGATION_KIT_FOREIGN_PAUSE_PCT_LONG = <percent>

@@ -181,6 +181,74 @@ fn read_snapshot(body: &str) -> Snapshot {
     s
 }
 
+// spec: delegation-kit/SPEC.md §usage-verdict — the fail-closed readings: an unreadable snapshot, a
+// missing mandatory key and a non-numeric percentage, each a budget-unknown its caller words.
+enum Loaded {
+    Read(Snapshot),
+    Unreadable,
+    MissingKeys(Snapshot),
+    NonNumeric(Snapshot),
+}
+
+fn load(path: &str) -> Loaded {
+    let Ok(body) = std::fs::read_to_string(path) else {
+        return Loaded::Unreadable;
+    };
+    let snap = read_snapshot(&body);
+    if snap.pct.is_empty() || snap.resets_at.is_empty() || snap.updated_at.is_empty() {
+        return Loaded::MissingKeys(snap);
+    }
+    if !is_percentage(&snap.pct) {
+        return Loaded::NonNumeric(snap);
+    }
+    Loaded::Read(snap)
+}
+
+struct Limits<'a> {
+    pause: &'a str,
+    pause_long: &'a str,
+    stale_age: i64,
+    pause_first: bool,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy)]
+enum Judged {
+    ResetOk,
+    AgeStale,
+    Pause { long: bool },
+    Clear,
+}
+
+// spec: delegation-kit/SPEC.md §usage-verdict — the weekly axis arms only when both seven_day keys
+// are present and well-formed.
+fn long_armed(snap: &Snapshot) -> bool {
+    !snap.pct_7d.is_empty() && !snap.resets_7d.is_empty() && is_percentage(&snap.pct_7d) && is_epoch(&snap.resets_7d)
+}
+
+// spec: delegation-kit/SPEC.md §usage-verdict — the rule's checks over a parsed snapshot, in either
+// order: RESET-OK, then age-STALE and the two pause axes, the axes first where `pause_first` (§The
+// keyed verdict). `Clear` is the would-be OK the account-keyed caller's reroute may still suppress.
+fn judge(snap: &Snapshot, now: i64, limits: &Limits) -> Judged {
+    if int(&snap.resets_at) - now <= 0 {
+        return Judged::ResetOk;
+    }
+    let stale = now - int(&snap.updated_at) > limits.stale_age;
+    if stale && !limits.pause_first {
+        return Judged::AgeStale;
+    }
+    // spec: delegation-kit/SPEC.md §usage-verdict — two pause axes judged independently; the weekly
+    // axis pauses only while its window is live.
+    let short = at_or_over(&snap.pct, limits.pause);
+    let long = long_armed(snap) && int(&snap.resets_7d) - now > 0 && at_or_over(&snap.pct_7d, limits.pause_long);
+    if short || long {
+        return Judged::Pause { long };
+    }
+    if stale {
+        return Judged::AgeStale;
+    }
+    Judged::Clear
+}
+
 // spec: delegation-kit/SPEC.md §The usage.txt contract — the sample line's wire shape: raw values
 // verbatim, optional keys omitted (never empty) when their source is absent.
 fn append_sample(cfg: &Config, snap: &Snapshot, login_at: i64, verdict: &str) {
@@ -320,28 +388,27 @@ pub fn verdict(args: &[String]) -> (String, i32) {
 
     let stale = |body: String| (format!("{} -> STALE ({})", body, NEVER_BLOCKS), 2);
 
-    let body = match std::fs::read_to_string(&cfg.usage_file) {
-        Ok(b) => b,
-        Err(_) => {
+    let snap = match load(&cfg.usage_file) {
+        Loaded::Read(s) => s,
+        Loaded::Unreadable => {
             return stale(format!(
                 "usage-verdict: cannot read {} width={}",
                 cfg.usage_file, cfg.width
             ))
         }
+        Loaded::MissingKeys(snap) => {
+            return stale(format!(
+                "usage-verdict: missing key(s) in {} (pct='{}' resets_at='{}' updated_at='{}') width={}",
+                cfg.usage_file, snap.pct, snap.resets_at, snap.updated_at, cfg.width
+            ))
+        }
+        Loaded::NonNumeric(snap) => {
+            return stale(format!(
+                "usage-verdict: non-numeric five_hour_used_pct='{}' in {} width={}",
+                snap.pct, cfg.usage_file, cfg.width
+            ))
+        }
     };
-    let snap = read_snapshot(&body);
-    if snap.pct.is_empty() || snap.resets_at.is_empty() || snap.updated_at.is_empty() {
-        return stale(format!(
-            "usage-verdict: missing key(s) in {} (pct='{}' resets_at='{}' updated_at='{}') width={}",
-            cfg.usage_file, snap.pct, snap.resets_at, snap.updated_at, cfg.width
-        ));
-    }
-    if !is_percentage(&snap.pct) {
-        return stale(format!(
-            "usage-verdict: non-numeric five_hour_used_pct='{}' in {} width={}",
-            snap.pct, cfg.usage_file, cfg.width
-        ));
-    }
 
     let now = now_epoch();
     let age = now - int(&snap.updated_at);
@@ -359,45 +426,37 @@ pub fn verdict(args: &[String]) -> (String, i32) {
         "used={}% age={}s resets_in={}s width={}",
         snap.pct, age, resets_in, cfg.width
     );
+    let limits = Limits {
+        pause: &cfg.pause_pct,
+        pause_long: &cfg.pause_pct_7d,
+        stale_age: int(&cfg.stale_age),
+        pause_first: false,
+    };
 
-    // spec: delegation-kit/SPEC.md §usage-verdict — check order: parse -> RESET-OK -> age-STALE ->
-    // pause axes -> account-STALE or login-STALE -> OK.
-    if resets_in <= 0 {
-        append_sample(&cfg, &snap, login_at, "RESET-OK");
-        return (
-            format!(
-                "{} -> RESET-OK (window rolled over {}s ago; pct is from the dead window, re-read for the live value)",
-                reading,
-                resets_in.abs()
-            ),
-            0,
-        );
-    }
-
-    if age > int(&cfg.stale_age) {
-        append_sample(&cfg, &snap, login_at, "STALE");
-        return (
-            format!(
-                "{} -> STALE (reading older than {}s; pct may lag reality; {})",
-                reading, cfg.stale_age, NEVER_BLOCKS
-            ),
-            2,
-        );
-    }
-
-    // spec: delegation-kit/SPEC.md §usage-verdict — two pause axes judged independently; the weekly
-    // axis arms only when both seven_day keys are present and its window is live.
-    let pause_5h = at_or_over(&snap.pct, &cfg.pause_pct);
-    let pause_7d = !snap.pct_7d.is_empty()
-        && !snap.resets_7d.is_empty()
-        && is_percentage(&snap.pct_7d)
-        && is_epoch(&snap.resets_7d)
-        && int(&snap.resets_7d) - now > 0
-        && at_or_over(&snap.pct_7d, &cfg.pause_pct_7d);
-
-    if pause_5h || pause_7d {
-        append_sample(&cfg, &snap, login_at, "PAUSE");
-        if pause_7d {
+    match judge(&snap, now, &limits) {
+        Judged::ResetOk => {
+            append_sample(&cfg, &snap, login_at, "RESET-OK");
+            return (
+                format!(
+                    "{} -> RESET-OK (window rolled over {}s ago; pct is from the dead window, re-read for the live value)",
+                    reading,
+                    resets_in.abs()
+                ),
+                0,
+            );
+        }
+        Judged::AgeStale => {
+            append_sample(&cfg, &snap, login_at, "STALE");
+            return (
+                format!(
+                    "{} -> STALE (reading older than {}s; pct may lag reality; {})",
+                    reading, cfg.stale_age, NEVER_BLOCKS
+                ),
+                2,
+            );
+        }
+        Judged::Pause { long: true } => {
+            append_sample(&cfg, &snap, login_at, "PAUSE");
             return (
                 format!(
                     "used={}% (7d {}%) age={}s resets_in={}s width={} -> PAUSE (7-day window; at or over {}% of the live weekly window — remediation is days, not hours)",
@@ -406,13 +465,17 @@ pub fn verdict(args: &[String]) -> (String, i32) {
                 1,
             );
         }
-        return (
-            format!(
-                "{} -> PAUSE (5h window; at or over {}% of the live 5h window)",
-                reading, cfg.pause_pct
-            ),
-            1,
-        );
+        Judged::Pause { long: false } => {
+            append_sample(&cfg, &snap, login_at, "PAUSE");
+            return (
+                format!(
+                    "{} -> PAUSE (5h window; at or over {}% of the live 5h window)",
+                    reading, cfg.pause_pct
+                ),
+                1,
+            );
+        }
+        Judged::Clear => {}
     }
 
     // spec: delegation-kit/SPEC.md §usage-verdict — the reroute follows the axis compares and may
@@ -448,6 +511,140 @@ pub fn verdict(args: &[String]) -> (String, i32) {
 
     append_sample(&cfg, &snap, login_at, "OK");
     (format!("{} -> OK", reading), 0)
+}
+
+// spec: delegation-kit/SPEC.md §The keyed verdict — what the keyed read is handed: the two tables,
+// the two thresholds, the stale age, the producer's bound and the toplevel it is spawned from.
+pub struct KeyedConfig {
+    pub usage: Vec<String>,
+    pub producers: Vec<String>,
+    pub pause: String,
+    pub pause_long: String,
+    pub stale_age: String,
+    pub timeout: u64,
+    pub root: String,
+}
+
+pub struct Keyed {
+    pub line: String,
+    pub word: &'static str,
+    pub code: i32,
+}
+
+pub const USAGE_TOKEN: &str = "@USAGE_FILE@";
+
+const KEYED_NEVER_BLOCKS: &str =
+    "never blocks a foreign run — refresh the snapshot before trusting the number";
+
+// spec: delegation-kit/SPEC.md §The keyed verdict — the adapter's own producer, run before every
+// keyed read from the toplevel, bounded and fail-soft: its failure leaves the snapshot as it was.
+fn produce(cfg: &KeyedConfig, adapter: &str, path: &str) {
+    let argv: Vec<String> = crate::emit::foreign_run::argv_of(&cfg.producers, adapter)
+        .iter()
+        .map(|w| w.replace(USAGE_TOKEN, path))
+        .collect();
+    let Some((program, rest)) = argv.split_first() else {
+        return;
+    };
+    let args: Vec<&str> = rest.iter().map(String::as_str).collect();
+    let program = crate::programs::Program::consumer("DELEGATION_KIT_FOREIGN_USAGE_CMD", program.as_str());
+    let _ = proc::run_bounded_in(&program, &args, Some(std::path::Path::new(&cfg.root)), cfg.timeout);
+}
+
+// spec: delegation-kit/SPEC.md §The keyed verdict — the account-keyed rule over one adapter's
+// snapshot, pause axes ahead of age-STALE, with no identity arm, no sample and no `width=` field;
+// `OFF` is the adapter with no snapshot.
+pub fn keyed(cfg: &KeyedConfig, adapter: &str) -> Keyed {
+    let head = format!("foreign-budget: adapter={}", adapter);
+    let Some(path) = crate::emit::foreign_run::argv_of(&cfg.usage, adapter).into_iter().next() else {
+        return Keyed {
+            line: format!(
+                "{} -> OFF (no DELEGATION_KIT_FOREIGN_USAGE snapshot is configured for this adapter; nothing budgets it, and it never blocks a foreign run)",
+                head
+            ),
+            word: "OFF",
+            code: 2,
+        };
+    };
+    let path = walk::abs_against(&cfg.root, &path);
+    produce(cfg, adapter, &path);
+    let stale = |body: String| Keyed {
+        line: format!("{} {} -> STALE (budget unknown; {})", head, body, KEYED_NEVER_BLOCKS),
+        word: "STALE",
+        code: 2,
+    };
+    let snap = match load(&path) {
+        Loaded::Read(s) => s,
+        Loaded::Unreadable => return stale(format!("cannot read {}", path)),
+        Loaded::MissingKeys(snap) => {
+            return stale(format!(
+                "missing key(s) in {} (pct='{}' resets_at='{}' updated_at='{}')",
+                path, snap.pct, snap.resets_at, snap.updated_at
+            ))
+        }
+        Loaded::NonNumeric(snap) => {
+            return stale(format!("non-numeric five_hour_used_pct='{}' in {}", snap.pct, path))
+        }
+    };
+    let now = now_epoch();
+    let age = now - int(&snap.updated_at);
+    let resets_in = int(&snap.resets_at) - now;
+    let long = if long_armed(&snap) {
+        format!(" (long {}%)", snap.pct_7d)
+    } else {
+        String::new()
+    };
+    let reading = format!("{} used={}%{} age={}s resets_in={}s", head, snap.pct, long, age, resets_in);
+    let limits = Limits {
+        pause: &cfg.pause,
+        pause_long: &cfg.pause_long,
+        stale_age: int(&cfg.stale_age),
+        pause_first: true,
+    };
+    let (word, code, clause) = match judge(&snap, now, &limits) {
+        Judged::ResetOk => (
+            "RESET-OK",
+            0,
+            format!(
+                "window rolled over {}s ago; pct is from the dead window, so nothing pauses",
+                resets_in.abs()
+            ),
+        ),
+        Judged::Pause { long: true } => (
+            "PAUSE",
+            1,
+            format!(
+                "long window; at or over {}% of a window that resets in {}s — no adapter is spawned until it does",
+                cfg.pause_long,
+                int(&snap.resets_7d) - now
+            ),
+        ),
+        Judged::Pause { long: false } => (
+            "PAUSE",
+            1,
+            format!(
+                "short window; at or over {}% of a window that resets in {}s — no adapter is spawned until it does",
+                cfg.pause, resets_in
+            ),
+        ),
+        Judged::AgeStale => (
+            "STALE",
+            2,
+            format!(
+                "reading older than {}s and under its pause thresholds; pct may lag reality; {}",
+                cfg.stale_age, KEYED_NEVER_BLOCKS
+            ),
+        ),
+        Judged::Clear => (
+            "OK",
+            0,
+            format!(
+                "reading within {}s and under its pause thresholds; headroom now, a floor and not a recommendation",
+                cfg.stale_age
+            ),
+        ),
+    };
+    Keyed { line: format!("{} -> {} ({})", reading, word, clause), word, code }
 }
 
 pub fn run(args: &[String]) -> i32 {
@@ -501,6 +698,42 @@ mod tests {
         assert!(is_percentage("0") && is_percentage("12.5") && is_percentage("100"));
         assert!(!is_percentage("") && !is_percentage("12.") && !is_percentage("-1") && !is_percentage("x"));
         assert!(is_epoch("-5") && is_epoch("5") && !is_epoch("notanepoch"));
+    }
+
+    // spec: delegation-kit/SPEC.md §The keyed verdict — one rule in two orders: an old at-or-over
+    // reading of a live window is STALE on the account-keyed order and a PAUSE on the keyed one,
+    // and neither order lets a dead window pause or a dead weekly window arm its axis
+    #[test]
+    fn the_rule_is_one_function_in_two_orders() {
+        let snap = |pct: &str, resets: i64, updated: i64, long: Option<(&str, i64)>| {
+            let mut body = format!("five_hour_used_pct={}\nfive_hour_resets_at={}\nupdated_at={}\n", pct, resets, updated);
+            if let Some((p, r)) = long {
+                body.push_str(&format!("seven_day_used_pct={}\nseven_day_resets_at={}\n", p, r));
+            }
+            read_snapshot(&body)
+        };
+        let limits = |pause_first| Limits { pause: "80", pause_long: "95", stale_age: 600, pause_first };
+        let now = 10_000;
+        let old_high = snap("90", now + 100, now - 5000, None);
+        assert_eq!(judge(&old_high, now, &limits(false)), Judged::AgeStale);
+        assert_eq!(judge(&old_high, now, &limits(true)), Judged::Pause { long: false });
+        let old_low = snap("10", now + 100, now - 5000, None);
+        assert_eq!(judge(&old_low, now, &limits(false)), Judged::AgeStale);
+        assert_eq!(judge(&old_low, now, &limits(true)), Judged::AgeStale);
+        let old_long = snap("10", now + 100, now - 5000, Some(("96", now + 9000)));
+        assert_eq!(judge(&old_long, now, &limits(true)), Judged::Pause { long: true });
+        let dead_long = snap("10", now + 100, now - 5000, Some(("96", now - 1)));
+        assert_eq!(judge(&dead_long, now, &limits(true)), Judged::AgeStale);
+        for order in [false, true] {
+            assert_eq!(judge(&snap("90", now - 1, now - 5, None), now, &limits(order)), Judged::ResetOk);
+            assert_eq!(judge(&snap("79.9", now + 100, now - 5, None), now, &limits(order)), Judged::Clear);
+            assert_eq!(judge(&snap("80", now + 100, now - 5, None), now, &limits(order)), Judged::Pause { long: false });
+            assert_eq!(
+                judge(&snap("90", now + 100, now - 5, Some(("95", now + 9000))), now, &limits(order)),
+                Judged::Pause { long: true },
+                "the long axis is named when both fire"
+            );
+        }
     }
 
     // spec: delegation-kit/SPEC.md §usage-verdict — the witness reads the newest sample's boundary

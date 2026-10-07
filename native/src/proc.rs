@@ -530,16 +530,29 @@ pub enum BoundedError {
 // one shape `run` cannot carry: a hook member calling a consumer-named reader must not hang a turn
 // on it. `Ok(None)` is the bound expiring, `timeout(1)`'s 124 without the optional program.
 pub fn run_bounded(program: &Program, args: &[&str], secs: u64) -> Result<Option<i32>, BoundedError> {
+    run_bounded_in(program, args, None, secs)
+}
+
+// spec: delegation-kit/SPEC.md §The keyed verdict — `run_bounded` from a named working directory:
+// a consumer's producer argv is spawned from the toplevel
+pub fn run_bounded_in(
+    program: &Program,
+    args: &[&str],
+    cwd: Option<&std::path::Path>,
+    secs: u64,
+) -> Result<Option<i32>, BoundedError> {
     #[cfg(test)]
     recorder::note(program.invocation());
     let target = spawn_target(program.invocation()).map_err(BoundedError::Spawn)?;
-    let mut child = Command::new(target.as_ref())
-        .args(args)
+    let mut cmd = Command::new(target.as_ref());
+    cmd.args(args)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::null())
-        .stderr(std::process::Stdio::null())
-        .spawn()
-        .map_err(|e| BoundedError::Spawn(e.to_string()))?;
+        .stderr(std::process::Stdio::null());
+    if let Some(dir) = cwd {
+        cmd.current_dir(dir);
+    }
+    let mut child = cmd.spawn().map_err(|e| BoundedError::Spawn(e.to_string()))?;
     let deadline = std::time::Instant::now() + std::time::Duration::from_secs(secs);
     loop {
         match child.try_wait() {

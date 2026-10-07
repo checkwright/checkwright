@@ -30,6 +30,7 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
        --usage-verdict [paths]                 budget verdict: 0 OK/RESET-OK, 1 PAUSE, 2 STALE
        --model-verdict [--expect <class>] [transcript]  running-model verdict: 0 READ/OK, 1 BELOW/UNBOUND, 2 UNKNOWN
        --foreign-run <adapter> <prompt-file> [--mode audit|sweep] [--key <key>]  one unit on a foreign adapter: 0 OK, 1 REFUSED, 2 FAILED
+       --foreign-run <adapter> --budget        the adapter's budget verdict, no spawn: 0 OK/RESET-OK, 1 PAUSE, 2 STALE/OFF
        --foreign-resume <key> <prompt-file> | <key> --close  the next turn of a foreign session, or its end: 0 OK/CLOSED, 1 REFUSED, 2 FAILED
        --lesson-sink <tag>                     route a lesson body on stdin to its sink
        --queue <verb> <slug> [args]            move or stamp one queue entry, then run the queue's gates
@@ -90,7 +91,11 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
           (the agent committed, or an audit wrote), 2 FAILED. The report, and a
           sweep's patch, land under <tmp-dir>/foreign/<key>/. An adapter
           DELEGATION_KIT_FOREIGN_RESUME gives a resume form keeps its clone on
-          OK as an open session. Unavailable is exit 2.
+          OK as an open session. The adapter's budget is read before the
+          spawn, and a paused window spawns nothing: FAILED (budget: ...).
+          With --budget it prints that budget verdict alone and spawns no
+          adapter: exit 0 OK / RESET-OK, 1 PAUSE, 2 STALE or OFF
+          (budget-unknown, which never blocks a run). Unavailable is exit 2.
   --foreign-resume  runs the next turn of an open session in its kept clone,
           the prompt file on stdin: exit 0 OK, 1 REFUSED (the session ends),
           2 FAILED (the session stays open). With --close it removes the clone

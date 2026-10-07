@@ -1,6 +1,7 @@
 // spec: delegation-kit/SPEC.md §The foreign-vendor run — one read-only audit or mechanical sweep on
 // a consumer's foreign adapter, in a scratch clone of committed `HEAD`: 0 OK, 1 REFUSED, 2 FAILED;
 // a resumable adapter's `OK` opens a session `--foreign-resume` continues and closes.
+use crate::hook::verdict::{self, KeyedConfig};
 use crate::proc::{self, ChildEnv, Redirect};
 use crate::programs::{self, Program};
 use crate::walk;
@@ -11,10 +12,15 @@ pub const KNOBS: &[&str] = &[
     "DELEGATION_KIT_FOREIGN_RESUME",
     "DELEGATION_KIT_FOREIGN_SESSION_MARKER",
     "DELEGATION_KIT_FOREIGN_TIMEOUT",
+    "DELEGATION_KIT_FOREIGN_USAGE",
+    "DELEGATION_KIT_FOREIGN_USAGE_CMD",
+    "DELEGATION_KIT_FOREIGN_PAUSE_PCT",
+    "DELEGATION_KIT_FOREIGN_PAUSE_PCT_LONG",
+    "DELEGATION_KIT_STALE_AGE",
     "GATE_SDK_TMP_DIR",
 ];
 
-const USAGE: &str = "usage: --foreign-run <adapter> <prompt-file> [--mode audit|sweep] [--key <key>] [--]\n  runs one unit on the adapter DELEGATION_KIT_FOREIGN_ADAPTERS configures, in a scratch clone of committed HEAD; the key names the run's directory and defaults to the prompt file's stem";
+const USAGE: &str = "usage: --foreign-run <adapter> <prompt-file> [--mode audit|sweep] [--key <key>] [--]\n       --foreign-run <adapter> --budget\n  runs one unit on the adapter DELEGATION_KIT_FOREIGN_ADAPTERS configures, in a scratch clone of committed HEAD; the key names the run's directory and defaults to the prompt file's stem. With --budget it prints the adapter's keyed budget verdict and spawns no adapter";
 
 const RESUME_USAGE: &str = "usage: --foreign-resume <key> <prompt-file> [--]\n       --foreign-resume <key> --close\n  runs the next turn of the session a resumable adapter opened under the key, or ends it";
 
@@ -45,9 +51,17 @@ fn one_component(arm: &str, key: &str) -> Result<(), String> {
 
 // spec: gate-sdk/SPEC.md §The bin/-tool contract — a dash-led token naming no option is a refusal,
 // and `--` ends option processing
-fn parse(args: &[String]) -> Result<Args, String> {
+#[derive(Debug, PartialEq)]
+enum Form {
+    Run(Args),
+    Budget(String),
+}
+
+fn parse(args: &[String]) -> Result<Form, String> {
     let mut rest: Vec<&str> = Vec::new();
     let mut sweep = false;
+    let mut mode = false;
+    let mut budget = false;
     let mut key: Option<String> = None;
     let mut literal = false;
     let mut i = 0;
@@ -63,7 +77,10 @@ fn parse(args: &[String]) -> Result<Args, String> {
                 Some("sweep") => sweep = true,
                 other => return Err(format!("foreign-run: --mode takes audit or sweep (got {})", other.unwrap_or("nothing"))),
             }
+            mode = true;
             i += 1;
+        } else if a == "--budget" {
+            budget = true;
         } else if a == "--key" {
             let k = args.get(i + 1).ok_or("foreign-run: --key needs a value")?;
             key = Some(k.clone());
@@ -78,6 +95,16 @@ fn parse(args: &[String]) -> Result<Args, String> {
         }
         i += 1;
     }
+    // spec: delegation-kit/SPEC.md §The keyed verdict — the `--budget` form takes the adapter alone
+    if budget {
+        if mode || key.is_some() {
+            return Err("foreign-run: --budget takes neither --mode nor --key".to_string());
+        }
+        let [adapter] = rest[..] else {
+            return Err(format!("foreign-run: --budget takes an adapter alone (got {} operand(s))", rest.len()));
+        };
+        return Ok(Form::Budget(adapter.to_string()));
+    }
     let [adapter, prompt] = rest[..] else {
         return Err(format!("foreign-run: takes an adapter and a prompt file (got {} operand(s))", rest.len()));
     };
@@ -85,7 +112,7 @@ fn parse(args: &[String]) -> Result<Args, String> {
         Path::new(prompt).file_stem().map(|s| s.to_string_lossy().into_owned()).unwrap_or_default()
     });
     one_component("foreign-run", &key)?;
-    Ok(Args { adapter: adapter.to_string(), prompt: prompt.to_string(), sweep, key })
+    Ok(Form::Run(Args { adapter: adapter.to_string(), prompt: prompt.to_string(), sweep, key }))
 }
 
 #[derive(Debug, PartialEq)]
@@ -128,7 +155,7 @@ fn parse_resume(args: &[String]) -> Result<ResumeArgs, String> {
 
 // spec: delegation-kit/SPEC.md §Layout and configuration — an adapter's argv is its `<adapter>=<word>`
 // elements' words, in element order
-fn argv_of(adapters: &[String], name: &str) -> Vec<String> {
+pub fn argv_of(adapters: &[String], name: &str) -> Vec<String> {
     adapters
         .iter()
         .filter_map(|e| e.split_once('='))
@@ -160,6 +187,7 @@ pub struct Config {
     pub repo: String,
     pub base: String,
     pub here: String,
+    pub budget: KeyedConfig,
 }
 
 struct Verdict {
@@ -170,6 +198,7 @@ struct Verdict {
 struct Run<'a> {
     args: &'a Args,
     dir: PathBuf,
+    budget: &'static str,
     exit: String,
     report: Option<PathBuf>,
     patch: Option<PathBuf>,
@@ -191,10 +220,11 @@ impl Run<'_> {
     fn line(&self, verdict: &str, code: i32) -> Verdict {
         Verdict {
             line: format!(
-                "foreign-run: adapter={} mode={} key={} exit={} report={} patch={} -> {}",
+                "foreign-run: adapter={} mode={} key={} budget={} exit={} report={} patch={} -> {}",
                 self.args.adapter,
                 mode_name(self.args.sweep),
                 self.args.key,
+                self.budget,
                 self.exit,
                 show(&self.report),
                 show(&self.patch),
@@ -392,9 +422,15 @@ fn clear_returns(dir: &Path) {
     }
 }
 
+// spec: delegation-kit/SPEC.md §The keyed verdict — the refusal a PAUSE becomes: the keyed line
+// from its `used=` field on
+fn paused(keyed: &verdict::Keyed) -> String {
+    format!("budget: {}", keyed.line.find("used=").map_or(keyed.line.as_str(), |at| &keyed.line[at..]))
+}
+
 fn foreign_run(cfg: &Config, a: &Args) -> Verdict {
     let dir = PathBuf::from(&cfg.base).join("foreign").join(&a.key);
-    let mut run = Run { args: a, dir, exit: "-".to_string(), report: None, patch: None };
+    let mut run = Run { args: a, dir, budget: "-", exit: "-".to_string(), report: None, patch: None };
     let argv = argv_of(&cfg.adapters, &a.adapter);
     let Some((program, words)) = argv.split_first() else {
         return run.failed(&format!("no adapter '{}' is configured in DELEGATION_KIT_FOREIGN_ADAPTERS", a.adapter));
@@ -420,6 +456,13 @@ fn foreign_run(cfg: &Config, a: &Args) -> Verdict {
             "a kept clone occupies {}; inspect and remove it, or pass another --key",
             tree.display()
         ));
+    }
+    // spec: delegation-kit/SPEC.md §The keyed verdict — read after the pre-spawn checks and before
+    // anything is written, so a paused run leaves no scratch and holds no key
+    let keyed = verdict::keyed(&cfg.budget, &a.adapter);
+    run.budget = keyed.word;
+    if keyed.code == 1 {
+        return run.failed(&paused(&keyed));
     }
     if let Err(e) = std::fs::create_dir_all(&run.dir) {
         return run.failed(&format!("cannot create {}: {}", run.dir.display(), e));
@@ -510,6 +553,7 @@ struct Turn<'a> {
     adapter: String,
     mode: &'static str,
     turn: String,
+    budget: &'static str,
     exit: String,
     report: Option<PathBuf>,
     patch: Option<PathBuf>,
@@ -519,11 +563,12 @@ impl Turn<'_> {
     fn line(&self, verdict: &str, code: i32) -> Verdict {
         Verdict {
             line: format!(
-                "foreign-resume: adapter={} mode={} key={} turn={} exit={} report={} patch={} -> {}",
+                "foreign-resume: adapter={} mode={} key={} turn={} budget={} exit={} report={} patch={} -> {}",
                 self.adapter,
                 self.mode,
                 self.key,
                 self.turn,
+                self.budget,
                 self.exit,
                 show(&self.report),
                 show(&self.patch),
@@ -548,6 +593,7 @@ fn foreign_resume(cfg: &Config, key: &str, prompt: &str) -> Verdict {
         adapter: "-".to_string(),
         mode: "-",
         turn: "-".to_string(),
+        budget: "-",
         exit: "-".to_string(),
         report: None,
         patch: None,
@@ -584,6 +630,13 @@ fn foreign_resume(cfg: &Config, key: &str, prompt: &str) -> Verdict {
         Ok(b) => b,
         Err(e) => return t.failed(&format!("cannot read {}: {}", dir.join("refs.txt").display(), e)),
     };
+    // spec: delegation-kit/SPEC.md §Resuming a session — a paused turn precedes the rotation: the
+    // counter holds, the previous report stays and the session stays open
+    let keyed = verdict::keyed(&cfg.budget, &s.adapter);
+    t.budget = keyed.word;
+    if keyed.code == 1 {
+        return t.failed(&paused(&keyed));
+    }
     let report = dir.join("report.txt");
     let stderr = dir.join("stderr.txt");
     for (from, stem) in [(&report, "report"), (&stderr, "stderr")] {
@@ -684,6 +737,15 @@ fn config() -> Result<Config, String> {
     let base = walk::abs_against(&here, &tmp);
     walk::make_scratch(&base).map_err(|e| format!("cannot create the scratch dir {}: {}", base, e))?;
     let repo = walk::toplevel_opt()?.ok_or("not inside a git work tree")?;
+    let budget = KeyedConfig {
+        usage: walk::knob_array("DELEGATION_KIT_FOREIGN_USAGE")?,
+        producers: walk::knob_array("DELEGATION_KIT_FOREIGN_USAGE_CMD")?,
+        pause: walk::knob_scalar("DELEGATION_KIT_FOREIGN_PAUSE_PCT")?,
+        pause_long: walk::knob_scalar("DELEGATION_KIT_FOREIGN_PAUSE_PCT_LONG")?,
+        stale_age: walk::knob_scalar("DELEGATION_KIT_STALE_AGE")?,
+        timeout,
+        root: repo.clone(),
+    };
     Ok(Config {
         adapters: walk::knob_array("DELEGATION_KIT_FOREIGN_ADAPTERS")?,
         resume: walk::knob_array("DELEGATION_KIT_FOREIGN_RESUME")?,
@@ -692,6 +754,7 @@ fn config() -> Result<Config, String> {
         repo,
         base,
         here,
+        budget,
     })
 }
 
@@ -704,13 +767,44 @@ pub fn run(argv: &[String]) -> i32 {
             return 2;
         }
     };
+    let a = match a {
+        Form::Run(a) => a,
+        Form::Budget(adapter) => return budget(&adapter),
+    };
     let v = match config() {
         Ok(cfg) => foreign_run(&cfg, &a),
-        Err(e) => Run { args: &a, dir: PathBuf::new(), exit: "-".to_string(), report: None, patch: None }
+        Err(e) => Run { args: &a, dir: PathBuf::new(), budget: "-", exit: "-".to_string(), report: None, patch: None }
             .failed(&format!("config: {}", e)),
     };
     println!("{}", v.line);
     v.code
+}
+
+// spec: delegation-kit/SPEC.md §The keyed verdict — the `--budget` form: the adapter's keyed line
+// on stdout at the verdict's own exit, no clone and no adapter; an adapter the knobs do not
+// configure is a shape refusal
+fn budget_form(cfg: &Config, adapter: &str) -> Result<verdict::Keyed, String> {
+    if argv_of(&cfg.adapters, adapter).is_empty() {
+        return Err(format!(
+            "foreign-run: no adapter '{}' is configured in DELEGATION_KIT_FOREIGN_ADAPTERS",
+            adapter
+        ));
+    }
+    Ok(verdict::keyed(&cfg.budget, adapter))
+}
+
+fn budget(adapter: &str) -> i32 {
+    match config().map_err(|e| format!("foreign-run: config: {}", e)).and_then(|cfg| budget_form(&cfg, adapter)) {
+        Ok(k) => {
+            println!("{}", k.line);
+            k.code
+        }
+        Err(e) => {
+            eprintln!("{}", e);
+            eprintln!("{}", USAGE);
+            2
+        }
+    }
 }
 
 pub fn resume(argv: &[String]) -> i32 {
@@ -725,7 +819,10 @@ pub fn resume(argv: &[String]) -> i32 {
     let v = match (config(), &a.prompt) {
         (Ok(cfg), Some(p)) => foreign_resume(&cfg, &a.key, p),
         (Ok(cfg), None) => foreign_close(&cfg, &a.key),
-        (Err(e), _) => Verdict { line: format!("foreign-resume: key={} -> FAILED (config: {})", a.key, e), code: 2 },
+        (Err(e), Some(_)) => {
+            Verdict { line: format!("foreign-resume: key={} budget=- -> FAILED (config: {})", a.key, e), code: 2 }
+        }
+        (Err(e), None) => Verdict { line: format!("foreign-resume: key={} -> FAILED (config: {})", a.key, e), code: 2 },
     };
     println!("{}", v.line);
     v.code
@@ -777,7 +874,35 @@ mod tests {
                 repo: self.root.join("src").display().to_string(),
                 base: self.root.join("tmp").display().to_string(),
                 here: self.root.display().to_string(),
+                budget: KeyedConfig {
+                    usage: Vec::new(),
+                    producers: Vec::new(),
+                    pause: "80".to_string(),
+                    pause_long: "95".to_string(),
+                    stale_age: "600".to_string(),
+                    timeout,
+                    root: self.root.join("src").display().to_string(),
+                },
             }
+        }
+
+        // spec: delegation-kit/SPEC.md §Testing — a snapshot outside the source repository, bound to
+        // the adapter: `pct` used, read `age` seconds ago, in a window with an hour left
+        fn budgeted(&self, mut cfg: Config, adapter: &str, pct: &str, age: i64) -> Config {
+            let now = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_secs() as i64)
+                .unwrap_or(0);
+            let path = self.root.join("usage.txt");
+            let body = format!(
+                "five_hour_used_pct={}\nfive_hour_resets_at={}\nupdated_at={}\n",
+                pct,
+                now + 3600,
+                now - age
+            );
+            std::fs::write(&path, body).expect("the snapshot");
+            cfg.budget.usage = vec![format!("{}={}", adapter, path.display())];
+            cfg
         }
 
         fn args(&self, adapter: &str, sweep: bool) -> Args {
@@ -831,7 +956,7 @@ mod tests {
         let r = Repo::new("audit-ok");
         let v = foreign_run(&r.cfg(&["ro=git", "ro=hash-object", "ro=--stdin"], 60), &r.args("ro", false));
         assert_eq!(v.code, 0, "{}", v.line);
-        assert!(v.line.contains("mode=audit key=prompt exit=0 report="), "{}", v.line);
+        assert!(v.line.contains("mode=audit key=prompt budget=OFF exit=0 report="), "{}", v.line);
         assert!(v.line.ends_with("patch=none -> OK"), "{}", v.line);
         let report = std::fs::read(r.run_dir().join("report.txt")).expect("the report");
         assert_eq!(String::from_utf8_lossy(&report), hash_of(&r, b"audit the tree\n"), "stdin carries the prompt");
@@ -899,11 +1024,11 @@ mod tests {
         let r = Repo::new("failed");
         let v = foreign_run(&r.cfg(&["ro=git"], 60), &r.args("nope", false));
         assert_eq!(v.code, 2, "{}", v.line);
-        assert!(v.line.contains("exit=- report=none patch=none -> FAILED (no adapter 'nope'"), "{}", v.line);
+        assert!(v.line.contains("budget=- exit=- report=none patch=none -> FAILED (no adapter 'nope'"), "{}", v.line);
         let mut missing = r.args("ro", false);
         missing.prompt = "absent.md".to_string();
         let v = foreign_run(&r.cfg(&["ro=git"], 60), &missing);
-        assert!(v.code == 2 && v.line.contains("cannot read the prompt file"), "{}", v.line);
+        assert!(v.code == 2 && v.line.contains("budget=- ") && v.line.contains("cannot read the prompt file"), "{}", v.line);
         let v = foreign_run(&r.cfg(&["bad=git", "bad=rev-parse", "bad=--verify", "bad=no-such-ref"], 60), &r.args("bad", false));
         assert_eq!(v.code, 2, "{}", v.line);
         assert!(v.line.contains("exit=128 report=") && v.line.contains("FAILED (the adapter exited 128)"), "{}", v.line);
@@ -928,15 +1053,115 @@ mod tests {
     // the key's default and its one-component rule, and the `--` escape
     #[test]
     fn the_argv_shape_is_held() {
-        let a = parse(&strings(&["ad", "dir/unit.prompt.md"])).expect("two operands");
+        let run = |argv: &[&str], why: &str| match parse(&strings(argv)).expect(why) {
+            Form::Run(a) => a,
+            Form::Budget(_) => panic!("{:?} is no budget form", argv),
+        };
+        let a = run(&["ad", "dir/unit.prompt.md"], "two operands");
         assert_eq!(a, Args { adapter: "ad".into(), prompt: "dir/unit.prompt.md".into(), sweep: false, key: "unit.prompt".into() });
-        let a = parse(&strings(&["--mode", "sweep", "--key", "k1", "ad", "p.md"])).expect("options first");
+        let a = run(&["--mode", "sweep", "--key", "k1", "ad", "p.md"], "options first");
         assert!(a.sweep && a.key == "k1");
-        let a = parse(&strings(&["ad", "--", "-p.md"])).expect("the escape");
+        let a = run(&["ad", "--", "-p.md"], "the escape");
         assert_eq!(a.prompt, "-p.md");
         for bad in [&["ad"][..], &["ad", "p", "q"], &["--help"], &["--mode", "write", "ad", "p"], &["--key", "a/b", "ad", "p"], &["--key", "..", "ad", "p"]] {
             assert!(parse(&strings(bad)).is_err(), "{:?} must refuse", bad);
         }
+    }
+
+    // spec: delegation-kit/SPEC.md §The keyed verdict — the `--budget` form's argv: the adapter
+    // alone, in either order, and a refusal beside a second operand, `--mode` or `--key`
+    #[test]
+    fn the_budget_form_takes_the_adapter_alone() {
+        assert_eq!(parse(&strings(&["ad", "--budget"])), Ok(Form::Budget("ad".into())));
+        assert_eq!(parse(&strings(&["--budget", "ad"])), Ok(Form::Budget("ad".into())));
+        for bad in [&["--budget"][..], &["ad", "p.md", "--budget"], &["--budget", "--mode", "audit", "ad"], &["--budget", "--key", "k", "ad"]] {
+            assert!(parse(&strings(bad)).is_err(), "{:?} must refuse", bad);
+        }
+    }
+
+    const RO: &[&str] = &["ro=git", "ro=hash-object", "ro=--stdin"];
+
+    // spec: delegation-kit/SPEC.md §Testing — a PAUSE spawns nothing and leaves no scratch; an
+    // at-or-over reading past the stale age still pauses, beside an under-threshold one that reads
+    // STALE and proceeds
+    #[test]
+    fn a_paused_window_spawns_nothing_and_an_unknown_budget_proceeds() {
+        let r = Repo::new("budget-pause");
+        for age in [0, 6000] {
+            let v = foreign_run(&r.budgeted(r.cfg(RO, 60), "ro", "90", age), &r.args("ro", false));
+            assert_eq!(v.code, 2, "{}", v.line);
+            assert!(v.line.contains("key=prompt budget=PAUSE exit=- report=none patch=none -> FAILED (budget: used=90% age="), "{}", v.line);
+            assert!(v.line.contains("-> PAUSE (short window; at or over 80% of a window that resets in "), "{}", v.line);
+            assert!(!r.run_dir().exists(), "a paused run leaves no scratch and holds no key");
+        }
+        let v = foreign_run(&r.budgeted(r.cfg(RO, 60), "ro", "10", 6000), &r.args("ro", false));
+        assert_eq!(v.code, 0, "{}", v.line);
+        assert!(v.line.contains("key=prompt budget=STALE exit=0 report=") && v.line.ends_with("-> OK"), "{}", v.line);
+        let v = foreign_run(&r.budgeted(r.cfg(RO, 60), "ro", "10", 0), &r.args("ro", false));
+        assert!(v.code == 0 && v.line.contains("budget=OK exit=0"), "{}", v.line);
+        let v = foreign_run(&r.budgeted(r.cfg(RO, 60), "other", "90", 0), &r.args("ro", false));
+        assert!(v.code == 0 && v.line.contains("budget=OFF exit=0"), "an adapter with no snapshot is unbudgeted: {}", v.line);
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — the producer runs before the read with the snapshot
+    // path substituted, and one that fails or outlives its bound leaves the snapshot read as it was
+    #[test]
+    fn the_producer_feeds_the_read_and_its_failure_leaves_the_snapshot() {
+        let r = Repo::new("budget-producer");
+        let mut cfg = r.budgeted(r.cfg(RO, 60), "ro", "10", 0);
+        let write = "printf 'five_hour_used_pct=91\\nfive_hour_resets_at=99999999999\\nupdated_at=1\\n' > \"$0\"";
+        cfg.budget.producers = strings(&["ro=bash", "ro=-c", &format!("ro={}", write), "ro=@USAGE_FILE@"]);
+        let v = foreign_run(&cfg, &r.args("ro", false));
+        assert!(v.code == 2 && v.line.contains("budget=PAUSE") && v.line.contains("used=91%"), "{}", v.line);
+        for (fail, timeout) in [("exit 3", 60), ("exec sleep 5", 1)] {
+            let mut cfg = r.budgeted(r.cfg(RO, timeout), "ro", "10", 0);
+            cfg.budget.producers = strings(&["ro=bash", "ro=-c", &format!("ro={}", fail)]);
+            let v = foreign_run(&cfg, &r.args("ro", false));
+            assert!(v.code == 0 && v.line.contains("budget=OK exit=0"), "{}: {}", fail, v.line);
+        }
+        let mut cfg = r.budgeted(r.cfg(RO, 60), "ro", "10", 0);
+        cfg.budget.producers = strings(&["ro=no-such-program-on-any-path"]);
+        let v = foreign_run(&cfg, &r.args("ro", false));
+        assert!(v.code == 0 && v.line.contains("budget=OK exit=0"), "a producer that cannot spawn: {}", v.line);
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — a paused resume: the turn counter holds, the previous
+    // report is not rotated and the session stays open
+    #[test]
+    fn a_paused_resume_holds_its_turn() {
+        let r = Repo::new("budget-resume");
+        let open = r.session_cfg(OPEN_STDOUT, RESUME_ECHO, MARKER, 60);
+        assert_eq!(foreign_run(&open, &r.args("s", false)).code, 0);
+        let paused = r.budgeted(r.session_cfg(OPEN_STDOUT, RESUME_ECHO, MARKER, 60), "s", "90", 0);
+        let v = foreign_resume(&paused, "prompt", "answer.md");
+        assert_eq!(v.code, 2, "{}", v.line);
+        assert!(v.line.starts_with("foreign-resume: adapter=s mode=audit key=prompt turn=1 budget=PAUSE exit=- report=none patch=none -> FAILED (budget: used=90% "), "{}", v.line);
+        assert!(r.read("session.txt").contains(" turn=1 "), "{}", r.read("session.txt"));
+        assert!(r.run_dir().join("report.txt").is_file() && !r.run_dir().join("report.1.txt").exists(), "nothing is rotated");
+        let v = foreign_resume(&r.budgeted(r.session_cfg(OPEN_STDOUT, RESUME_ECHO, MARKER, 60), "s", "10", 0), "prompt", "answer.md");
+        assert!(v.code == 0 && v.line.contains("turn=2 budget=OK exit=0"), "the window reset: {}", v.line);
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — the `--budget` form: the keyed line and its three
+    // exits, no clone made, and an unconfigured adapter refused
+    #[test]
+    fn the_budget_form_prints_the_keyed_line_at_its_exit() {
+        let r = Repo::new("budget-form");
+        let form = |cfg: &Config, adapter: &str| budget_form(cfg, adapter).expect("a configured adapter");
+        let k = form(&r.budgeted(r.cfg(RO, 60), "ro", "10", 0), "ro");
+        assert_eq!((k.code, k.word), (0, "OK"), "{}", k.line);
+        assert!(k.line.starts_with("foreign-budget: adapter=ro used=10% age="), "{}", k.line);
+        assert!(k.line.contains(" resets_in=") && k.line.contains("s -> OK (reading within 600s and under its pause thresholds; "), "{}", k.line);
+        let k = form(&r.budgeted(r.cfg(RO, 60), "ro", "80", 0), "ro");
+        assert_eq!((k.code, k.word), (1, "PAUSE"), "at-or-over pauses: {}", k.line);
+        let k = form(&r.budgeted(r.cfg(RO, 60), "ro", "10", 6000), "ro");
+        assert_eq!((k.code, k.word), (2, "STALE"), "{}", k.line);
+        assert!(k.line.contains("never blocks a foreign run"), "{}", k.line);
+        let k = form(&r.cfg(RO, 60), "ro");
+        assert_eq!((k.code, k.word), (2, "OFF"), "{}", k.line);
+        assert!(k.line.starts_with("foreign-budget: adapter=ro -> OFF (no DELEGATION_KIT_FOREIGN_USAGE snapshot"), "{}", k.line);
+        assert!(budget_form(&r.cfg(RO, 60), "nope").is_err(), "an unconfigured adapter is a shape refusal");
+        assert!(!r.root.join("tmp").join("foreign").exists(), "the form makes no clone");
     }
 
     // spec: delegation-kit/SPEC.md §Layout and configuration — an adapter's argv is its elements'
@@ -996,7 +1221,7 @@ mod tests {
         assert_eq!(foreign_run(&cfg, &r.args("s", false)).code, 0);
         let v = foreign_resume(&cfg, "prompt", "answer.md");
         assert_eq!(v.code, 0, "{}", v.line);
-        assert!(v.line.starts_with("foreign-resume: adapter=s mode=audit key=prompt turn=2 exit=0 report="), "{}", v.line);
+        assert!(v.line.starts_with("foreign-resume: adapter=s mode=audit key=prompt turn=2 budget=OFF exit=0 report="), "{}", v.line);
         assert!(v.line.ends_with("patch=none -> OK — resumable: --foreign-resume prompt <prompt-file>"), "{}", v.line);
         // comment-tier-exempt: a Windows bash stub prints the substituted path with forward slashes
         let answer = r.root.join("answer.md").display().to_string().replace('\\', "/");
@@ -1027,7 +1252,7 @@ mod tests {
         let v = foreign_resume(&cfg, "prompt", "answer.md");
         assert_eq!(v.code, 0, "{}", v.line);
         let patch = r.run_dir().join("change.patch");
-        assert!(v.line.contains(&format!("mode=sweep key=prompt turn=2 exit=0 report={} patch={} -> OK", r.run_dir().join("report.txt").display(), patch.display())), "{}", v.line);
+        assert!(v.line.contains(&format!("mode=sweep key=prompt turn=2 budget=OFF exit=0 report={} patch={} -> OK", r.run_dir().join("report.txt").display(), patch.display())), "{}", v.line);
         let body = String::from_utf8_lossy(&std::fs::read(&patch).expect("the patch")).into_owned();
         assert!(body.contains("tracked.cfg") && body.contains("new.cfg"), "{}", body);
         git(&r.root.join("src"), &["apply", "--check", patch.to_str().unwrap_or_default()]).expect("the patch applies cleanly");
@@ -1045,7 +1270,7 @@ mod tests {
         let v = foreign_resume(&cfg, "prompt", "answer.md");
         assert_eq!(v.code, 2, "{}", v.line);
         let patch = r.run_dir().join("change.patch");
-        assert!(v.line.contains(&format!("turn=2 exit=3 report={} patch={} -> FAILED (the adapter exited 3)", r.run_dir().join("report.txt").display(), patch.display())), "{}", v.line);
+        assert!(v.line.contains(&format!("turn=2 budget=OFF exit=3 report={} patch={} -> FAILED (the adapter exited 3)", r.run_dir().join("report.txt").display(), patch.display())), "{}", v.line);
         assert_eq!(foreign_close(&cfg, "prompt").code, 0);
         let body = String::from_utf8_lossy(&std::fs::read(&patch).expect("close keeps the patch")).into_owned();
         assert!(body.contains("tracked.cfg") && body.contains("new.cfg"), "{}", body);
@@ -1062,7 +1287,7 @@ mod tests {
         assert_eq!(foreign_run(&cfg, &r.args("s", false)).code, 0);
         let v = foreign_resume(&cfg, "prompt", "answer.md");
         assert_eq!(v.code, 2, "{}", v.line);
-        assert!(v.line.contains("turn=2 exit=3") && v.line.ends_with("-> FAILED (the adapter exited 3)"), "{}", v.line);
+        assert!(v.line.contains("turn=2 budget=OFF exit=3") && v.line.ends_with("-> FAILED (the adapter exited 3)"), "{}", v.line);
         assert!(r.read("session.txt").contains(" turn=2 "), "a failed turn keeps the session and advances");
         let commit = ["s=git", "s=-c", "s=user.name=t", "s=-c", "s=user.email=t@example.invalid", "s=commit", "s=--allow-empty", "s=-q", "s=-m", "s=@SESSION_ID@"];
         let cfg = r.session_cfg(OPEN_STDOUT, &commit, MARKER, 60);
@@ -1073,7 +1298,7 @@ mod tests {
         assert!(r.run_dir().join("report.2.txt").is_file(), "the failed turn's report was rotated");
         let v = foreign_resume(&cfg, "nope", "answer.md");
         assert_eq!(v.code, 2, "{}", v.line);
-        assert!(v.line.starts_with("foreign-resume: adapter=- mode=- key=nope turn=- exit=- report=none"), "{}", v.line);
+        assert!(v.line.starts_with("foreign-resume: adapter=- mode=- key=nope turn=- budget=- exit=- report=none"), "{}", v.line);
         assert!(v.line.contains("FAILED (no open session under"), "{}", v.line);
     }
 
