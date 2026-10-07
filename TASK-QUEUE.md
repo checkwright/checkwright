@@ -20,6 +20,24 @@ a dispatched session parked a wait nothing could satisfy, after `wait-on-unreach
 
 **Cost while deferred:** a held session per occurrence, for as long as nobody reads the process table. Filed 2026-10-07 by windows-shell-floor-pass' lead; found by the operator. Re-verified at this filing's close against the turn-end liveness log it then drained: one `decision=refuse` beside `verdict=green`, 23 seconds after that session's last commit, and no later row for it, so the bullet's claim that the turn ended with the loop running fell. Owner lookup: `waiter`, `never-exists`, `producer`, `process table` in this file and the disposed-findings record — `wait-on-unreachable-condition`, done, the fix this recurred after; [waiter-loop-condition-predicate-gap](#waiter-loop-condition-predicate-gap), DISTINCT (a guard rule over `pgrep` waiters); [turn-end-refusal-used-as-a-busy-wait](#turn-end-refusal-used-as-a-busy-wait), DISTINCT (polling through the refusal).
 
+### heterogeneous-agent-delegation
+
+[spec: SPEC-foreign-budget.md] [roadmap: now/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
+
+foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent. It cashes the public no-lock-in claim — governance enforced at the git/gate boundary, not by trusting the author; the verification substrate and the shared git-index/HEAD serialization are already agent-neutral. *Remaining, worst-first:* (3) **budget oracle** — N vendor-keyed oracles beside the account-keyed verdict (delegation-kit/SPEC.md §usage-verdict), fed by the vendors' JSONL token-usage events; (4) **stage-contract expression** — the stage-skill prose is not vendor-neutral, and a foreign stage session has no stamp path, since it commits nothing and has no transcript the stamp protocol reads.
+
+**Slices landed**, each in delegation-kit/SPEC.md §The foreign-vendor run and each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); then (2) the dispatch transport with (1) the escalation resume model riding it, `--foreign-resume` continuing a vendor-held session in its kept clone, a permission request travelling as an escalation in the report, and no adapter binding to a tier class (delegation-transport-pass, 2026-10-03). **Next slice:** (3) the budget oracle, taken into delegation-wait-journal-pass (operator direction, 2026-10-07, lead-relayed, not a ruling; unsized at scope, and no foreign run granted with it); then (4) stage-contract expression. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
+
+**Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, the pattern the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service) and [plugin-harness-reach](#plugin-harness-reach).
+
+**Demand attested (2026-07-23):** the operator holds three foreign-vendor subscriptions and wants read-heavy delegation routed to them for budget headroom. **Its citer** [companion-toolkit-profile](#companion-toolkit-profile) blocks on none of it.
+
+**Attribution, operator direction 2026-09-30, lead-relayed (not a ruling):** foreign harnesses' commit trailers off and the method stated in one place, the README, held by construction (foreign work lands in the delegating session's commit); a harness setting change takes the operator's confirmation.
+
+**Design memory (2026-07-25, 2026-08-02):** JSONL turn events ship on the installed binaries probed, the budget oracle's likely feed. The machine profile (context-kit/SPEC.md §bin/env-probe, local-only) owns which CLIs and how.
+
+**Cost while deferred:** stage-level work still bills one vendor's budget while three subscriptions are held, foreign spend goes unbudgeted, and this design memory ages against fast-moving CLIs. Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question).
+
 ## Technical Debt
 
 ### journal-caller-child-agent
@@ -127,24 +145,6 @@ a controlled A/B trial.
 hosted attestation. The team/paid rung: gates verified server-side by a party the committing agents cannot touch — hosted gate runs as a neutral attestation, cross-repo drift dashboards, maintained rulesets. A service, not code: cloning the kits does not clone the neutrality or the ops. Demand-gated — this entry is the public roadmap marker, not a scaffold; hosting and sequencing decisions are on record in the operator's local brief, and multi-operator-semantics is its prerequisite mechanism. Surfaced 2026-07-07.
 
 **Cost while deferred:** zero — this is a service rather than tree mechanism, so nothing rots; the residue is that gate runs stay self-attested, which binds only when a party the committing agents cannot touch is asked to trust them.
-
-### heterogeneous-agent-delegation
-
-[cost: iteration/low] [surface: delegation-kit] [roadmap: now/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
-
-foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent. It cashes the public no-lock-in claim — governance enforced at the git/gate boundary, not by trusting the author; the verification substrate and the shared git-index/HEAD serialization are already agent-neutral. *Remaining, worst-first:* (3) **budget oracle** — N vendor-keyed oracles beside the account-keyed verdict (delegation-kit/SPEC.md §usage-verdict), fed by the vendors' JSONL token-usage events; (4) **stage-contract expression** — the stage-skill prose is not vendor-neutral, and a foreign stage session has no stamp path, since it commits nothing and has no transcript the stamp protocol reads.
-
-**Slices landed**, each in delegation-kit/SPEC.md §The foreign-vendor run and each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); then (2) the dispatch transport with (1) the escalation resume model riding it, `--foreign-resume` continuing a vendor-held session in its kept clone, a permission request travelling as an escalation in the report, and no adapter binding to a tier class (delegation-transport-pass, 2026-10-03). **Next slice:** (3) the budget oracle, taken into delegation-wait-journal-pass (operator direction, 2026-10-07, lead-relayed, not a ruling; unsized at scope, and no foreign run granted with it); then (4) stage-contract expression. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
-
-**Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, the pattern the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service) and [plugin-harness-reach](#plugin-harness-reach).
-
-**Demand attested (2026-07-23):** the operator holds three foreign-vendor subscriptions and wants read-heavy delegation routed to them for budget headroom. **Its citer** [companion-toolkit-profile](#companion-toolkit-profile) blocks on none of it.
-
-**Attribution, operator direction 2026-09-30, lead-relayed (not a ruling):** foreign harnesses' commit trailers off and the method stated in one place, the README, held by construction (foreign work lands in the delegating session's commit); a harness setting change takes the operator's confirmation.
-
-**Design memory (2026-07-25, 2026-08-02):** JSONL turn events ship on the installed binaries probed, the budget oracle's likely feed. The machine profile (context-kit/SPEC.md §bin/env-probe, local-only) owns which CLIs and how.
-
-**Cost while deferred:** stage-level work still bills one vendor's budget while three subscriptions are held, foreign spend goes unbudgeted, and this design memory ages against fast-moving CLIs. Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question).
 
 ### companion-toolkit-profile
 
