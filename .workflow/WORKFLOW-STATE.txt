@@ -4,4 +4,4 @@
 
 ---
 
-— scope a502540c 2026-10-07 cd626bd14
+delegation-wait-journal-pass scope a502540c 2026-10-07 cd626bd14
