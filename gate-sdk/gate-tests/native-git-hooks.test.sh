@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # spec: gate-sdk/SPEC.md §git-hook — the binary under a served hook's name is that hook's launcher: git starts it with no interpreter, a clean commit lands on the summary line, a red member refuses the commit by gate name, a registry with no commit-msg member leaves that hook silent, a binary that cannot be started refuses naming the path and both remedies, a knob naming a hook's own name is refused at 2, and a registered member whose declaration resolves and cannot be read refuses either hook at 2
-# spec: gate-sdk/SPEC.md §install-hooks — the arm places both hooks untracked in gate-hooks under the common git directory with an absolute core.hooksPath, so a linked worktree runs them; a re-run replaces both; an absent binary refuses at 2 and places nothing; a failed core.hooksPath write refuses at 2 ahead of the receipt; a hook left behind by a replaced binary starts the binary now installed
+# spec: gate-sdk/SPEC.md §install-hooks — the arm places both hooks untracked in gate-hooks under the common git directory with an absolute core.hooksPath, so a linked worktree runs them; a re-run replaces both; an absent binary refuses at 2 and places nothing; a failed core.hooksPath write refuses at 2 ahead of the receipt; a failed blame.ignoreRevsFile write is reported with the status unmoved; a hook left behind by a replaced binary starts the binary now installed
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -162,6 +162,17 @@ rm -f "$repo/.git/config.lock"
 grep -qF 'could not set core.hooksPath' <<<"$out" || note unwired-text "the refusal does not name the key: $out"
 grep -qF 'Active hooks:' <<<"$out" && note unwired-receipt "a refused opt-in printed its receipt: $out"
 
+# 13. a failed blame.ignoreRevsFile write is reported and moves no status; a key already holding two values fails that write alone
+: >"$repo/.git-blame-ignore-revs"
+git -C "$repo" config --add blame.ignoreRevsFile one
+git -C "$repo" config --add blame.ignoreRevsFile two
+out="$( cd "$repo" && "./$bin_rel" --install-hooks 2>&1 )"; rc=$?
+git -C "$repo" config --unset-all blame.ignoreRevsFile
+rm -f "$repo/.git-blame-ignore-revs"
+[[ "$rc" -eq 0 ]] || note blame-status "want exit 0 when only blame.ignoreRevsFile cannot be written, got $rc -- $out"
+grep -qF 'could not set blame.ignoreRevsFile' <<<"$out" || note blame-text "the failed write is not reported by key: $out"
+grep -qF 'Active hooks:' <<<"$out" || note blame-receipt "the opt-in printed no receipt: $out"
+
 # 12. a registered member that resolves and cannot be read refuses either hook at 2; a host that reads through the mode (an administrator, a filesystem with no mode bits) cannot build the case
 printf 'subject\n' >"$SANDBOX/msg"
 printf 'a staged note\n' >"$repo/e.txt"
@@ -184,5 +195,5 @@ g reset -q -- e.txt
 rm -f "$repo/e.txt"
 
 [[ "$fails" -eq 0 ]] || { echo "native-git-hooks.test: $fails assertion(s) failed"; exit 1; }
-echo "native-git-hooks.test: clean (--install-hooks places both hooks untracked under the common git directory, absolute in core.hooksPath, refusing with nothing placed when the binary is absent; git starts the placed binary as each hook with no interpreter: a clean commit lands on the summary line, a red member refuses by gate name from the main checkout and from a linked worktree, the commit-msg hook is silent until a member registers at its tier and reaches one with no re-install; a hook outliving a replaced binary starts the installed one, an unstartable binary refuses naming the path and both remedies, a knob naming a hook is refused at 2, a re-run replaces both, a failed core.hooksPath write refuses at 2 with no receipt, and an unreadable resolved member refuses either hook at 2)"
+echo "native-git-hooks.test: clean (--install-hooks places both hooks untracked under the common git directory, absolute in core.hooksPath, refusing with nothing placed when the binary is absent; git starts the placed binary as each hook with no interpreter: a clean commit lands on the summary line, a red member refuses by gate name from the main checkout and from a linked worktree, the commit-msg hook is silent until a member registers at its tier and reaches one with no re-install; a hook outliving a replaced binary starts the installed one, an unstartable binary refuses naming the path and both remedies, a knob naming a hook is refused at 2, a re-run replaces both, a failed core.hooksPath write refuses at 2 with no receipt, a failed blame.ignoreRevsFile write is reported at exit 0, and an unreadable resolved member refuses either hook at 2)"
 exit 0

@@ -104,9 +104,9 @@ pub fn emit(args: &[String]) -> Result<String, String> {
             .append(true)
             .open(&path)
             .and_then(|mut f| f.write_all(&body))
-            .map_err(|e| format!("cannot append to {}: {}", spelled, e))?;
+            .map_err(|e| format!("cannot append to {}: {}", path, e))?;
     }
-    Ok(format!("journal: {} {} {}\n", spelled, stage, id))
+    Ok(format!("journal: {} {} {}\n", path, stage, id))
 }
 
 #[cfg(test)]
