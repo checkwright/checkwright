@@ -255,7 +255,7 @@ an adopter writes a custom gate in shell only. The registry resolves a member as
 **Folded in at build, 2026-10-07 (operator direction, lead-relayed, not a ruling): the hook-wiring rewire windows-kit-bash-files did not land.** It shares this entry's end, the last bash a native-Windows adopter owes, and not its mechanism. context-kit and guard-kit still owe bash there through their settings templates, whose hook commands lead with a `bash` word.
 
 - **Second deliverable.** Every hook registration a kit ships takes the exec form: `command` naming the gate binary under the project-directory placeholder, with no executable suffix, and `args` carrying `--hook` and the member. The registration parser reads the binary as a command token, and `check-settings-paths` resolves a suffix-less candidate. The plugin's wiring keeps the shell form, since it must exit 0 in a repository that never installed the kits. The refused-repository decline moves into the `--hook` arm. gate-sdk/SPEC.md §The adopter constraints' first script-door class narrows to a value the harness can only run through a shell. The bash row then names a runnable fence and a registered shell gate alone.
-- **Waits on** a native Windows host running the harness, which no workflow leg is. Unrun there: a suffix-less `command` path starts the file carrying the suffix, and the exec form starts, blocks, advises and proceeds on a missing binary with no bash on `PATH`.
+- **Waits on** a native Windows host, which no workflow leg is. Operator-run there 2026-10-07 (harness 2.1.292, both transcripts read): the exec form started, blocked, advised and proceeded on a missing binary by a failed direct spawn, and a suffix-less `command` started the suffixed file. Unrun: no bash on `PATH` with the `PATH` shown; the linked-worktree placeholder.
 - **Run on Linux, harness 2.1.292.** The exec form started the binary with its `args` and a substituted placeholder, and a trailing `;` `touch` in `args` made no file. A block refused the call and an advisory reached the session. With the binary renamed away the call proceeded, and no notice reached the model channel. In a linked worktree the placeholder named the main checkout. A `hooks` edit armed in the running session. A call a tool refuses on its own input never reaches the hook.
 - **Hazard.** The binary given no argument exits 2, so a harness that dropped `args` would block every call the matcher takes. A witness rides a matcher no session uses and a scratch copy of the binary.
 
@@ -482,6 +482,84 @@ a dispatched session parked a wait nothing could satisfy, after `wait-on-unreach
 **Inferred, not run:** the session held on the hook's refusal and never ended its turn — read that session's transcript past the refused turn end
 
 **Cost while deferred:** a held session per occurrence, for as long as nobody reads the process table. Filed 2026-10-07 by windows-shell-floor-pass' lead; found by the operator. Re-verified at this filing's close against the turn-end liveness log it then drained: one `decision=refuse` beside `verdict=green`, 23 seconds after that session's last commit, and no later row for it, so the bullet's claim that the turn ended with the loop running fell. Owner lookup: `waiter`, `never-exists`, `producer`, `process table` in this file and the disposed-findings record — `wait-on-unreachable-condition`, done, the fix this recurred after; [waiter-loop-condition-predicate-gap](#waiter-loop-condition-predicate-gap), DISTINCT (a guard rule over `pgrep` waiters); [turn-end-refusal-used-as-a-busy-wait](#turn-end-refusal-used-as-a-busy-wait), DISTINCT (polling through the refusal).
+
+### git-hook-fail-open-residues
+
+[cost: event/low] [surface: gate-sdk]
+
+two fail-open residues in the native git hooks. The `--git-hook` arm's selector reads a resolved member's manifest with a read error taken as an empty one (`native/src/emit/git_hook.rs`), so under a tier filter a declaration that resolves and cannot be read drops out of the selection, where gate-sdk/SPEC.md §git-hook has an unreadable registry refuse at exit 2. And `--install-hooks` reports a failed `core.hooksPath` write on stderr, still prints its receipt and returns the identity rung's status (`config` in `native/src/emit/install_hooks.rs`), so it can return 0 with no hook wired.
+
+**Deliverable:** both refusing at exit 2, a test row each, and gate-sdk/SPEC.md §git-hook and §install-hooks stating the exit.
+
+**Inferred, not run:** either failure — `--git-hook` over a registry with one unreadable member, and `--install-hooks` in a clone whose config cannot be written
+
+**Cost while deferred:** an unreadable gate file is skipped silently at commit, and a failed install reads as wired. Filed 2026-10-07 off windows-shell-floor-pass' close second-vendor review, carried to the next scope's intake. Re-verified by reading both sites. Owner lookup: `hooksPath`, `install-hooks`, `git-hook` in this file and the disposed-findings record — [custom-gate-substrates](#custom-gate-substrates) and [post-spec-cite-no-valve](#post-spec-cite-no-valve), DISTINCT (each names the arm in passing).
+
+### windows-hook-legs-unexecuted
+
+[cost: event/low] [surface: gate-sdk]
+
+four behaviors windows-shell-floor-pass landed run on no Windows leg. gate-sdk/gate-tests/native-git-hooks.test.sh skips its replaced-launcher forwarding assertion on a host with an executable suffix. The Windows hook witness in `.github/workflows/gates.yml` exercises `pre-commit` alone, leaving `commit-msg`, the absent-binary refusal, the self-name refusal and the linked-worktree case to Ubuntu. The session-context hook member's configured-command spawn has no Windows end-to-end run. The stop-restore witness checks `ErrorActionPreference` after a successful install block only, never a failing block nor the fetch fence's `ProgressPreference`.
+
+**Deliverable:** each run on a Windows leg, or a stated reason one cannot be.
+
+**Inferred, not run:** the last three, the reviewer's claims — read the witness steps of `.github/workflows/gates.yml` and the stop-restore witness
+
+**Cost while deferred:** a Windows-only regression in any of the four ships green. Filed 2026-10-07 off windows-shell-floor-pass' close second-vendor review, carried to the next scope's intake; the first held there by reading the test. Owner lookup: `Windows leg`, `ErrorActionPreference`, `stop-restore`, `witness` in this file and the disposed-findings record — [windows-kpi-plugin-start](#windows-kpi-plugin-start), DISTINCT (a plugin Windows cannot start); owner gate-sdk/SPEC.md §git-hook, with context-kit/SPEC.md §The session-context hook.
+
+### release-rows-removed-template
+
+[cost: event/low] [surface: context-kit]
+
+the accumulating release declaration surface (`.workflow/release-declarations.md`) tells an upgrader to re-copy from a template it also declares removed. Five rows name context-kit's `session-context.sh` template as the source of a re-copy or as gaining a step: two `check-template-copy-parity` rows under New and tightened gates, and the `--emit memory-dirs`, SessionStart-command and update-notice rows under Behavior changes. A later Behavior changes row declares the template removed for the session-context hook member. Composed as they stand, the next release note carries both.
+
+**Deliverable:** the rows rewritten so the note gives each reader one instruction, what a kept copy changes by hand and the move to the member; and the two gate rows kept only if `check-template-copy-parity` still reds a copy whose template is gone, read first.
+
+**Cost while deferred:** the next release note sends an upgrader to a file the same note removes. Filed 2026-10-07 off windows-shell-floor-pass' close second-vendor review, carried to the next scope's intake. Re-verified: the six rows read, and context-kit/templates/ holds no `session-context.sh`. Owner lookup: `release-declarations`, `declaration surface`, `session-context.sh` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §upgrade-smoke.
+
+### journal-fallback-path-relative
+
+[cost: event/low] [surface: lifecycle-kit]
+
+the journal arm's raw-append fallback can name another file from a subdirectory. `--enter-stage` opens the journal at the repository-anchored path and its note prints the pattern's relative spelling, so a session appending by hand to the printed path from beneath the root writes elsewhere, while lifecycle-kit/SPEC.md §The journal arm calls the raw append to the printed path a legal fallback. A new defect after `journal-arm-spec-departures` landed its one-anchor fix.
+
+**Deliverable:** a printed path that resolves from any working directory, or the fallback sentence bounded to the root; with a test row.
+
+**Inferred, not run:** the stray write — an append to the printed path from a subdirectory, after reading the note's print site
+
+**Cost while deferred:** a hand-appended finding lands in a file no successor reads. Filed 2026-10-07 off windows-shell-floor-pass' close second-vendor review, carried to the next scope's intake. Owner lookup: `raw append`, `journal arm`, `fallback` in this file and the disposed-findings record — [journal-caller-child-agent](#journal-caller-child-agent), DISTINCT (whom the arm resolves, not where the fallback writes); [same-stage-journal-append-uncoordinated](#same-stage-journal-append-uncoordinated), DISTINCT (parallel appends).
+
+### journal-caller-child-agent
+
+[cost: event/low] [surface: lifecycle-kit]
+
+the journal arm refuses a stage session's append while a child agent's transcript is the newest. `--emit journal` resolves its caller through the session-id arm's newest-transcript read (`native/src/emit/journal.rs`), so a session that has dispatched a read-only sweep cannot journal until the child's transcript is no longer newest. Reported by windows-shell-floor-pass' close session, which appended by hand in that window; lead-relayed.
+
+**Deliverable:** a caller resolution that survives a live child, or the limit stated in lifecycle-kit/SPEC.md §The journal arm with the fallback named; which is spec's.
+
+**Inferred, not run:** the refusal — `--emit journal` from a session whose dispatched child is mid-run
+
+**Cost while deferred:** the durable-before-acting write fails exactly when a session holds a child's findings. Filed 2026-10-07 by windows-shell-floor-pass' lead after its close, carried to the next scope's intake. Re-verified: the arm takes its id from the session-id arm. Owner lookup: `newest transcript`, `journal arm`, `session-id` in this file and the disposed-findings record — [journal-fallback-path-relative](#journal-fallback-path-relative), DISTINCT (the fallback's path); owner lifecycle-kit/SPEC.md §bin/session-id.sh, which states the newest-transcript limit for the lead's marker.
+
+### session-sweep-horizon-baked
+
+[cost: event/low] [surface: context-kit]
+
+the session-context hook member bakes its scratch sweep's age horizon: it removes scratch older than one day on a constant (`STALE_SECS` in `native/src/hook/session_context.rs`), with no context-kit knob and no off value, where doctrine-kit/DOCTRINE.md Policy-as-choice has a kit ship a calibration as a selectable set with off among it. The port carried the shell template's own literal.
+
+**Deliverable:** the horizon as a context-kit knob with an off value, its row in context-kit/SPEC.md §Layout and configuration and §The session-context hook stating the set; a feature, since it adds a knob.
+
+**Cost while deferred:** a consumer wanting another horizon, or no sweep, has no setting. Filed 2026-10-07 off windows-shell-floor-pass' close audit, carried to the next scope's intake. Re-verified: the constant, and no `CONTEXT_KIT_` knob in the SPEC names a sweep. Owner lookup: `age horizon`, `scratch sweep`, `STALE_SECS` in this file and the disposed-findings record — none; [site-health-resample-knobs](#site-health-resample-knobs), DISTINCT (the same class on site-kit's template).
+
+### kit-spec-arm-span-unresolved
+
+[cost: event/low] [surface: installer]
+
+a retired gate-binary arm named in a kit SPEC's code span resolves under no gate. lifecycle-kit/SPEC.md cited the hook-emit arm as a live precedent for a whole iteration after `native-executable-git-hooks` deleted it, its amendment's own delta having named the repoint, and the battery stayed green: `check-front-door-verbs` resolves an arm span against the binary's arm table on the front-door pages alone. Found twice at windows-shell-floor-pass' close, by its second-vendor review and its audit sweep, and fixed there.
+
+**Deliverable:** the same arm resolution over the kit SPECs' code spans, with the history valves; a feature, since it widens a gate's corpus.
+
+**Cost while deferred:** a kit SPEC can cite an arm the binary no longer carries, unread until a reader runs it. Filed 2026-10-07 off windows-shell-floor-pass' close, carried to the next scope's intake. Owner lookup: `arm span`, `front-door-verbs`, `retired arm` in this file and the disposed-findings record — none; owner installer/SPEC.md §check-front-door-verbs.
 
 ## Icebox
 

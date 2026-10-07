@@ -2,12 +2,12 @@
 # Columns are USD per single token (a $/MTok price / 1,000,000), tab-separated.
 # One row per model id and effective date (`effective_from`, empty for an open start), the id as it appears in a transcript's message.model.
 #
-# priced-as-of: 2026-09-29 — transcribed from the published Anthropic model-pricing
+# priced-as-of: 2026-10-07 — transcribed from the published Anthropic model-pricing
 # table. Prices are a dated literal with no machine-readable feed to derive them from,
 # so nothing but this date says when it was last checked; re-verify against the
 # published table when kpi-price-table-age raises it. Every row below was re-verified
 # against the published table on this date.
-# price-page-hash: 191b4f0fcb4a98a0e0e1bfa31676d2e85f5a3094 — the page section's hash
+# price-page-hash: 161f810c754db5b1d5176c96a0e894f22227909b — the page section's hash
 # --price-coverage printed when the rows above were re-verified (drift-kit/SPEC.md
 # §The price-coverage arm); transcribe the new one with priced-as-of:.
 #
