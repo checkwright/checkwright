@@ -1169,11 +1169,3 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 
 ## Done
 
-- stage-tier-line-unread
-- journal-arm-spec-departures
-- mirror-fold-absent-mirror
-- harness-sweep-inexact-prose
-- native-executable-git-hooks
-- install-windows-stop-restore
-- windows-kit-bash-files
-
