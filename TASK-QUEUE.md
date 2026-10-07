@@ -10,38 +10,6 @@
 
 ## Technical Debt
 
-### journal-caller-child-agent
-
-the journal arm refuses a stage session's append while a child agent's transcript is the newest. `--emit journal` resolves its caller through the session-id arm's newest-transcript read (`native/src/emit/journal.rs`), so a session that has dispatched a read-only sweep cannot journal until the child's transcript is no longer newest. Reported by windows-shell-floor-pass' close session, which appended by hand in that window; lead-relayed.
-
-**Deliverable:** a caller resolution that survives a live child. Spec's choice, over stating the limit: where the derived id carries no stamp, the journal arm walks the same scan newest-first to the first id a stamp carries, and refuses as now when none does. `--emit session-id` is unchanged, since an entering session has no stamp to be found by. lifecycle-kit/SPEC.md §The journal arm states the walk and its limit, a live child that is itself stamped; with a test row.
-
-**Cost while deferred:** the durable-before-acting write fails exactly when a session holds a child's findings. Filed 2026-10-07 by windows-shell-floor-pass' lead after its close, carried to the next scope's intake. Reproduced at this scope: with one dispatched child live, `--emit session-id` printed the child's id and `--emit journal` refused at exit 2 for want of a stamp carrying it; both resolved the stage session before the dispatch and after the child ended. Owner lookup: `newest transcript`, `journal arm`, `session-id` in this file and the disposed-findings record — [journal-fallback-path-relative](#journal-fallback-path-relative), DISTINCT (the fallback's path); owner lifecycle-kit/SPEC.md §bin/session-id.sh, which states the newest-transcript limit for the lead's marker.
-
-### journal-fallback-path-relative
-
-the journal arm's raw-append fallback can name another file from a subdirectory. `--enter-stage` opens the journal at the repository-anchored path and its note prints the pattern's relative spelling, so a session appending by hand to the printed path from beneath the root writes elsewhere, while lifecycle-kit/SPEC.md §The journal arm calls the raw append to the printed path a legal fallback. A new defect after `journal-arm-spec-departures` landed its one-anchor fix.
-
-**Deliverable:** a printed path that resolves from any working directory, or the fallback sentence bounded to the root; with a test row.
-
-**Cost while deferred:** a hand-appended finding fails to land, or lands in a file no successor reads. Filed 2026-10-07 off windows-shell-floor-pass' close second-vendor review, carried to the next scope's intake. Run at this scope: from a subdirectory an append to the printed relative path failed for want of the directory, and landed in a stray file where a scratch directory sat beneath it; the note's print site is `native/src/emit/enter_stage.rs`. Owner lookup: `raw append`, `journal arm`, `fallback` in this file and the disposed-findings record — [journal-caller-child-agent](#journal-caller-child-agent), DISTINCT (whom the arm resolves, not where the fallback writes); [same-stage-journal-append-uncoordinated](#same-stage-journal-append-uncoordinated), DISTINCT (parallel appends).
-
-### git-hook-fail-open-residues
-
-two fail-open residues in the native git hooks. The `--git-hook` arm's `commit-msg` selector reads a resolved member's manifest with a read error taken as an empty one (`commit_msg_selection` in `native/src/emit/git_hook.rs`), so a declaration that resolves and cannot be read drops out of the selection, where gate-sdk/SPEC.md §git-hook has an unreadable registry refuse at exit 2. And `--install-hooks` reports a failed `core.hooksPath` write on stderr, still prints its receipt and returns the identity rung's status (`config` in `native/src/emit/install_hooks.rs`), so it returns 0 with no hook wired, against that section's own `0 placed and verified`.
-
-**Deliverable:** both refusing at exit 2, a test row each, and gate-sdk/SPEC.md §git-hook and §install-hooks stating the exit. The second section also says a failed `git config` write is reported rather than crashing, *the shape the sibling per-clone installer rules*, and that sibling's shape is a printed skip that is never a hard failure (lifecycle-kit/SPEC.md §bin/install-lifecycle.sh). Read at spec: the section's exit contract decides it, since `0 placed and verified` cannot hold with `core.hooksPath` unset, where the sibling's driver is auxiliary to its two file writes. The exit was put to the operator, who answered "your call"; the lead's decision, 2026-10-07, not the operator's direction: spec's reading stands. So the refusal stands, and the sentence is rewritten to borrow the sibling's stderr report alone and state the status it departs on.
-
-**Cost while deferred:** an unreadable gate file is skipped silently at commit, and a failed install reads as wired. Filed 2026-10-07 off windows-shell-floor-pass' close second-vendor review, carried to the next scope's intake. Run at this scope in a scratch clone: the `commit-msg` hook over an unreadable `tier=commit-msg` member exited 0 printing nothing, where the readable member ran and failed at 1; and `--install-hooks` with the clone's config locked printed its could-not-set line and its receipt and exited 0, `core.hooksPath` unset. The pre-commit selector's read of an unreadable member was not run. Owner lookup: `hooksPath`, `install-hooks`, `git-hook` in this file and the disposed-findings record — [custom-gate-substrates](#custom-gate-substrates) and [post-spec-cite-no-valve](#post-spec-cite-no-valve), DISTINCT (each names the arm in passing).
-
-### release-rows-removed-template
-
-the accumulating release declaration surface (`.workflow/release-declarations.md`) tells an upgrader to re-copy from a template it also declares removed. Five rows name context-kit's `session-context.sh` template as the source of a re-copy or as gaining a step: two `check-template-copy-parity` rows under New and tightened gates, and the `--emit memory-dirs`, SessionStart-command and update-notice rows under Behavior changes. A later Behavior changes row declares the template removed for the session-context hook member. Composed as they stand, the next release note carries both.
-
-**Deliverable:** the rows rewritten so the note gives each reader one instruction, what a kept copy changes by hand and the move to the member; and the two gate rows kept only if `check-template-copy-parity` still reds a copy whose template is gone, read first.
-
-**Cost while deferred:** the next release note sends an upgrader to a file the same note removes. Filed 2026-10-07 off windows-shell-floor-pass' close second-vendor review, carried to the next scope's intake. Re-verified: the six rows read, and context-kit/templates/ holds no `session-context.sh`. Owner lookup: `release-declarations`, `declaration surface`, `session-context.sh` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §upgrade-smoke.
-
 ## Deferred
 
 ### foreign-project-critique
@@ -1231,4 +1199,8 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 ## Done
 
 - producerless-wait-recurred
+- journal-caller-child-agent
+- journal-fallback-path-relative
+- git-hook-fail-open-residues
+- release-rows-removed-template
 

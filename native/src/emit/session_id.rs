@@ -22,14 +22,14 @@ pub fn derive(i: &Inputs) -> Result<String, String> {
 // spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the process cwd is an *input* to source 3's
 // default. bash's `pwd` prints the logical path it carries in `PWD` where `current_dir()` returns
 // the physical one, so `PWD` is read where set and the crate's crosser answers otherwise.
-pub fn emit(_args: &[String]) -> Result<String, String> {
+pub fn inputs() -> Result<Inputs, String> {
     let pwd = var("PWD");
     let here = if pwd.is_empty() {
         crate::walk::cwd()?
     } else {
         pwd
     };
-    let inputs = Inputs {
+    Ok(Inputs {
         session_id: var("LIFECYCLE_KIT_SESSION_ID"),
         harness_id: var("CLAUDE_CODE_SESSION_ID"),
         child: var("CLAUDE_CODE_CHILD_SESSION"),
@@ -37,8 +37,11 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
         config_home: var("CLAUDE_CONFIG_DIR"),
         home: var(crate::sessions::HOME_VAR),
         here,
-    };
-    Ok(format!("{}\n", derive(&inputs)?))
+    })
+}
+
+pub fn emit(_args: &[String]) -> Result<String, String> {
+    Ok(format!("{}\n", derive(&inputs()?)?))
 }
 
 #[cfg(test)]
@@ -148,6 +151,31 @@ mod tests {
             "a top-level transcript tying the subagent's mtime must win, the top-level glob \
              running first and `-nt` replacing only on a strictly newer mtime"
         );
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The journal arm — the walk's order is the scan's own: newest
+    // first within the candidate set `resolve` read, and no candidate where it read the environment
+    #[test]
+    fn the_scan_lists_its_candidates_newest_first_and_none_for_an_environment_answer() {
+        let dir = scratch("scan");
+        let lead = "11112222-3333-4444-5555-666677778888";
+        let sub = |n: &str| format!("{}/{}/subagents/agent-{}.jsonl", dir, lead, n);
+        transcript(&sub("aaaa0000ffff"), 1_000);
+        transcript(&sub("bbbb0000ffff"), 3_000);
+        transcript(&sub("cccc0000ffff"), 2_000);
+        transcript(&format!("{}/{}.jsonl", dir, lead), 9_000);
+        let mut i = inputs(&dir);
+        let keys = |i: &Inputs| -> Vec<String> {
+            crate::sessions::scan_newest_first(i).iter().map(|p| key(p)).collect()
+        };
+        assert_eq!(keys(&i), ["11112222", "bbbb0000", "cccc0000", "aaaa0000"]);
+        i.harness_id = lead.to_string();
+        assert!(keys(&i).is_empty(), "a top-level session's id is the environment's, with no scan");
+        i.child = "1".to_string();
+        assert_eq!(keys(&i), ["bbbb0000", "cccc0000", "aaaa0000"]);
+        i.session_id = "override".to_string();
+        assert!(keys(&i).is_empty(), "the override is no scan");
         let _ = std::fs::remove_dir_all(&dir);
     }
 

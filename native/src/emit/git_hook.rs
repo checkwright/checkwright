@@ -93,21 +93,18 @@ pub(crate) fn precommit_selection(
     Ok(out)
 }
 
-fn commit_msg_selection(members: &[String], resolve_dirs: &[String], file: &str) -> Vec<Selected> {
-    members
-        .iter()
-        .filter(|m| {
-            registry::resolve(m, resolve_dirs).is_some_and(|src| {
-                let body = std::fs::read_to_string(&src).unwrap_or_default();
-                let f = registry::manifest_line(&body).map(registry::manifest_fields).unwrap_or_default();
-                registry::field(&f, "tier") == "commit-msg"
-            })
-        })
-        .map(|m| Selected {
-            name: m.clone(),
-            args: vec![file.to_string()],
-        })
-        .collect()
+fn commit_msg_selection(members: &[String], resolve_dirs: &[String], file: &str) -> Result<Vec<Selected>, String> {
+    let mut out: Vec<Selected> = Vec::new();
+    for m in members {
+        let Some(src) = registry::resolve(m, resolve_dirs) else { continue };
+        if registry::field(&runner::manifest(&src)?, "tier") == "commit-msg" {
+            out.push(Selected {
+                name: m.clone(),
+                args: vec![file.to_string()],
+            });
+        }
+    }
+    Ok(out)
 }
 
 // spec: gate-sdk/SPEC.md §git-hook — the quiet-green report: a failing member's output, then the
@@ -162,7 +159,7 @@ fn run_over(hook: &Hook, paths: &[String]) -> Result<(i32, String, usize), Strin
     let resolve_dirs = registry::resolve_dirs(&gates_dir, &walk::kit_roots_abs()?);
     let selected = match hook {
         Hook::PreCommit => precommit_selection(&members, &resolve_dirs, &walk::kit_roots()?, paths, Path::new("."))?,
-        Hook::CommitMsg(file) => commit_msg_selection(&members, &resolve_dirs, file),
+        Hook::CommitMsg(file) => commit_msg_selection(&members, &resolve_dirs, file)?,
     };
     // spec: gate-sdk/SPEC.md §git-hook — a registry with no `tier=commit-msg` member exits 0
     // printing nothing, the summary line included
@@ -304,6 +301,22 @@ mod tests {
         assert!(matches!(parse(&argv(&["pre-commit"])), Ok(Hook::PreCommit)));
         assert!(matches!(parse(&argv(&["commit-msg", "m"])), Ok(Hook::CommitMsg(f)) if f == "m"));
         assert_eq!(run(&argv(&["nope"])), 2);
+    }
+
+    // spec: gate-sdk/SPEC.md §git-hook — a member that resolves and cannot be read refuses either
+    // hook's selection, where a member resolving nowhere keeps each hook's own disposition
+    #[test]
+    fn a_resolved_declaration_that_cannot_be_read_refuses_both_selections() {
+        let d = std::env::temp_dir().join(format!("checkwright-git-hook-unreadable.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(&d).expect("scratch");
+        let dir = d.display().to_string();
+        let src = registry::resolve_dirs(&dir, &[]);
+        std::fs::write(d.join("check-ok.sh"), "#!/bin/sh\n# graph: couples=* dir=one valve=none tier=commit-msg\n").expect("member");
+        let ok = commit_msg_selection(&argv(&["check-ok", "check-absent"]), &src, "m").expect("readable members refused");
+        assert_eq!(ok.iter().map(|s| s.name.as_str()).collect::<Vec<_>>(), ["check-ok"]);
+        assert!(runner::manifest(&format!("{}/check-gone.sh", dir)).is_err());
+        let _ = std::fs::remove_dir_all(&d);
     }
 
     #[test]
@@ -476,7 +489,7 @@ mod tests {
             let selected = walk::kit_roots_abs().and_then(|roots| {
                 let resolve_dirs = registry::resolve_dirs(&gates_dir, &roots);
                 let pre = precommit_selection(&members, &resolve_dirs, &roots, &staged, &repo)?;
-                Ok(pre.len() + commit_msg_selection(&members, &resolve_dirs, "m").len())
+                Ok(pre.len() + commit_msg_selection(&members, &resolve_dirs, "m")?.len())
             });
             match selected {
                 Ok(0) => failed.push(format!("{}: nothing selected", name)),

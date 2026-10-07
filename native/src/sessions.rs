@@ -151,10 +151,7 @@ pub fn delegation(i: &Inputs) -> Delegation {
     }
     let dir = sessions_dir(i);
     let mut newest: Option<(String, SystemTime)> = None;
-    pick(
-        &mut newest,
-        &format!("{}/{}/subagents/*.jsonl", dir, i.harness_id),
-    );
+    pick(&mut newest, &narrowed_glob(&dir, &i.harness_id));
     if let Some((path, _)) = newest {
         return Delegation::Delegated(path);
     }
@@ -162,6 +159,35 @@ pub fn delegation(i: &Inputs) -> Delegation {
         return Delegation::TopLevel(i.harness_id.clone());
     }
     Delegation::Undetermined
+}
+
+fn narrowed_glob(dir: &str, harness_id: &str) -> String {
+    format!("{}/{}/subagents/*.jsonl", dir, harness_id)
+}
+
+// spec: lifecycle-kit/SPEC.md §The journal arm — the candidates of the scan `resolve` selects
+// from, newest first, a tie keeping glob order as `pick` does; empty where `resolve` answers from
+// the environment and scans nothing
+pub fn scan_newest_first(i: &Inputs) -> Vec<String> {
+    if !i.session_id.is_empty() || (!i.harness_id.is_empty() && i.child.is_empty()) {
+        return Vec::new();
+    }
+    let dir = sessions_dir(i);
+    let globs = if i.harness_id.is_empty() {
+        candidate_globs(&dir).to_vec()
+    } else {
+        vec![narrowed_glob(&dir, &i.harness_id)]
+    };
+    let mut found: Vec<(String, SystemTime)> = globs
+        .iter()
+        .flat_map(|g| crate::walk::glob_entries(g))
+        .filter_map(|f| {
+            let when = std::fs::metadata(&f).ok()?.modified().unwrap_or(SystemTime::UNIX_EPOCH);
+            Some((f, when))
+        })
+        .collect();
+    found.sort_by_key(|a| std::cmp::Reverse(a.1));
+    found.into_iter().map(|(f, _)| f).collect()
 }
 
 pub fn top_level(dir: &str, harness_id: &str) -> String {

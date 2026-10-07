@@ -72,6 +72,16 @@ GATE_SDK_GATES_DIR="$scratch" GATE_SDK_KIT_DIRS="$scratch" \
     GATE_SDK_TMP_DIR="$scratch/.tmp" bash "$RUN" --for >/dev/null 2>&1
 [[ $? -eq 2 ]] || { echo "FAIL [usage]: --for with no path should exit 2"; fails=$((fails + 1)); }
 
+# A member that resolves and cannot be read refuses the selection at exit 2, never a
+# narrower one; a host that reads through the mode cannot build the case.
+chmod 000 "$scratch/g_glob.sh"
+if ! head -c 1 "$scratch/g_glob.sh" >/dev/null 2>&1; then
+    out="$(run_for alpha/foo.txt)"; rc=$?
+    [[ "$rc" -eq 2 ]] || { echo "FAIL [unreadable]: expected exit 2, got $rc -- $out"; fails=$((fails + 1)); }
+    assert_has unreadable "run-gates: --for cannot read the declaration" "$out"
+fi
+chmod 755 "$scratch/g_glob.sh"
+
 [[ "$fails" -eq 0 ]] || { echo "run-for-path.test: $fails assertion(s) failed"; exit 1; }
-echo "run-for-path.test: clean (--for selects by shared matcher; trigger='*' universal, mode=staged pathspec passes args, ungoverned path noted)"
+echo "run-for-path.test: clean (--for selects by shared matcher; trigger='*' universal, mode=staged pathspec passes args, ungoverned path noted, an unreadable resolved member refused at 2)"
 exit 0

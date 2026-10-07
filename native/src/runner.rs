@@ -351,11 +351,13 @@ fn staged_matches(p: &str, globs: &[&str]) -> bool {
     globs.iter().any(|g| registry::couple_matches(p, g))
 }
 
-fn manifest(src: &str) -> Vec<(String, String)> {
-    let body = std::fs::read_to_string(src).unwrap_or_default();
-    registry::manifest_line(&body)
+// spec: gate-sdk/SPEC.md §Fail-closed contract — a resolved declaration that cannot be read is a
+// refusal, never an empty manifest, which would drop the member from every selection in silence
+pub(crate) fn manifest(src: &str) -> Result<Vec<(String, String)>, String> {
+    let body = std::fs::read(src).map_err(|e| format!("cannot read the declaration {}: {}", src, e))?;
+    Ok(registry::manifest_line(&String::from_utf8_lossy(&body))
         .map(registry::manifest_fields)
-        .unwrap_or_default()
+        .unwrap_or_default())
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — one selection over a path set, and which paths it covered
@@ -390,7 +392,7 @@ pub(crate) fn select(
                 return Err(format!("cannot resolve '{}' in: {}", name, resolve_dirs.join(" ")));
             }
         };
-        let f = manifest(&src);
+        let f = manifest(&src)?;
         if tier.is_some_and(|t| registry::field(&f, "tier") != t) {
             continue;
         }

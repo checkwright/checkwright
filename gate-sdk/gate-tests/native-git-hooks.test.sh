@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# spec: gate-sdk/SPEC.md §git-hook — the binary under a served hook's name is that hook's launcher: git starts it with no interpreter, a clean commit lands on the summary line, a red member refuses the commit by gate name, a registry with no commit-msg member leaves that hook silent, a binary that cannot be started refuses naming the path and both remedies, and a knob naming a hook's own name is refused at 2
-# spec: gate-sdk/SPEC.md §install-hooks — the arm places both hooks untracked in gate-hooks under the common git directory with an absolute core.hooksPath, so a linked worktree runs them; a re-run replaces both; an absent binary refuses at 2 and places nothing; a hook left behind by a replaced binary starts the binary now installed
+# spec: gate-sdk/SPEC.md §git-hook — the binary under a served hook's name is that hook's launcher: git starts it with no interpreter, a clean commit lands on the summary line, a red member refuses the commit by gate name, a registry with no commit-msg member leaves that hook silent, a binary that cannot be started refuses naming the path and both remedies, a knob naming a hook's own name is refused at 2, and a registered member whose declaration resolves and cannot be read refuses either hook at 2
+# spec: gate-sdk/SPEC.md §install-hooks — the arm places both hooks untracked in gate-hooks under the common git directory with an absolute core.hooksPath, so a linked worktree runs them; a re-run replaces both; an absent binary refuses at 2 and places nothing; a failed core.hooksPath write refuses at 2 ahead of the receipt; a hook left behind by a replaced binary starts the binary now installed
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -154,6 +154,35 @@ for h in pre-commit commit-msg; do
 done
 [[ "$(find "$hooks" -type f | wc -l | tr -d ' ')" -eq 2 ]] || note rerun-count "a re-run left other than the two hooks: $(ls "$hooks")"
 
+# 11. a failed core.hooksPath write refuses the opt-in at 2, ahead of the receipt
+: >"$repo/.git/config.lock"
+out="$( cd "$repo" && "./$bin_rel" --install-hooks 2>&1 )"; rc=$?
+rm -f "$repo/.git/config.lock"
+[[ "$rc" -eq 2 ]] || note unwired-status "want exit 2 when core.hooksPath cannot be written, got $rc -- $out"
+grep -qF 'could not set core.hooksPath' <<<"$out" || note unwired-text "the refusal does not name the key: $out"
+grep -qF 'Active hooks:' <<<"$out" && note unwired-receipt "a refused opt-in printed its receipt: $out"
+
+# 12. a registered member that resolves and cannot be read refuses either hook at 2; a host that reads through the mode (an administrator, a filesystem with no mode bits) cannot build the case
+printf 'subject\n' >"$SANDBOX/msg"
+printf 'a staged note\n' >"$repo/e.txt"
+g add e.txt
+for pair in "commit-msg:check-probe-msg" "pre-commit:check-probe-word"; do
+    hook="${pair%%:*}"; member="$repo/scripts/${pair##*:}.sh"
+    chmod 000 "$member"
+    if ! head -c 1 "$member" >/dev/null 2>&1; then
+        if [[ "$hook" == commit-msg ]]; then
+            out="$( cd "$repo" && "./$bin_rel" --git-hook commit-msg "$SANDBOX/msg" 2>&1 )"; rc=$?
+        else
+            out="$( cd "$repo" && "./$bin_rel" --git-hook pre-commit 2>&1 )"; rc=$?
+        fi
+        [[ "$rc" -eq 2 ]] || note "unreadable-$hook-status" "want exit 2 over an unreadable resolved member, got $rc -- $out"
+        grep -qF "$hook: cannot read the declaration scripts/${pair##*:}.sh" <<<"$out" || note "unreadable-$hook-text" "the refusal does not name the declaration: $out"
+    fi
+    chmod 755 "$member"
+done
+g reset -q -- e.txt
+rm -f "$repo/e.txt"
+
 [[ "$fails" -eq 0 ]] || { echo "native-git-hooks.test: $fails assertion(s) failed"; exit 1; }
-echo "native-git-hooks.test: clean (--install-hooks places both hooks untracked under the common git directory, absolute in core.hooksPath, refusing with nothing placed when the binary is absent; git starts the placed binary as each hook with no interpreter: a clean commit lands on the summary line, a red member refuses by gate name from the main checkout and from a linked worktree, the commit-msg hook is silent until a member registers at its tier and reaches one with no re-install; a hook outliving a replaced binary starts the installed one, an unstartable binary refuses naming the path and both remedies, a knob naming a hook is refused at 2, and a re-run replaces both)"
+echo "native-git-hooks.test: clean (--install-hooks places both hooks untracked under the common git directory, absolute in core.hooksPath, refusing with nothing placed when the binary is absent; git starts the placed binary as each hook with no interpreter: a clean commit lands on the summary line, a red member refuses by gate name from the main checkout and from a linked worktree, the commit-msg hook is silent until a member registers at its tier and reaches one with no re-install; a hook outliving a replaced binary starts the installed one, an unstartable binary refuses naming the path and both remedies, a knob naming a hook is refused at 2, a re-run replaces both, a failed core.hooksPath write refuses at 2 with no receipt, and an unreadable resolved member refuses either hook at 2)"
 exit 0

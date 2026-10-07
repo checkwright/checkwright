@@ -62,11 +62,22 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
         .ok_or_else(|| "not inside a git repository — there is no clone to place the hooks in".to_string())?;
 
     place(Path::new(&bin), &hooks_dir)?;
-    config("core.hooksPath", &hooks_dir.display().to_string());
+    // spec: gate-sdk/SPEC.md §install-hooks — an unwired clone is no opt-in: the refusal comes
+    // ahead of the receipt, which would read as one
+    config("core.hooksPath", &hooks_dir.display().to_string()).map_err(|e| {
+        format!(
+            "{} — the hooks are placed in {} and git is not pointed at them, so no hook runs; clear the cause and re-run",
+            e,
+            hooks_dir.display()
+        )
+    })?;
     // spec: gate-sdk/SPEC.md §install-hooks — the blame guard stays a file-existence test, so a
-    // consumer without the file gets the same one-line output it always got.
+    // consumer without the file gets the same one-line output it always got; its failed write is
+    // reported and the status unmoved, since no hook depends on it.
     if Path::new(".git-blame-ignore-revs").is_file() {
-        config("blame.ignoreRevsFile", ".git-blame-ignore-revs");
+        if let Err(e) = config("blame.ignoreRevsFile", ".git-blame-ignore-revs") {
+            eprintln!("install-hooks: {}", e);
+        }
     }
 
     // spec: gate-sdk/SPEC.md §install-hooks — the receipt prints whatever the rung returned: a
@@ -101,18 +112,13 @@ fn place(bin: &Path, dir: &Path) -> Result<(), String> {
     Ok(())
 }
 
-// spec: gate-sdk/SPEC.md §install-hooks — a per-clone git-config write that fails is reported,
-// the shape the sibling per-clone installer rules for its own driver step, never a crash.
-fn config(key: &str, value: &str) {
-    match proc::run(&programs::GIT, &["config", key, value]) {
-        Ok(c) if c.stdout().is_some() => println!("Installed: {} = {}", key, value),
-        Ok(c) => eprintln!(
-            "install-hooks: could not set {} ({})",
-            key,
-            c.failure_report().unwrap_or_default()
-        ),
-        Err(e) => eprintln!("install-hooks: {}", e),
+fn config(key: &str, value: &str) -> Result<(), String> {
+    let c = proc::run(&programs::GIT, &["config", key, value])?;
+    if c.stdout().is_none() {
+        return Err(format!("could not set {} ({})", key, c.failure_report().unwrap_or_default()));
     }
+    println!("Installed: {} = {}", key, value);
+    Ok(())
 }
 
 // spec: gate-sdk/SPEC.md §install-hooks — the apply-and-verify rung. The gate is resolved through

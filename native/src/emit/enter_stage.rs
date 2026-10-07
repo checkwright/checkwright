@@ -1344,16 +1344,19 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String], declared: Option<&str>) -> Result<
     // silently, and the first stage would then look like every firing of the absence this opener
     let mut journal = String::new();
     if c.journal_require == "1" {
+        // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — both lines name the anchored path,
+        // which a raw append resolves from any working directory
         let p = journal_path(&c.journal_pattern, &stage);
+        let shown = repo_anchored(&p).unwrap_or_else(|_| p.clone());
         let opened =
             repo_anchored(&p).and_then(|f| journal_open(&f, &stage, &stamp_iter, &id, &today, &head_at));
         match opened {
-            Ok(()) => journal = p,
+            Ok(()) => journal = shown,
             Err(_) => {
                 eprintln!(
                     "enter-stage: the stamp landed, but the resume journal at {} could not be \
                      opened — write it yourself.",
-                    p
+                    shown
                 );
             }
         }

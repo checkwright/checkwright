@@ -49,6 +49,15 @@ fn stamps(anchored: &str) -> Result<String, String> {
     }
 }
 
+// spec: lifecycle-kit/SPEC.md §The journal arm — the caller: the derived id where a stamp carries
+// it, else the first id down the derivation's own scan that one does, so a live child's newer
+// transcript does not unseat the stamped session that dispatched it
+fn caller(state_text: &str, derived: &str, scan: &[String], stages: &[String]) -> Option<(String, String)> {
+    std::iter::once(derived.to_string())
+        .chain(scan.iter().map(|p| crate::sessions::key(p)))
+        .find_map(|id| stages::caller_stage(state_text, &id, stages).map(|s| (id, s)))
+}
+
 fn text_of(args: &[String]) -> Result<Vec<u8>, String> {
     let fields = super::file_survey::positionals(args, "text").map_err(|e| format!("{}\n{}", e, USAGE))?;
     match fields {
@@ -69,14 +78,16 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     let body = shape(&text_of(args)?)?;
     worktree_refusal(walk::main_checkout_root().as_deref())?;
 
-    let id = super::session_id::emit(&[])?.trim_end().to_string();
+    let inputs = super::session_id::inputs()?;
+    let derived = super::session_id::derive(&inputs)?;
     let state = walk::knob_scalar("LIFECYCLE_KIT_STATE_FILE")?;
     let state_text = stamps(&super::enter_stage::repo_anchored(&state)?)?;
-    let Some(stage) = stages::caller_stage(&state_text, &id, &stages::stages()?) else {
+    let scan = crate::sessions::scan_newest_first(&inputs);
+    let Some((id, stage)) = caller(&state_text, &derived, &scan, &stages::stages()?) else {
         return Err(format!(
             "no stage stamp in {} carries this session's id ({}), so it has no journal to append \
              to — run --enter-stage <stage> first",
-            state, id
+            state, derived
         ));
     };
 
@@ -120,6 +131,23 @@ mod tests {
     #[test]
     fn an_absent_state_file_reads_as_no_stamp() {
         assert_eq!(stamps("/no/such/dir/stamps.txt").as_deref(), Ok(""));
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The journal arm — a stamped derived id is taken with no walk,
+    // an unstamped one yields to the newest stamped candidate, and no stamped candidate is no caller
+    #[test]
+    fn an_unstamped_derived_id_walks_the_scan_to_the_first_stamped_one() {
+        let stages: Vec<String> = ["scope", "build"].iter().map(|s| s.to_string()).collect();
+        let state = "---\ndemo scope aaaaaaaa 2026-06-01 none\ndemo build bbbbbbbb 2026-06-02 none\n";
+        let scan: Vec<String> = ["agent-cccccccc00", "agent-bbbbbbbb00", "agent-aaaaaaaa00"]
+            .iter()
+            .map(|n| format!("/s/lead/subagents/{}.jsonl", n))
+            .collect();
+        let got = |derived: &str, scan: &[String]| caller(state, derived, scan, &stages);
+        assert_eq!(got("aaaaaaaa", &scan), Some(("aaaaaaaa".to_string(), "scope".to_string())));
+        assert_eq!(got("cccccccc", &scan), Some(("bbbbbbbb".to_string(), "build".to_string())));
+        assert_eq!(got("cccccccc", &scan[..1]), None);
+        assert_eq!(got("cccccccc", &[]), None);
     }
 
     #[test]

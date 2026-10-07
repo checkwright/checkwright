@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: lifecycle-kit/SPEC.md §The journal arm — the arm end-to-end in a non-git sandbox: an operand and a standard input land in the journal of the caller's last-stamped stage and never the cursor's, a waiver line is no stage, every refusal exits 2 leaving each journal byte-identical, an absent journal and directory are created whatever the require switch, a retargeted pattern is followed, an absent state file is refused as an unstamped caller, standard input lands byte for byte, and from a subdirectory of a repository every reader of the derivation names one file
+# spec: lifecycle-kit/SPEC.md §The journal arm — the arm end-to-end in a non-git sandbox: an operand and a standard input land in the journal of the caller's last-stamped stage and never the cursor's, a waiver line is no stage, every refusal exits 2 leaving each journal byte-identical, an absent journal and directory are created whatever the require switch, a retargeted pattern is followed, an absent state file is refused as an unstamped caller, standard input lands byte for byte, from a subdirectory of a repository every reader of the derivation names one file and the path the entry printed takes a raw append into it, and a derived id no stamp carries walks its own scan newest-first to the first stamped id, refusing when none is
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -141,6 +141,53 @@ out="$(from_sub --emit-journal "from the subdirectory")"; rc=$?
     || note subdir-one-file "the opener and the arm did not write one file at the repository root: $(cat "$sb/scratch/validate-journal.md" 2>&1)"
 [[ -e "$sb/sub/scratch/validate-journal.md" ]] && note subdir-second-file "a second journal was written under the working directory"
 
+# --- the path the entry printed takes a raw append from the subdirectory into that one file ---
+sb="$SANDBOX/printed"; seed "$sb" 'demo scope aaaaaaaa 2026-06-01 none' 'demo build bbbbbbbb 2026-06-02 none'
+mkdir -p "$sb/sub" "$sb/scratch"
+printf '# TASK-QUEUE.md\n\n## Iteration: demo\n\n---\n\n## New Features\n\n## Technical Debt\n\n## Done\n' >"$sb/TASK-QUEUE.md"
+echo "the predecessor's finding" >"$sb/scratch/build-journal.md"
+git -C "$sb" init -q
+git -C "$sb" add -A
+git -C "$sb" -c user.email=t@t.invalid -c user.name=t -c commit.gpgsign=false commit -qm seed
+out="$(from_sub --enter-stage validate)"; rc=$?
+printed="$(sed -n 's/.*resume journal opened at \(.*\) — append each finding.*/\1/p' <<<"$out")"
+[[ "$rc" -eq 0 && -n "$printed" ]] || note printed-note "the entry printed no journal path (exit $rc): $out"
+( cd "$sb/sub" && printf 'by hand\n' >>"$printed" ) 2>/dev/null
+[[ "$(tail -n 1 "$sb/scratch/validate-journal.md" 2>/dev/null)" == "by hand" ]] \
+    || note printed-append "a raw append to the printed path '$printed' from a subdirectory missed the journal: $(cat "$sb/scratch/validate-journal.md" 2>&1)"
+[[ -e "$sb/sub/scratch/validate-journal.md" ]] && note printed-stray "the printed path named a file under the working directory"
+
+# --- a live child's newer transcript does not unseat the stamped caller, and no stamped candidate is the refusal ---
+lead='11112222-3333-4444-5555-666677778888'
+walk() {  # $1=sandbox  $2..=the binary's argv, the id derived from a narrowed transcript scan
+    local sb="$1"; shift
+    ( cd "$sb" && gate_env LIFECYCLE_KIT_KNOB_FILE="$sb/lifecycle-config.knobs" \
+                           LIFECYCLE_KIT_STATE_FILE=state/stamps.txt \
+                           LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN='scratch/<stage>-journal.md' \
+                           LIFECYCLE_KIT_SESSION_ID= \
+                           LIFECYCLE_KIT_SESSIONS_DIR="$sb/sessions" \
+                           CLAUDE_CODE_SESSION_ID="$lead" \
+                           CLAUDE_CODE_CHILD_SESSION=1 \
+        && gate_arm_run "$@" 2>&1 )
+}
+transcripts() {  # $1=sandbox — the stamped session's transcript, then its child's, newer
+    mkdir -p "$1/sessions/$lead/subagents"
+    : >"$1/sessions/$lead/subagents/agent-deadbeef0001.jsonl"; touch -t 202001010000 "$1/sessions/$lead/subagents/agent-deadbeef0001.jsonl"
+    : >"$1/sessions/$lead/subagents/agent-0badc0de0001.jsonl"; touch -t 202001020000 "$1/sessions/$lead/subagents/agent-0badc0de0001.jsonl"
+}
+sb="$SANDBOX/child"; seed "$sb" 'demo build deadbeef 2026-06-02 none'; transcripts "$sb"
+out="$(walk "$sb" --emit-session-id)"
+[[ "$out" == "0badc0de" ]] || note child-derived "the case is not built: the derivation did not answer the child's id: $out"
+out="$(walk "$sb" --emit-journal "held while a child ran")"; rc=$?
+[[ "$rc" -eq 0 && "$out" == "journal: scratch/build-journal.md build deadbeef" ]] \
+    || note child-walk "the arm did not walk past the unstamped child to the stamped caller (exit $rc): $out"
+[[ "$(cat "$sb/scratch/build-journal.md" 2>/dev/null)" == "held while a child ran" ]] || note child-body "the text did not land in the stamped caller's journal"
+sb="$SANDBOX/child-none"; seed "$sb" 'demo build cccccccc 2026-06-02 none'; transcripts "$sb"
+out="$(walk "$sb" --emit-journal "a finding")"; rc=$?
+[[ "$rc" -eq 2 ]] || note child-none-status "want exit 2 with no stamped candidate in the scan, got $rc -- $out"
+grep -qF '0badc0de' <<<"$out" || note child-none-id "the refusal does not name the derived id: $out"
+[[ -e "$sb/scratch" ]] && note child-none-nowrite "a refused walk created the journal directory"
+
 [[ "$fails" -eq 0 ]] || { echo "journal-arm.test: $fails assertion(s) failed"; exit 1; }
-echo "journal-arm.test: clean (an operand and a standard input land in the caller's last-stamped stage's journal with the one stdout line, DONE stands last, the cursor's journal and a waiver line are not read, five refusals exit 2 writing nothing, the separator admits a dash-led text, an absent journal is created at either require value, a retargeted pattern is followed, an absent state file is the unstamped refusal, a non-UTF-8 byte lands as itself, and from a subdirectory the opener, the entry assertion and the arm name one file)"
+echo "journal-arm.test: clean (an operand and a standard input land in the caller's last-stamped stage's journal with the one stdout line, DONE stands last, the cursor's journal and a waiver line are not read, five refusals exit 2 writing nothing, the separator admits a dash-led text, an absent journal is created at either require value, a retargeted pattern is followed, an absent state file is the unstamped refusal, a non-UTF-8 byte lands as itself, from a subdirectory the opener, the entry assertion and the arm name one file, the path the entry printed takes a raw append there into that file, and an unstamped derived id walks its scan to the stamped caller or refuses naming itself)"
 exit 0
