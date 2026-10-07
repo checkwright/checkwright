@@ -20,7 +20,7 @@
 246292cp canon-kit/SPEC.md
 5785cp canon-kit/templates/SPEC-amendment.md
 25807cp companion/SPEC.md
-113186cp context-kit/SPEC.md
+113325cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
 224110cp delegation-kit/SPEC.md
 38916cp delegation-kit/templates/agent-execution.md

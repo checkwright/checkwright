@@ -500,6 +500,7 @@ context-kit/
   gate-tests/check-settings-pins.test.sh # the refusal axis the pair cannot hold
   index-tests/                   # fixture corpus + expected outputs
   templates/settings-sessionstart.json
+  templates/nudge-delegation.txt # exemplar nudge
   templates/context-config.knobs # comment-only consumer knob file: a pointer to the roster below
   templates/close-brevity.md
   smoke/install.sh
@@ -533,7 +534,7 @@ A derived default below names the knob it reads as `${NAME}`, or as `${NAME:-<de
 - `CONTEXT_KIT_DRIFT_REPORT` — the **`--emit` arm name** of the consumer's drift report, not a path: the hook runs `--emit <name> --trend` for the brief's drift line; default empty, the line omitted. A path value degrades to no drift line, the degrade an absent report always had.
 - `CONTEXT_KIT_STAGE_RULES` — the **command** that emits stage→craft-rule pointers, not a path: the session-context hook runs it with the current stage appended for the brief's craft-rule block ([§The session-context hook](#the-session-context-hook), the configured-command rule). Default empty, the block omitted; `--emit stage-rules`, doctrine-kit's arm, is one value it takes ([doctrine-kit/SPEC.md §stage-rules](../doctrine-kit/SPEC.md#stage-rules)). A bare **executable** script path works as a command of one word; a **non-executable** script needs its interpreter written in the value, since the hook supplies none.
 - `CONTEXT_KIT_BRIEF_COMPONENT_MARK` — the directory name that makes a top-level directory a component for the brief's dirty-surface step and its footer's public-surface line; default `src`. Empty turns the step off and drops the line.
-- `CONTEXT_KIT_BRIEF_NUDGES` — keyed by stage, each value a tracked text file the brief prints verbatim on that stage; default empty, no nudge.
+- `CONTEXT_KIT_BRIEF_NUDGES` — keyed by stage, each value a tracked text file the brief prints verbatim on that stage; default empty, no nudge. `templates/nudge-delegation.txt` is the exemplar a consumer copies and keys to its stages.
 - `CONTEXT_KIT_BRIEF_FOOTER_FILE` — a tracked text file printed verbatim as the brief's index footer; default empty, the built-in footer.
 - `CONTEXT_KIT_BRIEF_COMMANDS` — array of a consumer's own brief lines, each element one command run after the drift line; default empty.
 - `CONTEXT_KIT_STATE_FILE` — the lifecycle evidence file; default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt`. Its **last data line** carries the stage cursor the hook routes on ([§The session-context hook](#the-session-context-hook)). Its first stamp names the iteration-start commit the meter's `--growth` and staleness read ([§The always-loaded meter](#the-always-loaded-meter)). It is context-kit's own knob, never an import of lifecycle-kit's, so a consumer without lifecycle-kit resolves an absent file and keeps the baseline-only reading.
