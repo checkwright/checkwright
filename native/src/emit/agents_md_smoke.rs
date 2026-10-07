@@ -123,7 +123,7 @@ fn smoke(scratch: &mut Scratch) -> Outcome {
     step!(regenerate(&consumer));
     step!(commit(
         &consumer,
-        "regenerate the hook + graph artifact under the AGENTS.md config"
+        "regenerate the graph artifact under the AGENTS.md config"
     ));
 
     step!(battery_is_green(&consumer));
@@ -272,23 +272,9 @@ fn battery_env() -> Vec<(String, String)> {
 }
 
 // spec: context-kit/SPEC.md §Testing — the regeneration ordering: each kit's install.sh already
-// wrote the hook and the graph artifact, but before `canon-config.knobs` was written, so both are
-// rewritten here under the same env the battery will run with.
+// wrote the graph artifact, but before `canon-config.knobs` was written, so it is rewritten here
+// under the same env the battery will run with.
 fn regenerate(consumer: &str) -> Result<(), Outcome> {
-    let hook = proc::run_merged_in(
-        &programs::BASH,
-        &["gate-sdk/bin/run-gates.sh", "--emit", "git-hooks", "--write"],
-        &battery_env(),
-        Some(Path::new(consumer)),
-    )
-    .map_err(|e| Outcome::Refuse(format!("{}: {}", NAME, e)))?;
-    if !hook.succeeded() {
-        return Err(Outcome::Refuse(format!(
-            "{}: could not regenerate the hook under the AGENTS.md config:\n{}",
-            NAME,
-            String::from_utf8_lossy(hook.output()).trim_end()
-        )));
-    }
     // spec: context-kit/SPEC.md §Testing — the graph artifact is a redirect rather than a capture,
     // so the emit's own stderr stays out of the committed HTML.
     let graph = spawn(

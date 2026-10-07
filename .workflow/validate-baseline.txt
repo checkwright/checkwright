@@ -22,7 +22,6 @@ gates check-footprint-fresh pass
 gates check-docs-mirror-fresh pass
 gates check-enforcement-fresh pass
 gates check-value-rollup-fresh pass
-gates check-hook-exec-bit pass
 gates check-exec-bit pass
 gates check-commit-msg pass
 gates check-commit-subject pass
