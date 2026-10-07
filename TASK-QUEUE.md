@@ -10,6 +10,38 @@
 
 ## Technical Debt
 
+### journal-caller-child-agent
+
+the journal arm refuses a stage session's append while a child agent's transcript is the newest. `--emit journal` resolves its caller through the session-id arm's newest-transcript read (`native/src/emit/journal.rs`), so a session that has dispatched a read-only sweep cannot journal until the child's transcript is no longer newest. Reported by windows-shell-floor-pass' close session, which appended by hand in that window; lead-relayed.
+
+**Deliverable:** a caller resolution that survives a live child, or the limit stated in lifecycle-kit/SPEC.md §The journal arm with the fallback named; which is spec's.
+
+**Cost while deferred:** the durable-before-acting write fails exactly when a session holds a child's findings. Filed 2026-10-07 by windows-shell-floor-pass' lead after its close, carried to the next scope's intake. Reproduced at this scope: with one dispatched child live, `--emit session-id` printed the child's id and `--emit journal` refused at exit 2 for want of a stamp carrying it; both resolved the stage session before the dispatch and after the child ended. Owner lookup: `newest transcript`, `journal arm`, `session-id` in this file and the disposed-findings record — [journal-fallback-path-relative](#journal-fallback-path-relative), DISTINCT (the fallback's path); owner lifecycle-kit/SPEC.md §bin/session-id.sh, which states the newest-transcript limit for the lead's marker.
+
+### journal-fallback-path-relative
+
+the journal arm's raw-append fallback can name another file from a subdirectory. `--enter-stage` opens the journal at the repository-anchored path and its note prints the pattern's relative spelling, so a session appending by hand to the printed path from beneath the root writes elsewhere, while lifecycle-kit/SPEC.md §The journal arm calls the raw append to the printed path a legal fallback. A new defect after `journal-arm-spec-departures` landed its one-anchor fix.
+
+**Deliverable:** a printed path that resolves from any working directory, or the fallback sentence bounded to the root; with a test row.
+
+**Cost while deferred:** a hand-appended finding fails to land, or lands in a file no successor reads. Filed 2026-10-07 off windows-shell-floor-pass' close second-vendor review, carried to the next scope's intake. Run at this scope: from a subdirectory an append to the printed relative path failed for want of the directory, and landed in a stray file where a scratch directory sat beneath it; the note's print site is `native/src/emit/enter_stage.rs`. Owner lookup: `raw append`, `journal arm`, `fallback` in this file and the disposed-findings record — [journal-caller-child-agent](#journal-caller-child-agent), DISTINCT (whom the arm resolves, not where the fallback writes); [same-stage-journal-append-uncoordinated](#same-stage-journal-append-uncoordinated), DISTINCT (parallel appends).
+
+### git-hook-fail-open-residues
+
+two fail-open residues in the native git hooks. The `--git-hook` arm's `commit-msg` selector reads a resolved member's manifest with a read error taken as an empty one (`commit_msg_selection` in `native/src/emit/git_hook.rs`), so a declaration that resolves and cannot be read drops out of the selection, where gate-sdk/SPEC.md §git-hook has an unreadable registry refuse at exit 2. And `--install-hooks` reports a failed `core.hooksPath` write on stderr, still prints its receipt and returns the identity rung's status (`config` in `native/src/emit/install_hooks.rs`), so it returns 0 with no hook wired, against that section's own `0 placed and verified`.
+
+**Deliverable:** both refusing at exit 2, a test row each, and gate-sdk/SPEC.md §git-hook and §install-hooks stating the exit. The second section also says a failed `git config` write is reported rather than crashing, which a refusal keeps.
+
+**Cost while deferred:** an unreadable gate file is skipped silently at commit, and a failed install reads as wired. Filed 2026-10-07 off windows-shell-floor-pass' close second-vendor review, carried to the next scope's intake. Run at this scope in a scratch clone: the `commit-msg` hook over an unreadable `tier=commit-msg` member exited 0 printing nothing, where the readable member ran and failed at 1; and `--install-hooks` with the clone's config locked printed its could-not-set line and its receipt and exited 0, `core.hooksPath` unset. The pre-commit selector's read of an unreadable member was not run. Owner lookup: `hooksPath`, `install-hooks`, `git-hook` in this file and the disposed-findings record — [custom-gate-substrates](#custom-gate-substrates) and [post-spec-cite-no-valve](#post-spec-cite-no-valve), DISTINCT (each names the arm in passing).
+
+### release-rows-removed-template
+
+the accumulating release declaration surface (`.workflow/release-declarations.md`) tells an upgrader to re-copy from a template it also declares removed. Five rows name context-kit's `session-context.sh` template as the source of a re-copy or as gaining a step: two `check-template-copy-parity` rows under New and tightened gates, and the `--emit memory-dirs`, SessionStart-command and update-notice rows under Behavior changes. A later Behavior changes row declares the template removed for the session-context hook member. Composed as they stand, the next release note carries both.
+
+**Deliverable:** the rows rewritten so the note gives each reader one instruction, what a kept copy changes by hand and the move to the member; and the two gate rows kept only if `check-template-copy-parity` still reds a copy whose template is gone, read first.
+
+**Cost while deferred:** the next release note sends an upgrader to a file the same note removes. Filed 2026-10-07 off windows-shell-floor-pass' close second-vendor review, carried to the next scope's intake. Re-verified: the six rows read, and context-kit/templates/ holds no `session-context.sh`. Owner lookup: `release-declarations`, `declaration surface`, `session-context.sh` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §upgrade-smoke.
+
 ## Deferred
 
 ### foreign-project-critique
@@ -90,7 +122,7 @@ hosted attestation. The team/paid rung: gates verified server-side by a party th
 
 foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent. It cashes the public no-lock-in claim — governance enforced at the git/gate boundary, not by trusting the author; the verification substrate and the shared git-index/HEAD serialization are already agent-neutral. *Remaining, worst-first:* (3) **budget oracle** — N vendor-keyed oracles beside the account-keyed verdict (delegation-kit/SPEC.md §usage-verdict), fed by the vendors' JSONL token-usage events; (4) **stage-contract expression** — the stage-skill prose is not vendor-neutral, and a foreign stage session has no stamp path, since it commits nothing and has no transcript the stamp protocol reads.
 
-**Slices landed**, each in delegation-kit/SPEC.md §The foreign-vendor run and each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); then (2) the dispatch transport with (1) the escalation resume model riding it, `--foreign-resume` continuing a vendor-held session in its kept clone, a permission request travelling as an escalation in the report, and no adapter binding to a tier class (delegation-transport-pass, 2026-10-03). **Next slice:** (3) the budget oracle or (4) stage-contract expression. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
+**Slices landed**, each in delegation-kit/SPEC.md §The foreign-vendor run and each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); then (2) the dispatch transport with (1) the escalation resume model riding it, `--foreign-resume` continuing a vendor-held session in its kept clone, a permission request travelling as an escalation in the report, and no adapter binding to a tier class (delegation-transport-pass, 2026-10-03). **Next slice:** (3) the budget oracle, taken into delegation-wait-journal-pass (operator direction, 2026-10-07, lead-relayed, not a ruling; unsized at scope, and no foreign run granted with it); then (4) stage-contract expression. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
 
 **Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, the pattern the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service) and [plugin-harness-reach](#plugin-harness-reach).
 
@@ -252,14 +284,9 @@ an adopter writes a custom gate in shell only. The registry resolves a member as
 
 **Deliverable:** the registry resolving further substrates under the output, fail-closed, fixture-pair and self-lint contracts: `.ps1` resolution in the registry and the runner, which the hook's `--git-hook` arm dispatches through, with a PowerShell lint counterpart to `check-shellcheck`; a Rust path, as an adopter-built executable the registry dispatches or an extension crate; and the install page's prerequisites per substrate. Whether one executable-dispatch shape serves both is spec's.
 
-**Folded in at build, 2026-10-07 (operator direction, lead-relayed, not a ruling): the hook-wiring rewire windows-kit-bash-files did not land.** It shares this entry's end, the last bash a native-Windows adopter owes, and not its mechanism. context-kit and guard-kit still owe bash there through their settings templates, whose hook commands lead with a `bash` word.
+**The hook-wiring rewire build folded in here on 2026-10-07 is [exec-form-hook-registration](#exec-form-hook-registration)**, its own entry by operator direction of that date: it shares this entry's end, the last bash a native-Windows adopter owes, and not its mechanism.
 
-- **Second deliverable.** Every hook registration a kit ships takes the exec form: `command` naming the gate binary under the project-directory placeholder, with no executable suffix, and `args` carrying `--hook` and the member. The registration parser reads the binary as a command token, and `check-settings-paths` resolves a suffix-less candidate. The plugin's wiring keeps the shell form, since it must exit 0 in a repository that never installed the kits. The refused-repository decline moves into the `--hook` arm. gate-sdk/SPEC.md §The adopter constraints' first script-door class narrows to a value the harness can only run through a shell. The bash row then names a runnable fence and a registered shell gate alone.
-- **Waits on** a native Windows host, which no workflow leg is. Operator-run there 2026-10-07 (harness 2.1.292, both transcripts read): the exec form started, blocked, advised and proceeded on a missing binary by a failed direct spawn, and a suffix-less `command` started the suffixed file. Unrun: no bash on `PATH` with the `PATH` shown; the linked-worktree placeholder.
-- **Run on Linux, harness 2.1.292.** The exec form started the binary with its `args` and a substituted placeholder, and a trailing `;` `touch` in `args` made no file. A block refused the call and an advisory reached the session. With the binary renamed away the call proceeded, and no notice reached the model channel. In a linked worktree the placeholder named the main checkout. A `hooks` edit armed in the running session. A call a tool refuses on its own input never reaches the hook.
-- **Hazard.** The binary given no argument exits 2, so a harness that dropped `args` would block every call the matcher takes. A witness rides a matcher no session uses and a scratch copy of the binary.
-
-**Cost while deferred:** a native-Windows adopter authoring a gate takes on a bash dependency and a second shell dialect, and one wanting a typed, testable gate must write shell or fork; one whose profile carries context-kit or guard-kit needs Git for Windows' bash for the hook wiring. Filed 2026-09-27 by platform-prerequisite-floors' lead. Re-verified: `registry::resolve` tries `sh` then `gate` per dir and nothing else. Owner lookup: `ps1`, `PowerShell`, `custom gate`, `Rust gate`, `consumer crate` in this file — none; owner gate-sdk/SPEC.md §lib/gate.sh and §The port-candidate criteria.
+**Cost while deferred:** a native-Windows adopter authoring a gate takes on a bash dependency and a second shell dialect, and one wanting a typed, testable gate must write shell or fork. Filed 2026-09-27 by platform-prerequisite-floors' lead. Re-verified: `registry::resolve` tries `sh` then `gate` per dir and nothing else. Owner lookup: `ps1`, `PowerShell`, `custom gate`, `Rust gate`, `consumer crate` in this file — none; owner gate-sdk/SPEC.md §lib/gate.sh and §The port-candidate criteria.
 
 ### plugin-harness-reach
 
@@ -477,23 +504,25 @@ a dated post citing a kit SPEC section by heading reds `check-spec-pointer` when
 
 a dispatched session parked a wait nothing could satisfy, after `wait-on-unreachable-condition` landed the clause against it. The first align session of windows-shell-floor-pass, mechanical class, launched `until [ -f .tmp/never-exists-marker ]; do sleep 30; done` 54 seconds after its entry stamp. The wait held the session about fourteen hours, the lead twice calling it harmless, until the operator found and killed it. Operator direction, 2026-10-07, lead session (not a ruling): reporting nothing blocking while a running shell holds a stage session is unacceptable. The lead's half landed at this filing: lifecycle-kit/templates/lead.md reads the process table first, on two named events.
 
-**Deliverable:** a mechanism where the clause failed twice. Candidates: delegation-kit/SPEC.md §The turn-end liveness hook's task-view arm, ruled unconditional because its condition resolves when the task ends, which a producerless loop falsifies; or a guard refusing a wait that names no producer. Which, and whether either is decidable, is spec's.
+**Deliverable:** a mechanism where the clause failed twice. Candidates: delegation-kit/SPEC.md §The turn-end liveness hook's task-view arm, ruled unconditional because its condition resolves when the task ends, which a producerless loop falsifies; or a guard refusing a wait that names no producer. Which, and whether either is decidable, is spec's. Taken into delegation-wait-journal-pass (operator direction, 2026-10-07, lead-relayed, not a ruling).
 
 **Inferred, not run:** the session held on the hook's refusal and never ended its turn — read that session's transcript past the refused turn end
 
 **Cost while deferred:** a held session per occurrence, for as long as nobody reads the process table. Filed 2026-10-07 by windows-shell-floor-pass' lead; found by the operator. Re-verified at this filing's close against the turn-end liveness log it then drained: one `decision=refuse` beside `verdict=green`, 23 seconds after that session's last commit, and no later row for it, so the bullet's claim that the turn ended with the loop running fell. Owner lookup: `waiter`, `never-exists`, `producer`, `process table` in this file and the disposed-findings record — `wait-on-unreachable-condition`, done, the fix this recurred after; [waiter-loop-condition-predicate-gap](#waiter-loop-condition-predicate-gap), DISTINCT (a guard rule over `pgrep` waiters); [turn-end-refusal-used-as-a-busy-wait](#turn-end-refusal-used-as-a-busy-wait), DISTINCT (polling through the refusal).
 
-### git-hook-fail-open-residues
+### exec-form-hook-registration
 
 [cost: event/low] [surface: gate-sdk]
 
-two fail-open residues in the native git hooks. The `--git-hook` arm's selector reads a resolved member's manifest with a read error taken as an empty one (`native/src/emit/git_hook.rs`), so under a tier filter a declaration that resolves and cannot be read drops out of the selection, where gate-sdk/SPEC.md §git-hook has an unreadable registry refuse at exit 2. And `--install-hooks` reports a failed `core.hooksPath` write on stderr, still prints its receipt and returns the identity rung's status (`config` in `native/src/emit/install_hooks.rs`), so it can return 0 with no hook wired.
+the hook-wiring rewire windows-kit-bash-files did not land: context-kit and guard-kit still owe bash on native Windows through their settings templates, whose hook commands lead with a `bash` word. Split 2026-10-07 at scope from [custom-gate-substrates](#custom-gate-substrates), where build had folded it (operator direction, 2026-10-07, lead-relayed, not a ruling: its own entry).
 
-**Deliverable:** both refusing at exit 2, a test row each, and gate-sdk/SPEC.md §git-hook and §install-hooks stating the exit.
+**Deliverable:** every hook registration a kit ships takes the exec form: `command` naming the gate binary under the project-directory placeholder, with no executable suffix, and `args` carrying `--hook` and the member. The registration parser reads the binary as a command token, and `check-settings-paths` resolves a suffix-less candidate. The plugin's wiring keeps the shell form, since it must exit 0 in a repository that never installed the kits. The refused-repository decline moves into the `--hook` arm. gate-sdk/SPEC.md §The adopter constraints' first script-door class narrows to a value the harness can only run through a shell. The bash row then names a runnable fence and a registered shell gate alone.
 
-**Inferred, not run:** either failure — `--git-hook` over a registry with one unreadable member, and `--install-hooks` in a clone whose config cannot be written
+- **Waits on** a native Windows host, which no workflow leg is. Operator-run there 2026-10-07 (Windows 11, harness 2.1.292, two sessions, both transcripts read by the lead): the exec form started the binary with its `args` and the placeholder substituted, and trailing shell words in `args` made no file; a block refused the call and an advisory reached the session; with the binary renamed away the call proceeded on a failed direct spawn of the suffix-less path, which shows no shell stands between; and the suffix-less path started the file carrying the suffix. Unrun: no bash on `PATH`, held on the operator's report with no transcript line showing the `PATH`, where the harness still found Git's bash for its own shell tool; a host with no Git for Windows bash at all; the linked-worktree placeholder on Windows; same-session arming.
+- **Run on Linux, harness 2.1.292.** The same four, and: with the binary renamed away no notice reached the model channel; in a linked worktree the placeholder named the main checkout; a `hooks` edit armed in the running session; a call a tool refuses on its own input never reaches the hook.
+- **Hazard.** The binary given no argument exits 2, so a harness that dropped `args` would block every call the matcher takes. A witness rides a matcher no session uses and a scratch copy of the binary.
 
-**Cost while deferred:** an unreadable gate file is skipped silently at commit, and a failed install reads as wired. Filed 2026-10-07 off windows-shell-floor-pass' close second-vendor review, carried to the next scope's intake. Re-verified by reading both sites. Owner lookup: `hooksPath`, `install-hooks`, `git-hook` in this file and the disposed-findings record — [custom-gate-substrates](#custom-gate-substrates) and [post-spec-cite-no-valve](#post-spec-cite-no-valve), DISTINCT (each names the arm in passing).
+**Cost while deferred:** a native-Windows adopter whose profile carries context-kit or guard-kit needs Git for Windows' bash for the hook wiring. Filed 2026-10-07 by windows-shell-floor-pass' build as a fold, its open question carried by that close to this scope's intake. Owner lookup at that close: hook wiring, settings templates, the exec form and PowerShell in the icebox — no other owner; [hook-contract-harness-neutral](#hook-contract-harness-neutral), DISTINCT (the contract's prose, not the registration's form); owner gate-sdk/SPEC.md §The adopter constraints.
 
 ### windows-hook-legs-unexecuted
 
@@ -506,40 +535,6 @@ four behaviors windows-shell-floor-pass landed run on no Windows leg. gate-sdk/g
 **Inferred, not run:** the last three, the reviewer's claims — read the witness steps of `.github/workflows/gates.yml` and the stop-restore witness
 
 **Cost while deferred:** a Windows-only regression in any of the four ships green. Filed 2026-10-07 off windows-shell-floor-pass' close second-vendor review, carried to the next scope's intake; the first held there by reading the test. Owner lookup: `Windows leg`, `ErrorActionPreference`, `stop-restore`, `witness` in this file and the disposed-findings record — [windows-kpi-plugin-start](#windows-kpi-plugin-start), DISTINCT (a plugin Windows cannot start); owner gate-sdk/SPEC.md §git-hook, with context-kit/SPEC.md §The session-context hook.
-
-### release-rows-removed-template
-
-[cost: event/low] [surface: context-kit]
-
-the accumulating release declaration surface (`.workflow/release-declarations.md`) tells an upgrader to re-copy from a template it also declares removed. Five rows name context-kit's `session-context.sh` template as the source of a re-copy or as gaining a step: two `check-template-copy-parity` rows under New and tightened gates, and the `--emit memory-dirs`, SessionStart-command and update-notice rows under Behavior changes. A later Behavior changes row declares the template removed for the session-context hook member. Composed as they stand, the next release note carries both.
-
-**Deliverable:** the rows rewritten so the note gives each reader one instruction, what a kept copy changes by hand and the move to the member; and the two gate rows kept only if `check-template-copy-parity` still reds a copy whose template is gone, read first.
-
-**Cost while deferred:** the next release note sends an upgrader to a file the same note removes. Filed 2026-10-07 off windows-shell-floor-pass' close second-vendor review, carried to the next scope's intake. Re-verified: the six rows read, and context-kit/templates/ holds no `session-context.sh`. Owner lookup: `release-declarations`, `declaration surface`, `session-context.sh` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §upgrade-smoke.
-
-### journal-fallback-path-relative
-
-[cost: event/low] [surface: lifecycle-kit]
-
-the journal arm's raw-append fallback can name another file from a subdirectory. `--enter-stage` opens the journal at the repository-anchored path and its note prints the pattern's relative spelling, so a session appending by hand to the printed path from beneath the root writes elsewhere, while lifecycle-kit/SPEC.md §The journal arm calls the raw append to the printed path a legal fallback. A new defect after `journal-arm-spec-departures` landed its one-anchor fix.
-
-**Deliverable:** a printed path that resolves from any working directory, or the fallback sentence bounded to the root; with a test row.
-
-**Inferred, not run:** the stray write — an append to the printed path from a subdirectory, after reading the note's print site
-
-**Cost while deferred:** a hand-appended finding lands in a file no successor reads. Filed 2026-10-07 off windows-shell-floor-pass' close second-vendor review, carried to the next scope's intake. Owner lookup: `raw append`, `journal arm`, `fallback` in this file and the disposed-findings record — [journal-caller-child-agent](#journal-caller-child-agent), DISTINCT (whom the arm resolves, not where the fallback writes); [same-stage-journal-append-uncoordinated](#same-stage-journal-append-uncoordinated), DISTINCT (parallel appends).
-
-### journal-caller-child-agent
-
-[cost: event/low] [surface: lifecycle-kit]
-
-the journal arm refuses a stage session's append while a child agent's transcript is the newest. `--emit journal` resolves its caller through the session-id arm's newest-transcript read (`native/src/emit/journal.rs`), so a session that has dispatched a read-only sweep cannot journal until the child's transcript is no longer newest. Reported by windows-shell-floor-pass' close session, which appended by hand in that window; lead-relayed.
-
-**Deliverable:** a caller resolution that survives a live child, or the limit stated in lifecycle-kit/SPEC.md §The journal arm with the fallback named; which is spec's.
-
-**Inferred, not run:** the refusal — `--emit journal` from a session whose dispatched child is mid-run
-
-**Cost while deferred:** the durable-before-acting write fails exactly when a session holds a child's findings. Filed 2026-10-07 by windows-shell-floor-pass' lead after its close, carried to the next scope's intake. Re-verified: the arm takes its id from the session-id arm. Owner lookup: `newest transcript`, `journal arm`, `session-id` in this file and the disposed-findings record — [journal-fallback-path-relative](#journal-fallback-path-relative), DISTINCT (the fallback's path); owner lifecycle-kit/SPEC.md §bin/session-id.sh, which states the newest-transcript limit for the lead's marker.
 
 ### session-sweep-horizon-baked
 
