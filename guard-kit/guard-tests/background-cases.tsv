@@ -21,3 +21,20 @@ fallthrough	false	bash worker.sh
 # the canonical launch in harness form: rule `background_no_record`'s exemption (1) lets the record
 # through and rule `bounded_wait`'s arm (B) grants it, the flag changing nothing in its text
 allow	true	bash scripts/check-foo.sh > .tmp/foo.log 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
+#
+# rule `wait_no_producer` — a backgrounded wait on a file condition is blocked while no record
+#           names a live producer; the sandbox's one record names a dead pid, so
+#           clause (d) holds on every row and the record-set pair is the bespoke
+#           lane's (gate-tests/git-mutation-under-producer.test.sh). Polarity is
+#           not read. The non-firing rows are one per remaining clause: a
+#           foreground call, a second loop span, a condition segment that is no
+#           shell test (`kill -0`, and a test joined to a command), and a body
+#           that runs something besides sleep.
+block	true	until [ -f .tmp/marker ]; do sleep 30; done
+block	true	while [ ! -f .tmp/marker ]; do sleep 30; done
+block	true	until test -d .tmp/out && [[ -s .tmp/out/done ]]; do sleep 30; done; echo waited
+allow	false	until [ -f .tmp/marker ]; do sleep 30; done
+fallthrough	true	until [ -f .tmp/a ]; do sleep 5; done; until [ -f .tmp/b ]; do sleep 5; done
+allow	true	while kill -0 2147483646 2>/dev/null; do sleep 5; done
+allow	true	until [ -f .tmp/marker ] || grep -q DONE .tmp/worker.log; do sleep 5; done
+fallthrough	true	until [ -f .tmp/marker ]; do touch .tmp/marker; sleep 5; done

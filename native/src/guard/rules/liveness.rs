@@ -1,5 +1,6 @@
 // spec: guard-kit/SPEC.md §The generic ruleset — the producer rules: a git write under a live
-// recorded producer, a launch that records nothing, and the two waits granted outright.
+// recorded producer, a launch that records nothing, a wait no producer can end, and the two waits
+// granted outright.
 use super::grants::{slot_reach, Reach};
 use super::reach::{interpreter_reach, refused, rm_tracked_reach};
 use super::{
@@ -257,6 +258,37 @@ pub fn background_no_record(ctx: &Ctx) -> Decided {
     Ok(Some(Verdict::Block(format!("this call backgrounds a child and writes no liveness record — re-issue it with the record written at the launch, in this spelling: '<command> [<redirects>] & echo \"pid=$! run=<key>\" > {h}/<key>.run; wait; rm -f {h}/<key>.run'. The 'wait' keeps the call alive until the child exits, so a backgrounded call's completion notification means the producer finished, and the trailing 'rm -f' retracts the record at exactly that moment. That spelling of an allowlisted command is granted outright, so complying costs no permission decision. The record buys two things nothing else does: it is what gives the tracked-tree-mutation rule its reach, so a commit taken while this child is still writing is refused rather than silently taken; and it is what lets the next arrival tell whether the producer is still writing instead of guessing at a process table. An inline wait loop and a read-only pipeline owe no record; a wait behind a script name cannot be read here and takes the record like any launch. If you genuinely need an unrecorded launch, run it yourself with !<command>.", h = home))))
 }
 
+// spec: guard-kit/SPEC.md §The generic ruleset — rule `wait_no_producer`'s clause (c): a shell test,
+// read past a leading `!`.
+fn is_shell_test(seg: &str) -> bool {
+    matches!(head_word(&command_word(&segment_core(seg))), "[" | "[[" | "test")
+}
+
+pub fn wait_no_producer(ctx: &Ctx) -> Decided {
+    let h = ctx.host();
+    if has_expansion(ctx.raw(ctx.cmd())?) {
+        return Ok(None);
+    }
+    let s = ctx.view(ctx.cmd(), SqDqHd)?;
+    if !(h.background || shell_backgrounds(&s)) {
+        return Ok(None);
+    }
+    let Some((cond, body, _)) = lone_loop(&s) else { return Ok(None) };
+    let stated = |t: &str| ctx.segments(t).into_iter().filter(|g| !trim(g).is_empty()).collect::<Vec<String>>();
+    let (conds, steps) = (stated(&cond), stated(&body));
+    if conds.is_empty() || !conds.iter().all(|g| is_shell_test(g)) {
+        return Ok(None);
+    }
+    if steps.is_empty() || !steps.iter().all(|g| head_word(trim(g)) == "sleep") {
+        return Ok(None);
+    }
+    if !h.live_run_records().is_empty() {
+        return Ok(None);
+    }
+    let home = h.scratch_homes().into_iter().next().unwrap_or_default();
+    Ok(Some(Verdict::Block(format!("this call backgrounds a wait on a file condition while no liveness record names a live producer — nothing this session is entitled to wait on can make that condition true, so the loop would hold the turn open until someone kills it. A wait launched to hold a turn open is the finding itself. Three lawful exits: (1) a shell producer is launched first, with its liveness record under {h}/ ('<command> [<redirects>] & echo \"pid=$! run=<key>\" > {h}/<key>.run; wait; rm -f {h}/<key>.run'), and the wait then passes — or wait on that recorded pid's liveness instead ('while kill -0 <pid> 2>/dev/null; do sleep 5; done'), which ends with the producer; (2) an Agent child is awaited by its completion notification, which needs no wait loop at all; (3) a question to your caller is asked and the turn ended, never waited on. If you genuinely need this wait, run it yourself with !<command>.", h = home))))
+}
+
 fn wait_redirects_inert(ctx: &Ctx, seg: &str) -> bool {
     ctx.redirect_pairs(seg).iter().filter(|p| !p.is_empty()).all(|p| inert_target(strip_redirect_op(p)))
 }
@@ -338,6 +370,20 @@ fn loop_parts(view: &str) -> Option<(String, String, String)> {
         }
     }
     None
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — a skeleton whose first statement is a `while`/`until`
+// loop with exactly one balanced `do … done` span: its condition, its body and what follows it.
+fn lone_loop(s: &str) -> Option<(String, String, String)> {
+    let span = loop_span(s)?;
+    if !matches!(span.first().map_or("", |(_, _, t)| t.as_str()), "until" | "while") {
+        return None;
+    }
+    let count = |w: &str| span.iter().filter(|(_, _, t)| t == w).count();
+    if count("do") != 1 || count("done") != 1 {
+        return None;
+    }
+    loop_parts(&format!("{};", s.replace('\n', ";")))
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — the recorded launch's tail after its `&`:
@@ -532,17 +578,7 @@ pub fn bounded_wait(ctx: &Ctx) -> Decided {
     if s.contains(['\'', '"']) || shell_backgrounds(&s) {
         return Ok(None);
     }
-    let Some(span) = loop_span(&s) else { return Ok(None) };
-    let first = span.first().map_or("", |(_, _, t)| t.as_str());
-    if !matches!(first, "until" | "while") {
-        return Ok(None);
-    }
-    let count = |w: &str| span.iter().filter(|(_, _, t)| t == w).count();
-    if count("do") != 1 || count("done") != 1 {
-        return Ok(None);
-    }
-    let view = format!("{};", s.replace('\n', ";"));
-    let Some((cond, body, tail)) = loop_parts(&view) else { return Ok(None) };
+    let Some((cond, body, tail)) = lone_loop(&s) else { return Ok(None) };
     let mut sleeps = 0usize;
     for seg in ctx.segments(&body) {
         let seg = trim(&seg);

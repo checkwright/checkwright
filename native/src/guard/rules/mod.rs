@@ -43,6 +43,7 @@ pub static TABLE: &[Rule] = &[
         views: &[Raw, SqDqHd, Dequoted],
         test: liveness::background_no_record,
     },
+    Rule { name: "wait_no_producer", shells: BASH, views: &[Raw, SqDqHd], test: liveness::wait_no_producer },
     Rule {
         name: "commit_only_paths",
         shells: BOTH,
@@ -552,10 +553,10 @@ mod tests {
     #[test]
     fn the_table_rows_are_distinct_and_their_views_spell() {
         let mut names: Vec<&str> = TABLE.iter().map(|r| r.name).collect();
-        assert_eq!(names.len(), 30);
+        assert_eq!(names.len(), 31);
         names.sort();
         names.dedup();
-        assert_eq!(names.len(), 30);
+        assert_eq!(names.len(), 31);
         for r in TABLE {
             let mut spelt: Vec<&str> = r.views.iter().map(|v| v.spelling()).collect();
             let n = spelt.len();

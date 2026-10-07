@@ -5,7 +5,8 @@
 # one would turn every other git row in that table into a block. The table keeps
 # the decline arm (a dead record present); everything below needs a process the
 # test itself owns. Each case runs the whole ruleset, so a case another rule
-# decides first asserts that the block is not this rule's.
+# decides first asserts that the block is not this rule's. Rule `wait_no_producer`'s
+# record-set pair lives here on the same ground.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -55,13 +56,32 @@ want() {  # $1=label $2=command $3=want-rc [$4=text the block must not carry] [$
     fi
 }
 
+# rule `wait_no_producer` reads the same record set: 2 = blocked, allow = rule `bounded_wait`'s grant.
+waits() {  # $1=label $2=want (2|allow)
+    checks=$((checks + 1))
+    local got
+    (cd "$tmp/cwd" && printf '{"tool_name":"Bash","tool_input":{"command":"until [ -f marker ]; do sleep 30; done","run_in_background":true}}' \
+        | GUARD_KIT_KNOB_FILE="$tmp/guard.knobs" GUARD_KIT_LOG="$tmp/friction.log" "$BIN" --hook shell-guard >"$tmp/out" 2>"$tmp/err")
+    got=$?
+    grep -qF '"permissionDecision":"allow"' "$tmp/out" && got=allow
+    if [[ "$got" != "$2" ]]; then
+        echo "  FAIL [$1]: a backgrounded file-test wait gave $got, want $2 — $(cat "$tmp/err")"
+        fails=$((fails + 1))
+    elif [[ "$got" == 2 ]] && ! grep -qF "no liveness record names a live producer" "$tmp/err"; then
+        echo "  FAIL [$1]: the block is not rule wait_no_producer's — $(cat "$tmp/err")"
+        fails=$((fails + 1))
+    fi
+}
+
 # --- no record at all: the rule is inert, whatever the command
 want "empty-dir-commit" "git commit -m done" 0
+waits "wait-empty-set" 2
 
 # --- a record naming a dead pid is not a live producer
 printf 'pid=2147483646 run=dead-run\n' >"$tmp/scratch/dead-run.run"
 want "dead-record-commit" "git commit -m done" 0
 want "dead-record-add"    "git add -A" 0
+waits "wait-dead-record" 2
 
 # --- a live record: the whole named write set blocks
 printf 'pid=%s run=validate-batch\n' "$live" >"$tmp/scratch/validate-batch.run"
@@ -69,6 +89,7 @@ for sub in add commit rm mv restore checkout switch reset stash merge rebase \
     cherry-pick revert apply am clean; do
     want "live-blocks-$sub" "git $sub" 2
 done
+waits "wait-live-record" allow
 
 # The corrective must name the blocking run so the reader can tell 'wait for
 # that' from 'reclaim a record whose owner is gone'.
@@ -117,6 +138,7 @@ want "quoted-mention"   "printf 'git commit -m x' >> notes.txt" 0
 rm -f "$tmp/scratch/validate-batch.run" "$tmp/scratch/dead-run.run"
 printf 'garbage\n' >"$tmp/scratch/broken.run"
 want "unparseable-record" "git commit -m done" 0
+waits "wait-unparseable-record" 2
 
 # --- and a file without the '.run' suffix is not a record at all
 printf 'pid=%s run=not-a-record\n' "$live" >"$tmp/scratch/notes.txt"
@@ -147,5 +169,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "git-mutation-under-producer.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "git-mutation-under-producer.test: ok ($checks assertions; the write set blocks under a live record on a Bash or a PowerShell call, read-only git and every conservative direction decline, and rule \`bounded_write\` withholds a removal of a live record)"
+echo "git-mutation-under-producer.test: ok ($checks assertions; the write set blocks under a live record on a Bash or a PowerShell call, read-only git and every conservative direction decline, rule \`bounded_write\` withholds a removal of a live record, and rule \`wait_no_producer\` blocks a backgrounded file-test wait until a record names a live pid)"
 exit 0

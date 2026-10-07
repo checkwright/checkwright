@@ -413,6 +413,9 @@ allow	until [ -f .tmp/marker ]; do sleep 10; done
 # command does. Rule `background_no_record` exempts the wait loop, so this row reaches rule `bounded_wait` and
 # is refused there rather than by an earlier rule's ordering
 fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done &
+# the same shell form over a file test is rule `wait_no_producer`'s block, the sandbox's one
+# record naming a dead pid
+block	until [ -f .tmp/marker ]; do sleep 5; done &
 # clause (a) — the first statement is not the loop
 fallthrough	echo start; until grep -q DONE .tmp/smoke.log; do sleep 5; done
 # clause (b) — the body runs something besides sleep

@@ -153,7 +153,7 @@ pub fn fire(
     Firing { code: 2, stderr: refusal(verdict, reader, run_dir, &runs) }
 }
 
-const TASK_REFUSAL: &str = "turn-end refused: the harness shows a background shell task of this session still running (a call moved to the background, or a backgrounded launch); await its completion notification before ending the turn.\n";
+const TASK_REFUSAL: &str = "turn-end refused: the harness shows a background shell task of this session still running (a call moved to the background, or a backgrounded launch); await its completion notification before ending the turn. Where the task is this session's own wait and nothing will make its condition true, stop it instead: an observer wrote nothing, so stopping it loses nothing.\n";
 
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — only an object element of an array
 // `background_tasks` with `type` `shell` and `status` `running` counts; anything else in the view
@@ -661,7 +661,7 @@ mod tests {
             want(&line, case, &["verdict=green", "records=0", decision]);
             assert!(!line.contains("running"), "case {}: the log carried a value of the view: {}", case, line);
             if rc == 2 {
-                want(&f.stderr, case, &["turn-end refused", "background shell task", "completion notification"]);
+                want(&f.stderr, case, &["turn-end refused", "background shell task", "completion notification", "nothing will make its condition true, stop it"]);
             } else {
                 assert!(f.stderr.is_empty(), "case {}: an allow carries no reason", case);
             }
