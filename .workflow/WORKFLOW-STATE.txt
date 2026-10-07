@@ -4,12 +4,4 @@
 
 ---
 
-windows-shell-floor-pass scope aea6ddb6 2026-10-06 1c441c078
-windows-shell-floor-pass spec ab78e89e 2026-10-06 9ba12f4a7
-windows-shell-floor-pass align aa151943 2026-10-06 c96c8ca24
-windows-shell-floor-pass align a5e51b2c 2026-10-06 878be1b42
-windows-shell-floor-pass build ab615dd2 2026-10-06 3bcfb1c63
-windows-shell-floor-pass build a6192716 2026-10-06 1300f02b0
-windows-shell-floor-pass build ac26cc59 2026-10-06 3cef679a3
-windows-shell-floor-pass validate ad8595f0 2026-10-07 9e5bd227d
-windows-shell-floor-pass close ad682e01 2026-10-07 d35af5d9a
+— scope a502540c 2026-10-07 cd626bd14
