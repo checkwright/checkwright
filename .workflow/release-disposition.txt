@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+windows-shell-floor-pass release deferred:v0.32.0 — a minor at the outstanding v0.32.0 floor, held: no release trigger fired. Elapsed time is dormant under the preview channel; the batch removes a gate, an arm and a knob, each declared and none a deprecation-marked surface, so no decommission; it carries no vulnerability or compromised artifact; no operator direction to release was given; the front door advertises nothing and the marketplace pins nothing the pinned release lacks.
