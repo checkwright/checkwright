@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+windows-shell-floor-pass gates sha256=d49ab61291770857142992a5130ad0f0abefb015c5607aabdc292b972ed3f924 pass=150 fail=0 ignore=0 verdict=clean 2026-10-07
+windows-shell-floor-pass gate_sdk sha256=0db30fa7aadcf36c1a84c6f626ee97d38b8624ce30e03c80ee692e1682880abd pass=1 fail=0 ignore=0 verdict=clean 2026-10-07
+windows-shell-floor-pass canon_kit sha256=94adc56304517c48e98925ef1b60184e537116f84dcc77387eb157e8108c8d50 pass=1 fail=0 ignore=0 verdict=clean 2026-10-07
+windows-shell-floor-pass context_kit sha256=a72a655fbdc2336af37022b95846efa73ffc06864ae2241f7ed48d2867d96cc0 pass=1 fail=0 ignore=0 verdict=clean 2026-10-07
+windows-shell-floor-pass delegation_kit sha256=e8b7dacc5b3a03c2084bd61274ee3c701400be4001eeaafa4126bc7f4b710363 pass=1 fail=0 ignore=0 verdict=clean 2026-10-07
+windows-shell-floor-pass doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-10-07
+windows-shell-floor-pass evidence_kit sha256=c62871f8123949178b90372d234262f4c133b06c830e8faa9bbb9af4d2767fea pass=1 fail=0 ignore=0 verdict=clean 2026-10-07
+windows-shell-floor-pass guard_kit sha256=01d94b4120e133665e01946fe44d31a730d2c6cdfd1570e5ce6b96a7a1b30e1b pass=1 fail=0 ignore=0 verdict=clean 2026-10-07
+windows-shell-floor-pass lifecycle_kit sha256=3443faac1a321c44bbb9958c3e699d905d1cf0b2fd04e67fa0b798773a4fca0e pass=1 fail=0 ignore=0 verdict=clean 2026-10-07
+windows-shell-floor-pass queue_kit sha256=a4c89486a636a6d9c43ded5bbbb06f21bd7c7b3db7a8a330bdcf89eb952b9f7d pass=1 fail=0 ignore=0 verdict=clean 2026-10-07
+windows-shell-floor-pass site_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-10-07
+windows-shell-floor-pass scripts sha256=49dacb217bc9bf8c6be056cfe56c9b86206a045896bf399678cdc401a89e2bde pass=1 fail=0 ignore=0 verdict=clean 2026-10-07
+windows-shell-floor-pass guard_tests sha256=771d271b131828a94e1300cbc8e3b855bdc9b02b16492a71f5d14f640e5468f2 pass=1 fail=0 ignore=0 verdict=clean 2026-10-07
+windows-shell-floor-pass demo sha256=d09b1d8f56e7324f76c00d677d31d80412076b9521a2fe080f7c66d7f6bcbc65 pass=1 fail=0 ignore=0 verdict=clean 2026-10-07
+windows-shell-floor-pass installer_smoke sha256=d4cbde1eb886927706048c90acb287bd1e9a5da5484ce85e96c6e4d3b8c8ab54 pass=28 fail=0 ignore=0 verdict=clean 2026-10-07
+windows-shell-floor-pass consumer_smoke sha256=8740a513b3cae754119560100cc2c94f7c3eb9f5eeaee033ec4e14fc9e69fed2 pass=1 fail=0 ignore=0 verdict=clean 2026-10-07
+windows-shell-floor-pass upgrade sha256=ae572d1be6e76e5500859dc4a131e9a4a04ce8fc0729a5015ce0006827704fd5 pass=1 fail=0 ignore=0 verdict=clean 2026-10-07
+windows-shell-floor-pass agents_md_smoke sha256=f3dd332d1717cf6f7a86df4a5376c6ea0697c28409bf265ae16086631726b439 pass=1 fail=0 ignore=0 verdict=clean 2026-10-07
+windows-shell-floor-pass index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-10-07
+windows-shell-floor-pass native_crate sha256=d28859f3eca692cf752e37e860c0a4f02cdabfb2f2123b70b6f4363732840ba4 pass=1 fail=0 ignore=0 verdict=clean 2026-10-07
+windows-shell-floor-pass projection_witness sha256=61cefa4f377f91ca4e09976b91d219c83d9f72b79ffaa76ab6197bbec948a27a pass=1 fail=0 ignore=0 verdict=clean 2026-10-07
