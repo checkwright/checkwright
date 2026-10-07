@@ -7,3 +7,4 @@
 delegation-wait-journal-pass scope a502540c 2026-10-07 cd626bd14
 delegation-wait-journal-pass spec a47f3e0b 2026-10-07 33994d135
 delegation-wait-journal-pass align ae2a8493 2026-10-07 40de751e7
+delegation-wait-journal-pass build aa4b09e5 2026-10-07 baa3a9f00
