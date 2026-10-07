@@ -293,7 +293,7 @@ the operator states that verification and workflow are fully decoupled, each shi
 
 ### openspec-delta-base-agreement
 
-[cost: event/low] [surface: companion]
+[cost: event/low] [surface: companion] [not-icebox-eligible: 2026-10-07 filed on the operator direction of 2026-09-29 and carries the measurement its gate would rest on; evicting it would compress both away]
 
 an OpenSpec change delta that disagrees with its base spec passes the battery and OpenSpec's own validator, and is caught, if at all, only at archive. Measured on openspec 1.13.2 at companion-technical-gates' spec: `validate --strict` exits 0 on a MODIFIED or RENAMED delta naming an absent requirement and on an ADDED one naming an existing requirement, printing only an INFO line; `archive -y` refuses those three, but `--skip-specs` bypasses the refusal; a REMOVED delta naming an absent requirement passes validate silently and archive takes it as already removed.
 
@@ -301,19 +301,9 @@ an OpenSpec change delta that disagrees with its base spec passes the battery an
 
 **Cost while deferred:** an OpenSpec adopter's technical gates read nothing on a conventional task list, which names no paths, so the companion's code-facing reach there is `check-task-path-claim` alone. Filed 2026-09-29 at companion-technical-gates' spec on an operator direction lead-relayed (not a ruling). Owner lookup: `delta`, `archive`, `openspec` in this file — `companion-spec-to-code-gates`, DISTINCT (it ships the task gates and defers this one), and `toolkit-nav-hierarchy`, DISTINCT (nav labels); owner companion/SPEC.md.
 
-### install-smoke-sh-matrix
-
-[cost: event/low] [surface: .github]
-
-`.github/workflows/gates.yml` spells three unix install-smoke legs as hand-copied jobs, `install-smoke-sh-macos`, `install-smoke-sh-macos-intel` and `install-smoke-sh-linux-arm64`, while every other derived job group is a matrix. The two macOS legs differ only in triple, one `uname -m` probe line and log strings; the arm64 leg is the same shape less the macOS remedy step. The roster step already emits `unix_legs`, read only by `crate-tests-unix`.
-
-**Deliverable:** one install-smoke-sh matrix over `unix_legs` less the baseline triple, the remedy step conditioned on the runner OS being macOS; `install-smoke-sh-linux` stays its own job for its baseline diff and foreign-host containers. **Inferred, not probed:** that nothing reds a declared triple with no smoke leg.
-
-**Cost while deferred:** triplicated YAML held in step by nobody, and a new unix triple needs a hand-written smoke job. Filed 2026-09-29 by companion-technical-gates' lead on an operator question. The rewrite needs a push to witness. Re-verified: the three job keys and the `unix_legs` output in gates.yml. Owner lookup: `install-smoke-sh`, `unix_legs` in this file — none; owner installer/SPEC.md §The consumer smoke.
-
 ### releases-page-table
 
-[cost: event/low] [surface: docs]
+[cost: event/low] [surface: docs] [not-icebox-eligible: 2026-10-07 holds the operator's question of 2026-09-29 and the table shape answering it; evicting it would compress the question away]
 
 docs/releases.md renders its derived note list as a bare list of version links, which repeats the nav: the page carries `nav_children_key: release`, so the nav already lists every note. Operator question, 2026-09-29, lead-relayed: a stats table instead.
 
@@ -367,11 +357,11 @@ the delivery rule under `lead-notification-wake-race`'s remedy, unprobed: does a
 
 ### windows-cfg-msrv-lint-local
 
-[cost: event/low] [surface: gate-sdk]
+[cost: event/low] [surface: gate-sdk] [recurrence: 2026-10-07]
 
-crate code under `cfg(not(unix))` is linted at the MSRV only by `native-artifacts`' Windows clippy legs: `check-crate-arms` lints the host target, and the `gates` job's Windows step is `cargo check`, which carries no `incompatible_msrv` lint. An `io::Error::other` (Rust 1.74, MSRV 1.71) in `front_end_parity.rs` reached a push at drift-kit-tail-crosser-pass and cost a hotfix push (gates run 37279844257).
+crate code under `cfg(not(unix))` is linted at the MSRV only by `native-artifacts`' Windows clippy legs: `check-crate-arms` lints the host target, and the `gates` job's Windows step is `cargo check`, which carries no `incompatible_msrv` lint. An `io::Error::other` (Rust 1.74, MSRV 1.71) in `front_end_parity.rs` reached a push at drift-kit-tail-crosser-pass and cost a hotfix push (gates run 37279844257). Recurred 2026-10-07 at windows-shell-floor-pass on a second axis, the linter's version: the lint step takes whatever clippy each runner image carries, no toolchain being pinned, so `needless_borrows_for_generic_args` in `registry.rs` redded the two aarch64 `native-artifacts` legs, whose image carried a newer clippy than the other legs and the local toolchain, and cost a hotfix push (gates run 37536725024).
 
-**Deliverable:** a contributor-side catch before the push: an opt-in cross-target clippy in `check-crate-arms` where the Windows target is installed, or a pre-push tool. Which, and how it degrades without `rustup`, is spec's: gate-sdk/SPEC.md §check-crate-arms rules the compile-only Windows check no gate, since it needs `rustup` and network.
+**Deliverable:** a contributor-side catch before the push: an opt-in cross-target clippy in `check-crate-arms` where the Windows target is installed, or a pre-push tool; and for the version axis a pinned toolchain or a local lint at the newest runner version. Which, and how it degrades without `rustup`, is spec's: gate-sdk/SPEC.md §check-crate-arms rules the compile-only Windows check no gate, since it needs `rustup` and network.
 
 **Cost while deferred:** a red push and a hotfix push per such slip. Filed 2026-10-05 by that iteration's build. Re-verified: the `gates` job runs `cargo check --target x86_64-pc-windows-msvc`, and the only clippy on a Windows target is `native-artifacts`'. One premise fell: the candidate catcher, a cross-target clippy in the `gates` job, still lands on the push and so saves no red push. Owner lookup: `MSRV`, `clippy`, `cfg(not(unix))` in this file — msrv-move-clippy-arm-coupling (Icebox), DISTINCT (a floor move un-suppressing lints); owner gate-sdk/SPEC.md §check-crate-arms.
 
@@ -458,6 +448,40 @@ kit prose carries the master harness's names where no knob owns them: the hook e
 **Deliverable:** a harness-neutral statement of the hook contract behind a binding table, the kit SPECs citing it; feature-sized, since it restates wire contracts.
 
 **Cost while deferred:** an adopter on another harness reads the hook-member sections as one vendor's protocol, which they are. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' build. Re-verified by grep over the kit SPECs for the event names, payload keys, variables and parameter names: 93 lines, delegation-kit 42, guard-kit 31, context-kit 8, lifecycle-kit 7, gate-sdk 3, drift-kit 1, evidence-kit 1. Owner lookup: `hook contract`, `binding table`, `harness-neutral`, `payload key` in this file and the disposed-findings record — none; [plugin-harness-reach](#plugin-harness-reach), DISTINCT (its per-harness guard wiring would bind against this contract); [harness-literal-catcher-gate](#harness-literal-catcher-gate), DISTINCT (the catcher for sites already generic).
+
+### windows-kpi-plugin-start
+
+[cost: event/low] [surface: drift-kit]
+
+a consumer KPI plugin cannot start on native Windows. The drift report starts a resolved tier-1 or tier-2 `kpi-<name>.sh` path as a program, with no interpreter word, and Windows starts no `.sh`. drift-kit/SPEC.md §The extensibility contract's promise is unreachable there and the row degrades to its plugin-failed read.
+
+**Deliverable:** a plugin dispatch a native-Windows consumer can meet. Its shape is spec's, and a ruling on [custom-gate-substrates](#custom-gate-substrates)' dispatch shape bears on it.
+
+**Inferred, not run:** the row degrades on native Windows — a drift report over a tree registering one plugin, on a Windows leg
+
+**Cost while deferred:** a native-Windows consumer's own KPI never reports. Filed 2026-10-06 by windows-shell-floor-pass' spec, operator direction lead-relayed (not a ruling). Re-verified by reading the report's plugin arm and the process wrapper: the path is spawned as given. Owner lookup: `DRIFT_KIT_KPIS_FILE`, `kpi-`, `plugin failed`, `extensibility` in this file and the disposed-findings record — none; [custom-gate-substrates](#custom-gate-substrates), DISTINCT (gate authoring off bash).
+
+### post-spec-cite-no-valve
+
+[cost: event/low] [surface: canon-kit]
+
+a dated post citing a kit SPEC section by heading reds `check-spec-pointer` when a later unit deletes that section. The other canon gates hold a post immutable and this one carries no valve for it, so an amendment rostering such a post as left standing cannot be followed. Met at native-executable-git-hooks, whose landing repointed the v0.30.0 post's one citation.
+
+**Deliverable:** one rule for a post's section citation, either a valve on the gate's prose-citation pass or a stated duty to repoint; which is spec's, against canon-kit/SPEC.md §check-spec-pointer.
+
+**Cost while deferred:** each section deletion a post cites edits a surface the tree calls immutable. Filed 2026-10-06 by windows-shell-floor-pass' build. Re-verified: the landing commit's diff carries a one-line edit to that post. Owner lookup: `docs/posts`, `check-spec-pointer`, `immutable` in this file and the disposed-findings record — [step-title-cite-unresolved](#step-title-cite-unresolved), DISTINCT (a step title no gate resolves).
+
+### producerless-wait-recurred
+
+[cost: event/high] [surface: delegation-kit]
+
+a dispatched session parked a wait nothing could satisfy, after `wait-on-unreachable-condition` landed the clause against it. The first align session of windows-shell-floor-pass, mechanical class, launched `until [ -f .tmp/never-exists-marker ]; do sleep 30; done` 54 seconds after its entry stamp. The wait held the session about fourteen hours, the lead twice calling it harmless, until the operator found and killed it. Operator direction, 2026-10-07, lead session (not a ruling): reporting nothing blocking while a running shell holds a stage session is unacceptable. The lead's half landed at this filing: lifecycle-kit/templates/lead.md reads the process table first, on two named events.
+
+**Deliverable:** a mechanism where the clause failed twice. Candidates: delegation-kit/SPEC.md §The turn-end liveness hook's task-view arm, ruled unconditional because its condition resolves when the task ends, which a producerless loop falsifies; or a guard refusing a wait that names no producer. Which, and whether either is decidable, is spec's.
+
+**Inferred, not run:** the session held on the hook's refusal and never ended its turn — read that session's transcript past the refused turn end
+
+**Cost while deferred:** a held session per occurrence, for as long as nobody reads the process table. Filed 2026-10-07 by windows-shell-floor-pass' lead; found by the operator. Re-verified at this filing's close against the turn-end liveness log it then drained: one `decision=refuse` beside `verdict=green`, 23 seconds after that session's last commit, and no later row for it, so the bullet's claim that the turn ended with the loop running fell. Owner lookup: `waiter`, `never-exists`, `producer`, `process table` in this file and the disposed-findings record — `wait-on-unreachable-condition`, done, the fix this recurred after; [waiter-loop-condition-predicate-gap](#waiter-loop-condition-predicate-gap), DISTINCT (a guard rule over `pgrep` waiters); [turn-end-refusal-used-as-a-busy-wait](#turn-end-refusal-used-as-a-busy-wait), DISTINCT (polling through the refusal).
 
 ## Icebox
 
@@ -1138,6 +1162,10 @@ Ported gate and emit modules carry spec: comments citing a section for a literal
 ### site-video-poster-rule
 
 No rule holds a docs video to a local poster linking out, so a first embed adds a third-party request.
+
+### install-smoke-sh-matrix
+
+Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix over the roster's unix legs would hold them in step.
 
 ## Done
 

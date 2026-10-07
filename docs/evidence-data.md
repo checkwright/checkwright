@@ -266,3 +266,4 @@
 | evidence-tail-liveness-pass | sc · · b v c | 0f/3d | 0 | 21s clean | 151 |
 | site-fence-release-cites-pass | sc · · b v c | 0f/3d | 0 | 21s clean | 151 |
 | doctrine-brevity-journal-arm-pass | sc sp a b v c | 3f/0d | 2 · ≤0d | 21s clean | 151 |
+| windows-shell-floor-pass | sc sp a b v c | 3f/5d | 2 · ≤1d | 21s clean | 150 |
