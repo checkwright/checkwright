@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: foreign-stage-contract-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,26 @@
 ## New Features
 
 ## Technical Debt
+
+### agent-child-wait-unstated
+
+a dispatched session awaiting an `Agent` child it launched has no stated in-turn wait. delegation-kit/templates/agent-execution.md's backgrounding bullet forbids ending the turn to wait, calls condition-waiting the only channel a dispatched role has, and tells the same reader an `Agent` dispatch is awaited by its completion notification and never looked for on disk. Guard-kit rule `wait_no_producer` refuses the device a session reached for in that bind, a backgrounded marker wait nothing could end, and leaves the bind.
+
+**Deliverable:** the wait a dispatched session owes an `Agent` child, stated in that bullet and its operative copies, with the harness behavior it rests on probed first: what holds a turn open once no other tool call is owed. Observed 2026-10-08 at delegation-wait-journal-pass' close: a child's completion notification reached the dispatching stage session inside its turn, between tool calls, while that session had other work to run.
+
+**Inferred, cannot run before build:** that a turn with nothing left to run receives it — the probe is this unit's first act, and the one transcript read at filing shows a session that backgrounded an unsatisfiable wait and then looped in the foreground on the child's worktree directory.
+
+**Cost while deferred:** a stage session fanning out read-only children holds a rule against each wait it can spell. Filed 2026-10-07 by delegation-wait-journal-pass' spec.
+
+### handback-refusal-unanswered
+
+a turn-end refusal drawn after a dispatched session's report-delivery call was followed by no model turn, in the one transcript read: the session stayed held on its own running shell task until the task was killed. The turn-end liveness hook's refusal presumes a turn that reads it.
+
+**Deliverable:** the measurement — a dispatched child that backgrounds a liveness wait on a short recorded producer, delivers its report and ends, read against the turn-end liveness log and its own transcript — then delegation-kit/SPEC.md stating what the refusal buys after a delivered report, or the hook declining there.
+
+**Inferred, cannot run before build:** that the harness withholds stop-hook feedback after that call — the measurement is this unit's deliverable, and one transcript is all that was read.
+
+**Cost while deferred:** a child that reports with a task still running is held until someone kills the task, by a refusal nobody reads. Filed 2026-10-07 by delegation-wait-journal-pass' spec.
 
 ## Deferred
 
@@ -88,9 +108,11 @@ hosted attestation. The team/paid rung: gates verified server-side by a party th
 
 [cost: iteration/low] [surface: delegation-kit] [roadmap: now/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
 
-foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent. It cashes the public no-lock-in claim — governance enforced at the git/gate boundary, not by trusting the author; the verification substrate and the shared git-index/HEAD serialization are already agent-neutral. *Remaining:* (4) **stage-contract expression** — the stage-skill prose is not vendor-neutral, and a foreign stage session has no stamp path, since it commits nothing and has no transcript the stamp protocol reads.
+foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent. It cashes the public no-lock-in claim — governance enforced at the git/gate boundary, not by trusting the author; the verification substrate and the shared git-index/HEAD serialization are already agent-neutral. *Remaining:* (4) **stage-contract expression** — a foreign stage session has no write path, since it commits nothing and has no transcript the stamp and tier reads take; the harness-bound prose is the bindings'.
 
-**Slices landed**, each in delegation-kit/SPEC.md §The foreign-vendor run and each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); then (2) the dispatch transport with (1) the escalation resume model riding it, `--foreign-resume` continuing a vendor-held session in its kept clone, a permission request travelling as an escalation in the report, and no adapter binding to a tier class (delegation-transport-pass, 2026-10-03). Then (3) the budget oracle, delegation-kit/SPEC.md §The keyed verdict (delegation-wait-journal-pass, 2026-10-07; operator direction, lead-relayed, not a ruling): each adapter may name a usage snapshot and the consumer command that writes it, both arms read §usage-verdict's rule over it before the spawn with the pause axes ahead of age-STALE, and `--foreign-run <adapter> --budget` prints the reading. No foreign run was granted with it: accepted by stub-driven crate cases and one producer read of a vendor's on-disk session store through a scratch binding, so a live turn refreshing the feed is unobserved, as is whether a turn in a vendor's non-persisting mode, two of this repo's three adapters, leaves a usage event on disk; one granted run of each kind settles both. **Open on (3):** the keyed order keeps RESET-OK ahead of both pause axes, so after a gap longer than the short window a run proceeds into a long window at or over its threshold and still live (§The foreign-vendor run's honest limits); whether the long axis precedes RESET-OK is unruled. **This repo's binding (operator direction, 2026-10-07, lead-relayed, not a ruling):** inline in the gitignored `.local` overlay alone, its adapters reading one snapshot under the metric dir from an inline producer; where the knob grammar refuses the inline command the binding is deferred as a gap and this repo stays `OFF`. **Next slice:** (4) stage-contract expression. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
+**Slices landed**, each in delegation-kit/SPEC.md §The foreign-vendor run and each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); then (2) the dispatch transport with (1) the escalation resume model riding it, `--foreign-resume` continuing a vendor-held session in its kept clone, a permission request travelling as an escalation in the report, and no adapter binding to a tier class (delegation-transport-pass, 2026-10-03). Then (3) the budget oracle, delegation-kit/SPEC.md §The keyed verdict (delegation-wait-journal-pass, 2026-10-07; operator direction, lead-relayed, not a ruling): each adapter may name a usage snapshot and the consumer command that writes it, both arms read §usage-verdict's rule over it before the spawn with the pause axes ahead of age-STALE, and `--foreign-run <adapter> --budget` prints the reading. No foreign run was granted with it: accepted by stub-driven crate cases and one producer read of a vendor's on-disk session store through a scratch binding, so a live turn refreshing the feed is unobserved, as is whether a turn in a vendor's non-persisting mode, two of this repo's three adapters, leaves a usage event on disk; one granted run of each kind settles both. **Open on (3):** the keyed order keeps RESET-OK ahead of both pause axes, so after a gap longer than the short window a run proceeds into a long window at or over its threshold and still live (§The foreign-vendor run's honest limits); whether the long axis precedes RESET-OK is unruled. **This repo's binding (operator direction, 2026-10-07, lead-relayed, not a ruling):** inline in the gitignored `.local` overlay alone, its adapters reading one snapshot under the metric dir from an inline producer; `--budget` read it `OK` 2026-10-08. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
+
+**Item (4)'s first slice, operator direction 2026-10-08, lead-relayed (not a ruling):** one read-heavy stage runs foreign in the read-only sandbox and the delegating session performs every state write. **Granted with it:** one live foreign run for its acceptance.
 
 **Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, the pattern the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service) and [plugin-harness-reach](#plugin-harness-reach).
 
@@ -358,6 +380,8 @@ crate code under `cfg(not(unix))` is linted at the MSRV only by `native-artifact
 
 **Deliverable:** a contributor-side catch before the push: an opt-in cross-target clippy in `check-crate-arms` where the Windows target is installed, or a pre-push tool; and for the version axis a pinned toolchain or a local lint at the newest runner version, one rule for the build and the lint with its move trigger stated. Which, and how it degrades without `rustup`, is spec's: gate-sdk/SPEC.md §check-crate-arms rules the compile-only Windows check no gate, since it needs `rustup` and network.
 
+**Push need (2026-10-08, inside the budget):** one mid-iteration push, since a toolchain or lint change in the workflow executes on runners alone and that run is its witness. In foreign-stage-contract-pass' unit set on its recurrence count, operator direction 2026-10-08, lead-relayed (not a ruling); spec authors it.
+
 **Cost while deferred:** a red push and a hotfix push per such slip. Filed 2026-10-05 by that iteration's build. Re-verified: the `gates` job runs `cargo check --target x86_64-pc-windows-msvc`, and the only clippy on a Windows target is `native-artifacts`'. One premise fell: the candidate catcher, a cross-target clippy in the `gates` job, still lands on the push and so saves no red push. Owner lookup: `MSRV`, `clippy`, `cfg(not(unix))` in this file — msrv-move-clippy-arm-coupling (Icebox), DISTINCT (a floor move un-suppressing lints); owner gate-sdk/SPEC.md §check-crate-arms.
 
 ### manual-ops-door-subkey
@@ -512,30 +536,6 @@ a retired gate-binary arm named in a kit SPEC's code span resolves under no gate
 
 **Cost while deferred:** a kit SPEC can cite an arm the binary no longer carries, unread until a reader runs it. Filed 2026-10-07 off windows-shell-floor-pass' close, carried to the next scope's intake. Owner lookup: `arm span`, `front-door-verbs`, `retired arm` in this file and the disposed-findings record — none; owner installer/SPEC.md §check-front-door-verbs.
 
-### agent-child-wait-unstated
-
-[cost: event/low] [surface: delegation-kit]
-
-a dispatched session awaiting an `Agent` child it launched has no stated in-turn wait. delegation-kit/templates/agent-execution.md's backgrounding bullet forbids ending the turn to wait, calls condition-waiting the only channel a dispatched role has, and tells the same reader an `Agent` dispatch is awaited by its completion notification and never looked for on disk. Guard-kit rule `wait_no_producer` refuses the device a session reached for in that bind, a backgrounded marker wait nothing could end, and leaves the bind.
-
-**Deliverable:** the wait a dispatched session owes an `Agent` child, stated in that bullet and its operative copies, with the harness behavior it rests on probed first: what holds a turn open once no other tool call is owed. Observed 2026-10-08 at delegation-wait-journal-pass' close: a child's completion notification reached the dispatching stage session inside its turn, between tool calls, while that session had other work to run.
-
-**Inferred, not run:** that a turn with nothing left to run receives it — the one transcript read at filing shows a session that backgrounded an unsatisfiable wait and then looped in the foreground on the child's worktree directory.
-
-**Cost while deferred:** a stage session fanning out read-only children holds a rule against each wait it can spell. Filed 2026-10-07 by delegation-wait-journal-pass' spec.
-
-### handback-refusal-unanswered
-
-[cost: event/low] [surface: delegation-kit]
-
-a turn-end refusal drawn after a dispatched session's report-delivery call was followed by no model turn, in the one transcript read: the session stayed held on its own running shell task until the task was killed. The turn-end liveness hook's refusal presumes a turn that reads it.
-
-**Deliverable:** the measurement — a dispatched child that backgrounds a liveness wait on a short recorded producer, delivers its report and ends, read against the turn-end liveness log and its own transcript — then delegation-kit/SPEC.md stating what the refusal buys after a delivered report, or the hook declining there.
-
-**Inferred, not run:** that the harness withholds stop-hook feedback after that call — one transcript.
-
-**Cost while deferred:** a child that reports with a task still running is held until someone kills the task, by a refusal nobody reads. Filed 2026-10-07 by delegation-wait-journal-pass' spec.
-
 ### wait-exemption-body-unbounded
 
 [cost: event/low] [surface: guard-kit]
@@ -552,7 +552,7 @@ guard-kit rule `background_no_record`'s bash exemption (2) exempts any backgroun
 
 a supervising session appends to its journal by a hand-spelled redirect. `--emit journal` finds the caller's journal through its stamp, and lifecycle-kit/SPEC.md §The journal arm states that a supervising session's journal has no stamp, so the arm does not reach it. `--emit manual-ops` at delegation-wait-journal-pass' close ranked the shell shape `printf >>` at 22 calls over a close and a supervision session, 8 iterations carrying it.
 
-**Deliverable:** an append form for the lead journal, a feature since it adds an arm form, or the shape added to `DRIFT_KIT_MANUAL_OPS_IGNORE` with its reason; which is spec's.
+**Deliverable:** an append form for the lead journal, a feature since it adds an arm form, or the shape added to `DRIFT_KIT_MANUAL_OPS_IGNORE` with its reason; which is spec's. In foreign-stage-contract-pass' unit set, operator direction 2026-10-08, lead-relayed (not a ruling).
 
 **Inferred, not run:** that the supervision share of those calls is lead-journal appends — the meter logs keys and never text, so the lead transcripts' redirect targets were not read
 

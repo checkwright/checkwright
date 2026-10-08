@@ -4,4 +4,4 @@
 
 ---
 
-— scope a7e99486 2026-10-08 8f7da0946
+foreign-stage-contract-pass scope a7e99486 2026-10-08 8f7da0946
