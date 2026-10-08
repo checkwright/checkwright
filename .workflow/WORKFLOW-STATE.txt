@@ -6,3 +6,4 @@
 
 foreign-stage-contract-pass scope a7e99486 2026-10-08 8f7da0946
 foreign-stage-contract-pass spec a611e67f 2026-10-08 c5a8576f8
+foreign-stage-contract-pass align af9a8e24 2026-10-08 cc35efba9
