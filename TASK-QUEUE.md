@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### handback-refusal-unanswered
-
-a turn-end refusal drawn after a dispatched session's report-delivery call was followed by no model turn, in the one transcript read: the session stayed held on its own running shell task until the task was killed. The turn-end liveness hook's refusal presumes a turn that reads it.
-
-**Deliverable:** the measurement — a dispatched child that backgrounds a liveness wait on a short recorded producer, delivers its report and ends, read against the turn-end liveness log and its own transcript — then delegation-kit/SPEC.md stating what the refusal buys after a delivered report, or the hook declining there.
-
-**Inferred, cannot run before build:** that the harness withholds stop-hook feedback after that call — the measurement is this unit's deliverable, and one transcript is all that was read.
-
-**Cost while deferred:** a child that reports with a task still running is held until someone kills the task, by a refusal nobody reads. Filed 2026-10-07 by delegation-wait-journal-pass' spec.
-
 ## Deferred
 
 ### foreign-project-critique
@@ -1236,4 +1226,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 
 - lead-journal-append-arm
 - agent-child-wait-unstated
+- handback-refusal-unanswered
 
