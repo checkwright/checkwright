@@ -14,15 +14,7 @@ Trigger 3 is mechanized at build entry: `check-stage-entry` assertion C blocks t
 
 **A sweep is a survey — check the record before you buy one, and file the one you buy.** The audit fan-out above is the most expensive survey any stage dispatches. Before dispatching it, read the survey record and run the witness on any block whose heading already answers your question; afterwards, file the finding a later stage will want. Both halves, and what a passing witness licenses you to cite, are lifecycle-kit/SPEC.md §The survey record.
 
-**Where your dispatch names a foreign adapter, the stage's reading runs there and every write stays yours.**
-
-1. Enter, stamp and verify your tier as any session of this stage does.
-2. Write `--emit stage-contract align` to a prompt file in the scratch dir and append what your dispatch gave you that varies.
-3. Run it as an audit-mode `--foreign-run` on the named adapter, under delegation-kit's foreign-run bullet (delegation-kit/templates/agent-execution.md): the budget read first, backgrounded with its liveness record.
-4. Check each finding before you build on it. Perform each proposed write you accept yourself, in this stage's own commit. Answer a question from the governed surfaces or escalate it, and return an answer with `--foreign-resume` where the adapter resumes.
-5. Run this stage's consistency gate yourself.
-6. Record the run's verdict line in your journal and in the message of the commit that lands its findings.
-7. A run that ends `FAILED` or `REFUSED` returns nothing to build on: execute the contract yourself, and where that needs a tier above your dispatch's, escalate a re-tier.
+**Where your dispatch names a foreign adapter**, this stage's reading runs there and every write stays yours: follow lifecycle-kit/templates/host-protocol.md (lifecycle-kit/SPEC.md §The host protocol).
 
 **Audit the amendment against itself before auditing it against the tree.** Two defects are visible on the amendment alone and both survive a green battery. An author-stated count ("three things and no fourth") is an assertion about the deliverable, so check it against what the deltas actually mandate rather than against the sentence it heads. And every `## Existing sections updated` entry must name the delta that owns it (canon-kit/templates/SPEC-amendment.md).
 

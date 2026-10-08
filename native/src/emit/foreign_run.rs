@@ -968,18 +968,41 @@ mod tests {
     // any prompt file does: the adapter reads its bytes whole and the clone stays clean
     #[test]
     fn a_stage_contract_document_runs_as_an_audit_prompt() {
-        let r = Repo::new("stage-contract");
-        let doc = crate::emit::stage_contract::compose(
-            "You write nothing.\n",
-            "align",
-            "Execute the template at kit/templates/stages/align.md, applying the bindings below.\n",
-        );
-        std::fs::write(r.root.join("prompt.md"), &doc).expect("the prompt file");
-        let v = foreign_run(&r.cfg(RO, 60), &r.args("ro", false));
-        assert_eq!(v.code, 0, "{}", v.line);
-        assert!(v.line.contains("mode=audit key=prompt") && v.line.ends_with("patch=none -> OK"), "{}", v.line);
-        let report = std::fs::read(r.run_dir().join("report.txt")).expect("the report");
-        assert_eq!(String::from_utf8_lossy(&report), hash_of(&r, doc.as_bytes()));
+        for stage in admitted_stages() {
+            let r = Repo::new(&format!("stage-contract-{}", stage));
+            let doc = crate::emit::stage_contract::compose(
+                "You write nothing.\n",
+                &stage,
+                &format!("Execute the template at kit/templates/stages/{}.md, applying the bindings below.\n", stage),
+            );
+            std::fs::write(r.root.join("prompt.md"), &doc).expect("the prompt file");
+            let v = foreign_run(&r.cfg(RO, 60), &r.args("ro", false));
+            assert_eq!(v.code, 0, "{}: {}", stage, v.line);
+            assert!(v.line.contains("mode=audit key=prompt") && v.line.ends_with("patch=none -> OK"), "{}", v.line);
+            let report = std::fs::read(r.run_dir().join("report.txt")).expect("the report");
+            assert_eq!(String::from_utf8_lossy(&report), hash_of(&r, doc.as_bytes()), "{}", stage);
+        }
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The host protocol — the admitted set is read off the shipped
+    // stage templates' pointer lines, and the build stage's alone carries none
+    fn admitted_stages() -> Vec<String> {
+        let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../lifecycle-kit/templates/stages");
+        let mut all: Vec<String> = Vec::new();
+        let mut admitted: Vec<String> = Vec::new();
+        for p in walk::glob_files(&dir, &["*.md".to_string()]).expect("the shipped stage templates") {
+            let Some(stage) = p.file_stem().and_then(|s| s.to_str()).map(str::to_string) else { continue };
+            let text = std::fs::read_to_string(&p).expect("a stage template");
+            if text.contains("lifecycle-kit/templates/host-protocol.md") {
+                admitted.push(stage.clone());
+            }
+            all.push(stage);
+        }
+        all.retain(|s| !admitted.contains(s));
+        assert_eq!(all, vec!["build".to_string()], "the stage templates carrying no pointer line");
+        assert!(admitted.len() > 1, "{:?}", admitted);
+        admitted.sort();
+        admitted
     }
 
     // spec: delegation-kit/SPEC.md §Testing — `@PROMPT_FILE@` is substituted with the prompt's
