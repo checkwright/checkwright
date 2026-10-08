@@ -35,13 +35,13 @@
 
 - `gate-sdk/SPEC.md` §check-crate-arms, the paragraph on each half's CI spelling: every leg lints and builds on the toolchain the root file names, and the gate lints on the same one wherever the host runs rustup.
 - The same section gains the honest limit: a host without rustup lints at its own version, and code under `cfg(not(unix))` is linted on a Windows leg alone, so a lint that fires only there still arrives with the push.
-- `CONTRIBUTING.md`, the build-before-commit bullet: the root file names the toolchain, and rustup fetches it on first use.
+- `CONTRIBUTING.md`, the build-before-commit bullet: the root file names the toolchain, and rustup fetches it on first use; and the tool table's `cargo` row, whose `≥ 1.71` stays the floor a build must hold, gains that a rustup host runs the root file's toolchain.
 
 **The `cfg(not(unix))` axis is not in this increment (operator direction, 2026-10-08, lead-relayed).** The entry's deliverable also names a contributor-side catch for Windows-only code, an opt-in cross-target clippy in `check-crate-arms` or a pre-push tool. Either needs the Windows target's standard library on the contributor's host. Probed at authoring on this repo's one build host: no rustup on `PATH`, and no `x86_64-pc-windows-msvc` library under the toolchain's sysroot. An opt-in arm would have no configuration that enables it here, which fails the causal-completeness check's first point. The axis stays on the queue entry, which is demoted.
 
 ## Producers and consumers
 
-- **The toolchain file.** *Producer:* the landing commit, then delta 2's sweep. *Consumers:* rustup, on every CI runner and on a contributor host that has it. *Enabling config:* the file's presence; nothing sets `RUSTUP_TOOLCHAIN` once the build body's export is deleted, by `git grep -n RUSTUP_TOOLCHAIN -- ':!docs' ':!TASK-QUEUE.md'`, which returns that script alone.
+- **The toolchain file.** *Producer:* the landing commit, then delta 2's sweep. *Consumers:* rustup, on every CI runner and on a contributor host that has it. *Enabling config:* the file's presence; nothing sets `RUSTUP_TOOLCHAIN` once the build body's export is deleted, by `git grep -n RUSTUP_TOOLCHAIN -- ':!docs' ':!TASK-QUEUE.md'`, which returns that script alone beside this amendment.
 - **Every field has a reader.** The channel is read at every cargo call; the profile and the component list are read when rustup installs the toolchain, the component by the lint step.
 - **Cargo-running steps,** by `grep -n 'cargo \|build-native.sh\|ci-build-artifact' .github/workflows/*.yml`: in `gates.yml` the `gates` job's build and its Windows `cargo check`, the `native-artifacts` build and lint, and the two crate-test jobs' build and test; in `publish.yml` the artifact build and one host build. Each runs from the repo root.
 - **Roster-holding readers of a new root file:** `scripts/root-allowlist.list`, which `GATE_SDK_ROOT_ALLOWLIST` names.
@@ -58,7 +58,7 @@
 - `.github/workflows/gates.yml` — the lint step's clippy fallback removed (delta 1).
 - `.workflow/audit-roster.txt` — the `toolchain-pin` class (delta 2).
 - `gate-sdk/SPEC.md` §check-crate-arms — the rule and the honest limit (delta 3).
-- `CONTRIBUTING.md` (delta 3).
+- `CONTRIBUTING.md` — the bullet and the `cargo` tool row (delta 3).
 - `docs/gate-sdk/SPEC.md` and every other generated projection of the surfaces above — regenerated, never hand-edited (all deltas).
 - `TASK-QUEUE.md`, the entry — its "left open there" sentence, which deltas 1 and 2 answer (deltas 1 and 2).
 
