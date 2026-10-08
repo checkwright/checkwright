@@ -66,11 +66,11 @@ hosted attestation. The team/paid rung: gates verified server-side by a party th
 
 [cost: iteration/low] [surface: delegation-kit] [roadmap: now/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
 
-foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent. It cashes the public no-lock-in claim — governance enforced at the git/gate boundary, not by trusting the author; the verification substrate and the shared git-index/HEAD serialization are already agent-neutral. *Remaining:* (4) **stage-contract expression**, past its two slices below: a stage whose writes a foreign agent performs.
+foreign agents. A lead delegating a stage to a foreign coding agent. It cashes the public no-lock-in claim — governance enforced at the git/gate boundary, not by trusting the author; the verification substrate and the shared git-index/HEAD serialization are already agent-neutral. *Remaining:* (4) **stage-contract expression**, past its two slices below: a stage whose writes a foreign agent performs.
 
 **Slices landed**, each in delegation-kit/SPEC.md §The foreign-vendor run and each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); then (2) the dispatch transport with (1) the escalation resume model riding it, `--foreign-resume`, that section's Resuming a session (delegation-transport-pass, 2026-10-03). Then (3) the budget oracle, delegation-kit/SPEC.md §The keyed verdict (delegation-wait-journal-pass, 2026-10-07; operator direction, lead-relayed, not a ruling), which owns the read and its `--budget` form. No foreign run was granted with it: accepted by stub-driven crate cases and one producer read of a vendor's on-disk session store through a scratch binding, so a live turn refreshing the feed is unobserved, as is whether a turn in a vendor's non-persisting mode, two of this repo's three adapters, leaves a usage event on disk; one granted run of each kind settles both. **This repo's binding (operator direction, 2026-10-07, lead-relayed, not a ruling):** inline in the gitignored `.local` overlay alone, its adapters reading one snapshot under the metric dir from an inline producer. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
 
-**Item (4)'s two slices landed** (both 2026-10-08; operator direction each, lead-relayed, not a ruling). First (foreign-stage-contract-pass), lifecycle-kit/SPEC.md §The stage-contract arm: the audit stage's reading runs foreign and its host performs every write. Second (foreign-stage-binding-pass), lifecycle-kit/SPEC.md §The host protocol: one protocol file, which every shipped stage template but the build stage's points at. **Grant spent** (one live foreign run, operator grant 2026-10-08, lead-relayed) by the second slice's own audit stage, whose landing commit message carries the run's `OK` verdict line. The agent wrote nothing, kept the frame's five parts and ran the contract's read-only commands unrefused; it left the battery and the successor-entry read to the host, its clone holding no gate binary. **Unobserved:** a foreign agent executing a non-audit contract, ungranted: that slice is accepted by stub-adapter crate cases and a read-only master-harness child handed one such document.
+**Item (4)'s two slices landed** (both 2026-10-08; operator direction each, lead-relayed, not a ruling). First (foreign-stage-contract-pass), lifecycle-kit/SPEC.md §The stage-contract arm: the audit stage's reading runs foreign and its host performs every write. Second (foreign-stage-binding-pass), lifecycle-kit/SPEC.md §The host protocol: one protocol file every shipped stage template but the build stage's points at. **Grant spent** (one live foreign run, operator grant 2026-10-08, lead-relayed) by the second slice's own audit stage, whose landing commit message carries the run's `OK` verdict line. The agent wrote nothing, kept the frame's five parts and ran the contract's read-only commands unrefused; it left the battery and the successor-entry read to the host, its clone holding no gate binary. **Unobserved, ungranted:** a foreign agent on a non-audit contract, whose frame is mostly writes and a reading may rest on ignored content. Accepted on stub-adapter crate cases and a read-only master-harness child handed one.
 
 **Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, the pattern the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service) and [plugin-harness-reach](#plugin-harness-reach).
 
@@ -324,7 +324,7 @@ the front-door rehearsal belongs in the methodology, operator direction 2026-09-
 
 the delivery rule under `lead-notification-wake-race`'s remedy, unprobed: does a completion notification queued during a supervisor's turn that makes no tool call wake its session, and does one tool call before the turn end drain it.
 
-**Deliverable:** that probe, run by a lead with the operator present, since a dispatched session's turn end is its session end and cannot observe it; then lifecycle-kit/templates/lead.md §The lead model's wait clause and the agent-execution backgrounding bullet's bound confirmed or corrected against the result.
+**Deliverable:** that probe, run by a lead with the operator present, since a dispatched session's report is all its caller holds and no session reports on its own turn end (delegation-kit/SPEC.md §The delegation model); then lifecycle-kit/templates/lead.md §The lead model's wait clause and the agent-execution backgrounding bullet's bound confirmed or corrected against the result.
 
 **Inferred, not run:** that a tool call before the turn end delivers the notification — two stalled transcripts show only an undrained queue at the stop, and one 2026-10-02 lead turn with tool calls received its notification inside the turn.
 
@@ -493,6 +493,30 @@ rule `sed_file`'s inline-python arm took one of two like calls in delegation-wai
 **Inferred, not run:** that a computed-text construct in the first body told them apart, the discriminator the rule entry states — neither body was replayed through the hook
 
 **Cost while deferred:** the steer toward the count-asserting rewrite arm is skipped by a shape nobody has named. Filed 2026-10-08 by delegation-wait-journal-pass' close, after its drain, and promoted at the next scope's intake. Re-verified: the rule entry blocks a literal rewrite carrying no computed-text construct and says it leans toward passing. Owner lookup: `python`, `--rewrite`, `heredoc`, `sed_file` in this file and the disposed-findings record — none; owner guard-kit/SPEC.md §The generic ruleset.
+
+### placed-hook-stale-on-rebuild
+
+[cost: event/high] [surface: gate-sdk] [recurrence: 2026-10-08]
+
+a placed git hook keeps running the binary of the last `--install-hooks`. Each hook is a hard link to the gate binary (gate-sdk/SPEC.md §install-hooks), and a build replaces that file, so the link stays on the previous build. A unit that mints a knob and sets it in a host knob file is refused at its own commit by the older binary; a unit that mints none is gated by the older binary and nothing says so. That section calls the arm a one-time per-clone opt-in and states no staleness rule.
+
+**Deliverable:** the placed hooks kept on the current binary, or a stale one named with its remedy. Which is spec's: gate-sdk/bin/build-native.sh re-placing a hook it finds placed, or a freshness check. A behavior change either way.
+
+**Inferred, not run:** that an adopter's `update` replacing the binary leaves that clone's hooks on the previous one — run `update` in a hooked scratch consumer and compare the hook's digest with the binary's
+
+**Cost while deferred:** every rebuild leaves the commit-time gates on the previous binary until a session notices. Filed 2026-10-08 by foreign-stage-binding-pass' build. Re-verified at that iteration's close: the two placed hooks shared one inode and the built binary held another, minutes newer. Its lead judged the recurrence at the second build batch, each session re-running the arm before it could commit, and the close entry met it again. Owner lookup: `install-hooks`, `placed hook`, `hard link`, `gate-hooks`, `hooksPath`, `binary-fresh` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §install-hooks.
+
+### arm-stdout-close-panic
+
+[cost: event/low] [surface: native]
+
+the `--queue` arm panics when its stdout closes before its post-check line: `--queue done <slug>` piped into a one-line filter printed its done line, ran the queue's gates, then died in the standard print macro on a broken pipe. The write had landed and the tree was correct.
+
+**Deliverable:** an arm whose reader has gone exits with no panic trace, on a status that still tells a landed write from a refused one. Whether per arm or once at process start is spec's, and gate-sdk/SPEC.md §The non-gate arm states it.
+
+**Inferred, not run:** that other arms share it — pipe an arm that prints on both sides of a slow step into `head -1` and read stderr
+
+**Cost while deferred:** a reader piping an arm into a line-limiting filter sees a panic trace beside a write that succeeded. Filed 2026-10-08 by foreign-stage-binding-pass' build. Re-verified at that close by reading the verb's source: one print ahead of the post-check and one after it, each the panicking macro; `--emit queue-edges` piped the same way left stderr empty. Owner lookup: `panic`, `pipe`, `stdout` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §The non-gate arm.
 
 ## Icebox
 
@@ -1179,12 +1203,4 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix over the roster's unix legs would hold them in step.
 
 ## Done
-
-- windows-cfg-msrv-lint-local
-- toolchain-fetch-no-retry
-- harness-literal-catcher-gate
-- stage-executor-binding
-- foreign-project-critique
-- turn-end-premise-stale
-- isolated-child-record-blind
 
