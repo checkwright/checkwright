@@ -35,13 +35,8 @@ binary="$(gate_native_bin)"
 binary="${binary##*/}"
 binary="${binary%.exe}$(gate_exe_suffix "$target")"
 
-# spec: gate-sdk/SPEC.md §Consumer payload — a glibc artifact's floor is a version need the loader must refuse below, and the linker decides whether that need is hard: one whose every reference is weak is flagged weak by a newer linker, and the loader then warns and runs. The runner label pins the C library and not the Rust toolchain the image carries (native/runners.list), so the glibc targets build on a named toolchain; move it as one deliberate edit, whose push is its witness.
-case "$target" in
-    *-unknown-linux-gnu)
-        export RUSTUP_TOOLCHAIN=1.98.1
-        rustup toolchain install "$RUSTUP_TOOLCHAIN" --profile minimal --no-self-update
-        ;;
-esac
+# spec: gate-sdk/SPEC.md §check-crate-arms — the toolchain is the root file's for every target; export no RUSTUP_TOOLCHAIN here, which would override it for this body alone, and keep a cargo call ahead of the first rustup one
+cargo --version
 rustup target add "$target"
 bash gate-sdk/bin/build-native.sh --target "$target"
 
@@ -135,7 +130,7 @@ else
   Pin this target's runner in native/runners.list to an image with the older library, or
   raise the row's Minimum cell to $floor_lead $measured, a support narrowing the release
   declaration surface declares under Behavior changes. A glibc measure below the
-  declared floor is a need the linker flagged weak: hold the toolchain this body names."
+  declared floor is a need the linker flagged weak: hold the toolchain rust-toolchain.toml names."
     fi
     echo "floor $target: $floor_lead $measured measured, equal to the declared $floor_lead $declared"
 fi

@@ -47,6 +47,10 @@ plugin
 # crates.io name-reservation placeholder (not developed in; the npm name is installer/)
 reserve
 
+# The Rust toolchain every cargo call takes; rustup resolves it from the working
+# directory upward, so it sits at the root (gate-sdk/SPEC.md §check-crate-arms)
+rust-toolchain.toml
+
 # Rust crate carrying the gate implementations that moved off the shell substrate
 # (not a kit — it carries no checks/ or smoke/; build output is gitignored)
 native

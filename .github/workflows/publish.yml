@@ -99,7 +99,9 @@ jobs:
 
       # spec: installer/SPEC.md §The packer — ROUTE 1: the tooling binary the assemble step dispatches to
       - name: build the gate binary this job's assemble step dispatches to
-        run: bash gate-sdk/bin/build-native.sh
+        run: |
+          cargo --version
+          bash gate-sdk/bin/build-native.sh
 
       - name: assemble the package from the tagged tree
         env:

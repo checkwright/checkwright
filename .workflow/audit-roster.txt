@@ -119,3 +119,8 @@ last: delegation-wait-journal-pass close
 corpus: the range cd626bd14..be279c074's ordered additions: no numbered-list line, one fenced recipe line in delegation-kit's README, the guard rule roster's new member and the keyed verdict's stated check order; every citation of the roster or either check order by position read, then the tree grepped for a rule cited by number or as first or last; delegated to a worktree, the one candidate re-read in the close session
 hits: 1
 declined: one held and fixed as an accuracy defect: delegation-kit/SPEC.md's honest limit called the keyed order the account-keyed one in every step but one, where it also drops the identity arms. The first-rule-that-decides and last-rule-declined sentences are semantic; the one-step-earlier and second-axis citations name the account-keyed order, which did not grow; the wait rule's placement names its neighbor
+
+class: toolchain-pin
+scope: the channel rust-toolchain.toml names against the newest stable Rust release (gate-sdk/SPEC.md §check-crate-arms); un-gateable, since the newest stable is a network read no commit-time gate may make. Compare the two: move the channel in a commit that edits that file alone, whose push is its witness, or record under declined why it holds. A defect a newer toolchain fixes moves it outside this cadence, by the same one-file commit.
+due: release prep
+last: never

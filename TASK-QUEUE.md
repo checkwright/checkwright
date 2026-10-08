@@ -22,7 +22,7 @@ a supervising session appends to its journal by a hand-spelled redirect. `--emit
 
 ### windows-cfg-msrv-lint-local
 
-[spec: SPEC-toolchain-pin.md] [recurrence: 2026-10-07, 2026-10-08]
+[spec: gate-sdk/SPEC.md] [recurrence: 2026-10-07, 2026-10-08]
 
 crate code under `cfg(not(unix))` is linted at the MSRV only by `native-artifacts`' Windows clippy legs: `check-crate-arms` lints the host target, and the `gates` job's Windows step is `cargo check`, which carries no `incompatible_msrv` lint. An `io::Error::other` (Rust 1.74, MSRV 1.71) in `front_end_parity.rs` reached a push at drift-kit-tail-crosser-pass and cost a hotfix push (gates run 37279844257). Recurred 2026-10-07 at windows-shell-floor-pass on a second axis, the linter's version: the lint step takes whatever clippy each runner image carries, no toolchain being pinned, so `needless_borrows_for_generic_args` in `registry.rs` redded the two aarch64 `native-artifacts` legs, whose image carried a newer clippy than the other legs and the local toolchain, and cost a hotfix push (gates run 37536725024). Recurred 2026-10-08 at delegation-wait-journal-pass' close on the same axis through the linker: the image's toolchain moved under its pinned label, the newer linker flagged the glibc artifact's floor need weak, and `install-smoke-sh-linux` redded on no build-input change (gates run 37690695609). Its hotfix, operator direction 2026-10-08, lead-relayed (not a ruling), names a toolchain for the glibc targets in `scripts/ci-build-artifact.sh` and reads hard needs alone (gates run 37732352212, green). Left open there: the named toolchain has no stated trigger to move, and the other targets and the lint step still ride the image's.
 

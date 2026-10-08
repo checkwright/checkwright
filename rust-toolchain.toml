@@ -1,0 +1,5 @@
+# spec: gate-sdk/SPEC.md §check-crate-arms — the one owner of the Rust toolchain version; move the channel in a commit that edits this file alone
+[toolchain]
+channel = "1.98.1"
+profile = "minimal"
+components = ["clippy"]

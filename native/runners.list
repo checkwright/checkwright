@@ -63,7 +63,7 @@
 # instead, because their floor is the glibc symbol set the image's toolchain
 # binds, and a floating image would move it. The label pins the C library and
 # not the Rust toolchain, which moves under it and whose linker decides whether
-# a need is hard, so the build body names that toolchain for these lines too.
+# a need is hard, so the root toolchain file names that toolchain for every line.
 # Every other Linux job in .github/workflows/ builds and measures no adopter
 # platform, so it PINS `ubuntu-24.04`: a `-latest` label moves it with no tree
 # edit and, through a weeks-long rollout, varies run to run. Move those pins as

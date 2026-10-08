@@ -29,7 +29,9 @@ jobs:
         run: sudo gem install --no-document kramdown-parser-gfm liquid:4.0.4
       # spec: gate-sdk/SPEC.md §check-crate-arms — CI's build step stays, ahead of the battery
       - name: build the native gate binary
-        run: bash gate-sdk/bin/build-native.sh
+        run: |
+          cargo --version
+          bash gate-sdk/bin/build-native.sh
       # spec: gate-sdk/SPEC.md §check-crate-arms — the Windows cross-check, compilation and not a gate
       - name: cross-check the crate compiles for Windows
         run: |
@@ -1510,9 +1512,7 @@ jobs:
         shell: bash
         env:
           TARGET: ${{ matrix.target }}
-        run: |
-          cargo clippy --version >/dev/null 2>&1 || rustup component add clippy
-          cargo clippy --release --all-targets --manifest-path native/Cargo.toml --target "$TARGET" -- -D warnings
+        run: cargo clippy --release --all-targets --manifest-path native/Cargo.toml --target "$TARGET" -- -D warnings
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -1569,7 +1569,9 @@ jobs:
       # spec: gate-sdk/SPEC.md §check-crate-arms — the host binary the registry-coverage tests spawn
       - name: build the host gate binary the registry-coverage tests spawn
         shell: bash
-        run: bash gate-sdk/bin/build-native.sh
+        run: |
+          cargo --version
+          bash gate-sdk/bin/build-native.sh
 
       - name: run the crate's unit tests for ${{ matrix.target }}
         shell: bash
@@ -1888,6 +1890,7 @@ jobs:
         env:
           TARGET: ${{ matrix.target }}
         run: |
+          cargo --version
           rustup target add "$TARGET"
           bash gate-sdk/bin/build-native.sh
 
