@@ -20,18 +20,6 @@ a supervising session appends to its journal by a hand-spelled redirect. `--emit
 
 **Cost while deferred:** each lead finding costs a redirect no allowlist entry can grant. Filed 2026-10-08 by delegation-wait-journal-pass' close, after its drain, and promoted at the next scope's intake. Re-verified: the arm section's honest limit, and no `printf` row in `scripts/drift-config.knobs`. Owner lookup: `lead journal`, `printf >>`, `MANUAL_OPS_IGNORE`, `journal arm` in this file and the disposed-findings record — none; the icebox's same-stage-journal-append-uncoordinated, DISTINCT (two stage sessions on one journal), and lead-held-block-no-sanctioned-surface, DISTINCT (a block's record, not the journal's writer); [manual-ops-door-subkey](#manual-ops-door-subkey), DISTINCT (the meter's key).
 
-### windows-cfg-msrv-lint-local
-
-[spec: gate-sdk/SPEC.md] [recurrence: 2026-10-07, 2026-10-08]
-
-crate code under `cfg(not(unix))` is linted at the MSRV only by `native-artifacts`' Windows clippy legs: `check-crate-arms` lints the host target, and the `gates` job's Windows step is `cargo check`, which carries no `incompatible_msrv` lint. An `io::Error::other` (Rust 1.74, MSRV 1.71) in `front_end_parity.rs` reached a push at drift-kit-tail-crosser-pass and cost a hotfix push (gates run 37279844257). Recurred 2026-10-07 at windows-shell-floor-pass on a second axis, the linter's version: the lint step takes whatever clippy each runner image carries, no toolchain being pinned, so `needless_borrows_for_generic_args` in `registry.rs` redded the two aarch64 `native-artifacts` legs, whose image carried a newer clippy than the other legs and the local toolchain, and cost a hotfix push (gates run 37536725024). Recurred 2026-10-08 at delegation-wait-journal-pass' close on the same axis through the linker: the image's toolchain moved under its pinned label, the newer linker flagged the glibc artifact's floor need weak, and `install-smoke-sh-linux` redded on no build-input change (gates run 37690695609). Its hotfix, operator direction 2026-10-08, lead-relayed (not a ruling), names a toolchain for the glibc targets in `scripts/ci-build-artifact.sh` and reads hard needs alone (gates run 37732352212, green). Left open there: the named toolchain has no stated trigger to move, and the other targets and the lint step still ride the image's.
-
-**Deliverable:** a contributor-side catch before the push: an opt-in cross-target clippy in `check-crate-arms` where the Windows target is installed, or a pre-push tool; and for the version axis a pinned toolchain or a local lint at the newest runner version, one rule for the build and the lint with its move trigger stated. Which, and how it degrades without `rustup`, is spec's: gate-sdk/SPEC.md §check-crate-arms rules the compile-only Windows check no gate, since it needs `rustup` and network.
-
-**Push need (2026-10-08, inside the budget):** one mid-iteration push, since a toolchain or lint change in the workflow executes on runners alone and that run is its witness. In foreign-stage-contract-pass' unit set on its recurrence count, operator direction 2026-10-08, lead-relayed (not a ruling); spec authors it. **Narrowed, operator direction 2026-10-08, lead-relayed (not a ruling):** this increment is the version axis alone; the `cfg(not(unix))` catch stays on this entry, which is demoted at build.
-
-**Cost while deferred:** a red push and a hotfix push per such slip. Filed 2026-10-05 by that iteration's build. Re-verified: the `gates` job runs `cargo check --target x86_64-pc-windows-msvc`, and the only clippy on a Windows target is `native-artifacts`'. One premise fell: the candidate catcher, a cross-target clippy in the `gates` job, still lands on the push and so saves no red push. Owner lookup: `MSRV`, `clippy`, `cfg(not(unix))` in this file — msrv-move-clippy-arm-coupling (Icebox), DISTINCT (a floor move un-suppressing lints); owner gate-sdk/SPEC.md §check-crate-arms.
-
 ### heterogeneous-agent-delegation
 
 [spec: SPEC-stage-contract.md] [roadmap: now/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
@@ -395,6 +383,18 @@ the delivery rule under `lead-notification-wake-race`'s remedy, unprobed: does a
 **Inferred, not run:** that a tool call before the turn end delivers the notification — two stalled transcripts show only an undrained queue at the stop, and one 2026-10-02 lead turn with tool calls received its notification inside the turn.
 
 **Cost while deferred:** the lead's wait clause rests on an inferred mechanism; if it is wrong, a stall still costs hours of idle wall-clock until the operator wakes the lead. Filed 2026-10-02 as a split at companion-tier-delegation-pass' scope, operator direction lead-relayed (not a ruling).
+
+### windows-cfg-msrv-lint-local
+
+[cost: event/low] [surface: gate-sdk] [recurrence: 2026-10-07, 2026-10-08]
+
+crate code under `cfg(not(unix))` is linted only by `native-artifacts`' Windows clippy legs: `check-crate-arms` lints the host target, and the `gates` job's Windows step is `cargo check`, which carries no clippy lint, `incompatible_msrv` among them. An `io::Error::other` (Rust 1.74, MSRV 1.71) in `front_end_parity.rs` reached a push at drift-kit-tail-crosser-pass and cost a hotfix push (gates run 37279844257). The two later recurrences were a second axis, the toolchain's version, which rode each runner image (gates runs 37536725024 and 37690695609). **That axis landed at foreign-stage-contract-pass:** the root `rust-toolchain.toml` names the toolchain every build and lint takes, moved by the audit roster's `toolchain-pin` class (gate-sdk/SPEC.md §check-crate-arms). Its push read `cargo 1.98.1` on all 16 cargo-running jobs (gates run 37742767288, green on a re-run of one leg whose toolchain fetch timed out).
+
+**Deliverable:** a contributor-side catch before the push for Windows-only code: an opt-in cross-target clippy in `check-crate-arms` where the Windows target is installed, or a pre-push tool. How it degrades without `rustup` is spec's: gate-sdk/SPEC.md §check-crate-arms rules the compile-only Windows check no gate, since it needs `rustup` and network.
+
+**Waits on host provisioning.** Either catch needs the Windows target's standard library on the contributor's host. Probed at foreign-stage-contract-pass' spec on this repo's one build host: no `rustup` on `PATH`, and no `x86_64-pc-windows-msvc` library under the toolchain's sysroot, so an opt-in arm would have no configuration that enables it here. Narrowed to the version axis for that increment and demoted at its build, operator direction 2026-10-08, lead-relayed (not a ruling).
+
+**Cost while deferred:** a red push and a hotfix push per Windows-only lint slip. Filed 2026-10-05 by that iteration's build. Re-verified: the `gates` job runs `cargo check --target x86_64-pc-windows-msvc`, and the only clippy on a Windows target is `native-artifacts`'. One premise fell: the candidate catcher, a cross-target clippy in the `gates` job, still lands on the push and so saves no red push. Owner lookup: `MSRV`, `clippy`, `cfg(not(unix))` in this file — msrv-move-clippy-arm-coupling (Icebox), DISTINCT (a floor move un-suppressing lints); owner gate-sdk/SPEC.md §check-crate-arms.
 
 ### manual-ops-door-subkey
 
