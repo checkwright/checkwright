@@ -37,7 +37,7 @@
 - The same section gains the honest limit: a host without rustup lints at its own version, and code under `cfg(not(unix))` is linted on a Windows leg alone, so a lint that fires only there still arrives with the push.
 - `CONTRIBUTING.md`, the build-before-commit bullet: the root file names the toolchain, and rustup fetches it on first use.
 
-**Open, escalated to the lead 2026-10-08: the `cfg(not(unix))` axis.** The entry's deliverable also names a contributor-side catch for Windows-only code, an opt-in cross-target clippy in `check-crate-arms` or a pre-push tool. Either needs the Windows target's standard library on the contributor's host. Probed at authoring on this repo's one build host: no rustup on `PATH`, and no `x86_64-pc-windows-msvc` library under the toolchain's sysroot. So an opt-in arm would have no configuration that enables it here, which fails the causal-completeness check's first point, and this amendment authors none until the question closes.
+**The `cfg(not(unix))` axis is not in this increment (operator direction, 2026-10-08, lead-relayed).** The entry's deliverable also names a contributor-side catch for Windows-only code, an opt-in cross-target clippy in `check-crate-arms` or a pre-push tool. Either needs the Windows target's standard library on the contributor's host. Probed at authoring on this repo's one build host: no rustup on `PATH`, and no `x86_64-pc-windows-msvc` library under the toolchain's sysroot. An opt-in arm would have no configuration that enables it here, which fails the causal-completeness check's first point. The axis stays on the queue entry, which is demoted.
 
 ## Producers and consumers
 
@@ -74,6 +74,6 @@
 - [ ] **The push is read.** The unit's one mid-iteration push follows the landing commit, and every run it triggers is watched to green with each leg's toolchain line read off the log.
 - [ ] **The marker discharged** — the cannot-run claim under Producers and consumers is corrected to what that run showed.
 - [ ] **Amendment deleted** — this file removed on merge; none remain for the component (`ls gate-sdk/SPEC-*.md`).
-- [ ] **Queue entry moved after the run is read, before the stage that drains the queue** — never in the merge commit. Demoted with `--queue demote windows-cfg-msrv-lint-local` where the `cfg(not(unix))` axis stays on it, and done where the escalated question removes that axis from it.
+- [ ] **Queue entry moved after the run is read, before the stage that drains the queue** — never in the merge commit. It is demoted, not done, with `--queue demote windows-cfg-msrv-lint-local`: the `cfg(not(unix))` axis stays on it, its body rewritten in that commit to the axis that remains and the host provisioning it waits on.
 - [ ] **Removals propagated** — every name this change retired is declared in `## Retired spellings` above, and `check-amendment-retired-spelling` runs each declaration against the whole tracked tree, not against the specs alone.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as debt tasks (a build-time causal gap is resolved that session, not deferred).

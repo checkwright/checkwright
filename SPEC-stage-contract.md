@@ -8,6 +8,8 @@ A stage runs today only on the master harness: its contract is a skill that harn
 
 **What the slice moves and what it leaves.** It moves the stage's *reading* onto the foreign window. The stamp, the tier verdict, the journal, every commit and the stage's oracle run stay the host's.
 
+**One delta belongs to the entry's previous slice.** Delta 6 settles the order question the budget oracle left open, by operator direction, and touches nothing the first five mint.
+
 **The seam.** The arm, the frame's shipped text and the host protocol are kit mechanism and name no vendor. Which adapter a stage's reading rides is the dispatcher's pick by name (delegation-kit/SPEC.md §The foreign-vendor run), and the frame's path is consumer config. A per-stage executor binding is a later unit's.
 
 ## What changes
@@ -66,8 +68,19 @@ The frame is instruction only, and it tells its reader:
 - The same section's honest limits gain two. **A foreign reading runs no oracle that needs a built artifact**, since the clone is committed state and the gate binary is not tracked. **Nothing verifies the reader's class**: the tier verdict reads the host's transcript, and an adapter binds to no tier class.
 - `delegation-kit/templates/agent-execution.md`, the foreign-run bullet: a stage's contract runs there only as its stage template says.
 
+### (6) An exhausted long window pauses ahead of RESET-OK in the keyed order {design-bearing} {user-facing: operator direction 2026-10-08, lead-relayed — settle the budget oracle's open order question this iteration: an at-or-over long window that has not reset pauses ahead of RESET-OK}
+
+**Not yet applied.** It rides this amendment because the entry is one and the question was left open on it by the budget-oracle slice; no other delta here depends on it.
+
+- `delegation-kit/SPEC.md` §The keyed verdict, the first difference: the keyed order becomes parse → long-axis pause → RESET-OK → short-axis pause → age-STALE → OK. The long axis fires where the snapshot carries a well-formed long pair, its percentage is at or over `DELEGATION_KIT_FOREIGN_PAUSE_PCT_LONG` and its own reset has not passed. The ground is the one the difference already gives for age: usage inside a window only rises until its reset, so the death of the short window says nothing about a long window still running.
+- **The long axis's own dead-window rule is unchanged**: a long pair whose reset has passed is disarmed (§usage-verdict), and the order then reads as it does today.
+- **The line** on that path is the keyed `PAUSE` naming the *long window* and its reset. Its short percentage is the dead window's, so the status clause says the short window rolled over.
+- **The account-keyed order is untouched.** Its weekly axis stays behind RESET-OK and age-STALE, which a demand-driven refresh makes safe there.
+- §The foreign-vendor run, the honest limit **The oracle is as fresh as the consumer's producer**: its last sentence, that a reading whose short window died is `RESET-OK` whatever its long window read, is replaced by the new order's reading: such a reading is `RESET-OK` only where its long window is under threshold, absent or itself reset.
+
 ## Producers and consumers
 
+- **The long-axis-first pause.** *Producer:* the keyed verdict, on a snapshot whose producer mapped a long window onto the weekly pair. *Enabling config:* this repo's overlay binds a producer that writes that pair. *Consumers:* the two the keyed verdict already has, the executor's pre-spawn read, which grades exit 1 as its refusal, and the dispatcher reading `--budget`. No new field, verdict word or exit is minted, so no roster-holding reader gains a name.
 - **The emitted document.** *Producer:* the arm, called by a host (delta 3). *Enabling config:* the defaults; this repo sets neither knob the arm reads beyond its stage roster, and its skills dir holds a shim per stage. *Consumer:* `--foreign-run`, as a prompt file, which reads bytes.
 - **The frame's report parts.** *Reader:* the host, at step 4. No program reads them.
 - **`LIFECYCLE_KIT_STAGE_CONTRACT_FRAME`.** *Reader:* the arm. *Roster-holding readers of a new lifecycle-kit knob,* by `git grep -l LIFECYCLE_KIT_SHIM_NGRAM -- ':!docs'`: lifecycle-kit/SPEC.md §Layout and configuration, the kit's static table in `native/src/knobs/lifecycle_kit.rs` and `native/src/knobs/mod.rs`; `scripts/lifecycle-config.knobs` holds only knobs this repo sets and takes no row.
@@ -84,6 +97,7 @@ The frame is instruction only, and it tells its reader:
 
 - the crate's cases for the arm: the composed document for a shim and for a standalone skill, and each refusal;
 - one case handing the emitted document to `--foreign-run` under the stub adapter the crate's foreign-run cases already use, in audit mode;
+- the crate's keyed-verdict cases for delta 6: a dead short window beside an at-or-over live long window pauses and spawns nothing, the same beside an under-threshold, absent or reset long window is `RESET-OK`, and the account-keyed table is unmoved;
 - one read-only child on the master harness, handed the emitted document for the audit stage and nothing else, its report read against the frame's parts. It shows the document is sufficient without the skill. It is not a foreign observation.
 
 **Unobserved where no foreign run happens:** a foreign agent executing the contract in its vendor's read-only sandbox. That covers whether it holds to the no-write frame (a breach is caught as `REFUSED`, never prevented), whether its sandbox lets the contract's read-only commands run, and whether its report keeps the parts. The line is carried on the queue entry at the demotion.
@@ -97,11 +111,12 @@ The frame is instruction only, and it tells its reader:
 - `lifecycle-kit/templates/frames/stage-contract.md` — new (delta 2); `.workflow/surface-ceiling.txt` — its row (delta 2).
 - `lifecycle-kit/templates/stages/align.md` (delta 3); `lifecycle-kit/templates/lead.md` (delta 4).
 - `lifecycle-kit/README.md` — the arm beside the arms it lists (delta 1).
+- `delegation-kit/SPEC.md` §The keyed verdict — the keyed order and its line on the long-axis path; §The foreign-vendor run — the rewritten freshness limit; §Testing — the cases (delta 6). `native/src/hook/verdict.rs` — the keyed order (delta 6).
 - `delegation-kit/SPEC.md` §The foreign-vendor run — the opening sentence and two honest limits (delta 5); `delegation-kit/templates/agent-execution.md` — the bullet's clause; by `grep -n 'A foreign-vendor run is mechanical' .claude/agents/*.md delegation-kit/templates/*.md` no operative copy restates the bullet (delta 5).
 - `.claude/agents/stage-session.md` — the list of what a dispatch prompt varies gains the adapter (delta 4).
 - `.workflow/release-declarations.md` — a row for the arm, the knob and the frame (deltas 1 and 2).
 - `docs/lifecycle-kit/`, `docs/delegation-kit/` and every other generated projection of the surfaces above — regenerated, never hand-edited (all deltas).
-- `TASK-QUEUE.md`, the cross-vendor delegation entry — its remaining-work line, the landed slice and the unobserved line, rewritten inside the entry cap in the demoting commit (all deltas); the per-stage executor entry's gate sentence, which this slice opens (delta 1).
+- `TASK-QUEUE.md`, the cross-vendor delegation entry — its remaining-work line, the landed slice, the settled order question and the unobserved line, rewritten inside the entry cap in the demoting commit (all deltas); the per-stage executor entry's gate sentence, which this slice opens (delta 1).
 
 ## Retired spellings
 
