@@ -7,3 +7,4 @@
 foreign-stage-binding-pass scope a770478c 2026-10-08 c4efe520a
 foreign-stage-binding-pass spec af4568f6 2026-10-08 745146724
 foreign-stage-binding-pass align a0526278 2026-10-08 8253909de
+foreign-stage-binding-pass build ac53d4d4 2026-10-08 201d0b781
