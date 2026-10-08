@@ -7,9 +7,13 @@ pub const KNOBS: &[&str] = &[
     "LIFECYCLE_KIT_STATE_FILE",
     "LIFECYCLE_KIT_STAGES",
     "LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN",
+    "LIFECYCLE_KIT_LEAD_JOURNAL_FILE",
+    "GATE_SDK_TMP_DIR",
 ];
 
-pub const USAGE: &str = "usage: --emit journal [--] \"<text>\"\n  appends the text, or standard input when no text is given, to the resume journal of the stage the calling session entered; \"--\" admits a text beginning with \"-\"";
+const LEAD: &str = "--lead";
+
+pub const USAGE: &str = "usage: --emit journal [--] \"<text>\"\n       --emit journal --lead [--] \"<text>\"\n  appends the text, or standard input when no text is given, to the resume journal of the stage the calling session entered, or with --lead as the first argument to the lead journal --enter-stage --open-lead-journal opened; \"--\" admits a text beginning with \"-\"";
 
 // spec: lifecycle-kit/SPEC.md §The journal arm — verbatim is the bytes: the blank test reads a
 // lossy view and the append never does, one closing newline added where the text lacks one; a
@@ -74,9 +78,53 @@ fn text_of(args: &[String]) -> Result<Vec<u8>, String> {
     }
 }
 
+fn append(path: &str, body: &[u8]) -> Result<(), String> {
+    use std::io::Write;
+    std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(path)
+        .and_then(|mut f| f.write_all(body))
+        .map_err(|e| format!("cannot append to {}: {}", path, e))
+}
+
+// spec: lifecycle-kit/SPEC.md §The journal arm — the lead form's own refusals: an absent journal
+// and a disposed last segment, each naming the opener as the remedy
+fn lead_refusal(path: &str, text: Option<&str>) -> Result<(), String> {
+    const REMEDY: &str = "run --enter-stage --open-lead-journal first";
+    match text {
+        None => Err(format!("the lead journal {} does not exist, so nothing was appended — {}", path, REMEDY)),
+        Some(t) if super::enter_stage::lead_journal_last_disposed(t) => Err(format!(
+            "the last segment of the lead journal {} is disposed (its last non-empty line is {}), and a              line after the mark would turn it back into an undisposed one, so nothing was appended — {}",
+            path,
+            super::enter_stage::DISPOSITION_MARK,
+            REMEDY
+        )),
+        Some(_) => Ok(()),
+    }
+}
+
+// spec: lifecycle-kit/SPEC.md §The journal arm — the lead form: the knob names the file, so no
+// stamp is read and no id derived
+fn emit_lead(body: &[u8]) -> Result<String, String> {
+    let spelled = super::enter_stage::lead_journal_spelled(
+        &walk::knob_scalar("GATE_SDK_TMP_DIR")?,
+        &walk::knob_scalar("LIFECYCLE_KIT_LEAD_JOURNAL_FILE")?,
+    );
+    let path = super::enter_stage::repo_anchored(&spelled)?;
+    let text = std::fs::read(&path).ok().map(|b| String::from_utf8_lossy(&b).into_owned());
+    lead_refusal(&path, text.as_deref())?;
+    append(&path, body)?;
+    Ok(format!("journal: {} lead\n", path))
+}
+
 pub fn emit(args: &[String]) -> Result<String, String> {
-    let body = shape(&text_of(args)?)?;
+    let lead = args.first().map(String::as_str) == Some(LEAD);
+    let body = shape(&text_of(&args[usize::from(lead)..])?)?;
     worktree_refusal(walk::main_checkout_root().as_deref())?;
+    if lead {
+        return emit_lead(&body);
+    }
 
     let inputs = super::session_id::inputs()?;
     let derived = super::session_id::derive(&inputs)?;
@@ -97,15 +145,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     if let Some(dir) = std::path::Path::new(&path).parent() {
         std::fs::create_dir_all(dir).map_err(|e| format!("cannot create {}: {}", dir.display(), e))?;
     }
-    {
-        use std::io::Write;
-        std::fs::OpenOptions::new()
-            .create(true)
-            .append(true)
-            .open(&path)
-            .and_then(|mut f| f.write_all(&body))
-            .map_err(|e| format!("cannot append to {}: {}", path, e))?;
-    }
+    append(&path, &body)?;
     Ok(format!("journal: {} {} {}\n", path, stage, id))
 }
 
@@ -163,6 +203,17 @@ mod tests {
         assert!(worktree_refusal(None).is_ok());
         let err = worktree_refusal(Some("/main")).expect_err("a linked worktree was admitted");
         assert!(err.contains("`/main`"), "{}", err);
+    }
+
+    #[test]
+    fn the_lead_form_refuses_an_absent_journal_and_a_disposed_last_segment() {
+        let absent = lead_refusal("/s/lead.md", None).expect_err("an absent journal was admitted");
+        assert!(absent.contains("--open-lead-journal"), "{}", absent);
+        let disposed = lead_refusal("/s/lead.md", Some("## lead-journal opened after k\nprose\nDISPOSED\n\n"))
+            .expect_err("a disposed last segment was admitted");
+        assert!(disposed.contains("--open-lead-journal") && disposed.contains("DISPOSED"), "{}", disposed);
+        assert!(lead_refusal("/s/lead.md", Some("")).is_ok());
+        assert!(lead_refusal("/s/lead.md", Some("early\nDISPOSED\n## lead-journal opened after k\nprose\n")).is_ok());
     }
 
     #[test]

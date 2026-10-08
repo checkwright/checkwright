@@ -12,7 +12,7 @@ The lead is optional. An iteration runs correctly with no lead — each stage is
 
 The session-context hook reads it on each re-fire and suppresses its executor-facing steps for this session only — the id match scopes the signal, so no other session inherits it and a stale marker self-invalidates (context-kit/SPEC.md §The session-context hook owns the grammar and limits). Skipping the step costs nothing but the suppression. If the Bash environment lacks the harness session uuid, the id derivation's newest-transcript fallback can mis-pick a just-finished subagent's id — verify before writing the marker (lifecycle-kit/SPEC.md §bin/session-id.sh owns the limit).
 
-Then open your resume journal with `--enter-stage --open-lead-journal` on the gate binary `GATE_SDK_NATIVE_BIN` names before writing to it; never overwrite the file.
+Then open your resume journal with `--enter-stage --open-lead-journal` on the gate binary `GATE_SDK_NATIVE_BIN` names before writing to it; never overwrite the file. Append to it with `--emit journal --lead "<finding>"`.
 
 Then read the model roster: run `--price-coverage` on the gate binary `GATE_SDK_NATIVE_BIN` names (drift-kit/SPEC.md §The price-coverage arm; without drift-kit, skip this). An id it names unpriced is a harness roster churn. Re-judge every tier assignment before your first dispatch (§Economics), and file the missing row with `--emit file-gap`. File a `CHANGED` price page the same way.
 

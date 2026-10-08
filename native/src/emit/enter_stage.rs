@@ -1523,7 +1523,17 @@ pub const DISPOSITION_MARK: &str = "DISPOSED";
 const LEAD_OPEN_MARK: &str = "## lead-journal opened after ";
 
 fn lead_journal_file(c: &Cfg) -> String {
-    format!("{}/{}", c.tmpdir.trim_end_matches('/'), c.lead_journal)
+    lead_journal_spelled(&c.tmpdir, &c.lead_journal)
+}
+
+pub fn lead_journal_spelled(tmpdir: &str, name: &str) -> String {
+    format!("{}/{}", tmpdir.trim_end_matches('/'), name)
+}
+
+// spec: lifecycle-kit/SPEC.md §The journal arm — the lead form's disposed read is the segment
+// reader the opener and the boundary advisory share, called a third time rather than copied
+pub fn lead_journal_last_disposed(text: &str) -> bool {
+    lead_segments(text).last().is_some_and(|s| s.disposed())
 }
 
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — fields 2 through the last of the last stamp,

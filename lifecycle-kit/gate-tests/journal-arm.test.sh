@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: lifecycle-kit/SPEC.md §The journal arm — the arm end-to-end in a non-git sandbox: an operand and a standard input land in the journal of the caller's last-stamped stage and never the cursor's, a waiver line is no stage, every refusal exits 2 leaving each journal byte-identical, an absent journal and directory are created whatever the require switch, a retargeted pattern is followed, an absent state file is refused as an unstamped caller, standard input lands byte for byte, from a subdirectory of a repository every reader of the derivation names one file and the path the entry printed and the one the arm prints each take a raw append into it, and a derived id no stamp carries walks its own scan newest-first to the first stamped id, refusing when none is
+# spec: lifecycle-kit/SPEC.md §The journal arm — the arm end-to-end in a non-git sandbox: an operand and a standard input land in the journal of the caller's last-stamped stage and never the cursor's, a waiver line is no stage, every refusal exits 2 leaving each journal byte-identical, an absent journal and directory are created whatever the require switch, a retargeted pattern is followed, an absent state file is refused as an unstamped caller, standard input lands byte for byte, from a subdirectory of a repository every reader of the derivation names one file and the path the entry printed and the one the arm prints each take a raw append into it, and a derived id no stamp carries walks its own scan newest-first to the first stamped id, refusing when none is; and the lead form: an operand and a standard input land after an open heading with the one stdout line and no stamp read, an absent journal and a disposed last segment are refused naming the opener, a linked worktree is refused, and the separator admits a text that begins with the flag
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -195,6 +195,57 @@ out="$(walk "$sb" --emit-journal "a finding")"; rc=$?
 grep -qF '0badc0de' <<<"$out" || note child-none-id "the refusal does not name the derived id: $out"
 [[ -e "$sb/scratch" ]] && note child-none-nowrite "a refused walk created the journal directory"
 
+# --- the lead form: the knob names the file, no stamp is read, and the write is the stage form's ---
+lead_arm() {  # $1=sandbox  $2..=the arm's argv after --lead; stdin is the caller's; no state file is named
+    local sb="$1"; shift
+    ( cd "${FROM:-$sb}" && gate_env LIFECYCLE_KIT_KNOB_FILE="$sb/lifecycle-config.knobs" \
+                           GATE_SDK_TMP_DIR=scratch \
+                           LIFECYCLE_KIT_STATE_FILE=state/absent.txt \
+                           LIFECYCLE_KIT_LEAD_JOURNAL_FILE="${LEADFILE:-lead-journal.md}" \
+                           LIFECYCLE_KIT_SESSION_ID=0badc0de01 \
+        && gate_arm_run --emit-journal --lead "$@" 2>&1 )
+}
+sb="$SANDBOX/lead"; mkdir -p "$sb/scratch"; : >"$sb/lifecycle-config.knobs"
+opened='## lead-journal opened after build deadbeef 2026-06-02 none'
+printf '## early\nDISPOSED\n\n%s\n' "$opened" >"$sb/scratch/lead-journal.md"
+out="$(lead_arm "$sb" "a lead finding")"; rc=$?
+[[ "$rc" -eq 0 && "$out" == "journal: "*"scratch/lead-journal.md lead" ]] || note lead-stdout "want exit 0 and the one line, got $rc -- $out"
+[[ "$(tail -n 2 "$sb/scratch/lead-journal.md")" == "$opened"$'\n'"a lead finding" ]] \
+    || note lead-body "the operand did not land verbatim after the open heading: $(cat "$sb/scratch/lead-journal.md")"
+out="$(printf 'line one\nline two\n' | lead_arm "$sb")"; rc=$?
+[[ "$rc" -eq 0 && "$(tail -n 2 "$sb/scratch/lead-journal.md")" == $'line one\nline two' ]] \
+    || note lead-stdin "the standard input did not land whole (exit $rc): $out"
+out="$(lead_arm "$sb" -- "--lead is where this text begins" </dev/null)"; rc=$?
+[[ "$rc" -eq 0 && "$(tail -n 1 "$sb/scratch/lead-journal.md")" == "--lead is where this text begins" ]] \
+    || note lead-separator "the separator did not admit a text beginning with the flag (exit $rc): $out"
+[[ -e "$sb/state" ]] && note lead-no-state "the lead form created or needed a state file"
+before="$(cat "$sb/scratch/lead-journal.md")"
+for argv in 'one two' '-led' ''; do
+    # shellcheck disable=SC2086
+    out="$(lead_arm "$sb" $argv </dev/null)"; rc=$?
+    [[ "$rc" -eq 2 && "$(cat "$sb/scratch/lead-journal.md")" == "$before" ]] || note "lead-argv[$argv]" "want exit 2 and no write, got $rc -- $out"
+done
+out="$(LEADFILE=other.md lead_arm "$sb" "a finding")"; rc=$?
+[[ "$rc" -eq 2 && ! -e "$sb/scratch/other.md" ]] || note lead-absent "an absent lead journal was not refused without a write (exit $rc): $out"
+grep -qF -- '--enter-stage --open-lead-journal' <<<"$out" || note lead-absent-remedy "the refusal does not name the opener: $out"
+printf 'DISPOSED\n\n' >>"$sb/scratch/lead-journal.md"; before="$(cat "$sb/scratch/lead-journal.md")"
+out="$(lead_arm "$sb" "after the mark")"; rc=$?
+[[ "$rc" -eq 2 && "$(cat "$sb/scratch/lead-journal.md")" == "$before" ]] || note lead-disposed "a disposed last segment was not refused without a write (exit $rc): $out"
+grep -qF -- '--enter-stage --open-lead-journal' <<<"$out" || note lead-disposed-remedy "the refusal does not name the opener: $out"
+
+# --- a linked worktree is refused by both forms' shared check ---
+sb="$SANDBOX/lead-wt"; mkdir -p "$sb/scratch"; : >"$sb/lifecycle-config.knobs"; echo seed >"$sb/seed"
+git -C "$sb" init -q
+git -C "$sb" add seed
+git -C "$sb" -c user.email=t@t.invalid -c user.name=t -c commit.gpgsign=false commit -qm seed
+git -C "$sb" worktree add -q "$SANDBOX/lead-wt-linked" 2>/dev/null
+mkdir -p "$SANDBOX/lead-wt-linked/scratch"
+printf '%s\n' "$opened" | tee "$sb/scratch/lead-journal.md" >"$SANDBOX/lead-wt-linked/scratch/lead-journal.md"
+out="$(FROM="$SANDBOX/lead-wt-linked" lead_arm "$sb" "from a worktree")"; rc=$?
+[[ "$rc" -eq 2 ]] || note lead-worktree "want exit 2 from a linked worktree, got $rc -- $out"
+[[ "$(cat "$sb/scratch/lead-journal.md" "$SANDBOX/lead-wt-linked/scratch/lead-journal.md")" == "$opened"$'\n'"$opened" ]] \
+    || note lead-worktree-nowrite "a refused worktree call wrote a journal"
+
 [[ "$fails" -eq 0 ]] || { echo "journal-arm.test: $fails assertion(s) failed"; exit 1; }
-echo "journal-arm.test: clean (an operand and a standard input land in the caller's last-stamped stage's journal with the one stdout line, DONE stands last, the cursor's journal and a waiver line are not read, five refusals exit 2 writing nothing, the separator admits a dash-led text, an absent journal is created at either require value, a retargeted pattern is followed, an absent state file is the unstamped refusal, a non-UTF-8 byte lands as itself, from a subdirectory the opener, the entry assertion and the arm name one file, the path the entry printed and the one the arm prints each take a raw append there into that file, and an unstamped derived id walks its scan to the stamped caller or refuses naming itself)"
+echo "journal-arm.test: clean (an operand and a standard input land in the caller's last-stamped stage's journal with the one stdout line, DONE stands last, the cursor's journal and a waiver line are not read, five refusals exit 2 writing nothing, the separator admits a dash-led text, an absent journal is created at either require value, a retargeted pattern is followed, an absent state file is the unstamped refusal, a non-UTF-8 byte lands as itself, from a subdirectory the opener, the entry assertion and the arm name one file, the path the entry printed and the one the arm prints each take a raw append there into that file, and an unstamped derived id walks its scan to the stamped caller or refuses naming itself; the lead form appends an operand, a standard input and a flag-led text behind the separator to the knob's file with no state file, and refuses its argv errors, an absent journal, a disposed last segment and a linked worktree writing nothing)"
 exit 0
