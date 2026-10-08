@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+foreign-stage-binding-pass gates sha256=0af633e9f45981e0c30ad2e8ae74c61ffc7b53c425133dbca8f28d4b77e4b7af pass=151 fail=0 ignore=0 verdict=clean 2026-10-08
+foreign-stage-binding-pass gate_sdk sha256=0db30fa7aadcf36c1a84c6f626ee97d38b8624ce30e03c80ee692e1682880abd pass=1 fail=0 ignore=0 verdict=clean 2026-10-08
+foreign-stage-binding-pass canon_kit sha256=94adc56304517c48e98925ef1b60184e537116f84dcc77387eb157e8108c8d50 pass=1 fail=0 ignore=0 verdict=clean 2026-10-08
+foreign-stage-binding-pass context_kit sha256=a72a655fbdc2336af37022b95846efa73ffc06864ae2241f7ed48d2867d96cc0 pass=1 fail=0 ignore=0 verdict=clean 2026-10-08
+foreign-stage-binding-pass delegation_kit sha256=e8b7dacc5b3a03c2084bd61274ee3c701400be4001eeaafa4126bc7f4b710363 pass=1 fail=0 ignore=0 verdict=clean 2026-10-08
+foreign-stage-binding-pass doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-10-08
+foreign-stage-binding-pass evidence_kit sha256=c62871f8123949178b90372d234262f4c133b06c830e8faa9bbb9af4d2767fea pass=1 fail=0 ignore=0 verdict=clean 2026-10-08
+foreign-stage-binding-pass guard_kit sha256=01d94b4120e133665e01946fe44d31a730d2c6cdfd1570e5ce6b96a7a1b30e1b pass=1 fail=0 ignore=0 verdict=clean 2026-10-08
+foreign-stage-binding-pass lifecycle_kit sha256=3443faac1a321c44bbb9958c3e699d905d1cf0b2fd04e67fa0b798773a4fca0e pass=1 fail=0 ignore=0 verdict=clean 2026-10-08
+foreign-stage-binding-pass queue_kit sha256=a4c89486a636a6d9c43ded5bbbb06f21bd7c7b3db7a8a330bdcf89eb952b9f7d pass=1 fail=0 ignore=0 verdict=clean 2026-10-08
+foreign-stage-binding-pass site_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-10-08
+foreign-stage-binding-pass scripts sha256=f88ec531b14135c9d1898d115c8cca0373e69162989d20d3732cd75ca79554b5 pass=1 fail=0 ignore=0 verdict=clean 2026-10-08
+foreign-stage-binding-pass guard_tests sha256=cf5ff176b69d3b14f74d3dfc4c0e07bf7b796801b2101379b363c23c82f7c5a1 pass=1 fail=0 ignore=0 verdict=clean 2026-10-08
+foreign-stage-binding-pass demo sha256=614a54c1c1b0bdbe61d65cde3bfd4367a21b321bef1fc932d19862ebfa9281bd pass=1 fail=0 ignore=0 verdict=clean 2026-10-08
+foreign-stage-binding-pass installer_smoke sha256=a3a4f3b347a9e4802f3bf98f0874f79d24c12ed388eeebe1fa14c00cd249b0af pass=28 fail=0 ignore=0 verdict=clean 2026-10-08
+foreign-stage-binding-pass consumer_smoke sha256=806a9de07780fd537467f3cb026aeacf7e524d9ecb490c2faf33924a6fd41791 pass=1 fail=0 ignore=0 verdict=clean 2026-10-08
+foreign-stage-binding-pass upgrade sha256=7b1f8753d207041b048d474c346972dd3959f08a43e0f254a6d99e06304b0141 pass=1 fail=0 ignore=0 verdict=clean 2026-10-08
+foreign-stage-binding-pass agents_md_smoke sha256=54f4922d3ac38dd2c7cad7e20628b996aaba1bc4b58bde726a8d3d88038bcc1e pass=1 fail=0 ignore=0 verdict=clean 2026-10-08
+foreign-stage-binding-pass index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-10-08
+foreign-stage-binding-pass native_crate sha256=a87aa0c38d3b4bc48cbd19b8159fbe0d1816788038d7ed7b48b69b62cbdb23c2 pass=1 fail=0 ignore=0 verdict=clean 2026-10-08
+foreign-stage-binding-pass projection_witness sha256=acff644d24a5c8576bafccf557456f7ee5d2f72eda44ea89d8c12fa03704b1b5 pass=1 fail=0 ignore=0 verdict=clean 2026-10-08
