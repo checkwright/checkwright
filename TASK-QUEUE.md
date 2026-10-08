@@ -56,6 +56,28 @@ an on-demand critique of the project's strategic weaknesses, run on the top fore
 
 **Cost while deferred:** strategic weaknesses surface only through the operator's own reading. The filing's ground, that this cost was nil while the operator held no foreign credit, lapsed: credit is held (operator answer 2026-10-06, lead-relayed, a fact and no run grant). Filed 2026-10-03 by delegation-transport-pass' lead. Re-verified: no tracked prose names a SWOT or an on-demand foreign critique. Owner lookup: `SWOT`, `critique`, `strategic`, `reflection` in this file — foreign-vendor-critique, DISTINCT (its close review landed this iteration); owner delegation-kit/SPEC.md §The foreign-vendor run, the SWOT's home open.
 
+### harness-literal-catcher-gate
+
+[spec: SPEC-harness-literal.md]
+
+kit prose outside the adapter surfaces can re-acquire a harness-bound literal with the battery green: the sweep that named the hook anchor generically landed with no catcher, against doctrine-kit/DOCTRINE.md Enforcement-first.
+
+**Deliverable:** a gate reading a knob-listed set of harness literals, the project-directory variable first, and red on any outside a knob-listed adapter-surface set (the wiring templates, plugin/, the settings-path reader's SPEC section and each sentence declaring the binding); new mechanism, so it enters through scope. In the unit set, 2026-10-08 (operator direction, lead-relayed, not a ruling).
+
+**Cost while deferred:** an edit to a kit SPEC or README can name one harness's variable where the generic name stood, unread until an adopter on another harness meets it. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' build on an operator direction, lead-relayed (not a ruling). Re-verified by grep over the kit SPECs and READMEs: the variable stands in plugin/SPEC.md, context-kit/SPEC.md's reader section, and one binding sentence each in guard-kit/SPEC.md and delegation-kit/README.md. Owner lookup: `harness literal`, `adapter surface`, `project-directory` in this file and the disposed-findings record — none; [plugin-harness-reach](#plugin-harness-reach), DISTINCT (the plugin's reach on other harnesses); owner gate-sdk/SPEC.md §The adopter constraints.
+
+### windows-cfg-msrv-lint-local
+
+[spec: SPEC-cross-target-lint.md] [recurrence: 2026-10-07, 2026-10-08]
+
+crate code under `cfg(not(unix))` is linted only by `native-artifacts`' Windows clippy legs: `check-crate-arms` lints the host target, and the `gates` job's Windows step is `cargo check`, which carries no clippy lint, `incompatible_msrv` among them. An `io::Error::other` (Rust 1.74, MSRV 1.71) in `front_end_parity.rs` reached a push at drift-kit-tail-crosser-pass and cost a hotfix push (gates run 37279844257). The two later recurrences were a second axis, the toolchain's version, which rode each runner image (gates runs 37536725024 and 37690695609). **That axis landed at foreign-stage-contract-pass:** the root `rust-toolchain.toml` names the toolchain every build and lint takes, moved by the audit roster's `toolchain-pin` class (gate-sdk/SPEC.md §check-crate-arms). Its push read `cargo 1.98.1` on all 16 cargo-running jobs (gates run 37742767288, green on a re-run of one leg whose toolchain fetch timed out).
+
+**Deliverable:** a contributor-side catch before the push for Windows-only code: an opt-in cross-target clippy in `check-crate-arms` where the Windows target is installed, or a pre-push tool. How it degrades without `rustup` is spec's: gate-sdk/SPEC.md §check-crate-arms rules the compile-only Windows check no gate, since it needs `rustup` and network.
+
+**The host-provisioning wait fell, 2026-10-08 at scope.** The build host still carries no `rustup` on `PATH` and no `x86_64-pc-windows-msvc` library under the toolchain's sysroot, re-probed, but a container reaches both: in the stock Rust image, the tree mounted read-only and marked a safe directory, the target and clippy added through its `rustup`, `cargo clippy --target x86_64-pc-windows-msvc --all-targets` finished clean on the crate. Lead-probed and re-run by scope; it needs a container runtime and network, and no Windows-only lint was seeded to see it red. Entered the unit set on the recurrence threshold (lead decision, 2026-10-08). **Constraint (lead decision on an operator direction, 2026-10-08, lead-relayed, not a ruling):** the catch runs on a Linux host with no Windows machine and no operator step; whether it is a container arm and how it degrades is spec's.
+
+**Cost while deferred:** a red push and a hotfix push per Windows-only lint slip. Filed 2026-10-05 by that iteration's build. Re-verified: the `gates` job runs `cargo check --target x86_64-pc-windows-msvc`, and the only clippy on a Windows target is `native-artifacts`'. One premise fell: the candidate catcher, a cross-target clippy in the `gates` job, still lands on the push and so saves no red push. Owner lookup: `MSRV`, `clippy`, `cfg(not(unix))` in this file — msrv-move-clippy-arm-coupling (Icebox), DISTINCT (a floor move un-suppressing lints); owner gate-sdk/SPEC.md §check-crate-arms.
+
 ## Technical Debt
 
 ### toolchain-fetch-no-retry
@@ -388,18 +410,6 @@ the delivery rule under `lead-notification-wake-race`'s remedy, unprobed: does a
 
 **Cost while deferred:** the lead's wait clause rests on an inferred mechanism; if it is wrong, a stall still costs hours of idle wall-clock until the operator wakes the lead. Filed 2026-10-02 as a split at companion-tier-delegation-pass' scope, operator direction lead-relayed (not a ruling).
 
-### windows-cfg-msrv-lint-local
-
-[cost: event/low] [surface: gate-sdk] [recurrence: 2026-10-07, 2026-10-08]
-
-crate code under `cfg(not(unix))` is linted only by `native-artifacts`' Windows clippy legs: `check-crate-arms` lints the host target, and the `gates` job's Windows step is `cargo check`, which carries no clippy lint, `incompatible_msrv` among them. An `io::Error::other` (Rust 1.74, MSRV 1.71) in `front_end_parity.rs` reached a push at drift-kit-tail-crosser-pass and cost a hotfix push (gates run 37279844257). The two later recurrences were a second axis, the toolchain's version, which rode each runner image (gates runs 37536725024 and 37690695609). **That axis landed at foreign-stage-contract-pass:** the root `rust-toolchain.toml` names the toolchain every build and lint takes, moved by the audit roster's `toolchain-pin` class (gate-sdk/SPEC.md §check-crate-arms). Its push read `cargo 1.98.1` on all 16 cargo-running jobs (gates run 37742767288, green on a re-run of one leg whose toolchain fetch timed out).
-
-**Deliverable:** a contributor-side catch before the push for Windows-only code: an opt-in cross-target clippy in `check-crate-arms` where the Windows target is installed, or a pre-push tool. How it degrades without `rustup` is spec's: gate-sdk/SPEC.md §check-crate-arms rules the compile-only Windows check no gate, since it needs `rustup` and network.
-
-**The host-provisioning wait fell, 2026-10-08 at scope.** The build host still carries no `rustup` on `PATH` and no `x86_64-pc-windows-msvc` library under the toolchain's sysroot, re-probed, but a container reaches both: in the stock Rust image, the tree mounted read-only and marked a safe directory, the target and clippy added through its `rustup`, `cargo clippy --target x86_64-pc-windows-msvc --all-targets` finished clean on the crate. Lead-probed and re-run by scope; it needs a container runtime and network, and no Windows-only lint was seeded to see it red. Entered the unit set on the recurrence threshold (lead decision, 2026-10-08). **Constraint (lead decision on an operator direction, 2026-10-08, lead-relayed, not a ruling):** the catch runs on a Linux host with no Windows machine and no operator step; whether it is a container arm and how it degrades is spec's.
-
-**Cost while deferred:** a red push and a hotfix push per Windows-only lint slip. Filed 2026-10-05 by that iteration's build. Re-verified: the `gates` job runs `cargo check --target x86_64-pc-windows-msvc`, and the only clippy on a Windows target is `native-artifacts`'. One premise fell: the candidate catcher, a cross-target clippy in the `gates` job, still lands on the push and so saves no red push. Owner lookup: `MSRV`, `clippy`, `cfg(not(unix))` in this file — msrv-move-clippy-arm-coupling (Icebox), DISTINCT (a floor move un-suppressing lints); owner gate-sdk/SPEC.md §check-crate-arms.
-
 ### manual-ops-door-subkey
 
 [cost: event/low] [surface: drift-kit]
@@ -463,16 +473,6 @@ site-kit/templates/site-health.yml's resample loop sets its attempt count and it
 **Deliverable:** both lifted into the probe step's env block, one attempt meaning off, the SPEC section stating the set; a feature, since each is a new name on the template's config surface.
 
 **Cost while deferred:** a copier wanting another bound, or no resample, edits the probe body. Filed 2026-10-06 by site-fence-release-cites-pass' close audit. Re-verified: the run body assigns `attempts=3` beside a pause, and the SPEC's resample paragraph states the ownership. Owner lookup: `site-health`, `resampl`, `attempts`, `pause` in this file and the disposed-findings record — [site-health-probe-unexecuted](#site-health-probe-unexecuted), DISTINCT (the loop's missing oracle, which this reshapes: its cases would read the knobs); [site-health-issue-venue-unwanted](#site-health-issue-venue-unwanted), DISTINCT (the issue step's venue).
-
-### harness-literal-catcher-gate
-
-[cost: event/low] [surface: gate-sdk]
-
-kit prose outside the adapter surfaces can re-acquire a harness-bound literal with the battery green: the sweep that named the hook anchor generically landed with no catcher, against doctrine-kit/DOCTRINE.md Enforcement-first.
-
-**Deliverable:** a gate reading a knob-listed set of harness literals, the project-directory variable first, and red on any outside a knob-listed adapter-surface set (the wiring templates, plugin/, the settings-path reader's SPEC section and each sentence declaring the binding); new mechanism, so it enters through scope. In the unit set, 2026-10-08 (operator direction, lead-relayed, not a ruling).
-
-**Cost while deferred:** an edit to a kit SPEC or README can name one harness's variable where the generic name stood, unread until an adopter on another harness meets it. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' build on an operator direction, lead-relayed (not a ruling). Re-verified by grep over the kit SPECs and READMEs: the variable stands in plugin/SPEC.md, context-kit/SPEC.md's reader section, and one binding sentence each in guard-kit/SPEC.md and delegation-kit/README.md. Owner lookup: `harness literal`, `adapter surface`, `project-directory` in this file and the disposed-findings record — none; [plugin-harness-reach](#plugin-harness-reach), DISTINCT (the plugin's reach on other harnesses); owner gate-sdk/SPEC.md §The adopter constraints.
 
 ### hook-contract-harness-neutral
 
