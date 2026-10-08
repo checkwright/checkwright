@@ -226,9 +226,15 @@ fn long_armed(snap: &Snapshot) -> bool {
 }
 
 // spec: delegation-kit/SPEC.md §usage-verdict — the rule's checks over a parsed snapshot, in either
-// order: RESET-OK, then age-STALE and the two pause axes, the axes first where `pause_first` (§The
-// keyed verdict). `Clear` is the would-be OK the account-keyed caller's reroute may still suppress.
+// order: RESET-OK, then age-STALE and the pause axes; under `pause_first` the axes lead, the long
+// one ahead of RESET-OK (§The keyed verdict). `Clear` is an OK the reroute may still suppress.
 fn judge(snap: &Snapshot, now: i64, limits: &Limits) -> Judged {
+    // spec: delegation-kit/SPEC.md §usage-verdict — two pause axes judged independently; the weekly
+    // axis pauses only while its window is live.
+    let long = long_armed(snap) && int(&snap.resets_7d) - now > 0 && at_or_over(&snap.pct_7d, limits.pause_long);
+    if long && limits.pause_first {
+        return Judged::Pause { long };
+    }
     if int(&snap.resets_at) - now <= 0 {
         return Judged::ResetOk;
     }
@@ -236,10 +242,7 @@ fn judge(snap: &Snapshot, now: i64, limits: &Limits) -> Judged {
     if stale && !limits.pause_first {
         return Judged::AgeStale;
     }
-    // spec: delegation-kit/SPEC.md §usage-verdict — two pause axes judged independently; the weekly
-    // axis pauses only while its window is live.
     let short = at_or_over(&snap.pct, limits.pause);
-    let long = long_armed(snap) && int(&snap.resets_7d) - now > 0 && at_or_over(&snap.pct_7d, limits.pause_long);
     if short || long {
         return Judged::Pause { long };
     }
@@ -614,9 +617,14 @@ pub fn keyed(cfg: &KeyedConfig, adapter: &str) -> Keyed {
             "PAUSE",
             1,
             format!(
-                "long window; at or over {}% of a window that resets in {}s — no adapter is spawned until it does",
+                "long window; at or over {}% of a window that resets in {}s{} — no adapter is spawned until it does",
                 cfg.pause_long,
-                int(&snap.resets_7d) - now
+                int(&snap.resets_7d) - now,
+                if resets_in <= 0 {
+                    format!("; the short window rolled over {}s ago and its pct is from the dead window", resets_in.abs())
+                } else {
+                    String::new()
+                }
             ),
         ),
         Judged::Pause { long: false } => (
@@ -702,7 +710,7 @@ mod tests {
 
     // spec: delegation-kit/SPEC.md §The keyed verdict — one rule in two orders: an old at-or-over
     // reading of a live window is STALE on the account-keyed order and a PAUSE on the keyed one,
-    // and neither order lets a dead window pause or a dead weekly window arm its axis
+    // and a dead short window beside a live at-or-over long one pauses on the keyed order alone
     #[test]
     fn the_rule_is_one_function_in_two_orders() {
         let snap = |pct: &str, resets: i64, updated: i64, long: Option<(&str, i64)>| {
@@ -724,8 +732,13 @@ mod tests {
         assert_eq!(judge(&old_long, now, &limits(true)), Judged::Pause { long: true });
         let dead_long = snap("10", now + 100, now - 5000, Some(("96", now - 1)));
         assert_eq!(judge(&dead_long, now, &limits(true)), Judged::AgeStale);
+        let dead_short = |long| snap("90", now - 1, now - 5, long);
+        assert_eq!(judge(&dead_short(Some(("95", now + 9000))), now, &limits(true)), Judged::Pause { long: true });
+        assert_eq!(judge(&dead_short(Some(("95", now + 9000))), now, &limits(false)), Judged::ResetOk);
         for order in [false, true] {
-            assert_eq!(judge(&snap("90", now - 1, now - 5, None), now, &limits(order)), Judged::ResetOk);
+            assert_eq!(judge(&dead_short(None), now, &limits(order)), Judged::ResetOk);
+            assert_eq!(judge(&dead_short(Some(("94.9", now + 9000))), now, &limits(order)), Judged::ResetOk);
+            assert_eq!(judge(&dead_short(Some(("96", now - 1))), now, &limits(order)), Judged::ResetOk);
             assert_eq!(judge(&snap("79.9", now + 100, now - 5, None), now, &limits(order)), Judged::Clear);
             assert_eq!(judge(&snap("80", now + 100, now - 5, None), now, &limits(order)), Judged::Pause { long: false });
             assert_eq!(

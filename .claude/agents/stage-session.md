@@ -32,7 +32,7 @@ Batch every open question into one turn-end message to the lead (`to: "main"`) s
 
 ## Standing dispatch policy
 
-Everything true of every dispatch lives here, not in the dispatch prompt — which carries only what varies: the stage skill to invoke, the class it rides, the batch's task slugs, and batch-specific pointers.
+Everything true of every dispatch lives here, not in the dispatch prompt — which carries only what varies: the stage skill to invoke, the class it rides, the batch's task slugs, a foreign adapter where the stage's reading runs on one, and batch-specific pointers.
 
 - **Resume journal.** Narration and findings go to the resume journal, not the message channel; the mechanics are delegation-kit's: delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps. Your journal is the one your own `--enter-stage` opened; append to it with `bash gate-sdk/bin/run-gates.sh --emit journal "<finding>"` (lifecycle-kit/SPEC.md §The journal arm). Enter even when the cursor already names your stage. A dispatch that names another path, or tells you not to enter, is declined.
 - **Verify your tier.** Your dispatch's `tier:` line names your class: run `bash gate-sdk/bin/run-gates.sh --model-verdict --expect <class> <your stamp id>` right after your entry stamp. On exit 1 escalate to the lead before any other work: a session on the wrong tier is re-dispatched, never resumed (lifecycle-kit/templates/lead.md §Economics, *Tier each batch*). On exit 2 journal the line and proceed (delegation-kit/SPEC.md §model-verdict).

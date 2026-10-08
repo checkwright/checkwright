@@ -3,7 +3,7 @@
 1370cp .claude/agents/consult-session.md
 2117cp .claude/agents/edit-sweep.md
 3164cp .claude/agents/hotfix-session.md
-9369cp .claude/agents/stage-session.md
+9426cp .claude/agents/stage-session.md
 93cp .claude/commands/adopt.md
 1411cp .claude/commands/agent-execution.md
 551cp .claude/commands/align.md
@@ -22,8 +22,8 @@
 25807cp companion/SPEC.md
 113311cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
-237964cp delegation-kit/SPEC.md
-39296cp delegation-kit/templates/agent-execution.md
+239415cp delegation-kit/SPEC.md
+39359cp delegation-kit/templates/agent-execution.md
 3397cp delegation-kit/templates/dispatch-checklists.md
 1308cp docs/canon-kit/index.md
 1677cp docs/context-kit/index.md
@@ -99,11 +99,12 @@
 288178cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
 279471cp installer/SPEC.md
-366372cp lifecycle-kit/SPEC.md
+371691cp lifecycle-kit/SPEC.md
 6534cp lifecycle-kit/templates/consult.md
-44675cp lifecycle-kit/templates/lead.md
+1412cp lifecycle-kit/templates/frames/stage-contract.md
+44894cp lifecycle-kit/templates/lead.md
 2100cp lifecycle-kit/templates/release-sweep.md
-7293cp lifecycle-kit/templates/stages/align.md
+8399cp lifecycle-kit/templates/stages/align.md
 9358cp lifecycle-kit/templates/stages/build.md
 23310cp lifecycle-kit/templates/stages/close.md
 19708cp lifecycle-kit/templates/stages/scope.md

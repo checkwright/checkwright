@@ -65,6 +65,7 @@ pub mod reads_census;
 pub mod rewrite;
 pub mod scan_prompts;
 pub mod stage_economics;
+pub mod stage_contract;
 pub mod stage_rules;
 pub mod support_table;
 pub mod roadmap;
@@ -644,6 +645,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-stage-rules",
         Arm::Emit(stage_rules::emit, Grammar::Parsed(stage_rules::USAGE)),
         stage_rules::KNOBS,
+    ),
+    // spec: lifecycle-kit/SPEC.md §The stage-contract arm — an `Arm::Emit` on stage-rules'
+    // precedent: the contract is a document and each failure is exit 2
+    (
+        "--emit-stage-contract",
+        Arm::Emit(stage_contract::emit, Grammar::Parsed(stage_contract::USAGE)),
+        stage_contract::KNOBS,
     ),
     // spec: lifecycle-kit/SPEC.md §bin/session-id.sh — an empty-roster member whose roster must
     // stay empty rather than merely happening to be: neither name it reads is a row in

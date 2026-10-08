@@ -58,7 +58,7 @@ for arm in docs-mirror roadmap queue-index entry-history port-blockers; do
 done
 
 # A free-text reader refuses a dash-led operand rather than reading it as an empty reading.
-for arm in md-index pub-index stage-rules ruling-staleness close-surfaces; do
+for arm in md-index pub-index stage-rules stage-contract ruling-staleness close-surfaces; do
     run "dash-$arm" 2 "--emit-$arm" --help
     has "dash-$arm" err "unrecognized option: --help"
     usage_once "dash-$arm"

@@ -964,6 +964,24 @@ mod tests {
         assert!(!r.run_dir().join("session.txt").exists(), "a one-shot adapter opens no session");
     }
 
+    // spec: delegation-kit/SPEC.md §Testing — a stage's emitted contract rides an audit-mode run as
+    // any prompt file does: the adapter reads its bytes whole and the clone stays clean
+    #[test]
+    fn a_stage_contract_document_runs_as_an_audit_prompt() {
+        let r = Repo::new("stage-contract");
+        let doc = crate::emit::stage_contract::compose(
+            "You write nothing.\n",
+            "align",
+            "Execute the template at kit/templates/stages/align.md, applying the bindings below.\n",
+        );
+        std::fs::write(r.root.join("prompt.md"), &doc).expect("the prompt file");
+        let v = foreign_run(&r.cfg(RO, 60), &r.args("ro", false));
+        assert_eq!(v.code, 0, "{}", v.line);
+        assert!(v.line.contains("mode=audit key=prompt") && v.line.ends_with("patch=none -> OK"), "{}", v.line);
+        let report = std::fs::read(r.run_dir().join("report.txt")).expect("the report");
+        assert_eq!(String::from_utf8_lossy(&report), hash_of(&r, doc.as_bytes()));
+    }
+
     // spec: delegation-kit/SPEC.md §Testing — `@PROMPT_FILE@` is substituted with the prompt's
     // absolute path
     #[test]
@@ -1101,6 +1119,37 @@ mod tests {
         assert!(v.code == 0 && v.line.contains("budget=OK exit=0"), "{}", v.line);
         let v = foreign_run(&r.budgeted(r.cfg(RO, 60), "other", "90", 0), &r.args("ro", false));
         assert!(v.code == 0 && v.line.contains("budget=OFF exit=0"), "an adapter with no snapshot is unbudgeted: {}", v.line);
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — a dead short window beside a live at-or-over long one
+    // pauses naming the long window and spawns nothing; beside an under-threshold, absent or reset
+    // long window it is RESET-OK and the run proceeds
+    #[test]
+    fn a_dead_short_window_pauses_only_behind_a_live_exhausted_long_one() {
+        let r = Repo::new("budget-long-first");
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_secs() as i64)
+            .unwrap_or(0);
+        let dead_short = |long: Option<(&str, i64)>| {
+            let cfg = r.budgeted(r.cfg(RO, 60), "ro", "90", 0);
+            let mut body = format!("five_hour_used_pct=90\nfive_hour_resets_at={}\nupdated_at={}\n", now - 100, now - 200);
+            if let Some((pct, resets)) = long {
+                body.push_str(&format!("seven_day_used_pct={}\nseven_day_resets_at={}\n", pct, resets));
+            }
+            std::fs::write(r.root.join("usage.txt"), body).expect("the snapshot");
+            cfg
+        };
+        let v = foreign_run(&dead_short(Some(("95", now + 9000))), &r.args("ro", false));
+        assert_eq!(v.code, 2, "{}", v.line);
+        assert!(v.line.contains("budget=PAUSE exit=- report=none"), "{}", v.line);
+        assert!(v.line.contains("-> PAUSE (long window; at or over 95% of a window that resets in "), "{}", v.line);
+        assert!(v.line.contains("the short window rolled over "), "{}", v.line);
+        assert!(!r.run_dir().exists(), "a paused run leaves no scratch and holds no key");
+        for long in [Some(("94", now + 9000)), None, Some(("99", now - 1))] {
+            let v = foreign_run(&dead_short(long), &r.args("ro", false));
+            assert!(v.code == 0 && v.line.contains("budget=RESET-OK exit=0"), "{:?}: {}", long, v.line);
+        }
     }
 
     // spec: delegation-kit/SPEC.md §Testing — the producer runs before the read with the snapshot

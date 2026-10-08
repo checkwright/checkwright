@@ -88,6 +88,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("LIFECYCLE_KIT_SKILLS_DIR", ".claude/commands"),
         Row::scalar("LIFECYCLE_KIT_SESSION_BOUNDARY", "stage"),
         Row::scalar("LIFECYCLE_KIT_AGENT_FILE", "CLAUDE.md"),
+        Row::scalar("LIFECYCLE_KIT_STAGE_CONTRACT_FRAME", "lifecycle-kit/templates/frames/stage-contract.md"),
         Row::scalar("LIFECYCLE_KIT_SHIM_NGRAM", "9"),
         Row::indexed("LIFECYCLE_KIT_SHIM_DEDUP_CORPUS", &[]),
         Row::derived("LIFECYCLE_KIT_QUEUE_FILE", Shape::Scalar, queue_file, &["GATE_SDK_QUEUE_FILE"]),

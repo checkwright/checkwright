@@ -85,6 +85,7 @@ gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --emit journal "<finding>"   # append to the resume journal of the stage you entered
 "$gates" --emit journal --lead "<finding>"   # a lead session: append to the lead journal its opener opened
 "$gates" --emit cite-survey "<heading-substring>"   # one carried survey, inline-ready
+"$gates" --emit stage-contract <stage>           # a stage's contract for a reader with no skill and no write path
 "$gates" --emit session-id                       # the canonical stamp id, by the derivation order
 "$gates" --emit ruling-staleness ["<ruling name>"…]  # fired conditions, undeclared ones, citing sites
 ```
