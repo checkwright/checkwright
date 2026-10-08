@@ -50,6 +50,8 @@ an on-demand critique of the project's strategic weaknesses, run on the top fore
 
 **In the unit set, 2026-10-08 (operator direction, lead-relayed, not a ruling).** No foreign run is granted for it, so its acceptance is stub-driven unless one is; the SWOT's home is the one question that may need the operator.
 
+**Executor and reflection path (operator direction, 2026-10-08, lead-relayed, not a ruling and no run grant):** the critique runs through codex on GPT-6-Astra at medium effort, which this repo's `codex-expert` adapter already binds; its output is saved to a file, and that file is submitted to `/consult` on Fable as the reflection pass.
+
 **Deliverable:** the on-demand trigger, the critique prompt, the reflection pass's contract and the SWOT's home, model literals in consumer config. The spec question is the reflection's write path, since work enters only through scope (doctrine-kit/DOCTRINE.md, Scope-gated intake).
 
 **Cost while deferred:** strategic weaknesses surface only through the operator's own reading. The filing's ground, that this cost was nil while the operator held no foreign credit, lapsed: credit is held (operator answer 2026-10-06, lead-relayed, a fact and no run grant). Filed 2026-10-03 by delegation-transport-pass' lead. Re-verified: no tracked prose names a SWOT or an on-demand foreign critique. Owner lookup: `SWOT`, `critique`, `strategic`, `reflection` in this file — foreign-vendor-critique, DISTINCT (its close review landed this iteration); owner delegation-kit/SPEC.md §The foreign-vendor run, the SWOT's home open.
