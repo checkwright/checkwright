@@ -13,7 +13,7 @@ Your commit discipline is delegation-kit/templates/agent-execution.md's, applied
 
 ## Journal and return
 
-Append each unit, as you land it, to the resume journal your dispatch grants, absolute into the main checkout's scratch dir (the **Resume journal — agent writes, scratch reset sweeps** bullet, same surface), and append `DONE` as its last line when the sweep is complete. Your final message is the contract: every commit you made by hash, every site you left and why, and the gates you ran with their verdicts. Do not end your turn with work still in flight, and do not end it to wait; the **Background + notification, never poll** bullet on the same surface owns how to wait in-turn.
+Append each unit, as you land it, to the resume journal your dispatch grants, absolute into the main checkout's scratch dir (the **Resume journal — agent writes, scratch reset sweeps** bullet, same surface), and append `DONE` as its last line when the sweep is complete. Your final message is the contract: every commit you made by hash, every site you left and why, and the gates you ran with their verdicts. Do not end your turn with work still in flight, and do not end it to wait on anything but an `Agent` child of your own; the **Background + notification, never poll** bullet on the same surface owns how to wait.
 
 ## Tier
 

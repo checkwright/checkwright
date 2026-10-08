@@ -428,7 +428,7 @@ Those rules take the PowerShell reader's segments, quoting and words, and otherw
 
   **It blocks, where the bias is toward passing.** The departure rests on an attested firing, the ground rules `git_mutation_under_producer` and `background_no_record` take. The wait was launched to hold a turn open, rule `bounded_wait`'s arm (A) granted it, and it held its session until it was killed. The wrong block costs one re-issue: a session whose producer is real launches it with its record first, in the spelling rule `background_no_record` names, and the wait then passes. The wrong pass costs a held session for as long as nobody reads the process table.
 
-  **The corrective** names those three exits, and says a wait launched to hold a turn open is the finding itself.
+  **The corrective** names those three exits, and says a wait launched to hold a turn open is the finding itself. For the `Agent` child it names the turn end that is its wait, the template's own bound beside it (delegation-kit/templates/agent-execution.md, **Background + notification, never poll**).
 
   **Beyond the shared directions it declines on each of these:**
   - a foreground call, which the foreground ceiling bounds, and which becomes the turn-end hook's subject where the harness moves it to the background ([delegation-kit/SPEC.md §The turn-end liveness hook](../delegation-kit/SPEC.md#the-turn-end-liveness-hook));

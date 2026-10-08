@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### agent-child-wait-unstated
-
-a dispatched session awaiting an `Agent` child it launched has no stated in-turn wait. delegation-kit/templates/agent-execution.md's backgrounding bullet forbids ending the turn to wait, calls condition-waiting the only channel a dispatched role has, and tells the same reader an `Agent` dispatch is awaited by its completion notification and never looked for on disk. Guard-kit rule `wait_no_producer` refuses the device a session reached for in that bind, a backgrounded marker wait nothing could end, and leaves the bind.
-
-**Deliverable:** the wait a dispatched session owes an `Agent` child, stated in that bullet and its operative copies, with the harness behavior it rests on probed first: what holds a turn open once no other tool call is owed. Observed 2026-10-08 at delegation-wait-journal-pass' close: a child's completion notification reached the dispatching stage session inside its turn, between tool calls, while that session had other work to run.
-
-**Inferred, cannot run before build:** that a turn with nothing left to run receives it — the probe is this unit's first act, and the one transcript read at filing shows a session that backgrounded an unsatisfiable wait and then looped in the foreground on the child's worktree directory.
-
-**Cost while deferred:** a stage session fanning out read-only children holds a rule against each wait it can spell. Filed 2026-10-07 by delegation-wait-journal-pass' spec.
-
 ### handback-refusal-unanswered
 
 a turn-end refusal drawn after a dispatched session's report-delivery call was followed by no model turn, in the one transcript read: the session stayed held on its own running shell task until the task was killed. The turn-end liveness hook's refusal presumes a turn that reads it.
@@ -1245,4 +1235,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 ## Done
 
 - lead-journal-append-arm
+- agent-child-wait-unstated
 
