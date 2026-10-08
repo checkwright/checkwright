@@ -31,7 +31,7 @@ Every top-level directory carrying a `SPEC.md` takes a row, kit or not, and one 
 | canon-kit | — | 5785cp · ~1531t |
 | companion | — | — |
 | context-kit | — | 2351cp · ~594t |
-| delegation-kit | — | 43601cp · ~10975t |
+| delegation-kit | — | 43608cp · ~10977t |
 | doctrine-kit | 2049cp · ~520t | — |
 | drift-kit | — | 6968cp · ~1760t |
 | evidence-kit | — | — |
@@ -42,4 +42,4 @@ Every top-level directory carrying a `SPEC.md` takes a row, kit or not, and one 
 | plugin | — | — |
 | queue-kit | — | 1392cp · ~359t |
 | site-kit | — | — |
-| **total** | 2350cp · ~596t | 206120cp · ~52035t |
+| **total** | 2350cp · ~596t | 206127cp · ~52036t |

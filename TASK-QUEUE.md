@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### turn-end-premise-stale
-
-the backgrounding rule's premise, that a dispatched agent's turn end is its session end, measured false on one harness build whose report rides a hand-back call: a session that handed back over a live shell task was resumed by that task's completion notification, and its dispatcher's first notification said the result may be interim. delegation-kit/SPEC.md §The turn-end liveness hook carries that measurement. The premise still opens the backgrounding bullet of delegation-kit/templates/agent-execution.md, heads its operative copy in the stage-session definition, and grounds lifecycle-kit/SPEC.md §The stamp protocol's sentence that a session ending its turn on running work emits a notification that lies. [notification-delivery-probe](#notification-delivery-probe) argues from the same premise.
-
-**Deliverable:** the premise re-read against a harness with a hand-back call; then the bullet, its operative copies and that SPEC sentence restated to what was measured, with the rule they ground, no turn ended on running work, kept or re-grounded at spec.
-
-**Inferred, cannot run before build:** an undelivered turn end over a live shell task with the turn-end hook unwired; the measured session had delivered its report under a wired hook — unwiring the hook is a permission-settings edit a stage session only prepares, so the reading is build's to take or to bound in the restated text.
-
-**Cost while deferred:** three surfaces instruct from a mechanism one measurement contradicts, so a reader bounds the rule by the wrong ground. Filed 2026-10-08 by foreign-stage-contract-pass' build. Re-verified: the three passages read as quoted; the harness behavior is the filer's one measurement. Owner lookup: `session end`, `turn end`, `hand-back` in this file and the disposed-findings record — [notification-delivery-probe](#notification-delivery-probe), DISTINCT (a supervisor's notification queue); owner delegation-kit/SPEC.md §The delegation model.
-
 ### isolated-child-record-blind
 
 a worktree-isolated child's turn-end firing reads an empty record set while its own producer's launch record stands in the main checkout's scratch dir, where the shell guard sends it, so the record-set arm cannot see a producer the child itself recorded and only the task-view arm refuses. delegation-kit/SPEC.md §The turn-end liveness hook states the isolated reading and neither the scratch dir it is taken over nor this consequence.
@@ -1205,4 +1195,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - harness-literal-catcher-gate
 - stage-executor-binding
 - foreign-project-critique
+- turn-end-premise-stale
 
