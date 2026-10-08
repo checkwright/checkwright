@@ -538,6 +538,42 @@ rule `sed_file`'s inline-python arm took one of two like calls in delegation-wai
 
 **Cost while deferred:** the steer toward the count-asserting rewrite arm is skipped by a shape nobody has named. Filed 2026-10-08 by delegation-wait-journal-pass' close, after its drain, and promoted at the next scope's intake. Re-verified: the rule entry blocks a literal rewrite carrying no computed-text construct and says it leans toward passing. Owner lookup: `python`, `--rewrite`, `heredoc`, `sed_file` in this file and the disposed-findings record — none; owner guard-kit/SPEC.md §The generic ruleset.
 
+### toolchain-fetch-no-retry
+
+[cost: event/low] [surface: gate-sdk]
+
+every cargo-running CI job fetches the pinned toolchain on its first cargo call, the runner images carrying none under the name `rust-toolchain.toml` pins, and nothing retries that fetch. On the pin's landing push one job of 16, the macOS arm64 `native-artifacts` leg, redded in `cargo --version` on a connect timeout fetching the channel manifest and skipped the five install-smoke legs behind it; a re-run of the failed jobs went green on the same tree.
+
+**Deliverable:** a bounded retry around each job's first cargo call, spelled once, or a toolchain cache step; then gate-sdk/SPEC.md §check-crate-arms' honest limit, which answers a failed fetch with a re-run of the leg, restated to the remedy taken.
+
+**Inferred, not run:** the red leg's cause and its green re-run, the filer's reading of the run, not re-read at the drain.
+
+**Cost while deferred:** a red push and a hand re-run per fetch failure. Filed 2026-10-08 by foreign-stage-contract-pass' build. Re-verified: the root file pins one channel, and no `cargo --version` step in gates.yml or publish.yml retries. Owner lookup: `toolchain`, `retry`, `fetch` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §check-crate-arms.
+
+### turn-end-premise-stale
+
+[cost: event/low] [surface: delegation-kit]
+
+the backgrounding rule's premise, that a dispatched agent's turn end is its session end, measured false on one harness build whose report rides a hand-back call: a session that handed back over a live shell task was resumed by that task's completion notification, and its dispatcher's first notification said the result may be interim. delegation-kit/SPEC.md §The turn-end liveness hook carries that measurement. The premise still opens the backgrounding bullet of delegation-kit/templates/agent-execution.md, heads its operative copy in the stage-session definition, and grounds lifecycle-kit/SPEC.md §The stamp protocol's sentence that a session ending its turn on running work emits a notification that lies. [notification-delivery-probe](#notification-delivery-probe) argues from the same premise.
+
+**Deliverable:** the premise re-read against a harness with a hand-back call; then the bullet, its operative copies and that SPEC sentence restated to what was measured, with the rule they ground, no turn ended on running work, kept or re-grounded at spec.
+
+**Inferred, not run:** an undelivered turn end over a live shell task with the turn-end hook unwired; the measured session had delivered its report under a wired hook.
+
+**Cost while deferred:** three surfaces instruct from a mechanism one measurement contradicts, so a reader bounds the rule by the wrong ground. Filed 2026-10-08 by foreign-stage-contract-pass' build. Re-verified: the three passages read as quoted; the harness behavior is the filer's one measurement. Owner lookup: `session end`, `turn end`, `hand-back` in this file and the disposed-findings record — [notification-delivery-probe](#notification-delivery-probe), DISTINCT (a supervisor's notification queue); owner delegation-kit/SPEC.md §The delegation model.
+
+### isolated-child-record-blind
+
+[cost: event/low] [surface: delegation-kit]
+
+a worktree-isolated child's turn-end firing reads an empty record set while its own producer's launch record stands in the main checkout's scratch dir, where the shell guard sends it, so the record-set arm cannot see a producer the child itself recorded and only the task-view arm refuses. delegation-kit/SPEC.md §The turn-end liveness hook states the isolated reading and neither the scratch dir it is taken over nor this consequence.
+
+**Deliverable:** that section stating which scratch dir an isolated firing reads, or the hook reading the main checkout's, with a case holding the choice.
+
+**Inferred, not run:** that the firing reads the worktree's scratch dir on the hook's relative default; one firing logged an empty set beside a live recorded producer, and the hook was not replayed under isolation.
+
+**Cost while deferred:** a producer an isolated child detaches from a foreground call carries a record its own turn end cannot read. Filed 2026-10-08 by foreign-stage-contract-pass' build. Re-verified: the capture log holds the empty-set refusal three seconds ahead of a one-record row. Owner lookup: `isolated`, `record set`, `scratch dir` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §The turn-end liveness hook.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
@@ -1223,8 +1259,4 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix over the roster's unix legs would hold them in step.
 
 ## Done
-
-- lead-journal-append-arm
-- agent-child-wait-unstated
-- handback-refusal-unanswered
 
