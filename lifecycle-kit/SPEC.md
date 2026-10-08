@@ -956,8 +956,6 @@ It is an `Arm::Emit` member on `--emit stage-rules`' precedent (doctrine-kit/SPE
 - Content the repository ignores or has not committed. A stage whose reading rests on a private surface gets a reading without it, and the host supplies that part.
 - A remote act: a push, a release, an authenticated read of a hosting service. The first two are writes and the third is the sandbox's to refuse; each is the host's.
 
-**The kit instructs the set and recommends none.** Which admitted stage is worth sending is the consumer's, through the executor binding or a dispatch prompt, on the arm's standing sentence that the reading worth sending is the dispatcher's judgment.
-
 **The stamp says who held the stage, and the commit message says who read.** The stamp grammar is unchanged: the id is the host's, and the tier verdict a stamp id resolves to is the host's model. The foreign reading is on record in the host's journal and the landing commit's message alone, each carrying the run's verdict line. **A host is tiered by what its writes demand**, templates/lead.md §Economics' rule for every batch: a report whose proposals the host can land after an oracle run is mechanical work, and one the host must turn into authored spec text is not.
 
 ### bin/install-lifecycle.sh
