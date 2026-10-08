@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: foreign-stage-binding-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -10,6 +10,36 @@
 
 ## Technical Debt
 
+### toolchain-fetch-no-retry
+
+every cargo-running CI job fetches the pinned toolchain on its first cargo call, the runner images carrying none under the name `rust-toolchain.toml` pins, and nothing retries that fetch. On the pin's landing push one job of 16, the macOS arm64 `native-artifacts` leg, redded in `cargo --version` on a connect timeout fetching the channel manifest and skipped the five install-smoke legs behind it; a re-run of the failed jobs went green on the same tree.
+
+**Deliverable:** a bounded retry around each job's first cargo call, spelled once, or a toolchain cache step; then gate-sdk/SPEC.md §check-crate-arms' honest limit, which answers a failed fetch with a re-run of the leg, restated to the remedy taken.
+
+**Push need (2026-10-08, inside the budget):** one mid-iteration push, since only a remote run executes the retry; operator direction on the unit set, lead-relayed (not a ruling).
+
+**Cost while deferred:** a red push and a hand re-run per fetch failure. Filed 2026-10-08 by foreign-stage-contract-pass' build. Read at promotion, 2026-10-08, off gates run 37742767288: attempt 1 failed that one leg on a TCP connect timeout downloading the channel manifest, five install-smoke legs skipped, and attempt 2 is green. Re-verified: the root file pins one channel, and no `cargo --version` step in gates.yml or publish.yml retries. Owner lookup: `toolchain`, `retry`, `fetch` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §check-crate-arms.
+
+### turn-end-premise-stale
+
+the backgrounding rule's premise, that a dispatched agent's turn end is its session end, measured false on one harness build whose report rides a hand-back call: a session that handed back over a live shell task was resumed by that task's completion notification, and its dispatcher's first notification said the result may be interim. delegation-kit/SPEC.md §The turn-end liveness hook carries that measurement. The premise still opens the backgrounding bullet of delegation-kit/templates/agent-execution.md, heads its operative copy in the stage-session definition, and grounds lifecycle-kit/SPEC.md §The stamp protocol's sentence that a session ending its turn on running work emits a notification that lies. [notification-delivery-probe](#notification-delivery-probe) argues from the same premise.
+
+**Deliverable:** the premise re-read against a harness with a hand-back call; then the bullet, its operative copies and that SPEC sentence restated to what was measured, with the rule they ground, no turn ended on running work, kept or re-grounded at spec.
+
+**Inferred, cannot run before build:** an undelivered turn end over a live shell task with the turn-end hook unwired; the measured session had delivered its report under a wired hook — unwiring the hook is a permission-settings edit a stage session only prepares, so the reading is build's to take or to bound in the restated text.
+
+**Cost while deferred:** three surfaces instruct from a mechanism one measurement contradicts, so a reader bounds the rule by the wrong ground. Filed 2026-10-08 by foreign-stage-contract-pass' build. Re-verified: the three passages read as quoted; the harness behavior is the filer's one measurement. Owner lookup: `session end`, `turn end`, `hand-back` in this file and the disposed-findings record — [notification-delivery-probe](#notification-delivery-probe), DISTINCT (a supervisor's notification queue); owner delegation-kit/SPEC.md §The delegation model.
+
+### isolated-child-record-blind
+
+a worktree-isolated child's turn-end firing reads an empty record set while its own producer's launch record stands in the main checkout's scratch dir, where the shell guard sends it, so the record-set arm cannot see a producer the child itself recorded and only the task-view arm refuses. delegation-kit/SPEC.md §The turn-end liveness hook states the isolated reading and neither the scratch dir it is taken over nor this consequence.
+
+**Deliverable:** that section stating which scratch dir an isolated firing reads, or the hook reading the main checkout's, with a case holding the choice.
+
+**Inferred, cannot run before build:** that the firing reads the worktree's scratch dir on the hook's relative default; one firing logged an empty set beside a live recorded producer, and the hook was not replayed under isolation — the replay needs an isolated firing's payload beside a recorded producer, which the case this unit lands constructs.
+
+**Cost while deferred:** a producer an isolated child detaches from a foreground call carries a record its own turn end cannot read. Filed 2026-10-08 by foreign-stage-contract-pass' build. Re-verified: the capture log holds the empty-set refusal three seconds ahead of a one-record row. Owner lookup: `isolated`, `record set`, `scratch dir` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §The turn-end liveness hook.
+
 ## Deferred
 
 ### foreign-project-critique
@@ -17,6 +47,8 @@
 [cost: event/low] [surface: delegation-kit]
 
 an on-demand critique of the project's strategic weaknesses, run on the top foreign tier (a consumer's expert adapter on `--foreign-run`), then a reflection pass on this harness's top tier that turns its findings into queue and SWOT updates. Operator direction 2026-10-03, lead-relayed (not a ruling). The close-time second-vendor review (`.workflow/audit-roster.txt`) reads one iteration's range and is distinct.
+
+**In the unit set, 2026-10-08 (operator direction, lead-relayed, not a ruling).** No foreign run is granted for it, so its acceptance is stub-driven unless one is; the SWOT's home is the one question that may need the operator.
 
 **Deliverable:** the on-demand trigger, the critique prompt, the reflection pass's contract and the SWOT's home, model literals in consumer config. The spec question is the reflection's write path, since work enters only through scope (doctrine-kit/DOCTRINE.md, Scope-gated intake).
 
@@ -29,6 +61,8 @@ an on-demand critique of the project's strategic weaknesses, run on the top fore
 a per-stage executor binding as consumer config: a consumer picks the harness and model for each stage, say every stage on the master harness and align on a foreign coding agent at a chosen model and effort, offered as a consumer-selectable set with today's all-master-harness posture one member. It extends `DELEGATION_KIT_TIER_MODEL`'s per-class binding to a per-stage executor. Operator direction 2026-10-03, lead-relayed (not a ruling).
 
 **Gate opened** by [heterogeneous-agent-delegation](#heterogeneous-agent-delegation)'s item (4) first slice (foreign-stage-contract-pass, 2026-10-08): the audit stage's reading runs on a foreign agent under lifecycle-kit/SPEC.md §The stage-contract arm, the adapter picked by the dispatcher by name.
+
+**In the unit set, 2026-10-08 (operator direction, lead-relayed, not a ruling),** behind that entry's next slice: only a stage with a host protocol can be bound foreign, so the knob's member set follows the slice.
 
 **Deliverable:** the stage-to-executor knob, its validator and the lead's dispatch-time read, in delegation-kit/SPEC.md §The tier binding, with fixtures.
 
@@ -88,11 +122,11 @@ hosted attestation. The team/paid rung: gates verified server-side by a party th
 
 [cost: iteration/low] [surface: delegation-kit] [roadmap: now/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
 
-foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent. It cashes the public no-lock-in claim — governance enforced at the git/gate boundary, not by trusting the author; the verification substrate and the shared git-index/HEAD serialization are already agent-neutral. *Remaining:* (4) **stage-contract expression**, past its first slice below: a host protocol for any stage but the audit stage, and a stage whose writes a foreign agent performs.
+foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent. It cashes the public no-lock-in claim — governance enforced at the git/gate boundary, not by trusting the author; the verification substrate and the shared git-index/HEAD serialization are already agent-neutral. *Remaining:* (4) **stage-contract expression**, past its first slice below: a host protocol for any stage but the audit stage, the next slice (operator direction, 2026-10-08, lead-relayed, not a ruling), and a stage whose writes a foreign agent performs.
 
-**Slices landed**, each in delegation-kit/SPEC.md §The foreign-vendor run and each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); then (2) the dispatch transport with (1) the escalation resume model riding it, `--foreign-resume`, that section's Resuming a session (delegation-transport-pass, 2026-10-03). Then (3) the budget oracle, delegation-kit/SPEC.md §The keyed verdict (delegation-wait-journal-pass, 2026-10-07; operator direction, lead-relayed, not a ruling), which owns the read and its `--budget` form. No foreign run was granted with it: accepted by stub-driven crate cases and one producer read of a vendor's on-disk session store through a scratch binding, so a live turn refreshing the feed is unobserved, as is whether a turn in a vendor's non-persisting mode, two of this repo's three adapters, leaves a usage event on disk; one granted run of each kind settles both. **The order question (3) left open landed with the slice below**, by the same direction: an at-or-over long window that has not reset pauses ahead of RESET-OK on the keyed order. **This repo's binding (operator direction, 2026-10-07, lead-relayed, not a ruling):** inline in the gitignored `.local` overlay alone, its adapters reading one snapshot under the metric dir from an inline producer; `--budget` read it `OK` 2026-10-08. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
+**Slices landed**, each in delegation-kit/SPEC.md §The foreign-vendor run and each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); then (2) the dispatch transport with (1) the escalation resume model riding it, `--foreign-resume`, that section's Resuming a session (delegation-transport-pass, 2026-10-03). Then (3) the budget oracle, delegation-kit/SPEC.md §The keyed verdict (delegation-wait-journal-pass, 2026-10-07; operator direction, lead-relayed, not a ruling), which owns the read and its `--budget` form. No foreign run was granted with it: accepted by stub-driven crate cases and one producer read of a vendor's on-disk session store through a scratch binding, so a live turn refreshing the feed is unobserved, as is whether a turn in a vendor's non-persisting mode, two of this repo's three adapters, leaves a usage event on disk; one granted run of each kind settles both. **This repo's binding (operator direction, 2026-10-07, lead-relayed, not a ruling):** inline in the gitignored `.local` overlay alone, its adapters reading one snapshot under the metric dir from an inline producer; `--budget` read it `OK` 2026-10-08. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
 
-**Item (4)'s first slice landed** (foreign-stage-contract-pass, 2026-10-08; operator direction, lead-relayed, not a ruling), lifecycle-kit/SPEC.md §The stage-contract arm: the audit stage's reading runs foreign and its host session performs every write. Accepted with no vendor: crate cases and a read-only master-harness child handed the document alone. **Unobserved:** a foreign agent executing the contract: whether it holds the no-write frame, whether its sandbox runs the contract's read-only commands, and whether its report keeps the parts. **Grant:** one live foreign run for this acceptance, narrowed by the operator the same day to mandatory-only, stands unspent; one host run of the audit stage discharges the line.
+**Item (4)'s first slice landed** (foreign-stage-contract-pass, 2026-10-08; operator direction, lead-relayed, not a ruling), lifecycle-kit/SPEC.md §The stage-contract arm: the audit stage's reading runs foreign and its host session performs every write. Accepted with no vendor: crate cases and a read-only master-harness child handed the document alone. **Unobserved:** a foreign agent executing the contract: whether it holds the no-write frame, whether its sandbox runs the contract's read-only commands, and whether its report keeps the parts. **Grant:** one live foreign run for this acceptance, narrowed by the operator the same day to mandatory-only, stands unspent; one host run of the audit stage discharges the line. Operator-confirmed 2026-10-08, lead-relayed (a grant): spendable on the next audit stage triggered.
 
 **Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, the pattern the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service) and [plugin-harness-reach](#plugin-harness-reach).
 
@@ -360,7 +394,7 @@ crate code under `cfg(not(unix))` is linted only by `native-artifacts`' Windows 
 
 **Deliverable:** a contributor-side catch before the push for Windows-only code: an opt-in cross-target clippy in `check-crate-arms` where the Windows target is installed, or a pre-push tool. How it degrades without `rustup` is spec's: gate-sdk/SPEC.md §check-crate-arms rules the compile-only Windows check no gate, since it needs `rustup` and network.
 
-**Waits on host provisioning.** Either catch needs the Windows target's standard library on the contributor's host. Probed at foreign-stage-contract-pass' spec on this repo's one build host: no `rustup` on `PATH`, and no `x86_64-pc-windows-msvc` library under the toolchain's sysroot, so an opt-in arm would have no configuration that enables it here. Narrowed to the version axis for that increment and demoted at its build, operator direction 2026-10-08, lead-relayed (not a ruling).
+**The host-provisioning wait fell, 2026-10-08 at scope.** The build host still carries no `rustup` on `PATH` and no `x86_64-pc-windows-msvc` library under the toolchain's sysroot, re-probed, but a container reaches both: in the stock Rust image, the tree mounted read-only and marked a safe directory, the target and clippy added through its `rustup`, `cargo clippy --target x86_64-pc-windows-msvc --all-targets` finished clean on the crate. Lead-probed and re-run by scope; it needs a container runtime and network, and no Windows-only lint was seeded to see it red. Entered the unit set on the recurrence threshold (lead decision, 2026-10-08). **Constraint (lead decision on an operator direction, 2026-10-08, lead-relayed, not a ruling):** the catch runs on a Linux host with no Windows machine and no operator step; whether it is a container arm and how it degrades is spec's.
 
 **Cost while deferred:** a red push and a hotfix push per Windows-only lint slip. Filed 2026-10-05 by that iteration's build. Re-verified: the `gates` job runs `cargo check --target x86_64-pc-windows-msvc`, and the only clippy on a Windows target is `native-artifacts`'. One premise fell: the candidate catcher, a cross-target clippy in the `gates` job, still lands on the push and so saves no red push. Owner lookup: `MSRV`, `clippy`, `cfg(not(unix))` in this file — msrv-move-clippy-arm-coupling (Icebox), DISTINCT (a floor move un-suppressing lints); owner gate-sdk/SPEC.md §check-crate-arms.
 
@@ -434,7 +468,7 @@ site-kit/templates/site-health.yml's resample loop sets its attempt count and it
 
 kit prose outside the adapter surfaces can re-acquire a harness-bound literal with the battery green: the sweep that named the hook anchor generically landed with no catcher, against doctrine-kit/DOCTRINE.md Enforcement-first.
 
-**Deliverable:** a gate reading a knob-listed set of harness literals, the project-directory variable first, and red on any outside a knob-listed adapter-surface set (the wiring templates, plugin/, the settings-path reader's SPEC section and each sentence declaring the binding); new mechanism, so it enters through scope.
+**Deliverable:** a gate reading a knob-listed set of harness literals, the project-directory variable first, and red on any outside a knob-listed adapter-surface set (the wiring templates, plugin/, the settings-path reader's SPEC section and each sentence declaring the binding); new mechanism, so it enters through scope. In the unit set, 2026-10-08 (operator direction, lead-relayed, not a ruling).
 
 **Cost while deferred:** an edit to a kit SPEC or README can name one harness's variable where the generic name stood, unread until an adopter on another harness meets it. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' build on an operator direction, lead-relayed (not a ruling). Re-verified by grep over the kit SPECs and READMEs: the variable stands in plugin/SPEC.md, context-kit/SPEC.md's reader section, and one binding sentence each in guard-kit/SPEC.md and delegation-kit/README.md. Owner lookup: `harness literal`, `adapter surface`, `project-directory` in this file and the disposed-findings record — none; [plugin-harness-reach](#plugin-harness-reach), DISTINCT (the plugin's reach on other harnesses); owner gate-sdk/SPEC.md §The adopter constraints.
 
@@ -537,42 +571,6 @@ rule `sed_file`'s inline-python arm took one of two like calls in delegation-wai
 **Inferred, not run:** that a computed-text construct in the first body told them apart, the discriminator the rule entry states — neither body was replayed through the hook
 
 **Cost while deferred:** the steer toward the count-asserting rewrite arm is skipped by a shape nobody has named. Filed 2026-10-08 by delegation-wait-journal-pass' close, after its drain, and promoted at the next scope's intake. Re-verified: the rule entry blocks a literal rewrite carrying no computed-text construct and says it leans toward passing. Owner lookup: `python`, `--rewrite`, `heredoc`, `sed_file` in this file and the disposed-findings record — none; owner guard-kit/SPEC.md §The generic ruleset.
-
-### toolchain-fetch-no-retry
-
-[cost: event/low] [surface: gate-sdk]
-
-every cargo-running CI job fetches the pinned toolchain on its first cargo call, the runner images carrying none under the name `rust-toolchain.toml` pins, and nothing retries that fetch. On the pin's landing push one job of 16, the macOS arm64 `native-artifacts` leg, redded in `cargo --version` on a connect timeout fetching the channel manifest and skipped the five install-smoke legs behind it; a re-run of the failed jobs went green on the same tree.
-
-**Deliverable:** a bounded retry around each job's first cargo call, spelled once, or a toolchain cache step; then gate-sdk/SPEC.md §check-crate-arms' honest limit, which answers a failed fetch with a re-run of the leg, restated to the remedy taken.
-
-**Inferred, not run:** the red leg's cause and its green re-run, the filer's reading of the run, not re-read at the drain.
-
-**Cost while deferred:** a red push and a hand re-run per fetch failure. Filed 2026-10-08 by foreign-stage-contract-pass' build. Re-verified: the root file pins one channel, and no `cargo --version` step in gates.yml or publish.yml retries. Owner lookup: `toolchain`, `retry`, `fetch` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §check-crate-arms.
-
-### turn-end-premise-stale
-
-[cost: event/low] [surface: delegation-kit]
-
-the backgrounding rule's premise, that a dispatched agent's turn end is its session end, measured false on one harness build whose report rides a hand-back call: a session that handed back over a live shell task was resumed by that task's completion notification, and its dispatcher's first notification said the result may be interim. delegation-kit/SPEC.md §The turn-end liveness hook carries that measurement. The premise still opens the backgrounding bullet of delegation-kit/templates/agent-execution.md, heads its operative copy in the stage-session definition, and grounds lifecycle-kit/SPEC.md §The stamp protocol's sentence that a session ending its turn on running work emits a notification that lies. [notification-delivery-probe](#notification-delivery-probe) argues from the same premise.
-
-**Deliverable:** the premise re-read against a harness with a hand-back call; then the bullet, its operative copies and that SPEC sentence restated to what was measured, with the rule they ground, no turn ended on running work, kept or re-grounded at spec.
-
-**Inferred, not run:** an undelivered turn end over a live shell task with the turn-end hook unwired; the measured session had delivered its report under a wired hook.
-
-**Cost while deferred:** three surfaces instruct from a mechanism one measurement contradicts, so a reader bounds the rule by the wrong ground. Filed 2026-10-08 by foreign-stage-contract-pass' build. Re-verified: the three passages read as quoted; the harness behavior is the filer's one measurement. Owner lookup: `session end`, `turn end`, `hand-back` in this file and the disposed-findings record — [notification-delivery-probe](#notification-delivery-probe), DISTINCT (a supervisor's notification queue); owner delegation-kit/SPEC.md §The delegation model.
-
-### isolated-child-record-blind
-
-[cost: event/low] [surface: delegation-kit]
-
-a worktree-isolated child's turn-end firing reads an empty record set while its own producer's launch record stands in the main checkout's scratch dir, where the shell guard sends it, so the record-set arm cannot see a producer the child itself recorded and only the task-view arm refuses. delegation-kit/SPEC.md §The turn-end liveness hook states the isolated reading and neither the scratch dir it is taken over nor this consequence.
-
-**Deliverable:** that section stating which scratch dir an isolated firing reads, or the hook reading the main checkout's, with a case holding the choice.
-
-**Inferred, not run:** that the firing reads the worktree's scratch dir on the hook's relative default; one firing logged an empty set beside a live recorded producer, and the hook was not replayed under isolation.
-
-**Cost while deferred:** a producer an isolated child detaches from a foreground call carries a record its own turn end cannot read. Filed 2026-10-08 by foreign-stage-contract-pass' build. Re-verified: the capture log holds the empty-set refusal three seconds ahead of a one-record row. Owner lookup: `isolated`, `record set`, `scratch dir` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §The turn-end liveness hook.
 
 ## Icebox
 

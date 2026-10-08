@@ -4,4 +4,4 @@
 
 ---
 
-— scope a770478c 2026-10-08 c4efe520a
+foreign-stage-binding-pass scope a770478c 2026-10-08 c4efe520a
