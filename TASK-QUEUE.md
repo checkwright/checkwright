@@ -68,16 +68,6 @@ kit prose outside the adapter surfaces can re-acquire a harness-bound literal wi
 
 ## Technical Debt
 
-### toolchain-fetch-no-retry
-
-every cargo-running CI job fetches the pinned toolchain on its first cargo call, the runner images carrying none under the name `rust-toolchain.toml` pins, and nothing retries that fetch. On the pin's landing push one job of 16, the macOS arm64 `native-artifacts` leg, redded in `cargo --version` on a connect timeout fetching the channel manifest and skipped the five install-smoke legs behind it; a re-run of the failed jobs went green on the same tree.
-
-**Deliverable:** a bounded retry around each job's first cargo call, spelled once, or a toolchain cache step; then gate-sdk/SPEC.md §check-crate-arms' honest limit, which answers a failed fetch with a re-run of the leg, restated to the remedy taken.
-
-**Push need (2026-10-08, inside the budget):** one mid-iteration push, since only a remote run executes the retry; operator direction on the unit set, lead-relayed (not a ruling).
-
-**Cost while deferred:** a red push and a hand re-run per fetch failure. Filed 2026-10-08 by foreign-stage-contract-pass' build. Read at promotion, 2026-10-08, off gates run 37742767288: attempt 1 failed that one leg on a TCP connect timeout downloading the channel manifest, five install-smoke legs skipped, and attempt 2 is green. Re-verified: the root file pins one channel, and no `cargo --version` step in gates.yml or publish.yml retries. Owner lookup: `toolchain`, `retry`, `fetch` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §check-crate-arms.
-
 ### turn-end-premise-stale
 
 the backgrounding rule's premise, that a dispatched agent's turn end is its session end, measured false on one harness build whose report rides a hand-back call: a session that handed back over a live shell task was resumed by that task's completion notification, and its dispatcher's first notification said the result may be interim. delegation-kit/SPEC.md §The turn-end liveness hook carries that measurement. The premise still opens the backgrounding bullet of delegation-kit/templates/agent-execution.md, heads its operative copy in the stage-session definition, and grounds lifecycle-kit/SPEC.md §The stamp protocol's sentence that a session ending its turn on running work emits a notification that lies. [notification-delivery-probe](#notification-delivery-probe) argues from the same premise.
@@ -1249,4 +1239,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 ## Done
 
 - windows-cfg-msrv-lint-local
+- toolchain-fetch-no-retry
 
