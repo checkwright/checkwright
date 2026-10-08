@@ -46,6 +46,7 @@ check-commit-msg
 check-commit-subject
 check-tree-terms
 check-portability-floor
+check-harness-literal
 check-projection-roster
 check-root-tiering
 check-workflow-tiering

@@ -42,6 +42,7 @@ pub mod gate_fixture_coverage;
 pub mod gate_output;
 pub mod gate_tamper;
 pub mod graph;
+pub mod harness_literal;
 pub mod kit_enum;
 pub mod docs_cname_parity;
 pub mod exec_bit;
@@ -2481,6 +2482,16 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["GATE_SDK_PORTABILITY_PATTERNS", "GATE_SDK_PORTABILITY_PATHS", "GATE_SDK_KIT_DIRS"],
         "gate-sdk",
+        &[("git", "")],
+    ),
+    // spec: gate-sdk/SPEC.md §check-harness-literal — no walk root: the corpus is `git ls-files`
+    // over the configured pathspecs, as §check-portability-floor's is
+    (
+        "check-harness-literal",
+        harness_literal::run,
+        &[],
+        &["GATE_SDK_HARNESS_LITERALS", "GATE_SDK_HARNESS_LITERAL_PATHS"],
+        "-",
         &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-projection-roster — no walk root: the corpus is the registry's

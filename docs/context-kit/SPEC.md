@@ -413,6 +413,7 @@ The class it defends recurs with every gate port: replacing a kit's `checks/<gat
 
 - Its tokens are `command` split on ASCII whitespace, or in the exec form `command` followed by each `args` element verbatim, with the same env and interpreter skip.
 - The candidate is taken when it carries a `/`, whatever its extension. The runtime-created ground that scopes a grant to `.sh` does not transfer: a hook names what the harness executes, never a path it creates.
+  <!-- harness-binding: the settings-path reader parses the wiring's own spelling -->
 - A leading project-root placeholder (`${CLAUDE_PROJECT_DIR}` or `$CLAUDE_PROJECT_DIR`, quoted or bare, then `/`) is stripped, and the rest resolves repo-relative, the root the harness substitutes. A candidate carrying any other `$` names a root outside the tree, such as a plugin's, and is skipped and counted.
 - **A stated limit, not a scope:** a hook running its script through an interpreter other than `bash`/`sh` (`node`, `pwsh -File`) puts the script in argument position, where the walk does not look.
 

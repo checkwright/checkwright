@@ -1,0 +1,3 @@
+# graph: couples=scripts/gate-sdk-config.knobs dir=one valve=none tier=precommit trigger=*
+# armed-by: GATE_SDK_HARNESS_LITERAL_PATHS
+# spec: gate-sdk/SPEC.md §check-harness-literal — no file on the configured corpus carries a configured harness literal outside a site declaring the binding

@@ -14,13 +14,26 @@ const VALVE: &str = "portability-declared:";
 // the token with nothing after it is a violation rather than a pass: `None` is *no valve here*
 // and `Some("")` is a valve whose only reader was given nothing to read
 fn valve_reason(line: &str) -> Option<&str> {
-    line.split_once(VALVE).map(|(_, r)| r.trim())
+    token_reason(VALVE, line)
+}
+
+// spec: gate-sdk/SPEC.md §check-harness-literal — the valve grammar is shared, the token is each
+// member's own
+pub(crate) fn token_reason<'a>(token: &str, line: &'a str) -> Option<&'a str> {
+    line.split_once(token).map(|(_, r)| r.trim())
+}
+
+// spec: gate-sdk/SPEC.md §check-portability-floor — the window is the matching line or the one
+// above, and an empty reason clears nothing
+pub(crate) fn declared<'a>(lines: &[&'a str], i: usize, reason: impl Fn(&'a str) -> Option<&'a str>) -> bool {
+    let above = if i > 0 { lines[i - 1] } else { "" };
+    reason(lines[i]).or_else(|| reason(above)).is_some_and(|r| !r.is_empty())
 }
 
 // spec: gate-sdk/SPEC.md §check-portability-floor — a NUL byte makes a member binary, and a
 // construct is a spelling a shell runs: a match inside a compiled artifact names no line to edit
 // and no command an adopter's machine executes, so the member is skipped and counted
-fn binary(bytes: &[u8]) -> bool {
+pub(crate) fn binary(bytes: &[u8]) -> bool {
     bytes.contains(&0)
 }
 
@@ -107,23 +120,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    // spec: gate-sdk/SPEC.md §check-portability-floor — the corpus is the *tracked* set under the
-    // configured pathspecs, never a directory walk: what an adopter executes is what the payload
-    // carries, and the payload is assembled from tracked files
-    let mut argv: Vec<&str> = vec!["ls-files", "--"];
-    for p in &paths {
-        argv.push(p.as_str());
-    }
-    let ls = proc::run(&programs::GIT, &argv).map_err(|e| format!("check-portability-floor: {}", e))?;
-    let listing = match ls.stdout() {
-        Some(o) => String::from_utf8_lossy(o).into_owned(),
-        None => {
-            return Err(format!(
-                "check-portability-floor: {}",
-                fresh::fail_closed("git-ls-files", ls.code())
-            ))
-        }
-    };
+    let listing = tracked("check-portability-floor", &paths)?;
 
     let mut hits: Vec<String> = Vec::new();
     let mut ascii_hits: Vec<String> = Vec::new();
@@ -161,13 +158,8 @@ fn inner(args: &[String]) -> Result<i32, String> {
             let Some((pat, _)) = compiled.iter().find(|(_, re)| re.is_match(line)) else {
                 continue;
             };
-            // spec: gate-sdk/SPEC.md §check-portability-floor — the window is the matching line
-            // or the one above, and an empty reason clears nothing
-            let above = if i > 0 { lines[i - 1] } else { "" };
-            if let Some(r) = valve_reason(line).or_else(|| valve_reason(above)) {
-                if !r.is_empty() {
-                    continue;
-                }
+            if declared(&lines, i, valve_reason) {
+                continue;
             }
             hits.push(format!("{}:{}:{}\n    pattern: {}", path, i + 1, line, pat));
         }
@@ -229,6 +221,21 @@ fn inner(args: &[String]) -> Result<i32, String> {
         ps1_checked
     );
     Ok(0)
+}
+
+// spec: gate-sdk/SPEC.md §check-portability-floor — the corpus is the *tracked* set under the
+// configured pathspecs, never a directory walk: what an adopter executes is what the payload
+// carries, and the payload is assembled from tracked files
+pub(crate) fn tracked(gate: &str, paths: &[String]) -> Result<String, String> {
+    let mut argv: Vec<&str> = vec!["ls-files", "--"];
+    for p in paths {
+        argv.push(p.as_str());
+    }
+    let ls = proc::run(&programs::GIT, &argv).map_err(|e| format!("{}: {}", gate, e))?;
+    match ls.stdout() {
+        Some(o) => Ok(String::from_utf8_lossy(o).into_owned()),
+        None => Err(format!("{}: {}", gate, fresh::fail_closed("git-ls-files", ls.code()))),
+    }
 }
 
 // spec: gate-sdk/SPEC.md §check-portability-floor — the ASCII arm reads the members Windows

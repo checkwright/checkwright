@@ -63,6 +63,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | [gate-sdk](gate-sdk/index.md) | check-exec-bit | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-tree-terms | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-portability-floor | precommit |
+| (consumer) | check-harness-literal | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-projection-roster | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-root-tiering | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-workflow-tiering | precommit |

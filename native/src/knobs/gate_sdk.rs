@@ -185,6 +185,8 @@ pub const KIT: Kit = Kit {
             .empty_takes_default().words(),
         Row::derived("GATE_SDK_PORTABILITY_PATTERNS", Shape::Scalar, portability_patterns, GATES).empty_takes_default().words(),
         Row::scalar("GATE_SDK_PORTABILITY_PATHS", "").empty_takes_default().words(),
+        Row::scalar("GATE_SDK_HARNESS_LITERALS", "").empty_takes_default().words(),
+        Row::scalar("GATE_SDK_HARNESS_LITERAL_PATHS", "").empty_takes_default().words(),
         Row::scalar("GATE_SDK_PROJECTION_ROSTER", "").empty_takes_default(),
         Row::scalar("GATE_SDK_PROJECTION_ROSTER_SECTION", "").empty_takes_default(),
         Row::scalar("GATE_SDK_KIT_DIRS", "").empty_takes_default().words(),

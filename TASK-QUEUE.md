@@ -56,16 +56,6 @@ an on-demand critique of the project's strategic weaknesses, run on the top fore
 
 **Cost while deferred:** strategic weaknesses surface only through the operator's own reading. The filing's ground, that this cost was nil while the operator held no foreign credit, lapsed: credit is held (operator answer 2026-10-06, lead-relayed, a fact and no run grant). Filed 2026-10-03 by delegation-transport-pass' lead. Re-verified: no tracked prose names a SWOT or an on-demand foreign critique. Owner lookup: `SWOT`, `critique`, `strategic`, `reflection` in this file — foreign-vendor-critique, DISTINCT (its close review landed this iteration); owner delegation-kit/SPEC.md §The foreign-vendor run, the SWOT's home open.
 
-### harness-literal-catcher-gate
-
-[spec: SPEC-harness-literal.md]
-
-kit prose outside the adapter surfaces can re-acquire a harness-bound literal with the battery green: the sweep that named the hook anchor generically landed with no catcher, against doctrine-kit/DOCTRINE.md Enforcement-first.
-
-**Deliverable:** a gate reading a knob-listed set of harness literals, the project-directory variable first, and red on any outside a knob-listed adapter-surface set (the wiring templates, plugin/, the settings-path reader's SPEC section and each sentence declaring the binding); new mechanism, so it enters through scope. In the unit set, 2026-10-08 (operator direction, lead-relayed, not a ruling).
-
-**Cost while deferred:** an edit to a kit SPEC or README can name one harness's variable where the generic name stood, unread until an adopter on another harness meets it. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' build on an operator direction, lead-relayed (not a ruling). Re-verified by grep over the kit SPECs and READMEs: the variable stands in plugin/SPEC.md, context-kit/SPEC.md's reader section, and one binding sentence each in guard-kit/SPEC.md and delegation-kit/README.md. Owner lookup: `harness literal`, `adapter surface`, `project-directory` in this file and the disposed-findings record — none; [plugin-harness-reach](#plugin-harness-reach), DISTINCT (the plugin's reach on other harnesses); owner gate-sdk/SPEC.md §The adopter constraints.
-
 ## Technical Debt
 
 ### turn-end-premise-stale
@@ -460,7 +450,7 @@ kit prose carries the master harness's names where no knob owns them: the hook e
 
 **Deliverable:** a harness-neutral statement of the hook contract behind a binding table, the kit SPECs citing it; feature-sized, since it restates wire contracts.
 
-**Cost while deferred:** an adopter on another harness reads the hook-member sections as one vendor's protocol, which they are. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' build. Re-verified by grep over the kit SPECs for the event names, payload keys, variables and parameter names: 93 lines, delegation-kit 42, guard-kit 31, context-kit 8, lifecycle-kit 7, gate-sdk 3, drift-kit 1, evidence-kit 1. Owner lookup: `hook contract`, `binding table`, `harness-neutral`, `payload key` in this file and the disposed-findings record — none; [plugin-harness-reach](#plugin-harness-reach), DISTINCT (its per-harness guard wiring would bind against this contract); [harness-literal-catcher-gate](#harness-literal-catcher-gate), DISTINCT (the catcher for sites already generic).
+**Cost while deferred:** an adopter on another harness reads the hook-member sections as one vendor's protocol, which they are. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' build. Re-verified by grep over the kit SPECs for the event names, payload keys, variables and parameter names: 93 lines, delegation-kit 42, guard-kit 31, context-kit 8, lifecycle-kit 7, gate-sdk 3, drift-kit 1, evidence-kit 1. Owner lookup: `hook contract`, `binding table`, `harness-neutral`, `payload key` in this file and the disposed-findings record — none; [plugin-harness-reach](#plugin-harness-reach), DISTINCT (its per-harness guard wiring would bind against this contract); `harness-literal-catcher-gate`, DISTINCT (the catcher for sites already generic).
 
 ### windows-kpi-plugin-start
 
@@ -1240,4 +1230,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 
 - windows-cfg-msrv-lint-local
 - toolchain-fetch-no-retry
+- harness-literal-catcher-gate
 

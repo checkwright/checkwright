@@ -1,0 +1,1 @@
+HARNESS-LITERAL: clean (2 file(s) scanned under 2 configured pathspec(s), 0 binary member(s) skipped; none names one of the 1 harness literal(s) outside a declared site)

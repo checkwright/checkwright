@@ -20,6 +20,7 @@ const SHELL_COLON: &[&str] = &[
     "exception-list:",
     "no-fixture:",
     "portability-declared:",
+    "harness-binding:",
     "path-dialect-exempt:",
     "gh-repo-exempt:",
     "action-permissions-exempt:",
