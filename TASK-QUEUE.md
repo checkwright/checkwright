@@ -8,6 +8,40 @@
 
 ## New Features
 
+### heterogeneous-agent-delegation
+
+[spec: SPEC-foreign-stage-binding.md] [roadmap: now/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
+
+foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent. It cashes the public no-lock-in claim — governance enforced at the git/gate boundary, not by trusting the author; the verification substrate and the shared git-index/HEAD serialization are already agent-neutral. *Remaining:* (4) **stage-contract expression**, past its first slice below: a host protocol for any stage but the audit stage, the next slice (operator direction, 2026-10-08, lead-relayed, not a ruling), and a stage whose writes a foreign agent performs.
+
+**Slices landed**, each in delegation-kit/SPEC.md §The foreign-vendor run and each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); then (2) the dispatch transport with (1) the escalation resume model riding it, `--foreign-resume`, that section's Resuming a session (delegation-transport-pass, 2026-10-03). Then (3) the budget oracle, delegation-kit/SPEC.md §The keyed verdict (delegation-wait-journal-pass, 2026-10-07; operator direction, lead-relayed, not a ruling), which owns the read and its `--budget` form. No foreign run was granted with it: accepted by stub-driven crate cases and one producer read of a vendor's on-disk session store through a scratch binding, so a live turn refreshing the feed is unobserved, as is whether a turn in a vendor's non-persisting mode, two of this repo's three adapters, leaves a usage event on disk; one granted run of each kind settles both. **This repo's binding (operator direction, 2026-10-07, lead-relayed, not a ruling):** inline in the gitignored `.local` overlay alone, its adapters reading one snapshot under the metric dir from an inline producer; `--budget` read it `OK` 2026-10-08. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
+
+**Item (4)'s first slice landed** (foreign-stage-contract-pass, 2026-10-08; operator direction, lead-relayed, not a ruling), lifecycle-kit/SPEC.md §The stage-contract arm: the audit stage's reading runs foreign and its host session performs every write. Accepted with no vendor: crate cases and a read-only master-harness child handed the document alone. **Unobserved:** a foreign agent executing the contract: whether it holds the no-write frame, whether its sandbox runs the contract's read-only commands, and whether its report keeps the parts. **Grant:** one live foreign run for this acceptance, narrowed by the operator the same day to mandatory-only, stands unspent; one host run of the audit stage discharges the line. Operator-confirmed 2026-10-08, lead-relayed (a grant): spendable on the next audit stage triggered.
+
+**Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, the pattern the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service) and [plugin-harness-reach](#plugin-harness-reach).
+
+**Demand attested (2026-07-23):** the operator holds three foreign-vendor subscriptions and wants read-heavy delegation routed to them for budget headroom. **Its citer** [companion-toolkit-profile](#companion-toolkit-profile) blocks on none of it.
+
+**Attribution, operator direction 2026-09-30, lead-relayed (not a ruling):** foreign harnesses' commit trailers off and the method stated in one place, the README, held by construction (foreign work lands in the delegating session's commit); a harness setting change takes the operator's confirmation.
+
+**Design memory (2026-07-25, 2026-08-02):** JSONL turn events ship on the installed binaries probed. The machine profile (context-kit/SPEC.md §bin/env-probe, local-only) owns which CLIs and how.
+
+**Cost while deferred:** stage-level work still bills one vendor's budget while three subscriptions are held, and this design memory ages against fast-moving CLIs. Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question).
+
+### stage-executor-binding
+
+[spec: SPEC-foreign-stage-binding.md]
+
+a per-stage executor binding as consumer config: a consumer picks the harness and model for each stage, say every stage on the master harness and align on a foreign coding agent at a chosen model and effort, offered as a consumer-selectable set with today's all-master-harness posture one member. It extends `DELEGATION_KIT_TIER_MODEL`'s per-class binding to a per-stage executor. Operator direction 2026-10-03, lead-relayed (not a ruling).
+
+**Gate opened** by [heterogeneous-agent-delegation](#heterogeneous-agent-delegation)'s item (4) first slice (foreign-stage-contract-pass, 2026-10-08): the audit stage's reading runs on a foreign agent under lifecycle-kit/SPEC.md §The stage-contract arm, the adapter picked by the dispatcher by name.
+
+**In the unit set, 2026-10-08 (operator direction, lead-relayed, not a ruling),** behind that entry's next slice: only a stage with a host protocol can be bound foreign, so the knob's member set follows the slice.
+
+**Deliverable:** the stage-to-executor knob, its validator and the lead's dispatch-time read, in delegation-kit/SPEC.md §The tier binding, with fixtures.
+
+**Cost while deferred:** a consumer has no declarative way to put a stage on a foreign agent, the pick riding each dispatch prompt. The filing's second ground, no foreign credit held, lapsed: credit is held (operator answer 2026-10-06, lead-relayed, a fact and no run grant). Filed 2026-10-03 by delegation-transport-pass' lead. Re-verified: the knob roster carries no stage- or executor-keyed delegation-kit knob. Owner lookup: `per-stage`, `executor`, `TIER_MODEL` in this file — heterogeneous-agent-delegation, DISTINCT (item (4) lets a stage run foreign; this chooses which); owner delegation-kit/SPEC.md §The tier binding.
+
 ## Technical Debt
 
 ### toolchain-fetch-no-retry
@@ -55,20 +89,6 @@ an on-demand critique of the project's strategic weaknesses, run on the top fore
 **Deliverable:** the on-demand trigger, the critique prompt, the reflection pass's contract and the SWOT's home, model literals in consumer config. The spec question is the reflection's write path, since work enters only through scope (doctrine-kit/DOCTRINE.md, Scope-gated intake).
 
 **Cost while deferred:** strategic weaknesses surface only through the operator's own reading. The filing's ground, that this cost was nil while the operator held no foreign credit, lapsed: credit is held (operator answer 2026-10-06, lead-relayed, a fact and no run grant). Filed 2026-10-03 by delegation-transport-pass' lead. Re-verified: no tracked prose names a SWOT or an on-demand foreign critique. Owner lookup: `SWOT`, `critique`, `strategic`, `reflection` in this file — foreign-vendor-critique, DISTINCT (its close review landed this iteration); owner delegation-kit/SPEC.md §The foreign-vendor run, the SWOT's home open.
-
-### stage-executor-binding
-
-[cost: event/low] [surface: delegation-kit]
-
-a per-stage executor binding as consumer config: a consumer picks the harness and model for each stage, say every stage on the master harness and align on a foreign coding agent at a chosen model and effort, offered as a consumer-selectable set with today's all-master-harness posture one member. It extends `DELEGATION_KIT_TIER_MODEL`'s per-class binding to a per-stage executor. Operator direction 2026-10-03, lead-relayed (not a ruling).
-
-**Gate opened** by [heterogeneous-agent-delegation](#heterogeneous-agent-delegation)'s item (4) first slice (foreign-stage-contract-pass, 2026-10-08): the audit stage's reading runs on a foreign agent under lifecycle-kit/SPEC.md §The stage-contract arm, the adapter picked by the dispatcher by name.
-
-**In the unit set, 2026-10-08 (operator direction, lead-relayed, not a ruling),** behind that entry's next slice: only a stage with a host protocol can be bound foreign, so the knob's member set follows the slice.
-
-**Deliverable:** the stage-to-executor knob, its validator and the lead's dispatch-time read, in delegation-kit/SPEC.md §The tier binding, with fixtures.
-
-**Cost while deferred:** a consumer has no declarative way to put a stage on a foreign agent, the pick riding each dispatch prompt. The filing's second ground, no foreign credit held, lapsed: credit is held (operator answer 2026-10-06, lead-relayed, a fact and no run grant). Filed 2026-10-03 by delegation-transport-pass' lead. Re-verified: the knob roster carries no stage- or executor-keyed delegation-kit knob. Owner lookup: `per-stage`, `executor`, `TIER_MODEL` in this file — heterogeneous-agent-delegation, DISTINCT (item (4) lets a stage run foreign; this chooses which); owner delegation-kit/SPEC.md §The tier binding.
 
 ### guard-quoted-operand-words
 
@@ -119,26 +139,6 @@ a controlled A/B trial.
 hosted attestation. The team/paid rung: gates verified server-side by a party the committing agents cannot touch — hosted gate runs as a neutral attestation, cross-repo drift dashboards, maintained rulesets. A service, not code: cloning the kits does not clone the neutrality or the ops. Demand-gated — this entry is the public roadmap marker, not a scaffold; hosting and sequencing decisions are on record in the operator's local brief, and multi-operator-semantics is its prerequisite mechanism. Surfaced 2026-07-07.
 
 **Cost while deferred:** zero — this is a service rather than tree mechanism, so nothing rots; the residue is that gate runs stay self-attested, which binds only when a party the committing agents cannot touch is asked to trust them.
-
-### heterogeneous-agent-delegation
-
-[cost: iteration/low] [surface: delegation-kit] [roadmap: now/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
-
-foreign agents. Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent. It cashes the public no-lock-in claim — governance enforced at the git/gate boundary, not by trusting the author; the verification substrate and the shared git-index/HEAD serialization are already agent-neutral. *Remaining:* (4) **stage-contract expression**, past its first slice below: a host protocol for any stage but the audit stage, the next slice (operator direction, 2026-10-08, lead-relayed, not a ruling), and a stage whose writes a foreign agent performs.
-
-**Slices landed**, each in delegation-kit/SPEC.md §The foreign-vendor run and each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); then (2) the dispatch transport with (1) the escalation resume model riding it, `--foreign-resume`, that section's Resuming a session (delegation-transport-pass, 2026-10-03). Then (3) the budget oracle, delegation-kit/SPEC.md §The keyed verdict (delegation-wait-journal-pass, 2026-10-07; operator direction, lead-relayed, not a ruling), which owns the read and its `--budget` form. No foreign run was granted with it: accepted by stub-driven crate cases and one producer read of a vendor's on-disk session store through a scratch binding, so a live turn refreshing the feed is unobserved, as is whether a turn in a vendor's non-persisting mode, two of this repo's three adapters, leaves a usage event on disk; one granted run of each kind settles both. **This repo's binding (operator direction, 2026-10-07, lead-relayed, not a ruling):** inline in the gitignored `.local` overlay alone, its adapters reading one snapshot under the metric dir from an inline producer; `--budget` read it `OK` 2026-10-08. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
-
-**Item (4)'s first slice landed** (foreign-stage-contract-pass, 2026-10-08; operator direction, lead-relayed, not a ruling), lifecycle-kit/SPEC.md §The stage-contract arm: the audit stage's reading runs foreign and its host session performs every write. Accepted with no vendor: crate cases and a read-only master-harness child handed the document alone. **Unobserved:** a foreign agent executing the contract: whether it holds the no-write frame, whether its sandbox runs the contract's read-only commands, and whether its report keeps the parts. **Grant:** one live foreign run for this acceptance, narrowed by the operator the same day to mandatory-only, stands unspent; one host run of the audit stage discharges the line. Operator-confirmed 2026-10-08, lead-relayed (a grant): spendable on the next audit stage triggered.
-
-**Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, the pattern the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service) and [plugin-harness-reach](#plugin-harness-reach).
-
-**Demand attested (2026-07-23):** the operator holds three foreign-vendor subscriptions and wants read-heavy delegation routed to them for budget headroom. **Its citer** [companion-toolkit-profile](#companion-toolkit-profile) blocks on none of it.
-
-**Attribution, operator direction 2026-09-30, lead-relayed (not a ruling):** foreign harnesses' commit trailers off and the method stated in one place, the README, held by construction (foreign work lands in the delegating session's commit); a harness setting change takes the operator's confirmation.
-
-**Design memory (2026-07-25, 2026-08-02):** JSONL turn events ship on the installed binaries probed. The machine profile (context-kit/SPEC.md §bin/env-probe, local-only) owns which CLIs and how.
-
-**Cost while deferred:** stage-level work still bills one vendor's budget while three subscriptions are held, and this design memory ages against fast-moving CLIs. Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question).
 
 ### companion-toolkit-profile
 
