@@ -35,6 +35,13 @@ binary="$(gate_native_bin)"
 binary="${binary##*/}"
 binary="${binary%.exe}$(gate_exe_suffix "$target")"
 
+# spec: gate-sdk/SPEC.md §Consumer payload — a glibc artifact's floor is a version need the loader must refuse below, and the linker decides whether that need is hard: one whose every reference is weak is flagged weak by a newer linker, and the loader then warns and runs. The runner label pins the C library and not the Rust toolchain the image carries (native/runners.list), so the glibc targets build on a named toolchain; move it as one deliberate edit, whose push is its witness.
+case "$target" in
+    *-unknown-linux-gnu)
+        export RUSTUP_TOOLCHAIN=1.98.1
+        rustup toolchain install "$RUSTUP_TOOLCHAIN" --profile minimal --no-self-update
+        ;;
+esac
 rustup target add "$target"
 bash gate-sdk/bin/build-native.sh --target "$target"
 
@@ -102,10 +109,11 @@ else
     [ -n "$declared" ] || floor_refuse "its $platforms_page row states no '$floor_lead <version>' Minimum, so there is nothing to hold the artifact to"
     command -v "$floor_tool" >/dev/null 2>&1 || floor_refuse "'$floor_tool' is not on PATH, so the artifact's floor cannot be measured"
     if [ "$floor_tool" = readelf ]; then
+        # spec: gate-sdk/SPEC.md §Consumer payload — a need flagged weak is no floor, since the loader runs the artifact without it, so only the hard needs are measured
         measured="$(readelf -V --wide "$out/$binary" | awk "$floor_cmp_awk"'
             /^Version needs section/ { inb = 1; next }
             /^Version .* section/    { inb = 0 }
-            inb {
+            inb && !/Flags: WEAK/ {
                 for (i = 1; i <= NF; i++) if ($i ~ /^GLIBC_[0-9]/) {
                     v = substr($i, 7)
                     if (best == "" || cmp(v, best) > 0) best = v
@@ -126,7 +134,8 @@ else
         floor_refuse "the artifact needs $floor_lead $measured while $platforms_page declares $floor_lead $declared.
   Pin this target's runner in native/runners.list to an image with the older library, or
   raise the row's Minimum cell to $floor_lead $measured, a support narrowing the release
-  declaration surface declares under Behavior changes."
+  declaration surface declares under Behavior changes. A glibc measure below the
+  declared floor is a need the linker flagged weak: hold the toolchain this body names."
     fi
     echo "floor $target: $floor_lead $measured measured, equal to the declared $floor_lead $declared"
 fi
