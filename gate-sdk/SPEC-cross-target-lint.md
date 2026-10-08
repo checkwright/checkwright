@@ -42,7 +42,7 @@ The build session writes the overlay lines and reports them, since no commit car
 - **`GATE_SDK_CRATE_TARGET_LINT_CMD`** — producer: a host's knob overlay; this repo's build host sets it (delta 4), and the crate's cases set it to a stub. Consumer: `check-crate-arms`, which spawns the argv and folds it into the cache key. Every element is read, as argv.
 - **The arm's verdict** — producer: the command's exit status. Consumer: the committing session, through the gate's report.
 - **The cache record** — existing; its key gains two inputs (delta 2), read by the same lookup in the main checkout and in a linked worktree.
-- **Roster-holding readers of the minted knob name** — the crate's knob table and rendered roster, the kit's knob template, the kit SPEC's knob list, the two spawn rosters gate-sdk/SPEC.md keeps, and the release declarations, each an update target below.
+- **Roster-holding readers of the minted knob name** — the crate's knob table and rendered roster, the kit SPEC's knob list, the gate's declared-knob and declared-program rosters, the two spawn rosters gate-sdk/SPEC.md keeps, and the release declarations, each an update target below.
 - **A narrowed corpus** — none. **An obligation on every member of a corpus** — none: the gate's fixture cases leave the knob unset and run the three arms as today.
 
 ## Existing sections updated
@@ -52,7 +52,8 @@ Produced by a read of gate-sdk/SPEC.md §check-crate-arms and `git grep -n 'GATE
 - `gate-sdk/SPEC.md` §check-crate-arms — the fourth arm beside the fixture arm's paragraph (delta 1), the cache paragraphs (delta 2), the Windows-leg sentence, the honest limit, the declared-programs paragraph and the arm counts (delta 3); §Layout and configuration — the knob bullet (delta 1); the crate's network-spawner roster and its consumer-changeable spawn list, which today name arms alone, each gaining this gate's command where set (delta 1).
 - `native/src/gates/crate_arms.rs` — the arm, the key and the declared program (deltas 1, 2 and 3); `native/src/knobs/gate_sdk.rs` — the row (delta 1).
 - The crate's cases under a stub command: a zero exit clean, a non-zero exit red with the output relayed, an unresolvable program at exit 2 naming the knob, an empty knob spawning nothing, and a changed argv missing the cache (deltas 1 and 2).
-- `gate-sdk/templates/gate-sdk-config.knobs` and `gate-sdk/README.md` where they list knobs (delta 1).
+- `gate-sdk/README.md` where it lists knobs (delta 1).
+- `native/src/gates/mod.rs` — `check-crate-arms`' declared-knob roster gains `GATE_SDK_CRATE_TARGET_LINT_CMD` (delta 1) and its declared-program roster gains the program that knob names (delta 3).
 - `.workflow/release-declarations.md` — a row for the knob (delta 1).
 - `docs/gate-sdk/` and every other generated projection of the surfaces above — regenerated, never hand-edited (all deltas).
 

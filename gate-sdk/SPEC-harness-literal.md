@@ -66,7 +66,7 @@ Produced by `git grep -n 'portability-declared' -- canon-kit/SPEC.md native/src`
 - `native/src/gates/` — the new module, sharing `portability_floor.rs`'s scanner; `native/src/knobs/gate_sdk.rs` — two rows (delta 1).
 - `scripts/check-harness-literal.gate`, `scripts/gate-tests/check-harness-literal/{good,bad}/` and its `.test.sh`, new (delta 1); `scripts/gates.list` and `scripts/gate-sdk-config.knobs` (delta 3).
 - `context-kit/SPEC.md`, `guard-kit/SPEC.md`, `delegation-kit/README.md` — one valve line each (delta 3).
-- `gate-sdk/templates/gate-sdk-config.knobs` and `gate-sdk/README.md` where they list knobs (delta 1).
+- `gate-sdk/README.md` where it lists knobs (delta 1).
 - `.workflow/release-declarations.md` — a row for the two knobs and the valve token (deltas 1 and 2).
 - `docs/kits.md`, `docs/check-graph.html`, `docs/gate-sdk/`, `docs/canon-kit/`, `docs/context-kit/`, `docs/guard-kit/`, `docs/delegation-kit/` and every other generated projection of the surfaces above — regenerated, never hand-edited (all deltas).
 
