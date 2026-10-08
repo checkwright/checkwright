@@ -50,7 +50,7 @@ an on-demand critique of the project's strategic weaknesses, run on the top fore
 
 **In the unit set, 2026-10-08 (operator direction, lead-relayed, not a ruling).** No foreign run is granted for it, so its acceptance is stub-driven unless one is; the SWOT's home is the one question that may need the operator.
 
-**Executor and reflection path (operator direction, 2026-10-08, lead-relayed, not a ruling and no run grant):** the critique runs through codex on GPT-6-Astra at medium effort, which this repo's `codex-expert` adapter already binds; its output is saved to a file, and that file is submitted to `/consult` on Fable as the reflection pass.
+**Executor and reflection path (operator direction, 2026-10-08, lead-relayed, not a ruling and no run grant):** the critique runs through codex on GPT-6-Astra at medium effort, which this repo's `codex-expert` adapter already binds; its output is saved to a file, and that file is submitted to `/consult` on Fable as the reflection pass. **Refined the same day (operator direction, lead-relayed, not a ruling):** `/consult` may instead run the critique directly, so it can put clarifying questions to codex on Astra, which the operator leans toward without choosing; no critique run is wanted now, and the deliverable is a clear process for triggering one later from a `/consult` that is updating the SWOT.
 
 **Deliverable:** the on-demand trigger, the critique prompt, the reflection pass's contract and the SWOT's home, model literals in consumer config. The spec question is the reflection's write path, since work enters only through scope (doctrine-kit/DOCTRINE.md, Scope-gated intake).
 
