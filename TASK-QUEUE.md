@@ -66,18 +66,6 @@ kit prose outside the adapter surfaces can re-acquire a harness-bound literal wi
 
 **Cost while deferred:** an edit to a kit SPEC or README can name one harness's variable where the generic name stood, unread until an adopter on another harness meets it. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' build on an operator direction, lead-relayed (not a ruling). Re-verified by grep over the kit SPECs and READMEs: the variable stands in plugin/SPEC.md, context-kit/SPEC.md's reader section, and one binding sentence each in guard-kit/SPEC.md and delegation-kit/README.md. Owner lookup: `harness literal`, `adapter surface`, `project-directory` in this file and the disposed-findings record — none; [plugin-harness-reach](#plugin-harness-reach), DISTINCT (the plugin's reach on other harnesses); owner gate-sdk/SPEC.md §The adopter constraints.
 
-### windows-cfg-msrv-lint-local
-
-[spec: SPEC-cross-target-lint.md] [recurrence: 2026-10-07, 2026-10-08]
-
-crate code under `cfg(not(unix))` is linted only by `native-artifacts`' Windows clippy legs: `check-crate-arms` lints the host target, and the `gates` job's Windows step is `cargo check`, which carries no clippy lint, `incompatible_msrv` among them. An `io::Error::other` (Rust 1.74, MSRV 1.71) in `front_end_parity.rs` reached a push at drift-kit-tail-crosser-pass and cost a hotfix push (gates run 37279844257). The two later recurrences were a second axis, the toolchain's version, which rode each runner image (gates runs 37536725024 and 37690695609). **That axis landed at foreign-stage-contract-pass:** the root `rust-toolchain.toml` names the toolchain every build and lint takes, moved by the audit roster's `toolchain-pin` class (gate-sdk/SPEC.md §check-crate-arms). Its push read `cargo 1.98.1` on all 16 cargo-running jobs (gates run 37742767288, green on a re-run of one leg whose toolchain fetch timed out).
-
-**Deliverable:** a contributor-side catch before the push for Windows-only code: an opt-in cross-target clippy in `check-crate-arms` where the Windows target is installed, or a pre-push tool. How it degrades without `rustup` is spec's: gate-sdk/SPEC.md §check-crate-arms rules the compile-only Windows check no gate, since it needs `rustup` and network.
-
-**The host-provisioning wait fell, 2026-10-08 at scope.** The build host still carries no `rustup` on `PATH` and no `x86_64-pc-windows-msvc` library under the toolchain's sysroot, re-probed, but a container reaches both: in the stock Rust image, the tree mounted read-only and marked a safe directory, the target and clippy added through its `rustup`, `cargo clippy --target x86_64-pc-windows-msvc --all-targets` finished clean on the crate. Lead-probed and re-run by scope; it needs a container runtime and network, and no Windows-only lint was seeded to see it red. Entered the unit set on the recurrence threshold (lead decision, 2026-10-08). **Constraint (lead decision on an operator direction, 2026-10-08, lead-relayed, not a ruling):** the catch runs on a Linux host with no Windows machine and no operator step; whether it is a container arm and how it degrades is spec's.
-
-**Cost while deferred:** a red push and a hotfix push per Windows-only lint slip. Filed 2026-10-05 by that iteration's build. Re-verified: the `gates` job runs `cargo check --target x86_64-pc-windows-msvc`, and the only clippy on a Windows target is `native-artifacts`'. One premise fell: the candidate catcher, a cross-target clippy in the `gates` job, still lands on the push and so saves no red push. Owner lookup: `MSRV`, `clippy`, `cfg(not(unix))` in this file — msrv-move-clippy-arm-coupling (Icebox), DISTINCT (a floor move un-suppressing lints); owner gate-sdk/SPEC.md §check-crate-arms.
-
 ## Technical Debt
 
 ### toolchain-fetch-no-retry
@@ -1259,4 +1247,6 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix over the roster's unix legs would hold them in step.
 
 ## Done
+
+- windows-cfg-msrv-lint-local
 

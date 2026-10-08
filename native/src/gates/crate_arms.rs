@@ -98,6 +98,46 @@ fn fixture_arm(runner: &Program, suites: &[(String, String, String)], here: &str
     Ok((ok, ran))
 }
 
+const TARGET_LINT_KNOB: &str = "GATE_SDK_CRATE_TARGET_LINT_CMD";
+// consumer-value-exempt: the name is the toolchain manager's own, which no consumer can move
+const TOOLCHAIN_FILE: &str = "rust-toolchain.toml";
+
+// spec: gate-sdk/SPEC.md §check-crate-arms — the target-lint arm: the knob's argv spawned with no
+// shell and git's repository locators stripped; `Some` is a failed lint's report, and `Err` a
+// command that could not be spawned, which names the knob
+fn target_lint_arm(argv: &[String]) -> Result<Option<String>, String> {
+    let Some((program, rest)) = argv.split_first() else {
+        return Ok(None);
+    };
+    let args: Vec<&str> = rest.iter().map(String::as_str).collect();
+    let program = Program::consumer("GATE_SDK_CRATE_TARGET_LINT_CMD", program.as_str());
+    let m = proc::run_merged_without(&program, &args, proc::GIT_REPO_LOCATORS)?;
+    if m.succeeded() {
+        return Ok(None);
+    }
+    Ok(Some(format!(
+        "{}: the target lint {} names failed (exit {}):\n{}",
+        NAME,
+        TARGET_LINT_KNOB,
+        m.reported_code(),
+        String::from_utf8_lossy(m.output()).trim_end_matches('\n')
+    )))
+}
+
+// spec: gate-sdk/SPEC.md §check-crate-arms — while the target-lint knob is set the cache key also
+// takes its argv and the root toolchain file's bytes; empty, the key is the three arms' own
+fn cache_key(base: &str, lint: &[String], toolchain: &[u8]) -> String {
+    if lint.is_empty() {
+        return base.to_string();
+    }
+    format!(
+        "{}\t{}\t{}",
+        base,
+        lint.join("\t"),
+        String::from_utf8_lossy(toolchain).escape_debug()
+    )
+}
+
 pub(crate) const LINKED_WORKTREE: &str = "this is a linked worktree";
 
 // spec: gate-sdk/SPEC.md §check-crate-arms — in a linked worktree the main checkout's record
@@ -148,6 +188,13 @@ pub fn run(_args: &[String]) -> i32 {
             return 2;
         }
     };
+    let lint = match walk::knob_array(TARGET_LINT_KNOB) {
+        Ok(v) => v,
+        Err(e) => {
+            eprintln!("{}: {}", NAME, e);
+            return 2;
+        }
+    };
     let manifest = format!("{}/Cargo.toml", crate_dir);
 
     // spec: gate-sdk/SPEC.md §check-crate-arms — the predicate is the crate's presence, never
@@ -182,7 +229,11 @@ pub fn run(_args: &[String]) -> i32 {
         .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
         .unwrap_or_default();
         if untracked.trim_end_matches('\n').is_empty() {
-            key = format!("{} {} {}", stamp, version_of(&RUSTC), version_of(&CARGO));
+            key = cache_key(
+                &format!("{} {} {}", stamp, version_of(&RUSTC), version_of(&CARGO)),
+                &lint,
+                &std::fs::read(TOOLCHAIN_FILE).unwrap_or_default(),
+            );
             if let Ok(recorded) = std::fs::read_to_string(&cache) {
                 if recorded.trim_end_matches('\n') == key {
                     println!(
@@ -258,6 +309,20 @@ pub fn run(_args: &[String]) -> i32 {
         }
     };
 
+    // spec: gate-sdk/SPEC.md §check-crate-arms — the target-lint arm runs last and whatever the
+    // other three said; an empty knob spawns nothing
+    match target_lint_arm(&lint) {
+        Ok(None) => {}
+        Ok(Some(report)) => {
+            fail = true;
+            println!("{}", report);
+        }
+        Err(e) => {
+            eprintln!("{}: {}", NAME, e);
+            return 2;
+        }
+    }
+
     if fail {
         println!("  help: fix the finding above. These are the arms CI runs, and this gate is now their");
         println!("        only spelling — the battery plus bash gate-sdk/bin/build-native.sh is the whole");
@@ -274,8 +339,11 @@ pub fn run(_args: &[String]) -> i32 {
         }
     }
     println!(
-        "CRATE-ARMS: clean (cargo clippy --all-targets at -D warnings and cargo test, both --release over {}, build scratch {}; {} fixture suite(s) green)",
-        crate_dir, target_dir, suites
+        "CRATE-ARMS: clean (cargo clippy --all-targets at -D warnings and cargo test, both --release over {}, build scratch {}; {} fixture suite(s) green{})",
+        crate_dir,
+        target_dir,
+        suites,
+        if lint.is_empty() { "" } else { "; the target lint green" }
     );
     0
 }
@@ -374,6 +442,57 @@ mod tests {
         };
         let _ = std::fs::remove_dir_all(&dir);
         assert_eq!(verdict.expect("arm ran"), (true, 1), "the suite saw a repository locator the hook exported");
+    }
+
+    // spec: gate-sdk/SPEC.md §check-crate-arms — the target-lint arm under a stub command: a zero
+    // exit is clean, a non-zero exit reds with the command's output relayed, and an empty knob
+    // spawns nothing
+    #[cfg(unix)]
+    #[test]
+    fn the_target_lint_arm_takes_its_verdict_from_the_commands_exit() {
+        let dir = std::env::temp_dir().join(format!("crate-arms-target-lint-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("scratch");
+        let stub = stub_runner(
+            &dir,
+            "#!/bin/sh\ncase \"$1\" in red) echo 'error: current MSRV is 1.71'; exit 101;; esac\nexit 0\n",
+        );
+        let argv = |word: &str| vec![stub.invocation().to_string(), word.to_string()];
+
+        let green = target_lint_arm(&argv("green"));
+        let red = target_lint_arm(&argv("red"));
+        crate::proc::recorder::start();
+        let unset = target_lint_arm(&[]);
+        let spawned = crate::proc::recorder::stop();
+        let _ = std::fs::remove_dir_all(&dir);
+
+        assert_eq!(green, Ok(None));
+        let report = red.expect("the stub ran").expect("a non-zero exit is a finding");
+        assert!(report.contains("exit 101") && report.contains("error: current MSRV is 1.71"), "{}", report);
+        assert_eq!(unset, Ok(None));
+        assert!(spawned.is_empty(), "an empty knob spawned {:?}", spawned);
+    }
+
+    // spec: gate-sdk/SPEC.md §check-crate-arms — a command that cannot be spawned is the gate's
+    // exit 2 and never a skip: the error names the knob that armed it
+    #[test]
+    fn an_unspawnable_target_lint_command_is_an_error_naming_the_knob() {
+        let e = target_lint_arm(&["checkwright-no-such-program-exists".to_string()])
+            .expect_err("an unresolvable program is no clean lint");
+        assert!(e.contains(TARGET_LINT_KNOB), "{}", e);
+    }
+
+    // spec: gate-sdk/SPEC.md §check-crate-arms — arming the lint, changing its argv or moving the
+    // toolchain file misses a record written before, and an empty knob leaves the key as it was
+    #[test]
+    fn the_cache_key_covers_the_target_lints_argv_and_the_toolchain_file() {
+        let argv = |w: &[&str]| w.iter().map(|s| s.to_string()).collect::<Vec<String>>();
+        let armed = cache_key("stamp v", &argv(&["lint", "a"]), b"channel = \"1\"\n");
+        assert_eq!(cache_key("stamp v", &[], b"channel = \"1\"\n"), "stamp v");
+        assert_ne!(armed, "stamp v");
+        assert_ne!(armed, cache_key("stamp v", &argv(&["lint", "b"]), b"channel = \"1\"\n"));
+        assert_ne!(armed, cache_key("stamp v", &argv(&["lint", "a"]), b"channel = \"2\"\n"));
+        assert!(!armed.contains('\n'), "a key carrying a newline never equals its own record");
     }
 
     // spec: gate-sdk/SPEC.md §check-crate-arms — the refusal is the contract: a linked worktree whose

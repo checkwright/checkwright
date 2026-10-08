@@ -2233,9 +2233,16 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_NATIVE_BIN",
             "GATE_SDK_KIT_DIRS",
             "GATE_SDK_GATES_DIR",
+            "GATE_SDK_CRATE_TARGET_LINT_CMD",
         ],
         "-",
-        &[("cargo", ""), ("git", ""), ("rustc", ""), ("?", "GATE_SDK_NATIVE_BIN")],
+        &[
+            ("cargo", ""),
+            ("git", ""),
+            ("rustc", ""),
+            ("?", "GATE_SDK_NATIVE_BIN"),
+            ("?", "GATE_SDK_CRATE_TARGET_LINT_CMD"),
+        ],
     ),
     // spec: gate-sdk/SPEC.md §check-gate-assertions — no walk root: the corpus is the kit SPEC
     // set at fixed paths, and each heading resolves through the registry rather than through a

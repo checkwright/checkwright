@@ -163,6 +163,7 @@ pub const KIT: Kit = Kit {
         Row::derived("GATE_SDK_NATIVE_TARGETS_FILE", Shape::Scalar, native_targets_file, CRATE).empty_takes_default(),
         Row::derived("GATE_SDK_NATIVE_RUNNERS_FILE", Shape::Scalar, native_runners_file, CRATE).empty_takes_default(),
         Row::derived("GATE_SDK_CARGO_TARGET_DIR", Shape::Scalar, cargo_target_dir, CRATE).empty_takes_default(),
+        Row::indexed("GATE_SDK_CRATE_TARGET_LINT_CMD", &[]),
         Row::derived("GATE_SDK_NATIVE_BIN", Shape::Scalar, native_bin, &[]).empty_takes_default(),
         Row::indexed(
             "GATE_SDK_PROGRAM_FLOOR",
