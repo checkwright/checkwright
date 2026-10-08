@@ -1312,6 +1312,30 @@ mod tests {
         assert!(!r.run_dir().join("report.1.txt").exists(), "a new open starts from no rotated report");
     }
 
+    // spec: lifecycle-kit/SPEC.md §templates/consult.md — the shipped critique frame rides an
+    // audit-mode run as any prompt file does, and one clarifying turn continues its session
+    #[test]
+    fn the_critique_frame_runs_as_an_audit_prompt_and_takes_a_question() {
+        let r = Repo::new("critique");
+        let shipped = Path::new(env!("CARGO_MANIFEST_DIR")).join("../lifecycle-kit/templates/frames/project-critique.md");
+        let frame = std::fs::read(shipped).expect("the shipped critique frame");
+        assert!(!frame.is_empty());
+        std::fs::write(r.root.join("prompt.md"), &frame).expect("the prompt file");
+        let open = ["s=bash", "s=-c", "s=echo 'session id: abc-1.x'; git hash-object --stdin"];
+        let cfg = r.session_cfg(&open, RESUME_ECHO, MARKER, 60);
+        let v = foreign_run(&cfg, &r.args("s", false));
+        assert_eq!(v.code, 0, "{}", v.line);
+        assert!(v.line.contains("mode=audit key=prompt") && v.line.contains("patch=none -> OK — resumable"), "{}", v.line);
+        assert_eq!(r.read("report.txt"), format!("session id: abc-1.x\n{}", hash_of(&r, &frame)), "stdin carries the frame");
+        let q = foreign_resume(&cfg, "prompt", "answer.md");
+        assert_eq!(q.code, 0, "{}", q.line);
+        assert!(q.line.contains("mode=audit key=prompt turn=2") && q.line.contains("-> OK"), "{}", q.line);
+        assert!(r.read("report.txt").ends_with("the answer\n"), "{}", r.read("report.txt"));
+        assert!(r.read("report.1.txt").starts_with("session id: abc-1.x\n"), "the critique's report is rotated, not lost");
+        assert_eq!(foreign_close(&cfg, "prompt").code, 0);
+        assert!(!r.tree_kept());
+    }
+
     // spec: delegation-kit/SPEC.md §Testing — resume: a sweep's patch covers the session's whole
     // change across two turns
     #[test]

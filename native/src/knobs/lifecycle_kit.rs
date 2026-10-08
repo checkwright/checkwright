@@ -90,6 +90,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("LIFECYCLE_KIT_AGENT_FILE", "CLAUDE.md"),
         Row::scalar("LIFECYCLE_KIT_STAGE_CONTRACT_FRAME", "lifecycle-kit/templates/frames/stage-contract.md"),
         Row::indexed("LIFECYCLE_KIT_STAGE_EXECUTOR", &[]),
+        Row::scalar("LIFECYCLE_KIT_CRITIQUE_ADAPTER", ""),
         Row::scalar("LIFECYCLE_KIT_SHIM_NGRAM", "9"),
         Row::indexed("LIFECYCLE_KIT_SHIM_DEDUP_CORPUS", &[]),
         Row::derived("LIFECYCLE_KIT_QUEUE_FILE", Shape::Scalar, queue_file, &["GATE_SDK_QUEUE_FILE"]),
@@ -267,6 +268,11 @@ fn validate(v: &Values) -> Vec<String> {
             errs.push(format!("LIFECYCLE_KIT_STAGE_EXECUTOR adapter '{}' is outside [a-z0-9-]", a));
         }
     }
+    if let Some(a) = scalar(v, "LIFECYCLE_KIT_CRITIQUE_ADAPTER").filter(|a| !a.is_empty()) {
+        if !super::delegation_kit::adapter_name(a) {
+            errs.push(format!("LIFECYCLE_KIT_CRITIQUE_ADAPTER '{}' is outside [a-z0-9-]", a));
+        }
+    }
     for n in ["LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK", "LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE"] {
         if let Some(s) = scalar(v, n) {
             if s != "0" && s != "1" {
@@ -327,6 +333,21 @@ mod tests {
         let clean = run(&["align=demo-1", "scope=other"]);
         assert!(!clean.iter().any(|e| e.contains("LIFECYCLE_KIT_STAGE_EXECUTOR")), "{:?}", clean);
         assert!(!run(&[]).iter().any(|e| e.contains("LIFECYCLE_KIT_STAGE_EXECUTOR")));
+    }
+
+    // spec: lifecycle-kit/SPEC.md §Layout and configuration — the critique adapter is one name in
+    // the adapter-name shape, and empty is off
+    #[test]
+    fn a_critique_adapter_outside_the_name_shape_is_refused() {
+        let run = |name: &str| {
+            let mut v: Values = Values::new();
+            v.insert("LIFECYCLE_KIT_CRITIQUE_ADAPTER", (Value::Scalar(name.to_string()), Origin::Tracked));
+            validate(&v).into_iter().filter(|e| e.contains("LIFECYCLE_KIT_CRITIQUE_ADAPTER")).collect::<Vec<_>>()
+        };
+        for bad in ["Demo_1", "demo expert", "demo=x"] {
+            assert_eq!(run(bad), vec![format!("LIFECYCLE_KIT_CRITIQUE_ADAPTER '{}' is outside [a-z0-9-]", bad)]);
+        }
+        assert!(run("demo-1").is_empty() && run("").is_empty());
     }
 
     #[test]
