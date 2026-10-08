@@ -9,3 +9,4 @@ foreign-stage-binding-pass spec af4568f6 2026-10-08 745146724
 foreign-stage-binding-pass align a0526278 2026-10-08 8253909de
 foreign-stage-binding-pass build ac53d4d4 2026-10-08 201d0b781
 foreign-stage-binding-pass build a1a7cf81 2026-10-08 d7294ec63
+foreign-stage-binding-pass build ad12ebc2 2026-10-08 7d75ab599
