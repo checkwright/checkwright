@@ -1,0 +1,20 @@
+# spec: gate-sdk/SPEC.md §check-crate-arms — a job's first cargo call fetches the pinned toolchain, and this is that call's one spelling, retried within a bound
+name: fetch the pinned toolchain
+description: Run the job's first cargo call, which fetches the toolchain the root file pins, retrying a failed fetch within a bound.
+runs:
+  using: composite
+  steps:
+    - name: fetch the pinned toolchain
+      shell: bash
+      run: |
+        for attempt in 1 2 3; do
+          if cargo --version; then
+            exit 0
+          fi
+          if [ "$attempt" -lt 3 ]; then
+            echo "toolchain fetch: attempt $attempt of 3 failed, retrying in $((attempt * 15))s" >&2
+            sleep "$((attempt * 15))"
+          fi
+        done
+        echo "toolchain fetch: cargo --version failed 3 times" >&2
+        exit 1

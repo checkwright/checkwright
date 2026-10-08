@@ -67,6 +67,9 @@ jobs:
         shell: bash
         run: bash scripts/ci-macos-floor.sh
 
+      # spec: gate-sdk/SPEC.md §check-crate-arms — the job's first cargo call, the pinned toolchain's fetch
+      - uses: ./.github/actions/toolchain
+
       # spec: gate-sdk/SPEC.md §Consumer payload — one build body with the CI producer, one digest
       - name: build the gate binary for ${{ matrix.target }}
         shell: bash
@@ -97,11 +100,12 @@ jobs:
           pattern: gate-binary-*
           path: ${{ runner.temp }}/artifact
 
+      # spec: gate-sdk/SPEC.md §check-crate-arms — the job's first cargo call, the pinned toolchain's fetch
+      - uses: ./.github/actions/toolchain
+
       # spec: installer/SPEC.md §The packer — ROUTE 1: the tooling binary the assemble step dispatches to
       - name: build the gate binary this job's assemble step dispatches to
-        run: |
-          cargo --version
-          bash gate-sdk/bin/build-native.sh
+        run: bash gate-sdk/bin/build-native.sh
 
       - name: assemble the package from the tagged tree
         env:

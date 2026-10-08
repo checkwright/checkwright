@@ -27,11 +27,11 @@ jobs:
       # spec: gate-sdk/SPEC.md §Consumer smoke — CI tool provisioning rides the filled instance
       - name: docs gate deps (kramdown GFM parser, liquid)
         run: sudo gem install --no-document kramdown-parser-gfm liquid:4.0.4
+      # spec: gate-sdk/SPEC.md §check-crate-arms — the job's first cargo call, the pinned toolchain's fetch
+      - uses: ./.github/actions/toolchain
       # spec: gate-sdk/SPEC.md §check-crate-arms — CI's build step stays, ahead of the battery
       - name: build the native gate binary
-        run: |
-          cargo --version
-          bash gate-sdk/bin/build-native.sh
+        run: bash gate-sdk/bin/build-native.sh
       # spec: gate-sdk/SPEC.md §check-crate-arms — the Windows cross-check, compilation and not a gate
       - name: cross-check the crate compiles for Windows
         run: |
@@ -1500,6 +1500,9 @@ jobs:
         shell: bash
         run: bash scripts/ci-macos-floor.sh
 
+      # spec: gate-sdk/SPEC.md §check-crate-arms — the job's first cargo call, the pinned toolchain's fetch
+      - uses: ./.github/actions/toolchain
+
       # spec: gate-sdk/SPEC.md §Consumer payload — one build body with publish.yml's build leg, one digest
       - name: build the gate binary for ${{ matrix.target }}
         shell: bash
@@ -1566,12 +1569,13 @@ jobs:
           ruby -S gem install --no-document kramdown-parser-gfm liquid:4.0.4
           ruby -e 'require "kramdown-parser-gfm"; require "liquid"; puts "ruby #{RUBY_VERSION}, liquid #{Liquid::VERSION}"'
 
+      # spec: gate-sdk/SPEC.md §check-crate-arms — the job's first cargo call, the pinned toolchain's fetch
+      - uses: ./.github/actions/toolchain
+
       # spec: gate-sdk/SPEC.md §check-crate-arms — the host binary the registry-coverage tests spawn
       - name: build the host gate binary the registry-coverage tests spawn
         shell: bash
-        run: |
-          cargo --version
-          bash gate-sdk/bin/build-native.sh
+        run: bash gate-sdk/bin/build-native.sh
 
       - name: run the crate's unit tests for ${{ matrix.target }}
         shell: bash
@@ -1884,13 +1888,15 @@ jobs:
           fi
           ruby -e 'require "kramdown-parser-gfm"; require "liquid"; puts "ruby #{RUBY_VERSION}, liquid #{Liquid::VERSION}"'
 
+      # spec: gate-sdk/SPEC.md §check-crate-arms — the job's first cargo call, the pinned toolchain's fetch
+      - uses: ./.github/actions/toolchain
+
       # spec: gate-sdk/SPEC.md §check-crate-arms — the host binary the registry-coverage tests spawn
       - name: build the host gate binary the registry-coverage tests spawn
         shell: bash
         env:
           TARGET: ${{ matrix.target }}
         run: |
-          cargo --version
           rustup target add "$TARGET"
           bash gate-sdk/bin/build-native.sh
 
