@@ -11,3 +11,4 @@ foreign-stage-contract-pass build ae7d6639 2026-10-08 78d418f38
 foreign-stage-contract-pass build a641ef7c 2026-10-08 941c9efe8
 foreign-stage-contract-pass build af532dbd 2026-10-08 361fbecd0
 foreign-stage-contract-pass validate a3a5ea44 2026-10-08 395a5d5fe
+foreign-stage-contract-pass close a0db3956 2026-10-08 9ff820a49
