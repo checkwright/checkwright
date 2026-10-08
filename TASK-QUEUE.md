@@ -8,6 +8,18 @@
 
 ## New Features
 
+### lead-journal-append-arm
+
+[spec: SPEC-lead-journal-arm.md]
+
+a supervising session appends to its journal by a hand-spelled redirect. `--emit journal` finds the caller's journal through its stamp, and lifecycle-kit/SPEC.md §The journal arm states that a supervising session's journal has no stamp, so the arm does not reach it. `--emit manual-ops` at delegation-wait-journal-pass' close ranked the shell shape `printf >>` at 22 calls over a close and a supervision session, 8 iterations carrying it.
+
+**Deliverable:** an append form for the lead journal, a feature since it adds an arm form, or the shape added to `DRIFT_KIT_MANUAL_OPS_IGNORE` with its reason; which is spec's. In foreign-stage-contract-pass' unit set, operator direction 2026-10-08, lead-relayed (not a ruling).
+
+**Read at spec, 2026-10-08:** in the one live lead transcript, every append redirect names the lead journal; the meter logs keys and never text, so the share across the eight iterations stays unread.
+
+**Cost while deferred:** each lead finding costs a redirect no allowlist entry can grant. Filed 2026-10-08 by delegation-wait-journal-pass' close, after its drain, and promoted at the next scope's intake. Re-verified: the arm section's honest limit, and no `printf` row in `scripts/drift-config.knobs`. Owner lookup: `lead journal`, `printf >>`, `MANUAL_OPS_IGNORE`, `journal arm` in this file and the disposed-findings record — none; the icebox's same-stage-journal-append-uncoordinated, DISTINCT (two stage sessions on one journal), and lead-held-block-no-sanctioned-surface, DISTINCT (a block's record, not the journal's writer); [manual-ops-door-subkey](#manual-ops-door-subkey), DISTINCT (the meter's key).
+
 ## Technical Debt
 
 ### agent-child-wait-unstated
@@ -545,18 +557,6 @@ guard-kit rule `background_no_record`'s bash exemption (2) exempts any backgroun
 **Deliverable:** the bash exemption held to a body of `sleep` statements, each decision table's loop-carrying rows re-derived, and guard-kit/SPEC.md §The generic ruleset stating it; a behavior change, since it widens a block.
 
 **Cost while deferred:** rule `git_mutation_under_producer` has no record to read for such a loop, so a commit under it passes. Filed 2026-10-07 by delegation-wait-journal-pass' build.
-
-### lead-journal-append-arm
-
-[cost: iteration/low] [surface: lifecycle-kit]
-
-a supervising session appends to its journal by a hand-spelled redirect. `--emit journal` finds the caller's journal through its stamp, and lifecycle-kit/SPEC.md §The journal arm states that a supervising session's journal has no stamp, so the arm does not reach it. `--emit manual-ops` at delegation-wait-journal-pass' close ranked the shell shape `printf >>` at 22 calls over a close and a supervision session, 8 iterations carrying it.
-
-**Deliverable:** an append form for the lead journal, a feature since it adds an arm form, or the shape added to `DRIFT_KIT_MANUAL_OPS_IGNORE` with its reason; which is spec's. In foreign-stage-contract-pass' unit set, operator direction 2026-10-08, lead-relayed (not a ruling).
-
-**Inferred, not run:** that the supervision share of those calls is lead-journal appends — the meter logs keys and never text, so the lead transcripts' redirect targets were not read
-
-**Cost while deferred:** each lead finding costs a redirect no allowlist entry can grant. Filed 2026-10-08 by delegation-wait-journal-pass' close, after its drain, and promoted at the next scope's intake. Re-verified: the arm section's honest limit, and no `printf` row in `scripts/drift-config.knobs`. Owner lookup: `lead journal`, `printf >>`, `MANUAL_OPS_IGNORE`, `journal arm` in this file and the disposed-findings record — none; the icebox's same-stage-journal-append-uncoordinated, DISTINCT (two stage sessions on one journal), and lead-held-block-no-sanctioned-surface, DISTINCT (a block's record, not the journal's writer); [manual-ops-door-subkey](#manual-ops-door-subkey), DISTINCT (the meter's key).
 
 ### inline-python-steer-split
 
