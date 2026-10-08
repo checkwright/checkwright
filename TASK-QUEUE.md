@@ -8,20 +8,6 @@
 
 ## New Features
 
-### stage-executor-binding
-
-[spec: SPEC-foreign-stage-binding.md]
-
-a per-stage executor binding as consumer config: a consumer picks the harness and model for each stage, say every stage on the master harness and align on a foreign coding agent at a chosen model and effort, offered as a consumer-selectable set with today's all-master-harness posture one member. It extends `DELEGATION_KIT_TIER_MODEL`'s per-class binding to a per-stage executor. Operator direction 2026-10-03, lead-relayed (not a ruling).
-
-**Gate opened** by [heterogeneous-agent-delegation](#heterogeneous-agent-delegation)'s item (4) first slice (foreign-stage-contract-pass, 2026-10-08): the audit stage's reading runs on a foreign agent under lifecycle-kit/SPEC.md §The stage-contract arm, the adapter picked by the dispatcher by name.
-
-**In the unit set, 2026-10-08 (operator direction, lead-relayed, not a ruling),** behind that entry's next slice: only a stage with a host protocol can be bound foreign, so the knob's member set follows the slice.
-
-**Deliverable:** the stage-to-executor knob, its validator and the lead's dispatch-time read, in delegation-kit/SPEC.md §The tier binding, with fixtures.
-
-**Cost while deferred:** a consumer has no declarative way to put a stage on a foreign agent, the pick riding each dispatch prompt. The filing's second ground, no foreign credit held, lapsed: credit is held (operator answer 2026-10-06, lead-relayed, a fact and no run grant). Filed 2026-10-03 by delegation-transport-pass' lead. Re-verified: the knob roster carries no stage- or executor-keyed delegation-kit knob. Owner lookup: `per-stage`, `executor`, `TIER_MODEL` in this file — heterogeneous-agent-delegation, DISTINCT (item (4) lets a stage run foreign; this chooses which); owner delegation-kit/SPEC.md §The tier binding.
-
 ### foreign-project-critique
 
 [spec: SPEC-consult-critique.md]
@@ -1231,4 +1217,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - windows-cfg-msrv-lint-local
 - toolchain-fetch-no-retry
 - harness-literal-catcher-gate
+- stage-executor-binding
 

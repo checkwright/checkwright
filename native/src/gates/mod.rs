@@ -1345,8 +1345,8 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-stage-skill-coverage",
         stage_skill_coverage::run,
-        &[("?", "", "", "dynamic@src/gates/stage_skill_coverage.rs:79")],
-        &["LIFECYCLE_KIT_SKILLS_DIR", "LIFECYCLE_KIT_STAGES"],
+        &[("?", "", "", "dynamic@src/gates/stage_skill_coverage.rs:95")],
+        &["LIFECYCLE_KIT_SKILLS_DIR", "LIFECYCLE_KIT_STAGES", "LIFECYCLE_KIT_STAGE_EXECUTOR"],
         "lifecycle-kit",
         &[],
     ),

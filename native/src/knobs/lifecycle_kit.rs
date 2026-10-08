@@ -89,6 +89,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("LIFECYCLE_KIT_SESSION_BOUNDARY", "stage"),
         Row::scalar("LIFECYCLE_KIT_AGENT_FILE", "CLAUDE.md"),
         Row::scalar("LIFECYCLE_KIT_STAGE_CONTRACT_FRAME", "lifecycle-kit/templates/frames/stage-contract.md"),
+        Row::indexed("LIFECYCLE_KIT_STAGE_EXECUTOR", &[]),
         Row::scalar("LIFECYCLE_KIT_SHIM_NGRAM", "9"),
         Row::indexed("LIFECYCLE_KIT_SHIM_DEDUP_CORPUS", &[]),
         Row::derived("LIFECYCLE_KIT_QUEUE_FILE", Shape::Scalar, queue_file, &["GATE_SDK_QUEUE_FILE"]),
@@ -244,6 +245,28 @@ fn validate(v: &Values) -> Vec<String> {
             Some(_) => {}
         }
     }
+    // spec: lifecycle-kit/SPEC.md §Layout and configuration — each executor element is
+    // `<stage>=<adapter>`, a configured stage bound once to a name in the shape delegation-kit's
+    // validator holds an adapter name to; the adapter table itself is that kit's to read
+    let mut bound: Vec<&str> = Vec::new();
+    for e in indexed(v, "LIFECYCLE_KIT_STAGE_EXECUTOR").unwrap_or(&[]) {
+        let Some((s, a)) = e.split_once('=') else {
+            errs.push(format!("LIFECYCLE_KIT_STAGE_EXECUTOR element '{}' lacks the '<stage>=<adapter>' shape", e));
+            continue;
+        };
+        if !known(s) {
+            errs.push(format!("LIFECYCLE_KIT_STAGE_EXECUTOR stage key '{}' is not in LIFECYCLE_KIT_STAGES", s));
+        }
+        if bound.contains(&s) {
+            errs.push(format!("LIFECYCLE_KIT_STAGE_EXECUTOR binds stage '{}' twice", s));
+        }
+        bound.push(s);
+        if a.is_empty() {
+            errs.push(format!("LIFECYCLE_KIT_STAGE_EXECUTOR element '{}' has an empty adapter", e));
+        } else if !super::delegation_kit::adapter_name(a) {
+            errs.push(format!("LIFECYCLE_KIT_STAGE_EXECUTOR adapter '{}' is outside [a-z0-9-]", a));
+        }
+    }
     for n in ["LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK", "LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE"] {
         if let Some(s) = scalar(v, n) {
             if s != "0" && s != "1" {
@@ -273,7 +296,38 @@ fn validate(v: &Values) -> Vec<String> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::ere::EreCapture;
+    use crate::knobs::Origin;
+
+    // spec: lifecycle-kit/SPEC.md §Layout and configuration — one firing row per executor-binding
+    // refusal, every finding of a table reported together, beside a table that passes
+    #[test]
+    fn every_executor_binding_refusal_fires_on_its_own_shape() {
+        let run = |elems: &[&str]| {
+            let list = |xs: &[&str]| (Value::Indexed(xs.iter().map(|s| s.to_string()).collect()), Origin::Tracked);
+            let mut v: Values = Values::new();
+            v.insert("LIFECYCLE_KIT_STAGES", list(&["scope", "align", "build"]));
+            v.insert("LIFECYCLE_KIT_STAGE_EXECUTOR", list(elems));
+            validate(&v)
+        };
+        let cases: &[(&str, &[&str])] = &[
+            ("lacks the '<stage>=<adapter>' shape", &["align"]),
+            ("stage key 'polish' is not in LIFECYCLE_KIT_STAGES", &["polish=demo"]),
+            ("binds stage 'align' twice", &["align=demo", "align=other"]),
+            ("element 'align=' has an empty adapter", &["align="]),
+            ("adapter 'Demo_1' is outside [a-z0-9-]", &["align=Demo_1"]),
+        ];
+        for (want, elems) in cases {
+            let errs = run(elems);
+            assert!(errs.iter().any(|e| e.contains(want)), "{:?} did not refuse with '{}': {:?}", elems, want, errs);
+        }
+        let all = run(&["align", "polish=demo", "scope="]);
+        assert_eq!(all.iter().filter(|e| e.contains("LIFECYCLE_KIT_STAGE_EXECUTOR")).count(), 3, "{:?}", all);
+        let clean = run(&["align=demo-1", "scope=other"]);
+        assert!(!clean.iter().any(|e| e.contains("LIFECYCLE_KIT_STAGE_EXECUTOR")), "{:?}", clean);
+        assert!(!run(&[]).iter().any(|e| e.contains("LIFECYCLE_KIT_STAGE_EXECUTOR")));
+    }
 
     #[test]
     fn a_lock_pattern_needs_one_group_the_engine_compiles() {

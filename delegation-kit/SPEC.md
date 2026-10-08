@@ -775,7 +775,7 @@ A malformed argv (an operand count other than two, a dash-led token naming no op
 
 - `report.txt` is the unit's return value, and a durable one: it outlives the calling session, so a successor finds it. The adapter selects the vendor mode whose standard output is the report, and the kit reads bytes: parsing each vendor's event stream would put a vendor schema in a kit literal.
 - A sweep's `change.patch` is applied by the dispatching session, which verifies it as it verifies any agent commit (§Verify after every agent commit) and commits it under its own attribution. Foreign work thus carries no vendor trailer, and the contributor list does not grow per vendor. A consumer's README states that method once. The foreign agent committing on the shared tree is refused, since it would race the shared git index.
-- The adapter's argv carries its own vendor's model choice, an alias or a pinned id, on §The tier binding's follow-or-pin reading. No adapter binds to a tier class: the tier binding's readers all read the master harness's model ids, so the dispatcher picks an adapter by name for the unit's class.
+- The adapter's argv carries its own vendor's model choice, an alias or a pinned id, on §The tier binding's follow-or-pin reading. No adapter binds to a tier class: the tier binding's readers all read the master harness's model ids, so the dispatcher picks an adapter by name for the unit's class, and a stage's pick may be bound in lifecycle-kit's executor knob (lifecycle-kit/SPEC.md §The host protocol).
 
 **Honest limits.**
 

@@ -1,1 +1,2 @@
 no journal step:    commands/validate.md
+no host protocol:   commands/scope.md (stage 'scope', bound to 'demo')

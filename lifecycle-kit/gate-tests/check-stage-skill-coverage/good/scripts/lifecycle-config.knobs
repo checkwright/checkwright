@@ -1,0 +1,2 @@
+# comment-tier-exempt: fixture config — one stage bound to a demo adapter, its skill carrying the host protocol's citation
+LIFECYCLE_KIT_STAGE_EXECUTOR[] = align=demo

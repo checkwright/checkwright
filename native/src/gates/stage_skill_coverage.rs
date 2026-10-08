@@ -1,6 +1,6 @@
 // spec: lifecycle-kit/SPEC.md §check-stage-skill-coverage — the configured stage set and the
-// skills dir cover each other, and every stage's executed surface carries the journal
-// obligation's citation
+// skills dir cover each other, every stage's executed surface carries the journal obligation's
+// citation, and every stage bound to a foreign adapter carries the host protocol's
 use crate::gates::skill_binding;
 use crate::stages;
 use crate::walk;
@@ -9,6 +9,7 @@ use std::path::Path;
 // spec: lifecycle-kit/SPEC.md §check-stage-skill-coverage — the marker is this citation and
 // never a sentence: a gate matching prose would become that prose's second author
 const JOURNAL_CITATION: &str = "lifecycle-kit/SPEC.md §The state machine";
+const HOST_CITATION: &str = "lifecycle-kit/SPEC.md §The host protocol";
 
 // spec: lifecycle-kit/SPEC.md §check-stage-skill-coverage — whitespace is collapsed before the
 // search so a citation the author wrapped across two lines still resolves
@@ -44,6 +45,21 @@ fn invoked_stages(text: &str) -> Vec<String> {
     out.sort();
     out.dedup();
     out
+}
+
+// spec: lifecycle-kit/SPEC.md §check-stage-skill-coverage — the executed surface is the template a
+// binding shim names, or the skill itself where it names none, so the copy-and-specialize fork is
+// covered too; an absent skill and a directive naming a missing file are other findings' subjects
+fn executed_surface(dir: &str, stage: &str) -> Option<(String, String)> {
+    let skill = format!("{}/{}.md", dir, stage);
+    let text = String::from_utf8_lossy(&std::fs::read(&skill).ok()?).into_owned();
+    match skill_binding::template_of(&text) {
+        Some(t) => {
+            let body = String::from_utf8_lossy(&std::fs::read(t).ok()?).into_owned();
+            Some((t.to_string(), normalized(&body)))
+        }
+        None => Some((skill, normalized(&text))),
+    }
 }
 
 pub fn run(args: &[String]) -> i32 {
@@ -111,29 +127,38 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
-    // spec: lifecycle-kit/SPEC.md §check-stage-skill-coverage — the third direction reads the
-    // surface the stage session actually executes: the template a binding shim names, or the
-    // skill itself where it names none, so the copy-and-specialize fork is covered too
     let mut uncited: Vec<String> = Vec::new();
     for s in &stage_set {
-        let skill = format!("{}/{}.md", dir, s);
-        let Ok(bytes) = std::fs::read(&skill) else {
-            continue;
-        };
-        let text = String::from_utf8_lossy(&bytes).into_owned();
-        let (surface, body) = match skill_binding::template_of(&text) {
-            Some(t) => match std::fs::read(t) {
-                Ok(tb) => (t.to_string(), String::from_utf8_lossy(&tb).into_owned()),
-                Err(_) => continue,
-            },
-            None => (skill.clone(), text.clone()),
-        };
-        if !normalized(&body).contains(JOURNAL_CITATION) {
-            uncited.push(format!("{} (stage '{}')", surface, s));
+        if let Some((surface, body)) = executed_surface(&dir, s) {
+            if !body.contains(JOURNAL_CITATION) {
+                uncited.push(format!("{} (stage '{}')", surface, s));
+            }
         }
     }
 
-    if !missing.is_empty() || !orphan.is_empty() || !uncited.is_empty() {
+    // spec: lifecycle-kit/SPEC.md §check-stage-skill-coverage — the fourth direction: a stage the
+    // executor knob binds must point at the protocol its host follows, so the bindable set is
+    // whatever the surfaces state and no roster of it exists
+    let executors = match walk::knob_array("LIFECYCLE_KIT_STAGE_EXECUTOR") {
+        Ok(v) => v,
+        Err(e) => {
+            eprintln!("check-stage-skill-coverage: {}", e);
+            return 2;
+        }
+    };
+    let mut unhosted: Vec<String> = Vec::new();
+    for e in &executors {
+        let Some((stage, adapter)) = e.split_once('=') else {
+            continue;
+        };
+        if let Some((surface, body)) = executed_surface(&dir, stage) {
+            if !body.contains(HOST_CITATION) {
+                unhosted.push(format!("{} (stage '{}', bound to '{}')", surface, stage, adapter));
+            }
+        }
+    }
+
+    if !missing.is_empty() || !orphan.is_empty() || !uncited.is_empty() || !unhosted.is_empty() {
         println!(
             "check-stage-skill-coverage: stage set ({}) and skills dir {}",
             stage_set.join(" "),
@@ -150,19 +175,26 @@ pub fn run(args: &[String]) -> i32 {
         for u in &uncited {
             println!("  no journal step:    {}", u);
         }
+        for u in &unhosted {
+            println!("  no host protocol:   {}", u);
+        }
         println!("  help: add the missing <stage>.md skill, or retire the orphan skill / fix the");
         println!("        stage name it invokes. The stage set is LIFECYCLE_KIT_STAGES (lifecycle-config.knobs).");
         println!(
             "  help: a stage's executed surface owes the resume-journal step, marked by its"
         );
         println!("        '{}' citation.", JOURNAL_CITATION);
+        println!("  help: a stage LIFECYCLE_KIT_STAGE_EXECUTOR binds owes a surface carrying the");
+        println!("        '{}' citation: unbind the stage, or carry the", HOST_CITATION);
+        println!("        protocol's pointer line in that surface.");
         return 1;
     }
 
     println!(
-        "STAGE-SKILL-COVERAGE: clean ({} stage(s) each have a skill; every enter-stage-invoking skill in {} names a live stage; every stage's executed surface cites the journal step)",
+        "STAGE-SKILL-COVERAGE: clean ({} stage(s) each have a skill; every enter-stage-invoking skill in {} names a live stage; every stage's executed surface cites the journal step; {} bound stage(s) read, each citing the host protocol)",
         stage_set.len(),
-        dir
+        dir,
+        executors.len()
     );
     0
 }
@@ -197,5 +229,7 @@ mod tests {
             .contains(JOURNAL_CITATION));
         assert!(!normalized("cite lifecycle-kit/SPEC.md §The stamp protocol")
             .contains(JOURNAL_CITATION));
+        assert!(normalized("follow it (lifecycle-kit/SPEC.md\n§The host protocol).").contains(HOST_CITATION));
+        assert!(!normalized("lifecycle-kit/SPEC.md §The state machine").contains(HOST_CITATION));
     }
 }

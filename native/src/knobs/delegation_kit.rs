@@ -177,7 +177,7 @@ fn validate(v: &Values) -> Vec<String> {
     errs
 }
 
-fn adapter_name(a: &str) -> bool {
+pub(crate) fn adapter_name(a: &str) -> bool {
     !a.is_empty() && a.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
 }
 
