@@ -42,6 +42,20 @@ a per-stage executor binding as consumer config: a consumer picks the harness an
 
 **Cost while deferred:** a consumer has no declarative way to put a stage on a foreign agent, the pick riding each dispatch prompt. The filing's second ground, no foreign credit held, lapsed: credit is held (operator answer 2026-10-06, lead-relayed, a fact and no run grant). Filed 2026-10-03 by delegation-transport-pass' lead. Re-verified: the knob roster carries no stage- or executor-keyed delegation-kit knob. Owner lookup: `per-stage`, `executor`, `TIER_MODEL` in this file — heterogeneous-agent-delegation, DISTINCT (item (4) lets a stage run foreign; this chooses which); owner delegation-kit/SPEC.md §The tier binding.
 
+### foreign-project-critique
+
+[spec: SPEC-consult-critique.md]
+
+an on-demand critique of the project's strategic weaknesses, run on the top foreign tier (a consumer's expert adapter on `--foreign-run`), then a reflection pass on this harness's top tier that turns its findings into queue and SWOT updates. Operator direction 2026-10-03, lead-relayed (not a ruling). The close-time second-vendor review (`.workflow/audit-roster.txt`) reads one iteration's range and is distinct.
+
+**In the unit set, 2026-10-08 (operator direction, lead-relayed, not a ruling).** No foreign run is granted for it, so its acceptance is stub-driven unless one is; the SWOT's home is the one question that may need the operator.
+
+**Executor and reflection path (operator direction, 2026-10-08, lead-relayed, not a ruling and no run grant):** the critique runs through codex on GPT-6-Astra at medium effort, which this repo's `codex-expert` adapter already binds; its output is saved to a file, and that file is submitted to `/consult` on Fable as the reflection pass. **Refined the same day (operator direction, lead-relayed, not a ruling):** `/consult` may instead run the critique directly, so it can put clarifying questions to codex on Astra, which the operator leans toward without choosing; no critique run is wanted now, and the deliverable is a clear process for triggering one later from a `/consult` that is updating the SWOT.
+
+**Deliverable:** the on-demand trigger, the critique prompt, the reflection pass's contract and the SWOT's home, model literals in consumer config. The spec question is the reflection's write path, since work enters only through scope (doctrine-kit/DOCTRINE.md, Scope-gated intake).
+
+**Cost while deferred:** strategic weaknesses surface only through the operator's own reading. The filing's ground, that this cost was nil while the operator held no foreign credit, lapsed: credit is held (operator answer 2026-10-06, lead-relayed, a fact and no run grant). Filed 2026-10-03 by delegation-transport-pass' lead. Re-verified: no tracked prose names a SWOT or an on-demand foreign critique. Owner lookup: `SWOT`, `critique`, `strategic`, `reflection` in this file — foreign-vendor-critique, DISTINCT (its close review landed this iteration); owner delegation-kit/SPEC.md §The foreign-vendor run, the SWOT's home open.
+
 ## Technical Debt
 
 ### toolchain-fetch-no-retry
@@ -75,20 +89,6 @@ a worktree-isolated child's turn-end firing reads an empty record set while its 
 **Cost while deferred:** a producer an isolated child detaches from a foreground call carries a record its own turn end cannot read. Filed 2026-10-08 by foreign-stage-contract-pass' build. Re-verified: the capture log holds the empty-set refusal three seconds ahead of a one-record row. Owner lookup: `isolated`, `record set`, `scratch dir` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §The turn-end liveness hook.
 
 ## Deferred
-
-### foreign-project-critique
-
-[cost: event/low] [surface: delegation-kit]
-
-an on-demand critique of the project's strategic weaknesses, run on the top foreign tier (a consumer's expert adapter on `--foreign-run`), then a reflection pass on this harness's top tier that turns its findings into queue and SWOT updates. Operator direction 2026-10-03, lead-relayed (not a ruling). The close-time second-vendor review (`.workflow/audit-roster.txt`) reads one iteration's range and is distinct.
-
-**In the unit set, 2026-10-08 (operator direction, lead-relayed, not a ruling).** No foreign run is granted for it, so its acceptance is stub-driven unless one is; the SWOT's home is the one question that may need the operator.
-
-**Executor and reflection path (operator direction, 2026-10-08, lead-relayed, not a ruling and no run grant):** the critique runs through codex on GPT-6-Astra at medium effort, which this repo's `codex-expert` adapter already binds; its output is saved to a file, and that file is submitted to `/consult` on Fable as the reflection pass. **Refined the same day (operator direction, lead-relayed, not a ruling):** `/consult` may instead run the critique directly, so it can put clarifying questions to codex on Astra, which the operator leans toward without choosing; no critique run is wanted now, and the deliverable is a clear process for triggering one later from a `/consult` that is updating the SWOT.
-
-**Deliverable:** the on-demand trigger, the critique prompt, the reflection pass's contract and the SWOT's home, model literals in consumer config. The spec question is the reflection's write path, since work enters only through scope (doctrine-kit/DOCTRINE.md, Scope-gated intake).
-
-**Cost while deferred:** strategic weaknesses surface only through the operator's own reading. The filing's ground, that this cost was nil while the operator held no foreign credit, lapsed: credit is held (operator answer 2026-10-06, lead-relayed, a fact and no run grant). Filed 2026-10-03 by delegation-transport-pass' lead. Re-verified: no tracked prose names a SWOT or an on-demand foreign critique. Owner lookup: `SWOT`, `critique`, `strategic`, `reflection` in this file — foreign-vendor-critique, DISTINCT (its close review landed this iteration); owner delegation-kit/SPEC.md §The foreign-vendor run, the SWOT's home open.
 
 ### guard-quoted-operand-words
 

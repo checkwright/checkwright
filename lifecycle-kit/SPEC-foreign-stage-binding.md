@@ -114,6 +114,7 @@ Produced by `git grep -n -l 'host protocol\|foreign adapter' -- ':!docs/' ':!TAS
 - `.claude/agents/stage-session.md` — read and unchanged.
 - `native/src/knobs/lifecycle_kit.rs` — the row and the validator's refusals (delta 4); `native/src/gates/stage_skill_coverage.rs` and `lifecycle-kit/gate-tests/check-stage-skill-coverage/` — the direction and a fixture pair extended with a bound stage whose surface carries the citation and one whose surface does not (delta 5).
 - The crate's cases — the validator's five refusals (delta 4), and `--emit stage-contract` composing a document for each admitted stage handed to an audit-mode run under the stub adapter (delta 2).
+- `.workflow/surface-ceiling.txt` — the rows of the four templates that gain the line and of the lead template re-stamped with `--emit always-loaded --ceiling` in the commit that grows each, and a row for the new protocol file where the ratchet governs it; the audit template shrinks and needs none (deltas 1, 2 and 6).
 - `.workflow/release-declarations.md` — a row for the knob, the gate's new red and the template set (deltas 2, 4 and 5).
 - `docs/lifecycle-kit/`, `docs/delegation-kit/` and every other generated projection of the surfaces above — regenerated, never hand-edited (all deltas).
 - `TASK-QUEUE.md` — the cross-vendor delegation entry's remaining-work list and landed-slices paragraph, rewritten inside the entry cap in the demoting commit (deltas 1, 2 and 3).
