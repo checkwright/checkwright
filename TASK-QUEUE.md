@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### isolated-child-record-blind
-
-a worktree-isolated child's turn-end firing reads an empty record set while its own producer's launch record stands in the main checkout's scratch dir, where the shell guard sends it, so the record-set arm cannot see a producer the child itself recorded and only the task-view arm refuses. delegation-kit/SPEC.md §The turn-end liveness hook states the isolated reading and neither the scratch dir it is taken over nor this consequence.
-
-**Deliverable:** that section stating which scratch dir an isolated firing reads, or the hook reading the main checkout's, with a case holding the choice.
-
-**Inferred, cannot run before build:** that the firing reads the worktree's scratch dir on the hook's relative default; one firing logged an empty set beside a live recorded producer, and the hook was not replayed under isolation — the replay needs an isolated firing's payload beside a recorded producer, which the case this unit lands constructs.
-
-**Cost while deferred:** a producer an isolated child detaches from a foreground call carries a record its own turn end cannot read. Filed 2026-10-08 by foreign-stage-contract-pass' build. Re-verified: the capture log holds the empty-set refusal three seconds ahead of a one-record row. Owner lookup: `isolated`, `record set`, `scratch dir` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §The turn-end liveness hook.
-
 ## Deferred
 
 ### guard-quoted-operand-words
@@ -1196,4 +1186,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - stage-executor-binding
 - foreign-project-critique
 - turn-end-premise-stale
+- isolated-child-record-blind
 

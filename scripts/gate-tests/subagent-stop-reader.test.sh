@@ -95,9 +95,28 @@ line="$(fire unresolved "$absent" 2 DELEGATION_KIT_KNOB_FILE="$tmp/mute.knobs")"
 want unresolved "$line" "verdict=unresolved" "live=no" "records=0" "decision=refuse"
 want unresolved-message "$(cat "$tmp/unresolved.err")" "turn-end refused" "produced no reading at all"
 
+# D — an isolated firing reads the main checkout's record set. A linked worktree's own scratch dir
+#     is empty while the record an isolated child wrote stands in the main checkout's, where the
+#     shell guard sends it; the relative default must resolve there, so the firing is fired from
+#     inside the worktree with the scratch dir left relative.
+main="$tmp/main"; mkdir -p "$main"
+git -C "$main" init -q
+git -C "$main" -c user.name=t -c user.email=t@example.invalid commit -q --allow-empty -m seed
+git -C "$main" worktree add -q "$tmp/isolated" -b isolated
+mkdir -p "$main/.tmp"
+printf 'pid=1 run=iso\n' >"$main/.tmp/iso.run"
+cd "$tmp/isolated" || { echo "  FAIL: cannot reach the linked worktree"; exit 1; }
+line="$(fire isolated .tmp 2)"
+want isolated "$line" "verdict=red" "live=yes" "records=1" "runs=iso" "decision=refuse"
+want isolated-message "$(cat "$tmp/isolated.err")" "turn-end refused" "runs=iso" "main/.tmp"
+cd "$main" || { echo "  FAIL: cannot reach the scratch main checkout"; exit 1; }
+line="$(fire main-checkout .tmp 2)"
+want main-checkout "$line" "verdict=red" "records=1" "runs=iso" "decision=refuse"
+cd "$ROOT" || { echo "  FAIL: cannot reach the repo root"; exit 1; }
+
 if [[ "$fails" -gt 0 ]]; then
     echo "subagent-stop-reader.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "subagent-stop-reader.test: ok (the resolved reader answers and its verdict reaches the exit: clean scratch dir green and allowed, live producer red and refused with a reason naming the argv the hook spawned, an absent dispatch binary declining open with no record, an override that produces no reading unresolved and refused rather than reported unavailable)"
+echo "subagent-stop-reader.test: ok (the resolved reader answers and its verdict reaches the exit: clean scratch dir green and allowed, live producer red and refused with a reason naming the argv the hook spawned, an absent dispatch binary declining open with no record, an override that produces no reading unresolved and refused rather than reported unavailable, a firing from a linked worktree reading the main checkout record set)"
 exit 0

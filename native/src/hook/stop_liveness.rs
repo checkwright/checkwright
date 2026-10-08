@@ -53,6 +53,10 @@ pub fn run(payload: Option<&Value>) -> i32 {
         Ok(v) => v,
         Err(e) => return hook::decline("subagent-stop-liveness", &e, payload),
     };
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the record set is the main
+    // checkout's: from a linked worktree a relative scratch dir resolves there, where an isolated
+    // session's launch records are written and the shell guard reads them
+    let run_dir = walk::capture_path(&run_dir);
     let reader = reader_argv(&liveness_cmd, &run_dir);
     let firing = fire(payload, &log, reader.as_deref(), &run_dir);
     if !firing.stderr.is_empty() {
