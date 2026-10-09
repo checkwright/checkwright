@@ -562,6 +562,18 @@ a hook refresh can leave a served hook absent, and the build script then says th
 
 **Cost while deferred:** a build on a full or read-only git directory turns the commit gates off with a message saying they still run. Filed 2026-10-09 by tier-resolution-pass' close off its second-vendor review, and promoted at the next scope's intake. Re-verified there by reading both files: the unlink precedes the link, and the script's message is as quoted. Owner lookup: `refresh`, `hooksPath`, `placed hook` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §build-native.
 
+### stop-test-reads-local-overlay
+
+[cost: session/high] [surface: scripts]
+
+scripts/gate-tests/subagent-stop-reader.test.sh fails six assertions wherever the consumer's gitignored delegation overlay binds a foreign tier row on a class outside the kit's default roster, so `check-crate-arms` and the full battery red there while CI, which holds no overlay, stays green. Its unresolved case points `DELEGATION_KIT_KNOB_FILE` at a scratch file holding the liveness command alone. The class roster then falls to the kit default while the overlay is still read from the gates directory (gate-sdk/SPEC.md §The knob file), the hook reports a malformed delegation config and allows the turn end, and the case reads exit 0 where it wants 2.
+
+**Deliverable:** the case's scratch binding made whole against whatever the overlay holds, the gates directory relocated with the knob file or the tracked roster carried into the scratch file, and the suite green under an overlay naming a class the default roster lacks.
+
+**Inferred, not run:** that the overlay's rows are the only cause — run the suite with the overlay's foreign tier rows on default-roster classes alone
+
+**Cost while deferred:** the commit-time full battery reds on any seat whose overlay binds such a row, this one since the four-class binding, and a commit reaching the crate is refused there. Filed 2026-10-09 by the scope after tier-resolution-pass, off its own battery run. Read there: the refusal names two overlay rows and the default roster's three classes, and the overlay's last write postdates that iteration's validate evidence. Owner lookup: `overlay`, `KNOB_FILE`, `subagent-stop`, `hermetic` in this file and the disposed-findings record — the icebox's hermetic-harness-export-masks-the-condition-under-test, DISTINCT (a harness pinning too much, where this one pins too little); owner delegation-kit/SPEC.md §Layout and configuration.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
