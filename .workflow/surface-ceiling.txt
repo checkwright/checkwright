@@ -22,7 +22,7 @@
 25807cp companion/SPEC.md
 113395cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
-255010cp delegation-kit/SPEC.md
+254804cp delegation-kit/SPEC.md
 40479cp delegation-kit/templates/agent-execution.md
 3397cp delegation-kit/templates/dispatch-checklists.md
 1308cp docs/canon-kit/index.md
@@ -94,13 +94,13 @@
 2698cp drift-kit/templates/close-knowledge.md
 4270cp drift-kit/templates/economics.md
 85183cp evidence-kit/SPEC.md
-968954cp gate-sdk/SPEC.md
+968863cp gate-sdk/SPEC.md
 2899cp gate-sdk/templates/adopt.md
 288430cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
 279471cp installer/SPEC.md
 385611cp lifecycle-kit/SPEC.md
-7699cp lifecycle-kit/templates/consult.md
+7691cp lifecycle-kit/templates/consult.md
 1212cp lifecycle-kit/templates/frames/project-critique.md
 1412cp lifecycle-kit/templates/frames/stage-contract.md
 1345cp lifecycle-kit/templates/host-protocol.md
