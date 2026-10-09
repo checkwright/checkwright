@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: front-door-readiness-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,40 @@
 ## New Features
 
 ## Technical Debt
+
+### hook-staging-fixed-sibling
+
+the hook placement stages each replacement under one fixed sibling name (`STAGED_SUFFIX` in `native/src/emit/install_hooks.rs`). Two placements running at once can remove or rename each other's sibling. A sibling a killed run left, where it cannot be removed, is written through by the copy fallback, which opens the existing name: a hard link to the binary and to the served hooks. gate-sdk/SPEC.md §install-hooks says a cut-short copy leaves the placed hook in place, and on that path it can truncate it.
+
+**Deliverable:** a per-run sibling name, or the removal's failure refused before the copy, with a crate case for a surviving sibling.
+
+**Run at promotion, on Linux, and the premise narrowed.** With a sibling linked to the running binary under a hooks directory that refuses the removal, the placement exits 2 on the copy (`Text file busy`) and the binary and both hooks keep their size. The copy cannot write through a link to the executable that is running, so the case left is a sibling linked to an *earlier* binary the placed hooks still serve.
+
+**Inferred, cannot run before build:** that a copy cut short through such a sibling truncates the served hooks, and that two placements at once take each other's sibling — each needs a placement stopped mid-copy, which takes the crate case this unit writes; a third candidate, a rename over a hook that is the running executable on Windows, is unconfirmed
+
+**Cost while deferred:** a placement after a killed run and a rebuild can write through the file the placed hooks link to. Filed 2026-10-09 off crate-reader-hardening-pass' close second-vendor review and carried to the next scope's intake. Re-verified there: the suffix is one constant. **Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration on the narrowed premise. Owner lookup: `sibling`, `install_hooks`, `staging`, `hard link` in this file and the disposed-findings record — none on this function; `hook-refresh-unlinks-first`, done, DISTINCT (the rename, which scoped neither concurrency nor a surviving sibling); owner gate-sdk/SPEC.md §install-hooks.
+
+### windows-hook-legs-unexecuted
+
+four behaviors windows-shell-floor-pass landed run on no Windows leg. gate-sdk/gate-tests/native-git-hooks.test.sh skips its replaced-launcher forwarding assertion on a host with an executable suffix. The Windows hook witness in `.github/workflows/gates.yml` exercises `pre-commit` alone, leaving `commit-msg`, the absent-binary refusal, the self-name refusal and the linked-worktree case to Ubuntu. The session-context hook member's configured-command spawn has no Windows end-to-end run. The stop-restore witness checks `ErrorActionPreference` after a successful install block only, never a failing block nor the fetch fence's `ProgressPreference`.
+
+**Deliverable:** each run on a Windows leg, or a stated reason one cannot be.
+
+**Read at promotion, 2026-10-10:** the last three hold. The Windows witness steps name `pre-commit.exe` alone, no step of the workflow starts a hook member, and the stop-restore witness reads the error preference after a block that exited 0, while no step asserts the progress preference.
+
+**Push need (2026-10-10, inside the budget):** one mid-iteration push, since a new Windows assertion runs on the remote leg alone; [action-walk-yaml-shapes](#action-walk-yaml-shapes) and the front-door job's workflow text ride the same push.
+
+**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration.
+
+**Cost while deferred:** a Windows-only regression in any of the four ships green. Filed 2026-10-07 off windows-shell-floor-pass' close second-vendor review, carried to the next scope's intake; the first held there by reading the test. Owner lookup: `Windows leg`, `ErrorActionPreference`, `stop-restore`, `witness` in this file and the disposed-findings record — [windows-kpi-plugin-start](#windows-kpi-plugin-start), DISTINCT (a plugin Windows cannot start); owner gate-sdk/SPEC.md §git-hook, with context-kit/SPEC.md §The session-context hook.
+
+### action-walk-yaml-shapes
+
+the job-partitioned action walk in `native/src/actions.rs` misreads three shapes of valid YAML. A `run` key whose block-scalar indicator is followed by a comment is taken as a one-line scalar, so the body below it is unread. A quoted `uses` value followed by a comment keeps its closing quote, so `check-action-step-order` refuses a job whose step is on the action. A `steps` sequence whose dashes sit at the `steps` key's own column leaves every step unread. The first and third reach `check-action-gh-repo` and `check-action-permissions` through the shared walk.
+
+**Deliverable:** a fixture row per shape, or each stated as a limit in the sections that own the walk.
+
+**Cost while deferred:** two silent passes and one false refusal on workflow text an adopter may write. Filed 2026-10-09 off crate-reader-hardening-pass' close second-vendor review and carried to the next scope's intake. Re-verified there: `is_block_scalar` admits an indicator, a chomping sign and digits, and nothing after them. Run over scratch workflows at promotion, each beside its control: a job checking out under no `contents:` scope passes `check-action-permissions` with its dashes at the `steps` column and reds with them indented, and `check-action-step-order` refuses a job whose quoted `uses` carries a trailing comment and passes it without the comment. **Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration with its two shapes run. Owner lookup: `block scalar`, `actions.rs`, `steps sequence`, `check-action-` in this file and the disposed-findings record — [site-health-probe-unexecuted](#site-health-probe-unexecuted), DISTINCT (a probe step no oracle executes); `toolchain-action-order-ungated`, done, DISTINCT (the gate on this walk, which scoped none of the three); owner gate-sdk/SPEC.md §check-action-gh-repo.
 
 ## Deferred
 
@@ -222,6 +256,8 @@ CONTRIBUTING.md promises an inbound issue or pull request a disposition within o
 
 **Deliverable:** either the cap carried on the public promise or a lane that honours it, and the disposition record named; CONTRIBUTING.md and the scope binding agree.
 
+**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration; whether it names a record, and so takes an amendment, is spec's.
+
 **Cost while deferred:** the first contributor past the cap reads a promise the tree breaks. Filed 2026-07-31; the promise and the cap re-read 2026-09-25 by consult.
 
 ### custom-gate-substrates
@@ -304,7 +340,21 @@ the front-door rehearsal belongs in the methodology, operator direction 2026-09-
 
 **Deliverable, three layers:** (1) a generic kit rule, before an audience-facing event rehearse the published front door from a clean seat and file what it finds, the container, platform and route set being consumer config (doctrine-kit or lifecycle-kit's release step, per the provenance seam); (2) here, a post-publish job in `.github/workflows/publish.yml` installing the just-published Release on clean runners (init, hooks on, a first red, an upgrade from the previous release, a hooked profile move), reaching the macOS and Windows runners a container cannot; (3) a manual agent-walked rehearsal of the routes CI cannot drive (the adoption prompt, the plugin marketplace, the Spec Kit extension), before audience events only, a catalog submission or a partner install, per the operator.
 
+**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration as its lead unit.
+
 **Cost while deferred:** each audience event risks a front-door defect only a clean-seat install would show; the one-off left macOS, native Windows, arm64 Linux, WSL and the npx, plugin, PowerShell and agent-prompt routes unrehearsed. Filed 2026-09-29 by preview-readiness' lead. Re-verified: `publish.yml` runs roster, build, pack, npm and release and installs nothing after publishing. Owner lookup: `rehears`, `post-publish`, `clean seat` in this file — [design-partner-preview](#design-partner-preview), DISTINCT (the observed install this precedes); owner RELEASING.md for layer 2, the kit rule's home open. Surface also doctrine-kit.
+
+**Split 2026-10-10 at scope:** the second layer's job runs on a tag alone, so its first run's reading is [front-door-job-observed](#front-door-job-observed) and this entry keeps the job.
+
+### front-door-job-observed
+
+[cost: event/low] [surface: lifecycle-kit] [observed-by: publish]
+
+the observation half of [front-door-rehearsal-rule](#front-door-rehearsal-rule)'s second layer: the first Release cut after its post-publish job lands runs that job on the clean runners, and the run is read.
+
+**Deliverable:** that observation, read off the `publish` run, with any defect the clean-seat installs show filed.
+
+**Cost while deferred:** the post-publish job ships unobserved until a release exercises it. Filed 2026-10-10 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `post-publish`, `publish`, `observed-by` in this file — [tarball-attestation-observed](#tarball-attestation-observed), DISTINCT (the attestation step's own first run, on the same release).
 
 ### notification-delivery-probe
 
@@ -418,18 +468,6 @@ the hook-wiring rewire windows-kit-bash-files did not land: context-kit and guar
 
 **Cost while deferred:** a native-Windows adopter whose profile carries context-kit or guard-kit needs Git for Windows' bash for the hook wiring. Filed 2026-10-07 by windows-shell-floor-pass' build as a fold, its open question carried by that close to this scope's intake. Owner lookup at that close: hook wiring, settings templates, the exec form and PowerShell in the icebox — no other owner; [hook-contract-harness-neutral](#hook-contract-harness-neutral), DISTINCT (the contract's prose, not the registration's form); owner gate-sdk/SPEC.md §The adopter constraints.
 
-### windows-hook-legs-unexecuted
-
-[cost: event/low] [surface: gate-sdk]
-
-four behaviors windows-shell-floor-pass landed run on no Windows leg. gate-sdk/gate-tests/native-git-hooks.test.sh skips its replaced-launcher forwarding assertion on a host with an executable suffix. The Windows hook witness in `.github/workflows/gates.yml` exercises `pre-commit` alone, leaving `commit-msg`, the absent-binary refusal, the self-name refusal and the linked-worktree case to Ubuntu. The session-context hook member's configured-command spawn has no Windows end-to-end run. The stop-restore witness checks `ErrorActionPreference` after a successful install block only, never a failing block nor the fetch fence's `ProgressPreference`.
-
-**Deliverable:** each run on a Windows leg, or a stated reason one cannot be.
-
-**Inferred, not run:** the last three, the reviewer's claims — read the witness steps of `.github/workflows/gates.yml` and the stop-restore witness
-
-**Cost while deferred:** a Windows-only regression in any of the four ships green. Filed 2026-10-07 off windows-shell-floor-pass' close second-vendor review, carried to the next scope's intake; the first held there by reading the test. Owner lookup: `Windows leg`, `ErrorActionPreference`, `stop-restore`, `witness` in this file and the disposed-findings record — [windows-kpi-plugin-start](#windows-kpi-plugin-start), DISTINCT (a plugin Windows cannot start); owner gate-sdk/SPEC.md §git-hook, with context-kit/SPEC.md §The session-context hook.
-
 ### session-sweep-horizon-baked
 
 [cost: event/low] [surface: context-kit]
@@ -516,6 +554,8 @@ ten listing readers already on the NUL form decode a name lossily through an arg
 
 **Inferred, not run:** that an overlay row of a kit other than delegation-kit refuses a kit-default suite — bind a row its default roster lacks in another kit's local overlay and run the fixture suites
 
+**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration; the deliverable's choice is spec's.
+
 **Cost while deferred:** a commit reaching `native/` is refused on such a seat while the remote stays green, and each further suite is found one refusal at a time. Filed 2026-10-09 by crate-reader-hardening-pass' first build batch and promoted at its close. Re-verified by grep: the three suites carry `unset DELEGATION_KIT_KNOB_FILE`. Owner lookup: `test-hermetic`, `overlay`, `hermetic` in this file and the disposed-findings record — [config-variant-battery-harness](#config-variant-battery-harness), DISTINCT (a shipped variant runner); [hermetic-harness-export-masks-the-condition-under-test](#hermetic-harness-export-masks-the-condition-under-test) and [hermetic-bin-roster-config](#hermetic-bin-roster-config), both DISTINCT (pins voiding an arm, a bin roster seam); owner gate-sdk/SPEC.md §lib/test-hermetic.sh.
 
 ### tier-model-shape-unvalidated
@@ -537,6 +577,8 @@ the tier tables' validator holds a model to no shape beyond carrying no whitespa
 an arm whose child inherits the binary's stdout exits off the closed-reader rule (gate-sdk/SPEC.md §The non-gate arm, *A departed stdout reader changes no status*). The rule `arm-stdout-close-panic` landed drops the binary's own failed writes; a child writing to the same departed reader dies of the signal, and the arm relays that death as its own status. Measured 2026-10-09 at crate-reader-hardening-pass' close: `--scratch-run` on a script printing 20000 lines exits 141 piped into `true` and 0 with a reader.
 
 **Deliverable:** the rule made true or bounded for the arms that hand a child the inherited stdout (`Sink::Inherit` in `native/src/proc.rs`): either the child's stdout routed so its reader's departure costs no status, or the section's reach stated as the binary's own writes, with a case in `native/tests/closed_reader.rs` for whichever holds. Which one is spec's.
+
+**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration; made true or bounded is spec's choice.
 
 **Cost while deferred:** an arm piped into an early-exiting filter exits on a status its contract does not list, under a rule whose text reads as total. Filed 2026-10-09 by crate-reader-hardening-pass' lead off its third build batch and promoted at its close. Owner lookup: `closed reader`, `departed`, `inherit`, `SIGPIPE`, `broken pipe` in this file and the disposed-findings record — none; `arm-stdout-close-panic`, done, DISTINCT (the process's own writes); owner gate-sdk/SPEC.md §The non-gate arm.
 
@@ -563,30 +605,6 @@ the shared front-matter reader (`front_matter_span` in `native/src/spec.rs`) tak
 **Inferred, not run:** that a gate on the reader gains a finding or a long measure on such a page — close a scratch page's block on three dots and run the six gates over it
 
 **Cost while deferred:** a page closing its front matter on dots can gain a false finding or be measured long. Filed 2026-10-09 off crate-reader-hardening-pass' close second-vendor review, which ran Jekyll 4.4.1 on such a page and got the body, and carried to the next scope's intake. Re-verified there: the reader's closing rule compares a trimmed line with three hyphens alone. Owner lookup: `three dots`, `closer`, `front matter` in this file and the disposed-findings record — [plugin-front-matter-yaml](#plugin-front-matter-yaml), DISTINCT (the plugin gate's own reader); `front-matter-reader-siblings`, done, DISTINCT (the shared reader and the unclosed opener); owner canon-kit/SPEC.md §The shared spec adapters.
-
-### action-walk-yaml-shapes
-
-[cost: event/low] [surface: gate-sdk]
-
-the job-partitioned action walk in `native/src/actions.rs` misreads three shapes of valid YAML. A `run` key whose block-scalar indicator is followed by a comment is taken as a one-line scalar, so the body below it is unread. A quoted `uses` value followed by a comment keeps its closing quote, so `check-action-step-order` refuses a job whose step is on the action. A `steps` sequence whose dashes sit at the `steps` key's own column leaves every step unread. The first and third reach `check-action-gh-repo` and `check-action-permissions` through the shared walk.
-
-**Deliverable:** a fixture row per shape, or each stated as a limit in the sections that own the walk.
-
-**Inferred, not run:** the second and third shapes, the reviewer's claims held by reading the walk — write each into a scratch workflow and run the three gates over it
-
-**Cost while deferred:** two silent passes and one false refusal on workflow text an adopter may write. Filed 2026-10-09 off crate-reader-hardening-pass' close second-vendor review and carried to the next scope's intake. Re-verified there for the first shape: `is_block_scalar` admits an indicator, a chomping sign and digits, and nothing after them. Owner lookup: `block scalar`, `actions.rs`, `steps sequence`, `check-action-` in this file and the disposed-findings record — [site-health-probe-unexecuted](#site-health-probe-unexecuted), DISTINCT (a probe step no oracle executes); `toolchain-action-order-ungated`, done, DISTINCT (the gate on this walk, which scoped none of the three); owner gate-sdk/SPEC.md §check-action-gh-repo.
-
-### hook-staging-fixed-sibling
-
-[cost: event/low] [surface: gate-sdk]
-
-the hook placement stages each replacement under one fixed sibling name (`STAGED_SUFFIX` in `native/src/emit/install_hooks.rs`). Two placements running at once can remove or rename each other's sibling. A sibling a killed run left, where it cannot be removed, is written through by the copy fallback, which opens the existing name: a hard link to the binary and to the served hooks. gate-sdk/SPEC.md §install-hooks says a cut-short copy leaves the placed hook in place, and on that path it can truncate it.
-
-**Deliverable:** a per-run sibling name, or the removal's failure refused before the copy, with a crate case for a surviving sibling.
-
-**Inferred, not run:** both cases, held by reading the staging function — leave an unremovable sibling linked to a placed hook and run the placement; a third candidate, a rename over a hook that is the running executable on Windows, is unconfirmed
-
-**Cost while deferred:** a placement after a killed run can truncate the binary every placed hook links to. Filed 2026-10-09 off crate-reader-hardening-pass' close second-vendor review and carried to the next scope's intake. Re-verified there: the suffix is one constant. Owner lookup: `sibling`, `install_hooks`, `staging`, `hard link` in this file and the disposed-findings record — none on this function; `hook-refresh-unlinks-first`, done, DISTINCT (the rename, which scoped neither concurrency nor a surviving sibling); owner gate-sdk/SPEC.md §install-hooks.
 
 ## Icebox
 
