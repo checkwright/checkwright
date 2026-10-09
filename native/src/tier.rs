@@ -82,6 +82,15 @@ pub fn roster_refusals(roster: &[String]) -> Vec<String> {
     errs
 }
 
+const ABSENT: &str = "which a foreign session's record reads as an absent field";
+
+// spec: delegation-kit/SPEC.md §Layout and configuration — the effort's shape
+fn plain(effort: &str) -> bool {
+    let mut bytes = effort.bytes();
+    bytes.next().is_some_and(|b| b.is_ascii_alphabetic())
+        && bytes.all(|b| b.is_ascii_alphanumeric() || matches!(b, b'.' | b'_' | b'-'))
+}
+
 // spec: delegation-kit/SPEC.md §Layout and configuration — a value's refusals, shared by both
 // tables: the model's on every row, the two matching spellings on the master table alone, and the
 // effort's where the value carries a comma. A model that passes is returned for the cross-row check.
@@ -93,10 +102,17 @@ fn value_refusals<'a>(knob: &str, e: &'a str, value: &'a str, matched: bool, err
             errs.push(format!("{} element '{}' carries whitespace in its effort", knob, e))
         }
         Some(f) if f.contains(',') => errs.push(format!("{} element '{}' carries a second comma", knob, e)),
+        Some("-") => errs.push(format!("{} element '{}' spells its effort as a lone dash, {}", knob, e, ABSENT)),
+        Some(f) if !plain(f) => errs.push(format!(
+            "{} element '{}' carries an effort that is not a letter followed by letters, digits, '.', '_' or '-'",
+            knob, e
+        )),
         _ => {}
     }
     if model.is_empty() {
         errs.push(format!("{} element '{}' has an empty value", knob, e));
+    } else if model == "-" {
+        errs.push(format!("{} element '{}' spells its value as a lone dash, {}", knob, e, ABSENT));
     } else if model.chars().any(char::is_whitespace) {
         errs.push(format!("{} element '{}' carries whitespace in its value", knob, e));
     } else if model == "inherit" {
@@ -241,11 +257,18 @@ mod tests {
         assert_eq!(values(&binding), vec!["big", "small"]);
         assert_eq!(classes_of(&binding, &roster(), "vendor-big-5"), vec!["judgment"]);
         assert!(refusals(&binding, &roster()).is_empty());
+        assert!(refusals(&b(&["judgment=big,x-high_2.5", "mechanical=a-"]), &roster()).is_empty());
         for (want, bad) in [
             ("has an empty effort", "judgment=big,"),
             ("carries whitespace in its effort", "judgment=big,very deep"),
             ("carries a second comma", "judgment=big,deep,x"),
             ("has an empty value", "judgment=,deep"),
+            ("spells its effort as a lone dash", "judgment=big,-"),
+            ("spells its value as a lone dash", "judgment=-"),
+            ("carries an effort that is not a letter followed by", "judgment=big,#deep"),
+            ("carries an effort that is not a letter followed by", "judgment=big,-deep"),
+            ("carries an effort that is not a letter followed by", "judgment=big,deep:x"),
+            ("carries an effort that is not a letter followed by", "judgment=big,9"),
         ] {
             let errs = refusals(&b(&[bad]), &roster());
             assert!(errs.len() == 1 && errs[0].contains(want), "{}: {:?}", bad, errs);
@@ -291,6 +314,9 @@ mod tests {
             ("has an empty effort", &["vend/judgment=g,"]),
             ("carries whitespace in its effort", &["vend/judgment=g,x y"]),
             ("carries a second comma", &["vend/judgment=g,x,y"]),
+            ("spells its effort as a lone dash", &["vend/judgment=g,-"]),
+            ("spells its value as a lone dash", &["vend/judgment=-"]),
+            ("carries an effort that is not a letter followed by", &["vend/judgment=g,#x"]),
         ] {
             let errs = foreign_refusals(&b(bad), &roster());
             assert!(errs.len() == 1 && errs[0].contains(want), "{:?}: {:?}", bad, errs);

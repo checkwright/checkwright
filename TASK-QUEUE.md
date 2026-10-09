@@ -62,14 +62,6 @@ a hook refresh can leave a served hook absent, and the build script then says th
 
 **Cost while deferred:** a refresh whose link and copy both fail turns the commit gates off with a message saying they still run. Filed 2026-10-09 by tier-resolution-pass' close off its second-vendor review, and promoted at the next scope's intake. Run there in scratch repositories: with a cross-device hooks directory and an unreadable source the refresh exits 2 and the first served hook is gone, no partial file left; on a read-only hooks directory the unlink itself is refused and both hooks stay, which narrows the filing's cost. A copy cut short by a full disk was not run, so whether it leaves a partial file is unread. Owner lookup: `refresh`, `hooksPath`, `placed hook` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §build-native.
 
-### tier-value-validator-gaps
-
-the tier tables' value validator admits values two of its writers cannot carry (`native/src/tier.rs`, the shared value refusals; delegation-kit/SPEC.md §Layout and configuration). A model or effort spelled as one dash is accepted, while a foreign session's record writes a dash for an absent field and reads one back as absent, so a session opened on such a row loses its pair at the first resume, against §The foreign-vendor run's rule that a session keeps the pair it opened with. An effort is refused only when empty, carrying whitespace or a second comma, and `--emit agent-tiers --write` puts it verbatim after the effort key in a definition's frontmatter, so a value opening with a hash is a YAML comment: the definition's effort is empty while assertion B compares bytes and passes.
-
-**Deliverable:** the validator refuses a lone dash and holds an effort to a plain-scalar shape, each with a crate row.
-
-**Cost while deferred:** a consumer binding such a value gets a green battery and a session or definition that silently lacks it; no row here is one. Filed 2026-10-09 by tier-resolution-pass' close off its second-vendor review, and promoted at the next scope's intake. Run there in a scratch tree: a binding carrying a hash-led effort, a lone-dash effort and a lone-dash model was accepted, and the write arm put each verbatim into a definition. The resume half was read, not run: no foreign session was opened on such a row. Owner lookup: `frontmatter`, `YAML`, `session.txt` in this file and the disposed-findings record — [plugin-front-matter-yaml](#plugin-front-matter-yaml), DISTINCT (a plugin description strict YAML rejects).
-
 ### front-matter-reader-siblings
 
 four front-matter readers read an opening `---` that nothing closes as front matter to the end of the file, so the page is skipped whole: `check-docs-collapsible`, `check-citation-link` (whose reader `check-pendency-contradiction` reads through), `check-docs-page-repeat` and `check-prose-tells` assertion G. `check-docs-page-length` reads it as Jekyll does, an unclosed `---` delimiting no block (canon-kit/SPEC.md §check-docs-page-length).
@@ -1241,4 +1233,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 ## Done
 
 - stop-test-reads-local-overlay
+- tier-value-validator-gaps
 
