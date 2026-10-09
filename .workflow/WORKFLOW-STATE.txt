@@ -4,4 +4,4 @@
 
 ---
 
-— scope a3f415d8 2026-10-09 6e36e7951
+crate-reader-hardening-pass scope a3f415d8 2026-10-09 6e36e7951
