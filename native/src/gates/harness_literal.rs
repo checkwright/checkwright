@@ -6,10 +6,10 @@ use crate::walk;
 
 const VALVE: &str = "harness-binding:";
 
-// spec: gate-sdk/SPEC.md §check-harness-literal — a trailing comment closer is not part of the
-// reason, so a markdown valve holding the token alone is an empty one
+// spec: gate-sdk/SPEC.md §check-harness-literal — the reason ends at the comment closer wherever
+// it sits on the line, so text after the closer justifies nothing
 fn valve_reason(line: &str) -> Option<&str> {
-    token_reason(VALVE, line).map(|r| r.strip_suffix("-->").unwrap_or(r).trim())
+    token_reason(VALVE, line).map(|r| r.split_once("-->").map_or(r, |(reason, _)| reason).trim())
 }
 
 pub fn run(_args: &[String]) -> i32 {
@@ -105,6 +105,15 @@ mod tests {
             valve_reason("<!-- harness-binding: the sentence declaring the binding -->"),
             Some("the sentence declaring the binding")
         );
+    }
+
+    #[test]
+    fn text_after_the_closer_is_not_a_reason() {
+        assert_eq!(valve_reason("<!-- harness-binding: --> DEMO_DIR"), Some(""));
+        assert_eq!(valve_reason("<!-- harness-binding:--> reads DEMO_DIR -->"), Some(""));
+        assert_eq!(valve_reason("<!-- harness-binding: declared --> DEMO_DIR"), Some("declared"));
+        let same_line = ["<!-- harness-binding: --> DEMO_DIR"];
+        assert!(!declared(&same_line, 0, valve_reason));
     }
 
     #[test]

@@ -2,4 +2,5 @@ name a harness-bound literal outside a declared site
 tree/bare.md:3:Anchor the command at `$DEMO_HARNESS_DIR`.
 tree/empty-reason.md:4:The variable is `DEMO_HARNESS_DIR`.
 tree/too-far.md:5:The variable is `DEMO_HARNESS_DIR`.
+tree/trailing-text.md:3:<!-- harness-binding: --> DEMO_HARNESS_DIR
 literal: DEMO_HARNESS_DIR

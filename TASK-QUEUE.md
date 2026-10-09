@@ -36,14 +36,6 @@ a placed git hook stays on the build of the last `--install-hooks` once a build 
 
 ## Technical Debt
 
-### harness-valve-trailing-text
-
-`check-harness-literal` accepts an empty-reason valve when text follows its comment closer on the same line: a markdown valve holding the token alone, closed, then a name, passes. The reason reader (`valve_reason`, `native/src/gates/harness_literal.rs`) strips a closer only as the line's suffix and takes the rest as the reason. gate-sdk/SPEC.md §check-harness-literal says an empty reason is a finding, and the fixture pair holds only a valve that ends its line.
-
-**Deliverable:** a reason read up to the comment closer wherever it sits on the line, a `bad/` fixture carrying the trailing-text valve, and a crate case beside the reader's own. Debt: it adds no name.
-
-**Cost while deferred:** a valve carrying no reason clears a literal on its own line. Filed 2026-10-08 as a gap by foreign-stage-binding-pass' close second-vendor review, a new defect in a landed gate; promoted 2026-10-09 by the next iteration's scope intake. Re-verified there by reading the reader, a suffix strip of the closer then a trim, and run in a scratch repository: the gate passed the trailing-text valve and redded the same valve ending its line. Owner lookup: `harness-binding`, `check-harness-literal`, `valve` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §check-harness-literal.
-
 ### tracked-set-quoted-path-names
 
 the tracked-set reader `check-portability-floor` and `check-harness-literal` share (`tracked`, `native/src/gates/portability_floor.rs`) lists its corpus with `git ls-files` and reads each output line as a path. Git quotes a name carrying a non-ASCII byte under its default quoting, a double quote or a backslash, so such a member is opened under its quoted spelling and the gate exits 2 on an unreadable corpus member, naming a path that does not exist. Neither gate's section in gate-sdk/SPEC.md states a filename restriction.
@@ -1243,4 +1235,6 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix over the roster's unix legs would hold them in step.
 
 ## Done
+
+- harness-valve-trailing-text
 
