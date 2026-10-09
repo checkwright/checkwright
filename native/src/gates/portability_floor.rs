@@ -127,8 +127,8 @@ fn inner(args: &[String]) -> Result<i32, String> {
     let mut scanned = 0usize;
     let mut skipped_binary = 0usize;
     let mut ps1_checked = 0usize;
-    for path in listing.lines() {
-        if path.is_empty() || exempt.iter().any(|e| e == path) {
+    for path in listing.iter().map(String::as_str) {
+        if exempt.iter().any(|e| e == path) {
             continue;
         }
         let Ok(bytes) = std::fs::read(path) else {
@@ -226,14 +226,22 @@ fn inner(args: &[String]) -> Result<i32, String> {
 // spec: gate-sdk/SPEC.md §check-portability-floor — the corpus is the *tracked* set under the
 // configured pathspecs, never a directory walk: what an adopter executes is what the payload
 // carries, and the payload is assembled from tracked files
-pub(crate) fn tracked(gate: &str, paths: &[String]) -> Result<String, String> {
-    let mut argv: Vec<&str> = vec!["ls-files", "--"];
-    for p in paths {
-        argv.push(p.as_str());
-    }
+pub(crate) fn tracked(gate: &str, paths: &[String]) -> Result<Vec<String>, String> {
+    tracked_under(None, gate, paths)
+}
+
+// spec: gate-sdk/SPEC.md §check-portability-floor — the listing is read NUL-terminated
+fn tracked_under(top: Option<&str>, gate: &str, paths: &[String]) -> Result<Vec<String>, String> {
+    let mut argv: Vec<&str> = top.map(|t| vec!["-C", t]).unwrap_or_default();
+    argv.extend(["ls-files", "-z", "--"]);
+    argv.extend(paths.iter().map(String::as_str));
     let ls = proc::run(&programs::GIT, &argv).map_err(|e| format!("{}: {}", gate, e))?;
     match ls.stdout() {
-        Some(o) => Ok(String::from_utf8_lossy(o).into_owned()),
+        Some(o) => Ok(String::from_utf8_lossy(o)
+            .split('\0')
+            .filter(|p| !p.is_empty())
+            .map(String::from)
+            .collect()),
         None => Err(format!("{}: {}", gate, fresh::fail_closed("git-ls-files", ls.code()))),
     }
 }
@@ -325,6 +333,32 @@ mod tests {
         assert!(!hit("sort -u \"$f\""));
         assert!(!hit("contact the maintainer"));
         assert!(!hit("the syntactic sugar is fine"));
+    }
+
+    #[test]
+    fn a_name_git_would_quote_is_listed_under_the_spelling_that_opens_it() {
+        let base = std::env::temp_dir().join(format!("checkwright-tracked-quoted.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&base);
+        std::fs::create_dir_all(&base).expect("mkdir");
+        let top = base.display().to_string();
+        let mut names = vec!["na\u{ef}ve.md", "plain.md"];
+        if cfg!(unix) {
+            names.extend(["a\"quote.md", "back\\slash.md"]);
+        }
+        names.sort_unstable();
+        let git = |args: &[&str]| proc::run(&programs::GIT, args).expect("git runs").stdout().is_some();
+        assert!(git(&["-C", &top, "init", "-q"]));
+        for n in &names {
+            std::fs::write(base.join(n), "x\n").expect("write");
+            assert!(git(&["-C", &top, "add", "--", n]));
+        }
+        let listed = tracked_under(Some(&top), "t", &[".".to_string()]);
+        let opened = listed.iter().flatten().all(|l| std::fs::read(base.join(l)).is_ok());
+        let _ = std::fs::remove_dir_all(&base);
+        let mut listed = listed.expect("the listing succeeds");
+        listed.sort_unstable();
+        assert_eq!(listed, names);
+        assert!(opened);
     }
 
     #[test]

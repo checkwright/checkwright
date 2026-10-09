@@ -43,7 +43,7 @@ fn inner() -> Result<i32, String> {
     let mut hits: Vec<String> = Vec::new();
     let mut scanned = 0usize;
     let mut skipped_binary = 0usize;
-    for path in listing.lines().filter(|p| !p.is_empty()) {
+    for path in listing.iter().map(String::as_str) {
         let Ok(bytes) = std::fs::read(path) else {
             return Err(format!(
                 "check-harness-literal: corpus member not readable: {}\nHARNESS-LITERAL: {}",

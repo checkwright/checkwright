@@ -117,6 +117,18 @@ out="$( cd "$SANDBOX/repo" \
     && gate_run check-portability-floor "$CHECKS" patterns.list 2>&1 )"; rc=$?
 expect binary-skipped 0 '1 binary member(s) skipped' "$rc" "$out"
 
+# --- a member whose name git quotes in its line listing is opened under its real
+# spelling: the finding names the file, where a quoted spelling exits 2 on a path
+# that does not exist.
+quoted="$(printf 'na\303\257ve-verb')"
+mkdir -p "$SANDBOX/repo/quoted"
+printf 'sort -V\n' > "$SANDBOX/repo/quoted/$quoted"
+git -C "$SANDBOX/repo" add quoted
+out="$( cd "$SANDBOX/repo" \
+    && gate_env GATE_SDK_PORTABILITY_PATHS=quoted \
+    && gate_run check-portability-floor "$CHECKS" patterns.list 2>&1 )"; rc=$?
+expect quoted-name 1 "quoted/$quoted:1:" "$rc" "$out"
+
 # --- record order over the tracked bad/ case: the roster arm's block, then the
 # ASCII arm's, each in path order, then line order. Read
 # off the pair so the corpus has one home. The corpus knob is set here rather
@@ -148,8 +160,8 @@ if [[ "$fails" -gt 0 ]]; then
     exit 1
 fi
 if [[ "$unreadable_arm" == run ]]; then
-    echo "check-portability-floor.test.sh: clean (the arms a case dir cannot reach: an unconfigured corpus disabling the assertion in its own sentence, an absent pattern file doing the same to the roster arm alone, the ASCII arm running under that empty roster, the same knob path finding the violation once set, a GNU escape refused by name at compile, an unreadable pattern file failing closed where an absent one degrades, a binary corpus member skipped-and-counted, and the bad pair's record order — 11 assertions over 8 cases)"
+    echo "check-portability-floor.test.sh: clean (the arms a case dir cannot reach: an unconfigured corpus disabling the assertion in its own sentence, an absent pattern file doing the same to the roster arm alone, the ASCII arm running under that empty roster, the same knob path finding the violation once set, a GNU escape refused by name at compile, an unreadable pattern file failing closed where an absent one degrades, a binary corpus member skipped-and-counted, a member whose name git quotes read under its real spelling, and the bad pair's record order — 12 assertions over 9 cases)"
 else
-    echo "check-portability-floor.test.sh: clean (the arms a case dir cannot reach: an unconfigured corpus disabling the assertion in its own sentence, an absent pattern file doing the same to the roster arm alone, the ASCII arm running under that empty roster, the same knob path finding the violation once set, a GNU escape refused by name at compile, a binary corpus member skipped-and-counted, and the bad pair's record order — 9 assertions over 7 cases; the unreadable-pattern-file arm declared a skip above, this account reading a mode-000 file)"
+    echo "check-portability-floor.test.sh: clean (the arms a case dir cannot reach: an unconfigured corpus disabling the assertion in its own sentence, an absent pattern file doing the same to the roster arm alone, the ASCII arm running under that empty roster, the same knob path finding the violation once set, a GNU escape refused by name at compile, a binary corpus member skipped-and-counted, a member whose name git quotes read under its real spelling, and the bad pair's record order — 10 assertions over 8 cases; the unreadable-pattern-file arm declared a skip above, this account reading a mode-000 file)"
 fi
 exit 0

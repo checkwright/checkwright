@@ -47,6 +47,7 @@
 - `check-hook-exec-bit` — removed, no tracked hook being left to hold a mode on (Behavior changes). A `gates.list` line still naming it resolves nowhere and reds: drop the line.
 - `check-graph` — loses assertion D, so it no longer holds a tracked `pre-commit` or `commit-msg` hook, and its `couples=` drops the two hook paths. Nothing to do.
 - `check-stage-skill-coverage` — gains a fourth direction, inert until you set the new `LIFECYCLE_KIT_STAGE_EXECUTOR` (Knob changes): every stage it binds must have an executed surface, the template its shim names or a copied skill itself, carrying the citation `lifecycle-kit/SPEC.md §The host protocol`. Of the shipped stage templates the build one alone lacks it, so binding `build` reds. Its clean line gains the count of bound stages read. Nothing to do while the knob is empty; on a red, unbind the stage or carry the pointer line in your copied skill.
+- `check-portability-floor` — a corpus member whose name carries a non-ASCII byte, a double quote or a backslash is now scanned, where the gate exited 2 naming a quoted path that does not exist. Such a member can gain a finding; fix it as the gate's help line says.
 
 ## Knob changes
 

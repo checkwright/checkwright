@@ -36,14 +36,6 @@ a placed git hook stays on the build of the last `--install-hooks` once a build 
 
 ## Technical Debt
 
-### tracked-set-quoted-path-names
-
-the tracked-set reader `check-portability-floor` and `check-harness-literal` share (`tracked`, `native/src/gates/portability_floor.rs`) lists its corpus with `git ls-files` and reads each output line as a path. Git quotes a name carrying a non-ASCII byte under its default quoting, a double quote or a backslash, so such a member is opened under its quoted spelling and the gate exits 2 on an unreadable corpus member, naming a path that does not exist. Neither gate's section in gate-sdk/SPEC.md states a filename restriction.
-
-**Deliverable:** the reader takes the NUL-terminated listing, the spelling the crate's other tracked-set readers use, with a crate case over a quoted name. Debt: it adds no name.
-
-**Cost while deferred:** one such file on either corpus fail-closes its gate; no tracked file here carries such a name. Filed 2026-10-08 as a gap by foreign-stage-binding-pass' close second-vendor review; promoted 2026-10-09 by the next iteration's scope intake. Re-verified there: the reader runs the listing with no `-z` and splits on lines, the tracked set lists no quoted name, and `check-harness-literal` run in a scratch repository tracking a name with a non-ASCII byte exited 2 naming the quoted spelling. `check-portability-floor` was not run there. Owner lookup: `ls-files`, `quotepath`, `quoted`, `portability-floor` in this file and the disposed-findings record — none; [guard-quoted-operand-words](#guard-quoted-operand-words) is distinct, a shell word's quoting. Owner gate-sdk/SPEC.md §check-portability-floor.
-
 ### toolchain-action-proxy-jobs
 
 five jobs in `.github/workflows/gates.yml` make a compiler version read their first toolchain call with no step on the retrying composite action: `native-artifacts-roster`, `install-smoke-pwsh-windows`, `install-smoke-sh-macos`, `install-smoke-sh-macos-intel` and `install-smoke-sh-linux-arm64`. gate-sdk/SPEC.md §check-crate-arms says each job that runs cargo takes the action ahead of its build, and a compiler proxy call fetches the pinned toolchain as a cargo call does, so these keep the unretried fetch the action was added to end.
@@ -1237,4 +1229,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 ## Done
 
 - harness-valve-trailing-text
+- tracked-set-quoted-path-names
 

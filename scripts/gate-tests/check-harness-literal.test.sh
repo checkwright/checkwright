@@ -51,6 +51,13 @@ git -C "$SANDBOX/repo" add artifact
 out="$( cd "$SANDBOX/repo" && run DEMO_HARNESS_DIR artifact )"; rc=$?
 expect binary-skipped 0 '1 binary member(s) skipped' "$rc" "$out"
 
+quoted="$(printf 'na\303\257ve.md')"
+mkdir -p "$SANDBOX/repo/quoted"
+printf 'Anchor at DEMO_HARNESS_DIR.\n' > "$SANDBOX/repo/quoted/$quoted"
+git -C "$SANDBOX/repo" add quoted
+out="$( cd "$SANDBOX/repo" && run DEMO_HARNESS_DIR quoted )"; rc=$?
+expect quoted-name 1 "quoted/$quoted:1:" "$rc" "$out"
+
 out="$( cd "$SANDBOX/bare" && GIT_CEILING_DIRECTORIES="$SANDBOX" run DEMO_HARNESS_DIR . )"; rc=$?
 expect non-repository 2 'git-ls-files' "$rc" "$out"
 
@@ -58,5 +65,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-harness-literal.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-harness-literal.test.sh: clean (the arms a case dir cannot reach: each empty knob disabling the gate in its own sentence, the same knobs finding the literal once set, a literal read as a fixed string, a binary member skipped-and-counted, and a non-repository working directory failing closed — 8 assertions over 7 cases)"
+echo "check-harness-literal.test.sh: clean (the arms a case dir cannot reach: each empty knob disabling the gate in its own sentence, the same knobs finding the literal once set, a literal read as a fixed string, a binary member skipped-and-counted, a member whose name git quotes read under its real spelling, and a non-repository working directory failing closed — 9 assertions over 8 cases)"
 exit 0
