@@ -10,6 +10,40 @@
 
 ## Technical Debt
 
+### stop-test-reads-local-overlay
+
+scripts/gate-tests/subagent-stop-reader.test.sh fails six assertions wherever the consumer's gitignored delegation overlay binds a foreign tier row on a class outside the kit's default roster, so `check-crate-arms` and the full battery red there while CI, which holds no overlay, stays green. Its unresolved case points `DELEGATION_KIT_KNOB_FILE` at a scratch file holding the liveness command alone. The class roster then falls to the kit default while the overlay is still read from the gates directory (gate-sdk/SPEC.md §The knob file), the hook reports a malformed delegation config and allows the turn end, and the case reads exit 0 where it wants 2.
+
+**Deliverable:** the case's scratch binding made whole against whatever the overlay holds, the gates directory relocated with the knob file or the tracked roster carried into the scratch file, and the suite green under an overlay naming a class the default roster lacks.
+
+**Promoted 2026-10-09, operator direction, lead-relayed (not a ruling):** it leads a set of eight on the crate's readers, with [hook-refresh-unlinks-first](#hook-refresh-unlinks-first), [tier-value-validator-gaps](#tier-value-validator-gaps), [front-matter-reader-siblings](#front-matter-reader-siblings), [listing-line-form-readers](#listing-line-form-readers), [tracked-name-lossy-decode](#tracked-name-lossy-decode), [arm-stdout-close-panic](#arm-stdout-close-panic) and [toolchain-action-order-ungated](#toolchain-action-order-ungated). The set needs the closing push alone.
+
+**Cost while deferred:** the commit-time full battery reds on any seat whose overlay binds such a row, this one since the four-class binding, and a commit reaching the crate is refused there. Filed 2026-10-09 by the scope after tier-resolution-pass, off its own battery run. Run there: the suite passes against a scratch gates directory whose overlay lacks the two rows the refusal names, and fails the same six assertions with them restored. Owner lookup: `overlay`, `KNOB_FILE`, `subagent-stop`, `hermetic` in this file and the disposed-findings record — the icebox's hermetic-harness-export-masks-the-condition-under-test, DISTINCT (a harness pinning too much, where this one pins too little); owner delegation-kit/SPEC.md §Layout and configuration.
+
+### hook-refresh-unlinks-first
+
+a hook refresh can leave a served hook absent, and the build script then says the opposite. The placement behind `--install-hooks --refresh` removes an existing hook file before it links or copies the replacement (`native/src/emit/install_hooks.rs`, `place`), so where the link and the copy both fail the hook is gone and git runs no hook it cannot find; gate-sdk/bin/build-native.sh then prints that the hooks stay on the previous build. gate-sdk/SPEC.md §build-native says a hook that could not be refreshed is named rather than silently left behind.
+
+**Deliverable:** the replacement placed under a sibling name and renamed over the hook, with a case whose replacement cannot be written.
+
+**Cost while deferred:** a refresh whose link and copy both fail turns the commit gates off with a message saying they still run. Filed 2026-10-09 by tier-resolution-pass' close off its second-vendor review, and promoted at the next scope's intake. Run there in scratch repositories: with a cross-device hooks directory and an unreadable source the refresh exits 2 and the first served hook is gone, no partial file left; on a read-only hooks directory the unlink itself is refused and both hooks stay, which narrows the filing's cost. A copy cut short by a full disk was not run, so whether it leaves a partial file is unread. Owner lookup: `refresh`, `hooksPath`, `placed hook` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §build-native.
+
+### tier-value-validator-gaps
+
+the tier tables' value validator admits values two of its writers cannot carry (`native/src/tier.rs`, the shared value refusals; delegation-kit/SPEC.md §Layout and configuration). A model or effort spelled as one dash is accepted, while a foreign session's record writes a dash for an absent field and reads one back as absent, so a session opened on such a row loses its pair at the first resume, against §The foreign-vendor run's rule that a session keeps the pair it opened with. An effort is refused only when empty, carrying whitespace or a second comma, and `--emit agent-tiers --write` puts it verbatim after the effort key in a definition's frontmatter, so a value opening with a hash is a YAML comment: the definition's effort is empty while assertion B compares bytes and passes.
+
+**Deliverable:** the validator refuses a lone dash and holds an effort to a plain-scalar shape, each with a crate row.
+
+**Cost while deferred:** a consumer binding such a value gets a green battery and a session or definition that silently lacks it; no row here is one. Filed 2026-10-09 by tier-resolution-pass' close off its second-vendor review, and promoted at the next scope's intake. Run there in a scratch tree: a binding carrying a hash-led effort, a lone-dash effort and a lone-dash model was accepted, and the write arm put each verbatim into a definition. The resume half was read, not run: no foreign session was opened on such a row. Owner lookup: `frontmatter`, `YAML`, `session.txt` in this file and the disposed-findings record — [plugin-front-matter-yaml](#plugin-front-matter-yaml), DISTINCT (a plugin description strict YAML rejects).
+
+### front-matter-reader-siblings
+
+four front-matter readers read an opening `---` that nothing closes as front matter to the end of the file, so the page is skipped whole: `check-docs-collapsible`, `check-citation-link` (whose reader `check-pendency-contradiction` reads through), `check-docs-page-repeat` and `check-prose-tells` assertion G. `check-docs-page-length` reads it as Jekyll does, an unclosed `---` delimiting no block (canon-kit/SPEC.md §check-docs-page-length).
+
+**Deliverable:** one shared front-matter span reader beside the fence reader, the four gates on it, a fixture row per gate, each SPEC section stating the reading, and the release declaration.
+
+**Cost while deferred:** a page with a broken front-matter block passes each of the four unread. Filed 2026-10-06 by site-fence-release-cites-pass' build. Re-verified by reading the four modules: each opens its front-matter state on a first-line `---` and clears it only on a later one. Owner lookup: `front matter`, `front_matter`, `prose_only` in this file and the disposed-findings record — [plugin-front-matter-yaml](#plugin-front-matter-yaml), DISTINCT (the plugin gate's YAML key reader).
+
 ## Deferred
 
 ### guard-quoted-operand-words
@@ -66,11 +100,11 @@ hosted attestation. The team/paid rung: gates verified server-side by a party th
 
 [cost: iteration/low] [surface: delegation-kit] [roadmap: now/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
 
-foreign agents. A lead delegating a stage to a foreign coding agent, cashing the public no-lock-in claim: governance enforced at the git/gate boundary, not by trusting the author. *Remaining:* (4) **stage-contract expression**, past its two slices below: a stage whose writes a foreign agent performs.
+foreign agents. A lead delegating a stage to a foreign coding agent, cashing the public no-lock-in claim: governance enforced at the git/gate boundary, not by trusting the author. *Remaining:* (4) **stage-contract expression**, past its two slices below: a stage whose writes a foreign agent performs. Held at scope 2026-10-09 (operator direction, lead-relayed, not a ruling); not ruled out.
 
-**Slices landed**, each in delegation-kit/SPEC.md §The foreign-vendor run and each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); then (2) the dispatch transport with (1) the escalation resume model riding it, `--foreign-resume`, that section's Resuming a session (delegation-transport-pass, 2026-10-03). Then (3) the budget oracle, delegation-kit/SPEC.md §The keyed verdict (delegation-wait-journal-pass, 2026-10-07; operator direction, lead-relayed, not a ruling). No foreign run was granted with it: accepted by stub-driven crate cases and one producer read of a vendor's on-disk session store through a scratch binding, so a live turn refreshing the feed is unobserved, as is whether a turn in a vendor's non-persisting mode, two of this repo's three adapters, leaves a usage event on disk; one granted run of each kind settles both. **This repo's binding (operator direction, 2026-10-07, lead-relayed, not a ruling):** inline in the gitignored `.local` overlay alone, its adapters reading one snapshot under the metric dir from an inline producer. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
+**Slices landed**, each in delegation-kit/SPEC.md §The foreign-vendor run, each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); then (2) the dispatch transport with (1) the escalation resume model riding it, `--foreign-resume`, that section's Resuming a session (delegation-transport-pass, 2026-10-03). Then (3) the budget oracle, delegation-kit/SPEC.md §The keyed verdict (delegation-wait-journal-pass, 2026-10-07; operator direction, lead-relayed, not a ruling). No foreign run was granted: accepted by stub-driven crate cases and one producer read of a vendor's on-disk session store through a scratch binding, so a live turn refreshing the feed is unobserved, as is whether a turn in a vendor's non-persisting mode, two of this repo's three adapters, leaves a usage event on disk; one granted run of each kind settles both. **This repo's binding (operator direction, 2026-10-07, lead-relayed, not a ruling):** inline in the gitignored `.local` overlay alone, its adapters reading one snapshot under the metric dir from an inline producer. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
 
-**Item (4)'s two slices landed** (both 2026-10-08; operator direction each, lead-relayed, not a ruling). First (foreign-stage-contract-pass), lifecycle-kit/SPEC.md §The stage-contract arm: the audit stage's reading runs foreign and its host performs every write. Second (foreign-stage-binding-pass), lifecycle-kit/SPEC.md §The host protocol: one protocol file every shipped stage template but the build stage's points at. **Grant spent** (one live foreign run, operator grant 2026-10-08, lead-relayed) by the second slice's own audit stage, whose landing commit message carries the run's `OK` verdict line. The agent wrote nothing, kept the frame's five parts and ran the contract's read-only commands unrefused; it left the battery and the successor-entry read to the host, its clone holding no gate binary. **Second grant spent** (operator grant 2026-10-09, lead-relayed: judgment-class model, medium effort) by tier-resolution-pass' spec stage, a non-audit contract; its amendment's landing commit carries the `OK` line. The agent wrote nothing, returned each amendment as a full-text proposal, and named each command needing the binary and each reading lacking ignored content.
+**Item (4)'s two slices landed** (both 2026-10-08; operator direction each, lead-relayed, not a ruling). First (foreign-stage-contract-pass), lifecycle-kit/SPEC.md §The stage-contract arm: the audit stage's reading runs foreign, its host performing every write. Second (foreign-stage-binding-pass), its §The host protocol: one protocol file every shipped stage template but the build stage's points at. **Grant spent** (one live foreign run, operator grant 2026-10-08, lead-relayed) by the second slice's own audit stage, whose landing commit carries the run's `OK` line. The agent wrote nothing, kept the frame's five parts, ran the contract's read-only commands unrefused, and left the battery and successor-entry read to the host, its clone holding no gate binary. **Second grant spent** (operator grant 2026-10-09, lead-relayed: judgment-class model, medium effort) by tier-resolution-pass' spec stage, a non-audit contract; its amendment's landing commit carries the `OK` line. It wrote nothing, returned each amendment as a full-text proposal, and named each command needing the binary and each reading lacking ignored content.
 
 **Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, the pattern the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service) and [plugin-harness-reach](#plugin-harness-reach).
 
@@ -80,7 +114,7 @@ foreign agents. A lead delegating a stage to a foreign coding agent, cashing the
 
 **Design memory (2026-07-25, 2026-08-02):** JSONL turn events ship on the installed binaries probed. The machine profile (context-kit/SPEC.md §bin/env-probe, local-only) owns which CLIs and how.
 
-**Cost while deferred:** stage-level work still bills one vendor's budget while three subscriptions are held, and this design memory ages against fast-moving CLIs. Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question).
+**Cost while deferred:** stage-level work still bills one vendor's budget, and the design memory ages against fast-moving CLIs. Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question).
 
 ### companion-toolkit-profile
 
@@ -362,16 +396,6 @@ a citation naming a numbered step by its bold title (RELEASING.md §The procedur
 
 **Inferred, not run:** that neither gate reads past the heading; no fixture rewording a cited title was run.
 
-### front-matter-reader-siblings
-
-[cost: event/low] [surface: native]
-
-four front-matter readers read an opening `---` that nothing closes as front matter to the end of the file, so the page is skipped whole: `check-docs-collapsible`, `check-citation-link` (whose reader `check-pendency-contradiction` reads through), `check-docs-page-repeat` and `check-prose-tells` assertion G. `check-docs-page-length` reads it as Jekyll does, an unclosed `---` delimiting no block (canon-kit/SPEC.md §check-docs-page-length).
-
-**Deliverable:** one shared front-matter span reader beside the fence reader, the four gates on it, a fixture row per gate, each SPEC section stating the reading, and the release declaration.
-
-**Cost while deferred:** a page with a broken front-matter block passes each of the four unread. Filed 2026-10-06 by site-fence-release-cites-pass' build. Re-verified by reading the four modules: each opens its front-matter state on a first-line `---` and clears it only on a later one. Owner lookup: `front matter`, `front_matter`, `prose_only` in this file and the disposed-findings record — [plugin-front-matter-yaml](#plugin-front-matter-yaml), DISTINCT (the plugin gate's YAML key reader).
-
 ### site-health-resample-knobs
 
 [cost: event/low] [surface: site-kit]
@@ -526,18 +550,6 @@ that an agent definition's effort line sets its child's effort (delegation-kit/S
 
 **Cost while deferred:** a class's bound effort is trusted on the harness's documentation, so a harness that ignored the line would run every class at the dispatcher's effort with the generated line and its freshness gate both green. Filed 2026-10-09 by tier-resolution-pass' close after its drain, and promoted at the next scope's intake. Re-verified there by grep: the five tracked definitions state one effort. Owner lookup: `effort`, `model-verdict`, `Honest limits` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §check-agent-tier-explicit.
 
-### tier-value-validator-gaps
-
-[cost: event/low] [surface: delegation-kit]
-
-the tier tables' value validator admits values two of its writers cannot carry (`native/src/tier.rs`, the shared value refusals; delegation-kit/SPEC.md §Layout and configuration). A model or effort spelled as one dash is accepted, while a foreign session's record writes a dash for an absent field and reads one back as absent, so a session opened on such a row loses its pair at the first resume, against §The foreign-vendor run's rule that a session keeps the pair it opened with. An effort is refused only when empty, carrying whitespace or a second comma, and `--emit agent-tiers --write` puts it verbatim after the effort key in a definition's frontmatter, so a value opening with a hash is a YAML comment: the definition's effort is empty while assertion B compares bytes and passes.
-
-**Deliverable:** the validator refuses a lone dash and holds an effort to a plain-scalar shape, each with a crate row.
-
-**Inferred, not run:** that such a row loses its pair or empties a definition's effort — bind one in a scratch tree, open and resume a session on it, and run the write arm
-
-**Cost while deferred:** a consumer binding such a value gets a green battery and a session or definition that silently lacks it; no row here is one. Filed 2026-10-09 by tier-resolution-pass' close off its second-vendor review, and promoted at the next scope's intake. Re-verified there by reading the validator: its refusals are an empty value, whitespace and a second comma. Owner lookup: `frontmatter`, `YAML`, `session.txt` in this file and the disposed-findings record — [plugin-front-matter-yaml](#plugin-front-matter-yaml), DISTINCT (a plugin description strict YAML rejects).
-
 ### tracked-name-lossy-decode
 
 [cost: event/low] [surface: native]
@@ -549,30 +561,6 @@ the shared tracked-set reader decodes git's NUL-terminated listing lossily (`nat
 **Inferred, not run:** that either gate exits 2 on such a name — list a scratch repository holding one through the reader
 
 **Cost while deferred:** an adopter tracking such a file cannot run either gate. Filed 2026-10-09 by tier-resolution-pass' close off its second-vendor review, and promoted at the next scope's intake. Re-verified there by grep: the listing read ends in a lossy decode. Owner lookup: `UTF-8`, `lossy`, `replacement character` in this file and the disposed-findings record — [listing-line-form-readers](#listing-line-form-readers), DISTINCT (the listing's form, not a name's decoding); one unit could carry both.
-
-### hook-refresh-unlinks-first
-
-[cost: event/low] [surface: gate-sdk]
-
-a hook refresh can leave a served hook absent, and the build script then says the opposite. The placement behind `--install-hooks --refresh` removes an existing hook file before it links or copies the replacement (`native/src/emit/install_hooks.rs`, `place`), so where the link and the copy both fail the hook is gone and git runs no hook it cannot find; gate-sdk/bin/build-native.sh then prints that the hooks stay on the previous build. gate-sdk/SPEC.md §build-native says a hook that could not be refreshed is named rather than silently left behind.
-
-**Deliverable:** the replacement placed under a sibling name and renamed over the hook, with a case whose replacement cannot be written.
-
-**Inferred, not run:** that a failed copy leaves no partial file git would run — induce the link and copy failures on a read-only hooks directory and list it
-
-**Cost while deferred:** a build on a full or read-only git directory turns the commit gates off with a message saying they still run. Filed 2026-10-09 by tier-resolution-pass' close off its second-vendor review, and promoted at the next scope's intake. Re-verified there by reading both files: the unlink precedes the link, and the script's message is as quoted. Owner lookup: `refresh`, `hooksPath`, `placed hook` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §build-native.
-
-### stop-test-reads-local-overlay
-
-[cost: session/high] [surface: scripts]
-
-scripts/gate-tests/subagent-stop-reader.test.sh fails six assertions wherever the consumer's gitignored delegation overlay binds a foreign tier row on a class outside the kit's default roster, so `check-crate-arms` and the full battery red there while CI, which holds no overlay, stays green. Its unresolved case points `DELEGATION_KIT_KNOB_FILE` at a scratch file holding the liveness command alone. The class roster then falls to the kit default while the overlay is still read from the gates directory (gate-sdk/SPEC.md §The knob file), the hook reports a malformed delegation config and allows the turn end, and the case reads exit 0 where it wants 2.
-
-**Deliverable:** the case's scratch binding made whole against whatever the overlay holds, the gates directory relocated with the knob file or the tracked roster carried into the scratch file, and the suite green under an overlay naming a class the default roster lacks.
-
-**Inferred, not run:** that the overlay's rows are the only cause — run the suite with the overlay's foreign tier rows on default-roster classes alone
-
-**Cost while deferred:** the commit-time full battery reds on any seat whose overlay binds such a row, this one since the four-class binding, and a commit reaching the crate is refused there. Filed 2026-10-09 by the scope after tier-resolution-pass, off its own battery run. Read there: the refusal names two overlay rows and the default roster's three classes, and the overlay's last write postdates that iteration's validate evidence. Owner lookup: `overlay`, `KNOB_FILE`, `subagent-stop`, `hermetic` in this file and the disposed-findings record — the icebox's hermetic-harness-export-masks-the-condition-under-test, DISTINCT (a harness pinning too much, where this one pins too little); owner delegation-kit/SPEC.md §Layout and configuration.
 
 ## Icebox
 
