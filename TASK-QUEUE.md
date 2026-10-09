@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### hook-refresh-unlinks-first
-
-a hook refresh can leave a served hook absent, and the build script then says the opposite. The placement behind `--install-hooks --refresh` removes an existing hook file before it links or copies the replacement (`native/src/emit/install_hooks.rs`, `place`), so where the link and the copy both fail the hook is gone and git runs no hook it cannot find; gate-sdk/bin/build-native.sh then prints that the hooks stay on the previous build. gate-sdk/SPEC.md §build-native says a hook that could not be refreshed is named rather than silently left behind.
-
-**Deliverable:** the replacement placed under a sibling name and renamed over the hook, with a case whose replacement cannot be written.
-
-**Cost while deferred:** a refresh whose link and copy both fail turns the commit gates off with a message saying they still run. Filed 2026-10-09 by tier-resolution-pass' close off its second-vendor review, and promoted at the next scope's intake. Run there in scratch repositories: with a cross-device hooks directory and an unreadable source the refresh exits 2 and the first served hook is gone, no partial file left; on a read-only hooks directory the unlink itself is refused and both hooks stay, which narrows the filing's cost. A copy cut short by a full disk was not run, so whether it leaves a partial file is unread. Owner lookup: `refresh`, `hooksPath`, `placed hook` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §build-native.
-
 ## Deferred
 
 ### guard-quoted-operand-words
@@ -1187,4 +1179,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - front-matter-reader-siblings
 - arm-stdout-close-panic
 - toolchain-action-order-ungated
+- hook-refresh-unlinks-first
 

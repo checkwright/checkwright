@@ -133,21 +133,33 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
 }
 
 // spec: gate-sdk/SPEC.md §install-hooks — each served hook is a hard link to the binary under the
-// hook's name, a copy where the link cannot be made, replaced on a re-run
+// hook's name, a copy where the link cannot be made. The replacement is written under a sibling
+// name and renamed over the hook, so a placement that fails leaves the hook already there in place
 fn place(bin: &Path, dir: &Path) -> Result<(), String> {
     std::fs::create_dir_all(dir).map_err(|e| format!("cannot create {}: {}", dir.display(), e))?;
     for hook in hook_launcher::SERVED {
         let dst = dir.join(hook_launcher::file_name(hook));
-        if dst.symlink_metadata().is_ok() {
-            std::fs::remove_file(&dst).map_err(|e| format!("cannot replace {}: {}", dst.display(), e))?;
-        }
-        if std::fs::hard_link(bin, &dst).is_err() {
-            std::fs::copy(bin, &dst)
-                .map_err(|e| format!("cannot place {} from {}: {}", dst.display(), bin.display(), e))?;
-        }
-        crate::install::make_executable(&dst)?;
+        let staged = dir.join(format!("{}{}", hook_launcher::file_name(hook), STAGED_SUFFIX));
+        let placed = stage(bin, &staged).and_then(|_| {
+            std::fs::rename(&staged, &dst).map_err(|e| format!("cannot replace {}: {}", dst.display(), e))
+        });
+        // spec: gate-sdk/SPEC.md §install-hooks — a rename between two links to one file succeeds
+        // and moves nothing, so the sibling is removed on every path
+        let _ = std::fs::remove_file(&staged);
+        placed?;
     }
     Ok(())
+}
+
+const STAGED_SUFFIX: &str = ".new";
+
+fn stage(bin: &Path, staged: &Path) -> Result<(), String> {
+    let _ = std::fs::remove_file(staged);
+    if std::fs::hard_link(bin, staged).is_err() {
+        std::fs::copy(bin, staged)
+            .map_err(|e| format!("cannot place {} from {}: {}", staged.display(), bin.display(), e))?;
+    }
+    crate::install::make_executable(staged)
 }
 
 fn config(key: &str, value: &str) -> Result<(), String> {
@@ -301,5 +313,32 @@ mod tests {
         assert_eq!(stale, "one", "a replaced binary must leave the placed hook as it was");
         assert_eq!(fresh, vec!["two".to_string(), "two".to_string()]);
         assert!(executable);
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — a replacement that cannot be written leaves both
+    // hooks as they were and no sibling behind, and so does a re-run over an unchanged binary
+    #[test]
+    fn a_replacement_that_cannot_be_written_leaves_the_placed_hooks() {
+        let d = std::env::temp_dir().join(format!("checkwright-install-hooks-kept.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(&d).expect("scratch");
+        let (bin, hooks) = (d.join("bin"), d.join("git/gate-hooks"));
+        std::fs::write(&bin, "one").expect("binary");
+        place(&bin, &hooks).expect("first placement");
+        place(&bin, &hooks).expect("a re-run over the same file");
+        let listed = |dir: &Path| -> Vec<String> { walk::list_dir(dir).expect("lists").into_iter().map(|(n, _)| n).collect() };
+        let rerun = listed(&hooks);
+        let refused = place(&d.join("no-such-binary"), &hooks);
+        let after = listed(&hooks);
+        let kept: Vec<String> = hook_launcher::SERVED
+            .iter()
+            .map(|h| std::fs::read_to_string(hooks.join(hook_launcher::file_name(h))).expect("the hook is still there"))
+            .collect();
+        let _ = std::fs::remove_dir_all(&d);
+        let both = vec![hook_launcher::file_name("commit-msg"), hook_launcher::file_name("pre-commit")];
+        assert_eq!(rerun, both, "a re-run left a sibling behind");
+        assert!(refused.is_err_and(|e| e.contains("cannot place")), "an absent source must refuse");
+        assert_eq!(after, both, "a refused placement left a sibling behind or removed a hook");
+        assert_eq!(kept, vec!["one".to_string(), "one".to_string()]);
     }
 }
