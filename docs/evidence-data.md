@@ -270,3 +270,4 @@
 | delegation-wait-journal-pass | sc sp a b v c | 2f/1d | 2 · ≤0d | 21s clean | 150 |
 | foreign-stage-contract-pass | sc sp a b v c | 3f/2d | 3 · ≤0d | 21s clean | 150 |
 | foreign-stage-binding-pass | sc sp a b v c | 5f/2d | 4 · ≤0d | 21s clean | 151 |
+| tier-resolution-pass | sc sp a b v c | 2f/3d | 2 · ≤0d | 21s clean | 151 |

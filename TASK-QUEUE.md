@@ -306,18 +306,6 @@ the front-door rehearsal belongs in the methodology, operator direction 2026-09-
 
 **Cost while deferred:** each audience event risks a front-door defect only a clean-seat install would show; the one-off left macOS, native Windows, arm64 Linux, WSL and the npx, plugin, PowerShell and agent-prompt routes unrehearsed. Filed 2026-09-29 by preview-readiness' lead. Re-verified: `publish.yml` runs roster, build, pack, npm and release and installs nothing after publishing. Owner lookup: `rehears`, `post-publish`, `clean seat` in this file — [design-partner-preview](#design-partner-preview), DISTINCT (the observed install this precedes); owner RELEASING.md for layer 2, the kit rule's home open. Surface also doctrine-kit.
 
-### worktree-memory-dir-key
-
-[cost: event/low] [surface: context-kit]
-
-`check-memory-off` derives the memory dir from the repository toplevel, which in a linked worktree is the worktree's own path, while the installed harness bundle keys its per-project memory dir on a canonical working-copy root (its default path reads a canonical-root lookup before the raw path). A linked-worktree session's memory may therefore land under the main checkout's slug, or under one no scan reads.
-
-**Deliverable:** an authenticated probe of where a linked-worktree session's memory dir lands, then the derivation in context-kit/SPEC.md §Layout and configuration matched to it, or a stated reason the worktree's own slug is right.
-
-**Inferred, not run:** the harness's canonical-root keying, read from its bundle; an unauthenticated run writes no memory dir, so the key was never observed.
-
-**Cost while deferred:** a worktree session's memory could accrete where `check-memory-off` never scans. Filed 2026-10-01 by context-kit-value-pass' spec. Re-verified: the gate's default derives from the repository toplevel (`git rev-parse --show-toplevel`). Owner lookup: `memory`, `worktree`, `canonical` in this file — none; owner context-kit/SPEC.md §check-memory-off.
-
 ### notification-delivery-probe
 
 [cost: event/low] [surface: lifecycle-kit]
@@ -505,6 +493,28 @@ the `--queue` arm panics when its stdout closes before its post-check line: `--q
 **Inferred, not run:** that other arms share it — pipe an arm that prints on both sides of a slow step into `head -1` and read stderr
 
 **Cost while deferred:** a reader piping an arm into a line-limiting filter sees a panic trace beside a write that succeeded. Filed 2026-10-08 by foreign-stage-binding-pass' build. Re-verified at that close by reading the verb's source: one print ahead of the post-check and one after it, each the panicking macro; `--emit queue-edges` piped the same way left stderr empty. Owner lookup: `panic`, `pipe`, `stdout` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §The non-gate arm.
+
+### listing-line-form-readers
+
+[cost: event/low] [surface: native]
+
+a tracked-set listing read in git's line form takes a quoted name as a path: git quotes a member whose name carries a non-ASCII byte, a double quote or a backslash there. `tracked-set-quoted-path-names` closed it for the one reader `check-portability-floor` and `check-harness-literal` share, which now lists NUL-terminated. A grep of `native/src` for a listing argv carrying no NUL flag finds the same split in some two dozen more modules, `check-docs-liquid-parse`'s two listings, the enum-sets emitter and the crate-fingerprint read among them.
+
+**Deliverable:** every listing reader on the NUL-terminated form, through one shared reader where the callers allow it; a crate case listing a scratch repository that holds such names; and a holder that reds a line-form listing argv in the crate, its form spec's.
+
+**Inferred, not run:** that each site misreads such a name, some testing only that a listing is non-empty — list a scratch repository holding a non-ASCII name through each reader
+
+**Cost while deferred:** a docs page, template or kit member under such a name is misclassified or unreadable to the gate that lists it; no tracked file here carries one. Filed 2026-10-09 by tier-resolution-pass' build. Re-verified by grep at that close, which widened the filing's three readers to the count above. Owner lookup: `ls-files`, `line-form`, `NUL-term`, `quoted spelling` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §check-portability-floor.
+
+### toolchain-action-order-ungated
+
+[cost: event/low] [surface: gate-sdk]
+
+no gate holds gate-sdk/SPEC.md §check-crate-arms' statement that every workflow job calling the toolchain takes the retrying composite action ahead of its first such call. The class was met twice, each time by review and grep: `toolchain-fetch-no-retry` landed the action on the cargo jobs and left five jobs whose first call is a compiler version read, which `toolchain-action-proxy-jobs` moved.
+
+**Deliverable:** an arm on the job-partitioned workflow walk that reds a job whose run step spells a toolchain program with no earlier step on the action, with its fixture pair; a feature, since it adds an assertion. A call reached through a script is outside what such a read sees, and the section says so.
+
+**Cost while deferred:** the next job added with a bare toolchain call keeps the unretried fetch, and a registry blip reds its leg with no cause in the tree. Filed 2026-10-09 by tier-resolution-pass' build. Re-verified: no file under `native/src`, `gate-sdk/checks` or `scripts` names the action's path. Owner lookup: `retry`, `composite action`, `toolchain-fetch`, `proxy job` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §check-crate-arms.
 
 ## Icebox
 
@@ -1190,11 +1200,9 @@ No rule holds a docs video to a local poster linking out, so a first embed adds 
 
 Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix over the roster's unix legs would hold them in step.
 
-## Done
+### worktree-memory-dir-key
 
-- harness-valve-trailing-text
-- tracked-set-quoted-path-names
-- toolchain-action-proxy-jobs
-- placed-hook-stale-on-rebuild
-- tier-class-resolution
+`check-memory-off` derives the memory dir from the repository toplevel, so a linked-worktree session's memory may land where no scan reads if the harness keys that dir on a canonical working-copy root, a keying read from its bundle and never observed.
+
+## Done
 
