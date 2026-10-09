@@ -2,7 +2,7 @@ The `consult` skill — a session that reconsiders a ruling with the operator or
 
 The write authority this skill leans on is **not** the skill's to grant: it belongs to the ruling record itself, which states who may record a ruling there and under what condition. What this skill adds on top of that authority is **obligation**. Any session that closes a ruling with the operator is permitted to record it; a consultation has not finished until it has.
 
-**First step — verify your tier.** A consultation runs on the class `--emit knob-values LIFECYCLE_KIT_CONSULT_CLASS` names. Run `--model-verdict --expect <that class>` on the gate binary `GATE_SDK_NATIVE_BIN` names (delegation-kit/SPEC.md §model-verdict; without delegation-kit, skip this). On exit 1, stop before reading in. Say that this session is below its floor, quoting the verdict line, so it is restarted on the judgment class: to the operator, or, dispatched, to the lead in one escalation block. On exit 2 the tier is unverified and not refused: state the verdict line in your first message and proceed.
+**First step — verify your tier.** A consultation runs on the class `--emit knob-values LIFECYCLE_KIT_CONSULT_CLASS` names. Run `--model-verdict --expect <that class>` on the gate binary `GATE_SDK_NATIVE_BIN` names (delegation-kit/SPEC.md §model-verdict; without delegation-kit, skip this). On exit 1, stop before reading in. Say that this session is below its floor, quoting the verdict line, so it is restarted on that class: to the operator, or, dispatched, to the lead in one escalation block. On exit 2 the tier is unverified and not refused: state the verdict line in your first message and proceed.
 
 ## Session ritual
 
