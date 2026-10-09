@@ -6,3 +6,4 @@
 
 crate-reader-hardening-pass scope a3f415d8 2026-10-09 6e36e7951
 crate-reader-hardening-pass spec a0fd60a0 2026-10-09 bb2e71797
+crate-reader-hardening-pass align a55c8422 2026-10-09 e9294f3f9
