@@ -124,3 +124,12 @@ if [[ ${#BN_PATFILES[@]} -gt 0 ]]; then
         exit 2
     fi
 fi
+
+# spec: gate-sdk/SPEC.md §build-native — a host build re-places an opted-in clone's hooks through
+# the arm, never by linking them here; a cross build's artifact may not run on this host, and a
+# failed refresh is named while the status stays cargo's
+if [[ -z "$BN_TARGET" ]]; then
+    "$BN_ART" --install-hooks --refresh ||
+        echo "build-native: the placed git hooks could not be refreshed, so they stay on the previous build — run --install-hooks to re-place them." >&2
+fi
+exit 0

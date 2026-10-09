@@ -8,7 +8,7 @@ use super::hook_launcher;
 use crate::{proc, programs};
 use crate::registry;
 use crate::walk;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 // spec: gate-sdk/SPEC.md §install-hooks — this arm's own names, then those its registry-resolved
 // callee declares
@@ -25,11 +25,14 @@ pub const KNOBS: &[&str] = &[
 
 const IDENTITY: &str = "check-identity";
 
-// spec: gate-sdk/SPEC.md §The bin/-tool contract — the member takes no argument, so any token is
-// a refusal before either knob resolves; usage itself lives on this arm's own front-end `case` arm,
-// which the class gives every member holding one.
-const USAGE: &str = "usage: --install-hooks
-  Takes no argument: the whole input is the GATE_SDK_* configuration.";
+const REFRESH: &str = "--refresh";
+
+// spec: gate-sdk/SPEC.md §The bin/-tool contract — the member takes one option and no positional,
+// so any other token is a refusal before either knob resolves; usage itself lives on this arm's own
+// front-end `case` arm, which the class gives every member holding one.
+const USAGE: &str = "usage: --install-hooks [--refresh]
+  --refresh re-places the hooks of a clone already opted in and changes nothing else.
+  Takes no other argument: the rest of the input is the GATE_SDK_* configuration.";
 
 pub fn run(args: &[String]) -> i32 {
     match dispatch(args) {
@@ -41,7 +44,45 @@ pub fn run(args: &[String]) -> i32 {
     }
 }
 
+fn absent(bin: &str) -> String {
+    format!("no gate binary at {} — place or build the binary GATE_SDK_NATIVE_BIN names first", bin)
+}
+
+// spec: gate-sdk/SPEC.md §install-hooks — the hooks directory `--refresh` re-places into: `None`
+// off the work-tree top, where the binary's path and the directory would resolve against another
+// tree, and in a clone not opted in, which a refresh never opts in
+fn refresh_target(here: &str) -> Result<Option<PathBuf>, String> {
+    let Some(top) = walk::toplevel_in_opt(here)? else {
+        return Ok(None);
+    };
+    if !hook_launcher::same_dir(Path::new(&top), Path::new(here)) {
+        return Ok(None);
+    }
+    Ok(hook_launcher::hooks_dir(Path::new(here)).filter(|dir| hook_launcher::opted_in(Path::new(here), dir)))
+}
+
+// spec: gate-sdk/SPEC.md §install-hooks — the files re-placed and nothing else: no config write, no
+// identity rung, no receipt
+fn refresh() -> Result<i32, String> {
+    let Some(hooks_dir) = refresh_target(&walk::cwd()?)? else {
+        return Ok(0);
+    };
+    let bin = walk::knob_scalar("GATE_SDK_NATIVE_BIN")?;
+    if !Path::new(&bin).is_file() {
+        return Err(absent(&bin));
+    }
+    place(Path::new(&bin), &hooks_dir)?;
+    println!("install-hooks: refreshed {}", hooks_dir.display());
+    Ok(0)
+}
+
 fn dispatch(args: &[String]) -> Result<i32, String> {
+    if args.first().map(String::as_str) == Some(REFRESH) {
+        return match args.get(1) {
+            Some(a) => Err(format!("{} takes no arguments (got: {})\n{}", REFRESH, a, USAGE)),
+            None => refresh(),
+        };
+    }
     let surplus = super::file_survey::positionals(args, "argument")
         .map_err(|e| format!("{}\n{}", e, USAGE))?;
     if let Some(a) = surplus.first() {
@@ -53,10 +94,7 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
     let bin = walk::knob_scalar("GATE_SDK_NATIVE_BIN")?;
     let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
     if !Path::new(&bin).is_file() {
-        return Err(format!(
-            "no gate binary at {} — place or build the binary GATE_SDK_NATIVE_BIN names first",
-            bin
-        ));
+        return Err(absent(&bin));
     }
     let hooks_dir = hook_launcher::hooks_dir(Path::new(&walk::cwd()?))
         .ok_or_else(|| "not inside a git repository — there is no clone to place the hooks in".to_string())?;
@@ -201,6 +239,41 @@ mod tests {
             let err = dispatch(&args).expect_err("a positional must refuse");
             assert!(err.contains("got: foo") && err.contains(USAGE), "{}", err);
         }
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — `--refresh` is the arm's one option and takes no
+    // operand, so a token after it refuses before anything is placed
+    #[test]
+    fn refresh_refuses_a_trailing_token_with_the_usage() {
+        for extra in ["foo", "--force"] {
+            let err = dispatch(&[REFRESH.to_string(), extra.to_string()]).expect_err("an operand must refuse");
+            assert!(err.contains(&format!("got: {}", extra)) && err.contains(USAGE), "{}", err);
+        }
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — a refresh has a target only at the work-tree top of a
+    // clone whose `core.hooksPath` names the hooks directory, so its caller never opts a clone in
+    #[test]
+    fn refresh_targets_only_the_top_of_a_clone_already_opted_in() {
+        let d = std::env::temp_dir().join(format!("checkwright-install-hooks-refresh.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(d.join("repo/sub")).expect("scratch");
+        let top = walk::normalize_abs(&d.join("repo").display().to_string());
+        let sub = format!("{}/sub", top);
+        proc::run(&programs::GIT, &["-C", &top, "init", "-q"]).expect("git init");
+        let unopted = refresh_target(&top);
+        let hooks = hook_launcher::hooks_dir(Path::new(&top)).expect("a hooks directory");
+        let elsewhere = d.join("elsewhere").display().to_string();
+        proc::run(&programs::GIT, &["-C", &top, "config", "core.hooksPath", &elsewhere]).expect("git config");
+        let other_path = refresh_target(&top);
+        proc::run(&programs::GIT, &["-C", &top, "config", "core.hooksPath", &hooks.display().to_string()]).expect("git config");
+        let opted = refresh_target(&top);
+        let below = refresh_target(&sub);
+        let _ = std::fs::remove_dir_all(&d);
+        assert_eq!(unopted, Ok(None));
+        assert_eq!(other_path, Ok(None));
+        assert_eq!(opted, Ok(Some(hooks)));
+        assert_eq!(below, Ok(None));
     }
 
     // spec: gate-sdk/SPEC.md §install-hooks — both served hooks are placed whatever the registry

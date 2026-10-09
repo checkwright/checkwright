@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# spec: gate-sdk/SPEC.md §git-hook — the binary under a served hook's name is that hook's launcher: git starts it with no interpreter, a clean commit lands on the summary line, a red member refuses the commit by gate name, a registry with no commit-msg member leaves that hook silent, a binary that cannot be started refuses naming the path and both remedies, a knob naming a hook's own name is refused at 2, and a registered member whose declaration resolves and cannot be read refuses either hook at 2
-# spec: gate-sdk/SPEC.md §install-hooks — the arm places both hooks untracked in gate-hooks under the common git directory with an absolute core.hooksPath, so a linked worktree runs them; a re-run replaces both; an absent binary refuses at 2 and places nothing; a failed core.hooksPath write refuses at 2 ahead of the receipt; a failed blame.ignoreRevsFile write is reported with the status unmoved; a hook left behind by a replaced binary starts the binary now installed
+# spec: gate-sdk/SPEC.md §git-hook — the binary under a served hook's name is that hook's launcher: git starts it with no interpreter, a clean commit lands on the summary line, a red member refuses the commit by gate name, a registry with no commit-msg member leaves that hook silent, a binary that cannot be started refuses naming the path and both remedies, a knob naming a hook's own name is refused at 2, a knob-file line naming any other knob is skipped unread while one setting the launcher's own knob as no scalar is refused at 2, and a registered member whose declaration resolves and cannot be read refuses either hook at 2
+# spec: gate-sdk/SPEC.md §install-hooks — the arm places both hooks untracked in gate-hooks under the common git directory with an absolute core.hooksPath, so a linked worktree runs them; a re-run replaces both; an absent binary refuses at 2 and places nothing; a failed core.hooksPath write refuses at 2 ahead of the receipt; a failed blame.ignoreRevsFile write is reported with the status unmoved; a hook left behind by a replaced binary starts the binary now installed; --refresh re-places both hooks of an opted-in clone from a replaced binary with no config write, and places nothing off the work-tree top or in a clone not opted in
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -194,6 +194,64 @@ done
 g reset -q -- e.txt
 rm -f "$repo/e.txt"
 
+# 14. the launcher reads its one knob and judges no other line: a name no table holds refuses the installed build and not the hook, which starts the binary the same file names
+if [[ -z "$sfx" ]]; then
+    cat >"$SANDBOX/pass" <<'EOF'
+#!/bin/sh
+echo "stub started: $*"
+exit 0
+EOF
+    chmod +x "$SANDBOX/pass"
+    printf 'GATE_SDK_MINTED_BY_A_LATER_BUILD = on\nGATE_SDK_NATIVE_BIN = %s\n' "$SANDBOX/pass" >"$repo/scripts/gate-sdk-config.local.knobs"
+    printf 'a later note\n' >"$repo/f.txt"
+    g add f.txt
+    out="$( cd "$repo" && "./$bin_rel" --git-hook pre-commit 2>&1 )"; rc=$?
+    [[ "$rc" -eq 2 ]] || note unknown-knob-build-status "want exit 2 from the installed build over a name its table lacks, got $rc -- $out"
+    grep -qF 'GATE_SDK_MINTED_BY_A_LATER_BUILD is not a gate-sdk knob' <<<"$out" || note unknown-knob-build-text "the installed build does not name the unknown knob: $out"
+    out="$(g commit -m 'docs: past a knob the launcher does not know' 2>&1)"; rc=$?
+    [[ "$rc" -eq 0 ]] || note unknown-knob-launcher-status "the launcher refused a commit over a knob-file line that is not its own ($rc): $out"
+    grep -qxF 'stub started: --git-hook pre-commit' <<<"$out" || note unknown-knob-launcher-start "the launcher did not start the binary the knob file names: $out"
+    printf 'GATE_SDK_NATIVE_BIN[] = %s\n' "$SANDBOX/pass" >"$repo/scripts/gate-sdk-config.local.knobs"
+    out="$( cd "$repo" && "$hooks/pre-commit" 2>&1 )"; rc=$?
+    [[ "$rc" -eq 2 ]] || note bin-line-status "want exit 2 from the launcher over a line setting its knob as no scalar, got $rc -- $out"
+    grep -qF 'scripts/gate-sdk-config.local.knobs:1: ' <<<"$out" || note bin-line-text "the refusal does not name the file and line: $out"
+    rm -f "$repo/scripts/gate-sdk-config.local.knobs"
+fi
+
+# 15. --refresh re-places both hooks from a replaced binary and does nothing else; off the work-tree top it places nothing, and an absent binary refuses at 2
+digest() { git hash-object --no-filters -- "$1"; }
+stale_hooks() { for h in pre-commit commit-msg; do rm -f "$hooks/$h$sfx"; printf 'stale\n' >"$hooks/$h$sfx"; done; }
+stale_hooks
+cp "$repo/$bin_rel" "$SANDBOX/rebuilt"
+mv -f "$SANDBOX/rebuilt" "$repo/$bin_rel"
+out="$( cd "$repo/scripts" && "../$bin_rel" --install-hooks --refresh 2>&1 )"; rc=$?
+[[ "$rc" -eq 0 && -z "$out" ]] || note refresh-subdir "want a silent exit 0 off the work-tree top, got $rc -- $out"
+[[ "$(cat "$hooks/pre-commit$sfx")" == stale ]] || note refresh-subdir-placed "a refresh off the work-tree top re-placed a hook"
+mv "$repo/$bin_rel" "$SANDBOX/held"
+out="$( cd "$repo" && "$SANDBOX/held" --install-hooks --refresh 2>&1 )"; rc=$?
+[[ "$rc" -eq 2 ]] || note refresh-absent-status "want exit 2 from a refresh with no binary at the knob's path, got $rc -- $out"
+grep -qF "no gate binary at $bin_rel" <<<"$out" || note refresh-absent-text "the refusal does not name the path: $out"
+mv "$SANDBOX/held" "$repo/$bin_rel"
+before="$(git -C "$repo" config --list --local)"
+out="$( cd "$repo" && "./$bin_rel" --install-hooks --refresh 2>&1 )"; rc=$?
+[[ "$rc" -eq 0 ]] || note refresh-status "want exit 0 from --refresh in an opted-in clone, got $rc -- $out"
+[[ "$out" == "install-hooks: refreshed $(git -C "$repo" config --get core.hooksPath)" ]] || note refresh-line "want the one refreshed line naming the hooks directory, got: $out"
+for h in pre-commit commit-msg; do
+    [[ "$(digest "$hooks/$h$sfx")" == "$(digest "$repo/$bin_rel")" ]] || note "refresh-$h" "a refresh left $h$sfx other than the replaced binary's bytes"
+    [[ -x "$hooks/$h$sfx" ]] || note "refresh-exec-$h" "a refresh left $h$sfx not executable"
+done
+[[ "$(git -C "$repo" config --list --local)" == "$before" ]] || note refresh-config "a refresh changed the clone's git config"
+
+# 16. --refresh never opts a clone in: with core.hooksPath unset it places nothing and leaves the key unset
+git -C "$repo" config --unset core.hooksPath
+rm -rf "$hooks"
+out="$( cd "$repo" && "./$bin_rel" --install-hooks --refresh 2>&1 )"; rc=$?
+[[ "$rc" -eq 0 && -z "$out" ]] || note refresh-unopted "want a silent exit 0 in a clone not opted in, got $rc -- $out"
+[[ -e "$hooks" ]] && note refresh-unopted-placed "a refresh placed hooks in a clone not opted in"
+[[ -z "$(git -C "$repo" config --get core.hooksPath)" ]] || note refresh-unopted-config "a refresh set core.hooksPath"
+out="$( cd "$repo" && "./$bin_rel" --install-hooks --refresh extra 2>&1 )"; rc=$?
+[[ "$rc" -eq 2 ]] || note refresh-operand "want exit 2 from --refresh with an operand, got $rc -- $out"
+
 [[ "$fails" -eq 0 ]] || { echo "native-git-hooks.test: $fails assertion(s) failed"; exit 1; }
-echo "native-git-hooks.test: clean (--install-hooks places both hooks untracked under the common git directory, absolute in core.hooksPath, refusing with nothing placed when the binary is absent; git starts the placed binary as each hook with no interpreter: a clean commit lands on the summary line, a red member refuses by gate name from the main checkout and from a linked worktree, the commit-msg hook is silent until a member registers at its tier and reaches one with no re-install; a hook outliving a replaced binary starts the installed one, an unstartable binary refuses naming the path and both remedies, a knob naming a hook is refused at 2, a re-run replaces both, a failed core.hooksPath write refuses at 2 with no receipt, a failed blame.ignoreRevsFile write is reported at exit 0, and an unreadable resolved member refuses either hook at 2)"
+echo "native-git-hooks.test: clean (--install-hooks places both hooks untracked under the common git directory, absolute in core.hooksPath, refusing with nothing placed when the binary is absent; git starts the placed binary as each hook with no interpreter: a clean commit lands on the summary line, a red member refuses by gate name from the main checkout and from a linked worktree, the commit-msg hook is silent until a member registers at its tier and reaches one with no re-install; a hook outliving a replaced binary starts the installed one, an unstartable binary refuses naming the path and both remedies, a knob naming a hook is refused at 2, a re-run replaces both, a knob-file line naming a knob the launcher does not know is left to the installed build, --refresh re-places an opted-in clone's hooks and nothing else, a failed core.hooksPath write refuses at 2 with no receipt, a failed blame.ignoreRevsFile write is reported at exit 0, and an unreadable resolved member refuses either hook at 2)"
 exit 0

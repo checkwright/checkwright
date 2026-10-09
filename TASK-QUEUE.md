@@ -24,16 +24,6 @@ one place where a tier class resolves to a model and an effort, on the master ha
 
 **Cost while deferred:** a model or effort move is edited at every adapter and at every dispatcher, and a consultation on the operator's preferred class has no class to expect. Filed 2026-10-09 as two gap bullets by the lead after foreign-stage-binding-pass closed; promoted the same day by the next iteration's scope intake. Owner lookup: `TIER_MODEL`, `model-verdict`, `agent-tiers`, `tier binding`, `expert`, `trivial` in this file and the disposed-findings record — no owner; [build-stage-tier-economics](#build-stage-tier-economics) is distinct, pricing the build stage's tier and binding nothing, and the record's `align tier` and `validate tier` rows are data for re-judging a binding, not this mechanism. Owner delegation-kit/SPEC.md §The tier binding.
 
-### placed-hook-stale-on-rebuild
-
-[spec: SPEC-hook-launcher.md] [recurrence: 2026-10-08]
-
-a placed git hook stays on the build of the last `--install-hooks` once a build replaces the binary's file. Each hook is a hard link to the gate binary (gate-sdk/SPEC.md §install-hooks) and only launches the binary now installed (§git-hook), so it judges no gate. Its harm is its own knob read, which holds gate-sdk's whole knob file to the older table: a unit minting a `GATE_SDK_` knob and setting it is refused at its own commit. Measured at spec: a name unknown to the launcher refuses in gate-sdk's knob file and passes in another kit's, and the install placement writes through the link, so an adopter's `update` carries the hooks with it.
-
-**Deliverable, operator direction 2026-10-09 at spec, lead-relayed (not a ruling):** the launcher reads `GATE_SDK_NATIVE_BIN` alone and judges no other knob-file line; `--install-hooks --refresh` re-places an already-opted-in clone's hooks; gate-sdk/bin/build-native.sh calls it after a host build. No doctor freshness line and no `update`-time refresh.
-
-**Cost while deferred:** every rebuild leaves the commit-time gates on the previous binary until a session notices. Filed 2026-10-08 by foreign-stage-binding-pass' build. Re-verified at that iteration's close: the two placed hooks shared one inode and the built binary held another, minutes newer. Its lead judged the recurrence at the second build batch, each session re-running the arm before it could commit, and the close entry met it again. Owner lookup: `install-hooks`, `placed hook`, `hard link`, `gate-hooks`, `hooksPath`, `binary-fresh` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §install-hooks.
-
 ## Technical Debt
 
 ## Deferred
@@ -1221,4 +1211,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - harness-valve-trailing-text
 - tracked-set-quoted-path-names
 - toolchain-action-proxy-jobs
+- placed-hook-stale-on-rebuild
 

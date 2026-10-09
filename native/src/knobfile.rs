@@ -42,63 +42,75 @@ fn refuse(file: &str, lno: usize, what: &str) -> String {
 pub fn parse(text: &str, file: &str) -> Result<Vec<Entry>, String> {
     let mut out: Vec<Entry> = Vec::new();
     for (idx, line) in text.lines().enumerate() {
-        let lno = idx + 1;
-        let t = line.trim_matches(blank);
-        if t.is_empty() || t.starts_with('#') {
-            continue;
+        if let Some(e) = parse_line(line, file, idx + 1)? {
+            out.push(e);
         }
-        let Some((head, value)) = t.split_once('=') else {
-            let Some((head, other)) = t.split_once("<-") else {
-                return Err(refuse(file, lno, "a line with no `=`"));
-            };
-            let (head, other) = (head.trim_matches(blank), other.trim_matches(blank));
-            let Some(name) = head.strip_suffix("[]") else {
-                return Err(refuse(file, lno, &format!("the reference head `{}` is not `NAME[]`", head)));
-            };
-            for n in [name, other] {
-                if !is_name(n) {
-                    return Err(refuse(file, lno, &format!("`{}` is not a SCREAMING_SNAKE knob name", n)));
-                }
-            }
-            out.push(Entry {
-                lno,
-                name: name.to_string(),
-                form: Form::Reference(other.to_string()),
-                value: String::new(),
-            });
-            continue;
-        };
-        let head = head.trim_matches(blank);
-        let value = value.trim_matches(blank);
-        if value.contains('\t') {
-            return Err(refuse(file, lno, "a value carrying a tab"));
-        }
-        let (name, form) = match head.split_once('[') {
-            None => (head, Form::Scalar),
-            Some((name, rest)) => {
-                let Some(key) = rest.strip_suffix(']') else {
-                    return Err(refuse(file, lno, &format!("the head `{}` does not close its `[`", head)));
-                };
-                if key.is_empty() {
-                    (name, Form::Indexed)
-                } else if key.contains(']') || key.contains('\t') {
-                    return Err(refuse(file, lno, &format!("the key `{}` carries a `]` or a tab", key)));
-                } else {
-                    (name, Form::Keyed(key.to_string()))
-                }
-            }
-        };
-        if !is_name(name) {
-            return Err(refuse(file, lno, &format!("`{}` is not a SCREAMING_SNAKE knob name", name)));
-        }
-        out.push(Entry {
-            lno,
-            name: name.to_string(),
-            form,
-            value: value.to_string(),
-        });
     }
     Ok(out)
+}
+
+// spec: gate-sdk/SPEC.md §git-hook — whether a line's head names a knob, read without judging the
+// line: the launcher holds one name to the grammar and skips every other line unread
+pub fn names(line: &str, name: &str) -> bool {
+    line.trim_matches(blank)
+        .strip_prefix(name)
+        .is_some_and(|rest| !rest.starts_with(|c: char| c.is_ascii_alphanumeric() || c == '_'))
+}
+
+pub fn parse_line(line: &str, file: &str, lno: usize) -> Result<Option<Entry>, String> {
+    let t = line.trim_matches(blank);
+    if t.is_empty() || t.starts_with('#') {
+        return Ok(None);
+    }
+    let Some((head, value)) = t.split_once('=') else {
+        let Some((head, other)) = t.split_once("<-") else {
+            return Err(refuse(file, lno, "a line with no `=`"));
+        };
+        let (head, other) = (head.trim_matches(blank), other.trim_matches(blank));
+        let Some(name) = head.strip_suffix("[]") else {
+            return Err(refuse(file, lno, &format!("the reference head `{}` is not `NAME[]`", head)));
+        };
+        for n in [name, other] {
+            if !is_name(n) {
+                return Err(refuse(file, lno, &format!("`{}` is not a SCREAMING_SNAKE knob name", n)));
+            }
+        }
+        return Ok(Some(Entry {
+            lno,
+            name: name.to_string(),
+            form: Form::Reference(other.to_string()),
+            value: String::new(),
+        }));
+    };
+    let head = head.trim_matches(blank);
+    let value = value.trim_matches(blank);
+    if value.contains('\t') {
+        return Err(refuse(file, lno, "a value carrying a tab"));
+    }
+    let (name, form) = match head.split_once('[') {
+        None => (head, Form::Scalar),
+        Some((name, rest)) => {
+            let Some(key) = rest.strip_suffix(']') else {
+                return Err(refuse(file, lno, &format!("the head `{}` does not close its `[`", head)));
+            };
+            if key.is_empty() {
+                (name, Form::Indexed)
+            } else if key.contains(']') || key.contains('\t') {
+                return Err(refuse(file, lno, &format!("the key `{}` carries a `]` or a tab", key)));
+            } else {
+                (name, Form::Keyed(key.to_string()))
+            }
+        }
+    };
+    if !is_name(name) {
+        return Err(refuse(file, lno, &format!("`{}` is not a SCREAMING_SNAKE knob name", name)));
+    }
+    Ok(Some(Entry {
+        lno,
+        name: name.to_string(),
+        form,
+        value: value.to_string(),
+    }))
 }
 
 #[cfg(test)]
@@ -126,6 +138,16 @@ mod tests {
         assert_eq!(one("A[] = x <- Y").form, Form::Indexed);
         assert_eq!(one("A[] = x <- Y").value, "x <- Y");
         assert_eq!(one("A[] = ${B}").value, "${B}");
+    }
+
+    #[test]
+    fn a_line_names_a_knob_by_its_whole_head_name_whatever_follows() {
+        for line in ["A_B = x", "  A_B[] = x", "A_B[k] = 1", "A_B[] <- C", "A_B", "A_B=", "A_B<-C"] {
+            assert!(names(line, "A_B"), "{}", line);
+        }
+        for line in ["A_BC = x", "A_B_C = x", "A_B2 = x", "# A_B = x", "X = A_B", ""] {
+            assert!(!names(line, "A_B"), "{}", line);
+        }
     }
 
     #[test]
