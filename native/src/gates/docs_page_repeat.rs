@@ -197,14 +197,11 @@ fn scan(text: &str, min_words: usize) -> Scan {
 // blocks, HTML comments and table rows are skipped, the rest of a commented line kept
 fn prose_lines(raw: &[&str]) -> Vec<(usize, String)> {
     let mut out: Vec<(usize, String)> = Vec::new();
-    let mut front = raw.first().map(|l| l.trim_end() == "---").unwrap_or(false);
+    let body = spec::front_matter_span(raw);
     let mut fence = spec::Fence::default();
     let mut comment = false;
     for (i, line) in raw.iter().enumerate() {
-        if front {
-            if i > 0 && line.trim_end() == "---" {
-                front = false;
-            }
+        if i < body {
             continue;
         }
         if !comment && fence.delimits(line) {

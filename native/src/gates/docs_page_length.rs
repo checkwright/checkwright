@@ -105,12 +105,7 @@ fn read_page(page: &str) -> Result<String, String> {
 // counted; an opening `---` nothing closes delimits no block, so the page counts whole
 fn page_words(text: &str) -> usize {
     let raw: Vec<&str> = text.lines().collect();
-    let rule = |l: &str| l.trim_end() == "---";
-    let body = if raw.first().is_some_and(|l| rule(l)) {
-        raw.iter().skip(1).position(|l| rule(l)).map_or(0, |close| close + 2)
-    } else {
-        0
-    };
+    let body = spec::front_matter_span(&raw);
     let mut fence = spec::Fence::default();
     let mut comment = false;
     let mut words = 0usize;

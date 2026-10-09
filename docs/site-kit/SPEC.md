@@ -92,7 +92,7 @@ A severed span never forms the closing fence run. It leaves a **single** stray b
 
 **Reach is `SITE_KIT_DOCS_DIR`, and stays there.** A repo-root page has no site URL and is served by the forge's own CommonMark view, so a kramdown-only divergence there is not reader-visible and this gate does not walk it. The renderer-to-surface map is a consumer's own documentation concern, not a widened scan.
 
-The scan enumerates tracked `*.md` files under `SITE_KIT_DOCS_DIR` via `git ls-files`. Every underscore-prefixed path segment is excluded, a file's own name included: those are Jekyll internals, not published pages. It strips Jekyll front matter, which only a leading `---` opens, so it renders exactly the body kramdown sees. It asserts three properties per page:
+The scan enumerates tracked `*.md` files under `SITE_KIT_DOCS_DIR` via `git ls-files`. Every underscore-prefixed path segment is excluded, a file's own name included: those are Jekyll internals, not published pages. It strips Jekyll front matter, which only a leading `---` opens and the next `---` line closes, so it renders exactly the body kramdown sees. An opening `---` that no later one closes delimits no block, which is Jekyll's reading, and the page is rendered whole. It asserts three properties per page:
 
 1. **No span-corruption leakage** — the rendered text carries neither a literal backtick nor a raw tag whose element name is not a known HTML element.
 2. **No heading leakage** — the count of rendered heading elements never exceeds the count of source heading lines outside any code context. The source count is the gate's own fence-aware scan under cmark rules: ATX and setext, both skipped inside a fenced or `~`-fenced block. A surplus rendered heading is a `#` line promoted out of a broken code block.
@@ -210,7 +210,7 @@ The corpus classes, the front-matter blanking, the verdict clipping and the prob
 `checks/check-docs-collapsible.gate` (`precommit`, binary-dispatched, `install: on-surface`), its rule in `native/src/gates/docs_collapsible.rs`. Invariant: every collapsible region on a tracked page under `SITE_KIT_DOCS_DIR` renders its body as markdown, names what it holds, and hides no heading.
 
 - **Corpus:** [§check-docs-render-fidelity](#check-docs-render-fidelity)'s page set, the same `git ls-files` enumeration with underscore-prefixed segments excluded.
-- **A region** opens at a line whose first non-blank text is `<details` and closes at a `</details>`, counted by depth so a nested region is its own region. Fenced blocks, HTML comments and the front-matter block are skipped.
+- **A region** opens at a line whose first non-blank text is `<details` and closes at a `</details>`, counted by depth so a nested region is its own region. Fenced blocks, HTML comments and the front-matter block are skipped, the block read as [§check-docs-render-fidelity](#check-docs-render-fidelity) reads it, so a page whose opening `---` nothing closes is scanned whole.
 - **Assertions**, one finding each:
   - the opening tag carries `markdown="1"` or `markdown="block"`, since without it the Pages parser passes the body through raw;
   - a `<summary>` element with non-empty text follows the opening tag on its own line or on the next non-blank line;

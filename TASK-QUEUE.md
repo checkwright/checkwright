@@ -38,14 +38,6 @@ a hook refresh can leave a served hook absent, and the build script then says th
 
 **Cost while deferred:** a refresh whose link and copy both fail turns the commit gates off with a message saying they still run. Filed 2026-10-09 by tier-resolution-pass' close off its second-vendor review, and promoted at the next scope's intake. Run there in scratch repositories: with a cross-device hooks directory and an unreadable source the refresh exits 2 and the first served hook is gone, no partial file left; on a read-only hooks directory the unlink itself is refused and both hooks stay, which narrows the filing's cost. A copy cut short by a full disk was not run, so whether it leaves a partial file is unread. Owner lookup: `refresh`, `hooksPath`, `placed hook` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §build-native.
 
-### front-matter-reader-siblings
-
-four front-matter readers read an opening `---` that nothing closes as front matter to the end of the file, so the page is skipped whole: `check-docs-collapsible`, `check-citation-link` (whose reader `check-pendency-contradiction` reads through), `check-docs-page-repeat` and `check-prose-tells` assertion G. `check-docs-page-length` reads it as Jekyll does, an unclosed `---` delimiting no block (canon-kit/SPEC.md §check-docs-page-length).
-
-**Deliverable:** one shared front-matter span reader beside the fence reader, the four gates on it, a fixture row per gate, each SPEC section stating the reading, and the release declaration.
-
-**Cost while deferred:** a page with a broken front-matter block passes each of the four unread. Filed 2026-10-06 by site-fence-release-cites-pass' build. Re-verified by reading the four modules: each opens its front-matter state on a first-line `---` and clears it only on a later one. Owner lookup: `front matter`, `front_matter`, `prose_only` in this file and the disposed-findings record — [plugin-front-matter-yaml](#plugin-front-matter-yaml), DISTINCT (the plugin gate's YAML key reader).
-
 ## Deferred
 
 ### guard-quoted-operand-words
@@ -1212,4 +1204,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - tier-value-validator-gaps
 - listing-line-form-readers
 - tracked-name-lossy-decode
+- front-matter-reader-siblings
 

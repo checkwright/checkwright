@@ -253,23 +253,13 @@ pub(crate) fn jekyll_internal(p: &str) -> bool {
     p.split('/').any(|seg| seg.starts_with('_'))
 }
 
-// spec: site-kit/SPEC.md §check-docs-render-fidelity — strip Jekyll front matter so the gate
-// renders exactly the body kramdown sees: a leading `---` opens it and the next `---` closes it,
-// and every kept record is newline-terminated the way awk's `print` wrote it
+// spec: site-kit/SPEC.md §check-docs-render-fidelity — strip the front-matter span so the gate
+// renders exactly the body kramdown sees, an unclosed opening `---` stripping nothing, and every
+// kept record is newline-terminated the way awk's `print` wrote it
 fn strip_front_matter(raw: &str) -> String {
     let mut out = String::new();
-    let mut fm = false;
-    for (i, line) in fresh::file_lines(raw).iter().enumerate() {
-        if i == 0 && *line == "---" {
-            fm = true;
-            continue;
-        }
-        if fm {
-            if *line == "---" {
-                fm = false;
-            }
-            continue;
-        }
+    let lines = fresh::file_lines(raw);
+    for line in &lines[crate::spec::front_matter_span(&lines)..] {
         out.push_str(line);
         out.push('\n');
     }
@@ -710,6 +700,7 @@ mod tests {
     fn front_matter_is_stripped_only_when_it_opens_the_page() {
         assert_eq!(strip_front_matter("---\ntitle: x\n---\nbody\n"), "body\n");
         assert_eq!(strip_front_matter("body\n---\nmore\n"), "body\n---\nmore\n");
+        assert_eq!(strip_front_matter("---\ntitle: x\n\nbody\n"), "---\ntitle: x\n\nbody\n");
         assert_eq!(strip_front_matter(""), "");
     }
 

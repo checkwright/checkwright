@@ -442,16 +442,13 @@ fn g_absence(file: &str, text: &str, vocab: &Absence) -> Vec<String> {
             }
         }
     };
-    let mut front = raw.first().is_some_and(|l| l.trim_end() == "---");
+    let body = spec::front_matter_span(&raw);
     let mut fence = spec::Fence::default();
     let (mut gen, mut comment) = (false, false);
     let mut cur: Option<AbsenceSection> = None;
     for (i, line) in raw.iter().enumerate() {
         let marked = line.contains(EXEMPT);
-        if front {
-            if i > 0 && line.trim_end() == "---" {
-                front = false;
-            }
+        if i < body {
             continue;
         }
         if gen {

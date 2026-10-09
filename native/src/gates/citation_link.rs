@@ -123,15 +123,12 @@ struct Scan {
 pub(crate) fn prose_only(text: &str) -> String {
     let mut out: Vec<String> = Vec::new();
     let raw: Vec<&str> = text.lines().collect();
-    let mut front = raw.first().map(|l| l.trim_end() == "---").unwrap_or(false);
+    let body = spec::front_matter_span(&raw);
     let mut fence = spec::Fence::default();
     let mut comment = false;
     let mut gen = false;
     for (i, line) in raw.iter().enumerate() {
-        if front {
-            if i > 0 && line.trim_end() == "---" {
-                front = false;
-            }
+        if i < body {
             out.push(String::new());
             continue;
         }

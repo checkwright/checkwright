@@ -170,15 +170,12 @@ fn scan(text: &str) -> Scan {
         regions: 0,
     };
     let mut stack: Vec<Open> = Vec::new();
-    let mut front = raw.first().map(|l| l.trim_end() == "---").unwrap_or(false);
+    let body = crate::spec::front_matter_span(&raw);
     let mut fence = crate::spec::Fence::default();
     let mut comment = false;
     let mut prev = "";
     for (i, line) in raw.iter().enumerate() {
-        if front {
-            if i > 0 && line.trim_end() == "---" {
-                front = false;
-            }
+        if i < body {
             continue;
         }
         if !comment && fence.delimits(line) {

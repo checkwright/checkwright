@@ -4,3 +4,4 @@ site/page.md:7: unlinked citation: [SPEC.md](kit/SPEC.md) §The upgrade contract
 site/page.md:9: unlinked citation: §Requirements lists.
 site/page.md:11: citation link carries no #anchor
 site/page.md:13: citation link's #anchor names another section
+site/unclosed.md:4: unlinked citation: kit/SPEC.md §Requirements.

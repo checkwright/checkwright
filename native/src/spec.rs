@@ -936,6 +936,15 @@ impl Fence {
     }
 }
 
+// spec: canon-kit/SPEC.md §The shared spec adapters — the front-matter span: the leading lines the block takes, both rules included; an opening `---` no later one closes delimits no block
+pub fn front_matter_span(raw: &[&str]) -> usize {
+    let rule = |l: &str| l.trim_end() == "---";
+    if !raw.first().is_some_and(|l| rule(l)) {
+        return 0;
+    }
+    raw.iter().skip(1).position(|l| rule(l)).map_or(0, |close| close + 2)
+}
+
 fn fence_run(t: &str) -> Option<(u8, usize)> {
     let c = *t.as_bytes().first()?;
     Some((c, t.bytes().take_while(|&b| b == c).count()))
@@ -1804,6 +1813,16 @@ mod tests {
         assert_eq!(fenced("~~~\n```\n~~~\nb\n", t), [true, true, true, false]);
         assert_eq!(fenced("- ~~~\n  ```\n  ~~~~\nb\n", t), [true, true, true, false]);
         assert_eq!(fenced("~~~\nb\n", Fence::default()), [false, false]);
+    }
+
+    #[test]
+    fn the_front_matter_span_ends_at_its_closing_rule_and_an_unclosed_one_spans_nothing() {
+        assert_eq!(front_matter_span(&["---", "title: x", "---  ", "body"]), 3);
+        assert_eq!(front_matter_span(&["---", "---", "body"]), 2);
+        assert_eq!(front_matter_span(&["---", "title: x", "", "body"]), 0);
+        assert_eq!(front_matter_span(&["body", "---", "more", "---"]), 0);
+        assert_eq!(front_matter_span(&["---"]), 0);
+        assert_eq!(front_matter_span(&[]), 0);
     }
 
     // spec: canon-kit/SPEC.md §check-md-refs — the three shapes a collapsing slug got wrong: an em
