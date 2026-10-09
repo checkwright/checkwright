@@ -581,6 +581,9 @@ jobs:
           pattern: gate-binary-*
           path: ${{ runner.temp }}/native-artifacts
 
+      # spec: gate-sdk/SPEC.md §check-crate-arms — the job's first cargo call, the pinned toolchain's fetch
+      - uses: ./.github/actions/toolchain
+
       # spec: installer/SPEC.md §The consumer smoke — each platform leg steers the roster at its host
       - name: place the producer's upload and pack a payload for this host
         shell: bash
@@ -1394,6 +1397,9 @@ jobs:
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
+      # spec: gate-sdk/SPEC.md §check-crate-arms — the job's first cargo call, the pinned toolchain's fetch
+      - uses: ./.github/actions/toolchain
+
       # spec: docs/install-parity-contracts.md §The install-platforms parity contract — the declaration's rows
       - name: derive the producer legs from the platform declaration
         id: legs
@@ -1987,6 +1993,9 @@ jobs:
           fi
           exit 0
 
+      # spec: gate-sdk/SPEC.md §check-crate-arms — the job's first cargo call, the pinned toolchain's fetch
+      - uses: ./.github/actions/toolchain
+
       # spec: installer/SPEC.md §The consumer smoke — probe steps report and never fail
       - name: probe the runner
         shell: bash
@@ -2207,6 +2216,9 @@ jobs:
           fi
           exit 0
 
+      # spec: gate-sdk/SPEC.md §check-crate-arms — the job's first cargo call, the pinned toolchain's fetch
+      - uses: ./.github/actions/toolchain
+
       # spec: installer/SPEC.md §The consumer smoke — probe steps report and never fail
       - name: probe the runner
         shell: bash
@@ -2373,6 +2385,9 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           fetch-depth: 0
+
+      # spec: gate-sdk/SPEC.md §check-crate-arms — the job's first cargo call, the pinned toolchain's fetch
+      - uses: ./.github/actions/toolchain
 
       # spec: installer/SPEC.md §The consumer smoke — probe steps report and never fail
       - name: probe the runner
