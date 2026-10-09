@@ -1,1 +1,8 @@
 # contract: lifecycle-kit/SPEC.md §The survey record — carried surveys, one block per survey; boundary-truncated, cited only behind a passing witness.
+
+## 2026-10-09 scope — Which deferred entries lead this iteration's unit set, ranked by cost while deferred, and what supersedes them?
+- corpus: TASK-QUEUE.md
+- oracle: bash gate-sdk/bin/run-gates.sh --emit queue-edges
+- rev: a43ec9ec8ef5c9d80b8e38943e7ea8eb21f7eb51
+- finding: The board holds one iteration-class row, heterogeneous-agent-delegation (roadmap now), no session-class row, and no entry at the recurrence threshold of 2. heterogeneous-agent-delegation has no inbound edge; its remaining item is one granted live foreign run of a non-audit stage. The carried inbox yielded four deferred entries: tier-class-resolution (feature, delegation-kit, reaching lifecycle-kit's consult template and executor knob, so cross-component), and three debts on gate-sdk (harness-valve-trailing-text, tracked-set-quoted-path-names, toolchain-action-proxy-jobs). Supersession: toolchain-action-proxy-jobs is reshaped by icebox install-smoke-sh-matrix; nothing in the pool or the icebox replaces the tier binding's names (TIER_MODEL, model-verdict, agent-tiers, FOREIGN_ADAPTERS, STAGE_EXECUTOR searched). placed-hook-stale-on-rebuild (gate-sdk, event/high, one recurrence date) bites every native build batch and any unit minting a knob. No retired slug in the edges output is a premise of a shortlisted entry. Trailing inflow mean-filed 3.8.
+- inferred: That placed-hook-stale-on-rebuild would refuse the tier unit's own knob-minting commit is read off that entry's body, not run. The harness-valve and quoted-path defects are held by reading their readers; neither gate case was run.
