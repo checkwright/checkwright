@@ -1,6 +1,26 @@
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the multi-call binary gate_command dispatches
 // a .gate-declared registry member to; `--list` reports the subcommand roster
 // check-gate-substrate-parity assertion B compares against the descriptors on disk
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — the two print macros are shadowed ahead of every
+// module, so each print site in the crate takes the departed-reader rule with no edit of its own.
+// A test build keeps the standard pair, whose output the test harness captures.
+#[cfg(not(test))]
+macro_rules! print {
+    ($($arg:tt)*) => {
+        $crate::print_dropping_departed_reader(format_args!($($arg)*))
+    };
+}
+#[cfg(not(test))]
+macro_rules! println {
+    () => {
+        $crate::print_dropping_departed_reader(format_args!("\n"))
+    };
+    ($($arg:tt)*) => {
+        $crate::print_dropping_departed_reader(format_args!("{}\n", format_args!($($arg)*)))
+    };
+}
+
 mod actions;
 mod actions_run;
 mod bashscan;
@@ -45,6 +65,32 @@ mod walk;
 mod walkthrough;
 
 use std::process::exit;
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — a write whose reader has gone is dropped with every
+// later one; any other stdout failure keeps the standard macro's panic
+#[cfg(not(test))]
+static STDOUT_READER_GONE: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
+#[cfg(not(test))]
+pub(crate) fn print_dropping_departed_reader(args: std::fmt::Arguments) {
+    use std::io::Write;
+    use std::sync::atomic::Ordering;
+    if STDOUT_READER_GONE.load(Ordering::Relaxed) {
+        return;
+    }
+    if let Err(e) = std::io::stdout().lock().write_fmt(args) {
+        if !departed_reader(&e) {
+            panic!("failed printing to stdout: {}", e);
+        }
+        STDOUT_READER_GONE.store(true, Ordering::Relaxed);
+    }
+}
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — the one predicate for a departed reader, shared by
+// the print path and the direct stdout handles
+pub(crate) fn departed_reader(e: &std::io::Error) -> bool {
+    e.kind() == std::io::ErrorKind::BrokenPipe
+}
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — an unknown subcommand is a harness error,
 // never a pass; `--reads` refuses through the same help so a descriptor naming a subcommand

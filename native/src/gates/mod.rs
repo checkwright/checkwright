@@ -3306,9 +3306,13 @@ mod tests {
         block.push_str(&format!("{}\texit\t{}\n", OBSERVER_SENTINEL, rc));
         use std::io::Write;
         let mut out = std::io::stdout().lock();
-        out.write_all(block.as_bytes())
-            .and_then(|_| out.flush())
-            .expect("cannot write the observation block");
+        // spec: gate-sdk/SPEC.md §The non-gate arm — a departed reader reads no block, so only a
+        // failure that could leave a truncated one read as whole keeps the panic
+        if let Err(e) = out.write_all(block.as_bytes()).and_then(|_| out.flush()) {
+            if !crate::departed_reader(&e) {
+                panic!("cannot write the observation block: {}", e);
+            }
+        }
     }
 
     // spec: gate-sdk/SPEC.md §run-gate-tests — the case's `args` file on the runner's own

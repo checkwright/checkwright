@@ -53,10 +53,11 @@ fn route(args: &[String]) -> Result<i32, String> {
 // inheriting it, so the arm re-emits what the child wrote
 fn spawn_sink(command: &str, body: &[u8]) -> Result<i32, String> {
     let done = proc::run_streamed(&programs::BASH, &["-c", command], body, Stderr::Inherit)?;
-    std::io::stdout()
-        .write_all(done.stdout())
-        .map_err(|e| format!("cannot re-emit the sink's output: {}", e))?;
-    Ok(done.code())
+    // spec: gate-sdk/SPEC.md §The non-gate arm — a departed reader is no refusal: the sink ran
+    match std::io::stdout().write_all(done.stdout()) {
+        Err(e) if !crate::departed_reader(&e) => Err(format!("cannot re-emit the sink's output: {}", e)),
+        _ => Ok(done.code()),
+    }
 }
 
 // spec: queue-kit/SPEC.md §The lesson-sink arm — the unconfigured tag falls **open**, appending
