@@ -147,6 +147,19 @@ Replacement text for lifecycle-kit/SPEC.md §templates/consult.md, the honest li
 
 The same section's paragraph **The template declares its own floor and checks it at entry** names the floor as the class `LIFECYCLE_KIT_CONSULT_CLASS` holds, default `judgment`, and carries delta 6's knob-not-slot ground in place of "It is a class rather than a slot…" through "…the binding already offers."
 
+### (9) This repo binds four classes, each with an effort
+
+This repo's roster becomes `expert`, `judgment`, `mechanical`, `trivial`, each bound to a model and an effort, and its consultations ride `expert`. {mechanical}
+
+The values are the consumer's and sit in its own config, never in a kit file. It lands after deltas 1, 2, 5 and 6 are built, since the binary that reads these rows must already know the roster knob, the effort half and the consult-class knob.
+
+- `scripts/delegation-config.knobs`: `DELEGATION_KIT_TIER_CLASSES` set to the four names, highest first as written above. `DELEGATION_KIT_TIER_MODEL` rows `expert=fable,high`, `judgment=opus,high`, `mechanical=sonnet,high` and `trivial=haiku,medium`. The `routing` row goes, with the comment that explains it: this repo splits its lead by session, so it names no routing class.
+- `scripts/lifecycle-config.knobs`: `LIFECYCLE_KIT_CONSULT_CLASS = expert`.
+- `.claude/agents/consult-session.md`: `tier: expert`, moved in the same commit as the knob, since nothing holds the two equal (delta 6's honest limit).
+- Every tiered definition regenerated with `--emit agent-tiers --write`, which rewrites `model:` where the class moved and inserts each `effort:` line.
+
+Its oracle is `check-agent-tier-explicit` green over the regenerated definitions, and `--emit knob-values` on the three knobs returning the values above. A definition reaches only sessions started after it lands, so a live lead keeps dispatching the old lines until its session ends.
+
 ## Producers and consumers
 
 - **A row's effort (delta 1).** Producer: the consumer's knob file. Consumers: `--emit agent-tiers` and assertion B, which generate and hold a definition's `effort:` line; `--model-verdict`, which compares it under `--expect`; a dispatcher's `--emit knob-values` read; and, on a foreign row, the executor's `@EFFORT@` substitution. A class binding none has no effort reader, and none is populated.
@@ -156,7 +169,7 @@ The same section's paragraph **The template declares its own floor and checks it
 - **`effort:` in a definition (delta 5).** Producer: `--emit agent-tiers --write`. Consumers: the harness at dispatch, and assertion B. **`effort=` on the verdict line.** Producer: the transcript's own field, written by the harness on every assistant record. Consumer: the session that ran the arm, and its caller reading the clause.
 - **`LIFECYCLE_KIT_CONSULT_CLASS` (delta 6).** Producer: the default, or a consumer's knob file or environment. Consumers: the consult template's first step and the lead's consultation dispatch, each through `--emit knob-values`, and lifecycle-kit's validator. Roster-holding readers: lifecycle-kit's knob table, `--emit knob-roster`, lifecycle-kit/SPEC.md §Layout and configuration and the kit's knob-file template.
 - **Narrowed corpus, point 5.** None is narrowed. The roster knob widens what a class may be, and its default is the set compiled today.
-- **Every member's satisfying value, point 6.** Delta 5 obliges each tiered definition to carry its class's effort where the class binds one. The members are the consumer's definitions declaring `tier:`, enumerated by `git grep -n '^tier:' -- .claude/agents`: here `audit-sweep` and `edit-sweep` on `mechanical`, and `consult-session`, `hotfix-session` and `stage-session` on `judgment`. Each one's satisfying value is its class's bound effort, which `--write` produces; while this repo's rows bind no effort the obligation is empty for all five. The kit's two fixture trees are the other members, and delta 5 names their cases.
+- **Every member's satisfying value, point 6.** Delta 5 obliges each tiered definition to carry its class's effort where the class binds one. The members are the consumer's definitions declaring `tier:`, enumerated by `git grep -n '^tier:' -- .claude/agents`: here `audit-sweep` and `edit-sweep` on `mechanical`, and `consult-session`, `hotfix-session` and `stage-session` on `judgment`. Each one's satisfying value is its class's bound pair under delta 9, which `--write` produces: `sonnet` and `high` for the two sweeps, `opus` and `high` for `hotfix-session` and `stage-session`, and `fable` and `high` for `consult-session` once its `tier:` reads `expert`. The kit's two fixture trees are the other members, and delta 5 names their cases.
 
 ## Existing sections updated
 
@@ -186,7 +199,7 @@ The same section's paragraph **The template declares its own floor and checks it
 - `native/src/runner.rs` — the usage lines and help paragraphs of `--foreign-run` and `--model-verdict` (deltas 4 and 5).
 - `docs/generated-projections.md` — the agent-definition tiers row names the effort line (delta 5).
 - `.workflow/release-declarations.md` — the tier-binding and foreign-run entries, both unreleased, gain the grammar, the knobs, `--class` and the line fields (deltas 1, 2, 3, 4, 5 and 6).
-- `scripts/delegation-config.knobs` and `.claude/agents/` — this repo's rows and its generated definitions, changed only where this repo binds an effort or a class (deltas 1 and 5).
+- `scripts/delegation-config.knobs`, `scripts/lifecycle-config.knobs` and `.claude/agents/` — this repo's roster, rows, consult class and regenerated definitions (delta 9).
 - `docs/delegation-kit/SPEC.md`, `docs/delegation-kit/README.md` and `docs/lifecycle-kit/SPEC.md` — the generated mirrors, stale the moment any of them lands (all deltas).
 
 Produced by `git grep -l` over the tracked tree for `TIER_MODEL`, `model-verdict`, `FOREIGN_ADAPTERS`, `FOREIGN_RESUME` and `STAGE_EXECUTOR`, by `git grep -n 'tier::\|CLASSES' -- native/src` for the crate's readers of the class vocabulary, and by `git grep -n 'judgment\|routing' -- lifecycle-kit/templates delegation-kit/templates` read for passages that name a class as a dispatch target. Passages that use `judgment` descriptively — a judgment-tier recommendation, the judgment stage rows of this repo's lead binding — are left as they are, since `judgment` remains a class and the default.
