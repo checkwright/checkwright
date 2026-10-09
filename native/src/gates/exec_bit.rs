@@ -11,6 +11,15 @@ fn pruned(path: &str, prune: &[String]) -> bool {
     path.split('/').any(|seg| prune.iter().any(|p| p == seg))
 }
 
+// spec: gate-sdk/SPEC.md §check-exec-bit — the live read is NUL-terminated and a canned dump is lines, so a record ends at either
+fn records(listing: &str) -> Vec<&str> {
+    if listing.contains('\0') {
+        listing.split('\0').collect()
+    } else {
+        fresh::file_lines(listing)
+    }
+}
+
 pub fn run(args: &[String]) -> i32 {
     let globs = match walk::knob_words("GATE_SDK_EXEC_GLOBS") {
         Ok(v) => v,
@@ -49,7 +58,7 @@ pub fn run(args: &[String]) -> i32 {
                     return 2;
                 }
             }
-            let ls = match proc::run(&programs::GIT, &["ls-files", "-s"]) {
+            let ls = match proc::run(&programs::GIT, &["ls-files", "-s", "-z"]) {
                 Ok(c) => c,
                 Err(e) => {
                     eprintln!("check-exec-bit: {}", e);
@@ -72,7 +81,7 @@ pub fn run(args: &[String]) -> i32 {
     let mut bad: Vec<String> = Vec::new();
     let mut notexec: Vec<String> = Vec::new();
     let (mut count, mut dcount) = (0usize, 0usize);
-    for line in fresh::file_lines(&listing) {
+    for line in records(&listing) {
         if line.is_empty() {
             continue;
         }

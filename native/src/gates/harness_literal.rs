@@ -1,7 +1,8 @@
 // spec: gate-sdk/SPEC.md §check-harness-literal — no file on the configured corpus carries a
 // configured harness literal outside a site declaring the binding
 use crate::fresh;
-use crate::gates::portability_floor::{binary, declared, token_reason, tracked};
+use crate::gates::portability_floor::{binary, declared, token_reason};
+use crate::listing;
 use crate::walk;
 
 const VALVE: &str = "harness-binding:";
@@ -38,7 +39,9 @@ fn inner() -> Result<i32, String> {
         return Ok(0);
     }
 
-    let listing = tracked("check-harness-literal", &paths)?;
+    let specs: Vec<&str> = paths.iter().map(String::as_str).collect();
+    let listing =
+        listing::tracked(None, &specs).map_err(|e| format!("check-harness-literal: {}", e.text()))?;
 
     let mut hits: Vec<String> = Vec::new();
     let mut scanned = 0usize;

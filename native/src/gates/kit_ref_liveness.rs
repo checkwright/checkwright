@@ -255,23 +255,15 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let (posts_dir, evidence_page, declarations) =
         frozen().map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
 
-    let ls =proc::run(&programs::GIT, &["ls-files", "--", scanroot])
-        .map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
-    let listing = match ls.stdout() {
-        Some(o) => String::from_utf8_lossy(o).into_owned(),
-        None => {
-            return Err(format!(
-                "KIT-REF-LIVENESS: {}",
-                fresh::fail_closed("git-ls-files", ls.code())
-            ))
+    let listing = crate::listing::tracked(None, &[scanroot]).map_err(|e| match e {
+        crate::listing::Refusal::Failed(code) => {
+            format!("KIT-REF-LIVENESS: {}", fresh::fail_closed("git-ls-files", code))
         }
-    };
+        other => format!("check-kit-ref-liveness: {}", other.text()),
+    })?;
 
     let mut files: Vec<String> = Vec::new();
-    for path in listing.lines() {
-        if path.is_empty() {
-            continue;
-        }
+    for path in listing.iter().map(String::as_str) {
         if walk::path_pruned(path, &prune) {
             continue;
         }

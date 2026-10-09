@@ -3,7 +3,6 @@
 use super::docs_render_fidelity::jekyll_internal;
 use crate::fresh;
 use crate::walk;
-use crate::{proc, programs};
 use std::path::Path;
 
 const NAME: &str = "check-docs-collapsible";
@@ -28,22 +27,13 @@ fn inner(args: &[String]) -> Result<i32, String> {
     if !fresh::is_dir(&docs) {
         return Err(format!("docs dir not found: {}", docs));
     }
-    let ls = proc::run(&programs::GIT, &["ls-files", "--", &docs])?;
-    let listing = match ls.stdout() {
-        Some(o) => String::from_utf8_lossy(o).into_owned(),
-        None => return Err(fresh::fail_closed("git-ls-files", ls.code())),
-    };
+    let listing = crate::listing::tracked(None, &[&docs]).map_err(|e| e.text())?;
     let prune = walk::prune_dirs()?;
     let mut pages: Vec<String> = listing
-        .lines()
+        .into_iter()
         .filter(|p| {
-            !p.is_empty()
-                && p.ends_with(".md")
-                && !jekyll_internal(p)
-                && !walk::path_pruned(p, &prune)
-                && Path::new(p).is_file()
+            p.ends_with(".md") && !jekyll_internal(p) && !walk::path_pruned(p, &prune) && Path::new(p).is_file()
         })
-        .map(str::to_string)
         .collect();
     pages.sort();
 

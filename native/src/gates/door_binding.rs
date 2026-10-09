@@ -223,13 +223,14 @@ fn doors_on(line: &str, base: &str) -> Vec<(usize, usize)> {
 // spec: guard-kit/SPEC.md §check-door-binding — a configured entry's tracked members, the corpus
 // being the tracked tree: a filesystem walk would reach a local build artifact, which is no
 // governed surface
+// spec: gate-sdk/SPEC.md §Fail-closed contract — a failed listing degrades to no member here; a name that is not UTF-8 refuses
 fn tracked_under(root: &str, entry: &str) -> Result<Vec<String>, String> {
-    let listed = crate::proc::run(&crate::programs::GIT, &["-C", root, "ls-files", "--", entry])?;
-    let text = listed
-        .stdout()
-        .map(|o| String::from_utf8_lossy(o).into_owned())
-        .unwrap_or_default();
-    Ok(text.lines().map(str::to_string).collect())
+    use crate::listing::Refusal;
+    match crate::listing::tracked(Some(root), &[entry]) {
+        Ok(names) => Ok(names),
+        Err(Refusal::Failed(_)) => Ok(Vec::new()),
+        Err(other) => Err(other.text()),
+    }
 }
 
 // spec: guard-kit/SPEC.md §check-door-binding — assertion C's corpus: each configured entry as

@@ -131,21 +131,17 @@ fn inner(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    let ls = proc::run(&programs::GIT, &["ls-files", "--", &docs]).map_err(|e| format!("{}: {}", NAME, e))?;
-    let listing = match ls.stdout() {
-        Some(o) => String::from_utf8_lossy(o).into_owned(),
-        None => {
-            return Err(format!(
-                "DOCS-RENDER-FIDELITY: {}",
-                fresh::fail_closed("git-ls-files", ls.code())
-            ))
+    let listing = crate::listing::tracked(None, &[&docs]).map_err(|e| match e {
+        crate::listing::Refusal::Failed(code) => {
+            format!("DOCS-RENDER-FIDELITY: {}", fresh::fail_closed("git-ls-files", code))
         }
-    };
+        other => format!("{}: {}", NAME, other.text()),
+    })?;
 
     let prune = walk::prune_dirs().map_err(|e| format!("{}: {}", NAME, e))?;
     let mut pages: Vec<String> = Vec::new();
-    for p in listing.lines() {
-        if p.is_empty() || !p.ends_with(".md") || jekyll_internal(p) || walk::path_pruned(p, &prune) {
+    for p in listing.iter().map(String::as_str) {
+        if !p.ends_with(".md") || jekyll_internal(p) || walk::path_pruned(p, &prune) {
             continue;
         }
         if Path::new(p).is_file() {

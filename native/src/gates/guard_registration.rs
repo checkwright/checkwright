@@ -3,8 +3,6 @@
 use crate::diff;
 use crate::guard::engine::Shell;
 use crate::guard::reader::View;
-use crate::programs;
-use crate::proc;
 use crate::walk;
 use std::collections::BTreeSet;
 use std::path::Path;
@@ -268,15 +266,15 @@ fn corpus_file(path: &str) -> Result<Option<String>, String> {
 }
 
 fn ls(pathspec: &str) -> Result<Vec<String>, String> {
-    let out = proc::run(&programs::GIT, &["ls-files", "--", pathspec])?;
-    match out.stdout() {
-        Some(o) => Ok(String::from_utf8_lossy(o).lines().filter(|l| !l.is_empty()).map(String::from).collect()),
-        None => Err(format!(
-            "git ls-files -- {} exited {} — the citation corpus could not be enumerated",
-            pathspec,
-            out.code().unwrap_or(-1)
-        )),
-    }
+    crate::listing::tracked(None, &[pathspec]).map_err(|e| {
+        e.text_or(|code| {
+            format!(
+                "git ls-files -- {} exited {} — the citation corpus could not be enumerated",
+                pathspec,
+                code.unwrap_or(-1)
+            )
+        })
+    })
 }
 
 fn compiled() -> Vec<Row> {

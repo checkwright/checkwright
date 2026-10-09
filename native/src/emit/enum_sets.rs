@@ -2,7 +2,6 @@
 // vocabulary plus the derived roster families over the kit tree, one `<set-name>`⇥`<member>` line
 // per member, every member read from the tree or from the gate that owns it
 // spec: gate-sdk/SPEC.md §The non-gate arm — a two-kit declared roster
-use crate::{proc, programs};
 use crate::walk;
 
 pub const KNOBS: &[&str] = &["GATE_SDK_KIT_DIRS", "QUEUE_KIT_LESSON_TAGS"];
@@ -41,19 +40,20 @@ fn emit_set(out: &mut String, set: &str, members: &[String]) {
 // walk, so an untracked new sibling does not enrol
 // spec: gate-sdk/SPEC.md §The port-candidate criteria — `git` is criterion 7's one sanctioned
 // exception on GATE_SDK_PROGRAM_FLOOR
+// spec: gate-sdk/SPEC.md §Fail-closed contract — a failed listing degrades to an empty family; a name that is not UTF-8 refuses
 fn tracked_under(dir: &str, suffix: &str) -> Result<Vec<String>, String> {
-    let listed = proc::run(&programs::GIT, &["ls-files", "--", dir])?;
-    let text = listed
-        .stdout()
-        .map(|o| String::from_utf8_lossy(o).into_owned())
-        .unwrap_or_default();
-    Ok(text
-        .lines()
+    use crate::listing::Refusal;
+    let names = match crate::listing::tracked(None, &[dir]) {
+        Ok(names) => names,
+        Err(Refusal::Failed(_)) => Vec::new(),
+        Err(other) => return Err(other.text()),
+    };
+    Ok(names
+        .into_iter()
         .filter(|p| match walk::rel_under(dir, p) {
             Some(rest) => !rest.contains('/') && rest.ends_with(suffix),
             None => false,
         })
-        .map(str::to_string)
         .collect())
 }
 

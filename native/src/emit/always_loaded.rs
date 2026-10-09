@@ -151,13 +151,10 @@ pub fn governed() -> Result<Vec<(String, u64)>, String> {
     let specs = walk::knob_array("CONTEXT_KIT_RATCHET_PATHS")?;
     let specs: Vec<&str> = specs.iter().map(String::as_str).filter(|s| !s.is_empty()).collect();
     if !specs.is_empty() {
-        let mut args: Vec<&str> = vec!["ls-files", "--"];
-        args.extend(specs);
-        let done = proc::run(&programs::GIT, &args)?;
-        let listed = done
-            .stdout()
-            .ok_or_else(|| "git ls-files could not list the ratchet pathspecs".to_string())?;
-        paths.extend(String::from_utf8_lossy(listed).lines().map(String::from));
+        paths.extend(
+            crate::listing::tracked(None, &specs)
+                .map_err(|e| e.text_or(|_| "git ls-files could not list the ratchet pathspecs".to_string()))?,
+        );
     }
     paths.sort();
     paths.dedup();

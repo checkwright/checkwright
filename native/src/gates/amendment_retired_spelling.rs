@@ -1,7 +1,6 @@
 // spec: canon-kit/SPEC.md §check-amendment-retired-spelling — every amendment carries a
 // `## Retired spellings` block, and every spelling it declares survives only at a path its
 // `## Existing sections updated` roster names
-use crate::{proc, programs};
 use crate::spec;
 use crate::walk;
 use std::path::Path;
@@ -187,23 +186,19 @@ fn corpus(root: &str, amendments: &[String]) -> Result<Vec<String>, String> {
     if crate::walk::toplevel_opt()?.is_none() {
         return Err("not a git repository — cannot enumerate the reconciliation corpus".into());
     }
-    let ls = proc::run(&programs::GIT, &["ls-files", "--", root])?;
-    let listing = match ls.stdout() {
-        Some(o) => String::from_utf8_lossy(o).into_owned(),
-        None => {
-            return Err(format!(
+    let listing = crate::listing::tracked(None, &[root]).map_err(|e| {
+        e.text_or(|code| {
+            format!(
                 "git ls-files exited {} — the reconciliation corpus could not be enumerated",
-                ls.code().unwrap_or(-1)
-            ))
-        }
-    };
+                code.unwrap_or(-1)
+            )
+        })
+    })?;
     let exclude = spec::knob_array_pub(EXCLUDE_KNOB)?;
     Ok(listing
-        .lines()
-        .filter(|p| !p.is_empty())
+        .into_iter()
         .filter(|p| !amendments.iter().any(|a| a == p))
         .filter(|p| !exclude.iter().any(|g| walk::pattern_match(g, p)))
-        .map(String::from)
         .collect())
 }
 

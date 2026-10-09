@@ -39,7 +39,7 @@ pub fn path_pruned(p: &str, prune: &[String]) -> bool {
 // tracked set yields none, on `authoring_tree`'s own degrade; an unresolved knob still fails closed
 pub fn tracked_shell_tree() -> Result<Vec<String>, String> {
     let prune = prune_dirs()?;
-    Ok(tracked_matching("*.sh")
+    Ok(tracked_matching("*.sh")?
         .into_iter()
         .filter(|l| !l.ends_with(".test.sh") && !path_pruned(l, &prune))
         .collect())
@@ -53,7 +53,7 @@ pub fn tracked_suites() -> Result<Vec<String>, String> {
     let tests_dir = knob_scalar("GATE_SDK_TESTS_DIR")?;
     let tests_dir = tests_dir.trim_end_matches('/');
     let tests_dir = tests_dir.strip_prefix("./").unwrap_or(tests_dir);
-    Ok(tracked_matching("*.test.sh")
+    Ok(tracked_matching("*.test.sh")?
         .into_iter()
         .filter(|l| is_suite(l, &prune, tests_dir))
         .collect())
@@ -67,19 +67,13 @@ fn is_suite(p: &str, prune: &[String], tests_dir: &str) -> bool {
     (name == "gate-tests" || dir == tests_dir) && (above.is_empty() || !path_pruned(&format!("{}/", above), prune))
 }
 
-fn tracked_matching(pathspec: &str) -> Vec<String> {
-    let bytes = match crate::proc::run(&programs::GIT, &["ls-files", "--", pathspec]) {
-        Ok(c) => match c.stdout() {
-            Some(b) => b.to_vec(),
-            None => return Vec::new(),
-        },
-        Err(_) => return Vec::new(),
-    };
-    String::from_utf8_lossy(&bytes)
-        .lines()
-        .filter(|l| !l.is_empty())
-        .map(String::from)
-        .collect()
+// spec: gate-sdk/SPEC.md §Fail-closed contract — a listing git could not produce degrades to none; a name that is not UTF-8 refuses
+fn tracked_matching(pathspec: &str) -> Result<Vec<String>, String> {
+    match crate::listing::tracked(None, &[pathspec]) {
+        Ok(names) => Ok(names),
+        Err(crate::listing::Refusal::NotUtf8(e)) => Err(e),
+        Err(_) => Ok(Vec::new()),
+    }
 }
 
 // spec: gate-sdk/SPEC.md §port-blockers — the file's own header block, the leading run of shebang,
@@ -686,7 +680,7 @@ pub fn authoring_tree(crate_dir: &str) -> bool {
     if !Path::new(crate_dir).is_dir() {
         return false;
     }
-    match crate::proc::run(&programs::GIT, &["-C", crate_dir, "ls-files"]) {
+    match crate::proc::run(&programs::GIT, &["-C", crate_dir, "ls-files", "-z"]) {
         Ok(c) => c
             .stdout()
             .map(|o| !String::from_utf8_lossy(o).trim().is_empty())

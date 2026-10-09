@@ -148,7 +148,7 @@ pub fn run(args: &[String]) -> i32 {
             let mut missing: Vec<String> = Vec::new();
             for (i, r) in kit_roots.iter().enumerate() {
                 let spec = format!("{}/{}", kit_paths[i], glob);
-                let out = match proc::run(&programs::GIT, &["-C", &repo_root, "ls-files", "--", &spec]) {
+                let out = match proc::run(&programs::GIT, &["-C", &repo_root, "ls-files", "-z", "--", &spec]) {
                     Ok(c) => c,
                     Err(e) => {
                         eprintln!("check-kit-enum: {}", e);

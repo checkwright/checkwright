@@ -1,7 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-template-registry-parity — a kit's shipped `.list` registry
 // template names exactly the artifacts of its sibling directory, both directions
 use crate::gates::smoke_entry_guard::{kit_name, scan_root};
-use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
@@ -156,27 +155,20 @@ pub fn run(args: &[String]) -> i32 {
                 );
                 return 2;
             }
-            let completed = match proc::run(&programs::GIT, &["-C", &dir, "ls-files", "--", "*.sh"]) {
-                Ok(c) => c,
+            let listing = match crate::listing::tracked(Some(&dir), &["*.sh"]) {
+                Ok(names) => names,
                 Err(e) => {
-                    eprintln!("check-template-registry-parity: {}", e);
-                    return 2;
-                }
-            };
-            let listing = match completed.stdout() {
-                Some(o) => String::from_utf8_lossy(o).into_owned(),
-                None => {
                     eprintln!(
-                        "check-template-registry-parity: git ls-files failed under {}",
-                        dir
+                        "check-template-registry-parity: {}",
+                        e.text_or(|_| format!("git ls-files failed under {}", dir))
                     );
                     return 2;
                 }
             };
             shipped.extend(
                 listing
-                    .lines()
-                    .filter(|f| !f.is_empty() && !f.contains('/'))
+                    .iter()
+                    .filter(|f| !f.contains('/'))
                     .map(|f| f.strip_suffix(".sh").unwrap_or(f).to_string()),
             );
         }

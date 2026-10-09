@@ -23,6 +23,7 @@ mod json;
 mod knobenv;
 mod knobfile;
 mod knobs;
+mod listing;
 mod marker;
 mod proc;
 mod programs;

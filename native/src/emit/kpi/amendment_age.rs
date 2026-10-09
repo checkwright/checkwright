@@ -14,18 +14,22 @@ pub fn is_amendment(path: &str) -> bool {
     !(path.contains("/gate-tests/") || path.contains("/templates/"))
 }
 
-fn git_lines(args: &[&str]) -> Vec<String> {
+fn git_text(args: &[&str]) -> String {
     proc::run(&programs::GIT, args)
         .ok()
         .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
-        .map(|s| s.lines().map(String::from).collect())
         .unwrap_or_default()
+}
+
+fn git_lines(args: &[&str]) -> Vec<String> {
+    git_text(args).lines().map(String::from).collect()
 }
 
 pub fn run(ctx: &Ctx, trend: bool) -> Option<String> {
     let _ = ctx;
-    let amends: Vec<String> = git_lines(&["ls-files"])
-        .into_iter()
+    let amends: Vec<String> = git_text(&["ls-files", "-z"])
+        .split('\0')
+        .map(String::from)
         .filter(|f| is_amendment(f))
         .collect();
     if amends.is_empty() {

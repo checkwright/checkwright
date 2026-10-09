@@ -2,7 +2,7 @@
 use super::docs_render_fidelity::{jekyll_internal, nul_records, spawn_filter};
 use crate::fresh;
 use crate::walk;
-use crate::{proc, programs};
+use crate::proc;
 use std::collections::HashSet;
 use std::io::Read;
 use std::path::Path;
@@ -53,24 +53,15 @@ fn inner(_args: &[String]) -> Result<i32, String> {
         ));
     }
 
-    let ls = proc::run(&programs::GIT, &["ls-files", "--", &docs]).map_err(|e| format!("{}: {}", NAME, e))?;
-    let listing = match ls.stdout() {
-        Some(o) => String::from_utf8_lossy(o).into_owned(),
-        None => {
-            return Err(format!(
-                "DOCS-LIQUID-PARSE: {}",
-                fresh::fail_closed("git-ls-files", ls.code())
-            ))
-        }
-    };
+    let listing = tracked(&[&docs])?;
 
     let pathspecs = walk::knob_array("SITE_KIT_LIQUID_TEMPLATES").map_err(|e| format!("{}: {}", NAME, e))?;
     let templates = selected(&pathspecs)?;
 
     let prune = walk::prune_dirs().map_err(|e| format!("{}: {}", NAME, e))?;
     let mut corpus: Vec<(String, Class)> = Vec::new();
-    for p in listing.lines() {
-        if p.is_empty() || walk::path_pruned(p, &prune) || !Path::new(p).is_file() {
+    for p in listing.iter().map(String::as_str) {
+        if walk::path_pruned(p, &prune) || !Path::new(p).is_file() {
             continue;
         }
         let fenced = || first_line_is_fence(p);
@@ -147,13 +138,17 @@ fn selected(pathspecs: &[String]) -> Result<HashSet<String>, String> {
     if pathspecs.is_empty() {
         return Ok(HashSet::new());
     }
-    let mut argv: Vec<&str> = vec!["ls-files", "--"];
-    argv.extend(pathspecs.iter().map(String::as_str));
-    let ls = proc::run(&programs::GIT, &argv).map_err(|e| format!("{}: {}", NAME, e))?;
-    match ls.stdout() {
-        Some(o) => Ok(String::from_utf8_lossy(o).lines().filter(|l| !l.is_empty()).map(str::to_string).collect()),
-        None => Err(format!("DOCS-LIQUID-PARSE: {}", fresh::fail_closed("git-ls-files", ls.code()))),
-    }
+    let specs: Vec<&str> = pathspecs.iter().map(String::as_str).collect();
+    Ok(tracked(&specs)?.into_iter().collect())
+}
+
+fn tracked(pathspecs: &[&str]) -> Result<Vec<String>, String> {
+    crate::listing::tracked(None, pathspecs).map_err(|e| match e {
+        crate::listing::Refusal::Failed(code) => {
+            format!("DOCS-LIQUID-PARSE: {}", fresh::fail_closed("git-ls-files", code))
+        }
+        other => format!("{}: {}", NAME, other.text()),
+    })
 }
 
 // spec: site-kit/SPEC.md §check-docs-liquid-parse — a template is matched on the repository-relative path the pathspecs are written against, every other class on the path relative to the docs dir

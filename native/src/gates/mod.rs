@@ -1304,7 +1304,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-door-binding",
         door_binding::run,
-        &[("?", "", "", "dynamic@src/gates/door_binding.rs:273")],
+        &[("?", "", "", "dynamic@src/gates/door_binding.rs:274")],
         &["GATE_SDK_KIT_DIRS", "GUARD_KIT_DOOR_ROOTS"],
         "guard-kit",
         &[("git", "")],
@@ -1334,7 +1334,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-template-registry-parity",
         template_registry_parity::run,
-        &[("?", "", "", "dynamic@src/gates/template_registry_parity.rs:89")],
+        &[("?", "", "", "dynamic@src/gates/template_registry_parity.rs:88")],
         &["GATE_SDK_KIT_DIRS"],
         "gate-sdk",
         &[("git", "")],

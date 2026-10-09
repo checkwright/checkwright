@@ -2,7 +2,6 @@
 // names is the single gated source of truth for the docs host; no tracked file names a configured host alias other than
 // that host in a URL
 use crate::fresh;
-use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
@@ -96,21 +95,12 @@ fn inner(args: &[String]) -> Result<i32, String> {
         .map_err(|e| format!("check-docs-cname-parity: {}", e))?;
     let prune = walk::prune_dirs().map_err(|e| format!("check-docs-cname-parity: {}", e))?;
 
-    let ls = proc::run(&programs::GIT, &["ls-files", "--", &scanroot])
-        .map_err(|e| format!("check-docs-cname-parity: {}", e))?;
-    let listing = match ls.stdout() {
-        Some(o) => String::from_utf8_lossy(o).into_owned(),
-        None => {
-            return Err(format!(
-                "check-docs-cname-parity: {}",
-                fresh::fail_closed("git-ls-files", ls.code())
-            ))
-        }
-    };
+    let listing = crate::listing::tracked(None, &[&scanroot])
+        .map_err(|e| format!("check-docs-cname-parity: {}", e.text()))?;
 
     let mut files: Vec<String> = Vec::new();
-    for path in listing.lines() {
-        if path.is_empty() || walk::path_pruned(path, &prune) {
+    for path in listing.iter().map(String::as_str) {
+        if walk::path_pruned(path, &prune) {
             continue;
         }
         if exempt.iter().any(|g| walk::pattern_match(g, path)) {

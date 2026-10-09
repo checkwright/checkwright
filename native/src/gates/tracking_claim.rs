@@ -49,7 +49,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     for c in &claims {
         let rel = spec::strip_dot_slash(crate::walk::rel_under(root, &c.file).unwrap_or(&c.file));
 
-        let ls = proc::run(&programs::GIT, &["-C", root, "ls-files", "--", &c.path])?;
+        let ls = proc::run(&programs::GIT, &["-C", root, "ls-files", "-z", "--", &c.path])?;
         let tracked = match ls.stdout() {
             Some(o) => !o.is_empty(),
             None => {

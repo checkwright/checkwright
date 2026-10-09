@@ -1,8 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-root-tiering — the repo root holds only allowlisted orientation
 // entries; workflow machinery stays under the configured dirs
-use crate::programs;
 use crate::gates::template_registry_parity::list_members;
-use crate::{fresh, proc, walk};
+use crate::walk;
 
 // spec: gate-sdk/SPEC.md §check-root-tiering — the fallback orientation set, generic by
 // construction plus the two configured document knobs: the consumer-shaped roster is the
@@ -89,30 +88,17 @@ pub fn run(args: &[String]) -> i32 {
         )
     };
 
-    let ls = match proc::run(&programs::GIT, &["ls-files", "--", &scanroot]) {
-        Ok(c) => c,
+    let listing = match crate::listing::tracked(None, &[&scanroot]) {
+        Ok(names) => names,
         Err(e) => {
-            eprintln!("check-root-tiering: {}", e);
-            return 2;
-        }
-    };
-    let listing = match ls.stdout() {
-        Some(o) => String::from_utf8_lossy(o).into_owned(),
-        None => {
-            eprintln!(
-                "check-root-tiering: {}",
-                fresh::fail_closed("git-ls-files", ls.code())
-            );
+            eprintln!("check-root-tiering: {}", e.text());
             return 2;
         }
     };
 
     let mut seen: Vec<String> = Vec::new();
     let mut stray: Vec<String> = Vec::new();
-    for path in listing.lines() {
-        if path.is_empty() {
-            continue;
-        }
+    for path in listing.iter().map(String::as_str) {
         // spec: gate-sdk/SPEC.md §Porting to Rust does not retire dialect exposure — a `.` scan
         // root prefixes nothing, which is an identity rather than a containment test
         let rest = match scanroot.as_str() {

@@ -75,7 +75,7 @@ pub fn run(args: &[String]) -> i32 {
         let rel = format!("{}/{}", wf, name);
 
         let is_tracked = if is_dir {
-            let ls = match proc::run(&programs::GIT, &["-C", root, "ls-files", "--", &rel]) {
+            let ls = match proc::run(&programs::GIT, &["-C", root, "ls-files", "-z", "--", &rel]) {
                 Ok(c) => c,
                 Err(e) => {
                     eprintln!("check-workflow-tiering: {}", e);

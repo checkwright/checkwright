@@ -201,7 +201,7 @@ fn target_resolves(tracked: &HashSet<String>, p: &str) -> Result<bool, String> {
     if !Path::new(p).is_dir() {
         return Ok(false);
     }
-    let ls = proc::run(&programs::GIT, &["ls-files", "--", p])?;
+    let ls = proc::run(&programs::GIT, &["ls-files", "-z", "--", p])?;
     Ok(ls.stdout().map(|o| !o.is_empty()).unwrap_or(false))
 }
 

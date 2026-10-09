@@ -309,14 +309,15 @@ fn comment_actions() -> Result<bool, String> {
 // spec: canon-kit/SPEC.md §check-spec-pointer — the workflow directory's tracked tier,
 // whatever the extension. A `git` that cannot answer leaves the tier empty exactly as the
 // shell's per-file `|| continue` does; the arm is reproduced rather than tightened here.
+// spec: gate-sdk/SPEC.md §Fail-closed contract — a name that is not UTF-8 is no failed listing, and refuses
 fn workflow_tier(root: &str) -> Result<Vec<String>, String> {
+    use crate::listing::Refusal;
     let wf = knob("GATE_SDK_WORKFLOW_DIR")?;
-    let tracked = crate::proc::run(&programs::GIT, &["-C", root, "ls-files", "--", &wf])?;
-    let listing = match tracked.stdout() {
-        Some(o) => String::from_utf8_lossy(o).into_owned(),
-        None => return Ok(Vec::new()),
+    let members = match crate::listing::tracked(Some(root), &[&wf]) {
+        Ok(names) => names,
+        Err(Refusal::Failed(_)) => return Ok(Vec::new()),
+        Err(other) => return Err(other.text()),
     };
-    let members: Vec<&str> = listing.lines().collect();
     let mut out: Vec<String> = Vec::new();
     for f in walk::glob_files(Path::new(root), &[format!("{}/*", wf)])? {
         let p = f.display().to_string();
@@ -324,7 +325,7 @@ fn workflow_tier(root: &str) -> Result<Vec<String>, String> {
             continue;
         }
         let rel = strip_dot_slash(walk::rel_under(root, &p).unwrap_or(&p));
-        if members.iter().any(|m| *m == rel) {
+        if members.iter().any(|m| m.as_str() == rel) {
             out.push(p);
         }
     }

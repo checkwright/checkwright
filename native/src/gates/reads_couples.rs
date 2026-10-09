@@ -343,10 +343,11 @@ impl Ctx {
         Ok(())
     }
 
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the listing arrives NUL-terminated, one name per record
     fn cover_listing(&mut self, d: &Demand, out: &str) {
         let (root, prune, gname, where_, globs, couples) =
             (d.root, d.prune, d.gname, d.where_, d.globs, d.couples);
-        for f in out.lines() {
+        for f in out.split('\0') {
             if f.is_empty() {
                 continue;
             }
@@ -381,7 +382,7 @@ fn tracked_under(repo: Option<&str>, root: &str) -> Result<String, String> {
     if let Some(r) = repo {
         args.extend(["-C", r]);
     }
-    args.push("ls-files");
+    args.extend(["ls-files", "-z"]);
     if root != "." {
         args.extend(["--", root]);
     }

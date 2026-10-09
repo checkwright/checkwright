@@ -223,7 +223,7 @@ pub fn run(_args: &[String]) -> i32 {
         // listing here is the shell form's discarded-stderr capture and not a second verdict
         let untracked = proc::run(
             &programs::GIT,
-            &["-C", &crate_dir, "ls-files", "--others", "--exclude-standard", "--", "."],
+            &["-C", &crate_dir, "ls-files", "-z", "--others", "--exclude-standard", "--", "."],
         )
         .ok()
         .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))

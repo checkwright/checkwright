@@ -2,7 +2,7 @@
 // that names a tracked consumer path or heading is a knob or a declared site
 use crate::gates::door_binding::rust_region;
 use crate::registry::{self, GATE_MODULES};
-use crate::{proc, programs, walk};
+use crate::walk;
 use std::collections::{BTreeSet, HashMap};
 use std::path::Path;
 
@@ -293,11 +293,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Err("no member resolves under the gates dir or any kit root".to_string());
     }
 
-    let listed = proc::run(&programs::GIT, &["ls-files"])?;
-    let Some(out) = listed.stdout() else {
-        return Err("git ls-files failed".to_string());
-    };
-    let tracked: BTreeSet<String> = String::from_utf8_lossy(out).lines().map(str::to_string).collect();
+    let tracked: BTreeSet<String> = crate::listing::tracked(None, &[])
+        .map_err(|e| e.text_or(|_| "git ls-files failed".to_string()))?
+        .into_iter()
+        .collect();
     let mut tracked_dirs: BTreeSet<String> = BTreeSet::new();
     for t in &tracked {
         let mut at = 0usize;

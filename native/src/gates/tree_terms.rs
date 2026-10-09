@@ -3,7 +3,6 @@
 use crate::ere::Ere;
 use crate::fresh;
 use crate::gates::commit_msg::resolve_files;
-use crate::{proc, programs};
 use crate::knobs::gate_sdk::MSG_PATTERN_FILE;
 use crate::walk;
 use std::path::Path;
@@ -101,24 +100,15 @@ fn inner(args: &[String]) -> Result<i32, String> {
         .map_err(|e| format!("check-tree-terms: {}", e))?;
 
     let prune = walk::prune_dirs().map_err(|e| format!("check-tree-terms: {}", e))?;
-    let ls = proc::run(&programs::GIT, &["ls-files", "--", &scanroot])
-        .map_err(|e| format!("check-tree-terms: {}", e))?;
-    let listing = match ls.stdout() {
-        Some(o) => String::from_utf8_lossy(o).into_owned(),
-        None => {
-            return Err(format!(
-                "check-tree-terms: {}",
-                fresh::fail_closed("git-ls-files", ls.code())
-            ))
-        }
-    };
+    let listing = crate::listing::tracked(None, &[&scanroot])
+        .map_err(|e| format!("check-tree-terms: {}", e.text()))?;
 
     // spec: gate-sdk/SPEC.md §check-tree-terms — the cheap-filter-then-match split: the per-path
     // filter costs no process, and the pattern set is compiled once for the whole walk rather than
     // per file. A port recompiling per file is the regression the split exists to prevent.
     let mut paths: Vec<&str> = Vec::new();
-    for path in listing.lines() {
-        if path.is_empty() || walk::path_pruned(path, &prune) || exempt.iter().any(|e| e == path) {
+    for path in listing.iter().map(String::as_str) {
+        if walk::path_pruned(path, &prune) || exempt.iter().any(|e| e == path) {
             continue;
         }
         if Path::new(path).is_file() {

@@ -2,7 +2,6 @@
 // tracked snapshot declares the theme colours
 use crate::fresh;
 use crate::walk;
-use crate::{proc, programs};
 use std::path::Path;
 
 const TOOL: &str = "check-docs-highlight-coverage";
@@ -131,12 +130,8 @@ fn inner(_args: &[String]) -> Result<i32, String> {
 
     let mut files: Vec<String> = Vec::new();
     for g in &globs {
-        let ls = proc::run(&programs::GIT, &["ls-files", "--", g])?;
-        let listing = match ls.stdout() {
-            Some(o) => String::from_utf8_lossy(o).into_owned(),
-            None => return Err(fresh::fail_closed("git-ls-files", ls.code())),
-        };
-        let hits: Vec<&str> = listing.lines().filter(|p| !p.is_empty() && Path::new(p).is_file()).collect();
+        let listing = crate::listing::tracked(None, &[g]).map_err(|e| e.text())?;
+        let hits: Vec<&str> = listing.iter().map(String::as_str).filter(|p| Path::new(p).is_file()).collect();
         if hits.is_empty() {
             findings.push(format!(
                 "override glob '{}' (SITE_KIT_HIGHLIGHT_OVERRIDES) matches no tracked file, so nothing overrides the theme",

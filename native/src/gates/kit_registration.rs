@@ -129,7 +129,7 @@ fn rule(args: &[String], stdout: &mut Vec<String>, stderr: &mut Vec<String>) -> 
         // assertion B: fixture-runner line — a '<kit>/gate-tests' line for each root shipping
         // gate-tests; the enumeration is git metadata, so an untracked fixture owes nothing
         let pathspec = format!("{}/gate-tests/", r);
-        let completed = match proc::run(&programs::GIT, &["-C", &repo_root, "ls-files", "--", &pathspec]) {
+        let completed = match proc::run(&programs::GIT, &["-C", &repo_root, "ls-files", "-z", "--", &pathspec]) {
             Ok(c) => c,
             Err(e) => {
                 stderr.push(format!("check-kit-registration: {}", e));

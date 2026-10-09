@@ -683,11 +683,11 @@ fn pack_tracked(commit: &str, src: &str, dst: &str, withhold: &[String]) -> Resu
     // spec: gate-sdk/SPEC.md §Consumer payload — the pre-flight reads the pathspec the archive
     // reads, so the fail-closed guarantee covers precisely what is packed and no refusal names a
     // path the payload was never going to carry
-    let mut ls: Vec<&str> = vec!["ls-files", "-s", "--"];
+    let mut ls: Vec<&str> = vec!["ls-files", "-s", "-z", "--"];
     ls.extend(spec.iter().map(String::as_str));
     let listing = git(&ls)?;
     let links: Vec<&str> = listing
-        .lines()
+        .split('\0')
         .filter(|l| l.starts_with("120000 "))
         .filter_map(|l| l.split_once('\t'))
         .map(|(_, p)| p)

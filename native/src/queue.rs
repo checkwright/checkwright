@@ -729,7 +729,7 @@ pub fn tracked_stems(file: &str) -> Vec<(String, String)> {
         _ => ".".to_string(),
     };
     let listing =
-        match crate::proc::run(&programs::GIT, &["-C", &dir, "ls-files", "--full-name", "--", ":/"]) {
+        match crate::proc::run(&programs::GIT, &["-C", &dir, "ls-files", "-z", "--full-name", "--", ":/"]) {
             Ok(c) => match c.stdout() {
                 Some(o) => String::from_utf8_lossy(o).into_owned(),
                 None => return Vec::new(),
@@ -737,7 +737,7 @@ pub fn tracked_stems(file: &str) -> Vec<(String, String)> {
             Err(_) => return Vec::new(),
         };
     listing
-        .lines()
+        .split('\0')
         .filter(|l| !l.is_empty())
         .filter_map(|l| {
             std::path::Path::new(l)
