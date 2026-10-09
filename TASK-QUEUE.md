@@ -36,16 +36,6 @@ a placed git hook stays on the build of the last `--install-hooks` once a build 
 
 ## Technical Debt
 
-### toolchain-action-proxy-jobs
-
-five jobs in `.github/workflows/gates.yml` make a compiler version read their first toolchain call with no step on the retrying composite action: `native-artifacts-roster`, `install-smoke-pwsh-windows`, `install-smoke-sh-macos`, `install-smoke-sh-macos-intel` and `install-smoke-sh-linux-arm64`. gate-sdk/SPEC.md §check-crate-arms says each job that runs cargo takes the action ahead of its build, and a compiler proxy call fetches the pinned toolchain as a cargo call does, so these keep the unretried fetch the action was added to end.
-
-**Deliverable:** each of the five takes the action ahead of its first toolchain call. Whether §check-crate-arms' assertion widens from a cargo call to any toolchain call is the unit's first read. Reshaped by [install-smoke-sh-matrix](#install-smoke-sh-matrix): under a matrix, three of the five are one job.
-
-**Push need (2026-10-09, inside the budget):** one mid-iteration push, since the change runs only on remote runners; the closing push is the set's second.
-
-**Cost while deferred:** a registry blip on any of the five reds its leg with no cause in the tree. Filed 2026-10-08 as a gap at foreign-stage-binding-pass' close, a new defect found after `toolchain-fetch-no-retry` landed: the first job by its second-vendor review, the other four by grep; promoted 2026-10-09 by the next iteration's scope intake. Re-verified there by grep: in each of the five the first toolchain call is the version read and no step uses the action; and by the arm64 leg's log of the last master run, where that read synced the channel and downloaded four components. Owner lookup: `toolchain`, `retry`, `gates.yml` in this file and the disposed-findings record — none owning it; owner gate-sdk/SPEC.md §check-crate-arms.
-
 ## Deferred
 
 ### guard-quoted-operand-words
@@ -1230,4 +1220,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 
 - harness-valve-trailing-text
 - tracked-set-quoted-path-names
+- toolchain-action-proxy-jobs
 
