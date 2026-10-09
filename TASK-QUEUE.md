@@ -552,6 +552,42 @@ the crate suite's `cargo test --release` rebuilds the release binary without `bi
 
 **Cost while deferred:** a wasted validate round, about 17 minutes, on any seat whose binary was last built by a plain cargo build. Filed 2026-10-09 by crate-reader-hardening-pass' validate, which saw the red and the clean rerun, and promoted at its close. Re-verified by reading the staging step. Owner lookup: `remap`, `installer_smoke`, `check-tree-terms`, `cargo test` in this file and the disposed-findings record — none; [validate-suite-wall-clock-unowned](#validate-suite-wall-clock-unowned) and [build-native-obligation-unconditional](#build-native-obligation-unconditional), both DISTINCT (the suites' serial cost, a rebuild owed by a crate-free commit); owner installer/SPEC.md §The consumer smoke.
 
+### front-matter-dotted-closer
+
+[cost: event/low] [surface: canon-kit]
+
+the shared front-matter reader (`front_matter_span` in `native/src/spec.rs`) takes a line of three hyphens as a block's only closer. Jekyll also closes a block on a line of three dots, so a page closed that way is read as carrying no block and its metadata is scanned as body by the six gates on the reader, where canon-kit/SPEC.md §The shared spec adapters calls the reading Jekyll's.
+
+**Deliverable:** the closer set stated in that section and read by the reader, with a unit row for the dotted form.
+
+**Inferred, not run:** that a gate on the reader gains a finding or a long measure on such a page — close a scratch page's block on three dots and run the six gates over it
+
+**Cost while deferred:** a page closing its front matter on dots can gain a false finding or be measured long. Filed 2026-10-09 off crate-reader-hardening-pass' close second-vendor review, which ran Jekyll 4.4.1 on such a page and got the body, and carried to the next scope's intake. Re-verified there: the reader's closing rule compares a trimmed line with three hyphens alone. Owner lookup: `three dots`, `closer`, `front matter` in this file and the disposed-findings record — [plugin-front-matter-yaml](#plugin-front-matter-yaml), DISTINCT (the plugin gate's own reader); `front-matter-reader-siblings`, done, DISTINCT (the shared reader and the unclosed opener); owner canon-kit/SPEC.md §The shared spec adapters.
+
+### action-walk-yaml-shapes
+
+[cost: event/low] [surface: gate-sdk]
+
+the job-partitioned action walk in `native/src/actions.rs` misreads three shapes of valid YAML. A `run` key whose block-scalar indicator is followed by a comment is taken as a one-line scalar, so the body below it is unread. A quoted `uses` value followed by a comment keeps its closing quote, so `check-action-step-order` refuses a job whose step is on the action. A `steps` sequence whose dashes sit at the `steps` key's own column leaves every step unread. The first and third reach `check-action-gh-repo` and `check-action-permissions` through the shared walk.
+
+**Deliverable:** a fixture row per shape, or each stated as a limit in the sections that own the walk.
+
+**Inferred, not run:** the second and third shapes, the reviewer's claims held by reading the walk — write each into a scratch workflow and run the three gates over it
+
+**Cost while deferred:** two silent passes and one false refusal on workflow text an adopter may write. Filed 2026-10-09 off crate-reader-hardening-pass' close second-vendor review and carried to the next scope's intake. Re-verified there for the first shape: `is_block_scalar` admits an indicator, a chomping sign and digits, and nothing after them. Owner lookup: `block scalar`, `actions.rs`, `steps sequence`, `check-action-` in this file and the disposed-findings record — [site-health-probe-unexecuted](#site-health-probe-unexecuted), DISTINCT (a probe step no oracle executes); `toolchain-action-order-ungated`, done, DISTINCT (the gate on this walk, which scoped none of the three); owner gate-sdk/SPEC.md §check-action-gh-repo.
+
+### hook-staging-fixed-sibling
+
+[cost: event/low] [surface: gate-sdk]
+
+the hook placement stages each replacement under one fixed sibling name (`STAGED_SUFFIX` in `native/src/emit/install_hooks.rs`). Two placements running at once can remove or rename each other's sibling. A sibling a killed run left, where it cannot be removed, is written through by the copy fallback, which opens the existing name: a hard link to the binary and to the served hooks. gate-sdk/SPEC.md §install-hooks says a cut-short copy leaves the placed hook in place, and on that path it can truncate it.
+
+**Deliverable:** a per-run sibling name, or the removal's failure refused before the copy, with a crate case for a surviving sibling.
+
+**Inferred, not run:** both cases, held by reading the staging function — leave an unremovable sibling linked to a placed hook and run the placement; a third candidate, a rename over a hook that is the running executable on Windows, is unconfirmed
+
+**Cost while deferred:** a placement after a killed run can truncate the binary every placed hook links to. Filed 2026-10-09 off crate-reader-hardening-pass' close second-vendor review and carried to the next scope's intake. Re-verified there: the suffix is one constant. Owner lookup: `sibling`, `install_hooks`, `staging`, `hard link` in this file and the disposed-findings record — none on this function; `hook-refresh-unlinks-first`, done, DISTINCT (the rename, which scoped neither concurrency nor a surviving sibling); owner gate-sdk/SPEC.md §install-hooks.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
