@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+crate-reader-hardening-pass gates sha256=e8394455813d5e186650929b65bb62fc4ce13dd07db2f81ca4e521a24d613eff pass=152 fail=0 ignore=0 verdict=clean 2026-10-09
+crate-reader-hardening-pass gate_sdk sha256=0db30fa7aadcf36c1a84c6f626ee97d38b8624ce30e03c80ee692e1682880abd pass=1 fail=0 ignore=0 verdict=clean 2026-10-09
+crate-reader-hardening-pass canon_kit sha256=94adc56304517c48e98925ef1b60184e537116f84dcc77387eb157e8108c8d50 pass=1 fail=0 ignore=0 verdict=clean 2026-10-09
+crate-reader-hardening-pass context_kit sha256=a72a655fbdc2336af37022b95846efa73ffc06864ae2241f7ed48d2867d96cc0 pass=1 fail=0 ignore=0 verdict=clean 2026-10-09
+crate-reader-hardening-pass delegation_kit sha256=e8b7dacc5b3a03c2084bd61274ee3c701400be4001eeaafa4126bc7f4b710363 pass=1 fail=0 ignore=0 verdict=clean 2026-10-09
+crate-reader-hardening-pass doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-10-09
+crate-reader-hardening-pass evidence_kit sha256=c62871f8123949178b90372d234262f4c133b06c830e8faa9bbb9af4d2767fea pass=1 fail=0 ignore=0 verdict=clean 2026-10-09
+crate-reader-hardening-pass guard_kit sha256=01d94b4120e133665e01946fe44d31a730d2c6cdfd1570e5ce6b96a7a1b30e1b pass=1 fail=0 ignore=0 verdict=clean 2026-10-09
+crate-reader-hardening-pass lifecycle_kit sha256=3443faac1a321c44bbb9958c3e699d905d1cf0b2fd04e67fa0b798773a4fca0e pass=1 fail=0 ignore=0 verdict=clean 2026-10-09
+crate-reader-hardening-pass queue_kit sha256=a4c89486a636a6d9c43ded5bbbb06f21bd7c7b3db7a8a330bdcf89eb952b9f7d pass=1 fail=0 ignore=0 verdict=clean 2026-10-09
+crate-reader-hardening-pass site_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-10-09
+crate-reader-hardening-pass scripts sha256=41d1316ce84634ce2cd5489d89516c6da7179b572ad9251dbee8c05f36f808a0 pass=1 fail=0 ignore=0 verdict=clean 2026-10-09
+crate-reader-hardening-pass guard_tests sha256=cf5ff176b69d3b14f74d3dfc4c0e07bf7b796801b2101379b363c23c82f7c5a1 pass=1 fail=0 ignore=0 verdict=clean 2026-10-09
+crate-reader-hardening-pass demo sha256=13ed5c17d67fdc5b10e0a3afb241052e98ecb34dec604a8d58f997e37d7b3c68 pass=1 fail=0 ignore=0 verdict=clean 2026-10-09
+crate-reader-hardening-pass installer_smoke sha256=bfdcb9213c4d6107485664d00601692bb0f7cd8247b1057ed5099f341fed0642 pass=28 fail=0 ignore=0 verdict=clean 2026-10-09
+crate-reader-hardening-pass consumer_smoke sha256=bde155aa454496ae9c72a5a5cb9e53084b759c20de056faf8f9dea947ea122d6 pass=1 fail=0 ignore=0 verdict=clean 2026-10-09
+crate-reader-hardening-pass upgrade sha256=4ce0203dff1d92a8de64f3725473c4ebd01317e04bd76f67a3ff3916e3d0bdfa pass=1 fail=0 ignore=0 verdict=clean 2026-10-09
+crate-reader-hardening-pass agents_md_smoke sha256=7f4fb28f88f7d58580b262fea33b4ce88502480813deba5faf9dfb90685f7971 pass=1 fail=0 ignore=0 verdict=clean 2026-10-09
+crate-reader-hardening-pass index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-10-09
+crate-reader-hardening-pass native_crate sha256=25dce7fdabfb28e4fe1c7be0c28fbd67886ae500f5d1602956320ef235f046af pass=1 fail=0 ignore=0 verdict=clean 2026-10-09
+crate-reader-hardening-pass projection_witness sha256=e7bc189ff4a91f90e992fd3e3d40037381b844586f337ed89eae708b1772d29d pass=1 fail=0 ignore=0 verdict=clean 2026-10-09
