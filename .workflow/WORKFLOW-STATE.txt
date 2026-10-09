@@ -10,3 +10,4 @@ crate-reader-hardening-pass align a55c8422 2026-10-09 e9294f3f9
 crate-reader-hardening-pass build a3f5a8e6 2026-10-09 6c9459dfb
 crate-reader-hardening-pass build acebe604 2026-10-09 562dda71e
 crate-reader-hardening-pass build a75e0f84 2026-10-09 4c6dfae11
+crate-reader-hardening-pass validate a5d6387b 2026-10-09 2bb24361c
