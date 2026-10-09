@@ -28,6 +28,30 @@ the `--queue` arm panics when its stdout closes before its post-check line: `--q
 
 **Cost while deferred:** a reader piping an arm into a line-limiting filter sees a panic trace beside a write that succeeded. Filed 2026-10-08 by foreign-stage-binding-pass' build. Re-verified at that close by reading the verb's source: one print ahead of the post-check and one after it, each the panicking macro; `--emit queue-edges` piped the same way left stderr empty. Owner lookup: `panic`, `pipe`, `stdout` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §The non-gate arm.
 
+### listing-line-form-readers
+
+[spec: SPEC-tracked-listing.md]
+
+a tracked-set listing read in git's line form takes a quoted name as a path: git quotes a member whose name carries a non-ASCII byte, a double quote or a backslash there. `tracked-set-quoted-path-names` closed it for the one reader `check-portability-floor` and `check-harness-literal` share, which now lists NUL-terminated. A grep of `native/src` for a listing argv carrying no NUL flag finds the same split in some two dozen more modules, `check-docs-liquid-parse`'s two listings, the enum-sets emitter and the crate-fingerprint read among them.
+
+**Deliverable:** every listing reader on the NUL-terminated form, through one shared reader where the callers allow it; a crate case listing a scratch repository that holds such names; and a holder that reds a line-form listing argv in the crate, its form spec's.
+
+**Operator direction 2026-10-09, lead-relayed (not a ruling):** the source stamp's listing keeps the line form, the reason carried in the holder's own exemption roster, and its shell holders ride the gap filed that day. Run at spec over a scratch repository tracking two non-ASCII names: three docs gates read one page of two and exited clean, and `check-root-tiering` redded a quoted first component; seven sites read emptiness alone.
+
+**Cost while deferred:** a docs page, template or kit member under such a name is misclassified or unreadable to the gate that lists it; no tracked file here carries one. Filed 2026-10-09 by tier-resolution-pass' build. Re-verified by grep at that close, which widened the filing's three readers to the count above. Owner lookup: `ls-files`, `line-form`, `NUL-term`, `quoted spelling` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §check-portability-floor.
+
+### tracked-name-lossy-decode
+
+[spec: SPEC-tracked-listing.md]
+
+the shared tracked-set reader decodes git's NUL-terminated listing lossily (`native/src/gates/portability_floor.rs`), so a tracked member whose name is not valid UTF-8 is opened under a replacement-character spelling: `check-portability-floor` and `check-harness-literal` exit 2 naming a path that does not exist, the symptom `tracked-set-quoted-path-names` closed for quoted names, and would scan another file where that spelling happens to exist. gate-sdk/SPEC.md §check-portability-floor states the NUL form and says nothing of a name's encoding.
+
+**Deliverable:** the reader carries a member's bytes as a path, or the section states that a non-UTF-8 name fails closed, with a case on a host that admits one.
+
+**Lead decision 2026-10-09, off this entry's own Deliverable (not an operator direction):** a non-UTF-8 name fails closed, the section stating it and the case running on a host that admits one. Run at spec over a scratch repository tracking such a name: `check-harness-literal` exits 2 on the replacement-character spelling, and `check-portability-floor` exits 2 earlier, at the crate's directory lister.
+
+**Cost while deferred:** an adopter tracking such a file cannot run either gate. Filed 2026-10-09 by tier-resolution-pass' close off its second-vendor review, and promoted at the next scope's intake. Re-verified there by grep: the listing read ends in a lossy decode. Owner lookup: `UTF-8`, `lossy`, `replacement character` in this file and the disposed-findings record — [listing-line-form-readers](#listing-line-form-readers), DISTINCT (the listing's form, not a name's decoding); one unit could carry both.
+
 ## Technical Debt
 
 ### stop-test-reads-local-overlay
@@ -526,18 +550,6 @@ rule `sed_file`'s inline-python arm took one of two like calls in delegation-wai
 
 **Cost while deferred:** the steer toward the count-asserting rewrite arm is skipped by a shape nobody has named. Filed 2026-10-08 by delegation-wait-journal-pass' close, after its drain, and promoted at the next scope's intake. Re-verified: the rule entry blocks a literal rewrite carrying no computed-text construct and says it leans toward passing. Owner lookup: `python`, `--rewrite`, `heredoc`, `sed_file` in this file and the disposed-findings record — none; owner guard-kit/SPEC.md §The generic ruleset.
 
-### listing-line-form-readers
-
-[cost: event/low] [surface: native]
-
-a tracked-set listing read in git's line form takes a quoted name as a path: git quotes a member whose name carries a non-ASCII byte, a double quote or a backslash there. `tracked-set-quoted-path-names` closed it for the one reader `check-portability-floor` and `check-harness-literal` share, which now lists NUL-terminated. A grep of `native/src` for a listing argv carrying no NUL flag finds the same split in some two dozen more modules, `check-docs-liquid-parse`'s two listings, the enum-sets emitter and the crate-fingerprint read among them.
-
-**Deliverable:** every listing reader on the NUL-terminated form, through one shared reader where the callers allow it; a crate case listing a scratch repository that holds such names; and a holder that reds a line-form listing argv in the crate, its form spec's.
-
-**Operator direction 2026-10-09, lead-relayed (not a ruling):** the source stamp's listing keeps the line form, the reason carried in the holder's own exemption roster, and its shell holders ride the gap filed that day. Run at spec over a scratch repository tracking two non-ASCII names: three docs gates read one page of two and exited clean, and `check-root-tiering` redded a quoted first component; seven sites read emptiness alone.
-
-**Cost while deferred:** a docs page, template or kit member under such a name is misclassified or unreadable to the gate that lists it; no tracked file here carries one. Filed 2026-10-09 by tier-resolution-pass' build. Re-verified by grep at that close, which widened the filing's three readers to the count above. Owner lookup: `ls-files`, `line-form`, `NUL-term`, `quoted spelling` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §check-portability-floor.
-
 ### agent-effort-line-unmeasured
 
 [cost: event/low] [surface: delegation-kit]
@@ -547,18 +559,6 @@ that an agent definition's effort line sets its child's effort (delegation-kit/S
 **Deliverable:** one dispatch of a definition whose effort differs from its dispatcher's running effort, `--model-verdict` read in the child, and the Honest-limits sentence rewritten to the result.
 
 **Cost while deferred:** a class's bound effort is trusted on the harness's documentation, so a harness that ignored the line would run every class at the dispatcher's effort with the generated line and its freshness gate both green. Filed 2026-10-09 by tier-resolution-pass' close after its drain, and promoted at the next scope's intake. Re-verified there by grep: the five tracked definitions state one effort. Owner lookup: `effort`, `model-verdict`, `Honest limits` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §check-agent-tier-explicit.
-
-### tracked-name-lossy-decode
-
-[cost: event/low] [surface: native]
-
-the shared tracked-set reader decodes git's NUL-terminated listing lossily (`native/src/gates/portability_floor.rs`), so a tracked member whose name is not valid UTF-8 is opened under a replacement-character spelling: `check-portability-floor` and `check-harness-literal` exit 2 naming a path that does not exist, the symptom `tracked-set-quoted-path-names` closed for quoted names, and would scan another file where that spelling happens to exist. gate-sdk/SPEC.md §check-portability-floor states the NUL form and says nothing of a name's encoding.
-
-**Deliverable:** the reader carries a member's bytes as a path, or the section states that a non-UTF-8 name fails closed, with a case on a host that admits one.
-
-**Lead decision 2026-10-09, off this entry's own Deliverable (not an operator direction):** a non-UTF-8 name fails closed, the section stating it and the case running on a host that admits one. Run at spec over a scratch repository tracking such a name: `check-harness-literal` exits 2 on the replacement-character spelling, and `check-portability-floor` exits 2 earlier, at the crate's directory lister.
-
-**Cost while deferred:** an adopter tracking such a file cannot run either gate. Filed 2026-10-09 by tier-resolution-pass' close off its second-vendor review, and promoted at the next scope's intake. Re-verified there by grep: the listing read ends in a lossy decode. Owner lookup: `UTF-8`, `lossy`, `replacement character` in this file and the disposed-findings record — [listing-line-form-readers](#listing-line-form-readers), DISTINCT (the listing's form, not a name's decoding); one unit could carry both.
 
 ## Icebox
 
