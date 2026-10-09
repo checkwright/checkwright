@@ -70,7 +70,7 @@ The definition generator writes a class's effort, and the tier verdict reports t
 
 **Honest limits.** A harness environment variable that forces every session's effort overrides a definition's line, the shape §The delegation model refuses for the subagent-model override; the verdict's clause is what surfaces it. A definition's line reaches only sessions started after it lands, as its `model:` does.
 
-**Inferred, not run:** that a definition carrying `effort: <level>` dispatches its child at that level — from a session started after the line lands, dispatch the type and run `--model-verdict <the child's id>`, reading its `effort=` field
+**Inferred, cannot run before build:** that a definition carrying `effort: <level>` dispatches its child at that level — the verdict's `effort=` field and the generated line exist only once build lands them, and a definition reaches only sessions started after it lands; the run is a dispatch of the type from such a session, then `--model-verdict <the child's id>`
 
 The cases: the fixture pair of `check-agent-tier-explicit` gains a good definition holding its class's effort and a bad one with a stale `effort:` line; crate tests for the verdict's `effort=` field, its `-`, and the clause.
 

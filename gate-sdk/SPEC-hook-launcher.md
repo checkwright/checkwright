@@ -50,7 +50,7 @@ No fixture builds the crate, `gate-tests/native-git-hooks.test.sh` included, and
 
 Replacement text for §git-hook, the two sentences from "A placed hook therefore never judges" to "the judging build is the installed one". **Not yet applied.**
 
-> A placed hook therefore never judges, a line of the knob files included: it reads `GATE_SDK_NATIVE_BIN` by name and leaves every other line to the build it starts. A hook is a hard link, so a writer that rewrites the binary's file in place carries the hook with it, as the install placement does (installer/SPEC.md §Placement). A writer that replaces the file leaves the hook on the previous build, acting only as a launcher: the crate build does, which is why it refreshes the hooks itself (§build-native), and so does a hook placed as a copy.
+> A placed hook therefore never judges, a line of the knob files included: it reads `GATE_SDK_NATIVE_BIN` by name and leaves every other line to the build it starts. A hook is a hard link, so a writer that rewrites the binary's file in place carries the hook with it, as the install placement does (installer/SPEC.md §Placement). A writer that replaces the file leaves the hook on the previous build, acting only as a launcher: the crate build does, which is why it refreshes the hooks itself (§build-native), a checkout that replaces a tracked binary does, and so does a hook placed as a copy.
 
 Replacement text for §install-hooks' opening sentence. **Not yet applied.**
 
@@ -60,9 +60,7 @@ Added to §install-hooks after "A re-run replaces both files and is otherwise id
 
 > **`--refresh` re-places the files of a clone already opted in and changes nothing else**: no config write, no identity rung, no receipt. It prints `install-hooks: refreshed <hooks-dir>`. A clone not opted in, or a working directory that is not the work-tree top, is a silent exit 0, so a build script may call it unconditionally.
 
-**Inferred, not run:** that a checkout replacing a tracked binary leaves a teammate's hard-linked hook on the previous build — in a scratch repository that tracks a binary, link a file to it, check out a commit that changes it, and run `ls -li` on the two
-
-Where that run shows the link left behind, §git-hook's list of replacing writers gains the checkout; where the link follows, the replacement text above stands as written.
+Measured for the checkout: in a scratch repository tracking a binary, a hard link to it kept the previous content after a checkout of a commit changing the file, and the file's inode differed from the link's. A checkout replaces the file, so the replacement text above lists it among the writers that leave a hook behind.
 
 ## Producers and consumers
 
@@ -82,7 +80,7 @@ Where that run shows the link left behind, §git-hook's list of replacing writer
 - `native/src/emit/install_hooks.rs` — the option and its three no-op branches (delta 2).
 - `native/src/runner.rs` — the usage line and help paragraph for `--install-hooks` (delta 2).
 - `gate-sdk/gate-tests/native-git-hooks.test.sh` — the cases deltas 1 and 2 name.
-- `installer/SPEC.md` §Reviewing the pre-commit hook — "each a hard link to the gate binary, or a copy where the link cannot be made" stands; the paragraph gains nothing unless delta 4's inferred claim comes back false, in which case it names the checkout (delta 4).
+- `installer/SPEC.md` §Reviewing the pre-commit hook — "each a hard link to the gate binary, or a copy where the link cannot be made" stands; the paragraph gains nothing, since a binary a clone tracks is outside what the installer places (delta 4).
 - `.workflow/release-declarations.md` — the `--install-hooks` behavior entry gains `--refresh` and the launcher's one-name read (deltas 1 and 2).
 - `docs/gate-sdk/SPEC.md` — the generated mirror, stale the moment any of them lands (all deltas).
 
