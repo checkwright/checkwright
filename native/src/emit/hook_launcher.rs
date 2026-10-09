@@ -252,7 +252,7 @@ mod tests {
         let absent = d.join("absent.knobs").display().to_string();
         let missing = bin_from(None, &dir, Some(&absent)).expect_err("a named file that is absent");
         let _ = std::fs::remove_dir_all(&d);
-        let at = format!("{}:", tracked.display());
+        let at = format!("{}/gate-sdk-config.knobs:", dir);
         for (bad, e) in &got {
             let lno = if bad.contains('#') { 4 } else { 2 };
             assert!(e.starts_with(&format!("{}{}: ", at, lno)), "{:?} gave {}", bad, e);
