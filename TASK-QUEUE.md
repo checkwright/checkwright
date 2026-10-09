@@ -18,6 +18,16 @@ no gate holds gate-sdk/SPEC.md §check-crate-arms' statement that every workflow
 
 **Cost while deferred:** the next job added with a bare toolchain call keeps the unretried fetch, and a registry blip reds its leg with no cause in the tree. Filed 2026-10-09 by tier-resolution-pass' build. Re-verified: no file under `native/src`, `gate-sdk/checks` or `scripts` names the action's path. Owner lookup: `retry`, `composite action`, `toolchain-fetch`, `proxy job` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §check-crate-arms.
 
+### arm-stdout-close-panic
+
+[spec: SPEC-stdout-reader.md]
+
+the `--queue` arm panics when its stdout closes before its post-check line: `--queue done <slug>` piped into a one-line filter printed its done line, ran the queue's gates, then died in the standard print macro on a broken pipe. The write had landed and the tree was correct.
+
+**Deliverable:** an arm whose reader has gone exits with no panic trace, on a status that still tells a landed write from a refused one. Whether per arm or once at process start is spec's, and gate-sdk/SPEC.md §The non-gate arm states it.
+
+**Cost while deferred:** a reader piping an arm into a line-limiting filter sees a panic trace beside a write that succeeded. Filed 2026-10-08 by foreign-stage-binding-pass' build. Re-verified at that close by reading the verb's source: one print ahead of the post-check and one after it, each the panicking macro; `--emit queue-edges` piped the same way left stderr empty. Owner lookup: `panic`, `pipe`, `stdout` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §The non-gate arm.
+
 ## Technical Debt
 
 ### stop-test-reads-local-overlay
@@ -515,18 +525,6 @@ rule `sed_file`'s inline-python arm took one of two like calls in delegation-wai
 **Inferred, not run:** that a computed-text construct in the first body told them apart, the discriminator the rule entry states — neither body was replayed through the hook
 
 **Cost while deferred:** the steer toward the count-asserting rewrite arm is skipped by a shape nobody has named. Filed 2026-10-08 by delegation-wait-journal-pass' close, after its drain, and promoted at the next scope's intake. Re-verified: the rule entry blocks a literal rewrite carrying no computed-text construct and says it leans toward passing. Owner lookup: `python`, `--rewrite`, `heredoc`, `sed_file` in this file and the disposed-findings record — none; owner guard-kit/SPEC.md §The generic ruleset.
-
-### arm-stdout-close-panic
-
-[cost: event/low] [surface: native]
-
-the `--queue` arm panics when its stdout closes before its post-check line: `--queue done <slug>` piped into a one-line filter printed its done line, ran the queue's gates, then died in the standard print macro on a broken pipe. The write had landed and the tree was correct.
-
-**Deliverable:** an arm whose reader has gone exits with no panic trace, on a status that still tells a landed write from a refused one. Whether per arm or once at process start is spec's, and gate-sdk/SPEC.md §The non-gate arm states it.
-
-**Inferred, not run:** that other arms share it — pipe an arm that prints on both sides of a slow step into `head -1` and read stderr
-
-**Cost while deferred:** a reader piping an arm into a line-limiting filter sees a panic trace beside a write that succeeded. Filed 2026-10-08 by foreign-stage-binding-pass' build. Re-verified at that close by reading the verb's source: one print ahead of the post-check and one after it, each the panicking macro; `--emit queue-edges` piped the same way left stderr empty. Owner lookup: `panic`, `pipe`, `stdout` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §The non-gate arm.
 
 ### listing-line-form-readers
 
