@@ -12,3 +12,4 @@ tier-resolution-pass build aa7be1ee 2026-10-09 454ca35e3
 tier-resolution-pass build a6cbf966 2026-10-09 e4f56af4a
 tier-resolution-pass build ada03c46 2026-10-09 4d8577c6b
 tier-resolution-pass validate abad403e 2026-10-09 fba8e1521
+tier-resolution-pass close ac2ddacb 2026-10-09 be20f0e5c
