@@ -5,3 +5,4 @@
 ---
 
 tier-resolution-pass scope a7420236 2026-10-09 15cdbbfd1
+tier-resolution-pass spec ad6a0d36 2026-10-09 274a9efe1
