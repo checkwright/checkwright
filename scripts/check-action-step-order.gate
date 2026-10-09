@@ -1,0 +1,9 @@
+# graph: couples=*.yml,*.yaml dir=one valve=none tier=precommit
+# spec: gate-sdk/SPEC.md §check-action-step-order — a job whose run: bodies spell a listed program has a step on the listed action ordered before the job's first such spelling
+# knob: GATE_LOCAL_STEP_ORDER_ACTION = ./.github/actions/toolchain
+# knob: GATE_LOCAL_STEP_ORDER_PROGRAMS[] = cargo
+# knob: GATE_LOCAL_STEP_ORDER_PROGRAMS[] = rustc
+# knob: GATE_LOCAL_STEP_ORDER_PROGRAMS[] = rustup
+# knob: GATE_LOCAL_STEP_ORDER_PROGRAMS[] = rustdoc
+# knob: GATE_LOCAL_STEP_ORDER_PROGRAMS[] = rustfmt
+# knob: GATE_LOCAL_STEP_ORDER_PROGRAMS[] = clippy-driver

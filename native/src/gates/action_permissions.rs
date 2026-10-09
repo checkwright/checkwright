@@ -152,7 +152,12 @@ impl Audit {
                 "{}:{}: an {} marker with no reason",
                 self.curfile, line, MARKER
             )),
-            Ev::WorkflowPerms(_, _) | Ev::JobEnv | Ev::StepEnv | Ev::WorkflowEnv => {}
+            Ev::WorkflowPerms(_, _)
+            | Ev::JobEnv
+            | Ev::StepEnv
+            | Ev::WorkflowEnv
+            | Ev::Uses(_, _)
+            | Ev::Word(_, _) => {}
         }
     }
 }
@@ -223,7 +228,7 @@ pub fn run(args: &[String]) -> i32 {
             continue;
         }
 
-        let stream = actions::walk_file(&text, MARKER);
+        let stream = actions::walk_file(&text, MARKER, &[]);
         a.curfile = f.display().to_string();
 
         // spec: gate-sdk/SPEC.md §check-action-permissions — a value the gate cannot resolve is

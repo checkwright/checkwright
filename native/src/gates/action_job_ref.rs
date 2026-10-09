@@ -8,10 +8,6 @@ use std::path::Path;
 
 const KNOB: &str = "GATE_SDK_JOB_REF_PATTERNS";
 
-// spec: gate-sdk/SPEC.md §check-action-job-ref — the gate mints no valve, so the shared walk is
-// handed a marker spelling no line can carry
-const NO_VALVE: &str = "\u{0}";
-
 // spec: gate-sdk/SPEC.md §check-action-job-ref — a single-backtick span on one line; a longer
 // backtick run opens no span this gate reads
 fn code_spans(line: &str) -> Vec<&str> {
@@ -60,7 +56,7 @@ fn job_keys(text: &str) -> Vec<String> {
     if !text.lines().any(|l| l.starts_with("jobs:")) {
         return Vec::new();
     }
-    actions::walk_file(text, NO_VALVE)
+    actions::walk_file(text, actions::NO_VALVE, &[])
         .into_iter()
         .filter_map(|e| match e {
             Ev::Job(name, _) => Some(name),

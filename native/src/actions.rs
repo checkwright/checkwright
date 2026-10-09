@@ -19,6 +19,8 @@ pub enum Ev {
     JobPerms(Perms, usize),
     Token,
     BareMarker(usize),
+    Uses(String, usize),
+    Word(String, usize),
 }
 
 // spec: gate-sdk/SPEC.md §check-action-permissions — the walk hands the resolved shape rather
@@ -30,6 +32,10 @@ pub enum Perms {
     Scopes(Vec<(String, String)>),
     Unreadable(String),
 }
+
+// spec: gate-sdk/SPEC.md §check-action-job-ref — a consumer minting no valve hands the walk a
+// marker spelling no line can carry
+pub const NO_VALVE: &str = "\u{0}";
 
 #[derive(PartialEq, Clone, Copy)]
 enum EnvScope {
@@ -197,8 +203,32 @@ fn marker_reason<'a>(line: &'a str, mark: &str) -> Option<&'a str> {
     )
 }
 
+// spec: gate-sdk/SPEC.md §check-action-step-order — a whole word is bounded on each side by a
+// character outside the class the `gh` detector tests after its token
+fn has_word(s: &str, word: &str) -> bool {
+    if word.is_empty() {
+        return false;
+    }
+    let joins = |c: u8| c.is_ascii_alphanumeric() || c == b'_' || c == b'.' || c == b'-';
+    let b = s.as_bytes();
+    let mut from = 0usize;
+    while let Some(p) = s[from..].find(word) {
+        let start = from + p;
+        let end = start + word.len();
+        if !(start > 0 && joins(b[start - 1])) && !b.get(end).is_some_and(|c| joins(*c)) {
+            return true;
+        }
+        from = start + 1;
+        while from < s.len() && !s.is_char_boundary(from) {
+            from += 1;
+        }
+    }
+    false
+}
+
 pub struct Walk<'a> {
     mark: &'a str,
+    words: &'a [String],
     jobcol: i64,
     jobkeycol: i64,
     stepcol: i64,
@@ -225,9 +255,12 @@ impl<'a> Walk<'a> {
     // spec: gate-sdk/SPEC.md §check-action-gh-repo — the valve's marker token is the caller's,
     // so a second consumer reuses the indentation binding and the required-reason rule under
     // its own spelling rather than copying the state machine to rename one string.
-    fn new(mark: &'a str) -> Self {
+    // spec: gate-sdk/SPEC.md §check-action-step-order — the word list is the caller's as the
+    // marker is, and an empty list yields no word event
+    fn new(mark: &'a str, words: &'a [String]) -> Self {
         Walk {
             mark,
+            words,
             jobcol: -1,
             jobkeycol: -1,
             stepcol: -1,
@@ -330,12 +363,28 @@ impl<'a> Walk<'a> {
         }
     }
 
+    // spec: gate-sdk/SPEC.md §check-action-step-order — a listed word counts anywhere on a body
+    // line, command position not required, and is reported once per line under its own line
+    fn scanwords(&mut self, s: &str, ln: usize) {
+        if self.words.is_empty() || s.trim_start_matches([' ', '\t']).starts_with('#') {
+            return;
+        }
+        for w in self.words {
+            if has_word(s, w) {
+                self.out.push(Ev::Word(w.clone(), ln));
+            }
+        }
+    }
+
     // spec: gate-sdk/SPEC.md §check-action-gh-repo — backslash continuations are joined
     // before matching, so a call split across lines is one unit and its `--repo` is found
     // wherever on the call it sits.
     fn endrun(&mut self) {
         self.inrun = false;
         let buf = std::mem::take(&mut self.rbuf);
+        for (s, ln) in &buf {
+            self.scanwords(s, *ln);
+        }
         let mut acc = String::new();
         let mut accln = 0usize;
         for (s, ln) in buf {
@@ -385,6 +434,7 @@ impl<'a> Walk<'a> {
             if u == "actions/checkout" {
                 self.out.push(Ev::Checkout(ln));
             }
+            self.out.push(Ev::Uses(u.to_string(), ln));
             return;
         }
         if k == "env" {
@@ -403,6 +453,7 @@ impl<'a> Walk<'a> {
             return;
         }
         if !v.is_empty() {
+            self.scanwords(v, ln);
             self.scanlogical(v, ln);
         }
     }
@@ -606,8 +657,8 @@ impl<'a> Walk<'a> {
     }
 }
 
-pub fn walk_file(text: &str, mark: &str) -> Vec<Ev> {
-    let mut w = Walk::new(mark);
+pub fn walk_file(text: &str, mark: &str, words: &[String]) -> Vec<Ev> {
+    let mut w = Walk::new(mark, words);
     for (i, raw) in text.lines().enumerate() {
         w.line(raw, i + 1);
     }
@@ -621,7 +672,7 @@ mod tests {
     const GH: &str = "gh-repo-exempt";
 
     fn gh_hits(body: &str) -> Vec<(usize, bool)> {
-        let mut w = Walk::new(GH);
+        let mut w = Walk::new(GH, &[]);
         w.scanlogical(body, 1);
         w.finish()
             .into_iter()
@@ -679,11 +730,13 @@ mod tests {
         let evs = walk_file(
             "jobs:\n  j:\n    # action-permissions-exempt: stated\n    steps:\n      - run: gh x\n",
             "action-permissions-exempt",
+            &[],
         );
         assert!(evs.iter().any(|e| matches!(e, Ev::JobExempt)));
         assert!(!walk_file(
             "jobs:\n  j:\n    # action-permissions-exempt: stated\n    steps:\n      - run: gh x\n",
-            GH
+            GH,
+            &[],
         )
         .iter()
         .any(|e| matches!(e, Ev::JobExempt)));
@@ -727,7 +780,7 @@ mod tests {
     }
 
     fn perms(text: &str) -> Vec<String> {
-        walk_file(text, GH)
+        walk_file(text, GH, &[])
             .into_iter()
             .filter_map(|e| match e {
                 Ev::WorkflowPerms(p, l) => Some(format!("w:{}:{}", l, shape(&p))),
@@ -773,15 +826,16 @@ mod tests {
         let inside = walk_file(
             "jobs:\n  a:\n    steps:\n      - env:\n          GH_TOKEN: ${{ github.token }}\n",
             GH,
+            &[],
         );
         assert_eq!(inside.iter().filter(|e| matches!(e, Ev::Token)).count(), 1);
-        let outside = walk_file("env:\n  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}\njobs:\n", GH);
+        let outside = walk_file("env:\n  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}\njobs:\n", GH, &[]);
         assert!(!outside.iter().any(|e| matches!(e, Ev::Token)));
     }
 
     #[test]
     fn a_continuation_makes_one_logical_line_of_a_split_call() {
-        let mut w = Walk::new(GH);
+        let mut w = Walk::new(GH, &[]);
         for (i, l) in [
             "jobs:",
             "  j:",
@@ -804,5 +858,55 @@ mod tests {
             })
             .collect();
         assert_eq!(hits, vec![(5, true)]);
+    }
+
+    fn words(text: &str, list: &[&str]) -> Vec<String> {
+        let list: Vec<String> = list.iter().map(|w| w.to_string()).collect();
+        walk_file(text, NO_VALVE, &list)
+            .into_iter()
+            .filter_map(|e| match e {
+                Ev::Word(w, l) => Some(format!("{}@{}", w, l)),
+                Ev::Uses(u, l) => Some(format!("uses:{}@{}", u, l)),
+                _ => None,
+            })
+            .collect()
+    }
+
+    // spec: gate-sdk/SPEC.md §check-action-step-order — whole-word on both sides, anywhere on the
+    // line, a comment line unread
+    #[test]
+    fn a_listed_word_counts_whole_and_anywhere_on_a_body_line() {
+        assert!(has_word("cargo build", "cargo"));
+        assert!(has_word("if ! cargo --version; then", "cargo"));
+        assert!(has_word("env X=1 \"$HOME\"/bin/cargo test", "cargo"));
+        assert!(has_word("echo \"run cargo\"", "cargo"));
+        assert!(!has_word("cargo-deny check", "cargo"));
+        assert!(!has_word("ls ~/.cargo/bin", "cargo"));
+        assert!(!has_word("xcargo build", "cargo"));
+        assert!(!has_word("cat cargo.lock", "cargo"));
+        assert!(!has_word("anything", ""));
+    }
+
+    // spec: gate-sdk/SPEC.md §check-action-step-order — each event carries its own line, and a
+    // caller passing no word receives no word event
+    #[test]
+    fn the_walk_emits_a_steps_ref_and_a_listed_words_line() {
+        let text = concat!(
+            "jobs:\n",
+            "  j:\n",
+            "    steps:\n",
+            "      - uses: ./.github/actions/toolchain\n",
+            "      - uses: \"actions/checkout@v4\"\n",
+            "      - run: |\n",
+            "          # cargo is not read here\n",
+            "          echo one \\\n",
+            "            && cargo build\n",
+            "      - run: rustc --version\n",
+        );
+        assert_eq!(
+            words(text, &["cargo", "rustc"]),
+            vec!["uses:./.github/actions/toolchain@4", "uses:actions/checkout@5", "cargo@9", "rustc@10"]
+        );
+        assert_eq!(words(text, &[]), vec!["uses:./.github/actions/toolchain@4", "uses:actions/checkout@5"]);
     }
 }

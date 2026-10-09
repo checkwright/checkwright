@@ -6,6 +6,7 @@ pub mod action_permissions;
 pub mod action_pinning;
 pub mod action_run_path;
 pub mod action_run_shell;
+pub mod action_step_order;
 pub mod amendment_queue;
 pub mod amendment_retired_spelling;
 pub mod amendment_update_target;
@@ -1794,6 +1795,21 @@ pub const REGISTRY: &[GateEntry] = &[
         &["GATE_LOCAL_WORKFLOWS_DIR"],
         "-",
         &[("git", "")],
+    ),
+    // spec: gate-sdk/SPEC.md §check-action-step-order — the scan root is its cohort's `?`-free
+    // default walk, and the action and the program set are the declaring descriptor's
+    (
+        "check-action-step-order",
+        action_step_order::run,
+        &[(".", "ext:lit:yml,yaml", "", "")],
+        &[
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+            "GATE_LOCAL_STEP_ORDER_ACTION",
+            "GATE_LOCAL_STEP_ORDER_PROGRAMS",
+        ],
+        "-",
+        &[],
     ),
     (
         "check-release-channel-parity",

@@ -1,0 +1,4 @@
+# Reject case: a job with no step on the action, one whose step follows the
+# spelling, one whose only step on the action sits in another job, and a
+# spelling behind `if`, outside command position.
+tree

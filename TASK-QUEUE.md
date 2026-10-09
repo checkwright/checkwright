@@ -8,16 +8,6 @@
 
 ## New Features
 
-### toolchain-action-order-ungated
-
-[spec: SPEC-step-order.md]
-
-no gate holds gate-sdk/SPEC.md §check-crate-arms' statement that every workflow job calling the toolchain takes the retrying composite action ahead of its first such call. The class was met twice, each time by review and grep: `toolchain-fetch-no-retry` landed the action on the cargo jobs and left five jobs whose first call is a compiler version read, which `toolchain-action-proxy-jobs` moved.
-
-**Deliverable:** an arm on the job-partitioned workflow walk that reds a job whose run step spells a toolchain program with no earlier step on the action, with its fixture pair; a feature, since it adds an assertion. A call reached through a script is outside what such a read sees, and the section says so.
-
-**Cost while deferred:** the next job added with a bare toolchain call keeps the unretried fetch, and a registry blip reds its leg with no cause in the tree. Filed 2026-10-09 by tier-resolution-pass' build. Re-verified: no file under `native/src`, `gate-sdk/checks` or `scripts` names the action's path. Owner lookup: `retry`, `composite action`, `toolchain-fetch`, `proxy job` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §check-crate-arms.
-
 ## Technical Debt
 
 ### hook-refresh-unlinks-first
@@ -1196,4 +1186,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - tracked-name-lossy-decode
 - front-matter-reader-siblings
 - arm-stdout-close-panic
+- toolchain-action-order-ungated
 

@@ -1,0 +1,27 @@
+name: ordered
+on: push
+jobs:
+  ordered:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/toolchain
+      - run: |
+          rustc -vV
+          cargo build --release
+  quiet:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo nothing listed
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          # cargo build would fetch, and this line is not read
+          echo done
+  longer:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          ls ~/.cargo/bin
+          cargo-deny --version

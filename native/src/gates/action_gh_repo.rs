@@ -118,7 +118,12 @@ impl Audit {
             }
             // spec: gate-sdk/SPEC.md §check-action-permissions — an existing consumer ignores a
             // stream member it has no arm for, which is what makes widening the stream additive.
-            Ev::WorkflowEnv | Ev::WorkflowPerms(_, _) | Ev::JobPerms(_, _) | Ev::Token => {}
+            Ev::WorkflowEnv
+            | Ev::WorkflowPerms(_, _)
+            | Ev::JobPerms(_, _)
+            | Ev::Token
+            | Ev::Uses(_, _)
+            | Ev::Word(_, _) => {}
             Ev::BareMarker(line) => self.bare.push(format!(
                 "{}:{}: a {} marker with no reason",
                 self.curfile, line, MARKER
@@ -187,7 +192,7 @@ pub fn run(args: &[String]) -> i32 {
             continue;
         }
 
-        let stream = actions::walk_file(&text, MARKER);
+        let stream = actions::walk_file(&text, MARKER, &[]);
         a.curfile = f.display().to_string();
         a.wenv = stream.iter().any(|e| matches!(e, Ev::WorkflowEnv));
         for ev in stream {

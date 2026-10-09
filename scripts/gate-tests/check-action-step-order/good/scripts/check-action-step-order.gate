@@ -1,0 +1,5 @@
+# graph: couples=*.yml,*.yaml dir=one valve=none tier=precommit
+# spec: gate-sdk/SPEC.md §check-action-step-order — the case's own declaration of the action and the program set its run reads
+# knob: GATE_LOCAL_STEP_ORDER_ACTION = ./.github/actions/toolchain
+# knob: GATE_LOCAL_STEP_ORDER_PROGRAMS[] = cargo
+# knob: GATE_LOCAL_STEP_ORDER_PROGRAMS[] = rustc

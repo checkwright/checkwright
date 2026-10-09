@@ -1,0 +1,28 @@
+name: unordered
+on: push
+jobs:
+  bare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo test --release
+  late:
+    runs-on: ubuntu-latest
+    steps:
+      - run: rustc -vV
+      - uses: ./.github/actions/toolchain
+  lender:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/actions/toolchain
+  borrower:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          cargo build
+  conditional:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          if ! cargo --version; then exit 2; fi
+      # - uses: ./.github/actions/toolchain
