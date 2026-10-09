@@ -54,16 +54,6 @@ the shared tracked-set reader decodes git's NUL-terminated listing lossily (`nat
 
 ## Technical Debt
 
-### stop-test-reads-local-overlay
-
-scripts/gate-tests/subagent-stop-reader.test.sh fails six assertions wherever the consumer's gitignored delegation overlay binds a foreign tier row on a class outside the kit's default roster, so `check-crate-arms` and the full battery red there while CI, which holds no overlay, stays green. Its unresolved case points `DELEGATION_KIT_KNOB_FILE` at a scratch file holding the liveness command alone. The class roster then falls to the kit default while the overlay is still read from the gates directory (gate-sdk/SPEC.md §The knob file), the hook reports a malformed delegation config and allows the turn end, and the case reads exit 0 where it wants 2.
-
-**Deliverable:** the case's scratch binding made whole against whatever the overlay holds, the gates directory relocated with the knob file or the tracked roster carried into the scratch file, and the suite green under an overlay naming a class the default roster lacks.
-
-**Promoted 2026-10-09, operator direction, lead-relayed (not a ruling):** it leads a set of eight on the crate's readers, with [hook-refresh-unlinks-first](#hook-refresh-unlinks-first), [tier-value-validator-gaps](#tier-value-validator-gaps), [front-matter-reader-siblings](#front-matter-reader-siblings), [listing-line-form-readers](#listing-line-form-readers), [tracked-name-lossy-decode](#tracked-name-lossy-decode), [arm-stdout-close-panic](#arm-stdout-close-panic) and [toolchain-action-order-ungated](#toolchain-action-order-ungated). The set needs the closing push alone.
-
-**Cost while deferred:** the commit-time full battery reds on any seat whose overlay binds such a row, this one since the four-class binding, and a commit reaching the crate is refused there. Filed 2026-10-09 by the scope after tier-resolution-pass, off its own battery run. Run there: the suite passes against a scratch gates directory whose overlay lacks the two rows the refusal names, and fails the same six assertions with them restored. Owner lookup: `overlay`, `KNOB_FILE`, `subagent-stop`, `hermetic` in this file and the disposed-findings record — the icebox's hermetic-harness-export-masks-the-condition-under-test, DISTINCT (a harness pinning too much, where this one pins too little); owner delegation-kit/SPEC.md §Layout and configuration.
-
 ### hook-refresh-unlinks-first
 
 a hook refresh can leave a served hook absent, and the build script then says the opposite. The placement behind `--install-hooks --refresh` removes an existing hook file before it links or copies the replacement (`native/src/emit/install_hooks.rs`, `place`), so where the link and the copy both fail the hook is gone and git runs no hook it cannot find; gate-sdk/bin/build-native.sh then prints that the hooks stay on the previous build. gate-sdk/SPEC.md §build-native says a hook that could not be refreshed is named rather than silently left behind.
@@ -1249,4 +1239,6 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 `check-memory-off` derives the memory dir from the repository toplevel, so a linked-worktree session's memory may land where no scan reads if the harness keys that dir on a canonical working-copy root, a keying read from its bundle and never observed.
 
 ## Done
+
+- stop-test-reads-local-overlay
 

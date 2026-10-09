@@ -91,7 +91,9 @@ want no-binary-message "$(cat "$tmp/no-binary.err")" "absent or not" "build-nati
 #      them would not spawn at all, and this arm is where that requirement is executable.
 mute="$tmp/mute-reader.sh"; printf '#!/usr/bin/env bash\nexit 2\n' > "$mute"; chmod +x "$mute"
 printf 'DELEGATION_KIT_LIVENESS_CMD[] = %s\n' "$mute" > "$tmp/mute.knobs"
-line="$(fire unresolved "$absent" 2 DELEGATION_KIT_KNOB_FILE="$tmp/mute.knobs")"
+# spec: gate-sdk/SPEC.md §The knob file — the local overlay stays in the gates directory when the tracked file is relocated, so the gates directory moves with it
+mkdir -p "$tmp/mute-gates"
+line="$(fire unresolved "$absent" 2 DELEGATION_KIT_KNOB_FILE="$tmp/mute.knobs" GATE_SDK_GATES_DIR="$tmp/mute-gates")"
 want unresolved "$line" "verdict=unresolved" "live=no" "records=0" "decision=refuse"
 want unresolved-message "$(cat "$tmp/unresolved.err")" "turn-end refused" "produced no reading at all"
 
