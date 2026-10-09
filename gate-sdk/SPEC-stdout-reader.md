@@ -28,7 +28,7 @@ Each site writing through a stdout handle of its own, rather than a print macro,
 
 ### (3) A crate test holds it on every platform leg
 
-A crate test runs the built binary with a stdout whose reader is already closed and asserts the status and an empty stderr {design-bearing}. It is a crate test rather than a shell suite because the failure has a Windows form, which only the crate's Windows legs can run (§check-crate-arms). Its cases, each on input it builds:
+A crate test runs the binary cargo builds for the test run, never the installed one at `GATE_SDK_NATIVE_BIN`, with a stdout that is a pipe whose reader is already closed (a closed descriptor is not that case), and asserts the status and an empty stderr {design-bearing}. The binary under test is cargo's because the rule lives in the process entry and `check-crate-arms` answers for the tree's source, never for a binary built earlier (§check-crate-arms). It is a crate test rather than a shell suite because the failure has a Windows form, which only the crate's Windows legs can run (§check-crate-arms). Its cases, each on input it builds:
 
 - a member whose verdict is clean exits 0, and one whose verdict is a finding exits 1;
 - an `--emit-` arm that prints a document exits 0;
