@@ -516,6 +516,52 @@ no gate holds gate-sdk/SPEC.md §check-crate-arms' statement that every workflow
 
 **Cost while deferred:** the next job added with a bare toolchain call keeps the unretried fetch, and a registry blip reds its leg with no cause in the tree. Filed 2026-10-09 by tier-resolution-pass' build. Re-verified: no file under `native/src`, `gate-sdk/checks` or `scripts` names the action's path. Owner lookup: `retry`, `composite action`, `toolchain-fetch`, `proxy job` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §check-crate-arms.
 
+### agent-effort-line-unmeasured
+
+[cost: event/low] [surface: delegation-kit]
+
+that an agent definition's effort line sets its child's effort (delegation-kit/SPEC.md §check-agent-tier-explicit, Honest limits) is unmeasured. tier-resolution-pass' close session ran under a definition stating one effort and read that effort from `--model-verdict`, but its dispatch named none and its dispatcher read the same value, so inheritance explains the reading as well as the definition does. Every tracked definition binds the same effort, so no session of this tree's present binding can tell the two apart.
+
+**Deliverable:** one dispatch of a definition whose effort differs from its dispatcher's running effort, `--model-verdict` read in the child, and the Honest-limits sentence rewritten to the result.
+
+**Cost while deferred:** a class's bound effort is trusted on the harness's documentation, so a harness that ignored the line would run every class at the dispatcher's effort with the generated line and its freshness gate both green. Filed 2026-10-09 by tier-resolution-pass' close after its drain, and promoted at the next scope's intake. Re-verified there by grep: the five tracked definitions state one effort. Owner lookup: `effort`, `model-verdict`, `Honest limits` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §check-agent-tier-explicit.
+
+### tier-value-validator-gaps
+
+[cost: event/low] [surface: delegation-kit]
+
+the tier tables' value validator admits values two of its writers cannot carry (`native/src/tier.rs`, the shared value refusals; delegation-kit/SPEC.md §Layout and configuration). A model or effort spelled as one dash is accepted, while a foreign session's record writes a dash for an absent field and reads one back as absent, so a session opened on such a row loses its pair at the first resume, against §The foreign-vendor run's rule that a session keeps the pair it opened with. An effort is refused only when empty, carrying whitespace or a second comma, and `--emit agent-tiers --write` puts it verbatim after the effort key in a definition's frontmatter, so a value opening with a hash is a YAML comment: the definition's effort is empty while assertion B compares bytes and passes.
+
+**Deliverable:** the validator refuses a lone dash and holds an effort to a plain-scalar shape, each with a crate row.
+
+**Inferred, not run:** that such a row loses its pair or empties a definition's effort — bind one in a scratch tree, open and resume a session on it, and run the write arm
+
+**Cost while deferred:** a consumer binding such a value gets a green battery and a session or definition that silently lacks it; no row here is one. Filed 2026-10-09 by tier-resolution-pass' close off its second-vendor review, and promoted at the next scope's intake. Re-verified there by reading the validator: its refusals are an empty value, whitespace and a second comma. Owner lookup: `frontmatter`, `YAML`, `session.txt` in this file and the disposed-findings record — [plugin-front-matter-yaml](#plugin-front-matter-yaml), DISTINCT (a plugin description strict YAML rejects).
+
+### tracked-name-lossy-decode
+
+[cost: event/low] [surface: native]
+
+the shared tracked-set reader decodes git's NUL-terminated listing lossily (`native/src/gates/portability_floor.rs`), so a tracked member whose name is not valid UTF-8 is opened under a replacement-character spelling: `check-portability-floor` and `check-harness-literal` exit 2 naming a path that does not exist, the symptom `tracked-set-quoted-path-names` closed for quoted names, and would scan another file where that spelling happens to exist. gate-sdk/SPEC.md §check-portability-floor states the NUL form and says nothing of a name's encoding.
+
+**Deliverable:** the reader carries a member's bytes as a path, or the section states that a non-UTF-8 name fails closed, with a case on a host that admits one.
+
+**Inferred, not run:** that either gate exits 2 on such a name — list a scratch repository holding one through the reader
+
+**Cost while deferred:** an adopter tracking such a file cannot run either gate. Filed 2026-10-09 by tier-resolution-pass' close off its second-vendor review, and promoted at the next scope's intake. Re-verified there by grep: the listing read ends in a lossy decode. Owner lookup: `UTF-8`, `lossy`, `replacement character` in this file and the disposed-findings record — [listing-line-form-readers](#listing-line-form-readers), DISTINCT (the listing's form, not a name's decoding); one unit could carry both.
+
+### hook-refresh-unlinks-first
+
+[cost: event/low] [surface: gate-sdk]
+
+a hook refresh can leave a served hook absent, and the build script then says the opposite. The placement behind `--install-hooks --refresh` removes an existing hook file before it links or copies the replacement (`native/src/emit/install_hooks.rs`, `place`), so where the link and the copy both fail the hook is gone and git runs no hook it cannot find; gate-sdk/bin/build-native.sh then prints that the hooks stay on the previous build. gate-sdk/SPEC.md §build-native says a hook that could not be refreshed is named rather than silently left behind.
+
+**Deliverable:** the replacement placed under a sibling name and renamed over the hook, with a case whose replacement cannot be written.
+
+**Inferred, not run:** that a failed copy leaves no partial file git would run — induce the link and copy failures on a read-only hooks directory and list it
+
+**Cost while deferred:** a build on a full or read-only git directory turns the commit gates off with a message saying they still run. Filed 2026-10-09 by tier-resolution-pass' close off its second-vendor review, and promoted at the next scope's intake. Re-verified there by reading both files: the unlink precedes the link, and the script's message is as quoted. Owner lookup: `refresh`, `hooksPath`, `placed hook` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §build-native.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
