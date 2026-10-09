@@ -8,6 +8,16 @@
 
 ## New Features
 
+### toolchain-action-order-ungated
+
+[spec: SPEC-step-order.md]
+
+no gate holds gate-sdk/SPEC.md §check-crate-arms' statement that every workflow job calling the toolchain takes the retrying composite action ahead of its first such call. The class was met twice, each time by review and grep: `toolchain-fetch-no-retry` landed the action on the cargo jobs and left five jobs whose first call is a compiler version read, which `toolchain-action-proxy-jobs` moved.
+
+**Deliverable:** an arm on the job-partitioned workflow walk that reds a job whose run step spells a toolchain program with no earlier step on the action, with its fixture pair; a feature, since it adds an assertion. A call reached through a script is outside what such a read sees, and the section says so.
+
+**Cost while deferred:** the next job added with a bare toolchain call keeps the unretried fetch, and a registry blip reds its leg with no cause in the tree. Filed 2026-10-09 by tier-resolution-pass' build. Re-verified: no file under `native/src`, `gate-sdk/checks` or `scripts` names the action's path. Owner lookup: `retry`, `composite action`, `toolchain-fetch`, `proxy job` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §check-crate-arms.
+
 ## Technical Debt
 
 ### stop-test-reads-local-overlay
@@ -529,16 +539,6 @@ a tracked-set listing read in git's line form takes a quoted name as a path: git
 **Inferred, not run:** that each site misreads such a name, some testing only that a listing is non-empty — list a scratch repository holding a non-ASCII name through each reader
 
 **Cost while deferred:** a docs page, template or kit member under such a name is misclassified or unreadable to the gate that lists it; no tracked file here carries one. Filed 2026-10-09 by tier-resolution-pass' build. Re-verified by grep at that close, which widened the filing's three readers to the count above. Owner lookup: `ls-files`, `line-form`, `NUL-term`, `quoted spelling` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §check-portability-floor.
-
-### toolchain-action-order-ungated
-
-[cost: event/low] [surface: gate-sdk]
-
-no gate holds gate-sdk/SPEC.md §check-crate-arms' statement that every workflow job calling the toolchain takes the retrying composite action ahead of its first such call. The class was met twice, each time by review and grep: `toolchain-fetch-no-retry` landed the action on the cargo jobs and left five jobs whose first call is a compiler version read, which `toolchain-action-proxy-jobs` moved.
-
-**Deliverable:** an arm on the job-partitioned workflow walk that reds a job whose run step spells a toolchain program with no earlier step on the action, with its fixture pair; a feature, since it adds an assertion. A call reached through a script is outside what such a read sees, and the section says so.
-
-**Cost while deferred:** the next job added with a bare toolchain call keeps the unretried fetch, and a registry blip reds its leg with no cause in the tree. Filed 2026-10-09 by tier-resolution-pass' build. Re-verified: no file under `native/src`, `gate-sdk/checks` or `scripts` names the action's path. Owner lookup: `retry`, `composite action`, `toolchain-fetch`, `proxy job` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §check-crate-arms.
 
 ### agent-effort-line-unmeasured
 
