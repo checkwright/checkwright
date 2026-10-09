@@ -4,12 +4,4 @@
 
 ---
 
-foreign-stage-binding-pass scope a770478c 2026-10-08 c4efe520a
-foreign-stage-binding-pass spec af4568f6 2026-10-08 745146724
-foreign-stage-binding-pass align a0526278 2026-10-08 8253909de
-foreign-stage-binding-pass build ac53d4d4 2026-10-08 201d0b781
-foreign-stage-binding-pass build a1a7cf81 2026-10-08 d7294ec63
-foreign-stage-binding-pass build ad12ebc2 2026-10-08 7d75ab599
-foreign-stage-binding-pass build a1e1dc47 2026-10-08 f53ce1843
-foreign-stage-binding-pass validate a448f36a 2026-10-08 e5f3566cd
-foreign-stage-binding-pass close acf32c94 2026-10-08 ff299775d
+— scope a7420236 2026-10-09 15cdbbfd1
