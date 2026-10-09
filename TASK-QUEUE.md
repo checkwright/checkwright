@@ -66,11 +66,11 @@ hosted attestation. The team/paid rung: gates verified server-side by a party th
 
 [cost: iteration/low] [surface: delegation-kit] [roadmap: now/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
 
-foreign agents. A lead delegating a stage to a foreign coding agent. It cashes the public no-lock-in claim — governance enforced at the git/gate boundary, not by trusting the author; the verification substrate and the shared git-index/HEAD serialization are already agent-neutral. *Remaining:* (4) **stage-contract expression**, past its two slices below: a stage whose writes a foreign agent performs.
+foreign agents. A lead delegating a stage to a foreign coding agent, cashing the public no-lock-in claim: governance enforced at the git/gate boundary, not by trusting the author. *Remaining:* (4) **stage-contract expression**, past its two slices below: a stage whose writes a foreign agent performs.
 
-**Slices landed**, each in delegation-kit/SPEC.md §The foreign-vendor run and each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); then (2) the dispatch transport with (1) the escalation resume model riding it, `--foreign-resume`, that section's Resuming a session (delegation-transport-pass, 2026-10-03). Then (3) the budget oracle, delegation-kit/SPEC.md §The keyed verdict (delegation-wait-journal-pass, 2026-10-07; operator direction, lead-relayed, not a ruling), which owns the read and its `--budget` form. No foreign run was granted with it: accepted by stub-driven crate cases and one producer read of a vendor's on-disk session store through a scratch binding, so a live turn refreshing the feed is unobserved, as is whether a turn in a vendor's non-persisting mode, two of this repo's three adapters, leaves a usage event on disk; one granted run of each kind settles both. **This repo's binding (operator direction, 2026-10-07, lead-relayed, not a ruling):** inline in the gitignored `.local` overlay alone, its adapters reading one snapshot under the metric dir from an inline producer. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
+**Slices landed**, each in delegation-kit/SPEC.md §The foreign-vendor run and each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); then (2) the dispatch transport with (1) the escalation resume model riding it, `--foreign-resume`, that section's Resuming a session (delegation-transport-pass, 2026-10-03). Then (3) the budget oracle, delegation-kit/SPEC.md §The keyed verdict (delegation-wait-journal-pass, 2026-10-07; operator direction, lead-relayed, not a ruling). No foreign run was granted with it: accepted by stub-driven crate cases and one producer read of a vendor's on-disk session store through a scratch binding, so a live turn refreshing the feed is unobserved, as is whether a turn in a vendor's non-persisting mode, two of this repo's three adapters, leaves a usage event on disk; one granted run of each kind settles both. **This repo's binding (operator direction, 2026-10-07, lead-relayed, not a ruling):** inline in the gitignored `.local` overlay alone, its adapters reading one snapshot under the metric dir from an inline producer. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
 
-**Item (4)'s two slices landed** (both 2026-10-08; operator direction each, lead-relayed, not a ruling). First (foreign-stage-contract-pass), lifecycle-kit/SPEC.md §The stage-contract arm: the audit stage's reading runs foreign and its host performs every write. Second (foreign-stage-binding-pass), lifecycle-kit/SPEC.md §The host protocol: one protocol file every shipped stage template but the build stage's points at. **Grant spent** (one live foreign run, operator grant 2026-10-08, lead-relayed) by the second slice's own audit stage, whose landing commit message carries the run's `OK` verdict line. The agent wrote nothing, kept the frame's five parts and ran the contract's read-only commands unrefused; it left the battery and the successor-entry read to the host, its clone holding no gate binary. **Unobserved, ungranted:** a foreign agent on a non-audit contract, whose frame is mostly writes and a reading may rest on ignored content. Accepted on stub-adapter crate cases and a read-only master-harness child handed one.
+**Item (4)'s two slices landed** (both 2026-10-08; operator direction each, lead-relayed, not a ruling). First (foreign-stage-contract-pass), lifecycle-kit/SPEC.md §The stage-contract arm: the audit stage's reading runs foreign and its host performs every write. Second (foreign-stage-binding-pass), lifecycle-kit/SPEC.md §The host protocol: one protocol file every shipped stage template but the build stage's points at. **Grant spent** (one live foreign run, operator grant 2026-10-08, lead-relayed) by the second slice's own audit stage, whose landing commit message carries the run's `OK` verdict line. The agent wrote nothing, kept the frame's five parts and ran the contract's read-only commands unrefused; it left the battery and the successor-entry read to the host, its clone holding no gate binary. **Unobserved; granted, unspent** (operator grant 2026-10-09, lead-relayed: one live run next iteration, the vendor's judgment-class model, medium effort): a foreign agent on a non-audit contract, whose frame is mostly writes and a reading may rest on ignored content. Accepted on stub-adapter crate cases and a read-only master-harness child handed one.
 
 **Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, the pattern the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service) and [plugin-harness-reach](#plugin-harness-reach).
 
@@ -517,6 +517,58 @@ the `--queue` arm panics when its stdout closes before its post-check line: `--q
 **Inferred, not run:** that other arms share it — pipe an arm that prints on both sides of a slow step into `head -1` and read stderr
 
 **Cost while deferred:** a reader piping an arm into a line-limiting filter sees a panic trace beside a write that succeeded. Filed 2026-10-08 by foreign-stage-binding-pass' build. Re-verified at that close by reading the verb's source: one print ahead of the post-check and one after it, each the panicking macro; `--emit queue-edges` piped the same way left stderr empty. Owner lookup: `panic`, `pipe`, `stdout` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §The non-gate arm.
+
+### harness-valve-trailing-text
+
+[cost: event/low] [surface: gate-sdk]
+
+`check-harness-literal` accepts an empty-reason valve when text follows its comment closer on the same line: a markdown valve holding the token alone, closed, then a name, passes. The reason reader (`valve_reason`, `native/src/gates/harness_literal.rs`) strips a closer only as the line's suffix and takes the rest as the reason. gate-sdk/SPEC.md §check-harness-literal says an empty reason is a finding, and the fixture pair holds only a valve that ends its line.
+
+**Deliverable:** a reason read up to the comment closer wherever it sits on the line, a `bad/` fixture carrying the trailing-text valve, and a crate case beside the reader's own. Debt: it adds no name.
+
+**Inferred, not run:** that the gate passes such a line — add it to a scratch corpus member and run `--only check-harness-literal`
+
+**Cost while deferred:** a valve carrying no reason clears a literal on its own line. Filed 2026-10-08 as a gap by foreign-stage-binding-pass' close second-vendor review, a new defect in a landed gate; promoted 2026-10-09 by the next iteration's scope intake. Re-verified there by reading the reader: a suffix strip of the closer, then a trim. Owner lookup: `harness-binding`, `check-harness-literal`, `valve` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §check-harness-literal.
+
+### tracked-set-quoted-path-names
+
+[cost: event/low] [surface: gate-sdk]
+
+the tracked-set reader `check-portability-floor` and `check-harness-literal` share (`tracked`, `native/src/gates/portability_floor.rs`) lists its corpus with `git ls-files` and reads each output line as a path. Git quotes a name carrying a non-ASCII byte under its default quoting, a double quote or a backslash, so such a member is opened under its quoted spelling and the gate exits 2 on an unreadable corpus member, naming a path that does not exist. Neither gate's section in gate-sdk/SPEC.md states a filename restriction.
+
+**Deliverable:** the reader takes the NUL-terminated listing, the spelling the crate's other tracked-set readers use, with a crate case over a quoted name. Debt: it adds no name.
+
+**Inferred, not run:** the exit 2 — track a file whose name carries a non-ASCII byte on either corpus in a scratch repository and run the gate
+
+**Cost while deferred:** one such file on either corpus fail-closes its gate; no tracked file here carries such a name. Filed 2026-10-08 as a gap by foreign-stage-binding-pass' close second-vendor review; promoted 2026-10-09 by the next iteration's scope intake. Re-verified there: the reader runs the listing with no `-z` and splits on lines, and the tracked set lists no quoted name. Owner lookup: `ls-files`, `quotepath`, `quoted`, `portability-floor` in this file and the disposed-findings record — none; [guard-quoted-operand-words](#guard-quoted-operand-words) is distinct, a shell word's quoting. Owner gate-sdk/SPEC.md §check-portability-floor.
+
+### toolchain-action-proxy-jobs
+
+[cost: event/low] [surface: gate-sdk]
+
+five jobs in `.github/workflows/gates.yml` make a compiler version read their first toolchain call with no step on the retrying composite action: `native-artifacts-roster`, `install-smoke-pwsh-windows`, `install-smoke-sh-macos`, `install-smoke-sh-macos-intel` and `install-smoke-sh-linux-arm64`. gate-sdk/SPEC.md §check-crate-arms says each job that runs cargo takes the action ahead of its build, and a compiler proxy call fetches the pinned toolchain as a cargo call does, so these keep the unretried fetch the action was added to end.
+
+**Deliverable:** each of the five takes the action ahead of its first toolchain call. Whether §check-crate-arms' assertion widens from a cargo call to any toolchain call is the unit's first read. Reshaped by [install-smoke-sh-matrix](#install-smoke-sh-matrix): under a matrix, three of the five are one job.
+
+**Inferred, not run:** that the proxy fetches on that call — read a cold runner's log at the first compiler version read of one of the five
+
+**Cost while deferred:** a registry blip on any of the five reds its leg with no cause in the tree. Filed 2026-10-08 as a gap at foreign-stage-binding-pass' close, a new defect found after `toolchain-fetch-no-retry` landed: the first job by its second-vendor review, the other four by grep; promoted 2026-10-09 by the next iteration's scope intake. Re-verified there by grep: in each of the five the first toolchain call is the version read and no step uses the action. Owner lookup: `toolchain`, `retry`, `gates.yml` in this file and the disposed-findings record — none owning it; owner gate-sdk/SPEC.md §check-crate-arms.
+
+### tier-class-resolution
+
+[cost: event/high] [surface: delegation-kit]
+
+one place where a tier class resolves to a model and an effort, on the master harness and on a foreign one. The tier binding (delegation-kit/SPEC.md §The tier binding) maps a class to a model alone, effort is chosen at each dispatch, and a foreign adapter carries its model and effort inline in its argv and binds to no class (§The foreign-vendor run). So a renamed model, or a newer one doing well enough at a lower effort, is edited per adapter and remembered per dispatcher.
+
+**Operator direction, 2026-10-09, lead-relayed (not a ruling), in two parts.** The operator's model is four classes per vendor: expert, for consultations that do the project critique and take strategic decisions; judgment and mechanical, for iteration execution, lead and stages; trivial, for a yes/no experiment an agent runs. Refined the same day: the classes are worth keeping only if the process relies on them as its interface, the value asked for is the one resolution point, and scope may weigh whether the classes earn their keep before two are added.
+
+**Scope's weighing, 2026-10-09.** The process does read classes as its interface: an agent definition's `tier:`, the dispatch guard's bound-value check, `--model-verdict --expect` at a consultation's and a stage session's entry, and the lead binding's per-stage classes. Two model ids carried all usage in the trailing week's transcripts (`--price-coverage`), so no expert-class or trivial-class model rode a dispatch in it.
+
+**Inferred, not run:** that a consultation started on a model above the bound judgment value reads `UNBOUND` and stops — run `--model-verdict --expect judgment` against such a session's transcript
+
+**Deliverable, design-pending:** the binding's value gains an effort; a foreign adapter resolves its model and effort from a class through the same read; and a consultation's expected class becomes a binding. Spec's questions: the class roster's home, kit vocabulary or consumer config (Policy-as-choice), and whether `routing`, bound here to the judgment model, survives. The amendment reverses §The foreign-vendor run's sentence that no adapter binds to a tier class and lifecycle-kit/SPEC.md's executor-knob note that the two bindings share no reader.
+
+**Cost while deferred:** a model or effort move is edited at every adapter and at every dispatcher, and a consultation on the operator's preferred class has no class to expect. Filed 2026-10-09 as two gap bullets by the lead after foreign-stage-binding-pass closed; promoted the same day by the next iteration's scope intake. Owner lookup: `TIER_MODEL`, `model-verdict`, `agent-tiers`, `tier binding`, `expert`, `trivial` in this file and the disposed-findings record — no owner; [build-stage-tier-economics](#build-stage-tier-economics) is distinct, pricing the build stage's tier and binding nothing, and the record's `align tier` and `validate tier` rows are data for re-judging a binding, not this mechanism. Owner delegation-kit/SPEC.md §The tier binding.
 
 ## Icebox
 
