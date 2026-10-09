@@ -482,6 +482,76 @@ that an agent definition's effort line sets its child's effort (delegation-kit/S
 
 **Cost while deferred:** a class's bound effort is trusted on the harness's documentation, so a harness that ignored the line would run every class at the dispatcher's effort with the generated line and its freshness gate both green. Filed 2026-10-09 by tier-resolution-pass' close after its drain, and promoted at the next scope's intake. Re-verified there by grep: the five tracked definitions state one effort. Owner lookup: `effort`, `model-verdict`, `Honest limits` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §check-agent-tier-explicit.
 
+### git-name-read-line-form
+
+[cost: event/low] [surface: native]
+
+git's name-listing reads outside the tracked-set listing still take the line form, which quotes a name carrying a special byte: the always-loaded growth diff (`--name-only`), the packer's and the stage entry's `status --porcelain` reads, the upgrade smoke's staged read, the packer's `ls-tree --name-only` reads and the source stamp's two shell holders among them. `listing-line-form-readers` closed the tracked-set listing alone, and its holder sees none of these.
+
+**Deliverable:** a census of the crate's name-bearing git reads by form, each one that reads a name moved to the NUL form through the shared reader or stated as an emptiness test that reads none, and the holder widened to the argvs it then covers.
+
+**Inferred, not run:** that each site misreads or misses a name git quotes — stage a member whose name carries a double quote and run each reader over it
+
+**Cost while deferred:** a staged or dirty member under a name git quotes is misread or missed by each such reader. Filed 2026-10-09 by crate-reader-hardening-pass' spec and promoted at its close. Re-verified by `git grep -n -E 'name-only|name-status|porcelain|ls-tree' -- native/src`: the named sites carry no `-z`, and most `porcelain` hits under the installer smoke are emptiness tests. Owner lookup: `name-only`, `name-status`, `porcelain` in this file and the disposed-findings record — none; `listing-line-form-readers`, done, DISTINCT (the tracked-set listing); owner gate-sdk/SPEC.md §Fail-closed contract.
+
+### nul-listing-lossy-decode
+
+[cost: event/low] [surface: native]
+
+ten listing readers already on the NUL form decode a name lossily through an argv of their own: `check-md-refs`, `check-spec-pointer`, `check-fence-command-head`, `check-docs-cmd`, `check-md-unwrapped`, the hook's staged read, the consumer-smoke and projection-witness listings, `--emit close-surfaces` and uninstall. A member whose name is not UTF-8 is matched or opened there under a replacement-character spelling, while the shared reader `tracked-name-lossy-decode` landed refuses it.
+
+**Deliverable:** each of the ten on the shared reader's refusing path, or its lossy read stated with the ground that keeps it, and one holder for the set.
+
+**Inferred, not run:** that each of the ten opens or matches a non-UTF-8 name under a replacement spelling — commit a member whose name carries a lone 0xff byte and run each reader over the tree
+
+**Cost while deferred:** the tree gives two answers on one name, a refusal from the shared reader and a silent misspelling from these. Filed 2026-10-09 by crate-reader-hardening-pass' spec and promoted at its close. Re-verified by `git grep -c from_utf8_lossy -- native/src`: each named module carries the call. Owner lookup: `lossy`, `from_utf8_lossy`, `non-UTF-8` in this file and the disposed-findings record — [worktree-memory-dir-key](#worktree-memory-dir-key), DISTINCT (a memory directory's key); `tracked-name-lossy-decode`, done, DISTINCT (the shared reader alone); owner gate-sdk/SPEC.md §Fail-closed contract.
+
+### hermetic-preamble-overlay-read
+
+[cost: event/low] [surface: gate-sdk]
+
+`lib/test-hermetic.sh` pins every kit's knob file at an empty one and leaves each kit's local overlay read (gate-sdk/SPEC.md §lib/test-hermetic.sh, its honest limit), so a suite running on kit defaults can be refused by a row a seat's overlay binds. It was met in three graph suites, where a delegation overlay bound a tier row on a class the default roster lacks and the graph emit exited 2. Those three now un-pin delegation-kit's knob file, by operator direction of 2026-10-09, lead-relayed (not a ruling), and `stop-test-reads-local-overlay` fixed a fourth suite by moving its gates directory.
+
+**Deliverable:** the preamble's treatment of overlays decided once, either an overlay pinned beside its knob file or the limit kept with a holder that names the suites it reaches, in place of a per-suite un-pin.
+
+**Inferred, not run:** that an overlay row of a kit other than delegation-kit refuses a kit-default suite — bind a row its default roster lacks in another kit's local overlay and run the fixture suites
+
+**Cost while deferred:** a commit reaching `native/` is refused on such a seat while the remote stays green, and each further suite is found one refusal at a time. Filed 2026-10-09 by crate-reader-hardening-pass' first build batch and promoted at its close. Re-verified by grep: the three suites carry `unset DELEGATION_KIT_KNOB_FILE`. Owner lookup: `test-hermetic`, `overlay`, `hermetic` in this file and the disposed-findings record — [config-variant-battery-harness](#config-variant-battery-harness), DISTINCT (a shipped variant runner); [hermetic-harness-export-masks-the-condition-under-test](#hermetic-harness-export-masks-the-condition-under-test) and [hermetic-bin-roster-config](#hermetic-bin-roster-config), both DISTINCT (pins voiding an arm, a bin roster seam); owner gate-sdk/SPEC.md §lib/test-hermetic.sh.
+
+### tier-model-shape-unvalidated
+
+[cost: event/low] [surface: delegation-kit]
+
+the tier tables' validator holds a model to no shape beyond carrying no whitespace, and `--emit agent-tiers --write` puts it bare after a definition's `model:` key. `tier-value-validator-gaps` closed the effort's hole and did not scope the model's shape.
+
+**Deliverable:** a model shape the validator refuses outside of, admitting a vendor's bracketed and dotted ids, with its unit rows and the sentence in delegation-kit/SPEC.md §check-agent-tier-explicit.
+
+**Inferred, not run:** that a model opening on a hash is written as a YAML comment, leaving the definition's model empty while assertion B compares bytes and passes — bind such a model on a scratch definition directory and run `--emit agent-tiers --write`, then the gate
+
+**Cost while deferred:** a binding typo of that shape ships a definition with no model under a green gate. Filed 2026-10-09 by crate-reader-hardening-pass' first build batch and promoted at its close. Re-verified by reading `native/src/knobs/delegation_kit.rs`: its refusal rows hold the pair's form and whitespace alone. Owner lookup: `agent-tiers`, `tier table`, `YAML comment` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §check-agent-tier-explicit.
+
+### inherited-stdout-child-status
+
+[cost: event/low] [surface: gate-sdk]
+
+an arm whose child inherits the binary's stdout exits off the closed-reader rule (gate-sdk/SPEC.md §The non-gate arm, *A departed stdout reader changes no status*). The rule `arm-stdout-close-panic` landed drops the binary's own failed writes; a child writing to the same departed reader dies of the signal, and the arm relays that death as its own status. Measured 2026-10-09 at crate-reader-hardening-pass' close: `--scratch-run` on a script printing 20000 lines exits 141 piped into `true` and 0 with a reader.
+
+**Deliverable:** the rule made true or bounded for the arms that hand a child the inherited stdout (`Sink::Inherit` in `native/src/proc.rs`): either the child's stdout routed so its reader's departure costs no status, or the section's reach stated as the binary's own writes, with a case in `native/tests/closed_reader.rs` for whichever holds. Which one is spec's.
+
+**Cost while deferred:** an arm piped into an early-exiting filter exits on a status its contract does not list, under a rule whose text reads as total. Filed 2026-10-09 by crate-reader-hardening-pass' lead off its third build batch and promoted at its close. Owner lookup: `closed reader`, `departed`, `inherit`, `SIGPIPE`, `broken pipe` in this file and the disposed-findings record — none; `arm-stdout-close-panic`, done, DISTINCT (the process's own writes); owner gate-sdk/SPEC.md §The non-gate arm.
+
+### unremapped-rebuild-reds-smoke
+
+[cost: event/low] [surface: installer]
+
+the crate suite's `cargo test --release` rebuilds the release binary without `bin/build-native.sh`'s path-remap flags, so the builder's cargo registry path is left in it. The next validate run's installer smoke stages that binary and reds on `check-tree-terms` until `bin/build-native.sh` is rerun. The smoke's staging step refuses a binary whose source stamp is stale (`native/src/emit/installer_smoke/staging.rs`) and reads nothing of the remap.
+
+**Deliverable:** one of three, spec's to choose: the crate suite built with the remap, the staging step refusing an unremapped binary with the rebuild steer it already prints for a stale one, or the smoke building through `bin/build-native.sh`.
+
+**Inferred, not run:** that a plain `cargo test --release` is what strips the remap — run it under `native/`, then the installer smoke, and read `check-tree-terms`
+
+**Cost while deferred:** a wasted validate round, about 17 minutes, on any seat whose binary was last built by a plain cargo build. Filed 2026-10-09 by crate-reader-hardening-pass' validate, which saw the red and the clean rerun, and promoted at its close. Re-verified by reading the staging step. Owner lookup: `remap`, `installer_smoke`, `check-tree-terms`, `cargo test` in this file and the disposed-findings record — none; [validate-suite-wall-clock-unowned](#validate-suite-wall-clock-unowned) and [build-native-obligation-unconditional](#build-native-obligation-unconditional), both DISTINCT (the suites' serial cost, a rebuild owed by a crate-free commit); owner installer/SPEC.md §The consumer smoke.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
@@ -1171,13 +1241,4 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 `check-memory-off` derives the memory dir from the repository toplevel, so a linked-worktree session's memory may land where no scan reads if the harness keys that dir on a canonical working-copy root, a keying read from its bundle and never observed.
 
 ## Done
-
-- stop-test-reads-local-overlay
-- tier-value-validator-gaps
-- listing-line-form-readers
-- tracked-name-lossy-decode
-- front-matter-reader-siblings
-- arm-stdout-close-panic
-- toolchain-action-order-ungated
-- hook-refresh-unlinks-first
 
