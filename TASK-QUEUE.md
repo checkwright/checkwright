@@ -534,7 +534,7 @@ a tracked-set listing read in git's line form takes a quoted name as a path: git
 
 **Deliverable:** every listing reader on the NUL-terminated form, through one shared reader where the callers allow it; a crate case listing a scratch repository that holds such names; and a holder that reds a line-form listing argv in the crate, its form spec's.
 
-**Inferred, not run:** that each site misreads such a name, some testing only that a listing is non-empty — list a scratch repository holding a non-ASCII name through each reader
+**Operator direction 2026-10-09, lead-relayed (not a ruling):** the source stamp's listing keeps the line form, the reason carried in the holder's own exemption roster, and its shell holders ride the gap filed that day. Run at spec over a scratch repository tracking two non-ASCII names: three docs gates read one page of two and exited clean, and `check-root-tiering` redded a quoted first component; seven sites read emptiness alone.
 
 **Cost while deferred:** a docs page, template or kit member under such a name is misclassified or unreadable to the gate that lists it; no tracked file here carries one. Filed 2026-10-09 by tier-resolution-pass' build. Re-verified by grep at that close, which widened the filing's three readers to the count above. Owner lookup: `ls-files`, `line-form`, `NUL-term`, `quoted spelling` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §check-portability-floor.
 
@@ -556,7 +556,7 @@ the shared tracked-set reader decodes git's NUL-terminated listing lossily (`nat
 
 **Deliverable:** the reader carries a member's bytes as a path, or the section states that a non-UTF-8 name fails closed, with a case on a host that admits one.
 
-**Inferred, not run:** that either gate exits 2 on such a name — list a scratch repository holding one through the reader
+**Lead decision 2026-10-09, off this entry's own Deliverable (not an operator direction):** a non-UTF-8 name fails closed, the section stating it and the case running on a host that admits one. Run at spec over a scratch repository tracking such a name: `check-harness-literal` exits 2 on the replacement-character spelling, and `check-portability-floor` exits 2 earlier, at the crate's directory lister.
 
 **Cost while deferred:** an adopter tracking such a file cannot run either gate. Filed 2026-10-09 by tier-resolution-pass' close off its second-vendor review, and promoted at the next scope's intake. Re-verified there by grep: the listing read ends in a lossy decode. Owner lookup: `UTF-8`, `lossy`, `replacement character` in this file and the disposed-findings record — [listing-line-form-readers](#listing-line-form-readers), DISTINCT (the listing's form, not a name's decoding); one unit could carry both.
 
