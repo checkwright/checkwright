@@ -5,3 +5,4 @@
 ---
 
 front-door-readiness-pass scope af71e82c 2026-10-10 ac5c39edd
+front-door-readiness-pass spec a736082c 2026-10-10 f8ed8ea5e
