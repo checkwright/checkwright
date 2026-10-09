@@ -8,6 +8,46 @@
 
 ## New Features
 
+### front-door-rehearsal-rule
+
+[spec: SPEC-front-door-rehearsal.md]
+
+the front-door rehearsal belongs in the methodology, operator direction 2026-09-29, lead-relayed (not a ruling). `front-door-container-rehearsal` found two defects no smoke had caught, a hooked update or profile move refused by `check-gate-tamper` and `init`/`uninstall` hiding git's own failure output, because every smoke installs a tree-packed payload from the author's seat and never the published artifact from a clean one.
+
+**Deliverable, three layers:** (1) a generic kit rule, before an audience-facing event rehearse the published front door from a clean seat and file what it finds, the container, platform and route set being consumer config (doctrine-kit or lifecycle-kit's release step, per the provenance seam); (2) here, a post-publish job in `.github/workflows/publish.yml` installing the just-published Release on clean runners (init, hooks on, a first red, an upgrade from the previous release, a hooked profile move), reaching the macOS and Windows runners a container cannot; (3) a manual agent-walked rehearsal of the routes CI cannot drive (the adoption prompt, the plugin marketplace, the Spec Kit extension), before audience events only, a catalog submission or a partner install, per the operator.
+
+**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration as its lead unit. **Chosen at spec:** the kit rule is a doctrine-kit engineering-craft rule read at close, and the job follows both channels on every runner the target roster maps.
+
+**Cost while deferred:** each audience event risks a front-door defect only a clean-seat install would show; the one-off left macOS, native Windows, arm64 Linux, WSL and the npx, plugin, PowerShell and agent-prompt routes unrehearsed. Filed 2026-09-29 by preview-readiness' lead. Re-verified: `publish.yml` runs roster, build, pack, npm and release and installs nothing after publishing. Owner lookup: `rehears`, `post-publish`, `clean seat` in this file — [design-partner-preview](#design-partner-preview), DISTINCT (the observed install this precedes); owner RELEASING.md for layers 2 and 3, doctrine-kit/DOCTRINE.md for the rule.
+
+**Split 2026-10-10 at scope:** the second layer's job runs on a tag alone, so its first run's reading is [front-door-job-observed](#front-door-job-observed) and this entry keeps the job.
+
+### inherited-stdout-child-status
+
+[spec: SPEC-child-stdout.md]
+
+an arm whose child inherits the binary's stdout exits off the closed-reader rule (gate-sdk/SPEC.md §The non-gate arm, *A departed stdout reader changes no status*). The rule `arm-stdout-close-panic` landed drops the binary's own failed writes; a child writing to the same departed reader dies of the signal, and the arm relays that death as its own status. Measured 2026-10-09 at crate-reader-hardening-pass' close: `--scratch-run` on a script printing 20000 lines exits 141 piped into `true` and 0 with a reader.
+
+**Deliverable:** the rule made true or bounded for the arms that hand a child the inherited stdout (`Sink::Inherit` in `native/src/proc.rs`): either the child's stdout routed so its reader's departure costs no status, or the section's reach stated as the binary's own writes, with a case in `native/tests/closed_reader.rs` for whichever holds. Which one is spec's.
+
+**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration; made true or bounded is spec's choice. **Chosen at spec:** bounded. Run there: a script that prints one line after its reader has gone exits 141 and one that prints nothing keeps its code, and `--run-validate` refuses on a pre-hook that died printing.
+
+**Cost while deferred:** an arm piped into an early-exiting filter exits on a status its contract does not list, under a rule whose text reads as total. Filed 2026-10-09 by crate-reader-hardening-pass' lead off its third build batch and promoted at its close. Owner lookup: `closed reader`, `departed`, `inherit`, `SIGPIPE`, `broken pipe` in this file and the disposed-findings record — none; `arm-stdout-close-panic`, done, DISTINCT (the process's own writes); owner gate-sdk/SPEC.md §The non-gate arm.
+
+### hermetic-preamble-overlay-read
+
+[spec: SPEC-overlay-locator.md]
+
+`lib/test-hermetic.sh` pins every kit's knob file at an empty one and leaves each kit's local overlay read (gate-sdk/SPEC.md §lib/test-hermetic.sh, its honest limit), so a suite running on kit defaults can be refused by a row a seat's overlay binds. It was met in three graph suites, where a delegation overlay bound a tier row on a class the default roster lacks and the graph emit exited 2. Those three now un-pin delegation-kit's knob file, by operator direction of 2026-10-09, lead-relayed (not a ruling), and `stop-test-reads-local-overlay` fixed a fourth suite by moving its gates directory.
+
+**Deliverable:** the preamble's treatment of overlays decided once, either an overlay pinned beside its knob file or the limit kept with a holder that names the suites it reaches, in place of a per-suite un-pin.
+
+**Run at spec, on a copy of the gates directory:** a lifecycle-kit overlay row turns that kit's fixture run from 4 failing lines to 56, so the class is every kit's.
+
+**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration; the deliverable's choice is spec's. **Chosen at spec:** the overlay pinned, through a locator of its own.
+
+**Cost while deferred:** a commit reaching `native/` is refused on such a seat while the remote stays green, and each further suite is found one refusal at a time. Filed 2026-10-09 by crate-reader-hardening-pass' first build batch and promoted at its close. Re-verified by grep: the three suites carry `unset DELEGATION_KIT_KNOB_FILE`. Owner lookup: `test-hermetic`, `overlay`, `hermetic` in this file and the disposed-findings record — [config-variant-battery-harness](#config-variant-battery-harness), DISTINCT (a shipped variant runner); [hermetic-harness-export-masks-the-condition-under-test](#hermetic-harness-export-masks-the-condition-under-test) and [hermetic-bin-roster-config](#hermetic-bin-roster-config), both DISTINCT (pins voiding an arm, a bin roster seam); owner gate-sdk/SPEC.md §lib/test-hermetic.sh.
+
 ## Technical Debt
 
 ### hook-staging-fixed-sibling
@@ -332,20 +372,6 @@ docs/releases.md renders its derived note list as a bare list of version links, 
 
 **Cost while deferred:** the next chrome addition can duplicate a page statement unseen until a reader finds it. Filed 2026-09-29 by companion-adoption-landing's build. Re-verified: canon-kit/SPEC.md §check-docs-page-repeat reads each `CANON_KIT_PAGE_REPEAT_PAGES` page alone and deliberately asserts no repeat across pages, so the arm must weigh that boundary. Owner lookup: `page-repeat`, `_layouts`, `chrome` in this file — [site-video-poster-rule](#site-video-poster-rule), DISTINCT (embeds); owner canon-kit/SPEC.md §check-docs-page-repeat, with docs/page-authoring.md §Page-authoring rules. Surface also canon-kit.
 
-### front-door-rehearsal-rule
-
-[cost: event/high] [surface: lifecycle-kit]
-
-the front-door rehearsal belongs in the methodology, operator direction 2026-09-29, lead-relayed (not a ruling). `front-door-container-rehearsal` found two defects no smoke had caught, a hooked update or profile move refused by `check-gate-tamper` and `init`/`uninstall` hiding git's own failure output, because every smoke installs a tree-packed payload from the author's seat and never the published artifact from a clean one.
-
-**Deliverable, three layers:** (1) a generic kit rule, before an audience-facing event rehearse the published front door from a clean seat and file what it finds, the container, platform and route set being consumer config (doctrine-kit or lifecycle-kit's release step, per the provenance seam); (2) here, a post-publish job in `.github/workflows/publish.yml` installing the just-published Release on clean runners (init, hooks on, a first red, an upgrade from the previous release, a hooked profile move), reaching the macOS and Windows runners a container cannot; (3) a manual agent-walked rehearsal of the routes CI cannot drive (the adoption prompt, the plugin marketplace, the Spec Kit extension), before audience events only, a catalog submission or a partner install, per the operator.
-
-**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration as its lead unit.
-
-**Cost while deferred:** each audience event risks a front-door defect only a clean-seat install would show; the one-off left macOS, native Windows, arm64 Linux, WSL and the npx, plugin, PowerShell and agent-prompt routes unrehearsed. Filed 2026-09-29 by preview-readiness' lead. Re-verified: `publish.yml` runs roster, build, pack, npm and release and installs nothing after publishing. Owner lookup: `rehears`, `post-publish`, `clean seat` in this file — [design-partner-preview](#design-partner-preview), DISTINCT (the observed install this precedes); owner RELEASING.md for layer 2, the kit rule's home open. Surface also doctrine-kit.
-
-**Split 2026-10-10 at scope:** the second layer's job runs on a tag alone, so its first run's reading is [front-door-job-observed](#front-door-job-observed) and this entry keeps the job.
-
 ### front-door-job-observed
 
 [cost: event/low] [surface: lifecycle-kit] [observed-by: publish]
@@ -544,20 +570,6 @@ ten listing readers already on the NUL form decode a name lossily through an arg
 
 **Cost while deferred:** the tree gives two answers on one name, a refusal from the shared reader and a silent misspelling from these. Filed 2026-10-09 by crate-reader-hardening-pass' spec and promoted at its close. Re-verified by `git grep -c from_utf8_lossy -- native/src`: each named module carries the call. Owner lookup: `lossy`, `from_utf8_lossy`, `non-UTF-8` in this file and the disposed-findings record — [worktree-memory-dir-key](#worktree-memory-dir-key), DISTINCT (a memory directory's key); `tracked-name-lossy-decode`, done, DISTINCT (the shared reader alone); owner gate-sdk/SPEC.md §Fail-closed contract.
 
-### hermetic-preamble-overlay-read
-
-[cost: event/low] [surface: gate-sdk]
-
-`lib/test-hermetic.sh` pins every kit's knob file at an empty one and leaves each kit's local overlay read (gate-sdk/SPEC.md §lib/test-hermetic.sh, its honest limit), so a suite running on kit defaults can be refused by a row a seat's overlay binds. It was met in three graph suites, where a delegation overlay bound a tier row on a class the default roster lacks and the graph emit exited 2. Those three now un-pin delegation-kit's knob file, by operator direction of 2026-10-09, lead-relayed (not a ruling), and `stop-test-reads-local-overlay` fixed a fourth suite by moving its gates directory.
-
-**Deliverable:** the preamble's treatment of overlays decided once, either an overlay pinned beside its knob file or the limit kept with a holder that names the suites it reaches, in place of a per-suite un-pin.
-
-**Inferred, not run:** that an overlay row of a kit other than delegation-kit refuses a kit-default suite — bind a row its default roster lacks in another kit's local overlay and run the fixture suites
-
-**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration; the deliverable's choice is spec's.
-
-**Cost while deferred:** a commit reaching `native/` is refused on such a seat while the remote stays green, and each further suite is found one refusal at a time. Filed 2026-10-09 by crate-reader-hardening-pass' first build batch and promoted at its close. Re-verified by grep: the three suites carry `unset DELEGATION_KIT_KNOB_FILE`. Owner lookup: `test-hermetic`, `overlay`, `hermetic` in this file and the disposed-findings record — [config-variant-battery-harness](#config-variant-battery-harness), DISTINCT (a shipped variant runner); [hermetic-harness-export-masks-the-condition-under-test](#hermetic-harness-export-masks-the-condition-under-test) and [hermetic-bin-roster-config](#hermetic-bin-roster-config), both DISTINCT (pins voiding an arm, a bin roster seam); owner gate-sdk/SPEC.md §lib/test-hermetic.sh.
-
 ### tier-model-shape-unvalidated
 
 [cost: event/low] [surface: delegation-kit]
@@ -569,18 +581,6 @@ the tier tables' validator holds a model to no shape beyond carrying no whitespa
 **Inferred, not run:** that a model opening on a hash is written as a YAML comment, leaving the definition's model empty while assertion B compares bytes and passes — bind such a model on a scratch definition directory and run `--emit agent-tiers --write`, then the gate
 
 **Cost while deferred:** a binding typo of that shape ships a definition with no model under a green gate. Filed 2026-10-09 by crate-reader-hardening-pass' first build batch and promoted at its close. Re-verified by reading `native/src/knobs/delegation_kit.rs`: its refusal rows hold the pair's form and whitespace alone. Owner lookup: `agent-tiers`, `tier table`, `YAML comment` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §check-agent-tier-explicit.
-
-### inherited-stdout-child-status
-
-[cost: event/low] [surface: gate-sdk]
-
-an arm whose child inherits the binary's stdout exits off the closed-reader rule (gate-sdk/SPEC.md §The non-gate arm, *A departed stdout reader changes no status*). The rule `arm-stdout-close-panic` landed drops the binary's own failed writes; a child writing to the same departed reader dies of the signal, and the arm relays that death as its own status. Measured 2026-10-09 at crate-reader-hardening-pass' close: `--scratch-run` on a script printing 20000 lines exits 141 piped into `true` and 0 with a reader.
-
-**Deliverable:** the rule made true or bounded for the arms that hand a child the inherited stdout (`Sink::Inherit` in `native/src/proc.rs`): either the child's stdout routed so its reader's departure costs no status, or the section's reach stated as the binary's own writes, with a case in `native/tests/closed_reader.rs` for whichever holds. Which one is spec's.
-
-**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration; made true or bounded is spec's choice.
-
-**Cost while deferred:** an arm piped into an early-exiting filter exits on a status its contract does not list, under a rule whose text reads as total. Filed 2026-10-09 by crate-reader-hardening-pass' lead off its third build batch and promoted at its close. Owner lookup: `closed reader`, `departed`, `inherit`, `SIGPIPE`, `broken pipe` in this file and the disposed-findings record — none; `arm-stdout-close-panic`, done, DISTINCT (the process's own writes); owner gate-sdk/SPEC.md §The non-gate arm.
 
 ### unremapped-rebuild-reds-smoke
 
