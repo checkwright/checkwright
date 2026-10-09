@@ -2027,7 +2027,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-agent-tier-explicit",
         agent_tier_explicit::run,
-        &[("?", "", "", "dynamic@src/gates/agent_tier_explicit.rs:61")],
+        &[("?", "", "", "dynamic@src/gates/agent_tier_explicit.rs:62")],
         &[
             "DELEGATION_KIT_AGENT_DIR",
             "DELEGATION_KIT_TIER_MODEL",

@@ -5,9 +5,10 @@ use crate::sessions::{self, Delegation, Inputs};
 use crate::tier;
 use crate::walk;
 
-pub const KNOBS: &[&str] = &["DELEGATION_KIT_TIER_MODEL", "DELEGATION_KIT_SESSIONS_DIR"];
+pub const KNOBS: &[&str] =
+    &["DELEGATION_KIT_TIER_MODEL", "DELEGATION_KIT_TIER_CLASSES", "DELEGATION_KIT_SESSIONS_DIR"];
 
-const USAGE: &str = "usage: --model-verdict [--expect <class>] [--] [<transcript.jsonl | session8>]\n  --expect names the floor class (judgment, routing or mechanical); the operand names the transcript by path or by an eight-character session id, and \"--\" takes one beginning with \"-\"";
+const USAGE: &str = "usage: --model-verdict [--expect <class>] [--] [<transcript.jsonl | session8>]\n  --expect names the floor class, one of DELEGATION_KIT_TIER_CLASSES; the operand names the transcript by path or by an eight-character session id, and \"--\" takes one beginning with \"-\"";
 
 const OFF_TIER: &str =
     "the session is not on its expected tier; stop before work that needs it and have it re-dispatched at that tier";
@@ -34,13 +35,6 @@ fn parse(args: &[String]) -> Result<Args, String> {
             literal = true;
         } else if a == "--expect" {
             let class = args.get(i + 1).ok_or("model-verdict: --expect needs a class")?;
-            if tier::rank(class).is_none() {
-                return Err(format!(
-                    "model-verdict: --expect names '{}', not one of {}",
-                    class,
-                    tier::CLASSES.join(", ")
-                ));
-            }
             out.expect = Some(class.clone());
             i += 1;
         } else if a.starts_with('-') {
@@ -94,13 +88,21 @@ fn transcript(operand: Option<&str>, i: &Inputs) -> Option<String> {
 }
 
 // spec: delegation-kit/SPEC.md §model-verdict — the newest assistant record whose usage is not all
-// zero, since the harness's synthetic records carry zero usage
-fn running_model(body: &str) -> Option<String> {
+// zero, since the harness's synthetic records carry zero usage; that record gives the effort too
+fn running_model(body: &str) -> Option<(String, Option<String>)> {
     body.lines()
         .rev()
         .filter_map(stage_economics::record)
         .find(|r| r.tokens != Tokens::default())
-        .map(|r| r.model)
+        .map(|r| (r.model, r.effort))
+}
+
+// spec: delegation-kit/SPEC.md §model-verdict — what a judgment reads beside the id
+struct Reading<'a> {
+    effort: Option<&'a str>,
+    session: &'a str,
+    binding: &'a [String],
+    roster: &'a [String],
 }
 
 pub fn verdict(args: &[String]) -> (String, i32) {
@@ -116,16 +118,23 @@ pub fn verdict(args: &[String]) -> (String, i32) {
     let unknown = |id: &str, session: &str, why: &str| {
         (
             format!(
-                "model-verdict: id={} session={} class=none expect={} -> UNKNOWN ({}) — {}",
+                "model-verdict: id={} effort=- session={} class=none expect={} -> UNKNOWN ({}) — {}",
                 id, session, expect, why, UNVERIFIED
             ),
             2,
         )
     };
-    let binding = match walk::knob_array("DELEGATION_KIT_TIER_MODEL") {
-        Ok(b) => b,
+    let tables = walk::knob_array("DELEGATION_KIT_TIER_MODEL")
+        .and_then(|b| walk::knob_array("DELEGATION_KIT_TIER_CLASSES").map(|r| (b, r)));
+    let (binding, roster) = match tables {
+        Ok(t) => t,
         Err(e) => return unknown("-", "-", &format!("the tier binding did not resolve: {}", e)),
     };
+    if let Some(class) = a.expect.as_deref().filter(|c| tier::rank(&roster, c).is_none()) {
+        eprintln!("model-verdict: --expect names '{}', not one of {}", class, roster.join(", "));
+        eprintln!("{}", USAGE);
+        return (String::new(), 2);
+    }
     let i = match inputs() {
         Ok(i) => i,
         Err(e) => return unknown("-", "-", &e),
@@ -138,21 +147,25 @@ pub fn verdict(args: &[String]) -> (String, i32) {
         Ok(b) => String::from_utf8_lossy(&b).into_owned(),
         Err(e) => return unknown("-", &session, &format!("cannot read {}: {}", path, e)),
     };
-    let Some(id) = running_model(&body) else {
+    let Some((id, effort)) = running_model(&body) else {
         return unknown("-", &session, "no assistant record with non-zero usage");
     };
-    judge(&id, &session, &binding, a.expect.as_deref())
+    let r = Reading { effort: effort.as_deref(), session: &session, binding: &binding, roster: &roster };
+    judge(&id, &r, a.expect.as_deref())
 }
 
-// spec: delegation-kit/SPEC.md §model-verdict — the verdict table over a read id
-fn judge(id: &str, session: &str, binding: &[String], expect: Option<&str>) -> (String, i32) {
-    let classes = tier::classes_of(binding, id);
+// spec: delegation-kit/SPEC.md §model-verdict — the verdict table over a read id; the model alone
+// decides it, and an effort off the expected class's bound one is an `OK` line's consequence
+fn judge(id: &str, r: &Reading, expect: Option<&str>) -> (String, i32) {
+    let (binding, roster) = (r.binding, r.roster);
+    let classes = tier::classes_of(binding, roster, id);
     let shown = if classes.is_empty() { "none".to_string() } else { classes.join(",") };
     let line = |verdict: &str, tail: &str| {
         format!(
-            "model-verdict: id={} session={} class={} expect={} -> {}{}",
+            "model-verdict: id={} effort={} session={} class={} expect={} -> {}{}",
             id,
-            session,
+            r.effort.unwrap_or("-"),
+            r.session,
             shown,
             expect.unwrap_or("-"),
             verdict,
@@ -168,9 +181,13 @@ fn judge(id: &str, session: &str, binding: &[String], expect: Option<&str>) -> (
     if tier::bound(binding, want).is_none() {
         return (line("UNKNOWN", &format!(" (class '{}' is unbound) — {}", want, UNVERIFIED)), 2);
     }
-    let floor = tier::rank(want).unwrap_or(0);
-    if classes.iter().any(|c| tier::rank(c).is_some_and(|r| r <= floor)) {
-        return (line("OK", ""), 0);
+    let floor = tier::rank(roster, want).unwrap_or(0);
+    if classes.iter().any(|c| tier::rank(roster, c).is_some_and(|r| r <= floor)) {
+        let off = match (r.effort, tier::effort(binding, want)) {
+            (Some(e), Some(b)) if e != b => format!(" — running effort {} is not the class's bound {}", e, b),
+            _ => String::new(),
+        };
+        return (line("OK", &off), 0);
     }
     if classes.is_empty() {
         return (line("UNBOUND", &format!(" — {}", OFF_TIER)), 1);
@@ -206,6 +223,10 @@ mod tests {
 
     impl Sandbox {
         fn new(tag: &str, binding: &[&str]) -> Sandbox {
+            Sandbox::with_roster(tag, binding, &[])
+        }
+
+        fn with_roster(tag: &str, binding: &[&str], roster: &[&str]) -> Sandbox {
             let knobs = knobenv::lock();
             let dir = std::env::temp_dir().join(format!("checkwright-model-verdict.{}.{}", tag, std::process::id()));
             let _ = std::fs::remove_dir_all(&dir);
@@ -221,19 +242,27 @@ mod tests {
             for e in binding {
                 file.push_str(&format!("DELEGATION_KIT_TIER_MODEL[] = {}\n", e));
             }
+            for c in roster {
+                file.push_str(&format!("DELEGATION_KIT_TIER_CLASSES[] = {}\n", c));
+            }
             std::fs::write(dir.join("delegation-config.knobs"), file).expect("the knob file must be writable");
             crate::knobs::reset(&knobs);
             Sandbox { dir, held, gates_dir, knobs }
         }
 
         fn transcript(&self, rel: &str, records: &[(&str, &str, u64)]) -> String {
+            self.effort_transcript(rel, records, None)
+        }
+
+        fn effort_transcript(&self, rel: &str, records: &[(&str, &str, u64)], effort: Option<&str>) -> String {
+            let top = effort.map_or(String::new(), |e| format!("\"effort\":\"{}\",", e));
             let path = self.dir.join(rel);
             std::fs::create_dir_all(path.parent().expect("a parent")).expect("the transcript dir");
             let mut body = String::from("{\"type\":\"user\",\"message\":{\"role\":\"user\"}}\n");
             for (id, model, out) in records {
                 body.push_str(&format!(
-                    "{{\"type\":\"assistant\",\"message\":{{\"id\":\"{}\",\"model\":\"{}\",\"usage\":{{\"input_tokens\":{},\"output_tokens\":{}}}}}}}\n",
-                    id, model, out, out
+                    "{{{}\"type\":\"assistant\",\"message\":{{\"id\":\"{}\",\"model\":\"{}\",\"usage\":{{\"input_tokens\":{},\"output_tokens\":{}}}}}}}\n",
+                    top, id, model, out, out
                 ));
             }
             std::fs::write(&path, body).expect("the transcript must be writable");
@@ -270,7 +299,7 @@ mod tests {
         let t = s.transcript("t.jsonl", &[("m1", "vendor-tiny-1", 5)]);
         let (line, code) = s.run(&[&t]);
         assert_eq!(code, 0, "{}", line);
-        assert!(line.ends_with("id=vendor-tiny-1 session=t class=none expect=- -> READ"), "{}", line);
+        assert!(line.ends_with("id=vendor-tiny-1 effort=- session=t class=none expect=- -> READ"), "{}", line);
     }
 
     // spec: delegation-kit/SPEC.md §model-verdict — OK by exact id, by alias token, and by a stronger
@@ -354,13 +383,54 @@ mod tests {
         assert!(line.contains("id=vendor-big-5"), "{}", line);
     }
 
+    // spec: delegation-kit/SPEC.md §model-verdict — the effort field reads the record's own, `-` where
+    // it carries none, and an `OK` under a class bound to another effort says so and stays `OK`
+    #[test]
+    fn the_line_reads_the_effort_and_names_one_off_the_bound() {
+        let s = Sandbox::new("effort", &["judgment=big,deep", "mechanical=small"]);
+        let deep = s.effort_transcript("deep.jsonl", &[("m1", "vendor-big-5", 5)], Some("deep"));
+        let (line, code) = s.run(&["--expect", "judgment", &deep]);
+        assert_eq!(code, 0, "{}", line);
+        assert!(line.ends_with("id=vendor-big-5 effort=deep session=deep class=judgment expect=judgment -> OK"), "{}", line);
+        let low = s.effort_transcript("low.jsonl", &[("m1", "vendor-big-5", 5)], Some("low"));
+        let (line, code) = s.run(&["--expect", "judgment", &low]);
+        assert_eq!(code, 0, "{}", line);
+        assert!(line.ends_with("effort=low session=low class=judgment expect=judgment -> OK — running effort low is not the class's bound deep"), "{}", line);
+        assert!(s.run(&[&low]).0.ends_with("effort=low session=low class=judgment expect=- -> READ"), "a bare read carries no clause");
+        let (line, _) = s.run(&["--expect", "mechanical", &low]);
+        assert!(line.ends_with("expect=mechanical -> OK"), "a class binding no effort compares none: {}", line);
+        let none = s.transcript("none.jsonl", &[("m1", "vendor-big-5", 5)]);
+        let (line, code) = s.run(&["--expect", "judgment", &none]);
+        assert!(code == 0 && line.ends_with("effort=- session=none class=judgment expect=judgment -> OK"), "{}", line);
+        let small = s.effort_transcript("small.jsonl", &[("m1", "vendor-small-4", 5)], Some("low"));
+        let (line, code) = s.run(&["--expect", "judgment", &small]);
+        assert!(code == 1 && line.contains("effort=low ") && line.contains("-> BELOW — the session is not"), "{}", line);
+    }
+
+    // spec: delegation-kit/SPEC.md §model-verdict — the classes and their ranking are the roster's:
+    // a consumer's own class is expected and ranked, and one its roster lacks is a shape refusal
+    #[test]
+    fn the_expected_class_and_the_ranking_are_the_rosters() {
+        let s = Sandbox::with_roster("roster", &["expert=huge", "judgment=big", "trivial=tiny"], &["expert", "judgment", "trivial"]);
+        let huge = s.transcript("huge.jsonl", &[("m1", "vendor-huge-9", 5)]);
+        let (line, code) = s.run(&["--expect", "trivial", &huge]);
+        assert!(code == 0 && line.contains("class=expert expect=trivial -> OK"), "{}", line);
+        let big = s.transcript("big.jsonl", &[("m1", "vendor-big-5", 5)]);
+        assert_eq!(s.run(&["--expect", "expert", &big]).1, 1, "judgment ranks under expert");
+        assert_eq!(s.run(&["--expect", "routing", &big]), (String::new(), 2), "a class the roster lacks");
+        drop(s);
+        let d = Sandbox::new("roster-default", &bound());
+        let big = d.transcript("big.jsonl", &[("m1", "vendor-big-5", 5)]);
+        assert_eq!(d.run(&["--expect", "premium", &big]), (String::new(), 2));
+        assert_eq!(d.run(&["--expect", "routing", &big]).1, 2, "routing is in the default roster and unbound here");
+    }
+
     // spec: gate-sdk/SPEC.md §The bin/-tool contract — the shape refusal and the `--` escape
     #[test]
     fn a_dash_led_operand_refuses_and_the_escape_takes_it() {
         let flag = vec!["--help".to_string()];
         assert!(parse(&flag).is_err());
         assert!(parse(&["--expect".to_string()]).is_err());
-        assert!(parse(&["--expect".to_string(), "premium".to_string()]).is_err());
         let escaped = parse(&["--".to_string(), "-t.jsonl".to_string()]).expect("the escape");
         assert_eq!(escaped.operand.as_deref(), Some("-t.jsonl"));
         assert!(parse(&["a.jsonl".to_string(), "b.jsonl".to_string()]).is_err(), "one operand at most");

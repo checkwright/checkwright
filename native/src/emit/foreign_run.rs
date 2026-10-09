@@ -11,6 +11,9 @@ pub const KNOBS: &[&str] = &[
     "DELEGATION_KIT_FOREIGN_ADAPTERS",
     "DELEGATION_KIT_FOREIGN_RESUME",
     "DELEGATION_KIT_FOREIGN_SESSION_MARKER",
+    "DELEGATION_KIT_FOREIGN_HARNESS",
+    "DELEGATION_KIT_FOREIGN_TIER_MODEL",
+    "DELEGATION_KIT_TIER_CLASSES",
     "DELEGATION_KIT_FOREIGN_TIMEOUT",
     "DELEGATION_KIT_FOREIGN_USAGE",
     "DELEGATION_KIT_FOREIGN_USAGE_CMD",
@@ -20,13 +23,21 @@ pub const KNOBS: &[&str] = &[
     "GATE_SDK_TMP_DIR",
 ];
 
-const USAGE: &str = "usage: --foreign-run <adapter> <prompt-file> [--mode audit|sweep] [--key <key>] [--]\n       --foreign-run <adapter> --budget\n  runs one unit on the adapter DELEGATION_KIT_FOREIGN_ADAPTERS configures, in a scratch clone of committed HEAD; the key names the run's directory and defaults to the prompt file's stem. With --budget it prints the adapter's keyed budget verdict and spawns no adapter";
+const USAGE: &str = "usage: --foreign-run <adapter> <prompt-file> [--mode audit|sweep] [--class <class>] [--key <key>] [--]\n       --foreign-run <adapter> --budget\n  runs one unit on the adapter DELEGATION_KIT_FOREIGN_ADAPTERS configures, in a scratch clone of committed HEAD; the key names the run's directory and defaults to the prompt file's stem. An adapter DELEGATION_KIT_FOREIGN_HARNESS names requires --class, a class of DELEGATION_KIT_TIER_CLASSES, and runs the model and effort its harness binds to it. With --budget it prints the adapter's keyed budget verdict and spawns no adapter";
 
 const RESUME_USAGE: &str = "usage: --foreign-resume <key> <prompt-file> [--]\n       --foreign-resume <key> --close\n  runs the next turn of the session a resumable adapter opened under the key, or ends it";
 
 const PROMPT_TOKEN: &str = "@PROMPT_FILE@";
 
 pub const SESSION_TOKEN: &str = "@SESSION_ID@";
+
+pub const MODEL_TOKEN: &str = "@MODEL@";
+
+const EFFORT_TOKEN: &str = "@EFFORT@";
+
+// spec: delegation-kit/SPEC.md §Layout and configuration — the two tokens only a class-taking
+// adapter's forms may carry
+pub const CLASS_TOKENS: &[&str] = &[MODEL_TOKEN, EFFORT_TOKEN];
 
 // spec: delegation-kit/SPEC.md §The foreign-vendor run — a `GIT_*` location variable inherited from
 // a hook context would point `git -C <clone>` and the adapter back at this repository
@@ -37,6 +48,7 @@ struct Args {
     adapter: String,
     prompt: String,
     sweep: bool,
+    class: Option<String>,
     key: String,
 }
 
@@ -63,6 +75,7 @@ fn parse(args: &[String]) -> Result<Form, String> {
     let mut mode = false;
     let mut budget = false;
     let mut key: Option<String> = None;
+    let mut class: Option<String> = None;
     let mut literal = false;
     let mut i = 0;
     while i < args.len() {
@@ -71,6 +84,10 @@ fn parse(args: &[String]) -> Result<Form, String> {
             rest.push(a);
         } else if a == "--" {
             literal = true;
+        } else if a == "--class" {
+            let c = args.get(i + 1).ok_or("foreign-run: --class needs a class")?;
+            class = Some(c.clone());
+            i += 1;
         } else if a == "--mode" {
             match args.get(i + 1).map(String::as_str) {
                 Some("audit") => sweep = false,
@@ -97,8 +114,8 @@ fn parse(args: &[String]) -> Result<Form, String> {
     }
     // spec: delegation-kit/SPEC.md §The keyed verdict — the `--budget` form takes the adapter alone
     if budget {
-        if mode || key.is_some() {
-            return Err("foreign-run: --budget takes neither --mode nor --key".to_string());
+        if mode || key.is_some() || class.is_some() {
+            return Err("foreign-run: --budget takes none of --mode, --class and --key".to_string());
         }
         let [adapter] = rest[..] else {
             return Err(format!("foreign-run: --budget takes an adapter alone (got {} operand(s))", rest.len()));
@@ -112,7 +129,67 @@ fn parse(args: &[String]) -> Result<Form, String> {
         Path::new(prompt).file_stem().map(|s| s.to_string_lossy().into_owned()).unwrap_or_default()
     });
     one_component("foreign-run", &key)?;
-    Ok(Form::Run(Args { adapter: adapter.to_string(), prompt: prompt.to_string(), sweep, key }))
+    Ok(Form::Run(Args { adapter: adapter.to_string(), prompt: prompt.to_string(), sweep, class, key }))
+}
+
+// spec: delegation-kit/SPEC.md §The foreign-vendor run — the shape a class-taking adapter holds its
+// run to, read once the tables resolve: a class, and one the roster holds. Any other adapter reads
+// nothing of the class it is passed.
+fn class_shape(cfg: &Config, a: &Args) -> Result<(), String> {
+    if argv_of(&cfg.harness, &a.adapter).is_empty() {
+        return Ok(());
+    }
+    match &a.class {
+        None => Err(format!(
+            "foreign-run: adapter '{}' takes a class (DELEGATION_KIT_FOREIGN_HARNESS names it) and --class names none",
+            a.adapter
+        )),
+        Some(c) if crate::tier::rank(&cfg.classes, c).is_none() => Err(format!(
+            "foreign-run: --class names '{}', not one of {}",
+            c,
+            cfg.classes.join(", ")
+        )),
+        Some(_) => Ok(()),
+    }
+}
+
+// spec: delegation-kit/SPEC.md §The foreign-vendor run — the pair a run's class resolves to: none
+// on an adapter that takes no class, else the row its harness binds, refused where the class is
+// unbound or a form asks for an effort the row lacks
+#[derive(Debug, PartialEq, Clone, Default)]
+struct Pair {
+    class: Option<String>,
+    model: Option<String>,
+    effort: Option<String>,
+}
+
+fn resolve(cfg: &Config, a: &Args) -> Result<Pair, String> {
+    let Some(harness) = argv_of(&cfg.harness, &a.adapter).into_iter().next() else {
+        return Ok(Pair::default());
+    };
+    let class = a.class.as_deref().ok_or(format!("adapter '{}' takes a class and the run names none", a.adapter))?;
+    let Some((model, effort)) = crate::tier::foreign_bound(&cfg.foreign_tiers, &harness, class) else {
+        return Err(format!(
+            "harness '{}' binds no '{}' row in DELEGATION_KIT_FOREIGN_TIER_MODEL",
+            harness, class
+        ));
+    };
+    let asks = |table: &[String]| argv_of(table, &a.adapter).iter().any(|w| w.contains(EFFORT_TOKEN));
+    if effort.is_none() && (asks(&cfg.adapters) || asks(&cfg.resume)) {
+        return Err(format!(
+            "adapter '{}' carries {} and the '{}/{}' row binds no effort",
+            a.adapter, EFFORT_TOKEN, harness, class
+        ));
+    }
+    Ok(Pair {
+        class: Some(class.to_string()),
+        model: Some(model.to_string()),
+        effort: effort.map(str::to_string),
+    })
+}
+
+fn dash(v: &Option<String>) -> &str {
+    v.as_deref().unwrap_or("-")
 }
 
 #[derive(Debug, PartialEq)]
@@ -183,6 +260,9 @@ pub struct Config {
     pub adapters: Vec<String>,
     pub resume: Vec<String>,
     pub markers: Vec<String>,
+    pub harness: Vec<String>,
+    pub foreign_tiers: Vec<String>,
+    pub classes: Vec<String>,
     pub timeout: u64,
     pub repo: String,
     pub base: String,
@@ -197,6 +277,7 @@ struct Verdict {
 
 struct Run<'a> {
     args: &'a Args,
+    class: Option<String>,
     dir: PathBuf,
     budget: &'static str,
     exit: String,
@@ -220,9 +301,10 @@ impl Run<'_> {
     fn line(&self, verdict: &str, code: i32) -> Verdict {
         Verdict {
             line: format!(
-                "foreign-run: adapter={} mode={} key={} budget={} exit={} report={} patch={} -> {}",
+                "foreign-run: adapter={} mode={} class={} key={} budget={} exit={} report={} patch={} -> {}",
                 self.args.adapter,
                 mode_name(self.args.sweep),
+                dash(&self.class),
                 self.args.key,
                 self.budget,
                 self.exit,
@@ -341,15 +423,21 @@ fn outcome(status: Option<i32>, timeout: u64) -> Result<(), String> {
     }
 }
 
-fn substitute(words: &[String], prompt: &str, id: Option<&str>) -> Vec<String> {
+// spec: delegation-kit/SPEC.md §Layout and configuration — every token substitutes inside a word,
+// and one the turn holds no value for is left as written
+fn substitute(words: &[String], prompt: &str, id: Option<&str>, pair: &Pair) -> Vec<String> {
+    let held = [
+        (SESSION_TOKEN, id),
+        (MODEL_TOKEN, pair.model.as_deref()),
+        (EFFORT_TOKEN, pair.effort.as_deref()),
+    ];
     words
         .iter()
         .map(|w| {
-            let w = w.replace(PROMPT_TOKEN, prompt);
-            match id {
-                Some(id) => w.replace(SESSION_TOKEN, id),
+            held.iter().fold(w.replace(PROMPT_TOKEN, prompt), |w, (token, value)| match value {
+                Some(v) => w.replace(token, v),
                 None => w,
-            }
+            })
         })
         .collect()
 }
@@ -359,11 +447,13 @@ fn resume_clause(key: &str) -> String {
 }
 
 // spec: delegation-kit/SPEC.md §The foreign-vendor run — `session.txt`, the binding a resume reads:
-// one line of `adapter= mode= base= turn= id=` fields, `-` for an id no marker produced
+// one line of `adapter= mode= class= model= effort= base= turn= id=` fields, `-` for a field the
+// open held no value for, and an absent pair field reads as `-`
 #[derive(Debug, PartialEq)]
 struct Session {
     adapter: String,
     sweep: bool,
+    pair: Pair,
     base: String,
     turn: u32,
     id: Option<String>,
@@ -372,9 +462,12 @@ struct Session {
 impl Session {
     fn render(&self) -> String {
         format!(
-            "adapter={} mode={} base={} turn={} id={}\n",
+            "adapter={} mode={} class={} model={} effort={} base={} turn={} id={}\n",
             self.adapter,
             mode_name(self.sweep),
+            dash(&self.pair.class),
+            dash(&self.pair.model),
+            dash(&self.pair.effort),
             self.base,
             self.turn,
             self.id.as_deref().unwrap_or("-")
@@ -394,9 +487,11 @@ impl Session {
             m => return Err(format!("mode '{}' is neither audit nor sweep", m)),
         };
         let turn = field("turn")?;
+        let held = |name: &str| field(name).ok().filter(|v| *v != "-").map(str::to_string);
         Ok(Session {
             adapter: field("adapter")?.to_string(),
             sweep,
+            pair: Pair { class: held("class"), model: held("model"), effort: held("effort") },
             base: field("base")?.to_string(),
             turn: turn.parse().map_err(|_| format!("turn '{}' is not a count", turn))?,
             id: Some(field("id")?).filter(|i| *i != "-").map(str::to_string),
@@ -430,11 +525,16 @@ fn paused(keyed: &verdict::Keyed) -> String {
 
 fn foreign_run(cfg: &Config, a: &Args) -> Verdict {
     let dir = PathBuf::from(&cfg.base).join("foreign").join(&a.key);
-    let mut run = Run { args: a, dir, budget: "-", exit: "-".to_string(), report: None, patch: None };
+    let mut run = Run { args: a, class: None, dir, budget: "-", exit: "-".to_string(), report: None, patch: None };
     let argv = argv_of(&cfg.adapters, &a.adapter);
-    let Some((program, words)) = argv.split_first() else {
+    if argv.is_empty() {
         return run.failed(&format!("no adapter '{}' is configured in DELEGATION_KIT_FOREIGN_ADAPTERS", a.adapter));
+    }
+    let pair = match resolve(cfg, a) {
+        Ok(p) => p,
+        Err(why) => return run.failed(&format!("class: {}", why)),
     };
+    run.class = pair.class.clone();
     let prompt = PathBuf::from(walk::abs_against(&cfg.here, &a.prompt));
     if std::fs::File::open(&prompt).is_err() || !prompt.is_file() {
         return run.failed(&format!("cannot read the prompt file {}", prompt.display()));
@@ -486,9 +586,10 @@ fn foreign_run(cfg: &Config, a: &Args) -> Verdict {
         }
     };
     let prompt_abs = prompt.display().to_string();
+    let mut words = substitute(&argv, &prompt_abs, None, &pair);
     let s = Spawn {
-        program: Program::consumer("DELEGATION_KIT_FOREIGN_ADAPTERS", program.replace(PROMPT_TOKEN, &prompt_abs)),
-        words: substitute(words, &prompt_abs, None),
+        program: Program::consumer("DELEGATION_KIT_FOREIGN_ADAPTERS", words.remove(0)),
+        words,
         tree: &tree,
         prompt: &prompt,
         report: &report,
@@ -538,7 +639,7 @@ fn foreign_run(cfg: &Config, a: &Args) -> Verdict {
             marker.unwrap_or_default()
         ));
     }
-    let binding = Session { adapter: a.adapter.clone(), sweep: a.sweep, base, turn: 1, id };
+    let binding = Session { adapter: a.adapter.clone(), sweep: a.sweep, pair, base, turn: 1, id };
     let recorded = std::fs::write(run.dir.join("refs.txt"), &before)
         .and_then(|()| std::fs::write(&session, binding.render()));
     if let Err(e) = recorded {
@@ -552,6 +653,7 @@ struct Turn<'a> {
     key: &'a str,
     adapter: String,
     mode: &'static str,
+    class: String,
     turn: String,
     budget: &'static str,
     exit: String,
@@ -563,9 +665,10 @@ impl Turn<'_> {
     fn line(&self, verdict: &str, code: i32) -> Verdict {
         Verdict {
             line: format!(
-                "foreign-resume: adapter={} mode={} key={} turn={} budget={} exit={} report={} patch={} -> {}",
+                "foreign-resume: adapter={} mode={} class={} key={} turn={} budget={} exit={} report={} patch={} -> {}",
                 self.adapter,
                 self.mode,
+                self.class,
                 self.key,
                 self.turn,
                 self.budget,
@@ -592,6 +695,7 @@ fn foreign_resume(cfg: &Config, key: &str, prompt: &str) -> Verdict {
         key,
         adapter: "-".to_string(),
         mode: "-",
+        class: "-".to_string(),
         turn: "-".to_string(),
         budget: "-",
         exit: "-".to_string(),
@@ -607,6 +711,7 @@ fn foreign_resume(cfg: &Config, key: &str, prompt: &str) -> Verdict {
     };
     t.adapter = s.adapter.clone();
     t.mode = mode_name(s.sweep);
+    t.class = dash(&s.pair.class).to_string();
     t.turn = s.turn.to_string();
     let prompt = PathBuf::from(walk::abs_against(&cfg.here, prompt));
     if std::fs::File::open(&prompt).is_err() || !prompt.is_file() {
@@ -616,11 +721,21 @@ fn foreign_resume(cfg: &Config, key: &str, prompt: &str) -> Verdict {
         return t.failed(&format!("no adapter '{}' is configured in DELEGATION_KIT_FOREIGN_ADAPTERS", s.adapter));
     }
     let form = argv_of(&cfg.resume, &s.adapter);
-    let Some((program, words)) = form.split_first() else {
+    if form.is_empty() {
         return t.failed(&format!("adapter '{}' has no resume form in DELEGATION_KIT_FOREIGN_RESUME", s.adapter));
-    };
+    }
     if s.id.is_none() && form.iter().any(|w| w.contains(SESSION_TOKEN)) {
         return t.failed(&format!("the session recorded no id, and adapter '{}' resumes by id", s.adapter));
+    }
+    // spec: delegation-kit/SPEC.md §Resuming a session — the turn runs on the pair the open
+    // recorded, so a form asking for a half the session holds none of fails before the spawn
+    for (token, held) in [(MODEL_TOKEN, &s.pair.model), (EFFORT_TOKEN, &s.pair.effort)] {
+        if held.is_none() && form.iter().any(|w| w.contains(token)) {
+            return t.failed(&format!(
+                "class: the session recorded none for {}, which adapter '{}' resumes with",
+                token, s.adapter
+            ));
+        }
     }
     let tree = dir.join("tree");
     if !tree.is_dir() {
@@ -655,12 +770,10 @@ fn foreign_resume(cfg: &Config, key: &str, prompt: &str) -> Verdict {
         t.failed(why)
     };
     let prompt_abs = prompt.display().to_string();
+    let mut words = substitute(&form, &prompt_abs, next.id.as_deref(), &next.pair);
     let sp = Spawn {
-        program: Program::consumer(
-            "DELEGATION_KIT_FOREIGN_RESUME",
-            substitute(std::slice::from_ref(program), &prompt_abs, next.id.as_deref()).remove(0),
-        ),
-        words: substitute(words, &prompt_abs, next.id.as_deref()),
+        program: Program::consumer("DELEGATION_KIT_FOREIGN_RESUME", words.remove(0)),
+        words,
         tree: &tree,
         prompt: &prompt,
         report: &report,
@@ -750,6 +863,9 @@ fn config() -> Result<Config, String> {
         adapters: walk::knob_array("DELEGATION_KIT_FOREIGN_ADAPTERS")?,
         resume: walk::knob_array("DELEGATION_KIT_FOREIGN_RESUME")?,
         markers: walk::knob_array("DELEGATION_KIT_FOREIGN_SESSION_MARKER")?,
+        harness: walk::knob_array("DELEGATION_KIT_FOREIGN_HARNESS")?,
+        foreign_tiers: walk::knob_array("DELEGATION_KIT_FOREIGN_TIER_MODEL")?,
+        classes: walk::knob_array("DELEGATION_KIT_TIER_CLASSES")?,
         timeout,
         repo,
         base,
@@ -772,9 +888,18 @@ pub fn run(argv: &[String]) -> i32 {
         Form::Budget(adapter) => return budget(&adapter),
     };
     let v = match config() {
-        Ok(cfg) => foreign_run(&cfg, &a),
-        Err(e) => Run { args: &a, dir: PathBuf::new(), budget: "-", exit: "-".to_string(), report: None, patch: None }
-            .failed(&format!("config: {}", e)),
+        Ok(cfg) => {
+            if let Err(e) = class_shape(&cfg, &a) {
+                eprintln!("{}", e);
+                eprintln!("{}", USAGE);
+                return 2;
+            }
+            foreign_run(&cfg, &a)
+        }
+        Err(e) => {
+            Run { args: &a, class: None, dir: PathBuf::new(), budget: "-", exit: "-".to_string(), report: None, patch: None }
+                .failed(&format!("config: {}", e))
+        }
     };
     println!("{}", v.line);
     v.code
@@ -870,6 +995,9 @@ mod tests {
                 adapters: strings(adapters),
                 resume: strings(resume),
                 markers: strings(markers),
+                harness: Vec::new(),
+                foreign_tiers: Vec::new(),
+                classes: strings(crate::tier::DEFAULT_CLASSES),
                 timeout,
                 repo: self.root.join("src").display().to_string(),
                 base: self.root.join("tmp").display().to_string(),
@@ -910,8 +1038,24 @@ mod tests {
                 adapter: adapter.to_string(),
                 prompt: "prompt.md".to_string(),
                 sweep,
+                class: None,
                 key: "prompt".to_string(),
             }
+        }
+
+        fn classed(&self, adapter: &str, class: &str) -> Args {
+            Args { class: Some(class.to_string()), ..self.args(adapter, false) }
+        }
+
+        // spec: delegation-kit/SPEC.md §Testing — a class-taking stub that echoes its argv: adapter
+        // `c` on harness `vend`, both tokens inside a word, its resume form carrying them too
+        fn class_cfg(&self, rows: &[&str]) -> Config {
+            let open = ["c=bash", "c=-c", "c=echo \"session id: c1 $0\"", "c=m=@MODEL@/e=@EFFORT@"];
+            let resume = ["c=bash", "c=-c", "c=echo \"$0\"", "c=m=@MODEL@/e=@EFFORT@/@SESSION_ID@"];
+            let mut cfg = self.session_cfg(&open, &resume, &["c=session id:"], 60);
+            cfg.harness = strings(&["c=vend"]);
+            cfg.foreign_tiers = strings(rows);
+            cfg
         }
 
         fn run_dir(&self) -> PathBuf {
@@ -956,7 +1100,7 @@ mod tests {
         let r = Repo::new("audit-ok");
         let v = foreign_run(&r.cfg(&["ro=git", "ro=hash-object", "ro=--stdin"], 60), &r.args("ro", false));
         assert_eq!(v.code, 0, "{}", v.line);
-        assert!(v.line.contains("mode=audit key=prompt budget=OFF exit=0 report="), "{}", v.line);
+        assert!(v.line.contains("mode=audit class=- key=prompt budget=OFF exit=0 report="), "{}", v.line);
         assert!(v.line.ends_with("patch=none -> OK"), "{}", v.line);
         let report = std::fs::read(r.run_dir().join("report.txt")).expect("the report");
         assert_eq!(String::from_utf8_lossy(&report), hash_of(&r, b"audit the tree\n"), "stdin carries the prompt");
@@ -978,7 +1122,7 @@ mod tests {
             std::fs::write(r.root.join("prompt.md"), &doc).expect("the prompt file");
             let v = foreign_run(&r.cfg(RO, 60), &r.args("ro", false));
             assert_eq!(v.code, 0, "{}: {}", stage, v.line);
-            assert!(v.line.contains("mode=audit key=prompt") && v.line.ends_with("patch=none -> OK"), "{}", v.line);
+            assert!(v.line.contains("mode=audit class=- key=prompt") && v.line.ends_with("patch=none -> OK"), "{}", v.line);
             let report = std::fs::read(r.run_dir().join("report.txt")).expect("the report");
             assert_eq!(String::from_utf8_lossy(&report), hash_of(&r, doc.as_bytes()), "{}", stage);
         }
@@ -1099,9 +1243,12 @@ mod tests {
             Form::Budget(_) => panic!("{:?} is no budget form", argv),
         };
         let a = run(&["ad", "dir/unit.prompt.md"], "two operands");
-        assert_eq!(a, Args { adapter: "ad".into(), prompt: "dir/unit.prompt.md".into(), sweep: false, key: "unit.prompt".into() });
+        assert_eq!(a, Args { adapter: "ad".into(), prompt: "dir/unit.prompt.md".into(), sweep: false, class: None, key: "unit.prompt".into() });
         let a = run(&["--mode", "sweep", "--key", "k1", "ad", "p.md"], "options first");
-        assert!(a.sweep && a.key == "k1");
+        assert!(a.sweep && a.key == "k1" && a.class.is_none());
+        let a = run(&["ad", "p.md", "--class", "judgment"], "a class");
+        assert_eq!(a.class.as_deref(), Some("judgment"));
+        assert!(parse(&strings(&["ad", "p.md", "--class"])).is_err(), "--class needs a value");
         let a = run(&["ad", "--", "-p.md"], "the escape");
         assert_eq!(a.prompt, "-p.md");
         for bad in [&["ad"][..], &["ad", "p", "q"], &["--help"], &["--mode", "write", "ad", "p"], &["--key", "a/b", "ad", "p"], &["--key", "..", "ad", "p"]] {
@@ -1115,7 +1262,7 @@ mod tests {
     fn the_budget_form_takes_the_adapter_alone() {
         assert_eq!(parse(&strings(&["ad", "--budget"])), Ok(Form::Budget("ad".into())));
         assert_eq!(parse(&strings(&["--budget", "ad"])), Ok(Form::Budget("ad".into())));
-        for bad in [&["--budget"][..], &["ad", "p.md", "--budget"], &["--budget", "--mode", "audit", "ad"], &["--budget", "--key", "k", "ad"]] {
+        for bad in [&["--budget"][..], &["ad", "p.md", "--budget"], &["--budget", "--mode", "audit", "ad"], &["--budget", "--key", "k", "ad"], &["--budget", "--class", "judgment", "ad"]] {
             assert!(parse(&strings(bad)).is_err(), "{:?} must refuse", bad);
         }
     }
@@ -1207,7 +1354,7 @@ mod tests {
         let paused = r.budgeted(r.session_cfg(OPEN_STDOUT, RESUME_ECHO, MARKER, 60), "s", "90", 0);
         let v = foreign_resume(&paused, "prompt", "answer.md");
         assert_eq!(v.code, 2, "{}", v.line);
-        assert!(v.line.starts_with("foreign-resume: adapter=s mode=audit key=prompt turn=1 budget=PAUSE exit=- report=none patch=none -> FAILED (budget: used=90% "), "{}", v.line);
+        assert!(v.line.starts_with("foreign-resume: adapter=s mode=audit class=- key=prompt turn=1 budget=PAUSE exit=- report=none patch=none -> FAILED (budget: used=90% "), "{}", v.line);
         assert!(r.read("session.txt").contains(" turn=1 "), "{}", r.read("session.txt"));
         assert!(r.run_dir().join("report.txt").is_file() && !r.run_dir().join("report.1.txt").exists(), "nothing is rotated");
         let v = foreign_resume(&r.budgeted(r.session_cfg(OPEN_STDOUT, RESUME_ECHO, MARKER, 60), "s", "10", 0), "prompt", "answer.md");
@@ -1260,7 +1407,7 @@ mod tests {
             assert_eq!(v.code, 0, "{}", v.line);
             assert!(v.line.ends_with("-> OK — resumable: --foreign-resume prompt <prompt-file>"), "{}", v.line);
             assert!(r.tree_kept(), "an open session keeps its clone");
-            assert_eq!(r.read("session.txt"), format!("adapter=s mode=audit base={} turn=1 id={}\n", r.head(), id));
+            assert_eq!(r.read("session.txt"), format!("adapter=s mode=audit class=- model=- effort=- base={} turn=1 id={}\n", r.head(), id));
             assert!(r.read("refs.txt").starts_with(&r.head()), "{}", r.read("refs.txt"));
             let again = foreign_run(&r.session_cfg(open, RESUME_ECHO, MARKER, 60), &r.args("s", false));
             assert_eq!(again.code, 2, "{}", again.line);
@@ -1293,7 +1440,7 @@ mod tests {
         assert_eq!(foreign_run(&cfg, &r.args("s", false)).code, 0);
         let v = foreign_resume(&cfg, "prompt", "answer.md");
         assert_eq!(v.code, 0, "{}", v.line);
-        assert!(v.line.starts_with("foreign-resume: adapter=s mode=audit key=prompt turn=2 budget=OFF exit=0 report="), "{}", v.line);
+        assert!(v.line.starts_with("foreign-resume: adapter=s mode=audit class=- key=prompt turn=2 budget=OFF exit=0 report="), "{}", v.line);
         assert!(v.line.ends_with("patch=none -> OK — resumable: --foreign-resume prompt <prompt-file>"), "{}", v.line);
         // comment-tier-exempt: a Windows bash stub prints the substituted path with forward slashes
         let answer = r.root.join("answer.md").display().to_string().replace('\\', "/");
@@ -1325,11 +1472,11 @@ mod tests {
         let cfg = r.session_cfg(&open, RESUME_ECHO, MARKER, 60);
         let v = foreign_run(&cfg, &r.args("s", false));
         assert_eq!(v.code, 0, "{}", v.line);
-        assert!(v.line.contains("mode=audit key=prompt") && v.line.contains("patch=none -> OK — resumable"), "{}", v.line);
+        assert!(v.line.contains("mode=audit class=- key=prompt") && v.line.contains("patch=none -> OK — resumable"), "{}", v.line);
         assert_eq!(r.read("report.txt"), format!("session id: abc-1.x\n{}", hash_of(&r, &frame)), "stdin carries the frame");
         let q = foreign_resume(&cfg, "prompt", "answer.md");
         assert_eq!(q.code, 0, "{}", q.line);
-        assert!(q.line.contains("mode=audit key=prompt turn=2") && q.line.contains("-> OK"), "{}", q.line);
+        assert!(q.line.contains("mode=audit class=- key=prompt turn=2") && q.line.contains("-> OK"), "{}", q.line);
         assert!(r.read("report.txt").ends_with("the answer\n"), "{}", r.read("report.txt"));
         assert!(r.read("report.1.txt").starts_with("session id: abc-1.x\n"), "the critique's report is rotated, not lost");
         assert_eq!(foreign_close(&cfg, "prompt").code, 0);
@@ -1348,7 +1495,7 @@ mod tests {
         let v = foreign_resume(&cfg, "prompt", "answer.md");
         assert_eq!(v.code, 0, "{}", v.line);
         let patch = r.run_dir().join("change.patch");
-        assert!(v.line.contains(&format!("mode=sweep key=prompt turn=2 budget=OFF exit=0 report={} patch={} -> OK", r.run_dir().join("report.txt").display(), patch.display())), "{}", v.line);
+        assert!(v.line.contains(&format!("mode=sweep class=- key=prompt turn=2 budget=OFF exit=0 report={} patch={} -> OK", r.run_dir().join("report.txt").display(), patch.display())), "{}", v.line);
         let body = String::from_utf8_lossy(&std::fs::read(&patch).expect("the patch")).into_owned();
         assert!(body.contains("tracked.cfg") && body.contains("new.cfg"), "{}", body);
         git(&r.root.join("src"), &["apply", "--check", patch.to_str().unwrap_or_default()]).expect("the patch applies cleanly");
@@ -1394,8 +1541,92 @@ mod tests {
         assert!(r.run_dir().join("report.2.txt").is_file(), "the failed turn's report was rotated");
         let v = foreign_resume(&cfg, "nope", "answer.md");
         assert_eq!(v.code, 2, "{}", v.line);
-        assert!(v.line.starts_with("foreign-resume: adapter=- mode=- key=nope turn=- budget=- exit=- report=none"), "{}", v.line);
+        assert!(v.line.starts_with("foreign-resume: adapter=- mode=- class=- key=nope turn=- budget=- exit=- report=none"), "{}", v.line);
         assert!(v.line.contains("FAILED (no open session under"), "{}", v.line);
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — a class-taking adapter runs the pair its harness binds
+    // to the run's class, both tokens substituted inside a word, and the line and the session name it
+    #[test]
+    fn a_run_resolves_its_class_into_the_adapters_argv() {
+        let r = Repo::new("class-ok");
+        let cfg = r.class_cfg(&["vend/judgment=g-9,deep", "vend/mechanical=g-1,low", "other/judgment=x,y"]);
+        let v = foreign_run(&cfg, &r.classed("c", "judgment"));
+        assert_eq!(v.code, 0, "{}", v.line);
+        assert!(v.line.starts_with("foreign-run: adapter=c mode=audit class=judgment key=prompt budget=OFF exit=0 "), "{}", v.line);
+        assert_eq!(r.read("report.txt"), "session id: c1 m=g-9/e=deep\n");
+        assert_eq!(
+            r.read("session.txt"),
+            format!("adapter=c mode=audit class=judgment model=g-9 effort=deep base={} turn=1 id=c1\n", r.head())
+        );
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — a resumed turn carries the pair the session opened
+    // with after the binding changed, and the next open takes the edited row
+    #[test]
+    fn a_resumed_turn_keeps_the_pair_its_session_opened_with() {
+        let r = Repo::new("class-resume");
+        assert_eq!(foreign_run(&r.class_cfg(&["vend/judgment=g-9,deep"]), &r.classed("c", "judgment")).code, 0);
+        let edited = r.class_cfg(&["vend/judgment=g-10,shallow"]);
+        let v = foreign_resume(&edited, "prompt", "answer.md");
+        assert_eq!(v.code, 0, "{}", v.line);
+        assert!(v.line.starts_with("foreign-resume: adapter=c mode=audit class=judgment key=prompt turn=2 "), "{}", v.line);
+        assert_eq!(r.read("report.txt"), "m=g-9/e=deep/c1\n");
+        assert!(r.read("session.txt").contains(" class=judgment model=g-9 effort=deep "), "{}", r.read("session.txt"));
+        assert_eq!(foreign_close(&edited, "prompt").code, 0);
+        assert_eq!(foreign_run(&edited, &r.classed("c", "judgment")).code, 0);
+        assert_eq!(r.read("report.txt"), "session id: c1 m=g-10/e=shallow\n");
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — an unbound class and an effortless row under the effort
+    // token fail before the budget read and clone nothing; a missing class and one the roster lacks
+    // are the class-taking adapter's shape refusals
+    #[test]
+    fn a_class_that_does_not_resolve_fails_before_any_clone() {
+        let r = Repo::new("class-failed");
+        let cases = [
+            (&["other/judgment=g"][..], "harness 'vend' binds no 'judgment' row in DELEGATION_KIT_FOREIGN_TIER_MODEL"),
+            (&["vend/judgment=g"], "adapter 'c' carries @EFFORT@ and the 'vend/judgment' row binds no effort"),
+        ];
+        for (rows, why) in cases {
+            let cfg = r.budgeted(r.class_cfg(rows), "c", "90", 0);
+            let v = foreign_run(&cfg, &r.classed("c", "judgment"));
+            assert_eq!(v.code, 2, "{}", v.line);
+            assert!(v.line.contains(&format!("class=- key=prompt budget=- exit=- report=none patch=none -> FAILED (class: {})", why)), "{}", v.line);
+            assert!(!r.run_dir().exists(), "nothing is cloned");
+        }
+        let cfg = r.class_cfg(&["vend/judgment=g,deep"]);
+        let missing = class_shape(&cfg, &r.args("c", false)).expect_err("a class-taking adapter needs a class");
+        assert!(missing.contains("adapter 'c' takes a class"), "{}", missing);
+        let unknown = class_shape(&cfg, &r.classed("c", "premium")).expect_err("a class the roster lacks");
+        assert!(unknown.contains("--class names 'premium', not one of judgment, routing, mechanical"), "{}", unknown);
+        assert_eq!(class_shape(&cfg, &r.classed("c", "judgment")), Ok(()));
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — an adapter no harness element names reads nothing of
+    // the class it is passed, whatever the class, and its line says so
+    #[test]
+    fn a_class_on_a_plain_adapter_applies_nothing() {
+        let r = Repo::new("class-plain");
+        let cfg = r.cfg(RO, 60);
+        for class in ["judgment", "a-class-no-roster-holds"] {
+            assert_eq!(class_shape(&cfg, &r.classed("ro", class)), Ok(()));
+            let v = foreign_run(&cfg, &r.classed("ro", class));
+            assert_eq!(v.code, 0, "{}", v.line);
+            assert!(v.line.contains("adapter=ro mode=audit class=- key=prompt"), "{}", v.line);
+        }
+    }
+
+    // spec: delegation-kit/SPEC.md §Resuming a session — a session opened on an adapter that took no
+    // class holds no pair, so a resume form later given a class token fails before the spawn
+    #[test]
+    fn a_resume_form_asking_for_a_pair_the_session_lacks_fails() {
+        let r = Repo::new("class-resume-none");
+        assert_eq!(foreign_run(&r.session_cfg(OPEN_STDOUT, RESUME_ECHO, MARKER, 60), &r.args("s", false)).code, 0);
+        let asking = ["s=bash", "s=-c", "s=echo \"$0\"", "s=@MODEL@"];
+        let v = foreign_resume(&r.session_cfg(OPEN_STDOUT, &asking, MARKER, 60), "prompt", "answer.md");
+        assert_eq!(v.code, 2, "{}", v.line);
+        assert!(v.line.contains("turn=1 budget=- exit=- report=none") && v.line.contains("FAILED (class: the session recorded none for @MODEL@"), "{}", v.line);
     }
 
     // spec: delegation-kit/SPEC.md §Resuming a session — the argv shape: a key and a prompt file, or a
@@ -1414,8 +1645,14 @@ mod tests {
     // and a line missing a field is refused
     #[test]
     fn the_session_record_round_trips() {
-        let s = Session { adapter: "a".into(), sweep: true, base: "abc".into(), turn: 4, id: None };
+        let s = Session { adapter: "a".into(), sweep: true, pair: Pair::default(), base: "abc".into(), turn: 4, id: None };
         assert_eq!(Session::parse(&s.render()), Ok(s));
+        let pair = Pair { class: Some("judgment".into()), model: Some("g-9".into()), effort: None };
+        let s = Session { adapter: "a".into(), sweep: false, pair, base: "abc".into(), turn: 1, id: Some("i".into()) };
+        assert_eq!(s.render(), "adapter=a mode=audit class=judgment model=g-9 effort=- base=abc turn=1 id=i\n");
+        assert_eq!(Session::parse(&s.render()), Ok(s));
+        let before = Session::parse("adapter=a mode=audit base=b turn=1 id=-\n").expect("a line without the pair");
+        assert_eq!(before.pair, Pair::default());
         assert!(Session::parse("adapter=a mode=audit turn=1 id=-\n").is_err());
         assert!(Session::parse("adapter=a mode=write base=b turn=1 id=-\n").is_err());
     }

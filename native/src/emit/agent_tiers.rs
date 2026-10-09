@@ -1,5 +1,6 @@
 // spec: delegation-kit/SPEC.md §check-agent-tier-explicit — the generator of every agent
-// definition's `model:` line: the bound value of the class its `tier:` field declares.
+// definition's `model:` line, and its `effort:` line where the class binds one: the pair bound to
+// the class its `tier:` field declares.
 use crate::walk;
 use std::path::Path;
 
@@ -11,12 +12,14 @@ pub const KNOBS: &[&str] = &[
 ];
 
 // spec: delegation-kit/SPEC.md §check-agent-tier-explicit — one tiered definition's reading: its
-// class, its current `model:` value, the value the binding expects, and the whole file as `--write`
-// would leave it.
+// class, its current `model:` and `effort:` values, the pair the binding expects, and the whole file
+// as `--write` would leave it.
 pub struct Tiered {
     pub path: String,
     pub current: Option<String>,
     pub expected: String,
+    pub current_effort: Option<String>,
+    pub expected_effort: Option<String>,
     pub before: String,
     pub after: String,
 }
@@ -39,10 +42,10 @@ pub fn field(text: &str, key: &str) -> Option<String> {
     None
 }
 
-// spec: delegation-kit/SPEC.md §check-agent-tier-explicit — `--write`'s rewrite: the `model:` line
-// inside the first frontmatter block replaced, or one inserted after `tier:` where none exists; no
+// spec: delegation-kit/SPEC.md §check-agent-tier-explicit — `--write`'s rewrite of the `model:` line
+// and, under a bound effort, the `effort:` line: each replaced where it stands or inserted, and no
 // other byte moves, line endings included.
-pub fn rewrite(text: &str, expected: &str) -> String {
+pub fn rewrite(text: &str, expected: &str, effort: Option<&str>) -> String {
     let lines: Vec<&str> = text.split_inclusive('\n').collect();
     let close = lines.iter().skip(1).position(|l| l.trim_end_matches(['\n', '\r']) == "---").map(|i| i + 1);
     let Some(close) = close.filter(|_| lines.first().map(|l| l.trim_end_matches(['\n', '\r'])) == Some("---")) else {
@@ -51,10 +54,24 @@ pub fn rewrite(text: &str, expected: &str) -> String {
     let eol = |l: &str| if l.ends_with("\r\n") { "\r\n" } else { "\n" };
     let is = |l: &str, key: &str| l.strip_prefix(key).is_some_and(|r| r.starts_with(':'));
     let mut out: Vec<String> = lines.iter().map(|l| l.to_string()).collect();
-    if let Some(i) = (1..close).find(|i| is(lines[*i], "model")) {
+    let mut close = close;
+    let model = if let Some(i) = (1..close).find(|i| is(lines[*i], "model")) {
         out[i] = format!("model: {}{}", expected, eol(lines[i]));
+        Some(i)
     } else if let Some(i) = (1..close).find(|i| is(lines[*i], "tier")) {
         out.insert(i + 1, format!("model: {}{}", expected, eol(lines[i])));
+        close += 1;
+        Some(i + 1)
+    } else {
+        None
+    };
+    if let Some(effort) = effort {
+        if let Some(i) = (1..close).find(|i| is(&out[*i], "effort")) {
+            out[i] = format!("effort: {}{}", effort, eol(&out[i]));
+        } else if let Some(i) = model {
+            let line = format!("effort: {}{}", effort, eol(&out[i]));
+            out.insert(i + 1, line);
+        }
     }
     out.concat()
 }
@@ -81,10 +98,13 @@ pub fn plan(dir: &str, binding: &[String]) -> Result<Vec<Tiered>, String> {
             unbound.push(format!("{}: tier '{}' names no bound class", path, class));
             continue;
         };
+        let effort = crate::tier::effort(binding, &class);
         out.push(Tiered {
             current: field(&before, "model"),
             expected: expected.to_string(),
-            after: rewrite(&before, expected),
+            current_effort: field(&before, "effort"),
+            expected_effort: effort.map(str::to_string),
+            after: rewrite(&before, expected, effort),
             path,
             before,
         });
@@ -121,11 +141,15 @@ fn report(defs: &[Tiered], write: bool) -> Result<String, String> {
             out.push_str(&format!("{}: current\n", d.path));
             continue;
         }
+        let effort = d.expected_effort.as_ref().map_or(String::new(), |e| {
+            format!(", effort: {} -> {}", d.current_effort.as_deref().unwrap_or("-"), e)
+        });
         out.push_str(&format!(
-            "{}: model: {} -> {}\n",
+            "{}: model: {} -> {}{}\n",
             d.path,
             d.current.as_deref().unwrap_or("-"),
-            d.expected
+            d.expected,
+            effort
         ));
     }
     if write {
@@ -156,12 +180,38 @@ mod tests {
     #[test]
     fn the_rewrite_touches_the_model_line_alone() {
         let stale = "---\nname: a\ntier: judgment\nmodel: small\n---\nbody model: x\n";
-        assert_eq!(rewrite(stale, "big"), "---\nname: a\ntier: judgment\nmodel: big\n---\nbody model: x\n");
+        assert_eq!(rewrite(stale, "big", None), "---\nname: a\ntier: judgment\nmodel: big\n---\nbody model: x\n");
         let missing = "---\nname: a\ntier: judgment\ndescription: d\n---\n";
-        assert_eq!(rewrite(missing, "big"), "---\nname: a\ntier: judgment\nmodel: big\ndescription: d\n---\n");
+        assert_eq!(rewrite(missing, "big", None), "---\nname: a\ntier: judgment\nmodel: big\ndescription: d\n---\n");
         let crlf = "---\r\ntier: judgment\r\nmodel: small\r\n---\r\n";
-        assert_eq!(rewrite(crlf, "big"), "---\r\ntier: judgment\r\nmodel: big\r\n---\r\n");
-        assert_eq!(rewrite("no frontmatter\n", "big"), "no frontmatter\n");
+        assert_eq!(rewrite(crlf, "big", None), "---\r\ntier: judgment\r\nmodel: big\r\n---\r\n");
+        assert_eq!(rewrite("no frontmatter\n", "big", None), "no frontmatter\n");
+    }
+
+    // spec: delegation-kit/SPEC.md §check-agent-tier-explicit — a bound effort replaces the effort
+    // line where it stands, is inserted after model: where none exists, and an unbound one leaves
+    // the line as written
+    #[test]
+    fn the_rewrite_holds_the_effort_line_where_the_class_binds_one() {
+        let deep = Some("deep");
+        let stale = "---\ntier: judgment\nmodel: big\neffort: low\n---\nbody effort: x\n";
+        assert_eq!(rewrite(stale, "big", deep), "---\ntier: judgment\nmodel: big\neffort: deep\n---\nbody effort: x\n");
+        let apart = "---\neffort: low\ntier: judgment\nmodel: big\n---\n";
+        assert_eq!(rewrite(apart, "big", deep), "---\neffort: deep\ntier: judgment\nmodel: big\n---\n");
+        let missing = "---\ntier: judgment\nmodel: small\nname: a\n---\n";
+        assert_eq!(rewrite(missing, "big", deep), "---\ntier: judgment\nmodel: big\neffort: deep\nname: a\n---\n");
+        let bare = "---\r\ntier: judgment\r\n---\r\n";
+        assert_eq!(rewrite(bare, "big", deep), "---\r\ntier: judgment\r\nmodel: big\r\neffort: deep\r\n---\r\n");
+        assert_eq!(rewrite(stale, "big", None), stale, "an unbound effort leaves the line as written");
+        assert_eq!(rewrite(&rewrite(missing, "big", deep), "big", deep), rewrite(missing, "big", deep));
+        let dir = scratch("effort");
+        std::fs::write(format!("{}/a.md", dir), missing).unwrap();
+        std::fs::write(format!("{}/b.md", dir), "---\ntier: mechanical\nmodel: small\neffort: any\n---\n").unwrap();
+        let defs = plan(&dir, &["judgment=big,deep".to_string(), "mechanical=small".to_string()]).expect("a plan");
+        let bare = report(&defs, false).expect("the bare report");
+        assert!(bare.contains(&format!("{}/a.md: model: small -> big, effort: - -> deep\n", dir)), "{}", bare);
+        assert!(bare.contains(&format!("{}/b.md: current\n", dir)), "{}", bare);
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     // spec: delegation-kit/SPEC.md §check-agent-tier-explicit — the bare report's two line shapes,

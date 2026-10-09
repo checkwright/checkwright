@@ -29,7 +29,7 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
        --usage-poll                            refresh the usage snapshot from its source
        --usage-verdict [paths]                 budget verdict: 0 OK/RESET-OK, 1 PAUSE, 2 STALE
        --model-verdict [--expect <class>] [transcript]  running-model verdict: 0 READ/OK, 1 BELOW/UNBOUND, 2 UNKNOWN
-       --foreign-run <adapter> <prompt-file> [--mode audit|sweep] [--key <key>]  one unit on a foreign adapter: 0 OK, 1 REFUSED, 2 FAILED
+       --foreign-run <adapter> <prompt-file> [--mode audit|sweep] [--class <class>] [--key <key>]  one unit on a foreign adapter: 0 OK, 1 REFUSED, 2 FAILED
        --foreign-run <adapter> --budget        the adapter's budget verdict, no spawn: 0 OK/RESET-OK, 1 PAUSE, 2 STALE/OFF
        --foreign-resume <key> <prompt-file> | <key> --close  the next turn of a foreign session, or its end: 0 OK/CLOSED, 1 REFUSED, 2 FAILED
        --lesson-sink <tag>                     route a lesson body on stdin to its sink
@@ -82,16 +82,23 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
   --model-verdict  emits one line naming the model the session runs on, read
           off its transcript, and with --expect <class> judges it against the
           tier binding: exit 0 READ or OK, 1 BELOW or UNBOUND (off its
-          expected tier), 2 UNKNOWN (unverified, never a refusal). The operand
-          names the transcript by path or eight-character session id; bare, it
-          takes the delegation-aware pick. Unavailable is exit 2.
+          expected tier), 2 UNKNOWN (unverified, never a refusal). The class
+          is one of DELEGATION_KIT_TIER_CLASSES. The line carries the effort
+          the session runs at, and an OK names one that is not the class's
+          bound effort. The operand names the transcript by path or
+          eight-character session id; bare, it takes the delegation-aware
+          pick. Unavailable is exit 2.
   --foreign-run  runs one read-only audit or mechanical sweep on the adapter
           DELEGATION_KIT_FOREIGN_ADAPTERS configures, in a scratch clone of
           committed HEAD, and emits one verdict line: exit 0 OK, 1 REFUSED
           (the agent committed, or an audit wrote), 2 FAILED. The report, and a
           sweep's patch, land under <tmp-dir>/foreign/<key>/. An adapter
           DELEGATION_KIT_FOREIGN_RESUME gives a resume form keeps its clone on
-          OK as an open session. The adapter's budget is read before the
+          OK as an open session. An adapter DELEGATION_KIT_FOREIGN_HARNESS
+          names requires --class and runs the model and effort its harness
+          binds to that class in DELEGATION_KIT_FOREIGN_TIER_MODEL; any other
+          adapter reads nothing of a class, and the line's class= says which
+          happened. The adapter's budget is read before the
           spawn, and a paused window spawns nothing: FAILED (budget: ...).
           With --budget it prints that budget verdict alone and spawns no
           adapter: exit 0 OK / RESET-OK, 1 PAUSE, 2 STALE or OFF

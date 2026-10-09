@@ -22,7 +22,7 @@
 25807cp companion/SPEC.md
 113395cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
-245137cp delegation-kit/SPEC.md
+254857cp delegation-kit/SPEC.md
 40211cp delegation-kit/templates/agent-execution.md
 3397cp delegation-kit/templates/dispatch-checklists.md
 1308cp docs/canon-kit/index.md
@@ -33,7 +33,7 @@
 1285cp docs/drift-kit/index.md
 1351cp docs/evidence-kit/index.md
 1463cp docs/gate-sdk/index.md
-9510cp docs/generated-projections.md
+9561cp docs/generated-projections.md
 1259cp docs/guard-kit/index.md
 5205cp docs/index.md
 8115cp docs/install-block-contracts.md
@@ -99,7 +99,7 @@
 288430cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
 279471cp installer/SPEC.md
-384776cp lifecycle-kit/SPEC.md
+385604cp lifecycle-kit/SPEC.md
 7605cp lifecycle-kit/templates/consult.md
 1212cp lifecycle-kit/templates/frames/project-critique.md
 1412cp lifecycle-kit/templates/frames/stage-contract.md

@@ -1,7 +1,8 @@
 // spec: delegation-kit/SPEC.md §check-agent-tier-explicit — every agent definition under the
 // scanned directory declares a `model:` field in its frontmatter (assertion A: an explicit
 // `inherit` passes, only omission reds), and where the tier binding is set its `model:` is the
-// bound value of the class its `tier:` declares (assertion B)
+// bound model of the class its `tier:` declares, beside that class's effort where it binds one
+// (assertion B)
 use crate::emit::agent_tiers;
 use crate::walk;
 use std::path::Path;
@@ -116,11 +117,11 @@ pub fn run(args: &[String]) -> i32 {
             let Some(door) = super::door_or_report("check-agent-tier-explicit", "--emit agent-tiers --write") else {
                 return 2;
             };
-            println!("check-agent-tier-explicit: agent definition(s) whose model: is not their tier class's bound model:");
+            println!("check-agent-tier-explicit: agent definition(s) whose model: or effort: is not what their tier class binds:");
             for f in &unbound {
                 println!("  {}", f);
             }
-            println!("  help: {} — it regenerates each model:", door);
+            println!("  help: {} — it regenerates each model:, and each effort: a class binds,", door);
             println!("        from the definition's tier: and DELEGATION_KIT_TIER_MODEL; a definition that should ride");
             println!("        its dispatcher's tier states 'model: inherit' and no tier:.");
         }
@@ -160,12 +161,22 @@ fn generated(text: &str, binding: &[String]) -> Option<String> {
     let Some(expected) = crate::tier::bound(binding, &class) else {
         return Some(format!("tier '{}' names no bound class", class));
     };
-    if agent_tiers::rewrite(text, expected) != text {
+    if agent_tiers::rewrite(text, expected, None) != text {
         return Some(format!(
             "stale model: {} (tier '{}' is bound to {})",
             model.as_deref().unwrap_or("-"),
             class,
             expected
+        ));
+    }
+    let effort = crate::tier::effort(binding, &class)?;
+    if agent_tiers::rewrite(text, expected, Some(effort)) != text {
+        return Some(format!(
+            "stale effort: {} (tier '{}' is bound to {},{})",
+            agent_tiers::field(text, "effort").as_deref().unwrap_or("-"),
+            class,
+            expected,
+            effort
         ));
     }
     None
@@ -217,6 +228,13 @@ mod tests {
         assert!(unbound.contains("names no bound class"), "{}", unbound);
         let untiered = generated("---\nmodel: big\n---\n", &binding).expect("untiered");
         assert!(untiered.contains("with no tier: field"), "{}", untiered);
+        assert_eq!(generated("---\ntier: judgment\nmodel: big\neffort: any\n---\n", &binding), None, "an unbound effort is the definition's own");
+        let paired = vec!["judgment=big,deep".to_string()];
+        assert_eq!(generated("---\ntier: judgment\nmodel: big\neffort: deep\n---\n", &paired), None);
+        let stale = generated("---\ntier: judgment\nmodel: big\neffort: low\n---\n", &paired).expect("a stale effort");
+        assert_eq!(stale, "stale effort: low (tier 'judgment' is bound to big,deep)");
+        let missing = generated("---\ntier: judgment\nmodel: big\n---\n", &paired).expect("a missing effort");
+        assert!(missing.starts_with("stale effort: - "), "{}", missing);
     }
 
     #[test]

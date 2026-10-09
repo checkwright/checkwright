@@ -1,1 +1,1 @@
-AGENT-TIER-EXPLICIT: clean (2 agent definition(s) under agents, each declaring an explicit model:; 1 holding their tier class's bound model)
+AGENT-TIER-EXPLICIT: clean (3 agent definition(s) under agents, each declaring an explicit model:; 2 holding their tier class's bound model)

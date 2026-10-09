@@ -1,88 +1,40 @@
 # SPEC amendment: tier-resolution
 
-A tier class resolves to a model and an effort in one place, for the master harness and for a foreign vendor's harness alike. Today the binding (delegation-kit/SPEC.md §The tier binding) maps a class to a master-harness model alone, effort is chosen at each dispatch, and a foreign adapter carries its model and effort as literal argv words and binds to no class. A renamed model, or a class moved to another effort, is edited at every adapter and remembered by every dispatcher.
-
-The two harnesses take one design: a class table whose rows bind a class to a model and an optional effort, one grammar, one parser, one resolver. The master harness's table is the existing knob. A foreign harness's table is a second knob in the same grammar, because of where each lives and never because the design differs: a knob named in a file is replaced whole (gate-sdk/SPEC.md §The knob file), a vendor's rows usually sit in the gitignored overlay beside the adapters, and master rows in that overlay would replace the tracked ones a freshness gate reads.
-
-Measured for this amendment:
-
-- Every assistant record in a master-harness transcript carries a top-level `effort` field beside `message.model`: over one lead session's subagent transcripts, each record read `high` or `medium`, the two values dispatched.
-- `--model-verdict --expect judgment` over a transcript whose model matches no bound value prints `class=none … -> UNBOUND` at exit 1.
-- The harness's subagent documentation gives a definition a frontmatter `effort:` field, a per-dispatch `effort` parameter that overrides it, and an environment variable that overrides both. Read from the documentation page, not from a dispatch.
+A tier class resolves to a model and an effort in one place, for the master harness and for a foreign vendor's harness alike. Deltas 1 through 6 are merged: the row grammar, the class roster, the foreign table, the executor's `--class`, the master readers' effort half and the consultation's class knob are canonical text, and each heading below points at where it landed. Deltas 7, 8 and 9 remain to apply: the templates that pass a class, the canonical passages that still say the two bindings do not meet, and this repo's own binding.
 
 ## What changes
 
 ### (1) A row binds a class to a model and an optional effort
 
-An element of `DELEGATION_KIT_TIER_MODEL` becomes `<class>=<model>[,<effort>]`, the effort being whatever its harness calls a reasoning level. {design-bearing} {user-facing: the entry's envelope direction — one resolution point, class to model plus effort}
-
-The element still splits at its first `=`. The value splits at its first `,`: the model before it and the effort after. A value with no comma binds a model and no effort, so every existing binding stays valid and means what it meant. The model keeps every refusal it has. The effort is refused when empty, when it carries whitespace and when it carries a second comma. The kit holds no effort vocabulary and no order over efforts: the levels are a harness's own and churn with its roster, the ground on which the kit ships no model value (gate-sdk/SPEC.md §The provenance seam).
-
-A class with no effort leaves effort where it is today, with the dispatcher. The one read a dispatcher makes is unchanged, `--emit knob-values DELEGATION_KIT_TIER_MODEL`, and now returns both halves.
-
-**A new arm is refused.** A resolver arm printing a class's pair would be a second spelling of that read, and its one caller already holds the row.
+Merged: delegation-kit/SPEC.md §The tier binding, **A row binds a model and an optional effort**. {design-bearing}
 
 ### (2) The class roster is a knob
 
-`DELEGATION_KIT_TIER_CLASSES` holds the classes, highest first: indexed, default `judgment`, `routing`, `mechanical`. {design-bearing} {user-facing: the entry's envelope direction — the class roster is consumer config with the kit's three as its default}
-
-Every reader that took the compiled three takes the roster: the binding's validator, `--model-verdict`'s `--expect` check and its ranking, and both tables' unknown-class refusal. The table validator refuses a name outside `[a-z0-9-]`, a name given twice, and a binding row whose class the roster lacks. Being indexed it has no environment spelling, on the binding's own ground.
-
-**`routing` stays, as a default member and no longer a constant.** Its reader is the split posture (lifecycle-kit/templates/lead.md §The lead model), which a consumer may or may not adopt. A consumer that splits its lead by session binds `routing` to its judgment model or drops it from its roster.
-
-**Honest limit.** The shipped templates name `judgment` and `mechanical`. A roster without one of them leaves the template step that names it reading `UNKNOWN`, tier unverified. The validator does not refuse such a roster, because a consumer who forks the templates may rename every class.
+Merged: delegation-kit/SPEC.md §The tier binding, **The roster is consumer config**, and §Layout and configuration, `DELEGATION_KIT_TIER_CLASSES`. {design-bearing}
 
 ### (3) A foreign harness has a class table of its own, in the same grammar
 
-`DELEGATION_KIT_FOREIGN_TIER_MODEL` holds a foreign harness's rows, `<harness>/<class>=<model>[,<effort>]`, and `DELEGATION_KIT_FOREIGN_HARNESS` names each class-taking adapter's harness, `<adapter>=<harness>`. {design-bearing} {user-facing: the operator's refinement on the entry — the two harnesses are modelled alike}
-
-A **harness** is a name in `[a-z0-9-]` for one vendor's model roster. Several adapters of one vendor differ in mode, sandbox and session handling and share a harness, so a model move is one row.
-
-- `DELEGATION_KIT_FOREIGN_TIER_MODEL` — indexed, default empty. The value after the `=` is delta 1's, read by the same parser. The table validator refuses an element that does not split, a harness or class outside its grammar, a class the roster lacks, a harness and class bound twice, and delta 1's effort refusals. The master table's matching refusals, the all-digit value and the leading-token value, are not applied: no reader matches a running model against a foreign row. A row whose harness no adapter names is not refused, since the rows may be tracked while the adapters sit in an overlay a fresh clone lacks.
-- `DELEGATION_KIT_FOREIGN_HARNESS` — indexed, default empty, at most one element per adapter. The validator refuses a malformed element, an adapter `DELEGATION_KIT_FOREIGN_ADAPTERS` does not configure, and a second element for one adapter.
-
-Both are indexed and take no environment spelling. Neither ships a value: a harness names a vendor and a row names its model.
+Merged: delegation-kit/SPEC.md §The tier binding, **A foreign harness has a table of its own**, and §Layout and configuration, `DELEGATION_KIT_FOREIGN_TIER_MODEL` and `DELEGATION_KIT_FOREIGN_HARNESS`. {design-bearing}
 
 ### (4) The executor resolves a run's class into the adapter's argv
 
-`--foreign-run` takes `--class <class>`, and an adapter word may carry `@MODEL@` and `@EFFORT@`, substituted with the pair the adapter's harness binds to that class. {design-bearing} {user-facing: the entry's envelope direction — a foreign adapter resolves its model and effort from a class through the same read}
-
-**An adapter takes a class when `DELEGATION_KIT_FOREIGN_HARNESS` names it.** The validator holds the two facts together: a class-taking adapter's open form carries `@MODEL@`, and an adapter no element names carries neither token in its open or its resume form. `@EFFORT@` is optional. The tokens substitute inside a word as `@PROMPT_FILE@` does, so a vendor's `key=value` option takes one.
-
-- **On a class-taking adapter `--class` is required.** A missing one, and a class the roster lacks, are shape refusals at exit 2 with the usage. A class the harness leaves unbound, or `@EFFORT@` under a row with no effort, is `FAILED (class: <why>)` with `budget=-`, among the pre-spawn checks that precede the budget read, so nothing is cloned.
-- **On any other adapter `--class` is accepted and applies nothing**, and the line says so. A host therefore always passes its reading's class and needs no second read to learn whether the adapter takes one.
-- **The verdict line gains `class=<class|->` after `mode=`**, on `--foreign-run` and `--foreign-resume` alike: the class whose pair was substituted, and `-` where none was. Its reader is the dispatcher, and the commit message that records a foreign reading (lifecycle-kit/SPEC.md §The host protocol).
-- **`--budget` beside `--class` is a shape refusal**, as it is beside `--mode`.
-
-**A session keeps the pair it opened with.** `session.txt` gains `class=<class|-> model=<model|-> effort=<effort|->` after `mode=`, and a resume substitutes those recorded values into the resume form. A binding edited while a session is open reaches the next open. Re-resolving at each turn is refused, since it would change a kept conversation's model with no line saying so; refusing the resume on a changed binding is refused too, since it strands a session over an edit that need not concern it.
-
-**What the class says and does not say.** The line's `class=` is what the executor passed. The kit parses no vendor stream, so whether the vendor ran that model at that effort stays unverified, on the ground §The foreign-vendor run gives for reading a report as bytes.
-
-The cases are crate tests under a stub adapter that echoes its argv: both tokens substituted inside a word; a class-taking adapter without `--class`; an unbound class and an effortless row under `@EFFORT@` failing before any clone; `--class` on a plain adapter printing `class=-`; a resumed turn carrying the opened pair after the binding changed; and each validator refusal of deltas 3 and 4.
+Merged: delegation-kit/SPEC.md §The foreign-vendor run, **The executor resolves a run's class into the adapter's argv**, and §Resuming a session. {design-bearing}
 
 ### (5) The master harness's readers take the pair
 
-The definition generator writes a class's effort, and the tier verdict reports the effort a session runs at. {design-bearing} {user-facing: the entry's envelope direction — one resolution point, class to model plus effort}
+Merged: delegation-kit/SPEC.md §check-agent-tier-explicit, §model-verdict and §The delegation model's D6 paragraph. {design-bearing}
 
-- **`--emit agent-tiers` and `check-agent-tier-explicit` assertion B.** Where a definition's class binds an effort, the expected frontmatter carries `effort: <effort>` on the line after `model:`, generated and byte-gated as `model:` is: `--write` rewrites that line or inserts it. Where the class binds none, an `effort:` line is left as written, the footing a definition without `tier:` has. The bare arm's per-definition line reports the pair.
-- **`--model-verdict`.** The line gains `effort=<effort|->` after `id=`, read from the top-level `effort` field of the record that gives the model, and `-` where the record carries none. The verdict and its exit are decided by the model alone, as today. With `--expect`, where the expected class binds an effort, an effort was read and the two differ, an `OK` line carries the consequence clause `— running effort <e> is not the class's bound <b>`. It stays `OK` at exit 0: the kit holds no order over efforts, so it cannot call a different one lower.
-- **D6 is unchanged** and reads the model half of the master table alone. A dispatch's `effort` is not held to the binding: an unnamed effort is the definition's or the dispatcher's, which the guard cannot see, so a check on the named case would only teach a dispatcher to leave it unnamed.
+**Inferred, cannot run before build:** that a definition carrying `effort: <level>` dispatches its child at that level — no definition in this tree carries the line until delta 9 lands, and a definition reaches only sessions started after it lands; the run is a dispatch of a tiered type from such a session, then `--model-verdict <the child's id>`
 
-**Honest limits.** A harness environment variable that forces every session's effort overrides a definition's line, the shape §The delegation model refuses for the subagent-model override; the verdict's clause is what surfaces it. A definition's line reaches only sessions started after it lands, as its `model:` does.
-
-**Inferred, cannot run before build:** that a definition carrying `effort: <level>` dispatches its child at that level — the verdict's `effort=` field and the generated line exist only once build lands them, and a definition reaches only sessions started after it lands; the run is a dispatch of the type from such a session, then `--model-verdict <the child's id>`
-
-The cases: the fixture pair of `check-agent-tier-explicit` gains a good definition holding its class's effort and a bad one with a stale `effort:` line; crate tests for the verdict's `effort=` field, its `-`, and the clause.
+Build landed the verdict's `effort=` field and the generated line, and the field reads a live session's own effort. The run above was not reachable from the session that built them. The canonical text states the claim as read from the harness's documentation and not measured (delegation-kit/SPEC.md §check-agent-tier-explicit, **Honest limits**), and a run that returns restates that sentence.
 
 ### (6) A consultation's class is a binding
 
-`LIFECYCLE_KIT_CONSULT_CLASS` names the class a consultation runs on: a scalar, default `judgment`. {design-bearing} {user-facing: the operator's two-part direction on the entry — a consultation rides a class of the consumer's choosing, which the kit lets it bind}
+Merged: lifecycle-kit/SPEC.md §Layout and configuration, `LIFECYCLE_KIT_CONSULT_CLASS`, with its honest limit. {design-bearing}
 
-The consult template's first step reads it with `--emit knob-values LIFECYCLE_KIT_CONSULT_CLASS` and passes it to `--model-verdict --expect`. The lead dispatches a consultation on that class. The table validator refuses an empty value and one outside `[a-z0-9-]`, and does not read delegation-kit's roster, on the ground `LIFECYCLE_KIT_STAGE_EXECUTOR` gives for an adapter name: a kit's validator reads its own table, and a class the roster lacks is `--model-verdict`'s refusal at exit 2, which the template already reads as unverified and states.
+One ground of this delta is not yet placed, because delta 8 places it in lifecycle-kit/SPEC.md §templates/consult.md:
 
-This is a knob and still not a template slot. The refusal of a slot stands on its own ground, a residue every adopter's shim would have to fill; a knob with a default asks nothing of an adopter who wants the default.
-
-**Honest limit.** A consumer's dispatched-consultation definition declares its own `tier:`, and nothing holds it equal to this knob. A consumer that moves one moves the other.
+> This is a knob and still not a template slot. The refusal of a slot stands on its own ground, a residue every adopter's shim would have to fill; a knob with a default asks nothing of an adopter who wants the default.
 
 ### (7) A foreign reading names its class
 
@@ -118,7 +70,7 @@ And in the foreign-run bullet of the same file, after "instead of a dispatch (de
 
 ### (8) The canonical passages that said the two bindings do not meet
 
-The sentences stating that no adapter binds to a class, and that the two bindings share no reader, are rewritten to what deltas 3, 4 and 6 make true. {mechanical}
+The sentences stating that no adapter binds to a class, and that the two bindings share no reader, are rewritten to what deltas 3, 4 and 6 made true. {mechanical}
 
 Replacement text for delegation-kit/SPEC.md §The foreign-vendor run, the third bullet of **What returns, and how it lands**. **Not yet applied.**
 
@@ -151,58 +103,37 @@ The same section's paragraph **The template declares its own floor and checks it
 
 This repo's roster becomes `expert`, `judgment`, `mechanical`, `trivial`, each bound to a model and an effort, and its consultations ride `expert`. {mechanical}
 
-The values are the consumer's and sit in its own config, never in a kit file. It lands after deltas 1, 2, 5 and 6 are built, since the binary that reads these rows must already know the roster knob, the effort half and the consult-class knob.
+The values are the consumer's and sit in its own config, never in a kit file. The binary that reads these rows knows the roster knob, the effort half and the consult-class knob, since deltas 1, 2, 5 and 6 are built.
 
 - `scripts/delegation-config.knobs`: `DELEGATION_KIT_TIER_CLASSES` set to the four names, highest first as written above. `DELEGATION_KIT_TIER_MODEL` rows `expert=fable,high`, `judgment=opus,high`, `mechanical=sonnet,high` and `trivial=haiku,medium`. The `routing` row goes, with the comment that explains it: this repo splits its lead by session, so it names no routing class.
 - `scripts/lifecycle-config.knobs`: `LIFECYCLE_KIT_CONSULT_CLASS = expert`.
-- `.claude/agents/consult-session.md`: `tier: expert`, moved in the same commit as the knob, since nothing holds the two equal (delta 6's honest limit).
+- `.claude/agents/consult-session.md`: `tier: expert`, moved in the same commit as the knob, since nothing holds the two equal (lifecycle-kit/SPEC.md §Layout and configuration, the knob's honest limit).
 - Every tiered definition regenerated with `--emit agent-tiers --write`, which rewrites `model:` where the class moved and inserts each `effort:` line.
 
 Its oracle is `check-agent-tier-explicit` green over the regenerated definitions, and `--emit knob-values` on the three knobs returning the values above. A definition reaches only sessions started after it lands, so a live lead keeps dispatching the old lines until its session ends.
 
 ## Producers and consumers
 
-- **A row's effort (delta 1).** Producer: the consumer's knob file. Consumers: `--emit agent-tiers` and assertion B, which generate and hold a definition's `effort:` line; `--model-verdict`, which compares it under `--expect`; a dispatcher's `--emit knob-values` read; and, on a foreign row, the executor's `@EFFORT@` substitution. A class binding none has no effort reader, and none is populated.
-- **`DELEGATION_KIT_TIER_CLASSES` (delta 2).** Producer: the kit's default, or the consumer's knob file. Consumers: both tables' validators, `--model-verdict`, and `--foreign-run`'s `--class` check. Roster-holding readers a minted knob lands on: delegation-kit's knob table and its validator in the crate, `--emit knob-roster`, delegation-kit/SPEC.md §Layout and configuration, `templates/delegation-config.knobs`, and each arm's declared-knob list that the crate's arm-knob test holds to what the module reads.
-- **`DELEGATION_KIT_FOREIGN_TIER_MODEL` and `DELEGATION_KIT_FOREIGN_HARNESS` (delta 3).** Producer: the consumer's knob file, usually the gitignored overlay. Consumer: the executor, at `--foreign-run`'s pre-spawn checks, and the validator. The same roster-holding readers as above, and `--foreign-run`'s and `--foreign-resume`'s declared knobs.
-- **`--class`, `class=`, and the session's three fields (delta 4).** Producer of `--class`: a stage host under the host protocol, a consultation commissioning a critique, and any dispatcher following the foreign-run bullet (delta 7). `class=` on the line is read by the dispatcher and copied into a host's journal and landing commit message. `session.txt`'s `class`, `model` and `effort` are each read at one transition, the resume's substitution, and `class` again for the resume line. On an adapter taking no class all three are `-` and nothing reads them.
-- **`effort:` in a definition (delta 5).** Producer: `--emit agent-tiers --write`. Consumers: the harness at dispatch, and assertion B. **`effort=` on the verdict line.** Producer: the transcript's own field, written by the harness on every assistant record. Consumer: the session that ran the arm, and its caller reading the clause.
-- **`LIFECYCLE_KIT_CONSULT_CLASS` (delta 6).** Producer: the default, or a consumer's knob file or environment. Consumers: the consult template's first step and the lead's consultation dispatch, each through `--emit knob-values`, and lifecycle-kit's validator. Roster-holding readers: lifecycle-kit's knob table, `--emit knob-roster`, lifecycle-kit/SPEC.md §Layout and configuration and the kit's knob-file template.
-- **Narrowed corpus, point 5.** None is narrowed. The roster knob widens what a class may be, and its default is the set compiled today.
-- **Every member's satisfying value, point 6.** Delta 5 obliges each tiered definition to carry its class's effort where the class binds one. The members are the consumer's definitions declaring `tier:`, enumerated by `git grep -n '^tier:' -- .claude/agents`: here `audit-sweep` and `edit-sweep` on `mechanical`, and `consult-session`, `hotfix-session` and `stage-session` on `judgment`. Each one's satisfying value is its class's bound pair under delta 9, which `--write` produces: `sonnet` and `high` for the two sweeps, `opus` and `high` for `hotfix-session` and `stage-session`, and `fable` and `high` for `consult-session` once its `tier:` reads `expert`. The kit's two fixture trees are the other members, and delta 5 names their cases.
+- **`--class` (delta 7).** Its producers are a stage host under the host protocol, a consultation commissioning a critique, and any dispatcher following the foreign-run bullet. Its reader, the executor, is built (delegation-kit/SPEC.md §The foreign-vendor run).
+- **`LIFECYCLE_KIT_CONSULT_CLASS`'s template readers (delta 7).** The consult template's first step and the lead's consultation dispatch, each through `--emit knob-values`. The knob and its validator are built.
+- **Narrowed corpus, point 5.** None is narrowed.
+- **Every member's satisfying value, point 6.** The built effort line obliges each tiered definition to carry its class's effort where the class binds one. The members are the consumer's definitions declaring `tier:`, enumerated by `git grep -n '^tier:' -- .claude/agents`: here `audit-sweep` and `edit-sweep` on `mechanical`, and `consult-session`, `hotfix-session` and `stage-session` on `judgment`. Each one's satisfying value is its class's bound pair under delta 9, which `--write` produces: `sonnet` and `high` for the two sweeps, `opus` and `high` for `hotfix-session` and `stage-session`, and `fable` and `high` for `consult-session` once its `tier:` reads `expert`.
 
 ## Existing sections updated
 
-- `delegation-kit/SPEC.md` §The tier binding — the element grammar, the roster knob, `routing`'s standing, the foreign table and the three-places paragraph (deltas 1, 2, 3 and 8).
-- `delegation-kit/SPEC.md` §check-agent-tier-explicit — assertion B's generated copy gains the effort line and the arm's printed pair (delta 5).
-- `delegation-kit/SPEC.md` §model-verdict — the line, **Which model**'s record read, the consequence-clause list and the declared knobs (deltas 2 and 5).
-- `delegation-kit/SPEC.md` §The delegation model — D6's paragraph says it reads the model half alone (delta 5).
-- `delegation-kit/SPEC.md` §The foreign-vendor run — the opening, the adapter paragraph's "and model", the verdict line and its exits, the cleanup step's `session.txt` grammar, the returns bullet, the honest limit and the declared knobs (deltas 4 and 8).
-- `delegation-kit/SPEC.md` §Resuming a session — the resume line and the recorded pair's substitution (delta 4).
-- `delegation-kit/SPEC.md` §Layout and configuration — the two tables' rows, the three new knobs, and the adapter and resume knobs' token lists (deltas 1, 2, 3 and 4).
-- `delegation-kit/SPEC.md` §Testing — the cases deltas 4 and 5 name.
-- `delegation-kit/README.md` — the bind-your-tiers step names the roster knob and the effort half (deltas 1 and 2).
-- `delegation-kit/templates/delegation-config.knobs` — the binding's comment and example rows, and the three new knobs (deltas 1, 2 and 3).
+- `delegation-kit/SPEC.md` §The tier binding — the opening paragraph's last sentence (delta 8).
+- `delegation-kit/SPEC.md` §The foreign-vendor run — the opening sentence, the returns bullet and the honest limit (delta 8).
 - `delegation-kit/templates/agent-execution.md` — the two passages delta 7 carries.
-- `delegation-kit/gate-tests/check-agent-tier-explicit/` — the effort cases (delta 5).
-- `lifecycle-kit/SPEC.md` §Layout and configuration — the executor knob's sub-bullets, the critique adapter's "It holds a name and no model" ground, and the new knob (deltas 6 and 8).
+- `lifecycle-kit/SPEC.md` §Layout and configuration — the executor knob's sub-bullets, and the critique adapter's "It holds a name and no model" ground (delta 8).
 - `lifecycle-kit/SPEC.md` §The host protocol — the host passes the reading's class, and the commit-message sentence's verdict line now carries it (delta 7).
-- `lifecycle-kit/SPEC.md` §templates/lead.md — the executor read names the reading's class, and the consultation dispatch its bound class (deltas 6 and 7).
-- `lifecycle-kit/SPEC.md` §templates/consult.md — the floor paragraph, the critique run and the honest limit (deltas 6, 7 and 8).
+- `lifecycle-kit/SPEC.md` §templates/lead.md — the executor read names the reading's class, and the consultation dispatch its bound class (delta 7).
+- `lifecycle-kit/SPEC.md` §templates/consult.md — the floor paragraph, the critique run and the honest limit (deltas 7 and 8).
 - `lifecycle-kit/templates/host-protocol.md`, `lifecycle-kit/templates/lead.md`, `lifecycle-kit/templates/consult.md` — delta 7's replacement text.
-- `native/src/tier.rs` — the row parser, the roster in place of the compiled classes, the foreign table and its resolver (deltas 1, 2 and 3).
-- `native/src/knobs/delegation_kit.rs` and `native/src/knobs/lifecycle_kit.rs` — the four knobs and their refusals (deltas 2, 3, 4 and 6).
-- `native/src/emit/agent_tiers.rs` and `native/src/gates/agent_tier_explicit.rs` — the effort line (delta 5).
-- `native/src/hook/model_verdict.rs` — the roster, the effort read and the clause (deltas 2 and 5).
-- `native/src/hook/dispatch.rs` — D6 reads the model half of a row (delta 1).
-- `native/src/emit/foreign_run.rs` — `--class`, the tokens, the line and the session record (delta 4).
-- `native/src/runner.rs` — the usage lines and help paragraphs of `--foreign-run` and `--model-verdict` (deltas 4 and 5).
-- `docs/generated-projections.md` — the agent-definition tiers row names the effort line (delta 5).
-- `.workflow/release-declarations.md` — the tier-binding and foreign-run entries, both unreleased, gain the grammar, the knobs, `--class` and the line fields (deltas 1, 2, 3, 4, 5 and 6).
+- `.workflow/release-declarations.md` — the template entries name the class a foreign reading passes and the knob a consultation reads (delta 7).
 - `scripts/delegation-config.knobs`, `scripts/lifecycle-config.knobs` and `.claude/agents/` — this repo's roster, rows, consult class and regenerated definitions (delta 9).
-- `docs/delegation-kit/SPEC.md`, `docs/delegation-kit/README.md` and `docs/lifecycle-kit/SPEC.md` — the generated mirrors, stale the moment any of them lands (all deltas).
+- `docs/delegation-kit/SPEC.md` and `docs/lifecycle-kit/SPEC.md` — the generated mirrors, stale the moment either source lands (deltas 7 and 8).
 
-Produced by `git grep -l` over the tracked tree for `TIER_MODEL`, `model-verdict`, `FOREIGN_ADAPTERS`, `FOREIGN_RESUME` and `STAGE_EXECUTOR`, by `git grep -n 'tier::\|CLASSES' -- native/src` for the crate's readers of the class vocabulary, and by `git grep -n 'judgment\|routing' -- lifecycle-kit/templates delegation-kit/templates` read for passages that name a class as a dispatch target. Passages that use `judgment` descriptively — a judgment-tier recommendation, the judgment stage rows of this repo's lead binding — are left as they are, since `judgment` remains a class and the default.
+Passages that use `judgment` descriptively — a judgment-tier recommendation, the judgment stage rows of this repo's lead binding — are left as they are, since `judgment` remains a class and the default.
 
 This repo's gitignored adapter overlay is outside the tracked tree and outside this roster. Moving its adapters onto classes is the operator's own edit: a harness element per adapter, the model and effort words replaced by the two tokens, and the rows that carry today's values.
 

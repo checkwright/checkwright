@@ -70,7 +70,10 @@ pub const KIT: Kit = Kit {
         Row::indexed("DELEGATION_KIT_READONLY_TYPES", &[]),
         Row::indexed("DELEGATION_KIT_MUTATING_TYPES", &[]),
         Row::scalar("DELEGATION_KIT_REQUIRE_TIER", "off"),
+        Row::indexed("DELEGATION_KIT_TIER_CLASSES", crate::tier::DEFAULT_CLASSES),
         Row::indexed("DELEGATION_KIT_TIER_MODEL", &[]),
+        Row::indexed("DELEGATION_KIT_FOREIGN_TIER_MODEL", &[]),
+        Row::indexed("DELEGATION_KIT_FOREIGN_HARNESS", &[]),
         Row::scalar("DELEGATION_KIT_SESSIONS_DIR", ""),
         Row::indexed("DELEGATION_KIT_STATUSLINE_INBOXES", &[]),
         Row::indexed("DELEGATION_KIT_FOREIGN_ADAPTERS", &[]),
@@ -168,7 +171,11 @@ fn validate(v: &Values) -> Vec<String> {
     errs.extend(foreign_refusals(v));
     // spec: delegation-kit/SPEC.md §The tier binding — the refusals are the matcher module's, so
     // the validator and every reader share one reading of an element
-    errs.extend(crate::tier::refusals(indexed(v, "DELEGATION_KIT_TIER_MODEL").unwrap_or(&[])));
+    let default: Vec<String> = crate::tier::DEFAULT_CLASSES.iter().map(|c| c.to_string()).collect();
+    let roster = indexed(v, "DELEGATION_KIT_TIER_CLASSES").unwrap_or(&default);
+    errs.extend(crate::tier::roster_refusals(roster));
+    errs.extend(crate::tier::refusals(indexed(v, "DELEGATION_KIT_TIER_MODEL").unwrap_or(&[]), roster));
+    errs.extend(crate::tier::foreign_refusals(indexed(v, "DELEGATION_KIT_FOREIGN_TIER_MODEL").unwrap_or(&[]), roster));
     for n in ["DELEGATION_KIT_GATE_FILES", "DELEGATION_KIT_META_PATHS"] {
         if indexed(v, n).is_some_and(|e| e.is_empty()) {
             errs.push(format!("{} is empty", n));
@@ -178,7 +185,7 @@ fn validate(v: &Values) -> Vec<String> {
 }
 
 pub(crate) fn adapter_name(a: &str) -> bool {
-    !a.is_empty() && a.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
+    crate::tier::name(a)
 }
 
 // spec: delegation-kit/SPEC.md §Layout and configuration — each adapter, resume and marker element is
@@ -204,6 +211,7 @@ fn foreign_refusals(v: &Values) -> Vec<String> {
     let markers = table("DELEGATION_KIT_FOREIGN_SESSION_MARKER", "marker");
     let usage = table("DELEGATION_KIT_FOREIGN_USAGE", "path");
     let producers = table("DELEGATION_KIT_FOREIGN_USAGE_CMD", "word");
+    let harness = table("DELEGATION_KIT_FOREIGN_HARNESS", "harness");
     let mut seen: Vec<&str> = Vec::new();
     for (a, _) in &resume {
         if seen.contains(&a.as_str()) {
@@ -250,6 +258,42 @@ fn foreign_refusals(v: &Values) -> Vec<String> {
             ));
         }
     }
+    // spec: delegation-kit/SPEC.md §Layout and configuration — a harness element is one per
+    // configured adapter, its harness a name; the adapter it names takes a class, so its open form
+    // carries the model token, and no other adapter's form carries either class token
+    for (i, (a, h)) in harness.iter().enumerate() {
+        if !crate::tier::name(h) {
+            errs.push(format!("DELEGATION_KIT_FOREIGN_HARNESS gives adapter '{}' the harness '{}', outside [a-z0-9-]", a, h));
+        }
+        match harness[..i].iter().filter(|(o, _)| o == a).count() {
+            0 if !adapters.iter().any(|(c, _)| c == a) => errs.push(format!(
+                "DELEGATION_KIT_FOREIGN_HARNESS names adapter '{}', which DELEGATION_KIT_FOREIGN_ADAPTERS does not configure",
+                a
+            )),
+            0 if !adapters.iter().any(|(c, w)| c == a && w.contains(crate::emit::foreign_run::MODEL_TOKEN)) => {
+                errs.push(format!(
+                    "DELEGATION_KIT_FOREIGN_HARNESS names adapter '{}', whose DELEGATION_KIT_FOREIGN_ADAPTERS form carries no {}",
+                    a,
+                    crate::emit::foreign_run::MODEL_TOKEN
+                ))
+            }
+            1 => errs.push(format!("DELEGATION_KIT_FOREIGN_HARNESS gives adapter '{}' more than one harness", a)),
+            _ => {}
+        }
+    }
+    for (knob, form) in [("DELEGATION_KIT_FOREIGN_ADAPTERS", &adapters), ("DELEGATION_KIT_FOREIGN_RESUME", &resume)] {
+        let mut told: Vec<&str> = Vec::new();
+        for (a, w) in form.iter() {
+            let token = crate::emit::foreign_run::CLASS_TOKENS.iter().find(|t| w.contains(**t));
+            if let Some(token) = token.filter(|_| !told.contains(&a.as_str()) && !harness.iter().any(|(h, _)| h == a)) {
+                told.push(a);
+                errs.push(format!(
+                    "{}'s form for adapter '{}' carries {} but DELEGATION_KIT_FOREIGN_HARNESS names no harness for it",
+                    knob, a, token
+                ));
+            }
+        }
+    }
     errs
 }
 
@@ -271,7 +315,7 @@ mod tests {
     #[test]
     fn every_tier_binding_refusal_fires_on_its_own_shape() {
         let cases: &[(&str, &[&str])] = &[
-            ("is not '<class>=<model>'", &["judgment"]),
+            ("is not '<class>=<model>[,<effort>]'", &["judgment"]),
             ("not one of judgment, routing, mechanical", &["premium=big"]),
             ("binds class 'judgment' twice", &["judgment=big", "judgment=bigger"]),
             ("has an empty value", &["judgment="]),
@@ -375,6 +419,53 @@ mod tests {
             assert_eq!(errs.len(), 1, "{:?} {:?}: {:?}", usage, cmd, errs);
             assert!(errs[0].contains(want), "{:?} {:?} did not refuse with '{}': {:?}", usage, cmd, want, errs);
         }
+    }
+
+    // spec: delegation-kit/SPEC.md §Layout and configuration — the harness table's refusals and the
+    // two facts it holds together with the adapter forms, each beside a passing table; the roster
+    // and the foreign rows reach the validator through their own knobs
+    #[test]
+    fn the_harness_table_and_the_class_tokens_are_held_together() {
+        let run = |adapters: &[&str], resume: &[&str], harness: &[&str], rows: &[&str], roster: Option<&[&str]>| {
+            let mut v: Values = Values::new();
+            let mut put = |k: &'static str, e: &[&str]| {
+                v.insert(k, (Value::Indexed(e.iter().map(|s| s.to_string()).collect()), Origin::Tracked));
+            };
+            put("DELEGATION_KIT_FOREIGN_ADAPTERS", adapters);
+            put("DELEGATION_KIT_FOREIGN_RESUME", resume);
+            put("DELEGATION_KIT_FOREIGN_HARNESS", harness);
+            put("DELEGATION_KIT_FOREIGN_TIER_MODEL", rows);
+            if let Some(r) = roster {
+                put("DELEGATION_KIT_TIER_CLASSES", r);
+            }
+            validate(&v)
+        };
+        let open: &[&str] = &["ad=prog", "ad=--model=@MODEL@", "ad=@EFFORT@", "plain=prog"];
+        assert!(run(open, &["ad=prog", "ad=@EFFORT@"], &["ad=vend"], &["vend/judgment=g,deep"], None).is_empty());
+        assert!(run(&["ad=prog", "ad=@MODEL@"], &[], &["ad=vend"], &[], None).is_empty(), "the effort token is optional");
+        assert!(run(&["plain=prog"], &[], &[], &["vend/judgment=g"], None).is_empty(), "rows no adapter names pass");
+        type Table<'a> = &'a [&'a str];
+        let cases: &[(&str, Table, Table, Table, Table)] = &[
+            ("is not '<adapter>=<harness>'", &["plain=prog"], &[], &["plain="], &[]),
+            ("the harness 'Vend', outside [a-z0-9-]", open, &[], &["ad=Vend"], &[]),
+            ("which DELEGATION_KIT_FOREIGN_ADAPTERS does not configure", &["plain=prog"], &[], &["ad=vend"], &[]),
+            ("more than one harness", open, &[], &["ad=vend", "ad=other"], &[]),
+            ("form carries no @MODEL@", &["ad=prog", "ad=@EFFORT@"], &[], &["ad=vend"], &[]),
+            ("DELEGATION_KIT_FOREIGN_ADAPTERS's form for adapter 'ad' carries @MODEL@ but", open, &[], &[], &[]),
+            ("DELEGATION_KIT_FOREIGN_RESUME's form for adapter 'plain' carries @EFFORT@ but", open, &["plain=@EFFORT@"], &["ad=vend"], &[]),
+            ("names class 'premium'", open, &[], &["ad=vend"], &["vend/premium=g"]),
+        ];
+        for (want, adapters, resume, harness, rows) in cases {
+            let errs = run(adapters, resume, harness, rows, None);
+            assert_eq!(errs.len(), 1, "{}: {:?}", want, errs);
+            assert!(errs[0].contains(want), "did not refuse with '{}': {:?}", want, errs);
+        }
+        let own: &[&str] = &["expert", "trivial"];
+        assert!(run(open, &[], &["ad=vend"], &["vend/expert=g"], Some(own)).is_empty());
+        let errs = run(open, &[], &["ad=vend"], &["vend/judgment=g"], Some(own));
+        assert!(errs.len() == 1 && errs[0].contains("not one of expert, trivial"), "{:?}", errs);
+        let errs = run(&[], &[], &[], &[], Some(&["judgment", "judgment"]));
+        assert!(errs.len() == 1 && errs[0].contains("names class 'judgment' twice"), "{:?}", errs);
     }
 
     // spec: delegation-kit/SPEC.md §Layout and configuration — a binding refusing on several findings

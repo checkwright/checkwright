@@ -1,3 +1,3 @@
-# spec: delegation-kit/SPEC.md §check-agent-tier-explicit — the case's binding: two classes bound, so assertion B runs
-DELEGATION_KIT_TIER_MODEL[] = judgment=big-tier-placeholder
+# spec: delegation-kit/SPEC.md §check-agent-tier-explicit — the case's binding: two classes bound, one with an effort, so assertion B runs over both halves
+DELEGATION_KIT_TIER_MODEL[] = judgment=big-tier-placeholder,deep-effort-placeholder
 DELEGATION_KIT_TIER_MODEL[] = mechanical=cheap-tier-placeholder

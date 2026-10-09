@@ -86,12 +86,13 @@ impl<V> Ordered<V> {
 }
 
 // spec: drift-kit/SPEC.md §The stage-economics meter — one transcript line read as an assistant
-// record: its message id, its model and its usage. A line that is not one, or carries no usage, is
-// none. The meter and delegation-kit's `--model-verdict` both read records through this.
+// record: its message id, model, usage and top-level effort. A line that is not one, or carries no
+// usage, is none. The meter and delegation-kit's `--model-verdict` both read records through this.
 pub struct Record {
     pub id: String,
     pub model: String,
     pub tokens: Tokens,
+    pub effort: Option<String>,
 }
 
 pub fn record(line: &str) -> Option<Record> {
@@ -111,6 +112,7 @@ pub fn record(line: &str) -> Option<Record> {
             cache_read: n("cache_read_input_tokens"),
             cache_write: n("cache_creation_input_tokens"),
         },
+        effort: v.get("effort").and_then(|x| x.as_str()).filter(|e| !e.is_empty()).map(str::to_string),
     })
 }
 

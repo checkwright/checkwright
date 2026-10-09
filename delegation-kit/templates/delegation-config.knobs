@@ -3,9 +3,16 @@
 # spec: delegation-kit/SPEC.md §Layout and configuration — D2's roster: the consumer's own read-only-dispatched agent-type names; default empty (D2 inert) — never a kit-shipped vocabulary (gate-sdk/SPEC.md §The provenance seam)
 # DELEGATION_KIT_READONLY_TYPES[] = <agent-type>
 
-# spec: delegation-kit/SPEC.md §The tier binding — one element per class (judgment, routing, mechanical); a value is an alias (follows the newest model) or an exact model id (pinned); default empty (off)
-# DELEGATION_KIT_TIER_MODEL[] = judgment=<model>
+# spec: delegation-kit/SPEC.md §The tier binding — the class roster, highest first; default judgment, routing, mechanical, and a value here replaces all three
+# DELEGATION_KIT_TIER_CLASSES[] = <class>
+
+# spec: delegation-kit/SPEC.md §The tier binding — one element per class; the model is an alias (follows the newest model) or an exact model id (pinned), the effort optional; default empty (off)
+# DELEGATION_KIT_TIER_MODEL[] = judgment=<model>,<effort>
 # DELEGATION_KIT_TIER_MODEL[] = mechanical=<model>
+
+# spec: delegation-kit/SPEC.md §The tier binding — a foreign harness's rows in the same grammar, and the harness of each adapter that takes a class; the kit ships neither (each names a vendor), so set both beside the adapters; default empty
+# DELEGATION_KIT_FOREIGN_TIER_MODEL[] = <harness>/<class>=<model>,<effort>
+# DELEGATION_KIT_FOREIGN_HARNESS[] = <adapter>=<harness>
 
 # spec: delegation-kit/SPEC.md §The foreign-vendor run — one `<adapter>=<word>` element per argv word, in order; the kit ships no adapter (each names a vendor's program), so set one in the gitignored `.local` overlay; default empty
 # DELEGATION_KIT_FOREIGN_ADAPTERS[] = <adapter>=<program>

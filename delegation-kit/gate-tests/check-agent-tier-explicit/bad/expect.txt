@@ -1,3 +1,4 @@
 no 'model:' field in frontmatter
 stale model: cheap-tier-placeholder (tier 'judgment' is bound to big-tier-placeholder)
 tier 'routing' names no bound class
+stale effort: shallow-effort-placeholder (tier 'judgment' is bound to big-tier-placeholder,deep-effort-placeholder)

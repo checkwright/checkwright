@@ -91,6 +91,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("LIFECYCLE_KIT_STAGE_CONTRACT_FRAME", "lifecycle-kit/templates/frames/stage-contract.md"),
         Row::indexed("LIFECYCLE_KIT_STAGE_EXECUTOR", &[]),
         Row::scalar("LIFECYCLE_KIT_CRITIQUE_ADAPTER", ""),
+        Row::scalar("LIFECYCLE_KIT_CONSULT_CLASS", "judgment"),
         Row::scalar("LIFECYCLE_KIT_SHIM_NGRAM", "9"),
         Row::indexed("LIFECYCLE_KIT_SHIM_DEDUP_CORPUS", &[]),
         Row::derived("LIFECYCLE_KIT_QUEUE_FILE", Shape::Scalar, queue_file, &["GATE_SDK_QUEUE_FILE"]),
@@ -273,6 +274,15 @@ fn validate(v: &Values) -> Vec<String> {
             errs.push(format!("LIFECYCLE_KIT_CRITIQUE_ADAPTER '{}' is outside [a-z0-9-]", a));
         }
     }
+    // spec: lifecycle-kit/SPEC.md §Layout and configuration — the consultation's class is one name in
+    // the shape delegation-kit holds a class to; that kit's roster is its own to read
+    if let Some(c) = scalar(v, "LIFECYCLE_KIT_CONSULT_CLASS") {
+        if c.is_empty() {
+            errs.push("LIFECYCLE_KIT_CONSULT_CLASS is empty".to_string());
+        } else if !crate::tier::name(c) {
+            errs.push(format!("LIFECYCLE_KIT_CONSULT_CLASS '{}' is outside [a-z0-9-]", c));
+        }
+    }
     for n in ["LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK", "LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE"] {
         if let Some(s) = scalar(v, n) {
             if s != "0" && s != "1" {
@@ -348,6 +358,22 @@ mod tests {
             assert_eq!(run(bad), vec![format!("LIFECYCLE_KIT_CRITIQUE_ADAPTER '{}' is outside [a-z0-9-]", bad)]);
         }
         assert!(run("demo-1").is_empty() && run("").is_empty());
+    }
+
+    // spec: lifecycle-kit/SPEC.md §Layout and configuration — the consultation's class is one name in
+    // the class-name shape, never empty, and a class no roster holds is not this validator's to refuse
+    #[test]
+    fn a_consult_class_outside_the_name_shape_is_refused() {
+        let run = |name: &str| {
+            let mut v: Values = Values::new();
+            v.insert("LIFECYCLE_KIT_CONSULT_CLASS", (Value::Scalar(name.to_string()), Origin::Tracked));
+            validate(&v).into_iter().filter(|e| e.contains("LIFECYCLE_KIT_CONSULT_CLASS")).collect::<Vec<_>>()
+        };
+        assert_eq!(run(""), vec!["LIFECYCLE_KIT_CONSULT_CLASS is empty".to_string()]);
+        for bad in ["Expert", "two words", "a=b"] {
+            assert_eq!(run(bad), vec![format!("LIFECYCLE_KIT_CONSULT_CLASS '{}' is outside [a-z0-9-]", bad)]);
+        }
+        assert!(run("judgment").is_empty() && run("a-class-no-roster-holds").is_empty());
     }
 
     #[test]
