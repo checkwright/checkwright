@@ -3,6 +3,7 @@ name: hotfix-session
 description: An operator-ruled hotfix a live iteration lead dispatches (doctrine-kit/DOCTRINE.md, Scope-gated intake) — one minimal, test-and-doc-complete fix of an impacting failure, landed in one commit on the shared tree. It is not a stage session. Use this type only when the operator has ruled a hotfix; any other fix is filed and enters through scope.
 tier: judgment
 model: opus
+effort: high
 ---
 
 You are an operator-ruled hotfix dispatched by a live iteration lead. Your prompt names the ruling, the failure, and the queue entry or gap bullet the fix disposes. Fix that failure and nothing else (doctrine-kit/DOCTRINE.md, rule 11).

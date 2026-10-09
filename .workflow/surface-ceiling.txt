@@ -1,9 +1,9 @@
 # contract: context-kit/SPEC.md §The surface ratchet
-7761cp .claude/agents/audit-sweep.md
-1370cp .claude/agents/consult-session.md
-2154cp .claude/agents/edit-sweep.md
-3201cp .claude/agents/hotfix-session.md
-9781cp .claude/agents/stage-session.md
+7774cp .claude/agents/audit-sweep.md
+1382cp .claude/agents/consult-session.md
+2167cp .claude/agents/edit-sweep.md
+3214cp .claude/agents/hotfix-session.md
+9794cp .claude/agents/stage-session.md
 93cp .claude/commands/adopt.md
 1411cp .claude/commands/agent-execution.md
 551cp .claude/commands/align.md
@@ -22,8 +22,8 @@
 25807cp companion/SPEC.md
 113395cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
-254857cp delegation-kit/SPEC.md
-40211cp delegation-kit/templates/agent-execution.md
+255010cp delegation-kit/SPEC.md
+40479cp delegation-kit/templates/agent-execution.md
 3397cp delegation-kit/templates/dispatch-checklists.md
 1308cp docs/canon-kit/index.md
 1677cp docs/context-kit/index.md
@@ -99,12 +99,12 @@
 288430cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
 279471cp installer/SPEC.md
-385604cp lifecycle-kit/SPEC.md
-7605cp lifecycle-kit/templates/consult.md
+385611cp lifecycle-kit/SPEC.md
+7699cp lifecycle-kit/templates/consult.md
 1212cp lifecycle-kit/templates/frames/project-critique.md
 1412cp lifecycle-kit/templates/frames/stage-contract.md
-1256cp lifecycle-kit/templates/host-protocol.md
-45286cp lifecycle-kit/templates/lead.md
+1345cp lifecycle-kit/templates/host-protocol.md
+45347cp lifecycle-kit/templates/lead.md
 2100cp lifecycle-kit/templates/release-sweep.md
 7495cp lifecycle-kit/templates/stages/align.md
 9358cp lifecycle-kit/templates/stages/build.md

@@ -8,22 +8,6 @@
 
 ## New Features
 
-### tier-class-resolution
-
-[spec: SPEC-tier-resolution.md]
-
-one place where a tier class resolves to a model and an effort, on the master harness and on a foreign one. The tier binding (delegation-kit/SPEC.md §The tier binding) maps a class to a model alone, effort is chosen at each dispatch, and a foreign adapter carries its model and effort inline in its argv and binds to no class (§The foreign-vendor run). So a renamed model, or a newer one doing well enough at a lower effort, is edited per adapter and remembered per dispatcher.
-
-**Operator direction, 2026-10-09, lead-relayed (not a ruling), in two parts.** The operator's model is four classes per vendor: expert, for consultations that do the project critique and take strategic decisions; judgment and mechanical, for iteration execution, lead and stages; trivial, for a yes/no experiment an agent runs. Refined the same day: the classes are worth keeping only if the process relies on them as its interface, the value asked for is the one resolution point, and scope may weigh whether the classes earn their keep before two are added.
-
-**Scope's weighing, 2026-10-09.** The process does read classes as its interface: an agent definition's `tier:`, the dispatch guard's bound-value check, `--model-verdict --expect` at a consultation's and a stage session's entry, and the lead binding's per-stage classes. Two model ids carried all usage in the trailing week's transcripts (`--price-coverage`), so no expert-class or trivial-class model rode a dispatch in it.
-
-**Envelope, operator direction 2026-10-09, lead-relayed (not a ruling; revisable at a later scope or spec):** one resolution point, class to model plus effort, on this harness and a foreign adapter through one read; the class roster is consumer config with the kit's three as its default, and this repo binds expert and trivial itself if wanted. Refined the same day after scope, the same class of steer: the master harness's classes and a foreign vendor's are modelled alike, each class a model plus an effort, the former the local harness and the latter the foreign one, with no separate design per side. The first direction spends [heterogeneous-agent-delegation](#heterogeneous-agent-delegation)'s granted foreign run on this unit's spec stage, on the local adapter `codex-session`; that run is spent and returned `OK`. **This repo's values, operator direction 2026-10-09 at spec, lead-relayed (not a ruling):** expert on fable, judgment on opus and mechanical on sonnet, each at high effort; trivial on haiku at medium; `routing` leaves this repo's roster; consultations ride expert. The gitignored adapter overlay stays the operator's own edit.
-
-**Deliverable, design-pending:** the binding's value gains an effort; a foreign adapter resolves its model and effort from a class through the same read; the class roster becomes a knob; and a consultation's expected class becomes a binding. Spec's question: whether `routing`, bound here to the judgment model, survives. The amendment reverses §The foreign-vendor run's sentence that no adapter binds to a tier class and lifecycle-kit/SPEC.md's executor-knob note that the two bindings share no reader.
-
-**Cost while deferred:** a model or effort move is edited at every adapter and at every dispatcher, and a consultation on the operator's preferred class has no class to expect. Filed 2026-10-09 as two gap bullets by the lead after foreign-stage-binding-pass closed; promoted the same day by the next iteration's scope intake. Owner lookup: `TIER_MODEL`, `model-verdict`, `agent-tiers`, `tier binding`, `expert`, `trivial` in this file and the disposed-findings record — no owner; [build-stage-tier-economics](#build-stage-tier-economics) is distinct, pricing the build stage's tier and binding nothing, and the record's `align tier` and `validate tier` rows are data for re-judging a binding, not this mechanism. Owner delegation-kit/SPEC.md §The tier binding.
-
 ## Technical Debt
 
 ## Deferred
@@ -1212,4 +1196,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - tracked-set-quoted-path-names
 - toolchain-action-proxy-jobs
 - placed-hook-stale-on-rebuild
+- tier-class-resolution
 

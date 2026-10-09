@@ -66,3 +66,5 @@ LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK = 1
 LIFECYCLE_KIT_MIRROR_ROOT = docs
 # spec: lifecycle-kit/SPEC.md §check-dispatch-entry — the agent type .claude/agents/stage-session.md declares, the one this repo's lead dispatches every stage session as
 LIFECYCLE_KIT_STAGE_SESSION_TYPES[] = stage-session
+# spec: lifecycle-kit/SPEC.md §Layout and configuration — a consultation rides this repo's highest class; the agent type .claude/agents/consult-session.md declares the same class
+LIFECYCLE_KIT_CONSULT_CLASS = expert

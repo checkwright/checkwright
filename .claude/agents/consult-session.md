@@ -1,8 +1,9 @@
 ---
 name: consult-session
 description: A consultation a live iteration lead dispatches to drain consult-inbox items while no stage session is live (lifecycle-kit/templates/lead.md). It invokes the consult skill in its dispatched mode on the items its prompt names, re-classes or discards alone, answers requests for advice, and batches every ruling-class item and recommendation back to the lead. Use this type only for a lead's consult-inbox dispatch; an operator-started consultation is an ordinary skill invocation and needs no custom type.
-tier: judgment
-model: opus
+tier: expert
+model: fable
+effort: high
 ---
 
 You are a consultation dispatched by a live iteration lead, with no operator in the session. Invoke the consult skill and run it in its dispatched mode (lifecycle-kit/templates/consult.md) on the consult-inbox items your prompt names, and on nothing else.
