@@ -1,1 +1,8 @@
 # contract: lifecycle-kit/SPEC.md §The survey record — carried surveys, one block per survey; boundary-truncated, cited only behind a passing witness.
+
+## 2026-10-10 scope — Which deferred entries lead this undirected iteration's unit set, ranked by cost class, roadmap and surface, with inbound edges and supersession read?
+- corpus: TASK-QUEUE.md
+- oracle: bash gate-sdk/bin/run-gates.sh --emit queue-edges
+- rev: c2bb4444c16761b199d3b1450eb9f4e3630995b2
+- finding: No deferred entry reaches the recurrence threshold (highest count 1). The one session- or iteration-class row is heterogeneous-agent-delegation, whose remaining item is held by operator direction. The three now-horizon roadmap rows wait on that hold, on a published tag or on operator hours, so none is buildable from the tree; front-door-rehearsal-rule is the buildable entry that advances two of them (design-partner-preview carries three inbound edges, one from it). gate-sdk carries the most board rows (ten with this intake's two). Supersession: custom-gate-substrates and gate-tamper-exemption-reader-substrate are reshaped by gate-authoring-sdk-surface's ruling; windows-kpi-plugin-start by custom-gate-substrates' dispatch shape; site-health-probe-unexecuted by site-health-resample-knobs. Every retired inbound target is disposed work cited as provenance except check-spec-pointer, whose name is live. The icebox holds no entry replacing a shortlisted deliverable's names.
+- inferred: Whether the operator lifts the 2026-10-09 hold on heterogeneous-agent-delegation's remaining item; whether a release is cut at this iteration's close; windows-hook-legs-unexecuted's last three claims, which its own marker carries.
