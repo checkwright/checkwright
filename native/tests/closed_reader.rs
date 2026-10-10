@@ -1,5 +1,6 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — the departed-reader rule, run on the binary cargo
-// builds for this test run with a stdout that is a pipe whose reader has already gone
+// builds for this test run with a stdout that is a pipe whose reader has already gone, and its
+// bound on a child handed that stdout
 
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output, Stdio};
@@ -127,4 +128,32 @@ fn a_refused_queue_move_still_exits_two() {
     assert_eq!(out.status.code(), Some(2), "{}", stderr(&out));
     assert!(!stderr(&out).contains("panicked"), "a refusal printed a panic trace: {}", stderr(&out));
     assert_eq!(scratch.queue(), QUEUE_HEAD, "a refused move changed the queue");
+}
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — a child handed the inherited stdout answers for its
+// own writes: the second assertion is the rule's bound, so a change making the rule total reds here
+#[cfg(unix)]
+#[test]
+fn a_child_on_the_inherited_stdout_answers_for_its_own_writes() {
+    let run = |case: &str, body: &str, unread: bool| {
+        let scratch = Scratch::new(case, QUEUE_HEAD);
+        std::fs::create_dir_all(scratch.0.join(".tmp")).expect("cannot create the scratch .tmp");
+        std::fs::write(scratch.0.join(".tmp").join("child.sh"), body).expect("cannot write the scratch script");
+        let args = ["--scratch-run", ".tmp/child.sh"];
+        if unread { scratch.unread(&args) } else { scratch.read(&args) }
+    };
+    for (case, body) in [("child-silent", "exit 7\n"), ("child-prints", "echo printed\nexit 7\n")] {
+        let with_reader = run(&format!("{}-read", case), body, false);
+        assert_eq!(with_reader.status.code(), Some(7), "{}: with a reader: {}", case, stderr(&with_reader));
+    }
+    let silent = run("child-silent", "exit 7\n", true);
+    assert_eq!(silent.status.code(), Some(7), "a child that wrote nothing: {}", stderr(&silent));
+    assert_eq!(stderr(&silent), "", "a child that wrote nothing: stderr is not empty");
+    let prints = run("child-prints", "echo printed\nexit 7\n", true);
+    assert_eq!(
+        prints.status.code(),
+        Some(128 + libc::SIGPIPE),
+        "a child that wrote after its reader had gone: {}",
+        stderr(&prints)
+    );
 }

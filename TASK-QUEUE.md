@@ -8,18 +8,6 @@
 
 ## New Features
 
-### inherited-stdout-child-status
-
-[spec: SPEC-child-stdout.md]
-
-an arm whose child inherits the binary's stdout exits off the closed-reader rule (gate-sdk/SPEC.md §The non-gate arm, *A departed stdout reader changes no status*). The rule `arm-stdout-close-panic` landed drops the binary's own failed writes; a child writing to the same departed reader dies of the signal, and the arm relays that death as its own status. Measured 2026-10-09 at crate-reader-hardening-pass' close: `--scratch-run` on a script printing 20000 lines exits 141 piped into `true` and 0 with a reader.
-
-**Deliverable:** the rule made true or bounded for the arms that hand a child the inherited stdout (`Sink::Inherit` in `native/src/proc.rs`): either the child's stdout routed so its reader's departure costs no status, or the section's reach stated as the binary's own writes, with a case in `native/tests/closed_reader.rs` for whichever holds. Which one is spec's.
-
-**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration; made true or bounded is spec's choice. **Chosen at spec:** bounded. Run there: a script that prints one line after its reader has gone exits 141 and one that prints nothing keeps its code, and `--run-validate` refuses on a pre-hook that died printing.
-
-**Cost while deferred:** an arm piped into an early-exiting filter exits on a status its contract does not list, under a rule whose text reads as total. Filed 2026-10-09 by crate-reader-hardening-pass' lead off its third build batch and promoted at its close. Owner lookup: `closed reader`, `departed`, `inherit`, `SIGPIPE`, `broken pipe` in this file and the disposed-findings record — none; `arm-stdout-close-panic`, done, DISTINCT (the process's own writes); owner gate-sdk/SPEC.md §The non-gate arm.
-
 ### hermetic-preamble-overlay-read
 
 [spec: SPEC-overlay-locator.md]
@@ -1272,4 +1260,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 
 - front-door-rehearsal-rule
 - contributor-writeback-disposition
+- inherited-stdout-child-status
 
