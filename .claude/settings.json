@@ -101,7 +101,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook session-context"
+            "command": "${CLAUDE_PROJECT_DIR}/native/target/release/checkwright-gates",
+            "args": [
+              "--hook",
+              "session-context"
+            ]
           }
         ]
       }
@@ -111,7 +115,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook subagent-stop-liveness"
+            "command": "${CLAUDE_PROJECT_DIR}/native/target/release/checkwright-gates",
+            "args": [
+              "--hook",
+              "subagent-stop-liveness"
+            ]
           }
         ]
       }
@@ -122,7 +130,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook shell-guard"
+            "command": "${CLAUDE_PROJECT_DIR}/native/target/release/checkwright-gates",
+            "args": [
+              "--hook",
+              "shell-guard"
+            ]
           }
         ]
       },
@@ -131,11 +143,19 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook agent-budget-guard"
+            "command": "${CLAUDE_PROJECT_DIR}/native/target/release/checkwright-gates",
+            "args": [
+              "--hook",
+              "agent-budget-guard"
+            ]
           },
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook agent-dispatch-guard"
+            "command": "${CLAUDE_PROJECT_DIR}/native/target/release/checkwright-gates",
+            "args": [
+              "--hook",
+              "agent-dispatch-guard"
+            ]
           }
         ]
       },
@@ -144,7 +164,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook workflow-state-guard"
+            "command": "${CLAUDE_PROJECT_DIR}/native/target/release/checkwright-gates",
+            "args": [
+              "--hook",
+              "workflow-state-guard"
+            ]
           }
         ]
       }
