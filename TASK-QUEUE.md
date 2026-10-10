@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: hook-placement-guard-rules-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,46 @@
 ## New Features
 
 ## Technical Debt
+
+### windows-running-hook-replace
+
+a hook placement renames its staged sibling over the hook, and no leg does so while that hook is a running executable: a commit in flight on Windows while `--install-hooks` or a build's refresh re-places. gate-sdk/SPEC.md §install-hooks states the rename and says nothing of what Windows returns there. `hook-staging-fixed-sibling`, done, left it as its one unrun candidate.
+
+**Deliverable:** a Windows-leg step that holds a placed hook running and re-places it, with that section stating what the placement returns.
+
+**Inferred, cannot run before build:** that Windows refuses the rename, exiting 2 with the earlier hook still served — only a Windows leg runs it, and the step that holds a placed hook running is this entry's deliverable
+
+**Push need (2026-10-10, inside the budget):** one mid-iteration push after the step lands, since no local run reaches a Windows leg; its run is read before the Done move.
+
+**Cost while deferred:** a refresh on Windows during a commit may fail loudly; nothing is served wrong. Filed 2026-10-10 by front-door-readiness-pass' build. Re-verified by reading that section and the `gates` workflow's hook steps: the rename is stated, no step re-places under a running hook. Owner lookup: `install-hooks`, `rename over`, `running hook`, `hook-staging` in this file and the disposed-findings record — none; `hook-staging-fixed-sibling`, done, DISTINCT (the sibling's name under two placements, landed); owner gate-sdk/SPEC.md §install-hooks.
+
+### hook-sibling-pid-namespace
+
+two residues of the hook placement's per-run sibling, in `native/src/emit/install_hooks.rs`. The sibling's name carries the process id alone, where gate-sdk/SPEC.md §install-hooks says two placements at once never remove or rename each other's: two placements in separate process-id namespaces sharing one hooks directory, as containers over a bind-mounted checkout are, can draw the same id. And the placement discards the error of the sibling's removal, where that section says the sibling is removed on every path, so a removal failing after a failed rename leaves the sibling with no line saying so.
+
+**Deliverable:** that section stating both limits, or a name no second namespace can draw and a reported removal failure.
+
+**Inferred, cannot run before build:** that two namespaces collide on one id — the placement takes its id from the process alone, so no run can force two placements onto one until build lands a seam for it
+
+**Cost while deferred:** a collision or a stranded sibling is silent, and each needs a hooks directory shared across namespaces or a failed rename first. Filed 2026-10-10 by front-door-readiness-pass' close, off its second-vendor review, and promoted at the next scope's intake. Re-verified there by reading the module: the name is the hook's file name, the staged suffix and `std::process::id()`, and both removals drop their result. Owner lookup: `install-hooks`, `sibling`, `process id` in this file and the disposed-findings record — [windows-running-hook-replace](#windows-running-hook-replace), DISTINCT (the rename over a running hook); `hook-staging-fixed-sibling`, done, DISTINCT (it landed the per-run sibling these are defects in, so no recurrence); owner gate-sdk/SPEC.md §install-hooks.
+
+### replaced-binary-self-path
+
+a gate that resolves its own executable reds when the binary is replaced under it. The first battery run after a `bash gate-sdk/bin/build-native.sh` rebuild went red once on `check-fence-run`, the gate binary's path reading `(deleted)`, and the re-run was green: one build session's report, where the lead's three rebuild-then-battery runs in that iteration were green. `execute` in `native/src/gates/fence_run.rs` copies `std::env::current_exe()` into its scratch once per document, and Linux answers that call with the unlinked path once the running process's file is replaced. The crate reads the same call at more than a dozen other sites. Reproduced at scope 2026-10-10: the gate run alone from a scratch copy of the binary, the copy replaced while it ran, exited 2 on that path at each of three delays. A battery whose gate process started after the replace stayed green, and so did a run whose `GATE_SDK_NATIVE_BIN` was absolute, which copies nothing.
+
+**Deliverable:** the read made safe across a replace at its shared sites, or the limit stated where the rebuild obligation is (gate-sdk/SPEC.md §Porting a gate to the binary substrate).
+
+**Cost while deferred:** a session reads a spurious red as its own regression right after the commit-time rebuild. Filed 2026-10-10 by front-door-readiness-pass' lead on its third build session's report, and promoted at the next scope's intake. Re-verified there by reading the gate and by `git grep -c current_exe -- native/src`. Owner lookup: `current_exe`, `(deleted)`, `fence-run`, `rebuild` in this file and the disposed-findings record — [unremapped-rebuild-reds-smoke](#unremapped-rebuild-reds-smoke), DISTINCT (a rebuild without the remap flags); owner gate-sdk/SPEC.md §Porting a gate to the binary substrate.
+
+### inline-python-steer-split
+
+rule `sed_file`'s inline-python arm took one of two like calls in delegation-wait-journal-pass' close session. A `python3 -` heredoc rewriting four tracked files through `open().write`, followed by a grep, ran; the next, rewriting one file and followed by a build call, was blocked with the steer to `--rewrite`.
+
+**Deliverable:** the two shapes as decision-table rows: a literal rewrite looping over several files, and a body followed by a second command. The rule's stated reach needs no correction.
+
+**Replayed at scope 2026-10-10**, on six reconstructions, the two bodies being on no record: every literal rewrite was blocked, over one file or four and whatever command followed it, and a body carrying a computed-text construct passed. That is the discriminator the rule entry states, and guard-kit/guard-tests/cases.tsv already pins it for a single file with nothing following.
+
+**Cost while deferred:** the steer toward the count-asserting rewrite arm is skipped by a shape nobody has named. Filed 2026-10-08 by delegation-wait-journal-pass' close, after its drain, and promoted at the next scope's intake. Re-verified: the rule entry blocks a literal rewrite carrying no computed-text construct and says it leans toward passing. Owner lookup: `python`, `--rewrite`, `heredoc`, `sed_file` in this file and the disposed-findings record — none; owner guard-kit/SPEC.md §The generic ruleset.
 
 ## Deferred
 
@@ -212,6 +252,8 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Deliverable:** that observation, read off the `publish` run and one install from the published Release, with any defect it shows filed.
 
+**Release (2026-10-10, operator direction, lead-relayed, not a ruling):** v0.32.0 is cut at hook-placement-guard-rules-pass' close, on the close binding's explicit-direction trigger. Its `publish` run produces this observation and [front-door-job-observed](#front-door-job-observed)'s, for the next scope to read.
+
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
 ### custom-gate-substrates
@@ -406,6 +448,10 @@ the hook-wiring rewire windows-kit-bash-files did not land: context-kit and guar
 - **Run on Linux, harness 2.1.292.** The same four, and: with the binary renamed away no notice reached the model channel; in a linked worktree the placeholder named the main checkout; a `hooks` edit armed in the running session; a call a tool refuses on its own input never reaches the hook.
 - **Hazard.** The binary given no argument exits 2, so a harness that dropped `args` would block every call the matcher takes. A witness rides a matcher no session uses and a scratch copy of the binary.
 
+**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** this entry leads hook-placement-guard-rules-pass with [windows-running-hook-replace](#windows-running-hook-replace), [hook-sibling-pid-namespace](#hook-sibling-pid-namespace), [replaced-binary-self-path](#replaced-binary-self-path), [guard-quoted-operand-words](#guard-quoted-operand-words), [shared-tree-stash-steer](#shared-tree-stash-steer), [wait-exemption-body-unbounded](#wait-exemption-body-unbounded) and [inline-python-steer-split](#inline-python-steer-split). **Open, the operator's, for spec:** whether the host with no bash at all is closed by one more operator run or by a stated limit. The edit to this repo's own registrations waits for the operator's confirmation of the prepared diff.
+
+**Push need (2026-10-10, inside the budget):** its Windows assertions ride [windows-running-hook-replace](#windows-running-hook-replace)'s mid-iteration push.
+
 **Cost while deferred:** a native-Windows adopter whose profile carries context-kit or guard-kit needs Git for Windows' bash for the hook wiring. Filed 2026-10-07 by windows-shell-floor-pass' build as a fold, its open question carried by that close to this scope's intake. Owner lookup at that close: hook wiring, settings templates, the exec form and PowerShell in the icebox — no other owner; [hook-contract-harness-neutral](#hook-contract-harness-neutral), DISTINCT (the contract's prose, not the registration's form); owner gate-sdk/SPEC.md §The adopter constraints.
 
 ### session-sweep-horizon-baked
@@ -437,18 +483,6 @@ guard-kit rule `background_no_record`'s bash exemption (2) exempts any backgroun
 **Deliverable:** the bash exemption held to a body of `sleep` statements, each decision table's loop-carrying rows re-derived, and guard-kit/SPEC.md §The generic ruleset stating it; a behavior change, since it widens a block.
 
 **Cost while deferred:** rule `git_mutation_under_producer` has no record to read for such a loop, so a commit under it passes. Filed 2026-10-07 by delegation-wait-journal-pass' build.
-
-### inline-python-steer-split
-
-[cost: event/low] [surface: guard-kit]
-
-rule `sed_file`'s inline-python arm took one of two like calls in delegation-wait-journal-pass' close session. A `python3 -` heredoc rewriting four tracked files through `open().write`, followed by a grep, ran; the next, rewriting one file and followed by a build call, was blocked with the steer to `--rewrite`.
-
-**Deliverable:** the two shapes as decision-table rows, and the rule or its stated reach in guard-kit/SPEC.md corrected to agree.
-
-**Inferred, not run:** that a computed-text construct in the first body told them apart, the discriminator the rule entry states — neither body was replayed through the hook
-
-**Cost while deferred:** the steer toward the count-asserting rewrite arm is skipped by a shape nobody has named. Filed 2026-10-08 by delegation-wait-journal-pass' close, after its drain, and promoted at the next scope's intake. Re-verified: the rule entry blocks a literal rewrite carrying no computed-text construct and says it leans toward passing. Owner lookup: `python`, `--rewrite`, `heredoc`, `sed_file` in this file and the disposed-findings record — none; owner guard-kit/SPEC.md §The generic ruleset.
 
 ### agent-effort-line-unmeasured
 
@@ -520,18 +554,6 @@ the shared front-matter reader (`front_matter_span` in `native/src/spec.rs`) tak
 
 **Cost while deferred:** a page closing its front matter on dots can gain a false finding or be measured long. Filed 2026-10-09 off crate-reader-hardening-pass' close second-vendor review, which ran Jekyll 4.4.1 on such a page and got the body, and carried to the next scope's intake. Re-verified there: the reader's closing rule compares a trimmed line with three hyphens alone. Owner lookup: `three dots`, `closer`, `front matter` in this file and the disposed-findings record — [plugin-front-matter-yaml](#plugin-front-matter-yaml), DISTINCT (the plugin gate's own reader); `front-matter-reader-siblings`, done, DISTINCT (the shared reader and the unclosed opener); owner canon-kit/SPEC.md §The shared spec adapters.
 
-### windows-running-hook-replace
-
-[cost: event/low] [surface: gate-sdk]
-
-a hook placement renames its staged sibling over the hook, and no leg does so while that hook is a running executable: a commit in flight on Windows while `--install-hooks` or a build's refresh re-places. gate-sdk/SPEC.md §install-hooks states the rename and says nothing of what Windows returns there. `hook-staging-fixed-sibling`, done, left it as its one unrun candidate.
-
-**Deliverable:** a Windows-leg step that holds a placed hook running and re-places it, with that section stating what the placement returns.
-
-**Inferred, not run:** that Windows refuses the rename, exiting 2 with the earlier hook still served — hold a placed hook running on a Windows leg and run `--install-hooks`
-
-**Cost while deferred:** a refresh on Windows during a commit may fail loudly; nothing is served wrong. Filed 2026-10-10 by front-door-readiness-pass' build. Re-verified by reading that section and the `gates` workflow's hook steps: the rename is stated, no step re-places under a running hook. Owner lookup: `install-hooks`, `rename over`, `running hook`, `hook-staging` in this file and the disposed-findings record — none; `hook-staging-fixed-sibling`, done, DISTINCT (the sibling's name under two placements, landed); owner gate-sdk/SPEC.md §install-hooks.
-
 ### boundary-wipe-unnamed-member
 
 [cost: event/low] [surface: lifecycle-kit]
@@ -543,30 +565,6 @@ the iteration boundary's scratch wipe leaves a directory holding a member whose 
 **Inferred, not run:** that the lister's refusal is what stops the descent — plant a member named with a lone 0xff byte under a scratch directory and run a boundary entry over a scratch tree
 
 **Cost while deferred:** one such scratch member leaves a could-not-remove note at every boundary. Filed 2026-10-10 by front-door-readiness-pass' close, where a scratch repository carrying one survived a boundary and was removed by hand, and promoted at the next scope's intake. Re-verified there by reading `wipe`: both its listings go through `walk::list_dir`. Owner lookup: `wipe`, `non-UTF-8`, `could not remove` in this file and the disposed-findings record — [nul-listing-lossy-decode](#nul-listing-lossy-decode), DISTINCT (ten readers that decode lossily where this one refuses); owner lifecycle-kit/SPEC.md §bin/enter-stage.sh.
-
-### hook-sibling-pid-namespace
-
-[cost: event/low] [surface: gate-sdk]
-
-two residues of the hook placement's per-run sibling, in `native/src/emit/install_hooks.rs`. The sibling's name carries the process id alone, where gate-sdk/SPEC.md §install-hooks says two placements at once never remove or rename each other's: two placements in separate process-id namespaces sharing one hooks directory, as containers over a bind-mounted checkout are, can draw the same id. And the placement discards the error of the sibling's removal, where that section says the sibling is removed on every path, so a removal failing after a failed rename leaves the sibling with no line saying so.
-
-**Deliverable:** that section stating both limits, or a name no second namespace can draw and a reported removal failure.
-
-**Inferred, not run:** that two namespaces collide on one id — run two placements under one forced id against one hooks directory
-
-**Cost while deferred:** a collision or a stranded sibling is silent, and each needs a hooks directory shared across namespaces or a failed rename first. Filed 2026-10-10 by front-door-readiness-pass' close, off its second-vendor review, and promoted at the next scope's intake. Re-verified there by reading the module: the name is the hook's file name, the staged suffix and `std::process::id()`, and both removals drop their result. Owner lookup: `install-hooks`, `sibling`, `process id` in this file and the disposed-findings record — [windows-running-hook-replace](#windows-running-hook-replace), DISTINCT (the rename over a running hook); `hook-staging-fixed-sibling`, done, DISTINCT (it landed the per-run sibling these are defects in, so no recurrence); owner gate-sdk/SPEC.md §install-hooks.
-
-### replaced-binary-self-path
-
-[cost: event/low] [surface: gate-sdk]
-
-a gate that resolves its own executable reds when the binary is replaced under it. The first battery run after a `bash gate-sdk/bin/build-native.sh` rebuild went red once on `check-fence-run`, the gate binary's path reading `(deleted)`, and the re-run was green: one build session's report, where the lead's three rebuild-then-battery runs in that iteration were green. `execute` in `native/src/gates/fence_run.rs` copies `std::env::current_exe()` into its scratch, and Linux answers that call with the unlinked path once the running process's file is replaced. The crate reads the same call at more than a dozen other sites.
-
-**Deliverable:** the cause confirmed, then the read made safe across a replace at its shared sites, or the limit stated where the rebuild obligation is (gate-sdk/SPEC.md §Porting a gate to the binary substrate).
-
-**Inferred, not run:** that a battery process alive across the rebuild's replace is what redded — start a battery, replace the binary mid-run, and read `check-fence-run`
-
-**Cost while deferred:** a session reads a spurious red as its own regression right after the commit-time rebuild. Filed 2026-10-10 by front-door-readiness-pass' lead on its third build session's report, and promoted at the next scope's intake. Re-verified there by reading the gate and by `git grep -c current_exe -- native/src`. Owner lookup: `current_exe`, `(deleted)`, `fence-run`, `rebuild` in this file and the disposed-findings record — [unremapped-rebuild-reds-smoke](#unremapped-rebuild-reds-smoke), DISTINCT (a rebuild without the remap flags); owner gate-sdk/SPEC.md §Porting a gate to the binary substrate.
 
 ## Icebox
 

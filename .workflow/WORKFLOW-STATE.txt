@@ -4,4 +4,4 @@
 
 ---
 
-— scope a7a281f4 2026-10-10 be91469b8
+hook-placement-guard-rules-pass scope a7a281f4 2026-10-10 be91469b8
