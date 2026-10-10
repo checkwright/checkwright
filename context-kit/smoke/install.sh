@@ -39,6 +39,16 @@ if [[ -f .claude/settings.json ]]; then
 else
     jq 'del(.["//"])' "$SMOKE_KIT_ROOT/templates/settings-sessionstart.json" > .claude/settings.json
 fi
+# spec: context-kit/SPEC.md §The session-context hook — the registration's placeholder, resolved at
+# the merge by the template's rule: the knob's value as the binary prints it, less any executable
+# suffix, under the project-directory prefix, an absolute value replacing the whole command
+hook_bin="$("$(gate_native_bin_spelled)" --emit knob-values GATE_SDK_NATIVE_BIN | cut -f3)"
+hook_bin="${hook_bin%.exe}"
+jq --arg b "$hook_bin" \
+    '(.hooks[]?[]?.hooks[]? | select((.command // "") | test("@GATE_SDK_NATIVE_BIN@")) | .command)
+        |= (if ($b | test("^(/|[A-Za-z]:[/\\\\])")) then $b else gsub("@GATE_SDK_NATIVE_BIN@"; $b) end)' \
+    .claude/settings.json > .claude/settings.json.new
+mv .claude/settings.json.new .claude/settings.json
 
 cat > CLAUDE.md <<'EOF'
 # Smoke consumer

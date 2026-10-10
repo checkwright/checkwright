@@ -26,6 +26,8 @@ const REPO_HOST: &str = "https://github.com/";
 // spec: gate-sdk/SPEC.md §The path-dialect contract — shell text the hook's own shell runs, so the
 // toplevel it names is produced and read there, never in the crate
 const FAIL_OPEN: &str = "r=$(git -C \"${CLAUDE_PROJECT_DIR:-.}\" rev-parse --show-toplevel 2>/dev/null) && test -f \"$r/gate-sdk/bin/run-gates.sh\" || exit 0; CLAUDE_PROJECT_DIR=$r; ";
+// spec: plugin/SPEC.md §The guards — the shell-form front-end call a member is rendered behind
+const FRONT_END_CALL: &str = "bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook ";
 // spec: plugin/SPEC.md §The skills — the Agent Skills bound on a description's length
 const DESCRIPTION_MAX: usize = 1024;
 
@@ -51,8 +53,9 @@ pub(crate) fn skill_body(path: &str) -> String {
     )
 }
 
-// spec: plugin/SPEC.md §The guards — each block under `hooks` in order, each command behind the
-// fail-open prefix, and the template's `//` note dropped
+// spec: plugin/SPEC.md §The guards — each block under `hooks` in order, each hook's command the
+// fail-open prefix and the front-end call of the member the registration parser reads off it, and
+// the template's `//` note dropped
 pub(crate) fn render_hooks(template: &Value) -> Result<Value, String> {
     let blocks = template
         .get("hooks")
@@ -64,8 +67,21 @@ pub(crate) fn render_hooks(template: &Value) -> Result<Value, String> {
         for block in list.as_array_mut().into_iter().flatten() {
             let hooks = block.get_mut("hooks").and_then(Value::as_array_mut);
             for hook in hooks.into_iter().flatten() {
-                if let Some(Value::String(c)) = hook.get_mut("command") {
-                    *c = format!("{}{}", FAIL_OPEN, c);
+                let member = match crate::hook::registration(&crate::hook::command_tokens(hook)) {
+                    crate::hook::Registration::Member(m) => m.to_string(),
+                    _ => {
+                        return Err(format!(
+                            "{} carries a hook that is no member registration, which the plugin has no command for: {}",
+                            HOOKS_TEMPLATE, hook
+                        ))
+                    }
+                };
+                if let Some(fields) = hook.as_object_mut() {
+                    fields.remove("args");
+                    fields.insert(
+                        "command".to_string(),
+                        Value::String(format!("{}{}{}", FAIL_OPEN, FRONT_END_CALL, member)),
+                    );
                 }
             }
         }
@@ -382,18 +398,25 @@ fn rule(args: &[String]) -> Result<i32, String> {
 mod tests {
     use super::*;
 
-    // spec: plugin/SPEC.md §The guards — every command prefixed, blocks in order, the note dropped
+    // spec: plugin/SPEC.md §The guards — each command composed from the member, exec form and shell
+    // form alike, blocks in order, the note dropped; a hook that is no member registration refused
     #[test]
-    fn the_hooks_rendering_prefixes_each_command_and_drops_the_note() {
+    fn the_hooks_rendering_composes_each_command_from_its_member_and_drops_the_note() {
         let t: Value = serde_json::from_str(
-            r#"{"//":"merge advice","hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"bash x --hook a"}]},{"matcher":"Write","hooks":[{"type":"command","command":"bash x --hook b"}]}]}}"#,
+            r#"{"//":"merge advice","hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"${CLAUDE_PROJECT_DIR}/@GATE_SDK_NATIVE_BIN@","args":["--hook","a"]}]},{"matcher":"Write","hooks":[{"type":"command","command":"bash x/run-gates.sh --hook b"}]}]}}"#,
         )
         .unwrap();
+        let call = |m: &str| format!("{}{}{}", FAIL_OPEN, FRONT_END_CALL, m);
         let want = serde_json::json!({"hooks":{"PreToolUse":[
-            {"matcher":"Bash","hooks":[{"type":"command","command":format!("{}bash x --hook a", FAIL_OPEN)}]},
-            {"matcher":"Write","hooks":[{"type":"command","command":format!("{}bash x --hook b", FAIL_OPEN)}]}
+            {"matcher":"Bash","hooks":[{"type":"command","command":call("a")}]},
+            {"matcher":"Write","hooks":[{"type":"command","command":call("b")}]}
         ]}});
         assert_eq!(render_hooks(&t).unwrap(), want);
+        let stray: Value = serde_json::from_str(
+            r#"{"hooks":{"Stop":[{"hooks":[{"type":"command","command":"bash scripts/x.sh"}]}]}}"#,
+        )
+        .unwrap();
+        assert!(render_hooks(&stray).unwrap_err().contains("no member registration"));
     }
     // spec: plugin/SPEC.md §The skills — the front matter's scalars and the body after it
     #[test]

@@ -1,0 +1,2 @@
+Named for the gate binary so an exec-form hook registering through it is read
+as a member registration. Never executed: the gate asserts the path exists.

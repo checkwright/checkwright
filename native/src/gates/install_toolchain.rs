@@ -2,7 +2,7 @@
 // toolchain tables hold whole-element parity with the probe roster, each row on its audience's page
 use super::install_docs;
 use crate::fresh;
-use crate::toolfloor::{CONTRIBUTOR, KIT_JOIN, REGISTERED};
+use crate::toolfloor::{ANCHOR_ARMS_NEEDED, CONTRIBUTOR, DERIVED, KIT_JOIN, REGISTERED};
 use std::collections::BTreeMap;
 use std::path::Path;
 
@@ -96,7 +96,13 @@ fn listed_rows(text: &str) -> Vec<Row> {
 // literal. That is what makes the parity unsatisfiable by editing both sides: one side is measured.
 fn roster_quad(element: &str, derived: &[String]) -> (String, String) {
     let e = crate::toolfloor::parse(element);
-    let audience = crate::toolfloor::resolved_audience(&e.audience, derived);
+    // spec: docs/install-parity-contracts.md §The install-toolchain parity contract — a derived
+    // audience whose kit list is empty keeps its sentinel, which `render` spells as the anchor arms
+    let audience = if e.audience == DERIVED && derived.is_empty() {
+        DERIVED.to_string()
+    } else {
+        crate::toolfloor::resolved_audience(&e.audience, derived)
+    };
     (
         e.name.clone(),
         format!("{}:{}:{}:{}", e.name, e.min, e.imp, audience),
@@ -127,6 +133,7 @@ fn render(quad: &str) -> String {
         "" => REQUIRED.to_string(),
         CONTRIBUTOR => CONTRIBUTORS.to_string(),
         REGISTERED => REGISTERED_GATES.to_string(),
+        DERIVED => ANCHOR_ARMS_NEEDED.to_string(),
         kits => {
             let names: Vec<&str> = kits.split(KIT_JOIN).collect();
             let listed = match names.split_last() {
@@ -203,21 +210,16 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     // spec: context-kit/SPEC.md §bin/env-probe — bought only where an element asks for it, so a
-    // roster carrying no derived audience needs no kit roots and a fixture may author one; an
-    // unresolvable derivation fails closed, on that section's undecided rule.
-    let derived = if elements
-        .iter()
-        .any(|e| crate::toolfloor::parse(e).audience == crate::toolfloor::DERIVED)
-    {
-        let d = crate::toolfloor::derived_kit_audience_here()?;
-        if d.is_empty() {
-            return Err(format!(
-                "the roster carries a '{}' audience and no kit root under this tree satisfies its \
-                 predicate — the page's row cannot be compared against nothing",
-                crate::toolfloor::DERIVED
-            ));
-        }
-        d
+    // roster carrying no derived audience needs no kit roots and a fixture may author one; a
+    // derivation that read no kit root fails closed, where one that found no surface is a list.
+    let derived = if elements.iter().any(|e| crate::toolfloor::parse(e).audience == DERIVED) {
+        crate::toolfloor::derived_kit_audience_here()?.ok_or_else(|| {
+            format!(
+                "the roster carries a '{}' audience and no kit root was read under this tree — the \
+                 page's row cannot be compared against a derivation that did not run",
+                DERIVED
+            )
+        })?
     } else {
         Vec::new()
     };
@@ -316,6 +318,11 @@ mod tests {
             roster_quad("bash:4.3::derived", &derived).1,
             "bash:4.3::alpha-kit+beta-kit"
         );
+        // spec: docs/install-parity-contracts.md §The install-toolchain parity contract — the
+        // empty kit list renders the anchor arms, never the unconditional cell an empty field takes
+        let empty = roster_quad("bash:4.3::derived", &[]).1;
+        assert_eq!(render(&empty), format!("| ≥ 4.3 | {} |", ANCHOR_ARMS_NEEDED));
+        assert_ne!(render(&empty), render("bash:4.3::"));
     }
 
     // spec: docs/install-parity-contracts.md §The install-toolchain parity contract — the

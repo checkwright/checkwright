@@ -10,7 +10,7 @@
 
 ### exec-form-hook-registration
 
-[spec: SPEC-exec-form-hooks.md]
+[spec: gate-sdk/SPEC.md]
 
 the hook-wiring rewire windows-kit-bash-files did not land: context-kit and guard-kit still owe bash on native Windows through their settings templates, whose hook commands lead with a `bash` word. Split 2026-10-07 at scope from [custom-gate-substrates](#custom-gate-substrates), where build had folded it (operator direction, 2026-10-07, lead-relayed, not a ruling: its own entry).
 
@@ -27,6 +27,11 @@ the hook-wiring rewire windows-kit-bash-files did not land: context-kit and guar
 **Answered at align (2026-10-10; lead decisions, each a constraint the amendment meets, revisable against the oracle):** one registration parser serves every caller and reads the template the amendment ships; after the change the bash row says what the Deliverable above says it names, `check-install-toolchain` exits on no error for that tree, and every surface the emptied bash audience reaches is covered by a delta or shown unreached; a `command` value the amendment allows does not red `check-settings-paths`, and the absolute-value allowance stays; `check-settings-paths`' new red for an unresolved placeholder is accepted, the operator asked and answering that the call is the lead's. The canonical-text rewrite's three choices rest on the operator directions the line above records.
 
 **Push need (2026-10-10, inside the budget by the operator grant on that entry's line):** its Windows assertions ride [windows-running-hook-replace](#windows-running-hook-replace)'s mid-iteration push.
+
+**Built (2026-10-10):** the amendment is merged and deleted, and the tag above bridges the push with the canonical spec. Two halves stay open, so the entry stays here.
+
+- **The Windows run.** `crate-tests-windows` gains the step *shell-guard reads its tree from a subdirectory*, and its crate tests hold the suffix-less candidate; both are read on the push above before the Done move.
+- **This repo's six registrations.** The exec-form diff of `.claude/settings.json` is prepared and applied by nobody: it waits for the operator's confirmation. The witness for the hazard above runs first, and it is itself a settings edit, so it waits on the same confirmation. On application `docs/enforcement.md` is regenerated where a row's printed surface moves.
 
 **Cost while deferred:** a native-Windows adopter whose profile carries context-kit or guard-kit needs Git for Windows' bash for the hook wiring. Filed 2026-10-07 by windows-shell-floor-pass' build as a fold, its open question carried by that close to this scope's intake. Owner lookup at that close: hook wiring, settings templates, the exec form and PowerShell in the icebox — no other owner; [hook-contract-harness-neutral](#hook-contract-harness-neutral), DISTINCT (the contract's prose, not the registration's form); owner gate-sdk/SPEC.md §The adopter constraints.
 

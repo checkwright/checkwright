@@ -28,7 +28,7 @@ checkwright init --profile full --without-kit lifecycle-kit --without-kit queue-
 
 <!-- companion-complement:end -->
 
-`complement` leaves out each kit whose job Spec Kit already does. [`companion/exclusions.list`](https://github.com/checkwright/checkwright/blob/master/companion/exclusions.list) records the Spec Kit surface each one defers to, and the line carries one `--without-kit` per kit. It needs `bash` 4.3 or later and seeds evidence files under `.workflow/`, beside Spec Kit's own. Drop a kit's `--without-kit` to adopt it later.
+`complement` leaves out each kit whose job Spec Kit already does. [`companion/exclusions.list`](https://github.com/checkwright/checkwright/blob/master/companion/exclusions.list) records the Spec Kit surface each one defers to, and the line carries one `--without-kit` per kit. It seeds evidence files under `.workflow/`, beside Spec Kit's own. Drop a kit's `--without-kit` to adopt it later.
 
 **Every kit.** Ask the install command for `full`, or run your system's line from the install page with:
 
@@ -40,7 +40,7 @@ checkwright init --profile full --recipe speckit
 
 <!-- companion-full:end -->
 
-`full` adds every kit's gates to the gates [the overview](spec-toolkits.md#what-the-gates-catch) names. It needs `bash` 4.3 or later, which stock macOS lacks ([macOS and Linux](install.md#macos-and-linux) has the remedy). It seeds Checkwright's own task queue and evidence files under `.workflow/` beside Spec Kit's own, and writes a doctrine block into your agent file.
+`full` adds every kit's gates to the gates [the overview](spec-toolkits.md#what-the-gates-catch) names. It seeds Checkwright's own task queue and evidence files under `.workflow/` beside Spec Kit's own, and writes a doctrine block into your agent file.
 
 Spec Kit has no lifecycle layer ([companion/SPEC.md §The lifecycle layer](companion/SPEC.md#the-lifecycle-layer)).
 

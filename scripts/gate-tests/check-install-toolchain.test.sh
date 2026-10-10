@@ -5,8 +5,8 @@
 # the three spellings of an unconstrained member, the implementation-token axis
 # diverging on its own, the audience axis in parity, diverging each way, and
 # spelled with a Needed value no audience renders to, the floor divergence,
-# both placement directions, and the fail-closed arm of a derived audience with
-# no kit root to resolve.
+# both placement directions, the fail-closed arm of a derived audience with no
+# kit root read, and the anchor-arm rendering of one whose kit list is empty.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -129,13 +129,34 @@ out="$(cd "$tmp/n" \
     && gate_run check-install-toolchain "$GATES_DIR" install.md CONTRIBUTING.md roster.sh 2>&1)"; rc=$?
 if [[ "$rc" -ne 2 ]]; then
     echo "  FAIL [underived-audience-fails-closed]: want exit 2, got $rc -- $out"; fails=$((fails + 1))
-elif ! grep -qF -- "no kit root under this tree satisfies its predicate" <<<"$out"; then
+elif ! grep -qF -- "no kit root was read under this tree" <<<"$out"; then
     echo "  FAIL [underived-audience-fails-closed]: exit 2 OK but output lacks the cause: $out"; fails=$((fails + 1))
 fi
+
+# O — the other empty answer: a kit root read and shipping no bash surface is the
+# empty kit list, which renders the two anchor arms. A page stating that cell is
+# clean, and a page still stating `required` reds against it.
+anchor='optional: if your docs mark a fence runnable or you register a shell gate'
+for c in o p; do
+    mkdir -p "$tmp/$c/plain-kit" && printf '# a kit shipping no bash surface\n' >"$tmp/$c/plain-kit/README.md"
+done
+write_case "$tmp/o" "| \`bash\` | ≥ 4.0 | $anchor | runs a fence or a shell gate |" 'bash:4.0::derived'
+write_case "$tmp/p" '| `bash` | ≥ 4.0 | required | runs the battery |' 'bash:4.0::derived'
+for c in "o:0:INSTALL-TOOLCHAIN: clean" "p:1:roster says | ≥ 4.0 | $anchor |, page says | ≥ 4.0 | required |"; do
+    IFS=: read -r dir want cause <<<"$c"
+    out="$(cd "$tmp/$dir" \
+        && gate_env GATE_SDK_KIT_DIRS=plain-kit \
+        && gate_run check-install-toolchain "$GATES_DIR" install.md CONTRIBUTING.md roster.sh 2>&1)"; rc=$?
+    if [[ "$rc" -ne "$want" ]]; then
+        echo "  FAIL [empty-kit-list-$dir]: want exit $want, got $rc -- $out"; fails=$((fails + 1))
+    elif ! grep -qF -- "$cause" <<<"$out"; then
+        echo "  FAIL [empty-kit-list-$dir]: exit $rc OK but output lacks '$cause': $out"; fails=$((fails + 1))
+    fi
+done
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-install-toolchain.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-install-toolchain.test: ok (both name-set directions red; a bare row, a trailing empty field and a doubled empty field are one unconstrained member; the implementation token and an invented floor each red on their own; the audience axis reaches parity, reds in both directions, and reds on a Needed value no audience renders to; a floor divergence reds; a row on the wrong page reds in both directions; no row anywhere and a derived audience with no kit root each fail closed)"
+echo "check-install-toolchain.test: ok (both name-set directions red; a bare row, a trailing empty field and a doubled empty field are one unconstrained member; the implementation token and an invented floor each red on their own; the audience axis reaches parity, reds in both directions, and reds on a Needed value no audience renders to; a floor divergence reds; a row on the wrong page reds in both directions; no row anywhere and a derived audience with no kit root read each fail closed; a kit root read and shipping no surface renders the anchor arms and reds a page that says otherwise)"
 exit 0

@@ -12,6 +12,10 @@ cat >> scripts/gates.list <<'EOF'
 check-door-binding
 EOF
 
+# shellcheck source=/dev/null
+source "$SMOKE_KIT_ROOT/../gate-sdk/lib/gate.sh"
+door="$(gate_native_bin_spelled)"
+
 mkdir -p .claude
 if [[ -f .claude/settings.json ]]; then
     prior_events="$(jq -c '.hooks // {} | keys' .claude/settings.json)"
@@ -30,15 +34,26 @@ fi
 
 # spec: guard-kit/SPEC.md §The recommended allowlist — the binary grant's placeholder, resolved the
 # way an adopter resolves it and then executed, because a grant that parses is not one that spawns
-# shellcheck source=/dev/null
-source "$SMOKE_KIT_ROOT/../gate-sdk/lib/gate.sh"
-door="$(gate_native_bin_spelled)"
 if [[ ! -x "$door" ]]; then
     echo "guard-kit/smoke/install.sh: the allowlist's binary grant resolves to '$door', which is not an executable file — the sweep re-points every adopter surface at a door this consumer cannot spawn" >&2
     exit 1
 fi
 if ! "$door" --emit knob-values GATE_SDK_NATIVE_BIN >/dev/null 2>&1; then
     echo "guard-kit/smoke/install.sh: the granted door '$door' is executable but did not run an arm" >&2
+    exit 1
+fi
+# spec: guard-kit/SPEC.md §The shell guard — the hook registrations' placeholder, resolved by the
+# hook template's own rule: the knob's value as the binary prints it, less any executable suffix,
+# under the project-directory prefix, an absolute value replacing the whole command
+hook_bin="$("$door" --emit knob-values GATE_SDK_NATIVE_BIN | cut -f3)"
+hook_bin="${hook_bin%.exe}"
+jq --arg b "$hook_bin" \
+    '(.hooks[]?[]?.hooks[]? | select((.command // "") | test("@GATE_SDK_NATIVE_BIN@")) | .command)
+        |= (if ($b | test("^(/|[A-Za-z]:[/\\\\])")) then $b else gsub("@GATE_SDK_NATIVE_BIN@"; $b) end)' \
+    .claude/settings.json > .claude/settings.json.new
+mv .claude/settings.json.new .claude/settings.json
+if jq -e '[.hooks[]?[]?.hooks[]?.command // "" | select(test("@GATE_SDK_NATIVE_BIN@"))] | length > 0' .claude/settings.json >/dev/null; then
+    echo "guard-kit/smoke/install.sh: an unresolved @GATE_SDK_NATIVE_BIN@ placeholder survived into the merged hook wiring" >&2
     exit 1
 fi
 allow=.claude/settings-allow.resolved.json
@@ -92,24 +107,45 @@ if [[ "$rc" -ne 2 || "$msg" != *"'cd'"* ]]; then
 fi
 # spec: guard-kit/SPEC.md §Testing — the merged wiring hands the PowerShell tool to the member, and
 # the member reads that tool's grammar
-if ! jq -e '[.hooks.PreToolUse[] | select(.matcher == "Bash|PowerShell") | .hooks[].command
-             | select(test("--hook shell-guard"))] | length == 1' .claude/settings.json >/dev/null; then
+wired_group='[.hooks.PreToolUse[] | select(.matcher == "Bash|PowerShell") | .hooks[] | select(.args == ["--hook", "shell-guard"])]'
+if ! jq -e "${wired_group} | length == 1" .claude/settings.json >/dev/null; then
     echo "guard-kit/smoke/install.sh: the merged wiring carries no Bash|PowerShell matcher group running the shell-guard" >&2
     exit 1
 fi
-# spec: guard-kit/SPEC.md §Testing — the wiring string itself, run as the harness runs it from a
-# subdirectory, so a command resolved against the hook's working directory reds here
-wired="$(jq -r '[.hooks.PreToolUse[] | select(.matcher == "Bash|PowerShell") | .hooks[].command
-                 | select(test("--hook shell-guard"))][0]' .claude/settings.json)"
+# spec: guard-kit/SPEC.md §Testing — the registration itself, spawned as the harness spawns it from a
+# subdirectory: the command with its args and no shell between, the project-directory variable
+# substituted, so a member that reads its tree from the hook's working directory reds here
 consumer_root="$(pwd -P)"
+wired="$(jq -r "${wired_group}[0].command" .claude/settings.json)"
+# shellcheck disable=SC2016  # the harness's own placeholder, matched as a literal
+project_dir_var='${CLAUDE_PROJECT_DIR}'
+wired="${wired//"$project_dir_var"/$consumer_root}"
+mapfile -t wired_args < <(jq -r "${wired_group}[0].args[]" .claude/settings.json)
 mkdir -p smoke-subdir/deeper
+wired_run() {  # $1=payload
+    (cd smoke-subdir/deeper && printf '%s' "$1" | CLAUDE_PROJECT_DIR="$consumer_root" "$wired" "${wired_args[@]}")
+}
 set +e
-msg="$(cd smoke-subdir/deeper && printf '%s' '{"tool_name":"Bash","tool_input":{"command":"cd deploy && ls"}}' | CLAUDE_PROJECT_DIR="$consumer_root" bash -c "$wired" 2>&1 >/dev/null)"
+msg="$(wired_run '{"tool_name":"Bash","tool_input":{"command":"cd deploy && ls"}}' 2>&1 >/dev/null)"
 rc=$?
 set -e
-rm -rf smoke-subdir
 if [[ "$rc" -ne 2 || "$msg" != *"'cd'"* ]]; then
-    echo "guard-kit/smoke/install.sh: the wired command '$wired', run from a subdirectory, did not block a compound-cd payload with rule \`cd_compound\`'s steer (exit $rc, want 2): $msg" >&2
+    echo "guard-kit/smoke/install.sh: the wired command '$wired ${wired_args[*]}', spawned from a subdirectory, did not block a compound-cd payload with rule \`cd_compound\`'s steer (exit $rc, want 2): $msg" >&2
+    exit 1
+fi
+# spec: guard-kit/SPEC.md §Testing — the tree's own knob file is read from the subdirectory: a
+# malformed one is refused there as at the root, where a member reading from its working directory
+# misses the file and allows the call with no word
+cp scripts/guard-config.knobs scripts/guard-config.knobs.smoke-orig
+printf 'a line that is no knob assignment\n' >> scripts/guard-config.knobs
+set +e
+msg="$(wired_run '{"tool_name":"Bash","tool_input":{"command":"ls"}}' 2>&1 >/dev/null)"
+rc=$?
+set -e
+mv scripts/guard-config.knobs.smoke-orig scripts/guard-config.knobs
+rm -rf smoke-subdir
+if [[ "$rc" -ne 2 || "$msg" != *"could not read its knobs"* ]]; then
+    echo "guard-kit/smoke/install.sh: the wired command, spawned from a subdirectory, did not refuse a malformed knob file at the tree's root (exit $rc, want 2): $msg" >&2
     exit 1
 fi
 set +e

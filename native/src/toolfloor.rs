@@ -20,6 +20,11 @@ pub const DERIVED: &str = "derived";
 // spec: context-kit/SPEC.md §bin/env-probe — a kit-list audience joins its kit names with this
 pub const KIT_JOIN: char = '+';
 
+// spec: context-kit/SPEC.md §bin/env-probe — the Needed cell of a `derived` audience whose kit
+// list is empty: the predicate's two anchor arms, a marked fence and a registered shell gate
+pub const ANCHOR_ARMS_NEEDED: &str =
+    "optional: if your docs mark a fence runnable or you register a shell gate";
+
 // spec: context-kit/SPEC.md §bin/env-probe — a kit-valued audience read as its kit names
 pub fn audience_kits(audience: &str) -> Vec<&str> {
     audience.split(KIT_JOIN).collect()
@@ -124,7 +129,7 @@ pub fn derived_audience_at(
     sdk_root: &str,
     gates_dir: Option<&str>,
 ) -> Result<Vec<String>, String> {
-    let mut out = kit_arms_at(anchor, roots, sdk_root)?;
+    let mut out = kit_arms_at(anchor, roots, sdk_root)?.unwrap_or_default();
     let floor = kit_name(sdk_root);
     let anchored = [
         fence_executor(anchor, roots, &floor)?,
@@ -158,12 +163,14 @@ fn registered_shell_gate(anchor: &str, roots: &[String], floor: &str, gates_dir:
 }
 
 // spec: context-kit/SPEC.md §bin/env-probe — the two per-kit-root arms alone, the audience a
-// payload carries before any adopter content exists
-fn kit_arms_at(anchor: &str, roots: &[String], sdk_root: &str) -> Result<Vec<String>, String> {
+// payload carries before any adopter content exists. Kit roots read and none shipping a surface
+// is an answer, the empty list; no kit root read beside the floor-holder is `None`, no answer.
+fn kit_arms_at(anchor: &str, roots: &[String], sdk_root: &str) -> Result<Option<Vec<String>>, String> {
     let configured = crate::walk::prune_dirs()?;
     let prune = |n: &str| n == "gate-tests" || n == "smoke" || configured.iter().any(|d| d == n);
     let tree = crate::walk::find_with_prune(std::path::Path::new(anchor), &prune)?;
     let floor = kit_name(sdk_root);
+    let mut read = false;
     let mut out: Vec<String> = Vec::new();
     for r in roots {
         let name = kit_name(r);
@@ -183,12 +190,13 @@ fn kit_arms_at(anchor: &str, roots: &[String], sdk_root: &str) -> Result<Vec<Str
         if !prefix.is_dir() {
             continue;
         }
+        read = true;
         if tree.iter().any(|p| p.starts_with(&prefix) && is_bash_surface(p)) {
             out.push(name);
         }
     }
     out.sort();
-    Ok(out)
+    Ok(read.then_some(out))
 }
 
 // spec: context-kit/SPEC.md §bin/env-probe — the third arm, over the anchor: the registry owner of
@@ -222,8 +230,9 @@ pub fn derived_audience_here() -> Result<Vec<String>, String> {
 }
 
 // spec: context-kit/SPEC.md §bin/env-probe — the kit-root arms against the tree the reader stands
-// in: the payload's floor, the one a page stating what an install owes is compared against
-pub fn derived_kit_audience_here() -> Result<Vec<String>, String> {
+// in: the payload's floor, the one a page stating what an install owes is compared against; `None`
+// where no kit root beside the floor-holder was read
+pub fn derived_kit_audience_here() -> Result<Option<Vec<String>>, String> {
     let here = crate::walk::cwd()?;
     kit_arms_at(&here, &crate::walk::kit_roots()?, &crate::walk::sdk_root())
 }
@@ -546,17 +555,43 @@ mod tests {
         let roots: Vec<String> = kits.iter().map(|k| repo.join(k).display().to_string()).collect();
         let derived = kit_arms_at(&repo.display().to_string(), &roots, &sdk)
             .expect("the derivation could not run");
-        assert!(
-            derived.iter().all(|k| k != "gate-sdk"),
-            "the floor-holder joined the audience, which makes the member unconditional: {:?}",
-            derived
+        assert_eq!(
+            derived,
+            Some(Vec::new()),
+            "a kit root ships a bash surface again, or none was read: name the kit on the page's row"
         );
-        for owed in ["context-kit", "guard-kit"] {
-            assert!(derived.iter().any(|k| k == owed), "{} left the audience: {:?}", owed, derived);
+        let floor_only = kit_arms_at(&repo.display().to_string(), std::slice::from_ref(&sdk), &sdk)
+            .expect("the derivation could not run");
+        assert_eq!(floor_only, None, "the floor-holder alone is no kit root read");
+    }
+
+    // spec: context-kit/SPEC.md §bin/env-probe — the two kit-root arms still fire: a kit shipping
+    // a bash-led hook template or a bash script joins, and a kit shipping an exec-form one does not
+    #[test]
+    fn a_kit_root_shipping_a_bash_surface_joins_the_kit_arms() {
+        let _knobs = crate::knobenv::lock();
+        let anchor = std::env::temp_dir().join(format!("toolfloor-kit-arms.{}", std::process::id()));
+        let sdk = anchor.join("gate-sdk").display().to_string();
+        for (kit, file, body) in [
+            ("a-kit", "templates/settings.json", "{\"hooks\":[{\"type\":\"command\",\"command\":\"bash x.sh\"}]}"),
+            ("b-kit", "bin/tool.sh", "#!/usr/bin/env bash\ntrue\n"),
+            ("c-kit", "templates/settings.json", "{\"hooks\":[{\"type\":\"command\",\"command\":\"${CLAUDE_PROJECT_DIR}/bin/gates\",\"args\":[\"--hook\",\"x\"]}]}"),
+        ] {
+            let path = anchor.join(kit).join(file);
+            std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+            std::fs::write(path, body).unwrap();
         }
-        for clear in ["drift-kit", "delegation-kit", "lifecycle-kit", "canon-kit", "queue-kit"] {
-            assert!(derived.iter().all(|k| k != clear), "{} joined the audience: {:?}", clear, derived);
-        }
+        let a = anchor.display().to_string();
+        let roots = |kits: &[&str]| -> Vec<String> {
+            kits.iter().map(|k| anchor.join(k).display().to_string()).collect()
+        };
+        assert_eq!(
+            kit_arms_at(&a, &roots(&["a-kit", "b-kit", "c-kit"]), &sdk).unwrap(),
+            Some(vec!["a-kit".to_string(), "b-kit".to_string()])
+        );
+        assert_eq!(kit_arms_at(&a, &roots(&["c-kit"]), &sdk).unwrap(), Some(Vec::new()));
+        assert_eq!(kit_arms_at(&a, &roots(&["absent-kit"]), &sdk).unwrap(), None);
+        let _ = std::fs::remove_dir_all(&anchor);
     }
 
     // spec: context-kit/SPEC.md §bin/env-probe — the third arm: the fence-executing gate's owner

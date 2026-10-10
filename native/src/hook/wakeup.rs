@@ -47,8 +47,8 @@ fn local_stamp() -> String {
     stamp_at(epoch, tm.tm_gmtoff as i64)
 }
 
-// spec: gate-sdk/SPEC.md §The program roster — off unix `date` resolves from the userland `bash`
-// already requires there
+// spec: context-kit/SPEC.md §bin/env-probe — off unix `date` resolves from Git for Windows'
+// userland where `PATH` carries it, and the stamp is empty where it does not
 #[cfg(not(unix))]
 fn local_stamp() -> String {
     proc::run(&programs::DATE, &["-Is"])

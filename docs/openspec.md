@@ -30,7 +30,7 @@ checkwright init --profile full --without-kit lifecycle-kit --without-kit queue-
 
 <!-- companion-complement:end -->
 
-`complement` leaves out each kit whose job OpenSpec already does. [`companion/exclusions.list`](https://github.com/checkwright/checkwright/blob/master/companion/exclusions.list) records the OpenSpec surface each one defers to, and the line carries one `--without-kit` per kit. It needs `bash` 4.3 or later and seeds evidence files under `.workflow/`, beside OpenSpec's own. Drop a kit's `--without-kit` to adopt it later. It applies no lifecycle layer, since it leaves the stage machine to OpenSpec.
+`complement` leaves out each kit whose job OpenSpec already does. [`companion/exclusions.list`](https://github.com/checkwright/checkwright/blob/master/companion/exclusions.list) records the OpenSpec surface each one defers to, and the line carries one `--without-kit` per kit. It seeds evidence files under `.workflow/`, beside OpenSpec's own. Drop a kit's `--without-kit` to adopt it later. It applies no lifecycle layer, since it leaves the stage machine to OpenSpec.
 
 **Every kit.** The third line installs `full`:
 
@@ -42,6 +42,6 @@ checkwright init --profile full --recipe openspec --recipe openspec-lifecycle
 
 <!-- companion-full:end -->
 
-It costs what the [Spec Kit](speckit.md) `full` line costs: `bash` 4.3 or later, and Checkwright's own workflow files beside OpenSpec's. The line also applies the lifecycle layer, which lets lifecycle-kit's stage machine read OpenSpec's in-flight changes: once you run the stage machine, a change touching two capabilities owes the align stage before build.
+It costs what the [Spec Kit](speckit.md) `full` line costs: Checkwright's own workflow files beside OpenSpec's. The line also applies the lifecycle layer, which lets lifecycle-kit's stage machine read OpenSpec's in-flight changes: once you run the stage machine, a change touching two capabilities owes the align stage before build.
 
 What the gates catch, what is tested and the limits: [Spec toolkits](spec-toolkits.md).

@@ -151,6 +151,14 @@ fn is_assignment(t: &str) -> bool {
 
 pub const FRONT_ENDS: [&str; 2] = ["run-gates.sh", "run-gates.ps1"];
 
+// spec: guard-kit/SPEC.md §The recommended allowlist — the binary's placeholder, the spelling a kit
+// template carries before the adopter's merge
+pub const BIN_PLACEHOLDER: &str = "@GATE_SDK_NATIVE_BIN@";
+
+// spec: gate-sdk/SPEC.md §The harness-integration arm — the Windows executable suffix, which a
+// committed registration may carry whatever host reads it
+const WINDOWS_EXE: &str = ".exe";
+
 #[derive(Debug, PartialEq)]
 pub enum Registration<'a> {
     NotAMember,
@@ -158,8 +166,18 @@ pub enum Registration<'a> {
     NoOperand,
 }
 
+// spec: gate-sdk/SPEC.md §The harness-integration arm — the three command-token spellings: a front
+// end's, the binary's own package name with or without an executable suffix, and its placeholder
+fn names_the_arm(base: &str) -> bool {
+    let bin = env!("CARGO_PKG_NAME");
+    FRONT_ENDS.contains(&base)
+        || base == BIN_PLACEHOLDER
+        || base == bin
+        || base.strip_suffix(WINDOWS_EXE) == Some(bin)
+}
+
 // spec: gate-sdk/SPEC.md §The harness-integration arm — the registration grammar's one parser: a
-// command token with the front end's file name, then `--hook`, then the member operand
+// command token whose file name is one of the three spellings, then `--hook`, then the member
 pub fn registration<'a>(tok: &[&'a str]) -> Registration<'a> {
     let Some(i) = command_index(tok) else {
         return Registration::NotAMember;
@@ -169,7 +187,7 @@ pub fn registration<'a>(tok: &[&'a str]) -> Registration<'a> {
         .rsplit(['/', '\\'])
         .next()
         .unwrap_or("");
-    if !FRONT_ENDS.contains(&base) || tok.get(i + 1) != Some(&"--hook") {
+    if !names_the_arm(base) || tok.get(i + 1) != Some(&"--hook") {
         return Registration::NotAMember;
     }
     match tok.get(i + 2) {
@@ -252,10 +270,35 @@ pub fn field(payload: Option<&Value>, path: &[&str]) -> String {
     }
 }
 
+// spec: gate-sdk/SPEC.md §The harness-integration arm — the decline for a tree with no repository
+// the arm may read: the front end's envelope for that case, a literal with no interpolated value
+const NO_TREE_ENVELOPE: &str = r#"{"systemMessage":"checkwright-gates: git refuses or skips the repository this session stands in, or answers none, so every hook guard in this tree is off and each guarded call is allowed. git status prints its reason, or git --git-dir=<that .git> status for a skipped one"}"#;
+
+// spec: gate-sdk/SPEC.md §The harness-integration arm — the tree the arm runs in: the toplevel of
+// its working directory, asked through the crosser before any knob is read
+fn tree() -> Result<String, String> {
+    match crate::walk::toplevel_opt() {
+        Ok(Some(top)) => Ok(top),
+        Ok(None) => Err("checkwright-gates: not inside a git repository".to_string()),
+        Err(e) => Err(format!("checkwright-gates: {}", e)),
+    }
+}
+
 // spec: gate-sdk/SPEC.md §The non-gate arm — the arm's dispatch: the member name is argv, never the
 // hook event name, so the port is a one-for-one substitution of a `command` value and every
 // `matcher` in the consumer's settings is left untouched.
 pub fn run(args: &[String]) -> i32 {
+    let entered = tree().and_then(|top| {
+        // spec: gate-sdk/SPEC.md §Fail-closed contract — cwd-write-exempt: the arm's own process
+        // enters the tree it guards, and no test reaches `run()`
+        std::env::set_current_dir(&top)
+            .map_err(|e| format!("checkwright-gates: cannot enter the work tree at {}: {}", top, e))
+    });
+    if let Err(line) = entered {
+        eprintln!("{}", line);
+        println!("{}", NO_TREE_ENVELOPE);
+        return 0;
+    }
     let Some(member) = args.first() else {
         eprintln!("checkwright-gates: --hook needs a member name — the hook could not run");
         eprintln!("  help: this binary carries: {}", members().join(", "));
@@ -389,10 +432,31 @@ mod tests {
         }
     }
 
-    // spec: gate-sdk/SPEC.md §The harness-integration arm — the parser both readers of a
-    // registration call: the front end by file name as the command token, then `--hook`
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — the parser every reader of a
+    // registration calls: a front end, the binary or its placeholder as the command token, then
+    // `--hook`; a renamed binary gets no member read
     #[test]
-    fn a_registration_names_its_member_only_through_the_front_end() {
+    fn a_registration_names_its_member_through_each_command_spelling() {
+        let exec = |json: &str| -> Value { serde_json::from_str(json).unwrap() };
+        let bin = env!("CARGO_PKG_NAME");
+        for command in [
+            format!("${{CLAUDE_PROJECT_DIR}}/native/target/release/{}", bin),
+            format!("C:/tools/{}.exe", bin),
+            format!("${{CLAUDE_PROJECT_DIR}}/{}", BIN_PLACEHOLDER),
+        ] {
+            let hook = exec(&format!(r#"{{"command":"{}","args":["--hook","wakeup-guard"]}}"#, command));
+            assert_eq!(
+                registration(&command_tokens(&hook)),
+                Registration::Member("wakeup-guard"),
+                "{}",
+                command
+            );
+        }
+        let renamed =
+            exec(r#"{"command":"${CLAUDE_PROJECT_DIR}/bin/my-gates","args":["--hook","wakeup-guard"]}"#);
+        assert_eq!(registration(&command_tokens(&renamed)), Registration::NotAMember);
+        let bare = exec(&format!(r#"{{"command":"bin/{}","args":["--hook"]}}"#, bin));
+        assert_eq!(registration(&command_tokens(&bare)), Registration::NoOperand);
         let t = |s: &'static str| s.split_ascii_whitespace().collect::<Vec<_>>();
         assert_eq!(
             registration(&t("bash gate-sdk/bin/run-gates.sh --hook shell-guard")),

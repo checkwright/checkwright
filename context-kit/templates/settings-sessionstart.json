@@ -1,10 +1,10 @@
 {
-  "//": "context-kit SessionStart wiring — merge into .claude/settings.json. The hook is the gate binary's session-context member: it assembles the session brief and always exits 0. Retarget the front-end path if gate-sdk is vendored elsewhere; the brief's layout judgments are context-kit knobs (CONTEXT_KIT_BRIEF_*), never an edited script.",
+  "//": "context-kit SessionStart wiring — merge into .claude/settings.json. The hook is the gate binary's session-context member: it assembles the session brief and always exits 0. At the merge, replace @GATE_SDK_NATIVE_BIN@ with the value your gate-sdk-config.knobs gives that knob, as the binary prints it (--emit knob-values GATE_SDK_NATIVE_BIN), minus any executable suffix, keeping the ${CLAUDE_PROJECT_DIR}/ prefix; an absolute value replaces the whole command, prefix included. Left unreplaced the command starts no program and the brief does not appear. A hook whose program cannot start is passed over; the harness's onFailure field is yours to set on the hook, and try it on your harness build before relying on it. The brief's layout judgments are context-kit knobs (CONTEXT_KIT_BRIEF_*), never an edited script.",
   "hooks": {
     "SessionStart": [
       {
         "hooks": [
-          { "type": "command", "command": "bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook session-context" }
+          { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/@GATE_SDK_NATIVE_BIN@", "args": ["--hook", "session-context"] }
         ]
       }
     ]

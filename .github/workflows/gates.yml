@@ -1799,6 +1799,28 @@ jobs:
           source gate-sdk/lib/gate.sh
           GATE_SDK_NATIVE_BIN="$PWD/$(gate_native_bin)" bash context-kit/gate-tests/session-context-spawn.test.sh
 
+      # spec: guard-kit/SPEC.md §The hook on native Windows — binding; the arm's root step, the binary started with no front end
+      - name: shell-guard reads its tree from a subdirectory
+        if: ${{ !cancelled() && matrix.target == 'x86_64-pc-windows-msvc' }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          source gate-sdk/lib/gate.sh
+          bin="$PWD/$(gate_native_bin)"
+          repo="$(cygpath -m "$(mktemp -d "${SMOKE_TMP:-/tmp}/hook-root.XXXXXX")")"
+          git -C "$repo" init -q
+          mkdir -p "$repo/scripts" "$repo/sub/deeper"
+          cp guard-kit/templates/guard-config.knobs "$repo/scripts/guard-config.knobs"
+          printf 'a line that is no knob assignment\n' >> "$repo/scripts/guard-config.knobs"
+          payload='{"hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"ls"}}'
+          msg="$(cd "$repo/sub/deeper" && printf '%s' "$payload" | "$bin" --hook shell-guard 2>&1 >/dev/null)"
+          rc=$?
+          printf '%s\n' "$msg"
+          if [[ "$rc" -ne 2 || "$msg" != *"could not read its knobs"* ]]; then
+            echo "::error::the shell-guard, started from a subdirectory, did not refuse the malformed knob file at the tree's root (exit $rc, want 2)"
+            exit 1
+          fi
+
       # spec: evidence-kit/SPEC.md §The producer-liveness lock — binding, against Get-Process as ground truth
       - name: producer liveness over Windows process ids
         if: ${{ !cancelled() && matrix.target == 'x86_64-pc-windows-msvc' }}

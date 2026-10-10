@@ -35,7 +35,7 @@ The tools each shipped gate runs. `required` binds every install. An `optional` 
 
 | Tool | Version | Needed | Why |
 |---|---|---|---|
-| `bash` | ≥ 4.3 | optional: if your profile includes context-kit or guard-kit | each ships hook wiring the harness runs with bash, and the gate library uses a nameref (`local -n`) |
+| `bash` | ≥ 4.3 | optional: if your docs mark a fence runnable or you register a shell gate | canon-kit's `check-fence-run` runs a marked fence with bash, and a shell gate sources the gate library, which uses a nameref (`local -n`) |
 | `git` | ≥ 2.15 | required | the gates read tracked files and the hooks fire at commit time; `check-docs-cmd` reads `rev-parse --is-shallow-repository` |
 | `curl` | ≥ 5.9 | optional: if your profile includes delegation-kit | its usage poller (`--usage-poll`) fetches its source with `curl -fsS`, and `-S` arrived in 5.9 |
 | `shellcheck` | ≥ 0.6 | optional: if you register a gate that runs it | `check-shellcheck` and `check-action-run-shell` run [ShellCheck](https://www.shellcheck.net/) with `-S warning` once you register them |
@@ -62,6 +62,8 @@ The install itself and the optional docs gates need these as well. `doctor` does
 | `liquid` | 4.0.4 exactly | optional: only if you register site-kit's docs gates | `check-docs-liquid-parse` parses with the version GitHub Pages runs |
 
 <!-- prerequisites:end -->
+
+The hook wiring the kits ship for Claude Code names the gate binary as the hook's `command` and passes `--hook` and the member in an `args` array, so the harness starts it with no shell. That takes **Claude Code 2.1.139 or later**. The floor is read from Claude Code's changelog, whose entry for that version adds the hook `args` field, and is not run here: the wiring was run on 2.1.292, and no build below the floor was tried. What an older build does with a registration carrying `args` is undocumented, so do not merge the wiring on one.
 
 A missing tool comes from your distribution's package on Linux or WSL, from Homebrew on macOS, or from Chocolatey on native Windows. To check your machine, run the gate binary with `--emit env-probe`: it writes an untracked `ENV.local.md` with each tool's version and verdict. Building Checkwright itself takes more: see the [contributing guide](https://github.com/checkwright/checkwright/blob/master/CONTRIBUTING.md).
 

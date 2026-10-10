@@ -30,7 +30,7 @@ Pick your route:
 
 ### Try it first
 
-`demo` in place of `init` runs the whole arc in a scratch repository of its own and removes it, without touching yours: it installs the `full` profile, runs the battery green, commits a task marked done with no evidence behind it and shows the claim caught, then withdraws the claim and runs green again. Its spellings are `sh -s -- demo` on the macOS and Linux line or the script-block form with `demo` on Windows; with Node, `npx checkwright demo`. `full` owes `bash` 4.3 or later ([Requirements](#requirements)). On stock macOS run the Homebrew bash block below first; on Windows, the `PATH` block.
+`demo` in place of `init` runs the whole arc in a scratch repository of its own and removes it, without touching yours: it installs the `full` profile, runs the battery green, commits a task marked done with no evidence behind it and shows the claim caught, then withdraws the claim and runs green again. Its spellings are `sh -s -- demo` on the macOS and Linux line or the script-block form with `demo` on Windows; with Node, `npx checkwright demo`. On Windows, run the `PATH` block below first.
 
 ### macOS and Linux
 

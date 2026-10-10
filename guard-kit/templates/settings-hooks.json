@@ -1,23 +1,23 @@
 {
-  "//": "guard-kit hook wiring — merge into .claude/settings.json. The shell-guard is the PreToolUse(Bash|PowerShell) hook, a compiled gate-binary member; the wakeup-guard and the path-guard block are optional (drop a block to skip it). The third block shows the path-shaped guard shape lifecycle-kit's workflow-state-guard is the shipped instance of. Project rules go in a command named by GUARD_KIT_CONSUMER_RULES_CMD in your knob file, never a copied script. On native Windows the harness runs these commands under Git for Windows' bash, so the same wiring serves every host; the shell-guard reads both shell tools; a consumer rule command receives both, and reads `tool_name` to tell them apart.",
+  "//": "guard-kit hook wiring — merge into .claude/settings.json. The shell-guard is the PreToolUse(Bash|PowerShell) hook, a compiled gate-binary member; the wakeup-guard and the path-guard block are optional (drop a block to skip it). The third block shows the path-shaped guard shape lifecycle-kit's workflow-state-guard is the shipped instance of. At the merge, replace @GATE_SDK_NATIVE_BIN@ in each command with the value your gate-sdk-config.knobs gives that knob, as the binary prints it (--emit knob-values GATE_SDK_NATIVE_BIN), minus any executable suffix, keeping the ${CLAUDE_PROJECT_DIR}/ prefix; an absolute value replaces the whole command, prefix included. This is not the allow template's rule: write no relative-command prefix here. Left unreplaced the command starts no program and the guard is off. A hook whose program cannot start lets the call through; to refuse it instead, set the harness's onFailure field to \"block\" on the hook, and try it on your harness build before relying on it. Project rules go in a command named by GUARD_KIT_CONSUMER_RULES_CMD in your knob file, never a copied script. The shell-guard reads both shell tools; a consumer rule command receives both, and reads `tool_name` to tell them apart.",
   "hooks": {
     "PreToolUse": [
       {
         "matcher": "Bash|PowerShell",
         "hooks": [
-          { "type": "command", "command": "bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook shell-guard" }
+          { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/@GATE_SDK_NATIVE_BIN@", "args": ["--hook", "shell-guard"] }
         ]
       },
       {
         "matcher": "ScheduleWakeup|CronCreate",
         "hooks": [
-          { "type": "command", "command": "bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook wakeup-guard" }
+          { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/@GATE_SDK_NATIVE_BIN@", "args": ["--hook", "wakeup-guard"] }
         ]
       },
       {
         "matcher": "Write|Edit",
         "hooks": [
-          { "type": "command", "command": "bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook workflow-state-guard" }
+          { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/@GATE_SDK_NATIVE_BIN@", "args": ["--hook", "workflow-state-guard"] }
         ]
       }
     ]

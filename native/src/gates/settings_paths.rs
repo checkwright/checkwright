@@ -43,21 +43,42 @@ pub fn literal_script_path(entry: &str) -> Option<&str> {
 #[derive(Debug, PartialEq)]
 enum HookPath {
     Literal(String),
-    Placeholder,
+    Unresolved,
+    Elsewhere,
     NoPath,
 }
 
-// spec: context-kit/SPEC.md §check-settings-paths — a hook's candidate carries a `/` whatever its
-// extension; a leading project-root placeholder is stripped, and any other `$` roots it elsewhere
+// spec: context-kit/SPEC.md §check-settings-paths — a hook's candidate: the binary's placeholder
+// left unresolved, a root outside the tree (absolute, or any `$` but the project root's), or a path
+// carrying a `/` whatever its extension, the leading project-root placeholder stripped
 fn hook_path(cand: &str) -> HookPath {
+    if cand.contains(hook::BIN_PLACEHOLDER) {
+        return HookPath::Unresolved;
+    }
+    let bare = cand.trim_matches(|c| c == '"' || c == '\'');
+    if walk::path_root(bare).is_some() {
+        return HookPath::Elsewhere;
+    }
     if !cand.contains('/') {
         return HookPath::NoPath;
     }
     let rest = strip_project_root(cand).unwrap_or_else(|| cand.to_string());
     if rest.contains('$') {
-        return HookPath::Placeholder;
+        return HookPath::Elsewhere;
     }
     HookPath::Literal(rest)
+}
+
+// spec: context-kit/SPEC.md §check-settings-paths — a candidate resolves as a file, or, its file
+// name carrying no extension, as the file with the host's executable suffix
+fn resolves(root: &str, p: &str, exe_suffix: &str) -> bool {
+    let path = format!("{}/{}", root, p);
+    if std::path::Path::new(&path).is_file() {
+        return true;
+    }
+    !exe_suffix.is_empty()
+        && std::path::Path::new(p).extension().is_none()
+        && std::path::Path::new(&format!("{}{}", path, exe_suffix)).is_file()
 }
 
 fn strip_project_root(cand: &str) -> Option<String> {
@@ -189,17 +210,28 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
-    let (mut hooks_checked, mut hooks_skipped, mut bad_member) = (0usize, 0usize, false);
+    let (mut hooks_checked, mut hooks_skipped, mut bad_member, mut unresolved) =
+        (0usize, 0usize, false, false);
     for h in hook_entries(&doc) {
         if let Some(cand) = command_token(&h.tokens) {
             match hook_path(cand) {
                 HookPath::Literal(p) => {
                     hooks_checked += 1;
-                    if !std::path::Path::new(&format!("{}/{}", root, p)).is_file() {
+                    if !resolves(&root, &p, std::env::consts::EXE_SUFFIX) {
                         dead.push(format!("{}: {} — no such file: {}", h.at, h.shown, p));
                     }
                 }
-                HookPath::Placeholder => hooks_skipped += 1,
+                HookPath::Unresolved => {
+                    hooks_checked += 1;
+                    unresolved = true;
+                    dead.push(format!(
+                        "{}: {} — unresolved placeholder: {}",
+                        h.at,
+                        h.shown,
+                        hook::BIN_PLACEHOLDER
+                    ));
+                }
+                HookPath::Elsewhere => hooks_skipped += 1,
                 HookPath::NoPath => {}
             }
         }
@@ -228,6 +260,19 @@ pub fn run(args: &[String]) -> i32 {
         println!("        grant is spent — a port that replaces checks/<gate>.sh with <gate>.gate");
         println!("        strands both the bare form and its '*' twin; swap a hook's registration");
         println!("        before deleting the script it runs, or its guard fails open silently.");
+        if unresolved {
+            let Some(door) =
+                super::door_or_report("check-settings-paths", "--emit knob-values GATE_SDK_NATIVE_BIN")
+            else {
+                return 2;
+            };
+            println!(
+                "  help: a hook merged from a kit template skipped its placeholder step — replace {}",
+                hook::BIN_PLACEHOLDER
+            );
+            println!("        with the GATE_SDK_NATIVE_BIN value, less any executable suffix; left as it is");
+            println!("        the hook starts no program and its guard is off. The value: {}", door);
+        }
         if bad_member {
             println!("  help: this binary carries: {}", hook::members().join(", "));
         }
@@ -235,7 +280,7 @@ pub fn run(args: &[String]) -> i32 {
     }
 
     println!(
-        "SETTINGS-PATHS: clean ({} literal .sh grant(s) and {} hook path(s) in {} resolve; {} hook(s) skipped for a placeholder)",
+        "SETTINGS-PATHS: clean ({} literal .sh grant(s) and {} hook path(s) in {} resolve; {} hook(s) skipped for a `$` root or an absolute path)",
         checked, hooks_checked, settings_file, hooks_skipped
     );
     0
@@ -284,9 +329,47 @@ mod tests {
         assert_eq!(hook_path("$CLAUDE_PROJECT_DIR/scripts/x.sh"), lit("scripts/x.sh"));
         assert_eq!(hook_path("\"$CLAUDE_PROJECT_DIR\"/scripts/x.sh"), lit("scripts/x.sh"));
         assert_eq!(hook_path("\"${CLAUDE_PROJECT_DIR}/scripts/x.sh\""), lit("scripts/x.sh"));
-        assert_eq!(hook_path("${CLAUDE_PLUGIN_ROOT}/x.sh"), HookPath::Placeholder);
-        assert_eq!(hook_path("$CLAUDE_PROJECT_DIRX/x.sh"), HookPath::Placeholder);
+        assert_eq!(hook_path("${CLAUDE_PLUGIN_ROOT}/x.sh"), HookPath::Elsewhere);
+        assert_eq!(hook_path("$CLAUDE_PROJECT_DIRX/x.sh"), HookPath::Elsewhere);
         assert_eq!(hook_path("node"), HookPath::NoPath);
+    }
+
+    // spec: context-kit/SPEC.md §check-settings-paths — an absolute candidate names a root outside
+    // the tree in either dialect, and the binary's placeholder is unresolved wherever it sits
+    #[test]
+    fn an_absolute_candidate_is_elsewhere_and_the_binary_placeholder_is_unresolved() {
+        assert_eq!(hook_path("/opt/tools/checkwright-gates"), HookPath::Elsewhere);
+        assert_eq!(hook_path("\"/opt/tools/checkwright-gates\""), HookPath::Elsewhere);
+        assert_eq!(hook_path("C:\\tools\\checkwright-gates.exe"), HookPath::Elsewhere);
+        assert_eq!(hook_path("C:/tools/checkwright-gates"), HookPath::Elsewhere);
+        let placeholder = hook::BIN_PLACEHOLDER;
+        assert_eq!(
+            hook_path(&format!("${{CLAUDE_PROJECT_DIR}}/{}", placeholder)),
+            HookPath::Unresolved
+        );
+        assert_eq!(hook_path(placeholder), HookPath::Unresolved);
+        assert_eq!(
+            hook_path("${CLAUDE_PROJECT_DIR}/native/target/release/checkwright-gates"),
+            HookPath::Literal("native/target/release/checkwright-gates".to_string())
+        );
+    }
+
+    // spec: context-kit/SPEC.md §check-settings-paths — a suffix-less candidate resolves against
+    // the file carrying the host's executable suffix, and a candidate with an extension does not
+    #[test]
+    fn a_suffixless_candidate_resolves_against_the_suffixed_file() {
+        let dir = std::env::temp_dir().join(format!("settings-paths-suffix.{}", std::process::id()));
+        std::fs::create_dir_all(dir.join("bin")).unwrap();
+        std::fs::write(dir.join("bin").join("gates.exe"), "").unwrap();
+        std::fs::write(dir.join("bin").join("plain"), "").unwrap();
+        let root = dir.display().to_string();
+        assert!(resolves(&root, "bin/gates", ".exe"));
+        assert!(!resolves(&root, "bin/gates", ""));
+        assert!(resolves(&root, "bin/plain", ""));
+        assert!(resolves(&root, "bin/plain", ".exe"));
+        assert!(!resolves(&root, "bin/gates.sh", ".exe"));
+        assert!(!resolves(&root, "bin/absent", ".exe"));
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]

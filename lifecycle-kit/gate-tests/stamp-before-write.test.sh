@@ -11,6 +11,8 @@ note() { echo "  FAIL [$1]: $2"; fails=$((fails + 1)); }
 
 sb="$SANDBOX/tree"
 mkdir -p "$sb/.workflow"
+# spec: gate-sdk/SPEC.md §The harness-integration arm — the arm declines outside a repository, so the sandbox is one
+git -C "$sb" init -q
 printf '# contract: lifecycle-kit/SPEC.md §check-stage-evidence\n\n---\n\ndemo scope aaaaaaaa 2026-06-01 none\ndemo build a94d72dc 2026-06-02 none\n' \
     >"$sb/.workflow/WORKFLOW-STATE.txt"
 printf 'LIFECYCLE_KIT_STAGE_SESSION_TYPES[] = stage-session\n' >"$sb/roster.knobs"

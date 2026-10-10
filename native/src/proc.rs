@@ -1894,8 +1894,8 @@ pub(crate) mod tests {
         // left behind by a deleted site moves with it rather than outliving it
         assert_eq!(
             valved.len(),
-            1,
-            "the valved working-directory writes are {:?}, not the one `pack()` site — a valve \
+            2,
+            "the valved working-directory writes are {:?}, not the `pack()` and `--hook` sites — a valve \
              removed or added moves this count with it",
             valved
         );

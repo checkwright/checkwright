@@ -3,3 +3,6 @@ Bash(bash tools/removed-gate.sh *) — no such file: tools/removed-gate.sh
 Bash(env DEMO_FLAG=1 bash tools/removed-gate.sh) — no such file: tools/removed-gate.sh
 hooks.PreToolUse[0].hooks[1]: bash tools/removed-hook.sh — no such file: tools/removed-hook.sh
 hooks.PreToolUse[0].hooks[2]: bash tools/run-gates.sh --hook no-such-guard — no such hook member: no-such-guard
+hooks.PreToolUse[0].hooks[3]: ${CLAUDE_PROJECT_DIR}/@GATE_SDK_NATIVE_BIN@ --hook shell-guard — unresolved placeholder: @GATE_SDK_NATIVE_BIN@
+hooks.PreToolUse[0].hooks[4]: ${CLAUDE_PROJECT_DIR}/tools/checkwright-gates --hook no-such-exec-guard — no such hook member: no-such-exec-guard
+help: a hook merged from a kit template skipped its placeholder step — replace @GATE_SDK_NATIVE_BIN@

@@ -1728,7 +1728,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-install-toolchain",
         install_toolchain::run,
-        &[("?", "", "", "dynamic@src/toolfloor.rs:165 via toolfloor::derived_kit_audience_here")],
+        &[("?", "", "", "dynamic@src/toolfloor.rs:171 via toolfloor::derived_kit_audience_here")],
         &["GATE_SDK_KIT_DIRS", "GATE_SDK_NATIVE_SRC", "GATE_LOCAL_INSTALL_DOCS", "GATE_LOCAL_CONTRIBUTING_FILE"],
         "-",
         &[("git", "")],
@@ -1847,7 +1847,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-plugin-parity",
         plugin_parity::run,
-        &[("?", "", "", "dynamic@src/gates/plugin_parity.rs:131")],
+        &[("?", "", "", "dynamic@src/gates/plugin_parity.rs:147")],
         &[
             "LIFECYCLE_KIT_SKILLS_DIR",
             "QUEUE_KIT_QUEUE_FILE",
