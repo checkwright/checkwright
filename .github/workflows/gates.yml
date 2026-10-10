@@ -1180,6 +1180,7 @@ jobs:
 
           if ($script:fails -gt 0) { Write-Host "::error::the placed hooks' other legs: $($script:fails) assertion(s) failed"; exit 1 }
           Write-Host "the placed hooks refused a bad subject, a worktree's violation, their own name and an absent binary, and started the binary the knob named"
+          exit 0
 
       # spec: RELEASING.md §The front-door rehearsal — the Windows driver parsed and its opening run by the host the job uses, on every push
       - name: the front-door driver's PowerShell twin refuses a missing operand
@@ -1196,6 +1197,7 @@ jobs:
           if ($code -ne 2) { Write-Host "::error::scripts/ci-front-door.ps1 run with no operand exited $code, not 2, under PowerShell $($PSVersionTable.PSVersion)"; exit 1 }
           if ($out -notmatch 'usage: ci-front-door\.ps1 <version>') { Write-Host "::error::scripts/ci-front-door.ps1 exited 2 with no operand and printed no usage line"; exit 1 }
           Write-Host "PowerShell $($PSVersionTable.PSVersion) parsed scripts/ci-front-door.ps1 whole and ran it to its missing-operand refusal"
+          exit 0
 
       # spec: installer/SPEC.md §Platform resolution — the POSIX half's witness on this Windows host
       - name: the POSIX bootstrap installs the lattice minimum on this Windows host
