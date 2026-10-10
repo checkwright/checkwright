@@ -8,46 +8,7 @@
 
 ## New Features
 
-### exec-form-hook-registration
-
-[spec: gate-sdk/SPEC.md]
-
-the hook-wiring rewire windows-kit-bash-files did not land: context-kit and guard-kit still owe bash on native Windows through their settings templates, whose hook commands lead with a `bash` word. Split 2026-10-07 at scope from [custom-gate-substrates](#custom-gate-substrates), where build had folded it (operator direction, 2026-10-07, lead-relayed, not a ruling: its own entry).
-
-**Deliverable:** every hook registration a kit ships takes the exec form: `command` naming the gate binary under the project-directory placeholder, with no executable suffix, and `args` carrying `--hook` and the member. The registration parser reads the binary as a command token, and `check-settings-paths` resolves a suffix-less candidate. The plugin's wiring keeps the shell form, since it must exit 0 in a repository that never installed the kits. The refused-repository decline moves into the `--hook` arm. gate-sdk/SPEC.md §The adopter constraints' first script-door class narrows to a value the harness can only run through a shell. The bash row then names a runnable fence and a registered shell gate alone.
-
-- **Waits on** a native Windows host, which no workflow leg is. Operator-run there 2026-10-07 (Windows 11, harness 2.1.292, two sessions, both transcripts read by the lead): the exec form started the binary with its `args` and the placeholder substituted, and trailing shell words in `args` made no file; a block refused the call and an advisory reached the session; with the binary renamed away the call proceeded on a failed direct spawn of the suffix-less path, which shows no shell stands between; and the suffix-less path started the file carrying the suffix. Unrun: no bash on `PATH`, held on the operator's report with no transcript line showing the `PATH`, where the harness still found Git's bash for its own shell tool; a host with no Git for Windows bash at all; the linked-worktree placeholder on Windows; same-session arming.
-- **Run on Linux, harness 2.1.292.** The same four, and: with the binary renamed away no notice reached the model channel; in a linked worktree the placeholder named the main checkout; a `hooks` edit armed in the running session; a call a tool refuses on its own input never reaches the hook.
-- **Hazard.** The binary given no argument exits 2, so a harness that dropped `args` would block every call the matcher takes. A witness rides a matcher no session uses and a scratch copy of the binary.
-
-**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** this entry leads hook-placement-guard-rules-pass with [windows-running-hook-replace](#windows-running-hook-replace), `hook-sibling-pid-namespace`, `replaced-binary-self-path`, `guard-quoted-operand-words`, `shared-tree-stash-steer`, `wait-exemption-body-unbounded` and `inline-python-steer-split`. The edit to this repo's own registrations waits for the operator's confirmation of the prepared diff, owed when the diff exists.
-
-**Answered at spec (2026-10-10; operator directions, lead-relayed, not rulings, but the third):** the exec form is the one shipped wiring, and the quiet absent-binary state is accepted, which reverses the refusal gate-sdk/SPEC.md §run-gates records; the host with no bash at all is a stated limit, with no operator run this iteration; a minimum harness version is stated on the requirements page, inferred until a witness runs. Lead decision: a template names the binary by the existing placeholder, guard-kit's `check-door-binding` assertion B unchanged, revisable against the oracle.
-
-**Answered at align (2026-10-10; lead decisions, each a constraint the amendment meets, revisable against the oracle):** one registration parser serves every caller and reads the template the amendment ships; after the change the bash row says what the Deliverable above says it names, `check-install-toolchain` exits on no error for that tree, and every surface the emptied bash audience reaches is covered by a delta or shown unreached; a `command` value the amendment allows does not red `check-settings-paths`, and the absolute-value allowance stays; `check-settings-paths`' new red for an unresolved placeholder is accepted, the operator asked and answering that the call is the lead's. The canonical-text rewrite's three choices rest on the operator directions the line above records.
-
-**Push need (2026-10-10, inside the budget by the operator grant on that entry's line):** its Windows assertions ride [windows-running-hook-replace](#windows-running-hook-replace)'s mid-iteration push.
-
-**Built (2026-10-10):** the amendment is merged and deleted, and the tag above bridges the push with the canonical spec. Two halves stay open, so the entry stays here.
-
-- **The Windows run.** `crate-tests-windows` gains the step *shell-guard reads its tree from a subdirectory*, and its crate tests hold the suffix-less candidate; both are read on the push above before the Done move.
-- **This repo's six registrations.** Landed 2026-10-10: `.claude/settings.json` carries the exec form for all six, applied by the lead on the operator's confirmation of the prepared diff (operator confirmation in the lead session, lead-relayed, spent on this edit). The witness for the hazard above ran first, measured by the lead on harness 2.1.296: a hook on a `NotebookEdit` matcher, registered against a scratch recorder standing in for the binary, logged `argc=2 argv=--hook escalation-guard`, so the harness passes `args`, and the witness registration is removed. After the apply the lead measured the battery green and a bare `cat` blocked by the binary's own shell guard. The landing session read the applied file byte-equal to the prepared one, the recorder's one logged line, and its own shell calls refused by the guard under the new registration. No projection moved.
-
-**Cost while deferred:** a native-Windows adopter whose profile carries context-kit or guard-kit needs Git for Windows' bash for the hook wiring. Filed 2026-10-07 by windows-shell-floor-pass' build as a fold, its open question carried by that close to this scope's intake. Owner lookup at that close: hook wiring, settings templates, the exec form and PowerShell in the icebox — no other owner; [hook-contract-harness-neutral](#hook-contract-harness-neutral), DISTINCT (the contract's prose, not the registration's form); owner gate-sdk/SPEC.md §The adopter constraints.
-
 ## Technical Debt
-
-### windows-running-hook-replace
-
-a hook placement renames its staged sibling over the hook, and no leg does so while that hook is a running executable: a commit in flight on Windows while `--install-hooks` or a build's refresh re-places. gate-sdk/SPEC.md §install-hooks states the rename and says nothing of what Windows returns there. `hook-staging-fixed-sibling`, done, left it as its one unrun candidate.
-
-**Deliverable:** a Windows-leg step that holds a placed hook running and re-places it, with that section stating what the placement returns.
-
-**Inferred, cannot run before build:** that Windows refuses the rename, exiting 2 with the earlier hook still served — only a Windows leg runs it, and the step that holds a placed hook running is this entry's deliverable
-
-**Push need (2026-10-10, inside the budget by operator grant of that date, lead-relayed: the release tag push counts and a third push is granted for this iteration):** one mid-iteration push after the step lands, since no local run reaches a Windows leg; its run is read before the Done move.
-
-**Cost while deferred:** a refresh on Windows during a commit may fail loudly; nothing is served wrong. Filed 2026-10-10 by front-door-readiness-pass' build. Re-verified by reading that section and the `gates` workflow's hook steps: the rename is stated, no step re-places under a running hook. Owner lookup: `install-hooks`, `rename over`, `running hook`, `hook-staging` in this file and the disposed-findings record — none; `hook-staging-fixed-sibling`, done, DISTINCT (the sibling's name under two placements, landed); owner gate-sdk/SPEC.md §install-hooks.
 
 ## Deferred
 
@@ -243,7 +204,7 @@ an adopter writes a custom gate in shell only. The registry resolves a member as
 
 **Deliverable:** the registry resolving further substrates under the output, fail-closed, fixture-pair and self-lint contracts: `.ps1` resolution in the registry and the runner, which the hook's `--git-hook` arm dispatches through, with a PowerShell lint counterpart to `check-shellcheck`; a Rust path, as an adopter-built executable the registry dispatches or an extension crate; and the install page's prerequisites per substrate. Whether one executable-dispatch shape serves both is spec's.
 
-**The hook-wiring rewire build folded in here on 2026-10-07 is [exec-form-hook-registration](#exec-form-hook-registration)**, its own entry by operator direction of that date: it shares this entry's end, the last bash a native-Windows adopter owes, and not its mechanism.
+**The hook-wiring rewire build folded in here on 2026-10-07 is `exec-form-hook-registration`**, its own entry by operator direction of that date: it shares this entry's end, the last bash a native-Windows adopter owes, and not its mechanism.
 
 **Cost while deferred:** a native-Windows adopter authoring a gate takes on a bash dependency and a second shell dialect, and one wanting a typed, testable gate must write shell or fork. Filed 2026-09-27 by platform-prerequisite-floors' lead. Re-verified: `registry::resolve` tries `sh` then `gate` per dir and nothing else. Owner lookup: `ps1`, `PowerShell`, `custom gate`, `Rust gate`, `consumer crate` in this file — none; owner gate-sdk/SPEC.md §lib/gate.sh and §The port-candidate criteria.
 
@@ -1213,4 +1174,6 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - inline-python-steer-split
 - replaced-binary-self-path
 - hook-sibling-pid-namespace
+- windows-running-hook-replace
+- exec-form-hook-registration
 
