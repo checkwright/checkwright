@@ -3180,7 +3180,7 @@ mod tests {
     // spec: gate-sdk/SPEC.md §lib/gate.sh — a case directory is set on a spawn and never entered,
     // so the member runs in a child of this test binary whose working directory is the case
     fn observe_in_case(name: &str, case: &std::path::Path) -> Observation {
-        let exe = std::env::current_exe().expect("a running test has an executable");
+        let exe = crate::proc::self_image().expect("a running test has an executable");
         let exe = exe.display().to_string();
         let module = module_path!()
             .split_once("::")

@@ -20,7 +20,7 @@ the hook-wiring rewire windows-kit-bash-files did not land: context-kit and guar
 - **Run on Linux, harness 2.1.292.** The same four, and: with the binary renamed away no notice reached the model channel; in a linked worktree the placeholder named the main checkout; a `hooks` edit armed in the running session; a call a tool refuses on its own input never reaches the hook.
 - **Hazard.** The binary given no argument exits 2, so a harness that dropped `args` would block every call the matcher takes. A witness rides a matcher no session uses and a scratch copy of the binary.
 
-**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** this entry leads hook-placement-guard-rules-pass with [windows-running-hook-replace](#windows-running-hook-replace), [hook-sibling-pid-namespace](#hook-sibling-pid-namespace), [replaced-binary-self-path](#replaced-binary-self-path), `guard-quoted-operand-words`, `shared-tree-stash-steer`, `wait-exemption-body-unbounded` and `inline-python-steer-split`. The edit to this repo's own registrations waits for the operator's confirmation of the prepared diff, owed when the diff exists.
+**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** this entry leads hook-placement-guard-rules-pass with [windows-running-hook-replace](#windows-running-hook-replace), [hook-sibling-pid-namespace](#hook-sibling-pid-namespace), `replaced-binary-self-path`, `guard-quoted-operand-words`, `shared-tree-stash-steer`, `wait-exemption-body-unbounded` and `inline-python-steer-split`. The edit to this repo's own registrations waits for the operator's confirmation of the prepared diff, owed when the diff exists.
 
 **Answered at spec (2026-10-10; operator directions, lead-relayed, not rulings, but the third):** the exec form is the one shipped wiring, and the quiet absent-binary state is accepted, which reverses the refusal gate-sdk/SPEC.md §run-gates records; the host with no bash at all is a stated limit, with no operator run this iteration; a minimum harness version is stated on the requirements page, inferred until a witness runs. Lead decision: a template names the binary by the existing placeholder, guard-kit's `check-door-binding` assertion B unchanged, revisable against the oracle.
 
@@ -58,14 +58,6 @@ two residues of the hook placement's per-run sibling, in `native/src/emit/instal
 **Inferred, cannot run before build:** that two namespaces collide on one id — the placement takes its id from the process alone, so no run can force two placements onto one until build lands a seam for it
 
 **Cost while deferred:** a collision or a stranded sibling is silent, and each needs a hooks directory shared across namespaces or a failed rename first. Filed 2026-10-10 by front-door-readiness-pass' close, off its second-vendor review, and promoted at the next scope's intake. Re-verified there by reading the module: the name is the hook's file name, the staged suffix and `std::process::id()`, and both removals drop their result. Owner lookup: `install-hooks`, `sibling`, `process id` in this file and the disposed-findings record — [windows-running-hook-replace](#windows-running-hook-replace), DISTINCT (the rename over a running hook); `hook-staging-fixed-sibling`, done, DISTINCT (it landed the per-run sibling these are defects in, so no recurrence); owner gate-sdk/SPEC.md §install-hooks.
-
-### replaced-binary-self-path
-
-a gate that resolves its own executable reds when the binary is replaced under it. The first battery run after a `bash gate-sdk/bin/build-native.sh` rebuild went red once on `check-fence-run`, the gate binary's path reading `(deleted)`, and the re-run was green: one build session's report, where the lead's three rebuild-then-battery runs in that iteration were green. `execute` in `native/src/gates/fence_run.rs` copies `std::env::current_exe()` into its scratch once per document, and Linux answers that call with the unlinked path once the running process's file is replaced. The crate reads the same call at more than a dozen other sites. Reproduced at scope 2026-10-10: the gate run alone from a scratch copy of the binary, the copy replaced while it ran, exited 2 on that path at each of three delays. A battery whose gate process started after the replace stayed green, and so did a run whose `GATE_SDK_NATIVE_BIN` was absolute, which copies nothing.
-
-**Deliverable:** the read made safe across a replace at its shared sites, or the limit stated where the rebuild obligation is (gate-sdk/SPEC.md §Porting a gate to the binary substrate).
-
-**Cost while deferred:** a session reads a spurious red as its own regression right after the commit-time rebuild. Filed 2026-10-10 by front-door-readiness-pass' lead on its third build session's report, and promoted at the next scope's intake. Re-verified there by reading the gate and by `git grep -c current_exe -- native/src`. Owner lookup: `current_exe`, `(deleted)`, `fence-run`, `rebuild` in this file and the disposed-findings record — [unremapped-rebuild-reds-smoke](#unremapped-rebuild-reds-smoke), DISTINCT (a rebuild without the remap flags); owner gate-sdk/SPEC.md §Porting a gate to the binary substrate.
 
 ## Deferred
 
@@ -1229,4 +1221,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - shared-tree-stash-steer
 - wait-exemption-body-unbounded
 - inline-python-steer-split
+- replaced-binary-self-path
 

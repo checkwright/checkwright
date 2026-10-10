@@ -877,7 +877,7 @@ pub fn run(args: &[String]) -> i32 {
         return 2;
     }
 
-    let self_exe = match std::env::current_exe() {
+    let self_exe = match crate::proc::self_image() {
         Ok(p) => p.display().to_string(),
         Err(e) => {
             eprintln!(

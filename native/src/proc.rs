@@ -379,6 +379,43 @@ pub fn is_executable(p: &std::path::Path) -> bool {
     p.is_file()
 }
 
+const UNLINKED_MARK: &str = " (deleted)";
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — the name this process was started under, the
+// kernel's mark for an unlinked file dropped where the marked name is no file: for a path handed to
+// a process that outlives this one, or read for the directories above it
+fn started_from(exe: std::path::PathBuf) -> std::path::PathBuf {
+    if exe.exists() {
+        return exe;
+    }
+    match exe.to_str().and_then(|s| s.strip_suffix(UNLINKED_MARK)) {
+        Some(name) => std::path::PathBuf::from(name),
+        None => exe,
+    }
+}
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — the running image: the start name while it is
+// still a file, else the process's own image link where the host carries one, so a child spawned or
+// a copy taken after the file was replaced is the build that is running
+fn image(exe: std::path::PathBuf, link: &std::path::Path) -> std::path::PathBuf {
+    if exe.is_file() {
+        exe
+    } else if link.exists() {
+        link.to_path_buf()
+    } else {
+        started_from(exe)
+    }
+}
+
+pub fn self_path() -> std::io::Result<std::path::PathBuf> {
+    std::env::current_exe().map(started_from)
+}
+
+pub fn self_image() -> std::io::Result<std::path::PathBuf> {
+    let link = format!("/proc/{}/exe", std::process::id());
+    std::env::current_exe().map(|exe| image(exe, std::path::Path::new(&link)))
+}
+
 // spec: gate-sdk/SPEC.md §Fail-closed contract — a child whose two streams were merged, the
 // `2>&1` capture a wrapper's shell form takes; the false green is closed on the `succeeded()`
 // side rather than by withholding the report
@@ -1899,6 +1936,64 @@ pub(crate) mod tests {
              removed or added moves this count with it",
             valved
         );
+    }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the own-path pin on the same roster shape,
+    // test scope kept: the code spelling is absent from every crate source but this one
+    #[test]
+    fn no_crate_source_outside_proc_reads_its_own_path_itself() {
+        let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+        let files = walk::find_files(&src, &["rs"]).expect("cannot enumerate the crate modules");
+        assert!(!files.is_empty(), "no module found to scan");
+        let spelling = concat!("current_exe", "(");
+        let mut offenders: Vec<String> = Vec::new();
+        for f in &files {
+            if f.file_name().is_some_and(|n| n == "proc.rs") {
+                continue;
+            }
+            let text = std::fs::read_to_string(f)
+                .unwrap_or_else(|e| panic!("cannot read {}: {}", f.display(), e));
+            for (n, line) in text.lines().enumerate() {
+                if line.contains(spelling) {
+                    offenders.push(format!("{}:{}", f.display(), n + 1));
+                }
+            }
+        }
+        assert!(
+            offenders.is_empty(),
+            "crate source reads the process's own path itself ({:?}) — once the binary's file is \
+             replaced under a running process, Linux answers with a name marked deleted, which \
+             names no file to spawn or copy. Take proc::self_image for a child or a copy made \
+             while this process runs, proc::self_path for a path handed to a process that \
+             outlives it or read for its directories",
+            offenders
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the image is the start name while that is a
+    // file and the process's image link once it is not; the start name loses the kernel's mark
+    // only where the marked name is no file
+    #[test]
+    fn a_replaced_binary_resolves_to_its_image_link_and_its_unmarked_name() {
+        let d = std::env::temp_dir().join(format!("checkwright-self-path.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(&d).expect("scratch");
+        let (there, link) = (d.join("bin"), d.join("link"));
+        std::fs::write(&there, "new").expect("the replacing file");
+        std::fs::write(&link, "old").expect("the image link");
+        let marked = d.join(format!("bin{}", UNLINKED_MARK));
+        let kept = image(there.clone(), &link);
+        let replaced = image(marked.clone(), &link);
+        let no_link = image(marked.clone(), &d.join("absent"));
+        let named = started_from(marked.clone());
+        std::fs::write(&marked, "a file of that very name").expect("a marked name");
+        let literal = started_from(marked.clone());
+        let _ = std::fs::remove_dir_all(&d);
+        assert_eq!(kept, there);
+        assert_eq!(replaced, link);
+        assert_eq!(no_link, there);
+        assert_eq!(named, there);
+        assert_eq!(literal, marked);
     }
 
     // spec: gate-sdk/SPEC.md §upgrade-smoke — a member writing scratch registers nothing

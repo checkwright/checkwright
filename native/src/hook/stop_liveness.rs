@@ -288,7 +288,7 @@ fn top_level_keys(payload: Option<&Value>) -> String {
 // the scratch dir appended.
 fn reader_argv(cmd: &[String], run_dir: &str) -> Option<Vec<String>> {
     let Some(program) = cmd.first() else {
-        let exe = std::env::current_exe().ok()?;
+        let exe = crate::proc::self_image().ok()?;
         return Some(vec![
             exe.display().to_string(),
             "check-producer-liveness".to_string(),
@@ -314,7 +314,7 @@ fn reader_argv(cmd: &[String], run_dir: &str) -> Option<Vec<String>> {
 // spec: gate-sdk/SPEC.md §The program roster — the default reader's head is this binary itself;
 // any other head is the override's, named by its knob
 fn reader_program(head: &str) -> programs::Program {
-    let own = std::env::current_exe().ok().map(|p| p.display().to_string());
+    let own = crate::proc::self_image().ok().map(|p| p.display().to_string());
     if own.as_deref() == Some(head) {
         programs::CHECKWRIGHT_GATES.at(head)
     } else {
@@ -872,7 +872,7 @@ mod tests {
     #[test]
     fn an_unset_knob_resolves_the_running_executable_and_the_gate_name() {
         let argv = reader_argv(&[], "/run/dir").expect("the default must resolve");
-        let exe = std::env::current_exe().expect("a running test has an executable");
+        let exe = crate::proc::self_image().expect("a running test has an executable");
         assert_eq!(
             argv,
             vec![exe.display().to_string(), "check-producer-liveness".to_string(), "/run/dir".to_string()],

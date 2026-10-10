@@ -48,7 +48,7 @@ pub fn run(args: &[String]) -> i32 {
         if members.is_empty() {
             return Ok(None);
         }
-        let exe = std::env::current_exe()
+        let exe = crate::proc::self_image()
             .map_err(|e| format!("cannot locate the running binary: {}", e))?
             .display()
             .to_string();

@@ -519,7 +519,7 @@ fn check() -> Result<bool, String> {
         }
     }
     let exe = forward_slashed(
-        std::env::current_exe()
+        crate::proc::self_image()
             .map_err(|e| format!("cannot locate this binary: {}", e))?
             .display()
             .to_string(),

@@ -266,7 +266,7 @@ fn cmd_arm_local(key: &str, pred: &str) -> Result<i32, String> {
     make_scratch(&p.scratch)?;
     let out = format!("{}/{}.local.out", p.work, key);
     let run_path = format!("{}/{}-local.run", p.scratch, key);
-    let me = std::env::current_exe()
+    let me = crate::proc::self_path()
         .map_err(|e| format!("cannot resolve this binary's own path: {}", e))?
         .display()
         .to_string();

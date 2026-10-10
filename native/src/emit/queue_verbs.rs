@@ -129,7 +129,7 @@ fn execute(args: &[String]) -> Result<i32, String> {
 // spec: queue-kit/SPEC.md §The queue verbs — the post-check spawns this executable on the argv the
 // front end composes for `--for`, rather than calling the battery in process
 fn post_check(file: &str) -> Result<i32, String> {
-    let exe = std::env::current_exe()
+    let exe = crate::proc::self_image()
         .map_err(|e| format!("cannot locate the running binary: {}", e))?
         .display()
         .to_string();

@@ -1754,7 +1754,7 @@ fn preflight_gate(name: &str, queue: &str, state: &str) -> Result<GateRun, Strin
             );
             return Ok(GateRun::Undispatchable);
         }
-        let exe = std::env::current_exe()
+        let exe = crate::proc::self_image()
             .map_err(|e| format!("cannot resolve this binary's own path: {}", e))?;
         program = programs::CHECKWRIGHT_GATES.at(exe.display().to_string());
         argv.push(name.to_string());

@@ -216,7 +216,7 @@ fn identity_rung(gates_dir: &str) -> i32 {
             );
             return 2;
         }
-        let exe = match std::env::current_exe() {
+        let exe = match crate::proc::self_image() {
             Ok(p) => p.display().to_string(),
             Err(e) => {
                 eprintln!("install-hooks: cannot resolve this binary's own path: {}", e);

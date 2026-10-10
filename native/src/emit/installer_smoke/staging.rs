@@ -75,7 +75,7 @@ pub(super) fn fallback_of(state: &Run, triple: &str) -> Result<String, Outcome> 
 }
 
 fn exe() -> Result<String, Outcome> {
-    std::env::current_exe()
+    crate::proc::self_image()
         .map(|p| p.display().to_string())
         .map_err(|e| refuse(format!("cannot resolve the running binary: {}", e)))
 }

@@ -180,7 +180,7 @@ fn dir_named(p: Option<&Path>, name: &str) -> Option<PathBuf> {
 }
 
 fn resolve_package() -> Option<Package> {
-    let exe = std::env::current_exe().ok()?;
+    let exe = crate::proc::self_path().ok()?;
     let target_dir = exe.parent()?;
     let target = target_dir.file_name()?.to_string_lossy().into_owned();
     let artifact_dir = dir_named(target_dir.parent(), ARTIFACT_DIR)?;

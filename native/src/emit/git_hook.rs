@@ -166,7 +166,7 @@ fn run_over(hook: &Hook, paths: &[String]) -> Result<(i32, String, usize), Strin
     if matches!(hook, Hook::CommitMsg(_)) && selected.is_empty() {
         return Ok((0, String::new(), 0));
     }
-    let self_exe = std::env::current_exe()
+    let self_exe = crate::proc::self_image()
         .map_err(|e| format!("cannot resolve this binary's own path: {}", e))?
         .display()
         .to_string();

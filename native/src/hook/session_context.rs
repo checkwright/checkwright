@@ -175,7 +175,7 @@ fn with_newline(text: &str) -> String {
 // spec: gate-sdk/SPEC.md §run-gates — a sibling arm is this binary re-exec'd as a child, never an
 // in-process dispatch: the child resolves its own knobs and its fault stays its own
 fn own_arm(args: &[&str]) -> Option<(i32, String)> {
-    let exe = std::env::current_exe().ok()?;
+    let exe = crate::proc::self_image().ok()?;
     let done = proc::run(&programs::CHECKWRIGHT_GATES.at(exe.display().to_string()), args).ok()?;
     Some((done.reported_code(), String::from_utf8_lossy(done.streams().0).into_owned()))
 }

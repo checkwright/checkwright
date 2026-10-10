@@ -459,8 +459,14 @@ The report is **non-empty by construction**. The exit code always exists, taken 
 
 - **Both valve tokens ride a `spec:` directive** rather than a bare comment (`// spec: <section> — spawn-funnel-exempt: <cause>`), which is how they clear `check-comment-tier` with no roster registration.
 - **Two sites are valved**, each a process entering the tree it works on at a point no test reaches. The `--pack-installer` arm's `pack()` enters the tree it packs: its module's cases call only its pure helpers, and its one caller is the arm's `run`. The `--hook` arm's `run()` enters the toplevel it resolved (§The harness-integration arm): its module's cases call the parser and the envelope helpers, never the dispatch. A valve at the site replaces an allowlist in the test, so the cause travels with the code it excuses.
-- **The red runs in both directions**, an unvalved site or a valved count other than one, so deleting the site reds the pin until the count moves with it.
+- **The red runs in both directions**, an unvalved site or a valved count other than the two above, so deleting a site reds the pin until the count moves with it.
 - **Honest limit:** a spelling roster cannot see a dependency that changes the working directory, which has no instance in the resolved graph, nor a later test reaching a valved site through the arm table.
+
+**A third pin there holds where the crate reads its own path.** A `bin/build-native.sh` run replaces the binary's file under a battery still in flight. Linux then answers the own-path call with the old name marked deleted, which names no file. A member that spawned or copied that name refused at exit 2 on a clean tree. So `proc.rs` owns the call behind two readers, and the code spelling `current_exe(` is asserted absent from every other crate source, test scope kept.
+
+- **`self_image` serves a child spawned or a copy taken while this process runs.** It answers the start name while that is a file, and otherwise the process's own image link under `/proc`. The child or the copy is then the build that is running, and one run never mixes two builds. Its readers are the runner's re-exec of a member, an arm's dispatch of a sibling, and the scratch placements of `check-fence-run` and the projection witness.
+- **`self_path` serves a path that outlives this process or is read for its directories.** It answers the start name, the kernel's mark dropped where the marked name is no file. A later reader then starts whatever build is at that name. The wait probe's local waiter and the installer's package lookup read it.
+- **Honest limit:** the image link is Linux's. On a host with none, a replaced binary resolves to its start name, the new build where the host put one there. A file whose own name ends in the mark is read as itself.
 
 **A tracked-set listing whose output is read is taken NUL-terminated.** Git's line form quotes a name carrying a non-ASCII byte, a double quote or a backslash, and a quoted spelling opens no file, matches no glob and compares equal to no walked name. The failure is silent in the common shape: the member drops out of the corpus and the verdict reads clean.
 

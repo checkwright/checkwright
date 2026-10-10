@@ -367,7 +367,7 @@ fn execute(fences: &[Runnable], bin: &str) -> Result<Vec<Option<String>>, String
 
     let placed = walk::abs_against(&root, bin);
     if walk::under(&root, &placed) {
-        let exe = std::env::current_exe()
+        let exe = crate::proc::self_image()
             .map_err(|e| format!("cannot locate the running binary: {}", e))?;
         csmoke::place_artifact(&exe.display().to_string(), &placed)?;
     }

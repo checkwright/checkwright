@@ -141,7 +141,7 @@ fn consumer_lane(tally: &mut Tally) -> Result<Option<(usize, String)>, String> {
 // spec: guard-kit/SPEC.md §Testing — the guard reads its knobs from the binary, and the
 // repo-relative default names nothing from inside the sandbox, so the running binary is exported
 fn running_binary() -> Result<String, String> {
-    let bin = std::env::current_exe()
+    let bin = crate::proc::self_image()
         .map_err(|e| format!("{}: cannot name the running binary: {}", NAME, e))?;
     Ok(walk::normalize_abs(&bin.to_string_lossy()))
 }
