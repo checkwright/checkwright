@@ -5,8 +5,8 @@ use super::grants::{slot_reach, Reach};
 use super::reach::{interpreter_reach, refused, rm_tracked_reach};
 use super::{
     command_word, git_subcommand, has_expansion, has_substitution, inert_target, is_banner, is_ro_segment,
-    loop_span, redirect_targets, ro_forms_clear, segment_core, shell_backgrounds, strip_redirect_op,
-    unredirected_words, GitWalk,
+    loop_span, loop_tokens, redirect_targets, ro_forms_clear, ro_forms_clear_except, segment_core,
+    shell_backgrounds, strip_redirect_op, unredirected_words, GitWalk,
 };
 use crate::guard::allow_match;
 use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Shell, Verdict};
@@ -235,6 +235,72 @@ fn ps_background_no_record(ctx: &Ctx) -> Decided {
     Ok(Some(Verdict::Block(format!("this PowerShell call backgrounds a process and writes no liveness record — re-issue it with the record written first, in this spelling: 'Set-Content -NoNewline -Path {h}/<key>.run -Value \"pid=$PID run=<key>`n\"; try {{ <command> }} finally {{ Remove-Item {h}/<key>.run }}'. $PID is the process running the command, so the record reads held exactly while the command runs, and the -NoNewline with the trailing `n is what makes the record parse: a plain Set-Content or a '>' writes a CRLF record, which reads as corrupt. Give a Start-Process launch -Wait inside that spelling rather than leaving it detached. The record is what gives the tracked-tree-mutation rule its reach, so a commit taken while this process is still writing is refused rather than silently taken. An inline wait loop ('while (<cond>) {{ Start-Sleep 5 }}') owes no record. No guard grant applies under PowerShell, so the spelling costs one permission decision. If you genuinely need an unrecorded launch, run it yourself with !<command>.", h = home))))
 }
 
+// spec: guard-kit/SPEC.md §The rule roster — rule `wait_no_producer`'s clause (b) body test, which rule
+// `background_no_record`'s exemption (2) takes: `sleep` statements and nothing else.
+fn only_sleeps(ctx: &Ctx, body: &str) -> bool {
+    let steps: Vec<String> = ctx.segments(body).into_iter().filter(|g| !trim(g).is_empty()).collect();
+    !steps.is_empty() && steps.iter().all(|g| head_word(trim(g)) == "sleep")
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — rule `background_no_record`'s bash exemption (2): every
+// `do … done` span's body only sleeps, every statement after the first loop is another such loop or
+// passes rule `bounded_wait`'s clause (d) test, and no body or tail statement ends in a bare `&`.
+fn waits_only(ctx: &Ctx, s: &str, toks: &[(i32, bool, String, usize)]) -> Result<bool, Fault> {
+    let mut loops: Vec<(usize, usize, usize, usize)> = Vec::new();
+    let (mut keyword, mut opened, mut nested) = (None, None, false);
+    for (depth, _, tok, at) in toks {
+        match tok.as_str() {
+            "until" | "while" | "for" if *depth == 0 && keyword.is_none() => keyword = Some(*at),
+            "do" if *depth == 1 => opened = Some((keyword.take().unwrap_or(*at), at + 2)),
+            "do" => nested = true,
+            "done" if *depth == 0 => {
+                if let Some((start, body)) = opened.take() {
+                    loops.push((start, body, *at, at + 4));
+                }
+            }
+            _ => {}
+        }
+    }
+    if loops.is_empty() || nested {
+        return Ok(false);
+    }
+    let text = |a: usize, b: usize| s.get(a.min(s.len())..b.min(s.len())).unwrap_or("");
+    for &(_, body, done, _) in &loops {
+        let body = text(body, done);
+        if !only_sleeps(ctx, body) || ctx.segments(body).iter().any(|g| shell_backgrounds(g)) {
+            return Ok(false);
+        }
+    }
+    let index_at = |at: usize| ctx.segments(text(0, at)).len().saturating_sub(1);
+    let mut tail: Vec<usize> = Vec::new();
+    for (k, &(_, _, _, end)) in loops.iter().enumerate() {
+        let next = loops.get(k + 1).map(|next| next.0);
+        let until = next.unwrap_or(s.len());
+        let piece = text(end, until);
+        let lead = trim_start(piece);
+        let piece = if lead.starts_with('&') && !lead.starts_with("&&") { &lead[1..] } else { piece };
+        let mut stated = false;
+        for seg in ctx.segments(piece) {
+            let seg = trim(&seg);
+            if seg.is_empty() {
+                continue;
+            }
+            if shell_backgrounds(seg) || !is_wait_tail_segment(ctx, seg) {
+                return Ok(false);
+            }
+            stated = true;
+        }
+        if stated {
+            tail.extend(index_at(end)..index_at(until) + usize::from(next.is_none()));
+        }
+    }
+    if tail.is_empty() {
+        return Ok(true);
+    }
+    let skip: Vec<usize> = (0..ctx.segments(s).len()).filter(|i| !tail.contains(i)).collect();
+    ro_forms_clear_except(ctx, ctx.cmd(), &skip)
+}
+
 pub fn background_no_record(ctx: &Ctx) -> Decided {
     if ctx.shell() == Shell::PowerShell {
         return ps_background_no_record(ctx);
@@ -250,8 +316,8 @@ pub fn background_no_record(ctx: &Ctx) -> Decided {
     if redirect_targets(&s).iter().any(|t| t.ends_with(".run") && h.in_scratch(t)) {
         return Ok(None);
     }
-    let Some(span) = loop_span(&s) else { return Ok(None) };
-    if span.iter().any(|(depth, _, _)| *depth >= 1) || is_ro_background(ctx, &s)? {
+    let Some(toks) = loop_tokens(&s) else { return Ok(None) };
+    if waits_only(ctx, &s, &toks)? || is_ro_background(ctx, &s)? {
         return Ok(None);
     }
     let home = h.scratch_homes().into_iter().next().unwrap_or_default();
@@ -275,11 +341,8 @@ pub fn wait_no_producer(ctx: &Ctx) -> Decided {
     }
     let Some((cond, body, _)) = lone_loop(&s) else { return Ok(None) };
     let stated = |t: &str| ctx.segments(t).into_iter().filter(|g| !trim(g).is_empty()).collect::<Vec<String>>();
-    let (conds, steps) = (stated(&cond), stated(&body));
-    if conds.is_empty() || !conds.iter().all(|g| is_shell_test(g)) {
-        return Ok(None);
-    }
-    if steps.is_empty() || !steps.iter().all(|g| head_word(trim(g)) == "sleep") {
+    let conds = stated(&cond);
+    if conds.is_empty() || !conds.iter().all(|g| is_shell_test(g)) || !only_sleeps(ctx, &body) {
         return Ok(None);
     }
     if !h.live_run_records().is_empty() {

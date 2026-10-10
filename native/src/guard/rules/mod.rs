@@ -436,36 +436,48 @@ fn is_bare_allow(h: &Host, seg: &str) -> (bool, bool) {
 // spec: guard-kit/SPEC.md §The generic ruleset — the ruleset's one shell-keyword walk: each token
 // with its loop depth and whether it stands in command position; `None` on an unbalanced do/done.
 fn loop_span(s: &str) -> Option<Vec<(i32, bool, String)>> {
+    Some(loop_tokens(s)?.into_iter().map(|(depth, cmdpos, tok, _)| (depth, cmdpos, tok)).collect())
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — the same walk with each token's byte offset in the
+// skeleton, for a reader that needs a span's text.
+fn loop_tokens(s: &str) -> Option<Vec<(i32, bool, String, usize)>> {
     let joined = format!("{};", s.replace('\n', ";"));
-    let mut padded = String::new();
     let b = joined.as_bytes();
-    let mut i = 0usize;
+    let mut cuts: Vec<(usize, usize)> = Vec::new();
+    let (mut i, mut open) = (0usize, None);
     while i < b.len() {
-        let two = &joined[i..(i + 2).min(b.len())];
-        if two == "||" || two == "&&" {
-            padded.push_str(&format!(" {} ", two));
-            i += 2;
-        } else if matches!(b[i], b';' | b'|' | b'&' | b'(' | b')' | b'{' | b'}') {
-            padded.push_str(&format!(" {} ", b[i] as char));
+        let glyph = match b[i] {
+            b'|' | b'&' if b.get(i + 1) == Some(&b[i]) => 2,
+            b';' | b'|' | b'&' | b'(' | b')' | b'{' | b'}' => 1,
+            _ => 0,
+        };
+        if glyph == 0 && !matches!(b[i], b' ' | b'\t') {
+            open.get_or_insert(i);
             i += 1;
-        } else {
-            let ch = joined[i..].chars().next().unwrap_or(' ');
-            padded.push(ch);
-            i += ch.len_utf8();
+            continue;
         }
+        if let Some(st) = open.take() {
+            cuts.push((st, i));
+        }
+        if glyph > 0 {
+            cuts.push((i, i + glyph));
+        }
+        i += glyph.max(1);
     }
     let mut out = Vec::new();
     let (mut depth, mut cmdpos) = (0i32, true);
-    for tok in words(&padded) {
+    for (at, end) in cuts {
+        let tok = &joined[at..end];
         match tok {
             ";" | "|" | "||" | "&&" | "&" | "(" | ")" | "{" | "}" | "!" | "until" | "while" | "if" | "then"
             | "else" | "elif" | "for" => {
-                out.push((depth, cmdpos, tok.to_string()));
+                out.push((depth, cmdpos, tok.to_string(), at));
                 cmdpos = true;
             }
             "do" => {
                 depth += 1;
-                out.push((depth, cmdpos, tok.to_string()));
+                out.push((depth, cmdpos, tok.to_string(), at));
                 cmdpos = true;
             }
             "done" => {
@@ -473,11 +485,11 @@ fn loop_span(s: &str) -> Option<Vec<(i32, bool, String)>> {
                 if depth < 0 {
                     return None;
                 }
-                out.push((depth, cmdpos, tok.to_string()));
+                out.push((depth, cmdpos, tok.to_string(), at));
                 cmdpos = true;
             }
             _ => {
-                out.push((depth, cmdpos, tok.to_string()));
+                out.push((depth, cmdpos, tok.to_string(), at));
                 cmdpos = false;
             }
         }
@@ -600,6 +612,27 @@ mod tests {
         assert_eq!(xargs_command_index("xargs --bogus grep"), Err(()));
         assert!(loop_span("until x; do sleep 1; done").is_some());
         assert!(loop_span("done").is_none());
+        let toks = loop_tokens("until a&&b; do sleep 1|&x; done").unwrap();
+        let read: Vec<(i32, &str, usize)> = toks.iter().map(|(d, _, t, at)| (*d, t.as_str(), *at)).collect();
+        assert_eq!(
+            read,
+            vec![
+                (0, "until", 0),
+                (0, "a", 6),
+                (0, "&&", 7),
+                (0, "b", 9),
+                (0, ";", 10),
+                (1, "do", 12),
+                (1, "sleep", 15),
+                (1, "1", 21),
+                (1, "|", 22),
+                (1, "&", 23),
+                (1, "x", 24),
+                (1, ";", 25),
+                (0, "done", 27),
+                (0, ";", 31),
+            ]
+        );
         assert_eq!(unredirected_words("grep x f > out", "grep x f > out"), Ok("grep x f".to_string()));
         assert_eq!(unredirected_words("> out", "> out"), Err(1));
         assert_eq!(unredirected_words("cat <<EOF", "cat <<EOF"), Err(2));

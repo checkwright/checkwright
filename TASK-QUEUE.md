@@ -8,20 +8,6 @@
 
 ## New Features
 
-### wait-exemption-body-unbounded
-
-[spec: SPEC-wait-body.md]
-
-guard-kit rule `background_no_record`'s bash exemption (2) exempts any backgrounded call carrying a `do … done` span, whatever its body runs, so a backgrounded loop that does work is a producer launched with no record: `until [ -f .tmp/marker ]; do touch .tmp/marker; sleep 5; done` falls through, pinned as a row of guard-kit/guard-tests/background-cases.tsv. The PowerShell exemption holds the body to one sleep statement, and rule `wait_no_producer` declines on the same body.
-
-**Deliverable:** the bash exemption held to a body of `sleep` statements, each decision table's loop-carrying rows re-derived, and guard-kit/SPEC.md §The generic ruleset stating it; a behavior change, since it widens a block.
-
-**Cost while deferred:** rule `git_mutation_under_producer` has no record to read for such a loop, so a commit under it passes. Filed 2026-10-07 by delegation-wait-journal-pass' build.
-
-**Reach (2026-10-10, operator direction, lead-relayed, not a ruling):** the body, plus the statements after the loop held to the read-only test; the condition is not held. This widens the Deliverable above, and the amendment carries it.
-
-**Answered at align (2026-10-10, operator direction, lead-relayed, not a ruling):** the exemption also refuses a statement ending in a lone `&`, which the body and tail tests alone admit behind a `sleep` or a banner.
-
 ### exec-form-hook-registration
 
 [spec: SPEC-exec-form-hooks.md]
@@ -34,7 +20,7 @@ the hook-wiring rewire windows-kit-bash-files did not land: context-kit and guar
 - **Run on Linux, harness 2.1.292.** The same four, and: with the binary renamed away no notice reached the model channel; in a linked worktree the placeholder named the main checkout; a `hooks` edit armed in the running session; a call a tool refuses on its own input never reaches the hook.
 - **Hazard.** The binary given no argument exits 2, so a harness that dropped `args` would block every call the matcher takes. A witness rides a matcher no session uses and a scratch copy of the binary.
 
-**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** this entry leads hook-placement-guard-rules-pass with [windows-running-hook-replace](#windows-running-hook-replace), [hook-sibling-pid-namespace](#hook-sibling-pid-namespace), [replaced-binary-self-path](#replaced-binary-self-path), `guard-quoted-operand-words`, `shared-tree-stash-steer`, [wait-exemption-body-unbounded](#wait-exemption-body-unbounded) and [inline-python-steer-split](#inline-python-steer-split). The edit to this repo's own registrations waits for the operator's confirmation of the prepared diff, owed when the diff exists.
+**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** this entry leads hook-placement-guard-rules-pass with [windows-running-hook-replace](#windows-running-hook-replace), [hook-sibling-pid-namespace](#hook-sibling-pid-namespace), [replaced-binary-self-path](#replaced-binary-self-path), `guard-quoted-operand-words`, `shared-tree-stash-steer`, `wait-exemption-body-unbounded` and [inline-python-steer-split](#inline-python-steer-split). The edit to this repo's own registrations waits for the operator's confirmation of the prepared diff, owed when the diff exists.
 
 **Answered at spec (2026-10-10; operator directions, lead-relayed, not rulings, but the third):** the exec form is the one shipped wiring, and the quiet absent-binary state is accepted, which reverses the refusal gate-sdk/SPEC.md §run-gates records; the host with no bash at all is a stated limit, with no operator run this iteration; a minimum harness version is stated on the requirements page, inferred until a witness runs. Lead decision: a template names the binary by the existing placeholder, guard-kit's `check-door-binding` assertion B unchanged, revisable against the oracle.
 
@@ -1246,4 +1232,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 
 - guard-quoted-operand-words
 - shared-tree-stash-steer
+- wait-exemption-body-unbounded
 
