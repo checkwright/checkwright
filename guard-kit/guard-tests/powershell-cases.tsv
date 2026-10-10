@@ -42,6 +42,12 @@ block	rm tracked.md
 block	remove-item -Recurse scratch.txt,tracked.md
 block	Remove-Item -Path:tracked.md
 block	git rm -f tracked.md
+block	Remove-Item 'tracked.md'
+block	del "tracked.md"
+block	Remove-Item 'two words.md'
+block	ri .\tracked.md
+block	Remove-Item 'track*.md'
+fallthrough	del 'scratch.txt'
 fallthrough	del scratch.txt
 fallthrough	Remove-Item -Path tracked.md -WhatIf
 fallthrough	Remove-Item -Filter tracked.md scratch.txt

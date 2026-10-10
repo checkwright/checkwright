@@ -7,6 +7,7 @@ use super::{
 use crate::ere::Ere;
 use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Verdict};
 use crate::guard::reader::View::SqDqHd;
+use crate::guard::reader::Word;
 use crate::guard::text::{self, grep_q, head_word, trim_start, words};
 
 fn block(m: impl Into<String>) -> Decided {
@@ -689,14 +690,37 @@ pub fn find_glob(ctx: &Ctx) -> Decided {
     block("don't list files with a bare 'find' — use the Glob tool: it returns matching paths (registered for a later Read) and needs no permission decision at all. If your toolset carries no Glob tool, keep 'find' and pipe the listing into a read-only consumer ('find <dir> -type f | sort'), which the read-only pipeline grant allows. This fires on a lone listing and on a ';'-sequence of them (a literal echo/printf banner between them is fine); a 'find' carrying an action predicate (-exec/-delete/…), piped into a consumer, or redirected is untouched. If you genuinely need find, run it yourself with !<command>.")
 }
 
-// spec: guard-kit/SPEC.md §The rule roster — a word as a steer prints it: bare where the shell reads
-// it as written, single-quoted otherwise.
-fn shell_word(w: &str) -> String {
-    if !w.is_empty() && w.bytes().all(|b| b.is_ascii_alphanumeric() || b"_./=:,+%@^-".contains(&b)) {
-        w.to_string()
-    } else {
-        format!("'{}'", w.replace('\'', "'\\''"))
+// spec: guard-kit/SPEC.md §The rule roster — rule `find_exec`'s read of one `find` segment's words: the
+// `-exec` word, its terminator and whether it runs per file, each tested by value; `None` where the
+// xargs spelling would run something else.
+fn exec_form(ws: &[Word]) -> Option<(usize, usize, bool)> {
+    let val = |k: usize| ws[k].value.as_str();
+    let mut execs = (0..ws.len()).filter(|&k| val(k) == "-exec");
+    let e = execs.next()?;
+    if execs.next().is_some() {
+        return None;
     }
+    let t = (e + 1..ws.len()).find(|&k| matches!(val(k), ";" | "+"))?;
+    let placed = t + 1 == ws.len() && t >= e + 3 && val(t - 1) == "{}" && !(e + 1..t - 1).any(|k| val(k).contains("{}"));
+    placed.then_some((e, t, val(t) == ";"))
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — rule `find_exec`'s steer: the predicate words and the
+// executed command's words as the command spelled them.
+fn exec_steer(ws: &[Word], e: usize, t: usize, per_file: bool) -> String {
+    let spelled = |ws: &[Word]| ws.iter().map(|w| w.spelling.as_str()).collect::<Vec<_>>().join(" ");
+    format!(
+        "find {} -print0 | xargs -0 {}{}",
+        spelled(&ws[1..e]),
+        if per_file { "-n 1 " } else { "" },
+        spelled(&ws[e + 1..t - 1])
+    )
+}
+
+// spec: guard-kit/SPEC.md §The reader and its views — word values joined as the declared-forms reader
+// takes a dequoted segment: a blank inside a value held as the view's sentinel.
+fn held_values(ws: &[Word]) -> String {
+    ws.iter().map(|w| w.value.replace(' ', "\x01").replace('\t', "\x02")).collect::<Vec<_>>().join(" ")
 }
 
 pub fn find_exec(ctx: &Ctx) -> Decided {
@@ -705,51 +729,26 @@ pub fn find_exec(ctx: &Ctx) -> Decided {
     if !s.contains("-exec") {
         return Ok(None);
     }
-    let Some(v) = ctx.dequoted(c)? else { return Ok(None) };
-    let (segs, dsegs) = (ctx.segments(&s), ctx.segments(&v));
-    if segs.len() != dsegs.len() {
-        return Ok(None);
-    }
+    let Some(read) = ctx.word_read(c)? else { return Ok(None) };
     let h = ctx.host();
-    for (seg, dseg) in segs.iter().zip(&dsegs) {
+    for (seg, ws) in ctx.segments(&s).iter().zip(&read) {
         let seg = trim_start(seg);
         if head_word(seg) != "find" || seg.contains("{}") {
             continue;
         }
-        let dr: Vec<&str> = words(trim_start(dseg));
-        let dw: Vec<String> = dr.iter().map(|w| text::unsentinel(w)).collect();
-        let execs: Vec<usize> = dw.iter().enumerate().filter(|(_, w)| *w == "-exec").map(|(i, _)| i).collect();
-        if execs.len() != 1 {
-            continue;
-        }
-        let e = execs[0];
-        let Some(t) = (e + 1..dw.len()).find(|&k| matches!(dw[k].replace('\\', "").as_str(), ";" | "+")) else {
-            continue;
-        };
-        let per_file = dw[t].replace('\\', "") == ";";
-        if t + 1 != dw.len() || t < e + 3 || dw[t - 1] != "{}" || dw[e + 1..t - 1].iter().any(|w| w.contains("{}")) {
-            continue;
-        }
-        let preds = dr[1..e].join(" ");
+        let Some((e, t, per_file)) = exec_form(ws) else { continue };
+        let preds = held_values(&ws[1..e]);
         if !ro_invocation_clear(h, "find", &preds, &preds, false) {
             continue;
         }
-        let cmd = &dw[e + 1..t - 1];
-        let bin = cmd[0].as_str();
-        if bin == "xargs" || !on_ro_roster(h, bin) || !ro_invocation_clear(h, bin, &dr[e + 2..t - 1].join(" "), "", true) {
+        let bin = ws[e + 1].value.as_str();
+        if bin == "xargs" || !on_ro_roster(h, bin) || !ro_invocation_clear(h, bin, &held_values(&ws[e + 2..t - 1]), "", true) {
             continue;
         }
-        if matches!(bin, "sed" | "awk") && !program_clear(bin, &dr[e + 1..t - 1].join(" ")) {
+        if matches!(bin, "sed" | "awk") && !program_clear(bin, &held_values(&ws[e + 1..t - 1])) {
             continue;
         }
-        let quoted = |ws: &[String]| ws.iter().map(|w| shell_word(w)).collect::<Vec<_>>().join(" ");
-        let steer = format!(
-            "find {} -print0 | xargs -0 {}{}",
-            quoted(&dw[1..e]),
-            if per_file { "-n 1 " } else { "" },
-            quoted(cmd)
-        );
-        return block(format!("don't run a read-only command through 'find -exec' — pipe the listing into xargs instead: '{}' runs the same command over the same files, and the read-only pipeline grant allows it with no permission decision, while -exec is one of find's execute forms and costs one. A find carrying any other action (-execdir, -ok, -delete, -fprint), running a command outside the read-only roster, or carrying more than one -exec is untouched. If you genuinely need -exec, run it yourself with !<command>.", steer));
+        return block(format!("don't run a read-only command through 'find -exec' — pipe the listing into xargs instead: '{}' runs the same command over the same files, and the read-only pipeline grant allows it with no permission decision, while -exec is one of find's execute forms and costs one. A find carrying any other action (-execdir, -ok, -delete, -fprint), running a command outside the read-only roster, or carrying more than one -exec is untouched. If you genuinely need -exec, run it yourself with !<command>.", exec_steer(ws, e, t, per_file)));
     }
     Ok(None)
 }
@@ -918,6 +917,50 @@ pub fn bare_sleep(ctx: &Ctx) -> Decided {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn find_words(ws: &[(&str, &str)]) -> Vec<Word> {
+        ws.iter().map(|(s, v)| Word { spelling: s.to_string(), value: v.to_string(), live: String::new() }).collect()
+    }
+
+    // spec: guard-kit/SPEC.md §The rule roster — the steer prints an escaped blank, a single-quoted
+    // regex backslash and an escaped glob as the command spelled them
+    #[test]
+    fn the_exec_steer_prints_the_words_as_spelled() {
+        let ws = find_words(&[
+            ("find", "find"),
+            (".", "."),
+            ("-regex", "-regex"),
+            ("'.*\\.md'", ".*\\.md"),
+            ("-name", "-name"),
+            ("\\*.md", "*.md"),
+            ("-exec", "-exec"),
+            ("cat", "cat"),
+            ("a\\ b", "a b"),
+            ("'{}'", "{}"),
+            ("\\;", ";"),
+        ]);
+        let (e, t, per_file) = exec_form(&ws).unwrap();
+        assert!(per_file);
+        assert_eq!(
+            exec_steer(&ws, e, t, per_file),
+            "find . -regex '.*\\.md' -name \\*.md -print0 | xargs -0 -n 1 cat a\\ b"
+        );
+        assert_eq!(held_values(&ws[e + 1..t - 1]), "cat a\x01b");
+    }
+
+    // spec: guard-kit/SPEC.md §The rule roster — the terminator is the word whose value is `;` or
+    // `+`, so a quoted backslash-semicolon ends nothing and an escaped command word is its name
+    #[test]
+    fn the_exec_form_reads_values() {
+        let quoted = find_words(&[("find", "find"), (".", "."), ("-exec", "-exec"), ("cat", "cat"), ("'{}'", "{}"), ("'\\;'", "\\;")]);
+        assert_eq!(exec_form(&quoted), None);
+        let escaped = find_words(&[("find", "find"), (".", "."), ("-exec", "-exec"), ("\\cat", "cat"), ("'{}'", "{}"), ("+", "+")]);
+        assert_eq!(exec_form(&escaped), Some((2, 5, false)));
+        let twice = find_words(&[("find", "find"), ("-exec", "-exec"), ("cat", "cat"), ("'{}'", "{}"), ("+", "+"), ("-exec", "-exec")]);
+        assert_eq!(exec_form(&twice), None);
+        let trailing = find_words(&[("find", "find"), ("-exec", "-exec"), ("cat", "cat"), ("'{}'", "{}"), ("+", "+"), ("-print", "-print")]);
+        assert_eq!(exec_form(&trailing), None);
+    }
 
     // spec: guard-kit/SPEC.md §The rule roster — the sed check clears a read and withholds every write
     // or execute spelling, and every command letter it does not model

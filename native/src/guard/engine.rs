@@ -1,7 +1,7 @@
 // spec: guard-kit/SPEC.md §The generic ruleset — the engine: the rule table walked in dispatch order,
 // each rule handed its declared views through a context and nothing else.
 use super::host::Host;
-use super::reader::{Reader, View};
+use super::reader::{Reader, View, Word};
 use super::rules::TABLE;
 
 // spec: guard-kit/SPEC.md §The shell guard — the four decisions a rule can take; each renders as
@@ -120,6 +120,15 @@ impl<'a> Ctx<'a> {
     pub fn dequoted(&self, c: &Cmd) -> Result<Option<String>, Fault> {
         self.declared(View::Dequoted)?;
         Ok(self.reader.view(&c.0, View::Dequoted))
+    }
+
+    // spec: guard-kit/SPEC.md §The reader and its views — the word read, built from the three views
+    // a caller declares; it faults as an undeclared view does.
+    pub fn word_read(&self, c: &Cmd) -> Result<Option<Vec<Vec<Word>>>, Fault> {
+        for view in [View::Raw, View::SqDqHd, View::Dequoted] {
+            self.declared(view)?;
+        }
+        Ok(self.reader.word_read(&c.0))
     }
 
     pub fn body(&self, c: &Cmd, k: usize) -> Result<String, Fault> {

@@ -65,6 +65,53 @@ pub fn control_byte(s: &str) -> Option<u8> {
     s.bytes().find(|&c| c < 0x20 && !matches!(c, b'\t' | b'\n' | b'\r'))
 }
 
+// spec: guard-kit/SPEC.md §The reader and its views — the word read's entry: one word as the command
+// spells it, as the shell passes it, and as the skeleton holds it.
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct Word {
+    pub spelling: String,
+    pub value: String,
+    pub live: String,
+}
+
+// spec: guard-kit/SPEC.md §The reader and its views — the word read's accumulator: a reader feeds it
+// the pieces of a word, face by face, and closes words and segments where its grammar does.
+pub struct WordAcc {
+    segs: Vec<Vec<Word>>,
+    open: Option<[Vec<u8>; 3]>,
+}
+
+impl WordAcc {
+    pub fn new() -> WordAcc {
+        WordAcc { segs: vec![Vec::new()], open: None }
+    }
+
+    pub fn piece(&mut self, spelling: &[u8], value: &[u8], live: &[u8]) {
+        let w = self.open.get_or_insert_with(Default::default);
+        w[0].extend_from_slice(spelling);
+        w[1].extend_from_slice(value);
+        w[2].extend_from_slice(live);
+    }
+
+    pub fn end_word(&mut self) {
+        if let Some([s, v, l]) = self.open.take() {
+            let text = |b: Vec<u8>| String::from_utf8_lossy(&b).into_owned();
+            let word = Word { spelling: text(s), value: text(v), live: text(l) };
+            self.segs.last_mut().expect("one segment is always open").push(word);
+        }
+    }
+
+    pub fn end_segment(&mut self) {
+        self.end_word();
+        self.segs.push(Vec::new());
+    }
+
+    pub fn finish(mut self) -> Vec<Vec<Word>> {
+        self.end_word();
+        self.segs
+    }
+}
+
 pub trait Reader {
     // spec: guard-kit/SPEC.md §The shell guard — a view of `text`; `None` only for a dequoted view
     // the skeleton cannot be aligned with. A skeleton never ends in a newline.
@@ -86,4 +133,7 @@ pub trait Reader {
     fn heredoc_terms(&self, text: &str) -> Vec<String>;
     // spec: guard-kit/SPEC.md §The shell guard — a segment as the permission matcher reads it.
     fn harness_view<'a>(&self, seg: &'a str) -> &'a str;
+    // spec: guard-kit/SPEC.md §The reader and its views — the word read: each compound-split segment's
+    // words; `None` where the dequoted view cannot be aligned.
+    fn word_read(&self, text: &str) -> Option<Vec<Vec<Word>>>;
 }

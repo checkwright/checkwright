@@ -1,7 +1,7 @@
 // spec: guard-kit/SPEC.md §The shell guard — the bash reader: the one holder of the normalizer,
 // the splitters, the redirect scan and the harness view, which the rules, the `scan-prompts` ranker
 // and `--emit-compare-settings-allow` all call.
-use super::reader::{Reader, View, DQ_MARK, HD_MARK, SQ_MARK};
+use super::reader::{Reader, View, Word, WordAcc, DQ_MARK, HD_MARK, SQ_MARK};
 use super::text::{self, is_space, trim_start};
 use crate::ere::EreError;
 
@@ -58,13 +58,19 @@ impl Reader for Bash {
     fn harness_view<'a>(&self, seg: &'a str) -> &'a str {
         harness_view(seg)
     }
+
+    fn word_read(&self, t: &str) -> Option<Vec<Vec<Word>>> {
+        word_read(t)
+    }
 }
+
+const COMPOUND_SEPS: &[&[u8]] = &[b"||", b"&&", b"|&", b";", b"|", b"\n"];
 
 // spec: guard-kit/SPEC.md §The shell guard — the compound split: one segment per line, split on
 // the harness's statement separators. `||`, `&&` and `|&` are tested before `|`, the leftmost-longest
 // alternation a `sed -E` gives for free and a scanner must spell.
 pub fn split_compound(cmd: &str) -> Vec<String> {
-    split_on(cmd, &[b"||", b"&&", b"|&", b";", b"|", b"\n"])
+    split_on(cmd, COMPOUND_SEPS)
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — the statement split, where a pipe is not a boundary.
@@ -634,6 +640,78 @@ pub fn dequoted(raw: &str) -> Option<String> {
     Some(text::chomp(&String::from_utf8_lossy(&out)).to_string())
 }
 
+// spec: guard-kit/SPEC.md §The reader and its views — the word read; `None` where the dequoted view
+// cannot be aligned, or where the walk and the compound split of the skeleton part.
+pub fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
+    dequoted(raw)?;
+    let b = text::chomp(raw).as_bytes();
+    let mut acc = WordAcc::new();
+    let mut i = 0usize;
+    while i < b.len() {
+        match b[i] {
+            b'\\' => {
+                match b.get(i + 1) {
+                    Some(b'\n') => {}
+                    Some(c) => acc.piece(&b[i..i + 2], &[*c], &b[i..i + 2]),
+                    None => acc.piece(b"\\", b"", b"\\"),
+                }
+                i += 2;
+            }
+            b'\'' => {
+                let k = b[i + 1..].iter().position(|&c| c == b'\'')?;
+                acc.piece(&b[i..i + k + 2], &b[i + 1..i + 1 + k], SQ_MARK.as_bytes());
+                i += k + 2;
+            }
+            b'"' => {
+                let mut value: Vec<u8> = Vec::new();
+                let mut k = i + 1;
+                loop {
+                    match *b.get(k)? {
+                        b'"' => break,
+                        b'\\' => {
+                            match *b.get(k + 1)? {
+                                b'\n' => {}
+                                c @ (b'$' | b'`' | b'"' | b'\\') => value.push(c),
+                                c => value.extend_from_slice(&[b'\\', c]),
+                            }
+                            k += 2;
+                        }
+                        c => {
+                            value.push(c);
+                            k += 1;
+                        }
+                    }
+                }
+                acc.piece(&b[i..=k], &value, DQ_MARK.as_bytes());
+                i = k + 1;
+            }
+            b' ' | b'\t' => {
+                acc.end_word();
+                i += 1;
+            }
+            c => match COMPOUND_SEPS.iter().find(|s| b[i..].starts_with(s)) {
+                Some(s) => {
+                    acc.end_segment();
+                    i += s.len();
+                }
+                None => {
+                    acc.piece(&[c], &[c], &[c]);
+                    i += 1;
+                }
+            },
+        }
+    }
+    let read = acc.finish();
+    let skel = skeleton(raw, Wants { sq: true, dq: true, hd: true, hdq: false });
+    let segs = split_compound(text::chomp(&skel));
+    let aligned = segs.len() == read.len()
+        && segs.iter().zip(&read).all(|(seg, ws)| {
+            let held = text::held_words(seg);
+            held.len() == ws.len() && held.iter().zip(ws).all(|(h, w)| *h == w.live)
+        });
+    aligned.then_some(read)
+}
+
 // spec: guard-kit/SPEC.md §The generic ruleset — the redirect-pair pattern, handed to the crate's own
 // matcher (gate-sdk/SPEC.md §The POSIX ERE matcher)
 pub const REDIRECT_RE_SRC: &str = "[0-9]*>>?[[:space:]]*(&[0-9-]+|[^[:space:]|;&<>]+)";
@@ -810,6 +888,54 @@ mod tests {
         assert_eq!(dequoted("echo 'open"), None);
         assert_eq!(dequoted("cat <<EOF\nx\nEOF"), None);
         assert_eq!(dequoted("echo 'a\nb'"), None);
+    }
+
+    fn faces(t: &str) -> Vec<Vec<(String, String, String)>> {
+        let read = word_read(t).unwrap_or_else(|| panic!("{:?} was not read", t));
+        read.into_iter()
+            .map(|seg| seg.into_iter().map(|w| (w.spelling, w.value, w.live)).collect())
+            .collect()
+    }
+
+    fn face(s: &str, v: &str, l: &str) -> (String, String, String) {
+        (s.to_string(), v.to_string(), l.to_string())
+    }
+
+    // spec: guard-kit/SPEC.md §The reader and its views — the word read's three faces, index-aligned
+    // with the compound split, and nothing where the dequoted view refuses
+    #[test]
+    fn the_word_read_carries_each_word_s_spelling_value_and_live_text() {
+        assert_eq!(
+            faces("rm 'two words.md' \"a\\\"b\""),
+            vec![vec![
+                face("rm", "rm", "rm"),
+                face("'two words.md'", "two words.md", SQ_MARK),
+                face("\"a\\\"b\"", "a\"b", DQ_MARK),
+            ]]
+        );
+        assert_eq!(
+            faces("cat a\\ b '.*\\.md' \\*.md"),
+            vec![vec![
+                face("cat", "cat", "cat"),
+                face("a\\ b", "a b", "a\\ b"),
+                face("'.*\\.md'", ".*\\.md", SQ_MARK),
+                face("\\*.md", "*.md", "\\*.md"),
+            ]]
+        );
+        assert_eq!(
+            faces("rm pre'fix'*.md; ls \\; x | wc"),
+            vec![
+                vec![face("rm", "rm", "rm"), face("pre'fix'*.md", "prefix*.md", &format!("pre{SQ_MARK}*.md"))],
+                vec![face("ls", "ls", "ls"), face("\\;", ";", "\\;"), face("x", "x", "x")],
+                vec![face("wc", "wc", "wc")],
+            ]
+        );
+        assert_eq!(faces("a \\\nb"), vec![vec![face("a", "a", "a"), face("b", "b", "b")]]);
+        assert_eq!(faces("echo \"a\\nb\"")[0][1].1, "a\\nb");
+        assert_eq!(word_read("echo 'open"), None);
+        assert_eq!(word_read("cat <<EOF\nx\nEOF"), None);
+        assert_eq!(word_read("echo 'a\nb'"), None);
+        assert_eq!(word_read("a \\&& b"), None);
     }
 
     // spec: guard-kit/SPEC.md §The generic ruleset — the terminators, including the one a herestring's

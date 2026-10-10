@@ -170,6 +170,11 @@ block	find src -type f -exec grep -q foo '{}' \;
 fallthrough	find src -type f -exec grep -q foo '{}' \; -print
 # an even backslash run is a literal backslash operand and a real break, so no terminator
 fallthrough	find src -type f -exec grep -q foo '{}' \\;
+# the terminator and the command word are read by value: a quoted backslash-semicolon is a literal
+# operand and ends nothing, and an escaped command word is the command it names
+fallthrough	find src -type f -exec cat '{}' '\;'
+block	find src -type f -exec \cat '{}' \;
+block	find . -name \*.md -exec cat a\ b '{}' \;
 allow	find . -name '*.md' -print0 | xargs -0 grep -l x
 fallthrough	find . -name '*.tsv' -delete
 fallthrough	find . -exec md5sum '{}' +
@@ -548,6 +553,22 @@ block	rm tracked.md; ls
 fallthrough	rm scratch.txt
 fallthrough	rm untracked-nowhere.md
 fallthrough	git rm -q tracked.md
+# each operand is tested as the shell passes it: a quoted or escaped one literally, the sandbox's
+#           blank-bearing tracked file included, and a bare glob as the shell expands it
+block	rm 'tracked.md'
+block	rm "tracked.md"
+block	rm two\ words.md
+block	rm 'two words.md'
+block	rm -f "two words.md" scratch.txt
+block	rm *.md
+block	rm track?d.md
+fallthrough	rm 'scratch.txt'
+fallthrough	rm *.txt
+# a quoted glob character names no file the steer's 'git rm' would read literally, and a word
+#           mixing a quoted span or an escape with a bare glob character is skipped
+fallthrough	rm '*.md'
+fallthrough	rm 'track'*.md
+fallthrough	rm two\ *.md
 # rule `rm_tracked`'s force arm — a 'git rm' carrying its force flag is blocked whether or
 #           not a grant matches: standalone, in a short cluster, long, abbreviated
 #           as git's option parser accepts it, behind a global option, and quoted.

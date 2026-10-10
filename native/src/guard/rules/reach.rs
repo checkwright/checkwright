@@ -7,6 +7,7 @@ use super::{
 use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Shell, Verdict};
 use crate::guard::host::under;
 use crate::guard::reader::View::{SqDqHd, SqHdq};
+use crate::guard::reader::Word;
 use crate::guard::text::{self, grep_q, head_word, trim_start, unsentinel, words};
 use crate::walk;
 
@@ -202,6 +203,7 @@ pub fn rm_tracked_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<String>, Fault> {
     }
     let s = ctx.view(c, SqDqHd)?;
     let dsegs = ctx.dequoted(c)?.map(|v| ctx.segments(&v)).unwrap_or_default();
+    let words = ctx.word_read(c)?;
     for (i, seg) in ctx.segments(&s).iter().enumerate() {
         let seg = trim_start(seg);
         let src = dsegs.get(i).filter(|d| !d.is_empty()).map_or(seg, String::as_str);
@@ -225,42 +227,152 @@ pub fn rm_tracked_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<String>, Fault> {
             continue;
         }
         let word = head_word(seg);
-        let paths = match ctx.shell() {
-            Shell::Bash if word == "rm" => {
-                text::all_words(&seg[word.len()..]).into_iter().filter(|a| !a.starts_with('-')).map(String::from).collect()
-            }
-            Shell::PowerShell if PS_DELETE.contains(&word.to_ascii_lowercase().as_str()) => {
-                match ps_delete_paths(&seg[word.len()..]) {
-                    Some(p) => p,
+        let ps = ctx.shell() == Shell::PowerShell;
+        let deletes = if ps { PS_DELETE.contains(&word.to_ascii_lowercase().as_str()) } else { word == "rm" };
+        if !deletes {
+            continue;
+        }
+        let read = words.as_ref().and_then(|w| w.get(i)).filter(|ws| ws.first().is_some_and(|w| w.live == word));
+        let operands: Vec<Operand> = match (read, ps) {
+            (Some(ws), false) => ws[1..].iter().filter(|w| !w.value.starts_with('-')).filter_map(bash_operand).collect(),
+            (Some(ws), true) => match ps_delete_paths(&ws[1..]) {
+                Some(p) => p
+                    .into_iter()
+                    .map(|(path, spelling)| {
+                        let value = path.replace('\\', "/");
+                        Operand { test: format!(":(glob){}", value), glob: true, value, spelling }
+                    })
+                    .collect(),
+                None => continue,
+            },
+            (None, false) => text::all_words(&seg[word.len()..])
+                .into_iter()
+                .filter(|a| !a.starts_with('-'))
+                .map(|a| Operand { test: a.to_string(), glob: false, value: a.to_string(), spelling: a.to_string() })
+                .collect(),
+            (None, true) => {
+                let bare: Vec<Word> = text::all_words(&seg[word.len()..]).into_iter().map(plain_word).collect();
+                match ps_delete_paths(&bare) {
+                    Some(p) => p
+                        .into_iter()
+                        .map(|(path, spelling)| Operand { test: path.clone(), glob: false, value: path, spelling })
+                        .collect(),
                     None => continue,
                 }
             }
-            _ => continue,
         };
-        for arg in paths {
-            if ctx.host().tracked(&arg) {
-                return Ok(Some(rm_steer(&arg, word, std::path::Path::new(&arg).is_dir())));
-            }
+        let h = ctx.host();
+        for o in operands {
+            let dir = if h.tracked(&o.test) {
+                std::path::Path::new(&o.value).is_dir()
+            } else if o.glob && h.tracked(&format!("{}/**", o.test)) {
+                true
+            } else {
+                continue;
+            };
+            return Ok(Some(rm_steer(&o, word, dir)));
         }
     }
     Ok(None)
 }
 
-// spec: guard-kit/SPEC.md §The rule roster — rule `rm_tracked`'s steer; a directory takes `-r`,
-// without which `git rm` refuses it.
-fn rm_steer(arg: &str, word: &str, dir: bool) -> String {
+// spec: guard-kit/SPEC.md §The rule roster — rule `rm_tracked`'s operand: the pathspec the tracked
+// test takes, whether it is a glob, the path the shell passes and the word the steer prints.
+struct Operand {
+    test: String,
+    glob: bool,
+    value: String,
+    spelling: String,
+}
+
+fn plain_word(w: &str) -> Word {
+    Word { spelling: w.to_string(), value: w.to_string(), live: w.to_string() }
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — rule `rm_tracked`'s bash operand: a literal one by its
+// value, a bare glob as the shell expands it, and none for a mixed word or a literal git would read
+// as a pattern.
+fn bash_operand(w: &Word) -> Option<Operand> {
+    const GLOB: [char; 3] = ['*', '?', '['];
+    let mut live_glob = false;
+    let mut held = false;
+    for ch in w.live.chars() {
+        if std::mem::take(&mut held) {
+            continue;
+        }
+        held = ch == '\\';
+        live_glob |= GLOB.contains(&ch);
+    }
+    let test = if !live_glob {
+        if w.value.contains(GLOB) || w.value.starts_with(':') {
+            return None;
+        }
+        format!(":(literal){}", w.value)
+    } else if w.live.contains(['\0', '\\']) {
+        return None;
+    } else {
+        format!(":(glob){}", w.value)
+    };
+    Some(Operand { test, glob: live_glob, value: w.value.clone(), spelling: w.spelling.clone() })
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — rule `rm_tracked`'s steer prints the operand as the
+// command spelled it; a directory takes `-r`, without which `git rm` refuses it.
+fn rm_steer(o: &Operand, word: &str, dir: bool) -> String {
     let form = if dir { "git rm -q -r" } else { "git rm -q" };
-    format!("don't delete the git-tracked path '{a}' with a bare '{w}' — use '{f} {a}': it removes the path and stages exactly that deletion in one motion, so no later 'git add -A' is needed to pick it up (which risks staging a concurrent session's foreign path). An '{w}' of an untracked or gitignored path is untouched. If you genuinely need {w}, run it yourself with !<command>.", a = arg, w = word, f = form)
+    format!("don't delete the git-tracked path '{v}' with a bare '{w}' — use '{f} {a}': it removes the path and stages exactly that deletion in one motion, so no later 'git add -A' is needed to pick it up (which risks staging a concurrent session's foreign path). An '{w}' of an untracked or gitignored path is untouched. If you genuinely need {w}, run it yourself with !<command>.", v = o.value, a = o.spelling, w = word, f = form)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    fn word(spelling: &str, value: &str, live: &str) -> Word {
+        Word { spelling: spelling.to_string(), value: value.to_string(), live: live.to_string() }
+    }
+
     #[test]
     fn the_rm_steer_carries_r_for_a_directory_only() {
-        assert!(rm_steer("kit", "rm", true).contains("use 'git rm -q -r kit'"));
-        assert!(rm_steer("a.md", "rm", false).contains("use 'git rm -q a.md'"));
+        let o = |w: &str| bash_operand(&plain_word(w)).unwrap();
+        assert!(rm_steer(&o("kit"), "rm", true).contains("use 'git rm -q -r kit'"));
+        assert!(rm_steer(&o("a.md"), "rm", false).contains("use 'git rm -q a.md'"));
+    }
+
+    // spec: guard-kit/SPEC.md §The rule roster — the steer prints a quoted and a blank-bearing operand
+    // as the command spelled it, and the tracked test takes the path the shell passes
+    #[test]
+    fn the_rm_steer_prints_the_operand_as_spelled() {
+        let quoted = bash_operand(&word("'two words.md'", "two words.md", "\0SQ")).unwrap();
+        assert_eq!(quoted.test, ":(literal)two words.md");
+        assert!(rm_steer(&quoted, "rm", false).contains("use 'git rm -q 'two words.md''"));
+        assert!(rm_steer(&quoted, "rm", false).contains("path 'two words.md' with"));
+        let escaped = bash_operand(&word("two\\ words.md", "two words.md", "two\\ words.md")).unwrap();
+        assert_eq!(escaped.test, ":(literal)two words.md");
+        assert!(rm_steer(&escaped, "rm", false).contains("use 'git rm -q two\\ words.md'"));
+    }
+
+    // spec: guard-kit/SPEC.md §The rule roster — a bare glob is tested as a glob, and a mixed word, a
+    // quoted glob character and a leading `:` are skipped
+    #[test]
+    fn the_bash_operand_splits_literal_glob_and_skipped() {
+        let bare = bash_operand(&plain_word("*.md")).unwrap();
+        assert_eq!((bare.test.as_str(), bare.glob), (":(glob)*.md", true));
+        assert!(bash_operand(&word("'*.md'", "*.md", "\0SQ")).is_none());
+        assert!(bash_operand(&word("\\*.md", "*.md", "\\*.md")).is_none());
+        assert!(bash_operand(&word("'a'*.md", "a*.md", "\0SQ*.md")).is_none());
+        assert!(bash_operand(&word("a\\ *.md", "a *.md", "a\\ *.md")).is_none());
+        assert!(bash_operand(&plain_word(":x")).is_none());
+    }
+
+    // spec: guard-kit/SPEC.md §The rule roster — under PowerShell every path is a glob by its value,
+    // `\` folded, and the steer prints a lone path's own word or a comma part quoted where it must be
+    #[test]
+    fn the_powershell_paths_are_globs_by_value() {
+        let ps = ps_delete_paths(&[word("'docs\\a b.md'", "docs\\a b.md", "\0SQ"), plain_word("x,it's"), plain_word("-Force")]).unwrap();
+        let got: Vec<(&str, &str)> = ps.iter().map(|(p, s)| (p.as_str(), s.as_str())).collect();
+        assert_eq!(got, vec![("docs\\a b.md", "'docs\\a b.md'"), ("x", "x"), ("it's", "'it''s'")]);
+        assert!(ps_delete_paths(&[plain_word("a"), plain_word("-wh")]).is_none());
+        assert!(ps_delete_paths(&[plain_word("-Filter"), plain_word("a")]).unwrap().is_empty());
     }
 }
 
@@ -288,16 +400,26 @@ const PS_VALUE_PARAMS: &[&str] = &[
 ];
 
 // spec: guard-kit/SPEC.md §The generic ruleset — the paths a PowerShell deletion names, each
-// parameter read by its prefix; `None` where a `-WhatIf` prefix makes the segment delete nothing.
-fn ps_delete_paths(args: &str) -> Option<Vec<String>> {
+// parameter read by its prefix off the word's value, and each path with the word a steer prints for
+// it; `None` where a `-WhatIf` prefix makes the segment delete nothing.
+fn ps_delete_paths(args: &[Word]) -> Option<Vec<(String, String)>> {
     let mut out = Vec::new();
     let mut skip = false;
-    for w in text::all_words(args) {
+    let parts = |v: &str, whole: Option<&Word>| -> Vec<(String, String)> {
+        v.split(',')
+            .filter(|p| !p.is_empty())
+            .map(|p| match whole {
+                Some(w) if w.value == p => (p.to_string(), w.spelling.clone()),
+                _ => (p.to_string(), ps_word(p)),
+            })
+            .collect()
+    };
+    for w in args {
         if std::mem::take(&mut skip) {
             continue;
         }
-        let Some(param) = w.strip_prefix('-') else {
-            out.extend(w.split(',').filter(|p| !p.is_empty()).map(String::from));
+        let Some(param) = w.value.strip_prefix('-') else {
+            out.extend(parts(&w.value, Some(w)));
             continue;
         };
         let (name, value) = match param.split_once(':') {
@@ -310,11 +432,21 @@ fn ps_delete_paths(args: &str) -> Option<Vec<String>> {
         let valued = !name.is_empty() && PS_VALUE_PARAMS.iter().any(|p| p.starts_with(&name));
         match value {
             None => skip = valued,
-            Some(v) if !valued => out.extend(v.split(',').filter(|p| !p.is_empty()).map(String::from)),
+            Some(v) if !valued => out.extend(parts(v, None)),
             Some(_) => {}
         }
     }
     Some(out)
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — a path as a PowerShell steer prints it where the command
+// spelled no word for it alone: bare where PowerShell reads it as written, single-quoted otherwise.
+fn ps_word(p: &str) -> String {
+    if p.bytes().all(|b| b.is_ascii_alphanumeric() || b"_./\\:+%^~-".contains(&b)) {
+        p.to_string()
+    } else {
+        format!("'{}'", p.replace('\'', "''"))
+    }
 }
 
 pub fn rm_tracked(ctx: &Ctx) -> Decided {

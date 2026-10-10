@@ -1,6 +1,6 @@
 // spec: guard-kit/SPEC.md §The reader and its views — the PowerShell reader: quoting, comments,
 // escapes and separators in PowerShell's grammar, and every other construct read as live.
-use super::reader::{Reader, View, DQ_MARK, HD_MARK, SQ_MARK};
+use super::reader::{Reader, View, Word, WordAcc, DQ_MARK, HD_MARK, SQ_MARK};
 use super::text;
 
 pub struct PowerShell;
@@ -38,7 +38,7 @@ impl Reader for PowerShell {
     }
 
     fn segments(&self, t: &str) -> Vec<String> {
-        split_on(t, &[b"||", b"&&", b";", b"|", b"\n"])
+        split_on(t, COMPOUND_SEPS)
     }
 
     fn statements(&self, t: &str) -> Vec<String> {
@@ -68,7 +68,13 @@ impl Reader for PowerShell {
     fn harness_view<'a>(&self, seg: &'a str) -> &'a str {
         seg
     }
+
+    fn word_read(&self, t: &str) -> Option<Vec<Vec<Word>>> {
+        word_read(t)
+    }
 }
+
+const COMPOUND_SEPS: &[&[u8]] = &[b"||", b"&&", b";", b"|", b"\n"];
 
 // spec: guard-kit/SPEC.md §The reader and its views — the redirect pair: an operator, blanks, then
 // an fd-dup or a target word; PowerShell reserves `<`.
@@ -246,6 +252,107 @@ fn sentinel(c: u8) -> u8 {
     }
 }
 
+// spec: guard-kit/SPEC.md §The reader and its views — a single-quoted span's content, each doubled
+// `''` one quote.
+fn sq_value(inner: &[u8]) -> Vec<u8> {
+    let mut v = Vec::with_capacity(inner.len());
+    let mut k = 0usize;
+    while k < inner.len() {
+        v.push(inner[k]);
+        k += if inner[k] == b'\'' { 2 } else { 1 };
+    }
+    v
+}
+
+// spec: guard-kit/SPEC.md §The reader and its views — an expandable span's content, its doubled `""`
+// and backtick escapes undone; `None` on an escape that spells a control character.
+fn dq_value(inner: &[u8]) -> Option<Vec<u8>> {
+    let mut v = Vec::with_capacity(inner.len());
+    let mut k = 0usize;
+    while k < inner.len() {
+        match inner[k] {
+            b'`' => {
+                let e = *inner.get(k + 1)?;
+                if b"0abefnrtuv".contains(&e) {
+                    return None;
+                }
+                v.push(e);
+                k += 2;
+            }
+            b'"' => {
+                v.push(b'"');
+                k += 2;
+            }
+            o => {
+                v.push(o);
+                k += 1;
+            }
+        }
+    }
+    Some(v)
+}
+
+// spec: guard-kit/SPEC.md §The reader and its views — the word read; `None` where the dequoted view
+// refuses, on a backtick-continued line, or where the walk and the compound split part.
+fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
+    dequoted(raw)?;
+    let b = text::chomp(raw).as_bytes();
+    let mut acc = WordAcc::new();
+    let mut i = 0usize;
+    while i < b.len() {
+        let c = b[i];
+        if c == b'`' {
+            let pair = &b[i..(i + 2).min(b.len())];
+            if pair.ends_with(b"\n") {
+                return None;
+            }
+            acc.piece(pair, pair, pair);
+            i += 2;
+            continue;
+        }
+        if let Some(end) = comment_end(b, i) {
+            acc.end_word();
+            i = end;
+            continue;
+        }
+        match c {
+            b'\'' => {
+                let end = sq_end(b, i)?;
+                acc.piece(&b[i..end], &sq_value(&b[i + 1..end - 1]), SQ_MARK.as_bytes());
+                i = end;
+            }
+            b'"' => {
+                let end = dq_end(b, i)?;
+                acc.piece(&b[i..end], &dq_value(&b[i + 1..end - 1])?, DQ_MARK.as_bytes());
+                i = end;
+            }
+            b' ' | b'\t' => {
+                acc.end_word();
+                i += 1;
+            }
+            _ => match COMPOUND_SEPS.iter().find(|s| b[i..].starts_with(s)) {
+                Some(s) => {
+                    acc.end_segment();
+                    i += s.len();
+                }
+                None => {
+                    acc.piece(&[c], &[c], &[c]);
+                    i += 1;
+                }
+            },
+        }
+    }
+    let read = acc.finish();
+    let skel = scan(raw, Wants { sq: true, dq: true, hd: true, hdq: false }).0;
+    let segs = split_on(text::chomp(&skel), COMPOUND_SEPS);
+    let solid = |s: &str| s.replace([' ', '\t'], "");
+    let aligned = segs.len() == read.len()
+        && segs.iter().zip(&read).all(|(seg, ws)| {
+            solid(seg) == ws.iter().map(|w| solid(&w.live)).collect::<String>()
+        });
+    aligned.then_some(read)
+}
+
 // spec: guard-kit/SPEC.md §The reader and its views — the dequoted view, aligned with the `sq dq hd`
 // skeleton: the quotes dropped and their escapes undone. `None` on a here-string, an unterminated
 // span, a newline inside quotes, or an escape that spells a control character.
@@ -272,42 +379,14 @@ fn dequoted(raw: &str) -> Option<String> {
         let content: Vec<u8> = match c {
             b'\'' => {
                 let end = sq_end(b, i)?;
-                let inner = &b[i + 1..end - 1];
+                let v = sq_value(&b[i + 1..end - 1]);
                 i = end;
-                let mut v = Vec::with_capacity(inner.len());
-                let mut k = 0usize;
-                while k < inner.len() {
-                    v.push(inner[k]);
-                    k += if inner[k] == b'\'' { 2 } else { 1 };
-                }
                 v
             }
             b'"' => {
                 let end = dq_end(b, i)?;
-                let inner = &b[i + 1..end - 1];
+                let v = dq_value(&b[i + 1..end - 1])?;
                 i = end;
-                let mut v = Vec::with_capacity(inner.len());
-                let mut k = 0usize;
-                while k < inner.len() {
-                    match inner[k] {
-                        b'`' => {
-                            let e = *inner.get(k + 1)?;
-                            if b"0abefnrtuv".contains(&e) {
-                                return None;
-                            }
-                            v.push(e);
-                            k += 2;
-                        }
-                        b'"' => {
-                            v.push(b'"');
-                            k += 2;
-                        }
-                        o => {
-                            v.push(o);
-                            k += 1;
-                        }
-                    }
-                }
                 v
             }
             _ => {
@@ -422,6 +501,36 @@ mod tests {
         assert_eq!(dequoted("echo 'open"), None);
         assert_eq!(dequoted("echo \"a\nb\""), None);
         assert_eq!(dequoted("echo \"a`nb\""), None);
+    }
+
+    // spec: guard-kit/SPEC.md §The reader and its views — the word read's three faces under
+    // PowerShell's quoting, and nothing where the dequoted view refuses or a line is continued
+    #[test]
+    fn the_word_read_carries_each_word_s_spelling_value_and_live_text() {
+        let faces = |t: &str| -> Vec<Vec<(String, String, String)>> {
+            let read = word_read(t).unwrap_or_else(|| panic!("{:?} was not read", t));
+            read.into_iter().map(|seg| seg.into_iter().map(|w| (w.spelling, w.value, w.live)).collect()).collect()
+        };
+        let face = |s: &str, v: &str, l: &str| (s.to_string(), v.to_string(), l.to_string());
+        assert_eq!(
+            faces("del 'it''s.md' \"a`\"b\" # gone"),
+            vec![vec![
+                face("del", "del", "del"),
+                face("'it''s.md'", "it's.md", SQ_MARK),
+                face("\"a`\"b\"", "a\"b", DQ_MARK),
+            ]]
+        );
+        assert_eq!(
+            faces("rm pre'fix'*.md; ls a` b | wc"),
+            vec![
+                vec![face("rm", "rm", "rm"), face("pre'fix'*.md", "prefix*.md", &format!("pre{SQ_MARK}*.md"))],
+                vec![face("ls", "ls", "ls"), face("a` b", "a` b", "a` b")],
+                vec![face("wc", "wc", "wc")],
+            ]
+        );
+        assert_eq!(word_read("@'\nx\n'@ | wc"), None);
+        assert_eq!(word_read("echo 'open"), None);
+        assert_eq!(word_read("git log `\n --oneline"), None);
     }
 
     // spec: guard-kit/SPEC.md §The reader and its views — the harness view is the identity

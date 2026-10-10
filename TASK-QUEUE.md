@@ -8,18 +8,6 @@
 
 ## New Features
 
-### guard-quoted-operand-words
-
-[spec: SPEC-word-read.md]
-
-Two rules read a command word without its quoting. Rule `rm_tracked`'s bash arm tests the `sq dq hd` skeleton's words (`native/src/guard/rules/reach.rs`, `rm_tracked_reach`), so any quoted operand reaches the tracked test as a mark: `rm 'README.md'` and `rm "README.md"` pass while `rm README.md` blocks, against guard-kit/SPEC.md's rule entry, which blocks an `rm` naming a tracked path. Rule `find_exec`'s steer re-quotes dequoted words (`native/src/guard/rules/tools.rs`, `shell_word`), and the dequoted view keeps an escaping backslash, indistinguishable there from a literal one inside single quotes: `-exec cat a\ b '{}' \;` is steered to `cat 'a\ b'`, a different file.
-
-**Deliverable:** each word read with its quoting known: the skeleton's held word beside the dequoted one, or a reader-owned word that carries it. The tracked test takes a quoted operand literally (`:(literal)`) and an unquoted one as the glob the shell expands. Both steers print the shell's own word. Each rule gets a decision-table row (a quoted tracked operand, a blank-bearing name, a single-quoted regex backslash), and guard-kit/SPEC.md §The reader and its views states the contract.
-
-**Cost while deferred:** a quoted `rm` of a tracked path deletes unstaged, outside the block's steer; a `find_exec` steer naming an escaped blank cannot be followed as printed. Filed 2026-10-03 by guard-ruleset-gate-neutrality-pass' spec. An exact word needs per-word quoting provenance that no rule consumes yet, and stripping backslashes, as rule `grant_path_slot` does, breaks the common single-quoted regex steer. That makes it a reader contract with cross-rule reach, the escaped-blank precedent's ground. Re-verified by hook probe: both steers as quoted above, and the `rm_tracked` premise widened from blank-bearing names to every quoted operand. Owner lookup: `shell_word`, `quoted operand`, `rm_tracked`, `exact word` in this file — none; owner guard-kit/SPEC.md §The reader and its views.
-
-**Answered at align (2026-10-10, operator direction, lead-relayed, not a ruling):** the behaviour is accepted as the amendment authors it, with its three departures from the Deliverable's literal-or-glob reading and rule `find_exec`'s two verdict moves, each stated in the amendment's user-facing marks. The operator was shown: a quoted PowerShell path tested as a glob; a quoted operand carrying `*`, `?` or `[` skipped, so `rm '*.md'` passes; `-exec cat '{}' '\;'` no longer steered and `-exec \cat '{}' \;` steered.
-
 ### shared-tree-stash-steer
 
 [spec: SPEC-git-stash.md]
@@ -58,7 +46,7 @@ the hook-wiring rewire windows-kit-bash-files did not land: context-kit and guar
 - **Run on Linux, harness 2.1.292.** The same four, and: with the binary renamed away no notice reached the model channel; in a linked worktree the placeholder named the main checkout; a `hooks` edit armed in the running session; a call a tool refuses on its own input never reaches the hook.
 - **Hazard.** The binary given no argument exits 2, so a harness that dropped `args` would block every call the matcher takes. A witness rides a matcher no session uses and a scratch copy of the binary.
 
-**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** this entry leads hook-placement-guard-rules-pass with [windows-running-hook-replace](#windows-running-hook-replace), [hook-sibling-pid-namespace](#hook-sibling-pid-namespace), [replaced-binary-self-path](#replaced-binary-self-path), [guard-quoted-operand-words](#guard-quoted-operand-words), [shared-tree-stash-steer](#shared-tree-stash-steer), [wait-exemption-body-unbounded](#wait-exemption-body-unbounded) and [inline-python-steer-split](#inline-python-steer-split). The edit to this repo's own registrations waits for the operator's confirmation of the prepared diff, owed when the diff exists.
+**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** this entry leads hook-placement-guard-rules-pass with [windows-running-hook-replace](#windows-running-hook-replace), [hook-sibling-pid-namespace](#hook-sibling-pid-namespace), [replaced-binary-self-path](#replaced-binary-self-path), `guard-quoted-operand-words`, [shared-tree-stash-steer](#shared-tree-stash-steer), [wait-exemption-body-unbounded](#wait-exemption-body-unbounded) and [inline-python-steer-split](#inline-python-steer-split). The edit to this repo's own registrations waits for the operator's confirmation of the prepared diff, owed when the diff exists.
 
 **Answered at spec (2026-10-10; operator directions, lead-relayed, not rulings, but the third):** the exec form is the one shipped wiring, and the quiet absent-binary state is accepted, which reverses the refusal gate-sdk/SPEC.md §run-gates records; the host with no bash at all is a stated limit, with no operator run this iteration; a minimum harness version is stated on the requirements page, inferred until a witness runs. Lead decision: a template names the binary by the existing placeholder, guard-kit's `check-door-binding` assertion B unchanged, revisable against the oracle.
 
@@ -1267,4 +1255,6 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 `check-memory-off` derives the memory dir from the repository toplevel, so a linked-worktree session's memory may land where no scan reads if the harness keys that dir on a canonical working-copy root, a keying read from its bundle and never observed.
 
 ## Done
+
+- guard-quoted-operand-words
 

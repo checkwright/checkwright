@@ -312,8 +312,9 @@ fn build_sandbox() -> Result<Sandbox, String> {
     git(&sandbox.root, &["init", "-q"])?;
     write(&at(".gitignore"), "scratch.txt\n.tmp/\nfriction.log\n")?;
     write(&at("tracked.md"), "tracked\n")?;
+    write(&at("two words.md"), "tracked\n")?;
     write(&at("scratch.txt"), "scratch\n")?;
-    git(&sandbox.root, &["add", "tracked.md"])?;
+    git(&sandbox.root, &["add", "tracked.md", "two words.md"])?;
 
     mkdir(&at(".tmp"))?;
     write(&at(".tmp/dead-producer.run"), "pid=2147483646 run=dead-producer\n")?;
