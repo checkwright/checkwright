@@ -1238,17 +1238,18 @@ jobs:
           if ($old -eq $new -or (Digest $preHook) -ne $old) { Write-Host "::error::the two binaries do not differ, or the placed hook is not the first one, so a replacement could not be told from none"; exit 1 }
 
           Write-Host "== the placed pre-commit.exe is held running =="
-          $shell = Join-Path ([Environment]::SystemDirectory) 'cmd.exe'
+          $release = Join-Path $t 'release'
+          $holder = Join-Path $t 'hold.cmd'
+          [IO.File]::WriteAllText($holder, "@echo off`r`n:wait`r`nif exist `"%~dp0release`" exit /b 0`r`nping -n 2 127.0.0.1 >nul`r`ngoto wait`r`n")
           $psi = [Diagnostics.ProcessStartInfo]::new()
           $psi.FileName = $preHook
           $psi.WorkingDirectory = $repo
           $psi.UseShellExecute = $false
-          $psi.RedirectStandardInput = $true
-          $psi.EnvironmentVariables['GATE_SDK_NATIVE_BIN'] = $shell -replace '\\', '/'
+          $psi.EnvironmentVariables['GATE_SDK_NATIVE_BIN'] = $holder
           $held = [Diagnostics.Process]::Start($psi)
           try {
-              Start-Sleep -Seconds 3
-              if ($held.HasExited) { throw "the placed hook exited $($held.ExitCode) with its input still open, so no running hook is under witness" }
+              Start-Sleep -Seconds 5
+              if ($held.HasExited) { throw "the placed hook exited $($held.ExitCode) with no release file written, so no running hook is under witness" }
 
               Write-Host "== the hooks are re-placed from a second binary =="
               Refresh $second
@@ -1259,18 +1260,17 @@ jobs:
               $msg = if (Test-Path -LiteralPath $msgHook -PathType Leaf) { Digest $msgHook } else { 'absent' }
               Check "the running hook is still served, by one binary or the other" ($pre -eq $old -or $pre -eq $new) "pre-commit.exe is $pre"
               Check "the other hook is still served, by one binary or the other" ($msg -eq $old -or $msg -eq $new) "commit-msg.exe is $msg"
-              Check "the status says which: 0 with the second binary served, 2 with the first" (($rcode -eq 0 -and $pre -eq $new -and $msg -eq $new) -or ($rcode -eq 2 -and $pre -eq $old)) "exit $rcode, pre-commit.exe $(if ($pre -eq $new) { 'second' } elseif ($pre -eq $old) { 'first' } else { $pre })"
-              if ($rcode -eq 2) { Check "the refusal names the hook it could not replace" ($rout -match 'cannot replace' -and $rout -match 'pre-commit') "$rout" }
+              $which = { param($d) if ($d -eq $new) { 'second' } elseif ($d -eq $old) { 'first' } else { $d } }
+              $refused = if ($rout -match 'cannot replace [^\r\n]*commit-msg') { $msg } elseif ($rout -match 'cannot replace [^\r\n]*pre-commit') { $pre } else { 'no hook named' }
+              Check "the status says which: 0 with the second binary served by both, 2 naming a hook the first still serves" (($rcode -eq 0 -and $pre -eq $new -and $msg -eq $new) -or ($rcode -eq 2 -and $refused -eq $old)) "exit $rcode, pre-commit.exe $(& $which $pre), commit-msg.exe $(& $which $msg), the hook the refusal names $(& $which $refused)"
               $left = @(Get-ChildItem -LiteralPath $hooks -File | Where-Object { $_.Name -ne 'pre-commit.exe' -and $_.Name -ne 'commit-msg.exe' })
               Check "no sibling is left that the run did not report" ($left.Count -eq 0 -or $rout -match 'cannot remove') "left: $($left.Name -join ', ')"
-              $outcome = if ($rcode -eq 0) { 'replaced the running hook and exited 0' } else { "refused at $rcode with the first binary still served" }
-              Write-Host "::notice::re-placing a running pre-commit.exe on $env:PWSH_TARGET $outcome; siblings left: $($left.Count)"
+              Write-Host "::notice::re-placing a running pre-commit.exe on $env:PWSH_TARGET exited $rcode with pre-commit.exe the $(& $which $pre) binary and commit-msg.exe the $(& $which $msg); siblings left: $($left.Count)"
           } finally {
-              if (-not $held.HasExited) {
-                  $held.StandardInput.Close()
-                  if (-not $held.WaitForExit(15000)) { $held.Kill(); $held.WaitForExit() }
-              }
+              [IO.File]::WriteAllText($release, '')
+              if (-not $held.WaitForExit(30000)) { $held.Kill($true); $held.WaitForExit() }
           }
+          Check "the held hook returned its child's status once released" ($held.ExitCode -eq 0) "exit $($held.ExitCode)"
 
           Write-Host "== with the hook no longer running, the re-placement lands =="
           Get-ChildItem -LiteralPath $hooks -File | Where-Object { $_.Name -ne 'pre-commit.exe' -and $_.Name -ne 'commit-msg.exe' } | Remove-Item -Force
@@ -1906,7 +1906,7 @@ jobs:
         if: ${{ !cancelled() && matrix.target == 'x86_64-pc-windows-msvc' }}
         shell: bash
         run: |
-          set -uo pipefail
+          set +e -uo pipefail
           source gate-sdk/lib/gate.sh
           bin="$PWD/$(gate_native_bin)"
           repo="$(cygpath -m "$(mktemp -d "${SMOKE_TMP:-/tmp}/hook-root.XXXXXX")")"
