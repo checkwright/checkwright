@@ -532,6 +532,42 @@ a hook placement renames its staged sibling over the hook, and no leg does so wh
 
 **Cost while deferred:** a refresh on Windows during a commit may fail loudly; nothing is served wrong. Filed 2026-10-10 by front-door-readiness-pass' build. Re-verified by reading that section and the `gates` workflow's hook steps: the rename is stated, no step re-places under a running hook. Owner lookup: `install-hooks`, `rename over`, `running hook`, `hook-staging` in this file and the disposed-findings record — none; `hook-staging-fixed-sibling`, done, DISTINCT (the sibling's name under two placements, landed); owner gate-sdk/SPEC.md §install-hooks.
 
+### boundary-wipe-unnamed-member
+
+[cost: event/low] [surface: lifecycle-kit]
+
+the iteration boundary's scratch wipe leaves a directory holding a member whose name is not UTF-8. `wipe` in `native/src/emit/enter_stage.rs` descends through the shared directory lister, which refuses such a name, so the directory is never emptied and its removal fails at every boundary until it is deleted by hand. lifecycle-kit/SPEC.md §bin/enter-stage.sh names a permission error and a concurrent writer as residue and not this one.
+
+**Deliverable:** the wipe removing a member it cannot name, or that section stating the limit and the hand removal.
+
+**Inferred, not run:** that the lister's refusal is what stops the descent — plant a member named with a lone 0xff byte under a scratch directory and run a boundary entry over a scratch tree
+
+**Cost while deferred:** one such scratch member leaves a could-not-remove note at every boundary. Filed 2026-10-10 by front-door-readiness-pass' close, where a scratch repository carrying one survived a boundary and was removed by hand, and promoted at the next scope's intake. Re-verified there by reading `wipe`: both its listings go through `walk::list_dir`. Owner lookup: `wipe`, `non-UTF-8`, `could not remove` in this file and the disposed-findings record — [nul-listing-lossy-decode](#nul-listing-lossy-decode), DISTINCT (ten readers that decode lossily where this one refuses); owner lifecycle-kit/SPEC.md §bin/enter-stage.sh.
+
+### hook-sibling-pid-namespace
+
+[cost: event/low] [surface: gate-sdk]
+
+two residues of the hook placement's per-run sibling, in `native/src/emit/install_hooks.rs`. The sibling's name carries the process id alone, where gate-sdk/SPEC.md §install-hooks says two placements at once never remove or rename each other's: two placements in separate process-id namespaces sharing one hooks directory, as containers over a bind-mounted checkout are, can draw the same id. And the placement discards the error of the sibling's removal, where that section says the sibling is removed on every path, so a removal failing after a failed rename leaves the sibling with no line saying so.
+
+**Deliverable:** that section stating both limits, or a name no second namespace can draw and a reported removal failure.
+
+**Inferred, not run:** that two namespaces collide on one id — run two placements under one forced id against one hooks directory
+
+**Cost while deferred:** a collision or a stranded sibling is silent, and each needs a hooks directory shared across namespaces or a failed rename first. Filed 2026-10-10 by front-door-readiness-pass' close, off its second-vendor review, and promoted at the next scope's intake. Re-verified there by reading the module: the name is the hook's file name, the staged suffix and `std::process::id()`, and both removals drop their result. Owner lookup: `install-hooks`, `sibling`, `process id` in this file and the disposed-findings record — [windows-running-hook-replace](#windows-running-hook-replace), DISTINCT (the rename over a running hook); `hook-staging-fixed-sibling`, done, DISTINCT (it landed the per-run sibling these are defects in, so no recurrence); owner gate-sdk/SPEC.md §install-hooks.
+
+### replaced-binary-self-path
+
+[cost: event/low] [surface: gate-sdk]
+
+a gate that resolves its own executable reds when the binary is replaced under it. The first battery run after a `bash gate-sdk/bin/build-native.sh` rebuild went red once on `check-fence-run`, the gate binary's path reading `(deleted)`, and the re-run was green: one build session's report, where the lead's three rebuild-then-battery runs in that iteration were green. `execute` in `native/src/gates/fence_run.rs` copies `std::env::current_exe()` into its scratch, and Linux answers that call with the unlinked path once the running process's file is replaced. The crate reads the same call at more than a dozen other sites.
+
+**Deliverable:** the cause confirmed, then the read made safe across a replace at its shared sites, or the limit stated where the rebuild obligation is (gate-sdk/SPEC.md §Porting a gate to the binary substrate).
+
+**Inferred, not run:** that a battery process alive across the rebuild's replace is what redded — start a battery, replace the binary mid-run, and read `check-fence-run`
+
+**Cost while deferred:** a session reads a spurious red as its own regression right after the commit-time rebuild. Filed 2026-10-10 by front-door-readiness-pass' lead on its third build session's report, and promoted at the next scope's intake. Re-verified there by reading the gate and by `git grep -c current_exe -- native/src`. Owner lookup: `current_exe`, `(deleted)`, `fence-run`, `rebuild` in this file and the disposed-findings record — [unremapped-rebuild-reds-smoke](#unremapped-rebuild-reds-smoke), DISTINCT (a rebuild without the remap flags); owner gate-sdk/SPEC.md §Porting a gate to the binary substrate.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
