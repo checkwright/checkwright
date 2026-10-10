@@ -60,7 +60,7 @@ The decision tables and the module tests take the new verdicts and pin the print
 - **`guard-tests/powershell-cases.tsv`**, block: `Remove-Item 'tracked.md'` and `del "tracked.md"`.
 - **Every existing row carrying a deletion with a quoted or escaped operand, or a bare glob operand, is re-derived**, the non-monotone table's rule (§Testing). Probe: `grep -nE "(rm|del|erase|ri|rd|rmdir|Remove-Item) .*['\"\\\\*?]" guard-kit/guard-tests/*.tsv`.
 - **A verdict row cannot hold a steer's words**, since a wrong steer still blocks. The module's own tests hold them: for rule `find_exec`, an escaped blank (`a\ b`), a single-quoted regex backslash (`'.*\.md'`) and an escaped glob (`\*.md`) each printed as spelled; for rule `rm_tracked`, a quoted and a blank-bearing operand.
-- **The verdict moves of delta 3 get rows**: `guard-tests/cases.tsv` takes `-exec cat '{}' '\;'` (falls through) and `-exec \cat` (steered), beside the existing escaped-terminator rows, which are re-derived.
+- **The verdict moves of delta 3 get rows**: `guard-tests/cases.tsv` takes `-exec cat '{}' '\;'` (falls through) and `-exec \cat '{}' \;` (steered), beside the existing escaped-terminator rows, which are re-derived.
 - **Each reader's module tests** hold the word read's three faces over a quoted span, an escaped blank, a mixed word and a command the dequoted view refuses.
 
 ## Producers and consumers
@@ -68,9 +68,9 @@ The decision tables and the module tests take the new verdicts and pin the print
 - **The word read.** Producer: the bash and PowerShell readers, from the command the engine holds, on a rule's call through its context. Consumers: rule `rm_tracked`'s deletion arm (delta 2) and rule `find_exec` (delta 3), by call. Each face has a reader: the spelling both steers, the value both rules' tests, the live text delta 2's literal-or-glob split.
 - **Rosters holding a view name.** None is minted, so the reader's view table, the `--guard-json` `view` mode and the declaration grammar are untouched. `check-guard-registration`'s assertion C holds delta 3's added `raw` in lockstep between the item and the table row.
 - **Predicate callers of rule `rm_tracked`'s test**, by `grep -n rm_tracked_reach native/src/guard/rules/*.rs`: rule `bounded_wait`'s arm (B) and rule `bounded_write`. Each runs the test under this rule's declaration and narrows as delta 2 states.
-- **Widening, not narrowing.** Delta 2 widens a block, and delta 3 changes printed text and, through its value-read tests, the verdict of a few exotic spellings: `-exec cat '{}' '\;'` is steered today and falls through after, since the shell passes `\;` literally, and `-exec \cat` is steered after where it fell through. The readers that red on the change are the decision tables, in both directions, and delta 4 names their rows.
+- **Widening, not narrowing.** Delta 2 widens a block, and delta 3 changes printed text and, through its value-read tests, the verdict of a few exotic spellings: `-exec cat '{}' '\;'` is steered today (run through the member on this tree) and falls through after, since the shell passes `\;` literally, and `-exec \cat '{}' \;` falls through today (run) and is steered after. The readers that red on the change are the decision tables, in both directions, and delta 4 names their rows.
 
-**Inferred, not run:** both verdict moves are read off the terminator strip and the roster test in `native/src/guard/rules/tools.rs` — send each command through the built member and read the verdict.
+**Inferred, cannot run before build:** the two verdicts after the change — the value read they rest on does not exist until build.
 
 ## Existing sections updated
 
