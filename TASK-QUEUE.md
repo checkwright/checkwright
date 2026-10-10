@@ -8,6 +8,38 @@
 
 ## New Features
 
+### guard-quoted-operand-words
+
+[spec: SPEC-word-read.md]
+
+Two rules read a command word without its quoting. Rule `rm_tracked`'s bash arm tests the `sq dq hd` skeleton's words (`native/src/guard/rules/reach.rs`, `rm_tracked_reach`), so any quoted operand reaches the tracked test as a mark: `rm 'README.md'` and `rm "README.md"` pass while `rm README.md` blocks, against guard-kit/SPEC.md's rule entry, which blocks an `rm` naming a tracked path. Rule `find_exec`'s steer re-quotes dequoted words (`native/src/guard/rules/tools.rs`, `shell_word`), and the dequoted view keeps an escaping backslash, indistinguishable there from a literal one inside single quotes: `-exec cat a\ b '{}' \;` is steered to `cat 'a\ b'`, a different file.
+
+**Deliverable:** each word read with its quoting known: the skeleton's held word beside the dequoted one, or a reader-owned word that carries it. The tracked test takes a quoted operand literally (`:(literal)`) and an unquoted one as the glob the shell expands. Both steers print the shell's own word. Each rule gets a decision-table row (a quoted tracked operand, a blank-bearing name, a single-quoted regex backslash), and guard-kit/SPEC.md §The reader and its views states the contract.
+
+**Cost while deferred:** a quoted `rm` of a tracked path deletes unstaged, outside the block's steer; a `find_exec` steer naming an escaped blank cannot be followed as printed. Filed 2026-10-03 by guard-ruleset-gate-neutrality-pass' spec. An exact word needs per-word quoting provenance that no rule consumes yet, and stripping backslashes, as rule `grant_path_slot` does, breaks the common single-quoted regex steer. That makes it a reader contract with cross-rule reach, the escaped-blank precedent's ground. Re-verified by hook probe: both steers as quoted above, and the `rm_tracked` premise widened from blank-bearing names to every quoted operand. Owner lookup: `shell_word`, `quoted operand`, `rm_tracked`, `exact word` in this file — none; owner guard-kit/SPEC.md §The reader and its views.
+
+### shared-tree-stash-steer
+
+[spec: SPEC-git-stash.md]
+
+A build session ran `git stash` / `git stash pop` on the shared checkout to rebuild a pre-change binary for a before/after probe. Stash rewrites the shared index and worktree under any concurrent session. Rule `git_mutation_under_producer` blocks `stash` only while a live producer record exists (guard-kit/SPEC.md, its act set), and no rule, agent-execution bullet or stage template steers a before/after probe to a throwaway worktree.
+
+**Deliverable:** a steer from a worktree-rewriting `git stash` on the main checkout to `git worktree add` under the scratch dir, either as a guard-kit block with its decision-table rows or as a delegation-kit/templates/agent-execution.md bullet; choosing between them is the unit's spec question.
+
+**Cost while deferred:** a concurrent session's uncommitted edits or staged paths can vanish or be re-applied under it. Lead-observed once, with the tree intact. Read at spec 2026-10-10: the friction log, which records every call no rule decides and so every stash outside a live producer, held no stash call since its last truncation beyond that stage's own probes. Spec chose the guard-kit block over the template bullet (2026-10-10, the Deliverable's own question). Filed 2026-10-03 by the lead at guard-ruleset-gate-neutrality-pass' build. Re-verified: `stash` sits only in the live-producer act set, and no template text names stash or a before/after probe. Owner lookup: `stash`, `before/after`, `throwaway` in this file — none; owner guard-kit/SPEC.md §The rule roster.
+
+### wait-exemption-body-unbounded
+
+[spec: SPEC-wait-body.md]
+
+guard-kit rule `background_no_record`'s bash exemption (2) exempts any backgrounded call carrying a `do … done` span, whatever its body runs, so a backgrounded loop that does work is a producer launched with no record: `until [ -f .tmp/marker ]; do touch .tmp/marker; sleep 5; done` falls through, pinned as a row of guard-kit/guard-tests/background-cases.tsv. The PowerShell exemption holds the body to one sleep statement, and rule `wait_no_producer` declines on the same body.
+
+**Deliverable:** the bash exemption held to a body of `sleep` statements, each decision table's loop-carrying rows re-derived, and guard-kit/SPEC.md §The generic ruleset stating it; a behavior change, since it widens a block.
+
+**Cost while deferred:** rule `git_mutation_under_producer` has no record to read for such a loop, so a commit under it passes. Filed 2026-10-07 by delegation-wait-journal-pass' build.
+
+**Open, the lead's (2026-10-10, spec):** whether the block also reaches a backgrounded loop's condition and the statements after it. Each fell through the member unrecorded, and the Deliverable above names the body alone; the amendment holds the body and carries the question.
+
 ## Technical Debt
 
 ### windows-running-hook-replace
@@ -51,26 +83,6 @@ rule `sed_file`'s inline-python arm took one of two like calls in delegation-wai
 **Cost while deferred:** the steer toward the count-asserting rewrite arm is skipped by a shape nobody has named. Filed 2026-10-08 by delegation-wait-journal-pass' close, after its drain, and promoted at the next scope's intake. Re-verified: the rule entry blocks a literal rewrite carrying no computed-text construct and says it leans toward passing. Owner lookup: `python`, `--rewrite`, `heredoc`, `sed_file` in this file and the disposed-findings record — none; owner guard-kit/SPEC.md §The generic ruleset.
 
 ## Deferred
-
-### guard-quoted-operand-words
-
-[cost: event/low] [surface: guard-kit]
-
-Two rules read a command word without its quoting. Rule `rm_tracked`'s bash arm tests the `sq dq hd` skeleton's words (`native/src/guard/rules/reach.rs`, `rm_tracked_reach`), so any quoted operand reaches the tracked test as a mark: `rm 'README.md'` and `rm "README.md"` pass while `rm README.md` blocks, against guard-kit/SPEC.md's rule entry, which blocks an `rm` naming a tracked path. Rule `find_exec`'s steer re-quotes dequoted words (`native/src/guard/rules/tools.rs`, `shell_word`), and the dequoted view keeps an escaping backslash, indistinguishable there from a literal one inside single quotes: `-exec cat a\ b '{}' \;` is steered to `cat 'a\ b'`, a different file.
-
-**Deliverable:** each word read with its quoting known: the skeleton's held word beside the dequoted one, or a reader-owned word that carries it. The tracked test takes a quoted operand literally (`:(literal)`) and an unquoted one as the glob the shell expands. Both steers print the shell's own word. Each rule gets a decision-table row (a quoted tracked operand, a blank-bearing name, a single-quoted regex backslash), and guard-kit/SPEC.md §The reader and its views states the contract.
-
-**Cost while deferred:** a quoted `rm` of a tracked path deletes unstaged, outside the block's steer; a `find_exec` steer naming an escaped blank cannot be followed as printed. Filed 2026-10-03 by guard-ruleset-gate-neutrality-pass' spec. An exact word needs per-word quoting provenance that no rule consumes yet, and stripping backslashes, as rule `grant_path_slot` does, breaks the common single-quoted regex steer. That makes it a reader contract with cross-rule reach, the escaped-blank precedent's ground. Re-verified by hook probe: both steers as quoted above, and the `rm_tracked` premise widened from blank-bearing names to every quoted operand. Owner lookup: `shell_word`, `quoted operand`, `rm_tracked`, `exact word` in this file — none; owner guard-kit/SPEC.md §The reader and its views.
-
-### shared-tree-stash-steer
-
-[cost: event/low] [surface: guard-kit]
-
-A build session ran `git stash` / `git stash pop` on the shared checkout to rebuild a pre-change binary for a before/after probe. Stash rewrites the shared index and worktree under any concurrent session. Rule `git_mutation_under_producer` blocks `stash` only while a live producer record exists (guard-kit/SPEC.md, its act set), and no rule, agent-execution bullet or stage template steers a before/after probe to a throwaway worktree.
-
-**Deliverable:** a steer from a worktree-rewriting `git stash` on the main checkout to `git worktree add` under the scratch dir, either as a guard-kit block with its decision-table rows or as a delegation-kit/templates/agent-execution.md bullet; choosing between them is the unit's spec question.
-
-**Cost while deferred:** a concurrent session's uncommitted edits or staged paths can vanish or be re-applied under it. Lead-observed once, with the tree intact; the frequency is **inferred, not run**. Filed 2026-10-03 by the lead at guard-ruleset-gate-neutrality-pass' build. Re-verified: `stash` sits only in the live-producer act set, and no template text names stash or a before/after probe. Owner lookup: `stash`, `before/after`, `throwaway` in this file — none; owner guard-kit/SPEC.md §The rule roster.
 
 ### config-variant-battery-harness
 
@@ -473,16 +485,6 @@ a retired gate-binary arm named in a kit SPEC's code span resolves under no gate
 **Deliverable:** the same arm resolution over the kit SPECs' code spans, with the history valves; a feature, since it widens a gate's corpus.
 
 **Cost while deferred:** a kit SPEC can cite an arm the binary no longer carries, unread until a reader runs it. Filed 2026-10-07 off windows-shell-floor-pass' close, carried to the next scope's intake. Owner lookup: `arm span`, `front-door-verbs`, `retired arm` in this file and the disposed-findings record — none; owner installer/SPEC.md §check-front-door-verbs.
-
-### wait-exemption-body-unbounded
-
-[cost: event/low] [surface: guard-kit]
-
-guard-kit rule `background_no_record`'s bash exemption (2) exempts any backgrounded call carrying a `do … done` span, whatever its body runs, so a backgrounded loop that does work is a producer launched with no record: `until [ -f .tmp/marker ]; do touch .tmp/marker; sleep 5; done` falls through, pinned as a row of guard-kit/guard-tests/background-cases.tsv. The PowerShell exemption holds the body to one sleep statement, and rule `wait_no_producer` declines on the same body.
-
-**Deliverable:** the bash exemption held to a body of `sleep` statements, each decision table's loop-carrying rows re-derived, and guard-kit/SPEC.md §The generic ruleset stating it; a behavior change, since it widens a block.
-
-**Cost while deferred:** rule `git_mutation_under_producer` has no record to read for such a loop, so a commit under it passes. Filed 2026-10-07 by delegation-wait-journal-pass' build.
 
 ### agent-effort-line-unmeasured
 
