@@ -6,7 +6,7 @@
 
 ### (1) The overlay takes a locator, `<KIT>_LOCAL_KNOB_FILE`
 
-Item 2 of the precedence list in gate-sdk/SPEC.md §The knob file is rewritten so the overlay is read from the file `<KIT>_LOCAL_KNOB_FILE` names when it is set non-empty, and from the gates directory otherwise {design-bearing} {user-facing: the entry's Unit set line leaves the deliverable's choice to this stage, and an overlay pinned beside its knob file is the choice; the name is that pin's mechanism and changes nothing for a consumer who does not set it}.
+Item 2 of the precedence list in gate-sdk/SPEC.md §The knob file is rewritten so the overlay is read from the file `<KIT>_LOCAL_KNOB_FILE` names when it is set non-empty, and from the gates directory otherwise {design-bearing} {user-facing: no direction is recorded; the name `<KIT>_LOCAL_KNOB_FILE`, exit 2 on a named overlay that is missing and the tracked locator leaving the overlay where it is are spec's choice under the entry's Unit set line, which leaves the deliverable to this stage, and the operator, asked, left them as spec's; they change nothing for a consumer who does not set the name}.
 
 Replacement for item 2. **Not yet applied.**
 

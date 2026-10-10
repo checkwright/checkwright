@@ -6,7 +6,7 @@ gate-sdk/SPEC.md §The non-gate arm states *A departed stdout reader changes no 
 
 ### (1) The rule's reach is the process's own writes
 
-The rule's lead sentence and its *Out of reach* bullet in gate-sdk/SPEC.md §The non-gate arm are rewritten so the rule covers the writes this process makes, and a bullet states what an arm does with a child it handed the inherited stdout {design-bearing}. No behaviour changes: the text is brought to what the binary does.
+The rule's lead sentence and its *Out of reach* bullet in gate-sdk/SPEC.md §The non-gate arm are rewritten so the rule covers the writes this process makes, and a bullet states what an arm does with a child it handed the inherited stdout {design-bearing} {user-facing: no direction is recorded; bounding the rule rather than making it true is spec's choice under the entry's Chosen-at-spec line, and the operator, asked, left it as spec's; a piped `--scratch-run` or `--run-validate` pre-hook keeps its relayed status and the published rule says so}. No behaviour changes: the text is brought to what the binary does.
 
 Replacement for the lead sentence. **Not yet applied.**
 
