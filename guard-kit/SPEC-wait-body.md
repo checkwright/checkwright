@@ -8,7 +8,7 @@ Rule `background_no_record`'s bash exemption (2) exempts a backgrounded call fro
 
 The bash exemption (2) of rule `background_no_record` holds only where every `do … done` span of the call has a body of `sleep` statements and nothing else, and every statement after the first loop that is not itself a loop passes rule `bounded_wait`'s clause (d) test {design-bearing} {user-facing: the entry's Deliverable for the body; for the statements after the loop, operator direction, 2026-10-10, lead-relayed, not a ruling — the body plus the statements after the loop held to the read-only test, the condition not held}.
 
-Replacement for the item's *Exemption (2), the call is a wait loop* bullet. **Not yet applied.**
+Replacement for the item's bash bullet opening *Exemption (2), the call is a wait loop.* (the PowerShell bullet opens the same words with a colon and is untouched). **Not yet applied.**
 
 > - **Exemption (2), the call is a wait loop.** A backgrounded `until <cond>; do sleep N; done` is the waiter rule `bare_sleep` steers toward, not a producer. It is detected by that rule's `do … done` span walk, and holds only where the call does no work of its own: every span's body is `sleep` statements and nothing else, on rule `wait_no_producer`'s clause (b) test, and every statement after the first loop is another such loop or passes rule `bounded_wait`'s clause (d) test, a read-only pipeline with the banner tolerance and inert redirect targets. Anything else takes the record like any launch. **The condition is not held:** a wait on a command that reads a remote state writes nothing here, and a record would hold every commit for its lifetime. Rule `bounded_wait` draws the same waiter/producer partition to withhold a grant, so an exempted wait goes on to meet rule `wait_no_producer`, which asks whether anything can end it, and then that rule's clauses.
 
@@ -22,16 +22,16 @@ Replacement for the item's *Exemption (2), the call is a wait loop* bullet. **No
 
 Each decision table's loop-carrying rows are re-derived {mechanical}.
 
-- **`guard-tests/background-cases.tsv`**: the row `until [ -f .tmp/marker ]; do touch .tmp/marker; sleep 5; done` flips from `fallthrough` to `block`, and §Testing's list of rule `wait_no_producer`'s rows drops *a body running something besides `sleep`* from its fall-through pair, which that row was. A harness-form `while true; do make build; done` blocks.
+- **`guard-tests/background-cases.tsv`**: the row `until [ -f .tmp/marker ]; do touch .tmp/marker; sleep 5; done` flips from `fallthrough` to `block`, and that table's header comment, which lists *a body that runs something besides sleep* among rule `wait_no_producer`'s non-firing rows, and §Testing's list of those rows, are re-worded to the row that pins the clause again (below). A harness-form `while true; do make build; done` blocks.
 - **`guard-tests/cases.tsv`**, the shell form: a work loop ending in a bare `&` blocks, and the existing `until grep -q DONE .tmp/smoke.log; do sleep 5; done &` row keeps its fall-through.
 - **Every row carrying a `do … done` span under either backgrounding form is re-derived**, by `grep -n 'done' guard-kit/guard-tests/background-cases.tsv guard-kit/guard-tests/cases.tsv`; the PowerShell tables are untouched, their exemption being already this narrow.
 - **The tail.** In `background-cases.tsv`, a wait followed by a producer (`until grep -q DONE .tmp/worker.log; do sleep 5; done; make build`) blocks, and the same wait followed by `echo waited` or by a `grep` keeps the verdict it has.
-- **Rule `wait_no_producer`'s rows keep their verdicts**: its body clause is the test this delta reuses, unchanged.
+- **Rule `wait_no_producer`'s body clause keeps a non-firing row.** The flipped row above was that clause's only one, and it now blocks one rule earlier, so deleting the clause would red nothing. A row takes its place: a work loop launched with its record written in the same call, in the spelling the block prints, falls through, which also pins the sentence above that the recorded launch meets no second block. §Testing's list keeps the clause in its fall-through set. Every other row of the rule keeps its verdict.
 
 ## Producers and consumers
 
 - **The narrowed exemption.** Producer: rule `background_no_record`'s bash arm, on every backgrounded `Bash` payload carrying a loop span. Consumer: the session, through the block; and rule `git_mutation_under_producer`, which gains a record to read for a work loop relaunched in the canonical spelling.
-- **Readers of exemption (2)'s shape**, by `grep -n 'exemption (2)' guard-kit/SPEC.md`: rule `wait_no_producer`'s clause (b), which says the shape it reads *is the shape exemption (2) exempts* and becomes exactly true for a single loop; rule `bounded_wait`'s clause (0), which is indifferent to the harness flag and reads its own body clause. Neither changes a verdict.
+- **Readers of exemption (2)'s shape**, by `grep -n 'exemption (2)' guard-kit/SPEC.md`: rule `wait_no_producer`'s clause (b), which says the shape it reads *is the shape exemption (2) exempts* and becomes exactly true for a single loop; rule `bounded_wait`'s clauses (0) and (b), which are indifferent to the harness flag and read their own no-`&` and body tests. Neither changes a verdict.
 - **Widening.** The delta widens a block, so the readers that red are the decision tables, in both directions (§Testing), and delta 2 names the flipped row.
 - **Instruction surfaces naming the exemption**, by `git grep -n 'exempt' -- delegation-kit/templates/agent-execution.md .claude/agents`: each tells a session to spell a wait inline and to record a producer, and none promises the exemption to a loop that works.
 
@@ -40,7 +40,7 @@ Each decision table's loop-carrying rows are re-derived {mechanical}.
 - `guard-kit/SPEC.md` §The rule roster — the `background_no_record` item's exemption (2) bullet (delta 1).
 - `guard-kit/SPEC.md` §Testing — the third table's row lists (delta 2).
 - `native/src/guard/rules/liveness.rs` — the exemption's test and the shared body predicate (delta 1).
-- `guard-kit/guard-tests/background-cases.tsv`, `guard-kit/guard-tests/cases.tsv` — the rows (delta 2).
+- `guard-kit/guard-tests/background-cases.tsv`, `guard-kit/guard-tests/cases.tsv` — the rows, and `background-cases.tsv`'s header comment naming the body clause's row (delta 2).
 - `docs/guard-kit/SPEC.md` — generated, stale once any delta lands (all deltas).
 - `.workflow/release-declarations.md` — a bullet for the widened block (delta 1).
 

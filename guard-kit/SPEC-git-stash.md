@@ -20,7 +20,7 @@ The item, in the roster's grammar. **Not yet applied.**
 >   - **The honest limits.** The guard cannot see whether another session shares the checkout, so the block also meets a session alone in its tree; a consumer whose sessions never share one allows the command in its consumer rules, which run first (§Consumer rules). A stash behind an alias or a script is not read. `git checkout <rev> -- .` and `git reset --hard` rewrite the same tree and stay rule `git_mutation_under_producer`'s alone.
 
 - **The block is chosen over the template bullet** on the Enforcement-first rule: a bullet in delegation-kit's agent-execution template reaches only a session that loaded it. The block's message carries the steer to every session at the call.
-- **It is admissible as generic mechanism** on the ground §The generic ruleset gives rule `commit_only_paths`: its subject is git's own argv and the checkout boundary, and it reads no project vocabulary.
+- **It is admissible as generic mechanism** on the ground rule `commit_only_paths`' item states for the same kind of subject, the shared index: its subject is git's own argv and the checkout boundary, and it reads no project vocabulary.
 - **No knob is minted.** An off switch is the consumer-rules allow the item names, the existing door for a rule a consumer does not want.
 - **The two-part PowerShell test holds**: the subject is git's argv and the checkout boundary, and the test needs no PowerShell vocabulary.
 
@@ -41,12 +41,12 @@ The decision tables and the worktree suite take the rule's firing and non-firing
 - **Rosters holding a rule name.** §The rule roster and the crate's rule table (`native/src/guard/rules/mod.rs`), held in lockstep by `check-guard-registration`: assertion B reds on the order and C on the declaration until both carry the item. Its assertion D resolves a citation against the roster, so this file names the rule name-first and uses no citation form for it until the item lands.
 - **Readers of the corrective's steer.** `git worktree add` under the scratch dir fell through the member on this tree, so the steer is followable at one permission decision; no recommended-allowlist entry is added for it.
 - **Widening.** The rule adds a block. The readers that red on it are the decision tables, in both directions (§Testing), and delta 2 names the one existing row.
-- **Kit prose telling a reader to stash**, by `git grep -n stash -- ':!TASK-QUEUE.md' ':!*/SPEC.md'`: the installer's and the companion's dirty-tree refusals print *Commit or stash first*. Both exits remain open to the person they address, and an agent following them meets the corrective's commit exit.
+- **Kit prose telling a reader to stash**, by `git grep -n stash -- ':!TASK-QUEUE.md' ':!*/SPEC.md'`: the dirty-tree refusals print *Commit or stash first* in the installer (`native/src/emit/pack_installer.rs`, `native/src/emit/installer_smoke/roster.rs`, `native/src/installer/init.rs` and `native/src/installer/uninstall.rs`) and the companion's install command. Both exits remain open to the person they address, and an agent following them meets the corrective's commit exit. The same probe reaches `scripts/guard-config.knobs`' breadth probe `Bash(git stash clear)`, which passes under the rule, `clear` leaving the tree as it is.
 
 ## Existing sections updated
 
 - `guard-kit/SPEC.md` §The rule roster — the new item after the `commit_only_paths` item (delta 1).
-- `guard-kit/SPEC.md` §Testing — the linked-worktree suite's case list gains the stash case (delta 2).
+- `guard-kit/SPEC.md` §Testing — the linked-worktree suite's case list gains the stash case, and the sandbox precondition saying every mutating-git row asserts rule `git_mutation_under_producer`'s decline arm is re-worded, since the new block rows are mutating-git rows that do not (delta 2).
 - `native/src/guard/rules/mod.rs`, `native/src/guard/rules/reach.rs` — the table row and the rule's test (delta 1).
 - `guard-kit/guard-tests/cases.tsv`, `guard-kit/guard-tests/powershell-cases.tsv`, `guard-kit/gate-tests/worktree-confinement.test.sh` — the rows and the case (delta 2).
 - `docs/guard-kit/SPEC.md` — generated, stale once any delta lands (all deltas).

@@ -17,7 +17,7 @@ The registration, as a kit template spells it. **Not yet applied.**
 ```
 
 - **The binary is spelled as the placeholder `@GATE_SDK_NATIVE_BIN@`**, the one guard-kit's allowlist template already carries and on its grounds (guard-kit/SPEC.md §The recommended allowlist): the knob's value is per consumer, and guard-kit/SPEC.md §check-door-binding's assertion B, which stays as written, bars a path to the binary from a kit template. The adopter resolves it at the merge to the knob's value as a path from the repository root, **with no executable suffix**, so one committed settings file serves a Windows and a POSIX clone alike. A value that is absolute replaces the whole `command`, the project-directory prefix with it.
-- **An unresolved placeholder is a guard that is off**, where in an allow entry it only costs a prompt. `check-settings-paths` reds it where it is registered (delta 3), and each template's `//` note says to resolve it and how to print the value.
+- **An unresolved placeholder is a guard that is off**, where in an allow entry it only costs a prompt. `check-settings-paths` reds it where it is registered (delta 3), and each template's `//` note says to resolve it and how to print the value. The allow template resolves the same placeholder by another rule, the value *spelled as a command* (guard-kit/SPEC.md §The recommended allowlist), so each note states the rule of its own file: here the knob's value as printed, minus any executable suffix, under the project-directory prefix and never the allow entry's relative-command prefix.
 - **The `//` note names the harness's `onFailure` field** as the adopter's own choice for a hook that should refuse when its program cannot start.
 
 The note states the field at the tier it was read at: the harness's published changelog, fetched at authoring, adds `onFailure: "block"` under 2.1.295, *a hook that can't start … blocks the action*. No session ran under it here, and the note says the adopter tries it before relying on it.
@@ -136,7 +136,7 @@ The Windows leg holds what no local run reaches {mechanical}.
 - `docs/requirements.md` — the harness floor and the regenerated toolchain row (deltas 1 and 8).
 - `docs/enforcement.md` — regenerated where a row moves (delta 3).
 - `.github/workflows/` — the Windows leg's step (delta 9).
-- `docs/gate-sdk/SPEC.md`, `docs/guard-kit/`, `docs/context-kit/`, `docs/delegation-kit/`, `docs/lifecycle-kit/` — generated mirrors, stale once any delta lands (all deltas).
+- `docs/gate-sdk/SPEC.md`, `docs/guard-kit/`, `docs/context-kit/`, `docs/delegation-kit/`, `docs/lifecycle-kit/`, `docs/plugin/SPEC.md` — generated mirrors, stale once any delta lands (all deltas).
 - `.workflow/release-declarations.md` — a bullet: the templates changed form, an already-merged shell-form wiring keeps working, and re-merging takes the placeholder step and the harness floor (deltas 1 and 8).
 
 ## Retired spellings

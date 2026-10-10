@@ -14,7 +14,7 @@ Two rules read a command word without its quoting. Rule `rm_tracked` tests the w
 
 The three are index-aligned, one entry per word, and a word the shell joins across an escaped blank is one entry. The read is a seam method both readers implement, added with its two callers (deltas 2 and 3). It is built from the `raw`, `sq dq hd` and `dequoted` views and mints no view name: a rule calling it declares those three, and the context faults on the read as it faults on an undeclared view. It answers nothing where the dequoted view cannot be aligned, and each caller states what it does then.
 
-Replacement for the sentence of §The reader and its views that closes the two derived views, *A reader pairing the skeleton's words with the view joins a skeleton word ending in an odd backslash run to the next.* **Not yet applied.**
+Addition after the sentence of §The reader and its views that closes the two derived views, *A reader pairing the skeleton's words with the view joins a skeleton word ending in an odd backslash run to the next.* That sentence stays: the skeleton's held word still pairs with the dequoted view for the rules that read it (`native/src/guard/text.rs`'s `held_words`, bound to the sentence, which `native/src/guard/rules/grants.rs` and `unredirected_words` in `native/src/guard/rules/mod.rs` call). **Not yet applied.**
 
 > The dequoted view keeps an escaping backslash, so in it `a\ b` and a single-quoted `a\ b` are one text. A rule that needs a word as the shell passes it, or as a steer must print it, takes the **word read** instead: each word of a segment as its spelling, its value and its live text, index-aligned, with a word joined across an escaped blank as one entry.
 
@@ -60,6 +60,7 @@ The decision tables and the module tests take the new verdicts and pin the print
 - **`guard-tests/powershell-cases.tsv`**, block: `Remove-Item 'tracked.md'` and `del "tracked.md"`.
 - **Every existing row carrying a deletion with a quoted or escaped operand, or a bare glob operand, is re-derived**, the non-monotone table's rule (§Testing). Probe: `grep -nE "(rm|del|erase|ri|rd|rmdir|Remove-Item) .*['\"\\\\*?]" guard-kit/guard-tests/*.tsv`.
 - **A verdict row cannot hold a steer's words**, since a wrong steer still blocks. The module's own tests hold them: for rule `find_exec`, an escaped blank (`a\ b`), a single-quoted regex backslash (`'.*\.md'`) and an escaped glob (`\*.md`) each printed as spelled; for rule `rm_tracked`, a quoted and a blank-bearing operand.
+- **The verdict moves of delta 3 get rows**: `guard-tests/cases.tsv` takes `-exec cat '{}' '\;'` (falls through) and `-exec \cat` (steered), beside the existing escaped-terminator rows, which are re-derived.
 - **Each reader's module tests** hold the word read's three faces over a quoted span, an escaped blank, a mixed word and a command the dequoted view refuses.
 
 ## Producers and consumers
@@ -67,14 +68,16 @@ The decision tables and the module tests take the new verdicts and pin the print
 - **The word read.** Producer: the bash and PowerShell readers, from the command the engine holds, on a rule's call through its context. Consumers: rule `rm_tracked`'s deletion arm (delta 2) and rule `find_exec` (delta 3), by call. Each face has a reader: the spelling both steers, the value both rules' tests, the live text delta 2's literal-or-glob split.
 - **Rosters holding a view name.** None is minted, so the reader's view table, the `--guard-json` `view` mode and the declaration grammar are untouched. `check-guard-registration`'s assertion C holds delta 3's added `raw` in lockstep between the item and the table row.
 - **Predicate callers of rule `rm_tracked`'s test**, by `grep -n rm_tracked_reach native/src/guard/rules/*.rs`: rule `bounded_wait`'s arm (B) and rule `bounded_write`. Each runs the test under this rule's declaration and narrows as delta 2 states.
-- **Widening, not narrowing.** Delta 2 widens a block and delta 3 changes only printed text. The readers that red on the change are the decision tables, in both directions, and delta 4 names their rows.
+- **Widening, not narrowing.** Delta 2 widens a block, and delta 3 changes printed text and, through its value-read tests, the verdict of a few exotic spellings: `-exec cat '{}' '\;'` is steered today and falls through after, since the shell passes `\;` literally, and `-exec \cat` is steered after where it fell through. The readers that red on the change are the decision tables, in both directions, and delta 4 names their rows.
+
+**Inferred, not run:** both verdict moves are read off the terminator strip and the roster test in `native/src/guard/rules/tools.rs` — send each command through the built member and read the verdict.
 
 ## Existing sections updated
 
-- `guard-kit/SPEC.md` §The reader and its views — the word read, in place of the pairing sentence (delta 1).
-- `guard-kit/SPEC.md` §The rule roster — the `rm_tracked` item's operand reading, steer and limits (delta 2); the `find_exec` item's declaration, terminator sentence and steer (delta 3).
+- `guard-kit/SPEC.md` §The reader and its views — the word read, added after the pairing sentence, which stays, and the seam enumeration naming it (delta 1).
+- `guard-kit/SPEC.md` §The rule roster — the `rm_tracked` item's operand reading, steer and limits, including its closing sentence that the steer and the force arm are unchanged, which no longer holds of the PowerShell steer (delta 2); the `find_exec` item's declaration, terminator sentence and steer (delta 3).
 - `guard-kit/SPEC.md` §Testing — the sandbox's third precondition (delta 4).
-- `native/src/guard/reader.rs`, `native/src/guard/bash.rs`, `native/src/guard/powershell.rs`, `native/src/guard/engine.rs` — the seam method, its two implementations and the context's read (delta 1).
+- `native/src/guard/reader.rs`, `native/src/guard/bash.rs`, `native/src/guard/powershell.rs`, `native/src/guard/engine.rs` — the seam method, its two implementations and the context's read (delta 1); `native/src/guard/text.rs` — `held_words` and its spec binding, kept (delta 1).
 - `native/src/guard/rules/reach.rs` — the deletion arm and its steer (delta 2).
 - `native/src/guard/rules/tools.rs`, `native/src/guard/rules/mod.rs` — the steer, the terminator test and the table row's views (delta 3).
 - `native/src/emit/run_guard_tests.rs` — the sandbox's second tracked file (delta 4).
