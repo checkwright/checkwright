@@ -204,7 +204,7 @@ an adopter writes a custom gate in shell only. The registry resolves a member as
 
 **Deliverable:** the registry resolving further substrates under the output, fail-closed, fixture-pair and self-lint contracts: `.ps1` resolution in the registry and the runner, which the hook's `--git-hook` arm dispatches through, with a PowerShell lint counterpart to `check-shellcheck`; a Rust path, as an adopter-built executable the registry dispatches or an extension crate; and the install page's prerequisites per substrate. Whether one executable-dispatch shape serves both is spec's.
 
-**The hook-wiring rewire build folded in here on 2026-10-07 is `exec-form-hook-registration`**, its own entry by operator direction of that date: it shares this entry's end, the last bash a native-Windows adopter owes, and not its mechanism.
+**The hook-wiring rewire build folded in here on 2026-10-07 landed as `exec-form-hook-registration`** on 2026-10-10, its own entry by operator direction of the earlier date: every hook registration a kit template ships starts the gate binary with no shell (gate-sdk/SPEC.md §The harness-integration arm). It shared this entry's end, the last bash a native-Windows adopter owes, and not its mechanism, so gate authoring is what that end still waits on here.
 
 **Cost while deferred:** a native-Windows adopter authoring a gate takes on a bash dependency and a second shell dialect, and one wanting a typed, testable gate must write shell or fork. Filed 2026-09-27 by platform-prerequisite-floors' lead. Re-verified: `registry::resolve` tries `sh` then `gate` per dir and nothing else. Owner lookup: `ps1`, `PowerShell`, `custom gate`, `Rust gate`, `consumer crate` in this file — none; owner gate-sdk/SPEC.md §lib/gate.sh and §The port-candidate criteria.
 
@@ -450,7 +450,7 @@ the crate suite's `cargo test --release` rebuilds the release binary without `bi
 
 **Deliverable:** one of three, spec's to choose: the crate suite built with the remap, the staging step refusing an unremapped binary with the rebuild steer it already prints for a stale one, or the smoke building through `bin/build-native.sh`.
 
-**Inferred, not run:** that a plain `cargo test --release` is what strips the remap — run it under `native/`, then the installer smoke, and read `check-tree-terms`
+**Run at hook-placement-guard-rules-pass' close:** `cargo test --release --no-run` into a scratch target directory emitted the binary with the cargo-home path in it, and `bin/build-native.sh` left none. The validate roster runs the crate suite after the installer smoke, so each clean run leaves the binary unremapped for the next, which `check-gate-binary-fresh` reads current.
 
 **Cost while deferred:** a wasted validate round, about 17 minutes, on any seat whose binary was last built by a plain cargo build. Filed 2026-10-09 by crate-reader-hardening-pass' validate, which saw the red and the clean rerun, and promoted at its close. Re-verified by reading the staging step. Owner lookup: `remap`, `installer_smoke`, `check-tree-terms`, `cargo test` in this file and the disposed-findings record — none; [validate-suite-wall-clock-unowned](#validate-suite-wall-clock-unowned) and [build-native-obligation-unconditional](#build-native-obligation-unconditional), both DISTINCT (the suites' serial cost, a rebuild owed by a crate-free commit); owner installer/SPEC.md §The consumer smoke.
 
@@ -477,6 +477,38 @@ the iteration boundary's scratch wipe leaves a directory holding a member whose 
 **Inferred, not run:** that the lister's refusal is what stops the descent — plant a member named with a lone 0xff byte under a scratch directory and run a boundary entry over a scratch tree
 
 **Cost while deferred:** one such scratch member leaves a could-not-remove note at every boundary. Filed 2026-10-10 by front-door-readiness-pass' close, where a scratch repository carrying one survived a boundary and was removed by hand, and promoted at the next scope's intake. Re-verified there by reading `wipe`: both its listings go through `walk::list_dir`. Owner lookup: `wipe`, `non-UTF-8`, `could not remove` in this file and the disposed-findings record — [nul-listing-lossy-decode](#nul-listing-lossy-decode), DISTINCT (ten readers that decode lossily where this one refuses); owner lifecycle-kit/SPEC.md §bin/enter-stage.sh.
+
+### wait-loop-lead-and-condition
+
+[cost: event/low] [surface: guard-kit]
+
+rule `background_no_record`'s wait-loop exemption passes a backgrounded call whose work stands in the loop's condition or in a statement ahead of its first loop. The exemption holds the loop body and the statements after the loop (guard-kit/SPEC.md §The rule roster), and names these two as its limit, the condition on the ground that a wait on remote state writes nothing here.
+
+**Deliverable:** the exemption holding a leading statement to the test its tail already takes, and a condition that is a build or a write told from one that reads remote state, or that section stating why neither can be; an amendment's to choose, since either moves the rule's verdicts.
+
+**Cost while deferred:** such a call is a producer with no liveness record, so rule `git_mutation_under_producer` holds no commit for it. Filed 2026-10-10 by hook-placement-guard-rules-pass' spec and promoted at its close. Re-verified there through the hook member with the background flag set: `until make; do sleep 1; done` passes, a lead no allow entry matches passes ahead of a wait loop, and a `cargo build` lead is stopped by a later rule's decorated-lead block alone. Owner lookup: `background_no_record`, `wait loop`, `exemption` in this file and the disposed-findings record — none; `wait-exemption-body-unbounded`, done, DISTINCT (the body and the tail, which landed); owner guard-kit/SPEC.md §The rule roster.
+
+### loop-keyword-as-argument
+
+[cost: event/low] [surface: guard-kit]
+
+the guard's one shell-keyword walk (`loop_span` in `native/src/guard/rules/mod.rs`) counts the words `do` and `done` wherever they stand, so one spelled as an argument unbalances the walk and rules `bare_sleep`, `background_no_record`, `wait_no_producer` and `bounded_wait` each decline. `sleep 5; echo done` passes the foreground-sleep block that `sleep 5; echo DONE` takes, and a backgrounded `until grep -q done <log>; do sleep 2; done; cargo build` passes the record block its `DONE` spelling takes.
+
+**Deliverable:** the walk reading the two keywords in command position only, with a decision-table row per rule for the argument spelling. The build that found it trialled that reading and every existing row held.
+
+**Cost while deferred:** a sleep or liveness rule is evaded by an ordinary word, with no intent needed. Filed 2026-10-10 by hook-placement-guard-rules-pass' build and promoted at its close. Re-verified there through the hook member: the four commands above gave those four verdicts. Owner lookup: `loop_span`, `bare_sleep`, `unbalanced`, `done` as an argument in this file and the disposed-findings record — none; [wait-loop-lead-and-condition](#wait-loop-lead-and-condition), DISTINCT (a stated limit of one exemption, where this is the walk four rules share); owner guard-kit/SPEC.md §The rule roster, rule `bare_sleep`'s discriminator.
+
+### wakeup-stamp-windows-spawn
+
+[cost: event/low] [surface: guard-kit]
+
+the wakeup-guard's log stamp is built in process on unix and spawns `date` off it (`local_stamp` in `native/src/hook/wakeup.rs`), resolved on `PATH` alone. A hook the harness starts directly on native Windows need not have Git for Windows' userland on `PATH`, and the stamp is then empty, the limit guard-kit/SPEC.md §The hook on native Windows and context-kit/SPEC.md §bin/env-probe both state.
+
+**Deliverable:** the off-unix stamp computed in process, held by a `crate-tests-windows` case, and the two limit sentences withdrawn.
+
+**Inferred, not run:** that the spawn finds nothing under an exec-form registration on a Windows host — start `--hook wakeup-guard` there with Git's `usr/bin` off `PATH` and read the log line
+
+**Cost while deferred:** a Windows adopter's wakeup-attempts log lines may carry no timestamp. Filed 2026-10-10 by hook-placement-guard-rules-pass' build and promoted at its close. Re-verified there by reading both `local_stamp` bodies. Owner lookup: `wakeup`, `date -Is`, `local_stamp` in this file and the disposed-findings record — none; `exec-form-hook-registration`, done, DISTINCT (the registration's form, where this is a member's own spawn); owner guard-kit/SPEC.md §wakeup-guard.
 
 ## Icebox
 
@@ -1167,13 +1199,4 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 `check-memory-off` derives the memory dir from the repository toplevel, so a linked-worktree session's memory may land where no scan reads if the harness keys that dir on a canonical working-copy root, a keying read from its bundle and never observed.
 
 ## Done
-
-- guard-quoted-operand-words
-- shared-tree-stash-steer
-- wait-exemption-body-unbounded
-- inline-python-steer-split
-- replaced-binary-self-path
-- hook-sibling-pid-namespace
-- windows-running-hook-replace
-- exec-form-hook-registration
 
