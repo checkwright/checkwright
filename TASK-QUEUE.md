@@ -298,7 +298,7 @@ the observation half of `front-door-rehearsal-rule`'s second layer: the first Re
 
 ### notification-delivery-probe
 
-[cost: event/low] [surface: lifecycle-kit]
+[cost: event/low] [surface: lifecycle-kit] [not-icebox-eligible: 2026-10-10 filed on the operator direction of 2026-10-02 and waits on a lead session with the operator present; evicting it would compress that direction away]
 
 the delivery rule under `lead-notification-wake-race`'s remedy, unprobed: does a completion notification queued during a supervisor's turn that makes no tool call wake its session, and does one tool call before the turn end drain it.
 
