@@ -274,7 +274,7 @@ The member reads `GUARD_KIT_CONSUMER_RULES_CMD` first on every payload that pars
 
 The guard is a hook member the harness starts directly, so the hook's floor on that host is the gate binary alone. The committed wiring (`templates/settings-hooks.json`) is the same on every host, which is what a settings file shared across a team's machines requires: its `command` carries no executable suffix, and the harness starts the file that carries one.
 
-**What was run**, on a Windows 11 host and on Linux, under Claude Code 2.1.292:
+**What was run**, on a native Windows host and on Linux:
 
 - the exec form started the binary with its `args` and the project-directory placeholder substituted;
 - a block refused the call and an advisory reached the session;
