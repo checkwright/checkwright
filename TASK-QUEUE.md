@@ -22,6 +22,8 @@ four behaviors windows-shell-floor-pass landed run on no Windows leg. gate-sdk/g
 
 **Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration.
 
+**Rider (2026-10-10, operator direction, lead-relayed, not a ruling):** a Windows-leg witness for `scripts/ci-front-door.ps1` joins `gates.yml` and rides this unit's push. It must have the file parsed and executed by a PowerShell host on a Windows leg on every push; the mechanism is build's.
+
 **Cost while deferred:** a Windows-only regression in any of the four ships green. Filed 2026-10-07 off windows-shell-floor-pass' close second-vendor review, carried to the next scope's intake; the first held there by reading the test. Owner lookup: `Windows leg`, `ErrorActionPreference`, `stop-restore`, `witness` in this file and the disposed-findings record — [windows-kpi-plugin-start](#windows-kpi-plugin-start), DISTINCT (a plugin Windows cannot start); owner gate-sdk/SPEC.md §git-hook, with context-kit/SPEC.md §The session-context hook.
 
 ## Deferred
