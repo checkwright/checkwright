@@ -1,5 +1,6 @@
 # spec: RELEASING.md §The procedure — Watch the publish workflow:the tag is the only trigger; one pack, each channel a sibling job
 # spec: gate-sdk/SPEC.md §Consumer payload — the roster-derived matrix, each digest computed once
+# spec: RELEASING.md §The front-door rehearsal — the published release installed on every roster runner, after both channels
 name: publish
 
 on:
@@ -17,6 +18,7 @@ jobs:
       contents: read
     outputs:
       legs: ${{ steps.legs.outputs.legs }}
+      runners: ${{ steps.legs.outputs.runners }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
@@ -42,6 +44,10 @@ jobs:
           fi
           echo "legs=$legs" >> "$GITHUB_OUTPUT"
           echo "build legs: $legs"
+          # spec: RELEASING.md §The front-door rehearsal — the seats: each distinct runner the build legs map to
+          runners="$(jq -c '[.[].runner] | unique' <<<"$legs")"
+          echo "runners=$runners" >> "$GITHUB_OUTPUT"
+          echo "front-door seats: $runners"
 
   build:
     needs: roster
@@ -223,6 +229,8 @@ jobs:
     permissions:
       contents: write
       attestations: read
+    outputs:
+      previous: ${{ steps.attach.outputs.previous }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
@@ -237,6 +245,7 @@ jobs:
           path: dist
 
       - name: attach the tarball, the gate binaries and their checksums to the Release
+        id: attach
         env:
           GH_TOKEN: ${{ github.token }}
           # spec: gate-sdk/SPEC.md §check-action-gh-repo — the sparse checkout carries a remote, but GH_REPO names the target repository explicitly rather than leaning on it
@@ -304,6 +313,12 @@ jobs:
             exit 1
           fi
 
+          # spec: RELEASING.md §The front-door rehearsal — the release before this one, read before this one is created or edited; empty where none is published
+          previous="$(gh release list --exclude-drafts --limit 30 --json tagName,publishedAt \
+            | jq -r --arg tag "$TAG" '[.[] | select(.tagName != $tag)] | sort_by(.publishedAt) | last | .tagName // empty')"
+          echo "previous=${previous#v}" >> "$GITHUB_OUTPUT"
+          echo "release before $TAG: ${previous:-none}"
+
           # spec: installer/SPEC.md §Versioning — the declared release channel is `preview`, so the Release states that posture; check-release-channel-parity holds the two in agreement
           if ! gh release view "$TAG" >/dev/null 2>&1; then
             gh release create "$TAG" --title "$TAG" --prerelease --notes-file "$body"
@@ -316,3 +331,45 @@ jobs:
           fi
           gh release upload "$TAG" "${assets[@]}" --clobber
           echo "attached ${#assets[@]} asset(s) to $TAG: ${assets[*]##*/}"
+
+  front-door:
+    needs: [roster, release, npm]
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: ${{ fromJSON(needs.roster.outputs.runners) }}
+    runs-on: ${{ matrix.runner }}
+    # spec: RELEASING.md §The front-door rehearsal — the job exports no credential to a step
+    permissions:
+      contents: read
+    steps:
+      # spec: RELEASING.md §The front-door rehearsal — the driver's two files and nothing else of the tree
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+          path: front-door
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /scripts/ci-front-door.sh
+            /scripts/ci-front-door.ps1
+
+      # spec: RELEASING.md §The front-door rehearsal — every driver step runs from a directory outside the checkout
+      - name: rehearse the published release from this seat
+        if: runner.os != 'Windows'
+        shell: bash
+        working-directory: ${{ runner.temp }}
+        env:
+          TAG: ${{ github.ref_name }}
+          PREVIOUS: ${{ needs.release.outputs.previous }}
+        run: bash "$GITHUB_WORKSPACE/front-door/scripts/ci-front-door.sh" "${TAG#v}" "$PREVIOUS"
+
+      - name: rehearse the published release from this seat, on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        working-directory: ${{ runner.temp }}
+        env:
+          TAG: ${{ github.ref_name }}
+          PREVIOUS: ${{ needs.release.outputs.previous }}
+        run: |
+          & (Join-Path $env:GITHUB_WORKSPACE 'front-door/scripts/ci-front-door.ps1') ($env:TAG -replace '^v', '') "$env:PREVIOUS"
+          exit $LASTEXITCODE

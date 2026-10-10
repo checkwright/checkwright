@@ -8,20 +8,6 @@
 
 ## New Features
 
-### front-door-rehearsal-rule
-
-[spec: SPEC-front-door-rehearsal.md]
-
-the front-door rehearsal belongs in the methodology, operator direction 2026-09-29, lead-relayed (not a ruling). `front-door-container-rehearsal` found two defects no smoke had caught, a hooked update or profile move refused by `check-gate-tamper` and `init`/`uninstall` hiding git's own failure output, because every smoke installs a tree-packed payload from the author's seat and never the published artifact from a clean one.
-
-**Deliverable, three layers:** (1) a generic kit rule, before an audience-facing event rehearse the published front door from a clean seat and file what it finds, the container, platform and route set being consumer config (doctrine-kit or lifecycle-kit's release step, per the provenance seam); (2) here, a post-publish job in `.github/workflows/publish.yml` installing the just-published Release on clean runners (init, hooks on, a first red, an upgrade from the previous release, a hooked profile move), reaching the macOS and Windows runners a container cannot; (3) a manual agent-walked rehearsal of the routes CI cannot drive (the adoption prompt, the plugin marketplace, the Spec Kit extension), before audience events only, a catalog submission or a partner install, per the operator.
-
-**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration as its lead unit. **Chosen at spec:** the kit rule is a doctrine-kit engineering-craft rule read at close, and the job follows both channels on every runner the target roster maps.
-
-**Cost while deferred:** each audience event risks a front-door defect only a clean-seat install would show; the one-off left macOS, native Windows, arm64 Linux, WSL and the npx, plugin, PowerShell and agent-prompt routes unrehearsed. Filed 2026-09-29 by preview-readiness' lead. Re-verified: `publish.yml` runs roster, build, pack, npm and release and installs nothing after publishing. Owner lookup: `rehears`, `post-publish`, `clean seat` in this file — [design-partner-preview](#design-partner-preview), DISTINCT (the observed install this precedes); owner RELEASING.md for layers 2 and 3, doctrine-kit/DOCTRINE.md for the rule.
-
-**Split 2026-10-10 at scope:** the second layer's job runs on a tag alone, so its first run's reading is [front-door-job-observed](#front-door-job-observed) and this entry keeps the job.
-
 ### inherited-stdout-child-status
 
 [spec: SPEC-child-stdout.md]
@@ -380,7 +366,7 @@ docs/releases.md renders its derived note list as a bare list of version links, 
 
 [cost: event/low] [surface: lifecycle-kit] [observed-by: publish]
 
-the observation half of [front-door-rehearsal-rule](#front-door-rehearsal-rule)'s second layer: the first Release cut after its post-publish job lands runs that job on the clean runners, and the run is read.
+the observation half of `front-door-rehearsal-rule`'s second layer: the first Release cut after its post-publish job lands runs that job on the clean runners, and the run is read.
 
 **Deliverable:** that observation, read off the `publish` run, with any defect the clean-seat installs show filed.
 
@@ -1299,4 +1285,6 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 `check-memory-off` derives the memory dir from the repository toplevel, so a linked-worktree session's memory may land where no scan reads if the harness keys that dir on a canonical working-copy root, a keying read from its bundle and never observed.
 
 ## Done
+
+- front-door-rehearsal-rule
 

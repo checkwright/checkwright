@@ -202,4 +202,12 @@ Where a rule below is *Enforced by* convention, no checkwright gate reads it yet
     *Enforced by:* judgment, and honestly so — which surface a session read a number off leaves no residue in the tree. What ships is the substitute for the read rather than a check on it. One part is an oracle per question: the `--emit` arms and the `good/`+`bad/` fixture pair ([gate-sdk/SPEC.md §The gate model](../gate-sdk/SPEC.md#the-gate-model)). The other is the printed set size of *An assertion reports the size of the set it ranged over*, which catches a proxy that ranged over nothing but not one that ranged over the wrong thing. Buildable and unbuilt: a census arm for any population a session is asked to size, so the hand sweep has a cheaper alternative at the moment it is tempting.
 
     *Stages:* spec, build, validate
+
+29. **Rehearse the published front door from a clean seat.** Before an audience meets a release, install the artifact as published, by each route that audience will take, on a seat that never held the project: no checkout, no cached toolchain, no configuration of the author's. Walk a newcomer's first session there, through the first refusal and the first upgrade, and file every finding (the *Gap disposition* rule). A smoke that packs the tree and installs it from the author's seat exercises neither the published bytes nor the clean host, so it passes what a stranger's first install refuses. A route a pipeline can drive is rehearsed by the pipeline on every publish; one it cannot is walked by hand before the event. Which seats, platforms, routes and events those are is the consumer's release procedure's to name.
+
+    *Under agent work:* an agent's seat is the author's, with every tool placed and configured, so its green install proves the author's path and no other.
+
+    *Enforced by:* convention at the release boundary; a consumer mechanizes the drivable routes as a job of its publish pipeline. No checkwright gate reads it yet: whether a rehearsal ran on a seat that never held the project leaves nothing in the tree but the consumer's own record.
+
+    *Stages:* close
 <!-- {% endraw %} -->
