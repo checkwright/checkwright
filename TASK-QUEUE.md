@@ -20,7 +20,7 @@ the hook-wiring rewire windows-kit-bash-files did not land: context-kit and guar
 - **Run on Linux, harness 2.1.292.** The same four, and: with the binary renamed away no notice reached the model channel; in a linked worktree the placeholder named the main checkout; a `hooks` edit armed in the running session; a call a tool refuses on its own input never reaches the hook.
 - **Hazard.** The binary given no argument exits 2, so a harness that dropped `args` would block every call the matcher takes. A witness rides a matcher no session uses and a scratch copy of the binary.
 
-**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** this entry leads hook-placement-guard-rules-pass with [windows-running-hook-replace](#windows-running-hook-replace), [hook-sibling-pid-namespace](#hook-sibling-pid-namespace), `replaced-binary-self-path`, `guard-quoted-operand-words`, `shared-tree-stash-steer`, `wait-exemption-body-unbounded` and `inline-python-steer-split`. The edit to this repo's own registrations waits for the operator's confirmation of the prepared diff, owed when the diff exists.
+**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** this entry leads hook-placement-guard-rules-pass with [windows-running-hook-replace](#windows-running-hook-replace), `hook-sibling-pid-namespace`, `replaced-binary-self-path`, `guard-quoted-operand-words`, `shared-tree-stash-steer`, `wait-exemption-body-unbounded` and `inline-python-steer-split`. The edit to this repo's own registrations waits for the operator's confirmation of the prepared diff, owed when the diff exists.
 
 **Answered at spec (2026-10-10; operator directions, lead-relayed, not rulings, but the third):** the exec form is the one shipped wiring, and the quiet absent-binary state is accepted, which reverses the refusal gate-sdk/SPEC.md §run-gates records; the host with no bash at all is a stated limit, with no operator run this iteration; a minimum harness version is stated on the requirements page, inferred until a witness runs. Lead decision: a template names the binary by the existing placeholder, guard-kit's `check-door-binding` assertion B unchanged, revisable against the oracle.
 
@@ -48,16 +48,6 @@ a hook placement renames its staged sibling over the hook, and no leg does so wh
 **Push need (2026-10-10, inside the budget by operator grant of that date, lead-relayed: the release tag push counts and a third push is granted for this iteration):** one mid-iteration push after the step lands, since no local run reaches a Windows leg; its run is read before the Done move.
 
 **Cost while deferred:** a refresh on Windows during a commit may fail loudly; nothing is served wrong. Filed 2026-10-10 by front-door-readiness-pass' build. Re-verified by reading that section and the `gates` workflow's hook steps: the rename is stated, no step re-places under a running hook. Owner lookup: `install-hooks`, `rename over`, `running hook`, `hook-staging` in this file and the disposed-findings record — none; `hook-staging-fixed-sibling`, done, DISTINCT (the sibling's name under two placements, landed); owner gate-sdk/SPEC.md §install-hooks.
-
-### hook-sibling-pid-namespace
-
-two residues of the hook placement's per-run sibling, in `native/src/emit/install_hooks.rs`. The sibling's name carries the process id alone, where gate-sdk/SPEC.md §install-hooks says two placements at once never remove or rename each other's: two placements in separate process-id namespaces sharing one hooks directory, as containers over a bind-mounted checkout are, can draw the same id. And the placement discards the error of the sibling's removal, where that section says the sibling is removed on every path, so a removal failing after a failed rename leaves the sibling with no line saying so.
-
-**Deliverable:** that section stating both limits, or a name no second namespace can draw and a reported removal failure.
-
-**Inferred, cannot run before build:** that two namespaces collide on one id — the placement takes its id from the process alone, so no run can force two placements onto one until build lands a seam for it
-
-**Cost while deferred:** a collision or a stranded sibling is silent, and each needs a hooks directory shared across namespaces or a failed rename first. Filed 2026-10-10 by front-door-readiness-pass' close, off its second-vendor review, and promoted at the next scope's intake. Re-verified there by reading the module: the name is the hook's file name, the staged suffix and `std::process::id()`, and both removals drop their result. Owner lookup: `install-hooks`, `sibling`, `process id` in this file and the disposed-findings record — [windows-running-hook-replace](#windows-running-hook-replace), DISTINCT (the rename over a running hook); `hook-staging-fixed-sibling`, done, DISTINCT (it landed the per-run sibling these are defects in, so no recurrence); owner gate-sdk/SPEC.md §install-hooks.
 
 ## Deferred
 
@@ -1222,4 +1212,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - wait-exemption-body-unbounded
 - inline-python-steer-split
 - replaced-binary-self-path
+- hook-sibling-pid-namespace
 

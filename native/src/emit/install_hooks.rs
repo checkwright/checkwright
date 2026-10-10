@@ -136,45 +136,82 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
 // hook's name, a copy where the link cannot be made. The replacement is written under a sibling
 // name and renamed over the hook, so a placement that fails leaves the hook already there in place
 fn place(bin: &Path, dir: &Path) -> Result<(), String> {
+    place_as(bin, dir, &run_tag())
+}
+
+fn place_as(bin: &Path, dir: &Path, tag: &str) -> Result<(), String> {
     std::fs::create_dir_all(dir).map_err(|e| format!("cannot create {}: {}", dir.display(), e))?;
     for hook in hook_launcher::SERVED {
         let dst = dir.join(hook_launcher::file_name(hook));
-        let staged = dir.join(staged_name(hook));
-        let placed = stage(bin, &staged).and_then(|_| {
-            std::fs::rename(&staged, &dst).map_err(|e| format!("cannot replace {}: {}", dst.display(), e))
-        });
+        let staged = dir.join(staged_name(hook, tag));
+        stage(bin, &staged)?;
+        let renamed =
+            std::fs::rename(&staged, &dst).map_err(|e| format!("cannot replace {}: {}", dst.display(), e));
         // spec: gate-sdk/SPEC.md §install-hooks — a rename between two links to one file succeeds
-        // and moves nothing, so the sibling is removed on every path
-        let _ = std::fs::remove_file(&staged);
-        placed?;
+        // and moves nothing, so the sibling is removed on every path; a removal that fails is
+        // reported, and moves the status only where the rename already had
+        match (renamed, remove_own(&staged)) {
+            (Ok(()), None) => {}
+            (Ok(()), Some(left)) => eprintln!("install-hooks: {}", left),
+            (Err(e), None) => return Err(e),
+            (Err(e), Some(left)) => return Err(format!("{}; {}", e, left)),
+        }
     }
     Ok(())
 }
 
 const STAGED_SUFFIX: &str = ".new";
 
-// spec: gate-sdk/SPEC.md §install-hooks — the sibling's name carries the placing process's id, so
-// two placements at once never remove or rename each other's
-fn staged_name(hook: &str) -> String {
-    format!("{}{}.{}", hook_launcher::file_name(hook), STAGED_SUFFIX, std::process::id())
+// spec: gate-sdk/SPEC.md §install-hooks — the sibling's name carries the placing process's id and
+// a value drawn at random per run, so a placement in another process-id namespace draws another
+fn run_tag() -> String {
+    use std::hash::{BuildHasher, Hasher};
+    let drawn = std::collections::hash_map::RandomState::new().build_hasher().finish();
+    format!("{}.{:016x}", std::process::id(), drawn)
 }
 
+fn staged_name(hook: &str, tag: &str) -> String {
+    format!("{}{}.{}", hook_launcher::file_name(hook), STAGED_SUFFIX, tag)
+}
+
+// spec: gate-sdk/SPEC.md §install-hooks — the sibling is created, never opened or removed first: a
+// name already there is another placement's, and the link and the copy both refuse it. A stage
+// that fails leaves nothing of its own behind
 fn stage(bin: &Path, staged: &Path) -> Result<(), String> {
-    let _ = std::fs::remove_file(staged);
     if std::fs::hard_link(bin, staged).is_err() {
         copy_new(bin, staged)
             .map_err(|e| format!("cannot place {} from {}: {}", staged.display(), bin.display(), e))?;
     }
-    crate::install::make_executable(staged)
+    crate::install::make_executable(staged).map_err(|e| match remove_own(staged) {
+        Some(left) => format!("{}; {}", e, left),
+        None => e,
+    })
+}
+
+fn remove_own(staged: &Path) -> Option<String> {
+    match std::fs::remove_file(staged) {
+        Ok(()) => None,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
+        Err(e) => Some(format!(
+            "cannot remove {}: {} — it serves no hook; delete it by hand",
+            staged.display(),
+            e
+        )),
+    }
 }
 
 // spec: gate-sdk/SPEC.md §install-hooks — the copy creates its file and never opens a name already
-// there: a sibling that survived its removal may be a link to the file the placed hooks serve,
-// and a write through it would replace or truncate them
+// there: a sibling there may be a link to the file the placed hooks serve, and a write through it
+// would replace or truncate them. A copy cut short removes the file it created
 fn copy_new(bin: &Path, staged: &Path) -> std::io::Result<()> {
     let mut src = std::fs::File::open(bin)?;
     let mut dst = std::fs::OpenOptions::new().write(true).create_new(true).open(staged)?;
-    std::io::copy(&mut src, &mut dst).map(|_| ())
+    let copied = std::io::copy(&mut src, &mut dst).map(|_| ());
+    if copied.is_err() {
+        drop(dst);
+        let _ = std::fs::remove_file(staged);
+    }
+    copied
 }
 
 fn config(key: &str, value: &str) -> Result<(), String> {
@@ -357,11 +394,11 @@ mod tests {
         assert_eq!(kept, vec!["one".to_string(), "one".to_string()]);
     }
 
-    // spec: gate-sdk/SPEC.md §install-hooks — a sibling that survived under this run's name and
-    // links to the file the placed hooks serve is never written through by the copy, and a
-    // placement that can remove it replaces both hooks
+    // spec: gate-sdk/SPEC.md §install-hooks — two placements forced onto one sibling name: the
+    // second refuses, writes nothing through the first's sibling and leaves it there, and a
+    // placement under a name of its own replaces both hooks
     #[test]
-    fn a_surviving_sibling_is_never_written_through() {
+    fn a_placement_drawing_a_name_already_there_refuses_and_leaves_it() {
         let d = std::env::temp_dir().join(format!("checkwright-install-hooks-survivor.{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&d);
         std::fs::create_dir_all(&d).expect("scratch");
@@ -371,19 +408,48 @@ mod tests {
         std::fs::remove_file(&bin).expect("the update's unlink");
         std::fs::write(&bin, "two").expect("the updated binary");
         let served = hooks.join(hook_launcher::file_name("pre-commit"));
-        let survivor = hooks.join(staged_name("pre-commit"));
-        std::fs::hard_link(&served, &survivor).expect("a killed run's sibling");
-        let copied = copy_new(&bin, &survivor);
+        let theirs = hooks.join(staged_name("pre-commit", "7.drawn"));
+        std::fs::hard_link(&served, &theirs).expect("another placement's sibling");
+        let copied = copy_new(&bin, &theirs);
+        let second = place_as(&bin, &hooks, "7.drawn");
         let through = std::fs::read_to_string(&served).expect("reads");
+        let kept = std::fs::read_to_string(&theirs).unwrap_or_default();
         let replaced = place(&bin, &hooks);
         let fresh = std::fs::read_to_string(&served).expect("reads");
-        let left = survivor.exists();
+        let left: Vec<String> = walk::list_dir(&hooks).expect("lists").into_iter().map(|(n, _)| n).collect();
         let _ = std::fs::remove_dir_all(&d);
         assert!(copied.is_err_and(|e| e.kind() == std::io::ErrorKind::AlreadyExists), "the copy opened a name already there");
-        assert_eq!(through, "one", "the copy wrote through the sibling into the placed hook");
+        assert!(second.is_err_and(|e| e.contains("cannot place")), "a second placement on one name must refuse");
+        assert_eq!(through, "one", "the refused placement wrote through the sibling into the placed hook");
+        assert_eq!(kept, "one", "the refused placement removed or replaced the other's sibling");
         assert_eq!(replaced, Ok(()));
         assert_eq!(fresh, "two");
-        assert!(!left, "the placement left its sibling behind");
+        assert_eq!(
+            left,
+            vec![
+                hook_launcher::file_name("commit-msg"),
+                hook_launcher::file_name("pre-commit"),
+                staged_name("pre-commit", "7.drawn")
+            ],
+            "a placement left its own sibling behind or removed another's"
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — two runs of one process draw two names, and a
+    // sibling that cannot be removed is reported with its path where an absent one is not
+    #[test]
+    fn a_run_draws_its_own_name_and_a_failed_removal_is_reported() {
+        let d = std::env::temp_dir().join(format!("checkwright-install-hooks-removal.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(d.join("held")).expect("scratch");
+        let (first, second) = (run_tag(), run_tag());
+        let held = remove_own(&d.join("held"));
+        let absent = remove_own(&d.join("absent"));
+        let _ = std::fs::remove_dir_all(&d);
+        assert_ne!(first, second, "two runs drew one sibling name");
+        assert!(first.starts_with(&format!("{}.", std::process::id())), "{}", first);
+        assert!(held.is_some_and(|r| r.contains("cannot remove") && r.contains("held")), "a failed removal went unreported");
+        assert_eq!(absent, None);
     }
 
     // spec: gate-sdk/SPEC.md §install-hooks — another run's sibling is neither removed nor renamed
