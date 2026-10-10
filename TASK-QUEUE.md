@@ -10,18 +10,6 @@
 
 ## Technical Debt
 
-### hook-staging-fixed-sibling
-
-the hook placement stages each replacement under one fixed sibling name (`STAGED_SUFFIX` in `native/src/emit/install_hooks.rs`). Two placements running at once can remove or rename each other's sibling. A sibling a killed run left, where it cannot be removed, is written through by the copy fallback, which opens the existing name: a hard link to the binary and to the served hooks. gate-sdk/SPEC.md §install-hooks says a cut-short copy leaves the placed hook in place, and on that path it can truncate it.
-
-**Deliverable:** a per-run sibling name, or the removal's failure refused before the copy, with a crate case for a surviving sibling.
-
-**Run at promotion, on Linux, and the premise narrowed.** With a sibling linked to the running binary under a hooks directory that refuses the removal, the placement exits 2 on the copy (`Text file busy`) and the binary and both hooks keep their size. The copy cannot write through a link to the executable that is running, so the case left is a sibling linked to an *earlier* binary the placed hooks still serve.
-
-**Inferred, cannot run before build:** that a copy cut short through such a sibling truncates the served hooks, and that two placements at once take each other's sibling — each needs a placement stopped mid-copy, which takes the crate case this unit writes; a third candidate, a rename over a hook that is the running executable on Windows, is unconfirmed
-
-**Cost while deferred:** a placement after a killed run and a rebuild can write through the file the placed hooks link to. Filed 2026-10-09 off crate-reader-hardening-pass' close second-vendor review and carried to the next scope's intake. Re-verified there: the suffix is one constant. **Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration on the narrowed premise. Owner lookup: `sibling`, `install_hooks`, `staging`, `hard link` in this file and the disposed-findings record — none on this function; `hook-refresh-unlinks-first`, done, DISTINCT (the rename, which scoped neither concurrency nor a surviving sibling); owner gate-sdk/SPEC.md §install-hooks.
-
 ### windows-hook-legs-unexecuted
 
 four behaviors windows-shell-floor-pass landed run on no Windows leg. gate-sdk/gate-tests/native-git-hooks.test.sh skips its replaced-launcher forwarding assertion on a host with an executable suffix. The Windows hook witness in `.github/workflows/gates.yml` exercises `pre-commit` alone, leaving `commit-msg`, the absent-binary refusal, the self-name refusal and the linked-worktree case to Ubuntu. The session-context hook member's configured-command spawn has no Windows end-to-end run. The stop-restore witness checks `ErrorActionPreference` after a successful install block only, never a failing block nor the fetch fence's `ProgressPreference`.
@@ -1248,4 +1236,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - contributor-writeback-disposition
 - inherited-stdout-child-status
 - hermetic-preamble-overlay-read
+- hook-staging-fixed-sibling
 

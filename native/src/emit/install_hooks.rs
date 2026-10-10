@@ -139,7 +139,7 @@ fn place(bin: &Path, dir: &Path) -> Result<(), String> {
     std::fs::create_dir_all(dir).map_err(|e| format!("cannot create {}: {}", dir.display(), e))?;
     for hook in hook_launcher::SERVED {
         let dst = dir.join(hook_launcher::file_name(hook));
-        let staged = dir.join(format!("{}{}", hook_launcher::file_name(hook), STAGED_SUFFIX));
+        let staged = dir.join(staged_name(hook));
         let placed = stage(bin, &staged).and_then(|_| {
             std::fs::rename(&staged, &dst).map_err(|e| format!("cannot replace {}: {}", dst.display(), e))
         });
@@ -153,13 +153,28 @@ fn place(bin: &Path, dir: &Path) -> Result<(), String> {
 
 const STAGED_SUFFIX: &str = ".new";
 
+// spec: gate-sdk/SPEC.md §install-hooks — the sibling's name carries the placing process's id, so
+// two placements at once never remove or rename each other's
+fn staged_name(hook: &str) -> String {
+    format!("{}{}.{}", hook_launcher::file_name(hook), STAGED_SUFFIX, std::process::id())
+}
+
 fn stage(bin: &Path, staged: &Path) -> Result<(), String> {
     let _ = std::fs::remove_file(staged);
     if std::fs::hard_link(bin, staged).is_err() {
-        std::fs::copy(bin, staged)
+        copy_new(bin, staged)
             .map_err(|e| format!("cannot place {} from {}: {}", staged.display(), bin.display(), e))?;
     }
     crate::install::make_executable(staged)
+}
+
+// spec: gate-sdk/SPEC.md §install-hooks — the copy creates its file and never opens a name already
+// there: a sibling that survived its removal may be a link to the file the placed hooks serve,
+// and a write through it would replace or truncate them
+fn copy_new(bin: &Path, staged: &Path) -> std::io::Result<()> {
+    let mut src = std::fs::File::open(bin)?;
+    let mut dst = std::fs::OpenOptions::new().write(true).create_new(true).open(staged)?;
+    std::io::copy(&mut src, &mut dst).map(|_| ())
 }
 
 fn config(key: &str, value: &str) -> Result<(), String> {
@@ -340,5 +355,56 @@ mod tests {
         assert!(refused.is_err_and(|e| e.contains("cannot place")), "an absent source must refuse");
         assert_eq!(after, both, "a refused placement left a sibling behind or removed a hook");
         assert_eq!(kept, vec!["one".to_string(), "one".to_string()]);
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — a sibling that survived under this run's name and
+    // links to the file the placed hooks serve is never written through by the copy, and a
+    // placement that can remove it replaces both hooks
+    #[test]
+    fn a_surviving_sibling_is_never_written_through() {
+        let d = std::env::temp_dir().join(format!("checkwright-install-hooks-survivor.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(&d).expect("scratch");
+        let (bin, hooks) = (d.join("bin"), d.join("git/gate-hooks"));
+        std::fs::write(&bin, "one").expect("binary");
+        place(&bin, &hooks).expect("first placement");
+        std::fs::remove_file(&bin).expect("the update's unlink");
+        std::fs::write(&bin, "two").expect("the updated binary");
+        let served = hooks.join(hook_launcher::file_name("pre-commit"));
+        let survivor = hooks.join(staged_name("pre-commit"));
+        std::fs::hard_link(&served, &survivor).expect("a killed run's sibling");
+        let copied = copy_new(&bin, &survivor);
+        let through = std::fs::read_to_string(&served).expect("reads");
+        let replaced = place(&bin, &hooks);
+        let fresh = std::fs::read_to_string(&served).expect("reads");
+        let left = survivor.exists();
+        let _ = std::fs::remove_dir_all(&d);
+        assert!(copied.is_err_and(|e| e.kind() == std::io::ErrorKind::AlreadyExists), "the copy opened a name already there");
+        assert_eq!(through, "one", "the copy wrote through the sibling into the placed hook");
+        assert_eq!(replaced, Ok(()));
+        assert_eq!(fresh, "two");
+        assert!(!left, "the placement left its sibling behind");
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — another run's sibling is neither removed nor renamed
+    #[test]
+    fn another_runs_sibling_is_left_alone() {
+        let d = std::env::temp_dir().join(format!("checkwright-install-hooks-foreign.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(d.join("git/gate-hooks")).expect("scratch");
+        let (bin, hooks) = (d.join("bin"), d.join("git/gate-hooks"));
+        std::fs::write(&bin, "one").expect("binary");
+        let foreign: Vec<PathBuf> = hook_launcher::SERVED
+            .iter()
+            .map(|h| hooks.join(format!("{}{}.0", hook_launcher::file_name(h), STAGED_SUFFIX)))
+            .collect();
+        for f in &foreign {
+            std::fs::write(f, "theirs").expect("another run's sibling");
+        }
+        let placed = place(&bin, &hooks);
+        let kept: Vec<String> = foreign.iter().map(|f| std::fs::read_to_string(f).unwrap_or_default()).collect();
+        let _ = std::fs::remove_dir_all(&d);
+        assert_eq!(placed, Ok(()));
+        assert_eq!(kept, vec!["theirs".to_string(), "theirs".to_string()]);
     }
 }

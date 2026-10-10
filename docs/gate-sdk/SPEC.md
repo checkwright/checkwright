@@ -2536,6 +2536,10 @@ The binary's `--install-hooks` arm is the per-clone opt-in, run once to opt in a
 
 **Both served hooks are always placed** ([§git-hook](#git-hook)), whatever the registry holds. Each is a hard link to the binary `GATE_SDK_NATIVE_BIN` names, under the hook's name with the host's executable suffix, and a copy where the link cannot be made. On a host with an executable bit the file carries it. A re-run replaces both files and is otherwise idempotent. Each replacement is written under a sibling name in the hooks directory and renamed over the hook. So a placement whose link and copy both fail, or whose copy is cut short, exits 2 with the hook already there still in place, and the sibling is removed on every path. A hook is never absent between the two: git runs no hook it cannot find, which would turn the commit gates off silently.
 
+- **The sibling's name carries the placing process's id**, so two placements running at once never remove or rename each other's.
+- **The copy creates its file and never opens a name already there.** A sibling that survived its removal may be a hard link to the file the placed hooks serve, and a copy opening it would write through to them. The placement refuses at exit 2 instead.
+- **Honest limit:** a run killed between the write and the rename leaves its sibling in the hooks directory. No later run removes it unless it draws the same process id, since a run cannot tell a dead run's sibling from a live one's. It serves no hook and the receipt lists it; delete it by hand.
+
 **`--refresh` re-places the files of a clone already opted in and changes nothing else**: no config write, no identity rung, no receipt. It prints `install-hooks: refreshed <hooks-dir>`. A clone not opted in, or a working directory that is not the work-tree top, is a silent exit 0, so a build script may call it unconditionally.
 
 - **Opted in** is `core.hooksPath` naming the hooks directory, so the option's caller never opts a clone in. None of the three things it skips changes when a file is re-placed.
