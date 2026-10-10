@@ -272,3 +272,4 @@
 | foreign-stage-binding-pass | sc sp a b v c | 5f/2d | 4 · ≤0d | 21s clean | 151 |
 | tier-resolution-pass | sc sp a b v c | 2f/3d | 2 · ≤0d | 21s clean | 151 |
 | crate-reader-hardening-pass | sc sp a b v c | 1f/6d | 3 · ≤0d | 21s clean | 152 |
+| front-door-readiness-pass | sc sp a b v c | 2f/4d | 3 · ≤0d | 21s clean | 152 |

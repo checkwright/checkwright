@@ -290,7 +290,7 @@ docs/releases.md renders its derived note list as a bare list of version links, 
 
 [cost: event/low] [surface: lifecycle-kit] [observed-by: publish]
 
-the observation half of `front-door-rehearsal-rule`'s second layer: the first Release cut after its post-publish job lands runs that job on the clean runners, and the run is read.
+the observation half of `front-door-rehearsal-rule`'s second layer: the first Release cut after its post-publish job landed, `publish.yml`'s `front-door`, runs that job on the clean runners, and the run is read.
 
 **Deliverable:** that observation, read off the `publish` run, with any defect the clean-seat installs show filed.
 
@@ -519,6 +519,18 @@ the shared front-matter reader (`front_matter_span` in `native/src/spec.rs`) tak
 **Inferred, not run:** that a gate on the reader gains a finding or a long measure on such a page — close a scratch page's block on three dots and run the six gates over it
 
 **Cost while deferred:** a page closing its front matter on dots can gain a false finding or be measured long. Filed 2026-10-09 off crate-reader-hardening-pass' close second-vendor review, which ran Jekyll 4.4.1 on such a page and got the body, and carried to the next scope's intake. Re-verified there: the reader's closing rule compares a trimmed line with three hyphens alone. Owner lookup: `three dots`, `closer`, `front matter` in this file and the disposed-findings record — [plugin-front-matter-yaml](#plugin-front-matter-yaml), DISTINCT (the plugin gate's own reader); `front-matter-reader-siblings`, done, DISTINCT (the shared reader and the unclosed opener); owner canon-kit/SPEC.md §The shared spec adapters.
+
+### windows-running-hook-replace
+
+[cost: event/low] [surface: gate-sdk]
+
+a hook placement renames its staged sibling over the hook, and no leg does so while that hook is a running executable: a commit in flight on Windows while `--install-hooks` or a build's refresh re-places. gate-sdk/SPEC.md §install-hooks states the rename and says nothing of what Windows returns there. `hook-staging-fixed-sibling`, done, left it as its one unrun candidate.
+
+**Deliverable:** a Windows-leg step that holds a placed hook running and re-places it, with that section stating what the placement returns.
+
+**Inferred, not run:** that Windows refuses the rename, exiting 2 with the earlier hook still served — hold a placed hook running on a Windows leg and run `--install-hooks`
+
+**Cost while deferred:** a refresh on Windows during a commit may fail loudly; nothing is served wrong. Filed 2026-10-10 by front-door-readiness-pass' build. Re-verified by reading that section and the `gates` workflow's hook steps: the rename is stated, no step re-places under a running hook. Owner lookup: `install-hooks`, `rename over`, `running hook`, `hook-staging` in this file and the disposed-findings record — none; `hook-staging-fixed-sibling`, done, DISTINCT (the sibling's name under two placements, landed); owner gate-sdk/SPEC.md §install-hooks.
 
 ## Icebox
 
@@ -1209,12 +1221,4 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 `check-memory-off` derives the memory dir from the repository toplevel, so a linked-worktree session's memory may land where no scan reads if the harness keys that dir on a canonical working-copy root, a keying read from its bundle and never observed.
 
 ## Done
-
-- front-door-rehearsal-rule
-- contributor-writeback-disposition
-- inherited-stdout-child-status
-- hermetic-preamble-overlay-read
-- hook-staging-fixed-sibling
-- action-walk-yaml-shapes
-- windows-hook-legs-unexecuted
 

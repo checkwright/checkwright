@@ -9,7 +9,7 @@ generated: true
 
 The cross-kit delivery rules the kits enforce piecemeal, stated once. This file is the deliverable of [doctrine-kit](README.md): referenced in place from a consumer's always-loaded agent file, never copy-installed — re-vendoring the kit *is* the doctrine upgrade. Each rule lands as its statement, why it holds under coding-agent work, and a pointer to the mechanism that enforces it; the mechanism and its knob rosters live in the cited kit SPEC, never restated here. Length is not graded: a clause stays for its class, never goes for its size ([SPEC.md §The doctrine deliverable](SPEC.md#the-doctrine-deliverable)).
 
-The roster is in two registers. **Methodology-maintenance** rules govern how the methodology's own surfaces stay honest; they bear on every surface edit and form the always-loaded digest a consumer installs. **Engineering-craft** rules govern how the work built under the methodology is written; they are load-triggered by test, rename, git-rewrite, config-edit, and dispatch work and live behind the link — an application of the load-trigger residency rule to the doctrine itself.
+The roster is in two registers. **Methodology-maintenance** rules govern how the methodology's own surfaces stay honest; they bear on every surface edit and form the always-loaded digest a consumer installs. **Engineering-craft** rules govern how the work built under the methodology is written; each is load-triggered by the stages its `*Stages:*` trailer names, and they live behind the link — an application of the load-trigger residency rule to the doctrine itself.
 
 ## Methodology-maintenance rules
 

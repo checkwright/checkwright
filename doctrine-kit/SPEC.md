@@ -8,7 +8,7 @@ The kit is a new remit rather than a fold into canon-kit: the doctrine spans kit
 
 `DOCTRINE.md` is the deliverable. It carries each cross-kit rule as its statement, why it holds under coding-agent work, and a pointer to the kit mechanism that enforces it; the mechanism and its knob rosters live in the cited kit SPEC, never restated in the doctrine. The rule *statements* are the doctrine's to own — a governed surface elsewhere cites a rule by name and links the doctrine rather than restating it.
 
-The roster carries two registers. Methodology-maintenance rules govern how the methodology's own surfaces stay honest and bear on every surface edit. Engineering-craft rules govern how the work built under the methodology is written, and are triggered by test, rename, git-rewrite, config-edit, and dispatch work. The maintenance register forms the installed digest; the craft register lives behind the link, load-triggered — the doctrine applying its own load-trigger residency rule to itself.
+The roster carries two registers. Methodology-maintenance rules govern how the methodology's own surfaces stay honest and bear on every surface edit. Engineering-craft rules govern how the work built under the methodology is written, and each is triggered by the stages its trailer names (§stage-rules). The maintenance register forms the installed digest; the craft register lives behind the link, load-triggered — the doctrine applying its own load-trigger residency rule to itself.
 
 **What a rule body owes beyond its digest.** A rule's body carries four things, and length grades none of them:
 
