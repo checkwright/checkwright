@@ -10,22 +10,6 @@
 
 ## Technical Debt
 
-### windows-hook-legs-unexecuted
-
-four behaviors windows-shell-floor-pass landed run on no Windows leg. gate-sdk/gate-tests/native-git-hooks.test.sh skips its replaced-launcher forwarding assertion on a host with an executable suffix. The Windows hook witness in `.github/workflows/gates.yml` exercises `pre-commit` alone, leaving `commit-msg`, the absent-binary refusal, the self-name refusal and the linked-worktree case to Ubuntu. The session-context hook member's configured-command spawn has no Windows end-to-end run. The stop-restore witness checks `ErrorActionPreference` after a successful install block only, never a failing block nor the fetch fence's `ProgressPreference`.
-
-**Deliverable:** each run on a Windows leg, or a stated reason one cannot be.
-
-**Read at promotion, 2026-10-10:** the last three hold. The Windows witness steps name `pre-commit.exe` alone, no step of the workflow starts a hook member, and the stop-restore witness reads the error preference after a block that exited 0, while no step asserts the progress preference.
-
-**Push need (2026-10-10, inside the budget):** one mid-iteration push, since a new Windows assertion runs on the remote leg alone; `action-walk-yaml-shapes` and the front-door job's workflow text ride the same push.
-
-**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration.
-
-**Rider (2026-10-10, operator direction, lead-relayed, not a ruling):** a Windows-leg witness for `scripts/ci-front-door.ps1` joins `gates.yml` and rides this unit's push. It must have the file parsed and executed by a PowerShell host on a Windows leg on every push; the mechanism is build's.
-
-**Cost while deferred:** a Windows-only regression in any of the four ships green. Filed 2026-10-07 off windows-shell-floor-pass' close second-vendor review, carried to the next scope's intake; the first held there by reading the test. Owner lookup: `Windows leg`, `ErrorActionPreference`, `stop-restore`, `witness` in this file and the disposed-findings record — [windows-kpi-plugin-start](#windows-kpi-plugin-start), DISTINCT (a plugin Windows cannot start); owner gate-sdk/SPEC.md §git-hook, with context-kit/SPEC.md §The session-context hook.
-
 ## Deferred
 
 ### guard-quoted-operand-words
@@ -1232,4 +1216,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - hermetic-preamble-overlay-read
 - hook-staging-fixed-sibling
 - action-walk-yaml-shapes
+- windows-hook-legs-unexecuted
 
