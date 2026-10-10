@@ -10,8 +10,6 @@
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
-# spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the graph is the real registry's, whose couples tokens resolve delegation-kit's config, so its knob file is un-pinned and read beside the overlay the pin leaves read
-unset DELEGATION_KIT_KNOB_FILE
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # gate-sdk/
 CHECKS="$DIR/checks"

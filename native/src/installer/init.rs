@@ -1172,7 +1172,7 @@ mod tests {
     fn a_projection_lands_at_the_consumers_knob_and_owns_only_a_tree_path() {
         let env = crate::knobenv::lock();
         let knob = "GATE_SDK_GRAPH_ARTIFACT";
-        for n in ["GATE_SDK_GATES_DIR", "GATE_SDK_KNOB_FILE", "GATE_SDK_CONFIG_FILE", knob] {
+        for n in ["GATE_SDK_GATES_DIR", "GATE_SDK_KNOB_FILE", "GATE_SDK_LOCAL_KNOB_FILE", "GATE_SDK_CONFIG_FILE", knob] {
             env.remove(n);
         }
         let root = std::env::temp_dir().join(format!("cw-init-knob-{}", std::process::id()));

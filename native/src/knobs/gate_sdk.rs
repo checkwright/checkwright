@@ -284,7 +284,7 @@ mod tests {
             ("GATE_SDK_NATIVE_RUNNERS_FILE", "gate_native_runners_file"),
         ];
         let clear = |env: &knobenv::KnobEnv| {
-            for n in ["GATE_SDK_NATIVE_BIN", "GATE_SDK_NATIVE_CRATE", "GATE_SDK_NATIVE_TARGETS_FILE", "GATE_SDK_NATIVE_RUNNERS_FILE", "GATE_SDK_MSG_PATTERN_FILES", "GATE_SDK_MSG_PATTERN_FILES_LOCAL", "GATE_SDK_KNOB_FILE"] {
+            for n in ["GATE_SDK_NATIVE_BIN", "GATE_SDK_NATIVE_CRATE", "GATE_SDK_NATIVE_TARGETS_FILE", "GATE_SDK_NATIVE_RUNNERS_FILE", "GATE_SDK_MSG_PATTERN_FILES", "GATE_SDK_MSG_PATTERN_FILES_LOCAL", "GATE_SDK_KNOB_FILE", "GATE_SDK_LOCAL_KNOB_FILE"] {
                 env.remove(n);
             }
             let _ = std::fs::remove_file(dir.join("gate-sdk-config.knobs"));

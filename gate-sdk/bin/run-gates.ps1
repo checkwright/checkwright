@@ -211,13 +211,14 @@ function Get-KnobFileValue {
     return $null
 }
 
-# spec: gate-sdk/SPEC.md §lib/gate.sh — _gate_prebinary_knob: the environment, the local overlay, the tracked file or GATE_SDK_KNOB_FILE, then the default; an empty value at any tier falls through
+# spec: gate-sdk/SPEC.md §lib/gate.sh — _gate_prebinary_knob: the environment, the local overlay or GATE_SDK_LOCAL_KNOB_FILE, the tracked file or GATE_SDK_KNOB_FILE, then the default; an empty value at any tier falls through
 function Get-PrebinaryKnob {
     param([string] $Name, [string] $Default)
     $v = [Environment]::GetEnvironmentVariable($Name)
     if ($v) { return $v }
     $dir = Get-GatesDir
-    $v = Get-KnobFileValue -File "$dir/gate-sdk-config.local.knobs" -Name $Name
+    $local = if ($env:GATE_SDK_LOCAL_KNOB_FILE) { $env:GATE_SDK_LOCAL_KNOB_FILE } else { "$dir/gate-sdk-config.local.knobs" }
+    $v = Get-KnobFileValue -File $local -Name $Name
     if ($v) { return $v }
     $tracked = if ($env:GATE_SDK_KNOB_FILE) { $env:GATE_SDK_KNOB_FILE } else { "$dir/gate-sdk-config.knobs" }
     $v = Get-KnobFileValue -File $tracked -Name $Name

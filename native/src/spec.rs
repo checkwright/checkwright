@@ -1845,6 +1845,7 @@ mod tests {
         std::fs::create_dir_all(&d).expect("scratch");
         knobs.set("GATE_SDK_GATES_DIR", &d.display().to_string());
         knobs.remove("CANON_KIT_KNOB_FILE");
+        knobs.remove("CANON_KIT_LOCAL_KNOB_FILE");
         knobs.remove("CANON_KIT_MIRROR_ROOT");
         for value in ["docs", "./site/ref/"] {
             std::fs::write(d.join("canon-config.knobs"), format!("CANON_KIT_MIRROR_ROOT = {}\n", value)).expect("write");
@@ -1873,6 +1874,7 @@ mod tests {
         std::fs::write(d.join("docs/api/SPEC.md"), "# api\n").expect("write");
         knobs.set("GATE_SDK_GATES_DIR", &gates.display().to_string());
         knobs.remove("CANON_KIT_KNOB_FILE");
+        knobs.remove("CANON_KIT_LOCAL_KNOB_FILE");
         knobs.remove("CANON_KIT_MIRROR_ROOT");
         let found = |value: &str| {
             std::fs::write(gates.join("canon-config.knobs"), format!("CANON_KIT_MIRROR_ROOT = {}\n", value)).expect("write");
@@ -1904,6 +1906,7 @@ mod tests {
         std::fs::write(tree.join("a.sh"), "echo\n").expect("write");
         knobs.set("GATE_SDK_GATES_DIR", &gates.display().to_string());
         knobs.remove("CANON_KIT_KNOB_FILE");
+        knobs.remove("CANON_KIT_LOCAL_KNOB_FILE");
         knobs.remove("CANON_KIT_COMMENT_SURFACE");
         let root = tree.display().to_string();
         let surface = |value: &str| {
@@ -1948,6 +1951,7 @@ mod tests {
         }
         knobs.set("GATE_SDK_GATES_DIR", &gates.display().to_string());
         knobs.remove("CANON_KIT_KNOB_FILE");
+        knobs.remove("CANON_KIT_LOCAL_KNOB_FILE");
         knobs.remove("CANON_KIT_COMMENT_ACTIONS");
         knobs.remove("CANON_KIT_COMMENT_SURFACE");
         crate::knobs::reset(&knobs);
@@ -1977,7 +1981,7 @@ mod tests {
         std::fs::create_dir_all(&tree).expect("scratch");
         std::fs::write(gates.join("canon-config.knobs"), knobs).expect("write");
         env.set("GATE_SDK_GATES_DIR", &gates.display().to_string());
-        for k in ["CANON_KIT_KNOB_FILE", "CANON_KIT_MANIFEST_FILES", "CANON_KIT_PROSE_SURFACE_GLOBS", "CANON_KIT_SCAN_KIT_ROOTS"] {
+        for k in ["CANON_KIT_KNOB_FILE", "CANON_KIT_LOCAL_KNOB_FILE", "CANON_KIT_MANIFEST_FILES", "CANON_KIT_PROSE_SURFACE_GLOBS", "CANON_KIT_SCAN_KIT_ROOTS"] {
             env.remove(k);
         }
         crate::knobs::reset(env);

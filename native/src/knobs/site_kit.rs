@@ -163,6 +163,7 @@ mod tests {
         std::fs::create_dir_all(&d).expect("scratch");
         env.set("GATE_SDK_GATES_DIR", &d.display().to_string());
         env.remove("SITE_KIT_KNOB_FILE");
+        env.remove("SITE_KIT_LOCAL_KNOB_FILE");
         env.remove("SITE_KIT_CONFIG_FILE");
         reset(&env);
         let batch = wire("SITE_KIT_RENDERER_BATCH").unwrap();

@@ -80,34 +80,32 @@ fn refusal(hook: &str, bin: &str, cause: &str) -> String {
 // the two knob files, each parsed only on the lines naming it, so a name this build's table lacks is
 // the started build's to judge
 fn bin_knob() -> Result<String, String> {
-    let named = std::env::var(gate_sdk::KIT.knob_file_var()).ok().filter(|v| !v.is_empty());
-    bin_from(std::env::var(BIN_KNOB).ok(), &knobs::gates_dir(), named.as_deref())
+    let set = |var: String| std::env::var(var).ok().filter(|v| !v.is_empty());
+    let named = set(gate_sdk::KIT.knob_file_var());
+    let local = set(gate_sdk::KIT.local_knob_file_var());
+    bin_from(std::env::var(BIN_KNOB).ok(), &knobs::gates_dir(), named.as_deref(), local.as_deref())
 }
 
-fn bin_from(env: Option<String>, dir: &str, named: Option<&str>) -> Result<String, String> {
+fn bin_from(env: Option<String>, dir: &str, named: Option<&str>, local: Option<&str>) -> Result<String, String> {
     let stem = gate_sdk::KIT.stem();
+    let layer = |locator: Option<&str>, var: String, infix: &str| match locator {
+        Some(f) => in_file(f, Some(&var)),
+        None => in_file(&format!("{}/{}-config{}.knobs", dir, stem, infix), None),
+    };
     let set = match env {
         Some(v) => Some(v),
-        None => match in_file(&format!("{}/{}-config.local.knobs", dir, stem), false)? {
+        None => match layer(local, gate_sdk::KIT.local_knob_file_var(), ".local")? {
             Some(v) => Some(v),
-            None => match named {
-                Some(f) => in_file(f, true)?,
-                None => in_file(&format!("{}/{}-config.knobs", dir, stem), false)?,
-            },
+            None => layer(named, gate_sdk::KIT.knob_file_var(), "")?,
         },
     };
     Ok(set.filter(|v| !v.is_empty()).unwrap_or_else(gate_sdk::host_native_bin))
 }
 
-fn in_file(path: &str, named: bool) -> Result<Option<String>, String> {
+fn in_file(path: &str, named_by: Option<&str>) -> Result<Option<String>, String> {
     if !Path::new(path).is_file() {
-        if named {
-            return Err(format!(
-                "{} names {}, which does not exist, so {} cannot be read",
-                gate_sdk::KIT.knob_file_var(),
-                path,
-                BIN_KNOB
-            ));
+        if let Some(var) = named_by {
+            return Err(format!("{} names {}, which does not exist, so {} cannot be read", var, path, BIN_KNOB));
         }
         return Ok(None);
     }
@@ -207,20 +205,29 @@ mod tests {
             format!("{} = x\nnot a knob line at all\n{}_OTHER[] = y\n  {} = bin/tracked\n", unheld, BIN_KNOB, BIN_KNOB),
         )
         .expect("write");
-        let from_tracked = bin_from(None, &dir, None);
-        let from_env = bin_from(Some("bin/env".to_string()), &dir, None);
-        let empty_env = bin_from(Some(String::new()), &dir, None);
+        let from_tracked = bin_from(None, &dir, None, None);
+        let from_env = bin_from(Some("bin/env".to_string()), &dir, None, None);
+        let empty_env = bin_from(Some(String::new()), &dir, None, None);
         std::fs::write(d.join("gate-sdk-config.local.knobs"), format!("{}[k] = 1\n{} = bin/local\n", unheld, BIN_KNOB)).expect("write");
-        let from_local = bin_from(None, &dir, None);
-        std::fs::write(d.join("gate-sdk-config.local.knobs"), "GATE_SDK_NATIVE_BIN =\n").expect("write");
-        let empty_local = bin_from(None, &dir, None);
-        std::fs::remove_file(d.join("gate-sdk-config.local.knobs")).expect("remove");
+        let from_local = bin_from(None, &dir, None, None);
         let named = d.join("elsewhere.knobs");
         std::fs::write(&named, "GATE_SDK_NATIVE_BIN = bin/named\n").expect("write");
-        let from_named = bin_from(None, &dir, Some(&named.display().to_string()));
+        let overlay = d.join("elsewhere.local.knobs");
+        std::fs::write(&overlay, "").expect("write");
+        let past_named_overlay = bin_from(None, &dir, None, Some(&overlay.display().to_string()));
+        std::fs::write(&overlay, "GATE_SDK_NATIVE_BIN = bin/named-local\n").expect("write");
+        let from_named_overlay = bin_from(None, &dir, Some(&named.display().to_string()), Some(&overlay.display().to_string()));
+        let local_past_named = bin_from(None, &dir, Some(&named.display().to_string()), None);
+        std::fs::write(d.join("gate-sdk-config.local.knobs"), "GATE_SDK_NATIVE_BIN =\n").expect("write");
+        let empty_local = bin_from(None, &dir, None, None);
+        std::fs::remove_file(d.join("gate-sdk-config.local.knobs")).expect("remove");
+        let from_named = bin_from(None, &dir, Some(&named.display().to_string()), None);
         std::fs::remove_file(&tracked).expect("remove");
-        let from_default = bin_from(None, &dir, None);
+        let from_default = bin_from(None, &dir, None, None);
         let _ = std::fs::remove_dir_all(&d);
+        assert_eq!(past_named_overlay, Ok("bin/tracked".to_string()));
+        assert_eq!(from_named_overlay, Ok("bin/named-local".to_string()));
+        assert_eq!(local_past_named, Ok("bin/local".to_string()));
         assert_eq!(from_tracked, Ok("bin/tracked".to_string()));
         assert_eq!(from_env, Ok("bin/env".to_string()));
         assert_eq!(empty_env, Ok(gate_sdk::host_native_bin()));
@@ -231,7 +238,7 @@ mod tests {
     }
 
     // spec: gate-sdk/SPEC.md §git-hook — a line setting the knob that is no scalar, the knob given
-    // twice, and a named knob file that is absent each leave no binary to start, so each refuses
+    // twice, and a named knob file or overlay that is absent each leave no binary to start, so each refuses
     // naming its file
     #[test]
     fn a_line_setting_the_knob_that_is_no_scalar_refuses_with_its_file_and_line() {
@@ -247,10 +254,12 @@ mod tests {
             "GATE_SDK_NATIVE_BIN = a\n# c\nGATE_SDK_NATIVE_BIN = b",
         ] {
             std::fs::write(&tracked, format!("# lead\n{}\n", bad)).expect("write");
-            got.push((bad.to_string(), bin_from(None, &dir, None).expect_err(bad)));
+            got.push((bad.to_string(), bin_from(None, &dir, None, None).expect_err(bad)));
         }
         let absent = d.join("absent.knobs").display().to_string();
-        let missing = bin_from(None, &dir, Some(&absent)).expect_err("a named file that is absent");
+        let missing = bin_from(None, &dir, Some(&absent), None).expect_err("a named file that is absent");
+        let no_overlay = bin_from(None, &dir, None, Some(&absent)).expect_err("a named overlay that is absent");
+        assert!(no_overlay.contains(&absent) && no_overlay.contains("GATE_SDK_LOCAL_KNOB_FILE"), "{}", no_overlay);
         let _ = std::fs::remove_dir_all(&d);
         let at = format!("{}/gate-sdk-config.knobs:", dir);
         for (bad, e) in &got {

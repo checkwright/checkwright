@@ -345,6 +345,10 @@ impl Kit {
         format!("{}KNOB_FILE", self.prefix())
     }
 
+    pub fn local_knob_file_var(&self) -> String {
+        format!("{}LOCAL_KNOB_FILE", self.prefix())
+    }
+
     fn row(&self, name: &str) -> Option<&'static Row> {
         self.rows.iter().find(|r| r.name == name)
     }
@@ -380,6 +384,7 @@ impl Kit {
         self.open_family
             && name.starts_with(&self.prefix())
             && name != self.knob_file_var()
+            && name != self.local_knob_file_var()
             && name != format!("{}CONFIG_FILE", self.prefix())
             && self.replacement(name).is_none()
     }
@@ -404,13 +409,14 @@ pub const STATIC_KITS: &[&Kit] = &[
 ];
 
 // spec: canon-kit/SPEC.md §check-docs-cmd — every name a static kit's reader reads: its declared
-// knobs, its file locator, the retired locator the legacy refusal still reads, each retired name
-// the refusal names, and the environment-only names
+// knobs, its two file locators, the retired locator the legacy refusal still reads, each retired
+// name the refusal names, and the environment-only names
 pub fn static_names() -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     for kit in STATIC_KITS {
         out.extend(kit.rows.iter().map(|r| r.name.to_string()));
         out.push(kit.knob_file_var());
+        out.push(kit.local_knob_file_var());
         out.push(format!("{}CONFIG_FILE", kit.prefix()));
         out.extend(kit.retired.iter().map(|(n, _)| n.to_string()));
         out.extend(kit.env_only.iter().map(|n| n.to_string()));
@@ -496,7 +502,7 @@ struct Layers {
     tracked: Layer,
 }
 
-type CacheKey = (&'static str, String, String, String);
+type CacheKey = (&'static str, String, String, String, String);
 type Loaded = Arc<Result<Layers, String>>;
 type Cache = Mutex<Vec<(CacheKey, Loaded)>>;
 
@@ -525,6 +531,7 @@ fn cache_key(kit: &'static Kit) -> CacheKey {
         gates_dir(),
         std::env::var(kit.knob_file_var()).unwrap_or_default(),
         std::env::var(format!("{}CONFIG_FILE", kit.prefix())).unwrap_or_default(),
+        std::env::var(kit.local_knob_file_var()).unwrap_or_default(),
     )
 }
 
@@ -534,14 +541,20 @@ fn layers(kit: &'static Kit) -> Loaded {
     if let Some((_, l)) = held.iter().find(|(k, _)| *k == key) {
         return l.clone();
     }
-    let l = Arc::new(load(kit, &key.1, &key.2, &key.3));
+    let l = Arc::new(load(kit, &key.1, &key.2, &key.3, &key.4));
     held.push((key, l.clone()));
     l
 }
 
 // spec: gate-sdk/SPEC.md §The knob file — the legacy refusals come first, because a shell config left
 // behind at upgrade would otherwise be silently ignored and drop the consumer's values
-fn load(kit: &'static Kit, dir: &str, knob_file: &str, config_file: &str) -> Result<Layers, String> {
+fn load(
+    kit: &'static Kit,
+    dir: &str,
+    knob_file: &str,
+    config_file: &str,
+    local_file: &str,
+) -> Result<Layers, String> {
     let stem = kit.stem();
     for legacy in [
         format!("{}/{}-config.sh", dir, stem),
@@ -586,7 +599,21 @@ fn load(kit: &'static Kit, dir: &str, knob_file: &str, config_file: &str) -> Res
         }
         knob_file.to_string()
     };
-    let local_path = format!("{}/{}-config.local.knobs", dir, stem);
+    let local_path = if local_file.is_empty() {
+        format!("{}/{}-config.local.knobs", dir, stem)
+    } else {
+        if !Path::new(local_file).is_file() {
+            return Err(format!(
+                "{} names {}, which does not exist — point it at the local overlay, or unset it to \
+                 read {}/{}-config.local.knobs",
+                kit.local_knob_file_var(),
+                local_file,
+                dir,
+                stem
+            ));
+        }
+        local_file.to_string()
+    };
     Ok(Layers {
         local: read_layer(kit, &local_path)?,
         tracked: read_layer(kit, &tracked_path)?,
@@ -921,7 +948,8 @@ pub fn wire_in(gates_dir: &str, name: &str) -> Result<String, String> {
     let (kit, row) = static_row(name)?;
     let knob_file = std::env::var(kit.knob_file_var()).unwrap_or_default();
     let config_file = std::env::var(format!("{}CONFIG_FILE", kit.prefix())).unwrap_or_default();
-    let l = load(kit, gates_dir, &knob_file, &config_file)?;
+    let local_file = std::env::var(kit.local_knob_file_var()).unwrap_or_default();
+    let l = load(kit, gates_dir, &knob_file, &config_file, &local_file)?;
     Ok(or_default(row, layered_from(&l, row.name, row.shape)?)?.0.wire())
 }
 
@@ -1192,6 +1220,7 @@ mod tests {
         env.set("GATE_SDK_GATES_DIR", dir);
         for k in STATIC_KITS {
             env.remove(&k.knob_file_var());
+            env.remove(&k.local_knob_file_var());
             env.remove(&format!("{}CONFIG_FILE", k.prefix()));
             for r in k.rows {
                 env.remove(r.name);
@@ -1395,6 +1424,19 @@ mod tests {
         let pinned = s.write("pinned.knobs", "SITE_KIT_CNAME = PINNED\n");
         env.set("SITE_KIT_KNOB_FILE", &pinned);
         assert_eq!(wire("SITE_KIT_CNAME").unwrap(), "PINNED");
+
+        s.write("site-config.local.knobs", "SITE_KIT_CNAME = BESIDE\n");
+        reset(&env);
+        assert_eq!(wire("SITE_KIT_CNAME").unwrap(), "BESIDE", "a relocated tracked file leaves the overlay where it is");
+        env.set("SITE_KIT_LOCAL_KNOB_FILE", &format!("{}/absent.local.knobs", s.dir()));
+        let absent = resolve("SITE_KIT_CNAME").unwrap_err();
+        assert!(absent.contains("SITE_KIT_LOCAL_KNOB_FILE") && absent.contains("does not exist"), "{}", absent);
+        let named = s.write("named.local.knobs", "SITE_KIT_CNAME = NAMED\n");
+        env.set("SITE_KIT_LOCAL_KNOB_FILE", &named);
+        assert_eq!(wire("SITE_KIT_CNAME").unwrap(), "NAMED");
+        let none = s.write("none.local.knobs", "");
+        env.set("SITE_KIT_LOCAL_KNOB_FILE", &none);
+        assert_eq!(wire("SITE_KIT_CNAME").unwrap(), "PINNED", "a named empty overlay leaves the one beside the gates directory unread");
         clean(&env, &s.dir());
         restore(&env);
     }
@@ -1916,6 +1958,7 @@ mod tests {
         for (body, want) in [
             ("DRIFT_KIT_SMOKE_CUSTOM[] = x\n", "not a drift-kit knob"),
             ("DRIFT_KIT_KNOB_FILE = x\n", "not a drift-kit knob"),
+            ("DRIFT_KIT_LOCAL_KNOB_FILE = x\n", "not a drift-kit knob"),
             ("DRIFT_KIT_CONFIG_FILE = x\n", "not a drift-kit knob"),
             ("DRIFT_KIT_SMOKE_CUSTOM = a\nDRIFT_KIT_SMOKE_CUSTOM = b\n", "given twice"),
         ] {

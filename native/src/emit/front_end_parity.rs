@@ -329,6 +329,25 @@ const CORPUS: &[Case] = &[
         "./from-override/gates",
     ),
     absent(
+        "GATE_SDK_NATIVE_BIN from a GATE_SDK_LOCAL_KNOB_FILE override",
+        &[("GATE_SDK_LOCAL_KNOB_FILE", "alt.local.knobs")],
+        &[
+            ("alt.local.knobs", "GATE_SDK_NATIVE_BIN=from-local-override/gates\n"),
+            (LOCAL, "GATE_SDK_NATIVE_BIN=from-local/gates\n"),
+            (TRACKED, "GATE_SDK_NATIVE_BIN=from-tracked/gates\n"),
+        ],
+        "./from-local-override/gates",
+    ),
+    absent(
+        "GATE_SDK_NATIVE_BIN past a GATE_SDK_LOCAL_KNOB_FILE naming an absent file",
+        &[("GATE_SDK_LOCAL_KNOB_FILE", "absent.local.knobs")],
+        &[
+            (LOCAL, "GATE_SDK_NATIVE_BIN=from-local/gates\n"),
+            (TRACKED, "GATE_SDK_NATIVE_BIN=from-tracked/gates\n"),
+        ],
+        "./from-tracked/gates",
+    ),
+    absent(
         "GATE_SDK_NATIVE_BIN from a GATE_SDK_GATES_DIR knob directory",
         &[("GATE_SDK_GATES_DIR", "cfg")],
         &[

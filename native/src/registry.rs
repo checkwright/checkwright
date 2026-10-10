@@ -1012,6 +1012,7 @@ mod tests {
         std::fs::write(d.join("canon-config.knobs"), body).expect("write");
         knobs.set("GATE_SDK_GATES_DIR", &d.display().to_string());
         knobs.remove("CANON_KIT_KNOB_FILE");
+        knobs.remove("CANON_KIT_LOCAL_KNOB_FILE");
         crate::knobs::reset(knobs);
         d
     }

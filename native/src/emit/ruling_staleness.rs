@@ -645,6 +645,7 @@ mod tests {
         .unwrap();
         knobs.set("GATE_SDK_GATES_DIR", &dir.join("cfg").display().to_string());
         knobs.remove("LIFECYCLE_KIT_KNOB_FILE");
+        knobs.remove("LIFECYCLE_KIT_LOCAL_KNOB_FILE");
         crate::knobs::reset(&knobs);
         let got = cite_corpus(&dir.display().to_string(), "record.md");
         knobs.remove("GATE_SDK_GATES_DIR");

@@ -57,14 +57,14 @@ _gate_prebinary_file_value() {  # <file> <NAME> <outvar>
     return 1
 }
 
-# spec: gate-sdk/SPEC.md §lib/gate.sh — a pre-binary knob over the static precedence: the environment, the local overlay, the tracked file, then the default its caller derives as the table does; an empty value takes the default, as each of these rows does
+# spec: gate-sdk/SPEC.md §lib/gate.sh — a pre-binary knob over the static precedence: the environment, the local overlay, the tracked file, each file at its locator where one is set, then the default its caller derives as the table does; an empty value takes the default, as each of these rows does
 _gate_prebinary_knob() {  # <NAME> <default>
     local _gpk_name="$1" _gpk_dir="${GATE_SDK_GATES_DIR:-scripts}" _gpk_v=""
     if [[ -n "${!_gpk_name:-}" ]]; then
         printf '%s\n' "${!_gpk_name}"
         return 0
     fi
-    if _gate_prebinary_file_value "$_gpk_dir/gate-sdk-config.local.knobs" "$_gpk_name" _gpk_v && [[ -n "$_gpk_v" ]]; then
+    if _gate_prebinary_file_value "${GATE_SDK_LOCAL_KNOB_FILE:-$_gpk_dir/gate-sdk-config.local.knobs}" "$_gpk_name" _gpk_v && [[ -n "$_gpk_v" ]]; then
         printf '%s\n' "$_gpk_v"
         return 0
     fi

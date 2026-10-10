@@ -8,20 +8,6 @@
 
 ## New Features
 
-### hermetic-preamble-overlay-read
-
-[spec: SPEC-overlay-locator.md]
-
-`lib/test-hermetic.sh` pins every kit's knob file at an empty one and leaves each kit's local overlay read (gate-sdk/SPEC.md §lib/test-hermetic.sh, its honest limit), so a suite running on kit defaults can be refused by a row a seat's overlay binds. It was met in three graph suites, where a delegation overlay bound a tier row on a class the default roster lacks and the graph emit exited 2. Those three now un-pin delegation-kit's knob file, by operator direction of 2026-10-09, lead-relayed (not a ruling), and `stop-test-reads-local-overlay` fixed a fourth suite by moving its gates directory.
-
-**Deliverable:** the preamble's treatment of overlays decided once, either an overlay pinned beside its knob file or the limit kept with a holder that names the suites it reaches, in place of a per-suite un-pin.
-
-**Run at spec, on a copy of the gates directory:** a lifecycle-kit overlay row turns that kit's fixture run from 4 failing lines to 56, so the class is every kit's.
-
-**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration; the deliverable's choice is spec's. **Chosen at spec:** the overlay pinned, through a locator of its own.
-
-**Cost while deferred:** a commit reaching `native/` is refused on such a seat while the remote stays green, and each further suite is found one refusal at a time. Filed 2026-10-09 by crate-reader-hardening-pass' first build batch and promoted at its close. Re-verified by grep: the three suites carry `unset DELEGATION_KIT_KNOB_FILE`. Owner lookup: `test-hermetic`, `overlay`, `hermetic` in this file and the disposed-findings record — [config-variant-battery-harness](#config-variant-battery-harness), DISTINCT (a shipped variant runner); [hermetic-harness-export-masks-the-condition-under-test](#hermetic-harness-export-masks-the-condition-under-test) and [hermetic-bin-roster-config](#hermetic-bin-roster-config), both DISTINCT (pins voiding an arm, a bin roster seam); owner gate-sdk/SPEC.md §lib/test-hermetic.sh.
-
 ## Technical Debt
 
 ### hook-staging-fixed-sibling
@@ -1261,4 +1247,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - front-door-rehearsal-rule
 - contributor-writeback-disposition
 - inherited-stdout-child-status
+- hermetic-preamble-overlay-read
 

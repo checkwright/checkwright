@@ -202,6 +202,9 @@ echo "stub started: $*"
 exit 0
 EOF
     chmod +x "$SANDBOX/pass"
+    # spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — these cases read the sandbox repository's own overlay, so its pin is lifted for them
+    overlay_pin="$GATE_SDK_LOCAL_KNOB_FILE"
+    unset GATE_SDK_LOCAL_KNOB_FILE
     printf 'GATE_SDK_MINTED_BY_A_LATER_BUILD = on\nGATE_SDK_NATIVE_BIN = %s\n' "$SANDBOX/pass" >"$repo/scripts/gate-sdk-config.local.knobs"
     printf 'a later note\n' >"$repo/f.txt"
     g add f.txt
@@ -216,6 +219,7 @@ EOF
     [[ "$rc" -eq 2 ]] || note bin-line-status "want exit 2 from the launcher over a line setting its knob as no scalar, got $rc -- $out"
     grep -qF 'scripts/gate-sdk-config.local.knobs:1: ' <<<"$out" || note bin-line-text "the refusal does not name the file and line: $out"
     rm -f "$repo/scripts/gate-sdk-config.local.knobs"
+    export GATE_SDK_LOCAL_KNOB_FILE="$overlay_pin"
 fi
 
 # 15. --refresh re-places both hooks from a replaced binary and does nothing else; off the work-tree top it places nothing, and an absent binary refuses at 2
