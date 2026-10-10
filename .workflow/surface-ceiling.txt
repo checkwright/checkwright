@@ -80,6 +80,7 @@
 6070cp docs/posts/2026-09-28-checkwright-v0-29-0.md
 6808cp docs/posts/2026-09-29-checkwright-v0-30-0.md
 4672cp docs/posts/2026-09-30-checkwright-v0-31-0.md
+106074cp docs/posts/2026-10-10-checkwright-v0-32-0.md
 6752cp docs/projection-fan-outs.md
 1460cp docs/queue-kit/index.md
 789cp docs/releases.md
@@ -94,9 +95,9 @@
 2698cp drift-kit/templates/close-knowledge.md
 4270cp drift-kit/templates/economics.md
 85183cp evidence-kit/SPEC.md
-992689cp gate-sdk/SPEC.md
+992444cp gate-sdk/SPEC.md
 2899cp gate-sdk/templates/adopt.md
-302895cp guard-kit/SPEC.md
+302866cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
 281359cp installer/SPEC.md
 385672cp lifecycle-kit/SPEC.md
