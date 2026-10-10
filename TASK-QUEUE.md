@@ -18,6 +18,8 @@ Two rules read a command word without its quoting. Rule `rm_tracked`'s bash arm 
 
 **Cost while deferred:** a quoted `rm` of a tracked path deletes unstaged, outside the block's steer; a `find_exec` steer naming an escaped blank cannot be followed as printed. Filed 2026-10-03 by guard-ruleset-gate-neutrality-pass' spec. An exact word needs per-word quoting provenance that no rule consumes yet, and stripping backslashes, as rule `grant_path_slot` does, breaks the common single-quoted regex steer. That makes it a reader contract with cross-rule reach, the escaped-blank precedent's ground. Re-verified by hook probe: both steers as quoted above, and the `rm_tracked` premise widened from blank-bearing names to every quoted operand. Owner lookup: `shell_word`, `quoted operand`, `rm_tracked`, `exact word` in this file — none; owner guard-kit/SPEC.md §The reader and its views.
 
+**Answered at align (2026-10-10, operator direction, lead-relayed, not a ruling):** the behaviour is accepted as the amendment authors it, with its three departures from the Deliverable's literal-or-glob reading and rule `find_exec`'s two verdict moves, each stated in the amendment's user-facing marks. The operator was shown: a quoted PowerShell path tested as a glob; a quoted operand carrying `*`, `?` or `[` skipped, so `rm '*.md'` passes; `-exec cat '{}' '\;'` no longer steered and `-exec \cat '{}' \;` steered.
+
 ### shared-tree-stash-steer
 
 [spec: SPEC-git-stash.md]
@@ -27,6 +29,8 @@ A build session ran `git stash` / `git stash pop` on the shared checkout to rebu
 **Deliverable:** a steer from a worktree-rewriting `git stash` on the main checkout to `git worktree add` under the scratch dir, either as a guard-kit block with its decision-table rows or as a delegation-kit/templates/agent-execution.md bullet; choosing between them is the unit's spec question.
 
 **Cost while deferred:** a concurrent session's uncommitted edits or staged paths can vanish or be re-applied under it. Lead-observed once, with the tree intact. Read at spec 2026-10-10: the friction log, which records every call no rule decides and so every stash outside a live producer, held no stash call since its last truncation beyond that stage's own probes. Spec chose the guard-kit block over the template bullet (2026-10-10, the Deliverable's own question). Filed 2026-10-03 by the lead at guard-ruleset-gate-neutrality-pass' build. Re-verified: `stash` sits only in the live-producer act set, and no template text names stash or a before/after probe. Owner lookup: `stash`, `before/after`, `throwaway` in this file — none; owner guard-kit/SPEC.md §The rule roster.
+
+**Answered at align (2026-10-10, operator direction, lead-relayed, not a ruling):** the rule blocks and mints no knob, and the amendment argues that against the Policy-as-choice rule.
 
 ### wait-exemption-body-unbounded
 
@@ -39,6 +43,8 @@ guard-kit rule `background_no_record`'s bash exemption (2) exempts any backgroun
 **Cost while deferred:** rule `git_mutation_under_producer` has no record to read for such a loop, so a commit under it passes. Filed 2026-10-07 by delegation-wait-journal-pass' build.
 
 **Reach (2026-10-10, operator direction, lead-relayed, not a ruling):** the body, plus the statements after the loop held to the read-only test; the condition is not held. This widens the Deliverable above, and the amendment carries it.
+
+**Answered at align (2026-10-10, operator direction, lead-relayed, not a ruling):** the exemption also refuses a statement ending in a lone `&`, which the body and tail tests alone admit behind a `sleep` or a banner.
 
 ### exec-form-hook-registration
 
@@ -55,6 +61,8 @@ the hook-wiring rewire windows-kit-bash-files did not land: context-kit and guar
 **Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** this entry leads hook-placement-guard-rules-pass with [windows-running-hook-replace](#windows-running-hook-replace), [hook-sibling-pid-namespace](#hook-sibling-pid-namespace), [replaced-binary-self-path](#replaced-binary-self-path), [guard-quoted-operand-words](#guard-quoted-operand-words), [shared-tree-stash-steer](#shared-tree-stash-steer), [wait-exemption-body-unbounded](#wait-exemption-body-unbounded) and [inline-python-steer-split](#inline-python-steer-split). The edit to this repo's own registrations waits for the operator's confirmation of the prepared diff, owed when the diff exists.
 
 **Answered at spec (2026-10-10; operator directions, lead-relayed, not rulings, but the third):** the exec form is the one shipped wiring, and the quiet absent-binary state is accepted, which reverses the refusal gate-sdk/SPEC.md §run-gates records; the host with no bash at all is a stated limit, with no operator run this iteration; a minimum harness version is stated on the requirements page, inferred until a witness runs. Lead decision: a template names the binary by the existing placeholder, guard-kit's `check-door-binding` assertion B unchanged, revisable against the oracle.
+
+**Answered at align (2026-10-10; lead decisions, each a constraint the amendment meets, revisable against the oracle):** one registration parser serves every caller and reads the template the amendment ships; after the change the bash row says what the Deliverable above says it names, `check-install-toolchain` exits on no error for that tree, and every surface the emptied bash audience reaches is covered by a delta or shown unreached; a `command` value the amendment allows does not red `check-settings-paths`, and the absolute-value allowance stays; `check-settings-paths`' new red for an unresolved placeholder is accepted, the operator asked and answering that the call is the lead's. The canonical-text rewrite's three choices rest on the operator directions the line above records.
 
 **Push need (2026-10-10, inside the budget by the operator grant on that entry's line):** its Windows assertions ride [windows-running-hook-replace](#windows-running-hook-replace)'s mid-iteration push.
 

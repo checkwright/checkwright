@@ -24,7 +24,7 @@ Addition after the sentence of §The reader and its views that closes the two de
 
 ### (2) Rule `rm_tracked` tests each operand as the shell passes it
 
-The deletion arm reads its operands through the word read, so a quoted or escaped operand reaches the tracked test {design-bearing} {user-facing: the entry's Deliverable — the tracked test takes a quoted operand literally and an unquoted one as the glob the shell expands, and the steer prints the shell's own word}.
+The deletion arm reads its operands through the word read, so a quoted or escaped operand reaches the tracked test {design-bearing} {user-facing: the entry's Deliverable — the tracked test takes a quoted operand literally and an unquoted one as the glob the shell expands, and the steer prints the shell's own word; operator direction, 2026-10-10, lead-relayed, not a ruling, accepting three departures from that reading as authored below — a literal operand whose value carries `*`, `?` or `[`, or opens with `:`, is skipped, so `rm '*.md'` passes; a word mixing a quoted span or an escape with a bare glob character is skipped; under PowerShell a quoted path is tested as a glob}.
 
 - **A literal operand**, one whose live text carries none of `*`, `?` and `[` bare, is tested by its value under git's `:(literal)` pathspec magic.
 - **A glob operand**, a word no quote or escape contributed to, is tested under `:(glob)`, where `*` stops at a `/` as the shell's does. The bare pathspec the rule passes today crosses directories: on this tree `*.rs` matches and `:(glob)*.rs` does not, there being no such file at the root.
@@ -45,7 +45,7 @@ Every rule taking this rule's test as a predicate narrows with it: rule `bounded
 
 ### (3) Rule `find_exec` prints the words the command spelled
 
-The steer joins the spellings of the predicate words and of the executed command's words, and re-quotes nothing {design-bearing} {user-facing: the entry's Deliverable — both steers print the shell's own word}.
+The steer joins the spellings of the predicate words and of the executed command's words, and re-quotes nothing {design-bearing} {user-facing: the entry's Deliverable — both steers print the shell's own word; operator direction, 2026-10-10, lead-relayed, not a ruling, accepting the two verdict moves the value-read tests make — `-exec cat '{}' '\;'` is steered today and falls through after, and `-exec \cat '{}' \;` falls through today and is steered after}.
 
 - **Its tests read values**: the `-exec` word, the terminator, the `{}` placement and the roster test. The terminator is the word whose value is `;` or `+`, which replaces the backslash strip the rule applies to a dequoted word.
 - **The declaration gains `raw`**, the word read's third view: the item's clause reads *Declares `raw`, `sq dq hd` and `dequoted`*, and the rule's table row with it.

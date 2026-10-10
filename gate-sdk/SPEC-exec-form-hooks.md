@@ -16,7 +16,7 @@ The registration, as a kit template spells it. **Not yet applied.**
 { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/@GATE_SDK_NATIVE_BIN@", "args": ["--hook", "shell-guard"] }
 ```
 
-- **The binary is spelled as the placeholder `@GATE_SDK_NATIVE_BIN@`**, the one guard-kit's allowlist template already carries and on its grounds (guard-kit/SPEC.md §The recommended allowlist): the knob's value is per consumer, and guard-kit/SPEC.md §check-door-binding's assertion B, which stays as written, bars a path to the binary from a kit template. The adopter resolves it at the merge to the knob's value as a path from the repository root, **with no executable suffix**, so one committed settings file serves a Windows and a POSIX clone alike. A value that is absolute replaces the whole `command`, the project-directory prefix with it.
+- **The binary is spelled as the placeholder `@GATE_SDK_NATIVE_BIN@`**, the one guard-kit's allowlist template already carries and on its grounds (guard-kit/SPEC.md §The recommended allowlist): the knob's value is per consumer, and guard-kit/SPEC.md §check-door-binding's assertion B, which stays as written, bars a path to the binary from a kit template. The adopter resolves it at the merge to the knob's value as a path from the repository root, **with no executable suffix**, so one committed settings file serves a Windows and a POSIX clone alike. A value that is absolute replaces the whole `command`, the project-directory prefix with it, and `check-settings-paths` skips and counts such a candidate (delta 3).
 - **An unresolved placeholder is a guard that is off**, where in an allow entry it only costs a prompt. `check-settings-paths` reds it where it is registered (delta 3), and each template's `//` note says to resolve it and how to print the value. The allow template resolves the same placeholder by another rule, the value *spelled as a command* (guard-kit/SPEC.md §The recommended allowlist), so each note states the rule of its own file: here the knob's value as printed, minus any executable suffix, under the project-directory prefix and never the allow entry's relative-command prefix.
 - **The `//` note names the harness's `onFailure` field** as the adopter's own choice for a hook that should refuse when its program cannot start.
 
@@ -44,15 +44,23 @@ Started with no front end, the arm resolves the repository root itself and decli
 
 ### (3) The registration grammar reads the binary
 
-The registration parser takes the gate binary as a command token beside the two front-end names, and `check-settings-paths` resolves a suffix-less hook candidate {design-bearing}.
+The registration parser takes the gate binary, by its name or by its placeholder, as a command token beside the two front-end names, and `check-settings-paths` resolves a suffix-less hook candidate, reds an unresolved placeholder and skips an absolute one {design-bearing} {user-facing: lead decision, 2026-10-10, revisable against the oracle — the new red for an unresolved placeholder is accepted, the operator asked and answering that the call is the lead's; lead decision of that date that a `command` value delta 1 allows does not red the gate}.
 
-- **The parser** (§The harness-integration arm, *the registration grammar has one parser*): a command token whose file name is a front end's, or the binary's own — the crate's package name, with or without an executable suffix — then `--hook`, then the member. It is the name assertion B of guard-kit's `check-door-binding` already derives, so the two cannot drift. A consumer who renamed the binary gets no member check, a stated limit.
-- **`check-settings-paths`** (context-kit/SPEC.md §check-settings-paths): a hook candidate resolves when its path is a file, or, where its file name carries no extension, when the path with the host's executable suffix is one. An unresolved placeholder is a candidate that resolves to nothing, and its finding's `help:` names the merge step. The fixture pair gains an exec-form binary registration in `good/`, and in `bad/` an unresolved placeholder and an exec-form `--hook` operand the binary does not carry, each moving the pinned counts.
+- **The parser** (§The harness-integration arm, *the registration grammar has one parser*): a command token whose file name is one of three spellings, then `--hook`, then the member.
+  - **A front end's**, as today.
+  - **The binary's own**, the crate's package name with or without an executable suffix. It is the name assertion B of guard-kit's `check-door-binding` already derives, so the two cannot drift. A consumer who renamed the binary gets no member check, a stated limit.
+  - **The binary's placeholder**, `@GATE_SDK_NATIVE_BIN@`, the spelling a kit template carries before the merge (delta 1). Without it the parser answers *no registration* for every hook of the template this amendment ships, read at `native/src/hook/mod.rs`, whose name set holds the two front ends and nothing else, and delta 5's rendering would refuse the real template at exit 2. The crate holds the token once, beside that name set; guard-kit/SPEC.md §The recommended allowlist stays its owner.
+- **One parser, every caller**: `check-settings-paths`, the enforcement map and `check-plugin-parity`'s rendering (delta 5) read a registration through it, the merged file and the unmerged template alike, so no caller carries a second reading of the template.
+- **`check-settings-paths`** (context-kit/SPEC.md §check-settings-paths), three candidate shapes beside the ones it reads today:
+  - **A suffix-less candidate** resolves when its path is a file, or, where its file name carries no extension, when the path with the host's executable suffix is one.
+  - **An unresolved placeholder** is a candidate that resolves to nothing, so it reds, and its finding's `help:` names the merge step. Its member is still read, the parser taking the token.
+  - **An absolute candidate**, one the path-dialect contract's root test answers (§The path-dialect contract), is skipped and counted with the `$`-rooted one, on that skip's ground: it names a root outside the tree, and whether a file stands there is a fact of the machine and not of the commit. Today the gate joins every literal candidate under the root, read at `native/src/gates/settings_paths.rs`, so the absolute value delta 1 allows would red on every tree. Its member is still read. The clean line's skipped count names both skips.
+  - **The fixture pair** gains in `good/` an exec-form binary registration and an absolute one, and in `bad/` an unresolved placeholder and an exec-form `--hook` operand the binary does not carry, each moving the pinned counts.
 - **The enforcement map** reads registrations through the same functions (§enforcement-map), so its rows keep their members and `docs/enforcement.md` is regenerated where a row's printed surface moves.
 
 ### (4) The sections that say a harness-wired arm keeps a shell door
 
-The canonical text that makes the front end a harness's permanent door is rewritten to the narrower fact {design-bearing}.
+The canonical text that makes the front end a harness's permanent door is rewritten to the narrower fact {design-bearing} {user-facing: operator directions, 2026-10-10, lead-relayed, not rulings — the exec form is the one shipped wiring and the quiet absent-binary state is accepted; the host with no bash at all is a stated limit; a minimum harness version is stated (delta 8)}.
 
 Replacement for §run-gates' two paragraphs opening *The front-end serves a harness shim and a pre-build clone rather than an adopter door* and *A harness cannot be wired to a binary that fail-opens on its own absence, and the residency is permanent*. **Not yet applied.**
 
@@ -67,7 +75,7 @@ Replacement for §run-gates' two paragraphs opening *The front-end serves a harn
 - **guard-kit/SPEC.md §The shell guard** and **§The hook on native Windows**: the member is reached by a direct spawn; the anchor paragraph keeps the project-directory binding and drops the relative-spelling `127` case and the inferred bash-opens-the-path sentence, neither having a shell left to occur in; the hook's floor on Windows is the binary alone.
 - **The no-bash host is a stated limit** (operator direction, 2026-10-10, lead-relayed), in §The hook on native Windows: the Windows runs were on a host carrying Git for Windows, where the harness still found its bash for its own shell tool, and a host with no bash at all is not run.
 - **context-kit/SPEC.md §The session-context hook**: *through the front end* and *It runs where the front end put it* become the direct spawn and the toplevel the arm resolved.
-- **context-kit/SPEC.md §bin/env-probe** is unchanged: its settings-template arm keys on a `bash` word, and no shipped template carries one after delta 1, so both kits leave the bash audience by derivation. `docs/requirements.md`'s toolchain row then reads as the derivation prints it.
+- **context-kit/SPEC.md §bin/env-probe** keeps its predicate and its four arms: the settings-template arm keys on a `bash` word, and no shipped template carries one after delta 1, so both kits leave the bash audience by derivation. What that empties, and each surface it reaches, is delta 10.
 
 ### (5) The plugin's hooks are rendered from the template's members
 
@@ -109,13 +117,42 @@ The Windows leg holds what no local run reaches {mechanical}.
 - **With `windows-running-hook-replace` in the same build batch** the assertions ride its mid-iteration push. **Without it** this unit owes that push itself, inside the budget by the operator's grant on that entry's Push need line.
 - The linked-worktree placeholder on Windows and same-session arming stay unrun, and §The hook on native Windows says so beside the no-bash host.
 
+### (10) The bash row names the fence and the shell gate
+
+With delta 1 landed no kit root ships a bash surface, so the kit-root derivation answers no kit, and the readers of that answer take it as an answer {design-bearing} {user-facing: the entry's Deliverable — the bash row then names a runnable fence and a registered shell gate alone; lead decision, 2026-10-10, revisable against the oracle, that `check-install-toolchain` exits on no error for that tree}.
+
+- **The emptied answer, probed.** `git grep -l -E '^#!.*[/ ]bash' -- ':!*/gate-tests/*' ':!*/smoke/*' ':!gate-sdk/*'` names no file under a kit root, and `git grep -n '"command"' -- '*/templates/*.json' ':!*/gate-tests/*'` names the two templates of delta 1 and no other. So the two kit-root arms of context-kit/SPEC.md §bin/env-probe rest on those templates alone, and after delta 1 they answer nothing.
+- **Today that is an error and not a red.** `check-install-toolchain` exits 2 on a `derived` audience resolving to no kit, read at `native/src/gates/install_toolchain.rs`, on the rule that an empty answer means no kit root was reached. The page's toolchain block is hand-authored and parity-held, so no row edit clears that exit and nothing regenerates the row.
+- **The derivation tells an empty answer from an unread one** (`native/src/toolfloor.rs`). Kit roots read and none shipping a surface is an answer, the empty kit list. No kit root read beside the floor-holder stays unresolvable. `check-install-toolchain` exits 2 on the second alone.
+- **The row for the empty answer.** A `derived` audience whose kit list is empty renders its Needed cell as the predicate's two anchor arms, and the gate compares the page's cell against that rendering. The crate holds the cell's text once, beside the predicate. Replacement for `docs/requirements.md`'s `bash` row. **Not yet applied.**
+
+  ```
+  | `bash` | ≥ 4.3 | optional: if your docs mark a fence runnable or you register a shell gate | canon-kit's `check-fence-run` runs a marked fence with bash, and a shell gate sources the gate library, which uses a nameref (`local -n`) |
+  ```
+
+- **docs/install-parity-contracts.md §The install-toolchain parity contract** states that rendering beside the kit-list one, and its sentence *A derived element the walk cannot resolve exits 2 rather than comparing the page against an empty audience* narrows to the unread case.
+- **context-kit/SPEC.md §bin/env-probe**, the `derived` bullet *A `derived` audience resolving to nothing is undecided, never not-owed*: its ground, *An empty answer means the derivation reached no kit root*, stops being the only case. The bullet keeps the verdict and restates the ground: the owed-predicate holds no way to tell the two empty answers apart, and reading either as not owed would fail open on the unread one. The `bash` member's item gains that no kit root ships a surface today, by the derivation, and that the two kit-root arms stay so a kit that ships one later joins.
+- **The owed-predicate and `doctor` are unchanged in code.** An empty resolution stays undecided, rendered unprobed, and cannot set the verdict (installer/SPEC.md §doctor). What moves is who meets it: every profile renders `bash` unprobed until its tree marks a fence or registers a shell gate, where a profile carrying guard-kit or context-kit is probed today and `init` refuses on a host without bash. That move is the entry's end.
+- **installer/SPEC.md**, each sentence resting on a kit owing bash through its wiring:
+  - §Requirements: *The `bash` audience* says the starter and prose profiles reach none of the owing kits, which becomes every profile; *What runs without `bash`* closes on Git for Windows' bash serving guard-kit's and context-kit's hook wiring, which is rewritten to what still takes it there, a registered shell gate, a marked fence and the plugin's hooks.
+  - §doctor: *A derivation that reached no kit root has no list to name* takes the empty answer beside the unread one.
+  - §demo, the Windows oracle's sentence that the leg holds bash on `PATH` *because `full` carries kits that owe `bash`* and act 1's `init` refuses without it: that ground goes, and the sentence states what the leg's order rests on once `init` no longer refuses.
+  - §The consumer smoke, the `bash`-less arm's two bullets reading a rendering off *whether the derivation reached a kit root*, which take the same two cases.
+- **The pages saying a profile needs bash**, by `git grep -n -E 'bash.? 4\.3' -- ':!docs/posts/*' ':!CHANGELOG.md' ':!native/*'`: `companion/SPEC.md` (`full`), `docs/speckit.md` and `docs/openspec.md` (`complement` and `full`), and `companion/speckit/README.md` and `companion/speckit/commands/install.md` where each names bash as a tier's cost. Each drops the claim. `docs/install.md`'s macOS remedy reads *if your profile owes `bash`* and stays true.
+- **Shown unreached.** `docs/requirements.md`'s Git for Windows row (*`bash` only where a row above owes it*) and its §Writing your own shell gates paragraph stay true as written. canon-kit/SPEC.md §check-fence-run and gate-sdk/SPEC.md §The program roster name the fence arm, which is unchanged. The `--emit env-probe` arm resolves through all four arms and this tree's answer there is non-empty. `check-install-toolchain`'s fixture templates carry their own hooks.
+
+**The acceptor is the installer smoke's `bash`-less arm.** Its subjects are the profiles whose `doctor` report carried no probed `bash` row, read off `doctor` and never listed (installer/SPEC.md §The consumer smoke), so its subject set widens to every profile with no edit. It installs each with `bash` masked, runs every command the follow-up block prints, and commits through the placed hooks, and a `bash` lookup anywhere on that path fails the step. A profile that still reaches bash on its install path reds there, and that red is a finding about the profile, fixed at its source.
+
+**Inferred, cannot run before build:** the arm's widened subject set, `doctor`'s rendering for a profile carrying guard-kit, and the gate's verdict on the replacement row — each rests on the two templates having changed form and on the derivation's new arm.
+
 ## Producers and consumers
 
 - **The exec-form registration.** Producer: the adopter's merge of a kit template into the settings file, and delta 7's edit here. Consumers: the harness, which spawns it; `check-settings-paths` and the enforcement map, through the one parser (delta 3); `check-plugin-parity`, which renders from the guard-kit template (delta 5); the tool-floor derivation, which reads a template's first command word and finds no `bash`.
 - **Each field's reader.** `command`: the harness, and `check-settings-paths`' path resolution. `args`: the harness, and the parser's member read.
 - **The arm's root resolution and decline.** Producer: the arm, on every direct spawn. Consumers: every hook member, which reads its knobs from the tree it now stands in; the session and the operator, through the envelope.
 - **Rosters holding a registration's shape**, each named in a delta: the parser's front-end name set, `check-settings-paths`' fixture pair, `check-plugin-parity`'s rendering and fixture templates, `check-door-binding`'s fail-open exemption, the tool floor's template arm.
-- **Narrowing (point 5).** Delta 1 removes the `bash` word from every shipped template. The tool-floor derivation is the reader with a non-monotone verdict: the bash member's audience shrinks, and `check-install-toolchain` reds until `docs/requirements.md`'s row is what the derivation prints. Its fixture templates carry their own hooks and are not narrowed. No reader asserts a count of shell-form registrations.
+- **Narrowing (point 5).** Delta 1 removes the `bash` word from every shipped template. The tool-floor derivation is the reader with a non-monotone verdict: the bash member's kit list empties, and delta 10 names each reader of that answer — `check-install-toolchain`, which errors on it today; the owed-predicate and `doctor`, unchanged in code; the installer smoke's `bash`-less arm, whose subject set widens; `native/src/toolfloor.rs`'s own tests, which hold this tree's derived kit list. No reader asserts a count of shell-form registrations.
+- **The parser's third spelling.** Producer: a kit template, before the merge. Consumers: `check-plugin-parity`'s rendering, which reads the unmerged guard-kit template; `check-settings-paths` and the enforcement map, which meet it only in a settings file merged without the placeholder step, where the first reds it.
 - **Every member's value (point 6).** Enumerated under delta 1 with the probe that produced the roster, the two members with no exec form narrowed past there.
 
 ## Existing sections updated
@@ -124,7 +161,12 @@ The Windows leg holds what no local run reaches {mechanical}.
 - `gate-sdk/SPEC.md` §The adopter constraints — the first script-door class (delta 4).
 - `gate-sdk/SPEC.md` §The harness-integration arm — the fail-open paragraph, the arm's root step and decline, the parser's command token (deltas 2, 3 and 4).
 - `guard-kit/SPEC.md` §The shell guard, §The hook on native Windows, §check-door-binding, §The recommended allowlist, §Testing — the wiring, the floor and its limits, the exemption's ground, the front-end grant's ground, the smoke's wiring run (deltas 1, 4, 6 and 9).
-- `context-kit/SPEC.md` §The session-context hook, §check-settings-paths — the wiring and the suffix-less candidate (deltas 3 and 4).
+- `context-kit/SPEC.md` §The session-context hook, §check-settings-paths — the wiring, the parser's three spellings, and the suffix-less, placeholder and absolute candidates (deltas 3 and 4).
+- `context-kit/SPEC.md` §bin/env-probe — the `derived` bullet's ground and the `bash` member's item (delta 10).
+- `docs/install-parity-contracts.md` §The install-toolchain parity contract — the empty answer's rendering and the narrowed exit 2 (delta 10).
+- `installer/SPEC.md` §Requirements, §doctor, §demo, §The consumer smoke — the sentences resting on a kit owing bash through its wiring (delta 10).
+- `companion/SPEC.md`, `companion/speckit/README.md`, `companion/speckit/commands/install.md`, `docs/speckit.md`, `docs/openspec.md` — a tier's bash cost (delta 10).
+- `native/src/toolfloor.rs`, `native/src/gates/install_toolchain.rs` — the empty answer told from the unread one, the Needed rendering, and the tests holding this tree's kit list (delta 10).
 - `delegation-kit/SPEC.md` §Layout and configuration, `lifecycle-kit/SPEC.md` §check-stage-evidence — the quoted wirings (delta 1).
 - `plugin/SPEC.md` §The guards — the rendering (delta 5).
 - `guard-kit/templates/settings-hooks.json`, `context-kit/templates/settings-sessionstart.json`, `guard-kit/templates/settings-allow.json` — the registrations and the notes (deltas 1 and 4).
@@ -133,11 +175,11 @@ The Windows leg holds what no local run reaches {mechanical}.
 - `context-kit/gate-tests/check-settings-paths/`, `scripts/gate-tests/check-plugin-parity/` — the fixture pairs (deltas 3 and 5).
 - `guard-kit/smoke/install.sh`, `context-kit/smoke/install.sh` — the placeholder's resolution at the merge and the wiring run (delta 6).
 - `.claude/settings.json` — six registrations, on the operator's confirmation (delta 7).
-- `docs/requirements.md` — the harness floor and the regenerated toolchain row (deltas 1 and 8).
+- `docs/requirements.md` — the harness floor and the hand-authored `bash` row (deltas 8 and 10).
 - `docs/enforcement.md` — regenerated where a row moves (delta 3).
 - `.github/workflows/` — the Windows leg's step (delta 9).
-- `docs/gate-sdk/SPEC.md`, `docs/guard-kit/`, `docs/context-kit/`, `docs/delegation-kit/`, `docs/lifecycle-kit/`, `docs/plugin/SPEC.md` — generated mirrors, stale once any delta lands (all deltas).
-- `.workflow/release-declarations.md` — a bullet: the templates changed form, an already-merged shell-form wiring keeps working, and re-merging takes the placeholder step and the harness floor (deltas 1 and 8).
+- `docs/gate-sdk/SPEC.md`, `docs/guard-kit/`, `docs/context-kit/`, `docs/delegation-kit/`, `docs/lifecycle-kit/`, `docs/plugin/SPEC.md`, `docs/installer/SPEC.md`, `docs/companion/` — generated mirrors, stale once any delta lands (all deltas).
+- `.workflow/release-declarations.md` — a bullet: the templates changed form, an already-merged shell-form wiring keeps working, and re-merging takes the placeholder step and the harness floor; and one for the profiles that stop owing bash (deltas 1, 8 and 10).
 
 ## Retired spellings
 

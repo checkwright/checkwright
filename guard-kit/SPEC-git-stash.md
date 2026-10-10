@@ -6,7 +6,7 @@ A session ran `git stash` and `git stash pop` on a checkout it shared, to build 
 
 ### (1) A new rule, `git_stash`
 
-§The rule roster gains the item **`git stash` on the main checkout** (`git_stash`), placed immediately after rule `commit_only_paths` {design-bearing} {user-facing: the entry's Deliverable leaves the choice between a guard-kit block and a delegation-kit template bullet to this stage, and the block is the choice}.
+§The rule roster gains the item **`git stash` on the main checkout** (`git_stash`), placed immediately after rule `commit_only_paths` {design-bearing} {user-facing: the entry's Deliverable leaves the choice between a guard-kit block and a delegation-kit template bullet to this stage, and the block is the choice; operator direction, 2026-10-10, lead-relayed, not a ruling — block, with no knob}.
 
 The item, in the roster's grammar. **Not yet applied.**
 
@@ -21,7 +21,8 @@ The item, in the roster's grammar. **Not yet applied.**
 
 - **The block is chosen over the template bullet** on the Enforcement-first rule: a bullet in delegation-kit's agent-execution template reaches only a session that loaded it. The block's message carries the steer to every session at the call.
 - **It is admissible as generic mechanism** on the ground rule `commit_only_paths`' item states for the same kind of subject, the shared index: its subject is git's own argv and the checkout boundary, and it reads no project vocabulary.
-- **No knob is minted.** An off switch is the consumer-rules allow the item names, the existing door for a rule a consumer does not want.
+- **No knob is minted, and the Policy-as-choice rule asks for none** (doctrine-kit/DOCTRINE.md). That rule binds a calibration a consumer could set differently *while the stated contract stays true*, and names `off` for a calibration that is the whole predicate as unregistering. The block on the main checkout is this rule's whole predicate: with it off nothing of the rule is left to assert, and a guard rule's unregistering is the consumer-rules allow the item names, which runs first. An advise selector fails the rule's own test, since under it the contract, that no tree-rewriting stash runs on the main checkout, is no longer true. The verb set is git's fact about which verbs rewrite, not a preference.
+- **Rule `commit_only_paths` stays silent on the lone pathless commit and this rule does not stay silent on the lone stash**, and the two differ on that item's own ground (*Only the compound fires*): a pathless commit is every consumer's ordinary commit, so refusing it would steer every session's every commit, while a tree-rewriting stash is no step of an ordinary session, and both of its uses have an exit the corrective names.
 - **The two-part PowerShell test holds**: the subject is git's argv and the checkout boundary, and the test needs no PowerShell vocabulary.
 
 ### (2) The rows and the suites
