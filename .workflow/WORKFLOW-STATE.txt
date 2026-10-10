@@ -10,3 +10,4 @@ front-door-readiness-pass align aca26e79 2026-10-10 60d62fce8
 front-door-readiness-pass build ad70c6d5 2026-10-10 b23dcf1ba
 front-door-readiness-pass build aa809efd 2026-10-10 22daa9f9a
 front-door-readiness-pass build aed47d40 2026-10-10 d9627dbbe
+front-door-readiness-pass validate aecfc273 2026-10-10 0c154c4f5
