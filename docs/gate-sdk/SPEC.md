@@ -2509,6 +2509,8 @@ The members read their knobs from the knob files when they run, and the arm pass
 
 The launcher's and the placement's cases are their modules' unit tests and `gate-tests/native-git-hooks.test.sh`, which commits through the placed hooks in a scratch repository and from a linked worktree. Its case for the one-name read points `GATE_SDK_NATIVE_BIN` at a stub exiting 0 beside a name no table holds, and the commit lands. A stub is the subject because one build cannot be older than itself: the case shows the launcher did not refuse, and the stub stands for a build that knows the name.
 
+**On a host with an executable suffix the suite skips its two stub cases**, since each stub is a sh script copied under the binary's name. The native Windows leg holds those legs in a step of its own ([installer/SPEC.md §The consumer smoke](../installer/SPEC.md#the-consumer-smoke)), over native members.
+
 ### measure-commit
 
 The binary's `--measure-commit` arm times what the `pre-commit` hook would run if every tracked file were staged. It lists the tracked paths with `git ls-files -z` and passes them to the hook arm's own selection and serial dispatch ([§git-hook](#git-hook)), three times. Nothing is staged, and the tree and the index are left as they were. It prints two lines:

@@ -46,6 +46,8 @@ To uninstall, `sh "$cw/package/bin/checkwright.sh" uninstall` reverses it in one
 
 Download the release, in PowerShell. Each block here stops at its first error, then puts your session's preferences back:
 
+<!-- windows-fetch:begin -->
+
 ```powershell
 . {
   $keep = $ErrorActionPreference, $ProgressPreference
@@ -61,6 +63,8 @@ Download the release, in PowerShell. Each block here stops at its first error, t
   } finally { $ErrorActionPreference, $ProgressPreference = $keep }
 }
 ```
+
+<!-- windows-fetch:end -->
 
 Check the attestation as on macOS and Linux:
 

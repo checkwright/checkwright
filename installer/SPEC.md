@@ -921,6 +921,16 @@ The smoke repository's half of that attribute lookup never answers, because the 
 
 **The PowerShell leg's hook steps commit through the hooks `init`'s printed `--install-hooks` line placed**, read from `core.hooksPath`. With every bash stripped from `PATH` one clean commit lands and one is refused by gate name. With every bundled `sh.exe` renamed away a commit must run its hooks and land, and the step's failure message names a hook that could not start without sh.
 
+**A further step holds the launcher's other legs on native Windows** (gate-sdk/SPEC.md §git-hook), in a scratch repository whose hooks `--install-hooks` placed and whose registry names one pre-commit member and one commit-msg member, both native:
+
+- a subject outside the grammar is refused by the commit-msg member's name, and a clean one lands on that hook's summary line;
+- a violating commit from a linked worktree is refused by gate name;
+- a knob naming a hook's own name is refused at 2;
+- a knob naming no file refuses the commit, naming the path and the bypass;
+- a placed hook started with the knob at another executable starts that one on the hook arm and returns its status. The executable is one the system directory carries. Where Git for Windows ships an `echo.exe` the step also reads the argument list whole, and it says so in a notice where it does not.
+
+**The same leg runs the front-door driver's PowerShell twin with no operand** (RELEASING.md §The front-door rehearsal) and holds its exit 2 and usage line.
+
 **A remedy step runs the page's block verbatim and adds nothing.** A macOS leg runs docs/install.md's `macos-remedy` block and a Windows leg its `windows-remedy` block, so a member the block lacks is the page's defect, fixed in the block. The macOS step then asserts that the adopter's next login shell resolves `bash` to Homebrew's prefix, and that the lines the block appended to `~/.zprofile` do so alone, after proving that a shell reading no profile does not.
 
 **The native Windows leg** checks the tree out with LF line endings first (gate-sdk/SPEC.md §Consumer payload), names a shell on every step (gate-sdk/SPEC.md §check-action-run-shell) and translates the scratch base once with `cygpath`. It prints the artifact name and never exports `GATE_SDK_NATIVE_BIN`, which would outrank the knob file `init` writes into each consumer. Per Windows triple it runs as parallel matrix entries, so no one entry holds the run. A `bootstrap` entry runs every step before the smoke. One entry per roster part runs `gate-sdk/bin/run-gates.ps1 --installer-smoke --part <k>/<n>` under `pwsh`, with the scratch base, the artifact hand-off and the roster steered at its host, as the macOS legs set them. `pwsh_parts` crosses `pwsh_legs` with those entries from a part count the workflow states once, and the smoke refuses a count its roster does not have.

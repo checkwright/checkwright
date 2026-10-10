@@ -1065,6 +1065,138 @@ jobs:
           }
           Write-Host "git started the placed hook with the sh it bundles renamed away, and the commit landed"
 
+      # spec: gate-sdk/SPEC.md §git-hook — the launcher's other legs on native Windows: the commit-msg hook, a linked worktree, both refusals, and a hook started against another binary
+      - name: the placed hooks refuse, forward and serve a linked worktree
+        if: matrix.part == 'bootstrap'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (Test-Path Variable:PSNativeCommandArgumentPassing) { $PSNativeCommandArgumentPassing = 'Standard' }
+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) { $PSNativeCommandUseErrorActionPreference = $false }
+          $bin = $env:PWSH_GATE_BIN
+          $t = Join-Path $env:PWSH_SCRATCH 'hook-legs'
+          if (Test-Path -LiteralPath $t) { Remove-Item -LiteralPath $t -Recurse -Force }
+          $repo = Join-Path $t 'repo'
+          New-Item -ItemType Directory -Force -Path (Join-Path $repo 'scripts') | Out-Null
+          $kit = (Join-Path $env:GITHUB_WORKSPACE 'gate-sdk') -replace '\\', '/'
+          [IO.File]::WriteAllText((Join-Path $repo 'scripts/gates.list'), "check-pipe-membership`ncheck-commit-subject`n")
+          [IO.File]::WriteAllText((Join-Path $repo 'scripts/gate-sdk-config.knobs'), "GATE_SDK_NATIVE_BIN = $bin`nGATE_SDK_KIT_DIRS = $kit`n")
+          $script:fails = 0
+          function Check([string] $label, [object] $cond, [string] $detail) {
+              if ($cond) { Write-Host "ok   $label" }
+              else { Write-Host "BAD  $label -- $detail"; $script:fails++ }
+          }
+          $violation = '#!/usr/bin/env bash' + "`n" + 'set -o pipefail' + "`n" + 'names=(a b c)' + "`n" + 'if printf "%s\n" "${names[@]}" | grep -q b; then echo found; fi' + "`n"
+          git -C $repo init -q .
+          git -C $repo config user.email probe@example.invalid
+          git -C $repo config user.name probe
+          git -C $repo add -A
+          git -C $repo commit -q -m 'chore: seed'
+
+          Write-Host "== --install-hooks places both hooks =="
+          Push-Location $repo
+          try {
+              $iout = (& $bin --install-hooks 2>&1) -join "`n"
+              $icode = $LASTEXITCODE
+          } finally { Pop-Location }
+          Write-Host "--install-hooks exited $icode"
+          $hooks = "$(git -C $repo config --get core.hooksPath)"
+          $preHook = "$hooks/pre-commit.exe"
+          $msgHook = "$hooks/commit-msg.exe"
+          if (-not $hooks -or -not (Test-Path -LiteralPath $preHook -PathType Leaf) -or -not (Test-Path -LiteralPath $msgHook -PathType Leaf)) {
+              Write-Host "::error::--install-hooks placed no pre-commit.exe and commit-msg.exe under core.hooksPath '$hooks', so no placed hook is under witness: exit $icode -- $iout"
+              exit 1
+          }
+
+          Write-Host "== git starts the placed commit-msg.exe =="
+          $head = git -C $repo rev-parse HEAD
+          [IO.File]::WriteAllText((Join-Path $repo 'note.txt'), "probe`n")
+          git -C $repo add note.txt
+          $out = (& git -C $repo commit -m 'a subject outside the grammar' 2>&1) -join "`n"
+          $code = $LASTEXITCODE
+          Check "a subject outside the grammar was refused" ($code -ne 0 -and (git -C $repo rev-parse HEAD) -eq $head) "exit $code -- $out"
+          Check "the refusal names the commit-msg gate that owns it" ($out -match 'commit-msg: check-commit-subject failed') "$out"
+          $out = (& git -C $repo commit -m 'docs: a clean note' 2>&1) -join "`n"
+          $code = $LASTEXITCODE
+          Check "a clean subject landed" ($code -eq 0 -and (git -C $repo rev-parse HEAD) -ne $head) "exit $code -- $out"
+          Check "the commit-msg hook printed its passed line" ($out -match 'commit-msg: \d+ gate\(s\) passed') "$out"
+
+          Write-Host "== a linked worktree runs the same hooks =="
+          $wt = Join-Path $t 'wt'
+          git -C $repo worktree add -q -b side $wt HEAD
+          $whead = git -C $wt rev-parse HEAD
+          [IO.File]::WriteAllText((Join-Path $wt 'violation.sh'), $violation)
+          git -C $wt add violation.sh
+          $out = (& git -C $wt commit -m 'chore: a pipeline that can lose its match' 2>&1) -join "`n"
+          $code = $LASTEXITCODE
+          Check "the violating commit from the linked worktree was refused" ($code -ne 0 -and (git -C $wt rev-parse HEAD) -eq $whead) "exit $code -- $out"
+          Check "the worktree's refusal names the gate that owns the violation" ($out -match 'pre-commit: check-pipe-membership failed') "$out"
+          git -C $repo worktree remove --force $wt
+
+          Write-Host "== a knob naming a hook's own name is refused =="
+          Push-Location $repo
+          try {
+              $env:GATE_SDK_NATIVE_BIN = $preHook
+              $out = (& $preHook 2>&1) -join "`n"
+              $code = $LASTEXITCODE
+          } finally { Remove-Item Env:GATE_SDK_NATIVE_BIN -ErrorAction SilentlyContinue; Pop-Location }
+          Check "the launcher refused at 2" ($code -eq 2) "exit $code -- $out"
+          Check "the refusal says the launcher would start itself" ($out -match 'the launcher would start itself') "$out"
+
+          Write-Host "== a binary that cannot be started refuses the commit =="
+          $absent = (Join-Path $t 'no-such-gate-binary.exe') -replace '\\', '/'
+          $head = git -C $repo rev-parse HEAD
+          [IO.File]::WriteAllText((Join-Path $repo 'note2.txt'), "probe`n")
+          git -C $repo add note2.txt
+          try {
+              $env:GATE_SDK_NATIVE_BIN = $absent
+              $out = (& git -C $repo commit -m 'docs: with no binary' 2>&1) -join "`n"
+              $code = $LASTEXITCODE
+          } finally { Remove-Item Env:GATE_SDK_NATIVE_BIN -ErrorAction SilentlyContinue }
+          Check "the commit was refused with no gate binary to judge it" ($code -ne 0 -and (git -C $repo rev-parse HEAD) -eq $head) "exit $code -- $out"
+          Check "the refusal names the hook and the path it could not start" ($out -match 'pre-commit: cannot start the gate binary at' -and $out -match 'no-such-gate-binary') "$out"
+          Check "the refusal names the bypass" ($out -match 'git commit --no-verify') "$out"
+
+          Write-Host "== a placed hook starts the binary the knob now names, and returns its status =="
+          $other = Join-Path ([Environment]::SystemDirectory) 'whoami.exe'
+          if (-not (Test-Path -LiteralPath $other -PathType Leaf)) { Write-Host "::error::no whoami.exe in the system directory to stand in for a replaced gate binary"; exit 1 }
+          $echo = Join-Path (Split-Path (Split-Path (Split-Path (& git --exec-path)))) 'usr/bin/echo.exe'
+          Push-Location $repo
+          try {
+              $env:GATE_SDK_NATIVE_BIN = $other -replace '\\', '/'
+              $out = (& $msgHook some-file 2>&1) -join "`n"
+              $code = $LASTEXITCODE
+              Check "the hook started the other binary on the hook arm" ($out -match '--git-hook') "exit $code -- $out"
+              Check "the hook returned the other binary's status" ($code -eq 1) "exit $code -- $out"
+              if (Test-Path -LiteralPath $echo -PathType Leaf) {
+                  $env:GATE_SDK_NATIVE_BIN = $echo -replace '\\', '/'
+                  $out = (& $msgHook some-file 2>&1) -join "`n"
+                  $code = $LASTEXITCODE
+                  Check "the hook passed the arm, its own name and git's operand, in that order" ($code -eq 0 -and $out.Trim() -eq '--git-hook commit-msg some-file') "exit $code -- $out"
+              } else {
+                  Write-Host "::notice::no echo.exe at $echo, so the forwarded argument list is read from whoami.exe's refusal of its first word alone"
+              }
+          } finally { Remove-Item Env:GATE_SDK_NATIVE_BIN -ErrorAction SilentlyContinue; Pop-Location }
+
+          if ($script:fails -gt 0) { Write-Host "::error::the placed hooks' other legs: $($script:fails) assertion(s) failed"; exit 1 }
+          Write-Host "the placed hooks refused a bad subject, a worktree's violation, their own name and an absent binary, and started the binary the knob named"
+
+      # spec: RELEASING.md §The front-door rehearsal — the Windows driver parsed and its opening run by the host the job uses, on every push
+      - name: the front-door driver's PowerShell twin refuses a missing operand
+        if: matrix.part == 'bootstrap'
+        shell: pwsh
+        working-directory: ${{ runner.temp }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) { $PSNativeCommandUseErrorActionPreference = $false }
+          $driver = Join-Path $env:GITHUB_WORKSPACE 'scripts/ci-front-door.ps1'
+          $out = (& pwsh -NoProfile -File $driver 2>&1) -join "`n"
+          $code = $LASTEXITCODE
+          Write-Host $out
+          if ($code -ne 2) { Write-Host "::error::scripts/ci-front-door.ps1 run with no operand exited $code, not 2, under PowerShell $($PSVersionTable.PSVersion)"; exit 1 }
+          if ($out -notmatch 'usage: ci-front-door\.ps1 <version>') { Write-Host "::error::scripts/ci-front-door.ps1 exited 2 with no operand and printed no usage line"; exit 1 }
+          Write-Host "PowerShell $($PSVersionTable.PSVersion) parsed scripts/ci-front-door.ps1 whole and ran it to its missing-operand refusal"
+
       # spec: installer/SPEC.md §Platform resolution — the POSIX half's witness on this Windows host
       - name: the POSIX bootstrap installs the lattice minimum on this Windows host
         if: matrix.part == 'bootstrap'
@@ -1112,14 +1244,51 @@ jobs:
               return ($body -join "`n")
           }
           $remedy = Get-PageBlock 'windows-remedy' 'docs/install.md'
+          $fetch = Get-PageBlock 'windows-fetch' 'docs/manual-install.md'
           $install = Get-PageBlock 'windows-install' 'docs/manual-install.md'
           Invoke-Expression $remedy | Out-Host
+          # spec: docs/install-block-contracts.md §The install blocks — the fetch fence as the page prints it: its placeholder version names no release, so the first fetch fails
+          $ErrorActionPreference = 'Continue'
+          $ProgressPreference = 'Continue'
+          $threw = $false
+          try {
+              try { Invoke-Expression $fetch | Out-Host } catch { $threw = $true; Write-Host "the fetch fence stopped on: $($_.Exception.Message)" }
+              $leftError = "$ErrorActionPreference"
+              $leftProgress = "$ProgressPreference"
+          } finally { $ErrorActionPreference = 'Stop' }
+          if (-not $threw) { Write-Host "::error::the page's windows-fetch block ran to its end against its placeholder version, so no failing fetch is under witness"; exit 1 }
+          if ($leftError -ne 'Continue' -or $leftProgress -ne 'Continue') {
+              Write-Host "::error::the page's windows-fetch block failed and left the session's error preference at $leftError and its progress preference at $leftProgress"
+              exit 1
+          }
+          Write-Host "the page's windows-fetch block failed its fetch and left both preferences as it found them"
           $v = $env:PWSH_VERSION
           $cw = Join-Path $env:PWSH_SCRATCH 'page-install'
           New-Item -ItemType Directory -Force -Path $cw | Out-Null
           Copy-Item -LiteralPath $env:PWSH_TARBALL -Destination "$cw\checkwright-$v.tgz"
           $hex = (Get-FileHash -LiteralPath "$cw\checkwright-$v.tgz" -Algorithm SHA256).Hash.ToLowerInvariant()
           [IO.File]::WriteAllText("$cw\checkwright-$v.tgz.sha256", "$hex  checkwright-$v.tgz`n")
+          # spec: docs/install-block-contracts.md §The install blocks — the block once over a digest that does not match, ahead of the run that installs
+          $placed = $cw
+          $cw = Join-Path $env:PWSH_SCRATCH 'page-install-mismatch'
+          New-Item -ItemType Directory -Force -Path $cw | Out-Null
+          Copy-Item -LiteralPath $env:PWSH_TARBALL -Destination "$cw\checkwright-$v.tgz"
+          [IO.File]::WriteAllText("$cw\checkwright-$v.tgz.sha256", "$('0' * 64)  checkwright-$v.tgz`n")
+          $refused = Join-Path $env:PWSH_SCRATCH 'page-install-mismatch-consumer'
+          New-Item -ItemType Directory -Force -Path $refused | Out-Null
+          git -C $refused init -q
+          Push-Location $refused
+          $ErrorActionPreference = 'Continue'
+          $why = ''
+          try {
+              try { Invoke-Expression $install | Out-Host } catch { $why = "$($_.Exception.Message)" }
+              $left = "$ErrorActionPreference"
+          } finally { $ErrorActionPreference = 'Stop'; Pop-Location }
+          $cw = $placed
+          if ($why -notmatch 'checksum mismatch') { Write-Host "::error::the page's windows-install block did not throw its checksum line over a digest that does not match; it threw '$why'"; exit 1 }
+          if ($left -ne 'Continue') { Write-Host "::error::the page's windows-install block failed and left the session's error preference at $left"; exit 1 }
+          if (Test-Path -LiteralPath (Join-Path $refused 'checkwright.lock')) { Write-Host "::error::the page's windows-install block wrote a checkwright.lock over a digest that does not match"; exit 1 }
+          Write-Host "the page's windows-install block refused a digest that does not match and left the error preference as it found it"
           $consumer = Join-Path $env:PWSH_SCRATCH 'page-install-consumer'
           New-Item -ItemType Directory -Force -Path $consumer | Out-Null
           git -C $consumer init -q
@@ -1618,6 +1787,15 @@ jobs:
             echo "::error::the scratch runner's PowerShell cases did not run under both pwsh and powershell"
             exit 1
           }
+
+      # spec: context-kit/SPEC.md §The session-context hook — a configured command started with no shell, on native Windows
+      - name: session-context starts its configured commands
+        if: ${{ !cancelled() && matrix.target == 'x86_64-pc-windows-msvc' }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          source gate-sdk/lib/gate.sh
+          GATE_SDK_NATIVE_BIN="$PWD/$(gate_native_bin)" bash context-kit/gate-tests/session-context-spawn.test.sh
 
       # spec: evidence-kit/SPEC.md §The producer-liveness lock — binding, against Get-Process as ground truth
       - name: producer liveness over Windows process ids
