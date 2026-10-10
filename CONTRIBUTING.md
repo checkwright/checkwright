@@ -22,7 +22,7 @@ Every gate ships a `good/`+`bad/` fixture pair (see [gate-sdk/SPEC.md §Fixture-
 
 Submit that case as a pull request. The CI backstop ([gate-sdk/SPEC.md §templates/gates-workflow.yml](gate-sdk/SPEC.md#templatesgates-workflowyml)) runs the full battery and every fixture runner over it, so the pair *is* the reproduction — no prose repro steps, no maintainer setup. File a gate-defect issue only when you cannot craft the fixture, and it must still name the gate, the exact gate output, and the expected-versus-actual verdict.
 
-Maintainer work runs in iterations, bounded units of work, and each opens with a triage sweep of open issues and PRs; the point between two iterations is the **iteration boundary** this page names. A filed issue is swept at the next boundary and given exactly one disposition — promoted into the work queue or closed with cause. It is never left linked-but-unqueued: the queue is the only place work waits.
+Maintainer work runs in iterations, bounded units of work, and each opens with a triage sweep of open issues and PRs; the point between two iterations is the **iteration boundary** this page names. Each boundary sweeps the five oldest open issues and the five oldest open pull requests; anything past five waits, in age order, for a later boundary. <!-- measured: boundary-sweep=five-oldest-per-lane --> A swept issue is given exactly one disposition — promoted into the work queue or closed with cause — and its record is the issue's own thread: a comment naming the queue entry it became, or the cause. It is never left linked-but-unqueued: the queue is the only place work waits.
 
 ## Pull requests
 
@@ -31,7 +31,7 @@ Maintainer work runs in iterations, bounded units of work, and each opens with a
 - **Battery-green in CI.** Run it locally first: the bare gate binary at `GATE_SDK_NATIVE_BIN` for the full battery, then the fixture runners the [README](README.md) lists — one of which builds and tests the `native/` crate, so a local run wants the adopter toolchain in [docs/requirements.md §Installing and running the shipped gates](docs/requirements.md#installing-and-running-the-shipped-gates) plus the contributor tools below it, `cargo` included. A red PR is not reviewed until it is green.
 - **Fix the tree, never weaken the gate.** A PR that relaxes a gate to pass instead of fixing what it caught is the defect, not the fix — this is check-gate-tamper's doctrine ([delegation-kit/SPEC.md §Verify after every agent commit](delegation-kit/SPEC.md#verify-after-every-agent-commit)). A gate change lands with the fixture that proves it and the reasoning in the PR body.
 - **DCO sign-off on every commit.** Sign each commit (`git commit -s` adds the `Signed-off-by:` line); it certifies the [Developer Certificate of Origin](https://developercertificate.org/). There is no CLA and no bot — the sign-off is checked in review.
-- **Every PR gets one disposition at a boundary.** A swept PR is merged (battery-green and in-convention), closed with cause, or reviewed with findings — where the findings that warrant design or follow-on work become queued entries. A PR is never left reviewed-but-actionless.
+- **Every swept PR gets one disposition.** A boundary takes the five oldest open PRs, as it does issues. <!-- measured: boundary-sweep=five-oldest-per-lane --> A swept PR is merged (battery-green and in-convention), closed with cause, or reviewed with findings — where the findings that warrant design or follow-on work become queued entries. The disposition is recorded on the PR's own thread, and a PR is never left reviewed-but-actionless.
 
 Building Checkwright needs these tools beyond an adopter's:
 
@@ -50,7 +50,7 @@ The kits are governed by their own conventions before taste. Read the queue and 
 
 ## Support
 
-Community support is best-effort: there is no response SLA, and stale-thread automation may close inactive issues and PRs. Triage runs at iteration boundaries rather than continuously — an issue or PR waits at most one iteration for its disposition, so there is no need to ping between boundaries. A clean fixture pair is the surest path to a merge — it asks the least of a reviewer.
+Community support is best-effort: there is no response SLA, and stale-thread automation may close inactive issues and PRs. Triage runs at iteration boundaries rather than continuously — an issue or PR among the five oldest of its kind is dispositioned at the next boundary, and one behind them at the boundary that reaches it, so there is no need to ping between boundaries. <!-- measured: boundary-sweep=five-oldest-per-lane --> A clean fixture pair is the surest path to a merge — it asks the least of a reviewer.
 
 Paid support, consultancy, and training are available — write to
 <hello@checkwright.dev>.

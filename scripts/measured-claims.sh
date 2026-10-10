@@ -41,6 +41,18 @@ _mc_owed="${_mc_owed% owed}"
 [[ "$_mc_owed" =~ ^[0-9]+$ ]] || { echo "measured-claims: --emit port-blockers --tree did not report an owed count: $_mc_tree" >&2; exit 2; }
 printf 'tree-shell-owed\t%s\n' "$_mc_owed"
 
+# spec: canon-kit/SPEC.md §check-measured-claim — the boundary sweep's cap and order as the scope
+# binding states them, the extent CONTRIBUTING.md's disposition promise binds to; a lane off
+# the cap or the order has no value to emit
+_mc_scope=.claude/commands/scope.md
+_mc_cap="$(sed -n 's/.*Cap: the top \([a-z]*\) items per lane per boundary.*/\1/p' "$_mc_scope" | head -n 1)"
+[[ -n "$_mc_cap" ]] || { echo "measured-claims: $_mc_scope states no 'Cap: the top <n> items per lane per boundary'" >&2; exit 2; }
+_mc_lanes="$(grep -c '^- \*\*[A-Za-z]*\*\* — ' "$_mc_scope")"
+_mc_ordered="$(grep -c "^- \*\*[A-Za-z]*\*\* — .*; take the top $_mc_cap, oldest first\. " "$_mc_scope")"
+(( _mc_lanes > 0 && _mc_lanes == _mc_ordered )) \
+    || { echo "measured-claims: $_mc_ordered of $_mc_lanes sweep lane(s) in $_mc_scope read 'take the top $_mc_cap, oldest first'" >&2; exit 2; }
+printf 'boundary-sweep\t%s-oldest-per-lane\n' "$_mc_cap"
+
 # spec: evidence-kit/SPEC.md §The baseline-claims arm — each validate-baseline row as a key a
 # sentence quoting the row binds to
 "$(gate_native_bin_spelled)" --emit baseline-claims \

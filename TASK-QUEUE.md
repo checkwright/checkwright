@@ -70,22 +70,6 @@ the job-partitioned action walk in `native/src/actions.rs` misreads three shapes
 
 **Cost while deferred:** two silent passes and one false refusal on workflow text an adopter may write. Filed 2026-10-09 off crate-reader-hardening-pass' close second-vendor review and carried to the next scope's intake. Re-verified there: `is_block_scalar` admits an indicator, a chomping sign and digits, and nothing after them. Run over scratch workflows at promotion, each beside its control: a job checking out under no `contents:` scope passes `check-action-permissions` with its dashes at the `steps` column and reds with them indented, and `check-action-step-order` refuses a job whose quoted `uses` carries a trailing comment and passes it without the comment. **Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration with its two shapes run. Owner lookup: `block scalar`, `actions.rs`, `steps sequence`, `check-action-` in this file and the disposed-findings record — [site-health-probe-unexecuted](#site-health-probe-unexecuted), DISTINCT (a probe step no oracle executes); `toolchain-action-order-ungated`, done, DISTINCT (the gate on this walk, which scoped none of the three); owner gate-sdk/SPEC.md §check-action-gh-repo.
 
-### contributor-writeback-disposition
-
-[recurrence: 2026-09-25]
-
-CONTRIBUTING.md promises an inbound issue or pull request a disposition within one iteration, and the scope binding caps each lane at five per iteration; the sixth inbound item is promised what the machine cannot deliver. The "pre-launch, dormant" ground has lapsed: releases are public.
-
-**Deliverable:** either the cap carried on the public promise or a lane that honours it, and the disposition record named; CONTRIBUTING.md and the scope binding agree.
-
-**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration; whether it names a record, and so takes an amendment, is spec's.
-
-**The promise moves (2026-10-10, operator direction, lead-relayed, not a ruling):** CONTRIBUTING.md carries the cap, each boundary sweeping the five oldest per lane and the rest waiting in age order, and the scope binding's pull-request lane gains *oldest first*.
-
-**Chosen at spec:** the disposition's record is the tracker thread, so the binding obliges a comment naming the queue entry on a promoted issue. No name is minted and the unit takes no amendment.
-
-**Cost while deferred:** the first contributor past the cap reads a promise the tree breaks. Filed 2026-07-31; the promise and the cap re-read 2026-09-25 by consult.
-
 ## Deferred
 
 ### guard-quoted-operand-words
@@ -1287,4 +1271,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 ## Done
 
 - front-door-rehearsal-rule
+- contributor-writeback-disposition
 

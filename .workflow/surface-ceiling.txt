@@ -13,7 +13,7 @@
 1451cp .claude/commands/economics.md
 5151cp .claude/commands/lead.md
 714cp .claude/commands/release-sweep.md
-6847cp .claude/commands/scope.md
+6908cp .claude/commands/scope.md
 1155cp .claude/commands/spec.md
 1728cp .claude/commands/validate.md
 12448cp CLAUDE.md
