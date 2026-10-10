@@ -444,7 +444,7 @@ the tier tables' validator holds a model to no shape beyond carrying no whitespa
 
 ### unremapped-rebuild-reds-smoke
 
-[cost: event/low] [surface: installer]
+[cost: event/low] [surface: installer] [recurrence: 2026-10-10]
 
 the crate suite's `cargo test --release` rebuilds the release binary without `bin/build-native.sh`'s path-remap flags, so the builder's cargo registry path is left in it. The next validate run's installer smoke stages that binary and reds on `check-tree-terms` until `bin/build-native.sh` is rerun. The smoke's staging step refuses a binary whose source stamp is stale (`native/src/emit/installer_smoke/staging.rs`) and reads nothing of the remap.
 

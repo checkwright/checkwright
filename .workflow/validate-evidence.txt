@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+hook-placement-guard-rules-pass gates sha256=a094dedb3680f3382142830b048887c49c48a9691cb99c97ba03a8951eef2765 pass=152 fail=0 ignore=0 verdict=clean 2026-10-10
+hook-placement-guard-rules-pass gate_sdk sha256=0db30fa7aadcf36c1a84c6f626ee97d38b8624ce30e03c80ee692e1682880abd pass=1 fail=0 ignore=0 verdict=clean 2026-10-10
+hook-placement-guard-rules-pass canon_kit sha256=94adc56304517c48e98925ef1b60184e537116f84dcc77387eb157e8108c8d50 pass=1 fail=0 ignore=0 verdict=clean 2026-10-10
+hook-placement-guard-rules-pass context_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-10-10
+hook-placement-guard-rules-pass delegation_kit sha256=e8b7dacc5b3a03c2084bd61274ee3c701400be4001eeaafa4126bc7f4b710363 pass=1 fail=0 ignore=0 verdict=clean 2026-10-10
+hook-placement-guard-rules-pass doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-10-10
+hook-placement-guard-rules-pass evidence_kit sha256=c62871f8123949178b90372d234262f4c133b06c830e8faa9bbb9af4d2767fea pass=1 fail=0 ignore=0 verdict=clean 2026-10-10
+hook-placement-guard-rules-pass guard_kit sha256=01d94b4120e133665e01946fe44d31a730d2c6cdfd1570e5ce6b96a7a1b30e1b pass=1 fail=0 ignore=0 verdict=clean 2026-10-10
+hook-placement-guard-rules-pass lifecycle_kit sha256=3443faac1a321c44bbb9958c3e699d905d1cf0b2fd04e67fa0b798773a4fca0e pass=1 fail=0 ignore=0 verdict=clean 2026-10-10
+hook-placement-guard-rules-pass queue_kit sha256=a4c89486a636a6d9c43ded5bbbb06f21bd7c7b3db7a8a330bdcf89eb952b9f7d pass=1 fail=0 ignore=0 verdict=clean 2026-10-10
+hook-placement-guard-rules-pass site_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-10-10
+hook-placement-guard-rules-pass scripts sha256=41d1316ce84634ce2cd5489d89516c6da7179b572ad9251dbee8c05f36f808a0 pass=1 fail=0 ignore=0 verdict=clean 2026-10-10
+hook-placement-guard-rules-pass guard_tests sha256=efb1186beb90f03d6e2e8205fe446367582bfe0dda3789fe82f221df04b6f3e2 pass=1 fail=0 ignore=0 verdict=clean 2026-10-10
+hook-placement-guard-rules-pass demo sha256=5769ca43a573ce28978e3d18a05df4f1b1ad16c51c5e80add2bff4475a1da0a6 pass=1 fail=0 ignore=0 verdict=clean 2026-10-10
+hook-placement-guard-rules-pass installer_smoke sha256=a876206b47e507729534ff63c7934cd9204e662a1fd07b4cecb8d5d4e0100e9f pass=28 fail=0 ignore=0 verdict=clean 2026-10-10
+hook-placement-guard-rules-pass consumer_smoke sha256=612e48d3630fe4fee39916656cb984d22d91d20aa57d0030ad86602e4ad15818 pass=1 fail=0 ignore=0 verdict=clean 2026-10-10
+hook-placement-guard-rules-pass upgrade sha256=979ac9e47700cc4397b81c13255267e01ad224718a13376b1be629275f714ee6 pass=1 fail=0 ignore=0 verdict=clean 2026-10-10
+hook-placement-guard-rules-pass agents_md_smoke sha256=56f9252ee564f2350817b946618bc70bceea8c871b0dd2d8aa145f9e09d003d3 pass=1 fail=0 ignore=0 verdict=clean 2026-10-10
+hook-placement-guard-rules-pass index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-10-10
+hook-placement-guard-rules-pass native_crate sha256=04cbefbfd0862b7ac4c30577e742b43163b0747331b9259492a29cbf073832a1 pass=1 fail=0 ignore=0 verdict=clean 2026-10-10
+hook-placement-guard-rules-pass projection_witness sha256=d0303d643adb10c7af3d75f9a5f4b3bd576711bfc31a6337c9dccaef2de82969 pass=1 fail=0 ignore=0 verdict=clean 2026-10-10
