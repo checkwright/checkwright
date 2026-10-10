@@ -16,7 +16,7 @@ doctrine-kit/DOCTRINE.md gains an engineering-craft rule after the last one, wit
 
 Rule text. **Not yet applied.**
 
-> 29. **Rehearse the published front door from a clean seat.** Before an audience meets a release, install the artifact as published, by each route that audience will take, on a seat that has never held the project: no checkout, no cached toolchain, no configuration of the author's. Walk a newcomer's first session there, through the first refusal and the first upgrade, and file every finding (the *Gap disposition* rule). A smoke that packs the tree and installs it from the author's seat exercises neither the published bytes nor the clean host, so it passes what a stranger's first install refuses. A route a pipeline can drive is rehearsed by the pipeline on every publish; one it cannot is walked by hand before the event. Which seats, platforms, routes and events those are is the consumer's release procedure's to name. *Under agent work:* an agent's seat is the author's, with every tool placed and configured, so its green install proves the author's path and no other. *Enforced by:* convention at the release boundary; a consumer mechanizes the drivable routes as a job of its publish pipeline.
+> 29. **Rehearse the published front door from a clean seat.** Before an audience meets a release, install the artifact as published, by each route that audience will take, on a seat that has never held the project: no checkout, no cached toolchain, no configuration of the author's. Walk a newcomer's first session there, through the first refusal and the first upgrade, and file every finding (the *Gap disposition* rule). A smoke that packs the tree and installs it from the author's seat exercises neither the published bytes nor the clean host, so it passes what a stranger's first install refuses. A route a pipeline can drive is rehearsed by the pipeline on every publish; one it cannot is walked by hand before the event. Which seats, platforms, routes and events those are is the consumer's release procedure's to name. *Under agent work:* an agent's seat is the author's, with every tool placed and configured, so its green install proves the author's path and no other. *Enforced by:* convention at the release boundary; a consumer mechanizes the drivable routes as a job of its publish pipeline. No checkwright gate reads it yet: whether a rehearsal ran on a seat that never held the project leaves nothing in the tree but the consumer's own record.
 >
 >     *Stages:* close
 
@@ -25,18 +25,18 @@ Rule text. **Not yet applied.**
 `.github/workflows/publish.yml` gains a job, `front-door`, that needs `release` and `npm` and runs delta 3's driver once per distinct runner the target roster maps {design-bearing}.
 
 - **The seats come from the roster.** `roster` gains a second output, the distinct runners of `native/runners.list`'s map for the targets in the roster, and the job's matrix is that list. No platform is spelled in the workflow, as for `build`.
-- **The job holds no credential.** Its permissions are `contents: read`, for a sparse checkout of the driver's two files and nothing else of the tree, placed outside the directory the driver installs into. It is handed no token, so the hosted script meets the signed-out seat a stranger has.
+- **The job exports no credential to a step.** Its permissions are `contents: read`, for a sparse checkout of the driver's two files and nothing else of the tree, which runs with `persist-credentials: false` and lands under a subdirectory of `RUNNER_TEMP`. Every driver step runs from a working directory outside that checkout, so the seat check reads the runner's own directory as clean. No token reaches a step's environment, so the hosted script meets the signed-out seat a stranger has.
 - **The release under rehearsal is the tag's, named explicitly.** The hosted pin still names the release before it until the drain commit moves it (installer/SPEC.md §The hosted install pin), so each leg passes the tag's version through `CHECKWRIGHT_VERSION`.
 - **The release before it comes from the `release` job**, as a job output: the newest published Release other than the tag's, read with that job's token before it creates or edits this one. An empty value means no earlier Release, and the driver states the upgrade leg skipped.
 - **It follows both channels.** `npm` waits on its approval environment, so the job starts after that approval; a refused or failed `npm` leaves it unrun, and the watch reads that as the channel's failure it is.
-- **A red leg is a finding on a published release.** Both channels have published the tag's bytes, so the tag is never re-pushed for it. The finding is filed, and a defect that stops a first install or a first upgrade is fixed and shipped as the next patch release, whose own job reads green. A leg red on a fetch that failed in transit is re-run.
-- **The text is written in the shapes the action walk reads today**: step dashes indented under `steps`, and no comment after a block-scalar indicator or a quoted `uses`. That holds whether or not [action-walk-yaml-shapes](TASK-QUEUE.md#action-walk-yaml-shapes) lands in the same batch, so the job waits on no sibling.
+- **A red leg is a finding on a published release.** Both channels have published the tag's bytes, so the tag is never re-pushed for it. The finding is filed, and a defect that stops a first install or a first upgrade is fixed and shipped as the next patch release, whose own job reads green. A leg red on a fetch that failed in transit is re-run. A leg red on a 404 for an asset name the release renamed is the drain commit's, which moves the name on the fetch surfaces (RELEASING.md §The procedure, step 4), and no finding on the release; the watch reads the fetch's failing name before it files.
+- **The text is written in the shapes the action walk reads today**: step dashes indented under `steps`, and no comment after a block-scalar indicator or a quoted `uses`. The matrix-resolved `runs-on` leaves the dialect unstated, so every `run:` step names its `shell:`, `bash` on the Unix legs and `pwsh` on the Windows ones, each step guarded by `runner.os` (gate-sdk/SPEC.md §check-action-run-shell). That holds whether or not [action-walk-yaml-shapes](TASK-QUEUE.md#action-walk-yaml-shapes) lands in the same batch, so the job waits on no sibling.
 
-### (3) The driver: one stranger's first session, per route
+### (3) The driver: one stranger's first session, per session
 
 Two new files, `scripts/ci-front-door.sh` and its PowerShell twin `scripts/ci-front-door.ps1`, take a version and an optional previous version and run the sequence below with no other input from the tree {design-bearing}. The shell file runs the Unix legs and the PowerShell one the Windows legs, each through the one-line install its system's install page prints (installer/SPEC.md §The dependency boundary, *The one-line install*).
 
-- **Shell, and permanently.** The subject is the line a stranger types into a shell and the bootstrap it starts. A compiled driver would be reached through the very bootstrap under test and could not run before the artifact it installs exists on the seat. Each file states that ground where it declares its disposition (gate-sdk/SPEC.md §The port-candidate criteria).
+- **Shell, and permanently.** The subject is the line a stranger types into a shell and the bootstrap that places the compiled binary, so a compiled driver would test the artifact with itself. Each file states that ground where it declares its disposition (gate-sdk/SPEC.md §The port-candidate criteria).
 - **The seat is checked first.** A `checkwright` already resolvable on `PATH`, or a working directory inside a git work tree, is exit 2: the seat is not clean, and nothing after it would mean what it says.
 - **The first session**, in a new empty repository under the runner's temp directory:
   1. the one-line install at the version exits 0 and leaves a `checkwright.lock` naming it;
@@ -54,16 +54,16 @@ Two new files, `scripts/ci-front-door.sh` and its PowerShell twin `scripts/ci-fr
 
 RELEASING.md gains a section, *The front-door rehearsal*, and step 5 of §The procedure points at it {design-bearing}.
 
-- **Step 5** adds `front-door` to what the publish watch reads, with delta 2's rule for a red leg in one sentence and a pointer to the section.
-- **The section's first half is the job's contract**: the seats, the three routes, the sequence of delta 3 and its statuses, cited by `publish.yml`'s and the two drivers' `# spec:` lines.
+- **Step 5** scopes its *watch both jobs* and *a red publish is fixed and the tag re-pushed* sentences to the two channel jobs, `release` and `npm`, adds `front-door` to what the publish watch reads, and states delta 2's rule for a red leg in one sentence (the tag is never re-pushed for it, the finding is filed, a defect that stops a first install or upgrade ships as the next patch) with a pointer to the section.
+- **The section's first half is the job's contract**: the seats, the two routes (the one-line install and the package) run as three sessions (first session, first upgrade, package), the sequence of delta 3 and its statuses, cited by `publish.yml`'s and the two drivers' `# spec:` lines.
 - **Its second half is the walked rehearsal**, this repository's consumer content under delta 1's rule:
   - **When.** Before an audience-facing event and only then: a catalog submission, or an install by a partner on a machine this project does not control. A release cut for no such event takes the job alone.
   - **What.** The routes no job drives: the adoption prompt given to a coding agent, the plugin marketplace install, and the Spec Kit extension. Each is walked by an agent session, on the release the event will meet, through the same first session as delta 3.
   - **Where.** A seat with no checkout of this repository and none of its author's configuration: a fresh container, or a machine the event's audience would recognise as theirs. The runbook names the property; which container is local operations content.
   - **Record.** Every finding goes to the gap inbox with `--emit file-gap`. The queue entry of the event the rehearsal precedes takes one dated line: the release, the seat, the routes walked and how many findings were filed. A rehearsal with no line did not happen.
-- **What stays unrehearsed is stated there**: a musl host and WSL, which no roster runner is, wait for the walked half.
+- **What stays unrehearsed is stated there**: a musl host and WSL, which no roster runner is, wait for the walked half. So does the seat itself: a hosted runner is clean of this project and of the author's configuration but carries its image's preinstalled tools, and the job's checkout is the driver's two files, so a seat with neither is the walked half's.
 
-installer/SPEC.md §The consumer smoke takes one sentence after its opening paragraph. **Not yet applied.**
+installer/SPEC.md gains two edits {design-bearing}. §The consumer smoke takes one sentence after its opening paragraph, and §The dependency boundary's *Arguments and overrides* bullet widens *installs a named older release* to *installs a named release, older or newer than the pin*, the use delta 2 and RELEASING.md step 4 make of it. **Not yet applied.**
 
 > It installs the tree's own pack from the author's seat; the published artifact on a clean one is RELEASING.md §The front-door rehearsal's.
 
@@ -82,11 +82,12 @@ installer/SPEC.md §The consumer smoke takes one sentence after its opening para
 - `docs/doctrine-kit/DOCTRINE.md` — generated mirror, stale once delta 1 lands (delta 1).
 - `.github/workflows/publish.yml` — the job, the two outputs and the header's `# spec:` line (delta 2).
 - `scripts/ci-front-door.sh`, `scripts/ci-front-door.ps1` — new (delta 3).
-- `RELEASING.md` §The procedure — step 5 (deltas 2 and 4).
+- `RELEASING.md` §The procedure — step 5: the watch's scope and the red-leg rule (deltas 2 and 4).
 - `RELEASING.md` — the new section (deltas 3 and 4).
 - `installer/SPEC.md` §The consumer smoke — the pointer sentence (delta 4).
+- `installer/SPEC.md` §The dependency boundary, *Arguments and overrides* — `CHECKWRIGHT_VERSION` installs a named release, older or newer than the pin (delta 4).
 - `docs/installer/SPEC.md` — generated mirror, stale once delta 4 lands (delta 4).
-- `.workflow/release-declarations.md` — a bullet for the doctrine's new rule, which a re-vendoring consumer receives (delta 1).
+- `.workflow/release-declarations.md` — a Behavior changes bullet led by `doctrine-kit/DOCTRINE.md` *Rehearse the published front door from a clean seat*: a re-vendoring consumer receives the rule and `--emit stage-rules close` gains its pointer; nothing to do (delta 1).
 
 ## Retired spellings
 
