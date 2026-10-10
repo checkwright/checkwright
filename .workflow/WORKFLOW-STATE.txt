@@ -7,3 +7,4 @@
 front-door-readiness-pass scope af71e82c 2026-10-10 ac5c39edd
 front-door-readiness-pass spec a736082c 2026-10-10 f8ed8ea5e
 front-door-readiness-pass align aca26e79 2026-10-10 60d62fce8
+front-door-readiness-pass build ad70c6d5 2026-10-10 b23dcf1ba
