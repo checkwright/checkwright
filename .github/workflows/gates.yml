@@ -1182,6 +1182,108 @@ jobs:
           Write-Host "the placed hooks refused a bad subject, a worktree's violation, their own name and an absent binary, and started the binary the knob named"
           exit 0
 
+      # spec: gate-sdk/SPEC.md §install-hooks — a hook re-placed while it runs, on native Windows; this is the oracle
+      - name: a placed hook is re-placed while it runs
+        if: matrix.part == 'bootstrap'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (Test-Path Variable:PSNativeCommandArgumentPassing) { $PSNativeCommandArgumentPassing = 'Standard' }
+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) { $PSNativeCommandUseErrorActionPreference = $false }
+          $bin = $env:PWSH_GATE_BIN
+          $t = Join-Path $env:PWSH_SCRATCH 'hook-running'
+          if (Test-Path -LiteralPath $t) { Remove-Item -LiteralPath $t -Recurse -Force }
+          $repo = Join-Path $t 'repo'
+          New-Item -ItemType Directory -Force -Path (Join-Path $repo 'scripts'), (Join-Path $t 'first'), (Join-Path $t 'second') | Out-Null
+          $leaf = Split-Path -Leaf $bin
+          $first = Join-Path $t "first/$leaf"
+          $second = Join-Path $t "second/$leaf"
+          Copy-Item -LiteralPath $bin -Destination $first
+          Copy-Item -LiteralPath $bin -Destination $second
+          $tail = [Text.Encoding]::ASCII.GetBytes('a second build')
+          $stream = [IO.File]::Open($second, [IO.FileMode]::Append)
+          try { $stream.Write($tail, 0, $tail.Length) } finally { $stream.Dispose() }
+          $kit = (Join-Path $env:GITHUB_WORKSPACE 'gate-sdk') -replace '\\', '/'
+          [IO.File]::WriteAllText((Join-Path $repo 'scripts/gates.list'), "check-pipe-membership`n")
+          [IO.File]::WriteAllText((Join-Path $repo 'scripts/gate-sdk-config.knobs'), "GATE_SDK_NATIVE_BIN = $($first -replace '\\', '/')`nGATE_SDK_KIT_DIRS = $kit`n")
+          $script:fails = 0
+          function Check([string] $label, [object] $cond, [string] $detail) {
+              if ($cond) { Write-Host "ok   $label" }
+              else { Write-Host "BAD  $label -- $detail"; $script:fails++ }
+          }
+          function Digest([string] $path) { (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash }
+          function Refresh([string] $from) {
+              Push-Location $repo
+              try {
+                  $env:GATE_SDK_NATIVE_BIN = $from -replace '\\', '/'
+                  $script:rout = (& $bin --install-hooks --refresh 2>&1) -join "`n"
+                  $script:rcode = $LASTEXITCODE
+              } finally { Remove-Item Env:GATE_SDK_NATIVE_BIN -ErrorAction SilentlyContinue; Pop-Location }
+          }
+          git -C $repo init -q .
+          Push-Location $repo
+          try {
+              $iout = (& $bin --install-hooks 2>&1) -join "`n"
+              $icode = $LASTEXITCODE
+          } finally { Pop-Location }
+          $hooks = "$(git -C $repo config --get core.hooksPath)"
+          $preHook = "$hooks/pre-commit.exe"
+          $msgHook = "$hooks/commit-msg.exe"
+          if (-not $hooks -or -not (Test-Path -LiteralPath $preHook -PathType Leaf) -or -not (Test-Path -LiteralPath $msgHook -PathType Leaf)) {
+              Write-Host "::error::--install-hooks placed no pre-commit.exe and commit-msg.exe under core.hooksPath '$hooks', so no placed hook is under witness: exit $icode -- $iout"
+              exit 1
+          }
+          $old = Digest $first
+          $new = Digest $second
+          if ($old -eq $new -or (Digest $preHook) -ne $old) { Write-Host "::error::the two binaries do not differ, or the placed hook is not the first one, so a replacement could not be told from none"; exit 1 }
+
+          Write-Host "== the placed pre-commit.exe is held running =="
+          $shell = Join-Path ([Environment]::SystemDirectory) 'cmd.exe'
+          $psi = [Diagnostics.ProcessStartInfo]::new()
+          $psi.FileName = $preHook
+          $psi.WorkingDirectory = $repo
+          $psi.UseShellExecute = $false
+          $psi.RedirectStandardInput = $true
+          $psi.EnvironmentVariables['GATE_SDK_NATIVE_BIN'] = $shell -replace '\\', '/'
+          $held = [Diagnostics.Process]::Start($psi)
+          try {
+              Start-Sleep -Seconds 3
+              if ($held.HasExited) { throw "the placed hook exited $($held.ExitCode) with its input still open, so no running hook is under witness" }
+
+              Write-Host "== the hooks are re-placed from a second binary =="
+              Refresh $second
+              $running = -not $held.HasExited
+              Write-Host "--install-hooks --refresh exited $rcode -- $rout"
+              Check "the hook was still running when it was re-placed" $running "it exited $(if (-not $running) { $held.ExitCode })"
+              $pre = if (Test-Path -LiteralPath $preHook -PathType Leaf) { Digest $preHook } else { 'absent' }
+              $msg = if (Test-Path -LiteralPath $msgHook -PathType Leaf) { Digest $msgHook } else { 'absent' }
+              Check "the running hook is still served, by one binary or the other" ($pre -eq $old -or $pre -eq $new) "pre-commit.exe is $pre"
+              Check "the other hook is still served, by one binary or the other" ($msg -eq $old -or $msg -eq $new) "commit-msg.exe is $msg"
+              Check "the status says which: 0 with the second binary served, 2 with the first" (($rcode -eq 0 -and $pre -eq $new -and $msg -eq $new) -or ($rcode -eq 2 -and $pre -eq $old)) "exit $rcode, pre-commit.exe $(if ($pre -eq $new) { 'second' } elseif ($pre -eq $old) { 'first' } else { $pre })"
+              if ($rcode -eq 2) { Check "the refusal names the hook it could not replace" ($rout -match 'cannot replace' -and $rout -match 'pre-commit') "$rout" }
+              $left = @(Get-ChildItem -LiteralPath $hooks -File | Where-Object { $_.Name -ne 'pre-commit.exe' -and $_.Name -ne 'commit-msg.exe' })
+              Check "no sibling is left that the run did not report" ($left.Count -eq 0 -or $rout -match 'cannot remove') "left: $($left.Name -join ', ')"
+              $outcome = if ($rcode -eq 0) { 'replaced the running hook and exited 0' } else { "refused at $rcode with the first binary still served" }
+              Write-Host "::notice::re-placing a running pre-commit.exe on $env:PWSH_TARGET $outcome; siblings left: $($left.Count)"
+          } finally {
+              if (-not $held.HasExited) {
+                  $held.StandardInput.Close()
+                  if (-not $held.WaitForExit(15000)) { $held.Kill(); $held.WaitForExit() }
+              }
+          }
+
+          Write-Host "== with the hook no longer running, the re-placement lands =="
+          Get-ChildItem -LiteralPath $hooks -File | Where-Object { $_.Name -ne 'pre-commit.exe' -and $_.Name -ne 'commit-msg.exe' } | Remove-Item -Force
+          Refresh $second
+          Check "the refresh exited 0" ($rcode -eq 0) "exit $rcode -- $rout"
+          Check "both hooks are the second binary" ((Digest $preHook) -eq $new -and (Digest $msgHook) -eq $new) "pre-commit.exe $(Digest $preHook), commit-msg.exe $(Digest $msgHook), second $new"
+          $left = @(Get-ChildItem -LiteralPath $hooks -File | Where-Object { $_.Name -ne 'pre-commit.exe' -and $_.Name -ne 'commit-msg.exe' })
+          Check "no sibling is left" ($left.Count -eq 0) "left: $($left.Name -join ', ')"
+
+          if ($script:fails -gt 0) { Write-Host "::error::a hook re-placed while it runs: $($script:fails) assertion(s) failed"; exit 1 }
+          Write-Host "a running hook was re-placed with a hook served throughout, and the re-placement landed once it had exited"
+          exit 0
+
       # spec: RELEASING.md §The front-door rehearsal — the Windows driver parsed and its opening run by the host the job uses, on every push
       - name: the front-door driver's PowerShell twin refuses a missing operand
         if: matrix.part == 'bootstrap'
