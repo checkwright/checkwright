@@ -4,11 +4,4 @@
 
 ---
 
-front-door-readiness-pass scope af71e82c 2026-10-10 ac5c39edd
-front-door-readiness-pass spec a736082c 2026-10-10 f8ed8ea5e
-front-door-readiness-pass align aca26e79 2026-10-10 60d62fce8
-front-door-readiness-pass build ad70c6d5 2026-10-10 b23dcf1ba
-front-door-readiness-pass build aa809efd 2026-10-10 22daa9f9a
-front-door-readiness-pass build aed47d40 2026-10-10 d9627dbbe
-front-door-readiness-pass validate aecfc273 2026-10-10 0c154c4f5
-front-door-readiness-pass close ab661c35 2026-10-10 56b1a703d
+— scope a7a281f4 2026-10-10 be91469b8
