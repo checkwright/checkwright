@@ -148,6 +148,14 @@ fallthrough	python3 - <<'PY'@NL@import json@NL@s = open('n.md').read()@NL@open('
 fallthrough	python3 - <<'PY'@NL@s = open('n.md').read()@NL@print(s.replace('a', 'b'))@NL@PY
 fallthrough	python3 - <<PY@NL@s = open('n.md').read()@NL@open('n.md', 'w').write(s.replace('cost $5', 'b'))@NL@PY
 fallthrough	python3 -m json.tool notes.json
+# the discriminator is the body alone: a literal rewrite looping over several files blocks as one
+# over a single file does, and a command following the body, a read or a build, moves neither
+# verdict; a body carrying a computed-text construct passes whatever follows it
+block	python3 - <<'PY'@NL@for p in ['a.md', 'b.md', 'c.md', 'd.md']:@NL@    s = open(p).read()@NL@    open(p, 'w').write(s.replace('old', 'new'))@NL@PY
+block	python3 - <<'PY'@NL@for p in ['a.md', 'b.md', 'c.md', 'd.md']:@NL@    s = open(p).read()@NL@    open(p, 'w').write(s.replace('old', 'new'))@NL@PY@NL@grep -n new a.md
+block	python3 - <<'PY'@NL@p = 'notes.md'@NL@s = open(p).read()@NL@open(p, 'w').write(s.replace('old', 'new'))@NL@PY@NL@make build
+block	python3 -c "p='notes.md'; s=open(p).read(); open(p,'w').write(s.replace('a', 'b'))" && make build
+fallthrough	python3 - <<'PY'@NL@import re@NL@for p in ['a.md', 'b.md']:@NL@    s = open(p).read()@NL@    open(p, 'w').write(re.sub('old', 'new', s).replace('c', 'd'))@NL@PY@NL@make build
 
 # rule `find_glob` — listing-only find steered to Glob, alone or as a ';'-batch of listings
 #          (a literal banner between them is fine); action-predicate / piped /

@@ -20,7 +20,7 @@ the hook-wiring rewire windows-kit-bash-files did not land: context-kit and guar
 - **Run on Linux, harness 2.1.292.** The same four, and: with the binary renamed away no notice reached the model channel; in a linked worktree the placeholder named the main checkout; a `hooks` edit armed in the running session; a call a tool refuses on its own input never reaches the hook.
 - **Hazard.** The binary given no argument exits 2, so a harness that dropped `args` would block every call the matcher takes. A witness rides a matcher no session uses and a scratch copy of the binary.
 
-**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** this entry leads hook-placement-guard-rules-pass with [windows-running-hook-replace](#windows-running-hook-replace), [hook-sibling-pid-namespace](#hook-sibling-pid-namespace), [replaced-binary-self-path](#replaced-binary-self-path), `guard-quoted-operand-words`, `shared-tree-stash-steer`, `wait-exemption-body-unbounded` and [inline-python-steer-split](#inline-python-steer-split). The edit to this repo's own registrations waits for the operator's confirmation of the prepared diff, owed when the diff exists.
+**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** this entry leads hook-placement-guard-rules-pass with [windows-running-hook-replace](#windows-running-hook-replace), [hook-sibling-pid-namespace](#hook-sibling-pid-namespace), [replaced-binary-self-path](#replaced-binary-self-path), `guard-quoted-operand-words`, `shared-tree-stash-steer`, `wait-exemption-body-unbounded` and `inline-python-steer-split`. The edit to this repo's own registrations waits for the operator's confirmation of the prepared diff, owed when the diff exists.
 
 **Answered at spec (2026-10-10; operator directions, lead-relayed, not rulings, but the third):** the exec form is the one shipped wiring, and the quiet absent-binary state is accepted, which reverses the refusal gate-sdk/SPEC.md §run-gates records; the host with no bash at all is a stated limit, with no operator run this iteration; a minimum harness version is stated on the requirements page, inferred until a witness runs. Lead decision: a template names the binary by the existing placeholder, guard-kit's `check-door-binding` assertion B unchanged, revisable against the oracle.
 
@@ -61,16 +61,6 @@ a gate that resolves its own executable reds when the binary is replaced under i
 **Deliverable:** the read made safe across a replace at its shared sites, or the limit stated where the rebuild obligation is (gate-sdk/SPEC.md §Porting a gate to the binary substrate).
 
 **Cost while deferred:** a session reads a spurious red as its own regression right after the commit-time rebuild. Filed 2026-10-10 by front-door-readiness-pass' lead on its third build session's report, and promoted at the next scope's intake. Re-verified there by reading the gate and by `git grep -c current_exe -- native/src`. Owner lookup: `current_exe`, `(deleted)`, `fence-run`, `rebuild` in this file and the disposed-findings record — [unremapped-rebuild-reds-smoke](#unremapped-rebuild-reds-smoke), DISTINCT (a rebuild without the remap flags); owner gate-sdk/SPEC.md §Porting a gate to the binary substrate.
-
-### inline-python-steer-split
-
-rule `sed_file`'s inline-python arm took one of two like calls in delegation-wait-journal-pass' close session. A `python3 -` heredoc rewriting four tracked files through `open().write`, followed by a grep, ran; the next, rewriting one file and followed by a build call, was blocked with the steer to `--rewrite`.
-
-**Deliverable:** the two shapes as decision-table rows: a literal rewrite looping over several files, and a body followed by a second command. The rule's stated reach needs no correction.
-
-**Replayed at scope 2026-10-10**, on six reconstructions, the two bodies being on no record: every literal rewrite was blocked, over one file or four and whatever command followed it, and a body carrying a computed-text construct passed. That is the discriminator the rule entry states, and guard-kit/guard-tests/cases.tsv already pins it for a single file with nothing following.
-
-**Cost while deferred:** the steer toward the count-asserting rewrite arm is skipped by a shape nobody has named. Filed 2026-10-08 by delegation-wait-journal-pass' close, after its drain, and promoted at the next scope's intake. Re-verified: the rule entry blocks a literal rewrite carrying no computed-text construct and says it leans toward passing. Owner lookup: `python`, `--rewrite`, `heredoc`, `sed_file` in this file and the disposed-findings record — none; owner guard-kit/SPEC.md §The generic ruleset.
 
 ## Deferred
 
@@ -1233,4 +1223,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - guard-quoted-operand-words
 - shared-tree-stash-steer
 - wait-exemption-body-unbounded
+- inline-python-steer-split
 
