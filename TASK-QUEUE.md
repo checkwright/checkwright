@@ -8,18 +8,6 @@
 
 ## New Features
 
-### shared-tree-stash-steer
-
-[spec: SPEC-git-stash.md]
-
-A build session ran `git stash` / `git stash pop` on the shared checkout to rebuild a pre-change binary for a before/after probe. Stash rewrites the shared index and worktree under any concurrent session. Rule `git_mutation_under_producer` blocks `stash` only while a live producer record exists (guard-kit/SPEC.md, its act set), and no rule, agent-execution bullet or stage template steers a before/after probe to a throwaway worktree.
-
-**Deliverable:** a steer from a worktree-rewriting `git stash` on the main checkout to `git worktree add` under the scratch dir, either as a guard-kit block with its decision-table rows or as a delegation-kit/templates/agent-execution.md bullet; choosing between them is the unit's spec question.
-
-**Cost while deferred:** a concurrent session's uncommitted edits or staged paths can vanish or be re-applied under it. Lead-observed once, with the tree intact. Read at spec 2026-10-10: the friction log, which records every call no rule decides and so every stash outside a live producer, held no stash call since its last truncation beyond that stage's own probes. Spec chose the guard-kit block over the template bullet (2026-10-10, the Deliverable's own question). Filed 2026-10-03 by the lead at guard-ruleset-gate-neutrality-pass' build. Re-verified: `stash` sits only in the live-producer act set, and no template text names stash or a before/after probe. Owner lookup: `stash`, `before/after`, `throwaway` in this file — none; owner guard-kit/SPEC.md §The rule roster.
-
-**Answered at align (2026-10-10, operator direction, lead-relayed, not a ruling):** the rule blocks and mints no knob, and the amendment argues that against the Policy-as-choice rule.
-
 ### wait-exemption-body-unbounded
 
 [spec: SPEC-wait-body.md]
@@ -46,7 +34,7 @@ the hook-wiring rewire windows-kit-bash-files did not land: context-kit and guar
 - **Run on Linux, harness 2.1.292.** The same four, and: with the binary renamed away no notice reached the model channel; in a linked worktree the placeholder named the main checkout; a `hooks` edit armed in the running session; a call a tool refuses on its own input never reaches the hook.
 - **Hazard.** The binary given no argument exits 2, so a harness that dropped `args` would block every call the matcher takes. A witness rides a matcher no session uses and a scratch copy of the binary.
 
-**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** this entry leads hook-placement-guard-rules-pass with [windows-running-hook-replace](#windows-running-hook-replace), [hook-sibling-pid-namespace](#hook-sibling-pid-namespace), [replaced-binary-self-path](#replaced-binary-self-path), `guard-quoted-operand-words`, [shared-tree-stash-steer](#shared-tree-stash-steer), [wait-exemption-body-unbounded](#wait-exemption-body-unbounded) and [inline-python-steer-split](#inline-python-steer-split). The edit to this repo's own registrations waits for the operator's confirmation of the prepared diff, owed when the diff exists.
+**Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** this entry leads hook-placement-guard-rules-pass with [windows-running-hook-replace](#windows-running-hook-replace), [hook-sibling-pid-namespace](#hook-sibling-pid-namespace), [replaced-binary-self-path](#replaced-binary-self-path), `guard-quoted-operand-words`, `shared-tree-stash-steer`, [wait-exemption-body-unbounded](#wait-exemption-body-unbounded) and [inline-python-steer-split](#inline-python-steer-split). The edit to this repo's own registrations waits for the operator's confirmation of the prepared diff, owed when the diff exists.
 
 **Answered at spec (2026-10-10; operator directions, lead-relayed, not rulings, but the third):** the exec form is the one shipped wiring, and the quiet absent-binary state is accepted, which reverses the refusal gate-sdk/SPEC.md §run-gates records; the host with no bash at all is a stated limit, with no operator run this iteration; a minimum harness version is stated on the requirements page, inferred until a witness runs. Lead decision: a template names the binary by the existing placeholder, guard-kit's `check-door-binding` assertion B unchanged, revisable against the oracle.
 
@@ -1257,4 +1245,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 ## Done
 
 - guard-quoted-operand-words
+- shared-tree-stash-steer
 

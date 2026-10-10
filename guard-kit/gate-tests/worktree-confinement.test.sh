@@ -93,6 +93,8 @@ want read-to-main      "$d" block "grep -rn foo $main/docs > $main/found.txt" "$
 
 # --- fell through: a write inside the session's own worktree is not this rule's
 want touch-own         "$d" fallthrough "touch inside.txt"
+# --- and so is a stash from it: the worktree has an index and files of its own
+want stash-own         "$d" fallthrough "git stash"
 
 # --- the selector: under off, a search of the main checkout blocks and the journal is still granted
 want off-grep          "$SANDBOX/off.knobs" block "grep -rn foo $main/docs" "$refusal"

@@ -240,7 +240,7 @@ allow	printf 'sleep 5' >> .tmp/note.txt
 #           all. The block arm needs a pid the test owns and lives in
 #           gate-tests/git-mutation-under-producer.test.sh.
 fallthrough	git add tracked.md
-fallthrough	git stash
+fallthrough	git restore --staged tracked.md
 fallthrough	git -C . commit -m done
 fallthrough	git rev-parse HEAD
 
@@ -269,6 +269,25 @@ fallthrough	git add scratch.txt && git commit -o scratch.txt tracked.md -m x
 fallthrough	git add scratch.txt && git commit scratch.txt -m x
 fallthrough	git add tracked.md && git commit -m 'git commit -a' -- tracked.md
 fallthrough	git commit -m x
+
+# rule `git_stash` — a stash that rewrites the working tree or the index is blocked on the main
+#           checkout, which the sandbox is; the forms that leave the tree as it is, a verb the
+#           walk does not know and a global option that moves the repository pass. The linked
+#           worktree's pass lives in gate-tests/worktree-confinement.test.sh.
+block	git stash
+block	git stash -u
+block	git stash push -m x
+block	git stash pop
+block	git stash apply
+block	git --no-pager stash
+block	git stash 2>&1
+block	git status; git stash pop
+fallthrough	git stash list
+fallthrough	git stash show -p
+fallthrough	git stash drop
+fallthrough	git stash frobnicate
+fallthrough	git -C sub stash
+fallthrough	echo 'git stash'
 
 # rule `truncate_scratch` — `: > file` truncation auto-allowed iff every target is gitignored
 allow	: > scratch.txt

@@ -195,6 +195,47 @@ pub fn commit_only_paths(ctx: &Ctx) -> Decided {
     Ok(None)
 }
 
+// spec: guard-kit/SPEC.md §The rule roster — rule `git_stash`'s verb read: whether the word after
+// `stash` names a form that rewrites the working tree or the index; `None` on a verb git's own set
+// does not carry.
+fn stash_rewrites(verb: Option<&str>) -> Option<bool> {
+    match verb {
+        None | Some("push" | "save" | "pop" | "apply" | "branch") => Some(true),
+        Some(v) if v.starts_with('-') => Some(true),
+        Some("list" | "show" | "create" | "store" | "drop" | "clear") => Some(false),
+        Some(_) => None,
+    }
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — rule `git_stash`: a tree-rewriting stash where the
+// session's working tree is the main checkout.
+pub fn git_stash(ctx: &Ctx) -> Decided {
+    let c = ctx.cmd();
+    if !ctx.raw(c)?.contains("stash") || ctx.expands(c, has_expansion)? {
+        return Ok(None);
+    }
+    let h = ctx.host();
+    if !h.roots().main.is_empty() {
+        return Ok(None);
+    }
+    let s = ctx.view(c, SqDqHd)?;
+    for seg in ctx.segments(&s) {
+        let cmdseg = command_word(&segment_core(&seg));
+        let Some(globals) = git_subcommand(&cmdseg, GitWalk::Globals) else { continue };
+        let moves = |g: &String| matches!(g.as_str(), "-C" | "--git-dir" | "--work-tree") || g.starts_with("--git-dir=") || g.starts_with("--work-tree=");
+        if globals.iter().any(moves) {
+            continue;
+        }
+        let ws = git_subcommand(&cmdseg, GitWalk::Args).unwrap_or_default();
+        if ws.first().map(String::as_str) != Some("stash") || stash_rewrites(ws.get(1).map(String::as_str)) != Some(true) {
+            continue;
+        }
+        let form = ws.get(1).filter(|v| !v.starts_with('-')).map_or("git stash".to_string(), |v| format!("git stash {}", v));
+        return block(format!("don't run '{form}' on the main checkout — a stash rewrites the working tree and the index every session in this checkout stands on: it takes every uncommitted edit in the tree, a concurrent session's among them, out from under it and puts them back at a moment that session did not choose. Two exits: to read or build another revision, 'git worktree add {home}/<name> <rev>', removed with 'git worktree remove {home}/<name>' when done; to set your own edits aside, commit them, naming their paths ('git commit -o <path>… -m '<msg>''). 'git stash list', 'show', 'create', 'store', 'drop' and 'clear' are untouched, and so is every stash from a linked worktree, which has an index and files of its own. If you genuinely need the stash, run it yourself with !<command>.", form = form, home = h.first_scratch()));
+    }
+    Ok(None)
+}
+
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `rm_tracked`'s test, a block for it and a
 // predicate for rule `bounded_wait`'s arm (B): the first refusal, or none.
 pub fn rm_tracked_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<String>, Fault> {
@@ -336,6 +377,19 @@ mod tests {
         let o = |w: &str| bash_operand(&plain_word(w)).unwrap();
         assert!(rm_steer(&o("kit"), "rm", true).contains("use 'git rm -q -r kit'"));
         assert!(rm_steer(&o("a.md"), "rm", false).contains("use 'git rm -q a.md'"));
+    }
+
+    // spec: guard-kit/SPEC.md §The rule roster — the stash forms that rewrite, the ones that leave the
+    // tree as it is, and a verb the read does not know
+    #[test]
+    fn the_stash_verb_read_splits_rewriting_from_inert() {
+        for v in [None, Some("-u"), Some("push"), Some("save"), Some("pop"), Some("apply"), Some("branch")] {
+            assert_eq!(stash_rewrites(v), Some(true), "{:?}", v);
+        }
+        for v in ["list", "show", "create", "store", "drop", "clear"] {
+            assert_eq!(stash_rewrites(Some(v)), Some(false), "{}", v);
+        }
+        assert_eq!(stash_rewrites(Some("frobnicate")), None);
     }
 
     // spec: guard-kit/SPEC.md §The rule roster — the steer prints a quoted and a blank-bearing operand

@@ -36,6 +36,10 @@ fallthrough	Start-Job { Start-Sleep 60 }
 block	git add tracked.md; git commit -m x
 fallthrough	git add tracked.md; git commit -o tracked.md -m x
 
+# rule `git_stash` — a tree-rewriting stash on the main checkout; a form that leaves the tree passes
+block	git stash
+fallthrough	git stash list
+
 # rule `rm_tracked` — the deletion commands, their parameters, and the git rm force arm
 block	Remove-Item tracked.md
 block	rm tracked.md

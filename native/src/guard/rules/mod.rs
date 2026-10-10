@@ -50,6 +50,7 @@ pub static TABLE: &[Rule] = &[
         views: &[SqHdq, SqDqHd, Dequoted],
         test: reach::commit_only_paths,
     },
+    Rule { name: "git_stash", shells: BOTH, views: &[Raw, SqDqHd], test: reach::git_stash },
     Rule { name: "truncate_scratch", shells: BASH, views: &[SqDqHd], test: grants::truncate_scratch },
     Rule { name: "append_scratch", shells: BASH, views: &[Hdq, SqDqHd], test: grants::append_scratch },
     Rule { name: "ro_pipeline", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: grants::ro_pipeline },
@@ -553,10 +554,10 @@ mod tests {
     #[test]
     fn the_table_rows_are_distinct_and_their_views_spell() {
         let mut names: Vec<&str> = TABLE.iter().map(|r| r.name).collect();
-        assert_eq!(names.len(), 31);
+        assert_eq!(names.len(), 32);
         names.sort();
         names.dedup();
-        assert_eq!(names.len(), 31);
+        assert_eq!(names.len(), 32);
         for r in TABLE {
             let mut spelt: Vec<&str> = r.views.iter().map(|v| v.spelling()).collect();
             let n = spelt.len();
