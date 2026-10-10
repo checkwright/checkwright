@@ -1,1 +1,3 @@
 job 'release' first invokes gh at line 35 with no repository context
+job 'flush_steps' first invokes gh at line 18 with no repository context
+job 'commented_indicator' first invokes gh at line 29 with no repository context

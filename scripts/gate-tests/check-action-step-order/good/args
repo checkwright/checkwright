@@ -1,4 +1,5 @@
 # Accept case: a job with the action ahead of its first spelling, a job spelling
 # nothing, a spelling on a comment line, a listed program inside a longer word,
-# and a composite action spelling a program, which has no job and is skipped.
+# a quoted ref on the action followed by a comment, and a composite action
+# spelling a program, which has no job and is skipped.
 tree

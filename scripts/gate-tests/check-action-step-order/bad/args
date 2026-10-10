@@ -1,4 +1,5 @@
 # Reject case: a job with no step on the action, one whose step follows the
 # spelling, one whose only step on the action sits in another job, and a
-# spelling behind `if`, outside command position.
+# spelling behind `if`, outside command position, a step sequence at the steps:
+# key's own column and a body under a commented block indicator.
 tree

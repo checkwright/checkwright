@@ -1,3 +1,4 @@
 # Reject case: the attested v0.17.0 miss, a mixed --repo job, a checkout ordered
-# after the call it was meant to establish context for, and a reasonless valve.
+# after the call it was meant to establish context for, a reasonless valve, a step
+# sequence at the steps: key's own column and a body under a commented indicator.
 tree

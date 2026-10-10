@@ -26,3 +26,13 @@ jobs:
       - run: |
           if ! cargo --version; then exit 2; fi
       # - uses: ./.github/actions/toolchain
+  flush:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - run: cargo build
+  commented:
+    runs-on: ubuntu-latest
+    steps:
+      - run: | # the body follows
+          rustc -vV

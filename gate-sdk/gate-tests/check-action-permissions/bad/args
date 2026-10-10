@@ -1,3 +1,4 @@
 # Reject case: it opens on the empty allowlist — the invisible construct — then the
-# attested miss itself, a gh job under an empty declaration, and a bare valve marker.
+# attested miss itself, a gh job under an empty declaration, a bare valve marker, a
+# step sequence at the steps: key's own column and a body under a commented indicator.
 tree

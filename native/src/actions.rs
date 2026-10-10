@@ -152,6 +152,8 @@ fn is_gh_repo_key(line: &str) -> bool {
     }
 }
 
+// spec: gate-sdk/SPEC.md §check-action-gh-repo — a comment set off from the block indicator by
+// white space is no part of it, so the body below is still read as the body
 fn is_block_scalar(v: &str) -> bool {
     let b = v.as_bytes();
     if b.is_empty() || (b[0] != b'|' && b[0] != b'>') {
@@ -161,7 +163,24 @@ fn is_block_scalar(v: &str) -> bool {
     if i < b.len() && (b[i] == b'-' || b[i] == b'+') {
         i += 1;
     }
-    b[i..].iter().all(u8::is_ascii_digit)
+    while i < b.len() && b[i].is_ascii_digit() {
+        i += 1;
+    }
+    let rest = &v[i..];
+    let comment = rest.trim_start_matches([' ', '\t']);
+    rest.is_empty() || (comment.len() < rest.len() && comment.starts_with('#'))
+}
+
+// spec: gate-sdk/SPEC.md §check-action-gh-repo — a quoted ref is what stands inside its quotes
+// and a plain one ends at white space, so a trailing comment is no part of either
+fn uses_ref(v: &str) -> &str {
+    match v.chars().next() {
+        Some(q @ ('"' | '\'')) => {
+            let inner = &v[1..];
+            &inner[..inner.find(q).unwrap_or(inner.len())]
+        }
+        _ => &v[..v.find([' ', '\t']).unwrap_or(v.len())],
+    }
 }
 
 // spec: gate-sdk/SPEC.md §check-action-gh-repo — a detected call's `--repo` is looked for
@@ -422,11 +441,7 @@ impl<'a> Walk<'a> {
             .trim_start_matches([' ', '\t'])
             .trim_end_matches([' ', '\t']);
         if k == "uses" {
-            let q = v.trim_start_matches(['"', '\'']).trim_end_matches(['"', '\'']);
-            let q = match q.find([' ', '\t']) {
-                Some(i) => &q[..i],
-                None => q,
-            };
+            let q = uses_ref(v);
             let u = match q.find('@') {
                 Some(i) => &q[..i],
                 None => q,
@@ -608,7 +623,10 @@ impl<'a> Walk<'a> {
             self.jobkeycol = c;
         }
 
-        if c == self.jobkeycol {
+        // spec: gate-sdk/SPEC.md §check-action-gh-repo — a dash at the `steps:` key's own column
+        // is that sequence's entry, never a job key
+        let flush_step = self.insteps && dash_prefix_len(line).is_some();
+        if c == self.jobkeycol && !flush_step {
             self.stepcol = -1;
             let k = keyof(line).unwrap_or("");
             self.insteps = k == "steps";
@@ -908,5 +926,31 @@ mod tests {
             vec!["uses:./.github/actions/toolchain@4", "uses:actions/checkout@5", "cargo@9", "rustc@10"]
         );
         assert_eq!(words(text, &[]), vec!["uses:./.github/actions/toolchain@4", "uses:actions/checkout@5"]);
+    }
+
+    // spec: gate-sdk/SPEC.md §check-action-gh-repo — a comment after a block indicator, a comment
+    // after a quoted ref and a step sequence at the `steps:` key's own column each read as the
+    // same job written without them, and the job key after such a sequence still closes it
+    #[test]
+    fn three_valid_yaml_shapes_read_as_their_plain_spellings() {
+        assert!(is_block_scalar("|") && is_block_scalar(">-2") && is_block_scalar("| # body"));
+        assert!(is_block_scalar("|-\t# body") && !is_block_scalar("|# joined") && !is_block_scalar("| body"));
+        assert_eq!(uses_ref("\"./a/b\" # why"), "./a/b");
+        assert_eq!(uses_ref("'a/b@v1'"), "a/b@v1");
+        assert_eq!(uses_ref("a/b@v1 # why"), "a/b@v1");
+        assert_eq!(uses_ref(""), "");
+        let text = concat!(
+            "jobs:\n",
+            "  j:\n",
+            "    steps:\n",
+            "    - uses: \"./.github/actions/toolchain\" # quoted, then a comment\n",
+            "    - name: a body under a commented indicator\n",
+            "      run: | # the body follows\n",
+            "        cargo build\n",
+            "    env:\n",
+            "      run: rustc\n",
+            "    - run: rustc --version\n",
+        );
+        assert_eq!(words(text, &["cargo", "rustc"]), vec!["uses:./.github/actions/toolchain@4", "cargo@7"]);
     }
 }

@@ -1,0 +1,22 @@
+name: yaml-shapes
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  # A step sequence whose dashes sit at the steps: key's own column is the same
+  # sequence as one indented below it, so its checkout arms the job.
+  flush_steps:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+  # A comment after the block indicator is no part of it: the body below is still
+  # read, and its gh call is the job's only evidence.
+  commented_indicator:
+    runs-on: ubuntu-latest
+    steps:
+      - name: a body under a commented indicator
+        run: | # the body follows
+          gh issue list --repo owner/repo --state open

@@ -18,19 +18,11 @@ four behaviors windows-shell-floor-pass landed run on no Windows leg. gate-sdk/g
 
 **Read at promotion, 2026-10-10:** the last three hold. The Windows witness steps name `pre-commit.exe` alone, no step of the workflow starts a hook member, and the stop-restore witness reads the error preference after a block that exited 0, while no step asserts the progress preference.
 
-**Push need (2026-10-10, inside the budget):** one mid-iteration push, since a new Windows assertion runs on the remote leg alone; [action-walk-yaml-shapes](#action-walk-yaml-shapes) and the front-door job's workflow text ride the same push.
+**Push need (2026-10-10, inside the budget):** one mid-iteration push, since a new Windows assertion runs on the remote leg alone; `action-walk-yaml-shapes` and the front-door job's workflow text ride the same push.
 
 **Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration.
 
 **Cost while deferred:** a Windows-only regression in any of the four ships green. Filed 2026-10-07 off windows-shell-floor-pass' close second-vendor review, carried to the next scope's intake; the first held there by reading the test. Owner lookup: `Windows leg`, `ErrorActionPreference`, `stop-restore`, `witness` in this file and the disposed-findings record — [windows-kpi-plugin-start](#windows-kpi-plugin-start), DISTINCT (a plugin Windows cannot start); owner gate-sdk/SPEC.md §git-hook, with context-kit/SPEC.md §The session-context hook.
-
-### action-walk-yaml-shapes
-
-the job-partitioned action walk in `native/src/actions.rs` misreads three shapes of valid YAML. A `run` key whose block-scalar indicator is followed by a comment is taken as a one-line scalar, so the body below it is unread. A quoted `uses` value followed by a comment keeps its closing quote, so `check-action-step-order` refuses a job whose step is on the action. A `steps` sequence whose dashes sit at the `steps` key's own column leaves every step unread. The first and third reach `check-action-gh-repo` and `check-action-permissions` through the shared walk.
-
-**Deliverable:** a fixture row per shape, or each stated as a limit in the sections that own the walk.
-
-**Cost while deferred:** two silent passes and one false refusal on workflow text an adopter may write. Filed 2026-10-09 off crate-reader-hardening-pass' close second-vendor review and carried to the next scope's intake. Re-verified there: `is_block_scalar` admits an indicator, a chomping sign and digits, and nothing after them. Run over scratch workflows at promotion, each beside its control: a job checking out under no `contents:` scope passes `check-action-permissions` with its dashes at the `steps` column and reds with them indented, and `check-action-step-order` refuses a job whose quoted `uses` carries a trailing comment and passes it without the comment. **Unit set (2026-10-10, operator direction, lead-relayed, not a ruling):** taken into this iteration with its two shapes run. Owner lookup: `block scalar`, `actions.rs`, `steps sequence`, `check-action-` in this file and the disposed-findings record — [site-health-probe-unexecuted](#site-health-probe-unexecuted), DISTINCT (a probe step no oracle executes); `toolchain-action-order-ungated`, done, DISTINCT (the gate on this walk, which scoped none of the three); owner gate-sdk/SPEC.md §check-action-gh-repo.
 
 ## Deferred
 
@@ -1237,4 +1229,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - inherited-stdout-child-status
 - hermetic-preamble-overlay-read
 - hook-staging-fixed-sibling
+- action-walk-yaml-shapes
 

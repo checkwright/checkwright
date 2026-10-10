@@ -3,3 +3,5 @@ job 'report' consumes the GitHub token under no declared scope
 job 'gates' checks out with no 'contents:' scope in scope
 job 'bare_valve' checks out with no 'contents:' scope in scope
 an action-permissions-exempt marker with no reason
+job 'flush_steps' checks out with no 'contents:' scope in scope
+job 'commented_indicator' consumes the GitHub token under no declared scope

@@ -25,3 +25,8 @@ jobs:
       - run: |
           ls ~/.cargo/bin
           cargo-deny --version
+  quoted:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: "./.github/actions/toolchain" # a quoted ref, then a comment
+      - run: cargo build --release

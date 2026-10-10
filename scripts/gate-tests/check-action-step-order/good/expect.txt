@@ -1,1 +1,1 @@
-ACTION-STEP-ORDER: clean (1 job(s) spelling a listed program across 1 Actions-shaped file(s) of 2 walked, each with a step on ./.github/actions/toolchain first; 3 job(s) spelling none, 1 composite-action file(s) and 0 non-Actions file(s) skipped)
+ACTION-STEP-ORDER: clean (2 job(s) spelling a listed program across 1 Actions-shaped file(s) of 2 walked, each with a step on ./.github/actions/toolchain first; 3 job(s) spelling none, 1 composite-action file(s) and 0 non-Actions file(s) skipped)
