@@ -10,18 +10,6 @@
 
 ## Technical Debt
 
-### toolchain-pin-trails-stable
-
-the Rust toolchain pin trails the newest stable release by one minor: `rust-toolchain.toml` names 1.98.1 and the stable channel manifest names 1.99.0. The audit roster's toolchain-pin class is due on release prep and had never been swept.
-
-**Deliverable:** the channel moved in a commit editing that file alone, on a push that is its witness (gate-sdk/SPEC.md §check-crate-arms).
-
-**Push need (2026-10-11, inside the budget):** one mid-iteration push, since the seat that builds here carries no toolchain manager and a remote run is the first to execute the new compiler. Operator direction, lead-relayed (not a ruling), chosen over the pin riding the closing push; a release tag at this iteration's close is then a third remote push.
-
-**Operator direction (2026-10-11, lead-relayed, not a ruling): hold the pin and defer this entry.** The move's push reddened one leg, so the channel returns to 1.98.1 in a commit editing that file alone, on a second mid-iteration push that direction grants and that covers no further one; a release tag at close is then a fourth remote push. The entry returns to Deferred carrying the run's evidence, neither Done as held nor active.
-
-**Cost while deferred:** the crate builds one stable release behind, with whatever that release fixes. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close audit, which held it because its two remaining pushes were the release's stamp commit and its tag, and carried to the next scope's intake. Re-verified there: the manifest dated 2026-10-01 names 1.99.0. Owner lookup: `toolchain`, `rust-toolchain`, `channel` in this file and the disposed-findings record — a runner-image notice, discarded, DISTINCT (a floating runner label); owner gate-sdk/SPEC.md §check-crate-arms.
-
 ## Deferred
 
 ### config-variant-battery-harness
@@ -501,6 +489,22 @@ the wakeup-guard's log stamp is built in process on unix and spawns `date` off i
 **Inferred, not run:** that the spawn finds nothing under an exec-form registration on a Windows host — start `--hook wakeup-guard` there with Git's `usr/bin` off `PATH` and read the log line
 
 **Cost while deferred:** a Windows adopter's wakeup-attempts log lines may carry no timestamp. Filed 2026-10-10 by hook-placement-guard-rules-pass' build and promoted at its close. Re-verified there by reading both `local_stamp` bodies. Owner lookup: `wakeup`, `date -Is`, `local_stamp` in this file and the disposed-findings record — none; `exec-form-hook-registration`, done, DISTINCT (the registration's form, where this is a member's own spawn); owner guard-kit/SPEC.md §wakeup-guard.
+
+### toolchain-pin-trails-stable
+
+[cost: event/low] [surface: native]
+
+the Rust toolchain pin trails the newest stable release by one minor: `rust-toolchain.toml` names 1.98.1 and the stable channel manifest names 1.99.0. The audit roster's toolchain-pin class is due on release prep and had never been swept.
+
+**Deliverable:** the channel moved in a commit editing that file alone, on a push that is its witness (gate-sdk/SPEC.md §check-crate-arms).
+
+**Tried 2026-10-11 by guard-rule-holes-pass' build and held, the deliverable unmet.** The move to 1.99.0 was pushed alone and its `gates` run reddened one leg. Every leg resolved cargo 1.99.0, and every crate-tests leg and seven of the eight native-artifacts legs were green. The `x86_64-unknown-linux-gnu` artifact built clean and then failed the artifact step's floor check (`scripts/ci-build-artifact.sh`): its highest hard glibc need measured 2.34 against the glibc 2.39 its row in `docs/requirements.md` declares, where the check requires the two equal. The `aarch64-unknown-linux-gnu` artifact measured 2.39, equal to its row. The check's refusal names the remedy for a measure below the declared floor, to hold the toolchain. **Inferred, not run:** that the 1.99.0 x86-64 artifact runs on a glibc 2.34 host; none was in reach. Operator direction (lead-relayed, not a ruling): the channel returned to 1.98.1 in a one-file commit on a second mid-iteration push, whose runs were green, and this entry returned here.
+
+**Why design-pending:** the move now reaches a published platform floor or the floor rule. Keeping 1.99.0 means lowering the x86-64 glibc row to what the artifact measures, on a host that proves it and with the two glibc rows then apart, or letting the check accept a measure below the declared floor. Neither is a toolchain-file edit.
+
+**Push need at a pick:** one push of its own, since the seat that builds here carries no toolchain manager and a remote run is the first to execute a new compiler.
+
+**Cost while deferred:** the crate builds one stable release behind, with whatever that release fixes. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close audit, which held it because its two remaining pushes were the release's stamp commit and its tag, and carried to the next scope's intake. Re-verified there: the manifest dated 2026-10-01 names 1.99.0. Owner lookup: `toolchain`, `rust-toolchain`, `channel` in this file and the disposed-findings record — a runner-image notice, discarded, DISTINCT (a floating runner label); owner gate-sdk/SPEC.md §check-crate-arms.
 
 ### windows-liveness-row-pid-reuse
 
