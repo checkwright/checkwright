@@ -88,7 +88,7 @@ a narrow external preview before any broad announcement: a preview cohort whose 
 
 **Sequencing is the load-bearing part.** The preview runs *before* [benchmark-ab-experiment](#benchmark-ab-experiment), so pilot findings shape that experiment's task classes and metrics rather than being retrofitted to them; per-gate true/false-positive history and profile retention are preview deliverables, not pre-launch builds. The full launch ruling behind this sequencing is operator material and stays in the local-only private brief; this entry carries only the queue-visible rung.
 
-**Expected FIRST FINDING, not a precondition:** today's quick start is curl, sha256sum, tar and `bash … init` from a repository root; macOS needs GNU bash and coreutils by adopter action; native Windows needs Git for Windows. That is why the merged channel gives the installer no delta — those host-floor facts are an output of the observation, not an input.
+**Expected FIRST FINDING, not a precondition** (facts restated 2026-10-11 to the current floor, operator direction, lead-relayed, not a ruling): today's quick start is a one-line install under POSIX sh or PowerShell; bash is owed only by a runnable fence or a registered shell gate; native Windows needs Git for Windows for `git` (docs/requirements.md). That is why the merged channel gives the installer no delta — those host-floor facts are an output of the observation, not an input.
 
 **Refused, grounds carried forward:** parking behind `native-windows-bash-floor` (landed 2026-09-18) or the git-only-floor discharge (the trigger is what the preview measures); the icebox (the highest cost-while-deferred in the intake).
 
@@ -486,6 +486,8 @@ rule `background_no_record`'s wait-loop exemption passes a backgrounded call who
 
 **Deliverable:** the exemption holding a leading statement to the test its tail already takes, and a condition that is a build or a write told from one that reads remote state, or that section stating why neither can be; an amendment's to choose, since either moves the rule's verdicts.
 
+**Taken into the iteration scoped 2026-10-11 (operator direction, lead-relayed, not a ruling)** as a feature, its amendment the spec stage's. It builds after [wait-exemption-redirect-tail](#wait-exemption-redirect-tail), whose repaired tail test the leading statement takes.
+
 **Cost while deferred:** such a call is a producer with no liveness record, so rule `git_mutation_under_producer` holds no commit for it. Filed 2026-10-10 by hook-placement-guard-rules-pass' spec and promoted at its close. Re-verified there through the hook member with the background flag set: `until make; do sleep 1; done` passes, a lead no allow entry matches passes ahead of a wait loop, and a `cargo build` lead is stopped by a later rule's decorated-lead block alone. Owner lookup: `background_no_record`, `wait loop`, `exemption` in this file and the disposed-findings record — none; `wait-exemption-body-unbounded`, done, DISTINCT (the body and the tail, which landed); owner guard-kit/SPEC.md §The rule roster.
 
 ### loop-keyword-as-argument
@@ -509,6 +511,72 @@ the wakeup-guard's log stamp is built in process on unix and spawns `date` off i
 **Inferred, not run:** that the spawn finds nothing under an exec-form registration on a Windows host — start `--hook wakeup-guard` there with Git's `usr/bin` off `PATH` and read the log line
 
 **Cost while deferred:** a Windows adopter's wakeup-attempts log lines may carry no timestamp. Filed 2026-10-10 by hook-placement-guard-rules-pass' build and promoted at its close. Re-verified there by reading both `local_stamp` bodies. Owner lookup: `wakeup`, `date -Is`, `local_stamp` in this file and the disposed-findings record — none; `exec-form-hook-registration`, done, DISTINCT (the registration's form, where this is a member's own spawn); owner guard-kit/SPEC.md §wakeup-guard.
+
+### wait-exemption-redirect-tail
+
+[cost: event/low] [surface: guard-kit]
+
+rule `background_no_record`'s wait-loop exemption passes two shapes its own body and tail clauses exclude (guard-kit/SPEC.md §The rule roster, exemption (2)). A body `sleep` carrying a write redirect stays exempt, the body test reading the statement's leading word only: `until grep -q DONE <log>; do sleep 1 > <tracked file>; done`. And a tail joined to the loop by a bare `&` skips the declared-write check its `;` spelling takes: `…; done & sort -o <out> <in>`.
+
+**Deliverable:** the body test refusing a `sleep` that carries a redirect, and the tail test reading a statement after a bare `&` as it reads one after `;`, with a row per shape in the background decision table.
+
+**Ordering:** this lands ahead of [wait-loop-lead-and-condition](#wait-loop-lead-and-condition), whose lead-statement fix takes the tail test repaired here.
+
+**Cost while deferred:** a backgrounded writer with no liveness record, so rule `git_mutation_under_producer` holds no commit for it. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close second-vendor review and carried to the next scope's intake. Re-verified there through the hook member with the background flag set: both shapes passed and the `;` tail blocked. Owner lookup: `background_no_record`, `wait loop`, `exemption` in this file and the disposed-findings record — [wait-loop-lead-and-condition](#wait-loop-lead-and-condition), DISTINCT (the lead and the condition, a limit the section states, where these two contradict its clauses); [loop-keyword-as-argument](#loop-keyword-as-argument), DISTINCT (the keyword walk); `wait-exemption-body-unbounded`, done, DISTINCT (the body and tail clauses themselves, which landed); owner guard-kit/SPEC.md §The rule roster.
+
+### git-stash-quoted-verb
+
+[cost: event/low] [surface: guard-kit]
+
+rule `git_stash` reads its words unquoted only. `git stash push` is blocked on the main checkout, and the same call passes with either word in single quotes, `git 'stash' push` or `git stash 'push'`: the quoted word reads as one the walk does not know, on which the rule declines. Neither the rule's text nor its declines list states the restriction, and guard-kit/SPEC.md §The reader and its views says a word's value is what the shell passes.
+
+**Deliverable:** the subcommand and its verb read by value through the word read, with a decision-table row per quoted spelling. `git stash --help` is blocked by the rule's own option-first clause and is left as stated.
+
+**Cost while deferred:** the block is evaded by quoting one word. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close second-vendor review and carried to the next scope's intake. Re-verified there through the hook member: the plain call blocked and both quoted spellings passed, the quoted subcommand being a second spelling the review did not name. Owner lookup: `git_stash`, `stash` in this file and the disposed-findings record — none; owner guard-kit/SPEC.md §The rule roster, rule `git_stash`.
+
+### powershell-word-read-operands
+
+[cost: event/low] [surface: guard-kit]
+
+the PowerShell reader's word read gives rule `rm_tracked` two wrong operands. A backtick escape outside quotes is left in the word's value, so `Remove-Item` of a tracked path spelled with one backtick-escaped letter passes. And an operand is split on commas whatever its quoting, so a single-quoted name carrying a comma is tested as two paths and blocks on the first. guard-kit/SPEC.md §The reader and its views says a value is what the shell passes, and its PowerShell bullet names a doubled quote and an expandable span's backtick escape alone.
+
+**Deliverable:** the value resolving a bare backtick escape, the comma split reading quoting, that bullet stating both, and a row per shape in the PowerShell decision table.
+
+**Cost while deferred:** a tracked delete missed, and a false block on a name carrying a literal comma. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close second-vendor review and carried to the next scope's intake. Re-verified there through the hook member under the PowerShell tool name: the escaped spelling passed where the plain one blocked, and the quoted comma name blocked on its first half. Owner lookup: `rm_tracked`, `backtick`, `Remove-Item`, `comma` in this file and the disposed-findings record — [expansion-rule-backtick-blind](#expansion-rule-backtick-blind), DISTINCT (bash command substitution); owner guard-kit/SPEC.md §The reader and its views, the word read.
+
+### hook-sibling-image-overclaim
+
+[cost: event/low] [surface: gate-sdk]
+
+gate-sdk/SPEC.md says more than the code holds in two places. The hook placement's cut-short copy removes its sibling and discards that removal's error (`native/src/emit/install_hooks.rs`), where §install-hooks says a sibling that cannot be removed is reported on stderr with its path. And `self_image` in `native/src/proc.rs` tests that its start name is a file and then returns the name, so a replace landing between that test and the child's open starts the new build, where §Fail-closed contract's own-path paragraph says one run never mixes two builds.
+
+**Deliverable:** the removal error joined to the refusal, and the image sentence stating the window or the reader opening what it tested.
+
+**Cost while deferred:** a stray sibling with no line naming it, and an absolute a narrow race falsifies. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close second-vendor review and carried to the next scope's intake. Re-verified there by reading both sources. Owner lookup: `cut-short`, `sibling`, `self_image`, `running image` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §install-hooks and §Fail-closed contract.
+
+### toolchain-pin-trails-stable
+
+[cost: event/low] [surface: native]
+
+the Rust toolchain pin trails the newest stable release by one minor: `rust-toolchain.toml` names 1.98.1 and the stable channel manifest names 1.99.0. The audit roster's toolchain-pin class is due on release prep and had never been swept.
+
+**Deliverable:** the channel moved in a commit editing that file alone, on a push that is its witness (gate-sdk/SPEC.md §check-crate-arms).
+
+**Push need (2026-10-11, inside the budget):** one mid-iteration push, since the seat that builds here carries no toolchain manager and a remote run is the first to execute the new compiler. Operator direction, lead-relayed (not a ruling), chosen over the pin riding the closing push; a release tag at this iteration's close is then a third remote push.
+
+**Cost while deferred:** the crate builds one stable release behind, with whatever that release fixes. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close audit, which held it because its two remaining pushes were the release's stamp commit and its tag, and carried to the next scope's intake. Re-verified there: the manifest dated 2026-10-01 names 1.99.0. Owner lookup: `toolchain`, `rust-toolchain`, `channel` in this file and the disposed-findings record — a runner-image notice, discarded, DISTINCT (a floating runner label); owner gate-sdk/SPEC.md §check-crate-arms.
+
+### windows-liveness-row-pid-reuse
+
+[cost: event/low] [surface: evidence-kit]
+
+the gates workflow's Windows liveness step misread one row once. On the run for hook-placement-guard-rules-pass' closing push, `crate-tests-windows` on the x64 triple failed its step for producer liveness over Windows process ids with row (b) reading alive twice: the log shows the record's pid read gone before and after the gate while the gate answered held. The step printed no other finding, the range since the last green run touched no crate or workflow file, and a re-run of that one job passed.
+
+**Deliverable:** the row made independent of pid reuse, or the gate's Windows read shown to answer for a recycled pid and the limit stated.
+
+**Inferred, not run:** that a low Windows pid was recycled between the truth read and the gate's, possibly into a process the gate itself started — cannot run here: the step executes on the workflow's Windows leg alone
+
+**Cost while deferred:** a closing push reds on a coin and costs a re-run and its wait. Surfaced 2026-10-11 by hook-placement-guard-rules-pass' close and carried to the next scope's intake. Owner lookup: `liveness`, `pid`, `recycl` in this file and the disposed-findings record — none; owner evidence-kit/SPEC.md §check-producer-liveness and the gates workflow's Windows crate leg.
 
 ## Icebox
 
