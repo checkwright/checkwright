@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### powershell-word-read-operands
-
-the PowerShell reader's word read gives rule `rm_tracked` two wrong operands. A backtick escape outside quotes is left in the word's value, so `Remove-Item` of a tracked path spelled with one backtick-escaped letter passes. And an operand is split on commas whatever its quoting, so a single-quoted name carrying a comma is tested as two paths and refused on the first. guard-kit/SPEC.md §The reader and its views says a value is what the shell passes, and its PowerShell bullet names a doubled quote and an expandable span's backtick escape alone.
-
-**Deliverable:** the value resolving a bare backtick escape, the comma split reading quoting, that bullet stating both, and a row per shape in the PowerShell decision table.
-
-**Cost while deferred:** a tracked delete missed, and a false block on a name carrying a literal comma. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close second-vendor review and carried to the next scope's intake. Re-verified there through the hook member under the PowerShell tool name: the guard passed the escaped spelling and refused the plain one, and refused the quoted comma name on its first half. Owner lookup: `rm_tracked`, `backtick`, `Remove-Item`, `comma` in this file and the disposed-findings record — [expansion-rule-backtick-blind](#expansion-rule-backtick-blind), DISTINCT (bash command substitution); owner guard-kit/SPEC.md §The reader and its views, the word read.
-
 ### hook-sibling-image-overclaim
 
 gate-sdk/SPEC.md says more than the code holds in two places. The hook placement's cut-short copy removes its sibling and discards that removal's error (`native/src/emit/install_hooks.rs`), where §install-hooks says a sibling that cannot be removed is reported on stderr with its path. And `self_image` in `native/src/proc.rs` tests that its start name is a file and then returns the name, so a replace landing between that test and the child's open starts the new build, where §Fail-closed contract's own-path paragraph says one run never mixes two builds.
@@ -1222,4 +1214,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - loop-keyword-as-argument
 - wait-loop-lead-and-condition
 - git-stash-quoted-verb
+- powershell-word-read-operands
 

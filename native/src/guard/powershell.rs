@@ -264,6 +264,10 @@ fn sq_value(inner: &[u8]) -> Vec<u8> {
     v
 }
 
+// spec: guard-kit/SPEC.md §The reader and its views — the characters a backtick turns into a
+// control character rather than protecting.
+const CONTROL_ESCAPES: &[u8] = b"0abefnrtuv";
+
 // spec: guard-kit/SPEC.md §The reader and its views — an expandable span's content, its doubled `""`
 // and backtick escapes undone; `None` on an escape that spells a control character.
 fn dq_value(inner: &[u8]) -> Option<Vec<u8>> {
@@ -273,7 +277,7 @@ fn dq_value(inner: &[u8]) -> Option<Vec<u8>> {
         match inner[k] {
             b'`' => {
                 let e = *inner.get(k + 1)?;
-                if b"0abefnrtuv".contains(&e) {
+                if CONTROL_ESCAPES.contains(&e) {
                     return None;
                 }
                 v.push(e);
@@ -292,8 +296,57 @@ fn dq_value(inner: &[u8]) -> Option<Vec<u8>> {
     Some(v)
 }
 
+// spec: guard-kit/SPEC.md §The reader and its views — a word's escape or quoted span at `i`, fed to
+// the accumulator face by face, and the offset past it; `i` itself where the byte stands bare, and
+// `None` where the read refuses.
+fn feed_quoting(b: &[u8], i: usize, acc: &mut WordAcc) -> Option<usize> {
+    match b[i] {
+        b'`' => {
+            let pair = &b[i..(i + 2).min(b.len())];
+            if pair[1..].iter().any(|e| *e == b'\n' || CONTROL_ESCAPES.contains(e)) {
+                return None;
+            }
+            acc.piece(pair, &pair[1..], pair);
+            Some(i + 2)
+        }
+        b'\'' => {
+            let end = sq_end(b, i)?;
+            acc.piece(&b[i..end], &sq_value(&b[i + 1..end - 1]), SQ_MARK.as_bytes());
+            Some(end)
+        }
+        b'"' => {
+            let end = dq_end(b, i)?;
+            acc.piece(&b[i..end], &dq_value(&b[i + 1..end - 1])?, DQ_MARK.as_bytes());
+            Some(end)
+        }
+        _ => Some(i),
+    }
+}
+
+// spec: guard-kit/SPEC.md §The reader and its views — one word's array elements, cut at each comma
+// that stands bare, each with the word read's three faces; `None` where the word read refuses.
+pub fn array_elements(spelling: &str) -> Option<Vec<Word>> {
+    let b = spelling.as_bytes();
+    let mut acc = WordAcc::new();
+    let mut i = 0usize;
+    while i < b.len() {
+        let next = feed_quoting(b, i, &mut acc)?;
+        if next != i {
+            i = next;
+            continue;
+        }
+        match b[i] {
+            b',' => acc.end_word(),
+            c => acc.piece(&[c], &[c], &[c]),
+        }
+        i += 1;
+    }
+    Some(acc.finish().into_iter().flatten().collect())
+}
+
 // spec: guard-kit/SPEC.md §The reader and its views — the word read; `None` where the dequoted view
-// refuses, on a backtick-continued line, or where the walk and the compound split part.
+// refuses, on a backtick-continued line, on a bare escape that spells a control character, or where
+// the walk and the compound split part.
 fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
     dequoted(raw)?;
     let b = text::chomp(raw).as_bytes();
@@ -301,13 +354,9 @@ fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
     let mut i = 0usize;
     while i < b.len() {
         let c = b[i];
-        if c == b'`' {
-            let pair = &b[i..(i + 2).min(b.len())];
-            if pair.ends_with(b"\n") {
-                return None;
-            }
-            acc.piece(pair, pair, pair);
-            i += 2;
+        let next = feed_quoting(b, i, &mut acc)?;
+        if next != i {
+            i = next;
             continue;
         }
         if let Some(end) = comment_end(b, i) {
@@ -316,16 +365,6 @@ fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
             continue;
         }
         match c {
-            b'\'' => {
-                let end = sq_end(b, i)?;
-                acc.piece(&b[i..end], &sq_value(&b[i + 1..end - 1]), SQ_MARK.as_bytes());
-                i = end;
-            }
-            b'"' => {
-                let end = dq_end(b, i)?;
-                acc.piece(&b[i..end], &dq_value(&b[i + 1..end - 1])?, DQ_MARK.as_bytes());
-                i = end;
-            }
             b' ' | b'\t' => {
                 acc.end_word();
                 i += 1;
@@ -524,13 +563,35 @@ mod tests {
             faces("rm pre'fix'*.md; ls a` b | wc"),
             vec![
                 vec![face("rm", "rm", "rm"), face("pre'fix'*.md", "prefix*.md", &format!("pre{SQ_MARK}*.md"))],
-                vec![face("ls", "ls", "ls"), face("a` b", "a` b", "a` b")],
+                vec![face("ls", "ls", "ls"), face("a` b", "a b", "a` b")],
                 vec![face("wc", "wc", "wc")],
             ]
         );
         assert_eq!(word_read("@'\nx\n'@ | wc"), None);
         assert_eq!(word_read("echo 'open"), None);
         assert_eq!(word_read("git log `\n --oneline"), None);
+        assert_eq!(faces("del trac`ked.md a`,b `'x"), vec![vec![
+            face("del", "del", "del"),
+            face("trac`ked.md", "tracked.md", "trac`ked.md"),
+            face("a`,b", "a,b", "a`,b"),
+            face("`'x", "'x", "`'x"),
+        ]]);
+        assert_eq!(word_read("del `tracked.md"), None);
+    }
+
+    // spec: guard-kit/SPEC.md §The reader and its views — a word parts into elements at a bare comma
+    // alone, and an element keeps its own spelling
+    #[test]
+    fn a_word_parts_into_elements_at_a_bare_comma() {
+        let parts = |t: &str| -> Vec<(String, String)> {
+            array_elements(t).unwrap().into_iter().map(|w| (w.spelling, w.value)).collect()
+        };
+        let pair = |s: &str, v: &str| (s.to_string(), v.to_string());
+        assert_eq!(parts("a,'b c',,d"), vec![pair("a", "a"), pair("'b c'", "b c"), pair("d", "d")]);
+        assert_eq!(parts("'a,b'"), vec![pair("'a,b'", "a,b")]);
+        assert_eq!(parts("\"a,b\",c`,d"), vec![pair("\"a,b\"", "a,b"), pair("c`,d", "c,d")]);
+        assert_eq!(array_elements("a,'open"), None);
+        assert_eq!(array_elements("a,`n"), None);
     }
 
     // spec: guard-kit/SPEC.md §The reader and its views — the harness view is the identity

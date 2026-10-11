@@ -6,6 +6,7 @@ use super::{
 };
 use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Shell, Verdict};
 use crate::guard::host::under;
+use crate::guard::powershell;
 use crate::guard::reader::View::{SqDqHd, SqHdq};
 use crate::guard::reader::Word;
 use crate::guard::text::{self, grep_q, head_word, trim_start, unsentinel, words};
@@ -460,11 +461,31 @@ mod tests {
     // `\` folded, and the steer prints a lone path's own word or a comma part quoted where it must be
     #[test]
     fn the_powershell_paths_are_globs_by_value() {
-        let ps = ps_delete_paths(&[word("'docs\\a b.md'", "docs\\a b.md", "\0SQ"), plain_word("x,it's"), plain_word("-Force")]).unwrap();
+        let ps = ps_delete_paths(&[
+            word("'docs\\a b.md'", "docs\\a b.md", "\0SQ"),
+            word("x,'it''s'", "x,it's", "x,\0SQ"),
+            plain_word("-Force"),
+            plain_word("-Path:a,b"),
+            word("\"-Path:c d\"", "-Path:c d", "\0DQ"),
+        ])
+        .unwrap();
         let got: Vec<(&str, &str)> = ps.iter().map(|(p, s)| (p.as_str(), s.as_str())).collect();
-        assert_eq!(got, vec![("docs\\a b.md", "'docs\\a b.md'"), ("x", "x"), ("it's", "'it''s'")]);
+        assert_eq!(
+            got,
+            vec![("docs\\a b.md", "'docs\\a b.md'"), ("x", "x"), ("it's", "'it''s'"), ("a", "a"), ("b", "b"), ("c d", "'c d'")]
+        );
         assert!(ps_delete_paths(&[plain_word("a"), plain_word("-wh")]).is_none());
         assert!(ps_delete_paths(&[plain_word("-Filter"), plain_word("a")]).unwrap().is_empty());
+    }
+
+    // spec: guard-kit/SPEC.md §The rule roster — only a comma standing bare parts a word into paths
+    #[test]
+    fn a_quoted_or_escaped_comma_parts_no_path() {
+        let paths = |w: Word| ps_delete_paths(&[w]).unwrap().into_iter().map(|(p, _)| p).collect::<Vec<_>>();
+        assert_eq!(paths(word("'a,b'", "a,b", "\0SQ")), vec!["a,b"]);
+        assert_eq!(paths(word("a`,b", "a,b", "a`,b")), vec!["a,b"]);
+        assert_eq!(paths(word("a,'b,c'", "a,b,c", "a,\0SQ")), vec!["a", "b,c"]);
+        assert_eq!(paths(word("-Path:'a,b',c", "-Path:a,b,c", "-Path:\0SQ,c")), vec!["a,b", "c"]);
     }
 
     // spec: guard-kit/SPEC.md §The rule roster — rule `git_stash` reads each word by its value, a
@@ -508,37 +529,35 @@ const PS_VALUE_PARAMS: &[&str] = &[
 fn ps_delete_paths(args: &[Word]) -> Option<Vec<(String, String)>> {
     let mut out = Vec::new();
     let mut skip = false;
-    let parts = |v: &str, whole: Option<&Word>| -> Vec<(String, String)> {
-        v.split(',')
-            .filter(|p| !p.is_empty())
-            .map(|p| match whole {
-                Some(w) if w.value == p => (p.to_string(), w.spelling.clone()),
-                _ => (p.to_string(), ps_word(p)),
-            })
-            .collect()
-    };
     for w in args {
         if std::mem::take(&mut skip) {
             continue;
         }
-        let Some(param) = w.value.strip_prefix('-') else {
-            out.extend(parts(&w.value, Some(w)));
+        let mut parts = powershell::array_elements(&w.spelling).unwrap_or_else(|| vec![w.clone()]).into_iter();
+        let Some(head) = parts.next() else { continue };
+        let Some(param) = head.value.strip_prefix('-') else {
+            out.extend(std::iter::once(head).chain(parts).map(|p| (p.value, p.spelling)));
             continue;
         };
-        let (name, value) = match param.split_once(':') {
-            Some((n, v)) => (n.to_ascii_lowercase(), Some(v)),
-            None => (param.to_ascii_lowercase(), None),
+        let (spelled, value) = match param.split_once(':') {
+            Some((n, v)) => (n, Some(v)),
+            None => (param, None),
         };
+        let name = spelled.to_ascii_lowercase();
         if name.len() >= 2 && "whatif".starts_with(&name) {
             return None;
         }
         let valued = !name.is_empty() && PS_VALUE_PARAMS.iter().any(|p| p.starts_with(&name));
         match value {
             None => skip = valued,
-            Some(v) if !valued => out.extend(parts(v, None)),
+            Some(v) if !valued => {
+                let word = head.spelling.strip_prefix(&format!("-{}:", spelled)).map_or_else(|| ps_word(v), str::to_string);
+                out.extend(std::iter::once((v.to_string(), word)).chain(parts.map(|p| (p.value, p.spelling))));
+            }
             Some(_) => {}
         }
     }
+    out.retain(|(path, _)| !path.is_empty());
     Some(out)
 }
 

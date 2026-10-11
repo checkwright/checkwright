@@ -40,11 +40,24 @@ fallthrough	git add tracked.md; git commit -o tracked.md -m x
 block	git stash
 block	git 'stash' push
 block	git stash "pop"
+block	git sta`sh
 fallthrough	git stash list
 fallthrough	git stash 'list'
 
-# rule `rm_tracked` — the deletion commands, their parameters, and the git rm force arm
+# rule `rm_tracked` — the deletion commands, their parameters, and the git rm force arm; a
+# backtick escape outside quotes resolves to its character, one spelling a control character is
+# no such path, and only a bare comma parts a word into paths
 block	Remove-Item tracked.md
+block	Remove-Item trac`ked.md
+block	Remove-Item two` words.md
+block	Remove-Item -Path:trac`ked.md
+block	Remove-Item scratch.txt,'tracked.md'
+block	Remove-Item 'scratch.txt,x',tracked.md
+fallthrough	Remove-Item `tracked.md
+fallthrough	Remove-Item 'tracked.md,x'
+fallthrough	Remove-Item "tracked.md,x"
+fallthrough	Remove-Item tracked.md`,x
+fallthrough	Remove-Item -Path:'tracked.md,x'
 block	rm tracked.md
 block	remove-item -Recurse scratch.txt,tracked.md
 block	Remove-Item -Path:tracked.md
