@@ -8,6 +8,18 @@
 
 ## New Features
 
+### wait-loop-lead-and-condition
+
+[spec: SPEC-wait-lead.md]
+
+rule `background_no_record`'s wait-loop exemption passes a backgrounded call whose work stands in the loop's condition or in a statement ahead of its first loop. The exemption holds the loop body and the statements after the loop (guard-kit/SPEC.md §The rule roster), and names these two as its limit, the condition on the ground that a wait on remote state writes nothing here.
+
+**Deliverable:** the exemption holding a leading statement to the test its tail already takes, and a condition that is a build or a write told from one that reads remote state, or that section stating why neither can be; an amendment's to choose, since either moves the rule's verdicts.
+
+**Taken into the iteration scoped 2026-10-11 (operator direction, lead-relayed, not a ruling)** as a feature, its amendment the spec stage's. It builds after [wait-exemption-redirect-tail](#wait-exemption-redirect-tail), whose repaired tail test the leading statement takes.
+
+**Cost while deferred:** such a call is a producer with no liveness record, so rule `git_mutation_under_producer` holds no commit for it. Filed 2026-10-10 by hook-placement-guard-rules-pass' spec and promoted at its close. Re-verified there through the hook member with the background flag set: `until make; do sleep 1; done` passes, a lead no allow entry matches passes ahead of a wait loop, and a `cargo build` lead is stopped by a later rule's decorated-lead block alone. Owner lookup: `background_no_record`, `wait loop`, `exemption` in this file and the disposed-findings record — none; `wait-exemption-body-unbounded`, done, DISTINCT (the body and the tail, which landed); owner guard-kit/SPEC.md §The rule roster.
+
 ## Technical Debt
 
 ### wait-exemption-redirect-tail
@@ -529,18 +541,6 @@ the iteration boundary's scratch wipe leaves a directory holding a member whose 
 **Inferred, not run:** that the lister's refusal is what stops the descent — plant a member named with a lone 0xff byte under a scratch directory and run a boundary entry over a scratch tree
 
 **Cost while deferred:** one such scratch member leaves a could-not-remove note at every boundary. Filed 2026-10-10 by front-door-readiness-pass' close, where a scratch repository carrying one survived a boundary and was removed by hand, and promoted at the next scope's intake. Re-verified there by reading `wipe`: both its listings go through `walk::list_dir`. Owner lookup: `wipe`, `non-UTF-8`, `could not remove` in this file and the disposed-findings record — [nul-listing-lossy-decode](#nul-listing-lossy-decode), DISTINCT (ten readers that decode lossily where this one refuses); owner lifecycle-kit/SPEC.md §bin/enter-stage.sh.
-
-### wait-loop-lead-and-condition
-
-[cost: event/low] [surface: guard-kit]
-
-rule `background_no_record`'s wait-loop exemption passes a backgrounded call whose work stands in the loop's condition or in a statement ahead of its first loop. The exemption holds the loop body and the statements after the loop (guard-kit/SPEC.md §The rule roster), and names these two as its limit, the condition on the ground that a wait on remote state writes nothing here.
-
-**Deliverable:** the exemption holding a leading statement to the test its tail already takes, and a condition that is a build or a write told from one that reads remote state, or that section stating why neither can be; an amendment's to choose, since either moves the rule's verdicts.
-
-**Taken into the iteration scoped 2026-10-11 (operator direction, lead-relayed, not a ruling)** as a feature, its amendment the spec stage's. It builds after [wait-exemption-redirect-tail](#wait-exemption-redirect-tail), whose repaired tail test the leading statement takes.
-
-**Cost while deferred:** such a call is a producer with no liveness record, so rule `git_mutation_under_producer` holds no commit for it. Filed 2026-10-10 by hook-placement-guard-rules-pass' spec and promoted at its close. Re-verified there through the hook member with the background flag set: `until make; do sleep 1; done` passes, a lead no allow entry matches passes ahead of a wait loop, and a `cargo build` lead is stopped by a later rule's decorated-lead block alone. Owner lookup: `background_no_record`, `wait loop`, `exemption` in this file and the disposed-findings record — none; `wait-exemption-body-unbounded`, done, DISTINCT (the body and the tail, which landed); owner guard-kit/SPEC.md §The rule roster.
 
 ### wakeup-stamp-windows-spawn
 
