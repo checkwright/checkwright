@@ -202,16 +202,19 @@ fn remove_own(staged: &Path) -> Option<String> {
 
 // spec: gate-sdk/SPEC.md §install-hooks — the copy creates its file and never opens a name already
 // there: a sibling there may be a link to the file the placed hooks serve, and a write through it
-// would replace or truncate them. A copy cut short removes the file it created
+// would replace or truncate them. A copy cut short removes its file or names it in the refusal
 fn copy_new(bin: &Path, staged: &Path) -> std::io::Result<()> {
-    let mut src = std::fs::File::open(bin)?;
+    copy_from(&mut std::fs::File::open(bin)?, staged)
+}
+
+fn copy_from(src: &mut impl std::io::Read, staged: &Path) -> std::io::Result<()> {
     let mut dst = std::fs::OpenOptions::new().write(true).create_new(true).open(staged)?;
-    let copied = std::io::copy(&mut src, &mut dst).map(|_| ());
-    if copied.is_err() {
-        drop(dst);
-        let _ = std::fs::remove_file(staged);
-    }
-    copied
+    let copied = std::io::copy(src, &mut dst).map(|_| ());
+    drop(dst);
+    copied.map_err(|e| match remove_own(staged) {
+        Some(left) => std::io::Error::new(e.kind(), format!("{}; {}", e, left)),
+        None => e,
+    })
 }
 
 fn config(key: &str, value: &str) -> Result<(), String> {
@@ -450,6 +453,42 @@ mod tests {
         assert!(first.starts_with(&format!("{}.", std::process::id())), "{}", first);
         assert!(held.is_some_and(|r| r.contains("cannot remove") && r.contains("held")), "a failed removal went unreported");
         assert_eq!(absent, None);
+    }
+
+    struct CutShort<F: FnMut()>(F);
+
+    impl<F: FnMut()> std::io::Read for CutShort<F> {
+        fn read(&mut self, _: &mut [u8]) -> std::io::Result<usize> {
+            (self.0)();
+            Err(std::io::Error::other("the source went away"))
+        }
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — a copy cut short removes the file it created, and a
+    // sibling it cannot remove is named in the refusal
+    #[test]
+    fn a_copy_cut_short_removes_its_file_or_names_it() {
+        let d = std::env::temp_dir().join(format!("checkwright-install-hooks-cut.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(&d).expect("scratch");
+        let (gone, held) = (d.join("gone"), d.join("held"));
+        let removed = copy_from(&mut CutShort(|| {}), &gone);
+        let left = gone.exists();
+        let swap = || {
+            if cfg!(unix) {
+                std::fs::remove_file(&held).expect("unlinks the open sibling");
+                std::fs::create_dir(&held).expect("a name the removal cannot take");
+            }
+        };
+        let kept = copy_from(&mut CutShort(swap), &held);
+        let _ = std::fs::remove_dir_all(&d);
+        assert!(removed.is_err_and(|e| !e.to_string().contains("cannot remove")), "a removal that worked was reported");
+        assert!(!left, "a copy cut short left its file behind");
+        let named = kept.is_err_and(|e| {
+            let said = e.to_string();
+            said.contains("the source went away") && said.contains("cannot remove") && said.contains("held")
+        });
+        assert_eq!(named, cfg!(unix), "a failed removal must join the refusal");
     }
 
     // spec: gate-sdk/SPEC.md §install-hooks — another run's sibling is neither removed nor renamed

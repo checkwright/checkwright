@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### hook-sibling-image-overclaim
-
-gate-sdk/SPEC.md says more than the code holds in two places. The hook placement's cut-short copy removes its sibling and discards that removal's error (`native/src/emit/install_hooks.rs`), where §install-hooks says a sibling that cannot be removed is reported on stderr with its path. And `self_image` in `native/src/proc.rs` tests that its start name is a file and then returns the name, so a replace landing between that test and the child's open starts the new build, where §Fail-closed contract's own-path paragraph says one run never mixes two builds.
-
-**Deliverable:** the removal error joined to the refusal, and the image sentence stating the window or the reader opening what it tested.
-
-**Cost while deferred:** a stray sibling with no line naming it, and an absolute a narrow race falsifies. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close second-vendor review and carried to the next scope's intake. Re-verified there by reading both sources. Owner lookup: `cut-short`, `sibling`, `self_image`, `running image` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §install-hooks and §Fail-closed contract.
-
 ### toolchain-pin-trails-stable
 
 the Rust toolchain pin trails the newest stable release by one minor: `rust-toolchain.toml` names 1.98.1 and the stable channel manifest names 1.99.0. The audit roster's toolchain-pin class is due on release prep and had never been swept.
@@ -1215,4 +1207,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - wait-loop-lead-and-condition
 - git-stash-quoted-verb
 - powershell-word-read-operands
+- hook-sibling-image-overclaim
 
