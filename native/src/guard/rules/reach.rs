@@ -1,8 +1,8 @@
 // spec: guard-kit/SPEC.md §The generic ruleset — the rules that judge what a command reaches: a
 // history rewrite, a tracked deletion, a scratch body, a wrapped payload, the main checkout.
 use super::{
-    command_word, git_subcommand, has_expansion, inert_target, is_banner, is_ro_segment,
-    program_bearing, ro_forms_clear, segment_core, shell_backgrounds, GitWalk,
+    command_word, git_subcommand, git_walk, has_expansion, inert_target, is_banner, is_ro_segment,
+    lead_keyword, program_bearing, ro_forms_clear, segment_core, shell_backgrounds, GitWalk,
 };
 use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Shell, Verdict};
 use crate::guard::host::under;
@@ -207,28 +207,66 @@ fn stash_rewrites(verb: Option<&str>) -> Option<bool> {
     }
 }
 
+// spec: guard-kit/SPEC.md §The rule roster — rule `git_stash`'s words: what a segment passes its
+// command, each by its value. A leading keyword and a redirect are read off the live text, so a
+// quoted one is a word; a word glued ahead of a redirect is kept.
+fn passed_words(ws: &[Word], escape: char) -> Vec<String> {
+    let mut out = Vec::new();
+    let mut target = false;
+    for w in ws {
+        if std::mem::take(&mut target) || (out.is_empty() && lead_keyword(&w.live)) {
+            continue;
+        }
+        let mut held = false;
+        let at = w.live.char_indices().find(|&(_, ch)| {
+            let bare = !std::mem::take(&mut held);
+            held = bare && ch == escape;
+            bare && matches!(ch, '>' | '<')
+        });
+        let Some((at, _)) = at else {
+            out.push(w.value.clone());
+            continue;
+        };
+        let (glued, redirect) = w.live.split_at(at);
+        if !(glued.bytes().all(|b| b.is_ascii_digit()) || matches!(glued, "&" | "*")) {
+            out.push(glued.to_string());
+        }
+        target = redirect.trim_start_matches(['>', '<']).is_empty();
+    }
+    out
+}
+
 // spec: guard-kit/SPEC.md §The rule roster — rule `git_stash`: a tree-rewriting stash where the
 // session's working tree is the main checkout.
 pub fn git_stash(ctx: &Ctx) -> Decided {
     let c = ctx.cmd();
-    if !ctx.raw(c)?.contains("stash") || ctx.expands(c, has_expansion)? {
+    if ctx.expands(c, has_expansion)? {
         return Ok(None);
     }
-    let h = ctx.host();
-    if !h.roots().main.is_empty() {
-        return Ok(None);
-    }
+    let escape = match ctx.shell() {
+        Shell::Bash => '\\',
+        Shell::PowerShell => '`',
+    };
     let s = ctx.view(c, SqDqHd)?;
-    for seg in ctx.segments(&s) {
-        let cmdseg = command_word(&segment_core(&seg));
-        let Some(globals) = git_subcommand(&cmdseg, GitWalk::Globals) else { continue };
+    let read = ctx.word_read(c)?;
+    for (i, seg) in ctx.segments(&s).iter().enumerate() {
+        let passed = match read.as_ref().and_then(|r| r.get(i)) {
+            Some(ws) => passed_words(ws, escape),
+            None => passed_words(&text::all_words(seg).into_iter().map(plain_word).collect::<Vec<Word>>(), escape),
+        };
+        let walk = |mode| git_walk(passed.iter().map(String::as_str), mode);
+        let Some(globals) = walk(GitWalk::Globals) else { continue };
         let moves = |g: &String| matches!(g.as_str(), "-C" | "--git-dir" | "--work-tree") || g.starts_with("--git-dir=") || g.starts_with("--work-tree=");
         if globals.iter().any(moves) {
             continue;
         }
-        let ws = git_subcommand(&cmdseg, GitWalk::Args).unwrap_or_default();
+        let ws = walk(GitWalk::Args).unwrap_or_default();
         if ws.first().map(String::as_str) != Some("stash") || stash_rewrites(ws.get(1).map(String::as_str)) != Some(true) {
             continue;
+        }
+        let h = ctx.host();
+        if !h.roots().main.is_empty() {
+            return Ok(None);
         }
         let form = ws.get(1).filter(|v| !v.starts_with('-')).map_or("git stash".to_string(), |v| format!("git stash {}", v));
         return block(format!("don't run '{form}' on the main checkout — a stash rewrites the working tree and the index every session in this checkout stands on: it takes every uncommitted edit in the tree, a concurrent session's among them, out from under it and puts them back at a moment that session did not choose. Two exits: to read or build another revision, 'git worktree add {home}/<name> <rev>', removed with 'git worktree remove {home}/<name>' when done; to set your own edits aside, commit them, naming their paths ('git commit -o <path>… -m '<msg>''). 'git stash list', 'show', 'create', 'store', 'drop' and 'clear' are untouched, and so is every stash from a linked worktree, which has an index and files of its own. If you genuinely need the stash, run it yourself with !<command>.", form = form, home = h.first_scratch()));
@@ -427,6 +465,17 @@ mod tests {
         assert_eq!(got, vec![("docs\\a b.md", "'docs\\a b.md'"), ("x", "x"), ("it's", "'it''s'")]);
         assert!(ps_delete_paths(&[plain_word("a"), plain_word("-wh")]).is_none());
         assert!(ps_delete_paths(&[plain_word("-Filter"), plain_word("a")]).unwrap().is_empty());
+    }
+
+    // spec: guard-kit/SPEC.md §The rule roster — rule `git_stash` reads each word by its value, a
+    // keyword and a redirect by the live text
+    #[test]
+    fn the_passed_words_drop_keywords_and_redirects_by_live_text() {
+        let got = |ws: &[Word]| passed_words(ws, '\\');
+        assert_eq!(got(&[plain_word("if"), plain_word("git"), word("'stash'", "stash", "\0SQ")]), vec!["git", "stash"]);
+        assert_eq!(got(&[plain_word("git"), plain_word("stash"), plain_word("2>&1"), plain_word(">"), plain_word("o"), plain_word("pop")]), vec!["git", "stash", "pop"]);
+        assert_eq!(got(&[plain_word("git"), plain_word("stash>o"), plain_word("&>/dev/null")]), vec!["git", "stash"]);
+        assert_eq!(got(&[plain_word("git"), word("'if'", "if", "\0SQ"), word("'>'", ">", "\0SQ"), word("a\\>b", "a>b", "a\\>b")]), vec!["git", "if", ">", "a>b"]);
     }
 }
 

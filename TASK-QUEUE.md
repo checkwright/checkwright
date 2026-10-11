@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### git-stash-quoted-verb
-
-rule `git_stash` reads its words unquoted only. The guard refuses `git stash push` on the main checkout, and the same call passes with either word in single quotes, `git 'stash' push` or `git stash 'push'`: the quoted word reads as one the walk does not know, on which the rule declines. Neither the rule's text nor its declines list states the restriction, and guard-kit/SPEC.md §The reader and its views says a word's value is what the shell passes.
-
-**Deliverable:** the subcommand and its verb read by value through the word read, with a decision-table row per quoted spelling. The rule's own option-first clause refuses `git stash --help`, which is left as stated.
-
-**Cost while deferred:** the block is evaded by quoting one word. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close second-vendor review and carried to the next scope's intake. Re-verified there through the hook member: the guard refused the plain call and passed both quoted spellings, the quoted subcommand being a second spelling the review did not name. Owner lookup: `git_stash`, `stash` in this file and the disposed-findings record — none; owner guard-kit/SPEC.md §The rule roster, rule `git_stash`.
-
 ### powershell-word-read-operands
 
 the PowerShell reader's word read gives rule `rm_tracked` two wrong operands. A backtick escape outside quotes is left in the word's value, so `Remove-Item` of a tracked path spelled with one backtick-escaped letter passes. And an operand is split on commas whatever its quoting, so a single-quoted name carrying a comma is tested as two paths and refused on the first. guard-kit/SPEC.md §The reader and its views says a value is what the shell passes, and its PowerShell bullet names a doubled quote and an expandable span's backtick escape alone.
@@ -1229,4 +1221,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - wait-exemption-redirect-tail
 - loop-keyword-as-argument
 - wait-loop-lead-and-condition
+- git-stash-quoted-verb
 

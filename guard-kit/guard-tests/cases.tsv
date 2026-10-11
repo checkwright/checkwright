@@ -283,7 +283,9 @@ fallthrough	git commit -m x
 # rule `git_stash` — a stash that rewrites the working tree or the index is blocked on the main
 #           checkout, which the sandbox is; the forms that leave the tree as it is, a verb the
 #           walk does not know and a global option that moves the repository pass. The linked
-#           worktree's pass lives in gate-tests/worktree-confinement.test.sh.
+#           worktree's pass lives in gate-tests/worktree-confinement.test.sh. Each word is read
+#           by its value, so a quoted or escaped spelling is the plain one; a redirect is no
+#           word, and a quoted `>` is one.
 block	git stash
 block	git stash -u
 block	git stash push -m x
@@ -292,12 +294,30 @@ block	git stash apply
 block	git --no-pager stash
 block	git stash 2>&1
 block	git status; git stash pop
+block	git 'stash' push
+block	git stash 'push'
+block	git "stash" pop
+block	git stash "pop"
+block	git 'stash'
+block	git st\ash
+block	git stash '-u'
+block	git '--no-pager' stash
+block	'git' stash
+block	git stash &>/dev/null
+block	if git stash>.tmp/o; then ls; fi
+block	echo "a@NL@b"; git stash
 fallthrough	git stash list
 fallthrough	git stash show -p
 fallthrough	git stash drop
 fallthrough	git stash frobnicate
 fallthrough	git -C sub stash
 fallthrough	echo 'git stash'
+fallthrough	git stash 'list'
+fallthrough	git 'stash' drop
+fallthrough	git '-C' sub stash
+fallthrough	git 'stash push'
+fallthrough	git stash '>'
+fallthrough	git stash2>.tmp/o
 
 # rule `truncate_scratch` — `: > file` truncation auto-allowed iff every target is gitignored
 allow	: > scratch.txt

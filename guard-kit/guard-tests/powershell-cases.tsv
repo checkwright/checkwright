@@ -38,7 +38,10 @@ fallthrough	git add tracked.md; git commit -o tracked.md -m x
 
 # rule `git_stash` — a tree-rewriting stash on the main checkout; a form that leaves the tree passes
 block	git stash
+block	git 'stash' push
+block	git stash "pop"
 fallthrough	git stash list
+fallthrough	git stash 'list'
 
 # rule `rm_tracked` — the deletion commands, their parameters, and the git rm force arm
 block	Remove-Item tracked.md

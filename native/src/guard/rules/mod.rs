@@ -50,7 +50,7 @@ pub static TABLE: &[Rule] = &[
         views: &[SqHdq, SqDqHd, Dequoted],
         test: reach::commit_only_paths,
     },
-    Rule { name: "git_stash", shells: BOTH, views: &[Raw, SqDqHd], test: reach::git_stash },
+    Rule { name: "git_stash", shells: BOTH, views: &[Raw, SqDqHd, Dequoted], test: reach::git_stash },
     Rule { name: "truncate_scratch", shells: BASH, views: &[SqDqHd], test: grants::truncate_scratch },
     Rule { name: "append_scratch", shells: BASH, views: &[Hdq, SqDqHd], test: grants::append_scratch },
     Rule { name: "ro_pipeline", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: grants::ro_pipeline },
@@ -110,11 +110,15 @@ fn is_banner(seg: &str) -> bool {
 
 // spec: guard-kit/SPEC.md §The generic ruleset — a leading shell keyword or negation does not change
 // which binary a segment runs.
+fn lead_keyword(tok: &str) -> bool {
+    matches!(tok, "!" | "until" | "while" | "if" | "then" | "else" | "elif" | "do")
+}
+
 fn command_word(seg: &str) -> String {
     let mut s = trim_start(seg);
     while !s.is_empty() {
         let tok = head_word(s);
-        if !matches!(tok, "!" | "until" | "while" | "if" | "then" | "else" | "elif" | "do") {
+        if !lead_keyword(tok) {
             break;
         }
         s = trim_start(&s[tok.len()..]);
@@ -122,6 +126,7 @@ fn command_word(seg: &str) -> String {
     text::chomp(s).to_string()
 }
 
+#[derive(Clone, Copy)]
 enum GitWalk {
     Sub,
     Globals,
@@ -131,10 +136,16 @@ enum GitWalk {
 // spec: guard-kit/SPEC.md §The generic ruleset — git's global options consumed so the subcommand is
 // reached; an option the walk does not recognize declines.
 fn git_subcommand(seg: &str, mode: GitWalk) -> Option<Vec<String>> {
+    git_walk(text::all_words(seg).into_iter(), mode)
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — the same walk over a command's words, however
+// their reader produced them.
+fn git_walk<'a>(words: impl Iterator<Item = &'a str>, mode: GitWalk) -> Option<Vec<String>> {
     let mut globals: Vec<String> = Vec::new();
     let mut out: Vec<String> = Vec::new();
     let (mut first, mut expect_arg, mut found) = (true, false, false);
-    for tok in text::all_words(seg) {
+    for tok in words {
         if found {
             out.push(tok.to_string());
             continue;
