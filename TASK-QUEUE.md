@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: guard-rule-holes-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,58 @@
 ## New Features
 
 ## Technical Debt
+
+### wait-exemption-redirect-tail
+
+rule `background_no_record`'s wait-loop exemption passes two shapes its own body and tail clauses exclude (guard-kit/SPEC.md §The rule roster, exemption (2)). A body `sleep` carrying a write redirect stays exempt, the body test reading the statement's leading word only: `until grep -q DONE <log>; do sleep 1 > <tracked file>; done`. And a tail joined to the loop by a bare `&` skips the declared-write check its `;` spelling takes: `…; done & sort -o <out> <in>`.
+
+**Deliverable:** the body test refusing a `sleep` that carries a redirect, and the tail test reading a statement after a bare `&` as it reads one after `;`, with a row per shape in the background decision table.
+
+**Ordering:** this lands ahead of [wait-loop-lead-and-condition](#wait-loop-lead-and-condition), whose lead-statement fix takes the tail test repaired here.
+
+**Cost while deferred:** a backgrounded writer with no liveness record, so rule `git_mutation_under_producer` holds no commit for it. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close second-vendor review and carried to the next scope's intake. Re-verified there through the hook member with the background flag set: both shapes passed and the `;` tail blocked. Owner lookup: `background_no_record`, `wait loop`, `exemption` in this file and the disposed-findings record — [wait-loop-lead-and-condition](#wait-loop-lead-and-condition), DISTINCT (the lead and the condition, a limit the section states, where these two contradict its clauses); [loop-keyword-as-argument](#loop-keyword-as-argument), DISTINCT (the keyword walk); `wait-exemption-body-unbounded`, done, DISTINCT (the body and tail clauses themselves, which landed); owner guard-kit/SPEC.md §The rule roster.
+
+### loop-keyword-as-argument
+
+the guard's one shell-keyword walk (`loop_span` in `native/src/guard/rules/mod.rs`) counts the words `do` and `done` wherever they stand, so one spelled as an argument unbalances the walk and rules `bare_sleep`, `background_no_record`, `wait_no_producer` and `bounded_wait` each decline. `sleep 5; echo done` passes the foreground-sleep block that `sleep 5; echo DONE` takes, and a backgrounded `until grep -q done <log>; do sleep 2; done; cargo build` passes the record block its `DONE` spelling takes.
+
+**Deliverable:** the walk reading the two keywords in command position only, with a decision-table row per rule for the argument spelling. The build that found it trialled that reading and every existing row held.
+
+**Cost while deferred:** a sleep or liveness rule is evaded by an ordinary word, with no intent needed. Filed 2026-10-10 by hook-placement-guard-rules-pass' build and promoted at its close. Re-verified there through the hook member: the four commands above gave those four verdicts. Owner lookup: `loop_span`, `bare_sleep`, `unbalanced`, `done` as an argument in this file and the disposed-findings record — none; [wait-loop-lead-and-condition](#wait-loop-lead-and-condition), DISTINCT (a stated limit of one exemption, where this is the walk four rules share); owner guard-kit/SPEC.md §The rule roster, rule `bare_sleep`'s discriminator.
+
+### git-stash-quoted-verb
+
+rule `git_stash` reads its words unquoted only. The guard refuses `git stash push` on the main checkout, and the same call passes with either word in single quotes, `git 'stash' push` or `git stash 'push'`: the quoted word reads as one the walk does not know, on which the rule declines. Neither the rule's text nor its declines list states the restriction, and guard-kit/SPEC.md §The reader and its views says a word's value is what the shell passes.
+
+**Deliverable:** the subcommand and its verb read by value through the word read, with a decision-table row per quoted spelling. The rule's own option-first clause refuses `git stash --help`, which is left as stated.
+
+**Cost while deferred:** the block is evaded by quoting one word. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close second-vendor review and carried to the next scope's intake. Re-verified there through the hook member: the guard refused the plain call and passed both quoted spellings, the quoted subcommand being a second spelling the review did not name. Owner lookup: `git_stash`, `stash` in this file and the disposed-findings record — none; owner guard-kit/SPEC.md §The rule roster, rule `git_stash`.
+
+### powershell-word-read-operands
+
+the PowerShell reader's word read gives rule `rm_tracked` two wrong operands. A backtick escape outside quotes is left in the word's value, so `Remove-Item` of a tracked path spelled with one backtick-escaped letter passes. And an operand is split on commas whatever its quoting, so a single-quoted name carrying a comma is tested as two paths and refused on the first. guard-kit/SPEC.md §The reader and its views says a value is what the shell passes, and its PowerShell bullet names a doubled quote and an expandable span's backtick escape alone.
+
+**Deliverable:** the value resolving a bare backtick escape, the comma split reading quoting, that bullet stating both, and a row per shape in the PowerShell decision table.
+
+**Cost while deferred:** a tracked delete missed, and a false block on a name carrying a literal comma. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close second-vendor review and carried to the next scope's intake. Re-verified there through the hook member under the PowerShell tool name: the guard passed the escaped spelling and refused the plain one, and refused the quoted comma name on its first half. Owner lookup: `rm_tracked`, `backtick`, `Remove-Item`, `comma` in this file and the disposed-findings record — [expansion-rule-backtick-blind](#expansion-rule-backtick-blind), DISTINCT (bash command substitution); owner guard-kit/SPEC.md §The reader and its views, the word read.
+
+### hook-sibling-image-overclaim
+
+gate-sdk/SPEC.md says more than the code holds in two places. The hook placement's cut-short copy removes its sibling and discards that removal's error (`native/src/emit/install_hooks.rs`), where §install-hooks says a sibling that cannot be removed is reported on stderr with its path. And `self_image` in `native/src/proc.rs` tests that its start name is a file and then returns the name, so a replace landing between that test and the child's open starts the new build, where §Fail-closed contract's own-path paragraph says one run never mixes two builds.
+
+**Deliverable:** the removal error joined to the refusal, and the image sentence stating the window or the reader opening what it tested.
+
+**Cost while deferred:** a stray sibling with no line naming it, and an absolute a narrow race falsifies. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close second-vendor review and carried to the next scope's intake. Re-verified there by reading both sources. Owner lookup: `cut-short`, `sibling`, `self_image`, `running image` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §install-hooks and §Fail-closed contract.
+
+### toolchain-pin-trails-stable
+
+the Rust toolchain pin trails the newest stable release by one minor: `rust-toolchain.toml` names 1.98.1 and the stable channel manifest names 1.99.0. The audit roster's toolchain-pin class is due on release prep and had never been swept.
+
+**Deliverable:** the channel moved in a commit editing that file alone, on a push that is its witness (gate-sdk/SPEC.md §check-crate-arms).
+
+**Push need (2026-10-11, inside the budget):** one mid-iteration push, since the seat that builds here carries no toolchain manager and a remote run is the first to execute the new compiler. Operator direction, lead-relayed (not a ruling), chosen over the pin riding the closing push; a release tag at this iteration's close is then a third remote push.
+
+**Cost while deferred:** the crate builds one stable release behind, with whatever that release fixes. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close audit, which held it because its two remaining pushes were the release's stamp commit and its tag, and carried to the next scope's intake. Re-verified there: the manifest dated 2026-10-01 names 1.99.0. Owner lookup: `toolchain`, `rust-toolchain`, `channel` in this file and the disposed-findings record — a runner-image notice, discarded, DISTINCT (a floating runner label); owner gate-sdk/SPEC.md §check-crate-arms.
 
 ## Deferred
 
@@ -490,16 +542,6 @@ rule `background_no_record`'s wait-loop exemption passes a backgrounded call who
 
 **Cost while deferred:** such a call is a producer with no liveness record, so rule `git_mutation_under_producer` holds no commit for it. Filed 2026-10-10 by hook-placement-guard-rules-pass' spec and promoted at its close. Re-verified there through the hook member with the background flag set: `until make; do sleep 1; done` passes, a lead no allow entry matches passes ahead of a wait loop, and a `cargo build` lead is stopped by a later rule's decorated-lead block alone. Owner lookup: `background_no_record`, `wait loop`, `exemption` in this file and the disposed-findings record — none; `wait-exemption-body-unbounded`, done, DISTINCT (the body and the tail, which landed); owner guard-kit/SPEC.md §The rule roster.
 
-### loop-keyword-as-argument
-
-[cost: event/low] [surface: guard-kit]
-
-the guard's one shell-keyword walk (`loop_span` in `native/src/guard/rules/mod.rs`) counts the words `do` and `done` wherever they stand, so one spelled as an argument unbalances the walk and rules `bare_sleep`, `background_no_record`, `wait_no_producer` and `bounded_wait` each decline. `sleep 5; echo done` passes the foreground-sleep block that `sleep 5; echo DONE` takes, and a backgrounded `until grep -q done <log>; do sleep 2; done; cargo build` passes the record block its `DONE` spelling takes.
-
-**Deliverable:** the walk reading the two keywords in command position only, with a decision-table row per rule for the argument spelling. The build that found it trialled that reading and every existing row held.
-
-**Cost while deferred:** a sleep or liveness rule is evaded by an ordinary word, with no intent needed. Filed 2026-10-10 by hook-placement-guard-rules-pass' build and promoted at its close. Re-verified there through the hook member: the four commands above gave those four verdicts. Owner lookup: `loop_span`, `bare_sleep`, `unbalanced`, `done` as an argument in this file and the disposed-findings record — none; [wait-loop-lead-and-condition](#wait-loop-lead-and-condition), DISTINCT (a stated limit of one exemption, where this is the walk four rules share); owner guard-kit/SPEC.md §The rule roster, rule `bare_sleep`'s discriminator.
-
 ### wakeup-stamp-windows-spawn
 
 [cost: event/low] [surface: guard-kit]
@@ -511,60 +553,6 @@ the wakeup-guard's log stamp is built in process on unix and spawns `date` off i
 **Inferred, not run:** that the spawn finds nothing under an exec-form registration on a Windows host — start `--hook wakeup-guard` there with Git's `usr/bin` off `PATH` and read the log line
 
 **Cost while deferred:** a Windows adopter's wakeup-attempts log lines may carry no timestamp. Filed 2026-10-10 by hook-placement-guard-rules-pass' build and promoted at its close. Re-verified there by reading both `local_stamp` bodies. Owner lookup: `wakeup`, `date -Is`, `local_stamp` in this file and the disposed-findings record — none; `exec-form-hook-registration`, done, DISTINCT (the registration's form, where this is a member's own spawn); owner guard-kit/SPEC.md §wakeup-guard.
-
-### wait-exemption-redirect-tail
-
-[cost: event/low] [surface: guard-kit]
-
-rule `background_no_record`'s wait-loop exemption passes two shapes its own body and tail clauses exclude (guard-kit/SPEC.md §The rule roster, exemption (2)). A body `sleep` carrying a write redirect stays exempt, the body test reading the statement's leading word only: `until grep -q DONE <log>; do sleep 1 > <tracked file>; done`. And a tail joined to the loop by a bare `&` skips the declared-write check its `;` spelling takes: `…; done & sort -o <out> <in>`.
-
-**Deliverable:** the body test refusing a `sleep` that carries a redirect, and the tail test reading a statement after a bare `&` as it reads one after `;`, with a row per shape in the background decision table.
-
-**Ordering:** this lands ahead of [wait-loop-lead-and-condition](#wait-loop-lead-and-condition), whose lead-statement fix takes the tail test repaired here.
-
-**Cost while deferred:** a backgrounded writer with no liveness record, so rule `git_mutation_under_producer` holds no commit for it. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close second-vendor review and carried to the next scope's intake. Re-verified there through the hook member with the background flag set: both shapes passed and the `;` tail blocked. Owner lookup: `background_no_record`, `wait loop`, `exemption` in this file and the disposed-findings record — [wait-loop-lead-and-condition](#wait-loop-lead-and-condition), DISTINCT (the lead and the condition, a limit the section states, where these two contradict its clauses); [loop-keyword-as-argument](#loop-keyword-as-argument), DISTINCT (the keyword walk); `wait-exemption-body-unbounded`, done, DISTINCT (the body and tail clauses themselves, which landed); owner guard-kit/SPEC.md §The rule roster.
-
-### git-stash-quoted-verb
-
-[cost: event/low] [surface: guard-kit]
-
-rule `git_stash` reads its words unquoted only. `git stash push` is blocked on the main checkout, and the same call passes with either word in single quotes, `git 'stash' push` or `git stash 'push'`: the quoted word reads as one the walk does not know, on which the rule declines. Neither the rule's text nor its declines list states the restriction, and guard-kit/SPEC.md §The reader and its views says a word's value is what the shell passes.
-
-**Deliverable:** the subcommand and its verb read by value through the word read, with a decision-table row per quoted spelling. `git stash --help` is blocked by the rule's own option-first clause and is left as stated.
-
-**Cost while deferred:** the block is evaded by quoting one word. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close second-vendor review and carried to the next scope's intake. Re-verified there through the hook member: the plain call blocked and both quoted spellings passed, the quoted subcommand being a second spelling the review did not name. Owner lookup: `git_stash`, `stash` in this file and the disposed-findings record — none; owner guard-kit/SPEC.md §The rule roster, rule `git_stash`.
-
-### powershell-word-read-operands
-
-[cost: event/low] [surface: guard-kit]
-
-the PowerShell reader's word read gives rule `rm_tracked` two wrong operands. A backtick escape outside quotes is left in the word's value, so `Remove-Item` of a tracked path spelled with one backtick-escaped letter passes. And an operand is split on commas whatever its quoting, so a single-quoted name carrying a comma is tested as two paths and blocks on the first. guard-kit/SPEC.md §The reader and its views says a value is what the shell passes, and its PowerShell bullet names a doubled quote and an expandable span's backtick escape alone.
-
-**Deliverable:** the value resolving a bare backtick escape, the comma split reading quoting, that bullet stating both, and a row per shape in the PowerShell decision table.
-
-**Cost while deferred:** a tracked delete missed, and a false block on a name carrying a literal comma. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close second-vendor review and carried to the next scope's intake. Re-verified there through the hook member under the PowerShell tool name: the escaped spelling passed where the plain one blocked, and the quoted comma name blocked on its first half. Owner lookup: `rm_tracked`, `backtick`, `Remove-Item`, `comma` in this file and the disposed-findings record — [expansion-rule-backtick-blind](#expansion-rule-backtick-blind), DISTINCT (bash command substitution); owner guard-kit/SPEC.md §The reader and its views, the word read.
-
-### hook-sibling-image-overclaim
-
-[cost: event/low] [surface: gate-sdk]
-
-gate-sdk/SPEC.md says more than the code holds in two places. The hook placement's cut-short copy removes its sibling and discards that removal's error (`native/src/emit/install_hooks.rs`), where §install-hooks says a sibling that cannot be removed is reported on stderr with its path. And `self_image` in `native/src/proc.rs` tests that its start name is a file and then returns the name, so a replace landing between that test and the child's open starts the new build, where §Fail-closed contract's own-path paragraph says one run never mixes two builds.
-
-**Deliverable:** the removal error joined to the refusal, and the image sentence stating the window or the reader opening what it tested.
-
-**Cost while deferred:** a stray sibling with no line naming it, and an absolute a narrow race falsifies. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close second-vendor review and carried to the next scope's intake. Re-verified there by reading both sources. Owner lookup: `cut-short`, `sibling`, `self_image`, `running image` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §install-hooks and §Fail-closed contract.
-
-### toolchain-pin-trails-stable
-
-[cost: event/low] [surface: native]
-
-the Rust toolchain pin trails the newest stable release by one minor: `rust-toolchain.toml` names 1.98.1 and the stable channel manifest names 1.99.0. The audit roster's toolchain-pin class is due on release prep and had never been swept.
-
-**Deliverable:** the channel moved in a commit editing that file alone, on a push that is its witness (gate-sdk/SPEC.md §check-crate-arms).
-
-**Push need (2026-10-11, inside the budget):** one mid-iteration push, since the seat that builds here carries no toolchain manager and a remote run is the first to execute the new compiler. Operator direction, lead-relayed (not a ruling), chosen over the pin riding the closing push; a release tag at this iteration's close is then a third remote push.
-
-**Cost while deferred:** the crate builds one stable release behind, with whatever that release fixes. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close audit, which held it because its two remaining pushes were the release's stamp commit and its tag, and carried to the next scope's intake. Re-verified there: the manifest dated 2026-10-01 names 1.99.0. Owner lookup: `toolchain`, `rust-toolchain`, `channel` in this file and the disposed-findings record — a runner-image notice, discarded, DISTINCT (a floating runner label); owner gate-sdk/SPEC.md §check-crate-arms.
 
 ### windows-liveness-row-pid-reuse
 

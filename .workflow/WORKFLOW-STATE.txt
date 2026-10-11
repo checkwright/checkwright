@@ -4,4 +4,4 @@
 
 ---
 
-— scope aae21f49 2026-10-11 400b2310e
+guard-rule-holes-pass scope aae21f49 2026-10-11 400b2310e
