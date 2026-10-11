@@ -126,4 +126,4 @@ due: release prep
 last: hook-placement-guard-rules-pass close
 corpus: rust-toolchain.toml read beside the stable channel manifest's version line, fetched in the close session; due on release prep (v0.32.0)
 hits: 1
-declined: the pin names 1.98.1 and the newest stable is 1.99.0; held and filed as a gap, since this seat carries no toolchain manager, the move's only witness is a push, and this close's pushes were the release's stamp commit and its tag
+declined: the pin names 1.98.1 and the newest stable is 1.99.0; held and filed as a gap, since this seat carries no toolchain manager, the move's only witness is a push, and at the sweep this close's pushes were a release's stamp commit and its tag, a release the operator then deferred

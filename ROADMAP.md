@@ -30,6 +30,7 @@ Adoption evidence, mostly. A rung promotes when someone hits the friction it des
 ### next
 
 - [gate-authoring-sdk-surface](TASK-QUEUE.md#gate-authoring-sdk-surface) *(ecosystem)* — Author a gate in any language behind one substrate-neutral descriptor.
+- [custom-gate-substrates](TASK-QUEUE.md#custom-gate-substrates) *(ecosystem)* — Write your own gate in PowerShell or Rust, where today it is shell alone.
 
 ### later
 
