@@ -242,20 +242,32 @@ fn only_sleeps(ctx: &Ctx, body: &str) -> bool {
     !steps.is_empty() && steps.iter().all(|g| head_word(trim(g)) == "sleep")
 }
 
-// spec: guard-kit/SPEC.md §The rule roster — rule `background_no_record`'s bash exemption (2): every
-// span's body only sleeps, to inert redirect targets, every statement after the first loop is another
-// such loop or passes rule `bounded_wait`'s clause (d) test, and none of them ends in a bare `&`.
+struct LoopSpan {
+    start: usize,
+    cond: usize,
+    open: usize,
+    close: usize,
+    commands: bool,
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — rule `background_no_record`'s bash exemption (2): the
+// call does no work its text shows, in a body, a condition or a statement outside a loop.
 fn waits_only(ctx: &Ctx, s: &str, toks: &[(i32, bool, String, usize)]) -> Result<bool, Fault> {
-    let mut loops: Vec<(usize, usize, usize, usize)> = Vec::new();
+    let mut loops: Vec<LoopSpan> = Vec::new();
     let (mut keyword, mut opened, mut nested) = (None, None, false);
     for (depth, _, tok, at) in toks.iter().filter(|t| t.1) {
         match tok.as_str() {
-            "until" | "while" | "for" if *depth == 0 && keyword.is_none() => keyword = Some(*at),
-            "do" if *depth == 1 => opened = Some((keyword.take().unwrap_or(*at), at + 2)),
+            "until" | "while" | "for" if *depth == 0 && keyword.is_none() => {
+                keyword = Some((*at, at + tok.len(), tok != "for"))
+            }
+            "do" if *depth == 1 => {
+                let (start, cond, commands) = keyword.take().unwrap_or((*at, *at, false));
+                opened = Some(LoopSpan { start, cond, open: *at, close: *at, commands });
+            }
             "do" => nested = true,
             "done" if *depth == 0 => {
-                if let Some((start, body)) = opened.take() {
-                    loops.push((start, body, *at, at + 4));
+                if let Some(span) = opened.take() {
+                    loops.push(LoopSpan { close: *at, ..span });
                 }
             }
             _ => {}
@@ -265,41 +277,31 @@ fn waits_only(ctx: &Ctx, s: &str, toks: &[(i32, bool, String, usize)]) -> Result
         return Ok(false);
     }
     let text = |a: usize, b: usize| s.get(a.min(s.len())..b.min(s.len())).unwrap_or("");
-    for &(_, body, done, _) in &loops {
-        let body = text(body, done);
-        let steps = ctx.segments(body);
-        if !only_sleeps(ctx, body) || steps.iter().any(|g| shell_backgrounds(g) || !wait_redirects_inert(ctx, g)) {
+    let stated = |t: &str| ctx.segments(t).into_iter().filter(|g| !trim(g).is_empty()).collect::<Vec<String>>();
+    let shows_write = |g: &String| shell_backgrounds(g) || !wait_redirects_inert(ctx, g);
+    for span in &loops {
+        let body = text(span.open + 2, span.close);
+        if !only_sleeps(ctx, body) || stated(body).iter().any(shows_write) {
+            return Ok(false);
+        }
+        if span.commands && stated(text(span.cond, span.open)).iter().any(shows_write) {
             return Ok(false);
         }
     }
-    let index_at = |at: usize| ctx.segments(text(0, at)).len().saturating_sub(1);
-    let mut tail: Vec<usize> = Vec::new();
-    for (k, &(_, _, _, end)) in loops.iter().enumerate() {
-        let next = loops.get(k + 1).map(|next| next.0);
-        let until = next.unwrap_or(s.len());
-        let piece = text(end, until);
-        let lead = trim_start(piece);
-        let piece = if lead.starts_with('&') && !lead.starts_with("&&") { &lead[1..] } else { piece };
-        let mut stated = false;
-        for seg in ctx.segments(piece) {
-            let seg = trim(&seg);
-            if seg.is_empty() {
-                continue;
-            }
-            if shell_backgrounds(seg) || !is_wait_tail_segment(ctx, seg) {
-                return Ok(false);
-            }
-            stated = true;
-        }
-        if stated {
-            tail.extend(index_at(end)..index_at(until) + usize::from(next.is_none()));
+    let outside =
+        |piece: &str| stated(piece).iter().all(|g| !shell_backgrounds(g) && is_wait_tail_segment(ctx, trim(g)));
+    if !outside(text(0, loops[0].start)) {
+        return Ok(false);
+    }
+    for (k, span) in loops.iter().enumerate() {
+        let piece = text(span.close + 4, loops.get(k + 1).map_or(s.len(), |next| next.start));
+        let own = trim_start(piece);
+        let piece = if own.starts_with('&') && !own.starts_with("&&") { &own[1..] } else { piece };
+        if !outside(piece) {
+            return Ok(false);
         }
     }
-    if tail.is_empty() {
-        return Ok(true);
-    }
-    let skip: Vec<usize> = (0..ctx.segments(s).len()).filter(|i| !tail.contains(i)).collect();
-    ro_forms_clear_statements(ctx, ctx.cmd(), &skip)
+    ro_forms_clear_statements(ctx, ctx.cmd())
 }
 
 pub fn background_no_record(ctx: &Ctx) -> Decided {

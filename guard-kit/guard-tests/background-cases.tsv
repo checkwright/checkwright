@@ -21,13 +21,16 @@ fallthrough	false	bash worker.sh
 # the canonical launch in harness form: rule `background_no_record`'s exemption (1) lets the record
 # through and rule `bounded_wait`'s arm (B) grants it, the flag changing nothing in its text
 allow	true	bash scripts/check-foo.sh > .tmp/foo.log 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
-# exemption (2) holds only where the call does no work of its own: every span's body only sleeps,
-# whatever its keyword, and what follows the first loop is another such loop or only reads. A loop
-# that works, a nest, a producer or a declared write form after the loop, and a body or tail
-# statement ending in a bare `&` each take the record. The `&` rows wait on a `grep`, since rule
-# `wait_no_producer` already blocks their shell-test spelling. The condition is not held.
-# A body `sleep` redirecting to a named file writes, where an inert target does not, and a tail
-# statement behind the loop's own `&` is read as one behind `;`.
+# exemption (2) holds only where the call does no work its text shows: every span's body only
+# sleeps, whatever its keyword, and a statement outside a loop, ahead of the first or after it, is
+# another such loop or only reads. A loop that works, a nest, a producer or a declared write form
+# ahead of the loop or after it, and a statement other than a loop ending in a bare `&` each take
+# the record. The `&` rows and the lead rows wait on a `grep`, since rule `wait_no_producer` reads
+# their shell-test spelling. A body `sleep` redirecting to a named file writes, where an inert
+# target does not, and a tail statement behind the loop's own `&` is read as one behind `;`.
+# A condition is held to the writes its text shows, a redirect to a named file, a statement-ending
+# `&` and a declared write form, and not to the read-only roster: a command outside it stays exempt.
+# A loop opens at a keyword leading a statement, so `echo for` hides no lead.
 block	true	while true; do make build; done
 block	true	for f in a b; do make build; done
 block	true	while true; do until [ -f .tmp/a ]; do sleep 1; done; done
@@ -45,7 +48,17 @@ allow	true	until grep -q DONE .tmp/worker.log; do sleep 5; done; grep -n ERR .tm
 block	true	until grep -q done .tmp/worker.log; do sleep 2; done; make build
 fallthrough	true	for i in 1 2 3; do sleep 5; done
 fallthrough	true	until make build; do sleep 1; done
-fallthrough	true	until sort -c -o out.txt data.txt; do sleep 5; done; echo waited
+block	true	until sort -c -o out.txt data.txt; do sleep 5; done; echo waited
+block	true	until grep -q DONE .tmp/worker.log > out.txt; do sleep 5; done
+block	true	until make build & grep -q DONE .tmp/worker.log; do sleep 1; done
+fallthrough	true	until gh run view 12 --json status 2>/dev/null | grep -q completed; do sleep 30; done
+block	true	make build; until grep -q DONE .tmp/worker.log; do sleep 5; done
+block	true	sort -o out.txt in.txt; until grep -q DONE .tmp/worker.log; do sleep 5; done
+block	true	make build & until grep -q DONE .tmp/worker.log; do sleep 5; done
+fallthrough	true	echo start; until grep -q DONE .tmp/worker.log; do sleep 5; done
+fallthrough	true	grep -c x .tmp/worker.log; until grep -q DONE .tmp/worker.log; do sleep 5; done
+block	true	echo for; make build; until grep -q DONE .tmp/worker.log; do sleep 5; done
+block	true	until grep -q DONE .tmp/worker.log; do sleep 5; done; echo for; make build; until grep -q X .tmp/worker.log; do sleep 5; done
 #
 # rule `wait_no_producer` — a backgrounded wait on a file condition is blocked while no record
 #           names a live producer; the sandbox's one record names a dead pid, so

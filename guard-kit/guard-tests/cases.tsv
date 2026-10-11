@@ -455,6 +455,9 @@ fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done &
 # after the wait, is a launch rule `background_no_record` holds to its record
 block	while true; do make build; done &
 block	until grep -q DONE .tmp/smoke.log; do sleep 5; done & make build
+# a statement ahead of the wait takes the tail's test: a producer there is a launch, a banner is not
+block	make build; until grep -q DONE .tmp/smoke.log; do sleep 5; done &
+fallthrough	echo start; until grep -q DONE .tmp/smoke.log; do sleep 5; done &
 # the same shell form over a file test is rule `wait_no_producer`'s block, the sandbox's one
 # record naming a dead pid
 block	until [ -f .tmp/marker ]; do sleep 5; done &

@@ -8,18 +8,6 @@
 
 ## New Features
 
-### wait-loop-lead-and-condition
-
-[spec: SPEC-wait-lead.md]
-
-rule `background_no_record`'s wait-loop exemption passes a backgrounded call whose work stands in the loop's condition or in a statement ahead of its first loop. The exemption holds the loop body and the statements after the loop (guard-kit/SPEC.md §The rule roster), and names these two as its limit, the condition on the ground that a wait on remote state writes nothing here.
-
-**Deliverable:** the exemption holding a leading statement to the test its tail already takes, and a condition that is a build or a write told from one that reads remote state, or that section stating why neither can be; an amendment's to choose, since either moves the rule's verdicts.
-
-**Taken into the iteration scoped 2026-10-11 (operator direction, lead-relayed, not a ruling)** as a feature, its amendment the spec stage's. It builds after `wait-exemption-redirect-tail`, whose repaired tail test the leading statement takes.
-
-**Cost while deferred:** such a call is a producer with no liveness record, so rule `git_mutation_under_producer` holds no commit for it. Filed 2026-10-10 by hook-placement-guard-rules-pass' spec and promoted at its close. Re-verified there through the hook member with the background flag set: `until make; do sleep 1; done` passes, a lead no allow entry matches passes ahead of a wait loop, and a `cargo build` lead is stopped by a later rule's decorated-lead block alone. Owner lookup: `background_no_record`, `wait loop`, `exemption` in this file and the disposed-findings record — none; `wait-exemption-body-unbounded`, done, DISTINCT (the body and the tail, which landed); owner guard-kit/SPEC.md §The rule roster.
-
 ## Technical Debt
 
 ### git-stash-quoted-verb
@@ -1240,4 +1228,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 
 - wait-exemption-redirect-tail
 - loop-keyword-as-argument
+- wait-loop-lead-and-condition
 

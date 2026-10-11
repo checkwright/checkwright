@@ -368,8 +368,8 @@ fn ro_forms_clear_except(ctx: &Ctx, c: &Cmd, skip: &[usize]) -> Result<bool, Fau
 
 // spec: guard-kit/SPEC.md §The rule roster — rule `background_no_record`'s reading of the same
 // reader: a segment the compound split leaves whole across a bare `&` is read statement by statement.
-fn ro_forms_clear_statements(ctx: &Ctx, c: &Cmd, skip: &[usize]) -> Result<bool, Fault> {
-    ro_forms_read(ctx, c, skip, true)
+fn ro_forms_clear_statements(ctx: &Ctx, c: &Cmd) -> Result<bool, Fault> {
+    ro_forms_read(ctx, c, &[], true)
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — a segment cut at each statement-ending bare `&`.
