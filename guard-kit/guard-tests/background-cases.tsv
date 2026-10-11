@@ -26,6 +26,8 @@ allow	true	bash scripts/check-foo.sh > .tmp/foo.log 2>&1 & echo "pid=$! run=foo"
 # that works, a nest, a producer or a declared write form after the loop, and a body or tail
 # statement ending in a bare `&` each take the record. The `&` rows wait on a `grep`, since rule
 # `wait_no_producer` already blocks their shell-test spelling. The condition is not held.
+# A body `sleep` redirecting to a named file writes, where an inert target does not, and a tail
+# statement behind the loop's own `&` is read as one behind `;`.
 block	true	while true; do make build; done
 block	true	for f in a b; do make build; done
 block	true	while true; do until [ -f .tmp/a ]; do sleep 1; done; done
@@ -33,6 +35,10 @@ block	true	until grep -q DONE .tmp/worker.log; do sleep 5; done; make build
 block	true	until grep -q DONE .tmp/worker.log; do sleep 5; done; sort -o out.txt .tmp/worker.log
 block	true	until grep -q DONE .tmp/worker.log; do sleep 5 & make build; done
 block	true	until grep -q DONE .tmp/worker.log; do sleep 5; done; echo waited & make build
+block	true	until grep -q DONE .tmp/worker.log; do sleep 1 > out.txt; done
+fallthrough	true	until grep -q DONE .tmp/worker.log; do sleep 5 2>/dev/null; done
+block	true	until grep -q DONE .tmp/worker.log; do sleep 5; done & sort -o out.txt .tmp/worker.log
+fallthrough	true	until grep -q DONE .tmp/worker.log; do sleep 5; done & grep -n ERR .tmp/worker.log
 allow	true	until grep -q DONE .tmp/worker.log; do sleep 5; done; echo waited
 allow	true	until grep -q DONE .tmp/worker.log; do sleep 5; done; grep -n ERR .tmp/worker.log
 fallthrough	true	for i in 1 2 3; do sleep 5; done

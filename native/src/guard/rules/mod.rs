@@ -363,6 +363,32 @@ fn ro_forms_clear(ctx: &Ctx, c: &Cmd) -> Result<bool, Fault> {
 // spec: guard-kit/SPEC.md §The generic ruleset — the same reader with the segments a caller has
 // already read as writes, by their compound-split index, left out.
 fn ro_forms_clear_except(ctx: &Ctx, c: &Cmd, skip: &[usize]) -> Result<bool, Fault> {
+    ro_forms_read(ctx, c, skip, false)
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — rule `background_no_record`'s reading of the same
+// reader: a segment the compound split leaves whole across a bare `&` is read statement by statement.
+fn ro_forms_clear_statements(ctx: &Ctx, c: &Cmd, skip: &[usize]) -> Result<bool, Fault> {
+    ro_forms_read(ctx, c, skip, true)
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — a segment cut at each statement-ending bare `&`.
+fn background_statements(seg: &str) -> Vec<&str> {
+    let b = seg.as_bytes();
+    let mut out = Vec::new();
+    let mut from = 0usize;
+    for i in 0..b.len() {
+        let led = i == 0 || !matches!(b[i - 1], b'&' | b'>' | b'|');
+        if b[i] == b'&' && led && b.get(i + 1).map_or(true, |c| text::is_space(*c)) {
+            out.push(&seg[from..i]);
+            from = i + 1;
+        }
+    }
+    out.push(&seg[from..]);
+    out
+}
+
+fn ro_forms_read(ctx: &Ctx, c: &Cmd, skip: &[usize], statements: bool) -> Result<bool, Fault> {
     let h = ctx.host();
     let Some(v) = ctx.dequoted(c)? else { return Ok(false) };
     let s = ctx.view(c, SqDqHd)?;
@@ -371,10 +397,22 @@ fn ro_forms_clear_except(ctx: &Ctx, c: &Cmd, skip: &[usize]) -> Result<bool, Fau
     if segs.len() != dsegs.len() {
         return Ok(false);
     }
+    let mut pairs: Vec<(&str, &str)> = Vec::new();
     for (i, (seg, dseg)) in segs.iter().zip(&dsegs).enumerate() {
         if skip.contains(&i) {
             continue;
         }
+        if !statements {
+            pairs.push((seg, dseg));
+            continue;
+        }
+        let (cut, dcut) = (background_statements(seg), background_statements(dseg));
+        if cut.len() != dcut.len() {
+            return Ok(false);
+        }
+        pairs.extend(cut.into_iter().zip(dcut));
+    }
+    for (seg, dseg) in pairs {
         let cw = command_word(seg);
         let bin = head_word(&cw);
         if bin.is_empty() || !on_ro_roster(h, bin) {
@@ -638,6 +676,8 @@ mod tests {
         assert_eq!(unredirected_words("cat <<EOF", "cat <<EOF"), Err(2));
         assert_eq!(unredirected_words("rm .tmp/a\\ b > o", "rm .tmp/a\\\x01b > o"), Ok("rm .tmp/a\\\x01b".to_string()));
         assert!(shell_backgrounds("make &"));
+        assert_eq!(background_statements(" done & sort -o a b 2>&1"), vec![" done ", " sort -o a b 2>&1"]);
+        assert_eq!(background_statements("a && b |& c &> d"), vec!["a && b |& c &> d"]);
         assert!(!shell_backgrounds("a && b 2>&1"));
     }
 }

@@ -5,7 +5,7 @@ use super::grants::{slot_reach, Reach};
 use super::reach::{interpreter_reach, refused, rm_tracked_reach};
 use super::{
     command_word, git_subcommand, has_expansion, has_substitution, inert_target, is_banner, is_ro_segment,
-    loop_span, loop_tokens, redirect_targets, ro_forms_clear, ro_forms_clear_except, segment_core,
+    loop_span, loop_tokens, redirect_targets, ro_forms_clear, ro_forms_clear_statements, segment_core,
     shell_backgrounds, strip_redirect_op, unredirected_words, GitWalk,
 };
 use crate::guard::allow_match;
@@ -243,8 +243,8 @@ fn only_sleeps(ctx: &Ctx, body: &str) -> bool {
 }
 
 // spec: guard-kit/SPEC.md §The rule roster — rule `background_no_record`'s bash exemption (2): every
-// `do … done` span's body only sleeps, every statement after the first loop is another such loop or
-// passes rule `bounded_wait`'s clause (d) test, and no body or tail statement ends in a bare `&`.
+// span's body only sleeps, to inert redirect targets, every statement after the first loop is another
+// such loop or passes rule `bounded_wait`'s clause (d) test, and none of them ends in a bare `&`.
 fn waits_only(ctx: &Ctx, s: &str, toks: &[(i32, bool, String, usize)]) -> Result<bool, Fault> {
     let mut loops: Vec<(usize, usize, usize, usize)> = Vec::new();
     let (mut keyword, mut opened, mut nested) = (None, None, false);
@@ -267,7 +267,8 @@ fn waits_only(ctx: &Ctx, s: &str, toks: &[(i32, bool, String, usize)]) -> Result
     let text = |a: usize, b: usize| s.get(a.min(s.len())..b.min(s.len())).unwrap_or("");
     for &(_, body, done, _) in &loops {
         let body = text(body, done);
-        if !only_sleeps(ctx, body) || ctx.segments(body).iter().any(|g| shell_backgrounds(g)) {
+        let steps = ctx.segments(body);
+        if !only_sleeps(ctx, body) || steps.iter().any(|g| shell_backgrounds(g) || !wait_redirects_inert(ctx, g)) {
             return Ok(false);
         }
     }
@@ -298,7 +299,7 @@ fn waits_only(ctx: &Ctx, s: &str, toks: &[(i32, bool, String, usize)]) -> Result
         return Ok(true);
     }
     let skip: Vec<usize> = (0..ctx.segments(s).len()).filter(|i| !tail.contains(i)).collect();
-    ro_forms_clear_except(ctx, ctx.cmd(), &skip)
+    ro_forms_clear_statements(ctx, ctx.cmd(), &skip)
 }
 
 pub fn background_no_record(ctx: &Ctx) -> Decided {

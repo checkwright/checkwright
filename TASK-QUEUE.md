@@ -16,21 +16,11 @@ rule `background_no_record`'s wait-loop exemption passes a backgrounded call who
 
 **Deliverable:** the exemption holding a leading statement to the test its tail already takes, and a condition that is a build or a write told from one that reads remote state, or that section stating why neither can be; an amendment's to choose, since either moves the rule's verdicts.
 
-**Taken into the iteration scoped 2026-10-11 (operator direction, lead-relayed, not a ruling)** as a feature, its amendment the spec stage's. It builds after [wait-exemption-redirect-tail](#wait-exemption-redirect-tail), whose repaired tail test the leading statement takes.
+**Taken into the iteration scoped 2026-10-11 (operator direction, lead-relayed, not a ruling)** as a feature, its amendment the spec stage's. It builds after `wait-exemption-redirect-tail`, whose repaired tail test the leading statement takes.
 
 **Cost while deferred:** such a call is a producer with no liveness record, so rule `git_mutation_under_producer` holds no commit for it. Filed 2026-10-10 by hook-placement-guard-rules-pass' spec and promoted at its close. Re-verified there through the hook member with the background flag set: `until make; do sleep 1; done` passes, a lead no allow entry matches passes ahead of a wait loop, and a `cargo build` lead is stopped by a later rule's decorated-lead block alone. Owner lookup: `background_no_record`, `wait loop`, `exemption` in this file and the disposed-findings record — none; `wait-exemption-body-unbounded`, done, DISTINCT (the body and the tail, which landed); owner guard-kit/SPEC.md §The rule roster.
 
 ## Technical Debt
-
-### wait-exemption-redirect-tail
-
-rule `background_no_record`'s wait-loop exemption passes two shapes its own body and tail clauses exclude (guard-kit/SPEC.md §The rule roster, exemption (2)). A body `sleep` carrying a write redirect stays exempt, the body test reading the statement's leading word only: `until grep -q DONE <log>; do sleep 1 > <tracked file>; done`. And a tail joined to the loop by a bare `&` skips the declared-write check its `;` spelling takes: `…; done & sort -o <out> <in>`.
-
-**Deliverable:** the body test refusing a `sleep` that carries a redirect, and the tail test reading a statement after a bare `&` as it reads one after `;`, with a row per shape in the background decision table.
-
-**Ordering:** this lands ahead of [wait-loop-lead-and-condition](#wait-loop-lead-and-condition), whose lead-statement fix takes the tail test repaired here.
-
-**Cost while deferred:** a backgrounded writer with no liveness record, so rule `git_mutation_under_producer` holds no commit for it. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close second-vendor review and carried to the next scope's intake. Re-verified there through the hook member with the background flag set: both shapes passed and the `;` tail blocked. Owner lookup: `background_no_record`, `wait loop`, `exemption` in this file and the disposed-findings record — [wait-loop-lead-and-condition](#wait-loop-lead-and-condition), DISTINCT (the lead and the condition, a limit the section states, where these two contradict its clauses); [loop-keyword-as-argument](#loop-keyword-as-argument), DISTINCT (the keyword walk); `wait-exemption-body-unbounded`, done, DISTINCT (the body and tail clauses themselves, which landed); owner guard-kit/SPEC.md §The rule roster.
 
 ### loop-keyword-as-argument
 
@@ -1255,4 +1245,6 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 `check-memory-off` derives the memory dir from the repository toplevel, so a linked-worktree session's memory may land where no scan reads if the harness keys that dir on a canonical working-copy root, a keying read from its bundle and never observed.
 
 ## Done
+
+- wait-exemption-redirect-tail
 
