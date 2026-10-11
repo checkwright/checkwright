@@ -518,6 +518,38 @@ the gates workflow's Windows liveness step misread one row once. On the run for 
 
 **Cost while deferred:** a closing push reds on a coin and costs a re-run and its wait. Surfaced 2026-10-11 by hook-placement-guard-rules-pass' close and carried to the next scope's intake. Owner lookup: `liveness`, `pid`, `recycl` in this file and the disposed-findings record — none; owner evidence-kit/SPEC.md §check-producer-liveness and the gates workflow's Windows crate leg.
 
+### wait-no-producer-lead-evasion
+
+[cost: event/low] [surface: guard-kit]
+
+guard-kit rule `wait_no_producer` asks that the call's first statement be the wait loop, so a banner or a read-only lead ahead of it evades the block: backgrounded over an empty record set, `echo start; until [ -f .tmp/marker ]; do sleep 30; done` and its `ls .tmp;` twin fall through where the bare wait is blocked. Guard-kit rule `background_no_record`'s wait-loop exemption admits that lead, so the two rules read different shapes as a wait. A banner after the loop still blocks.
+
+**Deliverable:** the rule's wait-loop clause reading the loop past a lead that exemption admits, or the section stating the limit; either moves a verdict or a stated contract, so it lands through an amendment. Rows for both leads.
+
+**Cost while deferred:** a file-condition wait no live producer can end holds a session, after one permission decision, since guard-kit rule `bounded_wait` declines on a lead too. Filed 2026-10-11 by guard-rule-holes-pass' spec and promoted at its close. Re-verified there by a run through the hook member with the background flag set. Owner lookup: `wait_no_producer`, `banner`, `lead` in this file and the disposed-findings record — none; `wait-loop-lead-and-condition`, done, DISTINCT (the record exemption's lead, where this is the producer block's); owner guard-kit/SPEC.md §The generic ruleset.
+
+### git-rules-word-read-siblings
+
+[cost: event/low] [surface: guard-kit]
+
+three guard-kit rules still read git's words off the quoted-span skeleton, the hole rule `git_stash` had before it took the word read. Under a live producer record `git 'commit' -m x`, `git "add" -A`, `git comm\it`, `git com'mit'` and `git 'reset' --hard` pass rule `git_mutation_under_producer` where the plain spelling is blocked; `git 'grep' foo` passes rule `git_grep`; `git 'commit' --amend` loses rule `git_rewrite`'s advise. The command word is a second axis of the same read: `'git' commit`, `\git commit`, `command git commit`, `env git commit` and `/usr/bin/git commit` pass the producer block, and `command git stash`, `env git stash` and `sudo git stash` pass rule `git_stash`, which blocks `\git stash`.
+
+**Deliverable:** the word read rule `git_stash` takes, lifted to the walk the git rules share, and a ruling in the section on a wrapper-led or path-spelled `git`, read or stated as a limit. Rows in the decision tables and in the live-producer gate test.
+
+**Cost while deferred:** a tracked-tree mutation lands under a live producer, or a stash on the shared checkout, after one permission decision, since no allow entry matches a quoted or wrapper-led spelling. Filed 2026-10-11 by guard-rule-holes-pass' build, read and not run, and promoted at its close. Re-verified there by runs through the hook member over a live pid's record, which also produced the command-word spellings. Owner lookup: `git_mutation_under_producer`, `git_grep`, `git_rewrite`, `word read`, `wrapper` in this file and the disposed-findings record — none; `git-stash-quoted-verb`, done, DISTINCT (one rule's read, which this carries to its siblings); owner guard-kit/SPEC.md §The generic ruleset.
+
+### bounded-wait-piped-loop
+
+[cost: event/low] [surface: guard-kit]
+
+guard-kit rule `bounded_wait` grants a foreground wait loop piped into a reader, `until [ -f marker ]; do sleep 5; done|cat` and its spaced spelling, and neither a decision-table row nor the rule's clauses say so: its tail clause speaks of statements after the loop, and a pipe is none. A loop piped into a writer (`done|rm -rf x`) is not granted, and the backgrounded piped wait meets rule `wait_no_producer`'s block.
+
+**Deliverable:** the piped tail declared in the rule's tail clause and pinned by a row for each spelling, or the grant withdrawn; which one is spec's.
+
+**Inferred, not run:** that the grant dates from loop-keyword-as-argument's cut of the loop at the walk's keywords — run the same rows on the gate binary built at the commit before it
+
+**Cost while deferred:** a grant no row holds can widen or vanish under the next edit to the shared walk unseen. Surfaced 2026-10-11 by guard-rule-holes-pass' lead off that unit's diff and filed at its close. Re-verified there by runs through the hook member. Owner lookup: `bounded_wait`, `piped`, `done|cat` in this file and the disposed-findings record — none; `loop-keyword-as-argument`, done, DISTINCT (the keyword walk, which declared the unspaced spelling alone); owner guard-kit/SPEC.md §The generic ruleset.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
@@ -1207,11 +1239,4 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 `check-memory-off` derives the memory dir from the repository toplevel, so a linked-worktree session's memory may land where no scan reads if the harness keys that dir on a canonical working-copy root, a keying read from its bundle and never observed.
 
 ## Done
-
-- wait-exemption-redirect-tail
-- loop-keyword-as-argument
-- wait-loop-lead-and-condition
-- git-stash-quoted-verb
-- powershell-word-read-operands
-- hook-sibling-image-overclaim
 
