@@ -18,6 +18,8 @@ the Rust toolchain pin trails the newest stable release by one minor: `rust-tool
 
 **Push need (2026-10-11, inside the budget):** one mid-iteration push, since the seat that builds here carries no toolchain manager and a remote run is the first to execute the new compiler. Operator direction, lead-relayed (not a ruling), chosen over the pin riding the closing push; a release tag at this iteration's close is then a third remote push.
 
+**Operator direction (2026-10-11, lead-relayed, not a ruling): hold the pin and defer this entry.** The move's push reddened one leg, so the channel returns to 1.98.1 in a commit editing that file alone, on a second mid-iteration push that direction grants and that covers no further one; a release tag at close is then a fourth remote push. The entry returns to Deferred carrying the run's evidence, neither Done as held nor active.
+
 **Cost while deferred:** the crate builds one stable release behind, with whatever that release fixes. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close audit, which held it because its two remaining pushes were the release's stamp commit and its tag, and carried to the next scope's intake. Re-verified there: the manifest dated 2026-10-01 names 1.99.0. Owner lookup: `toolchain`, `rust-toolchain`, `channel` in this file and the disposed-findings record — a runner-image notice, discarded, DISTINCT (a floating runner label); owner gate-sdk/SPEC.md §check-crate-arms.
 
 ## Deferred
