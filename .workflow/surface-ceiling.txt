@@ -96,7 +96,7 @@
 85183cp evidence-kit/SPEC.md
 992444cp gate-sdk/SPEC.md
 2899cp gate-sdk/templates/adopt.md
-303581cp guard-kit/SPEC.md
+303841cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
 281295cp installer/SPEC.md
 385672cp lifecycle-kit/SPEC.md

@@ -41,6 +41,8 @@ block	true	until grep -q DONE .tmp/worker.log; do sleep 5; done & sort -o out.tx
 fallthrough	true	until grep -q DONE .tmp/worker.log; do sleep 5; done & grep -n ERR .tmp/worker.log
 allow	true	until grep -q DONE .tmp/worker.log; do sleep 5; done; echo waited
 allow	true	until grep -q DONE .tmp/worker.log; do sleep 5; done; grep -n ERR .tmp/worker.log
+# a keyword spelled as an argument leaves the walk balanced, so the tail is still read
+block	true	until grep -q done .tmp/worker.log; do sleep 2; done; make build
 fallthrough	true	for i in 1 2 3; do sleep 5; done
 fallthrough	true	until make build; do sleep 1; done
 fallthrough	true	until sort -c -o out.txt data.txt; do sleep 5; done; echo waited
@@ -58,6 +60,7 @@ fallthrough	true	until sort -c -o out.txt data.txt; do sleep 5; done; echo waite
 block	true	until [ -f .tmp/marker ]; do sleep 30; done
 block	true	while [ ! -f .tmp/marker ]; do sleep 30; done
 block	true	until test -d .tmp/out && [[ -s .tmp/out/done ]]; do sleep 30; done; echo waited
+block	true	until [ -f .tmp/marker ]; do sleep 30; done; echo done
 allow	false	until [ -f .tmp/marker ]; do sleep 30; done
 fallthrough	true	until [ -f .tmp/a ]; do sleep 5; done; until [ -f .tmp/b ]; do sleep 5; done
 allow	true	while kill -0 2147483646 2>/dev/null; do sleep 5; done

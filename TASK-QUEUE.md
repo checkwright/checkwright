@@ -22,14 +22,6 @@ rule `background_no_record`'s wait-loop exemption passes a backgrounded call who
 
 ## Technical Debt
 
-### loop-keyword-as-argument
-
-the guard's one shell-keyword walk (`loop_span` in `native/src/guard/rules/mod.rs`) counts the words `do` and `done` wherever they stand, so one spelled as an argument unbalances the walk and rules `bare_sleep`, `background_no_record`, `wait_no_producer` and `bounded_wait` each decline. `sleep 5; echo done` passes the foreground-sleep block that `sleep 5; echo DONE` takes, and a backgrounded `until grep -q done <log>; do sleep 2; done; cargo build` passes the record block its `DONE` spelling takes.
-
-**Deliverable:** the walk reading the two keywords in command position only, with a decision-table row per rule for the argument spelling. The build that found it trialled that reading and every existing row held.
-
-**Cost while deferred:** a sleep or liveness rule is evaded by an ordinary word, with no intent needed. Filed 2026-10-10 by hook-placement-guard-rules-pass' build and promoted at its close. Re-verified there through the hook member: the four commands above gave those four verdicts. Owner lookup: `loop_span`, `bare_sleep`, `unbalanced`, `done` as an argument in this file and the disposed-findings record — none; [wait-loop-lead-and-condition](#wait-loop-lead-and-condition), DISTINCT (a stated limit of one exemption, where this is the walk four rules share); owner guard-kit/SPEC.md §The rule roster, rule `bare_sleep`'s discriminator.
-
 ### git-stash-quoted-verb
 
 rule `git_stash` reads its words unquoted only. The guard refuses `git stash push` on the main checkout, and the same call passes with either word in single quotes, `git 'stash' push` or `git stash 'push'`: the quoted word reads as one the walk does not know, on which the rule declines. Neither the rule's text nor its declines list states the restriction, and guard-kit/SPEC.md §The reader and its views says a word's value is what the shell passes.
@@ -1247,4 +1239,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 ## Done
 
 - wait-exemption-redirect-tail
+- loop-keyword-as-argument
 

@@ -238,6 +238,8 @@ fallthrough	pgrep -xf installer-smoke
 #           never reaches an auto-allow six rules later.
 block	sleep 30
 block	sleep 180; echo waited
+# a keyword spelled as an argument opens and closes no span
+block	sleep 5; echo done
 allow	until grep -q DONE .tmp/smoke.log; do sleep 5; done
 allow	printf 'sleep 5' >> .tmp/note.txt
 
@@ -441,6 +443,10 @@ allow	until grep -q DONE .tmp/smoke.log 2>/dev/null; do sleep 30; done; grep -n 
 allow	while kill -0 2147483646 2>/dev/null; do sleep 5; done
 allow	until ! kill -0 2147483646 2>/dev/null; do sleep 5; done
 allow	until [ -f .tmp/marker ]; do sleep 10; done
+# clause (a) counts the span's keywords in command position, so `done` as an argument is no second span
+allow	until grep -q done .tmp/smoke.log; do sleep 5; done; echo done
+# and cuts the loop at the walk's keywords, so a blank around one is not asked
+allow	until grep -q DONE .tmp/smoke.log;do sleep 5;done
 # clause (0) — a statement-ending `&` is a launch, not a wait, whatever else the
 # command does. Rule `background_no_record` exempts the wait loop, so this row reaches rule `bounded_wait` and
 # is refused there rather than by an earlier rule's ordering

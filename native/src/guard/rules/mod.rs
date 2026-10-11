@@ -472,7 +472,8 @@ fn is_bare_allow(h: &Host, seg: &str) -> (bool, bool) {
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — the ruleset's one shell-keyword walk: each token
-// with its loop depth and whether it stands in command position; `None` on an unbalanced do/done.
+// with its loop depth and whether it stands in command position, where alone a keyword is one;
+// `None` on an unbalanced do/done.
 fn loop_span(s: &str) -> Option<Vec<(i32, bool, String)>> {
     Some(loop_tokens(s)?.into_iter().map(|(depth, cmdpos, tok, _)| (depth, cmdpos, tok)).collect())
 }
@@ -508,23 +509,23 @@ fn loop_tokens(s: &str) -> Option<Vec<(i32, bool, String, usize)>> {
     for (at, end) in cuts {
         let tok = &joined[at..end];
         match tok {
-            ";" | "|" | "||" | "&&" | "&" | "(" | ")" | "{" | "}" | "!" | "until" | "while" | "if" | "then"
-            | "else" | "elif" | "for" => {
+            ";" | "|" | "||" | "&&" | "&" | "(" | ")" | "{" | "}" => {
                 out.push((depth, cmdpos, tok.to_string(), at));
                 cmdpos = true;
             }
-            "do" => {
+            "!" | "until" | "while" | "if" | "then" | "else" | "elif" | "for" if cmdpos => {
+                out.push((depth, cmdpos, tok.to_string(), at));
+            }
+            "do" if cmdpos => {
                 depth += 1;
                 out.push((depth, cmdpos, tok.to_string(), at));
-                cmdpos = true;
             }
-            "done" => {
+            "done" if cmdpos => {
                 depth -= 1;
                 if depth < 0 {
                     return None;
                 }
                 out.push((depth, cmdpos, tok.to_string(), at));
-                cmdpos = true;
             }
             _ => {
                 out.push((depth, cmdpos, tok.to_string(), at));
@@ -650,6 +651,10 @@ mod tests {
         assert_eq!(xargs_command_index("xargs --bogus grep"), Err(()));
         assert!(loop_span("until x; do sleep 1; done").is_some());
         assert!(loop_span("done").is_none());
+        let argued = loop_span("echo done; until grep -q do f; do sleep 1; done; echo for").unwrap();
+        let keywords: Vec<&str> =
+            argued.iter().filter(|(_, cmdpos, _)| *cmdpos).map(|(_, _, t)| t.as_str()).collect();
+        assert_eq!(keywords, vec!["echo", "until", "grep", "do", "sleep", "done", ";", "echo"]);
         let toks = loop_tokens("until a&&b; do sleep 1|&x; done").unwrap();
         let read: Vec<(i32, &str, usize)> = toks.iter().map(|(d, _, t, at)| (*d, t.as_str(), *at)).collect();
         assert_eq!(

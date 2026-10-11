@@ -5,7 +5,7 @@ use super::grants::{slot_reach, Reach};
 use super::reach::{interpreter_reach, refused, rm_tracked_reach};
 use super::{
     command_word, git_subcommand, has_expansion, has_substitution, inert_target, is_banner, is_ro_segment,
-    loop_span, loop_tokens, redirect_targets, ro_forms_clear, ro_forms_clear_statements, segment_core,
+    loop_tokens, redirect_targets, ro_forms_clear, ro_forms_clear_statements, segment_core,
     shell_backgrounds, strip_redirect_op, unredirected_words, GitWalk,
 };
 use crate::guard::allow_match;
@@ -248,7 +248,7 @@ fn only_sleeps(ctx: &Ctx, body: &str) -> bool {
 fn waits_only(ctx: &Ctx, s: &str, toks: &[(i32, bool, String, usize)]) -> Result<bool, Fault> {
     let mut loops: Vec<(usize, usize, usize, usize)> = Vec::new();
     let (mut keyword, mut opened, mut nested) = (None, None, false);
-    for (depth, _, tok, at) in toks {
+    for (depth, _, tok, at) in toks.iter().filter(|t| t.1) {
         match tok.as_str() {
             "until" | "while" | "for" if *depth == 0 && keyword.is_none() => keyword = Some(*at),
             "do" if *depth == 1 => opened = Some((keyword.take().unwrap_or(*at), at + 2)),
@@ -382,72 +382,24 @@ fn is_wait_tail_segment(ctx: &Ctx, seg: &str) -> bool {
     core.is_empty() || is_banner(core) || is_ro_segment(ctx.host(), core)
 }
 
-// spec: guard-kit/SPEC.md §The generic ruleset — the loop view split as
-// `^[[:space:]]*(until|while)[[:space:]]+(.+)[[:space:]]+do[[:space:]]+(.+)[[:space:]]+done([[:space:];].*)?$`,
-// each group the longest it can be.
-fn loop_parts(view: &str) -> Option<(String, String, String)> {
-    let sp = |c: u8| text::is_space(c);
-    let b = view.as_bytes();
-    let mut i = 0usize;
-    while i < b.len() && sp(b[i]) {
-        i += 1;
-    }
-    if !(view[i..].starts_with("until") || view[i..].starts_with("while")) {
-        return None;
-    }
-    i += 5;
-    let ws_start = i;
-    while i < b.len() && sp(b[i]) {
-        i += 1;
-    }
-    if i == ws_start {
-        return None;
-    }
-    let rest = &view[i..];
-    let rb = rest.as_bytes();
-    let keyword_after = |at: usize, kw: &str| -> Option<usize> {
-        let mut j = at;
-        if j >= rb.len() || !sp(rb[j]) {
-            return None;
-        }
-        while j < rb.len() && sp(rb[j]) {
-            j += 1;
-        }
-        rest[j..].starts_with(kw).then_some(j + kw.len())
-    };
-    for p in (1..rb.len()).rev() {
-        let Some(after_do) = keyword_after(p, "do") else { continue };
-        if after_do >= rb.len() || !sp(rb[after_do]) {
-            continue;
-        }
-        let mut q0 = after_do;
-        while q0 < rb.len() && sp(rb[q0]) {
-            q0 += 1;
-        }
-        for q in (q0 + 1..rb.len()).rev() {
-            let Some(after_done) = keyword_after(q, "done") else { continue };
-            let tail = &rest[after_done..];
-            if !tail.is_empty() && !tail.starts_with(|c: char| c.is_ascii_whitespace() || c == ';' || c == '\x0b') {
-                continue;
-            }
-            return Some((rest[..p].to_string(), rest[q0..q].to_string(), tail.to_string()));
-        }
-    }
-    None
-}
-
 // spec: guard-kit/SPEC.md §The generic ruleset — a skeleton whose first statement is a `while`/`until`
-// loop with exactly one balanced `do … done` span: its condition, its body and what follows it.
+// loop with exactly one balanced `do … done` span: its condition, its body and what follows it, cut
+// at the walk's own keywords.
 fn lone_loop(s: &str) -> Option<(String, String, String)> {
-    let span = loop_span(s)?;
-    if !matches!(span.first().map_or("", |(_, _, t)| t.as_str()), "until" | "while") {
+    let toks = loop_tokens(s)?;
+    let (_, _, first, at) = toks.first()?;
+    if !matches!(first.as_str(), "until" | "while") {
         return None;
     }
-    let count = |w: &str| span.iter().filter(|(_, _, t)| t == w).count();
-    if count("do") != 1 || count("done") != 1 {
+    let keyword = |w: &str| toks.iter().filter(|t| t.1 && t.2 == w).map(|t| t.3).collect::<Vec<usize>>();
+    let (opens, closes) = (keyword("do"), keyword("done"));
+    if opens.len() != 1 || closes.len() != 1 {
         return None;
     }
-    loop_parts(&format!("{};", s.replace('\n', ";")))
+    let (open, close) = (opens[0], closes[0]);
+    let joined = format!("{};", s.replace('\n', ";"));
+    let part = |a: usize, b: usize| joined.get(a..b).unwrap_or("").to_string();
+    Some((part(at + first.len(), open), part(open + 2, close), part(close + 4, joined.len())))
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — the recorded launch's tail after its `&`:
