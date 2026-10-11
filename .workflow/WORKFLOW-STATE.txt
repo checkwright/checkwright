@@ -7,3 +7,4 @@
 guard-rule-holes-pass scope aae21f49 2026-10-11 400b2310e
 guard-rule-holes-pass spec aed527d0 2026-10-11 6da165163
 guard-rule-holes-pass align aace862c 2026-10-11 fa99c5ab2
+guard-rule-holes-pass build a6a24ebe 2026-10-11 1d7c71b64
