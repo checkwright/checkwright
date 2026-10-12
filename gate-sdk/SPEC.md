@@ -466,7 +466,7 @@ The report is **non-empty by construction**. The exit code always exists, taken 
 
 - **`self_image` serves a child spawned or a copy taken while this process runs.** It answers the start name while that is a file, and otherwise the process's own image link under `/proc`. A child spawned or a copy taken across a replace of the file is then the build that is running.
 - **`self_path` serves a path that outlives this process or is read for its directories.** It answers the start name, the kernel's mark dropped where the marked name is no file. A later reader then starts whatever build is at that name.
-- **Honest limit:** the image link is Linux's. On a host with none, a replaced binary resolves to its start name, the new build where the host put one there. `self_image` tests the start name and then returns it, so a replace landing between that test and the child's open of the name starts the new build in that one child. A file whose own name ends in the mark is read as itself.
+- **Honest limit:** the image link is Linux's. On a host with none, a replaced binary resolves to its start name, the new build where the host put one there. `self_image` tests the start name and then returns it, so a replace landing between that test and the name's open starts or copies the new build in that one call. A file whose own name ends in the mark is read as itself.
 
 **A tracked-set listing whose output is read is taken NUL-terminated.** Git's line form quotes a name carrying a non-ASCII byte, a double quote or a backslash, and a quoted spelling opens no file, matches no glob and compares equal to no walked name. The failure is silent in the common shape: the member drops out of the corpus and the verdict reads clean.
 
