@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: guard-spelling-oracle-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,32 @@
 ## New Features
 
 ## Technical Debt
+
+### wait-exemption-redirect-tail
+
+guard-kit rule `background_no_record` blocks a wait loop whose closing ampersand follows an inert redirect: `until grep -q DONE log; do sleep 1; done 2>/dev/null &` is blocked where `until grep -q DONE log; do sleep 1; done &` is exempt and the harness-backgrounded `done 2>/dev/null` is granted. The exemption's text lets the loop itself end in a bare ampersand and treats an inert redirect as inert, so this is an over-block against the text `wait-loop-lead-and-condition` landed.
+
+**Deliverable:** the loop's own ampersand found past its inert redirects, and a row for the spelling.
+
+**Against the release bar** [tarball-attestation-observed](#tarball-attestation-observed) records: the published v0.31.0 binary falls through on this spelling in a scratch repository and the current one blocks it, so the verdict moved since that release, toward refusing a sanctioned wait. Whether that is the regression the bar names is the ruling party's.
+
+**Cost while deferred:** one re-issue of a sanctioned wait. Surfaced 2026-10-12 by guard-rule-holes-pass' close, off its second-vendor review, run through the hook member, and carried to the next scope's intake. Re-verified there by the same run. Owner lookup: `background_no_record`, `2>/dev/null &`, `inert redirect` in this file and the disposed-findings record — `wait-loop-lead-and-condition`, done, so a new defect; [wait-no-producer-lead-evasion](#wait-no-producer-lead-evasion), DISTINCT (the producer block's lead, where this is the record exemption's tail); owner guard-kit/SPEC.md §The generic ruleset.
+
+### git-stash-glued-redirect-value
+
+guard-kit rule `git_stash` loses a word's value where the word is glued ahead of a redirect or follows a separated fd-dup. On a main checkout `git 'stash'>/dev/null push`, `git stash 'pop'>/dev/null`, `git st\ash>/dev/null push` and `git stash 2>& 1 pop` fall through where `git stash>/dev/null push`, `git 'stash' >/dev/null push` and `git stash 2>&1 pop` block. The rule's item says every word is read by its value, a word glued ahead of a redirect stays one and a redirect's target is no word, so the code falls short of text `git-stash-quoted-verb` landed.
+
+**Deliverable:** the redirect cut keeping the word's value face, and a separated `>&` target read as a target; a decision-table row for each spelling above. Where [git-rules-word-read-siblings](#git-rules-word-read-siblings) lifts the read to the shared walk first, the fix is made once there.
+
+**Cost while deferred:** a stash on the shared checkout after one permission decision. Surfaced 2026-10-12 by guard-rule-holes-pass' close, off its second-vendor review, run through the hook member, and carried to the next scope's intake. Re-verified there by the same runs; the published v0.31.0 binary falls through on every `git stash` spelling in a scratch repository, so none of these is a regression from it. Owner lookup: `git_stash`, `glued`, `fd-dup` in this file and the disposed-findings record — `git-stash-quoted-verb`, done, so a new defect; [git-rules-word-read-siblings](#git-rules-word-read-siblings), DISTINCT (the sibling rules and the command word, where this is the landed read's own cut); owner guard-kit/SPEC.md §The generic ruleset.
+
+### keyword-walk-argument-position
+
+the guard's shared shell-keyword walk reads a keyword off two positions that are not command position: a `for` loop's variable and a redirect target after `>&`. Backgrounded, `for done in x; do make build; done` and `until grep -q DONE log; do sleep 1 >& done; done` fall through guard-kit rule `background_no_record` where `for x in a; do make build; done` and the `> out.txt` body block; foreground `sleep 5 >& done` passes rule `bare_sleep` where `sleep 5 > done` blocks. A body redirect spelled `>& out` falls through too, the fd-dup onto a named file the exemption's body clause does not hold.
+
+**Deliverable:** command position cleared after `for` and after a redirect operator, and the body redirect test reading `>&<file>`; a row for each spelling above in the tables that hold the two rules.
+
+**Cost while deferred:** a backgrounded work loop launches with no liveness record, or a foreground sleep holds a turn, after one permission decision. Surfaced 2026-10-12 by guard-rule-holes-pass' close, off its second-vendor review, run through the hook member, and carried to the next scope's intake. Re-verified there by the same runs; the published v0.31.0 binary falls through on each in a scratch repository, so none is a regression from it. Owner lookup: `keyword walk`, `for done`, `>& done`, `bare_sleep` in this file and the disposed-findings record — `loop-keyword-as-argument`, done, so a new defect in the command-position read it landed; owner guard-kit/SPEC.md §The generic ruleset.
 
 ## Deferred
 
@@ -546,41 +572,9 @@ guard-kit rule `bounded_wait` grants a foreground wait loop piped into a reader,
 
 **Deliverable:** the piped tail declared in the rule's tail clause and pinned by a row for each spelling, or the grant withdrawn; which one is spec's.
 
-**Inferred, not run:** that the grant dates from loop-keyword-as-argument's cut of the loop at the walk's keywords — run the same rows on the gate binary built at the commit before it
+**Run at scope 2026-10-13, on the published v0.31.0 binary and the current one in a scratch repository:** the spaced spelling is granted by both, and the unspaced one fell through at v0.31.0 and is granted now. So the spaced grant predates that release and the unspaced one is new since it, the row the release bar on [tarball-attestation-observed](#tarball-attestation-observed) reads. **Inferred, not run:** that the unspaced grant dates from loop-keyword-as-argument's cut of the loop at the walk's keywords — run the row on the gate binary built at the commit before it
 
 **Cost while deferred:** a grant no row holds can widen or vanish under the next edit to the shared walk unseen. Surfaced 2026-10-11 by guard-rule-holes-pass' lead off that unit's diff and filed at its close. Re-verified there by runs through the hook member. Owner lookup: `bounded_wait`, `piped`, `done|cat` in this file and the disposed-findings record — none; `loop-keyword-as-argument`, done, DISTINCT (the keyword walk, which declared the unspaced spelling alone); owner guard-kit/SPEC.md §The generic ruleset.
-
-### git-stash-glued-redirect-value
-
-[cost: event/low] [surface: guard-kit]
-
-guard-kit rule `git_stash` loses a word's value where the word is glued ahead of a redirect or follows a separated fd-dup. On a main checkout `git 'stash'>/dev/null push`, `git stash 'pop'>/dev/null`, `git st\ash>/dev/null push` and `git stash 2>& 1 pop` fall through where `git stash>/dev/null push`, `git 'stash' >/dev/null push` and `git stash 2>&1 pop` block. The rule's item says every word is read by its value, a word glued ahead of a redirect stays one and a redirect's target is no word, so the code falls short of text `git-stash-quoted-verb` landed.
-
-**Deliverable:** the redirect cut keeping the word's value face, and a separated `>&` target read as a target; a decision-table row for each spelling above. Where [git-rules-word-read-siblings](#git-rules-word-read-siblings) lifts the read to the shared walk first, the fix is made once there.
-
-**Cost while deferred:** a stash on the shared checkout after one permission decision. Surfaced 2026-10-12 by guard-rule-holes-pass' close, off its second-vendor review, run through the hook member, and carried to the next scope's intake. Re-verified there by the same runs; the published v0.31.0 binary falls through on every `git stash` spelling in a scratch repository, so none of these is a regression from it. Owner lookup: `git_stash`, `glued`, `fd-dup` in this file and the disposed-findings record — `git-stash-quoted-verb`, done, so a new defect; [git-rules-word-read-siblings](#git-rules-word-read-siblings), DISTINCT (the sibling rules and the command word, where this is the landed read's own cut); owner guard-kit/SPEC.md §The generic ruleset.
-
-### keyword-walk-argument-position
-
-[cost: event/low] [surface: guard-kit]
-
-the guard's shared shell-keyword walk reads a keyword off two positions that are not command position: a `for` loop's variable and a redirect target after `>&`. Backgrounded, `for done in x; do make build; done` and `until grep -q DONE log; do sleep 1 >& done; done` fall through guard-kit rule `background_no_record` where `for x in a; do make build; done` and the `> out.txt` body block; foreground `sleep 5 >& done` passes rule `bare_sleep` where `sleep 5 > done` blocks. A body redirect spelled `>& out` falls through too, the fd-dup onto a named file the exemption's body clause does not hold.
-
-**Deliverable:** command position cleared after `for` and after a redirect operator, and the body redirect test reading `>&<file>`; a row for each spelling above in the tables that hold the two rules.
-
-**Cost while deferred:** a backgrounded work loop launches with no liveness record, or a foreground sleep holds a turn, after one permission decision. Surfaced 2026-10-12 by guard-rule-holes-pass' close, off its second-vendor review, run through the hook member, and carried to the next scope's intake. Re-verified there by the same runs; the published v0.31.0 binary falls through on each in a scratch repository, so none is a regression from it. Owner lookup: `keyword walk`, `for done`, `>& done`, `bare_sleep` in this file and the disposed-findings record — `loop-keyword-as-argument`, done, so a new defect in the command-position read it landed; owner guard-kit/SPEC.md §The generic ruleset.
-
-### wait-exemption-redirect-tail
-
-[cost: event/low] [surface: guard-kit]
-
-guard-kit rule `background_no_record` blocks a wait loop whose closing ampersand follows an inert redirect: `until grep -q DONE log; do sleep 1; done 2>/dev/null &` is blocked where `until grep -q DONE log; do sleep 1; done &` is exempt and the harness-backgrounded `done 2>/dev/null` is granted. The exemption's text lets the loop itself end in a bare ampersand and treats an inert redirect as inert, so this is an over-block against the text `wait-loop-lead-and-condition` landed.
-
-**Deliverable:** the loop's own ampersand found past its inert redirects, and a row for the spelling.
-
-**Against the release bar** [tarball-attestation-observed](#tarball-attestation-observed) records: the published v0.31.0 binary falls through on this spelling in a scratch repository and the current one blocks it, so the verdict moved since that release, toward refusing a sanctioned wait. Whether that is the regression the bar names is the ruling party's.
-
-**Cost while deferred:** one re-issue of a sanctioned wait. Surfaced 2026-10-12 by guard-rule-holes-pass' close, off its second-vendor review, run through the hook member, and carried to the next scope's intake. Re-verified there by the same run. Owner lookup: `background_no_record`, `2>/dev/null &`, `inert redirect` in this file and the disposed-findings record — `wait-loop-lead-and-condition`, done, so a new defect; [wait-no-producer-lead-evasion](#wait-no-producer-lead-evasion), DISTINCT (the producer block's lead, where this is the record exemption's tail); owner guard-kit/SPEC.md §The generic ruleset.
 
 ### guard-spelling-variant-oracle
 
@@ -589,6 +583,10 @@ guard-kit rule `background_no_record` blocks a wait loop whose closing ampersand
 a close's second-vendor review has found holes in the guard rules that same iteration added or tightened at two consecutive closes, and each time the release was deferred. At hook-placement-guard-rules-pass' close the review found the wait-loop exemption, rule `git_stash` and PowerShell word-read holes; guard-rule-holes-pass fixed those and its own close review found defects in three of the fixes. Every finding of both reviews is one shape: a spelling the shell reads as the same command as a row the decision table already holds, a quoted or escaped word, a redirect glued or parted, a wrapper ahead of the command word, a keyword standing where no command stands. The table pins the spellings its author wrote, so nothing reds until a reader outside the session re-spells one.
 
 **Deliverable:** an oracle that meets a lexical rule's re-spellings before close does. Its form is the authoring stage's: rows derived from each table row by a declared set of shell-equivalent re-spellings, each asserting the row's own verdict unless the row declares the exception; or the review run at an earlier stage's reading; or both. Feature-sized where it adds a lane or a table grammar.
+
+**Unit set (operator direction, 2026-10-13, lead-relayed, not a ruling; revisable at a later scope or spec):** this entry leads guard-spelling-oracle-pass and is built first, its red rows the worklist for the six it bundles on this surface: [wait-exemption-redirect-tail](#wait-exemption-redirect-tail), [bounded-wait-piped-loop](#bounded-wait-piped-loop), [git-rules-word-read-siblings](#git-rules-word-read-siblings), [git-stash-glued-redirect-value](#git-stash-glued-redirect-value), [keyword-walk-argument-position](#keyword-walk-argument-position) and [wait-no-producer-lead-evasion](#wait-no-producer-lead-evasion). The set spends the closing push alone, inside the budget. Scope's recommendation to the authoring stage, not the operator's words: a derived row whose verdict differs may be declared a limit, so the unit stays bounded where the oracle reds more than the six cover.
+
+**Review placement (operator direction, 2026-10-13, lead-relayed, not a ruling):** both this iteration. The validate stage's reading runs on a foreign adapter and close keeps its own review; the early one is dropped once the oracle has absorbed its finding classes. **Grant (operator, 2026-10-13, lead-relayed):** one validate reading on a foreign adapter this iteration, unspent; the lead names the adapter in the dispatch.
 
 **Cost while deferred:** each iteration that edits a guard rule ends in a deferred release, and the entries a release run produces wait with it. Surfaced 2026-10-12 by guard-rule-holes-pass' lead, as a recurrence judgment filed for the session that may stamp it, and carried to the next scope's intake, which judged it a recurrence from both closes' recorded findings. Owner lookup: `second-vendor`, `re-spell`, `variant`, `equivalen` in this file and the disposed-findings record — none; [config-variant-battery-harness](#config-variant-battery-harness), DISTINCT (a consumer's config variants, where this is a command's spellings); owner guard-kit/SPEC.md §Testing.
 

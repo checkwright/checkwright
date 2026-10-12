@@ -4,4 +4,4 @@
 
 ---
 
-— scope aeeaf4a1 2026-10-12 910fea064
+guard-spelling-oracle-pass scope aeeaf4a1 2026-10-12 910fea064
