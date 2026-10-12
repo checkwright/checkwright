@@ -65,7 +65,7 @@ The deriver is a lexer of its own over blanks and one character class, and it re
   - `word-glued`, the blanks between a word and the redirect operator after it removed, where the word does not end in a digit;
   - `separator-tight`, the blanks on both sides of `;`, `&&`, `||`, `|` or `|&` removed.
 - **`wrap-command`**, derived once per row: `command` and a blank ahead of the row, where the row's first token is a `lead` site.
-- **Why `command` and no other wrapper.** It is the one wrapper that is both the shell's own spelling of the same command and one the permission matcher strips (§The reader and its views, the harness view), so a grant for the bare command reaches through it with no decision. `env`, `sudo` and their kin run a second program and are a program reach, no re-spelling.
+- **Why `command` and no other wrapper.** Of the wrappers the permission matcher strips (§The reader and its views, the harness view), it is the one that runs the same command and adds nothing to it, so a grant for the bare command reaches through it with no decision. `time` adds a timing report, `builtin` refuses a command that is no builtin, and `nohup`, `timeout`, `nice`, `stdbuf` and `xargs` run a second program, as do `env` and `sudo`: a program reach, no re-spelling.
 - **What the set leaves to review.** Two of the recorded finding classes are no re-spelling and are derived by nothing here: a decoration, an inert redirect appended or a banner put ahead, which changes the command and moves a verdict by design (`cat <file> 2>/dev/null` is a pipeline the band grants); and a keyword standing where no command stands, which is a rename. Their rows are authored.
 - **The deriver's own tests** pin each transform and each exclusion on a literal, in the module's `#[cfg(test)]` tests.
 
@@ -75,7 +75,7 @@ New §Testing passage, following delta 1's. **Not yet applied.**
 >
 > - per site, named with the site's kind: `sq` and `dq` quote the head, `esc` puts a backslash ahead of it, and `part` single-quotes its second half;
 > - per occurrence: `redirect-tight` and `redirect-apart` remove or add the blank between a redirect operator and its target, `dup-apart` parts `>&` from its descriptor, `word-glued` glues a word to the redirect operator after it, and `separator-tight` removes the blanks around a statement separator or a pipe;
-> - per row: `wrap-command` leads the row with `command`, the one wrapper that is both the shell's spelling of the same command and one the matcher strips.
+> - per row: `wrap-command` leads the row with `command`, the wrapper the matcher strips that runs the same command and adds nothing to it.
 >
 > **Its honest limits.** No shell runs a derived row, so the equivalence is the construction's and the deriver's own tests pin it. A row carrying a quote or an escape is underived. A decoration and a keyword standing as a word change the command and are no re-spelling, so their rows are authored. The PowerShell tables and the consumer lane are underived.
 
@@ -101,6 +101,10 @@ A derived row that fails the relation is green only under a limit row naming its
 New §Testing passage, following delta 2's. **Not yet applied.**
 
 > **A limit is declared, and held from both sides.** `guard-tests/variant-limits.tsv` (`<floor> <TAB> <rule> <TAB> <transform>`) names the re-spellings a rule's read does not reach. A section of a bash table opens at a comment line beginning `# rule` and a backticked rule name and runs to the next, and a failing re-spelling is green only under a limit row naming its row's section and its transform. The floor is the most permissive verdict the limit admits: `fallthrough`, or `allow` where the re-spelling is granted. The lane fails on a re-spelling no limit admits, on a limit row under which nothing fails, and on an `allow` floor nothing reaches, so lifting a rule's read deletes its rows in the same commit. A table it cannot read, a floor or transform off its set or a pair named twice is exit 2. **Its honest limit:** a limit is as wide as its section, so a second row of that section may start failing the same transform unseen.
+
+New line in §Layout and configuration's `guard-tests/` listing, after the `powershell-background-cases.tsv` line. **Not yet applied.**
+
+> `  guard-tests/variant-limits.tsv  # <floor> <TAB> <rule> <TAB> <transform>, the re-spellings a rule's read does not reach; read by the variant lane`
 
 ### (4) The ruleset states what a rule's read reaches
 
@@ -138,13 +142,14 @@ The arm's readers and describers take the third lane {mechanical}.
 - **The arm's three-valued exit is unchanged in meaning.** Readers of it, by `git grep -n -e 'run-guard-tests' -e 'run_guard_tests'` over the tracked tree: `native/src/emit/mod.rs`'s arm-table row, `.github/workflows/gates.yml`, `scripts/evidence-config.knobs`, `README.md`, `guard-kit/README.md`, `gate-sdk/SPEC.md` §The non-gate arm's split sentence, `guard-kit/gate-tests/consumer-rules.test.sh`, `guard-kit/templates/guard-config.knobs`, `native/src/gates/guard_registration.rs` and `.workflow/release-declarations.md`. Only the seam test passes positional tables, and delta 6 gives it the fifth.
 - **The spawned programs are unchanged**: the member and `git`, as gate-sdk/SPEC.md §The non-gate arm records, so that sentence stands.
 - **The limits table.** Producer: a build session, by hand, off the lane's own failure lines. Consumer: the lane, each field at the read delta 3 names. Readers of the directory, by `git grep -n 'guard-tests'` over the tracked tree: the arm, `native/src/hook/escalation.rs` (its own table alone) and `native/src/gates/guard_registration.rs`, which reads every tracked file for rule citations and meets none in a table of bare names.
-- **The section grammar** reads comment lines every table reader skips. The opening lines, by `grep -n '^# rule `' guard-kit/guard-tests/cases.tsv guard-kit/guard-tests/background-cases.tsv`: thirty-seven, each a rule name the roster carries.
-- **The run's price.** The prototype's derived rows added about fourteen seconds to the arm on this tree, one spawn per row. The arm is not a pre-commit gate.
+- **The section grammar** reads comment lines every table reader skips. The opening lines, by `grep -n '^# rule `' guard-kit/guard-tests/cases.tsv guard-kit/guard-tests/background-cases.tsv`: thirty-six, each a rule name the roster carries.
+- **The run's price.** The prototype's derived rows added about fourteen seconds to the arm on this tree on Linux, one spawn per row. The arm is not a pre-commit gate. It also runs on `crate-tests-windows`' x64 entry (§The hook on native Windows), where the price is unmeasured.
 - **Knobs.** None is minted, and the arm's declared roster is unchanged.
 
 ## Existing sections updated
 
 - `guard-kit/SPEC.md` §Testing — the opening paragraph's lane count, and the three new passages (deltas 1, 2 and 3).
+- `guard-kit/SPEC.md` §Layout and configuration — the `guard-tests/` listing gains the limits table (delta 3).
 - `guard-kit/SPEC.md` §The generic ruleset — the shared directions (delta 4).
 - `native/src/emit/run_guard_tests.rs` — the lane, the deriver and the limits read, in that file or a module beside it (deltas 1, 2 and 3).
 - `guard-kit/guard-tests/variant-limits.tsv` — new (deltas 3 and 5).

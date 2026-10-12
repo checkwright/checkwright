@@ -38,10 +38,12 @@ Replacement for §Testing's `wait_no_producer` bullet *a backgrounded file-test 
 
 > - a backgrounded file-test wait → block, in either polarity, over tests joined by `&&`, and piped into a reader;
 
+Where `wait-no-producer-lead-evasion` has landed, that bullet already ends *and behind a banner or a read*, and this replacement keeps the clause: *in either polarity, over tests joined by `&&`, behind a banner or a read, and piped into a reader*.
+
 ## Producers and consumers
 
 - **The declared reach.** Producer: rule `bounded_wait`'s arm (A), on every `Bash` payload whose first statement is a wait loop. Consumer: the session, through a grant it already receives.
-- **Readers of clause (d)**, by `grep -n -e 'clause (d)' guard-kit/SPEC.md`: rule `background_no_record`'s exemption (2), which calls the test for every statement outside a loop. The other hits are rule `wait_no_producer`'s own clause (d) and §scan-prompts' citation of rule `append_scratch`'s, each a different clause of its own item.
+- **Readers of clause (d)**, by `grep -n -e 'clause (d)' guard-kit/SPEC.md`: rule `background_no_record`'s exemption (2), which calls the test for every statement outside a loop. The other hits are rule `wait_no_producer`'s own clause (d), in the roster and in §Testing, and rule `append_scratch`'s, in the roster and in §scan-prompts, each a different clause of its own item.
 - **The entry's premise, run.** The gate binary built at the commit before `loop-keyword-as-argument` falls through on the unspaced spelling and grants the spaced one, so the unspaced grant is no older than that unit and the spaced one predates it.
 - **Knobs.** None is minted and none gains a reader.
 
