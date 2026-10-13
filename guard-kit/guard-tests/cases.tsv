@@ -18,6 +18,8 @@ block	git -c core.pager=cat log --oneline -3
 block	git --no-pager -c color.ui=never diff
 fallthrough	git log --oneline -3
 fallthrough	git commit -m 'drop git -c core.pager=cat'
+# arm (b) reads the git read (rule `git_mutation_under_producer`), so a quoted command word is git
+block	'git' -c core.pager=cat log --oneline -3
 block	/usr/bin/time -f %e make build
 block	make lint && /usr/bin/nice -n 5 make build
 fallthrough	time make build
@@ -210,6 +212,14 @@ block	git grep -i TODO
 block	git grep needle -- src
 fallthrough	git grep foo HEAD
 fallthrough	git grep --cached foo
+# the words come through the git read (rule `git_mutation_under_producer`): an escape inside a word,
+#           a path-spelled command word and a global option are the plain spelling's, a global
+#           option that moves the repository names another tree, and one quoted word is no subcommand
+block	git gr\ep foo
+block	/usr/bin/git grep foo
+block	git --no-pager grep foo
+fallthrough	git -C sub grep foo
+fallthrough	git 'grep foo'
 
 # rule `pgrep_self_match` — self-matching process-liveness predicate: a `pgrep -f` pattern that
 #           matches the command's own text can never go false, since `-f` scans the
@@ -279,13 +289,17 @@ fallthrough	git add scratch.txt && git commit -o scratch.txt tracked.md -m x
 fallthrough	git add scratch.txt && git commit scratch.txt -m x
 fallthrough	git add tracked.md && git commit -m 'git commit -a' -- tracked.md
 fallthrough	git commit -m x
+# the words come through the git read (rule `git_mutation_under_producer`)
+block	git add tracked.md && git comm\it -m x
 
 # rule `git_stash` — a stash that rewrites the working tree or the index is blocked on the main
 #           checkout, which the sandbox is; the forms that leave the tree as it is, a verb the
 #           walk does not know and a global option that moves the repository pass. The linked
 #           worktree's pass lives in gate-tests/worktree-confinement.test.sh. Each word is read
-#           by its value, so a quoted or escaped spelling is the plain one; a redirect is no
-#           word, and a quoted `>` is one.
+#           by its value through the git read (rule `git_mutation_under_producer`), so a quoted
+#           or escaped spelling is the plain one; a redirect is no word, and a quoted `>` is
+#           one. The command word is git by its path and behind a wrapper the matcher strips,
+#           and a second program that runs git is not read.
 block	git stash
 block	git stash -u
 block	git stash push -m x
@@ -303,6 +317,9 @@ block	git st\ash
 block	git stash '-u'
 block	git '--no-pager' stash
 block	'git' stash
+block	"git" stash
+block	\git stash
+block	g'it' stash
 block	git stash &>/dev/null
 block	if git stash>.tmp/o; then ls; fi
 block	echo "a@NL@b"; git stash
@@ -311,6 +328,11 @@ fallthrough	git stash show -p
 fallthrough	git stash drop
 fallthrough	git stash frobnicate
 fallthrough	git -C sub stash
+block	/usr/bin/git stash
+block	nohup git stash
+block	FOO=1 git stash
+fallthrough	env git stash
+fallthrough	sudo git stash
 fallthrough	echo 'git stash'
 fallthrough	git stash 'list'
 fallthrough	git 'stash' drop
@@ -604,6 +626,11 @@ advise	git commit -F .git/COMMIT_EDITMSG
 advise	git reset --soft HEAD~1
 fallthrough	git commit -m done
 fallthrough	git reset --hard HEAD~1
+# the words come through the git read (rule `git_mutation_under_producer`), one segment at a time: an
+#           option word in another statement is not the commit's
+advise	git comm\it --amend
+advise	git --no-pager commit --amend
+fallthrough	echo --amend; git commit -m x
 
 # rule `rm_tracked` — bare rm of a tracked path steers to 'git rm -q'; untracked,
 #           gitignored, and the already-correct git rm form pass
@@ -631,7 +658,8 @@ fallthrough	rm 'track'*.md
 fallthrough	rm two\ *.md
 # rule `rm_tracked`'s force arm — a 'git rm' carrying its force flag is blocked whether or
 #           not a grant matches: standalone, in a short cluster, long, abbreviated
-#           as git's option parser accepts it, behind a global option, and quoted.
+#           as git's option parser accepts it, behind a global option, and quoted or
+#           escaped, the words read through the git read (rule `git_mutation_under_producer`).
 #           A word after '--' is a path, and '--cached' keeps the file
 block	git rm -q -f tracked.md
 block	git rm -qf tracked.md
@@ -639,6 +667,7 @@ block	git rm --force tracked.md
 block	git rm --forc tracked.md
 block	git -C . rm -rf sub
 block	git rm -q '-f' tracked.md
+block	git \rm -q -f tracked.md
 fallthrough	git rm -q -- -f
 fallthrough	git rm --cached tracked.md
 

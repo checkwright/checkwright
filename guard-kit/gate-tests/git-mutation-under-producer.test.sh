@@ -115,6 +115,22 @@ want "global-glued"    "git --git-dir=.git commit -m done" 2
 # --- and a compound fires on the mutating segment wherever it sits
 want "compound-tail" "make build; git commit -m done" 2
 
+# --- the words come through the git read: a quoted or escaped subcommand is the one the
+#     shell passes, and the command word is git by its value, by its path and behind a
+#     wrapper the matcher strips; a second program that runs git is not read
+want "quoted-sub-sq"     "git 'commit' -m done" 2
+want "quoted-sub-dq"     'git "add" -A' 2
+want "escaped-sub"       'git comm\it -m done' 2
+want "part-quoted-sub"   "git com'mit' -m done" 2
+want "quoted-reset"      "git 'reset' --hard" 2
+want "quoted-git"        "'git' commit -m done" 2
+want "escaped-git"       '\git commit -m done' 2
+want "command-git"       "command git commit -m done" 2
+want "path-git"          "/usr/bin/git commit -m done" 2
+want "env-git"           "env git commit -m done" 0
+want "powershell-quoted-sub"  "git 'commit' -m done" 2 "" PowerShell
+want "powershell-escaped-sub" 'git com`mit -m done' 2 "" PowerShell
+
 # --- read-only git passes: the harm is the mutation, not the producer's liveness
 for sub in status log diff show rev-parse ls-files branch remote; do
     want "readonly-$sub" "git $sub" 0
@@ -169,5 +185,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "git-mutation-under-producer.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "git-mutation-under-producer.test: ok ($checks assertions; the write set blocks under a live record on a Bash or a PowerShell call, read-only git and every conservative direction decline, rule \`bounded_write\` withholds a removal of a live record, and rule \`wait_no_producer\` blocks a backgrounded file-test wait until a record names a live pid)"
+echo "git-mutation-under-producer.test: ok ($checks assertions; the write set blocks under a live record on a Bash or a PowerShell call however git and its subcommand are spelled, read-only git and every conservative direction decline, rule \`bounded_write\` withholds a removal of a live record, and rule \`wait_no_producer\` blocks a backgrounded file-test wait until a record names a live pid)"
 exit 0

@@ -1,8 +1,8 @@
 // spec: guard-kit/SPEC.md §The generic ruleset — the tool steers: a shell spelling of what a dedicated
 // tool or a kit arm does better, and the waits and process queries that cannot end.
 use super::{
-    command_word, has_expansion, has_substitution, is_banner, loop_span, on_ro_roster, ro_invocation_clear,
-    segment_core,
+    command_word, git_read, git_walk_of, has_expansion, has_substitution, is_banner, loop_span,
+    moves_repository, on_ro_roster, ro_invocation_clear, segment_core, GitWalk,
 };
 use crate::ere::Ere;
 use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Verdict};
@@ -779,17 +779,20 @@ pub fn git_grep(ctx: &Ctx) -> Decided {
     if grep_q(r"(&&|\|\||;|\||&|<|>)", &s) {
         return Ok(None);
     }
-    let toks = words(&s);
-    if toks.first() != Some(&"git") || toks.get(1) != Some(&"grep") {
+    let read = git_read(ctx, ctx.cmd())?;
+    let [Some(passed)] = read.as_slice() else { return Ok(None) };
+    let moved = git_walk_of(passed, GitWalk::Globals).map_or(true, |g| g.iter().any(|g| moves_repository(g)));
+    let toks = git_walk_of(passed, GitWalk::Args).unwrap_or_default();
+    if moved || toks.first().map(String::as_str) != Some("grep") {
         return Ok(None);
     }
     let (mut positionals, mut want_arg, mut pat_opt) = (0usize, false, false);
-    for tok in &toks[2..] {
+    for tok in &toks[1..] {
         if want_arg {
             want_arg = false;
             continue;
         }
-        match *tok {
+        match tok.as_str() {
             "--" => break,
             "--cached" | "--staged" | "--no-index" | "--untracked" => return Ok(None),
             "-e" | "-f" => {
@@ -919,7 +922,7 @@ mod tests {
     use super::*;
 
     fn find_words(ws: &[(&str, &str)]) -> Vec<Word> {
-        ws.iter().map(|(s, v)| Word { spelling: s.to_string(), value: v.to_string(), live: String::new() }).collect()
+        ws.iter().map(|(s, v)| Word::new(s, v, "")).collect()
     }
 
     // spec: guard-kit/SPEC.md §The rule roster — the steer prints an escaped blank, a single-quoted

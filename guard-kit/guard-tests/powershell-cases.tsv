@@ -14,12 +14,15 @@ fallthrough	git status > .tmp/out.log
 fallthrough	git status > .tmp\out.log
 fallthrough	git status 2>&1
 
-# rule `git_grep` — a working-tree search
+# rule `git_grep` — a working-tree search, its words read through the git read
 block	git grep foo
+block	git 'grep' foo
+block	git gre`p foo
 fallthrough	git grep foo HEAD
 
 # rule `git_mutation_under_producer`'s decline arm and rule `git_rewrite`
 advise	git commit --amend --no-edit
+advise	git 'commit' --amend
 fallthrough	git commit -m 'x'
 
 # rule `background_no_record`'s shell form — a detached Start-Process launch; -Wait, -WhatIf and a
@@ -34,6 +37,7 @@ fallthrough	Start-Job { Start-Sleep 60 }
 
 # rule `commit_only_paths` — a git add then a pathless commit; a commit naming its path passes
 block	git add tracked.md; git commit -m x
+block	git add tracked.md; git 'commit' -m x
 fallthrough	git add tracked.md; git commit -o tracked.md -m x
 
 # rule `git_stash` — a tree-rewriting stash on the main checkout; a form that leaves the tree passes

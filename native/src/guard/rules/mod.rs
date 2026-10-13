@@ -2,7 +2,7 @@
 // rules share. A rule reaches a view only through its context.
 use super::engine::{Cmd, Ctx, Fault, Rule, Shell};
 use super::host::Host;
-use super::reader::View;
+use super::reader::{View, Word};
 use super::text::{self, grep_q, head_word, trim, trim_start, words};
 
 mod grants;
@@ -18,7 +18,7 @@ use View::{Dequoted, Hdq, Raw, Sq, SqDqHd, SqDqHdq, SqHdq};
 
 pub static TABLE: &[Rule] = &[
     Rule { name: "cd_compound", shells: BOTH, views: &[SqDqHd], test: spelling::cd_compound },
-    Rule { name: "git_c_root", shells: BASH, views: &[Raw, SqDqHd], test: spelling::git_c_root },
+    Rule { name: "git_c_root", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: spelling::git_c_root },
     Rule { name: "scratch_redirect", shells: BOTH, views: &[SqDqHd], test: spelling::scratch_redirect },
     Rule { name: "abs_script", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: spelling::abs_script },
     Rule { name: "abs_prefix", shells: BASH, views: &[SqDqHd], test: spelling::abs_prefix },
@@ -28,13 +28,13 @@ pub static TABLE: &[Rule] = &[
     Rule { name: "find_glob", shells: BASH, views: &[Raw, SqDqHd], test: tools::find_glob },
     Rule { name: "find_exec", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: tools::find_exec },
     Rule { name: "cat_file", shells: BASH, views: &[Raw, SqDqHd], test: tools::cat_file },
-    Rule { name: "git_grep", shells: BOTH, views: &[Raw, SqDqHd], test: tools::git_grep },
+    Rule { name: "git_grep", shells: BOTH, views: &[Raw, SqDqHd, Dequoted], test: tools::git_grep },
     Rule { name: "pgrep_self_match", shells: BASH, views: &[Raw], test: tools::pgrep_self_match },
     Rule { name: "bare_sleep", shells: BASH, views: &[Raw, SqDqHd], test: tools::bare_sleep },
     Rule {
         name: "git_mutation_under_producer",
         shells: BOTH,
-        views: &[Raw, SqDqHd],
+        views: &[Raw, SqDqHd, Dequoted],
         test: liveness::git_mutation_under_producer,
     },
     Rule {
@@ -47,7 +47,7 @@ pub static TABLE: &[Rule] = &[
     Rule {
         name: "commit_only_paths",
         shells: BOTH,
-        views: &[SqHdq, SqDqHd, Dequoted],
+        views: &[Raw, SqHdq, SqDqHd, Dequoted],
         test: reach::commit_only_paths,
     },
     Rule { name: "git_stash", shells: BOTH, views: &[Raw, SqDqHd, Dequoted], test: reach::git_stash },
@@ -67,7 +67,7 @@ pub static TABLE: &[Rule] = &[
         test: grants::bounded_write,
     },
     Rule { name: "allowlist_chain", shells: BASH, views: &[SqDqHd], test: grants::allowlist_chain },
-    Rule { name: "git_rewrite", shells: BOTH, views: &[SqDqHd], test: reach::git_rewrite },
+    Rule { name: "git_rewrite", shells: BOTH, views: &[Raw, SqDqHd, Dequoted], test: reach::git_rewrite },
     Rule { name: "rm_tracked", shells: BOTH, views: &[Raw, SqDqHd, Dequoted], test: reach::rm_tracked },
     Rule { name: "script_interpreter", shells: BOTH, views: &[Raw, SqDqHd], test: reach::script_interpreter },
     Rule {
@@ -133,14 +133,79 @@ enum GitWalk {
     Args,
 }
 
-// spec: guard-kit/SPEC.md §The generic ruleset — git's global options consumed so the subcommand is
-// reached; an option the walk does not recognize declines.
-fn git_subcommand(seg: &str, mode: GitWalk) -> Option<Vec<String>> {
-    git_walk(text::all_words(seg).into_iter(), mode)
+fn plain_word(w: &str) -> Word {
+    Word::new(w, w, w)
 }
 
-// spec: guard-kit/SPEC.md §The generic ruleset — the same walk over a command's words, however
-// their reader produced them.
+// spec: guard-kit/SPEC.md §The rule roster — the git read's words (rule
+// `git_mutation_under_producer`): what a segment passes its command, each as its value and its live
+// text, a leading keyword and every redirect with its target dropped.
+fn passed_words(ws: &[Word], escape: char) -> Vec<(String, String)> {
+    let mut out = Vec::new();
+    let mut target = false;
+    for w in ws {
+        if std::mem::take(&mut target) || (out.is_empty() && lead_keyword(&w.live)) {
+            continue;
+        }
+        let mut held = false;
+        let at = w.live.char_indices().find(|&(_, ch)| {
+            let bare = !std::mem::take(&mut held);
+            held = bare && ch == escape;
+            bare && matches!(ch, '>' | '<')
+        });
+        let Some((at, _)) = at else {
+            out.push((w.value.clone(), w.live.clone()));
+            continue;
+        };
+        let (glued, redirect) = w.live.split_at(at);
+        if !(glued.bytes().all(|b| b.is_ascii_digit()) || matches!(glued, "&" | "*")) {
+            out.push((glued.to_string(), glued.to_string()));
+        }
+        target = redirect.trim_start_matches(['>', '<']).is_empty();
+    }
+    out
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — the git read (rule `git_mutation_under_producer`): for
+// each segment of the compound split, the words it passes git, led by `git`, or none where its
+// command word does not name git.
+fn git_read(ctx: &Ctx, c: &Cmd) -> Result<Vec<Option<Vec<String>>>, Fault> {
+    let escape = match ctx.shell() {
+        Shell::Bash => '\\',
+        Shell::PowerShell => '`',
+    };
+    let s = ctx.view(c, SqDqHd)?;
+    let read = ctx.word_read(c)?;
+    let segs = ctx.segments(&s);
+    Ok(segs
+        .iter()
+        .enumerate()
+        .map(|(i, seg)| {
+            let passed = match read.as_ref().and_then(|r| r.get(i)) {
+                Some(ws) => passed_words(ws, escape),
+                None => passed_words(&text::all_words(seg).into_iter().map(plain_word).collect::<Vec<Word>>(), escape),
+            };
+            let lives: Vec<String> = passed.iter().map(|(_, live)| live.replace([' ', '\t'], "\x01")).collect();
+            let kept = text::all_words(ctx.harness_view(&lives.join(" "))).len();
+            let mut values = passed.into_iter().map(|(value, _)| value).skip(lives.len() - kept);
+            let head = values.next()?;
+            (head.rsplit('/').next() == Some("git")).then(|| std::iter::once("git".to_string()).chain(values).collect())
+        })
+        .collect())
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — a global option that moves the repository a git
+// command reads, so the tree it names is not the session's.
+fn moves_repository(global: &str) -> bool {
+    matches!(global, "-C" | "--git-dir" | "--work-tree") || global.starts_with("--git-dir=") || global.starts_with("--work-tree=")
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — git's global options consumed so the subcommand is
+// reached, over the words the git read answers; an option the walk does not recognize declines.
+fn git_walk_of(words: &[String], mode: GitWalk) -> Option<Vec<String>> {
+    git_walk(words.iter().map(String::as_str), mode)
+}
+
 fn git_walk<'a>(words: impl Iterator<Item = &'a str>, mode: GitWalk) -> Option<Vec<String>> {
     let mut globals: Vec<String> = Vec::new();
     let mut out: Vec<String> = Vec::new();
@@ -648,16 +713,29 @@ mod tests {
         }
     }
 
+    // spec: guard-kit/SPEC.md §The rule roster — the git read takes each word by its value, a keyword
+    // and a redirect by the live text
+    #[test]
+    fn the_passed_words_drop_keywords_and_redirects_by_live_text() {
+        let word = |s: &str, v: &str, l: &str| Word::new(s, v, l);
+        let got = |ws: &[Word]| passed_words(ws, '\\').into_iter().map(|(value, _)| value).collect::<Vec<String>>();
+        assert_eq!(got(&[plain_word("if"), plain_word("git"), word("'stash'", "stash", "\0SQ")]), vec!["git", "stash"]);
+        assert_eq!(got(&[plain_word("git"), plain_word("stash"), plain_word("2>&1"), plain_word(">"), plain_word("o"), plain_word("pop")]), vec!["git", "stash", "pop"]);
+        assert_eq!(got(&[plain_word("git"), plain_word("stash>o"), plain_word("&>/dev/null")]), vec!["git", "stash"]);
+        assert_eq!(got(&[plain_word("git"), word("'if'", "if", "\0SQ"), word("'>'", ">", "\0SQ"), word("a\\>b", "a>b", "a\\>b")]), vec!["git", "if", ">", "a>b"]);
+    }
+
     #[test]
     fn the_shared_walks_read_as_the_library_did() {
         assert_eq!(command_word("  while ! kill -0 1"), "kill -0 1");
         assert_eq!(segment_core(" grep x f > out 2>&1 < in "), "grep x f");
+        let sub = |t: &str, mode| git_walk(text::all_words(t).into_iter(), mode);
         assert_eq!(
-            git_subcommand("git -C . --no-pager commit -m x", GitWalk::Sub),
+            sub("git -C . --no-pager commit -m x", GitWalk::Sub),
             Some(vec!["commit".to_string()])
         );
-        assert_eq!(git_subcommand("git --frob commit", GitWalk::Sub), None);
-        assert_eq!(git_subcommand("git -c a=b log", GitWalk::Globals), Some(vec!["-c".to_string()]));
+        assert_eq!(sub("git --frob commit", GitWalk::Sub), None);
+        assert_eq!(sub("git -c a=b log", GitWalk::Globals), Some(vec!["-c".to_string()]));
         assert_eq!(xargs_command_index("xargs -0 -n 1 grep x"), Ok(Some(4)));
         assert_eq!(xargs_command_index("xargs --bogus grep"), Err(()));
         assert!(loop_span("until x; do sleep 1; done").is_some());

@@ -74,6 +74,12 @@ pub struct Word {
     pub live: String,
 }
 
+impl Word {
+    pub fn new(spelling: &str, value: &str, live: &str) -> Word {
+        Word { spelling: spelling.to_string(), value: value.to_string(), live: live.to_string() }
+    }
+}
+
 // spec: guard-kit/SPEC.md §The reader and its views — the word read's accumulator: a reader feeds it
 // the pieces of a word, face by face, and closes words and segments where its grammar does.
 pub struct WordAcc {

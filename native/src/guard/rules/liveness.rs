@@ -4,7 +4,7 @@
 use super::grants::{slot_reach, Reach};
 use super::reach::{interpreter_reach, refused, rm_tracked_reach};
 use super::{
-    command_word, git_subcommand, has_expansion, has_substitution, inert_target, is_banner, is_ro_segment,
+    command_word, git_read, git_walk_of, has_expansion, has_substitution, inert_target, is_banner, is_ro_segment,
     loop_tokens, redirect_targets, ro_forms_clear, ro_forms_clear_statements, segment_core,
     shell_backgrounds, strip_redirect_op, unredirected_words, GitWalk,
 };
@@ -15,14 +15,12 @@ use crate::guard::reader::{DQ_MARK, SQ_MARK};
 use crate::guard::text::{self, grep_q, head_word, trim, trim_start, unsentinel, words};
 
 pub fn git_mutation_under_producer(ctx: &Ctx) -> Decided {
-    let raw = ctx.raw(ctx.cmd())?;
-    if !raw.contains("git") || ctx.expands(ctx.cmd(), has_expansion)? {
+    if ctx.expands(ctx.cmd(), has_expansion)? {
         return Ok(None);
     }
-    let s = ctx.view(ctx.cmd(), SqDqHd)?;
     let mut writes: Vec<String> = Vec::new();
-    for seg in ctx.segments(&s) {
-        let Some(sub) = git_subcommand(&command_word(&seg), GitWalk::Sub) else { continue };
+    for words in git_read(ctx, ctx.cmd())?.iter().flatten() {
+        let Some(sub) = git_walk_of(words, GitWalk::Sub) else { continue };
         let sub = &sub[0];
         if matches!(
             sub.as_str(),

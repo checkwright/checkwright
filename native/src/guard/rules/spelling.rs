@@ -1,7 +1,7 @@
 // spec: guard-kit/SPEC.md §The generic ruleset — the spelling rules: a command form the matcher cannot
 // resolve, steered to the one it can.
 use super::grants::rewrite_granted;
-use super::{command_word, git_subcommand, GitWalk};
+use super::{command_word, git_read, git_walk_of, GitWalk};
 use crate::guard::engine::{Cmd, Ctx, Decided, Shell, Verdict};
 use crate::guard::host::{knob_scalar_value, same_file};
 use crate::guard::reader::View::{SqDqHd, SqDqHdq, SqHdq};
@@ -44,20 +44,17 @@ pub fn git_c_root(ctx: &Ctx) -> Decided {
     if cmd.split('\n').any(|l| l.contains(&needle)) {
         return block(format!("drop 'git -C {} ' — cwd is the repo root, so the bare 'git <subcommand>' form is allowlisted and resolves on the match; the absolute '-C' spelling matches nothing and costs an out-of-band permission decision. Reserve 'git -C <dir>' for a different repo.", pwd));
     }
-    let git_c = cmd.find("git").is_some_and(|i| cmd[i + 3..].contains("-c"));
-    if !(git_c || ["/time", "/nice", "/nohup", "/stdbuf", "="].iter().any(|n| cmd.contains(n))) {
-        return Ok(None);
-    }
-    for seg in ctx.segments(&cmd) {
+    let gits = git_read(ctx, ctx.cmd())?;
+    for (i, seg) in ctx.segments(&cmd).iter().enumerate() {
         if seg.contains('=') {
-            if let Some(v) = knob_echo(raw, &seg) {
+            if let Some(v) = knob_echo(raw, seg) {
                 return Ok(Some(v));
             }
         }
-        let cmdseg = command_word(&seg);
+        let cmdseg = command_word(seg);
         let w = head_word(&cmdseg);
-        if w == "git" {
-            if let Some(globals) = git_subcommand(&cmdseg, GitWalk::Globals) {
+        if let Some(words) = gits.get(i).and_then(Option::as_ref) {
+            if let Some(globals) = git_walk_of(words, GitWalk::Globals) {
                 if globals.iter().any(|g| g == "-c") {
                     return block("drop the 'git -c <key>=<value>' override and run the bare 'git <subcommand>' — a pager or color override has no effect without a terminal, and the bare form is allowlisted and resolves on the match. A '-c' form is never granted: a '-c' key can name a program the subcommand runs (core.pager, core.fsmonitor, core.sshCommand, alias.*), which is also why the harness's matcher does not see through it. If you genuinely need the config override, run it yourself with !<command>.");
                 }

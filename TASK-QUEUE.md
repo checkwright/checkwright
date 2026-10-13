@@ -8,16 +8,6 @@
 
 ## New Features
 
-### git-rules-word-read-siblings
-
-[spec: SPEC-git-word-read.md]
-
-three guard-kit rules still read git's words off the quoted-span skeleton, the hole rule `git_stash` had before it took the word read. Under a live producer record `git 'commit' -m x`, `git "add" -A`, `git comm\it`, `git com'mit'` and `git 'reset' --hard` pass rule `git_mutation_under_producer` where the plain spelling is blocked; `git 'grep' foo` passes rule `git_grep`; `git 'commit' --amend` loses rule `git_rewrite`'s advise. The command word is a second axis of the same read: `'git' commit`, `\git commit`, `command git commit`, `env git commit` and `/usr/bin/git commit` pass the producer block, and `command git stash`, `env git stash` and `sudo git stash` pass rule `git_stash`, which blocks `\git stash`.
-
-**Deliverable:** the word read rule `git_stash` takes, lifted to the walk the git rules share, and a ruling in the section on a wrapper-led or path-spelled `git`, read or stated as a limit. Rows in the decision tables and in the live-producer gate test.
-
-**Cost while deferred:** a tracked-tree mutation lands under a live producer, or a stash on the shared checkout, after one permission decision, since no allow entry matches a quoted or wrapper-led spelling. Filed 2026-10-11 by guard-rule-holes-pass' build, read and not run, and promoted at its close. Re-verified there by runs through the hook member over a live pid's record, which also produced the command-word spellings. Owner lookup: `git_mutation_under_producer`, `git_grep`, `git_rewrite`, `word read`, `wrapper` in this file and the disposed-findings record — none; `git-stash-quoted-verb`, done, DISTINCT (one rule's read, which this carries to its siblings); owner guard-kit/SPEC.md §The generic ruleset.
-
 ### bounded-wait-piped-loop
 
 [spec: SPEC-piped-wait.md]
@@ -56,9 +46,9 @@ guard-kit rule `background_no_record` blocks a wait loop whose closing ampersand
 
 guard-kit rule `git_stash` loses a word's value where the word is glued ahead of a redirect or follows a separated fd-dup. On a main checkout `git 'stash'>/dev/null push`, `git stash 'pop'>/dev/null`, `git st\ash>/dev/null push` and `git stash 2>& 1 pop` fall through where `git stash>/dev/null push`, `git 'stash' >/dev/null push` and `git stash 2>&1 pop` block. The rule's item says every word is read by its value, a word glued ahead of a redirect stays one and a redirect's target is no word, so the code falls short of text `git-stash-quoted-verb` landed.
 
-**Deliverable:** the redirect cut keeping the word's value face, and a separated `>&` target read as a target; a decision-table row for each spelling above. Where [git-rules-word-read-siblings](#git-rules-word-read-siblings) lifts the read to the shared walk first, the fix is made once there.
+**Deliverable:** the redirect cut keeping the word's value face, and a separated `>&` target read as a target; a decision-table row for each spelling above. Where `git-rules-word-read-siblings` lifts the read to the shared walk first, the fix is made once there.
 
-**Cost while deferred:** a stash on the shared checkout after one permission decision. Surfaced 2026-10-12 by guard-rule-holes-pass' close, off its second-vendor review, run through the hook member, and carried to the next scope's intake. Re-verified there by the same runs; the published v0.31.0 binary falls through on every `git stash` spelling in a scratch repository, so none of these is a regression from it. Owner lookup: `git_stash`, `glued`, `fd-dup` in this file and the disposed-findings record — `git-stash-quoted-verb`, done, so a new defect; [git-rules-word-read-siblings](#git-rules-word-read-siblings), DISTINCT (the sibling rules and the command word, where this is the landed read's own cut); owner guard-kit/SPEC.md §The generic ruleset.
+**Cost while deferred:** a stash on the shared checkout after one permission decision. Surfaced 2026-10-12 by guard-rule-holes-pass' close, off its second-vendor review, run through the hook member, and carried to the next scope's intake. Re-verified there by the same runs; the published v0.31.0 binary falls through on every `git stash` spelling in a scratch repository, so none of these is a regression from it. Owner lookup: `git_stash`, `glued`, `fd-dup` in this file and the disposed-findings record — `git-stash-quoted-verb`, done, so a new defect; `git-rules-word-read-siblings`, DISTINCT (the sibling rules and the command word, where this is the landed read's own cut); owner guard-kit/SPEC.md §The generic ruleset.
 
 ### keyword-walk-argument-position
 
@@ -1267,4 +1257,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 ## Done
 
 - guard-spelling-variant-oracle
+- git-rules-word-read-siblings
 

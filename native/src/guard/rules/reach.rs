@@ -1,8 +1,8 @@
 // spec: guard-kit/SPEC.md §The generic ruleset — the rules that judge what a command reaches: a
 // history rewrite, a tracked deletion, a scratch body, a wrapped payload, the main checkout.
 use super::{
-    command_word, git_subcommand, git_walk, has_expansion, inert_target, is_banner, is_ro_segment,
-    lead_keyword, program_bearing, ro_forms_clear, segment_core, shell_backgrounds, GitWalk,
+    command_word, git_read, git_walk_of, has_expansion, inert_target, is_banner, is_ro_segment,
+    moves_repository, plain_word, program_bearing, ro_forms_clear, segment_core, shell_backgrounds, GitWalk,
 };
 use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Shell, Verdict};
 use crate::guard::host::under;
@@ -17,12 +17,20 @@ fn block(m: impl Into<String>) -> Decided {
 }
 
 pub fn git_rewrite(ctx: &Ctx) -> Decided {
-    let s = ctx.view(ctx.cmd(), SqDqHd)?;
-    let commit = grep_q("(^|[[:space:]])git[[:space:]]+commit([[:space:]]|$)", &s)
-        && grep_q("(^|[[:space:]])(-F|--file|--amend)([^A-Za-z0-9_]|$)", &s);
-    let reset = grep_q("(^|[[:space:]])git[[:space:]]+reset([[:space:]]|$)", &s)
-        && grep_q("(^|[[:space:]])--soft([^A-Za-z0-9_]|$)", &s);
-    if !(commit || reset) || refused(ctx, ctx.cmd())? {
+    let carries = |ws: &[String], opts: &[&str]| {
+        ws.iter().any(|w| {
+            opts.iter().any(|o| w.strip_prefix(o).is_some_and(|r| !r.starts_with(|c: char| c.is_ascii_alphanumeric() || c == '_')))
+        })
+    };
+    let rewrites = git_read(ctx, ctx.cmd())?.iter().flatten().any(|words| {
+        let ws = git_walk_of(words, GitWalk::Args).unwrap_or_default();
+        match ws.first().map(String::as_str) {
+            Some("commit") => carries(&ws[1..], &["-F", "--file", "--amend"]),
+            Some("reset") => carries(&ws[1..], &["--soft"]),
+            _ => false,
+        }
+    });
+    if !rewrites || refused(ctx, ctx.cmd())? {
         return Ok(None);
     }
     Ok(Some(Verdict::Advise("re-verify volatile git state before this history rewrite (DOCTRINE.md: Re-verify volatile state before a git history rewrite): confirm HEAD with 'git log --oneline -3' before an amend or squash; after a 'git reset --soft' re-stage and verify staged content with 'git show :<path>' before committing (the soft reset keeps the old index snapshot); carry the message in the command ('-m', or '-F -' from a heredoc) — a scratch message file may be another session's, and a leftover lands the wrong message with exit 0; if you must use a file, write it in this same command and read the result back with 'git log -1 --format=%B'; and rewrite the message when amending so it states the combined change.".to_string())))
@@ -100,23 +108,13 @@ fn commits_whole_index(args: &[String]) -> Option<bool> {
     let (mut paths, mut whole, mut skip, mut ends) = (false, false, false, false);
     let mut i = 0usize;
     while i < args.len() {
-        let w = args[i].replace('\\', "");
+        let w = args[i].as_str();
         i += 1;
         if std::mem::take(&mut skip) {
             continue;
         }
         if ends {
             paths = true;
-            continue;
-        }
-        if matches!(w.as_str(), "<<" | "<<-" | "<<<" | "<" | ">" | ">>" | "&>")
-            || (w.len() == 2 && w.as_bytes()[0].is_ascii_digit() && w.ends_with('>'))
-        {
-            skip = true;
-            continue;
-        }
-        let t = w.trim_start_matches(|c: char| c.is_ascii_digit());
-        if t.starts_with('<') || t.starts_with('>') || t.starts_with("&>") {
             continue;
         }
         if w == "--" {
@@ -175,16 +173,9 @@ pub fn commit_only_paths(ctx: &Ctx) -> Decided {
     if declines {
         return Ok(None);
     }
-    let s = ctx.view(c, SqDqHd)?;
-    let dsegs = ctx.dequoted(c)?.map(|v| ctx.segments(&v)).unwrap_or_default();
     let mut added = false;
-    for (i, seg) in ctx.segments(&s).iter().enumerate() {
-        let src = dsegs.get(i).filter(|d| !d.is_empty()).map_or(seg.as_str(), String::as_str);
-        let cmdseg = command_word(src);
-        if head_word(&cmdseg) != "git" {
-            continue;
-        }
-        let Some(ws) = git_subcommand(&cmdseg, GitWalk::Args) else { continue };
+    for words in git_read(ctx, c)?.iter().flatten() {
+        let Some(ws) = git_walk_of(words, GitWalk::Args) else { continue };
         match ws.first().map(String::as_str) {
             Some("add") => added = true,
             Some("commit") if added && commits_whole_index(&ws[1..]) == Some(true) => {
@@ -208,35 +199,6 @@ fn stash_rewrites(verb: Option<&str>) -> Option<bool> {
     }
 }
 
-// spec: guard-kit/SPEC.md §The rule roster — rule `git_stash`'s words: what a segment passes its
-// command, each by its value. A leading keyword and a redirect are read off the live text, so a
-// quoted one is a word; a word glued ahead of a redirect is kept.
-fn passed_words(ws: &[Word], escape: char) -> Vec<String> {
-    let mut out = Vec::new();
-    let mut target = false;
-    for w in ws {
-        if std::mem::take(&mut target) || (out.is_empty() && lead_keyword(&w.live)) {
-            continue;
-        }
-        let mut held = false;
-        let at = w.live.char_indices().find(|&(_, ch)| {
-            let bare = !std::mem::take(&mut held);
-            held = bare && ch == escape;
-            bare && matches!(ch, '>' | '<')
-        });
-        let Some((at, _)) = at else {
-            out.push(w.value.clone());
-            continue;
-        };
-        let (glued, redirect) = w.live.split_at(at);
-        if !(glued.bytes().all(|b| b.is_ascii_digit()) || matches!(glued, "&" | "*")) {
-            out.push(glued.to_string());
-        }
-        target = redirect.trim_start_matches(['>', '<']).is_empty();
-    }
-    out
-}
-
 // spec: guard-kit/SPEC.md §The rule roster — rule `git_stash`: a tree-rewriting stash where the
 // session's working tree is the main checkout.
 pub fn git_stash(ctx: &Ctx) -> Decided {
@@ -244,24 +206,12 @@ pub fn git_stash(ctx: &Ctx) -> Decided {
     if ctx.expands(c, has_expansion)? {
         return Ok(None);
     }
-    let escape = match ctx.shell() {
-        Shell::Bash => '\\',
-        Shell::PowerShell => '`',
-    };
-    let s = ctx.view(c, SqDqHd)?;
-    let read = ctx.word_read(c)?;
-    for (i, seg) in ctx.segments(&s).iter().enumerate() {
-        let passed = match read.as_ref().and_then(|r| r.get(i)) {
-            Some(ws) => passed_words(ws, escape),
-            None => passed_words(&text::all_words(seg).into_iter().map(plain_word).collect::<Vec<Word>>(), escape),
-        };
-        let walk = |mode| git_walk(passed.iter().map(String::as_str), mode);
-        let Some(globals) = walk(GitWalk::Globals) else { continue };
-        let moves = |g: &String| matches!(g.as_str(), "-C" | "--git-dir" | "--work-tree") || g.starts_with("--git-dir=") || g.starts_with("--work-tree=");
-        if globals.iter().any(moves) {
+    for passed in git_read(ctx, c)?.iter().flatten() {
+        let Some(globals) = git_walk_of(passed, GitWalk::Globals) else { continue };
+        if globals.iter().any(|g| moves_repository(g)) {
             continue;
         }
-        let ws = walk(GitWalk::Args).unwrap_or_default();
+        let ws = git_walk_of(passed, GitWalk::Args).unwrap_or_default();
         if ws.first().map(String::as_str) != Some("stash") || stash_rewrites(ws.get(1).map(String::as_str)) != Some(true) {
             continue;
         }
@@ -282,19 +232,16 @@ pub fn rm_tracked_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<String>, Fault> {
         return Ok(None);
     }
     let s = ctx.view(c, SqDqHd)?;
-    let dsegs = ctx.dequoted(c)?.map(|v| ctx.segments(&v)).unwrap_or_default();
+    let gits = git_read(ctx, c)?;
     let words = ctx.word_read(c)?;
     for (i, seg) in ctx.segments(&s).iter().enumerate() {
         let seg = trim_start(seg);
-        let src = dsegs.get(i).filter(|d| !d.is_empty()).map_or(seg, String::as_str);
-        let cmdseg = command_word(src);
-        if head_word(&cmdseg) == "git" {
-            let ws = git_subcommand(&cmdseg, GitWalk::Args).unwrap_or_default();
+        if let Some(passed) = gits.get(i).and_then(Option::as_ref) {
+            let ws = git_walk_of(passed, GitWalk::Args).unwrap_or_default();
             if ws.first().map(String::as_str) != Some("rm") {
                 continue;
             }
             for w in &ws[1..] {
-                let w = w.replace('\\', "");
                 if w == "--" {
                     break;
                 }
@@ -365,10 +312,6 @@ struct Operand {
     spelling: String,
 }
 
-fn plain_word(w: &str) -> Word {
-    Word { spelling: w.to_string(), value: w.to_string(), live: w.to_string() }
-}
-
 // spec: guard-kit/SPEC.md §The rule roster — rule `rm_tracked`'s bash operand: a literal one by its
 // value, a bare glob as the shell expands it, and none for a mixed word or a literal git would read
 // as a pattern.
@@ -408,7 +351,7 @@ mod tests {
     use super::*;
 
     fn word(spelling: &str, value: &str, live: &str) -> Word {
-        Word { spelling: spelling.to_string(), value: value.to_string(), live: live.to_string() }
+        Word::new(spelling, value, live)
     }
 
     #[test]
@@ -486,17 +429,6 @@ mod tests {
         assert_eq!(paths(word("a`,b", "a,b", "a`,b")), vec!["a,b"]);
         assert_eq!(paths(word("a,'b,c'", "a,b,c", "a,\0SQ")), vec!["a", "b,c"]);
         assert_eq!(paths(word("-Path:'a,b',c", "-Path:a,b,c", "-Path:\0SQ,c")), vec!["a,b", "c"]);
-    }
-
-    // spec: guard-kit/SPEC.md §The rule roster — rule `git_stash` reads each word by its value, a
-    // keyword and a redirect by the live text
-    #[test]
-    fn the_passed_words_drop_keywords_and_redirects_by_live_text() {
-        let got = |ws: &[Word]| passed_words(ws, '\\');
-        assert_eq!(got(&[plain_word("if"), plain_word("git"), word("'stash'", "stash", "\0SQ")]), vec!["git", "stash"]);
-        assert_eq!(got(&[plain_word("git"), plain_word("stash"), plain_word("2>&1"), plain_word(">"), plain_word("o"), plain_word("pop")]), vec!["git", "stash", "pop"]);
-        assert_eq!(got(&[plain_word("git"), plain_word("stash>o"), plain_word("&>/dev/null")]), vec!["git", "stash"]);
-        assert_eq!(got(&[plain_word("git"), word("'if'", "if", "\0SQ"), word("'>'", ">", "\0SQ"), word("a\\>b", "a>b", "a\\>b")]), vec!["git", "if", ">", "a>b"]);
     }
 }
 
