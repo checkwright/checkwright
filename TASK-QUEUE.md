@@ -192,7 +192,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Deliverable:** that observation, read off the `publish` run and one install from the published Release, with any defect it shows filed.
 
-**Release (operator direction, lead-relayed, not a ruling):** v0.32.0 stays deferred, by a direction relayed to guard-rule-holes-pass' close on 2026-10-12: closing push only, no tag and no publish. That close's reviews held seven guard findings, three of them defects in the fixes the iteration landed, and they enter through the next scope. **The bar for the cut, the same direction:** cut once no open finding is a wrong grant or a regression from v0.31.0; a fall-through hole rides as a declared limit in the note. Which open finding the bar blocks is read by the session that next weighs a cut, against its own runs: no finding was run against the v0.31.0 binary at that close. That cut's `publish` run produces this observation and [front-door-job-observed](#front-door-job-observed)'s.
+**Release (operator direction, lead-relayed, not a ruling):** v0.32.0 stays deferred, by a direction relayed to guard-rule-holes-pass' close on 2026-10-12: closing push only, no tag and no publish. That close's reviews held seven guard findings, three of them defects in the fixes the iteration landed, and they enter through the next scope. **The bar for the cut, the same direction:** cut once no open finding is a wrong grant or a regression from v0.31.0; a fall-through hole rides as a declared limit in the note. Which open finding the bar blocks is read by the session that next weighs a cut, against its own runs: no finding was run against the v0.31.0 binary at that close. **Review placement (operator direction, 2026-10-13, lead-relayed):** guard-spelling-oracle-pass ran no early re-spelling review at validate, where the one granted foreign run returned no reading, and relied on its close's review. That cut's `publish` run produces this observation and [front-door-job-observed](#front-door-job-observed)'s.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
@@ -289,16 +289,6 @@ the delivery rule under `lead-notification-wake-race`'s remedy, unprobed: does a
 **Inferred, not run:** that a tool call before the turn end delivers the notification — two stalled transcripts show only an undrained queue at the stop, and one 2026-10-02 lead turn with tool calls received its notification inside the turn.
 
 **Cost while deferred:** the lead's wait clause rests on an inferred mechanism; if it is wrong, a stall still costs hours of idle wall-clock until the operator wakes the lead. Filed 2026-10-02 as a split at companion-tier-delegation-pass' scope, operator direction lead-relayed (not a ruling).
-
-### manual-ops-door-subkey
-
-[cost: event/low] [surface: drift-kit]
-
-`--emit manual-ops` keys a shell call by guard-kit's ranking key, which sub-keys only its multi-command set, so every arm called through the gate binary folds into one key, and two spellings of the binary split it: `./native/target/release/checkwright-gates` 61 calls in 5 sessions and `native/target/release/checkwright-gates` 24 in 1 at drift-kit-tail-crosser-pass, rewrite, scratch-run and emit arms alike. The meter cannot say which arm is repeated. That close ignored both spellings as the door, as `bash gate-sdk/bin/run-gates.sh` already was; the per-arm signal is this entry's.
-
-**Deliverable:** a door-aware sub-key, the door plus its arm word, one key across the door's spellings, in drift-kit/SPEC.md §The manual-operation meter or guard-kit/SPEC.md §scan-prompts; which owner is spec's.
-
-**Cost while deferred:** a repeated arm, the strongest tooling candidate the meter could name, stays invisible. Filed 2026-10-05 by that iteration's build. Re-verified: the meter at close ranks the first spelling first and the second seventh; the split across spellings is new at the drain. Owner lookup: `ranking key`, `sub-key`, `manual-op` in this file — none; owner drift-kit/SPEC.md §The manual-operation meter.
 
 ### trajectory-limits-unstated
 
@@ -517,6 +507,26 @@ the gates workflow's Windows liveness step misread one row once. On the run for 
 **Inferred, not run:** that a low Windows pid was recycled between the truth read and the gate's, possibly into a process the gate itself started — cannot run here: the step executes on the workflow's Windows leg alone
 
 **Cost while deferred:** a closing push reds on a coin and costs a re-run and its wait. Surfaced 2026-10-11 by hook-placement-guard-rules-pass' close and carried to the next scope's intake. Owner lookup: `liveness`, `pid`, `recycl` in this file and the disposed-findings record — none; owner evidence-kit/SPEC.md §check-producer-liveness and the gates workflow's Windows crate leg.
+
+### guard-rules-skeleton-word-read
+
+[cost: event/high] [surface: guard-kit]
+
+most generic guard rules read the command word, an option or an operand off the skeleton, so a quoted, escaped, redirect-glued or `command`-led spelling of a row they block falls through. `guard-kit/guard-tests/variant-limits.tsv` is the worklist: every row is a rule and a re-spelling its read does not reach, all at the `fallthrough` floor.
+
+**Deliverable:** the word read lifted rule by rule (guard-kit/SPEC.md §The reader and its views), each lift deleting its limit rows in its own commit, safety blocks first: rules `script_interpreter` and `rm_tracked`.
+
+**Cost while deferred:** a steer or a safety block is evaded by one re-spelling, silently under `command`, which the matcher strips. Filed 2026-10-13 by guard-spelling-oracle-pass' spec off a prototype of the variant lane, and promoted at its close. Re-verified there: the lane is green under the table's rows and reds on a row nothing needs. Owner lookup: `skeleton`, `word read`, `variant-limits` in this file and the disposed-findings record — none; `git-rules-word-read-siblings`, done, DISTINCT (the git rules' lift, landed); owner guard-kit/SPEC.md §The generic ruleset.
+
+### variant-lane-underived-tables
+
+[cost: event/low] [surface: guard-kit]
+
+the guard decision tables' variant lane derives re-spellings from the two bash tables alone, which guard-kit/SPEC.md §Testing states as its limit: a PowerShell row and a consumer row keep only the spellings their author wrote.
+
+**Deliverable:** a PowerShell transform set (a doubled quote, a backtick escape, a cmdlet alias) over the two PowerShell tables, and the consumer lane's derivation as a consumer-selectable knob with off among its values, since deriving by default would let a kit release red a consumer's table.
+
+**Cost while deferred:** a PowerShell rule or a consumer rule misreading a re-spelling is met by a review or a user, never by the tables. Filed 2026-10-13 by guard-spelling-oracle-pass' spec and promoted at its close. Re-verified there by reading that section's limit sentence. Owner lookup: `variant`, `PowerShell`, `transform` in this file and the disposed-findings record — none; `guard-spelling-variant-oracle`, done, DISTINCT (the bash lane, landed); owner guard-kit/SPEC.md §Testing.
 
 ## Icebox
 
@@ -1206,13 +1216,9 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 
 `check-memory-off` derives the memory dir from the repository toplevel, so a linked-worktree session's memory may land where no scan reads if the harness keys that dir on a canonical working-copy root, a keying read from its bundle and never observed.
 
-## Done
+### manual-ops-door-subkey
 
-- guard-spelling-variant-oracle
-- git-rules-word-read-siblings
-- git-stash-glued-redirect-value
-- bounded-wait-piped-loop
-- wait-no-producer-lead-evasion
-- wait-exemption-redirect-tail
-- keyword-walk-argument-position
+the manual-operation meter keys every arm called through the gate binary's door as one key, split across the door's two spellings, so it cannot name a repeated arm; the deliverable is a door-aware sub-key owned by drift-kit/SPEC.md §The manual-operation meter or guard-kit/SPEC.md §scan-prompts.
+
+## Done
 
