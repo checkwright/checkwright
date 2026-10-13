@@ -250,6 +250,8 @@ block	sleep 30
 block	sleep 180; echo waited
 # a keyword spelled as an argument opens and closes no span
 block	sleep 5; echo done
+# a redirect operator ends the word it is glued to
+block	sleep>/dev/null 5
 allow	until grep -q DONE .tmp/smoke.log; do sleep 5; done
 allow	printf 'sleep 5' >> .tmp/note.txt
 
@@ -502,6 +504,12 @@ fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done &
 # after the wait, is a launch rule `background_no_record` holds to its record
 block	while true; do make build; done &
 block	until grep -q DONE .tmp/smoke.log; do sleep 5; done & make build
+# the loop's own `&` is found past its inert redirects; a redirect to a named file there is a
+# write, and a producer behind that `&` still a launch
+fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done 2>/dev/null &
+fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done >/dev/null 2>&1 &
+block	until grep -q DONE .tmp/smoke.log; do sleep 5; done > out.txt &
+block	until grep -q DONE .tmp/smoke.log; do sleep 5; done 2>/dev/null & make build
 # a statement ahead of the wait takes the tail's test: a producer there is a launch, a banner is not
 block	make build; until grep -q DONE .tmp/smoke.log; do sleep 5; done &
 fallthrough	echo start; until grep -q DONE .tmp/smoke.log; do sleep 5; done &
@@ -510,6 +518,7 @@ fallthrough	echo start; until grep -q DONE .tmp/smoke.log; do sleep 5; done &
 block	until [ -f .tmp/marker ]; do sleep 5; done &
 # and behind a banner, the lead rule `background_no_record`'s exemption admits
 block	echo start; until [ -f .tmp/marker ]; do sleep 5; done &
+block	until [ -f .tmp/marker ]; do sleep 5; done 2>/dev/null &
 # clause (a) — the first statement is not the loop
 fallthrough	echo start; until grep -q DONE .tmp/smoke.log; do sleep 5; done
 # clause (b) — the body runs something besides sleep

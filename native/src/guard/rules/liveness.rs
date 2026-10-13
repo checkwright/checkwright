@@ -4,7 +4,7 @@
 use super::grants::{slot_reach, Reach};
 use super::reach::{interpreter_reach, refused, rm_tracked_reach};
 use super::{
-    command_word, git_read, git_walk_of, has_expansion, has_substitution, inert_target, is_banner, is_ro_segment,
+    background_statements, command_word, git_read, git_walk_of, has_expansion, has_substitution, inert_target, is_banner, is_ro_segment,
     loop_tokens, redirect_targets, ro_forms_clear, ro_forms_clear_statements, segment_core,
     shell_backgrounds, strip_redirect_op, unredirected_words, GitWalk,
 };
@@ -292,8 +292,15 @@ fn waits_only(ctx: &Ctx, s: &str, toks: &[(i32, bool, String, usize)]) -> Result
     }
     for (k, span) in loops.iter().enumerate() {
         let piece = text(span.close + 4, loops.get(k + 1).map_or(s.len(), |next| next.start));
-        let own = trim_start(piece);
-        let piece = if own.starts_with('&') && !own.starts_with("&&") { &own[1..] } else { piece };
+        let (own, redirects) = (trim_start(piece), background_statements(piece)[0]);
+        let inert = ctx.segments(redirects).len() == 1 && segment_core(redirects).is_empty() && wait_redirects_inert(ctx, redirects);
+        let piece = if own.starts_with('&') && !own.starts_with("&&") {
+            &own[1..]
+        } else if redirects.len() < piece.len() && inert {
+            &piece[redirects.len() + 1..]
+        } else {
+            piece
+        };
         if !outside(piece) {
             return Ok(false);
         }

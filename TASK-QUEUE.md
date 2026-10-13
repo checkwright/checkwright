@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### wait-exemption-redirect-tail
-
-guard-kit rule `background_no_record` blocks a wait loop whose closing ampersand follows an inert redirect: `until grep -q DONE log; do sleep 1; done 2>/dev/null &` is blocked where `until grep -q DONE log; do sleep 1; done &` is exempt and the harness-backgrounded `done 2>/dev/null` is granted. The exemption's text lets the loop itself end in a bare ampersand and treats an inert redirect as inert, so this is an over-block against the text `wait-loop-lead-and-condition` landed.
-
-**Deliverable:** the loop's own ampersand found past its inert redirects, and a row for the spelling.
-
-**Against the release bar** [tarball-attestation-observed](#tarball-attestation-observed) records: the published v0.31.0 binary falls through on this spelling in a scratch repository and the current one blocks it, so the verdict moved since that release, toward refusing a sanctioned wait. Whether that is the regression the bar names is the ruling party's.
-
-**Cost while deferred:** one re-issue of a sanctioned wait. Surfaced 2026-10-12 by guard-rule-holes-pass' close, off its second-vendor review, run through the hook member, and carried to the next scope's intake. Re-verified there by the same run. Owner lookup: `background_no_record`, `2>/dev/null &`, `inert redirect` in this file and the disposed-findings record — `wait-loop-lead-and-condition`, done, so a new defect; `wait-no-producer-lead-evasion`, DISTINCT (the producer block's lead, where this is the record exemption's tail); owner guard-kit/SPEC.md §The generic ruleset.
-
 ### keyword-walk-argument-position
 
 the guard's shared shell-keyword walk reads a keyword off two positions that are not command position: a `for` loop's variable and a redirect target after `>&`. Backgrounded, `for done in x; do make build; done` and `until grep -q DONE log; do sleep 1 >& done; done` fall through guard-kit rule `background_no_record` where `for x in a; do make build; done` and the `> out.txt` body block; foreground `sleep 5 >& done` passes rule `bare_sleep` where `sleep 5 > done` blocks. A body redirect spelled `>& out` falls through too, the fd-dup onto a named file the exemption's body clause does not hold.
@@ -1231,4 +1221,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - git-stash-glued-redirect-value
 - bounded-wait-piped-loop
 - wait-no-producer-lead-evasion
+- wait-exemption-redirect-tail
 

@@ -555,7 +555,7 @@ fn loop_span(s: &str) -> Option<Vec<(i32, bool, String)>> {
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — the same walk with each token's byte offset in the
-// skeleton, for a reader that needs a span's text.
+// skeleton, for a reader that needs a span's text. A redirect operator ends the word it is glued to.
 fn loop_tokens(s: &str) -> Option<Vec<(i32, bool, String, usize)>> {
     let joined = format!("{};", s.replace('\n', ";"));
     let b = joined.as_bytes();
@@ -565,6 +565,7 @@ fn loop_tokens(s: &str) -> Option<Vec<(i32, bool, String, usize)>> {
         let glyph = match b[i] {
             b'|' | b'&' if b.get(i + 1) == Some(&b[i]) => 2,
             b';' | b'|' | b'&' | b'(' | b')' | b'{' | b'}' => 1,
+            b'>' | b'<' => b[i..].iter().take_while(|c| matches!(c, b'>' | b'<')).count(),
             _ => 0,
         };
         if glyph == 0 && !matches!(b[i], b' ' | b'\t') {
@@ -604,7 +605,7 @@ fn loop_tokens(s: &str) -> Option<Vec<(i32, bool, String, usize)>> {
                 out.push((depth, cmdpos, tok.to_string(), at));
             }
             _ => {
-                out.push((depth, cmdpos, tok.to_string(), at));
+                out.push((depth, cmdpos && !tok.starts_with(['>', '<']), tok.to_string(), at));
                 cmdpos = false;
             }
         }
@@ -779,6 +780,9 @@ mod tests {
                 (0, ";", 31),
             ]
         );
+        let glued = loop_span("until a; do sleep>o 1; done>o").unwrap();
+        let keywords: Vec<&str> = glued.iter().filter(|(_, cmdpos, _)| *cmdpos).map(|(_, _, t)| t.as_str()).collect();
+        assert_eq!(keywords, vec!["until", "a", "do", "sleep", "done"]);
         assert_eq!(unredirected_words("grep x f > out", "grep x f > out"), Ok("grep x f".to_string()));
         assert_eq!(unredirected_words("> out", "> out"), Err(1));
         assert_eq!(unredirected_words("cat <<EOF", "cat <<EOF"), Err(2));
