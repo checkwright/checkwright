@@ -3,6 +3,7 @@
 // which `Arm::Emit` collapses to 0-or-2.
 // spec: gate-sdk/SPEC.md §The non-gate arm — an arm table member rather than a hardcoded
 // top-level flag, because the member is configured: it needs the vendored guard-kit root.
+use super::guard_variants::{self, Admit, Held, Ledger};
 use crate::proc;
 use crate::programs;
 use crate::walk;
@@ -43,7 +44,8 @@ fn execute(args: &[String]) -> Result<i32, String> {
     let bg_cases = positional(args, 1, &format!("{}/guard-tests/background-cases.tsv", kit));
     let ps_cases = positional(args, 2, &format!("{}/guard-tests/powershell-cases.tsv", kit));
     let ps_bg_cases = positional(args, 3, &format!("{}/guard-tests/powershell-background-cases.tsv", kit));
-    for f in [&cases, &bg_cases, &ps_cases, &ps_bg_cases] {
+    let limits = positional(args, 4, &format!("{}/guard-tests/variant-limits.tsv", kit));
+    for f in [&cases, &bg_cases, &ps_cases, &ps_bg_cases, &limits] {
         if !Path::new(f).is_file() {
             return Err(format!("{}: missing {}", NAME, f));
         }
@@ -88,6 +90,7 @@ fn execute(args: &[String]) -> Result<i32, String> {
         ));
     }
     let kit_ran = tally.ran;
+    let (derived, limit_rows) = variant_lane(&mut tally, &sandbox.root, &log, &cases, &bg_cases, &limits)?;
     let consumer = consumer_lane(&mut tally)?;
     if tally.fails > 0 {
         println!(
@@ -98,10 +101,67 @@ fn execute(args: &[String]) -> Result<i32, String> {
     }
     let consumer_note = consumer.map_or(String::new(), |(n, table)| format!(", and {} consumer case(s) from {}", n, table));
     println!(
-        "{}: ok ({} cases across the generic ruleset, the backgrounding arm, the PowerShell reader and its backgrounding arm{})",
-        NAME, kit_ran, consumer_note
+        "{}: ok ({} cases across the generic ruleset, the backgrounding arm, the PowerShell reader and its backgrounding arm, and {} derived re-spelling(s) of the bash rows under {} limit row(s){})",
+        NAME, kit_ran, derived, limit_rows, consumer_note
     );
     Ok(0)
+}
+
+// spec: guard-kit/SPEC.md §Testing — the variant lane: each bash row's re-spellings fed as the row
+// is, held to the one-sided relation, a failure green only under a limit row held from both sides.
+fn variant_lane(
+    tally: &mut Tally,
+    root: &str,
+    log: &str,
+    cases: &str,
+    bg_cases: &str,
+    limits: &str,
+) -> Result<(usize, usize), String> {
+    let mut ledger =
+        Ledger::parse(&rows(limits, 3)?, limits).map_err(|e| format!("{}: {}", NAME, e))?;
+    let mut derived = 0;
+    for (table, flagged) in [(cases, false), (bg_cases, true)] {
+        let base = sectioned(table, if flagged { 3 } else { 2 })?;
+        let authored: std::collections::HashSet<(&str, &str)> =
+            base.iter().map(|(_, r)| if flagged { (r[1].as_str(), r[2].as_str()) } else { ("", r[1].as_str()) }).collect();
+        for (section, row) in &base {
+            let (want, flag, cell) = if flagged { (&row[0], row[1].as_str(), &row[2]) } else { (&row[0], "", &row[1]) };
+            for variant in guard_variants::derive(cell) {
+                if authored.contains(&(flag, variant.cell.as_str())) {
+                    continue;
+                }
+                let cmd = substitute(&variant.cell, root);
+                let got = decide(root, log, &cmd, flagged.then_some(flag), "Bash")?;
+                derived += 1;
+                tally.ran += 1;
+                let held = guard_variants::relation(want, &got);
+                if held == Held::Holds {
+                    continue;
+                }
+                let rule = section.as_deref().map_or("no rule section".to_string(), |s| format!("rule {}", s));
+                let why = match held {
+                    Held::Never => "no limit admits this class",
+                    _ => match ledger.admit(section.as_deref(), &variant.transform, &got) {
+                        Admit::Admitted => continue,
+                        Admit::NoLimit => "no limit row",
+                        Admit::BelowFloor => "below its limit row's floor",
+                    },
+                };
+                let flag_note = if flagged { format!(" [run_in_background={}]", flag) } else { String::new() };
+                println!(
+                    "  FAIL: want '{}', got '{}' -- [--hook shell-guard] [variant {} of {}, {}]{} {}",
+                    want, got, variant.transform, rule, why, flag_note, cmd
+                );
+                tally.fails += 1;
+            }
+        }
+    }
+    for finding in ledger.stale() {
+        println!("  FAIL: {} -- {}", finding, limits);
+        tally.fails += 1;
+    }
+    tally.ran += ledger.len();
+    Ok((derived, ledger.len()))
 }
 
 // spec: guard-kit/SPEC.md §Testing — the consumer lane: the consumer's rows against its own
@@ -193,17 +253,34 @@ fn substitute(cmd: &str, root: &str) -> String {
 // `IFS=$'\t' read -r`: tab is an IFS *whitespace* character, so leading and trailing tabs are
 // stripped and a run of them is one delimiter.
 fn rows(path: &str, width: usize) -> Result<Vec<Vec<String>>, String> {
+    Ok(sectioned(path, width)?.into_iter().map(|(_, cells)| cells).collect())
+}
+
+// spec: guard-kit/SPEC.md §Testing — each row beside the rule section it sits in, a section
+// opening at a comment line beginning `# rule` and a backticked rule name.
+fn sectioned(path: &str, width: usize) -> Result<Vec<Sectioned>, String> {
     let body = std::fs::read_to_string(path)
         .map_err(|e| format!("{}: cannot read {}: {}", NAME, path, e))?;
-    let mut out: Vec<Vec<String>> = Vec::new();
+    let mut section: Option<String> = None;
+    let mut out = Vec::new();
     for line in body.lines() {
+        if let Some(name) = section_name(line) {
+            section = Some(name.to_string());
+        }
         let cells = fields(line, width);
         if cells[0].trim_matches(' ').is_empty() || cells[0].starts_with('#') {
             continue;
         }
-        out.push(cells);
+        out.push((section.clone(), cells));
     }
     Ok(out)
+}
+
+type Sectioned = (Option<String>, Vec<String>);
+
+fn section_name(line: &str) -> Option<&str> {
+    let name = line.strip_prefix("# rule `")?.split('`').next()?;
+    (!name.is_empty()).then_some(name)
 }
 
 fn fields(line: &str, width: usize) -> Vec<String> {
@@ -401,6 +478,16 @@ mod tests {
             vec!["advise", "true", "a\tb"],
             "a tab inside the command cell belongs to the last field, as bash's read leaves it"
         );
+    }
+
+    // spec: guard-kit/SPEC.md §Testing — a section opens at `# rule` and a backticked name.
+    #[test]
+    fn a_section_opens_at_a_rule_comment_and_nowhere_else() {
+        assert_eq!(section_name("# rule `cd_compound` — cd in a compound command"), Some("cd_compound"));
+        assert_eq!(section_name("# rule `git_c_root`'s arm (d) — an export"), Some("git_c_root"));
+        assert_eq!(section_name("#          rule `append_scratch`'s create grant reaches it"), None);
+        assert_eq!(section_name("# rules `a` and `b`"), None);
+        assert_eq!(section_name("block\tcd deploy && ls"), None);
     }
 
     // spec: guard-kit/SPEC.md §Testing — the backgrounding flag rides beside the command.

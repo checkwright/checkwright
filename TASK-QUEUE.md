@@ -8,20 +8,6 @@
 
 ## New Features
 
-### guard-spelling-variant-oracle
-
-[spec: SPEC-variant-lane.md] [recurrence: 2026-10-12]
-
-a close's second-vendor review has found holes in the guard rules that same iteration added or tightened at two consecutive closes, and each time the release was deferred. At hook-placement-guard-rules-pass' close the review found the wait-loop exemption, rule `git_stash` and PowerShell word-read holes; guard-rule-holes-pass fixed those and its own close review found defects in three of the fixes. Every finding of both reviews is one shape: a spelling the shell reads as the same command as a row the decision table already holds, a quoted or escaped word, a redirect glued or parted, a wrapper ahead of the command word, a keyword standing where no command stands. The table pins the spellings its author wrote, so nothing reds until a reader outside the session re-spells one.
-
-**Deliverable:** an oracle that meets a lexical rule's re-spellings before close does. Its form is the authoring stage's: rows derived from each table row by a declared set of shell-equivalent re-spellings, each held to its row by a one-sided relation, the guard at least as strict on the re-spelling as on the row, unless a limit is declared (decision, 2026-10-13, the lead's under the operator's delegation, on the amendment's *Why not the row's own verdict* grounds: equality would red every grant row for a decline that costs one permission decision); or the review run at an earlier stage's reading; or both. Feature-sized where it adds a lane or a table grammar.
-
-**Unit set (operator direction, 2026-10-13, lead-relayed, not a ruling; revisable at a later scope or spec):** this entry leads guard-spelling-oracle-pass and is built first, its red rows the worklist for the six it bundles on this surface: [wait-exemption-redirect-tail](#wait-exemption-redirect-tail), [bounded-wait-piped-loop](#bounded-wait-piped-loop), [git-rules-word-read-siblings](#git-rules-word-read-siblings), [git-stash-glued-redirect-value](#git-stash-glued-redirect-value), [keyword-walk-argument-position](#keyword-walk-argument-position) and [wait-no-producer-lead-evasion](#wait-no-producer-lead-evasion). The set spends the closing push alone, inside the budget. Scope's recommendation to the authoring stage, not the operator's words: a derived row whose verdict differs may be declared a limit, so the unit stays bounded where the oracle reds more than the six cover.
-
-**Review placement (operator direction, 2026-10-13, lead-relayed, not a ruling):** both this iteration. The validate stage's reading runs on a foreign adapter and close keeps its own review; the early one is dropped once the oracle has absorbed its finding classes. **Grant (operator, 2026-10-13, lead-relayed):** one validate reading on a foreign adapter this iteration, unspent; the lead names the adapter in the dispatch.
-
-**Cost while deferred:** each iteration that edits a guard rule ends in a deferred release, and the entries a release run produces wait with it. Surfaced 2026-10-12 by guard-rule-holes-pass' lead, as a recurrence judgment filed for the session that may stamp it, and carried to the next scope's intake, which judged it a recurrence from both closes' recorded findings. Owner lookup: `second-vendor`, `re-spell`, `variant`, `equivalen` in this file and the disposed-findings record — none; [config-variant-battery-harness](#config-variant-battery-harness), DISTINCT (a consumer's config variants, where this is a command's spellings); owner guard-kit/SPEC.md §Testing.
-
 ### git-rules-word-read-siblings
 
 [spec: SPEC-git-word-read.md]
@@ -1279,4 +1265,6 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 `check-memory-off` derives the memory dir from the repository toplevel, so a linked-worktree session's memory may land where no scan reads if the harness keys that dir on a canonical working-copy root, a keying read from its bundle and never observed.
 
 ## Done
+
+- guard-spelling-variant-oracle
 

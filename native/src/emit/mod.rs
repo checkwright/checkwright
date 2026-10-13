@@ -72,6 +72,7 @@ pub mod roadmap;
 pub mod roadmap_lag;
 pub mod ruling_staleness;
 pub mod run_consumer_smoke;
+pub mod guard_variants;
 pub mod run_gate_tests;
 pub mod run_guard_tests;
 pub mod run_index_tests;

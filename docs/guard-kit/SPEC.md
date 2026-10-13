@@ -329,6 +329,7 @@ Those rules take the PowerShell reader's segments, quoting and words, and otherw
 **The shared directions.** Each is stated once here, and an item names only where it departs from one.
 
 - **A decline biases toward passing.** A rule declines rather than guesses: on an expansion or a substitution anywhere in the command, whose shapes rule `expansion` already blocks, and on an option, word or construct its walk does not model. Each such decline errs toward passing rather than toward a false block.
+- **A rule reads a word as its item says.** An item that reads words by their value says so. Any other rule reads the skeleton's word, so a command word, an option or an operand spelled with a quote or an escape, glued to a redirect, or led by `command` is a construct its walk does not model, and it declines. Each pair of rule and re-spelling that stands so is a row of the variant lane's limits table ([§Testing](#testing)), which holds the roster, and lifting a rule's read deletes its rows. The decline is silent under `command`, which the matcher strips ([§The reader and its views](#the-reader-and-its-views)), so a grant for the bare command reaches the call. A quoted or escaped command word is unmeasured at the matcher.
 - **A grant bounds the whole call.** `permissionDecision: allow` blesses the whole call, so a grant bounds the command rather than recognizing the shape it keys on.
 - **The settings read fails open.** A rule reading `GUARD_KIT_SETTINGS` declines on a failed binary read, a missing settings file or a parse error, so a grant resting on the read never turns a missing file into an allow.
 - **The auto-allow band** is rules `truncate_scratch`, `append_scratch`, `ro_pipeline`, `bounded_wait` and `bounded_write`. A steer whose subject a consumer could add to `GUARD_KIT_RO_BINS` is placed before the band, so a widened roster never has rule `ro_pipeline` grant what the steer refuses.
@@ -1081,6 +1082,7 @@ guard-kit/
   guard-tests/background-cases.tsv  # expected-decision <TAB> run_in_background <TAB> command
   guard-tests/powershell-cases.tsv  # expected-decision <TAB> command, each fed as a PowerShell payload
   guard-tests/powershell-background-cases.tsv  # expected-decision <TAB> run_in_background <TAB> command, each fed as a PowerShell payload
+  guard-tests/variant-limits.tsv  # <floor> <TAB> <rule> <TAB> <transform>, the re-spellings a rule's read does not reach; read by the variant lane
   gate-tests/scratch-run.test.sh    # the --scratch-run arm's SEAM cases, run by gate-sdk's runner
   gate-tests/rewrite.test.sh  # the --rewrite arm's operand refusals and write, run by gate-sdk's runner
   gate-tests/scan-prompts.test.sh   # bespoke unit test, run by gate-sdk's runner
@@ -1128,7 +1130,7 @@ Both logs are per-iteration scratch: a consumer gitignores them even where its w
 
 ## Testing
 
-The gate contracts do not fit hooks: a guard speaks exit 2 and hook JSON, not `OK:`/`FAIL:` lines. The kit therefore ships its own decision-table runner instead of `gate-tests/`. `guard-tests/cases.tsv` pairs an expected decision (`block`, `advise`, `allow`, `rewrite` or `fallthrough`) with a command. The `--run-guard-tests` arm feeds each through the shell guard as hook JSON on stdin and asserts the exit code and output class, failing on any mismatch. Every generic rule carries at least one firing and one non-firing case, the fixture-pair discipline transplanted. Two substitutions make a command expressible in one tab-separated cell: `@ROOT@` becomes the git sandbox root, and `@NL@` a newline, without which no heredoc case could be written. The runner has two lanes: the kit's tables against the member, and the consumer lane below.
+The gate contracts do not fit hooks: a guard speaks exit 2 and hook JSON, not `OK:`/`FAIL:` lines. The kit therefore ships its own decision-table runner instead of `gate-tests/`. `guard-tests/cases.tsv` pairs an expected decision (`block`, `advise`, `allow`, `rewrite` or `fallthrough`) with a command. The `--run-guard-tests` arm feeds each through the shell guard as hook JSON on stdin and asserts the exit code and output class, failing on any mismatch. Every generic rule carries at least one firing and one non-firing case, the fixture-pair discipline transplanted. Two substitutions make a command expressible in one tab-separated cell: `@ROOT@` becomes the git sandbox root, and `@NL@` a newline, without which no heredoc case could be written. The runner has three lanes: the kit's tables against the member, the variant lane, and the consumer lane, each below.
 
 **The member is an `Arm::Run` and an arm-table row, both forced.** The contract is a three-valued exit: 0 clean, 1 one or more verdict mismatches, 2 a harness precondition it could not meet. The evidence-kit suite reads the verdict, not the report, and an `Arm::Emit` collapses it to 0-or-2. The arm is a table member rather than a hardcoded top-level flag because it is **configured**: it needs where guard-kit is vendored, gate-sdk's `GATE_SDK_KIT_DIRS` ([gate-sdk/SPEC.md §The non-gate arm](../gate-sdk/SPEC.md#the-non-gate-arm), *the family is forced for any tool that needs configuration*). `bin/run-gates.sh` hands every unrecognised leading `--<token>` to `exec_arm`, so the front-end needs no edit. In a tree that does not vendor guard-kit the arm is unresolvable, as `--emit-scan-prompts` is: a refusal with a message at exit 2, not a defect.
 
@@ -1157,12 +1159,55 @@ The gate contracts do not fit hooks: a guard speaks exit 2 and hook JSON, not `O
 
 Rule `ro_pipeline`'s allowlisted-lead widening and rule `allowlist_chain` read the same file, so their rows are re-derived whenever it grows.
 
+**The variant lane** holds each bash row to the spellings the shell reads as the same command. It runs after the kit's tables and ahead of the consumer lane, on every run and under no knob, since it reads the kit's tables against the kit's rules and is no consumer calibration. For every eligible row of `cases.tsv` and `background-cases.tsv` it derives one re-spelling per site and transform. Each is fed through the member as the row itself is fed: the same payload and sandbox, the row's backgrounding flag where its table carries one, and the two substitutions applied to the derived cell. The lane fails where the guard reads the re-spelling more permissively than the row:
+
+- a `block` row's re-spelling blocks;
+- an `advise` row's advises or blocks;
+- a `fallthrough` row's falls through or blocks;
+- an `allow` or `rewrite` row's takes any of the four.
+
+Any other class fails, an `advise` its row does not carry among them, and no limit admits it. The relation is one-sided because a grant declines on a spelling it does not model ([§The generic ruleset](#the-generic-ruleset), the shared directions). Equality would red every grant row for a decline that costs one permission decision. A steer that blocks a re-spelling of a sanctioned form costs one re-issue in the plain spelling. A re-spelling equal to an authored row of the same table and flag is skipped, since the authored row decides it. A failing re-spelling prints in the kit lane's mismatch form, labelled with its transform and its row's section, and the summary line adds the lane's derived-row count and its limit-row count.
+
+**The deriver is a lexer of its own**, over blanks and one character class, sharing no function with the bash reader: a transform derived through the reader under test would inherit its misreads. A row is eligible where its cell, before substitution, carries no quote, backslash, `$`, backtick, `#`, parenthesis, brace, `[[`, `<<` or `@NL@`, each of which makes a blank-split token something other than a word. A **site** is a blank-split token's plain head, its leading run of letters, digits and `_ . / : % + , -`, where all of these hold:
+
+- the head is at least two characters long and no reserved word;
+- nothing follows it in the token but a separator or a redirect;
+- it is no file descriptor, an all-digit head ahead of a redirect;
+- its token does not follow `for`, `select`, `case` or `function`, whose next word is a name the shell does not dequote;
+- its token carries no `@`, the substitution tokens' character, so no verdict turns on how a host spells its temporary directory.
+
+A site is a `lead` where its token opens a statement and an `arg` elsewhere. A token opens a statement as the row's first, after a token that is or ends in a separator, a pipe or `&`, or after `if`, `then`, `else`, `elif`, `while`, `until`, `do`, `!` or `time`. A token ending in `>&` or `<&` closes none. The transforms:
+
+- per site, named with the site's kind (`sq-lead`, `sq-arg`): `sq` and `dq` quote the head, `esc` puts a backslash ahead of it, and `part` single-quotes its second half, cut at half its length rounded down;
+- per occurrence, a redirect operator being `<`, `>` or `>>` with no `&` on either side:
+  - `redirect-tight` and `redirect-apart` remove or add the blank between a redirect operator and its target;
+  - `dup-apart` parts `>&` from the descriptor glued to it;
+  - `word-glued` glues a word to the redirect operator after it, where the word ends in no digit and the operator carries no descriptor, either of which would move a descriptor;
+  - `separator-tight` removes the blanks around `;`, `&&`, `||`, `|` or `|&`;
+- per row: `wrap-command` leads a row whose first token is a `lead` site with `command`.
+
+`command` is the one wrapper the permission matcher strips ([§The reader and its views](#the-reader-and-its-views)) that runs the same command and adds nothing to it, so a grant for the bare command reaches through it with no decision. `time` adds a report, `builtin` refuses a command that is no builtin, and the rest run a second program, which is a program reach and no re-spelling.
+
+**Its honest limits.** No shell runs a derived row, so the equivalence is the construction's and the deriver's own crate tests pin each transform and each exclusion on a literal. A row carrying a quote or an escape is underived. A decoration, an inert redirect appended or a banner put ahead, and a keyword standing as a word change the command and are no re-spelling, so their rows are authored. The PowerShell tables and the consumer lane are underived.
+
+**A limit is declared, and held from both sides.** `guard-tests/variant-limits.tsv` (`<floor> <TAB> <rule> <TAB> <transform>`, in the table grammar) names the re-spellings a rule's read does not reach. It is the arm's fifth positional, defaulting under the kit root as the four tables do, so a call naming its own tables names its own limits. A section of a bash table opens at a comment line beginning `# rule` and a backticked rule name and runs to the next. Sections of one name are one section across both tables, and a row ahead of the first belongs to none, so its re-spellings take no limit. A failing re-spelling is green only under a limit row naming its row's section and its transform. The floor is the most permissive verdict the limit admits: `fallthrough`, or `allow` where the re-spelling is granted, `rewrite` included. The lane fails, each at exit 1:
+
+- on a re-spelling no limit admits, or one granted under a `fallthrough` floor;
+- on a limit row under which nothing fails, a rule naming no section among them;
+- on an `allow` floor no failing re-spelling under it reaches, which is tightened to `fallthrough`.
+
+So lifting a rule's read deletes its rows in the same commit. A table the lane cannot read is exit 2: a missing file, a floor or a transform off its set, or a rule and transform named twice.
+
+- **The floor** is there because a limit admitting a grant is a wider statement than one admitting a pass, and a `fallthrough` row must not come to cover a re-spelling a later edit starts granting.
+- **A limit is as wide as a section and no narrower**, the rule being the unit a contract is written in: an item says its words are read by value, or it does not. A limit per derived row would be a second table several times the size of the first, generated and unreasoned. **Its honest limit:** a second row of that section may start failing the same transform unseen.
+- **A marker on the base row is refused.** The decision cell is the table grammar's first field, and a second meaning in it would be read by every table's reader.
+
 **The consumer lane** runs a consumer's own rows against its own rule command, after the kit's tables and only where `GUARD_KIT_CONSUMER_CASES` names a table:
 
 - Each row is fed as a `Bash` payload to the argv `GUARD_KIT_CONSUMER_RULES_CMD` names, spawned directly with no shell, as the member spawns it ([§Consumer rules](#consumer-rules)). A consumer rule written for PowerShell is therefore not reached.
 - The working directory is the arm's own, the repository root through the front end or a root invocation, since a consumer's command is written for its repository. `@ROOT@` becomes that root, and `@NL@` a newline.
 - The environment is inherited, with `GATE_SDK_NATIVE_BIN` set to the running binary's absolute path.
-- The verdict is read on the same ladder, so a fault is `exit<rc>` or `unknown`, a mismatch whatever the row expected. A mismatch prints in the kit lane's form, labelled with the command, and either lane's mismatch makes the exit 1.
+- The verdict is read on the same ladder, so a fault is `exit<rc>` or `unknown`, a mismatch whatever the row expected. A mismatch prints in the kit lane's form, labelled with the command, and any lane's mismatch makes the exit 1.
 - A table set with no rule command, or naming no readable file, is exit 2.
 - The summary line adds the lane's row count and table, and names none where the knob is empty.
 
