@@ -371,8 +371,8 @@ fn is_wait_condition_segment(ctx: &Ctx, seg: &str) -> bool {
     }
 }
 
-// spec: guard-kit/SPEC.md §The generic ruleset — rule `bounded_wait`'s clause (d): every statement
-// after the loop meets rule `ro_pipeline`'s own test.
+// spec: guard-kit/SPEC.md §The generic ruleset — rule `bounded_wait`'s clause (d): every segment
+// after the loop, a statement or a piped reader, meets rule `ro_pipeline`'s own test.
 fn is_wait_tail_segment(ctx: &Ctx, seg: &str) -> bool {
     if !wait_redirects_inert(ctx, seg) {
         return false;

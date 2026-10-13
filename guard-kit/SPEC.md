@@ -558,7 +558,7 @@ Those rules take the PowerShell reader's segments, quoting and words, and otherw
   - **(a) The first statement is a `while`/`until` loop with exactly one balanced `do … done` span**, found by the ruleset's one shell-keyword walk (rule `bare_sleep`). More than one span declines: a nested wait is not the measured class, and which span is the body would be a guess.
   - **(b) The loop body contains nothing but `sleep`.** This is the rule's safety core, since a body running anything else is unbounded work under a grant. Each body statement is `sleep` plus exactly one numeric operand, and anything else declines.
   - **(c) The loop condition is read-only**, since it runs once per iteration, unboundedly often. It is held to rule `ro_pipeline`'s pipeline test, every redirect target inert. Two forms are admitted in their own right, each read-only without being a filter: the shell tests (`[ … ]`, `[[ … ]]`, `test`), and `kill -0 <pid>`, which sends no signal. A leading `!` is read past as rule `pgrep_self_match` reads a command word, so the negated spelling the correctives of rules `bare_sleep` and `git_mutation_under_producer` steer toward is granted.
-  - **(d) Every statement after the loop passes rule `ro_pipeline`'s read-only-pipeline test**, with the banner tolerance. Every measured call is a compound, the loop and then what the session does once the wait ends (*"report only results you hold"*), so a grant admitting only a lone loop would cover none of them. Unlike rule `ro_pipeline`, the tail need carry no read, since the loop is the call's work. The declared-forms reader runs once over the whole call, so condition and tail are held to it alike.
+  - **(d) Every segment after the loop passes rule `ro_pipeline`'s read-only-pipeline test**, with the banner tolerance: a statement behind `;`, `&&`, `||` or a newline, and a reader the loop is piped into, behind `|` or `|&`. Every measured call is a compound, the loop and then what the session does once the wait ends (*"report only results you hold"*), so a grant admitting only a lone loop would cover none of them. A piped reader is held as a statement is and reads only what `sleep` prints, so `done | cat` and `done|cat` are granted where `done | tee <file>` is not. Unlike rule `ro_pipeline`, the tail need carry no read, since the loop is the call's work. The declared-forms reader runs once over the whole call, so condition and tail are held to it alike.
   - **(e) Conservative decline on anything unmodelled**: either kind of substitution, or a backtick, anywhere in the **raw** command, and a quote surviving normalization, in rule `ro_pipeline`'s blanket spelling, the stricter of the band's two. Rule `append_scratch` reads the same tests on the `hdq` view; this rule keeps the raw command, its grant having no heredoc to narrow onto.
 
   **Two forms are not granted, and keep prompting by design**, since the target is the sanctioned class rather than the measured one:
@@ -1230,7 +1230,7 @@ A **third** table, `guard-tests/background-cases.tsv` (`<decision> <TAB> <run_in
 
 - in the background with no record → block;
 - in the background writing a `.run` record → fallthrough;
-- a wait loop in the background → the grant rule `bounded_wait`'s arm (A) earns it, alone or followed by a banner or a read;
+- a wait loop in the background → the grant rule `bounded_wait`'s arm (A) earns it, alone, followed by a banner or a read, or piped into a reader;
 - a loop that works, under either keyword, a nest, and a body `sleep` redirecting to a named file → block;
 - a producer or a declared write form ahead of the wait or after it, behind `;` or the loop's own `&`, and a lead hidden behind a keyword spelled as an argument → block;
 - a condition carrying a write its text shows, and a statement other than a loop ending in a bare `&` → block;
@@ -1242,7 +1242,7 @@ A **third** table, `guard-tests/background-cases.tsv` (`<decision> <TAB> <run_in
 
 The same table holds rule `wait_no_producer`'s harness-form rows, over the sandbox's one dead record, so clause (d) holds on each:
 
-- a backgrounded file-test wait → block, in either polarity and over tests joined by `&&`;
+- a backgrounded file-test wait → block, in either polarity, over tests joined by `&&`, and piped into a reader;
 - the same wait in the foreground → rule `bounded_wait`'s grant;
 - a second loop span → fallthrough;
 - a body running something besides `sleep` → fallthrough where the loop is launched with its record, in the spelling rule `background_no_record`'s block prints, since unrecorded it takes that block one rule earlier;

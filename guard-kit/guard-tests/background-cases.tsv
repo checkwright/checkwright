@@ -44,6 +44,10 @@ block	true	until grep -q DONE .tmp/worker.log; do sleep 5; done & sort -o out.tx
 fallthrough	true	until grep -q DONE .tmp/worker.log; do sleep 5; done & grep -n ERR .tmp/worker.log
 allow	true	until grep -q DONE .tmp/worker.log; do sleep 5; done; echo waited
 allow	true	until grep -q DONE .tmp/worker.log; do sleep 5; done; grep -n ERR .tmp/worker.log
+# a reader the loop is piped into is a statement outside the loop: a read stays exempt and
+# earns the grant, a piped writer takes the record
+allow	true	until grep -q DONE .tmp/worker.log; do sleep 5; done | cat
+block	true	until grep -q DONE .tmp/worker.log; do sleep 5; done | tee out.txt
 # a keyword spelled as an argument leaves the walk balanced, so the tail is still read
 block	true	until grep -q done .tmp/worker.log; do sleep 2; done; make build
 fallthrough	true	for i in 1 2 3; do sleep 5; done
@@ -74,6 +78,8 @@ block	true	until [ -f .tmp/marker ]; do sleep 30; done
 block	true	while [ ! -f .tmp/marker ]; do sleep 30; done
 block	true	until test -d .tmp/out && [[ -s .tmp/out/done ]]; do sleep 30; done; echo waited
 block	true	until [ -f .tmp/marker ]; do sleep 30; done; echo done
+block	true	until [ -f .tmp/marker ]; do sleep 30; done | cat
+block	true	until [ -f .tmp/marker ]; do sleep 30; done|cat
 allow	false	until [ -f .tmp/marker ]; do sleep 30; done
 fallthrough	true	until [ -f .tmp/a ]; do sleep 5; done; until [ -f .tmp/b ]; do sleep 5; done
 allow	true	while kill -0 2147483646 2>/dev/null; do sleep 5; done

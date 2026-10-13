@@ -8,18 +8,6 @@
 
 ## New Features
 
-### bounded-wait-piped-loop
-
-[spec: SPEC-piped-wait.md]
-
-guard-kit rule `bounded_wait` grants a foreground wait loop piped into a reader, `until [ -f marker ]; do sleep 5; done|cat` and its spaced spelling, and neither a decision-table row nor the rule's clauses say so: its tail clause speaks of statements after the loop, and a pipe is none. A loop piped into a writer (`done|rm -rf x`) is not granted, and the backgrounded piped wait meets rule `wait_no_producer`'s block.
-
-**Deliverable:** the piped tail declared in the rule's tail clause and pinned by a row for each spelling, or the grant withdrawn; which one is spec's.
-
-**Run at scope 2026-10-13, on the published v0.31.0 binary and the current one in a scratch repository:** the spaced spelling is granted by both, and the unspaced one fell through at v0.31.0 and is granted now. So the spaced grant predates that release and the unspaced one is new since it, the row the release bar on [tarball-attestation-observed](#tarball-attestation-observed) reads. Run at spec 2026-10-13: the gate binary built at the commit before loop-keyword-as-argument falls through on the unspaced spelling and grants the spaced one, so the unspaced grant is no older than that unit.
-
-**Cost while deferred:** a grant no row holds can widen or vanish under the next edit to the shared walk unseen. Surfaced 2026-10-11 by guard-rule-holes-pass' lead off that unit's diff and filed at its close. Re-verified there by runs through the hook member. Owner lookup: `bounded_wait`, `piped`, `done|cat` in this file and the disposed-findings record — none; `loop-keyword-as-argument`, done, DISTINCT (the keyword walk, which declared the unspaced spelling alone); owner guard-kit/SPEC.md §The generic ruleset.
-
 ### wait-no-producer-lead-evasion
 
 [spec: SPEC-wait-lead-read.md]
@@ -1251,4 +1239,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - guard-spelling-variant-oracle
 - git-rules-word-read-siblings
 - git-stash-glued-redirect-value
+- bounded-wait-piped-loop
 

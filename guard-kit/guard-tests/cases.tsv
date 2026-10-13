@@ -518,6 +518,14 @@ fallthrough	while pgrep worker >/dev/null 2>&1; do sleep 20; done; echo waited
 fallthrough	until gh run view 12 --json status 2>/dev/null | grep -q completed; do sleep 30; done
 # clause (d) — a tail statement rule `ro_pipeline` would not have granted standing alone
 fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done; git commit -m done
+# clause (d) holds a reader the loop is piped into as it holds a statement, behind `|` or `|&`
+# and with no blank around the pipe; a piped writer or a redirecting reader is withheld
+allow	until [ -f marker ]; do sleep 5; done | cat
+allow	until [ -f marker ]; do sleep 5; done|cat
+allow	until [ -f marker ]; do sleep 5; done |& cat
+fallthrough	until [ -f marker ]; do sleep 5; done | tee out.txt
+fallthrough	until [ -f marker ]; do sleep 5; done|rm -rf x
+fallthrough	until [ -f marker ]; do sleep 5; done | cat > out.txt
 # clause (e) — a backtick anywhere in the raw command; the `$(…)` spelling is
 # deliberately not a row, since rule `expansion` blocks it first and the row would pin
 # another rule's verdict
