@@ -4,33 +4,13 @@
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
+  **Push need (2026-10-13, inside the budget):** the closing push, and the release tag push beside it where close cuts the release this set is sized to unblock; no mid-iteration push, the decision tables running locally ahead of any remote leg.
+
+  **Unit set (operator direction, 2026-10-13, lead-relayed, not a ruling):** the five-entry set, scope's option C, where scope had recommended four.
+
 ---
 
 ## New Features
-
-### guard-drain-fix-unreviewed
-
-[spec: SPEC-lane-reach.md] [recurrence: 2026-10-13]
-
-a guard fix authored at the closing stage's drain reaches the closing push read by its author and the decision tables alone. For the third close running the second-vendor review found defects in guard fixes its own iteration landed; at guard-spelling-oracle-pass' close all three sat in the drain's fix, one of them a grant (`scratch-grant-glued-redirect`). The variant lane derived none of the three: two turn on a row that carries a quote, which the lane leaves underived, and one on a second redirect glued to a target, which no transform composes onto a grant row.
-
-**Deliverable:** the authoring stage's choice among three, or a combination: the drain promoting a finding whose fix moves a guard verdict in place of fixing it; the drain's guard fixes taking the review before they are committed; the lane deriving a quoted row and a doubled redirect. A form not taken is stated as the limit in guard-kit/SPEC.md §Testing.
-
-**Cost while deferred:** each iteration that edits a guard rule ends on a review finding in its own fix, and a cut the release bar holds is deferred again. Filed 2026-10-13 by guard-spelling-oracle-pass' lead as a recurrence judgment and promoted at the next scope's intake; `guard-spelling-variant-oracle`, done, recorded the shape's earlier recurrence, so its date rides this entry's first stamp. Owner lookup: `drain`, `second-vendor`, `underived` in this file and the disposed-findings record — [variant-lane-underived-tables](#variant-lane-underived-tables), DISTINCT (the PowerShell and consumer tables, where this is the bash lane's quoted rows and the drain's order); owner guard-kit/SPEC.md §Testing.
-
-**In the unit set (operator direction, 2026-10-13, lead-relayed, not a ruling)** `scratch-grant-glued-redirect` records. **Grant, unspent (operator, 2026-10-13, lead-relayed):** one foreign second-vendor review run at validate, its adapter unnamed; the lead asks for the adapter and reads its budget before that dispatch.
-
-### variant-lane-underived-tables
-
-[spec: SPEC-lane-reach.md]
-
-the guard decision tables' variant lane derives re-spellings from the two bash tables alone, which guard-kit/SPEC.md §Testing states as its limit: a PowerShell row and a consumer row keep only the spellings their author wrote.
-
-**Deliverable:** a PowerShell transform set (a doubled quote, a backtick escape, a cmdlet alias) over the two PowerShell tables, and the consumer lane's derivation as a consumer-selectable knob with off among its values, since deriving by default would let a kit release red a consumer's table.
-
-**Cost while deferred:** a PowerShell rule or a consumer rule misreading a re-spelling is met by a review or a user, never by the tables. Filed 2026-10-13 by guard-spelling-oracle-pass' spec and promoted at its close. Re-verified there by reading that section's limit sentence. Owner lookup: `variant`, `PowerShell`, `transform` in this file and the disposed-findings record — none; `guard-spelling-variant-oracle`, done, DISTINCT (the bash lane, landed); owner guard-kit/SPEC.md §Testing.
-
-**In the unit set (operator direction, 2026-10-13, lead-relayed, not a ruling)** `scratch-grant-glued-redirect` records, added to the four scope recommended. Where the authoring stage gives [guard-drain-fix-unreviewed](#guard-drain-fix-unreviewed) the lane form, the two add transforms to one lane and ride one amendment.
 
 ## Technical Debt
 
@@ -1263,4 +1243,6 @@ the manual-operation meter keys every arm called through the gate binary's door 
 - scratch-grant-glued-redirect
 - cat-operand-after-double-dash
 - sed-program-escaped-dash
+- guard-drain-fix-unreviewed
+- variant-lane-underived-tables
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Direct test of the shell guard's consumer stage, of --guard-json, the toolkit a consumer rule
-# command calls, and of --run-guard-tests' consumer lane and its limits-table read. Each stage case drives the shell-guard member from a scratch checkout under a
+# command calls, and of --run-guard-tests' consumer lane, its derivation and its limits-table read. Each stage case drives the shell-guard member from a scratch checkout under a
 # sandbox knob file naming a scratch rule command, so the command's exit, stdout and stderr are the
 # case's input and the member's relay of them is what is asserted.
 #
@@ -206,7 +206,8 @@ printf 'GUARD_KIT_CONSUMER_RULES_CMD[] = bash\nGUARD_KIT_CONSUMER_RULES_CMD[] = 
 printf 'block\tforbidden x\nfallthrough\tmake build\nblock\tat @ROOT@\n' >"$tmp/cwd/lane.tsv"
 eq "lane-green-status" "$(lane "$tmp/lane.knobs")" 0
 has "lane-green-count" "$tmp/out" "3 consumer case(s) from lane.tsv"
-has "lane-green-derived" "$tmp/out" "18 derived re-spelling(s) of the bash rows under 0 limit row(s)"
+has "lane-green-derived" "$tmp/out" "34 derived row(s) of the four tables under 0 limit row(s)"
+lacks "lane-green-underived" "$tmp/out" "derived re-spelling(s)"
 printf 'fallthrough\tforbidden x\nblock\tmake build\n' >"$tmp/cwd/lane.tsv"
 eq "lane-mismatch-status" "$(lane "$tmp/lane.knobs")" 1
 has "lane-mismatch-unblocked" "$tmp/out" "want 'fallthrough', got 'block' -- [consumer bash $tmp/lane-rule.sh] forbidden x"
@@ -218,6 +219,34 @@ printf 'GUARD_KIT_CONSUMER_CASES = lane.tsv\n' >"$tmp/lane-nocmd.knobs"
 eq "lane-nocmd-status" "$(lane "$tmp/lane-nocmd.knobs")" 2
 printf 'GUARD_KIT_CONSUMER_RULES_CMD[] = bash\nGUARD_KIT_CONSUMER_RULES_CMD[] = %s\nGUARD_KIT_CONSUMER_CASES = no-such.tsv\n' "$tmp/lane-rule.sh" >"$tmp/lane-nofile.knobs"
 eq "lane-nofile-status" "$(lane "$tmp/lane-nofile.knobs")" 2
+
+# --- the consumer lane's derivation: off where GUARD_KIT_CONSUMER_VARIANT_LIMITS is empty (above); a
+#     named table greens the re-spellings the consumer's command declines, reds one it does not
+#     declare and a row nothing needs, and the knob with no cases table or no readable table is a
+#     harness precondition
+derive_knobs() {  # $1=name $2=limits path, relative to the scratch checkout — a knob file naming it, its path echoed
+    printf 'GUARD_KIT_CONSUMER_RULES_CMD[] = bash\nGUARD_KIT_CONSUMER_RULES_CMD[] = %s\nGUARD_KIT_CONSUMER_CASES = lane.tsv\nGUARD_KIT_CONSUMER_VARIANT_LIMITS = %s\n' \
+        "$tmp/lane-rule.sh" "$2" >"$tmp/$1.knobs"
+    printf '%s' "$tmp/$1.knobs"
+}
+printf '# rule `cd_compound` — a section opener, its name the consumer'"'"'s own\nblock\tforbidden x\nfallthrough\tmake build\n' >"$tmp/cwd/lane.tsv"
+printf 'fallthrough\tcd_compound\t%s\n' sq-lead dq-lead esc-lead part-lead wrap-command >"$tmp/cwd/lane-limits.tsv"
+eq "derive-green-status" "$(lane "$(derive_knobs derive lane-limits.tsv)")" 0
+has "derive-green-count" "$tmp/out" "2 consumer case(s) from lane.tsv with 14 derived re-spelling(s) under 5 limit row(s) from lane-limits.tsv"
+: >"$tmp/cwd/lane-no-limits.tsv"
+eq "derive-undeclared-status" "$(lane "$(derive_knobs undeclared lane-no-limits.tsv)")" 1
+has "derive-undeclared-named" "$tmp/out" "want 'block', got 'fallthrough' -- [consumer bash $tmp/lane-rule.sh] [variant sq-lead of rule cd_compound, no limit row] 'forbidden' x"
+printf 'fallthrough\tcd_compound\t%s\n' sq-lead dq-lead esc-lead part-lead wrap-command sq-arg >"$tmp/cwd/lane-stale-limits.tsv"
+eq "derive-stale-status" "$(lane "$(derive_knobs stale lane-stale-limits.tsv)")" 1
+has "derive-stale-named" "$tmp/out" "limit row 'cd_compound sq-arg' admits a re-spelling that no longer fails"
+printf 'GUARD_KIT_CONSUMER_RULES_CMD[] = bash\nGUARD_KIT_CONSUMER_RULES_CMD[] = %s\nGUARD_KIT_CONSUMER_VARIANT_LIMITS = lane-limits.tsv\n' "$tmp/lane-rule.sh" >"$tmp/derive-nocases.knobs"
+eq "derive-nocases-status" "$(lane "$tmp/derive-nocases.knobs")" 2
+has "derive-nocases-named" "$tmp/out" "GUARD_KIT_CONSUMER_VARIANT_LIMITS"
+eq "derive-nofile-status" "$(lane "$(derive_knobs nofile no-such-limits.tsv)")" 2
+has "derive-nofile-named" "$tmp/out" "GUARD_KIT_CONSUMER_VARIANT_LIMITS"
+printf 'block\tcd_compound\tsq-lead\n' >"$tmp/cwd/lane-bad-limits.tsv"
+eq "derive-unreadable-status" "$(lane "$(derive_knobs unreadable lane-bad-limits.tsv)")" 2
+has "derive-unreadable-named" "$tmp/out" "GUARD_KIT_CONSUMER_VARIANT_LIMITS"
 
 # --- the variant lane reads the fifth positional: a limit row nothing needs is a mismatch, and a
 #     table it cannot read is a harness precondition
@@ -238,5 +267,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "consumer-rules.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "consumer-rules.test: ok ($checks assertions; the consumer command reads the payload bytes as received with the working directory and environment inherited, a block and a decision are relayed verbatim ahead of the generic ruleset, an empty result falls through to it, a fault — non-zero-non-2 exit, unparseable or non-object stdout, a command that cannot start — rides the ruleset's own answer and never silences it, an empty knob runs no stage; --guard-json field reads bytes verbatim and view prints the named view through the tool's reader, nothing for a tool no reader serves; a raw control byte is blocked by name before any rule; --run-guard-tests' consumer lane drives the consumer's rows against its command from the arm's working directory, reds a mismatch either way, is silent where no table is named, and refuses a table with no command or no file at exit 2; its variant lane counts the kit rows' re-spellings, reds a limit row nothing needs and refuses a limits table it cannot read at exit 2)"
+echo "consumer-rules.test: ok ($checks assertions; the consumer command reads the payload bytes as received with the working directory and environment inherited, a block and a decision are relayed verbatim ahead of the generic ruleset, an empty result falls through to it, a fault — non-zero-non-2 exit, unparseable or non-object stdout, a command that cannot start — rides the ruleset's own answer and never silences it, an empty knob runs no stage; --guard-json field reads bytes verbatim and view prints the named view through the tool's reader, nothing for a tool no reader serves; a raw control byte is blocked by name before any rule; --run-guard-tests' consumer lane drives the consumer's rows against its command from the arm's working directory, reds a mismatch either way, is silent where no table is named, and refuses a table with no command or no file at exit 2, and derives its rows' re-spellings only under a named limits table, held from both sides and refused at exit 2 with no cases table or no readable table; its variant lane counts the four tables' derived rows, reds a limit row nothing needs and refuses a limits table it cannot read at exit 2)"
 exit 0

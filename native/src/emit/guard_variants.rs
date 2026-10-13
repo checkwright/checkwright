@@ -1,10 +1,17 @@
-// spec: guard-kit/SPEC.md §Testing — the variant lane's deriver, its relation and its limits
-// ledger; the deriver is a lexer of its own and shares no function with the bash reader.
+// spec: guard-kit/SPEC.md §Testing — the variant lane's bash deriver, its two relations and its
+// limits ledger; the deriver is a lexer of its own and shares no function with the bash reader.
+use super::guard_ps_variants;
 
 pub const QUOTE_FORMS: &[&str] = &["sq", "dq", "esc", "part"];
 pub const SITE_KINDS: &[&str] = &["lead", "arg"];
 pub const SPACING: &[&str] = &["redirect-tight", "redirect-apart", "dup-apart", "word-glued", "separator-tight"];
 pub const WRAP: &str = "wrap-command";
+pub const ADDED_WRITES: &[(&str, &str)] = &[
+    ("added-write", " >tracked.md"),
+    ("added-write-glued", ">tracked.md"),
+    ("added-append-glued", ">>tracked.md"),
+    ("added-dup-glued", ">&tracked.md"),
+];
 
 const RESERVED: &[&str] = &[
     "if", "then", "else", "elif", "fi", "for", "while", "until", "do", "done", "case", "esac", "in", "function",
@@ -12,7 +19,8 @@ const RESERVED: &[&str] = &[
 ];
 const NAME_TAKERS: &[&str] = &["for", "select", "case", "function"];
 const STATEMENT_OPENERS: &[&str] = &["if", "then", "else", "elif", "while", "until", "do", "!", "time"];
-const INELIGIBLE: &[&str] = &["'", "\"", "\\", "$", "`", "#", "(", ")", "{", "}", "[[", "<<", "@NL@"];
+const INELIGIBLE: &[&str] = &["\\", "$", "`", "#", "(", ")", "{", "}", "[[", "<<", "@NL@"];
+const NO_WORD_END: &[&str] = &["#", "<<", "@NL@"];
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Variant {
@@ -23,13 +31,58 @@ pub struct Variant {
 pub fn is_transform(name: &str) -> bool {
     name == WRAP
         || SPACING.contains(&name)
+        || ADDED_WRITES.iter().any(|(added, _)| *added == name)
+        || guard_ps_variants::TRANSFORMS.contains(&name)
         || name
             .split_once('-')
             .is_some_and(|(form, kind)| QUOTE_FORMS.contains(&form) && SITE_KINDS.contains(&kind))
 }
 
 pub fn eligible(cell: &str) -> bool {
-    !INELIGIBLE.iter().any(|mark| cell.contains(mark))
+    !INELIGIBLE.iter().any(|mark| cell.contains(mark)) && outside(cell).is_some()
+}
+
+fn quote(b: u8) -> bool {
+    b == b'\'' || b == b'"'
+}
+
+fn outside(cell: &str) -> Option<Vec<bool>> {
+    let bytes = cell.as_bytes();
+    let mut mask = vec![true; bytes.len()];
+    let mut at = 0;
+    while at < bytes.len() {
+        if quote(bytes[at]) {
+            let close = at + 1 + bytes[at + 1..].iter().position(|&b| b == bytes[at])?;
+            mask[at..=close].fill(false);
+            at = close;
+        }
+        at += 1;
+    }
+    Some(mask)
+}
+
+pub fn takes_added_write(cell: &str) -> bool {
+    !NO_WORD_END.iter().any(|mark| cell.contains(mark))
+        && outside(cell).is_some()
+        && cell.as_bytes().last().is_some_and(|&b| plain(b) || quote(b))
+}
+
+pub fn added_writes(cell: &str) -> Vec<Variant> {
+    if !takes_added_write(cell) {
+        return Vec::new();
+    }
+    ADDED_WRITES
+        .iter()
+        .map(|(name, text)| Variant { transform: name.to_string(), cell: format!("{}{}", cell, text) })
+        .collect()
+}
+
+pub fn added_relation(got: &str) -> Held {
+    match got {
+        "block" | "advise" | "fallthrough" => Held::Holds,
+        _ if granted(got) => Held::Limitable,
+        _ => Held::Never,
+    }
 }
 
 fn blank(b: u8) -> bool {
@@ -44,17 +97,18 @@ fn operator_char(b: u8) -> bool {
     b";|&<>".contains(&b)
 }
 
-fn tokens(cell: &str) -> Vec<(usize, usize)> {
+fn tokens(cell: &str, mask: &[bool]) -> Vec<(usize, usize)> {
     let bytes = cell.as_bytes();
+    let parts = |at: usize| blank(bytes[at]) && mask[at];
     let mut out = Vec::new();
     let mut at = 0;
     while at < bytes.len() {
-        if blank(bytes[at]) {
+        if parts(at) {
             at += 1;
             continue;
         }
         let start = at;
-        while at < bytes.len() && !blank(bytes[at]) {
+        while at < bytes.len() && !parts(at) {
             at += 1;
         }
         out.push((start, at));
@@ -75,8 +129,8 @@ struct Site {
     lead: bool,
 }
 
-fn sites(cell: &str) -> Vec<Site> {
-    let toks = tokens(cell);
+fn sites(cell: &str, mask: &[bool]) -> Vec<Site> {
+    let toks = tokens(cell, mask);
     let mut out = Vec::new();
     for (i, &(start, end)) in toks.iter().enumerate() {
         let token = &cell[start..end];
@@ -84,7 +138,7 @@ fn sites(cell: &str) -> Vec<Site> {
         let len = token.bytes().take_while(|&b| plain(b)).count();
         let (head, rest) = token.split_at(len);
         let descriptor = head.bytes().all(|b| b.is_ascii_digit()) && rest.starts_with(['<', '>']);
-        if token.contains('@')
+        if token.contains(['@', '\'', '"'])
             || len < 2
             || RESERVED.contains(&head)
             || !rest.bytes().next().map_or(true, operator_char)
@@ -103,8 +157,8 @@ fn spliced(cell: &str, from: usize, to: usize, with: &str) -> String {
     format!("{}{}{}", &cell[..from], with, &cell[to..])
 }
 
-fn quote_variants(cell: &str, out: &mut Vec<Variant>) {
-    for site in sites(cell) {
+fn quote_variants(cell: &str, mask: &[bool], out: &mut Vec<Variant>) {
+    for site in sites(cell, mask) {
         let head = &cell[site.start..site.start + site.len];
         let (front, back) = head.split_at(site.len / 2);
         let kind = if site.lead { "lead" } else { "arg" };
@@ -130,11 +184,11 @@ fn blanks_after(bytes: &[u8], at: usize) -> usize {
     bytes[at..].iter().take_while(|&&b| blank(b)).count()
 }
 
-fn redirect_variants(cell: &str, out: &mut Vec<Variant>) {
+fn redirect_variants(cell: &str, mask: &[bool], out: &mut Vec<Variant>) {
     let bytes = cell.as_bytes();
     let mut at = 0;
     while at < bytes.len() {
-        if bytes[at] != b'<' && bytes[at] != b'>' {
+        if !mask[at] || (bytes[at] != b'<' && bytes[at] != b'>') {
             at += 1;
             continue;
         }
@@ -173,13 +227,14 @@ fn redirect_variants(cell: &str, out: &mut Vec<Variant>) {
     }
 }
 
-fn separator_variants(cell: &str, out: &mut Vec<Variant>) {
+fn separator_variants(cell: &str, mask: &[bool], out: &mut Vec<Variant>) {
     let bytes = cell.as_bytes();
     let mut at = 0;
     while at < bytes.len() {
         let prev = at.checked_sub(1).map(|p| bytes[p]);
         let next = bytes.get(at + 1).copied();
         let len = match bytes[at] {
+            _ if !mask[at] => 0,
             b';' if next != Some(b';') && next != Some(b'&') && prev != Some(b';') => 1,
             b'&' if next == Some(b'&') && prev.map_or(true, |b| !b"&<>|".contains(&b)) => 2,
             b'|' if prev != Some(b'>') && prev != Some(b'|') => match next {
@@ -209,14 +264,15 @@ fn separator_variants(cell: &str, out: &mut Vec<Variant>) {
 
 pub fn derive(cell: &str) -> Vec<Variant> {
     let mut out = Vec::new();
-    if !eligible(cell) {
+    let Some(mask) = outside(cell).filter(|_| eligible(cell)) else {
         return out;
-    }
-    quote_variants(cell, &mut out);
-    redirect_variants(cell, &mut out);
-    separator_variants(cell, &mut out);
-    let first = tokens(cell).first().map(|t| t.0);
-    if sites(cell).first().is_some_and(|s| Some(s.start) == first) {
+    };
+    let mask = mask.as_slice();
+    quote_variants(cell, mask, &mut out);
+    redirect_variants(cell, mask, &mut out);
+    separator_variants(cell, mask, &mut out);
+    let first = tokens(cell, mask).first().map(|t| t.0);
+    if sites(cell, mask).first().is_some_and(|s| Some(s.start) == first) {
         out.push(Variant { transform: WRAP.to_string(), cell: format!("command {}", cell) });
     }
     out
@@ -393,11 +449,64 @@ mod tests {
     #[test]
     fn an_ineligible_row_derives_nothing() {
         for cell in [
-            "echo 'a b'", "echo \"a\"", "echo a\\ b", "echo $HOME", "echo `pwd`", "ls # note", "(ls)", "ls {a,b}",
+            "echo 'a b", "echo \"a", "echo 'a\" b", "echo a\\ b", "echo $HOME", "echo `pwd`", "ls # note", "(ls)", "ls {a,b}",
             "[[ -f x ]]", "cat <<EOF@NL@x@NL@EOF", "printf x@NL@ls",
         ] {
             assert!(!eligible(cell), "{}", cell);
             assert!(derive(cell).is_empty(), "{}", cell);
+        }
+    }
+
+    #[test]
+    fn a_quoted_span_is_part_of_its_token_and_no_transform_reads_inside_it() {
+        assert_eq!(cells("echo 'a b' deploy", "sq-arg"), ["echo 'a b' 'deploy'"], "a blank in a span ends no token");
+        assert_eq!(cells("echo 'a b' deploy", "sq-lead"), ["'echo' 'a b' deploy"]);
+        assert_eq!(cells("grep 'x; ls' notes.md", "sq-lead"), ["'grep' 'x; ls' notes.md"], "a separator in a span opens no statement");
+        assert_eq!(cells("echo \"it's\" deploy", "dq-arg"), ["echo \"it's\" \"deploy\""], "the other quote is text in a span");
+        assert_eq!(cells("echo hi'x'", "sq-arg"), Vec::<String>::new(), "a token carrying a quote is no site");
+        assert_eq!(cells("echo hi;'x y'", "sq-arg"), Vec::<String>::new());
+        assert_eq!(cells("echo 'a > b' > out.txt", "redirect-tight"), ["echo 'a > b' >out.txt"]);
+        assert_eq!(cells("echo 'a > b' > out.txt", "word-glued"), Vec::<String>::new(), "a closing quote is no plain word end");
+        assert_eq!(cells("echo hi > 'out file.txt'", "redirect-tight"), ["echo hi >'out file.txt'"]);
+        assert_eq!(cells("echo 'a ; b' ; ls", "separator-tight"), ["echo 'a ; b';ls"]);
+        assert_eq!(cells("echo 'a 2>&1 b'", "dup-apart"), Vec::<String>::new());
+        assert_eq!(cells("git commit -m 'x y'", WRAP), ["command git commit -m 'x y'"]);
+        assert_eq!(cells("'git' status", WRAP), Vec::<String>::new(), "a quoted first token is no lead site");
+    }
+
+    #[test]
+    fn the_added_writes_append_to_a_cell_whose_end_a_redirect_can_follow() {
+        let got: Vec<(String, String)> = added_writes("ls").into_iter().map(|v| (v.transform, v.cell)).collect();
+        let want = [
+            ("added-write", "ls >tracked.md"),
+            ("added-write-glued", "ls>tracked.md"),
+            ("added-append-glued", "ls>>tracked.md"),
+            ("added-dup-glued", "ls>&tracked.md"),
+        ];
+        assert_eq!(got, want.map(|(t, c)| (t.to_string(), c.to_string())));
+        assert_eq!(added_writes("echo \"$HOME\"")[1].cell, "echo \"$HOME\">tracked.md", "an expansion is no exclusion here");
+        assert_eq!(added_writes(": > .tmp/a").len(), 4);
+        for cell in ["ls # note", "cat <<EOF@NL@x@NL@EOF", "printf x@NL@ls", "echo 'a", "ls &", "ls;", "(ls)", "ls |", ""] {
+            assert!(added_writes(cell).is_empty(), "{}", cell);
+        }
+        for (name, _) in ADDED_WRITES {
+            assert!(is_transform(name), "{}", name);
+        }
+    }
+
+    #[test]
+    fn an_added_write_is_never_granted_whatever_its_row() {
+        use Held::*;
+        for (got, want) in [
+            ("block", Holds),
+            ("advise", Holds),
+            ("fallthrough", Holds),
+            ("allow", Limitable),
+            ("rewrite", Limitable),
+            ("exit3", Never),
+            ("unknown", Never),
+        ] {
+            assert_eq!(added_relation(got), want, "{}", got);
         }
     }
 

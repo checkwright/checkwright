@@ -69,10 +69,10 @@ Run this arm the same way:
 
 ```sh
 gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
-"$gates" --run-guard-tests    # decision-table over the generic ruleset, its rows' re-spellings, then your own rules' table
+"$gates" --run-guard-tests    # decision-table over the generic ruleset, its bash and PowerShell rows' re-spellings and each bash row under an added write, then your own rules' table
 ```
 
-To test your own rules, name a table in `cases.tsv`'s grammar with `GUARD_KIT_CONSUMER_CASES`, a firing and a non-firing row per rule; the arm runs its rows against your rule command ([guard-kit/SPEC.md §Testing](SPEC.md#testing)).
+To test your own rules, name a table in `cases.tsv`'s grammar with `GUARD_KIT_CONSUMER_CASES`, a firing and a non-firing row per rule; the arm runs its rows against your rule command. Name a limits table with `GUARD_KIT_CONSUMER_VARIANT_LIMITS` to have those rows' re-spellings derived and held to it ([guard-kit/SPEC.md §Testing](SPEC.md#testing)).
 
 ## License
 

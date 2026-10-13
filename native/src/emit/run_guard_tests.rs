@@ -3,16 +3,19 @@
 // which `Arm::Emit` collapses to 0-or-2.
 // spec: gate-sdk/SPEC.md §The non-gate arm — an arm table member rather than a hardcoded
 // top-level flag, because the member is configured: it needs the vendored guard-kit root.
-use super::guard_variants::{self, Admit, Held, Ledger};
+use super::guard_ps_variants;
+use super::guard_variants::{self, Admit, Held, Ledger, Variant};
 use crate::proc;
 use crate::programs;
 use crate::walk;
 use std::path::Path;
 
 // spec: guard-kit/SPEC.md §Testing — the declared roster and its omissions are ruled there.
-pub const KNOBS: &[&str] = &["GATE_SDK_KIT_DIRS", "GUARD_KIT_CONSUMER_RULES_CMD", "GUARD_KIT_CONSUMER_CASES"];
+pub const KNOBS: &[&str] =
+    &["GATE_SDK_KIT_DIRS", "GUARD_KIT_CONSUMER_RULES_CMD", "GUARD_KIT_CONSUMER_CASES", LIMITS_KNOB];
 
 const CASES_KNOB: &str = "GUARD_KIT_CONSUMER_CASES";
+const LIMITS_KNOB: &str = "GUARD_KIT_CONSUMER_VARIANT_LIMITS";
 
 const NAME: &str = "run-guard-tests";
 
@@ -90,7 +93,8 @@ fn execute(args: &[String]) -> Result<i32, String> {
         ));
     }
     let kit_ran = tally.ran;
-    let (derived, limit_rows) = variant_lane(&mut tally, &sandbox.root, &log, &cases, &bg_cases, &limits)?;
+    let tables = [(cases.as_str(), false, "Bash"), (bg_cases.as_str(), true, "Bash"), (ps_cases.as_str(), false, "PowerShell"), (ps_bg_cases.as_str(), true, "PowerShell")];
+    let (derived, limit_rows) = variant_lane(&mut tally, &sandbox.root, &log, &tables, &limits)?;
     let consumer = consumer_lane(&mut tally)?;
     if tally.fails > 0 {
         println!(
@@ -99,58 +103,61 @@ fn execute(args: &[String]) -> Result<i32, String> {
         );
         return Ok(1);
     }
-    let consumer_note = consumer.map_or(String::new(), |(n, table)| format!(", and {} consumer case(s) from {}", n, table));
+    let consumer_note = consumer.map_or(String::new(), |c| {
+        let derived_note = c.derived.map_or(String::new(), |(n, limit_rows, limits)| {
+            format!(" with {} derived re-spelling(s) under {} limit row(s) from {}", n, limit_rows, limits)
+        });
+        format!(", and {} consumer case(s) from {}{}", c.rows, c.table, derived_note)
+    });
     println!(
-        "{}: ok ({} cases across the generic ruleset, the backgrounding arm, the PowerShell reader and its backgrounding arm, and {} derived re-spelling(s) of the bash rows under {} limit row(s){})",
+        "{}: ok ({} cases across the generic ruleset, the backgrounding arm, the PowerShell reader and its backgrounding arm, and {} derived row(s) of the four tables under {} limit row(s){})",
         NAME, kit_ran, derived, limit_rows, consumer_note
     );
     Ok(0)
 }
 
-// spec: guard-kit/SPEC.md §Testing — the variant lane: each bash row's re-spellings fed as the row
-// is, held to the one-sided relation, a failure green only under a limit row held from both sides.
+// spec: guard-kit/SPEC.md §Testing — the variant lane: each row's re-spellings fed as the row is
+// and held to the one-sided relation, each bash row's added writes held to never being granted, a
+// failure green only under a limit row held from both sides.
 fn variant_lane(
     tally: &mut Tally,
     root: &str,
     log: &str,
-    cases: &str,
-    bg_cases: &str,
+    tables: &[(&str, bool, &str)],
     limits: &str,
 ) -> Result<(usize, usize), String> {
     let mut ledger =
         Ledger::parse(&rows(limits, 3)?, limits).map_err(|e| format!("{}: {}", NAME, e))?;
     let mut derived = 0;
-    for (table, flagged) in [(cases, false), (bg_cases, true)] {
+    for &(table, flagged, tool) in tables {
         let base = sectioned(table, if flagged { 3 } else { 2 })?;
         let authored: std::collections::HashSet<(&str, &str)> =
             base.iter().map(|(_, r)| if flagged { (r[1].as_str(), r[2].as_str()) } else { ("", r[1].as_str()) }).collect();
         for (section, row) in &base {
             let (want, flag, cell) = if flagged { (&row[0], row[1].as_str(), &row[2]) } else { (&row[0], "", &row[1]) };
-            for variant in guard_variants::derive(cell) {
+            let (respelled, added) = if tool == "Bash" {
+                (guard_variants::derive(cell), guard_variants::added_writes(cell))
+            } else {
+                (guard_ps_variants::derive(cell), Vec::new())
+            };
+            let all = respelled.iter().map(|v| (v, false)).chain(added.iter().map(|v| (v, true)));
+            for (variant, is_added) in all {
                 if authored.contains(&(flag, variant.cell.as_str())) {
                     continue;
                 }
                 let cmd = substitute(&variant.cell, root);
-                let got = decide(root, log, &cmd, flagged.then_some(flag), "Bash")?;
+                let got = decide(root, log, &cmd, flagged.then_some(flag), tool)?;
                 derived += 1;
                 tally.ran += 1;
-                let held = guard_variants::relation(want, &got);
-                if held == Held::Holds {
+                let held = if is_added { guard_variants::added_relation(&got) } else { guard_variants::relation(want, &got) };
+                let Some(why) = unadmitted(&mut ledger, held, section.as_deref(), variant, &got) else {
                     continue;
-                }
-                let rule = section.as_deref().map_or("no rule section".to_string(), |s| format!("rule {}", s));
-                let why = match held {
-                    Held::Never => "no limit admits this class",
-                    _ => match ledger.admit(section.as_deref(), &variant.transform, &got) {
-                        Admit::Admitted => continue,
-                        Admit::NoLimit => "no limit row",
-                        Admit::BelowFloor => "below its limit row's floor",
-                    },
                 };
+                let tool_note = if tool == "Bash" { "" } else { " [PowerShell]" };
                 let flag_note = if flagged { format!(" [run_in_background={}]", flag) } else { String::new() };
                 println!(
-                    "  FAIL: want '{}', got '{}' -- [--hook shell-guard] [variant {} of {}, {}]{} {}",
-                    want, got, variant.transform, rule, why, flag_note, cmd
+                    "  FAIL: want '{}', got '{}' -- [--hook shell-guard]{} [variant {} of {}, {}]{} {}",
+                    want, got, tool_note, variant.transform, rule_label(section.as_deref()), why, flag_note, cmd
                 );
                 tally.fails += 1;
             }
@@ -164,10 +171,40 @@ fn variant_lane(
     Ok((derived, ledger.len()))
 }
 
+fn unadmitted(ledger: &mut Ledger, held: Held, section: Option<&str>, variant: &Variant, got: &str) -> Option<&'static str> {
+    match held {
+        Held::Holds => None,
+        Held::Never => Some("no limit admits this class"),
+        Held::Limitable => match ledger.admit(section, &variant.transform, got) {
+            Admit::Admitted => None,
+            Admit::NoLimit => Some("no limit row"),
+            Admit::BelowFloor => Some("below its limit row's floor"),
+        },
+    }
+}
+
+fn rule_label(section: Option<&str>) -> String {
+    section.map_or("no rule section".to_string(), |s| format!("rule {}", s))
+}
+
+struct Consumer {
+    rows: usize,
+    table: String,
+    derived: Option<(usize, usize, String)>,
+}
+
 // spec: guard-kit/SPEC.md §Testing — the consumer lane: the consumer's rows against its own
-// command, spawned directly from the arm's working directory; `None` where no table is named.
-fn consumer_lane(tally: &mut Tally) -> Result<Option<(usize, String)>, String> {
+// command, spawned directly from the arm's working directory; `None` where no table is named, and
+// the rows' bash re-spellings derived only where the consumer names its limits table.
+fn consumer_lane(tally: &mut Tally) -> Result<Option<Consumer>, String> {
     let table = crate::walk::knob_scalar(CASES_KNOB)?;
+    let limits = crate::walk::knob_scalar(LIMITS_KNOB)?;
+    if table.is_empty() && !limits.is_empty() {
+        return Err(format!(
+            "{}: {} names {} but {} is empty, so there are no rows to derive",
+            NAME, LIMITS_KNOB, limits, CASES_KNOB
+        ));
+    }
     if table.is_empty() {
         return Ok(None);
     }
@@ -187,15 +224,56 @@ fn consumer_lane(tally: &mut Tally) -> Result<Option<(usize, String)>, String> {
     let args: Vec<&str> = rest.iter().map(String::as_str).collect();
     let set = [("GATE_SDK_NATIVE_BIN".to_string(), bin)];
     let env = proc::ChildEnv { set: &set, unset: &[], cwd: None };
-    let before = tally.ran;
-    for row in rows(&table, 2)? {
-        let cmd = substitute(&row[1], &root);
-        let done = proc::run_with_stdin_in(&program, &args, payload(&cmd, None, "Bash").as_bytes(), &env)?;
-        let out = String::from_utf8_lossy(done.streams().0).into_owned();
-        let got = classify(done.reported_code(), out.trim_end_matches('\n'));
-        tally.check(&row[0], &got, &format!("[consumer {}] {}", argv.join(" "), cmd));
+    let mut ledger = None;
+    if !limits.is_empty() {
+        if !Path::new(&limits).is_file() {
+            return Err(format!("{}: {} names {}, which is not a readable file", NAME, LIMITS_KNOB, limits));
+        }
+        let parsed = Ledger::parse(&rows(&limits, 3)?, &limits).map_err(|e| format!("{}: {}: {}", NAME, LIMITS_KNOB, e))?;
+        ledger = Some(parsed);
     }
-    Ok(Some((tally.ran - before, table)))
+    let ask = |cmd: &str| -> Result<String, String> {
+        let done = proc::run_with_stdin_in(&program, &args, payload(cmd, None, "Bash").as_bytes(), &env)?;
+        let out = String::from_utf8_lossy(done.streams().0).into_owned();
+        Ok(classify(done.reported_code(), out.trim_end_matches('\n')))
+    };
+    let label = format!("[consumer {}]", argv.join(" "));
+    let base = sectioned(&table, 2)?;
+    for (_, row) in &base {
+        let cmd = substitute(&row[1], &root);
+        tally.check(&row[0], &ask(&cmd)?, &format!("{} {}", label, cmd));
+    }
+    let Some(mut ledger) = ledger else {
+        return Ok(Some(Consumer { rows: base.len(), table, derived: None }));
+    };
+    let authored: std::collections::HashSet<&str> = base.iter().map(|(_, r)| r[1].as_str()).collect();
+    let mut derived = 0;
+    for (section, row) in &base {
+        for variant in guard_variants::derive(&row[1]) {
+            if authored.contains(variant.cell.as_str()) {
+                continue;
+            }
+            let cmd = substitute(&variant.cell, &root);
+            let got = ask(&cmd)?;
+            derived += 1;
+            tally.ran += 1;
+            let held = guard_variants::relation(&row[0], &got);
+            let Some(why) = unadmitted(&mut ledger, held, section.as_deref(), &variant, &got) else {
+                continue;
+            };
+            println!(
+                "  FAIL: want '{}', got '{}' -- {} [variant {} of {}, {}] {}",
+                row[0], got, label, variant.transform, rule_label(section.as_deref()), why, cmd
+            );
+            tally.fails += 1;
+        }
+    }
+    for finding in ledger.stale() {
+        println!("  FAIL: {} -- {}", finding, limits);
+        tally.fails += 1;
+    }
+    tally.ran += ledger.len();
+    Ok(Some(Consumer { rows: base.len(), table, derived: Some((derived, ledger.len(), limits)) }))
 }
 
 // spec: guard-kit/SPEC.md §Testing — the guard reads its knobs from the binary, and the

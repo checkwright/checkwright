@@ -44,6 +44,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("GUARD_KIT_SCRATCH_POWERSHELL", ""),
         Row::indexed("GUARD_KIT_CONSUMER_RULES_CMD", &[]),
         Row::scalar("GUARD_KIT_CONSUMER_CASES", ""),
+        Row::scalar("GUARD_KIT_CONSUMER_VARIANT_LIMITS", ""),
     ],
     validate: Some(("guard config", validate)),
     open_family: false,

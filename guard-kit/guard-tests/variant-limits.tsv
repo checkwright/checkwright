@@ -1,6 +1,10 @@
 # guard-kit variant limits — <floor><TAB><rule><TAB><transform>, read by the variant lane of
 # --run-guard-tests (guard-kit/SPEC.md §Testing). A row is deleted in the commit that lifts its
-# read, and the lane fails on a row nothing needs.
+# read or withholds its grant, and the lane fails on a row nothing needs.
+allow	abs_script	added-append-glued
+allow	abs_script	added-dup-glued
+allow	abs_script	added-write
+allow	abs_script	added-write-glued
 fallthrough	allowlist_chain	dq-arg
 fallthrough	allowlist_chain	dq-lead
 fallthrough	allowlist_chain	esc-arg
@@ -13,6 +17,7 @@ fallthrough	allowlist_chain	wrap-command
 fallthrough	background_no_record	dq-lead
 fallthrough	background_no_record	esc-lead
 fallthrough	background_no_record	part-lead
+fallthrough	background_no_record	ps-tick-lead
 fallthrough	background_no_record	sq-lead
 fallthrough	bare_sleep	dq-lead
 fallthrough	bare_sleep	esc-lead
@@ -27,6 +32,7 @@ fallthrough	cat_file	wrap-command
 fallthrough	cd_compound	dq-lead
 fallthrough	cd_compound	esc-lead
 fallthrough	cd_compound	part-lead
+fallthrough	cd_compound	ps-tick-lead
 fallthrough	cd_compound	sq-lead
 fallthrough	cd_compound	wrap-command
 fallthrough	emitter_write	dq-lead
@@ -66,6 +72,7 @@ fallthrough	pgrep_self_match	wrap-command
 fallthrough	rm_tracked	dq-lead
 fallthrough	rm_tracked	esc-lead
 fallthrough	rm_tracked	part-lead
+fallthrough	rm_tracked	ps-tick-lead
 fallthrough	rm_tracked	sq-lead
 fallthrough	rm_tracked	wrap-command
 fallthrough	ro_pipeline	dq-arg
@@ -79,6 +86,9 @@ fallthrough	ro_pipeline	sq-lead
 fallthrough	ro_pipeline	wrap-command
 fallthrough	scratch_redirect	dq-arg
 fallthrough	scratch_redirect	part-arg
+fallthrough	scratch_redirect	ps-dq-arg
+fallthrough	scratch_redirect	ps-sq-arg
+fallthrough	scratch_redirect	ps-tick-arg
 fallthrough	scratch_redirect	sq-arg
 fallthrough	script_interpreter	dq-arg
 fallthrough	script_interpreter	dq-lead
@@ -86,7 +96,28 @@ fallthrough	script_interpreter	esc-arg
 fallthrough	script_interpreter	esc-lead
 fallthrough	script_interpreter	part-arg
 fallthrough	script_interpreter	part-lead
+fallthrough	script_interpreter	ps-dq-arg
+fallthrough	script_interpreter	ps-sq-arg
+fallthrough	script_interpreter	ps-tick-lead
 fallthrough	script_interpreter	sq-arg
 fallthrough	script_interpreter	sq-lead
 fallthrough	script_interpreter	word-glued
 fallthrough	script_interpreter	wrap-command
+fallthrough	sed_file	dq-arg
+fallthrough	sed_file	dq-lead
+fallthrough	sed_file	esc-arg
+fallthrough	sed_file	esc-lead
+allow	sed_file	part-arg
+fallthrough	sed_file	part-lead
+fallthrough	sed_file	sq-arg
+fallthrough	sed_file	sq-lead
+fallthrough	sed_file	wrap-command
+fallthrough	shell_wrapper	dq-arg
+fallthrough	shell_wrapper	dq-lead
+fallthrough	shell_wrapper	esc-arg
+fallthrough	shell_wrapper	esc-lead
+fallthrough	shell_wrapper	part-arg
+fallthrough	shell_wrapper	part-lead
+fallthrough	shell_wrapper	sq-arg
+fallthrough	shell_wrapper	sq-lead
+fallthrough	shell_wrapper	wrap-command

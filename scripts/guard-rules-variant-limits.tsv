@@ -1,0 +1,22 @@
+# This repo's consumer variant limits — <floor><TAB><rule><TAB><transform>, read by the consumer
+# lane of --run-guard-tests where GUARD_KIT_CONSUMER_VARIANT_LIMITS names this file
+# (guard-kit/SPEC.md §Testing). A rule is a section of scripts/guard-rules-cases.tsv.
+fallthrough	git_clean_ignored	dq-arg
+fallthrough	git_clean_ignored	dq-lead
+fallthrough	git_clean_ignored	esc-arg
+fallthrough	git_clean_ignored	esc-lead
+fallthrough	git_clean_ignored	part-arg
+fallthrough	git_clean_ignored	part-lead
+fallthrough	git_clean_ignored	sq-arg
+fallthrough	git_clean_ignored	sq-lead
+fallthrough	hook_bypass	dq-arg
+fallthrough	hook_bypass	dq-lead
+fallthrough	hook_bypass	esc-arg
+fallthrough	hook_bypass	esc-lead
+fallthrough	hook_bypass	part-arg
+fallthrough	hook_bypass	part-lead
+fallthrough	hook_bypass	sq-arg
+fallthrough	hook_bypass	sq-lead
+fallthrough	session_scratchpad	dq-arg
+fallthrough	session_scratchpad	part-arg
+fallthrough	session_scratchpad	sq-arg
