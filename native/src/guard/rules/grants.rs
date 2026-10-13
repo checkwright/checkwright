@@ -727,8 +727,8 @@ fn slot_capture(sv: &str, off: usize, len: usize, token: &str, start: bool, righ
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — the grant test on a rewritten command, rule
-// `worktree_confinement`'s predicate first: every segment matches a committed allow pattern and rule
-// `grant_path_slot`'s test finds no reach and can decide.
+// `worktree_confinement`'s predicate first: no redirect names a file, every segment matches a
+// committed allow pattern and rule `grant_path_slot`'s test finds no reach and can decide.
 pub fn rewrite_granted(ctx: &Ctx, c: &Cmd) -> Result<bool, Fault> {
     if refused(ctx, c)? {
         return Ok(false);
@@ -737,7 +737,10 @@ pub fn rewrite_granted(ctx: &Ctx, c: &Cmd) -> Result<bool, Fault> {
     if inners.is_empty() {
         return Ok(false);
     }
-    ctx.view(c, SqDqHd)?;
+    let skel = ctx.view(c, SqDqHd)?;
+    if redirect_targets(&skel).iter().any(|t| !inert_target(t)) {
+        return Ok(false);
+    }
     let Some(v) = ctx.dequoted(c)? else { return Ok(false) };
     for seg in ctx.segments(&v) {
         if shell_backgrounds(&seg) {

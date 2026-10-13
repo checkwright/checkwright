@@ -51,12 +51,23 @@ fn sed_plain_option(t: &str) -> bool {
 // per tool: the program word, its file operands and every program text on the command line; `None`
 // on an awk, perl or python option the table does not carry.
 fn program_operands(tool: &str, seg: &str) -> Option<Program> {
+    program_operands_read(tool, seg, None)
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — the walk with a segment's word read beside it: a
+// `sed` option is tested on its word's value.
+fn program_operands_read(tool: &str, seg: &str, read: Option<&Vec<Word>>) -> Option<Program> {
     let mut p = Program::default();
     let (mut skip, mut ends, mut have_prog) = ("", false, false);
     let digit_op = |t: &str, op: &str| t.len() == 1 + op.len() && t.as_bytes()[0].is_ascii_digit() && &t[1..] == op;
-    for raw_tok in words(seg).into_iter().skip(1) {
+    let skel = words(seg);
+    let read = read.filter(|ws| ws.len() == skel.len());
+    for (at, raw_tok) in skel.into_iter().enumerate().skip(1) {
         let tok = text::unsentinel(raw_tok);
-        let t = tok.as_str();
+        let t = match read {
+            Some(ws) if tool == "sed" && !ends && skip.is_empty() => ws[at].value.as_str(),
+            _ => tok.as_str(),
+        };
         if !skip.is_empty() {
             if skip == "prog" {
                 have_prog = true;
@@ -203,8 +214,9 @@ fn program_operands(tool: &str, seg: &str) -> Option<Program> {
 pub fn sed_file(ctx: &Ctx) -> Decided {
     let s = ctx.view(ctx.cmd(), SqDqHd)?;
     let door = &ctx.host().door;
-    for seg in ctx.segments(&s) {
-        let seg = trim_start(&seg);
+    let read = ctx.word_read(ctx.cmd())?.unwrap_or_default();
+    for (i, seg) in ctx.segments(&s).iter().enumerate() {
+        let seg = trim_start(seg);
         let tool = if seg == "sed" || starts_word(seg, "sed") {
             "sed"
         } else if starts_word(seg, "perl") {
@@ -212,7 +224,7 @@ pub fn sed_file(ctx: &Ctx) -> Decided {
         } else {
             continue;
         };
-        let Some(p) = program_operands(tool, seg) else { continue };
+        let Some(p) = program_operands_read(tool, seg, read.get(i)) else { continue };
         if p.inplace && (tool == "sed" || !p.operands.is_empty()) {
             return block(format!("don't rewrite a file with '{} -i' — use the rewrite arm: '{} --rewrite [--regex] [--expect <n>] [--] <find> <replace> <file>…' replaces a literal (or, with --regex, a line-scoped POSIX ERE) with fixed text across every named file and prints each changed span. For an edit a fixed replacement cannot express (a capture group, a deletion keyed on context), use the Edit tool. If you genuinely need the in-place edit, run it yourself with !<command>.", tool, door));
         }

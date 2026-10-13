@@ -52,6 +52,12 @@ fallthrough	some-runner > .tmp/op.err 2>&1
 #          unallowlisted scratch script and for a runner glob reached past its slot
 rewrite	bash @ROOT@/scripts/check-foo.sh
 rewrite	@ROOT@/scripts/check-env.sh --list
+#          a redirect naming a file withholds the grant, an ignored target included, since the
+#          allow match reaches it through a trailing star; an fd-dup and /dev/null are no file
+block	@ROOT@/scripts/check-env.sh --list>tracked.md
+block	@ROOT@/scripts/check-env.sh --list > .tmp/out.txt
+rewrite	@ROOT@/scripts/check-env.sh --list 2>&1
+rewrite	@ROOT@/scripts/check-env.sh --list >/dev/null
 block	bash @ROOT@/scripts/gen-configs.sh
 block	bash @ROOT@/.tmp/check-evil.sh
 block	bash @ROOT@/../evil/checks/check-x.sh
@@ -116,6 +122,11 @@ block	cat <<'EOF' > a/{b,c}/note.md@NL@prose@NL@EOF
 #          the in-place flag all pass, and so does the --rewrite arm both steer to
 block	sed -n '1,60p' TASK-QUEUE.md
 block	sed -i 's/a/b/' notes.md
+#          an option is read by its word's value: a quoted one is the option it is
+block	sed -'n' '1,60p' TASK-QUEUE.md
+block	sed '-n' '1,60p' TASK-QUEUE.md
+block	sed -'i' 's/a/b/' notes.md
+fallthrough	sed -'l' 5 '1,60p' TASK-QUEUE.md
 allow	sed -E 's/a/b/'
 allow	grep foo file | sed -e s/a/b/
 block	grep -n x tracked.md | sed -n '5,10p'

@@ -24,7 +24,7 @@ pub static TABLE: &[Rule] = &[
     Rule { name: "abs_prefix", shells: BASH, views: &[SqDqHd], test: spelling::abs_prefix },
     Rule { name: "expansion", shells: BASH, views: &[SqHdq, SqDqHdq], test: spelling::expansion },
     Rule { name: "brace_glyph", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: spelling::brace_glyph },
-    Rule { name: "sed_file", shells: BASH, views: &[SqDqHd, Dequoted, View::Body], test: tools::sed_file },
+    Rule { name: "sed_file", shells: BASH, views: &[Raw, SqDqHd, Dequoted, View::Body], test: tools::sed_file },
     Rule { name: "find_glob", shells: BASH, views: &[Raw, SqDqHd], test: tools::find_glob },
     Rule { name: "find_exec", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: tools::find_exec },
     Rule { name: "cat_file", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: tools::cat_file },

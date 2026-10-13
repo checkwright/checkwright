@@ -1,10 +1,6 @@
 # guard-kit variant limits — <floor><TAB><rule><TAB><transform>, read by the variant lane of
 # --run-guard-tests (guard-kit/SPEC.md §Testing). A row is deleted in the commit that lifts its
 # read or withholds its grant, and the lane fails on a row nothing needs.
-allow	abs_script	added-append-glued
-allow	abs_script	added-dup-glued
-allow	abs_script	added-write
-allow	abs_script	added-write-glued
 fallthrough	allowlist_chain	dq-arg
 fallthrough	allowlist_chain	dq-lead
 fallthrough	allowlist_chain	esc-arg
@@ -107,7 +103,7 @@ fallthrough	sed_file	dq-arg
 fallthrough	sed_file	dq-lead
 fallthrough	sed_file	esc-arg
 fallthrough	sed_file	esc-lead
-allow	sed_file	part-arg
+fallthrough	sed_file	part-arg
 fallthrough	sed_file	part-lead
 fallthrough	sed_file	sq-arg
 fallthrough	sed_file	sq-lead
