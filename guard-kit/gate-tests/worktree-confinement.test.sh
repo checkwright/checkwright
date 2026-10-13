@@ -90,6 +90,7 @@ want scratch-fold      "$d" block "touch $main/.tmp/../escape.txt" "$refusal"
 want ignored-outside   "$d" block "printf 'x\n' >> $main/notes.local.md" "$refusal"
 want git-c-amend       "$d" block "git -C $main commit --amend --no-edit" "$refusal"
 want read-to-main      "$d" block "grep -rn foo $main/docs > $main/found.txt" "$refusal"
+want read-dup-to-main  "$d" block "grep -rn foo $main/docs >& $main/found.txt" "$refusal"
 
 # --- fell through: a write inside the session's own worktree is not this rule's
 want touch-own         "$d" fallthrough "touch inside.txt"

@@ -3,7 +3,6 @@
 # read, and the lane fails on a row nothing needs.
 fallthrough	allowlist_chain	dq-arg
 fallthrough	allowlist_chain	dq-lead
-fallthrough	allowlist_chain	dup-apart
 fallthrough	allowlist_chain	esc-arg
 fallthrough	allowlist_chain	esc-lead
 fallthrough	allowlist_chain	part-arg

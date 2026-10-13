@@ -97,9 +97,7 @@ fn emitter_targets(ctx: &Ctx, s: &str) -> Option<Vec<String>> {
         if pair.is_empty() {
             continue;
         }
-        let p = pair.trim_start_matches(|c: char| c.is_ascii_digit());
-        let tgt = p.strip_prefix(">>").or_else(|| p.strip_prefix('>')).unwrap_or(p);
-        let tgt = trim_start(tgt);
+        let tgt = strip_redirect_op(&pair);
         if inert_target(tgt) {
             continue;
         }

@@ -254,44 +254,49 @@ fn git_walk<'a>(words: impl Iterator<Item = &'a str>, mode: GitWalk) -> Option<V
     found.then_some(out)
 }
 
-// spec: guard-kit/SPEC.md §The generic ruleset — every redirect target in a skeleton; the target
-// class excludes `&`, so an fd-dup drops out entirely.
+// spec: guard-kit/SPEC.md §The generic ruleset — every redirect target in a skeleton that names a
+// file, a `>&` onto one included; an fd-dup drops out.
 fn redirect_targets(s: &str) -> Vec<String> {
-    text::grep_o("[0-9]*>>?[[:space:]]*[^[:space:]|;&]+", s)
+    text::grep_o("[0-9]*>[>&]?[[:space:]]*[^[:space:]|;&]+", s)
         .into_iter()
         .map(|m| strip_redirect_op(&m).to_string())
+        .filter(|t| !t.starts_with('&'))
         .collect()
 }
 
-// spec: guard-kit/SPEC.md §The generic ruleset — a redirect pair's target: its fd digits and one or
-// two `>` dropped, then the blanks.
+// spec: guard-kit/SPEC.md §The generic ruleset — the word a `>&` dups onto: an fd number, with or
+// without the closing `-`, or a bare `-`. Any other word is a file.
+fn fd_word(w: &str) -> bool {
+    let fd = w.strip_suffix('-').unwrap_or(w);
+    w == "-" || (!fd.is_empty() && fd.bytes().all(|c| c.is_ascii_digit()))
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — a redirect pair's target: its fd digits and its
+// operator dropped, then the blanks. An fd-dup keeps its `&`; a `>&` onto a file yields the file.
 fn strip_redirect_op(pair: &str) -> &str {
     let p = pair.trim_start_matches(|c: char| c.is_ascii_digit());
     let p = p.strip_prefix('>').unwrap_or(p);
+    if let Some(word) = p.strip_prefix('&').map(trim_start) {
+        return if fd_word(word) { p } else { word };
+    }
     let p = p.strip_prefix('>').unwrap_or(p);
     trim_start(p)
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — an inert target: `/dev/null` or an fd-dup.
 fn inert_target(t: &str) -> bool {
-    t == "/dev/null" || t.strip_prefix('&').is_some_and(|r| r.starts_with(|c: char| c.is_ascii_digit() || c == '-'))
+    t == "/dev/null" || t.strip_prefix('&').is_some_and(|r| fd_word(trim_start(r)))
 }
 
-// spec: guard-kit/SPEC.md §The generic ruleset — a `>&` whose target is no fd number and no `-`: the
-// fd-dup spelling onto a named file, which the redirect-pair pattern does not read.
-fn dups_onto_file(seg: &str) -> bool {
-    let b = seg.as_bytes();
-    (0..b.len().saturating_sub(1)).filter(|&i| b[i] == b'>' && b[i + 1] == b'&').any(|i| {
-        let rest = trim_start(&seg[i + 2..]);
-        let word = rest.split(|c: char| c.is_whitespace() || matches!(c, '|' | ';' | '&' | '<' | '>')).next().unwrap_or("");
-        let fd = word.strip_suffix('-').unwrap_or(word);
-        !(word == "-" || (!fd.is_empty() && fd.bytes().all(|c| c.is_ascii_digit())))
-    })
+// spec: guard-kit/SPEC.md §The generic ruleset — a redirect pair spelled `>&` onto a named file.
+fn dups_onto_file(pair: &str) -> bool {
+    let p = pair.trim_start_matches(|c: char| c.is_ascii_digit());
+    p.strip_prefix(">&").is_some_and(|r| !fd_word(trim_start(r)))
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — a segment with its redirects removed and trimmed.
 fn segment_core(seg: &str) -> String {
-    let e = text::re(r"[[:space:]]*[0-9]*(>>?|<)[[:space:]]*(&?[0-9-]+|[^[:space:]]+)?");
+    let e = text::re(r"[[:space:]]*[0-9]*(>>?|>&|<)[[:space:]]*(&?[0-9-]+|[^[:space:]]+)?");
     let mut lines: Vec<String> = Vec::new();
     for line in seg.split('\n') {
         let mut kept = String::new();
@@ -803,12 +808,19 @@ mod tests {
         let argued = loop_span("for done in x; do sleep 1 >& done; done").unwrap();
         let keywords: Vec<&str> = argued.iter().filter(|(_, cmdpos, _)| *cmdpos).map(|(_, _, t)| t.as_str()).collect();
         assert_eq!(keywords, vec!["for", "do", "sleep", "done", ";"]);
-        for inert in ["sleep 1 2>&1", "sleep 1 >&2", "sleep 1 >& 2", "sleep 1 >&-", "sleep 1 2>&3-", "sleep 1 &> o", "x && y"] {
+        for inert in ["2>&1", ">&2", ">& 2", ">&-", "2>&3-", "> o", ">> o"] {
             assert!(!dups_onto_file(inert), "{} dups onto no file", inert);
         }
-        for write in ["sleep 1 >& out", "sleep 1 >&out", "sleep 1 2>&out; x", "sleep 1 >&2x", "sleep 1 >&"] {
-            assert!(dups_onto_file(write), "{} dups onto a file", write);
+        for inert in ["2>&1", ">&2", ">& 2", ">&-", "2>&3-", "2>/dev/null", ">&/dev/null", ">& /dev/null"] {
+            assert!(inert_target(strip_redirect_op(inert)), "{} is inert", inert);
         }
+        for (write, file) in [(">& out", "out"), (">&out", "out"), ("2>&out", "out"), (">&2x", "2x"), (">&-x", "-x"), ("1>> o", "o")] {
+            assert_eq!(strip_redirect_op(write), file);
+            assert!(!inert_target(strip_redirect_op(write)), "{} writes a file", write);
+            assert_eq!(dups_onto_file(write), write.contains('&'), "{}", write);
+        }
+        assert_eq!(redirect_targets("grep x f >& out 2>&1 >&2x 1>& 2 > o >&/dev/null"), vec!["out", "2x", "o", "/dev/null"]);
+        assert_eq!(segment_core("grep x f >& out 2>& 1 >&o2"), "grep x f");
         assert_eq!(unredirected_words("grep x f > out", "grep x f > out"), Ok("grep x f".to_string()));
         assert_eq!(unredirected_words("> out", "> out"), Err(1));
         assert_eq!(unredirected_words("cat <<EOF", "cat <<EOF"), Err(2));

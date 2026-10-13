@@ -714,7 +714,7 @@ pub fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
 
 // spec: guard-kit/SPEC.md §The generic ruleset — the redirect-pair pattern, handed to the crate's own
 // matcher (gate-sdk/SPEC.md §The POSIX ERE matcher)
-pub const REDIRECT_RE_SRC: &str = "[0-9]*>>?[[:space:]]*(&[0-9-]+|[^[:space:]|;&<>]+)";
+pub const REDIRECT_RE_SRC: &str = "[0-9]*>[>&]?[[:space:]]*(&[0-9-]+|[^[:space:]|;&<>]+)";
 
 // spec: guard-kit/SPEC.md §The generic ruleset — one match per line, leftmost-longest and
 // non-overlapping, which is `grep -o`'s contract. Line-wise rather than whole-string, because
@@ -868,6 +868,7 @@ mod tests {
         assert_eq!(redirect_pairs("sort -rn > out.txt").unwrap(), vec!["> out.txt"]);
         assert_eq!(redirect_pairs("cmd 1>>log 2>&-").unwrap(), vec!["1>>log", "2>&-"]);
         assert_eq!(redirect_pairs("cmd 2>&1").unwrap(), vec!["2>&1"]);
+        assert_eq!(redirect_pairs("cmd >& out 2>& 1 >&2x &> o").unwrap(), vec![">& out", "2>& 1", ">&2x", "> o"]);
         assert!(redirect_pairs("wc -l < in.txt").unwrap().is_empty());
         assert_eq!(
             redirect_pairs("jq . < a.json > b.json").unwrap(),

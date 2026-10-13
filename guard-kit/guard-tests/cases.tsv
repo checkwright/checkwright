@@ -254,7 +254,7 @@ block	sleep 5; echo done
 block	sleep>/dev/null 5
 # and its target is no command position, behind `>&` as behind `>`
 block	sleep 5 >& done
-fallthrough	echo waited >& sleep 5
+fallthrough	make waited >& sleep 5
 allow	until grep -q DONE .tmp/smoke.log; do sleep 5; done
 allow	printf 'sleep 5' >> .tmp/note.txt
 
@@ -354,6 +354,8 @@ fallthrough	git stash2>.tmp/o
 # rule `truncate_scratch` — `: > file` truncation auto-allowed iff every target is gitignored
 allow	: > scratch.txt
 fallthrough	: > tracked.txt
+# the grant is spelled `>` or `>>`: an fd-dup onto a named file earns none
+fallthrough	: >& scratch.txt
 
 # rule `append_scratch` — a write to gitignored targets auto-allowed, create and append alike.
 #           The clauses each get their refusing case, because each is what keeps
@@ -389,6 +391,8 @@ block	cat > tracked.md <<'EOF'@NL@line@NL@EOF
 # append-only split protects, and neither is a path git check-ignore can answer
 allow	printf 'x@NL@' >> .tmp/journal.md 2>/dev/null
 allow	cat >> .tmp/journal.md 2>&1
+# `>&` onto a named file is the write `>` is, granted on an ignored target
+allow	printf 'x' >& .tmp/note.txt
 # a continued line is one statement, as the shell reads it; a continued heredoc opener puts what
 # follows on the command line, ahead of the body, and the residue test refuses it
 allow	printf x \@NL@>> .tmp/j.md
@@ -398,6 +402,18 @@ fallthrough	cat >> .tmp/j.md <<'EOF' \@NL@; touch x@NL@EOF
 allow	grep -rn foo src | head
 allow	grep foo file | awk '{print}'
 fallthrough	grep foo file | md5sum
+# a read redirected to a named file is a write, behind `>&` as behind `>`: glued or apart, under a
+# descriptor, in a later pipe segment, and onto a word that only opens with a digit. An fd-dup
+# spelled apart, a closed descriptor and `/dev/null` stay inert
+fallthrough	grep -rn foo src > found.txt
+fallthrough	grep -rn foo src >& found.txt
+fallthrough	grep -rn foo src >&found.txt
+fallthrough	grep -rn foo src 1>& found.txt
+fallthrough	grep -rn foo src | head >& found.txt
+fallthrough	grep -rn foo src >&2x
+allow	grep -rn foo src 2>& 1
+allow	grep -rn foo src >&-
+allow	grep -rn foo src >& /dev/null
 # a compound is read statement by statement whatever joins it: each separator, a banner
 # statement, and the widened lead opening a later statement (rule `allowlist_chain` would block
 # it otherwise); a statement off the roster, a write form or a write in a later statement, and
@@ -579,6 +595,10 @@ fallthrough	bash scripts/check-foo.sh > tracked.md & echo "pid=$! run=foo" > .tm
 fallthrough	bash scripts/check-foo.sh &> tracked.md & echo "pid=$! run=foo" > .tmp/foo.run; wait
 fallthrough	bash scripts/check-foo.sh &>> tracked.md & echo "pid=$! run=foo" > .tmp/foo.run; wait
 fallthrough	bash scripts/check-foo.sh <> tracked.md & echo "pid=$! run=foo" > .tmp/foo.run; wait
+fallthrough	bash scripts/check-foo.sh >& tracked.md & echo "pid=$! run=foo" > .tmp/foo.run; wait
+# (B1) an fd-dup onto a named file withholds whatever its target, glued or apart
+fallthrough	bash scripts/check-foo.sh >& .tmp/foo.log & echo "pid=$! run=foo" > .tmp/foo.run; wait
+fallthrough	bash scripts/check-foo.sh >&.tmp/foo.log & echo "pid=$! run=foo" > .tmp/foo.run; wait
 # (B3) an expansion besides the record's own; rule `grant_path_slot`'s predicate declines a live '$'
 # in the launch too, so this row pins the verdict rather than the clause alone
 fallthrough	scripts/check-foo.sh $1 > .tmp/foo.log & echo "pid=$! run=foo" > .tmp/foo.run; wait
@@ -611,6 +631,8 @@ allow	rm -f .tmp/dead-producer.run
 # outside every scratch dir is neither's
 allow	grep -c x tracked.md > .tmp/n.txt; wc -l .tmp/n.txt
 fallthrough	grep -c x tracked.md > out.txt
+# an fd-dup onto a named file withholds even on a bounded target
+fallthrough	mkdir -p .tmp/out >& .tmp/n.txt
 # one refusing row per clause: the scratch member itself and a path outside every member (b); a
 # '..' component and a rooted path (a); a tracked destination (c, d); the operand grammar's
 # withheld forms; an xargs running a write utility (d); a backgrounded write, which rule
@@ -778,6 +800,9 @@ block	mkdir -p docs && cat > docs/x.md <<'EOF'@NL@line@NL@EOF
 block	make build && echo x > /tmp/x.txt
 fallthrough	make build; echo x > /dev/stderr
 block	cat >> tracked.md
+# `>&` onto a named file is the write `>` is, alone and beside an ignored target
+block	echo x >& tracked.md
+block	printf x >> .tmp/journal.md >& tracked.md
 fallthrough	bash gate-sdk/bin/run-gates.sh --emit trajectory > docs/x.md
 fallthrough	echo x > /dev/stderr
 fallthrough	make build > .tmp/b.log 2>&1 & echo "pid=$! run=b" > .tmp/b.run; wait; rm -f .tmp/b.run

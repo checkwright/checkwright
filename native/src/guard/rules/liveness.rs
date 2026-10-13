@@ -363,7 +363,7 @@ pub fn wait_no_producer(ctx: &Ctx) -> Decided {
 }
 
 fn wait_redirects_inert(ctx: &Ctx, seg: &str) -> bool {
-    !dups_onto_file(seg) && ctx.redirect_pairs(seg).iter().filter(|p| !p.is_empty()).all(|p| inert_target(strip_redirect_op(p)))
+    ctx.redirect_pairs(seg).iter().filter(|p| !p.is_empty()).all(|p| inert_target(strip_redirect_op(p)))
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `bounded_wait`'s clause (c): the loop condition
@@ -565,7 +565,7 @@ fn recorded_launch(ctx: &Ctx) -> Result<bool, Fault> {
     if ls.contains([';', '|', '\n']) || ls.contains("<<") || ls.contains("&&") || shell_backgrounds(&ls) {
         return Ok(false);
     }
-    if grep_q(">&[^0-9-]", &ls) {
+    if ctx.redirect_pairs(&ls).iter().any(|p| dups_onto_file(p)) {
         return Ok(false);
     }
     let Some(lv) = ctx.dequoted(&launch_cmd)? else { return Ok(false) };

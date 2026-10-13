@@ -17,6 +17,11 @@ block	true	bash worker.sh
 fallthrough	true	bash worker.sh > .tmp/worker.log 2>&1 & printf 'pid=1 run=worker\n' > .tmp/worker.run
 allow	true	until grep -q DONE .tmp/worker.log; do sleep 5; done
 allow	true	grep -rn foo src | head
+# exemption (3) reads `>&` onto a named file as the write `>` is, and an fd-dup spelled apart as inert
+block	true	grep -rn foo src > found.txt
+block	true	grep -rn foo src >& found.txt
+block	true	grep -rn foo src | head >&found.txt
+allow	true	grep -rn foo src 2>& 1
 fallthrough	false	bash worker.sh
 # the canonical launch in harness form: rule `background_no_record`'s exemption (1) lets the record
 # through and rule `bounded_wait`'s arm (B) grants it, the flag changing nothing in its text
@@ -59,6 +64,7 @@ fallthrough	true	for done in a b; do sleep 5; done
 block	true	until grep -q DONE .tmp/worker.log; do sleep 1 >& done; done
 block	true	until grep -q DONE .tmp/worker.log; do sleep 1 >& out.txt; done
 block	true	until grep -q DONE .tmp/worker.log >& out.txt; do sleep 5; done
+fallthrough	true	until grep -q DONE .tmp/worker.log; do sleep 5 >& /dev/null; done
 fallthrough	true	for i in 1 2 3; do sleep 5; done
 fallthrough	true	until make build; do sleep 1; done
 block	true	until sort -c -o out.txt data.txt; do sleep 5; done; echo waited
