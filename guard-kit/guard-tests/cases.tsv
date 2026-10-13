@@ -322,6 +322,11 @@ block	\git stash
 block	g'it' stash
 block	git stash &>/dev/null
 block	if git stash>.tmp/o; then ls; fi
+# a word glued ahead of a redirect keeps its value, and a separated `>&` takes its target
+block	git 'stash'>/dev/null push
+block	git stash 'pop'>/dev/null
+block	git st\ash>/dev/null push
+block	git stash 2>& 1 pop
 block	echo "a@NL@b"; git stash
 fallthrough	git stash list
 fallthrough	git stash show -p

@@ -42,14 +42,6 @@ guard-kit rule `background_no_record` blocks a wait loop whose closing ampersand
 
 **Cost while deferred:** one re-issue of a sanctioned wait. Surfaced 2026-10-12 by guard-rule-holes-pass' close, off its second-vendor review, run through the hook member, and carried to the next scope's intake. Re-verified there by the same run. Owner lookup: `background_no_record`, `2>/dev/null &`, `inert redirect` in this file and the disposed-findings record — `wait-loop-lead-and-condition`, done, so a new defect; [wait-no-producer-lead-evasion](#wait-no-producer-lead-evasion), DISTINCT (the producer block's lead, where this is the record exemption's tail); owner guard-kit/SPEC.md §The generic ruleset.
 
-### git-stash-glued-redirect-value
-
-guard-kit rule `git_stash` loses a word's value where the word is glued ahead of a redirect or follows a separated fd-dup. On a main checkout `git 'stash'>/dev/null push`, `git stash 'pop'>/dev/null`, `git st\ash>/dev/null push` and `git stash 2>& 1 pop` fall through where `git stash>/dev/null push`, `git 'stash' >/dev/null push` and `git stash 2>&1 pop` block. The rule's item says every word is read by its value, a word glued ahead of a redirect stays one and a redirect's target is no word, so the code falls short of text `git-stash-quoted-verb` landed.
-
-**Deliverable:** the redirect cut keeping the word's value face, and a separated `>&` target read as a target; a decision-table row for each spelling above. Where `git-rules-word-read-siblings` lifts the read to the shared walk first, the fix is made once there.
-
-**Cost while deferred:** a stash on the shared checkout after one permission decision. Surfaced 2026-10-12 by guard-rule-holes-pass' close, off its second-vendor review, run through the hook member, and carried to the next scope's intake. Re-verified there by the same runs; the published v0.31.0 binary falls through on every `git stash` spelling in a scratch repository, so none of these is a regression from it. Owner lookup: `git_stash`, `glued`, `fd-dup` in this file and the disposed-findings record — `git-stash-quoted-verb`, done, so a new defect; `git-rules-word-read-siblings`, DISTINCT (the sibling rules and the command word, where this is the landed read's own cut); owner guard-kit/SPEC.md §The generic ruleset.
-
 ### keyword-walk-argument-position
 
 the guard's shared shell-keyword walk reads a keyword off two positions that are not command position: a `for` loop's variable and a redirect target after `>&`. Backgrounded, `for done in x; do make build; done` and `until grep -q DONE log; do sleep 1 >& done; done` fall through guard-kit rule `background_no_record` where `for x in a; do make build; done` and the `> out.txt` body block; foreground `sleep 5 >& done` passes rule `bare_sleep` where `sleep 5 > done` blocks. A body redirect spelled `>& out` falls through too, the fd-dup onto a named file the exemption's body clause does not hold.
@@ -1258,4 +1250,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 
 - guard-spelling-variant-oracle
 - git-rules-word-read-siblings
+- git-stash-glued-redirect-value
 

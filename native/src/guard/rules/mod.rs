@@ -159,9 +159,9 @@ fn passed_words(ws: &[Word], escape: char) -> Vec<(String, String)> {
         };
         let (glued, redirect) = w.live.split_at(at);
         if !(glued.bytes().all(|b| b.is_ascii_digit()) || matches!(glued, "&" | "*")) {
-            out.push((glued.to_string(), glued.to_string()));
+            out.push((w.value_before(at).unwrap_or(glued).to_string(), glued.to_string()));
         }
-        target = redirect.trim_start_matches(['>', '<']).is_empty();
+        target = matches!(redirect.trim_start_matches(['>', '<']), "" | "&");
     }
     out
 }
@@ -714,15 +714,29 @@ mod tests {
     }
 
     // spec: guard-kit/SPEC.md §The rule roster — the git read takes each word by its value, a keyword
-    // and a redirect by the live text
+    // and a redirect by the live text, and a word glued ahead of a redirect by the value it holds
     #[test]
     fn the_passed_words_drop_keywords_and_redirects_by_live_text() {
+        use crate::guard::reader::WordAcc;
         let word = |s: &str, v: &str, l: &str| Word::new(s, v, l);
         let got = |ws: &[Word]| passed_words(ws, '\\').into_iter().map(|(value, _)| value).collect::<Vec<String>>();
         assert_eq!(got(&[plain_word("if"), plain_word("git"), word("'stash'", "stash", "\0SQ")]), vec!["git", "stash"]);
         assert_eq!(got(&[plain_word("git"), plain_word("stash"), plain_word("2>&1"), plain_word(">"), plain_word("o"), plain_word("pop")]), vec!["git", "stash", "pop"]);
         assert_eq!(got(&[plain_word("git"), plain_word("stash>o"), plain_word("&>/dev/null")]), vec!["git", "stash"]);
         assert_eq!(got(&[plain_word("git"), word("'if'", "if", "\0SQ"), word("'>'", ">", "\0SQ"), word("a\\>b", "a>b", "a\\>b")]), vec!["git", "if", ">", "a>b"]);
+        let pieced = |pieces: &[(&str, &str, &str)]| {
+            let mut acc = WordAcc::new();
+            for (s, v, l) in pieces {
+                acc.piece(s.as_bytes(), v.as_bytes(), l.as_bytes());
+            }
+            acc.finish().remove(0).remove(0)
+        };
+        let quoted = pieced(&[("'stash'", "stash", "\0SQ"), (">", ">", ">"), ("/dev/null", "/dev/null", "/dev/null")]);
+        let escaped = pieced(&[("st", "st", "st"), ("\\a", "a", "\\a"), ("sh", "sh", "sh"), (">", ">", ">"), ("o", "o", "o")]);
+        assert_eq!(got(&[plain_word("git"), quoted, plain_word("push")]), vec!["git", "stash", "push"]);
+        assert_eq!(got(&[plain_word("git"), escaped]), vec!["git", "stash"]);
+        assert_eq!(got(&[plain_word("git"), plain_word("stash"), plain_word("2>&"), plain_word("1"), plain_word("pop")]), vec!["git", "stash", "pop"]);
+        assert_eq!(got(&[plain_word("git"), plain_word("stash"), plain_word(">&"), plain_word("out"), plain_word("pop")]), vec!["git", "stash", "pop"]);
     }
 
     #[test]

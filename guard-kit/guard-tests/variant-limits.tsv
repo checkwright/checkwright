@@ -53,14 +53,9 @@ fallthrough	git_c_root	part-lead
 fallthrough	git_c_root	sq-arg
 fallthrough	git_c_root	sq-lead
 fallthrough	git_c_root	wrap-command
-fallthrough	git_stash	dq-arg
 fallthrough	git_stash	dq-lead
-fallthrough	git_stash	dup-apart
-fallthrough	git_stash	esc-arg
 fallthrough	git_stash	esc-lead
-fallthrough	git_stash	part-arg
 fallthrough	git_stash	part-lead
-fallthrough	git_stash	sq-arg
 fallthrough	git_stash	sq-lead
 fallthrough	grant_path_slot	esc-lead
 fallthrough	pgrep_self_match	dq-arg

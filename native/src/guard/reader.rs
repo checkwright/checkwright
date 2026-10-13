@@ -72,11 +72,24 @@ pub struct Word {
     pub spelling: String,
     pub value: String,
     pub live: String,
+    seams: Vec<(usize, usize)>,
 }
 
 impl Word {
     pub fn new(spelling: &str, value: &str, live: &str) -> Word {
-        Word { spelling: spelling.to_string(), value: value.to_string(), live: live.to_string() }
+        Word { spelling: spelling.to_string(), value: value.to_string(), live: live.to_string(), seams: Vec::new() }
+    }
+
+    // spec: guard-kit/SPEC.md §The reader and its views — the value of what a word holds ahead of
+    // the live offset `at`; `None` where `at` falls inside a piece.
+    pub fn value_before(&self, at: usize) -> Option<&str> {
+        if self.value == self.live {
+            return self.value.get(..at);
+        }
+        if at == 0 {
+            return Some("");
+        }
+        self.seams.iter().rev().find(|&&(live, _)| live == at).and_then(|&(_, value)| self.value.get(..value))
     }
 }
 
@@ -85,11 +98,12 @@ impl Word {
 pub struct WordAcc {
     segs: Vec<Vec<Word>>,
     open: Option<[Vec<u8>; 3]>,
+    seams: Vec<(usize, usize)>,
 }
 
 impl WordAcc {
     pub fn new() -> WordAcc {
-        WordAcc { segs: vec![Vec::new()], open: None }
+        WordAcc { segs: vec![Vec::new()], open: None, seams: Vec::new() }
     }
 
     pub fn piece(&mut self, spelling: &[u8], value: &[u8], live: &[u8]) {
@@ -97,12 +111,14 @@ impl WordAcc {
         w[0].extend_from_slice(spelling);
         w[1].extend_from_slice(value);
         w[2].extend_from_slice(live);
+        self.seams.push((w[2].len(), w[1].len()));
     }
 
     pub fn end_word(&mut self) {
         if let Some([s, v, l]) = self.open.take() {
             let text = |b: Vec<u8>| String::from_utf8_lossy(&b).into_owned();
-            let word = Word { spelling: text(s), value: text(v), live: text(l) };
+            let seams = std::mem::take(&mut self.seams);
+            let word = Word { spelling: text(s), value: text(v), live: text(l), seams };
             self.segs.last_mut().expect("one segment is always open").push(word);
         }
     }
