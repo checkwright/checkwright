@@ -57,10 +57,11 @@ want() {  # $1=label $2=command $3=want-rc [$4=text the block must not carry] [$
 }
 
 # rule `wait_no_producer` reads the same record set: 2 = blocked, allow = rule `bounded_wait`'s grant.
-waits() {  # $1=label $2=want (2|allow)
+# A banner-led wait earns no grant, so its non-firing verdict is 0.
+waits() {  # $1=label $2=want (2|allow|0) [$3=lead]
     checks=$((checks + 1))
     local got
-    (cd "$tmp/cwd" && printf '{"tool_name":"Bash","tool_input":{"command":"until [ -f marker ]; do sleep 30; done","run_in_background":true}}' \
+    (cd "$tmp/cwd" && printf '{"tool_name":"Bash","tool_input":{"command":"%suntil [ -f marker ]; do sleep 30; done","run_in_background":true}}' "${3:-}" \
         | GUARD_KIT_KNOB_FILE="$tmp/guard.knobs" GUARD_KIT_LOG="$tmp/friction.log" "$BIN" --hook shell-guard >"$tmp/out" 2>"$tmp/err")
     got=$?
     grep -qF '"permissionDecision":"allow"' "$tmp/out" && got=allow
@@ -76,6 +77,7 @@ waits() {  # $1=label $2=want (2|allow)
 # --- no record at all: the rule is inert, whatever the command
 want "empty-dir-commit" "git commit -m done" 0
 waits "wait-empty-set" 2
+waits "led-wait-empty-set" 2 "echo start; "
 
 # --- a record naming a dead pid is not a live producer
 printf 'pid=2147483646 run=dead-run\n' >"$tmp/scratch/dead-run.run"
@@ -90,6 +92,7 @@ for sub in add commit rm mv restore checkout switch reset stash merge rebase \
     want "live-blocks-$sub" "git $sub" 2
 done
 waits "wait-live-record" allow
+waits "led-wait-live-record" 0 "echo start; "
 
 # The corrective must name the blocking run so the reader can tell 'wait for
 # that' from 'reclaim a record whose owner is gone'.
@@ -185,5 +188,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "git-mutation-under-producer.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "git-mutation-under-producer.test: ok ($checks assertions; the write set blocks under a live record on a Bash or a PowerShell call however git and its subcommand are spelled, read-only git and every conservative direction decline, rule \`bounded_write\` withholds a removal of a live record, and rule \`wait_no_producer\` blocks a backgrounded file-test wait until a record names a live pid)"
+echo "git-mutation-under-producer.test: ok ($checks assertions; the write set blocks under a live record on a Bash or a PowerShell call however git and its subcommand are spelled, read-only git and every conservative direction decline, rule \`bounded_write\` withholds a removal of a live record, and rule \`wait_no_producer\` blocks a backgrounded file-test wait, bare or behind a banner, until a record names a live pid)"
 exit 0

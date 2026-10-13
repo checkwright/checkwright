@@ -286,8 +286,7 @@ fn waits_only(ctx: &Ctx, s: &str, toks: &[(i32, bool, String, usize)]) -> Result
             return Ok(false);
         }
     }
-    let outside =
-        |piece: &str| stated(piece).iter().all(|g| !shell_backgrounds(g) && is_wait_tail_segment(ctx, trim(g)));
+    let outside = |piece: &str| wait_statements_clear(ctx, piece);
     if !outside(text(0, loops[0].start)) {
         return Ok(false);
     }
@@ -340,7 +339,10 @@ pub fn wait_no_producer(ctx: &Ctx) -> Decided {
     if !(h.background || shell_backgrounds(&s)) {
         return Ok(None);
     }
-    let Some((cond, body, _)) = lone_loop(&s) else { return Ok(None) };
+    let Some((lead, cond, body, _)) = lone_loop(&s) else { return Ok(None) };
+    if !wait_statements_clear(ctx, &lead) {
+        return Ok(None);
+    }
     let stated = |t: &str| ctx.segments(t).into_iter().filter(|g| !trim(g).is_empty()).collect::<Vec<String>>();
     let conds = stated(&cond);
     if conds.is_empty() || !conds.iter().all(|g| is_shell_test(g)) || !only_sleeps(ctx, &body) {
@@ -382,24 +384,34 @@ fn is_wait_tail_segment(ctx: &Ctx, seg: &str) -> bool {
     core.is_empty() || is_banner(core) || is_ro_segment(ctx.host(), core)
 }
 
-// spec: guard-kit/SPEC.md §The generic ruleset — a skeleton whose first statement is a `while`/`until`
-// loop with exactly one balanced `do … done` span: its condition, its body and what follows it, cut
-// at the walk's own keywords.
-fn lone_loop(s: &str) -> Option<(String, String, String)> {
+// spec: guard-kit/SPEC.md §The rule roster — rule `background_no_record`'s exemption (2) statement
+// test, which rule `wait_no_producer`'s clause (b) takes for a lead: every statement of the piece
+// passes the tail's test and none ends in a bare `&`.
+fn wait_statements_clear(ctx: &Ctx, piece: &str) -> bool {
+    ctx.segments(piece)
+        .iter()
+        .filter(|g| !trim(g).is_empty())
+        .all(|g| !shell_backgrounds(g) && is_wait_tail_segment(ctx, trim(g)))
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — a skeleton carrying a `while`/`until` loop with
+// exactly one balanced `do … done` span: what stands ahead of it, its condition, its body and what
+// follows it, cut at the walk's own keywords.
+fn lone_loop(s: &str) -> Option<(String, String, String, String)> {
     let toks = loop_tokens(s)?;
-    let (_, _, first, at) = toks.first()?;
-    if !matches!(first.as_str(), "until" | "while") {
-        return None;
-    }
     let keyword = |w: &str| toks.iter().filter(|t| t.1 && t.2 == w).map(|t| t.3).collect::<Vec<usize>>();
     let (opens, closes) = (keyword("do"), keyword("done"));
     if opens.len() != 1 || closes.len() != 1 {
         return None;
     }
     let (open, close) = (opens[0], closes[0]);
+    let (_, _, first, at) = toks.iter().find(|t| t.1 && matches!(t.2.as_str(), "until" | "while" | "for"))?;
+    if first == "for" || *at > open {
+        return None;
+    }
     let joined = format!("{};", s.replace('\n', ";"));
     let part = |a: usize, b: usize| joined.get(a..b).unwrap_or("").to_string();
-    Some((part(at + first.len(), open), part(open + 2, close), part(close + 4, joined.len())))
+    Some((part(0, *at), part(at + first.len(), open), part(open + 2, close), part(close + 4, joined.len())))
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — the recorded launch's tail after its `&`:
@@ -594,7 +606,10 @@ pub fn bounded_wait(ctx: &Ctx) -> Decided {
     if s.contains(['\'', '"']) || shell_backgrounds(&s) {
         return Ok(None);
     }
-    let Some((cond, body, tail)) = lone_loop(&s) else { return Ok(None) };
+    let Some((lead, cond, body, tail)) = lone_loop(&s) else { return Ok(None) };
+    if !trim(&lead).is_empty() {
+        return Ok(None);
+    }
     let mut sleeps = 0usize;
     for seg in ctx.segments(&body) {
         let seg = trim(&seg);

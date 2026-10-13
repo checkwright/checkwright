@@ -80,6 +80,12 @@ block	true	until test -d .tmp/out && [[ -s .tmp/out/done ]]; do sleep 30; done; 
 block	true	until [ -f .tmp/marker ]; do sleep 30; done; echo done
 block	true	until [ -f .tmp/marker ]; do sleep 30; done | cat
 block	true	until [ -f .tmp/marker ]; do sleep 30; done|cat
+# the loop is read past a banner or a read ahead of it, the lead rule `background_no_record`'s
+# exemption admits; a second span still declines behind one
+block	true	echo start; until [ -f .tmp/marker ]; do sleep 30; done
+block	true	ls .tmp; until [ -f .tmp/marker ]; do sleep 30; done
+block	true	grep -c x .tmp/worker.log && until [ -f .tmp/marker ]; do sleep 30; done; echo waited
+fallthrough	true	echo start; until [ -f .tmp/a ]; do sleep 30; done; until [ -f .tmp/b ]; do sleep 30; done
 allow	false	until [ -f .tmp/marker ]; do sleep 30; done
 fallthrough	true	until [ -f .tmp/a ]; do sleep 5; done; until [ -f .tmp/b ]; do sleep 5; done
 allow	true	while kill -0 2147483646 2>/dev/null; do sleep 5; done

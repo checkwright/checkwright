@@ -8,16 +8,6 @@
 
 ## New Features
 
-### wait-no-producer-lead-evasion
-
-[spec: SPEC-wait-lead-read.md]
-
-guard-kit rule `wait_no_producer` asks that the call's first statement be the wait loop, so a banner or a read-only lead ahead of it evades the block: backgrounded over an empty record set, `echo start; until [ -f .tmp/marker ]; do sleep 30; done` and its `ls .tmp;` twin fall through where the bare wait is blocked. Guard-kit rule `background_no_record`'s wait-loop exemption admits that lead, so the two rules read different shapes as a wait. A banner after the loop still blocks.
-
-**Deliverable:** the rule's wait-loop clause reading the loop past a lead that exemption admits, or the section stating the limit; either moves a verdict or a stated contract, so it lands through an amendment. Rows for both leads.
-
-**Cost while deferred:** a file-condition wait no live producer can end holds a session, after one permission decision, since guard-kit rule `bounded_wait` declines on a lead too. Filed 2026-10-11 by guard-rule-holes-pass' spec and promoted at its close. Re-verified there by a run through the hook member with the background flag set. Owner lookup: `wait_no_producer`, `banner`, `lead` in this file and the disposed-findings record — none; `wait-loop-lead-and-condition`, done, DISTINCT (the record exemption's lead, where this is the producer block's); owner guard-kit/SPEC.md §The generic ruleset.
-
 ## Technical Debt
 
 ### wait-exemption-redirect-tail
@@ -28,7 +18,7 @@ guard-kit rule `background_no_record` blocks a wait loop whose closing ampersand
 
 **Against the release bar** [tarball-attestation-observed](#tarball-attestation-observed) records: the published v0.31.0 binary falls through on this spelling in a scratch repository and the current one blocks it, so the verdict moved since that release, toward refusing a sanctioned wait. Whether that is the regression the bar names is the ruling party's.
 
-**Cost while deferred:** one re-issue of a sanctioned wait. Surfaced 2026-10-12 by guard-rule-holes-pass' close, off its second-vendor review, run through the hook member, and carried to the next scope's intake. Re-verified there by the same run. Owner lookup: `background_no_record`, `2>/dev/null &`, `inert redirect` in this file and the disposed-findings record — `wait-loop-lead-and-condition`, done, so a new defect; [wait-no-producer-lead-evasion](#wait-no-producer-lead-evasion), DISTINCT (the producer block's lead, where this is the record exemption's tail); owner guard-kit/SPEC.md §The generic ruleset.
+**Cost while deferred:** one re-issue of a sanctioned wait. Surfaced 2026-10-12 by guard-rule-holes-pass' close, off its second-vendor review, run through the hook member, and carried to the next scope's intake. Re-verified there by the same run. Owner lookup: `background_no_record`, `2>/dev/null &`, `inert redirect` in this file and the disposed-findings record — `wait-loop-lead-and-condition`, done, so a new defect; `wait-no-producer-lead-evasion`, DISTINCT (the producer block's lead, where this is the record exemption's tail); owner guard-kit/SPEC.md §The generic ruleset.
 
 ### keyword-walk-argument-position
 
@@ -1240,4 +1230,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - git-rules-word-read-siblings
 - git-stash-glued-redirect-value
 - bounded-wait-piped-loop
+- wait-no-producer-lead-evasion
 
