@@ -1,4 +1,3 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
-guard-spelling-oracle-pass release deferred:v0.32.0 — a minor at the outstanding v0.32.0 floor, held by operator direction (lead-relayed to this close on 2026-10-13, not a ruling): cut only if the close's second-vendor review returned clean, and it held three findings in the close's own drain fix, one a grant that truncates a tracked file, so closing push only. The batch lands the variant lane over the bash decision tables, the git rules' one word read, the wait rules' lead, piped and redirect reads, the fd-dup onto a named file read as a write, and the escaped-option grant's fix.
