@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+guard-spelling-oracle-pass gates sha256=ed8de15e53dda96f6e72fccf41d368d60291f850a0a542ef380fb2c25033212d pass=152 fail=0 ignore=0 verdict=clean 2026-10-13
+guard-spelling-oracle-pass gate_sdk sha256=0db30fa7aadcf36c1a84c6f626ee97d38b8624ce30e03c80ee692e1682880abd pass=1 fail=0 ignore=0 verdict=clean 2026-10-13
+guard-spelling-oracle-pass canon_kit sha256=94adc56304517c48e98925ef1b60184e537116f84dcc77387eb157e8108c8d50 pass=1 fail=0 ignore=0 verdict=clean 2026-10-13
+guard-spelling-oracle-pass context_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-10-13
+guard-spelling-oracle-pass delegation_kit sha256=e8b7dacc5b3a03c2084bd61274ee3c701400be4001eeaafa4126bc7f4b710363 pass=1 fail=0 ignore=0 verdict=clean 2026-10-13
+guard-spelling-oracle-pass doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-10-13
+guard-spelling-oracle-pass evidence_kit sha256=c62871f8123949178b90372d234262f4c133b06c830e8faa9bbb9af4d2767fea pass=1 fail=0 ignore=0 verdict=clean 2026-10-13
+guard-spelling-oracle-pass guard_kit sha256=01d94b4120e133665e01946fe44d31a730d2c6cdfd1570e5ce6b96a7a1b30e1b pass=1 fail=0 ignore=0 verdict=clean 2026-10-13
+guard-spelling-oracle-pass lifecycle_kit sha256=3443faac1a321c44bbb9958c3e699d905d1cf0b2fd04e67fa0b798773a4fca0e pass=1 fail=0 ignore=0 verdict=clean 2026-10-13
+guard-spelling-oracle-pass queue_kit sha256=a4c89486a636a6d9c43ded5bbbb06f21bd7c7b3db7a8a330bdcf89eb952b9f7d pass=1 fail=0 ignore=0 verdict=clean 2026-10-13
+guard-spelling-oracle-pass site_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-10-13
+guard-spelling-oracle-pass scripts sha256=41d1316ce84634ce2cd5489d89516c6da7179b572ad9251dbee8c05f36f808a0 pass=1 fail=0 ignore=0 verdict=clean 2026-10-13
+guard-spelling-oracle-pass guard_tests sha256=56ed3b2d0663b53956d136926d3cf970c911be3b953e42ba53fffdc02ffedcca pass=1 fail=0 ignore=0 verdict=clean 2026-10-13
+guard-spelling-oracle-pass demo sha256=0b56f1ec99ce9719560b081b86fc4a1bf91df649d0547343b5f890fde7344678 pass=1 fail=0 ignore=0 verdict=clean 2026-10-13
+guard-spelling-oracle-pass installer_smoke sha256=0ecf6f9dd814a242183406dd4cb825a8efede0c8cd2bb45395d3a4a2ba57e12c pass=28 fail=0 ignore=0 verdict=clean 2026-10-13
+guard-spelling-oracle-pass consumer_smoke sha256=fd8627ed882160816a9130a42af7f382b8cf734f4a0e488a2c56a7af1a760398 pass=1 fail=0 ignore=0 verdict=clean 2026-10-13
+guard-spelling-oracle-pass upgrade sha256=ae3fe95357ee4fa6b2aa5f78f398570fe2a6526bf7b63530a7dd73d99ed4e464 pass=1 fail=0 ignore=0 verdict=clean 2026-10-13
+guard-spelling-oracle-pass agents_md_smoke sha256=e9b405afa877863e6da324225a41d1632da4de6e289cab60bd496acd2653578b pass=1 fail=0 ignore=0 verdict=clean 2026-10-13
+guard-spelling-oracle-pass index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-10-13
+guard-spelling-oracle-pass native_crate sha256=7c4b3a93daac1c00b21ef0779195595cb0e0f941053c51c8e9911e6675a88edc pass=1 fail=0 ignore=0 verdict=clean 2026-10-13
+guard-spelling-oracle-pass projection_witness sha256=d0303d643adb10c7af3d75f9a5f4b3bd576711bfc31a6337c9dccaef2de82969 pass=1 fail=0 ignore=0 verdict=clean 2026-10-13
