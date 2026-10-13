@@ -13,3 +13,10 @@
 - rev: 4ca2b05f92329890e14a60d62c64a54436e9b5be
 - finding: One non-event row: heterogeneous-agent-delegation, iteration/low, held at scope 2026-10-09 by operator direction. No deferred entry is at the recurrence threshold; guard-drain-fix-unreviewed carries one date and its lead's judgment of a third incidence. The guard-kit surface carries eight rows, the most of any, none with a live inbound edge. The release that tarball-attestation-observed, front-door-job-observed and companion-toolkit-profile wait on is held by scratch-grant-glued-redirect, a wrong grant, and cat-operand-after-double-dash, a regression from v0.31.0. Supersession: sed-program-escaped-dash and cat-operand-after-double-dash are reshaped by guard-rules-skeleton-word-read, whose lift of the same two rules rewrites the reads they fix; session-sweep-live-scratch is reshaped by session-sweep-horizon-baked, one function.
 - inferred: that the word-read lift of rules cat_file and ro_pipeline would rewrite the reads the two small guard entries fix: read off guard-tests/variant-limits.tsv's rows for those rules and the entries' deliverables, no lift exists to run
+
+## 2026-10-13 build — Which bash decision rows keep a grant when a write onto the sandbox's tracked file is appended, after scratch-grant-glued-redirect's fix?
+- corpus: guard-kit/guard-tests/cases.tsv
+- oracle: an out-of-crate deriver appending ' >tracked.md', '>tracked.md', '>>tracked.md', '>&tracked.md', '2>tracked.md', '&>tracked.md', '>|tracked.md', ' <>tracked.md' and '<>tracked.md' to each eligible cell, fed to --run-guard-tests as its first positional; grep the non-variant FAIL lines for got 'allow' or 'rewrite'
+- rev: 29be9b66add9b8dac1fae2bf952023bce4be5a7a
+- finding: no row is granted 'allow'; rule abs_script's one absolute-script row is 'rewrite' under every suffix but '>|', the finding already in the gap inbox
+- inferred: background-cases.tsv was not derived

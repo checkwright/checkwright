@@ -310,16 +310,8 @@ fn stream_range(ctx: &Ctx, c: &Cmd) -> Result<Option<Verdict>, Fault> {
 }
 
 // spec: guard-kit/SPEC.md §The rule roster — rule `ro_pipeline`'s program discriminator: a `sed` or
-// `awk` segment whose every program text is on the command line and clears the static check; a
-// word the shell passes as an option from behind an escape withholds.
+// `awk` segment whose every program text is on the command line and clears the static check.
 pub(super) fn program_clear(tool: &str, dseg: &str) -> bool {
-    let escaped_option = |w: &&str| {
-        let bare = w.trim_start_matches('\\');
-        bare.len() < w.len() && bare.starts_with('-')
-    };
-    if words(dseg).iter().any(escaped_option) {
-        return false;
-    }
     let Some(p) = program_operands(tool, dseg) else { return false };
     if p.from_file || p.unmodelled || p.inplace || p.scripts.is_empty() {
         return false;
@@ -761,6 +753,20 @@ pub fn find_exec(ctx: &Ctx) -> Decided {
     Ok(None)
 }
 
+// spec: guard-kit/SPEC.md §The rule roster — rule `cat_file`'s operand count: a dash-led word is an
+// option until `--`, and every word behind it is a file.
+fn cat_operands<'a>(args: impl Iterator<Item = &'a str>) -> usize {
+    let mut ended = false;
+    args.filter(|w| {
+        if !ended && *w == "--" {
+            ended = true;
+            return false;
+        }
+        ended || !w.starts_with('-')
+    })
+    .count()
+}
+
 pub fn cat_file(ctx: &Ctx) -> Decided {
     if has_substitution(ctx.raw(ctx.cmd())?) {
         return Ok(None);
@@ -772,8 +778,8 @@ pub fn cat_file(ctx: &Ctx) -> Decided {
     let read = ctx.word_read(ctx.cmd())?.unwrap_or_default();
     let cat_read = |i: usize, seg: &str| {
         let operands = match read.get(i) {
-            Some(ws) if !ws.is_empty() => ws[1..].iter().filter(|w| !w.value.starts_with('-')).count(),
-            _ => words(seg.strip_prefix("cat").unwrap_or(seg)).iter().filter(|t| !t.starts_with('-')).count(),
+            Some(ws) if !ws.is_empty() => cat_operands(ws[1..].iter().map(|w| w.value.as_str())),
+            _ => cat_operands(words(seg.strip_prefix("cat").unwrap_or(seg)).into_iter()),
         };
         head_word(seg) == "cat" && operands == 1
     };
@@ -935,6 +941,17 @@ mod tests {
 
     fn find_words(ws: &[(&str, &str)]) -> Vec<Word> {
         ws.iter().map(|(s, v)| Word::new(s, v, "")).collect()
+    }
+
+    // spec: guard-kit/SPEC.md §The rule roster — rule `cat_file`'s operand count
+    #[test]
+    fn a_double_dash_ends_cat_s_options() {
+        let count = |ws: &[&str]| cat_operands(ws.iter().copied());
+        assert_eq!(count(&["-n", "a"]), 1);
+        assert_eq!(count(&["--", "-n", "a"]), 2);
+        assert_eq!(count(&["-n", "--", "-n"]), 1);
+        assert_eq!(count(&["a", "--", "--"]), 2);
+        assert_eq!(count(&["--"]), 0);
     }
 
     // spec: guard-kit/SPEC.md §The rule roster — the steer prints an escaped blank, a single-quoted

@@ -25,13 +25,13 @@ fn block(m: impl Into<String>) -> Decided {
 pub fn truncate_scratch(ctx: &Ctx) -> Decided {
     let cmd = ctx.view(ctx.cmd(), SqDqHd)?;
     if !text::matches(
-        "^[[:space:]]*:([[:space:]]+[0-9]*>[>&]?[[:space:]]*[^[:space:]&|;<]+)+[[:space:]]*$",
+        "^[[:space:]]*:([[:space:]]+[0-9]*>[>&]?[[:space:]]*[^[:space:]&|;<>]+)+[[:space:]]*$",
         &cmd,
     ) {
         return Ok(None);
     }
     let mut all_ignored = true;
-    for m in text::grep_o("[0-9]*>[>&]?[[:space:]]*[^[:space:]&|;<]+", &cmd) {
+    for m in ctx.redirect_pairs(&cmd) {
         let tgt = strip_redirect_op(&m);
         if tgt.is_empty() {
             continue;
@@ -273,12 +273,15 @@ fn write_words(sw: &str, dw: &str) -> Option<(Vec<String>, Vec<String>)> {
         if !d[k].starts_with(&s[k][..n]) {
             return None;
         }
-        let tgt = if s[k].len() > n {
-            &d[k][n..]
+        let (held, tgt) = if s[k].len() > n {
+            (&s[k][n..], &d[k][n..])
         } else {
             k += 1;
-            *d.get(k)?
+            (*s.get(k)?, *d.get(k)?)
         };
+        if held.contains(['<', '>', '&']) {
+            return None;
+        }
         k += 1;
         match kind {
             Redir::In => {}
@@ -852,6 +855,9 @@ mod tests {
         assert_eq!(write_words("echo x>.tmp/f", "echo x>.tmp/f"), None);
         assert_eq!(write_words("ls >&out", "ls >&out"), None);
         assert_eq!(write_words("cat <<EOF", "cat <<EOF"), None);
+        for glued in ["echo x >> .tmp/a>f", "echo x >.tmp/a>>f", "echo x > .tmp/a2>f", "echo x >.tmp/a&>f", "ls >.tmp/a<f"] {
+            assert_eq!(write_words(glued, glued), None, "{}", glued);
+        }
         let (_, o) = write_words("ls &>>.tmp/a", "ls &>>.tmp/a").unwrap();
         assert_eq!(o, strings(&[".tmp/a"]));
         let (w, o) = write_words("touch .tmp/a\\ b", "touch .tmp/a\\\x01b").unwrap();

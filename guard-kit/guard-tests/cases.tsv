@@ -195,6 +195,9 @@ fallthrough	find . -name '*.tsv' -delete
 fallthrough	find . -exec md5sum '{}' +
 fallthrough	find . -exec sort -o out.txt '{}' +
 fallthrough	find . -exec grep x '{}' + -exec grep y '{}' +
+# the executed program is read by its words' values, so a quoted backslash ahead of a dash is
+# program text the check clears
+block	find . -name x -exec sed -n '\-x-p' '{}' +
 
 # rule `cat_file` — bare single-file cat steered to Read, alone or as a ';'-batch of reads
 #           (a literal echo/printf banner between reads is fine); multi-file, piped,
@@ -206,6 +209,12 @@ block	cat \-n guard-kit/SPEC.md
 block	cat '-n' guard-kit/SPEC.md
 block	cat "-n" guard-kit/SPEC.md
 allow	cat '-n' one.md two.md
+# `--` ends the options, so a dash-led word behind it is a file: two of them concatenate, and one
+# is the lone read
+allow	cat -- '-n' tracked.md
+allow	cat -- -n tracked.md
+block	cat -- -n
+block	cat -n -- tracked.md
 block	cat a.md; cat b.md
 block	cat a.md; echo ===; cat b.md
 fallthrough	cat a.md; make build
@@ -370,6 +379,15 @@ allow	: >& scratch.txt
 allow	: >&scratch.txt
 fallthrough	: >& tracked.txt
 fallthrough	: > scratch.txt 2>&1
+# a second redirect glued to a target is a redirect of its own, never part of an ignored name: a
+# target under the ignored directory is granted, and the same target with a write to a tracked
+# file glued on is not, a digit ahead of the glued operator being the target's own character
+allow	: > .tmp/a
+fallthrough	: > .tmp/a>tracked.md
+fallthrough	: >.tmp/a>tracked.md
+fallthrough	: >& .tmp/a>tracked.md
+fallthrough	: > .tmp/a>>tracked.md
+fallthrough	: > .tmp/a2>tracked.md
 
 # rule `append_scratch` — a write to gitignored targets auto-allowed, create and append alike.
 #           The clauses each get their refusing case, because each is what keeps
@@ -475,6 +493,12 @@ fallthrough	awk \-f prog.awk notes.txt
 fallthrough	grep x tracked.md | awk \-f prog.awk
 fallthrough	awk \-W posix 'NR<=5' notes.txt
 fallthrough	grep x tracked.md | xargs awk \-f prog.awk
+# the test reads the word's value, so a quoted backslash ahead of a dash is program text, here a
+# print under an address delimited by '-', where the same word unquoted is an option
+allow	grep x tracked.md | sed -n '\-x-p'
+allow	grep x tracked.md | xargs sed -n '\-x-p'
+fallthrough	grep x tracked.md | sed -n \-x-p
+fallthrough	grep x tracked.md | sed -n '\-x-w out.txt'
 fallthrough	grep x tracked.md | sed -l 5 s/a/b/
 # banner tolerance (rules `find_glob` and `cat_file`'s): a literal echo/printf
 # segment is skipped, but at least one roster read must remain
@@ -653,6 +677,10 @@ allow	grep -c x tracked.md > .tmp/n.txt; wc -l .tmp/n.txt
 fallthrough	grep -c x tracked.md > out.txt
 # an fd-dup onto a named file withholds even on a bounded target
 fallthrough	mkdir -p .tmp/out >& .tmp/n.txt
+# an operator glued to a redirect target withholds as one inside a word does: the shell reads a
+# second redirect, so the bounded word is not all the call writes
+fallthrough	grep -c x tracked.md > .tmp/n.txt>tracked.md
+fallthrough	mkdir -p .tmp/out >.tmp/n.txt>>tracked.md
 # one refusing row per clause: the scratch member itself and a path outside every member (b); a
 # '..' component and a rooted path (a); a tracked destination (c, d); the operand grammar's
 # withheld forms; an xargs running a write utility (d); a backgrounded write, which rule
@@ -823,6 +851,12 @@ block	cat >> tracked.md
 # `>&` onto a named file is the write `>` is, alone and beside an ignored target
 block	echo x >& tracked.md
 block	printf x >> .tmp/journal.md >& tracked.md
+# a second redirect glued to an ignored target is the write the spaced spelling is: no grant above
+# reads the glued word as one ignored name, so the tracked target reaches this rule
+block	echo x >> .tmp/a>tracked.md
+block	echo x >> .tmp/a>>tracked.md
+block	echo x > .tmp/a2>tracked.md
+block	echo x >.tmp/a&>tracked.md
 fallthrough	bash gate-sdk/bin/run-gates.sh --emit trajectory > docs/x.md
 fallthrough	echo x > /dev/stderr
 fallthrough	make build > .tmp/b.log 2>&1 & echo "pid=$! run=b" > .tmp/b.run; wait; rm -f .tmp/b.run

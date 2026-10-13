@@ -481,6 +481,19 @@ fn background_statements(seg: &str) -> Vec<&str> {
     out
 }
 
+// spec: guard-kit/SPEC.md §The rule roster — rule `ro_pipeline`'s program discriminator, its option
+// test: a word the shell passes dash-led whose dequoted token is not, or a segment whose word read
+// does not align with its dequoted words.
+fn masked_option(read: Option<&Vec<Word>>, dseg: &str) -> bool {
+    let dw = words(dseg);
+    match read {
+        Some(ws) if ws.len() == dw.len() => {
+            ws.iter().zip(dw).any(|(w, d)| w.value.starts_with('-') && !d.starts_with('-'))
+        }
+        _ => true,
+    }
+}
+
 fn ro_forms_read(ctx: &Ctx, c: &Cmd, skip: &[usize], statements: bool) -> Result<bool, Fault> {
     let h = ctx.host();
     let Some(v) = ctx.dequoted(c)? else { return Ok(false) };
@@ -490,22 +503,24 @@ fn ro_forms_read(ctx: &Ctx, c: &Cmd, skip: &[usize], statements: bool) -> Result
     if segs.len() != dsegs.len() {
         return Ok(false);
     }
-    let mut pairs: Vec<(&str, &str)> = Vec::new();
+    let read = ctx.word_read(c)?;
+    let mut pairs: Vec<(&str, &str, bool)> = Vec::new();
     for (i, (seg, dseg)) in segs.iter().zip(&dsegs).enumerate() {
         if skip.contains(&i) {
             continue;
         }
+        let masked = masked_option(read.as_ref().and_then(|r| r.get(i)), dseg);
         if !statements {
-            pairs.push((seg, dseg));
+            pairs.push((seg, dseg, masked));
             continue;
         }
         let (cut, dcut) = (background_statements(seg), background_statements(dseg));
         if cut.len() != dcut.len() {
             return Ok(false);
         }
-        pairs.extend(cut.into_iter().zip(dcut));
+        pairs.extend(cut.into_iter().zip(dcut).map(|(s, d)| (s, d, masked)));
     }
-    for (seg, dseg) in pairs {
+    for (seg, dseg, masked) in pairs {
         let cw = command_word(seg);
         let bin = head_word(&cw);
         if bin.is_empty() || !on_ro_roster(h, bin) {
@@ -517,7 +532,7 @@ fn ro_forms_read(ctx: &Ctx, c: &Cmd, skip: &[usize], statements: bool) -> Result
         if !ro_invocation_clear(h, bin, &strip(&dcw), &strip(&core), false) {
             return Ok(false);
         }
-        if matches!(bin, "sed" | "awk") && !tools::program_clear(bin, &dcw) {
+        if matches!(bin, "sed" | "awk") && (masked || !tools::program_clear(bin, &dcw)) {
             return Ok(false);
         }
         if bin != "xargs" {
@@ -536,7 +551,7 @@ fn ro_forms_read(ctx: &Ctx, c: &Cmd, skip: &[usize], statements: bool) -> Result
         if !ro_invocation_clear(h, &xcmd, &dtoks[idx + 1..].join(" "), "", true) {
             return Ok(false);
         }
-        if matches!(xcmd.as_str(), "sed" | "awk") && !tools::program_clear(&xcmd, &dtoks[idx..].join(" ")) {
+        if matches!(xcmd.as_str(), "sed" | "awk") && (masked || !tools::program_clear(&xcmd, &dtoks[idx..].join(" "))) {
             return Ok(false);
         }
     }
@@ -760,6 +775,19 @@ mod tests {
         assert_eq!(got(&[plain_word("git"), escaped]), vec!["git", "stash"]);
         assert_eq!(got(&[plain_word("git"), plain_word("stash"), plain_word("2>&"), plain_word("1"), plain_word("pop")]), vec!["git", "stash", "pop"]);
         assert_eq!(got(&[plain_word("git"), plain_word("stash"), plain_word(">&"), plain_word("out"), plain_word("pop")]), vec!["git", "stash", "pop"]);
+    }
+
+    // spec: guard-kit/SPEC.md §The rule roster — rule `ro_pipeline`'s program discriminator, its
+    // option test: an escaped option is masked, a quoted backslash ahead of a dash is program text
+    #[test]
+    fn a_word_passed_dash_led_from_behind_an_escape_is_masked() {
+        let word = |s: &str, v: &str, l: &str| Word::new(s, v, l);
+        let sed = |w: Word| vec![plain_word("sed"), plain_word("-n"), w];
+        assert!(masked_option(Some(&sed(word("\\-x-p", "-x-p", "\\-x-p"))), "sed -n \\-x-p"));
+        assert!(!masked_option(Some(&sed(word("'\\-x-p'", "\\-x-p", "\0SQ"))), "sed -n \\-x-p"));
+        assert!(!masked_option(Some(&sed(word("'-E'", "-E", "\0SQ"))), "sed -n -E"));
+        assert!(masked_option(Some(&sed(plain_word("p"))), "sed -n p x"));
+        assert!(masked_option(None, "sed -n p"));
     }
 
     #[test]

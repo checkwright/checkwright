@@ -12,13 +12,13 @@
 
 [spec: SPEC-lane-reach.md] [recurrence: 2026-10-13]
 
-a guard fix authored at the closing stage's drain reaches the closing push read by its author and the decision tables alone. For the third close running the second-vendor review found defects in guard fixes its own iteration landed; at guard-spelling-oracle-pass' close all three sat in the drain's fix, one of them a grant ([scratch-grant-glued-redirect](#scratch-grant-glued-redirect)). The variant lane derived none of the three: two turn on a row that carries a quote, which the lane leaves underived, and one on a second redirect glued to a target, which no transform composes onto a grant row.
+a guard fix authored at the closing stage's drain reaches the closing push read by its author and the decision tables alone. For the third close running the second-vendor review found defects in guard fixes its own iteration landed; at guard-spelling-oracle-pass' close all three sat in the drain's fix, one of them a grant (`scratch-grant-glued-redirect`). The variant lane derived none of the three: two turn on a row that carries a quote, which the lane leaves underived, and one on a second redirect glued to a target, which no transform composes onto a grant row.
 
 **Deliverable:** the authoring stage's choice among three, or a combination: the drain promoting a finding whose fix moves a guard verdict in place of fixing it; the drain's guard fixes taking the review before they are committed; the lane deriving a quoted row and a doubled redirect. A form not taken is stated as the limit in guard-kit/SPEC.md §Testing.
 
 **Cost while deferred:** each iteration that edits a guard rule ends on a review finding in its own fix, and a cut the release bar holds is deferred again. Filed 2026-10-13 by guard-spelling-oracle-pass' lead as a recurrence judgment and promoted at the next scope's intake; `guard-spelling-variant-oracle`, done, recorded the shape's earlier recurrence, so its date rides this entry's first stamp. Owner lookup: `drain`, `second-vendor`, `underived` in this file and the disposed-findings record — [variant-lane-underived-tables](#variant-lane-underived-tables), DISTINCT (the PowerShell and consumer tables, where this is the bash lane's quoted rows and the drain's order); owner guard-kit/SPEC.md §Testing.
 
-**In the unit set (operator direction, 2026-10-13, lead-relayed, not a ruling)** [scratch-grant-glued-redirect](#scratch-grant-glued-redirect) records. **Grant, unspent (operator, 2026-10-13, lead-relayed):** one foreign second-vendor review run at validate, its adapter unnamed; the lead asks for the adapter and reads its budget before that dispatch.
+**In the unit set (operator direction, 2026-10-13, lead-relayed, not a ruling)** `scratch-grant-glued-redirect` records. **Grant, unspent (operator, 2026-10-13, lead-relayed):** one foreign second-vendor review run at validate, its adapter unnamed; the lead asks for the adapter and reads its budget before that dispatch.
 
 ### variant-lane-underived-tables
 
@@ -30,43 +30,9 @@ the guard decision tables' variant lane derives re-spellings from the two bash t
 
 **Cost while deferred:** a PowerShell rule or a consumer rule misreading a re-spelling is met by a review or a user, never by the tables. Filed 2026-10-13 by guard-spelling-oracle-pass' spec and promoted at its close. Re-verified there by reading that section's limit sentence. Owner lookup: `variant`, `PowerShell`, `transform` in this file and the disposed-findings record — none; `guard-spelling-variant-oracle`, done, DISTINCT (the bash lane, landed); owner guard-kit/SPEC.md §Testing.
 
-**In the unit set (operator direction, 2026-10-13, lead-relayed, not a ruling)** [scratch-grant-glued-redirect](#scratch-grant-glued-redirect) records, added to the four scope recommended. Where the authoring stage gives [guard-drain-fix-unreviewed](#guard-drain-fix-unreviewed) the lane form, the two add transforms to one lane and ride one amendment.
+**In the unit set (operator direction, 2026-10-13, lead-relayed, not a ruling)** `scratch-grant-glued-redirect` records, added to the four scope recommended. Where the authoring stage gives [guard-drain-fix-unreviewed](#guard-drain-fix-unreviewed) the lane form, the two add transforms to one lane and ride one amendment.
 
 ## Technical Debt
-
-### scratch-grant-glued-redirect
-
-rules `truncate_scratch` and `append_scratch` grant a write to a tracked file where a second redirect is glued to the first target. `: > .tmp/a>README.md`, `: >.tmp/a>README.md`, `: >& .tmp/a>README.md`, `echo x >> .tmp/a>README.md` and `echo x >> .tmp/a>>README.md` are each `allow`, where the spaced `: > .tmp/a >README.md` falls through and the spaced `echo` spelling blocks. The rules admit `>` inside a target word, so the ignore test is asked of `.tmp/a>README.md` as one name, which the scratch directory's ignore rule covers, while the shell reads two redirects and writes both files.
-
-**Deliverable:** both rules' targets read off the reader's redirect pairs (guard-kit/SPEC.md §The reader and its views), or `>` and `<` excluded from their target class, with a decision row per spelling above.
-
-**Run at this intake**, through the hook member here and against the published v0.31.0 binary in a zero-config scratch repository: the two plain `:` spellings are `allow` at both; the `>&` spelling moved from fall-through to `allow`, and the two `echo` spellings from `block` to `allow`, since that release.
-
-**Cost while deferred:** a tracked file is emptied or overwritten with no permission decision, and the release bar [tarball-attestation-observed](#tarball-attestation-observed) records holds the next cut on it. Filed 2026-10-13 by guard-spelling-oracle-pass close's second-vendor review, which ran the `:` spellings, and promoted at the next scope's intake, where the `echo` spellings were first run. Owner lookup: `truncate_scratch`, `append_scratch`, `glued` in this file and the disposed-findings record — [guard-rules-skeleton-word-read](#guard-rules-skeleton-word-read), DISTINCT (a block's re-spelling falling through, where this is a grant's target class); owner guard-kit/SPEC.md §The generic ruleset.
-
-**Unit set (operator direction, 2026-10-13, lead-relayed, not a ruling):** this entry leads a five-entry guard-kit set with [cat-operand-after-double-dash](#cat-operand-after-double-dash), [sed-program-escaped-dash](#sed-program-escaped-dash), [guard-drain-fix-unreviewed](#guard-drain-fix-unreviewed) and [variant-lane-underived-tables](#variant-lane-underived-tables); scope had recommended the first four.
-
-**Push need (2026-10-13, inside the budget):** the closing push, and the release tag push beside it where close cuts the release this set is sized to unblock; no mid-iteration push, the decision tables running locally ahead of any remote leg.
-
-### cat-operand-after-double-dash
-
-rule `cat_file` blocks a multi-file `cat` whose file operand leads with a dash behind `--`: `cat -- '-n' README.md` takes the Read-tool steer, where it is the concatenation the rule's text leaves untouched. The rule's operand count drops every word whose value leads with a dash and does not read `--` as ending the options.
-
-**Deliverable:** the count reading `--`, with a row.
-
-**Run at this intake:** the spelling blocks here and was `allow` at the published v0.31.0 binary, a regression from that release.
-
-**Cost while deferred:** one re-issue for a file named with a leading dash; no grant. Filed 2026-10-13 by guard-spelling-oracle-pass close's second-vendor review and promoted at the next scope's intake. Owner lookup: `cat_file`, `operand count`, `--` in this file and the disposed-findings record — none; owner guard-kit/SPEC.md §The rule roster.
-
-### sed-program-escaped-dash
-
-rule `ro_pipeline`'s program discriminator withholds a read-only `sed` or `awk` whose quoted program text leads with a backslash and a dash: `grep x README.md | sed -n '\-x-p'`, a print under an address delimited by `-`, falls through. The option test withholds on any word led by a backslash whose remainder leads with a dash, read off the dequoted view, where a quoted backslash and an escaping one are one text.
-
-**Deliverable:** the option test taken off the word read's value, which tells the two apart, with a row; or the limit stated in the discriminator's paragraph.
-
-**Run at this intake:** the spelling falls through here and at the published v0.31.0 binary alike, so it is no regression from that release.
-
-**Cost while deferred:** one permission decision for a rare read-only spelling; no grant. Filed 2026-10-13 by guard-spelling-oracle-pass close's second-vendor review and promoted at the next scope's intake. Owner lookup: `ro_pipeline`, `discriminator`, `backslash` in this file and the disposed-findings record — none; owner guard-kit/SPEC.md §The generic ruleset.
 
 ## Deferred
 
@@ -1293,4 +1259,8 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 the manual-operation meter keys every arm called through the gate binary's door as one key, split across the door's two spellings, so it cannot name a repeated arm; the deliverable is a door-aware sub-key owned by drift-kit/SPEC.md §The manual-operation meter or guard-kit/SPEC.md §scan-prompts.
 
 ## Done
+
+- scratch-grant-glued-redirect
+- cat-operand-after-double-dash
+- sed-program-escaped-dash
 
