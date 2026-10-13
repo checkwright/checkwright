@@ -27,7 +27,7 @@ pub static TABLE: &[Rule] = &[
     Rule { name: "sed_file", shells: BASH, views: &[SqDqHd, Dequoted, View::Body], test: tools::sed_file },
     Rule { name: "find_glob", shells: BASH, views: &[Raw, SqDqHd], test: tools::find_glob },
     Rule { name: "find_exec", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: tools::find_exec },
-    Rule { name: "cat_file", shells: BASH, views: &[Raw, SqDqHd], test: tools::cat_file },
+    Rule { name: "cat_file", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: tools::cat_file },
     Rule { name: "git_grep", shells: BOTH, views: &[Raw, SqDqHd, Dequoted], test: tools::git_grep },
     Rule { name: "pgrep_self_match", shells: BASH, views: &[Raw], test: tools::pgrep_self_match },
     Rule { name: "bare_sleep", shells: BASH, views: &[Raw, SqDqHd], test: tools::bare_sleep },
@@ -273,7 +273,7 @@ fn fd_word(w: &str) -> bool {
 
 // spec: guard-kit/SPEC.md §The generic ruleset — a redirect pair's target: its fd digits and its
 // operator dropped, then the blanks. An fd-dup keeps its `&`; a `>&` onto a file yields the file.
-fn strip_redirect_op(pair: &str) -> &str {
+pub(super) fn strip_redirect_op(pair: &str) -> &str {
     let p = pair.trim_start_matches(|c: char| c.is_ascii_digit());
     let p = p.strip_prefix('>').unwrap_or(p);
     if let Some(word) = p.strip_prefix('&').map(trim_start) {

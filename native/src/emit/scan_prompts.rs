@@ -199,14 +199,8 @@ fn write_redirects(c: &str) -> Vec<(&'static str, String)> {
     let mut out = Vec::new();
     for pair in pairs {
         let p = pair.trim_start_matches(|ch: char| ch.is_ascii_digit());
-        let (op, tgt) = match p.strip_prefix(">>") {
-            Some(t) => (">>", t),
-            None => (">", p.strip_prefix('>').unwrap_or(p)),
-        };
-        let tgt = trim_start(tgt);
-        if tgt.is_empty() || tgt.starts_with('&') {
-            continue;
-        }
+        let op = if p.starts_with(">>") { ">>" } else { ">" };
+        let Some(tgt) = guard::file_target(&pair) else { continue };
         out.push((op, tgt.to_string()));
     }
     out
@@ -623,6 +617,9 @@ mod tests {
         assert_eq!(ranking_key("cat > .tmp/a.md <<EOF"), "cat >");
         assert_eq!(ranking_key("cat >> .tmp/b.md <<EOF"), "cat >>");
         assert_eq!(ranking_key("make build 2>&1"), "make");
+        assert_eq!(ranking_key("make build >& out.txt"), "make >");
+        assert_eq!(ranking_key("make build >&out.txt"), "make >");
+        assert_eq!(ranking_key("make build >& 2"), "make");
         assert_eq!(ranking_key("sort -rn 2> err.txt"), "sort >");
         assert_eq!(ranking_key("wc -l < in.txt"), "wc");
     }

@@ -39,6 +39,11 @@ fallthrough	FOO=bar make build
 # rule `scratch_redirect` — bare-name scratch redirect
 block	some-runner 2> op.err
 fallthrough	some-runner 2> .tmp/op.err
+# `>&` onto a named file is the same write, glued or apart
+block	some-runner >& op.err
+block	some-runner >&op.log
+fallthrough	some-runner >& .tmp/op.err
+fallthrough	some-runner > .tmp/op.err 2>&1
 
 # rule `abs_script` — absolute-path read-only repo script (rewrite) vs other script (block).
 #          The rewrite emits allow, so it attaches only when the rewritten command
@@ -196,6 +201,11 @@ fallthrough	find . -exec grep x '{}' + -exec grep y '{}' +
 #           redirected, &&-chained, mixed, and banner-only forms are composition and pass
 block	cat TASK-QUEUE.md
 block	cat -n guard-kit/SPEC.md
+# an option is read by its value, so a quoted or escaped one is no second operand
+block	cat \-n guard-kit/SPEC.md
+block	cat '-n' guard-kit/SPEC.md
+block	cat "-n" guard-kit/SPEC.md
+allow	cat '-n' one.md two.md
 block	cat a.md; cat b.md
 block	cat a.md; echo ===; cat b.md
 fallthrough	cat a.md; make build
@@ -354,8 +364,12 @@ fallthrough	git stash2>.tmp/o
 # rule `truncate_scratch` — `: > file` truncation auto-allowed iff every target is gitignored
 allow	: > scratch.txt
 fallthrough	: > tracked.txt
-# the grant is spelled `>` or `>>`: an fd-dup onto a named file earns none
-fallthrough	: >& scratch.txt
+# `>&` onto a named file is the truncation `>` is, bounded by the same target test; an fd-dup is
+# no gitignored target
+allow	: >& scratch.txt
+allow	: >&scratch.txt
+fallthrough	: >& tracked.txt
+fallthrough	: > scratch.txt 2>&1
 
 # rule `append_scratch` — a write to gitignored targets auto-allowed, create and append alike.
 #           The clauses each get their refusing case, because each is what keeps
@@ -455,6 +469,12 @@ fallthrough	grep x tracked.md | sed 's/a/b/w out.txt'
 fallthrough	awk 'BEGIN {system("ls")}'
 fallthrough	grep x tracked.md | awk '{"date" | getline d; print d}'
 fallthrough	grep x tracked.md | sed -f prog.sed
+# an option the shell passes from behind an escape withholds, since the walker would read it as the
+# program
+fallthrough	awk \-f prog.awk notes.txt
+fallthrough	grep x tracked.md | awk \-f prog.awk
+fallthrough	awk \-W posix 'NR<=5' notes.txt
+fallthrough	grep x tracked.md | xargs awk \-f prog.awk
 fallthrough	grep x tracked.md | sed -l 5 s/a/b/
 # banner tolerance (rules `find_glob` and `cat_file`'s): a literal echo/printf
 # segment is skipped, but at least one roster read must remain

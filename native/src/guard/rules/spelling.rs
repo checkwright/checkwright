@@ -149,7 +149,7 @@ pub fn scratch_redirect(ctx: &Ctx) -> Decided {
     let cmd = ctx.view(ctx.cmd(), SqDqHd)?;
     let bare = match ctx.shell() {
         Shell::Bash => grep_q(
-            "(^|[[:space:]])([0-9]*|&)>>?[[:space:]]*[^[:space:]/|&]+\\.(err|out|log)([[:space:]]|$)",
+            "(^|[[:space:]])([0-9]*|&)>[>&]?[[:space:]]*[^[:space:]/|&]+\\.(err|out|log)([[:space:]]|$)",
             &cmd,
         ),
         // spec: guard-kit/SPEC.md §The generic ruleset — PowerShell's `*` stream operator, and a `\`

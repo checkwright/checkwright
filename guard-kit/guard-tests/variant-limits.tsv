@@ -19,12 +19,9 @@ fallthrough	bare_sleep	esc-lead
 fallthrough	bare_sleep	part-lead
 fallthrough	bare_sleep	sq-lead
 fallthrough	bare_sleep	wrap-command
-allow	cat_file	dq-arg
 fallthrough	cat_file	dq-lead
-allow	cat_file	esc-arg
 fallthrough	cat_file	esc-lead
 fallthrough	cat_file	part-lead
-allow	cat_file	sq-arg
 fallthrough	cat_file	sq-lead
 fallthrough	cat_file	wrap-command
 fallthrough	cd_compound	dq-lead
@@ -93,4 +90,3 @@ fallthrough	script_interpreter	sq-arg
 fallthrough	script_interpreter	sq-lead
 fallthrough	script_interpreter	word-glued
 fallthrough	script_interpreter	wrap-command
-allow	sed_file	esc-arg

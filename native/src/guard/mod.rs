@@ -18,6 +18,13 @@ pub fn rule_table() -> &'static [engine::Rule] {
     rules::TABLE
 }
 
+// spec: guard-kit/SPEC.md §scan-prompts — a redirect pair's target on the rules' own fd-word test:
+// the file it writes, or `None` for an fd-dup.
+pub fn file_target(pair: &str) -> Option<&str> {
+    let t = rules::strip_redirect_op(pair);
+    (!t.is_empty() && !t.starts_with('&')).then_some(t)
+}
+
 // spec: guard-kit/SPEC.md §The shell guard — the settings-allow match core and its one compiled
 // holder: a closing `:*`, or a closing ` *` that is the rule's only `*`, is the head alone or the
 // head, a space, anything.

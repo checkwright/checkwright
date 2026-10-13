@@ -25,18 +25,18 @@ fn block(m: impl Into<String>) -> Decided {
 pub fn truncate_scratch(ctx: &Ctx) -> Decided {
     let cmd = ctx.view(ctx.cmd(), SqDqHd)?;
     if !text::matches(
-        "^[[:space:]]*:([[:space:]]+[0-9]*>>?[[:space:]]*[^[:space:]&|;<]+)+[[:space:]]*$",
+        "^[[:space:]]*:([[:space:]]+[0-9]*>[>&]?[[:space:]]*[^[:space:]&|;<]+)+[[:space:]]*$",
         &cmd,
     ) {
         return Ok(None);
     }
     let mut all_ignored = true;
-    for m in text::grep_o("[0-9]*>>?[[:space:]]*[^[:space:]&|;<]+", &cmd) {
+    for m in text::grep_o("[0-9]*>[>&]?[[:space:]]*[^[:space:]&|;<]+", &cmd) {
         let tgt = strip_redirect_op(&m);
         if tgt.is_empty() {
             continue;
         }
-        if !ctx.host().ignored(tgt) {
+        if tgt.starts_with('&') || !ctx.host().ignored(tgt) {
             all_ignored = false;
             break;
         }

@@ -310,8 +310,16 @@ fn stream_range(ctx: &Ctx, c: &Cmd) -> Result<Option<Verdict>, Fault> {
 }
 
 // spec: guard-kit/SPEC.md §The rule roster — rule `ro_pipeline`'s program discriminator: a `sed` or
-// `awk` segment whose every program text is on the command line and clears the static check.
+// `awk` segment whose every program text is on the command line and clears the static check; a
+// word the shell passes as an option from behind an escape withholds.
 pub(super) fn program_clear(tool: &str, dseg: &str) -> bool {
+    let escaped_option = |w: &&str| {
+        let bare = w.trim_start_matches('\\');
+        bare.len() < w.len() && bare.starts_with('-')
+    };
+    if words(dseg).iter().any(escaped_option) {
+        return false;
+    }
     let Some(p) = program_operands(tool, dseg) else { return false };
     if p.from_file || p.unmodelled || p.inplace || p.scripts.is_empty() {
         return false;
@@ -649,14 +657,14 @@ fn python_rewrite(ctx: &Ctx, c: &Cmd, s: &str) -> Decided {
 
 // spec: guard-kit/SPEC.md §The generic ruleset — a `;`-compound skeleton is a batched read when every
 // segment is a bare read or a literal banner, and at least one is a read.
-fn is_read_batch(ctx: &Ctx, s: &str, pred: impl Fn(&str) -> bool) -> bool {
+fn is_read_batch(ctx: &Ctx, s: &str, pred: impl Fn(usize, &str) -> bool) -> bool {
     let mut reads = 0usize;
-    for seg in ctx.segments(s) {
-        let seg = trim_start(&seg);
+    for (i, seg) in ctx.segments(s).iter().enumerate() {
+        let seg = trim_start(seg);
         if seg.is_empty() {
             continue;
         }
-        if pred(seg) {
+        if pred(i, seg) {
             reads += 1;
         } else if !is_banner(seg) {
             return false;
@@ -678,7 +686,7 @@ pub fn find_glob(ctx: &Ctx) -> Decided {
         return Ok(None);
     }
     let h = ctx.host();
-    let listing = |seg: &str| {
+    let listing = |_: usize, seg: &str| {
         head_word(seg) == "find" && {
             let rest = seg.strip_prefix("find").unwrap_or(seg);
             ro_invocation_clear(h, "find", rest, &segment_core(rest), false)
@@ -761,9 +769,13 @@ pub fn cat_file(ctx: &Ctx) -> Decided {
     if grep_q(r"(&&|\|\||\||&|<|>)", &s) {
         return Ok(None);
     }
-    let cat_read = |seg: &str| {
-        head_word(seg) == "cat"
-            && words(seg.strip_prefix("cat").unwrap_or(seg)).iter().filter(|t| !t.starts_with('-')).count() == 1
+    let read = ctx.word_read(ctx.cmd())?.unwrap_or_default();
+    let cat_read = |i: usize, seg: &str| {
+        let operands = match read.get(i) {
+            Some(ws) if !ws.is_empty() => ws[1..].iter().filter(|w| !w.value.starts_with('-')).count(),
+            _ => words(seg.strip_prefix("cat").unwrap_or(seg)).iter().filter(|t| !t.starts_with('-')).count(),
+        };
+        head_word(seg) == "cat" && operands == 1
     };
     if !is_read_batch(ctx, &s, cat_read) {
         return Ok(None);
