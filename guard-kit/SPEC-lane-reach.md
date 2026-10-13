@@ -83,6 +83,10 @@ New §Testing passage, placed after the write-added passage of delta 1. **Not ye
 > - `ps-case-lead` upper-cases a verb-noun `lead`, the one name every host matches without regard to case;
 > - `ps-alias-lead` replaces a cmdlet `lead` with each of its built-in aliases, from the deriver's own table, which its crate test holds to every verb-noun lead the tables carry.
 
+Replacement for the section sentences of §Testing's limits paragraph, *A section of a bash table opens … belongs to none, so its re-spellings take no limit.* **Not yet applied.**
+
+> A section of a table opens at a comment line beginning `# rule` and a backticked rule name and runs to the next. Sections of one name are one section across the four tables, and a row ahead of the first belongs to none, so its re-spellings take no limit. A `ps-` transform is derived from a PowerShell row alone, so a limit row naming one is held to the rule's section in those two tables.
+
 ### (4) The consumer lane's derivation is a knob
 
 A consumer names a limits table to have its own rows derived, and with none named the consumer lane runs as it does {design-bearing} {user-facing: `variant-lane-underived-tables`' Deliverable, the consumer lane's derivation as a consumer-selectable knob with off among its values — a new knob name, and a new exit 1 and exit 2 for a consumer that sets it}.
@@ -103,7 +107,7 @@ Replacement for §Testing's *The declared roster is …* sentence. **Not yet app
 
 New bullet in §Testing's consumer-lane list, after *A table set with no rule command, or naming no readable file, is exit 2.* **Not yet applied.**
 
-> - Where `GUARD_KIT_CONSUMER_VARIANT_LIMITS` names a limits table, the lane derives each row's bash re-spellings and feeds them to the same command, held to the variant lane's relation and to that table from both sides. A section's name is the consumer's own. The knob set with no cases table, or naming a table the lane cannot read, is exit 2. Off is the default because a kit release adding a transform would otherwise red a consumer's lane for a re-spelling its rules never read.
+> - Where `GUARD_KIT_CONSUMER_VARIANT_LIMITS` names a limits table, the lane derives each row's bash re-spellings and feeds them to the same command, held to the variant lane's relation and to that table from both sides. A section's name is the consumer's own. The knob set with no cases table, or naming a table the lane cannot read, is exit 2, and the summary line names the lane's derived and limit-row counts only where the knob is set. Off is the default because a kit release adding a transform would otherwise red a consumer's lane for a re-spelling its rules never read.
 
 New item in §Layout and configuration's knob list, after `GUARD_KIT_CONSUMER_CASES`. **Not yet applied.**
 
@@ -168,9 +172,9 @@ The arm's describers, its seam test and the knob's rosters take the widened lane
 
 ## Existing sections updated
 
-- `guard-kit/SPEC.md` §Testing — the variant-lane paragraph, the write-added passage, the eligibility sentence, the PowerShell passage, the declared roster, the consumer-lane bullet and the limits paragraph (deltas 1, 2, 3, 4 and 6).
+- `guard-kit/SPEC.md` §Testing — the variant-lane paragraph, the write-added passage, the eligibility sentence, the PowerShell passage, the limits paragraph's section sentences, the declared roster, the consumer-lane bullet and the honest-limits paragraph (deltas 1, 2, 3, 4 and 6).
 - `guard-kit/SPEC.md` §Layout and configuration — the knob's item and the tree comment (deltas 4 and 8).
-- `native/src/emit/guard_variants.rs`, `native/src/emit/run_guard_tests.rs` — the two families, the span rule, the PowerShell deriver and the consumer derivation, in those files or a module beside them (deltas 1, 2, 3 and 4).
+- `native/src/emit/guard_variants.rs`, `native/src/emit/run_guard_tests.rs` — the two families, the span rule, the PowerShell deriver, the consumer derivation and the ok line's count, in those files or a module beside them (deltas 1, 2, 3, 4 and 8).
 - `native/src/knobs/guard_kit.rs` — the knob's row (delta 8).
 - `guard-kit/guard-tests/variant-limits.tsv`, `guard-kit/guard-tests/cases.tsv`, `guard-kit/guard-tests/powershell-cases.tsv` — the limit rows, the authored row and the openers (delta 7).
 - `guard-kit/templates/guard-config.knobs`, `guard-kit/README.md`, `guard-kit/gate-tests/consumer-rules.test.sh` (delta 8).
