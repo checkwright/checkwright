@@ -1198,11 +1198,10 @@ A site is a `lead` where its token opens a statement and an `arg` elsewhere. A t
 - on a limit row under which nothing fails, a rule naming no section among them;
 - on an `allow` floor no failing re-spelling under it reaches, which is tightened to `fallthrough`.
 
-So lifting a rule's read deletes its rows in the same commit. A table the lane cannot read is exit 2: a missing file, a floor or a transform off its set, or a rule and transform named twice.
+A table the lane cannot read is exit 2: a missing file, a floor or a transform off its set, or a rule and transform named twice.
 
 - **The floor** is there because a limit admitting a grant is a wider statement than one admitting a pass, and a `fallthrough` row must not come to cover a re-spelling a later edit starts granting.
 - **A limit is as wide as a section and no narrower**, the rule being the unit a contract is written in: an item says its words are read by value, or it does not. A limit per derived row would be a second table several times the size of the first, generated and unreasoned. **Its honest limit:** a second row of that section may start failing the same transform unseen.
-- **A marker on the base row is refused.** The decision cell is the table grammar's first field, and a second meaning in it would be read by every table's reader.
 
 **The consumer lane** runs a consumer's own rows against its own rule command, after the kit's tables and only where `GUARD_KIT_CONSUMER_CASES` names a table:
 
