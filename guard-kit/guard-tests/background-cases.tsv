@@ -52,6 +52,13 @@ block	true	until grep -q DONE .tmp/worker.log; do sleep 5; done | tee out.txt
 block	true	until grep -q done .tmp/worker.log; do sleep 2; done; make build
 # and so does a keyword glued to a redirect, which ends the word
 block	true	while true; do make build; done>/dev/null
+# a `for` loop's variable and a redirect's target are no command position, so a keyword spelled
+# there closes no span; `>&` onto a named file is a write, in a body as in a condition
+block	true	for done in x; do make build; done
+fallthrough	true	for done in a b; do sleep 5; done
+block	true	until grep -q DONE .tmp/worker.log; do sleep 1 >& done; done
+block	true	until grep -q DONE .tmp/worker.log; do sleep 1 >& out.txt; done
+block	true	until grep -q DONE .tmp/worker.log >& out.txt; do sleep 5; done
 fallthrough	true	for i in 1 2 3; do sleep 5; done
 fallthrough	true	until make build; do sleep 1; done
 block	true	until sort -c -o out.txt data.txt; do sleep 5; done; echo waited

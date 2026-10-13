@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### keyword-walk-argument-position
-
-the guard's shared shell-keyword walk reads a keyword off two positions that are not command position: a `for` loop's variable and a redirect target after `>&`. Backgrounded, `for done in x; do make build; done` and `until grep -q DONE log; do sleep 1 >& done; done` fall through guard-kit rule `background_no_record` where `for x in a; do make build; done` and the `> out.txt` body block; foreground `sleep 5 >& done` passes rule `bare_sleep` where `sleep 5 > done` blocks. A body redirect spelled `>& out` falls through too, the fd-dup onto a named file the exemption's body clause does not hold.
-
-**Deliverable:** command position cleared after `for` and after a redirect operator, and the body redirect test reading `>&<file>`; a row for each spelling above in the tables that hold the two rules.
-
-**Cost while deferred:** a backgrounded work loop launches with no liveness record, or a foreground sleep holds a turn, after one permission decision. Surfaced 2026-10-12 by guard-rule-holes-pass' close, off its second-vendor review, run through the hook member, and carried to the next scope's intake. Re-verified there by the same runs; the published v0.31.0 binary falls through on each in a scratch repository, so none is a regression from it. Owner lookup: `keyword walk`, `for done`, `>& done`, `bare_sleep` in this file and the disposed-findings record — `loop-keyword-as-argument`, done, so a new defect in the command-position read it landed; owner guard-kit/SPEC.md §The generic ruleset.
-
 ## Deferred
 
 ### config-variant-battery-harness
@@ -1222,4 +1214,5 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 - bounded-wait-piped-loop
 - wait-no-producer-lead-evasion
 - wait-exemption-redirect-tail
+- keyword-walk-argument-position
 

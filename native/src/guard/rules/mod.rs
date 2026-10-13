@@ -277,6 +277,18 @@ fn inert_target(t: &str) -> bool {
     t == "/dev/null" || t.strip_prefix('&').is_some_and(|r| r.starts_with(|c: char| c.is_ascii_digit() || c == '-'))
 }
 
+// spec: guard-kit/SPEC.md §The generic ruleset — a `>&` whose target is no fd number and no `-`: the
+// fd-dup spelling onto a named file, which the redirect-pair pattern does not read.
+fn dups_onto_file(seg: &str) -> bool {
+    let b = seg.as_bytes();
+    (0..b.len().saturating_sub(1)).filter(|&i| b[i] == b'>' && b[i + 1] == b'&').any(|i| {
+        let rest = trim_start(&seg[i + 2..]);
+        let word = rest.split(|c: char| c.is_whitespace() || matches!(c, '|' | ';' | '&' | '<' | '>')).next().unwrap_or("");
+        let fd = word.strip_suffix('-').unwrap_or(word);
+        !(word == "-" || (!fd.is_empty() && fd.bytes().all(|c| c.is_ascii_digit())))
+    })
+}
+
 // spec: guard-kit/SPEC.md §The generic ruleset — a segment with its redirects removed and trimmed.
 fn segment_core(seg: &str) -> String {
     let e = text::re(r"[[:space:]]*[0-9]*(>>?|<)[[:space:]]*(&?[0-9-]+|[^[:space:]]+)?");
@@ -555,7 +567,8 @@ fn loop_span(s: &str) -> Option<Vec<(i32, bool, String)>> {
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — the same walk with each token's byte offset in the
-// skeleton, for a reader that needs a span's text. A redirect operator ends the word it is glued to.
+// skeleton, for a reader that needs a span's text. A redirect operator, its `&` included, ends the
+// word it is glued to, and neither its target nor a `for` loop's variable stands in command position.
 fn loop_tokens(s: &str) -> Option<Vec<(i32, bool, String, usize)>> {
     let joined = format!("{};", s.replace('\n', ";"));
     let b = joined.as_bytes();
@@ -565,7 +578,10 @@ fn loop_tokens(s: &str) -> Option<Vec<(i32, bool, String, usize)>> {
         let glyph = match b[i] {
             b'|' | b'&' if b.get(i + 1) == Some(&b[i]) => 2,
             b';' | b'|' | b'&' | b'(' | b')' | b'{' | b'}' => 1,
-            b'>' | b'<' => b[i..].iter().take_while(|c| matches!(c, b'>' | b'<')).count(),
+            b'>' | b'<' => {
+                let run = b[i..].iter().take_while(|c| matches!(c, b'>' | b'<')).count();
+                run + usize::from(b.get(i + run) == Some(&b'&'))
+            }
             _ => 0,
         };
         if glyph == 0 && !matches!(b[i], b' ' | b'\t') {
@@ -592,6 +608,7 @@ fn loop_tokens(s: &str) -> Option<Vec<(i32, bool, String, usize)>> {
             }
             "!" | "until" | "while" | "if" | "then" | "else" | "elif" | "for" if cmdpos => {
                 out.push((depth, cmdpos, tok.to_string(), at));
+                cmdpos = tok != "for";
             }
             "do" if cmdpos => {
                 depth += 1;
@@ -783,6 +800,15 @@ mod tests {
         let glued = loop_span("until a; do sleep>o 1; done>o").unwrap();
         let keywords: Vec<&str> = glued.iter().filter(|(_, cmdpos, _)| *cmdpos).map(|(_, _, t)| t.as_str()).collect();
         assert_eq!(keywords, vec!["until", "a", "do", "sleep", "done"]);
+        let argued = loop_span("for done in x; do sleep 1 >& done; done").unwrap();
+        let keywords: Vec<&str> = argued.iter().filter(|(_, cmdpos, _)| *cmdpos).map(|(_, _, t)| t.as_str()).collect();
+        assert_eq!(keywords, vec!["for", "do", "sleep", "done", ";"]);
+        for inert in ["sleep 1 2>&1", "sleep 1 >&2", "sleep 1 >& 2", "sleep 1 >&-", "sleep 1 2>&3-", "sleep 1 &> o", "x && y"] {
+            assert!(!dups_onto_file(inert), "{} dups onto no file", inert);
+        }
+        for write in ["sleep 1 >& out", "sleep 1 >&out", "sleep 1 2>&out; x", "sleep 1 >&2x", "sleep 1 >&"] {
+            assert!(dups_onto_file(write), "{} dups onto a file", write);
+        }
         assert_eq!(unredirected_words("grep x f > out", "grep x f > out"), Ok("grep x f".to_string()));
         assert_eq!(unredirected_words("> out", "> out"), Err(1));
         assert_eq!(unredirected_words("cat <<EOF", "cat <<EOF"), Err(2));

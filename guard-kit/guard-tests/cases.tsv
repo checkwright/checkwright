@@ -252,6 +252,9 @@ block	sleep 180; echo waited
 block	sleep 5; echo done
 # a redirect operator ends the word it is glued to
 block	sleep>/dev/null 5
+# and its target is no command position, behind `>&` as behind `>`
+block	sleep 5 >& done
+fallthrough	echo waited >& sleep 5
 allow	until grep -q DONE .tmp/smoke.log; do sleep 5; done
 allow	printf 'sleep 5' >> .tmp/note.txt
 
@@ -543,6 +546,9 @@ fallthrough	until [ -f marker ]; do sleep 5; done | cat > out.txt
 fallthrough	until grep -q DONE `cat .tmp/f`; do sleep 5; done
 # a non-inert redirect on the loop itself is a write, and a grant may not bless one
 fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done > out.txt
+# `>&` onto a named file is that write in its fd-dup spelling, in a condition as in a tail
+fallthrough	until grep -q DONE .tmp/smoke.log >& out.txt; do sleep 5; done
+fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done; grep -n ERR .tmp/smoke.log >& out.txt
 # clauses (c) and (d) take rule `ro_pipeline`'s declared forms over the whole call, so a
 # condition or a tail writing through a roster member's own option is refused
 fallthrough	while sort -c -o out.txt data.txt; do sleep 5; done

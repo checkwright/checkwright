@@ -4,7 +4,7 @@
 use super::grants::{slot_reach, Reach};
 use super::reach::{interpreter_reach, refused, rm_tracked_reach};
 use super::{
-    background_statements, command_word, git_read, git_walk_of, has_expansion, has_substitution, inert_target, is_banner, is_ro_segment,
+    background_statements, command_word, dups_onto_file, git_read, git_walk_of, has_expansion, has_substitution, inert_target, is_banner, is_ro_segment,
     loop_tokens, redirect_targets, ro_forms_clear, ro_forms_clear_statements, segment_core,
     shell_backgrounds, strip_redirect_op, unredirected_words, GitWalk,
 };
@@ -363,7 +363,7 @@ pub fn wait_no_producer(ctx: &Ctx) -> Decided {
 }
 
 fn wait_redirects_inert(ctx: &Ctx, seg: &str) -> bool {
-    ctx.redirect_pairs(seg).iter().filter(|p| !p.is_empty()).all(|p| inert_target(strip_redirect_op(p)))
+    !dups_onto_file(seg) && ctx.redirect_pairs(seg).iter().filter(|p| !p.is_empty()).all(|p| inert_target(strip_redirect_op(p)))
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `bounded_wait`'s clause (c): the loop condition
