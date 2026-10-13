@@ -4,10 +4,6 @@
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
-  **Push need (2026-10-13, inside the budget):** the closing push, and the release tag push beside it where close cuts the release this set is sized to unblock; no mid-iteration push, the decision tables running locally ahead of any remote leg.
-
-  **Unit set (operator direction, 2026-10-13, lead-relayed, not a ruling):** the five-entry set, scope's option C, where scope had recommended four.
-
 ---
 
 ## New Features
@@ -514,11 +510,13 @@ the gates workflow's Windows liveness step misread one row once. On the run for 
 
 ### guard-rules-skeleton-word-read
 
-[cost: event/high] [surface: guard-kit]
+[cost: event/high] [surface: guard-kit] [recurrence: 2026-10-13]
 
-most generic guard rules read the command word, an option or an operand off the skeleton, so a quoted, escaped, redirect-glued or `command`-led spelling of a row they block falls through. `guard-kit/guard-tests/variant-limits.tsv` is the worklist: every row is a rule and a re-spelling its read does not reach, all at the `fallthrough` floor.
+most generic guard rules read the command word, an option or an operand off the skeleton, so a quoted, escaped, redirect-glued or `command`-led spelling of a row they block falls through. `guard-kit/guard-tests/variant-limits.tsv` is the worklist: every row is a rule and a re-spelling its read does not reach, all at the `fallthrough` floor. Nine of them are the PowerShell reader's: a backtick inside a command name falls through rules `rm_tracked`, `cd_compound`, `script_interpreter` and `background_no_record`, and a quoted or backticked redirect target or scratch body path through rules `scratch_redirect` and `script_interpreter`.
 
-**Deliverable:** the word read lifted rule by rule (guard-kit/SPEC.md §The reader and its views), each lift deleting its limit rows in its own commit, safety blocks first: rules `script_interpreter` and `rm_tracked`.
+**Deliverable:** the word read lifted rule by rule (guard-kit/SPEC.md §The reader and its views), each lift deleting its limit rows in its own commit, safety blocks first: rules `script_interpreter` and `rm_tracked`. The PowerShell rows need that reader's own word read.
+
+**Inferred, not run:** that a PowerShell host reads each derived `ps-` row as its base row's command; no host is installed on the machine that derived them; run the derived rows through `pwsh` on the x64 Windows leg.
 
 **Cost while deferred:** a steer or a safety block is evaded by one re-spelling, silently under `command`, which the matcher strips. Filed 2026-10-13 by guard-spelling-oracle-pass' spec off a prototype of the variant lane, and promoted at its close. Re-verified there: the lane is green under the table's rows and reds on a row nothing needs. Owner lookup: `skeleton`, `word read`, `variant-limits` in this file and the disposed-findings record — none; `git-rules-word-read-siblings`, done, DISTINCT (the git rules' lift, landed); owner guard-kit/SPEC.md §The generic ruleset.
 
@@ -545,6 +543,16 @@ the session-context hook member's scratch sweep removes scratch a live session s
 **Inferred, not run:** that the sweep is what removed both at guard-spelling-oracle-pass — read off its tidy line by that iteration's lead; age a scratch role marker past the horizon and start the member over it
 
 **Cost while deferred:** a resumed lead silently loses its executor-step suppression, and a survey witness cannot be re-run without rebuilding its input. Filed 2026-10-13 by guard-spelling-oracle-pass' lead and promoted at the next scope's intake. Re-verified there by reading `sweep_dir`. Owner lookup: `scratch sweep`, `role marker`, `STALE_SECS` in this file and the disposed-findings record — [session-sweep-horizon-baked](#session-sweep-horizon-baked), DISTINCT (the horizon's value, where this is what the sweep spares at any horizon); owner context-kit/SPEC.md §The session-context hook.
+
+### consumer-rule-word-read
+
+[cost: event/low] [surface: guard-kit]
+
+a consumer rule command reads the command through `--guard-json view` alone, and no view gives it a word's value. This repo's three rules in `scripts/guard-rules.sh` match the `sq dq hd` view, so every quoted or escaped re-spelling of a row they block falls through: `'git' commit --no-verify -m x`, `git commit '-n' -m x`, `git 'clean' -fdx`, `ls '/tmp/claude-0/scratch'`. `scripts/guard-rules-variant-limits.tsv` declares the 19 pairs. The dequoted view is no fix, since it reads a quoted `-m` message naming the flag as the flag.
+
+**Deliverable:** a `--guard-json` verb printing the word read's values per segment (guard-kit/SPEC.md §Consumer rules), and this repo's three rules reading it, deleting their limit rows; a feature, since it adds a verb.
+
+**Cost while deferred:** this repo's hook-bypass block is evaded by one quoted word, and an adopter's own rule has the same hole with no read to close it. Filed 2026-10-13 by guard-grant-review-pass' build and promoted at its close. Re-verified there: `--run-guard-tests` is green under the 19 rows and derives 121 re-spellings. Owner lookup: `word read`, `guard-json`, `consumer rule` in this file and the disposed-findings record — [guard-rules-skeleton-word-read](#guard-rules-skeleton-word-read), DISTINCT (the generic rules' lift in the crate, where this is the read a consumer command is given); owner guard-kit/SPEC.md §Consumer rules.
 
 ## Icebox
 
@@ -1239,10 +1247,4 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 the manual-operation meter keys every arm called through the gate binary's door as one key, split across the door's two spellings, so it cannot name a repeated arm; the deliverable is a door-aware sub-key owned by drift-kit/SPEC.md §The manual-operation meter or guard-kit/SPEC.md §scan-prompts.
 
 ## Done
-
-- scratch-grant-glued-redirect
-- cat-operand-after-double-dash
-- sed-program-escaped-dash
-- guard-drain-fix-unreviewed
-- variant-lane-underived-tables
 
