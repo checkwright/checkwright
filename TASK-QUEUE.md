@@ -554,6 +554,40 @@ a consumer rule command reads the command through `--guard-json view` alone, and
 
 **Cost while deferred:** this repo's hook-bypass block is evaded by one quoted word, and an adopter's own rule has the same hole with no read to close it. Filed 2026-10-13 by guard-grant-review-pass' build and promoted at its close. Re-verified there: `--run-guard-tests` is green under the 19 rows and derives 121 re-spellings. Owner lookup: `word read`, `guard-json`, `consumer rule` in this file and the disposed-findings record — [guard-rules-skeleton-word-read](#guard-rules-skeleton-word-read), DISTINCT (the generic rules' lift in the crate, where this is the read a consumer command is given); owner guard-kit/SPEC.md §Consumer rules.
 
+### rewrite-grant-redirect-read
+
+[cost: event/high] [surface: guard-kit]
+
+the rewrite grant rules `abs_script` and `brace_glyph` share misreads two redirect spellings. It still attaches through the noclobber operator: in the decision table's sandbox `@ROOT@/scripts/check-env.sh --list >| scripts/check-env.sh --list`, its glued spelling and its `2>|` form classify `rewrite`, at v0.31.0 too, so a granted call truncates the script it names. The compound split parts `>|` at its bar and each half matches the sandbox's script pattern. And a quoted null target lost its grant: `>"/dev/null"` and `2>'/dev/null'` take rule `abs_script`'s corrective block, where v0.31.0 rewrote each and guard-kit/SPEC.md §The rule roster says `/dev/null` stays granted. The test reads the skeleton, where a quoted target is a mark.
+
+**Deliverable:** the grant withheld under the noclobber operator, held by authored rows and a derived suffix in the variant lane (guard-kit/SPEC.md §Testing); then the redirect test reading its target by value, or the roster item and the release declaration naming the unquoted spelling. One commit each, the grant first.
+
+**Inferred, not run:** that a read-only pipeline's grant attaches the same way, a roster command redirected through `>|` onto a word that names another — add `git status >| head` and its kin as rows of `guard-kit/guard-tests/cases.tsv` and run `--run-guard-tests`
+
+**Release bar:** the first half is a wrong grant by the bar on [tarball-attestation-observed](#tarball-attestation-observed). The second is a decline that moved from v0.31.0, read against the bar by the session weighing the cut.
+
+**Cost while deferred:** a granted call can truncate an allowlisted script, and v0.32.0 stays uncut, holding that entry's observation, [front-door-job-observed](#front-door-job-observed)'s and [companion-toolkit-profile](#companion-toolkit-profile)'s tag. Filed 2026-10-13 by guard-grant-review-pass' close off its second-vendor review, as two bullets, and promoted at the next scope's intake. Re-verified there through `--run-guard-tests` over rows added to the table and withdrawn: both halves hold, and fifteen other redirect spellings onto a file block. Owner lookup: `noclobber`, `rewrite grant`, `/dev/null` in this file and the disposed-findings record — [guard-rules-skeleton-word-read](#guard-rules-skeleton-word-read), DISTINCT (re-spellings falling through a block, where this is a grant's own test); [interpreter-grant-redirect-residue](#interpreter-grant-redirect-residue), DISTINCT (shapes never granted, where this one was); owner guard-kit/SPEC.md §The rule roster.
+
+### guard-fix-lands-unreviewed
+
+[cost: event/high] [surface: guard-kit]
+
+a guard fix authored at a closing drain returns from the second-vendor review with findings in it, four closes running. At guard-grant-review-pass' close the review of the drain's fix held two, one a grant the fix's own redirect test misses ([rewrite-grant-redirect-read](#rewrite-grant-redirect-read)). The variant lane, the form `guard-drain-fix-unreviewed` took, reached neither: no transform derives a noclobber suffix and no relation reaches an over-block. The two forms left are a consumer's stage order (guard-kit/SPEC.md §Testing, the variant lane's honest limits).
+
+**Deliverable:** this repo's close binding ordering one of them: a drain promotes a verdict-moving guard fix in place of landing it, or lands it only once a second party has read its diff. Which one is a direction, asked at the scope that promotes this entry.
+
+**Cost while deferred:** each such close defers the release its fix was for, v0.32.0 twice so far, and spends a review grant on a fix read after its commit. Filed 2026-10-13 by guard-grant-review-pass' close and promoted at the next scope's intake. Re-verified there against that close's commit messages and the limits sentence. Owner lookup: `drain fix`, `unreviewed`, `second-vendor` in this file and the disposed-findings record — `guard-drain-fix-unreviewed`, done, so a finding that recurred after its fix and is filed new; owner `.claude/commands/close.md`.
+
+### set-record-lost-at-done-move
+
+[cost: event/low] [surface: lifecycle-kit]
+
+a record scope lands for the whole unit set on one entry is lost when that entry moves to Done mid-iteration. At guard-grant-review-pass scope landed the Push need line and the operator's unit-set direction on the set's lead entry. The first build batch moved that entry to Done, a done line keeps only the slug, and the two remaining entries pointed at it. The second batch re-landed both under the queue's iteration header, outside the entry grammar, and close removed them by hand.
+
+**Deliverable:** a set-wide record given a home that outlives any one entry until close, or the Done move refusing while a live entry cites the body it removes. Which one is the authoring stage's, and the first is a feature.
+
+**Cost while deferred:** a batch split loses the push budget's stated need and a direction's record unless a session notices. Filed 2026-10-13 by guard-grant-review-pass' lead and promoted at the next scope's intake. Re-verified there against that close's drain commit message, which names the block leaving with the Done section. Owner lookup: `Done move`, `set-wide`, `Push need` in this file and the disposed-findings record — [section-prose-outlives-its-entries](#section-prose-outlives-its-entries), DISTINCT (a section preamble surviving Clear-Done, where this is a body lost ahead of it); [operator-authored-unit-set](#operator-authored-unit-set), DISTINCT (who authors a set); owner lifecycle-kit/SPEC.md §templates/stages/ and queue-kit/SPEC.md §The icebox tier.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
