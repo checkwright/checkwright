@@ -276,3 +276,4 @@
 | hook-placement-guard-rules-pass | sc sp a b v c | 5f/3d | 4 · ≤0d | 21s clean | 152 |
 | guard-rule-holes-pass | sc sp a b v c | 1f/5d | 1 · ≤0d | 21s clean | 152 |
 | guard-spelling-oracle-pass | sc sp a b v c | 2f/5d | 4 · ≤0d | 21s clean | 152 |
+| guard-grant-review-pass | sc sp a b v c | 1f/2d | 1 · ≤0d | 21s clean | 152 |
