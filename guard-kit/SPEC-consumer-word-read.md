@@ -30,6 +30,10 @@ Replacement for §Testing's `--guard-json` seam sentence, the first sentence of 
 
 > `--guard-json`'s seam cases sit beside them: a field read verbatim, `view` over a heredoc-bearing and a quoted command, `view` over a PowerShell payload printing its skeleton, and `view` printing nothing for a payload of a tool no reader serves (`Read`). `words` prints a quoted, an escaped and a split word as its value, two segments as two lines, a quoted tab encoded, and a PowerShell backtick-escaped word as its value; it prints nothing over a heredoc-bearing command and a `Read` payload, and refuses an operand.
 
+Replacement for the clause of `gate-sdk/SPEC.md` §The non-gate arm, in the bullet opening *It owes a named caller instead*, that names what the consumer command reads through the arm: a word value is neither a field nor a view. **Not yet applied.**
+
+> `--guard-json` by a consumer's rule command, which reads payload fields, views and word values and renders envelopes through it (guard-kit/SPEC.md §Consumer rules).
+
 ### (2) This repo's three rules compare word values
 
 `scripts/guard-rules.sh` reads `--guard-json words` and matches each rule per segment on whole word values, falling back to its present `sq dq hd` match where the mode prints nothing, and `scripts/guard-rules-variant-limits.tsv` loses all 19 rows {mechanical}.
@@ -52,12 +56,14 @@ Replacement for §Testing's `--guard-json` seam sentence, the first sentence of 
 - **The script's `# spec:` comment on the view** is rewritten to the read it now takes: word values per segment, the `sq dq hd` view where none is read.
 - **The order inside the unit:** delta 1 lands first, since the script calls the mode. The rule edit and the 19 rows' deletion are one commit, because the lane reds on a limit row under which nothing fails and, without the rows, on every re-spelling a rule still misses.
 
-**Inferred, cannot run before build:** that the word read answers on every derived re-spelling of the three rules' rows, so that the lane is green with no limit row — the mode it is read through does not exist until delta 1 lands; `--run-guard-tests` after delta 2 settles it, and a re-spelling still failing is a predicate to fix in that commit, never a limit row restored.
+The bash word read answers on all 50 derived re-spellings, and each of delta 2's predicates holds on their values: a unit probe over the 50 failing commands, run against the reader's `word_read`.
+
+**Inferred, cannot run before build:** that the lane is green with no limit row — the mode the script reads does not exist until delta 1 lands, and the probe reads the reader and no script; `--run-guard-tests` after delta 2 settles it, and a re-spelling still failing is a predicate to fix in that commit, never a limit row restored.
 
 ## Producers and consumers
 
 - **The `words` output.** Producer: `json_arm`'s `words` mode, on a consumer command's call, which `GUARD_KIT_CONSUMER_RULES_CMD` names and which this repo's knob file sets (`scripts/guard-config.knobs`), so the producer is reached on every guarded call here. Consumer: `scripts/guard-rules.sh`, by command substitution, once per call. Each field has its reader: the line is a segment, read by the per-segment predicates; the tab parts words, read by the split; a value is compared by the three rules. The empty output is read by the fallback.
-- **The roster-holding readers of the mode set**, by `grep -rln 'allow-entries' .` over the tracked tree: `guard-kit/SPEC.md` (§Consumer rules, delta 1), `native/src/guard/mod.rs` (the usage line, delta 1) and the generated `docs/guard-kit/SPEC.md`. `TOP_LEVEL_FLAGS` in `native/src/main.rs` rosters `--guard-json` itself and no mode.
+- **The roster-holding readers of the mode set**, by `git grep -ln 'guard-json'` over the tracked tree: `guard-kit/SPEC.md` (§Consumer rules, §Writing a consumer rule and §Testing, delta 1), `gate-sdk/SPEC.md` (§The non-gate arm, delta 1), `native/src/guard/mod.rs` (the usage line, delta 1), `guard-kit/gate-tests/consumer-rules.test.sh` (its closing summary line, with the seam cases) and the generated `docs/guard-kit/SPEC.md` and `docs/gate-sdk/SPEC.md`. `TOP_LEVEL_FLAGS` in `native/src/main.rs` rosters `--guard-json` itself and no mode, and `guard-kit/README.md` names the flag alone.
 - **The consumer lane's red conditions under delta 2's narrowing of the limits table to no row** (canon-kit/SPEC.md §The causal-completeness check, point 5), from §Testing: a re-spelling no limit admits reds, which the lift must leave none of; a limit row under which nothing fails reds, which leaves the rows nowhere to stay; an unreadable table is exit 2, and a comment-only one was read. No count or floor reads the table.
 - **Each of the 19 rows' satisfying value** (point 6), by `grep -v '^#' scripts/guard-rules-variant-limits.tsv`: every transform the rows name, `sq`, `dq`, `esc` and `part` at a `lead` or an `arg` site, quotes or escapes a word's head, and the word read's value removes the quotes and resolves the escape. Each derived word therefore has the value of the word it re-spells, which the predicates of delta 2 read whole. That the read answers on each derived command is the marker above.
 - **Knobs.** None is minted and none gains a reader. `GUARD_KIT_CONSUMER_VARIANT_LIMITS` keeps its value.
@@ -68,13 +74,14 @@ Replacement for §Testing's `--guard-json` seam sentence, the first sentence of 
 - `guard-kit/SPEC.md` §Consumer rules — the `view` bullet becomes two (delta 1).
 - `guard-kit/SPEC.md` §Writing a consumer rule — the third discipline bullet (delta 1).
 - `guard-kit/SPEC.md` §Testing — the `--guard-json` seam sentence (delta 1).
+- `gate-sdk/SPEC.md` §The non-gate arm — the caller clause of the bullet *It owes a named caller instead* (delta 1).
 - `native/src/guard/mod.rs` — the mode, its usage line and its unit test (delta 1).
-- `guard-kit/gate-tests/consumer-rules.test.sh` — the seam cases (delta 1).
+- `guard-kit/gate-tests/consumer-rules.test.sh` — the seam cases and the closing summary line (delta 1).
 - `.workflow/release-declarations.md` — the §Behavior changes bullet (delta 1).
 - `scripts/guard-rules.sh` — the read, the three predicates and the `# spec:` comment (delta 2).
 - `scripts/guard-rules-variant-limits.tsv` — the 19 rows deleted (delta 2).
 - `scripts/guard-rules-cases.tsv` — the four rows (delta 2).
-- `docs/guard-kit/SPEC.md` — generated, stale once the delta lands (all deltas).
+- `docs/guard-kit/SPEC.md` and `docs/gate-sdk/SPEC.md` — generated, stale once the delta lands (all deltas).
 
 ## Retired spellings
 
