@@ -21,7 +21,7 @@ pub(super) fn print_reissue_remedy() {
 
 // spec: gate-sdk/SPEC.md §check-commit-msg — `gate_msg_pattern_files` with no positional: every
 // required file must exist and be readable, and each local one joins where it does
-pub(super) fn resolve_files() -> Result<Vec<String>, String> {
+pub(crate) fn resolve_files() -> Result<Vec<String>, String> {
     let required = walk::knob_words("GATE_SDK_MSG_PATTERN_FILES")?;
     let local = walk::knob_words("GATE_SDK_MSG_PATTERN_FILES_LOCAL")?;
     let mut out: Vec<String> = Vec::new();
@@ -46,6 +46,22 @@ pub(super) fn resolve_files() -> Result<Vec<String>, String> {
         }
     }
     Ok(out)
+}
+
+// spec: gate-sdk/SPEC.md §check-commit-msg — the live lines of every resolved file, in order; `None`
+// is a file that could not be read, which each reader refuses in its own voice
+pub(crate) fn live_patterns(files: &[String]) -> Option<Vec<String>> {
+    let mut patterns: Vec<String> = Vec::new();
+    for f in files {
+        let text = String::from_utf8_lossy(&std::fs::read(f).ok()?).into_owned();
+        patterns.extend(
+            fresh::file_lines(&text)
+                .into_iter()
+                .filter(|l| fresh::live_line(l))
+                .map(String::from),
+        );
+    }
+    Some(patterns)
 }
 
 pub fn run(args: &[String]) -> i32 {
@@ -73,23 +89,13 @@ pub fn run(args: &[String]) -> i32 {
         }
     };
 
-    let mut patterns: Vec<String> = Vec::new();
-    for f in &files {
-        let Ok(bytes) = std::fs::read(f) else {
-            eprintln!(
-                "COMMIT-MSG: {}",
-                fresh::fail_closed("grep-patterns", Some(2))
-            );
-            return 2;
-        };
-        let text = String::from_utf8_lossy(&bytes).into_owned();
-        patterns.extend(
-            fresh::file_lines(&text)
-                .into_iter()
-                .filter(|l| fresh::live_line(l))
-                .map(String::from),
+    let Some(patterns) = live_patterns(&files) else {
+        eprintln!(
+            "COMMIT-MSG: {}",
+            fresh::fail_closed("grep-patterns", Some(2))
         );
-    }
+        return 2;
+    };
 
     if patterns.is_empty() {
         println!("COMMIT-MSG: clean (0 banned pattern(s) configured; message unchecked)");

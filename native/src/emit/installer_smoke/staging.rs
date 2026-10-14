@@ -187,6 +187,15 @@ fn stage_running_binary(state: &mut Run, bin_name: &str) -> Step {
             baked, crate_dir, tree, REBUILD
         )));
     }
+    let image = exe()?;
+    let banned = banned_matches(&image)?;
+    if banned > 0 {
+        return Err(refuse(format!(
+            "the running binary matches {} of the tree's banned patterns, the builder paths a build \
+             without bin/build-native.sh's path remap leaves (a plain `cargo test --release`) — {}.",
+            banned, REBUILD
+        )));
+    }
     let built_for = env!("CHECKWRIGHT_TARGET");
     if built_for != state.host {
         return Err(refuse(format!(
@@ -198,11 +207,36 @@ fn stage_running_binary(state: &mut Run, bin_name: &str) -> Step {
     let art = format!("{}/artifacts/{}", state.scratch, state.host);
     std::fs::create_dir_all(&art).map_err(|e| refuse(format!("cannot create {}: {}", art, e)))?;
     let staged = format!("{}/{}", art, bin_name);
-    std::fs::copy(exe()?, &staged).map_err(|e| fail(format!("could not stage the running binary for packing: {}", e)))?;
+    std::fs::copy(&image, &staged).map_err(|e| fail(format!("could not stage the running binary for packing: {}", e)))?;
     sidecar(&staged)?;
     drop_exec_mode(&staged)?;
     state.pack_artifacts = format!("{}/artifacts", state.scratch);
     Ok(())
+}
+
+// spec: installer/SPEC.md §The consumer smoke — the binary's bytes against the roster
+// `bin/build-native.sh` verifies its artifact against, so its rebuild clears this refusal; the
+// count is printed and never the matched text, which is the leak itself
+fn banned_matches(image: &str) -> Result<usize, Outcome> {
+    let unread = |why: String| refuse(format!("{} — the running binary's builder paths cannot be read", why));
+    let files = crate::gates::commit_msg::resolve_files().map_err(unread)?;
+    let patterns = crate::gates::commit_msg::live_patterns(&files)
+        .ok_or_else(|| unread(format!("a banned-pattern file among {} could not be read", files.join(" "))))?;
+    let bytes = std::fs::read(image).map_err(|e| unread(format!("cannot read {}: {}", image, e)))?;
+    count_matches(&bytes, &patterns).map_err(unread)
+}
+
+fn count_matches(bytes: &[u8], patterns: &[String]) -> Result<usize, String> {
+    let text = String::from_utf8_lossy(bytes);
+    let lines = crate::fresh::file_lines(&text);
+    let mut hits = 0;
+    for p in patterns {
+        let re = crate::ere::Ere::compile(p).map_err(|e| format!("a banned pattern does not compile: {}", e))?;
+        if lines.iter().any(|l| re.is_match(l)) {
+            hits += 1;
+        }
+    }
+    Ok(hits)
 }
 
 // spec: installer/SPEC.md §The packer — a pack spawn names both decisions: the root as its working
@@ -465,6 +499,22 @@ fn scratch_upstream(state: &mut Run) -> Step {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: installer/SPEC.md §The consumer smoke — an unremapped dependency path among binary
+    // bytes counts its pattern once, the remapped spelling counts nothing, and a pattern the engine
+    // refuses is a refusal rather than a clean read; the banned shape is composed, never spelled
+    #[test]
+    fn a_builder_path_among_the_bytes_counts_its_pattern() {
+        let leak = format!("/{}/bob/.cargo/registry/src/x.rs", "home");
+        let mut bytes = b"\x7fELF\0\x01".to_vec();
+        bytes.extend(leak.as_bytes());
+        bytes.extend(b"\0\n");
+        bytes.extend(leak.as_bytes());
+        let patterns = vec![format!("/{}/[a-z]+", "home"), "no-such-term-[0-9]+".to_string()];
+        assert_eq!(count_matches(&bytes, &patterns), Ok(1));
+        assert_eq!(count_matches(b"\0/builder/.cargo/registry/src/x.rs\0", &patterns), Ok(0));
+        assert!(count_matches(b"x", &["\\w+".to_string()]).is_err());
+    }
 
     // spec: installer/SPEC.md §The consumer smoke — the scratch upstream's tag sorts above the packed
     // version and both patch hops, the fallback version included

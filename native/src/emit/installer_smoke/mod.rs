@@ -22,6 +22,8 @@ mod upgrade;
 // hand-off and the tarball hand-out are read undeclared, no static kit owning their prefix
 pub const KNOBS: &[&str] = &[
     "GATE_SDK_KIT_DIRS",
+    "GATE_SDK_MSG_PATTERN_FILES",
+    "GATE_SDK_MSG_PATTERN_FILES_LOCAL",
     "GATE_SDK_NATIVE_BIN",
     "GATE_SDK_NATIVE_CRATE",
     "GATE_SDK_NATIVE_TARGETS_FILE",

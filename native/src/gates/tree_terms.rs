@@ -2,7 +2,7 @@
 // tracked-files half of the leak guard; the pattern files and their templates are self-exempt)
 use crate::ere::Ere;
 use crate::fresh;
-use crate::gates::commit_msg::resolve_files;
+use crate::gates::commit_msg::{live_patterns, resolve_files};
 use crate::knobs::gate_sdk::MSG_PATTERN_FILE;
 use crate::walk;
 use std::path::Path;
@@ -49,22 +49,9 @@ fn inner(args: &[String]) -> Result<i32, String> {
         }
     };
 
-    let mut patterns: Vec<String> = Vec::new();
-    for f in &files {
-        let Ok(bytes) = std::fs::read(f) else {
-            return Err(format!(
-                "TREE-TERMS: {}",
-                fresh::fail_closed("grep-patterns", Some(2))
-            ));
-        };
-        let text = String::from_utf8_lossy(&bytes).into_owned();
-        patterns.extend(
-            fresh::file_lines(&text)
-                .into_iter()
-                .filter(|l| fresh::live_line(l))
-                .map(String::from),
-        );
-    }
+    let patterns = live_patterns(&files).ok_or_else(|| {
+        format!("TREE-TERMS: {}", fresh::fail_closed("grep-patterns", Some(2)))
+    })?;
 
     // spec: gate-sdk/SPEC.md §check-tree-terms — an empty set leaves the tree unchecked and
     // clean: the fail-closed obligation is on a missing pattern file, never on an empty one
