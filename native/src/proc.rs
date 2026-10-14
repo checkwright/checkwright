@@ -684,6 +684,20 @@ pub(crate) mod kernel32 {
     pub const PROCESS_QUERY_LIMITED_INFORMATION: u32 = 0x1000;
     pub const STILL_ACTIVE: u32 = 259;
     pub const ERROR_ACCESS_DENIED: i32 = 5;
+    pub const TIME_ZONE_ID_STANDARD: u32 = 1;
+    pub const TIME_ZONE_ID_DAYLIGHT: u32 = 2;
+    pub const TIME_ZONE_ID_INVALID: u32 = u32::MAX;
+
+    #[repr(C)]
+    pub struct TimeZoneInformation {
+        pub bias: i32,
+        pub standard_name: [u16; 32],
+        pub standard_date: [u16; 8],
+        pub standard_bias: i32,
+        pub daylight_name: [u16; 32],
+        pub daylight_date: [u16; 8],
+        pub daylight_bias: i32,
+    }
 
     #[link(name = "kernel32")]
     extern "system" {
@@ -693,6 +707,7 @@ pub(crate) mod kernel32 {
         pub fn CreateJobObjectW(attributes: *mut core::ffi::c_void, name: *const u16) -> Handle;
         pub fn AssignProcessToJobObject(job: Handle, process: Handle) -> i32;
         pub fn TerminateJobObject(job: Handle, code: u32) -> i32;
+        pub fn GetTimeZoneInformation(info: *mut TimeZoneInformation) -> u32;
     }
 }
 

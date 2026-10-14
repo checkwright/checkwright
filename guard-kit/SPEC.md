@@ -288,7 +288,7 @@ On Linux a registration edited in a running session armed in it, and with the bi
 
 **A silent pass witnesses no wiring.** A passing member exits 0 with no output, as a call whose hook never fired does. A block, an advisory, or a stand-in at the registered path recording its argument vector shows the start.
 
-**Stated limits, each unrun.** The Windows runs of the exec form were on a host carrying Git for Windows, where the harness still found its bash for its own shell tool, so a host with no bash at all is not run. Neither is the linked-worktree placeholder on Windows, nor a registration arming in the session that wrote it. The wakeup-guard's log stamp spawns `date` there and is empty where `PATH` does not carry it (context-kit/SPEC.md §bin/env-probe).
+**Stated limits, each unrun.** The Windows runs of the exec form were on a host carrying Git for Windows, where the harness still found its bash for its own shell tool, so a host with no bash at all is not run. Neither is the linked-worktree placeholder on Windows, nor a registration arming in the session that wrote it.
 
 The member reads the payload bytes itself, so it absorbs no substrate difference in what it reads: a CR LF inside a command's own text is read verbatim on every host, and the binary writes LF on every host.
 
@@ -1060,7 +1060,7 @@ Dropping a declared glob would make the knob a silencer whose contents nobody re
 
 Optional second guard, same `--hook` dispatch, opposite posture: it blocks self-scheduled wakeups (`ScheduleWakeup`/`CronCreate`) unconditionally and logs each attempt. A stored prompt re-fires in a later session as if the user typed it, long after its premises are stale, and the scheduling call is invisible at the moment it matters. **Fail-closed**: the matcher proves the tool identity, so a logging failure still denies. The attempt log is drained and reviewed in the same close-stage triage pass as the friction log. Deliberate scheduling stays possible by disabling the hook for a session, since the block is the default, not a capability removal.
 
-Each attempt line is a local-zone stamp in GNU `date -Is`'s shape, `YYYY-MM-DDTHH:MM:SS±HH:MM`, then the payload's `session_id`, `tool_name` and `tool_input` as one JSON object in that key order, `null` for a field the payload lacks. On unix the binary builds the stamp in-process from the offset the C library reports for the instant. Off unix it spawns `date -Is`, which rides the userland `bash` requires (gate-sdk/SPEC.md §The program roster).
+Each attempt line is a local-zone stamp in GNU `date -Is`'s shape, `YYYY-MM-DDTHH:MM:SS±HH:MM`, then the payload's `session_id`, `tool_name` and `tool_input` as one JSON object in that key order, `null` for a field the payload lacks. The binary builds the stamp in process and spawns nothing, so a hook started with no userland on `PATH` still stamps. Its offset is the C library's for the instant on unix and the zone bias in force on Windows, held there by a `crate-tests-windows` case.
 
 The attempt log is a capture-tier surface on the friction log's terms: gitignored, advisory, reclaimed by the triage pass. It declares itself so whether or not the consumer wires the hook, because the tier has to hold the file the *first* time the guard fires:
 

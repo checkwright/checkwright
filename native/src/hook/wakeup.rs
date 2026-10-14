@@ -2,8 +2,6 @@
 // denies fail-closed whatever the payload said, and logs the attempt for close's triage. It emits
 // no envelope and speaks the protocol through its exit status alone.
 use crate::hook;
-#[cfg(not(unix))]
-use crate::{proc, programs};
 use crate::walk;
 use serde_json::Value;
 
@@ -28,38 +26,48 @@ fn append_attempt(log: &str, payload: Option<&Value>) {
     }
 }
 
-// spec: guard-kit/SPEC.md §wakeup-guard — GNU `date -Is`'s shape, built in-process on unix from
-// the offset `localtime_r` reports for this instant; an unreadable clock or zone costs the stamp
-// alone, exactly as the shell form's discarded stderr did.
-#[cfg(unix)]
+// spec: guard-kit/SPEC.md §wakeup-guard — GNU `date -Is`'s shape, built in-process from the offset
+// the system reports; an unreadable clock or zone costs the stamp alone, exactly as the shell
+// form's discarded stderr did.
 fn local_stamp() -> String {
     let Ok(now) = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH) else {
         return String::new();
     };
     let epoch = now.as_secs() as i64;
+    zone_offset(epoch).map_or_else(String::new, |offset| stamp_at(epoch, offset))
+}
+
+#[cfg(unix)]
+fn zone_offset(epoch: i64) -> Option<i64> {
     let t = epoch as _;
     // spec: gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency — sound because
     // `tm` is plain integers, zeroed is a valid value, and `localtime_r` writes only the one we own
     let mut tm: libc::tm = unsafe { std::mem::zeroed() };
     if unsafe { libc::localtime_r(&t, &mut tm) }.is_null() {
-        return String::new();
+        return None;
     }
-    stamp_at(epoch, tm.tm_gmtoff as i64)
+    Some(tm.tm_gmtoff as i64)
 }
 
-// spec: context-kit/SPEC.md §bin/env-probe — off unix `date` resolves from Git for Windows'
-// userland where `PATH` carries it, and the stamp is empty where it does not
-#[cfg(not(unix))]
-fn local_stamp() -> String {
-    proc::run(&programs::DATE, &["-Is"])
-        .ok()
-        .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()))
-        .unwrap_or_default()
+// spec: guard-kit/SPEC.md §wakeup-guard — the bias in force, in minutes west of UTC: the zone's
+// base plus its daylight or standard delta, whichever the system reports current
+#[cfg(windows)]
+fn zone_offset(_epoch: i64) -> Option<i64> {
+    use crate::proc::kernel32;
+    // spec: gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency — sound because
+    // the struct is plain integers, zeroed is a valid value, and the call writes only the one we own
+    let mut tz: kernel32::TimeZoneInformation = unsafe { std::mem::zeroed() };
+    let delta = match unsafe { kernel32::GetTimeZoneInformation(&mut tz) } {
+        kernel32::TIME_ZONE_ID_INVALID => return None,
+        kernel32::TIME_ZONE_ID_DAYLIGHT => tz.daylight_bias,
+        kernel32::TIME_ZONE_ID_STANDARD => tz.standard_bias,
+        _ => 0,
+    };
+    Some(-60 * (i64::from(tz.bias) + i64::from(delta)))
 }
 
 // spec: guard-kit/SPEC.md §wakeup-guard — `YYYY-MM-DDTHH:MM:SS±HH:MM`, byte-compatible with GNU
 // `date -Is`, a zero offset included as `+00:00`
-#[cfg_attr(not(unix), allow(dead_code))]
 fn stamp_at(epoch: i64, offset: i64) -> String {
     let local = epoch + offset;
     let (y, m, d) = hook::civil_from_days(local.div_euclid(86_400));
@@ -124,5 +132,37 @@ mod tests {
         assert_eq!(stamp_at(1_789_776_000, 7_200), "2026-09-19T02:00:00+02:00");
         assert_eq!(stamp_at(1_789_776_000, -16_200), "2026-09-18T19:30:00-04:30");
         assert_eq!(stamp_at(1_789_776_000, 0), "2026-09-19T00:00:00+00:00");
+    }
+
+    // spec: guard-kit/SPEC.md §wakeup-guard — the live stamp spawns nothing, so a host whose `PATH`
+    // carries no userland still gets one, and it reads back as this instant; `crate-tests-windows`
+    // holds the off-unix reader
+    #[test]
+    fn the_live_stamp_spawns_nothing_and_reads_back_as_now() {
+        crate::proc::recorder::start();
+        let stamp = local_stamp();
+        let spawned = crate::proc::recorder::stop();
+        assert!(spawned.is_empty(), "the stamp spawned {:?}", spawned);
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .expect("the clock must read")
+            .as_secs() as i64;
+        assert_eq!(stamp.len(), 25, "stamp {:?}", stamp);
+        let num = |r: std::ops::Range<usize>| -> i64 {
+            stamp[r].parse().unwrap_or_else(|_| panic!("stamp {:?}", stamp))
+        };
+        let sign = match &stamp[19..20] {
+            "+" => 1,
+            "-" => -1,
+            _ => panic!("stamp {:?}", stamp),
+        };
+        let offset = sign * (num(20..22) * 3600 + num(23..25) * 60);
+        assert!(offset.abs() <= 14 * 3600, "stamp {:?}", stamp);
+        assert!(
+            (now - 5..=now + 1).any(|e| stamp_at(e, offset) == stamp),
+            "stamp {:?} does not read back as epoch {}",
+            stamp,
+            now
+        );
     }
 }
