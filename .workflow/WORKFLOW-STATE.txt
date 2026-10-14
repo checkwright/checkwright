@@ -4,4 +4,4 @@
 
 ---
 
-— scope aeea4942 2026-10-14 e7328862e
+guard-word-read-release-pass scope aeea4942 2026-10-14 e7328862e

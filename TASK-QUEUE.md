@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: guard-word-read-release-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,54 @@
 ## New Features
 
 ## Technical Debt
+
+### grant-redirect-scan-cr
+
+the skeleton scan's redirect read takes a carriage return for whitespace (`is_space` in `native/src/guard/text.rs`), where bash keeps it inside the word, so a grant reads a file target as an fd-dup or a pipe. Rule `ro_pipeline` allows `grep -rn foo src >&2<CR>tracked.md`, which writes the file `2<CR>tracked.md`, and `grep -rn foo src ><CR>| head`, which writes a file named by the carriage return. A second mismatch sits in rule `abs_script`'s rewrite: `rewrite_granted` in `native/src/guard/rules/grants.rs` reads targets by value only where the scan finds one that is neither `/dev/null` nor an fd-dup, so `>/dev/null&>/dev/null` keeps its rewrite, while guard-kit/SPEC.md §The rule roster counts a word carrying a second operator as a file. Both of its redirects are the device, so that grant is benign either way.
+
+**Deliverable:** the scan's whitespace class matching bash's, with a `cases.tsv` row per spelling under each grant that reads it; and that rewrite test and its SPEC line brought to one reading. Both move a verdict, so they land in a build a validate reads (the close binding's promote-never-land rule).
+
+**Run at guard-word-read-release-pass' scope** through the hook member, in a scratch repo committing one allowlisted `check-*.sh`, against HEAD and the published v0.31.0 binary. Rule `abs_script`'s rewrite grants `<abs>/scripts/check-x.sh >&2<CR>tracked.md` at both. Rule `ro_pipeline` grants `><CR>| head` at both, and `>&2<CR>tracked.md` at HEAD alone, so that spelling is a regression from v0.31.0 and the others are older wrong grants. `is_space` is byte-identical at the tag.
+
+**Cost while deferred:** an auto-allowed read can write a file the grant never saw, and the v0.32.0 release bar stays unmet while this wrong grant is open. Filed 2026-10-14 by rewrite-grant-noclobber-pass' close, off its validate's second-vendor review. Re-verified there through the hook member at HEAD: allow, rule `ro_pipeline`, on both spellings. Owner lookup: `carriage`, `CRLF`, `is_space`, `whitespace class`, `second operator` in this file and the disposed-findings record — none; [guard-rules-skeleton-word-read](#guard-rules-skeleton-word-read), DISTINCT (a word's quoted spelling declined, where this is an operator misread into a grant); owner guard-kit/SPEC.md §The reader and its views and §The rule roster.
+
+### guard-rules-skeleton-word-read
+
+[recurrence: 2026-10-13, 2026-10-14]
+
+most generic guard rules read the command word, an option or an operand off the skeleton, so a quoted, escaped, redirect-glued or `command`-led spelling of a row they block falls through. `guard-kit/guard-tests/variant-limits.tsv` is the worklist: every row is a rule and a re-spelling its read does not reach, all at the `fallthrough` floor.
+
+**Narrowed at guard-word-read-release-pass' scope (operator direction, lead-relayed, not a ruling)** to the bash reader's block and steer rules: the table's rows less rule `ro_pipeline`'s and the `ps-` rows, 98 by the survey record's census. The grants' by-value redirect read, rule `ro_pipeline`'s rows and the PowerShell reader's rows were filed again as [grant-pwsh-word-read](#grant-pwsh-word-read), so no grant widens ahead of the v0.32.0 bar.
+
+**Unit set (2026-10-14, operator direction, lead-relayed, not a ruling)**, recorded on this entry as the one likeliest to land last: [grant-redirect-scan-cr](#grant-redirect-scan-cr) leads, with this slice, [unremapped-rebuild-reds-smoke](#unremapped-rebuild-reds-smoke), [wakeup-stamp-windows-spawn](#wakeup-stamp-windows-spawn) and the feature [consumer-rule-word-read](#consumer-rule-word-read), which spec authors. Composition: bundled on guard-kit's word read and redirect scan, the installer smoke riding as a threshold entry; drain 5 against inflow 3.2. Push need: 2 against one to two, the closing push and wakeup-stamp-windows-spawn's.
+
+**Deliverable:** the word read lifted rule by rule (guard-kit/SPEC.md §The reader and its views), each lift deleting its limit rows in its own commit, safety blocks first: rules `script_interpreter` and `rm_tracked`.
+
+**Cost while deferred:** a steer or a safety block is evaded by one re-spelling, silently under `command`, which the matcher strips. Filed 2026-10-13 by guard-spelling-oracle-pass' spec off a prototype of the variant lane, and promoted at its close. Re-verified there: the lane is green under the table's rows and reds on a row nothing needs. Owner lookup: `skeleton`, `word read`, `variant-limits` in this file and the disposed-findings record — none; `git-rules-word-read-siblings`, done, DISTINCT (the git rules' lift, landed); owner guard-kit/SPEC.md §The generic ruleset.
+
+### unremapped-rebuild-reds-smoke
+
+[recurrence: 2026-10-10, 2026-10-14]
+
+the crate suite's `cargo test --release` rebuilds the release binary without `bin/build-native.sh`'s path-remap flags, so the builder's cargo registry path is left in it. The next validate run's installer smoke stages that binary and reds on `check-tree-terms` until `bin/build-native.sh` is rerun. The smoke's staging step refuses a binary whose source stamp is stale (`native/src/emit/installer_smoke/staging.rs`) and reads nothing of the remap.
+
+**Deliverable:** one of three, spec's to choose: the crate suite built with the remap, the staging step refusing an unremapped binary with the rebuild steer it already prints for a stale one, or the smoke building through `bin/build-native.sh`.
+
+**Run at hook-placement-guard-rules-pass' close:** `cargo test --release --no-run` into a scratch target directory emitted the binary with the cargo-home path in it, and `bin/build-native.sh` left none. The validate roster runs the crate suite after the installer smoke, so each clean run leaves the binary unremapped for the next, which `check-gate-binary-fresh` reads current. **Met again at rewrite-grant-noclobber-pass' validate:** run 1 redded on three builder-home hits in the staged binary, and the run was clean after `bin/build-native.sh`.
+
+**Cost while deferred:** a wasted validate round, about 17 minutes, on any seat whose binary was last built by a plain cargo build. Filed 2026-10-09 by crate-reader-hardening-pass' validate, which saw the red and the clean rerun, and promoted at its close. Re-verified by reading the staging step. Owner lookup: `remap`, `installer_smoke`, `check-tree-terms`, `cargo test` in this file and the disposed-findings record — none; [validate-suite-wall-clock-unowned](#validate-suite-wall-clock-unowned) and [build-native-obligation-unconditional](#build-native-obligation-unconditional), both DISTINCT (the suites' serial cost, a rebuild owed by a crate-free commit); owner installer/SPEC.md §The consumer smoke.
+
+### wakeup-stamp-windows-spawn
+
+the wakeup-guard's log stamp is built in process on unix and spawns `date` off it (`local_stamp` in `native/src/hook/wakeup.rs`), resolved on `PATH` alone. A hook the harness starts directly on native Windows need not have Git for Windows' userland on `PATH`, and the stamp is then empty, the limit guard-kit/SPEC.md §The hook on native Windows and context-kit/SPEC.md §bin/env-probe both state.
+
+**Deliverable:** the off-unix stamp computed in process, held by a `crate-tests-windows` case, and the two limit sentences withdrawn.
+
+**Inferred, cannot run before build:** that the stamp is empty under an exec-form registration on a Windows host with Git's `usr/bin` off `PATH` — this seat has no Windows host, and the `crate-tests-windows` case the build adds is the first run reaching one; the in-process stamp is owed whichever way that reads.
+
+**Push need (2026-10-14, inside the budget):** one mid-iteration push, since its `crate-tests-windows` case executes on the remote Windows leg before any local run can; the operator accepted the set's two against the budget of one to two.
+
+**Cost while deferred:** a Windows adopter's wakeup-attempts log lines may carry no timestamp. Filed 2026-10-10 by hook-placement-guard-rules-pass' build and promoted at its close. Re-verified there by reading both `local_stamp` bodies. Owner lookup: `wakeup`, `date -Is`, `local_stamp` in this file and the disposed-findings record — none; `exec-form-hook-registration`, done, DISTINCT (the registration's form, where this is a member's own spawn); owner guard-kit/SPEC.md §wakeup-guard.
 
 ## Deferred
 
@@ -420,18 +468,6 @@ the tier tables' validator holds a model to no shape beyond carrying no whitespa
 
 **Cost while deferred:** a binding typo of that shape ships a definition with no model under a green gate. Filed 2026-10-09 by crate-reader-hardening-pass' first build batch and promoted at its close. Re-verified by reading `native/src/knobs/delegation_kit.rs`: its refusal rows hold the pair's form and whitespace alone. Owner lookup: `agent-tiers`, `tier table`, `YAML comment` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §check-agent-tier-explicit.
 
-### unremapped-rebuild-reds-smoke
-
-[cost: event/low] [surface: installer] [recurrence: 2026-10-10, 2026-10-14]
-
-the crate suite's `cargo test --release` rebuilds the release binary without `bin/build-native.sh`'s path-remap flags, so the builder's cargo registry path is left in it. The next validate run's installer smoke stages that binary and reds on `check-tree-terms` until `bin/build-native.sh` is rerun. The smoke's staging step refuses a binary whose source stamp is stale (`native/src/emit/installer_smoke/staging.rs`) and reads nothing of the remap.
-
-**Deliverable:** one of three, spec's to choose: the crate suite built with the remap, the staging step refusing an unremapped binary with the rebuild steer it already prints for a stale one, or the smoke building through `bin/build-native.sh`.
-
-**Run at hook-placement-guard-rules-pass' close:** `cargo test --release --no-run` into a scratch target directory emitted the binary with the cargo-home path in it, and `bin/build-native.sh` left none. The validate roster runs the crate suite after the installer smoke, so each clean run leaves the binary unremapped for the next, which `check-gate-binary-fresh` reads current. **Met again at rewrite-grant-noclobber-pass' validate:** run 1 redded on three builder-home hits in the staged binary, and the run was clean after `bin/build-native.sh`.
-
-**Cost while deferred:** a wasted validate round, about 17 minutes, on any seat whose binary was last built by a plain cargo build. Filed 2026-10-09 by crate-reader-hardening-pass' validate, which saw the red and the clean rerun, and promoted at its close. Re-verified by reading the staging step. Owner lookup: `remap`, `installer_smoke`, `check-tree-terms`, `cargo test` in this file and the disposed-findings record — none; [validate-suite-wall-clock-unowned](#validate-suite-wall-clock-unowned) and [build-native-obligation-unconditional](#build-native-obligation-unconditional), both DISTINCT (the suites' serial cost, a rebuild owed by a crate-free commit); owner installer/SPEC.md §The consumer smoke.
-
 ### front-matter-dotted-closer
 
 [cost: event/low] [surface: canon-kit]
@@ -455,18 +491,6 @@ the iteration boundary's scratch wipe leaves a directory holding a member whose 
 **Inferred, not run:** that the lister's refusal is what stops the descent — plant a member named with a lone 0xff byte under a scratch directory and run a boundary entry over a scratch tree
 
 **Cost while deferred:** one such scratch member leaves a could-not-remove note at every boundary. Filed 2026-10-10 by front-door-readiness-pass' close, where a scratch repository carrying one survived a boundary and was removed by hand, and promoted at the next scope's intake. Re-verified there by reading `wipe`: both its listings go through `walk::list_dir`. Owner lookup: `wipe`, `non-UTF-8`, `could not remove` in this file and the disposed-findings record — [nul-listing-lossy-decode](#nul-listing-lossy-decode), DISTINCT (ten readers that decode lossily where this one refuses); owner lifecycle-kit/SPEC.md §bin/enter-stage.sh.
-
-### wakeup-stamp-windows-spawn
-
-[cost: event/low] [surface: guard-kit]
-
-the wakeup-guard's log stamp is built in process on unix and spawns `date` off it (`local_stamp` in `native/src/hook/wakeup.rs`), resolved on `PATH` alone. A hook the harness starts directly on native Windows need not have Git for Windows' userland on `PATH`, and the stamp is then empty, the limit guard-kit/SPEC.md §The hook on native Windows and context-kit/SPEC.md §bin/env-probe both state.
-
-**Deliverable:** the off-unix stamp computed in process, held by a `crate-tests-windows` case, and the two limit sentences withdrawn.
-
-**Inferred, not run:** that the spawn finds nothing under an exec-form registration on a Windows host — start `--hook wakeup-guard` there with Git's `usr/bin` off `PATH` and read the log line
-
-**Cost while deferred:** a Windows adopter's wakeup-attempts log lines may carry no timestamp. Filed 2026-10-10 by hook-placement-guard-rules-pass' build and promoted at its close. Re-verified there by reading both `local_stamp` bodies. Owner lookup: `wakeup`, `date -Is`, `local_stamp` in this file and the disposed-findings record — none; `exec-form-hook-registration`, done, DISTINCT (the registration's form, where this is a member's own spawn); owner guard-kit/SPEC.md §wakeup-guard.
 
 ### toolchain-pin-trails-stable
 
@@ -495,18 +519,6 @@ the gates workflow's Windows liveness step misread one row once. On the run for 
 **Inferred, not run:** that a low Windows pid was recycled between the truth read and the gate's, possibly into a process the gate itself started — cannot run here: the step executes on the workflow's Windows leg alone
 
 **Cost while deferred:** a closing push reds on a coin and costs a re-run and its wait. Surfaced 2026-10-11 by hook-placement-guard-rules-pass' close and carried to the next scope's intake. Owner lookup: `liveness`, `pid`, `recycl` in this file and the disposed-findings record — none; owner evidence-kit/SPEC.md §check-producer-liveness and the gates workflow's Windows crate leg.
-
-### guard-rules-skeleton-word-read
-
-[cost: event/high] [surface: guard-kit] [recurrence: 2026-10-13, 2026-10-14]
-
-most generic guard rules read the command word, an option or an operand off the skeleton, so a quoted, escaped, redirect-glued or `command`-led spelling of a row they block falls through. `guard-kit/guard-tests/variant-limits.tsv` is the worklist: every row is a rule and a re-spelling its read does not reach, all at the `fallthrough` floor. Nine of them are the PowerShell reader's: a backtick inside a command name falls through rules `rm_tracked`, `cd_compound`, `script_interpreter` and `background_no_record`, and a quoted or backticked redirect target or scratch body path through rules `scratch_redirect` and `script_interpreter`.
-
-**Deliverable:** the word read lifted rule by rule (guard-kit/SPEC.md §The reader and its views), each lift deleting its limit rows in its own commit, safety blocks first: rules `script_interpreter` and `rm_tracked`. The PowerShell rows need that reader's own word read. The grants read a redirect target off the skeleton too, so a quoted `/dev/null` withholds the grant the bare spelling keeps: rule `ro_pipeline` falls through on `grep -rn foo src 2>"/dev/null"`, and rules `append_scratch`, `bounded_wait`, `bounded_write` and `background_no_record`'s third exemption read it the same way, read off their source and not run. Rule `abs_script`'s by-value read (`redirect_values` in `native/src/guard/rules/grants.rs`) is the lift they lack.
-
-**Inferred, not run:** that a PowerShell host reads each derived `ps-` row as its base row's command; no host is installed on the machine that derived them; run the derived rows through `pwsh` on the x64 Windows leg.
-
-**Cost while deferred:** a steer or a safety block is evaded by one re-spelling, silently under `command`, which the matcher strips. Filed 2026-10-13 by guard-spelling-oracle-pass' spec off a prototype of the variant lane, and promoted at its close. Re-verified there: the lane is green under the table's rows and reds on a row nothing needs. Owner lookup: `skeleton`, `word read`, `variant-limits` in this file and the disposed-findings record — none; `git-rules-word-read-siblings`, done, DISTINCT (the git rules' lift, landed); owner guard-kit/SPEC.md §The generic ruleset.
 
 ### foreign-budget-reset-ok-stale
 
@@ -552,17 +564,17 @@ a record scope lands for the whole unit set on one entry is lost when that entry
 
 **Cost while deferred:** a batch split loses the push budget's stated need and a direction's record unless a session notices. Filed 2026-10-13 by guard-grant-review-pass' lead and promoted at the next scope's intake. Re-verified there against that close's drain commit message, which names the block leaving with the Done section. Owner lookup: `Done move`, `set-wide`, `Push need` in this file and the disposed-findings record — [section-prose-outlives-its-entries](#section-prose-outlives-its-entries), DISTINCT (a section preamble surviving Clear-Done, where this is a body lost ahead of it); [operator-authored-unit-set](#operator-authored-unit-set), DISTINCT (who authors a set); owner lifecycle-kit/SPEC.md §templates/stages/ and queue-kit/SPEC.md §The icebox tier.
 
-### grant-redirect-scan-cr
+### grant-pwsh-word-read
 
-[cost: event/low] [surface: guard-kit]
+[cost: event/high] [surface: guard-kit]
 
-the skeleton scan's redirect read takes a carriage return for whitespace (`is_space` in `native/src/guard/text.rs`), where bash keeps it inside the word, so a grant reads a file target as an fd-dup or a pipe. Rule `ro_pipeline` allows `grep -rn foo src >&2<CR>tracked.md`, which writes the file `2<CR>tracked.md`, and `grep -rn foo src ><CR>| head`, which writes a file named by the carriage return. A second mismatch sits in rule `abs_script`'s rewrite: `rewrite_granted` in `native/src/guard/rules/grants.rs` reads targets by value only where the scan finds one that is neither `/dev/null` nor an fd-dup, so `>/dev/null&>/dev/null` keeps its rewrite, while guard-kit/SPEC.md §The rule roster counts a word carrying a second operator as a file. Both of its redirects are the device, so that grant is benign either way.
+the half of [guard-rules-skeleton-word-read](#guard-rules-skeleton-word-read) split off at guard-word-read-release-pass' scope (operator direction, lead-relayed, not a ruling), so no grant widened ahead of the v0.32.0 bar. Three reads stay on the skeleton. The grants read a redirect target there, so a quoted `/dev/null` withholds the grant the bare spelling keeps: rule `ro_pipeline` falls through on `grep -rn foo src 2>"/dev/null"`, and rules `append_scratch`, `bounded_wait`, `bounded_write` and `background_no_record`'s third exemption read it the same way, read off their source and not run. Rule `ro_pipeline` reads its command word there too, its 9 rows in `guard-kit/guard-tests/variant-limits.tsv`. And 9 rows are the PowerShell reader's: a backtick inside a command name falls through rules `rm_tracked`, `cd_compound`, `script_interpreter` and `background_no_record`, and a quoted or backticked redirect target or scratch body path through rules `scratch_redirect` and `script_interpreter`.
 
-**Deliverable:** the scan's whitespace class matching bash's, with a `cases.tsv` row per spelling under each grant that reads it; and that rewrite test and its SPEC line brought to one reading. Both move a verdict, so they land in a build a validate reads (the close binding's promote-never-land rule).
+**Deliverable:** rule `abs_script`'s by-value read (`redirect_values` in `native/src/guard/rules/grants.rs`) given to each grant, rule `ro_pipeline`'s command word read off the word read, and the PowerShell reader's own word read, each lift deleting its limit rows in its own commit. Every grant lift widens a grant, so it lands in a build a validate's second-vendor review reads.
 
-**Inferred, not run:** that rule `abs_script`'s rewrite grants the carriage-return spelling too, which needs the decision table's sandbox allowlist — add the row and run `--run-guard-tests`; and that v0.31.0 granted both spellings, read off `is_space` unchanged at the tag.
+**Inferred, not run:** that a PowerShell host reads each derived `ps-` row as its base row's command; no host is installed on the machine that derived them — run the derived rows through `pwsh` on the x64 Windows leg
 
-**Cost while deferred:** an auto-allowed read can write a file the grant never saw, and the v0.32.0 release bar stays unmet while this wrong grant is open. Filed 2026-10-14 by rewrite-grant-noclobber-pass' close, off its validate's second-vendor review. Re-verified there through the hook member at HEAD: allow, rule `ro_pipeline`, on both spellings. Owner lookup: `carriage`, `CRLF`, `is_space`, `whitespace class`, `second operator` in this file and the disposed-findings record — none; [guard-rules-skeleton-word-read](#guard-rules-skeleton-word-read), DISTINCT (a word's quoted spelling declined, where this is an operator misread into a grant); owner guard-kit/SPEC.md §The reader and its views and §The rule roster.
+**Cost while deferred:** a PowerShell re-spelling evades two safety blocks, rules `rm_tracked` and `script_interpreter`, and a quoted `/dev/null` costs a prompt the bare spelling does not. Filed 2026-10-14 by guard-word-read-release-pass' scope as the split's remainder; the finding was filed 2026-10-13 by guard-spelling-oracle-pass' spec. Owner lookup: `word read`, `redirect_values`, `ps-`, `pwsh` in this file and the disposed-findings record — [guard-rules-skeleton-word-read](#guard-rules-skeleton-word-read), DISTINCT (the bash block and steer half), [grant-redirect-scan-cr](#grant-redirect-scan-cr), DISTINCT (the scan this read lands on, which goes first); owner guard-kit/SPEC.md §The reader and its views.
 
 ## Icebox
 
