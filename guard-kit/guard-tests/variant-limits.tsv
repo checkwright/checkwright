@@ -20,11 +20,6 @@ fallthrough	bare_sleep	esc-lead
 fallthrough	bare_sleep	part-lead
 fallthrough	bare_sleep	sq-lead
 fallthrough	bare_sleep	wrap-command
-fallthrough	cat_file	dq-lead
-fallthrough	cat_file	esc-lead
-fallthrough	cat_file	part-lead
-fallthrough	cat_file	sq-lead
-fallthrough	cat_file	wrap-command
 fallthrough	cd_compound	ps-tick-lead
 fallthrough	emitter_write	dq-lead
 fallthrough	emitter_write	esc-lead
@@ -32,11 +27,6 @@ fallthrough	emitter_write	part-lead
 fallthrough	emitter_write	sq-lead
 fallthrough	emitter_write	word-glued
 fallthrough	emitter_write	wrap-command
-fallthrough	find_glob	dq-lead
-fallthrough	find_glob	esc-lead
-fallthrough	find_glob	part-lead
-fallthrough	find_glob	sq-lead
-fallthrough	find_glob	wrap-command
 fallthrough	git_c_root	dq-arg
 fallthrough	git_c_root	dq-lead
 fallthrough	git_c_root	esc-arg

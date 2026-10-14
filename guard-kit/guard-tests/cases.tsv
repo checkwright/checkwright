@@ -213,6 +213,8 @@ block	find lib -type f
 block	find lib -name '*.sh'
 block	find lib -type f; find lib -type d
 block	find lib -type f; echo ===; find lib -type d
+# the command words come through the command read, a banner's included: by value, by path, past a wrapper
+block	\find lib -type f; 'echo' ===; command find lib -type d
 fallthrough	find lib -type f; find lib -delete
 fallthrough	find . -name '*.tmp' -delete
 allow	find . -type f | head
@@ -259,6 +261,8 @@ block	cat -- -n
 block	cat -n -- tracked.md
 block	cat a.md; cat b.md
 block	cat a.md; echo ===; cat b.md
+# the command words come through the command read, a banner's included: by value, by path, past a wrapper
+block	\cat a.md; "printf" ===; /bin/cat b.md
 fallthrough	cat a.md; make build
 fallthrough	cat a.md && make build
 fallthrough	echo a; echo b

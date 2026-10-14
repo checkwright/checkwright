@@ -1,8 +1,8 @@
 // spec: guard-kit/SPEC.md §The generic ruleset — the tool steers: a shell spelling of what a dedicated
 // tool or a kit arm does better, and the waits and process queries that cannot end.
 use super::{
-    command_word, git_read, git_walk_of, has_expansion, has_substitution, is_banner, loop_span,
-    moves_repository, on_ro_roster, ro_invocation_clear, segment_core, GitWalk,
+    command_read, command_word, git_read, git_walk_of, has_expansion, has_substitution, is_banner, loop_span,
+    moves_repository, names_command, on_ro_roster, ro_invocation_clear, GitWalk,
 };
 use crate::ere::Ere;
 use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Verdict};
@@ -661,16 +661,17 @@ fn python_rewrite(ctx: &Ctx, c: &Cmd, s: &str) -> Decided {
 
 // spec: guard-kit/SPEC.md §The generic ruleset — a `;`-compound skeleton is a batched read when every
 // segment is a bare read or a literal banner, and at least one is a read.
-fn is_read_batch(ctx: &Ctx, s: &str, pred: impl Fn(usize, &str) -> bool) -> bool {
+fn is_read_batch(ctx: &Ctx, s: &str, read: &[Vec<Word>], pred: impl Fn(usize, &str) -> bool) -> bool {
     let mut reads = 0usize;
     for (i, seg) in ctx.segments(s).iter().enumerate() {
         let seg = trim_start(seg);
         if seg.is_empty() {
             continue;
         }
+        let banner = read.get(i).and_then(|ws| ws.first()).is_some_and(|w| names_command(w, "echo") || names_command(w, "printf"));
         if pred(i, seg) {
             reads += 1;
-        } else if !is_banner(seg) {
+        } else if !banner && !is_banner(seg) {
             return false;
         }
     }
@@ -690,13 +691,15 @@ pub fn find_glob(ctx: &Ctx) -> Decided {
         return Ok(None);
     }
     let h = ctx.host();
-    let listing = |_: usize, seg: &str| {
-        head_word(seg) == "find" && {
-            let rest = seg.strip_prefix("find").unwrap_or(seg);
-            ro_invocation_clear(h, "find", rest, &segment_core(rest), false)
-        }
+    let read = command_read(ctx, ctx.cmd())?;
+    let listing = |i: usize, _: &str| match read.get(i).and_then(|ws| ws.split_first()) {
+        Some((head, args)) => names_command(head, "find") && {
+            let rest = held_values(args);
+            ro_invocation_clear(h, "find", &rest, &rest, false)
+        },
+        None => false,
     };
-    if !is_read_batch(ctx, &s, listing) {
+    if !is_read_batch(ctx, &s, &read, listing) {
         return Ok(None);
     }
     block("don't list files with a bare 'find' — use the Glob tool: it returns matching paths (registered for a later Read) and needs no permission decision at all. If your toolset carries no Glob tool, keep 'find' and pipe the listing into a read-only consumer ('find <dir> -type f | sort'), which the read-only pipeline grant allows. This fires on a lone listing and on a ';'-sequence of them (a literal echo/printf banner between them is fine); a 'find' carrying an action predicate (-exec/-delete/…), piped into a consumer, or redirected is untouched. If you genuinely need find, run it yourself with !<command>.")
@@ -787,15 +790,12 @@ pub fn cat_file(ctx: &Ctx) -> Decided {
     if grep_q(r"(&&|\|\||\||&|<|>)", &s) {
         return Ok(None);
     }
-    let read = ctx.word_read(ctx.cmd())?.unwrap_or_default();
-    let cat_read = |i: usize, seg: &str| {
-        let operands = match read.get(i) {
-            Some(ws) if !ws.is_empty() => cat_operands(ws[1..].iter().map(|w| w.value.as_str())),
-            _ => cat_operands(words(seg.strip_prefix("cat").unwrap_or(seg)).into_iter()),
-        };
-        head_word(seg) == "cat" && operands == 1
+    let read = command_read(ctx, ctx.cmd())?;
+    let cat_read = |i: usize, _: &str| match read.get(i).and_then(|ws| ws.split_first()) {
+        Some((head, args)) => names_command(head, "cat") && cat_operands(args.iter().map(|w| w.value.as_str())) == 1,
+        None => false,
     };
-    if !is_read_batch(ctx, &s, cat_read) {
+    if !is_read_batch(ctx, &s, &read, cat_read) {
         return Ok(None);
     }
     block("don't read files with a bare 'cat' — use the Read tool: it returns numbered lines registered for a later Edit, and needs no permission decision at all. This fires on a lone 'cat <file>' and on a ';'-sequence of them (a literal echo/printf banner between reads is fine — batch them into one Read); a 'cat' feeding a pipe or heredoc, redirecting, or concatenating multiple files in one command is composition and untouched. If you genuinely need cat, run it yourself with !<command>.")
