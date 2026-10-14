@@ -10,20 +10,6 @@
 
 ## Technical Debt
 
-### unremapped-rebuild-reds-smoke
-
-[recurrence: 2026-10-10, 2026-10-14]
-
-the crate suite's `cargo test --release` rebuilds the release binary without `bin/build-native.sh`'s path-remap flags, so the builder's cargo registry path is left in it. The next validate run's installer smoke stages that binary and reds on `check-tree-terms` until `bin/build-native.sh` is rerun. The smoke's staging step refuses a binary whose source stamp is stale (`native/src/emit/installer_smoke/staging.rs`) and reads nothing of the remap.
-
-**Deliverable (form chosen at guard-word-read-release-pass' spec):** the staging step refusing an unremapped running binary at exit 2 with the rebuild steer it already prints for a stale one, by reading the binary's bytes against the tree's banned-pattern roster, `gate_msg_pattern_files`' set and the one `bin/build-native.sh` verifies its artifact against, so the remedy clears every refusal; installer/SPEC.md §The consumer smoke and gate-sdk/SPEC.md §check-gate-binary-fresh's sentence on the smoke's red say so. Not taken: the smoke building through `bin/build-native.sh`, against the same section's rule that the driver builds nothing; the crate suite built with the remap, since `scripts/evidence-config.knobs` execs its argv with no expansion, the remap has one holder, and `check-crate-arms`' `cargo test` over `GATE_SDK_CARGO_TARGET_DIR`, `native/target` by default, would stay a second unremapped producer.
-
-**Live at that spec:** this seat's release binary carried three cargo-home hits, so the refusal fires at the next validate unless `bin/build-native.sh` runs first.
-
-**Run at hook-placement-guard-rules-pass' close:** `cargo test --release --no-run` into a scratch target directory emitted the binary with the cargo-home path in it, and `bin/build-native.sh` left none. The validate roster runs the crate suite after the installer smoke, so each clean run leaves the binary unremapped for the next, which `check-gate-binary-fresh` reads current. **Met again at rewrite-grant-noclobber-pass' validate:** run 1 redded on three builder-home hits in the staged binary, and the run was clean after `bin/build-native.sh`.
-
-**Cost while deferred:** a wasted validate round, about 17 minutes, on any seat whose binary was last built by a plain cargo build. Filed 2026-10-09 by crate-reader-hardening-pass' validate, which saw the red and the clean rerun, and promoted at its close. Re-verified by reading the staging step. Owner lookup: `remap`, `installer_smoke`, `check-tree-terms`, `cargo test` in this file and the disposed-findings record — none; [validate-suite-wall-clock-unowned](#validate-suite-wall-clock-unowned) and [build-native-obligation-unconditional](#build-native-obligation-unconditional), both DISTINCT (the suites' serial cost, a rebuild owed by a crate-free commit); owner installer/SPEC.md §The consumer smoke.
-
 ### wakeup-stamp-windows-spawn
 
 the wakeup-guard's log stamp is built in process on unix and spawns `date` off it (`local_stamp` in `native/src/hook/wakeup.rs`), resolved on `PATH` alone. A hook the harness starts directly on native Windows need not have Git for Windows' userland on `PATH`, and the stamp is then empty, the limit guard-kit/SPEC.md §The hook on native Windows and context-kit/SPEC.md §bin/env-probe both state.
@@ -34,9 +20,9 @@ the wakeup-guard's log stamp is built in process on unix and spawns `date` off i
 
 **Push need (2026-10-14, inside the budget):** one mid-iteration push, since its `crate-tests-windows` case executes on the remote Windows leg before any local run can; the operator accepted the set's two against the budget of one to two.
 
-**Unit set (2026-10-14, operator direction, lead-relayed, not a ruling)**, recorded on this entry as the one likeliest to land last: `grant-redirect-scan-cr` leads, with this slice, [unremapped-rebuild-reds-smoke](#unremapped-rebuild-reds-smoke), [wakeup-stamp-windows-spawn](#wakeup-stamp-windows-spawn) and the feature `consumer-rule-word-read`, which spec authors. Composition: bundled on guard-kit's word read and redirect scan, the installer smoke riding as a threshold entry; drain 5 against inflow 3.2. Push need: 2 against one to two, the closing push and wakeup-stamp-windows-spawn's.
+**Unit set (2026-10-14, operator direction, lead-relayed, not a ruling)**, recorded on this entry as the one likeliest to land last: `grant-redirect-scan-cr` leads, with this slice, `unremapped-rebuild-reds-smoke`, [wakeup-stamp-windows-spawn](#wakeup-stamp-windows-spawn) and the feature `consumer-rule-word-read`, which spec authors. Composition: bundled on guard-kit's word read and redirect scan, the installer smoke riding as a threshold entry; drain 5 against inflow 3.2. Push need: 2 against one to two, the closing push and wakeup-stamp-windows-spawn's.
 
-**Unit-set record moved here (2026-10-14, lead decision, not a ruling)** verbatim from `guard-rules-skeleton-word-read` at its Done move in guard-word-read-release-pass' build, since this entry's batch lands last; the "this slice" above names that entry, and the record stays live between this entry and [unremapped-rebuild-reds-smoke](#unremapped-rebuild-reds-smoke) until close.
+**Unit-set record moved here (2026-10-14, lead decision, not a ruling)** verbatim from `guard-rules-skeleton-word-read` at its Done move in guard-word-read-release-pass' build, since this entry's batch lands last; the "this slice" above names that entry, and the record stays live between this entry and `unremapped-rebuild-reds-smoke` until close.
 
 **Cost while deferred:** a Windows adopter's wakeup-attempts log lines may carry no timestamp. Filed 2026-10-10 by hook-placement-guard-rules-pass' build and promoted at its close. Re-verified there by reading both `local_stamp` bodies. Owner lookup: `wakeup`, `date -Is`, `local_stamp` in this file and the disposed-findings record — none; `exec-form-hook-registration`, done, DISTINCT (the registration's form, where this is a member's own spawn); owner guard-kit/SPEC.md §wakeup-guard.
 
@@ -1249,4 +1235,5 @@ a citation naming a numbered step by its bold title, in RELEASING.md's procedure
 - grant-redirect-scan-cr
 - guard-rules-skeleton-word-read
 - consumer-rule-word-read
+- unremapped-rebuild-reds-smoke
 
