@@ -1,7 +1,7 @@
 // spec: guard-kit/SPEC.md §The generic ruleset — the spelling rules: a command form the matcher cannot
 // resolve, steered to the one it can.
 use super::grants::{redirect_values, rewrite_granted};
-use super::{command_read, command_word, git_read, git_walk_of, names_command, GitWalk};
+use super::{command_read, command_word, git_read, git_walk_of, names_command, passed_read, GitWalk};
 use crate::guard::engine::{Cmd, Ctx, Decided, Shell, Verdict};
 use crate::guard::host::{knob_scalar_value, same_file};
 use crate::guard::reader::View::{SqDqHd, SqDqHdq, SqHdq};
@@ -45,18 +45,31 @@ pub fn git_c_root(ctx: &Ctx) -> Decided {
     let raw = ctx.raw(ctx.cmd())?;
     let cmd = ctx.view(ctx.cmd(), SqDqHd)?;
     let needle = format!("git -C {} ", pwd);
-    if cmd.split('\n').any(|l| l.contains(&needle)) {
+    let gits = git_read(ctx, ctx.cmd())?;
+    let at_root = |ws: &Vec<String>| ws.len() > 3 && ws[1] == "-C" && &ws[2] == pwd;
+    if cmd.split('\n').any(|l| l.contains(&needle)) || gits.iter().flatten().any(at_root) {
         return block(format!("drop 'git -C {} ' — cwd is the repo root, so the bare 'git <subcommand>' form is allowlisted and resolves on the match; the absolute '-C' spelling matches nothing and costs an out-of-band permission decision. Reserve 'git -C <dir>' for a different repo.", pwd));
     }
-    let gits = git_read(ctx, ctx.cmd())?;
+    let passed = passed_read(ctx, ctx.cmd())?;
+    let commands = command_read(ctx, ctx.cmd())?;
     for (i, seg) in ctx.segments(&cmd).iter().enumerate() {
         if seg.contains('=') {
-            if let Some(v) = knob_echo(raw, seg) {
+            if let Some(v) = knob_echo(raw, words(seg).into_iter().map(str::to_string).collect()) {
                 return Ok(Some(v));
+            }
+            let ws = passed.get(i).map_or(&[][..], |ws| ws.as_slice());
+            let ws = &ws[ws.iter().take_while(|w| w.value == "command").count()..];
+            if let Some((first, rest)) = ws.split_first() {
+                let shape = if matches!(first.value.as_str(), "export" | "env") { &first.value } else { &first.live };
+                let lifted = std::iter::once(shape.clone()).chain(rest.iter().map(|w| w.live.clone())).collect();
+                if let Some(v) = knob_echo(raw, lifted) {
+                    return Ok(Some(v));
+                }
             }
         }
         let cmdseg = command_word(seg);
-        let w = head_word(&cmdseg);
+        let head = commands.get(i).and_then(|ws| ws.first()).map(|w| w.value.as_str()).filter(|v| v.contains('/'));
+        let w = head.unwrap_or_else(|| head_word(&cmdseg));
         if let Some(words) = gits.get(i).and_then(Option::as_ref) {
             if let Some(globals) = git_walk_of(words, GitWalk::Globals) {
                 if globals.iter().any(|g| g == "-c") {
@@ -77,8 +90,8 @@ pub fn git_c_root(ctx: &Ctx) -> Decided {
 
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `git_c_root`'s arm (d), one skeleton segment at
 // a time: the raw command is read only to spell the corrective.
-fn knob_echo(raw: &str, seg: &str) -> Option<Verdict> {
-    let mut ws = words(seg);
+fn knob_echo(raw: &str, ws: Vec<String>) -> Option<Verdict> {
+    let mut ws: Vec<&str> = ws.iter().map(String::as_str).collect();
     let mut shape = "lead";
     match ws.first().copied() {
         Some("export") => {
@@ -120,23 +133,20 @@ fn knob_echo(raw: &str, seg: &str) -> Option<Verdict> {
         if val != resolved && !(std::path::Path::new(val).exists() && same_file(val, &resolved)) {
             continue;
         }
-        let w: String = if shape == "export" && asg.len() == 1 { trim(seg).to_string() } else { w0.to_string() };
-        let (mut pre, mut post) = match raw.find(&w) {
-            Some(at) => (raw[..at].to_string(), raw[at + w.len()..].to_string()),
+        let (mut pre, mut post) = match raw.find(*w0) {
+            Some(at) => (raw[..at].to_string(), trim_start(&raw[at + w0.len()..]).to_string()),
             None => (raw.to_string(), raw.to_string()),
         };
-        post = trim_start(&post).to_string();
-        if w.starts_with("export") {
-            if post.starts_with("&&") || post.starts_with(';') {
-                let p = post.strip_prefix("&&").unwrap_or(&post);
-                let p = p.strip_prefix(';').unwrap_or(p);
+        let mut w = w0.to_string();
+        if shape != "lead" && asg.len() == 1 {
+            let tail = trim_end(&pre);
+            let cut = tail.rfind([' ', '\t']).map_or(0, |i| i + 1);
+            if shape == "export" {
+                w = format!("{} {}", &tail[cut..], w0);
+                let p = post.strip_prefix("&&").or_else(|| post.strip_prefix(';')).unwrap_or(&post);
                 post = trim_start(p).to_string();
             }
-        } else if shape == "env" && asg.len() == 1 {
-            let tail = trim_end(&pre);
-            if let Some(t) = tail.strip_suffix("env") {
-                pre = t.to_string();
-            }
+            pre = tail[..cut].to_string();
         }
         if post.is_empty() {
             let p = trim_end(&pre);

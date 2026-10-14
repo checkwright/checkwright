@@ -27,6 +27,9 @@ block	/usr/bin/time -f %e make build
 block	make lint && /usr/bin/nice -n 5 make build
 fallthrough	time make build
 fallthrough	file /usr/bin/time
+# arms (a) and (c) read words by value too
+block	git \-C @ROOT@ status --short
+block	command '/usr/bin/nohup' make build
 
 # rule `git_c_root`'s arm (d) — an export, leading assignment or env prefix setting a kit
 #          knob to the value it already resolves to. The sandbox exports the
@@ -38,6 +41,10 @@ block	env GATE_SDK_WORKFLOW_DIR=.workflow make build
 fallthrough	GATE_SDK_WORKFLOW_DIR=elsewhere make build
 fallthrough	GATE_SDK_JOBS=1 make build
 fallthrough	FOO=bar make build
+# arm (d) reads the export or env word by value past a leading `command`; a quoted value falls through
+block	command \env GATE_SDK_WORKFLOW_DIR=.workflow make build
+block	'export' GATE_SDK_WORKFLOW_DIR=.workflow && make build
+fallthrough	env GATE_SDK_WORKFLOW_DIR='.workflow' make build
 
 # rule `scratch_redirect` — bare-name scratch redirect
 block	some-runner 2> op.err

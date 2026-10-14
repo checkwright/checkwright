@@ -3,15 +3,6 @@
 # read or withholds its grant, and the lane fails on a row nothing needs.
 fallthrough	background_no_record	ps-tick-lead
 fallthrough	cd_compound	ps-tick-lead
-fallthrough	git_c_root	dq-arg
-fallthrough	git_c_root	dq-lead
-fallthrough	git_c_root	esc-arg
-fallthrough	git_c_root	esc-lead
-fallthrough	git_c_root	part-arg
-fallthrough	git_c_root	part-lead
-fallthrough	git_c_root	sq-arg
-fallthrough	git_c_root	sq-lead
-fallthrough	git_c_root	wrap-command
 fallthrough	pgrep_self_match	part-arg
 fallthrough	rm_tracked	ps-tick-lead
 fallthrough	scratch_redirect	ps-dq-arg
