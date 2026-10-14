@@ -29,7 +29,7 @@ pub static TABLE: &[Rule] = &[
     Rule { name: "find_exec", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: tools::find_exec },
     Rule { name: "cat_file", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: tools::cat_file },
     Rule { name: "git_grep", shells: BOTH, views: &[Raw, SqDqHd, Dequoted], test: tools::git_grep },
-    Rule { name: "pgrep_self_match", shells: BASH, views: &[Raw], test: tools::pgrep_self_match },
+    Rule { name: "pgrep_self_match", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: tools::pgrep_self_match },
     Rule { name: "bare_sleep", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: tools::bare_sleep },
     Rule {
         name: "git_mutation_under_producer",
@@ -196,17 +196,18 @@ fn passed_read(ctx: &Ctx, c: &Cmd) -> Result<Vec<Vec<Word>>, Fault> {
 // spec: guard-kit/SPEC.md §The reader and its views — the command read: per segment, the words it
 // passes its command, the wrappers the harness view strips dropped by their values.
 fn command_read(ctx: &Ctx, c: &Cmd) -> Result<Vec<Vec<Word>>, Fault> {
-    Ok(passed_read(ctx, c)?
-        .into_iter()
-        .map(|passed| {
-            let values: Vec<String> = passed
-                .iter()
-                .map(|w| if w.value.is_empty() { "\0".to_string() } else { w.value.replace([' ', '\t', '\n'], "\x01") })
-                .collect();
-            let kept = text::all_words(ctx.harness_view(&values.join(" "))).len();
-            passed.into_iter().skip(values.len() - kept).collect()
-        })
-        .collect())
+    Ok(passed_read(ctx, c)?.into_iter().map(|passed| past_wrappers(ctx, passed)).collect())
+}
+
+// spec: guard-kit/SPEC.md §The reader and its views — the command read's second half: the wrappers
+// the harness view strips dropped ahead of the command word, read off their values.
+fn past_wrappers(ctx: &Ctx, passed: Vec<Word>) -> Vec<Word> {
+    let values: Vec<String> = passed
+        .iter()
+        .map(|w| if w.value.is_empty() { "\0".to_string() } else { w.value.replace([' ', '\t', '\n'], "\x01") })
+        .collect();
+    let kept = text::all_words(ctx.harness_view(&values.join(" "))).len();
+    passed.into_iter().skip(values.len() - kept).collect()
 }
 
 // spec: guard-kit/SPEC.md §The reader and its views — a command word names `name` by its value or by

@@ -27,15 +27,7 @@ fallthrough	git_c_root	part-lead
 fallthrough	git_c_root	sq-arg
 fallthrough	git_c_root	sq-lead
 fallthrough	git_c_root	wrap-command
-fallthrough	pgrep_self_match	dq-arg
-fallthrough	pgrep_self_match	dq-lead
-fallthrough	pgrep_self_match	esc-arg
-fallthrough	pgrep_self_match	esc-lead
 fallthrough	pgrep_self_match	part-arg
-fallthrough	pgrep_self_match	part-lead
-fallthrough	pgrep_self_match	sq-arg
-fallthrough	pgrep_self_match	sq-lead
-fallthrough	pgrep_self_match	wrap-command
 fallthrough	rm_tracked	ps-tick-lead
 fallthrough	ro_pipeline	dq-arg
 fallthrough	ro_pipeline	dq-lead

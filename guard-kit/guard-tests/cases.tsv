@@ -299,6 +299,10 @@ fallthrough	git 'grep foo'
 block	bash gate-sdk/bin/run-gates.sh --installer-smoke & until ! pgrep -f installer-smoke; do sleep 5; done
 block	pkill -f installer-smoke; bash gate-sdk/bin/run-gates.sh --installer-smoke
 block	pgrep -f installer-smoke
+# the words are read by value too, so a wrapper-led, quoted or escaped spelling self-matches, while a
+# partly quoted pattern finds no copy of itself in the raw text
+block	nohup \pgrep "-f" installer-smoke
+fallthrough	pgrep -f install'er-smoke'
 block	while pgrep -f 'checkwright-gates --run-validate'; do sleep 5; done
 block	if pgrep -f worker; then echo up; fi
 block	while pgrep -f run-validate >/dev/null; do sleep 10; done

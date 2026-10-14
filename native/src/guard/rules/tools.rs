@@ -1,7 +1,7 @@
 // spec: guard-kit/SPEC.md §The generic ruleset — the tool steers: a shell spelling of what a dedicated
 // tool or a kit arm does better, and the waits and process queries that cannot end.
 use super::{
-    command_read, command_word, git_read, git_walk_of, has_expansion, has_substitution, is_banner, loop_span, segment_depths,
+    command_read, command_word, git_read, git_walk_of, has_expansion, has_substitution, is_banner, loop_span, passed_read, past_wrappers, segment_depths,
     moves_repository, names_command, on_ro_roster, ro_invocation_clear, GitWalk,
 };
 use crate::ere::Ere;
@@ -845,10 +845,10 @@ pub fn git_grep(ctx: &Ctx) -> Decided {
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `pgrep_self_match`'s pattern operand: the ERE
 // `-f` scans argv for, read whole across its blanks, with its case flag; `None` where the options
 // cannot be walked without guessing or `-x`/`-v` void the self-match argument.
-fn pgrep_pattern(seg: &str) -> Option<(bool, String)> {
+fn pgrep_pattern(toks: &[&str], spelled: bool) -> Option<(bool, String)> {
     let (mut pat, mut have_f, mut skip, mut icase) = (String::new(), false, false, false);
     let mut open: Option<char> = None;
-    for tok in words(seg).into_iter().skip(1) {
+    for &tok in toks {
         if let Some(q) = open {
             pat.push(' ');
             pat.push_str(tok);
@@ -861,7 +861,7 @@ fn pgrep_pattern(seg: &str) -> Option<(bool, String)> {
             skip = false;
             continue;
         }
-        if let Some(alone) = super::reach::redirect_word(tok) {
+        if let Some(alone) = super::reach::redirect_word(tok).filter(|_| spelled) {
             skip = alone;
             continue;
         }
@@ -891,7 +891,7 @@ fn pgrep_pattern(seg: &str) -> Option<(bool, String)> {
                     return None;
                 }
                 pat = t.to_string();
-                for q in ['\'', '"'] {
+                for q in ['\'', '"'].into_iter().filter(|_| spelled) {
                     if t.starts_with(q) && !(t.len() > 1 && t.ends_with(q)) {
                         open = Some(q);
                     }
@@ -901,6 +901,9 @@ fn pgrep_pattern(seg: &str) -> Option<(bool, String)> {
     }
     if !have_f || pat.is_empty() || open.is_some() {
         return None;
+    }
+    if !spelled {
+        return Some((icase, pat));
     }
     for q in ['\'', '"'] {
         if pat.len() >= 2 && pat.starts_with(q) && pat.ends_with(q) {
@@ -919,12 +922,27 @@ pub fn pgrep_self_match(ctx: &Ctx) -> Decided {
     if has_expansion(raw) {
         return Ok(None);
     }
+    let mut found: Vec<(bool, String)> = Vec::new();
     for seg in ctx.segments(raw).iter().flat_map(|s| s.split('&').map(String::from).collect::<Vec<_>>()) {
         let cmdseg = command_word(&seg);
-        if !matches!(head_word(&cmdseg), "pgrep" | "pkill") {
-            continue;
+        let toks = words(&cmdseg);
+        if matches!(toks.first(), Some(&"pgrep") | Some(&"pkill")) {
+            found.extend(pgrep_pattern(&toks[1..], true));
         }
-        let Some((icase, pat)) = pgrep_pattern(&cmdseg) else { continue };
+    }
+    if ctx.word_read(ctx.cmd())?.is_some() {
+        for passed in passed_read(ctx, ctx.cmd())? {
+            for group in passed.split(|w| w.live == "&") {
+                let ws = past_wrappers(ctx, group.to_vec());
+                let Some((head, args)) = ws.split_first() else { continue };
+                if names_command(head, "pgrep") || names_command(head, "pkill") {
+                    let values: Vec<&str> = args.iter().map(|w| w.value.as_str()).collect();
+                    found.extend(pgrep_pattern(&values, false));
+                }
+            }
+        }
+    }
+    for (icase, pat) in found {
         let (re_src, hay) = if icase { (pat.to_ascii_lowercase(), raw.to_ascii_lowercase()) } else { (pat.clone(), raw.to_string()) };
         let Ok(re) = Ere::compile(&re_src) else { continue };
         if !hay.split('\n').any(|l| re.is_match(l)) {
