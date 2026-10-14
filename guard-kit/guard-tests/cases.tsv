@@ -322,6 +322,11 @@ block	sleep 180; echo waited
 block	sleep 5; echo done
 # a redirect operator ends the word it is glued to
 block	sleep>/dev/null 5
+# the command word also comes through the command read, at the loop depth of its segment: by value,
+# by path and past a wrapper, while a quoted sleep in a loop body stays the sanctioned form
+block	echo start; \sleep 30
+block	nohup /bin/sleep 30
+fallthrough	until [ -f .tmp/marker ]; do \sleep 5; done
 # and its target is no command position, behind `>&` as behind `>`
 block	sleep 5 >& done
 fallthrough	make waited >& sleep 5

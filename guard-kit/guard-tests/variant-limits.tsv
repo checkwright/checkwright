@@ -11,11 +11,6 @@ fallthrough	allowlist_chain	sq-arg
 fallthrough	allowlist_chain	sq-lead
 fallthrough	allowlist_chain	wrap-command
 fallthrough	background_no_record	ps-tick-lead
-fallthrough	bare_sleep	dq-lead
-fallthrough	bare_sleep	esc-lead
-fallthrough	bare_sleep	part-lead
-fallthrough	bare_sleep	sq-lead
-fallthrough	bare_sleep	wrap-command
 fallthrough	cd_compound	ps-tick-lead
 fallthrough	emitter_write	dq-lead
 fallthrough	emitter_write	esc-lead

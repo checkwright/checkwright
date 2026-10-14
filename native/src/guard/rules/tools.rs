@@ -1,7 +1,7 @@
 // spec: guard-kit/SPEC.md §The generic ruleset — the tool steers: a shell spelling of what a dedicated
 // tool or a kit arm does better, and the waits and process queries that cannot end.
 use super::{
-    command_read, command_word, git_read, git_walk_of, has_expansion, has_substitution, is_banner, loop_span,
+    command_read, command_word, git_read, git_walk_of, has_expansion, has_substitution, is_banner, loop_span, segment_depths,
     moves_repository, names_command, on_ro_roster, ro_invocation_clear, GitWalk,
 };
 use crate::ere::Ere;
@@ -941,7 +941,15 @@ pub fn bare_sleep(ctx: &Ctx) -> Decided {
     }
     let s = ctx.view(ctx.cmd(), SqDqHd)?;
     let Some(span) = loop_span(&s) else { return Ok(None) };
-    if !span.iter().any(|(depth, cmdpos, tok)| tok == "sleep" && *cmdpos && *depth == 0) {
+    let bare = span.iter().any(|(depth, cmdpos, tok)| tok == "sleep" && *cmdpos && *depth == 0)
+        || match segment_depths(&s, ctx.segments(&s).len()) {
+            Some(depths) => command_read(ctx, ctx.cmd())?
+                .iter()
+                .zip(depths)
+                .any(|(ws, d)| d == Some(0) && ws.first().is_some_and(|w| names_command(w, "sleep"))),
+            None => false,
+        };
+    if !bare {
         return Ok(None);
     }
     block("don't wait by sleeping in the foreground — a wait must end when its condition goes true, not when a duration expires, and a foreground sleep spends a full-price turn doing nothing. Background a command that *exits* on the condition ('run_in_background' wrapping 'until <cond>; do sleep N; done') and take its completion notification: it fires the moment the condition holds and then ends. A dispatched agent is awaited by its own completion notification and never by a path on disk. The harness's event-stream form stays armed to its deadline after its event fires when the command it was armed with is unbounded, so it is the second choice for a single completion. Mind the polarity: 'until' takes a done predicate ('until [ -f marker ]'), while a PID's liveness is a still-running one and takes 'while' ('while kill -0 <pid> 2>/dev/null; do sleep N; done') — inverted, the loop exits at once with the producer still running. Spell that PID as the literal number you read out of the .run record: a '\"$var\"' expansion in the condition is refused by the expansion rule before this steer can be followed, and the literal form is the one the bounded-wait grant recognizes. A sleep inside a condition loop is untouched — that is the sanctioned form. If you genuinely need the settle, run it yourself with !<command>.")

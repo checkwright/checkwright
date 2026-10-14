@@ -30,7 +30,7 @@ pub static TABLE: &[Rule] = &[
     Rule { name: "cat_file", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: tools::cat_file },
     Rule { name: "git_grep", shells: BOTH, views: &[Raw, SqDqHd, Dequoted], test: tools::git_grep },
     Rule { name: "pgrep_self_match", shells: BASH, views: &[Raw], test: tools::pgrep_self_match },
-    Rule { name: "bare_sleep", shells: BASH, views: &[Raw, SqDqHd], test: tools::bare_sleep },
+    Rule { name: "bare_sleep", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: tools::bare_sleep },
     Rule {
         name: "git_mutation_under_producer",
         shells: BOTH,
@@ -624,6 +624,27 @@ fn loop_span(s: &str) -> Option<Vec<(i32, bool, String)>> {
     Some(loop_tokens(s)?.into_iter().map(|(depth, cmdpos, tok, _)| (depth, cmdpos, tok)).collect())
 }
 
+// spec: guard-kit/SPEC.md §The generic ruleset — each compound segment's loop depth at its first word in
+// command position that is no keyword; `None` where the walk and the compound split part.
+fn segment_depths(s: &str, n: usize) -> Option<Vec<Option<i32>>> {
+    let mut out = vec![None; n];
+    let mut k = 0usize;
+    for (depth, cmdpos, tok, _) in loop_tokens(s)? {
+        match tok.as_str() {
+            ";" | "||" | "&&" | "|" => k += 1,
+            "&" | "(" | ")" | "{" | "}" => {}
+            "!" | "until" | "while" | "if" | "then" | "else" | "elif" | "for" | "do" | "done" if cmdpos => {}
+            _ if cmdpos => {
+                if let Some(slot) = out.get_mut(k).filter(|d| d.is_none()) {
+                    *slot = Some(depth);
+                }
+            }
+            _ => {}
+        }
+    }
+    (k == n).then_some(out)
+}
+
 // spec: guard-kit/SPEC.md §The generic ruleset — the same walk with each token's byte offset in the
 // skeleton, for a reader that needs a span's text. A redirect operator, its `&` included, ends the
 // word it is glued to, and neither its target nor a `for` loop's variable stands in command position.
@@ -869,6 +890,11 @@ mod tests {
                 (0, ";", 31),
             ]
         );
+        assert_eq!(
+            segment_depths("echo a; until x; do sleep 1 |& cat; done", 5),
+            Some(vec![Some(0), Some(0), Some(1), Some(1), None])
+        );
+        assert_eq!(segment_depths("a \\; b", 1), None, "an escaped separator parts the two splits");
         let glued = loop_span("until a; do sleep>o 1; done>o").unwrap();
         let keywords: Vec<&str> = glued.iter().filter(|(_, cmdpos, _)| *cmdpos).map(|(_, _, t)| t.as_str()).collect();
         assert_eq!(keywords, vec!["until", "a", "do", "sleep", "done"]);
