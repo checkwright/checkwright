@@ -10,11 +10,7 @@ fallthrough	allowlist_chain	part-lead
 fallthrough	allowlist_chain	sq-arg
 fallthrough	allowlist_chain	sq-lead
 fallthrough	allowlist_chain	wrap-command
-fallthrough	background_no_record	dq-lead
-fallthrough	background_no_record	esc-lead
-fallthrough	background_no_record	part-lead
 fallthrough	background_no_record	ps-tick-lead
-fallthrough	background_no_record	sq-lead
 fallthrough	bare_sleep	dq-lead
 fallthrough	bare_sleep	esc-lead
 fallthrough	bare_sleep	part-lead

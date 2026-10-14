@@ -557,17 +557,20 @@ fn ro_forms_read(ctx: &Ctx, c: &Cmd, skip: &[usize], statements: bool) -> Result
     }
     for (seg, dseg, masked) in pairs {
         let cw = command_word(seg);
-        let bin = head_word(&cw);
+        let dcw = command_word(dseg);
+        let dhead = head_word(&dcw);
+        let bin = dhead.replace('\\', "");
+        let bin = bin.as_str();
         if bin.is_empty() || !on_ro_roster(h, bin) {
             continue;
         }
-        let dcw = command_word(dseg);
         let core = segment_core(&cw);
-        let strip = |s: &str| s.strip_prefix(bin).unwrap_or(s).to_string();
-        if !ro_invocation_clear(h, bin, &strip(&dcw), &strip(&core), false) {
+        let rest = |s: &str, head: &str| s.strip_prefix(head).unwrap_or(s).to_string();
+        if !ro_invocation_clear(h, bin, &rest(&dcw, dhead), &rest(&core, head_word(&core)), false) {
             return Ok(false);
         }
-        if matches!(bin, "sed" | "awk") && (masked || !tools::program_clear(bin, &dcw)) {
+        let program = format!("{}{}", bin, rest(&dcw, dhead));
+        if matches!(bin, "sed" | "awk") && (masked || !tools::program_clear(bin, &program)) {
             return Ok(false);
         }
         if bin != "xargs" {
