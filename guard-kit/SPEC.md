@@ -1228,6 +1228,7 @@ A site is a `lead` where its token opens a statement and an `arg` elsewhere. A t
 A table the lane cannot read is exit 2: a missing file, a floor or a transform off its set, or a rule and transform named twice.
 
 - **The floor** is there because a limit admitting a grant is a wider statement than one admitting a pass, and a `fallthrough` row must not come to cover a re-spelling a later edit starts granting.
+- **A third kind of limit is a re-spelling that changes the rule's own subject.** Rule `pgrep_self_match` tests its pattern against the raw text. A partly quoted pattern finds no copy of itself there, so it passes by the rule's test, not for want of a read.
 - **A limit is as wide as a section and no narrower**, the rule being the unit a contract is written in: an item says its words are read by value, or it does not. A limit per derived row would be a second table several times the size of the first, generated and unreasoned. **Its honest limit:** a second row of that section may start failing the same transform unseen.
 
 **The consumer lane** runs a consumer's own rows against its own rule command, after the kit's tables and only where `GUARD_KIT_CONSUMER_CASES` names a table:
