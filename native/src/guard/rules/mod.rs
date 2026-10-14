@@ -143,11 +143,11 @@ fn plain_word(w: &str) -> Word {
     Word::new(w, w, w)
 }
 
-// spec: guard-kit/SPEC.md §The rule roster — the git read's words (rule
-// `git_mutation_under_producer`): what a segment passes its command, each as its value and its live
-// text, a leading keyword and every redirect with its target dropped.
-fn passed_words(ws: &[Word], escape: char) -> Vec<(String, String)> {
-    let mut out = Vec::new();
+// spec: guard-kit/SPEC.md §The reader and its views — the command read's words: what a segment passes
+// its command, a leading keyword and every redirect with its target dropped, a word glued ahead of a
+// redirect cut to what it holds ahead of the operator.
+fn passed_words(ws: &[Word], escape: char) -> Vec<Word> {
+    let mut out: Vec<Word> = Vec::new();
     let mut target = false;
     for w in ws {
         if std::mem::take(&mut target) || (out.is_empty() && lead_keyword(&w.live)) {
@@ -160,22 +160,23 @@ fn passed_words(ws: &[Word], escape: char) -> Vec<(String, String)> {
             bare && matches!(ch, '>' | '<')
         });
         let Some((at, _)) = at else {
-            out.push((w.value.clone(), w.live.clone()));
+            out.push(w.clone());
             continue;
         };
         let (glued, redirect) = w.live.split_at(at);
         if !(glued.bytes().all(|b| b.is_ascii_digit()) || matches!(glued, "&" | "*")) {
-            out.push((w.value_before(at).unwrap_or(glued).to_string(), glued.to_string()));
+            let value = w.value_before(at).unwrap_or(glued);
+            out.push(Word::new(w.spelling_before(at).unwrap_or(value), value, glued));
         }
         target = matches!(redirect.trim_start_matches(['>', '<']), "" | "&");
     }
     out
 }
 
-// spec: guard-kit/SPEC.md §The rule roster — the git read (rule `git_mutation_under_producer`): for
-// each segment of the compound split, the words it passes git, led by `git`, or none where its
-// command word does not name git.
-fn git_read(ctx: &Ctx, c: &Cmd) -> Result<Vec<Option<Vec<String>>>, Fault> {
+// spec: guard-kit/SPEC.md §The reader and its views — the command read: for each segment of the
+// compound split, the words it passes its command, the command word first, the wrappers the harness
+// view strips dropped ahead of it; the skeleton's words where the word read answers nothing.
+fn command_read(ctx: &Ctx, c: &Cmd) -> Result<Vec<Vec<Word>>, Fault> {
     let escape = match ctx.shell() {
         Shell::Bash => '\\',
         Shell::PowerShell => '`',
@@ -191,11 +192,29 @@ fn git_read(ctx: &Ctx, c: &Cmd) -> Result<Vec<Option<Vec<String>>>, Fault> {
                 Some(ws) => passed_words(ws, escape),
                 None => passed_words(&text::all_words(seg).into_iter().map(plain_word).collect::<Vec<Word>>(), escape),
             };
-            let lives: Vec<String> = passed.iter().map(|(_, live)| live.replace([' ', '\t'], "\x01")).collect();
+            let lives: Vec<String> = passed.iter().map(|w| w.live.replace([' ', '\t'], "\x01")).collect();
             let kept = text::all_words(ctx.harness_view(&lives.join(" "))).len();
-            let mut values = passed.into_iter().map(|(value, _)| value).skip(lives.len() - kept);
-            let head = values.next()?;
-            (head.rsplit('/').next() == Some("git")).then(|| std::iter::once("git".to_string()).chain(values).collect())
+            passed.into_iter().skip(lives.len() - kept).collect()
+        })
+        .collect())
+}
+
+// spec: guard-kit/SPEC.md §The reader and its views — a command word names `name` by its value or by
+// the value's last path component.
+fn names_command(w: &Word, name: &str) -> bool {
+    w.value.rsplit('/').next() == Some(name)
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — the git read (rule `git_mutation_under_producer`): for
+// each segment of the compound split, the values the command read answers, led by `git`, or none
+// where its command word does not name git.
+fn git_read(ctx: &Ctx, c: &Cmd) -> Result<Vec<Option<Vec<String>>>, Fault> {
+    Ok(command_read(ctx, c)?
+        .into_iter()
+        .map(|ws| {
+            let (head, rest) = ws.split_first()?;
+            names_command(head, "git")
+                .then(|| std::iter::once("git".to_string()).chain(rest.iter().map(|w| w.value.clone())).collect())
         })
         .collect())
 }
@@ -763,7 +782,7 @@ mod tests {
     fn the_passed_words_drop_keywords_and_redirects_by_live_text() {
         use crate::guard::reader::WordAcc;
         let word = |s: &str, v: &str, l: &str| Word::new(s, v, l);
-        let got = |ws: &[Word]| passed_words(ws, '\\').into_iter().map(|(value, _)| value).collect::<Vec<String>>();
+        let got = |ws: &[Word]| passed_words(ws, '\\').into_iter().map(|w| w.value).collect::<Vec<String>>();
         assert_eq!(got(&[plain_word("if"), plain_word("git"), word("'stash'", "stash", "\0SQ")]), vec!["git", "stash"]);
         assert_eq!(got(&[plain_word("git"), plain_word("stash"), plain_word("2>&1"), plain_word(">"), plain_word("o"), plain_word("pop")]), vec!["git", "stash", "pop"]);
         assert_eq!(got(&[plain_word("git"), plain_word("stash>o"), plain_word("&>/dev/null")]), vec!["git", "stash"]);
@@ -777,7 +796,8 @@ mod tests {
         };
         let quoted = pieced(&[("'stash'", "stash", "\0SQ"), (">", ">", ">"), ("/dev/null", "/dev/null", "/dev/null")]);
         let escaped = pieced(&[("st", "st", "st"), ("\\a", "a", "\\a"), ("sh", "sh", "sh"), (">", ">", ">"), ("o", "o", "o")]);
-        assert_eq!(got(&[plain_word("git"), quoted, plain_word("push")]), vec!["git", "stash", "push"]);
+        assert_eq!(got(&[plain_word("git"), quoted.clone(), plain_word("push")]), vec!["git", "stash", "push"]);
+        assert_eq!(passed_words(&[quoted], '\\')[0].spelling, "'stash'", "a glued word keeps its own spelling");
         assert_eq!(got(&[plain_word("git"), escaped]), vec!["git", "stash"]);
         assert_eq!(got(&[plain_word("git"), plain_word("stash"), plain_word("2>&"), plain_word("1"), plain_word("pop")]), vec!["git", "stash", "pop"]);
         assert_eq!(got(&[plain_word("git"), plain_word("stash"), plain_word(">&"), plain_word("out"), plain_word("pop")]), vec!["git", "stash", "pop"]);

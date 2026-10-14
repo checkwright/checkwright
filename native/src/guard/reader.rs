@@ -72,7 +72,7 @@ pub struct Word {
     pub spelling: String,
     pub value: String,
     pub live: String,
-    seams: Vec<(usize, usize)>,
+    seams: Vec<(usize, usize, usize)>,
 }
 
 impl Word {
@@ -89,7 +89,19 @@ impl Word {
         if at == 0 {
             return Some("");
         }
-        self.seams.iter().rev().find(|&&(live, _)| live == at).and_then(|&(_, value)| self.value.get(..value))
+        self.seams.iter().rev().find(|&&(live, _, _)| live == at).and_then(|&(_, value, _)| self.value.get(..value))
+    }
+
+    // spec: guard-kit/SPEC.md §The reader and its views — the spelling of what a word holds ahead of
+    // the live offset `at`; `None` where `at` falls inside a piece.
+    pub fn spelling_before(&self, at: usize) -> Option<&str> {
+        if self.spelling == self.live {
+            return self.spelling.get(..at);
+        }
+        if at == 0 {
+            return Some("");
+        }
+        self.seams.iter().rev().find(|&&(live, _, _)| live == at).and_then(|&(_, _, s)| self.spelling.get(..s))
     }
 
     // spec: guard-kit/SPEC.md §The reader and its views — the value of what a word holds from the
@@ -105,7 +117,7 @@ impl Word {
 pub struct WordAcc {
     segs: Vec<Vec<Word>>,
     open: Option<[Vec<u8>; 3]>,
-    seams: Vec<(usize, usize)>,
+    seams: Vec<(usize, usize, usize)>,
 }
 
 impl WordAcc {
@@ -118,7 +130,7 @@ impl WordAcc {
         w[0].extend_from_slice(spelling);
         w[1].extend_from_slice(value);
         w[2].extend_from_slice(live);
-        self.seams.push((w[2].len(), w[1].len()));
+        self.seams.push((w[2].len(), w[1].len(), w[0].len()));
     }
 
     pub fn end_word(&mut self) {

@@ -65,12 +65,7 @@ fallthrough	pgrep_self_match	part-lead
 fallthrough	pgrep_self_match	sq-arg
 fallthrough	pgrep_self_match	sq-lead
 fallthrough	pgrep_self_match	wrap-command
-fallthrough	rm_tracked	dq-lead
-fallthrough	rm_tracked	esc-lead
-fallthrough	rm_tracked	part-lead
 fallthrough	rm_tracked	ps-tick-lead
-fallthrough	rm_tracked	sq-lead
-fallthrough	rm_tracked	wrap-command
 fallthrough	ro_pipeline	dq-arg
 fallthrough	ro_pipeline	dq-lead
 fallthrough	ro_pipeline	esc-arg

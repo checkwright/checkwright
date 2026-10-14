@@ -832,6 +832,15 @@ fallthrough	rm *.txt
 fallthrough	rm '*.md'
 fallthrough	rm 'track'*.md
 fallthrough	rm two\ *.md
+# the command word comes through the command read: by its value, by its path, and behind a wrapper
+#           the matcher strips; a redirect is no operand, and a quoted wrapper strips nothing
+block	\rm tracked.md
+block	/bin/rm tracked.md
+block	time rm tracked.md
+block	FOO=1 rm tracked.md
+block	if rm tracked.md; then ls; fi
+block	rm tracked.md 2>/dev/null
+fallthrough	'nohup' rm tracked.md
 # rule `rm_tracked`'s force arm — a 'git rm' carrying its force flag is blocked whether or
 #           not a grant matches: standalone, in a short cluster, long, abbreviated
 #           as git's option parser accepts it, behind a global option, and quoted or

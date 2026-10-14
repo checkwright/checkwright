@@ -1,8 +1,8 @@
 // spec: guard-kit/SPEC.md §The generic ruleset — the rules that judge what a command reaches: a
 // history rewrite, a tracked deletion, a scratch body, a wrapped payload, the main checkout.
 use super::{
-    command_word, git_read, git_walk_of, has_expansion, inert_target, is_banner, is_ro_segment,
-    moves_repository, plain_word, program_bearing, ro_forms_clear, segment_core, shell_backgrounds, GitWalk,
+    command_read, command_word, git_read, git_walk_of, has_expansion, inert_target, is_banner, is_ro_segment,
+    moves_repository, names_command, plain_word, program_bearing, ro_forms_clear, segment_core, shell_backgrounds, GitWalk,
 };
 use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Shell, Verdict};
 use crate::guard::host::under;
@@ -233,6 +233,7 @@ pub fn rm_tracked_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<String>, Fault> {
     }
     let s = ctx.view(c, SqDqHd)?;
     let gits = git_read(ctx, c)?;
+    let commands = command_read(ctx, c)?;
     let words = ctx.word_read(c)?;
     for (i, seg) in ctx.segments(&s).iter().enumerate() {
         let seg = trim_start(seg);
@@ -253,16 +254,31 @@ pub fn rm_tracked_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<String>, Fault> {
             }
             continue;
         }
-        let word = head_word(seg);
         let ps = ctx.shell() == Shell::PowerShell;
-        let deletes = if ps { PS_DELETE.contains(&word.to_ascii_lowercase().as_str()) } else { word == "rm" };
-        if !deletes {
+        if !ps {
+            let Some((head, args)) = commands.get(i).and_then(|ws| ws.split_first()) else { continue };
+            if !names_command(head, "rm") {
+                continue;
+            }
+            let args = args.iter().filter(|w| !w.value.starts_with('-'));
+            let operands: Vec<Operand> = if words.is_some() {
+                args.filter_map(bash_operand).collect()
+            } else {
+                args.map(|w| Operand { test: w.value.clone(), glob: false, value: w.value.clone(), spelling: w.value.clone() })
+                    .collect()
+            };
+            if let Some(m) = first_tracked(ctx, operands, &head.value) {
+                return Ok(Some(m));
+            }
+            continue;
+        }
+        let word = head_word(seg);
+        if !PS_DELETE.contains(&word.to_ascii_lowercase().as_str()) {
             continue;
         }
         let read = words.as_ref().and_then(|w| w.get(i)).filter(|ws| ws.first().is_some_and(|w| w.live == word));
-        let operands: Vec<Operand> = match (read, ps) {
-            (Some(ws), false) => ws[1..].iter().filter(|w| !w.value.starts_with('-')).filter_map(bash_operand).collect(),
-            (Some(ws), true) => match ps_delete_paths(&ws[1..]) {
+        let operands: Vec<Operand> = match read {
+            Some(ws) => match ps_delete_paths(&ws[1..]) {
                 Some(p) => p
                     .into_iter()
                     .map(|(path, spelling)| {
@@ -272,12 +288,7 @@ pub fn rm_tracked_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<String>, Fault> {
                     .collect(),
                 None => continue,
             },
-            (None, false) => text::all_words(&seg[word.len()..])
-                .into_iter()
-                .filter(|a| !a.starts_with('-'))
-                .map(|a| Operand { test: a.to_string(), glob: false, value: a.to_string(), spelling: a.to_string() })
-                .collect(),
-            (None, true) => {
+            None => {
                 let bare: Vec<Word> = text::all_words(&seg[word.len()..]).into_iter().map(plain_word).collect();
                 match ps_delete_paths(&bare) {
                     Some(p) => p
@@ -288,19 +299,28 @@ pub fn rm_tracked_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<String>, Fault> {
                 }
             }
         };
-        let h = ctx.host();
-        for o in operands {
-            let dir = if h.tracked(&o.test) {
-                std::path::Path::new(&o.value).is_dir()
-            } else if o.glob && h.tracked(&format!("{}/**", o.test)) {
-                true
-            } else {
-                continue;
-            };
-            return Ok(Some(rm_steer(&o, word, dir)));
+        if let Some(m) = first_tracked(ctx, operands, word) {
+            return Ok(Some(m));
         }
     }
     Ok(None)
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — rule `rm_tracked`'s steer for the first operand naming a
+// tracked path, or a directory holding one.
+fn first_tracked(ctx: &Ctx, operands: Vec<Operand>, word: &str) -> Option<String> {
+    let h = ctx.host();
+    for o in operands {
+        let dir = if h.tracked(&o.test) {
+            std::path::Path::new(&o.value).is_dir()
+        } else if o.glob && h.tracked(&format!("{}/**", o.test)) {
+            true
+        } else {
+            continue;
+        };
+        return Some(rm_steer(&o, word, dir));
+    }
+    None
 }
 
 // spec: guard-kit/SPEC.md §The rule roster — rule `rm_tracked`'s operand: the pathspec the tracked
