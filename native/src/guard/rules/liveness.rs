@@ -5,6 +5,7 @@ use super::grants::{slot_reach, Reach};
 use super::reach::{interpreter_reach, refused, rm_tracked_reach};
 use super::{
     background_statements, command_word, dups_onto_file, git_read, git_walk_of, has_expansion, has_substitution, inert_target, is_banner, is_ro_segment,
+    noclobber,
     loop_tokens, redirect_targets, ro_forms_clear, ro_forms_clear_statements, segment_core,
     shell_backgrounds, strip_redirect_op, unredirected_words, GitWalk,
 };
@@ -603,7 +604,7 @@ fn recorded_launch(ctx: &Ctx) -> Result<bool, Fault> {
 
 pub fn bounded_wait(ctx: &Ctx) -> Decided {
     let raw = ctx.raw(ctx.cmd())?;
-    if has_substitution(raw) || refused(ctx, ctx.cmd())? {
+    if has_substitution(raw) || noclobber(&ctx.view(ctx.cmd(), SqDqHd)?) || refused(ctx, ctx.cmd())? {
         return Ok(None);
     }
     if recorded_launch(ctx)? {

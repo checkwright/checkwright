@@ -12,6 +12,7 @@ pub const ADDED_WRITES: &[(&str, &str)] = &[
     ("added-append-glued", ">>tracked.md"),
     ("added-dup-glued", ">&tracked.md"),
 ];
+pub const NOCLOBBER_SELF: &str = "added-noclobber";
 
 const RESERVED: &[&str] = &[
     "if", "then", "else", "elif", "fi", "for", "while", "until", "do", "done", "case", "esac", "in", "function",
@@ -32,6 +33,7 @@ pub fn is_transform(name: &str) -> bool {
     name == WRAP
         || SPACING.contains(&name)
         || ADDED_WRITES.iter().any(|(added, _)| *added == name)
+        || name == NOCLOBBER_SELF
         || guard_ps_variants::TRANSFORMS.contains(&name)
         || name
             .split_once('-')
@@ -74,6 +76,7 @@ pub fn added_writes(cell: &str) -> Vec<Variant> {
     ADDED_WRITES
         .iter()
         .map(|(name, text)| Variant { transform: name.to_string(), cell: format!("{}{}", cell, text) })
+        .chain(std::iter::once(Variant { transform: NOCLOBBER_SELF.to_string(), cell: format!("{} >| {}", cell, cell) }))
         .collect()
 }
 
@@ -482,16 +485,19 @@ mod tests {
             ("added-write-glued", "ls>tracked.md"),
             ("added-append-glued", "ls>>tracked.md"),
             ("added-dup-glued", "ls>&tracked.md"),
+            ("added-noclobber", "ls >| ls"),
         ];
         assert_eq!(got, want.map(|(t, c)| (t.to_string(), c.to_string())));
         assert_eq!(added_writes("echo \"$HOME\"")[1].cell, "echo \"$HOME\">tracked.md", "an expansion is no exclusion here");
-        assert_eq!(added_writes(": > .tmp/a").len(), 4);
+        assert_eq!(added_writes("git status | head")[4].cell, "git status | head >| git status | head");
+        assert_eq!(added_writes(": > .tmp/a").len(), 5);
         for cell in ["ls # note", "cat <<EOF@NL@x@NL@EOF", "printf x@NL@ls", "echo 'a", "ls &", "ls;", "(ls)", "ls |", ""] {
             assert!(added_writes(cell).is_empty(), "{}", cell);
         }
         for (name, _) in ADDED_WRITES {
             assert!(is_transform(name), "{}", name);
         }
+        assert!(is_transform(NOCLOBBER_SELF));
     }
 
     #[test]

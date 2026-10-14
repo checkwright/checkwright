@@ -103,6 +103,12 @@ fn shell_backgrounds(s: &str) -> bool {
     grep_q("(^|[^&>|])&([[:space:]]|;|$)", s)
 }
 
+// spec: guard-kit/SPEC.md §The reader and its views — the noclobber operator live in a skeleton,
+// which every grant withholds on.
+fn noclobber(s: &str) -> bool {
+    s.contains(">|")
+}
+
 // spec: guard-kit/SPEC.md §The generic ruleset — a literal echo/printf banner segment.
 fn is_banner(seg: &str) -> bool {
     matches!(head_word(trim_start(seg)), "echo" | "printf")

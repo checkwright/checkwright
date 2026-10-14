@@ -58,6 +58,11 @@ block	@ROOT@/scripts/check-env.sh --list>tracked.md
 block	@ROOT@/scripts/check-env.sh --list > .tmp/out.txt
 rewrite	@ROOT@/scripts/check-env.sh --list 2>&1
 rewrite	@ROOT@/scripts/check-env.sh --list >/dev/null
+#          the noclobber operator truncates the word after it, which the split reads as a granted
+#          second segment: spaced, glued and under a descriptor, the grant is withheld
+block	@ROOT@/scripts/check-env.sh --list >| scripts/check-env.sh --list
+block	@ROOT@/scripts/check-env.sh --list>|scripts/check-env.sh --list
+block	@ROOT@/scripts/check-env.sh --list 2>| scripts/check-env.sh --list
 block	bash @ROOT@/scripts/gen-configs.sh
 block	bash @ROOT@/.tmp/check-evil.sh
 block	bash @ROOT@/../evil/checks/check-x.sh
@@ -100,6 +105,10 @@ block	find . -exec rm {} \;
 block	ls | xargs -I{} rm {}
 rewrite	find .tmp/x -exec cat {} +
 block	find .tmp/../x -exec cat {} +
+#          a placeholder command behind the noclobber operator is a write's target, not a segment
+block	printf x >| find .tmp/x -exec cat {} +
+block	printf x>|find .tmp/x -exec cat {} +
+block	printf x 2>| find .tmp/x -exec cat {} +
 block	git log @{u}..
 block	echo {1..5}
 block	mkdir -p a/{b,c}
@@ -457,6 +466,15 @@ fallthrough	grep -rn foo src >&2x
 allow	grep -rn foo src 2>& 1
 allow	grep -rn foo src >&-
 allow	grep -rn foo src >& /dev/null
+# the noclobber operator writes the word after it, which the split reads as a second roster
+# segment: spaced, glued and under a descriptor it withholds, and a quoted one is text. Behind an
+# allowlisted lead the withheld grant leaves rule `allowlist_chain`'s block
+fallthrough	grep -rn foo src >| sort
+fallthrough	grep -rn foo src>|sort
+fallthrough	grep -rn foo src 2>| sort
+fallthrough	cat tracked.md >| head -5
+block	git status >| head
+allow	grep -n '>|' tracked.md
 # a compound is read statement by statement whatever joins it: each separator, a banner
 # statement, and the widened lead opening a later statement (rule `allowlist_chain` would block
 # it otherwise); a statement off the roster, a write form or a write in a later statement, and
@@ -611,6 +629,11 @@ allow	until [ -f marker ]; do sleep 5; done |& cat
 fallthrough	until [ -f marker ]; do sleep 5; done | tee out.txt
 fallthrough	until [ -f marker ]; do sleep 5; done|rm -rf x
 fallthrough	until [ -f marker ]; do sleep 5; done | cat > out.txt
+# the noclobber operator is no pipe: the loop's output, and a tail statement's, is written to the
+# word after it
+fallthrough	until [ -f marker ]; do sleep 5; done >| cat
+fallthrough	until [ -f marker ]; do sleep 5; done 2>| cat
+fallthrough	until [ -f marker ]; do sleep 5; done; ls >| cat
 # clause (e) — a backtick anywhere in the raw command; the `$(…)` spelling is
 # deliberately not a row, since rule `expansion` blocks it first and the row would pin
 # another rule's verdict

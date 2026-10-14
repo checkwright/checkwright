@@ -206,7 +206,7 @@ printf 'GUARD_KIT_CONSUMER_RULES_CMD[] = bash\nGUARD_KIT_CONSUMER_RULES_CMD[] = 
 printf 'block\tforbidden x\nfallthrough\tmake build\nblock\tat @ROOT@\n' >"$tmp/cwd/lane.tsv"
 eq "lane-green-status" "$(lane "$tmp/lane.knobs")" 0
 has "lane-green-count" "$tmp/out" "3 consumer case(s) from lane.tsv"
-has "lane-green-derived" "$tmp/out" "34 derived row(s) of the four tables under 0 limit row(s)"
+has "lane-green-derived" "$tmp/out" "36 derived row(s) of the four tables under 0 limit row(s)"
 lacks "lane-green-underived" "$tmp/out" "derived re-spelling(s)"
 printf 'fallthrough\tforbidden x\nblock\tmake build\n' >"$tmp/cwd/lane.tsv"
 eq "lane-mismatch-status" "$(lane "$tmp/lane.knobs")" 1

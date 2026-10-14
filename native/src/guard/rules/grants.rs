@@ -2,7 +2,7 @@
 // allow is given only where every clause of its test holds, and every other failure declines.
 use super::reach::{interpreter_reach, refused, rm_tracked_reach};
 use super::{
-    has_substitution, inert_target, is_banner, is_bare_allow, is_ro_segment, is_ro_xargs,
+    has_substitution, inert_target, is_banner, is_bare_allow, is_ro_segment, is_ro_xargs, noclobber,
     redirect_targets, ro_forms_clear, ro_forms_clear_except, ro_forms_kit, segment_core,
     shell_backgrounds, strip_redirect_op, unredirected_words, xargs_command_index,
 };
@@ -24,6 +24,9 @@ fn block(m: impl Into<String>) -> Decided {
 
 pub fn truncate_scratch(ctx: &Ctx) -> Decided {
     let cmd = ctx.view(ctx.cmd(), SqDqHd)?;
+    if noclobber(&cmd) {
+        return Ok(None);
+    }
     if !text::matches(
         "^[[:space:]]*:([[:space:]]+[0-9]*>[>&]?[[:space:]]*[^[:space:]&|;<>]+)+[[:space:]]*$",
         &cmd,
@@ -114,6 +117,9 @@ pub fn append_scratch(ctx: &Ctx) -> Decided {
         return Ok(None);
     }
     let s = ctx.view(ctx.cmd(), SqDqHd)?;
+    if noclobber(&s) {
+        return Ok(None);
+    }
     let Some(targets) = emitter_targets(ctx, &s) else { return Ok(None) };
     if !targets.iter().all(|t| ctx.host().ignored(t)) {
         return Ok(None);
@@ -131,7 +137,7 @@ pub fn ro_pipeline(ctx: &Ctx) -> Decided {
         return Ok(None);
     }
     let s = ctx.view(ctx.cmd(), SqDqHd)?;
-    if s.contains(['\'', '"']) || shell_backgrounds(&s) {
+    if s.contains(['\'', '"']) || shell_backgrounds(&s) || noclobber(&s) {
         return Ok(None);
     }
     for tgt in redirect_targets(&s) {
@@ -474,7 +480,7 @@ pub fn bounded_write(ctx: &Ctx) -> Decided {
         return Ok(None);
     }
     let s = ctx.view(ctx.cmd(), SqDqHd)?;
-    if shell_backgrounds(&s) || s.contains(['\'', '"']) || s.contains("<<") {
+    if shell_backgrounds(&s) || s.contains(['\'', '"']) || s.contains("<<") || noclobber(&s) {
         return Ok(None);
     }
     let Some(v) = ctx.dequoted(ctx.cmd())? else { return Ok(None) };
@@ -738,7 +744,7 @@ pub fn rewrite_granted(ctx: &Ctx, c: &Cmd) -> Result<bool, Fault> {
         return Ok(false);
     }
     let skel = ctx.view(c, SqDqHd)?;
-    if redirect_targets(&skel).iter().any(|t| !inert_target(t)) {
+    if noclobber(&skel) || redirect_targets(&skel).iter().any(|t| !inert_target(t)) {
         return Ok(false);
     }
     let Some(v) = ctx.dequoted(c)? else { return Ok(false) };
