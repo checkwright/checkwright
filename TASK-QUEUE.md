@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: rewrite-grant-noclobber-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,26 @@
 ## New Features
 
 ## Technical Debt
+
+### rewrite-grant-redirect-read
+
+the rewrite grant rules `abs_script` and `brace_glyph` share misreads two redirect spellings. It still attaches through the noclobber operator: in the decision table's sandbox `@ROOT@/scripts/check-env.sh --list >| scripts/check-env.sh --list`, its glued spelling and its `2>|` form classify `rewrite`, at v0.31.0 too, so a granted call truncates the script it names. The compound split parts `>|` at its bar and each half matches the sandbox's script pattern. And a quoted null target lost its grant: `>"/dev/null"` and `2>'/dev/null'` take rule `abs_script`'s corrective block, where v0.31.0 rewrote each and guard-kit/SPEC.md §The rule roster says `/dev/null` stays granted. The test reads the skeleton, where a quoted target is a mark.
+
+Rule `ro_pipeline`'s grant attaches the same way: `git status >| head`, `ls >| sort` and `cat tracked.md >| head -5` classify `allow`, each writing a file named by the right half.
+
+**Deliverable:** every grant withheld under the noclobber operator, held by authored rows and a derived suffix in the variant lane (guard-kit/SPEC.md §Testing); then the redirect test reading its target by value, or the roster item and the release declaration naming the unquoted spelling. One commit each, the grants first.
+
+**Release bar:** the grants are wrong grants by the bar on [tarball-attestation-observed](#tarball-attestation-observed). The quoted null target is a decline that moved from v0.31.0, read against the bar by the session weighing the cut.
+
+**Cost while deferred:** a granted call can truncate an allowlisted script, and v0.32.0 stays uncut, holding that entry's observation, [front-door-job-observed](#front-door-job-observed)'s and [companion-toolkit-profile](#companion-toolkit-profile)'s tag. Filed 2026-10-13 by guard-grant-review-pass' close off its second-vendor review, as two bullets, and promoted at the next scope's intake. Re-verified there through `--run-guard-tests` over rows added to the table and withdrawn: both halves hold, and fifteen other redirect spellings onto a file block; the `ro_pipeline` rows were run the same way at promotion, where `git log --oneline >| head -3` and `git diff >| tail` were not granted. Owner lookup: `noclobber`, `rewrite grant`, `/dev/null` in this file and the disposed-findings record — [guard-rules-skeleton-word-read](#guard-rules-skeleton-word-read), DISTINCT (re-spellings falling through a block, where this is a grant's own test); [interpreter-grant-redirect-residue](#interpreter-grant-redirect-residue), DISTINCT (shapes never granted, where this one was); owner guard-kit/SPEC.md §The rule roster.
+
+### guard-fix-lands-unreviewed
+
+a guard fix authored at a closing drain returns from the second-vendor review with findings in it, four closes running. At guard-grant-review-pass' close the review of the drain's fix held two, one a grant the fix's own redirect test misses ([rewrite-grant-redirect-read](#rewrite-grant-redirect-read)). The variant lane, the form `guard-drain-fix-unreviewed` took, reached neither: no transform derives a noclobber suffix and no relation reaches an over-block. The two forms left are a consumer's stage order (guard-kit/SPEC.md §Testing, the variant lane's honest limits).
+
+**Deliverable:** this repo's close binding ordering one of them: a drain promotes a verdict-moving guard fix in place of landing it, or lands it only once a second party has read its diff. **The first, operator direction 2026-10-14, lead-relayed (not a ruling):** a verdict-moving guard fix found at a drain is promoted, never landed there, narrowing the 2026-10-13 direction on [tarball-attestation-observed](#tarball-attestation-observed).
+
+**Cost while deferred:** each such close defers the release its fix was for, v0.32.0 twice so far, and spends a review grant on a fix read after its commit. Filed 2026-10-13 by guard-grant-review-pass' close and promoted at the next scope's intake. Re-verified there against that close's commit messages and the limits sentence. Owner lookup: `drain fix`, `unreviewed`, `second-vendor` in this file and the disposed-findings record — `guard-drain-fix-unreviewed`, done, so a finding that recurred after its fix and is filed new; owner `.claude/commands/close.md`.
 
 ## Deferred
 
@@ -192,7 +212,9 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Deliverable:** that observation, read off the `publish` run and one install from the published Release, with any defect it shows filed.
 
-**Release (operator direction, lead-relayed, not a ruling):** v0.32.0 stays deferred, by a direction relayed to guard-rule-holes-pass' close on 2026-10-12: closing push only, no tag and no publish. **The bar for the cut, the same direction:** cut once no open finding is a wrong grant or a regression from v0.31.0; a fall-through hole rides as a declared limit in the note. Which open finding the bar blocks is read by the session that next weighs a cut, against its own runs. **At guard-spelling-oracle-pass' close (operator direction, 2026-10-13, lead-relayed):** no early review ran at validate, where the one granted foreign run returned no reading, and the close's review was relied on; it was cut only if that review returned clean, a failed run or a finding leaving the bar a judgment being asked, never skipped or met by a same-vendor reader. The review's re-run held three findings in the close's own drain fix, one a grant that truncates a tracked file, so the release deferred again; the three landed at guard-grant-review-pass. **At guard-grant-review-pass' close (operator direction, 2026-10-13, lead-relayed):** the close read the bar unmet on two inbox findings, rule `sed_file` losing its block to a grant under a quoted option, a regression from v0.31.0, and rule `abs_script`'s rewrite granting a redirect onto a tracked file, at v0.31.0 too. Both were fixed in that close's drain, and v0.32.0 was cut only if the close's second-vendor review of the drain fix returned clean. It held two in the fix, one a rewrite grant through the noclobber operator that truncates the script it names, at v0.31.0 too, so the release deferred again; both are in the gap inbox for the next scope. That cut's `publish` run produces this observation and [front-door-job-observed](#front-door-job-observed)'s.
+**Release (operator direction, lead-relayed, not a ruling):** v0.32.0 stays deferred, by a direction relayed to guard-rule-holes-pass' close on 2026-10-12: closing push only, no tag and no publish. **The bar for the cut, the same direction:** cut once no open finding is a wrong grant or a regression from v0.31.0; a fall-through hole rides as a declared limit in the note. Which open finding the bar blocks is read by the session that next weighs a cut, against its own runs. **At guard-spelling-oracle-pass' close (operator direction, 2026-10-13, lead-relayed):** no early review ran at validate, where the one granted foreign run returned no reading, and the close's review was relied on; it was cut only if that review returned clean, a failed run or a finding leaving the bar a judgment being asked, never skipped or met by a same-vendor reader. The review's re-run held three findings in the close's own drain fix, one a grant that truncates a tracked file, so the release deferred again; the three landed at guard-grant-review-pass. **At guard-grant-review-pass' close (operator direction, 2026-10-13, lead-relayed):** the close read the bar unmet on two inbox findings, rule `sed_file` losing its block to a grant under a quoted option, a regression from v0.31.0, and rule `abs_script`'s rewrite granting a redirect onto a tracked file, at v0.31.0 too. Both were fixed in that close's drain, and v0.32.0 was cut only if the close's second-vendor review of the drain fix returned clean. It held two in the fix, one a rewrite grant through the noclobber operator that truncates the script it names, at v0.31.0 too, so the release deferred again; both are in the gap inbox for the next scope. That cut's `publish` run produces this observation and [front-door-job-observed](#front-door-job-observed)'s. **At rewrite-grant-noclobber-pass' scope (operator direction, 2026-10-14, lead-relayed):** the unit set is [rewrite-grant-redirect-read](#rewrite-grant-redirect-read) and [guard-fix-lands-unreviewed](#guard-fix-lands-unreviewed), and a closing drain promotes a verdict-moving guard fix rather than landing it, narrowing the 2026-10-13 direction. **Grant (operator, 2026-10-14, lead-relayed):** one second-vendor foreign run at validate, the bar's reading resting on it, its adapter's budget line read fresh before it is spent; none at close.
+
+**Push need (2026-10-14, inside the budget):** the closing push, and the release tag push if that close reads the bar met, since `publish` is tag-triggered; recorded here because this entry stays live through the close.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
@@ -553,30 +575,6 @@ a consumer rule command reads the command through `--guard-json view` alone, and
 **Deliverable:** a `--guard-json` verb printing the word read's values per segment (guard-kit/SPEC.md §Consumer rules), and this repo's three rules reading it, deleting their limit rows; a feature, since it adds a verb.
 
 **Cost while deferred:** this repo's hook-bypass block is evaded by one quoted word, and an adopter's own rule has the same hole with no read to close it. Filed 2026-10-13 by guard-grant-review-pass' build and promoted at its close. Re-verified there: `--run-guard-tests` is green under the 19 rows and derives 121 re-spellings. Owner lookup: `word read`, `guard-json`, `consumer rule` in this file and the disposed-findings record — [guard-rules-skeleton-word-read](#guard-rules-skeleton-word-read), DISTINCT (the generic rules' lift in the crate, where this is the read a consumer command is given); owner guard-kit/SPEC.md §Consumer rules.
-
-### rewrite-grant-redirect-read
-
-[cost: event/high] [surface: guard-kit]
-
-the rewrite grant rules `abs_script` and `brace_glyph` share misreads two redirect spellings. It still attaches through the noclobber operator: in the decision table's sandbox `@ROOT@/scripts/check-env.sh --list >| scripts/check-env.sh --list`, its glued spelling and its `2>|` form classify `rewrite`, at v0.31.0 too, so a granted call truncates the script it names. The compound split parts `>|` at its bar and each half matches the sandbox's script pattern. And a quoted null target lost its grant: `>"/dev/null"` and `2>'/dev/null'` take rule `abs_script`'s corrective block, where v0.31.0 rewrote each and guard-kit/SPEC.md §The rule roster says `/dev/null` stays granted. The test reads the skeleton, where a quoted target is a mark.
-
-**Deliverable:** the grant withheld under the noclobber operator, held by authored rows and a derived suffix in the variant lane (guard-kit/SPEC.md §Testing); then the redirect test reading its target by value, or the roster item and the release declaration naming the unquoted spelling. One commit each, the grant first.
-
-**Inferred, not run:** that a read-only pipeline's grant attaches the same way, a roster command redirected through `>|` onto a word that names another — add `git status >| head` and its kin as rows of `guard-kit/guard-tests/cases.tsv` and run `--run-guard-tests`
-
-**Release bar:** the first half is a wrong grant by the bar on [tarball-attestation-observed](#tarball-attestation-observed). The second is a decline that moved from v0.31.0, read against the bar by the session weighing the cut.
-
-**Cost while deferred:** a granted call can truncate an allowlisted script, and v0.32.0 stays uncut, holding that entry's observation, [front-door-job-observed](#front-door-job-observed)'s and [companion-toolkit-profile](#companion-toolkit-profile)'s tag. Filed 2026-10-13 by guard-grant-review-pass' close off its second-vendor review, as two bullets, and promoted at the next scope's intake. Re-verified there through `--run-guard-tests` over rows added to the table and withdrawn: both halves hold, and fifteen other redirect spellings onto a file block. Owner lookup: `noclobber`, `rewrite grant`, `/dev/null` in this file and the disposed-findings record — [guard-rules-skeleton-word-read](#guard-rules-skeleton-word-read), DISTINCT (re-spellings falling through a block, where this is a grant's own test); [interpreter-grant-redirect-residue](#interpreter-grant-redirect-residue), DISTINCT (shapes never granted, where this one was); owner guard-kit/SPEC.md §The rule roster.
-
-### guard-fix-lands-unreviewed
-
-[cost: event/high] [surface: guard-kit]
-
-a guard fix authored at a closing drain returns from the second-vendor review with findings in it, four closes running. At guard-grant-review-pass' close the review of the drain's fix held two, one a grant the fix's own redirect test misses ([rewrite-grant-redirect-read](#rewrite-grant-redirect-read)). The variant lane, the form `guard-drain-fix-unreviewed` took, reached neither: no transform derives a noclobber suffix and no relation reaches an over-block. The two forms left are a consumer's stage order (guard-kit/SPEC.md §Testing, the variant lane's honest limits).
-
-**Deliverable:** this repo's close binding ordering one of them: a drain promotes a verdict-moving guard fix in place of landing it, or lands it only once a second party has read its diff. Which one is a direction, asked at the scope that promotes this entry.
-
-**Cost while deferred:** each such close defers the release its fix was for, v0.32.0 twice so far, and spends a review grant on a fix read after its commit. Filed 2026-10-13 by guard-grant-review-pass' close and promoted at the next scope's intake. Re-verified there against that close's commit messages and the limits sentence. Owner lookup: `drain fix`, `unreviewed`, `second-vendor` in this file and the disposed-findings record — `guard-drain-fix-unreviewed`, done, so a finding that recurred after its fix and is filed new; owner `.claude/commands/close.md`.
 
 ### set-record-lost-at-done-move
 
