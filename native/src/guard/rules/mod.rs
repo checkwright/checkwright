@@ -69,7 +69,7 @@ pub static TABLE: &[Rule] = &[
     Rule { name: "allowlist_chain", shells: BASH, views: &[SqDqHd], test: grants::allowlist_chain },
     Rule { name: "git_rewrite", shells: BOTH, views: &[Raw, SqDqHd, Dequoted], test: reach::git_rewrite },
     Rule { name: "rm_tracked", shells: BOTH, views: &[Raw, SqDqHd, Dequoted], test: reach::rm_tracked },
-    Rule { name: "script_interpreter", shells: BOTH, views: &[Raw, SqDqHd], test: reach::script_interpreter },
+    Rule { name: "script_interpreter", shells: BOTH, views: &[Raw, SqDqHd, Dequoted], test: reach::script_interpreter },
     Rule {
         name: "grant_path_slot",
         shells: BASH,
@@ -173,9 +173,8 @@ fn passed_words(ws: &[Word], escape: char) -> Vec<Word> {
     out
 }
 
-// spec: guard-kit/SPEC.md §The reader and its views — the command read: for each segment of the
-// compound split, the words it passes its command, the command word first, the wrappers the harness
-// view strips dropped ahead of it; the skeleton's words where the word read answers nothing.
+// spec: guard-kit/SPEC.md §The reader and its views — the command read: per segment, the words it
+// passes its command, the wrappers the harness view strips dropped by their values.
 fn command_read(ctx: &Ctx, c: &Cmd) -> Result<Vec<Vec<Word>>, Fault> {
     let escape = match ctx.shell() {
         Shell::Bash => '\\',
@@ -192,9 +191,12 @@ fn command_read(ctx: &Ctx, c: &Cmd) -> Result<Vec<Vec<Word>>, Fault> {
                 Some(ws) => passed_words(ws, escape),
                 None => passed_words(&text::all_words(seg).into_iter().map(plain_word).collect::<Vec<Word>>(), escape),
             };
-            let lives: Vec<String> = passed.iter().map(|w| w.live.replace([' ', '\t'], "\x01")).collect();
-            let kept = text::all_words(ctx.harness_view(&lives.join(" "))).len();
-            passed.into_iter().skip(lives.len() - kept).collect()
+            let values: Vec<String> = passed
+                .iter()
+                .map(|w| if w.value.is_empty() { "\0".to_string() } else { w.value.replace([' ', '\t', '\n'], "\x01") })
+                .collect();
+            let kept = text::all_words(ctx.harness_view(&values.join(" "))).len();
+            passed.into_iter().skip(values.len() - kept).collect()
         })
         .collect())
 }

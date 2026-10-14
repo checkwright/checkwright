@@ -833,14 +833,14 @@ fallthrough	rm '*.md'
 fallthrough	rm 'track'*.md
 fallthrough	rm two\ *.md
 # the command word comes through the command read: by its value, by its path, and behind a wrapper
-#           the matcher strips; a redirect is no operand, and a quoted wrapper strips nothing
+#           the matcher strips, read by its value; a redirect is no operand
 block	\rm tracked.md
 block	/bin/rm tracked.md
 block	time rm tracked.md
 block	FOO=1 rm tracked.md
 block	if rm tracked.md; then ls; fi
 block	rm tracked.md 2>/dev/null
-fallthrough	'nohup' rm tracked.md
+block	'nohup' rm tracked.md
 # rule `rm_tracked`'s force arm — a 'git rm' carrying its force flag is blocked whether or
 #           not a grant matches: standalone, in a short cluster, long, abbreviated
 #           as git's option parser accepts it, behind a global option, and quoted or
@@ -896,6 +896,16 @@ block	pwsh .tmp/x.ps1
 block	powershell.exe -f .tmp/x.ps1
 fallthrough	pwsh -File tools/x.ps1
 fallthrough	pwsh -c 'Get-Date'
+# under Bash each pipe member's words come through the command read, so a quoted or escaped
+# interpreter or body source, one behind a wrapper the matcher strips, a source glued to its '<'
+# and a quoted producer operand are the plain spelling's; a redirect is no body operand, and a
+# herestring's words stay its body
+block	\bash .tmp/x.sh
+block	nohup python3 '.tmp/x.py'
+block	if bash .tmp/x.sh 2>&1; then ls; fi
+block	python3 -<'.tmp/x.py'
+block	cat ".tmp/x.py" | python3
+fallthrough	bash <<< '.tmp/x.sh'
 
 # rule `grant_path_slot` — a committed grant matched only by reaching past its path slot. The
 #           sandbox carries a scratch 'rm -rf .tmp/*' grant and a

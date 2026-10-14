@@ -582,9 +582,9 @@ pub(super) fn redirect_word(tok: &str) -> Option<bool> {
 
 // spec: guard-kit/SPEC.md §The generic ruleset — an interpreter takes its program body from a -c/-e
 // argument, its first bare operand, or stdin; `None` on an option the walk cannot size.
-fn interpreter_body(seg: &str, arm: char) -> Option<Body> {
+fn interpreter_body(toks: &[&str], arm: char) -> Option<Body> {
     let mut skip = false;
-    for tok in words(seg).into_iter().skip(1) {
+    for &tok in toks.iter().skip(1) {
         if skip {
             skip = false;
             continue;
@@ -609,6 +609,27 @@ fn interpreter_body(seg: &str, arm: char) -> Option<Body> {
         }
     }
     Some(Body::Stdin)
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — rule `script_interpreter`'s `<` sources by value: a bare
+// `<` opening no heredoc, herestring, descriptor dup or read-write open, its target glued or the next word.
+fn input_sources(ws: &[Word]) -> Vec<String> {
+    let mut out = Vec::new();
+    for (k, w) in ws.iter().enumerate() {
+        let mut held = false;
+        let at = w.live.char_indices().find(|&(_, ch)| {
+            let bare = !std::mem::take(&mut held);
+            held = bare && ch == '\\';
+            bare && ch == '<'
+        });
+        let Some((at, _)) = at else { continue };
+        if w.live[at + 1..].starts_with(['<', '&', '>', '(']) {
+            continue;
+        }
+        let src = if at + 1 == w.live.len() { ws.get(k + 1).map(|n| n.value.as_str()) } else { w.value_after(at + 1) };
+        out.extend(src.map(str::to_string));
+    }
+    out
 }
 
 // spec: guard-kit/SPEC.md §The rule roster — a PowerShell host's options, each matched by a prefix
@@ -643,8 +664,7 @@ const PS_SWITCHES: &[&str] = &[
 // spec: guard-kit/SPEC.md §The rule roster — the host's own CLI grammar: `-File`'s operand or the
 // first bare word is the body, `-Command` and `-EncodedCommand` carry it inline, a `-` after `-File`
 // or `-Command` or no body word at all is stdin, and any other option declines.
-fn powershell_body(seg: &str) -> Option<Body> {
-    let toks = words(seg);
+fn powershell_body(toks: &[&str]) -> Option<Body> {
     let mut i = 1usize;
     while i < toks.len() {
         let tok = toks[i];
@@ -756,16 +776,28 @@ fn powershell_form(ctx: &Ctx, seg: &str, producers: &[String]) -> Option<Reach> 
 // path, as its arm, its word and the body source.
 pub fn interpreter_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<Reach>, Fault> {
     let raw = ctx.raw(c)?;
-    if !names_scratch(ctx, raw) || ctx.expands(c, declines_expansion)? {
+    let ps = ctx.shell() == Shell::PowerShell;
+    let read = if ps { None } else { ctx.word_read(c)? };
+    let valued = read.iter().flatten().flatten().any(|w| names_scratch(ctx, &w.value));
+    if !(names_scratch(ctx, raw) || valued) || ctx.expands(c, declines_expansion)? {
         return Ok(None);
     }
-    let ps = ctx.shell() == Shell::PowerShell;
     let s = ctx.view(c, SqDqHd)?;
-    for stmt in ctx.statements(&s) {
-        let pipes = ctx.pipes(&stmt);
+    let members: Vec<Vec<String>> = ctx.statements(&s).iter().map(|stmt| ctx.pipes(stmt)).collect();
+    let commands = if ps { None } else { Some(command_read(ctx, c)?) };
+    let commands = commands.filter(|cr| cr.len() == members.iter().map(Vec::len).sum::<usize>());
+    let mut at = 0usize;
+    for pipes in &members {
         for (i, pipe) in pipes.iter().enumerate() {
+            at += 1;
             let seg = command_word(pipe);
-            let word = path_word(ctx, head_word(&seg));
+            let lifted = commands.as_ref().map(|cr| &cr[at - 1]);
+            let toks: Vec<&str> = match lifted {
+                Some(ws) => ws.iter().map(|w| w.value.as_str()).collect(),
+                None => words(&seg),
+            };
+            let Some(&head) = toks.first() else { continue };
+            let word = path_word(ctx, head);
             if word.is_empty() {
                 continue;
             }
@@ -775,12 +807,13 @@ pub fn interpreter_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<Reach>, Fault> {
                 }
             }
             let (arm, body) = if powershell_host(ctx, &word) {
-                ('c', powershell_body(&seg))
+                ('c', powershell_body(&toks))
             } else {
                 let Some(arm) = interpreter_arm(ctx, &word) else { continue };
-                (arm, interpreter_body(&seg, arm))
+                (arm, interpreter_body(&toks, arm))
             };
             let hit = |src: &str, home: Home| Some((arm, word.clone(), src.to_string(), home));
+            let own = read.as_ref().filter(|_| lifted.is_some()).and_then(|r| r.get(at - 1));
             match body {
                 None => continue,
                 Some(Body::File(p)) => {
@@ -789,15 +822,27 @@ pub fn interpreter_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<Reach>, Fault> {
                     }
                 }
                 Some(Body::Stdin) => {
-                    for m in text::grep_o("(^|[^<])<[[:space:]]*[^[:space:]<>|;&]+", pipe) {
-                        let src = m.strip_prefix(|ch: char| ch != '<').unwrap_or(&m);
-                        let src = trim_start(src.strip_prefix('<').unwrap_or(src));
+                    let sources: Vec<String> = match own {
+                        Some(ws) => input_sources(ws),
+                        None => text::grep_o("(^|[^<])<[[:space:]]*[^[:space:]<>|;&]+", pipe)
+                            .iter()
+                            .map(|m| {
+                                let src = m.strip_prefix(|ch: char| ch != '<').unwrap_or(m);
+                                trim_start(src.strip_prefix('<').unwrap_or(src)).to_string()
+                            })
+                            .collect(),
+                    };
+                    for src in &sources {
                         if let Some(home) = scratch_home(ctx, src) {
                             return Ok(hit(src, home));
                         }
                     }
-                    for prev in &pipes[..i] {
-                        for tok in words(prev) {
+                    for (j, prev) in pipes[..i].iter().enumerate() {
+                        let toks: Vec<String> = match own.and(read.as_ref().and_then(|r| r.get(at - 1 - i + j))) {
+                            Some(ws) => ws.iter().map(|w| w.value.clone()).collect(),
+                            None => words(prev).into_iter().map(str::to_string).collect(),
+                        };
+                        for tok in &toks {
                             if let Some(home) = scratch_home(ctx, tok) {
                                 return Ok(hit(tok, home));
                             }
