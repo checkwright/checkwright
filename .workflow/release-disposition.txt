@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+rewrite-grant-noclobber-pass release deferred:v0.32.0 — a minor at the outstanding v0.32.0 floor, held by operator direction (lead-relayed, recorded on tarball-attestation-observed, not a ruling): the bar cuts once no open finding is a wrong grant, and the validate's second-vendor review found one, rule ro_pipeline granting a redirect whose target a carriage return hides, which a close may not land, so closing push only. The batch lands every grant withheld under the noclobber operator and the rewrite grant's redirect target read by value.
