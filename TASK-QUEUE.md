@@ -16,23 +16,9 @@ a consumer rule command reads the command through `--guard-json view` alone, and
 
 **Deliverable:** a `--guard-json` verb printing the word read's values per segment (guard-kit/SPEC.md §Consumer rules), and this repo's three rules reading it, deleting their limit rows; a feature, since it adds a verb.
 
-**Cost while deferred:** this repo's hook-bypass block is evaded by one quoted word, and an adopter's own rule has the same hole with no read to close it. Filed 2026-10-13 by guard-grant-review-pass' build and promoted at its close. Re-verified there: `--run-guard-tests` is green under the 19 rows and derives 121 re-spellings. Owner lookup: `word read`, `guard-json`, `consumer rule` in this file and the disposed-findings record — [guard-rules-skeleton-word-read](#guard-rules-skeleton-word-read), DISTINCT (the generic rules' lift in the crate, where this is the read a consumer command is given); owner guard-kit/SPEC.md §Consumer rules.
+**Cost while deferred:** this repo's hook-bypass block is evaded by one quoted word, and an adopter's own rule has the same hole with no read to close it. Filed 2026-10-13 by guard-grant-review-pass' build and promoted at its close. Re-verified there: `--run-guard-tests` is green under the 19 rows and derives 121 re-spellings. Owner lookup: `word read`, `guard-json`, `consumer rule` in this file and the disposed-findings record — `guard-rules-skeleton-word-read`, DISTINCT (the generic rules' lift in the crate, where this is the read a consumer command is given); owner guard-kit/SPEC.md §Consumer rules.
 
 ## Technical Debt
-
-### guard-rules-skeleton-word-read
-
-[recurrence: 2026-10-13, 2026-10-14]
-
-most generic guard rules read the command word, an option or an operand off the skeleton, so a quoted, escaped, redirect-glued or `command`-led spelling of a row they block falls through. `guard-kit/guard-tests/variant-limits.tsv` is the worklist: every row is a rule and a re-spelling its read does not reach, all at the `fallthrough` floor.
-
-**Narrowed at guard-word-read-release-pass' scope (operator direction, lead-relayed, not a ruling)** to the bash reader's block and steer rules: the table's rows less rule `ro_pipeline`'s and the `ps-` rows, 98 by the survey record's census. The grants' by-value redirect read, rule `ro_pipeline`'s rows and the PowerShell reader's rows were filed again as [grant-pwsh-word-read](#grant-pwsh-word-read), so no grant widens ahead of the v0.32.0 bar.
-
-**Unit set (2026-10-14, operator direction, lead-relayed, not a ruling)**, recorded on this entry as the one likeliest to land last: `grant-redirect-scan-cr` leads, with this slice, [unremapped-rebuild-reds-smoke](#unremapped-rebuild-reds-smoke), [wakeup-stamp-windows-spawn](#wakeup-stamp-windows-spawn) and the feature [consumer-rule-word-read](#consumer-rule-word-read), which spec authors. Composition: bundled on guard-kit's word read and redirect scan, the installer smoke riding as a threshold entry; drain 5 against inflow 3.2. Push need: 2 against one to two, the closing push and wakeup-stamp-windows-spawn's.
-
-**Deliverable:** the word read lifted rule by rule (guard-kit/SPEC.md §The reader and its views), each lift deleting its limit rows in its own commit, safety blocks first: rules `script_interpreter` and `rm_tracked`.
-
-**Cost while deferred:** a steer or a safety block is evaded by one re-spelling, silently under `command`, which the matcher strips. Filed 2026-10-13 by guard-spelling-oracle-pass' spec off a prototype of the variant lane, and promoted at its close. Re-verified there: the lane is green under the table's rows and reds on a row nothing needs. Owner lookup: `skeleton`, `word read`, `variant-limits` in this file and the disposed-findings record — none; `git-rules-word-read-siblings`, done, DISTINCT (the git rules' lift, landed); owner guard-kit/SPEC.md §The generic ruleset.
 
 ### unremapped-rebuild-reds-smoke
 
@@ -57,6 +43,10 @@ the wakeup-guard's log stamp is built in process on unix and spawns `date` off i
 **Inferred, cannot run before build:** that the stamp is empty under an exec-form registration on a Windows host with Git's `usr/bin` off `PATH` — this seat has no Windows host, and the `crate-tests-windows` case the build adds is the first run reaching one; the in-process stamp is owed whichever way that reads.
 
 **Push need (2026-10-14, inside the budget):** one mid-iteration push, since its `crate-tests-windows` case executes on the remote Windows leg before any local run can; the operator accepted the set's two against the budget of one to two.
+
+**Unit set (2026-10-14, operator direction, lead-relayed, not a ruling)**, recorded on this entry as the one likeliest to land last: `grant-redirect-scan-cr` leads, with this slice, [unremapped-rebuild-reds-smoke](#unremapped-rebuild-reds-smoke), [wakeup-stamp-windows-spawn](#wakeup-stamp-windows-spawn) and the feature [consumer-rule-word-read](#consumer-rule-word-read), which spec authors. Composition: bundled on guard-kit's word read and redirect scan, the installer smoke riding as a threshold entry; drain 5 against inflow 3.2. Push need: 2 against one to two, the closing push and wakeup-stamp-windows-spawn's.
+
+**Unit-set record moved here (2026-10-14, lead decision, not a ruling)** verbatim from `guard-rules-skeleton-word-read` at its Done move in guard-word-read-release-pass' build, since this entry's batch lands last; the "this slice" above names that entry, and the record stays live between this entry and [unremapped-rebuild-reds-smoke](#unremapped-rebuild-reds-smoke) until close.
 
 **Cost while deferred:** a Windows adopter's wakeup-attempts log lines may carry no timestamp. Filed 2026-10-10 by hook-placement-guard-rules-pass' build and promoted at its close. Re-verified there by reading both `local_stamp` bodies. Owner lookup: `wakeup`, `date -Is`, `local_stamp` in this file and the disposed-findings record — none; `exec-form-hook-registration`, done, DISTINCT (the registration's form, where this is a member's own spawn); owner guard-kit/SPEC.md §wakeup-guard.
 
@@ -560,13 +550,13 @@ a record scope lands for the whole unit set on one entry is lost when that entry
 
 [cost: event/high] [surface: guard-kit]
 
-the half of [guard-rules-skeleton-word-read](#guard-rules-skeleton-word-read) split off at guard-word-read-release-pass' scope (operator direction, lead-relayed, not a ruling), so no grant widened ahead of the v0.32.0 bar. Three reads stay on the skeleton. The grants read a redirect target there, so a quoted `/dev/null` withholds the grant the bare spelling keeps: rule `ro_pipeline` falls through on `grep -rn foo src 2>"/dev/null"`, and rules `append_scratch`, `bounded_wait`, `bounded_write` and `background_no_record`'s third exemption read it the same way, read off their source and not run. Rule `ro_pipeline` reads its command word there too, its 9 rows in `guard-kit/guard-tests/variant-limits.tsv`. And 9 rows are the PowerShell reader's: a backtick inside a command name falls through rules `rm_tracked`, `cd_compound`, `script_interpreter` and `background_no_record`, and a quoted or backticked redirect target or scratch body path through rules `scratch_redirect` and `script_interpreter`.
+the half of `guard-rules-skeleton-word-read` split off at guard-word-read-release-pass' scope (operator direction, lead-relayed, not a ruling), so no grant widened ahead of the v0.32.0 bar. Three reads stay on the skeleton. The grants read a redirect target there, so a quoted `/dev/null` withholds the grant the bare spelling keeps: rule `ro_pipeline` falls through on `grep -rn foo src 2>"/dev/null"`, and rules `append_scratch`, `bounded_wait`, `bounded_write` and `background_no_record`'s third exemption read it the same way, read off their source and not run. Rule `ro_pipeline` reads its command word there too, its 9 rows in `guard-kit/guard-tests/variant-limits.tsv`. And 9 rows are the PowerShell reader's: a backtick inside a command name falls through rules `rm_tracked`, `cd_compound`, `script_interpreter` and `background_no_record`, and a quoted or backticked redirect target or scratch body path through rules `scratch_redirect` and `script_interpreter`.
 
 **Deliverable:** rule `abs_script`'s by-value read (`redirect_values` in `native/src/guard/rules/grants.rs`) given to each grant, rule `ro_pipeline`'s command word read off the word read, and the PowerShell reader's own word read, each lift deleting its limit rows in its own commit. Every grant lift widens a grant, so it lands in a build a validate's second-vendor review reads.
 
 **Inferred, not run:** that a PowerShell host reads each derived `ps-` row as its base row's command; no host is installed on the machine that derived them — run the derived rows through `pwsh` on the x64 Windows leg
 
-**Cost while deferred:** a PowerShell re-spelling evades two safety blocks, rules `rm_tracked` and `script_interpreter`, and a quoted `/dev/null` costs a prompt the bare spelling does not. Filed 2026-10-14 by guard-word-read-release-pass' scope as the split's remainder; the finding was filed 2026-10-13 by guard-spelling-oracle-pass' spec. Owner lookup: `word read`, `redirect_values`, `ps-`, `pwsh` in this file and the disposed-findings record — [guard-rules-skeleton-word-read](#guard-rules-skeleton-word-read), DISTINCT (the bash block and steer half), `grant-redirect-scan-cr`, DISTINCT (the scan this read lands on, which goes first); owner guard-kit/SPEC.md §The reader and its views.
+**Cost while deferred:** a PowerShell re-spelling evades two safety blocks, rules `rm_tracked` and `script_interpreter`, and a quoted `/dev/null` costs a prompt the bare spelling does not. Filed 2026-10-14 by guard-word-read-release-pass' scope as the split's remainder; the finding was filed 2026-10-13 by guard-spelling-oracle-pass' spec. Owner lookup: `word read`, `redirect_values`, `ps-`, `pwsh` in this file and the disposed-findings record — `guard-rules-skeleton-word-read`, DISTINCT (the bash block and steer half), `grant-redirect-scan-cr`, DISTINCT (the scan this read lands on, which goes first); owner guard-kit/SPEC.md §The reader and its views.
 
 ## Icebox
 
@@ -1267,4 +1257,5 @@ a citation naming a numbered step by its bold title, in RELEASING.md's procedure
 ## Done
 
 - grant-redirect-scan-cr
+- guard-rules-skeleton-word-read
 
