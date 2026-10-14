@@ -76,7 +76,7 @@ pub static TABLE: &[Rule] = &[
         views: &[Raw, SqHdq, SqDqHd, Dequoted],
         test: grants::grant_path_slot,
     },
-    Rule { name: "emitter_write", shells: BASH, views: &[Raw, Hdq, SqDqHd], test: grants::emitter_write },
+    Rule { name: "emitter_write", shells: BASH, views: &[Raw, Hdq, SqDqHd, Dequoted], test: grants::emitter_write },
     Rule { name: "shell_wrapper", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: reach::shell_wrapper },
     Rule {
         name: "worktree_confinement",

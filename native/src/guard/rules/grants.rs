@@ -87,11 +87,10 @@ fn only_heredoc_residue(ctx: &Ctx, s: &str) -> bool {
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `emitter_write`'s clauses (0), (a) and (c) and
 // its quoted-target decline on one statement: every target that is neither `/dev/null` nor an
 // fd-dup, or `None` when the statement is no emitter write the rule can test.
-fn emitter_targets(ctx: &Ctx, s: &str) -> Option<Vec<String>> {
+fn emitter_targets(ctx: &Ctx, s: &str, lead: &str) -> Option<Vec<String>> {
     if shell_backgrounds(s) || !only_heredoc_residue(ctx, s) {
         return None;
     }
-    let lead = head_word(trim_start(s.split('\n').next().unwrap_or("")));
     if !ctx.host().append_bins.iter().any(|b| b == lead) {
         return None;
     }
@@ -112,6 +111,19 @@ fn emitter_targets(ctx: &Ctx, s: &str) -> Option<Vec<String>> {
     (!out.is_empty()).then_some(out)
 }
 
+// spec: guard-kit/SPEC.md §The generic ruleset — a statement's lead word as the skeleton spells it.
+fn statement_lead(s: &str) -> &str {
+    head_word(trim_start(s.split('\n').next().unwrap_or("")))
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — rule `emitter_write`'s lead by value: the dequoted
+// statement's first word past the matcher-stripped wrappers, cut at a redirect, escapes removed.
+fn valued_lead(ctx: &Ctx, d: &str) -> String {
+    let line = d.split('\n').next().unwrap_or("").replace('\\', "");
+    let word = head_word(ctx.harness_view(trim_start(&line)));
+    unsentinel(&word[..word.find(['>', '<']).unwrap_or(word.len())])
+}
+
 pub fn append_scratch(ctx: &Ctx) -> Decided {
     if emitter_unmodelled(ctx, ctx.cmd())? {
         return Ok(None);
@@ -120,7 +132,7 @@ pub fn append_scratch(ctx: &Ctx) -> Decided {
     if noclobber(&s) {
         return Ok(None);
     }
-    let Some(targets) = emitter_targets(ctx, &s) else { return Ok(None) };
+    let Some(targets) = emitter_targets(ctx, &s, statement_lead(&s)) else { return Ok(None) };
     if !targets.iter().all(|t| ctx.host().ignored(t)) {
         return Ok(None);
     }
@@ -845,10 +857,18 @@ pub fn emitter_write(ctx: &Ctx) -> Decided {
     }
     let h = ctx.host();
     let stmts = ctx.residue_statements(&s);
+    let dstmts = ctx.dequoted(ctx.cmd())?.map(|d| ctx.residue_statements(&d)).filter(|d| d.len() == stmts.len());
+    let lead_of = |j: usize, stmt: &str| -> String {
+        let skel = statement_lead(stmt);
+        match dstmts.as_ref().and_then(|d| d.get(j)).map(|d| valued_lead(ctx, d)) {
+            Some(v) if !h.append_bins.iter().any(|b| b == skel) => v,
+            _ => skel.to_string(),
+        }
+    };
     if stmts.len() > 1 {
-        for stmt in &stmts {
-            let Some(targets) = emitter_targets(ctx, stmt) else { continue };
-            let lead = head_word(trim_start(stmt));
+        for (j, stmt) in stmts.iter().enumerate() {
+            let lead = lead_of(j, stmt);
+            let Some(targets) = emitter_targets(ctx, stmt, &lead) else { continue };
             let unignored: Vec<&String> = targets.iter().filter(|t| !h.ignored(t)).collect();
             if unignored.is_empty() {
                 return block(format!("issue the '{}' write to '{}' as its own call, and the rest of this command as a separate one: alone, that write is granted with no permission decision, while compounded it makes the whole call one the harness decides out of band. If you genuinely need the compound, run it yourself with !<command>.", lead, targets.join(" ")));
@@ -861,7 +881,7 @@ pub fn emitter_write(ctx: &Ctx) -> Decided {
         }
         return Ok(None);
     }
-    let Some(targets) = emitter_targets(ctx, &s) else { return Ok(None) };
+    let Some(targets) = emitter_targets(ctx, &s, &lead_of(0, &s)) else { return Ok(None) };
     if targets.iter().any(|t| t.starts_with("/dev/")) {
         return Ok(None);
     }

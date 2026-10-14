@@ -964,6 +964,11 @@ block	cat >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF@NL@git status
 block	printf x >> .tmp/journal.md && make build
 allow	cat >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF
 block	printf x >> tracked.md; git status
+# where the skeleton's lead is no emitter, the lead is read by value: quoted, escaped, glued to its
+# redirect or behind a wrapper; rule `append_scratch` still reads the skeleton's lead alone
+block	\cat>> tracked.md
+block	nohup "printf" x >> .tmp/journal.md && make build
+fallthrough	'cat' >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF
 block	mkdir -p docs && cat > docs/x.md <<'EOF'@NL@line@NL@EOF
 block	make build && echo x > /tmp/x.txt
 fallthrough	make build; echo x > /dev/stderr
