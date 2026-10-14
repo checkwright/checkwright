@@ -1226,9 +1226,3 @@ a citation naming a numbered step by its bold title, in RELEASING.md's procedure
 
 ## Done
 
-- grant-redirect-scan-cr
-- guard-rules-skeleton-word-read
-- consumer-rule-word-read
-- unremapped-rebuild-reds-smoke
-- wakeup-stamp-windows-spawn
-
