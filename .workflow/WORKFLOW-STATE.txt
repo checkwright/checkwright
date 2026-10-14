@@ -11,3 +11,4 @@ guard-word-read-release-pass build a7b191f0 2026-10-14 221207507
 guard-word-read-release-pass build a83db920 2026-10-14 73d3a667c
 guard-word-read-release-pass build a8ff07c2 2026-10-14 de55a3c6f
 guard-word-read-release-pass validate a1f6a896 2026-10-14 96e537ddd
+guard-word-read-release-pass close a64af357 2026-10-14 941292067
