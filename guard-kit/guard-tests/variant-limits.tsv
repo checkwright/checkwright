@@ -73,12 +73,3 @@ fallthrough	sed_file	part-lead
 fallthrough	sed_file	sq-arg
 fallthrough	sed_file	sq-lead
 fallthrough	sed_file	wrap-command
-fallthrough	shell_wrapper	dq-arg
-fallthrough	shell_wrapper	dq-lead
-fallthrough	shell_wrapper	esc-arg
-fallthrough	shell_wrapper	esc-lead
-fallthrough	shell_wrapper	part-arg
-fallthrough	shell_wrapper	part-lead
-fallthrough	shell_wrapper	sq-arg
-fallthrough	shell_wrapper	sq-lead
-fallthrough	shell_wrapper	wrap-command

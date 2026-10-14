@@ -77,7 +77,7 @@ pub static TABLE: &[Rule] = &[
         test: grants::grant_path_slot,
     },
     Rule { name: "emitter_write", shells: BASH, views: &[Raw, Hdq, SqDqHd], test: grants::emitter_write },
-    Rule { name: "shell_wrapper", shells: BASH, views: &[Raw, SqDqHd], test: reach::shell_wrapper },
+    Rule { name: "shell_wrapper", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: reach::shell_wrapper },
     Rule {
         name: "worktree_confinement",
         shells: BOTH,
@@ -173,24 +173,32 @@ fn passed_words(ws: &[Word], escape: char) -> Vec<Word> {
     out
 }
 
-// spec: guard-kit/SPEC.md §The reader and its views — the command read: per segment, the words it
-// passes its command, the wrappers the harness view strips dropped by their values.
-fn command_read(ctx: &Ctx, c: &Cmd) -> Result<Vec<Vec<Word>>, Fault> {
+// spec: guard-kit/SPEC.md §The reader and its views — the command read's first half: per segment, the
+// words it passes, the skeleton's where the word read answers nothing.
+fn passed_read(ctx: &Ctx, c: &Cmd) -> Result<Vec<Vec<Word>>, Fault> {
     let escape = match ctx.shell() {
         Shell::Bash => '\\',
         Shell::PowerShell => '`',
     };
     let s = ctx.view(c, SqDqHd)?;
     let read = ctx.word_read(c)?;
-    let segs = ctx.segments(&s);
-    Ok(segs
+    Ok(ctx
+        .segments(&s)
         .iter()
         .enumerate()
-        .map(|(i, seg)| {
-            let passed = match read.as_ref().and_then(|r| r.get(i)) {
-                Some(ws) => passed_words(ws, escape),
-                None => passed_words(&text::all_words(seg).into_iter().map(plain_word).collect::<Vec<Word>>(), escape),
-            };
+        .map(|(i, seg)| match read.as_ref().and_then(|r| r.get(i)) {
+            Some(ws) => passed_words(ws, escape),
+            None => passed_words(&text::all_words(seg).into_iter().map(plain_word).collect::<Vec<Word>>(), escape),
+        })
+        .collect())
+}
+
+// spec: guard-kit/SPEC.md §The reader and its views — the command read: per segment, the words it
+// passes its command, the wrappers the harness view strips dropped by their values.
+fn command_read(ctx: &Ctx, c: &Cmd) -> Result<Vec<Vec<Word>>, Fault> {
+    Ok(passed_read(ctx, c)?
+        .into_iter()
+        .map(|passed| {
             let values: Vec<String> = passed
                 .iter()
                 .map(|w| if w.value.is_empty() { "\0".to_string() } else { w.value.replace([' ', '\t', '\n'], "\x01") })

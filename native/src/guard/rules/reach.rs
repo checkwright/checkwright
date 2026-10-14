@@ -1,7 +1,7 @@
 // spec: guard-kit/SPEC.md §The generic ruleset — the rules that judge what a command reaches: a
 // history rewrite, a tracked deletion, a scratch body, a wrapped payload, the main checkout.
 use super::{
-    command_read, command_word, git_read, git_walk_of, has_expansion, inert_target, is_banner, is_ro_segment,
+    command_read, command_word, git_read, passed_read, git_walk_of, has_expansion, inert_target, is_banner, is_ro_segment,
     moves_repository, names_command, plain_word, program_bearing, ro_forms_clear, segment_core, shell_backgrounds, GitWalk,
 };
 use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Shell, Verdict};
@@ -915,18 +915,18 @@ pub fn script_interpreter(ctx: &Ctx) -> Decided {
 
 pub fn shell_wrapper(ctx: &Ctx) -> Decided {
     let raw = ctx.raw(ctx.cmd())?;
-    let wrapped = raw.find("sh").is_some_and(|i| raw[i + 2..].contains("-c"));
-    if !wrapped {
+    let dequoted = ctx.dequoted(ctx.cmd())?.unwrap_or_default();
+    if !(raw.contains("sh") || dequoted.contains("sh")) {
         return Ok(None);
     }
-    let s = ctx.view(ctx.cmd(), SqDqHd)?;
-    for seg in ctx.segments(&s) {
-        let seg = trim_start(&seg);
-        let word = head_word(seg);
-        if !matches!(word, "bash" | "sh") {
+    for ws in passed_read(ctx, ctx.cmd())? {
+        let lead = ws.iter().take_while(|w| w.value == "command").count();
+        if ws.get(lead).is_some_and(|w| w.value.starts_with('-')) {
             continue;
         }
-        if head_word(trim_start(&seg[word.len()..])) != "-c" {
+        let Some((head, args)) = ws[lead.min(ws.len())..].split_first() else { continue };
+        let word = head.value.rsplit('/').next().unwrap_or("");
+        if !matches!(word, "bash" | "sh") || args.first().map(|w| w.value.as_str()) != Some("-c") {
             continue;
         }
         return block(format!("don't wrap a command in '{} -c': the payload sits inside one quoted argument, so neither the allowlist nor any guard rule can read what it runs. Run the payload as the command itself, or, for a body that needs a shell of its own, write it to a scratch script and run it through '{} --scratch-run <script>'. If you genuinely need the wrapper, run it yourself with !<command>.", word, ctx.host().door));
