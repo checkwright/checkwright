@@ -10,22 +10,6 @@
 
 ## Technical Debt
 
-### wakeup-stamp-windows-spawn
-
-the wakeup-guard's log stamp is built in process on unix and spawns `date` off it (`local_stamp` in `native/src/hook/wakeup.rs`), resolved on `PATH` alone. A hook the harness starts directly on native Windows need not have Git for Windows' userland on `PATH`, and the stamp is then empty, the limit guard-kit/SPEC.md §The hook on native Windows and context-kit/SPEC.md §bin/env-probe both state.
-
-**Deliverable:** the off-unix stamp computed in process, held by a `crate-tests-windows` case, and the two limit sentences withdrawn.
-
-**Inferred, cannot run before build:** that the stamp is empty under an exec-form registration on a Windows host with Git's `usr/bin` off `PATH` — this seat has no Windows host, and the `crate-tests-windows` case the build adds is the first run reaching one; the in-process stamp is owed whichever way that reads.
-
-**Push need (2026-10-14, inside the budget):** one mid-iteration push, since its `crate-tests-windows` case executes on the remote Windows leg before any local run can; the operator accepted the set's two against the budget of one to two.
-
-**Unit set (2026-10-14, operator direction, lead-relayed, not a ruling)**, recorded on this entry as the one likeliest to land last: `grant-redirect-scan-cr` leads, with this slice, `unremapped-rebuild-reds-smoke`, [wakeup-stamp-windows-spawn](#wakeup-stamp-windows-spawn) and the feature `consumer-rule-word-read`, which spec authors. Composition: bundled on guard-kit's word read and redirect scan, the installer smoke riding as a threshold entry; drain 5 against inflow 3.2. Push need: 2 against one to two, the closing push and wakeup-stamp-windows-spawn's.
-
-**Unit-set record moved here (2026-10-14, lead decision, not a ruling)** verbatim from `guard-rules-skeleton-word-read` at its Done move in guard-word-read-release-pass' build, since this entry's batch lands last; the "this slice" above names that entry, and the record stays live between this entry and `unremapped-rebuild-reds-smoke` until close.
-
-**Cost while deferred:** a Windows adopter's wakeup-attempts log lines may carry no timestamp. Filed 2026-10-10 by hook-placement-guard-rules-pass' build and promoted at its close. Re-verified there by reading both `local_stamp` bodies. Owner lookup: `wakeup`, `date -Is`, `local_stamp` in this file and the disposed-findings record — none; `exec-form-hook-registration`, done, DISTINCT (the registration's form, where this is a member's own spawn); owner guard-kit/SPEC.md §wakeup-guard.
-
 ## Deferred
 
 ### config-variant-battery-harness
@@ -1236,4 +1220,5 @@ a citation naming a numbered step by its bold title, in RELEASING.md's procedure
 - guard-rules-skeleton-word-read
 - consumer-rule-word-read
 - unremapped-rebuild-reds-smoke
+- wakeup-stamp-windows-spawn
 
