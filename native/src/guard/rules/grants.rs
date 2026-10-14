@@ -28,7 +28,7 @@ pub fn truncate_scratch(ctx: &Ctx) -> Decided {
         return Ok(None);
     }
     if !text::matches(
-        "^[[:space:]]*:([[:space:]]+[0-9]*>[>&]?[[:space:]]*[^[:space:]&|;<>]+)+[[:space:]]*$",
+        "^[[:blank:]]*:([[:blank:]]+[0-9]*>[>&]?[[:blank:]]*[^[:blank:]\n&|;<>]+)+[[:blank:]]*$",
         &cmd,
     ) {
         return Ok(None);
@@ -732,8 +732,9 @@ fn slot_capture(sv: &str, off: usize, len: usize, token: &str, start: bool, righ
     None
 }
 
-// spec: guard-kit/SPEC.md §The rule roster — rule `abs_script`'s redirect test by value: every target
-// the skeleton scan found, `n` of them, is `/dev/null` as the shell passes it.
+// spec: guard-kit/SPEC.md §The rule roster — rule `abs_script`'s redirect test by value, taken on
+// every call carrying a redirect: every target the skeleton scan found, `n` of them, is `/dev/null`
+// as the shell passes it.
 fn nulled_by_value(ctx: &Ctx, c: &Cmd, n: usize) -> Result<bool, Fault> {
     let Some(read) = ctx.word_read(c)? else { return Ok(false) };
     Ok(redirect_values(&read).is_some_and(|ts| ts.len() == n && ts.iter().all(|t| t == "/dev/null")))
@@ -796,7 +797,7 @@ pub fn rewrite_granted(ctx: &Ctx, c: &Cmd) -> Result<bool, Fault> {
         return Ok(false);
     }
     let files = redirect_targets(&skel);
-    if files.iter().any(|t| !inert_target(t)) && !nulled_by_value(ctx, c, files.len())? {
+    if !ctx.redirect_pairs(&skel).is_empty() && !nulled_by_value(ctx, c, files.len())? {
         return Ok(false);
     }
     let Some(v) = ctx.dequoted(c)? else { return Ok(false) };

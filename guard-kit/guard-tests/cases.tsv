@@ -68,6 +68,12 @@ block	@ROOT@/scripts/check-env.sh --list >"/dev/null x"
 block	@ROOT@/scripts/check-env.sh --list >'/dev/nullified.md'
 block	@ROOT@/scripts/check-env.sh --list >"tracked.md"
 block	@ROOT@/scripts/check-env.sh --list >"/dev/null">tracked.md
+#          a word carrying a second operator counts as a file, its two targets inert or not
+block	@ROOT@/scripts/check-env.sh --list >/dev/null&>/dev/null
+#          a carriage return is a word character, as bash reads it, so a descriptor glued to one or
+#          behind one names a file
+block	@ROOT@/scripts/check-env.sh --list >&2@CR@tracked.md
+block	@ROOT@/scripts/check-env.sh --list >&@CR@2
 #          the noclobber operator truncates the word after it, which the split reads as a granted
 #          second segment: spaced, glued and under a descriptor, the grant is withheld
 block	@ROOT@/scripts/check-env.sh --list >| scripts/check-env.sh --list
@@ -119,6 +125,9 @@ block	find .tmp/../x -exec cat {} +
 block	printf x >| find .tmp/x -exec cat {} +
 block	printf x>|find .tmp/x -exec cat {} +
 block	printf x 2>| find .tmp/x -exec cat {} +
+#          rule `abs_script`'s redirect test, a carriage return a word character in it
+block	find .tmp/x -exec cat {} + >&2@CR@tracked.md
+block	find .tmp/x -exec cat {} + >&@CR@2
 block	git log @{u}..
 block	echo {1..5}
 block	mkdir -p a/{b,c}
@@ -328,6 +337,9 @@ fallthrough	bash worker.sh & printf 'pid=1 run=worker\n' > .tmp/worker.run
 # through a member's own option owns work a commit could corrupt
 block	grep -rn foo src | sort -o out.txt &
 fallthrough	grep -rn foo src | head &
+# and its inert targets: a carriage return is a word character, so a descriptor glued to one names a file
+block	grep -rn foo src >&2@CR@tracked.md &
+block	grep -rn foo src >&@CR@2 &
 # '|&' pipes stderr too and backgrounds nothing
 fallthrough	make build |& tail -5
 
@@ -418,6 +430,11 @@ fallthrough	: >.tmp/a>tracked.md
 fallthrough	: >& .tmp/a>tracked.md
 fallthrough	: > .tmp/a>>tracked.md
 fallthrough	: > .tmp/a2>tracked.md
+# a carriage return is a word character: a descriptor glued to one names a file, and one ending an
+# ignored target stays in the name
+fallthrough	: >&2@CR@tracked.md
+fallthrough	: > scratch.txt >&@CR@2
+allow	: > .tmp/a@CR@
 
 # rule `append_scratch` — a write to gitignored targets auto-allowed, create and append alike.
 #           The clauses each get their refusing case, because each is what keeps
@@ -453,6 +470,9 @@ block	cat > tracked.md <<'EOF'@NL@line@NL@EOF
 # append-only split protects, and neither is a path git check-ignore can answer
 allow	printf 'x@NL@' >> .tmp/journal.md 2>/dev/null
 allow	cat >> .tmp/journal.md 2>&1
+# a carriage return is a word character, so a descriptor glued to one or behind one names a file
+block	cat >> .tmp/journal.md >&2@CR@tracked.md <<'EOF'@NL@line@NL@EOF
+block	cat >> .tmp/journal.md >&@CR@2 <<'EOF'@NL@line@NL@EOF
 # `>&` onto a named file is the write `>` is, granted on an ignored target
 allow	printf 'x' >& .tmp/note.txt
 # a continued line is one statement, as the shell reads it; a continued heredoc opener puts what
@@ -476,6 +496,11 @@ fallthrough	grep -rn foo src >&2x
 allow	grep -rn foo src 2>& 1
 allow	grep -rn foo src >&-
 allow	grep -rn foo src >& /dev/null
+# a carriage return is a word character, as bash reads it: a descriptor glued to one or behind one
+# names a file, and a redirect onto one alone writes a file of that name
+fallthrough	grep -rn foo src >&2@CR@tracked.md
+fallthrough	grep -rn foo src >&@CR@2
+fallthrough	grep -rn foo src >@CR@| head
 # the noclobber operator writes the word after it, which the split reads as a second roster
 # segment: spaced, glued and under a descriptor it withholds, and a quoted one is text. Behind an
 # allowlisted lead the withheld grant leaves rule `allowlist_chain`'s block
@@ -653,6 +678,10 @@ fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done > out.txt
 # `>&` onto a named file is that write in its fd-dup spelling, in a condition as in a tail
 fallthrough	until grep -q DONE .tmp/smoke.log >& out.txt; do sleep 5; done
 fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done; grep -n ERR .tmp/smoke.log >& out.txt
+# a carriage return is a word character, so a descriptor glued to one or behind one names a file
+fallthrough	until grep -q DONE .tmp/smoke.log >&2@CR@tracked.md; do sleep 5; done
+fallthrough	until grep -q DONE .tmp/smoke.log >&@CR@2; do sleep 5; done
+fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done; grep -n ERR .tmp/smoke.log >&2@CR@tracked.md
 # clauses (c) and (d) take rule `ro_pipeline`'s declared forms over the whole call, so a
 # condition or a tail writing through a roster member's own option is refused
 fallthrough	while sort -c -o out.txt data.txt; do sleep 5; done
@@ -687,6 +716,9 @@ fallthrough	bash scripts/check-foo.sh >& tracked.md & echo "pid=$! run=foo" > .t
 # (B1) an fd-dup onto a named file withholds whatever its target, glued or apart
 fallthrough	bash scripts/check-foo.sh >& .tmp/foo.log & echo "pid=$! run=foo" > .tmp/foo.run; wait
 fallthrough	bash scripts/check-foo.sh >&.tmp/foo.log & echo "pid=$! run=foo" > .tmp/foo.run; wait
+# and a carriage return is a word character, so a descriptor glued to one or behind one names a file
+fallthrough	bash scripts/check-foo.sh > .tmp/foo.log >&2@CR@tracked.md & echo "pid=$! run=foo" > .tmp/foo.run; wait
+fallthrough	bash scripts/check-foo.sh > .tmp/foo.log >&@CR@2 & echo "pid=$! run=foo" > .tmp/foo.run; wait
 # (B3) an expansion besides the record's own; rule `grant_path_slot`'s predicate declines a live '$'
 # in the launch too, so this row pins the verdict rather than the clause alone
 fallthrough	scripts/check-foo.sh $1 > .tmp/foo.log & echo "pid=$! run=foo" > .tmp/foo.run; wait

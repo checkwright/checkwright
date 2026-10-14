@@ -322,9 +322,9 @@ impl Tally {
     }
 }
 
-// spec: guard-kit/SPEC.md §Testing — the two substitutions, in the fixed order.
+// spec: guard-kit/SPEC.md §Testing — the three substitutions, in the fixed order.
 fn substitute(cmd: &str, root: &str) -> String {
-    cmd.replace("@ROOT@", root).replace("@NL@", "\n")
+    cmd.replace("@ROOT@", root).replace("@NL@", "\n").replace("@CR@", "\r")
 }
 
 // spec: guard-kit/SPEC.md §Testing — the table grammar, and the split reproduces bash's
@@ -533,13 +533,14 @@ mod tests {
         assert_eq!(classify(0, "{}"), "unknown");
     }
 
-    // spec: guard-kit/SPEC.md §Testing — the two substitutions in their fixed order.
+    // spec: guard-kit/SPEC.md §Testing — the three substitutions in their fixed order.
     #[test]
-    fn both_substitutions_apply_to_a_command_cell() {
+    fn every_substitution_applies_to_a_command_cell() {
         assert_eq!(
             substitute("cat @ROOT@/f <<EOF@NL@body@NL@EOF", "/tmp/s"),
             "cat /tmp/s/f <<EOF\nbody\nEOF"
         );
+        assert_eq!(substitute("ls >&2@CR@x", "/tmp/s"), "ls >&2\rx");
     }
 
     // spec: guard-kit/SPEC.md §Testing — the row grammar reproduces `IFS=$'\t' read -r`.

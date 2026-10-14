@@ -20,16 +20,6 @@ a consumer rule command reads the command through `--guard-json view` alone, and
 
 ## Technical Debt
 
-### grant-redirect-scan-cr
-
-the skeleton scan's redirect read takes a carriage return for whitespace (`is_space` in `native/src/guard/text.rs`), where bash keeps it inside the word, so a grant reads a file target as an fd-dup or a pipe. Rule `ro_pipeline` allows `grep -rn foo src >&2<CR>tracked.md`, which writes the file `2<CR>tracked.md`, and `grep -rn foo src ><CR>| head`, which writes a file named by the carriage return. A second mismatch sits in rule `abs_script`'s rewrite: `rewrite_granted` in `native/src/guard/rules/grants.rs` reads targets by value only where the scan finds one that is neither `/dev/null` nor an fd-dup, so `>/dev/null&>/dev/null` keeps its rewrite, while guard-kit/SPEC.md §The rule roster counts a word carrying a second operator as a file. Both of its redirects are the device, so that grant is benign either way.
-
-**Deliverable:** the scan's whitespace class matching bash's, with a `cases.tsv` row per spelling under each grant that reads it; and that rewrite test and its SPEC line brought to one reading. Both move a verdict, so they land in a build a validate reads (the close binding's promote-never-land rule).
-
-**Run at guard-word-read-release-pass' scope** through the hook member, in a scratch repo committing one allowlisted `check-*.sh`, against HEAD and the published v0.31.0 binary. Rule `abs_script`'s rewrite grants `<abs>/scripts/check-x.sh >&2<CR>tracked.md` at both. Rule `ro_pipeline` grants `><CR>| head` at both, and `>&2<CR>tracked.md` at HEAD alone, so that spelling is a regression from v0.31.0 and the others are older wrong grants. `is_space` is byte-identical at the tag.
-
-**Cost while deferred:** an auto-allowed read can write a file the grant never saw, and the v0.32.0 release bar stays unmet while this wrong grant is open. Filed 2026-10-14 by rewrite-grant-noclobber-pass' close, off its validate's second-vendor review. Re-verified there through the hook member at HEAD: allow, rule `ro_pipeline`, on both spellings. Owner lookup: `carriage`, `CRLF`, `is_space`, `whitespace class`, `second operator` in this file and the disposed-findings record — none; [guard-rules-skeleton-word-read](#guard-rules-skeleton-word-read), DISTINCT (a word's quoted spelling declined, where this is an operator misread into a grant); owner guard-kit/SPEC.md §The reader and its views and §The rule roster.
-
 ### guard-rules-skeleton-word-read
 
 [recurrence: 2026-10-13, 2026-10-14]
@@ -38,7 +28,7 @@ most generic guard rules read the command word, an option or an operand off the 
 
 **Narrowed at guard-word-read-release-pass' scope (operator direction, lead-relayed, not a ruling)** to the bash reader's block and steer rules: the table's rows less rule `ro_pipeline`'s and the `ps-` rows, 98 by the survey record's census. The grants' by-value redirect read, rule `ro_pipeline`'s rows and the PowerShell reader's rows were filed again as [grant-pwsh-word-read](#grant-pwsh-word-read), so no grant widens ahead of the v0.32.0 bar.
 
-**Unit set (2026-10-14, operator direction, lead-relayed, not a ruling)**, recorded on this entry as the one likeliest to land last: [grant-redirect-scan-cr](#grant-redirect-scan-cr) leads, with this slice, [unremapped-rebuild-reds-smoke](#unremapped-rebuild-reds-smoke), [wakeup-stamp-windows-spawn](#wakeup-stamp-windows-spawn) and the feature [consumer-rule-word-read](#consumer-rule-word-read), which spec authors. Composition: bundled on guard-kit's word read and redirect scan, the installer smoke riding as a threshold entry; drain 5 against inflow 3.2. Push need: 2 against one to two, the closing push and wakeup-stamp-windows-spawn's.
+**Unit set (2026-10-14, operator direction, lead-relayed, not a ruling)**, recorded on this entry as the one likeliest to land last: `grant-redirect-scan-cr` leads, with this slice, [unremapped-rebuild-reds-smoke](#unremapped-rebuild-reds-smoke), [wakeup-stamp-windows-spawn](#wakeup-stamp-windows-spawn) and the feature [consumer-rule-word-read](#consumer-rule-word-read), which spec authors. Composition: bundled on guard-kit's word read and redirect scan, the installer smoke riding as a threshold entry; drain 5 against inflow 3.2. Push need: 2 against one to two, the closing push and wakeup-stamp-windows-spawn's.
 
 **Deliverable:** the word read lifted rule by rule (guard-kit/SPEC.md §The reader and its views), each lift deleting its limit rows in its own commit, safety blocks first: rules `script_interpreter` and `rm_tracked`.
 
@@ -252,7 +242,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Deliverable:** that observation, read off the `publish` run and one install from the published Release, with any defect it shows filed.
 
-**Release (operator directions, lead-relayed, not rulings):** v0.32.0 stays deferred, closing push only, no tag and no publish, by a direction of 2026-10-12. **The bar for the cut, the same direction:** cut once no open finding is a wrong grant or a regression from v0.31.0; a fall-through hole rides as a declared limit in the note. Which open finding the bar blocks is read by the session that next weighs a cut, against its own runs. **At each close since 2026-10-13** the operator rested that reading on the iteration's second-vendor review returning clean, a failed run or a finding leaving the bar a judgment being asked, never skipped or met by a same-vendor reader; on 2026-10-14 the one granted run moved to validate, none at close. **Since 2026-10-14** a close promotes every verdict-moving guard change it would author rather than landing it, the close binding carrying the rule, so a finding the review returns waits for a later build and validate. Three closes have read the bar unmet on findings the latest review returned, the latest a carriage return the redirect scan takes for whitespace, open as [grant-redirect-scan-cr](#grant-redirect-scan-cr). That cut's `publish` run produces this observation and [front-door-job-observed](#front-door-job-observed)'s.
+**Release (operator directions, lead-relayed, not rulings):** v0.32.0 stays deferred, closing push only, no tag and no publish, by a direction of 2026-10-12. **The bar for the cut, the same direction:** cut once no open finding is a wrong grant or a regression from v0.31.0; a fall-through hole rides as a declared limit in the note. Which open finding the bar blocks is read by the session that next weighs a cut, against its own runs. **At each close since 2026-10-13** the operator rested that reading on the iteration's second-vendor review returning clean, a failed run or a finding leaving the bar a judgment being asked, never skipped or met by a same-vendor reader; on 2026-10-14 the one granted run moved to validate, none at close. **Since 2026-10-14** a close promotes every verdict-moving guard change it would author rather than landing it, the close binding carrying the rule, so a finding the review returns waits for a later build and validate. Three closes have read the bar unmet on findings the latest review returned, the latest a carriage return the redirect scan takes for whitespace, open as `grant-redirect-scan-cr`. That cut's `publish` run produces this observation and [front-door-job-observed](#front-door-job-observed)'s.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
@@ -576,7 +566,7 @@ the half of [guard-rules-skeleton-word-read](#guard-rules-skeleton-word-read) sp
 
 **Inferred, not run:** that a PowerShell host reads each derived `ps-` row as its base row's command; no host is installed on the machine that derived them — run the derived rows through `pwsh` on the x64 Windows leg
 
-**Cost while deferred:** a PowerShell re-spelling evades two safety blocks, rules `rm_tracked` and `script_interpreter`, and a quoted `/dev/null` costs a prompt the bare spelling does not. Filed 2026-10-14 by guard-word-read-release-pass' scope as the split's remainder; the finding was filed 2026-10-13 by guard-spelling-oracle-pass' spec. Owner lookup: `word read`, `redirect_values`, `ps-`, `pwsh` in this file and the disposed-findings record — [guard-rules-skeleton-word-read](#guard-rules-skeleton-word-read), DISTINCT (the bash block and steer half), [grant-redirect-scan-cr](#grant-redirect-scan-cr), DISTINCT (the scan this read lands on, which goes first); owner guard-kit/SPEC.md §The reader and its views.
+**Cost while deferred:** a PowerShell re-spelling evades two safety blocks, rules `rm_tracked` and `script_interpreter`, and a quoted `/dev/null` costs a prompt the bare spelling does not. Filed 2026-10-14 by guard-word-read-release-pass' scope as the split's remainder; the finding was filed 2026-10-13 by guard-spelling-oracle-pass' spec. Owner lookup: `word read`, `redirect_values`, `ps-`, `pwsh` in this file and the disposed-findings record — [guard-rules-skeleton-word-read](#guard-rules-skeleton-word-read), DISTINCT (the bash block and steer half), `grant-redirect-scan-cr`, DISTINCT (the scan this read lands on, which goes first); owner guard-kit/SPEC.md §The reader and its views.
 
 ## Icebox
 
@@ -1275,4 +1265,6 @@ the manual-operation meter keys every arm called through the gate binary's door 
 a citation naming a numbered step by its bold title, in RELEASING.md's procedure or lifecycle-kit/templates/lead.md, resolves under no gate, since check-spec-pointer and check-citation-link resolve the heading alone, so a reworded title strands every citing site with the battery green; the deliverable is a title-resolution arm on check-spec-pointer or the cited steps made headings, owned by canon-kit/SPEC.md §check-spec-pointer.
 
 ## Done
+
+- grant-redirect-scan-cr
 

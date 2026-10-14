@@ -64,6 +64,12 @@ pub fn trim_start(s: &str) -> &str {
     &s[i..]
 }
 
+// spec: guard-kit/SPEC.md §The reader and its views — bash's blank, the redirect scan's one separator
+// class: a carriage return, vertical tab or form feed is a word character.
+pub fn trim_blank_start(s: &str) -> &str {
+    s.trim_start_matches([' ', '\t'])
+}
+
 pub fn trim_end(s: &str) -> &str {
     let i = s.bytes().rposition(|c| !is_space(c)).map_or(0, |i| i + 1);
     &s[..i]

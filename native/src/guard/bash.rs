@@ -714,11 +714,11 @@ pub fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
 
 // spec: guard-kit/SPEC.md §The generic ruleset — the redirect-pair pattern, handed to the crate's own
 // matcher (gate-sdk/SPEC.md §The POSIX ERE matcher)
-pub const REDIRECT_RE_SRC: &str = "[0-9]*>[>&]?[[:space:]]*(&[0-9-]+|[^[:space:]|;&<>]+)";
+pub const REDIRECT_RE_SRC: &str = "[0-9]*>[>&]?[[:blank:]]*(&[0-9-]+|[^[:blank:]|;&<>]+)";
 
 // spec: guard-kit/SPEC.md §The generic ruleset — one match per line, leftmost-longest and
-// non-overlapping, which is `grep -o`'s contract. Line-wise rather than whole-string, because
-// `[[:space:]]` matches a newline and a whole-string scan would join two lines into one pair.
+// non-overlapping, which is `grep -o`'s contract. Line-wise, because a target class excluding only
+// blanks would run a whole-string scan's pair across a newline.
 pub fn redirect_pairs(text: &str) -> Result<Vec<String>, EreError> {
     crate::ere::Ere::compile(REDIRECT_RE_SRC)?;
     Ok(text::grep_o(REDIRECT_RE_SRC, text))
@@ -874,6 +874,8 @@ mod tests {
             redirect_pairs("jq . < a.json > b.json").unwrap(),
             vec!["> b.json"]
         );
+        assert_eq!(redirect_pairs("cmd >&2\rx >\r| y >\x0bz").unwrap(), vec![">&2\rx", ">\r", ">\x0bz"]);
+        assert_eq!(redirect_pairs("cmd >\tout").unwrap(), vec![">\tout"]);
     }
 
     // spec: guard-kit/SPEC.md §The reader and its views — the dequoted view
