@@ -801,6 +801,9 @@ fallthrough	make build > .tmp/b.log
 #           `ro_pipeline` grants an allowlisted lead beside roster reads first
 block	git status && rm -rf tmp
 block	git status 2>&1
+# a lead is read by value too, past a wrapper
+block	\git 'status' && rm -rf tmp
+block	FOO=1 git status; make build
 fallthrough	git status
 fallthrough	frobnicate && git status
 fallthrough	git status && ls && bash scripts/check-x.sh

@@ -66,7 +66,7 @@ pub static TABLE: &[Rule] = &[
         views: &[Raw, SqHdq, SqDqHd, Dequoted],
         test: grants::bounded_write,
     },
-    Rule { name: "allowlist_chain", shells: BASH, views: &[SqDqHd], test: grants::allowlist_chain },
+    Rule { name: "allowlist_chain", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: grants::allowlist_chain },
     Rule { name: "git_rewrite", shells: BOTH, views: &[Raw, SqDqHd, Dequoted], test: reach::git_rewrite },
     Rule { name: "rm_tracked", shells: BOTH, views: &[Raw, SqDqHd, Dequoted], test: reach::rm_tracked },
     Rule { name: "script_interpreter", shells: BOTH, views: &[Raw, SqDqHd, Dequoted], test: reach::script_interpreter },

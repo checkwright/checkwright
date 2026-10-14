@@ -2,7 +2,7 @@
 // allow is given only where every clause of its test holds, and every other failure declines.
 use super::reach::{interpreter_reach, refused, rm_tracked_reach};
 use super::{
-    fd_word, has_substitution, inert_target, is_banner, is_bare_allow, is_ro_segment, is_ro_xargs, noclobber,
+    command_read, fd_word, has_substitution, inert_target, is_banner, is_bare_allow, is_ro_segment, is_ro_xargs, noclobber,
     redirect_targets, ro_forms_clear, ro_forms_clear_except, ro_forms_kit, segment_core,
     shell_backgrounds, strip_redirect_op, unredirected_words, xargs_command_index,
 };
@@ -541,16 +541,23 @@ pub fn allowlist_chain(ctx: &Ctx) -> Decided {
     let skel = ctx.view(ctx.cmd(), SqDqHd)?;
     let segs = ctx.segments(&skel);
     let lead = trim(&segs[0]).to_string();
-    let lead_core = segment_core(&lead);
-    let (bare, via_star) = is_bare_allow(h, &lead);
+    let (mut lead_core, (mut bare, mut via_star)) = (segment_core(&lead), is_bare_allow(h, &lead));
+    let decorated = lead != lead_core;
+    if !bare {
+        let valued = command_read(ctx, ctx.cmd())?.first().map_or_else(String::new, |ws| {
+            ws.iter().map(|w| w.value.as_str()).collect::<Vec<_>>().join(" ")
+        });
+        (bare, via_star) = is_bare_allow(h, &valued);
+        lead_core = segment_core(&valued);
+    }
     if !bare {
         return Ok(None);
     }
-    if via_star && lead != lead_core && h.append_bins.iter().any(|e| head_word(&lead_core) == e) {
+    if via_star && decorated && h.append_bins.iter().any(|e| head_word(&lead_core) == e) {
         return Ok(None);
     }
     let steer = format!("run '{}' bare — it's a statically allowlisted command, but the decoration (chaining or a redirect) leaves a segment nothing grants, so the whole call falls off the match path and costs an out-of-band permission decision. Run the allowlisted command on its own; issue the rest as separate calls.", lead_core);
-    if lead != lead_core {
+    if decorated {
         return block(steer);
     }
     for seg in segs.iter().skip(1) {

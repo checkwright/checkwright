@@ -1,15 +1,6 @@
 # guard-kit variant limits — <floor><TAB><rule><TAB><transform>, read by the variant lane of
 # --run-guard-tests (guard-kit/SPEC.md §Testing). A row is deleted in the commit that lifts its
 # read or withholds its grant, and the lane fails on a row nothing needs.
-fallthrough	allowlist_chain	dq-arg
-fallthrough	allowlist_chain	dq-lead
-fallthrough	allowlist_chain	esc-arg
-fallthrough	allowlist_chain	esc-lead
-fallthrough	allowlist_chain	part-arg
-fallthrough	allowlist_chain	part-lead
-fallthrough	allowlist_chain	sq-arg
-fallthrough	allowlist_chain	sq-lead
-fallthrough	allowlist_chain	wrap-command
 fallthrough	background_no_record	ps-tick-lead
 fallthrough	cd_compound	ps-tick-lead
 fallthrough	emitter_write	dq-lead
@@ -29,15 +20,6 @@ fallthrough	git_c_root	sq-lead
 fallthrough	git_c_root	wrap-command
 fallthrough	pgrep_self_match	part-arg
 fallthrough	rm_tracked	ps-tick-lead
-fallthrough	ro_pipeline	dq-arg
-fallthrough	ro_pipeline	dq-lead
-fallthrough	ro_pipeline	esc-arg
-fallthrough	ro_pipeline	esc-lead
-fallthrough	ro_pipeline	part-arg
-fallthrough	ro_pipeline	part-lead
-fallthrough	ro_pipeline	sq-arg
-fallthrough	ro_pipeline	sq-lead
-fallthrough	ro_pipeline	wrap-command
 fallthrough	scratch_redirect	ps-dq-arg
 fallthrough	scratch_redirect	ps-sq-arg
 fallthrough	scratch_redirect	ps-tick-arg
