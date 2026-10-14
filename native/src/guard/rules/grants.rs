@@ -615,7 +615,8 @@ fn slot_segment(ctx: &Ctx, sw: &str, dw: &str, inners: &[String]) -> Reach {
         Err(1) => return Reach::Clean,
         Err(_) => return Reach::Undecided,
     };
-    let sv = ctx.harness_view(&ws).replace('\\', "");
+    let unescaped = ws.replace('\\', "");
+    let sv = ctx.harness_view(&unescaped).to_string();
     let rv = sv.replace('\x01', " ").replace('\x02', "\t");
     for inner in inners {
         let pat = inner.replace(":*", "*");

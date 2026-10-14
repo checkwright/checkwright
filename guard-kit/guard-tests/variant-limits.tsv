@@ -51,7 +51,6 @@ fallthrough	git_c_root	part-lead
 fallthrough	git_c_root	sq-arg
 fallthrough	git_c_root	sq-lead
 fallthrough	git_c_root	wrap-command
-fallthrough	grant_path_slot	esc-lead
 fallthrough	pgrep_self_match	dq-arg
 fallthrough	pgrep_self_match	dq-lead
 fallthrough	pgrep_self_match	esc-arg

@@ -923,6 +923,7 @@ block	bash ../../evil/checks/check-x.sh
 block	bash /elsewhere/checks/check-x.sh
 block	bash C:/elsewhere/checks/check-x.sh
 block	timeout 5 rm -rf .tmp/../scratch.txt
+block	\timeout 5 rm -rf .tmp/../scratch.txt
 fallthrough	rm -rf .tmp/x .tmp/y; make build
 fallthrough	rm -rf .tmp/x 2>/dev/null; make build
 fallthrough	bash guard-kit/checks/check-x.sh
