@@ -171,6 +171,23 @@ eq "view-body-usage" "$?" 2
 payload x | "$BIN" --guard-json view dq >/dev/null 2>&1
 eq "view-unknown-usage" "$?" 2
 
+# --- words: the word read's values, one line a segment, the words tab-separated
+words() {  # $1=command [$2=tool]
+    payload "$1" "${2:-Bash}" | "$BIN" --guard-json words
+}
+tab=$'\t'
+eq "words-quoted" "$(words "git 'clean' -fd")" "git${tab}clean${tab}-fd"
+eq "words-escaped" "$(words 'git \clean -fd')" "git${tab}clean${tab}-fd"
+eq "words-split" "$(words "git cl'ea'n -fd")" "git${tab}clean${tab}-fd"
+eq "words-segments" "$(words 'git commit -m x; echo --no-verify')" "$(printf 'git\tcommit\t-m\tx\necho\t--no-verify')"
+eq "words-tab" "$(printf '%s' '{"tool_name":"Bash","tool_input":{"command":"echo '\''a\tb'\''"}}' | "$BIN" --guard-json words)" 'echo'"${tab}"'a\tb'
+eq "words-backslash" "$(words "echo 'a\\b'")" 'echo'"${tab}"'a\\b'
+eq "words-powershell" "$(words 'git `clean -X' PowerShell)" "git${tab}clean${tab}-X"
+eq "words-heredoc" "$(words $'git commit -F - <<\'MSG\'\nx\nMSG' | wc -c | tr -d ' ')" 0
+eq "words-non-bash" "$(words 'echo "a"' Read | wc -c | tr -d ' ')" 0
+payload x | "$BIN" --guard-json words sq >/dev/null 2>&1
+eq "words-operand-usage" "$?" 2
+
 # --- a raw control byte could forge the reader's own marks: the member blocks naming it, before any
 #     rule and with no fall-through, and view prints nothing
 forged='{"tool_name":"Bash","tool_input":{"command":"make build \u0001 x"}}'
@@ -267,5 +284,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "consumer-rules.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "consumer-rules.test: ok ($checks assertions; the consumer command reads the payload bytes as received with the working directory and environment inherited, a block and a decision are relayed verbatim ahead of the generic ruleset, an empty result falls through to it, a fault — non-zero-non-2 exit, unparseable or non-object stdout, a command that cannot start — rides the ruleset's own answer and never silences it, an empty knob runs no stage; --guard-json field reads bytes verbatim and view prints the named view through the tool's reader, nothing for a tool no reader serves; a raw control byte is blocked by name before any rule; --run-guard-tests' consumer lane drives the consumer's rows against its command from the arm's working directory, reds a mismatch either way, is silent where no table is named, and refuses a table with no command or no file at exit 2, and derives its rows' re-spellings only under a named limits table, held from both sides and refused at exit 2 with no cases table or no readable table; its variant lane counts the four tables' derived rows, reds a limit row nothing needs and refuses a limits table it cannot read at exit 2)"
+echo "consumer-rules.test: ok ($checks assertions; the consumer command reads the payload bytes as received with the working directory and environment inherited, a block and a decision are relayed verbatim ahead of the generic ruleset, an empty result falls through to it, a fault — non-zero-non-2 exit, unparseable or non-object stdout, a command that cannot start — rides the ruleset's own answer and never silences it, an empty knob runs no stage; --guard-json field reads bytes verbatim, view prints the named view through the tool's reader, nothing for a tool no reader serves, and words prints the word read's values a segment a line, nothing where the read answers nothing, and refuses an operand; a raw control byte is blocked by name before any rule; --run-guard-tests' consumer lane drives the consumer's rows against its command from the arm's working directory, reds a mismatch either way, is silent where no table is named, and refuses a table with no command or no file at exit 2, and derives its rows' re-spellings only under a named limits table, held from both sides and refused at exit 2 with no cases table or no readable table; its variant lane counts the four tables' derived rows, reds a limit row nothing needs and refuses a limits table it cannot read at exit 2)"
 exit 0

@@ -126,10 +126,28 @@ pub fn json_view(payload: Option<&serde_json::Value>, view: reader::View) -> Opt
     reader.view(cmd, view).map(|v| reader::unmark(&v))
 }
 
+// spec: guard-kit/SPEC.md §Consumer rules — `--guard-json words`: the word read's values over the
+// command `view` reads, one line per segment; nothing wherever `view` prints nothing or the read
+// answers nothing.
+pub fn json_words(payload: Option<&serde_json::Value>) -> Option<Vec<String>> {
+    let p = payload?;
+    let (reader, _) = reader_for(p.get("tool_name")?.as_str()?)?;
+    let cmd = command_of(p)?;
+    if reader::control_byte(cmd).is_some() {
+        return None;
+    }
+    let segs = reader.word_read(cmd)?;
+    let line = |ws: &[reader::Word]| {
+        let vals: Vec<String> = ws.iter().map(|w| w.value.replace('\\', "\\\\").replace('\t', "\\t")).collect();
+        vals.join("\t")
+    };
+    Some(segs.iter().map(|ws| line(ws)).collect())
+}
+
 // spec: guard-kit/SPEC.md §The shell guard — `--guard-json <mode> [<arg>…]`, the reads and
 // renders a consumer rule command calls; every mode exits 0 and only a usage error exits 2.
 pub fn json_arm(args: &[String]) -> i32 {
-    let usage = "  usage: checkwright-gates --guard-json field <path> | --guard-json field-or-empty <path> | --guard-json view <view> | --guard-json allow-entries <settings-file> | --guard-json advise <msg> | --guard-json allow <reason> | --guard-json rewrite <cmd> <reason>";
+    let usage = "  usage: checkwright-gates --guard-json field <path> | --guard-json field-or-empty <path> | --guard-json view <view> | --guard-json words | --guard-json allow-entries <settings-file> | --guard-json advise <msg> | --guard-json allow <reason> | --guard-json rewrite <cmd> <reason>";
     let arg = |i: usize| args.get(i).map(String::as_str);
     // spec: guard-kit/SPEC.md §Consumer rules — a view is named by its declaration spelling, as one
     // operand or as its words; `body` names no view of a whole command, since it takes an index.
@@ -141,6 +159,10 @@ pub fn json_arm(args: &[String]) -> i32 {
         (Some("view"), Some(_), _) if view.is_some() => {
             let payload = crate::hook::read_payload();
             view.and_then(|v| json_view(payload.as_ref(), v)).map(|v| vec![v])
+        }
+        (Some("words"), None, None) => {
+            let payload = crate::hook::read_payload();
+            json_words(payload.as_ref())
         }
         (Some(m @ ("field" | "field-or-empty")), Some(path), None) => {
             let payload = crate::hook::read_payload();
@@ -233,6 +255,34 @@ mod tests {
         assert_eq!(json_view(Some(&forged), reader::View::SqDqHd), None);
     }
 
+    // spec: guard-kit/SPEC.md §Consumer rules — the word read's values, one line per segment, a
+    // backslash and a tab encoded, and nothing where the read answers nothing
+    #[test]
+    fn words_print_the_word_read_s_values_per_segment() {
+        let words = |command: &str| {
+            let p = serde_json::json!({"tool_name": "Bash", "tool_input": {"command": command}});
+            json_words(Some(&p))
+        };
+        let one = |l: &str| Some(vec![l.to_string()]);
+        assert_eq!(words("git 'clean' -fd\n"), one("git\tclean\t-fd"));
+        assert_eq!(words("git \\clean -\"X\""), one("git\tclean\t-X"));
+        assert_eq!(words("git cl'ea'n -X"), one("git\tclean\t-X"));
+        assert_eq!(
+            words("git commit -m x; echo --no-verify"),
+            Some(vec!["git\tcommit\t-m\tx".to_string(), "echo\t--no-verify".to_string()])
+        );
+        assert_eq!(words("echo 'a\tb'"), one("echo\ta\\tb"));
+        assert_eq!(words("echo 'a\\b'"), one("echo\ta\\\\b"));
+        let ps = serde_json::json!({"tool_name": "PowerShell", "tool_input": {"command": "git `clean -X"}});
+        assert_eq!(json_words(Some(&ps)), one("git\tclean\t-X"));
+        assert_eq!(words("git commit -F - <<'MSG'\nx\nMSG"), None);
+        let read = serde_json::json!({"tool_name": "Read", "tool_input": {"command": "ls"}});
+        assert_eq!(json_words(Some(&read)), None);
+        assert_eq!(words("\n"), None);
+        assert_eq!(words("echo \u{1} 'x'"), None);
+        assert_eq!(json_words(None), None);
+    }
+
     // spec: guard-kit/SPEC.md §The shell guard — every C0 byte but tab, line feed and carriage return
     // is refused, and the refusal names the first one
     #[test]
@@ -276,6 +326,7 @@ mod tests {
         assert_eq!(json_arm(&s(&["view"])), 2);
         assert_eq!(json_arm(&s(&["view", "body"])), 2);
         assert_eq!(json_arm(&s(&["view", "dq"])), 2);
+        assert_eq!(json_arm(&s(&["words", "sq"])), 2);
         assert_eq!(json_arm(&s(&["allow-entries", "/no/such/settings.json"])), 0);
     }
 
