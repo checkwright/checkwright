@@ -314,18 +314,6 @@ site-kit/templates/site-health.yml's probe step is linted by the `check-action-*
 
 **Inferred, not run:** that the loop passed those five cases under a scratch harness at its build, which no tracked file carries.
 
-### step-title-cite-unresolved
-
-[cost: event/low] [surface: canon-kit]
-
-a citation naming a numbered step by its bold title (RELEASING.md §The procedure, *Author the release-note post — in-iteration*, and the same shape citing lifecycle-kit/templates/lead.md) resolves under no gate: `check-spec-pointer` and `check-citation-link` resolve the heading alone, so a reworded step title leaves every citing site stale with the battery green.
-
-**Deliverable:** a holder for the title, either a title-resolution arm on `check-spec-pointer` or the cited steps made headings; which one is spec's, and so is whether a prefix resolves: .github/workflows/publish.yml cites *Watch the publish workflow* for a title that runs on to *both channels*, and .claude/agents/stage-session.md cites *Tier each batch* for a longer one (read 2026-10-06 at this entry's filing close, off its second-vendor review).
-
-**Cost while deferred:** one reworded title in RELEASING.md mis-names its citations, a gate's printed remedy among them. Filed 2026-10-06 by site-fence-release-cites-pass' build. Re-verified by grep: eight lines cite a step of the two files by title. Owner lookup: `bold title`, `step title`, `title-resolution` in this file and the disposed-findings record — none; release-step-number-cites, landed this iteration, DISTINCT (it moved the citations off the step's number, and this is the title's own drift, so no recurrence).
-
-**Inferred, not run:** that neither gate reads past the heading; no fixture rewording a cited title was run.
-
 ### site-health-resample-knobs
 
 [cost: event/low] [surface: site-kit]
@@ -1270,8 +1258,9 @@ Three unix install-smoke legs in gates.yml are hand-copied jobs where a matrix o
 
 the manual-operation meter keys every arm called through the gate binary's door as one key, split across the door's two spellings, so it cannot name a repeated arm; the deliverable is a door-aware sub-key owned by drift-kit/SPEC.md §The manual-operation meter or guard-kit/SPEC.md §scan-prompts.
 
-## Done
+### step-title-cite-unresolved
 
-- rewrite-grant-redirect-read
-- guard-fix-lands-unreviewed
+a citation naming a numbered step by its bold title, in RELEASING.md's procedure or lifecycle-kit/templates/lead.md, resolves under no gate, since check-spec-pointer and check-citation-link resolve the heading alone, so a reworded title strands every citing site with the battery green; the deliverable is a title-resolution arm on check-spec-pointer or the cited steps made headings, owned by canon-kit/SPEC.md §check-spec-pointer.
+
+## Done
 
