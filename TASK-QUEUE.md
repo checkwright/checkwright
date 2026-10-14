@@ -8,6 +8,16 @@
 
 ## New Features
 
+### consumer-rule-word-read
+
+[spec: SPEC-consumer-word-read.md]
+
+a consumer rule command reads the command through `--guard-json view` alone, and no view gives it a word's value. This repo's three rules in `scripts/guard-rules.sh` match the `sq dq hd` view, so every quoted or escaped re-spelling of a row they block falls through: `'git' commit --no-verify -m x`, `git commit '-n' -m x`, `git 'clean' -fdx`, `ls '/tmp/claude-0/scratch'`. `scripts/guard-rules-variant-limits.tsv` declares the 19 pairs. The dequoted view is no fix, since it reads a quoted `-m` message naming the flag as the flag.
+
+**Deliverable:** a `--guard-json` verb printing the word read's values per segment (guard-kit/SPEC.md §Consumer rules), and this repo's three rules reading it, deleting their limit rows; a feature, since it adds a verb.
+
+**Cost while deferred:** this repo's hook-bypass block is evaded by one quoted word, and an adopter's own rule has the same hole with no read to close it. Filed 2026-10-13 by guard-grant-review-pass' build and promoted at its close. Re-verified there: `--run-guard-tests` is green under the 19 rows and derives 121 re-spellings. Owner lookup: `word read`, `guard-json`, `consumer rule` in this file and the disposed-findings record — [guard-rules-skeleton-word-read](#guard-rules-skeleton-word-read), DISTINCT (the generic rules' lift in the crate, where this is the read a consumer command is given); owner guard-kit/SPEC.md §Consumer rules.
+
 ## Technical Debt
 
 ### grant-redirect-scan-cr
@@ -40,7 +50,9 @@ most generic guard rules read the command word, an option or an operand off the 
 
 the crate suite's `cargo test --release` rebuilds the release binary without `bin/build-native.sh`'s path-remap flags, so the builder's cargo registry path is left in it. The next validate run's installer smoke stages that binary and reds on `check-tree-terms` until `bin/build-native.sh` is rerun. The smoke's staging step refuses a binary whose source stamp is stale (`native/src/emit/installer_smoke/staging.rs`) and reads nothing of the remap.
 
-**Deliverable:** one of three, spec's to choose: the crate suite built with the remap, the staging step refusing an unremapped binary with the rebuild steer it already prints for a stale one, or the smoke building through `bin/build-native.sh`.
+**Deliverable (form chosen at guard-word-read-release-pass' spec):** the staging step refusing an unremapped running binary at exit 2 with the rebuild steer it already prints for a stale one, by reading the binary's bytes against the tree's banned-pattern roster, `gate_msg_pattern_files`' set and the one `bin/build-native.sh` verifies its artifact against, so the remedy clears every refusal; installer/SPEC.md §The consumer smoke and gate-sdk/SPEC.md §check-gate-binary-fresh's sentence on the smoke's red say so. Not taken: the smoke building through `bin/build-native.sh`, against the same section's rule that the driver builds nothing; the crate suite built with the remap, since `scripts/evidence-config.knobs` execs its argv with no expansion, the remap has one holder, and `check-crate-arms`' `cargo test` over `GATE_SDK_CARGO_TARGET_DIR`, `native/target` by default, would stay a second unremapped producer.
+
+**Live at that spec:** this seat's release binary carried three cargo-home hits, so the refusal fires at the next validate unless `bin/build-native.sh` runs first.
 
 **Run at hook-placement-guard-rules-pass' close:** `cargo test --release --no-run` into a scratch target directory emitted the binary with the cargo-home path in it, and `bin/build-native.sh` left none. The validate roster runs the crate suite after the installer smoke, so each clean run leaves the binary unremapped for the next, which `check-gate-binary-fresh` reads current. **Met again at rewrite-grant-noclobber-pass' validate:** run 1 redded on three builder-home hits in the staged binary, and the run was clean after `bin/build-native.sh`.
 
@@ -543,16 +555,6 @@ the session-context hook member's scratch sweep removes scratch a live session s
 **Inferred, not run:** that the sweep is what removed both at guard-spelling-oracle-pass — read off its tidy line by that iteration's lead; age a scratch role marker past the horizon and start the member over it
 
 **Cost while deferred:** a resumed lead silently loses its executor-step suppression, and a survey witness cannot be re-run without rebuilding its input. Filed 2026-10-13 by guard-spelling-oracle-pass' lead and promoted at the next scope's intake. Re-verified there by reading `sweep_dir`. Owner lookup: `scratch sweep`, `role marker`, `STALE_SECS` in this file and the disposed-findings record — [session-sweep-horizon-baked](#session-sweep-horizon-baked), DISTINCT (the horizon's value, where this is what the sweep spares at any horizon); owner context-kit/SPEC.md §The session-context hook.
-
-### consumer-rule-word-read
-
-[cost: event/low] [surface: guard-kit]
-
-a consumer rule command reads the command through `--guard-json view` alone, and no view gives it a word's value. This repo's three rules in `scripts/guard-rules.sh` match the `sq dq hd` view, so every quoted or escaped re-spelling of a row they block falls through: `'git' commit --no-verify -m x`, `git commit '-n' -m x`, `git 'clean' -fdx`, `ls '/tmp/claude-0/scratch'`. `scripts/guard-rules-variant-limits.tsv` declares the 19 pairs. The dequoted view is no fix, since it reads a quoted `-m` message naming the flag as the flag.
-
-**Deliverable:** a `--guard-json` verb printing the word read's values per segment (guard-kit/SPEC.md §Consumer rules), and this repo's three rules reading it, deleting their limit rows; a feature, since it adds a verb.
-
-**Cost while deferred:** this repo's hook-bypass block is evaded by one quoted word, and an adopter's own rule has the same hole with no read to close it. Filed 2026-10-13 by guard-grant-review-pass' build and promoted at its close. Re-verified there: `--run-guard-tests` is green under the 19 rows and derives 121 re-spellings. Owner lookup: `word read`, `guard-json`, `consumer rule` in this file and the disposed-findings record — [guard-rules-skeleton-word-read](#guard-rules-skeleton-word-read), DISTINCT (the generic rules' lift in the crate, where this is the read a consumer command is given); owner guard-kit/SPEC.md §Consumer rules.
 
 ### set-record-lost-at-done-move
 
