@@ -11,12 +11,3 @@ fallthrough	scratch_redirect	ps-tick-arg
 fallthrough	script_interpreter	ps-dq-arg
 fallthrough	script_interpreter	ps-sq-arg
 fallthrough	script_interpreter	ps-tick-lead
-fallthrough	sed_file	dq-arg
-fallthrough	sed_file	dq-lead
-fallthrough	sed_file	esc-arg
-fallthrough	sed_file	esc-lead
-fallthrough	sed_file	part-arg
-fallthrough	sed_file	part-lead
-fallthrough	sed_file	sq-arg
-fallthrough	sed_file	sq-lead
-fallthrough	sed_file	wrap-command

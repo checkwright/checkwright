@@ -169,6 +169,11 @@ block	sed -i 's/a/b/' notes.md
 block	sed -'n' '1,60p' TASK-QUEUE.md
 block	sed '-n' '1,60p' TASK-QUEUE.md
 block	sed -'i' 's/a/b/' notes.md
+#          under bash the tool and its words come through the command read: by value, by path and
+#          past a wrapper other than xargs, in a pipe member as at a statement's head
+block	\perl -'pi' -e 's/a/b/' notes.md
+block	grep -n x tracked.md | command sed \-n '5,10p'
+block	nohup \awk 'NR<=5' notes.txt
 fallthrough	sed -'l' 5 '1,60p' TASK-QUEUE.md
 allow	sed -E 's/a/b/'
 allow	grep foo file | sed -e s/a/b/

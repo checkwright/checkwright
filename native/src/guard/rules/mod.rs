@@ -210,6 +210,26 @@ fn past_wrappers(ctx: &Ctx, passed: Vec<Word>) -> Vec<Word> {
     passed.into_iter().skip(values.len() - kept).collect()
 }
 
+// spec: guard-kit/SPEC.md §The generic ruleset — each statement's pipe members of a skeleton, each as
+// its compound-split segment index, taken in order; `None` where the two splits yield different counts.
+fn pipe_members(ctx: &Ctx, s: &str) -> Option<Vec<Vec<(usize, String)>>> {
+    let mut at = 0usize;
+    let members: Vec<Vec<(usize, String)>> = ctx
+        .statements(s)
+        .iter()
+        .map(|stmt| {
+            ctx.pipes(stmt)
+                .into_iter()
+                .map(|p| {
+                    at += 1;
+                    (at - 1, p)
+                })
+                .collect()
+        })
+        .collect();
+    (at == ctx.segments(s).len()).then_some(members)
+}
+
 // spec: guard-kit/SPEC.md §The reader and its views — a command word names `name` by its value or by
 // the value's last path component.
 fn names_command(w: &Word, name: &str) -> bool {
