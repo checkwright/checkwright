@@ -17,7 +17,7 @@ const BOTH: &[Shell] = &[Shell::Bash, Shell::PowerShell];
 use View::{Dequoted, Hdq, Raw, Sq, SqDqHd, SqDqHdq, SqHdq};
 
 pub static TABLE: &[Rule] = &[
-    Rule { name: "cd_compound", shells: BOTH, views: &[SqDqHd], test: spelling::cd_compound },
+    Rule { name: "cd_compound", shells: BOTH, views: &[Raw, SqDqHd, Dequoted], test: spelling::cd_compound },
     Rule { name: "git_c_root", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: spelling::git_c_root },
     Rule { name: "scratch_redirect", shells: BOTH, views: &[SqDqHd], test: spelling::scratch_redirect },
     Rule { name: "abs_script", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: spelling::abs_script },

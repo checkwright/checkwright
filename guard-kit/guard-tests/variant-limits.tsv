@@ -25,12 +25,7 @@ fallthrough	cat_file	esc-lead
 fallthrough	cat_file	part-lead
 fallthrough	cat_file	sq-lead
 fallthrough	cat_file	wrap-command
-fallthrough	cd_compound	dq-lead
-fallthrough	cd_compound	esc-lead
-fallthrough	cd_compound	part-lead
 fallthrough	cd_compound	ps-tick-lead
-fallthrough	cd_compound	sq-lead
-fallthrough	cd_compound	wrap-command
 fallthrough	emitter_write	dq-lead
 fallthrough	emitter_write	esc-lead
 fallthrough	emitter_write	part-lead

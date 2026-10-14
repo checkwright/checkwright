@@ -1,7 +1,7 @@
 // spec: guard-kit/SPEC.md §The generic ruleset — the spelling rules: a command form the matcher cannot
 // resolve, steered to the one it can.
 use super::grants::rewrite_granted;
-use super::{command_word, git_read, git_walk_of, GitWalk};
+use super::{command_read, command_word, git_read, git_walk_of, names_command, GitWalk};
 use crate::guard::engine::{Cmd, Ctx, Decided, Shell, Verdict};
 use crate::guard::host::{knob_scalar_value, same_file};
 use crate::guard::reader::View::{SqDqHd, SqDqHdq, SqHdq};
@@ -30,7 +30,11 @@ pub fn cd_compound(ctx: &Ctx) -> Decided {
         }
         return Ok(None);
     }
-    if grep_q("(^|[;&|(])[[:space:]]*cd[[:space:]]", &cmd) && grep_q("[;&|]", &cmd) {
+    if !grep_q("[;&|]", &cmd) {
+        return Ok(None);
+    }
+    let named = command_read(ctx, ctx.cmd())?.iter().any(|ws| ws.first().is_some_and(|w| names_command(w, "cd")));
+    if named || grep_q("(^|[;&|(])[[:space:]]*cd[[:space:]]", &cmd) {
         return block("don't use 'cd' in a compound command (cwd drift, and the allowlist can't match the compound — the call costs an out-of-band permission decision). Pass absolute paths, or 'git -C <dir>' for git.");
     }
     Ok(None)

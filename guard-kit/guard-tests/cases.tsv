@@ -7,6 +7,9 @@
 # rule `cd_compound` — cd in a compound command
 block	cd deploy && ls
 fallthrough	cd deploy
+# under bash the command word comes through the command read: by value, by path and past a wrapper
+block	ls && \cd deploy
+block	ls; FOO=1 cd deploy
 
 # rule `git_c_root` — a prefix spelling that falls off the match path: (a) git -C <repo-root>
 #          when cwd is the root, (b) a git -c config override among git's global
