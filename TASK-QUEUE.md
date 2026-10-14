@@ -8,16 +8,6 @@
 
 ## New Features
 
-### consumer-rule-word-read
-
-[spec: SPEC-consumer-word-read.md]
-
-a consumer rule command reads the command through `--guard-json view` alone, and no view gives it a word's value. This repo's three rules in `scripts/guard-rules.sh` match the `sq dq hd` view, so every quoted or escaped re-spelling of a row they block falls through: `'git' commit --no-verify -m x`, `git commit '-n' -m x`, `git 'clean' -fdx`, `ls '/tmp/claude-0/scratch'`. `scripts/guard-rules-variant-limits.tsv` declares the 19 pairs. The dequoted view is no fix, since it reads a quoted `-m` message naming the flag as the flag.
-
-**Deliverable:** a `--guard-json` verb printing the word read's values per segment (guard-kit/SPEC.md §Consumer rules), and this repo's three rules reading it, deleting their limit rows; a feature, since it adds a verb.
-
-**Cost while deferred:** this repo's hook-bypass block is evaded by one quoted word, and an adopter's own rule has the same hole with no read to close it. Filed 2026-10-13 by guard-grant-review-pass' build and promoted at its close. Re-verified there: `--run-guard-tests` is green under the 19 rows and derives 121 re-spellings. Owner lookup: `word read`, `guard-json`, `consumer rule` in this file and the disposed-findings record — `guard-rules-skeleton-word-read`, DISTINCT (the generic rules' lift in the crate, where this is the read a consumer command is given); owner guard-kit/SPEC.md §Consumer rules.
-
 ## Technical Debt
 
 ### unremapped-rebuild-reds-smoke
@@ -44,7 +34,7 @@ the wakeup-guard's log stamp is built in process on unix and spawns `date` off i
 
 **Push need (2026-10-14, inside the budget):** one mid-iteration push, since its `crate-tests-windows` case executes on the remote Windows leg before any local run can; the operator accepted the set's two against the budget of one to two.
 
-**Unit set (2026-10-14, operator direction, lead-relayed, not a ruling)**, recorded on this entry as the one likeliest to land last: `grant-redirect-scan-cr` leads, with this slice, [unremapped-rebuild-reds-smoke](#unremapped-rebuild-reds-smoke), [wakeup-stamp-windows-spawn](#wakeup-stamp-windows-spawn) and the feature [consumer-rule-word-read](#consumer-rule-word-read), which spec authors. Composition: bundled on guard-kit's word read and redirect scan, the installer smoke riding as a threshold entry; drain 5 against inflow 3.2. Push need: 2 against one to two, the closing push and wakeup-stamp-windows-spawn's.
+**Unit set (2026-10-14, operator direction, lead-relayed, not a ruling)**, recorded on this entry as the one likeliest to land last: `grant-redirect-scan-cr` leads, with this slice, [unremapped-rebuild-reds-smoke](#unremapped-rebuild-reds-smoke), [wakeup-stamp-windows-spawn](#wakeup-stamp-windows-spawn) and the feature `consumer-rule-word-read`, which spec authors. Composition: bundled on guard-kit's word read and redirect scan, the installer smoke riding as a threshold entry; drain 5 against inflow 3.2. Push need: 2 against one to two, the closing push and wakeup-stamp-windows-spawn's.
 
 **Unit-set record moved here (2026-10-14, lead decision, not a ruling)** verbatim from `guard-rules-skeleton-word-read` at its Done move in guard-word-read-release-pass' build, since this entry's batch lands last; the "this slice" above names that entry, and the record stays live between this entry and [unremapped-rebuild-reds-smoke](#unremapped-rebuild-reds-smoke) until close.
 
@@ -1258,4 +1248,5 @@ a citation naming a numbered step by its bold title, in RELEASING.md's procedure
 
 - grant-redirect-scan-cr
 - guard-rules-skeleton-word-read
+- consumer-rule-word-read
 

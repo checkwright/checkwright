@@ -9,13 +9,17 @@ block	git commit --no-verify -m x
 block	git commit -n -m x
 fallthrough	git commit -m 'drop --no-verify from the docs'
 fallthrough	git commit -m x
+block	git commit --no-verify -F - <<'MSG'@NL@x@NL@MSG
+fallthrough	git commit -m x; echo --no-verify
 
 # rule `session_scratchpad` — the harness's per-session temporary path
 block	ls /tmp/claude-0/scratch
 fallthrough	ls .tmp/scratch
+block	git commit -m 'see /tmp/claude-0'
 
 # rule `git_clean_ignored` — git clean over gitignored state
 block	git clean -fdx
 block	git clean -X -n
 fallthrough	git clean -fd
+fallthrough	git clean -fd; ls -x
 fallthrough	git commit -F - <<'MSG'@NL@never run git clean -x here@NL@MSG

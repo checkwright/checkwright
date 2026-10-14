@@ -13,24 +13,98 @@ block() {
     exit 2
 }
 
-# spec: guard-kit/SPEC.md §Consumer rules — every rule matches the 'sq dq hd' view: none tests for an expansion, and a heredoc body naming a bypass flag or a scratchpad path is prose, not the executable command
-cmd="$("$bin" --guard-json view sq dq hd)" || {
-    printf 'guard-rules: cannot read the command view through %s\n' "$bin" >&2
+# spec: CLAUDE.md §This repo is governed by its own kits — a hook bypass is a one-off with cause, so it must stay visible: the allowlisted 'git commit -m *' glob would otherwise auto-allow a trailing bypass flag
+msg_bypass="a hook bypass (--no-verify/-n) is a one-off with cause, never auto-allowed — fix the red gate instead, or run the bypass yourself with !<command> so the cause is on record."
+# spec: CLAUDE.md §Housekeeping — .tmp/ is this repo's disposable scratch; the harness's per-session /tmp scratchpad leaks session work outside it, so the path prefix is blocked. Prefix-only match: kit mechanism legitimately uses TMPDIR (the hermetic bootstrap).
+msg_scratchpad="the harness per-session scratchpad (/tmp/claude-...) is not this repo's scratch home — use repo-local .tmp/ instead (CLAUDE.md §Housekeeping): it survives crashes in-tree and is wiped at the scope boundary. If you genuinely need the harness path, run it yourself with !<command>."
+# spec: CLAUDE.md §Housekeeping — .metric/ is gitignored persistent measurement trends and .tmp/ crash-recovery scratch; git clean -x/-X wipes both, so steer to the !<command> escape rather than let the destructive form auto-run
+msg_clean="git clean -x/-X wipes gitignored state — the irreplaceable measurement trends under .metric/ and crash-recovery resume journals under .tmp/. If you mean to discard them, run it yourself with !<command> so the intent is on record."
+
+# spec: guard-kit/SPEC.md §Consumer rules — every rule compares the command's word values per segment, as the shell passes them; where no word read answers (a heredoc-bearing command), it matches the 'sq dq hd' view, which none of the rules tests an expansion in and which keeps a heredoc body inert
+payload="$(cat)"
+words="$(printf '%s' "$payload" | "$bin" --guard-json words)" || {
+    printf 'guard-rules: cannot read the command words through %s\n' "$bin" >&2
     exit 1
 }
 
-# spec: CLAUDE.md §This repo is governed by its own kits — a hook bypass is a one-off with cause, so it must stay visible: the allowlisted 'git commit -m *' glob would otherwise auto-allow a trailing bypass flag
-case " $cmd " in
-    *" git commit "*"--no-verify"*|*" git commit -n "*)
-        block "a hook bypass (--no-verify/-n) is a one-off with cause, never auto-allowed — fix the red gate instead, or run the bypass yourself with !<command> so the cause is on record."
-        ;;
-esac
-# spec: CLAUDE.md §Housekeeping — .tmp/ is this repo's disposable scratch; the harness's per-session /tmp scratchpad leaks session work outside it, so the path prefix is blocked. Prefix-only match: kit mechanism legitimately uses TMPDIR (the hermetic bootstrap).
-if [[ "$cmd" == *"/tmp/claude-"* ]]; then
-    block "the harness per-session scratchpad (/tmp/claude-...) is not this repo's scratch home — use repo-local .tmp/ instead (CLAUDE.md §Housekeeping): it survives crashes in-tree and is wiped at the scope boundary. If you genuinely need the harness path, run it yourself with !<command>."
+if [[ -z "$words" ]]; then
+    cmd="$(printf '%s' "$payload" | "$bin" --guard-json view sq dq hd)" || {
+        printf 'guard-rules: cannot read the command view through %s\n' "$bin" >&2
+        exit 1
+    }
+    case " $cmd " in
+        *" git commit "*"--no-verify"*|*" git commit -n "*) block "$msg_bypass" ;;
+    esac
+    [[ "$cmd" == *"/tmp/claude-"* ]] && block "$msg_scratchpad"
+    if [[ " $cmd " == *" git clean "* && " $cmd " =~ [[:space:]]-[A-Za-z]*[xX] ]]; then
+        block "$msg_clean"
+    fi
+    exit 0
 fi
-# spec: CLAUDE.md §Housekeeping — .metric/ is gitignored persistent measurement trends and .tmp/ crash-recovery scratch; git clean -x/-X wipes both, so steer to the !<command> escape rather than let the destructive form auto-run
-if [[ " $cmd " == *" git clean "* && " $cmd " =~ [[:space:]]-[A-Za-z]*[xX] ]]; then
-    block "git clean -x/-X wipes gitignored state — the irreplaceable measurement trends under .metric/ and crash-recovery resume journals under .tmp/. If you mean to discard them, run it yourself with !<command> so the intent is on record."
-fi
+
+split_line() {
+    local rest="$1"
+    w=()
+    while :; do
+        w+=("${rest%%$'\t'*}")
+        [[ "$rest" == *$'\t'* ]] || break
+        rest="${rest#*$'\t'}"
+    done
+}
+
+word_pair_from() {
+    local i
+    for ((i = 0; i + 1 < ${#w[@]}; i++)); do
+        if [[ "${w[i]}" == "$1" && "${w[i + 1]}" == "$2" ]]; then
+            printf '%d' $((i + 2))
+            return 0
+        fi
+    done
+    return 1
+}
+
+rule_bypass() {
+    local from j
+    from="$(word_pair_from git commit)" || return 1
+    [[ "${w[from]-}" == "-n" ]] && return 0
+    for ((j = from; j < ${#w[@]}; j++)); do
+        [[ "${w[j]}" == "--no-verify" ]] && return 0
+    done
+    return 1
+}
+
+rule_scratchpad() {
+    local x
+    for x in "${w[@]}"; do
+        [[ "$x" == *"/tmp/claude-"* ]] && return 0
+    done
+    return 1
+}
+
+rule_clean() {
+    local from j
+    from="$(word_pair_from git clean)" || return 1
+    for ((j = from; j < ${#w[@]}; j++)); do
+        [[ "${w[j]}" =~ ^-[A-Za-z]*[xX] ]] && return 0
+    done
+    return 1
+}
+
+segments=()
+while IFS= read -r line; do
+    segments+=("$line")
+done <<<"$words"
+
+for rule in bypass scratchpad clean; do
+    for line in "${segments[@]}"; do
+        split_line "$line"
+        if "rule_$rule"; then
+            case "$rule" in
+                bypass) block "$msg_bypass" ;;
+                scratchpad) block "$msg_scratchpad" ;;
+                clean) block "$msg_clean" ;;
+            esac
+        fi
+    done
+done
 exit 0
