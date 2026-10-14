@@ -744,7 +744,7 @@ fn nulled_by_value(ctx: &Ctx, c: &Cmd, n: usize) -> Result<bool, Fault> {
 // spec: guard-kit/SPEC.md §The rule roster — each output redirect's target by its value, an fd-dup
 // dropped; `None` where a target is cut inside a piece, a word carries a second operator after its
 // first, or an operator has no word after it.
-fn redirect_values(read: &[Vec<Word>]) -> Option<Vec<String>> {
+pub(super) fn redirect_values(read: &[Vec<Word>]) -> Option<Vec<String>> {
     let mut out = Vec::new();
     for ws in read {
         let mut k = 0usize;

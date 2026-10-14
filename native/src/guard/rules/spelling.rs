@@ -1,6 +1,6 @@
 // spec: guard-kit/SPEC.md §The generic ruleset — the spelling rules: a command form the matcher cannot
 // resolve, steered to the one it can.
-use super::grants::rewrite_granted;
+use super::grants::{redirect_values, rewrite_granted};
 use super::{command_read, command_word, git_read, git_walk_of, names_command, GitWalk};
 use crate::guard::engine::{Cmd, Ctx, Decided, Shell, Verdict};
 use crate::guard::host::{knob_scalar_value, same_file};
@@ -152,10 +152,10 @@ fn knob_echo(raw: &str, seg: &str) -> Option<Verdict> {
 pub fn scratch_redirect(ctx: &Ctx) -> Decided {
     let cmd = ctx.view(ctx.cmd(), SqDqHd)?;
     let bare = match ctx.shell() {
-        Shell::Bash => grep_q(
-            "(^|[[:space:]])([0-9]*|&)>[>&]?[[:space:]]*[^[:space:]/|&]+\\.(err|out|log)([[:space:]]|$)",
-            &cmd,
-        ),
+        Shell::Bash => {
+            grep_q("(^|[[:space:]])([0-9]*|&)>[>&]?[[:space:]]*[^[:space:]/|&]+\\.(err|out|log)([[:space:]]|$)", &cmd)
+                || ctx.word_read(ctx.cmd())?.and_then(|r| redirect_values(&r)).is_some_and(|ts| ts.iter().any(|t| scratch_name(t)))
+        }
         // spec: guard-kit/SPEC.md §The generic ruleset — PowerShell's `*` stream operator, and a `\`
         // in the target a path separator.
         Shell::PowerShell => grep_q(
@@ -167,6 +167,12 @@ pub fn scratch_redirect(ctx: &Ctx) -> Decided {
         return block(format!("don't redirect scratch to a bare repo-root filename (e.g. 2> op.err) — it pollutes cwd and risks a 'git add -A'. Send it to a gitignored scratch dir (e.g. {}/<name>.err).", ctx.host().first_scratch()));
     }
     Ok(None)
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — rule `scratch_redirect`'s bare name, read by value: no
+// `/`, and a name ahead of an `.err`, `.out` or `.log` suffix.
+fn scratch_name(t: &str) -> bool {
+    !t.contains('/') && [".err", ".out", ".log"].iter().any(|s| t.len() > s.len() && t.ends_with(s))
 }
 
 pub fn abs_script(ctx: &Ctx) -> Decided {

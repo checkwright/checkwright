@@ -47,6 +47,11 @@ block	some-runner >& op.err
 block	some-runner >&op.log
 fallthrough	some-runner >& .tmp/op.err
 fallthrough	some-runner > .tmp/op.err 2>&1
+# under bash a target is also read by its value, so a quoted or glued one is the plain name, and a
+# carriage return is a character of it
+block	some-runner 2>'op.err'
+block	some-runner > op@CR@.log
+fallthrough	some-runner 2> '.tmp/op.err'
 
 # rule `abs_script` — absolute-path read-only repo script (rewrite) vs other script (block).
 #          The rewrite emits allow, so it attaches only when the rewritten command

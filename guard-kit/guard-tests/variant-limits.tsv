@@ -51,12 +51,9 @@ fallthrough	ro_pipeline	part-lead
 fallthrough	ro_pipeline	sq-arg
 fallthrough	ro_pipeline	sq-lead
 fallthrough	ro_pipeline	wrap-command
-fallthrough	scratch_redirect	dq-arg
-fallthrough	scratch_redirect	part-arg
 fallthrough	scratch_redirect	ps-dq-arg
 fallthrough	scratch_redirect	ps-sq-arg
 fallthrough	scratch_redirect	ps-tick-arg
-fallthrough	scratch_redirect	sq-arg
 fallthrough	script_interpreter	ps-dq-arg
 fallthrough	script_interpreter	ps-sq-arg
 fallthrough	script_interpreter	ps-tick-lead
