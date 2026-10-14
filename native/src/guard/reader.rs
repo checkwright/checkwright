@@ -91,6 +91,13 @@ impl Word {
         }
         self.seams.iter().rev().find(|&&(live, _)| live == at).and_then(|&(_, value)| self.value.get(..value))
     }
+
+    // spec: guard-kit/SPEC.md §The reader and its views — the value of what a word holds from the
+    // live offset `at` on; `None` where `at` falls inside a piece.
+    pub fn value_after(&self, at: usize) -> Option<&str> {
+        let before = self.value_before(at)?;
+        self.value.get(before.len()..)
+    }
 }
 
 // spec: guard-kit/SPEC.md §The reader and its views — the word read's accumulator: a reader feeds it

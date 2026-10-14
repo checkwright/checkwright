@@ -58,6 +58,16 @@ block	@ROOT@/scripts/check-env.sh --list>tracked.md
 block	@ROOT@/scripts/check-env.sh --list > .tmp/out.txt
 rewrite	@ROOT@/scripts/check-env.sh --list 2>&1
 rewrite	@ROOT@/scripts/check-env.sh --list >/dev/null
+#          a target is read by its value, so a quoted or escaped /dev/null is the device, and a quoted
+#          name that only opens with it, or a quoted file, is still a file
+rewrite	@ROOT@/scripts/check-env.sh --list >"/dev/null"
+rewrite	@ROOT@/scripts/check-env.sh --list 2>'/dev/null'
+rewrite	@ROOT@/scripts/check-env.sh --list > /dev/"null" 2>&1
+rewrite	@ROOT@/scripts/check-env.sh --list >\/dev/null
+block	@ROOT@/scripts/check-env.sh --list >"/dev/null x"
+block	@ROOT@/scripts/check-env.sh --list >'/dev/nullified.md'
+block	@ROOT@/scripts/check-env.sh --list >"tracked.md"
+block	@ROOT@/scripts/check-env.sh --list >"/dev/null">tracked.md
 #          the noclobber operator truncates the word after it, which the split reads as a granted
 #          second segment: spaced, glued and under a descriptor, the grant is withheld
 block	@ROOT@/scripts/check-env.sh --list >| scripts/check-env.sh --list

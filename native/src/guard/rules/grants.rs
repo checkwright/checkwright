@@ -2,7 +2,7 @@
 // allow is given only where every clause of its test holds, and every other failure declines.
 use super::reach::{interpreter_reach, refused, rm_tracked_reach};
 use super::{
-    has_substitution, inert_target, is_banner, is_bare_allow, is_ro_segment, is_ro_xargs, noclobber,
+    fd_word, has_substitution, inert_target, is_banner, is_bare_allow, is_ro_segment, is_ro_xargs, noclobber,
     redirect_targets, ro_forms_clear, ro_forms_clear_except, ro_forms_kit, segment_core,
     shell_backgrounds, strip_redirect_op, unredirected_words, xargs_command_index,
 };
@@ -10,7 +10,7 @@ use crate::guard::allow_match;
 use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Verdict};
 use crate::guard::host::{self, Host};
 use crate::guard::reader::View::{Hdq, SqDqHd, SqHdq};
-use crate::guard::reader::HD_MARK;
+use crate::guard::reader::{Word, HD_MARK};
 use crate::guard::text::{self, grep_q, head_word, trim, trim_start, unsentinel, words};
 use crate::walk;
 
@@ -732,6 +732,54 @@ fn slot_capture(sv: &str, off: usize, len: usize, token: &str, start: bool, righ
     None
 }
 
+// spec: guard-kit/SPEC.md §The rule roster — rule `abs_script`'s redirect test by value: every target
+// the skeleton scan found, `n` of them, is `/dev/null` as the shell passes it.
+fn nulled_by_value(ctx: &Ctx, c: &Cmd, n: usize) -> Result<bool, Fault> {
+    let Some(read) = ctx.word_read(c)? else { return Ok(false) };
+    Ok(redirect_values(&read).is_some_and(|ts| ts.len() == n && ts.iter().all(|t| t == "/dev/null")))
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — each output redirect's target by its value, an fd-dup
+// dropped; `None` where a target is cut inside a piece, a word carries a second operator after its
+// first, or an operator has no word after it.
+fn redirect_values(read: &[Vec<Word>]) -> Option<Vec<String>> {
+    let mut out = Vec::new();
+    for ws in read {
+        let mut k = 0usize;
+        while k < ws.len() {
+            let w = &ws[k];
+            k += 1;
+            let Some(at) = bare_operator(&w.live, 0, &['>']) else { continue };
+            let more = w.live[at + 1..].chars().next().filter(|c| matches!(c, '>' | '&'));
+            let end = at + 1 + more.map_or(0, char::len_utf8);
+            if bare_operator(&w.live, end, &['>', '<']).is_some() {
+                return None;
+            }
+            let value = if end == w.live.len() {
+                k += 1;
+                ws.get(k - 1)?.value.clone()
+            } else {
+                w.value_after(end)?.to_string()
+            };
+            if !(more == Some('&') && fd_word(&value)) {
+                out.push(value);
+            }
+        }
+    }
+    Some(out)
+}
+
+// spec: guard-kit/SPEC.md §The reader and its views — the first character of `set` at or after `from`
+// standing bare in a word's live text, not behind an escaping backslash.
+fn bare_operator(live: &str, from: usize, set: &[char]) -> Option<usize> {
+    let mut held = false;
+    live.char_indices().find(|&(i, ch)| {
+        let bare = !std::mem::take(&mut held);
+        held = bare && ch == '\\';
+        bare && i >= from && set.contains(&ch)
+    }).map(|(i, _)| i)
+}
+
 // spec: guard-kit/SPEC.md §The generic ruleset — the grant test on a rewritten command, rule
 // `worktree_confinement`'s predicate first: no redirect names a file, every segment matches a
 // committed allow pattern and rule `grant_path_slot`'s test finds no reach and can decide.
@@ -744,7 +792,11 @@ pub fn rewrite_granted(ctx: &Ctx, c: &Cmd) -> Result<bool, Fault> {
         return Ok(false);
     }
     let skel = ctx.view(c, SqDqHd)?;
-    if noclobber(&skel) || redirect_targets(&skel).iter().any(|t| !inert_target(t)) {
+    if noclobber(&skel) {
+        return Ok(false);
+    }
+    let files = redirect_targets(&skel);
+    if files.iter().any(|t| !inert_target(t)) && !nulled_by_value(ctx, c, files.len())? {
         return Ok(false);
     }
     let Some(v) = ctx.dequoted(c)? else { return Ok(false) };
@@ -819,6 +871,36 @@ mod tests {
 
     fn strings(ws: &[&str]) -> Vec<String> {
         ws.iter().map(|w| w.to_string()).collect()
+    }
+
+    // spec: guard-kit/SPEC.md §The rule roster — rule `abs_script`'s redirect test by value
+    #[test]
+    fn a_redirect_target_is_read_by_its_value_and_an_fd_dup_drops_out() {
+        use crate::guard::reader::WordAcc;
+        let pieced = |pieces: &[(&str, &str, &str)]| {
+            let mut acc = WordAcc::new();
+            for (s, v, l) in pieces {
+                acc.piece(s.as_bytes(), v.as_bytes(), l.as_bytes());
+            }
+            acc.finish().remove(0).remove(0)
+        };
+        let plain = |w: &str| Word::new(w, w, w);
+        let values = |ws: Vec<Word>| redirect_values(&[ws]);
+        let dq_null = pieced(&[(">", ">", ">"), ("\"/dev/null\"", "/dev/null", "\0DQ")]);
+        let sq_null = pieced(&[("2", "2", "2"), (">", ">", ">"), ("'/dev/null'", "/dev/null", "\0SQ")]);
+        assert_eq!(values(vec![plain("x"), dq_null.clone(), sq_null]), Some(strings(&["/dev/null", "/dev/null"])));
+        let part = pieced(&[("/dev/", "/dev/", "/dev/"), ("\"null\"", "null", "\0DQ")]);
+        assert_eq!(values(vec![plain("x"), plain(">"), part, plain("2>&1"), plain(">&"), plain("2"), plain(">&-")]), Some(strings(&["/dev/null"])));
+        let esc = pieced(&[(">", ">", ">"), ("\\/", "/", "\\/"), ("dev/null", "dev/null", "dev/null")]);
+        assert_eq!(values(vec![plain("x"), esc, plain(">>out"), plain("&>both"), plain("<>rw"), plain(">&"), plain("f")]), Some(strings(&["/dev/null", "out", "both", "rw", "f"])));
+        let second = pieced(&[(">", ">", ">"), ("\"/dev/null\"", "/dev/null", "\0DQ"), (">tracked.md", ">tracked.md", ">tracked.md")]);
+        assert_eq!(values(vec![plain("x"), second]), None, "a second operator in the word");
+        assert_eq!(values(vec![plain("x"), plain(">")]), None, "an operator with no word after it");
+        let quoted = Word::new("'>'", ">", "\0SQ");
+        let escaped = Word::new("\\>", ">", "\\>");
+        assert_eq!(values(vec![plain("x"), quoted, escaped, plain("y")]), Some(Vec::new()), "a quoted or escaped '>' is text");
+        assert_eq!(dq_null.value_after(1), Some("/dev/null"));
+        assert_eq!(dq_null.value_after(2), None, "a cut inside a piece");
     }
 
     // spec: guard-kit/SPEC.md §The generic ruleset — the bounds test's clause (a)
