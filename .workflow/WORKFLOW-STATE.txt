@@ -5,3 +5,4 @@
 ---
 
 guard-word-read-release-pass scope aeea4942 2026-10-14 e7328862e
+guard-word-read-release-pass spec a908e36f 2026-10-14 42151af15
