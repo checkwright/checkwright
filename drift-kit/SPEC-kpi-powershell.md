@@ -10,7 +10,7 @@ The entry left the dispatch shape open and said `custom-gate-substrates`' ruling
 
 ### (1) A tier dir resolves a PowerShell plugin {design-bearing} {user-facing: windows-kpi-plugin-start's Deliverable, "a plugin dispatch a native-Windows consumer can meet", operator direction lead-relayed when it was filed}
 
-Replacement for §The extensibility contract's tier list and the paragraph after it. **Not yet applied.**
+Replacement for §The extensibility contract's tier list and the two paragraphs after it, the shadowing paragraph and the one beginning *A tier-1 or tier-2 hit is **executed directly***. **Not yet applied.**
 
 > 1. each entry of `DRIFT_KIT_KPI_DIRS` — the adopter's own dirs, default the consumer gates dir — for a file named `<name>.sh`, then `<name>.ps1`;
 > 2. each vendored kit's `kpis/<name>.sh`, then `kpis/<name>.ps1`;
@@ -26,9 +26,9 @@ Replacement for §The KPI plugin contract's first sentence. **Not yet applied.**
 
 The modes, the exported environment and the scratch rule are unchanged, and a PowerShell plugin receives the same environment.
 
-Replacement for `drift-kit/README.md`'s KPI paragraph, its first two sentences. **Not yet applied.**
+Replacement for `drift-kit/README.md`'s KPI paragraph, its first three sentences. **Not yet applied.**
 
-> A KPI plugin is `kpi-<name>.sh`, or `kpi-<name>.ps1` started by the PowerShell host `GATE_SDK_POWERSHELL` names, resolved through `kpis.list` against your KPI dirs, then each vendored kit's `kpis/`, then the binary's built-in members — three tiers, consumer-first. Add your own by dropping a plugin in your gates dir and naming it in the registry; on native Windows, write it in PowerShell. Shadow a bundled one with a same-named file.
+> A KPI plugin is `kpi-<name>.sh`, or `kpi-<name>.ps1` started by the PowerShell host `GATE_SDK_POWERSHELL` names, resolved through `kpis.list` against your KPI dirs, then each vendored kit's `kpis/`, then the binary's built-in members — three tiers, consumer-first. Add your own by dropping a plugin in your gates dir and naming it in the registry; on native Windows, write it in PowerShell. Shadow a bundled one with a same-named file. A `.sh` plugin is executed directly, and either kind reads the exported `DRIFT_KIT_*` environment, both unchanged by the bundled set moving in-crate.
 
 ### (2) The plugin start calls gate-sdk's PowerShell helper {mechanical}
 

@@ -42,7 +42,7 @@ A new section of gate-sdk/SPEC.md, placed after §The extensibility model. It re
 >
 > **Which host, if any, is the consumer's selection, with off among its values** (doctrine-kit/DOCTRINE.md, Policy-as-choice). `GATE_SDK_POWERSHELL` is empty, `pwsh` or `powershell`, by name or as a path whose final component is one of the two. Windows PowerShell 5.1 is on every Windows host and `pwsh` is the cross-platform one, so a team spanning both sets the tracked value its members share and a seat overrides it in its local overlay. The same knob starts a drift-kit KPI plugin written in PowerShell (drift-kit/SPEC.md §The extensibility contract), so one value arms PowerShell for the consumer.
 
-Replacement for §The extensibility model's opening line and its first paragraph. **Not yet applied.**
+Replacement for §The extensibility model's opening line, its first paragraph, and the last sentence of its paragraph **Native plugins are refused**, *The neutral authoring surface a plugin ABI would foreclose is a gate-authoring SDK's to design, and refusing the ABI keeps it open.*, which becomes *The neutral authoring surface a plugin ABI would foreclose is §The gate-authoring surface's, and refusing the ABI keeps it open.* **Not yet applied.**
 
 > How a consumer extends the battery: four shapes, two kept and two refused, each with its ground.
 >
@@ -58,7 +58,7 @@ Replacement for §The extensibility model's opening line and its first paragraph
 - **`native/src/substrate.rs`**, a new module, owns the PowerShell target class. It holds the extension test, the host argument list and the host resolution, and `registry::invocation` and drift-kit's plugin start (drift-kit/SPEC-kpi-powershell.md) both call it. `emit/scratch_run.rs` takes the argument list and the extension test from it, and keeps its own knob and refusal order (delta 11).
 - **The knob.** `GATE_SDK_POWERSHELL`, a scalar row in gate-sdk's table, default empty, validated empty or with a final component of `pwsh` or `powershell`. The validator is the one `GUARD_KIT_SCRATCH_POWERSHELL` uses today, moved to `substrate.rs`, so the two knobs accept the same set.
 
-Replacement for §Layout and configuration's knob list: one row added beside `GATE_SDK_LINT_EXTRA_DIRS`. **Not yet applied.**
+Replacement for §Layout and configuration's knob list: two rows added beside `GATE_SDK_LINT_EXTRA_DIRS`, the second being delta 6's. **Not yet applied.**
 
 > - `GATE_SDK_POWERSHELL` — the PowerShell host that starts a gate's `# exec:` target and a PowerShell KPI plugin: empty (off, the default), `pwsh` or `powershell`, by name or path (§The gate-authoring surface).
 > - `GATE_SDK_PSSCRIPTANALYZER_EXCLUDE` — a whitespace list of PSScriptAnalyzer rule names `check-psscriptanalyzer` excludes, default empty (§check-psscriptanalyzer).
@@ -87,11 +87,13 @@ Replacement for §The `# graph:` manifest's paragraph **The layer above the desc
 
 Replacement for the last sentence of §The `# graph:` manifest's paragraph **The answering interface is substrate-neutral**: *Whether a later authoring SDK moves this contract to a substrate-neutral surface is that SDK's question.* becomes *An exec member answers neither flag, and §The gate-authoring surface rules why no argv convention is asked of it.* **Not yet applied.**
 
+Replacement for the second sentence of §The `# graph:` manifest's paragraph **A `.gate` descriptor never carries either field.**, *A descriptor's existence is the dispatch declaration, so its member is ported and has no port question left.*, which becomes *A descriptor's existence is the dispatch declaration, so its member dispatches to a subcommand or to an exec target (§The gate-authoring surface) and is never a shell script awaiting a port.* **Not yet applied.**
+
 `native/src/gates/comment_tier.rs`' built-in directive roster, `SHELL_COLON`, gains `exec:`. Without it every descriptor carrying the field reds `check-comment-tier`, whose surface this repo's `CANON_KIT_COMMENT_SURFACE` sets to `**/*.gate`.
 
 ### (4) The fixture runner and `gate_command` reach an exec member through `--emit gate-argv` {design-bearing} {user-facing: custom-gate-substrates' Deliverable — the fixture-pair contract it names, met for a PowerShell gate}
 
-`gate_command` (§lib/gate.sh) prints a member's argv, and the fixture runner and four shell callers execute it. A shell parse of the `# exec:` field would be a second holder of the field's grammar and of the host argument list. So for a `.gate` declaration `gate_command` asks the binary. It keeps its absent-binary check, then prints what a new arm, `--emit gate-argv <declaration>`, prints: `registry::invocation`'s answer, one element per line, with the binary's own path where a compiled member's first element is. The arm's refusal reaches `gate_command`'s caller as the existing harness-error status, never `return 1`.
+`gate_command` (§lib/gate.sh) prints a member's argv, and the fixture runner and its shell callers execute it. A shell parse of the `# exec:` field would be a second holder of the field's grammar and of the host argument list. So for a `.gate` declaration `gate_command` asks the binary. It keeps its absent-binary check, then prints what a new arm, `--emit gate-argv <declaration>`, prints: `registry::invocation`'s answer, one element per line, with the binary's own path where a compiled member's first element is. The arm's refusal reaches `gate_command`'s caller as the existing harness-error status, never `return 1`.
 
 - **The arm.** `native/src/emit/gate_argv.rs`, an `Arm::Emit` row declaring `GATE_SDK_POWERSHELL`, whose named caller is `gate_command`. Exit 0 prints the argv; exit 2 is a refusal.
 - **The fixture runner.** `run_gate_tests.rs` applies its executable guard and its absolutization to the first element when that element carries a path separator, and resolves a bare host name through the crate's program resolution instead. It absolutizes an exec member's target element before the `cd` into the case, as it does a script's first element.
@@ -112,7 +114,8 @@ The roster is every crate site that branches on a declaration's spelling, by `gr
 
 - **`check-gate-substrate-parity`.**
   - Assertion B's descriptor set, and assertion I's reverse direction ("a registration that dispatches to the binary"), take compiled members only, through the classifier. An exec descriptor names no subcommand by design.
-  - **New assertion K, exec placement.** Every `# exec:` field sits in a descriptor directly under the consumer gates directory, is the descriptor's only one, and names, relative to that directory with no `..` segment and no root, a tracked regular file of an admitted target class. A descriptor under a kit root carrying the field reds, naming §The gate-authoring surface.
+  - **New assertion K, exec placement.** Every `# exec:` field sits in a descriptor directly under the consumer gates directory, is the descriptor's only one, and names, relative to that directory with no `..` segment and no root, a tracked regular file of an admitted target class. A descriptor under a kit root carrying the field reds, naming §The gate-authoring surface. K's four reds are a misplaced field, a second field, a rooted or `..`-bearing value, and a target that is untracked or of no admitted class.
+  - The opening paragraph's count and roster, *Ten assertions: (A) declaration uniqueness; … and (J) smoke registries joined to owned subcommands.*, become *Eleven assertions:* with the same list and *(K) exec placement* appended after (J). **Not yet applied.**
   - Assertions A, C, D, E, F, G, H and J are unchanged. E reads kit roots, where K forbids the field, and an exec target in the gates directory is outside E's vendoring set.
   - Its pair gains `bad/` cases for K's four reds and a `good/` exec descriptor. Its descriptor's `couples=` reaches a kit descriptor through `kit:checks/*` but a consumer one through nothing, since its gates-directory tokens are `gates.list` and `*.sh`. So it gains `knob:GATE_SDK_GATES_DIR/*.gate` and `knob:GATE_SDK_GATES_DIR/*.ps1`, and a commit adding, moving or deleting an exec field or its target fires K.
 - **`check-gate-binary-fresh`** (`gate_binary_fresh.rs:88`): a member makes the binary load-bearing only when the classifier answers compiled. An exec member's spawn runs the host, never a subcommand.
@@ -168,7 +171,7 @@ A new section of `docs/requirements.md` between §Writing your own shell gates a
 >
 > A PowerShell gate is two files in your gates directory: a `.gate` descriptor carrying the gate's `# graph:` line, its `# spec:` line and `# exec: <script>.ps1`, and the script it names. It needs a PowerShell host, which you name by setting `GATE_SDK_POWERSHELL` in `gate-sdk-config.knobs`: `powershell` for Windows PowerShell 5.1, which every Windows host carries, or `pwsh` for PowerShell 7 on any system. The gate runs as your shell gates do and prints the same lines; it reads a knob through `--emit knob-values <NAME>` on the binary its environment names. `check-psscriptanalyzer` lints it once you register it, and then the PSScriptAnalyzer module binds you. Running its fixture pair with `--run-gate-tests` also uses Git for Windows' bash. [gate-sdk/SPEC.md](gate-sdk/SPEC.md#the-gate-authoring-surface) owns this.
 
-The first sentence of `docs/install.md`'s Windows **You need** paragraph's second sentence becomes: *Git for Windows' bash is also what runs any shell gate you write, and a gate you write in PowerShell needs none ([Writing your own PowerShell gates](requirements.md#writing-your-own-powershell-gates)).* **Not yet applied.**
+The second sentence of `docs/install.md`'s Windows **You need** paragraph becomes: *Git for Windows' bash is also what runs any shell gate you write, and a gate you write in PowerShell needs none ([Writing your own PowerShell gates](requirements.md#writing-your-own-powershell-gates)).* **Not yet applied.**
 
 `gate-sdk/README.md`'s Quick start paragraph on the first gate gains one sentence after its first: *To write it in PowerShell, write a `scripts/check-<area>.gate` descriptor whose `# exec:` line names `scripts/check-<area>.ps1`, and set `GATE_SDK_POWERSHELL` ([SPEC.md §The gate-authoring surface](SPEC.md#the-gate-authoring-surface)).* **Not yet applied.**
 
@@ -217,7 +220,7 @@ The honest limit on Group Policy that follows stays, and now also cites gate-sdk
 - **`--emit gate-argv`.** Producer: the arm. Consumer: `gate_command`, by stdout, at each fixture case's resolution and at each shell caller's.
 - **Roster-holding readers of the new names.**
   - The descriptor field roster in §The `# graph:` manifest (delta 3), and `comment_tier.rs`' `SHELL_COLON` (delta 3).
-  - The knob table in `native/src/knobs/gate_sdk.rs` and §Layout and configuration (delta 2); `--emit knob-roster` derives from the table.
+  - The knob table in `native/src/knobs/gate_sdk.rs` and §Layout and configuration (deltas 2 and 6); `--emit knob-roster` derives from the table.
   - `scripts/gates.list` and `gate-sdk/README.md`'s roster block for the new gate (delta 6). `check-kit-registration` and `check-readme-roster` hold those.
   - The `ARMS` table and its test-module census for `gate_argv.rs` (delta 4); `runner.rs`' `USAGE` names the `--emit <arm>` family generically, so it gains nothing.
   - `REGISTRY` in `native/src/gates/mod.rs` for the new gate's row.
@@ -227,8 +230,8 @@ The honest limit on Group Policy that follows stays, and now also cites gate-sdk
 ## Existing sections updated
 
 - `gate-sdk/SPEC.md` §The gate-authoring surface, new; §What the dispatch seam does not settle; §The extensibility model (delta 1).
-- `gate-sdk/SPEC.md` §Layout and configuration — the `GATE_SDK_POWERSHELL` row (delta 2).
-- `gate-sdk/SPEC.md` §The `# graph:` manifest — the descriptor paragraphs, the field roster, the substrate-blind paragraph and the answering-interface sentence (delta 3).
+- `gate-sdk/SPEC.md` §Layout and configuration — the `GATE_SDK_POWERSHELL` and `GATE_SDK_PSSCRIPTANALYZER_EXCLUDE` rows (deltas 2 and 6).
+- `gate-sdk/SPEC.md` §The `# graph:` manifest — the descriptor paragraphs, the field roster, the substrate-blind paragraph, the answering-interface sentence and the never-carries-either-field sentence (delta 3).
 - `gate-sdk/SPEC.md` §lib/gate.sh — the `gate_command` bullet (delta 4).
 - `gate-sdk/SPEC.md` §run-gate-tests — the dispatch paragraph and the honest limit (delta 4).
 - `gate-sdk/SPEC.md` §check-gate-substrate-parity — assertions B, I and K, and the pair (delta 5).
@@ -236,7 +239,7 @@ The honest limit on Group Policy that follows stays, and now also cites gate-sdk
 - `gate-sdk/SPEC.md` §check-psscriptanalyzer, new (delta 6).
 - `delegation-kit/SPEC.md` §Verify after every agent commit — assertion A's gate-file sentence (delta 5).
 - `guard-kit/SPEC.md` §scratch-run — the host arguments (delta 11).
-- `native/src/registry.rs`, `native/src/substrate.rs`, `native/src/knobs/gate_sdk.rs`, `native/src/knobs/guard_kit.rs` — the classifier, the invocation, the module and the knob (delta 2).
+- `native/src/registry.rs`, `native/src/substrate.rs`, `native/src/knobs/gate_sdk.rs`, `native/src/knobs/guard_kit.rs` — the classifier, the invocation, the module and the two knob rows (deltas 2 and 6).
 - `native/src/runner.rs`, `native/src/emit/enter_stage.rs`, `native/src/emit/install_hooks.rs`, `native/src/emit/run_consumer_smoke.rs` — each dispatch through `registry::invocation` (delta 2).
 - `native/src/gates/comment_tier.rs` — `SHELL_COLON` (delta 3).
 - `native/src/emit/gate_argv.rs`, `native/src/emit/mod.rs`, `gate-sdk/lib/gate.sh`, `native/src/emit/run_gate_tests.rs` — the arm and its callers (delta 4).
@@ -254,7 +257,8 @@ The honest limit on Group Policy that follows stays, and now also cites gate-sdk
 
 ## Retired spellings
 
-- None — the amendment adds a field, a class, a knob, an arm and a gate, and rewrites the sentences that said a descriptor has no dispatch field and a gate cannot be written in PowerShell without retiring a name.
+- `There is no dispatch field, no second registry and no mapping table` — the descriptor paragraph delta 3 replaces, since `# exec:` is a dispatch field (delta 3).
+- `a gate cannot be written in PowerShell today` — the install page sentence delta 7 replaces (delta 7).
 
 ## Definition of Done
 

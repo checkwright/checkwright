@@ -5,7 +5,7 @@ An adopter weighing a knob today edits the config seam, commits, and learns what
 The entry left three choices open. Each is settled here on the mechanism that decides it:
 
 - **The variant is a directory of whole files, never an env file.** An indexed or keyed knob takes no environment override (§The knob file), so an env file could vary scalars alone, and most corpus and exemption knobs are indexed. A directory of knob files reuses the one grammar the seam already has, and it varies `gates.list` as well.
-- **The scratch is a copy carrying history, never a worktree.** The crate refuses `git worktree add` (§Consumer smoke, the shared-clone rule), and a gate reading `HEAD` or the log would read a one-commit scratch differently from the tree. `csmoke::tracked_history_scratch` already builds that copy.
+- **The scratch is a copy carrying history, never a worktree.** The crate refuses `git worktree add` (§upgrade-smoke, the shared-clone rule), and a gate reading `HEAD` or the log would read a one-commit scratch differently from the tree. `csmoke::tracked_history_scratch` already builds that copy.
 - **The product is the diff.** The adopter's question is which gates the knob arms, disarms or reds. A full report would bury those rows under every unchanged gate.
 
 ## What changes
@@ -31,7 +31,7 @@ A new section in gate-sdk/SPEC.md §Per-component contracts, after §upgrade-smo
 ### (2) The arm's crate surface {mechanical}
 
 - `native/src/emit/run_config_variant.rs`, a new module, holds the arm. Its row joins `ARMS` in `native/src/emit/mod.rs` as an `Arm::Run`, declaring `GATE_SDK_TMP_DIR`, `GATE_SDK_GATES_DIR` and `GATE_SDK_NATIVE_BIN`, under a `spec:` comment naming §run-config-variant and the three-way exit that forces `Arm::Run` (§The non-gate arm).
-- The per-gate result reader splits a `GATE_SDK_VERBOSE` log into `(name, tail, output)` per `===== <name> =====` section. `native/src/emit/parse_gates_log.rs` holds only the tail reader, `tail`, so the arm adds the section split beside it there and reads each verdict through `tail`, leaving one reader of the tail grammar.
+- The per-gate result reader splits a `GATE_SDK_VERBOSE` log into `(name, tail, output)` per `===== <name> =====` section. `native/src/emit/parse_gates_log.rs`, evidence-kit's `--emit parse-gates-log` arm (evidence-kit/SPEC.md §Layout and configuration), holds the one reader of the tail grammar, its private `fn tail`. That function becomes `pub(crate)`, the section split sits beside it, and the arm reads each verdict through `tail`, leaving one reader of the tail grammar. The arm's own behavior and `USAGE` do not move.
 - `native/src/runner.rs`' `USAGE` gains the arm's line and paragraph.
 
 §The non-gate arm's list of members the exit contract forces out of the `--emit-` family gains one bullet after `--install-hooks`. **Not yet applied.**
@@ -40,7 +40,7 @@ A new section in gate-sdk/SPEC.md §Per-component contracts, after §upgrade-smo
 
 ### (3) The named caller is the adopt walk {mechanical} {user-facing: config-variant-battery-harness' Deliverable — an adopter sees which gates a knob arms, disarms or reds before committing the knob}
 
-Replacement for `gate-sdk/templates/adopt.md` step 3's last sentence. **Not yet applied.**
+Replacement for `gate-sdk/templates/adopt.md` step 3's last two sentences, from *Tell the user each change* to its end. **Not yet applied.**
 
 > Tell the user each change and the paths that ground it. Rehearse it first: copy the `*-config.knobs` file in the gates directory named for the knob's kit into a scratch directory under `.tmp/`, make the change there (one `NAME = value` line for a scalar, one `NAME[] = element` line per element for an `indexed` knob), and run `--run-config-variant` on that directory. Its rows name each gate the change arms, disarms or reds. Then write the change into the gates directory's file. Never edit a vendored kit file.
 

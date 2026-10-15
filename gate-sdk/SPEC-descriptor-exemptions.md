@@ -41,6 +41,12 @@ Replacement for §check-gate-exemption-tasks' paragraph **The header-field arm e
 
 The gate's clean line gains one count, `<n> descriptor exemption(s)`, after its array count, so a descriptor arm that found nothing reads as such rather than as an absent arm.
 
+Replacement for §check-gate-exemption-tasks' paragraph **Clean-line contract.**, its first two sentences. **Not yet applied.**
+
+> **Clean-line contract.** The line reports the exemption-array count, the `# exception:` descriptor-element count, the `# port-until:` header-field count, the **out-of-scope kit-shipped declaration count** and the derived live-slug count. All five are §run-gates' vacuous-pass tripwire applied to this gate's sets, and they read in opposite directions.
+
+The sentences after those two (an empty set means an arm ranged over nothing, an absurdly large slug set is the fail-open) stand, each now holding for the descriptor count as for the array count.
+
 ### (3) `check-gate-tamper` reads a descriptor's elements {design-bearing} {user-facing: gate-tamper-exemption-reader-substrate's opening, as delta 1}
 
 Replacement for delegation-kit/SPEC.md §Verify after every agent commit, assertion B's first sentence. **Not yet applied.**
@@ -73,7 +79,7 @@ Replacement for the last three sentences of gate-sdk/SPEC.md §Meta-gate conserv
 ## Existing sections updated
 
 - `gate-sdk/SPEC.md` §The `# graph:` manifest — the field roster's `# exception:` bullet (delta 1).
-- `gate-sdk/SPEC.md` §check-gate-exemption-tasks — the first bullet, the header-and-descriptor arm paragraph and the clean line (delta 2).
+- `gate-sdk/SPEC.md` §check-gate-exemption-tasks — the first bullet, the header-and-descriptor arm paragraph and the Clean-line contract paragraph (delta 2).
 - `gate-sdk/SPEC.md` §Meta-gate conservation for the binary substrate — the `check-gate-tamper` row (delta 3).
 - `delegation-kit/SPEC.md` §Verify after every agent commit — assertion B (delta 3).
 - `native/src/registry.rs` — `exemptions` (delta 1).
