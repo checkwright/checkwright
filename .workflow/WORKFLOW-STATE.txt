@@ -10,3 +10,4 @@ foreign-build-budget-pass align a06adab2 2026-10-15 fbf7e3e56
 foreign-build-budget-pass build a1a333e3 2026-10-15 61b98bc38
 foreign-build-budget-pass build ac9a463d 2026-10-15 8d791abfa
 foreign-build-budget-pass validate ac69f517 2026-10-15 8f3aced1d
+foreign-build-budget-pass close a899a51d 2026-10-15 4cbdedbcc
