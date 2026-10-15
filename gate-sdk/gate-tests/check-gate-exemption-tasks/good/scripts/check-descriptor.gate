@@ -2,3 +2,5 @@
 # install: zero-config
 # port-until: fix-sample-surface
 # spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — a descriptor-declared member of the tree's own gates dir whose held-port field resolves, so the in-scope `*.gate` half of the glob is exercised by a case instead of only by the live tree
+# exception: docs/legacy/*.md # until: fix-sample-surface
+# exception: vendored-token # permanent: a token outside this gate's rule

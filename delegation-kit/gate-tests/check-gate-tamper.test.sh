@@ -135,9 +135,30 @@ printf '{}\n' >"$d/product/checkwright.lock"
 git -C "$d" add scripts/check-sample.sh product/checkwright.lock
 case_run "$d" a-nested-manifest-namesake-beside-a-gate-edit 1 "  product/checkwright.lock"
 
+# I — a descriptor's `# exception:` line is an exemption element: one added beside a co-staged
+#     file it matches reds assertion B, and the same element matching nothing staged is silent.
+descriptor_repo() {
+    local d
+    d="$(new_repo "$1")"
+    printf '# graph: dir=one valve=none tier=precommit\n# exception: product/*.txt # permanent: seeded\n' \
+        >"$d/scripts/check-described.gate"
+    git -C "$d" add scripts/check-described.gate
+    git -C "$d" commit -q -m describe
+    printf '# exception: %s # until: some-task\n' "$2" >>"$d/scripts/check-described.gate"
+    git -C "$d" add scripts/check-described.gate
+    printf '%s\n' "$d"
+}
+d="$(descriptor_repo descriptor-self-serving 'product/*.md')"
+printf 'y\n' >"$d/product/excused.md"
+git -C "$d" add product/excused.md
+case_run "$d" a-descriptor-exemption-excusing-a-co-staged-file 1 "product/*.md -> product/excused.md"
+
+d="$(descriptor_repo descriptor-unmatched 'nowhere/*.md')"
+case_run "$d" a-descriptor-exemption-matching-nothing-staged 0 "GATE-TAMPER: clean"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-gate-tamper.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-gate-tamper.test: ok (live arm: HEAD-resident exemptions excluded, a newly added one excusing a co-staged file rejected, an unmatched one silent, a gate-file deletion read as empty, a registered gate outside every glob covered, the toplevel install manifest meta-layer and a nested namesake not)"
+echo "check-gate-tamper.test: ok (live arm: HEAD-resident exemptions excluded, a newly added one excusing a co-staged file rejected, an unmatched one silent, a descriptor's # exception: element read alike, a gate-file deletion read as empty, a registered gate outside every glob covered, the toplevel install manifest meta-layer and a nested namesake not)"
 exit 0

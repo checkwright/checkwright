@@ -378,6 +378,98 @@ pub fn projection(text: &str) -> Vec<String> {
         .collect()
 }
 
+pub fn is_slug_byte(c: u8) -> bool {
+    c.is_ascii_lowercase() || c.is_ascii_digit() || c == b'-'
+}
+
+// spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — a slug opens on a lowercase letter or a digit
+pub fn slug_at(b: &[u8], at: usize) -> Option<usize> {
+    if at >= b.len() || !(b[at].is_ascii_lowercase() || b[at].is_ascii_digit()) {
+        return None;
+    }
+    let mut j = at + 1;
+    while j < b.len() && is_slug_byte(b[j]) {
+        j += 1;
+    }
+    Some(j)
+}
+
+// spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — one exemption element's disposition
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Disposition {
+    Until(String),
+    Permanent,
+    Missing,
+}
+
+// spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the one disposition reader both grammars
+// share: the first `#`-opened `until: <slug>` annotation, else a `permanent:` one
+pub fn disposition(line: &str) -> Disposition {
+    let b = line.as_bytes();
+    let opened = |kw: &str| -> Vec<usize> {
+        let mut at = Vec::new();
+        for i in 0..b.len() {
+            if b[i] != b'#' {
+                continue;
+            }
+            let mut j = i + 1;
+            while j < b.len() && (b[j] == b' ' || b[j] == b'\t') {
+                j += 1;
+            }
+            if line[j..].starts_with(kw) {
+                at.push(j + kw.len());
+            }
+        }
+        at
+    };
+    for k in opened("until:") {
+        let mut k = k;
+        while k < b.len() && (b[k] == b' ' || b[k] == b'\t') {
+            k += 1;
+        }
+        if let Some(end) = slug_at(b, k) {
+            return Disposition::Until(String::from_utf8_lossy(&b[k..end]).into_owned());
+        }
+    }
+    if opened("permanent:").is_empty() {
+        Disposition::Missing
+    } else {
+        Disposition::Permanent
+    }
+}
+
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — the descriptor's exemption field
+pub const EXCEPTION: &str = "# exception:";
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Exemption {
+    pub line: usize,
+    pub element: String,
+    pub disposition: Disposition,
+}
+
+// spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the field's one parser: each `# exception:`
+// line's first token, and the disposition read off the rest of that line; an empty element is no
+// element
+pub fn exemptions(text: &str) -> Vec<Exemption> {
+    let mut out = Vec::new();
+    for (idx, l) in fresh::file_lines(text).into_iter().enumerate() {
+        let Some(rest) = l.strip_prefix(EXCEPTION) else {
+            continue;
+        };
+        let rest = rest.trim_start();
+        let (element, tail) = match rest.find(char::is_whitespace) {
+            Some(i) => (&rest[..i], &rest[i..]),
+            None => (rest, ""),
+        };
+        if element.is_empty() || element.starts_with('#') {
+            continue;
+        }
+        out.push(Exemption { line: idx + 1, element: element.to_string(), disposition: disposition(tail) });
+    }
+    out
+}
+
 // spec: gate-sdk/SPEC.md §The declaration cohort — the descriptor line declaring a knob no static
 // kit's prefix owns, and the prefix its name carries
 pub const KNOB_LINE: &str = "# knob:";
@@ -1040,6 +1132,28 @@ pub fn expand_couples(field: &str, kit_roots_rel: &[String]) -> Result<String, S
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn the_exemption_field_reads_each_element_with_its_disposition() {
+        let text = "# graph: dir=one\n\
+# exception: docs/*.md # until: fix-docs\n\
+# exception: legacy-token # permanent: structural\n\
+# exception: src/bare.rs\n\
+# exception:\n\
+# exception: # until: no-element\n\
+# exec: check-x.ps1\n";
+        let got: Vec<(usize, String, Disposition)> =
+            exemptions(text).into_iter().map(|e| (e.line, e.element, e.disposition)).collect();
+        assert_eq!(
+            got,
+            vec![
+                (2, "docs/*.md".to_string(), Disposition::Until("fix-docs".to_string())),
+                (3, "legacy-token".to_string(), Disposition::Permanent),
+                (4, "src/bare.rs".to_string(), Disposition::Missing),
+            ]
+        );
+        assert!(exemptions("# graph: dir=one\n# exception-list: arrays are not this field\n").is_empty());
+    }
 
     #[test]
     fn a_smoke_registry_body_is_the_gates_list_heredoc_and_nothing_else() {

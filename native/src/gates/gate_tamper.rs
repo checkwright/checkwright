@@ -99,6 +99,21 @@ fn extract_exemptions(text: &str) -> Vec<String> {
     out
 }
 
+// spec: delegation-kit/SPEC.md §Verify after every agent commit — a descriptor's `# exception:`
+// elements join its shell-array read, through the one parser of that field
+fn declared_exemptions(path: &str, text: &str) -> Vec<String> {
+    let mut out = extract_exemptions(text);
+    if path.ends_with(".gate") {
+        out.extend(registry::exemptions(text).into_iter().map(|e| e.element));
+    }
+    out
+}
+
+fn added_between(path: &str, old: &str, new: &str) -> Vec<String> {
+    let old_set = declared_exemptions(path, old);
+    declared_exemptions(path, new).into_iter().filter(|v| !old_set.contains(v)).collect()
+}
+
 // spec: delegation-kit/SPEC.md §Verify after every agent commit — awk's `gsub` both counts and
 // removes, so the value a line yields is already parenthesis-free before its first token is taken
 fn paren_split(line: &str) -> (i64, i64, String) {
@@ -144,9 +159,8 @@ fn collect_live(globs: &[String]) -> Result<(Vec<String>, Vec<String>), String> 
         }
         let new = git_blob(&format!(":{}", f))?;
         let old = git_blob(&format!("HEAD:{}", f))?;
-        let old_set = extract_exemptions(&old);
-        for v in extract_exemptions(&new) {
-            if !old_set.contains(&v) && !added.contains(&v) {
+        for v in added_between(f, &old, &new) {
+            if !added.contains(&v) {
                 added.push(v);
             }
         }
@@ -341,6 +355,14 @@ BAR=(
 
     // spec: delegation-kit/SPEC.md §Verify after every agent commit — a single-line array
     // closes its own balance, so the tag arms nothing and no value is read
+    #[test]
+    fn a_descriptor_element_is_read_as_an_addition_against_the_head_blob() {
+        let head = "# graph: dir=one\n# exception: kept/*.md # permanent: old\n";
+        let staged = format!("{}# exception: src/new.rs # until: some-task\n", head);
+        assert_eq!(added_between("scripts/check-x.gate", head, &staged), vec!["src/new.rs"]);
+        assert!(added_between("scripts/check-x.sh", head, &staged).is_empty());
+    }
+
     #[test]
     fn a_single_line_array_yields_nothing() {
         assert!(extract_exemptions("# exception-list:\nFOO=(a b c)\nd\n").is_empty());

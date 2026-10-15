@@ -8,18 +8,6 @@
 
 ## New Features
 
-### gate-tamper-exemption-reader-substrate
-
-[spec: SPEC-descriptor-exemptions.md]
-
-`check-gate-tamper`'s exemption reader has no implementation-side equivalent. Split 2026-08-09 at scope by operator ruling from an entry that kept its meta-path-roster half; this is the exemption half, unchanged in substance. `extract_exemptions()` parses a shell `# exception-list:` array literal, so a ported gate's Rust module can carry no exemption the gate is able to read.
-
-**Why design-pending:** it wants the ruling `gate-authoring-sdk-surface` holds — whether a meta-gate reads a substrate-neutral descriptor or learns each substrate — and that entry is horizon-set to ecosystem work, so this one waits.
-
-**The coupling was checked at the split rather than inherited.** It is true of this half and was not true of the roster half: which paths a tamper roster covers is configuration, where how a meta-gate reads an exemption across substrates is exactly the substrate-neutrality question the SDK entry holds.
-
-**Cost while deferred:** zero until a ported gate needs an exemption; no first-cohort member carries an exemption list, which gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate records in its `check-gate-tamper` row. Filed 2026-08-02 at close; found by build.
-
 ### config-variant-battery-harness
 
 [spec: SPEC-config-variant.md]
@@ -1115,4 +1103,5 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 - windows-kpi-plugin-start
 - custom-gate-substrates
 - gate-authoring-sdk-surface
+- gate-tamper-exemption-reader-substrate
 

@@ -1,7 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — every temporary-disposition annotation a
-// gate declaration carries names a live task: an exception-list element's until:, or the
-// declaration's own port-until: header field
-use crate::walk;
+// gate declaration carries names a live task: an exception-list element's until:, a descriptor's
+// `# exception:` element's, or the declaration's own port-until: header field
+use crate::{registry, walk};
 use std::path::Path;
 
 pub fn run(args: &[String]) -> i32 {
@@ -24,28 +24,13 @@ fn lstrip(s: &str) -> &str {
 const LIVE_OPEN: &[&str] = &["## New Features", "## Technical Debt", "## Deferred"]; // consumer-value-exempt: literals by the fail-open ground above
 const LIVE_CLOSE: &[&str] = &["## Done", "## Lessons Learned"]; // consumer-value-exempt: literals by the fail-open ground above
 
-fn is_slug_byte(c: u8) -> bool {
-    c.is_ascii_lowercase() || c.is_ascii_digit() || c == b'-'
-}
-
-fn slug_at(b: &[u8], at: usize) -> Option<usize> {
-    if at >= b.len() || !(b[at].is_ascii_lowercase() || b[at].is_ascii_digit()) {
-        return None;
-    }
-    let mut j = at + 1;
-    while j < b.len() && is_slug_byte(b[j]) {
-        j += 1;
-    }
-    Some(j)
-}
-
 // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the live slug is an entry heading's whole
 // text, `### <slug>` or `#### <slug>` for a sub-task; reading every slug-shaped token on every line
 // is the fail-open
 fn lead_line_slug(line: &str) -> Option<String> {
     let rest = line.strip_prefix("#### ").or_else(|| line.strip_prefix("### "))?;
     let t = rest.trim_end_matches([' ', '\t']).as_bytes();
-    match slug_at(t, 0) {
+    match registry::slug_at(t, 0) {
         Some(end) if end == t.len() => Some(String::from_utf8_lossy(t).into_owned()),
         _ => None,
     }
@@ -120,52 +105,6 @@ struct Element {
     kind: Kind,
 }
 
-// spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the `# until:` payload, taken off the
-// first `#` that opens the annotation rather than off the whole line
-fn until_slug(line: &str) -> Option<String> {
-    let b = line.as_bytes();
-    let mut i = 0usize;
-    while i < b.len() {
-        if b[i] != b'#' {
-            i += 1;
-            continue;
-        }
-        let mut j = i + 1;
-        while j < b.len() && (b[j] == b' ' || b[j] == b'\t') {
-            j += 1;
-        }
-        if line[j..].starts_with("until:") {
-            let mut k = j + "until:".len();
-            while k < b.len() && (b[k] == b' ' || b[k] == b'\t') {
-                k += 1;
-            }
-            if let Some(end) = slug_at(b, k) {
-                return Some(String::from_utf8_lossy(&b[k..end]).into_owned());
-            }
-        }
-        i += 1;
-    }
-    None
-}
-
-fn has_permanent(line: &str) -> bool {
-    let b = line.as_bytes();
-    let mut i = 0usize;
-    while i < b.len() {
-        if b[i] == b'#' {
-            let mut j = i + 1;
-            while j < b.len() && (b[j] == b' ' || b[j] == b'\t') {
-                j += 1;
-            }
-            if line[j..].starts_with("permanent:") {
-                return true;
-            }
-        }
-        i += 1;
-    }
-    false
-}
-
 fn assignment_opens(line: &str) -> bool {
     let t = lstrip(line).as_bytes();
     if t.is_empty() || !(t[0].is_ascii_alphabetic() || t[0] == b'_') {
@@ -214,10 +153,10 @@ fn parse_elements(text: &str, header_line: usize) -> Vec<Element> {
                 .chars()
                 .any(|c| !c.is_ascii_whitespace() && c != '(' && c != ')')
             {
-                let kind = match until_slug(line) {
-                    Some(s) => Kind::Until(s),
-                    None if has_permanent(line) => Kind::Permanent,
-                    None => Kind::None,
+                let kind = match registry::disposition(line) {
+                    registry::Disposition::Until(s) => Kind::Until(s),
+                    registry::Disposition::Permanent => Kind::Permanent,
+                    registry::Disposition::Missing => Kind::None,
                 };
                 out.push(Element { lno: nr, kind });
             }
@@ -319,6 +258,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         };
         if !header_hits(&text, "exception-list:").is_empty()
             || !header_hits(&text, "port-until:").is_empty()
+            || (f.ends_with(".gate") && !registry::exemptions(&text).is_empty())
         {
             skipped += 1;
         }
@@ -326,6 +266,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     let mut errors: Vec<String> = Vec::new();
     let mut arrays = 0usize;
+    let mut described = 0usize;
     let mut headers = 0usize;
 
     let mut texts: Vec<(String, String)> = Vec::new();
@@ -391,9 +332,31 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the header-field arm enters the walk
-    // independently of the '# exception-list:' marker, because a declaration carrying only the
-    // field is skipped by the trigger the array arm opens on
+    // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the header-field arm and the descriptor
+    // arm enter the walk independently of the '# exception-list:' marker, because a declaration
+    // carrying only a header field or only `# exception:` lines is skipped by the trigger the array
+    // arm opens on
+    for (f, text) in texts.iter().filter(|(f, _)| f.ends_with(".gate")) {
+        for ex in registry::exemptions(text) {
+            described += 1;
+            match ex.disposition {
+                registry::Disposition::Permanent => {}
+                registry::Disposition::Until(slug) => {
+                    if !live.contains(&slug) {
+                        errors.push(format!(
+                            "{}:{} — # until: {} does not resolve to a live task (moved to Done, or missing from {})",
+                            f, ex.line, slug, queue
+                        ));
+                    }
+                }
+                registry::Disposition::Missing => errors.push(format!(
+                    "{}:{} — exemption element carries neither # until: <slug> nor # permanent: <reason>",
+                    f, ex.line
+                )),
+            }
+        }
+    }
+
     for (f, text) in &texts {
         for (lineno, line) in header_hits(text, "port-until:") {
             let tail = match line.split_once("port-until:") {
@@ -402,7 +365,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             };
             let t = lstrip(tail).as_bytes();
             let mut n = 0usize;
-            while n < t.len() && is_slug_byte(t[n]) {
+            while n < t.len() && registry::is_slug_byte(t[n]) {
                 n += 1;
             }
             // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — a bare field is assertion G's
@@ -453,8 +416,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(1);
     }
     println!(
-        "GATE-EXEMPTION-TASKS: clean ({} exemption array(s), {} '# port-until:' header field(s), {} kit-shipped declaration(s) out of scope, {} live task slug(s); every in-scope element declares until-with-live-task or permanent-with-reason and every in-scope held declaration names a live entry)",
-        arrays, headers, skipped, live.len()
+        "GATE-EXEMPTION-TASKS: clean ({} exemption array(s), {} descriptor exemption(s), {} '# port-until:' header field(s), {} kit-shipped declaration(s) out of scope, {} live task slug(s); every in-scope element declares until-with-live-task or permanent-with-reason and every in-scope held declaration names a live entry)",
+        arrays, described, headers, skipped, live.len()
     );
     Ok(0)
 }
