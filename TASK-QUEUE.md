@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### git-name-read-line-form
-
-git's name-listing reads outside the tracked-set listing still take the line form, which quotes a name carrying a special byte: the always-loaded growth diff (`--name-only`), the packer's and the stage entry's `status --porcelain` reads, the upgrade smoke's staged read, the packer's `ls-tree --name-only` reads and the source stamp's two shell holders among them. `listing-line-form-readers` closed the tracked-set listing alone, and its holder sees none of these.
-
-**Deliverable:** a census of the crate's name-bearing git reads by form, each one that reads a name moved to the NUL form through the shared reader or stated as an emptiness test that reads none, and the holder widened to the argvs it then covers.
-
-**Run at crate-name-reader-pass' scope** in a scratch repository: the line-form `diff --cached --name-only` and `status --porcelain` print `"a\"b.md"` and `"\303\251.md"`, so git quotes every non-ASCII name under its default `core.quotePath`, which no crate site overrides, and `-z` prints both raw. The census reaches past the sites named above: the staged reads of `check-gate-tamper` (`gate_tamper.rs`) and `check-stage-evidence` (`stage_evidence.rs`), the foreign run's status read, the installer's staged read and `check-evidence-baseline`'s `ls-tree`.
-
-**Cost while deferred:** a staged or dirty member under a name git quotes, any non-ASCII name included, is misread or missed by each such reader. Filed 2026-10-09 by crate-reader-hardening-pass' spec and promoted at its close. Re-verified by `git grep -n -E 'name-only|name-status|porcelain|ls-tree' -- native/src`: the named sites carry no `-z`, and most `porcelain` hits under the installer smoke are emptiness tests. Owner lookup: `name-only`, `name-status`, `porcelain` in this file and the disposed-findings record — none; `listing-line-form-readers`, done, DISTINCT (the tracked-set listing); owner gate-sdk/SPEC.md §Fail-closed contract.
-
 ### nul-listing-lossy-decode
 
 ten listing readers already on the NUL form decode a name lossily through an argv of their own: `check-md-refs`, `check-spec-pointer`, `check-fence-command-head`, `check-docs-cmd`, `check-md-unwrapped`, the hook's staged read, the consumer-smoke and projection-witness listings, `--emit close-surfaces` and uninstall. A member whose name is not UTF-8 is matched or opened there under a replacement-character spelling, while the shared reader `tracked-name-lossy-decode` landed refuses it.
@@ -1185,4 +1175,6 @@ a citation naming a numbered step by its bold title, in RELEASING.md's procedure
 A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, since check-front-door-verbs reads the front-door pages alone; widening its arm resolution to the kit SPECs, with the history valves, would catch it.
 
 ## Done
+
+- git-name-read-line-form
 

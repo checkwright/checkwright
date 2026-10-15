@@ -103,11 +103,9 @@ fn flip_causation(baseline: &str, state: &str, rows: &[Row], errors: &mut Vec<St
     let closed = |what: String| {
         format!("{} — the check could not run; treating as failure (not clean)", what)
     };
-    let listed = proc::run(&programs::GIT, &["ls-tree", "--full-name", "--name-only", &start, "--", baseline])?;
-    let Some(listed) = listed.stdout() else {
-        return Err(closed(format!("cannot list {} at the iteration start {}", baseline, start)));
-    };
-    let name = String::from_utf8_lossy(listed).trim().to_string();
+    let listed = crate::listing::names(None, &["ls-tree", "-z", "--full-name", "--name-only", &start, "--", baseline])
+        .map_err(|e| e.text_or(|_| closed(format!("cannot list {} at the iteration start {}", baseline, start))))?;
+    let name = listed.into_iter().next().unwrap_or_default();
     let prior = if name.is_empty() {
         String::new()
     } else {

@@ -172,15 +172,9 @@ fn provenance(
     // spec: lifecycle-kit/SPEC.md §check-stage-evidence — the purity assertion is gated on the
     // state file being STAGED: a stamp nothing is committing is not a stamp this commit
     // introduces
-    let staged_raw = proc::run(&programs::GIT, &["diff", "--cached", "--name-only"])?;
-    let Some(bytes) = staged_raw.stdout() else {
-        return Err("git diff --cached failed — the staged path set could not be read; treating as failure (not clean)".to_string());
-    };
-    let staged: Vec<String> = String::from_utf8_lossy(bytes)
-        .lines()
-        .filter(|l| !l.trim().is_empty())
-        .map(|l| l.to_string())
-        .collect();
+    let staged = crate::listing::names(None, &["diff", "--cached", "-z", "--name-only"]).map_err(|e| {
+        e.text_or(|_| "git diff --cached failed — the staged path set could not be read; treating as failure (not clean)".to_string())
+    })?;
     if !staged.iter().any(|p| p == &rel_state) {
         return Ok(out);
     }

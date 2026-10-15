@@ -106,10 +106,17 @@ pub(super) fn hooked_move(state: &mut Run) -> Step {
             version, state.up_version
         )));
     }
-    let staged = git_out(&hc, &["show", "--name-only", "--format=", "HEAD"])?;
-    let names = lines::of("the hooked upgrade's commit", staged.as_bytes());
+    let shown = super::in_consumer(&programs::GIT, &["show", "-z", "--name-only", "--format=", "HEAD"], &[], &hc)?;
+    let Some(listed) = shown.stdout() else {
+        return Err(super::refuse(format!(
+            "git show could not read the hooked upgrade's commit in {} — {}",
+            hc,
+            shown.failure_report().unwrap_or_default()
+        )));
+    };
+    let names = crate::listing::decode(listed).map_err(|e| super::refuse(e.text()))?;
     if !names.iter().any(|n| n == "gate-sdk/lib/gate.sh") || !names.iter().any(|n| n == "checkwright.lock") {
-        super::show(&staged);
+        super::show(&names.join("\n"));
         return Err(fail(
             "the hooked upgrade's commit does not carry both the gate library and the manifest, so it never staged the shape this arm is about — repair the hop, never drop the assertion",
         ));

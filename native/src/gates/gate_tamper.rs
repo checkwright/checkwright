@@ -131,16 +131,11 @@ fn git_blob(rev: &str) -> Result<String, String> {
 }
 
 fn collect_live(globs: &[String]) -> Result<(Vec<String>, Vec<String>), String> {
-    let c = proc::run(&programs::GIT, &["diff", "--cached", "--name-only"])?;
-    let staged: Vec<String> = c
-        .stdout()
-        .map(|b| {
-            String::from_utf8_lossy(b)
-                .lines()
-                .map(String::from)
-                .collect()
-        })
-        .unwrap_or_default();
+    let staged: Vec<String> = match crate::listing::names(None, &["diff", "--cached", "-z", "--name-only"]) {
+        Ok(names) => names,
+        Err(crate::listing::Refusal::Failed(_)) => Vec::new(),
+        Err(e) => return Err(e.text()),
+    };
 
     let mut added: Vec<String> = Vec::new();
     for f in &staged {

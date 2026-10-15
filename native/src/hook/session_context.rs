@@ -203,13 +203,12 @@ fn is_lead(role_file: &str, payload: Option<&Value>) -> bool {
 
 // spec: context-kit/SPEC.md §The session-context hook — step 2: a component is a top-level
 // directory holding the configured mark, and an empty mark turns the step off
-fn changed_components(porcelain: &str, mark: &str, holds_mark: &dyn Fn(&str) -> bool) -> Vec<String> {
+fn changed_components(paths: &[String], mark: &str, holds_mark: &dyn Fn(&str) -> bool) -> Vec<String> {
     if mark.is_empty() {
         return Vec::new();
     }
-    let mut out: Vec<String> = porcelain
-        .lines()
-        .filter_map(|l| l.rsplit(' ').next())
+    let mut out: Vec<String> = paths
+        .iter()
         .filter_map(|p| p.split_once('/').map(|(top, _)| top.to_string()))
         .filter(|top| holds_mark(top))
         .collect();
@@ -219,9 +218,9 @@ fn changed_components(porcelain: &str, mark: &str, holds_mark: &dyn Fn(&str) -> 
 }
 
 fn dirty_surface(mark: &str) -> String {
-    let Ok(done) = proc::run(&programs::GIT, &["status", "--porcelain"]) else { return String::new() };
-    let Some(status) = done.stdout() else { return String::new() };
-    let changed = changed_components(&String::from_utf8_lossy(status), mark, &|top| {
+    let Ok(status) = crate::listing::status(None, &[]) else { return String::new() };
+    let paths: Vec<String> = status.into_iter().map(|s| s.path).collect();
+    let changed = changed_components(&paths, mark, &|top| {
         Path::new(top).join(mark).is_dir()
     });
     if changed.is_empty() {
@@ -336,11 +335,13 @@ mod tests {
     // directory, which is a component only where it holds the mark; an empty mark is no step
     #[test]
     fn a_component_is_a_changed_top_level_directory_holding_the_mark() {
-        let porcelain = " M alpha/src/lib.rs\n?? beta/notes.md\n M README.md\nR  old -> alpha/src/new.rs\n";
+        let paths: Vec<String> = ["alpha/src/lib.rs", "beta/notes.md", "README.md", "alpha/src/new.rs"]
+            .map(String::from)
+            .to_vec();
         let holds = |top: &str| top == "alpha";
-        assert_eq!(changed_components(porcelain, "src", &holds), vec!["alpha"]);
-        assert!(changed_components(porcelain, "", &holds).is_empty());
-        assert!(changed_components(" M README.md\n", "src", &holds).is_empty());
+        assert_eq!(changed_components(&paths, "src", &holds), vec!["alpha"]);
+        assert!(changed_components(&paths, "", &holds).is_empty());
+        assert!(changed_components(&["README.md".to_string()], "src", &holds).is_empty());
     }
 
     // spec: context-kit/SPEC.md §The session-context hook — the marker's id against the payload's

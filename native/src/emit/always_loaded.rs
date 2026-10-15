@@ -325,16 +325,17 @@ fn growth(m: &Measurement, baseline_file: &str) -> Result<String, String> {
         (m.base_commit.as_str(), short(&m.base_commit))
     };
     let paths = walk::knob_array("CONTEXT_KIT_GROWTH_PATHS")?;
-    let mut args: Vec<&str> = vec!["diff", "--name-only", "--no-renames", from, "--"];
+    let mut args: Vec<&str> = vec!["diff", "-z", "--name-only", "--no-renames", from, "--"];
     args.extend(paths.iter().map(String::as_str));
-    let changed = proc::run(&programs::GIT, &args)
-        .ok()
-        .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
-        .unwrap_or_default();
+    let changed = match crate::listing::names(None, &args) {
+        Ok(names) => names,
+        Err(crate::listing::Refusal::NotUtf8(e)) => return Err(e),
+        Err(_) => Vec::new(),
+    };
     // spec: context-kit/SPEC.md §The always-loaded meter — net growth is the file's code-point size
     // now less its size at the start commit, a path absent on either side counting zero
     let mut rows: Vec<(i64, String)> = Vec::new();
-    for f in changed.lines().filter(|l| !l.is_empty()) {
+    for f in &changed {
         let now = std::fs::read(f).map_or(0, |b| cp_of(&b)) as i64;
         let then = proc::run(&programs::GIT, &["show", &format!("{}:{}", from, f)])
             .ok()

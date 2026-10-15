@@ -638,20 +638,16 @@ fn copy_tree(src: &str, dest: &str) -> Result<(), Fail> {
 // regen step has run, so the claim stays exactly the sync's: it loses nothing a consumer owns
 fn determinism(consumer: &str, seen: &[String]) -> Result<(), Fail> {
     stage_all(consumer)?;
-    let c = proc::run(&programs::GIT, &["-C", consumer, "diff", "--cached", "--name-only"])
-        .map_err(|e| broken(one(format!("{}: {}", NAME, e))))?;
-    let listed = c
-        .stdout()
-        .map(|o| String::from_utf8_lossy(o).into_owned())
-        .ok_or_else(|| {
-            broken(one(format!(
-                "{}: cannot read the scratch consumer's staged set",
-                NAME
-            )))
-        })?;
+    let listed = crate::listing::names(Some(consumer), &["diff", "--cached", "-z", "--name-only"]).map_err(|e| {
+        broken(one(format!(
+            "{}: {}",
+            NAME,
+            e.text_or(|_| "cannot read the scratch consumer's staged set".to_string())
+        )))
+    })?;
     let stray: Vec<&str> = listed
-        .lines()
-        .filter(|p| !p.is_empty())
+        .iter()
+        .map(String::as_str)
         .filter(|p| {
             let top = p.split('/').next().unwrap_or(p);
             !seen.iter().any(|k| k == top)
