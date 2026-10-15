@@ -4,10 +4,4 @@
 
 ---
 
-foreign-build-budget-pass scope a46bdd8a 2026-10-15 2ffc3f540
-foreign-build-budget-pass spec a61f52e6 2026-10-15 ee8aac635
-foreign-build-budget-pass align a06adab2 2026-10-15 fbf7e3e56
-foreign-build-budget-pass build a1a333e3 2026-10-15 61b98bc38
-foreign-build-budget-pass build ac9a463d 2026-10-15 8d791abfa
-foreign-build-budget-pass validate ac69f517 2026-10-15 8f3aced1d
-foreign-build-budget-pass close a899a51d 2026-10-15 4cbdedbcc
+— scope a7cf051b 2026-10-15 b4e1ab077
