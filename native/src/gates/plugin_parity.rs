@@ -100,9 +100,15 @@ fn show(v: Option<&Value>) -> String {
     v.map(Value::to_string).unwrap_or_else(|| "absent".to_string())
 }
 
+struct Field {
+    key: String,
+    value: String,
+    fault: Option<String>,
+}
+
 // spec: plugin/SPEC.md §The skills — front matter between two `---` lines, read as `key: value`
 // scalars, and the body after it with its leading blank lines dropped
-fn front_matter(text: &str) -> Option<(Vec<(String, String)>, String)> {
+fn front_matter(text: &str) -> Option<(Vec<Field>, String)> {
     let rest = text.strip_prefix("---\n")?;
     let end = rest.find("\n---\n")?;
     let keys = rest[..end]
@@ -110,15 +116,34 @@ fn front_matter(text: &str) -> Option<(Vec<(String, String)>, String)> {
         .filter_map(|l| l.split_once(':'))
         .map(|(k, v)| {
             let v = v.trim();
-            let v = v
+            let quoted = v
                 .strip_prefix('"')
                 .and_then(|s| s.strip_suffix('"'))
-                .or_else(|| v.strip_prefix('\'').and_then(|s| s.strip_suffix('\'')))
-                .unwrap_or(v);
-            (k.trim().to_string(), v.to_string())
+                .or_else(|| v.strip_prefix('\'').and_then(|s| s.strip_suffix('\'')));
+            Field {
+                key: k.trim().to_string(),
+                value: quoted.unwrap_or(v).to_string(),
+                fault: if quoted.is_some() { None } else { plain_fault(v) },
+            }
         })
         .collect();
     Some((keys, rest[end + 5..].trim_start_matches('\n').to_string()))
+}
+
+// spec: plugin/SPEC.md §check-plugin-parity — what a YAML plain scalar cannot carry, so an unquoted value YAML rejects or cuts short reds here
+fn plain_fault(v: &str) -> Option<String> {
+    let first = v.chars().next()?;
+    let spaced = |c: char| v.strip_prefix(c).is_some_and(|r| r.is_empty() || r.starts_with([' ', '\t']));
+    if "[]{},#&*!|>'\"%@`".contains(first) || ['-', '?', ':'].into_iter().any(spaced) {
+        return Some(format!("opens with the YAML indicator `{}`", first));
+    }
+    if v.contains(": ") || v.contains(":\t") || v.ends_with(':') {
+        return Some("carries a `:` before a blank, which YAML reads as a mapping".to_string());
+    }
+    if v.contains(" #") || v.contains("\t#") {
+        return Some("carries a `#` after a blank, which YAML reads as a comment".to_string());
+    }
+    None
 }
 
 enum Pinned {
@@ -314,7 +339,15 @@ fn rule(args: &[String]) -> Result<i32, String> {
             findings.push(format!("  {}: no front matter; expected `---`, `name: {}`, a `description:`, `---`", path, n));
             continue;
         };
-        let get = |k: &str| keys.iter().find(|(key, _)| key == k).map(|(_, v)| v.as_str());
+        for f in &keys {
+            if let Some(why) = &f.fault {
+                findings.push(format!(
+                    "  {}: `{}` is an unquoted YAML plain scalar that {}; expected it quoted",
+                    path, f.key, why
+                ));
+            }
+        }
+        let get = |k: &str| keys.iter().find(|f| f.key == k).map(|f| f.value.as_str());
         if get("name") != Some(n.as_str()) {
             findings.push(format!("  {}: `name` is {:?}; expected `{}`, its directory", path, get("name"), n));
         }
@@ -422,8 +455,25 @@ mod tests {
     #[test]
     fn the_front_matter_reader_takes_scalars_and_the_body() {
         let (k, b) = front_matter("---\nname: scope\ndescription: 'Runs it.'\n---\n\nbody\n").unwrap();
-        assert_eq!(k, vec![("name".to_string(), "scope".to_string()), ("description".to_string(), "Runs it.".to_string())]);
+        let pairs: Vec<(&str, &str)> = k.iter().map(|f| (f.key.as_str(), f.value.as_str())).collect();
+        assert_eq!(pairs, [("name", "scope"), ("description", "Runs it.")]);
+        assert!(k.iter().all(|f| f.fault.is_none()));
         assert_eq!(b, "body\n");
         assert!(front_matter("no front matter\n").is_none());
+    }
+
+    // spec: plugin/SPEC.md §check-plugin-parity — an unquoted value YAML rejects or cuts short is a fault; its quoted twin and a safe plain scalar are none
+    #[test]
+    fn a_plain_scalar_yaml_cannot_carry_is_a_fault_and_quoting_clears_it() {
+        let faulted = |d: &str| {
+            let (k, _) = front_matter(&format!("---\ndescription: {}\n---\nbody\n", d)).unwrap();
+            k[0].fault.is_some()
+        };
+        for bad in ["Runs it: always.", "Runs it:", "Runs it #now", "- a list", "[x]", "* star", "'unclosed", "@at", ": lead"] {
+            assert!(faulted(bad), "{:?} passed", bad);
+        }
+        for good in ["\"Runs it: always.\"", "'Runs it: always.'", "Runs it.", "a:b", "C# code", "-flag", "the user's own", ""] {
+            assert!(!faulted(good), "{:?} faulted", good);
+        }
     }
 }

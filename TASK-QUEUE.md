@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### plugin-front-matter-yaml
-
-`check-plugin-parity`'s front-matter reader (`front_matter` in `native/src/gates/plugin_parity.rs`) splits each line at its first `:` and strips one quote pair, so it admits a `SKILL.md` description that strict YAML rejects: an unquoted `: ` in agent-execution's description passed the local battery and the harness CLI and redded only CI's `skills-ref` step on the v0.28.0 stamp push. plugin/SPEC.md §The validation leg rules manifest validity the leg's, and nothing runs that leg's oracles before a push.
-
-**Deliverable:** the reader refusing what a YAML plain scalar cannot carry, with a `bad/` fixture holding the `: ` case. Pinned to that branch at crate-name-reader-pass' scope (operator direction 2026-10-15, lead-relayed, not a ruling); the other branch, the leg's oracles run locally, is not taken.
-
-**Cost while deferred:** a front-matter slip is caught only by a push, which spends a hotfix from the budget. Filed 2026-09-28 by plugin-marketplace-queue-verbs' close. Re-verified: the reader above, and `.github/workflows/gates.yml` installs `skills-ref` in CI only. Owner lookup: `front matter`, `skills-ref`, `yaml` in this file — only the icebox's template-copy-parity-yaml-widening, DISTINCT (template copies); owner plugin/SPEC.md §check-plugin-parity.
-
 ## Deferred
 
 ### config-variant-battery-harness
@@ -1146,4 +1138,5 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 - nul-listing-lossy-decode
 - boundary-wipe-unnamed-member
 - front-matter-dotted-closer
+- plugin-front-matter-yaml
 
