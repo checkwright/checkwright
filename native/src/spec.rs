@@ -936,13 +936,14 @@ impl Fence {
     }
 }
 
-// spec: canon-kit/SPEC.md §The shared spec adapters — the front-matter span: the leading lines the block takes, both rules included; an opening `---` no later one closes delimits no block
+// spec: canon-kit/SPEC.md §The shared spec adapters — the front-matter span: the leading lines the block takes, both rules included; an opening `---` no later `---` or `...` closes delimits no block
 pub fn front_matter_span(raw: &[&str]) -> usize {
-    let rule = |l: &str| l.trim_end() == "---";
-    if !raw.first().is_some_and(|l| rule(l)) {
+    let opener = |l: &str| l.trim_end() == "---";
+    let closer = |l: &str| matches!(l.trim_end(), "---" | "...");
+    if !raw.first().is_some_and(|l| opener(l)) {
         return 0;
     }
-    raw.iter().skip(1).position(|l| rule(l)).map_or(0, |close| close + 2)
+    raw.iter().skip(1).position(|l| closer(l)).map_or(0, |close| close + 2)
 }
 
 fn fence_run(t: &str) -> Option<(u8, usize)> {
@@ -1822,6 +1823,8 @@ mod tests {
         assert_eq!(front_matter_span(&["---", "title: x", "", "body"]), 0);
         assert_eq!(front_matter_span(&["body", "---", "more", "---"]), 0);
         assert_eq!(front_matter_span(&["---"]), 0);
+        assert_eq!(front_matter_span(&["---", "title: x", "...  ", "body"]), 3);
+        assert_eq!(front_matter_span(&["...", "title: x", "...", "body"]), 0);
         assert_eq!(front_matter_span(&[]), 0);
     }
 

@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### front-matter-dotted-closer
-
-the shared front-matter reader (`front_matter_span` in `native/src/spec.rs`) takes a line of three hyphens as a block's only closer. Jekyll also closes a block on a line of three dots, so a page closed that way is read as carrying no block and its metadata is scanned as body by the six gates on the reader, where canon-kit/SPEC.md §The shared spec adapters calls the reading Jekyll's.
-
-**Deliverable:** the closer set stated in that section and read by the reader, with a unit row for the dotted form.
-
-**Run at crate-name-reader-pass' scope** with `check-docs-page-length` over a scratch tree bound at 10 words: a page whose block closes on three dots measures 31 words, its metadata counted as body, and reds; the same page closed on three hyphens passes. The other five gates on the reader were not run.
-
-**Cost while deferred:** a page closing its front matter on dots can gain a false finding or be measured long. Filed 2026-10-09 off crate-reader-hardening-pass' close second-vendor review, which ran Jekyll 4.4.1 on such a page and got the body, and carried to the next scope's intake. Re-verified there: the reader's closing rule compares a trimmed line with three hyphens alone. Owner lookup: `three dots`, `closer`, `front matter` in this file and the disposed-findings record — [plugin-front-matter-yaml](#plugin-front-matter-yaml), DISTINCT (the plugin gate's own reader); `front-matter-reader-siblings`, done, DISTINCT (the shared reader and the unclosed opener); owner canon-kit/SPEC.md §The shared spec adapters.
-
 ### plugin-front-matter-yaml
 
 `check-plugin-parity`'s front-matter reader (`front_matter` in `native/src/gates/plugin_parity.rs`) splits each line at its first `:` and strips one quote pair, so it admits a `SKILL.md` description that strict YAML rejects: an unquoted `: ` in agent-execution's description passed the local battery and the harness CLI and redded only CI's `skills-ref` step on the v0.28.0 stamp push. plugin/SPEC.md §The validation leg rules manifest validity the leg's, and nothing runs that leg's oracles before a push.
@@ -1155,4 +1145,5 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 - git-name-read-line-form
 - nul-listing-lossy-decode
 - boundary-wipe-unnamed-member
+- front-matter-dotted-closer
 
