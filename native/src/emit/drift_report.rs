@@ -2,7 +2,7 @@
 // measurement lives in a member. Advisory by construction, so the arm's exit is always 0 and a
 // member that fails yields a visible row rather than a missing one.
 use super::kpi::{self, Ctx};
-use crate::{proc, programs};
+use crate::{proc, programs, substrate};
 use crate::stages;
 use crate::walk;
 use std::path::Path;
@@ -14,6 +14,7 @@ pub const KNOBS: &[&str] = &[
     "DRIFT_KIT_*",
     "GATE_SDK_GATES_DIR",
     "GATE_SDK_KIT_DIRS",
+    "GATE_SDK_POWERSHELL",
     "GUARD_KIT_LOG",
     "GUARD_KIT_SETTINGS",
     "GUARD_KIT_SETTINGS_LOCAL",
@@ -61,27 +62,30 @@ fn iteration_start(fam: &[(String, String)]) -> String {
 
 
 // spec: drift-kit/SPEC.md §The extensibility contract — the three resolution tiers, consumer-first:
-// the adopter's own dirs, then each vendored kit's `kpis/`, then the crate's built-in members. The
-// first two answer with a path to execute directly; the third with a compiled member.
+// the adopter's own dirs, each vendored kit's `kpis/`, the built-ins. The first two answer with a
+// path, a `.sh` to execute or a `.ps1` for the PowerShell host; the third with a compiled member.
 enum Resolved {
     Plugin(String),
+    PowerShell(String),
     Builtin(kpi::Member),
 }
 
+// spec: drift-kit/SPEC.md §The extensibility contract — within one dir the `.sh` file wins
+fn in_dir(base: &str, name: &str) -> Option<Resolved> {
+    let sh = format!("{}/{}.sh", base, name);
+    if Path::new(&sh).is_file() {
+        return Some(Resolved::Plugin(sh));
+    }
+    let ps = format!("{}/{}.ps1", base, name);
+    Path::new(&ps).is_file().then_some(Resolved::PowerShell(ps))
+}
+
 fn resolve(name: &str, kpi_dirs: &[String], kit_roots: &[String]) -> Option<Resolved> {
-    for d in kpi_dirs {
-        let p = format!("{}/{}.sh", d, name);
-        if Path::new(&p).is_file() {
-            return Some(Resolved::Plugin(p));
-        }
-    }
-    for k in kit_roots {
-        let p = format!("{}/kpis/{}.sh", k, name);
-        if Path::new(&p).is_file() {
-            return Some(Resolved::Plugin(p));
-        }
-    }
-    kpi::lookup(name).map(Resolved::Builtin)
+    kpi_dirs
+        .iter()
+        .find_map(|d| in_dir(d, name))
+        .or_else(|| kit_roots.iter().find_map(|k| in_dir(&format!("{}/kpis", k), name)))
+        .or_else(|| kpi::lookup(name).map(Resolved::Builtin))
 }
 
 // spec: drift-kit/SPEC.md §The KPI plugin contract — the exported environment a consumer plugin
@@ -118,19 +122,38 @@ fn members(kpis_file: &str) -> Vec<String> {
         .unwrap_or_default()
 }
 
+// spec: drift-kit/SPEC.md §The extensibility contract — the row a PowerShell plugin reads while the
+// host knob is empty, naming the knob that arms it
+fn host_off() -> String {
+    format!("n/a (PowerShell plugin, {} is empty)", substrate::KNOB)
+}
+
 // spec: drift-kit/SPEC.md §The report skeleton — degrade discipline: a member that exits non-zero
-// or prints nothing is the fail-visible row, because a silently vanishing KPI is itself drift.
-fn invoke(r: &Resolved, ctx: &Ctx, trend: bool, env: &[(String, String)]) -> Option<String> {
-    match r {
-        Resolved::Builtin(f) => f(ctx, trend),
-        Resolved::Plugin(p) => {
-            let args: Vec<&str> = if trend { vec!["--trend"] } else { vec![] };
-            let plugin = programs::Program::consumer("DRIFT_KIT_KPIS_FILE", p.as_str());
-            proc::run_with_env(&plugin, &args, env)
-                .ok()
-                .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
+// or prints nothing is the fail-visible row, because a silently vanishing KPI is itself drift. The
+// `Err` is the host-off row, reached with no spawn.
+fn invoke(r: &Resolved, ctx: &Ctx, trend: bool, env: &[(String, String)], host: &str) -> Result<Option<String>, String> {
+    let mut args: Vec<String> = Vec::new();
+    let plugin = match r {
+        Resolved::Builtin(f) => return Ok(f(ctx, trend)),
+        Resolved::Plugin(p) => programs::Program::consumer("DRIFT_KIT_KPIS_FILE", p.as_str()),
+        Resolved::PowerShell(p) => {
+            if host.is_empty() {
+                return Err(host_off());
+            }
+            args = substrate::host_args(p);
+            match substrate::resolve_host("GATE_SDK_POWERSHELL", host) {
+                Ok(program) => program,
+                Err(_) => return Ok(None),
+            }
         }
+    };
+    if trend {
+        args.push("--trend".to_string());
     }
+    let args: Vec<&str> = args.iter().map(String::as_str).collect();
+    Ok(proc::run_with_env(&plugin, &args, env)
+        .ok()
+        .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned())))
 }
 
 fn render_rows(rows: &[(String, String)]) -> String {
@@ -169,6 +192,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     let env = child_env(&fam, &ctx);
     let kpi_dirs = walk::knob_array("DRIFT_KIT_KPI_DIRS").unwrap_or_default();
     let registry = members(&scalar(&fam, "KPIS_FILE"));
+    let host = walk::knob_scalar(substrate::KNOB)?;
 
     if trend {
         let mut frags: Vec<String> = Vec::new();
@@ -177,7 +201,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
                 Some(r) => r,
                 None => continue,
             };
-            let frag = invoke(&r, &ctx, true, &env).unwrap_or_default();
+            let frag = invoke(&r, &ctx, true, &env, &host).ok().flatten().unwrap_or_default();
             let frag = frag.lines().next().unwrap_or("");
             if !frag.is_empty() {
                 frags.push(frag.to_string());
@@ -202,7 +226,13 @@ pub fn emit(args: &[String]) -> Result<String, String> {
                 continue;
             }
         };
-        let out = invoke(&r, &ctx, false, &env).unwrap_or_default();
+        let out = match invoke(&r, &ctx, false, &env, &host) {
+            Ok(out) => out.unwrap_or_default(),
+            Err(row) => {
+                lead.push((name.clone(), row));
+                continue;
+            }
+        };
         let out = out.trim_end_matches('\n');
         if out.is_empty() {
             lead.push((name.clone(), "n/a (plugin failed)".to_string()));
@@ -274,6 +304,122 @@ mod tests {
         );
         assert!(resolve("kpi-nobody-ships-this", &dirs, &[]).is_none());
         std::fs::remove_dir_all(&dir).ok();
+    }
+
+    fn fixture(case: &str, files: &[&str]) -> std::path::PathBuf {
+        let dir = std::env::temp_dir().join(format!("cw-kpi-{}-{}", case, std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("cannot make the fixture dir");
+        for f in files {
+            let p = crate::walk::child(&dir, f);
+            if let Some(parent) = p.parent() {
+                std::fs::create_dir_all(parent).expect("cannot make the fixture subdir");
+            }
+            std::fs::write(&p, "").expect("cannot write the fixture plugin");
+        }
+        dir
+    }
+
+    fn found(r: Option<Resolved>) -> String {
+        match r {
+            Some(Resolved::Plugin(p)) => format!("sh {}", p),
+            Some(Resolved::PowerShell(p)) => format!("ps1 {}", p),
+            Some(Resolved::Builtin(_)) => "builtin".to_string(),
+            None => "none".to_string(),
+        }
+    }
+
+    // spec: drift-kit/SPEC.md §The extensibility contract — a `.ps1` answers a tier where no `.sh`
+    // sits beside it, the `.sh` wins beside one, tier 2 resolves one too, and a tier-1 `.ps1`
+    // shadows the built-in
+    #[test]
+    fn a_powershell_plugin_resolves_in_both_file_tiers_behind_a_sibling_sh() {
+        let dir = fixture("ps1", &["one/kpi-a.ps1", "two/kpi-b.sh", "two/kpi-b.ps1", "kit/kpis/kpi-c.ps1", "one/kpi-task-split.ps1"]);
+        let d = dir.display().to_string();
+        let dirs = vec![format!("{}/one", d), format!("{}/two", d)];
+        let kits = vec![format!("{}/kit", d)];
+        let got = [
+            found(resolve("kpi-a", &dirs, &kits)),
+            found(resolve("kpi-b", &dirs, &kits)),
+            found(resolve("kpi-c", &dirs, &kits)),
+            found(resolve("kpi-task-split", &dirs, &kits)),
+        ];
+        std::fs::remove_dir_all(&dir).ok();
+        assert_eq!(
+            got,
+            [
+                format!("ps1 {}/one/kpi-a.ps1", d),
+                format!("sh {}/two/kpi-b.sh", d),
+                format!("ps1 {}/kit/kpis/kpi-c.ps1", d),
+                format!("ps1 {}/one/kpi-task-split.ps1", d),
+            ]
+        );
+    }
+
+    // spec: drift-kit/SPEC.md §The extensibility contract — an empty host knob is the host-off row
+    // in either mode, reached with no spawn
+    #[test]
+    fn a_powershell_plugin_with_no_host_reads_the_host_off_row() {
+        let ctx = ctx_for_test();
+        let r = Resolved::PowerShell("/no/such/kpi-x.ps1".to_string());
+        let want = "n/a (PowerShell plugin, GATE_SDK_POWERSHELL is empty)".to_string();
+        assert_eq!(invoke(&r, &ctx, false, &[], ""), Err(want.clone()));
+        assert_eq!(invoke(&r, &ctx, true, &[], ""), Err(want));
+    }
+
+    // spec: drift-kit/SPEC.md §The extensibility contract — a native-Windows host starts no `.sh`,
+    // so there a `.sh` plugin's row is its fail-visible read
+    #[cfg(windows)]
+    #[test]
+    fn a_sh_plugin_on_windows_is_the_fail_visible_read() {
+        let dir = fixture("winsh", &[]);
+        let plugin = crate::walk::child(&dir, "kpi-winsh.sh");
+        std::fs::write(&plugin, "#!/bin/sh\nprintf 'lead\\tran\\tyes\\n'\n").expect("cannot write the plugin");
+        let r = Resolved::Plugin(plugin.display().to_string());
+        let got = invoke(&r, &ctx_for_test(), false, &[], "");
+        std::fs::remove_dir_all(&dir).ok();
+        assert_eq!(got, Ok(None));
+    }
+
+    // spec: drift-kit/SPEC.md §The extensibility contract — Windows PowerShell is on every Windows
+    // host, so a Windows build binds that arm; `pwsh` runs wherever it resolves
+    fn hosts() -> Vec<&'static str> {
+        let mut out: Vec<&'static str> = Vec::new();
+        if cfg!(windows) || proc::which("powershell").is_some() {
+            out.push("powershell");
+        }
+        if proc::which("pwsh").is_some() {
+            out.push("pwsh");
+        }
+        out
+    }
+
+    // spec: drift-kit/SPEC.md §The KPI plugin contract — the live case: a `.ps1` plugin answers both
+    // modes under each resolving host and reads the exported environment
+    #[test]
+    fn a_powershell_plugin_answers_both_modes_under_each_resolving_host() {
+        let dir = fixture("live", &[]);
+        let plugin = crate::walk::child(&dir, "kpi-live.ps1");
+        std::fs::write(
+            &plugin,
+            "if ($args.Count -eq 1 -and $args[0] -eq '--trend') { Write-Output ('live ' + $env:DRIFT_KIT_QUEUE_FILE); exit 0 }\n\
+             Write-Output (\"lead`tlive row`t\" + $env:DRIFT_KIT_QUEUE_FILE)\n",
+        )
+        .expect("cannot write the live plugin");
+        let r = Resolved::PowerShell(plugin.display().to_string());
+        let ctx = ctx_for_test();
+        let env = child_env(&[("QUEUE_FILE".to_string(), "seen-queue.md".to_string())], &ctx);
+        let mut got: Vec<String> = Vec::new();
+        let lines = |o: Result<Option<String>, String>| o.map(|s| s.map(|s| s.lines().collect::<Vec<_>>().join("\n")));
+        for host in hosts() {
+            let full = lines(invoke(&r, &ctx, false, &env, host));
+            let trend = lines(invoke(&r, &ctx, true, &env, host));
+            got.push(format!("{}: {:?} {:?}", host, full, trend));
+            assert_eq!(full, Ok(Some("lead\tlive row\tseen-queue.md".to_string())), "{}", host);
+            assert_eq!(trend, Ok(Some("live seen-queue.md".to_string())), "{}", host);
+        }
+        std::fs::remove_dir_all(&dir).ok();
+        eprintln!("live hosts: {:?}", got);
     }
 
     // spec: drift-kit/SPEC.md §The KPI plugin contract — the exported environment: every family

@@ -56,13 +56,13 @@ an adopter writes a custom gate in shell only. The registry resolves a member as
 
 ### windows-kpi-plugin-start
 
-[spec: SPEC-kpi-powershell.md]
+[spec: drift-kit/SPEC.md]
 
 a consumer KPI plugin cannot start on native Windows. The drift report starts a resolved tier-1 or tier-2 `kpi-<name>.sh` path as a program, with no interpreter word, and Windows starts no `.sh`. drift-kit/SPEC.md §The extensibility contract's promise is unreachable there and the row degrades to its plugin-failed read.
 
 **Deliverable:** a plugin dispatch a native-Windows consumer can meet. Its shape is spec's, and a ruling on [custom-gate-substrates](#custom-gate-substrates)' dispatch shape bears on it.
 
-**Inferred, cannot run before build:** the row degrades on native Windows, read off the code at spec: `drift_report.rs`' `invoke` spawns the plugin path as `argv[0]`, and `proc::spawn_target` passes a separator-bearing name through unresolved — no Windows host runs before the mid-iteration push, whose `crate-tests-windows` legs run SPEC-kpi-powershell.md delta 3's Windows case
+**Inferred, cannot run before build:** the row degrades on native Windows, read off the code at spec: `drift_report.rs`' `invoke` spawns the plugin path as `argv[0]`, and `proc::spawn_target` passes a separator-bearing name through unresolved — no Windows host runs before the mid-iteration push, whose `crate-tests-windows` legs run `drift_report.rs`' two Windows cases (drift-kit/SPEC.md §The extensibility contract)
 
 **Push need (2026-10-15, inside the budget):** the mid-iteration push [custom-gate-substrates](#custom-gate-substrates) spends, since the plugin's Windows dispatch runs first on a Windows leg.
 

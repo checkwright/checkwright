@@ -31,19 +31,19 @@ Degrade discipline: exit is always 0. A member that fails or produces nothing yi
 
 A registry name resolves through **three tiers, consumer-first**, and the first tier that answers wins:
 
-1. each entry of `DRIFT_KIT_KPI_DIRS` — the adopter's own dirs, default the consumer gates dir — for a file named `<name>.sh`;
-2. each vendored kit's `kpis/<name>.sh`;
+1. each entry of `DRIFT_KIT_KPI_DIRS` — the adopter's own dirs, default the consumer gates dir — for a file named `<name>.sh`, then `<name>.ps1`;
+2. each vendored kit's `kpis/<name>.sh`, then `kpis/<name>.ps1`;
 3. the **built-in members the binary carries** (§Bundled KPIs).
 
-So a consumer file named `kpi-task-split.sh` **shadows** the built-in of that name. The port moved the kit's own members into tier 3 and touched nothing about how a consumer's are found.
+So a consumer file named `kpi-task-split.sh` or `kpi-task-split.ps1` **shadows** the built-in of that name, and within one dir the `.sh` file wins. The port moved the kit's own members into tier 3 and touched nothing about how a consumer's are found.
 
-A tier-1 or tier-2 hit is **executed directly** (`"$path"`, never `bash "$path"`), so the execute bit still governs and a non-executable plugin degrades to the fail-visible row rather than running anyway. A consumer plugin reads the exported environment of §The KPI plugin contract and a built-in reads the same resolved values in process, so a consumer plugin is no second-class reader of the contract.
+A tier-1 or tier-2 `.sh` hit is **executed directly** (`"$path"`, never `bash "$path"`), so the execute bit still governs and a non-executable plugin degrades to the fail-visible row rather than running anyway. A `.ps1` hit is a **PowerShell plugin**, started by the host `GATE_SDK_POWERSHELL` names with gate-sdk's PowerShell target arguments (gate-sdk/SPEC.md §The gate-authoring surface), so the knob, not an execute bit, is what arms it. With the knob empty its row reads `n/a (PowerShell plugin, GATE_SDK_POWERSHELL is empty)`, which names the knob that arms it, and a host the knob names that does not resolve is the plugin's fail-visible row. A native-Windows host starts no `.sh`, so there a `.sh` plugin's row is its fail-visible read, and a PowerShell plugin is the form that runs. A consumer plugin reads the exported environment of §The KPI plugin contract and a built-in reads the same resolved values in process, so a consumer plugin is no second-class reader of the contract.
 
 `DRIFT_KIT_KPI_DIRS` exists for this extension point alone. A consumer-first plugin registry is the `check-graph`/`graph-vocab.knobs` consumer-config pattern, so narrowing it would narrow the provenance seam's own mechanism.
 
 ## The KPI plugin contract
 
-A plugin is `kpi-<name>.sh`, resolved through the registry and invoked directly (§The extensibility contract), so it must carry the execute bit or the report degrades that row to its fail-visible read. Two modes:
+A plugin is `kpi-<name>.sh` or `kpi-<name>.ps1`, resolved through the registry (§The extensibility contract). A `.sh` plugin is invoked directly and must carry the execute bit, or the report degrades that row to its fail-visible read; a `.ps1` plugin is started by the PowerShell host. Two modes:
 
 - **Full (no args)** — one or more rows on stdout, each `lead|lag<TAB><label><TAB><value>`: the section tag, a short human label, and a freeform value that carries its own caveat parenthetical (reading age, undercount note, pointer to the acting close-stage step). Multiple rows are legitimate for one measurement with two axes.
 - **`--trend`** — at most one compact `<key> <value>` fragment, or nothing (a plugin may opt out of the trend line).
