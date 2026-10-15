@@ -1,2 +1,1 @@
 # contract: lifecycle-kit/SPEC.md §The committed gap inbox — append-only mid-iteration gap capture, close-drained; one `- <YYYY-MM-DD> — <gap>` bullet per gap below (filed via run-gates.sh --emit file-gap).
-- 2026-10-15 — price-coverage reads claude-haiku-5-5 as unpriced: usage in the last 7d transcripts, no row in force in scripts/price-table.tsv (only claude-haiku-4-5-20251001). Harness roster churn; the trivial tier class binds haiku. Add the row from the price page.
