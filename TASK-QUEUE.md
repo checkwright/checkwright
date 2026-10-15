@@ -1144,9 +1144,3 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 
 ## Done
 
-- git-name-read-line-form
-- nul-listing-lossy-decode
-- boundary-wipe-unnamed-member
-- front-matter-dotted-closer
-- plugin-front-matter-yaml
-
