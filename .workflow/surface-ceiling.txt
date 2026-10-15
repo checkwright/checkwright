@@ -99,7 +99,7 @@
 333934cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
 281930cp installer/SPEC.md
-388997cp lifecycle-kit/SPEC.md
+389529cp lifecycle-kit/SPEC.md
 7691cp lifecycle-kit/templates/consult.md
 1212cp lifecycle-kit/templates/frames/project-critique.md
 1902cp lifecycle-kit/templates/frames/stage-contract-sweep.md

@@ -945,6 +945,20 @@ pub fn list_dir(root: &Path) -> Result<Vec<(String, bool)>, String> {
     Ok(out)
 }
 
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the children `list_dir` refuses to name, handed to a remover as paths and kinds
+pub fn unnamed_children(root: &Path) -> Vec<(PathBuf, bool)> {
+    let Ok(rd) = fs::read_dir(root) else {
+        return Vec::new();
+    };
+    let mut out: Vec<(PathBuf, bool)> = rd
+        .flatten()
+        .filter(|ent| ent.file_name().to_str().is_none())
+        .map(|ent| (ent.path(), ent.file_type().is_ok_and(|t| t.is_dir())))
+        .collect();
+    out.sort();
+    out
+}
+
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the same traversal with the prune predicate
 // supplied by the caller, because `gate_find`'s configured set is not every shell form's rule: a
 // member whose original reached for a bare `find` prunes what that `find` pruned.

@@ -1949,20 +1949,24 @@ struct Wiped {
 fn wipe(dir: &str, preserve: &[String]) -> Wiped {
     let mut out = Wiped::default();
     let root = Path::new(dir);
-    let Ok(kids) = walk::list_dir(root) else {
-        return out;
-    };
-    for (base, is_dir) in kids {
-        if base == ".gitkeep" || base == ".gitignore" || preserve.contains(&base) {
-            continue;
-        }
-        let child = walk::child(root, &base);
+    let mut take = |child: &Path, is_dir: bool, remove: fn(&Path, bool, &mut Vec<String>)| {
         let mut failed: Vec<String> = Vec::new();
-        remove_member(&child, is_dir, &mut failed);
+        remove(child, is_dir, &mut failed);
         if failed.is_empty() {
             out.removed.push(child.display().to_string());
         } else {
             out.failed.extend(failed);
+        }
+    };
+    for (child, is_dir) in walk::unnamed_children(root) {
+        take(&child, is_dir, remove_unnamed);
+    }
+    if let Ok(kids) = walk::list_dir(root) {
+        for (base, is_dir) in kids {
+            if base == ".gitkeep" || base == ".gitignore" || preserve.contains(&base) {
+                continue;
+            }
+            take(&walk::child(root, &base), is_dir, remove_member);
         }
     }
     out
@@ -1976,6 +1980,9 @@ fn remove_member(p: &Path, is_dir: bool, failed: &mut Vec<String>) {
     if dir {
         // spec: gate-sdk/SPEC.md §The crate's crosser — the listing goes through `walk`, the crate's
         // one filesystem-walking module, and `list_dir` sorts, which keeps the report order stable
+        for (kid, kid_dir) in walk::unnamed_children(p) {
+            remove_unnamed(&kid, kid_dir, failed);
+        }
         if let Ok(kids) = walk::list_dir(p) {
             for (base, kid_dir) in kids {
                 remove_member(&walk::child(p, &base), kid_dir, failed);
@@ -1983,6 +1990,14 @@ fn remove_member(p: &Path, is_dir: bool, failed: &mut Vec<String>) {
         }
     }
     let res = if dir { std::fs::remove_dir(p) } else { std::fs::remove_file(p) };
+    if res.is_err() {
+        failed.push(p.display().to_string());
+    }
+}
+
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — a member no listing names is removed whole, and a failure is named at it
+fn remove_unnamed(p: &Path, is_dir: bool, failed: &mut Vec<String>) {
+    let res = if is_dir && !p.is_symlink() { std::fs::remove_dir_all(p) } else { std::fs::remove_file(p) };
     if res.is_err() {
         failed.push(p.display().to_string());
     }
@@ -2349,6 +2364,31 @@ mod tests {
         );
         assert!(wiped.failed.is_empty(), "a removal failed: {:?}", wiped.failed);
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — a member whose name is not UTF-8 is removed, at the root and nested
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn the_wipe_removes_a_member_whose_name_is_not_utf8() {
+        use std::os::unix::ffi::OsStrExt;
+        let dir = std::env::temp_dir().join(format!("enter-stage-wipe-unnamed-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        let bad = std::ffi::OsStr::from_bytes(b"bad\xff");
+        std::fs::create_dir_all(dir.join("sub").join(bad)).expect("mk");
+        std::fs::write(dir.join("sub").join(bad).join("f"), "").expect("w");
+        std::fs::write(dir.join("sub/named"), "").expect("w");
+        std::fs::write(dir.join(bad), "").expect("w");
+        std::fs::write(dir.join("plain"), "").expect("w");
+        std::fs::write(dir.join(".gitkeep"), "").expect("w");
+        let wiped = wipe(&dir.display().to_string(), &[]);
+        let left = walk::list_dir(&dir);
+        let _ = std::fs::remove_dir_all(&dir);
+        assert_eq!(left, Ok(vec![(".gitkeep".to_string(), false)]), "the wipe left {:?}, failing {:?}", left, wiped.failed);
+        assert!(wiped.failed.is_empty(), "a removal failed: {:?}", wiped.failed);
+        let mut leaves: Vec<String> =
+            wiped.removed.iter().map(|w| w.rsplit('/').next().unwrap_or(w).to_string()).collect();
+        leaves.sort();
+        assert_eq!(leaves, ["bad\u{fffd}", "plain", "sub"]);
     }
 
     // spec: lifecycle-kit/SPEC.md §The state machine — the leaf-level contract: a missing path is

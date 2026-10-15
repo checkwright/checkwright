@@ -10,18 +10,6 @@
 
 ## Technical Debt
 
-### boundary-wipe-unnamed-member
-
-the iteration boundary's scratch wipe leaves a directory holding a member whose name is not UTF-8. `wipe` in `native/src/emit/enter_stage.rs` descends through the shared directory lister, which refuses such a name, so the directory is never emptied and its removal fails at every boundary until it is deleted by hand. lifecycle-kit/SPEC.md §bin/enter-stage.sh names a permission error and a concurrent writer as residue and not this one.
-
-**Deliverable:** the wipe removing a member it cannot name, or that section stating the limit and the hand removal.
-
-**Run at crate-name-reader-pass' scope:** the shared lister refuses a directory holding such a member, read off a gate run over a scratch tree, which printed its `non-UTF-8 entry name under <dir>` refusal at exit 2.
-
-That `wipe` stops at that refusal is read off its two lister calls, not run through a boundary entry, which needs a whole lifecycle tree; its unit case over a scratch directory at build is the oracle.
-
-**Cost while deferred:** one such scratch member leaves a could-not-remove note at every boundary. Filed 2026-10-10 by front-door-readiness-pass' close, where a scratch repository carrying one survived a boundary and was removed by hand, and promoted at the next scope's intake. Re-verified there by reading `wipe`: both its listings go through `walk::list_dir`. Owner lookup: `wipe`, `non-UTF-8`, `could not remove` in this file and the disposed-findings record — `nul-listing-lossy-decode`, DISTINCT (ten readers that decode lossily where this one refuses); owner lifecycle-kit/SPEC.md §bin/enter-stage.sh.
-
 ### front-matter-dotted-closer
 
 the shared front-matter reader (`front_matter_span` in `native/src/spec.rs`) takes a line of three hyphens as a block's only closer. Jekyll also closes a block on a line of three dots, so a page closed that way is read as carrying no block and its metadata is scanned as body by the six gates on the reader, where canon-kit/SPEC.md §The shared spec adapters calls the reading Jekyll's.
@@ -1166,4 +1154,5 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 
 - git-name-read-line-form
 - nul-listing-lossy-decode
+- boundary-wipe-unnamed-member
 
