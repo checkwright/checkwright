@@ -4,4 +4,4 @@
 
 ---
 
-— scope a46bdd8a 2026-10-15 2ffc3f540
+foreign-build-budget-pass scope a46bdd8a 2026-10-15 2ffc3f540

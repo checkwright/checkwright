@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: foreign-build-budget-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,24 @@
 ## New Features
 
 ## Technical Debt
+
+### agent-effort-line-unmeasured
+
+that an agent definition's effort line sets its child's effort (delegation-kit/SPEC.md §check-agent-tier-explicit, Honest limits) is unmeasured. tier-resolution-pass' close session ran under a definition stating one effort and read that effort from `--model-verdict`, but its dispatch named none and its dispatcher read the same value, so inheritance explains the reading as well as the definition does. Every tracked definition binds the same effort, so no session of this tree's present binding can tell the two apart.
+
+**Deliverable:** one dispatch of a definition whose effort differs from its dispatcher's running effort, `--model-verdict` read in the child, and the Honest-limits sentence rewritten to the result.
+
+**Cost while deferred:** a class's bound effort is trusted on the harness's documentation, so a harness that ignored the line would run every class at the dispatcher's effort with the generated line and its freshness gate both green. Filed 2026-10-09 by tier-resolution-pass' close after its drain, and promoted at the next scope's intake. Re-verified there by grep: the five tracked definitions state one effort. Owner lookup: `effort`, `model-verdict`, `Honest limits` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §check-agent-tier-explicit.
+
+### tier-model-shape-unvalidated
+
+the tier tables' validator holds a model to no shape beyond carrying no whitespace, and `--emit agent-tiers --write` puts it bare after a definition's `model:` key. `tier-value-validator-gaps` closed the effort's hole and did not scope the model's shape.
+
+**Deliverable:** a model shape the validator refuses outside of, admitting a vendor's bracketed and dotted ids, with its unit rows and the sentence in delegation-kit/SPEC.md §check-agent-tier-explicit.
+
+**Run at scope 2026-10-15** on a scratch repository binding `judgment=#bad,high`: the validator admitted it, `--emit agent-tiers --write` wrote `model: #bad`, a YAML comment leaving the model empty, and the gate read clean.
+
+**Cost while deferred:** a binding typo of that shape ships a definition with no model under a green gate. Filed 2026-10-09 by crate-reader-hardening-pass' first build batch and promoted at its close. Re-verified by reading `native/src/knobs/delegation_kit.rs`: its refusal rows hold the pair's form and whitespace alone. Owner lookup: `agent-tiers`, `tier table`, `YAML comment` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §check-agent-tier-explicit.
 
 ## Deferred
 
@@ -46,11 +64,11 @@ hosted attestation. The team/paid rung: gates verified server-side by a party th
 
 [cost: iteration/low] [surface: delegation-kit] [roadmap: now/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
 
-foreign agents. A lead delegating a stage to a foreign coding agent, cashing the public no-lock-in claim: governance enforced at the git/gate boundary, not by trusting the author. *Remaining:* (4) **stage-contract expression**, past its two slices below: a stage whose writes a foreign agent performs. Held at scope 2026-10-09 (operator direction, lead-relayed, not a ruling); not ruled out.
+foreign agents. A lead delegating a stage to a foreign coding agent, cashing the public no-lock-in claim: governance enforced at the git/gate boundary, not by trusting the author. *Remaining:* (4) **stage-contract expression**, past its two slices below: a stage whose writes a foreign agent performs. **Unit set, operator direction 2026-10-15, lead-relayed (not a ruling):** this item leads, with [foreign-budget-reset-ok-stale](#foreign-budget-reset-ok-stale), [agent-effort-line-unmeasured](#agent-effort-line-unmeasured) and [tier-model-shape-unvalidated](#tier-model-shape-unvalidated). It is accepted on stub-driven crate cases with no live-run grant, and the live foreign run is filed as a later observation.
 
 **Slices landed**, each in delegation-kit/SPEC.md §The foreign-vendor run, each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); then (2) the dispatch transport with (1) the escalation resume model riding it, `--foreign-resume`, that section's Resuming a session (delegation-transport-pass, 2026-10-03). Then (3) the budget oracle, delegation-kit/SPEC.md §The keyed verdict (delegation-wait-journal-pass, 2026-10-07; operator direction, lead-relayed, not a ruling). No foreign run was granted: accepted by stub-driven crate cases and one producer read of a vendor's on-disk session store through a scratch binding, so a live turn refreshing the feed is unobserved, as is whether a turn in a vendor's non-persisting mode, two of this repo's three adapters, leaves a usage event on disk; one granted run of each kind settles both. **This repo's binding (operator direction, 2026-10-07, lead-relayed, not a ruling):** inline in the gitignored `.local` overlay alone, its adapters reading one snapshot under the metric dir from an inline producer. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
 
-**Item (4)'s two slices landed** (both 2026-10-08; operator direction each, lead-relayed, not a ruling). First (foreign-stage-contract-pass), lifecycle-kit/SPEC.md §The stage-contract arm: the audit stage's reading runs foreign, its host performing every write. Second (foreign-stage-binding-pass), its §The host protocol: one protocol file every shipped stage template but the build stage's points at. **Grant spent** (one live foreign run, operator grant 2026-10-08, lead-relayed) by the second slice's own audit stage, whose landing commit carries the run's `OK` line. The agent wrote nothing, kept the frame's five parts, ran the contract's read-only commands unrefused, and left the battery and successor-entry read to the host, its clone holding no gate binary. **Second grant spent** (operator grant 2026-10-09, lead-relayed: judgment-class model, medium effort) by tier-resolution-pass' spec stage, a non-audit contract; its amendment's landing commit carries the `OK` line. It wrote nothing, returned each amendment as a full-text proposal, and named each command needing the binary and each reading lacking ignored content.
+**Item (4)'s two slices landed** (both 2026-10-08; operator direction each, lead-relayed, not a ruling). First (foreign-stage-contract-pass), lifecycle-kit/SPEC.md §The stage-contract arm: the audit stage's reading runs foreign, its host performing every write. Second (foreign-stage-binding-pass), its §The host protocol: one protocol file every shipped stage template but the build stage's points at. **Two grants spent** (operator grants 2026-10-08 and 2026-10-09, lead-relayed), by the second slice's audit stage and by tier-resolution-pass' spec stage, each landing commit carrying the run's `OK` line: the agent wrote nothing, returned every write as a full-text proposal, and left each command needing the gate binary to the host.
 
 **Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, the pattern the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service) and [plugin-harness-reach](#plugin-harness-reach).
 
@@ -374,16 +392,6 @@ a retired gate-binary arm named in a kit SPEC's code span resolves under no gate
 
 **Cost while deferred:** a kit SPEC can cite an arm the binary no longer carries, unread until a reader runs it. Filed 2026-10-07 off windows-shell-floor-pass' close, carried to the next scope's intake. Owner lookup: `arm span`, `front-door-verbs`, `retired arm` in this file and the disposed-findings record — none; owner installer/SPEC.md §check-front-door-verbs.
 
-### agent-effort-line-unmeasured
-
-[cost: event/low] [surface: delegation-kit]
-
-that an agent definition's effort line sets its child's effort (delegation-kit/SPEC.md §check-agent-tier-explicit, Honest limits) is unmeasured. tier-resolution-pass' close session ran under a definition stating one effort and read that effort from `--model-verdict`, but its dispatch named none and its dispatcher read the same value, so inheritance explains the reading as well as the definition does. Every tracked definition binds the same effort, so no session of this tree's present binding can tell the two apart.
-
-**Deliverable:** one dispatch of a definition whose effort differs from its dispatcher's running effort, `--model-verdict` read in the child, and the Honest-limits sentence rewritten to the result.
-
-**Cost while deferred:** a class's bound effort is trusted on the harness's documentation, so a harness that ignored the line would run every class at the dispatcher's effort with the generated line and its freshness gate both green. Filed 2026-10-09 by tier-resolution-pass' close after its drain, and promoted at the next scope's intake. Re-verified there by grep: the five tracked definitions state one effort. Owner lookup: `effort`, `model-verdict`, `Honest limits` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §check-agent-tier-explicit.
-
 ### git-name-read-line-form
 
 [cost: event/low] [surface: native]
@@ -407,18 +415,6 @@ ten listing readers already on the NUL form decode a name lossily through an arg
 **Inferred, not run:** that each of the ten opens or matches a non-UTF-8 name under a replacement spelling — commit a member whose name carries a lone 0xff byte and run each reader over the tree
 
 **Cost while deferred:** the tree gives two answers on one name, a refusal from the shared reader and a silent misspelling from these. Filed 2026-10-09 by crate-reader-hardening-pass' spec and promoted at its close. Re-verified by `git grep -c from_utf8_lossy -- native/src`: each named module carries the call. Owner lookup: `lossy`, `from_utf8_lossy`, `non-UTF-8` in this file and the disposed-findings record — [worktree-memory-dir-key](#worktree-memory-dir-key), DISTINCT (a memory directory's key); `tracked-name-lossy-decode`, done, DISTINCT (the shared reader alone); owner gate-sdk/SPEC.md §Fail-closed contract.
-
-### tier-model-shape-unvalidated
-
-[cost: event/low] [surface: delegation-kit]
-
-the tier tables' validator holds a model to no shape beyond carrying no whitespace, and `--emit agent-tiers --write` puts it bare after a definition's `model:` key. `tier-value-validator-gaps` closed the effort's hole and did not scope the model's shape.
-
-**Deliverable:** a model shape the validator refuses outside of, admitting a vendor's bracketed and dotted ids, with its unit rows and the sentence in delegation-kit/SPEC.md §check-agent-tier-explicit.
-
-**Inferred, not run:** that a model opening on a hash is written as a YAML comment, leaving the definition's model empty while assertion B compares bytes and passes — bind such a model on a scratch definition directory and run `--emit agent-tiers --write`, then the gate
-
-**Cost while deferred:** a binding typo of that shape ships a definition with no model under a green gate. Filed 2026-10-09 by crate-reader-hardening-pass' first build batch and promoted at its close. Re-verified by reading `native/src/knobs/delegation_kit.rs`: its refusal rows hold the pair's form and whitespace alone. Owner lookup: `agent-tiers`, `tier table`, `YAML comment` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §check-agent-tier-explicit.
 
 ### front-matter-dotted-closer
 
