@@ -28,7 +28,7 @@ ten listing readers already on the NUL form decode a name lossily through an arg
 
 **Run at crate-name-reader-pass' scope** in a scratch repository: a member named with a lone 0xff byte at the tree's root stops `--run` and `--only` at exit 2 before any gate, on the shared directory lister's refusal; in a subdirectory, `check-md-refs`, `check-spec-pointer` and `check-md-unwrapped` run green, with no verdict moved.
 
-**Inferred, not run:** that each of the ten opens or matches the name under a replacement spelling — cannot run here: each reader takes its doc set from consumer config a scratch tree must rebuild per reader, so build's per-reader unit cases are the oracle
+That each of the ten opens or matches the name under a replacement spelling is read off its `from_utf8_lossy` call, not shown by a verdict: each reader takes its doc set from consumer config a scratch tree must rebuild per reader, so its unit case at build is the oracle.
 
 **Cost while deferred:** the tree gives two answers on one name, a refusal from the shared reader and a silent misspelling from these. Filed 2026-10-09 by crate-reader-hardening-pass' spec and promoted at its close. Re-verified by `git grep -c from_utf8_lossy -- native/src`: each named module carries the call. Owner lookup: `lossy`, `from_utf8_lossy`, `non-UTF-8` in this file and the disposed-findings record — [worktree-memory-dir-key](#worktree-memory-dir-key), DISTINCT (a memory directory's key); `tracked-name-lossy-decode`, done, DISTINCT (the shared reader alone); owner gate-sdk/SPEC.md §Fail-closed contract.
 
@@ -40,7 +40,7 @@ the iteration boundary's scratch wipe leaves a directory holding a member whose 
 
 **Run at crate-name-reader-pass' scope:** the shared lister refuses a directory holding such a member, read off a gate run over a scratch tree, which printed its `non-UTF-8 entry name under <dir>` refusal at exit 2.
 
-**Inferred, not run:** that `wipe` stops at that refusal — cannot run here: a boundary entry needs a whole lifecycle tree and wipes the scratch of the tree it runs in, so build's unit case over a scratch directory is the oracle
+That `wipe` stops at that refusal is read off its two lister calls, not run through a boundary entry, which needs a whole lifecycle tree; its unit case over a scratch directory at build is the oracle.
 
 **Cost while deferred:** one such scratch member leaves a could-not-remove note at every boundary. Filed 2026-10-10 by front-door-readiness-pass' close, where a scratch repository carrying one survived a boundary and was removed by hand, and promoted at the next scope's intake. Re-verified there by reading `wipe`: both its listings go through `walk::list_dir`. Owner lookup: `wipe`, `non-UTF-8`, `could not remove` in this file and the disposed-findings record — [nul-listing-lossy-decode](#nul-listing-lossy-decode), DISTINCT (ten readers that decode lossily where this one refuses); owner lifecycle-kit/SPEC.md §bin/enter-stage.sh.
 
