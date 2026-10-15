@@ -3210,12 +3210,16 @@ mod tests {
         // spec: gate-sdk/SPEC.md §lib/gate.sh — the host binary overrides a case's own pin: the
         // observer asserts reach, which no pin moves, and a pinned stub need not start on every host
         let bin = root.join(crate::knobs::gate_sdk::host_native_bin());
-        let env = vec![
+        let mut env = vec![
             (OBSERVER_MARKER.to_string(), "1".to_string()),
             (OBSERVER_MEMBER.to_string(), name.to_string()),
             ("GATE_SDK_ROOT".to_string(), walk::normalize_abs(&sdk.display().to_string())),
             ("GATE_SDK_NATIVE_BIN".to_string(), walk::normalize_abs(&bin.display().to_string())),
         ];
+        // spec: gate-sdk/SPEC.md §lib/gate.sh — a stub PowerShell host is a shebang script
+        if cfg!(windows) {
+            env.push((crate::substrate::KNOB.to_string(), String::new()));
+        }
         let merged = crate::proc::run_merged_in(
             &programs::Program::consumer("test", exe),
             &[&observer, "--exact", "--ignored", "--nocapture"],

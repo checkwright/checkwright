@@ -67,13 +67,17 @@ jobs:
           mkdir -p "$dir"
           unzip -q -o "$RUNNER_TEMP/$asset" -d "$dir"
           pwsh -NoLogo -NoProfile -NonInteractive -Command '$v = (Import-Module PSScriptAnalyzer -PassThru).Version.ToString(); if ($v -ne $env:PSSCRIPTANALYZER_VERSION) { throw "imported PSScriptAnalyzer $v, not the pinned $env:PSSCRIPTANALYZER_VERSION" }; "PSScriptAnalyzer $v"'
+      # spec: gate-sdk/SPEC.md §check-psscriptanalyzer — armed through the local overlay, never the environment
       - name: full battery
         env:
           GATE_SDK_SARIF_FILE: ${{ runner.temp }}/gates.sarif
-          GATE_SDK_POWERSHELL: pwsh
         run: |
           shellcheck --version | grep '^version:'
-          bash gate-sdk/bin/run-gates.sh
+          printf 'GATE_SDK_POWERSHELL = pwsh\n' > scripts/gate-sdk-config.local.knobs
+          rc=0
+          bash gate-sdk/bin/run-gates.sh || rc=$?
+          rm -f scripts/gate-sdk-config.local.knobs
+          exit "$rc"
       # spec: installer/SPEC.md §The CI action — the SARIF upload is presentation, never the verdict
       - name: upload the battery's SARIF log
         if: always()
