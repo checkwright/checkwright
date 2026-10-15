@@ -182,6 +182,50 @@ mod tests {
         );
     }
 
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the own-decode roster: a file, its NUL splits outside the shared decode, and the ground each keeps
+    const OWN_DECODE: &[(&str, usize, &str)] = &[
+        ("src/gates/docs_cmd.rs", 1, "a deleted name: refusing it would block its own deletion, and history's names never change"),
+        ("src/queue.rs", 1, "a stem matched only against a kebab slug, which no replacement spelling equals"),
+        ("src/spec.rs", 1, "the manifest set compares a name's bytes and never decodes one"),
+    ];
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — a NUL split outside the shared decode reds outside the roster
+    #[test]
+    fn every_nul_listing_in_the_crate_decodes_through_the_shared_reader_or_is_rostered() {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+        let mut files = vec![root.join("build.rs")];
+        files.extend(crate::walk::find_files(&root.join("src"), &["rs"]).expect("the crate source is listable"));
+        let nul = "\\0";
+        let spellings = [format!("split('{}')", nul), format!("split(['{}'", nul), "split(|b| *b == 0)".to_string()];
+        let mut own: std::collections::BTreeMap<String, usize> = Default::default();
+        for f in &files {
+            let rel = f.strip_prefix(root).expect("under the crate").display().to_string().replace('\\', "/");
+            if rel == "src/listing.rs" {
+                continue;
+            }
+            let text = std::fs::read_to_string(f).expect("a crate source reads");
+            let n: usize = spellings.iter().map(|s| text.matches(s.as_str()).count()).sum();
+            if n > 0 {
+                own.insert(rel, n);
+            }
+        }
+        let rostered: std::collections::BTreeMap<String, usize> =
+            OWN_DECODE.iter().map(|(f, n, _)| (f.to_string(), *n)).collect();
+        assert_eq!(
+            own, rostered,
+            "a NUL-terminated listing is split outside the shared decode, or a roster row names no such \
+             split: decode it through listing::names, listing::tracked or listing::decode, or add the \
+             file, its count and its ground to OWN_DECODE"
+        );
+    }
+
+    #[test]
+    fn a_decoded_listing_refuses_a_name_that_is_not_utf8_where_a_lossy_read_would_rename_it() {
+        let got = decode(b"plain.md\0bad\xff.md\0");
+        assert!(matches!(&got, Err(Refusal::NotUtf8(t)) if t.contains("'bad\u{fffd}.md'")), "{:?}", got);
+        assert_eq!(decode(b"a.md\0b c.md\0").expect("decodes"), ["a.md", "b c.md"]);
+    }
+
     #[test]
     fn a_status_entry_names_its_current_path_and_drops_a_renames_source() {
         let (base, top) = scratch("status");

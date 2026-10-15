@@ -371,18 +371,16 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
     // spec: installer/SPEC.md §init — the read's status must survive: every file above is already
     // deleted, so a read that failed and returned nothing would stage the manifest alone and commit
     // it under a message claiming the removal.
-    let listed = super::git_batched(&root, &["ls-files", "-z"], &remove_set).map_err(|_| {
+    let unread = |why: &str| {
         refuse(
-            "could not read which of the removed files this repository tracks",
+            format!("could not read which of the removed files this repository tracks{}", why),
             "nothing was staged and the removal is not committed; the files are gone from the worktree and 'git status' shows them, so stage and commit that yourself, or 'git restore' them to undo.",
             1,
         )
-    })?;
-    let mut stage: Vec<String> = listed
-        .split(|b| *b == 0)
-        .filter(|s| !s.is_empty())
-        .map(|s| String::from_utf8_lossy(s).into_owned())
-        .collect();
+    };
+    let listed = super::git_batched(&root, &["ls-files", "-z"], &remove_set).map_err(|_| unread(""))?;
+    let mut stage: Vec<String> =
+        crate::listing::decode(&listed).map_err(|e| unread(&format!(" — {}", e.text())))?;
     let tracked_lock = super::git_code(&root, &["ls-files", "--error-unmatch", "--", lock::FILE])
         == Some(0);
     if lock_path.is_file() || tracked_lock {

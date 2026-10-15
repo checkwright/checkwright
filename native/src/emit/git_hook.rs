@@ -51,13 +51,8 @@ fn pin() -> Result<Vec<(String, String)>, String> {
 }
 
 fn staged() -> Result<Vec<String>, String> {
-    let c = proc::run(&programs::GIT, &["diff", "--cached", "--name-only", "-z", "--diff-filter=ACMR"])?;
-    let out = c.stdout().ok_or_else(|| "git could not list the staged set".to_string())?;
-    Ok(String::from_utf8_lossy(out)
-        .split('\0')
-        .filter(|p| !p.is_empty())
-        .map(String::from)
-        .collect())
+    crate::listing::names(None, &["diff", "--cached", "--name-only", "-z", "--diff-filter=ACMR"])
+        .map_err(|e| e.text_or(|_| "git could not list the staged set".to_string()))
 }
 
 fn first_seen(text: &str) -> Vec<String> {
@@ -198,13 +193,7 @@ fn median(samples: &[u128]) -> u128 {
 }
 
 fn tracked() -> Result<Vec<String>, String> {
-    let c = proc::run(&programs::GIT, &["ls-files", "-z"])?;
-    let out = c.stdout().ok_or_else(|| "git could not list the tracked paths".to_string())?;
-    Ok(String::from_utf8_lossy(out)
-        .split('\0')
-        .filter(|p| !p.is_empty())
-        .map(String::from)
-        .collect())
+    crate::listing::tracked(None, &[]).map_err(|e| e.text_or(|_| "git could not list the tracked paths".to_string()))
 }
 
 // spec: gate-sdk/SPEC.md §measure-commit — git runs a hook at the top level, where `ls-files`

@@ -163,12 +163,8 @@ fn row_file(locator: &str) -> &str {
     locator.split('#').next().unwrap_or(locator)
 }
 
-fn nul_list(out: &[u8]) -> Vec<String> {
-    String::from_utf8_lossy(out)
-        .split('\0')
-        .filter(|p| !p.is_empty())
-        .map(str::to_string)
-        .collect()
+fn nul_list(out: &[u8]) -> Result<Vec<String>, String> {
+    crate::listing::decode(out).map_err(|e| e.text())
 }
 
 // spec: lifecycle-kit/SPEC.md §The close-surfaces emit arm — the `<tracking>` value of each file,
@@ -184,11 +180,11 @@ fn tracking(base: &str, files: &[&str]) -> Result<Vec<&'static str>, String> {
         listed
             .stdout()
             .ok_or_else(|| format!("git ls-files failed under {}", base))?,
-    );
+    )?;
     let input: Vec<u8> = files.iter().flat_map(|f| f.bytes().chain(std::iter::once(0))).collect();
     let ci = proc::run_with_stdin(&programs::GIT, &["-C", base, "check-ignore", "--stdin", "-z"], &input)?;
     let ignored = match ci.code() {
-        Some(0) => nul_list(ci.streams().0),
+        Some(0) => nul_list(ci.streams().0)?,
         Some(1) => Vec::new(),
         other => {
             return Err(format!(

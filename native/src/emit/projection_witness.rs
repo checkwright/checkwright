@@ -237,11 +237,7 @@ fn witness_in(
         }
     }
     let listed = git(&dir, &["ls-files", "-z"])?;
-    let files: Vec<String> = String::from_utf8_lossy(&listed)
-        .split('\0')
-        .filter(|f| !f.is_empty())
-        .map(String::from)
-        .collect();
+    let files = crate::listing::decode(&listed).map_err(|e| e.text())?;
     let classes = classes(&files);
     let mut r = Report {
         classes: classes.len(),

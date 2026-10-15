@@ -256,7 +256,13 @@ impl Tree {
     fn read(top: &str) -> Result<Tree, String> {
         let mut tracked = HashSet::new();
         let mut tracked_base = HashSet::new();
-        for f in git_names(top, &["ls-files", "-z"], "listing tracked files")? {
+        let listed = crate::listing::tracked(Some(top), &[]).map_err(|e| {
+            e.text_or(|code| match code {
+                Some(c) => format!("git ls-files failed (exit {}) listing tracked files", c),
+                None => "git ls-files failed (killed by a signal) listing tracked files".to_string(),
+            })
+        })?;
+        for f in listed {
             tracked_base.insert(basename(&f).to_string());
             let mut i = 0usize;
             while let Some(off) = f[i..].find('/') {
@@ -377,6 +383,7 @@ fn git_text(top: &str, args: &[&str], what: &str) -> Result<String, String> {
     }
 }
 
+// spec: gate-sdk/SPEC.md §Fail-closed contract — a deleted name decodes lossily: refusing it would block its own deletion, and history's names never change
 fn git_names(top: &str, args: &[&str], what: &str) -> Result<Vec<String>, String> {
     Ok(git_text(top, args, what)?
         .split(['\0', '\n'])

@@ -27,9 +27,9 @@ fn git_lines(args: &[&str]) -> Vec<String> {
 
 pub fn run(ctx: &Ctx, trend: bool) -> Option<String> {
     let _ = ctx;
-    let amends: Vec<String> = git_text(&["ls-files", "-z"])
-        .split('\0')
-        .map(String::from)
+    let amends: Vec<String> = crate::listing::tracked(None, &[])
+        .unwrap_or_default()
+        .into_iter()
         .filter(|f| is_amendment(f))
         .collect();
     if amends.is_empty() {

@@ -10,18 +10,6 @@
 
 ## Technical Debt
 
-### nul-listing-lossy-decode
-
-ten listing readers already on the NUL form decode a name lossily through an argv of their own: `check-md-refs`, `check-spec-pointer`, `check-fence-command-head`, `check-docs-cmd`, `check-md-unwrapped`, the hook's staged read, the consumer-smoke and projection-witness listings, `--emit close-surfaces` and uninstall. A member whose name is not UTF-8 is matched or opened there under a replacement-character spelling, while the shared reader `tracked-name-lossy-decode` landed refuses it.
-
-**Deliverable:** each of the ten on the shared reader's refusing path, or its lossy read stated with the ground that keeps it, and one holder for the set.
-
-**Run at crate-name-reader-pass' scope** in a scratch repository: a member named with a lone 0xff byte at the tree's root stops `--run` and `--only` at exit 2 before any gate, on the shared directory lister's refusal; in a subdirectory, `check-md-refs`, `check-spec-pointer` and `check-md-unwrapped` run green, with no verdict moved.
-
-That each of the ten opens or matches the name under a replacement spelling is read off its `from_utf8_lossy` call, not shown by a verdict: each reader takes its doc set from consumer config a scratch tree must rebuild per reader, so its unit case at build is the oracle.
-
-**Cost while deferred:** the tree gives two answers on one name, a refusal from the shared reader and a silent misspelling from these. Filed 2026-10-09 by crate-reader-hardening-pass' spec and promoted at its close. Re-verified by `git grep -c from_utf8_lossy -- native/src`: each named module carries the call. Owner lookup: `lossy`, `from_utf8_lossy`, `non-UTF-8` in this file and the disposed-findings record — [worktree-memory-dir-key](#worktree-memory-dir-key), DISTINCT (a memory directory's key); `tracked-name-lossy-decode`, done, DISTINCT (the shared reader alone); owner gate-sdk/SPEC.md §Fail-closed contract.
-
 ### boundary-wipe-unnamed-member
 
 the iteration boundary's scratch wipe leaves a directory holding a member whose name is not UTF-8. `wipe` in `native/src/emit/enter_stage.rs` descends through the shared directory lister, which refuses such a name, so the directory is never emptied and its removal fails at every boundary until it is deleted by hand. lifecycle-kit/SPEC.md §bin/enter-stage.sh names a permission error and a concurrent writer as residue and not this one.
@@ -32,7 +20,7 @@ the iteration boundary's scratch wipe leaves a directory holding a member whose 
 
 That `wipe` stops at that refusal is read off its two lister calls, not run through a boundary entry, which needs a whole lifecycle tree; its unit case over a scratch directory at build is the oracle.
 
-**Cost while deferred:** one such scratch member leaves a could-not-remove note at every boundary. Filed 2026-10-10 by front-door-readiness-pass' close, where a scratch repository carrying one survived a boundary and was removed by hand, and promoted at the next scope's intake. Re-verified there by reading `wipe`: both its listings go through `walk::list_dir`. Owner lookup: `wipe`, `non-UTF-8`, `could not remove` in this file and the disposed-findings record — [nul-listing-lossy-decode](#nul-listing-lossy-decode), DISTINCT (ten readers that decode lossily where this one refuses); owner lifecycle-kit/SPEC.md §bin/enter-stage.sh.
+**Cost while deferred:** one such scratch member leaves a could-not-remove note at every boundary. Filed 2026-10-10 by front-door-readiness-pass' close, where a scratch repository carrying one survived a boundary and was removed by hand, and promoted at the next scope's intake. Re-verified there by reading `wipe`: both its listings go through `walk::list_dir`. Owner lookup: `wipe`, `non-UTF-8`, `could not remove` in this file and the disposed-findings record — `nul-listing-lossy-decode`, DISTINCT (ten readers that decode lossily where this one refuses); owner lifecycle-kit/SPEC.md §bin/enter-stage.sh.
 
 ### front-matter-dotted-closer
 
@@ -1177,4 +1165,5 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 ## Done
 
 - git-name-read-line-form
+- nul-listing-lossy-decode
 

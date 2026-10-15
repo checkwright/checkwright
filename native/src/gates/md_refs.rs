@@ -38,15 +38,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     // spec: canon-kit/SPEC.md §check-md-refs — the tracked-file membership set, filled once
     // rather than by a per-link exec
-    let listing = proc::run(&programs::GIT, &["ls-files", "-z"])?;
-    let tracked: HashSet<String> = match listing.stdout() {
-        Some(o) => String::from_utf8_lossy(o)
-            .split('\0')
-            .filter(|s| !s.is_empty())
-            .map(String::from)
-            .collect(),
-        None => return Err("git ls-files failed — the tracked set is unknown".to_string()),
-    };
+    let tracked: HashSet<String> = crate::listing::tracked(None, &[])
+        .map_err(|e| e.text_or(|_| "git ls-files failed — the tracked set is unknown".to_string()))?
+        .into_iter()
+        .collect();
 
     let mut anchors: HashMap<String, Vec<String>> = HashMap::new();
     let mut bad: Vec<String> = Vec::new();

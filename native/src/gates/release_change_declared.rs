@@ -78,8 +78,7 @@ impl Source for Git {
 
     fn changes(&self, base: &str) -> Result<Vec<(String, String)>, String> {
         let raw = git_out(&["diff", "--cached", "--no-renames", "--name-status", "-z", base])?;
-        let text = String::from_utf8_lossy(&raw).into_owned();
-        let fields: Vec<&str> = text.split('\0').filter(|f| !f.is_empty()).collect();
+        let fields = crate::listing::decode(&raw).map_err(|e| e.text())?;
         if fields.len() % 2 != 0 {
             return Err("git diff --name-status -z returned an odd field count, so the change set is unreadable".to_string());
         }

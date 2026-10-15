@@ -1,7 +1,7 @@
 // spec: canon-kit/SPEC.md §check-fence-command-head — every command in a shell fence of the governed
 // doc set starts with a word that can run, and a word beginning with `-` never can
 use crate::bashscan::{self, Kind, Token};
-use crate::{proc, programs, spec, walk};
+use crate::{spec, walk};
 use std::collections::HashSet;
 use std::path::Path;
 
@@ -104,16 +104,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the tracked set is read from the repository
 // toplevel, and a failed listing is the check that could not run
 pub(crate) fn tracked_files(top: &str) -> Result<HashSet<String>, String> {
-    let out = proc::run(&programs::GIT, &["-C", top, "ls-files", "-z"])?;
-    match out.code() {
-        Some(0) => Ok(String::from_utf8_lossy(out.stdout().unwrap_or(&[]))
-            .split('\0')
-            .filter(|s| !s.is_empty())
-            .map(str::to_string)
-            .collect()),
-        Some(c) => Err(format!("git ls-files failed (exit {}) listing tracked files", c)),
-        None => Err("git ls-files failed (killed by a signal) listing tracked files".to_string()),
-    }
+    let listed = crate::listing::tracked(Some(top), &[]).map_err(|e| {
+        e.text_or(|code| match code {
+            Some(c) => format!("git ls-files failed (exit {}) listing tracked files", c),
+            None => "git ls-files failed (killed by a signal) listing tracked files".to_string(),
+        })
+    })?;
+    Ok(listed.into_iter().collect())
 }
 
 // spec: canon-kit/SPEC.md §check-fence-command-head — the fences the shared reader delimits, each

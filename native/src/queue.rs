@@ -719,6 +719,7 @@ pub fn backtick_slugs(line: &str) -> Vec<(usize, usize)> {
 // spec: queue-kit/SPEC.md §The queue-edges arm — the name-live test's input is the tracked tree
 // listing and not a curated roster; an absent `git` or a queue file outside a work tree marks
 // nothing, the same direction the retired set's own degradations take
+// spec: gate-sdk/SPEC.md §Fail-closed contract — decoded lossily: a stem is matched only against a kebab slug, which no replacement spelling equals
 pub fn tracked_stems(file: &str) -> Vec<(String, String)> {
     if !crate::proc::on_path(&programs::GIT) {
         return Vec::new();

@@ -1,7 +1,7 @@
 // spec: lifecycle-kit/SPEC.md §check-dispatch-entry — while the dispatch marker holds a line, a
 // commit adds a stamp
 use crate::stages;
-use crate::{proc, programs, walk};
+use crate::walk;
 use std::path::Path;
 
 fn read_file(path: &str) -> Result<String, String> {
@@ -11,15 +11,9 @@ fn read_file(path: &str) -> Result<String, String> {
 }
 
 fn staged_paths() -> Result<Vec<String>, String> {
-    let c = proc::run(&programs::GIT, &["diff", "--cached", "--name-only", "-z"])?;
-    let out = c
-        .stdout()
-        .ok_or_else(|| "git diff --cached failed — the check could not run; treating as failure (not clean)".to_string())?;
-    Ok(String::from_utf8_lossy(out)
-        .split('\0')
-        .filter(|p| !p.is_empty())
-        .map(str::to_string)
-        .collect())
+    crate::listing::names(None, &["diff", "--cached", "--name-only", "-z"]).map_err(|e| {
+        e.text_or(|_| "git diff --cached failed — the check could not run; treating as failure (not clean)".to_string())
+    })
 }
 
 struct Inputs {

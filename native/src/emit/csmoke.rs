@@ -148,11 +148,7 @@ fn tracked_files(source: &Path) -> Result<Vec<String>, String> {
     if let Some(r) = listed.failure_report() {
         return Err(format!("git ls-files failed listing the tracked set — {}", r));
     }
-    Ok(String::from_utf8_lossy(listed.stdout().unwrap_or(&[]))
-        .split('\0')
-        .filter(|s| !s.is_empty())
-        .map(str::to_string)
-        .collect())
+    crate::listing::decode(listed.stdout().unwrap_or(&[])).map_err(|e| e.text())
 }
 
 fn scratch_dir(base: &Path, label: &str) -> Result<(crate::walkthrough::Scratch, std::path::PathBuf), String> {

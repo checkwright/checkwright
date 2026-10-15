@@ -685,9 +685,9 @@ fn pack_tracked(commit: &str, src: &str, dst: &str, withhold: &[String]) -> Resu
     // path the payload was never going to carry
     let mut ls: Vec<&str> = vec!["ls-files", "-s", "-z", "--"];
     ls.extend(spec.iter().map(String::as_str));
-    let listing = git(&ls)?;
+    let listing = crate::listing::names(None, &ls).map_err(|e| refuse(e.text_or(|_| format!("git {} failed", ls.join(" ")))))?;
     let links: Vec<&str> = listing
-        .split('\0')
+        .iter()
         .filter(|l| l.starts_with("120000 "))
         .filter_map(|l| l.split_once('\t'))
         .map(|(_, p)| p)

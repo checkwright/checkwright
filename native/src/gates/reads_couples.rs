@@ -2,7 +2,6 @@
 // registered gate has its tracked read set covered by the gate's expanded couples; the
 // undecidable remainder is skipped-and-counted
 use crate::gates;
-use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
 
@@ -343,14 +342,10 @@ impl Ctx {
         Ok(())
     }
 
-    // spec: gate-sdk/SPEC.md §Fail-closed contract — the listing arrives NUL-terminated, one name per record
-    fn cover_listing(&mut self, d: &Demand, out: &str) {
+    fn cover_listing(&mut self, d: &Demand, listed: &[String]) {
         let (root, prune, gname, where_, globs, couples) =
             (d.root, d.prune, d.gname, d.where_, d.globs, d.couples);
-        for f in out.split('\0') {
-            if f.is_empty() {
-                continue;
-            }
+        for f in listed.iter().map(String::as_str) {
             if prune && walk::path_pruned(f, &self.prune) {
                 continue;
             }
@@ -377,19 +372,9 @@ impl Ctx {
 
 // spec: gate-sdk/SPEC.md §check-reads-couples — a root's tracked files, listed in the working
 // directory's repository unless the caller names another
-fn tracked_under(repo: Option<&str>, root: &str) -> Result<String, String> {
-    let mut args: Vec<&str> = Vec::new();
-    if let Some(r) = repo {
-        args.extend(["-C", r]);
-    }
-    args.extend(["ls-files", "-z"]);
-    if root != "." {
-        args.extend(["--", root]);
-    }
-    proc::run(&programs::GIT, &args)
-        .ok()
-        .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
-        .ok_or_else(|| format!("git ls-files failed for root '{}'", root))
+fn tracked_under(repo: Option<&str>, root: &str) -> Result<Vec<String>, String> {
+    let specs: &[&str] = if root == "." { &[] } else { &[root] };
+    crate::listing::tracked(repo, specs).map_err(|e| e.text_or(|_| format!("git ls-files failed for root '{}'", root)))
 }
 
 fn manifest_field(text: &str, key: &str) -> String {
@@ -583,6 +568,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::{proc, programs};
 
     // spec: gate-sdk/SPEC.md §check-reads-couples — a `name:` token with no `/` keeps the basename
     // match, and one carrying `/` is put to the root-relative path component-wise, as `glob:` is
@@ -778,7 +764,7 @@ mod tests {
             );
             ctx.findings
         };
-        assert!(listing.contains("tools/alpha/SPEC.md"), "the scratch index lists no SPEC.md: {}", listing);
+        assert!(listing.iter().any(|l| l == "tools/alpha/SPEC.md"), "the scratch index lists no SPEC.md: {:?}", listing);
         let found = coverage(&here);
         assert!(found.is_empty(), "the repository spelling leaves the read uncovered: {:?}", found);
         assert!(

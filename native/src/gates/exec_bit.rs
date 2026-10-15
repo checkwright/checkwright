@@ -2,7 +2,6 @@
 // index mode 100755 and every tracked *.gate descriptor carries 100644, or a by-path-invoked kit
 // script degrades silently to a skipped check / failed plugin in a fresh clone
 use crate::fresh;
-use crate::{proc, programs};
 use crate::walk;
 
 // spec: gate-sdk/SPEC.md §check-exec-bit — the prune set exempts by path *segment*, so a
@@ -11,14 +10,6 @@ fn pruned(path: &str, prune: &[String]) -> bool {
     path.split('/').any(|seg| prune.iter().any(|p| p == seg))
 }
 
-// spec: gate-sdk/SPEC.md §check-exec-bit — the live read is NUL-terminated and a canned dump is lines, so a record ends at either
-fn records(listing: &str) -> Vec<&str> {
-    if listing.contains('\0') {
-        listing.split('\0').collect()
-    } else {
-        fresh::file_lines(listing)
-    }
-}
 
 pub fn run(args: &[String]) -> i32 {
     let globs = match walk::knob_words("GATE_SDK_EXEC_GLOBS") {
@@ -38,9 +29,10 @@ pub fn run(args: &[String]) -> i32 {
 
     // spec: gate-sdk/SPEC.md §check-exec-bit — argument mode lints a canned `git ls-files -s`
     // dump, so a fixture is hermetic against the host repo's index
-    let listing = match args.first() {
+    // spec: gate-sdk/SPEC.md §check-exec-bit — the live read is NUL-terminated and a canned dump is lines
+    let listing: Vec<String> = match args.first() {
         Some(dump) => match std::fs::read(dump) {
-            Ok(b) => String::from_utf8_lossy(&b).into_owned(),
+            Ok(b) => fresh::file_lines(&String::from_utf8_lossy(&b)).into_iter().map(String::from).collect(),
             Err(_) => {
                 eprintln!("check-exec-bit: ls-files dump not readable: {}", dump);
                 return 2;
@@ -58,20 +50,10 @@ pub fn run(args: &[String]) -> i32 {
                     return 2;
                 }
             }
-            let ls = match proc::run(&programs::GIT, &["ls-files", "-s", "-z"]) {
-                Ok(c) => c,
+            match crate::listing::names(None, &["ls-files", "-s", "-z"]) {
+                Ok(records) => records,
                 Err(e) => {
-                    eprintln!("check-exec-bit: {}", e);
-                    return 2;
-                }
-            };
-            match ls.stdout() {
-                Some(o) => String::from_utf8_lossy(o).into_owned(),
-                None => {
-                    eprintln!(
-                        "check-exec-bit: {}",
-                        fresh::fail_closed("git-ls-files", ls.code())
-                    );
+                    eprintln!("check-exec-bit: {}", e.text());
                     return 2;
                 }
             }
@@ -81,7 +63,7 @@ pub fn run(args: &[String]) -> i32 {
     let mut bad: Vec<String> = Vec::new();
     let mut notexec: Vec<String> = Vec::new();
     let (mut count, mut dcount) = (0usize, 0usize);
-    for line in records(&listing) {
+    for line in &listing {
         if line.is_empty() {
             continue;
         }

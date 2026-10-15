@@ -1,7 +1,6 @@
 // spec: canon-kit/SPEC.md §check-md-unwrapped — no paragraph in the governed markdown set is
 // broken across physical lines; the block scanner here is the one `--emit md-unwrap` joins by
 use crate::spec;
-use crate::{proc, programs};
 
 const NAME: &str = "check-md-unwrapped";
 
@@ -283,22 +282,17 @@ pub fn unwrap(text: &str, leads: &[String]) -> String {
 // spec: canon-kit/SPEC.md §check-md-unwrapped — the corpus: tracked files matching the include
 // globs less the exclude globs, both as git pathspecs
 fn corpus(include: &[String], exclude: &[String]) -> Result<Vec<String>, String> {
-    let mut argv: Vec<String> = vec!["ls-files".into(), "-z".into(), "--".into()];
-    argv.extend(include.iter().cloned());
-    argv.extend(exclude.iter().map(|e| format!(":(exclude){}", e)));
-    let refs: Vec<&str> = argv.iter().map(String::as_str).collect();
-    let ls = proc::run(&programs::GIT, &refs)?;
-    match ls.stdout() {
-        Some(o) => Ok(String::from_utf8_lossy(o)
-            .split('\0')
-            .filter(|s| !s.is_empty())
-            .map(String::from)
-            .collect()),
-        None => Err(format!(
-            "git ls-files exited {} — the governed markdown set could not be enumerated",
-            ls.code().unwrap_or(-1)
-        )),
-    }
+    let mut specs: Vec<String> = include.to_vec();
+    specs.extend(exclude.iter().map(|e| format!(":(exclude){}", e)));
+    let refs: Vec<&str> = specs.iter().map(String::as_str).collect();
+    crate::listing::tracked(None, &refs).map_err(|e| {
+        e.text_or(|code| {
+            format!(
+                "git ls-files exited {} — the governed markdown set could not be enumerated",
+                code.unwrap_or(-1)
+            )
+        })
+    })
 }
 
 fn head(s: &str) -> String {

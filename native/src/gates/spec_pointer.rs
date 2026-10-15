@@ -1,6 +1,5 @@
 // spec: canon-kit/SPEC.md §check-spec-pointer — every spec:/contract: directive on a governed
 // source and every free-prose §<heading> citation on a governed manifest resolves
-use crate::{proc, programs};
 use crate::spec;
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
@@ -28,12 +27,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
     // spec: canon-kit/SPEC.md §check-spec-pointer — the tracked-file membership set, filled once
     // from a single `git ls-files` pass rather than a per-pointer `--error-unmatch` exec
-    let ls = proc::run(&programs::GIT, &["-C", root, "ls-files", "-z"])?;
-    let raw = match ls.stdout() {
-        Some(o) => String::from_utf8_lossy(o).into_owned(),
-        None => return Err("git ls-files failed".to_string()),
-    };
-    let tracked: HashSet<&str> = raw.split('\0').filter(|s| !s.is_empty()).collect();
+    let raw = crate::listing::tracked(Some(root), &[]).map_err(|e| e.text_or(|_| "git ls-files failed".to_string()))?;
+    let tracked: HashSet<&str> = raw.iter().map(String::as_str).collect();
 
     let whitelist = spec::knob_array_pub("CANON_KIT_COMMENT_WHITELIST")?;
     let title_once = title_once()?;
