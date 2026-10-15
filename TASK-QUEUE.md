@@ -8,65 +8,17 @@
 
 ## New Features
 
-### gate-authoring-sdk-surface
-
-[spec: gate-sdk/SPEC.md] [roadmap: next/ecosystem] [roadmap-summary: Author a gate in any language behind one substrate-neutral descriptor.]
-
-a gate-authoring SDK. `.gate` as the substrate-neutral surface. **Operator-surfaced during `native-gate-dispatch-seam` build; filed so the framing outlives the session that saw it.** Horizon set 2026-08-02 on the operator's steer: this is ecosystem work on [companion-toolkit-profile](#companion-toolkit-profile)'s rung, not "make our own gates fast and opaque".
-
-**The observation:** because the manifest lives outside the implementation, the graph, hook, and meta-gate layers never learn what implements a gate. That is not a Rust seam that happens to work — it is a **language-agnostic** one. A gate could be written in any language behind a descriptor, and slice 1 already avoided baking a language into the descriptor format, the resolution path, and `check-gate-substrate-parity` assertion D (whose comment-leader match is `#`, `//` and `/*` deliberately). `GATE_SDK_NATIVE_SRC` is a path knob, not a language knob, for the same reason.
-
-**Why it is an SDK question and not a port question:** the port asks "how does *this* gate move"; this asks what a **third party** needs to author a gate on any substrate — the descriptor contract, the subcommand calling convention, the output contract, and the fixture-pair obligation, which are already the four things gate-sdk holds. The kit is most of an SDK already; what is missing is the statement that the substrate is a parameter.
-
-**Boundary against the two questions already settled, so this one does not sprawl:** how a compiled gate *arrives* and what it *discloses* are both ruled and recorded (gate-sdk/SPEC.md §Consumer payload, which owns both). What stays open is what a gate *is* independent of substrate, and that is this entry alone. The distinction it supplies outlived those rulings and is why it was worth keeping — a descriptor discloses a gate's **shape** without its **predicate**, which is the line the disclosure ruling drew.
-
-**Not started, and deliberately not widened into slice 1**: building it would have meant generalizing a seam with exactly one instance, which is the shape of a design that fits nothing later.
-
-**Cost while deferred:** each further port hardens substrate-specific assumptions by habit rather than by ruling, and the cheapest moment to keep the seam neutral is before the second language exists — not after.
-
-**One citer blocks on it:** [gate-tamper-exemption-reader-substrate](#gate-tamper-exemption-reader-substrate) is design-pending precisely on the ruling this entry holds, so deferring this entry holds that one too. Filed 2026-08-02 by build, on an operator ruling, during `native-gate-dispatch-seam`.
-
-### custom-gate-substrates
-
-[spec: gate-sdk/SPEC.md] [roadmap: next/ecosystem] [roadmap-summary: Write your own gate in PowerShell, where today it is shell alone.]
-
-an adopter writes a custom gate in shell only. The registry resolves a member as a `.sh` or a `.gate` declaration (gate-sdk/SPEC.md §lib/gate.sh), and a `.gate` descriptor dispatches into the published binary, which an install cannot extend. On native Windows an adopter therefore needs Git for Windows' bash to author a gate, although the installer and the PowerShell front end already run under PowerShell; operator direction, 2026-09-27 (lead session): customers may write gates in shell, but on Windows they should be able to write them in PowerShell. And there is no supported path to a Rust gate, while a fork that adds the subcommand and ships its own build can (docs/requirements.md §Writing your own Rust gates; operator direction, 2026-09-27, lead session). Custom Rust gates are wanted as a capability, with install prerequisites split between shipped native gates, custom shell gates and custom Rust gates (operator direction, 2026-09-27, lead session).
-
-**Deliverable:** the registry resolving further substrates under the output, fail-closed, fixture-pair and self-lint contracts: `.ps1` resolution in the registry and the runner, which the hook's `--git-hook` arm dispatches through, with a PowerShell lint counterpart to `check-shellcheck`, and the install page's prerequisites per substrate, in an executable-dispatch shape the Rust path can widen.
-
-**The hook-wiring rewire build folded in here on 2026-10-07 landed as `exec-form-hook-registration`** on 2026-10-10, its own entry by operator direction of the earlier date: every hook registration a kit template ships starts the gate binary with no shell (gate-sdk/SPEC.md §The harness-integration arm). It shared this entry's end, the last bash a native-Windows adopter owes, and not its mechanism, so gate authoring is what that end still waits on here. **Horizon (operator direction, lead-relayed to that close on 2026-10-11, not a ruling):** next, ecosystem, set on the close's lag read once the slice had landed.
-
-**Push need (2026-10-15, inside the budget):** one mid-iteration push, shared with [windows-kpi-plugin-start](#windows-kpi-plugin-start), since `.ps1` resolution runs first on the Windows legs and this seat has no PowerShell.
-
-**Cost while deferred:** a native-Windows adopter authoring a gate takes on a bash dependency and a second shell dialect. Filed 2026-09-27 by platform-prerequisite-floors' lead. Re-verified: `registry::resolve` tries `sh` then `gate` per dir and nothing else. Owner lookup: `ps1`, `PowerShell`, `custom gate`, `Rust gate`, `consumer crate` in this file — none; owner gate-sdk/SPEC.md §lib/gate.sh and §The port-candidate criteria.
-
-**The Rust path is split out** as [custom-rust-gates](#custom-rust-gates), at spec on 2026-10-15: this entry lands the PowerShell target class and the dispatch shape it shares.
-
 ### gate-tamper-exemption-reader-substrate
 
 [spec: SPEC-descriptor-exemptions.md]
 
 `check-gate-tamper`'s exemption reader has no implementation-side equivalent. Split 2026-08-09 at scope by operator ruling from an entry that kept its meta-path-roster half; this is the exemption half, unchanged in substance. `extract_exemptions()` parses a shell `# exception-list:` array literal, so a ported gate's Rust module can carry no exemption the gate is able to read.
 
-**Why design-pending:** it wants the ruling [gate-authoring-sdk-surface](#gate-authoring-sdk-surface) holds — whether a meta-gate reads a substrate-neutral descriptor or learns each substrate — and that entry is horizon-set to ecosystem work, so this one waits.
+**Why design-pending:** it wants the ruling `gate-authoring-sdk-surface` holds — whether a meta-gate reads a substrate-neutral descriptor or learns each substrate — and that entry is horizon-set to ecosystem work, so this one waits.
 
 **The coupling was checked at the split rather than inherited.** It is true of this half and was not true of the roster half: which paths a tamper roster covers is configuration, where how a meta-gate reads an exemption across substrates is exactly the substrate-neutrality question the SDK entry holds.
 
 **Cost while deferred:** zero until a ported gate needs an exemption; no first-cohort member carries an exemption list, which gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate records in its `check-gate-tamper` row. Filed 2026-08-02 at close; found by build.
-
-### windows-kpi-plugin-start
-
-[spec: drift-kit/SPEC.md]
-
-a consumer KPI plugin cannot start on native Windows. The drift report starts a resolved tier-1 or tier-2 `kpi-<name>.sh` path as a program, with no interpreter word, and Windows starts no `.sh`. drift-kit/SPEC.md §The extensibility contract's promise is unreachable there and the row degrades to its plugin-failed read.
-
-**Deliverable:** a plugin dispatch a native-Windows consumer can meet. Its shape is spec's, and a ruling on [custom-gate-substrates](#custom-gate-substrates)' dispatch shape bears on it.
-
-**Inferred, cannot run before build:** the row degrades on native Windows, read off the code at spec: `drift_report.rs`' `invoke` spawns the plugin path as `argv[0]`, and `proc::spawn_target` passes a separator-bearing name through unresolved — no Windows host runs before the mid-iteration push, whose `crate-tests-windows` legs run `drift_report.rs`' two Windows cases (drift-kit/SPEC.md §The extensibility contract)
-
-**Push need (2026-10-15, inside the budget):** the mid-iteration push [custom-gate-substrates](#custom-gate-substrates) spends, since the plugin's Windows dispatch runs first on a Windows leg.
-
-**Cost while deferred:** a native-Windows consumer's own KPI never reports. Filed 2026-10-06 by windows-shell-floor-pass' spec, operator direction lead-relayed (not a ruling). Re-verified by reading the report's plugin arm and the process wrapper: the path is spawned as given. Owner lookup: `DRIFT_KIT_KPIS_FILE`, `kpi-`, `plugin failed`, `extensibility` in this file and the disposed-findings record — none; [custom-gate-substrates](#custom-gate-substrates), DISTINCT (gate authoring off bash).
 
 ### config-variant-battery-harness
 
@@ -236,7 +188,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 [roadmap: next/ecosystem] [cost: event/low] [surface: gate-sdk] [roadmap-summary: Write your own gate in Rust, built by you and dispatched by the battery.]
 
-an adopter cannot dispatch a gate they compiled. Split 2026-10-15 at spec from [custom-gate-substrates](#custom-gate-substrates), the split the lead's dispatch left to spec (operator direction, option C, lead-relayed): the parent lands a descriptor's `# exec:` field with one target class, a PowerShell script, and this entry widens the class to an executable the adopter builds. Custom Rust gates are wanted as a capability (operator direction, 2026-09-27, lead session); docs/requirements.md §Writing your own Rust gates states that no path exists.
+an adopter cannot dispatch a gate they compiled. Split 2026-10-15 at spec from `custom-gate-substrates`, the split the lead's dispatch left to spec (operator direction, option C, lead-relayed): the parent lands a descriptor's `# exec:` field with one target class, a PowerShell script, and this entry widens the class to an executable the adopter builds. Custom Rust gates are wanted as a capability (operator direction, 2026-09-27, lead session); docs/requirements.md §Writing your own Rust gates states that no path exists.
 
 **Deliverable:** an `# exec:` target class started directly, with the executable naming a native-Windows target needs, and the install page's prerequisites for a Rust gate. Whether the battery checks an adopter-built binary against its source, as `check-gate-binary-fresh` checks the shipped one, is spec's.
 
@@ -1159,4 +1111,8 @@ a citation naming a numbered step by its bold title, in RELEASING.md's procedure
 A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, since check-front-door-verbs reads the front-door pages alone; widening its arm resolution to the kit SPECs, with the history valves, would catch it.
 
 ## Done
+
+- windows-kpi-plugin-start
+- custom-gate-substrates
+- gate-authoring-sdk-surface
 
