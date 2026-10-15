@@ -50,7 +50,7 @@ assert_has    contract '  FAIL: g_gone (unresolved)'                           "
 assert_has    contract '2 of 3 gates FAILED: g_fail g_gone'                    "$out"
 assert_has    contract '1 gate(s) omitted (local-policy)'                      "$out"
 # quiet green: a passing member's captured output is discarded unless the banner roll is on
-out="$(merged)"
+out="$(GATE_SDK_VERBOSE='' merged)"
 assert_absent contract 'g_pass: a line of its own output'                      "$out"
 # spec: gate-sdk/SPEC.md §run-gates — the omission line carries none of the summary's text, because
 # the consumer smokes match the green phrase against this output

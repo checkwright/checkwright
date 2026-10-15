@@ -72,6 +72,7 @@ pub mod support_table;
 pub mod roadmap;
 pub mod roadmap_lag;
 pub mod ruling_staleness;
+pub mod run_config_variant;
 pub mod run_consumer_smoke;
 pub mod guard_ps_variants;
 pub mod guard_variants;
@@ -841,6 +842,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--upgrade-smoke",
         Arm::Run(upgrade_smoke::run),
         upgrade_smoke::KNOBS,
+    ),
+    // spec: gate-sdk/SPEC.md §run-config-variant — an `Arm::Run` because its contract is the
+    // three-way exit, 0 nothing newly red, 1 a gate the variant reds, 2 no comparison made
+    (
+        "--run-config-variant",
+        Arm::Run(run_config_variant::run),
+        run_config_variant::KNOBS,
     ),
     // spec: queue-kit/SPEC.md §The lesson-sink arm — an `Arm::Run` and not an `--emit-` member:
     // its contract is the sink's exit status, which an emitting arm cannot carry. Its caller is a

@@ -8,20 +8,6 @@
 
 ## New Features
 
-### config-variant-battery-harness
-
-[spec: SPEC-config-variant.md]
-
-nothing shipped lets a customer run the battery under a named config-seam variant and see what changes; the fixture pairs prove each gate's arm against fixed trees, and the smoke scripts are this repo's harness legs.
-
-**Operator ruling at consult: file it costed.** Deliverable: a shipped, bridged arm that takes a scratch copy of the consumer's tree, applies a named variant of the config seam, runs the battery, and prints the per-gate verdict diff against baseline — so an adopter sees which gates a knob arms, disarms or reds before committing the knob.
-
-**Why design-pending:** the variant's declaration form (an env file or a config-dir overlay), whether the scratch copy is a worktree or a copy that carries untracked content, and whether the diff or a full report is the product. Native, per the interpreter constraint (gate-sdk/SPEC.md §The adopter constraints).
-
-**Refused:** repurposing the smoke scripts, which are install recipes read as text by the install-disposition gate and bound to this repo's harness; a shipped directory of shell tests, which widens the interpreter surface the adopter constraints shrink.
-
-**Cost while deferred:** an adopter evaluating a knob edits the seam, commits, and learns from the next red; the preview cohort's false-positive dispositions have no cheap rehearsal. Filed 2026-09-11 by consult as a direct entry, the test gap the operator named there.
-
 ## Technical Debt
 
 ## Deferred
@@ -1104,4 +1090,5 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 - custom-gate-substrates
 - gate-authoring-sdk-surface
 - gate-tamper-exemption-reader-substrate
+- config-variant-battery-harness
 

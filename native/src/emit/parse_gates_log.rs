@@ -7,7 +7,7 @@ pub const USAGE: &str = "usage: --emit parse-gates-log <log>";
 
 // spec: gate-sdk/SPEC.md §run-gates — the tail grammar this reads is gate-sdk's, and the tails
 // print only under GATE_SDK_VERBOSE
-fn tail(line: &str) -> Option<String> {
+pub(crate) fn tail(line: &str) -> Option<String> {
     let status = if line.starts_with("  PASS: ") {
         "pass"
     } else if line.starts_with("  FAIL: ") {
@@ -17,6 +17,45 @@ fn tail(line: &str) -> Option<String> {
     };
     let name = line.split_whitespace().nth(1).unwrap_or("");
     Some(format!("{} {}", name, status))
+}
+
+// spec: gate-sdk/SPEC.md §run-config-variant — one member's section of a verbose log: its verdict,
+// the tail its own name carries, and the output above that tail
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct Section {
+    pub name: String,
+    pub tail: Option<String>,
+    pub output: String,
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — a section opens on its `===== <name> =====` banner and the
+// summary banner ends the last; the member's tail is the last tail line naming it
+pub(crate) fn sections(log: &str) -> Vec<Section> {
+    let mut out: Vec<(String, Vec<&str>)> = Vec::new();
+    for line in log.lines() {
+        if let Some(name) = line.strip_prefix("===== ").and_then(|l| l.strip_suffix(" =====")) {
+            if name == "gates summary" {
+                break;
+            }
+            out.push((name.to_string(), Vec::new()));
+        } else if let Some((_, body)) = out.last_mut() {
+            body.push(line);
+        }
+    }
+    out.into_iter()
+        .map(|(name, body)| {
+            let at = body.iter().rposition(|l| {
+                tail(l).is_some_and(|t| t.rsplit_once(' ').is_some_and(|(n, _)| n == name))
+            });
+            let above = &body[..at.unwrap_or(body.len())];
+            let end = above.iter().rposition(|l| !l.is_empty()).map_or(0, |i| i + 1);
+            Section {
+                tail: at.and_then(|i| tail(body[i])),
+                output: above[..end].join("\n"),
+                name,
+            }
+        })
+        .collect()
 }
 
 // spec: evidence-kit/SPEC.md §The evidence adapters — the log is the arm's only positional
@@ -64,6 +103,22 @@ mod tests {
         assert_eq!(tail("    PASS: check-foo"), None);
         assert_eq!(tail("  pass: check-foo"), None);
         assert_eq!(tail("===== gates summary ====="), None);
+    }
+
+    // spec: gate-sdk/SPEC.md §run-config-variant — each banner opens a section, the tail naming its
+    // member closes the output, a nested tail naming another member stays output, and the summary
+    // banner ends the split
+    #[test]
+    fn a_verbose_log_splits_into_one_section_per_member() {
+        let log = "\n===== check-a =====\nA: clean (1 file)\n  PASS: check-a\n\n===== check-b =====\nB: 2 finding(s)\n  PASS: check-inner\n\n  FAIL: check-b (exit 1)\n    spec: https://example.invalid/b\n\n===== check-c =====\n  PASS: check-c\n\n===== gates summary =====\n===== check-late =====\n";
+        let got = sections(log);
+        assert_eq!(got.len(), 3, "{:?}", got);
+        assert_eq!(got[0].tail.as_deref(), Some("check-a pass"));
+        assert_eq!(got[0].output, "A: clean (1 file)");
+        assert_eq!(got[1].tail.as_deref(), Some("check-b fail"));
+        assert_eq!(got[1].output, "B: 2 finding(s)\n  PASS: check-inner");
+        assert_eq!(got[2].output, "");
+        assert!(sections("no banner\n  PASS: x\n").is_empty());
     }
 
     // spec: evidence-kit/SPEC.md §bin/run-validate.sh — a log with no tails yields no output, the

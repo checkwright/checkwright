@@ -34,6 +34,7 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
        --lesson-sink <tag>                     route a lesson body on stdin to its sink
        --queue <verb> <slug> [args]            move or stamp one queue entry, then run the queue's gates
        --upgrade-smoke                         prove the FROM->TO kit upgrade in scratch
+       --run-config-variant <dir> [--keep]     rehearse a config change: the gates it moves
        --run-consumer-smoke [args]             prove the kits install into a scratch consumer
        --install-lifecycle [file]              install the lifecycle resident surfaces
        --install-hooks [--refresh]             place this clone's git hooks (per-clone opt-in)
@@ -121,6 +122,14 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
           sync is deterministic and the phase-B red set is declared. Takes no
           argument. Exit 0 clean with one UPGRADE-SMOKE line on stdout, 1 an
           upgrade finding, 2 a broken tag or environment; unavailable is 2.
+  --run-config-variant  runs the battery twice over a scratch copy of the
+          tree carrying its history, as committed and with the files in <dir>
+          copied over their namesakes in the gates directory, and prints one
+          row per gate whose verdict or output moves: red, green, moved,
+          added, removed. `--keep` retains the scratch and prints its path.
+          Exit 0 no gate newly red, 1 a gate the variant reds, 2 no
+          comparison made (a refused <dir>, a scratch it could not build, a
+          battery that could not run); unavailable is 2.
   --run-consumer-smoke  takes [--keep] [kit-root...]: vendors the named kit
           roots (default: every kit; gate-sdk always first) into a scratch
           consumer, runs each smoke/install.sh, asserts the battery green under
