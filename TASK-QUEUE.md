@@ -364,16 +364,6 @@ the session-context hook member bakes its scratch sweep's age horizon: it remove
 
 **Cost while deferred:** a consumer wanting another horizon, or no sweep, has no setting. Filed 2026-10-07 off windows-shell-floor-pass' close audit, carried to the next scope's intake. Re-verified: the constant, and no `CONTEXT_KIT_` knob in the SPEC names a sweep. Owner lookup: `age horizon`, `scratch sweep`, `STALE_SECS` in this file and the disposed-findings record — none; [site-health-resample-knobs](#site-health-resample-knobs), DISTINCT (the same class on site-kit's template).
 
-### kit-spec-arm-span-unresolved
-
-[cost: event/low] [surface: installer]
-
-a retired gate-binary arm named in a kit SPEC's code span resolves under no gate. lifecycle-kit/SPEC.md cited the hook-emit arm as a live precedent for a whole iteration after `native-executable-git-hooks` deleted it, its amendment's own delta having named the repoint, and the battery stayed green: `check-front-door-verbs` resolves an arm span against the binary's arm table on the front-door pages alone. Found twice at windows-shell-floor-pass' close, by its second-vendor review and its audit sweep, and fixed there.
-
-**Deliverable:** the same arm resolution over the kit SPECs' code spans, with the history valves; a feature, since it widens a gate's corpus.
-
-**Cost while deferred:** a kit SPEC can cite an arm the binary no longer carries, unread until a reader runs it. Filed 2026-10-07 off windows-shell-floor-pass' close, carried to the next scope's intake. Owner lookup: `arm span`, `front-door-verbs`, `retired arm` in this file and the disposed-findings record — none; owner installer/SPEC.md §check-front-door-verbs.
-
 ### git-name-read-line-form
 
 [cost: event/low] [surface: native]
@@ -1190,9 +1180,9 @@ the manual-operation meter keys every arm called through the gate binary's door 
 
 a citation naming a numbered step by its bold title, in RELEASING.md's procedure or lifecycle-kit/templates/lead.md, resolves under no gate, since check-spec-pointer and check-citation-link resolve the heading alone, so a reworded title strands every citing site with the battery green; the deliverable is a title-resolution arm on check-spec-pointer or the cited steps made headings, owned by canon-kit/SPEC.md §check-spec-pointer.
 
-## Done
+### kit-spec-arm-span-unresolved
 
-- foreign-budget-reset-ok-stale
-- tier-model-shape-unvalidated
-- agent-effort-line-unmeasured
+A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, since check-front-door-verbs reads the front-door pages alone; widening its arm resolution to the kit SPECs, with the history valves, would catch it.
+
+## Done
 
