@@ -31,7 +31,7 @@ Replacement for the template line `# DELEGATION_KIT_FOREIGN_USAGE_CMD[] = <adapt
 
 The release declaration (`.workflow/release-declarations.md`, §Behavior changes) gains one bullet: **delegation-kit `--foreign-run`, `--foreign-resume`, knob `DELEGATION_KIT_FOREIGN_USAGE_CMD`, delegation-kit/templates/delegation-config.knobs** — a producer word may carry `@FAILED_RUN@`: such a producer also runs after a spawned turn that ends `FAILED`, with that turn's run directory in the word, and before a read with the word empty, so it can write a spend limit the vendor reported only as a failed turn's error. Nothing to do; a producer without the token runs as before.
 
-### (2) A producer writes a failed turn's wall and never moves a snapshot backwards {design-bearing}
+### (2) A producer writes a failed turn's wall and never moves a snapshot backwards {design-bearing} {user-facing: the foreign-budget-reset-ok-stale entry's Deliverable, its second remedy, as delta 1}
 
 The producer obligations in §The keyed verdict's paragraph **The axes are read by length** gain the two a failed turn needs. A wall written from an error survives only if the next refresh, which reads the vendor's feed, leaves the newer reading in place: the feed's newest report can predate the wall, as it does wherever the failed turn added nothing to the feed.
 
