@@ -12,7 +12,7 @@
 
 [spec: SPEC-foreign-build.md] [roadmap: now/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
 
-foreign agents. A lead delegating a stage to a foreign coding agent, cashing the public no-lock-in claim: governance enforced at the git/gate boundary, not by trusting the author. *Remaining:* (4) **stage-contract expression**, past its two slices below: a stage whose writes a foreign agent performs. **Unit set, operator direction 2026-10-15, lead-relayed (not a ruling):** this item leads, with `foreign-budget-reset-ok-stale`, [agent-effort-line-unmeasured](#agent-effort-line-unmeasured) and [tier-model-shape-unvalidated](#tier-model-shape-unvalidated). It is accepted on stub-driven crate cases with no live-run grant, and the live foreign run is filed as a later observation.
+foreign agents. A lead delegating a stage to a foreign coding agent, cashing the public no-lock-in claim: governance enforced at the git/gate boundary, not by trusting the author. *Remaining:* (4) **stage-contract expression**, past its two slices below: a stage whose writes a foreign agent performs. **Unit set, operator direction 2026-10-15, lead-relayed (not a ruling):** this item leads, with `foreign-budget-reset-ok-stale`, [agent-effort-line-unmeasured](#agent-effort-line-unmeasured) and `tier-model-shape-unvalidated`. It is accepted on stub-driven crate cases with no live-run grant, and the live foreign run is filed as a later observation.
 
 **Slices landed**, each in delegation-kit/SPEC.md §The foreign-vendor run, each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); then (2) the dispatch transport with (1) the escalation resume model riding it, `--foreign-resume`, that section's Resuming a session (delegation-transport-pass, 2026-10-03). Then (3) the budget oracle, delegation-kit/SPEC.md §The keyed verdict (delegation-wait-journal-pass, 2026-10-07; operator direction, lead-relayed, not a ruling). No foreign run was granted: accepted by stub-driven crate cases and one producer read of a vendor's on-disk session store through a scratch binding, so a live turn refreshing the feed is unobserved, as is whether a turn in a vendor's non-persisting mode, two of this repo's three adapters, leaves a usage event on disk; one granted run of each kind settles both. **This repo's binding (operator direction, 2026-10-07, lead-relayed, not a ruling):** inline in the gitignored `.local` overlay alone, its adapters reading one snapshot under the metric dir from an inline producer. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
 
@@ -37,16 +37,6 @@ that an agent definition's effort line sets its child's effort (delegation-kit/S
 **Deliverable:** one dispatch of a definition whose effort differs from its dispatcher's running effort, `--model-verdict` read in the child, and the Honest-limits sentence rewritten to the result.
 
 **Cost while deferred:** a class's bound effort is trusted on the harness's documentation, so a harness that ignored the line would run every class at the dispatcher's effort with the generated line and its freshness gate both green. Filed 2026-10-09 by tier-resolution-pass' close after its drain, and promoted at the next scope's intake. Re-verified there by grep: the five tracked definitions state one effort. Owner lookup: `effort`, `model-verdict`, `Honest limits` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §check-agent-tier-explicit.
-
-### tier-model-shape-unvalidated
-
-the tier tables' validator holds a model to no shape beyond carrying no whitespace, and `--emit agent-tiers --write` puts it bare after a definition's `model:` key. `tier-value-validator-gaps` closed the effort's hole and did not scope the model's shape.
-
-**Deliverable:** a model shape the validator refuses outside of, admitting a vendor's bracketed and dotted ids, with its unit rows and the sentence in delegation-kit/SPEC.md §check-agent-tier-explicit.
-
-**Run at scope 2026-10-15** on a scratch repository binding `judgment=#bad,high`: the validator admitted it, `--emit agent-tiers --write` wrote `model: #bad`, a YAML comment leaving the model empty, and the gate read clean.
-
-**Cost while deferred:** a binding typo of that shape ships a definition with no model under a green gate. Filed 2026-10-09 by crate-reader-hardening-pass' first build batch and promoted at its close. Re-verified by reading `native/src/knobs/delegation_kit.rs`: its refusal rows hold the pair's form and whitespace alone. Owner lookup: `agent-tiers`, `tier table`, `YAML comment` in this file and the disposed-findings record — none; owner delegation-kit/SPEC.md §check-agent-tier-explicit.
 
 ## Deferred
 
@@ -1211,4 +1201,5 @@ a citation naming a numbered step by its bold title, in RELEASING.md's procedure
 ## Done
 
 - foreign-budget-reset-ok-stale
+- tier-model-shape-unvalidated
 

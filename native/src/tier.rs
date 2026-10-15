@@ -84,11 +84,18 @@ pub fn roster_refusals(roster: &[String]) -> Vec<String> {
 
 const ABSENT: &str = "which a foreign session's record reads as an absent field";
 
-// spec: delegation-kit/SPEC.md §Layout and configuration — the effort's shape
+// spec: delegation-kit/SPEC.md §Layout and configuration — the two shapes, the effort's
 fn plain(effort: &str) -> bool {
     let mut bytes = effort.bytes();
     bytes.next().is_some_and(|b| b.is_ascii_alphabetic())
         && bytes.all(|b| b.is_ascii_alphanumeric() || matches!(b, b'.' | b'_' | b'-'))
+}
+
+// spec: delegation-kit/SPEC.md §Layout and configuration — the two shapes, the model's
+fn model_shape(model: &str) -> bool {
+    let mut bytes = model.bytes();
+    bytes.next().is_some_and(|b| b.is_ascii_alphanumeric())
+        && bytes.all(|b| b.is_ascii_alphanumeric() || matches!(b, b'.' | b'_' | b'-' | b':' | b'/' | b'@' | b'[' | b']'))
 }
 
 // spec: delegation-kit/SPEC.md §Layout and configuration — a value's refusals, shared by both
@@ -115,6 +122,11 @@ fn value_refusals<'a>(knob: &str, e: &'a str, value: &'a str, matched: bool, err
         errs.push(format!("{} element '{}' spells its value as a lone dash, {}", knob, e, ABSENT));
     } else if model.chars().any(char::is_whitespace) {
         errs.push(format!("{} element '{}' carries whitespace in its value", knob, e));
+    } else if !model_shape(model) {
+        errs.push(format!(
+            "{} element '{}' carries a model that is not a letter or digit followed by letters, digits, '.', '_', '-', ':', '/', '@', '[' or ']'",
+            knob, e
+        ));
     } else if model == "inherit" {
         errs.push(format!(
             "{} element '{}' binds 'inherit', which is a dispatcher's tier and not a model — state it in the definition instead",
@@ -258,6 +270,8 @@ mod tests {
         assert_eq!(classes_of(&binding, &roster(), "vendor-big-5"), vec!["judgment"]);
         assert!(refusals(&binding, &roster()).is_empty());
         assert!(refusals(&b(&["judgment=big,x-high_2.5", "mechanical=a-"]), &roster()).is_empty());
+        let ids = ["judgment=vendor-big-4-6[1m]", "routing=gpt-5.1-codex", "mechanical=vendor/small-v1:0@2025_01"];
+        assert!(refusals(&b(&ids), &roster()).is_empty(), "{:?}", refusals(&b(&ids), &roster()));
         for (want, bad) in [
             ("has an empty effort", "judgment=big,"),
             ("carries whitespace in its effort", "judgment=big,very deep"),
@@ -269,6 +283,11 @@ mod tests {
             ("carries an effort that is not a letter followed by", "judgment=big,-deep"),
             ("carries an effort that is not a letter followed by", "judgment=big,deep:x"),
             ("carries an effort that is not a letter followed by", "judgment=big,9"),
+            ("carries a model that is not a letter or digit followed by", "judgment=#bad,high"),
+            ("carries a model that is not a letter or digit followed by", "judgment=[big]"),
+            ("carries a model that is not a letter or digit followed by", "judgment=-big"),
+            ("carries a model that is not a letter or digit followed by", "judgment=big#x"),
+            ("carries a model that is not a letter or digit followed by", "judgment=\"big\""),
         ] {
             let errs = refusals(&b(&[bad]), &roster());
             assert!(errs.len() == 1 && errs[0].contains(want), "{}: {:?}", bad, errs);
@@ -317,6 +336,7 @@ mod tests {
             ("spells its effort as a lone dash", &["vend/judgment=g,-"]),
             ("spells its value as a lone dash", &["vend/judgment=-"]),
             ("carries an effort that is not a letter followed by", &["vend/judgment=g,#x"]),
+            ("carries a model that is not a letter or digit followed by", &["vend/judgment=#g"]),
         ] {
             let errs = foreign_refusals(&b(bad), &roster());
             assert!(errs.len() == 1 && errs[0].contains(want), "{:?}: {:?}", bad, errs);

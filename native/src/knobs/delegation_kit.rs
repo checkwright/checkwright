@@ -320,6 +320,7 @@ mod tests {
             ("binds class 'judgment' twice", &["judgment=big", "judgment=bigger"]),
             ("has an empty value", &["judgment="]),
             ("carries whitespace", &["judgment=big model"]),
+            ("carries a model that is not a letter or digit", &["judgment=#bad,high"]),
             ("binds 'inherit'", &["judgment=inherit"]),
             ("is all digits", &["mechanical=5"]),
             ("is the leading token of 'vendor-big-5'", &["judgment=vendor-big-5", "mechanical=vendor"]),
