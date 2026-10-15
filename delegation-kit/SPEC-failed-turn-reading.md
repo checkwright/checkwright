@@ -10,7 +10,7 @@ The entry's Deliverable leaves the authoring stage one of two remedies. This ame
 
 `DELEGATION_KIT_FOREIGN_USAGE_CMD` gains a second token, `@FAILED_RUN@`. Where any word of an adapter's producer carries it, the executor runs that producer once more after a spawned turn of that adapter ends `FAILED`, with the token substituted by the turn's run directory.
 
-- **When.** After a turn of `--foreign-run` or `--foreign-resume` whose adapter was spawned and whose line ends `FAILED`: a non-zero adapter exit or the bound's expiry. Not after `OK` or `REFUSED`, and not after a failure that precedes the spawn, a budget pause among them, since none of those leaves a vendor's answer to read. The call comes after the shape check and the patch, with the turn's `report.txt` and `stderr.txt` in place, and before the line prints.
+- **When.** After a turn of `--foreign-run` or `--foreign-resume` whose adapter was spawned and whose line ends `FAILED` with an `exit=` of a non-zero status or `timeout`. Not after `OK` or `REFUSED`, and not after a `FAILED` whose `exit=` is `-` or `0`: a failure that precedes the spawn, a budget pause among them, or one after a clean exit, an unreadable sweep patch among them. None of those leaves a vendor's error to read. The call comes after the shape check and the patch, with the turn's `report.txt` and `stderr.txt` in place, and before the line prints.
 - **The substitution.** On this call a word carrying `@FAILED_RUN@` has the run's directory substituted, absolute, `<GATE_SDK_TMP_DIR>/foreign/<key>/`. On the call before every keyed read it has the empty string substituted, so one producer serves both calls and tells them apart by that word. `@USAGE_FILE@` is substituted on both.
 - **The terms.** The refresh's terms, unchanged: spawned directly with no shell from the toplevel, its output discarded, bounded by `DELEGATION_KIT_FOREIGN_TIMEOUT`, and fail-soft, so a non-zero exit, a spawn failure or the bound's expiry leaves the snapshot as it was and the line as it would have printed.
 - **The line is unchanged.** Its `budget=` field stays the read before the spawn. The next read, a dispatcher's `--budget` or the next run's own, is where the producer's answer shows.
@@ -47,7 +47,7 @@ Replacement for §The foreign-vendor run's honest limit **The oracle is as fresh
 
 The keyed-verdict rows in `native/src/emit/foreign_run.rs` gain, on a stub adapter exiting 1 and a stub producer that logs each call's argv and, when its failed-run word is non-empty and that directory's `stderr.txt` carries a marker, writes an at-or-over reading:
 
-- the open's failed turn calls the producer with the run directory, and the next `--budget` read is `PAUSE` and the next open is `FAILED (budget: …)` with no run directory made;
+- the open's failed turn calls the producer with the run directory, and the next `--budget` read is `PAUSE` and the next open under a second key is `FAILED (budget: …)` with no run directory made;
 - a resumed turn ending `FAILED` calls it with the session's run directory, and the next resume is paused with its turn counter held;
 - the call before a read carries the empty word;
 - no failed-turn call follows an `OK` turn, a `REFUSED` turn or a failure before the spawn, and none follows any turn of an adapter whose producer lacks the token;

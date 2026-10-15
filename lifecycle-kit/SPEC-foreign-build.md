@@ -50,6 +50,14 @@ Replacement for that section's exit-2 bullet. **Not yet applied.**
 
 > - **Exit 2, nothing printed:** a `<stage>` outside `LIFECYCLE_KIT_STAGES`, an absent skill file, an absent or empty frame file for the mode asked, a missing or surplus operand, and a `--mode` with no value, a value other than `audit` and `sweep`, or a second `--mode`.
 
+Replacement for that section's **It emits for any configured stage.** bullet. **Not yet applied.**
+
+> - **It emits for any configured stage.** Which stage's work is worth sending is the dispatcher's judgment, and the kit instructs every stage whose template points at the host protocol (§The host protocol).
+
+Replacement for that section's **Honest limit.** paragraph. **Not yet applied.**
+
+> **Honest limit.** The frame is an instruction and confines nothing. In `audit` mode a reader that writes, and in either mode one that commits, is caught afterwards by the foreign run's shape check as a refusal, never prevented, and whether a vendor's sandbox lets the contract's commands run is that vendor's.
+
 Replacement for that section's roster sentence, the second sentence of its paragraph beginning *It is an `Arm::Emit` member*. **Not yet applied.**
 
 > Its declared roster is `LIFECYCLE_KIT_STAGES`, `LIFECYCLE_KIT_SKILLS_DIR`, `LIFECYCLE_KIT_STAGE_CONTRACT_FRAME` and `LIFECYCLE_KIT_STAGE_CONTRACT_SWEEP_FRAME`, the three paths at the journal-path derivation's anchor (§The stage-machine adapters).
@@ -133,18 +141,22 @@ The five other templates' pointer lines are unchanged, and name no mode, so thei
 
 ### (4) The lead, the binding and the delegation template speak of a stage's foreign work {mechanical}
 
-Three sentences say *reading* where a `sweep` stage sends writes too. **Not yet applied.**
+Seven phrases say *reading* where a `sweep` stage sends writes too, one per bullet. **Not yet applied.**
 
 - `lifecycle-kit/templates/lead.md`, *Under either posture*: "Dispatch a stage whose reading runs foreign as the same stage-session type …" becomes "Dispatch a stage whose work runs foreign as the same stage-session type …".
 - `lifecycle-kit/templates/lead.md`, *Read the stage's executor before you dispatch it*: "with the class the reading rides" becomes "with the class the foreign work rides".
 - `lifecycle-kit/SPEC.md` §templates/lead.md: "**A stage whose reading runs foreign is dispatched as an ordinary stage session**" becomes "**A stage whose work runs foreign is dispatched as an ordinary stage session**".
 - `lifecycle-kit/SPEC.md` §Layout and configuration, the `LIFECYCLE_KIT_STAGE_EXECUTOR` row: "one `<stage>=<adapter>` element per stage whose reading runs foreign" becomes "… per stage whose work runs foreign", and its first sub-bullet's "from the class the reading names" becomes "from the class the foreign run names".
+- `lifecycle-kit/SPEC.md` §templates/lead.md, the executor-binding paragraph: "at a tier chosen for a foreign reading" becomes "at a tier chosen for foreign work".
+- `lifecycle-kit/templates/lead.md`, the standing-dispatch-policy paragraph: "a foreign adapter where the stage's reading runs on one" becomes "a foreign adapter where the stage's work runs on one".
+- `.claude/agents/stage-session.md`, the standing dispatch policy's opening sentence: "a foreign adapter where the stage's reading runs on one" becomes "a foreign adapter where the stage's work runs on one".
 
 ### (5) delegation-kit names the sweep-mode stage contract {mechanical}
 
 **Not yet applied**, each sentence in `delegation-kit/SPEC.md`:
 
-- §The foreign-vendor run, the opening paragraph's second sentence becomes: "An audit-mode run may also carry a stage's contract under lifecycle-kit's host protocol (lifecycle-kit/SPEC.md §The host protocol), a reading that carries its stage's class, and a sweep-mode run may carry the contract of a stage whose writes run foreign, or a project critique a consultation commissions (lifecycle-kit/SPEC.md §templates/consult.md)."
+- §The foreign-vendor run, the opening paragraph's second sentence becomes: "An audit-mode run may also carry a stage's contract under lifecycle-kit's host protocol (lifecycle-kit/SPEC.md §The host protocol), a reading that carries its stage's class, or a project critique a consultation commissions (lifecycle-kit/SPEC.md §templates/consult.md), and a sweep-mode run may carry the contract of a stage whose writes run foreign (lifecycle-kit/SPEC.md §The host protocol)."
+- §The foreign-vendor run, the class-taking bullet **On any other adapter `--class` is accepted and applies nothing**: "A host therefore always passes its reading's class" becomes "A host therefore always passes its foreign work's class".
 - §The foreign-vendor run, the verdict line's reader: "and the commit message that records a foreign reading" becomes "and the commit message that lands a foreign run's work".
 - §The foreign-vendor run's honest limit **A foreign reading runs no oracle that needs a built artifact.** becomes "**A foreign run executes no oracle that needs a built artifact.** The clone is committed state and the gate binary is not tracked, so a stage's host runs the gate itself, and in `sweep` mode each red it finds costs a turn."
 - §Testing, the last sentence of the paragraph on `native/src/hook/verdict.rs` becomes: "One foreign-run row hands the contract composed for each stage whose pointer line names no mode to an audit-mode run under the stub adapter, which reads it whole, and one hands the build stage's `sweep` contract to a sweep-mode run under a stub that writes a file, whose `change.patch` carries it (lifecycle-kit/SPEC.md §The stage-contract arm)."
@@ -166,6 +178,7 @@ The crate case in `native/src/emit/foreign_run.rs`: the sweep set's documents, c
   - `lifecycle-kit/templates/stages/build.md` — delta 3;
   - `lifecycle-kit/templates/stages/{align,scope,spec,validate,close}.md` — their audit pointer lines read unchanged under delta 2's default mode;
   - `lifecycle-kit/templates/lead.md` — delta 4;
+  - `.claude/agents/stage-session.md` — delta 4, found by `grep -rn "stage's reading run"` over the tracked tree, which the grep above does not reach;
   - `lifecycle-kit/README.md` — delta 1;
   - `delegation-kit/SPEC.md` — delta 5;
   - `native/src/emit/stage_contract.rs`, `native/src/knobs/lifecycle_kit.rs` — delta 1;
@@ -180,20 +193,21 @@ The crate case in `native/src/emit/foreign_run.rs`: the sweep set's documents, c
 
 ## Existing sections updated
 
-- `lifecycle-kit/SPEC.md` §The stage-contract arm — the opening, the frame bullet, the exit-2 bullet and the roster and testing sentences (delta 1).
+- `lifecycle-kit/SPEC.md` §The stage-contract arm — the opening, the frame bullet, the exit-2 bullet, the any-configured-stage bullet, the honest limit and the roster and testing sentences (delta 1).
 - `lifecycle-kit/SPEC.md` §Layout and configuration — the new knob row (delta 1) and the executor row's two phrases (delta 4).
 - `lifecycle-kit/SPEC.md` §The host protocol — the section, whole (delta 2).
 - `lifecycle-kit/SPEC.md` §templates/stages/ — the pointer-line sentence (delta 2).
-- `lifecycle-kit/SPEC.md` §templates/lead.md — the dispatch sentence (delta 4).
+- `lifecycle-kit/SPEC.md` §templates/lead.md — the dispatch sentence and a phrase of the executor-binding paragraph (delta 4).
 - `lifecycle-kit/templates/frames/stage-contract-sweep.md` — new (delta 1).
 - `lifecycle-kit/templates/host-protocol.md` — whole (delta 2).
 - `lifecycle-kit/templates/stages/build.md` — the pointer line (delta 3).
-- `lifecycle-kit/templates/lead.md` — two phrases (delta 4).
+- `lifecycle-kit/templates/lead.md` — three phrases (delta 4).
+- `.claude/agents/stage-session.md` — one phrase (delta 4).
 - `lifecycle-kit/README.md` — the arm's usage line (delta 1).
 - `native/src/emit/stage_contract.rs` — the mode, the knob, `KNOBS`, `USAGE` and the unit tests (delta 1).
 - `native/src/knobs/lifecycle_kit.rs` — the knob row (delta 1).
 - `native/src/emit/foreign_run.rs` — `admitted_stages` (delta 3) and the sweep case (delta 5).
-- `delegation-kit/SPEC.md` §The foreign-vendor run and §Testing — four sentences (delta 5).
+- `delegation-kit/SPEC.md` §The foreign-vendor run and §Testing — five sentences (delta 5).
 - `.workflow/release-declarations.md` — two bullets (delta 1).
 - `.workflow/surface-ceiling.txt` — re-baselined where the ratchet reds (all deltas).
 - `docs/lifecycle-kit/SPEC.md`, `docs/lifecycle-kit/README.md`, `docs/delegation-kit/SPEC.md` — generated, stale once a delta lands (all deltas).
