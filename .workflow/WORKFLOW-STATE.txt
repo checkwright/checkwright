@@ -7,3 +7,4 @@
 foreign-build-budget-pass scope a46bdd8a 2026-10-15 2ffc3f540
 foreign-build-budget-pass spec a61f52e6 2026-10-15 ee8aac635
 foreign-build-budget-pass align a06adab2 2026-10-15 fbf7e3e56
+foreign-build-budget-pass build a1a333e3 2026-10-15 61b98bc38
