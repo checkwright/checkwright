@@ -158,9 +158,9 @@ pub struct Prices {
 type Dated = (Option<String>, [f64; 4]);
 
 impl Prices {
-    // spec: drift-kit/SPEC.md §The stage-economics meter — input 3's optional `effective_from`:
-    // several rows per model, a repeated (model, date) replacing the first, a non-ISO date pricing
-    // nothing and counted.
+    // spec: drift-kit/SPEC.md §The stage-economics meter — input 3's row shape: several rows per
+    // model, a repeated (model, date) replacing the first; a row short of four price cells, a cell
+    // that is not a number, or a non-ISO date prices nothing and is counted.
     pub fn parse(text: &str) -> Prices {
         let mut rows: HashMap<String, Vec<Dated>> = HashMap::new();
         let mut malformed = 0usize;
@@ -171,14 +171,16 @@ impl Prices {
                 continue;
             }
             let from = f.get(5).map(|v| v.trim()).filter(|v| !v.is_empty());
-            if from.is_some_and(|d| !super::kpi::is_iso_day(d)) {
+            let cells: Option<Vec<f64>> = (1..5)
+                .map(|i| f.get(i).and_then(|v| v.trim().parse::<f64>().ok()))
+                .collect();
+            let (Some(cells), false) = (cells, from.is_some_and(|d| !super::kpi::is_iso_day(d))) else {
                 malformed += 1;
                 continue;
-            }
-            let at = |i: usize| f.get(i).map_or(0.0, |v| v.trim().parse::<f64>().unwrap_or(0.0));
+            };
             let from = from.map(str::to_string);
             let dated = rows.entry(m.to_string()).or_default();
-            let price = [at(1), at(2), at(3), at(4)];
+            let price = [cells[0], cells[1], cells[2], cells[3]];
             match dated.iter_mut().find(|(d, _)| *d == from) {
                 Some(slot) => slot.1 = price,
                 None => dated.push((from, price)),
@@ -470,8 +472,8 @@ fn measure(r: &mut Run, state_file: &str, price_table: &str) -> Result<String, S
     }
     if r.prices.malformed > 0 {
         head.push_str(&format!(
-            "  {} price-table row(s) skipped — effective_from is not an ISO day, so they price \
-             nothing\n",
+            "  {} price-table row(s) skipped — short of four numeric price cells or an \
+             effective_from that is not an ISO day, so they price nothing\n",
             r.prices.malformed
         ));
     }
@@ -1241,6 +1243,27 @@ mod tests {
         assert_eq!(p.cell("late", t, "2026-05-01").as_deref(), Some("5.0000"));
         assert_eq!(p.cell("bad", t, "2026-07-01"), None, "a malformed date prices nothing");
         assert_eq!(p.malformed, 1);
+    }
+
+    // spec: drift-kit/SPEC.md §The stage-economics meter — a row short of four numeric price
+    // cells prices nothing and is counted, so a dropped tab never prices its model at zero
+    #[test]
+    fn a_short_or_unparsable_price_row_prices_nothing_and_is_counted() {
+        let p = Prices::parse(
+            "fused 0.000001\t0.000005\t0.0000001\t0.00000125\n\
+             blank\t1\t\t0\t0\n\
+             word\t1\tfree\t0\t0\n\
+             ok\t1\t0\t0\t0\n",
+        );
+        let t = Tokens {
+            input: 1,
+            ..Tokens::default()
+        };
+        for id in ["fused 0.000001", "blank", "word"] {
+            assert_eq!(p.cell(id, t, "2026-01-01"), None, "{id}");
+        }
+        assert_eq!(p.cell("ok", t, "2026-01-01").as_deref(), Some("1.0000"));
+        assert_eq!(p.malformed, 3);
     }
 
     // spec: drift-kit/SPEC.md §The stage-economics meter — Degradation: four zero counts price

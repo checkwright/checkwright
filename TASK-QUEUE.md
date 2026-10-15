@@ -432,6 +432,16 @@ rule `script_interpreter`'s stdin-body arm still reads an input redirect's blank
 
 **Cost while deferred:** a spurious block on a spelling no session writes; no grant and no missed block was found. Filed 2026-10-14 by guard-word-read-release-pass' close, promoted off a gap that build filed. Owner lookup: `carriage`, `input redirect`, `reach.rs`, `input_sources` in this file and the disposed-findings record — none; `grant-redirect-scan-cr`, done, DISTINCT (the grants' scan); owner guard-kit/SPEC.md §The reader and its views and §The rule roster (`script_interpreter`).
 
+### front-matter-reader-span
+
+[cost: event/low] [surface: canon-kit]
+
+five front-matter readers keep their own block bound and close it on `---` alone, where `spec::front_matter_span` closes on Jekyll's `---` or `...`: `check-md-unwrapped` (`native/src/gates/md_unwrapped.rs`), `check-docs-nav-reachable` and `check-docs-kit-parity` (each holding a dots-closed block open to EOF), `check-license-line` (`license_line.rs`, reading into the body) and `check-docs-liquid-parse`'s blanking (`docs_liquid_parse.rs` `is_fence`, parsing the YAML as Liquid).
+
+**Deliverable:** each reader bounded by `front_matter_span`, with a dots-closed case in each gate's fixture pair.
+
+**Cost while deferred:** a page closing its front matter on dots can draw a false finding or a false pass in each; no tracked page closes on dots, so the carry is an adopter's. Filed 2026-10-15 by crate-name-reader-pass' build, promoted at its close. Re-verified there by reading each reader's closer and probing every tracked page's front matter for a dots closer, none found. Owner lookup: `front_matter_span`, `dotted`, `closer` in this file and the disposed-findings record — `front-matter-dotted-closer`, done, DISTINCT (the shared span, which none of the five calls); owner canon-kit/SPEC.md §check-md-unwrapped, site-kit/SPEC.md §check-docs-liquid-parse and docs/site-architecture.md for the three consumer gates.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).

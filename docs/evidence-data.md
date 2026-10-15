@@ -280,3 +280,4 @@
 | rewrite-grant-noclobber-pass | sc · · b v c | 2f/3d | 0 | 21s clean | 152 |
 | guard-word-read-release-pass | sc sp a b v c | 1f/18d | 1 · ≤0d | 21s clean | 152 |
 | foreign-build-budget-pass | sc sp a b v c | 2f/1d | 2 · ≤0d | 21s clean | 152 |
+| crate-name-reader-pass | sc · · b v c | 0f/7d | 0 | 21s clean | 152 |
