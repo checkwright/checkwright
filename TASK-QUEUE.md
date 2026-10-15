@@ -62,7 +62,7 @@ a consumer KPI plugin cannot start on native Windows. The drift report starts a 
 
 **Deliverable:** a plugin dispatch a native-Windows consumer can meet. Its shape is spec's, and a ruling on [custom-gate-substrates](#custom-gate-substrates)' dispatch shape bears on it.
 
-**Inferred, not run:** the row degrades on native Windows — a drift report over a tree registering one plugin, on a Windows leg
+**Inferred, cannot run before build:** the row degrades on native Windows, read off the code at spec: `drift_report.rs`' `invoke` spawns the plugin path as `argv[0]`, and `proc::spawn_target` passes a separator-bearing name through unresolved — no Windows host runs before the mid-iteration push, whose `crate-tests-windows` legs run SPEC-kpi-powershell.md delta 3's Windows case
 
 **Push need (2026-10-15, inside the budget):** the mid-iteration push [custom-gate-substrates](#custom-gate-substrates) spends, since the plugin's Windows dispatch runs first on a Windows leg.
 
