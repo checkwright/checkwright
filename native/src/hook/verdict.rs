@@ -535,17 +535,36 @@ pub struct Keyed {
 }
 
 pub const USAGE_TOKEN: &str = "@USAGE_FILE@";
+pub const FAILED_TOKEN: &str = "@FAILED_RUN@";
 
 const KEYED_NEVER_BLOCKS: &str =
     "never blocks a foreign run — refresh the snapshot before trusting the number";
 
-// spec: delegation-kit/SPEC.md §The keyed verdict — the adapter's own producer, run before every
-// keyed read from the toplevel, bounded and fail-soft: its failure leaves the snapshot as it was.
-fn produce(cfg: &KeyedConfig, adapter: &str, path: &str) {
-    let argv: Vec<String> = crate::emit::foreign_run::argv_of(&cfg.producers, adapter)
+// spec: delegation-kit/SPEC.md §The keyed verdict — the adapter's snapshot, absolute against the
+// toplevel, or none where no `DELEGATION_KIT_FOREIGN_USAGE` element binds the adapter
+pub fn snapshot_of(cfg: &KeyedConfig, adapter: &str) -> Option<String> {
+    crate::emit::foreign_run::argv_of(&cfg.usage, adapter)
+        .into_iter()
+        .next()
+        .map(|p| walk::abs_against(&cfg.root, &p))
+}
+
+pub fn reads_failed_turns(cfg: &KeyedConfig, adapter: &str) -> bool {
+    crate::emit::foreign_run::argv_of(&cfg.producers, adapter).iter().any(|w| w.contains(FAILED_TOKEN))
+}
+
+fn producer_argv(cfg: &KeyedConfig, adapter: &str, path: &str, failed: Option<&str>) -> Vec<String> {
+    crate::emit::foreign_run::argv_of(&cfg.producers, adapter)
         .iter()
-        .map(|w| w.replace(USAGE_TOKEN, path))
-        .collect();
+        .map(|w| w.replace(USAGE_TOKEN, path).replace(FAILED_TOKEN, failed.unwrap_or("")))
+        .collect()
+}
+
+// spec: delegation-kit/SPEC.md §The keyed verdict — the adapter's own producer, run from the
+// toplevel before every keyed read and, handed a failed turn's run directory, after that turn;
+// bounded and fail-soft: its failure leaves the snapshot as it was.
+pub fn produce(cfg: &KeyedConfig, adapter: &str, path: &str, failed: Option<&str>) {
+    let argv = producer_argv(cfg, adapter, path, failed);
     let Some((program, rest)) = argv.split_first() else {
         return;
     };
@@ -559,7 +578,7 @@ fn produce(cfg: &KeyedConfig, adapter: &str, path: &str) {
 // `OFF` is the adapter with no snapshot.
 pub fn keyed(cfg: &KeyedConfig, adapter: &str) -> Keyed {
     let head = format!("foreign-budget: adapter={}", adapter);
-    let Some(path) = crate::emit::foreign_run::argv_of(&cfg.usage, adapter).into_iter().next() else {
+    let Some(path) = snapshot_of(cfg, adapter) else {
         return Keyed {
             line: format!(
                 "{} -> OFF (no DELEGATION_KIT_FOREIGN_USAGE snapshot is configured for this adapter; nothing budgets it, and it never blocks a foreign run)",
@@ -569,8 +588,7 @@ pub fn keyed(cfg: &KeyedConfig, adapter: &str) -> Keyed {
             code: 2,
         };
     };
-    let path = walk::abs_against(&cfg.root, &path);
-    produce(cfg, adapter, &path);
+    produce(cfg, adapter, &path, None);
     let stale = |body: String| Keyed {
         line: format!("{} {} -> STALE (budget unknown; {})", head, body, KEYED_NEVER_BLOCKS),
         word: "STALE",
@@ -747,6 +765,29 @@ mod tests {
                 "the long axis is named when both fire"
             );
         }
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — the producer's words: the failed turn's run directory
+    // inside a word, and the empty string where no turn is handed over
+    #[test]
+    fn the_failed_run_token_takes_the_run_directory_or_nothing() {
+        let cfg = KeyedConfig {
+            usage: vec!["a=u.txt".to_string()],
+            producers: ["a=prod", "a=--out=@USAGE_FILE@", "a=--run=@FAILED_RUN@", "b=other"]
+                .iter()
+                .map(|s| s.to_string())
+                .collect(),
+            pause: "80".to_string(),
+            pause_long: "95".to_string(),
+            stale_age: "600".to_string(),
+            timeout: 1,
+            root: "/top".to_string(),
+        };
+        assert_eq!(producer_argv(&cfg, "a", "/top/u.txt", Some("/top/.tmp/foreign/k")), vec!["prod", "--out=/top/u.txt", "--run=/top/.tmp/foreign/k"]);
+        assert_eq!(producer_argv(&cfg, "a", "/top/u.txt", None), vec!["prod", "--out=/top/u.txt", "--run="]);
+        assert!(reads_failed_turns(&cfg, "a") && !reads_failed_turns(&cfg, "b"));
+        assert_eq!(snapshot_of(&cfg, "a"), Some(walk::abs_against("/top", "u.txt")));
+        assert_eq!(snapshot_of(&cfg, "b"), None);
     }
 
     // spec: delegation-kit/SPEC.md §usage-verdict — the witness reads the newest sample's boundary

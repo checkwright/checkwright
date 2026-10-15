@@ -523,6 +523,17 @@ fn paused(keyed: &verdict::Keyed) -> String {
     format!("budget: {}", keyed.line.find("used=").map_or(keyed.line.as_str(), |at| &keyed.line[at..]))
 }
 
+// spec: delegation-kit/SPEC.md §The keyed verdict — a spawned turn ending FAILED on a non-zero exit
+// or the bound's expiry hands its run directory to a producer carrying `@FAILED_RUN@`
+fn after_failed_turn(cfg: &KeyedConfig, adapter: &str, dir: &Path, exit: &str) {
+    if exit == "-" || exit == "0" || !verdict::reads_failed_turns(cfg, adapter) {
+        return;
+    }
+    if let Some(path) = verdict::snapshot_of(cfg, adapter) {
+        verdict::produce(cfg, adapter, &path, Some(&dir.display().to_string()));
+    }
+}
+
 fn foreign_run(cfg: &Config, a: &Args) -> Verdict {
     let dir = PathBuf::from(&cfg.base).join("foreign").join(&a.key);
     let mut run = Run { args: a, class: None, dir, budget: "-", exit: "-".to_string(), report: None, patch: None };
@@ -618,6 +629,7 @@ fn foreign_run(cfg: &Config, a: &Args) -> Verdict {
     });
     if let Err(why) = done {
         let _ = std::fs::remove_dir_all(&tree);
+        after_failed_turn(&cfg.budget, &a.adapter, &run.dir, &run.exit);
         return run.failed(&why);
     }
     let form = argv_of(&cfg.resume, &a.adapter);
@@ -804,6 +816,7 @@ fn foreign_resume(cfg: &Config, key: &str, prompt: &str) -> Verdict {
             Err(unread) => format!("{}; and {}", why, unread),
             Ok(()) => why,
         };
+        after_failed_turn(&cfg.budget, &t.adapter, &dir, &t.exit);
         return advance(&t, &why);
     }
     if let Err(why) = patched {
@@ -1342,6 +1355,112 @@ mod tests {
         cfg.budget.producers = strings(&["ro=no-such-program-on-any-path"]);
         let v = foreign_run(&cfg, &r.args("ro", false));
         assert!(v.code == 0 && v.line.contains("budget=OK exit=0"), "a producer that cannot spawn: {}", v.line);
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — a stub producer logging each call's run-directory word
+    // and, where that directory's standard error carries the wall marker, writing an at-or-over
+    // reading; `exit` is how it ends a failed-turn call
+    fn walled(r: &Repo, mut cfg: Config, adapter: &str, exit: &str) -> Config {
+        let script = format!(
+            "printf '[%s]\\n' \"$2\" >> \"$0\"; [ -n \"$2\" ] || exit 0; \
+             grep -q WALL \"$2/stderr.txt\" && printf 'five_hour_used_pct=100\\nfive_hour_resets_at=99999999999\\nupdated_at=%s\\n' \"$(date +%s)\" > \"$1\"; {}",
+            exit
+        );
+        let log = r.root.join("producer.log").display().to_string();
+        cfg = r.budgeted(cfg, adapter, "10", 0);
+        cfg.budget.producers = [
+            "bash".to_string(),
+            "-c".to_string(),
+            script,
+            log,
+            "@USAGE_FILE@".to_string(),
+            "@FAILED_RUN@".to_string(),
+        ]
+        .iter()
+        .map(|w| format!("{}={}", adapter, w))
+        .collect();
+        cfg
+    }
+
+    fn calls(r: &Repo) -> Vec<String> {
+        std::fs::read_to_string(r.root.join("producer.log")).unwrap_or_default().lines().map(str::to_string).collect()
+    }
+
+    const WALL: &[&str] = &["w=bash", "w=-c", "w=echo 'WALL: out of credits' >&2; exit 1"];
+
+    // spec: delegation-kit/SPEC.md §Testing — an open's failed turn hands its run directory to the
+    // producer, whose wall pauses the next read and the next open under another key; the call
+    // before a read carries the empty word
+    #[test]
+    fn a_failed_open_feeds_its_wall_to_the_next_read() {
+        let r = Repo::new("failed-open");
+        let cfg = walled(&r, r.cfg(WALL, 60), "w", "exit 0");
+        let v = foreign_run(&cfg, &r.args("w", false));
+        assert!(v.code == 2 && v.line.contains("budget=OK exit=1") && v.line.ends_with("FAILED (the adapter exited 1)"), "the line is unchanged: {}", v.line);
+        assert_eq!(calls(&r), vec!["[]".to_string(), format!("[{}]", r.run_dir().display())]);
+        let k = budget_form(&cfg, "w").expect("a configured adapter");
+        assert_eq!(k.word, "PAUSE", "{}", k.line);
+        let second = Args { key: "second".to_string(), ..r.args("w", false) };
+        let v = foreign_run(&cfg, &second);
+        assert!(v.code == 2 && v.line.contains("key=second budget=PAUSE exit=- report=none") && v.line.contains("FAILED (budget: used=100%"), "{}", v.line);
+        assert!(!r.root.join("tmp").join("foreign").join("second").exists(), "a paused open makes no run directory");
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — a resumed turn ending FAILED hands over the session's
+    // run directory, and the next resume is paused with its turn counter held
+    #[test]
+    fn a_failed_resume_feeds_its_wall_and_the_next_resume_holds() {
+        let r = Repo::new("failed-resume");
+        assert_eq!(foreign_run(&r.session_cfg(OPEN_STDOUT, RESUME_ECHO, MARKER, 60), &r.args("s", false)).code, 0);
+        let wall = ["s=bash", "s=-c", "s=echo 'WALL: out of credits' >&2; exit 1"];
+        let cfg = walled(&r, r.session_cfg(OPEN_STDOUT, &wall, MARKER, 60), "s", "exit 0");
+        let v = foreign_resume(&cfg, "prompt", "answer.md");
+        assert!(v.code == 2 && v.line.contains("turn=2 budget=OK exit=1"), "{}", v.line);
+        assert_eq!(calls(&r), vec!["[]".to_string(), format!("[{}]", r.run_dir().display())]);
+        let v = foreign_resume(&cfg, "prompt", "answer.md");
+        assert!(v.code == 2 && v.line.contains("turn=2 budget=PAUSE exit=- report=none"), "{}", v.line);
+        assert!(r.read("session.txt").contains(" turn=2 "), "{}", r.read("session.txt"));
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — a timed-out turn is a failed one, and a producer
+    // exiting non-zero on the failed-turn call leaves the snapshot read as it was
+    #[test]
+    fn a_timed_out_turn_calls_the_producer_and_its_failure_is_soft() {
+        let r = Repo::new("failed-timeout");
+        let slow = ["w=bash", "w=-c", "w=echo WALL >&2; exec sleep 5"];
+        let cfg = walled(&r, r.cfg(&slow, 1), "w", "exit 0");
+        let v = foreign_run(&cfg, &r.args("w", false));
+        assert!(v.line.contains("exit=timeout"), "{}", v.line);
+        assert_eq!(calls(&r).len(), 2, "{:?}", calls(&r));
+        assert_eq!(budget_form(&cfg, "w").expect("configured").word, "PAUSE");
+        let r = Repo::new("failed-soft");
+        let quiet = ["w=bash", "w=-c", "w=echo 'no wall' >&2; exit 1"];
+        let cfg = walled(&r, r.cfg(&quiet, 60), "w", "exit 3");
+        let v = foreign_run(&cfg, &r.args("w", false));
+        assert!(v.code == 2 && v.line.contains("budget=OK exit=1"), "{}", v.line);
+        assert_eq!(calls(&r).len(), 2, "{:?}", calls(&r));
+        assert_eq!(budget_form(&cfg, "w").expect("configured").word, "OK");
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — no failed-turn call follows an OK, a REFUSED or a
+    // pre-spawn failure, nor any turn of an adapter whose producer lacks the token
+    #[test]
+    fn only_a_spawned_failed_turn_calls_the_producer() {
+        let wrote_and_failed = ["w=bash", "w=-c", "w=echo WALL >&2; git config --file x.cfg a.b c; exit 1"];
+        let unspawnable = ["w=no-such-program-on-any-path"];
+        let ok = ["w=bash", "w=-c", "w=echo WALL >&2"];
+        for (tag, adapter, code) in [("refused", &wrote_and_failed[..], 1), ("unspawnable", &unspawnable[..], 2), ("ok", &ok[..], 0)] {
+            let r = Repo::new(&format!("no-call-{}", tag));
+            let v = foreign_run(&walled(&r, r.cfg(adapter, 60), "w", "exit 0"), &r.args("w", false));
+            assert_eq!(v.code, code, "{}", v.line);
+            assert_eq!(calls(&r), vec!["[]".to_string()], "{}: {}", tag, v.line);
+        }
+        let r = Repo::new("no-call-tokenless");
+        let mut cfg = walled(&r, r.cfg(WALL, 60), "w", "exit 0");
+        cfg.budget.producers.retain(|w| !w.contains("@FAILED_RUN@"));
+        let v = foreign_run(&cfg, &r.args("w", false));
+        assert!(v.code == 2 && v.line.contains("exit=1"), "{}", v.line);
+        assert_eq!(calls(&r).len(), 1, "a producer without the token is called before the read alone: {:?}", calls(&r));
     }
 
     // spec: delegation-kit/SPEC.md §Testing — a paused resume: the turn counter holds, the previous

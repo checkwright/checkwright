@@ -8,23 +8,11 @@
 
 ## New Features
 
-### foreign-budget-reset-ok-stale
-
-[spec: SPEC-failed-turn-reading.md] [recurrence: 2026-10-15]
-
-the keyed verdict reads `RESET-OK` off a snapshot of any age once its short window's reset has passed, and a vendor's credit wall is no window. Its order puts `RESET-OK` ahead of age-STALE (delegation-kit/SPEC.md §The keyed verdict), so a snapshot more than a day old answered `RESET-OK` through three runs of one adapter that each exited 1 on the vendor's out-of-credits error, at guard-spelling-oracle-pass' validate and close. A stage dispatched on that reading spent an operator grant on a run that returned no report. It recurred on a fresh reading at guard-word-read-release-pass' close: `OK` at 11% on a 75-second-old snapshot, then the audit run exited 1 on the out-of-credits error, so staleness is not the whole class.
-
-**Deliverable:** one of two, the authoring stage's: the `RESET-OK` line's consequence stating that a reading older than its window predicts nothing of the new one, or a failed run's vendor error refreshing the snapshot through the consumer's producer; a feature, since either moves a verdict line or a producer contract.
-
-**Run at spec 2026-10-15** over the commit log: one of the three runs' verdict lines is on record, in that iteration's validate evidence commit, reading `budget=RESET-OK exit=1`; the other two record none. The spec stage chose the second remedy.
-
-**Cost while deferred:** one wasted foreign dispatch per credit outage, and a lead relaying `RESET-OK` as a go. Filed 2026-10-13 by guard-spelling-oracle-pass' lead and promoted at the next scope's intake. Re-verified there by reading the section: the keyed order is parse, long-axis pause, `RESET-OK`, short-axis pause, age-STALE. Owner lookup: `RESET-OK`, `credit`, `keyed verdict` in this file and the disposed-findings record — [heterogeneous-agent-delegation](#heterogeneous-agent-delegation), DISTINCT (its budget-oracle slice landed the order this entry reports against); owner delegation-kit/SPEC.md §The keyed verdict.
-
 ### heterogeneous-agent-delegation
 
 [spec: SPEC-foreign-build.md] [roadmap: now/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
 
-foreign agents. A lead delegating a stage to a foreign coding agent, cashing the public no-lock-in claim: governance enforced at the git/gate boundary, not by trusting the author. *Remaining:* (4) **stage-contract expression**, past its two slices below: a stage whose writes a foreign agent performs. **Unit set, operator direction 2026-10-15, lead-relayed (not a ruling):** this item leads, with [foreign-budget-reset-ok-stale](#foreign-budget-reset-ok-stale), [agent-effort-line-unmeasured](#agent-effort-line-unmeasured) and [tier-model-shape-unvalidated](#tier-model-shape-unvalidated). It is accepted on stub-driven crate cases with no live-run grant, and the live foreign run is filed as a later observation.
+foreign agents. A lead delegating a stage to a foreign coding agent, cashing the public no-lock-in claim: governance enforced at the git/gate boundary, not by trusting the author. *Remaining:* (4) **stage-contract expression**, past its two slices below: a stage whose writes a foreign agent performs. **Unit set, operator direction 2026-10-15, lead-relayed (not a ruling):** this item leads, with `foreign-budget-reset-ok-stale`, [agent-effort-line-unmeasured](#agent-effort-line-unmeasured) and [tier-model-shape-unvalidated](#tier-model-shape-unvalidated). It is accepted on stub-driven crate cases with no live-run grant, and the live foreign run is filed as a later observation.
 
 **Slices landed**, each in delegation-kit/SPEC.md §The foreign-vendor run, each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); then (2) the dispatch transport with (1) the escalation resume model riding it, `--foreign-resume`, that section's Resuming a session (delegation-transport-pass, 2026-10-03). Then (3) the budget oracle, delegation-kit/SPEC.md §The keyed verdict (delegation-wait-journal-pass, 2026-10-07; operator direction, lead-relayed, not a ruling). No foreign run was granted: accepted by stub-driven crate cases and one producer read of a vendor's on-disk session store through a scratch binding, so a live turn refreshing the feed is unobserved, as is whether a turn in a vendor's non-persisting mode, two of this repo's three adapters, leaves a usage event on disk; one granted run of each kind settles both. **This repo's binding (operator direction, 2026-10-07, lead-relayed, not a ruling):** inline in the gitignored `.local` overlay alone, its adapters reading one snapshot under the metric dir from an inline producer. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
 
@@ -1221,4 +1209,6 @@ the manual-operation meter keys every arm called through the gate binary's door 
 a citation naming a numbered step by its bold title, in RELEASING.md's procedure or lifecycle-kit/templates/lead.md, resolves under no gate, since check-spec-pointer and check-citation-link resolve the heading alone, so a reworded title strands every citing site with the battery green; the deliverable is a title-resolution arm on check-spec-pointer or the cited steps made headings, owned by canon-kit/SPEC.md §check-spec-pointer.
 
 ## Done
+
+- foreign-budget-reset-ok-stale
 
