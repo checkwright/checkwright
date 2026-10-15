@@ -143,7 +143,19 @@ pub fn run(args: &[String]) -> i32 {
             runtime += 1;
             continue;
         }
-        let (corpus, clean_re, help_re) = if src.ends_with(".gate") {
+        // spec: gate-sdk/SPEC.md §check-gate-output — an exec member owes a fixture pair, so its
+        // `# no-fixture:` is §check-gate-fixture-coverage's finding and never a module read here
+        let substrate = match registry::substrate(&src) {
+            Ok(s) => s,
+            Err(e) => {
+                eprintln!("check-gate-output: {}", e);
+                return 2;
+            }
+        };
+        if let registry::Substrate::Exec(_) = substrate {
+            continue;
+        }
+        let (corpus, clean_re, help_re) = if substrate == registry::Substrate::Compiled {
             let module = native_module(&crate_dir, m);
             if !Path::new(&crate_manifest).is_file() {
                 out_of_reach.push(m.clone());

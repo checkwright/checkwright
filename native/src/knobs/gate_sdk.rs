@@ -109,6 +109,8 @@ fn validate(v: &Values) -> Vec<String> {
         Some(s) => vec![format!("GATE_SDK_UPDATE_CHECK must be off|daily|weekly (got '{}')", s)],
         None => Vec::new(),
     };
+    // spec: gate-sdk/SPEC.md §The gate-authoring surface — the one host set every host knob accepts
+    errs.extend(scalar(v, crate::substrate::KNOB).and_then(|s| crate::substrate::host_refusal(crate::substrate::KNOB, s)));
     // spec: installer/SPEC.md §The upgrade contract — the refusals are the roster module's, so the
     // validator and every reader share one reading of an element
     errs.extend(crate::release_sections::refusals(
@@ -179,6 +181,8 @@ pub const KIT: Kit = Kit {
         Row::derived("GATE_SDK_EXEC_GLOBS", Shape::Scalar, exec_globs, GATES).empty_takes_default().words(),
         Row::scalar("GATE_SDK_EXEC_PRUNE", "gate-tests fixtures templates smoke").empty_takes_default().words(),
         Row::scalar("GATE_SDK_LINT_EXTRA_DIRS", "").empty_takes_default().words(),
+        Row::scalar("GATE_SDK_POWERSHELL", ""),
+        Row::scalar("GATE_SDK_PSSCRIPTANALYZER_EXCLUDE", "").words(),
         Row::scalar("GATE_SDK_GRAPH_EXTERNAL_REFS", "").empty_takes_default().words(),
         Row::derived("GATE_SDK_MSG_PATTERN_FILES", Shape::Scalar, msg_pattern_files, GATES).empty_takes_default().words(),
         Row::derived("GATE_SDK_MSG_PATTERN_FILES_LOCAL", Shape::Scalar, msg_pattern_files_local, GATES)

@@ -27,7 +27,8 @@ printf '# graph: couples=cfg dir=one valve=none tier=precommit trigger=*\n' \
     > "$scratch/check-noisy.gate"
 cat > "$scratch/bin" <<'BIN'
 #!/usr/bin/env bash
-exit 0
+[[ "$1 $2" == "--emit gate-argv" ]] || exit 9
+printf '%s\n%s\n' "$0" check-noisy
 BIN
 chmod +x "$scratch/bin"
 

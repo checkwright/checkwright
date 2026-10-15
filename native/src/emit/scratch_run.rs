@@ -4,16 +4,13 @@
 // than chosen: the runner reads `GATE_SDK_TMP_DIR`, and it passes the child's exit code through
 // verbatim while its stdout must reach the terminal as the child produces it.
 use crate::programs::{self, Program};
+use crate::substrate::{is_powershell_body, HOST_FLAGS};
 
 pub const KNOBS: &[&str] = &["GATE_SDK_TMP_DIR", "GUARD_KIT_SCRATCH_POWERSHELL"];
 
 const NAME: &str = "scratch-run";
 const USAGE: &str = "usage: --scratch-run <script> [args…]";
 const HOST_KNOB: &str = "GUARD_KIT_SCRATCH_POWERSHELL";
-
-// spec: guard-kit/SPEC.md §scratch-run — each flag carries its reason there: no profile, no prompt,
-// the process-scope policy, no banner.
-const HOST_FLAGS: &[&str] = &["-NoLogo", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File"];
 
 // spec: guard-kit/SPEC.md §scratch-run — the runner-side half of the interpreter set, read off the
 // file's own shebang rather than a roster: the runner has the *file*, so it reads what the file
@@ -40,13 +37,6 @@ pub fn bash_family(interpreter: &str) -> bool {
 // `bash_family`'s ground.
 pub fn powershell_family(interpreter: &str) -> bool {
     matches!(interpreter, "pwsh" | "powershell" | "")
-}
-
-// spec: guard-kit/SPEC.md §scratch-run — the extension decides the body's shell, `.ps1` matched
-// without regard to ASCII case.
-pub fn is_powershell_body(target: &str) -> bool {
-    let b = target.as_bytes();
-    b.len() >= 4 && b[b.len() - 4..].eq_ignore_ascii_case(b".ps1")
 }
 
 // spec: guard-kit/SPEC.md §scratch-run — the containment test reads the *resolved* path, never the
@@ -140,19 +130,7 @@ fn interpreter_for(target: &str, text: &str, host: &str) -> Result<Program, Stri
             target, HOST_KNOB
         ));
     }
-    let program = Program::consumer("GUARD_KIT_SCRATCH_POWERSHELL", host);
-    let found = if host.chars().any(std::path::is_separator) {
-        std::path::Path::new(host).is_file()
-    } else {
-        crate::proc::on_path(&program)
-    };
-    if !found {
-        return Err(format!(
-            "refusing {} — {} names '{}', which does not resolve to a PowerShell host here",
-            target, HOST_KNOB, host
-        ));
-    }
-    Ok(program)
+    crate::substrate::resolve_host("GUARD_KIT_SCRATCH_POWERSHELL", host).map_err(|e| format!("refusing {} — {}", target, e))
 }
 
 // spec: guard-kit/SPEC.md §scratch-run — the refusal order is the contract: every refusal fires
@@ -278,13 +256,6 @@ mod tests {
             assert!(!powershell_family(other), "{} was admitted", other);
         }
         assert!(!bash_family("pwsh") && !powershell_family("bash"));
-    }
-
-    // spec: guard-kit/SPEC.md §scratch-run — the extension decides, without regard to ASCII case.
-    #[test]
-    fn the_extension_decides_the_body_s_shell() {
-        assert!(is_powershell_body(".tmp/x.ps1") && is_powershell_body("X.PS1") && is_powershell_body("a.Ps1"));
-        assert!(!is_powershell_body(".tmp/x.sh") && !is_powershell_body("ps1") && !is_powershell_body("x.ps12"));
     }
 
     // spec: guard-kit/SPEC.md §scratch-run — the snapshot keeps the extension and hides behind a dot.

@@ -556,6 +556,42 @@ fn workflow_digests(text: &str, followed: &mut Vec<String>) -> Result<Vec<JobDig
     Ok(out)
 }
 
+// assertion K: an `# exec:` field sits alone in a gates-directory descriptor and names a tracked
+// target of an admitted class — true when held in place, a finding for each of the four reds otherwise
+// spec: gate-sdk/SPEC.md §check-gate-substrate-parity
+fn exec_placement(
+    desc: &str,
+    in_gates_dir: bool,
+    found: Result<registry::Substrate, String>,
+    findings: &mut Vec<String>,
+) -> Result<bool, String> {
+    let value = match found {
+        Ok(registry::Substrate::Exec(v)) => v,
+        Ok(_) => return Ok(false),
+        Err(e) => {
+            findings.push(format!("malformed exec field: {} {}", desc, e));
+            return Ok(false);
+        }
+    };
+    if !in_gates_dir {
+        findings.push(format!("exec field outside the gates directory: {} carries '{}' — a kit's gates reach a consumer compiled, so only a descriptor directly under the consumer gates directory names its implementation (gate-sdk/SPEC.md §The gate-authoring surface)", desc, registry::EXEC));
+        return Ok(false);
+    }
+    let target = registry::exec_target(desc, &value);
+    if !crate::substrate::is_powershell_body(&target) {
+        findings.push(format!("exec target of no admitted class: {} names {} — the one admitted target class is a PowerShell script (.ps1)", desc, target));
+        return Ok(false);
+    }
+    let (dir, base) = target.rsplit_once('/').unwrap_or((".", target.as_str()));
+    let tracked = Path::new(&target).is_file()
+        && !crate::listing::tracked(Some(dir), &[base]).map_err(|r| r.text())?.is_empty();
+    if !tracked {
+        findings.push(format!("exec target not tracked: {} names {}, which is not a tracked regular file", desc, target));
+        return Ok(false);
+    }
+    Ok(true)
+}
+
 fn rule(args: &[String]) -> Result<i32, String> {
     let gates_dir = match args.first() {
         Some(a) => a.clone(),
@@ -648,7 +684,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             continue;
         };
         declpaths.push(src.clone());
-        if src.ends_with(".gate") {
+        if registry::substrate(&src) == Ok(registry::Substrate::Compiled) {
             dispatching += 1;
         }
         declared += 1;
@@ -748,7 +784,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // assertion B: the .gate descriptors on disk and the binary's own subcommand roster are the
     // same set, with 'reference-only' the one dispositioned exception
     // spec: gate-sdk/SPEC.md §check-gate-substrate-parity
+    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — compiled descriptors only: an exec
+    // descriptor names no subcommand by design, and a malformed one is assertion K's to report
     let mut descriptors: Vec<String> = Vec::new();
+    let mut exec_placed = 0usize;
     for d in &resolve_dirs {
         if !fresh::is_dir(d) {
             continue;
@@ -758,8 +797,16 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 continue;
             }
             let base = f.rsplit('/').next().unwrap_or(&f);
-            if let Some(stem) = base.strip_suffix(".gate") {
-                descriptors.push(stem.to_string());
+            let Some(stem) = base.strip_suffix(".gate") else {
+                continue;
+            };
+            match registry::exec_field(&read(&f)?) {
+                Ok(registry::Substrate::Compiled) => descriptors.push(stem.to_string()),
+                found => {
+                    if exec_placement(&f, d == &gates_dir, found, &mut ctx.findings)? {
+                        exec_placed += 1;
+                    }
+                }
             }
         }
     }
@@ -791,7 +838,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let declarations = registry::unregistered_declarations(&list_text);
     let dispatching_registration: Vec<String> = members
         .iter()
-        .filter(|m| registry::resolve(m, &resolve_dirs).is_some_and(|p| p.ends_with(".gate")))
+        .filter(|m| registry::resolve(m, &resolve_dirs).is_some_and(|p| registry::substrate(&p) == Ok(registry::Substrate::Compiled)))
         .cloned()
         .collect();
     let reg = registration_parity(
@@ -1001,7 +1048,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     println!(
-        "GATE-SUBSTRATE-PARITY: clean ({declared} member(s) with one declaration each, {dispatching} of them dispatching to the binary{skipped};{noport_declared} of the {declpaths_shell} shell declaration(s) declare '# no-port:' with a cause and {portuntil_declared} declare '# port-until:' with a slug, neither on any descriptor nor both on one declaration; the tracked shell tree beyond that set {tree_state}, {tree_scanned} file(s) read for header-declaration shape and {tree_declared} of them declaring, counted apart from the declaration set so an empty one stays visible; {portuntil_grounded} of those held declaration(s) reach their ground in one hop, the section their own '# spec:' field names stating the hold; {ndesc} descriptor(s) in parity with the {nsub}-subcommand roster ({in_scope} in scope, {out_of_scope} out of scope — an unvendored kit, or a consumer declaration from another tree), {refonly} reference-only; {unregistered_declared} in-scope subcommand(s) unregistered in {list} with a declared reason and none undeclared, the reverse direction empty; {j_state}; {sensitive} substrate-sensitive member(s) {dispositioned}; {impl_scanned} implementation source(s) free of manifest-class annotation; {kit_scanned} kit root(s) scanned for an implementation sibling, crate root {crate_dir} outside every kit root; target roster {roster_state} at {roster_file} with {roster_targets} well-formed target(s); publish workflow(s) read: {wf_read_list}; absent: {wf_absent_list}; {wf_matrix} matrix declaration(s) roster-derived across {wf_jobs} job(s) with one producer per digest, {wf_followed_n} called script(s) read one hop deep)",
+        "GATE-SUBSTRATE-PARITY: clean ({declared} member(s) with one declaration each, {dispatching} of them dispatching to the binary{skipped};{noport_declared} of the {declpaths_shell} shell declaration(s) declare '# no-port:' with a cause and {portuntil_declared} declare '# port-until:' with a slug, neither on any descriptor nor both on one declaration; the tracked shell tree beyond that set {tree_state}, {tree_scanned} file(s) read for header-declaration shape and {tree_declared} of them declaring, counted apart from the declaration set so an empty one stays visible; {portuntil_grounded} of those held declaration(s) reach their ground in one hop, the section their own '# spec:' field names stating the hold; {ndesc} descriptor(s) in parity with the {nsub}-subcommand roster ({in_scope} in scope, {out_of_scope} out of scope — an unvendored kit, or a consumer declaration from another tree), {refonly} reference-only; {exec_placed} exec descriptor(s) in the gates directory, each naming one tracked PowerShell target; {unregistered_declared} in-scope subcommand(s) unregistered in {list} with a declared reason and none undeclared, the reverse direction empty; {j_state}; {sensitive} substrate-sensitive member(s) {dispositioned}; {impl_scanned} implementation source(s) free of manifest-class annotation; {kit_scanned} kit root(s) scanned for an implementation sibling, crate root {crate_dir} outside every kit root; target roster {roster_state} at {roster_file} with {roster_targets} well-formed target(s); publish workflow(s) read: {wf_read_list}; absent: {wf_absent_list}; {wf_matrix} matrix declaration(s) roster-derived across {wf_jobs} job(s) with one producer per digest, {wf_followed_n} called script(s) read one hop deep)",
         ndesc = descriptors.len(),
         nsub = roster.len(),
         in_scope = verdict.in_scope,
@@ -1099,6 +1146,39 @@ mod tests {
         v.iter()
             .map(|(a, b)| ((*a).to_string(), (*b).to_string()))
             .collect()
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion K's tracked half, which a
+    // committed fixture cannot seed: an untracked target reds and the same target tracked holds
+    #[test]
+    fn an_exec_target_holds_only_once_tracked() {
+        let d = std::env::temp_dir().join(format!("cw-parity-k-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(&d).expect("scratch");
+        let dir = walk::cross_arg(&d.display().to_string());
+        let git = |args: &[&str]| {
+            let mut a = vec!["-C", dir.as_str()];
+            a.extend(args);
+            crate::proc::run(&crate::programs::GIT, &a).expect("git");
+        };
+        git(&["init", "-q"]);
+        std::fs::write(d.join("check-x.ps1"), "exit 0\n").expect("target");
+        let desc = format!("{}/check-x.gate", dir);
+        let exec = || Ok(registry::Substrate::Exec("check-x.ps1".to_string()));
+        let mut untracked = Vec::new();
+        let first = exec_placement(&desc, true, exec(), &mut untracked);
+        git(&["add", "check-x.ps1"]);
+        let mut tracked = Vec::new();
+        let second = exec_placement(&desc, true, exec(), &mut tracked);
+        let mut misplaced = Vec::new();
+        let third = exec_placement(&desc, false, exec(), &mut misplaced);
+        let _ = std::fs::remove_dir_all(&d);
+        assert_eq!(first, Ok(false));
+        assert!(untracked[0].starts_with("exec target not tracked"), "{:?}", untracked);
+        assert_eq!(second, Ok(true));
+        assert!(tracked.is_empty(), "{:?}", tracked);
+        assert_eq!(third, Ok(false));
+        assert!(misplaced[0].starts_with("exec field outside the gates directory"), "{:?}", misplaced);
     }
 
     const DISPOSITION: &str = "| `check-reference` | Reference-only — carried by the binary with no descriptor. |";

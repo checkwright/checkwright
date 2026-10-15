@@ -122,11 +122,30 @@ got="$(gate_command check-one "$sandbox/a" "$sandbox/b" | paste -sd' ' -)"
 [[ "$got" == "$sandbox/b/check-one.sh" ]] \
     || { echo "  FAIL: gate_command shell argv was '$got'"; fails=$((fails + 1)); }
 
-# gate_command: a .gate member yields <binary> <name> when the binary is executable
-printf '#!/bin/sh\n' > "$sandbox/fakebin"; chmod +x "$sandbox/fakebin"
+# gate_command: a .gate member yields the binary's `--emit gate-argv` answer when it is executable
+cat >"$sandbox/fakebin" <<'EOF'
+#!/bin/sh
+[ "$1 $2" = "--emit gate-argv" ] || exit 9
+b=${3##*/}
+printf '%s\n%s\n' "$0" "${b%.gate}"
+EOF
+chmod +x "$sandbox/fakebin"
 got="$(GATE_SDK_NATIVE_BIN="$sandbox/fakebin" gate_command check-ported "$sandbox/a" "$sandbox/b" | paste -sd' ' -)"
 [[ "$got" == "$sandbox/fakebin check-ported" ]] \
     || { echo "  FAIL: gate_command native argv was '$got'"; fails=$((fails + 1)); }
+
+# gate_command: an exec member yields the host, its arguments and the target, from the real arm
+bin="$(gate_native_bin)"
+printf '# exec: check-ps.ps1\n' >"$sandbox/a/check-ps.gate"
+: >"$sandbox/a/check-ps.ps1"; : >"$sandbox/pwsh"
+got="$(GATE_SDK_POWERSHELL="$sandbox/pwsh" gate_command check-ps "$sandbox/a" | paste -sd' ' -)"
+[[ "$got" == "$sandbox/pwsh -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $sandbox/a/check-ps.ps1" ]] \
+    || { echo "  FAIL: gate_command exec argv was '$got' (binary $bin)"; fails=$((fails + 1)); }
+
+# fail-closed: the arm's refusal, here an empty host, is exit 2 and never return 1
+( GATE_SDK_POWERSHELL='' gate_command check-ps "$sandbox/a" >/dev/null 2>&1 )
+[[ "$?" -eq 2 ]] \
+    || { echo "  FAIL: gate_command did not exit 2 on the arm's refusal"; fails=$((fails + 1)); }
 
 # fail-closed: an absent binary is exit 2, never a skip and never a pass
 ( GATE_SDK_NATIVE_BIN="$sandbox/nope" gate_command check-ported "$sandbox/a" "$sandbox/b" >/dev/null 2>&1 )
@@ -143,5 +162,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "lib-gate.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "lib-gate.test: ok (fail_closed branches; gate_path_pruned; GATE_GREP_EXCLUDES; gate_find prune incl. the worktrees leaf; PRUNE_EXTRA_DIRS append over both branches; registry + resolution; .gate declaration/argv split + dispatch fail-closed)"
+echo "lib-gate.test: ok (fail_closed branches; gate_path_pruned; GATE_GREP_EXCLUDES; gate_find prune incl. the worktrees leaf; PRUNE_EXTRA_DIRS append over both branches; registry + resolution; .gate declaration/argv split + exec argv + dispatch fail-closed)"
 exit 0

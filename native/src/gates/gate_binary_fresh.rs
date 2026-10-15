@@ -83,10 +83,22 @@ pub fn run(args: &[String]) -> i32 {
     let listing = std::fs::read(&list)
         .map(|b| String::from_utf8_lossy(&b).into_owned())
         .unwrap_or_default();
-    let dispatching: Vec<String> = registry::members(&listing)
-        .into_iter()
-        .filter(|m| registry::resolve(m, &resolve_dirs).map(|s| s.ends_with(".gate")) == Some(true))
-        .collect();
+    // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the classifier answers which members
+    // dispatch: an exec member's spawn runs its host, never a subcommand
+    let mut dispatching: Vec<String> = Vec::new();
+    for m in registry::members(&listing) {
+        let Some(src) = registry::resolve(&m, &resolve_dirs) else {
+            continue;
+        };
+        match registry::substrate(&src) {
+            Ok(registry::Substrate::Compiled) => dispatching.push(m),
+            Ok(_) => {}
+            Err(e) => {
+                eprintln!("check-gate-binary-fresh: {} — the check could not run; treating as failure (not clean)", e);
+                return 2;
+            }
+        }
+    }
 
     // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — nothing dispatching is a clean report, not
     // a skipped assertion: no gate dispatches to the binary, so nothing can run stale. Both counts

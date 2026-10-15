@@ -10,6 +10,9 @@ on:
 # spec: gate-sdk/SPEC.md §check-shellcheck — the one pinned analyser version; bump it with each asset digest
 env:
   SHELLCHECK_VERSION: v0.11.0
+  # spec: gate-sdk/SPEC.md §check-psscriptanalyzer — the PowerShell analyser's pin and its asset digest, bumped together
+  PSSCRIPTANALYZER_VERSION: 1.23.0
+  PSSCRIPTANALYZER_SHA256: b9969345f78251112fb75bdddc789be8689a343472a2e09762303aa03287afab
 
 jobs:
   gates:
@@ -52,9 +55,22 @@ jobs:
           tar -xJf "$dir/$asset" -C "$dir"
           echo "$dir/shellcheck-$SHELLCHECK_VERSION" >> "$GITHUB_PATH"
           "$dir/shellcheck-$SHELLCHECK_VERSION/shellcheck" --version
+      # spec: gate-sdk/SPEC.md §check-psscriptanalyzer — this install is the CI verdict's reference, and the host is asked which version it imports
+      - name: install the pinned PSScriptAnalyzer release, digest-verified
+        run: |
+          set -euo pipefail
+          asset="PSScriptAnalyzer.$PSSCRIPTANALYZER_VERSION.nupkg"
+          curl -sSfL --retry 3 -o "$RUNNER_TEMP/$asset" \
+            "https://github.com/PowerShell/PSScriptAnalyzer/releases/download/$PSSCRIPTANALYZER_VERSION/$asset"
+          ( cd "$RUNNER_TEMP" && printf '%s  %s\n' "$PSSCRIPTANALYZER_SHA256" "$asset" | sha256sum -c - )
+          dir="$HOME/.local/share/powershell/Modules/PSScriptAnalyzer/$PSSCRIPTANALYZER_VERSION"
+          mkdir -p "$dir"
+          unzip -q -o "$RUNNER_TEMP/$asset" -d "$dir"
+          pwsh -NoLogo -NoProfile -NonInteractive -Command '$v = (Import-Module PSScriptAnalyzer -PassThru).Version.ToString(); if ($v -ne $env:PSSCRIPTANALYZER_VERSION) { throw "imported PSScriptAnalyzer $v, not the pinned $env:PSSCRIPTANALYZER_VERSION" }; "PSScriptAnalyzer $v"'
       - name: full battery
         env:
           GATE_SDK_SARIF_FILE: ${{ runner.temp }}/gates.sarif
+          GATE_SDK_POWERSHELL: pwsh
         run: |
           shellcheck --version | grep '^version:'
           bash gate-sdk/bin/run-gates.sh

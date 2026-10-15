@@ -64,14 +64,14 @@ function Invoke-InRepo {
 
 function Write-Ok {
     param([string]$Name)
-    Write-Host "front-door: $($script:Session): ${Name}: ok"
+    [Console]::Out.WriteLine("front-door: $($script:Session): ${Name}: ok")
     $script:Log.Clear()
 }
 
 function Write-Bad {
     param([string]$Name, [string]$Reason)
-    Write-Host "front-door: $($script:Session): ${Name}: FAILED: $Reason"
-    foreach ($line in $script:Log) { Write-Host $line }
+    [Console]::Out.WriteLine("front-door: $($script:Session): ${Name}: FAILED: $Reason")
+    foreach ($line in $script:Log) { [Console]::Out.WriteLine($line) }
     $script:Log.Clear()
 }
 
@@ -88,7 +88,7 @@ function Invoke-OneLine {
     return Invoke-InRepo $PsHost @('-NoProfile', '-Command', $text)
 }
 
-function New-Repo {
+function Initialize-Repo {
     param([string]$Session, [string]$Name)
     $script:Session = $Session
     $script:Repo = $Base
@@ -116,7 +116,7 @@ function Test-InstallAt {
     if (-not (Test-Path -LiteralPath (Join-Path $script:Repo $Lock))) { Write-Bad $Name "the install left no $Lock"; return $false }
     $got = Get-LockField 'version'
     if ($got -ne $At) { Write-Bad $Name "$Lock names version '$got', not $At"; return $false }
-    Write-Host "front-door: $($script:Session): ${Name}: ok"
+    [Console]::Out.WriteLine("front-door: $($script:Session): ${Name}: ok")
     return $true
 }
 
@@ -154,7 +154,7 @@ function Test-FollowUp {
     return $true
 }
 
-function Test-CommitLands {
+function Test-CommitLand {
     param([string]$Name)
     $script:Log.Clear()
     $script:Notes = $script:Notes + 1
@@ -235,30 +235,30 @@ function Test-ProfileMove {
 }
 
 function Test-FirstSession {
-    if (-not (New-Repo 'one-line first session' 'first')) { Write-Bad 'repository' 'git init failed'; return $false }
+    if (-not (Initialize-Repo 'one-line first session' 'first')) { Write-Bad 'repository' 'git init failed'; return $false }
     $script:GatesDir = ''
     if (-not (Test-InstallAt 'install' $Version)) { return $false }
     if (-not (Test-FollowUp 'follow-up block')) { return $false }
-    if (-not (Test-CommitLands 'clean commit')) { return $false }
+    if (-not (Test-CommitLand 'clean commit')) { return $false }
     if (-not (Test-CommitRefused 'first refusal')) { return $false }
     if (-not (Test-ProfileMove 'profile move')) { return $false }
-    if (-not (Test-CommitLands 'commit after the profile move')) { return $false }
+    if (-not (Test-CommitLand 'commit after the profile move')) { return $false }
     return $true
 }
 
 function Test-FirstUpgrade {
-    if (-not (New-Repo 'one-line first upgrade' 'upgrade')) { Write-Bad 'repository' 'git init failed'; return $false }
+    if (-not (Initialize-Repo 'one-line first upgrade' 'upgrade')) { Write-Bad 'repository' 'git init failed'; return $false }
     $script:GatesDir = ''
     if (-not (Test-InstallAt "install at $Previous" $Previous)) { return $false }
     if (-not (Test-FollowUp "follow-up block at $Previous")) { return $false }
-    if (-not (Test-CommitLands "commit at $Previous")) { return $false }
+    if (-not (Test-CommitLand "commit at $Previous")) { return $false }
     if (-not (Test-InstallAt "update to $Version" $Version @('update'))) { return $false }
-    if (-not (Test-CommitLands 'commit after the update')) { return $false }
+    if (-not (Test-CommitLand 'commit after the update')) { return $false }
     return $true
 }
 
 function Test-PackageRoute {
-    if (-not (New-Repo 'package' 'package')) { Write-Bad 'repository' 'git init failed'; return $false }
+    if (-not (Initialize-Repo 'package' 'package')) { Write-Bad 'repository' 'git init failed'; return $false }
     $npx = Get-Command npx -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
     if (-not $npx) { Write-Bad 'init' 'npx does not resolve on PATH'; return $false }
     if ((Invoke-InRepo $npx.Source @('--yes', "$Package@$Version", 'init')) -ne 0) {
@@ -278,7 +278,7 @@ try {
     if ($Previous) {
         if (-not (Test-FirstUpgrade)) { $findings = $true }
     } else {
-        Write-Host 'front-door: one-line first upgrade: skipped, no earlier release was given'
+        [Console]::Out.WriteLine('front-door: one-line first upgrade: skipped, no earlier release was given')
     }
     if (-not (Test-PackageRoute)) { $findings = $true }
 } finally {
@@ -286,8 +286,8 @@ try {
 }
 
 if ($findings) {
-    Write-Host "front-door: v${Version}: a step above failed"
+    [Console]::Out.WriteLine("front-door: v${Version}: a step above failed")
     exit 1
 }
-Write-Host "front-door: v${Version}: every session clean"
+[Console]::Out.WriteLine("front-door: v${Version}: every session clean")
 exit 0

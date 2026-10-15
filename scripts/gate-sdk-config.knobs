@@ -23,6 +23,9 @@ GATE_SDK_PAYLOAD_RECIPES[speckit] = companion/speckit/recipe
 # spec: gate-sdk/SPEC.md §check-shellcheck — this repo ships shell under no kit root: the installer's two bootstraps, its consumer smoke, the runnable adoption walkthrough, and the hosted one-line install script `docs/install.sh`, the only direct `*.sh` member of `docs`; name them so the lint that governs every other script in the tree governs these too. Each directory is named on its own because the gate globs *.sh per named directory and does not descend
 GATE_SDK_LINT_EXTRA_DIRS = installer/bin installer/consumer-smoke demo docs
 
+# comment-tier-exempt: this tree keeps every .ps1 BOM-less and ASCII outside comments, since Windows PowerShell 5.1 and a shebang-reading shim each break on a BOM (installer/SPEC.md §Requirements), so the analyser's BOM rule contradicts it on every script
+GATE_SDK_PSSCRIPTANALYZER_EXCLUDE = PSUseBOMForUnicodeEncodedFile
+
 # spec: gate-sdk/SPEC.md §check-portability-floor — this repo's install-path corpus: the files an adopter's machine actually executes. After the behind-invoke relocation that is `installer/bin` — the two bootstraps, and the whole of the install path written in a shell — plus the two hosted one-line install scripts that fetch them, and `gate-sdk/lib/gate.sh`, the one shell `init` leaves behind that the install path runs. Everything else an install performs is Rust and reaches no shell dialect at all. A corpus drawn by directory rather than by reachability is what let a GNU-only primary sit unseen. The vocabulary rides the knob's own default, scripts/portability-patterns.list
 GATE_SDK_PORTABILITY_PATHS = installer/bin docs/install.sh docs/install.ps1 gate-sdk/lib/gate.sh gate-sdk/bin/run-gates.sh gate-sdk/bin/run-gates.ps1
 

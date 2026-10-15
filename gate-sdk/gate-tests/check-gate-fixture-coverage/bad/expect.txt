@@ -1,1 +1,2 @@
 no '# no-fixture:' opt-out
+check-psopt (scripts/check-psopt.gate carries '# exec:' and '# no-fixture:')

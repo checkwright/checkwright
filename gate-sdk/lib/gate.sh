@@ -268,7 +268,7 @@ gate_resolve() {
     return 1
 }
 
-# spec: gate-sdk/SPEC.md §lib/gate.sh — resolve a gate name to its *invocation argv*, one element per line: `<dir>/<name>.sh` for a shell gate, `<binary> <name>` for a `.gate`-dispatched one. An absent or non-executable binary when a member dispatches to it is a harness error — exit 2, never a skip and never a pass (§Fail-closed contract).
+# spec: gate-sdk/SPEC.md §lib/gate.sh — resolve a gate name to its *invocation argv*, one element per line; a `.gate` declaration's is the binary's `--emit gate-argv` answer. An absent or non-executable binary, or the arm's refusal, is a harness error — exit 2, never a skip and never a pass (§Fail-closed contract).
 gate_command() {
     local g="$1" d bin
     shift
@@ -285,7 +285,7 @@ gate_command() {
                 printf 'failure (not clean). Build it: bash gate-sdk/bin/build-native.sh\n' >&2
                 exit 2
             fi
-            printf '%s\n%s\n' "$bin" "$g"
+            "$bin" --emit gate-argv "$d/$g.gate" || exit 2
             return 0
         fi
     done

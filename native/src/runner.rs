@@ -3,7 +3,6 @@
 // is the front-end that locates the binary and execs this arm.
 use crate::gates;
 use crate::proc;
-use crate::programs::{self, Program};
 use crate::registry;
 use crate::sarif;
 use crate::walk;
@@ -206,6 +205,7 @@ pub const KNOBS: &[&str] = &[
     "GATE_SDK_KIT_DIRS",
     "GATE_SDK_TMP_DIR",
     "GATE_SDK_SPEC_BASE_URL",
+    "GATE_SDK_POWERSHELL",
     crate::emit::EVERY_REGISTERED_KNOB,
 ];
 
@@ -649,28 +649,18 @@ pub(crate) fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome 
             )
         }
     };
-    let (program, mut args) = if src.ends_with(".gate") {
-        if gates::declared(&sel.name).is_none() {
-            {
-                return fail(
-                    "dispatch harness error, exit 2",
-                    format!(
-                        "checkwright-gates: no such gate subcommand: {} — the check could not run; \
-                         treating as failure (not clean)",
-                        sel.name
-                    ),
-                    started.elapsed().as_millis(),
-                );
-            }
-        }
-        (
-            programs::CHECKWRIGHT_GATES.at(d.self_exe),
-            vec![sel.name.clone()],
-        )
-    } else {
-        (Program::consumer(programs::GATE_DECLARATION, src), Vec::new())
+    let inv = match registry::invocation(&sel.name, &src, d.self_exe) {
+        Ok(i) => i,
+        Err(e) => return fail("dispatch harness error, exit 2", e, started.elapsed().as_millis()),
     };
+    let (program, mut args) = (inv.program, inv.args);
     args.extend(sel.args.iter().cloned());
+    // spec: gate-sdk/SPEC.md §The gate-authoring surface — a member the binary does not implement
+    // is handed the running binary, so it reads a knob through `--emit knob-values`
+    let mut env: Vec<(String, String)> = d.env.to_vec();
+    if inv.substrate != registry::Substrate::Compiled {
+        env.push(("GATE_SDK_NATIVE_BIN".to_string(), d.self_exe.to_string()));
+    }
 
     let tmpdir = d.scratch.join(format!("t{}", idx));
     if let Err(e) = std::fs::create_dir_all(&tmpdir) {
@@ -686,7 +676,7 @@ pub(crate) fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome 
         );
     }
     let capture = d.scratch.join(format!("c{}", idx));
-    match proc::dispatch(&program, &args, &tmpdir, &capture, d.env) {
+    match proc::dispatch(&program, &args, &tmpdir, &capture, &env) {
         Err(e) => fail(
             "dispatch harness error, exit 2",
             e,

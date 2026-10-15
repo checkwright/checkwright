@@ -60,8 +60,26 @@ pub fn run(_args: &[String]) -> i32 {
 
     let mut neither: Vec<String> = Vec::new();
     let mut halfpair: Vec<String> = Vec::new();
+    let mut exec_optout: Vec<String> = Vec::new();
     let (mut fixtured, mut optout, mut total, mut unresolved) = (0usize, 0usize, 0usize, 0usize);
     for m in &members {
+        // spec: gate-sdk/SPEC.md §check-gate-fixture-coverage — an exec member's pair is the only
+        // output-contract and fail-closed check its substrate has, so it takes no opt-out
+        if let Some(src) = registry::resolve(m, &resolve_dirs) {
+            match registry::substrate(&src) {
+                Ok(registry::Substrate::Exec(_)) => {
+                    let text = std::fs::read(&src).map(|b| String::from_utf8_lossy(&b).into_owned()).unwrap_or_default();
+                    if fresh::file_lines(&text).iter().any(|l| l.starts_with("# no-fixture:")) {
+                        exec_optout.push(format!("{} ({} carries '# exec:' and '# no-fixture:')", m, src));
+                    }
+                }
+                Ok(_) => {}
+                Err(e) => {
+                    eprintln!("check-gate-fixture-coverage: {}", e);
+                    return 2;
+                }
+            }
+        }
         if let Some(gd) = fixture_dir_for(m, &tests_dirs) {
             total += 1;
             let good = fresh::is_dir(&format!("{}/good", gd));
@@ -98,7 +116,7 @@ pub fn run(_args: &[String]) -> i32 {
     }
 
     let skipped = registry::unresolved_skipped(unresolved);
-    if !neither.is_empty() || !halfpair.is_empty() {
+    if !neither.is_empty() || !halfpair.is_empty() || !exec_optout.is_empty() {
         if !skipped.is_empty() {
             println!("check-gate-fixture-coverage: {} member(s) checked{}", total, skipped);
         }
@@ -129,6 +147,20 @@ pub fn run(_args: &[String]) -> i32 {
             println!();
             println!("  help: add the missing half under <tests-dir>/<gate>/, or remove");
             println!("        the partial dir and add a '# no-fixture:' opt-out instead.");
+        }
+        if !exec_optout.is_empty() {
+            if !neither.is_empty() || !halfpair.is_empty() {
+                println!();
+            }
+            println!("check-gate-fixture-coverage: exec member(s) opting out of a fixture pair");
+            println!("(gate-sdk/SPEC.md §The gate-authoring surface — the pair is the only output-contract");
+            println!("and fail-closed check an exec member has):");
+            println!();
+            for m in &exec_optout {
+                println!("  {}", m);
+            }
+            println!();
+            println!("  help: drop the '# no-fixture:' line and add <tests-dir>/<gate>/{{good,bad}}/.");
         }
         return 1;
     }

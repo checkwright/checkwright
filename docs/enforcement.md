@@ -24,6 +24,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | kit | gate | tier |
 | --- | --- | --- |
 | [gate-sdk](gate-sdk/index.md) | check-shellcheck | precommit |
+| [gate-sdk](gate-sdk/index.md) | check-psscriptanalyzer | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-gate-output | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-gate-fail-closed | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-gate-fixture-coverage | precommit |

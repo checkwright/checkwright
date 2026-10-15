@@ -124,6 +124,7 @@ pub mod scratch_citation;
 pub mod settings_paths;
 pub mod settings_pins;
 pub mod settings_pins_parity;
+pub mod psscriptanalyzer;
 pub mod shellcheck;
 pub mod shim_restatement;
 pub mod skill_binding;
@@ -2203,8 +2204,8 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-gate-substrate-parity",
         gate_substrate_parity::run,
         &[
-            ("?", "", "", "dynamic@src/gates/gate_substrate_parity.rs:879"),
-            ("?", "", "", "dynamic@src/gates/gate_substrate_parity.rs:904"),
+            ("?", "", "", "dynamic@src/gates/gate_substrate_parity.rs:926"),
+            ("?", "", "", "dynamic@src/gates/gate_substrate_parity.rs:951"),
         ],
         &[
             "GATE_SDK_GATES_DIR",
@@ -2316,6 +2317,22 @@ pub const REGISTRY: &[GateEntry] = &[
         ],
         "gate-sdk",
         &[("shellcheck", "")],
+    ),
+    // spec: gate-sdk/SPEC.md §check-psscriptanalyzer — `check-shellcheck`'s single-level listing,
+    // and the host in the knob form criterion 7's wrapper ruling keeps off the payload
+    (
+        "check-psscriptanalyzer",
+        psscriptanalyzer::run,
+        &[],
+        &[
+            "GATE_SDK_GATES_DIR",
+            "GATE_SDK_KIT_DIRS",
+            "GATE_SDK_LINT_EXTRA_DIRS",
+            "GATE_SDK_POWERSHELL",
+            "GATE_SDK_PSSCRIPTANALYZER_EXCLUDE",
+        ],
+        "gate-sdk",
+        &[("?", "GATE_SDK_POWERSHELL")],
     ),
     // spec: gate-sdk/SPEC.md §check-install-disposition — one `?` for the one root per kit root,
     // a set the registry cannot name concretely; `git` for the toplevel the positional root falls

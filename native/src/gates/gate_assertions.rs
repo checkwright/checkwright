@@ -257,31 +257,36 @@ fn resolve_gate_file(
     dirs: &[String],
     crate_dir: &str,
     crate_manifest: &str,
-) -> Resolved {
+) -> Result<Resolved, String> {
     if !scripts_dir.is_empty() {
         let p = format!("{}/{}.sh", scripts_dir, gate);
-        return if Path::new(&p).is_file() {
+        return Ok(if Path::new(&p).is_file() {
             Resolved::Found(p)
         } else {
             Resolved::Unresolved
-        };
+        });
     }
     let Some(decl) = resolve_declaration(gate, dirs) else {
-        return Resolved::Unresolved;
+        return Ok(Resolved::Unresolved);
     };
-    let decl = if decl.ends_with(".gate") {
-        if !Path::new(crate_manifest).is_file() {
-            return Resolved::OutOfReach;
+    // spec: gate-sdk/SPEC.md §check-gate-assertions — an exec member's markers are read from its
+    // target, as a compiled member's are from its module
+    let decl = match crate::registry::substrate(&decl) {
+        Ok(crate::registry::Substrate::Compiled) => {
+            if !Path::new(crate_manifest).is_file() {
+                return Ok(Resolved::OutOfReach);
+            }
+            native_module(crate_dir, gate)
         }
-        native_module(crate_dir, gate)
-    } else {
-        decl
+        Ok(crate::registry::Substrate::Exec(v)) => crate::registry::exec_target(&decl, &v),
+        Ok(crate::registry::Substrate::Shell) => decl,
+        Err(e) => return Err(format!("check-gate-assertions: {}", e)),
     };
-    if Path::new(&decl).is_file() {
+    Ok(if Path::new(&decl).is_file() {
         Resolved::Found(decl)
     } else {
         Resolved::Unresolved
-    }
+    })
 }
 
 // spec: gate-sdk/SPEC.md §check-gate-assertions — the comma join over a sorted label set, which
@@ -374,7 +379,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
                 &resolve_dirs,
                 &crate_dir,
                 &crate_manifest,
-            ) {
+            )? {
                 // spec: gate-sdk/SPEC.md §check-gate-assertions — a tree with no crate skips those
                 // members and counts them: an internal sentinel, not a failure path
                 Resolved::OutOfReach => {

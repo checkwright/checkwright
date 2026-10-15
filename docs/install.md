@@ -62,7 +62,7 @@ The same install, one step at a time: [Installing step by step on macOS and Linu
 
 This is the native Windows route. Under WSL, take [macOS and Linux](#macos-and-linux).
 
-**You need** the tools [Requirements](#requirements) lists for installing on Windows, where the minimum Windows version is stated too. Git for Windows' bash is also what runs any shell gate you write ([Writing your own shell gates](requirements.md#writing-your-own-shell-gates)).
+**You need** the tools [Requirements](#requirements) lists for installing on Windows, where the minimum Windows version is stated too. Git for Windows' bash is also what runs any shell gate you write, and a gate you write in PowerShell needs none ([Writing your own PowerShell gates](requirements.md#writing-your-own-powershell-gates)).
 
 The pre-commit hook needs no shell: it is the gate binary under the hook's name, and git starts it directly. The battery needs none either: run the gate binary with `--run`, or `gate-sdk/bin/run-gates.ps1` from PowerShell.
 

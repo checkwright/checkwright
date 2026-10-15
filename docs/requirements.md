@@ -81,7 +81,11 @@ To measure your own repository, run the gate binary with `--measure-commit`. It 
 
 ## Writing your own shell gates
 
-A gate you write is a copy of gate-sdk's `templates/check-skeleton.sh`. It is a bash script that sources gate-sdk's library, so it needs the `bash` floor above on every system, whatever your profile. `doctor` checks it once your `gates.list` registers the gate. On native Windows that bash is Git for Windows' bash: a gate cannot be written in PowerShell today. `check-shellcheck` lints your gate if you register it, and then `shellcheck`'s row binds you.
+A gate you write is a copy of gate-sdk's `templates/check-skeleton.sh`. It is a bash script that sources gate-sdk's library, so it needs the `bash` floor above on every system, whatever your profile. `doctor` checks it once your `gates.list` registers the gate. On native Windows that bash is Git for Windows' bash, or write the gate in PowerShell instead. `check-shellcheck` lints your gate if you register it, and then `shellcheck`'s row binds you.
+
+## Writing your own PowerShell gates
+
+A PowerShell gate is two files in your gates directory: a `.gate` descriptor carrying the gate's `# graph:` line, its `# spec:` line and `# exec: <script>.ps1`, and the script it names. It needs a PowerShell host, which you name by setting `GATE_SDK_POWERSHELL` in `gate-sdk-config.knobs`: `powershell` for Windows PowerShell 5.1, which every Windows host carries, or `pwsh` for PowerShell 7 on any system. The gate runs as your shell gates do and prints the same lines; it reads a knob through `--emit knob-values <NAME>` on the binary its environment names. `check-psscriptanalyzer` lints it once you register it, and then the `PSScriptAnalyzer` module binds you. Running its fixture pair with `--run-gate-tests` also uses Git for Windows' bash. [gate-sdk/SPEC.md](gate-sdk/SPEC.md#the-gate-authoring-surface) owns this.
 
 ## Writing your own Rust gates
 

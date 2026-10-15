@@ -14,7 +14,7 @@ function Install-Checkwright {
     Set-StrictMode -Version Latest
     $ErrorActionPreference = 'Stop'
     $ProgressPreference = 'SilentlyContinue'
-    if (Test-Path Variable:PSNativeCommandArgumentPassing) { $PSNativeCommandArgumentPassing = 'Standard' }
+    if (Test-Path Variable:PSNativeCommandArgumentPassing) { Set-Variable -Name PSNativeCommandArgumentPassing -Value 'Standard' }
     if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) { $PSNativeCommandUseErrorActionPreference = $false }
 
     $version = if ($env:CHECKWRIGHT_VERSION) { $env:CHECKWRIGHT_VERSION } else { $pin }

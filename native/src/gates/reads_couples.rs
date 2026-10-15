@@ -444,6 +444,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut analyzed = 0usize;
     let mut skipped = 0usize;
     let mut exempt = 0usize;
+    let mut exec_members = 0usize;
 
     for src in &sources {
         if !Path::new(src).is_file() {
@@ -468,7 +469,14 @@ fn rule(args: &[String]) -> Result<i32, String> {
         // spec: gate-sdk/SPEC.md §check-reads-couples — a `.gate` member's walks are unreadable to
         // a shell parse, so the registry answers instead. Compiled, that answer is an in-process
         // call rather than a spawn of the arm, which is what dissolves this member's own `c7`.
-        if src.ends_with(".gate") {
+        // spec: gate-sdk/SPEC.md §check-reads-couples — an exec member's reads are undecidable to
+        // any reader here, so it is counted and skipped, never asked to answer by argv
+        let substrate = crate::registry::substrate(src)?;
+        if let crate::registry::Substrate::Exec(_) = substrate {
+            exec_members += 1;
+            continue;
+        }
+        if substrate == crate::registry::Substrate::Compiled {
             let roots = gates::roots(&gname).ok_or_else(|| {
                 format!(
                     "{} dispatches to the binary, but no registered subcommand answers for '{}' — \
@@ -556,10 +564,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(1);
     }
     println!(
-        "READS-COUPLES: clean ({} resolvable walk(s) covered; {} undecidable walk(s) skipped-and-counted; {} exempt; across {} gate(s))",
+        "READS-COUPLES: clean ({} resolvable walk(s) covered; {} undecidable walk(s) skipped-and-counted; {} exempt; {} exec member(s) declaring no reads; across {} gate(s))",
         analyzed,
         skipped,
         exempt,
+        exec_members,
         sources.len()
     );
     Ok(0)

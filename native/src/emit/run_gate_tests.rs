@@ -311,18 +311,30 @@ fn run_case(h: &Harness, gate: &str, casedir: &str, want: i32, expect: &str) -> 
         );
         return 2;
     }
-    if !proc::is_executable(Path::new(&argv[0])) {
-        println!("  HARNESS: {} is not executable", argv[0]);
-        return 2;
-    }
-    let here = match walk::cwd() {
-        Ok(c) => c,
-        Err(e) => {
-            println!("  HARNESS: {}", e);
+    // spec: gate-sdk/SPEC.md §run-gate-tests — a path is guarded and absolutized, a bare host name
+    // resolved, so the child started from the case dir reaches the program the resolution named
+    if argv[0].chars().any(std::path::is_separator) {
+        if !proc::is_executable(Path::new(&argv[0])) {
+            println!("  HARNESS: {} is not executable", argv[0]);
             return 2;
         }
-    };
-    argv[0] = walk::abs_against(&here, &argv[0]);
+        let here = match walk::cwd() {
+            Ok(c) => c,
+            Err(e) => {
+                println!("  HARNESS: {}", e);
+                return 2;
+            }
+        };
+        argv[0] = walk::abs_against(&here, &argv[0]);
+    } else {
+        match proc::which(&argv[0]) {
+            Some(p) => argv[0] = p,
+            None => {
+                println!("  HARNESS: {} does not resolve on PATH", argv[0]);
+                return 2;
+            }
+        }
+    }
 
     // spec: gate-sdk/SPEC.md §run-gate-tests — `#` lines are stripped and the surviving text is
     // word-split on whitespace into argv, never taken one argument per line; the deliberate

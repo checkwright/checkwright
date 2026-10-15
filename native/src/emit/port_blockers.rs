@@ -319,16 +319,21 @@ struct Member {
 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a `.gate` member's rule is a binary subcommand
 // with no text to tokenize, so its requirements are read off the registry's own declaration, onto
 // the three row shapes a scanned command word already reaches and no fourth.
-fn needs_rows(member: &str, decl: &str, reg: &Registry) -> Member {
+// spec: gate-sdk/SPEC.md §port-blockers — an exec member's one requirement is its target class's
+// host, in the knob form, so it reports as that knob's command word
+const EXEC_NEEDS: &[(&str, &str)] = &[("?", crate::substrate::KNOB)];
+
+fn needs_rows(member: &str, decl: &str, exec: bool, reg: &Registry) -> Member {
     let mut m = Member {
         rows: Vec::new(),
         undecidable: false,
         libcalls: BTreeSet::new(),
     };
+    let label = if exec { "exec host" } else { "--needs" };
     // spec: gate-sdk/SPEC.md §Fail-closed contract — a registry that cannot answer for the member
     // is reported undecidable, never as an empty requirement set: a member silently reported clean
     // because the question failed is the captured-emptiness false green in report form.
-    let reqs = match crate::gates::needs(member) {
+    let reqs = match if exec { Some(EXEC_NEEDS) } else { crate::gates::needs(member) } {
         Some(r) => r,
         None => {
             m.rows.push(Row {
@@ -346,7 +351,7 @@ fn needs_rows(member: &str, decl: &str, reg: &Registry) -> Member {
                 m.rows.push(Row {
                     member: member.to_string(),
                     program: "?".to_string(),
-                    evidence: format!("{} (--needs: unbounded in the registry)", decl),
+                    evidence: format!("{} ({}: unbounded in the registry)", decl, label),
                 });
                 m.undecidable = true;
                 continue;
@@ -356,7 +361,7 @@ fn needs_rows(member: &str, decl: &str, reg: &Registry) -> Member {
                     m.rows.push(Row {
                         member: member.to_string(),
                         program: "?".to_string(),
-                        evidence: format!("{} (--needs ${}, default unresolvable)", decl, knob),
+                        evidence: format!("{} ({} ${}, default unresolvable)", decl, label, knob),
                     });
                     m.undecidable = true;
                 }
@@ -365,7 +370,7 @@ fn needs_rows(member: &str, decl: &str, reg: &Registry) -> Member {
                         m.rows.push(Row {
                             member: member.to_string(),
                             program: prog,
-                            evidence: format!("{} (--needs ${})", decl, knob),
+                            evidence: format!("{} ({} ${})", decl, label, knob),
                         });
                     }
                 }
@@ -376,7 +381,7 @@ fn needs_rows(member: &str, decl: &str, reg: &Registry) -> Member {
             m.rows.push(Row {
                 member: member.to_string(),
                 program: (*program).to_string(),
-                evidence: format!("{} (--needs)", decl),
+                evidence: format!("{} ({})", decl, label),
             });
         }
     }
@@ -545,12 +550,14 @@ fn registry_arm(mode: Mode, gates_dir: Option<String>) -> Result<String, String>
         // spec: gate-sdk/SPEC.md §port-blockers — a ported member leaves the partition entirely
         // rather than printing `?`: the grouping orders the *remaining* corpus, so there is no open
         // question to report. `--group` does not consume the requirement lookup: it has no row to fill.
-        if decl.ends_with(".gate") {
+        let substrate = registry::substrate(&decl)?;
+        if substrate != registry::Substrate::Shell {
             if mode == Mode::Group {
                 ported += 1;
                 continue;
             }
-            let m = needs_rows(&member, &decl, &reg);
+            let exec = matches!(substrate, registry::Substrate::Exec(_));
+            let m = needs_rows(&member, &decl, exec, &reg);
             undecidable += usize::from(m.undecidable);
             rows.extend(m.rows.into_iter().map(format_row));
             continue;
@@ -778,7 +785,7 @@ mod tests {
     #[test]
     fn a_compiled_members_requirement_is_read_off_the_registry_and_floor_filtered() {
         let reg = bare_registry();
-        let m = needs_rows("check-shellcheck", "gate-sdk/checks/check-shellcheck.gate", &reg);
+        let m = needs_rows("check-shellcheck", "gate-sdk/checks/check-shellcheck.gate", false, &reg);
         assert!(!m.undecidable);
         let progs: Vec<&str> = m.rows.iter().map(|r| r.program.as_str()).collect();
         assert!(progs.contains(&"shellcheck"), "the off-floor requirement is missing");
@@ -795,7 +802,7 @@ mod tests {
     #[test]
     fn a_member_the_registry_cannot_answer_for_is_undecidable_rather_than_clean() {
         let reg = bare_registry();
-        let m = needs_rows("check-not-a-registered-member", "scripts/absent.gate", &reg);
+        let m = needs_rows("check-not-a-registered-member", "scripts/absent.gate", false, &reg);
         assert!(m.undecidable, "the cannot-answer branch did not reach the counter");
         assert_eq!(m.rows.len(), 1);
         assert_eq!(m.rows[0].program, "?");

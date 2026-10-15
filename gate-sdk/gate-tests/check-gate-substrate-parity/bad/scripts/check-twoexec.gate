@@ -1,0 +1,3 @@
+# graph: couples=docs/*.md dir=one valve=none tier=precommit
+# exec: check-twoexec.ps1
+# exec: check-twoexec.ps1

@@ -4,7 +4,7 @@ use crate::runner::{self, Dispatch, Selected};
 use crate::{proc, programs, registry, walk};
 use std::path::{Path, PathBuf};
 
-pub const KNOBS: &[&str] = &["GATE_SDK_GATES_DIR", "GATE_SDK_KIT_DIRS"];
+pub const KNOBS: &[&str] = &["GATE_SDK_GATES_DIR", "GATE_SDK_KIT_DIRS", "GATE_SDK_POWERSHELL"];
 
 pub const USAGE: &str = "usage: --git-hook pre-commit | commit-msg <message-file>";
 

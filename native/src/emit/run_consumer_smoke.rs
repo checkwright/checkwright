@@ -11,7 +11,7 @@ use std::time::Instant;
 
 // spec: gate-sdk/SPEC.md §Consumer smoke — the roster is the consumer's: which kits to vendor and
 // the binary the scratch consumer receives and the probes dispatch to.
-pub const KNOBS: &[&str] = &["GATE_SDK_KIT_DIRS", "GATE_SDK_NATIVE_BIN"];
+pub const KNOBS: &[&str] = &["GATE_SDK_KIT_DIRS", "GATE_SDK_NATIVE_BIN", "GATE_SDK_POWERSHELL"];
 
 const NAME: &str = "run-consumer-smoke";
 const VERDICT: &str = "CONSUMER-SMOKE";
@@ -424,21 +424,25 @@ fn probe(tree: &str, checks_dir: &str, gate: &str) -> Result<Probe, Outcome> {
     let Some(decl) = registry::resolve(gate, &[checks_dir.to_string()]) else {
         return Ok(Probe::Exit(2));
     };
-    let (program, args): (programs::Program, Vec<&str>) = if decl.ends_with(".gate") {
-        let bin = walk::knob_scalar("GATE_SDK_NATIVE_BIN").map_err(env)?;
-        let path = format!("{}/{}", tree, bin);
-        if !proc::is_executable(Path::new(&path)) {
-            return Ok(Probe::HarnessError(format!(
-                "{} dispatches to the native binary, but {} is absent or not executable in {} — the probe could not run. Build it: bash gate-sdk/bin/build-native.sh",
-                gate, path, tree
-            )));
-        }
-        (programs::CHECKWRIGHT_GATES.at(path), vec![gate])
-    } else {
-        (programs::Program::consumer(programs::GATE_DECLARATION, decl), Vec::new())
+    let bin = walk::knob_scalar("GATE_SDK_NATIVE_BIN").map_err(env)?;
+    let path = format!("{}/{}", tree, bin);
+    let compiled = registry::substrate(&decl).map(|s| s == registry::Substrate::Compiled);
+    if compiled == Ok(true) && !proc::is_executable(Path::new(&path)) {
+        return Ok(Probe::HarnessError(format!(
+            "{} dispatches to the native binary, but {} is absent or not executable in {} — the probe could not run. Build it: bash gate-sdk/bin/build-native.sh",
+            gate, path, tree
+        )));
+    }
+    let inv = match registry::invocation(gate, &decl, &path) {
+        Ok(i) => i,
+        Err(e) => return Ok(Probe::HarnessError(e)),
     };
-    let locator = [("GATE_SDK_ROOT".to_string(), format!("{}/gate-sdk", tree))];
-    match proc::run_with_env_in(&program, &args, &locator, Some(Path::new(tree))) {
+    let args: Vec<&str> = inv.args.iter().map(String::as_str).collect();
+    let mut locator = vec![("GATE_SDK_ROOT".to_string(), format!("{}/gate-sdk", tree))];
+    if inv.substrate != registry::Substrate::Compiled {
+        locator.push(("GATE_SDK_NATIVE_BIN".to_string(), path.clone()));
+    }
+    match proc::run_with_env_in(&inv.program, &args, &locator, Some(Path::new(tree))) {
         Ok(done) => Ok(Probe::Exit(done.reported_code())),
         Err(_) => Ok(Probe::Exit(126)),
     }

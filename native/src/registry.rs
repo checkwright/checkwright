@@ -136,6 +136,116 @@ pub fn resolve(name: &str, dirs: &[String]) -> Option<String> {
     None
 }
 
+// spec: gate-sdk/SPEC.md §The gate-authoring surface — what implements a resolved declaration, the
+// one answer every site asking takes; an exec member carries its field's value
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Substrate {
+    Shell,
+    Compiled,
+    Exec(String),
+}
+
+pub const EXEC: &str = "# exec:";
+
+// spec: gate-sdk/SPEC.md §The gate-authoring surface — a `.gate` descriptor's `# exec:` lines, held
+// to one, non-empty, relative and with no `..` segment; a `.sh` is its own implementation
+pub fn substrate(decl: &str) -> Result<Substrate, String> {
+    if !decl.ends_with(".gate") {
+        return Ok(Substrate::Shell);
+    }
+    let text = std::fs::read(decl)
+        .map(|b| String::from_utf8_lossy(&b).into_owned())
+        .map_err(|e| format!("cannot read {}: {}", decl, e))?;
+    exec_field(&text).map_err(|e| format!("{}: {} (gate-sdk/SPEC.md §The gate-authoring surface)", decl, e))
+}
+
+// spec: gate-sdk/SPEC.md §The gate-authoring surface — the descriptor-text half, so the placement
+// assertion reads the same refusals the classifier raises
+pub fn exec_field(text: &str) -> Result<Substrate, String> {
+    let values: Vec<&str> = fresh::file_lines(text)
+        .into_iter()
+        .filter_map(|l| l.strip_prefix(EXEC))
+        .map(str::trim)
+        .collect();
+    let value = match values.as_slice() {
+        [] => return Ok(Substrate::Compiled),
+        [v] => *v,
+        _ => return Err(format!("carries {} `{}` lines, and a descriptor names one implementation", values.len(), EXEC)),
+    };
+    if value.is_empty() {
+        return Err(format!("its `{}` line names no file", EXEC));
+    }
+    let rooted = crate::walk::path_root(value).is_some() || value.as_bytes().get(1) == Some(&b':');
+    if rooted || value.split(['/', '\\']).any(|s| s == "..") {
+        return Err(format!(
+            "its `{}` value '{}' is rooted or climbs with `..` — it names a file relative to the descriptor's own directory",
+            EXEC, value
+        ));
+    }
+    Ok(Substrate::Exec(value.to_string()))
+}
+
+// spec: gate-sdk/SPEC.md §The gate-authoring surface — an exec value joined to its descriptor's
+// directory, the path the host starts and every target reader reads
+pub fn exec_target(decl: &str, value: &str) -> String {
+    match decl.rsplit_once('/') {
+        Some((dir, _)) => format!("{}/{}", dir, value),
+        None => value.to_string(),
+    }
+}
+
+// spec: gate-sdk/SPEC.md §The gate-authoring surface — one member's start: the program and its
+// leading arguments, the member's own arguments following
+pub struct Invocation {
+    pub substrate: Substrate,
+    pub program: crate::programs::Program,
+    pub args: Vec<String>,
+}
+
+pub fn invocation(name: &str, decl: &str, self_exe: &str) -> Result<Invocation, String> {
+    use crate::programs::{self, Program};
+    let substrate = substrate(decl)?;
+    let (program, args) = match &substrate {
+        Substrate::Shell => (Program::consumer(programs::GATE_DECLARATION, decl), Vec::new()),
+        Substrate::Compiled => {
+            if crate::gates::declared(name).is_none() {
+                return Err(format!(
+                    "checkwright-gates: no such gate subcommand: {} — the check could not run; treating as failure (not clean)",
+                    name
+                ));
+            }
+            (programs::CHECKWRIGHT_GATES.at(self_exe), vec![name.to_string()])
+        }
+        Substrate::Exec(value) => {
+            let target = exec_target(decl, value);
+            if !Path::new(&target).is_file() {
+                return Err(format!(
+                    "{}: its `{}` target {} is not a file — the check could not run; treating as failure (not clean)",
+                    decl, EXEC, target
+                ));
+            }
+            if !crate::substrate::is_powershell_body(&target) {
+                return Err(format!(
+                    "{}: its `{}` target {} is of no admitted target class (a PowerShell script, .ps1) — gate-sdk/SPEC.md §The gate-authoring surface",
+                    decl, EXEC, target
+                ));
+            }
+            let host = crate::walk::knob_scalar(crate::substrate::KNOB)?;
+            if host.is_empty() {
+                return Err(format!(
+                    "{} starts the PowerShell script {}, and {} is empty — set it to pwsh or powershell; a registered gate that cannot start is not clean",
+                    name,
+                    target,
+                    crate::substrate::KNOB
+                ));
+            }
+            let program = crate::substrate::resolve_host("GATE_SDK_POWERSHELL", &host)?;
+            (program, crate::substrate::host_args(&target))
+        }
+    };
+    Ok(Invocation { substrate, program, args })
+}
+
 // spec: gate-sdk/SPEC.md §Layout and configuration — a registered name resolving nowhere is the
 // runner's one red; a gate reading the registry skips it and names the skip on its own line
 pub fn unresolved_skipped(n: usize) -> String {

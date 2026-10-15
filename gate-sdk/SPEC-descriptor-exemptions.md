@@ -2,7 +2,7 @@
 
 A gate's exemption list is read by two meta-gates. `check-gate-tamper` refuses an added element that excuses a file staged beside it, and `check-gate-exemption-tasks` holds each element's disposition to a live task. Both parse the list as a shell `# exception-list:` array literal, so a gate whose declaration is a `.gate` descriptor can carry no list either one reads. A compiled gate's module, or a PowerShell gate's script, could hold one only in its own syntax, which neither meta-gate parses.
 
-gate-sdk/SPEC-gate-substrates.md rules the question this entry waited on: **a meta-gate reads the declaration and never learns a substrate** (§The gate-authoring surface, delta 1 there). An exemption list is read without a build, so it is manifest-class and lives in the descriptor. This amendment gives the descriptor that field. It mints no Rust-source reader, which gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate's `check-gate-tamper` row currently says the first ported holder owes.
+gate-sdk/SPEC.md §The gate-authoring surface rules the question this entry waited on: **a meta-gate reads the declaration and never learns a substrate**. An exemption list is read without a build, so it is manifest-class and lives in the descriptor. This amendment gives the descriptor that field. It mints no Rust-source reader, which gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate's `check-gate-tamper` row currently says the first ported holder owes.
 
 No tracked declaration carries an exemption list today: `git grep -n -E '^\s*#\s*exception-list:'` over the tree returns fixtures, bespoke tests and one unit-test literal. So no verdict on this tree moves, and the field's first holder is a later gate's.
 
@@ -23,7 +23,7 @@ A descriptor declares one exemption element per line:
 - **Where it may sit.** Any `.gate` descriptor, kit or consumer. `check-gate-exemption-tasks`' scope rule applies unchanged: a vendored kit's descriptor is out of scope outside the authoring tree, and counted.
 - **What it does not change.** A `.sh` declaration keeps its `# exception-list:` array, read by each meta-gate's existing shell parse. That the two shell parses diverge is filed as its own gap and is not this unit's.
 
-Replacement for the field roster in gate-sdk/SPEC.md §The `# graph:` manifest: one bullet added after `# no-fixture:`. **Not yet applied.** Where gate-sdk/SPEC-gate-substrates.md delta 3 has landed first, the bullet joins the roster that delta wrote, after its `# exec:` bullet. Where this lands first, it joins the current roster, and that delta's replacement roster carries it.
+Replacement for the field roster in gate-sdk/SPEC.md §The `# graph:` manifest: one bullet added after `# no-fixture:`. **Not yet applied.** The bullet joins the roster after its `# exec:` bullet.
 
 > - `# exception:`, optional, any number — `check-gate-tamper`, `check-gate-exemption-tasks` and the declaring gate itself, all through `registry::exemptions` (§check-gate-exemption-tasks).
 

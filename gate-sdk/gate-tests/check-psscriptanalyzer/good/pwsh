@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Stands in for the PowerShell host: answers as the module's script does over a clean corpus,
+# after checking it was started with the script and handed the targets and the exclusions.
+[[ "$1 $2 $3 $4" == "-NoLogo -NoProfile -NonInteractive -Command" ]] || exit 9
+[[ "$CHECKWRIGHT_PSSA_TARGETS" == ./clean.ps1 ]] || exit 9
+[[ "$CHECKWRIGHT_PSSA_EXCLUDE" == PSUseBOMForUnicodeEncodedFile ]] || exit 9
+exit 0

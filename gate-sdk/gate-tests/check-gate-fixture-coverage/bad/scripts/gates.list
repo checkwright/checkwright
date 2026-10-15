@@ -2,3 +2,4 @@
 # check-gate-fixture-coverage must REJECT.
 check-alpha
 check-gamma
+check-psopt

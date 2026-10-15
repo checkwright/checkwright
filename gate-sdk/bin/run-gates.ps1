@@ -9,7 +9,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 # spec: gate-sdk/SPEC.md §run-gates — the installer bootstrap's two pinned settings, on its ground: tokens reach the binary unrewritten, and the binary's non-zero status stays a status rather than a thrown exception
-if (Test-Path Variable:PSNativeCommandArgumentPassing) { $PSNativeCommandArgumentPassing = 'Standard' }
+if (Test-Path Variable:PSNativeCommandArgumentPassing) { Set-Variable -Name PSNativeCommandArgumentPassing -Value 'Standard' }
 if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) { $PSNativeCommandUseErrorActionPreference = $false }
 
 # spec: gate-sdk/SPEC.md §run-gates — the stub's lines are UTF-8 with a bare LF, so they are written as those bytes rather than through a console encoding that differs per host
@@ -64,7 +64,7 @@ function Test-Entry {
         if ($fi.Exists -or [System.IO.Directory]::Exists($Path)) { return $true }
         $lt = $fi.PSObject.Properties['LinkTarget']
         if ($lt -and $lt.Value) { return $true }
-    } catch { }
+    } catch { return $false }
     return $false
 }
 
@@ -318,6 +318,7 @@ function Get-SourceStamp {
 
 # spec: gate-sdk/SPEC.md §lib/gate.sh — gate_verdict_bin's linked-worktree half: the main checkout's binary linked into the door path when the door is gitignored and, in a tree carrying crate source, its source stamp is the tree's; never a build. Returns the refused condition, or $null once the door runs
 function Resolve-VerdictLink {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingEmptyCatchBlock', '', Justification = 'a failed directory, link or copy is read by the Test-Runnable that follows, which names the failure')]
     param([string] $Default, [string] $Door, [string] $DoorExe)
     $mainBin = Get-MainCheckoutBin -Default $Default
     if (-not $mainBin) { return '' }

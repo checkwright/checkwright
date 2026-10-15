@@ -61,13 +61,7 @@ fn validate(v: &Values) -> Vec<String> {
     if let Some(s) = scalar(v, "GUARD_KIT_WORKTREE_READS").filter(|s| !matches!(*s, "read-only" | "off")) {
         errs.push(format!("GUARD_KIT_WORKTREE_READS must be read-only|off (got '{}')", s));
     }
-    if let Some(s) = scalar(v, "GUARD_KIT_SCRATCH_POWERSHELL")
-        .filter(|s| !s.is_empty() && !matches!(crate::programs::name_of(s).as_str(), "pwsh" | "powershell"))
-    {
-        errs.push(format!(
-            "GUARD_KIT_SCRATCH_POWERSHELL must be empty, or name pwsh or powershell (got '{}')",
-            s
-        ));
-    }
+    let host = scalar(v, "GUARD_KIT_SCRATCH_POWERSHELL");
+    errs.extend(host.and_then(|s| crate::substrate::host_refusal("GUARD_KIT_SCRATCH_POWERSHELL", s)));
     errs
 }

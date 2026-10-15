@@ -10,7 +10,7 @@
 
 ### gate-authoring-sdk-surface
 
-[spec: SPEC-gate-substrates.md] [roadmap: next/ecosystem] [roadmap-summary: Author a gate in any language behind one substrate-neutral descriptor.]
+[spec: gate-sdk/SPEC.md] [roadmap: next/ecosystem] [roadmap-summary: Author a gate in any language behind one substrate-neutral descriptor.]
 
 a gate-authoring SDK. `.gate` as the substrate-neutral surface. **Operator-surfaced during `native-gate-dispatch-seam` build; filed so the framing outlives the session that saw it.** Horizon set 2026-08-02 on the operator's steer: this is ecosystem work on [companion-toolkit-profile](#companion-toolkit-profile)'s rung, not "make our own gates fast and opaque".
 
@@ -28,7 +28,7 @@ a gate-authoring SDK. `.gate` as the substrate-neutral surface. **Operator-surfa
 
 ### custom-gate-substrates
 
-[spec: SPEC-gate-substrates.md] [roadmap: next/ecosystem] [roadmap-summary: Write your own gate in PowerShell, where today it is shell alone.]
+[spec: gate-sdk/SPEC.md] [roadmap: next/ecosystem] [roadmap-summary: Write your own gate in PowerShell, where today it is shell alone.]
 
 an adopter writes a custom gate in shell only. The registry resolves a member as a `.sh` or a `.gate` declaration (gate-sdk/SPEC.md §lib/gate.sh), and a `.gate` descriptor dispatches into the published binary, which an install cannot extend. On native Windows an adopter therefore needs Git for Windows' bash to author a gate, although the installer and the PowerShell front end already run under PowerShell; operator direction, 2026-09-27 (lead session): customers may write gates in shell, but on Windows they should be able to write them in PowerShell. And there is no supported path to a Rust gate, while a fork that adds the subcommand and ships its own build can (docs/requirements.md §Writing your own Rust gates; operator direction, 2026-09-27, lead session). Custom Rust gates are wanted as a capability, with install prerequisites split between shipped native gates, custom shell gates and custom Rust gates (operator direction, 2026-09-27, lead session).
 

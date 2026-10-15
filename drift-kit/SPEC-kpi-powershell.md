@@ -2,7 +2,7 @@
 
 The drift report starts a consumer's tier-1 or tier-2 KPI plugin, `<dir>/<name>.sh`, as a program with no interpreter word (`native/src/emit/drift_report.rs`, `invoke`). Windows starts no `.sh`, so on a native-Windows host the spawn fails and the row reads its plugin-failed value. §The extensibility contract's promise, that a consumer adds a KPI by dropping a plugin in its own KPI dir, is unreachable there.
 
-The entry left the dispatch shape open and said `custom-gate-substrates`' ruling bears on it. That ruling (gate-sdk/SPEC-gate-substrates.md) admits a PowerShell script as a gate's implementation, started by the host `GATE_SDK_POWERSHELL` names. This amendment gives a plugin the same class through the same helper: a tier dir may hold `<name>.ps1`, started by that host. One knob then arms PowerShell for the consumer's gates and plugins alike, and a native-Windows consumer meets the promise with no bash.
+The entry left the dispatch shape open and said `custom-gate-substrates`' ruling bears on it. That ruling (gate-sdk/SPEC.md §The gate-authoring surface) admits a PowerShell script as a gate's implementation, started by the host `GATE_SDK_POWERSHELL` names. This amendment gives a plugin the same class through the same helper: a tier dir may hold `<name>.ps1`, started by that host. One knob then arms PowerShell for the consumer's gates and plugins alike, and a native-Windows consumer meets the promise with no bash.
 
 **Refused: starting a `.sh` plugin through `bash` on Windows.** It would need Git for Windows' bash for a plugin a Windows consumer would rather write in PowerShell, and it would split the plugin start in two per platform. The execute-bit rule depends on starting the file directly, and on Windows that rule does not exist. A `.sh` plugin keeps its start unchanged on every host.
 
@@ -35,7 +35,7 @@ Replacement for `drift-kit/README.md`'s KPI paragraph, its first three sentences
 - `resolve` in `native/src/emit/drift_report.rs` tries `<name>.sh` then `<name>.ps1` per tier-1 dir and per tier-2 root, and `Resolved::Plugin` carries which it found.
 - `invoke` starts a `.sh` plugin as today. It starts a `.ps1` plugin with the program and arguments `native/src/substrate.rs` returns for a PowerShell target, the plugin's own `--trend` after them, through the same `proc::run_with_env` and environment. An empty host yields the row of delta 1 without a spawn.
 - The arm's `KNOBS` gains `GATE_SDK_POWERSHELL`.
-- **This delta's act depends on gate-sdk/SPEC-gate-substrates.md delta 2.** Where that delta has landed first or lands in the same batch, this delta calls `substrate.rs` as it stands. Where this delta lands first, it creates `native/src/substrate.rs` with the PowerShell target class's extension test, argument list, host resolution and the `GATE_SDK_POWERSHELL` row exactly as that delta specifies, and that delta then calls the module rather than creating it.
+- **This delta calls `native/src/substrate.rs` as it stands**, the PowerShell target class's extension test, argument list and host resolution, beside the `GATE_SDK_POWERSHELL` row (gate-sdk/SPEC.md §The gate-authoring surface).
 
 ### (3) The crate cases {mechanical}
 
@@ -63,7 +63,7 @@ In `drift_report.rs`' test module:
 - `drift-kit/SPEC.md` §The KPI plugin contract — the first sentence (delta 1).
 - `drift-kit/README.md` — the KPI paragraph (delta 1).
 - `native/src/emit/drift_report.rs` — `resolve`, `invoke`, `KNOBS` and the cases (deltas 2 and 3).
-- `native/src/substrate.rs` — created here only where gate-sdk/SPEC-gate-substrates.md delta 2 has not landed (delta 2).
+- `native/src/substrate.rs` — called, never created: gate-sdk/SPEC.md §The gate-authoring surface owns it (delta 2).
 - `.workflow/release-declarations.md` — the §Behavior changes bullet (delta 4).
 - `docs/drift-kit/SPEC.md` and `docs/drift-kit/README.md` — generated mirrors, stale once a delta lands (all deltas).
 

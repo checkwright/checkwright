@@ -4,6 +4,7 @@
 # kits themselves, and lifecycle-kit's stage gates run on this repo's own
 # iteration state (TASK-QUEUE.md + .workflow/WORKFLOW-STATE.txt).
 check-shellcheck
+check-psscriptanalyzer
 check-gate-output
 check-gate-fail-closed
 check-gate-fixture-coverage

@@ -16,6 +16,7 @@ mkdir -p scripts .workflow
 cat > scripts/gates.list <<'EOF'
 # Consumer-smoke gate registry (gate-sdk meta-gates; kits append below).
 check-shellcheck
+check-psscriptanalyzer
 check-gate-output
 check-gate-fail-closed
 check-gate-fixture-coverage

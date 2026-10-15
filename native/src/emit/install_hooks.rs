@@ -16,6 +16,7 @@ pub const KNOBS: &[&str] = &[
     "GATE_SDK_GATES_DIR",
     "GATE_SDK_KIT_DIRS",
     "GATE_SDK_NATIVE_BIN",
+    "GATE_SDK_POWERSHELL",
     "GATE_SDK_IDENTITY_FILE",
     "GATE_SDK_GIT_EMAIL_FILE",
     "GATE_SDK_GIT_REMOTES_FILE",
@@ -246,41 +247,35 @@ fn identity_rung(gates_dir: &str) -> i32 {
     };
     println!();
     println!("Verifying git identity ({})…", IDENTITY);
-    if src.ends_with(".gate") {
-        // spec: gate-sdk/SPEC.md §run-gates — the descriptor branch re-execs this binary as a
-        // child rather than calling the member in process, on that section's fault-isolation ground
-        if crate::gates::declared(IDENTITY).is_none() {
-            eprintln!(
-                "install-hooks: {} declares a descriptor at {} but this binary carries no such subcommand — the gate could not run; treating as failure (not clean)",
-                IDENTITY, src
-            );
+    // spec: gate-sdk/SPEC.md §run-gates — a descriptor re-execs this binary as a child rather than
+    // calling the member in process, on that section's fault-isolation ground
+    // spec: gate-sdk/SPEC.md §install-hooks — a consumer shadow is that consumer's rule and this arm
+    // is not entitled to substitute its own, so it is started as the battery starts it, with its two
+    // streams in the caller's terminal and its status propagated.
+    let exe = match crate::proc::self_image() {
+        Ok(p) => p.display().to_string(),
+        Err(e) => {
+            eprintln!("install-hooks: cannot resolve this binary's own path: {}", e);
             return 2;
         }
-        let exe = match crate::proc::self_image() {
-            Ok(p) => p.display().to_string(),
-            Err(e) => {
-                eprintln!("install-hooks: cannot resolve this binary's own path: {}", e);
-                return 2;
-            }
-        };
-        match proc::run_to(&programs::CHECKWRIGHT_GATES.at(exe), &[IDENTITY], &proc::Sink::Inherit) {
-            Ok(code) => code,
-            Err(e) => {
-                eprintln!("install-hooks: {}", e);
-                2
-            }
+    };
+    let inv = match registry::invocation(IDENTITY, &src, &exe) {
+        Ok(i) => i,
+        Err(e) => {
+            eprintln!("install-hooks: {} at {} — {}", IDENTITY, src, e);
+            return 2;
         }
-    } else {
-        // spec: gate-sdk/SPEC.md §install-hooks — a consumer `.sh` shadow is that consumer's rule
-        // and this arm is not entitled to substitute its own, so it is spawned as the shell rung
-        // spawned it, with its two streams in the caller's terminal and its status propagated.
-        let shadow = programs::Program::consumer(programs::GATE_DECLARATION, src);
-        match proc::run_to(&shadow, &[], &proc::Sink::Inherit) {
-            Ok(code) => code,
-            Err(e) => {
-                eprintln!("install-hooks: {}", e);
-                2
-            }
+    };
+    let args: Vec<&str> = inv.args.iter().map(String::as_str).collect();
+    let env: Vec<(String, String)> = match inv.substrate {
+        registry::Substrate::Compiled => Vec::new(),
+        _ => vec![("GATE_SDK_NATIVE_BIN".to_string(), exe.clone())],
+    };
+    match proc::run_to_env(&inv.program, &args, &env, &proc::Sink::Inherit) {
+        Ok(code) => code,
+        Err(e) => {
+            eprintln!("install-hooks: {}", e);
+            2
         }
     }
 }

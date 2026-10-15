@@ -1,0 +1,2 @@
+./noisy.ps1:1: PSAvoidUsingWriteHost File uses Write-Host.
+help: PSScriptAnalyzer flagged the script(s) above

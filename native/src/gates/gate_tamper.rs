@@ -210,6 +210,11 @@ fn derived_gate_files(
         for m in registry::members(&text) {
             if let Some(p) = registry::resolve(m.trim(), &dirs) {
                 add(&p);
+                // spec: delegation-kit/SPEC.md §Verify after every agent commit — an exec member's
+                // target is its implementation, held to meta-layer isolation as its descriptor is
+                if let registry::Substrate::Exec(v) = registry::substrate(&p)? {
+                    add(&registry::exec_target(&p, &v));
+                }
             }
         }
     }
@@ -356,6 +361,8 @@ BAR=(
         std::fs::write(format!("{}/check-local.sh", gates), "").unwrap();
         std::fs::write(format!("{}/checks/check-kit.gate", kit), "").unwrap();
         std::fs::write(format!("{}/checks/check-local.gate", kit), "").unwrap();
+        std::fs::write(format!("{}/check-ps.gate", gates), "# exec: check-ps.ps1\n").unwrap();
+        std::fs::write(format!("{}/check-ps.ps1", gates), "").unwrap();
 
         assert_eq!(
             derived_gate_files(&top, &gates, std::slice::from_ref(&kit), &sdk).unwrap(),
@@ -364,7 +371,7 @@ BAR=(
 
         std::fs::write(
             format!("{}/gates.list", gates),
-            "# comment\ncheck-local\ncheck-kit\ncheck-nowhere\n",
+            "# comment\ncheck-local\ncheck-kit\ncheck-nowhere\ncheck-ps\n",
         )
         .unwrap();
         assert_eq!(
@@ -372,13 +379,15 @@ BAR=(
             vec![
                 "scripts/check-local.sh",
                 "vendor/extra/checks/check-kit.gate",
+                "scripts/check-ps.gate",
+                "scripts/check-ps.ps1",
                 "vendor/gate-sdk/lib/gate.sh"
             ]
         );
 
         assert_eq!(
             derived_gate_files(&top, &gates, std::slice::from_ref(&kit), &outside).unwrap(),
-            vec!["scripts/check-local.sh", "vendor/extra/checks/check-kit.gate"]
+            vec!["scripts/check-local.sh", "vendor/extra/checks/check-kit.gate", "scripts/check-ps.gate", "scripts/check-ps.ps1"]
         );
         let _ = std::fs::remove_dir_all(&scratch);
     }

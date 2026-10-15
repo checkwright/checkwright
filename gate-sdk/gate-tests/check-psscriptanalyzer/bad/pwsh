@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Stands in for the PowerShell host: answers as the module's script does when the analyser flags
+# each target, one finding line per target and the status the gate reads as a red.
+[[ "$1 $2 $3 $4" == "-NoLogo -NoProfile -NonInteractive -Command" ]] || exit 9
+while IFS= read -r t; do
+    [[ -n "$t" ]] && printf '%s:1: PSAvoidUsingWriteHost File uses Write-Host.\n' "$t"
+done <<<"$CHECKWRIGHT_PSSA_TARGETS"
+exit 1

@@ -715,6 +715,7 @@ The machine directives are these, each with its reader:
 
 - `graph:`, `shellcheck` and `contract:`;
 - `knob:`, a descriptor's declaration of a knob no static kit owns, by the knob resolver (gate-sdk/SPEC.md §The declaration cohort);
+- `exec:`, a descriptor's naming of the file implementing it, by the substrate classifier (gate-sdk/SPEC.md §The gate-authoring surface);
 - four read off a kit's vendored source (gate-sdk/SPEC.md §The install disposition and §Consumer smoke): `install:`, by the installer's recipe module and `check-install-disposition`; `armed-by:`, by `doctor` and `check-install-disposition`; `projection:`, by `check-projection-roster`; and `smoke-unregistered:`, by `--run-consumer-smoke` off `smoke/install.sh`;
 - the site valves, each read at its own site by the gate its owning section mints: `portability-declared: <reason>` (gate-sdk/SPEC.md §check-portability-floor), `harness-binding: <reason>` (gate-sdk/SPEC.md §check-harness-literal), `path-dialect-exempt: <reason>` (gate-sdk/SPEC.md §check-path-dialect), `door-contributor: <reason>` (guard-kit/SPEC.md §check-door-binding, assertion C), and `gh-repo-exempt: <reason>` and `action-permissions-exempt: <reason>` (gate-sdk/SPEC.md §check-action-gh-repo and §check-action-permissions);
 - `enforce:`, the monitor marker `--emit enforcement-map` reads off a non-gate surface, usually a scheduled workflow (gate-sdk/SPEC.md §enforcement-map).

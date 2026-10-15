@@ -57,6 +57,7 @@ mod sessions;
 mod sha256;
 mod spec;
 mod stages;
+mod substrate;
 mod tier;
 mod toolfloor;
 #[cfg(test)]

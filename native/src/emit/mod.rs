@@ -29,6 +29,7 @@ pub mod footprint;
 pub mod foreign_run;
 pub mod foreign_shells;
 pub mod front_end_parity;
+pub mod gate_argv;
 pub mod git_hook;
 pub mod hook_launcher;
 pub mod graph;
@@ -686,6 +687,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-fixture-suites",
         Arm::Emit(crate::registry::emit_fixture_suites, Grammar::Flags(&[])),
         &["GATE_SDK_KIT_DIRS", "GATE_SDK_GATES_DIR"],
+    ),
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — a declaration's invocation argv, whose caller is
+    // `gate_command`
+    (
+        "--emit-gate-argv",
+        Arm::Emit(gate_argv::emit, Grammar::Parsed(gate_argv::USAGE)),
+        gate_argv::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §The non-gate arm — the kit roots, derived from the gate-sdk root
     // locator, for the shell callers that still need the set

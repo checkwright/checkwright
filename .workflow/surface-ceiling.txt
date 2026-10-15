@@ -17,12 +17,12 @@
 1155cp .claude/commands/spec.md
 1728cp .claude/commands/validate.md
 12448cp CLAUDE.md
-246997cp canon-kit/SPEC.md
+247135cp canon-kit/SPEC.md
 5785cp canon-kit/templates/SPEC-amendment.md
 25632cp companion/SPEC.md
 116247cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
-258204cp delegation-kit/SPEC.md
+258256cp delegation-kit/SPEC.md
 40479cp delegation-kit/templates/agent-execution.md
 3397cp delegation-kit/templates/dispatch-checklists.md
 1308cp docs/canon-kit/index.md
@@ -38,7 +38,7 @@
 5205cp docs/index.md
 8768cp docs/install-block-contracts.md
 8675cp docs/install-parity-contracts.md
-9307cp docs/install.md
+9364cp docs/install.md
 1344cp docs/kits.md
 1458cp docs/lifecycle-kit/index.md
 3156cp docs/maintenance.md
@@ -83,7 +83,7 @@
 6752cp docs/projection-fan-outs.md
 1460cp docs/queue-kit/index.md
 789cp docs/releases.md
-7429cp docs/requirements.md
+8284cp docs/requirements.md
 5028cp docs/site-architecture.md
 2412cp docs/site-kit/index.md
 4710cp docs/spec-toolkits.md
@@ -94,9 +94,9 @@
 2698cp drift-kit/templates/close-knowledge.md
 4270cp drift-kit/templates/economics.md
 85183cp evidence-kit/SPEC.md
-995412cp gate-sdk/SPEC.md
+1013697cp gate-sdk/SPEC.md
 2899cp gate-sdk/templates/adopt.md
-333934cp guard-kit/SPEC.md
+333831cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
 281930cp installer/SPEC.md
 389411cp lifecycle-kit/SPEC.md

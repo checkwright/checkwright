@@ -18,6 +18,7 @@ pub const KNOBS: &[&str] = &[
     "GATE_SDK_PRUNE_DIRS",
     "GATE_SDK_PRUNE_EXTRA_DIRS",
     "GATE_SDK_KIT_DIRS",
+    "GATE_SDK_POWERSHELL",
 ];
 
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the unnamed-iteration placeholder, resolved
@@ -1743,29 +1744,28 @@ fn preflight_gate(name: &str, queue: &str, state: &str) -> Result<GateRun, Strin
         );
         return Ok(GateRun::Undispatchable);
     };
-    let program;
-    let mut argv: Vec<String> = Vec::new();
-    if src.ends_with(".gate") {
-        if crate::gates::declared(name).is_none() {
-            eprintln!(
-                "checkwright-gates: no such gate subcommand: {} — the check could not run; \
-                 treating as failure (not clean)",
-                name
-            );
+    let exe = crate::proc::self_image()
+        .map_err(|e| format!("cannot resolve this binary's own path: {}", e))?
+        .display()
+        .to_string();
+    let inv = match registry::invocation(name, &src, &exe) {
+        Ok(i) => i,
+        Err(e) => {
+            eprintln!("{}", e);
             return Ok(GateRun::Undispatchable);
         }
-        let exe = crate::proc::self_image()
-            .map_err(|e| format!("cannot resolve this binary's own path: {}", e))?;
-        program = programs::CHECKWRIGHT_GATES.at(exe.display().to_string());
-        argv.push(name.to_string());
-    } else {
-        program = Program::consumer(programs::GATE_DECLARATION, src);
-    }
+    };
+    let program = inv.program;
+    let mut argv: Vec<String> = inv.args;
     argv.push(queue.to_string());
     argv.push(state.to_string());
 
     let args: Vec<&str> = argv.iter().map(String::as_str).collect();
-    let merged = proc::run_merged_in(&program, &args, &[], None)?;
+    let env: Vec<(String, String)> = match inv.substrate {
+        registry::Substrate::Compiled => Vec::new(),
+        _ => vec![("GATE_SDK_NATIVE_BIN".to_string(), exe)],
+    };
+    let merged = proc::run_merged_in(&program, &args, &env, None)?;
     if merged.succeeded() {
         Ok(GateRun::Passed)
     } else {

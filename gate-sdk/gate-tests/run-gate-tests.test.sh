@@ -208,6 +208,8 @@ chmod +x "$scratch/checks/stub-writer.sh"
 # through it exactly as it resolves a real .gate member.
 : >"$scratch/checks/stub-native.gate"
 { printf '#!/usr/bin/env bash\n'
+  # The stand-in answers its own member's invocation, as the real arm answers a declared one.
+  printf 'if [[ "$1 $2" == "--emit gate-argv" && "$3" == */stub-native.gate ]]; then printf "%%s\\n%%s\\n" "$0" stub-native; exit 0; fi\n'
   printf 'if [[ "$1" == stub-native ]]; then\n'
   # Falling back to the relative default is what makes an unpinned case
   # observable as a write inside the case dir.
