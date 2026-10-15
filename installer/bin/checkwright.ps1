@@ -9,7 +9,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 # spec: installer/SPEC.md §The install boundary — step 5 forwards the caller's tokens through unrewritten, so the two settings that would rewrite them are pinned rather than inherited: 'Standard' stops the binder re-quoting the caller's tokens, and the native-error preference would otherwise turn the artifact's own non-zero status into a thrown exception and lose it
-if (Test-Path Variable:PSNativeCommandArgumentPassing) { $PSNativeCommandArgumentPassing = 'Standard' }
+if (Test-Path Variable:PSNativeCommandArgumentPassing) { Set-Variable -Name PSNativeCommandArgumentPassing -Value 'Standard' }
 if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) { $PSNativeCommandUseErrorActionPreference = $false }
 
 function Die {
@@ -80,7 +80,7 @@ function Get-FallbackTarget {
 }
 
 # spec: installer/SPEC.md §Selection — step 4's probe: a start failure is the exception `&` throws, and a non-zero exit is the artifact's own answer
-function Test-ArtifactRuns {
+function Test-ArtifactRun {
     param([string] $Artifact)
     $ErrorActionPreference = 'Continue'
     $global:LASTEXITCODE = -1
@@ -148,7 +148,7 @@ function Select-Artifact {
     }
     $pair = Resolve-Pair -Payload $Payload -Target $target
     Test-ArtifactDigest -Artifact $pair.Path -Sidecar $pair.Sidecar
-    if (-not $fallback -or (Test-ArtifactRuns -Artifact $pair.Path)) { return $pair }
+    if (-not $fallback -or (Test-ArtifactRun -Artifact $pair.Path)) { return $pair }
     if ($declared -notcontains $fallback) {
         Die "the $target gate binary does not run on this host, and this payload carries no fallback for it" `
             'no adopter action; report the host, the triple and the release.'
