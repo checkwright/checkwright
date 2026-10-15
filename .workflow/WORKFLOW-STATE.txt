@@ -7,3 +7,4 @@
 gate-substrate-sdk-pass scope aba01a2e 2026-10-15 18602ce36
 gate-substrate-sdk-pass spec a555553e 2026-10-15 32b89f227
 gate-substrate-sdk-pass align a42ab8cb 2026-10-15 dda1a8cf2
+gate-substrate-sdk-pass build adddf1db 2026-10-16 1df6105f4
