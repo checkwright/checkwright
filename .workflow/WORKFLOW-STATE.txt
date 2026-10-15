@@ -4,4 +4,4 @@
 
 ---
 
-— scope a7cf051b 2026-10-15 b4e1ab077
+crate-name-reader-pass scope a7cf051b 2026-10-15 b4e1ab077

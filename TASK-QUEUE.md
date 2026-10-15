@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: crate-name-reader-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,58 @@
 ## New Features
 
 ## Technical Debt
+
+### git-name-read-line-form
+
+git's name-listing reads outside the tracked-set listing still take the line form, which quotes a name carrying a special byte: the always-loaded growth diff (`--name-only`), the packer's and the stage entry's `status --porcelain` reads, the upgrade smoke's staged read, the packer's `ls-tree --name-only` reads and the source stamp's two shell holders among them. `listing-line-form-readers` closed the tracked-set listing alone, and its holder sees none of these.
+
+**Deliverable:** a census of the crate's name-bearing git reads by form, each one that reads a name moved to the NUL form through the shared reader or stated as an emptiness test that reads none, and the holder widened to the argvs it then covers.
+
+**Run at crate-name-reader-pass' scope** in a scratch repository: the line-form `diff --cached --name-only` and `status --porcelain` print `"a\"b.md"` and `"\303\251.md"`, so git quotes every non-ASCII name under its default `core.quotePath`, which no crate site overrides, and `-z` prints both raw. The census reaches past the sites named above: the staged reads of `check-gate-tamper` (`gate_tamper.rs`) and `check-stage-evidence` (`stage_evidence.rs`), the foreign run's status read, the installer's staged read and `check-evidence-baseline`'s `ls-tree`.
+
+**Cost while deferred:** a staged or dirty member under a name git quotes, any non-ASCII name included, is misread or missed by each such reader. Filed 2026-10-09 by crate-reader-hardening-pass' spec and promoted at its close. Re-verified by `git grep -n -E 'name-only|name-status|porcelain|ls-tree' -- native/src`: the named sites carry no `-z`, and most `porcelain` hits under the installer smoke are emptiness tests. Owner lookup: `name-only`, `name-status`, `porcelain` in this file and the disposed-findings record — none; `listing-line-form-readers`, done, DISTINCT (the tracked-set listing); owner gate-sdk/SPEC.md §Fail-closed contract.
+
+### nul-listing-lossy-decode
+
+ten listing readers already on the NUL form decode a name lossily through an argv of their own: `check-md-refs`, `check-spec-pointer`, `check-fence-command-head`, `check-docs-cmd`, `check-md-unwrapped`, the hook's staged read, the consumer-smoke and projection-witness listings, `--emit close-surfaces` and uninstall. A member whose name is not UTF-8 is matched or opened there under a replacement-character spelling, while the shared reader `tracked-name-lossy-decode` landed refuses it.
+
+**Deliverable:** each of the ten on the shared reader's refusing path, or its lossy read stated with the ground that keeps it, and one holder for the set.
+
+**Run at crate-name-reader-pass' scope** in a scratch repository: a member named with a lone 0xff byte at the tree's root stops `--run` and `--only` at exit 2 before any gate, on the shared directory lister's refusal; in a subdirectory, `check-md-refs`, `check-spec-pointer` and `check-md-unwrapped` run green, with no verdict moved.
+
+**Inferred, not run:** that each of the ten opens or matches the name under a replacement spelling — cannot run here: each reader takes its doc set from consumer config a scratch tree must rebuild per reader, so build's per-reader unit cases are the oracle
+
+**Cost while deferred:** the tree gives two answers on one name, a refusal from the shared reader and a silent misspelling from these. Filed 2026-10-09 by crate-reader-hardening-pass' spec and promoted at its close. Re-verified by `git grep -c from_utf8_lossy -- native/src`: each named module carries the call. Owner lookup: `lossy`, `from_utf8_lossy`, `non-UTF-8` in this file and the disposed-findings record — [worktree-memory-dir-key](#worktree-memory-dir-key), DISTINCT (a memory directory's key); `tracked-name-lossy-decode`, done, DISTINCT (the shared reader alone); owner gate-sdk/SPEC.md §Fail-closed contract.
+
+### boundary-wipe-unnamed-member
+
+the iteration boundary's scratch wipe leaves a directory holding a member whose name is not UTF-8. `wipe` in `native/src/emit/enter_stage.rs` descends through the shared directory lister, which refuses such a name, so the directory is never emptied and its removal fails at every boundary until it is deleted by hand. lifecycle-kit/SPEC.md §bin/enter-stage.sh names a permission error and a concurrent writer as residue and not this one.
+
+**Deliverable:** the wipe removing a member it cannot name, or that section stating the limit and the hand removal.
+
+**Run at crate-name-reader-pass' scope:** the shared lister refuses a directory holding such a member, read off a gate run over a scratch tree, which printed its `non-UTF-8 entry name under <dir>` refusal at exit 2.
+
+**Inferred, not run:** that `wipe` stops at that refusal — cannot run here: a boundary entry needs a whole lifecycle tree and wipes the scratch of the tree it runs in, so build's unit case over a scratch directory is the oracle
+
+**Cost while deferred:** one such scratch member leaves a could-not-remove note at every boundary. Filed 2026-10-10 by front-door-readiness-pass' close, where a scratch repository carrying one survived a boundary and was removed by hand, and promoted at the next scope's intake. Re-verified there by reading `wipe`: both its listings go through `walk::list_dir`. Owner lookup: `wipe`, `non-UTF-8`, `could not remove` in this file and the disposed-findings record — [nul-listing-lossy-decode](#nul-listing-lossy-decode), DISTINCT (ten readers that decode lossily where this one refuses); owner lifecycle-kit/SPEC.md §bin/enter-stage.sh.
+
+### front-matter-dotted-closer
+
+the shared front-matter reader (`front_matter_span` in `native/src/spec.rs`) takes a line of three hyphens as a block's only closer. Jekyll also closes a block on a line of three dots, so a page closed that way is read as carrying no block and its metadata is scanned as body by the six gates on the reader, where canon-kit/SPEC.md §The shared spec adapters calls the reading Jekyll's.
+
+**Deliverable:** the closer set stated in that section and read by the reader, with a unit row for the dotted form.
+
+**Run at crate-name-reader-pass' scope** with `check-docs-page-length` over a scratch tree bound at 10 words: a page whose block closes on three dots measures 31 words, its metadata counted as body, and reds; the same page closed on three hyphens passes. The other five gates on the reader were not run.
+
+**Cost while deferred:** a page closing its front matter on dots can gain a false finding or be measured long. Filed 2026-10-09 off crate-reader-hardening-pass' close second-vendor review, which ran Jekyll 4.4.1 on such a page and got the body, and carried to the next scope's intake. Re-verified there: the reader's closing rule compares a trimmed line with three hyphens alone. Owner lookup: `three dots`, `closer`, `front matter` in this file and the disposed-findings record — [plugin-front-matter-yaml](#plugin-front-matter-yaml), DISTINCT (the plugin gate's own reader); `front-matter-reader-siblings`, done, DISTINCT (the shared reader and the unclosed opener); owner canon-kit/SPEC.md §The shared spec adapters.
+
+### plugin-front-matter-yaml
+
+`check-plugin-parity`'s front-matter reader (`front_matter` in `native/src/gates/plugin_parity.rs`) splits each line at its first `:` and strips one quote pair, so it admits a `SKILL.md` description that strict YAML rejects: an unquoted `: ` in agent-execution's description passed the local battery and the harness CLI and redded only CI's `skills-ref` step on the v0.28.0 stamp push. plugin/SPEC.md §The validation leg rules manifest validity the leg's, and nothing runs that leg's oracles before a push.
+
+**Deliverable:** the reader refusing what a YAML plain scalar cannot carry, with a `bad/` fixture holding the `: ` case. Pinned to that branch at crate-name-reader-pass' scope (operator direction 2026-10-15, lead-relayed, not a ruling); the other branch, the leg's oracles run locally, is not taken.
+
+**Cost while deferred:** a front-matter slip is caught only by a push, which spends a hotfix from the budget. Filed 2026-09-28 by plugin-marketplace-queue-verbs' close. Re-verified: the reader above, and `.github/workflows/gates.yml` installs `skills-ref` in CI only. Owner lookup: `front matter`, `skills-ref`, `yaml` in this file — only the icebox's template-copy-parity-yaml-widening, DISTINCT (template copies); owner plugin/SPEC.md §check-plugin-parity.
 
 ## Deferred
 
@@ -51,6 +103,8 @@ foreign agents. A lead delegating a stage to a foreign coding agent, cashing the
 **Slices landed**, in delegation-kit/SPEC.md §The foreign-vendor run, the first two each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); (2) the dispatch transport with (1) the escalation resume model, `--foreign-resume` (delegation-transport-pass, 2026-10-03); (3) the budget oracle, §The keyed verdict (delegation-wait-journal-pass, 2026-10-07), accepted by stub-driven crate cases and one producer read of a vendor's on-disk session store. **This repo's binding (operator direction, 2026-10-07, lead-relayed, not a ruling):** inline in the gitignored `.local` overlay alone, its adapters reading one snapshot under the metric dir from an inline producer. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
 
 **Item (4), stage-contract expression, landed in three slices** (operator direction each, lead-relayed, not a ruling). lifecycle-kit/SPEC.md §The stage-contract arm (foreign-stage-contract-pass, 2026-10-08): the audit stage's reading runs foreign, its host performing every write. Its §The host protocol (foreign-stage-binding-pass, 2026-10-08): one protocol file the shipped stage templates point at. Its `sweep` mode (foreign-build-budget-pass, 2026-10-15): the build stage's file changes run foreign, the host applying the patch, running the oracle and returning each red, accepted on stub-driven crate cases with no live-run grant. **Two grants spent** (operator grants 2026-10-08 and 2026-10-09, lead-relayed) on audit-mode stages, each landing commit carrying the run's `OK` line: the agent wrote nothing, returned every write as a full-text proposal, and left each command needing the gate binary to the host.
+
+**Granted, unspent (operator grant 2026-10-15, lead-relayed):** one live run for crate-name-reader-pass' build in `sweep` mode on the `codex-session` adapter, its budget read OK at 8% used — item (a) above.
 
 **Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, the pattern the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service) and [plugin-harness-reach](#plugin-harness-reach).
 
@@ -194,6 +248,10 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Release (operator directions, lead-relayed, not rulings):** v0.32.0 stays deferred, closing push only, no tag and no publish, by a direction of 2026-10-12. **The bar for the cut, the same direction:** cut once no open finding is a wrong grant or a regression from v0.31.0; a fall-through hole rides as a declared limit in the note. Which open finding the bar blocks is read by the session that next weighs a cut, against its own runs. **At each close since 2026-10-13** the operator rested that reading on the iteration's second-vendor review returning clean, a failed run or a finding leaving the bar a judgment being asked, never skipped or met by a same-vendor reader; on 2026-10-14 the one granted run moved to validate, none at close. **Since 2026-10-14** a close promotes every verdict-moving guard change it would author rather than landing it, the close binding carrying the rule, so a finding the review returns waits for a later build and validate. Three closes read the bar unmet on findings the latest review returned; the last, `grant-redirect-scan-cr`, landed at guard-word-read-release-pass. **That close, by a direction of 2026-10-15,** runs one audit-mode second-vendor review over the iteration's range and cuts v0.32.0 on a clean return, closing push plus tag push; a finding or a failed run defers, a verdict-moving finding promoted. The run failed on the vendor's credit wall, so v0.32.0 stays deferred; foreign-build-budget-pass' close, granted no run, ran none and deferred it again. That cut's `publish` run produces this observation and [front-door-job-observed](#front-door-job-observed)'s.
 
+**Granted, unspent (operator grant 2026-10-15, lead-relayed):** one audit-mode second-vendor review on the `codex-review` adapter at crate-name-reader-pass' validate, over that iteration's range; a clean return lets its close cut v0.32.0, and a finding or a failed run defers as above.
+
+**Push need (2026-10-15, inside the budget):** the v0.32.0 tag push beside crate-name-reader-pass' closing push, spent only on the granted review's clean return; no unit of that set reads a remote run.
+
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
 ### custom-gate-substrates
@@ -227,16 +285,6 @@ the operator states that verification and workflow are fully decoupled, each shi
 **Deliverable:** a ruling on whether the gate binary is verification or substrate both halves share; if the decoupling then holds, the front door and docs/kits.md state it, and a workflow-only profile is weighed.
 
 **Cost while deferred:** the front door neither claims nor refutes a decoupling the operator believes in, and docs/kits.md reads as a dependency chain. Filed 2026-09-28 by plugin-marketplace-queue-verbs' lead. Re-verified: the three profiles' rows and comments in `installer/profiles.list`, and docs/kits.md line 13. Owner lookup: `decoupl`, `profiles.list`, `workflow-only` in this file — none; owner installer/SPEC.md §Profiles, with docs/kits.md.
-
-### plugin-front-matter-yaml
-
-[cost: event/low] [surface: plugin]
-
-`check-plugin-parity`'s front-matter reader (`front_matter` in `native/src/gates/plugin_parity.rs`) splits each line at its first `:` and strips one quote pair, so it admits a `SKILL.md` description that strict YAML rejects: an unquoted `: ` in agent-execution's description passed the local battery and the harness CLI and redded only CI's `skills-ref` step on the v0.28.0 stamp push. plugin/SPEC.md §The validation leg rules manifest validity the leg's, and nothing runs that leg's oracles before a push.
-
-**Deliverable:** the leg's oracles runnable locally before a package change commits, or the reader refusing what a YAML plain scalar cannot carry, with a `bad/` fixture holding the `: ` case.
-
-**Cost while deferred:** a front-matter slip is caught only by a push, which spends a hotfix from the budget. Filed 2026-09-28 by plugin-marketplace-queue-verbs' close. Re-verified: the reader above, and `.github/workflows/gates.yml` installs `skills-ref` in CI only. Owner lookup: `front matter`, `skills-ref`, `yaml` in this file — only the icebox's template-copy-parity-yaml-widening, DISTINCT (template copies); owner plugin/SPEC.md §check-plugin-parity.
 
 ### openspec-delta-base-agreement
 
@@ -363,54 +411,6 @@ the session-context hook member bakes its scratch sweep's age horizon: it remove
 **Deliverable:** the horizon as a context-kit knob with an off value, its row in context-kit/SPEC.md §Layout and configuration and §The session-context hook stating the set; a feature, since it adds a knob.
 
 **Cost while deferred:** a consumer wanting another horizon, or no sweep, has no setting. Filed 2026-10-07 off windows-shell-floor-pass' close audit, carried to the next scope's intake. Re-verified: the constant, and no `CONTEXT_KIT_` knob in the SPEC names a sweep. Owner lookup: `age horizon`, `scratch sweep`, `STALE_SECS` in this file and the disposed-findings record — none; [site-health-resample-knobs](#site-health-resample-knobs), DISTINCT (the same class on site-kit's template).
-
-### git-name-read-line-form
-
-[cost: event/low] [surface: native]
-
-git's name-listing reads outside the tracked-set listing still take the line form, which quotes a name carrying a special byte: the always-loaded growth diff (`--name-only`), the packer's and the stage entry's `status --porcelain` reads, the upgrade smoke's staged read, the packer's `ls-tree --name-only` reads and the source stamp's two shell holders among them. `listing-line-form-readers` closed the tracked-set listing alone, and its holder sees none of these.
-
-**Deliverable:** a census of the crate's name-bearing git reads by form, each one that reads a name moved to the NUL form through the shared reader or stated as an emptiness test that reads none, and the holder widened to the argvs it then covers.
-
-**Inferred, not run:** that each site misreads or misses a name git quotes — stage a member whose name carries a double quote and run each reader over it
-
-**Cost while deferred:** a staged or dirty member under a name git quotes is misread or missed by each such reader. Filed 2026-10-09 by crate-reader-hardening-pass' spec and promoted at its close. Re-verified by `git grep -n -E 'name-only|name-status|porcelain|ls-tree' -- native/src`: the named sites carry no `-z`, and most `porcelain` hits under the installer smoke are emptiness tests. Owner lookup: `name-only`, `name-status`, `porcelain` in this file and the disposed-findings record — none; `listing-line-form-readers`, done, DISTINCT (the tracked-set listing); owner gate-sdk/SPEC.md §Fail-closed contract.
-
-### nul-listing-lossy-decode
-
-[cost: event/low] [surface: native]
-
-ten listing readers already on the NUL form decode a name lossily through an argv of their own: `check-md-refs`, `check-spec-pointer`, `check-fence-command-head`, `check-docs-cmd`, `check-md-unwrapped`, the hook's staged read, the consumer-smoke and projection-witness listings, `--emit close-surfaces` and uninstall. A member whose name is not UTF-8 is matched or opened there under a replacement-character spelling, while the shared reader `tracked-name-lossy-decode` landed refuses it.
-
-**Deliverable:** each of the ten on the shared reader's refusing path, or its lossy read stated with the ground that keeps it, and one holder for the set.
-
-**Inferred, not run:** that each of the ten opens or matches a non-UTF-8 name under a replacement spelling — commit a member whose name carries a lone 0xff byte and run each reader over the tree
-
-**Cost while deferred:** the tree gives two answers on one name, a refusal from the shared reader and a silent misspelling from these. Filed 2026-10-09 by crate-reader-hardening-pass' spec and promoted at its close. Re-verified by `git grep -c from_utf8_lossy -- native/src`: each named module carries the call. Owner lookup: `lossy`, `from_utf8_lossy`, `non-UTF-8` in this file and the disposed-findings record — [worktree-memory-dir-key](#worktree-memory-dir-key), DISTINCT (a memory directory's key); `tracked-name-lossy-decode`, done, DISTINCT (the shared reader alone); owner gate-sdk/SPEC.md §Fail-closed contract.
-
-### front-matter-dotted-closer
-
-[cost: event/low] [surface: canon-kit]
-
-the shared front-matter reader (`front_matter_span` in `native/src/spec.rs`) takes a line of three hyphens as a block's only closer. Jekyll also closes a block on a line of three dots, so a page closed that way is read as carrying no block and its metadata is scanned as body by the six gates on the reader, where canon-kit/SPEC.md §The shared spec adapters calls the reading Jekyll's.
-
-**Deliverable:** the closer set stated in that section and read by the reader, with a unit row for the dotted form.
-
-**Inferred, not run:** that a gate on the reader gains a finding or a long measure on such a page — close a scratch page's block on three dots and run the six gates over it
-
-**Cost while deferred:** a page closing its front matter on dots can gain a false finding or be measured long. Filed 2026-10-09 off crate-reader-hardening-pass' close second-vendor review, which ran Jekyll 4.4.1 on such a page and got the body, and carried to the next scope's intake. Re-verified there: the reader's closing rule compares a trimmed line with three hyphens alone. Owner lookup: `three dots`, `closer`, `front matter` in this file and the disposed-findings record — [plugin-front-matter-yaml](#plugin-front-matter-yaml), DISTINCT (the plugin gate's own reader); `front-matter-reader-siblings`, done, DISTINCT (the shared reader and the unclosed opener); owner canon-kit/SPEC.md §The shared spec adapters.
-
-### boundary-wipe-unnamed-member
-
-[cost: event/low] [surface: lifecycle-kit]
-
-the iteration boundary's scratch wipe leaves a directory holding a member whose name is not UTF-8. `wipe` in `native/src/emit/enter_stage.rs` descends through the shared directory lister, which refuses such a name, so the directory is never emptied and its removal fails at every boundary until it is deleted by hand. lifecycle-kit/SPEC.md §bin/enter-stage.sh names a permission error and a concurrent writer as residue and not this one.
-
-**Deliverable:** the wipe removing a member it cannot name, or that section stating the limit and the hand removal.
-
-**Inferred, not run:** that the lister's refusal is what stops the descent — plant a member named with a lone 0xff byte under a scratch directory and run a boundary entry over a scratch tree
-
-**Cost while deferred:** one such scratch member leaves a could-not-remove note at every boundary. Filed 2026-10-10 by front-door-readiness-pass' close, where a scratch repository carrying one survived a boundary and was removed by hand, and promoted at the next scope's intake. Re-verified there by reading `wipe`: both its listings go through `walk::list_dir`. Owner lookup: `wipe`, `non-UTF-8`, `could not remove` in this file and the disposed-findings record — [nul-listing-lossy-decode](#nul-listing-lossy-decode), DISTINCT (ten readers that decode lossily where this one refuses); owner lifecycle-kit/SPEC.md §bin/enter-stage.sh.
 
 ### toolchain-pin-trails-stable
 
