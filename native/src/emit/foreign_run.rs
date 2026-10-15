@@ -1125,7 +1125,8 @@ mod tests {
     // any prompt file does: the adapter reads its bytes whole and the clone stays clean
     #[test]
     fn a_stage_contract_document_runs_as_an_audit_prompt() {
-        for stage in admitted_stages() {
+        let (audit, _) = admitted_stages();
+        for stage in audit {
             let r = Repo::new(&format!("stage-contract-{}", stage));
             let doc = crate::emit::stage_contract::compose(
                 "You write nothing.\n",
@@ -1141,25 +1142,57 @@ mod tests {
         }
     }
 
-    // spec: lifecycle-kit/SPEC.md §The host protocol — the admitted set is read off the shipped
-    // stage templates' pointer lines, and the build stage's alone carries none
-    fn admitted_stages() -> Vec<String> {
+    // spec: delegation-kit/SPEC.md §Testing — a `sweep` stage's emitted contract rides a sweep-mode
+    // run: the adapter reads its bytes whole, its one write is the patch, and the source takes no commit
+    #[test]
+    fn a_sweep_stage_contract_document_runs_as_a_sweep_prompt() {
+        let (_, sweep) = admitted_stages();
+        for stage in sweep {
+            let r = Repo::new(&format!("sweep-contract-{}", stage));
+            let doc = crate::emit::stage_contract::compose(
+                "You edit your clone.\n",
+                &stage,
+                &format!("Execute the template at kit/templates/stages/{}.md, applying the bindings below.\n", stage),
+            );
+            std::fs::write(r.root.join("prompt.md"), &doc).expect("the prompt file");
+            let before = r.head();
+            let writes = ["sw=bash", "sw=-c", "sw=git hash-object --stdin > contract.hash"];
+            let v = foreign_run(&r.cfg(&writes, 60), &r.args("sw", true));
+            assert_eq!(v.code, 0, "{}: {}", stage, v.line);
+            let patch = r.run_dir().join("change.patch");
+            assert!(v.line.contains("mode=sweep class=- key=prompt") && v.line.ends_with(&format!("patch={} -> OK", patch.display())), "{}", v.line);
+            let body = String::from_utf8_lossy(&std::fs::read(&patch).expect("the patch")).into_owned();
+            let hash = hash_of(&r, doc.as_bytes());
+            assert!(body.contains("contract.hash") && body.contains(hash.trim()), "{}: {}", stage, body);
+            assert_eq!(r.head(), before, "{}: the source took a commit", stage);
+        }
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The host protocol — both sets are read off the shipped stage
+    // templates' pointer lines: every template carries one, and those naming `sweep` are exactly build's
+    fn admitted_stages() -> (Vec<String>, Vec<String>) {
         let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../lifecycle-kit/templates/stages");
-        let mut all: Vec<String> = Vec::new();
-        let mut admitted: Vec<String> = Vec::new();
+        let mut bare: Vec<String> = Vec::new();
+        let mut audit: Vec<String> = Vec::new();
+        let mut sweep: Vec<String> = Vec::new();
         for p in walk::glob_files(&dir, &["*.md".to_string()]).expect("the shipped stage templates") {
             let Some(stage) = p.file_stem().and_then(|s| s.to_str()).map(str::to_string) else { continue };
             let text = std::fs::read_to_string(&p).expect("a stage template");
-            if text.contains("lifecycle-kit/templates/host-protocol.md") {
-                admitted.push(stage.clone());
+            let Some(line) = text.lines().find(|l| l.contains("lifecycle-kit/templates/host-protocol.md")) else {
+                bare.push(stage);
+                continue;
+            };
+            if line.contains("`sweep`") {
+                sweep.push(stage);
+            } else {
+                audit.push(stage);
             }
-            all.push(stage);
         }
-        all.retain(|s| !admitted.contains(s));
-        assert_eq!(all, vec!["build".to_string()], "the stage templates carrying no pointer line");
-        assert!(admitted.len() > 1, "{:?}", admitted);
-        admitted.sort();
-        admitted
+        assert!(bare.is_empty(), "the stage templates carrying no pointer line: {:?}", bare);
+        assert_eq!(sweep, vec!["build".to_string()], "the stage templates whose pointer line names sweep");
+        assert!(audit.len() > 1, "{:?}", audit);
+        audit.sort();
+        (audit, sweep)
     }
 
     // spec: delegation-kit/SPEC.md §Testing — `@PROMPT_FILE@` is substituted with the prompt's

@@ -89,6 +89,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("LIFECYCLE_KIT_SESSION_BOUNDARY", "stage"),
         Row::scalar("LIFECYCLE_KIT_AGENT_FILE", "CLAUDE.md"),
         Row::scalar("LIFECYCLE_KIT_STAGE_CONTRACT_FRAME", "lifecycle-kit/templates/frames/stage-contract.md"),
+        Row::scalar("LIFECYCLE_KIT_STAGE_CONTRACT_SWEEP_FRAME", "lifecycle-kit/templates/frames/stage-contract-sweep.md"),
         Row::indexed("LIFECYCLE_KIT_STAGE_EXECUTOR", &[]),
         Row::scalar("LIFECYCLE_KIT_CRITIQUE_ADAPTER", ""),
         Row::scalar("LIFECYCLE_KIT_CONSULT_CLASS", "judgment"),
