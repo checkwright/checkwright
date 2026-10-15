@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: gate-substrate-sdk-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -212,6 +212,8 @@ an adopter writes a custom gate in shell only. The registry resolves a member as
 
 **The hook-wiring rewire build folded in here on 2026-10-07 landed as `exec-form-hook-registration`** on 2026-10-10, its own entry by operator direction of the earlier date: every hook registration a kit template ships starts the gate binary with no shell (gate-sdk/SPEC.md §The harness-integration arm). It shared this entry's end, the last bash a native-Windows adopter owes, and not its mechanism, so gate authoring is what that end still waits on here. **Horizon (operator direction, lead-relayed to that close on 2026-10-11, not a ruling):** next, ecosystem, set on the close's lag read once the slice had landed.
 
+**Push need (2026-10-15, inside the budget):** one mid-iteration push, shared with [windows-kpi-plugin-start](#windows-kpi-plugin-start), since `.ps1` resolution runs first on the Windows legs and this seat has no PowerShell.
+
 **Cost while deferred:** a native-Windows adopter authoring a gate takes on a bash dependency and a second shell dialect, and one wanting a typed, testable gate must write shell or fork. Filed 2026-09-27 by platform-prerequisite-floors' lead. Re-verified: `registry::resolve` tries `sh` then `gate` per dir and nothing else. Owner lookup: `ps1`, `PowerShell`, `custom gate`, `Rust gate`, `consumer crate` in this file — none; owner gate-sdk/SPEC.md §lib/gate.sh and §The port-candidate criteria.
 
 ### plugin-harness-reach
@@ -337,6 +339,8 @@ a consumer KPI plugin cannot start on native Windows. The drift report starts a 
 **Deliverable:** a plugin dispatch a native-Windows consumer can meet. Its shape is spec's, and a ruling on [custom-gate-substrates](#custom-gate-substrates)' dispatch shape bears on it.
 
 **Inferred, not run:** the row degrades on native Windows — a drift report over a tree registering one plugin, on a Windows leg
+
+**Push need (2026-10-15, inside the budget):** the mid-iteration push [custom-gate-substrates](#custom-gate-substrates) spends, since the plugin's Windows dispatch runs first on a Windows leg.
 
 **Cost while deferred:** a native-Windows consumer's own KPI never reports. Filed 2026-10-06 by windows-shell-floor-pass' spec, operator direction lead-relayed (not a ruling). Re-verified by reading the report's plugin arm and the process wrapper: the path is spawned as given. Owner lookup: `DRIFT_KIT_KPIS_FILE`, `kpi-`, `plugin failed`, `extensibility` in this file and the disposed-findings record — none; [custom-gate-substrates](#custom-gate-substrates), DISTINCT (gate authoring off bash).
 
