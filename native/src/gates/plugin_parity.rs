@@ -107,12 +107,13 @@ struct Field {
 }
 
 // spec: plugin/SPEC.md §The skills — front matter between two `---` lines, read as `key: value`
-// scalars, and the body after it with its leading blank lines dropped
+// scalars past its full-line comments, and the body after it with its leading blank lines dropped
 fn front_matter(text: &str) -> Option<(Vec<Field>, String)> {
     let rest = text.strip_prefix("---\n")?;
     let end = rest.find("\n---\n")?;
     let keys = rest[..end]
         .lines()
+        .filter(|l| !l.trim_start().starts_with('#'))
         .filter_map(|l| l.split_once(':'))
         .map(|(k, v)| {
             let v = v.trim();
@@ -460,6 +461,10 @@ mod tests {
         assert!(k.iter().all(|f| f.fault.is_none()));
         assert_eq!(b, "body\n");
         assert!(front_matter("no front matter\n").is_none());
+        let (k, _) = front_matter("---\n# Note: use x: y\n  # indented: too\nname: scope\n---\nbody\n").unwrap();
+        let keys: Vec<&str> = k.iter().map(|f| f.key.as_str()).collect();
+        assert_eq!(keys, ["name"]);
+        assert!(k.iter().all(|f| f.fault.is_none()));
     }
 
     // spec: plugin/SPEC.md §check-plugin-parity — an unquoted value YAML rejects or cuts short is a fault; its quoted twin and a safe plain scalar are none
