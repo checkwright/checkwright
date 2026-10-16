@@ -660,8 +660,19 @@ fn drop_set_record(text: &str) -> (String, bool) {
     while from > hdr + 1 && blank(from - 1) {
         from -= 1;
     }
+    let mut gap = false;
+    if from > hdr + 1 && last < lines.len() && is_separator(&bare(lines[last])) {
+        if from < open {
+            from += 1;
+        } else {
+            gap = true;
+        }
+    }
     let mut out = String::new();
     for (i, l) in lines.iter().enumerate() {
+        if i == last && gap {
+            out.push('\n');
+        }
         if i < from || i >= last {
             out.push_str(l);
         }
@@ -2619,6 +2630,19 @@ mod tests {
         let (out, dropped) = drop_set_record(&q);
         assert!(dropped);
         assert_eq!(out, "# q\n\n## Iteration: demo\n\n  A consumer preamble.\n\n---\n\n## Done\n");
+    }
+
+    #[test]
+    fn a_record_abutting_the_rule_leaves_no_preamble_as_setext_text() {
+        let want = "# q\n\n## Iteration: demo\n\n  A consumer preamble.\n\n---\n\n## Done\n";
+        let q = "# q\n\n## Iteration: demo\n\n  A consumer preamble.\n\n  **Set record**\n\n  **Push need (2026-06-01, inside the budget):** the closing push.\n---\n\n## Done\n";
+        let (out, dropped) = drop_set_record(q);
+        assert!(dropped);
+        assert_eq!(out, want);
+        let q = "# q\n\n## Iteration: demo\n\n  A consumer preamble.\n  **Set record**\n  **Push need (2026-06-01, inside the budget):** the closing push.\n---\n\n## Done\n";
+        let (out, dropped) = drop_set_record(q);
+        assert!(dropped);
+        assert_eq!(out, want);
     }
 
     #[test]

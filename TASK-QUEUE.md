@@ -6,9 +6,9 @@
 
   **Set record**
 
-  **Grant (operator grant 2026-10-16, lead-relayed; still unspent):** one live validate review run, spent on the observation below. It rides `codex-session`, not `codex-review` (operator direction 2026-10-16, lead-relayed, not a ruling). Read off the gitignored overlay's argv, `codex-session` runs under a workspace-write sandbox and carries no `--ephemeral`, so its turn keeps a session on disk, where `codex-review` runs read-only and ephemeral. **The honest limit:** that the kept session refreshes the budget feed is the observation itself, and only validate's run settles it.
+  **Grant (operator grant 2026-10-16, lead-relayed; spent at validate):** one live validate second-vendor review run over the iteration's range, on `codex-session`, not `codex-review` (operator direction 2026-10-16, lead-relayed, not a ruling), because that adapter keeps its session on disk (its argv is the gitignored overlay's). v0.32.0 is cut on a clean return; the closing push, plus the tag push on a clean return, is inside the budget. The review returned changes requested, so the cut is deferred.
 
-  **Observation owed (operator direction 2026-10-17, lead-relayed, not a ruling):** validate observes whether that run's kept session refreshes the budget feed; close writes the observation onto the Deferred entry [heterogeneous-agent-delegation](#heterogeneous-agent-delegation), kept there with its body after its demotion from the active set. Whether the entry then closes stays the operator's. A deferred observation of that run is admitted.
+  **Observation owed (operator direction 2026-10-17, lead-relayed, not a ruling):** validate observes whether that run's kept session refreshes the budget feed; close writes the observation onto the Deferred entry [heterogeneous-agent-delegation](#heterogeneous-agent-delegation). Whether the entry then closes stays the operator's. Written at close.
 
 ---
 
@@ -30,7 +30,7 @@ a controlled A/B trial.
 
 [roadmap: later/commercial] [cost: event/low] [surface: evidence-kit] [roadmap-summary: Gate runs verified by a neutral party no committing agent can touch.]
 
-hosted attestation. The team/paid rung: gates verified server-side by a party the committing agents cannot touch — hosted gate runs as a neutral attestation, cross-repo drift dashboards, maintained rulesets. A service, not code: cloning the kits does not clone the neutrality or the ops. Demand-gated — this entry is the public roadmap marker, not a scaffold; hosting and sequencing decisions are on record in the operator's local brief, and multi-operator-semantics is its prerequisite mechanism. Surfaced 2026-07-07.
+hosted attestation. The team/paid rung: gates verified server-side by a party the committing agents cannot touch — hosted gate runs as a neutral attestation, cross-repo drift dashboards, maintained rulesets. A service, not code: cloning the kits does not clone the neutrality or the ops. Demand-gated — this entry is the public roadmap marker, not a scaffold; hosting and sequencing decisions are on record in the operator's local brief, and its prerequisite mechanism has landed (lifecycle-kit/SPEC.md §Multi-operator semantics). Its single-repo statistics half split off as [iteration-statistics-view](#iteration-statistics-view) (operator direction 2026-10-17, on consult advice, lead-relayed, not a ruling); the cross-repo dashboards stay here. Surfaced 2026-07-07.
 
 **Cost while deferred:** zero — this is a service rather than tree mechanism, so nothing rots; the residue is that gate runs stay self-attested, which binds only when a party the committing agents cannot touch is asked to trust them.
 
@@ -38,13 +38,13 @@ hosted attestation. The team/paid rung: gates verified server-side by a party th
 
 [cost: iteration/low] [surface: delegation-kit] [roadmap: now/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
 
-foreign agents. A lead delegating a stage to a foreign coding agent, cashing the public no-lock-in claim: governance enforced at the git/gate boundary, not by trusting the author. *Remaining:* one observation, settled by one granted live run: a live turn refreshing the budget feed. Whether the entry then closes is the operator's. The other (does a vendor's non-persisting turn leave a usage event on disk) split off as `ephemeral-turn-usage-read` (operator direction 2026-10-16, lead-relayed, not a ruling) and read at validate: the SPEC's sentence stands. The grant and the observation's landing sit in the queue's set record while that iteration runs.
+foreign agents. A lead delegating a stage to a foreign coding agent, cashing the public no-lock-in claim: governance enforced at the git/gate boundary, not by trusting the author. *Remaining:* nothing; whether the entry closes is the operator's.
+
+**Observed at budget-feed-observation-pass' validate (operator grant 2026-10-16, lead-relayed, spent):** a live `codex-session` turn's kept session refreshes the budget feed at the next keyed read, not within the run, whose pre-spawn read precedes the session file. The keyed `--budget` read after it showed `updated_at` at the last `rate_limits` event in the kept session file. The other observation, `ephemeral-turn-usage-read`, split off and was read at an earlier validate: the SPEC's sentence stands.
 
 **Slices landed**, in delegation-kit/SPEC.md §The foreign-vendor run, the first two each accepted by a granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); (2) the dispatch transport with (1) the escalation resume model, `--foreign-resume` (delegation-transport-pass, 2026-10-03); (3) the budget oracle, §The keyed verdict (delegation-wait-journal-pass, 2026-10-07), accepted by stub-driven crate cases and one producer read of a vendor's session store. **This repo's binding (operator direction, 2026-10-07, lead-relayed, not a ruling):** inline in the gitignored `.local` overlay alone, its adapters reading one metric-dir snapshot from an inline producer. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
 
-**Item (4), stage-contract expression, landed in three slices** (each an operator direction, lead-relayed, not a ruling). lifecycle-kit/SPEC.md §The stage-contract arm (foreign-stage-contract-pass, 2026-10-08): the audit stage's reading runs foreign, the host performing every write. Its §The host protocol (foreign-stage-binding-pass, 2026-10-08): one protocol file the shipped stage templates point at. Its `sweep` mode (foreign-build-budget-pass, 2026-10-15): the build stage's file changes run foreign, the host applying the patch, running the oracle and returning each red; accepted on stub-driven crate cases, no live-run grant. **Two grants spent** (operator grants 2026-10-08 and 2026-10-09, lead-relayed) on audit-mode stages, each landing commit carrying the run's `OK` line: the agent wrote nothing, returning each write as a full-text proposal and each gate-binary command to the host.
-
-**Third grant spent (operator grant 2026-10-16, lead-relayed):** gate-dispatch-hermetic-pass' build ran foreign end to end in `sweep` mode on `codex-session`, class judgment, after the operator confirmed the overlay edit lifting that adapter's read-only sandbox: turn 1 `OK` with two bespoke-test reds returned, the resume turn `OK` and applied, the landing commit carrying both lines.
+**Item (4), stage-contract expression, landed in three slices** (each an operator direction, lead-relayed, not a ruling): lifecycle-kit/SPEC.md §The stage-contract arm (foreign-stage-contract-pass, 2026-10-08), the audit stage's reading run foreign with the host performing every write; §The host protocol (foreign-stage-binding-pass, 2026-10-08), one protocol file the stage templates point at; and `sweep` mode (foreign-build-budget-pass, 2026-10-15), the build stage's file changes run foreign, the host applying the patch and returning each red. **Three grants spent** (operator grants 2026-10-08, 2026-10-09 and 2026-10-16, lead-relayed), each landing commit carrying the run's `OK` lines: two audit-mode stages, and gate-dispatch-hermetic-pass' build end to end in `sweep` mode on `codex-session`.
 
 **Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, as the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service) and [plugin-harness-reach](#plugin-harness-reach).
 
@@ -162,7 +162,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Second grant of 2026-10-16 spent (operator grant, lead-relayed):** tamper-reader-repair-pass' validate ran the review over its range, the set `exception-list-reader-gaps`, `exec-target-tamper-suffix`, `ephemeral-turn-usage-read`, `front-matter-reader-span` and `input-redirect-scan-cr`. It returned three P2 findings, so under the grant's own terms v0.32.0 stayed deferred and its tag push unspent; that close landed all three, none verdict-moving.
 
-**Third grant of 2026-10-16 (operator grant, lead-relayed), unspent at scope:** budget-feed-observation-pass' validate runs one second-vendor review over its range; v0.32.0 is cut on a clean return. **Push need (2026-10-16, inside the budget):** the closing push, plus the tag push on a clean return; landed here, where a Done move cannot take it.
+**Third grant of 2026-10-16 spent (operator grant, lead-relayed):** budget-feed-observation-pass' validate ran the review over its range, which returned changes requested on four findings, so v0.32.0 stayed deferred and its tag push unspent; that close fixed the three that held, none verdict-moving, and the fourth fell.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
@@ -341,6 +341,38 @@ the half of `guard-rules-skeleton-word-read` split off at guard-word-read-releas
 **Inferred, not run:** that a PowerShell host reads each derived `ps-` row as its base row's command; no host is installed on the machine that derived them — run the derived rows through `pwsh` on the x64 Windows leg
 
 **Cost while deferred:** a PowerShell re-spelling evades two safety blocks, rules `rm_tracked` and `script_interpreter`, and a quoted `/dev/null` costs a prompt the bare spelling does not. Filed 2026-10-14 by guard-word-read-release-pass' scope as the split's remainder; the finding was filed 2026-10-13 by guard-spelling-oracle-pass' spec. Owner lookup: `word read`, `redirect_values`, `ps-`, `pwsh` in this file and the disposed-findings record — `guard-rules-skeleton-word-read`, DISTINCT (the bash block and steer half), `grant-redirect-scan-cr`, done at guard-word-read-release-pass, DISTINCT (the scan this read lands on); owner guard-kit/SPEC.md §The reader and its views.
+
+### iteration-statistics-view
+
+[roadmap: next/adoption] [cost: event/low] [surface: drift-kit] [roadmap-summary: Per-iteration workflow statistics, charted for health and trends.]
+
+the statistics half of [hosted-attestation-service](#hosted-attestation-service), split off by operator direction 2026-10-17 on consult advice (lead-relayed, not a ruling), horizon `next` by the same direction: visualizable per-iteration statistics read for workflow health and trends. It is kit-side, single-repo and local, a self-contained chart projection over the trajectory emitter (drift-kit/SPEC.md §The published-evidence extractor) and the stage-economics meter (drift-kit/SPEC.md §The stage-economics meter), needing no service, no multi-operator prerequisite and no demand gate.
+
+**Deliverable:** design-pending, a feature since it adds a projection: which figures chart, the projection's form and home, and its freshness gate.
+
+**Cost while deferred:** a trend in workflow health shows only to a session that recomputes it from tables and logs. Filed 2026-10-17 by budget-feed-observation-pass' close from a gap bullet of that date. Owner lookup: `statistic`, `chart`, `visualiz`, `dashboard` in this file and the disposed-findings record — [hosted-attestation-service](#hosted-attestation-service), DISTINCT (it keeps the cross-repo dashboards, the hosted half).
+
+### crate-manifest-license-unheld
+
+[cost: event/low] [surface: scripts]
+
+the crate manifest `native/Cargo.toml` declares `license = "MIT"` while `LICENSE` and `scripts/license-line.conf` state Apache-2.0, present since the crate's first commit. `publish = false` keeps it off crates.io, but the manifest is tracked and public, and no gate reads the field: `check-license-line` reads the README and site license lines only.
+
+**Deliverable:** the field set to the source's license, and `check-license-line` or a sibling holding every tracked package manifest's license field to `license-line.conf`'s value, in one unit by Enforcement-first; a feature, since the gate gains a read contract.
+
+**Cost while deferred:** a reader of the public crate manifest is told the wrong license. Filed 2026-10-17 by budget-feed-observation-pass' close from a gap bullet of that date, surfaced probing a consult item. Re-verified there: the crate field reads MIT, and `reserve/crates/Cargo.toml`, `installer/package.json` and both plugin manifests read Apache-2.0. Owner lookup: `license`, `Cargo.toml`, `license-line` in this file and the disposed-findings record — none; `homepage-license-duplicate`, done, DISTINCT (the footer instance); owner docs/site-architecture.md §The license line.
+
+### companion-adoption-rehearsal
+
+[cost: event/low] [surface: companion]
+
+a clean-seat rehearsal of the companion toolkits' adoption (`companion/`: the Spec Kit extension and both recipes), installing as an adopter would, before testers are invited to give feedback (operator wish 2026-10-17, lead-relayed, a direction for the next scope). The toolkits are neither in the catalog nor promoted.
+
+**Deliverable:** each companion's adoption run from a clean seat, its findings filed.
+
+**Inferred, not run:** that no adopter-seat run of the companions has happened, read off the operator's wish.
+
+**Cost while deferred:** the first invited testers meet whatever a rehearsal would have caught. Filed 2026-10-17 by budget-feed-observation-pass' close from a gap bullet of that date; the operator wanted it now and it cannot enter before the next scope. Owner lookup: `rehears`, `companion`, `clean seat` in this file and the disposed-findings record — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (the catalog submission, waiting on a published tag); [design-partner-preview](#design-partner-preview), DISTINCT (the observed tester cohort, on operator hours); `front-door-container-rehearsal`, done, DISTINCT (the front door's first run, not the companions').
 
 ## Icebox
 
