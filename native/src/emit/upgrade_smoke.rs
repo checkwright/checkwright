@@ -867,7 +867,9 @@ fn release_note(to_tree: &str, ver: &str) -> Result<Option<String>, Fail> {
             continue;
         }
         let path = format!("{}/{}", dir, name);
-        if read(&path)?.lines().any(|l| re.is_match(l)) {
+        let text = read(&path)?;
+        let lines: Vec<&str> = text.lines().collect();
+        if lines[..crate::spec::front_matter_span(&lines)].iter().any(|l| re.is_match(l)) {
             return Ok(Some(path));
         }
     }
@@ -936,6 +938,22 @@ mod tests {
         let red = red_set(1, "2 of 108 gates FAILED: check-a check-b\n")
             .expect("the summary line was unreadable");
         assert_eq!(red, vec!["check-a".to_string(), "check-b".to_string()]);
+    }
+
+    // spec: gate-sdk/SPEC.md §upgrade-smoke — the note is the one under TO's `docs/posts/` whose front
+    // matter's `release:` names the tag, taken in glob order as the shell form took it
+    #[test]
+    fn a_release_key_below_the_front_matter_selects_no_note() {
+        let dir = std::env::temp_dir().join(format!("cw-upgrade-note-{}", std::process::id()));
+        std::fs::remove_dir_all(&dir).ok();
+        let posts = dir.join("docs/posts");
+        std::fs::create_dir_all(&posts).expect("the scratch posts dir must be creatable");
+        std::fs::write(posts.join("a-dotted.md"), "---\ntitle: x\n...\n\nrelease: v1.0.0\n").expect("w");
+        std::fs::write(posts.join("b-note.md"), "---\nrelease: v1.0.0\n...\n").expect("w");
+        let tree = dir.to_string_lossy().into_owned();
+        let note = release_note(&tree, "v1.0.0").map_err(|e| e.code).expect("the note did not resolve");
+        assert_eq!(note, Some(format!("{}/docs/posts/b-note.md", tree)));
+        std::fs::remove_dir_all(&dir).ok();
     }
 
     // spec: gate-sdk/SPEC.md §upgrade-smoke — a red battery with no summary line is a finding, not

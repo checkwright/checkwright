@@ -8,10 +8,11 @@ use crate::release_sections;
 use crate::walk;
 use std::path::Path;
 
-// spec: gate-sdk/SPEC.md §lib/declaration.sh — `^release:[[:space:]]+v`, the gate's own literal
-// shape, so it is matched directly rather than compiled
+// spec: gate-sdk/SPEC.md §lib/declaration.sh — `^release:[[:space:]]+v` inside the front-matter
+// span, the gate's own literal shape, so it is matched directly rather than compiled
 fn is_note(text: &str) -> bool {
-    text.lines().any(|l| {
+    let lines: Vec<&str> = text.lines().collect();
+    lines[..crate::spec::front_matter_span(&lines)].iter().any(|l| {
         l.strip_prefix("release:")
             .map(|r| {
                 let t = r.trim_start_matches([' ', '\t', '\r', '\x0b', '\x0c']);
@@ -135,5 +136,8 @@ mod tests {
         assert!(!is_note("---\nrelease:v1.2.3\n---\n"));
         assert!(!is_note("---\nrelease: 1.2.3\n---\n"));
         assert!(!is_note("# an announcement post with no front matter\n"));
+        assert!(is_note("---\nrelease: v1.2.3\n...\n"));
+        assert!(!is_note("---\ntitle: x\n...\nrelease: v1.2.3\n---\n"));
+        assert!(!is_note("---\ntitle: x\n---\n\nrelease: v1.2.3\n"));
     }
 }

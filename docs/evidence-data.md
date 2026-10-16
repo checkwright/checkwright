@@ -283,3 +283,4 @@
 | crate-name-reader-pass | sc · · b v c | 0f/7d | 0 | 21s clean | 152 |
 | gate-substrate-sdk-pass | sc sp a b v c | 4f/2d | 4 · ≤1d | 21s clean | 153 |
 | gate-dispatch-hermetic-pass | sc sp a b v c | 3f/0d | 3 · ≤0d | 21s clean | 153 |
+| tamper-reader-repair-pass | sc · · b v c | 0f/4d | 0 | 21s clean | 153 |

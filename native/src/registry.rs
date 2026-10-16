@@ -546,6 +546,8 @@ fn is_exception_tag(line: &str) -> bool {
 // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — one reader owns tagged shell arrays for both gates
 pub fn exception_arrays(text: &str) -> Vec<ExceptionArray> {
     let lines: Vec<&str> = text.lines().collect();
+    // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — quote state carries across lines as bash reads it, a carriage return before the newline included
+    let crlf: Vec<bool> = text.split_inclusive('\n').map(|l| l.ends_with("\r\n")).collect();
     let mut arrays = Vec::new();
     let mut pending = None;
     let mut current: Option<ExceptionArray> = None;
@@ -593,6 +595,8 @@ pub fn exception_arrays(text: &str) -> Vec<ExceptionArray> {
                 Some(_) => {
                     if ch == '"' {
                         quote = None;
+                    } else if ch == '\\' && i == chars.len() && crlf[idx] {
+                        word.as_mut().unwrap().1.push(ch);
                     } else if ch == '\\' && i == chars.len() {
                         continued = true;
                     } else if ch == '\\' && matches!(chars[i], '"' | '\\' | '$' | '`') {
@@ -613,6 +617,7 @@ pub fn exception_arrays(text: &str) -> Vec<ExceptionArray> {
                     balance += if ch == '(' { 1 } else { -1 };
                     if balance <= 0 { closed = true; break; }
                 }
+                '\\' if i == chars.len() && crlf[idx] => word.get_or_insert_with(|| (line, String::new())).1.push('\r'),
                 '\\' if i == chars.len() => continued = true,
                 _ => {
                     let w = word.get_or_insert_with(|| (line, String::new()));
@@ -631,6 +636,9 @@ pub fn exception_arrays(text: &str) -> Vec<ExceptionArray> {
             continue;
         }
         if quote.is_some() && !continued {
+            if crlf[idx] {
+                word.as_mut().unwrap().1.push('\r');
+            }
             word.as_mut().unwrap().1.push('\n');
         } else if quote.is_none() && !continued {
             finish(&mut word, &mut current, &mut yielded, opening_line, line);
@@ -1882,5 +1890,13 @@ mod exception_array_tests {
         let a = exception_arrays("# exception-list:\nA=(\n a/\\\nb # x\n c\n)\n");
         let values: Vec<&str> = a[0].elements.iter().map(|e| e.value.as_str()).collect();
         assert_eq!(values, ["a/b", "c"]);
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — quote state carries across lines as bash reads it, and a word's raw line is its last
+    #[test]
+    fn a_carriage_return_a_word_spans_or_escapes_is_kept() {
+        let a = exception_arrays("# exception-list:\nA=(\n 'a/b\r\nc'\n \"d/e\\\r\nf\"\n g/h\\\r\n i\n)\n");
+        let values: Vec<&str> = a[0].elements.iter().map(|e| e.value.as_str()).collect();
+        assert_eq!(values, ["a/b\r\nc", "d/e\\\r\nf", "g/h\r", "i"]);
     }
 }

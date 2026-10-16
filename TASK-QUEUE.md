@@ -154,9 +154,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Grant of 2026-10-16 spent (operator grant, lead-relayed):** gate-dispatch-hermetic-pass' close ran the review over its range, which returned two findings, both carried to the next scope's intake, so v0.32.0 stayed deferred and its tag push unspent.
 
-**Granted, unspent (operator grant 2026-10-16, lead-relayed):** one audit-mode second-vendor review over tamper-reader-repair-pass' range at validate, whose set the same day's direction ruled: `exception-list-reader-gaps`, `exec-target-tamper-suffix`, `ephemeral-turn-usage-read`, `front-matter-reader-span` and `input-redirect-scan-cr`. v0.32.0 is cut and its tag pushed only on a clean return; a finding or a failed run defers the cut.
-
-**Push need (2026-10-16, inside the budget):** 2 against 2 — the closing push, and the v0.32.0 tag push on that clean return; no unit's change reaches a remote run first, exec-target-tamper-suffix's crate case taking the suffix as a parameter.
+**Second grant of 2026-10-16 spent (operator grant, lead-relayed):** tamper-reader-repair-pass' validate ran the review over its range, the set `exception-list-reader-gaps`, `exec-target-tamper-suffix`, `ephemeral-turn-usage-read`, `front-matter-reader-span` and `input-redirect-scan-cr`. It returned three P2 findings, so under the grant's own terms v0.32.0 stayed deferred and its tag push unspent; that close landed all three, none verdict-moving.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 

@@ -268,9 +268,10 @@ jobs:
           shopt -s nullglob
           for f in $RELEASE_NOTE_GLOB; do
             key="$(awk -v key="$RELEASE_NOTE_TAG_KEY" '
-              /^---[[:space:]]*$/ { fm++; next }
-              fm == 1 && index($0, key ":") == 1 {
-                v = substr($0, length(key) + 2); sub(/^[[:space:]]+/, "", v); print v; exit
+              NR == 1 { if ($0 !~ /^---[[:space:]]*$/) exit; next }
+              /^(---|\.\.\.)[[:space:]]*$/ { if (found) print v; exit }
+              !found && index($0, key ":") == 1 {
+                v = substr($0, length(key) + 2); sub(/^[[:space:]]+/, "", v); found = 1
               }' "$f")"
             if [ "$key" = "$TAG" ]; then matches+=("$f"); fi
           done

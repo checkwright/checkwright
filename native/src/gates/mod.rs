@@ -1631,7 +1631,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-tightened-gates-grammar",
         tightened_gates_grammar::run,
-        &[("?", "", "", "dynamic@src/gates/tightened_gates_grammar.rs:50")],
+        &[("?", "", "", "dynamic@src/gates/tightened_gates_grammar.rs:51")],
         &["GATE_LOCAL_RELEASE_POSTS_DIR", "GATE_SDK_RELEASE_SECTIONS", "GATE_SDK_RELEASE_SECTION_ALIASES"],
         "-",
         &[],
