@@ -10,20 +10,6 @@
 
 ## Technical Debt
 
-### ephemeral-turn-usage-read
-
-[drain-exempt: validate-observes]
-
-the observation split off [heterogeneous-agent-delegation](#heterogeneous-agent-delegation): whether a turn in a vendor's non-persisting mode, the mode two of this repo's three adapters run in, leaves a usage event on disk. delegation-kit/SPEC.md §The keyed verdict states that such a run feeds nothing.
-
-**Deliverable:** that observation, read off validate's granted second-vendor review on this repo's ephemeral review adapter: the vendor's on-disk session store and the adapter's usage snapshot before and after the turn, and the SPEC's sentence confirmed or corrected against it.
-
-The review adapter carries the `--ephemeral` flag in the local overlay, read there; that the flag is the mode the SPEC names is what the granted run settles.
-
-The entry is drain-exempt because its whole deliverable is validate's run, so build lands nothing for it and validate takes its Done move once the run is read.
-
-**Cost while deferred:** the keyed verdict's sizing note rests on inference, so a consumer sizing its feed on it may misjudge how stale the snapshot runs. Filed 2026-10-16 by scope as a split of its parent, operator direction lead-relayed (not a ruling). Owner lookup: `ephemeral`, `non-persisting`, `usage event` in this file and the disposed-findings record — the parent alone; owner delegation-kit/SPEC.md §The keyed verdict.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -46,7 +32,7 @@ hosted attestation. The team/paid rung: gates verified server-side by a party th
 
 [cost: iteration/low] [surface: delegation-kit] [roadmap: now/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
 
-foreign agents. A lead delegating a stage to a foreign coding agent, cashing the public no-lock-in claim: governance enforced at the git/gate boundary, not by trusting the author. *Remaining:* one observation, settled by one granted live run: a live turn refreshing the budget feed. Whether the entry then closes is the operator's. The other, whether a turn in a vendor's non-persisting mode leaves a usage event on disk, split off as [ephemeral-turn-usage-read](#ephemeral-turn-usage-read) at tamper-reader-repair-pass' scope (operator direction 2026-10-16, lead-relayed, not a ruling).
+foreign agents. A lead delegating a stage to a foreign coding agent, cashing the public no-lock-in claim: governance enforced at the git/gate boundary, not by trusting the author. *Remaining:* one observation, settled by one granted live run: a live turn refreshing the budget feed. Whether the entry then closes is the operator's. The other, whether a turn in a vendor's non-persisting mode leaves a usage event on disk, split off as `ephemeral-turn-usage-read` (operator direction 2026-10-16, lead-relayed, not a ruling) and read at validate: the SPEC's sentence stands.
 
 **Slices landed**, in delegation-kit/SPEC.md §The foreign-vendor run, the first two each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); (2) the dispatch transport with (1) the escalation resume model, `--foreign-resume` (delegation-transport-pass, 2026-10-03); (3) the budget oracle, §The keyed verdict (delegation-wait-journal-pass, 2026-10-07), accepted by stub-driven crate cases and one producer read of a vendor's on-disk session store. **This repo's binding (operator direction, 2026-10-07, lead-relayed, not a ruling):** inline in the gitignored `.local` overlay alone, its adapters reading one snapshot under the metric dir from an inline producer. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
 
@@ -168,7 +154,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Grant of 2026-10-16 spent (operator grant, lead-relayed):** gate-dispatch-hermetic-pass' close ran the review over its range, which returned two findings, both carried to the next scope's intake, so v0.32.0 stayed deferred and its tag push unspent.
 
-**Granted, unspent (operator grant 2026-10-16, lead-relayed):** one audit-mode second-vendor review over tamper-reader-repair-pass' range at validate, whose set the same day's direction ruled: `exception-list-reader-gaps`, `exec-target-tamper-suffix`, [ephemeral-turn-usage-read](#ephemeral-turn-usage-read), `front-matter-reader-span` and `input-redirect-scan-cr`. v0.32.0 is cut and its tag pushed only on a clean return; a finding or a failed run defers the cut.
+**Granted, unspent (operator grant 2026-10-16, lead-relayed):** one audit-mode second-vendor review over tamper-reader-repair-pass' range at validate, whose set the same day's direction ruled: `exception-list-reader-gaps`, `exec-target-tamper-suffix`, `ephemeral-turn-usage-read`, `front-matter-reader-span` and `input-redirect-scan-cr`. v0.32.0 is cut and its tag pushed only on a clean return; a finding or a failed run defers the cut.
 
 **Push need (2026-10-16, inside the budget):** 2 against 2 — the closing push, and the v0.32.0 tag push on that clean return; no unit's change reaches a remote run first, exec-target-tamper-suffix's crate case taking the suffix as a parameter.
 
@@ -1076,4 +1062,5 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 - exec-target-tamper-suffix
 - front-matter-reader-span
 - input-redirect-scan-cr
+- ephemeral-turn-usage-read
 
