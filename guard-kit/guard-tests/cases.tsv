@@ -942,6 +942,11 @@ block	if bash .tmp/x.sh 2>&1; then ls; fi
 block	python3 -<'.tmp/x.py'
 block	cat ".tmp/x.py" | python3
 fallthrough	bash <<< '.tmp/x.sh'
+# a carriage return glued to the '<' is part of bash's word, so the body is a file named with it in
+# the working directory: the word read and, under a heredoc, the fallback scan both take bash's blank
+fallthrough	bash <@CR@.tmp/x.sh
+fallthrough	bash <@CR@.tmp/x.sh; cat <<'EOF'@NL@x@NL@EOF
+block	bash < .tmp/x.sh; cat <<'EOF'@NL@x@NL@EOF
 
 # rule `grant_path_slot` — a committed grant matched only by reaching past its path slot. The
 #           sandbox carries a scratch 'rm -rf .tmp/*' grant and a

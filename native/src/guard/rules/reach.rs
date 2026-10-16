@@ -824,11 +824,11 @@ pub fn interpreter_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<Reach>, Fault> {
                 Some(Body::Stdin) => {
                     let sources: Vec<String> = match own {
                         Some(ws) => input_sources(ws),
-                        None => text::grep_o("(^|[^<])<[[:space:]]*[^[:space:]<>|;&]+", pipe)
+                        None => text::grep_o("(^|[^<])<[[:blank:]]*[^[:blank:]\n<>|;&]+", pipe)
                             .iter()
                             .map(|m| {
                                 let src = m.strip_prefix(|ch: char| ch != '<').unwrap_or(m);
-                                trim_start(src.strip_prefix('<').unwrap_or(src)).to_string()
+                                text::trim_blank_start(src.strip_prefix('<').unwrap_or(src)).to_string()
                             })
                             .collect(),
                     };

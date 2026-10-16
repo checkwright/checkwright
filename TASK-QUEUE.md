@@ -24,14 +24,6 @@ The entry is drain-exempt because its whole deliverable is validate's run, so bu
 
 **Cost while deferred:** the keyed verdict's sizing note rests on inference, so a consumer sizing its feed on it may misjudge how stale the snapshot runs. Filed 2026-10-16 by scope as a split of its parent, operator direction lead-relayed (not a ruling). Owner lookup: `ephemeral`, `non-persisting`, `usage event` in this file and the disposed-findings record — the parent alone; owner delegation-kit/SPEC.md §The keyed verdict.
 
-### input-redirect-scan-cr
-
-rule `script_interpreter`'s stdin-body arm still reads an input redirect's blanks on the POSIX class where the word read prints nothing. Its fallback scan in `native/src/guard/rules/reach.rs` matches `<[[:space:]]*[^[:space:]<>|;&]+`, so a carriage return reads as a blank there, while bash keeps it in the word. Run at guard-word-read-release-pass' close through `--hook shell-guard`: `bash <` glued to a carriage return and `.tmp/x.sh` falls through on the word-read path, bash reading a file named with the carriage return in the working directory, and the same call carrying a heredoc blocks, the fallback taking `.tmp/x.sh` for its body. `grant-redirect-scan-cr` moved the grants' redirect scan to bash's blank and left the block rules' patterns; `scratch_redirect`'s own pattern moved at that iteration's build.
-
-**Deliverable:** the fallback scan reading bash's blank (space, tab), with a heredoc-bearing `@CR@` row in `guard-kit/guard-tests/cases.tsv`. It moves a verdict, that call's block to a fall-through, so it lands in a build a validate reads.
-
-**Cost while deferred:** a spurious block on a spelling no session writes; no grant and no missed block was found. Filed 2026-10-14 by guard-word-read-release-pass' close, promoted off a gap that build filed. Owner lookup: `carriage`, `input redirect`, `reach.rs`, `input_sources` in this file and the disposed-findings record — none; `grant-redirect-scan-cr`, done, DISTINCT (the grants' scan); owner guard-kit/SPEC.md §The reader and its views and §The rule roster (`script_interpreter`).
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -176,7 +168,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Grant of 2026-10-16 spent (operator grant, lead-relayed):** gate-dispatch-hermetic-pass' close ran the review over its range, which returned two findings, both carried to the next scope's intake, so v0.32.0 stayed deferred and its tag push unspent.
 
-**Granted, unspent (operator grant 2026-10-16, lead-relayed):** one audit-mode second-vendor review over tamper-reader-repair-pass' range at validate, whose set the same day's direction ruled: `exception-list-reader-gaps`, `exec-target-tamper-suffix`, [ephemeral-turn-usage-read](#ephemeral-turn-usage-read), `front-matter-reader-span` and [input-redirect-scan-cr](#input-redirect-scan-cr). v0.32.0 is cut and its tag pushed only on a clean return; a finding or a failed run defers the cut.
+**Granted, unspent (operator grant 2026-10-16, lead-relayed):** one audit-mode second-vendor review over tamper-reader-repair-pass' range at validate, whose set the same day's direction ruled: `exception-list-reader-gaps`, `exec-target-tamper-suffix`, [ephemeral-turn-usage-read](#ephemeral-turn-usage-read), `front-matter-reader-span` and `input-redirect-scan-cr`. v0.32.0 is cut and its tag pushed only on a clean return; a finding or a failed run defers the cut.
 
 **Push need (2026-10-16, inside the budget):** 2 against 2 — the closing push, and the v0.32.0 tag push on that clean return; no unit's change reaches a remote run first, exec-target-tamper-suffix's crate case taking the suffix as a parameter.
 
@@ -1083,4 +1075,5 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 - exception-list-reader-gaps
 - exec-target-tamper-suffix
 - front-matter-reader-span
+- input-redirect-scan-cr
 
