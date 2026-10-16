@@ -11,3 +11,4 @@ gate-substrate-sdk-pass build adddf1db 2026-10-16 1df6105f4
 gate-substrate-sdk-pass build aee0942b 2026-10-16 b26888c77
 gate-substrate-sdk-pass build a3d93374 2026-10-16 e3b43f691
 gate-substrate-sdk-pass validate a375dab4 2026-10-16 fd6bb8d0f
+gate-substrate-sdk-pass close a812aedf 2026-10-16 96c3b5681
