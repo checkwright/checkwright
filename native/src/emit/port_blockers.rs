@@ -319,9 +319,20 @@ struct Member {
 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a `.gate` member's rule is a binary subcommand
 // with no text to tokenize, so its requirements are read off the registry's own declaration, onto
 // the three row shapes a scanned command word already reaches and no fourth.
-// spec: gate-sdk/SPEC.md §port-blockers — an exec member's one requirement is its target class's
-// host, in the knob form, so it reports as that knob's command word
+// spec: gate-sdk/SPEC.md §port-blockers — a PowerShell exec member's one requirement is its host, in
+// the knob form, so it reports as that knob's command word
 const EXEC_NEEDS: &[(&str, &str)] = &[("?", crate::substrate::KNOB)];
+
+// spec: gate-sdk/SPEC.md §port-blockers — an executable exec member requires nothing the kit can
+// name, so it reports no row and is not undecided
+fn requires_nothing(decl: &str, substrate: &registry::Substrate) -> bool {
+    match substrate {
+        registry::Substrate::Exec(v) => {
+            crate::substrate::target_class(&registry::exec_target(decl, v)) == Some(crate::substrate::TargetClass::Executable)
+        }
+        _ => false,
+    }
+}
 
 fn needs_rows(member: &str, decl: &str, exec: bool, reg: &Registry) -> Member {
     let mut m = Member {
@@ -554,6 +565,9 @@ fn registry_arm(mode: Mode, gates_dir: Option<String>) -> Result<String, String>
         if substrate != registry::Substrate::Shell {
             if mode == Mode::Group {
                 ported += 1;
+                continue;
+            }
+            if requires_nothing(&decl, &substrate) {
                 continue;
             }
             let exec = matches!(substrate, registry::Substrate::Exec(_));
@@ -794,6 +808,17 @@ mod tests {
             "an on-floor program survived the filter the scanned path applies"
         );
         assert!(m.rows[0].evidence.ends_with("(--needs)"));
+    }
+
+    // spec: gate-sdk/SPEC.md §port-blockers — only an executable exec member leaves the rows; a
+    // PowerShell or classless one keeps its host row
+    #[test]
+    fn an_executable_exec_member_requires_nothing() {
+        let exec = |v: &str| registry::Substrate::Exec(v.to_string());
+        assert!(requires_nothing("scripts/check-rs.gate", &exec("bin/check-rs")));
+        assert!(!requires_nothing("scripts/check-ps.gate", &exec("check-ps.ps1")));
+        assert!(!requires_nothing("scripts/check-tx.gate", &exec("check-tx.txt")));
+        assert!(!requires_nothing("scripts/check-x.gate", &registry::Substrate::Compiled));
     }
 
     // spec: gate-sdk/SPEC.md §Fail-closed contract — a member the registry cannot answer for is

@@ -5,7 +5,7 @@ the tracked shell tree beyond that set out of scope here, this tree having autho
 1 of those held declaration(s) reach their ground in one hop, the section their own '# spec:' field names stating the hold
 1 descriptor(s) in parity with the
 out of scope — an unvendored kit, or a consumer declaration from another tree), 0 reference-only
-0 reference-only; 1 exec descriptor(s) in the gates directory, each naming one tracked PowerShell target
+0 reference-only; 2 exec descriptor(s) in the gates directory, each naming a target of an admitted class
 1 substrate-sensitive member(s) all dispositioned
 1 implementation source(s) free of manifest-class annotation
 1 kit root(s) scanned for an implementation sibling, crate root crate outside every kit root

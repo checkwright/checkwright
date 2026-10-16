@@ -245,6 +245,7 @@ fn label_of(m: &str) -> Option<String> {
 enum Resolved {
     Found(String),
     OutOfReach,
+    Built,
     Unresolved,
 }
 
@@ -269,8 +270,9 @@ fn resolve_gate_file(
     let Some(decl) = resolve_declaration(gate, dirs) else {
         return Ok(Resolved::Unresolved);
     };
-    // spec: gate-sdk/SPEC.md §check-gate-assertions — an exec member's markers are read from its
-    // target, as a compiled member's are from its module
+    // spec: gate-sdk/SPEC.md §check-gate-assertions — a PowerShell exec member's markers are read
+    // from its target, as a compiled member's are from its module; an executable's live in source
+    // its descriptor does not name
     let decl = match crate::registry::substrate(&decl) {
         Ok(crate::registry::Substrate::Compiled) => {
             if !Path::new(crate_manifest).is_file() {
@@ -278,7 +280,13 @@ fn resolve_gate_file(
             }
             native_module(crate_dir, gate)
         }
-        Ok(crate::registry::Substrate::Exec(v)) => crate::registry::exec_target(&decl, &v),
+        Ok(crate::registry::Substrate::Exec(v)) => {
+            let target = crate::registry::exec_target(&decl, &v);
+            if crate::substrate::target_class(&target) == Some(crate::substrate::TargetClass::Executable) {
+                return Ok(Resolved::Built);
+            }
+            target
+        }
         Ok(crate::registry::Substrate::Shell) => decl,
         Err(e) => return Err(format!("check-gate-assertions: {}", e)),
     };
@@ -351,6 +359,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
 
     let mut findings: Vec<String> = Vec::new();
     let mut out_of_reach: Vec<String> = Vec::new();
+    let mut built: Vec<String> = Vec::new();
     let mut coupled = 0usize;
 
     for spec in &specs {
@@ -384,6 +393,10 @@ fn inner(args: &[String]) -> Result<i32, String> {
                 // members and counts them: an internal sentinel, not a failure path
                 Resolved::OutOfReach => {
                     out_of_reach.push(c.heading.clone());
+                    continue;
+                }
+                Resolved::Built => {
+                    built.push(c.heading.clone());
                     continue;
                 }
                 // assertion B: the heading resolves to gate code through the registry
@@ -455,7 +468,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
         return Ok(1);
     }
 
-    let declared = if out_of_reach.is_empty() {
+    let mut declared = if out_of_reach.is_empty() {
         String::new()
     } else {
         format!(
@@ -465,9 +478,16 @@ fn inner(args: &[String]) -> Result<i32, String> {
             out_of_reach.join(" ")
         )
     };
+    if !built.is_empty() {
+        declared.push_str(&format!(
+            ", {} executable exec member(s) out of reach, their markers in source no descriptor names — {}",
+            built.len(),
+            built.join(" ")
+        ));
+    }
     println!(
         "GATE-ASSERTIONS: clean ({} of {} enumerated contract(s) coupled{})",
-        coupled - out_of_reach.len(),
+        coupled - out_of_reach.len() - built.len(),
         coupled,
         declared
     );

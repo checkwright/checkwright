@@ -55,7 +55,7 @@ gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --run-gate-tests gate-sdk/gate-tests gate-sdk/checks  # the kit's own tests
 ```
 
-Write your first gate by copying `gate-sdk/templates/check-skeleton.sh` to `scripts/check-<area>.sh`, editing it, adding `check-<area>` to `scripts/gates.list`, and shipping a `scripts/gate-tests/check-<area>/{good,bad}/` fixture pair. To write it in PowerShell, write a `scripts/check-<area>.gate` descriptor whose `# exec: check-<area>.ps1` line names the script `scripts/check-<area>.ps1` beside it, and set `GATE_SDK_POWERSHELL` ([SPEC.md §The gate-authoring surface](SPEC.md#the-gate-authoring-surface)). The meta-gates will hold you to the rest.
+Write your first gate by copying `gate-sdk/templates/check-skeleton.sh` to `scripts/check-<area>.sh`, editing it, adding `check-<area>` to `scripts/gates.list`, and shipping a `scripts/gate-tests/check-<area>/{good,bad}/` fixture pair. To write it in PowerShell, write a `scripts/check-<area>.gate` descriptor whose `# exec: check-<area>.ps1` line names the script `scripts/check-<area>.ps1` beside it, and set `GATE_SDK_POWERSHELL`; or let the `# exec:` line name a program you build, with no extension, such as a gate written in Rust ([SPEC.md §The gate-authoring surface](SPEC.md#the-gate-authoring-surface)). The meta-gates will hold you to the rest.
 
 ## Gates
 

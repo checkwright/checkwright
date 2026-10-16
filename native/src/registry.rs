@@ -148,7 +148,7 @@ pub enum Substrate {
 pub const EXEC: &str = "# exec:";
 
 // spec: gate-sdk/SPEC.md §The gate-authoring surface — a `.gate` descriptor's `# exec:` lines, held
-// to one, non-empty, relative and with no `..` segment; a `.sh` is its own implementation
+// to one, naming a file, relative and with no `..` segment; a `.sh` is its own implementation
 pub fn substrate(decl: &str) -> Result<Substrate, String> {
     if !decl.ends_with(".gate") {
         return Ok(Substrate::Shell);
@@ -172,8 +172,8 @@ pub fn exec_field(text: &str) -> Result<Substrate, String> {
         [v] => *v,
         _ => return Err(format!("carries {} `{}` lines, and a descriptor names one implementation", values.len(), EXEC)),
     };
-    if value.is_empty() {
-        return Err(format!("its `{}` line names no file", EXEC));
+    if value.is_empty() || value.ends_with(['/', '\\']) {
+        return Err(format!("its `{}` value '{}' names no file", EXEC, value));
     }
     let rooted = crate::walk::path_root(value).is_some() || value.as_bytes().get(1) == Some(&b':');
     if rooted || value.split(['/', '\\']).any(|s| s == "..") {
@@ -204,9 +204,10 @@ pub struct Invocation {
 
 pub fn invocation(name: &str, decl: &str, self_exe: &str) -> Result<Invocation, String> {
     use crate::programs::{self, Program};
+    use crate::substrate::TargetClass;
     let substrate = substrate(decl)?;
     let (program, args) = match &substrate {
-        Substrate::Shell => (Program::consumer(programs::GATE_DECLARATION, decl), Vec::new()),
+        Substrate::Shell => shell_start(decl)?,
         Substrate::Compiled => {
             if crate::gates::declared(name).is_none() {
                 return Err(format!(
@@ -218,15 +219,29 @@ pub fn invocation(name: &str, decl: &str, self_exe: &str) -> Result<Invocation, 
         }
         Substrate::Exec(value) => {
             let target = exec_target(decl, value);
+            let Some(class) = crate::substrate::target_class(&target) else {
+                return Err(format!(
+                    "{}: its `{}` target {} is of no admitted target class (a PowerShell script, .ps1, or an executable, whose name carries no `.`) — gate-sdk/SPEC.md §The gate-authoring surface",
+                    decl, EXEC, target
+                ));
+            };
+            if class == TargetClass::Executable {
+                let path = crate::substrate::executable_path(&target);
+                if !crate::proc::is_executable(Path::new(&path)) {
+                    return Err(format!(
+                        "{}: its `{}` target {} is not an executable file — your own build places it there, so build the gate before the battery runs; a registered gate that cannot start is not clean",
+                        decl, EXEC, path
+                    ));
+                }
+                return Ok(Invocation {
+                    program: Program::consumer(programs::GATE_DECLARATION, path),
+                    args: Vec::new(),
+                    substrate,
+                });
+            }
             if !Path::new(&target).is_file() {
                 return Err(format!(
                     "{}: its `{}` target {} is not a file — the check could not run; treating as failure (not clean)",
-                    decl, EXEC, target
-                ));
-            }
-            if !crate::substrate::is_powershell_body(&target) {
-                return Err(format!(
-                    "{}: its `{}` target {} is of no admitted target class (a PowerShell script, .ps1) — gate-sdk/SPEC.md §The gate-authoring surface",
                     decl, EXEC, target
                 ));
             }
@@ -244,6 +259,36 @@ pub fn invocation(name: &str, decl: &str, self_exe: &str) -> Result<Invocation, 
         }
     };
     Ok(Invocation { substrate, program, args })
+}
+
+// spec: gate-sdk/SPEC.md §The gate-authoring surface — a shell member's start, the one function the
+// battery's dispatch and the fixture runner share: the declaration itself, or on native Windows bash
+// with the declaration as its first argument
+pub fn shell_start(decl: &str) -> Result<(crate::programs::Program, Vec<String>), String> {
+    #[cfg(windows)]
+    {
+        windows_shell_start(decl, crate::proc::resolve_for_dispatch(crate::programs::BASH.invocation()))
+    }
+    #[cfg(not(windows))]
+    {
+        Ok((crate::programs::Program::consumer(crate::programs::GATE_DECLARATION, decl), Vec::new()))
+    }
+}
+
+// spec: gate-sdk/SPEC.md §The gate-authoring surface — bash resolved outside the system directory
+// before the spawn, or the dispatch refused
+#[cfg_attr(not(windows), allow(dead_code))]
+fn windows_shell_start(
+    decl: &str,
+    bash: Result<String, String>,
+) -> Result<(crate::programs::Program, Vec<String>), String> {
+    match bash {
+        Ok(path) => Ok((crate::programs::BASH.at(path), vec![decl.to_string()])),
+        Err(e) => Err(format!(
+            "{} is a shell gate, which native Windows starts through Git for Windows' bash: {} (docs/requirements.md §Writing your own shell gates)",
+            decl, e
+        )),
+    }
 }
 
 // spec: gate-sdk/SPEC.md §Layout and configuration — a registered name resolving nowhere is the
@@ -1132,6 +1177,28 @@ pub fn expand_couples(field: &str, kit_roots_rel: &[String]) -> Result<String, S
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: gate-sdk/SPEC.md §The gate-authoring surface — a value ending in a separator names no
+    // file, beside the empty, rooted and climbing refusals
+    #[test]
+    fn an_exec_value_must_name_a_file() {
+        for bad in ["# exec: bin/\n", "# exec: bin\\\n", "# exec:\n", "# exec: /abs\n", "# exec: ../up\n"] {
+            assert!(exec_field(bad).is_err(), "{:?}", bad);
+        }
+        assert!(exec_field("# exec: bin/\n").unwrap_err().contains("names no file"));
+        assert_eq!(exec_field("# exec: bin/check-x\n"), Ok(Substrate::Exec("bin/check-x".to_string())));
+    }
+
+    // spec: gate-sdk/SPEC.md §The gate-authoring surface — the Windows shell start: bash resolved
+    // first and handed the declaration, or a refusal naming Git for Windows' bash and the page
+    #[test]
+    fn the_windows_shell_start_runs_bash_or_refuses() {
+        let (program, args) = windows_shell_start("scripts/check-x.sh", Ok("C:/Git/bin/bash.exe".to_string())).expect("start");
+        assert_eq!(program.invocation(), "C:/Git/bin/bash.exe");
+        assert_eq!(args, vec!["scripts/check-x.sh".to_string()]);
+        let e = windows_shell_start("scripts/check-x.sh", Err("cannot resolve bash".to_string())).err().unwrap_or_default();
+        assert!(e.contains("Git for Windows' bash") && e.contains("§Writing your own shell gates"), "{}", e);
+    }
 
     #[test]
     fn the_exemption_field_reads_each_element_with_its_disposition() {

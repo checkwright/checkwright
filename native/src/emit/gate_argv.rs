@@ -48,7 +48,7 @@ mod tests {
         d
     }
 
-    // spec: gate-sdk/SPEC.md §The gate-authoring surface — the arm's three answers and its refusal
+    // spec: gate-sdk/SPEC.md §The gate-authoring surface — the arm's answer per start and its refusals
     #[test]
     fn each_substrate_prints_its_argv_and_an_unstartable_one_refuses() {
         let env = crate::knobenv::lock();
@@ -63,8 +63,20 @@ mod tests {
         std::fs::write(d.join("check-txt.gate"), "# exec: check-ps.txt\n").expect("txt");
         std::fs::write(d.join("check-ps.txt"), "\n").expect("txt target");
         std::fs::write(d.join("check-gone.gate"), "# exec: gone.ps1\n").expect("gone");
+        std::fs::write(d.join("check-rs.gate"), "# exec: bin/check-rs\n").expect("executable");
+        std::fs::create_dir_all(d.join("bin")).expect("bin");
+        let program = d.join(crate::substrate::executable_path("bin/check-rs"));
+        std::fs::write(&program, "").expect("program");
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(&program, std::fs::Permissions::from_mode(0o755)).expect("chmod");
+        }
+        std::fs::write(d.join("check-unbuilt.gate"), "# exec: bin/check-unbuilt\n").expect("unbuilt");
         env.set("GATE_SDK_POWERSHELL", &host);
         crate::knobs::reset(&env);
+        let rs = argv("check-rs", &format!("{}/check-rs.gate", dir), "/bin/x");
+        let unbuilt = argv("check-unbuilt", &format!("{}/check-unbuilt.gate", dir), "/bin/x");
         let sh = argv("check-sh", &format!("{}/check-sh.sh", dir), "/bin/x");
         let compiled = argv("check-shellcheck", &format!("{}/check-shellcheck.gate", dir), "/bin/x");
         let exec = argv("check-ps", &format!("{}/check-ps.gate", dir), "/bin/x");
@@ -77,7 +89,20 @@ mod tests {
         env.remove("GATE_SDK_POWERSHELL");
         crate::knobs::reset(&env);
         let _ = std::fs::remove_dir_all(&d);
-        assert_eq!(sh.unwrap(), format!("{}/check-sh.sh\n", dir));
+        let decl = format!("{}/check-sh.sh", dir);
+        // spec: gate-sdk/SPEC.md §The gate-authoring surface — native Windows starts a shell member
+        // through bash, every other host by its own path
+        if cfg!(windows) {
+            let sh = sh.unwrap();
+            let lines: Vec<&str> = sh.lines().collect();
+            assert_eq!(crate::programs::name_of(lines[0]), "bash", "{}", sh);
+            assert_eq!(&lines[1..], [decl.as_str()], "{}", sh);
+        } else {
+            assert_eq!(sh.unwrap(), format!("{}\n", decl));
+        }
+        assert_eq!(rs.unwrap(), format!("{}/{}\n", dir, crate::substrate::executable_path("bin/check-rs")));
+        let unbuilt = unbuilt.unwrap_err();
+        assert!(unbuilt.contains("is not an executable file") && unbuilt.contains("your own build"), "{}", unbuilt);
         assert_eq!(compiled.unwrap(), "/bin/x\ncheck-shellcheck\n");
         assert_eq!(
             exec.unwrap(),

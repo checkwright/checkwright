@@ -142,6 +142,13 @@ got="$(GATE_SDK_POWERSHELL="$sandbox/pwsh" gate_command check-ps "$sandbox/a" | 
 [[ "$got" == "$sandbox/pwsh -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $sandbox/a/check-ps.ps1" ]] \
     || { echo "  FAIL: gate_command exec argv was '$got' (binary $bin)"; fails=$((fails + 1)); }
 
+# gate_command: an executable exec member yields its suffixed path alone, from the real arm
+printf '# exec: bin/check-rs\n' >"$sandbox/a/check-rs.gate"
+mkdir -p "$sandbox/a/bin"; : >"$sandbox/a/bin/check-rs$(gate_exe_suffix)"; chmod +x "$sandbox/a/bin/check-rs$(gate_exe_suffix)"
+got="$(gate_command check-rs "$sandbox/a" | paste -sd' ' -)"
+[[ "$got" == "$sandbox/a/bin/check-rs$(gate_exe_suffix)" ]] \
+    || { echo "  FAIL: gate_command executable argv was '$got' (binary $bin)"; fails=$((fails + 1)); }
+
 # fail-closed: the arm's refusal, here an empty host, is exit 2 and never return 1
 ( GATE_SDK_POWERSHELL='' gate_command check-ps "$sandbox/a" >/dev/null 2>&1 )
 [[ "$?" -eq 2 ]] \
@@ -162,5 +169,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "lib-gate.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "lib-gate.test: ok (fail_closed branches; gate_path_pruned; GATE_GREP_EXCLUDES; gate_find prune incl. the worktrees leaf; PRUNE_EXTRA_DIRS append over both branches; registry + resolution; .gate declaration/argv split + exec argv + dispatch fail-closed)"
+echo "lib-gate.test: ok (fail_closed branches; gate_path_pruned; GATE_GREP_EXCLUDES; gate_find prune incl. the worktrees leaf; PRUNE_EXTRA_DIRS append over both branches; registry + resolution; .gate declaration/argv split + PowerShell and executable exec argv + dispatch fail-closed)"
 exit 0

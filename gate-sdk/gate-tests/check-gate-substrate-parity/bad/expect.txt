@@ -25,3 +25,4 @@ exec field outside the gates directory: kitroot/checks/check-kitexec.gate
 malformed exec field: scripts/check-twoexec.gate carries 2 `# exec:` lines
 malformed exec field: scripts/check-climb.gate its `# exec:` value '../check-climb.ps1' is rooted or climbs
 exec target of no admitted class: scripts/check-txtexec.gate names scripts/check-txtexec.txt
+malformed exec field: scripts/check-direxec.gate its `# exec:` value 'bin/' names no file

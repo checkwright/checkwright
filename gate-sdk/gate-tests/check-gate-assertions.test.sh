@@ -98,6 +98,22 @@ expect no-crate-skip 0 'declared out of reach with no crate at native/Cargo.toml
 expect no-crate-count 0 'clean (1 of 2 enumerated contract(s) coupled, 1 declared out of reach' "$rc" "$out"
 expect no-crate-named 0 'check-alpha' "$rc" "$out"
 
+# --- an executable exec member: its markers live in source the descriptor does not
+# name, so it is counted out of reach rather than read for markers it cannot carry ---
+cat > "$C/scripts/SPEC.md" <<'EOF'
+# consumer
+
+### check-gamma
+
+Invariant: gamma holds on two axes: (A) the first; (B) the second.
+EOF
+printf '# graph: couples=X dir=one valve=none tier=precommit\n# exec: bin/check-gamma\n' > "$C/scripts/check-gamma.gate"
+out="$( cd "$C" \
+    && gate_env GATE_SDK_KIT_DIRS="$kitdirs" GATE_SDK_GATES_DIR=scripts GATE_SDK_NATIVE_CRATE=native \
+    && gate_run check-gate-assertions "$CHECKS" 2>&1 )"; rc=$?
+expect executable-count 0 'clean (1 of 3 enumerated contract(s) coupled' "$rc" "$out"
+expect executable-named 0 '1 executable exec member(s) out of reach, their markers in source no descriptor names — check-gamma' "$rc" "$out"
+
 # --- the two fail-closed entry arms, neither of which any case dir can reach:
 # a named spec that does not exist, and a tree carrying no SPEC.md at all ---
 out="$( cd "$C" && gate_run check-gate-assertions "$CHECKS" absent-spec.md 2>&1 )"; rc=$?
@@ -113,5 +129,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-gate-assertions.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-gate-assertions.test.sh: clean (the arms a case dir cannot reach: the registry resolution walk over two kit SPECs, the descriptor-to-module redirection and its load-bearing red, the no-crate skip with its clean-line segment, and the two fail-closed entry arms — 8 assertions over 5 invocations)"
+echo "check-gate-assertions.test.sh: clean (the arms a case dir cannot reach: the registry resolution walk over two kit SPECs, the descriptor-to-module redirection and its load-bearing red, the no-crate skip with its clean-line segment, an executable exec member counted out of reach, and the two fail-closed entry arms — 10 assertions over 6 invocations)"
 exit 0

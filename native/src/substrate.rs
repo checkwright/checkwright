@@ -1,6 +1,6 @@
-// spec: gate-sdk/SPEC.md §The gate-authoring surface — the PowerShell target class: its extension
-// test, its host argument list and its host resolution, shared by a gate's `# exec:` dispatch, a
-// PowerShell KPI plugin's start and the scratch runner
+// spec: gate-sdk/SPEC.md §The gate-authoring surface — the exec target classes: the class test, the
+// PowerShell host argument list and host resolution, shared by a gate's `# exec:` dispatch, a
+// PowerShell KPI plugin's start and the scratch runner, and the executable's suffixed path
 use crate::programs::Program;
 
 pub const KNOB: &str = "GATE_SDK_POWERSHELL";
@@ -12,6 +12,31 @@ pub const HOST_FLAGS: &[&str] = &["-NoLogo", "-NoProfile", "-NonInteractive", "-
 pub fn is_powershell_body(target: &str) -> bool {
     let b = target.as_bytes();
     b.len() >= 4 && b[b.len() - 4..].eq_ignore_ascii_case(b".ps1")
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TargetClass {
+    PowerShell,
+    Executable,
+}
+
+// spec: gate-sdk/SPEC.md §The gate-authoring surface — read off the final path component: `.ps1` is
+// PowerShell, a component carrying no `.` an executable, anything else no admitted class
+pub fn target_class(target: &str) -> Option<TargetClass> {
+    let last = target.rsplit(['/', '\\']).next().unwrap_or(target);
+    if is_powershell_body(last) {
+        Some(TargetClass::PowerShell)
+    } else if !last.is_empty() && !last.contains('.') {
+        Some(TargetClass::Executable)
+    } else {
+        None
+    }
+}
+
+// spec: gate-sdk/SPEC.md §The gate-authoring surface — the file an executable target starts, so one
+// descriptor names one gate on every system
+pub fn executable_path(target: &str) -> String {
+    format!("{}{}", target, std::env::consts::EXE_SUFFIX)
 }
 
 // spec: gate-sdk/SPEC.md §The gate-authoring surface — a host knob is empty, or names `pwsh` or
@@ -62,6 +87,20 @@ mod tests {
     fn the_extension_test_ignores_ascii_case() {
         assert!(is_powershell_body(".tmp/x.ps1") && is_powershell_body("X.PS1") && is_powershell_body("a.Ps1"));
         assert!(!is_powershell_body("x.sh") && !is_powershell_body("ps1") && !is_powershell_body("x.ps12"));
+    }
+
+    // spec: gate-sdk/SPEC.md §The gate-authoring surface — the final component decides: no `.` is an
+    // executable, a dotfile or a dotted name is no class unless it ends in `.ps1`
+    #[test]
+    fn the_class_is_read_off_the_final_component() {
+        assert_eq!(target_class("gates/check-x.PS1"), Some(TargetClass::PowerShell));
+        for exe in ["check-widget", "bin/check-widget", "v1.2/check-widget", r"bin\check-widget"] {
+            assert_eq!(target_class(exe), Some(TargetClass::Executable), "{}", exe);
+        }
+        for none in ["check.v2", "bin/.hidden", "check.sh", "check.txt", "bin/", ""] {
+            assert_eq!(target_class(none), None, "{}", none);
+        }
+        assert_eq!(executable_path("bin/check-widget"), format!("bin/check-widget{}", std::env::consts::EXE_SUFFIX));
     }
 
     // spec: gate-sdk/SPEC.md §The gate-authoring surface — the validator's accept and refuse sets

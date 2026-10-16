@@ -556,8 +556,8 @@ fn workflow_digests(text: &str, followed: &mut Vec<String>) -> Result<Vec<JobDig
     Ok(out)
 }
 
-// assertion K: an `# exec:` field sits alone in a gates-directory descriptor and names a tracked
-// target of an admitted class — true when held in place, a finding for each of the four reds otherwise
+// assertion K: an `# exec:` field sits alone in a gates-directory descriptor and names a target of an
+// admitted class, a PowerShell one tracked — true when held in place, a finding for each red otherwise
 // spec: gate-sdk/SPEC.md §check-gate-substrate-parity
 fn exec_placement(
     desc: &str,
@@ -578,9 +578,15 @@ fn exec_placement(
         return Ok(false);
     }
     let target = registry::exec_target(desc, &value);
-    if !crate::substrate::is_powershell_body(&target) {
-        findings.push(format!("exec target of no admitted class: {} names {} — the one admitted target class is a PowerShell script (.ps1)", desc, target));
-        return Ok(false);
+    match crate::substrate::target_class(&target) {
+        None => {
+            findings.push(format!("exec target of no admitted class: {} names {} — the admitted target classes are a PowerShell script (.ps1) and an executable, whose name carries no `.`", desc, target));
+            return Ok(false);
+        }
+        // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — an executable is a build output, so
+        // K never looks for it
+        Some(crate::substrate::TargetClass::Executable) => return Ok(true),
+        Some(crate::substrate::TargetClass::PowerShell) => {}
     }
     let (dir, base) = target.rsplit_once('/').unwrap_or((".", target.as_str()));
     let tracked = Path::new(&target).is_file()
@@ -1048,7 +1054,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     println!(
-        "GATE-SUBSTRATE-PARITY: clean ({declared} member(s) with one declaration each, {dispatching} of them dispatching to the binary{skipped};{noport_declared} of the {declpaths_shell} shell declaration(s) declare '# no-port:' with a cause and {portuntil_declared} declare '# port-until:' with a slug, neither on any descriptor nor both on one declaration; the tracked shell tree beyond that set {tree_state}, {tree_scanned} file(s) read for header-declaration shape and {tree_declared} of them declaring, counted apart from the declaration set so an empty one stays visible; {portuntil_grounded} of those held declaration(s) reach their ground in one hop, the section their own '# spec:' field names stating the hold; {ndesc} descriptor(s) in parity with the {nsub}-subcommand roster ({in_scope} in scope, {out_of_scope} out of scope — an unvendored kit, or a consumer declaration from another tree), {refonly} reference-only; {exec_placed} exec descriptor(s) in the gates directory, each naming one tracked PowerShell target; {unregistered_declared} in-scope subcommand(s) unregistered in {list} with a declared reason and none undeclared, the reverse direction empty; {j_state}; {sensitive} substrate-sensitive member(s) {dispositioned}; {impl_scanned} implementation source(s) free of manifest-class annotation; {kit_scanned} kit root(s) scanned for an implementation sibling, crate root {crate_dir} outside every kit root; target roster {roster_state} at {roster_file} with {roster_targets} well-formed target(s); publish workflow(s) read: {wf_read_list}; absent: {wf_absent_list}; {wf_matrix} matrix declaration(s) roster-derived across {wf_jobs} job(s) with one producer per digest, {wf_followed_n} called script(s) read one hop deep)",
+        "GATE-SUBSTRATE-PARITY: clean ({declared} member(s) with one declaration each, {dispatching} of them dispatching to the binary{skipped};{noport_declared} of the {declpaths_shell} shell declaration(s) declare '# no-port:' with a cause and {portuntil_declared} declare '# port-until:' with a slug, neither on any descriptor nor both on one declaration; the tracked shell tree beyond that set {tree_state}, {tree_scanned} file(s) read for header-declaration shape and {tree_declared} of them declaring, counted apart from the declaration set so an empty one stays visible; {portuntil_grounded} of those held declaration(s) reach their ground in one hop, the section their own '# spec:' field names stating the hold; {ndesc} descriptor(s) in parity with the {nsub}-subcommand roster ({in_scope} in scope, {out_of_scope} out of scope — an unvendored kit, or a consumer declaration from another tree), {refonly} reference-only; {exec_placed} exec descriptor(s) in the gates directory, each naming a target of an admitted class; {unregistered_declared} in-scope subcommand(s) unregistered in {list} with a declared reason and none undeclared, the reverse direction empty; {j_state}; {sensitive} substrate-sensitive member(s) {dispositioned}; {impl_scanned} implementation source(s) free of manifest-class annotation; {kit_scanned} kit root(s) scanned for an implementation sibling, crate root {crate_dir} outside every kit root; target roster {roster_state} at {roster_file} with {roster_targets} well-formed target(s); publish workflow(s) read: {wf_read_list}; absent: {wf_absent_list}; {wf_matrix} matrix declaration(s) roster-derived across {wf_jobs} job(s) with one producer per digest, {wf_followed_n} called script(s) read one hop deep)",
         ndesc = descriptors.len(),
         nsub = roster.len(),
         in_scope = verdict.in_scope,
@@ -1172,7 +1178,11 @@ mod tests {
         let second = exec_placement(&desc, true, exec(), &mut tracked);
         let mut misplaced = Vec::new();
         let third = exec_placement(&desc, false, exec(), &mut misplaced);
+        let mut unbuilt = Vec::new();
+        let program = exec_placement(&desc, true, Ok(registry::Substrate::Exec("bin/check-x".to_string())), &mut unbuilt);
         let _ = std::fs::remove_dir_all(&d);
+        assert_eq!(program, Ok(true), "an untracked, unbuilt executable holds");
+        assert!(unbuilt.is_empty(), "{:?}", unbuilt);
         assert_eq!(first, Ok(false));
         assert!(untracked[0].starts_with("exec target not tracked"), "{:?}", untracked);
         assert_eq!(second, Ok(true));

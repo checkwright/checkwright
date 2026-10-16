@@ -1,0 +1,3 @@
+# graph: couples=docs/*.md dir=one valve=none tier=precommit
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — fixture executable descriptor, its program a build output never built here
+# exec: bin/check-rsgood

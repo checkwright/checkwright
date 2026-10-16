@@ -355,11 +355,24 @@ fn run_case(h: &Harness, gate: &str, casedir: &str, want: i32, expect: &str) -> 
         h.exported.iter().filter(|(k, _)| k != "GATE_SDK_NATIVE_BIN").cloned().collect();
     env.push(("GATE_SDK_NATIVE_BIN".to_string(), if pinned.is_empty() { h.bin.clone() } else { pinned }));
     env.push(("GATE_SDK_TMP_DIR".to_string(), h.case_tmp.clone()));
-    let mut spawn: Vec<&str> = argv[1..].iter().map(String::as_str).collect();
-    spawn.extend(args.iter().map(String::as_str));
+    // spec: gate-sdk/SPEC.md §run-gate-tests — a one-element `.sh` argv is a shell member, started
+    // through the battery's own shell arm
+    let (program, mut lead) = if argv.len() == 1 && argv[0].ends_with(".sh") {
+        match crate::registry::shell_start(&argv[0]) {
+            Ok(s) => s,
+            Err(e) => {
+                println!("  HARNESS: {} {} exited 2 (gate could not run / malformed fixture):", gate, casedir);
+                report(&e);
+                return 2;
+            }
+        }
+    } else {
+        (programs::Program::consumer(programs::GATE_DECLARATION, argv[0].as_str()), argv[1..].to_vec())
+    };
+    lead.extend(args);
+    let spawn: Vec<&str> = lead.iter().map(String::as_str).collect();
     // spec: gate-sdk/SPEC.md §run-gate-tests — the working directory is set on the *child* rather
     // than entered by this process, so no code path can leave the harness in a case dir.
-    let program = programs::Program::consumer(programs::GATE_DECLARATION, argv[0].as_str());
     let done = match proc::run_merged_in(&program, &spawn, &env, Some(Path::new(casedir))) {
         Ok(m) => m,
         Err(e) => {

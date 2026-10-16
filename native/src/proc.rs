@@ -161,6 +161,13 @@ fn spawn_target(program: &str) -> Result<std::borrow::Cow<'_, str>, String> {
     .map(std::borrow::Cow::Owned)
 }
 
+// spec: gate-sdk/SPEC.md §The gate-authoring surface — the spawn's resolution taken before a raw
+// spawn such as `dispatch`, so a system-directory homonym is refused rather than started
+#[cfg(windows)]
+pub fn resolve_for_dispatch(program: &str) -> Result<String, String> {
+    spawn_target(program).map(std::borrow::Cow::into_owned)
+}
+
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the pass-through arm, `resolve_floor_tool`'s own
 // ground: resolving here would swap the spawned literal for an absolute path on every host the
 // battery runs on
