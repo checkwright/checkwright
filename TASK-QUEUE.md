@@ -1076,6 +1076,3 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 
 ## Done
 
-- set-record-lost-at-done-move
-- trajectory-limits-unstated
-
