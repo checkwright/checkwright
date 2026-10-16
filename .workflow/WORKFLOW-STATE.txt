@@ -10,3 +10,4 @@ gate-dispatch-hermetic-pass align a0e9b487 2026-10-16 0c7e62d34
 gate-dispatch-hermetic-pass build a1a60418 2026-10-16 86f18f91d
 gate-dispatch-hermetic-pass build a6475d28 2026-10-16 896195553
 gate-dispatch-hermetic-pass validate ac3cfcba 2026-10-16 88b8f0d4c
+gate-dispatch-hermetic-pass close a3da9f0e 2026-10-16 0d55feded
