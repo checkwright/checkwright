@@ -1128,9 +1128,3 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 
 ## Done
 
-- windows-kpi-plugin-start
-- custom-gate-substrates
-- gate-authoring-sdk-surface
-- gate-tamper-exemption-reader-substrate
-- config-variant-battery-harness
-
