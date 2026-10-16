@@ -60,6 +60,7 @@
 - `check-psscriptanalyzer` — new, `on-surface`: lints your PowerShell gates and scripts with PSScriptAnalyzer at Warning and above once `GATE_SDK_POWERSHELL` names a host, and reads clean while it is empty. Nothing to do until you write PowerShell; once you set the host, install the PSScriptAnalyzer module for it.
 - `check-gate-substrate-parity` — gains assertion K, which reds a misplaced or dangling `# exec:` field: one outside a descriptor directly under your gates directory, a second one, a rooted or `..`-bearing value, or a target that is untracked or not a `.ps1`. Nothing to do unless you write one; fix each finding as it names.
 - `check-gate-fixture-coverage` — reds `# no-fixture:` on a descriptor carrying `# exec:`, since a PowerShell gate's fixture pair is the only check of its output and fail-closed contracts. Give the gate a `good/` and `bad/` pair.
+- `check-gate-tamper` — now runs at `pre-commit` on a staged `.gate` descriptor, a `.ps1` exec target or any path your `DELEGATION_KIT_GATE_FILES` names, where only a staged `.sh` triggered it, so a descriptor edit staged beside a non-meta path reds at the hook rather than first in the full battery. Split the gate edit into its own commit.
 
 ## Knob changes
 
@@ -270,3 +271,4 @@
 - **drift-kit `--emit stage-economics` and `--price-coverage`** — a price-table row short of four numeric price cells, as a dropped tab leaves it, now prices nothing: stage-economics counts it in its skipped-rows line and `--price-coverage` reads its model unpriced, where its missing or unparsable cells priced at zero. Repair any row either names.
 - **drift-kit KPI plugins** — a KPI dir may hold `kpi-<name>.ps1`, started by the PowerShell host `GATE_SDK_POWERSHELL` names, so a consumer KPI reports on native Windows. Nothing to do; a `.sh` plugin is unchanged, and wins over a `.ps1` of the same name in one dir.
 - **gate-sdk `--run-config-variant`, gate-sdk/templates/adopt.md** — a new arm that rehearses a config change: it runs the battery over a scratch copy of your tree as committed and again with the knob files in a directory you name, and prints each gate the change moves, exiting 1 when one goes red. Nothing to do; `templates/adopt.md` now rehearses each knob change with it.
+- **drift-kit `kpi-gate-backlog`** — a proposed gate declared by a `.gate` descriptor now counts as built, where only a `.sh` did, so the backlog row's unbuilt count drops by each such gate. Nothing to do.
