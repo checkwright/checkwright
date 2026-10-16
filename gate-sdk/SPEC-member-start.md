@@ -30,7 +30,7 @@ Replacement for §The gate-authoring surface, paragraph **The exec target classe
 
 An adopter's executable is a build output, so §check-gate-substrate-parity assertion K's tracked-file requirement binds the PowerShell class only. For an executable, K holds the placement, the field's shape and the class, and reads nothing about presence: whether the program is there to run is the dispatch's answer, exit 2 at run time. A tracked executable is admitted too, for an adopter who commits a program. K's existing unsuffixed `is_file()` read would test the wrong file on Windows, so it reads nothing for this class rather than the suffixed path: a K that reds an unbuilt gate would red every fresh clone before the adopter's build ran.
 
-Replacement for §check-gate-substrate-parity, the **assertion K** bullet's second and third sentences. **Not yet applied.**
+Replacement for §check-gate-substrate-parity, the **assertion K** bullet's sentence beginning `Its value names a tracked regular file` and its sentence beginning `K reds`, which the two sentences below take in order. The sentence between them, on a descriptor under a kit root, stands. **Not yet applied.**
 
 > Its value names a file of an admitted target class, relative to that directory with no `..` segment, no root and no trailing separator (§The gate-authoring surface): a PowerShell target is a tracked regular file, and an executable is a build output K never looks for. K reds a misplaced field, a second field, a rooted, `..`-bearing, separator-ended or empty value, a target of no admitted class, and a PowerShell target untracked.
 
@@ -70,9 +70,9 @@ Replacement for §port-blockers, the evidence-column clause beginning `or the de
 
 > or the declaration path and `(exec host $GATE_SDK_POWERSHELL)` for a PowerShell exec member. An executable exec member reports no row.
 
-Replacement for §check-gate-assertions, the sentence `An exec member's markers are read from its target, their locality-class home, as a compiled member's are read from its module`. **Not yet applied.**
+Replacement for §check-gate-assertions, the sentence beginning `An exec member's markers are read from its target`, through its closing `(§The gate-authoring surface).`. **Not yet applied.**
 
-> A PowerShell exec member's markers are read from its target, their locality-class home, as a compiled member's are read from its module. An executable's live in source its descriptor does not name, so it is counted out of reach, as a compiled member is in a tree with no crate.
+> A PowerShell exec member's markers are read from its target, their locality-class home, as a compiled member's are read from its module. An executable's live in source its descriptor does not name, so it is counted out of reach, as a compiled member is in a tree with no crate. The classifier tells the classes apart (§The gate-authoring surface).
 
 ### (5) A shell declaration on native Windows starts through bash {design-bearing} {user-facing: windows-shell-gate-dispatch's Deliverable, its first branch, the dispatch naming bash so docs/requirements.md §Writing your own shell gates and docs/install.md's Windows paragraph hold}
 
@@ -83,16 +83,16 @@ Replacement for §check-gate-assertions, the sentence `An exec member's markers 
 - **On Windows the shell arm starts `bash` with the declaration as its first argument, and the member's own arguments after.** On every other host the arm is unchanged.
 - **bash is resolved before the spawn, through the crate's program resolution with its system-directory rejection.** That is the `SYSTEM_DIR_HOMONYMS` rule §check-graph owns, so `System32`'s `bash.exe`, the WSL launcher, is never started. It is resolved there and not left to the spawn, because `proc::dispatch` spawns its program raw (`native/src/proc.rs`, the dispatch face). It is also resolved instead of `proc::resolve_floor_tool`, which falls back to the bare name, which Windows would search for in `System32` first.
 - **A bash that resolves nowhere outside the system directory is a dispatch refusal, exit 2.** The message names Git for Windows' bash and docs/requirements.md §Writing your own shell gates.
-- **The fixture runner takes the same start.** `gate_command` (§lib/gate.sh) answers a shell member with its path, and `--run-gate-tests` spawns that argv natively (`native/src/emit/run_gate_tests.rs`). So a one-element argv whose element the classifier answers shell for is started through the shell arm's function, and a case and the battery start a shell member identically.
+- **The fixture runner takes the same start.** `gate_command` (§lib/gate.sh) answers a shell member with its path, and `--run-gate-tests` spawns that argv natively (`native/src/emit/run_gate_tests.rs`). So a one-element argv whose element ends in `.sh` is started through the shell arm's function, and a case and the battery start a shell member identically. The test is the `.sh` extension, `gate_resolve`'s one spelling of a shell declaration, and not `registry::substrate`, which answers shell for every path that does not end in `.gate`. An executable's argv (delta 1) is also one element, the suffixed path. Its value carries no `.`, so the path ends in the host's suffix at most and never in `.sh`, and it is spawned as it is.
 - **Refused: having `gate_command` ask `--emit gate-argv` for a `.sh` declaration.** That would put the binary on the path of every shell caller of `gate_command`, a tree vendoring the library with no binary included. Its in-bash callers (`gate_run` in `lib/test-hermetic.sh`) already run a `.sh` by its path under Git for Windows' bash.
 
 The shell arm's one function is called from both sites. Its unit test in `native/src/emit/gate_argv.rs`, which pins the shell argv as the declaration alone, splits by `cfg(windows)`, since `crate-tests-windows` runs it.
 
-Replacement for §The gate-authoring surface, **One function starts every member**, its second sentence. **Not yet applied.**
+Replacement for §The gate-authoring surface, **One function starts every member**, the sentence beginning `Shell takes the declaration itself`. **Not yet applied.**
 
 > Shell takes the declaration itself, or on native Windows `bash` with the declaration as its first argument, bash resolved outside the system directory before the spawn. Compiled takes the binary and the name once the binary carries a subcommand of that name. A PowerShell exec member takes its host with the class's arguments once the target is a file, and an executable takes its suffixed path once that is an executable file.
 
-Replacement for §run-gate-tests, **The case runs whatever the member dispatches to**, its second sentence. **Not yet applied.**
+Replacement for §run-gate-tests, **The case runs whatever the member dispatches to**, the sentence beginning `The invocation resolves through`. **Not yet applied.**
 
 > The invocation resolves through `gate_command` (§lib/gate.sh), so a case runs `<binary> <name>` for a compiled member, the host and its target or the suffixed program for an exec member, and the script for a shell one, which on native Windows the runner starts through the shell arm of `registry::invocation`.
 
@@ -146,11 +146,16 @@ The page is held by the docs gates, so the build runs them on the page. It names
 
 ## Existing sections updated
 
-Rosters here came from the probes the deltas name, plus `git grep -n -F -e 'one admitted target class' -e 'tracked PowerShell target' -e 'There is no supported path today' -e 'One class is admitted' -e 'an adopter cannot author a compiled gate' -e 'never a compiled one'` over the tracked tree.
+Rosters here came from the probes the deltas name, plus `git grep -n -F -e 'one admitted target class' -e 'tracked PowerShell target' -e 'There is no supported path today' -e 'One class is admitted' -e 'cannot author a compiled gate' -e 'never a compiled one'` and `git grep -n -E 'compiled gate|exec descriptor|exec member|# exec:'` over the tracked tree.
 
 - `gate-sdk/SPEC.md` §The gate-authoring surface: the exec target classes (delta 1), the answering-interface sentence (delta 4), the one-start function (delta 5), the live dispatch case (delta 6).
 - `gate-sdk/SPEC.md` §The port-candidate criteria, the paragraph opening **The default's domain is a tree that carries the crate**. It says a consumer's substrate is shell or PowerShell, "never a compiled one", and that an adopter has no supported path to a compiled gate. Both become: an adopter writes a compiled gate as an executable exec target (§The gate-authoring surface), and the fork route is no longer the only one (delta 1).
-- `gate-sdk/SPEC.md` §Meta-gate conservation for the binary substrate, the `check-shellcheck` row's clause "an adopter cannot author a compiled gate". It becomes: an adopter's compiled gate is an executable exec target, which no shell lint reads (delta 1).
+- `gate-sdk/SPEC.md` §Meta-gate conservation for the binary substrate, the `check-shellcheck` row's clause "an adopter cannot author a compiled gate" and the consequence drawn from it, that a vendoring consumer's gate family is shell or an exec member's PowerShell. They change together: an adopter's compiled gate is an executable exec target, which no shell lint reads, and the family is shell, a PowerShell exec member or an executable (delta 1).
+- `gate-sdk/SPEC.md` §check-shellcheck, the paragraph **The gate ships to adopters for their own shell**. It says an adopter **cannot author a compiled gate**, and that a vendoring consumer's gate family is shell, or PowerShell behind an exec descriptor. It becomes the same pair as the row above (delta 1).
+- `gate-sdk/SPEC.md` §The `# graph:` manifest, the paragraph **Its existence is the dispatch declaration**, whose last clause says assertion K holds the exec path to a tracked file. K holds a PowerShell target tracked, and an executable's placement and class (delta 2).
+- `gate-sdk/SPEC.md` §The gate-authoring surface, the sentence beginning `It refuses two` that lists the field's refusals. It gains the separator-ended value (delta 1).
+- `gate-sdk/SPEC.md` §lib/gate.sh, the `gate_command` bullet. An exec member's answer is the host, its arguments and the target for a PowerShell class, and the suffixed path alone for an executable (delta 1).
+- `gate-sdk/SPEC.md` §port-blockers, the paragraph **A compiled member is read from its substrate**, its sentence saying an exec member's one requirement row is `?<TAB>GATE_SDK_POWERSHELL`. That holds for a PowerShell exec member, and an executable reports no row (delta 4).
 - `gate-sdk/SPEC.md` §check-gate-substrate-parity: assertion K and its fixture paragraph (delta 2).
 - `gate-sdk/SPEC.md` §check-gate-binary-fresh, the exec-member sentence (delta 3).
 - `gate-sdk/SPEC.md` §port-blockers, the default arm's evidence column (delta 4).
@@ -176,6 +181,8 @@ Rosters here came from the probes the deltas name, plus `git grep -n -F -e 'one 
 - `one admitted target class` — K's no-class finding names both classes; survivors are `native/src/gates/gate_substrate_parity.rs`, rewritten (delta 1).
 - `tracked PowerShell target` — K's clean segment; survivors are `native/src/gates/gate_substrate_parity.rs` and `gate-sdk/gate-tests/check-gate-substrate-parity/good/expect.txt`, both rewritten (delta 2).
 - `There is no supported path today` — the Rust-gate page's withdrawn claim; survivor `docs/requirements.md`, rewritten (delta 7).
+- `One class is admitted` — the exec target classes paragraph's count; survivors are `gate-sdk/SPEC.md` and its generated mirror `docs/gate-sdk/SPEC.md`, rewritten (delta 1).
+- `cannot author a compiled gate` — the two sites saying an adopter has no compiled-gate route; survivors are `gate-sdk/SPEC.md` and its generated mirror `docs/gate-sdk/SPEC.md`, rewritten (delta 1).
 
 ## Definition of Done
 

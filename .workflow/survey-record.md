@@ -13,3 +13,10 @@
 - rev: a0f8f3699270f6a7d8e186a4608933750790a15b
 - finding: Class readers that move: registry::invocation (order and arm), gate_substrate_parity K (class, tracked, clean segment), port_blockers EXEC_NEEDS, gate_assertions marker read. Unaffected: psscriptanalyzer, fixture_coverage, gate_output, gate_tamper, reads_couples, binary_fresh. Several readers match Substrate non-exhaustively, so a fourth variant would route silently. The shell start reaches two native spawners: proc::dispatch via invocation (raw Command::new, no System32 rejection) and run_gate_tests via lib/gate.sh gate_command's one-element .sh argv. No test or workflow dispatches a .sh member on Windows. Landed in gate-sdk/SPEC-member-start.md.
 - inferred: none
+
+## 2026-10-16 align — Which tracked surfaces still state an exec target as PowerShell-only or an adopter as unable to author a compiled gate, beyond the member-start roster as spec filed it?
+- corpus: gate-sdk/SPEC.md docs gate-sdk/README.md native/src native/tests
+- oracle: git grep -n -E 'compiled gate|exec descriptor|exec member|# exec:' -- . ':!docs/gate-sdk/SPEC.md'
+- rev: 23ac737f48be180c23b88a820b978b23571823a4
+- finding: Beyond spec's roster: SPEC.md check-shellcheck paragraph 'The gate ships to adopters' (bold-split phrase missed the -F probe) and the conservation row's family clause, the graph-manifest K sentence, the field-refusal list, the gate_command bullet and the port-blockers compiled-member paragraph. Landed in gate-sdk/SPEC-member-start.md roster; also three ordinal sentence anchors rewritten to opening words, and the runner's shell-start key set to the .sh extension since registry::substrate answers shell for every non-.gate path.
+- inferred: none

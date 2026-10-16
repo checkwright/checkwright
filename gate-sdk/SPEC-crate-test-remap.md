@@ -21,7 +21,7 @@ So cargo keys the compiled units by their flags, and a test arm carrying the bui
 
 The home is shell because §build-native's `# no-port:` cause already forces it: the build runs before any binary exists. It is a library function rather than a second script, so the battery's reader below takes the value without re-deriving it.
 
-Replacement for §build-native, the paragraph beginning **The released artifact carries no builder path**, its last three sentences. **Not yet applied.**
+Replacement for §build-native, the paragraph beginning **The released artifact carries no builder path**, the sentences from `The build therefore exports` through `The flags are appended`, its last four. **Not yet applied.**
 
 > The build therefore exports the `RUSTFLAGS` value `gate_native_rustflags` prints (§lib/gate.sh): the caller's own flags, then `--remap-path-prefix` for two prefixes. `CARGO_HOME` (defaulted to `$HOME/.cargo`) is the measured leak, and `HOME` covers a cargo home this tree cannot predict and any other path under the builder's home. A prefix that is empty or `/` contributes **no** flag, because remapping `/` would rewrite every absolute path in the binary. Every cargo call that can rewrite the placed binary takes that one value (§check-crate-arms).
 
@@ -43,7 +43,7 @@ Replacement for §check-crate-arms, the sentence after the two-line command bloc
 
 > `$CRATE` is `gate_native_crate` (§Layout and configuration), `$TARGET_DIR` is `GATE_SDK_CARGO_TARGET_DIR`, and both spawns run under the `RUSTFLAGS` `gate_native_rustflags` prints (§lib/gate.sh). So the test arm reuses the cache `bin/build-native.sh` fills and never rewrites the binary it placed, and its read is a `bash` spawn that exits 2 on failure.
 
-Replacement for §check-gate-binary-fresh, the paragraph **Running the crate's tests does not discharge the rebuild**, its second and third sentences. **Not yet applied.**
+Replacement for §check-gate-binary-fresh, the paragraph **Running the crate's tests does not discharge the rebuild**, the sentences beginning `While the crate carries an integration test` and `So the obligation is`. The sentence beginning `cargo test` compiles its own harness stands. **Not yet applied.**
 
 > A **plain** `cargo test --release` also rewrites that binary unremapped, because the integration tests need the bin target. This gate then reads the binary current, and the installer smoke's staging step refuses it at exit 2 on the builder path the banned-pattern roster matches (installer/SPEC.md §The consumer smoke). The test arm of §check-crate-arms builds under the build's own flags and leaves the binary alone, and validate's crate suite builds into a target dir of its own. So the obligation is `bash gate-sdk/bin/build-native.sh` (§build-native) as **its own named step**, after a plain test run where both run: a contributor routine stating a `cargo test` line has not stated it.
 
@@ -55,7 +55,7 @@ A suite's run command is split and exec'd as a literal argv with no expansion (`
 
 - **README.md's battery-roster register carries the same line.** `check-battery-roster` holds the register to each suite's run command as an exact string (evidence-kit/SPEC.md §check-battery-roster), so the two change in one commit.
 - **The cost is one cold build per clone**: 7 units, measured at about 50 seconds by the probe's no-flags row.
-- **The integration tests still spawn the placed binary.** They spawn it through `GATE_SDK_NATIVE_BIN`, which validate runs after a build, so the suite reads the same binary it did.
+- **The integration tests spawn the bin target cargo builds for them.** They name it through `env!("CARGO_BIN_EXE_checkwright-gates")` (`native/tests/closed_reader.rs`, `native/tests/exec_dispatch.rs`), never through `GATE_SDK_NATIVE_BIN`. So under the suite's own target dir they run the binary built there from the current source, and the placed binary is not read at all.
 - **The CI crate-test legs pass `--target <triple>`**, so cargo places their artifacts under `target/<triple>/` and never over the placed host binary. They are unchanged. Probed: a no-flags `cargo test --release --no-run --target x86_64-unknown-linux-gnu` into the scratch dir above built under `<dir>/x86_64-unknown-linux-gnu/release/` and left the host-layout binary's digest unchanged.
 
 ## Producers and consumers

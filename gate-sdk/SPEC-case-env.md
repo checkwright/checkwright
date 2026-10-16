@@ -31,7 +31,7 @@ Replacement for §run-gate-tests, the paragraph beginning **Fixture-pair hermeti
 
 > Fixture-pair hermeticity is the case dir as the child's working directory, and the case's own knob layers outranking the invoker's. Before its pins, the runner removes from the resolving shell and from the case invocation every file-layer locator (`GATE_SDK_GATES_DIR`, and each static kit's `<KIT>_KNOB_FILE`, `<KIT>_LOCAL_KNOB_FILE` and `<KIT>_CONFIG_FILE`) and every scalar a scalar line of the case's own knob files sets. A gate resolving its knob files under the cwd then finds only the case's own, and its value for each scalar the case sets is the case's. A scalar the case leaves unset still reaches it from the invoker, which is how a seat hands a case a per-machine value such as a PowerShell host. A fixture may ship its own cwd-relative config deliberately.
 
-Replacement for §run-gate-tests, the paragraph beginning **A `*.test.sh` reaches its gate the same way**, its last two sentences. **Not yet applied.**
+Replacement for §run-gate-tests, the paragraph beginning **A bespoke `*.test.sh` reaches its gate the same way, through `gate_run`**, its last two sentences. **Not yet applied.**
 
 > The `--run-gate-tests` arm, by contrast, **does** read the case's knob files: it runs each case in the case dir, strips every inherited file-layer locator and every scalar the case's files set, and then applies its own pins. The asymmetry is stated here because it is invisible at the call site that suffers from it.
 
