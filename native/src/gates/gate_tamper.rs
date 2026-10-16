@@ -136,6 +136,7 @@ fn derived_gate_files(
     gates_dir: &str,
     kit_roots: &[String],
     sdk_root: &str,
+    exe_suffix: &str,
 ) -> Result<Vec<String>, String> {
     let mut out: Vec<String> = Vec::new();
     let mut add = |abs: &str| {
@@ -155,9 +156,10 @@ fn derived_gate_files(
             if let Some(p) = registry::resolve(m.trim(), &dirs) {
                 add(&p);
                 // spec: delegation-kit/SPEC.md §Verify after every agent commit — an exec member's
-                // target is its implementation, held to meta-layer isolation as its descriptor is
+                // target is its implementation, held to meta-layer isolation as its descriptor is,
+                // under the path dispatch starts
                 if let registry::Substrate::Exec(v) = registry::substrate(&p)? {
-                    add(&registry::exec_target(&p, &v));
+                    add(&crate::substrate::started_path(&registry::exec_target(&p, &v), exe_suffix));
                 }
             }
         }
@@ -177,6 +179,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         &walk::abs_against(&here, &walk::knob_scalar("GATE_SDK_GATES_DIR")?),
         &kit_roots_abs,
         &walk::abs_against(&here, &walk::sdk_root()),
+        std::env::consts::EXE_SUFFIX,
     )?;
     let declared = globs.join(" ");
     for d in &derived {
@@ -313,31 +316,47 @@ BAR=(
         std::fs::write(format!("{}/checks/check-local.gate", kit), "").unwrap();
         std::fs::write(format!("{}/check-ps.gate", gates), "# exec: check-ps.ps1\n").unwrap();
         std::fs::write(format!("{}/check-ps.ps1", gates), "").unwrap();
+        std::fs::write(format!("{}/check-bin.gate", gates), "# exec: check-bin\n").unwrap();
 
         assert_eq!(
-            derived_gate_files(&top, &gates, std::slice::from_ref(&kit), &sdk).unwrap(),
+            derived_gate_files(&top, &gates, std::slice::from_ref(&kit), &sdk, "").unwrap(),
             vec!["vendor/gate-sdk/lib/gate.sh"]
         );
 
         std::fs::write(
             format!("{}/gates.list", gates),
-            "# comment\ncheck-local\ncheck-kit\ncheck-nowhere\ncheck-ps\n",
+            "# comment\ncheck-local\ncheck-kit\ncheck-nowhere\ncheck-ps\ncheck-bin\n",
         )
         .unwrap();
         assert_eq!(
-            derived_gate_files(&top, &gates, std::slice::from_ref(&kit), &sdk).unwrap(),
+            derived_gate_files(&top, &gates, std::slice::from_ref(&kit), &sdk, "").unwrap(),
             vec![
                 "scripts/check-local.sh",
                 "vendor/extra/checks/check-kit.gate",
                 "scripts/check-ps.gate",
                 "scripts/check-ps.ps1",
+                "scripts/check-bin.gate",
+                "scripts/check-bin",
                 "vendor/gate-sdk/lib/gate.sh"
             ]
         );
 
+        // spec: delegation-kit/SPEC.md §Verify after every agent commit — on a suffixed host the set
+        // holds the executable dispatch starts, and a PowerShell target as named
+        let suffixed = derived_gate_files(&top, &gates, std::slice::from_ref(&kit), &sdk, ".exe").unwrap();
+        assert!(suffixed.iter().any(|f| f == "scripts/check-bin.exe") && !suffixed.iter().any(|f| f == "scripts/check-bin"), "{:?}", suffixed);
+        assert!(suffixed.iter().any(|f| f == "scripts/check-ps.ps1"), "{:?}", suffixed);
+
         assert_eq!(
-            derived_gate_files(&top, &gates, std::slice::from_ref(&kit), &outside).unwrap(),
-            vec!["scripts/check-local.sh", "vendor/extra/checks/check-kit.gate", "scripts/check-ps.gate", "scripts/check-ps.ps1"]
+            derived_gate_files(&top, &gates, std::slice::from_ref(&kit), &outside, "").unwrap(),
+            vec![
+                "scripts/check-local.sh",
+                "vendor/extra/checks/check-kit.gate",
+                "scripts/check-ps.gate",
+                "scripts/check-ps.ps1",
+                "scripts/check-bin.gate",
+                "scripts/check-bin"
+            ]
         );
         let _ = std::fs::remove_dir_all(&scratch);
     }

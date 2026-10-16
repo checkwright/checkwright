@@ -10,16 +10,6 @@
 
 ## Technical Debt
 
-### exec-target-tamper-suffix
-
-`check-gate-tamper` holds an exec member's target in its gate-file set unsuffixed (`registry::exec_target`, called from `native/src/gates/gate_tamper.rs`), while dispatch starts `substrate::executable_path`, the target with the host's executable suffix. On Windows a tracked executable, which assertion K admits, sits outside the set, so a commit changing it beside product code passes assertion A unisolated. The ground delegation-kit/SPEC.md §Verify after every agent commit gives, an untracked build output never reaching a diff, does not cover the tracked case.
-
-**Deliverable:** the set holding the path dispatch starts for an executable target, a crate case pinning it with the suffix a parameter so a local run executes the Windows path, and the SPEC's ground covering the tracked case.
-
-The unisolated pass on a Windows seat is read off the code, no Windows host being in reach; the gates workflow's Windows crate leg is the first run that reaches it.
-
-**Cost while deferred:** a tracked exec gate on a Windows seat can change beside product code unisolated; a fail-open in mechanism new since v0.31.0, so no regression. Surfaced 2026-10-16 by gate-dispatch-hermetic-pass' close second-vendor review, carried to this scope's intake. Re-verified here by reading both sites. Owner lookup: `exec_target`, `executable_path`, `gate-tamper` in this file and the disposed-findings record — icebox [gate-tamper-consumer-gate-coverage](#gate-tamper-consumer-gate-coverage), DISTINCT (the shell gate-files glob); owner delegation-kit/SPEC.md §Verify after every agent commit.
-
 ### ephemeral-turn-usage-read
 
 the observation split off [heterogeneous-agent-delegation](#heterogeneous-agent-delegation): whether a turn in a vendor's non-persisting mode, the mode two of this repo's three adapters run in, leaves a usage event on disk. delegation-kit/SPEC.md §The keyed verdict states that such a run feeds nothing.
@@ -190,7 +180,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Grant of 2026-10-16 spent (operator grant, lead-relayed):** gate-dispatch-hermetic-pass' close ran the review over its range, which returned two findings, both carried to the next scope's intake, so v0.32.0 stayed deferred and its tag push unspent.
 
-**Granted, unspent (operator grant 2026-10-16, lead-relayed):** one audit-mode second-vendor review over tamper-reader-repair-pass' range at validate, whose set the same day's direction ruled: `exception-list-reader-gaps`, [exec-target-tamper-suffix](#exec-target-tamper-suffix), [ephemeral-turn-usage-read](#ephemeral-turn-usage-read), [front-matter-reader-span](#front-matter-reader-span) and [input-redirect-scan-cr](#input-redirect-scan-cr). v0.32.0 is cut and its tag pushed only on a clean return; a finding or a failed run defers the cut.
+**Granted, unspent (operator grant 2026-10-16, lead-relayed):** one audit-mode second-vendor review over tamper-reader-repair-pass' range at validate, whose set the same day's direction ruled: `exception-list-reader-gaps`, `exec-target-tamper-suffix`, [ephemeral-turn-usage-read](#ephemeral-turn-usage-read), [front-matter-reader-span](#front-matter-reader-span) and [input-redirect-scan-cr](#input-redirect-scan-cr). v0.32.0 is cut and its tag pushed only on a clean return; a finding or a failed run defers the cut.
 
 **Push need (2026-10-16, inside the budget):** 2 against 2 — the closing push, and the v0.32.0 tag push on that clean return; no unit's change reaches a remote run first, exec-target-tamper-suffix's crate case taking the suffix as a parameter.
 
@@ -1095,4 +1085,5 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 ## Done
 
 - exception-list-reader-gaps
+- exec-target-tamper-suffix
 

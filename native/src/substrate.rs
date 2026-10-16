@@ -39,6 +39,16 @@ pub fn executable_path(target: &str) -> String {
     format!("{}{}", target, std::env::consts::EXE_SUFFIX)
 }
 
+// spec: gate-sdk/SPEC.md §The gate-authoring surface — the file a target starts on a host whose
+// executable suffix is `suffix`: an executable's path suffixed, any other target as named
+pub fn started_path(target: &str, suffix: &str) -> String {
+    if target_class(target) == Some(TargetClass::Executable) {
+        format!("{}{}", target, suffix)
+    } else {
+        target.to_string()
+    }
+}
+
 // spec: gate-sdk/SPEC.md §The gate-authoring surface — a host knob is empty, or names `pwsh` or
 // `powershell` as `PATH` names a program, so every host knob accepts one set
 pub fn host_refusal(knob: &str, value: &str) -> Option<String> {
@@ -101,6 +111,9 @@ mod tests {
             assert_eq!(target_class(none), None, "{}", none);
         }
         assert_eq!(executable_path("bin/check-widget"), format!("bin/check-widget{}", std::env::consts::EXE_SUFFIX));
+        assert_eq!(started_path("bin/check-widget", std::env::consts::EXE_SUFFIX), executable_path("bin/check-widget"));
+        assert_eq!(started_path("bin/check-widget", ".exe"), "bin/check-widget.exe");
+        assert_eq!(started_path("gates/check-x.ps1", ".exe"), "gates/check-x.ps1");
     }
 
     // spec: gate-sdk/SPEC.md §The gate-authoring surface — the validator's accept and refuse sets
