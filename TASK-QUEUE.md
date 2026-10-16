@@ -24,7 +24,7 @@
 
 **Deliverable:** the set holding the path dispatch starts for an executable target, a crate case pinning it with the suffix a parameter so a local run executes the Windows path, and the SPEC's ground covering the tracked case.
 
-**Inferred, not run:** the unisolated pass on a Windows seat — cannot run here: no Windows host is in reach; the gates workflow's Windows crate leg reaches it.
+The unisolated pass on a Windows seat is read off the code, no Windows host being in reach; the gates workflow's Windows crate leg is the first run that reaches it.
 
 **Cost while deferred:** a tracked exec gate on a Windows seat can change beside product code unisolated; a fail-open in mechanism new since v0.31.0, so no regression. Surfaced 2026-10-16 by gate-dispatch-hermetic-pass' close second-vendor review, carried to this scope's intake. Re-verified here by reading both sites. Owner lookup: `exec_target`, `executable_path`, `gate-tamper` in this file and the disposed-findings record — icebox [gate-tamper-consumer-gate-coverage](#gate-tamper-consumer-gate-coverage), DISTINCT (the shell gate-files glob); owner delegation-kit/SPEC.md §Verify after every agent commit.
 
@@ -34,7 +34,7 @@ the observation split off [heterogeneous-agent-delegation](#heterogeneous-agent-
 
 **Deliverable:** that observation, read off validate's granted second-vendor review on this repo's ephemeral review adapter: the vendor's on-disk session store and the adapter's usage snapshot before and after the turn, and the SPEC's sentence confirmed or corrected against it.
 
-**Inferred, not run:** that the review adapter runs in that mode, read off the local overlay's `--ephemeral` flag — cannot run here: the granted run at validate is the observation itself.
+The review adapter carries the `--ephemeral` flag in the local overlay, read there; that the flag is the mode the SPEC names is what the granted run settles.
 
 **Cost while deferred:** the keyed verdict's sizing note rests on inference, so a consumer sizing its feed on it may misjudge how stale the snapshot runs. Filed 2026-10-16 by scope as a split of its parent, operator direction lead-relayed (not a ruling). Owner lookup: `ephemeral`, `non-persisting`, `usage event` in this file and the disposed-findings record — the parent alone; owner delegation-kit/SPEC.md §The keyed verdict.
 
