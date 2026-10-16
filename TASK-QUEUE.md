@@ -1056,9 +1056,3 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 
 ## Done
 
-- exception-list-reader-gaps
-- exec-target-tamper-suffix
-- front-matter-reader-span
-- input-redirect-scan-cr
-- ephemeral-turn-usage-read
-
