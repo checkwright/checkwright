@@ -162,7 +162,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 [roadmap: next/ecosystem] [cost: event/low] [surface: gate-sdk] [roadmap-summary: Write your own gate in Rust, built by you and dispatched by the battery.]
 
-an adopter cannot dispatch a gate they compiled. Split 2026-10-15 at spec from `custom-gate-substrates`, the split the lead's dispatch left to spec (operator direction, option C, lead-relayed): the parent landed a descriptor's `# exec:` field with one target class, a PowerShell script, and this entry widens the class to an executable the adopter builds. Custom Rust gates are wanted as a capability (operator direction, 2026-09-27, lead session); docs/requirements.md §Writing your own Rust gates states that no path exists.
+an adopter cannot dispatch a gate they compiled. Split 2026-10-15 at spec from `custom-gate-substrates`, the split the lead's dispatch left to spec (operator direction, option C, lead-relayed): the parent landed a descriptor's `# exec:` field with one target class, a PowerShell script, and this entry widens the class to an executable the adopter builds. Custom Rust gates are wanted as a capability (operator direction, 2026-09-27, lead session); docs/requirements.md §Writing your own Rust gates states that no path exists. **Horizon, operator direction 2026-10-16, lead-relayed (not a ruling):** stays `next` after its split parent landed.
 
 **Deliverable:** an `# exec:` target class started directly, with the executable naming a native-Windows target needs, and the install page's prerequisites for a Rust gate. Whether the battery checks an adopter-built binary against its source, as `check-gate-binary-fresh` checks the shipped one, is spec's.
 
