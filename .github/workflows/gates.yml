@@ -71,6 +71,8 @@ jobs:
       - name: full battery
         env:
           GATE_SDK_SARIF_FILE: ${{ runner.temp }}/gates.sarif
+          # spec: gate-sdk/SPEC.md §run-gates — the banner roll, so the log shows a knob-armed gate ran armed
+          GATE_SDK_VERBOSE: "1"
         run: |
           shellcheck --version | grep '^version:'
           printf 'GATE_SDK_POWERSHELL = pwsh\n' > scripts/gate-sdk-config.local.knobs
