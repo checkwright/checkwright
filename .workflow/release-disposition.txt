@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+budget-feed-observation-pass release deferred:v0.32.0 — a minor accumulated since v0.31.0, held because the granted validate review returned changes requested (a set-record drop leaving a preamble as setext text, set-wide records on an entry, an unexercised rename coverage claim) and the grant cuts only on a clean return, though this close fixed the three that held; no other trigger fires: the elapsed limb dormant under preview, no major, no security or supply-chain fix, front-door verbs and plugin parity green
