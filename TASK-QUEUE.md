@@ -12,11 +12,15 @@
 
 ### ephemeral-turn-usage-read
 
+[drain-exempt: validate-observes]
+
 the observation split off [heterogeneous-agent-delegation](#heterogeneous-agent-delegation): whether a turn in a vendor's non-persisting mode, the mode two of this repo's three adapters run in, leaves a usage event on disk. delegation-kit/SPEC.md §The keyed verdict states that such a run feeds nothing.
 
 **Deliverable:** that observation, read off validate's granted second-vendor review on this repo's ephemeral review adapter: the vendor's on-disk session store and the adapter's usage snapshot before and after the turn, and the SPEC's sentence confirmed or corrected against it.
 
 The review adapter carries the `--ephemeral` flag in the local overlay, read there; that the flag is the mode the SPEC names is what the granted run settles.
+
+The entry is drain-exempt because its whole deliverable is validate's run, so build lands nothing for it and validate takes its Done move once the run is read.
 
 **Cost while deferred:** the keyed verdict's sizing note rests on inference, so a consumer sizing its feed on it may misjudge how stale the snapshot runs. Filed 2026-10-16 by scope as a split of its parent, operator direction lead-relayed (not a ruling). Owner lookup: `ephemeral`, `non-persisting`, `usage event` in this file and the disposed-findings record — the parent alone; owner delegation-kit/SPEC.md §The keyed verdict.
 
