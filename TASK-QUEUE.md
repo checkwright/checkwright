@@ -8,6 +8,18 @@
 
 ## New Features
 
+### set-record-lost-at-done-move
+
+[spec: SPEC-set-record.md]
+
+a record scope lands for the whole unit set on one entry is lost when that entry moves to Done mid-iteration. At guard-grant-review-pass scope landed the Push need line and the operator's unit-set direction on the set's lead entry. The first build batch moved that entry to Done, a done line keeps only the slug, and the two remaining entries pointed at it. The second batch re-landed both under the queue's iteration header, outside the entry grammar, and close removed them by hand.
+
+**Deliverable:** a set-wide record given a home that outlives any one entry until close, or the Done move refusing while a live entry cites the body it removes. Which one is the authoring stage's, and the first is a feature.
+
+**Chosen at spec (2026-10-16, the form left to spec by the operator direction of that date):** the first form, a set record under the iteration header that the scope stage writes and the next boundary reset drops; the refusal form is declined in the amendment.
+
+**Cost while deferred:** a batch split loses the push budget's stated need and a direction's record unless a session notices. Filed 2026-10-13 by guard-grant-review-pass' lead and promoted at the next scope's intake. Re-verified there against that close's drain commit message, which names the block leaving with the Done section. Owner lookup: `Done move`, `set-wide`, `Push need` in this file and the disposed-findings record — [section-prose-outlives-its-entries](#section-prose-outlives-its-entries), DISTINCT (a section preamble surviving Clear-Done, where this is a body lost ahead of it); [operator-authored-unit-set](#operator-authored-unit-set), DISTINCT (who authors a set); owner lifecycle-kit/SPEC.md §templates/stages/ and queue-kit/SPEC.md §The icebox tier.
+
 ## Technical Debt
 
 ### heterogeneous-agent-delegation
@@ -34,19 +46,13 @@ foreign agents. A lead delegating a stage to a foreign coding agent, cashing the
 
 **Cost while deferred:** stage-level work still bills one vendor's budget, and the design memory ages against fast-moving CLIs. Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question).
 
-### set-record-lost-at-done-move
-
-a record scope lands for the whole unit set on one entry is lost when that entry moves to Done mid-iteration. At guard-grant-review-pass scope landed the Push need line and the operator's unit-set direction on the set's lead entry. The first build batch moved that entry to Done, a done line keeps only the slug, and the two remaining entries pointed at it. The second batch re-landed both under the queue's iteration header, outside the entry grammar, and close removed them by hand.
-
-**Deliverable:** a set-wide record given a home that outlives any one entry until close, or the Done move refusing while a live entry cites the body it removes. Which one is the authoring stage's, and the first is a feature.
-
-**Cost while deferred:** a batch split loses the push budget's stated need and a direction's record unless a session notices. Filed 2026-10-13 by guard-grant-review-pass' lead and promoted at the next scope's intake. Re-verified there against that close's drain commit message, which names the block leaving with the Done section. Owner lookup: `Done move`, `set-wide`, `Push need` in this file and the disposed-findings record — [section-prose-outlives-its-entries](#section-prose-outlives-its-entries), DISTINCT (a section preamble surviving Clear-Done, where this is a body lost ahead of it); [operator-authored-unit-set](#operator-authored-unit-set), DISTINCT (who authors a set); owner lifecycle-kit/SPEC.md §templates/stages/ and queue-kit/SPEC.md §The icebox tier.
-
 ### trajectory-limits-unstated
 
 drift-kit/SPEC.md §The published-evidence extractor says the extractor "states plainly that no controlled ungoverned baseline exists", and that the knowledge-friction exclusion is "stated as a limitation on the framing page". `native/src/emit/trajectory.rs` prints neither: its `--human` header is two lines naming neither limit, and no framing page exists, since `docs/evidence-data.md` is the bare table.
 
 **Deliverable:** the two limits stated where a reader of the published evidence meets them, either in the arm's output or on a framing page around the committed projection, or the SPEC's two claims narrowed to what the arm prints; which one is spec's.
+
+**Chosen at spec (2026-10-16, the form left to spec by the operator direction of that date):** the arm's output. The bare emission states both limits as two prose lines ahead of the table, on every path including a degraded one, so the committed page carries them and `--human` prints them under its header; the drift-kit smoke asserts both lines. drift-kit/SPEC.md §The published-evidence extractor re-phrases its two sentences to say the emission states each limit, and its interface sentence names the lines ahead of the table. No name is minted, so the unit takes no amendment. A framing page is declined, since a reader reaching the projection directly would meet neither limit, and so is narrowing the SPEC, which would drop the caveat its self-referential claim rests on. User-facing (the emission and the published page), settled by the same direction.
 
 **Cost while deferred:** a reader trusting the SPEC believes the published evidence carries its own caveats, and it carries none. Filed 2026-10-05 by context-kit-tail-publisher-pass' build. Re-verified: the `--human` branch of `emit` pushes the two header lines alone, and no `docs/` page outside the SPEC mirrors names an ungoverned baseline. Owner lookup: `ungoverned`, `framing page`, `trajectory` in this file — benchmark-ab-experiment, DISTINCT (the controlled experiment itself); owner drift-kit/SPEC.md §The published-evidence extractor.
 
