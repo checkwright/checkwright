@@ -142,7 +142,7 @@ Its surfaces are all in-crate or declared `# no-port:` — `native/src/emit/kfri
 
 ## The published-evidence extractor
 
-The `trajectory` emit arm (gate-sdk/SPEC.md §The non-gate arm) publishes the consumer's own governed trajectory, the evidence behind a committed projection of it. The benefits claim is *self-referential* by ruling: the extractor emits the governed arm's real history and states plainly that no controlled ungoverned baseline exists; a synthetic controlled A/B experiment is a separate measurement, not this mechanism.
+The `trajectory` emit arm (gate-sdk/SPEC.md §The non-gate arm) publishes the consumer's own governed trajectory, the evidence behind a committed projection of it. The benefits claim is *self-referential* by ruling: the extractor emits the governed arm's real history, and its emission states plainly, ahead of its table, that no controlled ungoverned baseline exists; a synthetic controlled A/B experiment is a separate measurement, not this mechanism.
 
 The extractor is a pure function of *closed* history, byte-stable across any commit that is not a close.
 
@@ -158,9 +158,9 @@ Per closed iteration it harvests:
 - **commit shape** — the feature/debt split of the iteration's commit subjects (`kpi-task-split`'s classification, applied over the same `(close(N-1), close(N)]` range).
 - **gate-roster growth** — the `gates.list` member count at the iteration's close commit; with the queue's proposed-gate mentions this bounds the named-but-unbuilt backlog.
 
-Excluded, and stated as a limitation on the framing page: knowledge-friction counts — their log is gitignored per-iteration scratch, not committed history, so the extractor cannot harvest it and that KPI stays a session-local lower bound.
+Excluded, and stated as a limitation in the emission ahead of its table: knowledge-friction counts — their log is gitignored per-iteration scratch, not committed history, so the extractor cannot harvest it and that KPI stays a session-local lower bound.
 
-Interface: `bash gate-sdk/bin/run-gates.sh --emit trajectory` writes the markdown table (one row per closed iteration, stable columns) to stdout — the shape the committed projection pins; `--human` prepends a human-oriented header. The extractor degrades per surface to an `n/a (<reason>)` cell and exits 0 — drift-kit's fail-visible discipline, registering no gate. `DRIFT_KIT_TRAJECTORY_SURFACES` overrides the harvested state-file paths (§Layout and configuration).
+Interface: `bash gate-sdk/bin/run-gates.sh --emit trajectory` writes the two limitation lines, then the markdown table (one row per closed iteration, stable columns), to stdout on every path, a degraded one included — the shape the committed projection pins; `--human` prepends a human-oriented header. The extractor degrades per surface to an `n/a (<reason>)` cell and exits 0 — drift-kit's fail-visible discipline, registering no gate. `DRIFT_KIT_TRAJECTORY_SURFACES` overrides the harvested state-file paths (§Layout and configuration).
 
 **Consumer wiring.** The kit ships no gate for the projection. A consumer publishing one commits the emission whole, so every number a reader meets there is emitted and none is hand-copied. It holds the page with a gate of its own that re-emits and byte-compares, the emitter/check-graph freshness pattern, its `# graph:` manifest coupling the page to the harvested state files.
 

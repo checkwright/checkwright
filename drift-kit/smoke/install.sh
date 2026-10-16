@@ -194,6 +194,21 @@ set -e
 grep -q '^| iteration |' <<<"$traj" || fail "trajectory missing table header"
 [[ "$(grep -c '^| alpha ' <<<"$traj")" -ge 1 ]] || fail "trajectory emitted no closed-iteration row (expected alpha)"
 if grep -q '^| beta ' <<<"$traj"; then fail "trajectory emitted the in-flight (unclosed) beta row"; fi
+# spec: drift-kit/SPEC.md §The published-evidence extractor — both limits precede the table on every path
+limits_ahead() {  # $1=emission  $2=path label
+    local head="${1%%| iteration |*}"
+    grep -q '^No controlled ungoverned baseline exists' <<<"$head" \
+        || fail "trajectory ($2) does not state the missing baseline ahead of its table"
+    grep -q '^Knowledge-friction counts are excluded' <<<"$head" \
+        || fail "trajectory ($2) does not state the knowledge-friction exclusion ahead of its table"
+}
+limits_ahead "$traj" "harvested"
+git -C "$work" init -q traj-empty
+traj="$( cd "$work/traj-empty" && GATE_SDK_NATIVE_BIN="$TRAJ_BIN" \
+    bash "$SMOKE_KIT_ROOT/../gate-sdk/bin/run-gates.sh" --emit trajectory 2>&1 )" \
+    || fail "the trajectory arm over a repository with no state file did not exit 0"
+grep -q '^| n/a (no ' <<<"$traj" || fail "trajectory over no state file did not degrade to its n/a row: $traj"
+limits_ahead "$traj" "degraded"
 
 # spec: drift-kit/SPEC.md §The queue-flow arm — a hermetic history of three iteration starts over
 # a queue whose pool moves between them: two closed windows, the in-flight third never one.

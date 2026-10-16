@@ -14,6 +14,11 @@ const STAGES_KNOB: &str = "DRIFT_KIT_STAGES";
 // shape depends on rather than a roster member it renders
 const CLOSE_STAGE: &str = "close";
 
+const LIMITS: &str = "No controlled ungoverned baseline exists: every row is the governed arm's own \
+history, so the table shows a trajectory, not an effect measured against a control.\n\n\
+Knowledge-friction counts are excluded: their log is gitignored per-iteration scratch, not \
+committed history, so the extractor cannot harvest them.\n";
+
 // spec: gate-sdk/SPEC.md §The consumer remainder cohort — the extractor anchored itself with a
 // `cd` to the toplevel and fell back to the cwd outside a repository, where every git read then
 // fails and the table degrades to its one n/a row. Both halves are reproduced.
@@ -388,6 +393,9 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         );
         out.push('\n');
     }
+    // spec: drift-kit/SPEC.md §The published-evidence extractor — both limits ride every path
+    out.push_str(LIMITS);
+    out.push('\n');
     out.push_str(&format!(
         "| iteration | stages ({}) | commits (feat/debt) | amendments (merged · max lag) | validate (suites) | gates.list |\n",
         legend

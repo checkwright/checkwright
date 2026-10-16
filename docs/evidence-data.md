@@ -1,3 +1,7 @@
+No controlled ungoverned baseline exists: every row is the governed arm's own history, so the table shows a trajectory, not an effect measured against a control.
+
+Knowledge-friction counts are excluded: their log is gitignored per-iteration scratch, not committed history, so the extractor cannot harvest them.
+
 | iteration | stages (sc sp a b v c) | commits (feat/debt) | amendments (merged · max lag) | validate (suites) | gates.list |
 | --- | --- | --- | --- | --- | --- |
 | lifecycle-kit | sc · · b v c | 2f/0d | 0 | n/a (pre-evidence-kit) | 9 |

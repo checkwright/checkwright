@@ -34,16 +34,6 @@ foreign agents. A lead delegating a stage to a foreign coding agent, cashing the
 
 **Cost while deferred:** stage-level work still bills one vendor's budget, and the design memory ages against fast-moving CLIs. Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question).
 
-### trajectory-limits-unstated
-
-drift-kit/SPEC.md §The published-evidence extractor says the extractor "states plainly that no controlled ungoverned baseline exists", and that the knowledge-friction exclusion is "stated as a limitation on the framing page". `native/src/emit/trajectory.rs` prints neither: its `--human` header is two lines naming neither limit, and no framing page exists, since `docs/evidence-data.md` is the bare table.
-
-**Deliverable:** the two limits stated where a reader of the published evidence meets them, either in the arm's output or on a framing page around the committed projection, or the SPEC's two claims narrowed to what the arm prints; which one is spec's.
-
-**Chosen at spec (2026-10-16, the form left to spec by the operator direction of that date):** the arm's output. The bare emission states both limits as two prose lines ahead of the table, on every path including a degraded one, so the committed page carries them and `--human` prints them under its header; the drift-kit smoke asserts both lines. drift-kit/SPEC.md §The published-evidence extractor re-phrases its two sentences to say the emission states each limit, and its interface sentence names the lines ahead of the table. No name is minted, so the unit takes no amendment. A framing page is declined, since a reader reaching the projection directly would meet neither limit, and so is narrowing the SPEC, which would drop the caveat its self-referential claim rests on. User-facing (the emission and the published page), settled by the same direction.
-
-**Cost while deferred:** a reader trusting the SPEC believes the published evidence carries its own caveats, and it carries none. Filed 2026-10-05 by context-kit-tail-publisher-pass' build. Re-verified: the `--human` branch of `emit` pushes the two header lines alone, and no `docs/` page outside the SPEC mirrors names an ungoverned baseline. Owner lookup: `ungoverned`, `framing page`, `trajectory` in this file — benchmark-ab-experiment, DISTINCT (the controlled experiment itself); owner drift-kit/SPEC.md §The published-evidence extractor.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -1051,4 +1041,5 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 ## Done
 
 - set-record-lost-at-done-move
+- trajectory-limits-unstated
 
