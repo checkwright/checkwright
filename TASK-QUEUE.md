@@ -10,14 +10,6 @@
 
 ## Technical Debt
 
-### exception-list-reader-gaps
-
-`registry::exception_arrays` in `native/src/registry.rs`, the shared exception-list reader `check-gate-tamper` and `check-gate-exemption-tasks` call since gate-dispatch-hermetic-pass, drops elements two ways, each fail-open for both gates. A regression: a `# exception-list:` tag on a line inside an open array is recognized only while no array is open, so the next tagged array is never read, where v0.31.0's own tamper reader armed it. An unstated assumption, not a regression: quote state resets on each line and ignores a backslash escape, so an escaped or unmatched quote ends or swallows the balance and later elements vanish, which gate-sdk/SPEC.md's shared shell-array grammar does not state.
-
-**Deliverable:** the tag read inside an open array, and quote state read as bash reads it (carried across lines, a backslash escaping outside single quotes) or the grammar stating the limit, each pinned by a case both gates' oracles carry.
-
-**Cost while deferred:** a regression from v0.31.0, so it holds v0.32.0 under the cut's bar, and a skipped array's exemptions go unchecked. Surfaced 2026-10-16 by gate-dispatch-hermetic-pass' close second-vendor review and an audit sweep, carried to this scope's intake; no hotfix (operator direction 2026-10-16, lead-relayed, not a ruling). Re-verified here by reading the reader's tag test, which reads a tag only while no array is open, its per-line quote reset, and v0.31.0's `gate_tamper.rs`, which carried its own reader. Owner lookup: `exception-list`, `exception_arrays`, `exemption-tasks` in this file and the disposed-findings record — none; `.workflow/release-declarations.md`'s `check-gate-tamper` line states the shared grammar; owner gate-sdk/SPEC.md §check-gate-exemption-tasks.
-
 ### exec-target-tamper-suffix
 
 `check-gate-tamper` holds an exec member's target in its gate-file set unsuffixed (`registry::exec_target`, called from `native/src/gates/gate_tamper.rs`), while dispatch starts `substrate::executable_path`, the target with the host's executable suffix. On Windows a tracked executable, which assertion K admits, sits outside the set, so a commit changing it beside product code passes assertion A unisolated. The ground delegation-kit/SPEC.md §Verify after every agent commit gives, an untracked build output never reaching a diff, does not cover the tracked case.
@@ -198,7 +190,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Grant of 2026-10-16 spent (operator grant, lead-relayed):** gate-dispatch-hermetic-pass' close ran the review over its range, which returned two findings, both carried to the next scope's intake, so v0.32.0 stayed deferred and its tag push unspent.
 
-**Granted, unspent (operator grant 2026-10-16, lead-relayed):** one audit-mode second-vendor review over tamper-reader-repair-pass' range at validate, whose set the same day's direction ruled: [exception-list-reader-gaps](#exception-list-reader-gaps), [exec-target-tamper-suffix](#exec-target-tamper-suffix), [ephemeral-turn-usage-read](#ephemeral-turn-usage-read), [front-matter-reader-span](#front-matter-reader-span) and [input-redirect-scan-cr](#input-redirect-scan-cr). v0.32.0 is cut and its tag pushed only on a clean return; a finding or a failed run defers the cut.
+**Granted, unspent (operator grant 2026-10-16, lead-relayed):** one audit-mode second-vendor review over tamper-reader-repair-pass' range at validate, whose set the same day's direction ruled: `exception-list-reader-gaps`, [exec-target-tamper-suffix](#exec-target-tamper-suffix), [ephemeral-turn-usage-read](#ephemeral-turn-usage-read), [front-matter-reader-span](#front-matter-reader-span) and [input-redirect-scan-cr](#input-redirect-scan-cr). v0.32.0 is cut and its tag pushed only on a clean return; a finding or a failed run defers the cut.
 
 **Push need (2026-10-16, inside the budget):** 2 against 2 — the closing push, and the v0.32.0 tag push on that clean return; no unit's change reaches a remote run first, exec-target-tamper-suffix's crate case taking the suffix as a parameter.
 
@@ -1101,4 +1093,6 @@ a citation naming a numbered step by its bold title, in RELEASING.md's procedure
 A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, since check-front-door-verbs reads the front-door pages alone; widening its arm resolution to the kit SPECs, with the history valves, would catch it.
 
 ## Done
+
+- exception-list-reader-gaps
 

@@ -9,3 +9,9 @@ axes/paren).rs
 axes/after.rs
 axes/first.rs
 axes/open.rs
+axes/inner.rs
+axes/after-quote.rs
+axes/esc").rs
+axes/bare name.rs
+axes/hash#mid.rs
+axes/after-escape.rs

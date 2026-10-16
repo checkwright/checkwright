@@ -537,51 +537,106 @@ fn assignment_opens(line: &str) -> bool {
     t[i..].starts_with(b"=(")
 }
 
+fn is_exception_tag(line: &str) -> bool {
+    line.trim_start_matches([' ', '\t'])
+        .strip_prefix('#')
+        .is_some_and(|s| s.trim_start_matches([' ', '\t']).starts_with("exception-list:"))
+}
+
 // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — one reader owns tagged shell arrays for both gates
 pub fn exception_arrays(text: &str) -> Vec<ExceptionArray> {
+    let lines: Vec<&str> = text.lines().collect();
     let mut arrays = Vec::new();
     let mut pending = None;
     let mut current: Option<ExceptionArray> = None;
+    let mut opening_line = 0;
     let mut balance = 0i64;
-    for (idx, raw) in text.lines().enumerate() {
+    let mut quote: Option<char> = None;
+    let mut continued = false;
+    let mut word: Option<(usize, String)> = None;
+    let mut yielded = 0;
+    let finish = |word: &mut Option<(usize, String)>, current: &mut Option<ExceptionArray>, yielded: &mut usize, opening_line: usize, end: usize| {
+        if let (Some((line, value)), Some(array)) = (word.take(), current.as_mut()) {
+            if line != *yielded {
+                *yielded = line;
+                array.elements.push(ArrayElement { line, raw: lines[end - 1].to_string(), value, opening: line == opening_line });
+            }
+        }
+    };
+    for (idx, raw) in lines.iter().enumerate() {
         let line = idx + 1;
-        let t = raw.trim_start_matches([' ', '\t']);
-        if current.is_none() && t.strip_prefix('#').is_some_and(|s| s.trim_start_matches([' ', '\t']).starts_with("exception-list:")) {
+        let mid_word = quote.is_some() || continued;
+        if !mid_word && is_exception_tag(raw) {
             pending = Some(line);
             continue;
         }
-        let opening = current.is_none();
-        if opening {
+        let body = if current.is_none() {
             if !assignment_opens(raw) { continue; }
             let Some(header) = pending.take() else { continue; };
             current = Some(ExceptionArray { header, elements: Vec::new() });
+            opening_line = line;
             balance = 0;
-        }
-        let mut quote = None;
-        let mut value_code = String::new();
-        for ch in raw.chars() {
-            if let Some(q) = quote {
-                if ch == q { quote = None; }
-                value_code.push(ch);
-            } else {
-                match ch {
-                    '#' => break,
-                    '\'' | '"' => { quote = Some(ch); value_code.push(ch); }
-                    '(' => { balance += 1; }
-                    ')' => { balance -= 1; }
-                    _ => { value_code.push(ch); }
+            &raw[raw.find('=').map_or(0, |i| i + 1)..]
+        } else { raw };
+        continued = false;
+        let chars: Vec<char> = body.chars().collect();
+        let mut i = 0;
+        let mut closed = false;
+        while i < chars.len() {
+            let ch = chars[i];
+            i += 1;
+            match quote {
+                Some('\'') => {
+                    if ch == '\'' { quote = None; } else { word.as_mut().unwrap().1.push(ch); }
+                    continue;
+                }
+                Some(_) => {
+                    if ch == '"' {
+                        quote = None;
+                    } else if ch == '\\' && i == chars.len() {
+                        continued = true;
+                    } else if ch == '\\' && matches!(chars[i], '"' | '\\' | '$' | '`') {
+                        word.as_mut().unwrap().1.push(chars[i]);
+                        i += 1;
+                    } else {
+                        word.as_mut().unwrap().1.push(ch);
+                    }
+                    continue;
+                }
+                None => {}
+            }
+            match ch {
+                ' ' | '\t' => finish(&mut word, &mut current, &mut yielded, opening_line, line),
+                '#' if word.is_none() => break,
+                '(' | ')' => {
+                    finish(&mut word, &mut current, &mut yielded, opening_line, line);
+                    balance += if ch == '(' { 1 } else { -1 };
+                    if balance <= 0 { closed = true; break; }
+                }
+                '\\' if i == chars.len() => continued = true,
+                _ => {
+                    let w = word.get_or_insert_with(|| (line, String::new()));
+                    match ch {
+                        '\'' | '"' => quote = Some(ch),
+                        '\\' => { w.1.push(chars[i]); i += 1; }
+                        _ => w.1.push(ch),
+                    }
                 }
             }
         }
-        let element = if opening {
-            value_code.split_once('=').map(|(_, s)| s).unwrap_or("")
-        } else { value_code.as_str() };
-        if let Some(token) = element.split_whitespace().next() {
-            let value: String = token.chars().filter(|c| *c != '\'' && *c != '"').collect();
-            current.as_mut().unwrap().elements.push(ArrayElement { line, raw: raw.to_string(), value, opening });
+        if closed {
+            arrays.push(current.take().unwrap());
+            quote = None;
+            continued = false;
+            continue;
         }
-        if balance <= 0 { arrays.push(current.take().unwrap()); }
+        if quote.is_some() && !continued {
+            word.as_mut().unwrap().1.push('\n');
+        } else if quote.is_none() && !continued {
+            finish(&mut word, &mut current, &mut yielded, opening_line, line);
+        }
     }
+    finish(&mut word, &mut current, &mut yielded, opening_line, lines.len().max(1));
     if let Some(array) = current { arrays.push(array); }
     arrays
 }
@@ -1791,5 +1846,41 @@ mod exception_array_tests {
         assert!(a[0].elements[0].opening);
         assert_eq!(a[1].elements[0].value, "e/f");
         assert!(!a[1].elements[0].opening);
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — a tag inside an open array arms the next assignment
+    #[test]
+    fn a_tag_inside_an_open_array_arms_the_next_assignment() {
+        let a = exception_arrays("# exception-list:\nA=(\n a/b\n# exception-list:\n)\nB=(\n c/d\n)\n");
+        assert_eq!(a.len(), 2);
+        assert_eq!(a[1].header, 4);
+        assert_eq!(a[1].elements[0].value, "c/d");
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — quote state carries across lines as bash reads it, and a word's raw line is its last
+    #[test]
+    fn a_quote_spanning_lines_holds_the_balance_open() {
+        let a = exception_arrays("# exception-list:\nA=(\n 'a/b\n)' # permanent: x\n c/d\n# exception-list: quoted, so no tag\n)\n");
+        assert_eq!(a.len(), 1);
+        let values: Vec<&str> = a[0].elements.iter().map(|e| e.value.as_str()).collect();
+        assert_eq!(values, ["a/b\n)", "c/d"]);
+        assert_eq!(a[0].elements[0].line, 3);
+        assert_eq!(disposition(&a[0].elements[0].raw), Disposition::Permanent, "a word's disposition sits on the line it ends on");
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — a backslash escapes outside single quotes only
+    #[test]
+    fn a_backslash_escapes_outside_single_quotes_only() {
+        let a = exception_arrays("# exception-list:\nA=(\n \"a/\\\").rs\" # x\n 'b/\\' # x\n c/d\\ e # x\n f\\'g\n h#i # x\n j/k\n)\n");
+        let values: Vec<&str> = a[0].elements.iter().map(|e| e.value.as_str()).collect();
+        assert_eq!(values, ["a/\").rs", "b/\\", "c/d e", "f'g", "h#i", "j/k"]);
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — a trailing backslash continues the word onto the next line
+    #[test]
+    fn a_trailing_backslash_continues_the_word() {
+        let a = exception_arrays("# exception-list:\nA=(\n a/\\\nb # x\n c\n)\n");
+        let values: Vec<&str> = a[0].elements.iter().map(|e| e.value.as_str()).collect();
+        assert_eq!(values, ["a/b", "c"]);
     }
 }

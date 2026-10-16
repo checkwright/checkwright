@@ -1,5 +1,5 @@
 GATE-EXEMPTION-TASKS: clean
-6 exemption array(s)
+10 exemption array(s)
 2 descriptor exemption(s)
 2 '# port-until:' header field(s)
 2 kit-shipped declaration(s) out of scope

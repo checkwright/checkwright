@@ -1,9 +1,15 @@
 gate edit not isolated
 self-serving exemption
 call-service/src/*.rs -> call-service/src/lib.rs
-axes/tag.rs
-axes/next.rs
-axes/paren).rs
-axes/after.rs
-axes/first.rs
-axes/open.rs
+axes/tag.rs -> axes/tag.rs
+axes/next.rs -> axes/next.rs
+axes/paren).rs -> axes/paren).rs
+axes/after.rs -> axes/after.rs
+axes/first.rs -> axes/first.rs
+axes/open.rs -> axes/open.rs
+axes/inner.rs -> axes/inner.rs
+axes/after-quote.rs -> axes/after-quote.rs
+axes/esc").rs -> axes/esc").rs
+axes/bare name.rs -> axes/bare name.rs
+axes/hash#mid.rs -> axes/hash#mid.rs
+axes/after-escape.rs -> axes/after-escape.rs
