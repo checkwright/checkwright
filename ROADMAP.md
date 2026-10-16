@@ -29,8 +29,6 @@ Adoption evidence, mostly. A rung promotes when someone hits the friction it des
 
 ### next
 
-- [custom-rust-gates](TASK-QUEUE.md#custom-rust-gates) *(ecosystem)* — Write your own gate in Rust, built by you and dispatched by the battery.
-
 ### later
 
 - [benchmark-ab-experiment](TASK-QUEUE.md#benchmark-ab-experiment) *(adoption)* — A controlled experiment measuring drift with and without governance.

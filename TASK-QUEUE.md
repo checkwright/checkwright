@@ -8,30 +8,6 @@
 
 ## New Features
 
-### custom-rust-gates
-
-[spec: SPEC-member-start.md] [roadmap: next/ecosystem] [roadmap-summary: Write your own gate in Rust, built by you and dispatched by the battery.]
-
-an adopter cannot dispatch a gate they compiled. Split 2026-10-15 at spec from `custom-gate-substrates`, the split the lead's dispatch left to spec (operator direction, option C, lead-relayed): the parent landed a descriptor's `# exec:` field with one target class, a PowerShell script, and this entry widens the class to an executable the adopter builds. Custom Rust gates are wanted as a capability (operator direction, 2026-09-27, lead session); docs/requirements.md §Writing your own Rust gates states that no path exists. **Horizon, operator direction 2026-10-16, lead-relayed (not a ruling):** stays `next` after its split parent landed.
-
-**Deliverable:** an `# exec:` target class started directly, with the executable naming a native-Windows target needs, and the install page's prerequisites for a Rust gate. Whether the battery checks an adopter-built binary against its source, as `check-gate-binary-fresh` checks the shipped one, is spec's.
-
-**Push need (2026-10-16, overrun ruled by the operator, lead-relayed):** one mid-iteration push, shared with [windows-shell-gate-dispatch](#windows-shell-gate-dispatch), since a Windows leg is the first run to start a consumer member there.
-
-**Cost while deferred:** an adopter wanting a typed, testable gate writes shell or PowerShell, or forks the binary and owns its release. Filed 2026-10-15 by spec, as the split above.
-
-### windows-shell-gate-dispatch
-
-[spec: SPEC-member-start.md]
-
-a registered `.sh` gate is spawned by its declaration path with no interpreter word: `registry::invocation` hands a `Substrate::Shell` member to `proc::dispatch` as `Program::consumer(GATE_DECLARATION, decl)`, and `proc::spawn_target` passes an argv[0] carrying a separator through untouched. docs/requirements.md §Writing your own shell gates and docs/install.md's Windows paragraph say Git for Windows' bash runs a shell gate.
-
-**Deliverable:** a native-Windows leg dispatching a registered `.sh` member, and then either the dispatch naming bash for a shell declaration on Windows or the two pages withdrawing the promise.
-
-**Push need (2026-10-16, overrun ruled by the operator, lead-relayed):** the mid-iteration push [custom-rust-gates](#custom-rust-gates) spends, landing in its batch.
-
-**Cost while deferred:** a native-Windows adopter's shell gate may fail as a dispatch harness error where the docs promise it runs. Filed 2026-10-16 by gate-substrate-sdk-pass' close, promoted off a gap that spec filed 2026-10-15. →fix failed: the candidate fixes are a Windows dispatch change no local host can test and a docs withdrawal, and the leg that decides between them is unrun. Owner lookup: `dispatch_one`, `shell gate`, `Git for Windows`, `Windows` in this file and the disposed-findings record — none; the 2026-10-10 `sole link` record, DISTINCT (hook placement); owner gate-sdk/SPEC.md §The gate-authoring surface.
-
 ### crate-test-unremaps-binary
 
 [spec: SPEC-crate-test-remap.md]
@@ -206,7 +182,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Granted, unspent (operator grant 2026-10-16, lead-relayed):** one second-vendor review over gate-dispatch-hermetic-pass' range and the v0.32.0 cut on its clean return; a finding or a failed run defers as above.
 
-**Push need (2026-10-16, overrun ruled by the operator, lead-relayed):** the v0.32.0 tag push, spent only on that clean return, the set's third against a budget of two beside the closing push and [custom-rust-gates](#custom-rust-gates)' mid-iteration push.
+**Push need (2026-10-16, overrun ruled by the operator, lead-relayed):** the v0.32.0 tag push, spent only on that clean return, the set's third against a budget of two beside the closing push and `custom-rust-gates`' mid-iteration push.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
@@ -1127,4 +1103,7 @@ a citation naming a numbered step by its bold title, in RELEASING.md's procedure
 A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, since check-front-door-verbs reads the front-door pages alone; widening its arm resolution to the kit SPECs, with the history valves, would catch it.
 
 ## Done
+
+- custom-rust-gates
+- windows-shell-gate-dispatch
 
