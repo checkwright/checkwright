@@ -8,3 +8,4 @@ gate-dispatch-hermetic-pass scope a34750c3 2026-10-16 08e5f6588
 gate-dispatch-hermetic-pass spec ab248373 2026-10-16 930f90fd3
 gate-dispatch-hermetic-pass align a0e9b487 2026-10-16 0c7e62d34
 gate-dispatch-hermetic-pass build a1a60418 2026-10-16 86f18f91d
+gate-dispatch-hermetic-pass build a6475d28 2026-10-16 896195553
