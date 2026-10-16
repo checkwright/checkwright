@@ -635,6 +635,40 @@ fn rewrite_header(text: &str, name: &str) -> String {
     out
 }
 
+// spec: lifecycle-kit/SPEC.md §The iteration boundary — the set record drop and the blank lines it keeps
+fn drop_set_record(text: &str) -> (String, bool) {
+    let lines = lines_with_ends(text);
+    let bare = |l: &str| l.trim_end_matches('\n').trim_end_matches('\r').to_string();
+    let Some(hdr) = lines.iter().position(|l| l.starts_with("## Iteration:")) else {
+        return (text.to_string(), false);
+    };
+    let end = (hdr + 1..lines.len())
+        .find(|&i| {
+            let b = bare(lines[i]);
+            is_separator(&b) || b.starts_with("## ")
+        })
+        .unwrap_or(lines.len());
+    let Some(open) = (hdr + 1..end).find(|&i| bare(lines[i]).trim() == "**Set record**") else {
+        return (text.to_string(), false);
+    };
+    let blank = |i: usize| bare(lines[i]).trim().is_empty();
+    let mut last = end;
+    while last > open + 1 && blank(last - 1) {
+        last -= 1;
+    }
+    let mut from = open;
+    while from > hdr + 1 && blank(from - 1) {
+        from -= 1;
+    }
+    let mut out = String::new();
+    for (i, l) in lines.iter().enumerate() {
+        if i < from || i >= last {
+            out.push_str(l);
+        }
+    }
+    (out, true)
+}
+
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — every data line's column 1 is rewritten, not
 // only the last: the first-stage entry truncates the state file, so every line below the
 // separator belongs to the current iteration by construction — which is what check-stage-evidence
@@ -817,8 +851,11 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String], declared: Option<&str>) -> Result<
     // the last stamp, so the temp file carrying the candidate transition is the STATE file, not
     // the queue.
     let new_queue_boundary;
+    let mut set_record_dropped = false;
     let pre_queue: &str = if first {
-        new_queue_boundary = rewrite_header(&queue_text, UNNAMED);
+        let (kept, dropped) = drop_set_record(&queue_text);
+        set_record_dropped = dropped;
+        new_queue_boundary = rewrite_header(&kept, UNNAMED);
         write_file(&tmpqueue, &new_queue_boundary)?;
         let header_only = through_separator(&state_text);
         write_file(&tmpstate, &format!("{}\n\n{}\n", header_only, stamp_line))?;
@@ -1281,6 +1318,13 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String], declared: Option<&str>) -> Result<
                 w, r
             ));
         }
+        if set_record_dropped {
+            say.out(&format!(
+                "the boundary would drop the closing iteration's set record from under the header \
+                 in {}.",
+                c.queue
+            ));
+        }
         println!(
             "enter-stage (simulate): entry to '{}' would proceed — no stamp, nothing written.",
             stage
@@ -1388,6 +1432,12 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String], declared: Option<&str>) -> Result<
              {}'.",
             stamp_line, UNNAMED
         );
+        if set_record_dropped {
+            println!(
+                "  note: dropped the closing iteration's set record from under the header in {}.",
+                c.queue
+            );
+        }
         println!(
             "  next: commit {} and {} together (the boundary reset writes both), hook enabled.",
             c.queue, c.state
@@ -2538,5 +2588,51 @@ mod tests {
             assert_eq!(&std::fs::read(p).expect("read"), body, "a refusal path wrote {}", p);
         }
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    const SET_RECORD: &str =
+        "  **Set record**\n\n  **Push need (2026-06-01, inside the budget):** the closing push.\n\n";
+
+    // spec: lifecycle-kit/SPEC.md §The iteration boundary — the boundary drops the set record
+    #[test]
+    fn the_boundary_drops_a_set_record_ended_by_a_rule() {
+        let q = format!("# q\n\n## Iteration: demo\n\n{}---\n\n## Done\n", SET_RECORD);
+        let (out, dropped) = drop_set_record(&q);
+        assert!(dropped);
+        assert_eq!(out, "# q\n\n## Iteration: demo\n\n---\n\n## Done\n");
+    }
+
+    #[test]
+    fn the_boundary_drops_a_set_record_ended_by_a_heading() {
+        let q = format!("# q\n\n## Iteration: demo\n\n{}## New Features\n\n## Done\n", SET_RECORD);
+        let (out, dropped) = drop_set_record(&q);
+        assert!(dropped);
+        assert_eq!(out, "# q\n\n## Iteration: demo\n\n## New Features\n\n## Done\n");
+    }
+
+    #[test]
+    fn the_boundary_keeps_a_preamble_above_the_set_record() {
+        let q = format!(
+            "# q\n\n## Iteration: demo\n\n  A consumer preamble.\n\n{}---\n\n## Done\n",
+            SET_RECORD
+        );
+        let (out, dropped) = drop_set_record(&q);
+        assert!(dropped);
+        assert_eq!(out, "# q\n\n## Iteration: demo\n\n  A consumer preamble.\n\n---\n\n## Done\n");
+    }
+
+    #[test]
+    fn a_queue_with_no_set_record_is_left_as_it_is() {
+        let q = "# q\n\n## Iteration: demo\n\n  A consumer preamble.\n\n---\n\n## New Features\n\n  **Set record**\n";
+        let (out, dropped) = drop_set_record(q);
+        assert!(!dropped, "an opening line outside the header region is no set record");
+        assert_eq!(out, q);
+    }
+
+    #[test]
+    fn the_rename_keeps_the_set_record() {
+        let q = format!("# q\n\n## Iteration: old\n\n{}---\n\n## Done\n", SET_RECORD);
+        let renamed = rewrite_header(&q, "new");
+        assert_eq!(renamed, q.replace("## Iteration: old", "## Iteration: new"));
     }
 }

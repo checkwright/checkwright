@@ -8,18 +8,6 @@
 
 ## New Features
 
-### set-record-lost-at-done-move
-
-[spec: SPEC-set-record.md]
-
-a record scope lands for the whole unit set on one entry is lost when that entry moves to Done mid-iteration. At guard-grant-review-pass scope landed the Push need line and the operator's unit-set direction on the set's lead entry. The first build batch moved that entry to Done, a done line keeps only the slug, and the two remaining entries pointed at it. The second batch re-landed both under the queue's iteration header, outside the entry grammar, and close removed them by hand.
-
-**Deliverable:** a set-wide record given a home that outlives any one entry until close, or the Done move refusing while a live entry cites the body it removes. Which one is the authoring stage's, and the first is a feature.
-
-**Chosen at spec (2026-10-16, the form left to spec by the operator direction of that date):** the first form, a set record under the iteration header that the scope stage writes and the next boundary reset drops; the refusal form is declined in the amendment.
-
-**Cost while deferred:** a batch split loses the push budget's stated need and a direction's record unless a session notices. Filed 2026-10-13 by guard-grant-review-pass' lead and promoted at the next scope's intake. Re-verified there against that close's drain commit message, which names the block leaving with the Done section. Owner lookup: `Done move`, `set-wide`, `Push need` in this file and the disposed-findings record — [section-prose-outlives-its-entries](#section-prose-outlives-its-entries), DISTINCT (a section preamble surviving Clear-Done, where this is a body lost ahead of it); [operator-authored-unit-set](#operator-authored-unit-set), DISTINCT (who authors a set); owner lifecycle-kit/SPEC.md §templates/stages/ and queue-kit/SPEC.md §The icebox tier.
-
 ## Technical Debt
 
 ### heterogeneous-agent-delegation
@@ -1061,4 +1049,6 @@ a citation naming a numbered step by its bold title, in RELEASING.md's procedure
 A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, since check-front-door-verbs reads the front-door pages alone; widening its arm resolution to the kit SPECs, with the history valves, would catch it.
 
 ## Done
+
+- set-record-lost-at-done-move
 
