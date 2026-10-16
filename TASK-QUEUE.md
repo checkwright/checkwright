@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: gate-dispatch-hermetic-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,14 @@
 ## New Features
 
 ## Technical Debt
+
+### exception-list-reader-split
+
+the two readers of the `# exception-list:` shell-array grammar diverge on five axes. `check-gate-tamper`'s `extract_exemptions` (`native/src/gates/gate_tamper.rs`) accepts the tag unspaced, strips quotes without protecting parentheses, takes each element's first token and yields nothing for a one-line array; `check-gate-exemption-tasks` (`gate_exemption_tasks.rs`) needs `# exception-list:` exactly, skips quoted parentheses, reads the whole line and reds a one-line array. An unspaced tag is tamper-read and never disposition-checked. The descriptor's `# exception:` lines already share one parser, `registry::exemptions`.
+
+**Deliverable:** one shared array reader both gates call, beside `registry::exemptions`, with a case per axis in each gate's fixture pair; gate-sdk/SPEC.md §check-gate-exemption-tasks states the grammar the shared reader takes.
+
+**Cost while deferred:** latent, since no tracked declaration carries a list; a consumer's unspaced tag escapes the disposition check. Filed 2026-10-16 by gate-substrate-sdk-pass' close, promoted off a gap that spec filed 2026-10-15; re-verified there by reading both readers. →fix failed: the unification moves two gates' verdicts on five axes, each owing its own fixture case, which is a build's unit rather than a drain's. Owner lookup: `exception-list`, `extract_exemptions`, `exemptions` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §check-gate-exemption-tasks and delegation-kit/SPEC.md §Verify after every agent commit.
 
 ## Deferred
 
@@ -38,7 +46,7 @@ foreign agents. A lead delegating a stage to a foreign coding agent, cashing the
 
 **Item (4), stage-contract expression, landed in three slices** (operator direction each, lead-relayed, not a ruling). lifecycle-kit/SPEC.md §The stage-contract arm (foreign-stage-contract-pass, 2026-10-08): the audit stage's reading runs foreign, its host performing every write. Its §The host protocol (foreign-stage-binding-pass, 2026-10-08): one protocol file the shipped stage templates point at. Its `sweep` mode (foreign-build-budget-pass, 2026-10-15): the build stage's file changes run foreign, the host applying the patch, running the oracle and returning each red, accepted on stub-driven crate cases with no live-run grant. **Two grants spent** (operator grants 2026-10-08 and 2026-10-09, lead-relayed) on audit-mode stages, each landing commit carrying the run's `OK` line: the agent wrote nothing, returned every write as a full-text proposal, and left each command needing the gate binary to the host.
 
-**Granted, unspent (operator grant 2026-10-15, lead-relayed):** one live run for crate-name-reader-pass' build in `sweep` mode on the `codex-session` adapter, its budget read OK at 8% used — item (a) above. Left unspent: that adapter pins a read-only sandbox, the permission system denied a workspace-write copy, and the build ran on the master harness (operator direction 2026-10-15, lead-relayed).
+**Granted, unspent (operator grant 2026-10-16, lead-relayed):** one live run of gate-dispatch-hermetic-pass' build in `sweep` mode, item (a) above, conditional on the permission-settings edit lifting the `codex-session` adapter's read-only sandbox, which the permission system denied at crate-name-reader-pass' build and which waits on the operator's explicit confirmation; no such edit is confirmed.
 
 **Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, the pattern the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service) and [plugin-harness-reach](#plugin-harness-reach).
 
@@ -152,9 +160,9 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Release (operator directions, lead-relayed, not rulings):** v0.32.0 stays deferred, closing push only, no tag and no publish, by a direction of 2026-10-12. **The bar for the cut, the same direction:** cut once no open finding is a wrong grant or a regression from v0.31.0; a fall-through hole rides as a declared limit in the note. Which open finding the bar blocks is read by the session that next weighs a cut, against its own runs. **At each close since 2026-10-13** the operator rested that reading on the iteration's second-vendor review returning clean, a failed run or a finding leaving the bar a judgment being asked, never skipped or met by a same-vendor reader; on 2026-10-14 the one granted run moved to validate, none at close. **Since 2026-10-14** a close promotes every verdict-moving guard change it would author rather than landing it, the close binding carrying the rule, so a finding the review returns waits for a later build and validate. Three closes read the bar unmet on findings the latest review returned; the last, `grant-redirect-scan-cr`, landed at guard-word-read-release-pass. **That close, by a direction of 2026-10-15,** runs one audit-mode second-vendor review over the iteration's range and cuts v0.32.0 on a clean return, closing push plus tag push; a finding or a failed run defers, a verdict-moving finding promoted. The run failed on the vendor's credit wall, so v0.32.0 stays deferred; foreign-build-budget-pass' close, granted no run, ran none and deferred it again. crate-name-reader-pass' validate spent its one granted run, not clean on one regression the operator ruled a hotfix for; its close deferred v0.32.0 again with no second run granted (operator direction 2026-10-15, lead-relayed), and gate-substrate-sdk-pass' close, given no new answer, deferred it under that direction. That cut's `publish` run produces this observation and [front-door-job-observed](#front-door-job-observed)'s.
 
-**Granted, unspent (operator grant 2026-10-15, lead-relayed):** one audit-mode second-vendor review on the `codex-review` adapter at crate-name-reader-pass' validate, over that iteration's range; a clean return lets its close cut v0.32.0, and a finding or a failed run defers as above.
+**Granted, unspent (operator grant 2026-10-16, lead-relayed):** one second-vendor review over gate-dispatch-hermetic-pass' range and the v0.32.0 cut on its clean return; a finding or a failed run defers as above.
 
-**Push need (2026-10-15, inside the budget):** the v0.32.0 tag push beside crate-name-reader-pass' closing push, spent only on the granted review's clean return; no unit of that set reads a remote run.
+**Push need (2026-10-16, overrun ruled by the operator, lead-relayed):** the v0.32.0 tag push, spent only on that clean return, the set's third against a budget of two beside the closing push and [custom-rust-gates](#custom-rust-gates)' mid-iteration push.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
@@ -165,6 +173,8 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 an adopter cannot dispatch a gate they compiled. Split 2026-10-15 at spec from `custom-gate-substrates`, the split the lead's dispatch left to spec (operator direction, option C, lead-relayed): the parent landed a descriptor's `# exec:` field with one target class, a PowerShell script, and this entry widens the class to an executable the adopter builds. Custom Rust gates are wanted as a capability (operator direction, 2026-09-27, lead session); docs/requirements.md §Writing your own Rust gates states that no path exists. **Horizon, operator direction 2026-10-16, lead-relayed (not a ruling):** stays `next` after its split parent landed.
 
 **Deliverable:** an `# exec:` target class started directly, with the executable naming a native-Windows target needs, and the install page's prerequisites for a Rust gate. Whether the battery checks an adopter-built binary against its source, as `check-gate-binary-fresh` checks the shipped one, is spec's.
+
+**Push need (2026-10-16, overrun ruled by the operator, lead-relayed):** one mid-iteration push, shared with [windows-shell-gate-dispatch](#windows-shell-gate-dispatch), since a Windows leg is the first run to start a consumer member there.
 
 **Cost while deferred:** an adopter wanting a typed, testable gate writes shell or PowerShell, or forks the binary and owns its release. Filed 2026-10-15 by spec, as the split above.
 
@@ -394,17 +404,9 @@ a registered `.sh` gate is spawned by its declaration path with no interpreter w
 
 **Inferred, not run:** that native Windows refuses to start the script, since no Windows leg dispatches a `.sh` member and this machine has no Windows host. Read off the source at gate-substrate-sdk-pass' close.
 
+**Push need (2026-10-16, overrun ruled by the operator, lead-relayed):** the mid-iteration push [custom-rust-gates](#custom-rust-gates) spends, landing in its batch.
+
 **Cost while deferred:** a native-Windows adopter's shell gate may fail as a dispatch harness error where the docs promise it runs. Filed 2026-10-16 by gate-substrate-sdk-pass' close, promoted off a gap that spec filed 2026-10-15. →fix failed: the candidate fixes are a Windows dispatch change no local host can test and a docs withdrawal, and the leg that decides between them is unrun. Owner lookup: `dispatch_one`, `shell gate`, `Git for Windows`, `Windows` in this file and the disposed-findings record — none; the 2026-10-10 `sole link` record, DISTINCT (hook placement); owner gate-sdk/SPEC.md §The gate-authoring surface.
-
-### exception-list-reader-split
-
-[cost: event/low] [surface: gate-sdk]
-
-the two readers of the `# exception-list:` shell-array grammar diverge on five axes. `check-gate-tamper`'s `extract_exemptions` (`native/src/gates/gate_tamper.rs`) accepts the tag unspaced, strips quotes without protecting parentheses, takes each element's first token and yields nothing for a one-line array; `check-gate-exemption-tasks` (`gate_exemption_tasks.rs`) needs `# exception-list:` exactly, skips quoted parentheses, reads the whole line and reds a one-line array. An unspaced tag is tamper-read and never disposition-checked. The descriptor's `# exception:` lines already share one parser, `registry::exemptions`.
-
-**Deliverable:** one shared array reader both gates call, beside `registry::exemptions`, with a case per axis in each gate's fixture pair; gate-sdk/SPEC.md §check-gate-exemption-tasks states the grammar the shared reader takes.
-
-**Cost while deferred:** latent, since no tracked declaration carries a list; a consumer's unspaced tag escapes the disposition check. Filed 2026-10-16 by gate-substrate-sdk-pass' close, promoted off a gap that spec filed 2026-10-15; re-verified there by reading both readers. →fix failed: the unification moves two gates' verdicts on five axes, each owing its own fixture case, which is a build's unit rather than a drain's. Owner lookup: `exception-list`, `extract_exemptions`, `exemptions` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §check-gate-exemption-tasks and delegation-kit/SPEC.md §Verify after every agent commit.
 
 ### case-pin-outranked-by-env
 
