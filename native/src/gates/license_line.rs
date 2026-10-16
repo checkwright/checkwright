@@ -155,13 +155,8 @@ fn license_section<'a>(text: &'a str, heading: &str) -> Option<Vec<&'a str>> {
 
 fn generated(text: &str) -> bool {
     let lines = fresh::file_lines(text);
-    if lines.first().map(|l| l.trim_end()) != Some("---") {
-        return false;
-    }
-    lines[1..]
-        .iter()
-        .take_while(|l| l.trim_end() != "---")
-        .any(|l| l.trim() == "generated: true")
+    let span = crate::spec::front_matter_span(&lines);
+    lines[..span].iter().any(|l| l.trim() == "generated: true")
 }
 
 // spec: docs/site-architecture.md §The license line — a walked README is compared to the source's
@@ -351,5 +346,8 @@ mod tests {
         assert!(generated("---\ntitle: README\ngenerated: true\n---\n# x\n"));
         assert!(!generated("# x\n---\ngenerated: true\n---\n"));
         assert!(!generated("---\ntitle: README\n---\ngenerated: true\n"));
+        assert!(generated("---\ntitle: README\ngenerated: true\n...\n# x\n"));
+        assert!(!generated("---\ntitle: README\n...\ngenerated: true\n---\n"));
+        assert!(!generated("---\ntitle: README\ngenerated: true\n"));
     }
 }

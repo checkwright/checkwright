@@ -49,23 +49,11 @@ struct Row {
 // spec: gate-sdk/SPEC.md §lib/declaration.sh — the note set is the posts dir filtered by the
 // `release:` front-matter key; the announcement post carries no front matter and is not a note
 pub fn front_matter_release(text: &str) -> Option<String> {
-    let mut fm = 0usize;
-    for line in text.lines() {
-        if line.starts_with("---")
-            && line[3..]
-                .bytes()
-                .all(|b| matches!(b, b' ' | b'\t' | b'\r' | b'\x0b' | b'\x0c'))
-        {
-            fm += 1;
-            continue;
-        }
-        if fm == 1 {
-            if let Some(rest) = line.strip_prefix("release:") {
-                return Some(rest.trim_start_matches([' ', '\t']).to_string());
-            }
-        }
-    }
-    None
+    let lines: Vec<&str> = text.lines().collect();
+    lines[..crate::spec::front_matter_span(&lines)]
+        .iter()
+        .find_map(|l| l.strip_prefix("release:"))
+        .map(|rest| rest.trim_start_matches([' ', '\t']).to_string())
 }
 
 // spec: installer/SPEC.md §Versioning — history ∪ live, the reader every truncated evidence file
@@ -383,6 +371,10 @@ mod tests {
             front_matter_release("---\ntitle: x\n---\n\nrelease: v1.2.3\n"),
             None
         );
+        assert_eq!(front_matter_release("---\nrelease: v1.2.3\n...\n").as_deref(), Some("v1.2.3"));
+        assert_eq!(front_matter_release("---\ntitle: x\n...\nrelease: v1.2.3\n---\n"), None);
+        assert_eq!(front_matter_release("---\nrelease: v1.2.3\n"), None);
+        assert_eq!(front_matter_release("# x\n\n---\nrelease: v1.2.3\n---\n"), None);
     }
 
     #[test]

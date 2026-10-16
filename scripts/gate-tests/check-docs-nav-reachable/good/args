@@ -5,7 +5,8 @@
 # mirror in a directory with no index.md reached only through a top-level
 # page's nav_suffix pair, a titleless note (notes/v1.md) reached only through
 # the derived-children rule (the Releases page names `release`, whose value
-# labels it), and an off-nav fragment (no front matter, unlinked) rescued by
+# labels it), a top-level nav page whose front matter closes on dots
+# (dotted.md), and an off-nav fragment (no front matter, unlinked) rescued by
 # the allowlist. The gate PASSES.
 docs
 docs-offnav.list

@@ -187,13 +187,10 @@ fn first_line_is_fence(p: &str) -> bool {
 fn frame(raw: &str) -> String {
     let s: String = raw.chars().filter(|c| *c != '\0').collect();
     let lines: Vec<&str> = s.split('\n').collect();
-    if lines.first().is_some_and(|l| is_fence(l)) {
-        if let Some(close) = lines.iter().skip(1).position(|l| is_fence(l)) {
-            let close = close + 1;
-            return format!("{}{}", "\n".repeat(close + 1), lines[close + 1..].join("\n"));
-        }
+    match crate::spec::front_matter_span(&lines) {
+        0 => s,
+        span => format!("{}{}", "\n".repeat(span), lines[span..].join("\n")),
     }
-    s
 }
 
 // spec: site-kit/SPEC.md §check-docs-liquid-parse — the verdict's first line, cut to 200 characters with a trailing ellipsis
@@ -246,6 +243,7 @@ mod tests {
         assert_eq!(frame("--- \r\nt: {{\r\n---\r\nbody"), "\n\n\nbody");
         assert_eq!(frame("body\n---\n{{ a\n---\n"), "body\n---\n{{ a\n---\n");
         assert_eq!(frame("---\nnever closed {{\n"), "---\nnever closed {{\n");
+        assert_eq!(frame("---\nt: {{\n... \n{{ a\n---\n"), "\n\n\n{{ a\n---\n");
         assert_eq!(frame("a\0b"), "ab");
     }
 

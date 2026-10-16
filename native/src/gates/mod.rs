@@ -1623,7 +1623,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-release-bump",
         release_bump::run,
-        &[("?", "", "", "dynamic@src/gates/release_bump.rs:156")],
+        &[("?", "", "", "dynamic@src/gates/release_bump.rs:144")],
         &["GATE_LOCAL_RELEASE_POSTS_DIR", "GATE_SDK_RELEASE_SECTIONS", "GATE_SDK_RELEASE_SECTION_ALIASES"],
         "-",
         &[("git", "")],
@@ -1684,7 +1684,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-docs-kit-parity",
         docs_kit_parity::run,
-        &[("?", "", "", "dynamic@src/gates/docs_kit_parity.rs:86")],
+        &[("?", "", "", "dynamic@src/gates/docs_kit_parity.rs:72")],
         &["GATE_LOCAL_KIT_REGISTRY_PAGE"],
         "-",
         &[],
@@ -1718,7 +1718,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-docs-nav-reachable",
         docs_nav_reachable::run,
-        &[("?", "", "", "dynamic@src/gates/docs_nav_reachable.rs:261")],
+        &[("?", "", "", "dynamic@src/gates/docs_nav_reachable.rs:235")],
         &["SITE_KIT_DOCS_DIR", "GATE_LOCAL_OFFNAV_LIST"],
         "-",
         &[("git", "")],
@@ -1942,7 +1942,7 @@ pub const REGISTRY: &[GateEntry] = &[
         license_line::run,
         &[
             (".", "name:knob:GATE_LOCAL_README_FILE", "", ""),
-            ("?", "", "", "dynamic@src/gates/license_line.rs:260"),
+            ("?", "", "", "dynamic@src/gates/license_line.rs:255"),
         ],
         &[
             "GATE_SDK_PRUNE_DIRS",

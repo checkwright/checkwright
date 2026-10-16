@@ -66,6 +66,7 @@
 - `check-gate-substrate-parity` — assertion K admits a second target class, a program you build, whose name carries no `.` and which K never looks for, being a build output, and reds an `# exec:` value ending in a separator. `check-gate-assertions` counts such a member out of reach on its clean line, and `--emit port-blockers` reports no row for it. Nothing to do; fix a finding as it names.
 - `check-gate-fixture-coverage` — reds `# no-fixture:` on a descriptor carrying `# exec:`, since a PowerShell gate's fixture pair is the only check of its output and fail-closed contracts. Give the gate a `good/` and `bad/` pair.
 - `check-gate-tamper` — now runs at `pre-commit` on a staged `.gate` descriptor, a `.ps1` exec target or any path your `DELEGATION_KIT_GATE_FILES` names, where only a staged `.sh` triggered it, so a descriptor edit staged beside a non-meta path reds at the hook rather than first in the full battery. Split the gate edit into its own commit.
+- `check-md-unwrapped` and `check-docs-liquid-parse` — read a page's front matter as canon-kit's front-matter span, so a block closed on a `...` line is skipped as front matter, where its metadata was read as body and a later `---` line, a thematic break say, was taken for its closer. A page closed on dots can lose a finding its metadata caused, or gain one in the body above that later line. Fix a finding as the gate's help line says.
 
 ## Knob changes
 

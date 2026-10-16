@@ -28,23 +28,9 @@ pub fn run(args: &[String]) -> i32 {
 // matter nesting the page under the Kit Reference parent, `nav_parent: kits` plus a
 // `nav_child_order` slot
 fn has_nav_block(text: &str) -> bool {
-    let mut fm = false;
+    let lines: Vec<&str> = text.lines().collect();
     let (mut parent, mut order) = (false, false);
-    for (n, line) in text.lines().enumerate() {
-        if n == 0 {
-            if line != "---" {
-                return false;
-            }
-            fm = true;
-            continue;
-        }
-        if fm && line == "---" {
-            fm = false;
-            continue;
-        }
-        if !fm {
-            continue;
-        }
+    for line in &lines[..crate::spec::front_matter_span(&lines)] {
         if let Some(rest) = line.strip_prefix("nav_parent:") {
             if trim(rest) == "kits" {
                 parent = true;
@@ -132,6 +118,9 @@ mod tests {
             "---\n---\nnav_parent: kits\nnav_child_order: 3\n"
         ));
         assert!(!has_nav_block("---\nnav_parent: kitsch\nnav_child_order: 3\n---\n"));
+        assert!(has_nav_block("---\nnav_parent: kits\nnav_child_order: 3\n...\n"));
+        assert!(!has_nav_block("---\nnav_parent: kits\n...\nnav_child_order: 3\n---\n"));
+        assert!(!has_nav_block("---\nnav_parent: kits\nnav_child_order: 3\n"));
         assert!(!has_nav_block("---\nnav_parent: kits\nnav_child_order: x\n---\n"));
     }
 

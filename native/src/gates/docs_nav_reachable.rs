@@ -50,21 +50,8 @@ fn key_matches<'a>(line: &'a str, key: &str) -> Option<&'a str> {
 
 fn front_matter(text: &str) -> Fm {
     let mut fm = Fm::default();
-    let mut inside = false;
-    for (n, line) in text.lines().enumerate() {
-        if n == 0 {
-            if line != "---" {
-                return Fm::default();
-            }
-            inside = true;
-            continue;
-        }
-        if inside && line == "---" {
-            inside = false;
-        }
-        if !inside {
-            continue;
-        }
+    let lines: Vec<&str> = text.lines().collect();
+    for &line in &lines[..crate::spec::front_matter_span(&lines)] {
         if key_matches(line, "title:").is_some() {
             fm.title = true;
         }
@@ -108,21 +95,8 @@ fn suffix_target(root: &str, pair: &str) -> Option<String> {
 // derived-children rule: a page whose front matter carries a key a nav page names in
 // nav_children_key holds a nav slot and takes the key value as its label
 fn key_value(text: &str, key: &str) -> String {
-    let mut inside = false;
-    for (n, line) in text.lines().enumerate() {
-        if n == 0 {
-            if line != "---" {
-                return String::new();
-            }
-            inside = true;
-            continue;
-        }
-        if inside && line == "---" {
-            return String::new();
-        }
-        if !inside {
-            continue;
-        }
+    let lines: Vec<&str> = text.lines().collect();
+    for line in &lines[..crate::spec::front_matter_span(&lines)] {
         let fields: Vec<&str> = line.split(is_space).filter(|f| !f.is_empty()).collect();
         if fields.first() == Some(&key) {
             return fields.get(1).unwrap_or(&"").to_string();
@@ -415,6 +389,11 @@ mod tests {
         assert!(!none.title);
         let closed = front_matter("---\n---\nnav_order: 2\n");
         assert!(!closed.order);
+        let dotted = front_matter("---\ntitle: X\n...\nnav_order: 2\n---\n");
+        assert!(dotted.title && !dotted.order);
+        assert!(!front_matter("---\ntitle: X\n").title);
+        assert_eq!(key_value("---\nversion: 1\n...\n", "version:"), "1");
+        assert_eq!(key_value("---\na: 1\n...\nversion: 1\n---\n", "version:"), "");
     }
 
     // spec: docs/site-architecture.md §Site chrome and the nav contract — a pair resolves

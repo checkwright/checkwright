@@ -1,3 +1,5 @@
 # No args: this case's docs/queue-kit page carries 'nav_parent: kits' but no
-# 'nav_child_order' slot, beside a lifecycle-kit page carrying both — only the
-# queue-kit page trips the nav child block sweep.
+# 'nav_child_order' slot, and its docs/site-kit page closes its block on dots
+# and spells the slot below it in the body, beside a lifecycle-kit page
+# carrying both — the queue-kit and site-kit pages trip the nav child block
+# sweep.

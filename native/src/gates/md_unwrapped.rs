@@ -159,15 +159,8 @@ pub fn scan(text: &str, leads: &[String]) -> Vec<Line> {
     let mut para: Option<usize> = None;
     let mut list_open = false;
     let mut exempt_next = false;
-    let mut start = 0usize;
-    if lines.first().map(|l| l.trim_end()) == Some("---") {
-        if let Some(end) = lines.iter().skip(1).position(|l| l.trim_end() == "---") {
-            for _ in 0..end + 2 {
-                out.push(Line { soft: false, content: 0 });
-            }
-            start = end + 2;
-        }
-    }
+    let start = spec::front_matter_span(&lines);
+    out.extend((0..start).map(|_| Line { soft: false, content: 0 }));
     for line in lines.iter().skip(start) {
         let (depth, qat) = strip_quotes(line);
         let body = &line[qat..];
@@ -388,6 +381,8 @@ mod tests {
         assert!(soft("<!--\na\nb\n-->\n").is_empty());
         assert!(soft("<div>\na\nb\n</div>\n").is_empty());
         assert!(soft("---\ntitle: a\nb: c\n---\n").is_empty());
+        assert!(soft("---\ntitle: a\nb: c\n...\n").is_empty());
+        assert_eq!(soft("---\ntitle: a\n...\n\nx\ny\n\n---\n"), vec![6]);
         assert!(soft("    code\n    more\n").is_empty());
         assert!(soft("a  \nb\n").is_empty());
         assert!(soft("a\\\nb\n").is_empty());

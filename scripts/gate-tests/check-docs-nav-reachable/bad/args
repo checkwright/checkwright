@@ -8,6 +8,7 @@
 # rescue it either; tools-overview.md is a child of Tools that both its
 # siblings link and that links each of them, an overview sitting as their
 # sibling; and Tools' nav_suffix names an absent page and carries a pair with
-# no '='. The gate REJECTS.
+# no '='; and dotted.md closes its front matter on dots and spells its
+# nav_order below the closer, in the body, where it is no slot. The gate REJECTS.
 docs
 docs-offnav.list

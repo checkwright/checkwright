@@ -1,1 +1,2 @@
 docs/queue-kit/index.md
+docs/site-kit/index.md
