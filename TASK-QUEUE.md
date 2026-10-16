@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: budget-feed-observation-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -9,6 +9,46 @@
 ## New Features
 
 ## Technical Debt
+
+### heterogeneous-agent-delegation
+
+[roadmap: now/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
+
+foreign agents. A lead delegating a stage to a foreign coding agent, cashing the public no-lock-in claim: governance enforced at the git/gate boundary, not by trusting the author. *Remaining:* one observation, settled by one granted live run: a live turn refreshing the budget feed. Whether the entry then closes is the operator's. The other, whether a turn in a vendor's non-persisting mode leaves a usage event on disk, split off as `ephemeral-turn-usage-read` (operator direction 2026-10-16, lead-relayed, not a ruling) and read at validate: the SPEC's sentence stands. **Promoted at budget-feed-observation-pass' scope (operator direction 2026-10-16, lead-relayed, not a ruling)**, the observation read off that iteration's one granted validate review run (operator grant 2026-10-16), its adapter turn being the live turn.
+
+**Inferred, not run:** that the review's adapter turn runs in a session-keeping mode, so it refreshes the feed — cannot run here: the grant's one run is validate's
+
+**Slices landed**, in delegation-kit/SPEC.md §The foreign-vendor run, the first two each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); (2) the dispatch transport with (1) the escalation resume model, `--foreign-resume` (delegation-transport-pass, 2026-10-03); (3) the budget oracle, §The keyed verdict (delegation-wait-journal-pass, 2026-10-07), accepted by stub-driven crate cases and one producer read of a vendor's on-disk session store. **This repo's binding (operator direction, 2026-10-07, lead-relayed, not a ruling):** inline in the gitignored `.local` overlay alone, its adapters reading one snapshot under the metric dir from an inline producer. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
+
+**Item (4), stage-contract expression, landed in three slices** (operator direction each, lead-relayed, not a ruling). lifecycle-kit/SPEC.md §The stage-contract arm (foreign-stage-contract-pass, 2026-10-08): the audit stage's reading runs foreign, its host performing every write. Its §The host protocol (foreign-stage-binding-pass, 2026-10-08): one protocol file the shipped stage templates point at. Its `sweep` mode (foreign-build-budget-pass, 2026-10-15): the build stage's file changes run foreign, the host applying the patch, running the oracle and returning each red, accepted on stub-driven crate cases with no live-run grant. **Two grants spent** (operator grants 2026-10-08 and 2026-10-09, lead-relayed) on audit-mode stages, each landing commit carrying the run's `OK` line: the agent wrote nothing, returned every write as a full-text proposal, and left each command needing the gate binary to the host.
+
+**Third grant spent (operator grant 2026-10-16, lead-relayed):** gate-dispatch-hermetic-pass' build ran in `sweep` mode foreign end to end on `codex-session`, class judgment, once the operator confirmed the edit lifting that adapter's read-only sandbox in the gitignored overlay: turn 1 `OK` with two bespoke-test reds returned, the resume turn `OK` and applied, the landing commit carrying both lines.
+
+**Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, the pattern the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service) and [plugin-harness-reach](#plugin-harness-reach).
+
+**Demand attested (2026-07-23):** the operator holds three foreign-vendor subscriptions and wants read-heavy delegation routed to them for budget headroom. **Its citer** [companion-toolkit-profile](#companion-toolkit-profile) blocks on none of it.
+
+**Attribution, operator direction 2026-09-30, lead-relayed (not a ruling):** foreign harnesses' commit trailers off and the method stated in one place, the README, held by construction (foreign work lands in the delegating session's commit); a harness setting change takes the operator's confirmation.
+
+**Design memory (2026-07-25, 2026-08-02):** JSONL turn events ship on the installed binaries probed. The machine profile (context-kit/SPEC.md §bin/env-probe, local-only) owns which CLIs and how.
+
+**Cost while deferred:** stage-level work still bills one vendor's budget, and the design memory ages against fast-moving CLIs. Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question).
+
+### set-record-lost-at-done-move
+
+a record scope lands for the whole unit set on one entry is lost when that entry moves to Done mid-iteration. At guard-grant-review-pass scope landed the Push need line and the operator's unit-set direction on the set's lead entry. The first build batch moved that entry to Done, a done line keeps only the slug, and the two remaining entries pointed at it. The second batch re-landed both under the queue's iteration header, outside the entry grammar, and close removed them by hand.
+
+**Deliverable:** a set-wide record given a home that outlives any one entry until close, or the Done move refusing while a live entry cites the body it removes. Which one is the authoring stage's, and the first is a feature.
+
+**Cost while deferred:** a batch split loses the push budget's stated need and a direction's record unless a session notices. Filed 2026-10-13 by guard-grant-review-pass' lead and promoted at the next scope's intake. Re-verified there against that close's drain commit message, which names the block leaving with the Done section. Owner lookup: `Done move`, `set-wide`, `Push need` in this file and the disposed-findings record — [section-prose-outlives-its-entries](#section-prose-outlives-its-entries), DISTINCT (a section preamble surviving Clear-Done, where this is a body lost ahead of it); [operator-authored-unit-set](#operator-authored-unit-set), DISTINCT (who authors a set); owner lifecycle-kit/SPEC.md §templates/stages/ and queue-kit/SPEC.md §The icebox tier.
+
+### trajectory-limits-unstated
+
+drift-kit/SPEC.md §The published-evidence extractor says the extractor "states plainly that no controlled ungoverned baseline exists", and that the knowledge-friction exclusion is "stated as a limitation on the framing page". `native/src/emit/trajectory.rs` prints neither: its `--human` header is two lines naming neither limit, and no framing page exists, since `docs/evidence-data.md` is the bare table.
+
+**Deliverable:** the two limits stated where a reader of the published evidence meets them, either in the arm's output or on a framing page around the committed projection, or the SPEC's two claims narrowed to what the arm prints; which one is spec's.
+
+**Cost while deferred:** a reader trusting the SPEC believes the published evidence carries its own caveats, and it carries none. Filed 2026-10-05 by context-kit-tail-publisher-pass' build. Re-verified: the `--human` branch of `emit` pushes the two header lines alone, and no `docs/` page outside the SPEC mirrors names an ungoverned baseline. Owner lookup: `ungoverned`, `framing page`, `trajectory` in this file — benchmark-ab-experiment, DISTINCT (the controlled experiment itself); owner drift-kit/SPEC.md §The published-evidence extractor.
 
 ## Deferred
 
@@ -27,28 +67,6 @@ a controlled A/B trial.
 hosted attestation. The team/paid rung: gates verified server-side by a party the committing agents cannot touch — hosted gate runs as a neutral attestation, cross-repo drift dashboards, maintained rulesets. A service, not code: cloning the kits does not clone the neutrality or the ops. Demand-gated — this entry is the public roadmap marker, not a scaffold; hosting and sequencing decisions are on record in the operator's local brief, and multi-operator-semantics is its prerequisite mechanism. Surfaced 2026-07-07.
 
 **Cost while deferred:** zero — this is a service rather than tree mechanism, so nothing rots; the residue is that gate runs stay self-attested, which binds only when a party the committing agents cannot touch is asked to trust them.
-
-### heterogeneous-agent-delegation
-
-[cost: iteration/low] [surface: delegation-kit] [roadmap: now/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
-
-foreign agents. A lead delegating a stage to a foreign coding agent, cashing the public no-lock-in claim: governance enforced at the git/gate boundary, not by trusting the author. *Remaining:* one observation, settled by one granted live run: a live turn refreshing the budget feed. Whether the entry then closes is the operator's. The other, whether a turn in a vendor's non-persisting mode leaves a usage event on disk, split off as `ephemeral-turn-usage-read` (operator direction 2026-10-16, lead-relayed, not a ruling) and read at validate: the SPEC's sentence stands.
-
-**Slices landed**, in delegation-kit/SPEC.md §The foreign-vendor run, the first two each accepted by one granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); (2) the dispatch transport with (1) the escalation resume model, `--foreign-resume` (delegation-transport-pass, 2026-10-03); (3) the budget oracle, §The keyed verdict (delegation-wait-journal-pass, 2026-10-07), accepted by stub-driven crate cases and one producer read of a vendor's on-disk session store. **This repo's binding (operator direction, 2026-10-07, lead-relayed, not a ruling):** inline in the gitignored `.local` overlay alone, its adapters reading one snapshot under the metric dir from an inline producer. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
-
-**Item (4), stage-contract expression, landed in three slices** (operator direction each, lead-relayed, not a ruling). lifecycle-kit/SPEC.md §The stage-contract arm (foreign-stage-contract-pass, 2026-10-08): the audit stage's reading runs foreign, its host performing every write. Its §The host protocol (foreign-stage-binding-pass, 2026-10-08): one protocol file the shipped stage templates point at. Its `sweep` mode (foreign-build-budget-pass, 2026-10-15): the build stage's file changes run foreign, the host applying the patch, running the oracle and returning each red, accepted on stub-driven crate cases with no live-run grant. **Two grants spent** (operator grants 2026-10-08 and 2026-10-09, lead-relayed) on audit-mode stages, each landing commit carrying the run's `OK` line: the agent wrote nothing, returned every write as a full-text proposal, and left each command needing the gate binary to the host.
-
-**Third grant spent (operator grant 2026-10-16, lead-relayed):** gate-dispatch-hermetic-pass' build ran in `sweep` mode foreign end to end on `codex-session`, class judgment, once the operator confirmed the edit lifting that adapter's read-only sandbox in the gitignored overlay: turn 1 `OK` with two bespoke-test reds returned, the resume turn `OK` and applied, the landing commit carrying both lines.
-
-**Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, the pattern the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service) and [plugin-harness-reach](#plugin-harness-reach).
-
-**Demand attested (2026-07-23):** the operator holds three foreign-vendor subscriptions and wants read-heavy delegation routed to them for budget headroom. **Its citer** [companion-toolkit-profile](#companion-toolkit-profile) blocks on none of it.
-
-**Attribution, operator direction 2026-09-30, lead-relayed (not a ruling):** foreign harnesses' commit trailers off and the method stated in one place, the README, held by construction (foreign work lands in the delegating session's commit); a harness setting change takes the operator's confirmation.
-
-**Design memory (2026-07-25, 2026-08-02):** JSONL turn events ship on the installed binaries probed. The machine profile (context-kit/SPEC.md §bin/env-probe, local-only) owns which CLIs and how.
-
-**Cost while deferred:** stage-level work still bills one vendor's budget, and the design memory ages against fast-moving CLIs. Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question).
 
 ### companion-toolkit-profile
 
@@ -156,6 +174,8 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Second grant of 2026-10-16 spent (operator grant, lead-relayed):** tamper-reader-repair-pass' validate ran the review over its range, the set `exception-list-reader-gaps`, `exec-target-tamper-suffix`, `ephemeral-turn-usage-read`, `front-matter-reader-span` and `input-redirect-scan-cr`. It returned three P2 findings, so under the grant's own terms v0.32.0 stayed deferred and its tag push unspent; that close landed all three, none verdict-moving.
 
+**Third grant of 2026-10-16 (operator grant, lead-relayed), unspent at scope:** budget-feed-observation-pass' validate runs one second-vendor review over its range; v0.32.0 is cut on a clean return. **Push need (2026-10-16, inside the budget):** the closing push, plus the tag push on a clean return; landed here, where a Done move cannot take it.
+
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
 ### plugin-harness-reach
@@ -229,16 +249,6 @@ the delivery rule under `lead-notification-wake-race`'s remedy, unprobed: does a
 **Inferred, not run:** that a tool call before the turn end delivers the notification — two stalled transcripts show only an undrained queue at the stop, and one 2026-10-02 lead turn with tool calls received its notification inside the turn.
 
 **Cost while deferred:** the lead's wait clause rests on an inferred mechanism; if it is wrong, a stall still costs hours of idle wall-clock until the operator wakes the lead. Filed 2026-10-02 as a split at companion-tier-delegation-pass' scope, operator direction lead-relayed (not a ruling).
-
-### trajectory-limits-unstated
-
-[cost: event/low] [surface: drift-kit]
-
-drift-kit/SPEC.md §The published-evidence extractor says the extractor "states plainly that no controlled ungoverned baseline exists", and that the knowledge-friction exclusion is "stated as a limitation on the framing page". `native/src/emit/trajectory.rs` prints neither: its `--human` header is two lines naming neither limit, and no framing page exists, since `docs/evidence-data.md` is the bare table.
-
-**Deliverable:** the two limits stated where a reader of the published evidence meets them, either in the arm's output or on a framing page around the committed projection, or the SPEC's two claims narrowed to what the arm prints; which one is spec's.
-
-**Cost while deferred:** a reader trusting the SPEC believes the published evidence carries its own caveats, and it carries none. Filed 2026-10-05 by context-kit-tail-publisher-pass' build. Re-verified: the `--human` branch of `emit` pushes the two header lines alone, and no `docs/` page outside the SPEC mirrors names an ungoverned baseline. Owner lookup: `ungoverned`, `framing page`, `trajectory` in this file — benchmark-ab-experiment, DISTINCT (the controlled experiment itself); owner drift-kit/SPEC.md §The published-evidence extractor.
 
 ### site-health-probe-unexecuted
 
@@ -331,16 +341,6 @@ the session-context hook member's scratch sweep removes scratch a live session s
 **Inferred, not run:** that the sweep is what removed both at guard-spelling-oracle-pass — read off its tidy line by that iteration's lead; age a scratch role marker past the horizon and start the member over it
 
 **Cost while deferred:** a resumed lead silently loses its executor-step suppression, and a survey witness cannot be re-run without rebuilding its input. Filed 2026-10-13 by guard-spelling-oracle-pass' lead and promoted at the next scope's intake. Re-verified there by reading `sweep_dir`. Owner lookup: `scratch sweep`, `role marker`, `STALE_SECS` in this file and the disposed-findings record — [session-sweep-horizon-baked](#session-sweep-horizon-baked), DISTINCT (the horizon's value, where this is what the sweep spares at any horizon); owner context-kit/SPEC.md §The session-context hook.
-
-### set-record-lost-at-done-move
-
-[cost: event/low] [surface: lifecycle-kit]
-
-a record scope lands for the whole unit set on one entry is lost when that entry moves to Done mid-iteration. At guard-grant-review-pass scope landed the Push need line and the operator's unit-set direction on the set's lead entry. The first build batch moved that entry to Done, a done line keeps only the slug, and the two remaining entries pointed at it. The second batch re-landed both under the queue's iteration header, outside the entry grammar, and close removed them by hand.
-
-**Deliverable:** a set-wide record given a home that outlives any one entry until close, or the Done move refusing while a live entry cites the body it removes. Which one is the authoring stage's, and the first is a feature.
-
-**Cost while deferred:** a batch split loses the push budget's stated need and a direction's record unless a session notices. Filed 2026-10-13 by guard-grant-review-pass' lead and promoted at the next scope's intake. Re-verified there against that close's drain commit message, which names the block leaving with the Done section. Owner lookup: `Done move`, `set-wide`, `Push need` in this file and the disposed-findings record — [section-prose-outlives-its-entries](#section-prose-outlives-its-entries), DISTINCT (a section preamble surviving Clear-Done, where this is a body lost ahead of it); [operator-authored-unit-set](#operator-authored-unit-set), DISTINCT (who authors a set); owner lifecycle-kit/SPEC.md §templates/stages/ and queue-kit/SPEC.md §The icebox tier.
 
 ### grant-pwsh-word-read
 
