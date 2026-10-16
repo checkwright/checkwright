@@ -1076,9 +1076,3 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 
 ## Done
 
-- custom-rust-gates
-- windows-shell-gate-dispatch
-- crate-test-unremaps-binary
-- case-pin-outranked-by-env
-- exception-list-reader-split
-
