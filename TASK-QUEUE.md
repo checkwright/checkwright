@@ -152,9 +152,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Release (operator directions, lead-relayed, not rulings):** v0.32.0 stays deferred, closing push only, no tag and no publish, by a direction of 2026-10-12. **The bar for the cut, the same direction:** cut once no open finding is a wrong grant or a regression from v0.31.0; a fall-through hole rides as a declared limit in the note. Which open finding the bar blocks is read by the session that next weighs a cut, against its own runs. **At each close since 2026-10-13** the operator rested that reading on the iteration's second-vendor review returning clean, a failed run or a finding leaving the bar a judgment being asked, never skipped or met by a same-vendor reader; on 2026-10-14 the one granted run moved to validate, none at close. **Since 2026-10-14** a close promotes every verdict-moving guard change it would author rather than landing it, the close binding carrying the rule, so a finding the review returns waits for a later build and validate. Three closes read the bar unmet on findings the latest review returned; the last, `grant-redirect-scan-cr`, landed at guard-word-read-release-pass. **That close, by a direction of 2026-10-15,** runs one audit-mode second-vendor review over the iteration's range and cuts v0.32.0 on a clean return, closing push plus tag push; a finding or a failed run defers, a verdict-moving finding promoted. The run failed on the vendor's credit wall, so v0.32.0 stays deferred; foreign-build-budget-pass' close, granted no run, ran none and deferred it again. crate-name-reader-pass' validate spent its one granted run, not clean on one regression the operator ruled a hotfix for; its close deferred v0.32.0 again with no second run granted (operator direction 2026-10-15, lead-relayed), and gate-substrate-sdk-pass' close, given no new answer, deferred it under that direction. That cut's `publish` run produces this observation and [front-door-job-observed](#front-door-job-observed)'s.
 
-**Granted, unspent (operator grant 2026-10-16, lead-relayed):** one second-vendor review over gate-dispatch-hermetic-pass' range and the v0.32.0 cut on its clean return; a finding or a failed run defers as above.
-
-**Push need (2026-10-16, overrun ruled by the operator, lead-relayed):** the v0.32.0 tag push, spent only on that clean return, the set's third against a budget of two beside the closing push and `custom-rust-gates`' mid-iteration push.
+**Grant of 2026-10-16 spent (operator grant, lead-relayed):** gate-dispatch-hermetic-pass' close ran the review over its range, which returned two findings, both carried to the next scope's intake, so v0.32.0 stayed deferred and its tag push unspent.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
@@ -373,6 +371,28 @@ five front-matter readers keep their own block bound and close it on `---` alone
 **Deliverable:** each reader bounded by `front_matter_span`, with a dots-closed case in each gate's fixture pair.
 
 **Cost while deferred:** a page closing its front matter on dots can draw a false finding or a false pass in each; no tracked page closes on dots, so the carry is an adopter's. Filed 2026-10-15 by crate-name-reader-pass' build, promoted at its close. Re-verified there by reading each reader's closer and probing every tracked page's front matter for a dots closer, none found. Owner lookup: `front_matter_span`, `dotted`, `closer` in this file and the disposed-findings record — `front-matter-dotted-closer`, done, DISTINCT (the shared span, which none of the five calls); owner canon-kit/SPEC.md §check-md-unwrapped, site-kit/SPEC.md §check-docs-liquid-parse and docs/site-architecture.md for the three consumer gates.
+
+### exception-list-reader-gaps
+
+[cost: event/high] [surface: gate-sdk]
+
+`registry::exception_arrays` in `native/src/registry.rs`, the shared exception-list reader `check-gate-tamper` and `check-gate-exemption-tasks` call since gate-dispatch-hermetic-pass, drops elements two ways, each fail-open for both gates. A regression: a `# exception-list:` tag on a line inside an open array is recognized only while no array is open, so the next tagged array is never read, where v0.31.0's own tamper reader armed it. An unstated assumption, not a regression: quote state resets on each line and ignores a backslash escape, so an escaped or unmatched quote ends or swallows the balance and later elements vanish, which gate-sdk/SPEC.md's shared shell-array grammar does not state.
+
+**Deliverable:** the tag read inside an open array, and quote state read as bash reads it (carried across lines, a backslash escaping outside single quotes) or the grammar stating the limit, each pinned by a case both gates' oracles carry.
+
+**Cost while deferred:** a regression from v0.31.0, so it holds v0.32.0 under the cut's bar, and a skipped array's exemptions go unchecked. Surfaced 2026-10-16 by gate-dispatch-hermetic-pass' close second-vendor review and an audit sweep, carried to this scope's intake; no hotfix (operator direction 2026-10-16, lead-relayed, not a ruling). Re-verified here by reading the reader's tag test, gated on no open array, its per-line quote reset, and v0.31.0's `gate_tamper.rs`, which carried its own reader. Owner lookup: `exception-list`, `exception_arrays`, `exemption-tasks` in this file and the disposed-findings record — none; `.workflow/release-declarations.md`'s `check-gate-tamper` line states the shared grammar; owner gate-sdk/SPEC.md §check-gate-exemption-tasks.
+
+### exec-target-tamper-suffix
+
+[cost: event/low] [surface: delegation-kit]
+
+`check-gate-tamper` holds an exec member's target in its gate-file set unsuffixed (`registry::exec_target`, called from `native/src/gates/gate_tamper.rs`), while dispatch starts `substrate::executable_path`, the target with the host's executable suffix. On Windows a tracked executable, which assertion K admits, sits outside the set, so a commit changing it beside product code passes assertion A unisolated. The ground delegation-kit/SPEC.md §Verify after every agent commit gives, an untracked build output never reaching a diff, does not cover the tracked case.
+
+**Deliverable:** the set holding the path dispatch starts for an executable target, a crate case pinning it, and the SPEC's ground covering the tracked case.
+
+**Inferred, not run:** the unisolated pass on a Windows seat — cannot run here: no Windows host is in reach; the gates workflow's Windows crate leg reaches it.
+
+**Cost while deferred:** a tracked exec gate on a Windows seat can change beside product code unisolated; a fail-open in mechanism new since v0.31.0, so no regression. Surfaced 2026-10-16 by gate-dispatch-hermetic-pass' close second-vendor review, carried to this scope's intake. Re-verified here by reading both sites. Owner lookup: `exec_target`, `executable_path`, `gate-tamper` in this file and the disposed-findings record — icebox [gate-tamper-consumer-gate-coverage](#gate-tamper-consumer-gate-coverage), DISTINCT (the shell gate-files glob); owner delegation-kit/SPEC.md §Verify after every agent commit.
 
 ## Icebox
 
