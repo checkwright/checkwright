@@ -64,12 +64,13 @@ gate_arm_run() {  # $1=arm flag  $2.. = the arm's own argv
 gate_run() {  # $1=gate-name  $2=checks-dir (absolute)  $3.. = gate args
     local _gr_gate="$1" _gr_dir="$2"
     shift 2
+    local _gr_out
     local -a _gr_argv=()
     # shellcheck source=./gate.sh
     source "$GATE_SDK_TEST_LIB_DIR/gate.sh"
-    mapfile -t _gr_argv < <(gate_command "$_gr_gate" "$_gr_dir")
     # spec: gate-sdk/SPEC.md §Fail-closed contract — an argv gate_command refused to build is
     # exit 2, the same verdict the dispatcher gives it, never a skipped assertion
-    [[ ${#_gr_argv[@]} -gt 0 ]] || return 2
+    _gr_out="$(gate_command "$_gr_gate" "$_gr_dir")" && [[ -n "$_gr_out" ]] || return 2
+    mapfile -t _gr_argv <<<"$_gr_out"
     "${_gr_argv[@]}" "$@"
 }

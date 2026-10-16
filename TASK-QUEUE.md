@@ -162,7 +162,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 [roadmap: next/ecosystem] [cost: event/low] [surface: gate-sdk] [roadmap-summary: Write your own gate in Rust, built by you and dispatched by the battery.]
 
-an adopter cannot dispatch a gate they compiled. Split 2026-10-15 at spec from `custom-gate-substrates`, the split the lead's dispatch left to spec (operator direction, option C, lead-relayed): the parent lands a descriptor's `# exec:` field with one target class, a PowerShell script, and this entry widens the class to an executable the adopter builds. Custom Rust gates are wanted as a capability (operator direction, 2026-09-27, lead session); docs/requirements.md §Writing your own Rust gates states that no path exists.
+an adopter cannot dispatch a gate they compiled. Split 2026-10-15 at spec from `custom-gate-substrates`, the split the lead's dispatch left to spec (operator direction, option C, lead-relayed): the parent landed a descriptor's `# exec:` field with one target class, a PowerShell script, and this entry widens the class to an executable the adopter builds. Custom Rust gates are wanted as a capability (operator direction, 2026-09-27, lead session); docs/requirements.md §Writing your own Rust gates states that no path exists.
 
 **Deliverable:** an `# exec:` target class started directly, with the executable naming a native-Windows target needs, and the install page's prerequisites for a Rust gate. Whether the battery checks an adopter-built binary against its source, as `check-gate-binary-fresh` checks the shipped one, is spec's.
 
@@ -383,6 +383,48 @@ five front-matter readers keep their own block bound and close it on `---` alone
 **Deliverable:** each reader bounded by `front_matter_span`, with a dots-closed case in each gate's fixture pair.
 
 **Cost while deferred:** a page closing its front matter on dots can draw a false finding or a false pass in each; no tracked page closes on dots, so the carry is an adopter's. Filed 2026-10-15 by crate-name-reader-pass' build, promoted at its close. Re-verified there by reading each reader's closer and probing every tracked page's front matter for a dots closer, none found. Owner lookup: `front_matter_span`, `dotted`, `closer` in this file and the disposed-findings record — `front-matter-dotted-closer`, done, DISTINCT (the shared span, which none of the five calls); owner canon-kit/SPEC.md §check-md-unwrapped, site-kit/SPEC.md §check-docs-liquid-parse and docs/site-architecture.md for the three consumer gates.
+
+### windows-shell-gate-dispatch
+
+[cost: event/low] [surface: gate-sdk]
+
+a registered `.sh` gate is spawned by its declaration path with no interpreter word: `registry::invocation` hands a `Substrate::Shell` member to `proc::dispatch` as `Program::consumer(GATE_DECLARATION, decl)`, and `proc::spawn_target` passes an argv[0] carrying a separator through untouched. docs/requirements.md §Writing your own shell gates and docs/install.md's Windows paragraph say Git for Windows' bash runs a shell gate.
+
+**Deliverable:** a native-Windows leg dispatching a registered `.sh` member, and then either the dispatch naming bash for a shell declaration on Windows or the two pages withdrawing the promise.
+
+**Inferred, not run:** that native Windows refuses to start the script, since no Windows leg dispatches a `.sh` member and this machine has no Windows host. Read off the source at gate-substrate-sdk-pass' close.
+
+**Cost while deferred:** a native-Windows adopter's shell gate may fail as a dispatch harness error where the docs promise it runs. Filed 2026-10-16 by gate-substrate-sdk-pass' close, promoted off a gap that spec filed 2026-10-15. →fix failed: the candidate fixes are a Windows dispatch change no local host can test and a docs withdrawal, and the leg that decides between them is unrun. Owner lookup: `dispatch_one`, `shell gate`, `Git for Windows`, `Windows` in this file and the disposed-findings record — none; the 2026-10-10 `sole link` record, DISTINCT (hook placement); owner gate-sdk/SPEC.md §The gate-authoring surface.
+
+### exception-list-reader-split
+
+[cost: event/low] [surface: gate-sdk]
+
+the two readers of the `# exception-list:` shell-array grammar diverge on five axes. `check-gate-tamper`'s `extract_exemptions` (`native/src/gates/gate_tamper.rs`) accepts the tag unspaced, strips quotes without protecting parentheses, takes each element's first token and yields nothing for a one-line array; `check-gate-exemption-tasks` (`gate_exemption_tasks.rs`) needs `# exception-list:` exactly, skips quoted parentheses, reads the whole line and reds a one-line array. An unspaced tag is tamper-read and never disposition-checked. The descriptor's `# exception:` lines already share one parser, `registry::exemptions`.
+
+**Deliverable:** one shared array reader both gates call, beside `registry::exemptions`, with a case per axis in each gate's fixture pair; gate-sdk/SPEC.md §check-gate-exemption-tasks states the grammar the shared reader takes.
+
+**Cost while deferred:** latent, since no tracked declaration carries a list; a consumer's unspaced tag escapes the disposition check. Filed 2026-10-16 by gate-substrate-sdk-pass' close, promoted off a gap that spec filed 2026-10-15; re-verified there by reading both readers. →fix failed: the unification moves two gates' verdicts on five axes, each owing its own fixture case, which is a build's unit rather than a drain's. Owner lookup: `exception-list`, `extract_exemptions`, `exemptions` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §check-gate-exemption-tasks and delegation-kit/SPEC.md §Verify after every agent commit.
+
+### case-pin-outranked-by-env
+
+[cost: event/low] [surface: gate-sdk]
+
+an exported knob outranks the knob file a fixture case pins it in, so a case runs under the inherited configuration rather than its own. Two instances at gate-substrate-sdk-pass' build: a workflow step's export armed `check-psscriptanalyzer`'s pair against the real analyser on CI only (fixed through the local overlay in 4a3f901c7), and an exported `GATE_SDK_VERBOSE` redded `gate-sdk/gate-tests/run-arm-contract.test.sh`'s quiet-green case under any verbose battery, which `--run-config-variant` always is (fixed by pinning that case `GATE_SDK_VERBOSE=''`). Also: the battery prints no per-gate clean line, so a CI log cannot show that a gate armed by a knob ran armed.
+
+**Deliverable:** the class catcher, either `gate-sdk/lib/test-hermetic.sh` and the fixture harness scrubbing the scalars a case pins from the inherited environment, or a check over `.github/workflows` env blocks and bespoke tests' unpinned reads against the knob names case knob files set.
+
+**Cost while deferred:** one false red, or one unarmed case, per new non-hermetic case, surfaced only by a CI or verbose run. Filed 2026-10-16 by gate-substrate-sdk-pass' close, promoted off two gaps that build filed the same day; both instances were fixed at build, so the re-verification read their fixes rather than re-running them. →fix failed: each catcher is a new mechanism, which a drain does not land. Owner lookup: `hermetic`, `GATE_SDK_VERBOSE`, `outrank`, `knob file` in this file, the icebox and the disposed-findings record — [hermetic-harness-export-masks-the-condition-under-test](#hermetic-harness-export-masks-the-condition-under-test) (icebox), DISTINCT (the harness's own export pinning the variable under test to its passing value, where here the inherited environment overrides a case's pin); owner gate-sdk/SPEC.md §run-gate-tests.
+
+### crate-test-unremaps-binary
+
+[cost: iteration/low] [surface: gate-sdk]
+
+`cargo test --release` over the crate rebuilds `native/target/release/checkwright-gates` without `bin/build-native.sh`'s remap flags, since the crate's integration tests need the bin target. So the next `--installer-smoke` refuses the running binary for carrying the builder's paths until `bash gate-sdk/bin/build-native.sh` reruns. Two spellings reach it: validate's `native_crate` suite (`EVIDENCE_KIT_RUN_native_crate` in `scripts/evidence-config.knobs`) and `check-crate-arms`' test arm, which shares the default `GATE_SDK_CARGO_TARGET_DIR`, so a plain `--run` after a crate edit leaves the binary unremapped too. Also: a validate re-run after a first fold needs the evidence file committed or restored, because the packer refuses a dirty tree.
+
+**Deliverable:** no spelling of the crate tests leaves the placed binary unremapped — the test arms on a target dir of their own or carrying the remap flags — with the installer smoke green after a battery and a validate run.
+
+**Cost while deferred:** a rebuild owed after every crate-touching battery before the installer smoke reads true, and a false validate red when it is forgotten. Filed 2026-10-16 by gate-substrate-sdk-pass' close, promoted off a gap that validate filed. Re-verified there: after `build-native.sh` the binary held no checkout path, and after one `--run` it held 3. →fix failed: the target-dir choice trades a cold rebuild against cache reuse, which gate-sdk/SPEC.md's refusal to default the target dir to scratch rules on, so it is a design call. **Inferred, not run:** which spelling is cheapest. Owner lookup: `remap`, `build-native`, `native_crate`, `installer_smoke`, `CARGO_TARGET_DIR` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §build-native and §check-crate-arms.
 
 ## Icebox
 

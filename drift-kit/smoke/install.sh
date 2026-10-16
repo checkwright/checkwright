@@ -294,12 +294,14 @@ if grep -q 'n/a' <<<"$kmd"; then fail "writer/reader default divergence: reader 
 # dated-header reads, each row's independent degradation, and the inversion the KPI
 # exists for (fresh age, expired prices, in one report).
 ptkpi() { DRIFT_KIT_PRICE_TABLE="$1" solo kpi-price-table-age; }
+# spec: drift-kit/SPEC.md §Testing — each relative date anchors at 12:00, since GNU date's relative
+# day keeps today's DST flag and so lands a day short across a fall-back from just after midnight
 pttrend_of() { DRIFT_KIT_PRICE_TABLE="$1" trend_frag kpi-price-table-age; }
 
 pt_both="$work/pt-both.tsv"
 cat > "$pt_both" <<EOF
-# priced-as-of: $(date -d '3 days ago' +%F) — trailing prose the reader must ignore
-# prices-valid-through: $(date -d '10 days' +%F)
+# priced-as-of: $(date -d '12:00 3 days ago' +%F) — trailing prose the reader must ignore
+# prices-valid-through: $(date -d '12:00 10 days' +%F)
 # model	input	output	cache_read	cache_creation
 test-model	0.000001	0.000002	0.0000001	0.000002
 EOF
@@ -316,7 +318,7 @@ pttrend="$(pttrend_of "$pt_both")"
 pt_inv="$work/pt-inverted.tsv"
 cat > "$pt_inv" <<EOF
 # priced-as-of: $(date +%F)
-# prices-valid-through: $(date -d 'yesterday' +%F)
+# prices-valid-through: $(date -d '12:00 yesterday' +%F)
 # model	input	output	cache_read	cache_creation
 test-model	0.000001	0.000002	0.0000001	0.000002
 EOF
@@ -328,14 +330,14 @@ grep -q 'EXPIRED 1d ago — re-verify (through' <<<"$ptinv" \
     || fail "inversion fixture: the trend fragment tracks age only, and must still emit"
 
 pt_noexp="$work/pt-noexpiry.tsv"
-printf '# priced-as-of: %s\ntest-model\t0.000001\t0.000002\t0.0000001\t0.000002\n' "$(date -d '1 day ago' +%F)" > "$pt_noexp"
+printf '# priced-as-of: %s\ntest-model\t0.000001\t0.000002\t0.0000001\t0.000002\n' "$(date -d '12:00 1 day ago' +%F)" > "$pt_noexp"
 ptne="$(ptkpi "$pt_noexp")"
 grep -q 'priced 1d ago' <<<"$ptne" || fail "age row must still report when the optional expiry header is absent: $ptne"
 grep -q 'n/a (no prices-valid-through: header)' <<<"$ptne" \
     || fail "absent optional expiry header must degrade its own row visibly, not the age row: $ptne"
 
 pt_noage="$work/pt-noage.tsv"
-printf '# prices-valid-through: %s\ntest-model\t0.000001\t0.000002\t0.0000001\t0.000002\n' "$(date -d '5 days' +%F)" > "$pt_noage"
+printf '# prices-valid-through: %s\ntest-model\t0.000001\t0.000002\t0.0000001\t0.000002\n' "$(date -d '12:00 5 days' +%F)" > "$pt_noage"
 ptna="$(ptkpi "$pt_noage")"
 grep -q 'n/a (no priced-as-of: header)' <<<"$ptna" || fail "absent priced-as-of: must degrade the age row visibly: $ptna"
 grep -q 'expires in 5d' <<<"$ptna" || fail "the expiry row degrades independently of the age row: $ptna"
@@ -490,7 +492,7 @@ cat > "$pcdir/pc1.jsonl" <<'EOF'
 {"type":"assistant","message":{"id":"p3","model":"pc-open","usage":{"input_tokens":1}}}
 {"type":"assistant","message":{"id":"p4","model":"pc-future","usage":{"input_tokens":1}}}
 EOF
-printf 'pc-open\t1\t1\t1\t1\npc-future\t1\t1\t1\t1\t%s\n' "$(date -d tomorrow +%F)" > "$work/pc-prices.tsv"
+printf 'pc-open\t1\t1\t1\t1\npc-future\t1\t1\t1\t1\t%s\n' "$(date -d '12:00 tomorrow' +%F)" > "$work/pc-prices.tsv"
 pcov() { DRIFT_KIT_SESSIONS_DIR="${PC_SESSIONS:-$pcdir}" DRIFT_KIT_PRICE_TABLE="${PC_TABLE:-$work/pc-prices.tsv}" \
     bash "$DRIFT_ARM" --price-coverage; }
 pcout="$(pcov)"

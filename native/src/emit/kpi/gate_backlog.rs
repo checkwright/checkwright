@@ -57,6 +57,14 @@ pub fn proposed_names(text: &str) -> Vec<String> {
     out
 }
 
+// spec: drift-kit/SPEC.md §Bundled KPIs — built is a declaration in either spelling the registry
+// resolves, a script or a descriptor (gate-sdk/SPEC.md §The `# graph:` manifest)
+fn is_declared(dir: &str, name: &str) -> bool {
+    ["sh", "gate"]
+        .iter()
+        .any(|ext| Path::new(&format!("{}/{}.{}", dir, name, ext)).is_file())
+}
+
 pub fn run(ctx: &Ctx, trend: bool) -> Option<String> {
     let text = match read(&ctx.queue_file) {
         Some(t) => t,
@@ -78,7 +86,7 @@ pub fn run(ctx: &Ctx, trend: bool) -> Option<String> {
         .filter(|n| {
             !dirs
                 .iter()
-                .any(|d| Path::new(&format!("{}/{}.sh", d, n)).is_file())
+                .any(|d| is_declared(d, n))
         })
         .count();
 
@@ -124,5 +132,18 @@ mod tests {
     fn a_trailing_separator_is_not_part_of_the_name() {
         assert_eq!(proposed_names("check-foo- and check-b--c"), vec!["check-b", "check-foo"]);
         assert!(proposed_names("check- alone").is_empty());
+    }
+
+    #[test]
+    fn a_descriptor_counts_as_built_beside_a_script() {
+        let dir = std::env::temp_dir().join(format!("gate-backlog-built-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(dir.join("check-desc.gate"), "").unwrap();
+        std::fs::write(dir.join("check-shell.sh"), "").unwrap();
+        let d = dir.to_string_lossy().to_string();
+        assert!(is_declared(&d, "check-desc"));
+        assert!(is_declared(&d, "check-shell"));
+        assert!(!is_declared(&d, "check-absent"));
+        std::fs::remove_dir_all(&dir).unwrap();
     }
 }

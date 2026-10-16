@@ -12,10 +12,10 @@ SDK="$SMOKE_KIT_ROOT/../gate-sdk"   # the vendored gate-sdk beside this kit
 source "$SDK/lib/gate.sh"
 
 kit_gate() {   # $1=gate-name  $2.. = gate args — dispatch a vendored doctrine-kit gate by name
-    local g="$1"; shift
+    local g="$1" out; shift
     local -a argv=()
-    mapfile -t argv < <(gate_command "$g" "$SMOKE_KIT_ROOT/checks")
-    [[ ${#argv[@]} -gt 0 ]] || return 2
+    out="$(gate_command "$g" "$SMOKE_KIT_ROOT/checks")" && [[ -n "$out" ]] || return 2
+    mapfile -t argv <<<"$out"
     "${argv[@]}" "$@"
 }
 

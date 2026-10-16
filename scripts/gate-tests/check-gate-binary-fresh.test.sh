@@ -40,9 +40,9 @@ DESC='# graph: couples=docs/*.md dir=one valve=none tier=precommit
 # gate_command (never a declaration path) before the case's value is exported, and the
 # gate reads that exported value, which outranks every knob file.
 gate_argv() {  # gate_argv <knob> <value> -> ARGV
-    local knob="$1" val="$2"
-    mapfile -t ARGV < <(gate_command check-gate-binary-fresh "$GATES_DIR")
-    [[ ${#ARGV[@]} -gt 0 ]] || return 2
+    local knob="$1" val="$2" out
+    out="$(gate_command check-gate-binary-fresh "$GATES_DIR")" && [[ -n "$out" ]] || return 2
+    mapfile -t ARGV <<<"$out"
     export "$knob=$val"
 }
 
