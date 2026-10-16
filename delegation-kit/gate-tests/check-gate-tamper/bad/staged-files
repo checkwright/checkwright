@@ -3,3 +3,9 @@
 # file; a src/ path outside the meta prefixes is not meta-layer)
 scripts/check-foo.sh
 call-service/src/lib.rs
+axes/tag.rs
+axes/next.rs
+axes/paren).rs
+axes/after.rs
+axes/first.rs
+axes/open.rs

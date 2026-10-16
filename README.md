@@ -79,7 +79,7 @@ bash gate-sdk/bin/run-gates.sh --run-gate-tests scripts/gate-tests              
 bash gate-sdk/bin/run-gates.sh --run-gate-tests guard-kit/gate-tests guard-kit/checks           # guard-kit fixtures + bespoke seam suites
 bash gate-sdk/bin/run-gates.sh --run-guard-tests                                                # guard-kit decision table
 bash gate-sdk/bin/run-gates.sh --run-index-tests                                                 # context-kit index tools
-cargo test --release --manifest-path native/Cargo.toml                                          # native crate unit tests
+cargo test --release --manifest-path native/Cargo.toml --target-dir native/target/validate  # native crate unit tests
 bash gate-sdk/bin/run-gates.sh --agents-md-smoke                                                # the AGENTS.md projection, end to end
 bash gate-sdk/bin/run-gates.sh --run-consumer-smoke                                             # every kit installs into a scratch consumer
 bash gate-sdk/bin/run-gates.sh --upgrade-smoke                                                  # a vendored tree upgrades in place

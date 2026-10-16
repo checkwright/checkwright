@@ -8,6 +8,18 @@ use crate::walk;
 
 const NAME: &str = "check-crate-arms";
 
+// spec: gate-sdk/SPEC.md §check-crate-arms — a failed library read refuses naming its function
+fn native_rustflags() -> Result<String, String> {
+    let script = r#"source "$1/lib/gate.sh" && gate_native_rustflags"#;
+    let unset = proc::GIT_REPO_LOCATORS.iter().map(|s| s.to_string()).collect::<Vec<_>>();
+    let done = proc::run_stdout_scrubbed(&programs::BASH, &["-c", script, "bash", &walk::sdk_root()], &[], std::path::Path::new("."), &unset)
+        .map_err(|e| format!("gate_native_rustflags: {}", e))?;
+    if done.code() != 0 {
+        return Err("gate_native_rustflags: shell library read failed".to_string());
+    }
+    Ok(String::from_utf8_lossy(done.stdout()).trim_end_matches('\n').to_string())
+}
+
 // spec: gate-sdk/SPEC.md §Fail-closed contract — this member's own refusal text at the shell
 // form's own point in the order, which that section states is *after* the crate-presence branch
 // and for `cargo` alone.
@@ -48,8 +60,8 @@ fn cache_path(tmp_dir: &str, crate_dir: &str) -> String {
 // spec: gate-sdk/SPEC.md §check-crate-arms — one arm's spawn, stripped of git's repository
 // locators, and its report: the merged capture is read whatever the status, because for these two
 // the *failing* run is the one whose report has to print
-fn arm(label: &str, crate_dir: &str, argv: &[&str]) -> Result<bool, String> {
-    let m = proc::run_merged_without(&CARGO, argv, proc::GIT_REPO_LOCATORS)?;
+fn arm(label: &str, crate_dir: &str, argv: &[&str], rustflags: &str) -> Result<bool, String> {
+    let m = proc::run_merged_scrubbed(&CARGO, argv, &[("RUSTFLAGS".to_string(), rustflags.to_string())], std::path::Path::new("."), &proc::GIT_REPO_LOCATORS.iter().map(|s| s.to_string()).collect::<Vec<_>>())?;
     if m.succeeded() {
         return Ok(true);
     }
@@ -252,6 +264,11 @@ pub fn run(_args: &[String]) -> i32 {
         return code;
     }
 
+    let rustflags = match native_rustflags() {
+        Ok(value) => value,
+        Err(e) => { eprintln!("{}: {}", NAME, e); return 2; }
+    };
+
     // spec: gate-sdk/SPEC.md §check-crate-arms — both arms run even when the first fails, so one
     // commit-time report carries what CI would have said in two. The second call is not guarded by
     // the first's verdict, which is the whole of that rule.
@@ -284,7 +301,7 @@ pub fn run(_args: &[String]) -> i32 {
             ],
         ),
     ] {
-        match arm(label, &crate_dir, &argv) {
+        match arm(label, &crate_dir, &argv, &rustflags) {
             Ok(ok) => fail |= !ok,
             Err(e) => {
                 eprintln!("{}: {}", NAME, e);
@@ -351,6 +368,29 @@ pub fn run(_args: &[String]) -> i32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: gate-sdk/SPEC.md §check-crate-arms — the flags read runs once and names its function on failure
+    #[test]
+    fn the_flags_read_consumes_the_library_and_refuses_a_failed_function() {
+        let dir = std::env::temp_dir().join(format!("crate-arms-flags-{}", std::process::id()));
+        std::fs::create_dir_all(dir.join("lib")).unwrap();
+        let env = crate::knobenv::lock();
+        let previous = std::env::var("GATE_SDK_ROOT").ok();
+        env.set("GATE_SDK_ROOT", &dir.display().to_string());
+        std::fs::write(dir.join("lib/gate.sh"), "gate_native_rustflags() { printf '%s\\n' 'flags from shell'; }\n").unwrap();
+        crate::proc::recorder::start();
+        let flags = native_rustflags();
+        let spawned = crate::proc::recorder::stop();
+        assert_eq!(flags.unwrap(), "flags from shell");
+        assert_eq!(spawned, vec![programs::BASH.invocation().to_string()]);
+        std::fs::write(dir.join("lib/gate.sh"), "gate_native_rustflags() { return 7; }\n").unwrap();
+        assert!(native_rustflags().unwrap_err().contains("gate_native_rustflags"));
+        match previous {
+            Some(value) => env.set("GATE_SDK_ROOT", &value),
+            None => env.remove("GATE_SDK_ROOT"),
+        }
+        std::fs::remove_dir_all(dir).unwrap();
+    }
 
     // spec: gate-sdk/SPEC.md §check-crate-arms — the cache is keyed on the crate path's content
     // identity, the arm no fixture case can reach: each case points at its own scratch dir as

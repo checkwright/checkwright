@@ -515,6 +515,77 @@ pub fn exemptions(text: &str) -> Vec<Exemption> {
     out
 }
 
+#[derive(Debug, PartialEq, Eq)]
+pub struct ArrayElement {
+    pub line: usize,
+    pub raw: String,
+    pub value: String,
+    pub opening: bool,
+}
+
+#[derive(Debug)]
+pub struct ExceptionArray {
+    pub header: usize,
+    pub elements: Vec<ArrayElement>,
+}
+
+fn assignment_opens(line: &str) -> bool {
+    let t = line.trim_start_matches([' ', '\t']).as_bytes();
+    if t.is_empty() || !(t[0].is_ascii_alphabetic() || t[0] == b'_') { return false; }
+    let mut i = 1;
+    while i < t.len() && (t[i].is_ascii_alphanumeric() || t[i] == b'_') { i += 1; }
+    t[i..].starts_with(b"=(")
+}
+
+// spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — one reader owns tagged shell arrays for both gates
+pub fn exception_arrays(text: &str) -> Vec<ExceptionArray> {
+    let mut arrays = Vec::new();
+    let mut pending = None;
+    let mut current: Option<ExceptionArray> = None;
+    let mut balance = 0i64;
+    for (idx, raw) in text.lines().enumerate() {
+        let line = idx + 1;
+        let t = raw.trim_start_matches([' ', '\t']);
+        if current.is_none() && t.strip_prefix('#').is_some_and(|s| s.trim_start_matches([' ', '\t']).starts_with("exception-list:")) {
+            pending = Some(line);
+            continue;
+        }
+        let opening = current.is_none();
+        if opening {
+            if !assignment_opens(raw) { continue; }
+            let Some(header) = pending.take() else { continue; };
+            current = Some(ExceptionArray { header, elements: Vec::new() });
+            balance = 0;
+        }
+        let mut quote = None;
+        let mut value_code = String::new();
+        for ch in raw.chars() {
+            if let Some(q) = quote {
+                if ch == q { quote = None; }
+                value_code.push(ch);
+            } else {
+                match ch {
+                    '#' => break,
+                    '\'' | '"' => { quote = Some(ch); value_code.push(ch); }
+                    '(' => { balance += 1; }
+                    ')' => { balance -= 1; }
+                    _ => { value_code.push(ch); }
+                }
+            }
+        }
+        let element = if opening {
+            value_code.split_once('=').map(|(_, s)| s).unwrap_or("")
+        } else { value_code.as_str() };
+        if let Some(token) = element.split_whitespace().next() {
+            let value: String = token.chars().filter(|c| *c != '\'' && *c != '"').collect();
+            current.as_mut().unwrap().elements.push(ArrayElement { line, raw: raw.to_string(), value, opening });
+        }
+        if balance <= 0 { arrays.push(current.take().unwrap()); }
+    }
+    if let Some(array) = current { arrays.push(array); }
+    arrays
+}
+
 // spec: gate-sdk/SPEC.md §The declaration cohort — the descriptor line declaring a knob no static
 // kit's prefix owns, and the prefix its name carries
 pub const KNOB_LINE: &str = "# knob:";
@@ -1683,5 +1754,42 @@ mod tests {
         crate::knobs::reset(&knobs);
         assert!(knob_paths("knob:QUEUE_KIT_ROADMAP_FILE").unwrap().is_empty(), "an empty value is no place");
         unscratch(&knobs, &d);
+    }
+}
+
+#[cfg(test)]
+mod exception_array_tests {
+    use super::*;
+
+    // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — both tag spacings arm the next assignment
+    #[test]
+    fn tags_arm_only_the_next_assignment_shape() {
+        let a = exception_arrays("#exception-list:\nignored text\n NAME=(\n a/b\n)\nOTHER=(ignored)\n");
+        assert_eq!(a.len(), 1);
+        assert_eq!(a[0].header, 1);
+        assert_eq!(a[0].elements[0].line, 4);
+        assert_eq!(a[0].elements[0].value, "a/b");
+        assert_eq!(exception_arrays("# exception-list:\nA=(a/b)\n")[0].elements[0].value, "a/b");
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — comments and quoted parentheses do not close the balance
+    #[test]
+    fn comments_and_quotes_protect_balance_and_raw_dispositions() {
+        let a = exception_arrays("# exception-list:\nA=( # )\n 'a/).rs' # permanent: ) reason\n b/c # until: live-task\n)\n");
+        assert_eq!(a[0].elements.len(), 2);
+        assert_eq!(a[0].elements[0].value, "a/).rs");
+        assert_eq!(disposition(&a[0].elements[0].raw), Disposition::Permanent);
+        assert_eq!(disposition(&a[0].elements[1].raw), Disposition::Until("live-task".into()));
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — each line yields its first token, with quotes removed
+    #[test]
+    fn one_line_is_one_element_and_opening_elements_are_flagged() {
+        let a = exception_arrays("#exception-list:\nA=(\"a/b\" c/d)\n# exception-list:\nB=(\n 'e/f' g/h # permanent: reason\n)\n");
+        assert_eq!(a[0].elements.len(), 1);
+        assert_eq!(a[0].elements[0].value, "a/b");
+        assert!(a[0].elements[0].opening);
+        assert_eq!(a[1].elements[0].value, "e/f");
+        assert!(!a[1].elements[0].opening);
     }
 }

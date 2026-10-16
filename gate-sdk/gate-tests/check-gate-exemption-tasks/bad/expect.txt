@@ -1,7 +1,13 @@
-GATE-EXEMPTION-TASKS: 7 violation(s):
+GATE-EXEMPTION-TASKS: 13 violation(s):
 check-descriptor.gate:5 — # until: retired-task does not resolve to a live task
 check-descriptor.gate:6 — exemption element carries neither # until: <slug> nor # permanent: <reason>
 # until: retired-task does not resolve to a live task
 exemption element carries neither # until: <slug> nor # permanent: <reason>
 # until: emphasis does not resolve to a live task
 # port-until: retired-task does not resolve to a live task
+check-array-axes.sh:4 —
+check-array-axes.sh:9 —
+check-array-axes.sh:13 —
+check-array-axes.sh:14 —
+check-array-axes.sh:18 —
+check-array-axes.sh:21 —

@@ -63,118 +63,6 @@ fn live_slugs(queue: &Path) -> Vec<String> {
     out
 }
 
-fn strip_comment(s: &str) -> &str {
-    match s.find('#') {
-        Some(i) => &s[..i],
-        None => s,
-    }
-}
-
-// spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the balance scan ignores a parenthesis
-// inside a comment or a quoted string, so an element carrying one does not close the array early
-fn strip_for_balance(s: &str) -> String {
-    drop_pairs(&drop_pairs(strip_comment(s), b'"'), b'\'')
-}
-
-fn drop_pairs(s: &str, q: u8) -> String {
-    let b = s.as_bytes();
-    let mut out: Vec<u8> = Vec::with_capacity(b.len());
-    let mut i = 0usize;
-    while i < b.len() {
-        if b[i] == q {
-            if let Some(off) = b[i + 1..].iter().position(|&c| c == q) {
-                i = i + 1 + off + 1;
-                continue;
-            }
-        }
-        out.push(b[i]);
-        i += 1;
-    }
-    String::from_utf8_lossy(&out).into_owned()
-}
-
-enum Kind {
-    OpenLine,
-    Until(String),
-    Permanent,
-    None,
-}
-
-struct Element {
-    lno: usize,
-    kind: Kind,
-}
-
-fn assignment_opens(line: &str) -> bool {
-    let t = lstrip(line).as_bytes();
-    if t.is_empty() || !(t[0].is_ascii_alphabetic() || t[0] == b'_') {
-        return false;
-    }
-    let mut i = 1usize;
-    while i < t.len() && (t[i].is_ascii_alphanumeric() || t[i] == b'_') {
-        i += 1;
-    }
-    i + 1 < t.len() && t[i] == b'=' && t[i + 1] == b'('
-}
-
-fn parse_elements(text: &str, header_line: usize) -> Vec<Element> {
-    let mut out: Vec<Element> = Vec::new();
-    let mut asgn = 0usize;
-    let mut started = false;
-    let mut bal: i64 = 0;
-    for (idx, line) in text.lines().enumerate() {
-        let nr = idx + 1;
-        if nr <= header_line {
-            continue;
-        }
-        if asgn == 0 {
-            if !assignment_opens(line) {
-                continue;
-            }
-            asgn = nr;
-            let after = match line.find('(') {
-                Some(i) => &line[i + 1..],
-                None => "",
-            };
-            let rest: String = strip_comment(after)
-                .chars()
-                .filter(|c| *c != ')' && !c.is_ascii_whitespace())
-                .collect();
-            if !rest.is_empty() {
-                out.push(Element {
-                    lno: nr,
-                    kind: Kind::OpenLine,
-                });
-            }
-        }
-        if nr > asgn {
-            let noc = strip_comment(line);
-            if noc
-                .chars()
-                .any(|c| !c.is_ascii_whitespace() && c != '(' && c != ')')
-            {
-                let kind = match registry::disposition(line) {
-                    registry::Disposition::Until(s) => Kind::Until(s),
-                    registry::Disposition::Permanent => Kind::Permanent,
-                    registry::Disposition::Missing => Kind::None,
-                };
-                out.push(Element { lno: nr, kind });
-            }
-        }
-        let s2 = strip_for_balance(line);
-        let o = s2.matches('(').count() as i64;
-        let c = s2.matches(')').count() as i64;
-        if o > 0 {
-            started = true;
-        }
-        bal += o - c;
-        if started && bal <= 0 {
-            break;
-        }
-    }
-    out
-}
-
 // spec: gate-sdk/SPEC.md §check-reads-couples — a one-level directory glob is pathname
 // expansion rather than a recursive walk, which is why this member declares an empty read-root
 // set: it resolves the corpus and never descends into one
@@ -185,6 +73,10 @@ fn declarations_in(dir: &str) -> Vec<String> {
 }
 
 fn header_hits(text: &str, opener: &str) -> Vec<(usize, String)> {
+    if opener == "exception-list:" {
+        let lines: Vec<&str> = text.lines().collect();
+        return registry::exception_arrays(text).into_iter().map(|a| (a.header, lines[a.header - 1].to_string())).collect();
+    }
     let mut out = Vec::new();
     for (idx, line) in text.lines().enumerate() {
         let t = lstrip(line);
@@ -192,11 +84,7 @@ fn header_hits(text: &str, opener: &str) -> Vec<(usize, String)> {
             continue;
         }
         let rest = lstrip(&t[1..]);
-        if opener == "exception-list:" {
-            if t.starts_with("# exception-list:") {
-                out.push((idx + 1, line.to_string()));
-            }
-        } else if rest.starts_with(opener) {
+        if rest.starts_with(opener) {
             out.push((idx + 1, line.to_string()));
         }
     }
@@ -308,24 +196,24 @@ fn rule(args: &[String]) -> Result<i32, String> {
     for (f, text) in &texts {
         for (lineno, _) in header_hits(text, "exception-list:") {
             arrays += 1;
-            for el in parse_elements(text, lineno) {
-                match el.kind {
-                    Kind::Permanent => {}
-                    Kind::Until(slug) => {
+            for el in registry::exception_arrays(text).into_iter().find(|a| a.header == lineno).unwrap().elements {
+                if el.opening {
+                    errors.push(format!("{}:{} — exemption element(s) on the array's opening '=(' line cannot carry a per-element disposition; put each element on its own line with a # until:/# permanent: comment", f, el.line));
+                    continue;
+                }
+                match registry::disposition(&el.raw) {
+                    registry::Disposition::Permanent => {}
+                    registry::Disposition::Until(slug) => {
                         if !live.contains(&slug) {
                             errors.push(format!(
                                 "{}:{} — # until: {} does not resolve to a live task (moved to Done, or missing from {})",
-                                f, el.lno, slug, queue
+                                f, el.line, slug, queue
                             ));
                         }
                     }
-                    Kind::OpenLine => errors.push(format!(
-                        "{}:{} — exemption element(s) on the array's opening '=(' line cannot carry a per-element disposition; put each element on its own line with a # until:/# permanent: comment",
-                        f, el.lno
-                    )),
-                    Kind::None => errors.push(format!(
+                    registry::Disposition::Missing => errors.push(format!(
                         "{}:{} — exemption element carries neither # until: <slug> nor # permanent: <reason>",
-                        f, el.lno
+                        f, el.line
                     )),
                 }
             }

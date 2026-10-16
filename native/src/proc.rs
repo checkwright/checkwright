@@ -1227,6 +1227,17 @@ pub fn run_stdout_in(
     env: &[(String, String)],
     cwd: &std::path::Path,
 ) -> Result<Streamed, String> {
+    run_stdout_scrubbed(program, args, env, cwd, &[])
+}
+
+// spec: gate-sdk/SPEC.md §run-gate-tests — resolve stdout under the case's scrubbed environment
+pub fn run_stdout_scrubbed(
+    program: &Program,
+    args: &[&str],
+    env: &[(String, String)],
+    cwd: &std::path::Path,
+    unset: &[String],
+) -> Result<Streamed, String> {
     #[cfg(test)]
     recorder::note(program.invocation());
     let io_err = |e: std::io::Error| {
@@ -1242,6 +1253,7 @@ pub fn run_stdout_in(
     cmd.args(args)
         .current_dir(cwd)
         .stdout(std::process::Stdio::from(sink));
+    for name in unset { cmd.env_remove(name); }
     for (k, v) in env {
         cmd.env(k, v);
     }

@@ -4,7 +4,7 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — an arm table member rather than a hardcoded
 // top-level flag, because the member is configured: a top-level flag has no row, so
 // the knob-file derivation could not see the three knobs below.
-use crate::{proc, programs};
+use crate::{knobfile, knobs, proc, programs};
 use crate::walk;
 use std::path::Path;
 
@@ -295,7 +295,11 @@ fn basename(p: &str) -> &str {
 // the executable guard and the absolutization on its first element, then run it from inside the case
 // dir with the scratch pin.
 fn run_case(h: &Harness, gate: &str, casedir: &str, want: i32, expect: &str) -> i32 {
-    let Some((pinned, mut argv)) = resolve_argv(h, gate, casedir) else {
+    let unset = match case_unset(casedir) {
+        Ok(names) => names,
+        Err(e) => { println!("  HARNESS: {}", e); return 2; }
+    };
+    let Some((pinned, mut argv)) = resolve_argv(h, gate, casedir, &unset) else {
         println!(
             "  HARNESS: {} resolves in none of: {}",
             gate,
@@ -373,7 +377,7 @@ fn run_case(h: &Harness, gate: &str, casedir: &str, want: i32, expect: &str) -> 
     let spawn: Vec<&str> = lead.iter().map(String::as_str).collect();
     // spec: gate-sdk/SPEC.md §run-gate-tests — the working directory is set on the *child* rather
     // than entered by this process, so no code path can leave the harness in a case dir.
-    let done = match proc::run_merged_in(&program, &spawn, &env, Some(Path::new(casedir))) {
+    let done = match proc::run_merged_scrubbed(&program, &spawn, &env, Path::new(casedir), &unset) {
         Ok(m) => m,
         Err(e) => {
             println!("  HARNESS: {} {} exited 2 (gate could not run / malformed fixture):", gate, casedir);
@@ -449,10 +453,34 @@ fn run_case(h: &Harness, gate: &str, casedir: &str, want: i32, expect: &str) -> 
     0
 }
 
+// spec: gate-sdk/SPEC.md §run-gate-tests — strip file locators and scalars the case itself sets
+fn case_unset(casedir: &str) -> Result<Vec<String>, String> {
+    let mut names = vec!["GATE_SDK_GATES_DIR".to_string()];
+    for kit in knobs::STATIC_KITS {
+        for suffix in ["KNOB_FILE", "LOCAL_KNOB_FILE", "CONFIG_FILE"] {
+            names.push(format!("{}{}", kit.prefix(), suffix));
+        }
+        for suffix in ["", ".local"] {
+            let file = format!("{}/scripts/{}-config{}.knobs", casedir, kit.stem(), suffix);
+            let text = match std::fs::read_to_string(&file) {
+                Ok(text) => text,
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,
+                Err(e) => return Err(format!("{}: {}", file, e)),
+            };
+            for (idx, line) in text.lines().enumerate() {
+                if let Ok(Some(entry)) = knobfile::parse_line(line, &file, idx + 1) {
+                    if entry.form == knobfile::Form::Scalar { names.push(entry.name); }
+                }
+            }
+        }
+    }
+    Ok(names)
+}
+
 // spec: gate-sdk/SPEC.md §run-gate-tests — the dispatch resolution is `gate_command`'s own answer,
 // read out of a bash that sources the unchanged `lib/gate.sh` with the `cd` on the shell side,
 // before `gate_command` runs.
-fn resolve_argv(h: &Harness, gate: &str, casedir: &str) -> Option<(String, Vec<String>)> {
+fn resolve_argv(h: &Harness, gate: &str, casedir: &str, unset: &[String]) -> Option<(String, Vec<String>)> {
     // spec: gate-sdk/SPEC.md §run-gate-tests — the binary, the pinned scratch and the gate-sdk root are
     // exported into the resolving shell, the shell form's process-wide export
     let script = r#"export GATE_SDK_NATIVE_BIN="$1"; export GATE_SDK_TMP_DIR="$3"; export GATE_SDK_ROOT="$2"; source "$2/lib/gate.sh"; shift 3; cd "$1" || exit 2; shift; printf '%s\n' "$(unset GATE_SDK_NATIVE_BIN; _gate_prebinary_knob GATE_SDK_NATIVE_BIN '')"; gate_command "$@""#;
@@ -461,7 +489,7 @@ fn resolve_argv(h: &Harness, gate: &str, casedir: &str) -> Option<(String, Vec<S
     // spec: gate-sdk/SPEC.md §run-gate-tests — a refusal is a status, not a parse: `gate_command`
     // names the refusal on stderr, which is inherited, and its status becomes the caller's
     // `HARNESS:` line.
-    let done = proc::run_streamed(&programs::BASH, &argv, b"", proc::Stderr::Inherit).ok()?;
+    let done = proc::run_stdout_scrubbed(&programs::BASH, &argv, &[], Path::new("."), unset).ok()?;
     if done.code() != 0 {
         return None;
     }

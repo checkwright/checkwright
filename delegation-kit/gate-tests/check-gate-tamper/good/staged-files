@@ -5,3 +5,4 @@ scripts/check-foo.sh
 scripts/SPEC.md
 TASK-QUEUE.md
 checkwright.lock
+scripts/axes/ignored.rs

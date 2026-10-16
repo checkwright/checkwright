@@ -398,3 +398,14 @@ gate_self_repo_prefix() {
     esac
     printf '%s/blob/%s/\n' "$id" "$ref"
 }
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the build and crate arms read one remapped RUSTFLAGS value
+gate_native_rustflags() {
+    local _nr_from
+    local -a _nr_flags=()
+    for _nr_from in "${CARGO_HOME:-$HOME/.cargo}" "${HOME:-}"; do
+        [[ -n "$_nr_from" && "$_nr_from" != / ]] || continue
+        _nr_flags+=("--remap-path-prefix=${_nr_from%/}=/builder")
+    done
+    printf '%s\n' "${RUSTFLAGS:+$RUSTFLAGS }${_nr_flags[*]}"
+}

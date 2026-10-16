@@ -61,9 +61,16 @@ DOC_ARGS=(conservation.md)
 run_case() {  # run_case <label> <sandbox> <want-rc> <substring>
     local label="$1" d="$2" want="$3" substr="$4" rc
     cases=$((cases + 1))
-    ( cd "$d" && env GATE_SDK_KIT_DIRS="${KITDIRS:-kitroot}" GATE_SDK_NATIVE_CRATE=crate \
-        GATE_SDK_NATIVE_SRC=impl CASE_SDK_ROOT="${CASE_SDK_ROOT:-}" \
-        bash -c 'source "$1"; [[ -z "$CASE_SDK_ROOT" ]] || export GATE_SDK_ROOT="$CASE_SDK_ROOT"; gate_run check-gate-substrate-parity "$2" scripts "${@:3}"' \
+    ( cd "$d" && env CASE_KIT_DIRS="${KITDIRS:-kitroot}" CASE_NATIVE_CRATE=crate \
+        CASE_NATIVE_SRC=impl CASE_SDK_ROOT="${CASE_SDK_ROOT:-}" \
+        bash -c '
+            source "$1"
+            export GATE_SDK_KIT_DIRS="$CASE_KIT_DIRS"
+            export GATE_SDK_NATIVE_CRATE="$CASE_NATIVE_CRATE"
+            export GATE_SDK_NATIVE_SRC="$CASE_NATIVE_SRC"
+            [[ -z "$CASE_SDK_ROOT" ]] || export GATE_SDK_ROOT="$CASE_SDK_ROOT"
+            gate_run check-gate-substrate-parity "$2" scripts "${@:3}"
+        ' \
         bash "$DIR/lib/test-hermetic.sh" "$DIR/checks" ${DOC_ARGS[@]+"${DOC_ARGS[@]}"} ) > "$OUT" 2>&1
     rc=$?
     if [[ "$rc" -ne "$want" ]]; then

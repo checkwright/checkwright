@@ -8,35 +8,7 @@
 
 ## New Features
 
-### crate-test-unremaps-binary
-
-[spec: SPEC-crate-test-remap.md]
-
-`cargo test --release` over the crate rebuilds `native/target/release/checkwright-gates` without `bin/build-native.sh`'s remap flags, since the crate's integration tests need the bin target. So the next `--installer-smoke` refuses the running binary for carrying the builder's paths until `bash gate-sdk/bin/build-native.sh` reruns. Two spellings reach it: validate's `native_crate` suite (`EVIDENCE_KIT_RUN_native_crate` in `scripts/evidence-config.knobs`) and `check-crate-arms`' test arm, which shares the default `GATE_SDK_CARGO_TARGET_DIR`, so a plain `--run` after a crate edit leaves the binary unremapped too. Also: a validate re-run after a first fold needs the evidence file committed or restored, because the packer refuses a dirty tree.
-
-**Deliverable:** no spelling of the crate tests leaves the placed binary unremapped — the test arms on a target dir of their own or carrying the remap flags — with the installer smoke green after a battery and a validate run.
-
-**Cost while deferred:** a rebuild owed after every crate-touching battery before the installer smoke reads true, and a false validate red when it is forgotten. Filed 2026-10-16 by gate-substrate-sdk-pass' close, promoted off a gap that validate filed. Re-verified there: after `build-native.sh` the binary held no checkout path, and after one `--run` it held 3. →fix failed: the target-dir choice trades a cold rebuild against cache reuse, which gate-sdk/SPEC.md's refusal to default the target dir to scratch rules on, so it is a design call. Owner lookup: `remap`, `build-native`, `native_crate`, `installer_smoke`, `CARGO_TARGET_DIR` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §build-native and §check-crate-arms.
-
-### case-pin-outranked-by-env
-
-[spec: SPEC-case-env.md]
-
-an exported knob outranks the knob file a fixture case pins it in, so a case runs under the inherited configuration rather than its own. Two instances at gate-substrate-sdk-pass' build: a workflow step's export armed `check-psscriptanalyzer`'s pair against the real analyser on CI only (fixed through the local overlay in 4a3f901c7), and an exported `GATE_SDK_VERBOSE` redded `gate-sdk/gate-tests/run-arm-contract.test.sh`'s quiet-green case under any verbose battery, which `--run-config-variant` always is (fixed by pinning that case `GATE_SDK_VERBOSE=''`). Also: the battery prints no per-gate clean line, so a CI log cannot show that a gate armed by a knob ran armed.
-
-**Deliverable:** the class catcher, either `gate-sdk/lib/test-hermetic.sh` and the fixture harness scrubbing the scalars a case pins from the inherited environment, or a check over `.github/workflows` env blocks and bespoke tests' unpinned reads against the knob names case knob files set.
-
-**Cost while deferred:** one false red, or one unarmed case, per new non-hermetic case, surfaced only by a CI or verbose run. Filed 2026-10-16 by gate-substrate-sdk-pass' close, promoted off two gaps that build filed the same day; both instances were fixed at build, so the re-verification read their fixes rather than re-running them. →fix failed: each catcher is a new mechanism, which a drain does not land. Owner lookup: `hermetic`, `GATE_SDK_VERBOSE`, `outrank`, `knob file` in this file, the icebox and the disposed-findings record — [hermetic-harness-export-masks-the-condition-under-test](#hermetic-harness-export-masks-the-condition-under-test) (icebox), DISTINCT (the harness's own export pinning the variable under test to its passing value, where here the inherited environment overrides a case's pin); owner gate-sdk/SPEC.md §run-gate-tests.
-
 ## Technical Debt
-
-### exception-list-reader-split
-
-the two readers of the `# exception-list:` shell-array grammar diverge on five axes. `check-gate-tamper`'s `extract_exemptions` (`native/src/gates/gate_tamper.rs`) accepts the tag unspaced, strips quotes without protecting parentheses, takes each element's first token and yields nothing for a one-line array; `check-gate-exemption-tasks` (`gate_exemption_tasks.rs`) needs `# exception-list:` exactly, skips quoted parentheses, reads the whole line and reds a one-line array. An unspaced tag is tamper-read and never disposition-checked. The descriptor's `# exception:` lines already share one parser, `registry::exemptions`.
-
-**Deliverable:** one shared array reader both gates call, beside `registry::exemptions`, with a case per axis in each gate's fixture pair; gate-sdk/SPEC.md §check-gate-exemption-tasks states the grammar the shared reader takes.
-
-**Cost while deferred:** latent, since no tracked declaration carries a list; a consumer's unspaced tag escapes the disposition check. Filed 2026-10-16 by gate-substrate-sdk-pass' close, promoted off a gap that spec filed 2026-10-15; re-verified there by reading both readers. →fix failed: the unification moves two gates' verdicts on five axes, each owing its own fixture case, which is a build's unit rather than a drain's. Owner lookup: `exception-list`, `extract_exemptions`, `exemptions` in this file and the disposed-findings record — none; owner gate-sdk/SPEC.md §check-gate-exemption-tasks and delegation-kit/SPEC.md §Verify after every agent commit.
 
 ## Deferred
 
@@ -1106,4 +1078,7 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 
 - custom-rust-gates
 - windows-shell-gate-dispatch
+- crate-test-unremaps-binary
+- case-pin-outranked-by-env
+- exception-list-reader-split
 

@@ -2237,9 +2237,7 @@ pub const REGISTRY: &[GateEntry] = &[
     // spec: gate-sdk/SPEC.md §check-crate-arms — no walk root: the corpus is a crate cargo is
     // handed by manifest path, and the tracked-source stamp it caches on comes from git rather
     // than from a walk this crate performs.
-    // spec: gate-sdk/SPEC.md §check-crate-arms — three named programs where criterion 7's
-    // report counts two, because `git` reaches this member through the shared source-stamp
-    // helper and sits on the program floor; the fixture arm's runner is the knob-named binary.
+    // spec: gate-sdk/SPEC.md §check-crate-arms — bash reads the build flags and the fixture runner is knob-named
     (
         "check-crate-arms",
         crate_arms::run,
@@ -2255,6 +2253,7 @@ pub const REGISTRY: &[GateEntry] = &[
         ],
         "-",
         &[
+            ("bash", ""),
             ("cargo", ""),
             ("git", ""),
             ("rustc", ""),

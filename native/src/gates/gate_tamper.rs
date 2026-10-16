@@ -45,58 +45,9 @@ fn list_lines(text: &str) -> Vec<String> {
         .collect()
 }
 
-fn strip_comment(line: &str) -> &str {
-    match line.find('#') {
-        Some(i) => &line[..i],
-        None => line,
-    }
-}
-
-// spec: delegation-kit/SPEC.md §Verify after every agent commit — the exemption reader: a
-// `# exception-list:` tag arms the next `NAME=(` line, and each element inside the array's
-// parenthesis balance yields its first whitespace-delimited token, unquoted
+// spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — shell-array values use the shared reader
 fn extract_exemptions(text: &str) -> Vec<String> {
-    let mut out: Vec<String> = Vec::new();
-    let mut tag = false;
-    let mut inarr = false;
-    let mut bal: i64 = 0;
-    for raw in text.lines() {
-        let t = raw.trim_start_matches(is_space);
-        if let Some(rest) = t.strip_prefix('#') {
-            if rest.trim_start_matches(is_space).starts_with("exception-list:") {
-                tag = true;
-                continue;
-            }
-        }
-        if tag && opens_array(t) {
-            tag = false;
-            inarr = true;
-            let (ob, cb, _) = paren_split(strip_comment(raw));
-            bal = ob - cb;
-            if bal <= 0 {
-                inarr = false;
-            }
-            continue;
-        }
-        if !inarr {
-            continue;
-        }
-        let (ob, cb, stripped) = paren_split(strip_comment(raw));
-        let v = stripped.trim_start_matches(is_space);
-        let v = match v.find(is_space) {
-            Some(i) => &v[..i],
-            None => v,
-        };
-        let v: String = v.chars().filter(|c| *c != '\'' && *c != '"').collect();
-        if !v.is_empty() {
-            out.push(v);
-        }
-        bal += ob - cb;
-        if bal <= 0 {
-            inarr = false;
-        }
-    }
-    out
+    registry::exception_arrays(text).into_iter().flat_map(|a| a.elements.into_iter().map(|e| e.value)).collect()
 }
 
 // spec: delegation-kit/SPEC.md §Verify after every agent commit — a descriptor's `# exception:`
@@ -112,30 +63,6 @@ fn declared_exemptions(path: &str, text: &str) -> Vec<String> {
 fn added_between(path: &str, old: &str, new: &str) -> Vec<String> {
     let old_set = declared_exemptions(path, old);
     declared_exemptions(path, new).into_iter().filter(|v| !old_set.contains(v)).collect()
-}
-
-// spec: delegation-kit/SPEC.md §Verify after every agent commit — awk's `gsub` both counts and
-// removes, so the value a line yields is already parenthesis-free before its first token is taken
-fn paren_split(line: &str) -> (i64, i64, String) {
-    let ob = line.matches('(').count() as i64;
-    let cb = line.matches(')').count() as i64;
-    (
-        ob,
-        cb,
-        line.chars().filter(|c| *c != '(' && *c != ')').collect(),
-    )
-}
-
-fn opens_array(t: &str) -> bool {
-    let b = t.as_bytes();
-    if b.is_empty() || !(b[0].is_ascii_alphabetic() || b[0] == b'_') {
-        return false;
-    }
-    let mut i = 1usize;
-    while i < b.len() && (b[i].is_ascii_alphanumeric() || b[i] == b'_') {
-        i += 1;
-    }
-    b[i..].starts_with(b"=(")
 }
 
 fn git_blob(rev: &str) -> Result<String, String> {
@@ -185,7 +112,10 @@ fn collect_fixture(dir: &str) -> Result<(Vec<String>, Vec<String>), String> {
             .map(|b| list_lines(&String::from_utf8_lossy(&b)))
             .unwrap_or_default()
     };
-    Ok((read("staged-files"), read("added-exemptions")))
+    let mut added = read("added-exemptions");
+    let path = format!("{}/exception-arrays.sh", dir);
+    if let Ok(text) = std::fs::read_to_string(path) { added.extend(extract_exemptions(&text)); }
+    Ok((read("staged-files"), added))
 }
 
 pub fn run(args: &[String]) -> i32 {
@@ -353,8 +283,6 @@ BAR=(
         assert_eq!(extract_exemptions(text), vec!["a/b.sh", "c/*.rs"]);
     }
 
-    // spec: delegation-kit/SPEC.md §Verify after every agent commit — a single-line array
-    // closes its own balance, so the tag arms nothing and no value is read
     #[test]
     fn a_descriptor_element_is_read_as_an_addition_against_the_head_blob() {
         let head = "# graph: dir=one\n# exception: kept/*.md # permanent: old\n";
@@ -364,8 +292,8 @@ BAR=(
     }
 
     #[test]
-    fn a_single_line_array_yields_nothing() {
-        assert!(extract_exemptions("# exception-list:\nFOO=(a b c)\nd\n").is_empty());
+    fn a_single_line_array_yields_its_first_value() {
+        assert_eq!(extract_exemptions("# exception-list:\nFOO=(a b c)\nd\n"), vec!["a"]);
     }
 
     #[test]

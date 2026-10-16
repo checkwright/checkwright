@@ -51,20 +51,8 @@ command -v cargo >/dev/null 2>&1 || {
     exit 2
 }
 
-# spec: gate-sdk/SPEC.md §build-native — the released artifact carries no builder path. rustc
-# records a panic location per crate it compiles, and a dependency's is absolute under the cargo
-# home, so an unremapped binary ships the builder's home directory to every adopter.
-BN_REMAP=()
-for _bn_from in "${CARGO_HOME:-$HOME/.cargo}" "${HOME:-}"; do
-    # spec: gate-sdk/SPEC.md §build-native — a remap of `/` would rewrite every absolute path in
-    # the binary, so an empty or root prefix contributes no flag rather than a catastrophic one
-    [[ -n "$_bn_from" && "$_bn_from" != "/" ]] || continue
-    BN_REMAP+=("--remap-path-prefix=${_bn_from%/}=/builder")
-done
-unset _bn_from
-# spec: gate-sdk/SPEC.md §build-native — appended to the caller's RUSTFLAGS rather than replacing
-# them, or a caller passing its own flags would silently lose them to this one
-RUSTFLAGS="${RUSTFLAGS:+$RUSTFLAGS }${BN_REMAP[*]}"
+# spec: gate-sdk/SPEC.md §build-native — every cargo writer reads the library's build flags
+RUSTFLAGS="$(gate_native_rustflags)"
 export RUSTFLAGS
 
 cargo build --release --manifest-path "$CRATE/Cargo.toml" "$@" || exit $?

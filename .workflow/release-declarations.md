@@ -2,6 +2,9 @@
 
 ## New and tightened gates
 
+- `check-crate-arms` — declares `bash`, and runs its clippy and test arms under the `RUSTFLAGS` `gate_native_rustflags` prints, so its test arm no longer rewrites the placed binary unremapped. Nothing to do where `bash` already runs your build.
+- `check-gate-tamper` — reads `# exception-list:` arrays through the shared grammar: an unspaced tag, an element on the opening `=(` line and a parenthesis inside a quoted element are now read. A new exemption in any of those shapes matching a co-staged file now reds; land it in its own commit.
+- `check-gate-exemption-tasks` — disposition-checks an unspaced `#exception-list:` tag through that shared grammar. Give each element of such an array its own line with a live `# until:` or a reasoned `# permanent:`.
 - `check-agent-tier-explicit` — gains assertion B, armed only once you set the new `DELEGATION_KIT_TIER_MODEL` binding: each agent definition then carries `tier: <class>` with the `model:` that class is bound to, or states `model: inherit` with no `tier:`. Nothing to do while the binding stays empty; once you bind it, declare each definition's `tier:` and run `--emit agent-tiers --write`.
 - `check-rule-citation` — leaves delegation-kit (Behavior changes), so a `gates.list` line still naming it, which the kit README's roster had you add, resolves nowhere and reds. Drop the line; `init` never registered it.
 - `check-gate-substrate-parity` — assertion I reds on `check-pendency-contradiction`, a new canon-kit gate the binary carries, until your `gates.list` registers it or declares `# unregistered: check-pendency-contradiction — <reason>`. Register it, or declare why you do not.
@@ -99,6 +102,10 @@
 - **a descriptor's exemptions** — a `.gate` descriptor may carry `# exception: <element> # until: <slug>` or `… # permanent: <reason>` lines, held by `check-gate-exemption-tasks` and `check-gate-tamper` as a script's `# exception-list:` array is, and `check-comment-tier` reads each such line as a machine directive. Nothing to do; a script's array is unchanged.
 
 ## Behavior changes
+
+- **gate-sdk `lib/gate.sh`, `bin/build-native.sh`** — `gate_native_rustflags` owns the build's flags and remapping. Read this function for cargo calls that can rewrite the placed binary.
+- **gate-sdk `--run-gate-tests`** — clears inherited file-layer locators and scalars each case's knob files set before applying runner pins. Pin a scalar in the case's file to override an invoker export; unset case scalars still inherit.
+- **gate-sdk `lib/test-hermetic.sh`** — clears inherited kit-prefixed variables except `GATE_SDK_NATIVE_BIN` before its own pins. Set a test's deliberate overrides after sourcing the library.
 
 - **guard-kit `--run-guard-tests`, guard-kit/templates/guard-config.knobs** — a new knob, `GUARD_KIT_CONSUMER_CASES` (default empty, off), names your own decision table in `cases.tsv`'s grammar; where it is set, `--run-guard-tests` runs its rows against your `GUARD_KIT_CONSUMER_RULES_CMD` from the repository root after the kit's tables, and a mismatch reds the run. The template carries the commented example. Nothing to do; to prove your rules fire, set the knob and write a firing and a non-firing row for each.
 - **guard-kit/templates/settings-hooks.json, plugin/hooks/hooks.json** — each front-end hook command is now `bash "${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh" --hook <member>`, so a session that changes into a subdirectory keeps its guards, and the plugin's hooks resolve the repository's toplevel through git, so they also fire in a session launched from a subdirectory. Re-spell each front-end hook command you merged into `.claude/settings.json` from guard-kit, delegation-kit or lifecycle-kit the same way; a relative command stays silent once a session leaves the root.

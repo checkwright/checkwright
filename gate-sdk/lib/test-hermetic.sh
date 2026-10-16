@@ -1,5 +1,5 @@
 # shellcheck shell=bash
-# spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — pin every kit's <KIT>_KNOB_FILE, <KIT>_LOCAL_KNOB_FILE and retired <KIT>_CONFIG_FILE to one shared empty file each so a bespoke gate-tests/*.test.sh runs on kit defaults, never the invoker's cwd config; knob-free by design (a config-pinning tool cannot be configured by the surface it pins)
+# spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — clear inherited kit-prefixed variables except GATE_SDK_NATIVE_BIN, then pin every kit's <KIT>_KNOB_FILE, <KIT>_LOCAL_KNOB_FILE and retired <KIT>_CONFIG_FILE to one shared empty file each so a bespoke gate-tests/*.test.sh runs on kit defaults, never the invoker's cwd config; knob-free by design (a config-pinning tool cannot be configured by the surface it pins)
 # no-port: gate-sdk/SPEC.md §lib/test-hermetic.sh — this library's whole API is three shell functions, gate_env, gate_run and gate_arm_run, called *inside* the caller's own shell, and a binary arm cannot be sourced into bash: the */gate-tests/*.test.sh suites source this file as their first act, and there is no in-crate arm a source line can name. gate_env exists rather than an env prefix because env cannot invoke a shell function. It resolves no knob of its own and computes no default. Structural, not a sizing judgment.
 # spec: gate-sdk/SPEC.md §The path-dialect contract — anchor the sourcing shell's cwd before the two roots below are derived and composed
 # shellcheck disable=SC2164 # the anchor is the contract's bare builtin, which check-path-dialect clears only as the whole line; a failed chdir leaves the cwd where it was
@@ -12,14 +12,13 @@ _th_empty_knobs="${TMPDIR:-/tmp}/gate-sdk-hermetic-empty.knobs"
 for _th_kit in "$_th_root"/gate-sdk "$_th_root"/*-kit; do
     [[ -d "$_th_kit" ]] || continue
     _th_var="$(printf '%s' "${_th_kit##*/}" | tr '[:lower:]-' '[:upper:]_')"
+    while IFS= read -r _th_name; do
+        [[ "$_th_name" == GATE_SDK_NATIVE_BIN ]] || unset "$_th_name"
+    done < <(compgen -A variable "${_th_var}_")
     export "${_th_var}_CONFIG_FILE=${_th_empty}"
     export "${_th_var}_KNOB_FILE=${_th_empty_knobs}"
     [[ "$_th_var" == GATE_SDK ]] || export "${_th_var}_LOCAL_KNOB_FILE=${_th_empty_knobs}"
 done
-# spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — neutralizes an ambient absolute path knob so a
-# sourcing test resolves both to their relative kit defaults against its own sandbox cwd; runs
-# before a test's own explicit pin, which by construction sits after this library's source line
-unset GATE_SDK_TMP_DIR GATE_SDK_WORKFLOW_DIR
 # spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the system temp dir heads the git ceiling list
 _th_sep=:
 case "${OSTYPE:-}" in msys* | cygwin* | win32*) _th_sep=';' ;; esac
@@ -40,7 +39,7 @@ if [[ -z "${GATE_SDK_NATIVE_BIN:-}" ]]; then
 fi
 # spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — gate-sdk's overlay is pinned after the binary read above, outside its already-set guard
 export GATE_SDK_LOCAL_KNOB_FILE="$_th_empty_knobs"
-unset _th_root _th_empty _th_empty_knobs _th_kit _th_var _th_bin _th_sep _th_tmp
+unset _th_name _th_root _th_empty _th_empty_knobs _th_kit _th_var _th_bin _th_sep _th_tmp
 
 # spec: gate-sdk/SPEC.md §run-gate-tests — invoke a gate through its declared dispatch rather
 # than by script path, so a bespoke test names a gate and never a substrate: gate_command

@@ -246,6 +246,36 @@ seen="$(cat "$scratch/env-probe.seen" 2>/dev/null)"
     fails=$((fails + 1))
 }
 
+# spec: gate-sdk/SPEC.md §run-gate-tests — case-file scalars outrank exports, while unset scalars inherit
+cat >"$scratch/checks/stub-knobs.sh" <<'EOF'
+#!/usr/bin/env bash
+source "$GATE_SDK_ROOT/lib/gate.sh"
+IFS=$'\t' read -r _ _ value < <(gate_knob_values GATE_SDK_QUEUE_FILE)
+printf 'scalar=%s inherited=%s\n' "$value" "${CANON_KIT_PROBE-unset}"
+if [[ "$PWD" == */bad ]]; then echo 'help: fixture'; exit 1; fi
+echo 'STUB-KNOBS: clean (case pins)'
+EOF
+chmod +x "$scratch/checks/stub-knobs.sh"
+for side in good bad; do
+    mkdir -p "$scratch/knobs/stub-knobs/$side/scripts"
+    printf 'GATE_SDK_QUEUE_FILE = case-value\n' >"$scratch/knobs/stub-knobs/$side/scripts/gate-sdk-config.knobs"
+    printf 'scalar=case-value inherited=seat-value\n' >"$scratch/knobs/stub-knobs/$side/expect.txt"
+done
+: >"$scratch/empty.knobs"
+for override in scalar gates-dir knob-file; do
+    out="$(
+        export CANON_KIT_PROBE=seat-value
+        case "$override" in
+            scalar) export GATE_SDK_QUEUE_FILE=foreign ;;
+            gates-dir) export GATE_SDK_GATES_DIR="$scratch/foreign" ;;
+            knob-file) export GATE_SDK_KNOB_FILE="$scratch/empty.knobs" ;;
+        esac
+        gate_arm_run --run-gate-tests "$scratch/knobs" "$scratch/checks" 2>&1
+    )"; rc=$?
+    assert_rc "case-knobs-$override" "$rc" 0
+    assert_has "case-knobs-$override" 'GATE-TESTS: clean' "$out"
+done
+
 [[ "$fails" -eq 0 ]] || { echo "run-gate-tests.test: $fails assertion(s) failed"; exit 1; }
 echo "run-gate-tests.test: clean (a leading flag and an absent named checks dir are refused, -- admits a path; expect.txt is a per-line conjunction, order-independent, blanks inert, all missing lines named; the output contract is asserted at runtime on both cases; scratch writes land outside the case dir on both dispatch spellings)"
 exit 0
