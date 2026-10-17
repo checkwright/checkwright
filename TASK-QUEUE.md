@@ -262,22 +262,6 @@ the session-context hook member bakes its scratch sweep's age horizon: it remove
 
 **Cost while deferred:** a consumer wanting another horizon, or no sweep, has no setting. Filed 2026-10-07 off windows-shell-floor-pass' close audit, carried to the next scope's intake. Re-verified: the constant, and no `CONTEXT_KIT_` knob in the SPEC names a sweep. Owner lookup: `age horizon`, `scratch sweep`, `STALE_SECS` in this file and the disposed-findings record — none; [site-health-resample-knobs](#site-health-resample-knobs), DISTINCT (the same class on site-kit's template).
 
-### toolchain-pin-trails-stable
-
-[cost: event/low] [surface: native]
-
-the Rust toolchain pin trails the newest stable release by one minor: `rust-toolchain.toml` names 1.98.1 and the stable channel manifest names 1.99.0. The audit roster's toolchain-pin class is due on release prep and had never been swept.
-
-**Deliverable:** the channel moved in a commit editing that file alone, on a push that is its witness (gate-sdk/SPEC.md §check-crate-arms).
-
-**Tried 2026-10-11 by guard-rule-holes-pass' build and held, the deliverable unmet.** The move to 1.99.0 was pushed alone and its `gates` run reddened one leg. Every leg resolved cargo 1.99.0, and every crate-tests leg and seven of the eight native-artifacts legs were green. The `x86_64-unknown-linux-gnu` artifact built clean and then failed the artifact step's floor check (`scripts/ci-build-artifact.sh`): its highest hard glibc need measured 2.34 against the glibc 2.39 its row in `docs/requirements.md` declares, where the check requires the two equal. The `aarch64-unknown-linux-gnu` artifact measured 2.39, equal to its row. The check's refusal names the remedy for a measure below the declared floor, to hold the toolchain. **Inferred, not run:** that the 1.99.0 x86-64 artifact runs on a glibc 2.34 host; none was in reach. Operator direction (lead-relayed, not a ruling): the channel returned to 1.98.1 in a one-file commit on a second mid-iteration push, whose runs were green, and this entry returned here.
-
-**Why design-pending:** the move now reaches a published platform floor or the floor rule. Keeping 1.99.0 means lowering the x86-64 glibc row to what the artifact measures, on a host that proves it and with the two glibc rows then apart, or letting the check accept a measure below the declared floor. Neither is a toolchain-file edit.
-
-**Push need at a pick:** one push of its own, since the seat that builds here carries no toolchain manager and a remote run is the first to execute a new compiler.
-
-**Cost while deferred:** the crate builds one stable release behind, with whatever that release fixes. Surfaced 2026-10-10 by hook-placement-guard-rules-pass' close audit, which held it because its two remaining pushes were the release's stamp commit and its tag, and carried to the next scope's intake. Re-verified there: the manifest dated 2026-10-01 names 1.99.0. Owner lookup: `toolchain`, `rust-toolchain`, `channel` in this file and the disposed-findings record — a runner-image notice, discarded, DISTINCT (a floating runner label); owner gate-sdk/SPEC.md §check-crate-arms.
-
 ### session-sweep-live-scratch
 
 [cost: event/low] [surface: context-kit]
@@ -1048,9 +1032,9 @@ a citation naming a numbered step by its bold title, in RELEASING.md's procedure
 
 A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, since check-front-door-verbs reads the front-door pages alone; widening its arm resolution to the kit SPECs, with the history valves, would catch it.
 
-## Done
+### toolchain-pin-trails-stable
 
-- crate-manifest-license-unheld
-- evaluator-agent-discovery
-- orchestration-page-overreach
+The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
+
+## Done
 

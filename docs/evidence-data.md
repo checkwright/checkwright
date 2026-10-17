@@ -291,3 +291,4 @@ Knowledge-friction counts are excluded: their log is gitignored per-iteration sc
 | budget-feed-observation-pass | sc sp a b v c | 1f/1d | 1 · ≤0d | 21s clean | 153 |
 | competitive-followup-pass | sc sp a b v c | 5f/1d | 3 · ≤0d | 21s clean | 154 |
 | prove-confinement-pass | sc sp a b v c | 2f/5d | 2 · ≤0d | 21s clean | 154 |
+| evaluator-discovery-pass | sc sp a b v c | 3f/0d | 2 · ≤1d | 21s clean | 155 |
