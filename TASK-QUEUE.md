@@ -24,6 +24,20 @@ the crate manifest `native/Cargo.toml` declares `license = "MIT"` while `LICENSE
 
 **Cost while deferred:** a reader of the public crate manifest is told the wrong license. Filed 2026-10-17 by budget-feed-observation-pass' close from a gap bullet of that date, surfaced probing a consult item. Re-verified there: the crate field reads MIT, and `reserve/crates/Cargo.toml`, `installer/package.json` and both plugin manifests read Apache-2.0. Owner lookup: `license`, `Cargo.toml`, `license-line` in this file and the disposed-findings record — none; `homepage-license-duplicate`, done, DISTINCT (the footer instance); owner docs/site-architecture.md §The license line.
 
+### evaluator-agent-discovery
+
+[spec: SPEC-evaluator-discovery.md]
+
+the adopter is increasingly a coding agent comparing tools and recommending or selecting one on a human's behalf, and the operator directed (2026-10-17, lead session, a direction, not a ruling) treating that agent as a first-class reader, for the next scope. Three surfaces stay here, unbuilt: (a) an evaluator-facing choosing page, when to pick it and when not, a comparison against the same-seat entrants the private brief's SWOT names and a custom-CI baseline, the limits stated; (b) `llms.txt` and `llms-full.txt` on the site, a generated projection behind a freshness gate; (d) registry metadata, `installer/package.json` carrying no `keywords` and `native/Cargo.toml`'s `description` reading as an internal binary.
+
+**Deliverable:** design-pending, a feature per surface that adds a page, a projection or a gate, spec authoring each. (d) lands with [crate-manifest-license-unheld](#crate-manifest-license-unheld), which edits the same manifest. (a) states the profiles as shipped, verification without the workflow and not the reverse, so [verify-workflow-decoupling](#verify-workflow-decoupling)'s ruling edits it later.
+
+**Cost while deferred:** an agent evaluating on a human's behalf finds no surface written for it and may not surface Checkwright at all. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet of that date. Re-verified there: no `docs/llms.txt`, no root `AGENTS.md`, no `keywords` in `installer/package.json`, and the crate description as stated. Owner lookup: `llms`, `AGENTS.md`, `evaluator`, `keywords` in this file and the disposed-findings record — none; owner docs/site-architecture.md. Re-verified at evaluator-discovery-pass' scope: unchanged.
+
+Surface (e) split off as [agent-selection-probe](#agent-selection-probe) at evaluator-discovery-pass' scope (operator direction 2026-10-17, lead-relayed, not a ruling).
+
+Surface (c) split off as [evaluator-root-agent-file](#evaluator-root-agent-file) by the same direction.
+
 ## Technical Debt
 
 ### orchestration-page-overreach
@@ -329,20 +343,6 @@ the statistics half of [hosted-attestation-service](#hosted-attestation-service)
 **Deliverable:** design-pending, a feature since it adds a projection: which figures chart, the projection's form and home, and its freshness gate.
 
 **Cost while deferred:** a trend in workflow health shows only to a session that recomputes it from tables and logs. Filed 2026-10-17 by budget-feed-observation-pass' close from a gap bullet of that date. Owner lookup: `statistic`, `chart`, `visualiz`, `dashboard` in this file and the disposed-findings record — [hosted-attestation-service](#hosted-attestation-service), DISTINCT (it keeps the cross-repo dashboards, the hosted half).
-
-### evaluator-agent-discovery
-
-[cost: event/high] [surface: docs]
-
-the adopter is increasingly a coding agent comparing tools and recommending or selecting one on a human's behalf, and the operator directed (2026-10-17, lead session, a direction, not a ruling) treating that agent as a first-class reader, for the next scope. Three surfaces stay here, unbuilt: (a) an evaluator-facing choosing page, when to pick it and when not, a comparison against the same-seat entrants the private brief's SWOT names and a custom-CI baseline, the limits stated; (b) `llms.txt` and `llms-full.txt` on the site, a generated projection behind a freshness gate; (d) registry metadata, `installer/package.json` carrying no `keywords` and `native/Cargo.toml`'s `description` reading as an internal binary.
-
-**Deliverable:** design-pending, a feature per surface that adds a page, a projection or a gate, spec authoring each. (d) lands with [crate-manifest-license-unheld](#crate-manifest-license-unheld), which edits the same manifest. (a) states the profiles as shipped, verification without the workflow and not the reverse, so [verify-workflow-decoupling](#verify-workflow-decoupling)'s ruling edits it later.
-
-**Cost while deferred:** an agent evaluating on a human's behalf finds no surface written for it and may not surface Checkwright at all. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet of that date. Re-verified there: no `docs/llms.txt`, no root `AGENTS.md`, no `keywords` in `installer/package.json`, and the crate description as stated. Owner lookup: `llms`, `AGENTS.md`, `evaluator`, `keywords` in this file and the disposed-findings record — none; owner docs/site-architecture.md. Re-verified at evaluator-discovery-pass' scope: unchanged.
-
-Surface (e) split off as [agent-selection-probe](#agent-selection-probe) at evaluator-discovery-pass' scope (operator direction 2026-10-17, lead-relayed, not a ruling).
-
-Surface (c) split off as [evaluator-root-agent-file](#evaluator-root-agent-file) by the same direction.
 
 ### evaluator-root-agent-file
 
