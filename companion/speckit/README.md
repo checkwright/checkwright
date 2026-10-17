@@ -10,7 +10,7 @@ Add the extension from a Checkwright release, with `X.Y.Z` the release's version
 specify extension add checkwright --from https://github.com/checkwright/checkwright/releases/download/vX.Y.Z/checkwright-companion-X.Y.Z.zip
 ```
 
-Then, in a clean worktree, ask your agent to run the extension's install command, `speckit.checkwright.install`.
+The project must be a git repository: `specify init` makes one only when asked to. `extension add` writes files under `.specify/` and your agent's command directory, so commit them, since the install refuses a worktree with uncommitted changes. Then ask your agent to run the extension's install command, `speckit.checkwright.install`. An integration that renders commands as skills names it `speckit-checkwright-install`, and the check command `speckit-checkwright-check`. The extension needs no configuration, whatever `extension add` prints.
 
 ## What it adds
 
