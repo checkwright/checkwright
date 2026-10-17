@@ -338,6 +338,60 @@ the crate manifest `native/Cargo.toml` declares `license = "MIT"` while `LICENSE
 
 **Cost while deferred:** a reader of the public crate manifest is told the wrong license. Filed 2026-10-17 by budget-feed-observation-pass' close from a gap bullet of that date, surfaced probing a consult item. Re-verified there: the crate field reads MIT, and `reserve/crates/Cargo.toml`, `installer/package.json` and both plugin manifests read Apache-2.0. Owner lookup: `license`, `Cargo.toml`, `license-line` in this file and the disposed-findings record — none; `homepage-license-duplicate`, done, DISTINCT (the footer instance); owner docs/site-architecture.md §The license line.
 
+### evaluator-agent-discovery
+
+[cost: event/high] [surface: docs]
+
+the adopter is increasingly a coding agent comparing tools and recommending or selecting one on a human's behalf, and the operator directed (2026-10-17, lead session, a direction, not a ruling) treating that agent as a first-class reader, for the next scope. Five surfaces are unbuilt: (a) an evaluator-facing choosing page, when to pick it and when not, a comparison against the same-seat entrants the private brief's SWOT names and a custom-CI baseline, the limits stated; (b) `llms.txt` and `llms-full.txt` on the site, a generated projection behind a freshness gate; (c) a root `AGENTS.md` for evaluators and adopters, since a cloning agent reads the maintainer-internal `CLAUDE.md`, which `check-root-tiering`'s second-agent-file refusal (context-kit/SPEC.md §The AGENTS.md agent-file adapter smoke) constrains; (d) registry metadata, `installer/package.json` carrying no `keywords` and `native/Cargo.toml`'s `description` reading as an internal binary; (e) a repeatable cold agent-selection probe asking foreign agent CLIs and a fresh session, context-free, for a tool verifying coding-agent claims before merge, recording whether Checkwright appears.
+
+**Deliverable:** design-pending, a feature per surface that adds a projection or gate; scope splits it.
+
+**Inferred, not run:** that an evaluating agent reading `CLAUDE.md` forms a worse impression — unmeasured; probe (e) measures it.
+
+**Cost while deferred:** an agent evaluating on a human's behalf finds no surface written for it and may not surface Checkwright at all. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet of that date. Re-verified there: no `docs/llms.txt`, no root `AGENTS.md`, no `keywords` in `installer/package.json`, and the crate description as stated. Owner lookup: `llms`, `AGENTS.md`, `evaluator`, `keywords` in this file and the disposed-findings record — none; owner docs/site-architecture.md.
+
+### prove-pwsh-leg-unmeasured
+
+[cost: event/low] [surface: installer]
+
+the PowerShell install-smoke leg (`install-smoke-pwsh-windows` in `.github/workflows/gates.yml`) runs `demo` and not `prove`, so the Windows route of `checkwright prove` (the path clone, the door spawned with the executable suffix, the not-held help on stderr) is measured by no leg, as installer/SPEC.md §prove's honest limits state.
+
+**Deliverable:** one `prove` step in that leg on a full-profile consumer, asserting exit 0 and the held grammar, and the honest limit dropped.
+
+**Cost while deferred:** a Windows-only failure of the activation proof reaches an adopter first. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet build filed that day off the activated-guarantee amendment's Definition of Done; not fixed at close because the leg runs only on the remote Windows runner, so its first run would be the closing push's. Re-verified there by reading the leg's steps. Owner lookup: `pwsh`, `prove`, install smoke in this file and the disposed-findings record — [grant-pwsh-word-read](#grant-pwsh-word-read), DISTINCT (the guard's PowerShell reader); owner installer/SPEC.md §prove.
+
+### orchestration-page-overreach
+
+[cost: event/low] [surface: docs]
+
+`docs/orchestration.md` frames Checkwright as the verification layer beneath orchestration, in its title and at three body sites, and `docs/index.md`'s link to it repeats the phrase, while the first screen now leads with the bounded promise (docs/positioning.md §The bounded promise): reproducible classes of unsupported claims caught before merge, structural evidence rather than correctness.
+
+**Deliverable:** those sites reworded under the bounded-promise rule.
+
+**Cost while deferred:** an evaluating agent quoting the orchestration page reads structural evidence checks as semantic verification, the overreach `bounded-promise-phrasing` closed on the first screen. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet build filed that day; not fixed at close because the operator's direction of that day (lead-relayed, not a ruling) chose first-screen-only reach for that unit, so this reach is a scope's to take. Re-verified there by grep: the title and lines 9, 11 and 24 of the page, and the index line. Owner lookup: `orchestration`, `verification layer` in this file and the disposed-findings record — none; `bounded-promise-phrasing`, done, DISTINCT (the first screen); owner docs/positioning.md §The bounded promise.
+
+### companion-prove-not-held
+
+[cost: event/low] [surface: installer]
+
+every companion `prose` and `complement` install, Spec Kit and OpenSpec alike, prints an `init` then: line offering `prove`, and `prove` answers not held, exit 1, with a help line steering to `--profile full`, by construction: §prove's claim reads lifecycle state files, which `complement` leaves out because the toolkit does that job (`companion/exclusions.list`). The companion's own done claim, a ticked task naming an absent path, is caught by `check-task-path-claim`, which `prove` never stages. `full` installs report held. Rehearsed 2026-10-17 at `companion-adoption-rehearsal`.
+
+**Deliverable:** design-pending, spec's: either `prove` gains a companion claim (a ticked task naming an absent path in the recipe's task-list glob), or the then: line is withheld or reworded where no claim can be staged; owners installer/SPEC.md §prove and §init, companion/SPEC.md.
+
+**Cost while deferred:** a companion tester's first proof step reports failure and recommends the tier the companion exists to avoid. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet of that date; spec-conformant, so a design question rather than a fix. Re-verified there by reading §prove step 4 and `companion/exclusions.list`. Owner lookup: `prove`, `then: line`, `companion` in this file and the disposed-findings record — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (the catalog submission).
+
+### companion-complement-init-line
+
+[cost: event/low] [surface: installer]
+
+a companion `complement` install (`init --profile full` with three `--without-kit` and a `--recipe`) reports `INIT: vendored 8 kit(s) at the full profile` and commits `chore: vendor Checkwright kits (full profile, ...)`, so a tester who asked for `complement` reads that `full` was installed; the lock is right. Rehearsed 2026-10-17 at `companion-adoption-rehearsal` on Spec Kit and OpenSpec.
+
+**Deliverable:** the `INIT:` line and the commit subject naming the left-out kits or the selection, in installer/SPEC.md §init and its crate test.
+
+**Inferred, not run:** the rehearsal's quoted line, read from build's report rather than a re-run here.
+
+**Cost while deferred:** one line of tester confusion per complement install, with no wrong behaviour. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet of that date; not fixed at close because it changes `init`'s user-facing output, whose wording is spec's. Owner lookup: `INIT:`, `complement`, `commit subject` in this file and the disposed-findings record — none; owner installer/SPEC.md §init.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).

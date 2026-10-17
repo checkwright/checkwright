@@ -8,7 +8,7 @@ DRIFT_KIT_PRICE_PAGE_CMD[] = curl
 DRIFT_KIT_PRICE_PAGE_CMD[] = -fsSL
 DRIFT_KIT_PRICE_PAGE_CMD[] = https://platform.claude.com/docs/en/about-claude/pricing.md
 DRIFT_KIT_PRICE_PAGE_SECTION = ## Model pricing
-# spec: drift-kit/SPEC.md §The manual-operation meter — this repo's ordinary work: its read-only inspection shapes, its scratch mkdir, its commit, its push watch, its liveness wait, its crate build and test, and its gate door under each spelling and redirect, each spelled as the ranking key spells it
+# spec: drift-kit/SPEC.md §The manual-operation meter — this repo's ordinary work: its read-only inspection shapes, its scratch mkdir, its commit, its push watch, its liveness wait, its crate build and test, its gate door under each spelling and redirect, and its queue file, which every stage edits, each spelled as the ranking key spells it
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = grep
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = cat
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = git commit
@@ -40,3 +40,4 @@ DRIFT_KIT_MANUAL_OPS_IGNORE[] = grep >
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = while >
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = gh run >
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = git add
+DRIFT_KIT_MANUAL_OPS_IGNORE[] = TASK-QUEUE.md
