@@ -1,14 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: prove-confinement-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-10-17, lead-relayed, not a ruling; the iteration opened undirected):** option A, full. Debt `prove-claim-path-confinement`, `knob-file-relative-to-cwd`, `prove-pwsh-leg-unmeasured`, `delta-agreement-lossy-capture`, `update-notice-windows-flake` and `windows-liveness-row-pid-reuse`; the features `companion-prove-not-held` and `companion-complement-init-line`, which spec authors and promotes. Stages scope, spec, build, validate and close, with align where `check-stage-entry` assertion C fires on a companion amendment spanning `installer/` and `companion/`. Confinement lands before the companion claim, since that claim's path must take the confined resolution.
-
-  **Push need (2026-10-17, inside the budget; the plan kept by operator direction, lead-relayed):** one mid-iteration push after build, serving the four Windows-bound units on their entries, plus the closing push. A v0.32.0 tag push, should close cut it, is a third, over the budget of two; the operator kept the plan knowing it.
 
 ---
 
