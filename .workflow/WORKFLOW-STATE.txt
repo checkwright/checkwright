@@ -4,10 +4,4 @@
 
 ---
 
-budget-feed-observation-pass scope abcd7075 2026-10-16 a996900c8
-budget-feed-observation-pass spec af8ab3ed 2026-10-16 085430f61
-budget-feed-observation-pass align a6cca0d2 2026-10-16 3c01955ea
-budget-feed-observation-pass build aacdf6c2 2026-10-16 a748672ee
-budget-feed-observation-pass build a8025655 2026-10-17 39ea85e0a
-budget-feed-observation-pass validate ad714c8f 2026-10-17 2a2237e0a
-budget-feed-observation-pass close a200e71a 2026-10-17 f5ab134fd
+— scope a4ebbc4f 2026-10-17 9ca73c4f4

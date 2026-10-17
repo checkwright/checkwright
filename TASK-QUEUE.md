@@ -1,14 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: budget-feed-observation-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **Grant (operator grant 2026-10-16, lead-relayed; spent at validate):** one live validate second-vendor review run over the iteration's range, on `codex-session`, not `codex-review` (operator direction 2026-10-16, lead-relayed, not a ruling), because that adapter keeps its session on disk (its argv is the gitignored overlay's). v0.32.0 is cut on a clean return; the closing push, plus the tag push on a clean return, is inside the budget. The review returned changes requested, so the cut is deferred.
-
-  **Observation owed (operator direction 2026-10-17, lead-relayed, not a ruling):** validate observes whether that run's kept session refreshes the budget feed; close writes the observation onto the Deferred entry `heterogeneous-agent-delegation`. Written at close, where the entry closed by operator direction 2026-10-17 (lead-relayed, not a ruling).
 
 ---
 
