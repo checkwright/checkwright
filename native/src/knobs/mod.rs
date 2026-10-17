@@ -949,23 +949,32 @@ pub fn static_owner(name: &str) -> Option<&'static Kit> {
     owner(name).filter(|k| k.row(name).is_some())
 }
 
-// spec: installer/SPEC.md §doctor — one static knob resolved as a battery run from a tree whose gates
-// directory is `gates_dir` resolves it, without entering that tree: the same precedence and legacy
-// refusals, read uncached because the process's own tree is a different one
-pub fn wire_in(gates_dir: &str, name: &str) -> Result<String, String> {
-    wire_in_value(gates_dir, name).map(|(v, _)| v.wire())
+// spec: installer/SPEC.md §doctor — one static knob resolved as a battery run at the root `anchor`
+// of a tree whose gates directory is `gates_dir` resolves it, without entering that tree: the same
+// precedence and legacy refusals, read uncached because the process's own tree is a different one
+pub fn wire_in(anchor: &Path, gates_dir: &str, name: &str) -> Result<String, String> {
+    wire_in_value(anchor, gates_dir, name).map(|(v, _)| v.wire())
 }
 
-// spec: installer/SPEC.md §doctor — a derived default's static siblings resolve in that tree too
-fn wire_in_value(gates_dir: &str, name: &str) -> Result<(Value, Origin), String> {
+// spec: installer/SPEC.md §doctor — a derived default's static siblings resolve in that tree too, and
+// a relative file locator opens against its root, where that battery runs, never this process's
+fn wire_in_value(anchor: &Path, gates_dir: &str, name: &str) -> Result<(Value, Origin), String> {
     let (kit, row) = static_row(name)?;
-    let knob_file = std::env::var(kit.knob_file_var()).unwrap_or_default();
-    let config_file = std::env::var(format!("{}CONFIG_FILE", kit.prefix())).unwrap_or_default();
-    let local_file = std::env::var(kit.local_knob_file_var()).unwrap_or_default();
+    let at_root = |var: String| {
+        let v = std::env::var(var).unwrap_or_default();
+        if v.is_empty() || crate::walk::path_root(&v).is_some() {
+            v
+        } else {
+            crate::walk::child(anchor, &v).display().to_string()
+        }
+    };
+    let knob_file = at_root(kit.knob_file_var());
+    let config_file = at_root(format!("{}CONFIG_FILE", kit.prefix()));
+    let local_file = at_root(kit.local_knob_file_var());
     let l = load(kit, gates_dir, &knob_file, &config_file, &local_file)?;
     let tree = |n: &str| match locator(n) {
         Some(l) => Ok(l),
-        None => wire_in_value(gates_dir, n),
+        None => wire_in_value(anchor, gates_dir, n),
     };
     or_default_by(row, layered_from(&l, row.name, row.shape)?, &tree).map(|(v, o, _)| (v, o))
 }
@@ -1296,12 +1305,12 @@ mod tests {
         let tree = Scratch::new("wire-in-tree");
         clean(&env, &here.dir());
         here.write("gate-sdk-config.knobs", "GATE_SDK_PORTABILITY_PATHS = here.sh\n");
-        assert_eq!(wire_in(&tree.dir(), "GATE_SDK_PORTABILITY_PATHS").unwrap(), "");
+        assert_eq!(wire_in(Path::new(&tree.dir()), &tree.dir(), "GATE_SDK_PORTABILITY_PATHS").unwrap(), "");
         tree.write("gate-sdk-config.knobs", "GATE_SDK_PORTABILITY_PATHS = tree.sh\n");
-        assert_eq!(wire_in(&tree.dir(), "GATE_SDK_PORTABILITY_PATHS").unwrap(), "tree.sh");
+        assert_eq!(wire_in(Path::new(&tree.dir()), &tree.dir(), "GATE_SDK_PORTABILITY_PATHS").unwrap(), "tree.sh");
         env.set("GATE_SDK_PORTABILITY_PATHS", "env.sh");
-        assert_eq!(wire_in(&tree.dir(), "GATE_SDK_PORTABILITY_PATHS").unwrap(), "env.sh");
-        assert!(wire_in(&tree.dir(), "PROBE_KIT_ARMING").is_err());
+        assert_eq!(wire_in(Path::new(&tree.dir()), &tree.dir(), "GATE_SDK_PORTABILITY_PATHS").unwrap(), "env.sh");
+        assert!(wire_in(Path::new(&tree.dir()), &tree.dir(), "PROBE_KIT_ARMING").is_err());
         clean(&env, &here.dir());
         restore(&env);
     }
@@ -1317,7 +1326,28 @@ mod tests {
         here.write("gate-sdk-config.knobs", "GATE_SDK_QUEUE_FILE = HERE.md\n");
         tree.write("gate-sdk-config.knobs", "GATE_SDK_QUEUE_FILE = TREE.md\n");
         reset(&env);
-        assert_eq!(wire_in(&tree.dir(), "LIFECYCLE_KIT_QUEUE_FILE").unwrap(), "TREE.md");
+        assert_eq!(wire_in(Path::new(&tree.dir()), &tree.dir(), "LIFECYCLE_KIT_QUEUE_FILE").unwrap(), "TREE.md");
+        clean(&env, &here.dir());
+        restore(&env);
+    }
+
+    // spec: installer/SPEC.md §doctor — a relative knob-file override opens against the named tree's
+    // root, where its battery runs: a file only there answers, and a root lacking it is refused
+    #[test]
+    fn a_relative_knob_file_override_opens_against_the_named_root() {
+        let env = knobenv::lock();
+        let here = Scratch::new("wire-in-rel-here");
+        let root = Scratch::new("wire-in-rel-root");
+        clean(&env, &here.dir());
+        let rel = format!("wire-in-rel-{}.knobs", std::process::id());
+        assert!(!Path::new(&rel).exists(), "{} sits in the process directory", rel);
+        root.write(&rel, "GATE_SDK_PORTABILITY_PATHS = root.sh\n");
+        env.set("GATE_SDK_KNOB_FILE", &rel);
+        let got = wire_in(Path::new(&root.dir()), &here.dir(), "GATE_SDK_PORTABILITY_PATHS");
+        let absent = wire_in(Path::new(&here.dir()), &here.dir(), "GATE_SDK_PORTABILITY_PATHS");
+        assert_eq!(got.unwrap(), "root.sh");
+        let absent = absent.unwrap_err();
+        assert!(absent.contains("GATE_SDK_KNOB_FILE") && absent.contains(&here.dir()), "{}", absent);
         clean(&env, &here.dir());
         restore(&env);
     }

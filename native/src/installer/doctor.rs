@@ -217,7 +217,7 @@ pub(super) fn tree_disarmed_block(out: &mut String, root: &std::path::Path, list
     let Some((gates, dirs)) = tree_decl_dirs(root) else {
         return;
     };
-    disarmed_block(out, root, list_text, &dirs, |k| crate::knobs::wire_in(&gates, k));
+    disarmed_block(out, root, list_text, &dirs, |k| crate::knobs::wire_in(root, &gates, k));
 }
 
 // spec: installer/SPEC.md §doctor — the tree's own resolution, anchored at its root as the battery
@@ -402,7 +402,7 @@ pub fn diagnose(selection: Option<&Selection>, caller: Caller) -> Report {
             if caller == Caller::Bare {
                 let reading = match tree_decl_dirs(&root) {
                     Some((gates, _)) => {
-                        let s = crate::emit::update_notice::Settings::resolve(|k| crate::knobs::wire_in(&gates, k));
+                        let s = crate::emit::update_notice::Settings::resolve(|k| crate::knobs::wire_in(&root, &gates, k));
                         crate::emit::update_notice::reading(&root, &s, crate::emit::update_notice::now())
                     }
                     None => crate::emit::update_notice::Reading::Unknown,

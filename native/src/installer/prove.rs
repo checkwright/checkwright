@@ -143,7 +143,7 @@ fn prove(scratch: &mut Scratch) -> Outcome {
     let gates = doctor::tree_decl_dirs(&clone)
         .map(|(g, _)| g)
         .unwrap_or_else(|| clone.join(crate::knobs::gates_dir()).display().to_string());
-    if let Ok(tmp) = crate::knobs::wire_in(&gates, "GATE_SDK_TMP_DIR") {
+    if let Ok(tmp) = crate::knobs::wire_in(&clone, &gates, "GATE_SDK_TMP_DIR") {
         if let Some(rel) = in_clone(&root, &tmp) {
             if !crate::walk::names_cwd(Path::new(&rel)) {
                 let _ = crate::walk::make_scratch(clone.join(rel));
@@ -157,8 +157,8 @@ fn prove(scratch: &mut Scratch) -> Outcome {
 
     // spec: installer/SPEC.md §prove — both battery runs read the claim's files at the paths resolved
     // here, so an absolute knob rebased onto the clone is the file the battery reads
-    let queue_rel = resolved(&root, &gates, QUEUE_KNOB, QUEUE_FILE);
-    let state_rel = resolved(&root, &gates, STATE_KNOB, STATE_FILE);
+    let queue_rel = resolved(&root, &clone, &gates, QUEUE_KNOB, QUEUE_FILE);
+    let state_rel = resolved(&root, &clone, &gates, STATE_KNOB, STATE_FILE);
     let claim_env: Vec<(String, String)> = [(QUEUE_KNOB, &queue_rel), (STATE_KNOB, &state_rel)]
         .into_iter()
         .filter_map(|(k, v)| v.as_ref().map(|v| (k.to_string(), v.clone())))
@@ -266,8 +266,8 @@ fn in_clone(root: &Path, value: &str) -> Option<String> {
     Some(kept.join("/"))
 }
 
-fn resolved(root: &Path, gates: &str, knob: &str, seeded: &str) -> Option<String> {
-    match crate::knobs::wire_in(gates, knob) {
+fn resolved(root: &Path, clone: &Path, gates: &str, knob: &str, seeded: &str) -> Option<String> {
+    match crate::knobs::wire_in(clone, gates, knob) {
         Ok(v) if !v.is_empty() => in_clone(root, &v),
         _ => Some(seeded.to_string()),
     }

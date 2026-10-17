@@ -1015,7 +1015,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
 // read off the seam this run wrote, since that is what the installed tree will resolve
 fn update_check_statement(root: &Path) {
     let gates = root.join(GATES_DIR).display().to_string();
-    let s = crate::emit::update_notice::Settings::resolve(|k| crate::knobs::wire_in(&gates, k));
+    let s = crate::emit::update_notice::Settings::resolve(|k| crate::knobs::wire_in(root, &gates, k));
     if s.on() {
         println!(
             "update check: {}, with git ls-remote against {}, which shows that host your IP address; set GATE_SDK_UPDATE_CHECK = off in {}/{} to turn it off.\n",
@@ -1075,7 +1075,7 @@ fn run_vendored(
 // directory's knob files as the battery run at the root resolves it
 fn knob_at(root: &Path, knob: &str) -> Result<String, Refusal> {
     let gates = root.join(GATES_DIR).to_string_lossy().into_owned();
-    crate::knobs::wire_in(&gates, knob).map_err(|e| refuse(format!("{} does not resolve: {}", knob, e), "", 2))
+    crate::knobs::wire_in(root, &gates, knob).map_err(|e| refuse(format!("{} does not resolve: {}", knob, e), "", 2))
 }
 
 // spec: installer/SPEC.md §The manifest — the roster holds repo-relative paths, so a projection a

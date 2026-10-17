@@ -50,14 +50,6 @@ The quoted line was settled at spec by reading `init.rs`: both lines print the p
 
 **Cost while deferred:** a tree carrying such a symlink has `prove` write a claim into a file outside its clone, and a P1 review finding stands open against a verb new since v0.31.0. Surfaced 2026-10-17 by competitive-followup-pass' close second-vendor review as three gap bullets, promoted at the next scope's intake. Re-verified there by reading `in_clone`, `resolved` and the `claim_env` filter. Owner lookup: `in_clone`, `claim_env`, `symlink`, `prove` in this file and the disposed-findings record — none; [companion-prove-not-held](#companion-prove-not-held), DISTINCT (which claim `prove` stages); [prove-pwsh-leg-unmeasured](#prove-pwsh-leg-unmeasured), DISTINCT (the Windows route's oracle); owner installer/SPEC.md §prove.
 
-### knob-file-relative-to-cwd
-
-`knobs::wire_in_value` in `native/src/knobs/mod.rs` reads `GATE_SDK_KNOB_FILE`, and each kit's knob-file and local-knob-file override, from the environment and hands a relative value to `load` unchanged, which opens it against the process directory. So `prove`, and `doctor` through the same read, resolve a derived default from the invoking worktree's knob file, dirty edits included, while a battery at the clone's root reads `HEAD`'s; the prior close's fix holds this only for the default knob-file location.
-
-**Deliverable:** a relative override resolved against the tree `wire_in` reads, per installer/SPEC.md §doctor's "without entering that tree", with a crate test.
-
-**Cost while deferred:** a consumer exporting a relative knob-file override gets a `prove` or `doctor` reading that disagrees with the battery it describes. Surfaced 2026-10-17 by competitive-followup-pass' close second-vendor review as a gap bullet, promoted at the next scope's intake. Re-verified there by reading `wire_in_value` and `load`'s `is_file` test on the raw value. Owner lookup: `wire_in`, `KNOB_FILE`, `relative` in this file and the disposed-findings record — none; [prove-claim-path-confinement](#prove-claim-path-confinement), DISTINCT (the claim files, where this is the knob file); owner installer/SPEC.md §doctor and §prove.
-
 ### prove-pwsh-leg-unmeasured
 
 the PowerShell install-smoke leg (`install-smoke-pwsh-windows` in `.github/workflows/gates.yml`) runs `demo` and not `prove`, so the Windows route of `checkwright prove` (the path clone, the door spawned with the executable suffix, the not-held help on stderr) is measured by no leg, as installer/SPEC.md §prove's honest limits state.
@@ -1131,4 +1123,6 @@ a citation naming a numbered step by its bold title, in RELEASING.md's procedure
 A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, since check-front-door-verbs reads the front-door pages alone; widening its arm resolution to the kit SPECs, with the history valves, would catch it.
 
 ## Done
+
+- knob-file-relative-to-cwd
 

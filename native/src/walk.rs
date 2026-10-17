@@ -411,7 +411,7 @@ pub fn kit_roots_abs() -> Result<Vec<String>, String> {
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the same roots a battery run from `anchor` derives, for a
 // reader asking about a tree it has not entered
 pub fn kit_roots_abs_at(anchor: &str, gates_dir: &str) -> Result<Vec<String>, String> {
-    let kit_dirs = crate::knobs::wire_in(gates_dir, "GATE_SDK_KIT_DIRS")?;
+    let kit_dirs = crate::knobs::wire_in(Path::new(anchor), gates_dir, "GATE_SDK_KIT_DIRS")?;
     let (here, roots) = roots_at(normalize_abs(anchor), &sdk_root(), &kit_dirs)?;
     Ok(absolutized(&here, &roots))
 }
