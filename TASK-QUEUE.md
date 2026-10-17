@@ -1,14 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: evaluator-discovery-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-10-17, lead-relayed, not a ruling; the iteration opened undirected):** option A. Debt `orchestration-page-overreach`; the features `evaluator-agent-discovery`, narrowed to its surfaces (a) the choosing page, (b) the `llms.txt` projection and (d) the registry metadata, and `crate-manifest-license-unheld`, which spec authors and promotes. Surfaces (c) and (e) split off deferred as `evaluator-root-agent-file` and `agent-selection-probe`. Stages scope, spec, build, validate and close, with align where `check-stage-entry` assertion C fires. The license field and its gate land with the description edit on `native/Cargo.toml`, the field first.
-
-  **Push need (2026-10-17, inside the budget):** the closing push alone; no unit's completion reads a remote run. A v0.32.0 tag push, should close cut it, is the second.
 
 ---
 
