@@ -899,12 +899,20 @@ fn lookup_held(name: &str) -> Result<(Value, Origin, bool), String> {
 }
 
 fn or_default(row: &'static Row, got: Option<(Value, Origin, bool)>) -> Result<(Value, Origin, bool), String> {
+    or_default_by(row, got, &input)
+}
+
+fn or_default_by(
+    row: &'static Row,
+    got: Option<(Value, Origin, bool)>,
+    resolve: Resolve,
+) -> Result<(Value, Origin, bool), String> {
     match got {
         Some((Value::Scalar(s), _, _)) if s.is_empty() && row.empty_takes_default => {
-            Ok((default_value(row, &input)?, Origin::Default, false))
+            Ok((default_value(row, resolve)?, Origin::Default, false))
         }
         Some(v) => Ok(v),
-        None => Ok((default_value(row, &input)?, Origin::Default, false)),
+        None => Ok((default_value(row, resolve)?, Origin::Default, false)),
     }
 }
 
@@ -945,12 +953,21 @@ pub fn static_owner(name: &str) -> Option<&'static Kit> {
 // directory is `gates_dir` resolves it, without entering that tree: the same precedence and legacy
 // refusals, read uncached because the process's own tree is a different one
 pub fn wire_in(gates_dir: &str, name: &str) -> Result<String, String> {
+    wire_in_value(gates_dir, name).map(|(v, _)| v.wire())
+}
+
+// spec: installer/SPEC.md §doctor — a derived default's static siblings resolve in that tree too
+fn wire_in_value(gates_dir: &str, name: &str) -> Result<(Value, Origin), String> {
     let (kit, row) = static_row(name)?;
     let knob_file = std::env::var(kit.knob_file_var()).unwrap_or_default();
     let config_file = std::env::var(format!("{}CONFIG_FILE", kit.prefix())).unwrap_or_default();
     let local_file = std::env::var(kit.local_knob_file_var()).unwrap_or_default();
     let l = load(kit, gates_dir, &knob_file, &config_file, &local_file)?;
-    Ok(or_default(row, layered_from(&l, row.name, row.shape)?)?.0.wire())
+    let tree = |n: &str| match locator(n) {
+        Some(l) => Ok(l),
+        None => wire_in_value(gates_dir, n),
+    };
+    or_default_by(row, layered_from(&l, row.name, row.shape)?, &tree).map(|(v, o, _)| (v, o))
 }
 
 fn lookup(name: &str) -> Result<(Value, Origin), String> {
@@ -1285,6 +1302,22 @@ mod tests {
         env.set("GATE_SDK_PORTABILITY_PATHS", "env.sh");
         assert_eq!(wire_in(&tree.dir(), "GATE_SDK_PORTABILITY_PATHS").unwrap(), "env.sh");
         assert!(wire_in(&tree.dir(), "PROBE_KIT_ARMING").is_err());
+        clean(&env, &here.dir());
+        restore(&env);
+    }
+
+    // spec: installer/SPEC.md §doctor — a derived default's static sibling resolves in the named
+    // tree, never the process's own
+    #[test]
+    fn a_derived_default_resolves_its_sibling_in_the_named_tree() {
+        let env = knobenv::lock();
+        let here = Scratch::new("wire-in-derived-here");
+        let tree = Scratch::new("wire-in-derived-tree");
+        clean(&env, &here.dir());
+        here.write("gate-sdk-config.knobs", "GATE_SDK_QUEUE_FILE = HERE.md\n");
+        tree.write("gate-sdk-config.knobs", "GATE_SDK_QUEUE_FILE = TREE.md\n");
+        reset(&env);
+        assert_eq!(wire_in(&tree.dir(), "LIFECYCLE_KIT_QUEUE_FILE").unwrap(), "TREE.md");
         clean(&env, &here.dir());
         restore(&env);
     }

@@ -8,6 +8,8 @@ use std::fmt::Write as _;
 use std::path::Path;
 
 const VERDICT: &str = "PROVE";
+const QUEUE_KNOB: &str = "LIFECYCLE_KIT_QUEUE_FILE";
+const STATE_KNOB: &str = "LIFECYCLE_KIT_STATE_FILE";
 pub(super) const USAGE: &[&str] = &[
     "usage: checkwright prove",
     "",
@@ -153,15 +155,22 @@ fn prove(scratch: &mut Scratch) -> Outcome {
     let door = super::init::command_token(&bin);
     print!("{}", report(&root, &clone, &manifest, &door));
 
+    // spec: installer/SPEC.md §prove — both battery runs read the claim's files at the paths resolved
+    // here, so an absolute knob rebased onto the clone is the file the battery reads
+    let queue_rel = resolved(&root, &gates, QUEUE_KNOB, QUEUE_FILE);
+    let state_rel = resolved(&root, &gates, STATE_KNOB, STATE_FILE);
+    let claim_env: Vec<(String, String)> = [(QUEUE_KNOB, &queue_rel), (STATE_KNOB, &state_rel)]
+        .into_iter()
+        .filter_map(|(k, v)| v.as_ref().map(|v| (k.to_string(), v.clone())))
+        .collect();
+
     // spec: installer/SPEC.md §prove — the battery at HEAD; a red one does not stop the run
     println!("\nbattery at HEAD");
-    let (_, out) = step!(battery(&clone, &bin));
+    let (_, out) = step!(battery(&clone, &bin, &claim_env));
     show::say(&summary(&out));
 
     // spec: installer/SPEC.md §prove — the claim, over the files a battery at the clone's root reads
     println!("\nthe claim");
-    let queue_rel = resolved(&root, &gates, "LIFECYCLE_KIT_QUEUE_FILE", QUEUE_FILE);
-    let state_rel = resolved(&root, &gates, "LIFECYCLE_KIT_STATE_FILE", STATE_FILE);
     let help = format!(
         "re-run init with --profile {}, the profile demo installs, to keep a task queue and stage state; init --help lists the profiles and the --with-kit selection.",
         super::profile::DERIVED
@@ -201,7 +210,7 @@ fn prove(scratch: &mut Scratch) -> Outcome {
         "a task moved to Done and validate and close stamped for iteration {}, with no evidence behind them",
         demo::ITERATION
     ));
-    let (rc, out) = step!(battery(&clone, &bin));
+    let (rc, out) = step!(battery(&clone, &bin, &claim_env));
     let quoted = if rc == 0 { None } else { demo::caught(&out) };
     let Some(quoted) = quoted else {
         show::say(&summary(&out));
@@ -236,13 +245,25 @@ fn minutes_since(then: i64, now: i64) -> i64 {
 }
 
 // spec: installer/SPEC.md §prove — a knob's path inside the repository, rebased onto the clone; a
-// path outside the repository is none of the clone's
+// path outside the repository, a relative one climbing out of it included, is none of the clone's
 fn in_clone(root: &Path, value: &str) -> Option<String> {
-    if crate::walk::path_root(value).is_none() {
-        return Some(value.to_string());
+    let rel = if crate::walk::path_root(value).is_none() {
+        Path::new(value)
+    } else {
+        Path::new(value).strip_prefix(root).ok()?
+    };
+    let mut kept: Vec<String> = Vec::new();
+    for c in rel.components() {
+        match c {
+            std::path::Component::CurDir => {}
+            std::path::Component::ParentDir => {
+                kept.pop()?;
+            }
+            std::path::Component::Normal(s) => kept.push(s.to_string_lossy().into_owned()),
+            _ => return None,
+        }
     }
-    let rel = Path::new(value).strip_prefix(root).ok()?;
-    Some(rel.components().map(|c| c.as_os_str().to_string_lossy().into_owned()).collect::<Vec<_>>().join("/"))
+    Some(kept.join("/"))
 }
 
 fn resolved(root: &Path, gates: &str, knob: &str, seeded: &str) -> Option<String> {
@@ -292,9 +313,10 @@ fn report(root: &Path, clone: &Path, manifest: &lock::Manifest, door: &str) -> S
 }
 
 // spec: installer/SPEC.md §prove — the battery is the clone's own door, spawned in the clone
-fn battery(clone: &Path, bin: &str) -> Result<(i32, String), Outcome> {
+fn battery(clone: &Path, bin: &str, claim_env: &[(String, String)]) -> Result<(i32, String), Outcome> {
     let door = clone.join(bin);
-    let set = [("GIT_TERMINAL_PROMPT".to_string(), "0".to_string())];
+    let mut set = vec![("GIT_TERMINAL_PROMPT".to_string(), "0".to_string())];
+    set.extend_from_slice(claim_env);
     let unset: Vec<String> = proc::GIT_REPO_LOCATORS.iter().map(|s| s.to_string()).collect();
     let m = proc::run_merged_scrubbed(
         &programs::CHECKWRIGHT_GATES.at(door.to_string_lossy().into_owned()),
@@ -354,6 +376,10 @@ mod tests {
         assert_eq!(super::in_clone(root, "TASK-QUEUE.md").as_deref(), Some("TASK-QUEUE.md"));
         assert_eq!(super::in_clone(root, "/repo/docs/q.md").as_deref(), Some("docs/q.md"));
         assert_eq!(super::in_clone(root, "/elsewhere/q.md"), None);
+        assert_eq!(super::in_clone(root, "./docs/../q.md").as_deref(), Some("q.md"));
+        assert_eq!(super::in_clone(root, "../../TASK-QUEUE.md"), None);
+        assert_eq!(super::in_clone(root, "docs/../../q.md"), None);
+        assert_eq!(super::in_clone(root, "/repo/../q.md"), None);
     }
 
     // spec: installer/SPEC.md §prove — the summary is the battery's own line, else its last
