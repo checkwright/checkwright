@@ -1094,9 +1094,3 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 
 ## Done
 
-- bounded-promise-phrasing
-- activated-guarantee-route
-- openspec-delta-base-agreement
-- consult-grant-spend-unmarked
-- companion-adoption-rehearsal
-
