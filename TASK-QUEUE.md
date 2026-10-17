@@ -14,6 +14,8 @@
 
   **Push need (2026-10-17, inside the budget):** the closing push, plus the tag push on a clean return; no unit reads a remote run.
 
+  **Owed at close (operator direction 2026-10-17, lead-relayed, not a ruling):** the operator sets the repository's GitHub About by hand to the approved product statement's plain rendering (`installer/package.json`'s `description`), after the account-selection step, around the closing push; until then site-health's About arm reports the difference.
+
 ---
 
 ## New Features
@@ -65,6 +67,8 @@ a clean-seat rehearsal of the companion toolkits' adoption (`companion/`: the Sp
 the front door's headline, "Deterministic verification for coding-agent delivery" (README.md, docs/index.md), and the Release-note opener RELEASING.md reserves, promise verification broadly, while docs/spec-toolkits.md §What the gates check against your code bounds them to path and story existence, so a buyer can read structural evidence checks as semantic verification.
 
 **Deliverable:** the headline, the opener and the phrasing rule docs/positioning.md carries led by the bounded promise: reproducible classes of unsupported claims caught before merge. The wording is drafted in build and approved by the operator before it lands (operator direction 2026-10-17, lead-relayed, not a ruling). It is drafted to survive quotation by a coding agent that evaluates the tool and summarises it for a person (operator direction 2026-10-17, lead-relayed mid-spec, not a ruling).
+
+**Approved (operator direction 2026-10-17, lead-relayed, not a ruling):** build's Option A verbatim, the headline, summary, opener and the positioning page's bounded-promise section; the reach is the first screen alone (headline, opener, meta descriptions), the orchestration page's verification-layer framing filed as a gap for the next scope.
 
 **Cost while deferred:** the first-screen claim overreaches what an evaluator's first run demonstrates. Filed 2026-10-17 by this iteration's scope from the competitive analysis' ranked actions. Owner lookup: `headline`, `phrasing`, `positioning` in this file and the disposed-findings record — none; [verify-workflow-decoupling](#verify-workflow-decoupling), DISTINCT (a decoupling statement on the same front door, after this); owner docs/positioning.md, with RELEASING.md.
 
