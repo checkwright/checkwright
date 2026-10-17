@@ -9,3 +9,4 @@ evaluator-discovery-pass spec abd9324b 2026-10-17 612d3a665
 evaluator-discovery-pass align a2477b9b 2026-10-17 ea69edd26
 evaluator-discovery-pass build a252ade7 2026-10-17 8d7af2f88
 evaluator-discovery-pass build ab906c9c 2026-10-18 38f273047
+evaluator-discovery-pass validate a42dd5b4 2026-10-18 646e952b8
