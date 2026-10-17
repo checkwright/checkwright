@@ -201,7 +201,7 @@ The native leg exists because a Windows record names a pid in one of two namespa
 
 **On a non-unix build an absent `ps` leaves the predicate unable to answer, and every reader, the writer's own claim included, refuses rather than reads free.** `ps` is reached only when the native leg and `kill -0` both read gone. Without the fallback, a process that exists but cannot be signalled is indistinguishable from one that is gone. Reading the unanswerable case as free would restore the false free the fallback closes. The refusal takes the guards' exit 2 wherever the reader has one.
 
-**PID reuse is a named, accepted residual.** A recycled PID yields a false *held* reading, which refuses a stage entry that could have proceeded. That direction fails closed and costs one file deletion to clear, against a defect that would cost the next session an evidence file changing underneath it. Two further cases are instances of the same residual, with the same direction and clearance:
+**PID reuse is a named, accepted residual.** A recycled PID yields a false *held* reading, which refuses a stage entry that could have proceeded. That direction fails closed and costs one file deletion to clear, against a defect that would cost the next session an evidence file changing underneath it. These cases are instances of the same residual, with the same direction and clearance:
 
 - the writer's own refusal reads the identical predicate, so a recycled PID makes `--run-validate` over-refuse;
 - on Windows, an MSYS pid that numerically matches a live Windows process reads held through the native leg;
