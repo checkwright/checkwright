@@ -25,20 +25,20 @@ New section, `installer/SPEC.md` §prove, after §demo. **Not yet applied.**
 > 1. **The clone.** Under the base `demo` uses (§demo, step 1), `git clone --local --no-checkout` makes a clone of the repository and checks `HEAD`'s commit out detached, with `demo`'s local identity and maintenance settings. It makes the scratch directory `init` makes (§What init seeds), which git does not carry. A drop guard removes it on every exit path. Every reading below is of that clone, except the hook state, which is per clone and read from yours.
 > 2. **The report.** `configured` names the profile, the kit count and the registry's member count, from the lock and the registry it records. `enforced` names where the battery runs without being asked: `at commit`, `doctor`'s hook-state line over your repository, and `in CI`, the workflow `init` seeds where `HEAD` carries it, else `none seeded`. `inactive` names each disarmed member, by `doctor`'s reader (§doctor), and the hooks when they are not opted in. Where your worktree differs from `HEAD`, a `note:` line says the run read `HEAD` alone.
 > 3. **The battery at `HEAD`.** The clone's door runs `--run`, and its summary is reported. A red battery does not stop the run.
-> 4. **The claim.** It resolves the queue and state files as a battery run at the clone's root resolves `LIFECYCLE_KIT_QUEUE_FILE` and `LIFECYCLE_KIT_STATE_FILE`, falling back to the paths `init` seeds. `demo`'s claim is written over them and committed with `--no-verify`, and the battery runs again. The claim is **caught** when the battery exits non-zero and a reddened block names the claim's iteration, `demo`'s rule, each block quoted back through its excerpt rule. A tree keeping neither file, or one the claim cannot be staged in, has no claim to catch.
+> 4. **The claim.** It resolves the queue and state files as a battery run at the clone's root resolves `LIFECYCLE_KIT_QUEUE_FILE` and `LIFECYCLE_KIT_STATE_FILE`, falling back to the paths `init` seeds. `demo`'s claim is written over them and committed with `--no-verify`, and the battery runs again. The claim is **caught** when the battery exits non-zero and a reddened block names the claim's iteration, `demo`'s rule, each block quoted back through its excerpt rule. A tree missing either file, or whose queue lacks the iteration header or the `## Done` section the claim is staged in, has no claim to catch, and the verdict below states which.
 > 5. **Time to proof.** On a catch, the whole minutes from the committer time of the oldest commit reachable from `HEAD` that added `checkwright.lock` to the run's own clock.
 >
 > **The verdict is the exit status, and the last line of stdout states it** in a grammar a crate test holds:
 >
 > - **0** — `PROVE: held — caught at <head>; time to proof <N> min`, `<head>` the abbreviated commit and `<N>` a decimal integer.
-> - **1** — `PROVE: not held — <cause>`: `the claim was not caught`, or `this tree keeps no <file> to claim a task done in`, followed by a `help:` line naming a profile or `--with-kit` selection that keeps a task queue and stage state, which `init --help` lists.
+> - **1** — `PROVE: not held — <cause>`: `the claim was not caught`, `this tree keeps no <file> to claim a task done in`, or `<file> keeps no <part> to claim a task done in`, `<part>` the iteration header or the `## Done` section. A missing file is followed by a `help:` line naming a profile or `--with-kit` selection that keeps a task queue and stage state, which `init --help` lists.
 > - **2** — `PROVE: FAIL(env) — <cause>` on stderr, for a refused precondition, a clone that could not be made, a failed `git`, or a door that could not be spawned.
 >
 > **What it spawns.** The verb spawns `git` and the clone's door, and nothing else, so it adds no member to the tool-floor roster. The battery spawns whatever the registered gates spawn, which is the installed selection's own floor.
 >
 > **Its oracle** is the consumer smoke's prove arm (§The consumer smoke).
 >
-> **Honest limits.** It proves `HEAD`, never uncommitted work, and a gate reading a file git ignores reads that file's absence in the clone. A gate red for another reason whose block prints the queue header would read as a catch. A tree vendored without the installer carries no lock and is refused. The Windows route runs the same code and is measured by no leg.
+> **Honest limits.** It proves `HEAD`, never uncommitted work, and a gate reading a file git ignores reads that file's absence in the clone. Its time runs from the install commit to the run, so it omits the install command's own run and counts any wait before the run. A gate red for another reason whose block prints the queue header would read as a catch. A tree vendored without the installer carries no lock and is refused. The Windows route runs the same code and is measured by no leg.
 
 Replacement for `installer/SPEC.md` §The verbs, a new table row after `demo`'s, and the classifier paragraph's first sentence. **Not yet applied.**
 
@@ -91,7 +91,7 @@ Replacement for `drift-kit/SPEC.md` §The install-evidence projection, the Insta
 
 > - **Installs** — observed; how many reached a first green, with the min, median and max time-to-first-green over those; how many reached a held proof, with the min, median and max time-to-proof over those. An install whose `<ttfg>` is the no-green sentinel is outside the first population, and one with no `proof` line outside the second. A `proof` line whose `<id>` has no install line contributes nothing.
 
-Owed with it: `native/src/emit/file_install.rs` and `native/src/emit/install_evidence.rs` and their crate cases, the usage line in `drift-kit/README.md`, and `docs/install-evidence.md`, regenerated with its freshness gate's printed command.
+Owed with it: `native/src/emit/file_install.rs` and `native/src/emit/install_evidence.rs` and their crate cases, `drift-kit/smoke/install.sh`'s capture and projection cases for the new kind with the install-observation bullet of `drift-kit/SPEC.md` §Testing that names them, the usage line in `drift-kit/README.md`, and `docs/install-evidence.md`, regenerated with its freshness gate's printed command.
 
 ### (5) The front door names the path and the proof {mechanical} {user-facing: as delta 1}
 
@@ -108,7 +108,7 @@ Owed with it: `native/src/emit/file_install.rs` and `native/src/emit/install_evi
   - Consumers: the adopter and an evaluating agent, through the exit status and the verdict line; the observer filing `proof` (delta 4); the prove arm (delta 3).
   - Readers it reuses rather than copies, from `grep -n "fn hooks_line\|fn tree_disarmed_block" native/src/installer/doctor.rs` and `grep -n "fn claim\|fn scratch_base" native/src/installer/demo.rs`: `doctor`'s hook-state and disarmed readers and `demo`'s claim and scratch base, each called from one module rather than re-implemented.
   - Roster-holding readers of the minted verb, from `grep -rln '"--demo"' native/src` and `grep -rln "checkwright demo" --include=*.md .`: `VERBS` and `TOP_LEVEL_FLAGS`; `installer/README.md`'s verb table, which invariant A holds equal to `VERBS`; the front-door pages invariant B reads; and the crate test holding every parser and `usage:` line to `FLAGS`, which `prove` joins with no flag.
-  - Fields: `<head>`, read by the adopter or agent to know which revision held; `<N>`, read by the observer as `<ttfp>`'s measurement and by an agent as its time to proof; `<cause>` and the `help:` line, read by the adopter on a `not held`.
+  - Fields: `<head>`, read by the adopter or agent to know which revision held; `<N>`, read by the observer as `<ttfp>` for a first held run, the install commit standing for the first install command, and by an agent as its time to proof; `<cause>` and the `help:` line, read by the adopter on a `not held`.
 - **The `then:` line (delta 2).** Producer: `init`, on every run printing the follow-up block. Consumer: the adopter or agent who ran `init`. The follow-up arm and the PowerShell leg parse the block alone, which the line's indentation ends (§init's block grammar).
 - **The `proof` kind (delta 4).** Producer: the observer at an observed install, filing with `--author` for the author seat's own. Consumer: the install-evidence projection's next emission, and `check-install-evidence-fresh` through the committed page. `<id>` is read by the projection's join; `<ttfp>` by its time-to-proof statistics.
 - **Point 5:** no delta narrows a corpus. The projection's Installs block gains columns, and the freshness gate byte-compares the regenerated page, which delta 4 lands.
@@ -122,7 +122,7 @@ The roster below came from `grep -n "demo\|doctor" installer/SPEC.md installer/R
 - `native/src/installer/mod.rs`, a new `native/src/installer/prove.rs` and `native/src/main.rs` (delta 1).
 - `installer/SPEC.md` §init and `native/src/installer/init.rs` (delta 2).
 - `installer/SPEC.md` §The consumer smoke and `native/src/emit/installer_smoke/` (delta 3).
-- `drift-kit/SPEC.md` §The install-observation record and §The install-evidence projection, `native/src/emit/file_install.rs`, `native/src/emit/install_evidence.rs`, `drift-kit/README.md` and `docs/install-evidence.md` (delta 4).
+- `drift-kit/SPEC.md` §The install-observation record, §The install-evidence projection and §Testing, `drift-kit/smoke/install.sh`, `native/src/emit/file_install.rs`, `native/src/emit/install_evidence.rs`, `drift-kit/README.md` and `docs/install-evidence.md` (delta 4).
 - `docs/install.md`, `installer/README.md` and `docs/maintenance.md` (delta 5).
 - `docs/installer/SPEC.md`, `docs/drift-kit/SPEC.md`, `docs/installer/README.md` and `docs/drift-kit/README.md`, the generated mirrors (all deltas).
 
@@ -138,5 +138,5 @@ The roster below came from `grep -n "demo\|doctor" installer/SPEC.md installer/R
 - [ ] **Amendment deleted** — this file removed on merge; no root-level amendment of this unit remains (`ls SPEC-*.md`).
 - [ ] **Removals propagated** — every name this change retired is declared in `## Retired spellings` above, and `check-amendment-retired-spelling` runs each declaration against the whole tracked tree, not against the specs alone.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as debt tasks (a build-time causal gap is resolved that session, not deferred), and the PowerShell leg's coverage of `prove` filed as a gap bullet.
-- [ ] **Fixture suites** — the installer consumer smoke, with the prove arm, and the drift-kit crate cases run green.
+- [ ] **Fixture suites** — the installer consumer smoke, with the prove arm, the drift-kit smoke and the drift-kit crate cases run green.
 - [ ] **Done move** — the entry moves to Done in the commit that merges this amendment, before the drain stage.

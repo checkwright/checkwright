@@ -29,23 +29,23 @@ New section, `canon-kit/SPEC.md` §check-delta-agreement, after §check-task-lab
 >
 > A **family** is a key of `CANON_KIT_DELTA_ITEM` and of exactly one of `CANON_KIT_DELTA_PRESENT` and `CANON_KIT_DELTA_ABSENT`. The `PRESENT` or `ABSENT` value is an ERE matching the family's **section heading**; the section runs from that line to the next heading of its level or shallower. The `ITEM` value is a one-group ERE, and each line in the section matching it names an item. Fences are skipped in a delta too. Two families may share a section heading, so one section can carry two assertions.
 >
-> - An item a `PRESENT` family names must be among its base's items.
-> - An item an `ABSENT` family names must not be among them.
-> - Where the base file does not exist, an item a family listed in `CANON_KIT_DELTA_BASE_REQUIRED` names is a finding. Any other family reads a missing base as carrying no items.
+> - Where the base file exists, an item a `PRESENT` family names must be among its base's items.
+> - Where it exists, an item an `ABSENT` family names must not be among them.
+> - Where the base file does not exist, an item a family listed in `CANON_KIT_DELTA_BASE_REQUIRED` names is a finding. Any other family asserts nothing against a missing base.
 >
 > Item names compare case-sensitively after trimming and collapsing each run of blanks to one space. A finding names the delta, the line, the family, the item and the base, and whether the base lacks it, already carries it, or does not exist.
 >
 > The table validator holds `CANON_KIT_DELTA_ITEM`'s key set equal to the union of the other two keyed knobs', with no key in both, each ITEM and the path and base-item knobs to the one-group shape, and every `CANON_KIT_DELTA_BASE_REQUIRED` member to a family. A refusal is exit 2.
 >
-> Declared by `checks/check-delta-agreement.gate`, `# install: zero-config`, `# armed-by: CANON_KIT_DELTA_PATH`, dispatching to the binary, with `knob:CANON_KIT_DELTA_PATH` and `*.md` in `couples=`. An empty knob is the clean skip, and its clean line says no delta is configured. The pair names no toolkit: `good/` holds a delta whose present and absent families agree with its base, a fenced example naming items its base lacks, a section of a family sharing its heading with another, and a delta with no base carrying only items of a family not base-required; `bad/` holds a present item its base lacks, an absent item its base carries, and a base-required family's item on a delta with no base. Tier `precommit`.
+> Declared by `checks/check-delta-agreement.gate`, `# install: zero-config`, `# armed-by: CANON_KIT_DELTA_PATH`, dispatching to the binary, with `knob:CANON_KIT_DELTA_PATH` and `*.md` in `couples=`. An empty `CANON_KIT_DELTA_PATH` is the clean skip, taken before the validator reads the tables, and its clean line says no delta is configured. The pair names no toolkit: `good/` holds a delta whose present and absent families agree with its base, a fenced example naming items its base lacks, a section of a family sharing its heading with another, and a delta with no base carrying only items of a family not base-required; `bad/` holds a present item its base lacks, an absent item its base carries, and a base-required family's item on a delta with no base. Tier `precommit`.
 
 Replacement for `canon-kit/SPEC.md` §Layout and configuration, a new bullet after the one opening `` `CANON_KIT_TASK_LIST_GLOBS` ``. **Not yet applied.**
 
 > - `CANON_KIT_DELTA_PATH`, the one-group ERE naming a delta and its base, and `CANON_KIT_DELTA_BASE_DIR`, the directory a base resolves under, default empty for the repository root. `CANON_KIT_DELTA_BASE_ITEM`, the one-group ERE naming an item in a base. `CANON_KIT_DELTA_PRESENT` and `CANON_KIT_DELTA_ABSENT`, keyed: per family, the ERE matching its section heading. `CANON_KIT_DELTA_ITEM`, keyed: per family, the one-group ERE naming an item in that section. `CANON_KIT_DELTA_BASE_REQUIRED`, indexed: the families whose items need the base to exist. All default empty (§check-delta-agreement).
 
-Owed with it: the six rows in `native/src/knobs/canon_kit.rs` and the table validator's arm beside the task-label one; the gate's row in the gate table of `native/src/gates/mod.rs`; the gate module and its crate cases (each finding shape, the shared-heading section, the fence skip, the name normalization); the `.gate` file and the fixture pair; the gate's row in `canon-kit/README.md`'s roster; and its registration in `scripts/gates.list`, disarmed here as `check-task-path-claim` is.
+Owed with it: the seven rows in `native/src/knobs/canon_kit.rs` and the table validator's arm beside the task-label one; the gate's row in the gate table of `native/src/gates/mod.rs`; the gate module and its crate cases (each finding shape, the shared-heading section, the fence skip, the name normalization, the missing base); the `.gate` file and the fixture pair; the gate's row in `canon-kit/README.md`'s roster and its line in `canon-kit/smoke/install.sh`'s registered roster, which `check-install-disposition` holds a superset of the zero-config members; and its registration in `scripts/gates.list`, disarmed here as `check-task-path-claim` is. The generated `docs/enforcement.md`, the rollup block of `docs/value.md` and `docs/check-graph.html` regenerate with the commands their freshness gates print.
 
-### (2) The OpenSpec recipe binds the uncovered disagreement, and the first overlap layer binds the rest {design-bearing}
+### (2) The OpenSpec recipe binds the uncovered disagreement, and the first overlap layer binds the rest {design-bearing} {user-facing: as delta 4}
 
 `companion/openspec/recipe/canon-config.knobs` gains five lines, and a new layer `companion/openspec/overlap/` holds `canon-config.knobs` and an empty `unregister.list`, packed as the recipe `openspec-overlap` by a `GATE_SDK_PAYLOAD_RECIPES[openspec-overlap]` line in `scripts/gate-sdk-config.knobs`. The spellings below are the design; the companion arm's run is their oracle, and build corrects a spelling to what it returns.
 
@@ -108,7 +108,7 @@ The arm's refusal set also reds a `companion-overlap` block on a toolkit with no
 - **`check-delta-agreement` (delta 1).**
   - Producer: the battery, at pre-commit and CI, wherever `init` registers canon-kit (`prose`, `complement`, `full`), armed by a seam carrying `CANON_KIT_DELTA_PATH`. The deployed configuration setting it is the OpenSpec recipe (delta 2), so the gate is live on every OpenSpec install line.
   - Consumers: the adopter, through the battery's FAIL block; `doctor`'s disarmed line, read off `# armed-by:` (installer/SPEC.md §doctor); the companion arm's step 4 and step 5 (delta 3); the support-table arm, through the fixture directories (delta 2).
-  - Roster-holding readers of the minted names, from `grep -rln "CANON_KIT_TASK_LABEL_CITES" native/src canon-kit gate-sdk scripts`, the sibling gate's knobs taken as the model: `native/src/knobs/canon_kit.rs` (rows and validator), the gate table in `native/src/gates/mod.rs` (each gate's declared knob roster, which takes the six names and the prune knobs the task gates declare), `canon-kit/SPEC.md` §Layout and configuration, and the generated `docs/canon-kit/SPEC.md`. `check-knob-citation` reads a cited knob against the rows, so the rows land with the citations. `check-install-disposition` reads the `# install:` line; the third assertion holds no gate name in the recipe module, and the binding is data in a recipe file.
+  - Roster-holding readers of the minted names, from `grep -rln "CANON_KIT_TASK_LABEL_CITES" native/src canon-kit gate-sdk scripts`, the sibling gate's knobs taken as the model: `native/src/knobs/canon_kit.rs` (rows and validator), the gate table in `native/src/gates/mod.rs` (each gate's declared knob roster, which takes the seven names and the prune knobs the task gates declare), `canon-kit/SPEC.md` §Layout and configuration, and the generated `docs/canon-kit/SPEC.md`. `check-knob-citation` reads a cited knob against the rows, so the rows land with the citations. `check-install-disposition` reads the `# install:` line; the third assertion holds no gate name in the recipe module, and the binding is data in a recipe file.
   - Fields: each finding's delta, line and item, read by the adopter; the family and the base, read by the adopter and by step 5's every-file assertion, which reads the delta path alone.
 - **The overlap layer (delta 2).** Producer: the packer, from the new `GATE_SDK_PAYLOAD_RECIPES` key. Consumers: `init --recipe openspec-overlap` (installer/SPEC.md §Payload recipes) and the companion arm's step 5. Readers of the recipe roster, from `grep -rn "GATE_SDK_PAYLOAD_RECIPES" native/src --include=*.rs -l`: the packer, `check-front-door-verbs`' recipe set, and the companion arm, whose step 1 derives the toolkit set from `companion/*/recipe/` and so does not read `overlap/` as a toolkit.
 - **The `companion-overlap` block (deltas 3 and 4).** Producer: `docs/openspec.md`. Consumers: the companion arm (delta 3), and `check-front-door-verbs`, which reads its `checkwright` line as an advertisement.
@@ -120,15 +120,16 @@ The arm's refusal set also reds a `companion-overlap` block on a toolkit with no
 The roster below came from `grep -n "overlap\|value bar\|Delta-to-base" companion/SPEC.md installer/SPEC.md docs/spec-toolkits.md docs/openspec.md` and `grep -n "overlay" .github/workflows/gates.yml` over the tracked tree.
 
 - `canon-kit/SPEC.md`, a new §check-delta-agreement and §Layout and configuration (delta 1).
-- `native/src/knobs/canon_kit.rs`, the gate table in `native/src/gates/mod.rs`, the gate module, `canon-kit/checks/`, `canon-kit/gate-tests/`, `canon-kit/README.md` and `scripts/gates.list` (delta 1).
+- `native/src/knobs/canon_kit.rs`, the gate table in `native/src/gates/mod.rs`, the gate module, `canon-kit/checks/`, `canon-kit/gate-tests/`, `canon-kit/README.md`, `canon-kit/smoke/install.sh` and `scripts/gates.list` (delta 1).
+- `docs/enforcement.md`, the rollup block of `docs/value.md` and `docs/check-graph.html`, the generated projections the new gate moves (delta 1).
 - `companion/openspec/recipe/canon-config.knobs` and the new `companion/openspec/overlap/` (delta 2).
 - `scripts/gate-sdk-config.knobs`, the `GATE_SDK_PAYLOAD_RECIPES` key (delta 2).
 - `companion/SPEC.md` §The OpenSpec recipe, a new §The OpenSpec overlap, §The tested claim, §The fixtures, §The support table, §The toolkit legs and §Honest limits (delta 2).
 - `companion/fixtures/openspec/defects/check-delta-agreement/` and `companion/fixtures/openspec/overlap/check-delta-agreement/` (delta 2).
-- `native/src/emit/support_table.rs`, the cell rule (delta 2).
+- `native/src/emit/support_table.rs`, the cell rule, and the OpenSpec claimed-gate list in `native/src/emit/installer_smoke/companion.rs` (delta 2).
 - `installer/SPEC.md` §The consumer smoke, the companion arm, and `native/src/emit/installer_smoke/companion.rs` (delta 3).
 - `docs/openspec.md`, `docs/spec-toolkits.md` and `.github/workflows/gates.yml` (delta 4).
-- `docs/canon-kit/SPEC.md`, `docs/companion/SPEC.md` and `docs/installer/SPEC.md`, the generated mirrors (all deltas).
+- `docs/canon-kit/SPEC.md`, `docs/canon-kit/README.md`, `docs/companion/SPEC.md` and `docs/installer/SPEC.md`, the generated mirrors (all deltas).
 
 ## Retired spellings
 
