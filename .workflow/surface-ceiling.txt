@@ -35,7 +35,7 @@
 1463cp docs/gate-sdk/index.md
 9561cp docs/generated-projections.md
 1259cp docs/guard-kit/index.md
-5383cp docs/index.md
+5230cp docs/index.md
 8768cp docs/install-block-contracts.md
 8675cp docs/install-parity-contracts.md
 9491cp docs/install.md

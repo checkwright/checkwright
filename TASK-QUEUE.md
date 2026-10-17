@@ -16,6 +16,8 @@
 
   **Push need (2026-10-17, inside the budget):** the closing push, plus the tag push on a clean return; no unit reads a remote run.
 
+  **Product statement revised (operator direction 2026-10-17, lead-relayed, replacing the Option A wording approved for `bounded-promise-phrasing`, whose entry has left the queue):** every product-statement site and the GitHub About carry the 277-character statement `scripts/product-statement.conf` now renders, since GitHub caps the About at 350 characters and Option A ran to 430.
+
   **Owed at close (operator direction and grant 2026-10-17, lead-relayed, revising the earlier by-hand direction; the operator makes no GitHub change by hand, so a GitHub act is owed by the session holding the tools):** the close session sets the repository's GitHub About to `installer/package.json`'s `description` after the closing push lands, behind the account step, and reads it back; until then site-health's About arm reports the difference.
 
 ---

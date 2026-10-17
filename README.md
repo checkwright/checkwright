@@ -4,7 +4,7 @@
 
 <!-- product-statement:begin -->
 
-**Reproducible checks that catch unsupported claims in coding-agent delivery before merge.** Checkwright turns classes of claims an agent can make without evidence into failing checks: a task marked done with no recorded test run, a lifecycle stage skipped, a spec or task naming a file the tree does not have. The checks are deterministic and structural: they prove the evidence a claim rests on exists, not that the code is correct.
+**Reproducible checks that catch unsupported claims in coding-agent delivery before merge:** a task marked done with no recorded test run, a skipped lifecycle stage, a spec naming a file the tree lacks. They prove the evidence a claim rests on exists, not that the code is correct.
 
 <!-- product-statement:end -->
 
