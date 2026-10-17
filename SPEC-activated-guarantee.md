@@ -10,7 +10,7 @@ Pairs `activated-guarantee-route`. The front door's guarantee is demonstrated on
 
 ### (1) The installer gains `prove` {design-bearing} {user-facing: activated-guarantee-route's Deliverable, the verb-or-doctor form it leaves to this stage, and the operator direction of 2026-10-17 making an evaluating agent a first-class reader, both lead-relayed}
 
-New section, `installer/SPEC.md` §prove, after §demo. **Not yet applied.**
+New section, `installer/SPEC.md` §prove, after §demo. **Applied**, with three in-envelope build rulings: the `help:` line goes to stderr so the verdict stays the last line of stdout, a committer time ahead of the clock reads as 0 minutes, and a queue or state knob naming a path outside the repository names no file of the clone's.
 
 > ## prove
 >
@@ -40,7 +40,7 @@ New section, `installer/SPEC.md` §prove, after §demo. **Not yet applied.**
 >
 > **Honest limits.** It proves `HEAD`, never uncommitted work, and a gate reading a file git ignores reads that file's absence in the clone. Its time runs from the install commit to the run, so it omits the install command's own run and counts any wait before the run. A gate red for another reason whose block prints the queue header would read as a catch. A tree vendored without the installer carries no lock and is refused. The Windows route runs the same code and is measured by no leg.
 
-Replacement for `installer/SPEC.md` §The verbs, a new table row after `demo`'s, and the classifier paragraph's first sentence. **Not yet applied.**
+Replacement for `installer/SPEC.md` §The verbs, a new table row after `demo`'s, and the classifier paragraph's first sentence. **Applied.**
 
 > | `prove` | is a done claim caught on my own tree, and what here is enforced? | `HEAD`, through a clone of its own, and the hook state of this clone |
 
@@ -52,13 +52,13 @@ The verb also joins `VERBS` in `native/src/installer/mod.rs` and `TOP_LEVEL_FLAG
 
 After the `next:` block, on every run that prints it, `init` prints one unindented line: `then: <door> --prove reports what this tree enforces and whether a task claimed done with no evidence is caught here.`, `<door>` spelled as the block's commands spell it. The line sits outside the block, so neither the consumer smoke's follow-up arm nor the PowerShell leg runs it, and a `not held` on `starter` reds neither.
 
-Replacement for `installer/SPEC.md` §init, the sentence of the paragraph beginning **It writes the kit directories** that opens "It makes **one commit**". **Not yet applied.**
+Replacement for `installer/SPEC.md` §init, the sentence of the paragraph beginning **It writes the kit directories** that opens "It makes **one commit**". **Applied.**
 
 > It makes **one commit** naming the profile and the version, then prints a **follow-up block**: the commands that finish the setup, each with its reason. A `then:` line after the block names `prove` (§prove), the step that shows the install working on this tree.
 
 ### (3) The consumer smoke gains the prove arm {design-bearing}
 
-New paragraph in `installer/SPEC.md` §The consumer smoke, after the demo arm's. **Not yet applied.**
+New paragraph in `installer/SPEC.md` §The consumer smoke, after the demo arm's. **Applied.**
 
 > **The prove arm** runs after the demo arm, in a fresh consumer `init` wrote at the lattice minimum, with `DEMO_TMP_DIR` pointed at a directory the harness owns. It runs `checkwright prove` through the installed package's entry point with stdin closed, and asserts, each as its own named failure line:
 >

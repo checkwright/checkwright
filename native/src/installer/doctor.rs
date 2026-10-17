@@ -213,7 +213,7 @@ fn content_empty(
     (present > 0).then_some(true)
 }
 
-fn tree_disarmed_block(out: &mut String, root: &std::path::Path, list_text: &str) {
+pub(super) fn tree_disarmed_block(out: &mut String, root: &std::path::Path, list_text: &str) {
     let Some((gates, dirs)) = tree_decl_dirs(root) else {
         return;
     };
@@ -337,7 +337,7 @@ fn latest_line(r: &crate::emit::update_notice::Reading) -> String {
 }
 
 // spec: installer/SPEC.md §doctor — the hook state on one line, none of it a failure
-fn hooks_line(opted_in: bool, missing: &[String]) -> String {
+pub(super) fn hooks_line(opted_in: bool, missing: &[String]) -> String {
     match (opted_in, missing.is_empty()) {
         (false, _) => "not opted in".to_string(),
         (true, true) => "opted in, both hooks present".to_string(),

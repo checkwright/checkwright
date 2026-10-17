@@ -113,8 +113,9 @@ Every verb answers `-h`/`--help` on its own, before any precondition and from an
 | `update` | bring the install here up to the version this package carries | the manifest, then everything `init` reads |
 | `uninstall` | reverse the install, keeping anything I have edited | the manifest's `files` roster, against the tree |
 | `demo` | show me the adoption arc without touching my repository | the payload, in a scratch repository of its own |
+| `prove` | is a done claim caught on my own tree, and what here is enforced? | `HEAD`, through a clone of its own, and the hook state of this clone |
 
-**The classifier is writes / does not write, and it decides `--dry-run`.** `doctor` and `diff` write nothing, and `demo` writes only into a scratch repository it makes and removes ([§demo](#demo)), so none of the three takes one. Every verb that writes does, with one meaning: print the plan, write nothing, exit 0. [§The consumer smoke](#the-consumer-smoke) asserts it behaviorally: `init`, `update` and `uninstall --dry-run` each leave the tree object and the worktree unchanged over a consumer the real run would change.
+**The classifier is writes / does not write, and it decides `--dry-run`.** `doctor` and `diff` write nothing, and `demo` and `prove` write only into a scratch repository each makes and removes ([§demo](#demo), [§prove](#prove)), so none of the four takes one. Every verb that writes does, with one meaning: print the plan, write nothing, exit 0. [§The consumer smoke](#the-consumer-smoke) asserts it behaviorally: `init`, `update` and `uninstall --dry-run` each leave the tree object and the worktree unchanged over a consumer the real run would change.
 
 **`diff` is a verb of its own, not a widening of `doctor`**, on two independent grounds:
 
@@ -137,7 +138,7 @@ The `--dry-run`s do not stand in for it: they answer *what would this payload ch
 
   Every refusal `init` makes about the machine is this one. *This package carries no version stamp* and *`checkwright.lock` carries a schema this build does not know* are about the package and the manifest, reached by the crate's own JSON reader, and each means exactly what it names.
 
-It writes the kit directories, a `gates.list` seeded with each kit's starting gates, the config seams those kits need, and the manifest. It makes **one commit** naming the profile and the version, then prints a **follow-up block**: the commands that finish the setup, each with its reason. Each runs the binary `init` placed by its root-relative path prefixed `./`, with the artifact's executable suffix, a spelling both `sh` and PowerShell run with no interpreter before it. `install-smoke-pwsh-windows` runs the printed lines from PowerShell and commits through the hooks they place. The commands are not spelled on this page: what `init` prints is `init`'s to say. Where the update check is on, an unindented `update check:` paragraph precedes the `INIT:` line, stating the interval, the host and the knob that turns it off ([§The update notice](#the-update-notice)); `--dry-run` prints none.
+It writes the kit directories, a `gates.list` seeded with each kit's starting gates, the config seams those kits need, and the manifest. It makes **one commit** naming the profile and the version, then prints a **follow-up block**: the commands that finish the setup, each with its reason. An unindented `then:` line after the block names `prove` ([§prove](#prove)), the step that shows the install working on this tree; it is no command of the block, so neither the follow-up arm nor the PowerShell leg runs it, and a `not held` on `starter` reds neither. Each command runs the binary `init` placed by its root-relative path prefixed `./`, with the artifact's executable suffix, a spelling both `sh` and PowerShell run with no interpreter before it. `install-smoke-pwsh-windows` runs the printed lines from PowerShell and commits through the hooks they place. The commands are not spelled on this page: what `init` prints is `init`'s to say. Where the update check is on, an unindented `update check:` paragraph precedes the `INIT:` line, stating the interval, the host and the knob that turns it off ([§The update notice](#the-update-notice)); `--dry-run` prints none.
 
 **The block has a stated grammar, because [§The consumer smoke](#the-consumer-smoke)'s follow-up arm reads it**, so a reflow reds that arm rather than silently un-covering it:
 
@@ -608,6 +609,41 @@ The trim runs through the payload's own copy of doctrine-kit's installer ([doctr
 
 The banner, the green-token matcher and the excerpt are one module both walkthroughs call; each keeps its own acts.
 
+## prove
+
+`checkwright prove` answers *is a done claim caught on my own tree, and what here is enforced?*
+
+It makes the claim `demo`'s act 3 makes ([§demo](#demo)) in a clone of your `HEAD`, runs your own battery over it, and reports what the install configures, enforces and leaves inactive. It writes nothing to your worktree, index, refs or object store.
+
+**It takes no operand.** `-h`/`--help` answers on its own ([§The verbs](#the-verbs)), and any other word is refused with the usage line and exit 2. It reads nothing from stdin. It spawns every child with stdin closed, `GIT_TERMINAL_PROMPT=0` and none of the repository locators a git hook exports. So it runs to its verdict under a shell with no terminal, an evaluating agent's included, and a call aimed at the clone reaches the clone. It reads no payload, since everything it reads is the tree's, so the placed binary runs it as `--prove` as well as a bootstrap does.
+
+**Preconditions, each refusing at exit 2:**
+
+- a git work tree git answers for, refused as [§init](#init) refuses one;
+- a `HEAD` naming a commit;
+- a `checkwright.lock` at `HEAD` carrying a `version` and a schema this build knows, else a refusal naming `init` and its commit;
+- a gate binary at `HEAD` at the path `GATE_SDK_NATIVE_BIN` names there.
+
+**The run.**
+
+1. **The clone.** Under the base `demo` uses ([§demo](#demo), step 1), `git clone --local --no-checkout` makes a clone of the repository and checks `HEAD`'s commit out detached, with `demo`'s local identity and maintenance settings. It makes the scratch directory `init` makes ([§What init seeds](#what-init-seeds)), which git does not carry. A drop guard removes it on every exit path. Every reading below is of that clone, except the hook state, which is per clone and read from yours.
+2. **The report.** `configured` names the profile, the kit count and the registry's member count, from the lock and the registry it records. `enforced` names where the battery runs without being asked: `at commit`, `doctor`'s hook-state line over your repository, and `in CI`, the workflow `init` seeds where `HEAD` carries it, else `none seeded`. `inactive` names each disarmed member, by `doctor`'s reader ([§doctor](#doctor)), and the hooks when they are not opted in. Where your worktree differs from `HEAD`, a `note:` line says the run read `HEAD` alone.
+3. **The battery at `HEAD`.** The clone's door runs `--run`, and its summary is reported. A red battery does not stop the run.
+4. **The claim.** It resolves the queue and state files as a battery run at the clone's root resolves `LIFECYCLE_KIT_QUEUE_FILE` and `LIFECYCLE_KIT_STATE_FILE`, falling back to the paths `init` seeds; a knob naming a path outside the repository names no file of the clone's. `demo`'s claim is written over them and committed with `--no-verify`, and the battery runs again. The claim is **caught** when the battery exits non-zero and a reddened block names the claim's iteration, `demo`'s rule, each block quoted back through its excerpt rule. A tree missing either file, or whose queue lacks the iteration header or the `## Done` section the claim is staged in, has no claim to catch, and the verdict below states which.
+5. **Time to proof.** On a catch, the whole minutes from the committer time of the oldest commit reachable from `HEAD` that added `checkwright.lock` to the run's own clock; a committer time ahead of that clock reads as `0`.
+
+**The verdict is the exit status, and the last line of stdout states it** in a grammar a crate test holds:
+
+- **0** — `PROVE: held — caught at <head>; time to proof <N> min`, `<head>` the abbreviated commit and `<N>` a decimal integer.
+- **1** — `PROVE: not held — <cause>`: `the claim was not caught`, `this tree keeps no <file> to claim a task done in`, or `<file> keeps no <part> to claim a task done in`, `<part>` the missing heading, the iteration header or the `## Done` section. A missing file is followed, on stderr so the verdict stays the last line of stdout, by a `help:` line naming the profile `demo` installs, which keeps a task queue and stage state; `init --help` lists the profiles and the `--with-kit` selection.
+- **2** — `PROVE: FAIL(env) — <cause>` on stderr, for a refused precondition, a clone that could not be made, a failed `git`, or a door that could not be spawned.
+
+**What it spawns.** The verb spawns `git` and the clone's door, and nothing else, so it adds no member to the tool-floor roster. The battery spawns whatever the registered gates spawn, which is the installed selection's own floor.
+
+**Its oracle** is the consumer smoke's prove arm ([§The consumer smoke](#the-consumer-smoke)).
+
+**Honest limits.** It proves `HEAD`, never uncommitted work, and a gate reading a file git ignores reads that file's absence in the clone. Its time runs from the install commit to the run, so it omits the install command's own run and counts any wait before the run. A gate red for another reason whose block prints the queue header would read as a catch. A tree vendored without the installer carries no lock and is refused. The Windows route runs the same code and is measured by no leg.
+
 ## The CI action
 
 `installer/action.yml` is a composite GitHub Action. A workflow runs the battery of a tree `init` installed with one step, `uses: <owner>/<repo>/installer@<commit>`, where `<owner>/<repo>` is `package.json`'s `repository` and `<commit>` is a release's tagged commit. [§What init seeds](#what-init-seeds) writes that step. Its inputs are `path`, the installed tree relative to the workspace or absolute (default `.`), `version`, and `upload-sarif` (default `true`); its output `sarif` is the log's path under `$RUNNER_TEMP`.
@@ -819,7 +855,15 @@ A payload that dropped the carry reds step 3 on every expected log.
 
 A verb that ran green and left its scratch behind, or wrote into the invoking tree, is a red.
 
-**The companion arm** runs after the demo arm and proves each payload recipe on its fixture tree ([companion/SPEC.md](../companion/SPEC.md#recipes)), one header per toolkit, so each is its own scenario. Each toolkit's install line is its `companion-install` block, `docs/openspec.md`'s for OpenSpec and the extension's install command's for Spec Kit, and the line's words from `init` to its end are the arguments. Its `companion-full` block is read from the same file the same way. The arm refuses an absent or empty block, an install line carrying no `--recipe`, or a full line not carrying `--profile full`, rather than skipping it. The Spec Kit page's `companion-full` line must carry the command's words from `init`, and the arm fails naming both when it does not. For each toolkit it:
+**The prove arm** runs after the demo arm, in a fresh consumer `init` wrote at the lattice minimum, with `DEMO_TMP_DIR` pointed at a directory the harness owns. It runs `checkwright prove` through the installed package's entry point with stdin closed, and asserts, each as its own named failure line:
+
+- exit 1 and a last line opening `PROVE: not held — this tree keeps no`;
+- after an `init` re-run at the payload-derived profile, exit 0 and a last line matching the held grammar ([§prove](#prove));
+- the placed binary's `--prove` reaching the same verdict, so the payload-free path is held;
+- the consumer's tree object and `git status --porcelain` identical before and after each run, and the `DEMO_TMP_DIR` directory empty afterwards;
+- `checkwright prove extra` refused at exit 2 with the usage line.
+
+**The companion arm** runs after the prove arm and proves each payload recipe on its fixture tree ([companion/SPEC.md](../companion/SPEC.md#recipes)), one header per toolkit, so each is its own scenario. Each toolkit's install line is its `companion-install` block, `docs/openspec.md`'s for OpenSpec and the extension's install command's for Spec Kit, and the line's words from `init` to its end are the arguments. Its `companion-full` block is read from the same file the same way. The arm refuses an absent or empty block, an install line carrying no `--recipe`, or a full line not carrying `--profile full`, rather than skipping it. The Spec Kit page's `companion-full` line must carry the command's words from `init`, and the arm fails naming both when it does not. For each toolkit it:
 
 1. asserts that the installed package carries `recipes/<toolkit>/`, so the knob covers every recipe directory under `companion/*/recipe/`;
 2. makes a scratch consumer, commits `companion/fixtures/<toolkit>/layout/` into it, runs `init` with the line's arguments from the packed tarball, turns the hooks on, and asserts one commit, a clean worktree, and the manifest's `recipes` equal to the line's;

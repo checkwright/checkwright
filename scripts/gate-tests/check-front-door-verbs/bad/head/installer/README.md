@@ -7,6 +7,7 @@
 | `diff` | compare | the manifest |
 | `update` | upgrade | the manifest |
 | `demo` | show | the payload |
+| `prove` | prove | the head |
 
 | flag | verbs | means |
 | --- | --- | --- |

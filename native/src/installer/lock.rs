@@ -70,8 +70,11 @@ pub struct Manifest {
 
 impl Manifest {
     pub fn read(path: &Path) -> Option<Manifest> {
-        let text = std::fs::read_to_string(path).ok()?;
-        let doc: Value = serde_json::from_str(&text).ok()?;
+        Manifest::parse(&std::fs::read_to_string(path).ok()?)
+    }
+
+    pub fn parse(text: &str) -> Option<Manifest> {
+        let doc: Value = serde_json::from_str(text).ok()?;
         Some(Manifest { doc })
     }
 

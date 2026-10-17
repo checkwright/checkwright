@@ -43,8 +43,9 @@ Re-running is idempotent and non-destructive. `init` reads the per-file hash `ch
 | `update` | bring the install here up to the version this package carries |
 | `uninstall` | reverse the install, keeping anything I have edited |
 | `demo` | show me the adoption arc without touching my repository |
+| `prove` | is a done claim caught on my own tree, and what here is enforced? |
 
-`doctor` and `diff` write nothing, so neither takes a `--dry-run`, and nor does `demo`, whose only writes are to a scratch repository it removes. Every verb that does write takes one, and it means the same thing in each: print the plan, write nothing, exit 0.
+`doctor` and `diff` write nothing, so neither takes a `--dry-run`, and nor do `demo` and `prove`, whose only writes are to a scratch repository each removes. Every verb that does write takes one, and it means the same thing in each: print the plan, write nothing, exit 0.
 
 `uninstall` reverses an install against the roster `init` recorded, keeping and reporting any file you edited rather than removing it — which is what lets an evaluation you decide against leave nothing of its own behind.
 

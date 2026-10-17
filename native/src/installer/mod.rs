@@ -8,6 +8,7 @@ pub mod init;
 pub mod lock;
 pub mod payload_recipe;
 pub mod profile;
+pub mod prove;
 pub mod recipe;
 pub mod selection;
 pub mod uninstall;
@@ -30,6 +31,7 @@ pub const VERBS: &[(&str, Verb)] = &[
     ("--update", update::run),
     ("--uninstall", uninstall::run),
     ("--demo", demo::run),
+    ("--prove", prove::run),
 ];
 
 // spec: installer/SPEC.md §The verbs — the same ownership for each verb's flags: a flag is
@@ -335,6 +337,7 @@ mod tests {
             "doctor" => doctor::USAGE[0].to_string(),
             "diff" => diff::usage()[0].clone(),
             "demo" => demo::USAGE[0].to_string(),
+            "prove" => prove::USAGE[0].to_string(),
             other => panic!("VERBS carries `{}`, which this test reads no usage line for", other),
         }
     }
@@ -389,7 +392,7 @@ mod tests {
     }
 
     // spec: installer/SPEC.md §The verbs — `update` forwards its argv to `init` verbatim, so its
-    // parser is init's; `doctor`, `diff` and `demo` take no flag and answer only through `run`
+    // parser is init's; `doctor`, `diff`, `demo` and `prove` take no flag and answer only through `run`
     fn refused_at(verb: &str, args: &[String]) -> Option<i32> {
         match verb {
             "init" | "update" => init::parse(args, None).err().map(|r| r.code),

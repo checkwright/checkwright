@@ -8,6 +8,7 @@
 | `update` | upgrade | the manifest |
 | `uninstall` | reverse | the manifest |
 | `demo` | show | the payload |
+| `prove` | prove | the head |
 
 | flag | verbs | means |
 | --- | --- | --- |

@@ -134,6 +134,7 @@ const TOP_LEVEL_FLAGS: &[&str] = &[
     "--update",
     "--uninstall",
     "--demo",
+    "--prove",
     "--reads",
     "--needs",
 ];

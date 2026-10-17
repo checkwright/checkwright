@@ -1002,6 +1002,12 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     println!("\nnext:");
     println!("  {} --install-hooks   # place the pre-commit and commit-msg hooks in this clone", front);
     println!("  {} --run             # the battery, green on what was just vendored", front);
+    // spec: installer/SPEC.md §init — the proof step sits outside the block, unindented, so the
+    // block's readers never run it
+    println!(
+        "then: {} --prove reports what this tree enforces and whether a task claimed done with no evidence is caught here.",
+        front
+    );
     Ok(0)
 }
 

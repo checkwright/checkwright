@@ -20,11 +20,37 @@ pub(super) const USAGE: &[&str] = &[
 // spec: installer/SPEC.md §demo — what an agent claiming done writes: an iteration named in the
 // queue header, a task under Done the seeded queue does not carry, then a validate and a close
 // stamp, each stage on a session token of its own
-const ITERATION: &str = "first-release";
-const TASK: &str = "add-login-page";
+pub(super) const ITERATION: &str = "first-release";
+pub(super) const TASK: &str = "add-login-page";
 const STAMPS: [(&str, &str); 2] = [("validate", "demo-validate"), ("close", "demo-close")];
 const ITERATION_HEADER: &str = "## Iteration:";
 const DONE_HEADING: &str = "## Done";
+
+// spec: installer/SPEC.md §demo — the scratch carries its own identity, so an unconfigured host's
+// missing user.name stops neither the seed commit nor the one `init` makes; and no detached
+// maintenance repacks the objects the teardown is removing
+pub(super) const SCRATCH_CONFIG: [(&str, &str); 4] = [
+    ("user.name", "checkwright demo"),
+    ("user.email", "demo@example.invalid"),
+    ("maintenance.auto", "false"),
+    ("gc.auto", "0"),
+];
+
+// spec: installer/SPEC.md §demo — the part of the queue the claim is staged in that a seed lacks
+#[derive(Debug, PartialEq)]
+pub(super) enum Missing {
+    Header,
+    Done,
+}
+
+impl Missing {
+    pub(super) fn part(&self) -> String {
+        match self {
+            Missing::Header => format!("'{}' header", ITERATION_HEADER),
+            Missing::Done => format!("'{}' section", DONE_HEADING),
+        }
+    }
+}
 
 // spec: installer/SPEC.md §demo — the three exit classes as a type, so a finding about the arc
 // cannot be raised on a precondition's spelling or the reverse
@@ -86,17 +112,9 @@ pub fn run(args: &[String]) -> i32 {
 }
 
 fn walkthrough(pkg: &Package, scratch: &mut Scratch) -> Outcome {
-    let repo = step!(make_scratch(scratch));
+    let repo = step!(make_scratch(scratch, "checkwright-demo").map_err(refuse));
     step!(git(&repo, &["init", "-q"]));
-    // spec: installer/SPEC.md §demo — the scratch carries its own identity, so an unconfigured
-    // host's missing user.name stops neither the seed commit nor the one `init` makes; and no
-    // detached maintenance repacks the objects the teardown is removing
-    for (k, v) in [
-        ("user.name", "checkwright demo"),
-        ("user.email", "demo@example.invalid"),
-        ("maintenance.auto", "false"),
-        ("gc.auto", "0"),
-    ] {
+    for (k, v) in SCRATCH_CONFIG {
         step!(git(&repo, &["config", k, v]));
     }
     step!(git(&repo, &["commit", "-q", "--allow-empty", "-m", "seed"]));
@@ -122,7 +140,8 @@ fn walkthrough(pkg: &Package, scratch: &mut Scratch) -> Outcome {
     let state = step!(read(&repo, STATE_FILE));
     let head = step!(git(&repo, &["rev-parse", "--short", "HEAD"]));
     let today = crate::emit::kpi::iso_day(crate::emit::kpi::now_epoch().div_euclid(86_400));
-    let (claimed_queue, claimed_state) = step!(claim(&queue, &state, head.trim(), &today).map_err(refuse));
+    let (claimed_queue, claimed_state) = step!(claim(&queue, &state, head.trim(), &today)
+        .map_err(|m| refuse(format!("the seeded {} carries no {} to stage the claim in", QUEUE_FILE, m.part()))));
     step!(write(&repo, QUEUE_FILE, &claimed_queue));
     step!(write(&repo, STATE_FILE, &claimed_state));
     step!(commit(&repo, &format!("done: {}", TASK)));
@@ -130,17 +149,13 @@ fn walkthrough(pkg: &Package, scratch: &mut Scratch) -> Outcome {
     if rc == 0 {
         return Outcome::Fail("the done claim did not turn the battery red".into());
     }
-    let quoted: Vec<Vec<String>> = show::failed_gates(&out)
-        .iter()
-        .map(|g| show::excerpt(&out, g))
-        .collect();
-    if !quoted.iter().flatten().any(|l| l.contains(ITERATION)) {
+    let Some(quoted) = caught(&out) else {
         print!("{}", ends_with_newline(&out));
         return Outcome::Fail(format!(
             "the battery went red without naming the claimed iteration {}",
             ITERATION
         ));
-    }
+    };
     for block in &quoted {
         println!();
         for line in block {
@@ -175,55 +190,52 @@ fn green_line(out: &str) -> Result<String, Outcome> {
 
 // spec: installer/SPEC.md §demo — `DEMO_TMP_DIR` when set, else the platform's temp directory; a
 // relative base resolves against the invoking directory, since every act spawns inside the scratch
-fn scratch_base(set: Option<std::ffi::OsString>, here: &str) -> PathBuf {
+pub(super) fn scratch_base(set: Option<std::ffi::OsString>, here: &str) -> PathBuf {
     let base = set.filter(|v| !v.is_empty()).map(PathBuf::from).unwrap_or_else(std::env::temp_dir);
     PathBuf::from(crate::walk::abs_against(here, &base.to_string_lossy()))
 }
 
+// spec: installer/SPEC.md §demo — every reddened block quoted back through the excerpt rule, when
+// some block names the claimed iteration
+pub(super) fn caught(out: &str) -> Option<Vec<Vec<String>>> {
+    let quoted: Vec<Vec<String>> = show::failed_gates(out).iter().map(|g| show::excerpt(out, g)).collect();
+    quoted.iter().flatten().any(|l| l.contains(ITERATION)).then_some(quoted)
+}
+
 // spec: installer/SPEC.md §demo — the directory is made in-process, since `mktemp` is a
 // contributor program this verb may not spawn
-fn make_scratch(scratch: &mut Scratch) -> Result<PathBuf, Outcome> {
-    let here = crate::walk::cwd().map_err(Outcome::Refuse)?;
+pub(super) fn make_scratch(scratch: &mut Scratch, prefix: &str) -> Result<PathBuf, String> {
+    let here = crate::walk::cwd()?;
     let base = scratch_base(std::env::var_os("DEMO_TMP_DIR"), &here);
     let stamp = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map(|d| d.as_nanos())
         .unwrap_or(0);
     for n in 0..64u32 {
-        let dir = base.join(format!("checkwright-demo.{}.{}.{}", std::process::id(), stamp, n));
+        let dir = base.join(format!("{}.{}.{}.{}", prefix, std::process::id(), stamp, n));
         match std::fs::create_dir(&dir) {
             Ok(()) => {
                 scratch.dir = Some(dir.clone());
                 return Ok(dir);
             }
             Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => continue,
-            Err(e) => {
-                return Err(Outcome::Refuse(format!(
-                    "cannot create the scratch repository under {}: {}",
-                    base.display(),
-                    e
-                )))
-            }
+            Err(e) => return Err(format!("cannot create the scratch repository under {}: {}", base.display(), e)),
         }
     }
-    Err(Outcome::Refuse(format!(
+    Err(format!(
         "cannot create the scratch repository under {}: every candidate name was taken",
         base.display()
-    )))
+    ))
 }
 
 // spec: installer/SPEC.md §demo — the claim staged over the seeded queue and state file; a seed
 // with no iteration header or no Done section cannot stage the act, the harness's failure and not
 // the arc's
-fn claim(queue: &str, state: &str, head: &str, date: &str) -> Result<(String, String), String> {
+pub(super) fn claim(queue: &str, state: &str, head: &str, date: &str) -> Result<(String, String), Missing> {
     let mut lines: Vec<String> = queue.lines().map(str::to_string).collect();
-    let header = lines.iter().position(|l| l.starts_with(ITERATION_HEADER)).ok_or_else(|| {
-        format!("the seeded {} carries no '{}' header to name the iteration in", QUEUE_FILE, ITERATION_HEADER)
-    })?;
+    let header = lines.iter().position(|l| l.starts_with(ITERATION_HEADER)).ok_or(Missing::Header)?;
     lines[header] = format!("{} {}", ITERATION_HEADER, ITERATION);
-    let done = lines.iter().position(|l| l.trim_end() == DONE_HEADING).ok_or_else(|| {
-        format!("the seeded {} carries no '{}' section to record the task under", QUEUE_FILE, DONE_HEADING)
-    })?;
+    let done = lines.iter().position(|l| l.trim_end() == DONE_HEADING).ok_or(Missing::Done)?;
     let at = if lines.get(done + 1).is_some_and(|l| l.is_empty()) { done + 2 } else { done + 1 };
     let mut insert = vec![format!("- {}", TASK)];
     if at == done + 1 {
@@ -358,7 +370,7 @@ mod tests {
     // spec: installer/SPEC.md §demo — a seeded queue act 3 cannot stage is an env refusal
     #[test]
     fn a_queue_with_no_header_or_no_done_section_cannot_stage_the_claim() {
-        assert!(super::claim("## Done\n", "", "abc1234", "2026-01-02").is_err());
-        assert!(super::claim("## Iteration: —\n", "", "abc1234", "2026-01-02").is_err());
+        assert_eq!(super::claim("## Done\n", "", "abc1234", "2026-01-02").err(), Some(super::Missing::Header));
+        assert_eq!(super::claim("## Iteration: —\n", "", "abc1234", "2026-01-02").err(), Some(super::Missing::Done));
     }
 }

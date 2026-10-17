@@ -30,6 +30,7 @@ pub(super) const ARMS: &[Row] = &[
     row("seed arm", "the CI workflow init seeded, every profile", super::profiles::seed, 1),
     row("close-surface arm", "the kits' capture logs declared in a vendored tree", super::carry::close_surface, 1),
     row("demo arm", "checkwright demo from the packed package, inside an installed {min} consumer", super::profiles::demo, 1),
+    row("prove arm", "checkwright prove on a {min} consumer, then on {max}, and the placed binary's --prove", super::profiles::prove, 1),
     row(
         "companion arm for speckit",
         "the Spec Kit recipe on its fixture tree, through the extension install command's line",

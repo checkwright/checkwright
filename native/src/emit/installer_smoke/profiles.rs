@@ -1135,6 +1135,119 @@ pub(super) fn demo(state: &mut Run) -> Step {
     Ok(())
 }
 
+// spec: installer/SPEC.md §The consumer smoke — the prove arm: not held on the lattice minimum, held
+// at the payload-derived profile through the package and the placed binary alike, the consumer
+// unchanged by every run, its scratch torn down and an operand refused
+pub(super) fn prove(state: &mut Run) -> Step {
+    let c = consumer(state, "prove")?;
+    let scratch = format!("{}/prove-scratch", state.scratch);
+    std::fs::create_dir_all(&scratch)
+        .map_err(|_| refuse("prove arm: could not make the scratch base the verb is pointed at"))?;
+    let tmp = [("DEMO_TMP_DIR".to_string(), scratch.clone())];
+    let install = |state: &Run, profile: &str| -> Step {
+        let m = state.verb(&c, &["init", "--profile", profile])?;
+        if !m.succeeded() {
+            show(&out(&m));
+            return Err(refuse(format!("prove arm: init --profile {} exited non-zero on the consumer", profile)));
+        }
+        Ok(())
+    };
+    let unchanged = |what: &str, run: &dyn Fn() -> Result<crate::proc::Merged, Outcome>| -> Result<crate::proc::Merged, Outcome> {
+        let (before, status) = (tree(&c)?, porcelain(&c)?);
+        let m = run()?;
+        if tree(&c)? != before {
+            return Err(failed(&m, format!("prove arm: {} changed the consumer's tree object", what)));
+        }
+        if porcelain(&c)? != status {
+            return Err(failed(&m, format!("prove arm: {} left the consumer's worktree changed", what)));
+        }
+        let left = walk::list_dir(Path::new(&scratch)).unwrap_or_default();
+        if !left.is_empty() {
+            let names: Vec<String> = left.into_iter().map(|(n, _)| n).collect();
+            return Err(failed(&m, format!("prove arm: {} left its scratch behind in DEMO_TMP_DIR: {}", what, names.join(" "))));
+        }
+        Ok(m)
+    };
+    let last = |m: &crate::proc::Merged| -> String {
+        out(m).lines().rev().find(|l| !l.trim().is_empty()).unwrap_or("").trim_end().to_string()
+    };
+
+    install(state, &state.profile_min)?;
+    let m = unchanged("checkwright prove", &|| state.verb_with(&c, &["prove"], &tmp))?;
+    let line = last(&m);
+    if m.code() != Some(1) || !line.starts_with("PROVE: not held — this tree keeps no") {
+        return Err(failed(&m, format!(
+            "prove arm: on {} checkwright prove exited {} with last line '{}', not 1 and 'PROVE: not held — this tree keeps no …'",
+            state.profile_min,
+            m.reported_code(),
+            line
+        )));
+    }
+    say(&format!("prove on {}: exit 1, {}", state.profile_min, line));
+
+    install(state, PROFILE_DERIVED)?;
+    let m = unchanged("checkwright prove", &|| state.verb_with(&c, &["prove"], &tmp))?;
+    let line = last(&m);
+    if m.code() != Some(0) || !held_line(&line) {
+        return Err(failed(&m, format!(
+            "prove arm: on {} checkwright prove exited {} with last line '{}', not 0 and the held grammar",
+            PROFILE_DERIVED,
+            m.reported_code(),
+            line
+        )));
+    }
+    say(&format!("prove on {}: exit 0, {}", PROFILE_DERIVED, line));
+
+    let seam = format!("{}/{}/gate-sdk-config.knobs", c, GATES_DIR);
+    let bin = seam_bin(&seam).unwrap_or_default();
+    if bin.is_empty() {
+        return Err(fail("prove arm: the consumer's seam names no gate binary to run --prove through"));
+    }
+    let mut set = super::consumer::path_set(&state.run_path);
+    set.extend(tmp.iter().cloned());
+    let placed = programs::CHECKWRIGHT_GATES.at(format!("{}/{}", c, bin));
+    let m = unchanged("the placed binary's --prove", &|| merged_in(&placed, &["--prove"], &set, &c))?;
+    let line = last(&m);
+    if m.code() != Some(0) || !held_line(&line) {
+        return Err(failed(&m, format!(
+            "prove arm: the placed binary's --prove exited {} with last line '{}', not the package's held verdict",
+            m.reported_code(),
+            line
+        )));
+    }
+    say(&format!("placed binary --prove: exit 0, {}", line));
+
+    let m = state.verb(&c, &["prove", "extra"])?;
+    if m.code() != Some(2) {
+        return Err(failed(&m, format!(
+            "prove arm: checkwright prove extra exited {}, not the usage refusal's 2",
+            m.reported_code()
+        )));
+    }
+    if !out(&m).contains("usage: checkwright prove") {
+        return Err(failed(&m, "prove arm: checkwright prove extra refused without the usage line"));
+    }
+    say("prove extra: refused at exit 2 with the usage line; the consumer unchanged and the scratch torn down by every run");
+    Ok(())
+}
+
+// spec: installer/SPEC.md §prove — `PROVE: held — caught at <head>; time to proof <N> min`
+fn held_line(line: &str) -> bool {
+    let Some(rest) = line.strip_prefix("PROVE: held — caught at ") else {
+        return false;
+    };
+    let Some((head, tail)) = rest.split_once("; time to proof ") else {
+        return false;
+    };
+    let Some(n) = tail.strip_suffix(" min") else {
+        return false;
+    };
+    !head.is_empty()
+        && head.chars().all(|ch| ch.is_ascii_hexdigit())
+        && !n.is_empty()
+        && n.chars().all(|ch| ch.is_ascii_digit())
+}
+
 // spec: installer/SPEC.md §The consumer smoke — the held-seed leg: a fresh consumer already holding
 // every surface init seeds, where a seed's absence guard decides
 pub(super) fn held_seeds(state: &mut Run) -> Step {
@@ -1232,7 +1345,7 @@ pub(super) fn summary(state: &Run) -> String {
         "the gate binary this run runs as, staged unrebuilt"
     };
     format!(
-        "{} profile(s) installed from the packed tarball with no registry access, each carrying {}, each put in front of a real prose defect (caught by {}) and each reversed back to its pre-init tree object, with gate rosters monotone across every comparable pair of the registries those installs wrote, plus the artifact-less {} leg driving a payload the packer itself produced with no artifact and asserting one refusal for init, doctor, diff and a bare invocation alike, naming the platform and writing nothing, the demo arm running checkwright demo green inside an installed consumer with its act 3 red read off a FAIL: line, the front-page proof block found in its output and that consumer unchanged and its scratch torn down, the companion arm applying each spec-toolkit recipe on its fixture tree green and catching each planted defect by its own gate, every complement line holding its left-out kits out, and the OpenSpec lifecycle layer firing check-stage-entry on a two-capability change and clearing on one, the extracted-tarball arm with node/npm masked and reversed the same way, the toolchain-free arm driving doctor and a full init with cargo/rustc masked, the jq-less arm asserting diff, uninstall and a lattice-minimum and a guard-kit init run clean with no jq on PATH, the installed guard hook answering a payload and doctor naming jq nowhere, the bash-less arm installing every profile that owes no bash and committing through its hooks clean and refused with no bash on PATH, the two-hop cross-version upgrade arm carrying the relinquish and re-add, the cross-version reversal arm reversing an unedited consumer back to its pre-init tree object after those same three hops, the newer-verb reversal arm reversing a first-version install by the next version with no upgrade, the hooked move arm committing a profile move and an upgrade shipping a gate-library change through the installed hooks while check-gate-tamper still refuses a gate edit co-staged with product code, the same-version seam arm and the protection branch chained onto it over a tampered gate binary, the narrowing arm re-running init at a smaller profile so files[] outlives kits, the selection arm adding a kit and a gate and dropping one at the minimum profile and clearing them with --no-selection, and the artifact arm driving the selection outcomes on a mutated copy of that payload, with its refusals asserted to differ in message and remedy and its fallback cases run wherever the hand-off carries a foreign-architecture preferred artifact, and the bootstrap's shasum fallback verifying and refusing with sha256sum masked wherever the host carries shasum",
+        "{} profile(s) installed from the packed tarball with no registry access, each carrying {}, each put in front of a real prose defect (caught by {}) and each reversed back to its pre-init tree object, with gate rosters monotone across every comparable pair of the registries those installs wrote, plus the artifact-less {} leg driving a payload the packer itself produced with no artifact and asserting one refusal for init, doctor, diff and a bare invocation alike, naming the platform and writing nothing, the demo arm running checkwright demo green inside an installed consumer with its act 3 red read off a FAIL: line, the front-page proof block found in its output and that consumer unchanged and its scratch torn down, the prove arm holding checkwright prove not held on the lattice minimum and held at the payload-derived profile through the package and the placed binary alike with the consumer unchanged by each run, the companion arm applying each spec-toolkit recipe on its fixture tree green and catching each planted defect by its own gate, every complement line holding its left-out kits out, and the OpenSpec lifecycle layer firing check-stage-entry on a two-capability change and clearing on one, the extracted-tarball arm with node/npm masked and reversed the same way, the toolchain-free arm driving doctor and a full init with cargo/rustc masked, the jq-less arm asserting diff, uninstall and a lattice-minimum and a guard-kit init run clean with no jq on PATH, the installed guard hook answering a payload and doctor naming jq nowhere, the bash-less arm installing every profile that owes no bash and committing through its hooks clean and refused with no bash on PATH, the two-hop cross-version upgrade arm carrying the relinquish and re-add, the cross-version reversal arm reversing an unedited consumer back to its pre-init tree object after those same three hops, the newer-verb reversal arm reversing a first-version install by the next version with no upgrade, the hooked move arm committing a profile move and an upgrade shipping a gate-library change through the installed hooks while check-gate-tamper still refuses a gate edit co-staged with product code, the same-version seam arm and the protection branch chained onto it over a tampered gate binary, the narrowing arm re-running init at a smaller profile so files[] outlives kits, the selection arm adding a kit and a gate and dropping one at the minimum profile and clearing them with --no-selection, and the artifact arm driving the selection outcomes on a mutated copy of that payload, with its refusals asserted to differ in message and remedy and its fallback cases run wherever the hand-off carries a foreign-architecture preferred artifact, and the bootstrap's shasum fallback verifying and refusing with sha256sum masked wherever the host carries shasum",
         state.profiles.len(),
         provenance,
         state.value_red.join(" "),
@@ -1255,5 +1368,22 @@ mod tests {
         let out = "INIT: vendored\n\nnext:\n  ./scripts/x --install-hooks   # opt in\n  ./scripts/x --run   # battery\nafter\n  ./not-this\n";
         assert_eq!(followups(out), vec!["./scripts/x --install-hooks", "./scripts/x --run"]);
         assert!(followups("INIT: vendored\n").is_empty());
+    }
+    // spec: installer/SPEC.md §prove — the held line's grammar: an abbreviated commit and a decimal
+    // count of whole minutes, nothing else
+    #[test]
+    fn the_held_line_matches_its_grammar_alone() {
+        assert!(super::held_line("PROVE: held — caught at abc1234; time to proof 12 min"));
+        assert!(!super::held_line("PROVE: held — caught at abc1234; time to proof min"));
+        assert!(!super::held_line("PROVE: held — caught at ; time to proof 3 min"));
+        assert!(!super::held_line("PROVE: not held — the claim was not caught"));
+        assert!(!super::held_line("PROVE: held — caught at abc1234; time to proof 3 mins"));
+    }
+
+    // spec: installer/SPEC.md §init — the then: line after the block is not one of its commands
+    #[test]
+    fn the_then_line_is_outside_the_block() {
+        let out = "next:\n  ./scripts/x --install-hooks   # opt in\n  ./scripts/x --run   # battery\nthen: ./scripts/x --prove reports\n";
+        assert_eq!(followups(out), vec!["./scripts/x --install-hooks", "./scripts/x --run"]);
     }
 }
