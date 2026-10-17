@@ -84,7 +84,7 @@ the PowerShell install-smoke leg (`install-smoke-pwsh-windows` in `.github/workf
 
 **Push need (2026-10-17, inside the budget):** the iteration's mid-iteration push after build, since the test fails on the Windows leg alone.
 
-**Inferred, not run:** that the probe's `ls-remote` overran its bound, the test taking the 5-second `DEFAULT_TIMEOUT`, on a Windows runner reading a just-written bare repository — cannot run here: the leg executes on the Windows runner alone.
+**Honest limit:** the cause is a hypothesis no local run can test — that the probe's `ls-remote` overran its bound, the test taking the 5-second `DEFAULT_TIMEOUT`, on a Windows runner reading a just-written bare repository. The leg executes on the Windows runner alone, so the build's evidence is that leg's run, read after the push.
 
 **Cost while deferred:** a closing push reds on a coin and costs a re-run and its wait, as one did at that close. Surfaced 2026-10-17 by competitive-followup-pass' close as a gap bullet, promoted at the next scope's intake. Owner lookup: `update_notice`, `update notice`, `crate-tests-windows`, `flake` in this file and the disposed-findings record — [windows-liveness-row-pid-reuse](#windows-liveness-row-pid-reuse), DISTINCT (another test on the same leg, a pid read rather than a probe bound); owner installer/SPEC.md §The update notice.
 
@@ -98,7 +98,7 @@ the gates workflow's Windows liveness step misread one row once. On the run for 
 
 **Push need (2026-10-17, inside the budget):** the iteration's mid-iteration push after build, since the step executes on the Windows leg alone.
 
-**Inferred, not run:** that a low Windows pid was recycled between the truth read and the gate's, possibly into a process the gate itself started — cannot run here: the step executes on the workflow's Windows leg alone
+**Honest limit:** the cause is a hypothesis no local run can test — that a low Windows pid was recycled between the truth read and the gate's, possibly into a process the gate itself started. The step executes on the workflow's Windows leg alone, so the build's evidence is that leg's run, read after the push.
 
 **Cost while deferred:** a closing push reds on a coin and costs a re-run and its wait. Surfaced 2026-10-11 by hook-placement-guard-rules-pass' close and carried to the next scope's intake. Owner lookup: `liveness`, `pid`, `recycl` in this file and the disposed-findings record — none; owner evidence-kit/SPEC.md §check-producer-liveness and the gates workflow's Windows crate leg.
 
