@@ -10,7 +10,7 @@
 
   **The set (operator direction 2026-10-17, lead-relayed, not a ruling):** `companion-adoption-rehearsal`, `bounded-promise-phrasing` and the features `activated-guarantee-route`, `openspec-delta-base-agreement` and `consult-grant-spend-unmarked`, the three features spec's to author and promote. The analysis' comparison arm rides [design-partner-preview](#design-partner-preview) as an annotation.
 
-  **Grant (operator grant 2026-10-17, lead-relayed; unspent):** one second-vendor review at validate; v0.32.0 is cut on a clean return under the bar [tarball-attestation-observed](#tarball-attestation-observed) records.
+  **Grant (operator grant 2026-10-17, lead-relayed; spent 2026-10-17 by validate's codex-review run, returned not clean on five findings filed to the gap inbox):** one second-vendor review at validate; v0.32.0 is cut on a clean return under the bar [tarball-attestation-observed](#tarball-attestation-observed) records.
 
   **Push need (2026-10-17, inside the budget):** the closing push, plus the tag push on a clean return; no unit reads a remote run.
 
