@@ -8,7 +8,7 @@
 
   **Grant (operator grant 2026-10-16, lead-relayed; spent at validate):** one live validate second-vendor review run over the iteration's range, on `codex-session`, not `codex-review` (operator direction 2026-10-16, lead-relayed, not a ruling), because that adapter keeps its session on disk (its argv is the gitignored overlay's). v0.32.0 is cut on a clean return; the closing push, plus the tag push on a clean return, is inside the budget. The review returned changes requested, so the cut is deferred.
 
-  **Observation owed (operator direction 2026-10-17, lead-relayed, not a ruling):** validate observes whether that run's kept session refreshes the budget feed; close writes the observation onto the Deferred entry [heterogeneous-agent-delegation](#heterogeneous-agent-delegation). Whether the entry then closes stays the operator's. Written at close.
+  **Observation owed (operator direction 2026-10-17, lead-relayed, not a ruling):** validate observes whether that run's kept session refreshes the budget feed; close writes the observation onto the Deferred entry `heterogeneous-agent-delegation`. Written at close, where the entry closed by operator direction 2026-10-17 (lead-relayed, not a ruling).
 
 ---
 
@@ -33,28 +33,6 @@ a controlled A/B trial.
 hosted attestation. The team/paid rung: gates verified server-side by a party the committing agents cannot touch — hosted gate runs as a neutral attestation, cross-repo drift dashboards, maintained rulesets. A service, not code: cloning the kits does not clone the neutrality or the ops. Demand-gated — this entry is the public roadmap marker, not a scaffold; hosting and sequencing decisions are on record in the operator's local brief, and its prerequisite mechanism has landed (lifecycle-kit/SPEC.md §Multi-operator semantics). Its single-repo statistics half split off as [iteration-statistics-view](#iteration-statistics-view) (operator direction 2026-10-17, on consult advice, lead-relayed, not a ruling); the cross-repo dashboards stay here. Surfaced 2026-07-07.
 
 **Cost while deferred:** zero — this is a service rather than tree mechanism, so nothing rots; the residue is that gate runs stay self-attested, which binds only when a party the committing agents cannot touch is asked to trust them.
-
-### heterogeneous-agent-delegation
-
-[cost: iteration/low] [surface: delegation-kit] [roadmap: now/ecosystem] [roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.]
-
-foreign agents. A lead delegating a stage to a foreign coding agent, cashing the public no-lock-in claim: governance enforced at the git/gate boundary, not by trusting the author. *Remaining:* nothing; whether the entry closes is the operator's.
-
-**Observed at budget-feed-observation-pass' validate (operator grant 2026-10-16, lead-relayed, spent):** a live `codex-session` turn's kept session refreshes the budget feed at the next keyed read, not within the run, whose pre-spawn read precedes the session file. The keyed `--budget` read after it showed `updated_at` at the last `rate_limits` event in the kept session file. The other observation, `ephemeral-turn-usage-read`, split off and was read at an earlier validate: the SPEC's sentence stands.
-
-**Slices landed**, in delegation-kit/SPEC.md §The foreign-vendor run, the first two each accepted by a granted live codex audit: the foreign-CLI executor, `--foreign-run` (delegation-tier-binding, 2026-09-30); (2) the dispatch transport with (1) the escalation resume model, `--foreign-resume` (delegation-transport-pass, 2026-10-03); (3) the budget oracle, §The keyed verdict (delegation-wait-journal-pass, 2026-10-07), accepted by stub-driven crate cases and one producer read of a vendor's session store. **This repo's binding (operator direction, 2026-10-07, lead-relayed, not a ruling):** inline in the gitignored `.local` overlay alone, its adapters reading one metric-dir snapshot from an inline producer. **Horizon, operator direction 2026-09-30, lead-relayed (not a ruling):** `now` — delivery has started, and close moves a horizon on actual work.
-
-**Item (4), stage-contract expression, landed in three slices** (each an operator direction, lead-relayed, not a ruling): lifecycle-kit/SPEC.md §The stage-contract arm (foreign-stage-contract-pass, 2026-10-08), the audit stage's reading run foreign with the host performing every write; §The host protocol (foreign-stage-binding-pass, 2026-10-08), one protocol file the stage templates point at; and `sweep` mode (foreign-build-budget-pass, 2026-10-15), the build stage's file changes run foreign, the host applying the patch and returning each red. **Three grants spent** (operator grants 2026-10-08, 2026-10-09 and 2026-10-16, lead-relayed), each landing commit carrying the run's `OK` lines: two audit-mode stages, and gate-dispatch-hermetic-pass' build end to end in `sweep` mode on `codex-session`.
-
-**Seam ruling (on record):** generic mechanism only — transport, budget oracle and escalation channel are consumer-config seams; a kit literal naming a vendor crosses the provenance seam, as the retired `prose-profile` ruled. Interacts with [hosted-attestation-service](#hosted-attestation-service) and [plugin-harness-reach](#plugin-harness-reach).
-
-**Demand attested (2026-07-23):** the operator holds three foreign-vendor subscriptions and wants read-heavy delegation routed to them for headroom. **Its citer** [companion-toolkit-profile](#companion-toolkit-profile) blocks on none of it.
-
-**Attribution, operator direction 2026-09-30, lead-relayed (not a ruling):** foreign harnesses' commit trailers off, the method stated once in the README, held by construction (foreign work lands in the delegating session's commit); a harness setting change takes the operator's confirmation.
-
-**Design memory (2026-07-25, 2026-08-02):** JSONL turn events ship on the installed binaries probed. The machine profile (context-kit/SPEC.md §bin/env-probe, local-only) owns which CLIs and how.
-
-**Cost while deferred:** stage-level work still bills one vendor's budget and the design memory ages against fast-moving CLIs. Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question).
 
 ### companion-toolkit-profile
 
@@ -1075,4 +1053,6 @@ a citation naming a numbered step by its bold title, in RELEASING.md's procedure
 A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, since check-front-door-verbs reads the front-door pages alone; widening its arm resolution to the kit SPECs, with the history valves, would catch it.
 
 ## Done
+
+- heterogeneous-agent-delegation
 
