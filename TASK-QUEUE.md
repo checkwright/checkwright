@@ -38,14 +38,6 @@ the PowerShell install-smoke leg (`install-smoke-pwsh-windows` in `.github/workf
 
 **Cost while deferred:** a Windows-only failure of the activation proof reaches an adopter first. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet build filed that day off the activated-guarantee amendment's Definition of Done; not fixed at close because the leg runs only on the remote Windows runner, so its first run would be the closing push's. Re-verified there by reading the leg's steps. Owner lookup: `pwsh`, `prove`, install smoke in this file and the disposed-findings record — [grant-pwsh-word-read](#grant-pwsh-word-read), DISTINCT (the guard's PowerShell reader); owner installer/SPEC.md §prove.
 
-### delta-agreement-lossy-capture
-
-`check-delta-agreement`'s `span()` in `native/src/gates/delta_agreement.rs` decodes a capture with `from_utf8_lossy`, and the ERE matcher's offsets are bytes, so two captures ending inside different multibyte characters both read U+FFFD and compare equal: under `^item (.).*$`, base `item é` and delta `item €` agree, so a PRESENT item wrongly agrees and an ABSENT one wrongly reds. canon-kit/SPEC.md §check-delta-agreement has item names compare case-sensitively, which distinct bytes must keep distinct.
-
-**Deliverable:** captures compared as bytes, decoded only for the finding's text, with a fixture or crate test on that pair.
-
-**Cost while deferred:** a consumer whose item pattern cuts a multibyte character gets a wrong verdict either way. Surfaced 2026-10-17 by competitive-followup-pass' close second-vendor review over that close's own multibyte fix, promoted at the next scope's intake. Re-verified there by reading `span` and the matcher's byte-wise contract. Owner lookup: `delta-agreement`, `from_utf8_lossy`, `multibyte` in this file and the disposed-findings record — none; owner canon-kit/SPEC.md §check-delta-agreement.
-
 ### update-notice-windows-flake
 
 `emit::update_notice::tests::a_probe_reads_the_upstream_and_an_unreachable_one_is_silent` failed once on `crate-tests-windows` x64, at competitive-followup-pass' second closing push: the weekly probe due after the bare clone into the once-missing upstream read Unknown and printed an empty line. The first closing push's run passed it on the same code, and a re-run passed.
@@ -1105,4 +1097,5 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 - knob-file-relative-to-cwd
 - companion-prove-not-held
 - companion-complement-init-line
+- delta-agreement-lossy-capture
 

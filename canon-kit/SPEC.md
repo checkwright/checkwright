@@ -853,7 +853,7 @@ A **family** is a key of `CANON_KIT_DELTA_ITEM` and of exactly one of `CANON_KIT
 - Where it exists, an item an `ABSENT` family names must not be among them.
 - Where the base file does not exist, an item a family listed in `CANON_KIT_DELTA_BASE_REQUIRED` names is a finding. Any other family asserts nothing against a missing base.
 
-Item names compare case-sensitively after trimming and collapsing each run of blanks to one space. A finding names the delta, the line, the family, the item and the base, and whether the base lacks it, already carries it, or does not exist.
+Item names compare byte for byte after trimming and collapsing each run of blanks to one space. A finding names the delta, the line, the family, the item and the base, and whether the base lacks it, already carries it, or does not exist.
 
 While `CANON_KIT_DELTA_PATH` is set, the table validator holds `CANON_KIT_DELTA_ITEM`'s key set equal to the union of the other two keyed knobs', with no key in both, each ITEM and the path and base-item knobs to the one-group shape, and every `CANON_KIT_DELTA_BASE_REQUIRED` member to a family. A refusal is exit 2, and the crate's unit tests hold it, since a `bad/` case held to exit 1 cannot express it.
 

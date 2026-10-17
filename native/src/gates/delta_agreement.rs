@@ -65,7 +65,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         let shown = spec::strip_dot_slash(&p.display().to_string());
         let rel = walk::rel_under(root, &shown).unwrap_or(&shown).trim_start_matches('/').to_string();
         if let Some((gs, ge)) = cfg.path.capture(&rel) {
-            let base = join(&cfg.base_dir, &span(&rel, gs, ge));
+            let base = join(&cfg.base_dir, &String::from_utf8_lossy(span(&rel, gs, ge)));
             deltas.push((rel, base));
         }
     }
@@ -164,23 +164,23 @@ fn config(
     })
 }
 
-// spec: canon-kit/SPEC.md §check-delta-agreement — an item name compares case-sensitively after
+// spec: canon-kit/SPEC.md §check-delta-agreement — an item name compares byte for byte after
 // trimming and collapsing each run of blanks to one space
-fn normalize(name: &str) -> String {
-    name.split([' ', '\t']).filter(|w| !w.is_empty()).collect::<Vec<_>>().join(" ")
+fn normalize(name: &[u8]) -> Vec<u8> {
+    name.split(|b| *b == b' ' || *b == b'\t').filter(|w| !w.is_empty()).collect::<Vec<_>>().join(&b' ')
 }
 
 // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — its offsets are bytes and need not fall on a
-// character boundary, so a group is read off the bytes
-fn span(text: &str, s: usize, e: usize) -> String {
-    String::from_utf8_lossy(&text.as_bytes()[s..e]).into_owned()
+// character boundary, so a group is read off the bytes and decoded only for display
+fn span(text: &str, s: usize, e: usize) -> &[u8] {
+    &text.as_bytes()[s..e]
 }
 
-fn captured(cap: &EreCapture, line: &str) -> Option<String> {
-    cap.capture(line).map(|(s, e)| normalize(&span(line, s, e)))
+fn captured(cap: &EreCapture, line: &str) -> Option<Vec<u8>> {
+    cap.capture(line).map(|(s, e)| normalize(span(line, s, e)))
 }
 
-fn base_items(text: &str, cap: &EreCapture) -> BTreeSet<String> {
+fn base_items(text: &str, cap: &EreCapture) -> BTreeSet<Vec<u8>> {
     let mut out = BTreeSet::new();
     let mut fence = spec::Fence::default();
     for line in text.lines() {
@@ -214,7 +214,7 @@ struct Scan {
 
 // spec: canon-kit/SPEC.md §check-delta-agreement — a family's section runs from its heading to the
 // next heading of that level or shallower; two families may share one heading
-fn scan(text: &str, families: &[Family], base: Option<&BTreeSet<String>>) -> Scan {
+fn scan(text: &str, families: &[Family], base: Option<&BTreeSet<Vec<u8>>>) -> Scan {
     let mut out = Scan {
         findings: Vec::new(),
         agreed: 0,
@@ -254,7 +254,7 @@ fn scan(text: &str, families: &[Family], base: Option<&BTreeSet<String>>) -> Sca
                 Some(why) => out.findings.push(Finding {
                     line: i + 1,
                     family: f.name.clone(),
-                    item,
+                    item: String::from_utf8_lossy(&item).into_owned(),
                     why,
                 }),
                 None => out.agreed += 1,
@@ -297,8 +297,8 @@ mod tests {
         .expect("the OpenSpec binding compiles")
     }
 
-    fn base() -> BTreeSet<String> {
-        ["Export one release", "Entry length"].iter().map(|s| s.to_string()).collect()
+    fn base() -> BTreeSet<Vec<u8>> {
+        ["Export one release", "Entry length"].iter().map(|s| s.as_bytes().to_vec()).collect()
     }
 
     fn got(s: &Scan) -> Vec<(usize, &str, &str, &Why)> {
@@ -343,7 +343,7 @@ mod tests {
     fn a_base_item_is_normalized_and_its_fences_skipped() {
         let cap = EreCapture::compile(REQ).unwrap();
         let items = base_items("### Requirement:Entry\tlength  \n```\n### Requirement: Quoted\n```\n", &cap);
-        assert_eq!(items.into_iter().collect::<Vec<_>>(), vec!["Entry length"]);
+        assert_eq!(items.into_iter().collect::<Vec<_>>(), vec![b"Entry length".to_vec()]);
     }
 
     #[test]
@@ -353,6 +353,25 @@ mod tests {
         let path = EreCapture::compile("^d/(.)").unwrap();
         let (s, e) = path.capture("d/\u{e9}.md").unwrap();
         assert!(!span("d/\u{e9}.md", s, e).is_empty());
+    }
+
+    #[test]
+    fn captures_ending_inside_different_multibyte_characters_stay_distinct() {
+        let item = "^item (.).*$";
+        let family = |present| Family {
+            name: "f".to_string(),
+            heading: crate::ere::Ere::compile("^## F").unwrap(),
+            item: EreCapture::compile(item).unwrap(),
+            present,
+            required: false,
+        };
+        let base = base_items("item \u{e9}\n", &EreCapture::compile(item).unwrap());
+        let text = "## F\nitem \u{20ac}\n";
+        let present = scan(text, &[family(true)], Some(&base));
+        assert_eq!(got(&present), vec![(2, "f", "\u{fffd}", &Why::Lacks)]);
+        let absent = scan(text, &[family(false)], Some(&base));
+        assert!(absent.findings.is_empty());
+        assert_eq!(absent.agreed, 1);
     }
 
     // spec: canon-kit/SPEC.md §check-delta-agreement — the exit-2 path, which a `bad/` fixture held
