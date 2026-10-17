@@ -19,6 +19,7 @@ const CLAIMED: &[&str] = &[
     "check-task-path-claim",
 ];
 const CLAIMED_SPECKIT: &[&str] = &["check-task-label-resolution"];
+const CLAIMED_OPENSPEC: &[&str] = &["check-delta-agreement"];
 
 // spec: installer/SPEC.md §The consumer smoke — the toolkits this table carries an arm header for,
 // held against the recipe directories so a recipe with no header reds
@@ -249,7 +250,11 @@ fn arm(state: &Run, tk: &str, label: &str, words: &[String]) -> Result<String, O
             tk, tk
         )));
     }
-    let own: &[&str] = if tk == "speckit" { CLAIMED_SPECKIT } else { &[] };
+    let own: &[&str] = match tk {
+        "speckit" => CLAIMED_SPECKIT,
+        "openspec" => CLAIMED_OPENSPEC,
+        _ => &[],
+    };
     for gate in CLAIMED.iter().chain(own) {
         if !Path::new(&format!("{}/defects/{}", fixtures, gate)).is_dir() {
             return Err(fail(format!(
@@ -288,6 +293,126 @@ fn arm(state: &Run, tk: &str, label: &str, words: &[String]) -> Result<String, O
         say(&format!("{}: defects/{}/ reds {}", label, gate, gate));
     }
     Ok(c)
+}
+
+// spec: installer/SPEC.md §The consumer smoke — every file under an overlay, relative to it
+fn overlay_files(root: &Path, rel: &str, out: &mut Vec<String>) -> Result<(), String> {
+    let here = if rel.is_empty() { root.to_path_buf() } else { root.join(rel) };
+    for (name, dir) in walk::list_dir(&here)? {
+        let next = if rel.is_empty() { name } else { format!("{}/{}", rel, name) };
+        if dir {
+            overlay_files(root, &next, out)?;
+        } else {
+            out.push(next);
+        }
+    }
+    Ok(())
+}
+
+// spec: installer/SPEC.md §The consumer smoke — a gate's block in the battery's output, from its
+// `===== <gate> =====` banner to its `FAIL: <gate>` line
+fn fail_block(said: &str, gate: &str) -> Option<String> {
+    let banner = format!("===== {} =====", gate);
+    let lead = format!("  FAIL: {} ", gate);
+    let lines: Vec<&str> = said.split('\n').map(|l| l.strip_suffix('\r').unwrap_or(l)).collect();
+    let start = lines.iter().position(|l| *l == banner)?;
+    let end = lines[start..].iter().position(|l| l.starts_with(&lead) || *l == lead.trim_end())?;
+    Some(lines[start..=start + end].join("\n"))
+}
+
+// spec: installer/SPEC.md §The consumer smoke — the overlap step: a toolkit carrying an overlap
+// directory runs its companion-overlap line in the same consumer and reds each overlay naming every
+// file it plants; a toolkit carrying none carries no companion-overlap block on its pages
+fn overlap(state: &Run, tk: &str, c: &str, pages: &[String]) -> Step {
+    let label = format!("{}-overlap", tk);
+    let dir = format!("{}/fixtures/{}/overlap", companion(state), tk);
+    let gates: Vec<String> = walk::list_dir(Path::new(&dir))
+        .unwrap_or_default()
+        .into_iter()
+        .filter(|(_, d)| *d)
+        .map(|(n, _)| n)
+        .collect();
+    if gates.is_empty() {
+        for page in pages {
+            if !block(page, "companion-overlap").is_empty() {
+                return Err(fail(format!(
+                    "companion arm, {}: {} carries a companion-overlap block and companion/fixtures/{}/overlap/ holds no gate directory, so no leg runs that line",
+                    label,
+                    walk::rel_under(&state.root, page).unwrap_or(page),
+                    tk
+                )));
+            }
+        }
+        return Ok(());
+    }
+    let must = format!("--recipe {}-overlap", tk);
+    let words = words_or(
+        state,
+        &pages[0],
+        "companion-overlap",
+        &must,
+        &format!("companion arm, {}: the toolkit carries overlap fixtures and no overlap line to run", label),
+    )?;
+    let before = super::consumer::commits(c)?;
+    let args: Vec<&str> = words.iter().map(String::as_str).collect();
+    let m = state.verb(c, &args)?;
+    if !m.succeeded() {
+        return Err(failed(&m, format!("companion arm, {}: {} exited non-zero", label, words.join(" "))));
+    }
+    if !super::profiles::commits_since(c, before)? || !porcelain(c)?.is_empty() {
+        return Err(fail(format!(
+            "companion arm, {}: {} did not make exactly one commit on a clean worktree",
+            label,
+            words.join(" ")
+        )));
+    }
+    let want: Vec<String> = words.windows(2).filter(|w| w[0] == "--recipe").map(|w| w[1].clone()).collect();
+    let got = Lock::of(c)?.list("recipes");
+    if got != want {
+        return Err(fail(format!(
+            "companion arm, {}: the manifest records recipes [{}] where the line applies [{}]",
+            label,
+            got.join(" "),
+            want.join(" ")
+        )));
+    }
+    green(state, &format!("{}, {}", label, words.join(" ")), c)?;
+    for gate in &gates {
+        let overlay = format!("{}/{}", dir, gate);
+        let mut planted = Vec::new();
+        overlay_files(Path::new(&overlay), "", &mut planted)
+            .map_err(|e| fail(format!("companion arm, {}: could not list overlap/{}/: {}", label, gate, e)))?;
+        copy_tree(Path::new(&overlay), Path::new(c))
+            .map_err(|e| fail(format!("companion arm, {}: could not plant overlap/{}/: {}", label, gate, e)))?;
+        let m = merged_in(&gates_bin(c)?, &["--run"], &[], c)?;
+        let said = out(&m);
+        let Some(found) = fail_block(&said, gate).filter(|_| !m.succeeded()) else {
+            return Err(failed(&m, format!(
+                "companion arm, {}: the battery did not red {} on overlap/{}/ (exit {})",
+                label,
+                gate,
+                gate,
+                m.reported_code()
+            )));
+        };
+        let unnamed: Vec<&String> = planted.iter().filter(|f| !found.contains(f.as_str())).collect();
+        if !unnamed.is_empty() {
+            super::show(&found);
+            return Err(fail(format!(
+                "companion arm, {}: {}'s finding names no {}, which overlap/{}/ plants",
+                label,
+                gate,
+                unnamed.iter().map(|s| s.as_str()).collect::<Vec<_>>().join(", "),
+                gate
+            )));
+        }
+        let restored = git(c, &["checkout", "-q", "--", "."])?.succeeded() && git(c, &["clean", "-fdq"])?.succeeded();
+        if !restored || !porcelain(c)?.is_empty() {
+            return Err(fail(format!("companion arm, {}: could not restore the consumer after overlap/{}/", label, gate)));
+        }
+        say(&format!("{}: overlap/{}/ reds {}, naming each of its {} file(s)", label, gate, gate, planted.len()));
+    }
+    Ok(())
 }
 
 // spec: companion/SPEC.md §The tiers — the manifest's kits hold none of the left-out kits, and its
@@ -403,14 +528,16 @@ fn same_words(state: &Run, label: &str, marker: &str, command: &[String]) -> Ste
 pub(super) fn speckit(state: &mut Run) -> Step {
     exclusions(state)?;
     say("companion/exclusions.list: every row names a pinned toolkit, a payload kit and a surface, and every toolkit with a recipe has one");
+    let command = format!("{}/speckit/commands/install.md", companion(state));
     let words = words_or(
         state,
-        &format!("{}/speckit/commands/install.md", companion(state)),
+        &command,
         "companion-install",
         "--recipe",
         "companion arm, speckit: the extension install command carries no install line to run",
     )?;
-    arm(state, "speckit", "speckit", &words).map(|_| ())
+    let c = arm(state, "speckit", "speckit", &words)?;
+    overlap(state, "speckit", &c, &[command, format!("{}/docs/speckit.md", state.root)])
 }
 
 pub(super) fn speckit_full(state: &mut Run) -> Step {
@@ -449,7 +576,8 @@ pub(super) fn openspec(state: &mut Run) -> Step {
         "--recipe",
         "companion arm, openspec: the OpenSpec page carries no install line to run",
     )?;
-    arm(state, "openspec", "openspec", &words).map(|_| ())
+    let c = arm(state, "openspec", "openspec", &words)?;
+    overlap(state, "openspec", &c, &[openspec_page(state)])
 }
 
 pub(super) fn openspec_complement(state: &mut Run) -> Step {
@@ -544,4 +672,17 @@ pub(super) fn openspec_lifecycle(state: &mut Run) -> Step {
         )));
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_fail_block_runs_from_the_gate_banner_to_its_fail_line() {
+        let said = "\n===== check-a =====\nx.md:1: a\n  FAIL: check-a (exit 1)\n\n===== check-b =====\ny.md\n  FAIL: check-b (exit 1)\n";
+        assert_eq!(fail_block(said, "check-a").as_deref(), Some("===== check-a =====\nx.md:1: a\n  FAIL: check-a (exit 1)"));
+        assert!(!fail_block(said, "check-a").unwrap().contains("y.md"));
+        assert!(fail_block(said, "check-c").is_none());
+    }
 }

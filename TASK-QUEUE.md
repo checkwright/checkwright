@@ -20,16 +20,6 @@
 
 ## New Features
 
-### openspec-delta-base-agreement
-
-[spec: SPEC-delta-agreement.md] [not-icebox-eligible: 2026-10-07 filed on the operator direction of 2026-09-29 and carries the measurement its gate would rest on; evicting it would compress both away]
-
-an OpenSpec change delta that disagrees with its base spec passes the battery and OpenSpec's own validator, and is caught, if at all, only at archive. Measured on openspec 1.13.2 at companion-technical-gates' spec: `validate --strict` exits 0 on a MODIFIED or RENAMED delta naming an absent requirement and on an ADDED one naming an existing requirement, printing only an INFO line; `archive -y` refuses those three, but `--skip-specs` bypasses the refusal; a REMOVED delta naming an absent requirement passes validate silently and archive takes it as already removed.
-
-**Deliverable:** a generic commit-time gate for heading-set delta agreement, its OpenSpec binding in the recipe, if it clears the value bar `toolkit-overlap-value-bar` landed (companion/SPEC.md §The tiers); it is that bar's first candidate, since OpenSpec owns the check at archive and this gate would re-check it earlier.
-
-**Cost while deferred:** an OpenSpec adopter's technical gates read nothing on a conventional task list, which names no paths, so the companion's code-facing reach there is `check-task-path-claim` alone. Filed 2026-09-29 at companion-technical-gates' spec on an operator direction lead-relayed (not a ruling). Owner lookup: `delta`, `archive`, `openspec` in this file — `companion-spec-to-code-gates`, DISTINCT (it ships the task gates and defers this one), and `toolkit-nav-hierarchy`, DISTINCT (nav labels); owner companion/SPEC.md.
-
 ### consult-grant-spend-unmarked
 
 [spec: SPEC-grant-spend-mark.md]
@@ -1072,4 +1062,5 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 
 - bounded-promise-phrasing
 - activated-guarantee-route
+- openspec-delta-base-agreement
 

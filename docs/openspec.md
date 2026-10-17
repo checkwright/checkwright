@@ -18,6 +18,20 @@ checkwright init --profile prose --recipe openspec
 
 The recipe governs the markdown under `openspec/`, exempts `openspec/changes/` from the rule against history words once you register it, since a change's delta records what a requirement said before, and points `check-task-path-claim` at each in-flight change's `tasks.md`. The install records it, so an upgrade re-applies it with the release it was tested against.
 
+It also points `check-delta-agreement` at each in-flight change's deltas, for the one disagreement no OpenSpec check catches: a change removing a requirement the capability's spec does not carry, which `openspec archive` takes as already removed.
+
+**Delta checks at commit, beside OpenSpec's own.** `openspec archive` refuses a delta that disagrees with its spec, such as one modifying a requirement the spec lacks or adding one it already carries. It runs only once the change is committed, and one of its flags skips the refusal. The overlap re-checks those deltas at commit. Add it beside the recipe:
+
+<!-- companion-overlap:begin -->
+
+```text
+checkwright init --profile prose --recipe openspec --recipe openspec-overlap
+```
+
+<!-- companion-overlap:end -->
+
+OpenSpec's own checks stay on, and the overlap adds only the families `check-delta-agreement` reads.
+
 **Keep each title unique within a spec.** OpenSpec specs often repeat a scenario title under two requirements. A citation of the second title would reach the first, so set `CANON_KIT_SPEC_POINTER_TITLE_ONCE = on` in `canon-config.knobs` to have `check-spec-pointer` red the repeat. Rename one apart, for instance *Idle timeout, web* and *Idle timeout, API*.
 
 **Every kit OpenSpec does not replace.** The second line installs `complement`:

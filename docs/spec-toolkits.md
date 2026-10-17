@@ -11,12 +11,15 @@ Checkwright's `prose` profile governs a repository of documents. A recipe fits i
 
 ## What the gates catch
 
-With the recipe applied, four kinds of defect in your specs fail CI, and a pre-commit hook catches them early:
+With the recipe applied, each of these defects in your specs fails CI, and a pre-commit hook catches it early:
 
 - a relative link to a missing file, or an anchored link to a heading that is not there, caught by `check-md-refs`;
 - a section citation such as `specs/001-login/spec.md §Assumptions` naming a heading that is not there, caught by `check-spec-pointer`; <!-- citation-link-exempt: an example of the citation form the gate reads, not a citation -->
 - a code fence that is never closed, caught by `check-spec-fence-balance`;
-- a documented command that runs a script your repository does not have, caught by `check-docs-cmd`.
+- a documented command that runs a script your repository does not have, caught by `check-docs-cmd`;
+- on OpenSpec, a change removing a requirement its capability's spec does not carry, caught by `check-delta-agreement`. OpenSpec's validator passes it, and `openspec archive` takes it as already removed.
+
+The OpenSpec overlap adds each delta `openspec archive` refuses only after commit. It catches a change that modifies or renames a requirement the spec lacks, renames onto or adds one it already carries, or changes a capability with no spec. Its line is on the OpenSpec page.
 
 A citation's path is read from the repository root, so write `specs/001-login/spec.md §Assumptions`, not `spec.md §Assumptions`. The second form is skipped rather than checked. <!-- citation-link-exempt: examples of the two citation forms, not citations -->
 
@@ -28,12 +31,13 @@ The task gates read your task lists against the tree. A task you ticked that nam
 
 ## Which checks each toolkit gets
 
-`prose`: the default line arms and tests it, and `complement` and `full` keep it. `full`: only the `full` line does. `opt-in`: an overlap you add beside the toolkit's own check ([the value bar](companion/SPEC.md#the-tiers)). `toolkit`: the toolkit's own check, which Checkwright leaves to it.
+`prose`: the default line arms and tests it, and `complement` and `full` keep it. `full`: only the `full` line does. `opt-in`: an overlap you add beside the toolkit's own check ([the value bar](companion/SPEC.md#the-tiers)). `prose + opt-in`: the default line arms it, and an overlap adds to what it checks. `toolkit`: the toolkit's own check, which Checkwright leaves to it.
 
 <!-- support-table:begin -->
 
 | Check | Spec Kit | OpenSpec |
 | --- | --- | --- |
+| `check-delta-agreement` | — | prose + opt-in |
 | `check-docs-cmd` | prose | prose |
 | `check-md-refs` | prose | prose |
 | `check-spec-fence-balance` | prose | prose |
@@ -47,7 +51,7 @@ The task gates read your task lists against the tree. A task you ticked that nam
 
 ## What is tested
 
-Every push to Checkwright's repository installs the profile on a tree in each toolkit's layout, applies the recipe through the toolkit's documented install line, and asserts the battery green. On Spec Kit it also installs `full` with the recipe and asserts the battery green and each defect caught. On each toolkit it also installs `complement` with the recipe, asserts the battery green and each defect caught, and asserts the left-out kits absent. It then plants each defect and asserts the gate that owns it reds. The same run installs the extension with Spec Kit's own command and validates the OpenSpec tree with OpenSpec's own validator. On OpenSpec it also applies the lifecycle layer to a `full` install and asserts that a change touching two capabilities demands the align stage. The versions tested are pinned in [`companion/toolkits.list`](https://github.com/checkwright/checkwright/blob/master/companion/toolkits.list). The recipes, the fixture trees and their design are under [`companion/`](companion/SPEC.md).
+Every push to Checkwright's repository installs the profile on a tree in each toolkit's layout, applies the recipe through the toolkit's documented install line, and asserts the battery green. On Spec Kit it also installs `full` with the recipe and asserts the battery green and each defect caught. On each toolkit it also installs `complement` with the recipe, asserts the battery green and each defect caught, and asserts the left-out kits absent. It then plants each defect and asserts the gate that owns it reds. The same run installs the extension with Spec Kit's own command and validates the OpenSpec tree with OpenSpec's own validator. On OpenSpec it also applies the lifecycle layer to a `full` install and asserts that a change touching two capabilities demands the align stage. It applies the overlap beside the recipe and asserts each delta it binds caught, and OpenSpec's own validator passes the same planted deltas. The versions tested are pinned in [`companion/toolkits.list`](https://github.com/checkwright/checkwright/blob/master/companion/toolkits.list). The recipes, the fixture trees and their design are under [`companion/`](companion/SPEC.md).
 
 ## Limits
 

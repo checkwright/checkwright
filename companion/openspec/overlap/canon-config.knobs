@@ -1,0 +1,12 @@
+# spec: companion/SPEC.md §The OpenSpec overlap — composed by `init --recipe openspec-overlap` after the recipe's lines into the consumer's scripts/canon-config.knobs
+CANON_KIT_DELTA_PRESENT[modified] = ^## MODIFIED Requirements
+CANON_KIT_DELTA_ITEM[modified] = ^### Requirement:[[:space:]]*(.+)$
+CANON_KIT_DELTA_PRESENT[renamed] = ^## RENAMED Requirements
+CANON_KIT_DELTA_ITEM[renamed] = ^- FROM: `### Requirement:[[:space:]]*(.+)`
+CANON_KIT_DELTA_ABSENT[renamed-to] = ^## RENAMED Requirements
+CANON_KIT_DELTA_ITEM[renamed-to] = ^- TO: `### Requirement:[[:space:]]*(.+)`
+CANON_KIT_DELTA_ABSENT[added] = ^## ADDED Requirements
+CANON_KIT_DELTA_ITEM[added] = ^### Requirement:[[:space:]]*(.+)$
+CANON_KIT_DELTA_BASE_REQUIRED[] = modified
+CANON_KIT_DELTA_BASE_REQUIRED[] = renamed
+CANON_KIT_DELTA_BASE_REQUIRED[] = removed

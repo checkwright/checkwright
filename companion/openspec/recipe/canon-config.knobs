@@ -2,3 +2,8 @@
 CANON_KIT_PROSE_SURFACE_GLOBS[] = openspec/**/*.md
 CANON_KIT_TEMPORAL_EXEMPT_PATHS[] = openspec/changes/**
 CANON_KIT_TASK_LIST_GLOBS[] = openspec/changes/*/tasks.md
+CANON_KIT_DELTA_PATH = ^openspec/changes/[^/]+/specs/(.+/spec\.md)$
+CANON_KIT_DELTA_BASE_DIR = openspec/specs
+CANON_KIT_DELTA_BASE_ITEM = ^### Requirement:[[:space:]]*(.+)$
+CANON_KIT_DELTA_PRESENT[removed] = ^## REMOVED Requirements
+CANON_KIT_DELTA_ITEM[removed] = ^### Requirement:[[:space:]]*(.+)$

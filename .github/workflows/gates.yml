@@ -513,7 +513,7 @@ jobs:
             || { echo "::error::extension.yml requires speckit_version '$floor', where the pin in companion/toolkits.list is $SPECKIT_VERSION"; exit 1; }
           echo "requires.speckit_version is $floor"
 
-      # spec: companion/SPEC.md §The toolkit legs — each native.list line over the layout, then over each full overlay
+      # spec: companion/SPEC.md §The toolkit legs — each native.list line over the layout, then over each full and each overlap overlay
       - name: run each toolkit's own checks over its fixture with the pinned package
         run: |
           set -euo pipefail
@@ -524,7 +524,7 @@ jobs:
             [ -d "$layout" ] || continue
             read -r -a argv <<< "$rest"
             pkg="$(pin "$tk" 2)"; ver="$(pin "$tk" 3)"
-            for overlay in "" companion/fixtures/"$tk"/full/*/; do
+            for overlay in "" companion/fixtures/"$tk"/full/*/ companion/fixtures/"$tk"/overlap/*/; do
               [ -z "$overlay" ] || [ -d "$overlay" ] || continue
               work="$RUNNER_TEMP/native-$tk"
               rm -rf "$work"; mkdir -p "$work"

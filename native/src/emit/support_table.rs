@@ -11,6 +11,8 @@ const END: &str = "<!-- support-table:end -->";
 // resolves it
 const TIERS: &[(&str, &str)] = &[("defects", "prose"), ("full", "full"), ("overlap", "opt-in")];
 const ABSENT: &str = "—";
+// spec: companion/SPEC.md §The support table — a default-line gate an overlap adds families to
+const LAYERED: &str = "prose + opt-in";
 
 struct Toolkit {
     key: String,
@@ -105,9 +107,13 @@ pub fn render(dir: &str) -> Result<String, String> {
     for gate in gates {
         let cells: Vec<&str> = (0..kits.len())
             .map(|i| {
+                let at = |tier: &str| proven.iter().any(|(g, k, t)| g == gate && *k == i && *t == tier);
+                if at("defects") && at("overlap") {
+                    return LAYERED;
+                }
                 TIERS
                     .iter()
-                    .find(|(tier, _)| proven.iter().any(|(g, k, t)| g == gate && *k == i && t == tier))
+                    .find(|(tier, _)| at(tier))
                     .map(|(_, mark)| *mark)
                     .unwrap_or(ABSENT)
             })
@@ -198,6 +204,8 @@ mod tests {
             "fixtures/b/defects/check-x",
             "fixtures/b/full/check-y",
             "fixtures/a/overlap/check-z",
+            "fixtures/b/defects/check-z",
+            "fixtures/b/overlap/check-z",
             "fixtures/a/layout",
         ] {
             fs::create_dir_all(root.join(d)).unwrap();
@@ -213,7 +221,7 @@ mod tests {
         assert_eq!(
             render(&dir).unwrap(),
             "\n| Check | Kit A | B |\n| --- | --- | --- |\n| `check-x` | prose | prose |\n\
-             | `check-y` | — | full |\n| `check-z` | opt-in | — |\n| `b check --all` | — | toolkit |\n"
+             | `check-y` | — | full |\n| `check-z` | opt-in | prose + opt-in |\n| `b check --all` | — | toolkit |\n"
         );
     }
 

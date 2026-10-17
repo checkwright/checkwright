@@ -51,7 +51,7 @@ pub(super) const ARMS: &[Row] = &[
     ),
     row(
         "companion arm for openspec",
-        "the OpenSpec recipe on its fixture tree, through the OpenSpec page's line",
+        "the OpenSpec recipe on its fixture tree, through the OpenSpec page's line, then its overlap line",
         super::companion::openspec,
         1,
     ),

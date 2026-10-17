@@ -6,6 +6,7 @@ Checkwright's gates over a repository whose specs another toolkit writes. This d
 
 - **A recipe per toolkit**, in `<toolkit>/recipe/`: the knob lines that fit the profiles to the toolkit's layout, applied by `init --recipe <toolkit>`.
 - **A lifecycle layer for OpenSpec**, in `openspec/lifecycle/`: the knob lines that let lifecycle-kit's stage machine read a change's in-flight deltas as amendments, applied with `--recipe openspec-lifecycle`.
+- **An overlap layer for OpenSpec**, in `openspec/overlap/`: the knob lines that re-check at commit the change deltas `openspec archive` refuses only later, applied with `--recipe openspec-overlap` beside the recipe.
 - **A Spec Kit extension**, in `speckit/`, whose install command installs Checkwright and applies the Spec Kit recipe for you.
 - **A fixture tree per toolkit**, in `fixtures/`, in the toolkit's own layout, with one planted defect per claimed gate. The consumer smoke installs the profile on each tree, applies the recipe, and asserts the battery green and each defect caught.
 - **The tested versions**, in `toolkits.list`.
@@ -23,7 +24,7 @@ What the gates catch in a spec tree, which checks each toolkit gets and the test
 
 ## Where the design lives
 
-[`companion/SPEC.md`](SPEC.md): how a recipe is applied, each recipe line with the idiom it answers, the lifecycle layer, the tested claim, the fixture rules, the extension's contract, the pack step, the toolkit legs, the support table and the honest limits.
+[`companion/SPEC.md`](SPEC.md): how a recipe is applied, each recipe line with the idiom it answers, the lifecycle layer, the OpenSpec overlap, the tested claim, the fixture rules, the extension's contract, the pack step, the toolkit legs, the support table and the honest limits.
 
 ## License
 

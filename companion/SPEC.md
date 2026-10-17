@@ -4,13 +4,14 @@ The companion package puts Checkwright's gates over a repository whose specs ano
 
 ## The component
 
-`companion/` is repo-root-governed and not a kit. It carries no `checks/` and no `smoke/`, so no kit-root resolver admits it. The package carries its recipes under `recipes/`, named in this repository's `GATE_SDK_PAYLOAD_RECIPES`: `openspec`, `openspec-lifecycle` and `speckit`. It adds no kit mechanism: each recipe is consumer config in knobs the `prose` profile reads, and the lifecycle layer is config in knobs lifecycle-kit reads. The toolkits' names live here, on the docs pages and on the front door, and never in a kit SPEC or a kit literal ([gate-sdk/SPEC.md §The provenance seam](../gate-sdk/SPEC.md#the-provenance-seam)).
+`companion/` is repo-root-governed and not a kit. It carries no `checks/` and no `smoke/`, so no kit-root resolver admits it. The package carries its recipes under `recipes/`, named in this repository's `GATE_SDK_PAYLOAD_RECIPES`: `openspec`, `openspec-lifecycle`, `openspec-overlap` and `speckit`. It adds no kit mechanism: each recipe and the overlap layer are consumer config in knobs the `prose` profile reads, and the lifecycle layer is config in knobs lifecycle-kit reads. The toolkits' names live here, on the docs pages and on the front door, and never in a kit SPEC or a kit literal ([gate-sdk/SPEC.md §The provenance seam](../gate-sdk/SPEC.md#the-provenance-seam)).
 
 - `toolkits.list` pins each toolkit, one `<toolkit> <package> <version> <name…>` line each. The toolkit name keys the line, the package is what the toolkit leg installs, the version is what it pins and asserts (§The toolkit legs), and the display name heads the toolkit's column in the support table (§The support table), in the file's order.
 - `native.list` rosters the checks each toolkit itself ships, one `<toolkit> <arguments…>` line each. The toolkit leg runs every line and the support table lists it, so the roster has two readers and no line goes untested.
 - `exclusions.list` records the kits each toolkit's `complement` line leaves out, one `<toolkit> <kit> <surface…>` line each: the kit, and the toolkit's own surface that already does its job. The companion arm holds each toolkit's `complement` line to its rows (§The tiers).
 - `<toolkit>/recipe/` holds a recipe (§Recipes).
 - `openspec/lifecycle/` holds OpenSpec's lifecycle layer (§The lifecycle layer).
+- `openspec/overlap/` holds OpenSpec's overlap layer (§The OpenSpec overlap).
 - `speckit/` is the Spec Kit extension around its recipe (§The Spec Kit extension). The directory is not named after the toolkit's repository, and a page links that repository at its root only, because `check-kit-ref-liveness` reds a `<name>-kit` path segment that names no kit root.
 - `fixtures/<toolkit>/` holds the fixture tree and its planted defects (§The fixtures).
 
@@ -53,13 +54,14 @@ Measured on `specify init --here --non-interactive --integration claude --script
 
 ### The OpenSpec recipe
 
-OpenSpec's own checks: `openspec validate --strict`, over the structure of specs and change deltas, and `openspec archive`, which refuses a MODIFIED, RENAMED or ADDED delta disagreeing with its base spec unless `--skip-specs` is passed.
+OpenSpec's own checks: `openspec validate --strict`, over the structure of specs and change deltas, and `openspec archive`, which refuses a delta disagreeing with its base spec unless `--skip-specs` is passed. Measured at 1.13.2, `validate` passes every disagreeing delta, and one disagreement passes `archive` too: a REMOVED requirement an existing base lacks, which `archive` reads as already removed.
 
 Measured on `openspec init --tools claude --no-animation --no-copilot-cloud .`, with a capability spec and one change:
 
 - `CANON_KIT_PROSE_SURFACE_GLOBS[] = openspec/**/*.md`, in `canon-config.knobs`, for the reason the Spec Kit line has.
 - `CANON_KIT_TEMPORAL_EXEMPT_PATHS[] = openspec/changes/**`, in the same file. A MODIFIED requirement in a change delta carries a `(Previously: …)` line, the form OpenSpec's own docs show, and `check-manifest-temporal` reds on it. Change deltas and the archive under `openspec/changes/` are history by design.
 - `CANON_KIT_TASK_LIST_GLOBS[] = openspec/changes/*/tasks.md`, in the same file, arms `check-task-path-claim` on each in-flight change's task list. The single `*` keeps `openspec/changes/archive/` out, since an archived change's paths are history.
+- The five `CANON_KIT_DELTA_*` lines in `canon-config.knobs` arm `check-delta-agreement` on each in-flight change's deltas against `openspec/specs/`, for the REMOVED family alone, the disagreement no OpenSpec check catches. Without them the gate asserts nothing. A requirement's name compares case-sensitively and blank-collapsed, as `archive` matches one. The path ERE's change segment cannot match `archive`'s dated child under `openspec/changes/archive/`, so an archived change is no delta.
 - `unregister.list` names no gate.
 
 **One convention, left to the adopter.** OpenSpec specs often repeat a scenario title under two requirements, and a citation of the second title binds to the first. `check-spec-pointer`'s one-title-per-file rule reds the repeat when `CANON_KIT_SPEC_POINTER_TITLE_ONCE` is `on`, a house rule the recipe does not arm; the OpenSpec page states the convention and the knob line.
@@ -73,6 +75,26 @@ OpenSpec's `full` line (§The tiers) applies the layer, as `--recipe openspec-li
 
 `check-spec-pointer`'s reach needs no layer. Both toolkits' specs are markdown, and each recipe already brings them into the governed set.
 
+### The OpenSpec overlap
+
+`openspec/overlap/` is the first overlap layer (§The tiers), applied as `--recipe openspec-overlap` beside the recipe, and the page's `companion-overlap` line carries both. It binds the disagreements `archive` refuses and `validate --strict` passes at the pin: a MODIFIED or RENAMED requirement the base lacks, a RENAMED target or an ADDED requirement the base already carries, and a MODIFIED, RENAMED or REMOVED delta on a capability with no base spec. Each clears the bar twice: `archive` runs after the change is committed, and `--skip-specs` skips it. The layer adds families to `check-delta-agreement` and arms nothing the recipe does not, so applied alone it asserts nothing. OpenSpec's own checks stay enabled.
+
+- `canon-config.knobs` adds the families `modified` and `renamed` (present: a MODIFIED requirement, a RENAMED `FROM`), `renamed-to` and `added` (absent: a RENAMED `TO` under the same heading, an ADDED requirement), and lists `modified`, `renamed` and the recipe's `removed` in `CANON_KIT_DELTA_BASE_REQUIRED`.
+- `unregister.list` names no gate.
+
+The split rests on this measurement at 1.13.2, over copies of the layout:
+
+| delta | `validate --all --strict` | `archive -y` | `archive -y --skip-specs` |
+| --- | --- | --- | --- |
+| MODIFIED naming a requirement the base lacks | 0, an INFO line | 1 | 0 |
+| RENAMED whose FROM the base lacks | 0, an INFO line | 1 | 0 |
+| RENAMED whose TO the base already carries | 0, an INFO line | 1 | — |
+| ADDED naming a requirement the base carries | 0, an INFO line | 1 | 0 |
+| MODIFIED or REMOVED on a capability with no base spec | 0 | 1 | — |
+| REMOVED naming a requirement an existing base lacks | 0, silent | 0, "already in sync" | 0 |
+
+`archive` matches a header case-sensitively, and ignores blank runs around and inside the requirement's name: a lowercased name is "not found", while a doubled inner space, trailing blanks or no space after the colon all match. The last row is no overlap, since no OpenSpec check covers it, so the recipe binds it on the default line; every other row re-checks ground `archive` covers, which the bar admits only as an additive layer off by default.
+
 ## The tested claim
 
 The recipes are proved against the defect classes below, each caught by a named gate, on `prose` and `complement` for both toolkits and on `full` for Spec Kit, whose `complement` and `full` legs plant them again. Both toolkits carry:
@@ -85,7 +107,7 @@ The recipes are proved against the defect classes below, each caught by a named 
 
 Spec Kit also carries a task citing a user story its spec does not define, by `check-task-label-resolution`.
 
-The OpenSpec `full` line is held green by the lifecycle leg. Each `complement` leg also asserts the left-out kits absent: the manifest's `kits` holds none of the toolkit's `exclusions.list` kits, and its recorded selection removes exactly them, after the install and after a bare re-run and a bare `update`. Delta-to-base agreement is OpenSpec's, at archive. A gate for it is an overlap, and none ships until one clears the value bar (§The tiers). `plan.md`'s source tree draws the structure a feature will have, so no gate reads it either.
+The OpenSpec `full` line is held green by the lifecycle leg. Each `complement` leg also asserts the left-out kits absent: the manifest's `kits` holds none of the toolkit's `exclusions.list` kits, and its recorded selection removes exactly them, after the install and after a bare re-run and a bare `update`. OpenSpec also carries a REMOVED requirement its base lacks, by `check-delta-agreement`, and its overlap a disagreement of each family `archive` refuses, by the same gate (§The OpenSpec overlap). `plan.md`'s source tree draws the structure a feature will have, so no gate reads it either.
 
 No recipe drops a gate. A toolkit idiom a gate reds is answered by a knob line fitting the gate to it. Dropping a gate would narrow what the companion ships, so it is a change to this section and not a recipe edit.
 
@@ -102,11 +124,11 @@ The support table on the toolkit page is derived from the fixture directories an
 
 Each source file is neither markdown nor a shell script, so no other claimed gate reads it.
 
-`fixtures/<toolkit>/defects/<gate>/` holds, per claimed gate, the files that replace their layout counterparts to plant that gate's defect. OpenSpec's `check-spec-pointer` defect is a citation of a requirement its spec does not carry, and its `check-md-refs` defect adds an anchored link to a missing requirement. Each toolkit's `check-task-path-claim` defect is its ticked task naming an absent path, and Spec Kit's `check-task-label-resolution` defect adds a task citing `[US2]`, which `spec.md` does not define.
+`fixtures/<toolkit>/defects/<gate>/` holds, per claimed gate, the files that replace their layout counterparts to plant that gate's defect. OpenSpec's `check-spec-pointer` defect is a citation of a requirement its spec does not carry, and its `check-md-refs` defect adds an anchored link to a missing requirement. Each toolkit's `check-task-path-claim` defect is its ticked task naming an absent path, and Spec Kit's `check-task-label-resolution` defect adds a task citing `[US2]`, which `spec.md` does not define. OpenSpec's `check-delta-agreement` defect adds a REMOVED requirement the notes spec lacks to the change's delta.
 
 `fixtures/<toolkit>/full/<gate>/` overlays the layout with what only the `full` line's gate reads, and names that gate.
 
-`fixtures/<toolkit>/overlap/<gate>/` plants the defect an overlap exists for, over the layout. The companion arm applies the toolkit's recipe and overlap layer and asserts the gate reds it. The toolkit leg runs the toolkit's own check over the same planted tree and asserts the check misses it, so a pin move to a release that closes the miss reds the leg, and the overlap is weighed again (§The tiers).
+`fixtures/<toolkit>/overlap/<gate>/` plants the defects an overlap exists for, over the layout, one per family the layer binds, each in a file of its own so a finding names it alone. The companion arm applies the toolkit's recipe and overlap layer and asserts the gate reds, naming every file the overlay carries. The toolkit leg runs the toolkit's own check over the same planted tree and asserts the check passes it, so a pin move to a release that closes a miss reds the leg, and the overlap is weighed again (§The tiers). OpenSpec's plants each sit in a change directory of their own holding only the delta, which `validate --strict` accepts with no proposal.
 
 The OpenSpec layout passes `openspec validate --all --strict` at the pin, with and without the `full` overlay, so the toolkit is its own fixture's oracle. This repository prunes every directory named `fixtures` from its own walks (`GATE_SDK_PRUNE_EXTRA_DIRS` in `scripts/gate-sdk-config.knobs`), since the trees carry each red on purpose. The companion arm governs them instead, inside a scratch consumer ([installer/SPEC.md §The consumer smoke](../installer/SPEC.md#the-consumer-smoke)).
 
@@ -142,8 +164,7 @@ The toolkits' own tools are oracles, and nothing here re-implements their schema
 
 1. installs the pinned `specify-cli`, runs `specify init --here --non-interactive --integration claude --script sh --ignore-agent-tools` in an empty scratch directory, since the non-interactive init refuses a non-empty one and a runner carrying no `claude` CLI, and packs the extension at version `0.0.0`. It serves the zip from a local web server and installs it with `specify extension add checkwright --from <url>`, answering the trust prompt. It asserts exit 0, `.specify/extensions/checkwright/extension.yml` present, and the hook registered in `.specify/extensions.yml`;
 2. asserts that `extension.yml`'s `requires.speckit_version` is `>=` the pinned version;
-3. runs each `native.list` line of a toolkit with a layout, with the toolkit's pinned package, over a copy of the layout and again with each `full` overlay copied over it;
-4. for each `fixtures/<toolkit>/overlap/<gate>/`, runs the toolkit's own check over the layout with the defect planted, and asserts that it passes.
+3. runs each `native.list` line of a toolkit with a layout, with the toolkit's pinned package, over a copy of the layout and again with each `full` and each `overlap` overlay copied over it, and asserts that each passes. An overlap overlay passing is the miss the overlap exists for.
 
 A pin moves by editing its `toolkits.list` line, and the job then proves the new version on the next push.
 
@@ -152,7 +173,7 @@ A pin moves by editing its `toolkits.list` line, and the job then proves the new
 `docs/spec-toolkits.md` carries a table with one row per check and one column per toolkit, between `<!-- support-table:begin -->` and `<!-- support-table:end -->` with a blank line inside each marker. `bash gate-sdk/bin/run-gates.sh --emit support-table` prints the block, and `--write` rewrites it and touches nothing else. A row is a tested fact, so it derives from the fixture tree and `native.list`, never from the recipe files: one recipe line arms many gates, while a defect directory proves one.
 
 - **The header** is `| Check |`, then each `toolkits.list` display name in file order.
-- **A gate row** is one per gate name under any toolkit's `fixtures/<toolkit>/{defects,full,overlap}/`, sorted by name, the name in a code span. The directory is the tier. A toolkit's cell reads `prose` where its `defects/<gate>/` exists, since the default line arms and tests it and each tier above it only adds. Otherwise it reads `full` where its `full/<gate>/` exists, `opt-in` where its `overlap/<gate>/` exists (§The tiers), and `—` elsewhere.
+- **A gate row** is one per gate name under any toolkit's `fixtures/<toolkit>/{defects,full,overlap}/`, sorted by name, the name in a code span. The directory is the tier. A toolkit's cell reads `prose` where its `defects/<gate>/` exists, since the default line arms and tests it and each tier above it only adds, and `prose + opt-in` where its `overlap/<gate>/` exists too. Otherwise it reads `full` where its `full/<gate>/` exists, `opt-in` where its `overlap/<gate>/` exists (§The tiers), and `—` elsewhere.
 - **A toolkit row** follows the gate rows, one per `native.list` line in file order: the line's `<toolkit> <arguments…>` in a code span, `toolkit` in that toolkit's cell and `—` in every other.
 - **Exit 2**, from the arm and from its gate, on a roster it cannot read: an unreadable `toolkits.list` or `native.list`, a `toolkits.list` line with no name, or a `native.list` line naming a toolkit `toolkits.list` lacks or carrying no arguments. It also exits 2 on a fixture toolkit directory `toolkits.list` lacks, and on a block that is absent or occurs twice.
 
@@ -165,5 +186,4 @@ A pin moves by editing its `toolkits.list` line, and the job then proves the new
 - The Windows route is documented and not run. A recipe adds no step of its own to it, and a leg piping the PowerShell line would retire this limit.
 - A pinned toolkit version says nothing about the next one.
 - The exclusion record is measured at each toolkit's pin, from what its init writes and the commands it ships. A toolkit release that adds or drops a workflow surface is seen only when a pin move measures it again.
-- No overlap has shipped, so neither the companion arm nor the toolkit leg yet loops over `fixtures/<toolkit>/overlap/`; the first overlap adds both loops.
 - A change whose two in-flight deltas sit under one capability in two changes fires the OpenSpec layer's audit, since each delta's directory is a component. So does a delta citing its own capability's spec, which sits outside the delta's directory. The align waiver is the valve. On Spec Kit the audit trigger is not machine-held.
