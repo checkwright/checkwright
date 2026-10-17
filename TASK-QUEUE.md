@@ -288,7 +288,7 @@ the Rust toolchain pin trails the newest stable release by one minor: `rust-tool
 
 ### windows-liveness-row-pid-reuse
 
-[cost: event/low] [surface: evidence-kit]
+[cost: event/low] [surface: evidence-kit] [recurrence: 2026-10-17]
 
 the gates workflow's Windows liveness step misread one row once. On the run for hook-placement-guard-rules-pass' closing push, `crate-tests-windows` on the x64 triple failed its step for producer liveness over Windows process ids with row (b) reading alive twice: the log shows the record's pid read gone before and after the gate while the gate answered held. The step printed no other finding, the range since the last green run touched no crate or workflow file, and a re-run of that one job passed.
 
