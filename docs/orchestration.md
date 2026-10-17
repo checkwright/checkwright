@@ -4,29 +4,29 @@ nav_parent: methodology
 nav_child_order: 1
 ---
 
-# Agent orchestration: the verification layer beneath it
+# Agent orchestration: the evidence checks beneath it
 
-Agent orchestration frameworks answer *who works on what, and when*: they fan a job out across agents, sequence the hand-offs, and keep many writers moving at once. They do not answer *whether the work is right*. Every delegation hop is a place where "the agent said it passed" can stand in for verification, and drift compounds per hop, so orchestration without a verification layer parallelizes drift.
+Agent orchestration frameworks answer *who works on what, and when*: they fan a job out across agents, sequence the hand-offs, and keep many writers moving at once. They do not check *whether each hop's claim is backed*. Every delegation hop is a place where "the agent said it passed" can stand in for a recorded run, and drift compounds per hop, so orchestration with nothing checking those claims parallelizes drift.
 
-Checkwright is that second answer. It makes *done* mechanically decidable, so a supervisor (human or agent) can trust a completed unit of work without reading all of it: coordination is only worth scaling once each coordinated result is checkable. Checkwright therefore sits **beneath** an orchestrator, as the verification layer a coordination layer stacks on. It complements your orchestration setup; it does not replace it.
+Checkwright answers part of that question. Its gates catch reproducible classes of unsupported claim before merge, so a supervisor (human or agent) can check the evidence behind a completed unit of work without reading all of it. They check that the evidence exists and agrees with the tree, never that the code is correct ([the bounded promise](positioning.md#the-bounded-promise)). Coordination is only worth scaling once each coordinated result carries evidence a gate can check, so Checkwright sits **beneath** an orchestrator. It complements your orchestration setup; it does not replace it.
 
 ## The mechanisms
 
-- **Verification survives the adversary.** After every commit a delegated agent makes, the supervisor re-runs the relevant gates and the validate battery rather than trusting the agent's report, and diffs every gate change the commit carries. `check-gate-tamper` blocks the two commit shapes a gate is weakened by: a gate edit staged with the code it judges, and a new exemption that excuses a file in its own commit. It reads a commit's shape, not its intent, so the diff review stays the supervisor's. Owned by [`delegation-kit/SPEC.md §Verify after every agent commit`](delegation-kit/SPEC.md#verify-after-every-agent-commit).
+- **The check survives the adversary.** After every commit a delegated agent makes, the supervisor re-runs the relevant gates and the validate battery rather than trusting the agent's report, and diffs every gate change the commit carries. `check-gate-tamper` blocks the two commit shapes a gate is weakened by: a gate edit staged with the code it judges, and a new exemption that excuses a file in its own commit. It reads a commit's shape, not its intent, so the diff review stays the supervisor's. Owned by [`delegation-kit/SPEC.md §Verify after every agent commit`](delegation-kit/SPEC.md#verify-after-every-agent-commit).
 - **Every dispatch can be metered.** An optional per-dispatch budget guard, wired as a harness hook, reads the usage verdict before each delegated agent starts and blocks the dispatch when the budget says pause, so a fan-out cannot run away with the token budget. Owned by [`delegation-kit/SPEC.md §The delegation model`](delegation-kit/SPEC.md#the-delegation-model).
 - **Stage claims are auditable evidence, not assertions.** Each lifecycle stage stamps a line into a committed state file when it runs, so a stateless supervisor can audit *what happened* by reading the stamps rather than re-reading the work. Owned by [`lifecycle-kit/SPEC.md §The state machine`](lifecycle-kit/SPEC.md#the-state-machine).
 - **Every run leaves a committed receipt.** A per-run evidence manifest is committed alongside the work, so "this passed" is a durable artifact in the history, checkable after the fact by anyone. Owned by [`evidence-kit/SPEC.md §Evidence manifest`](evidence-kit/SPEC.md#evidence-manifest).
 
-Together these make the delegation boundary trustworthy: work crosses it with a checkable receipt, not a promise.
+Together these make the delegation boundary checkable: work crosses it with a receipt a gate reads, not a promise.
 
 ## Checkwright's own coordination
 
-Checkwright is a verification layer, not an orchestration layer: the prerequisite for *unattended* orchestration at scale, where no human reads each hop. It carries a small, checkable amount of its *own* coordination:
+Checkwright checks each hop's claims rather than orchestrating; *unattended* orchestration, where no human reads each hop, needs them checked. It carries a small, checkable amount of its *own* coordination:
 
 - **The iteration lead** — a live session that dispatches an iteration's stage sessions as background agents and answers their batched escalations. The protocol is owned by [`lifecycle-kit/SPEC.md §templates/lead.md`](lifecycle-kit/SPEC.md#templatesleadmd).
 - **Multi-operator semantics** — merge and conflict behavior for the lifecycle's single-writer state surfaces, walked through [below](#two-operators-one-governed-tree). Owned by [`lifecycle-kit/SPEC.md §Multi-operator semantics`](lifecycle-kit/SPEC.md#multi-operator-semantics).
 
-Within one iteration that is the extent of it: a lead dispatching its own verified stages. Across operators Checkwright coordinates nothing: it verifies, so whatever coordinates can be trusted to have coordinated correct work. Where the coordination layer goes next is the queue's Deferred section, checkable in the tree.
+Within one iteration that is the extent of it: a lead dispatching its own verified stages. Across operators Checkwright coordinates nothing: it checks the evidence behind each claim, whatever coordinates the work. Where the coordination layer goes next is the queue's Deferred section, checkable in the tree.
 
 ## Running an iteration under a lead
 
@@ -56,7 +56,7 @@ Picture two iterations live at once — say *surface-trust* and *docs-polish*.
 3. **At a merge, the iteration-scoped surfaces resolve to the arriving side.** When one branch merges into another, the header line, the evidence file, and the other boundary-truncated surfaces take the checked-out iteration's version wholesale; the other side's copy is per-iteration scratch, and git history keeps the audit trail. The set is *derived* from what the iteration boundary already truncates and held by a `merge=iteration-scoped` driver and a parity gate. Shared backlog and lessons in the queue body merge like any prose; only its header region (the header line with its set record) is resolved by hand, and a wrong header resolution reddens at the next commit under the stage evidence gate.
 4. **Closes serialize at the integration branch.** Each operator closes on their own iteration branch, reconciling by merging the integration branch in; the close-merges land one after another on the integration branch. No lock, no lease — the serialization is the merge order git already imposes.
 
-The through-line: concurrency is isolation git already provides, and verification is unchanged on every branch. Whatever an operator's branch merges passed the battery, so two operators parallelize *checked* work, never drift.
+The through-line: concurrency is isolation git already provides, and the gates run unchanged on every branch. Whatever an operator's branch merges passed the battery, so two operators parallelize *checked* work, never drift.
 
 ## Where to go next
 

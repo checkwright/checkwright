@@ -94,4 +94,4 @@ Where Checkwright sits against practices you may already run, one page per angle
 
 - [Where Checkwright sits](positioning.md) — the layer model: Checkwright as layer-4 content beneath a closed harness prompt, plus its tiered harness-compatibility claim and memory-off position.
 - [Domain-driven design](ddd.md) — Checkwright as the enforcement layer for a ubiquitous language: banned synonyms, comment and naming directives, and one home per definition.
-- [Agent orchestration](orchestration.md) — Checkwright as the verification layer beneath a coordination framework: the gates, budget guard, stage stamps, and evidence manifest that make delegated work checkable.
+- [Agent orchestration](orchestration.md) — Checkwright as the evidence checks beneath a coordination framework: the gates, budget guard, stage stamps, and evidence manifest that make delegated work's claims checkable.

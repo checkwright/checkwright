@@ -16,14 +16,6 @@
 
 ## Technical Debt
 
-### orchestration-page-overreach
-
-`docs/orchestration.md` frames Checkwright as the verification layer beneath orchestration, in its title and at three body sites, and `docs/index.md`'s link to it repeats the phrase, while the first screen now leads with the bounded promise (docs/positioning.md §The bounded promise): reproducible classes of unsupported claims caught before merge, structural evidence rather than correctness.
-
-**Deliverable:** those sites reworded under the bounded-promise rule.
-
-**Cost while deferred:** an evaluating agent quoting the orchestration page reads structural evidence checks as semantic verification, the overreach `bounded-promise-phrasing` closed on the first screen. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet build filed that day; not fixed at close because the operator's direction of that day (lead-relayed, not a ruling) chose first-screen-only reach for that unit, so this reach is a scope's to take. Re-verified there by grep: the title and lines 9, 11 and 24 of the page, and the index line. Owner lookup: `orchestration`, `verification layer` in this file and the disposed-findings record — none; `bounded-promise-phrasing`, done, DISTINCT (the first screen); owner docs/positioning.md §The bounded promise.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -1060,4 +1052,5 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 
 - crate-manifest-license-unheld
 - evaluator-agent-discovery
+- orchestration-page-overreach
 
