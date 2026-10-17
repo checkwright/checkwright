@@ -4,6 +4,10 @@
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
+  **Set record**
+
+  **Directive (operator direction 2026-10-17, lead-relayed, not a ruling; it supersedes the dispatch's undirected line):** the theme is the follow-up actions to the recent competitive analysis that make Checkwright a more competitive offering, and the delayed actions doing so, if any. The analysis is the refreshed SWOT the operator directed to land in the private brief as drafted.
+
 ---
 
 ## New Features
@@ -345,6 +349,16 @@ a clean-seat rehearsal of the companion toolkits' adoption (`companion/`: the Sp
 **Inferred, not run:** that no adopter-seat run of the companions has happened, read off the operator's wish.
 
 **Cost while deferred:** the first invited testers meet whatever a rehearsal would have caught. Filed 2026-10-17 by budget-feed-observation-pass' close from a gap bullet of that date; the operator wanted it now and it cannot enter before the next scope. Owner lookup: `rehears`, `companion`, `clean seat` in this file and the disposed-findings record — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (the catalog submission, waiting on a published tag); [design-partner-preview](#design-partner-preview), DISTINCT (the observed tester cohort, on operator hours); `front-door-container-rehearsal`, done, DISTINCT (the front door's first run, not the companions').
+
+### consult-grant-spend-unmarked
+
+[cost: event/high] [surface: lifecycle-kit]
+
+a consult-inbox item that stays after a dispatched consultation spends its lead-relayed grant reads as grant-unspent to the next lead. The inbox is append-only, so the bullet is unchanged; the spend survives only in the spending commit's message and the gitignored consult journal. The next lead re-dispatched the SWOT item on an inferred-unspent grant, and an expert-tier consultation re-verified the spend before declining the critique.
+
+**Deliverable:** a sanctioned spend marker a dispatched consultation appends to a staying item, or a lead-template step reading the item's history before relaying its grant's status; which is spec's, against lifecycle-kit/SPEC.md §The consult inbox and §templates/lead.md.
+
+**Cost while deferred:** each lead consult dispatch over a staying spent-grant item buys an expert-tier consultation to rediscover the spend. Surfaced 2026-10-17 by budget-feed-observation-pass' second consult dispatch on the SWOT item and promoted at the next scope's intake. Owner lookup: `spent`, `grant`, `consult inbox` in this file and the disposed-findings record — none; [tarball-attestation-observed](#tarball-attestation-observed)'s grant records, DISTINCT (release grants on an entry, not an inbox item); owner lifecycle-kit/SPEC.md §The consult inbox.
 
 ## Icebox
 
