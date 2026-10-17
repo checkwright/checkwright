@@ -14,23 +14,13 @@
 
 ## New Features
 
-### crate-manifest-license-unheld
-
-[spec: SPEC-manifest-license.md]
-
-the crate manifest `native/Cargo.toml` declares `license = "MIT"` while `LICENSE` and `scripts/license-line.conf` state Apache-2.0, present since the crate's first commit. `publish = false` keeps it off crates.io, but the manifest is tracked and public, and no gate reads the field: `check-license-line` reads the README and site license lines only.
-
-**Deliverable:** the field set to the source's license, and `check-license-line` or a sibling holding every tracked package manifest's license field to `license-line.conf`'s value, in one unit by Enforcement-first; a feature, since the gate gains a read contract.
-
-**Cost while deferred:** a reader of the public crate manifest is told the wrong license. Filed 2026-10-17 by budget-feed-observation-pass' close from a gap bullet of that date, surfaced probing a consult item. Re-verified there: the crate field reads MIT, and `reserve/crates/Cargo.toml`, `installer/package.json` and both plugin manifests read Apache-2.0. Owner lookup: `license`, `Cargo.toml`, `license-line` in this file and the disposed-findings record — none; `homepage-license-duplicate`, done, DISTINCT (the footer instance); owner docs/site-architecture.md §The license line.
-
 ### evaluator-agent-discovery
 
 [spec: SPEC-evaluator-discovery.md]
 
 the adopter is increasingly a coding agent comparing tools and recommending or selecting one on a human's behalf, and the operator directed (2026-10-17, lead session, a direction, not a ruling) treating that agent as a first-class reader, for the next scope. Three surfaces stay here, unbuilt: (a) an evaluator-facing choosing page, when to pick it and when not, a comparison against the same-seat entrants the private brief's SWOT names and a custom-CI baseline, the limits stated; (b) `llms.txt` and `llms-full.txt` on the site, a generated projection behind a freshness gate; (d) registry metadata, `installer/package.json` carrying no `keywords` and `native/Cargo.toml`'s `description` reading as an internal binary.
 
-**Deliverable:** design-pending, a feature per surface that adds a page, a projection or a gate, spec authoring each. (d) lands with [crate-manifest-license-unheld](#crate-manifest-license-unheld), which edits the same manifest. (a) states the profiles as shipped, verification without the workflow and not the reverse, so [verify-workflow-decoupling](#verify-workflow-decoupling)'s ruling edits it later.
+**Deliverable:** design-pending, a feature per surface that adds a page, a projection or a gate, spec authoring each. (d) lands with `crate-manifest-license-unheld`, which edits the same manifest. (a) states the profiles as shipped, verification without the workflow and not the reverse, so [verify-workflow-decoupling](#verify-workflow-decoupling)'s ruling edits it later.
 
 **Cost while deferred:** an agent evaluating on a human's behalf finds no surface written for it and may not surface Checkwright at all. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet of that date. Re-verified there: no `docs/llms.txt`, no root `AGENTS.md`, no `keywords` in `installer/package.json`, and the crate description as stated. Owner lookup: `llms`, `AGENTS.md`, `evaluator`, `keywords` in this file and the disposed-findings record — none; owner docs/site-architecture.md. Re-verified at evaluator-discovery-pass' scope: unchanged.
 
@@ -1081,4 +1071,6 @@ a citation naming a numbered step by its bold title, in RELEASING.md's procedure
 A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, since check-front-door-verbs reads the front-door pages alone; widening its arm resolution to the kit SPECs, with the history valves, would catch it.
 
 ## Done
+
+- crate-manifest-license-unheld
 

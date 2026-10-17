@@ -4,3 +4,7 @@ kit/README.md: no '## License' section
 other/README.md: carries '## License' but is not a declared site
 docs/index.md: a page under docs carries '## License', which the site chrome already states
 docs/dotted.md: a page under docs carries '## License', which the site chrome already states
+crate/Cargo.toml: the license field reads 'MIT'
+expected: Apache-2.0
+pkg/package.json: carries no license field
+ext/extension.yml: carries a license field but is not a declared manifest in license-line.conf

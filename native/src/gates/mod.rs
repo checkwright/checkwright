@@ -1963,7 +1963,8 @@ pub const REGISTRY: &[GateEntry] = &[
         license_line::run,
         &[
             (".", "name:knob:GATE_LOCAL_README_FILE", "", ""),
-            ("?", "", "", "dynamic@src/gates/license_line.rs:255"),
+            (".", "name:knob:GATE_LOCAL_LICENSE_MANIFEST_NAMES", "", ""),
+            ("?", "", "", "dynamic@src/gates/license_line.rs:355"),
         ],
         &[
             "GATE_SDK_PRUNE_DIRS",
@@ -1971,6 +1972,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_LOCAL_LICENSE_CONF",
             "GATE_LOCAL_LICENSE_HEADING",
             "GATE_LOCAL_README_FILE",
+            "GATE_LOCAL_LICENSE_MANIFEST_NAMES",
         ],
         "-",
         &[],

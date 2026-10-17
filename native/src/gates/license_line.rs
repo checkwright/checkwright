@@ -1,5 +1,6 @@
 // spec: docs/site-architecture.md §The license line — every README's License section and the
-// site footer carry the one line the source renders for that site
+// site footer carry the one line the source renders for that site, and every package manifest's
+// license field the source's license
 use crate::fresh;
 use crate::walk;
 use std::path::Path;
@@ -20,6 +21,14 @@ struct Conf {
     pages: Option<String>,
     wheres: Vec<(String, String)>,
     sites: Vec<(String, Form)>,
+    manifests: Vec<(String, Kind)>,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy)]
+enum Kind {
+    Cargo,
+    Json,
+    Yaml,
 }
 
 pub fn run(args: &[String]) -> i32 {
@@ -38,6 +47,7 @@ fn parse(path: &str, text: &str) -> Result<Conf, String> {
     let mut pages: Option<String> = None;
     let mut wheres: Vec<(String, String)> = Vec::new();
     let mut sites: Vec<(String, Form)> = Vec::new();
+    let mut manifests: Vec<(String, Kind)> = Vec::new();
     for (n, line) in fresh::file_lines(text).into_iter().enumerate() {
         if !fresh::live_line(line) {
             continue;
@@ -84,9 +94,24 @@ fn parse(path: &str, text: &str) -> Result<Conf, String> {
                 }
                 sites.push((words[1].to_string(), form));
             }
+            "manifest" => {
+                if words.len() != 2 {
+                    return Err(format!("{}: 'manifest' takes one path", at));
+                }
+                let Some(k) = kind(words[1]) else {
+                    return Err(format!(
+                        "{}: manifest '{}' is of a kind with no reader (Cargo.toml, .json, .yml, .yaml)",
+                        at, words[1]
+                    ));
+                };
+                if manifests.iter().any(|(m, _)| m == words[1]) {
+                    return Err(format!("{}: manifest '{}' declared twice", at, words[1]));
+                }
+                manifests.push((words[1].to_string(), k));
+            }
             other => {
                 return Err(format!(
-                    "{}: unknown key '{}' (admitted: license, text, pages, where, site)",
+                    "{}: unknown key '{}' (admitted: license, text, pages, where, site, manifest)",
                     at, other
                 ))
             }
@@ -105,7 +130,82 @@ fn parse(path: &str, text: &str) -> Result<Conf, String> {
         pages,
         wheres,
         sites,
+        manifests,
     })
+}
+
+fn kind(path: &str) -> Option<Kind> {
+    let name = path.rsplit('/').next().unwrap_or(path);
+    if name == "Cargo.toml" {
+        Some(Kind::Cargo)
+    } else if name.ends_with(".json") {
+        Some(Kind::Json)
+    } else if name.ends_with(".yml") || name.ends_with(".yaml") {
+        Some(Kind::Yaml)
+    } else {
+        None
+    }
+}
+
+// spec: docs/site-architecture.md §The license line — a manifest's license field read by its kind;
+// `Ok(None)` is a manifest carrying no field, `Err` one the gate cannot read
+fn manifest_license(kind: Kind, text: &str) -> Result<Option<String>, String> {
+    match kind {
+        Kind::Cargo => {
+            let lines = fresh::file_lines(text);
+            let Some(start) = lines.iter().position(|l| l.trim() == "[package]") else {
+                return Ok(None);
+            };
+            for line in lines[start + 1..].iter().map(|l| l.trim()) {
+                if line.starts_with('[') {
+                    break;
+                }
+                let Some((key, value)) = line.split_once('=') else {
+                    continue;
+                };
+                if key.trim() != "license" {
+                    continue;
+                }
+                let value = value.trim();
+                return match value.strip_prefix('"').and_then(|v| v.split_once('"')) {
+                    Some((lic, rest)) if rest.trim().is_empty() || rest.trim().starts_with('#') => {
+                        Ok(Some(lic.to_string()))
+                    }
+                    _ => Err(format!("the [package] license value {} is not a basic string", value)),
+                };
+            }
+            Ok(None)
+        }
+        Kind::Json => {
+            let doc: serde_json::Value =
+                serde_json::from_str(text).map_err(|e| format!("does not parse as JSON ({})", e))?;
+            match doc.get("license") {
+                None => Ok(None),
+                Some(serde_json::Value::String(s)) => Ok(Some(s.clone())),
+                Some(other) => Err(format!("the top-level license value {} is not a string", other)),
+            }
+        }
+        Kind::Yaml => {
+            for line in fresh::file_lines(text) {
+                let Some((key, value)) = line.trim_start().split_once(':') else {
+                    continue;
+                };
+                if key.trim_end() != "license" {
+                    continue;
+                }
+                let value = value.trim();
+                if value.is_empty() {
+                    return Err("the license key carries no scalar value".to_string());
+                }
+                let unquoted = ['"', '\'']
+                    .iter()
+                    .find_map(|q| value.strip_prefix(*q).and_then(|v| v.strip_suffix(*q)))
+                    .unwrap_or(value);
+                return Ok(Some(unquoted.to_string()));
+            }
+            Ok(None)
+        }
+    }
 }
 
 fn is_html(site: &str) -> bool {
@@ -271,21 +371,55 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
+    let read_manifest = |rel: &str, k: Kind| -> Result<Option<String>, String> {
+        let text = fresh::read_captured(&at_root(rel)).map_err(|e| format!("{}: {}", rel, e))?;
+        manifest_license(k, &text).map_err(|e| format!("{}: {}", rel, e))
+    };
+    for (m, k) in &conf.manifests {
+        match read_manifest(m, *k)? {
+            None => findings.push(format!("  {}: carries no license field", m)),
+            Some(got) if got != conf.license => {
+                findings.push(format!("  {}: the license field reads '{}'", m, got));
+                findings.push(format!("    expected: {}", conf.license));
+            }
+            Some(_) => {}
+        }
+    }
+    let manifest_names = walk::knob_array("GATE_LOCAL_LICENSE_MANIFEST_NAMES")?;
+    let manifest_names: Vec<&str> = manifest_names.iter().map(String::as_str).collect();
+    for p in walk::find_named(Path::new(&root), &manifest_names)? {
+        let rel = site_key(p.strip_prefix(&root).unwrap_or(&p));
+        let k = kind(&rel).ok_or_else(|| {
+            format!(
+                "{}: GATE_LOCAL_LICENSE_MANIFEST_NAMES names a kind with no reader (Cargo.toml, .json, .yml, .yaml)",
+                rel
+            )
+        })?;
+        if read_manifest(&rel, k)?.is_some() && !conf.manifests.iter().any(|(m, _)| *m == rel) {
+            findings.push(format!(
+                "  {}: carries a license field but is not a declared manifest in {}",
+                rel, source
+            ));
+        }
+    }
+
     if !findings.is_empty() {
         println!("{}: license line(s) out of step with {}:", NAME, source);
         for f in &findings {
             println!("{}", f);
         }
         println!("  help: paste each expected line as its site's one license line, declare every README");
-        println!("        carrying the heading in {}, and drop a page's own License section", source);
-        println!("        (docs/site-architecture.md §The license line).");
+        println!("        carrying the heading in {}, and drop a page's own License section; a", source);
+        println!("        manifest's license field takes the declared license, and every manifest carrying");
+        println!("        one is declared (docs/site-architecture.md §The license line).");
         return Ok(1);
     }
     println!(
-        "LICENSE-LINE: clean ({} site(s) carry the license line; {} README(s) declared; {} page(s) carry none)",
+        "LICENSE-LINE: clean ({} site(s) carry the license line; {} README(s) declared; {} page(s) carry none; {} manifest(s) hold the license)",
         conf.sites.len(),
         covered,
-        pages
+        pages,
+        conf.manifests.len()
     );
     Ok(0)
 }
@@ -329,9 +463,61 @@ mod tests {
             "license A\ntext LICENSE\nsite R.md link L\nsite R.md link L\n",
             "license A\ntext LICENSE\nsite R.md beside L\n",
             "license A\ntext LICENSE\npages d\npages e\n",
+            "license A\ntext LICENSE\nmanifest a/Cargo.toml\nmanifest a/Cargo.toml\n",
+            "license A\ntext LICENSE\nmanifest setup.cfg\n",
+            "license A\ntext LICENSE\nmanifest a/package.json extra\n",
         ] {
             assert!(parse("t.conf", bad).is_err(), "accepted: {:?}", bad);
         }
+    }
+
+    #[test]
+    fn a_declared_manifest_keeps_its_kind() {
+        let c = parse(
+            "t.conf",
+            "license A\ntext LICENSE\nmanifest n/Cargo.toml\nmanifest p/package.json\nmanifest e/extension.yml\n",
+        )
+        .unwrap();
+        assert_eq!(
+            c.manifests,
+            vec![
+                ("n/Cargo.toml".to_string(), Kind::Cargo),
+                ("p/package.json".to_string(), Kind::Json),
+                ("e/extension.yml".to_string(), Kind::Yaml),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_cargo_manifest_is_read_for_its_package_tables_license() {
+        let read = |t: &str| manifest_license(Kind::Cargo, t);
+        assert_eq!(
+            read("[package]\nname = \"x\"\nlicense = \"MIT\" # note\n[dependencies]\n").unwrap(),
+            Some("MIT".into())
+        );
+        assert_eq!(read("[package]\nname = \"x\"\n[other]\nlicense = \"MIT\"\n").unwrap(), None);
+        assert_eq!(read("[package]\nlicense-file = \"L\"\n").unwrap(), None);
+        assert_eq!(read("[workspace]\nmembers = []\n").unwrap(), None);
+        assert!(read("[package]\nlicense.workspace = true\nlicense = 3\n").is_err());
+    }
+
+    #[test]
+    fn a_json_manifest_is_read_for_its_top_level_license_string() {
+        let read = |t: &str| manifest_license(Kind::Json, t);
+        assert_eq!(read("{\"license\": \"Apache-2.0\"}").unwrap(), Some("Apache-2.0".into()));
+        assert_eq!(read("{\"plugins\": [{\"license\": \"MIT\"}]}").unwrap(), None);
+        assert!(read("{\"license\": {\"type\": \"MIT\"}}").is_err());
+        assert!(read("{\"license\": ").is_err());
+    }
+
+    #[test]
+    fn a_yaml_manifest_is_read_for_its_first_license_key_unquoted() {
+        let read = |t: &str| manifest_license(Kind::Yaml, t);
+        assert_eq!(read("a:\n  license: \"Apache-2.0\"\nlicense: MIT\n").unwrap(), Some("Apache-2.0".into()));
+        assert_eq!(read("license: 'MIT'\n").unwrap(), Some("MIT".into()));
+        assert_eq!(read("license: MIT\n").unwrap(), Some("MIT".into()));
+        assert_eq!(read("# license: MIT\nname: x\n").unwrap(), None);
+        assert!(read("license:\n  name: MIT\n").is_err());
     }
 
     #[test]

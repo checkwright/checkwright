@@ -2,3 +2,7 @@
 # spec: docs/site-architecture.md §The license line — the case's own declaration of the heading and README name, which no positional names
 # knob: GATE_LOCAL_LICENSE_HEADING = ## License
 # knob: GATE_LOCAL_README_FILE = README.md
+# knob: GATE_LOCAL_LICENSE_MANIFEST_NAMES[] = Cargo.toml
+# knob: GATE_LOCAL_LICENSE_MANIFEST_NAMES[] = package.json
+# knob: GATE_LOCAL_LICENSE_MANIFEST_NAMES[] = plugin.json
+# knob: GATE_LOCAL_LICENSE_MANIFEST_NAMES[] = extension.yml

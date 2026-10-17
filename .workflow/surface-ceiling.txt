@@ -84,7 +84,7 @@
 1460cp docs/queue-kit/index.md
 789cp docs/releases.md
 8690cp docs/requirements.md
-5220cp docs/site-architecture.md
+5910cp docs/site-architecture.md
 2412cp docs/site-kit/index.md
 5463cp docs/spec-toolkits.md
 3183cp docs/speckit.md

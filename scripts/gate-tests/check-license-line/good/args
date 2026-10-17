@@ -2,5 +2,7 @@
 # generated mirror carrying a differently worded section, which the walk skips;
 # under the pages root docs/, page.md carries no License section and the generated
 # mirror.md and dotted.md, which do, are skipped, dotted.md's block closing on
-# dots. The gate ACCEPTS.
+# dots. crate/Cargo.toml, pkg/package.json and ext/extension.yml are declared
+# manifests stating the license, and the undeclared tool/package.json carries
+# no license field, so it needs no declaration. The gate ACCEPTS.
 license-line.conf .

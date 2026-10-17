@@ -1,4 +1,8 @@
-# graph: couples=scripts/license-line.conf,README.md,*/README.md,*/*/README.md,docs/_layouts/default.html,docs/*.md,docs/*/*.md,native/src/gates/license_line.rs dir=one valve=none tier=precommit
-# spec: docs/site-architecture.md §The license line — every README's License section and the site footer carry the one line scripts/license-line.conf renders for that site, every README carrying the heading is a declared site, and no hand-written page under the declared pages root carries the heading
+# graph: couples=scripts/license-line.conf,README.md,*/README.md,*/*/README.md,docs/_layouts/default.html,docs/*.md,docs/*/*.md,companion/speckit/extension.yml,installer/package.json,native/Cargo.toml,plugin/.claude-plugin/plugin.json,plugin/plugin.json,reserve/crates/Cargo.toml,native/src/gates/license_line.rs dir=one valve=none tier=precommit
+# spec: docs/site-architecture.md §The license line — every README's License section and the site footer carry the one line scripts/license-line.conf renders for that site, every README carrying the heading is a declared site, no hand-written page under the declared pages root carries the heading, and every package manifest carrying a license field is declared there and states its license
 # knob: GATE_LOCAL_LICENSE_CONF = scripts/license-line.conf
 # knob: GATE_LOCAL_LICENSE_HEADING = ## License
+# knob: GATE_LOCAL_LICENSE_MANIFEST_NAMES[] = Cargo.toml
+# knob: GATE_LOCAL_LICENSE_MANIFEST_NAMES[] = package.json
+# knob: GATE_LOCAL_LICENSE_MANIFEST_NAMES[] = plugin.json
+# knob: GATE_LOCAL_LICENSE_MANIFEST_NAMES[] = extension.yml

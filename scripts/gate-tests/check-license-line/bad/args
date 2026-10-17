@@ -2,5 +2,7 @@
 # wording, kit/README.md is declared but carries no License section, and
 # other/README.md carries the heading undeclared, and the hand-written pages
 # docs/index.md and docs/dotted.md carry their own License section, dotted.md's
-# 'generated: true' sitting below its dotted closer. The gate REJECTS.
+# 'generated: true' sitting below its dotted closer. The declared crate/Cargo.toml
+# states MIT, the declared pkg/package.json carries no license field, and
+# ext/extension.yml carries one undeclared. The gate REJECTS.
 license-line.conf .
