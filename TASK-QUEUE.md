@@ -382,6 +382,50 @@ a companion `complement` install (`init --profile full` with three `--without-ki
 
 **Cost while deferred:** one line of tester confusion per complement install, with no wrong behaviour. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet of that date; not fixed at close because it changes `init`'s user-facing output, whose wording is spec's. Owner lookup: `INIT:`, `complement`, `commit subject` in this file and the disposed-findings record — none; owner installer/SPEC.md §init.
 
+### prove-claim-path-confinement
+
+[cost: event/high] [surface: installer]
+
+`prove` confines its claim files to the clone lexically and never on the filesystem, so three paths reach past installer/SPEC.md §prove step 3 and the verb's "writes nothing to your worktree". (1) `in_clone` in `native/src/installer/prove.rs` checks a knob's path by its components alone, so a committed symlink `queue.md` pointing into the invoking repository, with `LIFECYCLE_KIT_QUEUE_FILE=queue.md`, has the claim's read and write follow it out of the clone; the prior close's fix closed the escape for `../` paths only. (2) It resolves `..` lexically, so with a committed directory symlink `alias -> real/sub` the knob `alias/../TASK-QUEUE.md` selects the root file where the filesystem selects `real/TASK-QUEUE.md`, and `prove` overwrites and reports the wrong one. (3) `claim_env` drops a knob `in_clone` rejected rather than overriding it, so the first battery run inherits an outside absolute `LIFECYCLE_KIT_QUEUE_FILE` from the environment before the not-held verdict, where step 3 sets both knobs.
+
+**Deliverable:** each knob path resolved against the clone's filesystem, an escape naming no file of the clone's; both knobs set on every battery run; a crate test per path.
+
+**Inferred, not run:** that the claim writes through the symlink into the invoking repository — read off `in_clone` and the claim loop's `std::fs::write`, which follows a symlink; a crate test committing the symlink and running `prove` runs it.
+
+**Cost while deferred:** a tree carrying such a symlink has `prove` write a claim into a file outside its clone, and a P1 review finding stands open against a verb new since v0.31.0. Surfaced 2026-10-17 by competitive-followup-pass' close second-vendor review as three gap bullets, promoted at the next scope's intake. Re-verified there by reading `in_clone`, `resolved` and the `claim_env` filter. Owner lookup: `in_clone`, `claim_env`, `symlink`, `prove` in this file and the disposed-findings record — none; [companion-prove-not-held](#companion-prove-not-held), DISTINCT (which claim `prove` stages); [prove-pwsh-leg-unmeasured](#prove-pwsh-leg-unmeasured), DISTINCT (the Windows route's oracle); owner installer/SPEC.md §prove.
+
+### knob-file-relative-to-cwd
+
+[cost: event/low] [surface: installer]
+
+`knobs::wire_in_value` in `native/src/knobs/mod.rs` reads `GATE_SDK_KNOB_FILE`, and each kit's knob-file and local-knob-file override, from the environment and hands a relative value to `load` unchanged, which opens it against the process directory. So `prove`, and `doctor` through the same read, resolve a derived default from the invoking worktree's knob file, dirty edits included, while a battery at the clone's root reads `HEAD`'s; the prior close's fix holds this only for the default knob-file location.
+
+**Deliverable:** a relative override resolved against the tree `wire_in` reads, per installer/SPEC.md §doctor's "without entering that tree", with a crate test.
+
+**Cost while deferred:** a consumer exporting a relative knob-file override gets a `prove` or `doctor` reading that disagrees with the battery it describes. Surfaced 2026-10-17 by competitive-followup-pass' close second-vendor review as a gap bullet, promoted at the next scope's intake. Re-verified there by reading `wire_in_value` and `load`'s `is_file` test on the raw value. Owner lookup: `wire_in`, `KNOB_FILE`, `relative` in this file and the disposed-findings record — none; [prove-claim-path-confinement](#prove-claim-path-confinement), DISTINCT (the claim files, where this is the knob file); owner installer/SPEC.md §doctor and §prove.
+
+### delta-agreement-lossy-capture
+
+[cost: event/low] [surface: canon-kit]
+
+`check-delta-agreement`'s `span()` in `native/src/gates/delta_agreement.rs` decodes a capture with `from_utf8_lossy`, and the ERE matcher's offsets are bytes, so two captures ending inside different multibyte characters both read U+FFFD and compare equal: under `^item (.).*$`, base `item é` and delta `item €` agree, so a PRESENT item wrongly agrees and an ABSENT one wrongly reds. canon-kit/SPEC.md §check-delta-agreement has item names compare case-sensitively, which distinct bytes must keep distinct.
+
+**Deliverable:** captures compared as bytes, decoded only for the finding's text, with a fixture or crate test on that pair.
+
+**Cost while deferred:** a consumer whose item pattern cuts a multibyte character gets a wrong verdict either way. Surfaced 2026-10-17 by competitive-followup-pass' close second-vendor review over that close's own multibyte fix, promoted at the next scope's intake. Re-verified there by reading `span` and the matcher's byte-wise contract. Owner lookup: `delta-agreement`, `from_utf8_lossy`, `multibyte` in this file and the disposed-findings record — none; owner canon-kit/SPEC.md §check-delta-agreement.
+
+### update-notice-windows-flake
+
+[cost: event/low] [surface: native]
+
+`emit::update_notice::tests::a_probe_reads_the_upstream_and_an_unreachable_one_is_silent` failed once on `crate-tests-windows` x64, at competitive-followup-pass' second closing push: the weekly probe due after the bare clone into the once-missing upstream read Unknown and printed an empty line. The first closing push's run passed it on the same code, and a re-run passed.
+
+**Deliverable:** the cause named and the test made independent of it, or the limit stated.
+
+**Inferred, not run:** that the probe's `ls-remote` overran its bound, the test taking the 5-second `DEFAULT_TIMEOUT`, on a Windows runner reading a just-written bare repository — cannot run here: the leg executes on the Windows runner alone.
+
+**Cost while deferred:** a closing push reds on a coin and costs a re-run and its wait, as one did at that close. Surfaced 2026-10-17 by competitive-followup-pass' close as a gap bullet, promoted at the next scope's intake. Owner lookup: `update_notice`, `update notice`, `crate-tests-windows`, `flake` in this file and the disposed-findings record — [windows-liveness-row-pid-reuse](#windows-liveness-row-pid-reuse), DISTINCT (another test on the same leg, a pid read rather than a probe bound); owner installer/SPEC.md §The update notice.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
