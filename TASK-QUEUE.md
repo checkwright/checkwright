@@ -1,24 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: competitive-followup-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **Directive (operator direction 2026-10-17, lead-relayed, not a ruling; it supersedes the dispatch's undirected line):** the theme is the follow-up actions to the recent competitive analysis that make Checkwright a more competitive offering, and the delayed actions doing so, if any. The analysis is the refreshed SWOT the operator directed to land in the private brief as drafted.
-
-  **The set (operator direction 2026-10-17, lead-relayed, not a ruling):** `companion-adoption-rehearsal`, `bounded-promise-phrasing` and the features `activated-guarantee-route`, `openspec-delta-base-agreement` and `consult-grant-spend-unmarked`, the three features spec's to author and promote. The analysis' comparison arm rides [design-partner-preview](#design-partner-preview) as an annotation.
-
-  **Grant (operator grant 2026-10-17, lead-relayed; spent 2026-10-17 by validate's codex-review run, returned not clean on five findings filed to the gap inbox):** one second-vendor review at validate; v0.32.0 is cut on a clean return under the bar [tarball-attestation-observed](#tarball-attestation-observed) records.
-
-  **Second grant (operator grant and direction 2026-10-17, lead-relayed; spent 2026-10-17 by close's codex-review run, returned not clean on five findings filed to the gap inbox, so the fallback ran):** one second-vendor review at close over the close's two fix commits (the prove and knob fix, the check-delta-agreement fix); v0.32.0 is cut on a clean return, closing push plus tag push. On a finding or a failed run, v0.32.0 defers, the front door withdraws `prove`, and the consumer smoke reads the overlap line off a surface outside the front door, the page line restored at the cut.
-
-  **Push need (2026-10-17, inside the budget):** the closing push, plus the tag push on a clean return; no unit reads a remote run. Spent: no tag; the closing push and a second carrying a recurrence stamp. **A third push, over budget (operator grant 2026-10-17, lead-relayed),** lands the revised product statement so master matches the About.
-
-  **Product statement revised (operator direction 2026-10-17, lead-relayed, replacing the Option A wording approved for `bounded-promise-phrasing`, whose entry has left the queue):** every product-statement site and the GitHub About carry the 277-character statement `scripts/product-statement.conf` now renders, since GitHub caps the About at 350 characters and Option A ran to 430.
-
-  **Owed at close (operator direction and grant 2026-10-17, lead-relayed, revising the earlier by-hand direction; the operator makes no GitHub change by hand, so a GitHub act is owed by the session holding the tools):** the close session sets the repository's GitHub About to `installer/package.json`'s `description` after the closing push lands, behind the account step, and reads it back; until then site-health's About arm reports the difference.
 
 ---
 
