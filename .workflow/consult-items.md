@@ -1,2 +1,1 @@
 # contract: lifecycle-kit/SPEC.md §The consult inbox — append-only capture of items owed to the consult skill, consult-drained; one bullet per item below.
-- 2026-10-17 — SWOT update: refresh the competitive SWOT in the local brief (§Competitive landscape + SWOT). The operator grants one codex-session run (2026-10-17, lead-relayed) to draft an outside-view SWOT opening as a proposal; nothing lands without a ruling. Operator request, lead-relayed.
