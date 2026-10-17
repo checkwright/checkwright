@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+competitive-followup-pass release deferred:v0.32.0 — a minor accumulated since v0.31.0, held because the granted validate review returned five findings and the operator's second grant, a close review of their fixes, returned five more, and both grants cut only on a clean return; the front-door trigger is met by withdrawal under the operator's fallback direction (prove and the openspec-overlap operand off the front door until the cut); no other trigger fires: the elapsed limb dormant under preview, no major, no security or supply-chain fix, plugin parity green

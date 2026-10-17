@@ -12,11 +12,11 @@
 
   **Grant (operator grant 2026-10-17, lead-relayed; spent 2026-10-17 by validate's codex-review run, returned not clean on five findings filed to the gap inbox):** one second-vendor review at validate; v0.32.0 is cut on a clean return under the bar [tarball-attestation-observed](#tarball-attestation-observed) records.
 
-  **Second grant (operator grant and direction 2026-10-17, lead-relayed):** one second-vendor review at close over the close's two fix commits (the prove and knob fix, the check-delta-agreement fix); v0.32.0 is cut on a clean return, closing push plus tag push. On a finding or a failed run, v0.32.0 defers, the front door withdraws `prove`, and the consumer smoke reads the overlap line off a surface outside the front door, the page line restored at the cut.
+  **Second grant (operator grant and direction 2026-10-17, lead-relayed; spent 2026-10-17 by close's codex-review run, returned not clean on five findings filed to the gap inbox, so the fallback ran):** one second-vendor review at close over the close's two fix commits (the prove and knob fix, the check-delta-agreement fix); v0.32.0 is cut on a clean return, closing push plus tag push. On a finding or a failed run, v0.32.0 defers, the front door withdraws `prove`, and the consumer smoke reads the overlap line off a surface outside the front door, the page line restored at the cut.
 
   **Push need (2026-10-17, inside the budget):** the closing push, plus the tag push on a clean return; no unit reads a remote run.
 
-  **Owed at close (operator direction 2026-10-17, lead-relayed, not a ruling):** the operator sets the repository's GitHub About by hand to the approved product statement's plain rendering (`installer/package.json`'s `description`), after the account-selection step, around the closing push; until then site-health's About arm reports the difference.
+  **Owed at close (operator direction and grant 2026-10-17, lead-relayed, revising the earlier by-hand direction; the operator makes no GitHub change by hand, so a GitHub act is owed by the session holding the tools):** the close session sets the repository's GitHub About to `installer/package.json`'s `description` after the closing push lands, behind the account step, and reads it back; until then site-health's About arm reports the difference.
 
 ---
 
@@ -151,6 +151,8 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 **Second grant of 2026-10-16 spent (operator grant, lead-relayed):** tamper-reader-repair-pass' validate ran the review over its range, the set `exception-list-reader-gaps`, `exec-target-tamper-suffix`, `ephemeral-turn-usage-read`, `front-matter-reader-span` and `input-redirect-scan-cr`. It returned three P2 findings, so under the grant's own terms v0.32.0 stayed deferred and its tag push unspent; that close landed all three, none verdict-moving.
 
 **Third grant of 2026-10-16 spent (operator grant, lead-relayed):** budget-feed-observation-pass' validate ran the review over its range, which returned changes requested on four findings, so v0.32.0 stayed deferred and its tag push unspent; that close fixed the three that held, none verdict-moving, and the fourth fell.
+
+**Two grants of 2026-10-17 spent:** competitive-followup-pass' validate and close reviews each returned five findings, so v0.32.0 stayed deferred. That close withdrew `prove` from docs/install.md and docs/maintenance.md and the overlap section from docs/openspec.md, its line held in `companion/fixtures/openspec/overlap/line.md`; **the cut restores them** and deletes the held file.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 

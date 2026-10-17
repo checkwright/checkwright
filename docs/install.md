@@ -17,7 +17,7 @@ An install needs a supported system and a few tools, and [What an install requir
 
 <!-- install-primary: tarball -->
 
-Run the one line for your system from your repository's root, in a new project or an existing one with every change committed: `init` makes one commit and refuses a dirty worktree. The line downloads the newest Release tarball, checks it against its published digest and, where `gh` is signed in and the release is attested, against its build attestation, unpacks it outside your repository and runs `init`, with no runtime to install first. A step-by-step form is linked under each line. The recommended path starts with `demo`, to see the guarantee. Install with your line and run the commands `init` prints; `checkwright prove` then shows the guarantee on your tree ([Prove it on your tree](#prove-it-on-your-tree)).
+Run the one line for your system from your repository's root, in a new project or an existing one with every change committed: `init` makes one commit and refuses a dirty worktree. The line downloads the newest Release tarball, checks it against its published digest and, where `gh` is signed in and the release is attested, against its build attestation, unpacks it outside your repository and runs `init`, with no runtime to install first. A step-by-step form is linked under each line. The recommended path starts with `demo`, to see the guarantee. Then install with your line and run the commands `init` prints.
 
 Pick your route:
 
@@ -112,7 +112,7 @@ The plugin installs no kit: it registers Checkwright's lifecycle skills and its 
 Give your agent this prompt:
 
 ```text
-Install Checkwright in this repository. Choose a profile with me from https://checkwright.dev/install.html#choosing-a-profile, then install it as https://checkwright.dev/install.html#install describes for this host, and run each command init prints. Then follow gate-sdk/templates/adopt.md. Then run checkwright prove from the repository root, through the then: line init printed, and report its last line.
+Install Checkwright in this repository. Choose a profile with me from https://checkwright.dev/install.html#choosing-a-profile, then install it as https://checkwright.dev/install.html#install describes for this host, and run each command init prints. Then follow gate-sdk/templates/adopt.md.
 ```
 
 The last step is the same walk the plugin's `adopt` skill runs.
@@ -131,12 +131,6 @@ Choose a profile with `--profile`. If another toolkit writes your specs, pass `-
 Moving to a profile that contains yours only adds. `init` refuses outside a git work tree or in a repository git refuses to read (the refusal names the command that prints why), on a dirty worktree (`--no-commit` stages instead of committing), or when `checkwright doctor` finds a missing tool. Re-running it is safe: it reports files you have edited instead of overwriting them, unless you pass `--force`. `--dry-run` prints the plan and writes nothing.
 
 **Choosing kits and gates.** `--with-kit` and `--without-kit` add a kit to your profile or take one out. `--with-gate` and `--without-gate` do the same for a gate. Each repeats. `checkwright.lock` records them, so a re-run keeps them until you pass new ones or `--no-selection`. `gate-sdk` stays, since it runs the others. To replace a gate with your own, put a gate of the same name in your gates directory. It runs instead of the kit's, and `init` never overwrites it.
-
-### Prove it on your tree
-
-`checkwright prove` makes the claim `demo` shows caught, a task marked done with no evidence behind it, on a scratch clone of your `HEAD`. It runs your own battery there before and after the claim and reports what your install enforces at commit and in CI, and what it leaves inactive. It writes nothing here. It asks nothing either, so a coding agent can run it unattended. The `then:` line `init` prints runs it through the binary `init` placed, and the [maintenance verbs](maintenance.md#managing) spell it for each route.
-
-Its last line is the verdict, and its exit status says the same: `PROVE: held`, exit `0`, with the minutes since the install commit, or `PROVE: not held`, exit `1`, with the cause. `starter`, the default, keeps no task queue, so it is not held, and the line names the profile that adds one.
 
 ## Going further
 

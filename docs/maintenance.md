@@ -12,7 +12,6 @@ nav_child_order: 3
 
 - `checkwright doctor` checks this machine against [Requirements](requirements.md) and reports what is installed.
 - `checkwright diff` lists the vendored files you have changed. Exit `0` means none.
-- `checkwright prove` shows what your install enforces and whether a task claimed done with no evidence is caught on your `HEAD`. Exit `0` means held. The `then:` line `init` printed runs it through the binary `init` placed.
 - `checkwright update` upgrades the install to the version you are running.
 - `checkwright uninstall` reverses the install in one commit.
 

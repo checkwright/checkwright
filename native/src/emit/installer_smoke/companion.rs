@@ -345,10 +345,14 @@ fn overlap(state: &Run, tk: &str, c: &str, pages: &[String]) -> Step {
         }
         return Ok(());
     }
+    // spec: installer/SPEC.md §The consumer smoke — a line held in the overlap directory, ahead of
+    // the release that carries its recipe, is read before the page's
+    let held = format!("{}/line.md", dir);
+    let source = if block(&held, "companion-overlap").is_empty() { &pages[0] } else { &held };
     let must = format!("--recipe {}-overlap", tk);
     let words = words_or(
         state,
-        &pages[0],
+        source,
         "companion-overlap",
         &must,
         &format!("companion arm, {}: the toolkit carries overlap fixtures and no overlap line to run", label),
