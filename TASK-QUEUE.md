@@ -20,16 +20,6 @@
 
 ## New Features
 
-### consult-grant-spend-unmarked
-
-[spec: SPEC-grant-spend-mark.md]
-
-a consult-inbox item that stays after a dispatched consultation spends its lead-relayed grant reads as grant-unspent to the next lead. The inbox is append-only, so the bullet is unchanged; the spend survives only in the spending commit's message and the gitignored consult journal. The next lead re-dispatched the SWOT item on an inferred-unspent grant, and an expert-tier consultation re-verified the spend before declining the critique.
-
-**Deliverable:** a sanctioned spend marker a dispatched consultation appends to a staying item, or a lead-template step reading the item's history before relaying its grant's status; which is spec's, against lifecycle-kit/SPEC.md §The consult inbox and §templates/lead.md.
-
-**Cost while deferred:** each lead consult dispatch over a staying spent-grant item buys an expert-tier consultation to rediscover the spend. Surfaced 2026-10-17 by budget-feed-observation-pass' second consult dispatch on the SWOT item and promoted at the next scope's intake. Owner lookup: `spent`, `grant`, `consult inbox` in this file and the disposed-findings record — none; [tarball-attestation-observed](#tarball-attestation-observed)'s grant records, DISTINCT (release grants on an entry, not an inbox item); owner lifecycle-kit/SPEC.md §The consult inbox.
-
 ## Technical Debt
 
 ### companion-adoption-rehearsal
@@ -1063,4 +1053,5 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 - bounded-promise-phrasing
 - activated-guarantee-route
 - openspec-delta-base-agreement
+- consult-grant-spend-unmarked
 

@@ -55,7 +55,7 @@ One qualification, because `--simulate` runs every matching entry-preflight comm
 
 **Relay, never assert.** The lead manages on *optimal* rather than extensive context, so what it hands a stage session travels no stronger than the lead holds it:
 
-- **A claim carries its tier**: measured (the command, and when it ran), inferred, or expected. Inferred is only for a claim no transcript, log or artifact in reach settles (doctrine-kit/DOCTRINE.md, Probe-before-assertion). A grant also carries whether it is spent, read off its target's current state at relay time.
+- **A claim carries its tier**: measured (the command, and when it ran), inferred, or expected. Inferred is only for a claim no transcript, log or artifact in reach settles (doctrine-kit/DOCTRINE.md, Probe-before-assertion). A grant also carries whether it is spent, read off its target's current state at relay time; an inbox item's grant is spent where the item's line carries a `Grant spent` mark for it (lifecycle-kit/SPEC.md §The consult inbox).
 - **A fix travels as the constraint it must meet**, never as the mechanism. The stage session holds the oracle and finds the mechanism.
 - **A rule travels only to a role it binds.** Before relaying one, read whose role its owning surface names.
 - **Operator answers that seem to conflict go back to the operator as that question**, never reconciled by inference and relayed as their words.
