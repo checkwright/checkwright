@@ -222,14 +222,23 @@ fn probe(upstream: &str, timeout: u64) -> Option<String> {
 mod tests {
     use super::*;
 
+    const SLOW_RUNNER_BOUND: &str = "60";
+
     fn settings(word: &str, upstream: &str) -> Settings {
         Settings::resolve(|k| {
             Ok(match k {
                 "GATE_SDK_UPDATE_CHECK" => word.to_string(),
                 "GATE_SDK_UPDATE_UPSTREAM" => upstream.to_string(),
+                "GATE_SDK_UPDATE_TIMEOUT" => SLOW_RUNNER_BOUND.to_string(),
                 _ => String::new(),
             })
         })
+    }
+
+    fn timed_line(tree: &Path, s: &Settings, now: u64) -> (String, String) {
+        let started = std::time::Instant::now();
+        let printed = line(&reading(tree, s, now));
+        (printed, format!("after {:?} of a {}s bound", started.elapsed(), s.timeout))
     }
 
     fn git(dir: &Path, args: &[&str]) {
@@ -323,15 +332,15 @@ mod tests {
         assert!(proc::run(&programs::GIT, &["clone", "-q", "--bare", &up_s, &bare_s]).expect("clone").stdout().is_some());
         let tree = scratch("tree");
         installed_tree(&tree, "1.0.0");
-        let printed = line(&reading(&tree, &settings("daily", &bare_s), 1_000));
-        assert!(printed.starts_with("checkwright v9.0.0 is available; this tree has v1.0.0."), "{}", printed);
+        let (printed, took) = timed_line(&tree, &settings("daily", &bare_s), 1_000);
+        assert!(printed.starts_with("checkwright v9.0.0 is available; this tree has v1.0.0."), "{:?} {}", printed, took);
         let cache = tree.join(".git").join(CACHE_FILE);
         let cached = std::fs::read_to_string(&cache).expect("cache written");
         assert_eq!(cached, format!("1000 9.0.0 {}\n", bare_s));
 
         std::fs::write(&cache, "1000 2.0.0 another-upstream\n").expect("cache");
-        let rekeyed = line(&reading(&tree, &settings("daily", &bare_s), 1_001));
-        assert!(rekeyed.starts_with("checkwright v9.0.0 is available"), "{}", rekeyed);
+        let (rekeyed, took) = timed_line(&tree, &settings("daily", &bare_s), 1_001);
+        assert!(rekeyed.starts_with("checkwright v9.0.0 is available"), "{:?} {}", rekeyed, took);
         assert_eq!(std::fs::read_to_string(&cache).expect("cache"), format!("1001 9.0.0 {}\n", bare_s));
 
         let lonely = scratch("lonely");
@@ -343,8 +352,8 @@ mod tests {
         assert_eq!(std::fs::read_to_string(&lonely_cache).expect("attempt recorded"), format!("1000 - {}\n", gone_s));
         assert!(proc::run(&programs::GIT, &["clone", "-q", "--bare", &up_s, &gone_s]).expect("clone").stdout().is_some());
         assert_eq!(reading(&lonely, &settings("weekly", &gone_s), 2_000), Reading::Unknown);
-        let due = line(&reading(&lonely, &settings("weekly", &gone_s), 1_000 + 604_800));
-        assert!(due.starts_with("checkwright v9.0.0 is available"), "{}", due);
+        let (due, took) = timed_line(&lonely, &settings("weekly", &gone_s), 1_000 + 604_800);
+        assert!(due.starts_with("checkwright v9.0.0 is available"), "{:?} {}", due, took);
         for d in [up, bare, tree, lonely] {
             let _ = std::fs::remove_dir_all(&d);
         }
@@ -387,8 +396,8 @@ mod tests {
         let tree = scratch("unstorable");
         installed_tree(&tree, "1.0.0");
         std::fs::create_dir_all(tree.join(".git").join(CACHE_FILE).join("held")).expect("block the record");
-        let first = line(&reading(&tree, &settings("weekly", &up_s), 1_000));
-        assert!(first.starts_with("checkwright v9.0.0 is available"), "{}", first);
+        let (first, took) = timed_line(&tree, &settings("weekly", &up_s), 1_000);
+        assert!(first.starts_with("checkwright v9.0.0 is available"), "{:?} {}", first, took);
         let _ = std::fs::remove_dir_all(&up);
         assert_eq!(reading(&tree, &settings("weekly", &up_s), 1_001), Reading::Unknown, "the second read did not probe");
         let _ = std::fs::remove_dir_all(&tree);
