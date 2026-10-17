@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+prove-confinement-pass release deferred:v0.32.0 — a minor accumulated since v0.31.0, the declaration surface unchanged this iteration; no trigger fires: the elapsed limb dormant under preview, no major, no security or supply-chain fix to shipped code (the claim-confinement fixes harden prove, which v0.31.0 does not carry), no operator direction to cut and no second-vendor review granted to rest the cut bar on, the front door still withdrawing prove and the overlap operand, plugin parity green
