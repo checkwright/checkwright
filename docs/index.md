@@ -7,7 +7,7 @@ nav_order: 1
 
 <!-- product-statement:begin -->
 
-**Deterministic verification for coding-agent delivery.** Checkwright is the verification layer under agent orchestration: spec drift, skipped stages, and unsupported *done* claims become failing checks before a merge, instead of review findings after one.
+**Reproducible checks that catch unsupported claims in coding-agent delivery before merge.** Checkwright turns classes of claims an agent can make without evidence into failing checks: a task marked done with no recorded test run, a lifecycle stage skipped, a spec or task naming a file the tree does not have. The checks are deterministic and structural: they prove the evidence a claim rests on exists, not that the code is correct.
 
 <!-- product-statement:end -->
 

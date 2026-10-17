@@ -62,16 +62,6 @@ a clean-seat rehearsal of the companion toolkits' adoption (`companion/`: the Sp
 
 **Cost while deferred:** the first invited testers meet whatever a rehearsal would have caught. Filed 2026-10-17 by budget-feed-observation-pass' close from a gap bullet of that date; the operator wanted it now and it cannot enter before the next scope. Owner lookup: `rehears`, `companion`, `clean seat` in this file and the disposed-findings record — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (the catalog submission itself); [design-partner-preview](#design-partner-preview), DISTINCT (the observed tester cohort, on operator hours); `front-door-container-rehearsal`, done, DISTINCT (the front door's first run, not the companions').
 
-### bounded-promise-phrasing
-
-the front door's headline, "Deterministic verification for coding-agent delivery" (README.md, docs/index.md), and the Release-note opener RELEASING.md reserves, promise verification broadly, while docs/spec-toolkits.md §What the gates check against your code bounds them to path and story existence, so a buyer can read structural evidence checks as semantic verification.
-
-**Deliverable:** the headline, the opener and the phrasing rule docs/positioning.md carries led by the bounded promise: reproducible classes of unsupported claims caught before merge. The wording is drafted in build and approved by the operator before it lands (operator direction 2026-10-17, lead-relayed, not a ruling). It is drafted to survive quotation by a coding agent that evaluates the tool and summarises it for a person (operator direction 2026-10-17, lead-relayed mid-spec, not a ruling).
-
-**Approved (operator direction 2026-10-17, lead-relayed, not a ruling):** build's Option A verbatim, the headline, summary, opener and the positioning page's bounded-promise section; the reach is the first screen alone (headline, opener, meta descriptions), the orchestration page's verification-layer framing filed as a gap for the next scope.
-
-**Cost while deferred:** the first-screen claim overreaches what an evaluator's first run demonstrates. Filed 2026-10-17 by this iteration's scope from the competitive analysis' ranked actions. Owner lookup: `headline`, `phrasing`, `positioning` in this file and the disposed-findings record — none; [verify-workflow-decoupling](#verify-workflow-decoupling), DISTINCT (a decoupling statement on the same front door, after this); owner docs/positioning.md, with RELEASING.md.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -1089,4 +1079,6 @@ a citation naming a numbered step by its bold title, in RELEASING.md's procedure
 A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, since check-front-door-verbs reads the front-door pages alone; widening its arm resolution to the kit SPECs, with the history valves, would catch it.
 
 ## Done
+
+- bounded-promise-phrasing
 

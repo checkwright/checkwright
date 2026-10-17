@@ -12,7 +12,7 @@ Every iteration close dispositions the release boundary and records the outcome 
 
    **Author the note's fixed chrome from this skeleton, never by copying a prior post** — this runbook is the chrome's single source (the verbatim text below was lifted once from the current posts to seed it, not copied per release):
 
-   - **Opener (fixed, verbatim)** — the reserved framing, then a per-release summary slot: *"Checkwright is the verification layer under agent orchestration, and this release {one- or two-sentence summary}."*
+   - **Opener (fixed, verbatim)** — the reserved framing, then a per-release summary slot: *"Checkwright catches reproducible classes of unsupported claims in coding-agent delivery before merge, and this release {one- or two-sentence summary}."*
    - **In brief (fixed, no `None` form)** — placed immediately after the Opener, ahead of the declaration-bearing sections below. It opens with the summary table, one row per declaration-bearing section in roster order, each Who acts cell taking its role's fixed phrase:
      - New and tightened gates: *everyone: these may red on upgrade*;
      - Knob changes: *if you set knobs*;

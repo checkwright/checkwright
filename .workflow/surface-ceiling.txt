@@ -35,7 +35,7 @@
 1463cp docs/gate-sdk/index.md
 9561cp docs/generated-projections.md
 1259cp docs/guard-kit/index.md
-5205cp docs/index.md
+5383cp docs/index.md
 8768cp docs/install-block-contracts.md
 8675cp docs/install-parity-contracts.md
 9364cp docs/install.md
@@ -47,7 +47,7 @@
 2495cp docs/openspec.md
 9927cp docs/orchestration.md
 8258cp docs/page-authoring.md
-9786cp docs/positioning.md
+10041cp docs/positioning.md
 1869cp docs/posts/2026-07-09-announcing-checkwright.md
 1034cp docs/posts/2026-07-14-checkwright-v0-1-0.md
 6422cp docs/posts/2026-07-17-checkwright-v0-2-0.md
