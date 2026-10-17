@@ -20,16 +20,6 @@
 
 ## New Features
 
-### activated-guarantee-route
-
-[spec: SPEC-activated-guarantee.md]
-
-an adopter meets the guarantee the front door promises only through `demo`, which installs `full` in a scratch repository (installer/SPEC.md §demo), while a first install with no `--profile` takes `starter`, gate-sdk alone (docs/install.md). What the adopter's own tree then enforces, holds configured but inactive, or lacks is left to the adopt walk's decisions, and no verb reports it: `doctor` answers whether the machine runs the battery and what is installed (installer/SPEC.md §doctor).
-
-**Deliverable:** one recommended adoption path showing, on the adopter's own tree, what is configured, enforced and inactive, with time to that proof as its metric; whether it widens `doctor` or is a verb of its own is spec's.
-
-**Cost while deferred:** effort precedes the payoff: an evaluator installs, then works out alone what guards the tree, which is where an install-then-bounce goes unseen. Filed 2026-10-17 by this iteration's scope from the competitive analysis' ranked actions, operator direction lead-relayed (not a ruling). Owner lookup: `doctor`, `activat`, `time-to`, `inactive` in this file and the disposed-findings record — none; owner installer/SPEC.md.
-
 ### openspec-delta-base-agreement
 
 [spec: SPEC-delta-agreement.md] [not-icebox-eligible: 2026-10-07 filed on the operator direction of 2026-09-29 and carries the measurement its gate would rest on; evicting it would compress both away]
@@ -1081,4 +1071,5 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 ## Done
 
 - bounded-promise-phrasing
+- activated-guarantee-route
 

@@ -38,10 +38,10 @@
 5383cp docs/index.md
 8768cp docs/install-block-contracts.md
 8675cp docs/install-parity-contracts.md
-9364cp docs/install.md
+10554cp docs/install.md
 1344cp docs/kits.md
 1458cp docs/lifecycle-kit/index.md
-3156cp docs/maintenance.md
+3381cp docs/maintenance.md
 3561cp docs/manual-install.md
 3007cp docs/methodology.md
 2495cp docs/openspec.md
