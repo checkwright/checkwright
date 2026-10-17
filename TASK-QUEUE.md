@@ -18,6 +18,36 @@
 
 ## New Features
 
+### activated-guarantee-route
+
+[spec: SPEC-activated-guarantee.md]
+
+an adopter meets the guarantee the front door promises only through `demo`, which installs `full` in a scratch repository (installer/SPEC.md §demo), while a first install with no `--profile` takes `starter`, gate-sdk alone (docs/install.md). What the adopter's own tree then enforces, holds configured but inactive, or lacks is left to the adopt walk's decisions, and no verb reports it: `doctor` answers whether the machine runs the battery and what is installed (installer/SPEC.md §doctor).
+
+**Deliverable:** one recommended adoption path showing, on the adopter's own tree, what is configured, enforced and inactive, with time to that proof as its metric; whether it widens `doctor` or is a verb of its own is spec's.
+
+**Cost while deferred:** effort precedes the payoff: an evaluator installs, then works out alone what guards the tree, which is where an install-then-bounce goes unseen. Filed 2026-10-17 by this iteration's scope from the competitive analysis' ranked actions, operator direction lead-relayed (not a ruling). Owner lookup: `doctor`, `activat`, `time-to`, `inactive` in this file and the disposed-findings record — none; owner installer/SPEC.md.
+
+### openspec-delta-base-agreement
+
+[spec: SPEC-delta-agreement.md] [not-icebox-eligible: 2026-10-07 filed on the operator direction of 2026-09-29 and carries the measurement its gate would rest on; evicting it would compress both away]
+
+an OpenSpec change delta that disagrees with its base spec passes the battery and OpenSpec's own validator, and is caught, if at all, only at archive. Measured on openspec 1.13.2 at companion-technical-gates' spec: `validate --strict` exits 0 on a MODIFIED or RENAMED delta naming an absent requirement and on an ADDED one naming an existing requirement, printing only an INFO line; `archive -y` refuses those three, but `--skip-specs` bypasses the refusal; a REMOVED delta naming an absent requirement passes validate silently and archive takes it as already removed.
+
+**Deliverable:** a generic commit-time gate for heading-set delta agreement, its OpenSpec binding in the recipe, if it clears the value bar `toolkit-overlap-value-bar` landed (companion/SPEC.md §The tiers); it is that bar's first candidate, since OpenSpec owns the check at archive and this gate would re-check it earlier.
+
+**Cost while deferred:** an OpenSpec adopter's technical gates read nothing on a conventional task list, which names no paths, so the companion's code-facing reach there is `check-task-path-claim` alone. Filed 2026-09-29 at companion-technical-gates' spec on an operator direction lead-relayed (not a ruling). Owner lookup: `delta`, `archive`, `openspec` in this file — `companion-spec-to-code-gates`, DISTINCT (it ships the task gates and defers this one), and `toolkit-nav-hierarchy`, DISTINCT (nav labels); owner companion/SPEC.md.
+
+### consult-grant-spend-unmarked
+
+[spec: SPEC-grant-spend-mark.md]
+
+a consult-inbox item that stays after a dispatched consultation spends its lead-relayed grant reads as grant-unspent to the next lead. The inbox is append-only, so the bullet is unchanged; the spend survives only in the spending commit's message and the gitignored consult journal. The next lead re-dispatched the SWOT item on an inferred-unspent grant, and an expert-tier consultation re-verified the spend before declining the critique.
+
+**Deliverable:** a sanctioned spend marker a dispatched consultation appends to a staying item, or a lead-template step reading the item's history before relaying its grant's status; which is spec's, against lifecycle-kit/SPEC.md §The consult inbox and §templates/lead.md.
+
+**Cost while deferred:** each lead consult dispatch over a staying spent-grant item buys an expert-tier consultation to rediscover the spend. Surfaced 2026-10-17 by budget-feed-observation-pass' second consult dispatch on the SWOT item and promoted at the next scope's intake. Owner lookup: `spent`, `grant`, `consult inbox` in this file and the disposed-findings record — none; [tarball-attestation-observed](#tarball-attestation-observed)'s grant records, DISTINCT (release grants on an entry, not an inbox item); owner lifecycle-kit/SPEC.md §The consult inbox.
+
 ## Technical Debt
 
 ### companion-adoption-rehearsal
@@ -34,7 +64,7 @@ a clean-seat rehearsal of the companion toolkits' adoption (`companion/`: the Sp
 
 the front door's headline, "Deterministic verification for coding-agent delivery" (README.md, docs/index.md), and the Release-note opener RELEASING.md reserves, promise verification broadly, while docs/spec-toolkits.md §What the gates check against your code bounds them to path and story existence, so a buyer can read structural evidence checks as semantic verification.
 
-**Deliverable:** the headline, the opener and the phrasing rule docs/positioning.md carries led by the bounded promise: reproducible classes of unsupported claims caught before merge. The wording is drafted in build and approved by the operator before it lands (operator direction 2026-10-17, lead-relayed, not a ruling).
+**Deliverable:** the headline, the opener and the phrasing rule docs/positioning.md carries led by the bounded promise: reproducible classes of unsupported claims caught before merge. The wording is drafted in build and approved by the operator before it lands (operator direction 2026-10-17, lead-relayed, not a ruling). It is drafted to survive quotation by a coding agent that evaluates the tool and summarises it for a person (operator direction 2026-10-17, lead-relayed mid-spec, not a ruling).
 
 **Cost while deferred:** the first-screen claim overreaches what an evaluator's first run demonstrates. Filed 2026-10-17 by this iteration's scope from the competitive analysis' ranked actions. Owner lookup: `headline`, `phrasing`, `positioning` in this file and the disposed-findings record — none; [verify-workflow-decoupling](#verify-workflow-decoupling), DISTINCT (a decoupling statement on the same front door, after this); owner docs/positioning.md, with RELEASING.md.
 
@@ -187,16 +217,6 @@ the operator states that verification and workflow are fully decoupled, each shi
 **Deliverable:** a ruling on whether the gate binary is verification or substrate both halves share; if the decoupling then holds, the front door and docs/kits.md state it, and a workflow-only profile is weighed.
 
 **Cost while deferred:** the front door neither claims nor refutes a decoupling the operator believes in, and docs/kits.md reads as a dependency chain. Filed 2026-09-28 by plugin-marketplace-queue-verbs' lead. Re-verified: the three profiles' rows and comments in `installer/profiles.list`, and docs/kits.md line 13. Owner lookup: `decoupl`, `profiles.list`, `workflow-only` in this file — none; owner installer/SPEC.md §Profiles, with docs/kits.md.
-
-### openspec-delta-base-agreement
-
-[cost: event/low] [surface: companion] [not-icebox-eligible: 2026-10-07 filed on the operator direction of 2026-09-29 and carries the measurement its gate would rest on; evicting it would compress both away]
-
-an OpenSpec change delta that disagrees with its base spec passes the battery and OpenSpec's own validator, and is caught, if at all, only at archive. Measured on openspec 1.13.2 at companion-technical-gates' spec: `validate --strict` exits 0 on a MODIFIED or RENAMED delta naming an absent requirement and on an ADDED one naming an existing requirement, printing only an INFO line; `archive -y` refuses those three, but `--skip-specs` bypasses the refusal; a REMOVED delta naming an absent requirement passes validate silently and archive takes it as already removed.
-
-**Deliverable:** a generic commit-time gate for heading-set delta agreement, its OpenSpec binding in the recipe, if it clears the value bar `toolkit-overlap-value-bar` landed (companion/SPEC.md §The tiers); it is that bar's first candidate, since OpenSpec owns the check at archive and this gate would re-check it earlier.
-
-**Cost while deferred:** an OpenSpec adopter's technical gates read nothing on a conventional task list, which names no paths, so the companion's code-facing reach there is `check-task-path-claim` alone. Filed 2026-09-29 at companion-technical-gates' spec on an operator direction lead-relayed (not a ruling). Owner lookup: `delta`, `archive`, `openspec` in this file — `companion-spec-to-code-gates`, DISTINCT (it ships the task gates and defers this one), and `toolkit-nav-hierarchy`, DISTINCT (nav labels); owner companion/SPEC.md.
 
 ### releases-page-table
 
@@ -363,26 +383,6 @@ the crate manifest `native/Cargo.toml` declares `license = "MIT"` while `LICENSE
 **Deliverable:** the field set to the source's license, and `check-license-line` or a sibling holding every tracked package manifest's license field to `license-line.conf`'s value, in one unit by Enforcement-first; a feature, since the gate gains a read contract.
 
 **Cost while deferred:** a reader of the public crate manifest is told the wrong license. Filed 2026-10-17 by budget-feed-observation-pass' close from a gap bullet of that date, surfaced probing a consult item. Re-verified there: the crate field reads MIT, and `reserve/crates/Cargo.toml`, `installer/package.json` and both plugin manifests read Apache-2.0. Owner lookup: `license`, `Cargo.toml`, `license-line` in this file and the disposed-findings record — none; `homepage-license-duplicate`, done, DISTINCT (the footer instance); owner docs/site-architecture.md §The license line.
-
-### consult-grant-spend-unmarked
-
-[cost: event/high] [surface: lifecycle-kit]
-
-a consult-inbox item that stays after a dispatched consultation spends its lead-relayed grant reads as grant-unspent to the next lead. The inbox is append-only, so the bullet is unchanged; the spend survives only in the spending commit's message and the gitignored consult journal. The next lead re-dispatched the SWOT item on an inferred-unspent grant, and an expert-tier consultation re-verified the spend before declining the critique.
-
-**Deliverable:** a sanctioned spend marker a dispatched consultation appends to a staying item, or a lead-template step reading the item's history before relaying its grant's status; which is spec's, against lifecycle-kit/SPEC.md §The consult inbox and §templates/lead.md.
-
-**Cost while deferred:** each lead consult dispatch over a staying spent-grant item buys an expert-tier consultation to rediscover the spend. Surfaced 2026-10-17 by budget-feed-observation-pass' second consult dispatch on the SWOT item and promoted at the next scope's intake. Owner lookup: `spent`, `grant`, `consult inbox` in this file and the disposed-findings record — none; [tarball-attestation-observed](#tarball-attestation-observed)'s grant records, DISTINCT (release grants on an entry, not an inbox item); owner lifecycle-kit/SPEC.md §The consult inbox.
-
-### activated-guarantee-route
-
-[cost: event/high] [surface: installer]
-
-an adopter meets the guarantee the front door promises only through `demo`, which installs `full` in a scratch repository (installer/SPEC.md §demo), while a first install with no `--profile` takes `starter`, gate-sdk alone (docs/install.md). What the adopter's own tree then enforces, holds configured but inactive, or lacks is left to the adopt walk's decisions, and no verb reports it: `doctor` answers whether the machine runs the battery and what is installed (installer/SPEC.md §doctor).
-
-**Deliverable:** one recommended adoption path showing, on the adopter's own tree, what is configured, enforced and inactive, with time to that proof as its metric; whether it widens `doctor` or is a verb of its own is spec's.
-
-**Cost while deferred:** effort precedes the payoff: an evaluator installs, then works out alone what guards the tree, which is where an install-then-bounce goes unseen. Filed 2026-10-17 by this iteration's scope from the competitive analysis' ranked actions, operator direction lead-relayed (not a ruling). Owner lookup: `doctor`, `activat`, `time-to`, `inactive` in this file and the disposed-findings record — none; owner installer/SPEC.md.
 
 ## Icebox
 
