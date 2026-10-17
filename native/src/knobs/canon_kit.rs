@@ -68,6 +68,13 @@ pub const KIT: Kit = Kit {
         Row::indexed("CANON_KIT_TASK_LIST_GLOBS", &[]),
         Row::keyed("CANON_KIT_TASK_LABEL_CITES", &[]),
         Row::keyed("CANON_KIT_TASK_LABEL_DEFINES", &[]),
+        Row::scalar("CANON_KIT_DELTA_PATH", ""),
+        Row::scalar("CANON_KIT_DELTA_BASE_DIR", ""),
+        Row::scalar("CANON_KIT_DELTA_BASE_ITEM", ""),
+        Row::keyed("CANON_KIT_DELTA_PRESENT", &[]),
+        Row::keyed("CANON_KIT_DELTA_ABSENT", &[]),
+        Row::keyed("CANON_KIT_DELTA_ITEM", &[]),
+        Row::indexed("CANON_KIT_DELTA_BASE_REQUIRED", &[]),
         Row::indexed(
             "CANON_KIT_FENCE_PROGRAMS",
             &[
@@ -418,6 +425,76 @@ fn validate(v: &Values) -> Vec<String> {
         keyed(v, "CANON_KIT_TASK_LABEL_CITES").unwrap_or(&[]),
         keyed(v, "CANON_KIT_TASK_LABEL_DEFINES").unwrap_or(&[]),
     ));
+    errs.extend(delta_refusals(
+        scalar(v, "CANON_KIT_DELTA_PATH").unwrap_or(""),
+        scalar(v, "CANON_KIT_DELTA_BASE_ITEM").unwrap_or(""),
+        keyed(v, "CANON_KIT_DELTA_PRESENT").unwrap_or(&[]),
+        keyed(v, "CANON_KIT_DELTA_ABSENT").unwrap_or(&[]),
+        keyed(v, "CANON_KIT_DELTA_ITEM").unwrap_or(&[]),
+        indexed(v, "CANON_KIT_DELTA_BASE_REQUIRED").unwrap_or(&[]),
+    ));
+    errs
+}
+
+// spec: canon-kit/SPEC.md §check-delta-agreement — read only while a delta is configured: the item
+// knob's key set is the union of the present and absent ones, no key in both, every one-group knob
+// in shape, and every base-required member a family
+pub(crate) fn delta_refusals(
+    path: &str,
+    base_item: &str,
+    present: &[(String, String)],
+    absent: &[(String, String)],
+    item: &[(String, String)],
+    required: &[String],
+) -> Vec<String> {
+    let mut errs: Vec<String> = Vec::new();
+    if path.is_empty() {
+        return errs;
+    }
+    let has = |pairs: &[(String, String)], k: &str| pairs.iter().any(|(pk, _)| pk == k);
+    for (k, _) in present.iter().filter(|(k, _)| has(absent, k)) {
+        errs.push(format!(
+            "the delta family '{}' is a key of both CANON_KIT_DELTA_PRESENT and CANON_KIT_DELTA_ABSENT: a family asserts one",
+            k
+        ));
+    }
+    for (knob, pairs) in [("CANON_KIT_DELTA_PRESENT", present), ("CANON_KIT_DELTA_ABSENT", absent)] {
+        for (k, _) in pairs.iter().filter(|(k, _)| !has(item, k)) {
+            errs.push(format!(
+                "the delta family '{}' is a key of {} and not of CANON_KIT_DELTA_ITEM: each family names its items",
+                k, knob
+            ));
+        }
+    }
+    for (k, _) in item.iter().filter(|(k, _)| !has(present, k) && !has(absent, k)) {
+        errs.push(format!(
+            "the delta family '{}' is a key of CANON_KIT_DELTA_ITEM and of neither CANON_KIT_DELTA_PRESENT nor CANON_KIT_DELTA_ABSENT",
+            k
+        ));
+    }
+    for (knob, p) in [("CANON_KIT_DELTA_PATH", path), ("CANON_KIT_DELTA_BASE_ITEM", base_item)] {
+        if let Err(e) = crate::ere::EreCapture::compile(p) {
+            errs.push(format!("{} = '{}' is not a one-group ERE: {}", knob, p, e));
+        }
+    }
+    for (k, p) in item {
+        if let Err(e) = crate::ere::EreCapture::compile(p) {
+            errs.push(format!("CANON_KIT_DELTA_ITEM[{}] = '{}' is not a one-group ERE: {}", k, p, e));
+        }
+    }
+    for (knob, pairs) in [("CANON_KIT_DELTA_PRESENT", present), ("CANON_KIT_DELTA_ABSENT", absent)] {
+        for (k, p) in pairs {
+            if let Err(e) = crate::ere::Ere::compile(p) {
+                errs.push(format!("{}[{}] = '{}' is not an ERE: {}", knob, k, p, e));
+            }
+        }
+    }
+    for r in required.iter().filter(|r| !has(item, r)) {
+        errs.push(format!(
+            "CANON_KIT_DELTA_BASE_REQUIRED names '{}', which is no delta family",
+            r
+        ));
+    }
     errs
 }
 
@@ -535,6 +612,25 @@ mod tests {
         let e = task_label_refusals(&pair("story", "a"), &pair("story", "(b)(c)"));
         assert!(e[0].contains("CANON_KIT_TASK_LABEL_CITES[story]") && e[0].contains("no capture group"), "{:?}", e);
         assert!(e[1].contains("second capture group"), "{:?}", e);
+    }
+
+    // spec: canon-kit/SPEC.md §check-delta-agreement — the exit-2 config: an empty path reads no
+    // table, a family in both or neither assertion knob, a pattern outside the shape, and a
+    // base-required member naming no family
+    #[test]
+    fn the_delta_knobs_pair_by_family_while_a_delta_is_configured() {
+        let pair = |a: &str, b: &str| vec![(a.to_string(), b.to_string())];
+        let req = "^### R: (.+)$";
+        assert!(delta_refusals("", "", &pair("x", "("), &[], &[], &["y".to_string()]).is_empty());
+        let ok = delta_refusals("^(.+)$", req, &pair("m", "^## M"), &pair("a", "^## A"), &[pair("m", req), pair("a", req)].concat(), &["m".to_string()]);
+        assert!(ok.is_empty(), "{:?}", ok);
+        let e = delta_refusals("^(.+)$", req, &pair("m", "^## M"), &pair("m", "^## A"), &pair("m", req), &[]);
+        assert!(e.iter().any(|x| x.contains("both")), "{:?}", e);
+        let e = delta_refusals("^.+$", "", &pair("m", "^## M"), &[], &pair("m", "(a)(b)"), &["z".to_string()]);
+        assert_eq!(e.len(), 4, "{:?}", e);
+        assert!(e.iter().any(|x| x.contains("CANON_KIT_DELTA_PATH") && x.contains("no capture group")), "{:?}", e);
+        assert!(e.iter().any(|x| x.contains("CANON_KIT_DELTA_ITEM[m]")), "{:?}", e);
+        assert!(e.iter().any(|x| x.contains("'z'")), "{:?}", e);
     }
 
     // spec: canon-kit/SPEC.md §check-prose-tells — the abbreviation floor is two or more, or off

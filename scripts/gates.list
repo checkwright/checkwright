@@ -133,6 +133,7 @@ check-unmarked-claim
 check-tracking-claim
 check-task-path-claim
 check-task-label-resolution
+check-delta-agreement
 check-prose-enum
 check-prose-tells
 check-prose-bounds

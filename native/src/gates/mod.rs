@@ -24,6 +24,7 @@ pub mod disposed_findings;
 pub mod doctrine_registration;
 pub mod door_binding;
 pub mod deferred_board_tags;
+pub mod delta_agreement;
 pub mod deprecation_task;
 pub mod docs_cmd;
 pub mod docs_highlight_coverage;
@@ -739,6 +740,26 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_TASK_LIST_GLOBS",
             "CANON_KIT_TASK_LABEL_CITES",
             "CANON_KIT_TASK_LABEL_DEFINES",
+        ],
+        "canon-kit",
+        &[],
+    ),
+    // spec: canon-kit/SPEC.md §check-delta-agreement — the deltas are the pruning walk's markdown
+    // files; a base is a stat and a read at the path the delta names, not a walk
+    (
+        "check-delta-agreement",
+        delta_agreement::run,
+        &[(".", "ext:lit:md", "", "")],
+        &[
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+            "CANON_KIT_DELTA_PATH",
+            "CANON_KIT_DELTA_BASE_DIR",
+            "CANON_KIT_DELTA_BASE_ITEM",
+            "CANON_KIT_DELTA_PRESENT",
+            "CANON_KIT_DELTA_ABSENT",
+            "CANON_KIT_DELTA_ITEM",
+            "CANON_KIT_DELTA_BASE_REQUIRED",
         ],
         "canon-kit",
         &[],

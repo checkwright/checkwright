@@ -50,6 +50,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    check-tracking-claim         # a path's tracking status in prose agrees with git
    check-task-path-claim        # needs task lists (a ticked task names only paths that exist)
    check-task-label-resolution  # needs task lists and label families (a cited label resolves beside it)
+   check-delta-agreement        # needs deltas and their families (a delta agrees with its base on which items exist)
    check-prose-enum             # partial enumeration of a governed set
    check-md-refs                # internal markdown links resolve
    check-md-unwrapped           # needs an unwrapped markdown set (no paragraph broken across lines)

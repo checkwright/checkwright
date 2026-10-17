@@ -1,0 +1,3 @@
+work/changes/one/deltas/notes/spec.md:3: family `new` names `Entry length`, which work/base/notes/spec.md already carries
+work/changes/one/deltas/notes/spec.md:7: family `changed` names `Entry limit`, which work/base/notes/spec.md lacks
+work/changes/two/deltas/cli/spec.md:3: family `changed` names `Export command`, and its base work/base/cli/spec.md does not exist

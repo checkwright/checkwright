@@ -16,6 +16,7 @@ check-spec-derivable-section
 check-spec-embedded-source
 check-citation-link
 check-comment-tier
+check-delta-agreement
 check-deprecation-task
 check-docs-cmd
 check-docs-link-convention

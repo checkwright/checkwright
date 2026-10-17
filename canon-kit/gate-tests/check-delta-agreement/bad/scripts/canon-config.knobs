@@ -1,0 +1,14 @@
+# spec: canon-kit/SPEC.md §check-delta-agreement — fixture consumer config: each change's deltas under work/changes/ against the base specs under work/base/
+CANON_KIT_DELTA_PATH = ^work/changes/[^/]+/deltas/(.+\.md)$
+CANON_KIT_DELTA_BASE_DIR = work/base
+CANON_KIT_DELTA_BASE_ITEM = ^### Item:[[:space:]]*(.+)$
+CANON_KIT_DELTA_PRESENT[changed] = ^## Changed
+CANON_KIT_DELTA_PRESENT[moved] = ^## Moved
+CANON_KIT_DELTA_ABSENT[moved-to] = ^## Moved
+CANON_KIT_DELTA_ABSENT[new] = ^## New
+CANON_KIT_DELTA_ITEM[changed] = ^### Item:[[:space:]]*(.+)$
+CANON_KIT_DELTA_ITEM[moved] = ^- From: (.+)$
+CANON_KIT_DELTA_ITEM[moved-to] = ^- To: (.+)$
+CANON_KIT_DELTA_ITEM[new] = ^### Item:[[:space:]]*(.+)$
+CANON_KIT_DELTA_BASE_REQUIRED[] = changed
+CANON_KIT_DELTA_BASE_REQUIRED[] = moved
