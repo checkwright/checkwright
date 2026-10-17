@@ -1054,5 +1054,3 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 
 ## Done
 
-- heterogeneous-agent-delegation
-
