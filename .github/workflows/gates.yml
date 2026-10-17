@@ -2090,14 +2090,18 @@ jobs:
           done
 
           echo "== reading 2, every process stopped =="
-          # spec: evidence-kit/SPEC.md §The producer-liveness lock — the accepted PID-reuse case: whatever holds the record's pid around the gate's read owes held
+          # spec: evidence-kit/SPEC.md §The producer-liveness lock — the accepted PID-reuse case: a read counts once its bracket and the gate agree, since a holder alive for one side's spawns alone is seen by that side only
           declare -A rpid=([a]="$apid" [b]="${tpid[b]}" [bp]="${tpid[bp]}" [c]="${tpid[c]}")
           for r in a b bp c; do
             t2[$r]="$(ours "${tpid[$r]}" "${born[$r]}")"
             held2[$r]=unstable
             for _ in 1 2 3 4 5; do
               h1="$(truth "${rpid[$r]}")"; g2[$r]="$(gate "$rec/$r.run")"; h2="$(truth "${rpid[$r]}")"
-              [[ "$h1" == "$h2" ]] && { held2[$r]="$h1"; break; }
+              [[ "$h1" == "$h2" ]] || continue
+              held2[$r]="$h1"
+              owed=0; [[ "$h1" == alive ]] && owed=1
+              [[ "${g2[$r]}" == "$owed" ]] && break
+              echo "($r) gate=${g2[$r]} over a bracket reading $h1 both sides: a transient holder of pid ${rpid[$r]}, read again"
             done
             echo "($r) truth=${t2[$r]}; record pid ${rpid[$r]:-<none>} read ${held2[$r]} around the gate; gate=${g2[$r]}"
           done
@@ -2151,7 +2155,7 @@ jobs:
               echo "::error::row ($r) measured nothing: pid ${rpid[$r]} changed holder around each of 5 gate reads"
               misread=1
             elif [[ "${g1[$r]}" != 1 || "${g2[$r]}" != "$want2" ]]; then
-              echo "::error::row ($r) misread: gate ${g1[$r]} alive, ${g2[$r]} gone, where 1 then $want2 is owed"
+              echo "::error::row ($r) misread: gate ${g1[$r]} alive, ${g2[$r]} gone, where 1 then $want2 is owed, no stopped read agreeing with its bracket in 5"
               misread=1
             else
               echo "row ($r): held then free, as owed"
