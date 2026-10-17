@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: competitive-followup-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
@@ -8,11 +8,35 @@
 
   **Directive (operator direction 2026-10-17, lead-relayed, not a ruling; it supersedes the dispatch's undirected line):** the theme is the follow-up actions to the recent competitive analysis that make Checkwright a more competitive offering, and the delayed actions doing so, if any. The analysis is the refreshed SWOT the operator directed to land in the private brief as drafted.
 
+  **The set (operator direction 2026-10-17, lead-relayed, not a ruling):** `companion-adoption-rehearsal`, `bounded-promise-phrasing` and the features `activated-guarantee-route`, `openspec-delta-base-agreement` and `consult-grant-spend-unmarked`, the three features spec's to author and promote. The analysis' comparison arm rides [design-partner-preview](#design-partner-preview) as an annotation.
+
+  **Grant (operator grant 2026-10-17, lead-relayed; unspent):** one second-vendor review at validate; v0.32.0 is cut on a clean return under the bar [tarball-attestation-observed](#tarball-attestation-observed) records.
+
+  **Push need (2026-10-17, inside the budget):** the closing push, plus the tag push on a clean return; no unit reads a remote run.
+
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### companion-adoption-rehearsal
+
+a clean-seat rehearsal of the companion toolkits' adoption (`companion/`: the Spec Kit extension and both recipes), installing as an adopter would, before testers are invited to give feedback (operator wish 2026-10-17, lead-relayed, a direction for the next scope). The toolkits are neither in the catalog nor promoted.
+
+**Deliverable:** each companion's adoption run from a clean seat, its findings filed. **Source (operator direction 2026-10-17, lead-relayed, not a ruling, following the v0.32.0 cut grant):** the tree's payload, packed and served as a local Release, installed by the documented adopter commands onto a fresh project in a clean docker seat. It runs last in build, so it rehearses the iteration's other units.
+
+**Re-verified 2026-10-17 at scope:** no clean-seat adopter run exists. The `companion-toolkits` leg and the consumer smoke's companion arm install the tree's own archive onto planted-defect fixtures, and docs/install-evidence.md records no companion run.
+
+**Cost while deferred:** the first invited testers meet whatever a rehearsal would have caught. Filed 2026-10-17 by budget-feed-observation-pass' close from a gap bullet of that date; the operator wanted it now and it cannot enter before the next scope. Owner lookup: `rehears`, `companion`, `clean seat` in this file and the disposed-findings record — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (the catalog submission itself); [design-partner-preview](#design-partner-preview), DISTINCT (the observed tester cohort, on operator hours); `front-door-container-rehearsal`, done, DISTINCT (the front door's first run, not the companions').
+
+### bounded-promise-phrasing
+
+the front door's headline, "Deterministic verification for coding-agent delivery" (README.md, docs/index.md), and the Release-note opener RELEASING.md reserves, promise verification broadly, while docs/spec-toolkits.md §What the gates check against your code bounds them to path and story existence, so a buyer can read structural evidence checks as semantic verification.
+
+**Deliverable:** the headline, the opener and the phrasing rule docs/positioning.md carries led by the bounded promise: reproducible classes of unsupported claims caught before merge. The wording is drafted in build and approved by the operator before it lands (operator direction 2026-10-17, lead-relayed, not a ruling).
+
+**Cost while deferred:** the first-screen claim overreaches what an evaluator's first run demonstrates. Filed 2026-10-17 by this iteration's scope from the competitive analysis' ranked actions. Owner lookup: `headline`, `phrasing`, `positioning` in this file and the disposed-findings record — none; [verify-workflow-decoupling](#verify-workflow-decoupling), DISTINCT (a decoupling statement on the same front door, after this); owner docs/positioning.md, with RELEASING.md.
 
 ## Deferred
 
@@ -56,19 +80,21 @@ a narrow external preview before any broad announcement: a preview cohort whose 
 
 **The TREE HALF landed in `external-install-evidence`** — drift-kit/SPEC.md §The install-observation record and §The install-evidence projection, the `--emit file-install` capture arm, and `docs/install-evidence.md` behind `check-install-evidence-fresh`. What is kept here is the expensive half: operator hours and a calendar window of thirty days or more, running beside later iterations and never inside a stage session. What re-promotes this entry is an observed install, not another tree change.
 
-**Sequencing is the load-bearing part.** The preview runs *before* [benchmark-ab-experiment](#benchmark-ab-experiment), so pilot findings shape that experiment's task classes and metrics rather than being retrofitted to them; per-gate true/false-positive history and profile retention are preview deliverables, not pre-launch builds. The full launch ruling behind this sequencing is operator material and stays in the local-only private brief; this entry carries only the queue-visible rung.
+**Sequencing is the load-bearing part.** The preview runs *before* [benchmark-ab-experiment](#benchmark-ab-experiment), so pilot findings shape that experiment's task classes and metrics rather than being retrofitted to them; per-gate true/false-positive history and profile retention are preview deliverables, not pre-launch builds. The launch ruling behind it stays in the private brief; this entry is the queue-visible rung.
 
 **Expected FIRST FINDING, not a precondition** (facts restated 2026-10-11 to the current floor, operator direction, lead-relayed, not a ruling): today's quick start is a one-line install under POSIX sh or PowerShell; bash is owed only by a runnable fence or a registered shell gate; native Windows needs Git for Windows for `git` (docs/requirements.md). That is why the merged channel gives the installer no delta — those host-floor facts are an output of the observation, not an input.
 
 **Refused, grounds carried forward:** parking behind `native-windows-bash-floor` (landed 2026-09-18) or the git-only-floor discharge (the trigger is what the preview measures); the icebox (the highest cost-while-deferred in the intake).
 
-**Held deferred twice on 2026-09-26, operator direction lead-relayed (not a ruling),** until the repaired front door (`front-door-demo-unreachable`, `demo-catches-a-done-claim`) was published, which v0.26.0 did.
+**Held deferred twice on 2026-09-26, operator direction lead-relayed (not a ruling),** until v0.26.0 published the repaired front door (`front-door-demo-unreachable`, `demo-catches-a-done-claim`).
 
 **Consult ruling, 2026-09-27, superseding the 2026-09-25 recommendation to promote next:** the cohort was re-ruled in the brief — one observed pre-submission install, then the installers the catalogs and the plugin marketplace send — so this entry runs *through* the two ecosystem units the ledger's `catalog-then-plugin` ruling sequenced first, not ahead of them; that ruling discharged 2026-09-29, the extension and the plugin package both published. The observed install is owed before the catalog submission; the rest re-promotes on the first observed install, as stated above.
 
-**Readiness ahead of the observed install, operator direction 2026-09-29, lead-relayed (not a ruling):** a clean-container first-run rehearsal ran first, as `front-door-container-rehearsal` at preview-readiness, its runs filed to the author seat's record (drift-kit/SPEC.md §The install-observation record), never the published one. Operator-seat adoption on the operator's own projects is independent evidence and gates nothing; counting it toward the observed install was declined.
+**Readiness ahead of the observed install, operator direction 2026-09-29, lead-relayed (not a ruling):** a clean-container first-run rehearsal ran first, as `front-door-container-rehearsal` at preview-readiness, its runs filed to the author seat's record, never the published one. Operator-seat adoption is independent evidence and gates nothing; counting it toward the observed install was declined.
 
-**Cost while deferred — still the highest of its intake, and now the more exposed half.** Every claim that would be strongest with external evidence still rests on internal dogfooding, and the channel that would carry it is built and reading zero: the published page states an honest `0` on every pass while the volume of unattested governed surface keeps growing. Deferring also silently defers [benchmark-ab-experiment](#benchmark-ab-experiment), since running that first would fix the wrong metrics. Surfaced 2026-08-02 at close, in the same intake pass, as the review's fourth-ranked item.
+**Comparison arm (operator direction 2026-10-17, lead-relayed, not a ruling):** where the metrics allow, beside a custom-CI baseline and one named same-seat entrant, on mistakes caught, setup effort, interruptions and retention.
+
+**Cost while deferred — still the highest of its intake, and now the more exposed half.** Every claim that would be strongest with external evidence still rests on internal dogfooding, and the channel that would carry it is built and reading zero: the published page states an honest `0` on every pass while the volume of unattested governed surface keeps growing. Deferring also silently defers [benchmark-ab-experiment](#benchmark-ab-experiment), since running that first would fix the wrong metrics. Surfaced 2026-08-02 at close as the review's fourth-ranked item.
 
 ### external-gate-quality-evidence
 
@@ -148,7 +174,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 the harness plugin package reaches Claude Code only in its tested and guarded parts. plugin/SPEC.md reads the portable `plugin.json` and `skills/` as loading on any Agent Plugins 1.0 client off the standard alone, since only Claude Code's install is run; the guards ride `hooks/hooks.json`, outside the standard's portable core, so no other client runs them; the marketplace file is Claude Code's format. No queue entry names another harness. **Inferred, not run:** which harnesses adopt Agent Plugins 1.0. **Operator-supplied, unverified:** Meta's coding harness "seems to be named Muse Code". **Harness priority, operator direction, 2026-09-28:** tier 1 Claude Code and Codex; tier 2 Muse Code, Antigravity and Cursor.
 
-**Deliverable:** (1) the skills load verified on the codex and Antigravity CLIs; (2) a survey of which harnesses read Agent Plugins 1.0 and their catalogs; (3) per-harness guard wiring where a harness has a hook surface.
+**Deliverable:** (1) the skills load verified on the codex and Antigravity CLIs; (2) a survey of which harnesses read Agent Plugins 1.0 and their catalogs; (3) per-harness guard wiring where a harness has a hook surface. **Read first (2026-10-17, competitive analysis, unprobed here):** Cursor imports Claude Code hook configuration from `.claude/settings*.json` by default, so one wiring may reach two harnesses.
 
 **Cost while deferred:** an adopter on another harness gets unverified skills and no guards. Filed 2026-09-28 by plugin-marketplace-queue-verbs' lead on an operator direction. Re-verified: plugin/SPEC.md states the portable core and that only Claude Code's install is run. Owner lookup: `Agent Plugins`, `codex`, `Cursor`, `Antigravity` in this file — none; owner plugin/SPEC.md.
 
@@ -338,18 +364,6 @@ the crate manifest `native/Cargo.toml` declares `license = "MIT"` while `LICENSE
 
 **Cost while deferred:** a reader of the public crate manifest is told the wrong license. Filed 2026-10-17 by budget-feed-observation-pass' close from a gap bullet of that date, surfaced probing a consult item. Re-verified there: the crate field reads MIT, and `reserve/crates/Cargo.toml`, `installer/package.json` and both plugin manifests read Apache-2.0. Owner lookup: `license`, `Cargo.toml`, `license-line` in this file and the disposed-findings record — none; `homepage-license-duplicate`, done, DISTINCT (the footer instance); owner docs/site-architecture.md §The license line.
 
-### companion-adoption-rehearsal
-
-[cost: event/low] [surface: companion]
-
-a clean-seat rehearsal of the companion toolkits' adoption (`companion/`: the Spec Kit extension and both recipes), installing as an adopter would, before testers are invited to give feedback (operator wish 2026-10-17, lead-relayed, a direction for the next scope). The toolkits are neither in the catalog nor promoted.
-
-**Deliverable:** each companion's adoption run from a clean seat, its findings filed.
-
-**Inferred, not run:** that no adopter-seat run of the companions has happened, read off the operator's wish.
-
-**Cost while deferred:** the first invited testers meet whatever a rehearsal would have caught. Filed 2026-10-17 by budget-feed-observation-pass' close from a gap bullet of that date; the operator wanted it now and it cannot enter before the next scope. Owner lookup: `rehears`, `companion`, `clean seat` in this file and the disposed-findings record — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (the catalog submission, waiting on a published tag); [design-partner-preview](#design-partner-preview), DISTINCT (the observed tester cohort, on operator hours); `front-door-container-rehearsal`, done, DISTINCT (the front door's first run, not the companions').
-
 ### consult-grant-spend-unmarked
 
 [cost: event/high] [surface: lifecycle-kit]
@@ -359,6 +373,16 @@ a consult-inbox item that stays after a dispatched consultation spends its lead-
 **Deliverable:** a sanctioned spend marker a dispatched consultation appends to a staying item, or a lead-template step reading the item's history before relaying its grant's status; which is spec's, against lifecycle-kit/SPEC.md §The consult inbox and §templates/lead.md.
 
 **Cost while deferred:** each lead consult dispatch over a staying spent-grant item buys an expert-tier consultation to rediscover the spend. Surfaced 2026-10-17 by budget-feed-observation-pass' second consult dispatch on the SWOT item and promoted at the next scope's intake. Owner lookup: `spent`, `grant`, `consult inbox` in this file and the disposed-findings record — none; [tarball-attestation-observed](#tarball-attestation-observed)'s grant records, DISTINCT (release grants on an entry, not an inbox item); owner lifecycle-kit/SPEC.md §The consult inbox.
+
+### activated-guarantee-route
+
+[cost: event/high] [surface: installer]
+
+an adopter meets the guarantee the front door promises only through `demo`, which installs `full` in a scratch repository (installer/SPEC.md §demo), while a first install with no `--profile` takes `starter`, gate-sdk alone (docs/install.md). What the adopter's own tree then enforces, holds configured but inactive, or lacks is left to the adopt walk's decisions, and no verb reports it: `doctor` answers whether the machine runs the battery and what is installed (installer/SPEC.md §doctor).
+
+**Deliverable:** one recommended adoption path showing, on the adopter's own tree, what is configured, enforced and inactive, with time to that proof as its metric; whether it widens `doctor` or is a verb of its own is spec's.
+
+**Cost while deferred:** effort precedes the payoff: an evaluator installs, then works out alone what guards the tree, which is where an install-then-bounce goes unseen. Filed 2026-10-17 by this iteration's scope from the competitive analysis' ranked actions, operator direction lead-relayed (not a ruling). Owner lookup: `doctor`, `activat`, `time-to`, `inactive` in this file and the disposed-findings record — none; owner installer/SPEC.md.
 
 ## Icebox
 
