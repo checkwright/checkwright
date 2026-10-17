@@ -3,6 +3,7 @@ name = "checkwright"
 version = "0.0.1"
 edition = "2021"
 description = "Reproducible checks that catch unsupported claims in coding-agent delivery before merge: a task marked done with no recorded test run, a skipped lifecycle stage, a spec naming a file the tree lacks. They prove the evidence a claim rests on exists, not that the code is correct."
+keywords = ["coding-agents", "ai-agents", "pre-commit", "ci", "spec-driven"]
 license = "Apache-2.0"
 repository = "https://github.com/checkwright/checkwright"
 readme = "README.md"
