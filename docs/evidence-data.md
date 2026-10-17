@@ -290,3 +290,4 @@ Knowledge-friction counts are excluded: their log is gitignored per-iteration sc
 | tamper-reader-repair-pass | sc · · b v c | 0f/4d | 0 | 21s clean | 153 |
 | budget-feed-observation-pass | sc sp a b v c | 1f/1d | 1 · ≤0d | 21s clean | 153 |
 | competitive-followup-pass | sc sp a b v c | 5f/1d | 3 · ≤0d | 21s clean | 154 |
+| prove-confinement-pass | sc sp a b v c | 2f/5d | 2 · ≤0d | 21s clean | 154 |

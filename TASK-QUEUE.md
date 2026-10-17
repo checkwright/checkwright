@@ -1046,12 +1046,3 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 
 ## Done
 
-- knob-file-relative-to-cwd
-- companion-prove-not-held
-- companion-complement-init-line
-- delta-agreement-lossy-capture
-- update-notice-windows-flake
-- windows-liveness-row-pid-reuse
-- prove-claim-path-confinement
-- prove-pwsh-leg-unmeasured
-
