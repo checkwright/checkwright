@@ -10,6 +10,9 @@ use std::path::Path;
 const VERDICT: &str = "PROVE";
 const QUEUE_KNOB: &str = "LIFECYCLE_KIT_QUEUE_FILE";
 const STATE_KNOB: &str = "LIFECYCLE_KIT_STATE_FILE";
+// spec: installer/SPEC.md §prove — a clone-relative path no clone holds, git tracking nothing in its
+// own directory
+const ABSENT: &str = ".git/checkwright-prove-absent";
 pub(super) const USAGE: &[&str] = &[
     "usage: checkwright prove",
     "",
@@ -144,10 +147,8 @@ fn prove(scratch: &mut Scratch) -> Outcome {
         .map(|(g, _)| g)
         .unwrap_or_else(|| clone.join(crate::knobs::gates_dir()).display().to_string());
     if let Ok(tmp) = crate::knobs::wire_in(&clone, &gates, "GATE_SDK_TMP_DIR") {
-        if let Some(rel) = in_clone(&root, &tmp) {
-            if !crate::walk::names_cwd(Path::new(&rel)) {
-                let _ = crate::walk::make_scratch(clone.join(rel));
-            }
+        if let Some(rel) = in_clone(&root, &clone, &tmp) {
+            let _ = crate::walk::make_scratch(clone.join(rel));
         }
     }
 
@@ -157,12 +158,9 @@ fn prove(scratch: &mut Scratch) -> Outcome {
 
     // spec: installer/SPEC.md §prove — both battery runs read the claim's files at the paths resolved
     // here, so an absolute knob rebased onto the clone is the file the battery reads
-    let queue_rel = resolved(&root, &clone, &gates, QUEUE_KNOB, QUEUE_FILE);
-    let state_rel = resolved(&root, &clone, &gates, STATE_KNOB, STATE_FILE);
-    let claim_env: Vec<(String, String)> = [(QUEUE_KNOB, &queue_rel), (STATE_KNOB, &state_rel)]
-        .into_iter()
-        .filter_map(|(k, v)| v.as_ref().map(|v| (k.to_string(), v.clone())))
-        .collect();
+    let queue = resolved(&root, &clone, &gates, QUEUE_KNOB, QUEUE_FILE);
+    let state = resolved(&root, &clone, &gates, STATE_KNOB, STATE_FILE);
+    let claim_env = claim_env(&[&queue, &state]);
 
     // spec: installer/SPEC.md §prove — the battery at HEAD; a red one does not stop the run
     println!("\nbattery at HEAD");
@@ -176,11 +174,11 @@ fn prove(scratch: &mut Scratch) -> Outcome {
         super::profile::DERIVED
     );
     let mut texts = Vec::new();
-    for (label, rel) in [(QUEUE_FILE, &queue_rel), (STATE_FILE, &state_rel)] {
-        match rel.as_ref().and_then(|r| std::fs::read_to_string(clone.join(r)).ok()) {
+    for f in [&queue, &state] {
+        match f.rel.as_ref().and_then(|r| std::fs::read_to_string(clone.join(r)).ok()) {
             Some(t) => texts.push(t),
             None => {
-                let named = rel.as_deref().unwrap_or(label);
+                let named = f.rel.as_deref().unwrap_or(&f.named);
                 return Outcome::NotHeld {
                     cause: format!("this tree keeps no {} to claim a task done in", named),
                     help,
@@ -188,7 +186,7 @@ fn prove(scratch: &mut Scratch) -> Outcome {
             }
         }
     }
-    let (queue_rel, state_rel) = (queue_rel.unwrap_or_default(), state_rel.unwrap_or_default());
+    let (queue_rel, state_rel) = (queue.rel.unwrap_or_default(), state.rel.unwrap_or_default());
     let today = crate::emit::kpi::iso_day(crate::emit::kpi::now_epoch().div_euclid(86_400));
     let (claimed_queue, claimed_state) = match demo::claim(&texts[0], &texts[1], &head, &today) {
         Ok(c) => c,
@@ -244,33 +242,76 @@ fn minutes_since(then: i64, now: i64) -> i64 {
     (now - then).max(0) / 60
 }
 
-// spec: installer/SPEC.md §prove — a knob's path inside the repository, rebased onto the clone; a
-// path outside the repository, a relative one climbing out of it included, is none of the clone's
-fn in_clone(root: &Path, value: &str) -> Option<String> {
+// spec: installer/SPEC.md §prove — a knob's path inside the repository, rebased onto the clone and
+// resolved on its filesystem; a path outside the repository is none of the clone's
+fn in_clone(root: &Path, clone: &Path, value: &str) -> Option<String> {
+    let v = Path::new(value);
     let rel = if crate::walk::path_root(value).is_none() {
-        Path::new(value)
+        v.to_path_buf()
     } else {
-        Path::new(value).strip_prefix(root).ok()?
-    };
-    let mut kept: Vec<String> = Vec::new();
-    for c in rel.components() {
-        match c {
-            std::path::Component::CurDir => {}
-            std::path::Component::ParentDir => {
-                kept.pop()?;
-            }
-            std::path::Component::Normal(s) => kept.push(s.to_string_lossy().into_owned()),
-            _ => return None,
+        match v.strip_prefix(root) {
+            Ok(r) => r.to_path_buf(),
+            Err(_) => v.strip_prefix(real_path(root)?).ok()?.to_path_buf(),
         }
-    }
-    Some(kept.join("/"))
+    };
+    confined(clone, &rel)
 }
 
-fn resolved(root: &Path, clone: &Path, gates: &str, knob: &str, seeded: &str) -> Option<String> {
-    match crate::knobs::wire_in(clone, gates, knob) {
-        Ok(v) if !v.is_empty() => in_clone(root, &v),
-        _ => Some(seeded.to_string()),
+// spec: installer/SPEC.md §prove — a clone-relative path as the clone's filesystem resolves it, each
+// symlink followed and each `..` taken where the filesystem takes it, as the clone-relative path of
+// the file it lands on; a path landing outside the clone, or on a dangling symlink, is none
+fn confined(clone: &Path, rel: &Path) -> Option<String> {
+    use std::path::Component;
+    if rel.components().any(|c| matches!(c, Component::Prefix(_) | Component::RootDir)) {
+        return None;
     }
+    let top = real_path(clone)?;
+    let mut probe = top.join(rel);
+    let mut absent = Vec::new();
+    while std::fs::symlink_metadata(&probe).is_err() {
+        absent.push(probe.file_name()?.to_os_string());
+        probe = probe.parent()?.to_path_buf();
+    }
+    let mut real = real_path(&probe)?;
+    real.extend(absent.iter().rev());
+    let inside = real.strip_prefix(&top).ok()?;
+    if inside.as_os_str().is_empty() {
+        return None;
+    }
+    Some(inside.components().map(|c| c.as_os_str().to_string_lossy()).collect::<Vec<_>>().join("/"))
+}
+
+// spec: gate-sdk/SPEC.md §The crate's crosser — the resolved path, its extended prefix stripped since
+// `confined` composes onto it
+fn real_path(p: &Path) -> Option<std::path::PathBuf> {
+    crate::walk::canonicalize(p).map(|c| std::path::PathBuf::from(crate::walk::strip_extended_prefix(&c)))
+}
+
+// spec: installer/SPEC.md §prove — one claim file: the name the tree gives it and where it lands in
+// the clone, `None` where it names no file of the clone's
+struct ClaimFile {
+    knob: &'static str,
+    named: String,
+    rel: Option<String>,
+}
+
+fn resolved(root: &Path, clone: &Path, gates: &str, knob: &'static str, seeded: &str) -> ClaimFile {
+    match crate::knobs::wire_in(clone, gates, knob) {
+        Ok(v) if !v.is_empty() => ClaimFile { knob, rel: in_clone(root, clone, &v), named: v },
+        _ => ClaimFile { knob, named: seeded.to_string(), rel: confined(clone, Path::new(seeded)) },
+    }
+}
+
+// spec: installer/SPEC.md §prove — every battery run sets both knobs, a file outside the clone to a
+// path the clone does not hold, so no value inherited from the environment reaches past the clone
+fn claim_env(files: &[&ClaimFile]) -> Vec<(String, String)> {
+    files
+        .iter()
+        .map(|f| {
+            let at = f.rel.clone().unwrap_or_else(|| format!("{}/{}", ABSENT, f.knob));
+            (f.knob.to_string(), at)
+        })
+        .collect()
 }
 
 fn report(root: &Path, clone: &Path, manifest: &lock::Manifest, door: &str) -> String {
@@ -368,18 +409,92 @@ mod tests {
         assert_eq!(super::minutes_since(2_000, 1_000), 0);
     }
 
+    struct Tree(std::path::PathBuf);
+
+    impl Tree {
+        fn new(tag: &str) -> Tree {
+            let d = std::env::temp_dir().join(format!("checkwright-prove-{}.{}", tag, std::process::id()));
+            let _ = std::fs::remove_dir_all(&d);
+            std::fs::create_dir_all(d.join("clone/docs")).expect("scratch");
+            std::fs::create_dir_all(d.join("outside")).expect("scratch");
+            std::fs::write(d.join("clone/TASK-QUEUE.md"), "q").expect("write");
+            std::fs::write(d.join("clone/docs/q.md"), "q").expect("write");
+            Tree(d)
+        }
+        fn clone(&self) -> std::path::PathBuf {
+            self.0.join("clone")
+        }
+    }
+
+    impl Drop for Tree {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.0);
+        }
+    }
+
     // spec: installer/SPEC.md §prove — a knob's relative path is the clone's, a rooted one inside the
     // repository is rebased onto it, and one outside it is none of the clone's
     #[test]
     fn a_knob_path_is_rebased_onto_the_clone_or_refused() {
-        let root = std::path::Path::new("/repo");
-        assert_eq!(super::in_clone(root, "TASK-QUEUE.md").as_deref(), Some("TASK-QUEUE.md"));
-        assert_eq!(super::in_clone(root, "/repo/docs/q.md").as_deref(), Some("docs/q.md"));
-        assert_eq!(super::in_clone(root, "/elsewhere/q.md"), None);
-        assert_eq!(super::in_clone(root, "./docs/../q.md").as_deref(), Some("q.md"));
-        assert_eq!(super::in_clone(root, "../../TASK-QUEUE.md"), None);
-        assert_eq!(super::in_clone(root, "docs/../../q.md"), None);
-        assert_eq!(super::in_clone(root, "/repo/../q.md"), None);
+        let t = Tree::new("rebase");
+        let (root, clone) = (std::path::Path::new("/repo"), t.clone());
+        let at = |v: &str| super::in_clone(root, &clone, v);
+        assert_eq!(at("TASK-QUEUE.md").as_deref(), Some("TASK-QUEUE.md"));
+        assert_eq!(at("/repo/docs/q.md").as_deref(), Some("docs/q.md"));
+        assert_eq!(at("docs/absent/new.md").as_deref(), Some("docs/absent/new.md"));
+        assert_eq!(at("/elsewhere/q.md"), None);
+        assert_eq!(at("./docs/../TASK-QUEUE.md").as_deref(), Some("TASK-QUEUE.md"));
+        assert_eq!(at("../../TASK-QUEUE.md"), None);
+        assert_eq!(at("docs/../../q.md"), None);
+        assert_eq!(at("/repo/../q.md"), None);
+        assert_eq!(at("."), None);
+    }
+
+    // spec: installer/SPEC.md §prove — a committed symlink out of the clone names none of its files,
+    // so the claim is never read or written through it
+    #[cfg(unix)]
+    #[test]
+    fn a_symlink_out_of_the_clone_names_none_of_its_files() {
+        let t = Tree::new("symlink-out");
+        let clone = t.clone();
+        std::fs::write(t.0.join("outside/TASK-QUEUE.md"), "theirs").expect("write");
+        std::os::unix::fs::symlink("../outside/TASK-QUEUE.md", clone.join("queue.md")).expect("symlink");
+        std::os::unix::fs::symlink("../outside", clone.join("away")).expect("symlink");
+        std::os::unix::fs::symlink("../outside/gone.md", clone.join("dangling.md")).expect("symlink");
+        std::os::unix::fs::symlink("docs/q.md", clone.join("near.md")).expect("symlink");
+        let at = |v: &str| super::in_clone(std::path::Path::new("/repo"), &clone, v);
+        assert_eq!(at("queue.md"), None);
+        assert_eq!(at("away/TASK-QUEUE.md"), None);
+        assert_eq!(at("away/new.md"), None);
+        assert_eq!(at("dangling.md"), None);
+        assert_eq!(at("near.md").as_deref(), Some("docs/q.md"));
+    }
+
+    // spec: installer/SPEC.md §prove — `..` after a directory symlink is taken where the filesystem
+    // takes it, so the knob selects the file the battery reads, never the lexical one
+    #[cfg(unix)]
+    #[test]
+    fn a_parent_step_after_a_directory_symlink_follows_the_filesystem() {
+        let t = Tree::new("dotdot");
+        let clone = t.clone();
+        std::fs::create_dir_all(clone.join("real/sub")).expect("scratch");
+        std::fs::write(clone.join("real/TASK-QUEUE.md"), "real").expect("write");
+        std::os::unix::fs::symlink("real/sub", clone.join("alias")).expect("symlink");
+        let at = super::in_clone(std::path::Path::new("/repo"), &clone, "alias/../TASK-QUEUE.md");
+        assert_eq!(at.as_deref(), Some("real/TASK-QUEUE.md"));
+    }
+
+    // spec: installer/SPEC.md §prove — every battery run sets both knobs, one naming nothing of the
+    // clone's to a path no clone holds, so an outside value in the environment is overridden
+    #[test]
+    fn every_battery_run_sets_both_knobs() {
+        let inside = super::ClaimFile { knob: super::QUEUE_KNOB, named: "q.md".into(), rel: Some("q.md".into()) };
+        let outside = super::ClaimFile { knob: super::STATE_KNOB, named: "/elsewhere/s".into(), rel: None };
+        let env = super::claim_env(&[&inside, &outside]);
+        assert_eq!(env.len(), 2, "{:?}", env);
+        assert_eq!(env[0], (super::QUEUE_KNOB.to_string(), "q.md".to_string()));
+        assert_eq!(env[1].0, super::STATE_KNOB);
+        assert!(env[1].1.starts_with(super::ABSENT) && !env[1].1.contains("elsewhere"), "{:?}", env[1]);
     }
 
     // spec: installer/SPEC.md §prove — the summary is the battery's own line, else its last
