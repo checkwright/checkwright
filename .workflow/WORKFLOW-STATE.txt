@@ -11,3 +11,4 @@ prove-confinement-pass build aa4fa98a 2026-10-17 bf52816f1
 prove-confinement-pass build af09aa9f 2026-10-17 18be9544a
 prove-confinement-pass build a2497c6d 2026-10-17 3795c3c0d
 prove-confinement-pass validate ac50f2bc 2026-10-17 70d00a95e
+prove-confinement-pass close adbeebb4 2026-10-17 7eaaeec54
