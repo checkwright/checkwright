@@ -4,4 +4,4 @@
 
 ---
 
-— scope a3773a2e 2026-10-17 2984af116
+evaluator-discovery-pass scope a3773a2e 2026-10-17 2984af116

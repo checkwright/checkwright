@@ -1,14 +1,28 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: evaluator-discovery-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The set (operator direction 2026-10-17, lead-relayed, not a ruling; the iteration opened undirected):** option A. Debt `orchestration-page-overreach`; the features `evaluator-agent-discovery`, narrowed to its surfaces (a) the choosing page, (b) the `llms.txt` projection and (d) the registry metadata, and `crate-manifest-license-unheld`, which spec authors and promotes. Surfaces (c) and (e) split off deferred as `evaluator-root-agent-file` and `agent-selection-probe`. Stages scope, spec, build, validate and close, with align where `check-stage-entry` assertion C fires. The license field and its gate land with the description edit on `native/Cargo.toml`, the field first.
+
+  **Push need (2026-10-17, inside the budget):** the closing push alone; no unit's completion reads a remote run. A v0.32.0 tag push, should close cut it, is the second.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### orchestration-page-overreach
+
+`docs/orchestration.md` frames Checkwright as the verification layer beneath orchestration, in its title and at three body sites, and `docs/index.md`'s link to it repeats the phrase, while the first screen now leads with the bounded promise (docs/positioning.md §The bounded promise): reproducible classes of unsupported claims caught before merge, structural evidence rather than correctness.
+
+**Deliverable:** those sites reworded under the bounded-promise rule.
+
+**Cost while deferred:** an evaluating agent quoting the orchestration page reads structural evidence checks as semantic verification, the overreach `bounded-promise-phrasing` closed on the first screen. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet build filed that day; not fixed at close because the operator's direction of that day (lead-relayed, not a ruling) chose first-screen-only reach for that unit, so this reach is a scope's to take. Re-verified there by grep: the title and lines 9, 11 and 24 of the page, and the index line. Owner lookup: `orchestration`, `verification layer` in this file and the disposed-findings record — none; `bounded-promise-phrasing`, done, DISTINCT (the first screen); owner docs/positioning.md §The bounded promise.
 
 ## Deferred
 
@@ -320,23 +334,41 @@ the crate manifest `native/Cargo.toml` declares `license = "MIT"` while `LICENSE
 
 [cost: event/high] [surface: docs]
 
-the adopter is increasingly a coding agent comparing tools and recommending or selecting one on a human's behalf, and the operator directed (2026-10-17, lead session, a direction, not a ruling) treating that agent as a first-class reader, for the next scope. Five surfaces are unbuilt: (a) an evaluator-facing choosing page, when to pick it and when not, a comparison against the same-seat entrants the private brief's SWOT names and a custom-CI baseline, the limits stated; (b) `llms.txt` and `llms-full.txt` on the site, a generated projection behind a freshness gate; (c) a root `AGENTS.md` for evaluators and adopters, since a cloning agent reads the maintainer-internal `CLAUDE.md`, which `check-root-tiering`'s second-agent-file refusal (context-kit/SPEC.md §The AGENTS.md agent-file adapter smoke) constrains; (d) registry metadata, `installer/package.json` carrying no `keywords` and `native/Cargo.toml`'s `description` reading as an internal binary; (e) a repeatable cold agent-selection probe asking foreign agent CLIs and a fresh session, context-free, for a tool verifying coding-agent claims before merge, recording whether Checkwright appears.
+the adopter is increasingly a coding agent comparing tools and recommending or selecting one on a human's behalf, and the operator directed (2026-10-17, lead session, a direction, not a ruling) treating that agent as a first-class reader, for the next scope. Three surfaces stay here, unbuilt: (a) an evaluator-facing choosing page, when to pick it and when not, a comparison against the same-seat entrants the private brief's SWOT names and a custom-CI baseline, the limits stated; (b) `llms.txt` and `llms-full.txt` on the site, a generated projection behind a freshness gate; (d) registry metadata, `installer/package.json` carrying no `keywords` and `native/Cargo.toml`'s `description` reading as an internal binary.
 
-**Deliverable:** design-pending, a feature per surface that adds a projection or gate; scope splits it.
+**Deliverable:** design-pending, a feature per surface that adds a page, a projection or a gate, spec authoring each. (d) lands with [crate-manifest-license-unheld](#crate-manifest-license-unheld), which edits the same manifest. (a) states the profiles as shipped, verification without the workflow and not the reverse, so [verify-workflow-decoupling](#verify-workflow-decoupling)'s ruling edits it later.
 
-**Inferred, not run:** that an evaluating agent reading `CLAUDE.md` forms a worse impression — unmeasured; probe (e) measures it.
+**Cost while deferred:** an agent evaluating on a human's behalf finds no surface written for it and may not surface Checkwright at all. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet of that date. Re-verified there: no `docs/llms.txt`, no root `AGENTS.md`, no `keywords` in `installer/package.json`, and the crate description as stated. Owner lookup: `llms`, `AGENTS.md`, `evaluator`, `keywords` in this file and the disposed-findings record — none; owner docs/site-architecture.md. Re-verified at evaluator-discovery-pass' scope: unchanged.
 
-**Cost while deferred:** an agent evaluating on a human's behalf finds no surface written for it and may not surface Checkwright at all. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet of that date. Re-verified there: no `docs/llms.txt`, no root `AGENTS.md`, no `keywords` in `installer/package.json`, and the crate description as stated. Owner lookup: `llms`, `AGENTS.md`, `evaluator`, `keywords` in this file and the disposed-findings record — none; owner docs/site-architecture.md.
+Surface (e) split off as [agent-selection-probe](#agent-selection-probe) at evaluator-discovery-pass' scope (operator direction 2026-10-17, lead-relayed, not a ruling).
 
-### orchestration-page-overreach
+Surface (c) split off as [evaluator-root-agent-file](#evaluator-root-agent-file) by the same direction.
 
-[cost: event/low] [surface: docs]
+### evaluator-root-agent-file
 
-`docs/orchestration.md` frames Checkwright as the verification layer beneath orchestration, in its title and at three body sites, and `docs/index.md`'s link to it repeats the phrase, while the first screen now leads with the bounded promise (docs/positioning.md §The bounded promise): reproducible classes of unsupported claims caught before merge, structural evidence rather than correctness.
+[cost: event/low] [surface: gate-sdk]
 
-**Deliverable:** those sites reworded under the bounded-promise rule.
+surface (c) of [evaluator-agent-discovery](#evaluator-agent-discovery), split off at evaluator-discovery-pass' scope (operator direction 2026-10-17, lead-relayed, not a ruling): a root `AGENTS.md` for evaluators and adopters, since a cloning agent reads the maintainer-internal `CLAUDE.md`.
 
-**Cost while deferred:** an evaluating agent quoting the orchestration page reads structural evidence checks as semantic verification, the overreach `bounded-promise-phrasing` closed on the first screen. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet build filed that day; not fixed at close because the operator's direction of that day (lead-relayed, not a ruling) chose first-screen-only reach for that unit, so this reach is a scope's to take. Re-verified there by grep: the title and lines 9, 11 and 24 of the page, and the index line. Owner lookup: `orchestration`, `verification layer` in this file and the disposed-findings record — none; `bounded-promise-phrasing`, done, DISTINCT (the first screen); owner docs/positioning.md §The bounded promise.
+**Why split rather than built:** `check-root-tiering`'s built-in allowlist rejects a stray second agent file at root (context-kit/SPEC.md §The AGENTS.md agent-file adapter smoke asserts it), and an `AGENTS.md` is the always-loaded file of any agent that reads one, so an evaluator-facing file would also load into every such session working here, foreign adapters running stages included. **Inferred, not run:** which foreign adapters this repo dispatches read `AGENTS.md`.
+
+**Deliverable:** design-pending, a feature: the file's audience and home and the rule `check-root-tiering` takes on it, or a refusal recorded.
+
+**Cost while deferred:** a cloning agent's first read is maintainer-internal instructions; whether that costs a recommendation is unmeasured until [agent-selection-probe](#agent-selection-probe) runs. Filed 2026-10-17 by evaluator-discovery-pass' scope as a split remainder. Re-verified there: no root `AGENTS.md`. Owner lookup: the parent's, none; owner gate-sdk/SPEC.md §check-root-tiering.
+
+### agent-selection-probe
+
+[cost: event/low] [surface: drift-kit]
+
+surface (e) of [evaluator-agent-discovery](#evaluator-agent-discovery), split off at evaluator-discovery-pass' scope (operator direction 2026-10-17, lead-relayed, not a ruling): a repeatable cold agent-selection probe asking foreign agent CLIs and a fresh session, context-free, for a tool verifying coding-agent claims before merge, recording whether Checkwright appears.
+
+**Why split rather than built:** each run buys foreign-CLI credit, which has already walled a granted second-vendor run, and an agent's answer moves on its own index and training clock rather than this tree's, so a run in the iteration landing the evaluator surfaces measures their absence.
+
+**Deliverable:** design-pending, a feature: the prompt set, the agents asked, the record's home and form, and the cadence.
+
+**Inferred, not run:** that an evaluating agent reading `CLAUDE.md` forms a worse impression; this probe measures it.
+
+**Cost while deferred:** whether the evaluator surfaces change what an agent recommends stays unmeasured. Filed 2026-10-17 by evaluator-discovery-pass' scope as a split remainder. Owner lookup: the parent's, `llms`, `AGENTS.md`, `evaluator`, `keywords` in this file and the disposed-findings record, none; owner drift-kit/SPEC.md, beside [design-partner-preview](#design-partner-preview)'s observation record.
 
 ### list-lead-in-count-unheld
 
