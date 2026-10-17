@@ -22,16 +22,6 @@
 
 ## Technical Debt
 
-### companion-adoption-rehearsal
-
-a clean-seat rehearsal of the companion toolkits' adoption (`companion/`: the Spec Kit extension and both recipes), installing as an adopter would, before testers are invited to give feedback (operator wish 2026-10-17, lead-relayed, a direction for the next scope). The toolkits are neither in the catalog nor promoted.
-
-**Deliverable:** each companion's adoption run from a clean seat, its findings filed. **Source (operator direction 2026-10-17, lead-relayed, not a ruling, following the v0.32.0 cut grant):** the tree's payload, packed and served as a local Release, installed by the documented adopter commands onto a fresh project in a clean docker seat. It runs last in build, so it rehearses the iteration's other units.
-
-**Re-verified 2026-10-17 at scope:** no clean-seat adopter run exists. The `companion-toolkits` leg and the consumer smoke's companion arm install the tree's own archive onto planted-defect fixtures, and docs/install-evidence.md records no companion run.
-
-**Cost while deferred:** the first invited testers meet whatever a rehearsal would have caught. Filed 2026-10-17 by budget-feed-observation-pass' close from a gap bullet of that date; the operator wanted it now and it cannot enter before the next scope. Owner lookup: `rehears`, `companion`, `clean seat` in this file and the disposed-findings record — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (the catalog submission itself); [design-partner-preview](#design-partner-preview), DISTINCT (the observed tester cohort, on operator hours); `front-door-container-rehearsal`, done, DISTINCT (the front door's first run, not the companions').
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -1054,4 +1044,5 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 - activated-guarantee-route
 - openspec-delta-base-agreement
 - consult-grant-spend-unmarked
+- companion-adoption-rehearsal
 
