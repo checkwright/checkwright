@@ -14,7 +14,7 @@
 
   **Second grant (operator grant and direction 2026-10-17, lead-relayed; spent 2026-10-17 by close's codex-review run, returned not clean on five findings filed to the gap inbox, so the fallback ran):** one second-vendor review at close over the close's two fix commits (the prove and knob fix, the check-delta-agreement fix); v0.32.0 is cut on a clean return, closing push plus tag push. On a finding or a failed run, v0.32.0 defers, the front door withdraws `prove`, and the consumer smoke reads the overlap line off a surface outside the front door, the page line restored at the cut.
 
-  **Push need (2026-10-17, inside the budget):** the closing push, plus the tag push on a clean return; no unit reads a remote run.
+  **Push need (2026-10-17, inside the budget):** the closing push, plus the tag push on a clean return; no unit reads a remote run. Spent: no tag; the closing push and a second carrying a recurrence stamp. **A third push, over budget (operator grant 2026-10-17, lead-relayed),** lands the revised product statement so master matches the About.
 
   **Product statement revised (operator direction 2026-10-17, lead-relayed, replacing the Option A wording approved for `bounded-promise-phrasing`, whose entry has left the queue):** every product-statement site and the GitHub About carry the 277-character statement `scripts/product-statement.conf` now renders, since GitHub caps the About at 350 characters and Option A ran to 430.
 
