@@ -12,6 +12,8 @@
 
   **Grant (operator grant 2026-10-17, lead-relayed; spent 2026-10-17 by validate's codex-review run, returned not clean on five findings filed to the gap inbox):** one second-vendor review at validate; v0.32.0 is cut on a clean return under the bar [tarball-attestation-observed](#tarball-attestation-observed) records.
 
+  **Second grant (operator grant and direction 2026-10-17, lead-relayed):** one second-vendor review at close over the close's two fix commits (the prove and knob fix, the check-delta-agreement fix); v0.32.0 is cut on a clean return, closing push plus tag push. On a finding or a failed run, v0.32.0 defers, the front door withdraws `prove`, and the consumer smoke reads the overlap line off a surface outside the front door, the page line restored at the cut.
+
   **Push need (2026-10-17, inside the budget):** the closing push, plus the tag push on a clean return; no unit reads a remote run.
 
   **Owed at close (operator direction 2026-10-17, lead-relayed, not a ruling):** the operator sets the repository's GitHub About by hand to the approved product statement's plain rendering (`installer/package.json`'s `description`), after the account-selection step, around the closing push; until then site-health's About arm reports the difference.
