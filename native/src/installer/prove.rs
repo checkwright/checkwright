@@ -127,7 +127,7 @@ fn prove(scratch: &mut Scratch) -> Outcome {
     // checked out detached at HEAD's commit
     let clone = step!(demo::make_scratch(scratch, "checkwright-prove").map_err(refuse));
     let (source, target) = (root.to_string_lossy().into_owned(), clone.to_string_lossy().into_owned());
-    step!(git_step(&root, &["clone", "-q", "--no-checkout", "--", &source, &target]));
+    step!(git_step(&root, &clone_argv(&source, &target)));
     for (k, v) in demo::SCRATCH_CONFIG {
         step!(git_step(&clone, &["config", k, v]));
     }
@@ -222,6 +222,12 @@ fn prove(scratch: &mut Scratch) -> Outcome {
     let since = added.lines().filter_map(|l| l.trim().parse::<i64>().ok()).min();
     let minutes = since.map(|t| minutes_since(t, crate::emit::kpi::now_epoch())).unwrap_or(0);
     Outcome::Held { head, minutes }
+}
+
+// spec: installer/SPEC.md §prove — a path clone, never `--local`: git then dies on a scratch on
+// another filesystem rather than copying the objects it cannot hardlink
+fn clone_argv<'a>(source: &'a str, target: &'a str) -> [&'a str; 6] {
+    ["clone", "-q", "--no-checkout", "--", source, target]
 }
 
 // spec: installer/SPEC.md §prove — whole minutes, and a committer time ahead of the clock reads as 0
@@ -321,6 +327,14 @@ mod tests {
     fn help_answers_and_an_operand_is_refused() {
         assert_eq!(super::run(&["--help".to_string()]), 0);
         assert_eq!(super::run(&["extra".to_string()]), 2);
+    }
+
+    // spec: installer/SPEC.md §prove — the clone is by path and never `--local`
+    #[test]
+    fn the_clone_is_by_path_and_never_local() {
+        let argv = super::clone_argv("/src", "/dst");
+        assert!(!argv.contains(&"--local"), "{:?}", argv);
+        assert_eq!(&argv[argv.len() - 2..], &["/src", "/dst"]);
     }
 
     // spec: installer/SPEC.md §prove — whole minutes, never negative
