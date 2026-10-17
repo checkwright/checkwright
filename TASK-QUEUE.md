@@ -14,6 +14,28 @@
 
 ## New Features
 
+### companion-prove-not-held
+
+[spec: SPEC-companion-prove.md]
+
+every companion `prose` and `complement` install, Spec Kit and OpenSpec alike, prints an `init` then: line offering `prove`, and `prove` answers not held, exit 1, with a help line steering to `--profile full`, by construction: §prove's claim reads lifecycle state files, which `complement` leaves out because the toolkit does that job (`companion/exclusions.list`). The companion's own done claim, a ticked task naming an absent path, is caught by `check-task-path-claim`, which `prove` never stages. `full` installs report held. Rehearsed 2026-10-17 at `companion-adoption-rehearsal`.
+
+**Deliverable:** design-pending, spec's: either `prove` gains a companion claim (a ticked task naming an absent path in the recipe's task-list glob), or the then: line is withheld or reworded where no claim can be staged; owners installer/SPEC.md §prove and §init, companion/SPEC.md.
+
+**Cost while deferred:** a companion tester's first proof step reports failure and recommends the tier the companion exists to avoid. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet of that date; spec-conformant, so a design question rather than a fix. Re-verified there by reading §prove step 4 and `companion/exclusions.list`. Owner lookup: `prove`, `then: line`, `companion` in this file and the disposed-findings record — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (the catalog submission).
+
+### companion-complement-init-line
+
+[spec: SPEC-complement-init-line.md]
+
+a companion `complement` install (`init --profile full` with three `--without-kit` and a `--recipe`) reports `INIT: vendored 8 kit(s) at the full profile` and commits `chore: vendor Checkwright kits (full profile, ...)`, so a tester who asked for `complement` reads that `full` was installed; the lock is right. Rehearsed 2026-10-17 at `companion-adoption-rehearsal` on Spec Kit and OpenSpec.
+
+**Deliverable:** the `INIT:` line and the commit subject naming the left-out kits or the selection, in installer/SPEC.md §init and its crate test.
+
+The quoted line was settled at spec by reading `init.rs`: both lines print the profile name alone, and the count is the selected set's, eleven payload kits less the three left out.
+
+**Cost while deferred:** one line of tester confusion per complement install, with no wrong behaviour. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet of that date; not fixed at close because it changes `init`'s user-facing output, whose wording is spec's. Owner lookup: `INIT:`, `complement`, `commit subject` in this file and the disposed-findings record — none; owner installer/SPEC.md §init.
+
 ## Technical Debt
 
 ### prove-claim-path-confinement
@@ -407,28 +429,6 @@ the adopter is increasingly a coding agent comparing tools and recommending or s
 **Deliverable:** those sites reworded under the bounded-promise rule.
 
 **Cost while deferred:** an evaluating agent quoting the orchestration page reads structural evidence checks as semantic verification, the overreach `bounded-promise-phrasing` closed on the first screen. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet build filed that day; not fixed at close because the operator's direction of that day (lead-relayed, not a ruling) chose first-screen-only reach for that unit, so this reach is a scope's to take. Re-verified there by grep: the title and lines 9, 11 and 24 of the page, and the index line. Owner lookup: `orchestration`, `verification layer` in this file and the disposed-findings record — none; `bounded-promise-phrasing`, done, DISTINCT (the first screen); owner docs/positioning.md §The bounded promise.
-
-### companion-prove-not-held
-
-[cost: event/low] [surface: installer]
-
-every companion `prose` and `complement` install, Spec Kit and OpenSpec alike, prints an `init` then: line offering `prove`, and `prove` answers not held, exit 1, with a help line steering to `--profile full`, by construction: §prove's claim reads lifecycle state files, which `complement` leaves out because the toolkit does that job (`companion/exclusions.list`). The companion's own done claim, a ticked task naming an absent path, is caught by `check-task-path-claim`, which `prove` never stages. `full` installs report held. Rehearsed 2026-10-17 at `companion-adoption-rehearsal`.
-
-**Deliverable:** design-pending, spec's: either `prove` gains a companion claim (a ticked task naming an absent path in the recipe's task-list glob), or the then: line is withheld or reworded where no claim can be staged; owners installer/SPEC.md §prove and §init, companion/SPEC.md.
-
-**Cost while deferred:** a companion tester's first proof step reports failure and recommends the tier the companion exists to avoid. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet of that date; spec-conformant, so a design question rather than a fix. Re-verified there by reading §prove step 4 and `companion/exclusions.list`. Owner lookup: `prove`, `then: line`, `companion` in this file and the disposed-findings record — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (the catalog submission).
-
-### companion-complement-init-line
-
-[cost: event/low] [surface: installer]
-
-a companion `complement` install (`init --profile full` with three `--without-kit` and a `--recipe`) reports `INIT: vendored 8 kit(s) at the full profile` and commits `chore: vendor Checkwright kits (full profile, ...)`, so a tester who asked for `complement` reads that `full` was installed; the lock is right. Rehearsed 2026-10-17 at `companion-adoption-rehearsal` on Spec Kit and OpenSpec.
-
-**Deliverable:** the `INIT:` line and the commit subject naming the left-out kits or the selection, in installer/SPEC.md §init and its crate test.
-
-**Inferred, not run:** the rehearsal's quoted line, read from build's report rather than a re-run here.
-
-**Cost while deferred:** one line of tester confusion per complement install, with no wrong behaviour. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet of that date; not fixed at close because it changes `init`'s user-facing output, whose wording is spec's. Owner lookup: `INIT:`, `complement`, `commit subject` in this file and the disposed-findings record — none; owner installer/SPEC.md §init.
 
 ## Icebox
 
