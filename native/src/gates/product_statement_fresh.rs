@@ -26,20 +26,22 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut findings: Vec<String> = Vec::new();
     for site in &sites {
         let text = fresh::read_captured(site).map_err(|e| format!("{}: {}", site, e))?;
-        let (slot, want) = ps::check(site, &text, &st)?;
-        if slot.actual != want {
-            findings.push(format!(
-                "  {}:{}: stale — carries {}, the source renders {}",
-                site,
-                slot.line,
-                slot.actual.trim(),
-                want.trim()
-            ));
+        for (slot, want) in ps::check(site, &text, &st)? {
+            if slot.actual != want {
+                findings.push(format!(
+                    "  {}:{}: stale {} — carries {}, the source renders {}",
+                    site,
+                    slot.line,
+                    slot.field,
+                    slot.actual.trim(),
+                    want.trim()
+                ));
+            }
         }
     }
     if !findings.is_empty() {
         println!(
-            "check-product-statement-fresh: {} site(s) differ from the product statement in {}:",
+            "check-product-statement-fresh: {} slot(s) differ from the product statement in {}:",
             findings.len(),
             source
         );

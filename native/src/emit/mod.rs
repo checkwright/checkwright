@@ -41,6 +41,7 @@ pub mod journal;
 pub mod kfric;
 pub mod kpi;
 pub mod lesson_sink;
+pub mod llms;
 pub mod manual_ops;
 pub mod md_index;
 pub mod md_section;
@@ -311,6 +312,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-product-statement",
         Arm::Emit(product_statement::emit, Grammar::Flags(&["--write"])),
         &[product_statement::SOURCE_KNOB, product_statement::SITES_KNOB],
+    ),
+    // spec: docs/agent-index.md §Inputs — the
+    // agent index reads the docs root and the product statement's source, both declared knobs
+    (
+        "--emit-llms",
+        Arm::Emit(llms::emit, Grammar::Flags(&["--write"])),
+        &[llms::ROOT_KNOB, product_statement::SOURCE_KNOB],
     ),
     (
         "--emit-support-table",

@@ -1,0 +1,28 @@
+<!-- door-contributor: every door below is copied from a menu page the door gate sweeps at its source -->
+# Fixture Site
+
+> Fixture checks. They catch a fixture claim.
+
+Source: https://fixture.example/
+
+# Fixture
+
+Start with the [guide](https://fixture.example/guide.html), then the [tool's spec](https://fixture.example/tool/SPEC.html#usage).
+
+Source: https://fixture.example/guide.html
+
+# Guide
+
+See [below](https://fixture.example/guide.html#use) and the [graph](https://fixture.example/graph.html).
+
+## Use
+
+```sh
+echo "[kept](kept.md)"
+```
+
+Source: https://fixture.example/tool/
+
+# tool
+
+Its [spec](https://fixture.example/tool/SPEC.html) and the [home page](https://fixture.example/).

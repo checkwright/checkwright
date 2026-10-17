@@ -25,7 +25,9 @@
 258664cp delegation-kit/SPEC.md
 40479cp delegation-kit/templates/agent-execution.md
 3397cp delegation-kit/templates/dispatch-checklists.md
+3468cp docs/agent-index.md
 1308cp docs/canon-kit/index.md
+5160cp docs/choosing.md
 1677cp docs/context-kit/index.md
 4343cp docs/ddd.md
 1311cp docs/delegation-kit/index.md
@@ -33,7 +35,7 @@
 1285cp docs/drift-kit/index.md
 1351cp docs/evidence-kit/index.md
 1463cp docs/gate-sdk/index.md
-9561cp docs/generated-projections.md
+10724cp docs/generated-projections.md
 1259cp docs/guard-kit/index.md
 5230cp docs/index.md
 8768cp docs/install-block-contracts.md
@@ -80,11 +82,11 @@
 6070cp docs/posts/2026-09-28-checkwright-v0-29-0.md
 6808cp docs/posts/2026-09-29-checkwright-v0-30-0.md
 4672cp docs/posts/2026-09-30-checkwright-v0-31-0.md
-6752cp docs/projection-fan-outs.md
+7065cp docs/projection-fan-outs.md
 1460cp docs/queue-kit/index.md
 789cp docs/releases.md
 8690cp docs/requirements.md
-5910cp docs/site-architecture.md
+6104cp docs/site-architecture.md
 2412cp docs/site-kit/index.md
 5463cp docs/spec-toolkits.md
 3183cp docs/speckit.md

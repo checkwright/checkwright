@@ -1,0 +1,78 @@
+# Checkwright
+
+> Reproducible checks that catch unsupported claims in coding-agent delivery before merge: a task marked done with no recorded test run, a skipped lifecycle stage, a spec naming a file the tree lacks. They prove the evidence a claim rests on exists, not that the code is correct.
+
+## Choosing
+
+- [Choosing](https://checkwright.dev/choosing.html): When Checkwright fits a repository where coding agents commit, when it does not, and how it compares with the alternatives.
+
+## Why Checkwright
+
+- [Why Checkwright](https://checkwright.dev/methodology.html)
+- [Orchestration](https://checkwright.dev/orchestration.html)
+- [Domain-driven design](https://checkwright.dev/ddd.html)
+- [Where Checkwright sits](https://checkwright.dev/positioning.html)
+
+## Install
+
+- [Install](https://checkwright.dev/install.html)
+- [Requirements](https://checkwright.dev/requirements.html)
+- [Manual steps](https://checkwright.dev/manual-install.html)
+- [Maintenance](https://checkwright.dev/maintenance.html)
+
+## Spec toolkits
+
+- [Spec toolkits](https://checkwright.dev/spec-toolkits.html)
+- [Spec Kit](https://checkwright.dev/speckit.html)
+- [OpenSpec](https://checkwright.dev/openspec.html)
+
+## Value
+
+- [Value](https://checkwright.dev/value.html)
+- [Enforcement map](https://checkwright.dev/enforcement.html)
+- [Footprint](https://checkwright.dev/footprint.html)
+
+## Kit Reference
+
+- [Kit Reference](https://checkwright.dev/kits.html)
+- [gate-sdk](https://checkwright.dev/gate-sdk/)
+- [lifecycle-kit](https://checkwright.dev/lifecycle-kit/)
+- [queue-kit](https://checkwright.dev/queue-kit/)
+- [canon-kit](https://checkwright.dev/canon-kit/)
+- [guard-kit](https://checkwright.dev/guard-kit/)
+- [delegation-kit](https://checkwright.dev/delegation-kit/)
+- [context-kit](https://checkwright.dev/context-kit/)
+- [drift-kit](https://checkwright.dev/drift-kit/)
+- [evidence-kit](https://checkwright.dev/evidence-kit/)
+- [site-kit](https://checkwright.dev/site-kit/)
+- [doctrine-kit](https://checkwright.dev/doctrine-kit/)
+
+## Optional
+
+- [Install spec](https://checkwright.dev/installer/SPEC.html)
+- [Install plugin](https://checkwright.dev/plugin/SPEC.html)
+- [Spec toolkits spec](https://checkwright.dev/companion/SPEC.html)
+- [gate-sdk README](https://checkwright.dev/gate-sdk/README.html)
+- [gate-sdk SPEC](https://checkwright.dev/gate-sdk/SPEC.html)
+- [lifecycle-kit README](https://checkwright.dev/lifecycle-kit/README.html)
+- [lifecycle-kit SPEC](https://checkwright.dev/lifecycle-kit/SPEC.html)
+- [queue-kit README](https://checkwright.dev/queue-kit/README.html)
+- [queue-kit SPEC](https://checkwright.dev/queue-kit/SPEC.html)
+- [canon-kit README](https://checkwright.dev/canon-kit/README.html)
+- [canon-kit SPEC](https://checkwright.dev/canon-kit/SPEC.html)
+- [guard-kit README](https://checkwright.dev/guard-kit/README.html)
+- [guard-kit SPEC](https://checkwright.dev/guard-kit/SPEC.html)
+- [delegation-kit README](https://checkwright.dev/delegation-kit/README.html)
+- [delegation-kit SPEC](https://checkwright.dev/delegation-kit/SPEC.html)
+- [context-kit README](https://checkwright.dev/context-kit/README.html)
+- [context-kit SPEC](https://checkwright.dev/context-kit/SPEC.html)
+- [drift-kit README](https://checkwright.dev/drift-kit/README.html)
+- [drift-kit SPEC](https://checkwright.dev/drift-kit/SPEC.html)
+- [evidence-kit README](https://checkwright.dev/evidence-kit/README.html)
+- [evidence-kit SPEC](https://checkwright.dev/evidence-kit/SPEC.html)
+- [site-kit README](https://checkwright.dev/site-kit/README.html)
+- [site-kit SPEC](https://checkwright.dev/site-kit/SPEC.html)
+- [doctrine-kit DOCTRINE](https://checkwright.dev/doctrine-kit/DOCTRINE.html)
+- [doctrine-kit README](https://checkwright.dev/doctrine-kit/README.html)
+- [doctrine-kit SPEC](https://checkwright.dev/doctrine-kit/SPEC.html)
+- [Releases](https://checkwright.dev/releases.html)

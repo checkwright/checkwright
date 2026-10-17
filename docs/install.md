@@ -1,7 +1,7 @@
 ---
 title: Install
 nav_id: install
-nav_order: 3
+nav_order: 4
 nav_suffix: spec=installer/SPEC.md plugin=plugin/SPEC.md
 ---
 

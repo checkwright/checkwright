@@ -1,0 +1,3 @@
+2 agent index file(s) differ from their rendering
+docs/llms.txt: stale
+docs/llms-full.txt: stale

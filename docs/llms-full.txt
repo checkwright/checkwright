@@ -1,0 +1,1422 @@
+<!-- door-contributor: every door below is copied from a menu page the door gate sweeps at its source -->
+# Checkwright
+
+> Reproducible checks that catch unsupported claims in coding-agent delivery before merge: a task marked done with no recorded test run, a skipped lifecycle stage, a spec naming a file the tree lacks. They prove the evidence a claim rests on exists, not that the code is correct.
+
+Source: https://checkwright.dev/
+
+# Checkwright
+
+**Reproducible checks that catch unsupported claims in coding-agent delivery before merge:** a task marked done with no recorded test run, a skipped lifecycle stage, a spec naming a file the tree lacks. They prove the evidence a claim rests on exists, not that the code is correct.
+
+It is for the maintainer of a repository coding agents write most of, who has to answer at merge time whether the work is actually done and cannot answer it by reading every diff.
+
+**It [complements the workflow you already run](https://checkwright.dev/spec-toolkits.html).** Keep your spec process, your prompts, your harness. Add Checkwright where a claim has to be mechanically proven rather than asserted: the instructions shape, the gates enforce. Why that split is the whole design: [Positioning](https://checkwright.dev/#positioning).
+
+## Try it first
+
+`demo` runs the whole arc in a scratch repository of its own and removes it, without touching yours; what it does and what it needs first: [Try it first](https://checkwright.dev/install.html#try-it-first).
+
+```sh
+curl -fsSL https://checkwright.dev/install.sh | sh -s -- demo                  # macOS and Linux
+```
+
+```powershell
+& ([scriptblock]::Create((irm https://checkwright.dev/install.ps1))) demo      # Windows, in PowerShell
+```
+
+```sh
+npx checkwright demo                                                           # with Node
+```
+
+## Install
+
+From your repository's root, in a new project or an existing one with every change committed, the same three routes without `demo` install the kits as one commit, the first two from the Release tarball:
+
+```sh
+curl -fsSL https://checkwright.dev/install.sh | sh                             # macOS and Linux
+```
+
+```powershell
+irm https://checkwright.dev/install.ps1 | iex                                  # Windows, in PowerShell
+```
+
+```sh
+npx checkwright init                                                           # with Node
+```
+
+Per-system prerequisites, profiles and the other verbs: [Install and upgrade](https://checkwright.dev/install.html).
+
+## What that buys you
+
+**Before.** A session finishes a task, moves it to Done and stamps the iteration validated and closed; the evidence is the session's own say-so. The commit goes in green, and the next stateless session reads it as ground truth.
+
+**After.** The battery reds on the claim. This is `demo`'s third act as it prints, trimmed of its remedy, help and spec text:
+
+```text
+  An agent reports task add-login-page done: it moves the task to Done and stamps
+  validate and close for iteration first-release, but no test run was ever recorded.
+
+  | ===== check-evidence-manifest =====
+  | EVIDENCE-MANIFEST: 1 issue(s) coupling .workflow/validate-evidence.txt to .workflow/WORKFLOW-STATE.txt:
+  |   iteration 'first-release' has a validate stamp but no evidence line — validate ran and recorded nothing
+  |   FAIL: check-evidence-manifest (exit 1)
+  → caught. Registered as a hook, this would have refused the commit.
+```
+
+Nothing there is a review opinion. Each finding is cheap and mechanically decidable, which is what earns it the right to block a commit rather than open a thread; the semantic residue stays with the human or the agent, undiluted.
+
+That is what **verification under delegation** means, and it is the prerequisite for scaling agent orchestration past the point where a human reads every hop: coordination is only worth parallelizing once each coordinated result is checkable.
+
+Which harnesses it runs under, and what adapts to yours: the [tiered compatibility claim](https://checkwright.dev/positioning.html#the-tiered-compatibility-claim).
+
+## Start here
+
+1. [Why Checkwright](https://checkwright.dev/methodology.html) — the delivery-methodology essay: what goes wrong when agents write, and the shape of the remedy.
+2. [Value](https://checkwright.dev/value.html) — what each kit enforces set against what it costs your context budget, joined from the registries; drills down to the [enforcement map](https://checkwright.dev/enforcement.html) and the [footprint](https://checkwright.dev/footprint.html).
+3. [Coupling graph](https://checkwright.dev/check-graph.html) — which content surfaces each gate binds together, emitted from the per-gate manifests.
+4. [Roadmap](https://github.com/checkwright/checkwright/blob/master/ROADMAP.md) — where the project is heading and what moves an item.
+5. [Announcing Checkwright](https://checkwright.dev/posts/2026-07-09-announcing-checkwright.html) — the launch note.
+
+## The kits
+
+Each kit has its own page, listed in reading order under [Kit Reference](https://checkwright.dev/kits.html) in the navigation, and each assumes the machinery of the ones above it. The Kit Reference page glosses every kit in one line.
+
+## Positioning
+
+Where Checkwright sits against practices you may already run, one page per angle.
+
+- [Where Checkwright sits](https://checkwright.dev/positioning.html) — the layer model: Checkwright as layer-4 content beneath a closed harness prompt, plus its tiered harness-compatibility claim and memory-off position.
+- [Domain-driven design](https://checkwright.dev/ddd.html) — Checkwright as the enforcement layer for a ubiquitous language: banned synonyms, comment and naming directives, and one home per definition.
+- [Agent orchestration](https://checkwright.dev/orchestration.html) — Checkwright as the verification layer beneath a coordination framework: the gates, budget guard, stage stamps, and evidence manifest that make delegated work checkable.
+
+Source: https://checkwright.dev/choosing.html
+
+# Choosing Checkwright
+
+Checkwright catches reproducible classes of unsupported claims in coding-agent delivery before merge, checking that the evidence a claim rests on exists rather than that the code is correct ([the bounded promise](https://checkwright.dev/positioning.html#the-bounded-promise)). This page is for a person or a coding agent deciding whether Checkwright fits a repository.
+
+## When it fits
+
+Checkwright fits a repository where coding agents commit and the team wants three claims caught before merge: a task marked done with no recorded test run, a skipped lifecycle stage, and a spec naming a path the tree lacks. Checkwright's checks run at commit and in CI with no agent harness, on a host where git is the one tool already required ([Requirements](https://checkwright.dev/requirements.html)). A team using Spec Kit or OpenSpec gets the artifacts those toolkits write held to the tree ([Spec toolkits](https://checkwright.dev/spec-toolkits.html)). Trying Checkwright is reversible: `demo` runs it in a scratch repository, and `uninstall` removes it ([Install](https://checkwright.dev/install.html)).
+
+## When it does not fit
+
+Checkwright does not fit a team that needs code judged correct, because its gates check that evidence exists and agrees with the tree, never what the code does ([What the gates check against your code](https://checkwright.dev/spec-toolkits.html#what-the-gates-check-against-your-code)). Checkwright does not fit a team that needs signed records of agent sessions or a party outside the repository vouching for a run. Checkwright signs no record of a run. The evidence-kit manifest a run writes is unsigned, the input such a party would verify ([`evidence-kit/SPEC.md` §Evidence manifest](https://checkwright.dev/evidence-kit/SPEC.html#evidence-manifest)). A team wanting the lifecycle workflow without the gates finds no profile that ships it, as the next section shows.
+
+## What you install
+
+Each install profile is a set of kits ([`installer/SPEC.md` §Profiles](https://checkwright.dev/installer/SPEC.html#profiles)). The `starter` profile is gate-sdk alone. The `prose` profile adds canon-kit. The `delegation` profile adds the kits whose subject is the agent session. The `full` profile is every kit. The checks run without the workflow, since `starter` and `prose` carry no lifecycle-kit and the companion recipes gate another toolkit's workflow. The workflow does not run without the checks, since every profile carrying lifecycle-kit carries gate-sdk. Under `delegation`, lifecycle-kit's checks enforce nothing until the files each one reads exist.
+
+## Alternatives
+
+The paragraphs on Chainloop and agent-attest state each project as its README did on 2026-10-17.
+
+**Your own CI.** Pre-commit hooks, scripts the team writes and required status checks can reproduce any single check here, for a team that writes and maintains it. Checkwright adds checks already written for the claims coding agents make, each shipping with a passing and a failing fixture and failing closed when it cannot run. It also adds the process state those checks read: the task queue, the stage stamps and the recorded test runs.
+
+**[Chainloop](https://github.com/chainloop-dev/chainloop)** (Apache-2.0) records coding-agent sessions, attesting them on `git push`, and CI outputs such as software bills of materials (SBOMs), scans and test reports. Each record is a signed, timestamped in-toto attestation kept in the team's Open Container Initiative (OCI) registry, S3 or Azure Blob, the CLI sending records to Chainloop Cloud by default. Policies in Rego or WebAssembly (WASM), which the team writes, say what each record must satisfy. A policy marked gating fails the CI job when a rule breaks, and a push is rejected where no session was recorded. Its PR merge check is in the paid Platform. Chainloop fits where the requirement is signed, stored evidence of what agents and pipelines did, judged by the team's own policies. Checkwright fits where the claim to check is in the repository's own files, with no keys and no record store.
+
+**[agent-attest](https://github.com/zhengqiuyang/agent-attest)** (MIT) writes an ed25519-signed in-toto attestation per commit under `.agent-attest/`, recording the agent, a hash of the prompt, the run's timing and exit code, and the result of a verification command. It marks whether that command was executed or only claimed. Its `gate` fails a commit touching a configured protected path when the commit has no valid passing attestation. It runs on Node. agent-attest fits where the requirement is a signed chain of custody for agent commits on protected paths. Checkwright fits where the requirement is checks over the task, stage and spec state a claim rests on.
+
+## Limits
+
+- What a gate promises, and what it does not, is stated in the bounded promise.
+- What the toolkit companion does not cover is stated in the [Spec toolkits limits](https://checkwright.dev/spec-toolkits.html#limits).
+- Which installs have been observed, and on which systems, is recorded in the [install evidence](https://checkwright.dev/install-evidence.html).
+- No check holds the Alternatives section's statements about other projects, which read as of the date that section gives.
+
+Source: https://checkwright.dev/methodology.html
+
+# Why Checkwright
+
+## The problem: discipline that does not hold
+
+Software teams keep their conventions in prose — style guides, spec documents, the comment at the top of the tricky file, the shared understanding that this list stays in sync with that one. This works because a human developer reads the prose, remembers it, and feels the friction when a change violates it.
+
+Coding agents break that mechanism. An agent session is stateless: it does not reliably re-read the convention it violated last week, because it was not there last week. It restates a spec in a comment and neither notices when the two diverge. It adds the ninth item to a list and forgets the registry that was supposed to grow with it. None of this is incompetence — it is the predictable result of asking a fresh reader, every time, to hold context that was never written down mechanically. The drift is silent, and silence is the whole problem: nobody is signalled.
+
+## The remedy: mechanize the decidable, isolate the semantic
+
+Checkwright's premise is a division of labour. Some consistency questions are mechanically decidable and cheap to check: does this link resolve, does this command exist, does every kit have a registry row, was this stage actually entered. Those belong to a machine. What remains is the irreducibly semantic judgment — is this the right design, does this prose actually explain the thing — and that is where human (or agent) attention should go, undiluted.
+
+So every cheap, low-false-positive, mechanically-decidable axis becomes a **gate**: a small program that scans a surface and blocks the commit when it finds a violation, naming the finding and the fix. The residue — the judgment a gate cannot make — is left to a reviewer who is freed from also playing linter.
+
+A gate earns its place only when it is cheap, rarely wrong, and guards a real failure mode. A gate that cries wolf trains its readers to bypass it, so a false positive is treated as a defect in the gate, not a cost of doing business.
+
+## The enforcement core carries no harness dependency
+
+What runs under any harness, what rides configuration and what stays harness-native is drawn once, on [Where Checkwright sits](https://checkwright.dev/positioning.html#the-tiered-compatibility-claim).
+
+## Why kits
+
+Checkwright is not a monolith. It is a set of kits, each owning one axis of the problem; the [Kit Reference](https://checkwright.dev/kits.html) names each kit and its axis. Installing a kit copies it into your repository whole, where it governs the tree from the inside. You adopt the ones that pay for themselves and leave the rest.
+
+This repository governs itself with the kits from day one — the same gates that ship to you run on the tree that builds them. A methodology that its own authors will not run is a slide deck; this one is dogfooded or it is nothing.
+
+## Where to go next
+
+- [Install](https://checkwright.dev/install.html) — vendor the kits and wire the upgrade contract.
+- [The kits](https://checkwright.dev/#the-kits) — one page each, in reading order.
+
+Source: https://checkwright.dev/orchestration.html
+
+# Agent orchestration: the verification layer beneath it
+
+Agent orchestration frameworks answer *who works on what, and when*: they fan a job out across agents, sequence the hand-offs, and keep many writers moving at once. They do not answer *whether the work is right*. Every delegation hop is a place where "the agent said it passed" can stand in for verification, and drift compounds per hop, so orchestration without a verification layer parallelizes drift.
+
+Checkwright is that second answer. It makes *done* mechanically decidable, so a supervisor (human or agent) can trust a completed unit of work without reading all of it: coordination is only worth scaling once each coordinated result is checkable. Checkwright therefore sits **beneath** an orchestrator, as the verification layer a coordination layer stacks on. It complements your orchestration setup; it does not replace it.
+
+## The mechanisms
+
+- **Verification survives the adversary.** After every commit a delegated agent makes, the supervisor re-runs the relevant gates and the validate battery rather than trusting the agent's report, and diffs every gate change the commit carries. `check-gate-tamper` blocks the two commit shapes a gate is weakened by: a gate edit staged with the code it judges, and a new exemption that excuses a file in its own commit. It reads a commit's shape, not its intent, so the diff review stays the supervisor's. Owned by [`delegation-kit/SPEC.md §Verify after every agent commit`](https://checkwright.dev/delegation-kit/SPEC.html#verify-after-every-agent-commit).
+- **Every dispatch can be metered.** An optional per-dispatch budget guard, wired as a harness hook, reads the usage verdict before each delegated agent starts and blocks the dispatch when the budget says pause, so a fan-out cannot run away with the token budget. Owned by [`delegation-kit/SPEC.md §The delegation model`](https://checkwright.dev/delegation-kit/SPEC.html#the-delegation-model).
+- **Stage claims are auditable evidence, not assertions.** Each lifecycle stage stamps a line into a committed state file when it runs, so a stateless supervisor can audit *what happened* by reading the stamps rather than re-reading the work. Owned by [`lifecycle-kit/SPEC.md §The state machine`](https://checkwright.dev/lifecycle-kit/SPEC.html#the-state-machine).
+- **Every run leaves a committed receipt.** A per-run evidence manifest is committed alongside the work, so "this passed" is a durable artifact in the history, checkable after the fact by anyone. Owned by [`evidence-kit/SPEC.md §Evidence manifest`](https://checkwright.dev/evidence-kit/SPEC.html#evidence-manifest).
+
+Together these make the delegation boundary trustworthy: work crosses it with a checkable receipt, not a promise.
+
+## Checkwright's own coordination
+
+Checkwright is a verification layer, not an orchestration layer: the prerequisite for *unattended* orchestration at scale, where no human reads each hop. It carries a small, checkable amount of its *own* coordination:
+
+- **The iteration lead** — a live session that dispatches an iteration's stage sessions as background agents and answers their batched escalations. The protocol is owned by [`lifecycle-kit/SPEC.md §templates/lead.md`](https://checkwright.dev/lifecycle-kit/SPEC.html#templatesleadmd).
+- **Multi-operator semantics** — merge and conflict behavior for the lifecycle's single-writer state surfaces, walked through [below](https://checkwright.dev/orchestration.html#two-operators-one-governed-tree). Owned by [`lifecycle-kit/SPEC.md §Multi-operator semantics`](https://checkwright.dev/lifecycle-kit/SPEC.html#multi-operator-semantics).
+
+Within one iteration that is the extent of it: a lead dispatching its own verified stages. Across operators Checkwright coordinates nothing: it verifies, so whatever coordinates can be trusted to have coordinated correct work. Where the coordination layer goes next is the queue's Deferred section, checkable in the tree.
+
+## Running an iteration under a lead
+
+The lead is a role a session *becomes*, not a stage it runs — and running no lead is equally valid. Two model tiers carry the work: the **judgment tier**, the stronger and pricier model you trust with design decisions, and the **routing tier**, a cheaper model that is enough for dispatching sessions and passing messages between them. The recommended shape is the **split posture**: the lead rides the routing tier and only the judgment-heavy work pays premium prices. It is a trade: a routing-tier lead relays a class of question a judgment-tier one would settle itself, and the lead template's [Economics section](https://github.com/checkwright/checkwright/blob/master/lifecycle-kit/templates/lead.md#economics--batch-and-compact-where-it-pays) states the trade and how to measure it.
+
+Each tier is bound to a model once, in your delegation config: to a model alias, which follows the newest model the harness names by it, or to an exact model id, which pins it. What each binding costs, and how an upgrade or a bypassed pin shows, are [`delegation-kit/SPEC.md §The tier binding`](https://checkwright.dev/delegation-kit/SPEC.html#the-tier-binding).
+
+To drive an iteration under the split posture:
+
+1. **`/lead` in a fresh session on the routing tier.** The lead role writes no lifecycle state of its own; every stamp and commit stays in the stage sessions it dispatches, so the history reads identically whether or not a lead drove it.
+2. **The lead dispatches `/scope` as a background stage session on the judgment tier.** Scope chooses and names the iteration's work and lands the commit that promotes it into the queue. Its agent stays resumable afterward as the iteration's **intent oracle**: the one session that remembers why the iteration took its shape.
+3. **When the iteration promotes a feature, the lead dispatches `/spec`** — the trigger-gated **amendment-authoring** stage — as a background stage session on the judgment tier. It authors the promoted features' design amendments and pairs each into the queue. A debt-only iteration skips it.
+4. **The lead dispatches each remaining stage** — `/align`, `/build`, `/validate`, `/close` — as a background stage session that runs its skill unchanged, on the tier your binding assigns its class. `validate` runs oracles and rides a cheaper tier; `build` is tiered **per batch**, so only the batches that carry design work stay on the judgment tier. A stage whose work splits into batches is one stage session per batch, each dispatched and verified by the lead; a stage session never dispatches its own siblings.
+5. **A blocked stage escalates to the lead and resumes in place.** The lead rules machinery questions itself; a question about the iteration's *intent* it forwards to the intent oracle and relays the answer back. A question outside the classes the lead may rule reaches the operator. One case does not resume: a cheaper-tier session that finds a fix it must design itself escalates for a fresh judgment-tier session, since a resumed session keeps its model.
+6. **If the oracle cannot be resumed,** the lead answers from the governed surfaces the rulings already live in — the amendments, the queue entries — and hands anything not derivable there to the operator.
+
+The **unified posture** — `/scope` in a live session, `/compact`, then `/lead` in that same session — is simpler when tiering is not a concern; every orchestration turn then re-reads scope's context at scope's prices. To stay hands-on, skip the lead and run each stage manually as an ordinary skill invocation, consulting the scope session when a stage raises a question. The postures and the escalation protocol, including which questions the lead may rule, are owned by `lifecycle-kit/SPEC.md §templates/lead.md`.
+
+## Two operators, one governed tree
+
+A lead drives one iteration. When a second operator works the same repo at the same time, the coordination is git topology, not a new mechanism. Every rule below is owned by `lifecycle-kit/SPEC.md §Multi-operator semantics`.
+
+Picture two iterations live at once — say *surface-trust* and *docs-polish*.
+
+1. **Each iteration owns one branch.** The first operator's iteration lives on its home branch; the second operator cuts a branch at their own `/scope` entry. The integration branch is just the degenerate single-operator home, which is why a solo repo needs none of this.
+2. **Each branch stamps its own state.** `surface-trust`'s stage sessions append its evidence on its branch; `docs-polish` does the same on its. Neither reads the other's state, so the state surfaces stay single-writer while two operators move, and operator attribution rides the git author on each stamp commit.
+3. **At a merge, the iteration-scoped surfaces resolve to the arriving side.** When one branch merges into another, the header line, the evidence file, and the other boundary-truncated surfaces take the checked-out iteration's version wholesale; the other side's copy is per-iteration scratch, and git history keeps the audit trail. The set is *derived* from what the iteration boundary already truncates and held by a `merge=iteration-scoped` driver and a parity gate. Shared backlog and lessons in the queue body merge like any prose; only its header region (the header line with its set record) is resolved by hand, and a wrong header resolution reddens at the next commit under the stage evidence gate.
+4. **Closes serialize at the integration branch.** Each operator closes on their own iteration branch, reconciling by merging the integration branch in; the close-merges land one after another on the integration branch. No lock, no lease — the serialization is the merge order git already imposes.
+
+The through-line: concurrency is isolation git already provides, and verification is unchanged on every branch. Whatever an operator's branch merges passed the battery, so two operators parallelize *checked* work, never drift.
+
+## Where to go next
+
+- [Why Checkwright](https://checkwright.dev/methodology.html) — the delivery-methodology essay behind the mechanism.
+- [The kits](https://checkwright.dev/#the-kits) — one page per kit, in reading order.
+
+Source: https://checkwright.dev/ddd.html
+
+# Domain-driven design: enforcing the ubiquitous language
+
+Domain-driven design asks a team to speak one **ubiquitous language** — a single agreed word for each concept, used identically in conversation, code, and specification. The discipline is famous and famously hard to hold: a synonym creeps in one plausible word at a time, and by the time anyone notices, the model and the vocabulary have quietly diverged.
+
+That divergence is exactly the failure Checkwright exists to stop. A ubiquitous language is the kind of discipline prose alone cannot hold when stateless agent sessions do the writing — a fresh session was not in the room when the team chose the canonical term, so it reaches for whichever synonym reads well. But vocabulary consistency is mechanically decidable: whether a banned word appears in the tree is a question a program can answer. So it belongs to a gate, not to a reviewer's memory.
+
+This page positions Checkwright as the enforcement layer for a ubiquitous language.
+
+## The mechanisms
+
+- **Banned-synonym enforcement.** A pattern file lists the synonyms that may never be committed; a gate scans every tracked file and blocks the commit when one appears. The canonical term wins because its rivals cannot land. Owned by [`gate-sdk/SPEC.md §check-tree-terms`](https://checkwright.dev/gate-sdk/SPEC.html#check-tree-terms).
+- **Comment and naming directives.** The language reaches comments and identifiers too, where a restated definition drifts from the one it copied. Comment discipline — a comment is a directive or it is deleted — is owned by [`canon-kit/SPEC.md §check-comment-tier`](https://checkwright.dev/canon-kit/SPEC.html#check-comment-tier).
+- **One home per definition.** A term is defined once and cited everywhere else, so there is a single place to change when the model moves. The content-tiering doctrine that makes each surface point rather than restate is owned by [`canon-kit/SPEC.md §Content tiering — the star topology`](https://checkwright.dev/canon-kit/SPEC.html#content-tiering--the-star-topology).
+- **Vocabulary as consumer config.** Every banned-word list here takes the same shape: optional consumer configuration a project supplies, following the pattern [`gate-sdk/SPEC.md §check-graph`](https://checkwright.dev/gate-sdk/SPEC.html#check-graph) establishes for rule content that lives outside the kit. This is the honesty clause. The kits ship generic mechanism and stay domain-neutral: no kit carries a domain word, and the coupling to any one domain — including the example below — lives in the consumer's config, never in Checkwright.
+
+## An example
+
+Take a fictional cargo-shipping domain — the classic domain-driven design teaching example — in which `cargo` is the canonical aggregate and `parcel` and `shipment` are synonyms the team has agreed to retire. The consumer writes a pattern file naming the retired words as extended-regex lines:
+
+```
+# cargo-terms.list — retired synonyms for the "cargo" aggregate.
+# One extended regular expression per line; '#' and blank lines are ignored.
+(^|[^A-Za-z])parcel([^A-Za-z]|$)
+(^|[^A-Za-z])shipment([^A-Za-z]|$)
+```
+
+Those long-hand word boundaries are deliberate. The gate matches through a portable extended regular expression engine, which refuses the GNU `\b` escape by name, so a list written with GNU extensions fails closed instead of quietly matching nothing (`gate-sdk/SPEC.md §check-tree-terms`).
+
+Register the tree scan, which no install profile registers for you (pass `--with-gate check-tree-terms` to `init`, or add the name to your `gates.list`), and point it at the list — the pattern-file argument stands in for the standing `GATE_SDK_MSG_PATTERN_FILES` configuration:
+
+```bash
+GATE_SDK_MSG_PATTERN_FILES=cargo-terms.list \
+    bash gate-sdk/bin/run-gates.sh --only check-tree-terms
+```
+
+From then on a session that writes `parcel` where the model says `cargo` is stopped at the commit, with the offending file and line named. Nothing in Checkwright knows what a `cargo` is; the pattern file is the consumer's, and the gate is the enforcement.
+
+## Where to go next
+
+- [Why Checkwright](https://checkwright.dev/methodology.html) — the delivery-methodology essay behind the mechanism.
+- [The kits](https://checkwright.dev/#the-kits) — one page per kit, in reading order.
+
+Source: https://checkwright.dev/positioning.html
+
+# Where Checkwright sits
+
+A coding agent runs inside a stack of layers, and where a tool sits in that stack decides what it can and cannot promise. This page places Checkwright in that stack and states which harnesses it runs under and which it merely adapts to.
+
+## The layer model
+
+Read the stack from the model up:
+
+1. **The model** — the language model that generates the work, token by token.
+2. **The harness** — the agent runtime that loops the model over tools: read a file, write one, run a command.
+3. **The harness prompt** — the closed system instructions the harness ships. The model cannot see around them, and project-level config loads *under* them: it can add, but it cannot override.
+4. **Checkwright** — harness-loaded project content (CLAUDE.md, the stage skills) *plus* gates that run outside the model entirely. It shapes and audits the behavior the lower layers produce.
+
+Checkwright is layer-4 content, and that subordination is the whole design constraint. A layer-4 instruction is a request the harness may honor; it is not a guarantee. The worked ceiling: [upstream Claude Code issue #75214](https://github.com/anthropics/claude-code/issues/75214), where project-level config cannot lift the harness's Task ask-first default, because the default lives in the closed layer-3 prompt. So anything that must hold lives in gates: programs that run outside the model, that a harness cannot re-interpret or decline. The instructions shape; the gates enforce. As [Agent orchestration](https://checkwright.dev/orchestration.html) frames it, Checkwright sits beneath the coordinating layer and claims no security or trust-layer ground.
+
+## The bounded promise
+
+Checkwright's own claims lead with what a gate does: it catches a reproducible class of unsupported claim before merge. A gate checks that the evidence a claim rests on exists and agrees with the tree (a recorded test run, a stage stamp, a path a task names). It does not judge whether the code does what the task says ([What the gates check against your code](https://checkwright.dev/spec-toolkits.html#what-the-gates-check-against-your-code)). So a headline, a release-note opener or a summary names the class caught, and never promises verification, correctness or a guarantee without qualifying it. Each such sentence stands alone, because a coding agent evaluating the tool quotes the sentence to a person, not the page around it.
+
+## The tiered compatibility claim
+
+Compatibility here is tiered, not blanket:
+
+- **Tier one — runs anywhere.** The gate battery is a prebuilt binary, with bash left in the library and tooling around it, over a coreutils toolchain. No gate reads a harness surface, so the battery runs under any harness, under any CI, or under no harness at all. This is the layer that does the enforcing, and it has no harness dependency to compromise.
+- **Tier two — configurable at the core, Claude-Code-native at the edges.** The always-loaded agent file is **configuration, not a port**: [the next section](https://checkwright.dev/positioning.html#running-under-an-agentsmd-harness) runs the kits under an `AGENTS.md` harness. What stays genuinely Claude-Code-native is the residue with no cross-harness target: the stage-skill auto-load bindings (the `.claude/` shims that point a `/build` at its template — one binding, not the mechanism, which is plain markdown run by path) and the settings pins, the session-hook wiring, and memory-off enforcement (no standard cross-harness settings surface exists to port them to).
+
+The part that must be portable — enforcement — is; only the harness-native bindings and settings residue are adapter work. The enforcement tier is tested beside two spec-authoring toolkits, each governed by a recipe on a tree in its own layout: [Spec toolkits](https://checkwright.dev/spec-toolkits.html).
+
+## Running under an AGENTS.md harness
+
+Checkwright defaults to `CLAUDE.md` as the always-loaded agent file, but no kit mechanism resolves that file by literal — each reads its kit's knob. A consumer whose harness reads `AGENTS.md` (or any other always-loaded agent file) runs every kit mechanism by pointing those knobs at that file. The path is exercised: context-kit's `--agents-md-smoke` arm stands up an `AGENTS.md` consumer, sets the knobs below, and runs the full battery green.
+
+Set the agent-file knobs in your kit config seams, each to your agent file:
+
+- `GATE_SDK_AGENT_FILE` — the root-tiering allowlist's agent-file entry (gate-sdk).
+- `LIFECYCLE_KIT_AGENT_FILE` — the lifecycle registration + shim-restatement corpus (lifecycle-kit).
+- `DOCTRINE_KIT_AGENT_FILE` — the always-loaded doctrine block's host (doctrine-kit).
+- `CONTEXT_KIT_SURFACES` and `CONTEXT_KIT_BREVITY_FILE` — the measured always-loaded surface and the brevity target (context-kit).
+- `CANON_KIT_MANIFEST_FILES` — the prose manifest that must govern the agent file (canon-kit).
+
+The kit-injected always-loaded blocks (each kit's `` / `` markers) land in whichever file `CONTEXT_KIT_SURFACES` names. The stage skills need no Claude shim grammar: an `AGENTS.md` harness runs a stage by invoking its template (`lifecycle-kit/templates/stages/*.md`) directly.
+
+Two honest limits:
+
+- **Settings stay Claude-Code-native.** The settings pins, the session-context hook wiring, and memory-off enforcement are the residue tier two names.
+- **Trigger lists carry default literals.** The gates' `# graph:` manifests carry the default `CLAUDE.md` literal, and the pre-commit hook's selection and the graph artifact's trigger lists both read them. A nondefault agent file means adjusting the affected `# graph:` trigger lines and regenerating the graph artifact, or relying on full-battery runs (the gate binary's `--run`), which read the knobs and are agent-file-agnostic.
+
+## The memory-off position
+
+Durable guidance belongs in tracked manifests — the CLAUDE.md, the kit SPECs, committed briefs — that the whole team and every fresh session read identically from the tree. It does not belong in per-user harness memory, which forks silently: one operator's remembered fact is invisible to the next session and to every teammate, so the guidance an agent acts on stops being auditable from the repository alone. Checkwright therefore holds harness auto-memory off with a gate, across whichever memory convention a harness offers. The invariant is owned by [`context-kit/SPEC.md §The memory-off doctrine`](https://checkwright.dev/context-kit/SPEC.html#the-memory-off-doctrine) and enforced by `check-memory-off`.
+
+## The design-philosophy contrast
+
+Approaches that make a coding agent follow a process cluster into recognizable stances. The contrast is drawn at the level of stance, not feature: a scored capability table would be a maintained artifact that rots the moment either side changes.
+
+**Against the rules-file stance.** The common approach writes the process down as a conventions file the agent is asked to follow at load time. Checkwright loads such a file too, but treats it as the *shaping* half only; the enforcing half lives in gates that run outside the model. That split is what the provenance seam protects, the rule that a kit ships generic mechanism and never the rule content of the project it came from. So the mechanism ships and publishes no one's rules. A single conventions file instead fuses process and private content into one artifact you can neither share without leaking nor keep without re-authoring.
+
+**Against the harness-memory stance.** The other approach lets the agent accumulate learned process in per-user memory that carries across sessions. Checkwright holds that memory off (the position above) and puts the process in a state machine instead: which stage a task sits in, and the evidence advancing it, are tracked files that every session and every teammate reads identically from the tree. Remembered process answers only to the operator who taught it; a state machine over the tree answers to the repository. The machine is owned by [`lifecycle-kit/SPEC.md §The state machine`](https://checkwright.dev/lifecycle-kit/SPEC.html#the-state-machine).
+
+Both other stances put what governs the work where only the model, or only one operator, can see it. Checkwright's wager is the opposite: enforcement outside the model, state on the tree, so the process that produced any commit is auditable from the repository alone.
+
+## Matching effort to the stage
+
+The stages do not make equal demands on the model, and it is worth dialing effort to match. Scope and align are the reasoning-dense stages: scope decides what a task *is* and where its boundary falls, and align reconciles the spec corpus and resolves cross-component amendments, where a wrong call travels furthest before code exists to catch it. Build is the mechanical stage: it implements a settled plan against a spec, with the gates there to catch a drifting hand. Validate and close stay judgment-heavy in another register: validate weighs whether the evidence earns the claim, and close triages what was learned against what to defer.
+
+So spend the model's deepest reasoning where a mistake is a *design* mistake (scope, align) or a judgment over evidence (validate, close), and let a mechanical build run leaner. These are effort tiers, never a stage-to-model roster, which would rot with the next model lineup and bind the methodology to one vendor. Which model or setting realizes each tier is the operator's call.
+
+This dial is orthogonal to delegation. The token lever owned by [`delegation-kit/SPEC.md §The delegation model`](https://checkwright.dev/delegation-kit/SPEC.html#the-delegation-model) decides *where* work runs, fanning audits and sweeps out to sub-agents to spare the session's context, while effort-tiering decides *how hard the model thinks*. A build can be low-effort and heavily delegated, an align high-effort and not delegated at all.
+
+## Where to go next
+
+- [Why Checkwright](https://checkwright.dev/methodology.html) — the delivery-methodology essay behind the mechanism.
+- [The kits](https://checkwright.dev/#the-kits) — one page per kit, in reading order.
+
+Source: https://checkwright.dev/install.html
+
+# Install and upgrade
+
+This page gets the kits into your repository, keeps them current, and takes them out again. Checkwright is vendored: `init` copies the kit source into your tree and commits it, so what governs your repository is committed and reviewable. The gate binary is the one compiled piece, and it is checked against a published digest before anything runs. The [footprint page](https://checkwright.dev/footprint.html) prices each kit in agent context.
+
+## Requirements
+
+An install needs a supported system and a few tools, and [What an install requires](https://checkwright.dev/requirements.html) lists both.
+
+## Install
+
+Run the one line for your system from your repository's root, in a new project or an existing one with every change committed: `init` makes one commit and refuses a dirty worktree. The line downloads the newest Release tarball, checks it against its published digest and, where `gh` is signed in and the release is attested, against its build attestation, unpacks it outside your repository and runs `init`, with no runtime to install first. A step-by-step form is linked under each line. The recommended path starts with `demo`, to see the guarantee. Then install with your line and run the commands `init` prints.
+
+Pick your route:
+
+- **macOS or Linux:** [the one line and its steps](https://checkwright.dev/install.html#macos-and-linux).
+- **Windows:** [natively, in PowerShell](https://checkwright.dev/install.html#windows).
+- **Windows through Windows Subsystem for Linux (WSL):** the [macOS and Linux](https://checkwright.dev/install.html#macos-and-linux) line, in your WSL shell. The install places the Linux gate binary and the pre-commit hook runs it, so commit to that repository from WSL too: Git for Windows cannot start the Linux binary.
+- **With Node:** [`npx checkwright init`](https://checkwright.dev/install.html#with-node).
+- **In Claude Code:** [the plugin marketplace](https://checkwright.dev/install.html#from-a-plugin-marketplace).
+- **With another coding agent:** [a prompt to give it](https://checkwright.dev/install.html#with-another-coding-agent).
+
+### Try it first
+
+`demo` in place of `init` runs the whole arc in a scratch repository of its own and removes it, without touching yours: it installs the `full` profile, runs the battery green, commits a task marked done with no evidence behind it and shows the claim caught, then withdraws the claim and runs green again. Its spellings are `sh -s -- demo` on the macOS and Linux line or the script-block form with `demo` on Windows; with Node, `npx checkwright demo`. On Windows, run the `PATH` block below first.
+
+### macOS and Linux
+
+**You need** the tools [Requirements](https://checkwright.dev/install.html#requirements) lists for installing on Linux and macOS.
+
+On macOS, stock bash is 3.2, below the floor. If your profile owes `bash` (Requirements), run this block, which installs Homebrew's bash and puts it first on your `PATH`, now and in `~/.zprofile`. If your login shell is bash, use `~/.bash_profile` instead. The floor's grounds are in [installer/SPEC.md](https://checkwright.dev/installer/SPEC.html#requirements) and context-kit's [env-probe](https://checkwright.dev/context-kit/SPEC.html#binenv-probe).
+
+```sh
+brew install bash \
+  && echo "export PATH=\"$(brew --prefix)/bin:\$PATH\"" >> ~/.zprofile \
+  && export PATH="$(brew --prefix)/bin:$PATH"
+```
+
+Then, from your repository root:
+
+```sh
+curl -fsSL https://checkwright.dev/install.sh | sh
+```
+
+The script is `docs/install.sh` in this repository; read it at <https://checkwright.dev/install.sh> before you pipe it. To pass arguments, name the verb first, since the line runs `init` only when given none: end the line with `sh -s -- init --profile prose`, `sh -s -- demo` or `sh -s -- uninstall`.
+
+The same install, one step at a time: [Installing step by step on macOS and Linux](https://checkwright.dev/manual-install.html#macos-and-linux).
+
+### Windows
+
+This is the native Windows route. Under WSL, take [macOS and Linux](https://checkwright.dev/install.html#macos-and-linux).
+
+**You need** the tools [Requirements](https://checkwright.dev/install.html#requirements) lists for installing on Windows, where the minimum Windows version is stated too. Git for Windows' bash is also what runs any shell gate you write, and a gate you write in PowerShell needs none ([Writing your own PowerShell gates](https://checkwright.dev/requirements.html#writing-your-own-powershell-gates)).
+
+The pre-commit hook needs no shell: it is the gate binary under the hook's name, and git starts it directly. The battery needs none either: run the gate binary with `--run`, or `gate-sdk/bin/run-gates.ps1` from PowerShell.
+
+Run this block in PowerShell first. It puts Git's `usr\bin` and `bin` on your `PATH`, for this session and every later one:
+
+```powershell
+. {
+  $exec = if (Get-Command git -ErrorAction SilentlyContinue) { git --exec-path }
+  if (-not $exec -or $LASTEXITCODE -ne 0) { throw 'git --exec-path named no directory: install Git for Windows, then run this block again' }
+  $git = Split-Path (Split-Path (Split-Path ($exec -replace '/', '\')))
+  [Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + ";$git\usr\bin;$git\bin", 'User')
+  $env:PATH = "$git\usr\bin;$git\bin;$env:PATH"
+}
+```
+
+Then, in PowerShell, from your repository root:
+
+```powershell
+irm https://checkwright.dev/install.ps1 | iex
+```
+
+The script is `docs/install.ps1` in this repository; read it at <https://checkwright.dev/install.ps1> before you pipe it. To pass arguments, run it as a script block, the verb first: `& ([scriptblock]::Create((irm https://checkwright.dev/install.ps1))) init --profile prose`, or `demo`, or `uninstall`.
+
+To run each step yourself on Windows: [Installing step by step](https://checkwright.dev/manual-install.html#windows).
+
+### With Node
+
+`npx checkwright init` runs the same `init` from the npm package, which carries npm's provenance attestation as the tarball carries a GitHub build attestation ([installer/SPEC.md](https://checkwright.dev/installer/SPEC.html#the-dependency-boundary)). `init` verifies the gate binary with `sha256sum` or `shasum`, and refuses without one. It needs Node 8.2 or later ([Requirements](https://checkwright.dev/install.html#requirements)).
+
+### From a plugin marketplace
+
+In Claude Code, add Checkwright's marketplace and install its plugin:
+
+```text
+/plugin marketplace add checkwright/checkwright
+/plugin install checkwright@checkwright
+```
+
+The plugin installs no kit: it registers Checkwright's lifecycle skills and its guards. Ask for its `install` skill in your repository: it chooses a profile with you and runs the same `init` this page documents. Then ask for its `adopt` skill: it fits the knobs to your layout, and works through the first reds with you until the battery is green or each has a disposition you accept. Any Agent Plugins client loads the repository's `plugin/` directory by its own install route ([plugin/README.md](https://checkwright.dev/plugin/README.html)).
+
+### With another coding agent
+
+Give your agent this prompt:
+
+```text
+Install Checkwright in this repository. Choose a profile with me from https://checkwright.dev/install.html#choosing-a-profile, then install it as https://checkwright.dev/install.html#install describes for this host, and run each command init prints. Then follow gate-sdk/templates/adopt.md.
+```
+
+The last step is the same walk the plugin's `adopt` skill runs.
+
+### Choosing a profile
+
+`init` vendors the kits, writes a `gates.list` and the config files they read, records the install in `checkwright.lock`, and makes one commit. It ends by printing the commands that finish the setup; run them.
+
+Choose a profile with `--profile`. If another toolkit writes your specs, pass `--recipe` with the toolkit's name, as [Spec toolkits](https://checkwright.dev/spec-toolkits.html) shows. With none, a first install takes `starter` and a re-run keeps the profile the install recorded:
+
+- `starter` — the gate SDK on its own;
+- `delegation` — adds the kits for agent sessions;
+- `prose` — adds canon-kit, for a repository of documents;
+- `full` — everything.
+
+Moving to a profile that contains yours only adds. `init` refuses outside a git work tree or in a repository git refuses to read (the refusal names the command that prints why), on a dirty worktree (`--no-commit` stages instead of committing), or when `checkwright doctor` finds a missing tool. Re-running it is safe: it reports files you have edited instead of overwriting them, unless you pass `--force`. `--dry-run` prints the plan and writes nothing.
+
+**Choosing kits and gates.** `--with-kit` and `--without-kit` add a kit to your profile or take one out. `--with-gate` and `--without-gate` do the same for a gate. Each repeats. `checkwright.lock` records them, so a re-run keeps them until you pass new ones or `--no-selection`. `gate-sdk` stays, since it runs the others. To replace a gate with your own, put a gate of the same name in your gates directory. It runs instead of the kit's, and `init` never overwrites it.
+
+## Going further
+
+- **Vendoring by hand**, and what a compiled gate discloses: [Vendoring without the installer](https://checkwright.dev/installer/SPEC.html#vendoring-without-the-installer).
+- **Reviewing the hook** before you install it: [Reviewing the pre-commit hook](https://checkwright.dev/installer/SPEC.html#reviewing-the-pre-commit-hook).
+- **Running under an `AGENTS.md` harness**: [the adapter recipe](https://checkwright.dev/positioning.html#running-under-an-agentsmd-harness).
+- **How the installer works**: [installer/SPEC.md](https://checkwright.dev/installer/SPEC.html).
+- **What a commit costs**, measured: [the pre-commit figure](https://checkwright.dev/requirements.html#what-a-commit-costs).
+- **Every step of the install**, run by hand: [Manual steps](https://checkwright.dev/manual-install.html).
+- **Managing, uninstalling and upgrading**: [Maintenance](https://checkwright.dev/maintenance.html).
+
+Back to the [kit map](https://checkwright.dev/#the-kits) or [why Checkwright](https://checkwright.dev/methodology.html).
+
+Source: https://checkwright.dev/requirements.html
+
+# What an install requires
+
+## Supported systems
+
+An install is possible only on a system below, where a prebuilt gate binary is published. Every joined system is built and installed on every push, on the runner images [`native/runners.list`](https://github.com/checkwright/checkwright/blob/master/native/runners.list) names.
+
+| System | Minimum | Binary | Status |
+|---|---|---|---|
+| Linux on x86-64 (glibc), and WSL | glibc 2.39 | `x86_64-unknown-linux-gnu` | joined |
+| Linux on arm64 (glibc) | glibc 2.39 | `aarch64-unknown-linux-gnu` | joined |
+| Linux on x86-64 (any C library) | Linux 3.2 | `x86_64-unknown-linux-musl` | joined |
+| Linux on arm64 (any C library) | Linux 4.1 | `aarch64-unknown-linux-musl` | joined |
+| macOS on Apple silicon | macOS 11 | `aarch64-apple-darwin` | joined |
+| macOS on Intel | macOS 10.12 | `x86_64-apple-darwin` | joined |
+| Windows on x86-64 | Windows 10 | `x86_64-pc-windows-msvc` | joined |
+| Windows on ARM64 | Windows 10 | `aarch64-pc-windows-msvc` | joined |
+
+`joined` means the current release publishes a binary for that system, at the floor shown; `held` means it is supported but not published yet, and names the run that would publish it. On any other system `init` refuses. On Linux, `init` takes the glibc binary where it runs and the static one everywhere else. Windows Subsystem for Linux (WSL) takes the Linux binary.
+
+## Installing and running the shipped gates
+
+The tools each shipped gate runs. `required` binds every install. An `optional` row binds you only under the condition it names:
+
+| Tool | Version | Needed | Why |
+|---|---|---|---|
+| `bash` | ≥ 4.3 | optional: if your docs mark a fence runnable or you register a shell gate | canon-kit's `check-fence-run` runs a marked fence with bash, and a shell gate sources the gate library, which uses a nameref (`local -n`) |
+| `git` | ≥ 2.15 | required | the gates read tracked files and the hooks fire at commit time; `check-docs-cmd` reads `rev-parse --is-shallow-repository` |
+| `curl` | ≥ 5.9 | optional: if your profile includes delegation-kit | its usage poller (`--usage-poll`) fetches its source with `curl -fsS`, and `-S` arrived in 5.9 |
+| `shellcheck` | ≥ 0.6 | optional: if you register a gate that runs it | `check-shellcheck` and `check-action-run-shell` run [ShellCheck](https://www.shellcheck.net/) with `-S warning` once you register them |
+
+The install itself and the optional docs gates need these as well. `doctor` does not probe them:
+
+| Tool | Minimum | Needed for | Why |
+|---|---|---|---|
+| `sh` | any POSIX `sh` | required to install on Linux and macOS | the one-line install and the bootstrap are POSIX sh throughout |
+| `curl` | 5.9 | required to install on Linux and macOS | the install line fetches with `curl -fsSL`, and `-S` arrived in 5.9 |
+| `tar` | any GNU or BSD `tar` | required to install on Linux and macOS | `tar -xzf` unpacks the release tarball |
+| `sha256sum` or `shasum` | any | required to install on Linux and macOS | the release tarball and the gate binary are checked against their published digests |
+| Windows PowerShell | 5.1 | required to install on Windows | the one-line install, the install block and the bootstrap run under it; its `Get-FileHash` checks the digests |
+| `tar.exe` | Windows 10 version 1803 | required to install on Windows | the install block unpacks the tarball with `System32\tar.exe` |
+| Git for Windows | `git` at the floor above | required to install on Windows | it supplies `git`; `bash` only where a row above owes it |
+| `gh` | any carrying `gh attestation` | optional: to check the build attestation | the one-line install runs `gh attestation verify` when `gh` is signed in, and says so when it is not |
+| Node | 8.2 | optional: only to install with npx | the first Node to bundle an npm carrying `npx` |
+| Ruby | 2.3 | optional: only if you register site-kit's docs gates | the two gems below need it |
+| `kramdown-parser-gfm` | any | optional: only if you register site-kit's docs gates | `check-docs-render-fidelity` re-renders every page through it |
+| `liquid` | 4.0.4 exactly | optional: only if you register site-kit's docs gates | `check-docs-liquid-parse` parses with the version GitHub Pages runs |
+
+The hook wiring the kits ship for Claude Code names the gate binary as the hook's `command` and passes `--hook` and the member in an `args` array, so the harness starts it with no shell. That takes **Claude Code 2.1.139 or later**. The floor is read from Claude Code's changelog, whose entry for that version adds the hook `args` field, and is not run here: the wiring was run on 2.1.292, and no build below the floor was tried. What an older build does with a registration carrying `args` is undocumented, so do not merge the wiring on one.
+
+A missing tool comes from your distribution's package on Linux or WSL, from Homebrew on macOS, or from Chocolatey on native Windows. To check your machine, run the gate binary with `--emit env-probe`: it writes an untracked `ENV.local.md` with each tool's version and verdict. Building Checkwright itself takes more: see the [contributing guide](https://github.com/checkwright/checkwright/blob/master/CONTRIBUTING.md).
+
+## What a commit costs
+
+The pre-commit hook runs the gates your profile registers whose triggers match the staged files. It runs them one after another and stops at the first red. The figure runs every gate whose triggers match a file over every tracked file, in a repository the one-line install has just initialized with `full`, the profile that contains every other. A gate that reads the staged set from git itself sees nothing staged, so the figure is a reference reading, not a ceiling.
+
+On `linux x86_64` with `14` logical CPUs, the hook ran `49` pre-commit gates over every tracked file in **2141 ms**, the median of three, measured at v0.31.0.
+
+To measure your own repository, run the gate binary with `--measure-commit`. It stages nothing and times the same run over every tracked file. Two costs sit outside the figure. First, the hook's own start: git starts it with no shell on any OS, and the `gates` workflow's probe step prints what that costs on each OS and architecture. Second, a gate you register yourself adds its own time.
+
+## Writing your own shell gates
+
+A gate you write is a copy of gate-sdk's `templates/check-skeleton.sh`. It is a bash script that sources gate-sdk's library, so it needs the `bash` floor above on every system, whatever your profile. `doctor` checks it once your `gates.list` registers the gate. On native Windows that bash is Git for Windows' bash, or write the gate in PowerShell instead. `check-shellcheck` lints your gate if you register it, and then `shellcheck`'s row binds you.
+
+## Writing your own PowerShell gates
+
+A PowerShell gate is two files in your gates directory: a `.gate` descriptor carrying the gate's `# graph:` line, its `# spec:` line and `# exec: <script>.ps1`, and the script it names. It needs a PowerShell host, which you name by setting `GATE_SDK_POWERSHELL` in `gate-sdk-config.knobs`: `powershell` for Windows PowerShell 5.1, which every Windows host carries, or `pwsh` for PowerShell 7 on any system. The gate runs as your shell gates do and prints the same lines; it reads a knob through `--emit knob-values <NAME>` on the binary its environment names. `check-psscriptanalyzer` lints it once you register it, and then the `PSScriptAnalyzer` module binds you. Running its fixture pair with `--run-gate-tests` also uses Git for Windows' bash. [gate-sdk/SPEC.md](https://checkwright.dev/gate-sdk/SPEC.html#the-gate-authoring-surface) owns this.
+
+## Writing your own Rust gates
+
+A Rust gate is a program you build. Its `.gate` descriptor in your gates directory carries the gate's `# graph:` line, its `# spec:` line, and `# exec: <path>`, naming the built program relative to that directory with no extension. The battery adds `.exe` on Windows, so one descriptor serves every system. It needs a Rust toolchain on every machine that runs the gate. The battery runs the program at that path and never builds it, so build it before the battery runs and rebuild it after each edit: the battery does not compare it with its source. A gate not yet built fails as a gate that could not run. It prints the lines your shell gates print, and reads a knob through `--emit knob-values <NAME>` on the binary its environment names. The same descriptor starts a program built in any language. The same section of gate-sdk/SPEC.md owns this.
+
+Source: https://checkwright.dev/manual-install.html
+
+# Installing step by step
+
+These are the steps the one-line install runs, taken one at a time for a reader who wants to see each command before it runs. Run your system's first block on the [install page](https://checkwright.dev/install.html) before them, where that page gives one. Pick a version from the [releases](https://github.com/checkwright/checkwright/releases) page and put it in place of `X.Y.Z`. [Requirements](https://checkwright.dev/requirements.html) lists the tools.
+
+## macOS and Linux
+
+Download the release into a scratch directory, so it unpacks outside the repository:
+
+```sh
+v=X.Y.Z
+cw="$(mktemp -d)" \
+  && curl -fsSLo "$cw/checkwright-$v.tgz" "https://github.com/checkwright/checkwright/releases/download/v$v/checkwright-$v.tgz" \
+  && curl -fsSLo "$cw/checkwright-$v.tgz.sha256" "https://github.com/checkwright/checkwright/releases/download/v$v/checkwright-$v.tgz.sha256"
+```
+
+Where `gh` is installed and signed in, check the build attestation too; a release older than attestation fails it:
+
+```sh
+gh attestation verify "$cw/checkwright-$v.tgz" --repo checkwright/checkwright --source-ref "refs/tags/v$v"
+```
+
+Then verify, extract and run `init` from your repository root:
+
+```sh
+( cd "$cw" \
+  && { sha256sum -c "checkwright-$v.tgz.sha256" || shasum -a 256 -c "checkwright-$v.tgz.sha256"; } \
+  && tar -xzf "checkwright-$v.tgz" ) \
+  && sh "$cw/package/bin/checkwright.sh" init
+```
+
+To verify, `git show --stat HEAD` lists everything the install brought in. Run the commands `init` prints to finish the setup.
+
+To uninstall, `sh "$cw/package/bin/checkwright.sh" uninstall` reverses it in one commit. If `$cw` is gone, download any release, as [Managing](https://checkwright.dev/maintenance.html#managing) says.
+
+## Windows
+
+Download the release, in PowerShell. Each block here stops at its first error, then puts your session's preferences back:
+
+```powershell
+. {
+  $keep = $ErrorActionPreference, $ProgressPreference
+  try {
+    $ErrorActionPreference = 'Stop'
+    $ProgressPreference = 'SilentlyContinue'
+    $v = 'X.Y.Z'
+    $cw = Join-Path ([IO.Path]::GetTempPath()) ([IO.Path]::GetRandomFileName())
+    New-Item -ItemType Directory $cw | Out-Null
+    $url = "https://github.com/checkwright/checkwright/releases/download/v$v/checkwright-$v.tgz"
+    Invoke-WebRequest $url -OutFile "$cw\checkwright-$v.tgz" -UseBasicParsing
+    Invoke-WebRequest "$url.sha256" -OutFile "$cw\checkwright-$v.tgz.sha256" -UseBasicParsing
+  } finally { $ErrorActionPreference, $ProgressPreference = $keep }
+}
+```
+
+Check the attestation as on macOS and Linux:
+
+```powershell
+gh attestation verify "$cw\checkwright-$v.tgz" --repo checkwright/checkwright --source-ref "refs/tags/v$v"
+```
+
+Then check the digest, unpack, and run `init`, still from your repository root:
+
+```powershell
+. {
+  $keep = $ErrorActionPreference
+  try {
+    $ErrorActionPreference = 'Stop'
+    $want = (Get-Content -Raw "$cw\checkwright-$v.tgz.sha256").Split(' ')[0]
+    if ((Get-FileHash "$cw\checkwright-$v.tgz" -Algorithm SHA256).Hash -ne $want) { throw 'checksum mismatch: download both files again' }
+    & "$env:SystemRoot\System32\tar.exe" -xzf "$cw\checkwright-$v.tgz" -C $cw
+    if ($LASTEXITCODE -ne 0) { throw 'tar.exe could not unpack the tarball: download it again' }
+    powershell -NoProfile -ExecutionPolicy Bypass -File "$cw\package\bin\checkwright.ps1" init
+  } finally { $ErrorActionPreference = $keep }
+}
+```
+
+Verify as above. To uninstall, run the `init` line with `uninstall` in place of `init`.
+
+Source: https://checkwright.dev/maintenance.html
+
+# Managing and upgrading an install
+
+## Managing
+
+`checkwright <verb>` below means the one line with `<verb>` as its argument (`sh -s -- <verb>` on macOS and Linux, the script-block form on Windows, since `irm … | iex` takes none), your install recipe's `init` line with `<verb>` in place of `init`, or `npx checkwright <verb>`. Each verb answers in its exit status, so a CI step can gate on it.
+
+- `checkwright doctor` checks this machine against [Requirements](https://checkwright.dev/requirements.html) and reports what is installed.
+- `checkwright diff` lists the vendored files you have changed. Exit `0` means none.
+- `checkwright update` upgrades the install to the version you are running.
+- `checkwright uninstall` reverses the install in one commit.
+
+`uninstall` needs no version: any release that reads your `checkwright.lock` runs it, so the one line reverses an install an older release made. `uninstall` removes only files `init` wrote and you left untouched. It keeps and reports any you edited, and never removes a file you wrote. Run it with `--dry-run` first to see the plan. A remedy block changes your machine and not your repository, so `uninstall` leaves it in place.
+
+### Requiring the CI check
+
+The pre-commit hook is a local backstop anyone can skip. `init` also commits `.github/workflows/gates.yml`, which runs the battery on every push and pull request at the release you installed and marks each red on the pull request. Make its check required in your branch protection, so a red battery blocks the merge, and keep the workflow file where the authors it checks cannot edit it.
+
+## Upgrading
+
+Release channel: **preview**
+
+While the channel reads `preview`, versions are `0.x`, a minor may break things, and every GitHub Release is marked pre-release, so none shows as Latest. Take a release from the releases list, or name an explicit version. Never rely on the Latest pointer.
+
+An upgrade has two phases:
+
+1. Run `checkwright update` from the new version, then run the commands it prints. If a kit now ships a `.knobs` config in place of a `*-config.sh`, move your settings into the `.knobs` file and delete the old one.
+2. Run the full battery. The gates that go red are your worklist. The release note says why each one moved.
+
+Every release note opens with **In brief**: a table linking each section below with its entry count and who acts on it, then a few plain bullets on what you get and whether you must act. Its **New and tightened gates**, **Knob changes**, **Gate-authoring changes**, **Platforms** and **Behavior changes** sections list what you reconcile. Each says "None." when there is nothing. All notes are on the [releases page](https://checkwright.dev/releases.html). The bump rules and the note grammar: [Versioning](https://checkwright.dev/installer/SPEC.html#versioning) and [The upgrade contract](https://checkwright.dev/installer/SPEC.html#the-upgrade-contract).
+
+An installed tree checks for a newer release once a week with `git ls-remote`, which shows the upstream host your IP address, and `doctor` and the session-context hook say when one exists. Set `GATE_SDK_UPDATE_CHECK = off` in your gates directory's `gate-sdk-config.knobs` to turn it off.
+
+Source: https://checkwright.dev/spec-toolkits.html
+
+# Spec toolkits: gating what Spec Kit and OpenSpec write
+
+Checkwright's `prose` profile governs a repository of documents. A recipe fits it to a spec tree that [Spec Kit](https://github.com/github/spec-kit) or [OpenSpec](https://github.com/Fission-AI/OpenSpec) writes: a few lines of gate configuration, applied with the install. Each toolkit has three lines: `prose`, the default; `complement`, every kit whose job the toolkit does not already do; and `full`, every kit. Each toolkit has a page: [Spec Kit](https://checkwright.dev/speckit.html), whose extension installs Checkwright with the recipe applied, and [OpenSpec](https://checkwright.dev/openspec.html), whose recipe you pass to `init`.
+
+## What the gates catch
+
+With the recipe applied, each of these defects in your specs fails CI, and a pre-commit hook catches it early:
+
+- a relative link to a missing file, or an anchored link to a heading that is not there, caught by `check-md-refs`;
+- a section citation such as `specs/001-login/spec.md §Assumptions` naming a heading that is not there, caught by `check-spec-pointer`; 
+- a code fence that is never closed, caught by `check-spec-fence-balance`;
+- a documented command that runs a script your repository does not have, caught by `check-docs-cmd`;
+- on OpenSpec, a change removing a requirement its capability's spec does not carry, caught by `check-delta-agreement`. OpenSpec's validator passes it, and `openspec archive` takes it as already removed.
+
+The OpenSpec overlap adds each delta `openspec archive` refuses only after commit. It catches a change that modifies or renames a requirement the spec lacks, renames onto or adds one it already carries, or changes a capability with no spec. Its line is on the OpenSpec page.
+
+A citation's path is read from the repository root, so write `specs/001-login/spec.md §Assumptions`, not `spec.md §Assumptions`. The second form is skipped rather than checked. 
+
+`git commit --no-verify` skips the hook, so the guarantee is CI: `init` commits a workflow that runs the battery, and once its check is required, a red battery blocks the merge ([Requiring the CI check](https://checkwright.dev/maintenance.html#requiring-the-ci-check)).
+
+## What the gates check against your code
+
+The task gates read your task lists against the tree. A task you ticked that names a file or directory the repository does not have reds `check-task-path-claim`. On Spec Kit, a task labelled with a user story the spec beside it does not define, such as `[US3]` with no User Story 3, reds `check-task-label-resolution`. Both check that a path or a story exists, not that the code does what the task says.
+
+## Which checks each toolkit gets
+
+`prose`: the default line arms and tests it, and `complement` and `full` keep it. `full`: only the `full` line does. `opt-in`: an overlap you add beside the toolkit's own check ([the value bar](https://checkwright.dev/companion/SPEC.html#the-tiers)). `prose + opt-in`: the default line arms it, and an overlap adds to what it checks. `toolkit`: the toolkit's own check, which Checkwright leaves to it.
+
+| Check | Spec Kit | OpenSpec |
+| --- | --- | --- |
+| `check-delta-agreement` | — | prose + opt-in |
+| `check-docs-cmd` | prose | prose |
+| `check-md-refs` | prose | prose |
+| `check-spec-fence-balance` | prose | prose |
+| `check-spec-pointer` | prose | prose |
+| `check-stage-entry` | — | full |
+| `check-task-label-resolution` | prose | — |
+| `check-task-path-claim` | prose | prose |
+| `openspec validate --all --strict --no-interactive` | — | toolkit |
+
+## What is tested
+
+Every push to Checkwright's repository installs the profile on a tree in each toolkit's layout, applies the recipe through the toolkit's documented install line, and asserts the battery green. On Spec Kit it also installs `full` with the recipe and asserts the battery green and each defect caught. On each toolkit it also installs `complement` with the recipe, asserts the battery green and each defect caught, and asserts the left-out kits absent. It then plants each defect and asserts the gate that owns it reds. The same run installs the extension with Spec Kit's own command and validates the OpenSpec tree with OpenSpec's own validator. On OpenSpec it also applies the lifecycle layer to a `full` install and asserts that a change touching two capabilities demands the align stage. It applies the overlap beside the recipe and asserts each delta it binds caught, and OpenSpec's own validator passes the same planted deltas. The versions tested are pinned in [`companion/toolkits.list`](https://github.com/checkwright/checkwright/blob/master/companion/toolkits.list). The recipes, the fixture trees and their design are under [`companion/`](https://checkwright.dev/companion/SPEC.html).
+
+## Limits
+
+- Spec Kit ships no validator, so the Spec Kit test tree follows the structure of its templates at the pinned version, and nothing checks it further.
+- The extension's two commands and its hook are instructions your agent follows. No test runs an agent through them; the tests run each install line the install command gives for macOS and Linux.
+- A required check stops a skipped hook, not an author who edits the workflow.
+- The Windows route is documented and not run.
+- A pinned version says nothing about the next one.
+
+Source: https://checkwright.dev/speckit.html
+
+# Checkwright for Spec Kit
+
+Add the extension from a Checkwright release, with `X.Y.Z` the release's version:
+
+```sh
+specify extension add checkwright --from https://github.com/checkwright/checkwright/releases/download/vX.Y.Z/checkwright-companion-X.Y.Z.zip
+```
+
+The project must be a git repository: `specify init` makes one only when asked to. `extension add` writes files under `.specify/` and your agent's command directory, so commit them, since the install refuses a worktree with uncommitted changes. Then ask your agent to run the extension's install command, `speckit.checkwright.install`. An integration that renders commands as skills names it `speckit-checkwright-install`, the form Spec Kit's own command list shows. The extension needs no configuration, whatever `extension add` prints. It installs `prose`, or `complement` or `full` when you ask for one, at the release the extension was tested with, with the Spec Kit recipe applied, and commits. The extension's `speckit.checkwright.check` command runs the battery, and an optional hook offers it after `implement`. The [extension's README](https://github.com/checkwright/checkwright/blob/master/companion/speckit/README.md) lists what it adds.
+
+The Spec Kit recipe prunes `.specify/`, whose scripts are Spec Kit's own, governs the markdown under `specs/`, admits `Task:` as a command, the first word of each line in the task list's example block, and points the task gates at each feature's `tasks.md`, a `[USn]` label resolving to the `### User Story n` heading in the `spec.md` beside it.
+
+The install command runs your system's line from the [install page](https://checkwright.dev/install.html#install), and the install's [Requirements](https://checkwright.dev/requirements.html) apply.
+
+**Every kit Spec Kit does not replace.** Ask the install command for `complement`, or run your system's line from the install page with:
+
+```text
+checkwright init --profile full --without-kit lifecycle-kit --without-kit queue-kit --without-kit doctrine-kit --recipe speckit
+```
+
+`complement` leaves out each kit whose job Spec Kit already does. [`companion/exclusions.list`](https://github.com/checkwright/checkwright/blob/master/companion/exclusions.list) records the Spec Kit surface each one defers to, and the line carries one `--without-kit` per kit. It seeds evidence files under `.workflow/`, beside Spec Kit's own. Drop a kit's `--without-kit` to adopt it later.
+
+**Every kit.** Ask the install command for `full`, or run your system's line from the install page with:
+
+```text
+checkwright init --profile full --recipe speckit
+```
+
+`full` adds every kit's gates to the gates [the overview](https://checkwright.dev/spec-toolkits.html#what-the-gates-catch) names. It seeds Checkwright's own task queue and evidence files under `.workflow/` beside Spec Kit's own, and writes a doctrine block into your agent file.
+
+Spec Kit has no lifecycle layer ([companion/SPEC.md §The lifecycle layer](https://checkwright.dev/companion/SPEC.html#the-lifecycle-layer)).
+
+What the gates catch, what is tested and the limits: [Spec toolkits](https://checkwright.dev/spec-toolkits.html).
+
+Source: https://checkwright.dev/openspec.html
+
+# Checkwright for OpenSpec
+
+Install from your repository's root, in a clean worktree, with your system's line on the [install page](https://checkwright.dev/install.html#install) and these arguments. Run the commands `init` prints.
+
+```text
+checkwright init --profile prose --recipe openspec
+```
+
+The recipe governs the markdown under `openspec/`, exempts `openspec/changes/` from the rule against history words once you register it, since a change's delta records what a requirement said before, and points `check-task-path-claim` at each in-flight change's `tasks.md`. The install records it, so an upgrade re-applies it with the release it was tested against.
+
+It also points `check-delta-agreement` at each in-flight change's deltas, for the one disagreement no OpenSpec check catches: a change removing a requirement the capability's spec does not carry, which `openspec archive` takes as already removed.
+
+**Keep each title unique within a spec.** OpenSpec specs often repeat a scenario title under two requirements. A citation of the second title would reach the first, so set `CANON_KIT_SPEC_POINTER_TITLE_ONCE = on` in `canon-config.knobs` to have `check-spec-pointer` red the repeat. Rename one apart, for instance *Idle timeout, web* and *Idle timeout, API*.
+
+**Every kit OpenSpec does not replace.** This line installs `complement`:
+
+```text
+checkwright init --profile full --without-kit lifecycle-kit --without-kit queue-kit --without-kit doctrine-kit --recipe openspec
+```
+
+`complement` leaves out each kit whose job OpenSpec already does. [`companion/exclusions.list`](https://github.com/checkwright/checkwright/blob/master/companion/exclusions.list) records the OpenSpec surface each one defers to, and the line carries one `--without-kit` per kit. It seeds evidence files under `.workflow/`, beside OpenSpec's own. Drop a kit's `--without-kit` to adopt it later. It applies no lifecycle layer, since it leaves the stage machine to OpenSpec.
+
+**Every kit.** This line installs `full`:
+
+```text
+checkwright init --profile full --recipe openspec --recipe openspec-lifecycle
+```
+
+It costs what the [Spec Kit](https://checkwright.dev/speckit.html) `full` line costs: Checkwright's own workflow files beside OpenSpec's. The line also applies the lifecycle layer, which lets lifecycle-kit's stage machine read OpenSpec's in-flight changes: once you run the stage machine, a change touching two capabilities owes the align stage before build.
+
+What the gates catch, what is tested and the limits: [Spec toolkits](https://checkwright.dev/spec-toolkits.html).
+
+Source: https://checkwright.dev/value.html
+
+# Value
+
+Checkwright's promise is a trade: mechanized consistency enforcement in exchange for a bounded, measured context footprint. This page sets the two side by side, per kit, so the exchange is legible before you install.
+
+The benefit half is the count of governed surfaces each kit holds, split by how hard each promise is kept; the [Enforcement map](https://checkwright.dev/enforcement.html) names every surface behind those counts and defines the classes. The cost half is the per-kit token footprint; the [Footprint](https://checkwright.dev/footprint.html) page shows how it is measured and what it excludes. Both are joined live from the emitters behind those pages, so this rollup cannot drift from them.
+
+The rows follow the footprint's roster, so `installer`, the install tool, has a row but is not a kit. The `(consumer)` row counts what Checkwright's own repository runs from outside its kits.
+
+A third generated projection sits beside those two: the [coupling graph](https://checkwright.dev/check-graph.html) renders every gate against the surfaces its `# graph:` manifest couples — the same manifests the pre-commit hook reads at commit — so you can see what fires when a given path changes.
+
+_Generated by `bash gate-sdk/bin/run-gates.sh --emit value-rollup --write`; do not hand-edit — `check-value-rollup-fresh` byte-compares this block against a fresh join._
+
+| kit | Blocking gates | Advisory KPIs | Guards | Session warnings | Validate suites | Monitors | always-loaded | load-triggered |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| canon-kit | 39 | — | — | — | — | — | — | ~1531t |
+| companion | — | — | — | — | — | — | — | — |
+| context-kit | 5 | — | — | 1 | — | — | — | ~594t |
+| delegation-kit | 2 | — | 3 | — | — | — | — | ~11043t |
+| doctrine-kit | 1 | — | — | — | — | — | ~520t | — |
+| drift-kit | — | 15 | — | — | — | — | — | ~1760t |
+| evidence-kit | 3 | — | — | — | — | — | — | — |
+| gate-sdk | 39 | — | — | — | 20 | — | — | ~787t |
+| guard-kit | 1 | — | 1 | — | — | — | — | ~1114t |
+| installer | — | — | — | — | — | — | — | — |
+| lifecycle-kit | 16 | — | 1 | — | — | — | ~76t | ~36035t |
+| plugin | — | — | — | — | — | — | — | — |
+| queue-kit | 10 | — | — | — | — | — | — | ~359t |
+| site-kit | 5 | — | — | — | — | — | — | — |
+| (consumer) | 34 | — | — | — | 1 | 1 | — | — |
+| **total** | 155 | 15 | 5 | 1 | 21 | 1 | ~596t | ~53225t |
+
+Source: https://checkwright.dev/enforcement.html
+
+# Enforcement map
+
+_Generated by `bash gate-sdk/bin/run-gates.sh --emit enforcement-map`; do not hand-edit — `check-enforcement-fresh` byte-compares this page against the emitter._
+
+Every governed surface in the repository this map is generated from is held by one enforcement class, ordered here from hardest to softest:
+
+- A **blocking gate** fails the commit (or, at the `align-only` tier, the consistency audit) — the pre-commit hook is its local reach, the CI workflow its server-side backstop. Owner: [`gate-sdk/SPEC.md` §Enforcement tiers](https://github.com/checkwright/checkwright/blob/master/gate-sdk/SPEC.md#enforcement-tiers).
+- An **advisory KPI** never blocks; it reports a drift trend into the session-context line. Owner: [`drift-kit/SPEC.md` §The KPI plugin contract](https://github.com/checkwright/checkwright/blob/master/drift-kit/SPEC.md#the-kpi-plugin-contract).
+- A **guard** intercepts a harness event — a tool call before it runs, a turn end before it completes — and can refuse it. Owner: [`guard-kit/SPEC.md` §The shell guard](https://github.com/checkwright/checkwright/blob/master/guard-kit/SPEC.md#the-shell-guard).
+- A **session warning** surfaces context when a session opens. Owner: [`context-kit/SPEC.md` §The session-context hook](https://github.com/checkwright/checkwright/blob/master/context-kit/SPEC.md#the-session-context-hook).
+- A **validate suite** holds a test baseline that a per-run evidence manifest attests. Owner: [`evidence-kit/SPEC.md` §Baseline manifest](https://github.com/checkwright/checkwright/blob/master/evidence-kit/SPEC.md#baseline-manifest).
+- A **monitor** watches deployment truth rather than tree truth, so it reds a scheduled run, never a merge. Owner: [`site-kit/SPEC.md` §The monitor boundary](https://github.com/checkwright/checkwright/blob/master/site-kit/SPEC.md#the-monitor-boundary).
+
+The rows below derive from the class registries — the gate registry, the KPI registry, the harness settings hooks, the evidence-suite config, and the `# enforce:` markers a non-gate surface declares itself with — so this map cannot drift from what actually runs. A registry a consumer has not adopted leaves its section absent. A surface that lives under no kit directory, the repository's own rather than a kit's, is grouped as `(consumer)`.
+
+## Blocking gates
+
+| kit | gate | tier |
+| --- | --- | --- |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-shellcheck | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-psscriptanalyzer | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-gate-output | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-gate-fail-closed | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-gate-fixture-coverage | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-gate-exemption-tasks | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-gate-substrate-parity | precommit |
+| (consumer) | check-gate-binary-fresh | precommit |
+| (consumer) | check-crate-arms | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-install-disposition | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-test-hermetic | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-path-dialect | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-pipe-membership | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-front-end-fail-open | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-assertion-strength | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-graph | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-reads-couples | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-kit-enum | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-kit-registration | precommit |
+| (consumer) | check-kit-roots-dialect | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-readme-roster | precommit |
+| (consumer) | check-packed-links | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-smoke-entry-guard | precommit |
+| (consumer) | check-docs-kit-parity | precommit |
+| (consumer) | check-docs-nav-reachable | precommit |
+| [doctrine-kit](https://checkwright.dev/doctrine-kit/) | check-doctrine-registration | precommit |
+| [lifecycle-kit](https://checkwright.dev/lifecycle-kit/) | check-lifecycle-registration | precommit |
+| (consumer) | check-guard-registration | precommit |
+| (consumer) | check-kit-ref-liveness | precommit |
+| (consumer) | check-trajectory-fresh | precommit |
+| (consumer) | check-install-evidence-fresh | precommit |
+| (consumer) | check-footprint-fresh | precommit |
+| (consumer) | check-docs-mirror-fresh | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-enforcement-fresh | precommit |
+| (consumer) | check-value-rollup-fresh | precommit |
+| (consumer) | check-product-statement-fresh | precommit |
+| (consumer) | check-llms-fresh | precommit |
+| (consumer) | check-license-line | precommit |
+| (consumer) | check-support-table-fresh | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-exec-bit | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-tree-terms | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-portability-floor | precommit |
+| (consumer) | check-harness-literal | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-projection-roster | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-root-tiering | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-workflow-tiering | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-action-pinning | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-action-run-shell | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-action-run-path | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-action-gh-repo | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-action-permissions | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-action-job-ref | precommit |
+| (consumer) | check-action-step-order | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-core-files | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-identity | precommit |
+| [lifecycle-kit](https://checkwright.dev/lifecycle-kit/) | check-stage-evidence | precommit |
+| [lifecycle-kit](https://checkwright.dev/lifecycle-kit/) | check-stage-entry | precommit |
+| [lifecycle-kit](https://checkwright.dev/lifecycle-kit/) | check-stage-skill-coverage | precommit |
+| [lifecycle-kit](https://checkwright.dev/lifecycle-kit/) | check-skill-binding | precommit |
+| [lifecycle-kit](https://checkwright.dev/lifecycle-kit/) | check-shim-restatement | precommit |
+| [lifecycle-kit](https://checkwright.dev/lifecycle-kit/) | check-lesson-disposition | precommit |
+| [lifecycle-kit](https://checkwright.dev/lifecycle-kit/) | check-merge-attrs | precommit |
+| [lifecycle-kit](https://checkwright.dev/lifecycle-kit/) | check-close-surfaces | precommit |
+| [lifecycle-kit](https://checkwright.dev/lifecycle-kit/) | check-survey-record | precommit |
+| [lifecycle-kit](https://checkwright.dev/lifecycle-kit/) | check-audit-roster | precommit |
+| [lifecycle-kit](https://checkwright.dev/lifecycle-kit/) | check-scratch-citation | precommit |
+| [lifecycle-kit](https://checkwright.dev/lifecycle-kit/) | check-gap-inbox-neutrality | precommit |
+| [lifecycle-kit](https://checkwright.dev/lifecycle-kit/) | check-disposed-findings | precommit |
+| [queue-kit](https://checkwright.dev/queue-kit/) | check-queue-sections | precommit |
+| [queue-kit](https://checkwright.dev/queue-kit/) | check-queue-hygiene | precommit |
+| [queue-kit](https://checkwright.dev/queue-kit/) | check-tag-lead-line | precommit |
+| [queue-kit](https://checkwright.dev/queue-kit/) | check-queue-entry-budget | precommit |
+| [queue-kit](https://checkwright.dev/queue-kit/) | check-deferred-board-tags | precommit |
+| [queue-kit](https://checkwright.dev/queue-kit/) | check-task-names | precommit |
+| [queue-kit](https://checkwright.dev/queue-kit/) | check-task-conservation | precommit |
+| [queue-kit](https://checkwright.dev/queue-kit/) | check-queue-prose-precondition | precommit |
+| [queue-kit](https://checkwright.dev/queue-kit/) | check-queue-slug-liveness | precommit |
+| [queue-kit](https://checkwright.dev/queue-kit/) | check-roadmap-fresh | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-amendment-queue | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-amendment-update-target | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-amendment-retired-spelling | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-spec-embedded-source | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-spec-fence-balance | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-md-refs | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-md-unwrapped | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-docs-link-convention | precommit |
+| [site-kit](https://checkwright.dev/site-kit/) | check-docs-cname-parity | precommit |
+| [site-kit](https://checkwright.dev/site-kit/) | check-docs-highlight-coverage | precommit |
+| [site-kit](https://checkwright.dev/site-kit/) | check-docs-render-fidelity | precommit |
+| [site-kit](https://checkwright.dev/site-kit/) | check-docs-collapsible | precommit |
+| [site-kit](https://checkwright.dev/site-kit/) | check-docs-liquid-parse | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-docs-cmd | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-docs-restatement-parity | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-docs-page-repeat | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-docs-page-length | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-citation-link | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-fence-command-head | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-fence-paste-unit | precommit |
+| (consumer) | check-install-toolchain | precommit |
+| (consumer) | check-install-platforms | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-install-claim | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-payload-claim | precommit |
+| (consumer) | check-installer-no-deps | precommit |
+| (consumer) | check-release-bump | precommit |
+| (consumer) | check-release-channel-parity | precommit |
+| (consumer) | check-install-pin | precommit |
+| (consumer) | check-front-door-verbs | precommit |
+| (consumer) | check-plugin-parity | precommit |
+| (consumer) | check-tightened-gates-grammar | precommit |
+| (consumer) | check-release-declaration-parity | precommit |
+| (consumer) | check-release-change-declared | precommit |
+| (consumer) | check-release-assets | precommit |
+| (consumer) | check-consumer-value-literal | precommit |
+| (consumer) | check-npm-publish-spec | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-manifest-temporal | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-pendency-contradiction | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-manifest-count | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-provenance-seam | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-measured-claim | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-unmarked-claim | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-tracking-claim | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-task-path-claim | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-task-label-resolution | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-delta-agreement | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-prose-enum | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-prose-tells | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-prose-bounds | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-knob-citation | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-knob-default-coupling | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-comment-tier | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-spec-pointer | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-todo-task-liveness | precommit |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-deprecation-task | precommit |
+| [evidence-kit](https://checkwright.dev/evidence-kit/) | check-evidence-baseline | precommit |
+| [evidence-kit](https://checkwright.dev/evidence-kit/) | check-evidence-manifest | precommit |
+| [evidence-kit](https://checkwright.dev/evidence-kit/) | check-battery-roster | precommit |
+| [delegation-kit](https://checkwright.dev/delegation-kit/) | check-gate-tamper | precommit |
+| (consumer) | check-rule-citation | precommit |
+| [delegation-kit](https://checkwright.dev/delegation-kit/) | check-agent-tier-explicit | precommit |
+| [context-kit](https://checkwright.dev/context-kit/) | check-brevity | precommit |
+| [context-kit](https://checkwright.dev/context-kit/) | check-surface-ratchet | precommit |
+| [context-kit](https://checkwright.dev/context-kit/) | check-settings-pins | precommit |
+| [context-kit](https://checkwright.dev/context-kit/) | check-settings-paths | precommit |
+| [context-kit](https://checkwright.dev/context-kit/) | check-memory-off | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-template-copy-parity | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-template-registry-parity | precommit |
+| [guard-kit](https://checkwright.dev/guard-kit/) | check-door-binding | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-commit-msg | commit-msg |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-commit-subject | commit-msg |
+| [lifecycle-kit](https://checkwright.dev/lifecycle-kit/) | check-stamp-subject | commit-msg |
+| [lifecycle-kit](https://checkwright.dev/lifecycle-kit/) | check-dispatch-entry | commit-msg |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-gate-assertions | align-only |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-spec-dod-singleton | align-only |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-spec-derivable-section | align-only |
+| [canon-kit](https://checkwright.dev/canon-kit/) | check-fence-run | align-only |
+
+## Advisory KPIs
+
+| kit | KPI |
+| --- | --- |
+| [drift-kit](https://checkwright.dev/drift-kit/) | kpi-task-split |
+| [drift-kit](https://checkwright.dev/drift-kit/) | kpi-gate-backlog |
+| [drift-kit](https://checkwright.dev/drift-kit/) | kpi-amendment-age |
+| [drift-kit](https://checkwright.dev/drift-kit/) | kpi-deferred-age |
+| [drift-kit](https://checkwright.dev/drift-kit/) | kpi-deprecated-surface |
+| [drift-kit](https://checkwright.dev/drift-kit/) | kpi-prompt-friction |
+| [drift-kit](https://checkwright.dev/drift-kit/) | kpi-always-loaded |
+| [drift-kit](https://checkwright.dev/drift-kit/) | kpi-settings-local |
+| [drift-kit](https://checkwright.dev/drift-kit/) | kpi-gate-runtime |
+| [drift-kit](https://checkwright.dev/drift-kit/) | kpi-overhead |
+| [drift-kit](https://checkwright.dev/drift-kit/) | kpi-price-table-age |
+| [drift-kit](https://checkwright.dev/drift-kit/) | kpi-queue-net-delta |
+| [drift-kit](https://checkwright.dev/drift-kit/) | kpi-stage-economics-lag |
+| [drift-kit](https://checkwright.dev/drift-kit/) | kpi-knowledge-friction |
+| [drift-kit](https://checkwright.dev/drift-kit/) | kpi-incident-recurrence |
+
+## Guards
+
+| kit | surface | event | intercepts |
+| --- | --- | --- | --- |
+| [guard-kit](https://checkwright.dev/guard-kit/) | shell-guard | PreToolUse | Bash |
+| [delegation-kit](https://checkwright.dev/delegation-kit/) | agent-budget-guard | PreToolUse | Agent |
+| [delegation-kit](https://checkwright.dev/delegation-kit/) | agent-dispatch-guard | PreToolUse | Agent |
+| [lifecycle-kit](https://checkwright.dev/lifecycle-kit/) | workflow-state-guard | PreToolUse | Write\|Edit |
+| [delegation-kit](https://checkwright.dev/delegation-kit/) | subagent-stop-liveness | SubagentStop | * |
+
+## Session warnings
+
+| kit | surface |
+| --- | --- |
+| [context-kit](https://checkwright.dev/context-kit/) | session-context |
+
+## Validate suites
+
+| kit | suite |
+| --- | --- |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | gates |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | gate_sdk |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | canon_kit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | context_kit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | delegation_kit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | doctrine_kit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | evidence_kit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | guard_kit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | lifecycle_kit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | queue_kit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | site_kit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | scripts |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | guard_tests |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | demo |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | installer_smoke |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | consumer_smoke |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | upgrade |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | agents_md_smoke |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | index_tests |
+| (consumer) | native_crate |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | projection_witness |
+
+## Monitors
+
+| kit | surface |
+| --- | --- |
+| (consumer) | live docs-site deployment — apex/www/http HTTPS, redirects, cert expiry, release-body note pointers, each published Release's prerelease flag against its own version line, theme highlight-class drift against the tracked snapshot, and the repository About against the product statement |
+
+Source: https://checkwright.dev/footprint.html
+
+# Context footprint
+
+What vendoring Checkwright costs a consumer's context budget, measured per kit and split by when the cost is paid. Every number here is generated from the tracked kit surfaces by `bash gate-sdk/bin/run-gates.sh --emit footprint` and held current by a freshness gate, so the page cannot drift from what the kits actually ship.
+
+## What is measured
+
+Each kit's footprint splits by when its cost lands in a session:
+
+- **Always-loaded** — the fixed block a kit injects into the consumer's always-loaded agent file, so it rides every session's context. Measured as the content a kit generates between its own `begin`/`end` markers in the configured surface files.
+- **Load-triggered** — the kit's shipped skill and template markdown, pulled into context only when its trigger fires. Measured over the markdown the kit ships under its templates directory.
+
+Code-point counts (`cp`) are exact. The token column is a labeled estimate — a bytes-over-four heuristic, marked with a leading `~` because the true count is model-tokenizer-dependent; read it as an order of magnitude, never a precise figure.
+
+## What is excluded
+
+The figures are kit-share only — what a kit itself ships. A consumer's own bindings (the skill shims that point at a vendored template), consumer configuration, the reference SPEC and README pages a reader opens on demand, and the session hook's dynamic body (which is consumer state, not fixed kit text) are all left out, so each number reflects the kit's advertised cost rather than a host repository's residue.
+
+## Per-kit footprint
+
+Every top-level directory carrying a `SPEC.md` takes a row, kit or not, and one that ships nothing into context shows an empty tier in both columns.
+
+| kit | always-loaded | load-triggered |
+| --- | --- | --- |
+| canon-kit | — | 5785cp · ~1531t |
+| companion | — | — |
+| context-kit | — | 2351cp · ~594t |
+| delegation-kit | — | 43876cp · ~11043t |
+| doctrine-kit | 2049cp · ~520t | — |
+| drift-kit | — | 6968cp · ~1760t |
+| evidence-kit | — | — |
+| gate-sdk | — | 3130cp · ~787t |
+| guard-kit | — | 4394cp · ~1114t |
+| installer | — | — |
+| lifecycle-kit | 301cp · ~76t | 142962cp · ~36035t |
+| plugin | — | — |
+| queue-kit | — | 1392cp · ~359t |
+| site-kit | — | — |
+| **total** | 2350cp · ~596t | 210858cp · ~53225t |
+
+Source: https://checkwright.dev/kits.html
+
+# Kit Reference
+
+One page per kit.
+
+## The kits
+
+Read in this order: each kit assumes the machinery of the ones above it.
+
+- [gate-sdk](https://checkwright.dev/gate-sdk/) — the lint framework the other kits register into.
+- [lifecycle-kit](https://checkwright.dev/lifecycle-kit/) — the iteration stage state machine for stateless sessions.
+- [queue-kit](https://checkwright.dev/queue-kit/) — the git-native, agent-readable task tracker.
+- [canon-kit](https://checkwright.dev/canon-kit/) — spec discipline for agent-authored components.
+- [guard-kit](https://checkwright.dev/guard-kit/) — permission-friction tooling for agent sessions.
+- [delegation-kit](https://checkwright.dev/delegation-kit/) — safe delegated-agent execution under a token budget.
+- [context-kit](https://checkwright.dev/context-kit/) — token-economics-aware context management.
+- [drift-kit](https://checkwright.dev/drift-kit/) — advisory drift reporting across the governed surfaces.
+- [evidence-kit](https://checkwright.dev/evidence-kit/) — a held-constant test baseline and a committed per-run evidence manifest.
+- [site-kit](https://checkwright.dev/site-kit/) — deployment-truth governance for a repo-served docs site: a CNAME-host parity gate, a rendered-page fidelity gate, and a live-site monitor template.
+- [doctrine-kit](https://checkwright.dev/doctrine-kit/) — the experience-packaging rung: the cross-kit delivery doctrine, referenced by link into a consumer's always-loaded agent file.
+
+Source: https://checkwright.dev/gate-sdk/
+
+# gate-sdk
+
+A self-testing lint framework for the prose, spec, and config surfaces conventional linters ignore. gate-sdk is the foundation the other kits build on: they ship their checks as gates that register into its runner, and its meta-gates hold those gates to a fixed shape.
+
+A gate is a small script that scans a surface, emits one machine-keyable success line or names each finding with a remedy, and fails the commit when it finds a violation. gate-sdk supplies the runner, the golden-fixture test harness, the `# graph:` coupling manifests, and a pre-commit hook.
+
+## Install
+
+The steps are the kit README's [Quick start](https://checkwright.dev/gate-sdk/README.html#quick-start) section. `checkwright init` does them for you — see the [install page](https://checkwright.dev/install.html).
+
+## Quick start
+
+Run these arms as the kit README spells them, PowerShell included:
+
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
+"$gates" --run-gate-tests gate-sdk/gate-tests gate-sdk/checks \
+  && "$gates" --install-hooks   # opt this clone into the hook
+```
+
+## Contracts
+
+The gate contracts — the output, fail-closed, fixture-pair, and self-lint disciplines every gate keeps — are defined in the kit's [`SPEC.md`](https://checkwright.dev/gate-sdk/SPEC.html#the-gate-model); its [`README.md`](https://checkwright.dev/gate-sdk/README.html#gate-sdk) lists the mechanism. The README ships in the vendored `gate-sdk/` directory; the SPEC is published here. Back to the [kit map](https://checkwright.dev/#the-kits) or the install guide.
+
+Source: https://checkwright.dev/lifecycle-kit/
+
+# lifecycle-kit
+
+An iteration stage state machine built for stateless agent sessions. Where a human developer carries the state of a task in their head across a day, successive agent sessions do not — so lifecycle-kit externalizes it: an evidence-stamp file records which stage a unit of work is in — its last stamp is the cursor — and proves each stage was actually entered.
+
+Each stage is a skill a session invokes; entering a stage stamps that file in one commit, and gates make skipping a stage fail the commit. The stages themselves are configuration, not code.
+
+## Install
+
+The steps are the kit README's [Install](https://checkwright.dev/lifecycle-kit/README.html#install) section. `checkwright init` does them for you — see the [install page](https://checkwright.dev/install.html).
+
+## Quick start
+
+Run these arms as the kit [README](https://checkwright.dev/lifecycle-kit/README.html#use) spells them, PowerShell included:
+
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
+"$gates" --enter-stage <stage>   # stamp a stage entry (the transition itself)
+```
+
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
+"$gates" --run-gate-tests lifecycle-kit/gate-tests lifecycle-kit/checks
+```
+
+## Contracts
+
+The state-machine contract — the stamp grammar, the stamp protocol, and the gates that enforce it — lives in the kit's [`SPEC.md`](https://checkwright.dev/lifecycle-kit/SPEC.html#the-state-machine); its [`README.md`](https://checkwright.dev/lifecycle-kit/README.html#lifecycle-kit) lists the mechanism. Back to the [kit map](https://checkwright.dev/#the-kits).
+
+Source: https://checkwright.dev/queue-kit/
+
+# queue-kit
+
+A git-native, agent-readable task tracker. The queue is a single Markdown file under version control, not an external service — so an agent session reads its work and its history from the same tree it commits to, with no credential and no network round-trip.
+
+queue-kit formalizes that file: one slug namespace, a small tag algebra (blocked-by, spec, drain-exempt, roadmap, observed-by, cost, surface, cap-credit, recurrence, roadmap-summary, not-icebox-eligible) that encodes preconditions an agent can resolve mechanically, an index tool, a roadmap projector that renders the curated entries as a generated public page, and gates that hold the grammar a session selects work by.
+
+## Install
+
+The steps are the kit README's [Install](https://checkwright.dev/queue-kit/README.html#install) section. `checkwright init` does them for you — see the [install page](https://checkwright.dev/install.html).
+
+## Quick start
+
+Run these arms as the kit [README](https://checkwright.dev/queue-kit/README.html#use) spells them, PowerShell included; `queue-index` lists the selectable work:
+
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
+"$gates" --emit queue-index \
+  && "$gates" --run-gate-tests queue-kit/gate-tests queue-kit/checks
+```
+
+## Contracts
+
+The queue format and the tag algebra are defined in the kit's [`SPEC.md`](https://checkwright.dev/queue-kit/SPEC.html#the-queue-format); its [`README.md`](https://checkwright.dev/queue-kit/README.html#queue-kit) lists the mechanism. Back to the [kit map](https://checkwright.dev/#the-kits).
+
+Source: https://checkwright.dev/canon-kit/
+
+# canon-kit
+
+Spec discipline for agent-authored components. When agents write both the code and the prose that describes it, the two drift silently: the spec restates what the code already says, the restatement rots, and no stateless session notices. canon-kit removes the copy.
+
+The kit keeps one canonical spec per component, carries changes as short-lived amendment files that merge and delete, and enforces a content-tiering star topology — one owner per fact, cite rather than restate. Its gates target the copy-shaped failure modes directly.
+
+## Install
+
+The steps are the kit README's [Install](https://checkwright.dev/canon-kit/README.html#install) section. `checkwright init` does them for you — see the [install page](https://checkwright.dev/install.html).
+
+## Quick start
+
+Run this arm as the kit [README](https://checkwright.dev/canon-kit/README.html#test) spells it, PowerShell included:
+
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
+"$gates" --run-gate-tests canon-kit/gate-tests canon-kit/checks
+```
+
+## Contracts
+
+The spec model — canonical-plus-amendment lifecycle, the tiering topology, and the anti-restatement doctrine — is defined in the kit's [`SPEC.md`](https://checkwright.dev/canon-kit/SPEC.html#the-spec-model); its [`README.md`](https://checkwright.dev/canon-kit/README.html#canon-kit) lists the mechanism. Back to the [kit map](https://checkwright.dev/#the-kits).
+
+Source: https://checkwright.dev/guard-kit/
+
+# guard-kit
+
+Permission-friction tooling for agent sessions. An agent that stops to ask permission for every routine command wastes turns and trains its supervisor to rubber-stamp; one that is allowed too much is unsafe. guard-kit steers the middle: a pre-tool guard that blocks, redirects, rewrites, or auto-allows a call by rule.
+
+It ships a harness-generic ruleset, a scanner for where prompts originate, tracked-versus-local allowlist curation, an optional wakeup guard, and a close-stage step that triages the friction a session actually hit. It registers no gates.
+
+## Install
+
+The steps are the kit README's [Install](https://checkwright.dev/guard-kit/README.html#install) section. `checkwright init` does them for you — see the [install page](https://checkwright.dev/install.html).
+
+## Quick start
+
+Run this arm as the kit [README](https://checkwright.dev/guard-kit/README.html#use) spells it, PowerShell included:
+
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
+"$gates" --run-guard-tests    # decision-table over the generic ruleset
+```
+
+## Contracts
+
+The guard decision model and the friction-triage step are defined in the kit's [`SPEC.md`](https://checkwright.dev/guard-kit/SPEC.html#the-shell-guard); its [`README.md`](https://checkwright.dev/guard-kit/README.html#guard-kit) lists the mechanism. Back to the [kit map](https://checkwright.dev/#the-kits).
+
+Source: https://checkwright.dev/delegation-kit/
+
+# delegation-kit
+
+Safe delegated-agent execution for budget-bounded sessions. Delegating work to sub-agents is the primary way a supervisor session stays within its token budget — but a sub-agent that shares the git index, weakens a gate to get past it, or reports a false pass turns a saving into a hazard. delegation-kit is the protocol that makes delegation safe.
+
+It supplies the supervisor rules (serialize on the shared index, one commit per unit, a resume journal, verify after every agent commit), a trustworthy budget verdict, and a commit-shape gate that blocks the attested gate-weakening shapes.
+
+## Install
+
+The steps are the kit README's [Install](https://checkwright.dev/delegation-kit/README.html#install) section. `checkwright init` does them for you — see the [install page](https://checkwright.dev/install.html).
+
+## Quick start
+
+Run this arm as the kit [README](https://checkwright.dev/delegation-kit/README.html#use) spells it, PowerShell included:
+
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
+"$gates" --usage-verdict        # one budget verdict: OK / PAUSE / STALE
+```
+
+## Contracts
+
+The supervisor protocol and the tamper-gate contract are defined in the kit's [`SPEC.md`](https://checkwright.dev/delegation-kit/SPEC.html#the-delegation-model); its [`README.md`](https://checkwright.dev/delegation-kit/README.html#delegation-kit) lists the mechanism. Back to the [kit map](https://checkwright.dev/#the-kits).
+
+Source: https://checkwright.dev/context-kit/
+
+# context-kit
+
+Token-economics-aware context management. Everything a stateless session reads costs tokens, and a session that reads whole files to answer a narrow question burns its budget before it starts work. context-kit makes reading cheap and deliberate.
+
+It ships index-first reading tools that surface a file's shape before its body, a session-start hook that assembles a compact orienting brief, an always-loaded meter with a committed baseline, a gate over the density of the densest always-loaded section, and a memory-off gate pair that keeps the harness's ungoverned per-session memory surface disabled — the doctrine and both gates are defined in the kit's [`SPEC.md`](https://checkwright.dev/context-kit/SPEC.html#the-memory-off-doctrine).
+
+## Install
+
+The steps are the kit README's [Install](https://checkwright.dev/context-kit/README.html#install) section. `checkwright init` does them for you — see the [install page](https://checkwright.dev/install.html).
+
+## Quick start
+
+Run these arms as the kit [README](https://checkwright.dev/context-kit/README.html#use) spells them, PowerShell included:
+
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
+"$gates" --emit md-index <file.md>   # outline before body
+```
+
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
+"$gates" --emit pub-index <component>/src/   # public API surface
+```
+
+## Contracts
+
+The reading-tool contracts and the always-loaded budget are defined in the kit's [`SPEC.md`](https://checkwright.dev/context-kit/SPEC.html#the-consumer-footprint), including the consumer footprint it holds — what the kits ask your always-loaded surface to carry, worth reading before you vendor. Its [`README.md`](https://checkwright.dev/context-kit/README.html#context-kit) lists the mechanism. Back to the [kit map](https://checkwright.dev/#the-kits).
+
+Source: https://checkwright.dev/drift-kit/
+
+# drift-kit
+
+Advisory drift reporting for stateless sessions. Not every consistency axis is cheap enough to block a commit — some are trends, not violations. drift-kit reports those: it collates pluggable KPIs from the other kits' governed surfaces under honest lead/lag labels, so a session sees where the tree is sliding without a false red.
+
+It ships the drift report, a KPI plugin registry, a one-line trend summary the session-start hook injects, and the knowledge-friction loop that captures a re-derived fact the moment it costs a session time. It registers no gates.
+
+## Install
+
+The steps are the kit README's [Install](https://checkwright.dev/drift-kit/README.html#install) section. `checkwright init` does them for you — see the [install page](https://checkwright.dev/install.html).
+
+## Quick start
+
+Run this arm as the kit [README](https://checkwright.dev/drift-kit/README.html#use) spells it, PowerShell included:
+
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
+"$gates" --emit drift-report   # the full advisory report
+```
+
+## Contracts
+
+The KPI registry contract and the knowledge-friction loop are defined in the kit's [`SPEC.md`](https://checkwright.dev/drift-kit/SPEC.html#the-kpi-plugin-contract); its [`README.md`](https://checkwright.dev/drift-kit/README.html#drift-kit) lists the mechanism. Back to the [kit map](https://checkwright.dev/#the-kits).
+
+Source: https://checkwright.dev/evidence-kit/
+
+# evidence-kit
+
+A held-constant test baseline and a committed per-run evidence manifest for the validate stage. A stage stamp proves a stage was invoked; this proves it produced a green result. Together they let a reviewer — or an external verifier — trust that the checks actually ran, not just that someone said so.
+
+The manifest is a versioned wire contract an outside party can consume, which is why the kit exists as a distinct surface: it is the seam a hosted attestation service would verify. It ships the validate runner and baseline-diff tool, and gates over baseline grammar, slug liveness, and manifest grammar.
+
+## Install
+
+The steps are the kit README's [Install](https://checkwright.dev/evidence-kit/README.html#install) section. `checkwright init` does them for you — see the [install page](https://checkwright.dev/install.html).
+
+## Quick start
+
+Run this arm as the kit [README](https://checkwright.dev/evidence-kit/README.html#test) spells it, PowerShell included:
+
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
+"$gates" --run-gate-tests evidence-kit/gate-tests evidence-kit/checks
+```
+
+## Contracts
+
+The baseline grammar and the versioned manifest contract are defined in the kit's [`SPEC.md`](https://checkwright.dev/evidence-kit/SPEC.html#per-component-contracts); its [`README.md`](https://checkwright.dev/evidence-kit/README.html#evidence-kit) lists the mechanism. Back to the [kit map](https://checkwright.dev/#the-kits).
+
+Source: https://checkwright.dev/site-kit/
+
+# site-kit
+
+Deployment-truth governance for a docs site served from the repository itself (GitHub Pages and equivalents). It keeps three truths apart: what the tree says about the site's host, whether the committed pages render faithfully through the parser that will serve them, and whether the live deployment is actually up.
+
+The host gate — `check-docs-cname-parity` — makes the CNAME file the single gated source of truth for the docs host. No tracked file may cite a configured host alias other than that host in a URL, so a domain rename is a one-line edit to the CNAME that the gate then propagates. The alias set is consumer config, never a kit literal: a kit that shipped a project's host names would publish them.
+
+The render gate — `check-docs-render-fidelity` — re-renders every tracked docs page through the Pages parser and asserts the observed leakage classes never reach the published artifact: it verifies the real rendered output rather than trusting that a page reading green on github.com ships intact. The class list and the gate's honest limit live in the kit's [`SPEC.md`](https://checkwright.dev/site-kit/SPEC.html#check-docs-render-fidelity).
+
+The Liquid gate, `check-docs-liquid-parse`, parses every docs file the Pages build runs Liquid over, since one unbalanced Liquid token fails the whole site build. Its corpus and limits live in the kit's [`SPEC.md`](https://checkwright.dev/site-kit/SPEC.html#check-docs-liquid-parse).
+
+The template — `site-health.yml` — is a scheduled probe of the live site (HTTPS, redirects, certificate expiry, and release-body note pointers). It verifies a deployment, not a tree, so it ships as a workflow a consumer copies rather than a gate: the line is where the asserted object lives, and none of what it asserts is in any checkout.
+
+## Install
+
+The steps are the kit README's [Install](https://checkwright.dev/site-kit/README.html#install) section. `checkwright init` does them for you — see the [install page](https://checkwright.dev/install.html).
+
+## Quick start
+
+Run this arm as the kit [README](https://checkwright.dev/site-kit/README.html#test) spells it, PowerShell included:
+
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
+"$gates" --run-gate-tests site-kit/gate-tests site-kit/checks
+```
+
+## Contracts
+
+The gate invariants, the monitor boundary, and every knob are defined in the kit's [`SPEC.md`](https://checkwright.dev/site-kit/SPEC.html#check-docs-cname-parity); its [`README.md`](https://checkwright.dev/site-kit/README.html#site-kit) lists the mechanism. Back to the [kit map](https://checkwright.dev/#the-kits).
+
+Source: https://checkwright.dev/doctrine-kit/
+
+# doctrine-kit
+
+The experience-packaging rung. The delivery doctrine the other kits enforce piecemeal becomes one customer-deliverable rules file, `DOCTRINE.md`, carried into a consumer's project by reference. It holds two registers: methodology-maintenance rules, which keep the methodology's own surfaces honest, and engineering-craft rules, which govern how the work built under it is written.
+
+The deliverable — `DOCTRINE.md` — is referenced in place, never copy-installed: a consumer's always-loaded agent file gains a one-line-per-rule digest and a markdown link to the vendored doctrine, and re-vendoring the kit *is* the doctrine upgrade. A copied doctrine drifts; a linked one cannot.
+
+The installer — the gate binary's `--install-doctrine` arm — inserts or replaces that reference block between fixed markers, so a re-run is idempotent and a harness-less consumer can paste the block by hand.
+
+The gate — `check-doctrine-registration` — holds the block honest: it asserts the configured agent file carries the markdown link *and* keeps its methodology-rule digest in per-rule lockstep with the doctrine, fail-closed when a scanned file or heading is missing. A rule the consumer does not keep resident is dropped by a declared trim marker beside the digest, never a silent deletion — so a re-vendor that changes the rule set surfaces at the next commit.
+
+The doctrine ships the rule statements only. Each kit's SPEC owns its mechanism and knob rosters, cited from the doctrine and never restated — so no private rule content crosses the provenance seam.
+
+## Install
+
+The steps are the kit README's [Install](https://checkwright.dev/doctrine-kit/README.html#install) section. `checkwright init` does them for you — see the [install page](https://checkwright.dev/install.html).
+
+## Quick start
+
+Run this arm as the kit README spells it, PowerShell included:
+
+```sh
+gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
+"$gates" --run-gate-tests doctrine-kit/gate-tests doctrine-kit/checks
+```
+
+## Contracts
+
+The rule statements live in the kit's [`DOCTRINE.md`](https://checkwright.dev/doctrine-kit/DOCTRINE.html); the installer contract, the gate invariant, and every knob are defined in its [`SPEC.md`](https://checkwright.dev/doctrine-kit/SPEC.html#check-doctrine-registration). Back to the [kit map](https://checkwright.dev/#the-kits).

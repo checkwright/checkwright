@@ -1,7 +1,7 @@
 ---
 title: Why Checkwright
 nav_id: methodology
-nav_order: 2
+nav_order: 3
 ---
 
 # Why Checkwright

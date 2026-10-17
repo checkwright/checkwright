@@ -1,0 +1,13 @@
+# Fixture Site
+
+> Fixture checks. They catch a fixture claim.
+
+## Guide
+
+- [Guide](https://fixture.example/guide.html): How the fixture fits.
+- [tool](https://fixture.example/tool/)
+
+## Optional
+
+- [tool SPEC](https://fixture.example/tool/SPEC.html)
+- [Notes](https://fixture.example/notes.html)

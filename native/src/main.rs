@@ -45,6 +45,7 @@ mod knobfile;
 mod knobs;
 mod listing;
 mod marker;
+mod nav;
 mod proc;
 mod programs;
 mod queue;

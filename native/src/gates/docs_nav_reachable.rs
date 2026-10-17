@@ -2,123 +2,10 @@
 // carries a title block and a menu entry of its own (nav slot, derived child, generated-sibling
 // suffix link, nav_suffix pair), or is listed in the off-nav allowlist
 use crate::fresh;
+use crate::nav::{self, basename, dirname, suffix_target, Fm};
 use crate::walk;
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
-
-// spec: docs/site-architecture.md §Site chrome and the nav contract — POSIX `[[:space:]]` minus
-// the newline awk's record separator already consumed
-const SPACE: [char; 5] = [' ', '\t', '\r', '\x0b', '\x0c'];
-
-// spec: docs/site-architecture.md §Site chrome and the nav contract — front-matter facts per
-// page: title:, the nav_order slot, nav_id / nav_parent, the generated: mirror marker, and
-// nav_children_key (the derived-children key a nav page names), and the nav_suffix pairs
-#[derive(Default)]
-struct Fm {
-    title: bool,
-    order: bool,
-    id: String,
-    parent: String,
-    generated: bool,
-    children_key: String,
-    suffix: Vec<String>,
-}
-
-fn is_space(c: char) -> bool {
-    SPACE.contains(&c)
-}
-
-// spec: docs/site-architecture.md §Site chrome and the nav contract — awk's `$2`: the second
-// whitespace-delimited field of the line, empty where the line carries only one
-fn field2(line: &str) -> String {
-    line.split(is_space)
-        .filter(|f| !f.is_empty())
-        .nth(1)
-        .unwrap_or("")
-        .to_string()
-}
-
-fn key_matches<'a>(line: &'a str, key: &str) -> Option<&'a str> {
-    let rest = line.strip_prefix(key)?;
-    let t = rest.trim_start_matches(SPACE);
-    if t.is_empty() {
-        None
-    } else {
-        Some(t)
-    }
-}
-
-fn front_matter(text: &str) -> Fm {
-    let mut fm = Fm::default();
-    let lines: Vec<&str> = text.lines().collect();
-    for &line in &lines[..crate::spec::front_matter_span(&lines)] {
-        if key_matches(line, "title:").is_some() {
-            fm.title = true;
-        }
-        if let Some(t) = key_matches(line, "nav_order:") {
-            if t.starts_with(|c: char| c.is_ascii_digit()) {
-                fm.order = true;
-            }
-        }
-        if key_matches(line, "nav_id:").is_some() {
-            fm.id = field2(line);
-        }
-        if key_matches(line, "nav_parent:").is_some() {
-            fm.parent = field2(line);
-        }
-        if let Some(t) = key_matches(line, "generated:") {
-            if t.starts_with("true") {
-                fm.generated = true;
-            }
-        }
-        if key_matches(line, "nav_children_key:").is_some() {
-            fm.children_key = field2(line);
-        }
-        if let Some(t) = key_matches(line, "nav_suffix:") {
-            fm.suffix = t.split(is_space).filter(|f| !f.is_empty()).map(String::from).collect();
-        }
-    }
-    fm
-}
-
-// spec: docs/site-architecture.md §Site chrome and the nav contract — a nav_suffix pair is
-// `<label>=<path>`, the path relative to the docs root; None where either side is empty
-fn suffix_target(root: &str, pair: &str) -> Option<String> {
-    let (label, path) = pair.split_once('=')?;
-    if label.is_empty() || path.is_empty() {
-        return None;
-    }
-    Some(format!("{}/{}", root, path))
-}
-
-// spec: docs/site-architecture.md §Site chrome and the nav contract — the include's
-// derived-children rule: a page whose front matter carries a key a nav page names in
-// nav_children_key holds a nav slot and takes the key value as its label
-fn key_value(text: &str, key: &str) -> String {
-    let lines: Vec<&str> = text.lines().collect();
-    for line in &lines[..crate::spec::front_matter_span(&lines)] {
-        let fields: Vec<&str> = line.split(is_space).filter(|f| !f.is_empty()).collect();
-        if fields.first() == Some(&key) {
-            return fields.get(1).unwrap_or(&"").to_string();
-        }
-    }
-    String::new()
-}
-
-fn dirname(p: &str) -> &str {
-    match p.rfind('/') {
-        None => ".",
-        Some(0) => "/",
-        Some(i) => &p[..i],
-    }
-}
-
-fn basename(p: &str) -> &str {
-    match p.rfind('/') {
-        None => p,
-        Some(i) => &p[i + 1..],
-    }
-}
 
 // spec: docs/site-architecture.md §Site chrome and the nav contract — `realpath -m
 // --relative-to=. --`: a lexical resolution that needs no existing path, then re-spelled
@@ -229,15 +116,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Err(format!("not a directory: {}", root));
     }
 
-    // spec: gate-sdk/SPEC.md §The consumer remainder cohort — the shell form's own prune, a
-    // bare `find … -type d -name '_*' -prune`, which is not `gate_find`'s prune set: this
-    // member reads no prune knob and declares none.
-    let mut pages: Vec<String> = walk::find_with_prune(Path::new(&root), &|n| n.starts_with('_'))?
-        .into_iter()
-        .map(|p| p.display().to_string())
-        .filter(|p| p.ends_with(".md"))
-        .collect();
-    pages.sort();
+    let model = nav::load(&root)?;
+    let pages = &model.pages;
     if pages.is_empty() {
         println!(
             "DOCS-NAV-REACHABLE: clean (0 docs page(s) found under {})",
@@ -258,41 +138,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    let mut texts: HashMap<String, String> = HashMap::new();
-    let mut fms: HashMap<String, Fm> = HashMap::new();
-    let mut top_nav_ids: HashSet<String> = HashSet::new();
-    let mut named_keys: Vec<String> = Vec::new();
-    for p in &pages {
-        let text = fresh::read_captured(p)?;
-        let fm = front_matter(&text);
-        if fm.order && !fm.id.is_empty() {
-            top_nav_ids.insert(fm.id.clone());
-        }
-        // spec: docs/site-architecture.md §Site chrome and the nav contract — only a top-level
-        // nav page names a derived-children key, matching the include's navpages-only iteration
-        if fm.order && !fm.children_key.is_empty() && !named_keys.contains(&fm.children_key) {
-            named_keys.push(fm.children_key.clone());
-        }
-        texts.insert(p.clone(), text);
-        fms.insert(p.clone(), fm);
-    }
-
-    let mut derived: HashSet<String> = HashSet::new();
-    if !named_keys.is_empty() {
-        for p in &pages {
-            for k in &named_keys {
-                if !key_value(&texts[p], &format!("{}:", k)).is_empty() {
-                    derived.insert(p.clone());
-                    break;
-                }
-            }
-        }
-    }
-
+    let fms = &model.fms;
     let inscope: HashSet<&String> = pages.iter().collect();
     let mut bad: Vec<String> = Vec::new();
-    let mut reach: HashSet<String> = derived.clone();
-    for p in &pages {
+    let mut reach: HashSet<String> = model.derived.clone();
+    for p in pages {
         let fm = &fms[p];
         for pair in &fm.suffix {
             match suffix_target(&root, pair) {
@@ -300,7 +150,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
                     "{}: nav_suffix pair {} is malformed — it takes <label>=<path>",
                     p, pair
                 )),
-                Some(t) if !inscope.contains(&t) => bad.push(format!(
+                Some((_, t)) if !inscope.contains(&t) => bad.push(format!(
                     "{}: nav_suffix names {}, which is not a docs page",
                     p,
                     pair.split_once('=').map_or("", |(_, path)| path)
@@ -308,37 +158,36 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 Some(_) => {}
             }
         }
-        let child = !fm.parent.is_empty() && top_nav_ids.contains(&fm.parent);
-        if !(fm.order || child) {
+        let child = model.is_child(p);
+        if !(fm.order.is_some() || child) {
             continue;
         }
         reach.insert(p.clone());
-        for t in fm.suffix.iter().filter_map(|pair| suffix_target(&root, pair)) {
+        for (_, t) in fm.suffix.iter().filter_map(|pair| suffix_target(&root, pair)) {
             reach.insert(t);
         }
         // spec: docs/site-architecture.md §Site chrome and the nav contract — the include's
-        // suffix-link rule: a nav child's index.md hangs its generated directory siblings
+        // suffix-link rule, read where a nav child is its directory's index.md
         if child && basename(p) == "index.md" {
-            let dir = dirname(p);
-            for sib in pages.iter().filter(|s| dirname(s) == dir && fms[*s].generated) {
+            for sib in model.generated_siblings(p) {
                 reach.insert(sib.clone());
             }
         }
     }
 
-    for (id, kids) in children_by_id(&pages, &fms) {
-        for overview in overviews(&kids, &texts) {
+    for (id, kids) in children_by_id(pages, fms) {
+        for overview in overviews(&kids, &model.texts) {
             bad.push(format!(
                 "{}: an overview among its siblings under {}. Every sibling links it and it links each of them, so make it their parent with nav_id.",
                 overview, id
             ));
         }
     }
-    for p in &pages {
+    for p in pages {
         if allow.contains(p) {
             continue;
         }
-        if !(fms[p].title || derived.contains(p)) {
+        if !(fms[p].title.is_some() || model.derived.contains(p)) {
             bad.push(format!(
                 "{}: no title front-matter block — it renders without a nav slot and joins no nav",
                 p
@@ -377,37 +226,6 @@ fn rule(args: &[String]) -> Result<i32, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    // spec: docs/site-architecture.md §Site chrome and the nav contract — the front-matter
-    // reader stops at the closing marker, and a page opening with anything else has none
-    #[test]
-    fn front_matter_is_read_from_the_first_block_only() {
-        let fm = front_matter("---\ntitle: X\nnav_order: 2\nnav_id: kits\n---\ntitle: Y\n");
-        assert!(fm.title && fm.order);
-        assert_eq!(fm.id, "kits");
-        let none = front_matter("# plain\ntitle: X\n");
-        assert!(!none.title);
-        let closed = front_matter("---\n---\nnav_order: 2\n");
-        assert!(!closed.order);
-        let dotted = front_matter("---\ntitle: X\n...\nnav_order: 2\n---\n");
-        assert!(dotted.title && !dotted.order);
-        assert!(!front_matter("---\ntitle: X\n").title);
-        assert_eq!(key_value("---\nversion: 1\n...\n", "version:"), "1");
-        assert_eq!(key_value("---\na: 1\n...\nversion: 1\n---\n", "version:"), "");
-    }
-
-    // spec: docs/site-architecture.md §Site chrome and the nav contract — a pair resolves
-    // against the docs root, and one lacking its `=` or either side resolves to nothing
-    #[test]
-    fn a_nav_suffix_pair_takes_label_equals_path() {
-        assert_eq!(
-            suffix_target("docs", "spec=installer/SPEC.md").as_deref(),
-            Some("docs/installer/SPEC.md")
-        );
-        assert_eq!(suffix_target("docs", "installer/SPEC.md"), None);
-        assert_eq!(suffix_target("docs", "spec="), None);
-        assert_eq!(suffix_target("docs", "=x.md"), None);
-    }
 
     // spec: docs/site-architecture.md §Site chrome and the nav contract — a link scan per
     // occurrence, dropping externals, anchors-only and non-`.md` targets

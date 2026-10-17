@@ -1,0 +1,3 @@
+# graph: couples=docs/*.md,docs/*/index.md,docs/*/SPEC.md,docs/*/README.md,docs/doctrine-kit/DOCTRINE.md,docs/posts/*.md,docs/_config.yml,docs/CNAME,scripts/product-statement.conf,docs/llms.txt,docs/llms-full.txt dir=one valve=none tier=precommit
+# projection: docs/llms.txt,docs/llms-full.txt
+# spec: docs/generated-projections.md §Generated projections and their freshness gates — the agent index files equal their rendering from the nav model and the product statement

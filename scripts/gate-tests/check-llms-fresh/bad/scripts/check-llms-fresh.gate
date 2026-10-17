@@ -1,0 +1,3 @@
+# graph: couples=docs/*.md,scripts/product-statement.conf dir=one valve=none tier=precommit
+# spec: docs/generated-projections.md §Generated projections and their freshness gates — the case's own declaration of the product statement's source, which no positional names
+# knob: GATE_LOCAL_PRODUCT_STATEMENT_CONF = scripts/product-statement.conf

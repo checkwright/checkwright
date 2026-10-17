@@ -1,5 +1,6 @@
 {
   "name": "fixture",
   "description": "Fixture category. The fixture's \"summary\" makes done a check.",
+  "keywords": ["fixture-word", "second_word"],
   "license": "Apache-2.0"
 }

@@ -1,7 +1,7 @@
 ---
 title: Kit Reference
 nav_id: kits
-nav_order: 6
+nav_order: 7
 ---
 
 # Kit Reference

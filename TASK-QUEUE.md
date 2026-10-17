@@ -14,20 +14,6 @@
 
 ## New Features
 
-### evaluator-agent-discovery
-
-[spec: SPEC-evaluator-discovery.md]
-
-the adopter is increasingly a coding agent comparing tools and recommending or selecting one on a human's behalf, and the operator directed (2026-10-17, lead session, a direction, not a ruling) treating that agent as a first-class reader, for the next scope. Three surfaces stay here, unbuilt: (a) an evaluator-facing choosing page, when to pick it and when not, a comparison against the same-seat entrants the private brief's SWOT names and a custom-CI baseline, the limits stated; (b) `llms.txt` and `llms-full.txt` on the site, a generated projection behind a freshness gate; (d) registry metadata, `installer/package.json` carrying no `keywords` and `native/Cargo.toml`'s `description` reading as an internal binary.
-
-**Deliverable:** design-pending, a feature per surface that adds a page, a projection or a gate, spec authoring each. (d) lands with `crate-manifest-license-unheld`, which edits the same manifest. (a) states the profiles as shipped, verification without the workflow and not the reverse, so [verify-workflow-decoupling](#verify-workflow-decoupling)'s ruling edits it later.
-
-**Cost while deferred:** an agent evaluating on a human's behalf finds no surface written for it and may not surface Checkwright at all. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet of that date. Re-verified there: no `docs/llms.txt`, no root `AGENTS.md`, no `keywords` in `installer/package.json`, and the crate description as stated. Owner lookup: `llms`, `AGENTS.md`, `evaluator`, `keywords` in this file and the disposed-findings record — none; owner docs/site-architecture.md. Re-verified at evaluator-discovery-pass' scope: unchanged.
-
-Surface (e) split off as [agent-selection-probe](#agent-selection-probe) at evaluator-discovery-pass' scope (operator direction 2026-10-17, lead-relayed, not a ruling).
-
-Surface (c) split off as [evaluator-root-agent-file](#evaluator-root-agent-file) by the same direction.
-
 ## Technical Debt
 
 ### orchestration-page-overreach
@@ -338,7 +324,7 @@ the statistics half of [hosted-attestation-service](#hosted-attestation-service)
 
 [cost: event/low] [surface: gate-sdk]
 
-surface (c) of [evaluator-agent-discovery](#evaluator-agent-discovery), split off at evaluator-discovery-pass' scope (operator direction 2026-10-17, lead-relayed, not a ruling): a root `AGENTS.md` for evaluators and adopters, since a cloning agent reads the maintainer-internal `CLAUDE.md`.
+surface (c) of `evaluator-agent-discovery`, split off at evaluator-discovery-pass' scope (operator direction 2026-10-17, lead-relayed, not a ruling): a root `AGENTS.md` for evaluators and adopters, since a cloning agent reads the maintainer-internal `CLAUDE.md`.
 
 **Why split rather than built:** `check-root-tiering`'s built-in allowlist rejects a stray second agent file at root (context-kit/SPEC.md §The AGENTS.md agent-file adapter smoke asserts it), and an `AGENTS.md` is the always-loaded file of any agent that reads one, so an evaluator-facing file would also load into every such session working here, foreign adapters running stages included. **Inferred, not run:** which foreign adapters this repo dispatches read `AGENTS.md`.
 
@@ -350,7 +336,7 @@ surface (c) of [evaluator-agent-discovery](#evaluator-agent-discovery), split of
 
 [cost: event/low] [surface: drift-kit]
 
-surface (e) of [evaluator-agent-discovery](#evaluator-agent-discovery), split off at evaluator-discovery-pass' scope (operator direction 2026-10-17, lead-relayed, not a ruling): a repeatable cold agent-selection probe asking foreign agent CLIs and a fresh session, context-free, for a tool verifying coding-agent claims before merge, recording whether Checkwright appears.
+surface (e) of `evaluator-agent-discovery`, split off at evaluator-discovery-pass' scope (operator direction 2026-10-17, lead-relayed, not a ruling): a repeatable cold agent-selection probe asking foreign agent CLIs and a fresh session, context-free, for a tool verifying coding-agent claims before merge, recording whether Checkwright appears.
 
 **Why split rather than built:** each run buys foreign-CLI credit, which has already walled a granted second-vendor run, and an agent's answer moves on its own index and training clock rather than this tree's, so a run in the iteration landing the evaluator surfaces measures their absence.
 
@@ -1073,4 +1059,5 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 ## Done
 
 - crate-manifest-license-unheld
+- evaluator-agent-discovery
 

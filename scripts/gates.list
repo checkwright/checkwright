@@ -40,6 +40,7 @@ check-docs-mirror-fresh
 check-enforcement-fresh
 check-value-rollup-fresh
 check-product-statement-fresh
+check-llms-fresh
 check-license-line
 check-support-table-fresh
 check-exec-bit

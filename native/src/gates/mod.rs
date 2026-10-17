@@ -89,6 +89,7 @@ pub mod knob_citation;
 pub mod knob_default_coupling;
 pub mod lesson_disposition;
 pub mod lifecycle_registration;
+pub mod llms_fresh;
 pub mod manifest_count;
 pub mod manifest_temporal;
 pub mod md_refs;
@@ -1739,7 +1740,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-docs-nav-reachable",
         docs_nav_reachable::run,
-        &[("?", "", "", "dynamic@src/gates/docs_nav_reachable.rs:235")],
+        &[("?", "", "", "dynamic@src/nav.rs:168 via nav::load")],
         &["SITE_KIT_DOCS_DIR", "GATE_LOCAL_OFFNAV_LIST"],
         "-",
         &[("git", "")],
@@ -1947,6 +1948,14 @@ pub const REGISTRY: &[GateEntry] = &[
         product_statement_fresh::run,
         &[],
         &["GATE_SDK_NATIVE_BIN", "GATE_LOCAL_PRODUCT_STATEMENT_CONF", "GATE_LOCAL_PRODUCT_STATEMENT_SURFACES"],
+        "-",
+        &[],
+    ),
+    (
+        "check-llms-fresh",
+        llms_fresh::run,
+        &[("?", "", "", "dynamic@src/nav.rs:168 via emit::llms::render")],
+        &["GATE_SDK_NATIVE_BIN", "SITE_KIT_DOCS_DIR", "GATE_LOCAL_PRODUCT_STATEMENT_CONF"],
         "-",
         &[],
     ),
