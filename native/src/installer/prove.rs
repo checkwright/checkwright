@@ -127,7 +127,7 @@ fn prove(scratch: &mut Scratch) -> Outcome {
     // checked out detached at HEAD's commit
     let clone = step!(demo::make_scratch(scratch, "checkwright-prove").map_err(refuse));
     let (source, target) = (root.to_string_lossy().into_owned(), clone.to_string_lossy().into_owned());
-    step!(git_step(&root, &["clone", "-q", "--local", "--no-checkout", "--", &source, &target]));
+    step!(git_step(&root, &["clone", "-q", "--no-checkout", "--", &source, &target]));
     for (k, v) in demo::SCRATCH_CONFIG {
         step!(git_step(&clone, &["config", k, v]));
     }
