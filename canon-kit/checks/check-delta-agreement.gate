@@ -1,4 +1,4 @@
-# graph: couples=knob:CANON_KIT_DELTA_PATH,*.md dir=one valve=none tier=precommit
+# graph: couples=*.md dir=one valve=none tier=precommit
 # install: zero-config
 # armed-by: CANON_KIT_DELTA_PATH
 # spec: canon-kit/SPEC.md §check-delta-agreement — every delta CANON_KIT_DELTA_PATH names agrees with its base on which items exist

@@ -65,7 +65,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         let shown = spec::strip_dot_slash(&p.display().to_string());
         let rel = walk::rel_under(root, &shown).unwrap_or(&shown).trim_start_matches('/').to_string();
         if let Some((gs, ge)) = cfg.path.capture(&rel) {
-            let base = join(&cfg.base_dir, &rel[gs..ge]);
+            let base = join(&cfg.base_dir, &span(&rel, gs, ge));
             deltas.push((rel, base));
         }
     }
@@ -170,8 +170,14 @@ fn normalize(name: &str) -> String {
     name.split([' ', '\t']).filter(|w| !w.is_empty()).collect::<Vec<_>>().join(" ")
 }
 
+// spec: gate-sdk/SPEC.md §The POSIX ERE matcher — its offsets are bytes and need not fall on a
+// character boundary, so a group is read off the bytes
+fn span(text: &str, s: usize, e: usize) -> String {
+    String::from_utf8_lossy(&text.as_bytes()[s..e]).into_owned()
+}
+
 fn captured(cap: &EreCapture, line: &str) -> Option<String> {
-    cap.capture(line).map(|(s, e)| normalize(&line[s..e]))
+    cap.capture(line).map(|(s, e)| normalize(&span(line, s, e)))
 }
 
 fn base_items(text: &str, cap: &EreCapture) -> BTreeSet<String> {
@@ -338,6 +344,15 @@ mod tests {
         let cap = EreCapture::compile(REQ).unwrap();
         let items = base_items("### Requirement:Entry\tlength  \n```\n### Requirement: Quoted\n```\n", &cap);
         assert_eq!(items.into_iter().collect::<Vec<_>>(), vec!["Entry length"]);
+    }
+
+    #[test]
+    fn a_group_ending_inside_a_multibyte_character_does_not_panic() {
+        let cap = EreCapture::compile("^### Requirement: (.).*$").unwrap();
+        assert!(captured(&cap, "### Requirement: \u{e9}t\u{e9}").is_some_and(|g| !g.is_empty()));
+        let path = EreCapture::compile("^d/(.)").unwrap();
+        let (s, e) = path.capture("d/\u{e9}.md").unwrap();
+        assert!(!span("d/\u{e9}.md", s, e).is_empty());
     }
 
     // spec: canon-kit/SPEC.md §check-delta-agreement — the exit-2 path, which a `bad/` fixture held
