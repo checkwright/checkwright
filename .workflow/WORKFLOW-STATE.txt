@@ -5,3 +5,4 @@
 ---
 
 competitive-followup-pass scope a4ebbc4f 2026-10-17 9ca73c4f4
+competitive-followup-pass spec a798876d 2026-10-17 a9a7a1c87
