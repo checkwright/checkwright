@@ -60,6 +60,7 @@ Roster produced by `git grep -n 'check-license-line\|license-line.conf'` over th
 - `native/Cargo.toml`, the `license` field (delta 1).
 - docs/site-architecture.md §The license line, both paragraphs, replaced as above (delta 2).
 - `native/src/gates/license_line.rs` — the `manifest` key in the parser and its admitted-key list, the readers, the comparison, the coverage walk, the findings, the `help:` block and the clean line, with crate unit tests for each reader and each new malformed-source refusal (delta 2).
+- `native/src/gates/mod.rs`, the `check-license-line` registry row — a declared walk root `name:knob:GATE_LOCAL_LICENSE_MANIFEST_NAMES` beside the README root, and the new knob in the row's declared-knob list. The coverage walk is a walk the recorder observes, so an undeclared root fails the crate's declared-roots unit test (gate-sdk/SPEC.md §check-reads-couples). The row's existing `?` root cites `license_line.rs` by line number and moves with the code above it (delta 2).
 - `scripts/check-license-line.gate` — the manifests joining `couples=`, the knob array's four `# knob:` lines, and the `# spec:` line naming the manifest half (delta 2).
 - `scripts/license-line.conf` — the six `manifest` lines (delta 2).
 - `scripts/gate-tests/check-license-line/good/` and `bad/` — each case's `.gate` copy carrying the new knob lines; `good/` a declared manifest of each kind holding the license; `bad/` a declared manifest whose field differs, one carrying no field, and an undeclared manifest carrying one, with `expect.txt` naming each finding (delta 2).
