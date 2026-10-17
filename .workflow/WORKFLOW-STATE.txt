@@ -11,3 +11,4 @@ competitive-followup-pass build abc42385 2026-10-17 d9dbcf46f
 competitive-followup-pass build a027435e 2026-10-17 43617620f
 competitive-followup-pass build a45999f0 2026-10-17 3c019e263
 competitive-followup-pass validate a5a59da3 2026-10-17 5ca8b2ee9
+competitive-followup-pass close a8c1c02a 2026-10-17 2d47b6ef0
