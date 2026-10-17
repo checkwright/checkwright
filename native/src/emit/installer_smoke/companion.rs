@@ -4,7 +4,7 @@
 use super::consumer::{
     consumer, copy_tree, failed, find_line, git, out, porcelain, seam_of, sorted, tree, Lock,
 };
-use super::{fail, merged_in, say, Outcome, Run, Step};
+use super::{fail, merged_in, refuse, say, Outcome, Run, Step};
 use crate::{programs, walk};
 use std::collections::BTreeMap;
 use std::path::Path;
@@ -230,9 +230,31 @@ fn green(state: &Run, label: &str, c: &str) -> Step {
     Ok(())
 }
 
+// spec: installer/SPEC.md §The consumer smoke — `checkwright prove` held on the install, the consumer
+// unchanged and the scratch torn down, through the prove arm's own readers
+fn proved(state: &Run, label: &str, c: &str) -> Step {
+    let scratch = format!("{}/prove-scratch-{}", state.scratch, label);
+    std::fs::create_dir_all(&scratch)
+        .map_err(|_| refuse(format!("companion arm, {}: could not make the scratch base prove is pointed at", label)))?;
+    let tmp = [("DEMO_TMP_DIR".to_string(), scratch.clone())];
+    let arm = format!("companion arm, {}", label);
+    let m = super::profiles::unchanged_by(&arm, c, &scratch, "checkwright prove", &|| state.verb_with(c, &["prove"], &tmp))?;
+    let line = super::profiles::last(&m);
+    if m.code() != Some(0) || !super::profiles::held_line(&line) {
+        return Err(failed(&m, format!(
+            "{}: checkwright prove exited {} with last line '{}', not 0 and the held grammar",
+            arm,
+            m.reported_code(),
+            line
+        )));
+    }
+    say(&format!("{}: checkwright prove exits 0, {}", label, line));
+    Ok(())
+}
+
 // spec: installer/SPEC.md §The consumer smoke — installed on the fixture tree, green, idempotent,
-// and each planted defect red by the gate that owns it
-fn arm(state: &Run, tk: &str, label: &str, words: &[String]) -> Result<String, Outcome> {
+// proved where step 3 runs, and each planted defect red by the gate that owns it
+fn arm(state: &Run, tk: &str, label: &str, words: &[String], prove: bool) -> Result<String, Outcome> {
     let root = companion(state);
     if !Path::new(&format!("{}/{}/recipe", root, tk)).is_dir() {
         return Err(fail(format!("companion arm: this arm names {}, and companion/{}/recipe/ does not exist", tk, tk)));
@@ -265,6 +287,9 @@ fn arm(state: &Run, tk: &str, label: &str, words: &[String]) -> Result<String, O
     }
     let c = install(state, tk, label, words)?;
     green(state, &format!("{}, {}", label, words.join(" ")), &c)?;
+    if prove {
+        proved(state, label, &c)?;
+    }
     let defects = walk::list_dir(Path::new(&format!("{}/defects", fixtures))).unwrap_or_default();
     for (gate, _) in defects.into_iter().filter(|(_, dir)| *dir) {
         copy_tree(Path::new(&format!("{}/defects/{}", fixtures, gate)), Path::new(&c))
@@ -479,7 +504,7 @@ fn complement(state: &Run, tk: &str, words: &[String]) -> Step {
         )));
     }
     say(&format!("{}: the line's --without-kit set is {}'s exclusions.list rows, {}", label, tk, want.join(" ")));
-    let c = arm(state, tk, &label, words)?;
+    let c = arm(state, tk, &label, words, true)?;
     held_out(&label, &c, &want, "the install and a bare re-run")?;
     let before = tree(&c)?;
     let m = state.verb(&c, &["update"])?;
@@ -540,7 +565,7 @@ pub(super) fn speckit(state: &mut Run) -> Step {
         "--recipe",
         "companion arm, speckit: the extension install command carries no install line to run",
     )?;
-    let c = arm(state, "speckit", "speckit", &words)?;
+    let c = arm(state, "speckit", "speckit", &words, true)?;
     overlap(state, "speckit", &c, &[command, format!("{}/docs/speckit.md", state.root)])
 }
 
@@ -553,7 +578,7 @@ pub(super) fn speckit_full(state: &mut Run) -> Step {
         "companion arm, speckit full: the extension install command carries no full line to run",
     )?;
     same_words(state, "speckit full", "companion-full", &words)?;
-    arm(state, "speckit", "speckit-full", &words).map(|_| ())
+    arm(state, "speckit", "speckit-full", &words, false).map(|_| ())
 }
 
 pub(super) fn speckit_complement(state: &mut Run) -> Step {
@@ -580,7 +605,7 @@ pub(super) fn openspec(state: &mut Run) -> Step {
         "--recipe",
         "companion arm, openspec: the OpenSpec page carries no install line to run",
     )?;
-    let c = arm(state, "openspec", "openspec", &words)?;
+    let c = arm(state, "openspec", "openspec", &words, true)?;
     overlap(state, "openspec", &c, &[openspec_page(state)])
 }
 

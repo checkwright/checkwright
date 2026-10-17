@@ -2,6 +2,7 @@
 // its own: what the install configures, enforces and leaves inactive, the battery, the claim, and
 // the verdict as the exit status and the last line of stdout.
 use super::{demo, doctor, lock, workflow, GATES_DIR, QUEUE_FILE, STATE_FILE};
+use crate::gates::task_path_claim::LISTS_KNOB;
 use crate::walkthrough::{self as show, Scratch};
 use crate::{proc, programs};
 use std::fmt::Write as _;
@@ -169,47 +170,19 @@ fn prove(scratch: &mut Scratch) -> Outcome {
 
     // spec: installer/SPEC.md §prove — the claim, over the files a battery at the clone's root reads
     println!("\nthe claim");
-    let help = format!(
-        "re-run init with --profile {}, the profile demo installs, to keep a task queue and stage state; init --help lists the profiles and the --with-kit selection.",
-        super::profile::DERIVED
-    );
-    let mut texts = Vec::new();
-    for f in [&queue, &state] {
-        match f.rel.as_ref().and_then(|r| std::fs::read_to_string(clone.join(r)).ok()) {
-            Some(t) => texts.push(t),
-            None => {
-                let named = f.rel.as_deref().unwrap_or(&f.named);
-                return Outcome::NotHeld {
-                    cause: format!("this tree keeps no {} to claim a task done in", named),
-                    help,
-                };
-            }
-        }
-    }
-    let (queue_rel, state_rel) = (queue.rel.unwrap_or_default(), state.rel.unwrap_or_default());
-    let today = crate::emit::kpi::iso_day(crate::emit::kpi::now_epoch().div_euclid(86_400));
-    let (claimed_queue, claimed_state) = match demo::claim(&texts[0], &texts[1], &head, &today) {
-        Ok(c) => c,
-        Err(m) => {
-            return Outcome::NotHeld {
-                cause: format!("{} keeps no {} to claim a task done in", queue_rel, m.part()),
-                help: String::new(),
-            }
-        }
-    };
-    for (rel, body) in [(&queue_rel, &claimed_queue), (&state_rel, &claimed_state)] {
+    let claim = step!(stage(&clone, &gates, &manifest, &queue, &state, &head));
+    for (rel, body) in &claim.writes {
         if let Err(e) = std::fs::write(clone.join(rel), body) {
             return refuse(format!("cannot write {} in the clone: {}", rel, e));
         }
     }
-    step!(git_step(&clone, &["add", "--", &queue_rel, &state_rel]));
+    let mut add = vec!["add", "--"];
+    add.extend(claim.writes.iter().map(|(rel, _)| rel.as_str()));
+    step!(git_step(&clone, &add));
     step!(git_step(&clone, &["commit", "-q", "--no-verify", "-m", &format!("done: {}", demo::TASK)]));
-    show::say(&format!(
-        "a task moved to Done and validate and close stamped for iteration {}, with no evidence behind them",
-        demo::ITERATION
-    ));
+    show::say(&claim.said);
     let (rc, out) = step!(battery(&clone, &bin, &claim_env));
-    let quoted = if rc == 0 { None } else { demo::caught(&out) };
+    let quoted = if rc == 0 { None } else { demo::caught(&out, &claim.named) };
     let Some(quoted) = quoted else {
         show::say(&summary(&out));
         return Outcome::NotHeld { cause: "the claim was not caught".to_string(), help: String::new() };
@@ -312,6 +285,94 @@ fn claim_env(files: &[&ClaimFile]) -> Vec<(String, String)> {
             (f.knob.to_string(), at)
         })
         .collect()
+}
+
+// spec: installer/SPEC.md §prove — one staged claim: each file it writes with its new body, the
+// string a reddened block must name to catch it, and the line the run says of it
+struct Claim {
+    writes: Vec<(String, String)>,
+    named: String,
+    said: String,
+}
+
+// spec: installer/SPEC.md §prove — the stage claim where the clone holds both lifecycle files, else
+// the task claim
+fn stage(clone: &Path, gates: &str, manifest: &lock::Manifest, queue: &ClaimFile, state: &ClaimFile, head: &str) -> Result<Claim, Outcome> {
+    let read = |f: &ClaimFile| f.rel.as_ref().and_then(|r| std::fs::read_to_string(clone.join(r)).ok());
+    let (q, s) = match (read(queue), read(state)) {
+        (Some(q), Some(s)) => (q, s),
+        (q, _) => return task_claim(clone, gates, manifest, if q.is_none() { queue } else { state }),
+    };
+    let (queue_rel, state_rel) = (queue.rel.clone().unwrap_or_default(), state.rel.clone().unwrap_or_default());
+    let today = crate::emit::kpi::iso_day(crate::emit::kpi::now_epoch().div_euclid(86_400));
+    let (cq, cs) = demo::claim(&q, &s, head, &today).map_err(|m| Outcome::NotHeld {
+        cause: format!("{} keeps no {} to claim a task done in", queue_rel, m.part()),
+        help: String::new(),
+    })?;
+    Ok(Claim {
+        writes: vec![(queue_rel, cq), (state_rel, cs)],
+        named: demo::ITERATION.to_string(),
+        said: format!(
+            "a task moved to Done and validate and close stamped for iteration {}, with no evidence behind them",
+            demo::ITERATION
+        ),
+    })
+}
+
+// spec: installer/SPEC.md §prove — the task claim: demo's task ticked done naming a path under a
+// top-level directory named for the verb, appended to the first task list resolving in the clone
+fn task_claim(clone: &Path, gates: &str, manifest: &lock::Manifest, missing: &ClaimFile) -> Result<Claim, Outcome> {
+    let Some(list) = task_list(clone, gates).map_err(refuse)? else {
+        return Err(Outcome::NotHeld {
+            cause: format!(
+                "this tree keeps no {} and no task list to claim a task done in",
+                missing.rel.as_deref().unwrap_or(&missing.named)
+            ),
+            help: not_held_help(manifest),
+        });
+    };
+    let path = format!("prove/{}.md", demo::TASK);
+    if std::fs::symlink_metadata(clone.join(&path)).is_ok() {
+        return Err(refuse(format!("the clone already holds {}, the path the task claim names", path)));
+    }
+    let mut body = std::fs::read_to_string(clone.join(&list))
+        .map_err(|e| refuse(format!("cannot read the task list {} in the clone: {}", list, e)))?;
+    if !body.is_empty() && !body.ends_with('\n') {
+        body.push('\n');
+    }
+    let _ = writeln!(body, "- [x] {} in {}", demo::TASK, path);
+    let said = format!("a task ticked done in {} naming {}, a path this tree does not hold", list, path);
+    Ok(Claim { writes: vec![(list, body)], named: path, said })
+}
+
+// spec: installer/SPEC.md §prove — the first task list in path order resolving inside the clone,
+// the globs and the prune set read from the clone as a battery at its root reads them
+fn task_list(clone: &Path, gates: &str) -> Result<Option<String>, String> {
+    let knob = |k: &str| crate::knobs::wire_in(clone, gates, k);
+    let globs: Vec<String> = knob(LISTS_KNOB)?.split('\t').filter(|g| !g.is_empty()).map(String::from).collect();
+    if globs.is_empty() {
+        return Ok(None);
+    }
+    let mut prune: Vec<String> = Vec::new();
+    for k in ["GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS"] {
+        prune.extend(knob(k)?.split_whitespace().map(String::from));
+    }
+    let top = clone.display().to_string();
+    let lists = crate::gates::task_path_claim::task_lists_pruned(&top, &globs, &|n| prune.iter().any(|d| d == n))?;
+    Ok(lists.iter().find_map(|l| Path::new(l).strip_prefix(clone).ok().and_then(|r| confined(clone, r))))
+}
+
+// spec: installer/SPEC.md §prove — the no-file help names the profile demo installs, and the task
+// list knob where the lock carries the kit owning it
+fn not_held_help(manifest: &lock::Manifest) -> String {
+    let profile = format!(
+        "re-run init with --profile {}, the profile demo installs, to keep a task queue and stage state",
+        super::profile::DERIVED
+    );
+    let kits = manifest.field("kits");
+    let owned = crate::knobs::static_owner(LISTS_KNOB).is_some_and(|k| kits.split_whitespace().any(|n| n == k.root));
+    let knob = if owned { format!(", or name a task list in {}", LISTS_KNOB) } else { String::new() };
+    format!("{}{}; init --help lists the profiles and the --with-kit selection.", profile, knob)
 }
 
 fn report(root: &Path, clone: &Path, manifest: &lock::Manifest, door: &str) -> String {
@@ -482,6 +543,76 @@ mod tests {
         std::os::unix::fs::symlink("real/sub", clone.join("alias")).expect("symlink");
         let at = super::in_clone(std::path::Path::new("/repo"), &clone, "alias/../TASK-QUEUE.md");
         assert_eq!(at.as_deref(), Some("real/TASK-QUEUE.md"));
+    }
+
+    fn lists_at(clone: &std::path::Path) -> String {
+        std::fs::create_dir_all(clone.join("scripts")).expect("scratch");
+        std::fs::write(clone.join("scripts/canon-config.knobs"), "CANON_KIT_TASK_LIST_GLOBS[] = specs/*/tasks.md\n")
+            .expect("write");
+        clone.join("scripts").display().to_string()
+    }
+
+    // spec: installer/SPEC.md §prove — the task claim lands at the end of the first task list in path
+    // order, the clone's knob naming the lists, as a new ticked item naming the absent path
+    #[test]
+    fn the_task_claim_ticks_demos_task_at_the_end_of_the_first_list() {
+        let _env = crate::knobenv::lock();
+        let t = Tree::new("task-claim");
+        let clone = t.clone();
+        let gates = lists_at(&clone);
+        for d in ["specs/b", "specs/a"] {
+            std::fs::create_dir_all(clone.join(d)).expect("scratch");
+        }
+        std::fs::write(clone.join("specs/a/tasks.md"), "- [x] T001 one").expect("write");
+        std::fs::write(clone.join("specs/b/tasks.md"), "- [ ] T002 two\n").expect("write");
+        let missing = super::ClaimFile { knob: super::STATE_KNOB, named: "s".into(), rel: Some("s".into()) };
+        let lock = super::lock::Manifest::parse(r#"{"kits":["gate-sdk","canon-kit"]}"#).expect("lock");
+        let Ok(claim) = super::task_claim(&clone, &gates, &lock, &missing) else { panic!("no task claim staged") };
+        assert_eq!(claim.named, "prove/add-login-page.md");
+        assert_eq!(claim.writes.len(), 1);
+        assert_eq!(claim.writes[0].0, "specs/a/tasks.md");
+        assert_eq!(claim.writes[0].1, "- [x] T001 one\n- [x] add-login-page in prove/add-login-page.md\n");
+        std::fs::create_dir_all(clone.join("prove")).expect("scratch");
+        std::fs::write(clone.join("prove/add-login-page.md"), "").expect("write");
+        assert!(matches!(super::task_claim(&clone, &gates, &lock, &missing), Err(super::Outcome::Refuse { .. })));
+    }
+
+    // spec: installer/SPEC.md §prove — a tree keeping no task list answers not held, its help naming
+    // the task list knob only where the lock carries the kit owning it
+    #[test]
+    fn no_task_list_is_not_held_and_the_help_names_the_knob_by_the_lock() {
+        let _env = crate::knobenv::lock();
+        let t = Tree::new("no-list");
+        let clone = t.clone();
+        let gates = lists_at(&clone);
+        let missing = super::ClaimFile { knob: super::QUEUE_KNOB, named: "TASK-QUEUE.md".into(), rel: None };
+        for (kits, names) in [(r#"["canon-kit"]"#, true), (r#"["gate-sdk"]"#, false)] {
+            let lock = super::lock::Manifest::parse(&format!(r#"{{"kits":{}}}"#, kits)).expect("lock");
+            let Err(super::Outcome::NotHeld { cause, help }) = super::task_claim(&clone, &gates, &lock, &missing) else {
+                panic!("a tree with no task list staged a claim")
+            };
+            assert_eq!(cause, "this tree keeps no TASK-QUEUE.md and no task list to claim a task done in");
+            assert_eq!(help.contains(super::LISTS_KNOB), names, "{}", help);
+            assert!(help.contains("--profile full"), "{}", help);
+        }
+    }
+
+    // spec: installer/SPEC.md §prove — a task list that is a symlink out of the clone is no list of
+    // the clone's, so the claim is never written through it and the walk takes the next
+    #[cfg(unix)]
+    #[test]
+    fn a_task_list_symlinked_out_of_the_clone_is_never_claimed_in() {
+        let _env = crate::knobenv::lock();
+        let t = Tree::new("list-out");
+        let clone = t.clone();
+        let gates = lists_at(&clone);
+        std::fs::write(t.0.join("outside/tasks.md"), "- [x] theirs\n").expect("write");
+        std::fs::create_dir_all(clone.join("specs/a")).expect("scratch");
+        std::os::unix::fs::symlink("../../../outside/tasks.md", clone.join("specs/a/tasks.md")).expect("symlink");
+        assert_eq!(super::task_list(&clone, &gates), Ok(None));
+        std::fs::create_dir_all(clone.join("specs/b")).expect("scratch");
+        std::fs::write(clone.join("specs/b/tasks.md"), "- [ ] mine\n").expect("write");
+        assert_eq!(super::task_list(&clone, &gates).as_ref().map(|o| o.as_deref()), Ok(Some("specs/b/tasks.md")));
     }
 
     // spec: installer/SPEC.md §prove — every battery run sets both knobs, one naming nothing of the

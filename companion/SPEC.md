@@ -103,7 +103,7 @@ The recipes are proved against the defect classes below, each caught by a named 
 - a dangling section citation, by `check-spec-pointer`;
 - an unclosed fence, by `check-spec-fence-balance`;
 - a documented command that invokes a missing script, by `check-docs-cmd`;
-- a ticked task naming a path that does not exist, by `check-task-path-claim`.
+- a ticked task naming a path that does not exist, by `check-task-path-claim`, the claim `checkwright prove` makes on `prose` and `complement` and holds on each ([installer/SPEC.md §prove](../installer/SPEC.md#prove)).
 
 Spec Kit also carries a task citing a user story its spec does not define, by `check-task-label-resolution`.
 

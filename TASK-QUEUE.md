@@ -14,16 +14,6 @@
 
 ## New Features
 
-### companion-prove-not-held
-
-[spec: SPEC-companion-prove.md]
-
-every companion `prose` and `complement` install, Spec Kit and OpenSpec alike, prints an `init` then: line offering `prove`, and `prove` answers not held, exit 1, with a help line steering to `--profile full`, by construction: §prove's claim reads lifecycle state files, which `complement` leaves out because the toolkit does that job (`companion/exclusions.list`). The companion's own done claim, a ticked task naming an absent path, is caught by `check-task-path-claim`, which `prove` never stages. `full` installs report held. Rehearsed 2026-10-17 at `companion-adoption-rehearsal`.
-
-**Deliverable:** design-pending, spec's: either `prove` gains a companion claim (a ticked task naming an absent path in the recipe's task-list glob), or the then: line is withheld or reworded where no claim can be staged; owners installer/SPEC.md §prove and §init, companion/SPEC.md.
-
-**Cost while deferred:** a companion tester's first proof step reports failure and recommends the tier the companion exists to avoid. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet of that date; spec-conformant, so a design question rather than a fix. Re-verified there by reading §prove step 4 and `companion/exclusions.list`. Owner lookup: `prove`, `then: line`, `companion` in this file and the disposed-findings record — [companion-toolkit-profile](#companion-toolkit-profile), DISTINCT (the catalog submission).
-
 ### companion-complement-init-line
 
 [spec: SPEC-complement-init-line.md]
@@ -48,7 +38,7 @@ The quoted line was settled at spec by reading `init.rs`: both lines print the p
 
 **Run at scope, 2026-10-17:** a scratch tree committing `queue.md` as a relative symlink out of its clone, the knob naming it, had the placed binary's `--prove` write the claim's iteration header and Done item into the file outside the clone, exit 1 on its empty registry.
 
-**Cost while deferred:** a tree carrying such a symlink has `prove` write a claim into a file outside its clone, and a P1 review finding stands open against a verb new since v0.31.0. Surfaced 2026-10-17 by competitive-followup-pass' close second-vendor review as three gap bullets, promoted at the next scope's intake. Re-verified there by reading `in_clone`, `resolved` and the `claim_env` filter. Owner lookup: `in_clone`, `claim_env`, `symlink`, `prove` in this file and the disposed-findings record — none; [companion-prove-not-held](#companion-prove-not-held), DISTINCT (which claim `prove` stages); [prove-pwsh-leg-unmeasured](#prove-pwsh-leg-unmeasured), DISTINCT (the Windows route's oracle); owner installer/SPEC.md §prove.
+**Cost while deferred:** a tree carrying such a symlink has `prove` write a claim into a file outside its clone, and a P1 review finding stands open against a verb new since v0.31.0. Surfaced 2026-10-17 by competitive-followup-pass' close second-vendor review as three gap bullets, promoted at the next scope's intake. Re-verified there by reading `in_clone`, `resolved` and the `claim_env` filter. Owner lookup: `in_clone`, `claim_env`, `symlink`, `prove` in this file and the disposed-findings record — none; `companion-prove-not-held`, DISTINCT (which claim `prove` stages); [prove-pwsh-leg-unmeasured](#prove-pwsh-leg-unmeasured), DISTINCT (the Windows route's oracle); owner installer/SPEC.md §prove.
 
 ### prove-pwsh-leg-unmeasured
 
@@ -1125,4 +1115,5 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 ## Done
 
 - knob-file-relative-to-cwd
+- companion-prove-not-held
 

@@ -149,7 +149,7 @@ fn walkthrough(pkg: &Package, scratch: &mut Scratch) -> Outcome {
     if rc == 0 {
         return Outcome::Fail("the done claim did not turn the battery red".into());
     }
-    let Some(quoted) = caught(&out) else {
+    let Some(quoted) = caught(&out, ITERATION) else {
         print!("{}", ends_with_newline(&out));
         return Outcome::Fail(format!(
             "the battery went red without naming the claimed iteration {}",
@@ -196,10 +196,10 @@ pub(super) fn scratch_base(set: Option<std::ffi::OsString>, here: &str) -> PathB
 }
 
 // spec: installer/SPEC.md §demo — every reddened block quoted back through the excerpt rule, when
-// some block names the claimed iteration
-pub(super) fn caught(out: &str) -> Option<Vec<Vec<String>>> {
+// some block names what the claim staged: demo's iteration, or the path `prove`'s task claim names
+pub(super) fn caught(out: &str, named: &str) -> Option<Vec<Vec<String>>> {
     let quoted: Vec<Vec<String>> = show::failed_gates(out).iter().map(|g| show::excerpt(out, g)).collect();
-    quoted.iter().flatten().any(|l| l.contains(ITERATION)).then_some(quoted)
+    quoted.iter().flatten().any(|l| l.contains(named)).then_some(quoted)
 }
 
 // spec: installer/SPEC.md §demo — the directory is made in-process, since `mktemp` is a

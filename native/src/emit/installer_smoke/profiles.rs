@@ -1152,24 +1152,8 @@ pub(super) fn prove(state: &mut Run) -> Step {
         }
         Ok(())
     };
-    let unchanged = |what: &str, run: &dyn Fn() -> Result<crate::proc::Merged, Outcome>| -> Result<crate::proc::Merged, Outcome> {
-        let (before, status) = (tree(&c)?, porcelain(&c)?);
-        let m = run()?;
-        if tree(&c)? != before {
-            return Err(failed(&m, format!("prove arm: {} changed the consumer's tree object", what)));
-        }
-        if porcelain(&c)? != status {
-            return Err(failed(&m, format!("prove arm: {} left the consumer's worktree changed", what)));
-        }
-        let left = walk::list_dir(Path::new(&scratch)).unwrap_or_default();
-        if !left.is_empty() {
-            let names: Vec<String> = left.into_iter().map(|(n, _)| n).collect();
-            return Err(failed(&m, format!("prove arm: {} left its scratch behind in DEMO_TMP_DIR: {}", what, names.join(" "))));
-        }
-        Ok(m)
-    };
-    let last = |m: &crate::proc::Merged| -> String {
-        out(m).lines().rev().find(|l| !l.trim().is_empty()).unwrap_or("").trim_end().to_string()
+    let unchanged = |what: &str, run: &dyn Fn() -> Result<crate::proc::Merged, Outcome>| {
+        unchanged_by("prove arm", &c, &scratch, what, run)
     };
 
     install(state, &state.profile_min)?;
@@ -1231,8 +1215,39 @@ pub(super) fn prove(state: &mut Run) -> Step {
     Ok(())
 }
 
+// spec: installer/SPEC.md §The consumer smoke — one prove run leaving the consumer's tree object and
+// `git status --porcelain` as it found them and its scratch directory empty, `arm` leading each
+// failure line
+pub(super) fn unchanged_by(
+    arm: &str,
+    c: &str,
+    scratch: &str,
+    what: &str,
+    run: &dyn Fn() -> Result<crate::proc::Merged, Outcome>,
+) -> Result<crate::proc::Merged, Outcome> {
+    let (before, status) = (tree(c)?, porcelain(c)?);
+    let m = run()?;
+    if tree(c)? != before {
+        return Err(failed(&m, format!("{}: {} changed the consumer's tree object", arm, what)));
+    }
+    if porcelain(c)? != status {
+        return Err(failed(&m, format!("{}: {} left the consumer's worktree changed", arm, what)));
+    }
+    let left = walk::list_dir(Path::new(scratch)).unwrap_or_default();
+    if !left.is_empty() {
+        let names: Vec<String> = left.into_iter().map(|(n, _)| n).collect();
+        return Err(failed(&m, format!("{}: {} left its scratch behind in DEMO_TMP_DIR: {}", arm, what, names.join(" "))));
+    }
+    Ok(m)
+}
+
+// spec: installer/SPEC.md §prove — the verdict is the last line of stdout
+pub(super) fn last(m: &crate::proc::Merged) -> String {
+    out(m).lines().rev().find(|l| !l.trim().is_empty()).unwrap_or("").trim_end().to_string()
+}
+
 // spec: installer/SPEC.md §prove — `PROVE: held — caught at <head>; time to proof <N> min`
-fn held_line(line: &str) -> bool {
+pub(super) fn held_line(line: &str) -> bool {
     let Some(rest) = line.strip_prefix("PROVE: held — caught at ") else {
         return false;
     };
@@ -1345,7 +1360,7 @@ pub(super) fn summary(state: &Run) -> String {
         "the gate binary this run runs as, staged unrebuilt"
     };
     format!(
-        "{} profile(s) installed from the packed tarball with no registry access, each carrying {}, each put in front of a real prose defect (caught by {}) and each reversed back to its pre-init tree object, with gate rosters monotone across every comparable pair of the registries those installs wrote, plus the artifact-less {} leg driving a payload the packer itself produced with no artifact and asserting one refusal for init, doctor, diff and a bare invocation alike, naming the platform and writing nothing, the demo arm running checkwright demo green inside an installed consumer with its act 3 red read off a FAIL: line, the front-page proof block found in its output and that consumer unchanged and its scratch torn down, the prove arm holding checkwright prove not held on the lattice minimum and held at the payload-derived profile through the package and the placed binary alike with the consumer unchanged by each run, the companion arm applying each spec-toolkit recipe on its fixture tree green and catching each planted defect by its own gate, every complement line holding its left-out kits out, and the OpenSpec lifecycle layer firing check-stage-entry on a two-capability change and clearing on one, the extracted-tarball arm with node/npm masked and reversed the same way, the toolchain-free arm driving doctor and a full init with cargo/rustc masked, the jq-less arm asserting diff, uninstall and a lattice-minimum and a guard-kit init run clean with no jq on PATH, the installed guard hook answering a payload and doctor naming jq nowhere, the bash-less arm installing every profile that owes no bash and committing through its hooks clean and refused with no bash on PATH, the two-hop cross-version upgrade arm carrying the relinquish and re-add, the cross-version reversal arm reversing an unedited consumer back to its pre-init tree object after those same three hops, the newer-verb reversal arm reversing a first-version install by the next version with no upgrade, the hooked move arm committing a profile move and an upgrade shipping a gate-library change through the installed hooks while check-gate-tamper still refuses a gate edit co-staged with product code, the same-version seam arm and the protection branch chained onto it over a tampered gate binary, the narrowing arm re-running init at a smaller profile so files[] outlives kits, the selection arm adding a kit and a gate and dropping one at the minimum profile and clearing them with --no-selection, and the artifact arm driving the selection outcomes on a mutated copy of that payload, with its refusals asserted to differ in message and remedy and its fallback cases run wherever the hand-off carries a foreign-architecture preferred artifact, and the bootstrap's shasum fallback verifying and refusing with sha256sum masked wherever the host carries shasum",
+        "{} profile(s) installed from the packed tarball with no registry access, each carrying {}, each put in front of a real prose defect (caught by {}) and each reversed back to its pre-init tree object, with gate rosters monotone across every comparable pair of the registries those installs wrote, plus the artifact-less {} leg driving a payload the packer itself produced with no artifact and asserting one refusal for init, doctor, diff and a bare invocation alike, naming the platform and writing nothing, the demo arm running checkwright demo green inside an installed consumer with its act 3 red read off a FAIL: line, the front-page proof block found in its output and that consumer unchanged and its scratch torn down, the prove arm holding checkwright prove not held on the lattice minimum and held at the payload-derived profile through the package and the placed binary alike with the consumer unchanged by each run, the companion arm applying each spec-toolkit recipe on its fixture tree green, holding checkwright prove on each install and complement line and catching each planted defect by its own gate, every complement line holding its left-out kits out, and the OpenSpec lifecycle layer firing check-stage-entry on a two-capability change and clearing on one, the extracted-tarball arm with node/npm masked and reversed the same way, the toolchain-free arm driving doctor and a full init with cargo/rustc masked, the jq-less arm asserting diff, uninstall and a lattice-minimum and a guard-kit init run clean with no jq on PATH, the installed guard hook answering a payload and doctor naming jq nowhere, the bash-less arm installing every profile that owes no bash and committing through its hooks clean and refused with no bash on PATH, the two-hop cross-version upgrade arm carrying the relinquish and re-add, the cross-version reversal arm reversing an unedited consumer back to its pre-init tree object after those same three hops, the newer-verb reversal arm reversing a first-version install by the next version with no upgrade, the hooked move arm committing a profile move and an upgrade shipping a gate-library change through the installed hooks while check-gate-tamper still refuses a gate edit co-staged with product code, the same-version seam arm and the protection branch chained onto it over a tampered gate binary, the narrowing arm re-running init at a smaller profile so files[] outlives kits, the selection arm adding a kit and a gate and dropping one at the minimum profile and clearing them with --no-selection, and the artifact arm driving the selection outcomes on a mutated copy of that payload, with its refusals asserted to differ in message and remedy and its fallback cases run wherever the hand-off carries a foreign-architecture preferred artifact, and the bootstrap's shasum fallback verifying and refusing with sha256sum masked wherever the host carries shasum",
         state.profiles.len(),
         provenance,
         state.value_red.join(" "),

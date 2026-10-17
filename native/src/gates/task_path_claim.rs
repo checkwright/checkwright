@@ -4,7 +4,7 @@ use crate::spec;
 use crate::walk;
 use std::path::Path;
 
-const LISTS_KNOB: &str = "CANON_KIT_TASK_LIST_GLOBS";
+pub(crate) const LISTS_KNOB: &str = "CANON_KIT_TASK_LIST_GLOBS";
 const VALVE: &str = "task-path-exempt:";
 
 pub fn run(args: &[String]) -> i32 {
@@ -76,7 +76,14 @@ fn rule(args: &[String]) -> Result<i32, String> {
 // spec: canon-kit/SPEC.md §check-task-path-claim — a task list is a markdown file the knob's globs
 // match, through the pruning walk
 pub(crate) fn task_lists(root: &str, globs: &[String]) -> Result<Vec<String>, String> {
-    let mut lists: Vec<String> = walk::glob_corpus(Path::new(root), globs)?
+    let prune = walk::prune_dirs()?;
+    task_lists_pruned(root, globs, &|n| prune.iter().any(|d| d == n))
+}
+
+// spec: installer/SPEC.md §prove — the same lists for a reader resolving the prune set in a tree it
+// has not entered
+pub(crate) fn task_lists_pruned(root: &str, globs: &[String], prune: &dyn Fn(&str) -> bool) -> Result<Vec<String>, String> {
+    let mut lists: Vec<String> = walk::glob_files_pruned(Path::new(root), globs, prune)?
         .into_iter()
         .filter(|p| p.is_file() && p.extension().is_some_and(|e| e == "md"))
         .map(|p| spec::strip_dot_slash(&p.display().to_string()))
