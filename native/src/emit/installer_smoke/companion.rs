@@ -2,7 +2,7 @@
 // its toolkit's documented install line to its fixture tree, the full and complement lines likewise,
 // and the OpenSpec lifecycle layer's audit leg
 use super::consumer::{
-    consumer, copy_tree, failed, find_line, git, out, porcelain, seam_of, sorted, tree, Lock,
+    consumer, copy_tree, failed, find_line, first_starting, git, git_out, out, porcelain, seam_of, sorted, tree, Lock,
 };
 use super::{fail, merged_in, refuse, say, Outcome, Run, Step};
 use crate::{programs, walk};
@@ -151,6 +151,19 @@ fn exclusions(state: &Run) -> Result<BTreeMap<String, Vec<String>>, Outcome> {
     Ok(excluded)
 }
 
+// spec: installer/SPEC.md §The consumer smoke — the kits a line leaves out, both flag spellings
+fn without_kits(words: &[String]) -> Vec<String> {
+    let mut kits: Vec<String> = Vec::new();
+    for (i, w) in words.iter().enumerate() {
+        if w == "--without-kit" {
+            kits.extend(words.get(i + 1).cloned());
+        } else if let Some(k) = w.strip_prefix("--without-kit=") {
+            kits.push(k.to_string());
+        }
+    }
+    kits
+}
+
 fn gates_bin(c: &str) -> Result<programs::Program, Outcome> {
     let bin = seam_of(c).ok_or_else(|| fail(format!("{} names no gate binary in its seam", c)))?;
     Ok(programs::CHECKWRIGHT_GATES.at(format!("{}/{}", c, bin)))
@@ -178,6 +191,21 @@ fn install(state: &Run, tk: &str, label: &str, words: &[String]) -> Result<Strin
     if !dirty.is_empty() {
         super::show(&dirty);
         return Err(why(format!("{} left the worktree dirty", words.join(" "))));
+    }
+    // spec: installer/SPEC.md §The consumer smoke — a line leaving kits out is reported and committed
+    // as the profile phrase naming each of them, not as the bare profile
+    let init_line = first_starting(&out(&m), "INIT:").to_string();
+    let subject = git_out(&c, &["log", "-1", "--format=%s"])?.trim().to_string();
+    for (what, text) in [("INIT: line", &init_line), ("commit subject", &subject)] {
+        let unnamed: Vec<String> = without_kits(words).into_iter().filter(|k| !text.contains(k.as_str())).collect();
+        if !unnamed.is_empty() {
+            return Err(why(format!(
+                "the {} '{}' names no {}, which the line leaves out",
+                what,
+                text,
+                unnamed.join(" ")
+            )));
+        }
     }
     let want: Vec<String> = words.windows(2).filter(|w| w[0] == "--recipe").map(|w| w[1].clone()).collect();
     let got = Lock::of(&c)?.list("recipes");
@@ -476,15 +504,7 @@ fn held_out(label: &str, c: &str, want: &[String], moment: &str) -> Step {
 fn complement(state: &Run, tk: &str, words: &[String]) -> Step {
     let label = format!("{}-complement", tk);
     let want = exclusions(state)?.remove(tk).unwrap_or_default();
-    let mut line_kits: Vec<String> = Vec::new();
-    for (i, w) in words.iter().enumerate() {
-        if w == "--without-kit" {
-            line_kits.extend(words.get(i + 1).cloned());
-        } else if let Some(k) = w.strip_prefix("--without-kit=") {
-            line_kits.push(k.to_string());
-        }
-    }
-    let line_kits = sorted(line_kits);
+    let line_kits = sorted(without_kits(words));
     let only_line: Vec<&String> = line_kits.iter().filter(|k| !want.contains(k)).collect();
     if !only_line.is_empty() {
         return Err(fail(format!(

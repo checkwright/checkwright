@@ -286,6 +286,31 @@ fn retired_members(
         .collect()
 }
 
+// spec: installer/SPEC.md §init — the install is named by its profile and the kits a selection adds
+// or removes, each list in payload order; `INIT:` and the commit subject share this one phrase
+fn profile_phrase(profile_name: &str, profile_kits: &[String], kits: &[String]) -> String {
+    let join = |names: Vec<&String>| -> String {
+        match names.split_last() {
+            None => String::new(),
+            Some((last, [])) => last.to_string(),
+            Some((last, rest)) => {
+                let head: Vec<&str> = rest.iter().map(|k| k.as_str()).collect();
+                format!("{} and {}", head.join(", "), last)
+            }
+        }
+    };
+    let added: Vec<&String> = kits.iter().filter(|k| !profile_kits.contains(k)).collect();
+    let removed: Vec<&String> = profile_kits.iter().filter(|k| !kits.contains(k)).collect();
+    let mut out = format!("{} profile", profile_name);
+    if !added.is_empty() {
+        out.push_str(&format!(" with {}", join(added)));
+    }
+    if !removed.is_empty() {
+        out.push_str(&format!(" without {}", join(removed)));
+    }
+    out
+}
+
 fn plan_gates(pkg: &Package, kits: &[String], profile_name: &str) -> String {
     let mut out = String::new();
     out.push_str(&format!(
@@ -936,10 +961,8 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     // spec: installer/SPEC.md §init — idempotence is a property of the tree, so a re-run that
     // changed nothing exits clean rather than on an empty commit. The predicate reads the index and
     // stays the guard on whether a commit is attempted at all.
-    let message = format!(
-        "chore: vendor Checkwright kits ({} profile, v{})",
-        profile_name, version
-    );
+    let phrase = profile_phrase(&profile_name, &profile_kits, &kits);
+    let message = format!("chore: vendor Checkwright kits ({}, v{})", phrase, version);
     if super::git_code(&root, &["diff", "--cached", "--quiet"]) == Some(0) {
         // spec: installer/SPEC.md §init — a run init considers a no-op still commits what it
         // rewrote, so this asks what the predicate above cannot: whether the roster differs from the
@@ -961,16 +984,16 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
                     let residue = listed.lines().filter(|l| !l.is_empty()).count();
                     super::commit_or_refuse(&root, &message, COMMIT_FAILED)?;
                     println!(
-                        "INIT: already at the {} profile (v{}) — {} file(s) checked; {} that init had rewritten were uncommitted and are now committed.",
-                        profile_name, version, r.written.len(), residue
+                        "INIT: already at the {} (v{}) — {} file(s) checked; {} that init had rewritten were uncommitted and are now committed.",
+                        phrase, version, r.written.len(), residue
                     );
                     return Ok(0);
                 }
             }
         }
         println!(
-            "INIT: already at the {} profile (v{}) — {} file(s) checked, nothing to change and nothing it rewrote left uncommitted.",
-            profile_name, version, r.written.len()
+            "INIT: already at the {} (v{}) — {} file(s) checked, nothing to change and nothing it rewrote left uncommitted.",
+            phrase, version, r.written.len()
         );
         return Ok(0);
     }
@@ -981,16 +1004,16 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         // would hand the adopter the step that does the proving.
         super::commit_or_refuse(&root, &message, COMMIT_FAILED)?;
         println!(
-            "INIT: vendored {} kit(s) at the {} profile (v{}) and committed them.",
+            "INIT: vendored {} kit(s) at the {} (v{}) and committed them.",
             kits.len(),
-            profile_name,
+            phrase,
             version
         );
     } else {
         println!(
-            "INIT: vendored {} kit(s) at the {} profile (v{}) and staged them — --no-commit, so the commit is yours.",
+            "INIT: vendored {} kit(s) at the {} (v{}) and staged them — --no-commit, so the commit is yours.",
             kits.len(),
-            profile_name,
+            phrase,
             version
         );
     }
@@ -1091,6 +1114,24 @@ fn in_tree(root: &Path, p: &str) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: installer/SPEC.md §init — the profile phrase: no adjustment, an addition, a removal and both
+    #[test]
+    fn the_profile_phrase_names_the_kits_a_selection_adds_and_drops() {
+        let v = |a: &[&str]| a.iter().map(|s| s.to_string()).collect::<Vec<_>>();
+        let base = v(&["a-kit", "b-kit", "c-kit"]);
+        assert_eq!(profile_phrase("full", &base, &base), "full profile");
+        assert_eq!(profile_phrase("small", &v(&["a-kit"]), &v(&["a-kit", "b-kit"])), "small profile with b-kit");
+        assert_eq!(profile_phrase("full", &base, &v(&["b-kit"])), "full profile without a-kit and c-kit");
+        assert_eq!(
+            profile_phrase("full", &v(&["a-kit", "b-kit", "c-kit", "d-kit"]), &v(&["d-kit"])),
+            "full profile without a-kit, b-kit and c-kit"
+        );
+        assert_eq!(
+            profile_phrase("small", &v(&["a-kit", "b-kit"]), &v(&["b-kit", "c-kit", "d-kit"])),
+            "small profile with c-kit and d-kit without a-kit"
+        );
+    }
 
     // spec: installer/SPEC.md §The verbs — the flag grammar: both `--profile` spellings, the three
     // bare flags, `--help` answering on its own, and an unknown argument refusing.

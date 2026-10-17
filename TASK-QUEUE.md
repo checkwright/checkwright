@@ -14,18 +14,6 @@
 
 ## New Features
 
-### companion-complement-init-line
-
-[spec: SPEC-complement-init-line.md]
-
-a companion `complement` install (`init --profile full` with three `--without-kit` and a `--recipe`) reports `INIT: vendored 8 kit(s) at the full profile` and commits `chore: vendor Checkwright kits (full profile, ...)`, so a tester who asked for `complement` reads that `full` was installed; the lock is right. Rehearsed 2026-10-17 at `companion-adoption-rehearsal` on Spec Kit and OpenSpec.
-
-**Deliverable:** the `INIT:` line and the commit subject naming the left-out kits or the selection, in installer/SPEC.md §init and its crate test.
-
-The quoted line was settled at spec by reading `init.rs`: both lines print the profile name alone, and the count is the selected set's, eleven payload kits less the three left out.
-
-**Cost while deferred:** one line of tester confusion per complement install, with no wrong behaviour. Filed 2026-10-17 by competitive-followup-pass' close from a gap bullet of that date; not fixed at close because it changes `init`'s user-facing output, whose wording is spec's. Owner lookup: `INIT:`, `complement`, `commit subject` in this file and the disposed-findings record — none; owner installer/SPEC.md §init.
-
 ## Technical Debt
 
 ### prove-claim-path-confinement
@@ -1116,4 +1104,5 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 
 - knob-file-relative-to-cwd
 - companion-prove-not-held
+- companion-complement-init-line
 
