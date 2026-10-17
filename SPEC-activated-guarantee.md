@@ -72,7 +72,7 @@ The arm is a new scenario header in `native/src/emit/installer_smoke/`, beside t
 
 ### (4) The install-observation record gains the proof {design-bearing} {user-facing: activated-guarantee-route's Deliverable, "with time to that proof as its metric"}
 
-Replacement for `drift-kit/SPEC.md` §The install-observation record, the grammar block, a new bullet after `<ttfg>`'s, and the key-rule list. **Not yet applied.**
+Replacement for `drift-kit/SPEC.md` §The install-observation record, the grammar block, a new bullet after `<ttfg>`'s, and the key-rule list. **Applied.**
 
 > ```
 > <date> install <id> <profile> <floor> <ttfg>
@@ -87,7 +87,7 @@ Replacement for `drift-kit/SPEC.md` §The install-observation record, the gramma
 
 The interface block gains `--emit file-install proof <id> <ttfp>`, and `<ttfp>` joins the closed-set refusals. **A new kind, not a field on `install`**, because a field would change a shipped arity and make an install filed before its proof wait for one; a kind is additive, and a record written before it reads unchanged.
 
-Replacement for `drift-kit/SPEC.md` §The install-evidence projection, the Installs bullet. **Not yet applied.**
+Replacement for `drift-kit/SPEC.md` §The install-evidence projection, the Installs bullet. **Applied.**
 
 > - **Installs** — observed; how many reached a first green, with the min, median and max time-to-first-green over those; how many reached a held proof, with the min, median and max time-to-proof over those. An install whose `<ttfg>` is the no-green sentinel is outside the first population, and one with no `proof` line outside the second. A `proof` line whose `<id>` has no install line contributes nothing.
 

@@ -1,8 +1,8 @@
 **Installs**
 
-| observed | reached a first green | time-to-first-green in minutes (min · median · max) |
-| --- | --- | --- |
-| 0 | 0 | n/a (no install reached a first green) |
+| observed | reached a first green | time-to-first-green in minutes (min · median · max) | reached a held proof | time-to-proof in minutes (min · median · max) |
+| --- | --- | --- | --- | --- |
+| 0 | 0 | n/a (no install reached a first green) | 0 | n/a (no install reached a held proof) |
 
 **Reds hit by a non-author**
 

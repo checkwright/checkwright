@@ -106,13 +106,23 @@ fn roster() -> Option<BTreeSet<String>> {
     )
 }
 
+fn spread(sorted: &[i64], none: &str) -> String {
+    match (sorted.first(), median(sorted), sorted.last()) {
+        (Some(lo), Some(mid), Some(hi)) => format!("{} · {} · {}", lo, mid, hi),
+        _ => format!("n/a ({})", none),
+    }
+}
+
 // spec: drift-kit/SPEC.md §The install-evidence projection — Installs: observed, how many reached a
-// first green, and the min, median and max time-to-first-green over those that did.
+// first green and a held proof, and the min, median and max of each time over those that did; a
+// proof whose `<id>` has no install line contributes nothing.
 fn installs(events: &[Event<'_>]) -> String {
     let cols = &[
         "observed",
         "reached a first green",
         "time-to-first-green in minutes (min · median · max)",
+        "reached a held proof",
+        "time-to-proof in minutes (min · median · max)",
     ];
     let rows = of_kind(events, "install", 4);
     let mut greens: Vec<i64> = rows
@@ -121,14 +131,25 @@ fn installs(events: &[Event<'_>]) -> String {
         .filter_map(|e| e.fields[3].parse::<i64>().ok())
         .collect();
     greens.sort_unstable();
-    let ttfg = match (greens.first(), median(&greens), greens.last()) {
-        (Some(lo), Some(mid), Some(hi)) => format!("{} · {} · {}", lo, mid, hi),
-        _ => "n/a (no install reached a first green)".to_string(),
-    };
+    let ids: BTreeSet<&str> = rows.iter().map(|e| e.fields[0]).collect();
+    let mut proofs: BTreeMap<&str, i64> = BTreeMap::new();
+    for p in of_kind(events, "proof", 2) {
+        if let (true, Ok(m)) = (ids.contains(p.fields[0]), p.fields[1].parse::<i64>()) {
+            proofs.entry(p.fields[0]).or_insert(m);
+        }
+    }
+    let mut ttfp: Vec<i64> = proofs.into_values().collect();
+    ttfp.sort_unstable();
     block(
         "Installs",
         cols,
-        row(&[rows.len().to_string(), greens.len().to_string(), ttfg]),
+        row(&[
+            rows.len().to_string(),
+            greens.len().to_string(),
+            spread(&greens, "no install reached a first green"),
+            ttfp.len().to_string(),
+            spread(&ttfp, "no install reached a held proof"),
+        ]),
     )
 }
 
@@ -338,7 +359,22 @@ mod tests {
     fn the_installs_block_counts_its_denominator_and_excludes_the_no_green_sentinel() {
         let events = parse(RECORD);
         let out = installs(&events);
-        assert!(out.contains("| 2 | 1 | 12 · 12 · 12 |"), "{}", out);
+        assert!(out.contains("| 2 | 1 | 12 · 12 · 12 | 0 | n/a (no install reached a held proof) |"), "{}", out);
+    }
+
+    // spec: drift-kit/SPEC.md §The install-evidence projection — the proof population is the
+    // install lines: a proof whose `<id>` has no install line contributes nothing, and the time to
+    // proof takes its min · median · max over the rest
+    #[test]
+    fn the_installs_block_counts_held_proofs_over_installed_ids_alone() {
+        let record = format!(
+            "{}2026-01-02 proof i1 30\n2026-01-02 proof i2 10\n2026-01-02 proof ghost 1\n",
+            RECORD
+        );
+        let events = parse(&record);
+        let out = installs(&events);
+        assert!(out.contains("| 2 | 1 | 12 · 12 · 12 | 2 | 10 · 10 · 30 |"), "{}", out);
+        assert!(!out.contains("ghost"), "{}", out);
     }
 
     // spec: drift-kit/SPEC.md §The install-evidence projection — the lower of the two middle values
@@ -410,7 +446,9 @@ mod tests {
     #[test]
     fn an_empty_record_renders_every_block_with_a_counted_zero() {
         let events = parse("");
-        assert!(installs(&events).contains("| 0 | 0 | n/a (no install reached a first green) |"));
+        assert!(installs(&events).contains(
+            "| 0 | 0 | n/a (no install reached a first green) | 0 | n/a (no install reached a held proof) |"
+        ));
         assert!(reds(&events).contains("| 0 | 0 | 0 | 0 |"));
         assert!(per_gate(&events).contains("n/a (no red observed)"));
         assert!(retention(&events).contains("n/a (no check-in observed)"));

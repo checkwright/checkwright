@@ -7,6 +7,7 @@ pub const KNOBS: &[&str] = &["DRIFT_KIT_INSTALL_RECORD", "DRIFT_KIT_AUTHOR_INSTA
 
 pub const USAGE: &str = "usage: --emit file-install [--author] [--] <kind> <field>...\n  \
      install <id> <profile> <floor> <ttfg>\n  \
+     proof <id> <ttfp>\n  \
      red <id> <gate> <verdict> <disposition> <behaviour>\n  \
      checkin <id> <day> <kit> <retained>\n  \
      appends one dated line to the install-observation record; \
@@ -42,6 +43,7 @@ pub const NO_GREEN: &str = "-";
 enum Check {
     Set(&'static [&'static str]),
     Ttfg,
+    Minutes,
     Free,
 }
 
@@ -63,6 +65,13 @@ const KINDS: &[Kind] = &[
             ("floor", Check::Free),
             ("ttfg", Check::Ttfg),
         ],
+        key: &[0],
+    },
+    // spec: drift-kit/SPEC.md §The install-observation record — a kind of its own rather than a field
+    // on `install`, so a shipped arity is unchanged and an install filed before its proof reads as is
+    Kind {
+        name: "proof",
+        fields: &[("id", Check::Free), ("ttfp", Check::Minutes)],
         key: &[0],
     },
     Kind {
@@ -95,7 +104,13 @@ fn kind(name: &str) -> Option<&'static Kind> {
 // spec: drift-kit/SPEC.md §The install-observation record — a non-negative integer of minutes, or
 // the no-green sentinel; a leading `+` or `-` is not a count of minutes.
 fn is_ttfg(v: &str) -> bool {
-    v == NO_GREEN || (!v.is_empty() && v.bytes().all(|b| b.is_ascii_digit()))
+    v == NO_GREEN || is_minutes(v)
+}
+
+// spec: drift-kit/SPEC.md §The install-observation record — `<ttfp>` takes no sentinel: an install
+// with no `proof` line reached no proof
+fn is_minutes(v: &str) -> bool {
+    !v.is_empty() && v.bytes().all(|b| b.is_ascii_digit())
 }
 
 // spec: drift-kit/SPEC.md §The install-observation record — the refusals are the protocol: an
@@ -128,6 +143,14 @@ fn validate(k: &Kind, fields: &[String]) -> Result<(), String> {
                         "{}: <{}> is \"{}\"; minutes to the first green as a non-negative integer, \
                          or \"{}\" where no green was reached\n{}",
                         k.name, label, v, NO_GREEN, USAGE
+                    ));
+                }
+            }
+            Check::Minutes => {
+                if !is_minutes(v) {
+                    return Err(format!(
+                        "{}: <{}> is \"{}\"; minutes to the first held proof as a non-negative integer\n{}",
+                        k.name, label, v, USAGE
                     ));
                 }
             }
@@ -351,6 +374,29 @@ mod tests {
         assert!(!is_ttfg("+3"));
         assert!(!is_ttfg("3m"));
         assert!(!is_ttfg("3.5"));
+    }
+
+    // spec: drift-kit/SPEC.md §The install-observation record — `<ttfp>` is minutes and nothing else,
+    // its kind's arity is two, and a re-filed proof replaces on `<id>` as an install does
+    #[test]
+    fn a_proof_is_minutes_with_no_sentinel_and_replaces_on_its_id() {
+        let proof = kind("proof").expect("the proof kind");
+        assert!(validate(proof, &fields(&["i1", "0"])).is_ok());
+        assert!(validate(proof, &fields(&["i1", "42"])).is_ok());
+        for bad in [NO_GREEN, "-1", "+3", "3m", "3.5"] {
+            assert!(validate(proof, &fields(&["i1", bad])).is_err(), "ttfp {} was filed", bad);
+        }
+        assert!(validate(proof, &fields(&["i1"])).is_err(), "short arity");
+        assert!(validate(proof, &fields(&["i1", "4", "x"])).is_err(), "long arity");
+        assert_eq!(line_key(proof, &["i1", "4"]), line_key(proof, &["i1", "9"]));
+        assert_ne!(line_key(proof, &["i1", "4"]), line_key(kind("install").expect("install"), &["i1"]));
+        let body = "2026-01-01 install i1 linux bash5 12\n2026-01-01 proof i1 30\n";
+        let want = line_key(proof, &["i1"]).expect("a key");
+        assert_eq!(
+            replace_in_place(body, proof, &want, "2026-01-02 proof i1 20").as_deref(),
+            Some("2026-01-01 install i1 linux bash5 12\n2026-01-02 proof i1 20\n"),
+            "the proof replaced its own line and left the install's alone"
+        );
     }
 
     // spec: drift-kit/SPEC.md §The install-observation record — one key rule per kind, because

@@ -814,14 +814,14 @@ set +e
 iempty="$(iev)"; ircq=$?
 set -e
 [[ "$ircq" -eq 0 ]] || fail "the install-evidence arm exited $ircq over an absent record (advisory emission must exit 0)"
-grep -q '^| 0 | 0 | n/a (no install reached a first green) |$' <<<"$iempty" \
+grep -q '^| 0 | 0 | n/a (no install reached a first green) | 0 | n/a (no install reached a held proof) |$' <<<"$iempty" \
     || fail "an absent record did not render the Installs block as a counted zero: $iempty"
 grep -q 'n/a (no red observed)' <<<"$iempty" \
     || fail "an absent record did not degrade the Per-gate block to its named n/a: $iempty"
 grep -q 'n/a (no check-in observed)' <<<"$iempty" \
     || fail "an absent record did not degrade the Retention block to its named n/a: $iempty"
 
-# spec: drift-kit/SPEC.md §The install-observation record — the line grammar of each of the three
+# spec: drift-kit/SPEC.md §The install-observation record — the line grammar of each of the four
 # kinds, the date stamped by the producer rather than by its caller.
 fin install i1 a-profile a-floor 12 >/dev/null
 fin -- install i2 b-profile b-floor - >/dev/null
@@ -830,6 +830,8 @@ fin red i1 check-alpha false-positive bypassed unchanged >/dev/null
 fin red i2 check-outside-this-roster unclear abandoned unchanged >/dev/null
 fin checkin i1 7 gate-sdk yes >/dev/null
 fin checkin i2 30 drift-kit no >/dev/null
+fin proof i1 30 >/dev/null
+fin proof ghost 5 >/dev/null
 grep -q "^$today install i1 a-profile a-floor 12\$" "$irec" \
     || fail "the install line grammar moved: $(cat "$irec")"
 grep -q "^$today install i2 b-profile b-floor -\$" "$irec" \
@@ -838,6 +840,8 @@ grep -q "^$today red i1 check-zeta true-positive fixed changed\$" "$irec" \
     || fail "the red line grammar moved: $(cat "$irec")"
 grep -q "^$today checkin i1 7 gate-sdk yes\$" "$irec" \
     || fail "the checkin line grammar moved: $(cat "$irec")"
+grep -q "^$today proof i1 30\$" "$irec" \
+    || fail "the proof line grammar moved: $(cat "$irec")"
 
 # spec: drift-kit/SPEC.md §The install-observation record — one key rule per kind: install replaces
 # on <id>, checkin on the <id> <day> <kit> triple, and red is pure append because a red event has no
@@ -850,6 +854,10 @@ grep -q "^$today install i1 a-profile a-floor 40\$" "$irec" \
     || fail "a re-filed install did not correct the row it replaced: $(cat "$irec")"
 [[ "$(grep -n 'install i1 ' "$irec" | cut -d: -f1)" -eq 1 ]] \
     || fail "the replace did not rewrite the key's line where it stood"
+fin proof i1 20 >/dev/null
+[[ "$(ilines)" -eq "$ibefore" ]] || fail "a re-filed proof added a line rather than replacing its <id>'s"
+grep -q "^$today proof i1 20\$" "$irec" \
+    || fail "a re-filed proof did not correct the row it replaced: $(cat "$irec")"
 fin checkin i1 7 gate-sdk no >/dev/null
 [[ "$(ilines)" -eq "$ibefore" ]] || fail "a re-filed checkin added a line rather than replacing its triple's"
 fin checkin i1 30 gate-sdk yes >/dev/null
@@ -879,6 +887,9 @@ irefuse "a behaviour outside its set"      red i1 check-alpha unclear fixed mayb
 irefuse "a day outside its set"            checkin i1 14 gate-sdk yes
 irefuse "a retained value outside its set" checkin i1 7 gate-sdk maybe
 irefuse "a malformed ttfg"                 install i1 a-profile a-floor 12m
+irefuse "a malformed ttfp"                 proof i1 12m
+irefuse "a no-green sentinel as a ttfp"    -- proof i1 -
+irefuse "a short proof arity"              proof i1
 irefuse "a flag in a positional slot"      install i1 --list a-floor 12
 
 # spec: drift-kit/SPEC.md §The install-observation record — a leading --author files into the author
@@ -901,8 +912,8 @@ cmp -s "$work/author-record.before" "$irec_author" \
 # denominator, the group-bys render in a fixed order with the unrostered aggregate last, and two
 # emissions over one unchanged record are byte-identical — the property the freshness gate rests on.
 ifull="$(iev)"
-grep -q '^| 2 | 1 | 40 · 40 · 40 |$' <<<"$ifull" \
-    || fail "the Installs block lost its denominator or counted the no-green sentinel as a zero: $ifull"
+grep -q '^| 2 | 1 | 40 · 40 · 40 | 1 | 20 · 20 · 20 |$' <<<"$ifull" \
+    || fail "the Installs block lost a denominator, counted the no-green sentinel as a zero, or counted a proof with no install line: $ifull"
 grep -q '^| 4 | 2 | 1 | 1 |$' <<<"$ifull" \
     || fail "the Reds block lost its denominator or its verdict split: $ifull"
 grep -q '^| 4 | 2 | 0 | 1 | 1 |$' <<<"$ifull" \
@@ -922,7 +933,7 @@ grep -q '^| 2 | 1 | 0 |$' <<<"$ifull" \
     || fail "the First-useful-red block lost its denominator or its median span: $ifull"
 grep -q '^| 30 | drift-kit | 1 | 0 |$' <<<"$ifull" \
     || fail "the Retention block dropped a kit at the second horizon: $ifull"
-for ileak in i1 i2 a-profile b-profile a-floor b-floor; do
+for ileak in i1 i2 ghost a-profile b-profile a-floor b-floor; do
     if grep -q -- "$ileak" <<<"$ifull"; then
         fail "the projection published \"$ileak\" — <id>, <profile> and <floor> never reach it: $ifull"
     fi

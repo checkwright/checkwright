@@ -375,6 +375,7 @@ One line per observation event, whitespace-separated positional fields, the date
 
 ```
 <date> install <id> <profile> <floor> <ttfg>
+<date> proof   <id> <ttfp>
 <date> red     <id> <gate> <verdict> <disposition> <behaviour>
 <date> checkin <id> <day> <kit> <retained>
 ```
@@ -387,6 +388,9 @@ Fields split into two classes, and the split is the seam rather than a convenien
 - `<day>` — `7` | `30`. The check-in horizon.
 - `<retained>` — `yes` | `no`.
 - `<ttfg>` — a non-negative integer, minutes from the first install command to the first green gate run, or `-` where no green was reached. `-` is a value, not a gap: an install that never went green is the observation this channel most needs and the one a missing line would erase.
+- `<ttfp>` — a non-negative integer, minutes from the first install command to the first proof the consumer's activation check reported held. An install with no `proof` line reached none, so the kind needs no sentinel: the `install` line already records the install.
+
+`proof` is **a kind of its own, not a field on `install`**. A field would change a shipped arity and make an install filed before its proof wait for one. A kind is additive, and a record written before it reads unchanged.
 
 Every other field — `<id>`, `<profile>`, `<floor>`, `<gate>`, `<kit>` — is **free text validated for shape alone**, because each names a *consumer's* vocabulary. A kit literal enumerating one consumer's profile names, host floors or gate roster would publish that vocabulary and be false for every other consumer ([gate-sdk/SPEC.md §The provenance seam](../gate-sdk/SPEC.md#the-provenance-seam)). The projection reads the consumer's own `DRIFT_KIT_GATES_FILE` as a *classifier* of `<gate>`, never as a validator. An adopter's red may name a gate this roster does not carry, and refusing it would discard the observation over a naming disagreement.
 
@@ -395,7 +399,7 @@ Every other field — `<id>`, `<profile>`, `<floor>`, `<gate>`, `<kit>` — is *
 **One key rule per kind, because assuming a single rule would be wrong for two of them.** The sibling meters replace a measured line; this channel mostly does not.
 
 - `red` is **pure append**. Two identical red lines are two reds. A red event has no natural key — the same person can hit the same gate twice, and collapsing that would erase the recurrence the channel exists to measure.
-- `install` **replaces on `<id>`**. One install has one first-green time; a re-measure corrects it rather than adding a second install.
+- `install` and `proof` each **replace on `<id>`**. One install has one first-green time and one first proof; a re-measure corrects it rather than adding a second.
 - `checkin` **replaces on the `<id> <day> <kit>` triple**, the shape [§The stage-economics meter](#the-stage-economics-meter) already uses for the same reason: a re-run of a check-in must not double-count retention.
 
 **A replace is in place**, the shape [§The stage-economics meter](#the-stage-economics-meter)'s trend log fixes. The key's first line is rewritten where it stands, any later duplicate of that key is dropped, and only a key new to the record appends. So a re-file corrects rather than reorders, and a re-file of unchanged fields leaves the record byte-identical.
@@ -406,6 +410,7 @@ Every other field — `<id>`, `<profile>`, `<floor>`, `<gate>`, `<kit>` — is *
 
 ```
 --emit file-install install <id> <profile> <floor> <ttfg>
+--emit file-install proof   <id> <ttfp>
 --emit file-install red     <id> <gate> <verdict> <disposition> <behaviour>
 --emit file-install checkin <id> <day> <kit> <retained>
 ```
@@ -435,7 +440,7 @@ It is a **pure function of the non-author record**, `DRIFT_KIT_INSTALL_RECORD`; 
 
 **Every published figure carries its denominator.** The population this measures is small by construction, and a rate published without its n is the dishonest form of exactly the claim this channel exists to make honest. Blocks:
 
-- **Installs** — observed; how many reached a first green; the min, median and max time-to-first-green over those that did. An install whose `<ttfg>` is the no-green sentinel is outside that population rather than a zero in it.
+- **Installs** — observed; how many reached a first green, with the min, median and max time-to-first-green over those; how many reached a held proof, with the min, median and max time-to-proof over those. An install whose `<ttfg>` is the no-green sentinel is outside the first population rather than a zero in it, and one with no `proof` line outside the second. A `proof` line whose `<id>` has no install line contributes nothing.
 - **Reds hit by a non-author** — the total, split by `<verdict>`.
 - **Per gate** — one row per gate a `red` line names: reds, false positives, reds that changed behaviour. A gate name absent from `DRIFT_KIT_GATES_FILE` is rendered in its own `unrostered` count rather than dropped, so an adopter running a roster this consumer does not carry still contributes. It is a *count* and not a named row for the same reason `<gate>` is publishable at all — a rostered name is the publisher's own vocabulary and an unrostered one is the adopter's, which the rule below never publishes. The aggregate row sorts last whatever the roster holds, so its position is the block's rule rather than its spelling's.
 - **Dispositions** — the `<disposition>` split over the same total.
@@ -565,8 +570,8 @@ The arms and the fixture-stable members, each over purpose-built inputs:
 - **`kpi-price-table-age`** reads two dates out of a file the fixture writes, so the smoke drives it over purpose-built tables: the age row, the `price <N>d` trend fragment, and each header's absence degrading its own row independently. It asserts **the inversion the KPI exists for**: a table whose `priced-as-of:` is *today* and whose `prices-valid-through:` has passed reads a fresh age row and an `EXPIRED` expiry row together. A fixture pinning only the age row has not tested the feature, since the age row is reassuring in exactly that case. The no-table degradation emits its single `n/a (no price table)` row.
 - **`kpi-incident-recurrence`** reads declarations out of a queue file the fixture writes. The smoke asserts the single lag row, the count **summing dates across declarations** rather than counting declarations, the highest-count slug and the `recur <N>` trend fragment. Both degradations, a queue with no declaration and no queue file at all, are asserted, with the trend's silence under the first.
 - **The install-observation pair** is a pure function of the record, so the smoke drives both arms **through the front-end** over a throwaway record named by `DRIFT_KIT_INSTALL_RECORD`.
-  - The capture arm: the line grammar of each of the three kinds, and the per-kind key rules, a re-filed `install` and a re-filed `checkin` each replacing and a re-filed `red` appending. The `--author` routing into a throwaway `DRIFT_KIT_AUTHOR_INSTALL_RECORD`, the projection's blindness to it, and a misplaced flag refused. One refusal per class — an unknown kind, the wrong arity, an empty positional, a closed-set field outside its set, and a flag in a positional slot — each leaves the record unchanged. A refusal that wrote is the failure the exit code alone would not show.
-  - The projection: each block's denominator over that record, the sorted group-by order, the byte-identity of two emissions over one unchanged record, and the `unrostered` classification against a throwaway gates file. The record-absent degradation is asserted to be the counted zero rather than a missing block, the reading the committed page rests on.
+  - The capture arm: the line grammar of each of the four kinds, and the per-kind key rules, a re-filed `install`, `proof` and `checkin` each replacing and a re-filed `red` appending. The `--author` routing into a throwaway `DRIFT_KIT_AUTHOR_INSTALL_RECORD`, the projection's blindness to it, and a misplaced flag refused. One refusal per class — an unknown kind, the wrong arity, an empty positional, a closed-set field outside its set, and a flag in a positional slot — each leaves the record unchanged. A refusal that wrote is the failure the exit code alone would not show.
+  - The projection: each block's denominator over that record, a `proof` whose `<id>` has no install line counted nowhere, the sorted group-by order, the byte-identity of two emissions over one unchanged record, and the `unrostered` classification against a throwaway gates file. The record-absent degradation is asserted to be the counted zero rather than a missing block, the reading the committed page rests on.
 - **The manual-operation meter** runs through its arm over its own sessions dir, state file and log, with `smoke/manual-ops-fixture.jsonl` as one stamped session's transcript, carrying a repeated block id, another tool and an unparseable line, beside a second stamped session. The smoke asserts the printed lines' fields and order where two keys tie on calls and differ on sessions. A key a throwaway knob file's `DRIFT_KIT_MANUAL_OPS_IGNORE` names is absent, and `DRIFT_KIT_MANUAL_OPS_TOP` bounds the ranking. The log keeps its grammar, a re-run leaves it byte-identical, and a pre-seeded line for a key under another iteration raises its `<iterations>` to 2. An edit off the repository keys as `(outside)`, and no command text reaches the output or the log. With no stamp or no sessions dir, the run prints a 0-exit notice and writes no log.
 
 Gate-sdk's `check-shellcheck` lints all kit sources as usual.
