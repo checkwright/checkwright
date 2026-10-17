@@ -14,6 +14,16 @@
 
 ## New Features
 
+### crate-manifest-license-unheld
+
+[spec: SPEC-manifest-license.md]
+
+the crate manifest `native/Cargo.toml` declares `license = "MIT"` while `LICENSE` and `scripts/license-line.conf` state Apache-2.0, present since the crate's first commit. `publish = false` keeps it off crates.io, but the manifest is tracked and public, and no gate reads the field: `check-license-line` reads the README and site license lines only.
+
+**Deliverable:** the field set to the source's license, and `check-license-line` or a sibling holding every tracked package manifest's license field to `license-line.conf`'s value, in one unit by Enforcement-first; a feature, since the gate gains a read contract.
+
+**Cost while deferred:** a reader of the public crate manifest is told the wrong license. Filed 2026-10-17 by budget-feed-observation-pass' close from a gap bullet of that date, surfaced probing a consult item. Re-verified there: the crate field reads MIT, and `reserve/crates/Cargo.toml`, `installer/package.json` and both plugin manifests read Apache-2.0. Owner lookup: `license`, `Cargo.toml`, `license-line` in this file and the disposed-findings record — none; `homepage-license-duplicate`, done, DISTINCT (the footer instance); owner docs/site-architecture.md §The license line.
+
 ## Technical Debt
 
 ### orchestration-page-overreach
@@ -319,16 +329,6 @@ the statistics half of [hosted-attestation-service](#hosted-attestation-service)
 **Deliverable:** design-pending, a feature since it adds a projection: which figures chart, the projection's form and home, and its freshness gate.
 
 **Cost while deferred:** a trend in workflow health shows only to a session that recomputes it from tables and logs. Filed 2026-10-17 by budget-feed-observation-pass' close from a gap bullet of that date. Owner lookup: `statistic`, `chart`, `visualiz`, `dashboard` in this file and the disposed-findings record — [hosted-attestation-service](#hosted-attestation-service), DISTINCT (it keeps the cross-repo dashboards, the hosted half).
-
-### crate-manifest-license-unheld
-
-[cost: event/low] [surface: scripts]
-
-the crate manifest `native/Cargo.toml` declares `license = "MIT"` while `LICENSE` and `scripts/license-line.conf` state Apache-2.0, present since the crate's first commit. `publish = false` keeps it off crates.io, but the manifest is tracked and public, and no gate reads the field: `check-license-line` reads the README and site license lines only.
-
-**Deliverable:** the field set to the source's license, and `check-license-line` or a sibling holding every tracked package manifest's license field to `license-line.conf`'s value, in one unit by Enforcement-first; a feature, since the gate gains a read contract.
-
-**Cost while deferred:** a reader of the public crate manifest is told the wrong license. Filed 2026-10-17 by budget-feed-observation-pass' close from a gap bullet of that date, surfaced probing a consult item. Re-verified there: the crate field reads MIT, and `reserve/crates/Cargo.toml`, `installer/package.json` and both plugin manifests read Apache-2.0. Owner lookup: `license`, `Cargo.toml`, `license-line` in this file and the disposed-findings record — none; `homepage-license-duplicate`, done, DISTINCT (the footer instance); owner docs/site-architecture.md §The license line.
 
 ### evaluator-agent-discovery
 
