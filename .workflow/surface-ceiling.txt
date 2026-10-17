@@ -19,7 +19,7 @@
 12448cp CLAUDE.md
 250761cp canon-kit/SPEC.md
 5785cp canon-kit/templates/SPEC-amendment.md
-28879cp companion/SPEC.md
+28926cp companion/SPEC.md
 116247cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
 258664cp delegation-kit/SPEC.md
@@ -44,7 +44,7 @@
 3381cp docs/maintenance.md
 3561cp docs/manual-install.md
 3007cp docs/methodology.md
-3352cp docs/openspec.md
+3341cp docs/openspec.md
 9927cp docs/orchestration.md
 8258cp docs/page-authoring.md
 10041cp docs/positioning.md

@@ -93,7 +93,7 @@ The split rests on this measurement at 1.13.2, over copies of the layout:
 | MODIFIED or REMOVED on a capability with no base spec | 0 | 1 | — |
 | REMOVED naming a requirement an existing base lacks | 0, silent | 0, "already in sync" | 0 |
 
-`archive` matches a header case-sensitively, and ignores blank runs around and inside the requirement's name: a lowercased name is "not found", while a doubled inner space, trailing blanks or no space after the colon all match. The last row is no overlap, since no OpenSpec check covers it, so the recipe binds it on the default line; every other row re-checks ground `archive` covers, which the bar admits only as an additive layer off by default.
+`archive` matches a header case-sensitively, and ignores blank runs around and inside the requirement's name: a lowercased name is "not found", while a doubled inner space, trailing blanks or no space after the colon all match. The REMOVED row naming a requirement an existing base lacks is no overlap, since no OpenSpec check covers it, so the recipe binds it on the default line. Every other row re-checks ground `archive` covers, which the bar admits only as an additive layer off by default.
 
 ## The tested claim
 
