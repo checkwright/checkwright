@@ -1,14 +1,56 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: guard-word-read-reach-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The set (operator direction 2026-10-19, lead-relayed, not a ruling; the iteration opened undirected):** option B over the recommended A. The debt `ro-background-quoted-fd-target`, `background-record-bare-amp`, `pwsh-herestring-word-read` and `heredoc-call-rule-decline`, promoted by scope; the feature `word-read-dollar-quote-grants`, which spec authors and promotes. Stages scope, spec, build, validate and close; the amendment spans guard-kit alone, so no audit stage is triggered. `heredoc-call-rule-decline` lands before `word-read-dollar-quote-grants`, an ordering scope inferred from the heredoc decline's then-unread cause; scope's later code read puts that cause in per-rule operator tests rather than the word read, so the pair is likely independent and the order costs nothing kept. Composition: bundled — the five guard-kit entries share `background_no_record`, the word read and the rule roster; drain 5 against inflow 3.2. Supersession: `word-read-dollar-quote-grants` — reshaped by `heredoc-call-rule-decline` (inferred, weakened as above).
+
+  **Release review (operator grant 2026-10-19, lead-relayed, unspent):** one second-vendor review over the iteration's range, run at validate; close cuts v0.32.0 on a clean return, against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed).
+
+  **Push need (2026-10-19, inside the budget):** 2 against 2 — the closing push, and the v0.32.0 tag push only if the granted review returns clean; no unit reads a remote run.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### ro-background-quoted-fd-target
+
+rule `background_no_record`'s read-only exemption (`is_ro_background`, `native/src/guard/rules/liveness.rs`) still reads a quoted `'&1'` redirect target as an fd-dup: `sort > '&1'` with `run_in_background` falls through, where `sort > tracked.md` blocks for the missing record, though the call writes a file named `&1`. `ro-pipeline-wrong-grants` widened the value read so no value-read target is an fd-dup, and missed this site.
+
+**Deliverable:** the exemption reads the target by value, with a firing background row of this shape. It moves a verdict from fall-through to block, so it lands in a build.
+
+**Cost while deferred:** an unrecorded backgrounded write a later commit can race; never a wrong grant. Surfaced 2026-10-18 by guard-grant-kpi-pass' close (second-vendor review, P3), promoted at the next scope's carried-bullet intake. Re-verified there: both commands on the built binary. Owner lookup: `is_ro_background`, `fd-dup`, `'&1'` in this file and the disposed-findings record, none; [background-record-bare-amp](#background-record-bare-amp) is DISTINCT (the same rule's `&`-joined segment walk, not its target read); owner guard-kit/SPEC.md §The generic ruleset.
+
+### background-record-bare-amp
+
+rule `background_no_record` misses a backgrounded writer behind a read's bare `&`: `grep -rn foo src & sort -o out.txt tracked.md &` and `grep -rn foo src & make build &` fall through, where `sort -o out.txt tracked.md &` and `grep -rn foo src; sort -o out.txt tracked.md &` block.
+
+**Deliverable:** the rule reads every `&`-joined segment, with a firing row of this shape. It moves a verdict from fall-through to block, so it lands in a build.
+
+**Cost while deferred:** an unrecorded producer a later commit can race. Filed 2026-10-18 by guard-grant-kpi-pass' close, draining its build's bullet; pre-existing, not moved by `ro-pipeline-wrong-grants`. Re-verified there: all four commands on the built binary. Owner lookup: `background_no_record`, `bare '&'` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The generic ruleset.
+
+### pwsh-herestring-word-read
+
+the PowerShell reader's word read answers nothing on a call carrying a here-string, so its by-value rules read the skeleton there and a quoted or backtick-escaped word beside one goes unread: `git 'stash' push` blocks, `git 'stash' push; $h = @'@NL@x@NL@'@` falls through. `guard-word-read-heredoc` lifted the bash heredoc case only.
+
+**Deliverable:** the word read reaches a here-string-bearing call, with firing PowerShell rows, or the limit declared. It moves verdicts from fall-through to block, so it lands in a build.
+
+**Cost while deferred:** a block or steer missed beside a here-string, never a wrong grant, since no PowerShell call is granted. Filed 2026-10-18 by guard-grant-kpi-pass' close, draining its spec's bullet. Re-verified there: the `git 'stash' push` pair above on the built binary. Owner lookup: `here-string`, `herestring` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The reader and its views.
+
+### heredoc-call-rule-decline
+
+rules `cat_file`, `find_glob`, `find_exec`, `git_grep`, `brace_glyph`, `grant_path_slot`, `expansion`, `sed_file` (its `python3 -c` rows) and `emitter_write`'s by-value lead decide a call bare and fall through once a heredoc rides it: `cat TASK-QUEUE.md` blocks, `cat TASK-QUEUE.md <<'EOF'` falls through, most such rows carrying no quote of their own.
+
+**Deliverable:** each rule reads a heredoc-bearing call as it reads the bare one, with firing rows carrying a heredoc, or each limit declared in the rule roster. It moves verdicts from fall-through to block, steer or allow, so it lands in a build, never at a close.
+
+**Cause, read in the code at guard-word-read-reach-pass' scope:** a per-rule operator test, not the word read. `cat_file`, `git_grep` and `find_glob` decline on their own `<`/`>` regex over the `SqDqHd` view, which keeps the heredoc opener; the other rules' sites are unread. `cat_file`'s own steer calls a heredoc-fed `cat` composition, so its row may be a limit to declare.
+
+**Cost while deferred:** a missed steer leaves the call to the harness prompt, and `find_glob`'s and `grant_path_slot`'s lost grants leave it to the harness grant; never a wrong grant. Filed 2026-10-18 by guard-grant-kpi-pass' close, draining its spec's bullet. Re-verified there: 36 of 258 heredoc-free block/advise rows of `guard-tests/cases.tsv` fall through with `<<'EOF'@NL@x@NL@EOF` appended, on the built binary outside the sandbox; the bullet said 40. Owner lookup: `heredoc`, `word read` in this file and the disposed-findings record, only the done `guard-word-read-heredoc`; owner guard-kit/SPEC.md §The rule roster.
 
 ## Deferred
 
@@ -279,48 +321,6 @@ gate-sdk/SPEC.md §The hook contract's binding table is held to the crate's spel
 **Deliverable:** one crate module holding the binding's spellings that every member reads, with a test holding the table to it, or a refusal recorded.
 
 **Cost while deferred:** the table can drift from what the members read, unseen until a fixture reds. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: `tool_input` spelled in six `native/src/hook/` modules and `guard/mod.rs`. Owner lookup: `binding table`, `hook contract` in this file, none; owner gate-sdk/SPEC.md §The hook contract.
-
-### heredoc-call-rule-decline
-
-[cost: event/low] [surface: guard-kit]
-
-rules `cat_file`, `find_glob`, `find_exec`, `git_grep`, `brace_glyph`, `grant_path_slot`, `expansion`, `sed_file` (its `python3 -c` rows) and `emitter_write`'s by-value lead decide a call bare and fall through once a heredoc rides it: `cat TASK-QUEUE.md` blocks, `cat TASK-QUEUE.md <<'EOF'` falls through, most such rows carrying no quote of their own.
-
-**Deliverable:** each rule reads a heredoc-bearing call as it reads the bare one, with firing rows carrying a heredoc, or each limit declared in the rule roster. It moves verdicts from fall-through to block, steer or allow, so it lands in a build, never at a close.
-
-**Inferred, not run:** the cause, whether the dequoted view or a per-rule segment test declines.
-
-**Cost while deferred:** a missed steer leaves the call to the harness prompt, and `find_glob`'s and `grant_path_slot`'s lost grants leave it to the harness grant; never a wrong grant. Filed 2026-10-18 by guard-grant-kpi-pass' close, draining its spec's bullet. Re-verified there: 36 of 258 heredoc-free block/advise rows of `guard-tests/cases.tsv` fall through with `<<'EOF'@NL@x@NL@EOF` appended, on the built binary outside the sandbox; the bullet said 40. Owner lookup: `heredoc`, `word read` in this file and the disposed-findings record, only the done `guard-word-read-heredoc`; owner guard-kit/SPEC.md §The rule roster.
-
-### pwsh-herestring-word-read
-
-[cost: event/low] [surface: guard-kit]
-
-the PowerShell reader's word read answers nothing on a call carrying a here-string, so its by-value rules read the skeleton there and a quoted or backtick-escaped word beside one goes unread: `git 'stash' push` blocks, `git 'stash' push; $h = @'@NL@x@NL@'@` falls through. `guard-word-read-heredoc` lifted the bash heredoc case only.
-
-**Deliverable:** the word read reaches a here-string-bearing call, with firing PowerShell rows, or the limit declared. It moves verdicts from fall-through to block, so it lands in a build.
-
-**Cost while deferred:** a block or steer missed beside a here-string, never a wrong grant, since no PowerShell call is granted. Filed 2026-10-18 by guard-grant-kpi-pass' close, draining its spec's bullet. Re-verified there: the `git 'stash' push` pair above on the built binary. Owner lookup: `here-string`, `herestring` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The reader and its views.
-
-### background-record-bare-amp
-
-[cost: event/low] [surface: guard-kit]
-
-rule `background_no_record` misses a backgrounded writer behind a read's bare `&`: `grep -rn foo src & sort -o out.txt tracked.md &` and `grep -rn foo src & make build &` fall through, where `sort -o out.txt tracked.md &` and `grep -rn foo src; sort -o out.txt tracked.md &` block.
-
-**Deliverable:** the rule reads every `&`-joined segment, with a firing row of this shape. It moves a verdict from fall-through to block, so it lands in a build.
-
-**Cost while deferred:** an unrecorded producer a later commit can race. Filed 2026-10-18 by guard-grant-kpi-pass' close, draining its build's bullet; pre-existing, not moved by `ro-pipeline-wrong-grants`. Re-verified there: all four commands on the built binary. Owner lookup: `background_no_record`, `bare '&'` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The generic ruleset.
-
-### ro-background-quoted-fd-target
-
-[cost: event/low] [surface: guard-kit]
-
-rule `background_no_record`'s read-only exemption (`is_ro_background`, `native/src/guard/rules/liveness.rs`) still reads a quoted `'&1'` redirect target as an fd-dup: `sort > '&1'` with `run_in_background` falls through, where `sort > tracked.md` blocks for the missing record, though the call writes a file named `&1`. `ro-pipeline-wrong-grants` widened the value read so no value-read target is an fd-dup, and missed this site.
-
-**Deliverable:** the exemption reads the target by value, with a firing background row of this shape. It moves a verdict from fall-through to block, so it lands in a build.
-
-**Cost while deferred:** an unrecorded backgrounded write a later commit can race; never a wrong grant. Surfaced 2026-10-18 by guard-grant-kpi-pass' close (second-vendor review, P3), promoted at the next scope's carried-bullet intake. Re-verified there: both commands on the built binary. Owner lookup: `is_ro_background`, `fd-dup`, `'&1'` in this file and the disposed-findings record, none; [background-record-bare-amp](#background-record-bare-amp) is DISTINCT (the same rule's `&`-joined segment walk, not its target read); owner guard-kit/SPEC.md §The generic ruleset.
 
 ### word-read-dollar-quote-grants
 
