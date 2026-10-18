@@ -1,14 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: harness-reach-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-10-18, lead-relayed, not a ruling; the iteration opened undirected):** option D. The features `plugin-harness-reach`, `hook-contract-harness-neutral` and `grant-pwsh-word-read`, which spec authors and promotes; scope promotes no debt. The choice lifts the 2026-10-14 direction that held `grant-pwsh-word-read` back so no grant widened ahead of the v0.32.0 bar, the escalated option naming that lift. Stages scope, spec, align (the amendments span plugin, guard-kit and the kit SPECs carrying hook names), build, validate and close. The hook contract lands first and the per-harness guard wiring binds against its binding table. Composition: bundled on the hook surface plus guard-kit taken whole; drain 3 against inflow 1.8.
-
-  **Second-vendor review (operator grant 2026-10-18, lead-relayed, spent at validate):** one audit-mode review over this iteration's range, at validate. Every grant lift in `grant-pwsh-word-read` lands before it. Whether v0.32.0 is cut is close's reading against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed); a cut's tag push would make the set's pushes three against a budget of two, so close asks for it.
 
 ---
 
