@@ -1,18 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: guard-grant-kpi-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-10-18, lead-relayed, not a ruling; the iteration opened undirected):** option B over the recommended A. The debt `ro-pipeline-wrong-grants`, which leads, and `pwsh-string-expr-overblock`, promoted by scope; the features `guard-word-read-heredoc` and `statistics-kpi-breadth`, which spec authors and promotes. Stages scope, spec, build, validate and close; each amendment spans one component, so no audit stage is triggered. The ro_pipeline forms check lands on word-read values before the heredoc widening of the word read. Composition: bundled — the three guard-kit findings on the shell guard's reader and rules, plus `statistics-kpi-breadth` as a second whole surface (drift-kit), one more batch and no new stage; drain 4 against inflow 2.8.
-
-  **Audit stage (operator direction 2026-10-18, lead-relayed, not a ruling):** `check-stage-entry` assertion C refused the simulated build entry, the two amendments naming drift-kit and guard-kit surfaces, and the operator chose to run align over declaring a waiver. The stages are scope, spec, align, build, validate and close, which replaces the stage list in the set record above. Align's audit found the two amendments disjoint, each changing its own component's contract and neither the other's, so assertion C over-demanded here, as its honest limit states; the align stamp satisfies it and no waiver is declared.
-
-  **Push need (2026-10-18, inside the budget):** 2 against 2 — the closing push, and the v0.32.0 tag push only if close's reading against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed) cuts; no unit reads a remote run. The standing direction rests that reading on a clean second-vendor review, and none is granted for this set, so close asks for one.
-
-  **Close (operator directions 2026-10-18, lead-relayed, not rulings):** one audit-mode second-vendor review granted at close over b2ca4b0f6..HEAD, cutting v0.32.0 on a clean return, a finding or a failed run deferring it; and `tarball-attestation-observed`, listed by roadmap-lag, stays untagged.
 
 ---
 
