@@ -6,3 +6,4 @@
 
 guard-word-read-reach-pass scope afe7cbfc 2026-10-19 e20343a99
 guard-word-read-reach-pass spec ae2a8d29 2026-10-19 bc229f31f
+guard-word-read-reach-pass build a8354f55 2026-10-19 5e7e37951
