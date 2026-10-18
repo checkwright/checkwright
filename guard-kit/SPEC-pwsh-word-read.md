@@ -53,7 +53,7 @@ Replacement for `guard-kit/SPEC.md` §The reader and its views, the paragraph op
 - Two `append_scratch` rows with no heredoc carry the quoted ignored target and the quoted `/dev/null`: allow `printf x >> ".tmp/j.md"` and allow `printf x >> .tmp/j.md 2>"/dev/null"`.
 - The steer test for `emitter_write` sits in `native/src/guard/mod.rs`, since a rule source may not name the bash reader (`no_rule_source_names_the_reader`). It drives the engine over `echo x > "README.md"` and `printf x >> 'README.md'`.
 
-**Open at build, escalated:** the word read answers nothing on a heredoc-bearing call. So the three heredoc rows below fall back to the skeleton's target, and the mechanism above cannot meet them.
+**Escalated at build, decided 2026-10-18 (intent oracle, lead-relayed, not a ruling): A.** The word read answers nothing on a heredoc-bearing call, so the three heredoc rows below keep the skeleton's target, as this delta's fallback sentence states. Each asserts `block`. Rule `emitter_write`'s steer names an unreadable quoted target "the quoted target", never the placeholder's letters. The heredoc false block is filed as a gap, and the release declaration names it as a declared limit.
 
 `guard-kit/SPEC.md` §The rule roster, **applied at build**:
 

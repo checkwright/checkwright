@@ -857,8 +857,8 @@ pub fn emitter_write(ctx: &Ctx) -> Decided {
             if targets.iter().any(|t| t.starts_with("/dev/")) {
                 continue;
             }
-            let un: Vec<&str> = unignored.iter().map(|s| s.as_str()).collect();
-            return block(format!("write '{}' with the Write or Edit tool as its own call instead of the '{}' redirect, and issue the rest of this command as a separate one: git does not ignore the target, so no rule grants the write, and compounding it takes the whole call off the match path. If you genuinely need the compound, run it yourself with !<command>.", un.join(" "), lead));
+            let un: Vec<String> = unignored.iter().map(|s| shown(s)).collect();
+            return block(format!("write {} with the Write or Edit tool as its own call instead of the '{}' redirect, and issue the rest of this command as a separate one: git does not ignore the target, so no rule grants the write, and compounding it takes the whole call off the match path. If you genuinely need the compound, run it yourself with !<command>.", un.join(" "), lead));
         }
         return Ok(None);
     }
@@ -871,9 +871,19 @@ pub fn emitter_write(ctx: &Ctx) -> Decided {
         if h.ignored(tgt) {
             continue;
         }
-        return block(format!("don't write '{}' through a redirect: git does not ignore it, so no rule grants the write. Use the Write or Edit tool for a file, or the capture arm that owns the surface when the target is one — the tool is reviewable where a redirect is not, and the arm keeps the surface's grammar. If you genuinely need the redirect, run it yourself with !<command>.", tgt));
+        return block(format!("don't write {} through a redirect: git does not ignore it, so no rule grants the write. Use the Write or Edit tool for a file, or the capture arm that owns the surface when the target is one — the tool is reviewable where a redirect is not, and the arm keeps the surface's grammar. If you genuinely need the redirect, run it yourself with !<command>.", shown(tgt)));
     }
     Ok(None)
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — rule `emitter_write`'s steer names a target by its value,
+// and one the word read cannot give as the quoted target, never a placeholder's letters.
+fn shown(t: &str) -> String {
+    if t.contains('\0') {
+        "the quoted target".to_string()
+    } else {
+        format!("'{}'", t)
+    }
 }
 
 #[cfg(test)]

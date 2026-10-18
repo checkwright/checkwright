@@ -506,6 +506,10 @@ allow	cat >> .tmp/journal.md 2>&1
 # a target is read by its value, so a quoted ignored target is granted and a quoted /dev/null is inert
 allow	printf x >> ".tmp/j.md"
 allow	printf x >> .tmp/j.md 2>"/dev/null"
+# the word read answers nothing on a heredoc-bearing call, so there a quoted target keeps the
+# skeleton's placeholder, a file no rule can name: the grant withholds and rule `emitter_write` blocks
+block	cat >> ".tmp/j.md" <<'EOF'@NL@x@NL@EOF
+block	cat >> .tmp/j.md 2>"/dev/null" <<'EOF'@NL@x@NL@EOF
 # a carriage return is a word character, so a descriptor glued to one or behind one names a file
 block	cat >> .tmp/journal.md >&2@CR@tracked.md <<'EOF'@NL@line@NL@EOF
 block	cat >> .tmp/journal.md >&@CR@2 <<'EOF'@NL@line@NL@EOF
@@ -1031,6 +1035,8 @@ fallthrough	make build > .tmp/b.log 2>&1 & echo "pid=$! run=b" > .tmp/b.run; wai
 fallthrough	echo x 2>"/dev/null"
 block	echo x > "README.md"
 block	printf x >> 'README.md'
+# a heredoc-bearing call's quoted target is the skeleton's, named the quoted target in the steer
+block	cat >> "README.md" <<'EOF'@NL@x@NL@EOF
 
 # rule `shell_wrapper` — a bash -c or sh -c wrapper blocks; a wrapper behind another command
 #           word, and the scratch runner taking a script path, do not fire

@@ -269,6 +269,14 @@ mod tests {
                 v => panic!("{}: {:?}", cmd, v),
             }
         }
+        let heredoc = engine::Cmd::new("cat >> \"README.md\" <<'EOF'\nx\nEOF");
+        match engine::decide(&bash::Bash, engine::Shell::Bash, &host, &heredoc) {
+            Some(engine::Verdict::Block(m)) => {
+                assert!(m.contains("don't write the quoted target through a redirect"), "{}", m);
+                assert!(!m.contains('\0') && !m.contains("'DQ'"), "{}", m);
+            }
+            v => panic!("the heredoc write: {:?}", v),
+        }
     }
 
     // spec: guard-kit/SPEC.md §Consumer rules — the word read's values, one line per segment, a
