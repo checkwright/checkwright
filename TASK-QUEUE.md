@@ -310,6 +310,16 @@ gate-sdk/SPEC.md §The hook contract's binding table is held to the crate's spel
 
 **Cost while deferred:** the table can drift from what the members read, unseen until a fixture reds. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: `tool_input` spelled in six `native/src/hook/` modules and `guard/mod.rs`. Owner lookup: `binding table`, `hook contract` in this file, none; owner gate-sdk/SPEC.md §The hook contract.
 
+### statistics-kpi-breadth
+
+[cost: event/low] [surface: drift-kit]
+
+the statistics view charts seven figures (drift-kit/SPEC.md §The statistics view: spend, cache-read, commit shape, amendments, validate, gate roster, queue flow) and none of the drift-report KPIs. Operator direction 2026-10-18, lead-relayed, not a ruling: add the useful KPIs, governance overhead first, and split spend and cache-read by model as well as by stage band; the stage-economics log already carries a model column per row, so a by-model split needs no new input.
+
+**Deliverable:** design-pending, a feature: which KPIs join (candidates: kpi-overhead's governance-vs-task share, always-loaded cp, prompt friction, gate battery ms, defer age, kfric and recur counts) and the model split's form, band or panel. Most drift KPIs are current-state readings with no per-iteration series, so each needs a value re-derivable from committed history at each close or a recorded series, under the privacy and home rule the spend panels follow.
+
+**Cost while deferred:** the view shows spend but not where governance spend goes, so the overhead trend is read off one drift-report number at a time. Surfaced 2026-10-18 by the lead session after harness-reach-pass' close, promoted at the next scope's carried-bullet intake. Re-verified there: the section's figure list holds the seven. Owner lookup: `statistics`, `kpi-overhead`, `by-model` in this file and the disposed-findings record, none live (`iteration-statistics-view`, retired, landed the view); owner drift-kit/SPEC.md §The statistics view.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
