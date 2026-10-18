@@ -6,7 +6,7 @@
 
   **Set record**
 
-  **The set (operator direction 2026-10-18, lead-relayed, not a ruling; the iteration opened undirected):** option D. The features [plugin-harness-reach](#plugin-harness-reach), `hook-contract-harness-neutral` and [grant-pwsh-word-read](#grant-pwsh-word-read), which spec authors and promotes; scope promotes no debt. The choice lifts the 2026-10-14 direction that held `grant-pwsh-word-read` back so no grant widened ahead of the v0.32.0 bar, the escalated option naming that lift. Stages scope, spec, align (the amendments span plugin, guard-kit and the kit SPECs carrying hook names), build, validate and close. The hook contract lands first and the per-harness guard wiring binds against its binding table. Composition: bundled on the hook surface plus guard-kit taken whole; drain 3 against inflow 1.8.
+  **The set (operator direction 2026-10-18, lead-relayed, not a ruling; the iteration opened undirected):** option D. The features [plugin-harness-reach](#plugin-harness-reach), `hook-contract-harness-neutral` and `grant-pwsh-word-read`, which spec authors and promotes; scope promotes no debt. The choice lifts the 2026-10-14 direction that held `grant-pwsh-word-read` back so no grant widened ahead of the v0.32.0 bar, the escalated option naming that lift. Stages scope, spec, align (the amendments span plugin, guard-kit and the kit SPECs carrying hook names), build, validate and close. The hook contract lands first and the per-harness guard wiring binds against its binding table. Composition: bundled on the hook surface plus guard-kit taken whole; drain 3 against inflow 1.8.
 
   **Second-vendor review (operator grant 2026-10-18, lead-relayed, unspent):** one audit-mode review over this iteration's range, at validate. Every grant lift in `grant-pwsh-word-read` lands before it. Whether v0.32.0 is cut is close's reading against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed); a cut's tag push would make the set's pushes three against a budget of two, so close asks for it.
 
@@ -25,22 +25,6 @@ the harness plugin package reaches Claude Code only in its tested and guarded pa
 **Reach of (3), decided 2026-10-18 (intent oracle, lead-relayed, not a ruling):** Codex is wired through the existing rendering and verified by a run. The Antigravity binding, the Cursor and Muse Code observation and Codex's `apply_patch` silent allow are filed as costed gaps (SPEC-harness-reach.md).
 
 **Cost while deferred:** an adopter on another harness gets unverified skills and no guards. Filed 2026-09-28 by plugin-marketplace-queue-verbs' lead on an operator direction. Re-verified: plugin/SPEC.md states the portable core and that only Claude Code's install is run. Owner lookup: `Agent Plugins`, `codex`, `Cursor`, `Antigravity` in this file — none; owner plugin/SPEC.md.
-
-### grant-pwsh-word-read
-
-[spec: SPEC-pwsh-word-read.md]
-
-the half of `guard-rules-skeleton-word-read` split off at guard-word-read-release-pass' scope (operator direction, lead-relayed, not a ruling), so no grant widened ahead of the v0.32.0 bar. Three reads stay on the skeleton. The grants read a redirect target there, so a quoted `/dev/null` withholds the grant the bare spelling keeps: rule `ro_pipeline` falls through on `grep -rn foo src 2>"/dev/null"`, and rules `append_scratch`, `bounded_wait`, `bounded_write` and `background_no_record`'s third exemption read it the same way. Probed at spec: `bounded_write` already reads by value, and `background_no_record` and `emitter_write` block. Rule `ro_pipeline` reads its command word there too, and declines a quoted one silently: no variant-lane relation reaches a grant's decline, so it has no limit rows (the 9 once filed under it were block rows rule `allowlist_chain` took over at that iteration's build). And 9 rows in `guard-kit/guard-tests/variant-limits.tsv` are the PowerShell reader's: a backtick inside a command name falls through rules `rm_tracked`, `cd_compound`, `script_interpreter` and `background_no_record`, and a quoted or backticked redirect target or scratch body path through rules `scratch_redirect` and `script_interpreter`.
-
-**Deliverable:** rule `abs_script`'s by-value read (`redirect_values` in `native/src/guard/rules/grants.rs`) given to each grant, rule `ro_pipeline`'s command word read off the word read with authored rows as its oracle, and the PowerShell reader's own word read, each lift deleting its limit rows, where it has any, in its own commit. Every grant lift widens a grant, so it lands in a build a validate's second-vendor review reads.
-
-**Inferred, cannot run before build:** a PowerShell host reads each derived `ps-` row as its base row's command — no host is installed on the machine that derived them, and the step running the rows through `pwsh` on the x64 Windows leg lands at build (SPEC-pwsh-word-read.md delta 4)
-
-**`emitter_write` rides this unit (decided 2026-10-18, intent oracle, lead-relayed, not a ruling):** its false block on a quoted `/dev/null`, observed at spec, is fixed by the same by-value target read. Rows keep a tracked target blocked, and it lands before the validate review.
-
-**Push need (2026-10-18, inside the budget):** one mid-iteration push, after the PowerShell reader's word read lands, to read the x64 Windows leg, since no `pwsh` is on the build machine.
-
-**Cost while deferred:** a PowerShell re-spelling evades two safety blocks, rules `rm_tracked` and `script_interpreter`, and a quoted `/dev/null` costs a prompt the bare spelling does not. Filed 2026-10-14 by guard-word-read-release-pass' scope as the split's remainder; the finding was filed 2026-10-13 by guard-spelling-oracle-pass' spec. Owner lookup: `word read`, `redirect_values`, `ps-`, `pwsh` in this file and the disposed-findings record — `guard-rules-skeleton-word-read`, DISTINCT (the bash block and steer half), `grant-redirect-scan-cr`, done at guard-word-read-release-pass, DISTINCT (the scan this read lands on); owner guard-kit/SPEC.md §The reader and its views.
 
 ## Technical Debt
 
@@ -957,4 +941,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 ## Done
 
 - hook-contract-harness-neutral
+- grant-pwsh-word-read
 
