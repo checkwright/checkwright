@@ -12,6 +12,8 @@
 
   **Push need (2026-10-18, inside the budget):** 2 against 2 — the closing push, and the v0.32.0 tag push only if close's reading against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed) cuts; no unit reads a remote run. The standing direction rests that reading on a clean second-vendor review, and none is granted for this set, so close asks for one.
 
+  **Close (operator directions 2026-10-18, lead-relayed, not rulings):** one audit-mode second-vendor review granted at close over b2ca4b0f6..HEAD, cutting v0.32.0 on a clean return, a finding or a failed run deferring it; and `tarball-attestation-observed`, listed by roadmap-lag, stays untagged.
+
 ---
 
 ## New Features
