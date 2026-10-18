@@ -640,6 +640,14 @@ pub fn dequoted(raw: &str) -> Option<String> {
     Some(text::chomp(&String::from_utf8_lossy(&out)).to_string())
 }
 
+// spec: guard-kit/SPEC.md §The reader and its views — an ANSI-C quoted word: the bare `$` run ahead
+// of the quote, less an escaped first `$`, is odd, since `$$` is the shell's pid.
+fn ansi_c_quote(b: &[u8], i: usize) -> bool {
+    let run = b[..i].iter().rev().take_while(|&&c| c == b'$').count();
+    let live = if run > 0 && escaped(b, i - run) { run - 1 } else { run };
+    live % 2 == 1
+}
+
 // spec: guard-kit/SPEC.md §The reader and its views — the word read; `None` where the dequoted view
 // cannot be aligned outside a heredoc, or where the walk and the compound split of the skeleton part.
 pub fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
@@ -694,6 +702,9 @@ pub fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
                 i += 2;
             }
             b'\'' => {
+                if ansi_c_quote(b, i) {
+                    return None;
+                }
                 let k = b[i + 1..].iter().position(|&c| c == b'\'')?;
                 if heredoc && b[i + 1..i + 1 + k].contains(&b'\n') {
                     return None;
@@ -991,6 +1002,20 @@ mod tests {
         assert_eq!(word_read("a \\&& b"), None);
     }
 
+    // spec: guard-kit/SPEC.md §The reader and its views — an ANSI-C quoted word reads nothing, with a
+    // heredoc beside it too; an escaped `$`, the pid `$$` and a `$` in double quotes stay read
+    #[test]
+    fn the_word_read_answers_nothing_on_an_ansi_c_quoted_word() {
+        assert_eq!(word_read("cat >> \".tmp/\"$'\\056\\056/README.md'"), None);
+        assert_eq!(word_read("cat >> \".tmp/\"$'\\056\\056/README.md' <<'EOF'\nx\nEOF"), None);
+        assert_eq!(word_read("echo $$$'x'"), None);
+        assert_eq!(word_read("echo \\$$'x'"), None);
+        assert_eq!(word_read("echo \\\\$'x'"), None);
+        assert_eq!(faces("echo \\$'x'")[0][1].1, "$x");
+        assert_eq!(faces("echo $$'x'")[0][1].1, "$$x");
+        assert_eq!(faces("echo \"$\"'x'")[0][1].1, "$x");
+    }
+
     // spec: guard-kit/SPEC.md §The reader and its views — a heredoc read as the skeleton holds it: the
     // opener and the terminator bare, a non-empty body one mark word alone in its segment
     #[test]
@@ -1032,7 +1057,7 @@ mod tests {
             if verdict.trim().is_empty() || verdict.starts_with('#') {
                 continue;
             }
-            if cell.contains(['#']) || cell.contains("<<") || cell.contains("@NL@") || cell.ends_with(['&', '|', ';', '\\']) {
+            if cell.contains(['#']) || ["<<", "@NL@", "$'"].iter().any(|t| cell.contains(t)) || cell.ends_with(['&', '|', ';', '\\']) {
                 continue;
             }
             let row = cell.replace("@ROOT@", "/tmp/sandbox").replace("@CR@", "\r");
