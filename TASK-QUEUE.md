@@ -242,6 +242,16 @@ surface (e) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 
 **Cost while deferred:** a new kit's suites lint nothing until the knob is edited, and the 129 linted today carried four warnings that went unseen. Filed 2026-10-18 by site-health-statistics-pass' close as the derivation residual of the drained unlinted-gate-tests bullet. Re-verified there: 129 direct suites across eleven directories, ShellCheck 0.11.0 `-S warning` found four warnings, and a probe file proved the widened knob reaches the corpus. Owner lookup: `shellcheck`, `LINT_EXTRA`, `gate-tests` lint in this file and the disposed-findings record found none; the owner is gate-sdk/SPEC.md §check-shellcheck.
 
+### manifest-count-blank-run-bound
+
+[cost: event/low] [surface: canon-kit]
+
+`check-manifest-count` arm B reads a lead-in's list only past at most one blank line (canon-kit/SPEC.md §check-manifest-count states the bound; `lead_ins` in `native/src/gates/manifest_count.rs` skips one blank with an `if`), so a lead-in, two blank lines, then a list is silently unread, though Markdown reads a blank run as one separator. A fail-open on an adopter's prose; this tree never double-blanks.
+
+**Deliverable:** the bound widened to a blank run in the SPEC and the reader, with a bad-fixture case; a stated-contract change, so it rides an amendment.
+
+**Cost while deferred:** a miscounted lead-in behind a blank run passes unread. Surfaced 2026-10-18 by session-sweep-policy-pass' close (baked-calibration audit), promoted at the next scope's carried-bullet intake. Re-verified there: the single-blank skip in `lead_ins`. Owner lookup: `manifest-count`, `manifest_count`, `lead_ins`, `blank run` in this file and the disposed-findings record found none; owner canon-kit/SPEC.md §check-manifest-count.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
