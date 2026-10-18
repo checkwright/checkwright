@@ -295,3 +295,4 @@ Knowledge-friction counts are excluded: their log is gitignored per-iteration sc
 | site-health-statistics-pass | sc sp a b v c | 3f/0d | 4 · ≤0d | 21s clean | 155 |
 | session-sweep-policy-pass | sc sp a b v c | 3f/0d | 4 · ≤0d | 21s clean | 155 |
 | harness-reach-pass | sc sp a b v c | 10f/1d | 3 · ≤0d | 21s clean | 155 |
+| guard-grant-kpi-pass | sc sp a b v c | 2f/3d | 2 · ≤0d | 21s clean | 155 |

@@ -136,7 +136,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Two grants of 2026-10-17 spent:** competitive-followup-pass' validate and close reviews each returned five findings, so v0.32.0 stayed deferred. That close withdrew `prove` from docs/install.md and docs/maintenance.md and the overlap section from docs/openspec.md, its line held in `companion/fixtures/openspec/overlap/line.md`; **the cut restores them** and deletes the held file.
 
-**Two grants of 2026-10-18 spent:** session-sweep-policy-pass' close review returned five P2 findings, all fixed at that close, none verdict-moving; harness-reach-pass' validate review returned three verdict-moving findings, two of them wrong grants, promoted as `ro-pipeline-wrong-grants` and `pwsh-string-expr-overblock`. Each left v0.32.0 deferred.
+**Two grants of 2026-10-18 spent:** session-sweep-policy-pass' close review returned five P2 findings, all fixed at that close, none verdict-moving; harness-reach-pass' validate review returned three verdict-moving findings, two of them wrong grants, promoted as `ro-pipeline-wrong-grants` and `pwsh-string-expr-overblock`, both landed at guard-grant-kpi-pass. Each left v0.32.0 deferred.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
@@ -287,6 +287,38 @@ gate-sdk/SPEC.md §The hook contract's binding table is held to the crate's spel
 **Deliverable:** one crate module holding the binding's spellings that every member reads, with a test holding the table to it, or a refusal recorded.
 
 **Cost while deferred:** the table can drift from what the members read, unseen until a fixture reds. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: `tool_input` spelled in six `native/src/hook/` modules and `guard/mod.rs`. Owner lookup: `binding table`, `hook contract` in this file, none; owner gate-sdk/SPEC.md §The hook contract.
+
+### heredoc-call-rule-decline
+
+[cost: event/low] [surface: guard-kit]
+
+rules `cat_file`, `find_glob`, `find_exec`, `git_grep`, `brace_glyph`, `grant_path_slot`, `expansion`, `sed_file` (its `python3 -c` rows) and `emitter_write`'s by-value lead decide a call bare and fall through once a heredoc rides it: `cat TASK-QUEUE.md` blocks, `cat TASK-QUEUE.md <<'EOF'` falls through, most such rows carrying no quote of their own.
+
+**Deliverable:** each rule reads a heredoc-bearing call as it reads the bare one, with firing rows carrying a heredoc, or each limit declared in the rule roster. It moves verdicts from fall-through to block, steer or allow, so it lands in a build, never at a close.
+
+**Inferred, not run:** the cause, whether the dequoted view or a per-rule segment test declines.
+
+**Cost while deferred:** a missed steer leaves the call to the harness prompt, and `find_glob`'s and `grant_path_slot`'s lost grants leave it to the harness grant; never a wrong grant. Filed 2026-10-18 by guard-grant-kpi-pass' close, draining its spec's bullet. Re-verified there: 36 of 258 heredoc-free block/advise rows of `guard-tests/cases.tsv` fall through with `<<'EOF'@NL@x@NL@EOF` appended, on the built binary outside the sandbox; the bullet said 40. Owner lookup: `heredoc`, `word read` in this file and the disposed-findings record, only the done `guard-word-read-heredoc`; owner guard-kit/SPEC.md §The rule roster.
+
+### pwsh-herestring-word-read
+
+[cost: event/low] [surface: guard-kit]
+
+the PowerShell reader's word read answers nothing on a call carrying a here-string, so its by-value rules read the skeleton there and a quoted or backtick-escaped word beside one goes unread: `git 'stash' push` blocks, `git 'stash' push; $h = @'@NL@x@NL@'@` falls through. `guard-word-read-heredoc` lifted the bash heredoc case only.
+
+**Deliverable:** the word read reaches a here-string-bearing call, with firing PowerShell rows, or the limit declared. It moves verdicts from fall-through to block, so it lands in a build.
+
+**Cost while deferred:** a block or steer missed beside a here-string, never a wrong grant, since no PowerShell call is granted. Filed 2026-10-18 by guard-grant-kpi-pass' close, draining its spec's bullet. Re-verified there: the `git 'stash' push` pair above on the built binary. Owner lookup: `here-string`, `herestring` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The reader and its views.
+
+### background-record-bare-amp
+
+[cost: event/low] [surface: guard-kit]
+
+rule `background_no_record` misses a backgrounded writer behind a read's bare `&`: `grep -rn foo src & sort -o out.txt tracked.md &` and `grep -rn foo src & make build &` fall through, where `sort -o out.txt tracked.md &` and `grep -rn foo src; sort -o out.txt tracked.md &` block.
+
+**Deliverable:** the rule reads every `&`-joined segment, with a firing row of this shape. It moves a verdict from fall-through to block, so it lands in a build.
+
+**Cost while deferred:** an unrecorded producer a later commit can race. Filed 2026-10-18 by guard-grant-kpi-pass' close, draining its build's bullet; pre-existing, not moved by `ro-pipeline-wrong-grants`. Re-verified there: all four commands on the built binary. Owner lookup: `background_no_record`, `bare '&'` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The generic ruleset.
 
 ## Icebox
 
