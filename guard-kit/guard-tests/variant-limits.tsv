@@ -1,7 +1,6 @@
 # guard-kit variant limits — <floor><TAB><rule><TAB><transform>, read by the variant lane of
 # --run-guard-tests (guard-kit/SPEC.md §Testing). A row is deleted in the commit that lifts its
 # read or withholds its grant, and the lane fails on a row nothing needs.
-fallthrough	background_no_record	ps-tick-lead
 fallthrough	pgrep_self_match	part-arg
 fallthrough	scratch_redirect	ps-dq-arg
 fallthrough	scratch_redirect	ps-sq-arg

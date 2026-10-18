@@ -64,9 +64,9 @@ fn is_ro_background(ctx: &Ctx, s: &str) -> Result<bool, Fault> {
 
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `background_no_record`'s PowerShell shell form: a
 // segment led by `Start-Process` or an alias, carrying no `-Wait` and no `-WhatIf` by any prefix.
-fn ps_detaches(seg: &str) -> bool {
+fn ps_detaches(seg: &str, valued: Option<&str>) -> bool {
     let ws = words(trim_start(seg));
-    let Some(head) = ws.first() else { return false };
+    let Some(head) = valued.or(ws.first().copied()) else { return false };
     if !["start-process", "saps", "start"].contains(&head.to_ascii_lowercase().as_str()) {
         return false;
     }
@@ -214,7 +214,9 @@ fn ps_background_no_record(ctx: &Ctx) -> Decided {
     let h = ctx.host();
     let s = ctx.view(ctx.cmd(), SqDqHd)?;
     let segs = ctx.segments(&s);
-    if !(h.background || segs.iter().any(|g| ps_detaches(g))) {
+    let read = ctx.word_read(ctx.cmd())?;
+    let head = |i: usize| read.as_ref().and_then(|r| r.get(i)).and_then(|ws| ws.first()).map(|w| w.value.as_str());
+    if !(h.background || segs.iter().enumerate().any(|(i, g)| ps_detaches(g, head(i)))) {
         return Ok(None);
     }
     let raw_segs = ctx.segments(ctx.raw(ctx.cmd())?);
