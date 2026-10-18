@@ -370,6 +370,10 @@ fallthrough	bash worker.sh & printf 'pid=1 run=worker\n' > .tmp/worker.run
 # through a member's own option owns work a commit could corrupt
 block	grep -rn foo src | sort -o out.txt &
 fallthrough	grep -rn foo src | head &
+# a member glued to a redirect still owes the record by its write form, in a lone statement as
+# behind a loop's statement-ending '&'
+block	sort>/dev/null -o out.txt tracked.md &
+block	until [ -f x ]; do sleep 1; done & sort>/dev/null -o out.txt tracked.md
 # and its inert targets: a carriage return is a word character, so a descriptor glued to one names a file
 block	grep -rn foo src >&2@CR@tracked.md &
 block	grep -rn foo src >&@CR@2 &
@@ -540,6 +544,9 @@ allow	grep -rn foo src >& /dev/null
 allow	grep -rn foo src 2>"/dev/null"
 allow	grep -rn foo src 2>'/dev/null'
 fallthrough	grep -rn foo src 2>"out.txt"
+# a quoted target spelling a descriptor is a file of that name, since only a live '>&' dups
+fallthrough	grep -rn foo src > '&1'
+fallthrough	grep -rn foo src 2>"&2"
 # a carriage return is a word character, as bash reads it: a descriptor glued to one or behind one
 # names a file, and a redirect onto one alone writes a file of that name
 fallthrough	grep -rn foo src >&2@CR@tracked.md
@@ -584,6 +591,10 @@ fallthrough	grep -c foo tracked.md \\@NL@md5sum scratch.txt
 # the continued line's words are read whole, so a write form on its second line still withholds
 fallthrough	sort a.txt \@NL@-o out.txt
 fallthrough	grep foo 'a\' | sort -o out.txt
+# the declared forms key on the member as the command read gives it, so a member glued to a
+# redirect is still the member and its write form withholds
+fallthrough	sort>/dev/null -o tracked.md scratch.txt
+allow	sort>/dev/null tracked.md
 # the sed and awk program discriminator: a program the static check clears is read-only (a redirect
 # glyph inside an awk string is skipped); an output redirect, a written file, a system() call, a
 # command piped into getline and a program file withhold

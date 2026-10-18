@@ -572,8 +572,9 @@ fn ro_invocation_clear(h: &Host, bin: &str, dwords: &str, skel_core: &str, xargs
     true
 }
 
-// spec: guard-kit/SPEC.md §The generic ruleset — the one declared-forms reader: the dequoted view
-// aligned segment for segment with the skeleton, withheld where the two cannot be aligned.
+// spec: guard-kit/SPEC.md §The generic ruleset — the one declared-forms reader: each segment's member
+// and words by their values off the command read, its program off the dequoted view aligned segment
+// for segment with the skeleton; withheld where the word read answers nothing or the two do not align.
 fn ro_forms_clear(ctx: &Ctx, c: &Cmd) -> Result<bool, Fault> {
     ro_forms_clear_except(ctx, c, &[])
 }
@@ -619,44 +620,69 @@ fn masked_option(read: Option<&Vec<Word>>, dseg: &str) -> bool {
     }
 }
 
+// spec: guard-kit/SPEC.md §The generic ruleset — one segment's words cut where `background_statements`
+// cuts its skeleton: after a word whose live text ends in a statement-ending bare `&`, the `&` dropped;
+// `None` where that cut falls inside a piece.
+fn background_words(ws: &[Word]) -> Option<Vec<Vec<Word>>> {
+    let mut out: Vec<Vec<Word>> = vec![Vec::new()];
+    for w in ws {
+        let b = w.live.as_bytes();
+        let n = b.len();
+        let ends = n > 0 && b[n - 1] == b'&' && (n == 1 || !matches!(b[n - 2], b'&' | b'>' | b'|'));
+        if !ends {
+            out.last_mut()?.push(w.clone());
+            continue;
+        }
+        if n > 1 {
+            let value = w.value_before(n - 1)?;
+            out.last_mut()?.push(Word::new(w.spelling_before(n - 1)?, value, &w.live[..n - 1]));
+        }
+        out.push(Vec::new());
+    }
+    Some(out)
+}
+
 fn ro_forms_read(ctx: &Ctx, c: &Cmd, skip: &[usize], statements: bool) -> Result<bool, Fault> {
     let h = ctx.host();
+    let escape = escape_char(ctx);
     let Some(v) = ctx.dequoted(c)? else { return Ok(false) };
     let s = ctx.view(c, SqDqHd)?;
     let segs = ctx.segments(&s);
     let dsegs = ctx.segments(&v);
-    if segs.len() != dsegs.len() {
+    let Some(read) = ctx.word_read(c)? else { return Ok(false) };
+    if segs.len() != dsegs.len() || read.len() != segs.len() {
         return Ok(false);
     }
-    let read = ctx.word_read(c)?;
-    let mut pairs: Vec<(&str, &str, bool)> = Vec::new();
-    for (i, (seg, dseg)) in segs.iter().zip(&dsegs).enumerate() {
+    let mut pairs: Vec<(&str, &str, Vec<Word>, bool)> = Vec::new();
+    for (i, ((seg, dseg), ws)) in segs.iter().zip(&dsegs).zip(&read).enumerate() {
         if skip.contains(&i) {
             continue;
         }
-        let masked = masked_option(read.as_ref().and_then(|r| r.get(i)), dseg);
+        let masked = masked_option(Some(ws), dseg);
         if !statements {
-            pairs.push((seg, dseg, masked));
+            pairs.push((seg, dseg, passed_words(ws, escape), masked));
             continue;
         }
         let (cut, dcut) = (background_statements(seg), background_statements(dseg));
+        let Some(wcut) = background_words(ws).filter(|w| w.len() == cut.len()) else { return Ok(false) };
         if cut.len() != dcut.len() {
             return Ok(false);
         }
-        pairs.extend(cut.into_iter().zip(dcut).map(|(s, d)| (s, d, masked)));
+        pairs.extend(cut.into_iter().zip(dcut).zip(wcut).map(|((s, d), w)| (s, d, passed_words(&w, escape), masked)));
     }
-    for (seg, dseg, masked) in pairs {
+    for (seg, dseg, passed, masked) in pairs {
+        let Some((head, args)) = passed.split_first() else { continue };
+        let bin = head.value.as_str();
+        if !on_ro_roster(h, bin) {
+            continue;
+        }
         let cw = command_word(seg);
         let dcw = command_word(dseg);
         let dhead = head_word(&dcw);
-        let bin = dhead.replace('\\', "");
-        let bin = bin.as_str();
-        if bin.is_empty() || !on_ro_roster(h, bin) {
-            continue;
-        }
         let core = segment_core(&cw);
         let rest = |s: &str, head: &str| s.strip_prefix(head).unwrap_or(s).to_string();
-        if !ro_invocation_clear(h, bin, &rest(&dcw, dhead), &rest(&core, head_word(&core)), false) {
+        let values: Vec<&str> = args.iter().map(|w| w.value.as_str()).collect();
+        if !ro_invocation_clear(h, bin, &values.join(" "), &rest(&core, head_word(&core)), false) {
             return Ok(false);
         }
         let program = format!("{}{}", bin, rest(&dcw, dhead));
@@ -966,6 +992,23 @@ mod tests {
         assert!(!masked_option(Some(&sed(word("'-E'", "-E", "\0SQ"))), "sed -n -E"));
         assert!(masked_option(Some(&sed(plain_word("p"))), "sed -n p x"));
         assert!(masked_option(None, "sed -n p"));
+    }
+
+    // spec: guard-kit/SPEC.md §The rule roster — rule `background_no_record`'s statement cut on the
+    // word read: a word ending in a statement-ending bare `&` closes its statement, the `&` dropped
+    #[test]
+    fn the_word_read_cuts_where_the_skeleton_cuts_at_a_bare_ampersand() {
+        let values = |ws: &[Word]| {
+            background_words(ws).map(|st| st.into_iter().map(|w| w.into_iter().map(|w| w.value).collect::<Vec<String>>()).collect::<Vec<_>>())
+        };
+        let ws = [plain_word("sleep"), plain_word("1"), plain_word("&"), plain_word("sort>/dev/null"), plain_word("-o"), plain_word("x")];
+        assert_eq!(values(&ws), Some(vec![vec!["sleep".to_string(), "1".to_string()], vec!["sort>/dev/null".to_string(), "-o".to_string(), "x".to_string()]]));
+        let glued = [plain_word("sleep"), plain_word("1&"), plain_word("ls")];
+        assert_eq!(values(&glued), Some(vec![vec!["sleep".to_string(), "1".to_string()], vec!["ls".to_string()]]));
+        let kept = [plain_word("ls"), plain_word("2>&"), plain_word("1"), Word::new("'&'", "&", "\0SQ")];
+        assert_eq!(values(&kept).map(|st| st.len()), Some(1), "a dup operator and a quoted '&' cut nothing");
+        let held = Word::new("'a'&", "a&", "\0SQ&");
+        assert_eq!(values(&[plain_word("echo"), held]), None, "a cut inside a piece");
     }
 
     #[test]

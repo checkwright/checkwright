@@ -168,7 +168,7 @@ pub fn ro_pipeline(ctx: &Ctx) -> Decided {
         return Ok(None);
     }
     for tgt in valued_targets(ctx, ctx.cmd())? {
-        if !tgt.is_empty() && !(tgt == "/dev/null" || is_fd_dup(&tgt)) {
+        if !tgt.is_empty() && tgt != "/dev/null" {
             return Ok(None);
         }
     }
@@ -207,10 +207,6 @@ pub fn ro_pipeline(ctx: &Ctx) -> Decided {
         return Ok(None);
     }
     allow("read-only search pipeline (shell-guard auto-allow)")
-}
-
-fn is_fd_dup(t: &str) -> bool {
-    t.strip_prefix('&').is_some_and(|r| r.starts_with(|c: char| c.is_ascii_digit()))
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — the bounds test's clause (a): relative, not
