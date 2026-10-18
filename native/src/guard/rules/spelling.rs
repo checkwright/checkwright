@@ -20,11 +20,14 @@ const PS_LOCATION: &[&str] =
 pub fn cd_compound(ctx: &Ctx) -> Decided {
     let cmd = ctx.view(ctx.cmd(), SqDqHd)?;
     if ctx.shell() == Shell::PowerShell {
-        let segs: Vec<String> = ctx.segments(&cmd).into_iter().filter(|s| !trim(s).is_empty()).collect();
+        let passed = passed_read(ctx, ctx.cmd())?;
+        let segs: Vec<(usize, String)> =
+            ctx.segments(&cmd).into_iter().enumerate().filter(|(_, s)| !trim(s).is_empty()).collect();
         let hit = segs
             .iter()
-            .map(|s| head_word(trim_start(s)))
-            .find(|w| PS_LOCATION.contains(&w.to_ascii_lowercase().as_str()));
+            .filter_map(|(i, _)| passed.get(*i).and_then(|ws| ws.first()))
+            .find(|w| PS_LOCATION.contains(&w.value.to_ascii_lowercase().as_str()))
+            .map(|w| w.spelling.clone());
         if let Some(w) = hit.filter(|_| segs.len() > 1) {
             return block(format!("don't use '{}' in a compound command (cwd drift, and the allowlist can't match the compound — the call costs an out-of-band permission decision). Pass absolute paths, or 'git -C <dir>' for git.", w));
         }
