@@ -535,6 +535,12 @@ block	cat >> ".tmp/"$'\056\056/tracked.md'
 block	cat >> ".tmp/"$'\056\056/tracked.md' <<'EOF'@NL@x@NL@EOF
 block	printf x > .tmp/$'x'
 allow	printf $'x\n' >> .tmp/j.md
+# a locale-translated word (`$"…"`) is unread as an ANSI-C one is, the catalog that translates it
+# being out of the guard's sight, so a target spelling one is no gitignored target either
+block	cat >> ".tmp/"$"../tracked.md"
+block	cat >> ".tmp/"$"../tracked.md" <<'EOF'@NL@x@NL@EOF
+block	printf x > .tmp/$"x"
+allow	printf $"x" >> .tmp/j.md
 # a carriage return is a word character, so a descriptor glued to one or behind one names a file
 block	cat >> .tmp/journal.md >&2@CR@tracked.md <<'EOF'@NL@line@NL@EOF
 block	cat >> .tmp/journal.md >&@CR@2 <<'EOF'@NL@line@NL@EOF
@@ -616,8 +622,10 @@ fallthrough	grep foo 'a\' | sort -o out.txt
 # redirect is still the member and its write form withholds
 fallthrough	sort>/dev/null -o tracked.md scratch.txt
 allow	sort>/dev/null tracked.md
-# an ANSI-C quoted word is unread, so a write form spelled with one withholds the grant
+# an ANSI-C quoted or locale-translated word is unread, so a write form spelled with one withholds
+# the grant
 fallthrough	sort $'-o' tracked.md scratch.txt
+fallthrough	sort $"-o" tracked.md scratch.txt
 # the sed and awk program discriminator: a program the static check clears is read-only (a redirect
 # glyph inside an awk string is skipped); an output redirect, a written file, a system() call, a
 # command piped into getline and a program file withhold

@@ -640,9 +640,9 @@ pub fn dequoted(raw: &str) -> Option<String> {
     Some(text::chomp(&String::from_utf8_lossy(&out)).to_string())
 }
 
-// spec: guard-kit/SPEC.md §The reader and its views — an ANSI-C quoted word: the bare `$` run ahead
-// of the quote, less an escaped first `$`, is odd, since `$$` is the shell's pid.
-fn ansi_c_quote(b: &[u8], i: usize) -> bool {
+// spec: guard-kit/SPEC.md §The reader and its views — an ANSI-C quoted or locale-translated word: the
+// bare `$` run ahead of the quote, less an escaped first `$`, is odd, since `$$` is the shell's pid.
+fn dollar_quote(b: &[u8], i: usize) -> bool {
     let run = b[..i].iter().rev().take_while(|&&c| c == b'$').count();
     let live = if run > 0 && escaped(b, i - run) { run - 1 } else { run };
     live % 2 == 1
@@ -702,7 +702,7 @@ pub fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
                 i += 2;
             }
             b'\'' => {
-                if ansi_c_quote(b, i) {
+                if dollar_quote(b, i) {
                     return None;
                 }
                 let k = b[i + 1..].iter().position(|&c| c == b'\'')?;
@@ -713,6 +713,9 @@ pub fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
                 i += k + 2;
             }
             b'"' => {
+                if dollar_quote(b, i) {
+                    return None;
+                }
                 let mut value: Vec<u8> = Vec::new();
                 let mut k = i + 1;
                 loop {
@@ -1002,10 +1005,10 @@ mod tests {
         assert_eq!(word_read("a \\&& b"), None);
     }
 
-    // spec: guard-kit/SPEC.md §The reader and its views — an ANSI-C quoted word reads nothing, with a
-    // heredoc beside it too; an escaped `$`, the pid `$$` and a `$` in double quotes stay read
+    // spec: guard-kit/SPEC.md §The reader and its views — an ANSI-C quoted or locale-translated word
+    // reads nothing, with a heredoc beside it too; an escaped `$`, the pid `$$` and a quoted `$` stay read
     #[test]
-    fn the_word_read_answers_nothing_on_an_ansi_c_quoted_word() {
+    fn the_word_read_answers_nothing_on_a_dollar_quoted_word() {
         assert_eq!(word_read("cat >> \".tmp/\"$'\\056\\056/README.md'"), None);
         assert_eq!(word_read("cat >> \".tmp/\"$'\\056\\056/README.md' <<'EOF'\nx\nEOF"), None);
         assert_eq!(word_read("echo $$$'x'"), None);
@@ -1014,6 +1017,15 @@ mod tests {
         assert_eq!(faces("echo \\$'x'")[0][1].1, "$x");
         assert_eq!(faces("echo $$'x'")[0][1].1, "$$x");
         assert_eq!(faces("echo \"$\"'x'")[0][1].1, "$x");
+        assert_eq!(word_read("cat >> \".tmp/\"$\"../README.md\""), None);
+        assert_eq!(word_read("cat >> \".tmp/\"$\"../README.md\" <<'EOF'\nx\nEOF"), None);
+        assert_eq!(word_read("echo $$$\"x\""), None);
+        assert_eq!(word_read("echo \\$$\"x\""), None);
+        assert_eq!(word_read("echo \\\\$\"x\""), None);
+        assert_eq!(faces("echo \\$\"x\"")[0][1].1, "$x");
+        assert_eq!(faces("echo $$\"x\"")[0][1].1, "$$x");
+        assert_eq!(faces("echo '$'\"x\"")[0][1].1, "$x");
+        assert_eq!(faces("echo \"a$\"\"x\"")[0][1].1, "a$x");
     }
 
     // spec: guard-kit/SPEC.md §The reader and its views — a heredoc read as the skeleton holds it: the
@@ -1057,7 +1069,7 @@ mod tests {
             if verdict.trim().is_empty() || verdict.starts_with('#') {
                 continue;
             }
-            if cell.contains(['#']) || ["<<", "@NL@", "$'"].iter().any(|t| cell.contains(t)) || cell.ends_with(['&', '|', ';', '\\']) {
+            if cell.contains(['#']) || ["<<", "@NL@", "$'", "$\""].iter().any(|t| cell.contains(t)) || cell.ends_with(['&', '|', ';', '\\']) {
                 continue;
             }
             let row = cell.replace("@ROOT@", "/tmp/sandbox").replace("@CR@", "\r");
