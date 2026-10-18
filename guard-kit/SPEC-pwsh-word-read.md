@@ -59,7 +59,7 @@ Replacement for `guard-kit/SPEC.md` §The reader and its views, the paragraph op
 
   > Its targets are read by their value, as rule `append_scratch` reads them, so a quoted `/dev/null` is no write and a quoted tracked target is arm (b)'s, named as its value.
 
-- **§The reader and its views**, the paragraph **Rule `append_scratch` reads no raw command**, opens instead: "**Rule `append_scratch`'s decline reads no raw command**: its `raw` and `dequoted` views feed the word read of its targets alone." The rest of the paragraph stands.
+- **§The reader and its views**, the paragraph **Rule `append_scratch` reads no raw command**, whose opening clause "**Rule `append_scratch` reads no raw command**, and the exception is the bound above rather than a hole in it." reads "**Rule `append_scratch`'s decline reads no raw command**, and the exception is the bound above rather than a hole in it; its `raw` and `dequoted` views feed the word read of its targets alone." The rest of the paragraph, from "Its decline reads the `hdq` view", stands.
 
 Authored rows, in `guard-kit/guard-tests/cases.tsv` under each rule's section:
 
@@ -149,7 +149,7 @@ Each rule below already declares `raw`, `sq dq hd` and `dequoted`, so no `TABLE`
 The entry's inferred claim, that a PowerShell host reads each derived `ps-` row as its base row's command, is settled by a host, not by this tree's own lexer.
 
 - **A new arm, `--emit-guard-ps-variants`,** prints every derived PowerShell row of the kit's two PowerShell tables as `<transform> <TAB> <base> <TAB> <variant>`, one per line, from the same `guard_ps_variants::derive` the lane calls. It reads the tables' default paths, exits 0, and exits 2 on an unreadable table. It is an `ARMS` row in `native/src/emit/mod.rs` with an `Arm::Run` member, its `spec:` binding naming guard-kit/SPEC.md §Testing.
-- **A step on `crate-tests-windows`' x64 leg**, `guard PowerShell re-spellings under pwsh's parser`, runs the arm. A `pwsh` script inline in the step parses each base and variant with `[System.Management.Automation.Language.Parser]::ParseInput`. It reds the step on any line where the two parse with errors, or where their `CommandAst` element lists differ in count, kind or static value. A `StringConstantExpressionAst` compares by `.Value`, and a redirection by operator and by its target's static value. It prints the number of lines compared, and reds on zero.
+- **A step on `crate-tests-windows`' x64 leg**, `guard PowerShell re-spellings under pwsh's parser`, runs the arm. A `pwsh` script inline in the step parses each base and variant with `[System.Management.Automation.Language.Parser]::ParseInput`. It reds the step on any line where the two parse with errors, or where their `CommandAst` element lists differ in count, kind or static value. A `StringConstantExpressionAst` compares by `.Value`, and a redirection by operator and by its target's static value. Two transforms change the command word's spelling, so that word alone compares otherwise: `ps-case-lead` without regard to case, and `ps-alias-lead` by resolving the variant's word through `Get-Alias` to its definition and comparing that to the base's word without regard to case. A word the host defines no alias for reds the step. It prints the number of lines compared, and reds on zero.
 
 **Inferred, cannot run before build:** pwsh reads each derived PowerShell row as its base row's command — no PowerShell host is on the build machine, and the step that runs one lands with this delta and runs at the entry's mid-iteration push.
 

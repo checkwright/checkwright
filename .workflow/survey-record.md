@@ -13,3 +13,10 @@
 - rev: c0fe5fbd8d8d879645e42f4244fcf52efc6db40a
 - finding: 129 red lines: delegation-kit SPEC 57, guard-kit SPEC 39, lifecycle-kit SPEC 7, context-kit SPEC 7, gate-sdk SPEC 6, drift-kit SPEC 6, guard-kit README 2, delegation-kit README 2, lifecycle-kit README 1, evidence-kit SPEC 1, delegation-kit/templates/agent-execution.md 1; dispositions per gate-sdk/SPEC-hook-contract.md delta 3
 - inferred: none
+
+## 2026-10-18 align — Which section headings carry the 129 harness-literal red lines under delta 4's roster (build worklist by heading)
+- corpus: '*/SPEC.md' '*/README.md' README.md '*/templates/*.md'
+- oracle: check-harness-literal with delta 4's roster set in the environment, lines grouped by nearest preceding heading
+- rev: 3d793261aa4a623a920e0b49edcb82ca5118f367
+- finding: At 3bd711bc2 the 129 lines sit under: delegation-kit SPEC The delegation model 23, The turn-end liveness hook 22 (plus its Attribution 1, probe 1, background_tasks 2 subsections), Operative residency 2, Layout 3, Testing 1, model-verdict 1, usage.txt 1; guard-kit SPEC The rule roster 13, The shell guard 6, Testing 5, Layout 4, Consumer rules 3, intro 1, friction loop 1, generic ruleset 1, wakeup-guard 1, escalation-guard 1, reader and its views 1, rewrite security posture 1, Writing a consumer rule 1; lifecycle-kit SPEC session-id.sh 4; context-kit SPEC session-context hook 5; drift-kit SPEC stage-economics 4; gate-sdk SPEC harness-integration arm 4, run-gates 1, enforcement-map 1. The guard-kit hook-on-native-Windows section carries none.
+- inferred: none

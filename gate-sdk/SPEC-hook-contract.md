@@ -1,10 +1,12 @@
 # SPEC amendment: hook-contract
 
-Pairs `hook-contract-harness-neutral`. gate-sdk/SPEC.md §The adopter constraints declares the hook members "the exception by construction". Their sections state the shipped Claude Code binding's event names, matchers, payload keys and variables as the contract itself, so an adopter on another harness cannot tell the kit's contract from one vendor's spelling of it. This amendment does three things:
+Pairs `hook-contract-harness-neutral`. gate-sdk/SPEC.md §The adopter constraints declares the hook members "the exception by construction". Their sections state the shipped Claude Code binding's event names, matchers, payload keys and variables as the contract itself, so an adopter on another harness cannot tell the kit's contract from one vendor's spelling of it. This amendment does five things:
 
-- **It states the contract once, in roles.** A new section of gate-sdk/SPEC.md does this, beside §The harness-integration arm, whose channels it already owns.
-- **It spells the shipped binding in one table there.** The kit SPECs then name the roles and cite it.
-- **It widens this repository's `GATE_SDK_HARNESS_LITERALS`** so `check-harness-literal` reds a spelling that leaves the table. That is the catcher landing with the fix.
+- **It states the contract once, in roles, and spells the shipped binding in one table there** (delta 1). A new section of gate-sdk/SPEC.md does this, beside §The harness-integration arm, whose channels it already owns.
+- **It points the adopter constraint at that section** (delta 2).
+- **It rewrites the kit SPECs' passages** to name the roles and cite the table (delta 3).
+- **It widens this repository's `GATE_SDK_HARNESS_LITERALS`** so `check-harness-literal` reds a spelling that leaves the table (delta 4). That is the catcher landing with the fix.
+- **It names the roster in `check-harness-literal`'s closing sentence** (delta 5).
 
 **Reach: gate-sdk, guard-kit, delegation-kit, context-kit, lifecycle-kit, drift-kit, evidence-kit and this repo's knob file.** Delta 3 rewrites passages in six kits' SPECs and READMEs, so the amendment is cross-component and the audit stage follows spec. The set record orders this unit first. `plugin-harness-reach`'s guard wiring is stated against the table, and its amendment (plugin/SPEC-harness-reach.md) carries both acts for the order.
 
@@ -49,11 +51,11 @@ A new `gate-sdk/SPEC.md` subsection, `#### The hook contract`, immediately after
 
 > #### The hook contract
 >
-> Every hook member speaks one contract, stated here in **roles**. A harness reaches it through a **binding**, its spelling of each role. Kit prose names the role and cites this section, and the binding table below is the one place a spelling is written. The kit ships one binding, Claude Code's. A harness speaking it reaches every member unchanged; a harness speaking another protocol is unwired until a binding of its own is built (plugin/SPEC.md §The harnesses).
+> Every hook member speaks one contract, stated here in **roles**. A harness reaches it through a **binding**, its spelling of each role. Kit prose names the role and cites this section, and the binding table below is the one place a spelling is written. The kit ships one binding, Claude Code's. A harness speaking it reaches every member unchanged; a harness speaking another protocol is unwired until a binding of its own is built (plugin/SPEC.md §The guards).
 >
 > - **The events.** *Before-tool-call* fires ahead of a tool call, scoped by the wiring's matcher to the tools a member serves. *Session-start* fires once per session, and never for a dispatched child. *Child-turn-end* fires when a dispatched child ends its turn. The main session's turn end is deliberately unwired (delegation-kit/SPEC.md §The turn-end liveness hook). A member is named by argv, never by its event (§The harness-integration arm).
 > - **The tools a matcher names.** The *shell tools*, one per shell reader; the *dispatch tool*; the *message tool*; the *wake tools*; the *file-write tools*; the *search tools* (`GUARD_KIT_SEARCH_TOOLS`).
-> - **The payload.** Every event carries the *event name*, the *session id*, the *transcript path* and the *working directory*. A call inside a dispatched child also carries the *child id*, whose presence and never whose value marks the nesting, and the *child type*. Before-tool-call adds the *tool name* and the *tool input*: the *command*, the *background flag*, the *written path*, the *message target* and *body*, and the dispatch tool's *dispatch parameters* (type, isolation, model, description, prompt). Child-turn-end adds the *loop guard*, the *live tasks* (each an id, a kind, a status, a description, and a child type or a command), the *child transcript* and the *last message*. Session-start adds the *model*.
+> - **The payload.** Every event carries the *event name*, the *session id*, the *transcript path* and the *working directory*. A call inside a dispatched child also carries the *child id*, whose presence and never whose value marks the nesting, and the *child type*. Before-tool-call adds the *tool name* and the *tool input*: the *command*, the *background flag*, the *written path*, the *message target* and *body*, and the dispatch tool's *dispatch parameters* (type, isolation, model, description, prompt). Child-turn-end adds the *loop guard*, the *live tasks* (each an id, a kind, a status, a description, and a child type or a command), the *child transcript* and the *last message*. Session-start may add the *model*, which no member reads (delegation-kit/SPEC.md §model-verdict reads it from the transcript).
 > - **The decisions.** *Block*: exit 2, the reason on stderr, which the harness feeds to the model. *No decision*: exit 0 with nothing on stdout. *Advise*: exit 0 with a *context envelope* the model reads, on before-tool-call alone, since on child-turn-end it keeps the child running. *Grant*: exit 0 with an *allow envelope* and a reason. *Rewrite*: a grant carrying the changed command. *Operator notice*: exit 0 with the *notice field*, which every event accepts. Any other non-zero status is a non-blocking error after which the call proceeds, so an absent member disables its policy rather than refusing (guard-kit/SPEC.md §The shell guard). No member asks the user.
 > - **The variables.** The *project directory*, written `<project-dir>` in kit prose; the *session-id variable*, which carries the root session's id in a child; the *child-session marker*, which is set at the top level too; the *config home*, written `<config-home>`; and the *plugin root*.
 > - **The wiring.** The *exec form*, a program and an argument array started with no shell (§The harness-integration arm), and the optional *start-failure policy*.
@@ -63,10 +65,10 @@ A new `gate-sdk/SPEC.md` subsection, `#### The hook contract`, immediately after
 >
 > - Events: before-tool-call `PreToolUse`, session-start `SessionStart`, child-turn-end `SubagentStop`, the unwired main turn end `Stop`. <!-- harness-binding: the shipped binding table -->
 > - Tools: shells `Bash` and `PowerShell`; dispatch `Agent`; message `SendMessage`; wake `ScheduleWakeup` and `CronCreate`; file-write `Write` and `Edit`; search `Glob` and `Grep`. <!-- harness-binding: the shipped binding table -->
-> - Common payload: `hook_event_name`, `session_id`, `transcript_path`, `cwd`, and inside a child `agent_id` and `agent_type`; also `permission_mode` and `prompt_id`, and on a tool call `effort` and `tool_use_id`, which no member reads. <!-- harness-binding: the shipped binding table -->
-> - Tool call: `tool_name`; `tool_input`, carrying `command`, `run_in_background` (JSON `true` when set, absent when not), `file_path`, `to` and `message`, and for `Agent` `subagent_type`, `isolation`, `model`, `description` and `prompt`. <!-- harness-binding: the shipped binding table -->
-> - Child turn end: `stop_hook_active`; `background_tasks`, each carrying `id`, `type` (`subagent` or `shell`), `status` and `description`, plus `agent_type` or `command`; `agent_transcript_path`; `last_assistant_message`; also `session_crons`, which no member reads. <!-- harness-binding: the shipped binding table -->
-> - Session start: `model`. <!-- harness-binding: the shipped binding table -->
+> - Common payload: `hook_event_name`, `session_id`, `transcript_path`, and inside a child `agent_id` and `agent_type`; also `cwd`, `permission_mode` and `prompt_id`, and on a tool call `effort` and `tool_use_id`, which no member reads. <!-- harness-binding: the shipped binding table -->
+> - Tool call: `tool_name`; `tool_input`, carrying `command`, `run_in_background` (JSON `true` when set, absent when not), `file_path`, `to` and `message`, and for `Agent` `subagent_type`, `isolation` and `model`, and `description` and `prompt`, which no member reads. <!-- harness-binding: the shipped binding table -->
+> - Child turn end: `stop_hook_active`; `background_tasks`, each carrying `id`, `type` (`subagent` or `shell`), `status` and `description`, plus `agent_type` or `command`; `agent_transcript_path`; also `last_assistant_message` and `session_crons`, which no member reads. <!-- harness-binding: the shipped binding table -->
+> - Session start: `model`, present only optionally and read by no member. <!-- harness-binding: the shipped binding table -->
 > - Envelopes: context `{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":…}}`; allow `permissionDecision` `"allow"` with `permissionDecisionReason`; rewrite `updatedInput`; notice `systemMessage`; a turn end also refuses on `decision: "block"`. <!-- harness-binding: the shipped binding table -->
 > - Variables: `CLAUDE_PROJECT_DIR`, `CLAUDE_CODE_SESSION_ID`, `CLAUDE_CODE_CHILD_SESSION`, `CLAUDE_CONFIG_DIR` (default `~/.claude`), `CLAUDE_PLUGIN_ROOT`. <!-- harness-binding: the shipped binding table -->
 > - Wiring: `command` with `args`; `onFailure`. <!-- harness-binding: the shipped binding table -->
@@ -95,7 +97,7 @@ Every line the widened gate reds (delta 4) takes one of three dispositions. The 
   - a wiring instruction an adopter pastes;
   - a template addressed to the harness's own agent.
 
-The sections, from the oracle's output grouped by heading, with the disposition each section's lines mostly take. Build reads each line against the rule:
+The sections, from the oracle's output grouped by heading, with the disposition each section's lines mostly take. Build reads each line against the rule. The oracle reds no line under guard-kit/SPEC.md's §The hook on native Windows, so that section is not listed:
 
 - **gate-sdk/SPEC.md:** §The harness-integration arm (the argv paragraph, the decline paragraphs), (a); §run-gates, the stub's notice envelope, (a); §enforcement-map's session-start warning, (a).
 - **guard-kit/SPEC.md:**
@@ -103,7 +105,6 @@ The sections, from the oracle's output grouped by heading, with the disposition 
   - §The shell guard: the protocol and verdict paragraphs and the call's step 3, (a); its valved project-directory sentence, already (c), now citing the table for the spelling;
   - §The reader and its views' payload record, (b), with the live-mode paragraphs following it keeping their argument in roles;
   - §Consumer rules, (a), with the `view` mode's payload reads as (c);
-  - §The hook on native Windows, (a);
   - §The rule roster: the chokepoint and grant-envelope wording, (a); `background_no_record`'s harness form, (a);
   - §Writing a consumer rule, (a);
   - §rewrite's §The rewrite arm's security posture, (a);
@@ -112,8 +113,8 @@ The sections, from the oracle's output grouped by heading, with the disposition 
   - §Testing's in-crate payload and classification-ladder descriptions and its fixture tables, (c);
   - guard-kit/README.md's opening line, (a), and its §Install wiring line, (c).
 - **delegation-kit/SPEC.md:**
-  - §The delegation model with its §Operative residency, §The probe is asymmetric… and §Attribution was weighed… subsections, (a), with the chokepoint roster (b) and the two env-route sentences as (c);
-  - §The turn-end liveness hook, (a) throughout, with the log line's grammar (c), and its §What `background_tasks` carries subsection's live-children shape (b);
+  - §The delegation model with its §Operative residency subsection, (a), with the chokepoint roster (b) and the two env-route sentences as (c);
+  - §The turn-end liveness hook with its §The probe is asymmetric… and §Attribution was weighed… subsections, (a) throughout, with the log line's grammar (c), and its §What `background_tasks` carries subsection's live-children shape (b);
   - §usage-verdict's §The usage.txt contract, the `<config-home>` line, (c);
   - §model-verdict's session-start payload, (a);
   - §Layout and configuration's config home and wiring prose, (c);
@@ -129,7 +130,7 @@ The sections, from the oracle's output grouped by heading, with the disposition 
 
 ### (4) This repository lists the binding's spellings {mechanical}
 
-`scripts/gate-sdk-config.knobs`, `GATE_SDK_HARNESS_LITERALS`, from its one member to the roster below. **Not yet applied.** Each member is a spelling distinctive enough that a byte match finds no kit-neutral word; `Bash`, `Agent`, `Write`, `Edit`, `session_id` and `agent_id` are left out as words prose uses otherwise.
+`scripts/gate-sdk-config.knobs`, `GATE_SDK_HARNESS_LITERALS`, from its one member to the roster below, and the `# spec:` comment above it, which names "the project-directory variable's name", to name the binding table's spellings instead. **Not yet applied.** Each member is a spelling distinctive enough that a byte match finds no kit-neutral word; `Bash`, `Agent`, `Write`, `Edit`, `session_id` and `agent_id` are left out as words prose uses otherwise.
 
 ```text
 CLAUDE_PROJECT_DIR CLAUDE_CODE_SESSION_ID CLAUDE_CODE_CHILD_SESSION CLAUDE_CONFIG_DIR CLAUDE_PLUGIN_ROOT
