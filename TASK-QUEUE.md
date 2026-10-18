@@ -1,14 +1,36 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: guard-grant-kpi-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The set (operator direction 2026-10-18, lead-relayed, not a ruling; the iteration opened undirected):** option B over the recommended A. The debt `ro-pipeline-wrong-grants`, which leads, and `pwsh-string-expr-overblock`, promoted by scope; the features `guard-word-read-heredoc` and `statistics-kpi-breadth`, which spec authors and promotes. Stages scope, spec, build, validate and close; each amendment spans one component, so no audit stage is triggered. The ro_pipeline forms check lands on word-read values before the heredoc widening of the word read. Composition: bundled — the three guard-kit findings on the shell guard's reader and rules, plus `statistics-kpi-breadth` as a second whole surface (drift-kit), one more batch and no new stage; drain 4 against inflow 2.8.
+
+  **Push need (2026-10-18, inside the budget):** 2 against 2 — the closing push, and the v0.32.0 tag push only if close's reading against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed) cuts; no unit reads a remote run. The standing direction rests that reading on a clean second-vendor review, and none is granted for this set, so close asks for one.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### ro-pipeline-wrong-grants
+
+two wrong grants in the shell guard's read-only-pipeline rule, each auto-allowed as "read-only search pipeline", both from harness-reach-pass' second-vendor review (P1). (a) `sort>/dev/null -o tracked.md input.txt`: the command word is read as `sort` but the forms check keys on the dequoted head `sort>/dev/null`, so the `-o` write option is never checked; a regression in that iteration's range. (b) `ls > '&1'`: the redirect target read by value, the filename `&1`, is taken for a descriptor duplication, though bash truncates a file named `&1`; before the range the quoted target's placeholder withheld the grant.
+
+**Deliverable:** both refused, a `guard-kit/guard-tests/` row per case, read by a later validate before any close relies on it. Verdict-moving (allow to prompt), so a close promotes it rather than landing it (operator direction 2026-10-18, lead-relayed).
+
+**Cost while deferred:** a session can write a tracked file with no permission decision, and the v0.32.0 bar ([tarball-attestation-observed](#tarball-attestation-observed)) stays unmet. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: both payloads return `allow` from `--hook shell-guard` on the built binary. Owner lookup: `ro_pipeline`, `read-only search pipeline`, `fd_dup` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md.
+
+### pwsh-string-expr-overblock
+
+the shell guard blocks the PowerShell string expression `'.tmp/x.ps1'`, which executes nothing: the value-only tokens drop its quoting, so the rule reads it as a scratch execution. From harness-reach-pass' second-vendor review (P2).
+
+**Deliverable:** a quoted string expression read as a value, with a `guard-kit/guard-tests/` row. Verdict-moving (block to allow), so a close promotes it.
+
+**Cost while deferred:** a rare PowerShell call is refused with a misleading scratch-run steer. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: the payload exits 2 with the scratch-path steer. Owner lookup: `string expression`, `scratch execution` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §scratch-run.
 
 ## Deferred
 
@@ -219,26 +241,6 @@ surface (e) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 **Deliverable:** the bound widened to a blank run in the SPEC and the reader, with a bad-fixture case; a stated-contract change, so it rides an amendment.
 
 **Cost while deferred:** a miscounted lead-in behind a blank run passes unread. Surfaced 2026-10-18 by session-sweep-policy-pass' close (baked-calibration audit), promoted at the next scope's carried-bullet intake. Re-verified there: the reader's single-blank skip. Owner lookup: `manifest-count`, `manifest_count`, `lead_ins`, `blank run` in this file and the disposed-findings record found none; owner canon-kit/SPEC.md §check-manifest-count.
-
-### ro-pipeline-wrong-grants
-
-[cost: event/high] [surface: guard-kit]
-
-two wrong grants in the shell guard's read-only-pipeline rule, each auto-allowed as "read-only search pipeline", both from harness-reach-pass' second-vendor review (P1). (a) `sort>/dev/null -o tracked.md input.txt`: the command word is read as `sort` but the forms check keys on the dequoted head `sort>/dev/null`, so the `-o` write option is never checked; a regression in that iteration's range. (b) `ls > '&1'`: the redirect target read by value, the filename `&1`, is taken for a descriptor duplication, though bash truncates a file named `&1`; before the range the quoted target's placeholder withheld the grant.
-
-**Deliverable:** both refused, a `guard-kit/guard-tests/` row per case, read by a later validate before any close relies on it. Verdict-moving (allow to prompt), so a close promotes it rather than landing it (operator direction 2026-10-18, lead-relayed).
-
-**Cost while deferred:** a session can write a tracked file with no permission decision, and the v0.32.0 bar ([tarball-attestation-observed](#tarball-attestation-observed)) stays unmet. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: both payloads return `allow` from `--hook shell-guard` on the built binary. Owner lookup: `ro_pipeline`, `read-only search pipeline`, `fd_dup` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md.
-
-### pwsh-string-expr-overblock
-
-[cost: event/low] [surface: guard-kit]
-
-the shell guard blocks the PowerShell string expression `'.tmp/x.ps1'`, which executes nothing: the value-only tokens drop its quoting, so the rule reads it as a scratch execution. From harness-reach-pass' second-vendor review (P2).
-
-**Deliverable:** a quoted string expression read as a value, with a `guard-kit/guard-tests/` row. Verdict-moving (block to allow), so a close promotes it.
-
-**Cost while deferred:** a rare PowerShell call is refused with a misleading scratch-run steer. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: the payload exits 2 with the scratch-path steer. Owner lookup: `string expression`, `scratch execution` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §scratch-run.
 
 ### guard-word-read-heredoc
 
