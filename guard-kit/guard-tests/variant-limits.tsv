@@ -3,7 +3,6 @@
 # read or withholds its grant, and the lane fails on a row nothing needs.
 fallthrough	background_no_record	ps-tick-lead
 fallthrough	pgrep_self_match	part-arg
-fallthrough	rm_tracked	ps-tick-lead
 fallthrough	scratch_redirect	ps-dq-arg
 fallthrough	scratch_redirect	ps-sq-arg
 fallthrough	scratch_redirect	ps-tick-arg

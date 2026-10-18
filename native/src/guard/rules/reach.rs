@@ -272,11 +272,13 @@ pub fn rm_tracked_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<String>, Fault> {
             }
             continue;
         }
-        let word = head_word(seg);
-        if !PS_DELETE.contains(&word.to_ascii_lowercase().as_str()) {
+        let skel = head_word(seg);
+        let read = words.as_ref().and_then(|w| w.get(i)).filter(|ws| ws.first().is_some_and(|w| w.live == skel));
+        let word = read.and_then(|ws| ws.first()).map_or(skel, |w| w.spelling.as_str());
+        let value = read.and_then(|ws| ws.first()).map_or(skel, |w| w.value.as_str());
+        if !PS_DELETE.contains(&value.to_ascii_lowercase().as_str()) {
             continue;
         }
-        let read = words.as_ref().and_then(|w| w.get(i)).filter(|ws| ws.first().is_some_and(|w| w.live == word));
         let operands: Vec<Operand> = match read {
             Some(ws) => match ps_delete_paths(&ws[1..]) {
                 Some(p) => p
