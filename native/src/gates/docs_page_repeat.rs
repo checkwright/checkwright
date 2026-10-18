@@ -128,8 +128,9 @@ impl Chrome {
         for el in ["script", "style"] {
             markup = blank_spans(&markup, &format!("<{}", el), &format!("</{}>", el));
         }
-        for (idx, line) in markup.lines().enumerate() {
-            for t in literal_hrefs(line) {
+        let templated = blank_spans(&blank_spans(&markup, "{{", "}}"), "{%", "%}");
+        for (idx, (line, raw)) in templated.lines().zip(markup.lines()).enumerate() {
+            for t in literal_hrefs(line, raw) {
                 if let Some(t) = chrome_target(&t) {
                     self.targets
                         .entry(t)
@@ -137,7 +138,7 @@ impl Chrome {
                 }
             }
         }
-        let bare = strip_tags(&blank_spans(&blank_spans(&markup, "{{", "}}"), "{%", "%}"));
+        let bare = strip_tags(&templated);
         for (idx, line) in bare.lines().enumerate() {
             for folded in long_sentences(line, min_words) {
                 self.sentences
@@ -194,26 +195,37 @@ fn strip_tags(text: &str) -> String {
 }
 
 // spec: canon-kit/SPEC.md §check-docs-page-repeat — a literal `href` value: quoted, and holding
-// no template expression
-fn literal_hrefs(line: &str) -> Vec<String> {
+// no template expression; `line` is `raw` with template expressions blanked byte for byte
+fn literal_hrefs(line: &str, raw: &str) -> Vec<String> {
     let low = line.to_ascii_lowercase();
     let b = line.as_bytes();
+    let skip_ws = |mut i: usize| {
+        while b.get(i).is_some_and(u8::is_ascii_whitespace) {
+            i += 1;
+        }
+        i
+    };
     let mut out = Vec::new();
     let mut from = 0usize;
-    while let Some(off) = low[from..].find("href=") {
+    while let Some(off) = low[from..].find("href") {
         let at = from + off;
-        from = at + 5;
+        from = at + 4;
         if at > 0 && !b[at - 1].is_ascii_whitespace() {
             continue;
         }
-        let Some(&q) = b.get(at + 5).filter(|&&q| q == b'"' || q == b'\'') else {
+        let eq = skip_ws(at + 4);
+        if b.get(eq) != Some(&b'=') {
+            continue;
+        }
+        let qi = skip_ws(eq + 1);
+        let Some(&q) = b.get(qi).filter(|&&q| q == b'"' || q == b'\'') else {
             continue;
         };
-        let start = at + 6;
+        let start = qi + 1;
         let Some(len) = line[start..].find(q as char) else {
             continue;
         };
-        let v = line[start..start + len].trim();
+        let v = raw[start..start + len].trim();
         from = start + len + 1;
         if !v.is_empty() && !v.contains("{{") && !v.contains("{%") {
             out.push(v.to_string());
@@ -543,6 +555,25 @@ mod tests {
             vec![
                 (1, "_layouts/default.html:6", "https://example.dev/repo"),
                 (5, "_layouts/default.html:5", "built by the same small team that ships it"),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_spaced_href_is_read_and_one_inside_a_template_expression_is_not() {
+        let mut chrome = Chrome::default();
+        chrome.add(
+            "_layouts/default.html",
+            "<a href = \"https://example.dev/widget\">Source</a>\n{% assign x = '<a href=\"https://example.dev/other\">O</a>' %}\n<a href=\"/x/{{ page.url }}\">Self</a>\n<a\n  data-href=\"https://example.dev/data\" HREF='https://example.dev/caps'>C</a>\n",
+            8,
+        );
+        let mut got: Vec<(&str, &str)> = chrome.targets.iter().map(|(k, v)| (k.as_str(), v.as_str())).collect();
+        got.sort();
+        assert_eq!(
+            got,
+            vec![
+                ("https://example.dev/caps", "_layouts/default.html:5"),
+                ("https://example.dev/widget", "_layouts/default.html:1"),
             ]
         );
     }

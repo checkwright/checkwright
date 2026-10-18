@@ -190,19 +190,22 @@ fn opening_cardinal(sentence: &str) -> Option<(String, u64)> {
         t = t.trim_start_matches(|c: char| c.is_ascii_digit());
         t = t[1..].trim_start();
     }
-    let strip_emph = |t: &str| t.trim_start_matches(['*', '_']).to_string();
-    let mut owned = strip_emph(t);
-    if owned.len() > 4 && owned[..4].eq_ignore_ascii_case("the ") {
-        owned = strip_emph(owned[4..].trim_start());
+    let mut t = t.trim_start_matches(['*', '_']);
+    if t.get(..4).is_some_and(|p| p.eq_ignore_ascii_case("the ")) {
+        t = t[4..].trim_start().trim_start_matches(['*', '_']);
     }
-    let b = owned.as_bytes();
-    let word = b.iter().take_while(|c| c.is_ascii_alphanumeric()).count();
-    if word == 0 || b.get(word) == Some(&b'_') {
+    let word = t.bytes().take_while(|c| c.is_ascii_alphanumeric()).count();
+    if word == 0 {
         return None;
     }
-    let tok = &owned[..word];
+    let rest = &t[word..];
+    let after = rest.trim_start_matches('_');
+    if after.len() < rest.len() && after.chars().next().is_some_and(char::is_alphanumeric) {
+        return None;
+    }
+    let tok = &t[..word];
     let value = if tok.bytes().all(|c| c.is_ascii_digit()) {
-        tok.parse::<u64>().ok()?
+        tok.parse::<u64>().unwrap_or(u64::MAX)
     } else {
         spec::cardinal_word_value(&tok.to_ascii_lowercase())?
             .parse::<u64>()
@@ -268,6 +271,22 @@ mod tests {
         );
         assert_eq!(read, 1);
         assert_eq!(out, vec![(5, "Two".to_string(), 1)]);
+    }
+
+    #[test]
+    fn multibyte_underscore_emphasis_and_an_oversized_digit_run() {
+        let (read, out) = scan(
+            "Café items:\n- a\n\n日本語:\n- a\n\n_Two_ cases:\n- a\n\n__Two__ cases:\n- a\n\nTwo_ways:\n- a\n\n18446744073709551616 cases:\n- a\n",
+        );
+        assert_eq!(read, 3);
+        assert_eq!(
+            out,
+            vec![
+                (7, "Two".to_string(), 1),
+                (10, "Two".to_string(), 1),
+                (16, "18446744073709551616".to_string(), 1),
+            ]
+        );
     }
 
     #[test]
