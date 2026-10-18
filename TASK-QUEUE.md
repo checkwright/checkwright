@@ -14,15 +14,6 @@
 
 ## New Features
 
-### site-health-probe-unexecuted
-
-[spec: SPEC-probe-test.md]
-
-site-kit/templates/site-health.yml's probe step is linted by the `check-action-*` gates and copied by the kit's smoke, and no tracked oracle executes its bash before a consumer's scheduled run.
-
-**Deliverable:** a tracked site-kit test that extracts the probe step's run block and runs it under PATH stubs for `curl`, `gh` and `sleep`, over a healthy set, one and two transient failures, a persistent failure and `force_fail`.
-
-**Cost while deferred:** a regression in the resample loop or an arm's zero case ships to every copier unseen. Filed 2026-10-06 by site-fence-release-cites-pass' build. Re-verified: no tracked `.sh` names `site-health` but site-kit/smoke/install.sh, which copies the template and runs none of it. Owner lookup: `site-health`, `resampl`, `PATH stub` in this file and the disposed-findings record — `site-health-issue-venue-unwanted`, DISTINCT (the issue step's venue); owner site-kit/SPEC.md §templates/site-health.yml.
 ### iteration-statistics-view
 
 [spec: SPEC-statistics-view.md] [roadmap: next/adoption] [roadmap-summary: Per-iteration workflow statistics, charted for health and trends.]
@@ -1007,4 +998,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 - site-health-resample-knobs
 - site-health-issue-venue-unwanted
+- site-health-probe-unexecuted
 
