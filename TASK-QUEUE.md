@@ -212,7 +212,7 @@ a dated post citing a kit SPEC section by heading reds `check-spec-pointer` when
 
 ### session-sweep-horizon-baked
 
-[cost: event/low] [surface: context-kit]
+[cost: event/low] [surface: context-kit] [not-icebox-eligible: 2026-10-18 a shipped hook breaking Policy-as-choice, a defect rather than demand-gated work, whose site-kit sibling landed this iteration; evicting it would bury a known doctrine breach]
 
 the session-context hook member bakes its scratch sweep's age horizon: it removes scratch older than one day on a constant (`STALE_SECS` in `native/src/hook/session_context.rs`), with no context-kit knob and no off value, where doctrine-kit/DOCTRINE.md Policy-as-choice has a kit ship a calibration as a selectable set with off among it. The port carried the shell template's own literal.
 
@@ -995,9 +995,4 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
-
-- site-health-resample-knobs
-- site-health-issue-venue-unwanted
-- site-health-probe-unexecuted
-- iteration-statistics-view
 
