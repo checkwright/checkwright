@@ -45,7 +45,7 @@ pub fn git_mutation_under_producer(ctx: &Ctx) -> Decided {
 // commit to corrupt, so it owes no record.
 fn is_ro_background(ctx: &Ctx, s: &str) -> Result<bool, Fault> {
     let h = ctx.host();
-    if !valued_targets(ctx, ctx.cmd())?.iter().all(|t| t == "/dev/null" || t.strip_prefix('&').is_some_and(|r| r.starts_with(|c: char| c.is_ascii_digit()))) {
+    if !valued_targets(ctx, ctx.cmd())?.iter().all(|t| inert_value(t)) {
         return Ok(false);
     }
     let mut reads = 0usize;

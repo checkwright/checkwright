@@ -28,14 +28,6 @@ the bash word read answers nothing on a call carrying an ANSI-C (`$'...'`) or lo
 
 ## Technical Debt
 
-### ro-background-quoted-fd-target
-
-rule `background_no_record`'s read-only exemption (`is_ro_background`, `native/src/guard/rules/liveness.rs`) still reads a quoted `'&1'` redirect target as an fd-dup: `sort > '&1'` with `run_in_background` falls through, where `sort > tracked.md` blocks for the missing record, though the call writes a file named `&1`. `ro-pipeline-wrong-grants` widened the value read so no value-read target is an fd-dup, and missed this site.
-
-**Deliverable:** the exemption reads the target by value, with a firing background row of this shape. It moves a verdict from fall-through to block, so it lands in a build.
-
-**Cost while deferred:** an unrecorded backgrounded write a later commit can race; never a wrong grant. Surfaced 2026-10-18 by guard-grant-kpi-pass' close (second-vendor review, P3), promoted at the next scope's carried-bullet intake. Re-verified there: both commands on the built binary. Owner lookup: `is_ro_background`, `fd-dup`, `'&1'` in this file and the disposed-findings record, none; [background-record-bare-amp](#background-record-bare-amp) is DISTINCT (the same rule's `&`-joined segment walk, not its target read); owner guard-kit/SPEC.md §The generic ruleset.
-
 ### background-record-bare-amp
 
 rule `background_no_record` misses a backgrounded writer behind a read's bare `&`: `grep -rn foo src & sort -o out.txt tracked.md &` and `grep -rn foo src & make build &` fall through, where `sort -o out.txt tracked.md &` and `grep -rn foo src; sort -o out.txt tracked.md &` block.
@@ -1033,4 +1025,6 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
+
+- ro-background-quoted-fd-target
 

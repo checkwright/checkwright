@@ -22,8 +22,11 @@ block	true	grep -rn foo src > found.txt
 block	true	grep -rn foo src >& found.txt
 block	true	grep -rn foo src | head >&found.txt
 allow	true	grep -rn foo src 2>& 1
-# and reads each target by its value, so a quoted /dev/null is inert
+# and reads each target by its value, so a quoted /dev/null is inert and a quoted descriptor is
+# the file it names, never an fd-dup
 allow	true	grep -rn foo src 2>"/dev/null"
+block	true	sort > '&1'
+block	true	grep -rn foo src 2>'&1'
 fallthrough	false	bash worker.sh
 # the canonical launch in harness form: rule `background_no_record`'s exemption (1) lets the record
 # through and rule `bounded_wait`'s arm (B) grants it, the flag changing nothing in its text
