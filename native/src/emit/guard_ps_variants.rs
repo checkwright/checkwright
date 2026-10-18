@@ -22,6 +22,7 @@ const ALIASES: &[(&str, &[&str])] = &[
     ("Start-Job", &["sajb"]),
     ("Start-Process", &["saps", "start"]),
     ("Start-Sleep", &["sleep"]),
+    ("Write-Output", &["echo"]),
 ];
 
 pub fn eligible(cell: &str) -> bool {

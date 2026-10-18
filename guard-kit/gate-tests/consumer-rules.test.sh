@@ -183,6 +183,7 @@ eq "words-segments" "$(words 'git commit -m x; echo --no-verify')" "$(printf 'gi
 eq "words-tab" "$(printf '%s' '{"tool_name":"Bash","tool_input":{"command":"echo '\''a\tb'\''"}}' | "$BIN" --guard-json words)" 'echo'"${tab}"'a\tb'
 eq "words-backslash" "$(words "echo 'a\\b'")" 'echo'"${tab}"'a\\b'
 eq "words-powershell" "$(words 'git `clean -X' PowerShell)" "git${tab}clean${tab}-X"
+eq "words-here-string" "$(words $'git \'stash\' push; @\'\nx\n\'@ | Write-Output' PowerShell)" "$(printf 'git\tstash\tpush\nHD\nWrite-Output')"
 eq "words-heredoc" "$(words $'git commit -F - <<\'MSG\'\nx\nMSG')" "$(printf 'git\tcommit\t-F\t-\t%s\nHD\nMSG' "<<'MSG'")"
 eq "words-non-bash" "$(words 'echo "a"' Read | wc -c | tr -d ' ')" 0
 payload x | "$BIN" --guard-json words sq >/dev/null 2>&1

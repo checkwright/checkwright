@@ -344,11 +344,11 @@ pub fn array_elements(spelling: &str) -> Option<Vec<Word>> {
     Some(acc.finish().into_iter().flatten().collect())
 }
 
-// spec: guard-kit/SPEC.md §The reader and its views — the word read; `None` where the dequoted view
-// refuses, on a backtick-continued line, on a bare escape that spells a control character, or where
-// the walk and the compound split part.
+// spec: guard-kit/SPEC.md §The reader and its views — the word read, a here-string one `hd`-marked
+// piece; `None` where the dequoted view refuses on anything else, on a backtick-continued line, on a
+// bare escape that spells a control character, or where the walk and the compound split part.
 fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
-    dequoted(raw)?;
+    dequoted_past(raw, true)?;
     let b = text::chomp(raw).as_bytes();
     let mut acc = WordAcc::new();
     let mut i = 0usize;
@@ -357,6 +357,11 @@ fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
         let next = feed_quoting(b, i, &mut acc)?;
         if next != i {
             i = next;
+            continue;
+        }
+        if let Some((end, _, _)) = (c == b'@').then(|| here_string(b, i)).flatten() {
+            acc.piece(&b[i..end], HD_MARK.as_bytes(), HD_MARK.as_bytes());
+            i = end;
             continue;
         }
         if let Some(end) = comment_end(b, i) {
@@ -396,6 +401,12 @@ fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
 // skeleton: the quotes dropped and their escapes undone. `None` on a here-string, an unterminated
 // span, a newline inside quotes, or an escape that spells a control character.
 fn dequoted(raw: &str) -> Option<String> {
+    dequoted_past(raw, false)
+}
+
+// spec: guard-kit/SPEC.md §The reader and its views — the same walk, a here-string held as the `hd`
+// mark rather than refused where `here` is set: the word read's refusal test.
+fn dequoted_past(raw: &str, here: bool) -> Option<String> {
     let b = raw.as_bytes();
     let n = b.len();
     let mut out: Vec<u8> = Vec::with_capacity(n);
@@ -412,8 +423,13 @@ fn dequoted(raw: &str) -> Option<String> {
             i = end;
             continue;
         }
-        if c == b'@' && here_string(b, i).is_some() {
-            return None;
+        if let Some((end, _, _)) = (c == b'@').then(|| here_string(b, i)).flatten() {
+            if !here {
+                return None;
+            }
+            out.extend_from_slice(HD_MARK.as_bytes());
+            i = end;
+            continue;
         }
         let content: Vec<u8> = match c {
             b'\'' => {
@@ -543,7 +559,8 @@ mod tests {
     }
 
     // spec: guard-kit/SPEC.md §The reader and its views — the word read's three faces under
-    // PowerShell's quoting, and nothing where the dequoted view refuses or a line is continued
+    // PowerShell's quoting, a here-string one piece, and nothing where the dequoted view refuses on
+    // anything else or a line is continued
     #[test]
     fn the_word_read_carries_each_word_s_spelling_value_and_live_text() {
         let faces = |t: &str| -> Vec<Vec<(String, String, String)>> {
@@ -567,7 +584,19 @@ mod tests {
                 vec![face("wc", "wc", "wc")],
             ]
         );
-        assert_eq!(word_read("@'\nx\n'@ | wc"), None);
+        assert_eq!(
+            faces("@'\nx; y | z\n'@ | wc"),
+            vec![vec![face("@'\nx; y | z\n'@", HD_MARK, HD_MARK)], vec![face("wc", "wc", "wc")]]
+        );
+        assert_eq!(
+            faces("git 'stash' push; $h = @\"\na\n\"@"),
+            vec![
+                vec![face("git", "git", "git"), face("'stash'", "stash", SQ_MARK), face("push", "push", "push")],
+                vec![face("$h", "$h", "$h"), face("=", "=", "="), face("@\"\na\n\"@", HD_MARK, HD_MARK)],
+            ]
+        );
+        assert_eq!(word_read("@'\nx\n'@; echo 'open"), None);
+        assert_eq!(word_read("@'\nx\n'@; echo \"a\nb\""), None);
         assert_eq!(word_read("echo 'open"), None);
         assert_eq!(word_read("git log `\n --oneline"), None);
         assert_eq!(faces("del trac`ked.md a`,b `'x"), vec![vec![

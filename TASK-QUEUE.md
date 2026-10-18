@@ -24,17 +24,9 @@ the bash word read answers nothing on a call carrying an ANSI-C (`$'...'`) or lo
 
 **Deliverable:** a feature, since it lifts a refusal guard-kit/SPEC.md §The reader and its views states: ANSI-C escapes (octal, hex, `\u`, `\c`, the C escapes) resolved into the value face, restoring those grants; for `$"..."` the guard cannot see the catalog (`TEXTDOMAIN`, `TEXTDOMAINDIR`, the locale), so a read as its double-quoted value is weighed against keeping the refusal declared. It widens grants, the class the release bar reads.
 
-**Cost while deferred:** one permission decision per such call. Surfaced 2026-10-18 and 2026-10-19 by the two word-read hotfixes after guard-grant-kpi-pass' close, promoted at the next scope's carried-bullet intake as one entry. Re-verified there: each call above falls through on the built binary, `tracked.md` as `TASK-QUEUE.md`, and the plain `grep a` allows. Owner lookup: `ANSI-C`, `value face`, `locale` in this file and the disposed-findings record, none; [pwsh-herestring-word-read](#pwsh-herestring-word-read) is DISTINCT (the PowerShell reader); owner guard-kit/SPEC.md §The reader and its views.
+**Cost while deferred:** one permission decision per such call. Surfaced 2026-10-18 and 2026-10-19 by the two word-read hotfixes after guard-grant-kpi-pass' close, promoted at the next scope's carried-bullet intake as one entry. Re-verified there: each call above falls through on the built binary, `tracked.md` as `TASK-QUEUE.md`, and the plain `grep a` allows. Owner lookup: `ANSI-C`, `value face`, `locale` in this file and the disposed-findings record, none; `pwsh-herestring-word-read` is DISTINCT (the PowerShell reader); owner guard-kit/SPEC.md §The reader and its views.
 
 ## Technical Debt
-
-### pwsh-herestring-word-read
-
-the PowerShell reader's word read answers nothing on a call carrying a here-string, so its by-value rules read the skeleton there and a quoted or backtick-escaped word beside one goes unread: `git 'stash' push` blocks, `git 'stash' push; $h = @'@NL@x@NL@'@` falls through. `guard-word-read-heredoc` lifted the bash heredoc case only.
-
-**Deliverable:** the word read reaches a here-string-bearing call, with firing PowerShell rows, or the limit declared. It moves verdicts from fall-through to block, so it lands in a build.
-
-**Cost while deferred:** a block or steer missed beside a here-string, never a wrong grant, since no PowerShell call is granted. Filed 2026-10-18 by guard-grant-kpi-pass' close, draining its spec's bullet. Re-verified there: the `git 'stash' push` pair above on the built binary. Owner lookup: `here-string`, `herestring` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The reader and its views.
 
 ### heredoc-call-rule-decline
 
@@ -1020,4 +1012,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 - ro-background-quoted-fd-target
 - background-record-bare-amp
+- pwsh-herestring-word-read
 
