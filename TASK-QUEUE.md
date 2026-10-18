@@ -14,26 +14,6 @@
 
 ## New Features
 
-### site-health-issue-venue-unwanted
-
-[spec: SPEC-issue-opt-in.md] [not-icebox-eligible: 2026-09-21 operator-ruled, cron-armed]
-
-the site-health probe files issues on the public repo for failures the iteration lifecycle resolves anyway, and the operator does not want that venue.
-
-**Operator-ruled 2026-08-25: the issue-filing path is unwanted.** The objection is to the **venue**, not to the probe — and a later session must not read it as the probe being wrong. Both firings were true positives on arm #6, the Release body missing its note URL: 2026-08-08 on `v0.22.0` and 2026-08-24 on `v0.25.0`, each cleared by the probe's own recovery path.
-
-**Those dates sit in this prose deliberately.** The operator has since deleted both issues — probed here, `gh issue list --state all` returns nothing — so the tracker is empty, two dead run-log URLs are all that survives of the evidence, and the underlying defect's repair landed as `release-body-step-has-no-in-tree-witness` — the publish job now composes the Release body, unwitnessed until the first tagged publish run — rather than at any issue that resolves. The `site-health` label survives and is harmless: the workflow's label creation is idempotent and its open-issue lookup returns empty either way.
-
-**The deletion is not the fix, and an empty tracker is not the problem going away.** The workflow is unchanged and still armed on its `17 6 * * *` cron, so the next arm-#6 failure opens a fresh issue. That is the whole reason this entry exists.
-
-**The fork, unresolved, and it is two changes rather than one.** (1) Repo-copy only: delete the step and the `issues: write` scope from `.github/workflows/site-health.yml`. One file — but that file is pinned governed repo-meta in `scripts/core-files.list` and is a copy of `site-kit/templates/site-health.yml`, so this forks the template a repo governed by its own kits dogfoods. (2) Kit-level opt-in: the issue path becomes consumer config defaulting **off** under the `<KIT>_<KNOB>` convention, with this repo taking the default — template plus site-kit/SPEC.md plus `site-kit/smoke/install.sh`, which copies the template in.
-
-**Option 2, operator direction 2026-10-18, lead-relayed, not a ruling:** the issue path becomes kit-level consumer config under `<KIT>_<KNOB>`, defaulting off, and this repo takes the default. The operator was told it reverses the shipped design site-kit/SPEC.md §templates/site-health.yml states, that a failed probe opens or updates an issue and recovery self-clears.
-
-**The replacement signal is the whole cost, and one half is now probed.** Candidate A, red run only: GitHub's documented scheduled-failure notification targets the last modifier of the **cron syntax** — not the last committer — and here that is `016d522a`, 2026-07-10, the operator, so the channel resolves to the right person today. The limit that cannot be probed from the tree is whether their notification settings deliver it. Candidate B, write the failure report to the run's job summary: visible in the Actions tab and files nothing, but the workflow writes no step summary today, so this is net-new work rather than a redirect.
-
-**Cost while deferred:** tracker noise on a public repo, and nothing worse — the probe is accurate and self-clearing, so no outage goes unseen while this waits. Filed 2026-08-25 by scope, operator-directed and relayed through the lead; the tree read behind it was re-run here rather than taken on the relay.
-
 ### site-health-probe-unexecuted
 
 [spec: SPEC-probe-test.md]
@@ -42,7 +22,7 @@ site-kit/templates/site-health.yml's probe step is linted by the `check-action-*
 
 **Deliverable:** a tracked site-kit test that extracts the probe step's run block and runs it under PATH stubs for `curl`, `gh` and `sleep`, over a healthy set, one and two transient failures, a persistent failure and `force_fail`.
 
-**Cost while deferred:** a regression in the resample loop or an arm's zero case ships to every copier unseen. Filed 2026-10-06 by site-fence-release-cites-pass' build. Re-verified: no tracked `.sh` names `site-health` but site-kit/smoke/install.sh, which copies the template and runs none of it. Owner lookup: `site-health`, `resampl`, `PATH stub` in this file and the disposed-findings record — [site-health-issue-venue-unwanted](#site-health-issue-venue-unwanted), DISTINCT (the issue step's venue); owner site-kit/SPEC.md §templates/site-health.yml.
+**Cost while deferred:** a regression in the resample loop or an arm's zero case ships to every copier unseen. Filed 2026-10-06 by site-fence-release-cites-pass' build. Re-verified: no tracked `.sh` names `site-health` but site-kit/smoke/install.sh, which copies the template and runs none of it. Owner lookup: `site-health`, `resampl`, `PATH stub` in this file and the disposed-findings record — `site-health-issue-venue-unwanted`, DISTINCT (the issue step's venue); owner site-kit/SPEC.md §templates/site-health.yml.
 ### iteration-statistics-view
 
 [spec: SPEC-statistics-view.md] [roadmap: next/adoption] [roadmap-summary: Per-iteration workflow statistics, charted for health and trends.]
@@ -1026,4 +1006,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 ## Done
 
 - site-health-resample-knobs
+- site-health-issue-venue-unwanted
 

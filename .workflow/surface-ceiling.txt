@@ -35,7 +35,7 @@
 1285cp docs/drift-kit/index.md
 1351cp docs/evidence-kit/index.md
 1463cp docs/gate-sdk/index.md
-10724cp docs/generated-projections.md
+10709cp docs/generated-projections.md
 1259cp docs/guard-kit/index.md
 5236cp docs/index.md
 8768cp docs/install-block-contracts.md
@@ -100,7 +100,7 @@
 3130cp gate-sdk/templates/adopt.md
 333925cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
-292505cp installer/SPEC.md
+292511cp installer/SPEC.md
 393612cp lifecycle-kit/SPEC.md
 8150cp lifecycle-kit/templates/consult.md
 1212cp lifecycle-kit/templates/frames/project-critique.md
@@ -119,4 +119,4 @@
 16207cp plugin/SPEC.md
 159691cp queue-kit/SPEC.md
 1392cp queue-kit/templates/TASK-QUEUE.md
-57386cp site-kit/SPEC.md
+58215cp site-kit/SPEC.md

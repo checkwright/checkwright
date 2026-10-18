@@ -8,13 +8,12 @@ on:
   workflow_dispatch:
     inputs:
       force_fail:
-        description: 'Inject a synthetic probe failure to exercise the issue path'
+        description: 'Inject a synthetic probe failure to exercise the failure path'
         type: boolean
         default: false
 
-# spec: site-kit/SPEC.md §templates/site-health.yml — the permissions block is an allowlist
+# spec: site-kit/SPEC.md §templates/site-health.yml — the permissions block is an allowlist; ISSUE_TRACKING: 'on' adds issues: write
 permissions:
-  issues: write
   contents: read
 
 jobs:
@@ -291,14 +290,36 @@ jobs:
             echo "all probes green"
           fi
 
-      - name: file or clear the site-health issue
+      - name: report the probe result
         env:
+          # spec: site-kit/SPEC.md §templates/site-health.yml — the issue path: 'on' also needs issues: write in the permissions block
+          ISSUE_TRACKING: 'off'
           GH_TOKEN: ${{ github.token }}
           STATUS: ${{ steps.probe.outputs.status }}
           REPORT: ${{ steps.probe.outputs.report }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
+          tracking="${ISSUE_TRACKING-}"
+          case "$tracking" in
+            on|off) ;;
+            *)
+              echo "ISSUE_TRACKING must be 'on' or 'off' (got '$tracking')"
+              exit 1
+              ;;
+          esac
+
+          if [ "$tracking" = off ]; then
+            if [ "$STATUS" = fail ]; then
+              echo "FAILED probe(s):"
+              printf '%s\n' "$REPORT"
+              echo "issue path off; the red run is the signal"
+              exit 1
+            fi
+            echo "all probes green; issue path off"
+            exit 0
+          fi
+
           label=site-health
           gh label create "$label" --color b60205 \
             --description "Live-site monitoring probe failure" 2>/dev/null || true
