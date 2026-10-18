@@ -1934,6 +1934,72 @@ jobs:
         shell: bash
         run: bash gate-sdk/bin/run-gates.sh --run-guard-tests
 
+      # spec: guard-kit/SPEC.md §Testing — binding; a PowerShell host parses each derived PowerShell row against its base
+      - name: guard PowerShell re-spellings under pwsh's parser
+        if: ${{ !cancelled() && matrix.target == 'x86_64-pc-windows-msvc' }}
+        shell: pwsh
+        run: |
+          [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+          $lines = & ./native/target/release/checkwright-gates.exe --emit-guard-ps-variants
+          if ($LASTEXITCODE -ne 0) { Write-Output "::error::--emit-guard-ps-variants exited $LASTEXITCODE"; exit 1 }
+          function Read-Ast([string]$text) {
+            $tokens = $null; $errors = $null
+            $ast = [System.Management.Automation.Language.Parser]::ParseInput($text, [ref]$tokens, [ref]$errors)
+            [pscustomobject]@{ Ast = $ast; Errors = @($errors) }
+          }
+          function Get-Static($e) {
+            if ($e -is [System.Management.Automation.Language.StringConstantExpressionAst]) { return $e.Value }
+            if ($e -is [System.Management.Automation.Language.CommandParameterAst]) {
+              $arg = if ($e.Argument) { Get-Static $e.Argument } else { '' }
+              return "-$($e.ParameterName):$arg"
+            }
+            return $e.Extent.Text
+          }
+          function Get-Redirect($r) {
+            if ($r -is [System.Management.Automation.Language.MergingRedirectionAst]) { return "$($r.FromStream)>&$($r.ToStream)" }
+            return "$($r.FromStream)>$(if ($r.Append) { '>' }) $(Get-Static $r.Location)"
+          }
+          function Get-Commands($ast) { @($ast.FindAll({ param($n) $n -is [System.Management.Automation.Language.CommandAst] }, $true)) }
+          $compared = 0; $unequal = 0
+          foreach ($line in $lines) {
+            if (-not $line) { continue }
+            $f = $line -split "`t", 3
+            if ($f.Count -ne 3) { Write-Output "::error::a line that is no <transform> <base> <variant> triple: $line"; $unequal++; continue }
+            $transform, $base, $variant = $f
+            $compared++
+            $why = $null
+            $b = Read-Ast $base; $v = Read-Ast $variant
+            if ($b.Errors.Count -or $v.Errors.Count) { $why = "parse errors, $($b.Errors.Count) in the base and $($v.Errors.Count) in the variant" }
+            $bc = Get-Commands $b.Ast; $vc = Get-Commands $v.Ast
+            if (-not $why -and $bc.Count -ne $vc.Count) { $why = "$($bc.Count) command(s) against $($vc.Count)" }
+            for ($i = 0; -not $why -and $i -lt $bc.Count; $i++) {
+              $be = $bc[$i].CommandElements; $ve = $vc[$i].CommandElements
+              if ($bc[$i].InvocationOperator -ne $vc[$i].InvocationOperator) { $why = "command $i's invocation operator"; break }
+              if ($be.Count -ne $ve.Count) { $why = "command $i's $($be.Count) element(s) against $($ve.Count)"; break }
+              for ($k = 0; -not $why -and $k -lt $be.Count; $k++) {
+                $bk = $be[$k].GetType().Name; $vk = $ve[$k].GetType().Name
+                if ($bk -ne $vk) { $why = "command $i element $k is a $bk against a $vk"; break }
+                $bs = Get-Static $be[$k]; $vs = Get-Static $ve[$k]
+                if ($bs -ceq $vs) { continue }
+                if ($k -eq 0 -and $transform -eq 'ps-case-lead' -and $bs -ieq $vs) { continue }
+                if ($k -eq 0 -and $transform -eq 'ps-alias-lead') {
+                  $alias = Get-Alias -Name $vs -ErrorAction SilentlyContinue
+                  if (-not $alias) { $why = "'$vs' is no alias on this host"; break }
+                  if ($alias.Definition -ieq $bs) { continue }
+                  $why = "'$vs' is an alias of '$($alias.Definition)', not of '$bs'"; break
+                }
+                $why = "command $i element $k reads '$vs' against '$bs'"
+              }
+              $br = @($bc[$i].Redirections | ForEach-Object { Get-Redirect $_ }) -join ' | '
+              $vr = @($vc[$i].Redirections | ForEach-Object { Get-Redirect $_ }) -join ' | '
+              if (-not $why -and $br -cne $vr) { $why = "command $i redirects '$vr' against '$br'" }
+            }
+            if ($why) { $unequal++; Write-Output "::error::$transform re-spelling '$variant' of '$base': $why" }
+          }
+          Write-Output "compared $compared PowerShell re-spelling(s) against their base rows under pwsh $($PSVersionTable.PSVersion): $unequal unequal"
+          if ($compared -eq 0) { Write-Output "::error::no PowerShell re-spelling was compared"; exit 1 }
+          if ($unequal -gt 0) { exit 1 }
+
       # spec: guard-kit/SPEC.md §scratch-run — binding; reds unless both PowerShell hosts ran their cases
       - name: scratch runner under both PowerShells
         if: ${{ !cancelled() && matrix.target == 'x86_64-pc-windows-msvc' }}

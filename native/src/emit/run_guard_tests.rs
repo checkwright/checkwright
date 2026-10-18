@@ -41,6 +41,26 @@ pub fn run(args: &[String]) -> i32 {
     }
 }
 
+// spec: guard-kit/SPEC.md §Testing — the PowerShell re-spellings a PowerShell host parses on the
+// x64 Windows leg: every derived row of the two PowerShell tables as `<transform>\t<base>\t<variant>`.
+pub fn emit_ps_variants(_: &[String]) -> Result<String, String> {
+    ps_variant_lines(&kit_root()?)
+}
+
+fn ps_variant_lines(kit: &str) -> Result<String, String> {
+    let mut out = String::new();
+    for (table, width) in [("powershell-cases.tsv", 2), ("powershell-background-cases.tsv", 3)] {
+        let path = format!("{}/guard-tests/{}", kit, table);
+        for row in rows(&path, width)? {
+            let base = &row[width - 1];
+            for v in guard_ps_variants::derive(base) {
+                out.push_str(&format!("{}\t{}\t{}\n", v.transform, base, v.cell));
+            }
+        }
+    }
+    Ok(out)
+}
+
 fn execute(args: &[String]) -> Result<i32, String> {
     let kit = kit_root()?;
     let cases = positional(args, 0, &format!("{}/guard-tests/cases.tsv", kit));
@@ -582,5 +602,24 @@ mod tests {
             r#"{"tool_input":{"command":"ls","run_in_background":true},"tool_name":"Bash"}"#
         );
         assert_eq!(payload("ls", None, "PowerShell"), r#"{"tool_input":{"command":"ls"},"tool_name":"PowerShell"}"#);
+    }
+
+    // spec: guard-kit/SPEC.md §Testing — every line the Windows leg parses is a transform, an
+    // eligible base and a variant the deriver made of it; an unreadable table refuses
+    #[test]
+    fn each_powershell_variant_line_names_its_transform_base_and_variant() {
+        let kit = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../guard-kit");
+        let lines = ps_variant_lines(&kit.display().to_string()).unwrap();
+        let mut n = 0;
+        for line in lines.lines() {
+            let f: Vec<&str> = line.split('\t').collect();
+            assert_eq!(f.len(), 3, "{}", line);
+            assert!(guard_ps_variants::TRANSFORMS.contains(&f[0]), "{}", line);
+            assert!(guard_ps_variants::derive(f[1]).iter().any(|v| v.transform == f[0] && v.cell == f[2]), "{}", line);
+            n += 1;
+        }
+        assert!(n > 0);
+        assert!(lines.lines().any(|l| l.starts_with("ps-alias-lead\t")));
+        assert!(ps_variant_lines("/nonexistent").is_err());
     }
 }

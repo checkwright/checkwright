@@ -964,6 +964,12 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Run(run_guard_tests::run),
         run_guard_tests::KNOBS,
     ),
+    // spec: guard-kit/SPEC.md §Testing — the PowerShell re-spellings the Windows leg's host parses
+    (
+        "--emit-guard-ps-variants",
+        Arm::Emit(run_guard_tests::emit_ps_variants, Grammar::Flags(&[])),
+        &["GATE_SDK_KIT_DIRS"],
+    ),
     // spec: context-kit/SPEC.md §Testing — an `Arm::Run` because the contract is the three-valued
     // exit the `index_tests` validate suite reads, and a table member because it reaches two kit
     // roots, a read a hardcoded flag would hide from the knob-file derivation
