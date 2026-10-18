@@ -28,8 +28,6 @@ Adoption evidence, mostly. A rung promotes when someone hits the friction it des
 
 ### next
 
-- [plugin-harness-reach](TASK-QUEUE.md#plugin-harness-reach) *(ecosystem)* — The plugin package verified on more harnesses, with guards wherever a harness has a hook surface.
-
 ### later
 
 - [benchmark-ab-experiment](TASK-QUEUE.md#benchmark-ab-experiment) *(adoption)* — A controlled experiment measuring drift with and without governance.

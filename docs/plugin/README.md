@@ -24,7 +24,16 @@ In Claude Code:
 /plugin install checkwright@checkwright
 ```
 
-Any other Agent Plugins client loads this `plugin/` directory by its own install route.
+In Codex:
+
+```text
+codex plugin marketplace add checkwright/checkwright
+codex plugin add checkwright@checkwright
+```
+
+In Antigravity, from a clone of this repository: `agy plugin install ./plugin`. Codex and Antigravity register the skills and no guard.
+
+Any other Agent Plugins client loads this `plugin/` directory by its own install route; [`plugin/SPEC.md` §The harnesses](SPEC.md#the-harnesses) lists the ones read.
 
 Then ask for the `install` skill, then for the `adopt` skill, in the repository you want governed, or install Checkwright yourself ([Install](https://checkwright.dev/install.html)).
 

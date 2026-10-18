@@ -20,6 +20,22 @@ The package serves two formats from one tree:
 
 The two formats read the same `skills/` layout, so one package carries both manifests over one set of skills, and a client implementing either reads its own manifest.
 
+## The harnesses
+
+The package is one tree, and each harness reads what its own format reaches of it. The standard names no adopter, so a harness is listed here once its own documentation or a run shows it reading the package. Each cell says which: **run** is a command this repository's build ran, and **read** is the harness's documentation, at the URL given below the table.
+
+| harness | skills | hooks | catalog |
+|---|---|---|---|
+| Claude Code | run: `.claude-plugin/plugin.json`, `skills/` | run: `hooks/hooks.json`, this rendering | run: `.claude-plugin/marketplace.json` |
+| Codex | run: the portable `plugin.json`, `skills/` | not wired: `codex-cli` 0.162.1 discovers none beside the root `plugin.json` (run); discovered, this rendering blocks (run, 0.162.1; [§The guards](#the-guards)) | run: `.claude-plugin/marketplace.json`, read as Codex's legacy location; a `git-subdir` source |
+| Antigravity | run: the portable `plugin.json`, `skills/`, installed from a local directory | not wired: its protocol differs ([§The guards](#the-guards)) | read: an official marketplace only |
+| Cursor | read: an Agent Plugin's `plugin.json` and `skills/` | not wired from the plugin: it reads hooks only from its own plugin format, and imports a project's Claude Code settings wiring by default | read: its own `.cursor-plugin/marketplace.json` |
+| Muse Code | read: Claude Code-format plugins | read: a Claude Code-format plugin's hooks, unsupported events skipped; its payload is undocumented | read: `muse plugins marketplace` |
+
+Sources: developers.openai.com/codex/plugins/build and learn.chatgpt.com/docs/hooks for Codex; the CLI's built-in plugin and hooks documentation for Antigravity; cursor.com/docs/plugins, cursor.com/docs/hooks and cursor.com/docs/reference/third-party-hooks for Cursor; dev.meta.ai/docs/muse-code for Muse Code. A harness not in the table is unread, not unsupported.
+
+A **read** cell becomes **run** only by a later run, written by the build that runs that harness.
+
 ## The manifests
 
 - `plugin/plugin.json`, the portable manifest, carries `$schema` (the published Agent Plugins schema URL), `name`, `description`, `author`, `homepage`, `repository` and `license`.
@@ -62,7 +78,7 @@ Vendoring stays with `init`. A plugin that vendored kits itself would be a secon
 
 ## The guards
 
-`plugin/hooks/hooks.json` is a rendering of `guard-kit/templates/settings-hooks.json`, for the one harness that reads a plugin's hooks; the portable manifest carries skills alone, since the standard excludes hooks from its core. The rendering:
+`plugin/hooks/hooks.json` is a rendering of `guard-kit/templates/settings-hooks.json`, for the harness that reads a plugin's hooks in the shipped binding's protocol ([gate-sdk/SPEC.md §The hook contract](../gate-sdk/SPEC.md#the-hook-contract)), Claude Code. The portable manifest carries skills alone, since the standard excludes hooks from its core. The rendering:
 
 - takes each block under `hooks`, its event, its matcher and its hook entries, in order;
 - reads each hook's member through the registration parser ([gate-sdk/SPEC.md §The harness-integration arm](../gate-sdk/SPEC.md#the-harness-integration-arm)) and composes its `command` as the fail-open prefix followed by the shell-form front-end call of that member: `r=$(git -C "${CLAUDE_PROJECT_DIR:-.}" rev-parse --show-toplevel 2>/dev/null) && test -f "$r/gate-sdk/bin/run-gates.sh" || exit 0; CLAUDE_PROJECT_DIR=$r; bash "${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh" --hook <member>`, dropping the template's `args`;
@@ -72,6 +88,14 @@ Vendoring stays with `init`. A plugin that vendored kits itself would be a secon
 A plugin's hooks fire in every repository where the plugin is enabled, so each command first tests for the vendored front end and exits 0 without it. That test takes a shell, so the plugin's hooks keep the shell form where the template's registrations take the exec form. **The plugin therefore owes bash on every host**: the harness runs a shell-form hook command under a POSIX shell, Git for Windows' bash on native Windows. It runs it in the session's current directory, which a subdirectory launch or the session's own `cd` moves off the root, so the prefix resolves the repository's toplevel from the harness's project directory. The shell-guard fires anywhere inside a vendored repository and stays silent outside one, and declines, through the front end, where git refuses or skips the repository the session stands in.
 
 The prefix differs from the settings rendering's anchor because the plugin loads where project settings do not. Launched from a subdirectory, a session loads no project settings, and a hook supplied any other way runs with its working directory and `CLAUDE_PROJECT_DIR` both naming that subdirectory. So the variable cannot name the root here, and the prefix asks git for the toplevel, one spawn per call measured at under a millisecond, git being the adopter floor's one unconditional member. It falls back to the working directory where the variable is unset, exits 0 where there is no repository or no vendored front end, and rebinds `CLAUDE_PROJECT_DIR` to the toplevel for the front-end call after it. The rebinding is local to the hook's shell and its children, so one rendered command serves a root launch, a subdirectory launch and a `cd` alike.
+
+**Codex speaks the shipped binding's protocol and runs no guard from this package.** `codex-cli` 0.162.1 discovers no plugin hooks while the package root carries `plugin.json`, whether or not that manifest names its hooks under `extensions.com.openai` or a `.codex-plugin/plugin.json` sits beside it. A copy without the root manifest has `hooks/hooks.json` discovered. The root manifest stays, since it is the portable core and Antigravity refuses a package without it ([§The manifests](#the-manifests)). Where Codex discovers the rendering, it runs it unchanged, on three terms of its own:
+
+- **It runs a plugin's hooks only after the user trusts them** in its `/hooks` view, and a changed rendering is skipped until trusted again.
+- **It sets no project-directory variable and runs a hook in the session's working directory**, so the prefix's fallback to `.` is the path it takes. Run on that copy, the shell guard blocks in a vendored repository, from a subdirectory launch too, and stays silent in an empty one.
+- **Two of the rendering's blocks reach less there.** No Codex tool matches `ScheduleWakeup|CronCreate`, so the wakeup guard never fires. Its patch tool matches `Write|Edit` but carries the patch text, never a written path, so `workflow-state-guard` reads no path and allows.
+
+**Antigravity is not wired.** Its hook payload, its decision envelope and its hook file's shape each differ from the shipped binding. It runs a hook in the plugin's own directory with no project-directory variable, so a command there cannot find the repository's front end without reading the payload. It installs this package with its hooks skipped.
 
 context-kit's session-start wiring is not rendered: it is a context brief rather than a guard.
 
@@ -104,11 +128,18 @@ The `plugin-validate` job in `.github/workflows/gates.yml` runs each external or
 - **The portable manifest.** It fetches the published schema and validates `plugin/plugin.json` against it with `ajv-cli` under JSON Schema draft 2020-12, the draft the schema declares.
 - **The skills.** It validates each skill directory with the Agent Skills reference validator, `skills-ref validate <dir>`, installed at a pinned commit. That library says it is for demonstration and not production, so a finding it raises is read against the Agent Skills specification before a skill is changed for it.
 
-A build that changes the package runs the same commands locally. It installs the plugin from a scratch marketplace with a relative source into a scratch harness config, to see the skills registered; `CLAUDE_CONFIG_DIR` pointed at a scratch directory leaves the user's own config untouched. A scratch config carries no login, so the guards are seen in a session that loads the package with `--plugin-dir`, which installs nothing: firing in a vendored scratch repository and silent in an empty one. Two more sessions follow, and the guard fires in both: one launched from a subdirectory of the vendored repository, and one whose Bash tool changes into a subdirectory before its next call.
+A build that changes the package runs the same commands locally, then installs it into each harness it verifies, under a scratch configuration home, so the user's own configuration is untouched:
+
+- **Claude Code.** From a scratch marketplace with a relative source into a scratch harness config, to see the skills registered; `CLAUDE_CONFIG_DIR` pointed at a scratch directory. A scratch config carries no login, so the guards are seen in a session that loads the package with `--plugin-dir`, which installs nothing: firing in a vendored scratch repository and silent in an empty one. Two more sessions follow, and the guard fires in both: one launched from a subdirectory of the vendored repository, and one whose Bash tool changes into a subdirectory before its next call.
+- **Codex.** `codex plugin marketplace add` of the repository and `codex plugin add checkwright@checkwright`, `CODEX_HOME` pointed at a scratch directory, then `codex plugin list`. `codex debug prompt-input` shows the skills the model is given, and the app server's `hooks/list` shows which hooks are discovered. A scratch home carries no login, so a session is opened through a model provider configured in that home and served from the local host, which answers with the tool call under test. Where the hooks are discovered, the shell guard fires in a vendored scratch repository and stays silent in an empty one.
+- **Antigravity.** `agy plugin validate plugin` and `agy plugin install ./plugin`, `HOME` pointed at an absolute scratch directory, since `agy` refuses a relative one, then `agy plugin list`, which counts the skills.
 
 ## Honest limits
 
-- Only Claude Code's install is run. Every other Agent Plugins client is read off the standard.
+- Claude Code's, Codex's and Antigravity's installs are run; every other harness in [§The harnesses](#the-harnesses) is read off its own documentation.
+- Codex runs no guard from this package, and once it discovers them, still no wakeup guard and no `workflow-state-guard` over a patch ([§The guards](#the-guards)).
+- Codex records an install at version `1.0.0`, since neither manifest carries `version` ([§The manifests](#the-manifests)). Whether a pin move reaches an installed copy through `codex plugin marketplace upgrade` is unrun.
+- Antigravity, Cursor and Muse Code run no guard from this package.
 - (B)'s front-matter reader is a subset of YAML: a quoted value's escapes and a value continued onto a later line are not read, so the validation leg still catches a slip in either.
 - A skill takes each slot's own text as its binding, which is weaker than a repository's own bound skill.
 - An adopter who also merged guard-kit's settings wiring runs each guard twice, and the friction log counts each fall-through twice, so the README says to keep one of the two.

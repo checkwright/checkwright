@@ -6,25 +6,13 @@
 
   **Set record**
 
-  **The set (operator direction 2026-10-18, lead-relayed, not a ruling; the iteration opened undirected):** option D. The features [plugin-harness-reach](#plugin-harness-reach), `hook-contract-harness-neutral` and `grant-pwsh-word-read`, which spec authors and promotes; scope promotes no debt. The choice lifts the 2026-10-14 direction that held `grant-pwsh-word-read` back so no grant widened ahead of the v0.32.0 bar, the escalated option naming that lift. Stages scope, spec, align (the amendments span plugin, guard-kit and the kit SPECs carrying hook names), build, validate and close. The hook contract lands first and the per-harness guard wiring binds against its binding table. Composition: bundled on the hook surface plus guard-kit taken whole; drain 3 against inflow 1.8.
+  **The set (operator direction 2026-10-18, lead-relayed, not a ruling; the iteration opened undirected):** option D. The features `plugin-harness-reach`, `hook-contract-harness-neutral` and `grant-pwsh-word-read`, which spec authors and promotes; scope promotes no debt. The choice lifts the 2026-10-14 direction that held `grant-pwsh-word-read` back so no grant widened ahead of the v0.32.0 bar, the escalated option naming that lift. Stages scope, spec, align (the amendments span plugin, guard-kit and the kit SPECs carrying hook names), build, validate and close. The hook contract lands first and the per-harness guard wiring binds against its binding table. Composition: bundled on the hook surface plus guard-kit taken whole; drain 3 against inflow 1.8.
 
   **Second-vendor review (operator grant 2026-10-18, lead-relayed, unspent):** one audit-mode review over this iteration's range, at validate. Every grant lift in `grant-pwsh-word-read` lands before it. Whether v0.32.0 is cut is close's reading against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed); a cut's tag push would make the set's pushes three against a budget of two, so close asks for it.
 
 ---
 
 ## New Features
-
-### plugin-harness-reach
-
-[spec: SPEC-harness-reach.md] [roadmap: next/ecosystem] [roadmap-summary: The plugin package verified on more harnesses, with guards wherever a harness has a hook surface.] [not-icebox-eligible: 2026-10-06 filed on the operator direction of 2026-09-28 its body carries; evicting it would compress that direction away]
-
-the harness plugin package reaches Claude Code only in its tested and guarded parts. plugin/SPEC.md reads the portable `plugin.json` and `skills/` as loading on any Agent Plugins 1.0 client off the standard alone, since only Claude Code's install is run; the guards ride `hooks/hooks.json`, outside the standard's portable core, so no other client runs them; the marketplace file is Claude Code's format. No queue entry names another harness. Found at spec, 2026-10-18: the standard publishes no adopter list, Codex's and Cursor's docs name it, Antigravity installs the package, and Meta's harness is Muse Code (dev.meta.ai/docs/muse-code). **Harness priority, operator direction, 2026-09-28:** tier 1 Claude Code and Codex; tier 2 Muse Code, Antigravity and Cursor.
-
-**Deliverable:** (1) the skills load verified on the codex and Antigravity CLIs; (2) a survey of which harnesses read Agent Plugins 1.0 and their catalogs; (3) per-harness guard wiring where a harness has a hook surface. Cursor imports Claude Code hook configuration from `.claude/settings*.json` by default (cursor.com/docs/reference/third-party-hooks, read at spec).
-
-**Reach of (3), decided 2026-10-18 (intent oracle, lead-relayed, not a ruling):** Codex is wired through the existing rendering and verified by a run. The Antigravity binding, the Cursor and Muse Code observation and Codex's `apply_patch` silent allow are filed as costed gaps (SPEC-harness-reach.md).
-
-**Cost while deferred:** an adopter on another harness gets unverified skills and no guards. Filed 2026-09-28 by plugin-marketplace-queue-verbs' lead on an operator direction. Re-verified: plugin/SPEC.md states the portable core and that only Claude Code's install is run. Owner lookup: `Agent Plugins`, `codex`, `Cursor`, `Antigravity` in this file — none; owner plugin/SPEC.md.
 
 ## Technical Debt
 
@@ -942,4 +930,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 - hook-contract-harness-neutral
 - grant-pwsh-word-read
+- plugin-harness-reach
 

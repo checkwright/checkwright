@@ -25,7 +25,7 @@ Pick your route:
 - **Windows:** [natively, in PowerShell](#windows).
 - **Windows through Windows Subsystem for Linux (WSL):** the [macOS and Linux](#macos-and-linux) line, in your WSL shell. The install places the Linux gate binary and the pre-commit hook runs it, so commit to that repository from WSL too: Git for Windows cannot start the Linux binary.
 - **With Node:** [`npx checkwright init`](#with-node).
-- **In Claude Code:** [the plugin marketplace](#from-a-plugin-marketplace).
+- **In Claude Code or Codex:** [the plugin marketplace](#from-a-plugin-marketplace).
 - **With another coding agent:** [a prompt to give it](#with-another-coding-agent).
 
 ### Try it first
@@ -105,7 +105,14 @@ In Claude Code, add Checkwright's marketplace and install its plugin:
 /plugin install checkwright@checkwright
 ```
 
-The plugin installs no kit: it registers Checkwright's lifecycle skills and its guards. Ask for its `install` skill in your repository: it chooses a profile with you and runs the same `init` this page documents. Then ask for its `adopt` skill: it fits the knobs to your layout, and works through the first reds with you until the battery is green or each has a disposition you accept. Any Agent Plugins client loads the repository's `plugin/` directory by its own install route ([plugin/README.md](plugin/README.md)).
+In Codex:
+
+```text
+codex plugin marketplace add checkwright/checkwright
+codex plugin add checkwright@checkwright
+```
+
+The plugin installs no kit: it registers Checkwright's lifecycle skills, and in Claude Code its guards. Ask for its `install` skill in your repository: it chooses a profile with you and runs the same `init` this page documents. Then ask for its `adopt` skill: it fits the knobs to your layout, and works through the first reds with you until the battery is green or each has a disposition you accept. Any Agent Plugins client loads the repository's `plugin/` directory by its own install route ([plugin/README.md](plugin/README.md)), Antigravity with `agy plugin install ./plugin` from a clone; [plugin/SPEC.md](plugin/SPEC.md#the-harnesses) lists the harnesses read, Codex and Antigravity among them.
 
 ### With another coding agent
 

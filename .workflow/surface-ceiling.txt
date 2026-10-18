@@ -40,7 +40,7 @@
 5236cp docs/index.md
 8768cp docs/install-block-contracts.md
 8675cp docs/install-parity-contracts.md
-9491cp docs/install.md
+9800cp docs/install.md
 1344cp docs/kits.md
 1458cp docs/lifecycle-kit/index.md
 3156cp docs/maintenance.md
@@ -116,7 +116,7 @@
 10382cp lifecycle-kit/templates/stages/spec.md
 6372cp lifecycle-kit/templates/stages/validate.md
 2830cp lifecycle-kit/templates/upgrade.md
-16207cp plugin/SPEC.md
+21253cp plugin/SPEC.md
 159691cp queue-kit/SPEC.md
 1392cp queue-kit/templates/TASK-QUEUE.md
 58825cp site-kit/SPEC.md
