@@ -52,7 +52,7 @@ pub static TABLE: &[Rule] = &[
     },
     Rule { name: "git_stash", shells: BOTH, views: &[Raw, SqDqHd, Dequoted], test: reach::git_stash },
     Rule { name: "truncate_scratch", shells: BASH, views: &[SqDqHd], test: grants::truncate_scratch },
-    Rule { name: "append_scratch", shells: BASH, views: &[Hdq, SqDqHd], test: grants::append_scratch },
+    Rule { name: "append_scratch", shells: BASH, views: &[Raw, Hdq, SqDqHd, Dequoted], test: grants::append_scratch },
     Rule { name: "ro_pipeline", shells: BASH, views: &[Raw, SqDqHd, Dequoted], test: grants::ro_pipeline },
     Rule {
         name: "bounded_wait",
@@ -347,6 +347,70 @@ pub(super) fn strip_redirect_op(pair: &str) -> &str {
 // spec: guard-kit/SPEC.md §The generic ruleset — an inert target: `/dev/null` or an fd-dup.
 fn inert_target(t: &str) -> bool {
     t == "/dev/null" || t.strip_prefix('&').is_some_and(|r| fd_word(trim_blank_start(r)))
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — rule `abs_script`'s redirect test by value, taken on
+// every call carrying a redirect: every target the skeleton scan found, `n` of them, is `/dev/null`
+// as the shell passes it.
+pub(super) fn nulled_by_value(ctx: &Ctx, c: &Cmd, n: usize) -> Result<bool, Fault> {
+    let Some(read) = ctx.word_read(c)? else { return Ok(false) };
+    Ok(redirect_values(&read, '\\').is_some_and(|ts| ts.len() == n && ts.iter().all(|t| t == "/dev/null")))
+}
+
+// spec: guard-kit/SPEC.md §The reader and its views — the redirect pairs' targets by value: the
+// word read's where it answers and pairs one for one with the skeleton's, else the skeleton's.
+pub(super) fn valued_targets(ctx: &Ctx, c: &Cmd) -> Result<Vec<String>, Fault> {
+    let skel = redirect_targets(&ctx.view(c, SqDqHd)?);
+    let read = ctx.word_read(c)?;
+    Ok(paired_targets(skel, read.as_deref(), escape_char(ctx)))
+}
+
+fn paired_targets(skel: Vec<String>, read: Option<&[Vec<Word>]>, escape: char) -> Vec<String> {
+    match read.and_then(|r| redirect_values(r, escape)) {
+        Some(values) if values.len() == skel.len() => values,
+        _ => skel,
+    }
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — each output redirect's target by its value, an fd-dup
+// dropped; `None` where a target is cut inside a piece, a word carries a second operator after its
+// first, or an operator has no word after it.
+pub(super) fn redirect_values(read: &[Vec<Word>], escape: char) -> Option<Vec<String>> {
+    let mut out = Vec::new();
+    for ws in read {
+        let mut k = 0usize;
+        while k < ws.len() {
+            let w = &ws[k];
+            k += 1;
+            let Some(at) = bare_operator(&w.live, 0, &['>'], escape) else { continue };
+            let more = w.live[at + 1..].chars().next().filter(|c| matches!(c, '>' | '&'));
+            let end = at + 1 + more.map_or(0, char::len_utf8);
+            if bare_operator(&w.live, end, &['>', '<'], escape).is_some() {
+                return None;
+            }
+            let value = if end == w.live.len() {
+                k += 1;
+                ws.get(k - 1)?.value.clone()
+            } else {
+                w.value_after(end)?.to_string()
+            };
+            if !(more == Some('&') && fd_word(&value)) {
+                out.push(value);
+            }
+        }
+    }
+    Some(out)
+}
+
+// spec: guard-kit/SPEC.md §The reader and its views — the first character of `set` at or after `from`
+// standing bare in a word's live text, not behind an escaping character.
+fn bare_operator(live: &str, from: usize, set: &[char], escape: char) -> Option<usize> {
+    let mut held = false;
+    live.char_indices().find(|&(i, ch)| {
+        let bare = !std::mem::take(&mut held);
+        held = bare && ch == escape;
+        bare && i >= from && set.contains(&ch)
+    }).map(|(i, _)| i)
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — a redirect pair spelled `>&` onto a named file.
@@ -861,6 +925,34 @@ mod tests {
         assert_eq!(got(&[plain_word("git"), escaped]), vec!["git", "stash"]);
         assert_eq!(got(&[plain_word("git"), plain_word("stash"), plain_word("2>&"), plain_word("1"), plain_word("pop")]), vec!["git", "stash", "pop"]);
         assert_eq!(got(&[plain_word("git"), plain_word("stash"), plain_word(">&"), plain_word("out"), plain_word("pop")]), vec!["git", "stash", "pop"]);
+    }
+
+    // spec: guard-kit/SPEC.md §The reader and its views — the redirect pairs' targets by value, the
+    // skeleton's standing where the word read answers nothing or the two counts part
+    #[test]
+    fn a_target_is_read_by_its_value_where_the_two_reads_pair() {
+        use crate::guard::reader::WordAcc;
+        let pieced = |pieces: &[(&str, &str, &str)]| {
+            let mut acc = WordAcc::new();
+            for (s, v, l) in pieces {
+                acc.piece(s.as_bytes(), v.as_bytes(), l.as_bytes());
+            }
+            acc.finish().remove(0).remove(0)
+        };
+        let s = |ts: &[&str]| ts.iter().map(|t| t.to_string()).collect::<Vec<String>>();
+        let paired = |skel: &[&str], ws: Vec<Word>| paired_targets(s(skel), Some(&[ws]), '\\');
+        let null = s(&["/dev/null"]);
+        assert_eq!(paired(&["/dev/null"], vec![plain_word("x"), plain_word("2>/dev/null")]), null, "bare");
+        let dq = pieced(&[("2", "2", "2"), (">", ">", ">"), ("\"/dev/null\"", "/dev/null", "\0DQ")]);
+        assert_eq!(paired(&["\0DQ"], vec![plain_word("x"), dq]), null, "quoted");
+        let esc = pieced(&[(">", ">", ">"), ("\\/", "/", "\\/"), ("dev/null", "dev/null", "dev/null")]);
+        assert_eq!(paired(&["\\/dev/null"], vec![plain_word("x"), esc]), null, "escaped");
+        let apart = Word::new("'/dev/null'", "/dev/null", "\0SQ");
+        assert_eq!(paired(&["\0SQ"], vec![plain_word("x"), plain_word(">"), apart]), null, "split apart");
+        assert_eq!(paired(&[], vec![plain_word("x"), plain_word("2>&1")]), Vec::<String>::new(), "an fd-dup");
+        let quoted = Word::new("\"out\"", "out", "\0DQ");
+        assert_eq!(paired(&["\0DQ", "x"], vec![plain_word("y"), plain_word(">"), quoted]), s(&["\0DQ", "x"]), "a count mismatch falls back");
+        assert_eq!(paired_targets(s(&["\0DQ"]), None, '\\'), s(&["\0DQ"]), "no word read falls back");
     }
 
     // spec: guard-kit/SPEC.md §The rule roster — rule `ro_pipeline`'s program discriminator, its

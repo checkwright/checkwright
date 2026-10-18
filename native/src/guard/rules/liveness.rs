@@ -7,7 +7,7 @@ use super::{
     background_statements, command_word, dups_onto_file, git_read, git_walk_of, has_expansion, has_substitution, inert_target, is_banner, is_ro_segment,
     noclobber,
     loop_tokens, redirect_targets, ro_forms_clear, ro_forms_clear_statements, segment_core,
-    shell_backgrounds, strip_redirect_op, unredirected_words, GitWalk,
+    shell_backgrounds, strip_redirect_op, unredirected_words, valued_targets, GitWalk,
 };
 use crate::guard::allow_match;
 use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Shell, Verdict};
@@ -45,7 +45,7 @@ pub fn git_mutation_under_producer(ctx: &Ctx) -> Decided {
 // commit to corrupt, so it owes no record.
 fn is_ro_background(ctx: &Ctx, s: &str) -> Result<bool, Fault> {
     let h = ctx.host();
-    if !redirect_targets(s).iter().all(|t| t == "/dev/null" || t.strip_prefix('&').is_some_and(|r| r.starts_with(|c: char| c.is_ascii_digit()))) {
+    if !valued_targets(ctx, ctx.cmd())?.iter().all(|t| t == "/dev/null" || t.strip_prefix('&').is_some_and(|r| r.starts_with(|c: char| c.is_ascii_digit()))) {
         return Ok(false);
     }
     let mut reads = 0usize;
@@ -371,8 +371,8 @@ fn wait_redirects_inert(ctx: &Ctx, seg: &str) -> bool {
 
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `bounded_wait`'s clause (c): the loop condition
 // is held to the read-only segment test plus the shell tests and `kill -0`.
-fn is_wait_condition_segment(ctx: &Ctx, seg: &str) -> bool {
-    if !wait_redirects_inert(ctx, seg) {
+fn is_wait_condition_segment(ctx: &Ctx, seg: &str, inert: bool) -> bool {
+    if !inert {
         return false;
     }
     let cw = command_word(&segment_core(seg));
@@ -385,8 +385,8 @@ fn is_wait_condition_segment(ctx: &Ctx, seg: &str) -> bool {
 
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `bounded_wait`'s clause (d): every segment
 // after the loop, a statement or a piped reader, meets rule `ro_pipeline`'s own test.
-fn is_wait_tail_segment(ctx: &Ctx, seg: &str) -> bool {
-    if !wait_redirects_inert(ctx, seg) {
+fn is_wait_tail_segment(ctx: &Ctx, seg: &str, inert: bool) -> bool {
+    if !inert {
         return false;
     }
     let core = segment_core(seg);
@@ -401,7 +401,7 @@ fn wait_statements_clear(ctx: &Ctx, piece: &str) -> bool {
     ctx.segments(piece)
         .iter()
         .filter(|g| !trim(g).is_empty())
-        .all(|g| !shell_backgrounds(g) && is_wait_tail_segment(ctx, trim(g)))
+        .all(|g| !shell_backgrounds(g) && is_wait_tail_segment(ctx, trim(g), wait_redirects_inert(ctx, g)))
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — a skeleton carrying a `while`/`until` loop with
@@ -587,18 +587,14 @@ fn recorded_launch(ctx: &Ctx) -> Result<bool, Fault> {
         return Ok(false);
     }
     let mut targets: Vec<String> = Vec::new();
-    for pair in ctx.redirect_pairs(&ls) {
-        if pair.is_empty() {
-            continue;
-        }
-        let tgt = strip_redirect_op(&pair);
-        if inert_target(tgt) {
+    for tgt in valued_targets(ctx, &launch_cmd)? {
+        if inert_target(&tgt) {
             continue;
         }
         if tgt.contains(SQ_MARK) || tgt.contains(DQ_MARK) {
             return Ok(false);
         }
-        targets.push(tgt.to_string());
+        targets.push(tgt);
     }
     targets.push(path);
     Ok(targets.iter().all(|t| h.ignored(t)))
@@ -620,6 +616,7 @@ pub fn bounded_wait(ctx: &Ctx) -> Decided {
     if !trim(&lead).is_empty() {
         return Ok(None);
     }
+    let inert = valued_targets(ctx, ctx.cmd())?.iter().all(|t| inert_target(t));
     let mut sleeps = 0usize;
     for seg in ctx.segments(&body) {
         let seg = trim(&seg);
@@ -641,7 +638,7 @@ pub fn bounded_wait(ctx: &Ctx) -> Decided {
         if seg.is_empty() {
             continue;
         }
-        if !is_wait_condition_segment(ctx, seg) {
+        if !is_wait_condition_segment(ctx, seg, inert) {
             return Ok(None);
         }
         conds += 1;
@@ -651,7 +648,7 @@ pub fn bounded_wait(ctx: &Ctx) -> Decided {
     }
     for seg in ctx.segments(&tail) {
         let seg = trim_start(&seg);
-        if !seg.is_empty() && !is_wait_tail_segment(ctx, seg) {
+        if !seg.is_empty() && !is_wait_tail_segment(ctx, seg, inert) {
             return Ok(None);
         }
     }

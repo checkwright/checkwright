@@ -1,8 +1,8 @@
 // spec: guard-kit/SPEC.md §The generic ruleset — the spelling rules: a command form the matcher cannot
 // resolve, steered to the one it can.
-use super::grants::{redirect_values, rewrite_granted};
+use super::grants::rewrite_granted;
 use super::reach::path_word;
-use super::{command_read, escape_char, command_word, git_read, git_walk_of, names_command, passed_read, GitWalk};
+use super::{command_read, escape_char, redirect_values, command_word, git_read, git_walk_of, names_command, passed_read, GitWalk};
 use crate::guard::engine::{Cmd, Ctx, Decided, Shell, Verdict};
 use crate::guard::host::{knob_scalar_value, same_file};
 use crate::guard::reader::View::{SqDqHd, SqDqHdq, SqHdq};

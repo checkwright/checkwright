@@ -503,6 +503,9 @@ block	cat > tracked.md <<'EOF'@NL@line@NL@EOF
 # append-only split protects, and neither is a path git check-ignore can answer
 allow	printf 'x@NL@' >> .tmp/journal.md 2>/dev/null
 allow	cat >> .tmp/journal.md 2>&1
+# a target is read by its value, so a quoted ignored target is granted and a quoted /dev/null is inert
+allow	printf x >> ".tmp/j.md"
+allow	printf x >> .tmp/j.md 2>"/dev/null"
 # a carriage return is a word character, so a descriptor glued to one or behind one names a file
 block	cat >> .tmp/journal.md >&2@CR@tracked.md <<'EOF'@NL@line@NL@EOF
 block	cat >> .tmp/journal.md >&@CR@2 <<'EOF'@NL@line@NL@EOF
@@ -529,6 +532,10 @@ fallthrough	grep -rn foo src >&2x
 allow	grep -rn foo src 2>& 1
 allow	grep -rn foo src >&-
 allow	grep -rn foo src >& /dev/null
+# each target is read by its value, so a quoted /dev/null is inert and a quoted file is still a write
+allow	grep -rn foo src 2>"/dev/null"
+allow	grep -rn foo src 2>'/dev/null'
+fallthrough	grep -rn foo src 2>"out.txt"
 # a carriage return is a word character, as bash reads it: a descriptor glued to one or behind one
 # names a file, and a redirect onto one alone writes a file of that name
 fallthrough	grep -rn foo src >&2@CR@tracked.md
@@ -667,6 +674,8 @@ allow	until grep -q DONE .tmp/smoke.log 2>/dev/null; do sleep 30; done; grep -n 
 allow	while kill -0 2147483646 2>/dev/null; do sleep 5; done
 allow	until ! kill -0 2147483646 2>/dev/null; do sleep 5; done
 allow	until [ -f .tmp/marker ]; do sleep 10; done
+# the loop's targets are read by their value, so a quoted /dev/null is inert
+allow	until [ -f .tmp/x ]; do sleep 5; done 2>"/dev/null"
 # clause (a) counts the span's keywords in command position, so `done` as an argument is no second span
 allow	until grep -q done .tmp/smoke.log; do sleep 5; done; echo done
 # and cuts the loop at the walk's keywords, so a blank around one is not asked
@@ -739,10 +748,11 @@ fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done; sort -o out.txt
 # trailing retraction
 allow	bash scripts/check-foo.sh > .tmp/foo.log 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
 allow	scripts/check-foo.sh --all > .tmp/foo.log & echo "pid=$! run=foo" > .tmp/foo.run; wait
-# a target spelling a placeholder's letters is read as written; a quoted target is a real
-# placeholder, whose path the grant never read
+# a target spelling a placeholder's letters is read as written; a quoted target is read by its
+# value, granted where it is ignored and withheld where it is tracked
 allow	bash scripts/check-foo.sh > .tmp/DQ.log 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
-fallthrough	bash scripts/check-foo.sh > ".tmp/foo.log" 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
+allow	bash scripts/check-foo.sh > ".tmp/foo.log" 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
+fallthrough	bash scripts/check-foo.sh > "tracked.md" 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
 # (B0) the shape: a record whose filename does not carry its key, and no wait
 fallthrough	bash scripts/check-foo.sh > .tmp/foo.log 2>&1 & echo "pid=$! run=foo" > .tmp/bar.run; wait
 fallthrough	bash scripts/check-foo.sh > .tmp/foo.log 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run
@@ -1017,6 +1027,10 @@ block	echo x >.tmp/a&>tracked.md
 fallthrough	bash gate-sdk/bin/run-gates.sh --emit trajectory > docs/x.md
 fallthrough	echo x > /dev/stderr
 fallthrough	make build > .tmp/b.log 2>&1 & echo "pid=$! run=b" > .tmp/b.run; wait; rm -f .tmp/b.run
+# a target is read by its value: a quoted /dev/null is no write, and a quoted tracked target blocks
+fallthrough	echo x 2>"/dev/null"
+block	echo x > "README.md"
+block	printf x >> 'README.md'
 
 # rule `shell_wrapper` — a bash -c or sh -c wrapper blocks; a wrapper behind another command
 #           word, and the scratch runner taking a script path, do not fire

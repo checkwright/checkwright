@@ -32,7 +32,7 @@ The PowerShell word read already exists (§The reader and its views, the PowerSh
 
 ### (1) A redirect target is read by its value in the bash grants and in rule `emitter_write` {design-bearing} {user-facing: grant-pwsh-word-read's Deliverable, "rule `abs_script`'s by-value read … given to each grant", and the 2026-10-18 decision on `emitter_write` above}
 
-Replacement for `guard-kit/SPEC.md` §The reader and its views, the paragraph opening **The redirect pairs**. Its last two sentences, from **The scan's blanks are bash's**, stay as written. **Not yet applied.**
+Replacement for `guard-kit/SPEC.md` §The reader and its views, the paragraph opening **The redirect pairs**. Its last two sentences, from **The scan's blanks are bash's**, stay as written. **Applied at build.**
 
 > **The redirect pairs** answer each output redirect as its operator and target, and a rule reads what a call writes off them. `/dev/null` and an fd-dup are the **inert targets**, and any other is a file written. Under bash `>&` is an operator, glued to its word or apart. An fd number, with or without a closing `-`, or a bare `-` makes it an fd-dup (`2>& 1`, `>&-`). Any other word is a file, the write `> <file>` is (`>& out`, `>&2x`), so no rule grants or exempts the command as writing nothing. **A target is read by its value** where the word read answers and the skeleton's targets and the read's values pair one for one, in order, so `2>"/dev/null"` is the device and `> "README.md"` names `README.md`. Where they do not pair, the skeleton's target stands and a quoted one is a file no rule can name.
 
@@ -46,7 +46,16 @@ Replacement for `guard-kit/SPEC.md` §The reader and its views, the paragraph op
 - **`emitter_targets`**, shared by rules `append_scratch` and `emitter_write`, reads each statement's targets by value. The statement's targets are the call's `valued_targets` taken in statement order. A target whose value is inert is skipped. Any other target is tested by its value with `git check-ignore`, and a value still carrying a quote character declines. So a quoted `/dev/null` is no write, a quoted ignored target is granted, and a quoted tracked target is blocked with its name in the steer, never the placeholder's letters.
 - **Rule `append_scratch` declares `raw`, `hdq`, `sq dq hd` and `dequoted`.** The `TABLE` row gains `Raw` and `Dequoted`, which `Ctx::word_read` requires.
 
-`guard-kit/SPEC.md` §The rule roster, **not yet applied**:
+**Ruled at build, inside the envelope:**
+
+- `emitter_targets` takes the statement's targets from a `statement_targets` helper beside it. The helper replaces each non-fd-dup redirect-pair target with the call's value in order, where the counts pair. It keeps the redirect-pair reading, not `redirect_targets`, as the fallback, so a glued `<<` after a target reads as it did.
+- Arm (B)'s by-value read moves an authored row: `bash scripts/check-foo.sh > ".tmp/foo.log" 2>&1 & echo …` is `allow`, where it was `fallthrough`, and its tracked twin `> "tracked.md"` is a new `fallthrough` row.
+- Two `append_scratch` rows with no heredoc carry the quoted ignored target and the quoted `/dev/null`: allow `printf x >> ".tmp/j.md"` and allow `printf x >> .tmp/j.md 2>"/dev/null"`.
+- The steer test for `emitter_write` sits in `native/src/guard/mod.rs`, since a rule source may not name the bash reader (`no_rule_source_names_the_reader`). It drives the engine over `echo x > "README.md"` and `printf x >> 'README.md'`.
+
+**Open at build, escalated:** the word read answers nothing on a heredoc-bearing call. So the three heredoc rows below fall back to the skeleton's target, and the mechanism above cannot meet them.
+
+`guard-kit/SPEC.md` §The rule roster, **applied at build**:
 
 - **`append_scratch`:**
   - The declaration reads "Declares `raw`, `hdq`, `sq dq hd` and `dequoted`."
@@ -152,9 +161,7 @@ The entry's inferred claim, that a PowerShell host reads each derived `ps-` row 
 - **A new arm, `--emit-guard-ps-variants`,** prints every derived PowerShell row of the kit's two PowerShell tables as `<transform> <TAB> <base> <TAB> <variant>`, one per line, from the same `guard_ps_variants::derive` the lane calls. It reads the tables' default paths, exits 0, and exits 2 on an unreadable table. It is an `ARMS` row in `native/src/emit/mod.rs` with an `Arm::Emit` member and an empty flags grammar, its `spec:` binding naming guard-kit/SPEC.md §Testing (ruled at build: authored `Arm::Run`, but its exit is the 0-or-2 an emitting member already has, and every other `--emit-` row is one).
 - **A step on `crate-tests-windows`' x64 leg**, `guard PowerShell re-spellings under pwsh's parser`, runs the arm. A `pwsh` script inline in the step parses each base and variant with `[System.Management.Automation.Language.Parser]::ParseInput`. It reds the step on any line where the two parse with errors, or where their `CommandAst` element lists differ in count, kind or static value. A `StringConstantExpressionAst` compares by `.Value`, and a redirection by operator and by its target's static value. Two transforms change the command word's spelling, so that word alone compares otherwise: `ps-case-lead` without regard to case, and `ps-alias-lead` by resolving the variant's word through `Get-Alias` to its definition and comparing that to the base's word without regard to case. A word the host defines no alias for reds the step. It prints the number of lines compared, and reds on zero.
 
-**Inferred, cannot run before build:** pwsh reads each derived PowerShell row as its base row's command — no PowerShell host is on the build machine, and the step that runs one lands with this delta and runs at the entry's mid-iteration push.
-
-The step's first green run is the evidence, and the build that reads it deletes the marker above.
+**Settled at build, by the mid-iteration push's run:** pwsh 7.6.6 on the x64 Windows leg compared 304 derived PowerShell rows against their base rows, 0 unequal, every `ps-alias-lead` alias defined on the host.
 
 `guard-kit/SPEC.md` §Testing, the PowerShell deriver's **Its honest limits**: "No shell runs a derived row, so the equivalence is the construction's" reads "No shell runs a derived bash row, so its equivalence is the construction's; a PowerShell host parses each derived PowerShell row against its base on the x64 Windows leg (`--emit-guard-ps-variants`)". **Applied at build**, the host's parse a paragraph of its own ahead of the honest limits, and §The hook on native Windows' roster of the leg's steps gaining it.
 

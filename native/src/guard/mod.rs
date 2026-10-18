@@ -255,6 +255,22 @@ mod tests {
         assert_eq!(json_view(Some(&forged), reader::View::SqDqHd), None);
     }
 
+    // spec: guard-kit/SPEC.md §The rule roster — rule `emitter_write`'s steer names a quoted tracked
+    // target by its value and never a placeholder's letters
+    #[test]
+    fn an_emitter_write_steer_names_a_quoted_target_by_its_value() {
+        let host = host::Host::load(false).expect("the guard's knobs load");
+        for cmd in ["echo x > \"README.md\"", "printf x >> 'README.md'"] {
+            match engine::decide(&bash::Bash, engine::Shell::Bash, &host, &engine::Cmd::new(cmd)) {
+                Some(engine::Verdict::Block(m)) => {
+                    assert!(m.contains("'README.md'"), "{}: {}", cmd, m);
+                    assert!(!m.contains('\0') && !m.contains("'DQ'") && !m.contains("'SQ'"), "{}: {}", cmd, m);
+                }
+                v => panic!("{}: {:?}", cmd, v),
+            }
+        }
+    }
+
     // spec: guard-kit/SPEC.md §Consumer rules — the word read's values, one line per segment, a
     // backslash and a tab encoded, and nothing where the read answers nothing
     #[test]

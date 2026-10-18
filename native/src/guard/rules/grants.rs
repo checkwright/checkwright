@@ -2,15 +2,16 @@
 // allow is given only where every clause of its test holds, and every other failure declines.
 use super::reach::{interpreter_reach, refused, rm_tracked_reach};
 use super::{
-    command_read, fd_word, has_substitution, inert_target, is_banner, is_bare_allow, is_ro_segment, is_ro_xargs,
-    lead_keyword, noclobber, on_ro_roster, passed_read, pipe_members, redirect_targets, ro_forms_clear, ro_forms_clear_except, ro_forms_kit, segment_core,
+    command_read, escape_char, has_substitution, inert_target, is_banner, is_bare_allow, is_ro_segment, is_ro_xargs,
+    lead_keyword, noclobber, nulled_by_value, on_ro_roster, passed_read, pipe_members, redirect_targets, redirect_values,
+    ro_forms_clear, valued_targets, ro_forms_clear_except, ro_forms_kit, segment_core,
     shell_backgrounds, strip_redirect_op, unredirected_words, xargs_command_index,
 };
 use crate::guard::allow_match;
 use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Verdict};
 use crate::guard::host::{self, Host};
 use crate::guard::reader::View::{Hdq, SqDqHd, SqHdq};
-use crate::guard::reader::{Word, HD_MARK};
+use crate::guard::reader::HD_MARK;
 use crate::guard::text::{self, grep_q, head_word, trim, trim_start, unsentinel, words};
 use crate::walk;
 
@@ -84,10 +85,9 @@ fn only_heredoc_residue(ctx: &Ctx, s: &str) -> bool {
     i == segs.len()
 }
 
-// spec: guard-kit/SPEC.md §The generic ruleset — rule `emitter_write`'s clauses (0), (a) and (c) and
-// its quoted-target decline on one statement: every target that is neither `/dev/null` nor an
-// fd-dup, or `None` when the statement is no emitter write the rule can test.
-fn emitter_targets(ctx: &Ctx, s: &str, lead: &str) -> Option<Vec<String>> {
+// spec: guard-kit/SPEC.md §The generic ruleset — rule `emitter_write`'s clauses (0), (a) and (c) on one
+// statement's targets by value: each that is no inert target, `None` where the rule cannot test it.
+fn emitter_targets(ctx: &Ctx, s: &str, lead: &str, targets: &[String]) -> Option<Vec<String>> {
     if shell_backgrounds(s) || !only_heredoc_residue(ctx, s) {
         return None;
     }
@@ -95,11 +95,7 @@ fn emitter_targets(ctx: &Ctx, s: &str, lead: &str) -> Option<Vec<String>> {
         return None;
     }
     let mut out = Vec::new();
-    for pair in ctx.redirect_pairs(s) {
-        if pair.is_empty() {
-            continue;
-        }
-        let tgt = strip_redirect_op(&pair);
+    for tgt in targets {
         if inert_target(tgt) {
             continue;
         }
@@ -109,6 +105,24 @@ fn emitter_targets(ctx: &Ctx, s: &str, lead: &str) -> Option<Vec<String>> {
         out.push(tgt.to_string());
     }
     (!out.is_empty()).then_some(out)
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — each statement's redirect-pair targets, an fd-dup
+// kept, every other target replaced in order by the call's value for it where the word read answers
+// and pairs one for one; the skeleton's own where it does not.
+fn statement_targets(ctx: &Ctx, stmts: &[String]) -> Result<Vec<Vec<String>>, Fault> {
+    let each: Vec<Vec<String>> = stmts
+        .iter()
+        .map(|s| ctx.redirect_pairs(s).iter().filter(|p| !p.is_empty()).map(|p| strip_redirect_op(p).to_string()).collect())
+        .collect();
+    let files = each.iter().flatten().filter(|t| !t.starts_with('&')).count();
+    let read = ctx.word_read(ctx.cmd())?;
+    let Some(values) = read.and_then(|r| redirect_values(&r, escape_char(ctx))).filter(|v| v.len() == files) else { return Ok(each) };
+    let mut values = values.into_iter();
+    Ok(each
+        .into_iter()
+        .map(|ts| ts.into_iter().map(|t| if t.starts_with('&') { t } else { values.next().unwrap_or(t) }).collect())
+        .collect())
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — a statement's lead word as the skeleton spells it.
@@ -132,8 +146,9 @@ pub fn append_scratch(ctx: &Ctx) -> Decided {
     if noclobber(&s) {
         return Ok(None);
     }
-    let Some(targets) = emitter_targets(ctx, &s, statement_lead(&s)) else { return Ok(None) };
-    if !targets.iter().all(|t| ctx.host().ignored(t)) {
+    let valued = statement_targets(ctx, std::slice::from_ref(&s))?.concat();
+    let Some(targets) = emitter_targets(ctx, &s, statement_lead(&s), &valued) else { return Ok(None) };
+    if !targets.iter().all(|t| !t.contains('\0') && ctx.host().ignored(t)) {
         return Ok(None);
     }
     if refused(ctx, ctx.cmd())? {
@@ -152,7 +167,7 @@ pub fn ro_pipeline(ctx: &Ctx) -> Decided {
     if shell_backgrounds(&s) || noclobber(&s) {
         return Ok(None);
     }
-    for tgt in redirect_targets(&s) {
+    for tgt in valued_targets(ctx, ctx.cmd())? {
         if !tgt.is_empty() && !(tgt == "/dev/null" || is_fd_dup(&tgt)) {
             return Ok(None);
         }
@@ -766,55 +781,6 @@ fn slot_capture(sv: &str, off: usize, len: usize, token: &str, start: bool, righ
     None
 }
 
-// spec: guard-kit/SPEC.md §The rule roster — rule `abs_script`'s redirect test by value, taken on
-// every call carrying a redirect: every target the skeleton scan found, `n` of them, is `/dev/null`
-// as the shell passes it.
-fn nulled_by_value(ctx: &Ctx, c: &Cmd, n: usize) -> Result<bool, Fault> {
-    let Some(read) = ctx.word_read(c)? else { return Ok(false) };
-    Ok(redirect_values(&read, '\\').is_some_and(|ts| ts.len() == n && ts.iter().all(|t| t == "/dev/null")))
-}
-
-// spec: guard-kit/SPEC.md §The rule roster — each output redirect's target by its value, an fd-dup
-// dropped; `None` where a target is cut inside a piece, a word carries a second operator after its
-// first, or an operator has no word after it.
-pub(super) fn redirect_values(read: &[Vec<Word>], escape: char) -> Option<Vec<String>> {
-    let mut out = Vec::new();
-    for ws in read {
-        let mut k = 0usize;
-        while k < ws.len() {
-            let w = &ws[k];
-            k += 1;
-            let Some(at) = bare_operator(&w.live, 0, &['>'], escape) else { continue };
-            let more = w.live[at + 1..].chars().next().filter(|c| matches!(c, '>' | '&'));
-            let end = at + 1 + more.map_or(0, char::len_utf8);
-            if bare_operator(&w.live, end, &['>', '<'], escape).is_some() {
-                return None;
-            }
-            let value = if end == w.live.len() {
-                k += 1;
-                ws.get(k - 1)?.value.clone()
-            } else {
-                w.value_after(end)?.to_string()
-            };
-            if !(more == Some('&') && fd_word(&value)) {
-                out.push(value);
-            }
-        }
-    }
-    Some(out)
-}
-
-// spec: guard-kit/SPEC.md §The reader and its views — the first character of `set` at or after `from`
-// standing bare in a word's live text, not behind an escaping backslash.
-fn bare_operator(live: &str, from: usize, set: &[char], escape: char) -> Option<usize> {
-    let mut held = false;
-    live.char_indices().find(|&(i, ch)| {
-        let bare = !std::mem::take(&mut held);
-        held = bare && ch == escape;
-        bare && i >= from && set.contains(&ch)
-    }).map(|(i, _)| i)
-}
-
 // spec: guard-kit/SPEC.md §The generic ruleset — the grant test on a rewritten command, rule
 // `worktree_confinement`'s predicate first: no redirect names a file, every segment matches a
 // committed allow pattern and rule `grant_path_slot`'s test finds no reach and can decide.
@@ -880,9 +846,10 @@ pub fn emitter_write(ctx: &Ctx) -> Decided {
         }
     };
     if stmts.len() > 1 {
+        let valued = statement_targets(ctx, &stmts)?;
         for (j, stmt) in stmts.iter().enumerate() {
             let lead = lead_of(j, stmt);
-            let Some(targets) = emitter_targets(ctx, stmt, &lead) else { continue };
+            let Some(targets) = emitter_targets(ctx, stmt, &lead, &valued[j]) else { continue };
             let unignored: Vec<&String> = targets.iter().filter(|t| !h.ignored(t)).collect();
             if unignored.is_empty() {
                 return block(format!("issue the '{}' write to '{}' as its own call, and the rest of this command as a separate one: alone, that write is granted with no permission decision, while compounded it makes the whole call one the harness decides out of band. If you genuinely need the compound, run it yourself with !<command>.", lead, targets.join(" ")));
@@ -895,7 +862,8 @@ pub fn emitter_write(ctx: &Ctx) -> Decided {
         }
         return Ok(None);
     }
-    let Some(targets) = emitter_targets(ctx, &s, &lead_of(0, &s)) else { return Ok(None) };
+    let valued = statement_targets(ctx, std::slice::from_ref(&s))?.concat();
+    let Some(targets) = emitter_targets(ctx, &s, &lead_of(0, &s), &valued) else { return Ok(None) };
     if targets.iter().any(|t| t.starts_with("/dev/")) {
         return Ok(None);
     }
@@ -911,6 +879,7 @@ pub fn emitter_write(ctx: &Ctx) -> Decided {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::guard::reader::Word;
 
     fn strings(ws: &[&str]) -> Vec<String> {
         ws.iter().map(|w| w.to_string()).collect()
