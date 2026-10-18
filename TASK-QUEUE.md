@@ -14,16 +14,6 @@
 
 ## New Features
 
-### iteration-statistics-view
-
-[spec: SPEC-statistics-view.md] [roadmap: next/adoption] [roadmap-summary: Per-iteration workflow statistics, charted for health and trends.]
-
-the statistics half of [hosted-attestation-service](#hosted-attestation-service), split off by operator direction 2026-10-17 on consult advice (lead-relayed, not a ruling), horizon `next` by the same direction: visualizable per-iteration statistics read for workflow health and trends. It is kit-side, single-repo and local, a self-contained chart projection over the trajectory emitter (drift-kit/SPEC.md §The published-evidence extractor) and the stage-economics meter (drift-kit/SPEC.md §The stage-economics meter), needing no service, no multi-operator prerequisite and no demand gate.
-
-**Deliverable:** the statistics view its amendment specifies: seven per-iteration figures charted into one self-contained HTML file under the metric dir, local and uncommitted, so it carries no freshness gate.
-
-**Cost while deferred:** a trend in workflow health shows only to a session that recomputes it from tables and logs. Filed 2026-10-17 by budget-feed-observation-pass' close from a gap bullet of that date. Owner lookup: `statistic`, `chart`, `visualiz`, `dashboard` in this file and the disposed-findings record — [hosted-attestation-service](#hosted-attestation-service), DISTINCT (it keeps the cross-repo dashboards, the hosted half).
-
 ## Technical Debt
 
 ## Deferred
@@ -40,7 +30,7 @@ a controlled A/B trial.
 
 [roadmap: later/commercial] [cost: event/low] [surface: evidence-kit] [roadmap-summary: Gate runs verified by a neutral party no committing agent can touch.]
 
-hosted attestation. The team/paid rung: gates verified server-side by a party the committing agents cannot touch — hosted gate runs as a neutral attestation, cross-repo drift dashboards, maintained rulesets. A service, not code: cloning the kits does not clone the neutrality or the ops. Demand-gated — this entry is the public roadmap marker, not a scaffold; hosting and sequencing decisions are on record in the operator's local brief, and its prerequisite mechanism has landed (lifecycle-kit/SPEC.md §Multi-operator semantics). Its single-repo statistics half split off as [iteration-statistics-view](#iteration-statistics-view) (operator direction 2026-10-17, on consult advice, lead-relayed, not a ruling); the cross-repo dashboards stay here. Surfaced 2026-07-07.
+hosted attestation. The team/paid rung: gates verified server-side by a party the committing agents cannot touch — hosted gate runs as a neutral attestation, cross-repo drift dashboards, maintained rulesets. A service, not code: cloning the kits does not clone the neutrality or the ops. Demand-gated — this entry is the public roadmap marker, not a scaffold; hosting and sequencing decisions are on record in the operator's local brief, and its prerequisite mechanism has landed (lifecycle-kit/SPEC.md §Multi-operator semantics). Its single-repo statistics half split off as `iteration-statistics-view` (operator direction 2026-10-17, on consult advice, lead-relayed, not a ruling); the cross-repo dashboards stay here. Surfaced 2026-07-07.
 
 **Cost while deferred:** zero — this is a service rather than tree mechanism, so nothing rots; the residue is that gate runs stay self-attested, which binds only when a party the committing agents cannot touch is asked to trust them.
 
@@ -999,4 +989,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - site-health-resample-knobs
 - site-health-issue-venue-unwanted
 - site-health-probe-unexecuted
+- iteration-statistics-view
 

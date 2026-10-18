@@ -347,10 +347,14 @@ impl Run {
             iter, stage, who, model, t.input, t.output, t.cache_read, t.cache_write, cost
         ));
         let marker = format!("{} {} {} in=", iter, stage, model);
-        let line = format!(
-            "{} {} {} {} in={} out={} cr={} cw={} cost={}",
-            self.today, iter, stage, model, t.input, t.output, t.cache_read, t.cache_write, cost
-        );
+        let line = row_line(&LogRow {
+            date: self.today.clone(),
+            iteration: iter.to_string(),
+            stage: stage.to_string(),
+            model: model.to_string(),
+            tokens: t,
+            cost,
+        });
         // spec: drift-kit/SPEC.md §The stage-economics meter — the trend log: replace in place: the key's first line is
         // rewritten where it stands and a later duplicate dropped, so an unchanged re-run is
         // byte-identical; only a key new to the log appends.
@@ -374,6 +378,56 @@ impl Run {
             Err(_) => Vec::new(),
         }
     }
+}
+
+// spec: drift-kit/SPEC.md §The stage-economics meter — the trend log's row, the one shape its
+// writer formats and its readers parse, so the two directions are one grammar
+#[derive(Clone, Debug, PartialEq)]
+pub struct LogRow {
+    pub date: String,
+    pub iteration: String,
+    pub stage: String,
+    pub model: String,
+    pub tokens: Tokens,
+    pub cost: String,
+}
+
+pub fn row_line(r: &LogRow) -> String {
+    let t = r.tokens;
+    format!(
+        "{} {} {} {} in={} out={} cr={} cw={} cost={}",
+        r.date, r.iteration, r.stage, r.model, t.input, t.output, t.cache_read, t.cache_write, r.cost
+    )
+}
+
+// spec: drift-kit/SPEC.md §The statistics view — the inverse of `row_line`: a line off its grammar
+// is none, so a hand-edited or truncated line drops out rather than charting a guessed figure
+pub fn parse_row(line: &str) -> Option<LogRow> {
+    let f: Vec<&str> = line.split(' ').collect();
+    let [date, iteration, stage, model, i, o, cr, cw, cost] = f[..] else {
+        return None;
+    };
+    let n = |field: &str, key: &str| -> Option<u64> {
+        let v = field.strip_prefix(key)?;
+        v.bytes().all(|b| b.is_ascii_digit()).then(|| v.parse().ok())?
+    };
+    let cost = cost.strip_prefix("cost=")?;
+    if cost != "n/a" && cost.parse::<f64>().is_err() {
+        return None;
+    }
+    Some(LogRow {
+        date: date.to_string(),
+        iteration: iteration.to_string(),
+        stage: stage.to_string(),
+        model: model.to_string(),
+        tokens: Tokens {
+            input: n(i, "in=")?,
+            output: n(o, "out=")?,
+            cache_read: n(cr, "cr=")?,
+            cache_write: n(cw, "cw=")?,
+        },
+        cost: cost.to_string(),
+    })
 }
 
 // spec: drift-kit/SPEC.md §The stage-economics meter — a logged line belongs to a row key when the
@@ -985,6 +1039,39 @@ fn fanout_pass(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: drift-kit/SPEC.md §The statistics view — the row parse is the format string's inverse,
+    // for a priced and an `n/a` cost alike, and a line off the grammar parses to nothing
+    #[test]
+    fn a_logged_row_parses_back_to_the_row_it_was_formatted_from() {
+        for cost in ["12.0664", "n/a", "0.0000"] {
+            let row = LogRow {
+                date: "2026-10-18".to_string(),
+                iteration: "alpha".to_string(),
+                stage: "build+fanout".to_string(),
+                model: "m-1".to_string(),
+                tokens: Tokens {
+                    input: 1,
+                    output: 2,
+                    cache_read: 3,
+                    cache_write: 4,
+                },
+                cost: cost.to_string(),
+            };
+            let line = row_line(&row);
+            assert_eq!(parse_row(&line), Some(row), "{}", line);
+        }
+        for bad in [
+            "2026-10-18 alpha build m in=1 out=2 cr=3 cw=4",
+            "2026-10-18 alpha build m in=1 out=2 cr=x cw=4 cost=0.1",
+            "2026-10-18 alpha build m in=1 out=2 cr=3 cw=4 cost=free",
+            "2026-10-18 alpha build m in=1 out=2 cw=3 cr=4 cost=0.1",
+            "2026-10-18 alpha build m in=1 out=2 cr=3 cw=4 cost=0.1 extra",
+            "",
+        ] {
+            assert!(parse_row(bad).is_none(), "{}", bad);
+        }
+    }
 
     // spec: drift-kit/SPEC.md §The stage-economics meter — the message-id dedup is not an
     // optimisation: a streaming transcript repeats an id with input and cache constant and output

@@ -28,8 +28,6 @@ Adoption evidence, mostly. A rung promotes when someone hits the friction it des
 
 ### next
 
-- [iteration-statistics-view](TASK-QUEUE.md#iteration-statistics-view) *(adoption)* — Per-iteration workflow statistics, charted for health and trends.
-
 ### later
 
 - [benchmark-ab-experiment](TASK-QUEUE.md#benchmark-ab-experiment) *(adoption)* — A controlled experiment measuring drift with and without governance.

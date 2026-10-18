@@ -56,8 +56,32 @@ pub fn starts(versions: &[String], want: usize) -> Vec<(String, String)> {
     out
 }
 
+// spec: drift-kit/SPEC.md §The statistics view — one harvest, two renderers: a window's row
+pub struct Window {
+    pub label: String,
+    pub filed: i64,
+    pub drained: i64,
+}
+
 pub fn emit(args: &[String]) -> Result<String, String> {
     let n = windows_arg(args)?;
+    let rows = match windows(Some(n))? {
+        Ok(rows) => rows,
+        Err(reason) => return Ok(format!("n/a ({})\n", reason)),
+    };
+    let mut out = String::new();
+    let mut filed_sum = 0i64;
+    for w in &rows {
+        filed_sum += w.filed;
+        out.push_str(&format!("{} filed {} drained {}\n", w.label, w.filed, w.drained));
+    }
+    out.push_str(&format!("mean-filed {:.1}\n", filed_sum as f64 / rows.len() as f64));
+    Ok(out)
+}
+
+// spec: drift-kit/SPEC.md §The queue-flow arm — the trailing `limit` windows oldest first, every
+// window where `limit` is none; the inner error is the degrade's `n/a` reason
+pub fn windows(limit: Option<usize>) -> Result<Result<Vec<Window>, String>, String> {
     let knob = crate::walk::knob_scalar;
     let (state_file, queue_file) = (knob("DRIFT_KIT_STATE_FILE")?, knob("DRIFT_KIT_QUEUE_FILE")?);
     let (deferred, icebox) = (
@@ -67,7 +91,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     let top = crate::walk::toplevel().or_else(|_| crate::walk::cwd())?;
     let git = Git { top: top.clone() };
     let (state_path, queue_path) = (repo_path(&top, &state_file), repo_path(&top, &queue_file));
-    let na = |reason: String| Ok(format!("n/a ({})\n", reason));
+    let na = |reason: String| Ok(Err(reason));
 
     let revs = match git.read(&["log", "--format=%H", "--", &state_path]) {
         Some(l) if !l.trim().is_empty() => l,
@@ -91,7 +115,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
                 found.push(s);
             }
         }
-        if found.len() == n + 1 {
+        if limit.is_some_and(|n| found.len() == n + 1) {
             break;
         }
     }
@@ -100,8 +124,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     }
     found.reverse();
 
-    let mut out = String::new();
-    let mut filed_sum = 0i64;
+    let mut out = Vec::new();
     for w in found.windows(2) {
         let ((from, label), (to, _)) = (&w[0], &w[1]);
         let mut pools = Vec::new();
@@ -115,12 +138,13 @@ pub fn emit(args: &[String]) -> Result<String, String> {
             }
         }
         let (filed, drained) = flow(&pools[0], &pools[1]);
-        filed_sum += filed;
-        out.push_str(&format!("{} filed {} drained {}\n", label, filed, drained));
+        out.push(Window {
+            label: label.clone(),
+            filed,
+            drained,
+        });
     }
-    let rows = (found.len() - 1) as f64;
-    out.push_str(&format!("mean-filed {:.1}\n", filed_sum as f64 / rows));
-    Ok(out)
+    Ok(Ok(out))
 }
 
 #[cfg(test)]

@@ -33,7 +33,7 @@ Every top-level directory carrying a `SPEC.md` takes a row, kit or not, and one 
 | context-kit | — | 2351cp · ~594t |
 | delegation-kit | — | 43876cp · ~11043t |
 | doctrine-kit | 2049cp · ~520t | — |
-| drift-kit | — | 6968cp · ~1760t |
+| drift-kit | — | 7378cp · ~1863t |
 | evidence-kit | — | — |
 | gate-sdk | — | 3130cp · ~787t |
 | guard-kit | — | 4394cp · ~1114t |
@@ -42,4 +42,4 @@ Every top-level directory carrying a `SPEC.md` takes a row, kit or not, and one 
 | plugin | — | — |
 | queue-kit | — | 1392cp · ~359t |
 | site-kit | — | — |
-| **total** | 2350cp · ~596t | 210858cp · ~53225t |
+| **total** | 2350cp · ~596t | 211268cp · ~53329t |

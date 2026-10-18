@@ -69,6 +69,7 @@ pub mod scan_prompts;
 pub mod stage_economics;
 pub mod stage_contract;
 pub mod stage_rules;
+pub mod statistics;
 pub mod support_table;
 pub mod roadmap;
 pub mod roadmap_lag;
@@ -642,6 +643,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-queue-flow",
         Arm::Emit(queue_flow::emit, Grammar::Parsed(queue_flow::USAGE)),
         queue_flow::KNOBS,
+    ),
+    // spec: drift-kit/SPEC.md §The statistics view — an `Arm::Emit` because its whole exit grammar
+    // is the 0/2 collapse; its roster is its file and the knobs of the three harvests it calls
+    (
+        "--emit-statistics",
+        Arm::Emit(statistics::emit, Grammar::Parsed(statistics::USAGE)),
+        statistics::KNOBS,
     ),
     // spec: lifecycle-kit/SPEC.md §The survey record — the citation affordance: it derives no stage
     // and stamps no rev, so its sibling's state-file knob is deliberately off this roster.

@@ -66,6 +66,10 @@ fn stage_economics_log(resolve: Resolve) -> Result<Value, String> {
     under(resolve, "DRIFT_KIT_METRIC_DIR", "stage-economics-log.txt")
 }
 
+fn statistics_file(resolve: Resolve) -> Result<Value, String> {
+    under(resolve, "DRIFT_KIT_METRIC_DIR", "statistics.html")
+}
+
 fn manual_ops_log(resolve: Resolve) -> Result<Value, String> {
     under(resolve, "DRIFT_KIT_METRIC_DIR", "manual-ops-log.txt")
 }
@@ -104,6 +108,12 @@ pub const KIT: Kit = Kit {
             "DRIFT_KIT_STAGE_ECONOMICS_LOG",
             Shape::Scalar,
             stage_economics_log,
+            &["DRIFT_KIT_METRIC_DIR"],
+        ),
+        Row::derived(
+            "DRIFT_KIT_STATISTICS_FILE",
+            Shape::Scalar,
+            statistics_file,
             &["DRIFT_KIT_METRIC_DIR"],
         ),
         Row::derived(

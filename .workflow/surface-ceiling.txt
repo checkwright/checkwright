@@ -8,7 +8,7 @@
 1411cp .claude/commands/agent-execution.md
 551cp .claude/commands/align.md
 1135cp .claude/commands/build.md
-9476cp .claude/commands/close.md
+9572cp .claude/commands/close.md
 2355cp .claude/commands/consult.md
 1451cp .claude/commands/economics.md
 5151cp .claude/commands/lead.md
@@ -92,9 +92,9 @@
 3183cp docs/speckit.md
 2522cp docs/value.md
 33120cp doctrine-kit/SPEC.md
-126639cp drift-kit/SPEC.md
+134685cp drift-kit/SPEC.md
 2698cp drift-kit/templates/close-knowledge.md
-4270cp drift-kit/templates/economics.md
+4680cp drift-kit/templates/economics.md
 85177cp evidence-kit/SPEC.md
 1027967cp gate-sdk/SPEC.md
 3130cp gate-sdk/templates/adopt.md

@@ -14,7 +14,7 @@ const STAGES_KNOB: &str = "DRIFT_KIT_STAGES";
 // shape depends on rather than a roster member it renders
 const CLOSE_STAGE: &str = "close";
 
-const LIMITS: &str = "No controlled ungoverned baseline exists: every row is the governed arm's own \
+pub const LIMITS: &str = "No controlled ungoverned baseline exists: every row is the governed arm's own \
 history, so the table shows a trajectory, not an effect measured against a control.\n\n\
 Knowledge-friction counts are excluded: their log is gitignored per-iteration scratch, not \
 committed history, so the extractor cannot harvest them.\n";
@@ -85,7 +85,29 @@ struct Iteration {
     val_suites: usize,
     val_fail: i64,
     val_present: bool,
-    gates: String,
+    gates: Option<usize>,
+}
+
+// spec: drift-kit/SPEC.md §The statistics view — one harvest, two renderers: a closed iteration's
+// harvested fields, read by this arm's table and by the statistics view in process
+pub struct Closed {
+    pub name: String,
+    pub stages: Vec<String>,
+    pub feat: usize,
+    pub debt: usize,
+    pub amendments: usize,
+    pub max_lag: i64,
+    pub val_present: bool,
+    pub val_suites: usize,
+    pub val_fail: i64,
+    pub gates: Option<usize>,
+}
+
+pub struct Harvest {
+    pub state_file: String,
+    pub state_present: bool,
+    pub roster: Vec<String>,
+    pub closed: Vec<Closed>,
 }
 
 // spec: drift-kit/SPEC.md §The published-evidence extractor — the harvest's stamp grammar, the
@@ -333,17 +355,17 @@ fn harvest_gate_counts(git: &Git, gates_file: &str, iters: &mut HashMap<String, 
             Some(c) => c.clone(),
             None => continue,
         };
-        e.gates = match git.read(&["show", &format!("{}:{}", close, gates_file)]) {
-            Some(roster) => roster
-                .lines()
-                .filter(|l| {
-                    let t = l.trim_start_matches([' ', '\t']);
-                    !t.is_empty() && !t.starts_with('#')
-                })
-                .count()
-                .to_string(),
-            None => "n/a".to_string(),
-        };
+        e.gates = git
+            .read(&["show", &format!("{}:{}", close, gates_file)])
+            .map(|roster| {
+                roster
+                    .lines()
+                    .filter(|l| {
+                        let t = l.trim_start_matches([' ', '\t']);
+                        !t.is_empty() && !t.starts_with('#')
+                    })
+                    .count()
+            });
     }
 }
 
@@ -366,24 +388,9 @@ fn render_stages(seen: &[String], stages: &[String], abbr: &[String]) -> String 
 // arm returns the document, else the comparator compares against a banner.
 pub fn emit(args: &[String]) -> Result<String, String> {
     let human = args.iter().any(|a| a == "--human");
-
-    let surfaces = walk::knob_scalar(SURFACES_KNOB)?;
-    let mut fields = surfaces.split_whitespace();
-    let state_file = fields.next().unwrap_or_default().to_string();
-    let evidence_file = fields.next().unwrap_or_default().to_string();
-    let gates_file = walk::knob_scalar(GATES_KNOB)?;
-    let stages = walk::knob_array(STAGES_KNOB)?;
-    let abbr = abbreviations(&stages);
+    let h = harvest()?;
+    let abbr = abbreviations(&h.roster);
     let legend = abbr.join(" ");
-
-    let git = Git { top: toplevel() };
-    let mut order: Vec<String> = Vec::new();
-    let mut iters: HashMap<String, Iteration> = HashMap::new();
-    harvest_stamps(&git, &state_file, &stages, &mut order, &mut iters);
-    let owner = harvest_ranges(&git, &order, &mut iters);
-    harvest_amendments(&git, &owner, &mut iters);
-    harvest_validate(&git, &evidence_file, &mut iters);
-    harvest_gate_counts(&git, &gates_file, &mut iters);
 
     let mut out = String::new();
     if human {
@@ -402,16 +409,12 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     ));
     out.push_str("| --- | --- | --- | --- | --- | --- |\n");
 
-    if !git.has(&["cat-file", "-e", &format!("HEAD:{}", state_file)]) {
-        out.push_str(&format!("| n/a (no {}) | · | · | · | · | · |\n", state_file));
+    if !h.state_present {
+        out.push_str(&format!("| n/a (no {}) | · | · | · | · | · |\n", h.state_file));
         return Ok(out);
     }
 
-    for it in &order {
-        let e = match iters.get(it) {
-            Some(e) if e.close.is_some() => e,
-            _ => continue,
-        };
+    for e in &h.closed {
         let amend = if e.amendments == 0 {
             "0".to_string()
         } else {
@@ -428,16 +431,63 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         };
         out.push_str(&format!(
             "| {} | {} | {}f/{}d | {} | {} | {} |\n",
-            it,
-            render_stages(&e.stages, &stages, &abbr),
+            e.name,
+            render_stages(&e.stages, &h.roster, &abbr),
             e.feat,
             e.debt,
             amend,
             val,
-            if e.gates.is_empty() { "n/a" } else { e.gates.as_str() }
+            e.gates.map_or_else(|| "n/a".to_string(), |g| g.to_string())
         ));
     }
     Ok(out)
+}
+
+// spec: drift-kit/SPEC.md §The published-evidence extractor — the closed iterations in emission
+// order with every harvested field; an absent state file reads `state_present` false and no row
+pub fn harvest() -> Result<Harvest, String> {
+    let surfaces = walk::knob_scalar(SURFACES_KNOB)?;
+    let mut fields = surfaces.split_whitespace();
+    let state_file = fields.next().unwrap_or_default().to_string();
+    let evidence_file = fields.next().unwrap_or_default().to_string();
+    let gates_file = walk::knob_scalar(GATES_KNOB)?;
+    let roster = walk::knob_array(STAGES_KNOB)?;
+
+    let git = Git { top: toplevel() };
+    let state_present = git.has(&["cat-file", "-e", &format!("HEAD:{}", state_file)]);
+    let mut order: Vec<String> = Vec::new();
+    let mut iters: HashMap<String, Iteration> = HashMap::new();
+    harvest_stamps(&git, &state_file, &roster, &mut order, &mut iters);
+    let owner = harvest_ranges(&git, &order, &mut iters);
+    harvest_amendments(&git, &owner, &mut iters);
+    harvest_validate(&git, &evidence_file, &mut iters);
+    harvest_gate_counts(&git, &gates_file, &mut iters);
+
+    let mut closed = Vec::new();
+    if state_present {
+        for name in order {
+            if let Some(e) = iters.remove(&name).filter(|e| e.close.is_some()) {
+                closed.push(Closed {
+                    name,
+                    stages: e.stages,
+                    feat: e.feat,
+                    debt: e.debt,
+                    amendments: e.amendments,
+                    max_lag: e.max_lag,
+                    val_present: e.val_present,
+                    val_suites: e.val_suites,
+                    val_fail: e.val_fail,
+                    gates: e.gates,
+                });
+            }
+        }
+    }
+    Ok(Harvest {
+        state_file,
+        state_present,
+        roster,
+        closed,
+    })
 }
 
 #[cfg(test)]

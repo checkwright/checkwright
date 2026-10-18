@@ -598,6 +598,59 @@ grep -q 'n/a (empty stage roster)' <<<"$(DRIFT_KIT_KNOB_FILE="$work/lag-noroster
 grep -q 'n/a (no closed iteration)' <<<"$(DRIFT_KIT_STATE_FILE="$work/se-state.txt" DRIFT_KIT_STAGE_ECONOMICS_LOG="$work/lag-log.txt" solo kpi-stage-economics-lag)" \
     || fail "a stamp source with no terminal stamp must degrade fail-visibly"
 
+# spec: drift-kit/SPEC.md §Testing — the statistics view over the same fake history, beta's close
+# committed and gamma in flight, with a purpose-built trend log under a throwaway metric dir.
+tcommit "fix: beta close"
+printf 'gamma scope s6 2025-01-05 none\n' > "$trepo/.workflow/WORKFLOW-STATE.txt"; tcommit "feat: gamma scope"
+smetric="$work/stat-metric"; mkdir -p "$smetric"
+cat > "$smetric/stage-economics-log.txt" <<'EOF'
+2025-01-02 alpha build test-model in=1 out=1 cr=100 cw=1 cost=1.5
+2025-01-02 alpha supervision test-model in=1 out=1 cr=10 cw=1 cost=0.25
+2025-01-02 alpha build+fanout test-model in=1 out=1 cr=1 cw=1 cost=0.5
+2025-01-04 beta close test-model in=1 out=1 cr=1 cw=1 cost=n/a
+2025-01-05 gamma scope test-model in=1 out=1 cr=1 cw=1 cost=1
+EOF
+stats() { ( cd "$trepo" && GATE_SDK_NATIVE_BIN="$TRAJ_BIN" DRIFT_KIT_METRIC_DIR="$smetric" \
+    bash "$DRIFT_ARM" --emit statistics "$@" ); }
+sdoc="$smetric/statistics.html"
+set +e
+sout="$(stats)"; src=$?
+set -e
+[[ "$src" -eq 0 ]] || fail "the statistics arm exited $src (advisory emission must exit 0)"
+[[ "$(head -n 1 <<<"$sout")" == "statistics: wrote $sdoc — 2 closed iteration(s)" ]] \
+    || fail "the statistics arm did not report its write at DRIFT_KIT_STATISTICS_FILE: $sout"
+[[ -f "$sdoc" ]] || fail "the statistics view was not written under the metric dir"
+[[ "$(grep -c '<section class="panel"' "$sdoc")" -eq 7 ]] || fail "the statistics view does not carry seven panels"
+for fig in spend cache-read 'commit shape' amendments validate 'gate roster'; do
+    grep -qx "  $fig: charted" <<<"$sout" || fail "the statistics figure '$fig' was not charted: $sout"
+done
+grep -q '^  queue flow: n/a (' <<<"$sout" || fail "the queue-flow figure did not degrade over a history of no starts: $sout"
+grep -qx '  1 iteration(s) with incomplete pricing' <<<"$sout" || fail "the incomplete-pricing count is not 1: $sout"
+grep -q 'alpha: stage rows \$1.50' "$sdoc" || fail "the closed iteration alpha is not charted"
+if grep -q 'gamma' "$sdoc"; then fail "the statistics view charted the in-flight iteration"; fi
+for banned in '<script' 'src=' 'url(' 'href'; do
+    if grep -qF "$banned" "$sdoc"; then fail "the statistics view references outside itself ($banned)"; fi
+done
+cp "$sdoc" "$work/stat-first.html"
+stats >/dev/null
+cmp -s "$sdoc" "$work/stat-first.html" || fail "two statistics emissions over unchanged inputs differ"
+nolog="$(DRIFT_KIT_STAGE_ECONOMICS_LOG="$work/no-such-log.txt" stats)"
+for fig in spend cache-read; do
+    grep -qx "  $fig: n/a (no stage-economics log)" <<<"$nolog" || fail "a log-absent run did not degrade '$fig': $nolog"
+done
+for fig in 'commit shape' amendments validate 'gate roster'; do
+    grep -qx "  $fig: charted" <<<"$nolog" || fail "a log-absent run dropped '$fig': $nolog"
+done
+[[ "$(stats 1 | head -n 1)" == "statistics: wrote $sdoc — 1 closed iteration(s)" ]] \
+    || fail "the statistics arm did not honour its trailing-iteration count"
+if grep -q 'alpha' "$sdoc"; then fail "a one-iteration statistics view still charts alpha"; fi
+for bad in 0 x; do
+    set +e
+    stats "$bad" >/dev/null 2>&1; brc=$?
+    set -e
+    [[ "$brc" -eq 2 ]] || fail "the statistics arm took '$bad' with exit $brc, not 2"
+done
+
 # spec: drift-kit/SPEC.md §The stage-economics meter — the attribution invariant over its own fixture
 # set: one session bearing two stamps bills once (its last), and a transcript matching no stamp is
 # counted as the under-count bound. Its own sessions dir, state file, and log — the flat fixture set's
