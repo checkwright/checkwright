@@ -208,7 +208,7 @@ Knobs:
   - `CANON_KIT_PROSE_TELL_PHRASES` — array of throat-clearing phrases matched case-insensitively, default a bundled generic-English set (`It's worth noting`, `That said`, …).
   - `CANON_KIT_PROSE_TELL_ABBR_ALLOW` — array of abbreviations exempt from the undefined-abbreviation tell, default a bundled universal set (`API`, `CLI`, `URL`, …).
 
-  The threshold knobs are validated by this table, so a malformed value refuses at exit 2 with every finding. The threshold knobs, each with its value set, a `_MAX` ceiling taking a non-negative integer:
+  The threshold knobs are validated by this table, so a malformed value refuses at exit 2 with every finding. Each, with its value set, a `_MAX` ceiling taking a non-negative integer:
 
   - `CANON_KIT_PROSE_TELL_EMDASH_MAX` — em-dashes a paragraph may carry, default `2`.
   - `CANON_KIT_PROSE_TELL_CONTRAST_MAX` — "not X, it's Y" contrast turns a section may carry, default `1`.
@@ -992,7 +992,7 @@ Invariant: no declared page states a relative link target, or a sentence of `CAN
 
 **Red** is one finding per later occurrence, naming the page, its line, the first occurrence's line and the repeated target or sentence. Each arm carries its own `help:` line. A link's is *link the first mention and make the later one plain text or an in-page anchor*. A sentence's is *state it once and point back to it*. Chrome's is *the site chrome already states it on every page: drop the page's copy*, and its finding names the chrome file and line as the first occurrence. The clean line counts pages, links, sentences and chrome files. **Exit 2:** an unreadable page or chrome file, or a `CANON_KIT_PAGE_REPEAT_MIN_WORDS` that is not a positive integer. `tier=precommit`, `install: zero-config`, armed by `CANON_KIT_PAGE_REPEAT_PAGES`.
 
-**Deliberately not asserted: a page-grain link rule, or a repeat across pages.** A page citing several sections of one README downward is the anchored shape §check-docs-link-convention requires, so the grain is the target, fragment included. A restatement across pages is usually a paraphrase, which no scanner decides. Chrome is no other page, since it renders inside each one, so arm C reads it as part of every page. **Honest limits:** every chrome file joins every page whichever template a page renders through, so a consumer with several layouts names only the chrome all of them share. Character references are compared undecoded. A chrome statement shorter than the sentence floor and carrying no link, such as a three-word licence line, is not read.
+**Deliberately not asserted: a page-grain link rule, or a repeat across pages.** A page citing several sections of one README downward is the anchored shape §check-docs-link-convention requires, so the grain is the target, fragment included. A restatement across pages is usually a paraphrase, which no scanner decides. Chrome is no other page: it renders inside each one. **Honest limits:** every chrome file joins every page whichever template a page renders through, so a consumer with several layouts names only the chrome all of them share. Character references are compared undecoded. A chrome statement shorter than the sentence floor and carrying no link, such as a three-word licence line, is not read.
 
 ### check-docs-page-length
 
