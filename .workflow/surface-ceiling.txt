@@ -92,7 +92,7 @@
 3183cp docs/speckit.md
 2522cp docs/value.md
 33120cp doctrine-kit/SPEC.md
-134685cp drift-kit/SPEC.md
+134637cp drift-kit/SPEC.md
 2698cp drift-kit/templates/close-knowledge.md
 4680cp drift-kit/templates/economics.md
 85177cp evidence-kit/SPEC.md
@@ -101,7 +101,7 @@
 333925cp guard-kit/SPEC.md
 4394cp guard-kit/templates/close-triage.md
 292511cp installer/SPEC.md
-393612cp lifecycle-kit/SPEC.md
+393601cp lifecycle-kit/SPEC.md
 8150cp lifecycle-kit/templates/consult.md
 1212cp lifecycle-kit/templates/frames/project-critique.md
 1902cp lifecycle-kit/templates/frames/stage-contract-sweep.md
