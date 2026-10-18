@@ -747,12 +747,15 @@ fn declines_expansion(raw: &str) -> bool {
 
 pub type Reach = (char, String, String, Home);
 
-// spec: guard-kit/SPEC.md §The rule roster — arm (c) case 2, the PowerShell invocation forms: the
-// call or dot-source operator before a scratch path, a scratch path in command position, and
-// `Invoke-Expression` in a segment or behind a producer naming one.
-fn powershell_form(ctx: &Ctx, toks: &[&str], producers: &[Vec<&str>]) -> Option<Reach> {
+// spec: guard-kit/SPEC.md §The rule roster — arm (c) case 2, the PowerShell invocation forms, none
+// under a lead word opening on a quote: the call or dot-source operator before a scratch path, a
+// scratch path in command position, and `Invoke-Expression` in a segment or behind a producer.
+fn powershell_form(ctx: &Ctx, toks: &[&str], string_lead: bool, producers: &[Vec<&str>]) -> Option<Reach> {
     let word = *toks.first()?;
     let hit = |src: &str, home: Home| Some(('c', word.to_string(), src.to_string(), home));
+    if string_lead {
+        return None;
+    }
     if matches!(word, "&" | ".") {
         let next = toks.get(1)?;
         return scratch_home(ctx, next).and_then(|home| hit(next, home));
@@ -808,7 +811,8 @@ pub fn interpreter_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<Reach>, Fault> {
                         None => words(&pipes[j]),
                     })
                     .collect();
-                if let Some(r) = powershell_form(ctx, &toks, &producers) {
+                let string_lead = lifted.and_then(|ws| ws.first()).is_some_and(|w| w.spelling.starts_with(['\'', '"']));
+                if let Some(r) = powershell_form(ctx, &toks, string_lead, &producers) {
                     return Ok(Some(r));
                 }
             }

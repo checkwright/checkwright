@@ -46,14 +46,6 @@ two wrong grants in the shell guard's read-only-pipeline rule, each auto-allowed
 
 **Cost while deferred:** a session can write a tracked file with no permission decision, and the v0.32.0 bar ([tarball-attestation-observed](#tarball-attestation-observed)) stays unmet. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: both payloads return `allow` from `--hook shell-guard` on the built binary. Owner lookup: `ro_pipeline`, `read-only search pipeline`, `fd_dup` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md.
 
-### pwsh-string-expr-overblock
-
-the shell guard blocks the PowerShell string expression `'.tmp/x.ps1'`, which executes nothing: the value-only tokens drop its quoting, so the rule reads it as a scratch execution. From harness-reach-pass' second-vendor review (P2).
-
-**Deliverable:** a quoted string expression read as a value, with a `guard-kit/guard-tests/` row. Verdict-moving (block to allow), so a close promotes it.
-
-**Cost while deferred:** a rare PowerShell call is refused with a misleading scratch-run steer. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: the payload exits 2 with the scratch-path steer. Owner lookup: `string expression`, `scratch execution` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §scratch-run.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -172,7 +164,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Two grants of 2026-10-17 spent:** competitive-followup-pass' validate and close reviews each returned five findings, so v0.32.0 stayed deferred. That close withdrew `prove` from docs/install.md and docs/maintenance.md and the overlap section from docs/openspec.md, its line held in `companion/fixtures/openspec/overlap/line.md`; **the cut restores them** and deletes the held file.
 
-**Two grants of 2026-10-18 spent:** session-sweep-policy-pass' close review returned five P2 findings, all fixed at that close, none verdict-moving; harness-reach-pass' validate review returned three verdict-moving findings, two of them wrong grants, promoted as [ro-pipeline-wrong-grants](#ro-pipeline-wrong-grants) and [pwsh-string-expr-overblock](#pwsh-string-expr-overblock). Each left v0.32.0 deferred.
+**Two grants of 2026-10-18 spent:** session-sweep-policy-pass' close review returned five P2 findings, all fixed at that close, none verdict-moving; harness-reach-pass' validate review returned three verdict-moving findings, two of them wrong grants, promoted as [ro-pipeline-wrong-grants](#ro-pipeline-wrong-grants) and `pwsh-string-expr-overblock`. Each left v0.32.0 deferred.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
@@ -1025,4 +1017,6 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
+
+- pwsh-string-expr-overblock
 

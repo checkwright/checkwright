@@ -89,6 +89,13 @@ block	powershell -NoProfile -ExecutionPolicy Bypass .tmp/x.ps1
 block	Get-Content -Raw .tmp/x.ps1 | iex
 block	bash .tmp/x.sh
 block	python3 .tmp/x.py
+# a quoted scratch path is a string expression, printed rather than run, alone and piped to a
+# reader; under the call operator or into Invoke-Expression it runs
+fallthrough	'.tmp/x.ps1'
+fallthrough	".tmp\x.ps1"; Get-ChildItem
+fallthrough	'.tmp/x.ps1' | Select-Object -First 1
+block	& '.tmp/x.ps1'
+block	'.tmp/x.ps1' | iex
 fallthrough	& tools/build.ps1
 fallthrough	pwsh -File tools/build.ps1
 fallthrough	pwsh -Command 'Get-Date'
