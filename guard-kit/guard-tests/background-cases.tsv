@@ -27,6 +27,11 @@ allow	true	grep -rn foo src 2>& 1
 allow	true	grep -rn foo src 2>"/dev/null"
 block	true	sort > '&1'
 block	true	grep -rn foo src 2>'&1'
+# and reads each statement a bare `&` ends, so a writer behind a read's `&` owes the record
+block	true	grep -rn foo src & sort -o out.txt tracked.md &
+block	true	grep -rn foo src & make build &
+block	false	grep -rn foo src & make build &
+fallthrough	true	grep -rn foo src & grep -c x tracked.md &
 fallthrough	false	bash worker.sh
 # the canonical launch in harness form: rule `background_no_record`'s exemption (1) lets the record
 # through and rule `bounded_wait`'s arm (B) grants it, the flag changing nothing in its text

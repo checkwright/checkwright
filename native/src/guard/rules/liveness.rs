@@ -42,7 +42,7 @@ pub fn git_mutation_under_producer(ctx: &Ctx) -> Decided {
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — a child that writes nothing has nothing for a later
-// commit to corrupt, so it owes no record.
+// commit to corrupt, so it owes no record; read statement by statement across a bare `&`.
 fn is_ro_background(ctx: &Ctx, s: &str) -> Result<bool, Fault> {
     let h = ctx.host();
     if !valued_targets(ctx, ctx.cmd())?.iter().all(|t| inert_value(t)) {
@@ -50,16 +50,18 @@ fn is_ro_background(ctx: &Ctx, s: &str) -> Result<bool, Fault> {
     }
     let mut reads = 0usize;
     for seg in ctx.segments(s) {
-        let seg = trim_start(&seg);
-        if seg.is_empty() || is_banner(seg) {
-            continue;
+        for statement in background_statements(&seg) {
+            let statement = trim_start(statement);
+            if statement.is_empty() || is_banner(statement) {
+                continue;
+            }
+            if !is_ro_segment(h, statement) {
+                return Ok(false);
+            }
+            reads += 1;
         }
-        if !is_ro_segment(h, seg) {
-            return Ok(false);
-        }
-        reads += 1;
     }
-    Ok(reads >= 1 && ro_forms_clear(ctx, ctx.cmd())?)
+    Ok(reads >= 1 && ro_forms_clear_statements(ctx, ctx.cmd())?)
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `background_no_record`'s PowerShell shell form: a

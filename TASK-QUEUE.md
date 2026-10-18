@@ -28,14 +28,6 @@ the bash word read answers nothing on a call carrying an ANSI-C (`$'...'`) or lo
 
 ## Technical Debt
 
-### background-record-bare-amp
-
-rule `background_no_record` misses a backgrounded writer behind a read's bare `&`: `grep -rn foo src & sort -o out.txt tracked.md &` and `grep -rn foo src & make build &` fall through, where `sort -o out.txt tracked.md &` and `grep -rn foo src; sort -o out.txt tracked.md &` block.
-
-**Deliverable:** the rule reads every `&`-joined segment, with a firing row of this shape. It moves a verdict from fall-through to block, so it lands in a build.
-
-**Cost while deferred:** an unrecorded producer a later commit can race. Filed 2026-10-18 by guard-grant-kpi-pass' close, draining its build's bullet; pre-existing, not moved by `ro-pipeline-wrong-grants`. Re-verified there: all four commands on the built binary. Owner lookup: `background_no_record`, `bare '&'` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The generic ruleset.
-
 ### pwsh-herestring-word-read
 
 the PowerShell reader's word read answers nothing on a call carrying a here-string, so its by-value rules read the skeleton there and a quoted or backtick-escaped word beside one goes unread: `git 'stash' push` blocks, `git 'stash' push; $h = @'@NL@x@NL@'@` falls through. `guard-word-read-heredoc` lifted the bash heredoc case only.
@@ -1027,4 +1019,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 ## Done
 
 - ro-background-quoted-fd-target
+- background-record-bare-amp
 
