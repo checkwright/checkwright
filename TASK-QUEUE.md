@@ -14,6 +14,44 @@
 
 ## New Features
 
+### hook-contract-harness-neutral
+
+[spec: SPEC-hook-contract.md]
+
+kit prose carries the master harness's names where no knob owns them: the hook event names and matchers, the payload keys, the session and config-home variables (owner lifecycle-kit/SPEC.md §bin/session-id.sh), the dispatch tool's parameter names, and two of drift-kit's measurement commands. gate-sdk/SPEC.md §The adopter constraints declares the hook members' names the shipped binding, so nothing is misstated.
+
+**Deliverable:** a harness-neutral statement of the hook contract behind a binding table, the kit SPECs citing it; feature-sized, since it restates wire contracts.
+
+**Cost while deferred:** an adopter on another harness reads the hook-member sections as one vendor's protocol, which they are. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' build. Re-counted at spec by `check-harness-literal` with the amendment's roster: 129 lines across six kits' SPECs, READMEs and one template (SPEC-hook-contract.md). Owner lookup: `hook contract`, `binding table`, `harness-neutral`, `payload key` in this file and the disposed-findings record — none; [plugin-harness-reach](#plugin-harness-reach), DISTINCT (its per-harness guard wiring would bind against this contract); `harness-literal-catcher-gate`, DISTINCT (the catcher for sites already generic).
+
+### plugin-harness-reach
+
+[spec: SPEC-harness-reach.md] [roadmap: next/ecosystem] [roadmap-summary: The plugin package verified on more harnesses, with guards wherever a harness has a hook surface.] [not-icebox-eligible: 2026-10-06 filed on the operator direction of 2026-09-28 its body carries; evicting it would compress that direction away]
+
+the harness plugin package reaches Claude Code only in its tested and guarded parts. plugin/SPEC.md reads the portable `plugin.json` and `skills/` as loading on any Agent Plugins 1.0 client off the standard alone, since only Claude Code's install is run; the guards ride `hooks/hooks.json`, outside the standard's portable core, so no other client runs them; the marketplace file is Claude Code's format. No queue entry names another harness. Found at spec, 2026-10-18: the standard publishes no adopter list, Codex's and Cursor's docs name it, Antigravity installs the package, and Meta's harness is Muse Code (dev.meta.ai/docs/muse-code). **Harness priority, operator direction, 2026-09-28:** tier 1 Claude Code and Codex; tier 2 Muse Code, Antigravity and Cursor.
+
+**Deliverable:** (1) the skills load verified on the codex and Antigravity CLIs; (2) a survey of which harnesses read Agent Plugins 1.0 and their catalogs; (3) per-harness guard wiring where a harness has a hook surface. Cursor imports Claude Code hook configuration from `.claude/settings*.json` by default (cursor.com/docs/reference/third-party-hooks, read at spec).
+
+**Reach of (3), decided 2026-10-18 (intent oracle, lead-relayed, not a ruling):** Codex is wired through the existing rendering and verified by a run. The Antigravity binding, the Cursor and Muse Code observation and Codex's `apply_patch` silent allow are filed as costed gaps (SPEC-harness-reach.md).
+
+**Cost while deferred:** an adopter on another harness gets unverified skills and no guards. Filed 2026-09-28 by plugin-marketplace-queue-verbs' lead on an operator direction. Re-verified: plugin/SPEC.md states the portable core and that only Claude Code's install is run. Owner lookup: `Agent Plugins`, `codex`, `Cursor`, `Antigravity` in this file — none; owner plugin/SPEC.md.
+
+### grant-pwsh-word-read
+
+[spec: SPEC-pwsh-word-read.md]
+
+the half of `guard-rules-skeleton-word-read` split off at guard-word-read-release-pass' scope (operator direction, lead-relayed, not a ruling), so no grant widened ahead of the v0.32.0 bar. Three reads stay on the skeleton. The grants read a redirect target there, so a quoted `/dev/null` withholds the grant the bare spelling keeps: rule `ro_pipeline` falls through on `grep -rn foo src 2>"/dev/null"`, and rules `append_scratch`, `bounded_wait`, `bounded_write` and `background_no_record`'s third exemption read it the same way. Probed at spec: `bounded_write` already reads by value, and `background_no_record` and `emitter_write` block. Rule `ro_pipeline` reads its command word there too, and declines a quoted one silently: no variant-lane relation reaches a grant's decline, so it has no limit rows (the 9 once filed under it were block rows rule `allowlist_chain` took over at that iteration's build). And 9 rows in `guard-kit/guard-tests/variant-limits.tsv` are the PowerShell reader's: a backtick inside a command name falls through rules `rm_tracked`, `cd_compound`, `script_interpreter` and `background_no_record`, and a quoted or backticked redirect target or scratch body path through rules `scratch_redirect` and `script_interpreter`.
+
+**Deliverable:** rule `abs_script`'s by-value read (`redirect_values` in `native/src/guard/rules/grants.rs`) given to each grant, rule `ro_pipeline`'s command word read off the word read with authored rows as its oracle, and the PowerShell reader's own word read, each lift deleting its limit rows, where it has any, in its own commit. Every grant lift widens a grant, so it lands in a build a validate's second-vendor review reads.
+
+**Inferred, cannot run before build:** a PowerShell host reads each derived `ps-` row as its base row's command — no host is installed on the machine that derived them, and the step running the rows through `pwsh` on the x64 Windows leg lands at build (SPEC-pwsh-word-read.md delta 4)
+
+**`emitter_write` rides this unit (decided 2026-10-18, intent oracle, lead-relayed, not a ruling):** its false block on a quoted `/dev/null`, observed at spec, is fixed by the same by-value target read. Rows keep a tracked target blocked, and it lands before the validate review.
+
+**Push need (2026-10-18, inside the budget):** one mid-iteration push, after the PowerShell reader's word read lands, to read the x64 Windows leg, since no `pwsh` is on the build machine.
+
+**Cost while deferred:** a PowerShell re-spelling evades two safety blocks, rules `rm_tracked` and `script_interpreter`, and a quoted `/dev/null` costs a prompt the bare spelling does not. Filed 2026-10-14 by guard-word-read-release-pass' scope as the split's remainder; the finding was filed 2026-10-13 by guard-spelling-oracle-pass' spec. Owner lookup: `word read`, `redirect_values`, `ps-`, `pwsh` in this file and the disposed-findings record — `guard-rules-skeleton-word-read`, DISTINCT (the bash block and steer half), `grant-redirect-scan-cr`, done at guard-word-read-release-pass, DISTINCT (the scan this read lands on); owner guard-kit/SPEC.md §The reader and its views.
+
 ## Technical Debt
 
 ## Deferred
@@ -138,16 +176,6 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
-### plugin-harness-reach
-
-[roadmap: next/ecosystem] [cost: event/low] [surface: plugin] [roadmap-summary: The plugin package verified on more harnesses, with guards wherever a harness has a hook surface.] [not-icebox-eligible: 2026-10-06 filed on the operator direction of 2026-09-28 its body carries; evicting it would compress that direction away]
-
-the harness plugin package reaches Claude Code only in its tested and guarded parts. plugin/SPEC.md reads the portable `plugin.json` and `skills/` as loading on any Agent Plugins 1.0 client off the standard alone, since only Claude Code's install is run; the guards ride `hooks/hooks.json`, outside the standard's portable core, so no other client runs them; the marketplace file is Claude Code's format. No queue entry names another harness. **Inferred, not run:** which harnesses adopt Agent Plugins 1.0. **Operator-supplied, unverified:** Meta's coding harness "seems to be named Muse Code". **Harness priority, operator direction, 2026-09-28:** tier 1 Claude Code and Codex; tier 2 Muse Code, Antigravity and Cursor.
-
-**Deliverable:** (1) the skills load verified on the codex and Antigravity CLIs; (2) a survey of which harnesses read Agent Plugins 1.0 and their catalogs; (3) per-harness guard wiring where a harness has a hook surface. **Read first (2026-10-17, competitive analysis, unprobed here):** Cursor imports Claude Code hook configuration from `.claude/settings*.json` by default, so one wiring may reach two harnesses.
-
-**Cost while deferred:** an adopter on another harness gets unverified skills and no guards. Filed 2026-09-28 by plugin-marketplace-queue-verbs' lead on an operator direction. Re-verified: plugin/SPEC.md states the portable core and that only Claude Code's install is run. Owner lookup: `Agent Plugins`, `codex`, `Cursor`, `Antigravity` in this file — none; owner plugin/SPEC.md.
-
 ### verify-workflow-decoupling
 
 [cost: event/low] [surface: installer] [not-icebox-eligible: 2026-10-06 holds the operator's stated aim of 2026-09-28 and the ruling it waits on; evicting it would compress the question away]
@@ -189,30 +217,6 @@ the delivery rule under `lead-notification-wake-race`'s remedy, unprobed: does a
 **Inferred, not run:** that a tool call before the turn end delivers the notification — two stalled transcripts show only an undrained queue at the stop, and one 2026-10-02 lead turn with tool calls received its notification inside the turn.
 
 **Cost while deferred:** the lead's wait clause rests on an inferred mechanism; if it is wrong, a stall still costs hours of idle wall-clock until the operator wakes the lead. Filed 2026-10-02 as a split at companion-tier-delegation-pass' scope, operator direction lead-relayed (not a ruling).
-
-### hook-contract-harness-neutral
-
-[cost: event/low] [surface: guard-kit]
-
-kit prose carries the master harness's names where no knob owns them: the hook event names and matchers, the payload keys, the session and config-home variables (owner lifecycle-kit/SPEC.md §bin/session-id.sh), the dispatch tool's parameter names, and two of drift-kit's measurement commands. gate-sdk/SPEC.md §The adopter constraints declares the hook members' names the shipped binding, so nothing is misstated.
-
-**Deliverable:** a harness-neutral statement of the hook contract behind a binding table, the kit SPECs citing it; feature-sized, since it restates wire contracts.
-
-**Cost while deferred:** an adopter on another harness reads the hook-member sections as one vendor's protocol, which they are. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' build. Re-verified by grep over the kit SPECs for the event names, payload keys, variables and parameter names: 93 lines, delegation-kit 42, guard-kit 31, context-kit 8, lifecycle-kit 7, gate-sdk 3, drift-kit 1, evidence-kit 1. Owner lookup: `hook contract`, `binding table`, `harness-neutral`, `payload key` in this file and the disposed-findings record — none; [plugin-harness-reach](#plugin-harness-reach), DISTINCT (its per-harness guard wiring would bind against this contract); `harness-literal-catcher-gate`, DISTINCT (the catcher for sites already generic).
-
-### grant-pwsh-word-read
-
-[cost: event/high] [surface: guard-kit]
-
-the half of `guard-rules-skeleton-word-read` split off at guard-word-read-release-pass' scope (operator direction, lead-relayed, not a ruling), so no grant widened ahead of the v0.32.0 bar. Three reads stay on the skeleton. The grants read a redirect target there, so a quoted `/dev/null` withholds the grant the bare spelling keeps: rule `ro_pipeline` falls through on `grep -rn foo src 2>"/dev/null"`, and rules `append_scratch`, `bounded_wait`, `bounded_write` and `background_no_record`'s third exemption read it the same way, read off their source and not run. Rule `ro_pipeline` reads its command word there too, and declines a quoted one silently: no variant-lane relation reaches a grant's decline, so it has no limit rows (the 9 once filed under it were block rows rule `allowlist_chain` took over at that iteration's build). And 9 rows in `guard-kit/guard-tests/variant-limits.tsv` are the PowerShell reader's: a backtick inside a command name falls through rules `rm_tracked`, `cd_compound`, `script_interpreter` and `background_no_record`, and a quoted or backticked redirect target or scratch body path through rules `scratch_redirect` and `script_interpreter`.
-
-**Deliverable:** rule `abs_script`'s by-value read (`redirect_values` in `native/src/guard/rules/grants.rs`) given to each grant, rule `ro_pipeline`'s command word read off the word read with authored rows as its oracle, and the PowerShell reader's own word read, each lift deleting its limit rows, where it has any, in its own commit. Every grant lift widens a grant, so it lands in a build a validate's second-vendor review reads.
-
-**Inferred, not run:** that a PowerShell host reads each derived `ps-` row as its base row's command; no host is installed on the machine that derived them — run the derived rows through `pwsh` on the x64 Windows leg
-
-**Push need (2026-10-18, inside the budget):** one mid-iteration push, after the PowerShell reader's word read lands, to read the x64 Windows leg, since no `pwsh` is on the build machine.
-
-**Cost while deferred:** a PowerShell re-spelling evades two safety blocks, rules `rm_tracked` and `script_interpreter`, and a quoted `/dev/null` costs a prompt the bare spelling does not. Filed 2026-10-14 by guard-word-read-release-pass' scope as the split's remainder; the finding was filed 2026-10-13 by guard-spelling-oracle-pass' spec. Owner lookup: `word read`, `redirect_values`, `ps-`, `pwsh` in this file and the disposed-findings record — `guard-rules-skeleton-word-read`, DISTINCT (the bash block and steer half), `grant-redirect-scan-cr`, done at guard-word-read-release-pass, DISTINCT (the scan this read lands on); owner guard-kit/SPEC.md §The reader and its views.
 
 ### evaluator-root-agent-file
 
