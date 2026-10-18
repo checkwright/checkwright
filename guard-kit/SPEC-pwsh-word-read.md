@@ -128,7 +128,7 @@ Each rule below already declares `raw`, `sq dq hd` and `dequoted`, so no `TABLE`
 | `rm_tracked` | the deletion command word by value before the `PS_DELETE` lookup (`reach.rs`); the operands already read by value | `rm_tracked ps-tick-lead` |
 | `background_no_record` | `ps_detaches`' head word by value (`liveness.rs`) | `background_no_record ps-tick-lead` |
 | `scratch_redirect` | the PowerShell target by value through `redirect_values`, with `\` folded to `/` before `scratch_name` (`spelling.rs`) | `scratch_redirect ps-dq-arg`, `ps-sq-arg`, `ps-tick-arg` |
-| `script_interpreter` | `interpreter_reach`'s lifted tokens under PowerShell too, the two `!ps` guards dropped, with `powershell_form` taking those tokens rather than a skeleton segment (`reach.rs`) | `script_interpreter ps-dq-arg`, `ps-sq-arg`, `ps-tick-lead` |
+| `script_interpreter` | `interpreter_reach`'s lifted tokens under PowerShell too, the two `!ps` guards dropped, with `powershell_form` taking those tokens rather than a skeleton segment, and its pipe producers' lifted tokens too (ruled at build: the `ps-sq-arg` and `ps-dq-arg` rows of `Get-Content -Raw .tmp/x.ps1 \| iex` read the producer's path) (`reach.rs`) | `script_interpreter ps-dq-arg`, `ps-sq-arg`, `ps-tick-lead` |
 
 **`redirect_values` takes the reader's escape character**: `\` under bash and the backtick under PowerShell, as `passed_words` already does. Its bash behaviour and its unit test are unchanged, and the test gains a PowerShell case for each of a bare, a quoted and a backticked target.
 
@@ -136,7 +136,7 @@ Each rule below already declares `raw`, `sq dq hd` and `dequoted`, so no `TABLE`
 
 **Honest limit, kept.** PowerShell's stop-parsing token `--%` is not modelled: the words after it are read with quoting PowerShell does not apply there. No rule this delta lifts reads a command word after it. Its arguments are read as the reader's other honest limits read an unmodelled construct.
 
-`guard-kit/SPEC.md`, **not yet applied**:
+`guard-kit/SPEC.md`, **applied at build**, the honest limit above landing in the PowerShell reader's honest limit:
 
 - **§The generic ruleset's shared direction A rule reads a word as its item says:** its second sentence gains "Under PowerShell rules `cd_compound`, `rm_tracked`, `background_no_record`, `scratch_redirect` and `script_interpreter` read their command words, redirect targets and body paths through the word read." The sentence opening "Any other rule reads the skeleton's word" stands.
 - **`cd_compound`:** "when one of them is the first word of a segment" reads "when one of them is the value of a segment's first word".

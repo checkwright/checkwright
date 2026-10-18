@@ -750,8 +750,7 @@ pub type Reach = (char, String, String, Home);
 // spec: guard-kit/SPEC.md §The rule roster — arm (c) case 2, the PowerShell invocation forms: the
 // call or dot-source operator before a scratch path, a scratch path in command position, and
 // `Invoke-Expression` in a segment or behind a producer naming one.
-fn powershell_form(ctx: &Ctx, seg: &str, producers: &[String]) -> Option<Reach> {
-    let toks = words(seg);
+fn powershell_form(ctx: &Ctx, toks: &[&str], producers: &[Vec<&str>]) -> Option<Reach> {
     let word = *toks.first()?;
     let hit = |src: &str, home: Home| Some(('c', word.to_string(), src.to_string(), home));
     if matches!(word, "&" | ".") {
@@ -764,7 +763,7 @@ fn powershell_form(ctx: &Ctx, seg: &str, producers: &[String]) -> Option<Reach> 
     if !matches!(word.to_ascii_lowercase().as_str(), "invoke-expression" | "iex") {
         return None;
     }
-    let sources = toks[1..].iter().copied().chain(producers.iter().flat_map(|p| words(p)));
+    let sources = toks[1..].iter().chain(producers.iter().flatten()).copied();
     for tok in sources {
         if let Some(home) = scratch_home(ctx, tok) {
             return hit(tok, home);
@@ -779,15 +778,14 @@ fn powershell_form(ctx: &Ctx, seg: &str, producers: &[String]) -> Option<Reach> 
 pub fn interpreter_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<Reach>, Fault> {
     let raw = ctx.raw(c)?;
     let ps = ctx.shell() == Shell::PowerShell;
-    let read = if ps { None } else { ctx.word_read(c)? };
+    let read = ctx.word_read(c)?;
     let valued = read.iter().flatten().flatten().any(|w| names_scratch(ctx, &w.value));
     if !(names_scratch(ctx, raw) || valued) || ctx.expands(c, declines_expansion)? {
         return Ok(None);
     }
     let s = ctx.view(c, SqDqHd)?;
     let members: Vec<Vec<String>> = ctx.statements(&s).iter().map(|stmt| ctx.pipes(stmt)).collect();
-    let commands = if ps { None } else { Some(command_read(ctx, c)?) };
-    let commands = commands.filter(|cr| cr.len() == members.iter().map(Vec::len).sum::<usize>());
+    let commands = Some(command_read(ctx, c)?).filter(|cr| cr.len() == members.iter().map(Vec::len).sum::<usize>());
     let mut at = 0usize;
     for pipes in &members {
         for (i, pipe) in pipes.iter().enumerate() {
@@ -804,7 +802,13 @@ pub fn interpreter_reach(ctx: &Ctx, c: &Cmd) -> Result<Option<Reach>, Fault> {
                 continue;
             }
             if ps {
-                if let Some(r) = powershell_form(ctx, &seg, &pipes[..i]) {
+                let producers: Vec<Vec<&str>> = (0..i)
+                    .map(|j| match commands.as_ref() {
+                        Some(cr) => cr[at - 1 - i + j].iter().map(|w| w.value.as_str()).collect(),
+                        None => words(&pipes[j]),
+                    })
+                    .collect();
+                if let Some(r) = powershell_form(ctx, &toks, &producers) {
                     return Ok(Some(r));
                 }
             }

@@ -2,6 +2,3 @@
 # --run-guard-tests (guard-kit/SPEC.md §Testing). A row is deleted in the commit that lifts its
 # read or withholds its grant, and the lane fails on a row nothing needs.
 fallthrough	pgrep_self_match	part-arg
-fallthrough	script_interpreter	ps-dq-arg
-fallthrough	script_interpreter	ps-sq-arg
-fallthrough	script_interpreter	ps-tick-lead
