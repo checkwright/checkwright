@@ -1,8 +1,14 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: site-health-statistics-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The set (operator direction 2026-10-18, lead-relayed, not a ruling; the iteration opened undirected):** option A. The features `iteration-statistics-view`, `site-health-resample-knobs`, `site-health-probe-unexecuted` and `site-health-issue-venue-unwanted`, which spec authors and promotes; scope promotes no debt. Stages scope, spec, build, validate and close, with align where `check-stage-entry` assertion C fires. Order on the site-health template: the knobs and the issue opt-in land before the probe test, whose cases read both.
+
+  **Push need (2026-10-18, inside the budget):** the closing push alone; no unit's completion reads a remote run, the probe being exercised by a local test under stubs, never a dispatched run. A v0.32.0 tag push, should close cut it, is the second.
 
 ---
 
@@ -96,7 +102,7 @@ the site-health probe files issues on the public repo for failures the iteration
 
 **The fork, unresolved, and it is two changes rather than one.** (1) Repo-copy only: delete the step and the `issues: write` scope from `.github/workflows/site-health.yml`. One file — but that file is pinned governed repo-meta in `scripts/core-files.list` and is a copy of `site-kit/templates/site-health.yml`, so this forks the template a repo governed by its own kits dogfoods. (2) Kit-level opt-in: the issue path becomes consumer config defaulting **off** under the `<KIT>_<KNOB>` convention, with this repo taking the default — template plus site-kit/SPEC.md plus `site-kit/smoke/install.sh`, which copies the template in.
 
-**Option 2 is the recommendation and it is BLOCKED, operator-class.** The template header states the issue path as a standing design ruling — a failed probe opens or updates an issue and recovery self-clears — so making it opt-out reverses that ruling, which is the operator's to do and neither a stage's nor a lead's. Recorded rather than resolved.
+**Option 2, operator direction 2026-10-18, lead-relayed, not a ruling:** the issue path becomes kit-level consumer config under `<KIT>_<KNOB>`, defaulting off, and this repo takes the default. The operator was told it reverses the shipped design site-kit/SPEC.md §templates/site-health.yml states, that a failed probe opens or updates an issue and recovery self-clears.
 
 **The replacement signal is the whole cost, and one half is now probed.** Candidate A, red run only: GitHub's documented scheduled-failure notification targets the last modifier of the **cron syntax** — not the last committer — and here that is `016d522a`, 2026-07-10, the operator, so the channel resolves to the right person today. The limit that cannot be probed from the tree is whether their notification settings deliver it. Candidate B, write the failure report to the run's job summary: visible in the Actions tab and files nothing, but the workflow writes no step summary today, so this is net-new work rather than a redirect.
 
