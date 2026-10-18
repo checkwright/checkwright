@@ -34,6 +34,9 @@ jobs:
           RELEASE_NOTE_URL_PATH: '/posts/{slug}'
           HIGHLIGHT_CSS_PATH: '/assets/css/style.css'
           HIGHLIGHT_TOKENS_FILE: 'scripts/highlight-tokens.list'
+          # spec: site-kit/SPEC.md §templates/site-health.yml — the resample's bounds; RESAMPLE_ATTEMPTS: '1' turns it off
+          RESAMPLE_ATTEMPTS: '3'
+          RESAMPLE_PAUSE: '30'
           FORCE_FAIL: ${{ inputs.force_fail }}
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -48,10 +51,16 @@ jobs:
           echo "apex host: $apex"
 
           # spec: site-kit/SPEC.md §templates/site-health.yml — the resample
-          attempts=3
-          pause=30
+          attempts="${RESAMPLE_ATTEMPTS-}"
+          pause="${RESAMPLE_PAUSE-}"
+          knob=""
+          if ! [[ "$attempts" =~ ^[1-9][0-9]*$ ]]; then
+            knob="RESAMPLE_ATTEMPTS must be a positive integer, 1 turning the resample off (got '$attempts')"
+          elif ! [[ "$pause" =~ ^[0-9]+$ ]]; then
+            knob="RESAMPLE_PAUSE must be whole seconds, 0 admitted (got '$pause')"
+          fi
           attempt=1
-          while :; do
+          while [ -z "$knob" ]; do
             failures=()
 
             code="$(curl -sS -m 20 -o /dev/null -w '%{http_code}' "https://$apex/")"
@@ -258,7 +267,11 @@ jobs:
             attempt=$(( attempt + 1 ))
             sleep "$pause"
           done
-          echo "probe set settled on attempt $attempt of $attempts"
+          if [ -n "$knob" ]; then
+            failures=("$knob")
+          else
+            echo "probe set settled on attempt $attempt of $attempts"
+          fi
 
           if [ "$FORCE_FAIL" = true ]; then
             failures+=("synthetic failure (force_fail dispatch input)")

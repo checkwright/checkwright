@@ -14,16 +14,6 @@
 
 ## New Features
 
-### site-health-resample-knobs
-
-[spec: SPEC-resample-knobs.md]
-
-site-kit/templates/site-health.yml's resample loop sets its attempt count and its pause as literals in the probe step's run body, outside the step's env block that holds the template's other knobs, and site-kit/SPEC.md §templates/site-health.yml says the template owns both as literals. doctrine-kit/DOCTRINE.md Policy-as-choice asks a calibration to ship as a consumer-selectable set, off among it.
-
-**Deliverable:** both lifted into the probe step's env block, one attempt meaning off, the SPEC section stating the set; a feature, since each is a new name on the template's config surface.
-
-**Cost while deferred:** a copier wanting another bound, or no resample, edits the probe body. Filed 2026-10-06 by site-fence-release-cites-pass' close audit. Re-verified: the run body assigns `attempts=3` beside a pause, and the SPEC's resample paragraph states the ownership. Owner lookup: `site-health`, `resampl`, `attempts`, `pause` in this file and the disposed-findings record — [site-health-probe-unexecuted](#site-health-probe-unexecuted), DISTINCT (the loop's missing oracle, which this reshapes: its cases would read the knobs); [site-health-issue-venue-unwanted](#site-health-issue-venue-unwanted), DISTINCT (the issue step's venue).
-
 ### site-health-issue-venue-unwanted
 
 [spec: SPEC-issue-opt-in.md] [not-icebox-eligible: 2026-09-21 operator-ruled, cron-armed]
@@ -267,7 +257,7 @@ the session-context hook member bakes its scratch sweep's age horizon: it remove
 
 **Deliverable:** the horizon as a context-kit knob with an off value, its row in context-kit/SPEC.md §Layout and configuration and §The session-context hook stating the set; a feature, since it adds a knob.
 
-**Cost while deferred:** a consumer wanting another horizon, or no sweep, has no setting. Filed 2026-10-07 off windows-shell-floor-pass' close audit, carried to the next scope's intake. Re-verified: the constant, and no `CONTEXT_KIT_` knob in the SPEC names a sweep. Owner lookup: `age horizon`, `scratch sweep`, `STALE_SECS` in this file and the disposed-findings record — none; [site-health-resample-knobs](#site-health-resample-knobs), DISTINCT (the same class on site-kit's template).
+**Cost while deferred:** a consumer wanting another horizon, or no sweep, has no setting. Filed 2026-10-07 off windows-shell-floor-pass' close audit, carried to the next scope's intake. Re-verified: the constant, and no `CONTEXT_KIT_` knob in the SPEC names a sweep. Owner lookup: `age horizon`, `scratch sweep`, `STALE_SECS` in this file and the disposed-findings record — none; `site-health-resample-knobs`, DISTINCT (the same class on site-kit's template).
 
 ### session-sweep-live-scratch
 
@@ -1034,4 +1024,6 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
+
+- site-health-resample-knobs
 

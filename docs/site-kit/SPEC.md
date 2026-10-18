@@ -28,7 +28,7 @@ The kit is vendored beside gate-sdk (conventionally at `site-kit/`). Its gates r
 
 Config is a **knob file**: write a `site-config.knobs` in the gates dir, or point `SITE_KIT_KNOB_FILE` elsewhere, setting any knob [§Knob defaults](#knob-defaults) lists. Defaults fill what the file leaves unset. [gate-sdk/SPEC.md §The knob file](../gate-sdk/SPEC.md#the-knob-file) owns the grammar, the `.local` overlay, the environment-over-file precedence for a scalar, and the refusals: a set `SITE_KIT_KNOB_FILE` that does not exist, a left-behind `site-config.sh`, and a non-empty file named by the retired `SITE_KIT_CONFIG_FILE`.
 
-`templates/site-health.yml` is governed by none of these. Its knobs (`ALT_DOMAIN`, the three `RELEASE_NOTE_*` and the two `HIGHLIGHT_*` below) are **step-level workflow env** set in the copied file itself, not `SITE_KIT_*` knobs, and no knob file names them. The template is copied and edited, not read as config. Reaching into the gates dir would couple a monitor to it, and would hard-code a vendored kit path into a workflow distributed by verbatim copy.
+`templates/site-health.yml` is governed by none of these. Its knobs (`ALT_DOMAIN`, the three `RELEASE_NOTE_*`, the two `HIGHLIGHT_*` and the two `RESAMPLE_*`, all below) are **step-level workflow env** set in the copied file itself, not `SITE_KIT_*` knobs, and no knob file names them. The template is copied and edited, not read as config. Reaching into the gates dir would couple a monitor to it, and would hard-code a vendored kit path into a workflow distributed by verbatim copy.
 
 ## Knob defaults
 
@@ -254,10 +254,10 @@ The scheduled live-site probe, copied verbatim into a consumer's `.github/workfl
 
 A failure opens or updates a single `site-health` issue and reds the run; recovery closes it. The `ALT_DOMAIN` value is a bare hostname, never a `://` literal, so it does not itself trip the parity gate. A `# enforce:` marker rides the template so that, once copied, an enforcement map projects it as a monitor. Its floating `runs-on` label follows [gate-sdk/SPEC.md §templates/gates-workflow.yml](../gate-sdk/SPEC.md#templatesgates-workflowyml).
 
-**The resample.** One bad sample is not a failure. The probe set runs up to a bounded number of attempts with a pause between them, and only a set that fails on the last attempt reaches the failure path. The template owns the count and the pause as literals, as it owns each probe's timeout. The whole set is resampled, never one request, so a single bound covers every arm, the API reads included, and a wrong answer no HTTP client classes as transient is resampled too.
+**The resample.** One bad sample is not a failure. The probe set runs up to a bounded number of attempts with a pause between them, and only a set that fails on the last attempt reaches the failure path. The bounds are two values in the probe step's env block: `RESAMPLE_ATTEMPTS`, a positive integer where `1` turns the resample off, and `RESAMPLE_PAUSE`, the whole seconds between attempts, `0` admitted. The template ships them at `3` and `30`. A value outside its set is a misconfigured knob and therefore a finding: the step reports it as the set's one failure and runs no probe. The whole set is resampled, never one request, so a single bound covers every arm, the API reads included, and a wrong answer no HTTP client classes as transient is resampled too.
 
 - **The report** is the last attempt's failures; an earlier attempt's are printed to the run log only.
-- **A standing defect is resampled too**, a misconfigured knob included, so it reaches the issue later by the pauses.
+- **A standing defect is resampled too**, a misconfigured arm knob included, so it reaches the issue later by the pauses.
 - **The synthetic failure** the `force_fail` input injects is added after the last attempt and waits out no pause.
 - **Each attempt prints its own census lines**, and the run log says which attempt settled the set.
 - **A failing run costs up to the attempt count times** what **Cost per run** below states.
