@@ -53,12 +53,22 @@ pub struct Ovh {
     pub gate: f64,
 }
 
-// spec: drift-kit/SPEC.md §The statistics view — a line off the meter's grammar parses to nothing
+// spec: drift-kit/SPEC.md §The statistics view — a line off the meter's grammar
+// (§The overhead meter) parses to nothing
 fn ovh_line(line: &str) -> Option<Ovh> {
-    let session8 = line.split_whitespace().nth(1)?;
-    if session8.contains('=') {
+    let f: Vec<&str> = line.split_whitespace().collect();
+    let [date, session8, rest @ ..] = f.as_slice() else {
+        return None;
+    };
+    let tags = ["total=", "gov=", "gate=", "pct="];
+    if !crate::queue::is_iso_date(date)
+        || session8.contains('=')
+        || rest.len() != tags.len()
+        || rest.iter().zip(tags).any(|(t, tag)| !t.starts_with(tag))
+    {
         return None;
     }
+    overhead::tagged(line, "pct=")?;
     Some(Ovh {
         session8: session8.to_string(),
         total: overhead::tagged(line, "total=")?,
@@ -1720,6 +1730,10 @@ mod tests {
         );
         assert_eq!(ovh_line("2026-07-11 total=1 gov=1 gate=1"), None);
         assert_eq!(ovh_line("2026-07-11 472b902e total=1 gate=1"), None);
+        assert_eq!(ovh_line("garbage 472b902e total=100 gov=90 gate=10"), None);
+        assert_eq!(ovh_line("garbage 472b902e total=100 gov=90 gate=10 pct=90"), None);
+        assert_eq!(ovh_line("2026-07-11 472b902e total=100 gov=90 gate=10"), None);
+        assert_eq!(ovh_line("2026-07-11 472b902e total=x gov=90 gate=10 pct=90"), None);
 
         let r = render(&inputs());
         assert!(r.report.contains("  governance share: charted\n"), "{}", r.report);

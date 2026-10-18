@@ -312,6 +312,26 @@ rule `background_no_record` misses a backgrounded writer behind a read's bare `&
 
 **Cost while deferred:** an unrecorded producer a later commit can race. Filed 2026-10-18 by guard-grant-kpi-pass' close, draining its build's bullet; pre-existing, not moved by `ro-pipeline-wrong-grants`. Re-verified there: all four commands on the built binary. Owner lookup: `background_no_record`, `bare '&'` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The generic ruleset.
 
+### ro-background-quoted-fd-target
+
+[cost: event/low] [surface: guard-kit]
+
+rule `background_no_record`'s read-only exemption (`is_ro_background`, `native/src/guard/rules/liveness.rs`) still reads a quoted `'&1'` redirect target as an fd-dup: `sort > '&1'` with `run_in_background` falls through, where `sort > tracked.md` blocks for the missing record, though the call writes a file named `&1`. `ro-pipeline-wrong-grants` widened the value read so no value-read target is an fd-dup, and missed this site.
+
+**Deliverable:** the exemption reads the target by value, with a firing background row of this shape. It moves a verdict from fall-through to block, so it lands in a build.
+
+**Cost while deferred:** an unrecorded backgrounded write a later commit can race; never a wrong grant. Surfaced 2026-10-18 by guard-grant-kpi-pass' close (second-vendor review, P3), promoted at the next scope's carried-bullet intake. Re-verified there: both commands on the built binary. Owner lookup: `is_ro_background`, `fd-dup`, `'&1'` in this file and the disposed-findings record, none; [background-record-bare-amp](#background-record-bare-amp) is DISTINCT (the same rule's `&`-joined segment walk, not its target read); owner guard-kit/SPEC.md §The generic ruleset.
+
+### word-read-dollar-quote-grants
+
+[cost: event/low] [surface: guard-kit]
+
+the bash word read answers nothing on a call carrying an ANSI-C (`$'...'`) or locale-translated (`$"..."`) word since the two hotfixes that closed their wrong grants, so read-only calls `ro_pipeline` granted by value fall through to a prompt: `grep $'a\tb' tracked.md`, `head -5 $'README.md'`, `ls $'docs'`, `echo $'a\nb' | wc -l`, `grep $"a" tracked.md`.
+
+**Deliverable:** a feature, since it lifts a refusal guard-kit/SPEC.md §The reader and its views states: ANSI-C escapes (octal, hex, `\u`, `\c`, the C escapes) resolved into the value face, restoring those grants; for `$"..."` the guard cannot see the catalog (`TEXTDOMAIN`, `TEXTDOMAINDIR`, the locale), so a read as its double-quoted value is weighed against keeping the refusal declared. It widens grants, the class the release bar reads.
+
+**Cost while deferred:** one permission decision per such call. Surfaced 2026-10-18 and 2026-10-19 by the two word-read hotfixes after guard-grant-kpi-pass' close, promoted at the next scope's carried-bullet intake as one entry. Re-verified there: each call above falls through on the built binary, `tracked.md` as `TASK-QUEUE.md`, and the plain `grep a` allows. Owner lookup: `ANSI-C`, `value face`, `locale` in this file and the disposed-findings record, none; [pwsh-herestring-word-read](#pwsh-herestring-word-read) is DISTINCT (the PowerShell reader); owner guard-kit/SPEC.md §The reader and its views.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
