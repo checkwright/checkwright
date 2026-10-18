@@ -84,7 +84,7 @@ A cross-component causal gap surfacing at build is not a deferred TODO: stop, re
    - **A Done move there asserts an unfinished deliverable finished.** A done entry is a bare slug, so **every** tag goes with it, one a generated public projection reads included, dropping the item there while the work remains outstanding.
    - **A demotion lands the entry back inside a size cap.** queue-kit's size cap measures a deferred entry ([queue-kit/SPEC.md §check-queue-entry-budget](../queue-kit/SPEC.md#check-queue-entry-budget)). Any roster or table this amendment has the build transcribe onto the entry is priced against that cap, and an entry near it is compressed in the demoting commit.
    - **Return it to the position it was promoted from, with the board tags the promotion dropped:** `--queue demote <slug>` recovers both from the revision before the promoting commit ([queue-kit/SPEC.md §The queue verbs](../queue-kit/SPEC.md#the-queue-verbs)). No surface owns a demoted entry's position, so otherwise two batches demoting into one section in sequence reverse their relative order. A deferred entry carries the board tags ([queue-kit/SPEC.md §check-deferred-board-tags](../queue-kit/SPEC.md#check-deferred-board-tags)).
-5. Propagate removals (grep every spec for names the change retired), file discovered gaps as debt tasks, and commit the merge with the work.
+5. Propagate removals (grep every spec for names the change retired, and repoint a dated post's citation of a retired heading, [§check-spec-pointer](#check-spec-pointer)), file discovered gaps as debt tasks, and commit the merge with the work.
 
 The shipped amendment template ends in a Definition-of-Done checklist that includes causal completeness, instruction-only replacement text (the doctrine rule named, not linked: the prose profile vendors no doctrine-kit), merged-with-no-information-lost, the file-deleted assertions, and gap filing.
 
@@ -395,7 +395,7 @@ Three valves suppress a legitimately past line:
 
 - a per-site `manifest-temporal-exempt: <reason>` comment on the line or the one above;
 - `CANON_KIT_TEMPORAL_EXEMPT_SECTIONS`, heading names whose whole section, subsections included, is exempt, so a deliberate-absence section may narrate what the kit excludes;
-- `CANON_KIT_TEMPORAL_EXEMPT_PATHS`, path globs whose whole file is exempt, for an immutable dated-narrative surface a heading cannot address: dated announcement posts, which take link and command resolution but not narration governance.
+- `CANON_KIT_TEMPORAL_EXEMPT_PATHS`, path globs whose whole file is exempt, for an immutable dated-narrative surface a heading cannot address: dated announcement posts, which take link, command and section-citation resolution but not narration governance.
 
 The same valves admit a retired path under [§check-docs-cmd](#check-docs-cmd) assertion C and a retired knob under its assertion B, so one exemption clears both gates, and this section, which owns the valves, states their reach once. A finding names the file, line and marker. An unreadable manifest fails closed.
 
@@ -773,6 +773,8 @@ The pass reads three citation forms:
 - a `§` with no path, resolved against the headings of the whole manifest set, the citing file included.
 
 An adjacent path that is not a tracked file is out of scope, since path liveness stays with `check-md-refs` and `check-kit-ref-liveness`, and a link target that is not a tracked file (a URL, an untracked path) drops to the third form. The third form's intended file is not syntactic, because prose puts the owning path before the heading, after it or nowhere. So it asserts liveness and not provenance: the heading exists somewhere in the governed set, and a citation aimed at the wrong file that carries a live title passes, its finding reading "in no governed file". A fragment not opening with a letter, a digit or a backtick is a placeholder (`§<heading>`) or the mark itself and never fires, and neither does a `§` inside a code span. In the third form one opening with an ASCII digit (`0`–`9`) never fires either, being a section-number mark (`§3`, `§2.1`); another script's digit opens a heading.
+
+**A dated post's citation is held like its links.** A file matching `CANON_KIT_TEMPORAL_EXEMPT_PATHS`, immutable as prose, stays in this pass. A unit retiring a heading such a file cites repoints the citation in the same commit, to the section now carrying its content or to the file alone when none does, the one edit such a file takes. No valve: a published citation to a retired section dangles for every reader, as a dead link would.
 
 Honest limits. A short heading is a prefix of many fragments, so the union under-reds around short titles. A heading opening with an ASCII digit (`## 3. Terms`) is checked only when cited with a path. It over-reds once: a citation naming a lead and running on with the heading's own separator as prose is the separator bound's.
 

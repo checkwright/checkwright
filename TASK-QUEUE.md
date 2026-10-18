@@ -38,16 +38,6 @@ Run at spec: an aged scratch role marker and an aged directory, the member start
 
 **Cost while deferred:** a resumed lead silently loses its executor-step suppression, and a survey witness cannot be re-run without rebuilding its input. Filed 2026-10-13 by guard-spelling-oracle-pass' lead and promoted at the next scope's intake. Re-verified there by reading `sweep_dir`. Owner lookup: `scratch sweep`, `role marker`, `STALE_SECS` in this file and the disposed-findings record — [session-sweep-horizon-baked](#session-sweep-horizon-baked), DISTINCT (the horizon's value, where this is what the sweep spares at any horizon); owner context-kit/SPEC.md §The session-context hook.
 
-### post-spec-cite-no-valve
-
-[spec: SPEC-post-citation.md]
-
-a dated post citing a kit SPEC section by heading reds `check-spec-pointer` when a later unit deletes that section. The other canon gates hold a post immutable and this one carries no valve for it, so an amendment rostering such a post as left standing cannot be followed. Met at native-executable-git-hooks, whose landing repointed the v0.30.0 post's one citation.
-
-**Deliverable:** one rule for a post's section citation, either a valve on the gate's prose-citation pass or a stated duty to repoint; which is spec's, against canon-kit/SPEC.md §check-spec-pointer.
-
-**Cost while deferred:** each section deletion a post cites edits a surface the tree calls immutable. Filed 2026-10-06 by windows-shell-floor-pass' build. Re-verified: the landing commit's diff carries a one-line edit to that post. Owner lookup: `docs/posts`, `check-spec-pointer`, `immutable` in this file and the disposed-findings record — [step-title-cite-unresolved](#step-title-cite-unresolved), DISTINCT (a step title no gate resolves).
-
 ### list-lead-in-count-unheld
 
 [spec: SPEC-lead-in-count.md]
@@ -997,4 +987,6 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
+
+- post-spec-cite-no-valve
 

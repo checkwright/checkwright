@@ -6,7 +6,7 @@ title: Page authoring
 
 This page holds the rules a docs page is written to.
 
-A page's `title:` is its nav label and its H1 the label's full form: the H1 names the label's subject, as *Install* and *Install and upgrade* do. Living pages are governed prose under the anti-restatement doctrine (cite downward, never restate a SPEC's invariant); dated `docs/posts/` are immutable, temporal-exempt but still link/command-resolved (`scripts/canon-config.knobs`). A page off-nav by design joins `scripts/docs-offnav.list` — an embedded data fragment no link targets, or maintainer governance like this page reached only by citation.
+A page's `title:` is its nav label and its H1 the label's full form: the H1 names the label's subject, as *Install* and *Install and upgrade* do. Living pages are governed prose under the anti-restatement doctrine (cite downward, never restate a SPEC's invariant); dated `docs/posts/` are immutable, temporal-exempt but still link-, command- and section-citation-resolved, a retired target's repoint being the one edit a post takes (`scripts/canon-config.knobs`). A page off-nav by design joins `scripts/docs-offnav.list` — an embedded data fragment no link targets, or maintainer governance like this page reached only by citation.
 
 **Nav labels.** Sibling labels are parallel in form: all nouns, or all a product's names. A child's label never repeats its parent's, since the parent already frames it. An overview is the parent of its subpages, never their sibling. `check-docs-nav-reachable` holds the last rule ([§Site chrome and the nav contract](site-architecture.md#site-chrome-and-the-nav-contract)). The other two are review's.
 
