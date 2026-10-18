@@ -138,7 +138,7 @@ pub fn json_words(payload: Option<&serde_json::Value>) -> Option<Vec<String>> {
     }
     let segs = reader.word_read(cmd)?;
     let line = |ws: &[reader::Word]| {
-        let vals: Vec<String> = ws.iter().map(|w| w.value.replace('\\', "\\\\").replace('\t', "\\t")).collect();
+        let vals: Vec<String> = ws.iter().map(|w| reader::unmark(&w.value).replace('\\', "\\\\").replace('\t', "\\t")).collect();
         vals.join("\t")
     };
     Some(segs.iter().map(|ws| line(ws)).collect())
@@ -260,7 +260,7 @@ mod tests {
     #[test]
     fn an_emitter_write_steer_names_a_quoted_target_by_its_value() {
         let host = host::Host::load(false).expect("the guard's knobs load");
-        for cmd in ["echo x > \"README.md\"", "printf x >> 'README.md'"] {
+        for cmd in ["echo x > \"README.md\"", "printf x >> 'README.md'", "cat >> \"README.md\" <<'EOF'\nx\nEOF"] {
             match engine::decide(&bash::Bash, engine::Shell::Bash, &host, &engine::Cmd::new(cmd)) {
                 Some(engine::Verdict::Block(m)) => {
                     assert!(m.contains("'README.md'"), "{}: {}", cmd, m);
@@ -268,14 +268,6 @@ mod tests {
                 }
                 v => panic!("{}: {:?}", cmd, v),
             }
-        }
-        let heredoc = engine::Cmd::new("cat >> \"README.md\" <<'EOF'\nx\nEOF");
-        match engine::decide(&bash::Bash, engine::Shell::Bash, &host, &heredoc) {
-            Some(engine::Verdict::Block(m)) => {
-                assert!(m.contains("don't write the quoted target through a redirect"), "{}", m);
-                assert!(!m.contains('\0') && !m.contains("'DQ'"), "{}", m);
-            }
-            v => panic!("the heredoc write: {:?}", v),
         }
     }
 
@@ -299,7 +291,10 @@ mod tests {
         assert_eq!(words("echo 'a\\b'"), one("echo\ta\\\\b"));
         let ps = serde_json::json!({"tool_name": "PowerShell", "tool_input": {"command": "git `clean -X"}});
         assert_eq!(json_words(Some(&ps)), one("git\tclean\t-X"));
-        assert_eq!(words("git commit -F - <<'MSG'\nx\nMSG"), None);
+        assert_eq!(
+            words("git commit -F - <<'MSG'\nx\nMSG"),
+            Some(vec!["git\tcommit\t-F\t-\t<<'MSG'".to_string(), "HD".to_string(), "MSG".to_string()])
+        );
         let read = serde_json::json!({"tool_name": "Read", "tool_input": {"command": "ls"}});
         assert_eq!(json_words(Some(&read)), None);
         assert_eq!(words("\n"), None);

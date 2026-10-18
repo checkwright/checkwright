@@ -16,16 +16,6 @@
 
 ## New Features
 
-### guard-word-read-heredoc
-
-[spec: SPEC-word-read-heredoc.md]
-
-the bash word read answers nothing on a call carrying a heredoc (the dequoted view refuses, and the skeleton keeps a quoted delimiter verbatim), so rules `append_scratch` and `emitter_write` read a quoted redirect target there off the skeleton. `cat >> ".tmp/j.md" <<'EOF'` is falsely blocked by `emitter_write`, whose steer names the quoted target, and a quoted `/dev/null` beside a heredoc withholds the append grant.
-
-**Deliverable:** the word read answered on heredoc calls (the body a mark word, the delimiter live verbatim), a reader change reaching every by-value rule and `--guard-json words`. Verdict-moving, so a close promotes it.
-
-**Cost while deferred:** a prompt or block on a quoted scratch target beside a heredoc, which the unquoted spelling avoids. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: the call above exits 2 with the quoted-target steer, `.tmp/` gitignored. Owner lookup: `heredoc`, `word read` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The reader and its views.
-
 ### statistics-kpi-breadth
 
 [spec: SPEC-kpi-breadth.md]
@@ -1019,4 +1009,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 ## Done
 
 - pwsh-string-expr-overblock
+- guard-word-read-heredoc
 

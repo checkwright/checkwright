@@ -175,6 +175,7 @@ pub trait Reader {
     // spec: guard-kit/SPEC.md §The shell guard — a segment as the permission matcher reads it.
     fn harness_view<'a>(&self, seg: &'a str) -> &'a str;
     // spec: guard-kit/SPEC.md §The reader and its views — the word read: each compound-split segment's
-    // words; `None` where the dequoted view cannot be aligned.
+    // words; `None` where the dequoted view cannot be aligned outside a heredoc, or where the walk and
+    // the compound split of the skeleton part.
     fn word_read(&self, text: &str) -> Option<Vec<Vec<Word>>>;
 }

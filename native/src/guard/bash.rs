@@ -641,13 +641,49 @@ pub fn dequoted(raw: &str) -> Option<String> {
 }
 
 // spec: guard-kit/SPEC.md §The reader and its views — the word read; `None` where the dequoted view
-// cannot be aligned, or where the walk and the compound split of the skeleton part.
+// cannot be aligned outside a heredoc, or where the walk and the compound split of the skeleton part.
 pub fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
-    dequoted(raw)?;
-    let b = text::chomp(raw).as_bytes();
+    let t = text::chomp(raw);
+    let (_, extents, bodies) = scan(t, Wants::default());
+    let heredoc = !extents.is_empty();
+    if !heredoc {
+        dequoted(raw)?;
+    }
+    let b = t.as_bytes();
     let mut acc = WordAcc::new();
     let mut i = 0usize;
+    let (mut at, mut term_at) = (0usize, None::<usize>);
+    let bare = |acc: &mut WordAcc, bytes: &[u8]| {
+        for &c in bytes {
+            if is_space(c) {
+                acc.end_word();
+            } else {
+                acc.piece(&[c], &[c], &[c]);
+            }
+        }
+    };
     while i < b.len() {
+        if let Some(e) = extents.get(at) {
+            if i == e.start && term_at.is_none() {
+                let held = bodies[at].len();
+                if held == 0 {
+                    term_at = Some(i);
+                } else {
+                    let end = (e.start + held - 1).min(b.len());
+                    acc.piece(&b[i..end], HD_MARK.as_bytes(), HD_MARK.as_bytes());
+                    term_at = Some(end + 1);
+                    i = end;
+                    continue;
+                }
+            }
+            if term_at == Some(i) {
+                bare(&mut acc, &b[i..e.end]);
+                i = e.end;
+                at += 1;
+                term_at = None;
+                continue;
+            }
+        }
         match b[i] {
             b'\\' => {
                 match b.get(i + 1) {
@@ -659,6 +695,9 @@ pub fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
             }
             b'\'' => {
                 let k = b[i + 1..].iter().position(|&c| c == b'\'')?;
+                if heredoc && b[i + 1..i + 1 + k].contains(&b'\n') {
+                    return None;
+                }
                 acc.piece(&b[i..i + k + 2], &b[i + 1..i + 1 + k], SQ_MARK.as_bytes());
                 i += k + 2;
             }
@@ -682,12 +721,24 @@ pub fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
                         }
                     }
                 }
+                if heredoc && b[i..=k].contains(&b'\n') {
+                    return None;
+                }
                 acc.piece(&b[i..=k], &value, DQ_MARK.as_bytes());
                 i = k + 1;
             }
             b' ' | b'\t' => {
                 acc.end_word();
                 i += 1;
+            }
+            b'<' if b[i..].starts_with(b"<<<") => {
+                bare(&mut acc, b"<<<");
+                i += 3;
+            }
+            b'<' if heredoc_header(&b[i..]).is_some() => {
+                let len = heredoc_header(&b[i..]).map_or(1, |h| h.0);
+                bare(&mut acc, &b[i..i + len]);
+                i += len;
             }
             c => match COMPOUND_SEPS.iter().find(|s| b[i..].starts_with(s)) {
                 Some(s) => {
@@ -936,9 +987,77 @@ mod tests {
         assert_eq!(faces("a \\\nb"), vec![vec![face("a", "a", "a"), face("b", "b", "b")]]);
         assert_eq!(faces("echo \"a\\nb\"")[0][1].1, "a\\nb");
         assert_eq!(word_read("echo 'open"), None);
-        assert_eq!(word_read("cat <<EOF\nx\nEOF"), None);
         assert_eq!(word_read("echo 'a\nb'"), None);
         assert_eq!(word_read("a \\&& b"), None);
+    }
+
+    // spec: guard-kit/SPEC.md §The reader and its views — a heredoc read as the skeleton holds it: the
+    // opener and the terminator bare, a non-empty body one mark word alone in its segment
+    #[test]
+    fn the_word_read_reads_a_heredoc_as_the_skeleton_holds_it() {
+        let hd = |s: &str| face(s, HD_MARK, HD_MARK);
+        let plain = |w: &str| face(w, w, w);
+        assert_eq!(faces("cat <<EOF\nx\nEOF"), vec![vec![plain("cat"), plain("<<EOF")], vec![hd("x")], vec![plain("EOF")]]);
+        assert_eq!(
+            faces("cat >> \".tmp/j.md\" << \"EOF\"\na 'b'\nc\nEOF"),
+            vec![
+                vec![plain("cat"), plain(">>"), face("\".tmp/j.md\"", ".tmp/j.md", DQ_MARK), plain("<<"), plain("\"EOF\"")],
+                vec![hd("a 'b'\nc")],
+                vec![plain("EOF")],
+            ]
+        );
+        assert_eq!(faces("cat <<'E\"F'\nx\nE\"F")[2], vec![plain("E\"F")], "a quoted delimiter keeps its quotes");
+        assert_eq!(faces("cat <<'EOF'\nEOF\nls"), vec![vec![plain("cat"), plain("<<'EOF'")], vec![plain("EOF")], vec![plain("ls")]], "an empty body adds no segment");
+        assert_eq!(
+            faces("a <<A <<-B\n1\nA\n2\n\tB"),
+            vec![vec![plain("a"), plain("<<A"), plain("<<-B")], vec![hd("1")], vec![plain("A")], vec![hd("2")], vec![plain("B")]],
+            "two heredocs on one line"
+        );
+        assert_eq!(faces("cat <<EOF\nnever\nends"), vec![vec![plain("cat"), plain("<<EOF")], vec![hd("never\nends")]], "a body with no terminator");
+        assert_eq!(word_read("cat <<EOF; echo 'a\nb'\nx\nEOF"), None, "a quoted span carrying a newline beside a heredoc");
+        assert_eq!(faces("cat <<< \"x y\"")[0][2], face("\"x y\"", "x y", DQ_MARK), "a herestring is no heredoc");
+    }
+
+    // spec: guard-kit/SPEC.md §The reader and its views — a heredoc adds only its own words, over every
+    // bash decision-table row one can be appended to
+    #[test]
+    fn a_heredoc_adds_only_its_own_words_to_every_row_it_can_follow() {
+        let table = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../guard-kit/guard-tests/cases.tsv");
+        let body = std::fs::read_to_string(table).unwrap();
+        let heredocs: [(&str, &[&str], &str); 3] =
+            [("<<'EOF'", &["x"], "x"), ("<<EOF", &["a \"b\" \\c"], "a \"b\" \\c"), ("<< \"EOF\"", &[], "")];
+        let mut seen = 0usize;
+        for line in body.lines() {
+            let Some((verdict, cell)) = line.split_once('\t') else { continue };
+            if verdict.trim().is_empty() || verdict.starts_with('#') {
+                continue;
+            }
+            if cell.contains(['#']) || cell.contains("<<") || cell.contains("@NL@") || cell.ends_with(['&', '|', ';', '\\']) {
+                continue;
+            }
+            let row = cell.replace("@ROOT@", "/tmp/sandbox").replace("@CR@", "\r");
+            let base = word_read(&row).unwrap_or_else(|| panic!("{:?} was not read", row));
+            for (opener, lines, spelling) in heredocs {
+                let mut call = format!("{} {}\n", row, opener);
+                for l in lines {
+                    call.push_str(l);
+                    call.push('\n');
+                }
+                call.push_str("EOF");
+                let mut want = base.clone();
+                let last = want.last_mut().expect("a read has a segment");
+                last.extend(opener.split(' ').map(|w| Word::new(w, w, w)));
+                if !spelling.is_empty() {
+                    want.push(vec![Word::new(spelling, HD_MARK, HD_MARK)]);
+                }
+                want.push(vec![Word::new("EOF", "EOF", "EOF")]);
+                let got = word_read(&call).unwrap_or_else(|| panic!("{:?} was not read", call));
+                let faces = |r: &[Vec<Word>]| r.iter().map(|s| s.iter().map(|w| (w.spelling.clone(), w.value.clone(), w.live.clone())).collect::<Vec<_>>()).collect::<Vec<_>>();
+                assert_eq!(faces(&got), faces(&want), "{:?}", call);
+                seen += 1;
+            }
+        }
+        assert!(seen > 0);
     }
 
     // spec: guard-kit/SPEC.md §The generic ruleset — the terminators, including the one a herestring's

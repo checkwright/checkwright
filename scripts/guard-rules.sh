@@ -20,7 +20,7 @@ msg_scratchpad="the harness per-session scratchpad (/tmp/claude-...) is not this
 # spec: CLAUDE.md §Housekeeping — .metric/ is gitignored persistent measurement trends and .tmp/ crash-recovery scratch; git clean -x/-X wipes both, so steer to the !<command> escape rather than let the destructive form auto-run
 msg_clean="git clean -x/-X wipes gitignored state — the irreplaceable measurement trends under .metric/ and crash-recovery resume journals under .tmp/. If you mean to discard them, run it yourself with !<command> so the intent is on record."
 
-# spec: guard-kit/SPEC.md §Consumer rules — every rule compares the command's word values per segment, as the shell passes them; where no word read answers (a heredoc-bearing command), it matches the 'sq dq hd' view, which none of the rules tests an expansion in and which keeps a heredoc body inert
+# spec: guard-kit/SPEC.md §Consumer rules — every rule compares the command's word values per segment, as the shell passes them; where no word read answers (a quoted span carrying a newline, say), it matches the 'sq dq hd' view, which none of the rules tests an expansion in and which keeps a heredoc body inert
 payload="$(cat)"
 words="$(printf '%s' "$payload" | "$bin" --guard-json words)" || {
     printf 'guard-rules: cannot read the command words through %s\n' "$bin" >&2

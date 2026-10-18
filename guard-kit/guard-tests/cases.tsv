@@ -30,6 +30,8 @@ fallthrough	file /usr/bin/time
 # arms (a) and (c) read words by value too
 block	git \-C @ROOT@ status --short
 block	command '/usr/bin/nohup' make build
+# a heredoc beside the call leaves its words read by value
+block	'git' -c core.pager=cat log --oneline -3 <<'EOF'@NL@x@NL@EOF
 
 # rule `git_c_root`'s arm (d) — an export, leading assignment or env prefix setting a kit
 #          knob to the value it already resolves to. The sandbox exports the
@@ -59,6 +61,8 @@ fallthrough	some-runner > .tmp/op.err 2>&1
 block	some-runner 2>'op.err'
 block	some-runner > op@CR@.log
 fallthrough	some-runner 2> '.tmp/op.err'
+# a heredoc beside the call leaves its targets read by value
+block	some-runner 2>'op.err' <<'EOF'@NL@x@NL@EOF
 
 # rule `abs_script` — absolute-path read-only repo script (rewrite) vs other script (block).
 #          The rewrite emits allow, so it attaches only when the rewritten command
@@ -202,6 +206,8 @@ fallthrough	perl -pi -e 's/a/b/'
 fallthrough	perl -I lib -pi -e 's/a/b/' notes.md
 fallthrough	perl -ne 'print if /x/' notes.md
 fallthrough	bash gate-sdk/bin/run-gates.sh --rewrite --regex 'a|b' 'c' notes.md
+# a heredoc beside the call leaves its options read by value
+block	sed -'n' '1,60p' TASK-QUEUE.md <<'EOF'@NL@x@NL@EOF
 # rule `sed_file`'s python arm — an inline body (a quoted heredoc feeding stdin, or a -c argument) that is a
 #          literal rewrite; a computed replacement, an import, a read-only body, a '$' in an
 #          unquoted-delimiter body and a module run all pass
@@ -448,6 +454,8 @@ fallthrough	git '-C' sub stash
 fallthrough	git 'stash push'
 fallthrough	git stash '>'
 fallthrough	git stash2>.tmp/o
+# a heredoc beside the call leaves its words read by value
+block	git 'stash' <<'EOF'@NL@x@NL@EOF
 
 # rule `truncate_scratch` — `: > file` truncation auto-allowed iff every target is gitignored
 allow	: > scratch.txt
@@ -510,10 +518,11 @@ allow	cat >> .tmp/journal.md 2>&1
 # a target is read by its value, so a quoted ignored target is granted and a quoted /dev/null is inert
 allow	printf x >> ".tmp/j.md"
 allow	printf x >> .tmp/j.md 2>"/dev/null"
-# the word read answers nothing on a heredoc-bearing call, so there a quoted target keeps the
-# skeleton's placeholder, a file no rule can name: the grant withholds and rule `emitter_write` blocks
-block	cat >> ".tmp/j.md" <<'EOF'@NL@x@NL@EOF
-block	cat >> .tmp/j.md 2>"/dev/null" <<'EOF'@NL@x@NL@EOF
+# a heredoc-bearing call's targets are read by value too, whatever its delimiter's quoting
+allow	cat >> ".tmp/j.md" <<'EOF'@NL@x@NL@EOF
+allow	cat >> .tmp/j.md 2>"/dev/null" <<'EOF'@NL@x@NL@EOF
+allow	cat >> ".tmp/j.md" << "EOF"@NL@x@NL@EOF
+allow	cat >> ".tmp/j.md" <<'E"F'@NL@x@NL@E"F
 # a carriage return is a word character, so a descriptor glued to one or behind one names a file
 block	cat >> .tmp/journal.md >&2@CR@tracked.md <<'EOF'@NL@line@NL@EOF
 block	cat >> .tmp/journal.md >&@CR@2 <<'EOF'@NL@line@NL@EOF
@@ -883,6 +892,9 @@ fallthrough	git reset --hard HEAD~1
 advise	git comm\it --amend
 advise	git --no-pager commit --amend
 fallthrough	echo --amend; git commit -m x
+# a heredoc beside the call leaves its words read by value, and its body stays a mark no rule reads
+advise	git 'commit' --amend -F - <<'EOF'@NL@msg@NL@EOF
+advise	git commit -F - <<'MSG'@NL@git stash; rm tracked.md@NL@MSG
 
 # rule `rm_tracked` — bare rm of a tracked path steers to 'git rm -q'; untracked,
 #           gitignored, and the already-correct git rm form pass
@@ -917,6 +929,8 @@ block	FOO=1 rm tracked.md
 block	if rm tracked.md; then ls; fi
 block	rm tracked.md 2>/dev/null
 block	'nohup' rm tracked.md
+# a heredoc beside the call leaves its operands read by value
+block	rm 'tracked.md' <<'EOF'@NL@x@NL@EOF
 # rule `rm_tracked`'s force arm — a 'git rm' carrying its force flag is blocked whether or
 #           not a grant matches: standalone, in a short cluster, long, abbreviated
 #           as git's option parser accepts it, behind a global option, and quoted or
@@ -983,10 +997,15 @@ block	python3 -<'.tmp/x.py'
 block	cat ".tmp/x.py" | python3
 fallthrough	bash <<< '.tmp/x.sh'
 # a carriage return glued to the '<' is part of bash's word, so the body is a file named with it in
-# the working directory: the word read and, under a heredoc, the fallback scan both take bash's blank
+# the working directory: the word read takes bash's blank, and so does the skeleton's scan on a call
+# the read refuses, a quoted newline say
 fallthrough	bash <@CR@.tmp/x.sh
 fallthrough	bash <@CR@.tmp/x.sh; cat <<'EOF'@NL@x@NL@EOF
+fallthrough	bash <@CR@.tmp/x.sh; echo 'a@NL@b'
+block	bash < .tmp/x.sh; echo 'a@NL@b'
 block	bash < .tmp/x.sh; cat <<'EOF'@NL@x@NL@EOF
+# a heredoc beside the call leaves its command word read by value
+block	\bash .tmp/x.sh <<'EOF'@NL@x@NL@EOF
 
 # rule `grant_path_slot` — a committed grant matched only by reaching past its path slot. The
 #           sandbox carries a scratch 'rm -rf .tmp/*' grant and a
@@ -1046,8 +1065,9 @@ fallthrough	make build > .tmp/b.log 2>&1 & echo "pid=$! run=b" > .tmp/b.run; wai
 fallthrough	echo x 2>"/dev/null"
 block	echo x > "README.md"
 block	printf x >> 'README.md'
-# a heredoc-bearing call's quoted target is the skeleton's, named the quoted target in the steer
+# a heredoc-bearing call's quoted target is read by its value too, and the steer names it
 block	cat >> "README.md" <<'EOF'@NL@x@NL@EOF
+fallthrough	echo x 2>"/dev/null" <<'EOF'@NL@x@NL@EOF
 
 # rule `shell_wrapper` — a bash -c or sh -c wrapper blocks; a wrapper behind another command
 #           word, and the scratch runner taking a script path, do not fire
