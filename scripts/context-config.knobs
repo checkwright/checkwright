@@ -52,6 +52,9 @@ CONTEXT_KIT_BRIEF_NUDGES[build] = scripts/brief-nudge-delegation.txt
 CONTEXT_KIT_BRIEF_COMMANDS[] = --usage-verdict
 CONTEXT_KIT_BRIEF_COMMANDS[] = --emit consult-count
 
+# comment-tier-exempt: the boundary wipe already reclaims .tmp/ at every scope entry, and with LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE set a stage journal the age sweep took after a day idle would refuse the next stage's entry
+CONTEXT_KIT_SWEEP_HORIZON_HOURS = off
+
 # spec: context-kit/SPEC.md §Layout and configuration — the policy calibrations this repo relies on, bound at the values its gates are green at so a kit default's move moves no verdict here (Policy-as-choice)
 CONTEXT_KIT_BREVITY_CAP = 330
 CONTEXT_KIT_BREVITY_POINTER_RE = §

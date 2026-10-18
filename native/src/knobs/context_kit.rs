@@ -100,6 +100,8 @@ pub const KIT: Kit = Kit {
             session_role_file,
             &["GATE_SDK_TMP_DIR"],
         ),
+        Row::scalar("CONTEXT_KIT_SWEEP_HORIZON_HOURS", "24"),
+        Row::indexed("CONTEXT_KIT_SWEEP_PRESERVE", &[]),
         Row::scalar("CONTEXT_KIT_BRIEF_COMPONENT_MARK", "src"),
         Row::keyed("CONTEXT_KIT_BRIEF_NUDGES", &[]),
         Row::scalar("CONTEXT_KIT_BRIEF_FOOTER_FILE", ""),
@@ -116,7 +118,8 @@ pub const KIT: Kit = Kit {
 };
 
 // spec: context-kit/SPEC.md §Layout and configuration — a broken context config gates nothing:
-// emptiness, the cap's positive-integer shape, and a settings file a consumer set to a path that is absent
+// emptiness, the cap's positive-integer shape, the sweep horizon's positive-integer-or-off shape,
+// and a settings file a consumer set to a path that is absent
 fn validate(v: &Values) -> Vec<String> {
     let mut errs: Vec<String> = Vec::new();
     for n in ["CONTEXT_KIT_SETTINGS_FILE", "CONTEXT_KIT_SETTINGS_PINS", "CONTEXT_KIT_BREVITY_FILE"] {
@@ -128,6 +131,11 @@ fn validate(v: &Values) -> Vec<String> {
     if let Some(b) = scalar(v, "CONTEXT_KIT_BREVITY_CAP") {
         if b.is_empty() || !b.bytes().all(|c| c.is_ascii_digit()) || b.bytes().all(|c| c == b'0') {
             errs.push(format!("CONTEXT_KIT_BREVITY_CAP must be a positive integer of code points (got '{}')", b));
+        }
+    }
+    if let Some(h) = scalar(v, "CONTEXT_KIT_SWEEP_HORIZON_HOURS") {
+        if h != "off" && !h.parse::<u64>().is_ok_and(|n| n > 0) {
+            errs.push(format!("CONTEXT_KIT_SWEEP_HORIZON_HOURS must be a positive integer of hours or off (got '{}')", h));
         }
     }
     errs

@@ -16,28 +16,6 @@
 
 ## New Features
 
-### session-sweep-horizon-baked
-
-[spec: SPEC-sweep-policy.md] [not-icebox-eligible: 2026-10-18 a shipped hook breaking Policy-as-choice, a defect rather than demand-gated work, whose site-kit sibling landed this iteration; evicting it would bury a known doctrine breach]
-
-the session-context hook member bakes its scratch sweep's age horizon: it removes scratch older than one day on a constant (`STALE_SECS` in `native/src/hook/session_context.rs`), with no context-kit knob and no off value, where doctrine-kit/DOCTRINE.md Policy-as-choice has a kit ship a calibration as a selectable set with off among it. The port carried the shell template's own literal.
-
-**Deliverable:** the horizon as a context-kit knob with an off value, its row in context-kit/SPEC.md §Layout and configuration and §The session-context hook stating the set; a feature, since it adds a knob.
-
-**Cost while deferred:** a consumer wanting another horizon, or no sweep, has no setting. Filed 2026-10-07 off windows-shell-floor-pass' close audit, carried to the next scope's intake. Re-verified: the constant, and no `CONTEXT_KIT_` knob in the SPEC names a sweep. Owner lookup: `age horizon`, `scratch sweep`, `STALE_SECS` in this file and the disposed-findings record — none; `site-health-resample-knobs`, done at site-health-statistics-pass, DISTINCT (the same class on site-kit's template).
-
-### session-sweep-live-scratch
-
-[spec: SPEC-sweep-policy.md]
-
-the session-context hook member's scratch sweep removes scratch a live session still needs. `sweep_dir` in `native/src/hook/session_context.rs` spares two dot-file names and nothing else, so a session resumed more than the horizon after it wrote them loses its session-role marker, after which the session-id arm's fallback names another session, and loses any scratch input a survey record's oracle reads (lifecycle-kit/SPEC.md §The survey record).
-
-**Deliverable:** the sweep sparing the role marker and a keep-list the consumer binds, on `LIFECYCLE_KIT_BOUNDARY_PRESERVE`'s posture, stated in context-kit/SPEC.md §The session-context hook; a feature where it adds a knob. Lands with [session-sweep-horizon-baked](#session-sweep-horizon-baked), which edits the same function.
-
-Run at spec: an aged scratch role marker and an aged directory, the member started over them, both removed (`Tidied 3`).
-
-**Cost while deferred:** a resumed lead silently loses its executor-step suppression, and a survey witness cannot be re-run without rebuilding its input. Filed 2026-10-13 by guard-spelling-oracle-pass' lead and promoted at the next scope's intake. Re-verified there by reading `sweep_dir`. Owner lookup: `scratch sweep`, `role marker`, `STALE_SECS` in this file and the disposed-findings record — [session-sweep-horizon-baked](#session-sweep-horizon-baked), DISTINCT (the horizon's value, where this is what the sweep spares at any horizon); owner context-kit/SPEC.md §The session-context hook.
-
 ## Technical Debt
 
 ## Deferred
@@ -971,4 +949,6 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - post-spec-cite-no-valve
 - list-lead-in-count-unheld
 - docs-chrome-page-repeat
+- session-sweep-horizon-baked
+- session-sweep-live-scratch
 

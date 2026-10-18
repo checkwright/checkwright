@@ -12,6 +12,8 @@ pub const KNOBS: &[&str] = &[
     "CONTEXT_KIT_DRIFT_REPORT",
     "CONTEXT_KIT_STAGE_RULES",
     "CONTEXT_KIT_SESSION_ROLE_FILE",
+    "CONTEXT_KIT_SWEEP_HORIZON_HOURS",
+    "CONTEXT_KIT_SWEEP_PRESERVE",
     "CONTEXT_KIT_ENV_PROFILE_FILE",
     "CONTEXT_KIT_BRIEF_COMPONENT_MARK",
     "CONTEXT_KIT_BRIEF_NUDGES",
@@ -24,14 +26,13 @@ pub const KNOBS: &[&str] = &[
 const RULE_OPEN: &str = "── Session context (context-kit session-context hook) ──────────────────";
 const RULE_CLOSE: &str = "────────────────────────────────────────────────────────────────────────";
 
-// spec: context-kit/SPEC.md §The session-context hook — the scratch sweep's age horizon, one day
-const STALE_SECS: u64 = 1440 * 60;
-
 struct Knobs {
     state_file: String,
     drift_arm: String,
     stage_rules: String,
     role_file: String,
+    horizon: Option<u64>,
+    keep: Vec<String>,
     env_profile: String,
     mark: String,
     nudges: Vec<(String, String)>,
@@ -47,6 +48,8 @@ fn knobs() -> Result<Knobs, String> {
         drift_arm: walk::knob_scalar("CONTEXT_KIT_DRIFT_REPORT")?,
         stage_rules: walk::knob_scalar("CONTEXT_KIT_STAGE_RULES")?,
         role_file: walk::knob_scalar("CONTEXT_KIT_SESSION_ROLE_FILE")?,
+        horizon: horizon_secs(&walk::knob_scalar("CONTEXT_KIT_SWEEP_HORIZON_HOURS")?)?,
+        keep: walk::knob_array("CONTEXT_KIT_SWEEP_PRESERVE")?,
         env_profile: walk::knob_scalar("CONTEXT_KIT_ENV_PROFILE_FILE")?,
         mark: walk::knob_scalar("CONTEXT_KIT_BRIEF_COMPONENT_MARK")?,
         nudges: walk::knob_map("CONTEXT_KIT_BRIEF_NUDGES")?,
@@ -55,6 +58,18 @@ fn knobs() -> Result<Knobs, String> {
         tmp_dir: walk::knob_scalar("GATE_SDK_TMP_DIR")?,
         door: crate::gates::door_spelling(&walk::knob_scalar("GATE_SDK_NATIVE_BIN")?),
     })
+}
+
+// spec: context-kit/SPEC.md §Layout and configuration — `off` is no sweep, else whole hours; the
+// predicate is the table validator's, so a value it admits always reads here
+fn horizon_secs(raw: &str) -> Result<Option<u64>, String> {
+    if raw == "off" {
+        return Ok(None);
+    }
+    match raw.parse::<u64>() {
+        Ok(h) if h > 0 => Ok(Some(h.saturating_mul(3600))),
+        _ => Err(format!("CONTEXT_KIT_SWEEP_HORIZON_HOURS is '{}', neither a positive integer nor off", raw)),
+    }
 }
 
 pub fn run(payload: &Payload) -> i32 {
@@ -118,7 +133,7 @@ fn brief(k: &Knobs, payload: Option<&Value>) -> String {
     }
 
     out.push_str(&memory_backstop());
-    out.push_str(&sweep(&k.tmp_dir));
+    out.push_str(&sweep(k));
     out.push_str(&footer(k));
 
     if !lead && !stage.is_empty() && !k.stage_rules.is_empty() {
@@ -261,27 +276,36 @@ fn memory_backstop() -> String {
     }
 }
 
-fn stale(path: &Path, now: std::time::SystemTime) -> bool {
+fn stale(path: &Path, now: std::time::SystemTime, horizon: u64) -> bool {
     path.symlink_metadata()
         .and_then(|m| m.modified())
         .ok()
         .and_then(|t| now.duration_since(t).ok())
-        .is_some_and(|age| age.as_secs() > STALE_SECS)
+        .is_some_and(|age| age.as_secs() > horizon)
+}
+
+struct Spare<'a> {
+    keep: &'a [String],
+    marker: &'a str,
 }
 
 // spec: context-kit/SPEC.md §The session-context hook — step 6, depth-first so a stale directory
-// goes once it is empty; the count is what was removed
-fn sweep_dir(dir: &Path, now: std::time::SystemTime) -> usize {
+// goes once it is empty; the count is what was removed. A keep-list name is matched at the scratch
+// root alone and never descended; the marker is matched by its whole resolved path at any depth
+fn sweep_dir(dir: &Path, root: bool, now: std::time::SystemTime, horizon: u64, spare: &Spare) -> usize {
     let Ok(entries) = walk::list_dir(dir) else { return 0 };
     let mut swept = 0;
     for (name, is_dir) in entries {
-        if name == ".gitkeep" || name == ".gitignore" {
+        if name == ".gitkeep" || name == ".gitignore" || (root && spare.keep.contains(&name)) {
             continue;
         }
         let path = dir.join(&name);
-        let old = stale(&path, now);
+        if walk::normalize_abs(&path.to_string_lossy()) == spare.marker {
+            continue;
+        }
+        let old = stale(&path, now, horizon);
         if is_dir {
-            swept += sweep_dir(&path, now);
+            swept += sweep_dir(&path, false, now, horizon, spare);
             if old && std::fs::remove_dir(&path).is_ok() {
                 swept += 1;
             }
@@ -292,15 +316,32 @@ fn sweep_dir(dir: &Path, now: std::time::SystemTime) -> usize {
     swept
 }
 
-fn sweep(tmp_dir: &str) -> String {
-    let dir = Path::new(tmp_dir);
-    if !dir.is_dir() {
+// spec: context-kit/SPEC.md §The session-context hook — the scratch dir and the marker are both
+// resolved against the toplevel the member runs at, so the marker match compares two whole paths
+fn sweep(k: &Knobs) -> String {
+    let Some(horizon) = k.horizon else { return String::new() };
+    let Ok(here) = walk::cwd() else { return String::new() };
+    let root = walk::abs_against(&here, &k.tmp_dir);
+    let marker = walk::abs_against(&here, &k.role_file);
+    let keep: Vec<String> = k.keep.iter().filter(|e| !e.contains('/')).cloned().collect();
+    let mut lines: Vec<String> = Vec::new();
+    if Path::new(&root).is_dir() {
+        let spare = Spare { keep: &keep, marker: &marker };
+        match sweep_dir(Path::new(&root), true, std::time::SystemTime::now(), horizon, &spare) {
+            0 => {}
+            n => lines.push(format!("Tidied {} stale scratch path(s) from {}/.", n, k.tmp_dir)),
+        }
+    }
+    for e in k.keep.iter().filter(|e| e.contains('/')) {
+        lines.push(format!(
+            "sweep keep-list entry '{}' spares nothing: CONTEXT_KIT_SWEEP_PRESERVE names scratch-root children",
+            e
+        ));
+    }
+    if lines.is_empty() {
         return String::new();
     }
-    match sweep_dir(dir, std::time::SystemTime::now()) {
-        0 => String::new(),
-        n => format!("Tidied {} stale scratch path(s) from {}/.\n\n", n, tmp_dir),
-    }
+    format!("{}\n\n", lines.join("\n"))
 }
 
 // spec: context-kit/SPEC.md §The session-context hook — step 7: a configured footer file prints
@@ -364,34 +405,60 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
     }
 
-    // spec: context-kit/SPEC.md §The session-context hook — the sweep spares the two keep files and
-    // anything younger than the horizon, and takes a stale directory once it is empty
+    // spec: context-kit/SPEC.md §The session-context hook — the sweep spares the two keep files, the
+    // marker and a root keep-list name whole at any age, and anything younger than the horizon; it
+    // takes a stale directory once it is empty, a nested keep-list basename, and nothing at off
     #[test]
     fn the_sweep_takes_only_stale_paths_and_spares_the_keep_files() {
         let dir = std::env::temp_dir().join(format!("cw-session-sweep-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
-        std::fs::create_dir_all(dir.join("old")).expect("scratch dir");
-        for f in ["fresh.txt", ".gitkeep", ".gitignore", "old/inner.txt"] {
+        for d in ["old", "kept/deep", "other"] {
+            std::fs::create_dir_all(dir.join(d)).expect("scratch dir");
+        }
+        let files = [
+            "fresh.txt",
+            ".gitkeep",
+            ".gitignore",
+            "old/inner.txt",
+            "session-role",
+            "kept/deep/note.txt",
+            "other/kept",
+        ];
+        for f in files {
             std::fs::write(dir.join(f), "x").expect("scratch file");
         }
+        let marker = walk::normalize_abs(&dir.join("session-role").to_string_lossy());
+        let keep = vec!["kept".to_string()];
+        let spare = Spare { keep: &keep, marker: &marker };
+        let horizon = 3600;
         let now = std::time::SystemTime::now();
-        assert_eq!(sweep_dir(&dir, now), 0);
-        let later = now + std::time::Duration::from_secs(STALE_SECS + 60);
-        assert_eq!(sweep_dir(&dir, later), 3);
+        assert_eq!(sweep_dir(&dir, true, now, horizon, &spare), 0);
+        let later = now + std::time::Duration::from_secs(horizon + 60);
+        assert_eq!(sweep_dir(&dir, true, later, horizon, &spare), 5);
         assert!(dir.join(".gitkeep").is_file() && dir.join(".gitignore").is_file());
-        assert!(!dir.join("old").exists() && !dir.join("fresh.txt").exists());
+        assert!(dir.join("session-role").is_file() && dir.join("kept/deep/note.txt").is_file());
+        assert!(!dir.join("old").exists() && !dir.join("fresh.txt").exists() && !dir.join("other").exists());
+        std::fs::write(dir.join("aged.txt"), "x").expect("scratch file");
+        let k = Knobs {
+            horizon: None,
+            tmp_dir: dir.display().to_string(),
+            role_file: String::new(),
+            keep: Vec::new(),
+            ..knobs_for_test("", "")
+        };
+        assert_eq!(sweep(&k), "");
+        assert!(dir.join("aged.txt").is_file());
         let _ = std::fs::remove_dir_all(&dir);
     }
 
-    // spec: context-kit/SPEC.md §The session-context hook — the built-in footer drops its
-    // public-surface line with the mark, and a footer file replaces all of it
-    #[test]
-    fn the_footer_follows_the_mark_and_yields_to_a_file() {
-        let k = |mark: &str, footer_file: &str| Knobs {
+    fn knobs_for_test(mark: &str, footer_file: &str) -> Knobs {
+        Knobs {
             state_file: String::new(),
             drift_arm: String::new(),
             stage_rules: String::new(),
             role_file: String::new(),
+            horizon: Some(3600),
+            keep: Vec::new(),
             env_profile: String::new(),
             mark: mark.to_string(),
             nudges: Vec::new(),
@@ -399,7 +466,14 @@ mod tests {
             commands: Vec::new(),
             tmp_dir: String::new(),
             door: "./gates".to_string(),
-        };
+        }
+    }
+
+    // spec: context-kit/SPEC.md §The session-context hook — the built-in footer drops its
+    // public-surface line with the mark, and a footer file replaces all of it
+    #[test]
+    fn the_footer_follows_the_mark_and_yields_to_a_file() {
+        let k = knobs_for_test;
         let built_in = footer(&k("lib", ""));
         assert!(built_in.contains("./gates --emit pub-index <component>/lib/"));
         assert_eq!(built_in.lines().count(), 5);
