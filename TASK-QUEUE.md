@@ -1,8 +1,16 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: session-sweep-policy-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The set (operator direction 2026-10-18, lead-relayed, not a ruling; the iteration opened undirected):** option C. The features `session-sweep-horizon-baked`, `session-sweep-live-scratch`, `post-spec-cite-no-valve`, `list-lead-in-count-unheld` and `docs-chrome-page-repeat`, which spec authors and promotes; scope promotes no debt. Stages scope, spec, build, validate and close, with align where `check-stage-entry` assertion C fires. The two sweep entries land together on `sweep_dir`. Spec weighs the page-repeat arm against `check-docs-page-repeat`'s deliberate refusal of cross-page repeat, `post-spec-cite-no-valve` at the width of the icebox's `post-immutability-machine-read-carveout`, and the sweep keep-list against the icebox's `boundary-preserve-covers-names-not-lifetimes`. Composition: bundled on context-kit (one function) plus canon-kit taken whole with its page-repeat arm; drain 5 against inflow 2.4.
+
+  **Second-vendor review (operator grant 2026-10-18, lead-relayed, unspent):** one audit-mode review over this iteration's range, at validate or close. A clean return cuts v0.32.0, closing push plus tag push; a finding or a failed run defers it under the bar recorded in `tarball-attestation-observed`. The set is guard-free so the range carries no verdict-moving guard change.
+
+  **Push need (2026-10-18, inside the budget):** 2 — the closing push, and the v0.32.0 tag push the grant spends on a clean return. No unit's completion reads a remote run.
 
 ---
 
@@ -124,7 +132,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 ### plugin-harness-reach
 
-[cost: event/low] [surface: plugin] [not-icebox-eligible: 2026-10-06 filed on the operator direction of 2026-09-28 its body carries; evicting it would compress that direction away]
+[roadmap: next/ecosystem] [cost: event/low] [surface: plugin] [roadmap-summary: The plugin package verified on more harnesses, with guards wherever a harness has a hook surface.] [not-icebox-eligible: 2026-10-06 filed on the operator direction of 2026-09-28 its body carries; evicting it would compress that direction away]
 
 the harness plugin package reaches Claude Code only in its tested and guarded parts. plugin/SPEC.md reads the portable `plugin.json` and `skills/` as loading on any Agent Plugins 1.0 client off the standard alone, since only Claude Code's install is run; the guards ride `hooks/hooks.json`, outside the standard's portable core, so no other client runs them; the marketplace file is Claude Code's format. No queue entry names another harness. **Inferred, not run:** which harnesses adopt Agent Plugins 1.0. **Operator-supplied, unverified:** Meta's coding harness "seems to be named Muse Code". **Harness priority, operator direction, 2026-09-28:** tier 1 Claude Code and Codex; tier 2 Muse Code, Antigravity and Cursor.
 
