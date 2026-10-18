@@ -16,6 +16,58 @@
 
 ## New Features
 
+### session-sweep-horizon-baked
+
+[spec: SPEC-sweep-policy.md] [not-icebox-eligible: 2026-10-18 a shipped hook breaking Policy-as-choice, a defect rather than demand-gated work, whose site-kit sibling landed this iteration; evicting it would bury a known doctrine breach]
+
+the session-context hook member bakes its scratch sweep's age horizon: it removes scratch older than one day on a constant (`STALE_SECS` in `native/src/hook/session_context.rs`), with no context-kit knob and no off value, where doctrine-kit/DOCTRINE.md Policy-as-choice has a kit ship a calibration as a selectable set with off among it. The port carried the shell template's own literal.
+
+**Deliverable:** the horizon as a context-kit knob with an off value, its row in context-kit/SPEC.md §Layout and configuration and §The session-context hook stating the set; a feature, since it adds a knob.
+
+**Cost while deferred:** a consumer wanting another horizon, or no sweep, has no setting. Filed 2026-10-07 off windows-shell-floor-pass' close audit, carried to the next scope's intake. Re-verified: the constant, and no `CONTEXT_KIT_` knob in the SPEC names a sweep. Owner lookup: `age horizon`, `scratch sweep`, `STALE_SECS` in this file and the disposed-findings record — none; `site-health-resample-knobs`, done at site-health-statistics-pass, DISTINCT (the same class on site-kit's template).
+
+### session-sweep-live-scratch
+
+[spec: SPEC-sweep-policy.md]
+
+the session-context hook member's scratch sweep removes scratch a live session still needs. `sweep_dir` in `native/src/hook/session_context.rs` spares two dot-file names and nothing else, so a session resumed more than the horizon after it wrote them loses its session-role marker, after which the session-id arm's fallback names another session, and loses any scratch input a survey record's oracle reads (lifecycle-kit/SPEC.md §The survey record).
+
+**Deliverable:** the sweep sparing the role marker and a keep-list the consumer binds, on `LIFECYCLE_KIT_BOUNDARY_PRESERVE`'s posture, stated in context-kit/SPEC.md §The session-context hook; a feature where it adds a knob. Lands with [session-sweep-horizon-baked](#session-sweep-horizon-baked), which edits the same function.
+
+Run at spec: an aged scratch role marker and an aged directory, the member started over them, both removed (`Tidied 3`).
+
+**Cost while deferred:** a resumed lead silently loses its executor-step suppression, and a survey witness cannot be re-run without rebuilding its input. Filed 2026-10-13 by guard-spelling-oracle-pass' lead and promoted at the next scope's intake. Re-verified there by reading `sweep_dir`. Owner lookup: `scratch sweep`, `role marker`, `STALE_SECS` in this file and the disposed-findings record — [session-sweep-horizon-baked](#session-sweep-horizon-baked), DISTINCT (the horizon's value, where this is what the sweep spares at any horizon); owner context-kit/SPEC.md §The session-context hook.
+
+### post-spec-cite-no-valve
+
+[spec: SPEC-post-citation.md]
+
+a dated post citing a kit SPEC section by heading reds `check-spec-pointer` when a later unit deletes that section. The other canon gates hold a post immutable and this one carries no valve for it, so an amendment rostering such a post as left standing cannot be followed. Met at native-executable-git-hooks, whose landing repointed the v0.30.0 post's one citation.
+
+**Deliverable:** one rule for a post's section citation, either a valve on the gate's prose-citation pass or a stated duty to repoint; which is spec's, against canon-kit/SPEC.md §check-spec-pointer.
+
+**Cost while deferred:** each section deletion a post cites edits a surface the tree calls immutable. Filed 2026-10-06 by windows-shell-floor-pass' build. Re-verified: the landing commit's diff carries a one-line edit to that post. Owner lookup: `docs/posts`, `check-spec-pointer`, `immutable` in this file and the disposed-findings record — [step-title-cite-unresolved](#step-title-cite-unresolved), DISTINCT (a step title no gate resolves).
+
+### list-lead-in-count-unheld
+
+[spec: SPEC-lead-in-count.md]
+
+a spelled cardinal introducing an adjacent bullet list drifts when the list gains a member, and no gate reads it: evidence-kit/SPEC.md §The producer-liveness lock said "Two further cases" over three bullets from the commit adding the third until this close repaired it. `check-manifest-count` bans cardinals over declared governed collections only, so a sentence-local list is outside its reach.
+
+**Deliverable:** `check-manifest-count` widened, or a sibling, to red a cardinal in a sentence ending on `:` whose next block is a bullet list, with its fixture pair; a feature, since the gate gains a read contract.
+
+**Cost while deferred:** a reader is told a wrong count beside the list that shows the right one. Filed 2026-10-17 by prove-confinement-pass' close from its audit sweep, as the staleness step's gap generalization. Re-verified there: the bullets read three at the paragraph's next block, and the battery ran green over it. Owner lookup: `cardinal`, `count word`, `manifest-count`, `bullet count` in this file and the disposed-findings record — none; owner canon-kit/SPEC.md §check-manifest-count.
+
+### docs-chrome-page-repeat
+
+[spec: SPEC-chrome-repeat.md]
+
+`check-docs-page-repeat` reads page sources and never `docs/_layouts` or `docs/_includes`, so a chrome addition repeating a page's statement passes. Found at `homepage-license-duplicate`, where the footer's license line duplicated docs/index.md's License section; that unit's `check-license-line` widening holds the license instance only.
+
+**Deliverable:** an arm prefixing the layout's and includes' literal text nodes (Liquid excluded) to every page's corpus, so a sentence of eight words or more or a link target stated in both reds; or a boundary note refusing it.
+
+**Cost while deferred:** the next chrome addition can duplicate a page statement unseen until a reader finds it. Filed 2026-09-29 by companion-adoption-landing's build. Re-verified: canon-kit/SPEC.md §check-docs-page-repeat reads each `CANON_KIT_PAGE_REPEAT_PAGES` page alone and deliberately asserts no repeat across pages, so the arm must weigh that boundary. Owner lookup: `page-repeat`, `_layouts`, `chrome` in this file — [site-video-poster-rule](#site-video-poster-rule), DISTINCT (embeds); owner canon-kit/SPEC.md §check-docs-page-repeat, with docs/page-authoring.md §Page-authoring rules. Surface also canon-kit.
+
 ## Technical Debt
 
 ## Deferred
@@ -160,16 +212,6 @@ docs/releases.md renders its derived note list as a bare list of version links, 
 
 **Cost while deferred:** a reader skipping several versions opens each note to learn which need action. Filed 2026-09-29 by companion-technical-gates' lead, at the operator's leave. Re-verified: the page's `<ul>` loop and 29 notes carrying `release:`. Owner lookup: `releases.md`, `front-matter` in this file — none; owner docs/site-architecture.md, with installer/SPEC.md §The upgrade contract for the keys.
 
-### docs-chrome-page-repeat
-
-[cost: event/low] [surface: docs]
-
-`check-docs-page-repeat` reads page sources and never `docs/_layouts` or `docs/_includes`, so a chrome addition repeating a page's statement passes. Found at `homepage-license-duplicate`, where the footer's license line duplicated docs/index.md's License section; that unit's `check-license-line` widening holds the license instance only.
-
-**Deliverable:** an arm prefixing the layout's and includes' literal text nodes (Liquid excluded) to every page's corpus, so a sentence of eight words or more or a link target stated in both reds; or a boundary note refusing it.
-
-**Cost while deferred:** the next chrome addition can duplicate a page statement unseen until a reader finds it. Filed 2026-09-29 by companion-adoption-landing's build. Re-verified: canon-kit/SPEC.md §check-docs-page-repeat reads each `CANON_KIT_PAGE_REPEAT_PAGES` page alone and deliberately asserts no repeat across pages, so the arm must weigh that boundary. Owner lookup: `page-repeat`, `_layouts`, `chrome` in this file — [site-video-poster-rule](#site-video-poster-rule), DISTINCT (embeds); owner canon-kit/SPEC.md §check-docs-page-repeat, with docs/page-authoring.md §Page-authoring rules. Surface also canon-kit.
-
 ### front-door-job-observed
 
 [cost: event/low] [surface: lifecycle-kit] [observed-by: publish]
@@ -201,38 +243,6 @@ kit prose carries the master harness's names where no knob owns them: the hook e
 **Deliverable:** a harness-neutral statement of the hook contract behind a binding table, the kit SPECs citing it; feature-sized, since it restates wire contracts.
 
 **Cost while deferred:** an adopter on another harness reads the hook-member sections as one vendor's protocol, which they are. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' build. Re-verified by grep over the kit SPECs for the event names, payload keys, variables and parameter names: 93 lines, delegation-kit 42, guard-kit 31, context-kit 8, lifecycle-kit 7, gate-sdk 3, drift-kit 1, evidence-kit 1. Owner lookup: `hook contract`, `binding table`, `harness-neutral`, `payload key` in this file and the disposed-findings record — none; [plugin-harness-reach](#plugin-harness-reach), DISTINCT (its per-harness guard wiring would bind against this contract); `harness-literal-catcher-gate`, DISTINCT (the catcher for sites already generic).
-
-### post-spec-cite-no-valve
-
-[cost: event/low] [surface: canon-kit]
-
-a dated post citing a kit SPEC section by heading reds `check-spec-pointer` when a later unit deletes that section. The other canon gates hold a post immutable and this one carries no valve for it, so an amendment rostering such a post as left standing cannot be followed. Met at native-executable-git-hooks, whose landing repointed the v0.30.0 post's one citation.
-
-**Deliverable:** one rule for a post's section citation, either a valve on the gate's prose-citation pass or a stated duty to repoint; which is spec's, against canon-kit/SPEC.md §check-spec-pointer.
-
-**Cost while deferred:** each section deletion a post cites edits a surface the tree calls immutable. Filed 2026-10-06 by windows-shell-floor-pass' build. Re-verified: the landing commit's diff carries a one-line edit to that post. Owner lookup: `docs/posts`, `check-spec-pointer`, `immutable` in this file and the disposed-findings record — [step-title-cite-unresolved](#step-title-cite-unresolved), DISTINCT (a step title no gate resolves).
-
-### session-sweep-horizon-baked
-
-[cost: event/low] [surface: context-kit] [not-icebox-eligible: 2026-10-18 a shipped hook breaking Policy-as-choice, a defect rather than demand-gated work, whose site-kit sibling landed this iteration; evicting it would bury a known doctrine breach]
-
-the session-context hook member bakes its scratch sweep's age horizon: it removes scratch older than one day on a constant (`STALE_SECS` in `native/src/hook/session_context.rs`), with no context-kit knob and no off value, where doctrine-kit/DOCTRINE.md Policy-as-choice has a kit ship a calibration as a selectable set with off among it. The port carried the shell template's own literal.
-
-**Deliverable:** the horizon as a context-kit knob with an off value, its row in context-kit/SPEC.md §Layout and configuration and §The session-context hook stating the set; a feature, since it adds a knob.
-
-**Cost while deferred:** a consumer wanting another horizon, or no sweep, has no setting. Filed 2026-10-07 off windows-shell-floor-pass' close audit, carried to the next scope's intake. Re-verified: the constant, and no `CONTEXT_KIT_` knob in the SPEC names a sweep. Owner lookup: `age horizon`, `scratch sweep`, `STALE_SECS` in this file and the disposed-findings record — none; `site-health-resample-knobs`, done at site-health-statistics-pass, DISTINCT (the same class on site-kit's template).
-
-### session-sweep-live-scratch
-
-[cost: event/low] [surface: context-kit]
-
-the session-context hook member's scratch sweep removes scratch a live session still needs. `sweep_dir` in `native/src/hook/session_context.rs` spares two dot-file names and nothing else, so a session resumed more than the horizon after it wrote them loses its session-role marker, after which the session-id arm's fallback names another session, and loses any path a survey record's witness names (lifecycle-kit/SPEC.md §The survey record).
-
-**Deliverable:** the sweep sparing the role marker and a keep-list the consumer binds, on `LIFECYCLE_KIT_BOUNDARY_PRESERVE`'s posture, stated in context-kit/SPEC.md §The session-context hook; a feature where it adds a knob. Lands with [session-sweep-horizon-baked](#session-sweep-horizon-baked), which edits the same function.
-
-**Inferred, not run:** that the sweep is what removed both at guard-spelling-oracle-pass — read off its tidy line by that iteration's lead; age a scratch role marker past the horizon and start the member over it
-
-**Cost while deferred:** a resumed lead silently loses its executor-step suppression, and a survey witness cannot be re-run without rebuilding its input. Filed 2026-10-13 by guard-spelling-oracle-pass' lead and promoted at the next scope's intake. Re-verified there by reading `sweep_dir`. Owner lookup: `scratch sweep`, `role marker`, `STALE_SECS` in this file and the disposed-findings record — [session-sweep-horizon-baked](#session-sweep-horizon-baked), DISTINCT (the horizon's value, where this is what the sweep spares at any horizon); owner context-kit/SPEC.md §The session-context hook.
 
 ### grant-pwsh-word-read
 
@@ -271,16 +281,6 @@ surface (e) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 **Inferred, not run:** that an evaluating agent reading `CLAUDE.md` forms a worse impression; this probe measures it.
 
 **Cost while deferred:** whether the evaluator surfaces change what an agent recommends stays unmeasured. Filed 2026-10-17 by evaluator-discovery-pass' scope as a split remainder. Owner lookup: the parent's, `llms`, `AGENTS.md`, `evaluator`, `keywords` in this file and the disposed-findings record, none; owner drift-kit/SPEC.md, beside [design-partner-preview](#design-partner-preview)'s observation record.
-
-### list-lead-in-count-unheld
-
-[cost: event/low] [surface: canon-kit]
-
-a spelled cardinal introducing an adjacent bullet list drifts when the list gains a member, and no gate reads it: evidence-kit/SPEC.md §The producer-liveness lock said "Two further cases" over three bullets from the commit adding the third until this close repaired it. `check-manifest-count` bans cardinals over declared governed collections only, so a sentence-local list is outside its reach.
-
-**Deliverable:** `check-manifest-count` widened, or a sibling, to red a cardinal in a sentence ending on `:` whose next block is a bullet list, with its fixture pair; a feature, since the gate gains a read contract.
-
-**Cost while deferred:** a reader is told a wrong count beside the list that shows the right one. Filed 2026-10-17 by prove-confinement-pass' close from its audit sweep, as the staleness step's gap generalization. Re-verified there: the bullets read three at the paragraph's next block, and the battery ran green over it. Owner lookup: `cardinal`, `count word`, `manifest-count`, `bullet count` in this file and the disposed-findings record — none; owner canon-kit/SPEC.md §check-manifest-count.
 
 ### shellcheck-gate-tests-derived
 
