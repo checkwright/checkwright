@@ -6,23 +6,13 @@
 
   **Set record**
 
-  **The set (operator direction 2026-10-18, lead-relayed, not a ruling; the iteration opened undirected):** option D. The features [plugin-harness-reach](#plugin-harness-reach), [hook-contract-harness-neutral](#hook-contract-harness-neutral) and [grant-pwsh-word-read](#grant-pwsh-word-read), which spec authors and promotes; scope promotes no debt. The choice lifts the 2026-10-14 direction that held `grant-pwsh-word-read` back so no grant widened ahead of the v0.32.0 bar, the escalated option naming that lift. Stages scope, spec, align (the amendments span plugin, guard-kit and the kit SPECs carrying hook names), build, validate and close. The hook contract lands first and the per-harness guard wiring binds against its binding table. Composition: bundled on the hook surface plus guard-kit taken whole; drain 3 against inflow 1.8.
+  **The set (operator direction 2026-10-18, lead-relayed, not a ruling; the iteration opened undirected):** option D. The features [plugin-harness-reach](#plugin-harness-reach), `hook-contract-harness-neutral` and [grant-pwsh-word-read](#grant-pwsh-word-read), which spec authors and promotes; scope promotes no debt. The choice lifts the 2026-10-14 direction that held `grant-pwsh-word-read` back so no grant widened ahead of the v0.32.0 bar, the escalated option naming that lift. Stages scope, spec, align (the amendments span plugin, guard-kit and the kit SPECs carrying hook names), build, validate and close. The hook contract lands first and the per-harness guard wiring binds against its binding table. Composition: bundled on the hook surface plus guard-kit taken whole; drain 3 against inflow 1.8.
 
   **Second-vendor review (operator grant 2026-10-18, lead-relayed, unspent):** one audit-mode review over this iteration's range, at validate. Every grant lift in `grant-pwsh-word-read` lands before it. Whether v0.32.0 is cut is close's reading against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed); a cut's tag push would make the set's pushes three against a budget of two, so close asks for it.
 
 ---
 
 ## New Features
-
-### hook-contract-harness-neutral
-
-[spec: SPEC-hook-contract.md]
-
-kit prose carries the master harness's names where no knob owns them: the hook event names and matchers, the payload keys, the session and config-home variables (owner lifecycle-kit/SPEC.md §bin/session-id.sh), the dispatch tool's parameter names, and two of drift-kit's measurement commands. gate-sdk/SPEC.md §The adopter constraints declares the hook members' names the shipped binding, so nothing is misstated.
-
-**Deliverable:** a harness-neutral statement of the hook contract behind a binding table, the kit SPECs citing it; feature-sized, since it restates wire contracts.
-
-**Cost while deferred:** an adopter on another harness reads the hook-member sections as one vendor's protocol, which they are. Filed 2026-10-06 by doctrine-brevity-journal-arm-pass' build. Re-counted at spec by `check-harness-literal` with the amendment's roster: 129 lines across six kits' SPECs, READMEs and one template (SPEC-hook-contract.md). Owner lookup: `hook contract`, `binding table`, `harness-neutral`, `payload key` in this file and the disposed-findings record — none; [plugin-harness-reach](#plugin-harness-reach), DISTINCT (its per-harness guard wiring would bind against this contract); `harness-literal-catcher-gate`, DISTINCT (the catcher for sites already generic).
 
 ### plugin-harness-reach
 
@@ -965,4 +955,6 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
+
+- hook-contract-harness-neutral
 

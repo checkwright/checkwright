@@ -7,7 +7,7 @@ generated: true
 <!-- {% raw %} -->
 # guard-kit
 
-Permission-friction reduction for coding-agent sessions. A `PreToolUse` guard decides at call time — **block** with a corrective message, **steer** to a better form, **rewrite** to the allowlisted spelling, **auto-allow** the provably safe, or log the fall-through — a scanner ranks what the allowlist failed to cover, a curation tool finds the redundant local overrides, and a close-stage triage step makes the whole loop a habit.
+Permission-friction reduction for coding-agent sessions. A before-tool-call guard ([gate-sdk/SPEC.md §The hook contract](../gate-sdk/SPEC.md#the-hook-contract)) decides at call time — **block** with a corrective message, **steer** to a better form, **rewrite** to the allowlisted spelling, **auto-allow** the provably safe, or log the fall-through — a scanner ranks what the allowlist failed to cover, a curation tool finds the redundant local overrides, and a close-stage triage step makes the whole loop a habit.
 
 Why: a command no allowlist entry matches is decided **out of band** — by interrupting a human, or by a model asked to judge the call — and that decision is invisible to the agent either way, so it cannot notice, count, or fix the friction it causes. The cost is paid per call, out of the operator's attention or out of latency and tokens, and compounds as the command surface grows. The kit closes the loop by making the fall-through set — exactly the commands nothing granted — the one thing that *is* recorded. See [SPEC.md](SPEC.md) for the framework, the generic ruleset, what the steering buys, and the triage criterion.
 
@@ -39,7 +39,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
    Your project's own block/steer/allow rules are a command you write, named by `GUARD_KIT_CONSUMER_RULES_CMD` in `guard-config.knobs`: the shell guard runs it before the generic ruleset, on the harness's own hook protocol, and `--guard-json` on the gate binary is its toolkit ([guard-kit/SPEC.md §Consumer rules](SPEC.md#consumer-rules)).
 
-2. Wire the hooks — merge `templates/settings-hooks.json` into your harness settings file, `GUARD_KIT_SETTINGS` (the `shell-guard` on `PreToolUse(Bash|PowerShell)`; the optional `wakeup-guard` on `ScheduleWakeup|CronCreate`; and an optional third block showing the path-shaped shape a consumer kit's own guard registers under — lifecycle-kit's `workflow-state-guard` is the shipped instance).
+2. Wire the hooks — merge `templates/settings-hooks.json` into your harness settings file, `GUARD_KIT_SETTINGS` (the `shell-guard` on `PreToolUse(Bash|PowerShell)`; the optional `wakeup-guard` on `ScheduleWakeup|CronCreate`; and an optional third block showing the path-shaped shape a consumer kit's own guard registers under — lifecycle-kit's `workflow-state-guard` is the shipped instance). <!-- harness-binding: a wiring instruction an adopter pastes -->
 
    Then review `templates/settings-allow.json` against [guard-kit/SPEC.md §The recommended allowlist](SPEC.md#the-recommended-allowlist), and union the entries you accept into that file's `permissions.allow`.
 
