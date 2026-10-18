@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+guard-grant-kpi-pass release deferred:v0.32.0 — a minor accumulated since v0.31.0, this iteration adding the heredoc word read, the fd-dup target repair, the PowerShell string-expression read and the twelve-figure statistics view to the declaration surface; held under the v0.32.0 bar, since the granted close review returned a wrong grant (an ANSI-C quoted scratch target) beside two other findings, filed to the gap inbox, and no other trigger fires: the elapsed limb dormant under preview, no major, no security or supply-chain fix, front-door verbs and plugin parity green
