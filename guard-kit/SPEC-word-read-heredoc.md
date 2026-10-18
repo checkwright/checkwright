@@ -67,6 +67,7 @@ Rows in `guard-kit/guard-tests/cases.tsv`:
   ```
 
 - **`emitter_write`.** Line 1038's comment reads "# a heredoc-bearing call's quoted target is read by its value too, and the steer names it". After line 1039, add `fallthrough	echo x 2>"/dev/null" <<'EOF'@NL@x@NL@EOF`.
+- **`script_interpreter`'s carriage-return rows.** Line 975's comment, "the word read and, under a heredoc, the fallback scan both take bash's blank", reads "the word read takes bash's blank, and so does the skeleton's scan on a call the read refuses, a quoted newline say". The comment is stale once row 977 is read by the word read, and the fallback scan keeps no row of its own. After line 977, add two heredoc-free rows, whose verdicts were run on the built binary and which the amendment moves not at all: `fallthrough	bash <@CR@.tmp/x.sh; echo 'a@NL@b'` and `block	bash < .tmp/x.sh; echo 'a@NL@b'`.
 - **One row per rule the read now reaches**, each in its rule's section, every verdict run on the prototype:
   - `rm_tracked`: `block	rm 'tracked.md' <<'EOF'@NL@x@NL@EOF`;
   - `git_stash`: `block	git 'stash' <<'EOF'@NL@x@NL@EOF`;
@@ -95,7 +96,9 @@ Tests:
 
 ### (3) The release record says the limit is lifted {mechanical}
 
-`.workflow/release-declarations.md`, `## Behavior changes`. Both bullets are unreleased, so each is rewritten in place rather than contradicted by a new one. **Not yet applied.**
+`.workflow/release-declarations.md`, `## Behavior changes`. The three bullets are unreleased, so each is rewritten in place rather than contradicted by a new one. **Not yet applied.**
+
+- **The `script_interpreter` bullet**: "where the command read yields no words for the call, a heredoc-bearing one say," reads "where the command read yields no words for the call, a quoted span carrying a newline say,". Its example stays, `bash <` and a carriage return beside a heredoc still falling through, since `cases.tsv` line 977 pins the verdict and the read now answers on that call.
 
 - **The `--guard-json` `words` bullet**: "It prints nothing where the read does not answer, a heredoc-bearing command among them" reads "It prints nothing where the read does not answer, a PowerShell here-string among them; a heredoc's body prints as the line `HD`".
 - **The bullet for rules `ro_pipeline`, `background_no_record`, `bounded_wait`, `append_scratch` and `emitter_write`** loses its "Declared limit:" sentence. In its place: "A heredoc-bearing call is read the same way, so `cat >> ".tmp/j.md" <<'EOF'` is granted, and a quoted or escaped word beside a heredoc now reaches every rule that reads words by value: `rm 'tracked.md' <<'EOF'` blocks as `rm 'tracked.md'` does. A decision-table row of yours pinning a fall-through there is re-derived."
