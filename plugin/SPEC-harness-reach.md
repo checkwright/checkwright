@@ -20,6 +20,17 @@ Pairs `plugin-harness-reach`. The package is verified on Claude Code alone, and 
   - *Building the Antigravity binding now.* Its hook runs in the plugin's own directory with no project-directory variable, so it needs a launcher reading the payload to find the repository, and that is interpreter surface (gate-sdk/SPEC.md §The adopter constraints).
   - *Teaching `workflow-state-guard` to read `apply_patch`'s file headers.* That is reader work deliverable (3) does not settle.
 
+**Delta 2 narrowed at build (2026-10-18, intent-oracle decision, relayed by the lead; not an operator ruling): option B.** The build's Codex run disproved delta 2's premise, so the measured limit is Q1's answer applied to it:
+
+- **Run, `codex-cli 0.162.1`, scratch `CODEX_HOME`, a local mock model provider opening the session:** the 13 skills reach the model's prompt. The package's hooks are never discovered while the root `plugin.json` is present: `hooks/list` and `plugin/read` return no hooks, whether or not that manifest carries `extensions.com.openai.hooks` or a `.codex-plugin/plugin.json` sits beside it. A scratch copy without the root manifest has `hooks/hooks.json` discovered. Under it, with hook trust bypassed for the invocation, the rendering blocks in a vendored scratch repository, including from a launch in a subdirectory, and stays silent in an empty one. That answers delta 2's inferred marker.
+- **So Codex is not wired.** The Codex row of §The harnesses records both measured halves, each marked **run** with its version. The guard bullets name Claude Code alone, and the honest limits name the discovery gap. The root manifest, §The manifests and Antigravity's route stand.
+- **Filed, not built:** Codex guard wiring, costed as tier-1 guard wiring that waits on an upstream discovery fix. It is re-checked when a Codex release discovers hooks with `plugin.json` still at the root. The likely upstream defect is named in the gap bullet only; reporting it upstream is outside this iteration.
+- **Refused, with grounds:**
+  - *Removing the root `plugin.json`* reverses §The manifests, and Antigravity's validate then fails with "missing plugin.json" (run).
+  - *A second, Codex-only package directory* is a new published surface, which is a scope change.
+
+The deltas below are merged as this decision narrows them. Where a delta's quoted text says Codex runs the guards, the decision governs.
+
 **What was run at spec.** None of this touched the user's harness configuration:
 
 - **`codex-cli 0.162.1`, `CODEX_HOME` pointed at a scratch directory.**
