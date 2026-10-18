@@ -954,9 +954,3 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 ## Done
 
-- post-spec-cite-no-valve
-- list-lead-in-count-unheld
-- docs-chrome-page-repeat
-- session-sweep-horizon-baked
-- session-sweep-live-scratch
-
