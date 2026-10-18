@@ -6,3 +6,4 @@
 
 guard-grant-kpi-pass scope a77297d8 2026-10-18 b2ca4b0f6
 guard-grant-kpi-pass spec a6043904 2026-10-18 79572e6ac
+guard-grant-kpi-pass align afc4def2 2026-10-18 f6350079e
