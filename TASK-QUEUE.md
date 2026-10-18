@@ -1022,8 +1022,3 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 ## Done
 
-- pwsh-string-expr-overblock
-- guard-word-read-heredoc
-- ro-pipeline-wrong-grants
-- statistics-kpi-breadth
-
