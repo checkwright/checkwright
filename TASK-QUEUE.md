@@ -14,6 +14,26 @@
 
 ## New Features
 
+### guard-word-read-heredoc
+
+[spec: SPEC-word-read-heredoc.md]
+
+the bash word read answers nothing on a call carrying a heredoc (the dequoted view refuses, and the skeleton keeps a quoted delimiter verbatim), so rules `append_scratch` and `emitter_write` read a quoted redirect target there off the skeleton. `cat >> ".tmp/j.md" <<'EOF'` is falsely blocked by `emitter_write`, whose steer names the quoted target, and a quoted `/dev/null` beside a heredoc withholds the append grant.
+
+**Deliverable:** the word read answered on heredoc calls (the body a mark word, the delimiter live verbatim), a reader change reaching every by-value rule and `--guard-json words`. Verdict-moving, so a close promotes it.
+
+**Cost while deferred:** a prompt or block on a quoted scratch target beside a heredoc, which the unquoted spelling avoids. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: the call above exits 2 with the quoted-target steer, `.tmp/` gitignored. Owner lookup: `heredoc`, `word read` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The reader and its views.
+
+### statistics-kpi-breadth
+
+[spec: SPEC-kpi-breadth.md]
+
+the statistics view charts seven figures (drift-kit/SPEC.md §The statistics view: spend, cache-read, commit shape, amendments, validate, gate roster, queue flow) and none of the drift-report KPIs. Operator direction 2026-10-18, lead-relayed, not a ruling: add the useful KPIs, governance overhead first, and split spend and cache-read by model as well as by stage band; the stage-economics log already carries a model column per row, so a by-model split needs no new input.
+
+**Deliverable:** the twelve-figure view its amendment specifies: governance share, always-loaded and deferred age join, and spend and cache-read each gain a by-model panel beside a by-band one. The amendment's opening carries which candidates were refused and why.
+
+**Cost while deferred:** the view shows spend but not where governance spend goes, so the overhead trend is read off one drift-report number at a time. Surfaced 2026-10-18 by the lead session after harness-reach-pass' close, promoted at the next scope's carried-bullet intake. Re-verified there: the section's figure list holds the seven. Owner lookup: `statistics`, `kpi-overhead`, `by-model` in this file and the disposed-findings record, none live (`iteration-statistics-view`, retired, landed the view); owner drift-kit/SPEC.md §The statistics view.
+
 ## Technical Debt
 
 ### ro-pipeline-wrong-grants
@@ -242,16 +262,6 @@ surface (e) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 
 **Cost while deferred:** a miscounted lead-in behind a blank run passes unread. Surfaced 2026-10-18 by session-sweep-policy-pass' close (baked-calibration audit), promoted at the next scope's carried-bullet intake. Re-verified there: the reader's single-blank skip. Owner lookup: `manifest-count`, `manifest_count`, `lead_ins`, `blank run` in this file and the disposed-findings record found none; owner canon-kit/SPEC.md §check-manifest-count.
 
-### guard-word-read-heredoc
-
-[cost: event/low] [surface: guard-kit]
-
-the bash word read answers nothing on a call carrying a heredoc (the dequoted view refuses, and the skeleton keeps a quoted delimiter verbatim), so rules `append_scratch` and `emitter_write` read a quoted redirect target there off the skeleton. `cat >> ".tmp/j.md" <<'EOF'` is falsely blocked by `emitter_write`, whose steer names the quoted target, and a quoted `/dev/null` beside a heredoc withholds the append grant.
-
-**Deliverable:** the word read answered on heredoc calls (the body a mark word, the delimiter live verbatim), a reader change reaching every by-value rule and `--guard-json words`. Verdict-moving, so a close promotes it.
-
-**Cost while deferred:** a prompt or block on a quoted scratch target beside a heredoc, which the unquoted spelling avoids. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: the call above exits 2 with the quoted-target steer, `.tmp/` gitignored. Owner lookup: `heredoc`, `word read` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The reader and its views.
-
 ### codex-plugin-hook-discovery
 
 [cost: event/high] [surface: plugin]
@@ -311,16 +321,6 @@ gate-sdk/SPEC.md §The hook contract's binding table is held to the crate's spel
 **Deliverable:** one crate module holding the binding's spellings that every member reads, with a test holding the table to it, or a refusal recorded.
 
 **Cost while deferred:** the table can drift from what the members read, unseen until a fixture reds. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: `tool_input` spelled in six `native/src/hook/` modules and `guard/mod.rs`. Owner lookup: `binding table`, `hook contract` in this file, none; owner gate-sdk/SPEC.md §The hook contract.
-
-### statistics-kpi-breadth
-
-[cost: event/low] [surface: drift-kit]
-
-the statistics view charts seven figures (drift-kit/SPEC.md §The statistics view: spend, cache-read, commit shape, amendments, validate, gate roster, queue flow) and none of the drift-report KPIs. Operator direction 2026-10-18, lead-relayed, not a ruling: add the useful KPIs, governance overhead first, and split spend and cache-read by model as well as by stage band; the stage-economics log already carries a model column per row, so a by-model split needs no new input.
-
-**Deliverable:** design-pending, a feature: which KPIs join (candidates: kpi-overhead's governance-vs-task share, always-loaded cp, prompt friction, gate battery ms, defer age, kfric and recur counts) and the model split's form, band or panel. Most drift KPIs are current-state readings with no per-iteration series, so each needs a value re-derivable from committed history at each close or a recorded series, under the privacy and home rule the spend panels follow.
-
-**Cost while deferred:** the view shows spend but not where governance spend goes, so the overhead trend is read off one drift-report number at a time. Surfaced 2026-10-18 by the lead session after harness-reach-pass' close, promoted at the next scope's carried-bullet intake. Re-verified there: the section's figure list holds the seven. Owner lookup: `statistics`, `kpi-overhead`, `by-model` in this file and the disposed-findings record, none live (`iteration-statistics-view`, retired, landed the view); owner drift-kit/SPEC.md §The statistics view.
 
 ## Icebox
 
