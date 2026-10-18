@@ -40,7 +40,7 @@ A new section, `## The statistics view`, after §The queue-flow arm in `drift-ki
 
 ### (2) One harvest, two renderers {design-bearing}
 
-`native/src/emit/trajectory.rs` exposes its harvest: a public function returning the closed iterations in emission order with each one's stages, commit split, amendment count and lag, validate verdict and gate count. Its `emit` renders the markdown table from that function, byte-identical to today's output. `native/src/emit/queue_flow.rs` exposes its window rows the same way. The meter's trend-log line parse in `native/src/emit/stage_economics.rs` is the one the arm calls. Where the meter keeps that parse private, the build exposes it rather than writing a second parse. **Not yet applied.**
+`native/src/emit/trajectory.rs` exposes its harvest: a public function returning the closed iterations in emission order with each one's stages, commit split, amendment count and lag, validate verdict and gate count. Its `emit` renders the markdown table from that function, byte-identical to today's output. `native/src/emit/queue_flow.rs` exposes its window rows the same way. The meter holds no parse of a log row's fields: its only reads of a row are `redated`'s date and key split and the `kpi-stage-economics-lag` reader's whitespace split for dates, and `cr` and `cost` are written by the row's format string alone. So `native/src/emit/stage_economics.rs` gains one public row parse, the inverse of that format string, placed beside it and carrying a round-trip test against it, and the arm calls that parse rather than splitting rows in `statistics.rs`. **Not yet applied.**
 
 The committed trajectory projection is the check on this delta. `check-trajectory-fresh` byte-compares `docs/evidence-data.md` against a re-emission, so a refactor that moved one byte of the table reds it at the commit (docs/generated-projections.md, the trajectory projection).
 
@@ -72,7 +72,7 @@ Replacements. **Not yet applied.**
 
   > 4. **Statistics view** — the same binary's `--emit statistics` (drift-kit/SPEC.md §The statistics view): the per-iteration figures charted into one local HTML file. Run it after step 2, so the spend panel holds this iteration's rows.
 
-  and after the **Posture verdict** bullet:
+  and in the paragraph opening "Run it at close", "Chain the three reporting tools in order, then read their output into one narrative" becomes "Chain the three reporting tools in order, render the view (step 4), then read their output into one narrative", and after the **Posture verdict** bullet:
 
   > - **The view.** Name the file the statistics view wrote, and any panel it printed as `n/a`, so the reader knows where the trend is and what it lacks.
 

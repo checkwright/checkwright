@@ -67,7 +67,7 @@ Replacements. **Not yet applied.**
   - site-kit/README.md item 5 and installer/SPEC.md §The release channel (delta 3);
   - their generated mirrors under `docs/`.
 
-  `.workflow/release-declarations.md` names the issue in a bullet already declared for a shipped release, which stays as written. The fixture `gate-sdk/gate-tests/check-action-gh-repo/good/tree/workflows/arms.yml` spells its own `gh issue` calls and does not copy the template.
+  `site-kit/smoke/install.sh` copies the template and keeps no issue wording (`git grep -n -i issue -- site-kit/smoke` matches nothing), so delta 1 leaves it unedited. `.workflow/release-declarations.md` names the issue in a bullet already declared for a shipped release, which stays as written. The fixture `gate-sdk/gate-tests/check-action-gh-repo/good/tree/workflows/arms.yml` spells its own `gh issue` calls and does not copy the template.
 - **Point 5:** delta 1 narrows the template's permission set, and the reader whose verdict could move is `check-action-permissions`. It reds a checkout-armed job that lacks a `contents:` scope at `read` or `write`. The `probe` job keeps `contents: read`, so it stays clean.
 - **Point 6:** delta 1 obliges each copy of the template in this tree. The members, from `git grep -l "name: site-health" -- '*.yml'`, are `site-kit/templates/site-health.yml` and `.github/workflows/site-health.yml`, and both take `ISSUE_TRACKING: 'off'` with no `issues: write`.
 
@@ -82,7 +82,6 @@ The roster is the reader probe above.
 - `installer/SPEC.md` §The release channel (delta 3).
 - `.workflow/release-declarations.md`: a `## Behavior changes` bullet saying that a copy of the template no longer files issues by default, and naming the two edits that restore them, plus a `## Knob changes` bullet naming `ISSUE_TRACKING` (deltas 1 and 2).
 - `docs/site-kit/SPEC.md`, `docs/site-kit/README.md` and `docs/installer/SPEC.md`, the generated mirrors (all deltas).
-
 ## Retired spellings
 
 - `file or clear the site-health issue` — the report step's old name, renamed `report the probe result` (delta 1).
