@@ -134,7 +134,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Two grants of 2026-10-17 spent:** competitive-followup-pass' validate and close reviews each returned five findings, so v0.32.0 stayed deferred. That close withdrew `prove` from docs/install.md and docs/maintenance.md and the overlap section from docs/openspec.md, its line held in `companion/fixtures/openspec/overlap/line.md`; **the cut restores them** and deletes the held file.
 
-**Grant of 2026-10-18 spent:** session-sweep-policy-pass' close review returned five P2 findings, so v0.32.0 stayed deferred; that close fixed all five, none verdict-moving.
+**Two grants of 2026-10-18 spent:** session-sweep-policy-pass' close review returned five P2 findings, all fixed at that close, none verdict-moving; harness-reach-pass' validate review returned three verdict-moving findings, two of them wrong grants, promoted as [ro-pipeline-wrong-grants](#ro-pipeline-wrong-grants) and [pwsh-string-expr-overblock](#pwsh-string-expr-overblock). Each left v0.32.0 deferred.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
@@ -225,6 +225,96 @@ surface (e) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 **Deliverable:** the bound widened to a blank run in the SPEC and the reader, with a bad-fixture case; a stated-contract change, so it rides an amendment.
 
 **Cost while deferred:** a miscounted lead-in behind a blank run passes unread. Surfaced 2026-10-18 by session-sweep-policy-pass' close (baked-calibration audit), promoted at the next scope's carried-bullet intake. Re-verified there: the single-blank skip in `lead_ins`. Owner lookup: `manifest-count`, `manifest_count`, `lead_ins`, `blank run` in this file and the disposed-findings record found none; owner canon-kit/SPEC.md §check-manifest-count.
+
+### ro-pipeline-wrong-grants
+
+[cost: event/high] [surface: guard-kit]
+
+two wrong grants in the shell guard's read-only-pipeline rule, each auto-allowed as "read-only search pipeline", both from harness-reach-pass' second-vendor review (P1). (a) `sort>/dev/null -o tracked.md input.txt`: `passed_read` extracts `sort`, but `ro_forms_read` keys on the dequoted head `sort>/dev/null`, so the `-o` write-option check never runs (`native/src/guard/rules/grants.rs` near line 193); a regression in that iteration's range. (b) `ls > '&1'`: `valued_targets` returns the filename `&1` and `is_fd_dup` reads it as a descriptor duplication, though bash truncates a file named `&1` (near line 170); before the range the quoted target's placeholder withheld the grant.
+
+**Deliverable:** both refused, a `guard-kit/guard-tests/` row per case, read by a later validate before any close relies on it. Verdict-moving (allow to prompt), so a close promotes it rather than landing it (operator direction 2026-10-18, lead-relayed).
+
+**Cost while deferred:** a session can write a tracked file with no permission decision, and the v0.32.0 bar ([tarball-attestation-observed](#tarball-attestation-observed)) stays unmet. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: both payloads return `allow` from `--hook shell-guard` on the built binary. Owner lookup: `ro_pipeline`, `read-only search pipeline`, `fd_dup` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md.
+
+### pwsh-string-expr-overblock
+
+[cost: event/low] [surface: guard-kit]
+
+the shell guard blocks the PowerShell string expression `'.tmp/x.ps1'`, which executes nothing: the value-only tokens drop its quoting and `powershell_form` reads it as a scratch execution (`native/src/guard/rules/reach.rs` near line 795). From harness-reach-pass' second-vendor review (P2).
+
+**Deliverable:** a quoted string expression read as a value, with a `guard-kit/guard-tests/` row. Verdict-moving (block to allow), so a close promotes it.
+
+**Cost while deferred:** a rare PowerShell call is refused with a misleading scratch-run steer. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: the payload exits 2 with the scratch-path steer. Owner lookup: `powershell_form`, `string expression` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §scratch-run.
+
+### guard-word-read-heredoc
+
+[cost: event/low] [surface: guard-kit]
+
+the bash word read answers nothing on a call carrying a heredoc (the dequoted view refuses, and the skeleton keeps a quoted delimiter verbatim), so rules `append_scratch` and `emitter_write` read a quoted redirect target there off the skeleton. `cat >> ".tmp/j.md" <<'EOF'` is falsely blocked by `emitter_write`, whose steer names the quoted target, and a quoted `/dev/null` beside a heredoc withholds the append grant.
+
+**Deliverable:** the word read answered on heredoc calls (the body a mark word, the delimiter live verbatim), a reader change reaching every by-value rule and `--guard-json words`. Verdict-moving, so a close promotes it.
+
+**Cost while deferred:** a prompt or block on a quoted scratch target beside a heredoc, which the unquoted spelling avoids. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: the call above exits 2 with the quoted-target steer, `.tmp/` gitignored. Owner lookup: `heredoc`, `word read` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The reader and its views.
+
+### codex-plugin-hook-discovery
+
+[cost: event/high] [surface: plugin]
+
+`codex-cli` 0.162.1 discovers no plugin hooks while the package root carries the portable `plugin.json` (with or without `extensions.com.openai` hooks or a `.codex-plugin/plugin.json` beside it); without that manifest `hooks/hooks.json` is discovered and the unchanged rendering blocks correctly. Likely upstream: Codex's build docs say `hooks/hooks.json` is discovered by default. Codex guard wiring is tier 1 (operator direction 2026-09-28).
+
+**Residue that bites once discovery lands:** Codex's patch tool matches `Write|Edit` but carries the patch as `tool_input.command` with no `file_path`, and `workflow-state-guard` allows on an empty path (`native/src/hook/workflow_state.rs`), so a Codex session could hand-write the stage state file; read the patch's file headers for the written paths, or state why not (owner lifecycle-kit/SPEC.md §check-stage-entry).
+
+**Deliverable:** on a Codex release discovering hooks beside the root manifest, re-run plugin/SPEC.md §The validation leg's Codex install, wire the guards, close the patch residue, and update plugin/SPEC.md's Codex row and plugin/README.md's guard bullet.
+
+**Cost while deferred:** a Codex adopter gets the skills and no shell, wakeup or workflow-state guard. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's Codex row and limits, `workflow_state.rs` allowing on an empty `file_path`. Owner lookup: `codex`, `apply_patch` in this file and the disposed-findings record, none; owner plugin/SPEC.md §The harnesses.
+
+### codex-plugin-version-pin
+
+[cost: event/low] [surface: plugin] [observed-by: publish]
+
+Codex keys an installed plugin at version `1.0.0`, since neither manifest carries `version` (plugin/SPEC.md §The manifests) and Codex does not take the marketplace entry's, so whether a pin move reaches an installed copy through `codex plugin marketplace upgrade` is unrun.
+
+**Deliverable:** run it at the next release's pin move, and fix the manifest stance if it does not reach.
+
+**Cost while deferred:** a Codex user may stay on an old package after a release. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's limit and no `version` key in `plugin/plugin.json`. Owner lookup: `codex`, `marketplace upgrade` in this file, none; owner plugin/SPEC.md §The manifests.
+
+### antigravity-hook-binding
+
+[cost: event/low] [surface: plugin]
+
+a hook binding for the plugin's guards under Antigravity, split off `plugin-harness-reach` (decided 2026-10-18 by the intent oracle). Its protocol differs on every axis: camelCase `toolCall.name`/`args.CommandLine`, matcher `run_command`, a stdout decision `allow`/`deny`/`ask`, a named-hook `hooks.json` at the plugin root. It runs a hook in the plugin dir with no project-dir variable, so a binding needs payload and envelope translation in the `--hook` arm plus project discovery from `workspacePaths` without a launcher script.
+
+**Cost while deferred:** an Antigravity user installing the plugin gets the skills and no guard. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's Antigravity row reads not wired. Owner lookup: `antigravity`, `agy` in this file, none; owner plugin/SPEC.md §The harnesses with gate-sdk/SPEC.md §The hook contract.
+
+### cursor-muse-plugin-observed
+
+[cost: event/low] [surface: plugin]
+
+Cursor and Muse Code are installed on no build machine, so plugin/SPEC.md §The harnesses carries their rows read off their docs only: Cursor reads an Agent Plugin's skills and imports a project's Claude Code settings hooks by default (its `Bash` to `Shell` tool-name mapping unrun), and Muse Code installs Claude-format plugins with an undocumented hook payload.
+
+**Deliverable:** install and run each on a machine that has it, turn its cells from read to run, and file any wiring defect.
+
+**Cost while deferred:** two tier-2 harnesses' skill load and guard reach rest on vendor docs. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: neither CLI on the build machine's PATH. Owner lookup: `cursor`, `muse` in this file, none; owner plugin/SPEC.md §The harnesses.
+
+### permission-grammar-neutral
+
+[cost: event/low] [surface: guard-kit]
+
+kit prose states one harness's permission-rule grammar as the kit's: guard-kit's `Bash(...)` allow patterns, the matcher's wrapper strip and the `:*` idiom are Claude Code's settings grammar. Left out of `hook-contract-harness-neutral`'s binding table at its spec.
+
+**Deliverable:** the grammar named as a binding's spelling, cited to the binding table, or a refusal recorded.
+
+**Cost while deferred:** an adopter on another harness reads the allowlist sections as one vendor's settings format. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: 22 `Bash(` lines in guard-kit/SPEC.md, one each in gate-sdk and context-kit. Owner lookup: `permission-rule grammar`, `Bash(` in this file, none; owner guard-kit/SPEC.md §The recommended allowlist.
+
+### hook-binding-single-source
+
+[cost: event/low] [surface: gate-sdk]
+
+gate-sdk/SPEC.md §The hook contract's binding table is held to the crate's spellings by nothing, an honest limit `hook-contract-harness-neutral`'s amendment stated: each hook member spells its payload paths and envelopes in its own module (`native/src/hook/*.rs`, `native/src/guard/mod.rs`), so a renamed key moves the code without the table.
+
+**Deliverable:** one crate module holding the binding's spellings that every member reads, with a test holding the table to it, or a refusal recorded.
+
+**Cost while deferred:** the table can drift from what the members read, unseen until a fixture reds. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: `tool_input` spelled in six `native/src/hook/` modules and `guard/mod.rs`. Owner lookup: `binding table`, `hook contract` in this file, none; owner gate-sdk/SPEC.md §The hook contract.
 
 ## Icebox
 
