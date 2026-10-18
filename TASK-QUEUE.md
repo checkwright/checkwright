@@ -28,16 +28,6 @@ the statistics view charts seven figures (drift-kit/SPEC.md §The statistics vie
 
 ## Technical Debt
 
-### ro-pipeline-wrong-grants
-
-two wrong grants in the shell guard's read-only-pipeline rule, each auto-allowed as "read-only search pipeline", both from harness-reach-pass' second-vendor review (P1). (a) `sort>/dev/null -o tracked.md input.txt`: the command word is read as `sort` but the forms check keys on the dequoted head `sort>/dev/null`, so the `-o` write option is never checked; a regression in that iteration's range. (b) `ls > '&1'`: the redirect target read by value, the filename `&1`, is taken for a descriptor duplication, though bash truncates a file named `&1`; before the range the quoted target's placeholder withheld the grant.
-
-**Deliverable:** both refused, a `guard-kit/guard-tests/` row per case, read by a later validate before any close relies on it. Verdict-moving (allow to prompt), so a close promotes it rather than landing it (operator direction 2026-10-18, lead-relayed).
-
-**Widened (2026-10-18, lead decision on intent-oracle advice):** the value-read fd-dup test is refused at every rule reading redirect targets by value: `ro_pipeline`, `append_scratch` through `emitter_targets`, `bounded_wait`, `recorded_launch`, whose probe on the built binary showed the grant, and `bounded_write`, whose target read granted the same writes once `append_scratch` withheld. `emitter_write` shares `emitter_targets`, so its steer now reaches such a target, fall-through to block. One `guard-kit/guard-tests/` row per rule, and a heredoc-call row for `append_scratch`; the definition lives in guard-kit/SPEC.md §The reader and its views.
-
-**Cost while deferred:** a session can write a tracked file with no permission decision, and the v0.32.0 bar ([tarball-attestation-observed](#tarball-attestation-observed)) stays unmet. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: both payloads return `allow` from `--hook shell-guard` on the built binary. Owner lookup: `ro_pipeline`, `read-only search pipeline`, `fd_dup` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -156,7 +146,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Two grants of 2026-10-17 spent:** competitive-followup-pass' validate and close reviews each returned five findings, so v0.32.0 stayed deferred. That close withdrew `prove` from docs/install.md and docs/maintenance.md and the overlap section from docs/openspec.md, its line held in `companion/fixtures/openspec/overlap/line.md`; **the cut restores them** and deletes the held file.
 
-**Two grants of 2026-10-18 spent:** session-sweep-policy-pass' close review returned five P2 findings, all fixed at that close, none verdict-moving; harness-reach-pass' validate review returned three verdict-moving findings, two of them wrong grants, promoted as [ro-pipeline-wrong-grants](#ro-pipeline-wrong-grants) and `pwsh-string-expr-overblock`. Each left v0.32.0 deferred.
+**Two grants of 2026-10-18 spent:** session-sweep-policy-pass' close review returned five P2 findings, all fixed at that close, none verdict-moving; harness-reach-pass' validate review returned three verdict-moving findings, two of them wrong grants, promoted as `ro-pipeline-wrong-grants` and `pwsh-string-expr-overblock`. Each left v0.32.0 deferred.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
@@ -1012,4 +1002,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 - pwsh-string-expr-overblock
 - guard-word-read-heredoc
+- ro-pipeline-wrong-grants
 
