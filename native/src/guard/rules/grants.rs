@@ -2,8 +2,8 @@
 // allow is given only where every clause of its test holds, and every other failure declines.
 use super::reach::{interpreter_reach, refused, rm_tracked_reach};
 use super::{
-    command_read, fd_word, has_substitution, inert_target, is_banner, is_bare_allow, is_ro_segment, is_ro_xargs, noclobber,
-    redirect_targets, ro_forms_clear, ro_forms_clear_except, ro_forms_kit, segment_core,
+    command_read, fd_word, has_substitution, inert_target, is_banner, is_bare_allow, is_ro_segment, is_ro_xargs,
+    lead_keyword, noclobber, on_ro_roster, passed_read, pipe_members, redirect_targets, ro_forms_clear, ro_forms_clear_except, ro_forms_kit, segment_core,
     shell_backgrounds, strip_redirect_op, unredirected_words, xargs_command_index,
 };
 use crate::guard::allow_match;
@@ -149,7 +149,7 @@ pub fn ro_pipeline(ctx: &Ctx) -> Decided {
         return Ok(None);
     }
     let s = ctx.view(ctx.cmd(), SqDqHd)?;
-    if s.contains(['\'', '"']) || shell_backgrounds(&s) || noclobber(&s) {
+    if shell_backgrounds(&s) || noclobber(&s) {
         return Ok(None);
     }
     for tgt in redirect_targets(&s) {
@@ -158,17 +158,31 @@ pub fn ro_pipeline(ctx: &Ctx) -> Decided {
         }
     }
     let decorated = ctx.segments(&s).len() > 1;
+    let members: Vec<Vec<(Option<String>, String)>> = match pipe_members(ctx, &s) {
+        Some(ms) => {
+            let passed = passed_read(ctx, ctx.cmd())?;
+            ms.into_iter()
+                .map(|stmt| stmt.into_iter().map(|(at, seg)| (passed.get(at).and_then(|ws| ws.first()).map(|w| w.value.clone()), seg)).collect())
+                .collect()
+        }
+        None => ctx.statements(&s).iter().map(|stmt| ctx.pipes(stmt).into_iter().map(|seg| (None, seg)).collect()).collect(),
+    };
     let mut reads = 0usize;
-    for stmt in ctx.statements(&s) {
-        for (i, seg) in ctx.pipes(&stmt).iter().enumerate() {
+    for stmt in members {
+        for (i, (valued, seg)) in stmt.iter().enumerate() {
             let seg = trim_start(seg);
             if seg.is_empty() || is_banner(seg) {
                 continue;
             }
-            if head_word(seg) == "xargs" && !is_ro_xargs(h, seg) {
+            let head = head_word(seg);
+            let word = match valued {
+                Some(v) if !lead_keyword(head) => v.as_str(),
+                _ => head,
+            };
+            if word == "xargs" && !is_ro_xargs(h, &format!("{}{}", word, &seg[head.len()..])) {
                 return Ok(None);
             }
-            if !is_ro_segment(h, seg) && !(i == 0 && decorated && is_bare_allow(h, seg).0) {
+            if !on_ro_roster(h, word) && !(i == 0 && decorated && is_bare_allow(h, seg).0) {
                 return Ok(None);
             }
             reads += 1;

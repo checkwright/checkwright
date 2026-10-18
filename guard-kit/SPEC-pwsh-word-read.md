@@ -90,7 +90,7 @@ A unit test in `native/src/guard/rules/mod.rs` holds `valued_targets` on a bare,
 - **A member whose skeleton head is a shell keyword declines**, so `! grep -q x f` keeps today's verdict.
 - **Where the word read answers nothing or the two splits part**, the skeleton's head word is read, as today.
 
-`guard-kit/SPEC.md` §The rule roster, **not yet applied**:
+`guard-kit/SPEC.md` §The rule roster, **applied at build**:
 
 - `ro_pipeline`'s "Granted silently when every pipe segment leads with a roster binary" reads "Granted silently when every pipe segment's command word, read by its value off the word read and compared whole, is a roster binary".
 - The list of refusals loses "a leftover quote after normalization" and gains "a command word the word read cannot give".
@@ -103,7 +103,8 @@ Authored rows, `cases.tsv` `ro_pipeline` section:
 - allow `"grep" foo f`;
 - allow `\grep foo f`;
 - allow `g'rep' foo f`;
-- fallthrough `'/bin/cat' f`;
+- fallthrough `'/bin/grep' foo f`, the whole-value compare;
+- block `'/bin/cat' f`, rule `cat_file`'s ahead of the band, as the safety argument below states (ruled at build: the row was authored `fallthrough`, against that argument);
 - fallthrough `'sort' -o out.txt f`;
 - fallthrough `'xargs' rm`;
 - fallthrough `! grep -q x f`.

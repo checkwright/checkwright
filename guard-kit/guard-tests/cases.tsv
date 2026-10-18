@@ -638,6 +638,21 @@ fallthrough	rg --pre=cat foo src | head
 allow	rg foo src | head
 fallthrough	find . -type f | xargs sort -o out.txt
 fallthrough	find . -name '*.txt' | xargs uniq
+# a member's command word is its value off the word read, compared whole: a quoted, escaped or
+# part-quoted roster binary is granted where its forms clear, an escaped quote in an operand is a
+# character of its word, while a path, a write form, the
+# command a quoted xargs runs and a leading keyword withhold; a quoted path to cat stays rule
+# `cat_file`'s block ahead of the band
+allow	'grep' -rn foo src | head
+allow	"grep" foo f
+allow	\grep foo f
+allow	g'rep' foo f
+allow	grep it\'s f
+fallthrough	'/bin/grep' foo f
+block	'/bin/cat' f
+fallthrough	'sort' -o out.txt f
+fallthrough	'xargs' rm
+fallthrough	! grep -q x f
 
 # rule `bounded_wait` — a sanctioned wait auto-allowed. Arm (A), the bounded in-turn wait: the
 #           grant rows are the two of the four measured calls it is shaped to
