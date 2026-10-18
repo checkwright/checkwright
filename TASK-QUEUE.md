@@ -8,7 +8,7 @@
 
   **The set (operator direction 2026-10-18, lead-relayed, not a ruling; the iteration opened undirected):** option D. The features `plugin-harness-reach`, `hook-contract-harness-neutral` and `grant-pwsh-word-read`, which spec authors and promotes; scope promotes no debt. The choice lifts the 2026-10-14 direction that held `grant-pwsh-word-read` back so no grant widened ahead of the v0.32.0 bar, the escalated option naming that lift. Stages scope, spec, align (the amendments span plugin, guard-kit and the kit SPECs carrying hook names), build, validate and close. The hook contract lands first and the per-harness guard wiring binds against its binding table. Composition: bundled on the hook surface plus guard-kit taken whole; drain 3 against inflow 1.8.
 
-  **Second-vendor review (operator grant 2026-10-18, lead-relayed, unspent):** one audit-mode review over this iteration's range, at validate. Every grant lift in `grant-pwsh-word-read` lands before it. Whether v0.32.0 is cut is close's reading against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed); a cut's tag push would make the set's pushes three against a budget of two, so close asks for it.
+  **Second-vendor review (operator grant 2026-10-18, lead-relayed, spent at validate):** one audit-mode review over this iteration's range, at validate. Every grant lift in `grant-pwsh-word-read` lands before it. Whether v0.32.0 is cut is close's reading against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed); a cut's tag push would make the set's pushes three against a budget of two, so close asks for it.
 
 ---
 
@@ -220,17 +220,17 @@ surface (e) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 
 [cost: event/low] [surface: canon-kit]
 
-`check-manifest-count` arm B reads a lead-in's list only past at most one blank line (canon-kit/SPEC.md §check-manifest-count states the bound; `lead_ins` in `native/src/gates/manifest_count.rs` skips one blank with an `if`), so a lead-in, two blank lines, then a list is silently unread, though Markdown reads a blank run as one separator. A fail-open on an adopter's prose; this tree never double-blanks.
+`check-manifest-count` arm B reads a lead-in's list only past at most one blank line (canon-kit/SPEC.md §check-manifest-count states the bound), so a lead-in, two blank lines, then a list is silently unread, though Markdown reads a blank run as one separator. A fail-open on an adopter's prose; this tree never double-blanks.
 
 **Deliverable:** the bound widened to a blank run in the SPEC and the reader, with a bad-fixture case; a stated-contract change, so it rides an amendment.
 
-**Cost while deferred:** a miscounted lead-in behind a blank run passes unread. Surfaced 2026-10-18 by session-sweep-policy-pass' close (baked-calibration audit), promoted at the next scope's carried-bullet intake. Re-verified there: the single-blank skip in `lead_ins`. Owner lookup: `manifest-count`, `manifest_count`, `lead_ins`, `blank run` in this file and the disposed-findings record found none; owner canon-kit/SPEC.md §check-manifest-count.
+**Cost while deferred:** a miscounted lead-in behind a blank run passes unread. Surfaced 2026-10-18 by session-sweep-policy-pass' close (baked-calibration audit), promoted at the next scope's carried-bullet intake. Re-verified there: the reader's single-blank skip. Owner lookup: `manifest-count`, `manifest_count`, `lead_ins`, `blank run` in this file and the disposed-findings record found none; owner canon-kit/SPEC.md §check-manifest-count.
 
 ### ro-pipeline-wrong-grants
 
 [cost: event/high] [surface: guard-kit]
 
-two wrong grants in the shell guard's read-only-pipeline rule, each auto-allowed as "read-only search pipeline", both from harness-reach-pass' second-vendor review (P1). (a) `sort>/dev/null -o tracked.md input.txt`: `passed_read` extracts `sort`, but `ro_forms_read` keys on the dequoted head `sort>/dev/null`, so the `-o` write-option check never runs (`native/src/guard/rules/grants.rs` near line 193); a regression in that iteration's range. (b) `ls > '&1'`: `valued_targets` returns the filename `&1` and `is_fd_dup` reads it as a descriptor duplication, though bash truncates a file named `&1` (near line 170); before the range the quoted target's placeholder withheld the grant.
+two wrong grants in the shell guard's read-only-pipeline rule, each auto-allowed as "read-only search pipeline", both from harness-reach-pass' second-vendor review (P1). (a) `sort>/dev/null -o tracked.md input.txt`: the command word is read as `sort` but the forms check keys on the dequoted head `sort>/dev/null`, so the `-o` write option is never checked; a regression in that iteration's range. (b) `ls > '&1'`: the redirect target read by value, the filename `&1`, is taken for a descriptor duplication, though bash truncates a file named `&1`; before the range the quoted target's placeholder withheld the grant.
 
 **Deliverable:** both refused, a `guard-kit/guard-tests/` row per case, read by a later validate before any close relies on it. Verdict-moving (allow to prompt), so a close promotes it rather than landing it (operator direction 2026-10-18, lead-relayed).
 
@@ -240,11 +240,11 @@ two wrong grants in the shell guard's read-only-pipeline rule, each auto-allowed
 
 [cost: event/low] [surface: guard-kit]
 
-the shell guard blocks the PowerShell string expression `'.tmp/x.ps1'`, which executes nothing: the value-only tokens drop its quoting and `powershell_form` reads it as a scratch execution (`native/src/guard/rules/reach.rs` near line 795). From harness-reach-pass' second-vendor review (P2).
+the shell guard blocks the PowerShell string expression `'.tmp/x.ps1'`, which executes nothing: the value-only tokens drop its quoting, so the rule reads it as a scratch execution. From harness-reach-pass' second-vendor review (P2).
 
 **Deliverable:** a quoted string expression read as a value, with a `guard-kit/guard-tests/` row. Verdict-moving (block to allow), so a close promotes it.
 
-**Cost while deferred:** a rare PowerShell call is refused with a misleading scratch-run steer. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: the payload exits 2 with the scratch-path steer. Owner lookup: `powershell_form`, `string expression` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §scratch-run.
+**Cost while deferred:** a rare PowerShell call is refused with a misleading scratch-run steer. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: the payload exits 2 with the scratch-path steer. Owner lookup: `string expression`, `scratch execution` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §scratch-run.
 
 ### guard-word-read-heredoc
 
