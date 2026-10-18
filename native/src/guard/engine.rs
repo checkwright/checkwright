@@ -160,6 +160,10 @@ impl<'a> Ctx<'a> {
         self.reader.heredoc_terms(t)
     }
 
+    pub fn heredoc_openers(&self, t: &str) -> Vec<String> {
+        self.reader.heredoc_openers(t)
+    }
+
     pub fn harness_view<'t>(&self, seg: &'t str) -> &'t str {
         self.reader.harness_view(seg)
     }

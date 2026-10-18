@@ -55,6 +55,10 @@ impl Reader for Bash {
         heredoc_terms(t)
     }
 
+    fn heredoc_openers(&self, t: &str) -> Vec<String> {
+        heredoc_openers(t)
+    }
+
     fn harness_view<'a>(&self, seg: &'a str) -> &'a str {
         harness_view(seg)
     }
@@ -123,8 +127,12 @@ fn escaped(b: &[u8], i: usize) -> bool {
 // placeholder there is a word, so a quoted herestring opens one as a bare-word herestring does.
 const TERM_RE_SRC: &str = "<<-?[[:space:]]*(\"[^\"]*\"|'[^']*'|\u{0}?[A-Za-z_][A-Za-z0-9_]*)";
 
-pub fn heredoc_terms(line: &str) -> Vec<String> {
+pub fn heredoc_openers(line: &str) -> Vec<String> {
     text::grep_o(TERM_RE_SRC, line)
+}
+
+pub fn heredoc_terms(line: &str) -> Vec<String> {
+    heredoc_openers(line)
         .into_iter()
         .map(|t| {
             let t = t.split_once("<<").map_or(t.as_str(), |(_, r)| r);

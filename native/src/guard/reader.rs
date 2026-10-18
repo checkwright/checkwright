@@ -172,6 +172,8 @@ pub trait Reader {
     fn redirect_pairs(&self, text: &str) -> Vec<String>;
     // spec: guard-kit/SPEC.md §The generic ruleset — the terminator of each heredoc a line opens.
     fn heredoc_terms(&self, text: &str) -> Vec<String>;
+    // spec: guard-kit/SPEC.md §The generic ruleset — each heredoc opener a line carries, as spelled.
+    fn heredoc_openers(&self, text: &str) -> Vec<String>;
     // spec: guard-kit/SPEC.md §The shell guard — a segment as the permission matcher reads it.
     fn harness_view<'a>(&self, seg: &'a str) -> &'a str;
     // spec: guard-kit/SPEC.md §The reader and its views — the word read: each compound-split segment's

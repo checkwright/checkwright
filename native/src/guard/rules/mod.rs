@@ -92,6 +92,51 @@ fn has_substitution(raw: &str) -> bool {
     grep_q(r"\$\(|<\(|>\(", raw) || raw.contains('`')
 }
 
+// spec: guard-kit/SPEC.md §The rule roster — a heredoc-bearing call read as its bare one.
+struct Unheredoc {
+    residue: Vec<bool>,
+    bare: String,
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — a line with each heredoc opener blanked.
+fn unopened(ctx: &Ctx, line: &str) -> String {
+    ctx.heredoc_openers(line).iter().fold(line.to_string(), |l, o| l.replacen(o.as_str(), " ", 1))
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — each compound-split segment flagged where it is heredoc
+// residue, and the skeleton with that residue dropped and each opener blanked; `None` where the call
+// carries no heredoc, a terminator line is missing, or the line and segment walks part.
+fn unheredoc(ctx: &Ctx, s: &str) -> Option<Unheredoc> {
+    let lines: Vec<&str> = s.split('\n').collect();
+    let (mut residue, mut kept, mut any) = (Vec::new(), Vec::new(), false);
+    let mut i = 0usize;
+    while i < lines.len() {
+        let line = lines[i];
+        i += 1;
+        kept.push(unopened(ctx, line));
+        residue.extend(std::iter::repeat(false).take(ctx.segments(line).len()));
+        for t in ctx.heredoc_terms(line) {
+            any = true;
+            if lines.get(i).is_some_and(|l| trim_start(l) == super::reader::HD_MARK) {
+                residue.push(true);
+                i += 1;
+            }
+            if !lines.get(i).is_some_and(|l| trim_start(l) == t) {
+                return None;
+            }
+            residue.push(true);
+            i += 1;
+        }
+    }
+    (any && residue.len() == ctx.segments(s).len()).then(|| Unheredoc { residue, bare: kept.join("\n") })
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — a heredoc read as no composition holds only where no word
+// names the stdin it feeds.
+fn names_stdin(read: &[Vec<Word>]) -> bool {
+    read.iter().flatten().any(|w| w.value == "-" || w.value == "/dev/stdin")
+}
+
 // spec: guard-kit/SPEC.md §The generic ruleset — the wider decline: any expansion or substitution.
 fn has_expansion(raw: &str) -> bool {
     grep_q(r"\$\(|<\(|>\(|\$\{|\$[A-Za-z_]", raw) || raw.contains('`')

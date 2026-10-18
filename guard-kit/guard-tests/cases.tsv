@@ -119,6 +119,8 @@ allow	cat <<'EOF' > .tmp/note.md@NL@the path @ROOT@/tools/report.py is steered@N
 #          unquoted-delimiter heredoc body — the stated bound on the hd class.
 block	echo $(pwd)
 block	P=/tmp/x
+# a heredoc opener riding an assignment is no command after it, so the assignment stands alone
+block	P=/tmp/x <<'EOF'@NL@x@NL@EOF
 allow	awk '$1' data.txt
 # 'hdq': an unquoted delimiter expands, so its body stays live; a quoted one
 # cannot expand, and the shell is what guarantees that — so its body is inert
@@ -214,6 +216,8 @@ block	sed -'n' '1,60p' TASK-QUEUE.md <<'EOF'@NL@x@NL@EOF
 block	python3 - <<'PY'@NL@p = 'notes.md'@NL@s = open(p).read()@NL@assert s.count('old') == 1@NL@s = s.replace('old', 'new')@NL@open(p, 'w').write(s)@NL@PY
 block	python3 - <<'PY'@NL@def sub(p, o, n):@NL@    s = open(p).read()@NL@    assert s.count(o) == 1@NL@    open(p, 'w').write(s.replace(o, n))@NL@sub('a.md', 'x', 'y')@NL@PY
 block	python3 -c "p='notes.md'; s=open(p).read(); open(p,'w').write(s.replace('a', 'b'))"
+# a heredoc beside a -c body is the body's stdin, and the body is read off the word read
+block	python3 -c "p='notes.md'; s=open(p).read(); open(p,'w').write(s.replace('a', 'b'))" <<'EOF'@NL@x@NL@EOF
 fallthrough	python3 - <<'PY'@NL@p = 'notes.md'@NL@s = open(p).read()@NL@open(p, 'w').write(s.replace('a', f'{p}'))@NL@PY
 fallthrough	python3 - <<'PY'@NL@s = open('n.md').read()@NL@open('n.md', 'w').write(re.sub('a', 'b', s).replace('c', 'd'))@NL@PY
 fallthrough	python3 - <<'PY'@NL@import json@NL@s = open('n.md').read()@NL@open('n.md', 'w').write(s.replace('a', 'b'))@NL@PY
@@ -238,6 +242,11 @@ block	find lib -type f; find lib -type d
 block	find lib -type f; echo ===; find lib -type d
 # the command words come through the command read, a banner's included: by value, by path, past a wrapper
 block	\find lib -type f; 'echo' ===; command find lib -type d
+# a heredoc feeds a stdin find never reads, so it composes nothing: its opener and residue are read
+# past, and any other redirect beside it still composes
+block	find lib -type f <<'EOF'@NL@x@NL@EOF
+block	find lib -type f; find lib -type d <<'EOF'@NL@x@NL@EOF
+fallthrough	find . -type f > listing.txt <<'EOF'@NL@x@NL@EOF
 fallthrough	find lib -type f; find lib -delete
 fallthrough	find . -name '*.tmp' -delete
 allow	find . -type f | head
@@ -257,6 +266,9 @@ fallthrough	find src -type f -exec grep -q foo '{}' \\;
 fallthrough	find src -type f -exec cat '{}' '\;'
 block	find src -type f -exec \cat '{}' \;
 block	find . -name \*.md -exec cat a\ b '{}' \;
+# a heredoc feeds a stdin no executed read takes, unless a word names it
+block	find src -type f -exec grep -q foo '{}' \; <<'EOF'@NL@x@NL@EOF
+fallthrough	find src -type f -exec grep -f - '{}' \; <<'EOF'@NL@x@NL@EOF
 allow	find . -name '*.md' -print0 | xargs -0 grep -l x
 fallthrough	find . -name '*.tsv' -delete
 fallthrough	find . -exec md5sum '{}' +
@@ -286,6 +298,12 @@ block	cat a.md; cat b.md
 block	cat a.md; echo ===; cat b.md
 # the command words come through the command read, a banner's included: by value, by path, past a wrapper
 block	\cat a.md; "printf" ===; /bin/cat b.md
+# a heredoc feeds a stdin a one-file cat never reads, so it composes nothing; a heredoc-fed cat
+# names no file, or names stdin, and passes
+block	cat TASK-QUEUE.md <<'EOF'@NL@x@NL@EOF
+block	cat a.md; cat b.md <<'EOF'@NL@x@NL@EOF
+fallthrough	cat -- - <<'EOF'@NL@x@NL@EOF
+fallthrough	cat /dev/stdin <<'EOF'@NL@x@NL@EOF
 fallthrough	cat a.md; make build
 fallthrough	cat a.md && make build
 fallthrough	echo a; echo b
@@ -306,6 +324,9 @@ fallthrough	git grep --cached foo
 block	git gr\ep foo
 block	/usr/bin/git grep foo
 block	git --no-pager grep foo
+# a heredoc feeds a stdin git grep reads only where a word names it
+block	git grep foo <<'EOF'@NL@x@NL@EOF
+fallthrough	git grep -f - <<'EOF'@NL@x@NL@EOF
 fallthrough	git -C sub grep foo
 fallthrough	git 'grep foo'
 
@@ -1052,6 +1073,8 @@ block	bash /elsewhere/checks/check-x.sh
 block	bash C:/elsewhere/checks/check-x.sh
 block	timeout 5 rm -rf .tmp/../scratch.txt
 block	\timeout 5 rm -rf .tmp/../scratch.txt
+# a heredoc-bearing call is declined, its dequoted view unaligned: the stated limit
+fallthrough	rm -rf .tmp/../scratch.txt <<'EOF'@NL@x@NL@EOF
 fallthrough	rm -rf .tmp/x .tmp/y; make build
 fallthrough	rm -rf .tmp/x 2>/dev/null; make build
 fallthrough	bash guard-kit/checks/check-x.sh
@@ -1072,6 +1095,9 @@ block	printf x >> tracked.md; git status
 # redirect or behind a wrapper; rule `append_scratch` still reads the skeleton's lead alone
 block	\cat>> tracked.md
 block	nohup "printf" x >> .tmp/journal.md && make build
+# and beside a heredoc, off the command read
+block	\cat>> tracked.md <<'EOF'@NL@x@NL@EOF
+block	nohup "printf" x >> .tmp/journal.md && make build <<'EOF'@NL@x@NL@EOF
 fallthrough	'cat' >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF
 block	mkdir -p docs && cat > docs/x.md <<'EOF'@NL@line@NL@EOF
 block	make build && echo x > /tmp/x.txt

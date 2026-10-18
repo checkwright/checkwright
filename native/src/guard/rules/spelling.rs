@@ -244,6 +244,8 @@ pub fn expansion(ctx: &Ctx) -> Decided {
         return block("avoid shell variables/expansions ($VAR, ${...}, $(...), <(...)) — the harness's matcher refuses every expansion, so no allowlist entry can match the command and it costs an out-of-band permission decision. Inline the literal path, use a relative path, or 'git -C <dir>'. If you genuinely need the expansion, run it yourself with !<command>.");
     }
     let expn = ctx.view(ctx.cmd(), SqDqHdq)?;
+    let expn: Vec<String> = expn.split('\n').map(|l| super::unopened(ctx, l)).collect();
+    let expn = expn.join("\n");
     if grep_q(
         "(^|[;(]|&&|\\|\\|)[[:space:]]*[A-Za-z_][A-Za-z0-9_]*=[^[:space:];|&]*[[:space:]]*($|;)",
         &expn,

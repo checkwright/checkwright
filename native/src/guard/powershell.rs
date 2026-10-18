@@ -63,6 +63,10 @@ impl Reader for PowerShell {
         Vec::new()
     }
 
+    fn heredoc_openers(&self, _: &str) -> Vec<String> {
+        Vec::new()
+    }
+
     // spec: guard-kit/SPEC.md §The reader and its views — no wrapper strip is documented for the
     // PowerShell matcher.
     fn harness_view<'a>(&self, seg: &'a str) -> &'a str {

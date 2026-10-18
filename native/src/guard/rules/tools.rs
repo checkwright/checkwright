@@ -2,7 +2,7 @@
 // tool or a kit arm does better, and the waits and process queries that cannot end.
 use super::{
     command_read, command_word, git_read, git_walk_of, has_expansion, has_substitution, is_banner, loop_span, passed_read, past_wrappers, pipe_members, segment_depths,
-    moves_repository, names_command, on_ro_roster, ro_invocation_clear, GitWalk,
+    moves_repository, names_command, names_stdin, on_ro_roster, passed_words, ro_invocation_clear, unheredoc, unopened, GitWalk,
 };
 use crate::ere::Ere;
 use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Verdict};
@@ -636,6 +636,17 @@ fn python_rewrite(ctx: &Ctx, c: &Cmd, s: &str) -> Decided {
                 return python_block(door);
             }
         }
+    } else if unheredoc(ctx, s).is_some() {
+        for passed in passed_read(ctx, c)? {
+            let Some((head, args)) = passed.split_first() else { continue };
+            if !matches!(head.value.as_str(), "python" | "python3") {
+                continue;
+            }
+            let Some(p) = program_walk("python", args.iter().map(|w| text::unsentinel(&w.value)).collect()) else { continue };
+            if p.inline && is_literal_rewrite(&p.prog, false) {
+                return python_block(door);
+            }
+        }
     }
     let mut k = 0usize;
     for seg in ctx.segments(s) {
@@ -662,11 +673,11 @@ fn python_rewrite(ctx: &Ctx, c: &Cmd, s: &str) -> Decided {
 
 // spec: guard-kit/SPEC.md §The generic ruleset — a `;`-compound skeleton is a batched read when every
 // segment is a bare read or a literal banner, and at least one is a read.
-fn is_read_batch(ctx: &Ctx, s: &str, read: &[Vec<Word>], pred: impl Fn(usize, &str) -> bool) -> bool {
+fn is_read_batch(ctx: &Ctx, s: &str, read: &[Vec<Word>], residue: &[bool], pred: impl Fn(usize, &str) -> bool) -> bool {
     let mut reads = 0usize;
     for (i, seg) in ctx.segments(s).iter().enumerate() {
         let seg = trim_start(seg);
-        if seg.is_empty() {
+        if seg.is_empty() || residue.get(i) == Some(&true) {
             continue;
         }
         let banner = read.get(i).and_then(|ws| ws.first()).is_some_and(|w| names_command(w, "echo") || names_command(w, "printf"));
@@ -679,6 +690,15 @@ fn is_read_batch(ctx: &Ctx, s: &str, read: &[Vec<Word>], pred: impl Fn(usize, &s
     reads >= 1
 }
 
+// spec: guard-kit/SPEC.md §The rule roster — the composition test rules `find_glob`, `cat_file` and
+// `git_grep` share: `re` finds nothing in the skeleton, read past a heredoc where the word read answers
+// and no word names its stdin; the heredoc residue's segments flagged, or `None` where it composes.
+fn uncomposed(ctx: &Ctx, c: &Cmd, s: &str, re: &'static str) -> Result<Option<Vec<bool>>, Fault> {
+    let Some(u) = unheredoc(ctx, s) else { return Ok((!grep_q(re, s)).then(Vec::new)) };
+    let read = ctx.word_read(c)?;
+    Ok((!grep_q(re, &u.bare) && read.is_some_and(|r| !names_stdin(&r))).then_some(u.residue))
+}
+
 fn has_search_tool(ctx: &Ctx, t: &str) -> bool {
     ctx.host().search_tools.iter().any(|x| x == t)
 }
@@ -688,19 +708,17 @@ pub fn find_glob(ctx: &Ctx) -> Decided {
         return Ok(None);
     }
     let s = ctx.view(ctx.cmd(), SqDqHd)?;
-    if grep_q(r"(&&|\|\||\||&|<|>)", &s) {
-        return Ok(None);
-    }
+    let Some(residue) = uncomposed(ctx, ctx.cmd(), &s, r"(&&|\|\||\||&|<|>)")? else { return Ok(None) };
     let h = ctx.host();
     let read = command_read(ctx, ctx.cmd())?;
-    let listing = |i: usize, _: &str| match read.get(i).and_then(|ws| ws.split_first()) {
+    let listing =|i: usize, _: &str| match read.get(i).and_then(|ws| ws.split_first()) {
         Some((head, args)) => names_command(head, "find") && {
             let rest = held_values(args);
             ro_invocation_clear(h, "find", &rest, &rest, false)
         },
         None => false,
     };
-    if !is_read_batch(ctx, &s, &read, listing) {
+    if !is_read_batch(ctx, &s, &read, &residue, listing) {
         return Ok(None);
     }
     block("don't list files with a bare 'find' — use the Glob tool: it returns matching paths (registered for a later Read) and needs no permission decision at all. If your toolset carries no Glob tool, keep 'find' and pipe the listing into a read-only consumer ('find <dir> -type f | sort'), which the read-only pipeline grant allows. This fires on a lone listing and on a ';'-sequence of them (a literal echo/printf banner between them is fine); a 'find' carrying an action predicate (-exec/-delete/…), piped into a consumer, or redirected is untouched. If you genuinely need find, run it yourself with !<command>.")
@@ -747,11 +765,25 @@ pub fn find_exec(ctx: &Ctx) -> Decided {
     }
     let Some(read) = ctx.word_read(c)? else { return Ok(None) };
     let h = ctx.host();
+    let heredoc = unheredoc(ctx, &s);
+    if heredoc.is_some() && names_stdin(&read) {
+        return Ok(None);
+    }
+    let escape = super::escape_char(ctx);
     for (seg, ws) in ctx.segments(&s).iter().zip(&read) {
         let seg = trim_start(seg);
         if head_word(seg) != "find" || seg.contains("{}") {
             continue;
         }
+        let unopened_ws;
+        let ws = match &heredoc {
+            Some(_) if unopened(ctx, seg).contains(['<', '>']) => continue,
+            Some(_) => {
+                unopened_ws = passed_words(ws, escape);
+                &unopened_ws
+            }
+            None => ws,
+        };
         let Some((e, t, per_file)) = exec_form(ws) else { continue };
         let preds = held_values(&ws[1..e]);
         if !ro_invocation_clear(h, "find", &preds, &preds, false) {
@@ -788,18 +820,16 @@ pub fn cat_file(ctx: &Ctx) -> Decided {
         return Ok(None);
     }
     let s = ctx.view(ctx.cmd(), SqDqHd)?;
-    if grep_q(r"(&&|\|\||\||&|<|>)", &s) {
-        return Ok(None);
-    }
+    let Some(residue) = uncomposed(ctx, ctx.cmd(), &s, r"(&&|\|\||\||&|<|>)")? else { return Ok(None) };
     let read = command_read(ctx, ctx.cmd())?;
-    let cat_read = |i: usize, _: &str| match read.get(i).and_then(|ws| ws.split_first()) {
+    let cat_read =|i: usize, _: &str| match read.get(i).and_then(|ws| ws.split_first()) {
         Some((head, args)) => names_command(head, "cat") && cat_operands(args.iter().map(|w| w.value.as_str())) == 1,
         None => false,
     };
-    if !is_read_batch(ctx, &s, &read, cat_read) {
+    if !is_read_batch(ctx, &s, &read, &residue, cat_read) {
         return Ok(None);
     }
-    block("don't read files with a bare 'cat' — use the Read tool: it returns numbered lines registered for a later Edit, and needs no permission decision at all. This fires on a lone 'cat <file>' and on a ';'-sequence of them (a literal echo/printf banner between reads is fine — batch them into one Read); a 'cat' feeding a pipe or heredoc, redirecting, or concatenating multiple files in one command is composition and untouched. If you genuinely need cat, run it yourself with !<command>.")
+    block("don't read files with a bare 'cat' — use the Read tool: it returns numbered lines registered for a later Edit, and needs no permission decision at all. This fires on a lone 'cat <file>' and on a ';'-sequence of them (a literal echo/printf banner between reads is fine — batch them into one Read); a 'cat' feeding a pipe, reading a heredoc, redirecting, or concatenating multiple files in one command is composition and untouched. If you genuinely need cat, run it yourself with !<command>.")
 }
 
 pub fn git_grep(ctx: &Ctx) -> Decided {
@@ -807,10 +837,9 @@ pub fn git_grep(ctx: &Ctx) -> Decided {
         return Ok(None);
     }
     let s = ctx.view(ctx.cmd(), SqDqHd)?;
-    if grep_q(r"(&&|\|\||;|\||&|<|>)", &s) {
-        return Ok(None);
-    }
-    let read = git_read(ctx, ctx.cmd())?;
+    let Some(residue) = uncomposed(ctx, ctx.cmd(), &s, r"(&&|\|\||;|\||&|<|>)")? else { return Ok(None) };
+    let read: Vec<Option<Vec<String>>> =
+        git_read(ctx, ctx.cmd())?.into_iter().enumerate().filter(|(i, _)| residue.get(*i) != Some(&true)).map(|(_, r)| r).collect();
     let [Some(passed)] = read.as_slice() else { return Ok(None) };
     let moved = git_walk_of(passed, GitWalk::Globals).map_or(true, |g| g.iter().any(|g| moves_repository(g)));
     let toks = git_walk_of(passed, GitWalk::Args).unwrap_or_default();

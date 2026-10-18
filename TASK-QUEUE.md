@@ -28,16 +28,6 @@ the bash word read answers nothing on a call carrying an ANSI-C (`$'...'`) or lo
 
 ## Technical Debt
 
-### heredoc-call-rule-decline
-
-rules `cat_file`, `find_glob`, `find_exec`, `git_grep`, `brace_glyph`, `grant_path_slot`, `expansion`, `sed_file` (its `python3 -c` rows) and `emitter_write`'s by-value lead decide a call bare and fall through once a heredoc rides it: `cat TASK-QUEUE.md` blocks, `cat TASK-QUEUE.md <<'EOF'` falls through, most such rows carrying no quote of their own.
-
-**Deliverable:** each rule reads a heredoc-bearing call as it reads the bare one, with firing rows carrying a heredoc, or each limit declared in the rule roster. It moves verdicts from fall-through to block, steer or allow, so it lands in a build, never at a close.
-
-**Cause, read in the code at guard-word-read-reach-pass' scope:** a per-rule operator test, not the word read. `cat_file`, `git_grep` and `find_glob` decline on their own `<`/`>` regex over the `SqDqHd` view, which keeps the heredoc opener; the other rules' sites are unread. `cat_file`'s own steer calls a heredoc-fed `cat` composition, so its row may be a limit to declare.
-
-**Cost while deferred:** a missed steer leaves the call to the harness prompt, and `find_glob`'s and `grant_path_slot`'s lost grants leave it to the harness grant; never a wrong grant. Filed 2026-10-18 by guard-grant-kpi-pass' close, draining its spec's bullet. Re-verified there: 36 of 258 heredoc-free block/advise rows of `guard-tests/cases.tsv` fall through with `<<'EOF'@NL@x@NL@EOF` appended, on the built binary outside the sandbox; the bullet said 40. Owner lookup: `heredoc`, `word read` in this file and the disposed-findings record, only the done `guard-word-read-heredoc`; owner guard-kit/SPEC.md §The rule roster.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -1013,4 +1003,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - ro-background-quoted-fd-target
 - background-record-bare-amp
 - pwsh-herestring-word-read
+- heredoc-call-rule-decline
 

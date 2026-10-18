@@ -5,7 +5,7 @@ use super::{
     command_read, escape_char, has_substitution, inert_value, is_banner, is_bare_allow, is_ro_segment, is_ro_xargs,
     lead_keyword, noclobber, nulled_by_value, on_ro_roster, passed_read, pipe_members, redirect_targets, redirect_values,
     ro_forms_clear, valued_targets, ro_forms_clear_except, ro_forms_kit, segment_core,
-    shell_backgrounds, strip_redirect_op, unredirected_words, xargs_command_index,
+    shell_backgrounds, strip_redirect_op, unheredoc, unredirected_words, xargs_command_index,
 };
 use crate::guard::allow_match;
 use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Verdict};
@@ -140,6 +140,20 @@ fn valued_lead(ctx: &Ctx, d: &str) -> String {
     let line = d.split('\n').next().unwrap_or("").replace('\\', "");
     let word = head_word(ctx.harness_view(trim_start(&line)));
     unsentinel(&word[..word.find(['>', '<']).unwrap_or(word.len())])
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — rule `emitter_write`'s lead by value on a heredoc-bearing
+// call: each statement's first segment's command word off the command read; `None` where the
+// statements' segments do not sum to the call's.
+fn read_leads(ctx: &Ctx, stmts: &[String]) -> Result<Option<Vec<String>>, Fault> {
+    let read = command_read(ctx, ctx.cmd())?;
+    let mut at = 0usize;
+    let mut leads = Vec::new();
+    for stmt in stmts {
+        leads.push(read.get(at).and_then(|ws| ws.first()).map_or(String::new(), |w| w.value.clone()));
+        at += ctx.segments(stmt).len();
+    }
+    Ok((at == read.len()).then_some(leads))
 }
 
 pub fn append_scratch(ctx: &Ctx) -> Decided {
@@ -838,9 +852,18 @@ pub fn emitter_write(ctx: &Ctx) -> Decided {
     let h = ctx.host();
     let stmts = ctx.residue_statements(&s);
     let dstmts = ctx.dequoted(ctx.cmd())?.map(|d| ctx.residue_statements(&d)).filter(|d| d.len() == stmts.len());
+    let read_leads = match dstmts {
+        None if unheredoc(ctx, &s).is_some() => read_leads(ctx, &stmts)?,
+        _ => None,
+    };
     let lead_of = |j: usize, stmt: &str| -> String {
         let skel = statement_lead(stmt);
-        match dstmts.as_ref().and_then(|d| d.get(j)).map(|d| valued_lead(ctx, d)) {
+        let valued = match (&dstmts, &read_leads) {
+            (Some(d), _) => d.get(j).map(|d| valued_lead(ctx, d)),
+            (None, Some(r)) => r.get(j).cloned(),
+            _ => None,
+        };
+        match valued {
             Some(v) if !h.append_bins.iter().any(|b| b == skel) => v,
             _ => skel.to_string(),
         }
