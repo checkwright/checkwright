@@ -1018,7 +1018,3 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 ## Done
 
-- hook-contract-harness-neutral
-- grant-pwsh-word-read
-- plugin-harness-reach
-
