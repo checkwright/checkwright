@@ -2,7 +2,7 @@
 
 Pairs `session-sweep-horizon-baked` and `session-sweep-live-scratch`, which edit one function. The session-context hook's step 6 removes scratch on a constant age horizon (`STALE_SECS` in `native/src/hook/session_context.rs`, one day) and spares only `.gitkeep` and `.gitignore`. That breaks doctrine-kit/DOCTRINE.md Policy-as-choice, which asks for a calibration shipped as a consumer-selectable set with off among it. It also takes a session-lifetime artifact once its session idles past the horizon. Re-run at spec over a sandboxed scratch dir: an aged session-role marker and an aged directory, the member started over them with stdin from `/dev/null`, printed `Tidied 3 stale scratch path(s)` and removed both.
 
-**Reach: context-kit, lifecycle-kit, the crate and this repo's knob file.** Delta 3 rewrites one lifecycle-kit paragraph, so this amendment is cross-component and the audit stage follows spec.
+**Reach: context-kit, lifecycle-kit, installer, the crate and this repo's knob file.** Delta 3 rewrites one lifecycle-kit paragraph, so this amendment is cross-component and the audit stage follows spec.
 
 **The keep-list, weighed against the icebox's `boundary-preserve-covers-names-not-lifetimes`.** That entry's objection is that a keep-list of names re-buys one omission per new session-lifetime artifact, where the property is a lifetime. The sweep is already a lifetime mechanism: its age guard approximates "no live session still reads this". A names list on top of it is the residue, and this amendment keeps the residue small two ways.
 
@@ -58,12 +58,19 @@ Replacement for `lifecycle-kit/SPEC.md` §bin/enter-stage.sh, the paragraph open
 
 This repo sets no `CONTEXT_KIT_SWEEP_PRESERVE`. With the sweep off it has nothing to keep, and a list here would be a second spelling of the boundary keep-list for an inert reclaimer.
 
+### (5) Two prose claims of a day-old sweep name the default {mechanical}
+
+Delta 1 makes the horizon a knob, so two sentences that state the sweep's age as a fact hold only at the default. **Not yet applied.**
+
+- `lifecycle-kit/SPEC.md` §The survey record, the sentence "whose age guard is shorter than an iteration" becomes "whose default age horizon is shorter than an iteration".
+- `installer/SPEC.md` §The update notice, the cache paragraph's "the session-context hook's scratch sweep reclaims entries older than a day" becomes "the session-context hook's scratch sweep reclaims, at its default horizon, entries older than a day".
+
 ## Producers and consumers
 
 - **`CONTEXT_KIT_SWEEP_HORIZON_HOURS` (deltas 1 and 2).**
   - Producer: the static defaults table at `24`, overridden by a consumer's knob file. This repo sets `off` (delta 4), so the default and the off value are each set by a deployed configuration: a fresh adopter runs the default.
   - Consumer: the session-context member, through `knobs()` at its start, once per hook fire. `stale` compares it, and `sweep` short-circuits on `off`. The table validator also reads it, refusing a malformed value for every context-kit reader.
-  - Roster-holding readers: `KNOBS` in `native/src/hook/session_context.rs`, the member's declared-name list (§Layout and configuration, "a compiled member refusing a name its table does not declare") (delta 1); the defaults table (delta 2); `--emit knob-roster`, derived from that table. Probe: `git grep -n "CONTEXT_KIT_SESSION_ROLE_FILE" -- native context-kit scripts installer gate-sdk`, over the tracked tree, finds for the sibling knob the SPEC's two mentions, `KNOBS` and the table row, and nothing else.
+  - Roster-holding readers: `KNOBS` in `native/src/hook/session_context.rs`, the member's declared-name list (§Layout and configuration, "a compiled member refusing a name its table does not declare") (delta 1); the defaults table (delta 2); `--emit knob-roster`, derived from that table. Probe: `git grep -n "CONTEXT_KIT_SESSION_ROLE_FILE" -- native context-kit scripts installer gate-sdk`, over the tracked tree, finds for the sibling knob the SPEC's two mentions, `KNOBS`, the `Knobs` read and the table row, and nothing else.
 - **`CONTEXT_KIT_SWEEP_PRESERVE` (deltas 1 and 2).**
   - Producer: a consumer's knob file. The kit default is empty and this repo sets none (delta 4), so no deployed configuration sets it today. That is the point-1 exposure: the keep-list is policy-as-choice for a consumer keeping the sweep, and only the crate's unit test exercises it. Stated, not hidden.
   - Consumer: `sweep_dir` at the scratch root, per hook fire; the malformed-entry line's one reader is the session reading the brief.
@@ -80,10 +87,11 @@ The roster came from `git grep -n -i "scratch sweep\|older than a day\|day horiz
 - `context-kit/SPEC.md` §Layout and configuration, the knob bullets and the validator list (delta 2).
 - `native/src/hook/session_context.rs`, the constant, `Knobs`, `KNOBS`, `stale`, `sweep_dir`, `sweep` and the sweep test (delta 1).
 - `native/src/knobs/context_kit.rs`, the two rows and the validator rule (delta 2).
-- `lifecycle-kit/SPEC.md` §bin/enter-stage.sh, the second-reclaimer paragraph (delta 3).
+- `lifecycle-kit/SPEC.md` §bin/enter-stage.sh, the second-reclaimer paragraph (delta 3), and §The survey record's "age guard" clause (delta 5).
+- `installer/SPEC.md` §The update notice, the cache paragraph (delta 5).
 - `scripts/context-config.knobs` (delta 4).
 - `.workflow/release-declarations.md`, `## Knob changes`: one bullet naming the two context-kit knobs and their defaults, and one under `## Behavior changes` saying the sweep now spares the session-role marker at any age (deltas 1 and 2).
-- `docs/context-kit/SPEC.md` and `docs/lifecycle-kit/SPEC.md`, the generated mirrors (all deltas).
+- `docs/context-kit/SPEC.md`, `docs/lifecycle-kit/SPEC.md` and `docs/installer/SPEC.md`, the generated mirrors (all deltas).
 
 ## Retired spellings
 
