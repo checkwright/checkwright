@@ -173,13 +173,18 @@ fn passed_words(ws: &[Word], escape: char) -> Vec<Word> {
     out
 }
 
+// spec: guard-kit/SPEC.md §The reader and its views — the running reader's escape character.
+fn escape_char(ctx: &Ctx) -> char {
+    match ctx.shell() {
+        Shell::Bash => '\\',
+        Shell::PowerShell => '`',
+    }
+}
+
 // spec: guard-kit/SPEC.md §The reader and its views — the command read's first half: per segment, the
 // words it passes, the skeleton's where the word read answers nothing.
 fn passed_read(ctx: &Ctx, c: &Cmd) -> Result<Vec<Vec<Word>>, Fault> {
-    let escape = match ctx.shell() {
-        Shell::Bash => '\\',
-        Shell::PowerShell => '`',
-    };
+    let escape = escape_char(ctx);
     let s = ctx.view(c, SqDqHd)?;
     let read = ctx.word_read(c)?;
     Ok(ctx

@@ -771,23 +771,23 @@ fn slot_capture(sv: &str, off: usize, len: usize, token: &str, start: bool, righ
 // as the shell passes it.
 fn nulled_by_value(ctx: &Ctx, c: &Cmd, n: usize) -> Result<bool, Fault> {
     let Some(read) = ctx.word_read(c)? else { return Ok(false) };
-    Ok(redirect_values(&read).is_some_and(|ts| ts.len() == n && ts.iter().all(|t| t == "/dev/null")))
+    Ok(redirect_values(&read, '\\').is_some_and(|ts| ts.len() == n && ts.iter().all(|t| t == "/dev/null")))
 }
 
 // spec: guard-kit/SPEC.md §The rule roster — each output redirect's target by its value, an fd-dup
 // dropped; `None` where a target is cut inside a piece, a word carries a second operator after its
 // first, or an operator has no word after it.
-pub(super) fn redirect_values(read: &[Vec<Word>]) -> Option<Vec<String>> {
+pub(super) fn redirect_values(read: &[Vec<Word>], escape: char) -> Option<Vec<String>> {
     let mut out = Vec::new();
     for ws in read {
         let mut k = 0usize;
         while k < ws.len() {
             let w = &ws[k];
             k += 1;
-            let Some(at) = bare_operator(&w.live, 0, &['>']) else { continue };
+            let Some(at) = bare_operator(&w.live, 0, &['>'], escape) else { continue };
             let more = w.live[at + 1..].chars().next().filter(|c| matches!(c, '>' | '&'));
             let end = at + 1 + more.map_or(0, char::len_utf8);
-            if bare_operator(&w.live, end, &['>', '<']).is_some() {
+            if bare_operator(&w.live, end, &['>', '<'], escape).is_some() {
                 return None;
             }
             let value = if end == w.live.len() {
@@ -806,11 +806,11 @@ pub(super) fn redirect_values(read: &[Vec<Word>]) -> Option<Vec<String>> {
 
 // spec: guard-kit/SPEC.md §The reader and its views — the first character of `set` at or after `from`
 // standing bare in a word's live text, not behind an escaping backslash.
-fn bare_operator(live: &str, from: usize, set: &[char]) -> Option<usize> {
+fn bare_operator(live: &str, from: usize, set: &[char], escape: char) -> Option<usize> {
     let mut held = false;
     live.char_indices().find(|&(i, ch)| {
         let bare = !std::mem::take(&mut held);
-        held = bare && ch == '\\';
+        held = bare && ch == escape;
         bare && i >= from && set.contains(&ch)
     }).map(|(i, _)| i)
 }
@@ -928,7 +928,7 @@ mod tests {
             acc.finish().remove(0).remove(0)
         };
         let plain = |w: &str| Word::new(w, w, w);
-        let values = |ws: Vec<Word>| redirect_values(&[ws]);
+        let values = |ws: Vec<Word>| redirect_values(&[ws], '\\');
         let dq_null = pieced(&[(">", ">", ">"), ("\"/dev/null\"", "/dev/null", "\0DQ")]);
         let sq_null = pieced(&[("2", "2", "2"), (">", ">", ">"), ("'/dev/null'", "/dev/null", "\0SQ")]);
         assert_eq!(values(vec![plain("x"), dq_null.clone(), sq_null]), Some(strings(&["/dev/null", "/dev/null"])));
@@ -944,6 +944,13 @@ mod tests {
         assert_eq!(values(vec![plain("x"), quoted, escaped, plain("y")]), Some(Vec::new()), "a quoted or escaped '>' is text");
         assert_eq!(dq_null.value_after(1), Some("/dev/null"));
         assert_eq!(dq_null.value_after(2), None, "a cut inside a piece");
+        let ps = |ws: Vec<Word>| redirect_values(&[ws], '`');
+        let ps_sq = pieced(&[("2", "2", "2"), (">", ">", ">"), ("'op.err'", "op.err", "\0SQ")]);
+        let ps_tick = pieced(&[("op.e", "op.e", "op.e"), ("`r", "r", "`r"), ("r", "r", "r")]);
+        assert_eq!(ps(vec![plain("x"), plain("2>op.err"), plain("2>&1")]), Some(strings(&["op.err"])), "a bare target");
+        assert_eq!(ps(vec![plain("x"), ps_sq]), Some(strings(&["op.err"])), "a quoted target");
+        assert_eq!(ps(vec![plain("x"), plain("2>"), ps_tick]), Some(strings(&["op.err"])), "a backticked target");
+        assert_eq!(ps(vec![plain("x"), Word::new("`>", ">", "`>"), plain("y")]), Some(Vec::new()), "a backticked '>' is text");
     }
 
     // spec: guard-kit/SPEC.md §The generic ruleset — the bounds test's clause (a)

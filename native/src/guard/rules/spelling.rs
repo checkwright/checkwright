@@ -1,7 +1,8 @@
 // spec: guard-kit/SPEC.md §The generic ruleset — the spelling rules: a command form the matcher cannot
 // resolve, steered to the one it can.
 use super::grants::{redirect_values, rewrite_granted};
-use super::{command_read, command_word, git_read, git_walk_of, names_command, passed_read, GitWalk};
+use super::reach::path_word;
+use super::{command_read, escape_char, command_word, git_read, git_walk_of, names_command, passed_read, GitWalk};
 use crate::guard::engine::{Cmd, Ctx, Decided, Shell, Verdict};
 use crate::guard::host::{knob_scalar_value, same_file};
 use crate::guard::reader::View::{SqDqHd, SqDqHdq, SqHdq};
@@ -164,18 +165,22 @@ fn knob_echo(raw: &str, ws: Vec<String>) -> Option<Verdict> {
 
 pub fn scratch_redirect(ctx: &Ctx) -> Decided {
     let cmd = ctx.view(ctx.cmd(), SqDqHd)?;
-    let bare = match ctx.shell() {
-        Shell::Bash => {
-            grep_q("(^|[[:space:]])([0-9]*|&)>[>&]?[[:space:]]*[^[:space:]/|&]+\\.(err|out|log)([[:space:]]|$)", &cmd)
-                || ctx.word_read(ctx.cmd())?.and_then(|r| redirect_values(&r)).is_some_and(|ts| ts.iter().any(|t| scratch_name(t)))
-        }
-        // spec: guard-kit/SPEC.md §The generic ruleset — PowerShell's `*` stream operator, and a `\`
-        // in the target a path separator.
-        Shell::PowerShell => grep_q(
-            "(^|[[:space:]])([0-9]*|&|[*])>>?[[:space:]]*[^[:space:]/|&]+\\.(err|out|log)([[:space:]]|$)",
-            &cmd.replace('\\', "/"),
-        ),
-    };
+    let by_value = ctx
+        .word_read(ctx.cmd())?
+        .and_then(|r| redirect_values(&r, escape_char(ctx)))
+        .is_some_and(|ts| ts.iter().any(|t| scratch_name(&path_word(ctx, t))));
+    let bare = by_value
+        || match ctx.shell() {
+            Shell::Bash => {
+                grep_q("(^|[[:space:]])([0-9]*|&)>[>&]?[[:space:]]*[^[:space:]/|&]+\\.(err|out|log)([[:space:]]|$)", &cmd)
+            }
+            // spec: guard-kit/SPEC.md §The generic ruleset — PowerShell's `*` stream operator, and a `\`
+            // in the target a path separator.
+            Shell::PowerShell => grep_q(
+                "(^|[[:space:]])([0-9]*|&|[*])>>?[[:space:]]*[^[:space:]/|&]+\\.(err|out|log)([[:space:]]|$)",
+                &cmd.replace('\\', "/"),
+            ),
+        };
     if bare {
         return block(format!("don't redirect scratch to a bare repo-root filename (e.g. 2> op.err) — it pollutes cwd and risks a 'git add -A'. Send it to a gitignored scratch dir (e.g. {}/<name>.err).", ctx.host().first_scratch()));
     }

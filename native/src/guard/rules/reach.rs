@@ -534,7 +534,7 @@ pub fn rm_tracked(ctx: &Ctx) -> Decided {
 
 // spec: guard-kit/SPEC.md §The generic ruleset — a path word as the rule compares it: under
 // PowerShell `\` folds to `/`, rule `worktree_confinement`'s precedent.
-fn path_word(ctx: &Ctx, w: &str) -> String {
+pub(super) fn path_word(ctx: &Ctx, w: &str) -> String {
     match ctx.shell() {
         Shell::PowerShell => w.replace('\\', "/"),
         Shell::Bash => w.to_string(),
