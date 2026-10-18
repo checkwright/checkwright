@@ -16,3 +16,10 @@ governed gates today, its cardinal and noun straddling the line break.
 
 Above the old eleven-word ceiling the single-token cardinals reach too: the
 suite carries seventeen gates, and the roster names ninety rules.
+
+A lead-in count drifts when its list gains a member. The three arms:
+
+- the first arm
+- the second arm
+- a third arm
+- a fourth arm, added later

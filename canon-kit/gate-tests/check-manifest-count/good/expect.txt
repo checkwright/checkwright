@@ -1,1 +1,1 @@
-MANIFEST-COUNT: clean
+MANIFEST-COUNT: clean (2 manifest file(s), 2 lead-in(s) read

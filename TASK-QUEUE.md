@@ -38,16 +38,6 @@ Run at spec: an aged scratch role marker and an aged directory, the member start
 
 **Cost while deferred:** a resumed lead silently loses its executor-step suppression, and a survey witness cannot be re-run without rebuilding its input. Filed 2026-10-13 by guard-spelling-oracle-pass' lead and promoted at the next scope's intake. Re-verified there by reading `sweep_dir`. Owner lookup: `scratch sweep`, `role marker`, `STALE_SECS` in this file and the disposed-findings record — [session-sweep-horizon-baked](#session-sweep-horizon-baked), DISTINCT (the horizon's value, where this is what the sweep spares at any horizon); owner context-kit/SPEC.md §The session-context hook.
 
-### list-lead-in-count-unheld
-
-[spec: SPEC-lead-in-count.md]
-
-a spelled cardinal introducing an adjacent bullet list drifts when the list gains a member, and no gate reads it: evidence-kit/SPEC.md §The producer-liveness lock said "Two further cases" over three bullets from the commit adding the third until this close repaired it. `check-manifest-count` bans cardinals over declared governed collections only, so a sentence-local list is outside its reach.
-
-**Deliverable:** `check-manifest-count` widened, or a sibling, to red a cardinal in a sentence ending on `:` whose next block is a bullet list, with its fixture pair; a feature, since the gate gains a read contract.
-
-**Cost while deferred:** a reader is told a wrong count beside the list that shows the right one. Filed 2026-10-17 by prove-confinement-pass' close from its audit sweep, as the staleness step's gap generalization. Re-verified there: the bullets read three at the paragraph's next block, and the battery ran green over it. Owner lookup: `cardinal`, `count word`, `manifest-count`, `bullet count` in this file and the disposed-findings record — none; owner canon-kit/SPEC.md §check-manifest-count.
-
 ### docs-chrome-page-repeat
 
 [spec: SPEC-chrome-repeat.md]
@@ -989,4 +979,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 ## Done
 
 - post-spec-cite-no-valve
+- list-lead-in-count-unheld
 

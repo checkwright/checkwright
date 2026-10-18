@@ -34,7 +34,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required); the queue-facing gate
    check-fence-paste-unit       # needs declared pages (every code block is one paste)
    check-knob-citation          # knob values stated only in the owning SPEC
    check-knob-default-coupling  # source knob defaults agree with the owning SPEC
-   check-manifest-count         # no bare cardinal over a governed collection
+   check-manifest-count         # no bare cardinal over a governed collection, no lead-in count off its list
    check-measured-claim         # needs a measured-claim oracle (marked claims re-measured)
    check-unmarked-claim         # needs a claim-class roster (a declared class carries a marker)
    check-manifest-temporal      # no temporal narration in manifest prose

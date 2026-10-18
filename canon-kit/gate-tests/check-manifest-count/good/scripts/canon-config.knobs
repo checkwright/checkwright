@@ -1,0 +1,4 @@
+# spec: canon-kit/SPEC.md §check-manifest-count — fixture consumer config: a dated-note manifest the temporal path valve holds out of arm B
+CANON_KIT_MANIFEST_FILES[] = *.md
+CANON_KIT_MANIFEST_FILES[] = posts/*.md
+CANON_KIT_TEMPORAL_EXEMPT_PATHS[] = posts/*

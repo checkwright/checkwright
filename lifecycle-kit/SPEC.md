@@ -670,7 +670,7 @@ An emitting arm collapses to `{0, 2}` and would rewrite every refusal to the mis
 
 Two alternatives stay refused. Reading the flag in any position repairs one spelling and keeps discarding every other unparsed argument in silence, where the refusal covers the class. An environment knob for the mode mints a config surface for what an argument already expresses, and every child the arm spawns would inherit it.
 
-**The declared roster is the prefix family `LIFECYCLE_KIT_*`, plus four names outside it.** The family is derived rather than transcribed. This arm and the pre-flight gates it dispatches read lifecycle-kit knobs, and a transcribed union drifts the first time one of those gates gains a knob. Each dispatched gate inherits the invoking environment unchanged and resolves its own knobs. The four:
+**The declared roster is the prefix family `LIFECYCLE_KIT_*`, plus four names outside it.** The family is derived rather than transcribed. This arm and the pre-flight gates it dispatches read lifecycle-kit knobs, and a transcribed union drifts the first time one of those gates gains a knob. Each dispatched gate inherits the invoking environment unchanged and resolves its own knobs. They are:
 
 - `GATE_SDK_PRUNE_DIRS` and `GATE_SDK_PRUNE_EXTRA_DIRS`, which are `check-stage-entry`'s;
 - `GATE_SDK_KIT_DIRS`, the kit roots whose `checks/` directories the two pre-flight members resolve in;

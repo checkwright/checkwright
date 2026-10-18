@@ -49,3 +49,30 @@ objection the ban encodes is answered by an oracle rather than suppressed.
 The boundary is the notation's, not a list's end: a hyphenated compound is
 multi-token, so twenty-one gates stays outside a single-token grammar's reach
 while its digit spelling does not. That limit is stated rather than closed.
+
+A lead-in count agreeing with its list stands. The two modes:
+
+- the first mode
+- the second mode
+
+Nested content and a blank line between items leave the count at the item level. Three kinds:
+
+1. the first kind
+   - a detail nested under it
+
+2. the second kind
+   carried onto a continuation line
+3. the third kind
+
+A cardinal past the opening word is unread, so the trigger splits in two ways:
+
+- one way
+- a second way
+- a third way
+
+<!-- manifest-count-exempt: the list holds the whole of which the lead-in names the part -->
+Two of the three cases:
+
+- the first case
+- the second case
+- the third case

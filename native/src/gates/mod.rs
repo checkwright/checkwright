@@ -447,6 +447,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_COUNT_COLLECTIONS",
             "CANON_KIT_COUNT_WEDGE_WORDS",
             "CANON_KIT_COUNT_ALLOWED_PHRASES",
+            "CANON_KIT_TEMPORAL_EXEMPT_PATHS",
         ],
         "canon-kit",
         &[("git", "")],

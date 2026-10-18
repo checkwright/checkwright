@@ -1,1 +1,2 @@
 restated collection total
+lead-in count: 'three' over 4 item(s)
