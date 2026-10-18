@@ -344,6 +344,12 @@ pub(super) fn strip_redirect_op(pair: &str) -> &str {
     trim_blank_start(p)
 }
 
+// spec: guard-kit/SPEC.md §The reader and its views — an inert target read by value: `/dev/null`
+// alone, since a live fd-dup never reaches a value and `&1` there names a file.
+fn inert_value(t: &str) -> bool {
+    t == "/dev/null"
+}
+
 // spec: guard-kit/SPEC.md §The generic ruleset — an inert target: `/dev/null` or an fd-dup.
 fn inert_target(t: &str) -> bool {
     t == "/dev/null" || t.strip_prefix('&').is_some_and(|r| fd_word(trim_blank_start(r)))

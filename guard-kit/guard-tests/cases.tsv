@@ -518,6 +518,11 @@ allow	cat >> .tmp/journal.md 2>&1
 # a target is read by its value, so a quoted ignored target is granted and a quoted /dev/null is inert
 allow	printf x >> ".tmp/j.md"
 allow	printf x >> .tmp/j.md 2>"/dev/null"
+# a quoted target spelling a descriptor is a file of that name git does not ignore, beside a
+# heredoc too: the grant withholds and rule `emitter_write` blocks
+block	printf x >> .tmp/j.md > '&1'
+block	printf x >> .tmp/j.md 2>"&1"
+block	cat >> .tmp/j.md > '&1' <<'EOF'@NL@x@NL@EOF
 # a heredoc-bearing call's targets are read by value too, whatever its delimiter's quoting
 allow	cat >> ".tmp/j.md" <<'EOF'@NL@x@NL@EOF
 allow	cat >> .tmp/j.md 2>"/dev/null" <<'EOF'@NL@x@NL@EOF
@@ -700,6 +705,8 @@ allow	until ! kill -0 2147483646 2>/dev/null; do sleep 5; done
 allow	until [ -f .tmp/marker ]; do sleep 10; done
 # the loop's targets are read by their value, so a quoted /dev/null is inert
 allow	until [ -f .tmp/x ]; do sleep 5; done 2>"/dev/null"
+# a quoted target spelling a descriptor is a file of that name, and the loop writes it
+fallthrough	until [ -f .tmp/x ]; do sleep 5; done > '&1'
 # clause (a) counts the span's keywords in command position, so `done` as an argument is no second span
 allow	until grep -q done .tmp/smoke.log; do sleep 5; done; echo done
 # and cuts the loop at the walk's keywords, so a blank around one is not asked
@@ -777,6 +784,7 @@ allow	scripts/check-foo.sh --all > .tmp/foo.log & echo "pid=$! run=foo" > .tmp/f
 allow	bash scripts/check-foo.sh > .tmp/DQ.log 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
 allow	bash scripts/check-foo.sh > ".tmp/foo.log" 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
 fallthrough	bash scripts/check-foo.sh > "tracked.md" 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
+fallthrough	bash scripts/check-foo.sh > '&1' 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
 # (B0) the shape: a record whose filename does not carry its key, and no wait
 fallthrough	bash scripts/check-foo.sh > .tmp/foo.log 2>&1 & echo "pid=$! run=foo" > .tmp/bar.run; wait
 fallthrough	bash scripts/check-foo.sh > .tmp/foo.log 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run
@@ -835,6 +843,9 @@ allow	grep -c x tracked.md > .tmp/n.txt; wc -l .tmp/n.txt
 fallthrough	grep -c x tracked.md > out.txt
 # an fd-dup onto a named file withholds even on a bounded target
 fallthrough	mkdir -p .tmp/out >& .tmp/n.txt
+# a quoted target spelling a descriptor is a file of that name, beside a bounded write as alone
+fallthrough	mkdir -p .tmp/d > '&1'
+fallthrough	grep -c x tracked.md > .tmp/o 2>"&1"
 # an operator glued to a redirect target withholds as one inside a word does: the shell reads a
 # second redirect, so the bounded word is not all the call writes
 fallthrough	grep -c x tracked.md > .tmp/n.txt>tracked.md
@@ -1065,6 +1076,8 @@ fallthrough	make build > .tmp/b.log 2>&1 & echo "pid=$! run=b" > .tmp/b.run; wai
 fallthrough	echo x 2>"/dev/null"
 block	echo x > "README.md"
 block	printf x >> 'README.md'
+# a quoted target spelling a descriptor is a file of that name git does not ignore
+block	echo x > '&1'
 # a heredoc-bearing call's quoted target is read by its value too, and the steer names it
 block	cat >> "README.md" <<'EOF'@NL@x@NL@EOF
 fallthrough	echo x 2>"/dev/null" <<'EOF'@NL@x@NL@EOF

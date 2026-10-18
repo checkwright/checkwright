@@ -4,7 +4,7 @@
 use super::grants::{slot_reach, Reach};
 use super::reach::{interpreter_reach, refused, rm_tracked_reach};
 use super::{
-    background_statements, command_word, dups_onto_file, git_read, git_walk_of, has_expansion, has_substitution, inert_target, is_banner, is_ro_segment,
+    background_statements, command_word, dups_onto_file, git_read, git_walk_of, has_expansion, has_substitution, inert_target, inert_value, is_banner, is_ro_segment,
     noclobber,
     loop_tokens, redirect_targets, ro_forms_clear, ro_forms_clear_statements, segment_core,
     shell_backgrounds, strip_redirect_op, unredirected_words, valued_targets, GitWalk,
@@ -588,7 +588,7 @@ fn recorded_launch(ctx: &Ctx) -> Result<bool, Fault> {
     }
     let mut targets: Vec<String> = Vec::new();
     for tgt in valued_targets(ctx, &launch_cmd)? {
-        if inert_target(&tgt) {
+        if inert_value(&tgt) {
             continue;
         }
         if tgt.contains(SQ_MARK) || tgt.contains(DQ_MARK) {
@@ -616,7 +616,7 @@ pub fn bounded_wait(ctx: &Ctx) -> Decided {
     if !trim(&lead).is_empty() {
         return Ok(None);
     }
-    let inert = valued_targets(ctx, ctx.cmd())?.iter().all(|t| inert_target(t));
+    let inert = valued_targets(ctx, ctx.cmd())?.iter().all(|t| inert_value(t));
     let mut sleeps = 0usize;
     for seg in ctx.segments(&body) {
         let seg = trim(&seg);

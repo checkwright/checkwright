@@ -34,6 +34,8 @@ two wrong grants in the shell guard's read-only-pipeline rule, each auto-allowed
 
 **Deliverable:** both refused, a `guard-kit/guard-tests/` row per case, read by a later validate before any close relies on it. Verdict-moving (allow to prompt), so a close promotes it rather than landing it (operator direction 2026-10-18, lead-relayed).
 
+**Widened (2026-10-18, lead decision on intent-oracle advice):** the value-read fd-dup test is refused at every rule reading redirect targets by value: `ro_pipeline`, `append_scratch` through `emitter_targets`, `bounded_wait`, `recorded_launch`, whose probe on the built binary showed the grant, and `bounded_write`, whose target read granted the same writes once `append_scratch` withheld. `emitter_write` shares `emitter_targets`, so its steer now reaches such a target, fall-through to block. One `guard-kit/guard-tests/` row per rule, and a heredoc-call row for `append_scratch`; the definition lives in guard-kit/SPEC.md §The reader and its views.
+
 **Cost while deferred:** a session can write a tracked file with no permission decision, and the v0.32.0 bar ([tarball-attestation-observed](#tarball-attestation-observed)) stays unmet. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: both payloads return `allow` from `--hook shell-guard` on the built binary. Owner lookup: `ro_pipeline`, `read-only search pipeline`, `fd_dup` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md.
 
 ## Deferred

@@ -2,7 +2,7 @@
 // allow is given only where every clause of its test holds, and every other failure declines.
 use super::reach::{interpreter_reach, refused, rm_tracked_reach};
 use super::{
-    command_read, escape_char, has_substitution, inert_target, is_banner, is_bare_allow, is_ro_segment, is_ro_xargs,
+    command_read, escape_char, has_substitution, inert_value, is_banner, is_bare_allow, is_ro_segment, is_ro_xargs,
     lead_keyword, noclobber, nulled_by_value, on_ro_roster, passed_read, pipe_members, redirect_targets, redirect_values,
     ro_forms_clear, valued_targets, ro_forms_clear_except, ro_forms_kit, segment_core,
     shell_backgrounds, strip_redirect_op, unredirected_words, xargs_command_index,
@@ -96,7 +96,7 @@ fn emitter_targets(ctx: &Ctx, s: &str, lead: &str, targets: &[String]) -> Option
     }
     let mut out = Vec::new();
     for tgt in targets {
-        if inert_target(tgt) {
+        if inert_value(tgt) {
             continue;
         }
         if tgt.contains(['"', '\'']) {
@@ -108,21 +108,25 @@ fn emitter_targets(ctx: &Ctx, s: &str, lead: &str, targets: &[String]) -> Option
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — each statement's redirect-pair targets, an fd-dup
-// kept, every other target replaced in order by the call's value for it where the word read answers
-// and pairs one for one; the skeleton's own where it does not.
+// dropped, every other target replaced in order by the call's value for it where the word read
+// answers and pairs one for one; the skeleton's own where it does not.
 fn statement_targets(ctx: &Ctx, stmts: &[String]) -> Result<Vec<Vec<String>>, Fault> {
     let each: Vec<Vec<String>> = stmts
         .iter()
-        .map(|s| ctx.redirect_pairs(s).iter().filter(|p| !p.is_empty()).map(|p| strip_redirect_op(p).to_string()).collect())
+        .map(|s| {
+            ctx.redirect_pairs(s)
+                .iter()
+                .filter(|p| !p.is_empty())
+                .map(|p| strip_redirect_op(p).to_string())
+                .filter(|t| !t.starts_with('&'))
+                .collect()
+        })
         .collect();
-    let files = each.iter().flatten().filter(|t| !t.starts_with('&')).count();
+    let files = each.iter().flatten().count();
     let read = ctx.word_read(ctx.cmd())?;
     let Some(values) = read.and_then(|r| redirect_values(&r, escape_char(ctx))).filter(|v| v.len() == files) else { return Ok(each) };
     let mut values = values.into_iter();
-    Ok(each
-        .into_iter()
-        .map(|ts| ts.into_iter().map(|t| if t.starts_with('&') { t } else { values.next().unwrap_or(t) }).collect())
-        .collect())
+    Ok(each.into_iter().map(|ts| ts.into_iter().map(|t| values.next().unwrap_or(t)).collect()).collect())
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — a statement's lead word as the skeleton spells it.
@@ -168,7 +172,7 @@ pub fn ro_pipeline(ctx: &Ctx) -> Decided {
         return Ok(None);
     }
     for tgt in valued_targets(ctx, ctx.cmd())? {
-        if !tgt.is_empty() && tgt != "/dev/null" {
+        if !tgt.is_empty() && !inert_value(&tgt) {
             return Ok(None);
         }
     }
@@ -330,7 +334,7 @@ fn write_words(sw: &str, dw: &str) -> Option<(Vec<String>, Vec<String>)> {
             Redir::In => {}
             Redir::Dup if tgt == "-" || (!tgt.is_empty() && tgt.bytes().all(|b| b.is_ascii_digit())) => {}
             Redir::Dup => return None,
-            Redir::Out if inert_target(&clean(tgt)) => {}
+            Redir::Out if inert_value(&clean(tgt)) => {}
             Redir::Out => out.push(clean(tgt)),
         }
     }
