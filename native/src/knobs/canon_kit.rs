@@ -60,6 +60,7 @@ pub const KIT: Kit = Kit {
         Row::indexed("CANON_KIT_RESTATEMENT_PAGES", &[]),
         Row::indexed("CANON_KIT_PAGE_REPEAT_PAGES", &[]),
         Row::scalar("CANON_KIT_PAGE_REPEAT_MIN_WORDS", "8"),
+        Row::indexed("CANON_KIT_PAGE_REPEAT_CHROME", &[]),
         Row::indexed("CANON_KIT_PAGE_LENGTH_PAGES", &[]),
         Row::indexed("CANON_KIT_PAGE_LENGTH_EXCLUDE", &[]),
         Row::scalar("CANON_KIT_PAGE_LENGTH_MAX_WORDS", "off"),

@@ -26,7 +26,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required); the queue-facing gate
    check-todo-task-liveness     # resolves TODO(task:) slugs against the queue
    check-docs-cmd               # invoked paths + kit knobs in docs resolve
    check-docs-restatement-parity # needs restating pages (their code tokens held to the README beside each)
-   check-docs-page-repeat       # needs declared pages (no link target or long sentence stated twice on one)
+   check-docs-page-repeat       # needs declared pages (no link target or long sentence stated twice on one, or restated from the chrome)
    check-docs-page-length       # needs declared pages and a bound (no page past the word bound)
    check-citation-link          # needs declared pages (every section citation links its section)
    check-fence-command-head     # every shell-fence command starts with a word that can run

@@ -678,16 +678,21 @@ pub const REGISTRY: &[GateEntry] = &[
         "canon-kit",
         &[],
     ),
-    // spec: canon-kit/SPEC.md §check-docs-page-repeat — the page corpus is the knob's glob walk
+    // spec: canon-kit/SPEC.md §check-docs-page-repeat — the page corpus and the chrome are each a
+    // knob's glob walk
     (
         "check-docs-page-repeat",
         docs_page_repeat::run,
-        &[(".", "glob:knob:CANON_KIT_PAGE_REPEAT_PAGES", "", "")],
+        &[
+            (".", "glob:knob:CANON_KIT_PAGE_REPEAT_PAGES", "", ""),
+            (".", "glob:knob:CANON_KIT_PAGE_REPEAT_CHROME", "", ""),
+        ],
         &[
             "GATE_SDK_PRUNE_DIRS",
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "CANON_KIT_PAGE_REPEAT_PAGES",
             "CANON_KIT_PAGE_REPEAT_MIN_WORDS",
+            "CANON_KIT_PAGE_REPEAT_CHROME",
         ],
         "canon-kit",
         &[],

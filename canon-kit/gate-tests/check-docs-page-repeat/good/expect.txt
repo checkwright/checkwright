@@ -1,1 +1,2 @@
-DOCS-PAGE-REPEAT: clean (1 page(s), 2 link(s), 3 sentence(s)
+DOCS-PAGE-REPEAT: clean (1 page(s), 3 link(s), 6 sentence(s)
+1 chrome file(s), none restated on a page

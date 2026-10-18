@@ -38,16 +38,6 @@ Run at spec: an aged scratch role marker and an aged directory, the member start
 
 **Cost while deferred:** a resumed lead silently loses its executor-step suppression, and a survey witness cannot be re-run without rebuilding its input. Filed 2026-10-13 by guard-spelling-oracle-pass' lead and promoted at the next scope's intake. Re-verified there by reading `sweep_dir`. Owner lookup: `scratch sweep`, `role marker`, `STALE_SECS` in this file and the disposed-findings record — [session-sweep-horizon-baked](#session-sweep-horizon-baked), DISTINCT (the horizon's value, where this is what the sweep spares at any horizon); owner context-kit/SPEC.md §The session-context hook.
 
-### docs-chrome-page-repeat
-
-[spec: SPEC-chrome-repeat.md]
-
-`check-docs-page-repeat` reads page sources and never `docs/_layouts` or `docs/_includes`, so a chrome addition repeating a page's statement passes. Found at `homepage-license-duplicate`, where the footer's license line duplicated docs/index.md's License section; that unit's `check-license-line` widening holds the license instance only.
-
-**Deliverable:** an arm prefixing the layout's and includes' literal text nodes (Liquid excluded) to every page's corpus, so a sentence of eight words or more or a link target stated in both reds; or a boundary note refusing it.
-
-**Cost while deferred:** the next chrome addition can duplicate a page statement unseen until a reader finds it. Filed 2026-09-29 by companion-adoption-landing's build. Re-verified: canon-kit/SPEC.md §check-docs-page-repeat reads each `CANON_KIT_PAGE_REPEAT_PAGES` page alone and deliberately asserts no repeat across pages, so the arm must weigh that boundary. Owner lookup: `page-repeat`, `_layouts`, `chrome` in this file — [site-video-poster-rule](#site-video-poster-rule), DISTINCT (embeds); owner canon-kit/SPEC.md §check-docs-page-repeat, with docs/page-authoring.md §Page-authoring rules. Surface also canon-kit.
-
 ## Technical Debt
 
 ## Deferred
@@ -980,4 +970,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 - post-spec-cite-no-valve
 - list-lead-in-count-unheld
+- docs-chrome-page-repeat
 

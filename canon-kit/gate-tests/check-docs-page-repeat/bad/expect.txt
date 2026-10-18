@@ -1,3 +1,5 @@
 site/page.md:7: link target `guide.md#install` first stated at line 3
 site/page.md:8: sentence "run the gate before every single commit you make here" first stated at line 5
 site/unclosed.md:6: sentence "run the gate before every single commit you make here" first stated at line 4
+site/page.md:10: link target `https://example.dev/widget` first stated at site/_chrome/footer.html:3
+site/page.md:12: sentence "this site is maintained by the same people who ship the widget" first stated at site/_chrome/footer.html:2
