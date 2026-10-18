@@ -1,6 +1,7 @@
 // spec: context-kit/SPEC.md §The always-loaded meter — the standing per-session surface against
 // the committed baseline. Two levels: `measure` produces the figures and `emit` renders the three
 // modes over them, which is what lets `kpi-always-loaded` read them as data (§bin/footprint).
+use crate::history::Blobs;
 use crate::{proc, programs};
 use crate::section;
 use crate::stages;
@@ -221,17 +222,23 @@ pub fn write_ceiling(path: &str) -> Result<String, String> {
     ))
 }
 
-// spec: context-kit/SPEC.md §The always-loaded meter — the surfaces' size at a past commit, one
-// `git show` per surface; a path git cannot show counts zero, as an absent surface does live.
-fn surface_at(commit: &str, surfaces: &[String]) -> u64 {
+// spec: context-kit/SPEC.md §The always-loaded meter — the surfaces' size at a past commit, read
+// through one batched blob reader the caller holds, so a reader of many commits spawns one `git`;
+// a path the commit does not carry counts zero, as an absent surface does live.
+// spec: drift-kit/SPEC.md §The statistics view — the always-loaded line reads each close commit here
+pub(crate) fn surface_at(blobs: &mut Blobs, commit: &str, surfaces: &[String]) -> u64 {
     surfaces
         .iter()
-        .filter_map(|p| {
-            proc::run(&programs::GIT, &["show", &format!("{}:{}", commit, p)])
-                .ok()
-                .and_then(|c| c.stdout().map(cp_of))
-        })
+        .filter_map(|p| blobs.at(commit, p).ok().flatten())
+        .map(|t| cp_of(t.as_bytes()))
         .sum()
+}
+
+// spec: context-kit/SPEC.md §The always-loaded meter — the reader `surface_at` takes, opened at the
+// toplevel; `None` where `git` cannot start, which every past-commit figure reads as absent
+pub(crate) fn blobs() -> Option<Blobs> {
+    let top = walk::toplevel().or_else(|_| walk::cwd()).ok()?;
+    Blobs::open(&top).ok()
 }
 
 // spec: context-kit/SPEC.md §The always-loaded meter — `start` is the iteration-start commit the
@@ -252,7 +259,7 @@ pub fn measure(start: &str) -> Result<Measurement, String> {
     let start_surface = if start.is_empty() {
         None
     } else {
-        Some(surface_at(start, &surfaces))
+        Some(blobs().map_or(0, |mut b| surface_at(&mut b, start, &surfaces)))
     };
     Ok(Measurement {
         surface,

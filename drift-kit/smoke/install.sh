@@ -607,9 +607,13 @@ cat > "$smetric/stage-economics-log.txt" <<'EOF'
 2025-01-02 alpha build test-model in=1 out=1 cr=100 cw=1 cost=1.5
 2025-01-02 alpha supervision test-model in=1 out=1 cr=10 cw=1 cost=0.25
 2025-01-02 alpha build+fanout test-model in=1 out=1 cr=1 cw=1 cost=0.5
+2025-01-02 alpha build second-model in=1 out=1 cr=5 cw=1 cost=0.1
 2025-01-04 beta close test-model in=1 out=1 cr=1 cw=1 cost=n/a
 2025-01-05 gamma scope test-model in=1 out=1 cr=1 cw=1 cost=1
 EOF
+# spec: drift-kit/SPEC.md §Testing — one line keyed on alpha's close stamp's session, one on no stamp
+printf '2025-01-02 s3 total=1000 gov=600 gate=100 pct=60\n2025-01-02 nostamp9 total=10 gov=1 gate=1 pct=10\n' \
+    > "$smetric/overhead-log.txt"
 stats() { ( cd "$trepo" && GATE_SDK_NATIVE_BIN="$TRAJ_BIN" DRIFT_KIT_METRIC_DIR="$smetric" \
     bash "$DRIFT_ARM" --emit statistics "$@" ); }
 sdoc="$smetric/statistics.html"
@@ -620,13 +624,30 @@ set -e
 [[ "$(head -n 1 <<<"$sout")" == "statistics: wrote $sdoc — 2 closed iteration(s)" ]] \
     || fail "the statistics arm did not report its write at DRIFT_KIT_STATISTICS_FILE: $sout"
 [[ -f "$sdoc" ]] || fail "the statistics view was not written under the metric dir"
-[[ "$(grep -c '<section class="panel"' "$sdoc")" -eq 7 ]] || fail "the statistics view does not carry seven panels"
-for fig in spend cache-read 'commit shape' amendments validate 'gate roster'; do
+[[ "$(grep -c '<section class="panel"' "$sdoc")" -eq 12 ]] || fail "the statistics view does not carry twelve panels"
+for fig in spend 'spend by model' cache-read 'cache-read by model' 'governance share' 'commit shape' \
+    amendments validate 'gate roster'; do
     grep -qx "  $fig: charted" <<<"$sout" || fail "the statistics figure '$fig' was not charted: $sout"
 done
 grep -q '^  queue flow: n/a (' <<<"$sout" || fail "the queue-flow figure did not degrade over a history of no starts: $sout"
 grep -qx '  1 iteration(s) with incomplete pricing' <<<"$sout" || fail "the incomplete-pricing count is not 1: $sout"
-grep -q 'alpha: stage rows \$1.50' "$sdoc" || fail "the closed iteration alpha is not charted"
+grep -qx '  1 overhead-log session(s) name no closed iteration' <<<"$sout" \
+    || fail "the overhead-log session no stamp names was not counted: $sout"
+grep -q 'alpha: governance 60% of volume (gate output 10%, rest 50%) over 1 measured session(s)' "$sdoc" \
+    || fail "the governance share of alpha's close session was not charted"
+for model in test-model second-model; do
+    [[ "$(grep -o "</span>$model</span>" "$sdoc" | wc -l)" -eq 2 ]] \
+        || fail "both by-model panels do not name '$model' in their legend"
+done
+# spec: drift-kit/SPEC.md §Testing — the kit roots are the vendored siblings of gate-sdk, so the
+# union pass resolves context-kit's witness and the self-sufficiency pass does not
+if [[ -f "$SMOKE_KIT_ROOT/../context-kit/templates/context-config.knobs" ]]; then aload='charted'
+else aload='n/a (context-kit absent)'; fi
+grep -qx "  always-loaded: $aload" <<<"$sout" \
+    || fail "the always-loaded line did not read '$aload' as the vendored kit roots resolve context-kit's witness: $sout"
+grep -qx '  deferred age: n/a (no charted close commit holds a defer date)' <<<"$sout" \
+    || fail "the deferred age did not degrade over a history committing no queue file: $sout"
+grep -q 'alpha: stage rows \$1.60' "$sdoc" || fail "the closed iteration alpha is not charted"
 if grep -q 'gamma' "$sdoc"; then fail "the statistics view charted the in-flight iteration"; fi
 for banned in '<script' 'src=' 'url(' 'href'; do
     if grep -qF "$banned" "$sdoc"; then fail "the statistics view references outside itself ($banned)"; fi
@@ -635,12 +656,16 @@ cp "$sdoc" "$work/stat-first.html"
 stats >/dev/null
 cmp -s "$sdoc" "$work/stat-first.html" || fail "two statistics emissions over unchanged inputs differ"
 nolog="$(DRIFT_KIT_STAGE_ECONOMICS_LOG="$work/no-such-log.txt" stats)"
-for fig in spend cache-read; do
+for fig in spend 'spend by model' cache-read 'cache-read by model'; do
     grep -qx "  $fig: n/a (no stage-economics log)" <<<"$nolog" || fail "a log-absent run did not degrade '$fig': $nolog"
 done
-for fig in 'commit shape' amendments validate 'gate roster'; do
+for fig in 'governance share' 'commit shape' amendments validate 'gate roster'; do
     grep -qx "  $fig: charted" <<<"$nolog" || fail "a log-absent run dropped '$fig': $nolog"
 done
+noovh="$(DRIFT_KIT_OVERHEAD_LOG="$work/no-such-overhead-log.txt" stats)"
+grep -qx '  governance share: n/a (no overhead log)' <<<"$noovh" \
+    || fail "an overhead-log-absent run did not degrade governance share: $noovh"
+grep -qx '  spend: charted' <<<"$noovh" || fail "an overhead-log-absent run dropped spend: $noovh"
 [[ "$(stats 1 | head -n 1)" == "statistics: wrote $sdoc — 1 closed iteration(s)" ]] \
     || fail "the statistics arm did not honour its trailing-iteration count"
 if grep -q 'alpha' "$sdoc"; then fail "a one-iteration statistics view still charts alpha"; fi

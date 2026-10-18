@@ -11,8 +11,13 @@ const LABEL: &str = "always-loaded";
 // it out from under this row.
 const WITNESS: &str = "templates/context-config.knobs";
 
+// spec: drift-kit/SPEC.md §The statistics view — the always-loaded line takes this same witness
+pub(crate) fn present(kit_roots: &[String]) -> bool {
+    sibling_tool(kit_roots, WITNESS).is_some()
+}
+
 pub fn run(ctx: &Ctx, trend: bool) -> Option<String> {
-    if sibling_tool(&ctx.kit_roots, WITNESS).is_none() {
+    if !present(&ctx.kit_roots) {
         return na("lead", LABEL, "context-kit absent", trend);
     }
     let m = match always_loaded::measure(&ctx.iteration_start) {

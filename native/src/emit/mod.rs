@@ -645,7 +645,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         queue_flow::KNOBS,
     ),
     // spec: drift-kit/SPEC.md §The statistics view — an `Arm::Emit` because its whole exit grammar
-    // is the 0/2 collapse; its roster is its file and the knobs of the three harvests it calls
+    // is the 0/2 collapse; its roster is its file and the knobs of the harvests and reads it calls
     (
         "--emit-statistics",
         Arm::Emit(statistics::emit, Grammar::Parsed(statistics::USAGE)),

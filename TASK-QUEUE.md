@@ -16,16 +16,6 @@
 
 ## New Features
 
-### statistics-kpi-breadth
-
-[spec: SPEC-kpi-breadth.md]
-
-the statistics view charts seven figures (drift-kit/SPEC.md §The statistics view: spend, cache-read, commit shape, amendments, validate, gate roster, queue flow) and none of the drift-report KPIs. Operator direction 2026-10-18, lead-relayed, not a ruling: add the useful KPIs, governance overhead first, and split spend and cache-read by model as well as by stage band; the stage-economics log already carries a model column per row, so a by-model split needs no new input.
-
-**Deliverable:** the twelve-figure view its amendment specifies: governance share, always-loaded and deferred age join, and spend and cache-read each gain a by-model panel beside a by-band one. The amendment's opening carries which candidates were refused and why.
-
-**Cost while deferred:** the view shows spend but not where governance spend goes, so the overhead trend is read off one drift-report number at a time. Surfaced 2026-10-18 by the lead session after harness-reach-pass' close, promoted at the next scope's carried-bullet intake. Re-verified there: the section's figure list holds the seven. Owner lookup: `statistics`, `kpi-overhead`, `by-model` in this file and the disposed-findings record, none live (`iteration-statistics-view`, retired, landed the view); owner drift-kit/SPEC.md §The statistics view.
-
 ## Technical Debt
 
 ## Deferred
@@ -1003,4 +993,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - pwsh-string-expr-overblock
 - guard-word-read-heredoc
 - ro-pipeline-wrong-grants
+- statistics-kpi-breadth
 

@@ -78,6 +78,7 @@ pub(super) fn days_from_civil(date: &str) -> Option<i64> {
 struct Iteration {
     stages: Vec<String>,
     close: Option<String>,
+    close_date: String,
     feat: usize,
     debt: usize,
     amendments: usize,
@@ -92,6 +93,8 @@ struct Iteration {
 // harvested fields, read by this arm's table and by the statistics view in process
 pub struct Closed {
     pub name: String,
+    pub close: String,
+    pub close_date: String,
     pub stages: Vec<String>,
     pub feat: usize,
     pub debt: usize,
@@ -159,8 +162,11 @@ fn harvest_stamps(
         if !e.stages.iter().any(|s| s == stage) {
             e.stages.push(stage.to_string());
         }
+        // spec: drift-kit/SPEC.md §The statistics view — the deferred age counts to the close
+        // stamp's own date, its fourth field: the last close stamp's, as the commit is
         if stage == CLOSE_STAGE {
             e.close = Some(commit.clone());
+            e.close_date = line[1..].split(' ').nth(3).unwrap_or_default().to_string();
         }
     }
 }
@@ -469,6 +475,8 @@ pub fn harvest() -> Result<Harvest, String> {
             if let Some(e) = iters.remove(&name).filter(|e| e.close.is_some()) {
                 closed.push(Closed {
                     name,
+                    close: e.close.unwrap_or_default(),
+                    close_date: e.close_date,
                     stages: e.stages,
                     feat: e.feat,
                     debt: e.debt,

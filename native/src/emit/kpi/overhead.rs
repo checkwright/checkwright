@@ -16,7 +16,8 @@ pub struct Window {
 // spec: drift-kit/SPEC.md §Bundled KPIs — awk's field loop assigns on every match, so the
 // rightmost spelling on a line is the one that survives; the value is read to the first `=` the
 // same way `split($i, a, "=")` takes a[2].
-fn tagged(line: &str, tag: &str) -> Option<f64> {
+// spec: drift-kit/SPEC.md §The statistics view — the governance share reads a line's fields here
+pub(crate) fn tagged(line: &str, tag: &str) -> Option<f64> {
     line.split_whitespace()
         .filter_map(|t| t.strip_prefix(tag))
         .next_back()
