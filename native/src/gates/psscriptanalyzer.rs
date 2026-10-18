@@ -170,12 +170,31 @@ mod tests {
         assert!(SCRIPT.contains("'Warning', 'Error', 'ParseError'") && SCRIPT.contains("exit 3"));
     }
 
+    // spec: gate-sdk/SPEC.md §check-psscriptanalyzer — the stub host is run only once no sibling
+    // test's fork can still hold it open for writing, which a spawn meanwhile meets as ETXTBSY
+    #[cfg(unix)]
+    fn write_stub_host(host: &std::path::Path, code: i32) {
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::write(host, format!("#!/bin/sh\nexit {}\n", code)).expect("stub");
+        std::fs::set_permissions(host, std::fs::Permissions::from_mode(0o755)).expect("chmod");
+        const ETXTBSY: i32 = 26;
+        for _ in 0..200 {
+            match std::process::Command::new(host).output() {
+                Err(e) if e.raw_os_error() == Some(ETXTBSY) => {
+                    std::thread::sleep(std::time::Duration::from_millis(10))
+                }
+                Err(e) => panic!("cannot run the stub host: {}", e),
+                Ok(_) => return,
+            }
+        }
+        panic!("the stub host stayed busy for two seconds");
+    }
+
     // spec: gate-sdk/SPEC.md §check-psscriptanalyzer — the exit mapping over a stub host: off is
     // clean, the analyser's 0 and 1 pass through, its absent module and any other status are 2
     #[cfg(unix)]
     #[test]
     fn the_exit_mapping_over_a_stub_host() {
-        use std::os::unix::fs::PermissionsExt;
         let env = crate::knobenv::lock();
         let d = std::env::temp_dir().join(format!("cw-pssa-exit-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&d);
@@ -190,8 +209,7 @@ mod tests {
         env.set(substrate::KNOB, &host.display().to_string());
         crate::knobs::reset(&env);
         for code in [0, 1, 3, 7] {
-            std::fs::write(&host, format!("#!/bin/sh\nexit {}\n", code)).expect("stub");
-            std::fs::set_permissions(&host, std::fs::Permissions::from_mode(0o755)).expect("chmod");
+            write_stub_host(&host, code);
             got.push(run(std::slice::from_ref(&dir)));
         }
         std::fs::remove_file(&host).expect("drop the host");
