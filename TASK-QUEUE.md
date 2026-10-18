@@ -110,6 +110,18 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 **Cost while deferred:** low and bounded — every entry needing discrimination keeps buying it with text against the entry budget. Filed 2026-09-01 by close under CLAUDE.md §Housekeeping's operator-directed exception; it rides no cut and is no hotfix.
 
+### smoke-whole-tree-precondition-unscoped
+
+[cost: event/low] [surface: installer] [recurrence: 2026-10-18]
+
+the consumer smoke gates its whole suite on an unscoped clean-tree preflight (installer/SPEC.md §The consumer smoke), so a dirty path the payload never reads still costs the full `installer_smoke` suite; the packer's own refusal is already footprint-scoped (§The packer).
+
+**Recurred 2026-10-18, at session-sweep-policy-pass' validate.** A completed `--run-validate` with one red suite folds `.workflow/validate-evidence.txt` (native/src/emit/run_validate.rs folds after the whole roster, so a mid-roster abort writes nothing), and the rerun's preflight refused on that dirty manifest: one wasted validate run plus a manual restore. A 2026-10-16 bullet of this shape was discarded as tree-decided; that record is deleted, the honest limit stating the behaviour while rule-it-correct stays refused.
+
+**Ruled `lead, own-authority` 2026-09-10, lead-relayed, not the operator's: leave it filed.** Narrowing the preflight (B) and ruling it correct (C) were both refused at build. B is no one-liner: the smoke's post-run clean assertion is sound only because the preflight established a clean tree, so the pair moves together, an envelope change against the merged `pack-step-dirty-tree-predicate-unscoped` amendment. C stays live: the smoke asserts over the tree it packs, so its precondition may be correct on independent grounds. The recurrence adds a route from the other owner, run-validate keeping its fold out of a path a later suite's preflight reads (evidence-kit/SPEC.md §Evidence manifest), the same envelope question.
+
+**Cost while deferred:** each validate rerun after a red run, and each capture left uncommitted while a validate battery is pending, costs a full `installer_smoke` suite. Filed 2026-09-10 by close, draining the gap inbox; thawed 2026-10-18 by close on the recurrence. Owner lookup: `dirty`, `validate-evidence`, `run-validate` in this file and the disposed-findings record — the 2026-10-16 record, deleted as its ground fell; owner installer/SPEC.md §The consumer smoke.
+
 ### tarball-attestation-observed
 
 [cost: event/low] [surface: installer] [observed-by: publish]
@@ -827,10 +839,6 @@ Blind to retired carriers.
 ### rationale-located-by-reading-not-by-grep
 
 Grep misses paraphrases.
-
-### smoke-whole-tree-precondition-unscoped
-
-Any dirty path blocks the smoke.
 
 ### spec-internal-identifier-prefix-drift
 

@@ -293,3 +293,4 @@ Knowledge-friction counts are excluded: their log is gitignored per-iteration sc
 | prove-confinement-pass | sc sp a b v c | 2f/5d | 2 · ≤0d | 21s clean | 154 |
 | evaluator-discovery-pass | sc sp a b v c | 3f/0d | 2 · ≤1d | 21s clean | 155 |
 | site-health-statistics-pass | sc sp a b v c | 3f/0d | 4 · ≤0d | 21s clean | 155 |
+| session-sweep-policy-pass | sc sp a b v c | 3f/0d | 4 · ≤0d | 21s clean | 155 |
