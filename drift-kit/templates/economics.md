@@ -1,11 +1,11 @@
 CONSUMER BINDING — create `economics.md` in your agent-skill directory as a binding shim naming this template (a header `Execute the template at <path>, applying the bindings below.` then a `## Bindings` section) and bind its one slot — the model posture the report weighs. `/economics` is a post-iteration reporting ritual, not a lifecycle stage: it moves no cursor and stamps nothing (drift-kit/SPEC.md §The `/economics` skill), so it is outside the stage roster and never a gate.
 
-Run it at close (the close skill may invoke it) or ad hoc. It answers, for the iteration just run: what did it cost, where did the cost land, and was the model posture worth it. Chain the three reporting tools in order, render the view (step 4), then read their output into one narrative — do not paste the raw tool dumps:
+Run it at close (the close skill may invoke it) or ad hoc. It answers, for the iteration just run: what did it cost, where did the cost land, and was the model posture worth it. Chain the three reporting tools in order, render the view, then read their output into one narrative — do not paste the raw tool dumps:
 
 1. **Governance overhead** — `--emit overhead-meter <session-id>` on the gate binary `GATE_SDK_NATIVE_BIN` names, run against the closing session and passing its stage stamp id (a delegated session must) (drift-kit/SPEC.md §The overhead meter): the governance-versus-task byte proxy for this session.
 2. **Stage economics** — the same binary's `--emit stage-economics` (drift-kit/SPEC.md §The stage-economics meter): real spend by stage × model × iteration, priced through the consumer price table. `cr` (cache-read) is the headline burn field — accumulated-context cache-read, not model choice, is the dominant draw, so lead the cost story with it. A missing price table degrades cost to `n/a` and the tokens still report.
 3. **Manual operations** — the same binary's `--emit manual-ops` (drift-kit/SPEC.md §The manual-operation meter): the shell shapes and hand-edited paths this iteration repeated, ranked, with how many iterations each has ranked in.
-4. **Statistics view** — the same binary's `--emit statistics` (drift-kit/SPEC.md §The statistics view): the per-iteration figures charted into one local HTML file. Run it after step 2, so the spend panel holds this iteration's rows.
+4. **Statistics view** — the same binary's `--emit statistics` (drift-kit/SPEC.md §The statistics view): the per-iteration figures charted into one local HTML file. Run it after stage-economics, so the spend panel holds this iteration's rows.
 
 Compose the narrative from those surfaces:
 

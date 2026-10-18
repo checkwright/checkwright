@@ -1080,8 +1080,8 @@ mod tests {
         assert!(r.document.contains("No controlled ungoverned baseline exists"));
     }
 
-    // spec: drift-kit/SPEC.md §The statistics view — Degrade: the log's absence takes figures 1
-    // and 2, an absent state file takes all seven, and a queue-flow reason takes figure 7 alone
+    // spec: drift-kit/SPEC.md §The statistics view — Degrade: the log's absence takes spend and
+    // cache-read, an absent state file takes every figure, and a queue-flow reason takes queue flow alone
     #[test]
     fn a_missing_input_degrades_only_the_panels_reading_it() {
         let mut inp = inputs();
