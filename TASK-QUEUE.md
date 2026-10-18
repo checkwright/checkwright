@@ -1,14 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: site-health-statistics-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-10-18, lead-relayed, not a ruling; the iteration opened undirected):** option A. The features `iteration-statistics-view`, `site-health-resample-knobs`, `site-health-probe-unexecuted` and `site-health-issue-venue-unwanted`, which spec authors and promotes; scope promotes no debt. Stages scope, spec, build, validate and close, with align where `check-stage-entry` assertion C fires. Order on the site-health template: the knobs and the issue opt-in land before the probe test, whose cases read both.
-
-  **Push need (2026-10-18, inside the budget):** the closing push alone; no unit's completion reads a remote run, the probe being exercised by a local test under stubs, never a dispatched run. A v0.32.0 tag push, should close cut it, is the second.
 
 ---
 

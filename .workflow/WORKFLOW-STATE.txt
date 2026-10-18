@@ -4,10 +4,4 @@
 
 ---
 
-site-health-statistics-pass scope a416d1c3 2026-10-18 1d2cc34f6
-site-health-statistics-pass spec af2f7e3e 2026-10-18 e02ef4bae
-site-health-statistics-pass align a3016f01 2026-10-18 ef0e3e8ce
-site-health-statistics-pass build ae4d98ab 2026-10-18 be81c5e8a
-site-health-statistics-pass build a5f7b7b8 2026-10-18 7345440f0
-site-health-statistics-pass validate a7f187d5 2026-10-18 0471fb912
-site-health-statistics-pass close ac50258a 2026-10-18 8943956da
+— scope a93ada4a 2026-10-18 522de0480
