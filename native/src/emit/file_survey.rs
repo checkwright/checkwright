@@ -185,9 +185,15 @@ pub fn emit(args: &[String]) -> Result<String, String> {
 // spec: lifecycle-kit/SPEC.md §The survey record — append-only within the iteration, never edited
 // in place, so a filing cannot lose a block a concurrent one landed. Shared with `--emit-file-gap`,
 // whose surface carries the same rule as a merge property (§The committed gap inbox).
+// spec: lifecycle-kit/SPEC.md §check-gap-inbox-neutrality — a body appended to a file whose last
+// line lacks its break starts a line of its own, so a hand truncation cannot fuse it onto the header.
 pub(super) fn append(path: &std::path::Path, body: &str) -> std::io::Result<()> {
     use std::io::Write;
+    let unterminated = std::fs::read(path)?.last().is_some_and(|b| *b != b'\n');
     let mut f = std::fs::OpenOptions::new().append(true).open(path)?;
+    if unterminated {
+        f.write_all(b"\n")?;
+    }
     f.write_all(body.as_bytes())
 }
 
@@ -239,6 +245,20 @@ mod tests {
         for want in ["linked worktree of `/r`", "`.workflow/gap-inbox.md` line", "hands the finding back to its dispatcher", "appends the line by hand"] {
             assert!(err.contains(want), "the refusal lacks {:?}: {}", want, err);
         }
+    }
+
+    // spec: lifecycle-kit/SPEC.md §check-gap-inbox-neutrality — the attested fusion: a header with
+    // no trailing break gains one before the body, and a terminated file gains none
+    #[test]
+    fn an_append_to_an_unterminated_file_starts_its_own_line() {
+        let dir = std::env::temp_dir().join(format!("file-survey-append-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let p = dir.join("inbox.md");
+        std::fs::write(&p, "# contract: h").unwrap();
+        append(&p, "- a\n").unwrap();
+        append(&p, "- b\n").unwrap();
+        assert_eq!(std::fs::read_to_string(&p).unwrap(), "# contract: h\n- a\n- b\n");
+        std::fs::remove_dir_all(&dir).unwrap();
     }
 
     fn ps(a: &[&str]) -> Corpus {

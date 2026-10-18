@@ -104,6 +104,7 @@ check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4=file  $5..=env ass
     local out rc
     # spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the overrides are exported rather than passed
     # through `env`, because `env` cannot invoke the gate_run shell function
+    # shellcheck disable=SC2163 # each argument is a NAME=value pair, so exporting the expansion is the intent
     out="$(export "$@"; gate_run check-brevity "$DIR/checks" "$SANDBOX/$file" 2>&1)"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$label]: want exit $want, got $rc -- $out"; fails=$((fails + 1)); return

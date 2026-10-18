@@ -21,8 +21,8 @@ GATE_SDK_PAYLOAD_RECIPES[openspec-lifecycle] = companion/openspec/lifecycle
 GATE_SDK_PAYLOAD_RECIPES[openspec-overlap] = companion/openspec/overlap
 GATE_SDK_PAYLOAD_RECIPES[speckit] = companion/speckit/recipe
 
-# spec: gate-sdk/SPEC.md §check-shellcheck — this repo ships shell under no kit root: the installer's two bootstraps, its consumer smoke, the runnable adoption walkthrough, and the hosted one-line install script `docs/install.sh`, the only direct `*.sh` member of `docs`; name them so the lint that governs every other script in the tree governs these too. Each directory is named on its own because the gate globs *.sh per named directory and does not descend
-GATE_SDK_LINT_EXTRA_DIRS = installer/bin installer/consumer-smoke demo docs
+# spec: gate-sdk/SPEC.md §check-shellcheck — this repo ships shell under no kit root: the installer's two bootstraps, its consumer smoke, the runnable adoption walkthrough, and the hosted one-line install script `docs/install.sh`, the only direct `*.sh` member of `docs`; name them so the lint that governs every other script in the tree governs these too, and each tree's bespoke `gate-tests/*.test.sh`, which `--run-gate-tests` runs as shell under no linted kit directory. Each directory is named on its own because the gate globs *.sh per named directory and does not descend
+GATE_SDK_LINT_EXTRA_DIRS = installer/bin installer/consumer-smoke demo docs canon-kit/gate-tests context-kit/gate-tests delegation-kit/gate-tests doctrine-kit/gate-tests evidence-kit/gate-tests gate-sdk/gate-tests guard-kit/gate-tests lifecycle-kit/gate-tests queue-kit/gate-tests scripts/gate-tests site-kit/gate-tests
 
 # comment-tier-exempt: this tree keeps every .ps1 BOM-less and ASCII outside comments, since Windows PowerShell 5.1 and a shebang-reading shim each break on a BOM (installer/SPEC.md §Requirements), so the analyser's BOM rule contradicts it on every script
 GATE_SDK_PSSCRIPTANALYZER_EXCLUDE = PSUseBOMForUnicodeEncodedFile

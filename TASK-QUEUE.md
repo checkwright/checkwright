@@ -30,7 +30,7 @@ a controlled A/B trial.
 
 [roadmap: later/commercial] [cost: event/low] [surface: evidence-kit] [roadmap-summary: Gate runs verified by a neutral party no committing agent can touch.]
 
-hosted attestation. The team/paid rung: gates verified server-side by a party the committing agents cannot touch — hosted gate runs as a neutral attestation, cross-repo drift dashboards, maintained rulesets. A service, not code: cloning the kits does not clone the neutrality or the ops. Demand-gated — this entry is the public roadmap marker, not a scaffold; hosting and sequencing decisions are on record in the operator's local brief, and its prerequisite mechanism has landed (lifecycle-kit/SPEC.md §Multi-operator semantics). Its single-repo statistics half split off as `iteration-statistics-view` (operator direction 2026-10-17, on consult advice, lead-relayed, not a ruling); the cross-repo dashboards stay here. Surfaced 2026-07-07.
+hosted attestation. The team/paid rung: gates verified server-side by a party the committing agents cannot touch — hosted gate runs as a neutral attestation, cross-repo drift dashboards, maintained rulesets. A service, not code: cloning the kits does not clone the neutrality or the ops. Demand-gated — this entry is the public roadmap marker, not a scaffold; hosting and sequencing decisions are on record in the operator's local brief, and its prerequisite mechanism has landed (lifecycle-kit/SPEC.md §Multi-operator semantics). Its single-repo statistics half split off as `iteration-statistics-view`, landed at site-health-statistics-pass (operator direction 2026-10-17, on consult advice, lead-relayed, not a ruling); the cross-repo dashboards stay here. Surfaced 2026-07-07.
 
 **Cost while deferred:** zero — this is a service rather than tree mechanism, so nothing rots; the residue is that gate runs stay self-attested, which binds only when a party the committing agents cannot touch is asked to trust them.
 
@@ -218,7 +218,7 @@ the session-context hook member bakes its scratch sweep's age horizon: it remove
 
 **Deliverable:** the horizon as a context-kit knob with an off value, its row in context-kit/SPEC.md §Layout and configuration and §The session-context hook stating the set; a feature, since it adds a knob.
 
-**Cost while deferred:** a consumer wanting another horizon, or no sweep, has no setting. Filed 2026-10-07 off windows-shell-floor-pass' close audit, carried to the next scope's intake. Re-verified: the constant, and no `CONTEXT_KIT_` knob in the SPEC names a sweep. Owner lookup: `age horizon`, `scratch sweep`, `STALE_SECS` in this file and the disposed-findings record — none; `site-health-resample-knobs`, DISTINCT (the same class on site-kit's template).
+**Cost while deferred:** a consumer wanting another horizon, or no sweep, has no setting. Filed 2026-10-07 off windows-shell-floor-pass' close audit, carried to the next scope's intake. Re-verified: the constant, and no `CONTEXT_KIT_` knob in the SPEC names a sweep. Owner lookup: `age horizon`, `scratch sweep`, `STALE_SECS` in this file and the disposed-findings record — none; `site-health-resample-knobs`, done at site-health-statistics-pass, DISTINCT (the same class on site-kit's template).
 
 ### session-sweep-live-scratch
 
@@ -279,6 +279,16 @@ a spelled cardinal introducing an adjacent bullet list drifts when the list gain
 **Deliverable:** `check-manifest-count` widened, or a sibling, to red a cardinal in a sentence ending on `:` whose next block is a bullet list, with its fixture pair; a feature, since the gate gains a read contract.
 
 **Cost while deferred:** a reader is told a wrong count beside the list that shows the right one. Filed 2026-10-17 by prove-confinement-pass' close from its audit sweep, as the staleness step's gap generalization. Re-verified there: the bullets read three at the paragraph's next block, and the battery ran green over it. Owner lookup: `cardinal`, `count word`, `manifest-count`, `bullet count` in this file and the disposed-findings record — none; owner canon-kit/SPEC.md §check-manifest-count.
+
+### shellcheck-gate-tests-derived
+
+[cost: once/low] [surface: gate-sdk]
+
+`check-shellcheck` reaches the bespoke `<tree>/gate-tests/*.test.sh` suites only through a hand-kept list of eleven directories in this repo's `GATE_SDK_LINT_EXTRA_DIRS`. A twelfth kit's suites join no lint until someone remembers to name them. The kit-root predicate derives `lib/`, `bin/`, `checks/`, `templates/` and `smoke/` and never `gate-tests/`, although `--run-gate-tests` spawns each direct `*.test.sh` as shell and the fixture pair ships to every adopter.
+
+**Deliverable:** a feature. Either the derived set gains each kit root's and the gates dir's `gate-tests/` direct `*.sh`, with fixture coverage and the knob list shrunk back to the installer, demo and docs directories, or a refusal is recorded in gate-sdk/SPEC.md §check-shellcheck. Widening a shipped gate's corpus for every adopter is a kit-semantics call, so a close drain does not make it.
+
+**Cost while deferred:** a new kit's suites lint nothing until the knob is edited, and the 129 linted today carried four warnings that went unseen. Filed 2026-10-18 by site-health-statistics-pass' close as the derivation residual of the drained unlinted-gate-tests bullet. Re-verified there: 129 direct suites across eleven directories, ShellCheck 0.11.0 `-S warning` found four warnings, and a probe file proved the widened knob reaches the corpus. Owner lookup: `shellcheck`, `LINT_EXTRA`, `gate-tests` lint in this file and the disposed-findings record found none; the owner is gate-sdk/SPEC.md §check-shellcheck.
 
 ## Icebox
 

@@ -1462,14 +1462,14 @@ The four gate-sdk contracts:
 
 Invariant: the gap inbox ([§The committed gap inbox](#the-committed-gap-inbox)) records observations, not conclusions. Two assertions over every non-blank line below the `# contract:` header:
 
-- **A — grammar.** Every line is `- <YYYY-MM-DD> — <prose>` with non-empty prose, since the raw append is a legal fallback that would otherwise let a malformed bullet wait for the drain.
+- **A — grammar.** Every line is `- <YYYY-MM-DD> — <prose>` with non-empty prose, since the raw append is a legal fallback that would otherwise let a malformed bullet wait for the drain. A bullet fused onto the header line is a finding too, since every bullet reader reads by line; the capture arms start an appended body on a line of its own.
 - **B — no interposed verdict.** No bullet's prose opens with the retired ``recurrence of `<slug>`:`` form. This is the class assertion: it catches a conclusion reaching the capture surface **by any producer**, a stale vendored affordance or a hand append copying an older bullet's shape, not only the affordance this kit ships. The `help:` line teaches the rule rather than the regex: say *why* you believe the bullet re-files an entry, in the prose, and let the drain judge.
 
 An absent inbox is **clean, not fail-closed**: never having filed a gap is a legal state for a fresh consumer, unlike [§check-lifecycle-registration](#check-lifecycle-registration)'s missing agent file, which is an install that did not finish. Fail-closed applies to the scanner's own exit status, per gate-sdk's contract.
 
 **Bare drives the configured inbox; an explicit file argument drives it hermetically**, the [§check-survey-record](#check-survey-record) precedent, which lets the fixture pair run against a copied inbox.
 
-**The tool-side contract is pinned separately.** This gate reads the surface and cannot see which producer wrote a line, so it cannot hold the affordance to its own contract; `gate-tests/file-gap-recurrence.test.sh` does. The fixture-runner catches the producer regressing, and the gate catches a verdict arriving by any other route.
+**The tool-side contract is pinned separately**, by `gate-tests/file-gap-recurrence.test.sh`: this gate reads the surface and cannot see which producer wrote a line.
 
 The four gate-sdk contracts ([gate-sdk/SPEC.md §The gate model](../gate-sdk/SPEC.md#the-gate-model)):
 

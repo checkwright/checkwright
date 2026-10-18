@@ -4,7 +4,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" || exit 2
-ROOT="$(pwd -P)"
 # The subject is the arm, reached through the shipped front-end a consumer invokes. No `jq`
 # precondition rides along:
 # the arm reads both allow lists in-crate, and the sandbox JSON below is written with printf, so

@@ -1,3 +1,4 @@
 retired 'recurrence of `<slug>`:' verdict
 not a gap bullet
+fused onto the header line
 help:

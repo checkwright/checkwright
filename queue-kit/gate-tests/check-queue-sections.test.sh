@@ -55,7 +55,7 @@ refused active "QUEUE_KIT_ACTIVE_SECTIONS[] = New Features
 QUEUE_KIT_ACTIVE_SECTIONS[] = Now:" QUEUE_KIT_ACTIVE_SECTIONS
 refused deferred "QUEUE_KIT_DEFERRED_SECTION = Backlog:" QUEUE_KIT_DEFERRED_SECTION
 refused icebox "QUEUE_KIT_ICEBOX_SECTION = Icebox:" QUEUE_KIT_ICEBOX_SECTION
-refused done "QUEUE_KIT_DONE_SECTION = Done:" QUEUE_KIT_DONE_SECTION
+refused "done" "QUEUE_KIT_DONE_SECTION = Done:" QUEUE_KIT_DONE_SECTION
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-queue-sections.test: $fails assertion(s) failed"

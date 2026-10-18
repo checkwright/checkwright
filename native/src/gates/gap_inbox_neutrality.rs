@@ -46,6 +46,12 @@ fn well_formed(line: &str) -> bool {
     i < d.len()
 }
 
+// spec: lifecycle-kit/SPEC.md §check-gap-inbox-neutrality — a well-formed bullet starting anywhere
+// inside the header line; the header's own `- <YYYY-MM-DD>` placeholder is no date and never matches
+fn fused_bullet(header: &str) -> bool {
+    header.match_indices('-').any(|(i, _)| well_formed(&header[i..]))
+}
+
 // spec: lifecycle-kit/SPEC.md §check-gap-inbox-neutrality — the prose is what survives the
 // `-[[:space:]][0-9-]+[[:space:]]—[[:space:]]*` lead the shell form strips
 fn prose_of(line: &str) -> String {
@@ -125,6 +131,12 @@ pub fn run(args: &[String]) -> i32 {
     for (idx, line) in text.lines().enumerate() {
         let fnr = idx + 1;
         if fnr == 1 && line.starts_with('#') && line[1..].starts_with(is_space) {
+            if fused_bullet(line) {
+                findings.push(format!(
+                    "{}:{}: a bullet is fused onto the header line — every bullet reader reads by line and sees none here; break the line before the bullet",
+                    inbox, fnr
+                ));
+            }
             continue;
         }
         if line.chars().all(is_space) {
@@ -179,6 +191,13 @@ mod tests {
         assert!(!well_formed("- 2026-8-13 — something"));
         assert!(!well_formed("-2026-08-13 — something"));
         assert!(!well_formed("- 2026-08-13 - something"));
+    }
+
+    #[test]
+    fn a_bullet_fused_onto_the_header_is_found_and_the_placeholder_is_not() {
+        let h = "# contract: x; one `- <YYYY-MM-DD> — <gap>` bullet per gap below.";
+        assert!(!fused_bullet(h));
+        assert!(fused_bullet(&format!("{}- 2026-10-18 — a gap", h)));
     }
 
     #[test]
