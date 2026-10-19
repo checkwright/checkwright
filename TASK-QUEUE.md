@@ -16,6 +16,16 @@
 
 ## New Features
 
+### permission-grammar-neutral
+
+[spec: SPEC-permission-grammar.md]
+
+kit prose states one harness's permission-rule grammar as the kit's: guard-kit's `Bash(...)` allow patterns, the matcher's wrapper strip and the `:*` idiom are Claude Code's settings grammar. Left out of `hook-contract-harness-neutral`'s binding table at its spec.
+
+**Deliverable:** the grammar named as a binding's spelling, cited to the binding table, or a refusal recorded.
+
+**Cost while deferred:** an adopter on another harness reads the allowlist sections as one vendor's settings format. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: 22 `Bash(` lines in guard-kit/SPEC.md, one each in gate-sdk and context-kit. Owner lookup: `permission-rule grammar`, `Bash(` in this file, none; owner guard-kit/SPEC.md §The recommended allowlist.
+
 ## Technical Debt
 
 ### skeleton-ansi-c-escaped-quote
@@ -307,16 +317,6 @@ Cursor and Muse Code are installed on no build machine, so plugin/SPEC.md §The 
 **Deliverable:** install and run each on a machine that has it, turn its cells from read to run, and file any wiring defect.
 
 **Cost while deferred:** two tier-2 harnesses' skill load and guard reach rest on vendor docs. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: neither CLI on the build machine's PATH. Owner lookup: `cursor`, `muse` in this file, none; owner plugin/SPEC.md §The harnesses.
-
-### permission-grammar-neutral
-
-[cost: event/low] [surface: guard-kit]
-
-kit prose states one harness's permission-rule grammar as the kit's: guard-kit's `Bash(...)` allow patterns, the matcher's wrapper strip and the `:*` idiom are Claude Code's settings grammar. Left out of `hook-contract-harness-neutral`'s binding table at its spec.
-
-**Deliverable:** the grammar named as a binding's spelling, cited to the binding table, or a refusal recorded.
-
-**Cost while deferred:** an adopter on another harness reads the allowlist sections as one vendor's settings format. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: 22 `Bash(` lines in guard-kit/SPEC.md, one each in gate-sdk and context-kit. Owner lookup: `permission-rule grammar`, `Bash(` in this file, none; owner guard-kit/SPEC.md §The recommended allowlist.
 
 ### hook-binding-single-source
 
