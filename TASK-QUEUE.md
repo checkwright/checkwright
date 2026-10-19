@@ -8,6 +8,8 @@
 
   **The set (operator direction 2026-10-19, lead-relayed, not a ruling; the iteration opened undirected):** option B over the recommended A. The guard-kit debt `harness-lone-amp-remeasure`, `escaped-pipe-amp-wrong-grant`, `ansi-c-continuation-grant` and `dequoted-view-ansi-c-value`, promoted by scope. Stages scope, build, validate and close: no feature, no amendment. The two v0.32.0 bar blockers are `escaped-pipe-amp-wrong-grant` and `ansi-c-continuation-grant`, both wrong grants; `dequoted-view-ansi-c-value` moves fall-through to allow, so it is new grant surface in the range the release review reads. Composition: bundled — the four share guard-kit's shell reader (guard-kit/SPEC.md §The reader and its views, `native/src/guard/`); drain 4 against inflow 4.2, below inflow because the next-largest surfaces, plugin and drift-kit, are externally gated or add a spec stage. Supersession: `escaped-pipe-amp-wrong-grant` — reshaped by `harness-lone-amp-remeasure`, the measurement deciding whether the compound split moves at the `&` reading `statement_amp` touches, so it runs first; `dequoted-view-ansi-c-value` — reshaped by `ansi-c-continuation-grant`, the view's value resolution reading the joined word, so the continuation join lands first.
 
+  **Fifth unit (operator direction 2026-10-19, lead-relayed):** `line-feed-value-forms-escape`, a wrong grant the build found, entered directly into the set rather than left to the close drain.
+
   **Release review (operator grant 2026-10-19, lead-relayed, unspent):** one audit-mode second-vendor review over the iteration's range, run at validate; close cuts v0.32.0 on a clean return, against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed), which stands unchanged; a finding or a failed run defers the cut.
 
   **Push need (2026-10-19, inside the budget):** 2 against 2 — the closing push, and the v0.32.0 tag push only if the granted review returns clean; no unit reads a remote run.
@@ -25,6 +27,16 @@ the harness's published permissions page lists a lone `&` among its recognized c
 **Deliverable:** that measurement re-run on the current harness; if the harness now splits, the compound split and rule `background_no_record`'s reading move with it, landing in a build, and the measured record's text is updated either way.
 
 **Cost while deferred:** none in the grant direction, since the guard reads a segment carrying a lone `&` as ungranted; at worst a grant withheld. Filed 2026-10-19 by guard-ansi-c-bar-pass' close, draining its spec session's bullet. Re-verified there: the docs page's separator list. Inferred, not run: the harness's current split. Owner lookup: `lone`, `separator`, `measured` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The reader and its views.
+
+**Probe permission (operator direction 2026-10-19, lead-relayed):** the build session's attempt to write the probe was refused by the harness's auto-mode classifier and not worked around. The operator wants the nested `claude -p` probe permitted, which is a permission-settings edit: the build session prepares the narrowest diff, the operator confirms it before it is applied, and the probe runs only then.
+
+### line-feed-value-forms-escape
+
+a word whose value carries a line feed, an ANSI-C `$'…\n…'` span, hides every word after it from rule `ro_pipeline`'s declared-forms check: `ro_forms_read` joins the values with a blank and `ro_invocation_clear` reads the first line only, so `find docs -name $'*.md\n' -delete` is auto-allowed as a read-only search pipeline.
+
+**Deliverable:** no word after a line-feed-bearing value escapes the forms check, with a firing row in `guard-kit/guard-tests/`. It moves allow to fall-through, so it lands in a build.
+
+**Cost while deferred:** a wrong grant of a contrived spelling that can delete tracked files; it blocks the v0.32.0 bar. Entered directly (operator direction 2026-10-19, lead-relayed) from the build session's gap bullet of the same date. Re-verified there: allowed on a build of the third unit's landing commit run from a plain clone. Born with the ANSI-C value read in guard-ansi-c-bar-pass; whether v0.31.0 allowed it is inferred, not run. Owner: guard-kit/SPEC.md §The generic ruleset, rule `ro_pipeline`'s declared-forms reader.
 
 ## Deferred
 
