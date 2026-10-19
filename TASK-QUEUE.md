@@ -20,16 +20,6 @@
 
 ## Technical Debt
 
-### harness-lone-amp-remeasure
-
-the harness's published permissions page lists a lone `&` among its recognized command separators, while guard-kit/SPEC.md §The reader and its views records a `claude -p` measurement that the harness does not split on it.
-
-**Deliverable:** that measurement re-run on the current harness; if the harness now splits, the compound split and rule `background_no_record`'s reading move with it, landing in a build, and the measured record's text is updated either way.
-
-**Cost while deferred:** none in the grant direction, since the guard reads a segment carrying a lone `&` as ungranted; at worst a grant withheld. Filed 2026-10-19 by guard-ansi-c-bar-pass' close, draining its spec session's bullet. Re-verified there: the docs page's separator list. Inferred, not run: the harness's current split. Owner lookup: `lone`, `separator`, `measured` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The reader and its views.
-
-**Probe permission (operator direction 2026-10-19, lead-relayed):** the build session's attempt to write the probe was refused by the harness's auto-mode classifier and not worked around. The operator wants the nested `claude -p` probe permitted, which is a permission-settings edit: the build session prepares the narrowest diff, the operator confirms it before it is applied, and the probe runs only then.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -998,4 +988,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - ansi-c-continuation-grant
 - dequoted-view-ansi-c-value
 - line-feed-value-forms-escape
+- harness-lone-amp-remeasure
 
