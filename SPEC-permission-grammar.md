@@ -22,7 +22,7 @@ Pairs `permission-grammar-neutral`. Kit prose states the shipped harness's permi
 - **What it leaves out:**
   - The settings file's name and location. Config already owns them (`GUARD_KIT_SETTINGS`, `GUARD_KIT_SETTINGS_LOCAL`, `CONTEXT_KIT_SETTINGS_FILE`), and the adopter constraint names them generically already.
   - The permission modes and their `defaultMode` key, which guard-kit/SPEC.md §The reader and its views argues about but no member parses.
-  - The harness's deny and ask rules, which no kit surface reads.
+  - The harness's deny and ask rules, from which no kit surface parses a rule. drift-kit's overlay count reads the three lists' lengths alone (drift-kit/SPEC.md §Bundled KPIs).
   - The headless measurement invocation (`claude -p …`). It is a measuring tool's command line and not a grammar spelling, and it stays beside the records it produced.
 
 **The measured matcher records stay where guard-kit models them.** These are the compound split's separator class and escapes, and the allow match's five measured cases. They argue the model they pin, and the allow match is the one holder of that model (guard-kit/SPEC.md §The reader and its views). Moving them into gate-sdk would split a model from its evidence. So their site keeps the spelling under a valve as the adapter's own record, and the binding table's measured record cites it (delta 1). The payload record moved into the table under `hook-contract-harness-neutral`, and it differs: many members read it, so it had no single model to sit beside.
@@ -69,7 +69,7 @@ Without the exclusion it reds a 34th line, `scripts/gate-tests/check-guard-regis
 
 - **A binding-table row, after the Transcript row, valved as its siblings are:**
 
-  > - Permission rules: allow list `permissions.allow`; a rule `<Tool>(<pattern>)`, the shell rules `Bash(<pattern>)` and `PowerShell(<pattern>)`; prefix idiom a closing `:*`; wrapper strip, the documented set guard-kit/SPEC.md §The reader and its views' harness view models. <!-- harness-binding: the shipped binding table -->
+  > - Permission rules: allow list `permissions.allow`; a rule `<Tool>(<pattern>)`, the shell rules `Bash(<pattern>)` and `PowerShell(<pattern>)`; prefix idiom a closing `:*`; wrapper strip, the documented set that the harness view models (guard-kit/SPEC.md §The reader and its views). <!-- harness-binding: the shipped binding table -->
 
 - **The measured record, replacing its paragraph:**
 
@@ -140,7 +140,7 @@ The lines at revision `92ee5d70c`, from the oracle's output, each with its dispo
 | guard-kit/SPEC.md:1016 | §check-door-binding, a permission pattern | (b): the gate parses the wrapper |
 | guard-kit/SPEC.md:1071 | §compare-settings-allow, the ruling's subject | (a): "the three allow-list readers" |
 | guard-kit/SPEC.md:1345 | §Testing, the consumer smoke | (b): the smoke strips the wrapper |
-| guard-kit/templates/close-triage.md:5 | the allowlist bullet | (a), as delta 3's triage bullet |
+| guard-kit/templates/close-triage.md:5 | the allowlist bullet | (a): the parenthetical alone, worded as delta 3's triage bullet words it; the rest of the template's bullet stays |
 | guard-kit/templates/close-triage.md:7 | the PowerShell section | (a): "its allowlist entry is a rule for the PowerShell tool" |
 | guard-kit/README.md:37 | §Install, the union step | (b), a wiring instruction |
 | context-kit/SPEC.md:397 | §check-settings-paths | (b), parses the key |
@@ -170,7 +170,7 @@ The lines at revision `92ee5d70c`, from the oracle's output, each with its dispo
     - the kit prose citing it (deltas 3 and 4);
     - an adopter writing a binding of their own, who needs the rule shapes the kit's readers parse.
   - Its one roster-holding reader is `check-harness-literal`, which holds the row's listed spellings to the valved lines (delta 5).
-  - Point 4: the row's fields each have a reader in the crate. The allow-list key is read by the `scan-prompts` ranker, the `compare-settings-allow` arm, `check-settings-paths` and the consumer-rule host's `allow-entries` mode. The rule wrapper is stripped in `native/src/emit/scan_prompts.rs`, `native/src/guard/host.rs`, `native/src/gates/settings_paths.rs` and `native/src/gates/door_binding.rs`. The prefix idiom is read by `guard::allow_match`, and the wrapper strip by the harness view. `PowerShell(<pattern>)` has no parser: the row carries it because guard-kit's PowerShell triage names it, and it is marked as the second shell tool's rule, not as a read.
+  - Point 4: the row's fields each have a reader in the crate. The allow-list key is read by the `scan-prompts` ranker, the `compare-settings-allow` arm, `check-settings-paths` and the consumer-rule host's `allow-entries` mode, and its length is counted by drift-kit's overlay KPI (`native/src/emit/kpi/settings_local.rs`), which parses no rule. The rule wrapper is stripped in `native/src/emit/scan_prompts.rs`, `native/src/guard/host.rs`, `native/src/gates/settings_paths.rs` and `native/src/gates/door_binding.rs`. The prefix idiom is read by `guard::allow_match`, and the wrapper strip by the harness view. `PowerShell(<pattern>)` has no parser: the row carries it because guard-kit's PowerShell triage names it, and it is marked as the second shell tool's rule, not as a read.
   - Probe: `git grep -n -F -e 'Bash(' -e '"permissions"' -e ':*' -- native/src`.
 - **The widened roster and narrowed corpus (delta 5).**
   - Producer: this repo's knob file, a deployed configuration.
