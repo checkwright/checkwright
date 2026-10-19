@@ -16,16 +16,6 @@
 
 ## New Features
 
-### word-read-dollar-quote-grants
-
-[spec: SPEC-dollar-quote-read.md]
-
-the bash word read answers nothing on a call carrying an ANSI-C (`$'...'`) or locale-translated (`$"..."`) word since the two hotfixes that closed their wrong grants, so read-only calls `ro_pipeline` granted by value fall through to a prompt: `grep $'a\tb' tracked.md`, `head -5 $'README.md'`, `ls $'docs'`, `echo $'a\nb' | wc -l`, `grep $"a" tracked.md`.
-
-**Deliverable:** a feature, since it lifts a refusal guard-kit/SPEC.md §The reader and its views states: ANSI-C escapes (octal, hex, `\u`, `\c`, the C escapes) resolved into the value face, restoring those grants; for `$"..."` the guard cannot see the catalog (`TEXTDOMAIN`, `TEXTDOMAINDIR`, the locale), so a read as its double-quoted value is weighed against keeping the refusal declared. It widens grants, the class the release bar reads.
-
-**Cost while deferred:** one permission decision per such call. Surfaced 2026-10-18 and 2026-10-19 by the two word-read hotfixes after guard-grant-kpi-pass' close, promoted at the next scope's carried-bullet intake as one entry. Re-verified there: each call above falls through on the built binary, `tracked.md` as `TASK-QUEUE.md`, and the plain `grep a` allows. Owner lookup: `ANSI-C`, `value face`, `locale` in this file and the disposed-findings record, none; `pwsh-herestring-word-read` is DISTINCT (the PowerShell reader); owner guard-kit/SPEC.md §The reader and its views.
-
 ## Technical Debt
 
 ## Deferred
@@ -1004,4 +994,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - background-record-bare-amp
 - pwsh-herestring-word-read
 - heredoc-call-rule-decline
+- word-read-dollar-quote-grants
 

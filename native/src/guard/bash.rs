@@ -648,12 +648,86 @@ pub fn dequoted(raw: &str) -> Option<String> {
     Some(text::chomp(&String::from_utf8_lossy(&out)).to_string())
 }
 
-// spec: guard-kit/SPEC.md §The reader and its views — an ANSI-C quoted or locale-translated word: the
-// bare `$` run ahead of the quote, less an escaped first `$`, is odd, since `$$` is the shell's pid.
+// spec: guard-kit/SPEC.md §The reader and its views — a `$`-quoted word: a quote behind an odd run of
+// bare `$`, less an escaped first `$`, since `$$` is the shell's pid.
 fn dollar_quote(b: &[u8], i: usize) -> bool {
     let run = b[..i].iter().rev().take_while(|&&c| c == b'$').count();
     let live = if run > 0 && escaped(b, i - run) { run - 1 } else { run };
     live % 2 == 1
+}
+
+// spec: guard-kit/SPEC.md §The reader and its views — an ANSI-C quoted span's value as bash resolves
+// its escapes; `None` where the read refuses the span.
+fn ansi_c(content: &[u8]) -> Option<Vec<u8>> {
+    if content.iter().rev().take_while(|&&c| c == b'\\').count() % 2 == 1 {
+        return None;
+    }
+    let hex = |s: &[u8], max: usize| -> (u32, usize) {
+        let n = s.iter().take(max).take_while(|c| c.is_ascii_hexdigit()).count();
+        let v = s[..n].iter().fold(0u32, |v, &c| v * 16 + (c as char).to_digit(16).unwrap_or(0));
+        (v, n)
+    };
+    let mut out = Vec::with_capacity(content.len());
+    let mut k = 0usize;
+    while k < content.len() {
+        let c = content[k];
+        k += 1;
+        if c != b'\\' {
+            out.push(c);
+            continue;
+        }
+        let &e = content.get(k)?;
+        k += 1;
+        let resolved: u32 = match e {
+            b'n' => 0x0a,
+            b't' => 0x09,
+            b'r' => 0x0d,
+            b'a' => 0x07,
+            b'b' => 0x08,
+            b'e' | b'E' => 0x1b,
+            b'f' => 0x0c,
+            b'v' => 0x0b,
+            b'\\' | b'\'' | b'"' | b'?' => e as u32,
+            b'0'..=b'7' => {
+                let n = content[k - 1..].iter().take(3).take_while(|c| (b'0'..=b'7').contains(c)).count();
+                let v = content[k - 1..k - 1 + n].iter().fold(0u32, |v, &c| v * 8 + (c - b'0') as u32);
+                k += n - 1;
+                v % 256
+            }
+            b'x' | b'u' | b'U' => {
+                let (v, n) = hex(&content[k..], match e { b'x' => 2, b'u' => 4, _ => 8 });
+                if n == 0 {
+                    out.extend_from_slice(&[b'\\', e]);
+                    continue;
+                }
+                k += n;
+                if e != b'x' && v >= 0x80 {
+                    return None;
+                }
+                v
+            }
+            b'c' => {
+                let Some(&x) = content.get(k) else {
+                    out.extend_from_slice(b"\\c");
+                    continue;
+                };
+                k += if x == b'\\' && content.get(k + 1) == Some(&b'\\') { 2 } else { 1 };
+                if !x.is_ascii() {
+                    return None;
+                }
+                if x == b'?' { 0x7f } else { (x.to_ascii_uppercase() & 0x1f) as u32 }
+            }
+            _ => {
+                out.extend_from_slice(&[b'\\', e]);
+                continue;
+            }
+        };
+        if resolved >= 0x80 || (resolved < 0x20 && !matches!(resolved, 0x09 | 0x0a | 0x0d)) {
+            return None;
+        }
+        out.push(resolved as u8);
+    }
+    Some(out)
 }
 
 // spec: guard-kit/SPEC.md §The reader and its views — the word read; `None` where the dequoted view
@@ -709,10 +783,17 @@ pub fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
                 }
                 i += 2;
             }
-            b'\'' => {
-                if dollar_quote(b, i) {
+            b'$' if b.get(i + 1) == Some(&b'\'') && dollar_quote(b, i + 1) => {
+                let k = b[i + 2..].iter().position(|&c| c == b'\'')?;
+                let content = &b[i + 2..i + 2 + k];
+                if content.contains(&b'\n') {
                     return None;
                 }
+                let live = format!("${SQ_MARK}");
+                acc.piece(&b[i..i + k + 3], &ansi_c(content)?, live.as_bytes());
+                i += k + 3;
+            }
+            b'\'' => {
                 let k = b[i + 1..].iter().position(|&c| c == b'\'')?;
                 if heredoc && b[i + 1..i + 1 + k].contains(&b'\n') {
                     return None;
@@ -1013,15 +1094,18 @@ mod tests {
         assert_eq!(word_read("a \\&& b"), None);
     }
 
-    // spec: guard-kit/SPEC.md §The reader and its views — an ANSI-C quoted or locale-translated word
-    // reads nothing, with a heredoc beside it too; an escaped `$`, the pid `$$` and a quoted `$` stay read
+    // spec: guard-kit/SPEC.md §The reader and its views — an ANSI-C quoted word is read by its resolved
+    // value, with a heredoc beside it too, and a locale-translated one reads nothing; an escaped `$`,
+    // the pid `$$` and a quoted `$` stay read as written
     #[test]
     fn the_word_read_answers_nothing_on_a_dollar_quoted_word() {
-        assert_eq!(word_read("cat >> \".tmp/\"$'\\056\\056/README.md'"), None);
-        assert_eq!(word_read("cat >> \".tmp/\"$'\\056\\056/README.md' <<'EOF'\nx\nEOF"), None);
-        assert_eq!(word_read("echo $$$'x'"), None);
-        assert_eq!(word_read("echo \\$$'x'"), None);
-        assert_eq!(word_read("echo \\\\$'x'"), None);
+        let target = format!("{DQ_MARK}${SQ_MARK}");
+        let resolved = face("\".tmp/\"$'\\056\\056/README.md'", ".tmp/../README.md", &target);
+        assert_eq!(faces("cat >> \".tmp/\"$'\\056\\056/README.md'")[0][2], resolved);
+        assert_eq!(faces("cat >> \".tmp/\"$'\\056\\056/README.md' <<'EOF'\nx\nEOF")[0][2], resolved);
+        assert_eq!(faces("echo $$$'x'")[0][1].1, "$$x");
+        assert_eq!(faces("echo \\$$'x'")[0][1].1, "$x");
+        assert_eq!(faces("echo \\\\$'x'")[0][1].1, "\\x");
         assert_eq!(faces("echo \\$'x'")[0][1].1, "$x");
         assert_eq!(faces("echo $$'x'")[0][1].1, "$$x");
         assert_eq!(faces("echo \"$\"'x'")[0][1].1, "$x");
@@ -1034,6 +1118,56 @@ mod tests {
         assert_eq!(faces("echo $$\"x\"")[0][1].1, "$$x");
         assert_eq!(faces("echo '$'\"x\"")[0][1].1, "$x");
         assert_eq!(faces("echo \"a$\"\"x\"")[0][1].1, "a$x");
+    }
+
+    // spec: guard-kit/SPEC.md §The reader and its views — each escape resolved to the bytes bash gives
+    // it, or refused
+    #[test]
+    fn an_ansi_c_escape_resolves_as_bash_resolves_it_or_refuses() {
+        let read = |c: &str| ansi_c(c.as_bytes()).map(|v| String::from_utf8(v).unwrap());
+        let reads = |c: &str, v: &str| assert_eq!(read(c).as_deref(), Some(v), "{:?}", c);
+        let refuses = |c: &str| assert_eq!(read(c), None, "{:?}", c);
+        reads("\\n", "\n");
+        reads("\\t", "\t");
+        reads("\\r", "\r");
+        for c in ["\\a", "\\b", "\\e", "\\E", "\\f", "\\v"] {
+            refuses(c);
+        }
+        reads("\\\\", "\\");
+        reads("\\'", "'");
+        reads("\\\"", "\"");
+        reads("\\?", "?");
+        reads("\\101", "A");
+        reads("\\56x", ".x");
+        refuses("\\7");
+        refuses("\\0101");
+        refuses("\\777");
+        reads("\\x41", "A");
+        refuses("\\x4");
+        reads("\\x414", "A4");
+        reads("\\xg", "\\xg");
+        refuses("\\x80");
+        reads("\\u41", "A");
+        reads("\\u0041", "A");
+        refuses("\\U000000e9");
+        reads("\\u41g", "Ag");
+        refuses("\\cA");
+        refuses("\\ca");
+        reads("\\cI", "\t");
+        reads("\\ci", "\t");
+        reads("\\c?", "\u{7f}");
+        refuses("\\c\\\\x");
+        reads("\\q", "\\q");
+        reads("\\8", "\\8");
+        reads("a\\c", "a\\c");
+        reads("\\x", "\\x");
+        reads("\\u", "\\u");
+        reads("\\U", "\\U");
+        refuses("\\0");
+        refuses("\\x00");
+        refuses("\\c@");
+        refuses("a\\");
+        reads("a\\\\", "a\\");
     }
 
     // spec: guard-kit/SPEC.md §The reader and its views — a heredoc read as the skeleton holds it: the
@@ -1077,11 +1211,14 @@ mod tests {
             if verdict.trim().is_empty() || verdict.starts_with('#') {
                 continue;
             }
-            if cell.contains(['#']) || ["<<", "@NL@", "$'", "$\""].iter().any(|t| cell.contains(t)) || cell.ends_with(['&', '|', ';', '\\']) {
+            if cell.contains(['#']) || ["<<", "@NL@", "$\""].iter().any(|t| cell.contains(t)) || cell.ends_with(['&', '|', ';', '\\']) {
                 continue;
             }
             let row = cell.replace("@ROOT@", "/tmp/sandbox").replace("@CR@", "\r");
-            let base = word_read(&row).unwrap_or_else(|| panic!("{:?} was not read", row));
+            let Some(base) = word_read(&row) else {
+                assert!(row.contains("$'"), "{:?} was not read", row);
+                continue;
+            };
             for (opener, lines, spelling) in heredocs {
                 let mut call = format!("{} {}\n", row, opener);
                 for l in lines {
@@ -1101,6 +1238,38 @@ mod tests {
                 assert_eq!(faces(&got), faces(&want), "{:?}", call);
                 seen += 1;
             }
+        }
+        assert!(seen > 0);
+    }
+
+    // spec: guard-kit/SPEC.md §The reader and its views — an ANSI-C span with no escape reads as the
+    // single-quoted span it re-spells, over every decision-table row carrying one
+    #[test]
+    fn an_ansi_c_span_reads_as_its_single_quoted_spelling() {
+        let table = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../guard-kit/guard-tests/cases.tsv");
+        let body = std::fs::read_to_string(table).unwrap();
+        let values = |r: Vec<Vec<Word>>| r.into_iter().map(|s| s.into_iter().map(|w| w.value).collect::<Vec<_>>()).collect::<Vec<_>>();
+        let mut seen = 0usize;
+        for line in body.lines() {
+            let Some((verdict, cell)) = line.split_once('\t') else { continue };
+            if verdict.trim().is_empty() || verdict.starts_with('#') || !cell.contains('\'') || cell.matches('\'').count() % 2 == 1 {
+                continue;
+            }
+            if cell.contains(['\\', '"', '$', '#']) || ["<<", "@NL@"].iter().any(|t| cell.contains(t)) {
+                continue;
+            }
+            let row = cell.replace("@ROOT@", "/tmp/sandbox").replace("@CR@", "\r");
+            let mut spelled = String::new();
+            for (k, part) in row.split('\'').enumerate() {
+                if k > 0 {
+                    spelled.push_str(if k % 2 == 1 { "$'" } else { "'" });
+                }
+                spelled.push_str(part);
+            }
+            let base = word_read(&row).unwrap_or_else(|| panic!("{:?} was not read", row));
+            let got = word_read(&spelled).unwrap_or_else(|| panic!("{:?} was not read", spelled));
+            assert_eq!(values(got), values(base), "{:?}", spelled);
+            seen += 1;
         }
         assert!(seen > 0);
     }

@@ -181,6 +181,8 @@ eq "words-escaped" "$(words 'git \clean -fd')" "git${tab}clean${tab}-fd"
 eq "words-split" "$(words "git cl'ea'n -fd")" "git${tab}clean${tab}-fd"
 eq "words-segments" "$(words 'git commit -m x; echo --no-verify')" "$(printf 'git\tcommit\t-m\tx\necho\t--no-verify')"
 eq "words-tab" "$(printf '%s' '{"tool_name":"Bash","tool_input":{"command":"echo '\''a\tb'\''"}}' | "$BIN" --guard-json words)" 'echo'"${tab}"'a\tb'
+eq "words-newline" "$(words "echo \$'a\\nb'")" 'echo'"${tab}"'a\nb'
+eq "words-ansi-c" "$(words "git \$'st\\x61sh'")" "git${tab}stash"
 eq "words-backslash" "$(words "echo 'a\\b'")" 'echo'"${tab}"'a\\b'
 eq "words-powershell" "$(words 'git `clean -X' PowerShell)" "git${tab}clean${tab}-X"
 eq "words-here-string" "$(words $'git \'stash\' push; @\'\nx\n\'@ | Write-Output' PowerShell)" "$(printf 'git\tstash\tpush\nHD\nWrite-Output')"

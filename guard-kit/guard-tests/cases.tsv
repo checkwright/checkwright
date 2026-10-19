@@ -443,6 +443,7 @@ block	git stash 'push'
 block	git "stash" pop
 block	git stash "pop"
 block	git 'stash'
+block	git $'st\x61sh'
 block	git st\ash
 block	git stash '-u'
 block	git '--no-pager' stash
@@ -549,13 +550,14 @@ allow	cat >> ".tmp/j.md" <<'EOF'@NL@x@NL@EOF
 allow	cat >> .tmp/j.md 2>"/dev/null" <<'EOF'@NL@x@NL@EOF
 allow	cat >> ".tmp/j.md" << "EOF"@NL@x@NL@EOF
 allow	cat >> ".tmp/j.md" <<'E"F'@NL@x@NL@E"F
-# an ANSI-C quoted word leaves the word read answering nothing, so a target spelling one is no
-# gitignored target, beside a heredoc too (`$'\056\056'` is `..`, out of the scratch dir), and rule
-# `emitter_write` blocks
+# an ANSI-C quoted word is read by its resolved value, so a target spelling one names the file it
+# resolves to (`$'\056\056'` is `..`, out of the scratch dir) and rule `emitter_write` blocks, beside a
+# heredoc too; a span the read cannot resolve exactly leaves the target unread
 block	cat >> ".tmp/"$'\056\056/tracked.md'
 block	cat >> ".tmp/"$'\056\056/tracked.md' <<'EOF'@NL@x@NL@EOF
-block	printf x > .tmp/$'x'
+allow	printf x > .tmp/$'x'
 allow	printf $'x\n' >> .tmp/j.md
+block	printf x > .tmp/$'\e'
 # a locale-translated word (`$"…"`) is unread as an ANSI-C one is, the catalog that translates it
 # being out of the guard's sight, so a target spelling one is no gitignored target either
 block	cat >> ".tmp/"$"../tracked.md"
@@ -643,10 +645,25 @@ fallthrough	grep foo 'a\' | sort -o out.txt
 # redirect is still the member and its write form withholds
 fallthrough	sort>/dev/null -o tracked.md scratch.txt
 allow	sort>/dev/null tracked.md
-# an ANSI-C quoted or locale-translated word is unread, so a write form spelled with one withholds
-# the grant
+# an ANSI-C quoted word is read by its value, so a write form spelled with one withholds the grant as
+# the plain spelling does, and a read-only call so spelled is granted; a locale-translated word is
+# unread, so a write form spelled with one withholds too
 fallthrough	sort $'-o' tracked.md scratch.txt
 fallthrough	sort $"-o" tracked.md scratch.txt
+fallthrough	sort $'-\157' tracked.md scratch.txt
+allow	grep $'a\tb' tracked.md
+allow	head -5 $'tracked.md'
+allow	echo $'a\nb' | wc -l
+allow	sort $'a\n-o' tracked.md
+allow	grep $'\q' tracked.md
+# a span the read cannot resolve exactly leaves the call unread: a control, a byte above ASCII,
+# a NUL, an escaped quote
+fallthrough	grep $'\cA' tracked.md
+fallthrough	grep $'\U000000e9' tracked.md
+fallthrough	grep $'\x80' tracked.md
+fallthrough	grep $'a\0b' tracked.md
+fallthrough	grep $'it\'s' tracked.md
+fallthrough	grep $"a" tracked.md
 # the sed and awk program discriminator: a program the static check clears is read-only (a redirect
 # glyph inside an awk string is skipped); an output redirect, a written file, a system() call, a
 # command piped into getline and a program file withhold
@@ -959,6 +976,7 @@ block	rm 'tracked.md'
 block	rm "tracked.md"
 block	rm two\ words.md
 block	rm 'two words.md'
+block	rm $'tracked.md'
 block	rm -f "two words.md" scratch.txt
 block	rm *.md
 block	rm track?d.md

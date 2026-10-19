@@ -138,7 +138,7 @@ pub fn json_words(payload: Option<&serde_json::Value>) -> Option<Vec<String>> {
     }
     let segs = reader.word_read(cmd)?;
     let line = |ws: &[reader::Word]| {
-        let vals: Vec<String> = ws.iter().map(|w| reader::unmark(&w.value).replace('\\', "\\\\").replace('\t', "\\t")).collect();
+        let vals: Vec<String> = ws.iter().map(|w| reader::unmark(&w.value).replace('\\', "\\\\").replace('\t', "\\t").replace('\n', "\\n")).collect();
         vals.join("\t")
     };
     Some(segs.iter().map(|ws| line(ws)).collect())
@@ -289,6 +289,7 @@ mod tests {
         );
         assert_eq!(words("echo 'a\tb'"), one("echo\ta\\tb"));
         assert_eq!(words("echo 'a\\b'"), one("echo\ta\\\\b"));
+        assert_eq!(words("echo $'a\\nb'"), one("echo\ta\\nb"));
         let ps = serde_json::json!({"tool_name": "PowerShell", "tool_input": {"command": "git `clean -X"}});
         assert_eq!(json_words(Some(&ps)), one("git\tclean\t-X"));
         assert_eq!(

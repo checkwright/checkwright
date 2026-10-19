@@ -752,9 +752,9 @@ fn exec_steer(ws: &[Word], e: usize, t: usize, per_file: bool) -> String {
 }
 
 // spec: guard-kit/SPEC.md §The reader and its views — word values joined as the declared-forms reader
-// takes a dequoted segment: a blank inside a value held as the view's sentinel.
+// takes a dequoted segment: a blank or a newline inside a value held as the view's sentinel.
 fn held_values(ws: &[Word]) -> String {
-    ws.iter().map(|w| w.value.replace(' ', "\x01").replace('\t', "\x02")).collect::<Vec<_>>().join(" ")
+    ws.iter().map(|w| w.value.replace([' ', '\n'], "\x01").replace('\t', "\x02")).collect::<Vec<_>>().join(" ")
 }
 
 pub fn find_exec(ctx: &Ctx) -> Decided {
