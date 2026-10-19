@@ -48,7 +48,7 @@ Either way the arm constructs no payload of its own.
 >
 > **What it prints.** Line one is the decision, in the decision table's ladder (§Testing): `block`, `advise`, `allow`, `rewrite` or `fallthrough`, or `exit<rc>` and `unknown` for an answer the ladder does not place. The child's stdout follows verbatim, then its stderr verbatim, so a block's steer and an allow's reason are read where the hook wrote them. The ladder is `--run-guard-tests`' own function.
 >
-> **Exit:** 0 when the child answered, whatever its decision; 2 for a usage error, a `--bin` path that is not an executable file, a sandbox that cannot be built, or a child that cannot be spawned. `-h` or `--help` first prints the usage at exit 0. Every refusal prints it on stderr at exit 2:
+> **Exit:** 0 when the child answered, whatever its decision; 2 for a usage error, a `--bin` path that is not an executable file, a sandbox that cannot be built, or a child that cannot be spawned. `-h` or `--help` first prints the usage at exit 0. Every grammar refusal prints it on stderr at exit 2:
 >
 > - a surplus operand;
 > - a leading-`-` operand before `--`;
@@ -61,7 +61,7 @@ Either way the arm constructs no payload of its own.
 
 `guard-kit/SPEC.md` §Testing, the paragraph opening **Any ad-hoc invocation of the shell guard must set `GUARD_KIT_LOG` to a scratch path.**, reads as follows. **Not yet applied.**
 
-> **Ask the guard for a verdict with `--guard-verdict` (§guard-verdict), which points `GUARD_KIT_LOG` at scratch itself; any other ad-hoc invocation of the shell guard must set it to a scratch path.** The logger's default is the *live* friction log, so a probe driving the guard files its synthetic commands as real friction and skews the next close's ranking. The kit's own runners all set it: the decision table into its sandbox, the `scan-prompts` fixture into its own, and the verdict arm into its own file. **No scanner is proposed:** the polluting caller is a one-off script in the gitignored scratch dir, so there is no committed corpus to scan.
+> **Ask the guard for a verdict with `--guard-verdict` (§guard-verdict), which points `GUARD_KIT_LOG` at scratch itself; any other ad-hoc invocation of the shell guard must set it to a scratch path.** The logger's default is the *live* friction log, so a probe driving the guard files its synthetic commands as real friction and skews the next close's ranking. The kit's own runners all set it: the decision table into its sandbox, the `scan-prompts` fixture into its own, and the verdict arm into its own file. **No scanner is proposed:** the polluting caller is a one-off script in the gitignored scratch dir, so there is no committed corpus to scan. The convention is carried by this sentence and by the `--scratch-run` arm's echo-at-execution.
 
 `native/src/emit/run_guard_tests.rs`. **Not yet applied.**
 
@@ -146,7 +146,7 @@ The roster came from `git grep -n -e "--hook shell-guard" -e "GUARD_KIT_LOG" -- 
 - `guard-kit/gate-tests/guard-verdict.test.sh` (delta 1).
 - `gate-sdk/SPEC.md` §The non-gate arm (delta 2).
 - `guard-kit/README.md`, `.workflow/release-declarations.md` (delta 3).
-- `docs/guard-kit/SPEC.md` and `docs/gate-sdk/SPEC.md`, the generated mirrors (all deltas).
+- `docs/guard-kit/SPEC.md` and `docs/gate-sdk/SPEC.md`, the generated mirrors (all deltas), and `docs/guard-kit/README.md`, the mirror of delta 3's README edit (`docs/generated-projections.md` rosters the README mirrors beside the SPEC ones).
 
 ## Retired spellings
 

@@ -57,7 +57,7 @@ The same section's **The knob widens when the hook fires it too.** paragraph: "c
 
 The crate's existing positional test keeps the override covered.
 
-Inferred, to be confirmed at build: the fixture runner hands a case with no `args` file an empty argv, which `run_case` in `native/src/emit/run_gate_tests.rs` shows, and a relative `GATE_SDK_KIT_DIRS` word resolves against the case dir, as `check-smoke-entry-guard`'s case-local `GATE_SDK_KIT_DIRS = alpha-kit beta-kit` does.
+Read at align from the implementing lines: the fixture runner hands a case with no `args` file an empty argv (`run_case` in `native/src/emit/run_gate_tests.rs` reads `args` only when the file opens), and a relative `GATE_SDK_KIT_DIRS` word resolves against the case dir (`walk::roots_at` keeps a given word as spelled and `kit_roots_abs` absolutizes it against the process cwd, which `run_case` sets on the child to the case dir), as `check-smoke-entry-guard`'s case-local `GATE_SDK_KIT_DIRS = alpha-kit beta-kit` does.
 
 ### (3) This repo's knob names only the shell under no kit root {mechanical}
 

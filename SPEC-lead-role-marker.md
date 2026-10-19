@@ -93,7 +93,7 @@ The same section's test paragraph, "The hermetic cases live in `gate-tests/`: cr
 ## Producers and consumers
 
 - **The marker write (delta 1).**
-  - Producer: `open_lead_journal`, reached as `--enter-stage --open-lead-journal` through `bash gate-sdk/bin/run-gates.sh`, which the lead template's first step runs (delta 2). No knob enables it. It runs wherever the opener runs.
+  - Producer: `open_lead_journal`, reached as `--enter-stage --open-lead-journal`, which the lead template's first step runs on the gate binary `GATE_SDK_NATIVE_BIN` names (delta 2), or through `bash gate-sdk/bin/run-gates.sh`. No knob enables it. It runs wherever the opener runs.
   - Consumer: the session-context hook's identity match, reading the file `CONTEXT_KIT_SESSION_ROLE_FILE` names on each fire (`native/src/hook/session_context.rs`). The one field, the id, is read by that match. The line's grammar is unchanged, so the reader does not move.
   - Roster-holding readers of the surfaces: the scratch sweep's spare and this repo's `LIFECYCLE_KIT_BOUNDARY_PRESERVE` name the file by knob and by name, and neither moves. The arm's `KNOBS` roster gains the knob, and the SPEC roster it mirrors gains it in delta 1.
 - **The id derivation's new caller (delta 1).** `crate::emit::session_id::emit`, already the stamp's. Its callers paragraph is rewritten under delta 1, and the arm's empty roster does not move.
@@ -111,7 +111,8 @@ The roster came from `git grep -n -i -E "session.role|SESSION_ROLE" -- ':!TASK-Q
 - `lifecycle-kit/templates/lead.md`, the first step; `lifecycle-kit/SPEC.md` §templates/lead.md; `lifecycle-kit/README.md` (delta 2).
 - `context-kit/SPEC.md` §The session-context hook and §Layout and configuration (delta 3).
 - `.workflow/release-declarations.md` (delta 4).
-- `docs/lifecycle-kit/SPEC.md` and `docs/context-kit/SPEC.md`, the generated mirrors (all deltas).
+- `docs/lifecycle-kit/SPEC.md` and `docs/context-kit/SPEC.md`, the generated mirrors (all deltas), and `docs/lifecycle-kit/README.md`, the mirror of delta 2's README edit.
+- `docs/footprint.md` and the `docs/value.md` rollup block it feeds, the generated projections moved by delta 2's change to the load-triggered `lifecycle-kit/templates/lead.md` (`docs/generated-projections.md` rosters both).
 
 ## Retired spellings
 
