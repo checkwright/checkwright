@@ -10,7 +10,7 @@
 
   **Fifth unit (operator direction 2026-10-19, lead-relayed):** `line-feed-value-forms-escape`, a wrong grant the build found, entered directly into the set rather than left to the close drain.
 
-  **Release review (operator grant 2026-10-19, lead-relayed, unspent):** one audit-mode second-vendor review over the iteration's range, run at validate; close cuts v0.32.0 on a clean return, against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed), which stands unchanged; a finding or a failed run defers the cut.
+  **Release review (operator grant 2026-10-19, lead-relayed, spent at validate, the run failed on the vendor's content refusal with no report, so close defers by a direction of 2026-10-19, lead-relayed, not a ruling):** one audit-mode second-vendor review over the iteration's range, run at validate; close cuts v0.32.0 on a clean return, against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed), which stands unchanged; a finding or a failed run defers the cut.
 
   **Push need (2026-10-19, inside the budget):** 2 against 2 — the closing push, and the v0.32.0 tag push only if the granted review returns clean; no unit reads a remote run.
 
@@ -134,13 +134,11 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Release (operator directions, lead-relayed, not rulings):** v0.32.0 stays deferred, closing push only, no tag and no publish, by a direction of 2026-10-12. **The bar for the cut, the same direction:** cut once no open finding is a wrong grant or a regression from v0.31.0; a fall-through hole rides as a declared limit in the note. Which open finding the bar blocks is read by the session that next weighs a cut, against its own runs. **At each close since 2026-10-13** the operator rested that reading on the iteration's second-vendor review returning clean, a failed run or a finding leaving the bar a judgment being asked, never skipped or met by a same-vendor reader; on 2026-10-14 the one granted run moved to validate, none at close. **Since 2026-10-14** a close promotes every verdict-moving guard change it would author rather than landing it, the close binding carrying the rule, so a finding the review returns waits for a later build and validate. Three closes read the bar unmet on findings the latest review returned; the last, `grant-redirect-scan-cr`, landed at guard-word-read-release-pass. **That close, by a direction of 2026-10-15,** runs one audit-mode second-vendor review over the iteration's range and cuts v0.32.0 on a clean return, closing push plus tag push; a finding or a failed run defers, a verdict-moving finding promoted. The run failed on the vendor's credit wall, so v0.32.0 stays deferred; foreign-build-budget-pass' close, granted no run, ran none and deferred it again. crate-name-reader-pass' validate spent its one granted run, not clean on one regression the operator ruled a hotfix for; its close deferred v0.32.0 again with no second run granted (operator direction 2026-10-15, lead-relayed), and gate-substrate-sdk-pass' close, given no new answer, deferred it under that direction. That cut's `publish` run produces this observation and [front-door-job-observed](#front-door-job-observed)'s.
 
-**Three grants of 2026-10-16 spent (lead-relayed):** reviews at gate-dispatch-hermetic-pass' close, tamper-reader-repair-pass' validate and budget-feed-observation-pass' validate returned two, three and four findings, none verdict-moving, each held one fixed or carried; v0.32.0 stayed deferred.
+**Three grants of 2026-10-16 and three of 2026-10-18 spent (lead-relayed):** each review returned findings, fixed there or landed in a later build, and each left v0.32.0 deferred.
 
 **Two grants of 2026-10-17 spent:** competitive-followup-pass' validate and close reviews each returned five findings, so v0.32.0 stayed deferred. That close withdrew `prove` from docs/install.md and docs/maintenance.md and the overlap section from docs/openspec.md, its line held in `companion/fixtures/openspec/overlap/line.md`; **the cut restores them** and deletes the held file.
 
-**Three grants of 2026-10-18 spent:** session-sweep-policy-pass' close review returned five P2 findings, fixed there; harness-reach-pass' validate review three verdict-moving ones, two wrong grants, landed at guard-grant-kpi-pass as `ro-pipeline-wrong-grants` and `pwsh-string-expr-overblock`; guard-grant-kpi-pass' close review three, one a wrong grant since fixed. Each left v0.32.0 deferred.
-
-**Two grants of 2026-10-19 spent:** guard-word-read-reach-pass' validate review returned a wrong grant, hotfixed, and a wrong block, `escaped-amp-statement-split`; guard-ansi-c-bar-pass' two wrong grants, `escaped-pipe-amp-wrong-grant` and `ansi-c-continuation-grant`. Each close deferred v0.32.0.
+**Three grants of 2026-10-19 spent:** guard-word-read-reach-pass' validate review returned a wrong grant, hotfixed, and a wrong block, `escaped-amp-statement-split`; guard-ansi-c-bar-pass' two wrong grants, `escaped-pipe-amp-wrong-grant` and `ansi-c-continuation-grant`, landed at guard-reader-value-bar-pass; that iteration's validate run failed, the vendor refusing the content as a cybersecurity flag and returning no report, and its trace's wrong grant is [bounded-write-backslash-grant](#bounded-write-backslash-grant). Each close deferred v0.32.0, the last by a direction of 2026-10-19 (lead-relayed, not a ruling): closing push only, no tag, no publish and no second run, the bar unchanged.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
@@ -281,6 +279,16 @@ gate-sdk/SPEC.md §The hook contract's binding table is held to the crate's spel
 **Deliverable:** one crate module holding the binding's spellings that every member reads, with a test holding the table to it, or a refusal recorded.
 
 **Cost while deferred:** the table can drift from what the members read, unseen until a fixture reds. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: `tool_input` spelled in six `native/src/hook/` modules and `guard/mod.rs`. Owner lookup: `binding table`, `hook contract` in this file, none; owner gate-sdk/SPEC.md §The hook contract.
+
+### bounded-write-backslash-grant
+
+[cost: event/low] [surface: guard-kit]
+
+rule `bounded_write` auto-allows `touch '\.tmp/a'`, `touch "\.tmp/a"`, `touch $'\\.tmp/a'`, `printf x > '\.tmp/a'` and `mkdir -p '\.tmp/x'` as a bounded scratch write, though bash's value for each word keeps the backslash, so the path sits under a directory named `\.tmp` outside the scratch dir. The `mkdir -p` grant creates that directory itself; a bare `mkdir '\.tmp'` falls through.
+
+**Deliverable:** the bounds test reads the word's value, a kept backslash included, with firing rows for the single-quoted, double-quoted and ANSI-C spellings in `guard-kit/guard-tests/`. It moves allow to fall-through, so it lands in a build.
+
+**Cost while deferred:** a wrong grant of contrived spellings; it blocks the v0.32.0 bar. Filed 2026-10-19 by guard-reader-value-bar-pass' close, draining validate's bullet from the failed second-vendor review's trace; promoted for the next iteration by operator direction 2026-10-19, lead-relayed, not a ruling. Re-verified there: all five allowed on the built binary at the close stamp's head. At v0.31.0, built from its tag, the `touch` spellings fall through and the `printf` redirect is refused, the rule landing after that tag, so the grant is unreleased rather than pre-existing. Inferred, not run: that the in-scratch test reads the backslash as an escape of the dot. Owner lookup: `backslash`, `bounded write`, `scratch-write`, `in-scratch` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The rule roster, rule `bounded_write`.
 
 ## Icebox
 
@@ -983,10 +991,4 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
-
-- escaped-pipe-amp-wrong-grant
-- ansi-c-continuation-grant
-- dequoted-view-ansi-c-value
-- line-feed-value-forms-escape
-- harness-lone-amp-remeasure
 
