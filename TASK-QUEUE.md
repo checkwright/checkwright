@@ -278,7 +278,27 @@ rule `bounded_write` auto-allows `touch '\.tmp/a'`, `touch "\.tmp/a"`, `touch $'
 
 **Deliverable:** the bounds test reads the word's value, a kept backslash included, with firing rows for the single-quoted, double-quoted and ANSI-C spellings in `guard-kit/guard-tests/`. It moves allow to fall-through, so it lands in a build.
 
-**Cost while deferred:** a wrong grant of contrived spellings; it blocks the v0.32.0 bar. Filed 2026-10-19 by guard-reader-value-bar-pass' close, draining validate's bullet from the failed second-vendor review's trace; promoted for the next iteration by operator direction 2026-10-19, lead-relayed, not a ruling. Re-verified there: all five allowed on the built binary at the close stamp's head. At v0.31.0, built from its tag, the `touch` spellings fall through and the `printf` redirect is refused, the rule landing after that tag, so the grant is unreleased rather than pre-existing. Inferred, not run: that the in-scratch test reads the backslash as an escape of the dot. Owner lookup: `backslash`, `bounded write`, `scratch-write`, `in-scratch` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The rule roster, rule `bounded_write`.
+**Cost while deferred:** a wrong grant of contrived spellings; it blocks the v0.32.0 bar. Filed 2026-10-19 by guard-reader-value-bar-pass' close, draining validate's bullet from the failed second-vendor review's trace; promoted for the next iteration by operator direction 2026-10-19, lead-relayed, not a ruling. Re-verified there: all five allowed on the built binary at the close stamp's head. At v0.31.0, built from its tag, the `touch` spellings fall through and the `printf` redirect is refused, the rule landing after that tag, so the grant is unreleased rather than pre-existing. Corrected at the next scope: the bounds test compares path components literally (`bounded` in `native/src/guard/rules/grants.rs`), so the backslash is lost before it, in the target's value or its skeleton fallback; two spellings re-verified allowed. Owner lookup: `backslash`, `bounded write`, `scratch-write`, `in-scratch` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The rule roster, rule `bounded_write`.
+
+### lead-role-marker-guard-refused
+
+[cost: iteration/low] [surface: lifecycle-kit]
+
+lifecycle-kit/templates/lead.md's first step prescribes a session-role command built on command substitution and parameter expansion, and this repo's `--hook shell-guard` refuses it outright under its expansion rule, so every lead hand-inlines the binary path and its session id, or skips the suppression. The template and the guard disagree; a literal-path spelling is no fix for adopters, whose binary path differs by install.
+
+**Deliverable:** design-pending, a feature spanning lifecycle-kit and context-kit (§The session-context hook names `/lead`'s first step as the marker's producer): an arm that writes the marker itself, so the lead's step is one literal command. Scope's lean: `--enter-stage --open-lead-journal`, the lead's next step already, writes it, adding no name; a separate arm is the alternative.
+
+**Cost while deferred:** each lead session spends a refused command and a hand-built one, or runs unsuppressed. Filed 2026-10-19 by guard-reader-value-bar-pass' lead after its close; promoted at the next scope's carried-bullet intake. Re-verified there: the template's command, fed to the built hook, exits 2 on the expansion rule. Owner lookup: `session-role`, `guard-verdict` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §templates/lead.md, with context-kit/SPEC.md §The session-context hook.
+
+### guard-verdict-typed-operand
+
+[cost: event/low] [surface: guard-kit]
+
+no arm prints the shell guard's decision for a command given as a typed operand, so a session re-verifying a guard finding hand-builds the hook's JSON payload in scratch, and the guard's own expansion rule refuses the obvious one-line spellings. Settling regression-versus-the-last-release needs that release's binary: one close spent a tag worktree and a cargo build, and several drains carried the verdict as inferred for want of it.
+
+**Deliverable:** design-pending, a feature: a guard-kit arm taking the command as an operand and printing the decision the hook would return, plus a way to ask an older binary the same, whose `--hook shell-guard` it already has; whether that half reads a released binary or stays manual is the amendment's to settle.
+
+**Cost while deferred:** each guard verdict a drain or validate re-verifies costs a scratch payload and, against a release, a build. Filed 2026-10-19 by guard-reader-value-bar-pass' close (manual-ops, two keys); promoted at the next scope's carried-bullet intake. Re-verified there: this scope's own probe needed a payload file after two refused spellings. Owner lookup: `guard-verdict`, `typed operand` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §Testing.
 
 ## Icebox
 
