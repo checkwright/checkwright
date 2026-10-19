@@ -8,7 +8,7 @@
 
   **The set (operator direction 2026-10-19, lead-relayed, not a ruling; the iteration opened undirected):** option C over the recommended A. The debt `skeleton-ansi-c-escaped-quote`, `worktree-ansi-c-path-word`, `escaped-amp-statement-split` and `path-slot-ansi-c-dollar`, promoted by scope; the feature `permission-grammar-neutral`, which spec authors and promotes, its grammar cited to gate-sdk/SPEC.md §The hook contract's binding table. Stages scope, spec, align, build, validate and close, the second component and the audit walk accepted with the set. The two v0.32.0 bar blockers are `worktree-ansi-c-path-word` (a wrong grant) and `escaped-amp-statement-split` (a regression from v0.31.0). Composition: bundled — the four guard-kit debt entries share the shell-guard word read and skeleton, the feature guard-kit's rule roster prose; drain 5 against inflow 3.6. Supersession: `path-slot-ansi-c-dollar` — reshaped by `skeleton-ansi-c-escaped-quote`; `worktree-ansi-c-path-word` — reshaped by `skeleton-ansi-c-escaped-quote`, the skeleton's span end moving the word read's odd-backslash refusal both read, so the skeleton lands first.
 
-  **Release review (operator grant 2026-10-19, lead-relayed, unspent):** one second-vendor review over the iteration's range, run at validate; close cuts v0.32.0 on a clean return, against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed).
+  **Release review (operator grant 2026-10-19, lead-relayed, spent at validate, not clean on two wrong grants, so close defers):** one second-vendor review over the iteration's range, run at validate; close cuts v0.32.0 on a clean return, against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed).
 
   **Push need (2026-10-19, inside the budget):** 2 against 2 — the closing push, and the v0.32.0 tag push only if the granted review returns clean; no unit reads a remote run.
 
@@ -138,7 +138,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Three grants of 2026-10-18 spent:** session-sweep-policy-pass' close review returned five P2 findings, fixed there; harness-reach-pass' validate review three verdict-moving ones, two wrong grants, landed at guard-grant-kpi-pass as `ro-pipeline-wrong-grants` and `pwsh-string-expr-overblock`; guard-grant-kpi-pass' close review three, one a wrong grant since fixed. Each left v0.32.0 deferred.
 
-**One grant of 2026-10-19 spent:** guard-word-read-reach-pass' validate review returned a wrong grant, hotfixed, and a wrong block, promoted as `escaped-amp-statement-split`; its close deferred v0.32.0, the bar also meeting the open wrong grant in `worktree-ansi-c-path-word`.
+**Two grants of 2026-10-19 spent:** guard-word-read-reach-pass' validate review returned a wrong grant, hotfixed, and a wrong block, `escaped-amp-statement-split`; guard-ansi-c-bar-pass' two wrong grants, [escaped-pipe-amp-wrong-grant](#escaped-pipe-amp-wrong-grant) and [ansi-c-continuation-grant](#ansi-c-continuation-grant). Each close deferred v0.32.0.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
@@ -279,6 +279,46 @@ gate-sdk/SPEC.md §The hook contract's binding table is held to the crate's spel
 **Deliverable:** one crate module holding the binding's spellings that every member reads, with a test holding the table to it, or a refusal recorded.
 
 **Cost while deferred:** the table can drift from what the members read, unseen until a fixture reds. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: `tool_input` spelled in six `native/src/hook/` modules and `guard/mod.rs`. Owner lookup: `binding table`, `hook contract` in this file, none; owner gate-sdk/SPEC.md §The hook contract.
+
+### escaped-pipe-amp-wrong-grant
+
+[cost: event/low] [surface: guard-kit]
+
+`wc -l README.md\|&touch README.md` auto-allows as a read-only search pipeline, though bash reads `\|` as a word character, ends the statement at the glued `&` and runs `touch`. `statement_amp` in `native/src/guard/text.rs` excludes an `&` behind a `|` without testing whether that `|` is itself escaped; the control `wc -l README.md\|touch README.md` is one `wc` and allowed correctly.
+
+**Deliverable:** the exclusion takes only an unescaped `|`, with a firing row in `guard-kit/guard-tests/`. It moves allow to block, so it lands in a build.
+
+**Cost while deferred:** a wrong grant of one contrived spelling; it blocks the v0.32.0 bar. Filed 2026-10-19 by guard-ansi-c-bar-pass' close, draining the validate second-vendor review's bullet. Re-verified there: allowed on the built binary at the close stamp's head. The exclusion was born in the prior iteration's hotfix and is absent at v0.31.0; whether v0.31.0 allowed the call is inferred, not run. Owner lookup: `statement_amp`, `escaped pipe`, `ampersand` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The reader and its views.
+
+### ansi-c-continuation-grant
+
+[cost: event/low] [surface: guard-kit]
+
+a backslash-newline between `$` and the opening quote is removed by bash, so `printf $`, backslash, newline, `'\'' ; touch README.md ; printf '' >> .tmp/j` is one ANSI-C word ending after `touch`'s statement; the skeleton tests the quote's raw predecessor, reads a plain single-quoted span, hides the `touch` and auto-allows the call as a scratch write. The bare `printf $'\''` spelling is refused.
+
+**Deliverable:** the skeleton's dollar-quote test and the word read join a continuation first, with firing rows, including the worktree-confinement shape `cat $`, backslash, newline, `'<main>/docs/a.md' >> .tmp/j` under worktree reads off, run from a linked worktree. It moves allow to block, so it lands in a build.
+
+**Cost while deferred:** a wrong grant of one contrived spelling; it blocks the v0.32.0 bar. Filed 2026-10-19 by guard-ansi-c-bar-pass' close, draining the validate second-vendor review's bullet. Re-verified there: the scratch-write shape allowed on the built binary at the close stamp's head. Inferred, not run: the worktree shape. Owner lookup: `continuation`, `backslash-newline`, `ANSI-C` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The reader and its views.
+
+### dequoted-view-ansi-c-value
+
+[cost: event/low] [surface: guard-kit]
+
+the bash dequoted view holds an ANSI-C span as spelled, so every check reading it withholds on a marked word: the declared-forms `sed`/`awk`/`xargs` discriminators, rule `worktree_confinement`'s predicate, and the dollar declines of rules `grant_path_slot`, `abs_script`, `brace_glyph`, `bounded_wait` and `bounded_write`.
+
+**Deliverable:** the view resolves the span to its value, as it reads a single-quoted span of the same value, and the SPEC's declared limits lift with it. It moves fall-through to allow, so it lands in a build.
+
+**Cost while deferred:** one permission decision per contrived ANSI-C spelling (`find .tmp/old -name $'*.txt' -delete`, `awk $'{print}' f`), never a wrong grant. Filed 2026-10-19 by guard-ansi-c-bar-pass' close, draining its build's declared-limit bullet. Re-verified there: both examples fall through on the built binary. Owner lookup: `dequoted view`, `ANSI-C` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The reader and its views.
+
+### harness-lone-amp-remeasure
+
+[cost: event/low] [surface: guard-kit]
+
+the harness's published permissions page lists a lone `&` among its recognized command separators, while guard-kit/SPEC.md §The reader and its views records a `claude -p` measurement that the harness does not split on it.
+
+**Deliverable:** that measurement re-run on the current harness; if the harness now splits, the compound split and rule `background_no_record`'s reading move with it, landing in a build, and the measured record's text is updated either way.
+
+**Cost while deferred:** none in the grant direction, since the guard reads a segment carrying a lone `&` as ungranted; at worst a grant withheld. Filed 2026-10-19 by guard-ansi-c-bar-pass' close, draining its spec session's bullet. Re-verified there: the docs page's separator list. Inferred, not run: the harness's current split. Owner lookup: `lone`, `separator`, `measured` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The reader and its views.
 
 ## Icebox
 
@@ -981,10 +1021,4 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
-
-- skeleton-ansi-c-escaped-quote
-- worktree-ansi-c-path-word
-- path-slot-ansi-c-dollar
-- escaped-amp-statement-split
-- permission-grammar-neutral
 
