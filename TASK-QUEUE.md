@@ -1,16 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: guard-word-read-reach-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-10-19, lead-relayed, not a ruling; the iteration opened undirected):** option B over the recommended A. The debt `ro-background-quoted-fd-target`, `background-record-bare-amp`, `pwsh-herestring-word-read` and `heredoc-call-rule-decline`, promoted by scope; the feature `word-read-dollar-quote-grants`, which spec authors and promotes. Stages scope, spec, build, validate and close; the amendment spans guard-kit alone, so no audit stage is triggered. `heredoc-call-rule-decline` lands before `word-read-dollar-quote-grants`, an ordering scope inferred from the heredoc decline's then-unread cause; scope's later code read puts that cause in per-rule operator tests rather than the word read, so the pair is likely independent and the order costs nothing kept. Composition: bundled — the five guard-kit entries share `background_no_record`, the word read and the rule roster; drain 5 against inflow 3.2. Supersession: `word-read-dollar-quote-grants` — reshaped by `heredoc-call-rule-decline` (inferred, weakened as above).
-
-  **Release review (operator grant 2026-10-19, lead-relayed, spent at validate, not clean):** one second-vendor review over the iteration's range, run at validate; close cuts v0.32.0 on a clean return, against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed). No second run granted.
-
-  **Push need (2026-10-19, inside the budget):** 2 against 2 — the closing push, and the v0.32.0 tag push only if the granted review returns clean; no unit reads a remote run.
 
 ---
 
