@@ -238,15 +238,9 @@ fn carries_expansion(live: &str) -> bool {
 }
 
 // spec: guard-kit/SPEC.md §scan-prompts — guard-kit rule `background_no_record`'s statement-ending bare `&` on the structural
-// view, with `|&` excluded as the separator it is: never after `&`, `>` or `|`, and followed by a
-// blank, a `;` or the end.
+// view, held once in `guard::text::statement_amp`.
 fn backgrounds(structural: &str) -> bool {
-    let b = structural.as_bytes();
-    (0..b.len()).any(|i| {
-        b[i] == b'&'
-            && (i == 0 || !matches!(b[i - 1], b'&' | b'>' | b'|'))
-            && b.get(i + 1).map_or(true, |c| is_space(*c) || *c == b';')
-    })
+    (0..structural.len()).any(|i| guard::text::statement_amp(structural.as_bytes(), i))
 }
 
 // spec: guard-kit/SPEC.md §scan-prompts — the allowlist-reachability verdict, per logged call over

@@ -32,6 +32,9 @@ block	true	grep -rn foo src & sort -o out.txt tracked.md &
 block	true	grep -rn foo src & make build &
 block	false	grep -rn foo src & make build &
 fallthrough	true	grep -rn foo src & grep -c x tracked.md &
+block	true	grep -rn foo src &sort -o out.txt tracked.md
+block	true	ls&touch x
+fallthrough	true	grep -rn foo src &grep -c x tracked.md
 fallthrough	false	bash worker.sh
 # the canonical launch in harness form: rule `background_no_record`'s exemption (1) lets the record
 # through and rule `bounded_wait`'s arm (B) grants it, the flag changing nothing in its text

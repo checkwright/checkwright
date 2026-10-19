@@ -110,6 +110,29 @@ impl Word {
         let before = self.value_before(at)?;
         self.value.get(before.len()..)
     }
+
+    // spec: guard-kit/SPEC.md §The reader and its views — the word a word holds between the live
+    // offsets `from` and `to`, its seams kept; `None` where either falls inside a piece.
+    pub fn slice(&self, from: usize, to: usize) -> Option<Word> {
+        let ends = |at: usize| {
+            if at == self.live.len() {
+                return Some((self.value.len(), self.spelling.len()));
+            }
+            Some((self.value_before(at)?.len(), self.spelling_before(at)?.len()))
+        };
+        let ((v0, s0), (v1, s1)) = (ends(from)?, ends(to)?);
+        let seams = self
+            .seams
+            .iter()
+            .filter(|s| s.0 > from && s.0 <= to)
+            .map(|s| (s.0 - from, s.1.saturating_sub(v0), s.2.saturating_sub(s0)));
+        Some(Word {
+            spelling: self.spelling.get(s0..s1)?.to_string(),
+            value: self.value.get(v0..v1)?.to_string(),
+            live: self.live.get(from..to)?.to_string(),
+            seams: seams.collect(),
+        })
+    }
 }
 
 // spec: guard-kit/SPEC.md §The reader and its views — the word read's accumulator: a reader feeds it

@@ -3,7 +3,7 @@
 use super::engine::{Cmd, Ctx, Fault, Rule, Shell};
 use super::host::Host;
 use super::reader::{View, Word};
-use super::text::{self, grep_q, head_word, trim, trim_blank_start, trim_start, words};
+use super::text::{self, grep_q, head_word, statement_amp, trim, trim_blank_start, trim_start, words};
 
 mod grants;
 mod liveness;
@@ -142,10 +142,8 @@ fn has_expansion(raw: &str) -> bool {
     grep_q(r"\$\(|<\(|>\(|\$\{|\$[A-Za-z_]", raw) || raw.contains('`')
 }
 
-// spec: guard-kit/SPEC.md §The generic ruleset — a statement-ending bare `&`, never `&&`, `|&` or a
-// redirect's fd-dup.
 fn shell_backgrounds(s: &str) -> bool {
-    grep_q("(^|[^&>|])&([[:space:]]|;|$)", s)
+    (0..s.len()).any(|i| statement_amp(s.as_bytes(), i))
 }
 
 // spec: guard-kit/SPEC.md §The reader and its views — the noclobber operator live in a skeleton,
@@ -644,15 +642,11 @@ fn ro_forms_clear_statements(ctx: &Ctx, c: &Cmd) -> Result<bool, Fault> {
 
 // spec: guard-kit/SPEC.md §The generic ruleset — a segment cut at each statement-ending bare `&`.
 fn background_statements(seg: &str) -> Vec<&str> {
-    let b = seg.as_bytes();
     let mut out = Vec::new();
     let mut from = 0usize;
-    for i in 0..b.len() {
-        let led = i == 0 || !matches!(b[i - 1], b'&' | b'>' | b'|');
-        if b[i] == b'&' && led && b.get(i + 1).map_or(true, |c| text::is_space(*c)) {
-            out.push(&seg[from..i]);
-            from = i + 1;
-        }
+    for i in (0..seg.len()).filter(|&i| statement_amp(seg.as_bytes(), i)) {
+        out.push(&seg[from..i]);
+        from = i + 1;
     }
     out.push(&seg[from..]);
     out
@@ -672,23 +666,24 @@ fn masked_option(read: Option<&Vec<Word>>, dseg: &str) -> bool {
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — one segment's words cut where `background_statements`
-// cuts its skeleton: after a word whose live text ends in a statement-ending bare `&`, the `&` dropped;
+// cuts its skeleton: at each statement-ending bare `&` a word's live text carries, the `&` dropped;
 // `None` where that cut falls inside a piece.
 fn background_words(ws: &[Word]) -> Option<Vec<Vec<Word>>> {
     let mut out: Vec<Vec<Word>> = vec![Vec::new()];
     for w in ws {
-        let b = w.live.as_bytes();
-        let n = b.len();
-        let ends = n > 0 && b[n - 1] == b'&' && (n == 1 || !matches!(b[n - 2], b'&' | b'>' | b'|'));
-        if !ends {
+        let mut from = 0usize;
+        for at in (0..w.live.len()).filter(|&i| statement_amp(w.live.as_bytes(), i)) {
+            if at > from {
+                out.last_mut()?.push(w.slice(from, at)?);
+            }
+            out.push(Vec::new());
+            from = at + 1;
+        }
+        if from == 0 {
             out.last_mut()?.push(w.clone());
-            continue;
+        } else if from < w.live.len() {
+            out.last_mut()?.push(w.slice(from, w.live.len())?);
         }
-        if n > 1 {
-            let value = w.value_before(n - 1)?;
-            out.last_mut()?.push(Word::new(w.spelling_before(n - 1)?, value, &w.live[..n - 1]));
-        }
-        out.push(Vec::new());
     }
     Some(out)
 }
@@ -1060,6 +1055,25 @@ mod tests {
         assert_eq!(values(&kept).map(|st| st.len()), Some(1), "a dup operator and a quoted '&' cut nothing");
         let held = Word::new("'a'&", "a&", "\0SQ&");
         assert_eq!(values(&[plain_word("echo"), held]), None, "a cut inside a piece");
+        let lead = [plain_word("ls"), plain_word("&touch"), plain_word("x")];
+        assert_eq!(values(&lead), Some(vec![vec!["ls".to_string()], vec!["touch".to_string(), "x".to_string()]]));
+        let mid = [plain_word("ls&touch&"), plain_word("x")];
+        assert_eq!(values(&mid), Some(vec![vec!["ls".to_string()], vec!["touch".to_string()], vec!["x".to_string()]]));
+        let ops = [plain_word("a&&b"), plain_word("&>o"), plain_word("<&3"), plain_word(">&2")];
+        assert_eq!(values(&ops).map(|st| st.len()), Some(1), "`&&`, `&>`, `<&` and `>&` cut nothing");
+    }
+
+    // spec: guard-kit/SPEC.md §The generic ruleset — a bare `&` glued to the next word ends its
+    // statement as a spaced one does.
+    #[test]
+    fn a_glued_bare_ampersand_ends_a_statement() {
+        for glued in ["ls &touch x", "ls&touch x", "ls &\0SQ", "(make &)", "a &;b"] {
+            assert!(shell_backgrounds(glued), "{:?} backgrounds", glued);
+        }
+        for kept in ["a && b", "a &>o", "a &>>o", "a >&2", "a 2>&1", "a <&3", "a <& 3", "a |& b"] {
+            assert!(!shell_backgrounds(kept), "{:?} backgrounds nothing", kept);
+        }
+        assert_eq!(background_statements("grep -rn foo src &sort -o o t"), vec!["grep -rn foo src ", "sort -o o t"]);
     }
 
     #[test]

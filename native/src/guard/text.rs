@@ -85,6 +85,14 @@ pub fn chomp(s: &str) -> &str {
     s.trim_end_matches('\n')
 }
 
+// spec: guard-kit/SPEC.md §The generic ruleset — rule `background_no_record`'s statement-ending bare
+// `&` at byte `i`: no part of `&&`, `&>`, `>&`, `<&` or `|&`, whatever follows it.
+pub fn statement_amp(b: &[u8], i: usize) -> bool {
+    b[i] == b'&'
+        && (i == 0 || !matches!(b[i - 1], b'&' | b'>' | b'<' | b'|'))
+        && !matches!(b.get(i + 1), Some(b'&' | b'>'))
+}
+
 // spec: guard-kit/SPEC.md §The generic ruleset — `read -ra words <<<"$s"`: the first line only, split
 // on blanks.
 pub fn words(s: &str) -> Vec<&str> {

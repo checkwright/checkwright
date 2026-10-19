@@ -403,6 +403,15 @@ block	sort>/dev/null -o out.txt tracked.md &
 block	until [ -f x ]; do sleep 1; done & sort>/dev/null -o out.txt tracked.md
 # and its inert targets: a carriage return is a word character, so a descriptor glued to one names a file
 block	grep -rn foo src >&2@CR@tracked.md &
+# a bare `&` glued to the next word ends its statement as a spaced one does, so the read ahead
+# of it is no read-only pipeline; `&&`, `&>`, `>&`, `<&` and `|&` end none
+block	ls &touch x
+block	ls&touch x
+block	grep -rn foo src &sort -o out.txt tracked.md
+fallthrough	grep -rn foo src &grep -c x tracked.md
+allow	grep -c x tracked.md <&0 2>&1 |& head
+allow	grep -c x tracked.md <& 0
+allow	grep -c x tracked.md &>/dev/null
 block	grep -rn foo src >&@CR@2 &
 # '|&' pipes stderr too and backgrounds nothing
 fallthrough	make build |& tail -5
