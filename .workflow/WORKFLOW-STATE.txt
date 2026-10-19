@@ -9,3 +9,4 @@ lead-role-guard-binding-pass spec a6bd1912 2026-10-20 8b238be40
 lead-role-guard-binding-pass align a0efe368 2026-10-20 81ce6ab32
 lead-role-guard-binding-pass build afbbb815 2026-10-20 a7b4fc779
 lead-role-guard-binding-pass build a8e94833 2026-10-20 12e34b2c4
+lead-role-guard-binding-pass validate a481fe5d 2026-10-20 2cd4a28ba
