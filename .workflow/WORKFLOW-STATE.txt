@@ -6,3 +6,4 @@
 
 lead-role-guard-binding-pass scope a3d86423 2026-10-19 14eacd6cb
 lead-role-guard-binding-pass spec a6bd1912 2026-10-20 8b238be40
+lead-role-guard-binding-pass align a0efe368 2026-10-20 81ce6ab32
