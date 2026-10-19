@@ -1,18 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: guard-reader-value-bar-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-10-19, lead-relayed, not a ruling; the iteration opened undirected):** option B over the recommended A. The guard-kit debt `harness-lone-amp-remeasure`, `escaped-pipe-amp-wrong-grant`, `ansi-c-continuation-grant` and `dequoted-view-ansi-c-value`, promoted by scope. Stages scope, build, validate and close: no feature, no amendment. The two v0.32.0 bar blockers are `escaped-pipe-amp-wrong-grant` and `ansi-c-continuation-grant`, both wrong grants; `dequoted-view-ansi-c-value` moves fall-through to allow, so it is new grant surface in the range the release review reads. Composition: bundled — the four share guard-kit's shell reader (guard-kit/SPEC.md §The reader and its views, `native/src/guard/`); drain 4 against inflow 4.2, below inflow because the next-largest surfaces, plugin and drift-kit, are externally gated or add a spec stage. Supersession: `escaped-pipe-amp-wrong-grant` — reshaped by `harness-lone-amp-remeasure`, the measurement deciding whether the compound split moves at the `&` reading `statement_amp` touches, so it runs first; `dequoted-view-ansi-c-value` — reshaped by `ansi-c-continuation-grant`, the view's value resolution reading the joined word, so the continuation join lands first.
-
-  **Fifth unit (operator direction 2026-10-19, lead-relayed):** `line-feed-value-forms-escape`, a wrong grant the build found, entered directly into the set rather than left to the close drain.
-
-  **Release review (operator grant 2026-10-19, lead-relayed, spent at validate, the run failed on the vendor's content refusal with no report, so close defers by a direction of 2026-10-19, lead-relayed, not a ruling):** one audit-mode second-vendor review over the iteration's range, run at validate; close cuts v0.32.0 on a clean return, against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed), which stands unchanged; a finding or a failed run defers the cut.
-
-  **Push need (2026-10-19, inside the budget):** 2 against 2 — the closing push, and the v0.32.0 tag push only if the granted review returns clean; no unit reads a remote run.
 
 ---
 
