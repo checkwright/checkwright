@@ -738,6 +738,12 @@ allow	grep $'a\tb' tracked.md | awk '{print}'
 # carrying it withholds, as its plain spelling's newline-bearing span does
 fallthrough	awk $'{print}\n' tracked.md
 fallthrough	grep -l x tracked.md | xargs grep $'a\nb'
+# the declared forms read every line of the values, so a value carrying a line feed hides no word
+# after it from them
+fallthrough	find . -name $'*.md\n' -delete
+fallthrough	find . -name $'\n' -o -name 'tracked.md' -delete
+fallthrough	sort $'a\n' -o out.txt tracked.md
+allow	grep -c $'a\nb' tracked.md
 # banner tolerance (rules `find_glob` and `cat_file`'s): a literal echo/printf
 # segment is skipped, but at least one roster read must remain
 allow	echo === | grep foo src

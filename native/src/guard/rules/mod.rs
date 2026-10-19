@@ -584,7 +584,7 @@ fn ro_forms_kit(bin: &str) -> Option<&'static str> {
 
 // spec: guard-kit/SPEC.md §The generic ruleset — the declared-forms test on one invocation: the
 // consumer's entry else the kit table; false on a matched form, an undeclared member, or `pos:N`
-// under xargs.
+// under xargs. A value's line feed is held as a word character, so no word after it is cut away.
 fn ro_invocation_clear(h: &Host, bin: &str, dwords: &str, skel_core: &str, xargs: bool) -> bool {
     let forms = match h.ro_forms.iter().find(|(k, _)| k == bin) {
         Some((_, v)) => v.clone(),
@@ -597,7 +597,7 @@ fn ro_invocation_clear(h: &Host, bin: &str, dwords: &str, skel_core: &str, xargs
     if decl.is_empty() {
         return false;
     }
-    let unslashed = dwords.replace('\\', "");
+    let unslashed = dwords.replace('\\', "").replace('\n', "\x01");
     let ws = words(&unslashed);
     let skel = words(skel_core);
     for tok in decl {

@@ -30,14 +30,6 @@ the harness's published permissions page lists a lone `&` among its recognized c
 
 **Probe permission (operator direction 2026-10-19, lead-relayed):** the build session's attempt to write the probe was refused by the harness's auto-mode classifier and not worked around. The operator wants the nested `claude -p` probe permitted, which is a permission-settings edit: the build session prepares the narrowest diff, the operator confirms it before it is applied, and the probe runs only then.
 
-### line-feed-value-forms-escape
-
-a word whose value carries a line feed, an ANSI-C `$'…\n…'` span, hides every word after it from rule `ro_pipeline`'s declared-forms check: `ro_forms_read` joins the values with a blank and `ro_invocation_clear` reads the first line only, so `find docs -name $'*.md\n' -delete` is auto-allowed as a read-only search pipeline.
-
-**Deliverable:** no word after a line-feed-bearing value escapes the forms check, with a firing row in `guard-kit/guard-tests/`. It moves allow to fall-through, so it lands in a build.
-
-**Cost while deferred:** a wrong grant of a contrived spelling that can delete tracked files; it blocks the v0.32.0 bar. Entered directly (operator direction 2026-10-19, lead-relayed) from the build session's gap bullet of the same date. Re-verified there: allowed on a build of the third unit's landing commit run from a plain clone. Born with the ANSI-C value read in guard-ansi-c-bar-pass; whether v0.31.0 allowed it is inferred, not run. Owner: guard-kit/SPEC.md §The generic ruleset, rule `ro_pipeline`'s declared-forms reader.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -1005,4 +997,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - escaped-pipe-amp-wrong-grant
 - ansi-c-continuation-grant
 - dequoted-view-ansi-c-value
+- line-feed-value-forms-escape
 
