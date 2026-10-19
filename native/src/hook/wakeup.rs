@@ -95,13 +95,9 @@ fn summary(payload: Option<&Value>) -> String {
     let Some(doc) = payload else {
         return String::new();
     };
-    let at = |k: &str| doc.get(k).cloned().unwrap_or(Value::Null).to_string();
-    format!(
-        r#"{{"session_id":{},"tool_name":{},"tool_input":{}}}"#,
-        at("session_id"),
-        at("tool_name"),
-        at("tool_input")
-    )
+    use crate::hook::binding::{SESSION_ID, TOOL_INPUT, TOOL_NAME};
+    let at = |k: &str| format!("{}:{}", hook::quote(k), doc.get(k).cloned().unwrap_or(Value::Null));
+    format!("{{{},{},{}}}", at(SESSION_ID), at(TOOL_NAME), at(TOOL_INPUT))
 }
 
 // spec: guard-kit/SPEC.md §wakeup-guard — the denial text, carried verbatim off the shell member:

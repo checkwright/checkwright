@@ -3,6 +3,7 @@
 // gate output contract's. `--hook <member>` is the one dispatching arm of that sub-class.
 use serde_json::Value;
 
+pub mod binding;
 pub mod budget;
 pub mod dispatch;
 pub mod escalation;
@@ -205,10 +206,7 @@ pub fn advise(msg: &str) -> i32 {
 }
 
 pub fn advise_envelope(msg: &str) -> String {
-    format!(
-        r#"{{"hookSpecificOutput":{{"hookEventName":"PreToolUse","additionalContext":{}}}}}"#,
-        quote(msg)
-    )
+    binding::context_envelope(msg)
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the escaper the hand-written envelope never had. The
@@ -242,10 +240,10 @@ pub fn decline(name: &str, reason: &str, payload: Option<&Value>) -> i32 {
 // envelope reaches the model on `PreToolUse`; elsewhere the universal `systemMessage` reaches the
 // operator, a turn-end event having no model channel that does not refuse the stop
 pub fn decline_envelope(text: &str, payload: Option<&Value>) -> String {
-    if field(payload, &["hook_event_name"]) == "PreToolUse" {
+    if field(payload, &[binding::EVENT_NAME]) == binding::EVENT_BEFORE_TOOL_CALL {
         advise_envelope(text)
     } else {
-        format!(r#"{{"systemMessage":{}}}"#, quote(text))
+        binding::notice_envelope(text)
     }
 }
 
@@ -271,8 +269,8 @@ pub fn field(payload: Option<&Value>, path: &[&str]) -> String {
 }
 
 // spec: gate-sdk/SPEC.md §The harness-integration arm — the decline for a tree with no repository
-// the arm may read: the front end's envelope for that case, a literal with no interpolated value
-const NO_TREE_ENVELOPE: &str = r#"{"systemMessage":"checkwright-gates: git refuses or skips the repository this session stands in, or answers none, so every hook guard in this tree is off and each guarded call is allowed. git status prints its reason, or git --git-dir=<that .git> status for a skipped one"}"#;
+// the arm may read: the front end's notice for that case, a literal with no interpolated value
+const NO_TREE_NOTICE: &str = "checkwright-gates: git refuses or skips the repository this session stands in, or answers none, so every hook guard in this tree is off and each guarded call is allowed. git status prints its reason, or git --git-dir=<that .git> status for a skipped one";
 
 // spec: gate-sdk/SPEC.md §The harness-integration arm — the tree the arm runs in: the toplevel of
 // its working directory, asked through the crosser before any knob is read
@@ -296,7 +294,7 @@ pub fn run(args: &[String]) -> i32 {
     });
     if let Err(line) = entered {
         eprintln!("{}", line);
-        println!("{}", NO_TREE_ENVELOPE);
+        println!("{}", binding::notice_envelope(NO_TREE_NOTICE));
         return 0;
     }
     let Some(member) = args.first() else {

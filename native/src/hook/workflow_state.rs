@@ -2,6 +2,7 @@
 // stamp is the `--enter-stage` arm's to write, and every gate that would catch a hand-stamp fires only
 // at commit, so an uncommitted hand-stamp is otherwise never seen at all.
 use crate::hook;
+use crate::hook::binding::{CHILD_ID, CHILD_TYPE, TOOL_INPUT, WRITTEN_PATH};
 use crate::walk;
 use serde_json::Value;
 use std::path::{Path, PathBuf};
@@ -19,7 +20,7 @@ pub fn run(payload: Option<&Value>) -> i32 {
     if payload.is_none() {
         return degraded();
     }
-    let path = hook::field(payload, &["tool_input", "file_path"]);
+    let path = hook::field(payload, &[TOOL_INPUT, WRITTEN_PATH]);
     if !path.is_empty() && same_file(&path, &state_file) {
         return hook::block(NAME, &blocked(&state_file));
     }
@@ -33,11 +34,11 @@ fn stamp_before_write(payload: Option<&Value>) -> i32 {
         Ok(r) => r,
         Err(e) => return hook::decline(NAME, &format!("the stamp-before-write rule could not resolve LIFECYCLE_KIT_STAGE_SESSION_TYPES ({})", e), payload),
     };
-    let agent_type = hook::field(payload, &["agent_type"]);
+    let agent_type = hook::field(payload, &[CHILD_TYPE]);
     if agent_type.is_empty() || !roster.contains(&agent_type) {
         return 0;
     }
-    let agent_id = hook::field(payload, &["agent_id"]);
+    let agent_id = hook::field(payload, &[CHILD_ID]);
     if agent_id.is_empty() {
         return hook::decline(NAME, &format!("the stamp-before-write rule read a '{}' caller with no agent_id, so it cannot tell which stamp is its own", agent_type), payload);
     }
@@ -76,7 +77,7 @@ fn superseded_stage(payload: Option<&Value>, agent_type: &str, id: &str, state_t
         Ok(_) => return hook::decline(NAME, "the superseded-stage rule read an empty GATE_SDK_TMP_DIR", payload),
         Err(e) => return hook::decline(NAME, &format!("the superseded-stage rule could not resolve GATE_SDK_TMP_DIR ({})", e), payload),
     };
-    let path = hook::field(payload, &["tool_input", "file_path"]);
+    let path = hook::field(payload, &[TOOL_INPUT, WRITTEN_PATH]);
     if !path.is_empty() && under(&path, &tmp) {
         return 0;
     }

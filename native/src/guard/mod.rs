@@ -66,8 +66,8 @@ pub fn json_field(payload: Option<&serde_json::Value>, path: &str, or_empty: boo
 // shell the rule table filters on; `None` is a tool no reader serves.
 pub fn reader_for(tool: &str) -> Option<(&'static dyn reader::Reader, engine::Shell)> {
     match tool {
-        "Bash" => Some((&bash::Bash, engine::Shell::Bash)),
-        "PowerShell" => Some((&powershell::PowerShell, engine::Shell::PowerShell)),
+        crate::hook::binding::TOOL_BASH => Some((&bash::Bash, engine::Shell::Bash)),
+        crate::hook::binding::TOOL_POWERSHELL => Some((&powershell::PowerShell, engine::Shell::PowerShell)),
         _ => None,
     }
 }
@@ -76,12 +76,12 @@ pub fn reader_for(tool: &str) -> Option<(&'static dyn reader::Reader, engine::Sh
 // with its trailing newlines stripped, as the shell guard's command substitution stripped them; an
 // absent or empty command is none.
 pub fn command_of(payload: &serde_json::Value) -> Option<&str> {
-    let cmd = payload.pointer("/tool_input/command")?.as_str()?.trim_end_matches('\n');
+    use crate::hook::binding::{COMMAND, TOOL_INPUT};
+    let cmd = payload.get(TOOL_INPUT)?.get(COMMAND)?.as_str()?.trim_end_matches('\n');
     (!cmd.is_empty()).then_some(cmd)
 }
 
-// spec: guard-kit/SPEC.md §The shell guard — `guard_allow`'s envelope; the braces stay a
-// literal so the key order is the one the library always printed.
+// spec: guard-kit/SPEC.md §The shell guard — `guard_allow`'s envelope, in the binding's key order
 pub fn allow_envelope(reason: &str) -> String {
     allow_envelope_with(reason, None)
 }
@@ -89,29 +89,16 @@ pub fn allow_envelope(reason: &str) -> String {
 // spec: guard-kit/SPEC.md §Consumer rules — an envelope carrying a consumer fault adds it as
 // `additionalContext`, after every key the library printed.
 pub fn allow_envelope_with(reason: &str, context: Option<&str>) -> String {
-    format!(
-        r#"{{"hookSpecificOutput":{{"hookEventName":"PreToolUse","permissionDecision":"allow","permissionDecisionReason":{}{}}}}}"#,
-        crate::hook::quote(reason),
-        context_key(context)
-    )
+    crate::hook::binding::allow_envelope(reason, None, context)
 }
 
-// spec: guard-kit/SPEC.md §The shell guard — the rewrite envelope, key order as above
+// spec: guard-kit/SPEC.md §The shell guard — the rewrite envelope
 pub fn rewrite_envelope(cmd: &str, reason: &str) -> String {
     rewrite_envelope_with(cmd, reason, None)
 }
 
 pub fn rewrite_envelope_with(cmd: &str, reason: &str, context: Option<&str>) -> String {
-    format!(
-        r#"{{"hookSpecificOutput":{{"hookEventName":"PreToolUse","permissionDecision":"allow","permissionDecisionReason":{},"updatedInput":{{"command":{}}}{}}}}}"#,
-        crate::hook::quote(reason),
-        crate::hook::quote(cmd),
-        context_key(context)
-    )
-}
-
-fn context_key(context: Option<&str>) -> String {
-    context.map_or(String::new(), |c| format!(r#","additionalContext":{}"#, crate::hook::quote(c)))
+    crate::hook::binding::allow_envelope(reason, Some(cmd), context)
 }
 
 // spec: guard-kit/SPEC.md §Consumer rules — `--guard-json view`: nothing for each case that section

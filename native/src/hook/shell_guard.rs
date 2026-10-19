@@ -4,6 +4,7 @@
 use crate::guard::engine::{self, Cmd, Verdict};
 use crate::guard::host::{self, Host};
 use crate::guard::reader;
+use crate::hook::binding::{BACKGROUND, TOOL_INPUT, TOOL_NAME};
 use crate::hook::{self, Payload};
 use crate::{proc, programs};
 use serde_json::Value;
@@ -41,17 +42,15 @@ pub fn run(payload: &Payload) -> i32 {
         Stage::Fault(f) => Some(f),
     };
     let fault = fault.as_deref();
-    let selected = p.get("tool_name").and_then(Value::as_str).and_then(crate::guard::reader_for);
+    let selected = p.get(TOOL_NAME).and_then(Value::as_str).and_then(crate::guard::reader_for);
     let (Some((reader, shell)), Some(cmd)) = (selected, crate::guard::command_of(p)) else {
         return fault.map_or(0, hook::advise);
     };
     if let Some(c) = reader::control_byte(cmd) {
         return control_byte_block(c, fault);
     }
-    let background = matches!(
-        p.pointer("/tool_input/run_in_background"),
-        Some(Value::Bool(true))
-    ) || p.pointer("/tool_input/run_in_background").and_then(Value::as_str) == Some("true");
+    let flag = p.get(TOOL_INPUT).and_then(|i| i.get(BACKGROUND));
+    let background = matches!(flag, Some(Value::Bool(true))) || flag.and_then(Value::as_str) == Some("true");
     let host = match Host::load(background) {
         Ok(h) => h,
         Err(e) => return refused(&e),

@@ -3,6 +3,7 @@
 // the bound tier, D3 the nested-dispatch advisory.
 use crate::gates::agent_tier_explicit;
 use crate::hook;
+use crate::hook::binding::{CHILD_ID, DISPATCH_ISOLATION, DISPATCH_MODEL, DISPATCH_TYPE, TOOL_INPUT};
 use crate::walk;
 use serde_json::Value;
 use std::path::Path;
@@ -48,14 +49,14 @@ pub fn run(payload: Option<&Value>) -> i32 {
         }
     };
     let binding = read_array("DELEGATION_KIT_TIER_MODEL", "D6 (the bound tier)", &mut notes);
-    let Some(doc) = payload.filter(|d| d.get("tool_input").is_some_and(Value::is_object)) else {
+    let Some(doc) = payload.filter(|d| d.get(TOOL_INPUT).is_some_and(Value::is_object)) else {
         return degraded("the hook payload did not parse, or carried no tool_input object");
     };
 
-    let subagent_type = hook::field(Some(doc), &["tool_input", "subagent_type"]);
-    let isolation = hook::field(Some(doc), &["tool_input", "isolation"]);
-    let model = hook::field(Some(doc), &["tool_input", "model"]);
-    let nested = doc.get("agent_id").is_some_and(|v| !v.is_null());
+    let subagent_type = hook::field(Some(doc), &[TOOL_INPUT, DISPATCH_TYPE]);
+    let isolation = hook::field(Some(doc), &[TOOL_INPUT, DISPATCH_ISOLATION]);
+    let model = hook::field(Some(doc), &[TOOL_INPUT, DISPATCH_MODEL]);
+    let nested = doc.get(CHILD_ID).is_some_and(|v| !v.is_null());
     let lookup = |ty: &str| tier_defined(&agent_dir, ty);
     let cfg = Config {
         readonly: &readonly,

@@ -212,7 +212,7 @@ fn is_lead(role_file: &str, payload: Option<&Value>) -> bool {
     let Ok(text) = std::fs::read_to_string(role_file) else { return false };
     let mut fields = text.lines().next().unwrap_or("").split_whitespace();
     let (role, sid) = (fields.next().unwrap_or(""), fields.next().unwrap_or(""));
-    let own: String = hook::field(payload, &["session_id"]).chars().take(8).collect();
+    let own: String = hook::field(payload, &[hook::binding::SESSION_ID]).chars().take(8).collect();
     role == "lead" && !sid.is_empty() && own == sid
 }
 

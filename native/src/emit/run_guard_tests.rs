@@ -5,6 +5,7 @@
 // top-level flag, because the member is configured: it needs the vendored guard-kit root.
 use super::guard_ps_variants;
 use super::guard_variants::{self, Admit, Held, Ledger, Variant};
+use crate::hook::binding::{TOOL_BASH, TOOL_POWERSHELL};
 use crate::proc;
 use crate::programs;
 use crate::walk;
@@ -82,13 +83,13 @@ fn execute(args: &[String]) -> Result<i32, String> {
         .map(|r| (r[0].clone(), r[1].clone()))
     {
         let cmd = substitute(&cmd, &sandbox.root);
-        let got = decide(&sandbox.root, &log, &cmd, None, "Bash")?;
+        let got = decide(&sandbox.root, &log, &cmd, None, TOOL_BASH)?;
         tally.check(&want, &got, &format!("[--hook shell-guard] {}", cmd));
     }
     for row in rows(&bg_cases, 3)? {
         let (want, rib, cmd) = (row[0].clone(), row[1].clone(), row[2].clone());
         let cmd = substitute(&cmd, &sandbox.root);
-        let got = decide(&sandbox.root, &log, &cmd, Some(&rib), "Bash")?;
+        let got = decide(&sandbox.root, &log, &cmd, Some(&rib), TOOL_BASH)?;
         tally.check(&want, &got, &format!("[--hook shell-guard] [run_in_background={}] {}", rib, cmd));
     }
     for (want, cmd) in rows(&ps_cases, 2)?
@@ -96,13 +97,13 @@ fn execute(args: &[String]) -> Result<i32, String> {
         .map(|r| (r[0].clone(), r[1].clone()))
     {
         let cmd = substitute(&cmd, &sandbox.root);
-        let got = decide(&sandbox.root, &log, &cmd, None, "PowerShell")?;
+        let got = decide(&sandbox.root, &log, &cmd, None, TOOL_POWERSHELL)?;
         tally.check(&want, &got, &format!("[--hook shell-guard] [PowerShell] {}", cmd));
     }
     for row in rows(&ps_bg_cases, 3)? {
         let (want, rib, cmd) = (row[0].clone(), row[1].clone(), row[2].clone());
         let cmd = substitute(&cmd, &sandbox.root);
-        let got = decide(&sandbox.root, &log, &cmd, Some(&rib), "PowerShell")?;
+        let got = decide(&sandbox.root, &log, &cmd, Some(&rib), TOOL_POWERSHELL)?;
         tally.check(&want, &got, &format!("[--hook shell-guard] [PowerShell] [run_in_background={}] {}", rib, cmd));
     }
 
@@ -113,7 +114,7 @@ fn execute(args: &[String]) -> Result<i32, String> {
         ));
     }
     let kit_ran = tally.ran;
-    let tables = [(cases.as_str(), false, "Bash"), (bg_cases.as_str(), true, "Bash"), (ps_cases.as_str(), false, "PowerShell"), (ps_bg_cases.as_str(), true, "PowerShell")];
+    let tables = [(cases.as_str(), false, TOOL_BASH), (bg_cases.as_str(), true, TOOL_BASH), (ps_cases.as_str(), false, TOOL_POWERSHELL), (ps_bg_cases.as_str(), true, TOOL_POWERSHELL)];
     let (derived, limit_rows) = variant_lane(&mut tally, &sandbox.root, &log, &tables, &limits)?;
     let consumer = consumer_lane(&mut tally)?;
     if tally.fails > 0 {
@@ -155,7 +156,7 @@ fn variant_lane(
             base.iter().map(|(_, r)| if flagged { (r[1].as_str(), r[2].as_str()) } else { ("", r[1].as_str()) }).collect();
         for (section, row) in &base {
             let (want, flag, cell) = if flagged { (&row[0], row[1].as_str(), &row[2]) } else { (&row[0], "", &row[1]) };
-            let (respelled, added) = if tool == "Bash" {
+            let (respelled, added) = if tool == TOOL_BASH {
                 (guard_variants::derive(cell), guard_variants::added_writes(cell))
             } else {
                 (guard_ps_variants::derive(cell), Vec::new())
@@ -173,7 +174,7 @@ fn variant_lane(
                 let Some(why) = unadmitted(&mut ledger, held, section.as_deref(), variant, &got) else {
                     continue;
                 };
-                let tool_note = if tool == "Bash" { "" } else { " [PowerShell]" };
+                let tool_note = if tool == TOOL_BASH { "" } else { " [PowerShell]" };
                 let flag_note = if flagged { format!(" [run_in_background={}]", flag) } else { String::new() };
                 println!(
                     "  FAIL: want '{}', got '{}' -- [--hook shell-guard]{} [variant {} of {}, {}]{} {}",
@@ -253,7 +254,7 @@ fn consumer_lane(tally: &mut Tally) -> Result<Option<Consumer>, String> {
         ledger = Some(parsed);
     }
     let ask = |cmd: &str| -> Result<String, String> {
-        let done = proc::run_with_stdin_in(&program, &args, payload(cmd, None, "Bash").as_bytes(), &env)?;
+        let done = proc::run_with_stdin_in(&program, &args, payload(cmd, None, TOOL_BASH).as_bytes(), &env)?;
         let out = String::from_utf8_lossy(done.streams().0).into_owned();
         Ok(classify(done.reported_code(), out.trim_end_matches('\n')))
     };
@@ -428,15 +429,16 @@ fn decide(root: &str, log: &str, cmd: &str, background: Option<&str>, tool: &str
 // spec: guard-kit/SPEC.md §Testing — the hook payload, `jq -nc`'s construction moved in-crate,
 // carrying the tool name the member selects its reader by.
 fn payload(cmd: &str, background: Option<&str>, tool: &str) -> String {
+    use crate::hook::binding::{BACKGROUND, COMMAND, TOOL_INPUT, TOOL_NAME};
     let mut input = serde_json::Map::new();
-    input.insert("command".to_string(), serde_json::Value::String(cmd.to_string()));
+    input.insert(COMMAND.to_string(), serde_json::Value::String(cmd.to_string()));
     if background == Some("true") {
-        input.insert("run_in_background".to_string(), serde_json::Value::Bool(true));
+        input.insert(BACKGROUND.to_string(), serde_json::Value::Bool(true));
     }
     serde_json::Value::Object(
         [
-            ("tool_name".to_string(), serde_json::Value::String(tool.to_string())),
-            ("tool_input".to_string(), serde_json::Value::Object(input)),
+            (TOOL_NAME.to_string(), serde_json::Value::String(tool.to_string())),
+            (TOOL_INPUT.to_string(), serde_json::Value::Object(input)),
         ]
         .into_iter()
         .collect(),
@@ -453,13 +455,14 @@ fn classify(rc: i32, out: &str) -> String {
     if rc != 0 {
         return format!("exit{}", rc);
     }
-    if out.contains("\"updatedInput\"") {
+    use crate::hook::binding::{ADDITIONAL_CONTEXT, DECISION_ALLOW, PERMISSION_DECISION, UPDATED_INPUT};
+    if out.contains(&format!("\"{}\"", UPDATED_INPUT)) {
         return "rewrite".to_string();
     }
-    if out.contains("\"additionalContext\"") {
+    if out.contains(&format!("\"{}\"", ADDITIONAL_CONTEXT)) {
         return "advise".to_string();
     }
-    if out.contains("\"permissionDecision\":\"allow\"") {
+    if out.contains(&format!("\"{}\":\"{}\"", PERMISSION_DECISION, DECISION_ALLOW)) {
         return "allow".to_string();
     }
     if out.is_empty() {
@@ -592,16 +595,16 @@ mod tests {
     // spec: guard-kit/SPEC.md §Testing — the backgrounding flag rides beside the command.
     #[test]
     fn the_payload_carries_the_backgrounding_flag_only_when_the_row_sets_it() {
-        assert_eq!(payload("ls", None, "Bash"), r#"{"tool_input":{"command":"ls"},"tool_name":"Bash"}"#);
+        assert_eq!(payload("ls", None, TOOL_BASH), r#"{"tool_input":{"command":"ls"},"tool_name":"Bash"}"#);
         assert_eq!(
-            payload("ls", Some("false"), "Bash"),
+            payload("ls", Some("false"), TOOL_BASH),
             r#"{"tool_input":{"command":"ls"},"tool_name":"Bash"}"#
         );
         assert_eq!(
-            payload("ls", Some("true"), "Bash"),
+            payload("ls", Some("true"), TOOL_BASH),
             r#"{"tool_input":{"command":"ls","run_in_background":true},"tool_name":"Bash"}"#
         );
-        assert_eq!(payload("ls", None, "PowerShell"), r#"{"tool_input":{"command":"ls"},"tool_name":"PowerShell"}"#);
+        assert_eq!(payload("ls", None, TOOL_POWERSHELL), r#"{"tool_input":{"command":"ls"},"tool_name":"PowerShell"}"#);
     }
 
     // spec: guard-kit/SPEC.md §Testing — every line the Windows leg parses is a transform, an

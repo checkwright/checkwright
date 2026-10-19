@@ -1,6 +1,7 @@
 // spec: guard-kit/SPEC.md §escalation-guard — the PreToolUse(SendMessage) advisory member: it
 // nudges a headerless escalation to the lead toward the decision shape and never blocks.
 use crate::hook;
+use crate::hook::binding::{MESSAGE_BODY, MESSAGE_TARGET, TOOL_INPUT};
 use serde_json::Value;
 
 const NAME: &str = "escalation-guard";
@@ -12,13 +13,13 @@ const HEADERS: &[&str] = &["Question", "Options", "Recommendation", "Evidence"];
 pub fn run(payload: Option<&Value>) -> i32 {
     // spec: guard-kit/SPEC.md §escalation-guard — advisory posture: never block; an uninspectable
     // payload passes, which is the whole of this member's degraded path
-    let to = hook::field(payload, &["tool_input", "to"]);
+    let to = hook::field(payload, &[TOOL_INPUT, MESSAGE_TARGET]);
     // spec: guard-kit/SPEC.md §escalation-guard — only an upward message (to the lead as "main")
     // is an escalation
     if to != "main" {
         return 0;
     }
-    let message = hook::field(payload, &["tool_input", "message"]);
+    let message = hook::field(payload, &[TOOL_INPUT, MESSAGE_BODY]);
     let missing: Vec<&str> = HEADERS
         .iter()
         .copied()

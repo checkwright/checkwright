@@ -58,14 +58,6 @@ rule `bounded_write` auto-allows `touch '\.tmp/a'`, `touch "\.tmp/a"`, `touch $'
 
 **Cost while deferred:** a wrong grant of contrived spellings; it blocks the v0.32.0 bar. Filed 2026-10-19 by guard-reader-value-bar-pass' close, draining validate's bullet from the failed second-vendor review's trace; promoted for the next iteration by operator direction 2026-10-19, lead-relayed, not a ruling. Re-verified there: all five allowed on the built binary at the close stamp's head. At v0.31.0, built from its tag, the `touch` spellings fall through and the `printf` redirect is refused, the rule landing after that tag, so the grant is unreleased rather than pre-existing. Corrected at the next scope: the bounds test compares path components literally (`bounded` in `native/src/guard/rules/grants.rs`), so the backslash is lost before it, in the target's value or its skeleton fallback; two spellings re-verified allowed. Owner lookup: `backslash`, `bounded write`, `scratch-write`, `in-scratch` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The rule roster, rule `bounded_write`.
 
-### hook-binding-single-source
-
-gate-sdk/SPEC.md §The hook contract's binding table is held to the crate's spellings by nothing, an honest limit `hook-contract-harness-neutral`'s amendment stated: each hook member spells its payload paths and envelopes in its own module (`native/src/hook/*.rs`, `native/src/guard/mod.rs`), so a renamed key moves the code without the table.
-
-**Deliverable:** one crate module holding the binding's spellings that every member reads, with a test holding the table to it, or a refusal recorded.
-
-**Cost while deferred:** the table can drift from what the members read, unseen until a fixture reds. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: `tool_input` spelled in six `native/src/hook/` modules and `guard/mod.rs`. Owner lookup: `binding table`, `hook contract` in this file, none; owner gate-sdk/SPEC.md §The hook contract.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -1007,4 +999,6 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
+
+- hook-binding-single-source
 

@@ -3,6 +3,10 @@
 // refusing reading or a running shell task of its own, else 0 — plus a knob-fault decline's envelope.
 use crate::emit::kpi;
 use crate::hook;
+use crate::hook::binding::{
+    CHILD_ID, CHILD_TRANSCRIPT, CHILD_TYPE, EVENT_NAME, LIVE_TASKS, LOOP_GUARD, SESSION_ID, TASK_ID, TASK_KIND,
+    TASK_KIND_CHILD, TASK_KIND_SHELL, TASK_RUNNING, TASK_STATUS,
+};
 use crate::{proc, programs};
 use crate::walk;
 use serde_json::Value;
@@ -74,13 +78,13 @@ pub fn fire(
     reader: Option<&[String]>,
     run_dir: &str,
 ) -> Firing {
-    let event = sanitize(&hook::field(payload, &["hook_event_name"]));
-    let session = sanitize(&hook::field(payload, &["session_id"]));
+    let event = sanitize(&hook::field(payload, &[EVENT_NAME]));
+    let session = sanitize(&hook::field(payload, &[SESSION_ID]));
     let keys = sanitize(&top_level_keys(payload));
     // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the contracted loop guard, read
     // only to bound the one arm whose condition never resolves
     let continuing = payload
-        .and_then(|d| d.get("stop_hook_active"))
+        .and_then(|d| d.get(LOOP_GUARD))
         .and_then(Value::as_bool)
         .unwrap_or(false);
 
@@ -167,14 +171,14 @@ const TASK_REFUSAL: &str = "turn-end refused: the harness shows a background she
 // condition unscoped rather than dropping it
 fn shell_task_running(payload: Option<&Value>) -> bool {
     let running: Vec<&Value> = payload
-        .and_then(|d| d.get("background_tasks"))
+        .and_then(|d| d.get(LIVE_TASKS))
         .and_then(Value::as_array)
         .map(|tasks| {
             tasks
                 .iter()
                 .filter(|t| {
-                    t.get("type").and_then(Value::as_str) == Some("shell")
-                        && t.get("status").and_then(Value::as_str) == Some("running")
+                    t.get(TASK_KIND).and_then(Value::as_str) == Some(TASK_KIND_SHELL)
+                        && t.get(TASK_STATUS).and_then(Value::as_str) == Some(TASK_RUNNING)
                 })
                 .collect()
         })
@@ -183,13 +187,13 @@ fn shell_task_running(payload: Option<&Value>) -> bool {
         return false;
     }
     let Some(transcript) = payload
-        .and_then(|d| d.get("agent_transcript_path"))
+        .and_then(|d| d.get(CHILD_TRANSCRIPT))
         .and_then(Value::as_str)
         .and_then(|p| std::fs::read(p).ok())
     else {
         return true;
     };
-    running.iter().any(|t| match t.get("id").and_then(Value::as_str) {
+    running.iter().any(|t| match t.get(TASK_ID).and_then(Value::as_str) {
         Some(id) if !id.is_empty() => has_whole_token(&transcript, id.as_bytes()),
         _ => true,
     })
@@ -201,21 +205,21 @@ fn harness_helper(payload: Option<&Value>) -> bool {
     let Some(d) = payload else {
         return false;
     };
-    let untyped = d.get("agent_type").and_then(Value::as_str) == Some("");
+    let untyped = d.get(CHILD_TYPE).and_then(Value::as_str) == Some("");
     let transcript_absent = d
-        .get("agent_transcript_path")
+        .get(CHILD_TRANSCRIPT)
         .and_then(Value::as_str)
         .filter(|p| !p.is_empty())
         .is_some_and(|p| {
             matches!(std::fs::metadata(p), Err(e) if e.kind() == std::io::ErrorKind::NotFound)
         });
     let unlisted = match (
-        d.get("agent_id").and_then(Value::as_str).filter(|id| !id.is_empty()),
-        d.get("background_tasks").and_then(Value::as_array),
+        d.get(CHILD_ID).and_then(Value::as_str).filter(|id| !id.is_empty()),
+        d.get(LIVE_TASKS).and_then(Value::as_array),
     ) {
         (Some(id), Some(tasks)) => !tasks.iter().any(|t| {
-            t.get("type").and_then(Value::as_str) == Some("subagent")
-                && t.get("id").and_then(Value::as_str) == Some(id)
+            t.get(TASK_KIND).and_then(Value::as_str) == Some(TASK_KIND_CHILD)
+                && t.get(TASK_ID).and_then(Value::as_str) == Some(id)
         }),
         _ => false,
     };
