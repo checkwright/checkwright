@@ -1034,9 +1034,3 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 ## Done
 
-- ro-background-quoted-fd-target
-- background-record-bare-amp
-- pwsh-herestring-word-read
-- heredoc-call-rule-decline
-- word-read-dollar-quote-grants
-
