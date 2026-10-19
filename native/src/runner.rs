@@ -162,7 +162,8 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
           write and writes nothing, `--rename <name>` renames the iteration
           across the queue header and column 1 of every stamp, and
           `--open-lead-journal` opens the lead journal under a heading keyed on
-          the stage cursor, stamping nothing. Exit 0 a stamp or
+          the stage cursor and writes the session-role marker, stamping
+          nothing. Exit 0 a stamp or
           a reported no-op, 1 a refusal, 2 a usage or configuration error;
           unavailable is 2, because the caller is a stage session's first step
           whose failure must be visible and a silent 0 would let a session

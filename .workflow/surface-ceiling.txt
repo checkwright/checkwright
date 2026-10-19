@@ -20,7 +20,7 @@
 254715cp canon-kit/SPEC.md
 5785cp canon-kit/templates/SPEC-amendment.md
 29158cp companion/SPEC.md
-118053cp context-kit/SPEC.md
+118212cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
 258602cp delegation-kit/SPEC.md
 40553cp delegation-kit/templates/agent-execution.md
@@ -101,13 +101,13 @@
 351784cp guard-kit/SPEC.md
 4439cp guard-kit/templates/close-triage.md
 292536cp installer/SPEC.md
-394456cp lifecycle-kit/SPEC.md
+396425cp lifecycle-kit/SPEC.md
 8150cp lifecycle-kit/templates/consult.md
 1212cp lifecycle-kit/templates/frames/project-critique.md
 1902cp lifecycle-kit/templates/frames/stage-contract-sweep.md
 1412cp lifecycle-kit/templates/frames/stage-contract.md
 1922cp lifecycle-kit/templates/host-protocol.md
-45533cp lifecycle-kit/templates/lead.md
+44793cp lifecycle-kit/templates/lead.md
 2100cp lifecycle-kit/templates/release-sweep.md
 7495cp lifecycle-kit/templates/stages/align.md
 9658cp lifecycle-kit/templates/stages/build.md

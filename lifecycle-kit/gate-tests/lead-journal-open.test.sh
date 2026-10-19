@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — --open-lead-journal end-to-end through a sandboxed enter-stage: the heading keyed on fields 2 through the last of the last stamp, creation with its directory, append after an undisposed segment, a disposed segment dropped, the idempotent no-op, --simulate writing nothing, the surplus refusal, the none key on a stampless state file, and no stamp ever appended
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — --open-lead-journal end-to-end through a sandboxed enter-stage: the heading keyed on fields 2 through the last of the last stamp, creation with its directory, append after an undisposed segment, a disposed segment dropped, the idempotent no-op, --simulate writing nothing, the surplus refusal, the none key on a stampless state file, the session-role marker (written, rewritten on the journal no-op, left alone when held, skipped where the id does not derive, simulated unwritten, never written on a refusal), and no stamp ever appended
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -32,6 +32,12 @@ run_open() {  # $1=sandbox subdir, rest = argv after the tool name
     ( cd "$sb" && gate_env GATE_SDK_TMP_DIR="$sb/scratch" && gate_arm_run --enter-stage "$@" 2>&1 )
 }
 
+run_as() {  # $1=sandbox subdir  $2=pinned session id, rest = argv after the tool name
+    local sb="$1" id="$2"; shift 2
+    ( cd "$sb" && gate_env GATE_SDK_TMP_DIR="$sb/scratch" LIFECYCLE_KIT_SESSION_ID="$id" \
+        && gate_arm_run --enter-stage "$@" 2>&1 )
+}
+
 untracked_only() {  # $1=sandbox subdir  $2=assertion label
     cmp -s "$1/queue.before" "$1/TASK-QUEUE.md" || note "$2" "the queue was written"
     cmp -s "$1/state.before" "$1/.workflow/WORKFLOW-STATE.txt" || note "$2" "the state file was written"
@@ -40,18 +46,51 @@ untracked_only() {  # $1=sandbox subdir  $2=assertion label
 # --- creation, with its directory, under the cursor's key ---
 cr="$SANDBOX/create"
 seed "$cr" stamps
-out="$(run_open "$cr" --open-lead-journal)"; rc=$?
+out="$(run_as "$cr" abcdef0123 --open-lead-journal)"; rc=$?
 [[ "$rc" -eq 0 ]] || note create "want exit 0, got $rc -- $out"
 [[ "$(cat "$cr/scratch/lead-journal.md" 2>/dev/null)" == "## lead-journal opened after $KEY" ]] \
     || note create-heading "the journal is not exactly the keyed heading: $(cat "$cr/scratch/lead-journal.md" 2>/dev/null)"
 untracked_only "$cr" create-untracked
+[[ "$(cat "$cr/scratch/session-role" 2>/dev/null)" == "lead abcdef01" ]] \
+    || note marker-write "the marker is not exactly the pinned id's line: $(cat "$cr/scratch/session-role" 2>/dev/null)"
 
-# --- the idempotent no-op on a re-run at the same cursor ---
+# --- the idempotent no-op on a re-run at the same cursor, the marker rewritten under a new id ---
 cp "$cr/scratch/lead-journal.md" "$cr/journal.before"
-out="$(run_open "$cr" --open-lead-journal)"; rc=$?
+out="$(run_as "$cr" 12345678ab --open-lead-journal)"; rc=$?
 [[ "$rc" -eq 0 ]] || note noop "want exit 0, got $rc -- $out"
 cmp -s "$cr/journal.before" "$cr/scratch/lead-journal.md" || note noop-bytes "the re-run wrote the journal"
 grep -qF 'idempotent no-op' <<<"$out" || note noop-report "the re-run did not report a no-op: $out"
+[[ "$(cat "$cr/scratch/session-role" 2>/dev/null)" == "lead 12345678" ]] \
+    || note marker-noop-rewrite "the journal no-op did not rewrite the marker: $(cat "$cr/scratch/session-role" 2>/dev/null)"
+
+# --- a marker already holding the line is reported and left alone ---
+cp "$cr/scratch/session-role" "$cr/marker.before"
+out="$(run_as "$cr" 12345678ab --open-lead-journal)"; rc=$?
+[[ "$rc" -eq 0 ]] || note marker-same "want exit 0, got $rc -- $out"
+cmp -s "$cr/marker.before" "$cr/scratch/session-role" || note marker-same-bytes "a held marker was rewritten"
+grep -qF 'already holds' <<<"$out" || note marker-same-report "a held marker was not reported: $out"
+
+# --- an id that does not derive skips the marker at exit 0, the journal still opened ---
+sk="$SANDBOX/skip"
+seed "$sk" stamps
+mkdir -p "$sk/sessions"
+out="$( cd "$sk" && unset LIFECYCLE_KIT_SESSION_ID CLAUDE_CODE_SESSION_ID CLAUDE_CODE_CHILD_SESSION \
+    && gate_env GATE_SDK_TMP_DIR="$sk/scratch" LIFECYCLE_KIT_SESSIONS_DIR="$sk/sessions" \
+    && gate_arm_run --enter-stage --open-lead-journal 2>&1 )"; rc=$?
+[[ "$rc" -eq 0 ]] || note marker-skip "want exit 0, got $rc -- $out"
+[[ "$(cat "$sk/scratch/lead-journal.md" 2>/dev/null)" == "## lead-journal opened after $KEY" ]] \
+    || note marker-skip-journal "the skip did not leave the journal opened"
+[[ -e "$sk/scratch/session-role" ]] && note marker-skip-file "an underived id wrote a marker"
+grep -qF 'skipped the session-role marker' <<<"$out" || note marker-skip-report "the skip is not named: $out"
+
+# --- --simulate relays the marker line and path under its prefix and writes no marker ---
+ms="$SANDBOX/marker-simulate"
+seed "$ms" stamps
+out="$(run_as "$ms" abcdef0123 --simulate --open-lead-journal)"; rc=$?
+[[ "$rc" -eq 0 ]] || note marker-simulate "want exit 0, got $rc -- $out"
+grep -qE "^enter-stage \(simulate\): .*'lead abcdef01'.*$ms/scratch/session-role" <<<"$out" \
+    || note marker-simulate-relay "--simulate does not relay the marker line and path: $out"
+[[ -e "$ms/scratch/session-role" ]] && note marker-simulate-file "--simulate wrote the marker"
 
 # --- append after an undisposed segment, keeping it byte for byte ---
 ap="$SANDBOX/append"
@@ -101,10 +140,12 @@ for surplus in extra --simulate; do
     out="$(run_open "$su" --open-lead-journal "$surplus")"; rc=$?
     [[ "$rc" -eq 2 ]] || note "surplus-$surplus" "want exit 2, got $rc -- $out"
     [[ -e "$su/scratch/lead-journal.md" ]] && note "surplus-$surplus-write" "a refused open wrote the journal"
+    [[ -e "$su/scratch/session-role" ]] && note "marker-surplus-$surplus" "a refused open wrote the marker"
     untracked_only "$su" "surplus-$surplus-untracked"
 done
 grep -qF -- '--enter-stage --simulate --open-lead-journal' <<<"$out" \
     || note surplus-spelling "a trailing --simulate is not told the flag-first spelling: $out"
+
 
 # --- a stampless state file keys the heading on none ---
 no="$SANDBOX/none"
@@ -115,5 +156,5 @@ out="$(run_open "$no" --open-lead-journal)"; rc=$?
     || note none-heading "a stampless state file did not key on none: $(cat "$no/scratch/lead-journal.md" 2>/dev/null)"
 
 [[ "$fails" -eq 0 ]] || { echo "lead-journal-open.test: $fails assertion(s) failed"; exit 1; }
-echo "lead-journal-open.test: clean (--open-lead-journal creates its keyed heading, appends after an undisposed segment, drops a disposed one, no-ops at the same cursor, simulates read-only under its prefix, refuses a surplus argument with nothing written, keys on none without a stamp, and never stamps)"
+echo "lead-journal-open.test: clean (--open-lead-journal creates its keyed heading, appends after an undisposed segment, drops a disposed one, no-ops at the same cursor, simulates read-only under its prefix, refuses a surplus argument with nothing written, keys on none without a stamp, writes the session-role marker, rewrites it on the no-op, leaves a held one alone, skips it at exit 0 where the id does not derive, simulates it unwritten, and never stamps)"
 exit 0

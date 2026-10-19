@@ -86,7 +86,7 @@ Steps, in order:
 
 **The session-role signal.** Stage-conditioned injection keys off the lifecycle cursor, which says nothing about whether the *reading* session is a lead, a stage session or a manual run. Without a role signal a lead draws executor-facing craft rules at every hook fire, startup plus each compact or resume re-fire. The signal is a **session-id-scoped** marker file:
 
-- **Producer.** `/lead`'s first step writes one line `lead <id>`, `<id>` being the `--emit-session-id` arm's value, to `CONTEXT_KIT_SESSION_ROLE_FILE` (gitignored scratch, default `${GATE_SDK_TMP_DIR:-.tmp}/session-role`).
+- **Producer.** lifecycle-kit's lead-journal opener, `--enter-stage --open-lead-journal`, run as `/lead`'s first step, writes one line `lead <id>`, `<id>` being the `--emit-session-id` derivation's value, to `CONTEXT_KIT_SESSION_ROLE_FILE` (gitignored scratch, default `${GATE_SDK_TMP_DIR:-.tmp}/session-role`) (lifecycle-kit/SPEC.md §bin/enter-stage.sh).
 - **Match.** The session is `lead` only when the marker's id equals the 8-char prefix of **its own payload's session id**. It is read from the hook payload, never from the session-id variable, because a subagent is handed its *parent's* id in that variable. The named assumption: were the harness to fire session-start in subagents, an env-var read would match every stage session to its lead's marker and invert the suppression onto its intended audience. A concurrent or later top-level session never bleeds, and a stale marker self-invalidates when the id rotates.
 - **One stdin read.** The payload arrives on stdin and the hook arm reads it whole before the member runs; an absent or unparseable payload is an absent signal. A **manual** run inheriting an open terminal or pipe blocks on that read: run the hook by hand with stdin from `/dev/null`.
 - **Why top-level scoping suffices.** Session-start does not fire for a dispatched child, so the hook fires only in leads and manual runs, and the identity match discriminates exactly those.
@@ -96,7 +96,7 @@ Accepted limits, not defects:
 
 - The startup fire precedes `/lead` by construction: one fire per lead session, against the per-compact and per-resume recurrence that is the actual waste.
 - The marker lives as long as the **lead session, not the iteration**, so a consumer boundary ritual wiping gitignored scratch must spare it; otherwise a lead outliving the boundary reverts to absent-signal behavior until it rewrites the marker.
-- The producer inherits `--emit-session-id`'s dependency on the session-id variable. Unset, the newest-transcript fallback in a lead with live subagents returns an `agent-` prefix no payload matches, and the signal no-ops, costing a suppression and never a correctness property.
+- The opener inherits `--emit-session-id`'s dependency on the session-id variable. Unset, the newest-transcript fallback in a lead with live subagents returns an `agent-` prefix no payload matches, and the signal no-ops, costing a suppression and never a correctness property.
 
 Two alternatives are refused. A launch-env var is a perpetual operator ritual whose forgotten export degrades with no signal. Both producers with a precedence rule is two producers and a rule to spec and gate, for a gap one hook fire wide.
 
@@ -539,7 +539,7 @@ A derived default below names the knob it reads as `${NAME}`, or as `${NAME:-<de
 - `CONTEXT_KIT_BRIEF_COMMANDS` — array of a consumer's own brief lines, each element one command run after the drift line; default empty.
 - `CONTEXT_KIT_STATE_FILE` — the lifecycle evidence file; default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt`. Its **last data line** carries the stage cursor the hook routes on (§The session-context hook). Its first stamp names the iteration-start commit the meter's `--growth` and staleness read (§The always-loaded meter). It is context-kit's own knob, never an import of lifecycle-kit's, so a consumer without lifecycle-kit resolves an absent file and keeps the baseline-only reading.
 - `CONTEXT_KIT_ENV_PROFILE_FILE` — the consumer-local env profile the env-probe arm writes and the session-context hook's step 9 emits (§bin/env-probe); default `ENV.local.md`.
-- `CONTEXT_KIT_SESSION_ROLE_FILE` — the session-role marker `/lead` writes and the session-context hook's identity match reads (§The session-context hook); default `${GATE_SDK_TMP_DIR:-.tmp}/session-role`, gitignored scratch.
+- `CONTEXT_KIT_SESSION_ROLE_FILE` — the session-role marker lifecycle-kit's lead-journal opener writes and the session-context hook's identity match reads (§The session-context hook); default `${GATE_SDK_TMP_DIR:-.tmp}/session-role`, gitignored scratch.
 - `CONTEXT_KIT_SWEEP_HORIZON_HOURS` — whole hours a scratch path stays unmodified before the scratch sweep takes it (§The session-context hook): a positive integer, or `off`, which turns the sweep off; default `24`.
 - `CONTEXT_KIT_SWEEP_PRESERVE` — array of scratch-root names the sweep spares whole at any age; default empty. An entry containing `/` spares nothing. The session-role marker is spared without being named.
 - `CONTEXT_KIT_BASELINE_FILE` — default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/always-loaded-baseline.txt`.

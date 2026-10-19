@@ -9,9 +9,9 @@ use crate::stages;
 use crate::walk;
 use std::path::Path;
 
-// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the declared roster: the whole
-// `LIFECYCLE_KIT_*` family this arm reads, plus the gate-sdk names outside it that the arm and
-// the pre-flight gates it dispatches read.
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the declared roster: the `LIFECYCLE_KIT_*`
+// family, the gate-sdk names the arm and its pre-flight gates read, and the session-role
+// marker's knob the lead-journal opener writes through.
 pub const KNOBS: &[&str] = &[
     "LIFECYCLE_KIT_*",
     "GATE_SDK_TMP_DIR",
@@ -19,6 +19,7 @@ pub const KNOBS: &[&str] = &[
     "GATE_SDK_PRUNE_EXTRA_DIRS",
     "GATE_SDK_KIT_DIRS",
     "GATE_SDK_POWERSHELL",
+    "CONTEXT_KIT_SESSION_ROLE_FILE",
 ];
 
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the unnamed-iteration placeholder, resolved
@@ -69,6 +70,7 @@ struct Cfg {
     worktree_check: String,
     worktree_re: Option<EreCapture>,
     tmpdir: String,
+    role_file: String,
 }
 
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the lock pattern compiles once per run through
@@ -106,6 +108,7 @@ fn cfg() -> Result<Cfg, String> {
         worktree_check: walk::knob_scalar("LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK")?,
         worktree_re: lock_capture()?,
         tmpdir: walk::knob_scalar("GATE_SDK_TMP_DIR")?,
+        role_file: walk::knob_scalar("CONTEXT_KIT_SESSION_ROLE_FILE")?,
     })
 }
 
@@ -154,7 +157,8 @@ fn usage(stages: &[String]) -> String {
         "usage: --enter-stage [--simulate] <stage>          (stage ∈ {})\n       \
          --enter-stage [--simulate] --rename <name>  (rename the iteration: queue \
          header + column 1 of every stamp)\n       --enter-stage [--simulate] \
-         --open-lead-journal  (open the lead journal under a heading keyed on the cursor)\n       \
+         --open-lead-journal  (open the lead journal under a heading keyed on the cursor, and \
+         write the session-role marker)\n       \
          --enter-stage --dispatch <stage> [--waive <reason…>]  (the dispatcher: \
          pre-flight, then declare a stage-session dispatch, optionally carrying a user-ruled \
          audit waiver)\n       --enter-stage --dispatch-withdraw <stage>  \
@@ -382,6 +386,7 @@ fn open_lead_journal(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String>
                     lj, heading
                 );
             }
+            role_marker(c, say)?;
             return Ok(0);
         }
     }
@@ -400,6 +405,7 @@ fn open_lead_journal(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String>
         for d in &dropped {
             say.out(&format!("would drop the disposed segment: {}", d));
         }
+        role_marker(c, say)?;
         return Ok(0);
     }
 
@@ -445,7 +451,63 @@ fn open_lead_journal(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String>
     for d in &dropped {
         println!("  note: dropped the disposed segment: {}", d);
     }
+    role_marker(c, say)?;
     Ok(0)
+}
+
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the opener writes the session-role marker: the
+// id derived in process as the stamp derives it, a held line left alone, an underived id a skip at
+// exit 0, an unwritable marker exit 2
+fn role_marker(c: &Cfg, say: &Say) -> Result<(), String> {
+    let path = &c.role_file;
+    let id = match crate::emit::session_id::emit(&[]) {
+        Ok(id) => id.trim().to_string(),
+        Err(e) => {
+            let skip = format!(
+                "the session-role marker {} — the session id did not derive ({}); the journal is \
+                 opened, and only the executor-facing suppression is lost.",
+                path, e
+            );
+            if say.sim {
+                say.out(&format!("would skip {}", skip));
+            } else {
+                eprintln!("enter-stage: skipped {}", skip);
+            }
+            return Ok(());
+        }
+    };
+    let line = format!("lead {}", id);
+    let held = read(path);
+    if held.strip_suffix('\n').unwrap_or(&held) == line {
+        if say.sim {
+            say.out(&format!(
+                "the session-role marker {} already holds '{}' — the real opener would leave it \
+                 alone.",
+                path, line
+            ));
+        } else {
+            println!(
+                "enter-stage: the session-role marker {} already holds '{}' — left alone.",
+                path, line
+            );
+        }
+        return Ok(());
+    }
+    if say.sim {
+        say.out(&format!(
+            "would write '{}' to the session-role marker {} — no write.",
+            line, path
+        ));
+        return Ok(());
+    }
+    if let Some(dir) = Path::new(path).parent().filter(|d| !d.as_os_str().is_empty()) {
+        std::fs::create_dir_all(dir).map_err(|e| {
+            format!("cannot create the session-role marker's dir {}: {}", dir.display(), e)
+        })?;
+    }
+    write_file(path, &format!("{}\n", line))?;
+    println!("enter-stage: wrote '{}' to the session-role marker {}.", line, path);
+    Ok(())
 }
 
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — --rename: the two-surface iteration rename in
@@ -2591,6 +2653,7 @@ mod tests {
             worktree_check: "0".into(),
             worktree_re: None,
             tmpdir: dir.display().to_string(),
+            role_file: String::new(),
         };
         assert!(valve.query(&c, "demo", "build").is_err(), "a malformed ledger must refuse");
         assert_eq!(std::fs::read(&v).expect("read"), bad_before, "the fail-closed refusal wrote the ledger");

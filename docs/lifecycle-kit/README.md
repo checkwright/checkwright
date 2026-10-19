@@ -90,7 +90,7 @@ gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --emit ruling-staleness ["<ruling name>"…]  # fired conditions, undeclared ones, citing sites
 ```
 
-`--emit session-id` is [SPEC.md §bin/session-id.sh](SPEC.md#binsession-idsh)'s derivation order, which `--enter-stage` reads for you: reach for it directly only where a session writes an id itself, as `templates/lead.md`'s session-role marker step does. It takes no argument and resolves no knob. **The front-end route reads the cwd `bin/run-gates.sh` cds to** — the git toplevel — so a caller standing elsewhere whose sessions dir is the cwd-slugged default invokes the binary's `--emit-session-id` arm directly instead, which is what `--enter-stage` does.
+`--emit session-id` is [SPEC.md §bin/session-id.sh](SPEC.md#binsession-idsh)'s derivation order, which `--enter-stage` reads for you: reach for it directly only where a session writes an id itself. It takes no argument and resolves no knob. **The front-end route reads the cwd `bin/run-gates.sh` cds to** — the git toplevel — so a caller standing elsewhere whose sessions dir is the cwd-slugged default invokes the binary's `--emit-session-id` arm directly instead, which is what `--enter-stage` does.
 
 The two survey arms are the capture and citation affordances of [SPEC.md §The survey record](SPEC.md#the-survey-record). `--` ends option processing for either, and a positional beginning with `-` without it, `--help` included, is a refusal that prints the arm's usage at exit 2 ([gate-sdk/SPEC.md §The bin/-tool contract](../gate-sdk/SPEC.md#the-bin-tool-contract)).
 
