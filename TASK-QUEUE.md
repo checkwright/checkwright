@@ -1,14 +1,60 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: guard-ansi-c-bar-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The set (operator direction 2026-10-19, lead-relayed, not a ruling; the iteration opened undirected):** option C over the recommended A. The debt `skeleton-ansi-c-escaped-quote`, `worktree-ansi-c-path-word`, `escaped-amp-statement-split` and `path-slot-ansi-c-dollar`, promoted by scope; the feature [permission-grammar-neutral](#permission-grammar-neutral), which spec authors and promotes, its grammar cited to gate-sdk/SPEC.md §The hook contract's binding table. Stages scope, spec, align, build, validate and close, the second component and the audit walk accepted with the set. The two v0.32.0 bar blockers are `worktree-ansi-c-path-word` (a wrong grant) and `escaped-amp-statement-split` (a regression from v0.31.0). Composition: bundled — the four guard-kit debt entries share the shell-guard word read and skeleton, the feature guard-kit's rule roster prose; drain 5 against inflow 3.6. Supersession: `path-slot-ansi-c-dollar` — reshaped by `skeleton-ansi-c-escaped-quote`; `worktree-ansi-c-path-word` — reshaped by `skeleton-ansi-c-escaped-quote`, the skeleton's span end moving the word read's odd-backslash refusal both read, so the skeleton lands first.
+
+  **Release review (operator grant 2026-10-19, lead-relayed, unspent):** one second-vendor review over the iteration's range, run at validate; close cuts v0.32.0 on a clean return, against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed).
+
+  **Push need (2026-10-19, inside the budget):** 2 against 2 — the closing push, and the v0.32.0 tag push only if the granted review returns clean; no unit reads a remote run.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### skeleton-ansi-c-escaped-quote
+
+the bash skeleton closes an ANSI-C span at an escaped quote: `$'\''` is one word to bash, but the skeleton's single-quoted span ends at the backslash-quote, so the text up to bash's next quote is inert to every skeleton reader. `git stash` and `rm README.md` block bare; `git status $'\'' ; git stash ; echo ''` and `ls $'\'' ; rm README.md ; ls 'a'` fall through.
+
+**Deliverable:** the skeleton ends an ANSI-C span where bash does, with firing rows of both shapes. It moves verdicts from fall-through to block, so it lands in a build.
+
+**Honest limit:** no grant was found riding the inert text over the eight shapes probed at spec, and no wider corpus was run; a grant reading the word read declines, the read refusing such a span. Both pairs re-verified at guard-ansi-c-bar-pass' scope, and v0.31.0 falls through on them too, so no regression.
+
+**Cost while deferred:** a missed block on a contrived spelling. Filed 2026-10-19 by guard-word-read-reach-pass' close, draining its spec's bullet. Re-verified there: both pairs on the built binary. Owner lookup: `skeleton`, `ANSI-C`, `escaped quote` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The reader and its views.
+
+### worktree-ansi-c-path-word
+
+rule `worktree_confinement` reads its path words off the dequoted view, which holds an ANSI-C quoted word unresolved behind its `$`. From a linked worktree, `rm $'<main>/README.md'` and `touch $'\x2e\x2e/<main>/x'` fall through where the plain spellings block. Under `GUARD_KIT_WORKTREE_READS=off`, `cat $'<main>/README.md\cA' >> .tmp/j.md`, a span the word read refuses, is granted by rule `append_scratch` where the plain spelling blocks: a wrong grant predating the ANSI-C word read, whose guard-word-read-reach-pass hotfix refuses a grant only on a call carrying a word the read resolved. guard-kit/SPEC.md states that refusal unconditionally in §The reader and its views and in the rule's roster entry, so the code is the defect and the contract stands.
+
+**Deliverable:** the rule reads its path words by value off the word read, and a call carrying a span the read refuses takes no grant, with firing rows run from a linked worktree. It moves verdicts from fall-through to block and from allow to fall-through, so it lands in a build.
+
+**The block half is debt (operator direction 2026-10-19, lead-relayed, not a ruling):** the same build commit rewrites §The rule roster's declared limit that no path word is read off an ANSI-C quoted word. Re-verified at guard-ansi-c-bar-pass' scope: v0.31.0 grants the `\cA` append too, so the wrong grant predates it.
+
+**Cost while deferred:** one wrong grant of a contrived main-checkout read appended into scratch from an isolated session, and a confinement block left to a permission decision. Filed 2026-10-19 by guard-word-read-reach-pass' close, draining two bullets its lead filed from the post-validate hotfix. Re-verified there: all three pairs from a scratch repository's linked worktree on the built binary. Owner lookup: `worktree_confinement`, `append_scratch`, `ANSI-C` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The rule roster.
+
+### escaped-amp-statement-split
+
+rule `background_no_record` blocks a foreground read whose `&` is escaped: `grep -c x\&y README.md`, one pattern word to bash, blocks as if it backgrounded a child, while `grep -c x README.md` is allowed. The statement splitter (`statement_amp` in `native/src/guard/text.rs`) ignores escaping, a regression from guard-word-read-reach-pass' glued-ampersand hotfix. Found by that iteration's validate second-vendor review (its P2); held filed with no hotfix by operator direction 2026-10-19, lead-relayed, not a ruling.
+
+**Deliverable:** the splitter ends no statement at an escaped or quoted `&`, with a row of this shape. It moves a verdict from block to allow, so it lands in a build.
+
+**A regression from v0.31.0, re-verified at guard-ansi-c-bar-pass' scope:** v0.31.0's Release binary lets the escaped call fall through, so this block meets the v0.32.0 bar.
+
+**Cost while deferred:** a re-issue per such call, never a wrong grant. Filed 2026-10-19 by guard-word-read-reach-pass' close, draining its validate's bullet. Re-verified there: the pair above on the built binary. Owner lookup: `statement_amp`, `background_no_record`, `escaped` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The generic ruleset.
+
+### path-slot-ansi-c-dollar
+
+rules `grant_path_slot`, `abs_script`, `brace_glyph`, `bounded_wait` and `bounded_write` decline on any live `$` in the single-and-heredoc-quoted view, so an ANSI-C word's `$` withholds a grant its single-quoted spelling earns: `find .tmp/old -name '*.txt' -delete` is allowed, `find .tmp/old -name $'*.txt' -delete` falls through. A spec prototype over 116 respelled `cases.tsv` rows found two off verdict.
+
+**Deliverable:** each predicate reads an ANSI-C word the word read resolves as its value, with firing rows, or the limit declared. It moves verdicts from fall-through to allow, a widened grant, so it lands in a build that validate reads.
+
+**Cost while deferred:** one permission decision per such call, never a wrong grant. Filed 2026-10-19 by guard-word-read-reach-pass' close, draining its spec's bullet. Re-verified there: the `find` pair on the built binary. The bullet's second shape, an absolute script path with `2>$'/dev/null'` blocking where `2>'/dev/null'` is rewritten, did not reproduce at the repo root, both spellings taking `abs_script`'s same repo-relative steer. Owner lookup: `grant_path_slot`, `bounded_write`, `slot_reach` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The rule roster.
 
 ## Deferred
 
@@ -281,50 +327,6 @@ gate-sdk/SPEC.md §The hook contract's binding table is held to the crate's spel
 **Deliverable:** one crate module holding the binding's spellings that every member reads, with a test holding the table to it, or a refusal recorded.
 
 **Cost while deferred:** the table can drift from what the members read, unseen until a fixture reds. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: `tool_input` spelled in six `native/src/hook/` modules and `guard/mod.rs`. Owner lookup: `binding table`, `hook contract` in this file, none; owner gate-sdk/SPEC.md §The hook contract.
-
-### worktree-ansi-c-path-word
-
-[cost: event/low] [surface: guard-kit]
-
-rule `worktree_confinement` reads its path words off the dequoted view, which holds an ANSI-C quoted word unresolved behind its `$`. From a linked worktree, `rm $'<main>/README.md'` and `touch $'\x2e\x2e/<main>/x'` fall through where the plain spellings block. Under `GUARD_KIT_WORKTREE_READS=off`, `cat $'<main>/README.md\cA' >> .tmp/j.md`, a span the word read refuses, is granted by rule `append_scratch` where the plain spelling blocks: a wrong grant predating the ANSI-C word read, whose guard-word-read-reach-pass hotfix refuses a grant only on a call carrying a word the read resolved. guard-kit/SPEC.md states that refusal unconditionally in §The reader and its views and in the rule's roster entry, so the code is the defect and the contract stands.
-
-**Deliverable:** the rule reads its path words by value off the word read, and a call carrying a span the read refuses takes no grant, with firing rows run from a linked worktree. It moves verdicts from fall-through to block and from allow to fall-through, so it lands in a build.
-
-**Cost while deferred:** one wrong grant of a contrived main-checkout read appended into scratch from an isolated session, and a confinement block left to a permission decision. Filed 2026-10-19 by guard-word-read-reach-pass' close, draining two bullets its lead filed from the post-validate hotfix. Re-verified there: all three pairs from a scratch repository's linked worktree on the built binary. Owner lookup: `worktree_confinement`, `append_scratch`, `ANSI-C` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The rule roster.
-
-### escaped-amp-statement-split
-
-[cost: event/low] [surface: guard-kit]
-
-rule `background_no_record` blocks a foreground read whose `&` is escaped: `grep -c x\&y README.md`, one pattern word to bash, blocks as if it backgrounded a child, while `grep -c x README.md` is allowed. The statement splitter (`statement_amp` in `native/src/guard/text.rs`) ignores escaping, a regression from guard-word-read-reach-pass' glued-ampersand hotfix. Found by that iteration's validate second-vendor review (its P2); held filed with no hotfix by operator direction 2026-10-19, lead-relayed, not a ruling.
-
-**Deliverable:** the splitter ends no statement at an escaped or quoted `&`, with a row of this shape. It moves a verdict from block to allow, so it lands in a build.
-
-**Inferred, not run:** the verdict v0.31.0 returned on this call.
-
-**Cost while deferred:** a re-issue per such call, never a wrong grant. Filed 2026-10-19 by guard-word-read-reach-pass' close, draining its validate's bullet. Re-verified there: the pair above on the built binary. Owner lookup: `statement_amp`, `background_no_record`, `escaped` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The generic ruleset.
-
-### skeleton-ansi-c-escaped-quote
-
-[cost: event/low] [surface: guard-kit]
-
-the bash skeleton closes an ANSI-C span at an escaped quote: `$'\''` is one word to bash, but the skeleton's single-quoted span ends at the backslash-quote, so the text up to bash's next quote is inert to every skeleton reader. `git stash` and `rm README.md` block bare; `git status $'\'' ; git stash ; echo ''` and `ls $'\'' ; rm README.md ; ls 'a'` fall through.
-
-**Deliverable:** the skeleton ends an ANSI-C span where bash does, with firing rows of both shapes. It moves verdicts from fall-through to block, so it lands in a build.
-
-**Inferred, not run:** that no grant rides the inert text beyond the eight shapes probed at spec, a grant reading the word read declining since the read refuses such a span.
-
-**Cost while deferred:** a missed block on a contrived spelling. Filed 2026-10-19 by guard-word-read-reach-pass' close, draining its spec's bullet. Re-verified there: both pairs on the built binary. Owner lookup: `skeleton`, `ANSI-C`, `escaped quote` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The reader and its views.
-
-### path-slot-ansi-c-dollar
-
-[cost: event/low] [surface: guard-kit]
-
-rules `grant_path_slot`, `abs_script`, `brace_glyph`, `bounded_wait` and `bounded_write` decline on any live `$` in the single-and-heredoc-quoted view, so an ANSI-C word's `$` withholds a grant its single-quoted spelling earns: `find .tmp/old -name '*.txt' -delete` is allowed, `find .tmp/old -name $'*.txt' -delete` falls through. A spec prototype over 116 respelled `cases.tsv` rows found two off verdict.
-
-**Deliverable:** each predicate reads an ANSI-C word the word read resolves as its value, with firing rows, or the limit declared. It moves verdicts from fall-through to allow, a widened grant, so it lands in a build that validate reads.
-
-**Cost while deferred:** one permission decision per such call, never a wrong grant. Filed 2026-10-19 by guard-word-read-reach-pass' close, draining its spec's bullet. Re-verified there: the `find` pair on the built binary. The bullet's second shape, an absolute script path with `2>$'/dev/null'` blocking where `2>'/dev/null'` is rewritten, did not reproduce at the repo root, both spellings taking `abs_script`'s same repo-relative steer. Owner lookup: `grant_path_slot`, `bounded_write`, `slot_reach` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The rule roster.
 
 ## Icebox
 
