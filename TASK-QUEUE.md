@@ -28,6 +28,16 @@ lifecycle-kit/templates/lead.md's first step prescribes a session-role command b
 
 **Cost while deferred:** each lead session spends a refused command and a hand-built one, or runs unsuppressed. Filed 2026-10-19 by guard-reader-value-bar-pass' lead after its close; promoted at the next scope's carried-bullet intake. Re-verified there: the template's command, fed to the built hook, exits 2 on the expansion rule. Owner lookup: `session-role`, `guard-verdict` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §templates/lead.md, with context-kit/SPEC.md §The session-context hook.
 
+### shellcheck-gate-tests-derived
+
+[spec: SPEC-shellcheck-gate-tests.md]
+
+`check-shellcheck` reaches the bespoke `<tree>/gate-tests/*.test.sh` suites only through a hand-kept list of eleven directories in this repo's `GATE_SDK_LINT_EXTRA_DIRS`. A twelfth kit's suites join no lint until someone remembers to name them. The kit-root predicate derives `lib/`, `bin/`, `checks/`, `templates/` and `smoke/` and never `gate-tests/`, although `--run-gate-tests` spawns each direct `*.test.sh` as shell and the fixture pair ships to every adopter.
+
+**Deliverable:** a feature. Either the derived set gains each kit root's and the gates dir's `gate-tests/` direct `*.sh`, with fixture coverage and the knob list shrunk back to the installer, demo and docs directories, or a refusal is recorded in gate-sdk/SPEC.md §check-shellcheck. Widening a shipped gate's corpus for every adopter is a kit-semantics call, so a close drain does not make it.
+
+**Cost while deferred:** a new kit's suites lint nothing until the knob is edited, and the 129 linted today carried four warnings that went unseen. Filed 2026-10-18 by site-health-statistics-pass' close as the derivation residual of the drained unlinted-gate-tests bullet. Re-verified there: 129 direct suites across eleven directories, ShellCheck 0.11.0 `-S warning` found four warnings, and a probe file proved the widened knob reaches the corpus. Owner lookup: `shellcheck`, `LINT_EXTRA`, `gate-tests` lint in this file and the disposed-findings record found none; the owner is gate-sdk/SPEC.md §check-shellcheck.
+
 ## Technical Debt
 
 ### bounded-write-backslash-grant
@@ -235,16 +245,6 @@ surface (e) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 **Inferred, not run:** that an evaluating agent reading `CLAUDE.md` forms a worse impression; this probe measures it.
 
 **Cost while deferred:** whether the evaluator surfaces change what an agent recommends stays unmeasured. Filed 2026-10-17 by evaluator-discovery-pass' scope as a split remainder. Owner lookup: the parent's, `llms`, `AGENTS.md`, `evaluator`, `keywords` in this file and the disposed-findings record, none; owner drift-kit/SPEC.md, beside [design-partner-preview](#design-partner-preview)'s observation record.
-
-### shellcheck-gate-tests-derived
-
-[cost: once/low] [surface: gate-sdk]
-
-`check-shellcheck` reaches the bespoke `<tree>/gate-tests/*.test.sh` suites only through a hand-kept list of eleven directories in this repo's `GATE_SDK_LINT_EXTRA_DIRS`. A twelfth kit's suites join no lint until someone remembers to name them. The kit-root predicate derives `lib/`, `bin/`, `checks/`, `templates/` and `smoke/` and never `gate-tests/`, although `--run-gate-tests` spawns each direct `*.test.sh` as shell and the fixture pair ships to every adopter.
-
-**Deliverable:** a feature. Either the derived set gains each kit root's and the gates dir's `gate-tests/` direct `*.sh`, with fixture coverage and the knob list shrunk back to the installer, demo and docs directories, or a refusal is recorded in gate-sdk/SPEC.md §check-shellcheck. Widening a shipped gate's corpus for every adopter is a kit-semantics call, so a close drain does not make it.
-
-**Cost while deferred:** a new kit's suites lint nothing until the knob is edited, and the 129 linted today carried four warnings that went unseen. Filed 2026-10-18 by site-health-statistics-pass' close as the derivation residual of the drained unlinted-gate-tests bullet. Re-verified there: 129 direct suites across eleven directories, ShellCheck 0.11.0 `-S warning` found four warnings, and a probe file proved the widened knob reaches the corpus. Owner lookup: `shellcheck`, `LINT_EXTRA`, `gate-tests` lint in this file and the disposed-findings record found none; the owner is gate-sdk/SPEC.md §check-shellcheck.
 
 ### manifest-count-blank-run-bound
 
