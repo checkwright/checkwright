@@ -22,8 +22,8 @@ const NAME: &str = "run-guard-tests";
 
 // spec: guard-kit/SPEC.md §Testing — `Drop` is the shell form's `trap 'rm -rf' EXIT`, armed the
 // moment the directory exists so no later refusal can leak it.
-struct Sandbox {
-    root: String,
+pub(crate) struct Sandbox {
+    pub(crate) root: String,
 }
 
 impl Drop for Sandbox {
@@ -299,7 +299,7 @@ fn consumer_lane(tally: &mut Tally) -> Result<Option<Consumer>, String> {
 
 // spec: guard-kit/SPEC.md §Testing — the guard reads its knobs from the binary, and the
 // repo-relative default names nothing from inside the sandbox, so the running binary is exported
-fn running_binary() -> Result<String, String> {
+pub(crate) fn running_binary() -> Result<String, String> {
     let bin = crate::proc::self_image()
         .map_err(|e| format!("{}: cannot name the running binary: {}", NAME, e))?;
     Ok(walk::normalize_abs(&bin.to_string_lossy()))
@@ -344,7 +344,7 @@ impl Tally {
 }
 
 // spec: guard-kit/SPEC.md §Testing — the three substitutions, in the fixed order.
-fn substitute(cmd: &str, root: &str) -> String {
+pub(crate) fn substitute(cmd: &str, root: &str) -> String {
     cmd.replace("@ROOT@", root).replace("@NL@", "\n").replace("@CR@", "\r")
 }
 
@@ -404,31 +404,38 @@ fn fields(line: &str, width: usize) -> Vec<String> {
 // spec: guard-kit/SPEC.md §Testing — one case, spawned from inside the sandbox with the same inputs
 // the harness supplied, driving the `--hook shell-guard` member directly with no front end.
 fn decide(root: &str, log: &str, cmd: &str, background: Option<&str>, tool: &str) -> Result<String, String> {
-    let bin = running_binary()?;
-    let set = [
-        ("GUARD_KIT_LOG".to_string(), log.to_string()),
-        ("GATE_SDK_NATIVE_BIN".to_string(), bin.clone()),
-        ("PWD".to_string(), root.to_string()),
-    ];
-    let env = proc::ChildEnv { set: &set, unset: &[], cwd: Some(Path::new(root)) };
-    let done = proc::run_with_stdin_in(
-        &programs::CHECKWRIGHT_GATES.at(bin.clone()),
-        &["--hook", "shell-guard"],
-        payload(cmd, background, tool).as_bytes(),
-        &env,
-    )?;
-    let (code, out) = (
-        done.reported_code(),
-        String::from_utf8_lossy(done.streams().0).into_owned(),
-    );
+    let (code, out, _) = ask(&running_binary()?, root, log, &payload(cmd, background, tool))?;
     // spec: guard-kit/SPEC.md §Testing — the shell form captured the guard in `$( … )`, which
     // strips every trailing newline before the ladder's emptiness arm reads it.
     Ok(classify(code, out.trim_end_matches('\n')))
 }
 
+// spec: guard-kit/SPEC.md §guard-verdict — one ask of a binary's `--hook shell-guard` from inside
+// `root`, shared with the verdict arm
+pub(crate) fn ask(bin: &str, root: &str, log: &str, payload: &str) -> Result<(i32, String, String), String> {
+    let set = [
+        ("GUARD_KIT_LOG".to_string(), log.to_string()),
+        ("GATE_SDK_NATIVE_BIN".to_string(), bin.to_string()),
+        ("PWD".to_string(), root.to_string()),
+    ];
+    let env = proc::ChildEnv { set: &set, unset: &[], cwd: Some(Path::new(root)) };
+    let done = proc::run_with_stdin_in(
+        &programs::CHECKWRIGHT_GATES.at(bin.to_string()),
+        &["--hook", "shell-guard"],
+        payload.as_bytes(),
+        &env,
+    )?;
+    let (out, err) = done.streams();
+    Ok((
+        done.reported_code(),
+        String::from_utf8_lossy(out).into_owned(),
+        String::from_utf8_lossy(err).into_owned(),
+    ))
+}
+
 // spec: guard-kit/SPEC.md §Testing — the hook payload, `jq -nc`'s construction moved in-crate,
 // carrying the tool name the member selects its reader by.
-fn payload(cmd: &str, background: Option<&str>, tool: &str) -> String {
+pub(crate) fn payload(cmd: &str, background: Option<&str>, tool: &str) -> String {
     use crate::hook::binding::{BACKGROUND, COMMAND, TOOL_INPUT, TOOL_NAME};
     let mut input = serde_json::Map::new();
     input.insert(COMMAND.to_string(), serde_json::Value::String(cmd.to_string()));
@@ -448,7 +455,7 @@ fn payload(cmd: &str, background: Option<&str>, tool: &str) -> String {
 
 // spec: guard-kit/SPEC.md §Testing — the five-way ladder in exit-code-then-substring order; the
 // order is load-bearing and the section says why.
-fn classify(rc: i32, out: &str) -> String {
+pub(crate) fn classify(rc: i32, out: &str) -> String {
     if rc == 2 {
         return "block".to_string();
     }
@@ -474,7 +481,7 @@ fn classify(rc: i32, out: &str) -> String {
 // spec: guard-kit/SPEC.md §Testing — the sandbox's five preconditions, each a case's precondition
 // rather than scenery: the section enumerates them and says what turns green for the wrong reason
 // when a harness builds four.
-fn build_sandbox() -> Result<Sandbox, String> {
+pub(crate) fn build_sandbox() -> Result<Sandbox, String> {
     let made = std::env::temp_dir().join(format!("checkwright-guard-tests.{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&made);
     mkdir(&made.display().to_string())?;

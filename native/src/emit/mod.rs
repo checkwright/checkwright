@@ -77,6 +77,7 @@ pub mod ruling_staleness;
 pub mod run_config_variant;
 pub mod run_consumer_smoke;
 pub mod guard_ps_variants;
+pub mod guard_verdict;
 pub mod guard_variants;
 pub mod run_gate_tests;
 pub mod run_guard_tests;
@@ -963,6 +964,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--run-guard-tests",
         Arm::Run(run_guard_tests::run),
         run_guard_tests::KNOBS,
+    ),
+    // spec: guard-kit/SPEC.md §guard-verdict — an `Arm::Run` because it prints the hook's answer and
+    // spawns the binary it asks, so it may not join the fence-safe set
+    (
+        "--guard-verdict",
+        Arm::Run(guard_verdict::run),
+        guard_verdict::KNOBS,
     ),
     // spec: guard-kit/SPEC.md §Testing — the PowerShell re-spellings the Windows leg's host parses
     (

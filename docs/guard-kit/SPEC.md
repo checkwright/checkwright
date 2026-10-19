@@ -987,6 +987,32 @@ The key derivation, the verdict's shapes and exclusions, the grant test's readin
 
 **Two changes are recorded as no step.** Moving the measurement from a spawn-and-parse to an in-crate call left the keying untouched, read with both holders present. Ranking PowerShell lines apart moves no Bash line: 20 across 54 before and after.
 
+## guard-verdict
+
+`--guard-verdict [--sandbox] [--powershell] [--background] [--bin <binary>] (--stdin | [--] <command>)` prints the decision the shell guard returns for `<command>`. **The member is the gate binary's arm**, reached as `bash gate-sdk/bin/run-gates.sh --guard-verdict …`. It is spelled bare because its child runs the consumer's rule command and any binary `--bin` names ([gate-sdk/SPEC.md §The non-gate arm](../gate-sdk/SPEC.md#the-non-gate-arm)).
+
+**What it asks.** It builds the hook payload with `--run-guard-tests`' own builder, carrying the command, the PowerShell shell tool under `--powershell` (else the bash one), and the background flag under `--background` ([gate-sdk/SPEC.md §The hook contract](../gate-sdk/SPEC.md#the-hook-contract)). It spawns `<binary> --hook shell-guard` with the payload on stdin. `<binary>` is the running binary, or the path `--bin` names, so a released binary is asked the same question. To ask one, extract it from the Release's per-target archive `checkwright-gates-<version>-<target>.tar.gz`, check it against the sidecar beside it, and mark it executable. No arm fetches it: a fetch would make the arm a network spawner and a second copy of the bootstraps' target resolution and digest check ([installer/SPEC.md §The gate binary](../installer/SPEC.md#the-gate-binary)). The child's `GATE_SDK_NATIVE_BIN` names the binary asked, and its `GUARD_KIT_LOG` names a file of the arm's own under `GATE_SDK_TMP_DIR`, removed once the child exits. So a verdict probe never files a synthetic command as friction.
+
+**Where it asks.**
+
+- **In the tree by default**, from the git toplevel. The answer is the one the hook returns there: the consumer's rule command, the knob files, the tracked set, the liveness records and the settings allowlist all take part.
+- **Under `--sandbox`**, from inside a sandbox `--run-guard-tests` builds, by its own builder, removed once the child exits ([§Testing](#testing)). There the answer is the generic ruleset's alone, the one a row of the decision table pins, and it depends on no knob file. That makes it the mode for asking a release: in the tree, a knob a later release added refuses an earlier binary's knob read, and the guard then blocks every command.
+
+The command takes the decision table's three substitutions, `@ROOT@` naming the mode's root, so a table row's command is pasted as written. It arrives as the one operand, read verbatim after `--`, or under `--stdin` as the whole of standard input with one trailing newline dropped. A quoted-delimiter heredoc carries any spelling past the guard that reads the arm's own command line.
+
+**What it prints.** Line one is the decision, in the decision table's ladder ([§Testing](#testing)): `block`, `advise`, `allow`, `rewrite` or `fallthrough`, or `exit<rc>` and `unknown` for an answer the ladder does not place. The child's stdout follows it verbatim, and the child's stderr goes to the arm's stderr verbatim, so a block's steer and an allow's reason are read where the hook wrote them. The ladder is `--run-guard-tests`' own function.
+
+**Exit:** 0 when the child answered, whatever its decision. It exits 2 for a usage error, a `--bin` path that is not an executable file, a scratch dir or sandbox that cannot be made, a working directory outside any repository without `--sandbox`, or a child that cannot be spawned. `-h` or `--help` first prints the usage at exit 0. Every grammar refusal prints it on stderr at exit 2:
+
+- a surplus operand;
+- a leading-`-` operand before `--`;
+- a command operand beside `--stdin`;
+- no command at all.
+
+Its knob roster is `GATE_SDK_TMP_DIR` and the shell guard's own knobs, which the child reads itself ([gate-sdk/SPEC.md §The non-gate arm](../gate-sdk/SPEC.md#the-non-gate-arm), a dispatching arm's declaration). **Honest limits:** in the tree an earlier binary's answer reads today's knob files, as stated above. The sandbox carries the decision table's fixture files and settings and nothing of the tree's. The arm reports what the binary asked returns, and never what a harness would do with an answer it does not recognize.
+
+The arm is `native/src/emit/guard_verdict.rs` and its `ARMS` row. Its seam cases live in `gate-tests/guard-verdict.test.sh`.
+
 ## check-door-binding
 
 Invariant, three assertions over the tracked tree:
@@ -1280,7 +1306,7 @@ A table the lane cannot read is exit 2: a missing file, a floor or a transform o
 
 **A row writes a path relative unless the case is *about* an absolute one.** The runner drives each case from inside the sandbox, and rule `abs_prefix` blocks any command carrying the repo-root prefix. An `@ROOT@`-absolute target therefore never reaches the rule under test, and the miss reads as a rule defect rather than a spelling one. `@ROOT@` is for the cases whose subject is the absolute form, rules `git_c_root`, `abs_script` and `abs_prefix`, and for a foreign-repo contrast.
 
-**Any ad-hoc invocation of the shell guard must set `GUARD_KIT_LOG` to a scratch path.** The logger's default is the *live* friction log, so a probe driving the guard in a loop files its synthetic commands as real friction and skews the next close's ranking. The kit's own runners all set it: the decision table into its sandbox, the `scan-prompts` fixture into its own. **No scanner is proposed:** the polluting caller is a one-off script in the gitignored scratch dir, so there is no committed corpus to scan. The convention is carried by this sentence and by the `--scratch-run` arm's echo-at-execution.
+**Ask the guard for a verdict with `--guard-verdict` ([§guard-verdict](#guard-verdict)), which points `GUARD_KIT_LOG` at scratch itself. Any other ad-hoc invocation of the shell guard must set it to a scratch path.** The logger's default is the *live* friction log, so a probe driving the guard files its synthetic commands as real friction and skews the next close's ranking. The kit's own runners all set it: the decision table into its sandbox, the `scan-prompts` fixture into its own, and the verdict arm into its own file. **No scanner is proposed:** the polluting caller is a one-off script in the gitignored scratch dir, so there is no committed corpus to scan. The convention is carried by this sentence and by the `--scratch-run` arm's echo-at-execution.
 
 **The decision table is the instrument for any change to what the guard refuses, and its red condition is not monotone.** It fails on a verdict mismatch **in either direction**, so a change that *narrows* refusal cannot be cleared by inspection. Every existing case whose command carries a double-quoted brace, a heredoc, a banner segment, an append redirect to a gitignored target, or an allowlisted lead with a read-only tail has its expected column **re-derived**. A new blocking rule likewise re-derives every row its trigger reaches, as rule `background_no_record` did every row carrying a trailing `&`. The `scan-prompts` arm cannot substitute: a block exits 2 before the fall-through line is written, so that report is blind to every block the guard makes. A change converting a block into a grant reads on the scan as a pure improvement, or as nothing at all.
 
