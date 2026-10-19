@@ -38,6 +38,16 @@ lifecycle-kit/templates/lead.md's first step prescribes a session-role command b
 
 **Cost while deferred:** a new kit's suites lint nothing until the knob is edited, and the 129 linted today carried four warnings that went unseen. Filed 2026-10-18 by site-health-statistics-pass' close as the derivation residual of the drained unlinted-gate-tests bullet. Re-verified there: 129 direct suites across eleven directories, ShellCheck 0.11.0 `-S warning` found four warnings, and a probe file proved the widened knob reaches the corpus. Owner lookup: `shellcheck`, `LINT_EXTRA`, `gate-tests` lint in this file and the disposed-findings record found none; the owner is gate-sdk/SPEC.md §check-shellcheck.
 
+### guard-verdict-typed-operand
+
+[spec: SPEC-guard-verdict.md]
+
+no arm prints the shell guard's decision for a command given as a typed operand, so a session re-verifying a guard finding hand-builds the hook's JSON payload in scratch, and the guard's own expansion rule refuses the obvious one-line spellings. Settling regression-versus-the-last-release needs that release's binary: one close spent a tag worktree and a cargo build, and several drains carried the verdict as inferred for want of it.
+
+**Deliverable:** design-pending, a feature: a guard-kit arm taking the command as an operand and printing the decision the hook would return, plus a way to ask an older binary the same, whose `--hook shell-guard` it already has; whether that half reads a released binary or stays manual is the amendment's to settle.
+
+**Cost while deferred:** each guard verdict a drain or validate re-verifies costs a scratch payload and, against a release, a build. Filed 2026-10-19 by guard-reader-value-bar-pass' close (manual-ops, two keys); promoted at the next scope's carried-bullet intake. Re-verified there: this scope's own probe needed a payload file after two refused spellings. Owner lookup: `guard-verdict`, `typed operand` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §Testing.
+
 ## Technical Debt
 
 ### bounded-write-backslash-grant
@@ -295,16 +305,6 @@ Cursor and Muse Code are installed on no build machine, so plugin/SPEC.md §The 
 **Deliverable:** install and run each on a machine that has it, turn its cells from read to run, and file any wiring defect.
 
 **Cost while deferred:** two tier-2 harnesses' skill load and guard reach rest on vendor docs. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: neither CLI on the build machine's PATH. Owner lookup: `cursor`, `muse` in this file, none; owner plugin/SPEC.md §The harnesses.
-
-### guard-verdict-typed-operand
-
-[cost: event/low] [surface: guard-kit]
-
-no arm prints the shell guard's decision for a command given as a typed operand, so a session re-verifying a guard finding hand-builds the hook's JSON payload in scratch, and the guard's own expansion rule refuses the obvious one-line spellings. Settling regression-versus-the-last-release needs that release's binary: one close spent a tag worktree and a cargo build, and several drains carried the verdict as inferred for want of it.
-
-**Deliverable:** design-pending, a feature: a guard-kit arm taking the command as an operand and printing the decision the hook would return, plus a way to ask an older binary the same, whose `--hook shell-guard` it already has; whether that half reads a released binary or stays manual is the amendment's to settle.
-
-**Cost while deferred:** each guard verdict a drain or validate re-verifies costs a scratch payload and, against a release, a build. Filed 2026-10-19 by guard-reader-value-bar-pass' close (manual-ops, two keys); promoted at the next scope's carried-bullet intake. Re-verified there: this scope's own probe needed a payload file after two refused spellings. Owner lookup: `guard-verdict`, `typed operand` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §Testing.
 
 ## Icebox
 
