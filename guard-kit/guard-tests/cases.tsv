@@ -908,6 +908,9 @@ allow	mv .tmp/a.txt .tmp/b.txt
 allow	cp tracked.md .tmp/copy.md
 allow	grep -n x tracked.md | tee .tmp/hits.txt
 allow	find .tmp/old -name '*.txt' -delete
+# an ANSI-C quoted word's '$' stands live in the 'sq hdq' view, so the expansion decline withholds
+# the grant its single-quoted spelling earns: a declared limit
+fallthrough	find .tmp/old -name $'*.txt' -delete
 allow	git status > .tmp/status.txt 2>&1
 allow	mkdir -p .tmp/d; git status > .tmp/d/s.txt; wc -l .tmp/d/s.txt
 allow	rm -rf .tmp/x >> .tmp/journal.md

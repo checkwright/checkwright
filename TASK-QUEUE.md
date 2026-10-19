@@ -38,14 +38,6 @@ rule `background_no_record` blocks a foreground read whose `&` is escaped: `grep
 
 **Cost while deferred:** a re-issue per such call, never a wrong grant. Filed 2026-10-19 by guard-word-read-reach-pass' close, draining its validate's bullet. Re-verified there: the pair above on the built binary. Owner lookup: `statement_amp`, `background_no_record`, `escaped` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The generic ruleset.
 
-### path-slot-ansi-c-dollar
-
-rules `grant_path_slot`, `abs_script`, `brace_glyph`, `bounded_wait` and `bounded_write` decline on any live `$` in the single-and-heredoc-quoted view, so an ANSI-C word's `$` withholds a grant its single-quoted spelling earns: `find .tmp/old -name '*.txt' -delete` is allowed, `find .tmp/old -name $'*.txt' -delete` falls through. A spec prototype over 116 respelled `cases.tsv` rows found two off verdict.
-
-**Deliverable:** each predicate reads an ANSI-C word the word read resolves as its value, with firing rows, or the limit declared. It moves verdicts from fall-through to allow, a widened grant, so it lands in a build that validate reads.
-
-**Cost while deferred:** one permission decision per such call, never a wrong grant. Filed 2026-10-19 by guard-word-read-reach-pass' close, draining its spec's bullet. Re-verified there: the `find` pair on the built binary. The bullet's second shape, an absolute script path with `2>$'/dev/null'` blocking where `2>'/dev/null'` is rewritten, did not reproduce at the repo root, both spellings taking `abs_script`'s same repo-relative steer. Owner lookup: `grant_path_slot`, `bounded_write`, `slot_reach` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The rule roster.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -1012,4 +1004,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 - skeleton-ansi-c-escaped-quote
 - worktree-ansi-c-path-word
+- path-slot-ansi-c-dollar
 
