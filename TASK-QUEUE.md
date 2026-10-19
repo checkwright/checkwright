@@ -292,7 +292,7 @@ gate-sdk/SPEC.md §The hook contract's binding table is held to the crate's spel
 
 [cost: event/low] [surface: guard-kit]
 
-rule `worktree_confinement` reads its path words off the dequoted view, which holds an ANSI-C quoted word unresolved behind its `$`. From a linked worktree, `rm $'<main>/README.md'` and `touch $'\x2e\x2e/<main>/x'` fall through where the plain spellings block. Under `GUARD_KIT_WORKTREE_READS=off`, `cat $'<main>/README.md\cA' >> .tmp/j.md`, a span the word read refuses, is granted by rule `append_scratch` where the plain spelling blocks: a wrong grant predating the ANSI-C word read, whose guard-word-read-reach-pass hotfix refuses a grant only on a call carrying a word the read resolved.
+rule `worktree_confinement` reads its path words off the dequoted view, which holds an ANSI-C quoted word unresolved behind its `$`. From a linked worktree, `rm $'<main>/README.md'` and `touch $'\x2e\x2e/<main>/x'` fall through where the plain spellings block. Under `GUARD_KIT_WORKTREE_READS=off`, `cat $'<main>/README.md\cA' >> .tmp/j.md`, a span the word read refuses, is granted by rule `append_scratch` where the plain spelling blocks: a wrong grant predating the ANSI-C word read, whose guard-word-read-reach-pass hotfix refuses a grant only on a call carrying a word the read resolved. guard-kit/SPEC.md states that refusal unconditionally in §The reader and its views and in the rule's roster entry, so the code is the defect and the contract stands.
 
 **Deliverable:** the rule reads its path words by value off the word read, and a call carrying a span the read refuses takes no grant, with firing rows run from a linked worktree. It moves verdicts from fall-through to block and from allow to fall-through, so it lands in a build.
 
@@ -326,7 +326,7 @@ the bash skeleton closes an ANSI-C span at an escaped quote: `$'\''` is one word
 
 [cost: event/low] [surface: guard-kit]
 
-rules `grant_path_slot` (its `slot_reach`, the predicate `abs_script`, `brace_glyph` and `bounded_wait` share) and `bounded_write` decline on any live `$` in the single-and-heredoc-quoted view, so an ANSI-C word's `$` withholds a grant its single-quoted spelling earns: `find .tmp/old -name '*.txt' -delete` is allowed, `find .tmp/old -name $'*.txt' -delete` falls through. A spec prototype over 116 respelled `cases.tsv` rows found two off verdict.
+rules `grant_path_slot`, `abs_script`, `brace_glyph`, `bounded_wait` and `bounded_write` decline on any live `$` in the single-and-heredoc-quoted view, so an ANSI-C word's `$` withholds a grant its single-quoted spelling earns: `find .tmp/old -name '*.txt' -delete` is allowed, `find .tmp/old -name $'*.txt' -delete` falls through. A spec prototype over 116 respelled `cases.tsv` rows found two off verdict.
 
 **Deliverable:** each predicate reads an ANSI-C word the word read resolves as its value, with firing rows, or the limit declared. It moves verdicts from fall-through to allow, a widened grant, so it lands in a build that validate reads.
 

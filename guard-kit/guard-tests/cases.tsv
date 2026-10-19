@@ -110,7 +110,7 @@ fallthrough	python3 /other/repo/tools/report.py
 fallthrough	printf '%s' 'the path @ROOT@/tools/report.py is steered'
 fallthrough	printf '%s' "the path @ROOT@/tools/report.py is steered"
 #          The heredoc row lands on `allow` rather than `fallthrough` because
-#          rule `append_scratch`'s create grant reaches it fourteen rules later; a rule `abs_prefix`
+#          rule `append_scratch`'s create grant reaches it later in the table; a rule `abs_prefix`
 #          regression would still read `block`, which is what this row asserts.
 allow	cat <<'EOF' > .tmp/note.md@NL@the path @ROOT@/tools/report.py is steered@NL@EOF
 
@@ -358,7 +358,7 @@ fallthrough	pgrep -xf installer-smoke
 #           are `allow` rather than `fallthrough` because a later auto-allow
 #           grants them outright — rule `append_scratch` the append, rule `bounded_wait` the wait — and
 #           each still proves rule `bare_sleep` inert, since a block exits 2 at rule `bare_sleep` and
-#           never reaches an auto-allow six rules later.
+#           never reaches either grant later in the table.
 block	sleep 30
 block	sleep 180; echo waited
 # a keyword spelled as an argument opens and closes no span
@@ -521,7 +521,7 @@ allow	: > .tmp/a@CR@
 #           heredoc residue must never be confused with.
 #           Targets are relative, as rules `scratch_redirect` and `truncate_scratch`'s are: the runner drives the
 #           guard from inside the sandbox, and an `@ROOT@`-absolute target would
-#           meet rule `abs_prefix`'s repo-root-prefix block nine rules earlier.
+#           meet rule `abs_prefix`'s repo-root-prefix block first.
 #           A refused write still reaching rule `emitter_write` reads `block` there rather than
 #           `fallthrough`: what these rows assert is that rule `append_scratch` did not grant.
 allow	cat >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF
@@ -1038,7 +1038,7 @@ fallthrough	git rm --cached tracked.md
 #           The firing rows are delta 3's probe table promoted from evidence into
 #           fixtures: one per body source, both arms. Targets are relative, as
 #           rules `scratch_redirect`, `truncate_scratch` and `append_scratch`'s are — an `@ROOT@`-absolute one would meet rule `abs_prefix`
-#           eighteen rules earlier.
+#           first.
 # arm (a), bash/sh: the operand form is the steer this rule inherited from a
 #          consumer rule, and the stdin form is the widening the re-key buys it
 block	bash .tmp/x.sh

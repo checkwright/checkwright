@@ -8,7 +8,7 @@
 #           producer, a read-only pipeline owns nothing a commit could corrupt,
 #           and a foreground call never reaches the rule at all. The wait-loop
 #           row is an `allow` rather than a `fallthrough` because rule `bounded_wait` grants
-#           it two rules later, which still proves rule `background_no_record`'s exemption: a block
+#           it later in the table, which still proves rule `background_no_record`'s exemption: a block
 #           would classify as `block`, not `allow`.
 #           It is also where rule `bounded_wait`'s indifference to the harness flag is pinned
 #           — the flag backgrounds the call without changing its text, so clause
