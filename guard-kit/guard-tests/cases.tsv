@@ -683,6 +683,14 @@ allow	grep $'\q' tracked.md
 allow	grep $'it\'s' tracked.md
 block	git status $'\'' ; git stash ; echo ''
 block	ls $'\'' ; rm tracked.md ; ls 'a'
+# bash removes a backslash-newline before it reads a word, so a continuation between a '$' and its
+# quote, or inside a '$' run, opens the span as the joined spelling does
+block	printf $'\'' ; touch tracked.md ; printf '' >> .tmp/j
+block	printf $\@NL@'\'' ; touch tracked.md ; printf '' >> .tmp/j
+block	ls $\@NL@'\'' ; rm tracked.md ; ls 'a'
+block	ls $\@NL@\@NL@'\'' ; rm tracked.md ; ls 'a'
+block	ls $$\@NL@$'\'' ; rm tracked.md ; ls 'a'
+allow	grep $\@NL@'it\'s' tracked.md
 # a span the read cannot resolve exactly leaves the call unread: a control, a byte above ASCII,
 # a NUL
 fallthrough	grep $'\cA' tracked.md

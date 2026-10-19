@@ -124,6 +124,10 @@ want ansi-c-touch-up   "$d" block "touch \$'\\x2e\\x2e/\\x2e\\x2e/\\x2e\\x2e/new
 want off-cat-scratch   "$SANDBOX/off.knobs" block "cat $main/docs/a.md >> .tmp/j.md" "$refusal"
 want ansi-c-refused    "$SANDBOX/off.knobs" fallthrough "cat \$'$main/docs/a.md\\cA' >> .tmp/j.md"
 want locale-refused    "$SANDBOX/off.knobs" fallthrough "cat \$\"$main/docs/a.md\" >> .tmp/j.md"
+# --- bash removes a backslash-newline between a '$' and its quote before it reads the word, so the
+#     continued spelling is read as the joined one
+want ansi-c-scratch    "$SANDBOX/off.knobs" block "cat \$'$main/docs/a.md' >> .tmp/j" "$refusal"
+want ansi-c-continued  "$SANDBOX/off.knobs" block "cat \$\\"$'\n'"'$main/docs/a.md' >> .tmp/j" "$refusal"
 
 # --- a read-only arm on the gate binary or the front end is admitted over the main checkout, in either
 #     spelling of the arm; an arm outside the read-only set is refused

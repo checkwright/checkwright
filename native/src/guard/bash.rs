@@ -658,11 +658,31 @@ pub fn dequoted(raw: &str) -> Option<String> {
 }
 
 // spec: guard-kit/SPEC.md §The reader and its views — a `$`-quoted word: a quote behind an odd run of
-// bare `$`, less an escaped first `$`, since `$$` is the shell's pid.
+// bare `$`, less an escaped first `$`, since `$$` is the shell's pid. A continuation is removed before
+// bash reads the word, so the run is counted across one.
 fn dollar_quote(b: &[u8], i: usize) -> bool {
-    let run = b[..i].iter().rev().take_while(|&&c| c == b'$').count();
-    let live = if run > 0 && escaped(b, i - run) { run - 1 } else { run };
+    let (mut at, mut run) = (i, 0usize);
+    loop {
+        while at >= 2 && b[at - 1] == b'\n' && b[at - 2] == b'\\' && !escaped(b, at - 2) {
+            at -= 2;
+        }
+        if at == 0 || b[at - 1] != b'$' {
+            break;
+        }
+        run += 1;
+        at -= 1;
+    }
+    let live = if run > 0 && escaped(b, at) { run - 1 } else { run };
     live % 2 == 1
+}
+
+// spec: guard-kit/SPEC.md §The reader and its views — the first byte at or after `i` that no
+// continuation removes.
+fn past_continuations(b: &[u8], mut i: usize) -> usize {
+    while b.get(i) == Some(&b'\\') && b.get(i + 1) == Some(&b'\n') {
+        i += 2;
+    }
+    i
 }
 
 // spec: guard-kit/SPEC.md §The reader and its views — where bash ends an ANSI-C span: the first quote
@@ -803,15 +823,16 @@ pub fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
                 }
                 i += 2;
             }
-            b'$' if b.get(i + 1) == Some(&b'\'') && dollar_quote(b, i + 1) => {
-                let k = ansi_c_close(&b[i + 2..])?;
-                let content = &b[i + 2..i + 2 + k];
+            b'$' if b.get(past_continuations(b, i + 1)) == Some(&b'\'') && dollar_quote(b, past_continuations(b, i + 1)) => {
+                let q = past_continuations(b, i + 1);
+                let k = ansi_c_close(&b[q + 1..])?;
+                let content = &b[q + 1..q + 1 + k];
                 if content.contains(&b'\n') {
                     return None;
                 }
                 let live = format!("${SQ_MARK}");
-                acc.ansi_c_piece(&b[i..i + k + 3], &ansi_c(content)?, live.as_bytes());
-                i += k + 3;
+                acc.ansi_c_piece(&b[i..q + k + 2], &ansi_c(content)?, live.as_bytes());
+                i = q + k + 2;
             }
             b'\'' => {
                 let k = b[i + 1..].iter().position(|&c| c == b'\'')?;
@@ -977,6 +998,20 @@ mod tests {
         assert_eq!(dequoted("grep $'it\\'s' f").as_deref(), Some("grep $it\\'s f"));
         assert_eq!(faces("grep $'it\\'s' f")[0][1], face("$'it\\'s'", "it's", &format!("${SQ_MARK}")));
         assert_eq!(word_read("echo $'\\' ; rm x"), None);
+    }
+
+    // spec: guard-kit/SPEC.md §The reader and its views — a continuation is removed before bash reads
+    // the word, so one between a `$` and its quote, or inside a `$` run, opens the span as the joined
+    // spelling does
+    #[test]
+    fn a_continuation_inside_a_dollar_quote_is_joined_first() {
+        let s = |c: &str| skeleton(c, SQDQ);
+        assert_eq!(s("ls $\\\n'\\'' ; rm x"), format!("ls $\\\n{SQ_MARK} ; rm x"));
+        assert_eq!(s("ls $\\\n\\\n'\\'' ; rm x"), format!("ls $\\\n\\\n{SQ_MARK} ; rm x"));
+        assert_eq!(s("ls $\\\n$'\\' ; rm x"), format!("ls $\\\n${SQ_MARK} ; rm x"));
+        assert_eq!(s("ls $\\\\\n'\\' ; rm x"), format!("ls $\\\\\n{SQ_MARK} ; rm x"));
+        assert_eq!(faces("grep $\\\n'it\\'s' f")[0][1], face("$\\\n'it\\'s'", "it's", &format!("${SQ_MARK}")));
+        assert_eq!(faces("grep $\\\n$'x' f")[0][1], face("$$'x'", "$$x", &format!("$${SQ_MARK}")));
     }
 
     // spec: guard-kit/SPEC.md §The reader and its views — command text that spells a placeholder's
