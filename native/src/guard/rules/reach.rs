@@ -8,7 +8,7 @@ use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Shell, Verdict};
 use crate::guard::host::under;
 use crate::guard::powershell;
 use crate::guard::reader::View::{SqDqHd, SqHdq};
-use crate::guard::reader::Word;
+use crate::guard::reader::{Word, DQ_MARK, SQ_MARK};
 use crate::guard::text::{self, grep_q, head_word, trim_start, unsentinel, words};
 use crate::walk;
 
@@ -945,16 +945,68 @@ pub fn shell_wrapper(ctx: &Ctx) -> Decided {
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `worktree_confinement`'s test as a predicate,
-// taken under that rule's own declared views; from a linked worktree it also refuses a call carrying
-// an ANSI-C quoted word, whose value its dequoted path-word read does not hold.
+// under that rule's own views; from a linked worktree it also refuses an ANSI-C quoted word and,
+// where the word read answers nothing, a quoted span behind a `$`.
 pub fn refused(ctx: &Ctx, c: &Cmd) -> Result<bool, Fault> {
     ctx.under("worktree_confinement", |w| {
-        let linked = !w.host().roots().main.is_empty() && w.shell() == Shell::Bash;
-        if linked && w.word_read(c)?.is_some_and(|r| r.iter().flatten().any(Word::ansi_c)) {
-            return Ok(true);
+        if !w.host().roots().main.is_empty() && w.shell() == Shell::Bash {
+            let carries = match w.word_read(c)? {
+                Some(r) => r.iter().flatten().any(Word::ansi_c),
+                None => {
+                    let s = w.view(c, SqDqHd)?;
+                    [SQ_MARK, DQ_MARK].iter().any(|m| s.contains(&format!("${m}")))
+                }
+            };
+            if carries {
+                return Ok(true);
+            }
         }
         Ok(worktree_refuses(w, c)?.is_some())
     })
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — rule `worktree_confinement`'s path-word candidates: under
+// bash each word's value off the word read, a redirect operator standing bare at its head cut away;
+// elsewhere, or where the read answers nothing, the dequoted view's words or the skeleton's.
+fn path_candidates(ctx: &Ctx, c: &Cmd, ps: bool, s: &str) -> Result<Vec<String>, Fault> {
+    if !ps {
+        if let Some(read) = ctx.word_read(c)? {
+            return Ok(read
+                .iter()
+                .flatten()
+                .map(|w| {
+                    let cut = redirect_head(&w.live);
+                    w.value_after(cut).unwrap_or(&w.value).to_string()
+                })
+                .collect());
+        }
+    }
+    let v = ctx.dequoted(c)?.unwrap_or_else(|| s.to_string());
+    Ok(v.split('\n')
+        .flat_map(words)
+        .map(|w| {
+            let mut w = unsentinel(w);
+            if ps {
+                w = w.replace('\\', "/");
+                if w.starts_with("*>") {
+                    w.remove(0);
+                }
+            }
+            let cut = redirect_head(&w);
+            w[cut..].to_string()
+        })
+        .collect())
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — the length of a redirect operator, with its descriptor
+// digits, heading a word; zero where none does.
+fn redirect_head(w: &str) -> usize {
+    let digits = w.bytes().take_while(u8::is_ascii_digit).count();
+    let after = &w[digits..];
+    match [">>", ">&", "&>", ">", "<"].iter().find(|o| after.starts_with(*o)) {
+        Some(op) => digits + op.len(),
+        None => 0,
+    }
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `worktree_confinement`'s test: from a linked
@@ -976,39 +1028,23 @@ pub fn worktree_refuses(ctx: &Ctx, c: &Cmd) -> Result<Option<(String, String)>, 
         return Ok(None);
     }
     let s = ctx.view(c, SqDqHd)?;
-    let v = ctx.dequoted(c)?.unwrap_or_else(|| s.clone());
     let mut found: Option<(String, String)> = None;
-    'lines: for line in v.split('\n') {
-        for w in words(line) {
-            let mut w = unsentinel(w);
-            if ps {
-                w = w.replace('\\', "/");
-                if w.starts_with("*>") {
-                    w.remove(0);
-                }
-            }
-            let digits = w.bytes().take_while(u8::is_ascii_digit).count();
-            let after = &w[digits..];
-            let op = [">>", ">&", "&>", ">", "<"].iter().find(|o| after.starts_with(*o));
-            if let Some(op) = op {
-                w = after[op.len()..].to_string();
-            }
-            if w.starts_with("--") && w.len() > 3 && w.as_bytes()[3..].contains(&b'=') {
-                w = w.split_once('=').map_or(w.clone(), |(_, r)| r.to_string());
-            }
-            if walk::path_root(&w).is_none() {
-                let dotdot = w == ".." || w.starts_with("../") || w.ends_with("/..") || w.contains("/../");
-                if !dotdot {
-                    continue;
-                }
-            }
-            let t = h.lexical(&w);
-            if !h.in_main(&t) || h.in_scratch(&t) {
+    for mut w in path_candidates(ctx, c, ps, &s)? {
+        if w.starts_with("--") && w.len() > 3 && w.as_bytes()[3..].contains(&b'=') {
+            w = w.split_once('=').map_or(w.clone(), |(_, r)| r.to_string());
+        }
+        if walk::path_root(&w).is_none() {
+            let dotdot = w == ".." || w.starts_with("../") || w.ends_with("/..") || w.contains("/../");
+            if !dotdot {
                 continue;
             }
-            found = Some((w, t));
-            break 'lines;
         }
+        let t = h.lexical(&w);
+        if !h.in_main(&t) || h.in_scratch(&t) {
+            continue;
+        }
+        found = Some((w, t));
+        break;
     }
     let Some(hit) = found else { return Ok(None) };
     if !ps && worktree_admitted(ctx, c, &s)? {

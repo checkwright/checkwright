@@ -28,16 +28,6 @@ kit prose states one harness's permission-rule grammar as the kit's: guard-kit's
 
 ## Technical Debt
 
-### worktree-ansi-c-path-word
-
-rule `worktree_confinement` reads its path words off the dequoted view, which holds an ANSI-C quoted word unresolved behind its `$`. From a linked worktree, `rm $'<main>/README.md'` and `touch $'\x2e\x2e/<main>/x'` fall through where the plain spellings block. Under `GUARD_KIT_WORKTREE_READS=off`, `cat $'<main>/README.md\cA' >> .tmp/j.md`, a span the word read refuses, is granted by rule `append_scratch` where the plain spelling blocks: a wrong grant predating the ANSI-C word read, whose guard-word-read-reach-pass hotfix refuses a grant only on a call carrying a word the read resolved. guard-kit/SPEC.md states that refusal unconditionally in §The reader and its views and in the rule's roster entry, so the code is the defect and the contract stands.
-
-**Deliverable:** the rule reads its path words by value off the word read, and a call carrying a span the read refuses takes no grant, with firing rows run from a linked worktree. It moves verdicts from fall-through to block and from allow to fall-through, so it lands in a build.
-
-**The block half is debt (operator direction 2026-10-19, lead-relayed, not a ruling):** the same build commit rewrites §The rule roster's declared limit that no path word is read off an ANSI-C quoted word. Re-verified at guard-ansi-c-bar-pass' scope: v0.31.0 grants the `\cA` append too, so the wrong grant predates it.
-
-**Cost while deferred:** one wrong grant of a contrived main-checkout read appended into scratch from an isolated session, and a confinement block left to a permission decision. Filed 2026-10-19 by guard-word-read-reach-pass' close, draining two bullets its lead filed from the post-validate hotfix. Re-verified there: all three pairs from a scratch repository's linked worktree on the built binary. Owner lookup: `worktree_confinement`, `append_scratch`, `ANSI-C` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The rule roster.
-
 ### escaped-amp-statement-split
 
 rule `background_no_record` blocks a foreground read whose `&` is escaped: `grep -c x\&y README.md`, one pattern word to bash, blocks as if it backgrounded a child, while `grep -c x README.md` is allowed. The statement splitter (`statement_amp` in `native/src/guard/text.rs`) ignores escaping, a regression from guard-word-read-reach-pass' glued-ampersand hotfix. Found by that iteration's validate second-vendor review (its P2); held filed with no hotfix by operator direction 2026-10-19, lead-relayed, not a ruling.
@@ -176,7 +166,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Three grants of 2026-10-18 spent:** session-sweep-policy-pass' close review returned five P2 findings, fixed there; harness-reach-pass' validate review three verdict-moving ones, two wrong grants, landed at guard-grant-kpi-pass as `ro-pipeline-wrong-grants` and `pwsh-string-expr-overblock`; guard-grant-kpi-pass' close review three, one a wrong grant since fixed. Each left v0.32.0 deferred.
 
-**One grant of 2026-10-19 spent:** guard-word-read-reach-pass' validate review returned a wrong grant, hotfixed, and a wrong block, promoted as [escaped-amp-statement-split](#escaped-amp-statement-split); its close deferred v0.32.0, the bar also meeting the open wrong grant in [worktree-ansi-c-path-word](#worktree-ansi-c-path-word).
+**One grant of 2026-10-19 spent:** guard-word-read-reach-pass' validate review returned a wrong grant, hotfixed, and a wrong block, promoted as [escaped-amp-statement-split](#escaped-amp-statement-split); its close deferred v0.32.0, the bar also meeting the open wrong grant in `worktree-ansi-c-path-word`.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
@@ -1021,4 +1011,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 ## Done
 
 - skeleton-ansi-c-escaped-quote
+- worktree-ansi-c-path-word
 
