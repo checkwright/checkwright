@@ -18,6 +18,16 @@
 
 ## New Features
 
+### lead-role-marker-guard-refused
+
+[spec: SPEC-lead-role-marker.md]
+
+lifecycle-kit/templates/lead.md's first step prescribes a session-role command built on command substitution and parameter expansion, and this repo's `--hook shell-guard` refuses it outright under its expansion rule, so every lead hand-inlines the binary path and its session id, or skips the suppression. The template and the guard disagree; a literal-path spelling is no fix for adopters, whose binary path differs by install.
+
+**Deliverable:** design-pending, a feature spanning lifecycle-kit and context-kit (§The session-context hook names `/lead`'s first step as the marker's producer): an arm that writes the marker itself, so the lead's step is one literal command. Scope's lean: `--enter-stage --open-lead-journal`, the lead's next step already, writes it, adding no name; a separate arm is the alternative.
+
+**Cost while deferred:** each lead session spends a refused command and a hand-built one, or runs unsuppressed. Filed 2026-10-19 by guard-reader-value-bar-pass' lead after its close; promoted at the next scope's carried-bullet intake. Re-verified there: the template's command, fed to the built hook, exits 2 on the expansion rule. Owner lookup: `session-role`, `guard-verdict` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §templates/lead.md, with context-kit/SPEC.md §The session-context hook.
+
 ## Technical Debt
 
 ### bounded-write-backslash-grant
@@ -285,16 +295,6 @@ Cursor and Muse Code are installed on no build machine, so plugin/SPEC.md §The 
 **Deliverable:** install and run each on a machine that has it, turn its cells from read to run, and file any wiring defect.
 
 **Cost while deferred:** two tier-2 harnesses' skill load and guard reach rest on vendor docs. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: neither CLI on the build machine's PATH. Owner lookup: `cursor`, `muse` in this file, none; owner plugin/SPEC.md §The harnesses.
-
-### lead-role-marker-guard-refused
-
-[cost: iteration/low] [surface: lifecycle-kit]
-
-lifecycle-kit/templates/lead.md's first step prescribes a session-role command built on command substitution and parameter expansion, and this repo's `--hook shell-guard` refuses it outright under its expansion rule, so every lead hand-inlines the binary path and its session id, or skips the suppression. The template and the guard disagree; a literal-path spelling is no fix for adopters, whose binary path differs by install.
-
-**Deliverable:** design-pending, a feature spanning lifecycle-kit and context-kit (§The session-context hook names `/lead`'s first step as the marker's producer): an arm that writes the marker itself, so the lead's step is one literal command. Scope's lean: `--enter-stage --open-lead-journal`, the lead's next step already, writes it, adding no name; a separate arm is the alternative.
-
-**Cost while deferred:** each lead session spends a refused command and a hand-built one, or runs unsuppressed. Filed 2026-10-19 by guard-reader-value-bar-pass' lead after its close; promoted at the next scope's carried-bullet intake. Re-verified there: the template's command, fed to the built hook, exits 2 on the expansion rule. Owner lookup: `session-role`, `guard-verdict` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §templates/lead.md, with context-kit/SPEC.md §The session-context hook.
 
 ### guard-verdict-typed-operand
 
