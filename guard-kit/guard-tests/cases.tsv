@@ -418,6 +418,14 @@ block	grep -rn foo src >&@CR@2 &
 allow	grep -c x\&y tracked.md
 allow	grep -c 'x&y' tracked.md
 block	grep -c x\\&y tracked.md
+# an escaped '|', '>', '<' or '&' is a character of its word too, so a bare '&' behind one ends
+# its statement and the operator it would have formed is none
+block	wc -l tracked.md\|&touch tracked.md
+block	wc -l tracked.md\>&touch tracked.md
+block	wc -l tracked.md\<&touch tracked.md
+block	wc -l tracked.md\&&touch tracked.md
+allow	wc -l tracked.md\|touch tracked.md
+allow	grep -c x tracked.md\\|& head
 # '|&' pipes stderr too and backgrounds nothing
 fallthrough	make build |& tail -5
 

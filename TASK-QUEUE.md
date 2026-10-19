@@ -26,14 +26,6 @@ the harness's published permissions page lists a lone `&` among its recognized c
 
 **Cost while deferred:** none in the grant direction, since the guard reads a segment carrying a lone `&` as ungranted; at worst a grant withheld. Filed 2026-10-19 by guard-ansi-c-bar-pass' close, draining its spec session's bullet. Re-verified there: the docs page's separator list. Inferred, not run: the harness's current split. Owner lookup: `lone`, `separator`, `measured` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The reader and its views.
 
-### escaped-pipe-amp-wrong-grant
-
-`wc -l README.md\|&touch README.md` auto-allows as a read-only search pipeline, though bash reads `\|` as a word character, ends the statement at the glued `&` and runs `touch`. `statement_amp` in `native/src/guard/text.rs` excludes an `&` behind a `|` without testing whether that `|` is itself escaped; the control `wc -l README.md\|touch README.md` is one `wc` and allowed correctly.
-
-**Deliverable:** the exclusion takes only an unescaped `|`, with a firing row in `guard-kit/guard-tests/`. It moves allow to block, so it lands in a build.
-
-**Cost while deferred:** a wrong grant of one contrived spelling; it blocks the v0.32.0 bar. Filed 2026-10-19 by guard-ansi-c-bar-pass' close, draining the validate second-vendor review's bullet. Re-verified there: allowed on the built binary at the close stamp's head. The exclusion was born in the prior iteration's hotfix and is absent at v0.31.0; whether v0.31.0 allowed the call is inferred, not run. Owner lookup: `statement_amp`, `escaped pipe`, `ampersand` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The reader and its views.
-
 ### ansi-c-continuation-grant
 
 a backslash-newline between `$` and the opening quote is removed by bash, so `printf $`, backslash, newline, `'\'' ; touch README.md ; printf '' >> .tmp/j` is one ANSI-C word ending after `touch`'s statement; the skeleton tests the quote's raw predecessor, reads a plain single-quoted span, hides the `touch` and auto-allows the call as a scratch write. The bare `printf $'\''` spelling is refused.
@@ -170,7 +162,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Three grants of 2026-10-18 spent:** session-sweep-policy-pass' close review returned five P2 findings, fixed there; harness-reach-pass' validate review three verdict-moving ones, two wrong grants, landed at guard-grant-kpi-pass as `ro-pipeline-wrong-grants` and `pwsh-string-expr-overblock`; guard-grant-kpi-pass' close review three, one a wrong grant since fixed. Each left v0.32.0 deferred.
 
-**Two grants of 2026-10-19 spent:** guard-word-read-reach-pass' validate review returned a wrong grant, hotfixed, and a wrong block, `escaped-amp-statement-split`; guard-ansi-c-bar-pass' two wrong grants, [escaped-pipe-amp-wrong-grant](#escaped-pipe-amp-wrong-grant) and [ansi-c-continuation-grant](#ansi-c-continuation-grant). Each close deferred v0.32.0.
+**Two grants of 2026-10-19 spent:** guard-word-read-reach-pass' validate review returned a wrong grant, hotfixed, and a wrong block, `escaped-amp-statement-split`; guard-ansi-c-bar-pass' two wrong grants, `escaped-pipe-amp-wrong-grant` and [ansi-c-continuation-grant](#ansi-c-continuation-grant). Each close deferred v0.32.0.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
@@ -1013,4 +1005,6 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
+
+- escaped-pipe-amp-wrong-grant
 

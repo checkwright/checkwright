@@ -1266,7 +1266,7 @@ mod tests {
             }
             let row = cell.replace("@ROOT@", "/tmp/sandbox").replace("@CR@", "\r");
             let Some(base) = word_read(&row) else {
-                assert!(row.contains("$'"), "{:?} was not read", row);
+                assert!(row.contains("$'") || row.contains("\\&&"), "{:?} was not read", row);
                 continue;
             };
             for (opener, lines, spelling) in heredocs {

@@ -87,12 +87,13 @@ pub fn chomp(s: &str) -> &str {
 
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `background_no_record`'s statement-ending bare
 // `&` at byte `i`: no part of `&&`, `&>`, `>&`, `<&` or `|&`, whatever follows it, and not behind an
-// odd backslash run.
+// odd backslash run. An escaped predecessor is a character of its word and forms no operator.
 pub fn statement_amp(b: &[u8], i: usize) -> bool {
+    let escaped = |at: usize| b[..at].iter().rev().take_while(|&&c| c == b'\\').count() % 2 == 1;
     b[i] == b'&'
-        && (i == 0 || !matches!(b[i - 1], b'&' | b'>' | b'<' | b'|'))
+        && (i == 0 || !matches!(b[i - 1], b'&' | b'>' | b'<' | b'|') || escaped(i - 1))
         && !matches!(b.get(i + 1), Some(b'&' | b'>'))
-        && b[..i].iter().rev().take_while(|&&c| c == b'\\').count() % 2 == 0
+        && !escaped(i)
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — `read -ra words <<<"$s"`: the first line only, split
@@ -166,6 +167,15 @@ mod tests {
         assert_eq!(head_word("git\tlog"), "git");
         assert_eq!(chomp("a\n\n"), "a");
         assert_eq!(trim("  a b \n"), "a b");
+    }
+
+    #[test]
+    fn an_escaped_predecessor_forms_no_operator_with_a_bare_amp() {
+        let at = |s: &str| (0..s.len()).filter(|&i| statement_amp(s.as_bytes(), i)).collect::<Vec<_>>();
+        assert_eq!(at("a|&b a>&b a<&b a&&b a&>b"), Vec::<usize>::new());
+        assert_eq!(at("a\\|&b"), vec![3]);
+        assert_eq!(at("a\\>&b a\\<&b a\\&&b"), vec![3, 9, 15]);
+        assert_eq!(at("a\\\\|&b a\\&b"), Vec::<usize>::new());
     }
 
     #[test]
