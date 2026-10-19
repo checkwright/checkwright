@@ -41,7 +41,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
 2. Wire the hooks — merge `templates/settings-hooks.json` into your harness settings file, `GUARD_KIT_SETTINGS` (the `shell-guard` on `PreToolUse(Bash|PowerShell)`; the optional `wakeup-guard` on `ScheduleWakeup|CronCreate`; and an optional third block showing the path-shaped shape a consumer kit's own guard registers under — lifecycle-kit's `workflow-state-guard` is the shipped instance). <!-- harness-binding: a wiring instruction an adopter pastes -->
 
-   Then review `templates/settings-allow.json` against [guard-kit/SPEC.md §The recommended allowlist](SPEC.md#the-recommended-allowlist), and union the entries you accept into that file's `permissions.allow`.
+   Then review `templates/settings-allow.json` against [guard-kit/SPEC.md §The recommended allowlist](SPEC.md#the-recommended-allowlist), and union the entries you accept into that file's `permissions.allow`. <!-- harness-binding: a wiring instruction an adopter pastes -->
 
 3. Gitignore the two scratch logs (`.workflow/prompt-friction.log`, `.workflow/wakeup-attempts.log`) and their drain companions (`.workflow/*.drain`, `.workflow/*.drain.part`) — both logs are per-iteration, drained at close.
 

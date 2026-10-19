@@ -6,7 +6,7 @@
 
   **Set record**
 
-  **The set (operator direction 2026-10-19, lead-relayed, not a ruling; the iteration opened undirected):** option C over the recommended A. The debt `skeleton-ansi-c-escaped-quote`, `worktree-ansi-c-path-word`, `escaped-amp-statement-split` and `path-slot-ansi-c-dollar`, promoted by scope; the feature [permission-grammar-neutral](#permission-grammar-neutral), which spec authors and promotes, its grammar cited to gate-sdk/SPEC.md §The hook contract's binding table. Stages scope, spec, align, build, validate and close, the second component and the audit walk accepted with the set. The two v0.32.0 bar blockers are `worktree-ansi-c-path-word` (a wrong grant) and `escaped-amp-statement-split` (a regression from v0.31.0). Composition: bundled — the four guard-kit debt entries share the shell-guard word read and skeleton, the feature guard-kit's rule roster prose; drain 5 against inflow 3.6. Supersession: `path-slot-ansi-c-dollar` — reshaped by `skeleton-ansi-c-escaped-quote`; `worktree-ansi-c-path-word` — reshaped by `skeleton-ansi-c-escaped-quote`, the skeleton's span end moving the word read's odd-backslash refusal both read, so the skeleton lands first.
+  **The set (operator direction 2026-10-19, lead-relayed, not a ruling; the iteration opened undirected):** option C over the recommended A. The debt `skeleton-ansi-c-escaped-quote`, `worktree-ansi-c-path-word`, `escaped-amp-statement-split` and `path-slot-ansi-c-dollar`, promoted by scope; the feature `permission-grammar-neutral`, which spec authors and promotes, its grammar cited to gate-sdk/SPEC.md §The hook contract's binding table. Stages scope, spec, align, build, validate and close, the second component and the audit walk accepted with the set. The two v0.32.0 bar blockers are `worktree-ansi-c-path-word` (a wrong grant) and `escaped-amp-statement-split` (a regression from v0.31.0). Composition: bundled — the four guard-kit debt entries share the shell-guard word read and skeleton, the feature guard-kit's rule roster prose; drain 5 against inflow 3.6. Supersession: `path-slot-ansi-c-dollar` — reshaped by `skeleton-ansi-c-escaped-quote`; `worktree-ansi-c-path-word` — reshaped by `skeleton-ansi-c-escaped-quote`, the skeleton's span end moving the word read's odd-backslash refusal both read, so the skeleton lands first.
 
   **Release review (operator grant 2026-10-19, lead-relayed, unspent):** one second-vendor review over the iteration's range, run at validate; close cuts v0.32.0 on a clean return, against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed).
 
@@ -15,16 +15,6 @@
 ---
 
 ## New Features
-
-### permission-grammar-neutral
-
-[spec: SPEC-permission-grammar.md]
-
-kit prose states one harness's permission-rule grammar as the kit's: guard-kit's `Bash(...)` allow patterns, the matcher's wrapper strip and the `:*` idiom are Claude Code's settings grammar. Left out of `hook-contract-harness-neutral`'s binding table at its spec.
-
-**Deliverable:** the grammar named as a binding's spelling, cited to the binding table, or a refusal recorded.
-
-**Cost while deferred:** an adopter on another harness reads the allowlist sections as one vendor's settings format. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: 22 `Bash(` lines in guard-kit/SPEC.md, one each in gate-sdk and context-kit. Owner lookup: `permission-rule grammar`, `Bash(` in this file, none; owner guard-kit/SPEC.md §The recommended allowlist.
 
 ## Technical Debt
 
@@ -996,4 +986,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - worktree-ansi-c-path-word
 - path-slot-ansi-c-dollar
 - escaped-amp-statement-split
+- permission-grammar-neutral
 
