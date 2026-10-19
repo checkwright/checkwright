@@ -40,14 +40,6 @@ lifecycle-kit/templates/lead.md's first step prescribes a session-role command b
 
 ## Technical Debt
 
-### bounded-write-backslash-grant
-
-rule `bounded_write` auto-allows `touch '\.tmp/a'`, `touch "\.tmp/a"`, `touch $'\\.tmp/a'`, `printf x > '\.tmp/a'` and `mkdir -p '\.tmp/x'` as a bounded scratch write, though bash's value for each word keeps the backslash, so the path sits under a directory named `\.tmp` outside the scratch dir. The `mkdir -p` grant creates that directory itself; a bare `mkdir '\.tmp'` falls through.
-
-**Deliverable:** the bounds test reads the word's value, a kept backslash included, with firing rows for the single-quoted, double-quoted and ANSI-C spellings in `guard-kit/guard-tests/`. It moves allow to fall-through, so it lands in a build.
-
-**Cost while deferred:** a wrong grant of contrived spellings; it blocks the v0.32.0 bar. Filed 2026-10-19 by guard-reader-value-bar-pass' close, draining validate's bullet from the failed second-vendor review's trace; promoted for the next iteration by operator direction 2026-10-19, lead-relayed, not a ruling. Re-verified there: all five allowed on the built binary at the close stamp's head. At v0.31.0, built from its tag, the `touch` spellings fall through and the `printf` redirect is refused, the rule landing after that tag, so the grant is unreleased rather than pre-existing. Corrected at the next scope: the bounds test compares path components literally (`bounded` in `native/src/guard/rules/grants.rs`), so the backslash is lost before it, in the target's value or its skeleton fallback; two spellings re-verified allowed. Owner lookup: `backslash`, `bounded write`, `scratch-write`, `in-scratch` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The rule roster, rule `bounded_write`.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -166,7 +158,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Two grants of 2026-10-17 spent:** competitive-followup-pass' validate and close reviews each returned five findings, so v0.32.0 stayed deferred. That close withdrew `prove` from docs/install.md and docs/maintenance.md and the overlap section from docs/openspec.md, its line held in `companion/fixtures/openspec/overlap/line.md`; **the cut restores them** and deletes the held file.
 
-**Three grants of 2026-10-19 spent:** guard-word-read-reach-pass' validate review returned a wrong grant, hotfixed, and a wrong block, `escaped-amp-statement-split`; guard-ansi-c-bar-pass' two wrong grants, `escaped-pipe-amp-wrong-grant` and `ansi-c-continuation-grant`, landed at guard-reader-value-bar-pass; that iteration's validate run failed, the vendor refusing the content as a cybersecurity flag and returning no report, and its trace's wrong grant is [bounded-write-backslash-grant](#bounded-write-backslash-grant). Each close deferred v0.32.0, the last by a direction of 2026-10-19 (lead-relayed, not a ruling): closing push only, no tag, no publish and no second run, the bar unchanged.
+**Three grants of 2026-10-19 spent:** guard-word-read-reach-pass' validate review returned a wrong grant, hotfixed, and a wrong block, `escaped-amp-statement-split`; guard-ansi-c-bar-pass' two wrong grants, `escaped-pipe-amp-wrong-grant` and `ansi-c-continuation-grant`, landed at guard-reader-value-bar-pass; that iteration's validate run failed, the vendor refusing the content as a cybersecurity flag and returning no report, and its trace's wrong grant is `bounded-write-backslash-grant`. Each close deferred v0.32.0, the last by a direction of 2026-10-19 (lead-relayed, not a ruling): closing push only, no tag, no publish and no second run, the bar unchanged.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
@@ -992,4 +984,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 - hook-binding-single-source
 - guard-verdict-typed-operand
+- bounded-write-backslash-grant
 

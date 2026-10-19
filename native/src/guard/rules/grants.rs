@@ -11,7 +11,7 @@ use crate::guard::allow_match;
 use crate::guard::engine::{Cmd, Ctx, Decided, Fault, Verdict};
 use crate::guard::host::{self, Host};
 use crate::guard::reader::View::{Hdq, SqDqHd, SqHdq};
-use crate::guard::reader::HD_MARK;
+use crate::guard::reader::{Word, HD_MARK};
 use crate::guard::text::{self, grep_q, head_word, trim, trim_start, unsentinel, words};
 use crate::walk;
 
@@ -317,39 +317,50 @@ fn redirect_op(w: &str) -> Result<Option<(usize, Redir)>, ()> {
 
 // spec: guard-kit/SPEC.md §The generic ruleset — one segment read as rule `grant_path_slot` reads
 // it: its command words and its output redirect targets, dequoted with backslashes removed.
-fn write_words(sw: &str, dw: &str) -> Option<(Vec<String>, Vec<String>)> {
+fn write_words(sw: &str, dw: &str, read: Option<&[Word]>) -> Option<(Vec<String>, Vec<String>)> {
     let (s, d) = (text::held_words(sw), words(dw));
     if s.len() != d.len() {
         return None;
     }
-    let clean = |w: &str| unsentinel(&w.replace('\\', ""));
+    // spec: guard-kit/SPEC.md §The rule roster — rule `bounded_write` reads each word by its value,
+    // a backslash its quoting kept included; without a word read paired one for one, a word whose
+    // backslash cannot be told kept from consumed is no value
+    let read = read.filter(|r| r.len() == s.len());
+    let value = |k: usize, n: usize| -> Option<String> {
+        match read {
+            Some(r) => r[k].value_after(n).map(String::from),
+            None if d[k][n..].contains('\\') => None,
+            None => Some(unsentinel(&d[k][n..])),
+        }
+    };
     let (mut cmd, mut out) = (Vec::new(), Vec::new());
     let mut k = 0usize;
     while k < s.len() {
         let Some((n, kind)) = redirect_op(s[k]).ok()? else {
-            cmd.push(clean(d[k]));
+            cmd.push(value(k, 0)?);
             k += 1;
             continue;
         };
         if !d[k].starts_with(&s[k][..n]) {
             return None;
         }
-        let (held, tgt) = if s[k].len() > n {
-            (&s[k][n..], &d[k][n..])
+        let (held, at, skip) = if s[k].len() > n {
+            (&s[k][n..], k, n)
         } else {
             k += 1;
-            (*s.get(k)?, *d.get(k)?)
+            (*s.get(k)?, k, 0)
         };
         if held.contains(['<', '>', '&']) {
             return None;
         }
         k += 1;
+        let tgt = value(at, skip)?;
         match kind {
             Redir::In => {}
             Redir::Dup if tgt == "-" || (!tgt.is_empty() && tgt.bytes().all(|b| b.is_ascii_digit())) => {}
             Redir::Dup => return None,
-            Redir::Out if inert_value(&clean(tgt)) => {}
-            Redir::Out => out.push(clean(tgt)),
+            Redir::Out if inert_value(&tgt) => {}
+            Redir::Out => out.push(tgt),
         }
     }
     Some((cmd, out))
@@ -544,13 +555,14 @@ pub fn bounded_write(ctx: &Ctx) -> Decided {
         return Ok(None);
     }
     let inners = h.allow_inners();
+    let read = ctx.word_read(ctx.cmd())?.filter(|r| r.len() == segs.len());
     let (mut writes, mut skip) = (0usize, Vec::new());
     for (i, (seg, dseg)) in segs.iter().zip(&dsegs).enumerate() {
         let seg = trim_start(seg);
         if seg.is_empty() {
             continue;
         }
-        let Some((ws, outs)) = write_words(seg, dseg) else { return Ok(None) };
+        let Some((ws, outs)) = write_words(seg, dseg, read.as_ref().map(|r| r[i].as_slice())) else { return Ok(None) };
         if !outs.iter().all(|t| bounded(h, t, false)) {
             return Ok(None);
         }
@@ -911,6 +923,7 @@ fn shown(t: &str) -> String {
 
 #[cfg(test)]
 mod tests {
+    use super::super::plain_word;
     use super::*;
     use crate::guard::reader::Word;
 
@@ -991,22 +1004,39 @@ mod tests {
     // spec: guard-kit/SPEC.md §The generic ruleset — a segment's words and its output targets
     #[test]
     fn the_redirects_split_from_the_words_and_an_unread_one_withholds() {
-        let (w, o) = write_words("git status > .tmp/s 2>&1", "git status > .tmp/s 2>&1").unwrap();
+        let (w, o) = write_words("git status > .tmp/s 2>&1", "git status > .tmp/s 2>&1", None).unwrap();
         assert_eq!((w, o), (strings(&["git", "status"]), strings(&[".tmp/s"])));
-        let (_, o) = write_words("grep x a >/dev/null <in", "grep x a >/dev/null <in").unwrap();
+        let (_, o) = write_words("grep x a >/dev/null <in", "grep x a >/dev/null <in", None).unwrap();
         assert!(o.is_empty());
-        assert_eq!(write_words("echo x>.tmp/f", "echo x>.tmp/f"), None);
-        assert_eq!(write_words("ls >&out", "ls >&out"), None);
-        assert_eq!(write_words("cat <<EOF", "cat <<EOF"), None);
+        assert_eq!(write_words("echo x>.tmp/f", "echo x>.tmp/f", None), None);
+        assert_eq!(write_words("ls >&out", "ls >&out", None), None);
+        assert_eq!(write_words("cat <<EOF", "cat <<EOF", None), None);
         for glued in ["echo x >> .tmp/a>f", "echo x >.tmp/a>>f", "echo x > .tmp/a2>f", "echo x >.tmp/a&>f", "ls >.tmp/a<f"] {
-            assert_eq!(write_words(glued, glued), None, "{}", glued);
+            assert_eq!(write_words(glued, glued, None), None, "{}", glued);
         }
-        let (_, o) = write_words("ls &>>.tmp/a", "ls &>>.tmp/a").unwrap();
+        let (_, o) = write_words("ls &>>.tmp/a", "ls &>>.tmp/a", None).unwrap();
         assert_eq!(o, strings(&[".tmp/a"]));
-        let (w, o) = write_words("touch .tmp/a\\ b", "touch .tmp/a\\\x01b").unwrap();
-        assert_eq!((w, o), (strings(&["touch", ".tmp/a b"]), vec![]));
-        let (_, o) = write_words("ls > .tmp/a\\ b", "ls > .tmp/a\\\x01b").unwrap();
-        assert_eq!(o, strings(&[".tmp/a b"]));
+    }
+
+    // spec: guard-kit/SPEC.md §The rule roster — rule `bounded_write` reads each word by its value: a
+    // backslash a quote keeps stays, one an unquoted word consumes goes, and without a paired word
+    // read a word carrying one withholds
+    #[test]
+    fn a_word_is_read_by_its_value_and_a_kept_backslash_stays() {
+        let kept = || Word::new("'\\.tmp/a'", "\\.tmp/a", "\0SQ");
+        let read = [plain_word("touch"), kept()];
+        assert_eq!(
+            write_words("touch \0SQ", "touch \\.tmp/a", Some(&read)),
+            Some((strings(&["touch", "\\.tmp/a"]), vec![]))
+        );
+        let read = [plain_word("printf"), plain_word("x"), plain_word(">"), kept()];
+        assert_eq!(write_words("printf x > \0SQ", "printf x > \\.tmp/a", Some(&read)).map(|p| p.1), Some(strings(&["\\.tmp/a"])));
+        let consumed = [plain_word("touch"), Word::new("\\.tmp/a", ".tmp/a", "\\.tmp/a")];
+        assert_eq!(write_words("touch \\.tmp/a", "touch \\.tmp/a", Some(&consumed)).map(|p| p.0), Some(strings(&["touch", ".tmp/a"])));
+        let spaced = [plain_word("touch"), Word::new(".tmp/a\\ b", ".tmp/a b", ".tmp/a\\ b")];
+        assert_eq!(write_words("touch .tmp/a\\ b", "touch .tmp/a\\\x01b", Some(&spaced)).map(|p| p.0), Some(strings(&["touch", ".tmp/a b"])));
+        assert_eq!(write_words("touch .tmp/a\\ b", "touch .tmp/a\\\x01b", None), None);
+        assert_eq!(write_words("touch \0SQ", "touch \\.tmp/a", Some(&read[..1])), None, "an unpaired read is no read");
     }
 
     // spec: guard-kit/SPEC.md §The generic ruleset — the operand grammar's option walk

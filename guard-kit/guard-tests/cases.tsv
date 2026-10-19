@@ -958,6 +958,15 @@ allow	rm -rf .tmp/x .tmp/y
 allow	rm -rf .tmp/x\ y
 allow	touch .tmp/a\ b
 allow	rm -f .tmp/dead-producer.run
+# a backslash the word's quoting keeps is part of its value, so the target sits under a directory
+# named '\.tmp', outside every scratch dir, whether a write utility or a redirect names it; one an
+# unquoted word consumes is no part of the value
+fallthrough	touch '\.tmp/a'
+fallthrough	touch "\.tmp/a"
+fallthrough	touch $'\\.tmp/a'
+fallthrough	mkdir -p '\.tmp/x'
+block	printf x > '\.tmp/a'
+allow	touch \.tmp/a
 # a read redirected to a bounded target is this rule's grant, not rule `ro_pipeline`'s, and a target
 # outside every scratch dir is neither's
 allow	grep -c x tracked.md > .tmp/n.txt; wc -l .tmp/n.txt
