@@ -73,7 +73,8 @@ pub struct Word {
     pub value: String,
     pub live: String,
     seams: Vec<(usize, usize, usize)>,
-    ansi_c: bool,
+    ansi_c: usize,
+    unresolved: bool,
 }
 
 impl Word {
@@ -83,14 +84,21 @@ impl Word {
             value: value.to_string(),
             live: live.to_string(),
             seams: Vec::new(),
-            ansi_c: false,
+            ansi_c: 0,
+            unresolved: false,
         }
     }
 
-    // spec: guard-kit/SPEC.md §The reader and its views — the word carries an ANSI-C quoted piece, whose
-    // value the dequoted view does not hold; a slice keeps its word's answer.
-    pub fn ansi_c(&self) -> bool {
+    // spec: guard-kit/SPEC.md §The reader and its views — the ANSI-C quoted pieces the word carries, each
+    // one live `$` of the skeleton; a slice keeps its word's answer.
+    pub fn ansi_c(&self) -> usize {
         self.ansi_c
+    }
+
+    // spec: guard-kit/SPEC.md §The reader and its views — the word carries an ANSI-C quoted piece whose
+    // value the dequoted view holds unresolved; a slice keeps its word's answer.
+    pub fn unresolved(&self) -> bool {
+        self.unresolved
     }
 
     // spec: guard-kit/SPEC.md §The reader and its views — the value of what a word holds ahead of
@@ -145,6 +153,7 @@ impl Word {
             live: self.live.get(from..to)?.to_string(),
             seams: seams.collect(),
             ansi_c: self.ansi_c,
+            unresolved: self.unresolved,
         })
     }
 }
@@ -155,12 +164,13 @@ pub struct WordAcc {
     segs: Vec<Vec<Word>>,
     open: Option<[Vec<u8>; 3]>,
     seams: Vec<(usize, usize, usize)>,
-    ansi_c: bool,
+    ansi_c: usize,
+    unresolved: bool,
 }
 
 impl WordAcc {
     pub fn new() -> WordAcc {
-        WordAcc { segs: vec![Vec::new()], open: None, seams: Vec::new(), ansi_c: false }
+        WordAcc { segs: vec![Vec::new()], open: None, seams: Vec::new(), ansi_c: 0, unresolved: false }
     }
 
     pub fn piece(&mut self, spelling: &[u8], value: &[u8], live: &[u8]) {
@@ -171,17 +181,18 @@ impl WordAcc {
         self.seams.push((w[2].len(), w[1].len(), w[0].len()));
     }
 
-    pub fn ansi_c_piece(&mut self, spelling: &[u8], value: &[u8], live: &[u8]) {
+    pub fn ansi_c_piece(&mut self, spelling: &[u8], value: &[u8], live: &[u8], resolved: bool) {
         self.piece(spelling, value, live);
-        self.ansi_c = true;
+        self.ansi_c += 1;
+        self.unresolved |= !resolved;
     }
 
     pub fn end_word(&mut self) {
         if let Some([s, v, l]) = self.open.take() {
             let text = |b: Vec<u8>| String::from_utf8_lossy(&b).into_owned();
             let seams = std::mem::take(&mut self.seams);
-            let ansi_c = std::mem::take(&mut self.ansi_c);
-            let word = Word { spelling: text(s), value: text(v), live: text(l), seams, ansi_c };
+            let (ansi_c, unresolved) = (std::mem::take(&mut self.ansi_c), std::mem::take(&mut self.unresolved));
+            let word = Word { spelling: text(s), value: text(v), live: text(l), seams, ansi_c, unresolved };
             self.segs.last_mut().expect("one segment is always open").push(word);
         }
     }

@@ -607,12 +607,22 @@ pub fn dequoted(raw: &str) -> Option<String> {
             if at(s, i, SQ_MARK.len()) != SQ_MARK.as_bytes() {
                 return None;
             }
-            let k = if dollar_quote(r, j) {
+            let ansi = dollar_quote(r, j);
+            let k = if ansi {
                 ansi_c_close(&r[j + 1..])?
             } else {
                 r[j + 1..].iter().position(|&c| c == b'\'')?
             };
-            span = r[j + 1..j + 1 + k].to_vec();
+            let content = &r[j + 1..j + 1 + k];
+            span = match ansi.then(|| resolved_ansi_c(content)).flatten() {
+                Some(v) => {
+                    if let Some(p) = out.iter().rposition(|&c| c == b'$') {
+                        out.remove(p);
+                    }
+                    v
+                }
+                None => content.to_vec(),
+            };
             j += k + 2;
         } else {
             if at(s, i, DQ_MARK.len()) != DQ_MARK.as_bytes() {
@@ -697,6 +707,12 @@ fn ansi_c_close(b: &[u8]) -> Option<usize> {
         }
     }
     None
+}
+
+// spec: guard-kit/SPEC.md §The reader and its views — the value the dequoted view holds for an ANSI-C
+// span: none where the read refuses it or its value carries a line feed, which no aligned span holds.
+fn resolved_ansi_c(content: &[u8]) -> Option<Vec<u8>> {
+    ansi_c(content).filter(|v| !v.contains(&b'\n'))
 }
 
 // spec: guard-kit/SPEC.md §The reader and its views — an ANSI-C quoted span's value as bash resolves
@@ -830,8 +846,8 @@ pub fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
                 if content.contains(&b'\n') {
                     return None;
                 }
-                let live = format!("${SQ_MARK}");
-                acc.ansi_c_piece(&b[i..q + k + 2], &ansi_c(content)?, live.as_bytes());
+                let (live, value) = (format!("${SQ_MARK}"), ansi_c(content)?);
+                acc.ansi_c_piece(&b[i..q + k + 2], &value, live.as_bytes(), resolved_ansi_c(content).is_some());
                 i = q + k + 2;
             }
             b'\'' => {
@@ -995,7 +1011,7 @@ mod tests {
         assert_eq!(s("echo $$'\\' ; rm x"), format!("echo $${SQ_MARK} ; rm x"));
         assert_eq!(s("echo \\$'\\' ; rm x"), format!("echo \\${SQ_MARK} ; rm x"));
         assert_eq!(s("echo $'\\' ; rm x"), "echo $'\\' ; rm x");
-        assert_eq!(dequoted("grep $'it\\'s' f").as_deref(), Some("grep $it\\'s f"));
+        assert_eq!(dequoted("grep $'it\\'s' f").as_deref(), Some("grep it's f"));
         assert_eq!(faces("grep $'it\\'s' f")[0][1], face("$'it\\'s'", "it's", &format!("${SQ_MARK}")));
         assert_eq!(word_read("echo $'\\' ; rm x"), None);
     }
@@ -1117,6 +1133,9 @@ mod tests {
         assert_eq!(dequoted("echo 'open"), None);
         assert_eq!(dequoted("cat <<EOF\nx\nEOF"), None);
         assert_eq!(dequoted("echo 'a\nb'"), None);
+        assert_eq!(dequoted("grep $'a b\\x3b' f").as_deref(), Some("grep a\x01b\x03 f"));
+        assert_eq!(dequoted("echo $$$'x' $\\\n'y'").as_deref(), Some("echo $$x \\\ny"));
+        assert_eq!(dequoted("echo $'a\\nb' $'\\cA'").as_deref(), Some("echo $a\\nb $\\cA"));
     }
 
     fn faces(t: &str) -> Vec<Vec<(String, String, String)>> {
@@ -1192,17 +1211,19 @@ mod tests {
         assert_eq!(faces("echo \"a$\"\"x\"")[0][1].1, "a$x");
     }
 
-    // spec: guard-kit/SPEC.md §The reader and its views — a word carrying an ANSI-C quoted piece is
-    // marked as one, and the pid, an escaped `$` and a plain quote are not
+    // spec: guard-kit/SPEC.md §The reader and its views — a word counts its ANSI-C quoted pieces, and
+    // the pid, an escaped `$` and a plain quote are none; one the dequoted view holds unresolved marks it
     #[test]
-    fn the_word_read_marks_a_word_carrying_an_ansi_c_piece() {
-        let marks = |c: &str| -> Vec<bool> { word_read(c).unwrap()[0].iter().map(Word::ansi_c).collect() };
-        assert_eq!(marks("awk $'BEGIN { \\x73ystem(\"x\") }' f"), [false, true, false]);
-        assert_eq!(marks("cat >> \".tmp/\"$'\\056\\056/x'"), [false, false, true]);
-        assert_eq!(marks("echo $$$'x' a"), [false, true, false]);
-        assert_eq!(marks("echo $$'x' \\$'x' 'x' \"x\""), [false, false, false, false, false]);
-        let w = word_read("echo a$'b'c").unwrap()[0][1].clone();
-        assert!(w.slice(0, 1).is_some_and(|s| s.ansi_c()));
+    fn the_word_read_counts_a_word_s_ansi_c_pieces_and_marks_an_unresolved_one() {
+        let count = |c: &str| -> Vec<usize> { word_read(c).unwrap()[0].iter().map(Word::ansi_c).collect() };
+        let marks = |c: &str| -> Vec<bool> { word_read(c).unwrap()[0].iter().map(Word::unresolved).collect() };
+        assert_eq!(count("awk $'BEGIN { \\x73ystem(\"x\") }' f"), [0, 1, 0]);
+        assert_eq!(count("cat >> \".tmp/\"$'\\056\\056/x'"), [0, 0, 1]);
+        assert_eq!(count("echo $$$'x' a$'b'$'c'"), [0, 1, 2]);
+        assert_eq!(count("echo $$'x' \\$'x' 'x' \"x\""), [0, 0, 0, 0, 0]);
+        assert_eq!(marks("echo $'a\\nb' $'a\\tb'"), [false, true, false]);
+        let w = word_read("echo a$'\\n'c").unwrap()[0][1].clone();
+        assert!(w.slice(0, 1).is_some_and(|s| s.unresolved() && s.ansi_c() == 1));
     }
 
     // spec: guard-kit/SPEC.md §The reader and its views — each escape resolved to the bytes bash gives
@@ -1328,7 +1349,8 @@ mod tests {
     }
 
     // spec: guard-kit/SPEC.md §The reader and its views — an ANSI-C span with no escape reads as the
-    // single-quoted span it re-spells, over every decision-table row carrying one
+    // single-quoted span it re-spells, in the word read and the dequoted view, over every decision-table
+    // row carrying one
     #[test]
     fn an_ansi_c_span_reads_as_its_single_quoted_spelling() {
         let table = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../guard-kit/guard-tests/cases.tsv");
@@ -1354,6 +1376,7 @@ mod tests {
             let base = word_read(&row).unwrap_or_else(|| panic!("{:?} was not read", row));
             let got = word_read(&spelled).unwrap_or_else(|| panic!("{:?} was not read", spelled));
             assert_eq!(values(got), values(base), "{:?}", spelled);
+            assert_eq!(dequoted(&spelled), dequoted(&row), "{:?}", spelled);
             seen += 1;
         }
         assert!(seen > 0);

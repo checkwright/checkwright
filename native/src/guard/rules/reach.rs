@@ -945,13 +945,13 @@ pub fn shell_wrapper(ctx: &Ctx) -> Decided {
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `worktree_confinement`'s test as a predicate,
-// under that rule's own views; from a linked worktree it also refuses an ANSI-C quoted word and,
-// where the word read answers nothing, a quoted span behind a `$`.
+// under that rule's own views; from a linked worktree it also refuses a word the dequoted view holds
+// unresolved and, where the word read answers nothing, a quoted span behind a `$`.
 pub fn refused(ctx: &Ctx, c: &Cmd) -> Result<bool, Fault> {
     ctx.under("worktree_confinement", |w| {
         if !w.host().roots().main.is_empty() && w.shell() == Shell::Bash {
             let carries = match w.word_read(c)? {
-                Some(r) => r.iter().flatten().any(Word::ansi_c),
+                Some(r) => r.iter().flatten().any(Word::unresolved),
                 None => {
                     let s = w.view(c, SqDqHd)?;
                     [SQ_MARK, DQ_MARK].iter().any(|m| s.contains(&format!("${m}")))

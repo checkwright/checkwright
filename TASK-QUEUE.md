@@ -26,14 +26,6 @@ the harness's published permissions page lists a lone `&` among its recognized c
 
 **Cost while deferred:** none in the grant direction, since the guard reads a segment carrying a lone `&` as ungranted; at worst a grant withheld. Filed 2026-10-19 by guard-ansi-c-bar-pass' close, draining its spec session's bullet. Re-verified there: the docs page's separator list. Inferred, not run: the harness's current split. Owner lookup: `lone`, `separator`, `measured` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The reader and its views.
 
-### dequoted-view-ansi-c-value
-
-the bash dequoted view holds an ANSI-C span as spelled, so every check reading it withholds on a marked word: the declared-forms `sed`/`awk`/`xargs` discriminators, rule `worktree_confinement`'s predicate, and the dollar declines of rules `grant_path_slot`, `abs_script`, `brace_glyph`, `bounded_wait` and `bounded_write`.
-
-**Deliverable:** the view resolves the span to its value, as it reads a single-quoted span of the same value, and the SPEC's declared limits lift with it. It moves fall-through to allow, so it lands in a build.
-
-**Cost while deferred:** one permission decision per contrived ANSI-C spelling (`find .tmp/old -name $'*.txt' -delete`, `awk $'{print}' f`), never a wrong grant. Filed 2026-10-19 by guard-ansi-c-bar-pass' close, draining its build's declared-limit bullet. Re-verified there: both examples fall through on the built binary. Owner lookup: `dequoted view`, `ANSI-C` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The reader and its views.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -1000,4 +992,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 - escaped-pipe-amp-wrong-grant
 - ansi-c-continuation-grant
+- dequoted-view-ansi-c-value
 

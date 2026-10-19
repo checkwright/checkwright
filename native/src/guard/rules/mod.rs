@@ -146,6 +146,23 @@ fn shell_backgrounds(s: &str) -> bool {
     (0..s.len()).any(|i| statement_amp(s.as_bytes(), i))
 }
 
+// spec: guard-kit/SPEC.md §The reader and its views — a `$` live in the `sq hdq` view `live`: any but an
+// ANSI-C piece's own, counted off the word read, and that one too where the read answers nothing or
+// holds a word unresolved.
+fn live_dollar(ctx: &Ctx, c: &Cmd, live: &str) -> Result<bool, Fault> {
+    let n = live.matches('$').count();
+    if n == 0 {
+        return Ok(false);
+    }
+    Ok(match ctx.word_read(c)? {
+        Some(r) => {
+            let ws = || r.iter().flatten();
+            ws().any(Word::unresolved) || ws().map(Word::ansi_c).sum::<usize>() != n
+        }
+        None => true,
+    })
+}
+
 // spec: guard-kit/SPEC.md §The reader and its views — the noclobber operator live in a skeleton,
 // which every grant withholds on.
 fn noclobber(s: &str) -> bool {
@@ -705,9 +722,9 @@ fn ro_forms_read(ctx: &Ctx, c: &Cmd, skip: &[usize], statements: bool) -> Result
             continue;
         }
         let masked = masked_option(Some(ws), dseg);
-        let ansi_c = ws.iter().any(Word::ansi_c);
+        let unresolved = ws.iter().any(Word::unresolved);
         if !statements {
-            pairs.push((seg, dseg, passed_words(ws, escape), masked, ansi_c));
+            pairs.push((seg, dseg, passed_words(ws, escape), masked, unresolved));
             continue;
         }
         let (cut, dcut) = (background_statements(seg), background_statements(dseg));
@@ -715,9 +732,9 @@ fn ro_forms_read(ctx: &Ctx, c: &Cmd, skip: &[usize], statements: bool) -> Result
         if cut.len() != dcut.len() {
             return Ok(false);
         }
-        pairs.extend(cut.into_iter().zip(dcut).zip(wcut).map(|((s, d), w)| (s, d, passed_words(&w, escape), masked, ansi_c)));
+        pairs.extend(cut.into_iter().zip(dcut).zip(wcut).map(|((s, d), w)| (s, d, passed_words(&w, escape), masked, unresolved)));
     }
-    for (seg, dseg, passed, masked, ansi_c) in pairs {
+    for (seg, dseg, passed, masked, unresolved) in pairs {
         let Some((head, args)) = passed.split_first() else { continue };
         let bin = head.value.as_str();
         if !on_ro_roster(h, bin) {
@@ -733,13 +750,13 @@ fn ro_forms_read(ctx: &Ctx, c: &Cmd, skip: &[usize], statements: bool) -> Result
             return Ok(false);
         }
         let program = format!("{}{}", bin, rest(&dcw, dhead));
-        if matches!(bin, "sed" | "awk") && (masked || ansi_c || !tools::program_clear(bin, &program)) {
+        if matches!(bin, "sed" | "awk") && (masked || unresolved || !tools::program_clear(bin, &program)) {
             return Ok(false);
         }
         if bin != "xargs" {
             continue;
         }
-        if ansi_c {
+        if unresolved {
             return Ok(false);
         }
         let idx = match xargs_command_index(&dcw) {

@@ -3,7 +3,7 @@
 use super::reach::{interpreter_reach, refused, rm_tracked_reach};
 use super::{
     command_read, escape_char, has_substitution, inert_value, is_banner, is_bare_allow, is_ro_segment, is_ro_xargs,
-    lead_keyword, noclobber, nulled_by_value, on_ro_roster, passed_read, pipe_members, redirect_targets, redirect_values,
+    lead_keyword, live_dollar, noclobber, nulled_by_value, on_ro_roster, passed_read, pipe_members, redirect_targets, redirect_values,
     ro_forms_clear, valued_targets, ro_forms_clear_except, ro_forms_kit, segment_core,
     shell_backgrounds, strip_redirect_op, unheredoc, unredirected_words, xargs_command_index,
 };
@@ -531,7 +531,7 @@ fn find_targets(h: &Host, args: &[String]) -> Option<Vec<(String, bool)>> {
 
 pub fn bounded_write(ctx: &Ctx) -> Decided {
     let h = ctx.host();
-    if has_substitution(ctx.raw(ctx.cmd())?) || ctx.view(ctx.cmd(), SqHdq)?.contains('$') {
+    if has_substitution(ctx.raw(ctx.cmd())?) || live_dollar(ctx, ctx.cmd(), &ctx.view(ctx.cmd(), SqHdq)?)? {
         return Ok(None);
     }
     let s = ctx.view(ctx.cmd(), SqDqHd)?;
@@ -638,7 +638,7 @@ pub enum Reach {
 // carrying a quoted statement separator whole rather than skipping it.
 pub fn slot_reach(ctx: &Ctx, c: &Cmd, predicate: bool) -> Result<Reach, Fault> {
     let live = ctx.view(c, SqHdq)?;
-    if live.contains('$') || live.contains("<(") || live.contains(">(") || ctx.raw(c)?.contains('`') {
+    if live_dollar(ctx, c, &live)? || live.contains("<(") || live.contains(">(") || ctx.raw(c)?.contains('`') {
         return Ok(Reach::Undecided);
     }
     let inners = ctx.host().allow_inners();

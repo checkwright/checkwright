@@ -722,18 +722,22 @@ allow	grep x tracked.md | xargs sed -n '\-x-p'
 fallthrough	grep x tracked.md | sed -n \-x-p
 fallthrough	grep x tracked.md | sed -n '\-x-w out.txt'
 fallthrough	grep x tracked.md | sed -l 5 s/a/b/
-# the discriminator and the xargs arm read the dequoted view, which holds an ANSI-C quoted word
-# unresolved, so a segment carrying one withholds where the plain spelling withholds, and so does a
-# program or an xargs run the plain spelling clears
+# the discriminator and the xargs arm read the dequoted view, which holds an ANSI-C quoted word by its
+# value, so a segment carrying one is read as its plain spelling: an escape spelling a write or execute
+# form withholds, and a program or an xargs run the plain spelling clears is granted
 fallthrough	awk $'BEGIN { \x73ystem("printf pwned > tracked.md") }'
 fallthrough	grep x tracked.md | sed $'s/a/b/\x77 out.txt'
-fallthrough	awk $'{print}' tracked.md
+allow	awk $'{print}' tracked.md
 fallthrough	grep -l x tracked.md | xargs sort $'-o' tracked.md
 fallthrough	grep -l x tracked.md | xargs sort $'-\157' tracked.md
 fallthrough	grep -l x tracked.md | xargs awk $'BEGIN { \x73ystem("ls") }'
-fallthrough	grep -l x tracked.md | xargs grep $'a\tb'
+allow	grep -l x tracked.md | xargs grep $'a\tb'
 fallthrough	until awk $'BEGIN { \x73ystem("ls") }' tracked.md; do sleep 1; done
 allow	grep $'a\tb' tracked.md | awk '{print}'
+# a value carrying a line feed is held unresolved, as no aligned span holds one, so a segment
+# carrying it withholds, as its plain spelling's newline-bearing span does
+fallthrough	awk $'{print}\n' tracked.md
+fallthrough	grep -l x tracked.md | xargs grep $'a\nb'
 # banner tolerance (rules `find_glob` and `cat_file`'s): a literal echo/printf
 # segment is skipped, but at least one roster read must remain
 allow	echo === | grep foo src
@@ -929,9 +933,16 @@ allow	mv .tmp/a.txt .tmp/b.txt
 allow	cp tracked.md .tmp/copy.md
 allow	grep -n x tracked.md | tee .tmp/hits.txt
 allow	find .tmp/old -name '*.txt' -delete
-# an ANSI-C quoted word's '$' stands live in the 'sq hdq' view, so the expansion decline withholds
-# the grant its single-quoted spelling earns: a declared limit
-fallthrough	find .tmp/old -name $'*.txt' -delete
+# an ANSI-C quoted word's '$' is its piece's own, so the expansion decline reads past it and the
+# grant its single-quoted spelling earns stands, a target read by its value; a pid, a held value and a
+# span the read refuses still withhold
+allow	find .tmp/old -name $'*.txt' -delete
+allow	rm -rf .tmp/$'old'
+allow	printf x > .tmp/$'a\x2etxt'
+block	rm -rf .tmp/$'\x2e\x2e'/tracked.md
+fallthrough	find .tmp/old -name $$'*.txt' -delete
+fallthrough	touch .tmp/$'a\nb'
+fallthrough	find .tmp/old -name $'*\e.txt' -delete
 allow	git status > .tmp/status.txt 2>&1
 allow	mkdir -p .tmp/d; git status > .tmp/d/s.txt; wc -l .tmp/d/s.txt
 allow	rm -rf .tmp/x >> .tmp/journal.md

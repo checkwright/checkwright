@@ -105,10 +105,11 @@ want off-journal       "$SANDBOX/off.knobs" allow "printf 'x\n' >> $main/.tmp/jo
 want awk-declared      "$SANDBOX/awk.knobs" block "awk '{print}' $main/docs/a.md" "$refusal"
 
 # --- the path words are read by value off the word read, so an ANSI-C quoted path blocks as its plain
-#     spelling does; the admitted read's checks read the dequoted view, which holds such a word
-#     unresolved, so a call carrying one is refused every grant and falls through where its plain
-#     spelling is granted
-want ansi-c-grep       "$d" fallthrough "grep -rn foo \$'$main/docs'"
+#     spelling does; the admitted read's checks read the dequoted view, which holds such a word by its
+#     value, so a read so spelled is granted as its plain spelling is, and one whose value carries a
+#     line feed, which that view holds unresolved, is refused every grant and falls through
+want ansi-c-grep       "$d" allow "grep -rn foo \$'$main/docs'"
+want ansi-c-held-grep  "$d" fallthrough "grep -rn \$'foo\\n' $main/docs"
 want ansi-c-off-grep   "$SANDBOX/off.knobs" block "grep -rn foo \$'$main/docs'" "$refusal"
 want ansi-c-traversal  "$SANDBOX/off.knobs" block "grep -rn foo \$'\\x2e\\x2e/\\x2e\\x2e/\\x2e\\x2e/docs'" "$refusal"
 want ansi-c-awk        "$SANDBOX/awk.knobs" block "awk '{print}' \$'$main/docs/a.md'" "$refusal"
@@ -206,5 +207,5 @@ grep -qF "from-the-main-checkout" "$main/.workflow/prompt-friction.log" 2>/dev/n
 git -C "$main" worktree remove --force "$wt"
 
 [[ "$fails" -eq 0 ]] || { echo "worktree-confinement.test: $fails of $checks assertion(s) failed"; exit 1; }
-echo "worktree-confinement.test: ok ($checks assertions; from a linked worktree the journal append under the main scratch dir and read-only searches of the main checkout pass, every write naming the main checkout outside its scratch dir is refused with the loaded roster named, a PowerShell call meets the same refusal with no admitted read and has a main-checkout scratch body steered to the own scratch dir, a write in the own worktree is not the rule's, 'off' refuses the search and keeps the journal, an ANSI-C quoted path blocks as its plain spelling does and a call carrying an ANSI-C quoted word or a \$-quoted span the word read refuses is refused every grant, a program-bearing tool is never admitted while a read-only arm of the gate binary is and the refusal names both forms, and the liveness record resolves to the main checkout's scratch dir for the launch, its grant and the git-write hold, and a fall-through at the relative log default lands in the main checkout's log)"
+echo "worktree-confinement.test: ok ($checks assertions; from a linked worktree the journal append under the main scratch dir and read-only searches of the main checkout pass, every write naming the main checkout outside its scratch dir is refused with the loaded roster named, a PowerShell call meets the same refusal with no admitted read and has a main-checkout scratch body steered to the own scratch dir, a write in the own worktree is not the rule's, 'off' refuses the search and keeps the journal, an ANSI-C quoted path blocks as its plain spelling does and a call carrying an ANSI-C quoted word whose value carries a line feed or a \$-quoted span the word read refuses is refused every grant, a program-bearing tool is never admitted while a read-only arm of the gate binary is and the refusal names both forms, and the liveness record resolves to the main checkout's scratch dir for the launch, its grant and the git-write hold, and a fall-through at the relative log default lands in the main checkout's log)"
 exit 0
