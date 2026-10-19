@@ -665,13 +665,17 @@ allow	head -5 $'tracked.md'
 allow	echo $'a\nb' | wc -l
 allow	sort $'a\n-o' tracked.md
 allow	grep $'\q' tracked.md
+# an ANSI-C span ends where bash ends it, at the first quote no backslash escapes, so an escaped quote
+# is a character of its value and the text after it is live to every skeleton reader
+allow	grep $'it\'s' tracked.md
+block	git status $'\'' ; git stash ; echo ''
+block	ls $'\'' ; rm tracked.md ; ls 'a'
 # a span the read cannot resolve exactly leaves the call unread: a control, a byte above ASCII,
-# a NUL, an escaped quote
+# a NUL
 fallthrough	grep $'\cA' tracked.md
 fallthrough	grep $'\U000000e9' tracked.md
 fallthrough	grep $'\x80' tracked.md
 fallthrough	grep $'a\0b' tracked.md
-fallthrough	grep $'it\'s' tracked.md
 fallthrough	grep $"a" tracked.md
 # the sed and awk program discriminator: a program the static check clears is read-only (a redirect
 # glyph inside an awk string is skipped); an output redirect, a written file, a system() call, a

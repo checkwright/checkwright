@@ -28,16 +28,6 @@ kit prose states one harness's permission-rule grammar as the kit's: guard-kit's
 
 ## Technical Debt
 
-### skeleton-ansi-c-escaped-quote
-
-the bash skeleton closes an ANSI-C span at an escaped quote: `$'\''` is one word to bash, but the skeleton's single-quoted span ends at the backslash-quote, so the text up to bash's next quote is inert to every skeleton reader. `git stash` and `rm README.md` block bare; `git status $'\'' ; git stash ; echo ''` and `ls $'\'' ; rm README.md ; ls 'a'` fall through.
-
-**Deliverable:** the skeleton ends an ANSI-C span where bash does, with firing rows of both shapes. It moves verdicts from fall-through to block, so it lands in a build.
-
-**Honest limit:** no grant was found riding the inert text over the eight shapes probed at spec, and no wider corpus was run; a grant reading the word read declines, the read refusing such a span. Both pairs re-verified at guard-ansi-c-bar-pass' scope, and v0.31.0 falls through on them too, so no regression.
-
-**Cost while deferred:** a missed block on a contrived spelling. Filed 2026-10-19 by guard-word-read-reach-pass' close, draining its spec's bullet. Re-verified there: both pairs on the built binary. Owner lookup: `skeleton`, `ANSI-C`, `escaped quote` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The reader and its views.
-
 ### worktree-ansi-c-path-word
 
 rule `worktree_confinement` reads its path words off the dequoted view, which holds an ANSI-C quoted word unresolved behind its `$`. From a linked worktree, `rm $'<main>/README.md'` and `touch $'\x2e\x2e/<main>/x'` fall through where the plain spellings block. Under `GUARD_KIT_WORKTREE_READS=off`, `cat $'<main>/README.md\cA' >> .tmp/j.md`, a span the word read refuses, is granted by rule `append_scratch` where the plain spelling blocks: a wrong grant predating the ANSI-C word read, whose guard-word-read-reach-pass hotfix refuses a grant only on a call carrying a word the read resolved. guard-kit/SPEC.md states that refusal unconditionally in §The reader and its views and in the rule's roster entry, so the code is the defect and the contract stands.
@@ -1029,4 +1019,6 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
+
+- skeleton-ansi-c-escaped-quote
 

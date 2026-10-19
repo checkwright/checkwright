@@ -387,6 +387,7 @@ fn heredoc_header(s: &[u8]) -> Option<(usize, &[u8], bool)> {
 enum State {
     None,
     Sq,
+    AnsiC,
     Dq,
 }
 
@@ -415,8 +416,12 @@ fn scan(cmd: &str, w: Wants) -> Scanned {
     let mut i = 0usize;
     while i < n {
         match state {
-            State::Sq => {
-                match b[i..].iter().position(|&c| c == b'\'') {
+            State::Sq | State::AnsiC => {
+                let close = match state {
+                    State::AnsiC => ansi_c_close(&b[i..]),
+                    _ => b[i..].iter().position(|&c| c == b'\''),
+                };
+                match close {
                     None => {
                         span.extend_from_slice(&b[i..]);
                         i = n;
@@ -478,7 +483,7 @@ fn scan(cmd: &str, w: Wants) -> Scanned {
         }
         let ch = b[i];
         if ch == b'\'' {
-            state = State::Sq;
+            state = if dollar_quote(b, i) { State::AnsiC } else { State::Sq };
             span.clear();
             span.push(b'\'');
             i += 1;
@@ -602,7 +607,11 @@ pub fn dequoted(raw: &str) -> Option<String> {
             if at(s, i, SQ_MARK.len()) != SQ_MARK.as_bytes() {
                 return None;
             }
-            let k = r[j + 1..].iter().position(|&c| c == b'\'')?;
+            let k = if dollar_quote(r, j) {
+                ansi_c_close(&r[j + 1..])?
+            } else {
+                r[j + 1..].iter().position(|&c| c == b'\'')?
+            };
             span = r[j + 1..j + 1 + k].to_vec();
             j += k + 2;
         } else {
@@ -656,12 +665,23 @@ fn dollar_quote(b: &[u8], i: usize) -> bool {
     live % 2 == 1
 }
 
+// spec: guard-kit/SPEC.md §The reader and its views — where bash ends an ANSI-C span: the first quote
+// no backslash escapes, as an offset into the text after the opening quote.
+fn ansi_c_close(b: &[u8]) -> Option<usize> {
+    let mut k = 0usize;
+    while k < b.len() {
+        match b[k] {
+            b'\'' => return Some(k),
+            b'\\' => k += 2,
+            _ => k += 1,
+        }
+    }
+    None
+}
+
 // spec: guard-kit/SPEC.md §The reader and its views — an ANSI-C quoted span's value as bash resolves
 // its escapes; `None` where the read refuses the span.
 fn ansi_c(content: &[u8]) -> Option<Vec<u8>> {
-    if content.iter().rev().take_while(|&&c| c == b'\\').count() % 2 == 1 {
-        return None;
-    }
     let hex = |s: &[u8], max: usize| -> (u32, usize) {
         let n = s.iter().take(max).take_while(|c| c.is_ascii_hexdigit()).count();
         let v = s[..n].iter().fold(0u32, |v, &c| v * 16 + (c as char).to_digit(16).unwrap_or(0));
@@ -784,7 +804,7 @@ pub fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
                 i += 2;
             }
             b'$' if b.get(i + 1) == Some(&b'\'') && dollar_quote(b, i + 1) => {
-                let k = b[i + 2..].iter().position(|&c| c == b'\'')?;
+                let k = ansi_c_close(&b[i + 2..])?;
                 let content = &b[i + 2..i + 2 + k];
                 if content.contains(&b'\n') {
                     return None;
@@ -940,6 +960,23 @@ mod tests {
         assert_eq!(skeleton("echo 'a;b' && ls", Wants::default()), "echo 'a;b' && ls");
         assert_eq!(skeleton("grep -oE \"a\\\"b\" file", SQDQ), format!("grep -oE {DQ_MARK} file"));
         assert_eq!(skeleton("echo 'unterminated", SQDQ), "echo 'unterminated");
+    }
+
+    // spec: guard-kit/SPEC.md §The reader and its views — an ANSI-C span ends where bash ends it, at the
+    // first quote no backslash escapes; a plain or pid-led single-quoted span still ends at its next quote
+    #[test]
+    fn the_skeleton_ends_an_ansi_c_span_where_bash_does() {
+        let s = |c: &str| skeleton(c, SQDQ);
+        assert_eq!(s("git status $'\\'' ; git stash ; echo ''"), format!("git status ${SQ_MARK} ; git stash ; echo {SQ_MARK}"));
+        assert_eq!(s("ls $'a\\\\' ; rm x"), format!("ls ${SQ_MARK} ; rm x"));
+        assert_eq!(s("ls $'a\\\\\\'b' ; rm x"), format!("ls ${SQ_MARK} ; rm x"));
+        assert_eq!(s("echo '\\' ; rm x"), format!("echo {SQ_MARK} ; rm x"));
+        assert_eq!(s("echo $$'\\' ; rm x"), format!("echo $${SQ_MARK} ; rm x"));
+        assert_eq!(s("echo \\$'\\' ; rm x"), format!("echo \\${SQ_MARK} ; rm x"));
+        assert_eq!(s("echo $'\\' ; rm x"), "echo $'\\' ; rm x");
+        assert_eq!(dequoted("grep $'it\\'s' f").as_deref(), Some("grep $it\\'s f"));
+        assert_eq!(faces("grep $'it\\'s' f")[0][1], face("$'it\\'s'", "it's", &format!("${SQ_MARK}")));
+        assert_eq!(word_read("echo $'\\' ; rm x"), None);
     }
 
     // spec: guard-kit/SPEC.md §The reader and its views — command text that spells a placeholder's

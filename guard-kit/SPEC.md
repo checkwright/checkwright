@@ -131,8 +131,7 @@ It is built from the `raw`, `sq dq hd` and `dequoted` views and mints no view na
 **The read answers nothing on an ANSI-C span whose value it cannot give exactly**:
 
 - where an escape resolves to a C0 control other than tab, line feed and carriage return, NUL included. A command cannot carry one raw (§The shell guard), and in a value it would read as a mark or as one of the dequoted view's sentinels;
-- where an escape resolves above ASCII. Bash encodes a `\u` or `\U` there in the locale's charset, which the guard cannot see, and an octal or hex escape there is a byte that is no character;
-- where the span's content ends in an odd run of backslashes. Bash reads that quote as escaped and runs the span on, where the skeleton closes it.
+- where an escape resolves above ASCII. Bash encodes a `\u` or `\U` there in the locale's charset, which the guard cannot see, and an octal or hex escape there is a byte that is no character.
 
 **Each refusal is a declared limit, and it costs one permission decision**: a read-only call so spelled (`grep $'\e[1m' f`) reaches the harness's decision rather than a grant, and a write so targeted blocks as a write to a quoted target. A rule whose verdict reads no refused word still decides, so `printf $"x" >> .tmp/j.md` is granted on its unquoted target.
 
@@ -152,7 +151,7 @@ It is built from the `raw`, `sq dq hd` and `dequoted` views and mints no view na
 
 **The skeleton is the context-aware normalizer, and the only place a rule learns what part of a command is live.** It returns the command with every region of the named inert classes replaced by a placeholder, and everything else byte-identical. Four classes:
 
-- **`sq`**, single-quoted spans;
+- **`sq`**, single-quoted spans. An ANSI-C span ends where bash ends it, at the first quote no backslash escapes, so `$'\''` is one span;
 - **`dq`**, double-quoted spans;
 - **`hd`**, heredoc bodies, from the line after an opener to its terminator line;
 - **`hdq`**, the subset of `hd` whose **delimiter is quoted** (`<<'EOF'`), where the shell itself guarantees the body does not expand. That guarantee lets the one rule that must keep heredoc bodies live keep only the bodies that can actually expand.
