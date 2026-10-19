@@ -1,16 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: guard-ansi-c-bar-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-10-19, lead-relayed, not a ruling; the iteration opened undirected):** option C over the recommended A. The debt `skeleton-ansi-c-escaped-quote`, `worktree-ansi-c-path-word`, `escaped-amp-statement-split` and `path-slot-ansi-c-dollar`, promoted by scope; the feature `permission-grammar-neutral`, which spec authors and promotes, its grammar cited to gate-sdk/SPEC.md §The hook contract's binding table. Stages scope, spec, align, build, validate and close, the second component and the audit walk accepted with the set. The two v0.32.0 bar blockers are `worktree-ansi-c-path-word` (a wrong grant) and `escaped-amp-statement-split` (a regression from v0.31.0). Composition: bundled — the four guard-kit debt entries share the shell-guard word read and skeleton, the feature guard-kit's rule roster prose; drain 5 against inflow 3.6. Supersession: `path-slot-ansi-c-dollar` — reshaped by `skeleton-ansi-c-escaped-quote`; `worktree-ansi-c-path-word` — reshaped by `skeleton-ansi-c-escaped-quote`, the skeleton's span end moving the word read's odd-backslash refusal both read, so the skeleton lands first.
-
-  **Release review (operator grant 2026-10-19, lead-relayed, spent at validate, not clean on two wrong grants, so close defers):** one second-vendor review over the iteration's range, run at validate; close cuts v0.32.0 on a clean return, against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed).
-
-  **Push need (2026-10-19, inside the budget):** 2 against 2 — the closing push, and the v0.32.0 tag push only if the granted review returns clean; no unit reads a remote run.
 
 ---
 

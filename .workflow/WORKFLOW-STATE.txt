@@ -4,10 +4,4 @@
 
 ---
 
-guard-ansi-c-bar-pass scope abd49e37 2026-10-19 886b22fe4
-guard-ansi-c-bar-pass spec a1f03127 2026-10-19 43edc0379
-guard-ansi-c-bar-pass align a323ab7c 2026-10-19 1c496f183
-guard-ansi-c-bar-pass build a97d1ea4 2026-10-19 a04e1ec7f
-guard-ansi-c-bar-pass build abde9abb 2026-10-19 70648d320
-guard-ansi-c-bar-pass validate a2e968dc 2026-10-19 33c15f645
-guard-ansi-c-bar-pass close afda0e3c 2026-10-19 fbb4a0a22
+— scope a29f13e4 2026-10-19 ae0147a2c
