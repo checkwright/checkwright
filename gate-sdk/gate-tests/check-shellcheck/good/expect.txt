@@ -1,1 +1,1 @@
-SHELLCHECK: clean
+SHELLCHECK: clean (2 scripts)

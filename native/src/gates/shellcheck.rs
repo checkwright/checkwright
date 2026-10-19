@@ -6,10 +6,9 @@ use crate::walk;
 
 const NAME: &str = "check-shellcheck";
 
-// spec: gate-sdk/SPEC.md §check-shellcheck — each kit root contributes these five directories and
-// no other, so the derived set is the shell form's own `"$k/lib" "$k/bin" "$k/checks" "$k/templates" "$k/smoke"`
-// in that order: the target list's order is the order shellcheck reports in
-const KIT_SUBDIRS: &[&str] = &["lib", "bin", "checks", "templates", "smoke"];
+// spec: gate-sdk/SPEC.md §check-shellcheck — each kit root contributes these six directories and
+// no other, in this order: the target list's order is the order shellcheck reports in
+const KIT_SUBDIRS: &[&str] = &["lib", "bin", "checks", "templates", "smoke", "gate-tests"];
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the refusal is this member's own text at the
 // shell form's own point in the order: before the target glob, so a tree with nothing to lint and
@@ -21,15 +20,12 @@ fn refuse_absent_program() -> i32 {
     2
 }
 
-// spec: gate-sdk/SPEC.md §check-shellcheck — the derived default: the consumer gates dir, then
-// each kit root's four directories, then the extra-dirs knob appended. Positional arguments
-// remain a full scope override (the hermetic fixture affordance), never an addition.
-fn target_dirs(args: &[String]) -> Result<Vec<String>, String> {
-    if !args.is_empty() {
-        return Ok(args.to_vec());
-    }
-    let mut dirs = vec![walk::knob_scalar("GATE_SDK_GATES_DIR")?];
-    for kit in walk::kit_roots_abs()? {
+// spec: gate-sdk/SPEC.md §check-shellcheck — the derived corpus both lint gates read: the
+// consumer gates and tests dirs, each kit root's six directories, then the extra-dirs knob
+// appended
+pub fn lint_dirs_from(gates_dir: &str, tests_dir: &str, kit_roots: &[String], extra: &[String]) -> Vec<String> {
+    let mut dirs = vec![gates_dir.to_string(), tests_dir.to_string()];
+    for kit in kit_roots {
         for sub in KIT_SUBDIRS {
             dirs.push(format!("{}/{}", kit, sub));
         }
@@ -37,8 +33,26 @@ fn target_dirs(args: &[String]) -> Result<Vec<String>, String> {
     // spec: gate-sdk/SPEC.md §check-shellcheck — the consumer-added set is appended to the
     // derived default, never substituted for it, so a consumer that sets nothing keeps the
     // shipped coverage exactly and one that sets it can only widen
-    dirs.extend(walk::knob_words("GATE_SDK_LINT_EXTRA_DIRS")?);
-    Ok(dirs)
+    dirs.extend(extra.iter().cloned());
+    dirs
+}
+
+pub fn lint_dirs() -> Result<Vec<String>, String> {
+    Ok(lint_dirs_from(
+        &walk::knob_scalar("GATE_SDK_GATES_DIR")?,
+        &walk::knob_scalar("GATE_SDK_TESTS_DIR")?,
+        &walk::kit_roots_abs()?,
+        &walk::knob_words("GATE_SDK_LINT_EXTRA_DIRS")?,
+    ))
+}
+
+// spec: gate-sdk/SPEC.md §check-shellcheck — positional arguments remain a full scope override
+// (the hermetic fixture affordance), never an addition
+fn target_dirs(args: &[String]) -> Result<Vec<String>, String> {
+    if !args.is_empty() {
+        return Ok(args.to_vec());
+    }
+    lint_dirs()
 }
 
 pub fn run(args: &[String]) -> i32 {
@@ -113,6 +127,26 @@ mod tests {
             vec!["alpha".to_string(), "beta".to_string()],
             "a positional scope override picked up a derived directory, so the hermetic \
              fixture affordance is no longer hermetic"
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §check-shellcheck — the suites are derived, never named: each kit
+    // root's `gate-tests/` and the tests dir join the corpus, in the order shellcheck reports in
+    #[test]
+    fn the_derived_dirs_take_each_kit_root_s_suites_and_the_tests_dir() {
+        let roots = vec!["/r/alpha-kit".to_string(), "/r/beta-kit".to_string()];
+        let dirs = lint_dirs_from("scripts", "scripts/gate-tests", &roots, &["docs".to_string()]);
+        let mut want = vec!["scripts".to_string(), "scripts/gate-tests".to_string()];
+        for root in &roots {
+            for sub in ["lib", "bin", "checks", "templates", "smoke", "gate-tests"] {
+                want.push(format!("{}/{}", root, sub));
+            }
+        }
+        want.push("docs".to_string());
+        assert_eq!(
+            dirs, want,
+            "the derived corpus lost a kit root's suites or the tests dir, so a new kit's \
+             suites would lint nothing until a knob named them"
         );
     }
 

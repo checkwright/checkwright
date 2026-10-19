@@ -6,9 +6,6 @@ use crate::{proc, registry, substrate, walk};
 const NAME: &str = "check-psscriptanalyzer";
 const EXCLUDE_KNOB: &str = "GATE_SDK_PSSCRIPTANALYZER_EXCLUDE";
 
-// spec: gate-sdk/SPEC.md §check-psscriptanalyzer — §check-shellcheck's per-kit directories
-const KIT_SUBDIRS: &[&str] = &["lib", "bin", "checks", "templates", "smoke"];
-
 // spec: gate-sdk/SPEC.md §check-psscriptanalyzer — the two values handed to the script, one per
 // line, so no path or rule name is composed into the command text
 const TARGETS_VAR: &str = "CHECKWRIGHT_PSSA_TARGETS";
@@ -30,23 +27,16 @@ foreach ($r in @(Invoke-ScriptAnalyzer @p)) { $found++; [Console]::Out.WriteLine
 }; \
 if ($found -gt 0) { exit 1 }; exit 0";
 
-// spec: gate-sdk/SPEC.md §check-psscriptanalyzer — the derived corpus: the gates dir, each kit
-// root's directories, the extra-dirs knob, then each registered exec member's PowerShell target;
-// positional dirs replace the whole set, the hermetic fixture affordance
+// spec: gate-sdk/SPEC.md §check-psscriptanalyzer — the derived corpus: §check-shellcheck's
+// directories, then each registered exec member's PowerShell target; positional dirs replace the
+// whole set, the hermetic fixture affordance
 fn targets(args: &[String]) -> Result<(Vec<String>, Vec<String>), String> {
     let (dirs, exec) = if !args.is_empty() {
         (args.to_vec(), Vec::new())
     } else {
         let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
-        let kit_roots = walk::kit_roots_abs()?;
-        let mut dirs = vec![gates_dir.clone()];
-        for kit in &kit_roots {
-            for sub in KIT_SUBDIRS {
-                dirs.push(format!("{}/{}", kit, sub));
-            }
-        }
-        dirs.extend(walk::knob_words("GATE_SDK_LINT_EXTRA_DIRS")?);
-        (dirs, exec_targets(&gates_dir, &kit_roots)?)
+        let dirs = super::shellcheck::lint_dirs()?;
+        (dirs, exec_targets(&gates_dir, &walk::kit_roots_abs()?)?)
     };
     let mut out: Vec<String> = Vec::new();
     for d in &dirs {

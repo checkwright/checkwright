@@ -1,1 +1,3 @@
 SC2164
+kit-warn.sh
+tests-warn.sh

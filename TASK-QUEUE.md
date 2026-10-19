@@ -18,16 +18,6 @@
 
 ## New Features
 
-### shellcheck-gate-tests-derived
-
-[spec: SPEC-shellcheck-gate-tests.md]
-
-`check-shellcheck` reaches the bespoke `<tree>/gate-tests/*.test.sh` suites only through a hand-kept list of eleven directories in this repo's `GATE_SDK_LINT_EXTRA_DIRS`. A twelfth kit's suites join no lint until someone remembers to name them. The kit-root predicate derives `lib/`, `bin/`, `checks/`, `templates/` and `smoke/` and never `gate-tests/`, although `--run-gate-tests` spawns each direct `*.test.sh` as shell and the fixture pair ships to every adopter.
-
-**Deliverable:** a feature. Either the derived set gains each kit root's and the gates dir's `gate-tests/` direct `*.sh`, with fixture coverage and the knob list shrunk back to the installer, demo and docs directories, or a refusal is recorded in gate-sdk/SPEC.md §check-shellcheck. Widening a shipped gate's corpus for every adopter is a kit-semantics call, so a close drain does not make it.
-
-**Cost while deferred:** a new kit's suites lint nothing until the knob is edited, and the 129 linted today carried four warnings that went unseen. Filed 2026-10-18 by site-health-statistics-pass' close as the derivation residual of the drained unlinted-gate-tests bullet. Re-verified there: 129 direct suites across eleven directories, ShellCheck 0.11.0 `-S warning` found four warnings, and a probe file proved the widened knob reaches the corpus. Owner lookup: `shellcheck`, `LINT_EXTRA`, `gate-tests` lint in this file and the disposed-findings record found none; the owner is gate-sdk/SPEC.md §check-shellcheck.
-
 ## Technical Debt
 
 ## Deferred
@@ -976,4 +966,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - guard-verdict-typed-operand
 - bounded-write-backslash-grant
 - lead-role-marker-guard-refused
+- shellcheck-gate-tests-derived
 

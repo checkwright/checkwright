@@ -1,0 +1,2 @@
+# spec: gate-sdk/SPEC.md §check-shellcheck — the case's kit roots, pinned so the derivation reads this case's alpha-kit rather than the real gate-sdk root the runner exports
+GATE_SDK_KIT_DIRS = alpha-kit

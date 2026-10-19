@@ -1,4 +1,4 @@
-# graph: couples=knob:GATE_SDK_GATES_DIR/*.ps1,kit:*.ps1,knob:GATE_SDK_LINT_EXTRA_DIRS/*.ps1,knob:GATE_SDK_GATES_DIR/*.gate dir=one valve=none tier=precommit
+# graph: couples=knob:GATE_SDK_GATES_DIR/*.ps1,knob:GATE_SDK_TESTS_DIR/*.ps1,kit:*.ps1,knob:GATE_SDK_LINT_EXTRA_DIRS/*.ps1,knob:GATE_SDK_GATES_DIR/*.gate dir=one valve=none tier=precommit
 # install: on-surface
 # armed-by: GATE_SDK_POWERSHELL
 # spec: gate-sdk/SPEC.md §check-psscriptanalyzer — PSScriptAnalyzer lint of the PowerShell family at Warning and above (the self-lint contract)

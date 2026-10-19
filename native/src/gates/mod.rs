@@ -2349,6 +2349,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &[
             "GATE_SDK_GATES_DIR",
+            "GATE_SDK_TESTS_DIR",
             "GATE_SDK_KIT_DIRS",
             "GATE_SDK_LINT_EXTRA_DIRS",
         ],
@@ -2363,6 +2364,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &[
             "GATE_SDK_GATES_DIR",
+            "GATE_SDK_TESTS_DIR",
             "GATE_SDK_KIT_DIRS",
             "GATE_SDK_LINT_EXTRA_DIRS",
             "GATE_SDK_POWERSHELL",
