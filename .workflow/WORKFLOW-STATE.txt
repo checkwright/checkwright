@@ -4,4 +4,4 @@
 
 ---
 
-— scope a3d86423 2026-10-19 14eacd6cb
+lead-role-guard-binding-pass scope a3d86423 2026-10-19 14eacd6cb

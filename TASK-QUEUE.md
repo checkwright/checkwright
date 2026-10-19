@@ -1,14 +1,40 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: lead-role-guard-binding-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The set (operator direction 2026-10-20, lead-relayed, not a ruling; the iteration opened undirected):** option C over the recommended A. Debt promoted by scope: `bounded-write-backslash-grant`, the one open v0.32.0 bar blocker, and `hook-binding-single-source`. Features for spec to author and pair: `lead-role-marker-guard-refused`, `guard-verdict-typed-operand` and `shellcheck-gate-tests-derived`. Stages scope, spec, align (the lead-role amendment spans lifecycle-kit and context-kit), build, validate and close.
+
+  **Order (scope, own authority):** `hook-binding-single-source` builds before `guard-verdict-typed-operand`, whose arm builds a hook payload and reads the single-sourced binding spellings rather than spelling its own.
+
+  **Release review (operator grant 2026-10-20, lead-relayed, unspent):** one audit-mode second-vendor review over the iteration's range, run at validate; close may cut v0.32.0 on a clean return, against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed); a finding or a failed run defers the cut.
+
+  **Push need (2026-10-20, inside the budget):** 2 against 2 — the closing push, and the v0.32.0 tag push only if the granted review returns clean; no unit reads a remote run.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### bounded-write-backslash-grant
+
+rule `bounded_write` auto-allows `touch '\.tmp/a'`, `touch "\.tmp/a"`, `touch $'\\.tmp/a'`, `printf x > '\.tmp/a'` and `mkdir -p '\.tmp/x'` as a bounded scratch write, though bash's value for each word keeps the backslash, so the path sits under a directory named `\.tmp` outside the scratch dir. The `mkdir -p` grant creates that directory itself; a bare `mkdir '\.tmp'` falls through.
+
+**Deliverable:** the bounds test reads the word's value, a kept backslash included, with firing rows for the single-quoted, double-quoted and ANSI-C spellings in `guard-kit/guard-tests/`. It moves allow to fall-through, so it lands in a build.
+
+**Cost while deferred:** a wrong grant of contrived spellings; it blocks the v0.32.0 bar. Filed 2026-10-19 by guard-reader-value-bar-pass' close, draining validate's bullet from the failed second-vendor review's trace; promoted for the next iteration by operator direction 2026-10-19, lead-relayed, not a ruling. Re-verified there: all five allowed on the built binary at the close stamp's head. At v0.31.0, built from its tag, the `touch` spellings fall through and the `printf` redirect is refused, the rule landing after that tag, so the grant is unreleased rather than pre-existing. Corrected at the next scope: the bounds test compares path components literally (`bounded` in `native/src/guard/rules/grants.rs`), so the backslash is lost before it, in the target's value or its skeleton fallback; two spellings re-verified allowed. Owner lookup: `backslash`, `bounded write`, `scratch-write`, `in-scratch` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The rule roster, rule `bounded_write`.
+
+### hook-binding-single-source
+
+gate-sdk/SPEC.md §The hook contract's binding table is held to the crate's spellings by nothing, an honest limit `hook-contract-harness-neutral`'s amendment stated: each hook member spells its payload paths and envelopes in its own module (`native/src/hook/*.rs`, `native/src/guard/mod.rs`), so a renamed key moves the code without the table.
+
+**Deliverable:** one crate module holding the binding's spellings that every member reads, with a test holding the table to it, or a refusal recorded.
+
+**Cost while deferred:** the table can drift from what the members read, unseen until a fixture reds. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: `tool_input` spelled in six `native/src/hook/` modules and `guard/mod.rs`. Owner lookup: `binding table`, `hook contract` in this file, none; owner gate-sdk/SPEC.md §The hook contract.
 
 ## Deferred
 
@@ -259,26 +285,6 @@ Cursor and Muse Code are installed on no build machine, so plugin/SPEC.md §The 
 **Deliverable:** install and run each on a machine that has it, turn its cells from read to run, and file any wiring defect.
 
 **Cost while deferred:** two tier-2 harnesses' skill load and guard reach rest on vendor docs. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: neither CLI on the build machine's PATH. Owner lookup: `cursor`, `muse` in this file, none; owner plugin/SPEC.md §The harnesses.
-
-### hook-binding-single-source
-
-[cost: event/low] [surface: gate-sdk]
-
-gate-sdk/SPEC.md §The hook contract's binding table is held to the crate's spellings by nothing, an honest limit `hook-contract-harness-neutral`'s amendment stated: each hook member spells its payload paths and envelopes in its own module (`native/src/hook/*.rs`, `native/src/guard/mod.rs`), so a renamed key moves the code without the table.
-
-**Deliverable:** one crate module holding the binding's spellings that every member reads, with a test holding the table to it, or a refusal recorded.
-
-**Cost while deferred:** the table can drift from what the members read, unseen until a fixture reds. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: `tool_input` spelled in six `native/src/hook/` modules and `guard/mod.rs`. Owner lookup: `binding table`, `hook contract` in this file, none; owner gate-sdk/SPEC.md §The hook contract.
-
-### bounded-write-backslash-grant
-
-[cost: event/low] [surface: guard-kit]
-
-rule `bounded_write` auto-allows `touch '\.tmp/a'`, `touch "\.tmp/a"`, `touch $'\\.tmp/a'`, `printf x > '\.tmp/a'` and `mkdir -p '\.tmp/x'` as a bounded scratch write, though bash's value for each word keeps the backslash, so the path sits under a directory named `\.tmp` outside the scratch dir. The `mkdir -p` grant creates that directory itself; a bare `mkdir '\.tmp'` falls through.
-
-**Deliverable:** the bounds test reads the word's value, a kept backslash included, with firing rows for the single-quoted, double-quoted and ANSI-C spellings in `guard-kit/guard-tests/`. It moves allow to fall-through, so it lands in a build.
-
-**Cost while deferred:** a wrong grant of contrived spellings; it blocks the v0.32.0 bar. Filed 2026-10-19 by guard-reader-value-bar-pass' close, draining validate's bullet from the failed second-vendor review's trace; promoted for the next iteration by operator direction 2026-10-19, lead-relayed, not a ruling. Re-verified there: all five allowed on the built binary at the close stamp's head. At v0.31.0, built from its tag, the `touch` spellings fall through and the `printf` redirect is refused, the rule landing after that tag, so the grant is unreleased rather than pre-existing. Corrected at the next scope: the bounds test compares path components literally (`bounded` in `native/src/guard/rules/grants.rs`), so the backslash is lost before it, in the target's value or its skeleton fallback; two spellings re-verified allowed. Owner lookup: `backslash`, `bounded write`, `scratch-write`, `in-scratch` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The rule roster, rule `bounded_write`.
 
 ### lead-role-marker-guard-refused
 
