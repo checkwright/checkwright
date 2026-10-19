@@ -413,6 +413,11 @@ allow	grep -c x tracked.md <&0 2>&1 |& head
 allow	grep -c x tracked.md <& 0
 allow	grep -c x tracked.md &>/dev/null
 block	grep -rn foo src >&@CR@2 &
+# an escaped or quoted '&' is a character of its word and ends no statement; after an even
+# backslash run it is bare again
+allow	grep -c x\&y tracked.md
+allow	grep -c 'x&y' tracked.md
+block	grep -c x\\&y tracked.md
 # '|&' pipes stderr too and backgrounds nothing
 fallthrough	make build |& tail -5
 

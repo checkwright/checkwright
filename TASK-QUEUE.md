@@ -28,16 +28,6 @@ kit prose states one harness's permission-rule grammar as the kit's: guard-kit's
 
 ## Technical Debt
 
-### escaped-amp-statement-split
-
-rule `background_no_record` blocks a foreground read whose `&` is escaped: `grep -c x\&y README.md`, one pattern word to bash, blocks as if it backgrounded a child, while `grep -c x README.md` is allowed. The statement splitter (`statement_amp` in `native/src/guard/text.rs`) ignores escaping, a regression from guard-word-read-reach-pass' glued-ampersand hotfix. Found by that iteration's validate second-vendor review (its P2); held filed with no hotfix by operator direction 2026-10-19, lead-relayed, not a ruling.
-
-**Deliverable:** the splitter ends no statement at an escaped or quoted `&`, with a row of this shape. It moves a verdict from block to allow, so it lands in a build.
-
-**A regression from v0.31.0, re-verified at guard-ansi-c-bar-pass' scope:** v0.31.0's Release binary lets the escaped call fall through, so this block meets the v0.32.0 bar.
-
-**Cost while deferred:** a re-issue per such call, never a wrong grant. Filed 2026-10-19 by guard-word-read-reach-pass' close, draining its validate's bullet. Re-verified there: the pair above on the built binary. Owner lookup: `statement_amp`, `background_no_record`, `escaped` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The generic ruleset.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -158,7 +148,7 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Three grants of 2026-10-18 spent:** session-sweep-policy-pass' close review returned five P2 findings, fixed there; harness-reach-pass' validate review three verdict-moving ones, two wrong grants, landed at guard-grant-kpi-pass as `ro-pipeline-wrong-grants` and `pwsh-string-expr-overblock`; guard-grant-kpi-pass' close review three, one a wrong grant since fixed. Each left v0.32.0 deferred.
 
-**One grant of 2026-10-19 spent:** guard-word-read-reach-pass' validate review returned a wrong grant, hotfixed, and a wrong block, promoted as [escaped-amp-statement-split](#escaped-amp-statement-split); its close deferred v0.32.0, the bar also meeting the open wrong grant in `worktree-ansi-c-path-word`.
+**One grant of 2026-10-19 spent:** guard-word-read-reach-pass' validate review returned a wrong grant, hotfixed, and a wrong block, promoted as `escaped-amp-statement-split`; its close deferred v0.32.0, the bar also meeting the open wrong grant in `worktree-ansi-c-path-word`.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
@@ -1005,4 +995,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - skeleton-ansi-c-escaped-quote
 - worktree-ansi-c-path-word
 - path-slot-ansi-c-dollar
+- escaped-amp-statement-split
 

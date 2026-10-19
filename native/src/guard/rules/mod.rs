@@ -1071,10 +1071,10 @@ mod tests {
     // statement as a spaced one does.
     #[test]
     fn a_glued_bare_ampersand_ends_a_statement() {
-        for glued in ["ls &touch x", "ls&touch x", "ls &\0SQ", "(make &)", "a &;b"] {
+        for glued in ["ls &touch x", "ls&touch x", "ls &\0SQ", "(make &)", "a &;b", "grep x\\\\&y f"] {
             assert!(shell_backgrounds(glued), "{:?} backgrounds", glued);
         }
-        for kept in ["a && b", "a &>o", "a &>>o", "a >&2", "a 2>&1", "a <&3", "a <& 3", "a |& b"] {
+        for kept in ["a && b", "a &>o", "a &>>o", "a >&2", "a 2>&1", "a <&3", "a <& 3", "a |& b", "grep x\\&y f", "a \\& b"] {
             assert!(!shell_backgrounds(kept), "{:?} backgrounds nothing", kept);
         }
         assert_eq!(background_statements("grep -rn foo src &sort -o o t"), vec!["grep -rn foo src ", "sort -o o t"]);

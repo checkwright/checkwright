@@ -86,11 +86,13 @@ pub fn chomp(s: &str) -> &str {
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `background_no_record`'s statement-ending bare
-// `&` at byte `i`: no part of `&&`, `&>`, `>&`, `<&` or `|&`, whatever follows it.
+// `&` at byte `i`: no part of `&&`, `&>`, `>&`, `<&` or `|&`, whatever follows it, and not behind an
+// odd backslash run.
 pub fn statement_amp(b: &[u8], i: usize) -> bool {
     b[i] == b'&'
         && (i == 0 || !matches!(b[i - 1], b'&' | b'>' | b'<' | b'|'))
         && !matches!(b.get(i + 1), Some(b'&' | b'>'))
+        && b[..i].iter().rev().take_while(|&&c| c == b'\\').count() % 2 == 0
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — `read -ra words <<<"$s"`: the first line only, split
