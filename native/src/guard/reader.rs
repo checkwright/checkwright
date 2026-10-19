@@ -73,11 +73,24 @@ pub struct Word {
     pub value: String,
     pub live: String,
     seams: Vec<(usize, usize, usize)>,
+    ansi_c: bool,
 }
 
 impl Word {
     pub fn new(spelling: &str, value: &str, live: &str) -> Word {
-        Word { spelling: spelling.to_string(), value: value.to_string(), live: live.to_string(), seams: Vec::new() }
+        Word {
+            spelling: spelling.to_string(),
+            value: value.to_string(),
+            live: live.to_string(),
+            seams: Vec::new(),
+            ansi_c: false,
+        }
+    }
+
+    // spec: guard-kit/SPEC.md §The reader and its views — the word carries an ANSI-C quoted piece, whose
+    // value the dequoted view does not hold; a slice keeps its word's answer.
+    pub fn ansi_c(&self) -> bool {
+        self.ansi_c
     }
 
     // spec: guard-kit/SPEC.md §The reader and its views — the value of what a word holds ahead of
@@ -131,6 +144,7 @@ impl Word {
             value: self.value.get(v0..v1)?.to_string(),
             live: self.live.get(from..to)?.to_string(),
             seams: seams.collect(),
+            ansi_c: self.ansi_c,
         })
     }
 }
@@ -141,11 +155,12 @@ pub struct WordAcc {
     segs: Vec<Vec<Word>>,
     open: Option<[Vec<u8>; 3]>,
     seams: Vec<(usize, usize, usize)>,
+    ansi_c: bool,
 }
 
 impl WordAcc {
     pub fn new() -> WordAcc {
-        WordAcc { segs: vec![Vec::new()], open: None, seams: Vec::new() }
+        WordAcc { segs: vec![Vec::new()], open: None, seams: Vec::new(), ansi_c: false }
     }
 
     pub fn piece(&mut self, spelling: &[u8], value: &[u8], live: &[u8]) {
@@ -156,11 +171,17 @@ impl WordAcc {
         self.seams.push((w[2].len(), w[1].len(), w[0].len()));
     }
 
+    pub fn ansi_c_piece(&mut self, spelling: &[u8], value: &[u8], live: &[u8]) {
+        self.piece(spelling, value, live);
+        self.ansi_c = true;
+    }
+
     pub fn end_word(&mut self) {
         if let Some([s, v, l]) = self.open.take() {
             let text = |b: Vec<u8>| String::from_utf8_lossy(&b).into_owned();
             let seams = std::mem::take(&mut self.seams);
-            let word = Word { spelling: text(s), value: text(v), live: text(l), seams };
+            let ansi_c = std::mem::take(&mut self.ansi_c);
+            let word = Word { spelling: text(s), value: text(v), live: text(l), seams, ansi_c };
             self.segs.last_mut().expect("one segment is always open").push(word);
         }
     }

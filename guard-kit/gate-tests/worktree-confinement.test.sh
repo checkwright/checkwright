@@ -104,6 +104,17 @@ want off-journal       "$SANDBOX/off.knobs" allow "printf 'x\n' >> $main/.tmp/jo
 # --- a program-bearing tool is never admitted, whatever the roster declares of it
 want awk-declared      "$SANDBOX/awk.knobs" block "awk '{print}' $main/docs/a.md" "$refusal"
 
+# --- the path-word read takes the dequoted view, which holds an ANSI-C quoted word unresolved, so a call
+#     carrying one is refused every grant and falls through, where its plain spelling is granted or blocks
+want ansi-c-grep       "$d" fallthrough "grep -rn foo \$'$main/docs'"
+want ansi-c-off-grep   "$SANDBOX/off.knobs" fallthrough "grep -rn foo \$'$main/docs'"
+want ansi-c-traversal  "$SANDBOX/off.knobs" fallthrough "grep -rn foo \$'\\x2e\\x2e/\\x2e\\x2e/\\x2e\\x2e/docs'"
+want ansi-c-awk        "$SANDBOX/awk.knobs" fallthrough "awk '{print}' \$'$main/docs/a.md'"
+want off-cat-journal   "$SANDBOX/off.knobs" block "cat $main/docs/a.md >> $main/.tmp/journal.md" "$refusal"
+want ansi-c-journal    "$SANDBOX/off.knobs" fallthrough "cat \$'$main/docs/a.md' >> $main/.tmp/journal.md"
+want off-wait          "$SANDBOX/off.knobs" block "until grep -q foo $main/docs/a.md; do sleep 1; done" "$refusal"
+want ansi-c-wait       "$SANDBOX/off.knobs" fallthrough "until grep -q foo \$'$main/docs/a.md'; do sleep 1; done"
+
 # --- a read-only arm on the gate binary or the front end is admitted over the main checkout, in either
 #     spelling of the arm; an arm outside the read-only set is refused
 want arm-md-section    "$d" fallthrough "$BIN --emit md-section $main/docs/a.md \"H\""
@@ -181,5 +192,5 @@ grep -qF "from-the-main-checkout" "$main/.workflow/prompt-friction.log" 2>/dev/n
 git -C "$main" worktree remove --force "$wt"
 
 [[ "$fails" -eq 0 ]] || { echo "worktree-confinement.test: $fails of $checks assertion(s) failed"; exit 1; }
-echo "worktree-confinement.test: ok ($checks assertions; from a linked worktree the journal append under the main scratch dir and read-only searches of the main checkout pass, every write naming the main checkout outside its scratch dir is refused with the loaded roster named, a PowerShell call meets the same refusal with no admitted read and has a main-checkout scratch body steered to the own scratch dir, a write in the own worktree is not the rule's, 'off' refuses the search and keeps the journal, a program-bearing tool is never admitted while a read-only arm of the gate binary is and the refusal names both forms, and the liveness record resolves to the main checkout's scratch dir for the launch, its grant and the git-write hold, and a fall-through at the relative log default lands in the main checkout's log)"
+echo "worktree-confinement.test: ok ($checks assertions; from a linked worktree the journal append under the main scratch dir and read-only searches of the main checkout pass, every write naming the main checkout outside its scratch dir is refused with the loaded roster named, a PowerShell call meets the same refusal with no admitted read and has a main-checkout scratch body steered to the own scratch dir, a write in the own worktree is not the rule's, 'off' refuses the search and keeps the journal, a call carrying an ANSI-C quoted word is refused every grant, a program-bearing tool is never admitted while a read-only arm of the gate binary is and the refusal names both forms, and the liveness record resolves to the main checkout's scratch dir for the launch, its grant and the git-write hold, and a fall-through at the relative log default lands in the main checkout's log)"
 exit 0

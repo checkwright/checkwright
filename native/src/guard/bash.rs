@@ -790,7 +790,7 @@ pub fn word_read(raw: &str) -> Option<Vec<Vec<Word>>> {
                     return None;
                 }
                 let live = format!("${SQ_MARK}");
-                acc.piece(&b[i..i + k + 3], &ansi_c(content)?, live.as_bytes());
+                acc.ansi_c_piece(&b[i..i + k + 3], &ansi_c(content)?, live.as_bytes());
                 i += k + 3;
             }
             b'\'' => {
@@ -1118,6 +1118,19 @@ mod tests {
         assert_eq!(faces("echo $$\"x\"")[0][1].1, "$$x");
         assert_eq!(faces("echo '$'\"x\"")[0][1].1, "$x");
         assert_eq!(faces("echo \"a$\"\"x\"")[0][1].1, "a$x");
+    }
+
+    // spec: guard-kit/SPEC.md §The reader and its views — a word carrying an ANSI-C quoted piece is
+    // marked as one, and the pid, an escaped `$` and a plain quote are not
+    #[test]
+    fn the_word_read_marks_a_word_carrying_an_ansi_c_piece() {
+        let marks = |c: &str| -> Vec<bool> { word_read(c).unwrap()[0].iter().map(Word::ansi_c).collect() };
+        assert_eq!(marks("awk $'BEGIN { \\x73ystem(\"x\") }' f"), [false, true, false]);
+        assert_eq!(marks("cat >> \".tmp/\"$'\\056\\056/x'"), [false, false, true]);
+        assert_eq!(marks("echo $$$'x' a"), [false, true, false]);
+        assert_eq!(marks("echo $$'x' \\$'x' 'x' \"x\""), [false, false, false, false, false]);
+        let w = word_read("echo a$'b'c").unwrap()[0][1].clone();
+        assert!(w.slice(0, 1).is_some_and(|s| s.ansi_c()));
     }
 
     // spec: guard-kit/SPEC.md §The reader and its views — each escape resolved to the bytes bash gives

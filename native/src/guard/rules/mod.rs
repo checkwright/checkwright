@@ -622,8 +622,8 @@ fn ro_invocation_clear(h: &Host, bin: &str, dwords: &str, skel_core: &str, xargs
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — the one declared-forms reader: each segment's member
-// and words by their values off the command read, its program off the dequoted view aligned segment
-// for segment with the skeleton; withheld where the word read answers nothing or the two do not align.
+// and words by their values, its program off the dequoted view aligned with the skeleton; withheld where
+// the word read answers nothing, the two do not align, or a dequoted read meets an ANSI-C quoted word.
 fn ro_forms_clear(ctx: &Ctx, c: &Cmd) -> Result<bool, Fault> {
     ro_forms_clear_except(ctx, c, &[])
 }
@@ -699,14 +699,15 @@ fn ro_forms_read(ctx: &Ctx, c: &Cmd, skip: &[usize], statements: bool) -> Result
     if segs.len() != dsegs.len() || read.len() != segs.len() {
         return Ok(false);
     }
-    let mut pairs: Vec<(&str, &str, Vec<Word>, bool)> = Vec::new();
+    let mut pairs: Vec<(&str, &str, Vec<Word>, bool, bool)> = Vec::new();
     for (i, ((seg, dseg), ws)) in segs.iter().zip(&dsegs).zip(&read).enumerate() {
         if skip.contains(&i) {
             continue;
         }
         let masked = masked_option(Some(ws), dseg);
+        let ansi_c = ws.iter().any(Word::ansi_c);
         if !statements {
-            pairs.push((seg, dseg, passed_words(ws, escape), masked));
+            pairs.push((seg, dseg, passed_words(ws, escape), masked, ansi_c));
             continue;
         }
         let (cut, dcut) = (background_statements(seg), background_statements(dseg));
@@ -714,9 +715,9 @@ fn ro_forms_read(ctx: &Ctx, c: &Cmd, skip: &[usize], statements: bool) -> Result
         if cut.len() != dcut.len() {
             return Ok(false);
         }
-        pairs.extend(cut.into_iter().zip(dcut).zip(wcut).map(|((s, d), w)| (s, d, passed_words(&w, escape), masked)));
+        pairs.extend(cut.into_iter().zip(dcut).zip(wcut).map(|((s, d), w)| (s, d, passed_words(&w, escape), masked, ansi_c)));
     }
-    for (seg, dseg, passed, masked) in pairs {
+    for (seg, dseg, passed, masked, ansi_c) in pairs {
         let Some((head, args)) = passed.split_first() else { continue };
         let bin = head.value.as_str();
         if !on_ro_roster(h, bin) {
@@ -732,11 +733,14 @@ fn ro_forms_read(ctx: &Ctx, c: &Cmd, skip: &[usize], statements: bool) -> Result
             return Ok(false);
         }
         let program = format!("{}{}", bin, rest(&dcw, dhead));
-        if matches!(bin, "sed" | "awk") && (masked || !tools::program_clear(bin, &program)) {
+        if matches!(bin, "sed" | "awk") && (masked || ansi_c || !tools::program_clear(bin, &program)) {
             return Ok(false);
         }
         if bin != "xargs" {
             continue;
+        }
+        if ansi_c {
+            return Ok(false);
         }
         let idx = match xargs_command_index(&dcw) {
             Err(()) => return Ok(false),

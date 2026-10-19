@@ -945,9 +945,16 @@ pub fn shell_wrapper(ctx: &Ctx) -> Decided {
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `worktree_confinement`'s test as a predicate,
-// taken under that rule's own declared views.
+// taken under that rule's own declared views; from a linked worktree it also refuses a call carrying
+// an ANSI-C quoted word, whose value its dequoted path-word read does not hold.
 pub fn refused(ctx: &Ctx, c: &Cmd) -> Result<bool, Fault> {
-    Ok(ctx.under("worktree_confinement", |w| worktree_refuses(w, c))?.is_some())
+    ctx.under("worktree_confinement", |w| {
+        let linked = !w.host().roots().main.is_empty() && w.shell() == Shell::Bash;
+        if linked && w.word_read(c)?.is_some_and(|r| r.iter().flatten().any(Word::ansi_c)) {
+            return Ok(true);
+        }
+        Ok(worktree_refuses(w, c)?.is_some())
+    })
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `worktree_confinement`'s test: from a linked

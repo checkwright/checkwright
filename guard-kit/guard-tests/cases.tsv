@@ -697,6 +697,18 @@ allow	grep x tracked.md | xargs sed -n '\-x-p'
 fallthrough	grep x tracked.md | sed -n \-x-p
 fallthrough	grep x tracked.md | sed -n '\-x-w out.txt'
 fallthrough	grep x tracked.md | sed -l 5 s/a/b/
+# the discriminator and the xargs arm read the dequoted view, which holds an ANSI-C quoted word
+# unresolved, so a segment carrying one withholds where the plain spelling withholds, and so does a
+# program or an xargs run the plain spelling clears
+fallthrough	awk $'BEGIN { \x73ystem("printf pwned > tracked.md") }'
+fallthrough	grep x tracked.md | sed $'s/a/b/\x77 out.txt'
+fallthrough	awk $'{print}' tracked.md
+fallthrough	grep -l x tracked.md | xargs sort $'-o' tracked.md
+fallthrough	grep -l x tracked.md | xargs sort $'-\157' tracked.md
+fallthrough	grep -l x tracked.md | xargs awk $'BEGIN { \x73ystem("ls") }'
+fallthrough	grep -l x tracked.md | xargs grep $'a\tb'
+fallthrough	until awk $'BEGIN { \x73ystem("ls") }' tracked.md; do sleep 1; done
+allow	grep $'a\tb' tracked.md | awk '{print}'
 # banner tolerance (rules `find_glob` and `cat_file`'s): a literal echo/printf
 # segment is skipped, but at least one roster read must remain
 allow	echo === | grep foo src
