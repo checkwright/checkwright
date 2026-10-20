@@ -1,18 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: lead-role-guard-binding-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-10-20, lead-relayed, not a ruling; the iteration opened undirected):** option C over the recommended A. Debt promoted by scope: `bounded-write-backslash-grant`, the one open v0.32.0 bar blocker, and `hook-binding-single-source`. Features for spec to author and pair: `lead-role-marker-guard-refused`, `guard-verdict-typed-operand` and `shellcheck-gate-tests-derived`. Stages scope, spec, align (the lead-role amendment spans lifecycle-kit and context-kit), build, validate and close.
-
-  **Order (scope, own authority):** `hook-binding-single-source` builds before `guard-verdict-typed-operand`, whose arm builds a hook payload and reads the single-sourced binding spellings rather than spelling its own.
-
-  **Release review (operator grant 2026-10-20, lead-relayed, spent at validate):** one audit-mode second-vendor review over the iteration's range, run at validate; close may cut v0.32.0 on a clean return, against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed); a finding or a failed run defers the cut. **Returned not clean:** two wrong grants of `bounded_write`, filed to the gap inbox, absent at v0.31.0 and already present at the range base; v0.32.0 stays deferred.
-
-  **Push need (2026-10-20, inside the budget):** 2 against 2 — the closing push, and the v0.32.0 tag push only if the granted review returns clean; no unit reads a remote run.
 
 ---
 
