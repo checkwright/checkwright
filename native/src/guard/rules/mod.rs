@@ -86,6 +86,22 @@ pub static TABLE: &[Rule] = &[
     },
 ];
 
+// spec: guard-kit/SPEC.md §The generic ruleset — the literal test every grant and rewrite takes: the
+// received call passes each word as spelled. Rule `bounded_wait` reads it with arm (B)'s record
+// statement set aside.
+pub fn literal_call(rule: &str, raw: &str) -> bool {
+    let set_aside = match rule {
+        "bounded_wait" => liveness::record_set_aside(raw),
+        _ => None,
+    };
+    let call = set_aside.as_deref().unwrap_or(raw);
+    if call.contains(['\'', '"', '\\', '$', '`', '(', ')', '*', '?', '\r']) || call.contains("<<") {
+        return false;
+    }
+    call.split([' ', '\t', '\n', '|', '&', ';', '<', '>'])
+        .all(|w| !w.starts_with('~') && (!w.contains('[') || matches!(w, "[" | "[[")))
+}
+
 // spec: guard-kit/SPEC.md §The shell guard — the raw-command carve-out every grant takes: a
 // substitution in any spelling.
 fn has_substitution(raw: &str) -> bool {

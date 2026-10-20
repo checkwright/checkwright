@@ -73,9 +73,11 @@ d="$SANDBOX/default.knobs"
 refusal="reaches the main checkout"
 
 # --- allowed: the journal by shell under the main scratch dir, reads of the main checkout, and a
-#     read redirected into the session's own worktree
-want journal-append    "$d" allow "printf 'x\n' >> $main/.tmp/journal.md"
-want journal-heredoc   "$d" allow "cat >> $main/.tmp/journal.md <<'EOF'"$'\n'"a finding"$'\n'"EOF"
+#     read redirected into the session's own worktree; a journal append failing the literal test, a
+#     quoted or heredoc one, takes no grant and reaches the harness's own path
+want journal-append    "$d" allow "printf x >> $main/.tmp/journal.md"
+want journal-quoted    "$d" fallthrough "printf 'x\n' >> $main/.tmp/journal.md"
+want journal-heredoc   "$d" fallthrough "cat >> $main/.tmp/journal.md <<'EOF'"$'\n'"a finding"$'\n'"EOF"
 want grep-main         "$d" allow "grep -rn foo $main/docs"
 want grep-head-main    "$d" allow "grep -rn foo $main/docs | head -5"
 want find-name-main    "$d" allow "find $main/docs -name a.md"
@@ -99,16 +101,16 @@ want stash-own         "$d" fallthrough "git stash"
 
 # --- the selector: under off, a search of the main checkout blocks and the journal is still granted
 want off-grep          "$SANDBOX/off.knobs" block "grep -rn foo $main/docs" "$refusal"
-want off-journal       "$SANDBOX/off.knobs" allow "printf 'x\n' >> $main/.tmp/journal.md"
+want off-journal       "$SANDBOX/off.knobs" allow "printf x >> $main/.tmp/journal.md"
 
 # --- a program-bearing tool is never admitted, whatever the roster declares of it
 want awk-declared      "$SANDBOX/awk.knobs" block "awk '{print}' $main/docs/a.md" "$refusal"
 
 # --- the path words are read by value off the word read, so an ANSI-C quoted path blocks as its plain
 #     spelling does; the admitted read's checks read the dequoted view, which holds such a word by its
-#     value, so a read so spelled is granted as its plain spelling is, and one whose value carries a
-#     line feed, which that view holds unresolved, is refused every grant and falls through
-want ansi-c-grep       "$d" allow "grep -rn foo \$'$main/docs'"
+#     value, so a read so spelled is admitted as its plain spelling is, and falls through on the literal
+#     test every grant takes, as one whose value carries a line feed, which that view holds unresolved, does
+want ansi-c-grep       "$d" fallthrough "grep -rn foo \$'$main/docs'"
 want ansi-c-held-grep  "$d" fallthrough "grep -rn \$'foo\\n' $main/docs"
 want ansi-c-off-grep   "$SANDBOX/off.knobs" block "grep -rn foo \$'$main/docs'" "$refusal"
 want ansi-c-traversal  "$SANDBOX/off.knobs" block "grep -rn foo \$'\\x2e\\x2e/\\x2e\\x2e/\\x2e\\x2e/docs'" "$refusal"

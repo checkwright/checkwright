@@ -2,7 +2,7 @@
 // each rule handed its declared views through a context and nothing else.
 use super::host::Host;
 use super::reader::{Reader, View, Word};
-use super::rules::TABLE;
+use super::rules::{literal_call, TABLE};
 
 // spec: guard-kit/SPEC.md §The shell guard — the four decisions a rule can take; each renders as
 // the envelope the library printed.
@@ -186,9 +186,16 @@ pub fn row(name: &str) -> &'static Rule {
 // spec: guard-kit/SPEC.md §The generic ruleset — the first rule that decides ends the call; a view
 // fault decides nothing and says so loudly.
 pub fn decide(reader: &dyn Reader, shell: Shell, host: &Host, cmd: &Cmd) -> Option<Verdict> {
-    for rule in TABLE.iter().filter(|r| r.shells.contains(&shell)) {
+    decide_over(TABLE, reader, shell, host, cmd)
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — a grant or a rewrite on a call the literal test
+// refuses is a decline, and the walk goes on.
+fn decide_over(table: &'static [Rule], reader: &dyn Reader, shell: Shell, host: &Host, cmd: &Cmd) -> Option<Verdict> {
+    for rule in table.iter().filter(|r| r.shells.contains(&shell)) {
         let ctx = Ctx { reader, shell, rule, host, cmd };
         match (rule.test)(&ctx) {
+            Ok(Some(Verdict::Allow(_) | Verdict::Rewrite(..))) if !literal_call(rule.name, &cmd.0) => {}
             Ok(Some(v)) => return Some(v),
             Ok(None) => {}
             Err(f) => return Some(Verdict::Advise(fault_message(&f))),
@@ -203,4 +210,79 @@ pub fn fault_message(f: &Fault) -> String {
         f.rule,
         f.view.spelling()
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn grant(_: &Ctx) -> Decided {
+        Ok(Some(Verdict::Allow("stub".to_string())))
+    }
+
+    fn rewrite(_: &Ctx) -> Decided {
+        Ok(Some(Verdict::Rewrite("ls".to_string(), "stub".to_string())))
+    }
+
+    fn steer(_: &Ctx) -> Decided {
+        Ok(Some(Verdict::Block("stub".to_string())))
+    }
+
+    static GRANTS: &[Rule] = &[
+        Rule { name: "stub_grant", shells: &[Shell::Bash], views: &[], test: grant },
+        Rule { name: "stub_rewrite", shells: &[Shell::Bash], views: &[], test: rewrite },
+    ];
+    static STEERS: &[Rule] = &[
+        Rule { name: "stub_grant", shells: &[Shell::Bash], views: &[], test: grant },
+        Rule { name: "stub_steer", shells: &[Shell::Bash], views: &[], test: steer },
+    ];
+
+    // spec: guard-kit/SPEC.md §The generic ruleset — the engine holds the literal test over every
+    // grant verdict, so a rule that omits it grants nothing outside it and a later rule still reads
+    // the call.
+    #[test]
+    fn a_grant_on_a_call_the_literal_test_refuses_is_a_decline() {
+        let host = Host::load(false).expect("the guard's knobs load");
+        let reader = super::super::bash::Bash;
+        let ask = |table: &'static [Rule], c: &str| decide_over(table, &reader, Shell::Bash, &host, &Cmd::new(c));
+        assert_eq!(ask(GRANTS, "echo a >> .tmp/j.md"), Some(Verdict::Allow("stub".to_string())));
+        for refused in [
+            "echo \"a b\" >> .tmp/j.md",
+            "echo 'a' >> .tmp/j.md",
+            "echo a\\ b >> .tmp/j.md",
+            "ls .tmp/o*",
+            "ls .tmp/o?",
+            "ls .tmp/[ab]",
+            "ls ~/x",
+            "echo $HOME",
+            "echo `x`",
+            "cat <<EOF\nx\nEOF",
+            "cat <<<x",
+            "ls\r",
+            "(ls)",
+        ] {
+            assert_eq!(ask(GRANTS, refused), None, "{:?}", refused);
+            assert_eq!(ask(STEERS, refused), Some(Verdict::Block("stub".to_string())), "{:?}", refused);
+        }
+        for literal in ["until [ -f .tmp/x ]; do sleep 5; done", "[[ -f .tmp/x ]]", "ls .tmp/a~ a=b"] {
+            assert_eq!(ask(GRANTS, literal), Some(Verdict::Allow("stub".to_string())), "{:?}", literal);
+        }
+    }
+
+    // spec: guard-kit/SPEC.md §The rule roster — rule `bounded_wait`'s arm (B) record statement is the
+    // literal test's one exemption, byte for byte, and the rest of the call stays held to the test
+    #[test]
+    fn the_record_template_alone_is_set_aside_for_bounded_wait() {
+        let launch = "git status > .tmp/k.log 2>&1 & echo \"pid=$! run=k\" > .tmp/k.run; wait; rm -f .tmp/k.run";
+        assert!(literal_call("bounded_wait", launch));
+        assert!(!literal_call("bounded_write", launch), "the exemption is rule `bounded_wait`'s alone");
+        for off in [
+            "git status > .tmp/k.log 2>&1 & echo  \"pid=$! run=k\" > .tmp/k.run; wait",
+            "git status > .tmp/k.log 2>&1 & echo \"pid=$! run=k\" >.tmp/k.run; wait",
+            "git \"status\" > .tmp/k.log 2>&1 & echo \"pid=$! run=k\" > .tmp/k.run; wait",
+            "git status > .tmp/k.log 2>&1 & echo \"pid=$! run=k\" > .tmp/k.run; wait; rm -f .tmp/*.run",
+        ] {
+            assert!(!literal_call("bounded_wait", off), "{:?}", off);
+        }
+    }
 }

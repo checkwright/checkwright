@@ -170,7 +170,7 @@ fn variant_lane(
                 let got = decide(root, log, &cmd, flagged.then_some(flag), tool)?;
                 derived += 1;
                 tally.ran += 1;
-                let held = if is_added { guard_variants::added_relation(&got) } else { guard_variants::relation(want, &got) };
+                let held = if is_added { guard_variants::added_relation(&got) } else { guard_variants::relation(want, &got, &variant.transform) };
                 let Some(why) = unadmitted(&mut ledger, held, section.as_deref(), variant, &got) else {
                     continue;
                 };
@@ -278,7 +278,7 @@ fn consumer_lane(tally: &mut Tally) -> Result<Option<Consumer>, String> {
             let got = ask(&cmd)?;
             derived += 1;
             tally.ran += 1;
-            let held = guard_variants::relation(&row[0], &got);
+            let held = guard_variants::relation(&row[0], &got, &variant.transform);
             let Some(why) = unadmitted(&mut ledger, held, section.as_deref(), &variant, &got) else {
                 continue;
             };
@@ -504,6 +504,7 @@ pub(crate) fn build_sandbox() -> Result<Sandbox, String> {
     mkdir(&at(".tmp"))?;
     write(&at(".tmp/dead-producer.run"), "pid=2147483646 run=dead-producer\n")?;
     write(&at(".tmp/notes.txt"), "not a record\n")?;
+    mkdir(&at(".tmp/held"))?;
 
     mkdir(&at(".claude"))?;
     write(

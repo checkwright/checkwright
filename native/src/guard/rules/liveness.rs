@@ -1,7 +1,7 @@
 // spec: guard-kit/SPEC.md §The generic ruleset — the producer rules: a git write under a live
 // recorded producer, a launch that records nothing, a wait no producer can end, and the two waits
 // granted outright.
-use super::grants::{slot_reach, Reach};
+use super::grants::{slot_reach, through_link, Reach};
 use super::reach::{interpreter_reach, refused, rm_tracked_reach};
 use super::{
     background_statements, command_word, dups_onto_file, git_read, git_walk_of, has_expansion, has_substitution, inert_target, inert_value, is_banner, is_ro_segment,
@@ -426,9 +426,9 @@ fn lone_loop(s: &str) -> Option<(String, String, String, String)> {
     Some((part(0, *at), part(at + first.len(), open), part(open + 2, close), part(close + 4, joined.len())))
 }
 
-// spec: guard-kit/SPEC.md §The generic ruleset — the recorded launch's tail after its `&`:
-// ` echo <quoted> > <path>; wait[; rm -f <path>]`, the quoted record either the literal
-// `"pid=$! run=<key>"` or its `dq` placeholder. The key, the record path and the removed path.
+// spec: guard-kit/SPEC.md §The rule roster — rule `bounded_wait`'s arm (B) template match on the
+// tail after the launch's `&`, the record statement byte for byte, its quoted record literal or the
+// `dq` placeholder; the key, the record path and the removed path.
 fn launch_tail(t: &str, placeholder: bool) -> Option<(String, String, String)> {
     let b = t.as_bytes();
     let mut i = 0usize;
@@ -464,7 +464,7 @@ fn launch_tail(t: &str, placeholder: bool) -> Option<(String, String, String)> {
             false
         }
     };
-    if !ws(&mut i) || !lit(&mut i, "echo") || !ws(&mut i) {
+    if !ws(&mut i) || !lit(&mut i, "echo ") {
         return None;
     }
     let key = if placeholder {
@@ -489,11 +489,9 @@ fn launch_tail(t: &str, placeholder: bool) -> Option<(String, String, String)> {
         }
         k
     };
-    ws(&mut i);
-    if !lit(&mut i, ">") {
+    if !lit(&mut i, " > ") {
         return None;
     }
-    ws(&mut i);
     let path = word(&mut i)?;
     if !sep(&mut i) || !lit(&mut i, "wait") {
         return None;
@@ -533,6 +531,16 @@ fn split_launch(s: &str, placeholder: bool) -> Option<(String, (String, String, 
         }
     }
     None
+}
+
+// spec: guard-kit/SPEC.md §The generic ruleset — the literal test's one exemption: the call with arm
+// (B)'s template statement set aside, `None` where no statement matches the template.
+pub(super) fn record_set_aside(raw: &str) -> Option<String> {
+    let (launch, (key, path, _)) = split_launch(raw, false)?;
+    let tail = &raw[launch.len() + 1..];
+    let template = format!("echo \"pid=$! run={}\" > {}", key, path);
+    let at = tail.find(&template)?;
+    Some(format!("{}&{}{}", launch, &tail[..at], &tail[at + template.len()..]))
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — rule `bounded_wait`'s arm (B), the recorded launch:
@@ -599,7 +607,7 @@ fn recorded_launch(ctx: &Ctx) -> Result<bool, Fault> {
         targets.push(tgt);
     }
     targets.push(path);
-    Ok(targets.iter().all(|t| h.ignored(t)))
+    Ok(targets.iter().all(|t| h.ignored(t) && !through_link(t)))
 }
 
 pub fn bounded_wait(ctx: &Ctx) -> Decided {

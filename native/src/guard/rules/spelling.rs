@@ -2,7 +2,7 @@
 // resolve, steered to the one it can.
 use super::grants::rewrite_granted;
 use super::reach::path_word;
-use super::{command_read, escape_char, redirect_values, command_word, git_read, git_walk_of, names_command, passed_read, GitWalk};
+use super::{command_read, escape_char, literal_call, redirect_values, command_word, git_read, git_walk_of, names_command, passed_read, GitWalk};
 use crate::guard::engine::{Cmd, Ctx, Decided, Shell, Verdict};
 use crate::guard::host::{knob_scalar_value, same_file};
 use crate::guard::reader::View::{SqDqHd, SqDqHdq, SqHdq};
@@ -213,7 +213,7 @@ pub fn abs_script(ctx: &Ctx) -> Decided {
     let relcmd = raw.replace(&pre, "");
     for g in &ctx.host().ro_scripts {
         if crate::walk::glob_match(g, base) || crate::walk::glob_match(g, rest) {
-            if rewrite_granted(ctx, &Cmd::new(relcmd.clone()))? {
+            if literal_call("abs_script", raw) && rewrite_granted(ctx, &Cmd::new(relcmd.clone()))? {
                 return Ok(Some(Verdict::Rewrite(
                     relcmd,
                     "abs repo read-only script normalized to relative (shell-guard)".to_string(),
@@ -264,7 +264,7 @@ pub fn brace_glyph(ctx: &Ctx) -> Decided {
     let resid = sq.replace("{}", "");
     if !resid.contains('{') && !resid.contains('}') {
         let rw = raw.replace("{}", "'{}'");
-        if rewrite_granted(ctx, &Cmd::new(rw.clone()))? {
+        if literal_call("brace_glyph", raw) && rewrite_granted(ctx, &Cmd::new(rw.clone()))? {
             return Ok(Some(Verdict::Rewrite(
                 rw,
                 "bare {} placeholder single-quoted so the harness matcher passes it (shell-guard)".to_string(),

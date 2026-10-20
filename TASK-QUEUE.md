@@ -18,28 +18,6 @@
 
 ## New Features
 
-### guard-grant-literal-shrink
-
-[spec: SPEC-grant-literal-shrink.md]
-
-the shell guard's grant side keeps chasing parity with bash's spellings and does not converge: the last five iterations were guard passes, and each granted second-vendor review that returned a report found new wrong grants, the latest [bounded-write-link-reach-grant](#bounded-write-link-reach-grant). The steering and block rules fail safe, a wrong block costing a prompt; the grant rules (guard-kit/SPEC.md §The generic ruleset: the auto-allow band and the rewrite grants) do not, and they duplicate the harness's own permission and auto-mode classifier.
-
-**Deliverable:** design-pending, a feature narrowing asserted behaviour: the grants shrink to literal spellings, falling through on any glob, quoting, backslash, or `cp` or redirect into a directory; the steering and block rules stay. Lead advice, not a ruling: with the shrink, take the zero-wrong-grant review off the v0.32.0 bar or narrow it to the shrunk set ([tarball-attestation-observed](#tarball-attestation-observed) carries the bar).
-
-**Cost while deferred:** every iteration's validate and close re-spend a review and a bar reading on the grant side, and v0.32.0 stays held, so the catalog submission's published tag waits. Measured by the lead from the stage-economics log: guard iterations cost about 34% of spend since 2026-10-13. Surfaced 2026-10-20 by the lead after lead-role-guard-binding-pass' close, operator direction (lead session, not a ruling): weigh it at the next scope against the other priorities. Re-verified at that scope: 13 of 77 iteration names since 2026-09-24 carry `guard`, and the five trailing ones all do. Owner lookup: `grant side`, `literal`, `auto-allow` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The generic ruleset.
-
-### bounded-write-link-reach-grant
-
-[spec: SPEC-grant-literal-shrink.md]
-
-rule `bounded_write` grants two writes that reach through a symbolic link in scratch. A glob final component: `touch .tmp/l*` and `ls > .tmp/l*` allow, since the bounds test's clause (c) reads a glob word's parent directory for clauses (b) to (f), so clause (e) never sees a matched link; the literal `touch .tmp/link` falls through. A directory destination: `cp src .tmp/d` allows, since `cp`'s row writes "the destination" and the effective target `.tmp/d/src` takes no bounds test; where it is a link, GNU `cp` follows it and overwrites the link's target, while `cp src .tmp/d/src` falls through. Both contradict clause (e)'s own ground.
-
-**Deliverable:** guard-kit/SPEC.md's bounds test and `cp` row name the paths a glob and a directory destination reach, `native/src/guard/rules/grants.rs` withholds where one is a link or cannot be read, and firing rows in `guard-kit/guard-tests/` hold both. It moves allow to fall-through, so it lands in a build.
-
-**Cost while deferred:** a wrong grant needing a planted link in scratch; it blocks the v0.32.0 bar. Filed 2026-10-20 by lead-role-guard-binding-pass' close, draining validate's two bullets from the second-vendor review. Re-verified there in a disposable `.tmp/fx` fixture: each glob and directory form allowed, each literal form fell through, and `cp` overwrote the link's target; `bounded_write` absent at v0.31.0 and present at the iteration base. Owner lookup: `bounded_write`, `symlink`, `link`, `write_targets` in this file and the disposed-findings record, none; `bounded-write-backslash-grant`, Done, DISTINCT (a kept backslash, not a link); owner guard-kit/SPEC.md §The rule roster, rule `bounded_write`.
-
-**Also owed in this file, surfaced 2026-10-20 at lead-role-guard-binding-pass' close audit, carried to the next scope:** the `spec:` comment above `fn write_words` in `grants.rs` still says its words are dequoted with backslashes removed, while the function reads each by value, a kept backslash included; reword it to the by-value read, pointing at rule `bounded_write`. Comment-only, no verdict moves.
-
 ### run-scratch-system-temp
 
 [spec: SPEC-run-scratch-root.md]
@@ -168,9 +146,9 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Release (operator directions, lead-relayed, not rulings):** v0.32.0 has stayed deferred since a direction of 2026-10-12, closing push only. **The bar, the same direction:** cut once no open finding is a wrong grant or a regression from v0.31.0; a fall-through hole rides as a declared limit in the note. **Since 2026-10-13** that reading rests on the iteration's second-vendor review returning clean, a failed run or a finding leaving the bar a judgment being asked, never met by a same-vendor reader; **since 2026-10-14** a close promotes every verdict-moving guard change it would author rather than landing it (the close binding carries the rule). That cut's `publish` run produces this observation and [front-door-job-observed](#front-door-job-observed)'s.
 
-**Grants spent 2026-10-15 to 2026-10-20:** every review returned findings or failed (a credit wall, a content refusal), each finding fixed or landed in a later build, the last two wrong grants [bounded-write-link-reach-grant](#bounded-write-link-reach-grant); each close deferred v0.32.0. The competitive-followup-pass close withdrew `prove` from docs/install.md and docs/maintenance.md and the overlap section from docs/openspec.md, its line held in `companion/fixtures/openspec/overlap/line.md`; **the cut restores them** and deletes the held file.
+**Grants spent 2026-10-15 to 2026-10-20:** every review returned findings or failed (a credit wall, a content refusal), each finding fixed or landed in a later build, the last two wrong grants `bounded-write-link-reach-grant`; each close deferred v0.32.0. The competitive-followup-pass close withdrew `prove` from docs/install.md and docs/maintenance.md and the overlap section from docs/openspec.md, its line held in `companion/fixtures/openspec/overlap/line.md`; **the cut restores them** and deletes the held file.
 
-**Bar narrowed, operator direction 2026-10-20, lead-relayed at guard-grant-shrink-pass' scope:** the zero-wrong-grant bar now reads over the grant set left after [guard-grant-literal-shrink](#guard-grant-literal-shrink); one second-vendor review is granted at that iteration's validate, and its close cuts v0.32.0 on a clean return.
+**Bar narrowed, operator direction 2026-10-20, lead-relayed at guard-grant-shrink-pass' scope:** the zero-wrong-grant bar now reads over the grant set left after `guard-grant-literal-shrink`; one second-vendor review is granted at that iteration's validate, and its close cuts v0.32.0 on a clean return.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
@@ -995,4 +973,6 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 ## Done
 
 - hook-binding-reader-rows
+- guard-grant-literal-shrink
+- bounded-write-link-reach-grant
 

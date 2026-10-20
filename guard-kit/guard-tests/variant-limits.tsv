@@ -2,3 +2,13 @@
 # --run-guard-tests (guard-kit/SPEC.md §Testing). A row is deleted in the commit that lifts its
 # read or withholds its grant, and the lane fails on a row nothing needs.
 fallthrough	pgrep_self_match	part-arg
+# the arm (a) of rule `emitter_write` fires only on a write the literal test passes, so a quoted
+# or escaped re-spelling of a compounded scratch write reaches the harness's own path
+fallthrough	emitter_write	sq-lead
+fallthrough	emitter_write	dq-lead
+fallthrough	emitter_write	esc-lead
+fallthrough	emitter_write	part-lead
+fallthrough	emitter_write	sq-arg
+fallthrough	emitter_write	dq-arg
+fallthrough	emitter_write	esc-arg
+fallthrough	emitter_write	part-arg

@@ -3,7 +3,7 @@
 use super::reach::{interpreter_reach, refused, rm_tracked_reach};
 use super::{
     command_read, escape_char, has_substitution, inert_value, is_banner, is_bare_allow, is_ro_segment, is_ro_xargs,
-    lead_keyword, live_dollar, noclobber, nulled_by_value, on_ro_roster, passed_read, pipe_members, redirect_targets, redirect_values,
+    lead_keyword, literal_call, live_dollar, noclobber, nulled_by_value, on_ro_roster, passed_read, pipe_members, redirect_targets, redirect_values,
     ro_forms_clear, valued_targets, ro_forms_clear_except, ro_forms_kit, segment_core,
     shell_backgrounds, strip_redirect_op, unheredoc, unredirected_words, xargs_command_index,
 };
@@ -40,7 +40,7 @@ pub fn truncate_scratch(ctx: &Ctx) -> Decided {
         if tgt.is_empty() {
             continue;
         }
-        if tgt.starts_with('&') || !ctx.host().ignored(tgt) {
+        if tgt.starts_with('&') || !ctx.host().ignored(tgt) || through_link(tgt) {
             all_ignored = false;
             break;
         }
@@ -166,7 +166,7 @@ pub fn append_scratch(ctx: &Ctx) -> Decided {
     }
     let valued = statement_targets(ctx, std::slice::from_ref(&s))?.concat();
     let Some(targets) = emitter_targets(ctx, &s, statement_lead(&s), &valued) else { return Ok(None) };
-    if !targets.iter().all(|t| !t.contains('\0') && ctx.host().ignored(t)) {
+    if !targets.iter().all(|t| !t.contains('\0') && ctx.host().ignored(t) && !through_link(t)) {
         return Ok(None);
     }
     if refused(ctx, ctx.cmd())? {
@@ -241,46 +241,44 @@ fn components(p: &str) -> Vec<&str> {
 }
 
 // spec: guard-kit/SPEC.md §The generic ruleset — the `bounded_write` rule's bounds test on one
-// target word; a glob in the last component moves clauses (b) to (f) onto its parent directory.
+// target word, read as written.
 pub(super) fn bounded(h: &Host, word: &str, removed: bool) -> bool {
     if !contained(word) {
         return false;
     }
     let comps = components(word);
-    let glob = |c: &str| c.contains(['*', '?', '[']);
-    let Some((last, parents)) = comps.split_last() else { return false };
-    if parents.iter().any(|c| glob(c)) {
-        return false;
-    }
-    let (read, strict) = if glob(last) { (parents, 0) } else { (&comps[..], 1) };
     let inside = h.scratch_dirs.iter().filter(|m| walk::path_root(m).is_none()).any(|m| {
         let mc = components(m);
-        !mc.is_empty() && read.len() >= mc.len() + strict && read[..mc.len()] == mc[..]
+        !mc.is_empty() && comps.len() > mc.len() && comps[..mc.len()] == mc[..]
     });
-    let path = read.join("/");
-    if !inside || !h.ignored(&path) || h.tracked(&path) {
-        return false;
-    }
-    if reaches_link(std::path::Path::new("."), read) {
+    let path = comps.join("/");
+    if !inside || !h.ignored(&path) || h.tracked(&path) || through_link(&path) {
         return false;
     }
     let t = h.lexical(&path);
     !removed || !h.live_run_paths().iter().any(|r| host::under(&h.lexical(r), &t))
 }
 
-// spec: guard-kit/SPEC.md §The generic ruleset — the bounds test's clause (e): an existing component
-// of the path under `base`, the path included, is a symbolic link.
-fn reaches_link(base: &std::path::Path, comps: &[&str]) -> bool {
+// spec: guard-kit/SPEC.md §The rule roster — the link test, rule `bounded_write`'s bounds clause (e):
+// an existing component of the path under `base`, the path included, is a link or cannot be read.
+fn reaches_link(base: &std::path::Path, path: &str) -> bool {
     let mut p = base.to_path_buf();
-    for c in comps {
+    for c in std::path::Path::new(path).components() {
         p.push(c);
         match std::fs::symlink_metadata(&p) {
             Ok(m) if m.file_type().is_symlink() => return true,
             Ok(_) => {}
-            Err(_) => return false,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return false,
+            Err(_) => return true,
         }
     }
     false
+}
+
+// spec: guard-kit/SPEC.md §The rule roster — the link test rules `truncate_scratch` and `append_scratch`
+// and rule `bounded_wait`'s arm (B2) read, on a target as the working directory reads it.
+pub(super) fn through_link(path: &str) -> bool {
+    reaches_link(std::path::Path::new("."), path)
 }
 
 enum Redir {
@@ -315,8 +313,8 @@ fn redirect_op(w: &str) -> Result<Option<(usize, Redir)>, ()> {
     }))
 }
 
-// spec: guard-kit/SPEC.md §The generic ruleset — one segment read as rule `grant_path_slot` reads
-// it: its command words and its output redirect targets, dequoted with backslashes removed.
+// spec: guard-kit/SPEC.md §The rule roster — rule `bounded_write`'s read of one segment: its command
+// words and its output redirect targets, each by its value.
 fn write_words(sw: &str, dw: &str, read: Option<&[Word]>) -> Option<(Vec<String>, Vec<String>)> {
     let (s, d) = (text::held_words(sw), words(dw));
     if s.len() != d.len() {
@@ -383,16 +381,15 @@ fn grammar(bin: &str) -> Option<Grammar> {
         "rmdir" => g(&["-v", "--verbose", "--ignore-fail-on-non-empty"], &[], &[]),
         "mv" => g(
             &["-f", "-n", "-v", "-T", "-u", "--force", "--no-clobber", "--verbose", "--no-target-directory", "--update"],
-            &["-t", "--target-directory"],
+            &[],
             &[],
         ),
         "cp" => g(
             &[
                 "-r", "-R", "-a", "-p", "-P", "-f", "-n", "-v", "-T", "-u", "--recursive", "--archive",
                 "--no-dereference", "--force", "--no-clobber", "--verbose", "--no-target-directory", "--update",
-                "--parents",
             ],
-            &["-t", "--target-directory"],
+            &[],
             &["--preserve"],
         ),
         "tee" => g(&["-a", "-i", "--append", "--ignore-interrupts"], &[], &[]),
@@ -485,20 +482,13 @@ fn write_targets(h: &Host, ws: &[String]) -> Option<Vec<(String, bool)>> {
     if bin == "find" {
         return find_targets(h, args);
     }
-    let (opts, mut ops) = parse_opts(&grammar(bin)?, args)?;
-    let target_dir = opts.iter().find(|(k, _)| matches!(*k, "-t" | "--target-directory"));
+    let (_, mut ops) = parse_opts(&grammar(bin)?, args)?;
     let out: Vec<(String, bool)> = match bin.as_str() {
         "mkdir" | "touch" | "tee" => ops.into_iter().map(|w| (w, false)).collect(),
         "rm" | "rmdir" => ops.into_iter().map(|w| (w, true)).collect(),
         "mv" | "cp" => {
-            let dest = match target_dir {
-                Some((_, v)) => v.clone()?,
-                None => ops.pop()?,
-            };
-            if ops.is_empty() {
-                return None;
-            }
-            if bin == "cp" && opts.iter().any(|(k, _)| *k == "--parents") && !ops.iter().all(|w| contained(w)) {
+            let dest = ops.pop()?;
+            if ops.is_empty() || std::fs::symlink_metadata(&dest).is_ok_and(|m| m.is_dir()) {
                 return None;
             }
             let removed = bin == "mv";
@@ -887,6 +877,9 @@ pub fn emitter_write(ctx: &Ctx) -> Decided {
             let Some(targets) = emitter_targets(ctx, stmt, &lead, &valued[j]) else { continue };
             let unignored: Vec<&String> = targets.iter().filter(|t| !h.ignored(t)).collect();
             if unignored.is_empty() {
+                if stmt.contains('\0') || !literal_call("append_scratch", stmt) {
+                    continue;
+                }
                 return block(format!("issue the '{}' write to '{}' as its own call, and the rest of this command as a separate one: alone, that write is granted with no permission decision, while compounded it makes the whole call one the harness decides out of band. If you genuinely need the compound, run it yourself with !<command>.", lead, targets.join(" ")));
             }
             if targets.iter().any(|t| t.starts_with("/dev/")) {
@@ -992,11 +985,15 @@ mod tests {
         let linked = std::os::unix::fs::symlink(base.join("d/real"), base.join("d/link")).is_ok();
         #[cfg(windows)]
         let linked = std::os::windows::fs::symlink_dir(base.join("d/real"), base.join("d/link")).is_ok();
-        assert!(!reaches_link(&base, &["d", "real", "x"]));
-        assert!(!reaches_link(&base, &["d", "absent", "x"]));
+        std::fs::write(base.join("d/file"), "").unwrap();
+        assert!(!reaches_link(&base, "d/real/x"));
+        assert!(!reaches_link(&base, "d/absent/x"));
+        #[cfg(unix)]
+        assert!(reaches_link(&base, "d/file/x"), "a component that cannot be read withholds");
         if linked {
-            assert!(reaches_link(&base, &["d", "link"]));
-            assert!(reaches_link(&base, &["d", "link", "x"]));
+            assert!(reaches_link(&base, "d/link"));
+            assert!(reaches_link(&base, "d/link/x"));
+            assert!(reaches_link(&base, "./d/link"));
         }
         let _ = std::fs::remove_dir_all(&base);
     }
@@ -1048,13 +1045,18 @@ mod tests {
         assert_eq!(ops, strings(&["-x"]));
         assert!(parse_opts(&rm, &strings(&["--no-preserve-root", "x"])).is_none());
         assert!(parse_opts(&rm, &strings(&["-rI", "x"])).is_none());
+        let touch = grammar("touch").unwrap();
+        let (o, ops) = parse_opts(&touch, &strings(&["-cd2020-01-01", ".tmp/a"])).unwrap();
+        assert_eq!(o[1], ("-d", Some("2020-01-01".to_string())));
+        assert_eq!(ops, strings(&[".tmp/a"]));
         let mv = grammar("mv").unwrap();
-        let (o, ops) = parse_opts(&mv, &strings(&["-ft.tmp/d", "a"])).unwrap();
-        assert_eq!(o[1], ("-t", Some(".tmp/d".to_string())));
-        assert_eq!(ops, strings(&["a"]));
+        for into in [&["-ft.tmp/d", "a"][..], &["-t", ".tmp/d", "a"], &["--target-directory=.tmp/d", "a"], &["--t", ".tmp/d", "a"]] {
+            assert!(parse_opts(&mv, &strings(into)).is_none(), "{:?} names a directory to write into", into);
+        }
         let cp = grammar("cp").unwrap();
         assert!(parse_opts(&cp, &strings(&["--preserve=mode", "a", "b"])).is_some());
-        assert!(parse_opts(&cp, &strings(&["--p", "a", "b"])).is_none());
+        assert!(parse_opts(&cp, &strings(&["--parents", "a", "b"])).is_none());
+        assert!(parse_opts(&cp, &strings(&["--pa", "a", "b"])).is_none());
         assert!(parse_opts(&cp, &strings(&["--force=1", "a", "b"])).is_none());
     }
 }

@@ -77,12 +77,13 @@ block	@ROOT@/scripts/check-env.sh --list>tracked.md
 block	@ROOT@/scripts/check-env.sh --list > .tmp/out.txt
 rewrite	@ROOT@/scripts/check-env.sh --list 2>&1
 rewrite	@ROOT@/scripts/check-env.sh --list >/dev/null
-#          a target is read by its value, so a quoted or escaped /dev/null is the device, and a quoted
-#          name that only opens with it, or a quoted file, is still a file
-rewrite	@ROOT@/scripts/check-env.sh --list >"/dev/null"
-rewrite	@ROOT@/scripts/check-env.sh --list 2>'/dev/null'
-rewrite	@ROOT@/scripts/check-env.sh --list > /dev/"null" 2>&1
-rewrite	@ROOT@/scripts/check-env.sh --list >\/dev/null
+#          a quoted or escaped call fails the literal test (guard-kit/SPEC.md §The generic ruleset),
+#          so the corrective block fires whatever the target names: a quoted or escaped /dev/null,
+#          a quoted name that only opens with it and a quoted file alike
+block	@ROOT@/scripts/check-env.sh --list >"/dev/null"
+block	@ROOT@/scripts/check-env.sh --list 2>'/dev/null'
+block	@ROOT@/scripts/check-env.sh --list > /dev/"null" 2>&1
+block	@ROOT@/scripts/check-env.sh --list >\/dev/null
 block	@ROOT@/scripts/check-env.sh --list >"/dev/null x"
 block	@ROOT@/scripts/check-env.sh --list >'/dev/nullified.md'
 block	@ROOT@/scripts/check-env.sh --list >"tracked.md"
@@ -109,10 +110,10 @@ block	python3 @ROOT@/tools/report.py
 fallthrough	python3 /other/repo/tools/report.py
 fallthrough	printf '%s' 'the path @ROOT@/tools/report.py is steered'
 fallthrough	printf '%s' "the path @ROOT@/tools/report.py is steered"
-#          The heredoc row lands on `allow` rather than `fallthrough` because
-#          rule `append_scratch`'s create grant reaches it later in the table; a rule `abs_prefix`
-#          regression would still read `block`, which is what this row asserts.
-allow	cat <<'EOF' > .tmp/note.md@NL@the path @ROOT@/tools/report.py is steered@NL@EOF
+#          The heredoc row falls through, since a heredoc opener fails the literal test every grant
+#          takes (guard-kit/SPEC.md §The generic ruleset); a rule `abs_prefix` regression would
+#          read `block`, which is what this row asserts.
+fallthrough	cat <<'EOF' > .tmp/note.md@NL@the path @ROOT@/tools/report.py is steered@NL@EOF
 
 # rule `expansion` — shell expansion / assignment; single-quoted $ stays literal.
 #          'sq' only: a double-quoted "$x" expands, and so does an
@@ -121,11 +122,13 @@ block	echo $(pwd)
 block	P=/tmp/x
 # a heredoc opener riding an assignment is no command after it, so the assignment stands alone
 block	P=/tmp/x <<'EOF'@NL@x@NL@EOF
-allow	awk '$1' data.txt
+# a pass row falls through rather than being granted: its quote or heredoc opener fails the literal
+# test every grant takes (guard-kit/SPEC.md §The generic ruleset)
+fallthrough	awk '$1' data.txt
 # 'hdq': an unquoted delimiter expands, so its body stays live; a quoted one
 # cannot expand, and the shell is what guarantees that — so its body is inert
 block	cat <<EOF > .tmp/n.md@NL@value is $(date)@NL@EOF
-allow	cat <<'EOF' > .tmp/n.md@NL@value is $(date)@NL@EOF
+fallthrough	cat <<'EOF' > .tmp/n.md@NL@value is $(date)@NL@EOF
 # reaches rule `git_rewrite`'s advisory, which is the correct verdict for a commit -F; the
 # point is that rule `expansion` no longer blocks it before rule `git_rewrite` is ever consulted
 advise	git commit -F - <<'MSG'@NL@names a $(cmd) in the body@NL@MSG
@@ -137,7 +140,9 @@ advise	git commit -F - <<'MSG'@NL@names a $(cmd) in the body@NL@MSG
 #          The placeholder rewrite emits allow, so it attaches only when the
 #          rewritten command is allowlisted and stays inside rule `grant_path_slot`'s path slots;
 #          an unallowlisted and an unbounded placeholder block with the quoted-
-#          spelling corrective instead
+#          spelling corrective instead, and so does a placeholder call failing the
+#          literal test (guard-kit/SPEC.md §The generic ruleset): `\;` is a backslash.
+#          A pass row carrying a quote or a heredoc falls through on that test
 block	find . -exec rm {} \;
 block	ls | xargs -I{} rm {}
 rewrite	find .tmp/x -exec cat {} +
@@ -152,10 +157,10 @@ block	find .tmp/x -exec cat {} + >&@CR@2
 block	git log @{u}..
 block	echo {1..5}
 block	mkdir -p a/{b,c}
-allow	awk '{print $1}'
+fallthrough	awk '{print $1}'
 block	find . -exec grep foo '{}' +
-allow	grep -rnE "^[a-z]{2,}" src
-allow	cat <<'EOF' > .tmp/note.md@NL@a brace {a,b} in prose@NL@EOF
+fallthrough	grep -rnE "^[a-z]{2,}" src
+fallthrough	cat <<'EOF' > .tmp/note.md@NL@a brace {a,b} in prose@NL@EOF
 block	cat <<'EOF' > a/{b,c}/note.md@NL@prose@NL@EOF
 
 # rule `sed_file` — sed or awk reading a file or a stream's line range, or sed rewriting one; a
@@ -164,8 +169,10 @@ block	cat <<'EOF' > a/{b,c}/note.md@NL@prose@NL@EOF
 #          with one file operand and no pipe into the segment (steered to Read),
 #          and the same range piped into with no operand (steered to head and
 #          tail); a transform, a regex filter or range, a program file, a second
-#          operand and a piped-into awk with an action all pass, most of them to
-#          rule `ro_pipeline`'s program check. perl fires on an in-place bundle with at
+#          operand and a piped-into awk with an action all pass, an unquoted program
+#          granted by rule `ro_pipeline`'s program check and a quoted one falling
+#          through on the literal test every grant takes (guard-kit/SPEC.md §The
+#          generic ruleset). perl fires on an in-place bundle with at
 #          least one file operand, a sweep or a glob included; perl -pi reading
 #          stdin, an xargs-led perl, an unmodelled perl option and a perl without
 #          the in-place flag all pass, and so does the --rewrite arm both steer to
@@ -181,22 +188,22 @@ block	\perl -'pi' -e 's/a/b/' notes.md
 block	grep -n x tracked.md | command sed \-n '5,10p'
 block	nohup \awk 'NR<=5' notes.txt
 fallthrough	sed -'l' 5 '1,60p' TASK-QUEUE.md
-allow	sed -E 's/a/b/'
+fallthrough	sed -E 's/a/b/'
 allow	grep foo file | sed -e s/a/b/
 block	grep -n x tracked.md | sed -n '5,10p'
 block	grep -n x tracked.md | awk 'NR>=5 && NR<=10'
 allow	grep -n x tracked.md | head -n 10 | tail -n +5
 block	awk 'NR>=10 && NR<=40' TASK-QUEUE.md
 block	awk -F: 'NR==5,NR==9 { print $0 }' notes.txt
-allow	awk '/^## Layout/,/^## Testing/' SPEC.md
+fallthrough	awk '/^## Layout/,/^## Testing/' SPEC.md
 block	awk 'NR<=5' notes.txt | head -3
-allow	awk 'NR>=10 && NR<=40 {print $2}' notes.txt
-allow	awk '/needle/' notes.txt
-allow	awk '/^## Layout/,/^## Testing/' notes.txt
+fallthrough	awk 'NR>=10 && NR<=40 {print $2}' notes.txt
+fallthrough	awk '/needle/' notes.txt
+fallthrough	awk '/^## Layout/,/^## Testing/' notes.txt
 fallthrough	awk -f prog.awk notes.txt
-allow	awk 'NR<=5' a.txt b.txt
+fallthrough	awk 'NR<=5' a.txt b.txt
 block	awk 'NR<=5' my\ notes.txt
-allow	grep -n foo notes.txt | awk 'NR<=5' notes.txt
+fallthrough	grep -n foo notes.txt | awk 'NR<=5' notes.txt
 fallthrough	awk -W posix 'NR<=5' notes.txt
 block	perl -pi -e 's/a/b/' notes.md
 block	perl -0pi -e 's/a/b/' notes.md
@@ -269,7 +276,9 @@ block	find . -name \*.md -exec cat a\ b '{}' \;
 # a heredoc feeds a stdin no executed read takes, unless a word names it
 block	find src -type f -exec grep -q foo '{}' \; <<'EOF'@NL@x@NL@EOF
 fallthrough	find src -type f -exec grep -f - '{}' \; <<'EOF'@NL@x@NL@EOF
-allow	find . -name '*.md' -print0 | xargs -0 grep -l x
+# a quoted read no rule steers takes no grant either: the literal test (guard-kit/SPEC.md §The
+# generic ruleset) refuses its quote
+fallthrough	find . -name '*.md' -print0 | xargs -0 grep -l x
 fallthrough	find . -name '*.tsv' -delete
 fallthrough	find . -exec md5sum '{}' +
 fallthrough	find . -exec sort -o out.txt '{}' +
@@ -283,14 +292,15 @@ block	find . -name x -exec sed -n '\-x-p' '{}' +
 #           redirected, &&-chained, mixed, and banner-only forms are composition and pass
 block	cat TASK-QUEUE.md
 block	cat -n guard-kit/SPEC.md
-# an option is read by its value, so a quoted or escaped one is no second operand
+# an option is read by its value, so a quoted or escaped one is no second operand; a quoted pass row
+# falls through on the literal test every grant takes (guard-kit/SPEC.md §The generic ruleset)
 block	cat \-n guard-kit/SPEC.md
 block	cat '-n' guard-kit/SPEC.md
 block	cat "-n" guard-kit/SPEC.md
-allow	cat '-n' one.md two.md
+fallthrough	cat '-n' one.md two.md
 # `--` ends the options, so a dash-led word behind it is a file: two of them concatenate, and one
 # is the lone read
-allow	cat -- '-n' tracked.md
+fallthrough	cat -- '-n' tracked.md
 allow	cat -- -n tracked.md
 block	cat -- -n
 block	cat -n -- tracked.md
@@ -354,11 +364,12 @@ fallthrough	pgrep -xf installer-smoke
 
 # rule `bare_sleep` — bare foreground sleep steered to a condition wait. The non-firing
 #           cases are the load-bearing ones: a sleep inside an `until … do … done`
-#           loop *is* the sanctioned form, and a quoted mention is inert. Both
-#           are `allow` rather than `fallthrough` because a later auto-allow
-#           grants them outright — rule `append_scratch` the append, rule `bounded_wait` the wait — and
-#           each still proves rule `bare_sleep` inert, since a block exits 2 at rule `bare_sleep` and
-#           never reaches either grant later in the table.
+#           loop *is* the sanctioned form, and a quoted mention is inert. The loop
+#           is `allow` rather than `fallthrough` because rule `bounded_wait` grants
+#           it later in the table, and the quoted mention falls through, its quote
+#           failing the literal test every grant takes (guard-kit/SPEC.md §The
+#           generic ruleset). Each still proves rule `bare_sleep` inert, since a
+#           block exits 2 at rule `bare_sleep`.
 block	sleep 30
 block	sleep 180; echo waited
 # a keyword spelled as an argument opens and closes no span
@@ -374,7 +385,7 @@ fallthrough	until [ -f .tmp/marker ]; do \sleep 5; done
 block	sleep 5 >& done
 fallthrough	make waited >& sleep 5
 allow	until grep -q DONE .tmp/smoke.log; do sleep 5; done
-allow	printf 'sleep 5' >> .tmp/note.txt
+fallthrough	printf 'sleep 5' >> .tmp/note.txt
 
 # rule `git_mutation_under_producer` — tracked-tree mutation under a live producer. The sandbox's only
 #           `*.run` record names a dead pid and a non-record file sits beside
@@ -414,9 +425,10 @@ allow	grep -c x tracked.md <& 0
 allow	grep -c x tracked.md &>/dev/null
 block	grep -rn foo src >&@CR@2 &
 # an escaped or quoted '&' is a character of its word and ends no statement; after an even
-# backslash run it is bare again
-allow	grep -c x\&y tracked.md
-allow	grep -c 'x&y' tracked.md
+# backslash run it is bare again. A read carrying the escape or the quote falls through rather than
+# being granted, on the literal test every grant takes (guard-kit/SPEC.md §The generic ruleset)
+fallthrough	grep -c x\&y tracked.md
+fallthrough	grep -c 'x&y' tracked.md
 block	grep -c x\\&y tracked.md
 # an escaped '|', '>', '<' or '&' is a character of its word too, so a bare '&' behind one ends
 # its statement and the operator it would have formed is none
@@ -424,8 +436,8 @@ block	wc -l tracked.md\|&touch tracked.md
 block	wc -l tracked.md\>&touch tracked.md
 block	wc -l tracked.md\<&touch tracked.md
 block	wc -l tracked.md\&&touch tracked.md
-allow	wc -l tracked.md\|touch tracked.md
-allow	grep -c x tracked.md\\|& head
+fallthrough	wc -l tracked.md\|touch tracked.md
+fallthrough	grep -c x tracked.md\\|& head
 # '|&' pipes stderr too and backgrounds nothing
 fallthrough	make build |& tail -5
 
@@ -520,10 +532,10 @@ fallthrough	: >& .tmp/a>tracked.md
 fallthrough	: > .tmp/a>>tracked.md
 fallthrough	: > .tmp/a2>tracked.md
 # a carriage return is a word character: a descriptor glued to one names a file, and one ending an
-# ignored target stays in the name
+# ignored target fails the literal test (guard-kit/SPEC.md §The generic ruleset)
 fallthrough	: >&2@CR@tracked.md
 fallthrough	: > scratch.txt >&@CR@2
-allow	: > .tmp/a@CR@
+fallthrough	: > .tmp/a@CR@
 
 # rule `append_scratch` — a write to gitignored targets auto-allowed, create and append alike.
 #           The clauses each get their refusing case, because each is what keeps
@@ -537,68 +549,76 @@ allow	: > .tmp/a@CR@
 #           meet rule `abs_prefix`'s repo-root-prefix block first.
 #           A refused write still reaching rule `emitter_write` reads `block` there rather than
 #           `fallthrough`: what these rows assert is that rule `append_scratch` did not grant.
-allow	cat >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF
-allow	cat > .tmp/journal.md <<'EOF'@NL@line@NL@EOF
+#           A call failing the literal test (guard-kit/SPEC.md §The generic ruleset) takes no
+#           grant, so a quote, a backslash, a `$` and a heredoc or herestring opener each fall
+#           through, the heredoc journal append among them, and the grant's rows are literal
+#           spellings.
+fallthrough	cat >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF
+fallthrough	cat > .tmp/journal.md <<'EOF'@NL@line@NL@EOF
 block	cat >> tracked.md <<'EOF'@NL@line@NL@EOF
 fallthrough	rm -rf scratch.txt >> .tmp/journal.md
 block	printf x >> .tmp/journal.md@NL@rm -rf scratch.txt
-# (d)'s region test is `hdq`, not the raw command: a backtick in a QUOTED
-# delimiter's body cannot substitute, so the grant reaches the shape the mandated
-# journal append is always spelled in; an UNQUOTED delimiter leaves the body live
-# and the decline still fires. Nothing else distinguishes the two at the grant
-# boundary, so these two rows are the whole holder of the asymmetry.
-allow	cat >> .tmp/journal.md <<'EOF'@NL@a `slug` in prose@NL@EOF
+# a heredoc takes no grant whatever its delimiter's quoting; (d)'s `hdq` region test is held by the
+# rows of rule `emitter_write`, which reads it on the same view
+fallthrough	cat >> .tmp/journal.md <<'EOF'@NL@a `slug` in prose@NL@EOF
 fallthrough	cat >> .tmp/journal.md <<EOF@NL@a `slug` in prose@NL@EOF
 # the create half rests on rule `truncate_scratch`: `: > f` and then `cat >> f` are each already
 # granted, so a create adds one permission decision and no capability. Every
 # other clause still holds — a tracked target refuses on the per-target ignore
 # test the append case takes, which is the row that would catch an over-wide grant
-allow	printf 'x' > .tmp/note.txt
+allow	printf x > .tmp/note.txt
+fallthrough	printf 'x' > .tmp/note.txt
 block	cat > tracked.md <<'EOF'@NL@line@NL@EOF
 # the two inert targets are exempt from (a) and (b): neither is a file the
 # append-only split protects, and neither is a path git check-ignore can answer
-allow	printf 'x@NL@' >> .tmp/journal.md 2>/dev/null
+allow	printf x >> .tmp/journal.md 2>/dev/null
+fallthrough	printf 'x@NL@' >> .tmp/journal.md 2>/dev/null
 allow	cat >> .tmp/journal.md 2>&1
-# a target is read by its value, so a quoted ignored target is granted and a quoted /dev/null is inert
-allow	printf x >> ".tmp/j.md"
-allow	printf x >> .tmp/j.md 2>"/dev/null"
+# a quoted target fails the literal test, an ignored one and a quoted /dev/null beside one alike
+fallthrough	printf x >> ".tmp/j.md"
+fallthrough	printf x >> .tmp/j.md 2>"/dev/null"
 # a quoted target spelling a descriptor is a file of that name git does not ignore, beside a
 # heredoc too: the grant withholds and rule `emitter_write` blocks
 block	printf x >> .tmp/j.md > '&1'
 block	printf x >> .tmp/j.md 2>"&1"
 block	cat >> .tmp/j.md > '&1' <<'EOF'@NL@x@NL@EOF
-# a heredoc-bearing call's targets are read by value too, whatever its delimiter's quoting
-allow	cat >> ".tmp/j.md" <<'EOF'@NL@x@NL@EOF
-allow	cat >> .tmp/j.md 2>"/dev/null" <<'EOF'@NL@x@NL@EOF
-allow	cat >> ".tmp/j.md" << "EOF"@NL@x@NL@EOF
-allow	cat >> ".tmp/j.md" <<'E"F'@NL@x@NL@E"F
+# a heredoc-bearing call falls through on the same test, whatever its delimiter's quoting
+fallthrough	cat >> ".tmp/j.md" <<'EOF'@NL@x@NL@EOF
+fallthrough	cat >> .tmp/j.md 2>"/dev/null" <<'EOF'@NL@x@NL@EOF
+fallthrough	cat >> ".tmp/j.md" << "EOF"@NL@x@NL@EOF
+fallthrough	cat >> ".tmp/j.md" <<'E"F'@NL@x@NL@E"F
 # an ANSI-C quoted word is read by its resolved value, so a target spelling one names the file it
 # resolves to (`$'\056\056'` is `..`, out of the scratch dir) and rule `emitter_write` blocks, beside a
-# heredoc too; a span the read cannot resolve exactly leaves the target unread
+# heredoc too; a span the read cannot resolve exactly leaves the target unread, and a resolvable
+# one into scratch falls through on the literal test
 block	cat >> ".tmp/"$'\056\056/tracked.md'
 block	cat >> ".tmp/"$'\056\056/tracked.md' <<'EOF'@NL@x@NL@EOF
-allow	printf x > .tmp/$'x'
-allow	printf $'x\n' >> .tmp/j.md
+fallthrough	printf x > .tmp/$'x'
+fallthrough	printf $'x\n' >> .tmp/j.md
 block	printf x > .tmp/$'\e'
 # a locale-translated word (`$"…"`) is unread as an ANSI-C one is, the catalog that translates it
-# being out of the guard's sight, so a target spelling one is no gitignored target either
+# being out of the guard's sight, so a target spelling one is no gitignored target either, and a
+# write carrying one into scratch falls through on the literal test
 block	cat >> ".tmp/"$"../tracked.md"
 block	cat >> ".tmp/"$"../tracked.md" <<'EOF'@NL@x@NL@EOF
 block	printf x > .tmp/$"x"
-allow	printf $"x" >> .tmp/j.md
+fallthrough	printf $"x" >> .tmp/j.md
 # a carriage return is a word character, so a descriptor glued to one or behind one names a file
 block	cat >> .tmp/journal.md >&2@CR@tracked.md <<'EOF'@NL@line@NL@EOF
 block	cat >> .tmp/journal.md >&@CR@2 <<'EOF'@NL@line@NL@EOF
 # `>&` onto a named file is the write `>` is, granted on an ignored target
-allow	printf 'x' >& .tmp/note.txt
-# a continued line is one statement, as the shell reads it; a continued heredoc opener puts what
-# follows on the command line, ahead of the body, and the residue test refuses it
-allow	printf x \@NL@>> .tmp/j.md
+allow	printf x >& .tmp/note.txt
+fallthrough	printf 'x' >& .tmp/note.txt
+# a continued line's backslash fails the literal test, and a continued heredoc opener puts what
+# follows on the command line, ahead of the body, which the residue test refuses too
+fallthrough	printf x \@NL@>> .tmp/j.md
 fallthrough	cat >> .tmp/j.md <<'EOF' \@NL@; touch x@NL@EOF
 
-# rule `ro_pipeline` — read-only pipeline auto-allow; a non-roster segment falls through
+# rule `ro_pipeline` — read-only pipeline auto-allow; a non-roster segment falls through, and so
+#          does a call failing the literal test (guard-kit/SPEC.md §The generic ruleset): a quote,
+#          a backslash or a `$` anywhere in it, so the value-read rows below each pin that refusal
 allow	grep -rn foo src | head
-allow	grep foo file | awk '{print}'
+fallthrough	grep foo file | awk '{print}'
 fallthrough	grep foo file | md5sum
 # a read redirected to a named file is a write, behind `>&` as behind `>`: glued or apart, under a
 # descriptor, in a later pipe segment, and onto a word that only opens with a digit. An fd-dup
@@ -612,9 +632,9 @@ fallthrough	grep -rn foo src >&2x
 allow	grep -rn foo src 2>& 1
 allow	grep -rn foo src >&-
 allow	grep -rn foo src >& /dev/null
-# each target is read by its value, so a quoted /dev/null is inert and a quoted file is still a write
-allow	grep -rn foo src 2>"/dev/null"
-allow	grep -rn foo src 2>'/dev/null'
+# a quoted target fails the literal test, a quoted /dev/null as a quoted file
+fallthrough	grep -rn foo src 2>"/dev/null"
+fallthrough	grep -rn foo src 2>'/dev/null'
 fallthrough	grep -rn foo src 2>"out.txt"
 # a quoted target spelling a descriptor is a file of that name, since only a live '>&' dups
 fallthrough	grep -rn foo src > '&1'
@@ -632,7 +652,7 @@ fallthrough	grep -rn foo src>|sort
 fallthrough	grep -rn foo src 2>| sort
 fallthrough	cat tracked.md >| head -5
 block	git status >| head
-allow	grep -n '>|' tracked.md
+fallthrough	grep -n '>|' tracked.md
 # a compound is read statement by statement whatever joins it: each separator, a banner
 # statement, and the widened lead opening a later statement (rule `allowlist_chain` would block
 # it otherwise); a statement off the roster, a write form or a write in a later statement, and
@@ -648,17 +668,18 @@ fallthrough	grep -c x tracked.md; md5sum tracked.md
 fallthrough	grep -c x tracked.md; sort -o out.txt tracked.md
 fallthrough	grep -c x tracked.md; touch tracked.md
 fallthrough	grep -c x tracked.md & wc -l tracked.md
-# the split keeps an escaped ';' in its word, so the call is one read; an even backslash run is
-# a real break, and its second statement 'b' is off the roster
-allow	grep foo a\;b
+# the split keeps an escaped ';' in its word, so the call is one read, whose backslash fails the
+# literal test; an even backslash run is a real break, and its second statement 'b' is off the roster
+fallthrough	grep foo a\;b
 fallthrough	grep foo a\\;b
-# an escaped '|' and a backslash-newline are no break either, so each call below is one read; an
+# an escaped '|' and a backslash-newline are no break either, so each call below is one read, its
+# backslash failing the literal test; an
 # even run is a literal backslash and then a real break, here before a segment off the roster. The
 # dequoted view reads a quoted backslash as an escape the skeleton never carries, so the declared-forms
 # reader withholds on the split-count mismatch
-allow	grep foo a \| b
+fallthrough	grep foo a \| b
 fallthrough	grep foo a \\| md5sum
-allow	grep -c foo tracked.md \@NL@scratch.txt
+fallthrough	grep -c foo tracked.md \@NL@scratch.txt
 fallthrough	grep -c foo tracked.md \\@NL@md5sum scratch.txt
 # the continued line's words are read whole, so a write form on its second line still withholds
 fallthrough	sort a.txt \@NL@-o out.txt
@@ -668,29 +689,30 @@ fallthrough	grep foo 'a\' | sort -o out.txt
 fallthrough	sort>/dev/null -o tracked.md scratch.txt
 allow	sort>/dev/null tracked.md
 # an ANSI-C quoted word is read by its value, so a write form spelled with one withholds the grant as
-# the plain spelling does, and a read-only call so spelled is granted; a locale-translated word is
-# unread, so a write form spelled with one withholds too
+# the plain spelling does, and a read-only call so spelled falls through on the literal test; a
+# locale-translated word is unread, so a write form spelled with one withholds too
 fallthrough	sort $'-o' tracked.md scratch.txt
 fallthrough	sort $"-o" tracked.md scratch.txt
 fallthrough	sort $'-\157' tracked.md scratch.txt
-allow	grep $'a\tb' tracked.md
-allow	head -5 $'tracked.md'
-allow	echo $'a\nb' | wc -l
-allow	sort $'a\n-o' tracked.md
-allow	grep $'\q' tracked.md
+fallthrough	grep $'a\tb' tracked.md
+fallthrough	head -5 $'tracked.md'
+fallthrough	echo $'a\nb' | wc -l
+fallthrough	sort $'a\n-o' tracked.md
+fallthrough	grep $'\q' tracked.md
 # an ANSI-C span ends where bash ends it, at the first quote no backslash escapes, so an escaped quote
 # is a character of its value and the text after it is live to every skeleton reader
-allow	grep $'it\'s' tracked.md
+fallthrough	grep $'it\'s' tracked.md
 block	git status $'\'' ; git stash ; echo ''
 block	ls $'\'' ; rm tracked.md ; ls 'a'
 # bash removes a backslash-newline before it reads a word, so a continuation between a '$' and its
-# quote, or inside a '$' run, opens the span as the joined spelling does
-block	printf $'\'' ; touch tracked.md ; printf '' >> .tmp/j
-block	printf $\@NL@'\'' ; touch tracked.md ; printf '' >> .tmp/j
+# quote, or inside a '$' run, opens the span as the joined spelling does; the write behind the span
+# is a literal one, so the arm (a) of rule `emitter_write` reads it
+block	printf $'\'' ; touch tracked.md ; printf x >> .tmp/j ; ls 'a'
+block	printf $\@NL@'\'' ; touch tracked.md ; printf x >> .tmp/j ; ls 'a'
 block	ls $\@NL@'\'' ; rm tracked.md ; ls 'a'
 block	ls $\@NL@\@NL@'\'' ; rm tracked.md ; ls 'a'
 block	ls $$\@NL@$'\'' ; rm tracked.md ; ls 'a'
-allow	grep $\@NL@'it\'s' tracked.md
+fallthrough	grep $\@NL@'it\'s' tracked.md
 # a span the read cannot resolve exactly leaves the call unread: a control, a byte above ASCII,
 # a NUL
 fallthrough	grep $'\cA' tracked.md
@@ -698,12 +720,13 @@ fallthrough	grep $'\U000000e9' tracked.md
 fallthrough	grep $'\x80' tracked.md
 fallthrough	grep $'a\0b' tracked.md
 fallthrough	grep $"a" tracked.md
-# the sed and awk program discriminator: a program the static check clears is read-only (a redirect
-# glyph inside an awk string is skipped); an output redirect, a written file, a system() call, a
-# command piped into getline and a program file withhold
-allow	grep -n x tracked.md | sed 's/a/b/'
-allow	grep -c x tracked.md | awk '{s+=$1} END {print s}'
-allow	awk '{print "a > b | c"}' tracked.md
+# the sed and awk program discriminator: a program the static check clears is read-only; an output
+# redirect, a written file, a system() call, a command piped into getline and a program file
+# withhold. A quoted program falls through on the literal test whatever the check finds
+allow	grep -n x tracked.md | sed s/a/b/
+fallthrough	grep -n x tracked.md | sed 's/a/b/'
+fallthrough	grep -c x tracked.md | awk '{s+=$1} END {print s}'
+fallthrough	awk '{print "a > b | c"}' tracked.md
 fallthrough	grep x tracked.md | awk '{print > "out.txt"}'
 fallthrough	grep x tracked.md | sed 's/a/b/w out.txt'
 fallthrough	awk 'BEGIN {system("ls")}'
@@ -716,24 +739,26 @@ fallthrough	grep x tracked.md | awk \-f prog.awk
 fallthrough	awk \-W posix 'NR<=5' notes.txt
 fallthrough	grep x tracked.md | xargs awk \-f prog.awk
 # the test reads the word's value, so a quoted backslash ahead of a dash is program text, here a
-# print under an address delimited by '-', where the same word unquoted is an option
-allow	grep x tracked.md | sed -n '\-x-p'
-allow	grep x tracked.md | xargs sed -n '\-x-p'
+# print under an address delimited by '-', where the same word unquoted is an option; the quote
+# fails the literal test either way
+fallthrough	grep x tracked.md | sed -n '\-x-p'
+fallthrough	grep x tracked.md | xargs sed -n '\-x-p'
 fallthrough	grep x tracked.md | sed -n \-x-p
 fallthrough	grep x tracked.md | sed -n '\-x-w out.txt'
 fallthrough	grep x tracked.md | sed -l 5 s/a/b/
 # the discriminator and the xargs arm read the dequoted view, which holds an ANSI-C quoted word by its
 # value, so a segment carrying one is read as its plain spelling: an escape spelling a write or execute
-# form withholds, and a program or an xargs run the plain spelling clears is granted
+# form withholds, and a program or an xargs run the plain spelling clears falls through on the literal
+# test
 fallthrough	awk $'BEGIN { \x73ystem("printf pwned > tracked.md") }'
 fallthrough	grep x tracked.md | sed $'s/a/b/\x77 out.txt'
-allow	awk $'{print}' tracked.md
+fallthrough	awk $'{print}' tracked.md
 fallthrough	grep -l x tracked.md | xargs sort $'-o' tracked.md
 fallthrough	grep -l x tracked.md | xargs sort $'-\157' tracked.md
 fallthrough	grep -l x tracked.md | xargs awk $'BEGIN { \x73ystem("ls") }'
-allow	grep -l x tracked.md | xargs grep $'a\tb'
+fallthrough	grep -l x tracked.md | xargs grep $'a\tb'
 fallthrough	until awk $'BEGIN { \x73ystem("ls") }' tracked.md; do sleep 1; done
-allow	grep $'a\tb' tracked.md | awk '{print}'
+fallthrough	grep $'a\tb' tracked.md | awk '{print}'
 # a value carrying a line feed is held unresolved, as no aligned span holds one, so a segment
 # carrying it withholds, as its plain spelling's newline-bearing span does
 fallthrough	awk $'{print}\n' tracked.md
@@ -743,17 +768,18 @@ fallthrough	grep -l x tracked.md | xargs grep $'a\nb'
 fallthrough	find . -name $'*.md\n' -delete
 fallthrough	find . -name $'\n' -o -name 'tracked.md' -delete
 fallthrough	sort $'a\n' -o out.txt tracked.md
-allow	grep -c $'a\nb' tracked.md
+fallthrough	grep -c $'a\nb' tracked.md
 # banner tolerance (rules `find_glob` and `cat_file`'s): a literal echo/printf
 # segment is skipped, but at least one roster read must remain
 allow	echo === | grep foo src
 fallthrough	echo a | echo b
 # widened lead: the bare form of a committed allow entry may lead, since it was reviewed —
 # but only where something decorates it, so the undecorated form (rule `allowlist_chain`'s
-# 'fallthrough git status' below) is still never intercepted here
+# 'fallthrough git status' below) is still never intercepted here. A quoted tail fails the literal
+# test, so no grant is taken and the decorated lead meets rule `allowlist_chain`'s block
 allow	git status | head
 allow	git status | head -20
-allow	git status | awk '{print}'
+block	git status | awk '{print}'
 block	git status | md5sum
 # xargs is on the roster but executes rather than filters, so it is granted only
 # when the command it runs is itself a roster binary. The refusing cases are the
@@ -785,16 +811,15 @@ fallthrough	rg --pre=cat foo src | head
 allow	rg foo src | head
 fallthrough	find . -type f | xargs sort -o out.txt
 fallthrough	find . -name '*.txt' | xargs uniq
-# a member's command word is its value off the word read, compared whole: a quoted, escaped or
-# part-quoted roster binary is granted where its forms clear, an escaped quote in an operand is a
-# character of its word, while a path, a write form, the
-# command a quoted xargs runs and a leading keyword withhold; a quoted path to cat stays rule
-# `cat_file`'s block ahead of the band
-allow	'grep' -rn foo src | head
-allow	"grep" foo f
-allow	\grep foo f
-allow	g'rep' foo f
-allow	grep it\'s f
+# a member's command word is its value off the word read, compared whole; a quoted, escaped or
+# part-quoted roster binary and an escaped quote in an operand fail the literal test, while a path,
+# a write form, the command a quoted xargs runs and a leading keyword withhold; a quoted path to cat
+# stays rule `cat_file`'s block ahead of the band
+fallthrough	'grep' -rn foo src | head
+fallthrough	"grep" foo f
+fallthrough	\grep foo f
+fallthrough	g'rep' foo f
+fallthrough	grep it\'s f
 fallthrough	'/bin/grep' foo f
 block	'/bin/cat' f
 fallthrough	'sort' -o out.txt f
@@ -814,8 +839,9 @@ allow	until grep -q DONE .tmp/smoke.log 2>/dev/null; do sleep 30; done; grep -n 
 allow	while kill -0 2147483646 2>/dev/null; do sleep 5; done
 allow	until ! kill -0 2147483646 2>/dev/null; do sleep 5; done
 allow	until [ -f .tmp/marker ]; do sleep 10; done
-# the loop's targets are read by their value, so a quoted /dev/null is inert
-allow	until [ -f .tmp/x ]; do sleep 5; done 2>"/dev/null"
+# a quoted target fails the literal test (guard-kit/SPEC.md §The generic ruleset), a quoted
+# /dev/null as a quoted descriptor
+fallthrough	until [ -f .tmp/x ]; do sleep 5; done 2>"/dev/null"
 # a quoted target spelling a descriptor is a file of that name, and the loop writes it
 fallthrough	until [ -f .tmp/x ]; do sleep 5; done > '&1'
 # clause (a) counts the span's keywords in command position, so `done` as an argument is no second span
@@ -887,13 +913,16 @@ fallthrough	while sort -c -o out.txt data.txt; do sleep 5; done
 fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done; sort -o out.txt .tmp/smoke.log
 # arm (B) — the launch-record-wait spelling rule `background_no_record`'s corrective names, granted for an
 # allowlisted, bounded launch writing only gitignored targets, with and without the
-# trailing retraction
+# trailing retraction. The record statement, matched byte for byte, is the literal test's one
+# exemption, and the rest of the call takes the test, so a quoted launch target falls through
 allow	bash scripts/check-foo.sh > .tmp/foo.log 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
 allow	scripts/check-foo.sh --all > .tmp/foo.log & echo "pid=$! run=foo" > .tmp/foo.run; wait
-# a target spelling a placeholder's letters is read as written; a quoted target is read by its
-# value, granted where it is ignored and withheld where it is tracked
+fallthrough	scripts/check-foo.sh --all > .tmp/foo.log & echo "pid=$! run=foo"  > .tmp/foo.run; wait
+fallthrough	scripts/check-foo.sh --all > .tmp/foo.log & echo "pid=$! run=foo" >.tmp/foo.run; wait
+# a target spelling a placeholder's letters is read as written; a quoted target fails the literal
+# test, ignored or tracked
 allow	bash scripts/check-foo.sh > .tmp/DQ.log 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
-allow	bash scripts/check-foo.sh > ".tmp/foo.log" 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
+fallthrough	bash scripts/check-foo.sh > ".tmp/foo.log" 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
 fallthrough	bash scripts/check-foo.sh > "tracked.md" 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
 fallthrough	bash scripts/check-foo.sh > '&1' 2>&1 & echo "pid=$! run=foo" > .tmp/foo.run; wait; rm -f .tmp/foo.run
 # (B0) the shape: a record whose filename does not carry its key, and no wait
@@ -934,17 +963,31 @@ fallthrough	scripts/check-foo.sh $1 > .tmp/foo.log & echo "pid=$! run=foo" > .tm
 allow	mkdir -p .tmp/out
 allow	touch .tmp/a.txt
 allow	rm -rf .tmp/old
-allow	rm -f .tmp/*.log
 allow	mv .tmp/a.txt .tmp/b.txt
 allow	cp tracked.md .tmp/copy.md
 allow	grep -n x tracked.md | tee .tmp/hits.txt
-allow	find .tmp/old -name '*.txt' -delete
-# an ANSI-C quoted word's '$' is its piece's own, so the expansion decline reads past it and the
-# grant its single-quoted spelling earns stands, a target read by its value; a pid, a held value and a
-# span the read refuses still withhold
-allow	find .tmp/old -name $'*.txt' -delete
-allow	rm -rf .tmp/$'old'
-allow	printf x > .tmp/$'a\x2etxt'
+# a glob, a quote and a backslash each fail the literal test (guard-kit/SPEC.md §The generic
+# ruleset), so the bounds test never reads a globbed target or a quoted program; the allowlisted
+# `ls` so redirected then meets rule `allowlist_chain`'s block
+fallthrough	rm -f .tmp/*.log
+fallthrough	touch .tmp/o*
+block	ls > .tmp/o*
+fallthrough	find .tmp/old -name '*.txt' -delete
+# a destination naming an existing directory withholds, `-T` or not, and so do the options naming a
+# directory to write into; the sandbox's `.tmp/held/` is that directory, and a path under it is a
+# file the bounds test reads
+allow	cp tracked.md .tmp/held/copy.md
+fallthrough	cp tracked.md .tmp/held
+fallthrough	cp -T tracked.md .tmp/held
+fallthrough	mv .tmp/notes.txt .tmp/held
+fallthrough	cp -t .tmp/held tracked.md
+fallthrough	mv --target-directory=.tmp/held .tmp/notes.txt
+fallthrough	cp --parents tracked.md .tmp/held/x
+# an ANSI-C quoted word's '$' is its piece's own, so the expansion decline reads past it, and the
+# literal test refuses its quote; a pid, a held value and a span the read refuses withhold too
+fallthrough	find .tmp/old -name $'*.txt' -delete
+fallthrough	rm -rf .tmp/$'old'
+fallthrough	printf x > .tmp/$'a\x2etxt'
 block	rm -rf .tmp/$'\x2e\x2e'/tracked.md
 fallthrough	find .tmp/old -name $$'*.txt' -delete
 fallthrough	touch .tmp/$'a\nb'
@@ -955,18 +998,19 @@ allow	rm -rf .tmp/x >> .tmp/journal.md
 allow	printf x >> .tmp/journal.md@NL@rm -rf .tmp/x
 allow	printf x >> .tmp/journal.md && git status
 allow	rm -rf .tmp/x .tmp/y
-allow	rm -rf .tmp/x\ y
-allow	touch .tmp/a\ b
+# an escaped blank fails the literal test
+fallthrough	rm -rf .tmp/x\ y
+fallthrough	touch .tmp/a\ b
 allow	rm -f .tmp/dead-producer.run
 # a backslash the word's quoting keeps is part of its value, so the target sits under a directory
 # named '\.tmp', outside every scratch dir, whether a write utility or a redirect names it; one an
-# unquoted word consumes is no part of the value
+# unquoted word consumes is no part of the value, and fails the literal test
 fallthrough	touch '\.tmp/a'
 fallthrough	touch "\.tmp/a"
 fallthrough	touch $'\\.tmp/a'
 fallthrough	mkdir -p '\.tmp/x'
 block	printf x > '\.tmp/a'
-allow	touch \.tmp/a
+fallthrough	touch \.tmp/a
 # a read redirected to a bounded target is this rule's grant, not rule `ro_pipeline`'s, and a target
 # outside every scratch dir is neither's
 allow	grep -c x tracked.md > .tmp/n.txt; wc -l .tmp/n.txt
@@ -1175,27 +1219,37 @@ fallthrough	rm -rf .tmp/`printf x`/y
 
 # rule `emitter_write` — an emitter write the harness cannot grant. Arm (a): a write rule `append_scratch`
 #           grants alone, compounded with another statement, blocks; the same write
-#           alone is rule `append_scratch`'s grant. Arm (b): a lone write to a target git does not
+#           alone is rule `append_scratch`'s grant. A write failing the literal test
+#           (guard-kit/SPEC.md §The generic ruleset), a heredoc's among them, takes no
+#           grant alone, so compounded it fires no arm (a) and reaches the harness's
+#           own path, and alone it falls through. Arm (b): a lone write to a target git does not
 #           ignore blocks, while a lead off the emitter roster, a device target and
 #           a backgrounded launch writing its record do not fire. Arm (c): a
 #           compounded write to a target git does not ignore, in or outside the
 #           repository, blocks; a compounded write to a device target does not fire
-block	cat >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF@NL@git status
+fallthrough	cat >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF@NL@git status
 block	printf x >> .tmp/journal.md && make build
-allow	cat >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF
+fallthrough	cat >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF
 block	printf x >> tracked.md; git status
 # where the skeleton's lead is no emitter, the lead is read by value: quoted, escaped, glued to its
-# redirect or behind a wrapper; rule `append_scratch` still reads the skeleton's lead alone
+# redirect or behind a wrapper; rule `append_scratch` still reads the skeleton's lead alone. A quoted
+# or escaped write to an ignored target fails the literal test, so it fires no arm (a)
 block	\cat>> tracked.md
-block	nohup "printf" x >> .tmp/journal.md && make build
+fallthrough	nohup "printf" x >> .tmp/journal.md && make build
+block	nohup printf x >> .tmp/journal.md && make build
 # and beside a heredoc, off the command read
 block	\cat>> tracked.md <<'EOF'@NL@x@NL@EOF
-block	nohup "printf" x >> .tmp/journal.md && make build <<'EOF'@NL@x@NL@EOF
+fallthrough	nohup "printf" x >> .tmp/journal.md && make build <<'EOF'@NL@x@NL@EOF
 fallthrough	'cat' >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF
 block	mkdir -p docs && cat > docs/x.md <<'EOF'@NL@line@NL@EOF
 block	make build && echo x > /tmp/x.txt
 fallthrough	make build; echo x > /dev/stderr
 block	cat >> tracked.md
+# clause (d)'s region test reads `hdq`: a backtick in a quoted delimiter's body cannot substitute, so
+# the write is read and blocks, while an unquoted delimiter leaves the body live and the rule
+# declines; these two rows are the whole holder of the asymmetry
+block	cat >> tracked.md <<'EOF'@NL@a `slug` in prose@NL@EOF
+fallthrough	cat >> tracked.md <<EOF@NL@a `slug` in prose@NL@EOF
 # `>&` onto a named file is the write `>` is, alone and beside an ignored target
 block	echo x >& tracked.md
 block	printf x >> .tmp/journal.md >& tracked.md

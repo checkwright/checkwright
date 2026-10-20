@@ -288,7 +288,10 @@ pub enum Held {
     Never,
 }
 
-pub fn relation(base: &str, got: &str) -> Held {
+pub fn relation(base: &str, got: &str, transform: &str) -> Held {
+    if granted(base) && granted(got) && quoting(transform) {
+        return Held::Never;
+    }
     let holds: &[&str] = match base {
         "advise" => &["advise", "block"],
         "fallthrough" => &["fallthrough", "block"],
@@ -302,6 +305,12 @@ pub fn relation(base: &str, got: &str) -> Held {
     } else {
         Held::Never
     }
+}
+
+// spec: guard-kit/SPEC.md §Testing — a transform adding a quote or a backslash, which the literal test
+// refuses a grant on.
+fn quoting(transform: &str) -> bool {
+    transform.split_once('-').is_some_and(|(form, kind)| QUOTE_FORMS.contains(&form) && SITE_KINDS.contains(&kind))
 }
 
 fn granted(got: &str) -> bool {
@@ -584,8 +593,24 @@ mod tests {
             ("allow", "exit3", Never),
             ("allow", "unknown", Never),
         ] {
-            assert_eq!(relation(base, got), want, "{} -> {}", base, got);
+            assert_eq!(relation(base, got, "redirect-tight"), want, "{} -> {}", base, got);
         }
+        for (base, got, want) in [
+            ("allow", "allow", Never),
+            ("allow", "rewrite", Never),
+            ("rewrite", "allow", Never),
+            ("allow", "fallthrough", Holds),
+            ("allow", "block", Holds),
+            ("fallthrough", "allow", Limitable),
+        ] {
+            for form in QUOTE_FORMS {
+                for kind in SITE_KINDS {
+                    let transform = format!("{}-{}", form, kind);
+                    assert_eq!(relation(base, got, &transform), want, "{} -> {} under {}", base, got, transform);
+                }
+            }
+        }
+        assert_eq!(relation("allow", "allow", WRAP), Holds, "a wrap adds no quote");
     }
 
     fn row(floor: &str, rule: &str, transform: &str) -> Vec<String> {
