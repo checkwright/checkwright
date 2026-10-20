@@ -1,18 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: guard-grant-shrink-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-10-20, lead-relayed, not a ruling; the iteration opened undirected):** option A as scope recommended. Debt promoted by scope: `hook-binding-reader-rows`. Features for spec to author and pair: `guard-grant-literal-shrink` and `run-scratch-system-temp`; `bounded-write-link-reach-grant` is mooted by the shrink, its two wrong grants becoming cases of the shrink's amendment, and the icebox's `interpreter-grant-redirect-residue` is mooted with it. Stages scope, spec, build, validate and close; each amendment stays inside one component.
-
-  **Order (scope, own authority):** `hook-binding-reader-rows` builds before the shrink, which edits the same guard host files.
-
-  **Release review (operator grant 2026-10-20, lead-relayed, spent at validate):** one second-vendor review at validate, against the bar as narrowed on [tarball-attestation-observed](#tarball-attestation-observed); close cuts v0.32.0 on a clean return. **The run failed:** the adapter exited 1 on a content refusal after about 40k tokens, with an empty report and no finding; no clean return, so v0.32.0 stays deferred.
-
-  **Push need (2026-10-20, operator direction lead-relayed: three pushes, this iteration only):** 3 against 2 — one mid-iteration push for `run-scratch-system-temp`, the closing push, and the v0.32.0 tag push on a clean review.
 
 ---
 
