@@ -12,8 +12,8 @@
 # and the write-side row below drives the runner from a non-git sandbox cwd.
 #
 # The self-invocation is bounded by an inner tree that cannot reach the runner
-# again: rows below hand it fixture dirs and no *.test.sh at all, and the one
-# tree that ships a *.test.sh ships a leaf that reads its environment and exits.
+# again: rows below hand it fixture dirs and no *.test.sh at all, and the two
+# trees that ship a *.test.sh ship a leaf that reads its environment and exits.
 # A scratch *.test.sh that re-invokes the runner would not be bounded.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
@@ -276,6 +276,34 @@ for override in scalar gates-dir knob-file; do
     assert_has "case-knobs-$override" 'GATE-TESTS: clean' "$out"
 done
 
+# spec: gate-sdk/SPEC.md §run-gate-tests — a bespoke test's TMPDIR lies under the invoker's tmp dir, the run scratch heads its git ceiling, and the scratch is gone once the runner exits
+mkdir -p "$scratch/ceiling"
+cat >"$scratch/ceiling/probe.test.sh" <<'EOF'
+#!/usr/bin/env bash
+sep=:
+case "${OSTYPE:-}" in msys* | cygwin* | win32*) sep=';' ;; esac
+head="${GIT_CEILING_DIRECTORIES%%"$sep"*}"
+{ (cd -P "$TMPDIR" && pwd -P); (cd -P "$head" && pwd -P); } >"$PWD/ceiling-probe.seen"
+exit 0
+EOF
+out="$( cd "$scratch" && export GATE_SDK_TMP_DIR=run-tmp \
+    && gate_arm_run --run-gate-tests "$scratch/ceiling" "$scratch/checks" 2>&1 )"; rc=$?
+assert_rc  ceiling "$rc" 0
+root="$(cd -P "$scratch" && pwd -P)/run-tmp"
+{ IFS= read -r seen_tmp; IFS= read -r seen_head; } <"$scratch/ceiling-probe.seen"
+case "$seen_head" in
+    "$root"/checkwright-run.*) ;;
+    *) echo "FAIL [ceiling]: the git ceiling is headed by '$seen_head', not a run scratch under $root"; fails=$((fails + 1)) ;;
+esac
+[[ "${seen_tmp%/*}" == "$seen_head" ]] || {
+    echo "FAIL [ceiling]: the suite's TMPDIR '$seen_tmp' is no private dir directly under the run scratch '$seen_head'"
+    fails=$((fails + 1))
+}
+compgen -G "$root/checkwright-run.*" >/dev/null && {
+    echo "FAIL [ceiling]: a run scratch survived the runner under $root"
+    fails=$((fails + 1))
+}
+
 [[ "$fails" -eq 0 ]] || { echo "run-gate-tests.test: $fails assertion(s) failed"; exit 1; }
-echo "run-gate-tests.test: clean (a leading flag and an absent named checks dir are refused, -- admits a path; expect.txt is a per-line conjunction, order-independent, blanks inert, all missing lines named; the output contract is asserted at runtime on both cases; scratch writes land outside the case dir on both dispatch spellings)"
+echo "run-gate-tests.test: clean (a leading flag and an absent named checks dir are refused, -- admits a path; expect.txt is a per-line conjunction, order-independent, blanks inert, all missing lines named; the output contract is asserted at runtime on both cases; scratch writes land outside the case dir on both dispatch spellings; a suite's temporaries lie in a run scratch under the tmp dir, heading its git ceiling, removed on exit)"
 exit 0

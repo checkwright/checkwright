@@ -1323,6 +1323,21 @@ fn exit_code(status: &std::process::ExitStatus) -> i32 {
     2
 }
 
+// spec: gate-sdk/SPEC.md §run-gates — a runner's child: its private `TMPDIR`, and the run scratch
+// heading its git ceiling, joined to an inherited one by the host's list separator
+pub fn scratch_env(tmpdir: &std::path::Path, run_scratch: &std::path::Path) -> Vec<(String, String)> {
+    let sep = if cfg!(windows) { ';' } else { ':' };
+    let mut ceiling = run_scratch.display().to_string();
+    if let Some(inherited) = std::env::var_os("GIT_CEILING_DIRECTORIES").filter(|v| !v.is_empty()) {
+        ceiling.push(sep);
+        ceiling.push_str(&inherited.to_string_lossy());
+    }
+    vec![
+        ("TMPDIR".to_string(), tmpdir.display().to_string()),
+        ("GIT_CEILING_DIRECTORIES".to_string(), ceiling),
+    ]
+}
+
 // spec: gate-sdk/SPEC.md §run-gates — the merge is two handles on **one** file description
 // (`try_clone` is `dup`), so the two streams share an offset and interleave exactly as the shell
 // dispatcher's `2>&1` did; reading them as two pipes would reorder a gate's own report.
@@ -1334,6 +1349,7 @@ pub fn dispatch(
     program: &Program,
     args: &[String],
     tmpdir: &std::path::Path,
+    run_scratch: &std::path::Path,
     capture: &std::path::Path,
     env: &[(String, String)],
 ) -> Result<Dispatched, String> {
@@ -1350,7 +1366,7 @@ pub fn dispatch(
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::from(out))
         .stderr(std::process::Stdio::from(err))
-        .env("TMPDIR", tmpdir);
+        .envs(scratch_env(tmpdir, run_scratch));
     for (k, v) in env {
         cmd.env(k, v);
     }

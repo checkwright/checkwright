@@ -19,7 +19,8 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # canon-kit/
-SANDBOX="$(mktemp -d)"
+# spec: gate-sdk/SPEC.md §run-gates — the sandbox keeps the system temp dir by an explicit path, since the subject's surface prunes over its root's own ancestors and a runner's TMPDIR lies under the tmp dir, a pruned name
+SANDBOX="$(mktemp -d /tmp/check-comment-tier.XXXXXX)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
 fails=0

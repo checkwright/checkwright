@@ -4,7 +4,7 @@ use crate::runner::{self, Dispatch, Selected};
 use crate::{proc, programs, registry, walk};
 use std::path::{Path, PathBuf};
 
-pub const KNOBS: &[&str] = &["GATE_SDK_GATES_DIR", "GATE_SDK_KIT_DIRS", "GATE_SDK_POWERSHELL"];
+pub const KNOBS: &[&str] = &["GATE_SDK_GATES_DIR", "GATE_SDK_KIT_DIRS", "GATE_SDK_POWERSHELL", "GATE_SDK_TMP_DIR"];
 
 pub const USAGE: &str = "usage: --git-hook pre-commit | commit-msg <message-file>";
 
@@ -165,9 +165,7 @@ fn run_over(hook: &Hook, paths: &[String]) -> Result<(i32, String, usize), Strin
         .map_err(|e| format!("cannot resolve this binary's own path: {}", e))?
         .display()
         .to_string();
-    let scratch = std::env::temp_dir().join(format!("checkwright-git-hook.{}", std::process::id()));
-    let _ = std::fs::remove_dir_all(&scratch);
-    std::fs::create_dir_all(&scratch).map_err(|e| format!("cannot create {}: {}", scratch.display(), e))?;
+    let scratch = runner::run_scratch(&walk::knob_scalar("GATE_SDK_TMP_DIR")?)?;
     let d = Dispatch {
         resolve_dirs: &resolve_dirs,
         self_exe: &self_exe,

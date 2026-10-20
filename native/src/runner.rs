@@ -686,7 +686,7 @@ pub(crate) fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome 
         );
     }
     let capture = d.scratch.join(format!("c{}", idx));
-    match proc::dispatch(&program, &args, &tmpdir, &capture, &env) {
+    match proc::dispatch(&program, &args, &tmpdir, d.scratch, &capture, &env) {
         Err(e) => fail(
             "dispatch harness error, exit 2",
             e,
@@ -742,6 +742,24 @@ fn report_omissions(list_text: &str) {
         println!("{} gate(s) omitted ({}).", n, r);
         i += n;
     }
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — the one maker of every runner's run scratch:
+// `checkwright-run.<pid>` under the tmp dir absolutized at the invoker's root, the tmp dir made
+// self-ignoring where absent
+pub(crate) fn run_scratch(tmp_dir: &str) -> Result<PathBuf, String> {
+    run_scratch_at(&walk::cwd()?, tmp_dir)
+}
+
+fn run_scratch_at(here: &str, tmp_dir: &str) -> Result<PathBuf, String> {
+    let root = PathBuf::from(walk::abs_against(here, tmp_dir));
+    let scratch = root.join(format!("checkwright-run.{}", std::process::id()));
+    let made = walk::make_scratch(&root).and_then(|()| {
+        let _ = std::fs::remove_dir_all(&scratch);
+        std::fs::create_dir_all(&scratch)
+    });
+    made.map_err(|e| format!("cannot create the run scratch {}: {}", scratch.display(), e))?;
+    Ok(scratch)
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — only an unfiltered run of the configured registry writes the
@@ -862,20 +880,13 @@ pub fn run(args: &[String]) -> i32 {
             return 2;
         }
     };
-    // spec: gate-sdk/SPEC.md §run-gates — the run's own scratch: under the *system* temp dir, which
-    // is where an anonymous temporary already went, and absolute because a child's cwd is its own
-    // and a relative `TMPDIR` would resolve somewhere else in it. Removed on the way out.
-    let scratch = std::env::temp_dir().join(format!("checkwright-run.{}", std::process::id()));
-    let _ = std::fs::remove_dir_all(&scratch);
-    if let Err(e) = std::fs::create_dir_all(&scratch) {
-        eprintln!(
-            "{}: cannot create the run scratch {}: {} — treating as failure (not clean)",
-            TOOL,
-            scratch.display(),
-            e
-        );
-        return 2;
-    }
+    let scratch = match run_scratch(&tmp_dir) {
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!("{}: {} — treating as failure (not clean)", TOOL, e);
+            return 2;
+        }
+    };
 
     let self_exe = match crate::proc::self_image() {
         Ok(p) => p.display().to_string(),
@@ -1052,6 +1063,43 @@ fn dispatch_all(d: &Dispatch, selected: &[Selected]) -> Vec<Outcome> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: gate-sdk/SPEC.md §run-gates — the run scratch lies under the tmp dir absolutized at the
+    // invoker's root, a relative value included, and a dispatched child's `TMPDIR` lies under it
+    // with the run scratch heading its git ceiling
+    #[test]
+    fn the_run_scratch_roots_under_the_tmp_dir_and_heads_each_childs_ceiling() {
+        let here = std::env::temp_dir().join(format!("checkwright-run-scratch-test.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&here);
+        std::fs::create_dir_all(&here).unwrap();
+        let here_s = walk::abs_against(&here.display().to_string(), ".");
+        let root = PathBuf::from(walk::abs_against(&here_s, "rel/tmp"));
+        let scratch = run_scratch_at(&here_s, "rel/tmp").unwrap();
+        assert_eq!(scratch.parent(), Some(root.as_path()), "the run scratch is a child of the absolutized tmp dir");
+        assert!(walk::path_root(&scratch.display().to_string()).is_some() && scratch.is_dir());
+        assert!(root.join(".gitignore").is_file(), "the tmp dir the run made ignores itself");
+
+        let tmpdir = scratch.join("t0");
+        std::fs::create_dir_all(&tmpdir).unwrap();
+        let env = proc::scratch_env(&tmpdir, &scratch);
+        let get = |k: &str| env.iter().find(|(n, _)| n == k).map(|(_, v)| v.clone()).unwrap();
+        assert_eq!(get("TMPDIR"), tmpdir.display().to_string());
+        let sep = if cfg!(windows) { ';' } else { ':' };
+        assert_eq!(get("GIT_CEILING_DIRECTORIES").split(sep).next(), Some(scratch.display().to_string().as_str()));
+
+        #[cfg(unix)]
+        {
+            let script = r#"printf '%s\n%s\n' "$TMPDIR" "$GIT_CEILING_DIRECTORIES""#;
+            let args: Vec<String> = ["-c", script].iter().map(|s| s.to_string()).collect();
+            let done = proc::dispatch(&crate::programs::BASH, &args, &tmpdir, &scratch, &scratch.join("c0"), &[]).unwrap();
+            let out = String::from_utf8(done.output).unwrap();
+            let mut lines = out.lines();
+            assert_eq!(lines.next(), Some(tmpdir.display().to_string().as_str()));
+            let ceiling = lines.next().unwrap();
+            assert_eq!(ceiling.split(sep).next(), Some(scratch.display().to_string().as_str()), "{}", ceiling);
+        }
+        let _ = std::fs::remove_dir_all(&here);
+    }
 
     // spec: gate-sdk/SPEC.md §run-gates — the write predicate over a bare run and the three
     // filtered ones

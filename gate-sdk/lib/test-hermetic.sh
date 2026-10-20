@@ -19,7 +19,7 @@ for _th_kit in "$_th_root"/gate-sdk "$_th_root"/*-kit; do
     export "${_th_var}_KNOB_FILE=${_th_empty_knobs}"
     [[ "$_th_var" == GATE_SDK ]] || export "${_th_var}_LOCAL_KNOB_FILE=${_th_empty_knobs}"
 done
-# spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the system temp dir heads the git ceiling list
+# spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the temp dir the suite is handed heads the git ceiling list
 _th_sep=:
 case "${OSTYPE:-}" in msys* | cygwin* | win32*) _th_sep=';' ;; esac
 _th_tmp="$(cd -P "${TMPDIR:-/tmp}" && pwd -P)"

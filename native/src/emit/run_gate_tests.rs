@@ -6,7 +6,8 @@
 // the knob-file derivation could not see the three knobs below.
 use crate::{knobfile, knobs, proc, programs};
 use crate::walk;
-use std::path::Path;
+use std::cell::Cell;
+use std::path::{Path, PathBuf};
 
 pub const KNOBS: &[&str] = &[
     "GATE_SDK_TESTS_DIR",
@@ -63,7 +64,35 @@ pub fn run(args: &[String]) -> i32 {
         eprintln!("{}: no fixture tree at {}", NAME, tests_dir);
         return 2;
     }
-    execute(&harness, &tests_dir)
+    let scratch = match crate::runner::run_scratch(&harness.case_tmp) {
+        Ok(s) => RunScratch { root: s, next: Cell::new(0) },
+        Err(e) => {
+            eprintln!("{}: {} — treating as failure (not clean)", NAME, e);
+            return 2;
+        }
+    };
+    let code = execute(&harness, &scratch, &tests_dir);
+    let _ = std::fs::remove_dir_all(&scratch.root);
+    code
+}
+
+// spec: gate-sdk/SPEC.md §run-gate-tests — the runner's temporaries are a run scratch's: each case
+// invocation and each bespoke test is handed its own private dir under it, with the ceiling
+struct RunScratch {
+    root: PathBuf,
+    next: Cell<usize>,
+}
+
+impl RunScratch {
+    fn child_env(&self) -> Result<Vec<(String, String)>, String> {
+        let n = self.next.get();
+        self.next.set(n + 1);
+        let tmpdir = self.root.join(format!("t{}", n));
+        std::fs::create_dir_all(&tmpdir).map_err(|e| {
+            format!("cannot create the per-child scratch {}: {} — the check could not run", tmpdir.display(), e)
+        })?;
+        Ok(proc::scratch_env(&tmpdir, &self.root))
+    }
 }
 
 fn tests_dir(args: &[String]) -> Result<String, String> {
@@ -157,7 +186,7 @@ fn check_dirs(sdk: &str) -> Result<Vec<String>, String> {
 // spec: gate-sdk/SPEC.md §run-gate-tests — every subdirectory of a tests dir is read as a case
 // pair and `<tests-dir>/*.test.sh` as a unit test; the runner exits 2 only when it holds
 // **neither**, so a gateless kit's unit-test-only dir is a lawful tests dir printing `0 pairs`.
-fn execute(h: &Harness, tests_dir: &str) -> i32 {
+fn execute(h: &Harness, scratch: &RunScratch, tests_dir: &str) -> i32 {
     let (gate_dirs, unit_tests) = discover(tests_dir);
     if gate_dirs.is_empty() && unit_tests.is_empty() {
         eprintln!(
@@ -194,8 +223,8 @@ fn execute(h: &Harness, tests_dir: &str) -> i32 {
 
         pairs += 1;
 
-        let gc = run_case(h, gate, &good, 0, &good_expect);
-        let bc = run_case(h, gate, &bad, 1, &bad_expect);
+        let gc = run_case(h, scratch, gate, &good, 0, &good_expect);
+        let bc = run_case(h, scratch, gate, &bad, 1, &bad_expect);
         if gc == 1 || bc == 1 {
             logic_fail += 1;
         }
@@ -209,7 +238,11 @@ fn execute(h: &Harness, tests_dir: &str) -> i32 {
     for t in &unit_tests {
         unit += 1;
         let path = format!("{}/{}", tests_dir, t);
-        match proc::run_merged_in(&programs::BASH, &[path.as_str()], &h.exported, None) {
+        let env = scratch.child_env().map(|mut env| {
+            env.extend(h.exported.iter().cloned());
+            env
+        });
+        match env.and_then(|env| proc::run_merged_in(&programs::BASH, &[path.as_str()], &env, None)) {
             Ok(m) if m.succeeded() => {}
             Ok(m) => {
                 println!("  FAIL: {}", t);
@@ -294,7 +327,7 @@ fn basename(p: &str) -> &str {
 // spec: gate-sdk/SPEC.md §run-gate-tests — one case: resolve the dispatch inside the case dir, take
 // the executable guard and the absolutization on its first element, then run it from inside the case
 // dir with the scratch pin.
-fn run_case(h: &Harness, gate: &str, casedir: &str, want: i32, expect: &str) -> i32 {
+fn run_case(h: &Harness, scratch: &RunScratch, gate: &str, casedir: &str, want: i32, expect: &str) -> i32 {
     let unset = match case_unset(casedir) {
         Ok(names) => names,
         Err(e) => { println!("  HARNESS: {}", e); return 2; }
@@ -359,6 +392,14 @@ fn run_case(h: &Harness, gate: &str, casedir: &str, want: i32, expect: &str) -> 
         h.exported.iter().filter(|(k, _)| k != "GATE_SDK_NATIVE_BIN").cloned().collect();
     env.push(("GATE_SDK_NATIVE_BIN".to_string(), if pinned.is_empty() { h.bin.clone() } else { pinned }));
     env.push(("GATE_SDK_TMP_DIR".to_string(), h.case_tmp.clone()));
+    match scratch.child_env() {
+        Ok(e) => env.extend(e),
+        Err(e) => {
+            println!("  HARNESS: {} {} exited 2 (gate could not run / malformed fixture):", gate, casedir);
+            report(&e);
+            return 2;
+        }
+    }
     // spec: gate-sdk/SPEC.md §run-gate-tests — a one-element `.sh` argv is a shell member, started
     // through the battery's own shell arm
     let (program, mut lead) = if argv.len() == 1 && argv[0].ends_with(".sh") {

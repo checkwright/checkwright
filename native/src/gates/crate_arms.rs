@@ -58,10 +58,11 @@ fn cache_path(tmp_dir: &str, crate_dir: &str) -> String {
 }
 
 // spec: gate-sdk/SPEC.md §check-crate-arms — one arm's spawn, stripped of git's repository
-// locators, and its report: the merged capture is read whatever the status, because for these two
-// the *failing* run is the one whose report has to print
+// locators and of `TMPDIR`, and its report: the merged capture is read whatever the status, because
+// for these two the *failing* run is the one whose report has to print
 fn arm(label: &str, crate_dir: &str, argv: &[&str], rustflags: &str) -> Result<bool, String> {
-    let m = proc::run_merged_scrubbed(&CARGO, argv, &[("RUSTFLAGS".to_string(), rustflags.to_string())], std::path::Path::new("."), &proc::GIT_REPO_LOCATORS.iter().map(|s| s.to_string()).collect::<Vec<_>>())?;
+    let unset: Vec<String> = proc::GIT_REPO_LOCATORS.iter().chain(&["TMPDIR"]).map(|s| s.to_string()).collect();
+    let m = proc::run_merged_scrubbed(&CARGO, argv, &[("RUSTFLAGS".to_string(), rustflags.to_string())], std::path::Path::new("."), &unset)?;
     if m.succeeded() {
         return Ok(true);
     }
