@@ -11,3 +11,4 @@ guard-grant-shrink-pass build aee7b250 2026-10-20 7d71d13d0
 guard-grant-shrink-pass build a0095f26 2026-10-20 0de738383
 guard-grant-shrink-pass build a96b1529 2026-10-20 054446668
 guard-grant-shrink-pass validate a4906811 2026-10-21 bf8b1982d
+guard-grant-shrink-pass close a90e680d 2026-10-21 bd61c9043
