@@ -1,14 +1,32 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: guard-grant-shrink-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The set (operator direction 2026-10-20, lead-relayed, not a ruling; the iteration opened undirected):** option A as scope recommended. Debt promoted by scope: `hook-binding-reader-rows`. Features for spec to author and pair: `guard-grant-literal-shrink` and `run-scratch-system-temp`; `bounded-write-link-reach-grant` is mooted by the shrink, its two wrong grants becoming cases of the shrink's amendment, and the icebox's `interpreter-grant-redirect-residue` is mooted with it. Stages scope, spec, build, validate and close; each amendment stays inside one component.
+
+  **Order (scope, own authority):** `hook-binding-reader-rows` builds before the shrink, which edits the same guard host files.
+
+  **Release review (operator grant 2026-10-20, lead-relayed, unspent):** one second-vendor review at validate, against the bar as narrowed on [tarball-attestation-observed](#tarball-attestation-observed); close cuts v0.32.0 on a clean return.
+
+  **Push need (2026-10-20, operator direction lead-relayed: three pushes, this iteration only):** 3 against 2 — one mid-iteration push for `run-scratch-system-temp`, the closing push, and the v0.32.0 tag push on a clean review.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### hook-binding-reader-rows
+
+gate-sdk/SPEC.md §The hook contract's variables, wiring, transcript and permission rows are spelled at each reader outside the hook members, so its unit test holds only the member rows to `native/src/hook/binding.rs` and the section's honest limit states the rest.
+
+**Deliverable:** the readers take those spellings from `binding.rs` and its test widens to every row, or a refusal recorded in that honest limit. The readers include `native/src/guard/host.rs`'s `Bash(` strip and `native/src/guard/mod.rs`'s `:*` idiom, so it lands in a build.
+
+**Cost while deferred:** a renamed key in those rows drifts from the table until a reader's fixture reds. Filed 2026-10-20 by lead-role-guard-binding-pass' close, draining build's bullet, the residual of `hook-binding-single-source`, Done, which bound the member rows only. Re-verified there: `native/src` files outside `hook/binding.rs`, the guard host among them, spell those rows' keys. Owner lookup: `binding.rs`, `reader-rows`, `permission row` in this file and the disposed-findings record, none; [antigravity-hook-binding](#antigravity-hook-binding) DISTINCT (another harness's binding); owner gate-sdk/SPEC.md §The hook contract.
 
 ## Deferred
 
@@ -122,15 +140,11 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Deliverable:** that observation, read off the `publish` run and one install from the published Release, with any defect it shows filed.
 
-**Release (operator directions, lead-relayed, not rulings):** v0.32.0 stays deferred, closing push only, no tag and no publish, by a direction of 2026-10-12. **The bar for the cut, the same direction:** cut once no open finding is a wrong grant or a regression from v0.31.0; a fall-through hole rides as a declared limit in the note. Which open finding the bar blocks is read by the session that next weighs a cut, against its own runs. **At each close since 2026-10-13** the operator rested that reading on the iteration's second-vendor review returning clean, a failed run or a finding leaving the bar a judgment being asked, never skipped or met by a same-vendor reader; on 2026-10-14 the one granted run moved to validate, none at close. **Since 2026-10-14** a close promotes every verdict-moving guard change it would author rather than landing it, the close binding carrying the rule, so a finding the review returns waits for a later build and validate. Three closes read the bar unmet on findings the latest review returned; the last, `grant-redirect-scan-cr`, landed at guard-word-read-release-pass. **That close, by a direction of 2026-10-15,** runs one audit-mode second-vendor review over the iteration's range and cuts v0.32.0 on a clean return, closing push plus tag push; a finding or a failed run defers, a verdict-moving finding promoted. The run failed on the vendor's credit wall, so v0.32.0 stays deferred; foreign-build-budget-pass' close, granted no run, ran none and deferred it again. crate-name-reader-pass' validate spent its one granted run, not clean on one regression the operator ruled a hotfix for; its close deferred v0.32.0 again with no second run granted (operator direction 2026-10-15, lead-relayed), and gate-substrate-sdk-pass' close, given no new answer, deferred it under that direction. That cut's `publish` run produces this observation and [front-door-job-observed](#front-door-job-observed)'s.
+**Release (operator directions, lead-relayed, not rulings):** v0.32.0 has stayed deferred since a direction of 2026-10-12, closing push only. **The bar, the same direction:** cut once no open finding is a wrong grant or a regression from v0.31.0; a fall-through hole rides as a declared limit in the note. **Since 2026-10-13** that reading rests on the iteration's second-vendor review returning clean, a failed run or a finding leaving the bar a judgment being asked, never met by a same-vendor reader; **since 2026-10-14** a close promotes every verdict-moving guard change it would author rather than landing it (the close binding carries the rule). That cut's `publish` run produces this observation and [front-door-job-observed](#front-door-job-observed)'s.
 
-**Three grants of 2026-10-16 and three of 2026-10-18 spent (lead-relayed):** each review returned findings, fixed there or landed in a later build, and each left v0.32.0 deferred.
+**Grants spent 2026-10-15 to 2026-10-20:** every review returned findings or failed (a credit wall, a content refusal), each finding fixed or landed in a later build, the last two wrong grants [bounded-write-link-reach-grant](#bounded-write-link-reach-grant); each close deferred v0.32.0. The competitive-followup-pass close withdrew `prove` from docs/install.md and docs/maintenance.md and the overlap section from docs/openspec.md, its line held in `companion/fixtures/openspec/overlap/line.md`; **the cut restores them** and deletes the held file.
 
-**Two grants of 2026-10-17 spent:** competitive-followup-pass' validate and close reviews each returned five findings, so v0.32.0 stayed deferred. That close withdrew `prove` from docs/install.md and docs/maintenance.md and the overlap section from docs/openspec.md, its line held in `companion/fixtures/openspec/overlap/line.md`; **the cut restores them** and deletes the held file.
-
-**Three grants of 2026-10-19 spent:** guard-word-read-reach-pass' validate review returned a wrong grant, hotfixed, and a wrong block, `escaped-amp-statement-split`; guard-ansi-c-bar-pass' two wrong grants, `escaped-pipe-amp-wrong-grant` and `ansi-c-continuation-grant`, landed at guard-reader-value-bar-pass; that iteration's validate run failed, the vendor refusing the content as a cybersecurity flag and returning no report, and its trace's wrong grant is `bounded-write-backslash-grant`, since landed. Each close deferred v0.32.0, the last by a direction of 2026-10-19 (lead-relayed, not a ruling): closing push only, no tag, no publish and no second run, the bar unchanged.
-
-**2026-10-20's grant spent** at lead-role-guard-binding-pass' validate: two wrong grants, [bounded-write-link-reach-grant](#bounded-write-link-reach-grant); v0.32.0 deferred.
+**Bar narrowed, operator direction 2026-10-20, lead-relayed at guard-grant-shrink-pass' scope:** the zero-wrong-grant bar now reads over the grant set left after [guard-grant-literal-shrink](#guard-grant-literal-shrink); one second-vendor review is granted at that iteration's validate, and its close cuts v0.32.0 on a clean return.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
@@ -264,16 +278,6 @@ rule `bounded_write` grants two writes that reach through a symbolic link in scr
 
 **Also owed in this file, surfaced 2026-10-20 at lead-role-guard-binding-pass' close audit, carried to the next scope:** the `spec:` comment above `fn write_words` in `grants.rs` still says its words are dequoted with backslashes removed, while the function reads each by value, a kept backslash included; reword it to the by-value read, pointing at rule `bounded_write`. Comment-only, no verdict moves.
 
-### hook-binding-reader-rows
-
-[cost: event/low] [surface: gate-sdk]
-
-gate-sdk/SPEC.md §The hook contract's variables, wiring, transcript and permission rows are spelled at each reader outside the hook members, so its unit test holds only the member rows to `native/src/hook/binding.rs` and the section's honest limit states the rest.
-
-**Deliverable:** the readers take those spellings from `binding.rs` and its test widens to every row, or a refusal recorded in that honest limit. The readers include `native/src/guard/host.rs`'s `Bash(` strip and `native/src/guard/mod.rs`'s `:*` idiom, so it lands in a build.
-
-**Cost while deferred:** a renamed key in those rows drifts from the table until a reader's fixture reds. Filed 2026-10-20 by lead-role-guard-binding-pass' close, draining build's bullet, the residual of `hook-binding-single-source`, Done, which bound the member rows only. Re-verified there: `native/src` files outside `hook/binding.rs`, the guard host among them, spell those rows' keys. Owner lookup: `binding.rs`, `reader-rows`, `permission row` in this file and the disposed-findings record, none; [antigravity-hook-binding](#antigravity-hook-binding) DISTINCT (another harness's binding); owner gate-sdk/SPEC.md §The hook contract.
-
 ### guard-grant-literal-shrink
 
 [cost: iteration/high] [surface: guard-kit]
@@ -291,6 +295,8 @@ the shell guard's grant side keeps chasing parity with bash's spellings and does
 the gate binary roots its battery run scratch at the system temp dir (`native/src/runner.rs`: each member's private `TMPDIR` and capture), `proc.rs`'s captures and the crate tests use `temp_dir`, and the shell fixture suites use `mktemp -d`, no `TMPDIR` bound anywhere. On a host whose `/tmp` is tmpfs it lands in memory, against the repo-local scratch intent behind `GATE_SDK_TMP_DIR` (operator direction 2026-10-20, lead session, not a ruling).
 
 **Deliverable:** design-pending, a feature: gate-sdk/SPEC.md §run-gates states the root, so a ruling is owed on rooting the run scratch under `GATE_SDK_TMP_DIR` or binding `TMPDIR` to it for every child, with a fixture that needs a directory outside any repository kept outside.
+
+**Push need (2026-10-20, operator direction lead-relayed, over the budget):** one mid-iteration push after build, since the Windows and macOS legs run the new scratch root before any local run can; the shrink's link fixtures ride it.
 
 **Cost while deferred:** paid when a run's scratch meets a small or full tmpfs. Measured at this scope: `/tmp` held 784K at rest and no residue of the binary's, so the scratch is transient. Surfaced 2026-10-20 by the lead after lead-role-guard-binding-pass' close. Owner lookup: `tmpfs`, `temp_dir`, `TMPDIR` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
 
