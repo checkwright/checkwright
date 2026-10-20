@@ -19,8 +19,7 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # canon-kit/
-# spec: gate-sdk/SPEC.md §run-gates — the sandbox keeps the system temp dir by an explicit path, since the subject's surface prunes over its root's own ancestors and a runner's TMPDIR lies under the tmp dir, a pruned name
-SANDBOX="$(mktemp -d /tmp/check-comment-tier.XXXXXX)"
+SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
 fails=0
@@ -174,9 +173,17 @@ check_case "configured-glob-skips-pruned-dir" prune-cfg.knobs 0 "COMMENT-TIER: c
     "$SANDBOX/prune-root"
 chmod a+x "$SANDBOX/prune-root/target/deps"
 
+# The prune set reads a path below the scan root, never the root's own ancestors: a root lying
+# under a pruned name (a runner's scratch under `.tmp`, here `target`) still governs its sources.
+mkdir -p "$SANDBOX/target/rooted"
+cp "$SANDBOX/bad.rs" "$SANDBOX/target/rooted/bad.rs"
+mkcfg "$SANDBOX/rooted-cfg.knobs" 'CANON_KIT_COMMENT_SURFACE[] = **/*.rs' 'CANON_KIT_COMMENT_POSITIONAL[] = unsafe'
+check_case "pruned-ancestor-root-governed" rooted-cfg.knobs 1 "standalone slash block restates" \
+    "$SANDBOX/target/rooted"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-comment-tier.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-comment-tier.test.sh: clean (slash surface + positional rescue + txt restricted roster + templates/ governance + count override edges + paragraph-join wrap + workflow-dir markdown headings as structure with its single-hash lines still governed + a configured ** kept out of pruned dirs)"
+echo "check-comment-tier.test.sh: clean (slash surface + positional rescue + txt restricted roster + templates/ governance + count override edges + paragraph-join wrap + workflow-dir markdown headings as structure with its single-hash lines still governed + a configured ** kept out of pruned dirs + a root under a pruned name still governed)"
 exit 0

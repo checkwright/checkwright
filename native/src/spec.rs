@@ -270,7 +270,10 @@ pub fn comment_surface(root: &str, with_templates: bool) -> Result<Vec<String>, 
         let prune = walk::prune_dirs()?;
         walk::glob_files_pruned(rootp, &globs, &|n| prune.iter().any(|d| d == n))?
             .into_iter()
-            .filter(|f| f.is_file() && !walk::path_pruned(&f.display().to_string(), &prune))
+            .filter(|f| {
+                let p = f.display().to_string();
+                f.is_file() && !walk::path_pruned(walk::rel_under(root, &p).unwrap_or(&p), &prune)
+            })
             .collect()
     };
     if actions {
