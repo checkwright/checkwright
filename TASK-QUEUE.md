@@ -262,11 +262,11 @@ Cursor and Muse Code are installed on no build machine, so plugin/SPEC.md §The 
 
 [cost: session/low] [surface: gate-sdk]
 
-The run scratch now roots under `GATE_SDK_TMP_DIR` (gate-sdk/SPEC.md §run-gates, per-gate scratch isolation), but production `std::env::temp_dir()` sites still write the system temp dir: guard-kit's decision-table sandbox (`emit/run_guard_tests.rs`), context-kit's index tests (`emit/run_index_tests.rs`), the front-end parity arm (`emit/front_end_parity.rs`), two gates' work dirs (`gates/action_run_shell.rs`, `gates/settings_pins_parity.rs`) and `proc.rs`'s captures in a top-level arm's own process. On Windows a compiled member's temp lookup reads `TMP`, not the `TMPDIR` the runner binds, so every member capture stays at the system temp dir there.
+The run scratch now roots under `GATE_SDK_TMP_DIR` (gate-sdk/SPEC.md §run-gates, per-gate scratch isolation), but production `std::env::temp_dir()` sites still write the system temp dir, across guard-kit's decision-table sandbox, context-kit's index tests, the front-end parity arm, the installer smoke, a gate's work dir and `proc.rs`'s captures in a top-level arm's own process; the set is the grep below, never this list. On Windows a compiled member's temp lookup reads `TMP`, not the `TMPDIR` the runner binds, so every member capture stays at the system temp dir there.
 
 **Deliverable:** route each production site through the run's scratch root, or state per site why the system temp dir is correct, and bind `TMP` beside `TMPDIR` for a Windows child; drop the honest-limit sentence that names the `TMP` residue.
 
-**Cost while deferred:** one small transient tree or capture per run outside the tmp dir's one-component bound, on a tmpfs system temp dir. Filed 2026-10-21 by guard-grant-shrink-pass' close. Re-verified there: `grep -n 'temp_dir()'` over the named files, each hit above its file's first `#[cfg(test)]`. Owner lookup: `temp_dir`, `system temp` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
+**Cost while deferred:** one small transient tree or capture per run outside the tmp dir's one-component bound, on a tmpfs system temp dir. Filed 2026-10-21 by guard-grant-shrink-pass' close. Re-verified there: `grep -rn 'temp_dir()' native/src`, read for each hit above its file's first `#[cfg(test)]` outside a test-only module. Owner lookup: `temp_dir`, `system temp` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
 
 ### tmp-dir-prune-coupling
 
