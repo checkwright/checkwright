@@ -138,7 +138,9 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Two grants of 2026-10-17 spent:** competitive-followup-pass' validate and close reviews each returned five findings, so v0.32.0 stayed deferred. That close withdrew `prove` from docs/install.md and docs/maintenance.md and the overlap section from docs/openspec.md, its line held in `companion/fixtures/openspec/overlap/line.md`; **the cut restores them** and deletes the held file.
 
-**Three grants of 2026-10-19 spent:** guard-word-read-reach-pass' validate review returned a wrong grant, hotfixed, and a wrong block, `escaped-amp-statement-split`; guard-ansi-c-bar-pass' two wrong grants, `escaped-pipe-amp-wrong-grant` and `ansi-c-continuation-grant`, landed at guard-reader-value-bar-pass; that iteration's validate run failed, the vendor refusing the content as a cybersecurity flag and returning no report, and its trace's wrong grant is `bounded-write-backslash-grant`. Each close deferred v0.32.0, the last by a direction of 2026-10-19 (lead-relayed, not a ruling): closing push only, no tag, no publish and no second run, the bar unchanged.
+**Three grants of 2026-10-19 spent:** guard-word-read-reach-pass' validate review returned a wrong grant, hotfixed, and a wrong block, `escaped-amp-statement-split`; guard-ansi-c-bar-pass' two wrong grants, `escaped-pipe-amp-wrong-grant` and `ansi-c-continuation-grant`, landed at guard-reader-value-bar-pass; that iteration's validate run failed, the vendor refusing the content as a cybersecurity flag and returning no report, and its trace's wrong grant is `bounded-write-backslash-grant`, since landed. Each close deferred v0.32.0, the last by a direction of 2026-10-19 (lead-relayed, not a ruling): closing push only, no tag, no publish and no second run, the bar unchanged.
+
+**2026-10-20's grant spent** at lead-role-guard-binding-pass' validate: two wrong grants, [bounded-write-link-reach-grant](#bounded-write-link-reach-grant); v0.32.0 deferred.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
@@ -259,6 +261,26 @@ Cursor and Muse Code are installed on no build machine, so plugin/SPEC.md §The 
 **Deliverable:** install and run each on a machine that has it, turn its cells from read to run, and file any wiring defect.
 
 **Cost while deferred:** two tier-2 harnesses' skill load and guard reach rest on vendor docs. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: neither CLI on the build machine's PATH. Owner lookup: `cursor`, `muse` in this file, none; owner plugin/SPEC.md §The harnesses.
+
+### bounded-write-link-reach-grant
+
+[cost: event/low] [surface: guard-kit]
+
+rule `bounded_write` grants two writes that reach through a symbolic link in scratch. A glob final component: `touch .tmp/l*` and `ls > .tmp/l*` allow, since the bounds test's clause (c) reads a glob word's parent directory for clauses (b) to (f), so clause (e) never sees a matched link; the literal `touch .tmp/link` falls through. A directory destination: `cp src .tmp/d` allows, since `cp`'s row writes "the destination" and the effective target `.tmp/d/src` takes no bounds test; where it is a link, GNU `cp` follows it and overwrites the link's target, while `cp src .tmp/d/src` falls through. Both contradict clause (e)'s own ground.
+
+**Deliverable:** guard-kit/SPEC.md's bounds test and `cp` row name the paths a glob and a directory destination reach, `native/src/guard/rules/grants.rs` withholds where one is a link or cannot be read, and firing rows in `guard-kit/guard-tests/` hold both. It moves allow to fall-through, so it lands in a build.
+
+**Cost while deferred:** a wrong grant needing a planted link in scratch; it blocks the v0.32.0 bar. Filed 2026-10-20 by lead-role-guard-binding-pass' close, draining validate's two bullets from the second-vendor review. Re-verified there in a disposable `.tmp/fx` fixture: each glob and directory form allowed, each literal form fell through, and `cp` overwrote the link's target; `bounded_write` absent at v0.31.0 and present at the iteration base. Inferred, not run: `cp -r` reaching a link deeper in the destination. Owner lookup: `bounded_write`, `symlink`, `link`, `write_targets` in this file and the disposed-findings record, none; `bounded-write-backslash-grant`, Done, DISTINCT (a kept backslash, not a link); owner guard-kit/SPEC.md §The rule roster, rule `bounded_write`.
+
+### hook-binding-reader-rows
+
+[cost: event/low] [surface: gate-sdk]
+
+gate-sdk/SPEC.md §The hook contract's variables, wiring, transcript and permission rows are spelled at each reader outside the hook members, so its unit test holds only the member rows to `native/src/hook/binding.rs` and the section's honest limit states the rest.
+
+**Deliverable:** the readers take those spellings from `binding.rs` and its test widens to every row, or a refusal recorded in that honest limit. The readers include `native/src/guard/host.rs`'s `Bash(` strip and `native/src/guard/mod.rs`'s `:*` idiom, so it lands in a build.
+
+**Cost while deferred:** a renamed key in those rows drifts from the table until a reader's fixture reds. Filed 2026-10-20 by lead-role-guard-binding-pass' close, draining build's bullet, the residual of `hook-binding-single-source`, Done, which bound the member rows only. Re-verified there: thirteen `native/src` files outside `hook/binding.rs` spell those rows' keys. Owner lookup: `binding.rs`, `reader-rows`, `permission row` in this file and the disposed-findings record, none; [antigravity-hook-binding](#antigravity-hook-binding) DISTINCT (another harness's binding); owner gate-sdk/SPEC.md §The hook contract.
 
 ## Icebox
 
@@ -961,10 +983,4 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
-
-- hook-binding-single-source
-- guard-verdict-typed-operand
-- bounded-write-backslash-grant
-- lead-role-marker-guard-refused
-- shellcheck-gate-tests-derived
 

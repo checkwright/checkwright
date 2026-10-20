@@ -299,3 +299,4 @@ Knowledge-friction counts are excluded: their log is gitignored per-iteration sc
 | guard-word-read-reach-pass | sc sp · b v c | 2f/9d | 1 · ≤0d | 21s clean | 155 |
 | guard-ansi-c-bar-pass | sc sp a b v c | 0f/3d | 1 · ≤0d | 21s clean | 155 |
 | guard-reader-value-bar-pass | sc · · b v c | 1f/3d | 0 | 21s clean | 155 |
+| lead-role-guard-binding-pass | sc sp a b v c | 3f/2d | 3 · ≤0d | 21s clean | 155 |
