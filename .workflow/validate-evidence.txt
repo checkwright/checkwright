@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+lead-role-guard-binding-pass gates sha256=fd027e37cd4cfd51e7c85bb73227dd96f4b70608fe5ee573040e8418d8f37538 pass=155 fail=0 ignore=0 verdict=clean 2026-10-20
+lead-role-guard-binding-pass gate_sdk sha256=c1ad68813979393b485d2b07b7aafc72953e0f2453bed750b8e8ee5dd3711eae pass=1 fail=0 ignore=0 verdict=clean 2026-10-20
+lead-role-guard-binding-pass canon_kit sha256=7da861c196258fd00b91559ec77ed8c768822bd5bde1ce22c3191410addd736c pass=1 fail=0 ignore=0 verdict=clean 2026-10-20
+lead-role-guard-binding-pass context_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-10-20
+lead-role-guard-binding-pass delegation_kit sha256=e8b7dacc5b3a03c2084bd61274ee3c701400be4001eeaafa4126bc7f4b710363 pass=1 fail=0 ignore=0 verdict=clean 2026-10-20
+lead-role-guard-binding-pass doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-10-20
+lead-role-guard-binding-pass evidence_kit sha256=c62871f8123949178b90372d234262f4c133b06c830e8faa9bbb9af4d2767fea pass=1 fail=0 ignore=0 verdict=clean 2026-10-20
+lead-role-guard-binding-pass guard_kit sha256=6cb4ff2f4bd80b6561bd33590971d82cddcaa430595db7b5b0fefd800ace387b pass=1 fail=0 ignore=0 verdict=clean 2026-10-20
+lead-role-guard-binding-pass lifecycle_kit sha256=83b0f30c7091e60a96eac9d498bf22cc7766ac4d472b56501a4777e0e6507c4c pass=1 fail=0 ignore=0 verdict=clean 2026-10-20
+lead-role-guard-binding-pass queue_kit sha256=a4c89486a636a6d9c43ded5bbbb06f21bd7c7b3db7a8a330bdcf89eb952b9f7d pass=1 fail=0 ignore=0 verdict=clean 2026-10-20
+lead-role-guard-binding-pass site_kit sha256=9a315d2c0239c08b3c5d4fb7435d5c8a4f3a1faf11c4cdffd9788f2249ba03eb pass=1 fail=0 ignore=0 verdict=clean 2026-10-20
+lead-role-guard-binding-pass scripts sha256=43840b7690f4fcef0a2b3fd78af2c3c589c05ffc3de40e3f39ac3fe27d48a7be pass=1 fail=0 ignore=0 verdict=clean 2026-10-20
+lead-role-guard-binding-pass guard_tests sha256=a4c0d84438b2e33b8abad5dbfaf3e48965a64911dfed49f706578e8527023691 pass=1 fail=0 ignore=0 verdict=clean 2026-10-20
+lead-role-guard-binding-pass demo sha256=e1b09a3723a20588184daa010e3d30bc6e77ce1a3a4459a0876cf7c47f1bee19 pass=1 fail=0 ignore=0 verdict=clean 2026-10-20
+lead-role-guard-binding-pass installer_smoke sha256=6cc642e7fdf051c3a15458bd7b4d7a79e8688f53b5c84e124342787c53a9e17f pass=29 fail=0 ignore=0 verdict=clean 2026-10-20
+lead-role-guard-binding-pass consumer_smoke sha256=4a5391d3c30caf2b628c5a410f8d98d96b1843632ccb3aa07096f9a00296b098 pass=1 fail=0 ignore=0 verdict=clean 2026-10-20
+lead-role-guard-binding-pass upgrade sha256=93d9e6fa081331551c3f4513786364f2754b5bb31d0be6cc9b80e4fd53649e25 pass=1 fail=0 ignore=0 verdict=clean 2026-10-20
+lead-role-guard-binding-pass agents_md_smoke sha256=470c0570f80ccf557c0dfae2bdb359497184f561e477e5e20c60195cda6a209e pass=1 fail=0 ignore=0 verdict=clean 2026-10-20
+lead-role-guard-binding-pass index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-10-20
+lead-role-guard-binding-pass native_crate sha256=7eb1d9330189008053939a544dd7694c27e96fd996f205108cca01bba242cb4b pass=1 fail=0 ignore=0 verdict=clean 2026-10-20
+lead-role-guard-binding-pass projection_witness sha256=0b40fcef6dc17e4526e8193b10aa952421600364894ac47dba20fa36edc23eba pass=1 fail=0 ignore=0 verdict=clean 2026-10-20

@@ -10,7 +10,7 @@
 
   **Order (scope, own authority):** `hook-binding-single-source` builds before `guard-verdict-typed-operand`, whose arm builds a hook payload and reads the single-sourced binding spellings rather than spelling its own.
 
-  **Release review (operator grant 2026-10-20, lead-relayed, unspent):** one audit-mode second-vendor review over the iteration's range, run at validate; close may cut v0.32.0 on a clean return, against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed); a finding or a failed run defers the cut.
+  **Release review (operator grant 2026-10-20, lead-relayed, spent at validate):** one audit-mode second-vendor review over the iteration's range, run at validate; close may cut v0.32.0 on a clean return, against the bar recorded in [tarball-attestation-observed](#tarball-attestation-observed); a finding or a failed run defers the cut. **Returned not clean:** two wrong grants of `bounded_write`, filed to the gap inbox, absent at v0.31.0 and already present at the range base; v0.32.0 stays deferred.
 
   **Push need (2026-10-20, inside the budget):** 2 against 2 — the closing push, and the v0.32.0 tag push only if the granted review returns clean; no unit reads a remote run.
 
