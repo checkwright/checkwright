@@ -18,6 +18,40 @@
 
 ## New Features
 
+### guard-grant-literal-shrink
+
+[spec: SPEC-grant-literal-shrink.md]
+
+the shell guard's grant side keeps chasing parity with bash's spellings and does not converge: the last five iterations were guard passes, and each granted second-vendor review that returned a report found new wrong grants, the latest [bounded-write-link-reach-grant](#bounded-write-link-reach-grant). The steering and block rules fail safe, a wrong block costing a prompt; the grant rules (guard-kit/SPEC.md §The generic ruleset: the auto-allow band and the rewrite grants) do not, and they duplicate the harness's own permission and auto-mode classifier.
+
+**Deliverable:** design-pending, a feature narrowing asserted behaviour: the grants shrink to literal spellings, falling through on any glob, quoting, backslash, or `cp` or redirect into a directory; the steering and block rules stay. Lead advice, not a ruling: with the shrink, take the zero-wrong-grant review off the v0.32.0 bar or narrow it to the shrunk set ([tarball-attestation-observed](#tarball-attestation-observed) carries the bar).
+
+**Cost while deferred:** every iteration's validate and close re-spend a review and a bar reading on the grant side, and v0.32.0 stays held, so the catalog submission's published tag waits. Measured by the lead from the stage-economics log: guard iterations cost about 34% of spend since 2026-10-13. Surfaced 2026-10-20 by the lead after lead-role-guard-binding-pass' close, operator direction (lead session, not a ruling): weigh it at the next scope against the other priorities. Re-verified at that scope: 13 of 77 iteration names since 2026-09-24 carry `guard`, and the five trailing ones all do. Owner lookup: `grant side`, `literal`, `auto-allow` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The generic ruleset.
+
+### bounded-write-link-reach-grant
+
+[spec: SPEC-grant-literal-shrink.md]
+
+rule `bounded_write` grants two writes that reach through a symbolic link in scratch. A glob final component: `touch .tmp/l*` and `ls > .tmp/l*` allow, since the bounds test's clause (c) reads a glob word's parent directory for clauses (b) to (f), so clause (e) never sees a matched link; the literal `touch .tmp/link` falls through. A directory destination: `cp src .tmp/d` allows, since `cp`'s row writes "the destination" and the effective target `.tmp/d/src` takes no bounds test; where it is a link, GNU `cp` follows it and overwrites the link's target, while `cp src .tmp/d/src` falls through. Both contradict clause (e)'s own ground.
+
+**Deliverable:** guard-kit/SPEC.md's bounds test and `cp` row name the paths a glob and a directory destination reach, `native/src/guard/rules/grants.rs` withholds where one is a link or cannot be read, and firing rows in `guard-kit/guard-tests/` hold both. It moves allow to fall-through, so it lands in a build.
+
+**Cost while deferred:** a wrong grant needing a planted link in scratch; it blocks the v0.32.0 bar. Filed 2026-10-20 by lead-role-guard-binding-pass' close, draining validate's two bullets from the second-vendor review. Re-verified there in a disposable `.tmp/fx` fixture: each glob and directory form allowed, each literal form fell through, and `cp` overwrote the link's target; `bounded_write` absent at v0.31.0 and present at the iteration base. Owner lookup: `bounded_write`, `symlink`, `link`, `write_targets` in this file and the disposed-findings record, none; `bounded-write-backslash-grant`, Done, DISTINCT (a kept backslash, not a link); owner guard-kit/SPEC.md §The rule roster, rule `bounded_write`.
+
+**Also owed in this file, surfaced 2026-10-20 at lead-role-guard-binding-pass' close audit, carried to the next scope:** the `spec:` comment above `fn write_words` in `grants.rs` still says its words are dequoted with backslashes removed, while the function reads each by value, a kept backslash included; reword it to the by-value read, pointing at rule `bounded_write`. Comment-only, no verdict moves.
+
+### run-scratch-system-temp
+
+[spec: SPEC-run-scratch-root.md]
+
+the gate binary roots its battery run scratch at the system temp dir (`native/src/runner.rs`: each member's private `TMPDIR` and capture), `proc.rs`'s captures and the crate tests use `temp_dir`, and the shell fixture suites use `mktemp -d`, no `TMPDIR` bound anywhere. On a host whose `/tmp` is tmpfs it lands in memory, against the repo-local scratch intent behind `GATE_SDK_TMP_DIR` (operator direction 2026-10-20, lead session, not a ruling).
+
+**Deliverable:** design-pending, a feature: gate-sdk/SPEC.md §run-gates states the root, so a ruling is owed on rooting the run scratch under `GATE_SDK_TMP_DIR` or binding `TMPDIR` to it for every child, with a fixture that needs a directory outside any repository kept outside.
+
+**Push need (2026-10-20, operator direction lead-relayed, over the budget):** one mid-iteration push after build, since the Windows and macOS legs run the new scratch root before any local run can; the shrink's link fixtures ride it.
+
+**Cost while deferred:** paid when a run's scratch meets a small or full tmpfs. Measured at this scope: `/tmp` held 784K at rest and no residue of the binary's, so the scratch is transient. Surfaced 2026-10-20 by the lead after lead-role-guard-binding-pass' close. Owner lookup: `tmpfs`, `temp_dir`, `TMPDIR` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
+
 ## Technical Debt
 
 ### hook-binding-reader-rows
@@ -265,40 +299,6 @@ Cursor and Muse Code are installed on no build machine, so plugin/SPEC.md §The 
 **Deliverable:** install and run each on a machine that has it, turn its cells from read to run, and file any wiring defect.
 
 **Cost while deferred:** two tier-2 harnesses' skill load and guard reach rest on vendor docs. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: neither CLI on the build machine's PATH. Owner lookup: `cursor`, `muse` in this file, none; owner plugin/SPEC.md §The harnesses.
-
-### bounded-write-link-reach-grant
-
-[cost: event/low] [surface: guard-kit]
-
-rule `bounded_write` grants two writes that reach through a symbolic link in scratch. A glob final component: `touch .tmp/l*` and `ls > .tmp/l*` allow, since the bounds test's clause (c) reads a glob word's parent directory for clauses (b) to (f), so clause (e) never sees a matched link; the literal `touch .tmp/link` falls through. A directory destination: `cp src .tmp/d` allows, since `cp`'s row writes "the destination" and the effective target `.tmp/d/src` takes no bounds test; where it is a link, GNU `cp` follows it and overwrites the link's target, while `cp src .tmp/d/src` falls through. Both contradict clause (e)'s own ground.
-
-**Deliverable:** guard-kit/SPEC.md's bounds test and `cp` row name the paths a glob and a directory destination reach, `native/src/guard/rules/grants.rs` withholds where one is a link or cannot be read, and firing rows in `guard-kit/guard-tests/` hold both. It moves allow to fall-through, so it lands in a build.
-
-**Cost while deferred:** a wrong grant needing a planted link in scratch; it blocks the v0.32.0 bar. Filed 2026-10-20 by lead-role-guard-binding-pass' close, draining validate's two bullets from the second-vendor review. Re-verified there in a disposable `.tmp/fx` fixture: each glob and directory form allowed, each literal form fell through, and `cp` overwrote the link's target; `bounded_write` absent at v0.31.0 and present at the iteration base. Inferred, not run: `cp -r` reaching a link deeper in the destination. Owner lookup: `bounded_write`, `symlink`, `link`, `write_targets` in this file and the disposed-findings record, none; `bounded-write-backslash-grant`, Done, DISTINCT (a kept backslash, not a link); owner guard-kit/SPEC.md §The rule roster, rule `bounded_write`.
-
-**Also owed in this file, surfaced 2026-10-20 at lead-role-guard-binding-pass' close audit, carried to the next scope:** the `spec:` comment above `fn write_words` in `grants.rs` still says its words are dequoted with backslashes removed, while the function reads each by value, a kept backslash included; reword it to the by-value read, pointing at rule `bounded_write`. Comment-only, no verdict moves.
-
-### guard-grant-literal-shrink
-
-[cost: iteration/high] [surface: guard-kit]
-
-the shell guard's grant side keeps chasing parity with bash's spellings and does not converge: the last five iterations were guard passes, and each granted second-vendor review that returned a report found new wrong grants, the latest [bounded-write-link-reach-grant](#bounded-write-link-reach-grant). The steering and block rules fail safe, a wrong block costing a prompt; the grant rules (guard-kit/SPEC.md §The generic ruleset: the auto-allow band and the rewrite grants) do not, and they duplicate the harness's own permission and auto-mode classifier.
-
-**Deliverable:** design-pending, a feature narrowing asserted behaviour: the grants shrink to literal spellings, falling through on any glob, quoting, backslash, or `cp` or redirect into a directory; the steering and block rules stay. Lead advice, not a ruling: with the shrink, take the zero-wrong-grant review off the v0.32.0 bar or narrow it to the shrunk set ([tarball-attestation-observed](#tarball-attestation-observed) carries the bar).
-
-**Cost while deferred:** every iteration's validate and close re-spend a review and a bar reading on the grant side, and v0.32.0 stays held, so the catalog submission's published tag waits. Measured by the lead from the stage-economics log: guard iterations cost about 34% of spend since 2026-10-13. Surfaced 2026-10-20 by the lead after lead-role-guard-binding-pass' close, operator direction (lead session, not a ruling): weigh it at the next scope against the other priorities. Re-verified at that scope: 13 of 77 iteration names since 2026-09-24 carry `guard`, and the five trailing ones all do. Owner lookup: `grant side`, `literal`, `auto-allow` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The generic ruleset.
-
-### run-scratch-system-temp
-
-[cost: event/low] [surface: gate-sdk]
-
-the gate binary roots its battery run scratch at the system temp dir (`native/src/runner.rs`: each member's private `TMPDIR` and capture), `proc.rs`'s captures and the crate tests use `temp_dir`, and the shell fixture suites use `mktemp -d`, no `TMPDIR` bound anywhere. On a host whose `/tmp` is tmpfs it lands in memory, against the repo-local scratch intent behind `GATE_SDK_TMP_DIR` (operator direction 2026-10-20, lead session, not a ruling).
-
-**Deliverable:** design-pending, a feature: gate-sdk/SPEC.md §run-gates states the root, so a ruling is owed on rooting the run scratch under `GATE_SDK_TMP_DIR` or binding `TMPDIR` to it for every child, with a fixture that needs a directory outside any repository kept outside.
-
-**Push need (2026-10-20, operator direction lead-relayed, over the budget):** one mid-iteration push after build, since the Windows and macOS legs run the new scratch root before any local run can; the shrink's link fixtures ride it.
-
-**Cost while deferred:** paid when a run's scratch meets a small or full tmpfs. Measured at this scope: `/tmp` held 784K at rest and no residue of the binary's, so the scratch is transient. Surfaced 2026-10-20 by the lead after lead-role-guard-binding-pass' close. Owner lookup: `tmpfs`, `temp_dir`, `TMPDIR` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
 
 ## Icebox
 
