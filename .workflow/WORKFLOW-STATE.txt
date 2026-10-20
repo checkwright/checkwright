@@ -5,3 +5,4 @@
 ---
 
 guard-grant-shrink-pass scope abfca38e 2026-10-20 eb7b040bd
+guard-grant-shrink-pass spec a4e0d929 2026-10-20 faa721f93
