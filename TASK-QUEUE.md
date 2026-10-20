@@ -18,18 +18,6 @@
 
 ## New Features
 
-### run-scratch-system-temp
-
-[spec: SPEC-run-scratch-root.md]
-
-the gate binary roots its battery run scratch at the system temp dir (`native/src/runner.rs`: each member's private `TMPDIR` and capture), `proc.rs`'s captures and the crate tests use `temp_dir`, and the shell fixture suites use `mktemp -d`, no `TMPDIR` bound anywhere. On a host whose `/tmp` is tmpfs it lands in memory, against the repo-local scratch intent behind `GATE_SDK_TMP_DIR` (operator direction 2026-10-20, lead session, not a ruling).
-
-**Deliverable:** design-pending, a feature: gate-sdk/SPEC.md §run-gates states the root, so a ruling is owed on rooting the run scratch under `GATE_SDK_TMP_DIR` or binding `TMPDIR` to it for every child, with a fixture that needs a directory outside any repository kept outside.
-
-**Push need (2026-10-20, operator direction lead-relayed, over the budget):** one mid-iteration push after build, since the Windows and macOS legs run the new scratch root before any local run can; the shrink's link fixtures ride it.
-
-**Cost while deferred:** paid when a run's scratch meets a small or full tmpfs. Measured at this scope: `/tmp` held 784K at rest and no residue of the binary's, so the scratch is transient. Surfaced 2026-10-20 by the lead after lead-role-guard-binding-pass' close. Owner lookup: `tmpfs`, `temp_dir`, `TMPDIR` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
-
 ## Technical Debt
 
 ## Deferred
@@ -975,4 +963,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - hook-binding-reader-rows
 - guard-grant-literal-shrink
 - bounded-write-link-reach-grant
+- run-scratch-system-temp
 
