@@ -24,7 +24,7 @@ Replacement for `gate-sdk/SPEC.md` §run-gates, the concurrency contract's bulle
 
 ### (2) The fixture runner serves its children from a run scratch {design-bearing} {user-facing: as delta 1}
 
-`gate-sdk/SPEC.md` §run-gate-tests gains a paragraph after the one opening **The pin's scope is the pair loop**. **Not yet applied.**
+`gate-sdk/SPEC.md` §run-gate-tests gains a paragraph after the one opening "The pin's **scope is the pair loop and the shell that resolves each case's argv, never the runner's own process**". **Not yet applied.**
 
 > **The runner's temporaries are a run scratch's (§run-gates).** Each case invocation and each bespoke `*.test.sh` runs with a private `TMPDIR` under it and the run scratch heading its `GIT_CEILING_DIRECTORIES`, so a suite's `mktemp -d` sandbox lands repo-local and still sits outside any repository. That leaves the scratch pin above as it stands. The pin is the knob a member resolves its declared cache from, and `TMPDIR` is where an anonymous temporary lands.
 
@@ -32,7 +32,7 @@ Replacement for §lib/test-hermetic.sh's sentence **The library heads `GIT_CEILI
 
 > **The library heads `GIT_CEILING_DIRECTORIES` with the temp dir it is handed, `${TMPDIR:-/tmp}` resolved physically**: the system temp dir in a standalone run, and a private dir under the run scratch under `--run-gate-tests` (§run-gate-tests). So a stray `.git` there, which any process can create, never marks a suite's `mktemp` sandbox as inside a repository. A repository a test builds in its sandbox sits below the ceiling and is still found.
 
-`native/src/emit/run_gate_tests.rs`: the arm makes a run scratch through delta 1's function, hands each case invocation and each bespoke test a private `TMPDIR` under it with the ceiling, and removes it on the way out. `lib/test-hermetic.sh`'s code is unchanged. **Not yet applied.**
+`native/src/emit/run_gate_tests.rs`: the arm makes a run scratch through delta 1's function, hands each case invocation and each bespoke test a private `TMPDIR` under it with the ceiling, and removes it on the way out. `lib/test-hermetic.sh`'s code is unchanged, and the `spec:` comment above its ceiling line, which says the system temp dir heads the list, reads "the temp dir the suite is handed heads the git ceiling list". **Not yet applied.**
 
 ### (3) The crate's unit tests keep the system temp dir {mechanical}
 
@@ -65,7 +65,7 @@ The docs mirror regenerates: `bash gate-sdk/bin/run-gates.sh --emit docs-mirror 
 
 - `gate-sdk/SPEC.md` §run-gates, the concurrency contract's scratch-isolation bullet (deltas 1 and 3).
 - `gate-sdk/SPEC.md` §run-gate-tests (delta 2).
-- `gate-sdk/SPEC.md` §lib/test-hermetic.sh, the ceiling paragraph (delta 2).
+- `gate-sdk/SPEC.md` §lib/test-hermetic.sh, the ceiling paragraph (delta 2), and the `spec:` comment above the ceiling line in `gate-sdk/lib/test-hermetic.sh`, found by `git grep -n -i "system temp"` over the tracked tree.
 - `native/src/runner.rs`, `native/src/proc.rs`'s `dispatch`, `native/src/emit/git_hook.rs` and `native/src/emit/run_gate_tests.rs` (deltas 1, 2 and 4), found by `grep -rn "temp_dir()" native/src` read for production sites, before each file's first `#[cfg(test)]`. A compiled member's own sites, two gates' work dirs and `proc.rs`'s captures among them, follow the bound `TMPDIR` on a Unix host. The sites a top-level arm reaches in its own process stay: guard-kit's decision-table sandbox, context-kit's index tests, the front-end parity arm, the installer smoke's masked roster and `proc.rs`'s captures there. Each lies outside this unit's component or its runners, and they are filed as one costed gap with the Windows `TMP` limit.
 - `gate-sdk/gate-tests/run-gate-tests.test.sh` (delta 4).
 - `.workflow/release-declarations.md` (delta 5).
