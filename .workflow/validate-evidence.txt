@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+guard-grant-shrink-pass gates sha256=979f60861f14e093ee2a8443c001292716bba1a6a2742aff5b1cefc75bde7d8e pass=155 fail=0 ignore=0 verdict=clean 2026-10-21
+guard-grant-shrink-pass gate_sdk sha256=c1ad68813979393b485d2b07b7aafc72953e0f2453bed750b8e8ee5dd3711eae pass=1 fail=0 ignore=0 verdict=clean 2026-10-21
+guard-grant-shrink-pass canon_kit sha256=7da861c196258fd00b91559ec77ed8c768822bd5bde1ce22c3191410addd736c pass=1 fail=0 ignore=0 verdict=clean 2026-10-21
+guard-grant-shrink-pass context_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-10-21
+guard-grant-shrink-pass delegation_kit sha256=e8b7dacc5b3a03c2084bd61274ee3c701400be4001eeaafa4126bc7f4b710363 pass=1 fail=0 ignore=0 verdict=clean 2026-10-21
+guard-grant-shrink-pass doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-10-21
+guard-grant-shrink-pass evidence_kit sha256=c62871f8123949178b90372d234262f4c133b06c830e8faa9bbb9af4d2767fea pass=1 fail=0 ignore=0 verdict=clean 2026-10-21
+guard-grant-shrink-pass guard_kit sha256=6cb4ff2f4bd80b6561bd33590971d82cddcaa430595db7b5b0fefd800ace387b pass=1 fail=0 ignore=0 verdict=clean 2026-10-21
+guard-grant-shrink-pass lifecycle_kit sha256=83b0f30c7091e60a96eac9d498bf22cc7766ac4d472b56501a4777e0e6507c4c pass=1 fail=0 ignore=0 verdict=clean 2026-10-21
+guard-grant-shrink-pass queue_kit sha256=a4c89486a636a6d9c43ded5bbbb06f21bd7c7b3db7a8a330bdcf89eb952b9f7d pass=1 fail=0 ignore=0 verdict=clean 2026-10-21
+guard-grant-shrink-pass site_kit sha256=9a315d2c0239c08b3c5d4fb7435d5c8a4f3a1faf11c4cdffd9788f2249ba03eb pass=1 fail=0 ignore=0 verdict=clean 2026-10-21
+guard-grant-shrink-pass scripts sha256=43840b7690f4fcef0a2b3fd78af2c3c589c05ffc3de40e3f39ac3fe27d48a7be pass=1 fail=0 ignore=0 verdict=clean 2026-10-21
+guard-grant-shrink-pass guard_tests sha256=13a010dc18b6a1f9980ff8efb9e7220f407fce43aa2d0f3394a593247e43c367 pass=1 fail=0 ignore=0 verdict=clean 2026-10-21
+guard-grant-shrink-pass demo sha256=8d4b2ed56fce05b02d6667d9396fa220945ded4a957e1cf2690537f1dd3ee605 pass=1 fail=0 ignore=0 verdict=clean 2026-10-21
+guard-grant-shrink-pass installer_smoke sha256=2eb036602b96cfc33a49608d3d3d7cc6c0a0df0ef81de62e6c850c9895be687f pass=29 fail=0 ignore=0 verdict=clean 2026-10-21
+guard-grant-shrink-pass consumer_smoke sha256=165a6a3c3bcf0ce5f16490f18d7d79d7932f6fbd776269d2cdbcba3bd86740f9 pass=1 fail=0 ignore=0 verdict=clean 2026-10-21
+guard-grant-shrink-pass upgrade sha256=1e566a9b983dd03c5e21ec66e0be54828f2a50ea3361fe59f4d8d749a3340cbf pass=1 fail=0 ignore=0 verdict=clean 2026-10-21
+guard-grant-shrink-pass agents_md_smoke sha256=4b3d80f8bee165497d24a84e2b38d3d692fcb8d8ed1200f8dbf6385f56bc6103 pass=1 fail=0 ignore=0 verdict=clean 2026-10-21
+guard-grant-shrink-pass index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-10-21
+guard-grant-shrink-pass native_crate sha256=b1beb969c070f18ae107de4208f19d0d17141054e5f850d6d77bd3017fa2280a pass=1 fail=0 ignore=0 verdict=clean 2026-10-21
+guard-grant-shrink-pass projection_witness sha256=0b40fcef6dc17e4526e8193b10aa952421600364894ac47dba20fa36edc23eba pass=1 fail=0 ignore=0 verdict=clean 2026-10-21

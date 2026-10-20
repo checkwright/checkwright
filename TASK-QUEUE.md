@@ -10,7 +10,7 @@
 
   **Order (scope, own authority):** `hook-binding-reader-rows` builds before the shrink, which edits the same guard host files.
 
-  **Release review (operator grant 2026-10-20, lead-relayed, unspent):** one second-vendor review at validate, against the bar as narrowed on [tarball-attestation-observed](#tarball-attestation-observed); close cuts v0.32.0 on a clean return.
+  **Release review (operator grant 2026-10-20, lead-relayed, spent at validate):** one second-vendor review at validate, against the bar as narrowed on [tarball-attestation-observed](#tarball-attestation-observed); close cuts v0.32.0 on a clean return. **The run failed:** the adapter exited 1 on a content refusal after about 40k tokens, with an empty report and no finding; no clean return, so v0.32.0 stays deferred.
 
   **Push need (2026-10-20, operator direction lead-relayed: three pushes, this iteration only):** 3 against 2 — one mid-iteration push for `run-scratch-system-temp`, the closing push, and the v0.32.0 tag push on a clean review.
 
