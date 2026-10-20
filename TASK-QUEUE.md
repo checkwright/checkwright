@@ -134,9 +134,9 @@ the observation half of `tarball-build-attestation`: the first Release cut after
 
 **Release (operator directions, lead-relayed, not rulings):** v0.32.0 has stayed deferred since a direction of 2026-10-12, closing push only. **The bar, the same direction:** cut once no open finding is a wrong grant or a regression from v0.31.0; a fall-through hole rides as a declared limit in the note. **Since 2026-10-13** that reading rests on the iteration's second-vendor review returning clean, a failed run or a finding leaving the bar a judgment being asked, never met by a same-vendor reader; **since 2026-10-14** a close promotes every verdict-moving guard change it would author rather than landing it (the close binding carries the rule). That cut's `publish` run produces this observation and [front-door-job-observed](#front-door-job-observed)'s.
 
-**Grants spent 2026-10-15 to 2026-10-20:** every review returned findings or failed (a credit wall, a content refusal), each finding fixed or landed in a later build, the last two wrong grants `bounded-write-link-reach-grant`; each close deferred v0.32.0. The competitive-followup-pass close withdrew `prove` from docs/install.md and docs/maintenance.md and the overlap section from docs/openspec.md, its line held in `companion/fixtures/openspec/overlap/line.md`; **the cut restores them** and deletes the held file.
+**Grants spent 2026-10-15 to 2026-10-21:** every review returned findings or failed (a credit wall, a content refusal), each finding fixed or landed in a later build, the last two wrong grants closed by the literal-only grant shrink at guard-grant-shrink-pass; each close deferred v0.32.0. The competitive-followup-pass close withdrew `prove` from docs/install.md and docs/maintenance.md and the overlap section from docs/openspec.md, its line held in `companion/fixtures/openspec/overlap/line.md`; **the cut restores them** and deletes the held file.
 
-**Bar narrowed, operator direction 2026-10-20, lead-relayed at guard-grant-shrink-pass' scope:** the zero-wrong-grant bar now reads over the grant set left after `guard-grant-literal-shrink`; one second-vendor review is granted at that iteration's validate, and its close cuts v0.32.0 on a clean return.
+**Bar narrowed, operator direction 2026-10-20, lead-relayed at guard-grant-shrink-pass' scope:** the zero-wrong-grant bar reads over the grant set that iteration's literal-only shrink left. Its one granted review ran at its validate and failed on the vendor's content refusal with no report, so **v0.32.0 stays deferred (operator direction 2026-10-21, lead-relayed, not a ruling):** closing push only, no tag, no publish and no second review run, no grant being held.
 
 **Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
 
@@ -257,6 +257,36 @@ Cursor and Muse Code are installed on no build machine, so plugin/SPEC.md §The 
 **Deliverable:** install and run each on a machine that has it, turn its cells from read to run, and file any wiring defect.
 
 **Cost while deferred:** two tier-2 harnesses' skill load and guard reach rest on vendor docs. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: neither CLI on the build machine's PATH. Owner lookup: `cursor`, `muse` in this file, none; owner plugin/SPEC.md §The harnesses.
+
+### run-scratch-temp-residue
+
+[cost: session/low] [surface: gate-sdk]
+
+The run scratch now roots under `GATE_SDK_TMP_DIR` (gate-sdk/SPEC.md §run-gates, per-gate scratch isolation), but production `std::env::temp_dir()` sites still write the system temp dir: guard-kit's decision-table sandbox (`emit/run_guard_tests.rs`), context-kit's index tests (`emit/run_index_tests.rs`), the front-end parity arm (`emit/front_end_parity.rs`), two gates' work dirs (`gates/action_run_shell.rs`, `gates/settings_pins_parity.rs`) and `proc.rs`'s captures in a top-level arm's own process. On Windows a compiled member's temp lookup reads `TMP`, not the `TMPDIR` the runner binds, so every member capture stays at the system temp dir there.
+
+**Deliverable:** route each production site through the run's scratch root, or state per site why the system temp dir is correct, and bind `TMP` beside `TMPDIR` for a Windows child; drop the honest-limit sentence that names the `TMP` residue.
+
+**Cost while deferred:** one small transient tree or capture per run outside the tmp dir's one-component bound, on a tmpfs system temp dir. Filed 2026-10-21 by guard-grant-shrink-pass' close. Re-verified there: `grep -n 'temp_dir()'` over the named files, each hit above its file's first `#[cfg(test)]`. Owner lookup: `temp_dir`, `system temp` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
+
+### tmp-dir-prune-coupling
+
+[cost: event/low] [surface: gate-sdk]
+
+A battery runs its members in parallel with each child's private `TMPDIR` under the run scratch in `GATE_SDK_TMP_DIR`. A consumer whose tmp dir sits inside the tree under a name `GATE_SDK_PRUNE_DIRS` does not carry has every filesystem-walking gate descend into sibling members' live private dirs, and `walk_pruned` fails closed on a directory that vanishes mid-walk (`native/src/walk.rs`, its `read_dir` and `symlink_metadata` errors), so a sound tree reds nondeterministically at exit 2. The default `.tmp` is pruned, so this repo never meets it.
+
+**Deliverable:** prune the resolved tmp dir by path in `walk_pruned`, or state the coupling as a constraint in gate-sdk/SPEC.md §Layout and configuration with a check that reds on an in-tree tmp dir off a pruned name.
+
+**Cost while deferred:** zero at the default layout; a flaky exit 2 for a consumer moving the tmp dir to an unpruned in-tree name. Filed 2026-10-21 by guard-grant-shrink-pass' close. Re-verified there: `walk_pruned`'s `read_dir` and stat both map an error to `Err`. Owner lookup: `walk_pruned`, `PRUNE_DIRS`, `vanish` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Layout and configuration.
+
+### wait-loop-trailing-read-block
+
+[cost: event/low] [surface: guard-kit]
+
+Rule `background_no_record` blocks a backgrounded inline wait loop trailed by a read-only statement as an unrecorded launch: `until date +%s | awk '<prog>'; do sleep 60; done; date` under `run_in_background` exits 2 with the record corrective, while the same loop without `; date` passes. guard-kit/SPEC.md §The generic ruleset exempts an inline wait loop and a read-only pipeline from the record, which the compound plausibly meets, so the block is a wrong one that fails safe at the cost of a re-spelling.
+
+**Deliverable:** decide whether the exemption reaches a compound of exempt statements; if it does, admit it with decision-table rows in `guard-kit/guard-tests/`, and if not, say so in the rule's text.
+
+**Cost while deferred:** a re-spelling whenever a session trails a wait loop with a read. Filed 2026-10-21 by guard-grant-shrink-pass' close, a verdict-moving guard change a close files rather than lands. Re-verified there: the hook arm on both spellings, exit 2 and exit 0. Owner lookup: `background_no_record`, `wait loop` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The generic ruleset.
 
 ## Icebox
 
@@ -441,10 +471,6 @@ Two link-prefix holders, unheld.
 ### stage-cursor-rerun-stamp-gap
 
 A skipped re-run stamp points the cursor back.
-
-### interpreter-grant-redirect-residue
-
-Seven redirected shapes stay ungranted.
 
 ### build-native-obligation-unconditional
 
@@ -960,8 +986,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 ## Done
 
-- hook-binding-reader-rows
-- guard-grant-literal-shrink
-- bounded-write-link-reach-grant
-- run-scratch-system-temp
+- interpreter-grant-redirect-residue
 
