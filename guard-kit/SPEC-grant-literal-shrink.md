@@ -41,7 +41,7 @@ Replacement for `guard-kit/SPEC.md` §The generic ruleset, the shared direction 
 - **The engine's backstop.** `engine::decide` treats a rule's `Allow` or `Rewrite` on a call the predicate refuses as a decline and walks on, so a later rule still reads the call. A crate test drives `decide` over a stub rule granting a quoted call and asserts no verdict.
 - **Rules `abs_script` and `brace_glyph`** call the predicate themselves, through their `raw` declaration, so a refused call takes the block their items already name. The band rules need no call of their own and no declaration change.
 
-### (2) The scratch writes refuse a target reached through a link {design-bearing} {user-facing: the release bar narrowed by the operator's direction of 2026-10-20 on tarball-attestation-observed, "the zero-wrong-grant bar now reads over the grant set left after guard-grant-literal-shrink"}
+### (2) The scratch writes refuse a target reached through a link {design-bearing} {user-facing: the release bar narrowed by the operator's direction of 2026-10-20 on tarball-attestation-observed, "the zero-wrong-grant bar now reads over the grant set left after guard-grant-literal-shrink"; arm (B2)'s link test, operator direction of 2026-10-20, lead-relayed at align}
 
 Replacement for `guard-kit/SPEC.md` §The rule roster, rule `truncate_scratch`'s sentence **Granted silently when the command is *only* `:` followed by redirects and every target is gitignored, after rule `worktree_confinement`'s test as a predicate: truncating scratch is safe, and a tracked file still takes the decision.** **Not yet applied.**
 
@@ -53,7 +53,13 @@ Replacement for rule `append_scratch`'s clause (b), its first sentence. **Not ye
 
 Rule `append_scratch`'s herestring sentence, from **A herestring takes no grant** to **Spell the write as a heredoc.**, reads: "**A heredoc and a herestring take no grant**, the literal test refusing each opener (§The generic ruleset). A write whose text needs either reaches the harness's own path or its write tool. The residue reading above still serves rule `emitter_write`'s statements." **Not yet applied.**
 
-`native/src/guard/rules/grants.rs`: both rules call the link test bounds clause (e) already calls, one function, on every target they test. **Not yet applied.**
+Rule `bounded_wait`'s arm (B), clause (B2), reads: **Not yet applied.**
+
+> - **(B2) The call writes only gitignored or inert targets, reached through no link**, on rule `append_scratch`'s exact `git check-ignore --quiet --` predicate and its inert-target carve-out, and rule `truncate_scratch`'s link test, each target read by its value. The record path takes both tests too, so the grant never rests on a scratch dir being ignored, nor on a record path or a launch redirect target that is a link to a tracked file.
+
+The arm took no link test before this delta: a recorded launch redirecting to a scratch link onto a tracked file was granted (asked at align through `--guard-verdict`, with the link made for the probe and removed after it). That is the same wrong-grant class as the first row of the table above, so the zero-wrong-grant bar reads it closed here. Operator direction of 2026-10-20, lead-relayed, not a ruling.
+
+`native/src/guard/rules/grants.rs` and `native/src/guard/rules/liveness.rs`: rules `truncate_scratch` and `append_scratch`, and arm (B2), call the link test bounds clause (e) already calls, one function made visible to the second file, on every target they test. **Not yet applied.**
 
 ### (3) A write into a directory, or through a glob, takes no bounded grant {design-bearing} {user-facing: guard-grant-literal-shrink's Deliverable, as delta 1}
 
@@ -108,7 +114,7 @@ The same section's sentence **The relation is one-sided because a grant declines
 - **The sandbox** (guard-kit/SPEC.md §Testing, precondition 4) adds a `.tmp/held/` directory beside `.tmp/notes.txt`, which rule `bounded_write`'s directory-destination rows write into. The precondition count stays five. **Not yet applied.**
 - **Every grant row the literal test refuses** moves to the verdict the member returns, read row by row, and its section comment says why. A row that moves to `block` names the rule that claims it in that comment. Each grant rule keeps at least one literal firing row.
 - **New rows, one per case, each asserting the verdict the member returns, which is never a grant**: `cp tracked.md .tmp/held`, `mv .tmp/notes.txt .tmp/held`, `cp -t .tmp/held tracked.md`, `touch .tmp/o*` and `ls > .tmp/o*`, beside the granted `cp tracked.md .tmp/held/copy.md`. The quoted rows `echo "a b" >> .tmp/j.md` and `grep -rn "foo bar" tracked.md` are added where no moved row already pins the class.
-- **The link cases are crate tests**, on the pattern of `grants.rs`' `a_link_anywhere_on_the_path_is_seen`: the link is made on either host and its assertions skipped where the host refuses one. A scratch repository holds a gitignored `.tmp/` with a link to a tracked file and a link to a directory. `: > <link>`, `echo x >> <link>`, `echo x > <link>`, `touch <link>/f` and `cp <tracked> <dir-link>` each take no grant, and each same call on a plain scratch target is granted. The decision table's sandbox carries no link, since a host may refuse to make one and a row cannot be skipped, so rule `bounded_write`'s **Honest limits** gain the sentence "The link test is held by the crate's tests, which skip where the host refuses a link; the decision table's sandbox carries none." **Not yet applied.**
+- **The link cases are crate tests**, on the pattern of `grants.rs`' `a_link_anywhere_on_the_path_is_seen`: the link is made on either host and its assertions skipped where the host refuses one. A scratch repository holds a gitignored `.tmp/` with a link to a tracked file and a link to a directory. `: > <link>`, `echo x >> <link>`, `echo x > <link>`, `touch <link>/f`, `cp <tracked> <dir-link>`, and a recorded launch of an allowlisted command whose redirect target is the link and one whose record path is the link (rule `bounded_wait`'s arm (B)) each take no grant, and each same call on a plain scratch target is granted. The decision table's sandbox carries no link, since a host may refuse to make one and a row cannot be skipped, so rule `bounded_write`'s **Honest limits** gain the sentence "The link test is held by the crate's tests, which skip where the host refuses a link; the decision table's sandbox carries none." **Not yet applied.**
 
 ### (9) The release declaration and the mirror {mechanical}
 
@@ -116,11 +122,24 @@ The same section's sentence **The relation is one-sided because a grant declines
 
 The docs mirror regenerates: `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write`.
 
+### (10) Rule `append_scratch` stops calling the journal append granted {mechanical} {user-facing: operator direction of 2026-10-20, lead-relayed at align, "rewrite the two append_scratch passages to the literal-only grant; file the delegation-kit surfaces as a gap pointing journal appends at --emit journal"; the prompt regression ships until that gap lands, the operator told}
+
+Replacement for `guard-kit/SPEC.md` rule `append_scratch`'s lead sentences **The mandated resume-journal append** through **so none can grant it.** **Not yet applied.**
+
+> A resume-journal append (delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps) is a redirect, and the harness checks a redirect target as a file write. A shell rule grants the command and never the target, so none can grant it. The grant is the literal spelling's (§The generic ruleset): an append carrying a quote, a heredoc or a herestring reaches the harness's own path, and the journal arm (lifecycle-kit/SPEC.md §The journal arm) is the spelling of a finding that costs no decision.
+
+Replacement for the paragraph **One statement is one segment plus its own heredoc residue**, from its bold lead through **the hazard the one-statement bound is for.** The herestring sentence after it is delta 2's. **Not yet applied.**
+
+> **One statement is one segment, beside the heredoc residue rule `emitter_write` reads.** The compound split emits per line, and the `hd` class leaves a heredoc's body placeholder and terminator on lines of their own, so a `cat >> … <<'EOF'` statement splits into three segments. The literal test refuses its opener (§The generic ruleset), so this rule never grants such a call. The test here is that the call is one segment, which refuses a second statement on its own line (`printf x >> .tmp/j.md`, newline, `rm -rf …`), the hazard the one-statement bound is for.
+
+**The cross-component surfaces this strands**, filed as one gap and not amended here, since each amendment stays inside one component: `delegation-kit/templates/agent-execution.md`'s **Resume journal** bullet, whose "Spell the append as its own bare statement" rests on a scratch-write grant a quoted finding no longer gets, and `delegation-kit/SPEC.md` §Resume journal's isolated-child shell append. The gap points a journal append at `--emit journal`. Until it lands, a quoted or heredoc journal append costs a permission decision.
+
 ## Producers and consumers
 
 - **The literal test** (delta 1). Producer: `literal_call`, reached on every hook call the bash reader serves, from `engine::decide`'s grant-verdict check and from rules `abs_script` and `brace_glyph`. Consumers: the engine, which declines the grant, and those two rules, which block. It reads the command's raw text, which every rule's context already carries. It mints no view and no knob. Rule `worktree_confinement`'s predicate list and §Consumer rules are untouched: a consumer's decision is relayed before the engine runs, so its grants stay bounded by its author.
-- **The link test** (delta 2). Producer: the one function bounds clause (e) calls, now also called by rules `truncate_scratch` and `append_scratch` on each target. It reads the filesystem through `symlink_metadata`, relative to the working directory, as clause (e) does. Consumers: those two rules' grant decisions.
+- **The link test** (delta 2). Producer: the one function bounds clause (e) calls, now also called by rules `truncate_scratch` and `append_scratch`, and by rule `bounded_wait`'s arm (B2), on each target. It reads the filesystem through `symlink_metadata`, relative to the working directory, as clause (e) does. Consumers: those rules' grant decisions.
 - **The directory test** (delta 3). Producer: rule `bounded_write`'s operand walk, on `mv`'s and `cp`'s destination. Consumer: that rule's grant decision.
+- **The journal-append surfaces** (delta 10). Producer: rule `append_scratch`, which no longer grants a quoted or heredoc append. Consumers outside this component: delegation-kit's `agent-execution.md` bullet and §Resume journal, named in delta 10 and filed as a gap.
 - **The template exemption** (delta 4). Producer: arm (B)'s template match, called by the predicate when the deciding rule is `bounded_wait`. Consumer: the engine's check. No other rule reads past the template.
 - **The variant relation** (delta 7). Producer: the variant lane's classifier. Consumer: the lane's verdict, at exit 1 through the existing mismatch form.
 - **Roster-holding readers, each red condition named:**
@@ -134,7 +153,7 @@ The docs mirror regenerates: `bash gate-sdk/bin/run-gates.sh --emit docs-mirror 
 ## Existing sections updated
 
 - `guard-kit/SPEC.md` §The generic ruleset, the shared direction on what a grant bounds (delta 1).
-- `guard-kit/SPEC.md` §The rule roster: rules `truncate_scratch` and `append_scratch` (delta 2), rule `bounded_write` (delta 3), rule `bounded_wait`'s arm (B) (delta 4), rules `abs_script` and `brace_glyph` (delta 5), rule `emitter_write` (delta 6).
+- `guard-kit/SPEC.md` §The rule roster: rules `truncate_scratch` and `append_scratch` (delta 2), rule `bounded_write` (delta 3), rule `bounded_wait`'s arm (B) (deltas 2 and 4), rule `append_scratch`'s intro and one-statement paragraph (delta 10), rules `abs_script` and `brace_glyph` (delta 5), rule `emitter_write` (delta 6).
 - `guard-kit/SPEC.md` §The recommended allowlist, the absent-entries bullet **A write to a gitignored target, a truncation of one, a sanctioned wait and a write bounded to a scratch dir**, reads "…grant their literal spellings from the hook, where no settings entry can reach them" (delta 1). **Not yet applied.**
 - `guard-kit/SPEC.md` rule `ro_pipeline`, the paragraph **Why admit a cleared program**, gains the sentence "A program spelled with a quote takes the literal test's refusal (§The generic ruleset), so the discriminator admits a program spelled bare" (delta 1). **Not yet applied.**
 - `guard-kit/SPEC.md` §Testing: the variant relation (delta 7) and the sandbox's precondition 4 (delta 8).
