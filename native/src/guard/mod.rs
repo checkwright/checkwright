@@ -33,8 +33,8 @@ pub fn allow_match(s: &str, glob: &str) -> bool {
         Some(b) => (b, ")"),
         None => (glob, ""),
     };
-    let head = if let Some(h) = body.strip_suffix(":*") {
-        Some(h.replace(":*", "*"))
+    let head = if let Some(h) = body.strip_suffix(crate::hook::binding::PREFIX_IDIOM) {
+        Some(h.replace(crate::hook::binding::PREFIX_IDIOM, "*"))
     } else {
         body.strip_suffix(" *")
             .filter(|h| !h.contains('*'))
@@ -45,7 +45,7 @@ pub fn allow_match(s: &str, glob: &str) -> bool {
             crate::walk::glob_match(&format!("{head}{tail}"), s)
                 || crate::walk::glob_match(&format!("{head} *{tail}"), s)
         }
-        None => crate::walk::glob_match(&glob.replace(":*", "*"), s),
+        None => crate::walk::glob_match(&glob.replace(crate::hook::binding::PREFIX_IDIOM, "*"), s),
     }
 }
 

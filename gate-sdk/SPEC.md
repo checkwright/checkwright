@@ -1146,9 +1146,9 @@ Every hook member speaks one contract, stated here in **roles**. A harness reach
 
 **The measured record.** The payload rows above were read off the harness's published hook contract and off recorded firings, and the permission row off its published permission rules, each fetched rather than recalled. That row's matcher behavior is measured where guard-kit models it (guard-kit/SPEC.md §The reader and its views). A harness revision reshaping either is drift no gate here detects, so only re-reading the contract catches it.
 
-**The members' one copy.** Every hook member reads the event, tool, payload, session-start and envelope rows' spellings from one crate module, `native/src/hook/binding.rs`, which also builds the envelopes. Its unit test holds those rows and the module to one set of spellings, so a renamed key reds until this table moves with it.
+**The one copy.** Every reader of a row's spellings, a hook member or any other, takes them from one crate module, `native/src/hook/binding.rs`, which also builds the envelopes and reads the allow list and a shell rule's pattern. Its unit test holds every row and the module to one set of spellings, so a renamed key reds until this table moves with it.
 
-**Honest limits.** The variables, wiring, transcript and permission rows are read outside the members, each reader spelling its own, so a renamed key there reds a reader's fixture, not this section. The test compares spellings, never the object a row places them in. The table names the payloads the members read and not every field a harness sends. It names the permission spellings the kit reads, not the harness's whole permission grammar.
+**Honest limits.** The test compares spellings, never the object a row places them in. Test and fixture data spell keys as literal text, and the manual-operation meter's edit-tool roster names tools the table does not. The table names the payloads the members read and not every field a harness sends. It names the permission spellings the kit reads, not the harness's whole permission grammar.
 
 ### The port-candidate criteria
 

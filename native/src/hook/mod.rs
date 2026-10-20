@@ -118,8 +118,8 @@ pub fn owner(member: &str) -> Option<&'static str> {
 // spec: context-kit/SPEC.md §check-settings-paths — a hook's tokens: `command` split on ASCII
 // whitespace, or, in the exec form, `command` followed by each `args` element verbatim
 pub fn command_tokens(hook: &Value) -> Vec<&str> {
-    let cmd = hook.get("command").and_then(Value::as_str).unwrap_or("");
-    match hook.get("args").and_then(Value::as_array) {
+    let cmd = hook.get(binding::COMMAND).and_then(Value::as_str).unwrap_or("");
+    match hook.get(binding::WIRING_ARGS).and_then(Value::as_array) {
         Some(args) => std::iter::once(cmd)
             .chain(args.iter().filter_map(Value::as_str))
             .collect(),

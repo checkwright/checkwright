@@ -149,10 +149,10 @@ fn inputs() -> Result<crate::sessions::Inputs, String> {
     };
     Ok(crate::sessions::Inputs {
         session_id: String::new(),
-        harness_id: var("CLAUDE_CODE_SESSION_ID"),
-        child: var("CLAUDE_CODE_CHILD_SESSION"),
+        harness_id: var(crate::hook::binding::SESSION_ID_VAR),
+        child: var(crate::hook::binding::CHILD_SESSION_VAR),
         sessions_dir: crate::walk::knob_scalar("DRIFT_KIT_SESSIONS_DIR")?,
-        config_home: var("CLAUDE_CONFIG_DIR"),
+        config_home: var(crate::hook::binding::CONFIG_DIR_VAR),
         home: var(crate::sessions::HOME_VAR),
         here,
     })

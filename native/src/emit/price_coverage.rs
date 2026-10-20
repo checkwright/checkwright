@@ -54,7 +54,7 @@ fn report() -> Result<String, String> {
         harness_id: String::new(),
         child: String::new(),
         sessions_dir: walk::knob_scalar("DRIFT_KIT_SESSIONS_DIR")?,
-        config_home: var("CLAUDE_CONFIG_DIR"),
+        config_home: var(crate::hook::binding::CONFIG_DIR_VAR),
         home: var(crate::sessions::HOME_VAR),
         here: if pwd.is_empty() { walk::cwd()? } else { pwd },
     };

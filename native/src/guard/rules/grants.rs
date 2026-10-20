@@ -693,7 +693,7 @@ fn slot_segment(ctx: &Ctx, sw: &str, dw: &str, inners: &[String]) -> Reach {
     let sv = ctx.harness_view(&unescaped).to_string();
     let rv = sv.replace('\x01', " ").replace('\x02', "\t");
     for inner in inners {
-        let pat = inner.replace(":*", "*");
+        let pat = inner.replace(crate::hook::binding::PREFIX_IDIOM, "*");
         if !pat.contains('*') || pat.contains(['?', '[']) || !allow_match(&rv, &pat) {
             continue;
         }

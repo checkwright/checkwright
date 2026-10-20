@@ -144,7 +144,7 @@ impl Host {
     pub fn allow_inners(&self) -> Vec<String> {
         self.allow_entries()
             .iter()
-            .filter_map(|e| e.strip_prefix("Bash(")?.strip_suffix(')'))
+            .filter_map(|e| crate::hook::binding::shell_rule_inner(e))
             .filter(|i| !i.is_empty())
             .map(String::from)
             .collect()

@@ -73,7 +73,7 @@ pub fn paths() -> Result<Paths, String> {
         account_config: k("DELEGATION_KIT_ACCOUNT_CONFIG")?,
     };
     if p.usage_file.is_empty() {
-        p.usage_file = format!("{}/usage.txt", crate::sessions::config_home(&var("CLAUDE_CONFIG_DIR"), &home));
+        p.usage_file = format!("{}/usage.txt", crate::sessions::config_home(&var(crate::hook::binding::CONFIG_DIR_VAR), &home));
     }
     if p.cred_file.is_empty() {
         let dir = p.usage_file.rsplit_once('/').map_or(p.usage_file.as_str(), |(d, _)| d);

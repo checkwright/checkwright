@@ -4,6 +4,7 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — an arm table member on the forced-family test
 // (it reads seven consumer knobs), and `Arm::Emit` because exit is always 0, so no `1` is
 // load-bearing and the `{0, 2}` collapse costs nothing.
+use crate::hook::binding::{META_SUFFIX, PARENT_AGENT_ID, SUBAGENTS_DIR, TRANSCRIPT_SUFFIX};
 use std::collections::HashMap;
 
 pub const KNOBS: &[&str] = &[
@@ -456,7 +457,7 @@ pub fn inputs() -> Result<crate::sessions::Inputs, String> {
         harness_id: String::new(),
         child: String::new(),
         sessions_dir: knob("DRIFT_KIT_SESSIONS_DIR")?,
-        config_home: var("CLAUDE_CONFIG_DIR"),
+        config_home: var(crate::hook::binding::CONFIG_DIR_VAR),
         home: var(crate::sessions::HOME_VAR),
         here,
     })
@@ -616,7 +617,7 @@ fn measure(r: &mut Run, state_file: &str, price_table: &str) -> Result<String, S
         // spec: drift-kit/SPEC.md §The stage-economics meter — a nested-tier transcript names its
         // supervising lead in its own path, which is what makes the supervision row derivable with
         // no stamp and no lifecycle change.
-        if let Some((head_path, _)) = transcript.rsplit_once("/subagents/") {
+        if let Some((head_path, _)) = transcript.rsplit_once(&format!("/{}/", SUBAGENTS_DIR)) {
             let lead = head_path.rsplit('/').next().unwrap_or(head_path).to_string();
             *dispatch.entry(format!("{} {}", lead, iter)).or_insert(0) += 1;
             if !leads.contains(&lead) {
@@ -808,7 +809,7 @@ fn supervision_pass(
     }
     let dir = crate::sessions::sessions_dir(&r.inputs);
     for lead in leads {
-        let lead_path = format!("{}/{}.jsonl", dir, lead);
+        let lead_path = format!("{}/{}{}", dir, lead, TRANSCRIPT_SUFFIX);
         if attributed.contains(&lead_path) {
             continue;
         }
@@ -911,23 +912,23 @@ fn fanout_pass(
     let mut parent: HashMap<String, String> = HashMap::new();
     let mut have: std::collections::HashSet<String> = std::collections::HashSet::new();
     let mut nested = 0usize;
-    for sub in crate::walk::glob_entries(&format!("{}/*/subagents", dir)) {
-        let metas = crate::walk::glob_entries(&format!("{}/*.meta.json", sub));
-        nested += crate::walk::glob_entries(&format!("{}/*.jsonl", sub)).len();
+    for sub in crate::walk::glob_entries(&format!("{}/*/{}", dir, SUBAGENTS_DIR)) {
+        let metas = crate::walk::glob_entries(&format!("{}/*{}", sub, META_SUFFIX));
+        nested += crate::walk::glob_entries(&format!("{}/*{}", sub, TRANSCRIPT_SUFFIX)).len();
         if metas.is_empty() {
             continue;
         }
         for meta in metas {
-            let Some(stem) = meta.strip_suffix(".meta.json") else {
+            let Some(stem) = meta.strip_suffix(META_SUFFIX) else {
                 continue;
             };
-            let transcript = format!("{}.jsonl", stem);
+            let transcript = format!("{}{}", stem, TRANSCRIPT_SUFFIX);
             have.insert(transcript.clone());
             let pid = std::fs::read_to_string(&meta)
                 .ok()
                 .and_then(|t| serde_json::from_str::<serde_json::Value>(&t).ok())
                 .and_then(|v| {
-                    v.get("parentAgentId")
+                    v.get(PARENT_AGENT_ID)
                         .and_then(|x| x.as_str())
                         .map(str::to_string)
                 })
@@ -936,11 +937,11 @@ fn fanout_pass(
             // a direct child of the root session; a named agent with no transcript is counted,
             // never guessed, so the edge is left empty and the walk fails at it.
             let resolved = if pid.is_empty() {
-                format!("{}.jsonl", sub.trim_end_matches("/subagents"))
-            } else if std::path::Path::new(&format!("{}/agent-{}.jsonl", sub, pid)).is_file() {
-                format!("{}/agent-{}.jsonl", sub, pid)
-            } else if std::path::Path::new(&format!("{}/{}.jsonl", sub, pid)).is_file() {
-                format!("{}/{}.jsonl", sub, pid)
+                format!("{}{}", sub.trim_end_matches(&format!("/{}", SUBAGENTS_DIR)), TRANSCRIPT_SUFFIX)
+            } else if std::path::Path::new(&format!("{}/agent-{}{}", sub, pid, TRANSCRIPT_SUFFIX)).is_file() {
+                format!("{}/agent-{}{}", sub, pid, TRANSCRIPT_SUFFIX)
+            } else if std::path::Path::new(&format!("{}/{}{}", sub, pid, TRANSCRIPT_SUFFIX)).is_file() {
+                format!("{}/{}{}", sub, pid, TRANSCRIPT_SUFFIX)
             } else {
                 String::new()
             };
@@ -973,7 +974,7 @@ fn fanout_pass(
     let mut unresolved = 0usize;
     let mut fanout: Ordered<Tokens> = Ordered::default();
     let mut fanout_key: Vec<(String, String)> = Vec::new();
-    for f in crate::walk::glob_entries(&format!("{}/*/subagents/*.jsonl", dir)) {
+    for f in crate::walk::glob_entries(&format!("{}/*/{}/*{}", dir, SUBAGENTS_DIR, TRANSCRIPT_SUFFIX)) {
         if anchors.contains(&f) || attributed.contains(&f) {
             continue;
         }

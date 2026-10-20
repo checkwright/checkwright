@@ -54,14 +54,6 @@ the gate binary roots its battery run scratch at the system temp dir (`native/sr
 
 ## Technical Debt
 
-### hook-binding-reader-rows
-
-gate-sdk/SPEC.md §The hook contract's variables, wiring, transcript and permission rows are spelled at each reader outside the hook members, so its unit test holds only the member rows to `native/src/hook/binding.rs` and the section's honest limit states the rest.
-
-**Deliverable:** the readers take those spellings from `binding.rs` and its test widens to every row, or a refusal recorded in that honest limit. The readers include `native/src/guard/host.rs`'s `Bash(` strip and `native/src/guard/mod.rs`'s `:*` idiom, so it lands in a build.
-
-**Cost while deferred:** a renamed key in those rows drifts from the table until a reader's fixture reds. Filed 2026-10-20 by lead-role-guard-binding-pass' close, draining build's bullet, the residual of `hook-binding-single-source`, Done, which bound the member rows only. Re-verified there: `native/src` files outside `hook/binding.rs`, the guard host among them, spell those rows' keys. Owner lookup: `binding.rs`, `reader-rows`, `permission row` in this file and the disposed-findings record, none; [antigravity-hook-binding](#antigravity-hook-binding) DISTINCT (another harness's binding); owner gate-sdk/SPEC.md §The hook contract.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -1001,4 +993,6 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
+
+- hook-binding-reader-rows
 

@@ -18,7 +18,7 @@ fn memory_dir_default() -> Result<Option<String>, String> {
     let Some(top) = walk::toplevel_opt()? else {
         return Ok(None);
     };
-    let config_dir = std::env::var("CLAUDE_CONFIG_DIR").unwrap_or_default();
+    let config_dir = std::env::var(crate::hook::binding::CONFIG_DIR_VAR).unwrap_or_default();
     // spec: context-kit/SPEC.md §check-memory-off — an unreadable home refuses rather than
     // deriving a path under `/` that would be absent and therefore read as clean
     let home = if config_dir.is_empty() {
@@ -32,8 +32,9 @@ fn memory_dir_default() -> Result<Option<String>, String> {
         String::new()
     };
     Ok(Some(format!(
-        "{}/projects/{}/memory",
+        "{}/{}/{}/memory",
         crate::sessions::config_home(&config_dir, &home),
+        crate::hook::binding::PROJECTS_DIR,
         crate::sessions::slug(&top)
     )))
 }

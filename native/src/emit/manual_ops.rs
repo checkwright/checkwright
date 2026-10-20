@@ -2,6 +2,7 @@
 // repeated by hand, ranked, over the transcripts the stage-economics meter attributes to it.
 // spec: gate-sdk/SPEC.md §The non-gate arm — an arm table member because it reads consumer knobs,
 // and `Arm::Emit` because exit is always 0 bar a usage error, so no `1` is load-bearing.
+use crate::hook::binding::{COMMAND, TOOL_BASH, TOOL_POWERSHELL, TOOL_USE_BLOCK, WORKING_DIR};
 use std::collections::{BTreeSet, HashMap, HashSet};
 
 pub const KNOBS: &[&str] = &[
@@ -20,7 +21,7 @@ pub const USAGE: &str = "usage: --emit manual-ops [iteration]\n  bare: the itera
 
 // spec: drift-kit/SPEC.md §The manual-operation meter — the harness's transcript vocabulary: its
 // shell tools and its file-writing tools, each with the input field that keys the call
-const SHELL_TOOLS: &[&str] = &["Bash", "PowerShell"];
+const SHELL_TOOLS: &[&str] = &[TOOL_BASH, TOOL_POWERSHELL];
 const EDIT_TOOLS: &[(&str, &str)] = &[
     ("Edit", "file_path"),
     ("MultiEdit", "file_path"),
@@ -70,12 +71,12 @@ fn calls(body: &str, top: Option<&str>) -> Vec<(Kind, String)> {
         if v.get("type").and_then(|t| t.as_str()) != Some("assistant") {
             continue;
         }
-        let cwd = v.get("cwd").and_then(|c| c.as_str()).filter(|c| !c.is_empty());
+        let cwd = v.get(WORKING_DIR).and_then(|c| c.as_str()).filter(|c| !c.is_empty());
         let Some(blocks) = v.pointer("/message/content").and_then(|c| c.as_array()) else {
             continue;
         };
         for b in blocks {
-            if b.get("type").and_then(|t| t.as_str()) != Some("tool_use") {
+            if b.get("type").and_then(|t| t.as_str()) != Some(TOOL_USE_BLOCK) {
                 continue;
             }
             if let Some(id) = b.get("id").and_then(|i| i.as_str()) {
@@ -86,8 +87,8 @@ fn calls(body: &str, top: Option<&str>) -> Vec<(Kind, String)> {
             let name = b.get("name").and_then(|n| n.as_str()).unwrap_or("");
             let field = |k: &str| b.pointer(&format!("/input/{}", k)).and_then(|x| x.as_str());
             let call = if SHELL_TOOLS.contains(&name) {
-                let cmd = field("command").unwrap_or("");
-                let key = if name == "PowerShell" {
+                let cmd = field(COMMAND).unwrap_or("");
+                let key = if name == TOOL_POWERSHELL {
                     super::scan_prompts::powershell_key(cmd)
                 } else {
                     super::scan_prompts::ranking_key(cmd)

@@ -51,9 +51,7 @@ pub(crate) fn read_allow(path: &str) -> AllowRead {
         Err(_) => return AllowRead::Unparseable,
     };
     AllowRead::Entries(
-        doc.get("permissions")
-            .and_then(|p| p.get("allow"))
-            .and_then(|v| v.as_array())
+        crate::hook::binding::allow_array(&doc)
             .map(|a| {
                 a.iter()
                     .filter_map(|e| e.as_str())

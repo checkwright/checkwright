@@ -70,13 +70,11 @@ pub fn allow_inners(text: &str) -> Vec<String> {
         Ok(d) => d,
         Err(_) => return Vec::new(),
     };
-    doc.get("permissions")
-        .and_then(|p| p.get("allow"))
-        .and_then(|v| v.as_array())
+    crate::hook::binding::allow_array(&doc)
         .map(|a| {
             a.iter()
                 .filter_map(|e| e.as_str())
-                .filter_map(|s| s.strip_prefix("Bash("))
+                .filter_map(crate::hook::binding::shell_rule_open)
                 .map(|s| s.strip_suffix(')').unwrap_or(s).to_string())
                 .collect()
         })
@@ -348,7 +346,7 @@ pub fn tally(log_text: &str, allow: &[String], overlay: &[String]) -> Tally {
     for raw in lines {
         // spec: guard-kit/SPEC.md §scan-prompts — a raw tab marks a PowerShell line, which the grant
         // test cannot read, so it is keyed apart and on no Bash count.
-        if let Some(("PowerShell", cmd)) = raw.split_once('\t') {
+        if let Some((crate::hook::binding::TOOL_POWERSHELL, cmd)) = raw.split_once('\t') {
             let key = powershell_key(&decode(cmd));
             if !key.is_empty() {
                 bump(&mut t.powershell, &key);

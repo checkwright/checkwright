@@ -281,7 +281,7 @@ fn hook_sections(settings: &str, set: bool) -> Result<Vec<Section>, String> {
                     continue;
                 }
                 let (kit, surface) = hook_row(&crate::hook::command_tokens(h));
-                if event == "SessionStart" {
+                if event == crate::hook::binding::EVENT_SESSION_START {
                     warnings.push(Row { kit, cells: vec![surface] });
                 } else {
                     guards.push(Row {

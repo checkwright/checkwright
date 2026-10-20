@@ -4,6 +4,7 @@
 use super::install_pin::{is_triple, pin_of};
 use super::pinned_release::{self, read, Disposition};
 use super::skill_binding::template_of;
+use crate::hook::binding::{COMMAND, PROJECT_DIR_VAR, WIRING_ARGS};
 use crate::{fresh, walk};
 use serde_json::{Map, Value};
 use std::collections::BTreeSet;
@@ -23,11 +24,16 @@ const SCHEMA_LEAD: &str = "https://agent-plugins.org/schemas/";
 const SCHEMA_TAIL: &str = "/plugin.schema.json";
 const REPO_HOST: &str = "https://github.com/";
 // spec: plugin/SPEC.md §The guards — the fail-open prefix every rendered hook command carries
-// spec: gate-sdk/SPEC.md §The path-dialect contract — shell text the hook's own shell runs, so the
-// toplevel it names is produced and read there, never in the crate
-const FAIL_OPEN: &str = "r=$(git -C \"${CLAUDE_PROJECT_DIR:-.}\" rev-parse --show-toplevel 2>/dev/null) && test -f \"$r/gate-sdk/bin/run-gates.sh\" || exit 0; CLAUDE_PROJECT_DIR=$r; ";
+fn fail_open() -> String {
+    let v = PROJECT_DIR_VAR;
+    // spec: gate-sdk/SPEC.md §The path-dialect contract — shell text the hook's own shell runs, so the
+    // toplevel it names is produced and read there, never in the crate
+    format!("r=$(git -C \"${{{v}:-.}}\" rev-parse --show-toplevel 2>/dev/null) && test -f \"$r/gate-sdk/bin/run-gates.sh\" || exit 0; {v}=$r; ")
+}
 // spec: plugin/SPEC.md §The guards — the shell-form front-end call a member is rendered behind
-const FRONT_END_CALL: &str = "bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook ";
+fn front_end_call() -> String {
+    format!("bash \"${{{}}}/gate-sdk/bin/run-gates.sh\" --hook ", PROJECT_DIR_VAR)
+}
 // spec: plugin/SPEC.md §The skills — the Agent Skills bound on a description's length
 const DESCRIPTION_MAX: usize = 1024;
 
@@ -77,10 +83,10 @@ pub(crate) fn render_hooks(template: &Value) -> Result<Value, String> {
                     }
                 };
                 if let Some(fields) = hook.as_object_mut() {
-                    fields.remove("args");
+                    fields.remove(WIRING_ARGS);
                     fields.insert(
-                        "command".to_string(),
-                        Value::String(format!("{}{}{}", FAIL_OPEN, FRONT_END_CALL, member)),
+                        COMMAND.to_string(),
+                        Value::String(format!("{}{}{}", fail_open(), front_end_call(), member)),
                     );
                 }
             }
@@ -440,7 +446,7 @@ mod tests {
             r#"{"//":"merge advice","hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"${CLAUDE_PROJECT_DIR}/@GATE_SDK_NATIVE_BIN@","args":["--hook","a"]}]},{"matcher":"Write","hooks":[{"type":"command","command":"bash x/run-gates.sh --hook b"}]}]}}"#,
         )
         .unwrap();
-        let call = |m: &str| format!("{}{}{}", FAIL_OPEN, FRONT_END_CALL, m);
+        let call = |m: &str| format!("{}{}{}", fail_open(), front_end_call(), m);
         let want = serde_json::json!({"hooks":{"PreToolUse":[
             {"matcher":"Bash","hooks":[{"type":"command","command":call("a")}]},
             {"matcher":"Write","hooks":[{"type":"command","command":call("b")}]}

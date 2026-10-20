@@ -7,6 +7,7 @@
 // spec: gate-sdk/SPEC.md §lib/gate.sh — nothing here reads the environment. Every input arrives on
 // `Inputs`, so each *arm* resolves its own kit's knobs and hands the answer in, and this module
 // declares no knob roster of its own.
+use crate::hook::binding::{CONFIG_HOME_DEFAULT, PROJECTS_DIR, SUBAGENTS_DIR, TRANSCRIPT_SUFFIX};
 use std::time::SystemTime;
 
 // spec: lifecycle-kit/SPEC.md §bin/session-id.sh — every input the derivation order reads, taken
@@ -37,7 +38,7 @@ pub fn normalize(id: &str) -> String {
 // one place a value is computed*. A bare id passes through it unchanged.
 pub fn key(path: &str) -> String {
     let base = path.rsplit(['/', '\\']).next().unwrap_or(path);
-    normalize(base.strip_suffix(".jsonl").unwrap_or(base))
+    normalize(base.strip_suffix(TRANSCRIPT_SUFFIX).unwrap_or(base))
 }
 
 // spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the harness's own cut and hash, values it owns,
@@ -87,7 +88,7 @@ pub fn sessions_dir(i: &Inputs) -> String {
     if !i.sessions_dir.is_empty() {
         return i.sessions_dir.clone();
     }
-    format!("{}/projects/{}", config_home(&i.config_home, &i.home), slug(&i.here))
+    format!("{}/{}/{}", config_home(&i.config_home, &i.home), PROJECTS_DIR, slug(&i.here))
 }
 
 // spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the variable `~` is read from, one name for
@@ -98,7 +99,7 @@ pub const HOME_VAR: &str = if cfg!(windows) { "USERPROFILE" } else { "HOME" };
 // when set non-empty, else `~/.claude`: the one derivation every reader of that home shares
 pub fn config_home(config_dir: &str, home: &str) -> String {
     if config_dir.is_empty() {
-        format!("{}/.claude", home)
+        format!("{}/{}", home, CONFIG_HOME_DEFAULT)
     } else {
         config_dir.to_string()
     }
@@ -109,8 +110,8 @@ pub fn config_home(config_dir: &str, home: &str) -> String {
 // tier, which `resolve`'s widened branch walks.
 fn candidate_globs(dir: &str) -> [String; 2] {
     [
-        format!("{}/*.jsonl", dir),
-        format!("{}/*/subagents/*.jsonl", dir),
+        format!("{}/*{}", dir, TRANSCRIPT_SUFFIX),
+        format!("{}/*/{}/*{}", dir, SUBAGENTS_DIR, TRANSCRIPT_SUFFIX),
     ]
 }
 
@@ -162,7 +163,7 @@ pub fn delegation(i: &Inputs) -> Delegation {
 }
 
 fn narrowed_glob(dir: &str, harness_id: &str) -> String {
-    format!("{}/{}/subagents/*.jsonl", dir, harness_id)
+    format!("{}/{}/{}/*{}", dir, harness_id, SUBAGENTS_DIR, TRANSCRIPT_SUFFIX)
 }
 
 // spec: lifecycle-kit/SPEC.md §The journal arm — the candidates of the scan `resolve` selects
@@ -191,7 +192,7 @@ pub fn scan_newest_first(i: &Inputs) -> Vec<String> {
 }
 
 pub fn top_level(dir: &str, harness_id: &str) -> String {
-    format!("{}/{}.jsonl", dir, harness_id)
+    format!("{}/{}{}", dir, harness_id, TRANSCRIPT_SUFFIX)
 }
 
 pub fn newest(i: &Inputs) -> Option<String> {
@@ -226,16 +227,18 @@ pub fn resolve(i: &Inputs) -> Result<String, String> {
         Delegation::TopLevel(id) => Ok(top_level(&dir, &id)),
         Delegation::Delegated(path) => Ok(path),
         Delegation::Undetermined if !i.harness_id.is_empty() => Err(format!(
-            "no subagent transcript under {}/{}/subagents and no top-level {}\n  help: confirm \
+            "no subagent transcript under {}/{}/{} and no top-level {}\n  help: confirm \
              this is the right sessions dir (LIFECYCLE_KIT_SESSIONS_DIR).",
             dir,
             i.harness_id,
+            SUBAGENTS_DIR,
             top_level(&dir, &i.harness_id)
         )),
         Delegation::Undetermined => newest(i).ok_or_else(|| {
             format!(
-                "no transcript (*.jsonl) under {}\n  help: confirm this is the right sessions \
+                "no transcript (*{}) under {}\n  help: confirm this is the right sessions \
                  dir (LIFECYCLE_KIT_SESSIONS_DIR).",
+                TRANSCRIPT_SUFFIX,
                 dir
             )
         }),

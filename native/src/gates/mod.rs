@@ -1876,7 +1876,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-plugin-parity",
         plugin_parity::run,
-        &[("?", "", "", "dynamic@src/gates/plugin_parity.rs:173")],
+        &[("?", "", "", "dynamic@src/gates/plugin_parity.rs:179")],
         &[
             "LIFECYCLE_KIT_SKILLS_DIR",
             "QUEUE_KIT_QUEUE_FILE",
@@ -2179,7 +2179,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-memory-off",
         memory_off::run,
-        &[("?", "", "", "dynamic@src/gates/memory_off.rs:130")],
+        &[("?", "", "", "dynamic@src/gates/memory_off.rs:131")],
         &[
             "CONTEXT_KIT_MEMORY_DIRS",
             "CONTEXT_KIT_SETTINGS_FILE",

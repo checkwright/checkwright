@@ -1,5 +1,6 @@
 // spec: drift-kit/SPEC.md §Bundled KPIs — kpi-settings-local: entry count of the untracked local permission overlay
 use super::{na, read, Ctx};
+use crate::hook::binding;
 use serde_json::Value;
 
 const LABEL: &str = "settings.local";
@@ -9,9 +10,9 @@ const LABEL: &str = "settings.local";
 // counting nothing, and an unparseable document degrading rather than counting zero.
 pub fn overlay_entries(text: &str) -> Option<usize> {
     let doc: Value = serde_json::from_str(text).ok()?;
-    let perms = doc.get("permissions");
+    let perms = doc.get(binding::PERMISSIONS);
     Some(
-        ["allow", "deny", "ask"]
+        [binding::ALLOW_LIST, "deny", "ask"]
             .iter()
             .filter_map(|k| perms.and_then(|p| p.get(k)).and_then(|v| v.as_array()))
             .map(|a| a.len())

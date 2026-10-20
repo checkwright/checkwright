@@ -1,5 +1,6 @@
 // spec: context-kit/SPEC.md §check-settings-paths — every path the committed settings file tells
 // the harness to run resolves in the working tree, and every `--hook` operand is a member
+use crate::hook::binding::PROJECT_DIR_VAR;
 use crate::hook::{self, Registration};
 use crate::walk;
 use serde_json::Value;
@@ -7,9 +8,7 @@ use serde_json::Value;
 // spec: context-kit/SPEC.md §check-settings-paths — the kit-owned allow-array read, string-typed
 // entries only; hand-compiled rather than routed through a path expression
 fn allow_entries(doc: &Value) -> Vec<String> {
-    doc.get("permissions")
-        .and_then(|p| p.get("allow"))
-        .and_then(|a| a.as_array())
+    hook::binding::allow_array(doc)
         .map(|a| {
             a.iter()
                 .filter_map(|v| v.as_str().map(String::from))
@@ -32,7 +31,7 @@ fn command_token<'a>(tok: &[&'a str]) -> Option<&'a str> {
 // spec: context-kit/SPEC.md §check-settings-paths — the extraction predicate's one holder; its
 // second reader is guard-kit's compare-settings-allow, which calls it rather than copying it
 pub fn literal_script_path(entry: &str) -> Option<&str> {
-    let inner = entry.strip_prefix("Bash(")?.strip_suffix(')')?;
+    let inner = hook::binding::shell_rule_inner(entry)?;
     let cand = command_token(&tokens(inner))?;
     // spec: context-kit/SPEC.md §check-settings-paths — a `*` in the command token makes it a
     // pattern, intentionally polymorphic over files that need not exist today; the `*` twin of
@@ -87,8 +86,8 @@ fn strip_project_root(cand: &str) -> Option<String> {
         _ => (None, cand),
     };
     let after = body
-        .strip_prefix("${CLAUDE_PROJECT_DIR}")
-        .or_else(|| body.strip_prefix("$CLAUDE_PROJECT_DIR"))?;
+        .strip_prefix(format!("${{{}}}", PROJECT_DIR_VAR).as_str())
+        .or_else(|| body.strip_prefix(format!("${}", PROJECT_DIR_VAR).as_str()))?;
     let (after, quote) = match quote {
         Some(q) if after.starts_with(q) => (&after[1..], None),
         other => (after, other),
@@ -122,9 +121,9 @@ fn hook_entries(doc: &Value) -> Vec<HookEntry<'_>> {
                     continue;
                 }
                 let tokens = hook::command_tokens(h);
-                let shown = match h.get("args") {
+                let shown = match h.get(hook::binding::WIRING_ARGS) {
                     Some(_) => tokens.join(" "),
-                    None => h.get("command").and_then(Value::as_str).unwrap_or("").to_string(),
+                    None => h.get(hook::binding::COMMAND).and_then(Value::as_str).unwrap_or("").to_string(),
                 };
                 out.push(HookEntry {
                     at: format!("hooks.{}[{}].hooks[{}]", event, i, j),
