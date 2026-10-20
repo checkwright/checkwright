@@ -1009,7 +1009,7 @@ The command takes the decision table's substitutions ([§Testing](#testing)), `@
 - a command operand beside `--stdin`;
 - no command at all.
 
-Its knob roster is `GATE_SDK_TMP_DIR` and the shell guard's own knobs, which the child reads itself ([gate-sdk/SPEC.md §The non-gate arm](../gate-sdk/SPEC.md#the-non-gate-arm), a dispatching arm's declaration). **Honest limits:** in the tree an earlier binary's answer reads today's knob files, as stated above. The sandbox carries the decision table's fixture files and settings and nothing of the tree's. The arm reports what the binary asked returns, and never what a harness would do with an answer it does not recognize.
+Its knob roster is `GATE_SDK_TMP_DIR` and the shell guard's own knobs, which the child reads itself ([gate-sdk/SPEC.md §The non-gate arm](../gate-sdk/SPEC.md#the-non-gate-arm), a dispatching arm's declaration). **Honest limits:** the sandbox carries the decision table's fixture files and settings and nothing of the tree's. The arm reports what the binary asked returns, and never what a harness would do with an answer it does not recognize.
 
 The arm is `native/src/emit/guard_verdict.rs` and its `ARMS` row. Its seam cases live in `gate-tests/guard-verdict.test.sh`.
 
