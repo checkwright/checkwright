@@ -280,7 +280,7 @@ gate-sdk/SPEC.md §The hook contract's variables, wiring, transcript and permiss
 
 **Deliverable:** the readers take those spellings from `binding.rs` and its test widens to every row, or a refusal recorded in that honest limit. The readers include `native/src/guard/host.rs`'s `Bash(` strip and `native/src/guard/mod.rs`'s `:*` idiom, so it lands in a build.
 
-**Cost while deferred:** a renamed key in those rows drifts from the table until a reader's fixture reds. Filed 2026-10-20 by lead-role-guard-binding-pass' close, draining build's bullet, the residual of `hook-binding-single-source`, Done, which bound the member rows only. Re-verified there: thirteen `native/src` files outside `hook/binding.rs` spell those rows' keys. Owner lookup: `binding.rs`, `reader-rows`, `permission row` in this file and the disposed-findings record, none; [antigravity-hook-binding](#antigravity-hook-binding) DISTINCT (another harness's binding); owner gate-sdk/SPEC.md §The hook contract.
+**Cost while deferred:** a renamed key in those rows drifts from the table until a reader's fixture reds. Filed 2026-10-20 by lead-role-guard-binding-pass' close, draining build's bullet, the residual of `hook-binding-single-source`, Done, which bound the member rows only. Re-verified there: `native/src` files outside `hook/binding.rs`, the guard host among them, spell those rows' keys. Owner lookup: `binding.rs`, `reader-rows`, `permission row` in this file and the disposed-findings record, none; [antigravity-hook-binding](#antigravity-hook-binding) DISTINCT (another harness's binding); owner gate-sdk/SPEC.md §The hook contract.
 
 ## Icebox
 
