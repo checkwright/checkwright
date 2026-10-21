@@ -1402,7 +1402,7 @@ Honest limit on Behavior changes: **its bullets are declared for the human upgra
 - **Release** is the note's `release:` value, linked to the note by its path relative to the page.
 - **Date** is the `YYYY-MM-DD` that opens the note's filename.
 - **Bump** is the highest component that moved from the next-older row, `major`, `minor` or `patch`, and `—` on the oldest row.
-- **Action on upgrade** is `yes` where the note's `gates` section carries a bullet, or its `knobs` section carries a rename or removal: a bullet carrying `→` anywhere after its lead token, so a removal naming several knobs before one arrow counts. Otherwise it is `no`. A knob addition asks nothing of an upgrader, so it does not set the flag.
+- **Action on upgrade** is `yes` where the note's `gates` section carries a bullet, or its `knobs` section carries a rename or removal: a bullet carrying `→` anywhere after its lead token, so a removal naming several knobs before one arrow counts. Otherwise it is `no`.
 - **A count cell** is the bullet count of that role's section, found under its heading or an alias, counted as the summary table counts it. A `None` body is `0`, and `—` marks a note carrying no such section because it was published before the section existed.
 - **Exit 2**, from the arm and from its gate, on an unreadable posts dir, note or page. It also exits 2 on a `release:` value outside `check-release-bump`'s version grammar, two notes carrying one version, a note filename not opening with a date, a roster the validator refuses, and a block that is absent or occurs twice.
 
