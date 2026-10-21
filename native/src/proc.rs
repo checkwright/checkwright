@@ -871,7 +871,7 @@ static MERGE_SEQ: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsiz
 static TEMP_BASE: std::sync::Mutex<Option<std::path::PathBuf>> = std::sync::Mutex::new(None);
 
 // spec: gate-sdk/SPEC.md §run-gates — where this process writes a spawn's capture: the run scratch
-// it holds, else its own temp dir, the crate's one production read of that
+// it holds, else its own temp dir, the spawn layer's read of that
 pub fn temp_base() -> std::path::PathBuf {
     TEMP_BASE
         .lock()
