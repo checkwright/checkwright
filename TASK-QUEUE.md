@@ -32,14 +32,6 @@ docs/releases.md renders its derived note list as a bare list of version links, 
 
 ## Technical Debt
 
-### tmp-dir-prune-coupling
-
-A battery runs its members in parallel with each child's private `TMPDIR` under the run scratch in `GATE_SDK_TMP_DIR`. A consumer whose tmp dir sits inside the tree under a name `GATE_SDK_PRUNE_DIRS` does not carry has every filesystem-walking gate descend into sibling members' live private dirs, and `walk_pruned` fails closed on a directory that vanishes mid-walk (`native/src/walk.rs`, its `read_dir` and `symlink_metadata` errors), so a sound tree reds nondeterministically at exit 2. The default `.tmp` is pruned, so this repo never meets it.
-
-**Deliverable:** prune the resolved tmp dir by path in `walk_pruned`, stated in gate-sdk/SPEC.md §Layout and configuration; the check route adds a name, so it is refused (operator direction 2026-10-21, lead-relayed, not a ruling). Builds before run-scratch-temp-residue, which moves more transient captures under the tmp dir.
-
-**Cost while deferred:** zero at the default layout; a flaky exit 2 for a consumer moving the tmp dir to an unpruned in-tree name. Filed 2026-10-21 by guard-grant-shrink-pass' close. Re-verified there: `walk_pruned`'s `read_dir` and stat both map an error to `Err`. Owner lookup: `walk_pruned`, `PRUNE_DIRS`, `vanish` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Layout and configuration.
-
 ### run-scratch-temp-residue
 
 The run scratch now roots under `GATE_SDK_TMP_DIR` (gate-sdk/SPEC.md §run-gates, per-gate scratch isolation), but production `std::env::temp_dir()` sites still write the system temp dir, across guard-kit's decision-table sandbox, context-kit's index tests, the front-end parity arm, the installer smoke, a gate's work dir and `proc.rs`'s captures in a top-level arm's own process; the set is the grep below, never this list. On Windows a compiled member's temp lookup reads `TMP`, not the `TMPDIR` the runner binds, so every member capture stays at the system temp dir there.
@@ -977,4 +969,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 ## Done
 
 - wait-loop-trailing-read-block
+- tmp-dir-prune-coupling
 

@@ -998,6 +998,10 @@ fn walk_pruned(
     // this one line is what makes unit test A's observation complete.
     #[cfg(test)]
     recorder::note(&root.display().to_string());
+    let skip = match links {
+        Links::Skip => Descent::at(root, prune)?,
+        Links::Entry => Descent::named(prune),
+    };
     let mut out = Vec::new();
     let mut stack = vec![root.to_path_buf()];
     while let Some(dir) = stack.pop() {
@@ -1019,7 +1023,7 @@ fn walk_pruned(
             let meta = fs::symlink_metadata(&p)
                 .map_err(|e| format!("cannot stat {}: {}", p.display(), e))?;
             if meta.is_dir() {
-                if prune(&name) || dir_prune.is_some_and(|f| f(&p)) {
+                if (skip.name)(&name) || dir_prune.is_some_and(|f| f(&p)) || skip.scratch(&p) {
                     continue;
                 }
                 stack.push(p);
@@ -1030,6 +1034,32 @@ fn walk_pruned(
     }
     out.sort();
     Ok(out)
+}
+
+// spec: gate-sdk/SPEC.md §Layout and configuration — a descent's two prunes: the caller's by name,
+// and the resolved tmp dir by path whatever its name, held only where it lies under the walk's root
+// spec: context-kit/SPEC.md §Index-first reading — `named` is the index walk's, which keeps scratch
+struct Descent<'a> {
+    name: &'a dyn Fn(&str) -> bool,
+    here: String,
+    tmp: Option<String>,
+}
+
+impl<'a> Descent<'a> {
+    fn at(root: &Path, name: &'a dyn Fn(&str) -> bool) -> Result<Self, String> {
+        let here = cwd()?;
+        let tmp = abs_against(&here, &knob_scalar("GATE_SDK_TMP_DIR")?);
+        let tmp = under(&abs_against(&here, &root.display().to_string()), &tmp).then_some(tmp);
+        Ok(Descent { name, here, tmp })
+    }
+
+    fn named(name: &'a dyn Fn(&str) -> bool) -> Self {
+        Descent { name, here: String::new(), tmp: None }
+    }
+
+    fn scratch(&self, dir: &Path) -> bool {
+        self.tmp.as_deref().is_some_and(|t| same_path(t, &abs_against(&self.here, &dir.display().to_string())))
+    }
 }
 
 // spec: gate-sdk/SPEC.md §The port-candidate criteria — one glob component, matched as bash
@@ -1160,6 +1190,7 @@ fn entry_path(dir: &Path, ent: &fs::DirEntry) -> Option<PathBuf> {
 // spec: gate-sdk/SPEC.md §The port-candidate criteria — `**`-capable list matching over a
 // knob's glob array, the semantics committed once there rather than re-decided per port.
 // Bash-faithful: no prune set applies, because pathname expansion has none.
+// spec: gate-sdk/SPEC.md §Layout and configuration — the tmp dir's own prune still bounds `**`
 pub fn glob_files(root: &Path, globs: &[String]) -> Result<Vec<PathBuf>, String> {
     glob_files_pruned(root, globs, &|_| false)
 }
@@ -1173,11 +1204,12 @@ pub fn glob_files_pruned(
 ) -> Result<Vec<PathBuf>, String> {
     #[cfg(test)]
     recorder::note(&root.display().to_string());
+    let skip = Descent::at(root, prune)?;
     let mut out = Vec::new();
     for g in globs {
         let comps: Vec<&str> = g.split('/').filter(|c| !c.is_empty()).collect();
         let mut hits: Vec<PathBuf> = Vec::new();
-        expand(root, &comps, prune, &mut hits)?;
+        expand(root, &comps, &skip, &mut hits)?;
         hits.sort();
         out.extend(hits);
     }
@@ -1195,7 +1227,7 @@ pub fn glob_corpus(root: &Path, globs: &[String]) -> Result<Vec<PathBuf>, String
 fn expand(
     base: &Path,
     comps: &[&str],
-    prune: &dyn Fn(&str) -> bool,
+    skip: &Descent,
     out: &mut Vec<PathBuf>,
 ) -> Result<(), String> {
     if comps.is_empty() {
@@ -1206,14 +1238,14 @@ fn expand(
     }
     let (head, rest) = (comps[0], &comps[1..]);
     if head == "**" {
-        expand(base, rest, prune, out)?;
-        for d in subdirs(base, prune)? {
-            expand(&d, comps, prune, out)?;
+        expand(base, rest, skip, out)?;
+        for d in subdirs(base, skip)? {
+            expand(&d, comps, skip, out)?;
         }
         return Ok(());
     }
     if !has_meta(head) {
-        return expand(&child(base, head), rest, prune, out);
+        return expand(&child(base, head), rest, skip, out);
     }
     let rd = match fs::read_dir(base) {
         Ok(r) => r,
@@ -1233,7 +1265,7 @@ fn expand(
             None => continue,
         };
         if match_component(head, name) {
-            expand(&p, rest, prune, out)?;
+            expand(&p, rest, skip, out)?;
         }
     }
     Ok(())
@@ -1306,7 +1338,7 @@ pub fn dir_readable(p: &Path) -> bool {
     fs::read_dir(p).is_ok()
 }
 
-fn subdirs(base: &Path, prune: &dyn Fn(&str) -> bool) -> Result<Vec<PathBuf>, String> {
+fn subdirs(base: &Path, skip: &Descent) -> Result<Vec<PathBuf>, String> {
     let rd = match fs::read_dir(base) {
         Ok(r) => r,
         Err(_) => return Ok(Vec::new()),
@@ -1317,11 +1349,11 @@ fn subdirs(base: &Path, prune: &dyn Fn(&str) -> bool) -> Result<Vec<PathBuf>, St
         let Some(p) = entry_path(base, &ent) else {
             continue;
         };
-        if p.file_name().and_then(|n| n.to_str()).is_some_and(prune) {
+        if p.file_name().and_then(|n| n.to_str()).is_some_and(skip.name) {
             continue;
         }
         let meta = fs::symlink_metadata(&p).map_err(|e| format!("cannot stat {}: {}", p.display(), e))?;
-        if meta.is_dir() {
+        if meta.is_dir() && !skip.scratch(&p) {
             let hidden = p
                 .file_name()
                 .and_then(|n| n.to_str())
@@ -1734,6 +1766,43 @@ mod tests {
         make_scratch("").expect("an empty spelling is accepted");
         make_scratch(".").expect("the working directory is accepted");
         assert_eq!(Path::new(".gitignore").exists(), before, "the working directory was told to ignore itself");
+    }
+
+    // spec: gate-sdk/SPEC.md §Layout and configuration — the tmp dir is pruned by its resolved path
+    // under an unpruned name: its namesake elsewhere is still walked, and a walk rooted in it reads it
+    #[test]
+    fn a_walk_prunes_the_resolved_tmp_dir_by_path_and_not_by_name() {
+        let env = crate::knobenv::lock();
+        let base = std::env::temp_dir().join(format!("walk-tmp-prune-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&base);
+        for f in ["src/a.txt", "scratch/run/b.txt", "src/scratch/c.txt"] {
+            let p = base.join(f);
+            std::fs::create_dir_all(p.parent().expect("parent")).expect("mk");
+            std::fs::write(&p, "x").expect("w");
+        }
+        env.set("GATE_SDK_TMP_DIR", &base.join("scratch").display().to_string());
+        let rel = |root: &Path| -> Vec<String> {
+            find_with_prune(root, &|_| false)
+                .expect("the walk must succeed")
+                .iter()
+                .map(|p| p.strip_prefix(root).expect("under root").display().to_string().replace('\\', "/"))
+                .collect()
+        };
+        assert_eq!(rel(&base), vec!["src/a.txt", "src/scratch/c.txt"]);
+        assert_eq!(rel(&base.join("scratch")), vec!["run/b.txt"]);
+        let indexed = find_link_entries_with_prune(&base, &|_| false).expect("the index walk must succeed");
+        assert_eq!(indexed.len(), 3, "the index walk keeps scratch: {:?}", indexed);
+        let globbed = |g: &str| -> Vec<String> {
+            glob_files(&base, &[g.to_string()])
+                .expect("the expansion must succeed")
+                .iter()
+                .map(|p| p.strip_prefix(&base).expect("under root").display().to_string().replace('\\', "/"))
+                .collect()
+        };
+        assert_eq!(globbed("**/*.txt"), vec!["src/a.txt", "src/scratch/c.txt"]);
+        assert_eq!(globbed("scratch/**/*.txt"), vec!["scratch/run/b.txt"]);
+        env.remove("GATE_SDK_TMP_DIR");
+        let _ = std::fs::remove_dir_all(&base);
     }
 
     // spec: gate-sdk/SPEC.md §check-pipe-membership — a suite is a direct child of an unpruned tests
