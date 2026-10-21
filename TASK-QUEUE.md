@@ -1,14 +1,42 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: scratch-confinement-releases-table-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The set (operator direction 2026-10-21, lead-relayed, not a ruling; the iteration opened undirected):** option C, over scope's recommended A. Debt promoted by scope: `tmp-dir-prune-coupling` and `run-scratch-temp-residue`, gate-sdk's run scratch under `GATE_SDK_TMP_DIR`. Feature for spec to author and pair: `releases-page-table`. `wait-loop-trailing-read-block` is retired as decided by guard-kit/SPEC.md (disposed-findings record). Stages scope, spec, build, validate and close; drain 4 against inflow 2.8.
+
+  **Order (scope, own authority):** `tmp-dir-prune-coupling` builds before `run-scratch-temp-residue`, which moves more transient captures under the tmp dir.
+
+  **Release (operator direction 2026-10-21, lead-relayed, not a ruling):** v0.32.0 stays deferred, closing push only, no review grant.
+
+  **Push need (2026-10-21, inside the budget):** 2 against 2 — one mid-iteration push serving `run-scratch-temp-residue` (`crate-tests-windows`) and `releases-page-table` (`pages-build-deployment`), batched after both build, and the closing push.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### tmp-dir-prune-coupling
+
+A battery runs its members in parallel with each child's private `TMPDIR` under the run scratch in `GATE_SDK_TMP_DIR`. A consumer whose tmp dir sits inside the tree under a name `GATE_SDK_PRUNE_DIRS` does not carry has every filesystem-walking gate descend into sibling members' live private dirs, and `walk_pruned` fails closed on a directory that vanishes mid-walk (`native/src/walk.rs`, its `read_dir` and `symlink_metadata` errors), so a sound tree reds nondeterministically at exit 2. The default `.tmp` is pruned, so this repo never meets it.
+
+**Deliverable:** prune the resolved tmp dir by path in `walk_pruned`, stated in gate-sdk/SPEC.md §Layout and configuration; the check route adds a name, so it is refused (operator direction 2026-10-21, lead-relayed, not a ruling). Builds before run-scratch-temp-residue, which moves more transient captures under the tmp dir.
+
+**Cost while deferred:** zero at the default layout; a flaky exit 2 for a consumer moving the tmp dir to an unpruned in-tree name. Filed 2026-10-21 by guard-grant-shrink-pass' close. Re-verified there: `walk_pruned`'s `read_dir` and stat both map an error to `Err`. Owner lookup: `walk_pruned`, `PRUNE_DIRS`, `vanish` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Layout and configuration.
+
+### run-scratch-temp-residue
+
+The run scratch now roots under `GATE_SDK_TMP_DIR` (gate-sdk/SPEC.md §run-gates, per-gate scratch isolation), but production `std::env::temp_dir()` sites still write the system temp dir, across guard-kit's decision-table sandbox, context-kit's index tests, the front-end parity arm, the installer smoke, a gate's work dir and `proc.rs`'s captures in a top-level arm's own process; the set is the grep below, never this list. On Windows a compiled member's temp lookup reads `TMP`, not the `TMPDIR` the runner binds, so every member capture stays at the system temp dir there.
+
+**Deliverable:** route each production site through the run's scratch root, or state per site why the system temp dir is correct, and bind `TMP` beside `TMPDIR` for a Windows child; drop the honest-limit sentence that names the `TMP` residue.
+
+**Push need (2026-10-21, inside the budget):** the iteration's one mid-iteration push, since `crate-tests-windows`' front-end-parity and guard-tests steps run the `TMP` binding before any local run can.
+
+**Cost while deferred:** one small transient tree or capture per run outside the tmp dir's one-component bound, on a tmpfs system temp dir. Filed 2026-10-21 by guard-grant-shrink-pass' close. Re-verified there: `grep -rn 'temp_dir()' native/src`, read for each hit above its file's first `#[cfg(test)]` outside a test-only module. Owner lookup: `temp_dir`, `system temp` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
 
 ## Deferred
 
@@ -148,6 +176,8 @@ docs/releases.md renders its derived note list as a bare list of version links, 
 
 **Deliverable:** a derived table whose columns answer an upgrader, above all whether a release needs action on upgrade (its `gates` or `knobs` role section carries entries, roles per installer/SPEC.md §The upgrade contract); also version, date, bump class and per-section counts, which each note's In brief summary table already states. The note composer writes the counts and the action flag as front-matter keys and a gate holds them equal to the note's sections; parsing sections in Liquid at render time is refused as fragile.
 
+**Push need (2026-10-21, inside the budget):** the same mid-iteration push as run-scratch-temp-residue's, since only `pages-build-deployment` renders the table's Liquid.
+
 **Cost while deferred:** a reader skipping several versions opens each note to learn which need action. Filed 2026-09-29 by companion-technical-gates' lead, at the operator's leave. Re-verified: the page's `<ul>` loop and 29 notes carrying `release:`. Owner lookup: `releases.md`, `front-matter` in this file — none; owner docs/site-architecture.md, with installer/SPEC.md §The upgrade contract for the keys.
 
 ### front-door-job-observed
@@ -212,7 +242,7 @@ surface (e) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 
 [cost: event/high] [surface: plugin]
 
-`codex-cli` 0.162.1 discovers no plugin hooks while the package root carries the portable `plugin.json` (with or without `extensions.com.openai` hooks or a `.codex-plugin/plugin.json` beside it); without that manifest `hooks/hooks.json` is discovered and the unchanged rendering blocks correctly. Likely upstream: Codex's build docs say `hooks/hooks.json` is discovered by default. Codex guard wiring is tier 1 (operator direction 2026-09-28).
+`codex-cli` 0.162.1 and 0.163.0 (re-probed 2026-10-21 through the app server's `hooks/list`) discover no plugin hooks while the package root carries the portable `plugin.json` (with or without `extensions.com.openai` hooks or a `.codex-plugin/plugin.json` beside it); without that manifest `hooks/hooks.json` is discovered and the unchanged rendering blocks correctly. Likely upstream: Codex's build docs say `hooks/hooks.json` is discovered by default. Codex guard wiring is tier 1 (operator direction 2026-09-28).
 
 **Residue that bites once discovery lands:** Codex's patch tool matches `Write|Edit` but carries the patch as `tool_input.command` with no `file_path`, and `workflow-state-guard` allows on an empty path (`native/src/hook/workflow_state.rs`), so a Codex session could hand-write the stage state file; read the patch's file headers for the written paths, or state why not (owner lifecycle-kit/SPEC.md §check-stage-entry).
 
@@ -247,36 +277,6 @@ Cursor and Muse Code are installed on no build machine, so plugin/SPEC.md §The 
 **Deliverable:** install and run each on a machine that has it, turn its cells from read to run, and file any wiring defect.
 
 **Cost while deferred:** two tier-2 harnesses' skill load and guard reach rest on vendor docs. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: neither CLI on the build machine's PATH. Owner lookup: `cursor`, `muse` in this file, none; owner plugin/SPEC.md §The harnesses.
-
-### run-scratch-temp-residue
-
-[cost: session/low] [surface: gate-sdk]
-
-The run scratch now roots under `GATE_SDK_TMP_DIR` (gate-sdk/SPEC.md §run-gates, per-gate scratch isolation), but production `std::env::temp_dir()` sites still write the system temp dir, across guard-kit's decision-table sandbox, context-kit's index tests, the front-end parity arm, the installer smoke, a gate's work dir and `proc.rs`'s captures in a top-level arm's own process; the set is the grep below, never this list. On Windows a compiled member's temp lookup reads `TMP`, not the `TMPDIR` the runner binds, so every member capture stays at the system temp dir there.
-
-**Deliverable:** route each production site through the run's scratch root, or state per site why the system temp dir is correct, and bind `TMP` beside `TMPDIR` for a Windows child; drop the honest-limit sentence that names the `TMP` residue.
-
-**Cost while deferred:** one small transient tree or capture per run outside the tmp dir's one-component bound, on a tmpfs system temp dir. Filed 2026-10-21 by guard-grant-shrink-pass' close. Re-verified there: `grep -rn 'temp_dir()' native/src`, read for each hit above its file's first `#[cfg(test)]` outside a test-only module. Owner lookup: `temp_dir`, `system temp` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
-
-### tmp-dir-prune-coupling
-
-[cost: event/low] [surface: gate-sdk]
-
-A battery runs its members in parallel with each child's private `TMPDIR` under the run scratch in `GATE_SDK_TMP_DIR`. A consumer whose tmp dir sits inside the tree under a name `GATE_SDK_PRUNE_DIRS` does not carry has every filesystem-walking gate descend into sibling members' live private dirs, and `walk_pruned` fails closed on a directory that vanishes mid-walk (`native/src/walk.rs`, its `read_dir` and `symlink_metadata` errors), so a sound tree reds nondeterministically at exit 2. The default `.tmp` is pruned, so this repo never meets it.
-
-**Deliverable:** prune the resolved tmp dir by path in `walk_pruned`, or state the coupling as a constraint in gate-sdk/SPEC.md §Layout and configuration with a check that reds on an in-tree tmp dir off a pruned name.
-
-**Cost while deferred:** zero at the default layout; a flaky exit 2 for a consumer moving the tmp dir to an unpruned in-tree name. Filed 2026-10-21 by guard-grant-shrink-pass' close. Re-verified there: `walk_pruned`'s `read_dir` and stat both map an error to `Err`. Owner lookup: `walk_pruned`, `PRUNE_DIRS`, `vanish` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Layout and configuration.
-
-### wait-loop-trailing-read-block
-
-[cost: event/low] [surface: guard-kit]
-
-Rule `background_no_record` blocks a backgrounded inline wait loop trailed by a read-only statement as an unrecorded launch: `until date +%s | awk '<prog>'; do sleep 60; done; date` under `run_in_background` exits 2 with the record corrective, while the same loop without `; date` passes. guard-kit/SPEC.md §The generic ruleset exempts an inline wait loop and a read-only pipeline from the record, which the compound plausibly meets, so the block is a wrong one that fails safe at the cost of a re-spelling.
-
-**Deliverable:** decide whether the exemption reaches a compound of exempt statements; if it does, admit it with decision-table rows in `guard-kit/guard-tests/`, and if not, say so in the rule's text.
-
-**Cost while deferred:** a re-spelling whenever a session trails a wait loop with a read. Filed 2026-10-21 by guard-grant-shrink-pass' close, a verdict-moving guard change a close files rather than lands. Re-verified there: the hook arm on both spellings, exit 2 and exit 0. Owner lookup: `background_no_record`, `wait loop` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §The generic ruleset.
 
 ## Icebox
 
@@ -975,4 +975,6 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
+
+- wait-loop-trailing-read-block
 
