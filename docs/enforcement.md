@@ -62,6 +62,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | (consumer) | check-llms-fresh | precommit |
 | (consumer) | check-license-line | precommit |
 | (consumer) | check-support-table-fresh | precommit |
+| (consumer) | check-release-table-fresh | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-exec-bit | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-tree-terms | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-portability-floor | precommit |

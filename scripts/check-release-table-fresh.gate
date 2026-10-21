@@ -1,0 +1,4 @@
+# graph: couples=docs/posts/*.md,docs/releases.md,native/src/gates/release_table_fresh.rs,native/src/emit/release_table.rs dir=one valve=none tier=precommit
+# projection: docs/releases.md
+# spec: installer/SPEC.md §The releases table — the releases page's release-table block carries the table the release notes derive
+# knob: GATE_LOCAL_RELEASES_PAGE = docs/releases.md

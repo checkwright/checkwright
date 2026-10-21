@@ -119,6 +119,7 @@ pub mod queue_wrap;
 pub mod readme_roster;
 pub mod reads_couples;
 pub mod release_bump;
+pub mod release_table_fresh;
 pub mod roadmap_fresh;
 pub mod root_tiering;
 pub mod rule_citation;
@@ -1651,7 +1652,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-release-bump",
         release_bump::run,
-        &[("?", "", "", "dynamic@src/gates/release_bump.rs:144")],
+        &[("?", "", "", "dynamic@src/gates/release_bump.rs:158")],
         &["GATE_LOCAL_RELEASE_POSTS_DIR", "GATE_SDK_RELEASE_SECTIONS", "GATE_SDK_RELEASE_SECTION_ALIASES"],
         "-",
         &[("git", "")],
@@ -1970,6 +1971,20 @@ pub const REGISTRY: &[GateEntry] = &[
         support_table_fresh::run,
         &[],
         &["GATE_SDK_NATIVE_BIN", "GATE_LOCAL_COMPANION_DIR", "GATE_LOCAL_SUPPORT_TABLE_PAGE"],
+        "-",
+        &[],
+    ),
+    (
+        "check-release-table-fresh",
+        release_table_fresh::run,
+        &[("?", "", "", "dynamic@src/emit/release_table.rs:43 via emit::release_table::render")],
+        &[
+            "GATE_SDK_NATIVE_BIN",
+            "GATE_LOCAL_RELEASE_POSTS_DIR",
+            "GATE_LOCAL_RELEASES_PAGE",
+            "GATE_SDK_RELEASE_SECTIONS",
+            "GATE_SDK_RELEASE_SECTION_ALIASES",
+        ],
         "-",
         &[],
     ),

@@ -64,6 +64,7 @@ pub mod queue_index;
 pub mod queue_migrate;
 pub mod queue_verbs;
 pub mod reads_census;
+pub mod release_table;
 pub mod rewrite;
 pub mod scan_prompts;
 pub mod stage_economics;
@@ -326,6 +327,16 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-support-table",
         Arm::Emit(support_table::emit, Grammar::Flags(&["--write"])),
         &[support_table::PAGE_KNOB, support_table::COMPANION_KNOB],
+    ),
+    (
+        "--emit-release-table",
+        Arm::Emit(release_table::emit, Grammar::Flags(&["--write"])),
+        &[
+            release_table::POSTS_KNOB,
+            release_table::PAGE_KNOB,
+            crate::release_sections::SECTIONS_KNOB,
+            crate::release_sections::ALIASES_KNOB,
+        ],
     ),
     // spec: canon-kit/SPEC.md §The reference-link grammar — the source set is derived from the
     // tracked tree rather than enumerated, so the configured values are the blob ref, the mirror

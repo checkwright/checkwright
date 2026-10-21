@@ -35,7 +35,7 @@
 1285cp docs/drift-kit/index.md
 1351cp docs/evidence-kit/index.md
 1463cp docs/gate-sdk/index.md
-10709cp docs/generated-projections.md
+11148cp docs/generated-projections.md
 1259cp docs/guard-kit/index.md
 5236cp docs/index.md
 8768cp docs/install-block-contracts.md
@@ -43,7 +43,7 @@
 9800cp docs/install.md
 1344cp docs/kits.md
 1458cp docs/lifecycle-kit/index.md
-3156cp docs/maintenance.md
+3203cp docs/maintenance.md
 3561cp docs/manual-install.md
 3007cp docs/methodology.md
 2731cp docs/openspec.md
@@ -84,7 +84,6 @@
 4672cp docs/posts/2026-09-30-checkwright-v0-31-0.md
 7064cp docs/projection-fan-outs.md
 1460cp docs/queue-kit/index.md
-789cp docs/releases.md
 8690cp docs/requirements.md
 6104cp docs/site-architecture.md
 2412cp docs/site-kit/index.md
@@ -100,7 +99,7 @@
 3130cp gate-sdk/templates/adopt.md
 355499cp guard-kit/SPEC.md
 4439cp guard-kit/templates/close-triage.md
-292659cp installer/SPEC.md
+295315cp installer/SPEC.md
 396306cp lifecycle-kit/SPEC.md
 8150cp lifecycle-kit/templates/consult.md
 1212cp lifecycle-kit/templates/frames/project-critique.md

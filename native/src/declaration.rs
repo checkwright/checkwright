@@ -87,11 +87,21 @@ fn bullet_body(line: &str) -> Option<&str> {
 // spec: gate-sdk/SPEC.md §lib/declaration.sh — a backticked lead is the span *directly* after the
 // marker: anything else yields no token rather than a stripped one, which is what keeps the bolded
 // spellings visible instead of silent
-fn lead_token(line: &str) -> Option<&str> {
+fn lead_split(line: &str) -> Option<(&str, &str)> {
     let body = bullet_body(line)?;
     let inner = body.strip_prefix('`')?;
     let end = inner.find('`')?;
-    inner.get(..end)
+    Some((inner.get(..end)?, inner.get(end + 1..)?))
+}
+
+fn lead_token(line: &str) -> Option<&str> {
+    lead_split(line).map(|(t, _)| t)
+}
+
+// spec: installer/SPEC.md §The releases table — what a knob bullet carries after its lead token,
+// where a rename's or a removal's arrow stands
+pub fn after_lead_token(line: &str) -> Option<&str> {
+    lead_split(line).map(|(_, rest)| rest)
 }
 
 fn bold_lead(line: &str) -> Option<&str> {

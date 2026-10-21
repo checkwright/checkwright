@@ -131,7 +131,7 @@ pub fn render(dir: &str) -> Result<String, String> {
 }
 
 // spec: companion/SPEC.md §The support table — the block's line span; an absent or repeated
-// block is no place to write, so it refuses
+// block is no place to write, so it refuses. The releases table reads its own markers here too.
 pub struct Block {
     pub line: usize,
     start: usize,
@@ -139,10 +139,10 @@ pub struct Block {
     pub actual: String,
 }
 
-pub fn block(page: &str, text: &str) -> Result<Block, String> {
+pub fn marked_block(page: &str, text: &str, begin: &str, end: &str) -> Result<Block, String> {
     let lines = fresh::file_lines(text);
     let at = |m: &str| -> Vec<usize> { lines.iter().enumerate().filter(|(_, l)| **l == m).map(|(i, _)| i).collect() };
-    let (b, e) = (at(BEGIN), at(END));
+    let (b, e) = (at(begin), at(end));
     match (b.as_slice(), e.as_slice()) {
         ([b], [e]) if b < e => Ok(Block {
             line: b + 1,
@@ -153,16 +153,20 @@ pub fn block(page: &str, text: &str) -> Result<Block, String> {
         _ => Err(format!(
             "{}: needs exactly one {} … {} pair, in order ({} begin, {} end)",
             page,
-            BEGIN,
-            END,
+            begin,
+            end,
             b.len(),
             e.len()
         )),
     }
 }
 
-fn rewrite(page: &str, text: &str, table: &str) -> Result<String, String> {
-    let blk = block(page, text)?;
+pub fn block(page: &str, text: &str) -> Result<Block, String> {
+    marked_block(page, text, BEGIN, END)
+}
+
+fn rewrite(page: &str, text: &str, begin: &str, end: &str, table: &str) -> Result<String, String> {
+    let blk = marked_block(page, text, begin, end)?;
     let lines = fresh::file_lines(text);
     let mut out: Vec<String> = lines[..blk.start].iter().map(|l| l.to_string()).collect();
     out.push(table.to_string());
@@ -174,19 +178,24 @@ fn rewrite(page: &str, text: &str, table: &str) -> Result<String, String> {
     Ok(rendered)
 }
 
-// spec: companion/SPEC.md §The support table — the bare arm prints the block; `--write` rewrites
-// it in place and touches nothing else
+// spec: companion/SPEC.md §The support table — `--write` rewrites the block in place and touches
+// nothing else; `arm` names the table in the report
+pub fn write_marked(arm: &str, page: &str, begin: &str, end: &str, table: &str) -> Result<String, String> {
+    let text = crate::emit::read_text(page)?;
+    let new = rewrite(page, &text, begin, end, table)?;
+    if new == text {
+        return Ok(format!("{}: {} already fresh\n", arm, page));
+    }
+    std::fs::write(page, new).map_err(|e| format!("cannot write {}: {}", page, e))?;
+    Ok(format!("{}: rewrote {}\n", arm, page))
+}
+
+// spec: companion/SPEC.md §The support table — the bare arm prints the block
 pub fn emit(args: &[String]) -> Result<String, String> {
     let table = render(&crate::walk::knob_scalar(COMPANION_KNOB)?)?;
     if args.iter().any(|a| a == "--write") {
         let page = crate::walk::knob_scalar(PAGE_KNOB)?;
-        let text = crate::emit::read_text(&page)?;
-        let new = rewrite(&page, &text, &table)?;
-        if new == text {
-            return Ok(format!("support-table: {} already fresh\n", page));
-        }
-        std::fs::write(&page, new).map_err(|e| format!("cannot write {}: {}", page, e))?;
-        return Ok(format!("support-table: rewrote {}\n", page));
+        return write_marked("support-table", &page, BEGIN, END, &table);
     }
     Ok(format!("{}\n", table.trim_matches('\n')))
 }
@@ -242,9 +251,9 @@ mod tests {
     #[test]
     fn a_write_touches_the_block_alone_and_an_absent_or_doubled_block_refuses() {
         let md = format!("# T\n\n{}\nold\n{}\n\nrest\n", BEGIN, END);
-        let got = rewrite("p.md", &md, "\n| t |\n").unwrap();
+        let got = rewrite("p.md", &md, BEGIN, END, "\n| t |\n").unwrap();
         assert_eq!(got, format!("# T\n\n{}\n\n| t |\n\n{}\n\nrest\n", BEGIN, END));
-        assert_eq!(rewrite("p.md", &got, "\n| t |\n").unwrap(), got);
+        assert_eq!(rewrite("p.md", &got, BEGIN, END, "\n| t |\n").unwrap(), got);
         assert!(block("p.md", "none\n").is_err());
         assert!(block("p.md", &format!("{0}\n{1}\n{0}\n{1}\n", BEGIN, END)).is_err());
     }

@@ -1,0 +1,1 @@
+RELEASE-TABLE-FRESH: clean (page.md carries the table posts derives)

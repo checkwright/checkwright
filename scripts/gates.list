@@ -43,6 +43,7 @@ check-product-statement-fresh
 check-llms-fresh
 check-license-line
 check-support-table-fresh
+check-release-table-fresh
 check-exec-bit
 check-commit-msg
 check-commit-subject

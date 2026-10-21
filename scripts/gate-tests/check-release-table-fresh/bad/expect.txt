@@ -1,0 +1,2 @@
+1 stale block — page.md:3 differs from the table posts derives
+> | [v0.1.0](posts/2026-01-01-v0-1-0.md) | 2026-01-01 | — | yes | 2 | 1 | — | — | 0 |

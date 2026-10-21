@@ -16,6 +16,20 @@ const GRAMMAR: &str = "<major>.<minor>.<patch>, each a run of ASCII digits";
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct Version(u64, u64, u64);
 
+impl Version {
+    // spec: installer/SPEC.md §Versioning — the highest component that moved from the older
+    // version, which the floor and the releases table's Bump column both read
+    pub(crate) fn bump_over(&self, older: &Version) -> &'static str {
+        if self.0 != older.0 {
+            "major"
+        } else if self.1 != older.1 {
+            "minor"
+        } else {
+            "patch"
+        }
+    }
+}
+
 // spec: gate-sdk/SPEC.md §The declaration cohort — the refusal names the token, the file or
 // disposition line it came from, and the grammar: a refusal whose text does not name where the
 // token came from sends its reader to the wrong file.
@@ -240,7 +254,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    let patch_only = newest.version.0 == prev.version.0 && newest.version.1 == prev.version.1;
+    let patch_only = newest.version.bump_over(&prev.version) == "patch";
     if patch_only && (counts.iter().any(|(_, n)| *n > 0) || floor.is_some()) {
         println!("check-release-bump: v{} is a patch-only bump over v{}, but its note carries phase-B work (installer/SPEC.md §Versioning — the floor is minor):", newest.raw, prev.raw);
         for (s, n) in counts.iter().filter(|(_, n)| *n > 0) {
