@@ -13,7 +13,7 @@ use std::path::Path;
 
 // spec: guard-kit/SPEC.md §Testing — the declared roster and its omissions are ruled there.
 pub const KNOBS: &[&str] =
-    &["GATE_SDK_KIT_DIRS", "GUARD_KIT_CONSUMER_RULES_CMD", "GUARD_KIT_CONSUMER_CASES", LIMITS_KNOB];
+    &["GATE_SDK_KIT_DIRS", "GATE_SDK_TMP_DIR", "GUARD_KIT_CONSUMER_RULES_CMD", "GUARD_KIT_CONSUMER_CASES", LIMITS_KNOB];
 
 const CASES_KNOB: &str = "GUARD_KIT_CONSUMER_CASES";
 const LIMITS_KNOB: &str = "GUARD_KIT_CONSUMER_VARIANT_LIMITS";
@@ -74,7 +74,8 @@ fn execute(args: &[String]) -> Result<i32, String> {
             return Err(format!("{}: missing {}", NAME, f));
         }
     }
-    let sandbox = build_sandbox()?;
+    let held = crate::runner::run_scratch(&walk::knob_scalar("GATE_SDK_TMP_DIR")?)?;
+    let sandbox = build_sandbox(&held)?;
     let log = format!("{}/friction.log", sandbox.root);
 
     let mut tally = Tally::default();
@@ -481,8 +482,8 @@ pub(crate) fn classify(rc: i32, out: &str) -> String {
 // spec: guard-kit/SPEC.md §Testing — the sandbox's five preconditions, each a case's precondition
 // rather than scenery: the section enumerates them and says what turns green for the wrong reason
 // when a harness builds four.
-pub(crate) fn build_sandbox() -> Result<Sandbox, String> {
-    let made = std::env::temp_dir().join(format!("checkwright-guard-tests.{}", std::process::id()));
+pub(crate) fn build_sandbox(base: &Path) -> Result<Sandbox, String> {
+    let made = base.join("guard-sandbox");
     let _ = std::fs::remove_dir_all(&made);
     mkdir(&made.display().to_string())?;
     // spec: gate-sdk/SPEC.md §The crate's crosser — `sandbox.root` is composed into paths by

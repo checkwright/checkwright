@@ -747,8 +747,34 @@ fn report_omissions(list_text: &str) {
 // spec: gate-sdk/SPEC.md §run-gates — the one maker of every runner's run scratch:
 // `checkwright-run.<pid>` under the tmp dir absolutized at the invoker's root, the tmp dir made
 // self-ignoring where absent
-pub(crate) fn run_scratch(tmp_dir: &str) -> Result<PathBuf, String> {
-    run_scratch_at(&walk::cwd()?, tmp_dir)
+pub(crate) fn run_scratch(tmp_dir: &str) -> Result<RunScratch, String> {
+    run_scratch_in(&walk::cwd()?, tmp_dir)
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — the same scratch for a caller resolving the tmp dir against a
+// root other than its working directory
+pub(crate) fn run_scratch_in(here: &str, tmp_dir: &str) -> Result<RunScratch, String> {
+    let dir = run_scratch_at(here, tmp_dir)?;
+    proc::hold_temp_base(&dir);
+    Ok(RunScratch(dir))
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — a held run scratch, the process's temp base while it lives and
+// removed on every exit path
+pub(crate) struct RunScratch(PathBuf);
+
+impl std::ops::Deref for RunScratch {
+    type Target = Path;
+    fn deref(&self) -> &Path {
+        &self.0
+    }
+}
+
+impl Drop for RunScratch {
+    fn drop(&mut self) {
+        proc::release_temp_base(&self.0);
+        let _ = std::fs::remove_dir_all(&self.0);
+    }
 }
 
 fn run_scratch_at(here: &str, tmp_dir: &str) -> Result<PathBuf, String> {
@@ -895,7 +921,6 @@ pub fn run(args: &[String]) -> i32 {
                 "{}: cannot resolve this binary's own path: {} — treating as failure (not clean)",
                 TOOL, e
             );
-            let _ = std::fs::remove_dir_all(&scratch);
             return 2;
         }
     };
@@ -907,18 +932,19 @@ pub fn run(args: &[String]) -> i32 {
             return 2;
         }
     };
+    let scratch_path = scratch.to_path_buf();
     let d = Dispatch {
         resolve_dirs: &resolve_dirs,
         self_exe: &self_exe,
         list: &list,
-        scratch: &scratch,
+        scratch: &scratch_path,
         spec_base_url: &spec_base_url,
         env: &[],
     };
 
     let sarif_path = std::env::var(sarif::KNOB).unwrap_or_default();
     let outcomes = dispatch_all(&d, &selected);
-    let _ = std::fs::remove_dir_all(&scratch);
+    drop(scratch);
 
     if writes_timings(&parsed.only, &parsed.paths, explicit) {
         write_timings(
@@ -1084,6 +1110,7 @@ mod tests {
         let env = proc::scratch_env(&tmpdir, &scratch);
         let get = |k: &str| env.iter().find(|(n, _)| n == k).map(|(_, v)| v.clone()).unwrap();
         assert_eq!(get("TMPDIR"), tmpdir.display().to_string());
+        assert_eq!(get("TMP"), tmpdir.display().to_string(), "a Windows child reads TMP, so it names the same private dir");
         let sep = if cfg!(windows) { ';' } else { ':' };
         assert_eq!(get("GIT_CEILING_DIRECTORIES").split(sep).next(), Some(scratch.display().to_string().as_str()));
 

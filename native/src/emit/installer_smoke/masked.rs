@@ -266,6 +266,8 @@ pub(super) fn prove_absent(stem: &str, path: &str, arm: &str) -> Step {
     prove_control(&programs::GIT, &["--version"], path, arm, stem)
 }
 
+// spec: installer/SPEC.md §The consumer smoke — a control probe's working directory, written to by
+// nothing and outside the worktree as the smoke's scratch base is, so the system temp dir serves
 fn invoking_dir() -> String {
     std::env::temp_dir().display().to_string()
 }

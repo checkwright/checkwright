@@ -411,13 +411,13 @@ fn execute(fences: &[Runnable], bin: &str) -> Result<Vec<Option<String>>, String
     Ok(out)
 }
 
-// spec: canon-kit/SPEC.md §check-fence-run — `DEMO_TMP_DIR`, then the platform temp directory, the
+// spec: canon-kit/SPEC.md §check-fence-run — `DEMO_TMP_DIR`, then the process's temp base, the
 // base §Consumer smoke's builder takes
 pub(crate) fn scratch_base() -> PathBuf {
     std::env::var_os("DEMO_TMP_DIR")
         .filter(|v| !v.is_empty())
         .map(PathBuf::from)
-        .unwrap_or_else(std::env::temp_dir)
+        .unwrap_or_else(crate::proc::temp_base)
 }
 
 // spec: canon-kit/SPEC.md §check-fence-run — the fixed environment, inherited in nothing but the

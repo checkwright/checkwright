@@ -7,10 +7,10 @@ use crate::{proc, programs};
 use crate::walk;
 use std::path::{Path, PathBuf};
 
-// spec: context-kit/SPEC.md §Testing — one declared knob, the transported kit roots; a compiled
-// member has no `BASH_SOURCE` anchor. No `CONTEXT_KIT_` knob is declared, that section's rule for
-// the sibling smoke.
-pub const KNOBS: &[&str] = &["GATE_SDK_KIT_DIRS"];
+// spec: context-kit/SPEC.md §Testing — the transported kit roots, since a compiled member has no
+// `BASH_SOURCE` anchor, and the tmp dir its run scratch lies in. No `CONTEXT_KIT_` knob is
+// declared, that section's rule for the sibling smoke.
+pub const KNOBS: &[&str] = &["GATE_SDK_KIT_DIRS", "GATE_SDK_TMP_DIR"];
 
 const NAME: &str = "run-index-tests";
 const VERDICT: &str = "INDEX-TESTS";
@@ -23,14 +23,9 @@ const USAGE: &str =
 // spec: context-kit/SPEC.md §Testing — the scratch lifecycle is the arm's own control flow rather
 // than a trap, and one root removed on every exit path is what repairs the shell form's leak
 // window rather than reproducing it.
+// spec: gate-sdk/SPEC.md §run-gates — that root is the arm's run scratch, removed by its holder
 struct Scratch {
-    root: PathBuf,
-}
-
-impl Drop for Scratch {
-    fn drop(&mut self) {
-        let _ = std::fs::remove_dir_all(&self.root);
-    }
+    root: crate::runner::RunScratch,
 }
 
 pub fn run(args: &[String]) -> i32 {
@@ -309,8 +304,7 @@ fn parent_of(root: &str) -> Result<String, String> {
 }
 
 fn make_scratch() -> Result<Scratch, String> {
-    let root = std::env::temp_dir().join(format!("checkwright-index-tests.{}", std::process::id()));
-    let _ = std::fs::remove_dir_all(&root);
+    let root = crate::runner::run_scratch(&walk::knob_scalar("GATE_SDK_TMP_DIR")?)?;
     std::fs::create_dir_all(root.join("pub-lang"))
         .map_err(|e| format!("cannot create the scratch dir {}: {}", root.display(), e))?;
     Ok(Scratch { root })

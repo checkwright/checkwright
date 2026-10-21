@@ -5,9 +5,9 @@ use crate::programs::{self, Program};
 use crate::walk;
 use std::path::{Path, PathBuf};
 
-// spec: gate-sdk/SPEC.md §run-gates — the arm resolves no knob: every value a case needs it writes
-// into that case's own scratch repository or environment
-pub const KNOBS: &[&str] = &[];
+// spec: gate-sdk/SPEC.md §run-gates — the arm resolves the tmp dir its run scratch lies in and no
+// other knob: every value a case needs it writes into that case's own scratch repository or environment
+pub const KNOBS: &[&str] = &["GATE_SDK_TMP_DIR"];
 
 const NAME: &str = "run-front-end-parity";
 const VERDICT: &str = "FRONT-END-PARITY";
@@ -475,15 +475,6 @@ fn corpus() -> Vec<&'static Case> {
     CORPUS.iter().chain(unix).collect()
 }
 
-// spec: gate-sdk/SPEC.md §run-gates — the scratch root is removed on every exit path
-struct Scratch(PathBuf);
-
-impl Drop for Scratch {
-    fn drop(&mut self) {
-        let _ = std::fs::remove_dir_all(&self.0);
-    }
-}
-
 pub fn run(args: &[String]) -> i32 {
     if let Some(a) = args.first() {
         eprintln!("{}: unknown argument: {}; usage: --run-front-end-parity", NAME, a);
@@ -524,14 +515,15 @@ fn check() -> Result<bool, String> {
             .display()
             .to_string(),
     );
-    let scratch = Scratch(scratch_root()?);
+    let held = crate::runner::run_scratch(&walk::knob_scalar("GATE_SDK_TMP_DIR")?)?;
+    let scratch = scratch_root(&held)?;
     let unset = inherited_knobs();
     let mut clean = true;
     let cases = corpus();
     for (i, case) in cases.iter().enumerate() {
-        let dir = scratch.0.join(format!("case-{:02}", i));
+        let dir = scratch.join(format!("case-{:02}", i));
         let (stub_arg, twin_arg) = prepare(case, &dir, &sdk, &stub, &twin, Path::new(&exe))?;
-        let mut ceiling = forward_slashed(scratch.0.display().to_string());
+        let mut ceiling = forward_slashed(scratch.display().to_string());
         let mut set: Vec<(String, String)> = Vec::new();
         for (k, v) in case.env {
             if *k == CEILING {
@@ -610,14 +602,11 @@ fn forward_slashed(p: String) -> String {
     }
 }
 
-// spec: gate-sdk/SPEC.md §run-gates — a long-name, prefix-free absolute root: Windows hands the
-// temporary directory out in its 8.3 spelling and `canonicalize` adds a verbatim prefix, and either
+// spec: gate-sdk/SPEC.md §run-gates — the run scratch as a long-name, prefix-free absolute root: a
+// Windows path may arrive in its 8.3 spelling and `canonicalize` adds a verbatim prefix, and either
 // would make the stub and the twin see two spellings of one directory
-fn scratch_root() -> Result<PathBuf, String> {
-    let root = std::env::temp_dir().join(format!("checkwright-front-end-parity.{}", std::process::id()));
-    let _ = std::fs::remove_dir_all(&root);
-    std::fs::create_dir_all(&root).map_err(|e| format!("cannot create {}: {}", root.display(), e))?;
-    let s = walk::canonicalize(&root).ok_or_else(|| format!("cannot resolve {}", root.display()))?;
+fn scratch_root(root: &Path) -> Result<PathBuf, String> {
+    let s = walk::canonicalize(root).ok_or_else(|| format!("cannot resolve {}", root.display()))?;
     Ok(PathBuf::from(s.strip_prefix(r"\\?\").unwrap_or(&s)))
 }
 

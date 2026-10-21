@@ -7,7 +7,7 @@
 use crate::{knobfile, knobs, proc, programs};
 use crate::walk;
 use std::cell::Cell;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 pub const KNOBS: &[&str] = &[
     "GATE_SDK_TESTS_DIR",
@@ -71,15 +71,13 @@ pub fn run(args: &[String]) -> i32 {
             return 2;
         }
     };
-    let code = execute(&harness, &scratch, &tests_dir);
-    let _ = std::fs::remove_dir_all(&scratch.root);
-    code
+    execute(&harness, &scratch, &tests_dir)
 }
 
 // spec: gate-sdk/SPEC.md §run-gate-tests — the runner's temporaries are a run scratch's: each case
 // invocation and each bespoke test is handed its own private dir under it, with the ceiling
 struct RunScratch {
-    root: PathBuf,
+    root: crate::runner::RunScratch,
     next: Cell<usize>,
 }
 

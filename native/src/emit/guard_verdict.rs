@@ -139,10 +139,15 @@ fn verdict(ask: Ask) -> Result<(String, String), String> {
     };
     let top = walk::toplevel_opt()?;
     let base = top.clone().unwrap_or_else(|| here.clone());
-    let tmp = walk::abs_against(&base, &walk::knob_scalar(TMP_KNOB)?);
+    let tmp_dir = walk::knob_scalar(TMP_KNOB)?;
+    let tmp = walk::abs_against(&base, &tmp_dir);
     std::fs::create_dir_all(&tmp).map_err(|e| format!("cannot create the scratch dir {}: {}", tmp, e))?;
     let log = format!("{}/guard-verdict.{}.log", tmp, std::process::id());
-    let sandbox: Option<Sandbox> = if ask.sandbox { Some(table::build_sandbox()?) } else { None };
+    let held = if ask.sandbox { Some(crate::runner::run_scratch_in(&base, &tmp_dir)?) } else { None };
+    let sandbox: Option<Sandbox> = match &held {
+        Some(h) => Some(table::build_sandbox(h)?),
+        None => None,
+    };
     let root = match (&sandbox, top) {
         (Some(s), _) => s.root.clone(),
         (None, Some(t)) => t,
@@ -153,6 +158,7 @@ fn verdict(ask: Ask) -> Result<(String, String), String> {
     let answer = table::ask(&bin, &root, &log, &payload);
     let _ = std::fs::remove_file(&log);
     drop(sandbox);
+    drop(held);
     let (code, out, err) = answer?;
     Ok(render(code, &out, &err))
 }

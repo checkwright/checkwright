@@ -525,7 +525,7 @@ fn merged(
             program.label(), e
         )
     };
-    let capture = std::env::temp_dir().join(format!(
+    let capture = temp_base().join(format!(
         "checkwright-merged.{}.{}",
         std::process::id(),
         MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
@@ -735,7 +735,7 @@ pub fn run_bounded_capture(
             program.label(), e
         )
     };
-    let capture = std::env::temp_dir().join(format!(
+    let capture = temp_base().join(format!(
         "checkwright-bounded.{}.{}",
         std::process::id(),
         MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
@@ -867,6 +867,31 @@ pub fn run_with_env_in(
 }
 
 static MERGE_SEQ: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+
+static TEMP_BASE: std::sync::Mutex<Option<std::path::PathBuf>> = std::sync::Mutex::new(None);
+
+// spec: gate-sdk/SPEC.md §run-gates — where this process writes a spawn's capture: the run scratch
+// it holds, else its own temp dir, the crate's one production read of that
+pub fn temp_base() -> std::path::PathBuf {
+    TEMP_BASE
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .clone()
+        .unwrap_or_else(std::env::temp_dir)
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — `runner::RunScratch` is the one holder: it takes the base when
+// made and releases it before removing the directory, so no later capture lands in a removed one
+pub(crate) fn hold_temp_base(dir: &std::path::Path) {
+    *TEMP_BASE.lock().unwrap_or_else(|e| e.into_inner()) = Some(dir.to_path_buf());
+}
+
+pub(crate) fn release_temp_base(dir: &std::path::Path) {
+    let mut held = TEMP_BASE.lock().unwrap_or_else(|e| e.into_inner());
+    if held.as_deref() == Some(dir) {
+        *held = None;
+    }
+}
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — `run` with a body written to the child's stdin,
 // the one shape `run` cannot carry: a shell caller's `printf … | git hash-object --stdin` has no
@@ -1080,7 +1105,7 @@ pub fn run_streamed(
         )
     };
     let seq = MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-    let dir = std::env::temp_dir();
+    let dir = temp_base();
     let inp = dir.join(format!("checkwright-in.{}.{}", std::process::id(), seq));
     let outp = dir.join(format!("checkwright-out.{}.{}", std::process::id(), seq));
     let cleanup = || {
@@ -1247,7 +1272,7 @@ pub fn run_stdout_scrubbed(
         )
     };
     let seq = MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-    let outp = std::env::temp_dir().join(format!("checkwright-out.{}.{}", std::process::id(), seq));
+    let outp = temp_base().join(format!("checkwright-out.{}.{}", std::process::id(), seq));
     let sink = std::fs::File::create(&outp).map_err(io_err)?;
     let mut cmd = Command::new(spawn_target(program.invocation())?.as_ref());
     cmd.args(args)
@@ -1323,8 +1348,8 @@ fn exit_code(status: &std::process::ExitStatus) -> i32 {
     2
 }
 
-// spec: gate-sdk/SPEC.md §run-gates — a runner's child: its private `TMPDIR`, and the run scratch
-// heading its git ceiling, joined to an inherited one by the host's list separator
+// spec: gate-sdk/SPEC.md §run-gates — a runner's child: its private dir as `TMPDIR` and `TMP`, and
+// the run scratch heading its git ceiling, joined to an inherited one by the host's list separator
 pub fn scratch_env(tmpdir: &std::path::Path, run_scratch: &std::path::Path) -> Vec<(String, String)> {
     let sep = if cfg!(windows) { ';' } else { ':' };
     let mut ceiling = run_scratch.display().to_string();
@@ -1334,6 +1359,7 @@ pub fn scratch_env(tmpdir: &std::path::Path, run_scratch: &std::path::Path) -> V
     }
     vec![
         ("TMPDIR".to_string(), tmpdir.display().to_string()),
+        ("TMP".to_string(), tmpdir.display().to_string()),
         ("GIT_CEILING_DIRECTORIES".to_string(), ceiling),
     ]
 }
@@ -1936,6 +1962,46 @@ pub(crate) mod tests {
              call needs something proc::run does not carry, or declare the shape it cannot with \
              a `spawn-funnel-exempt:` cause above the site",
             offenders
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — the temp-dir roster: shipped code reads the system temp
+    // dir through `temp_base` alone, but for the sites installer/SPEC.md keeps on the platform's
+    // temp dir by name, §The consumer smoke's two and §demo's scratch base
+    #[test]
+    fn no_shipped_module_reads_the_system_temp_dir_outside_its_declared_sites() {
+        let _knobs = crate::knobenv::lock();
+        let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+        let files = walk::find_files(&src, &["rs"]).expect("cannot enumerate the crate modules");
+        assert!(!files.is_empty(), "no module found to scan");
+        let declared = [
+            ("proc.rs", 1),
+            ("emit/installer_smoke/roster.rs", 1),
+            ("emit/installer_smoke/masked.rs", 1),
+            ("installer/demo.rs", 1),
+        ];
+        let spelling = concat!("env::", "temp_dir");
+        let mut found: Vec<(String, usize)> = Vec::new();
+        for f in &files {
+            let text = std::fs::read_to_string(f).unwrap_or_else(|e| panic!("cannot read {}: {}", f.display(), e));
+            if text.lines().any(|l| l.trim() == "#![cfg(test)]") || f.ends_with("usage_tests.rs") {
+                continue;
+            }
+            let n = shipped_scope(&text).matches(spelling).count();
+            if n > 0 {
+                let rel = f.strip_prefix(&src).expect("under src").display().to_string().replace('\\', "/");
+                found.push((rel, n));
+            }
+        }
+        found.sort();
+        let mut want: Vec<(String, usize)> = declared.iter().map(|(p, n)| (p.to_string(), *n)).collect();
+        want.sort();
+        assert_eq!(
+            found, want,
+            "a shipped module reads the system temp dir itself — a capture or sandbox there escapes \
+             the run scratch a runner holds and the private TMPDIR/TMP a member is handed. Take \
+             proc::temp_base(), or state in the owning SPEC why the system temp dir is correct and \
+             add the site here"
         );
     }
 

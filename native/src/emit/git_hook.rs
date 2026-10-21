@@ -177,7 +177,7 @@ fn run_over(hook: &Hook, paths: &[String]) -> Result<(i32, String, usize), Strin
     let verbose = std::env::var("GATE_SDK_VERBOSE").is_ok_and(|v| !v.is_empty());
     let mut out = String::new();
     let code = report(hook.name(), &d, &selected, verbose, &mut out);
-    let _ = std::fs::remove_dir_all(&scratch);
+    drop(scratch);
     Ok((code, out, selected.len()))
 }
 

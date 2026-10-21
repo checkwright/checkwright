@@ -173,6 +173,8 @@ pub(super) fn declare(part: Option<u8>) {
 // tree the run packs is clean
 pub(super) fn preflight(state: &mut Run) -> Step {
     state.root = walk::toplevel().map_err(refuse)?;
+    // spec: installer/SPEC.md §The consumer smoke — the system temp dir is the last fallback because
+    // the scratch consumer lies outside the repository under test, never in its run scratch
     let base = undeclared("INSTALLER_SMOKE_TMP_DIR")
         .or_else(|| undeclared("TMPDIR"))
         .unwrap_or_else(|| std::env::temp_dir().display().to_string());
