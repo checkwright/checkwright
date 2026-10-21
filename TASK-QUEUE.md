@@ -18,29 +18,7 @@
 
 ## New Features
 
-### releases-page-table
-
-[spec: installer/SPEC.md] [not-icebox-eligible: 2026-10-07 holds the operator's question of 2026-09-29 and the table shape answering it; evicting it would compress the question away]
-
-docs/releases.md renders its derived note list as a bare list of version links, which repeats the nav: the page carries `nav_children_key: release`, so the nav already lists every note. Operator question, 2026-09-29, lead-relayed: a stats table instead.
-
-**Deliverable:** a derived table whose columns answer an upgrader, above all whether a release needs action on upgrade (a `gates` bullet, or a knob rename or removal); also version, date, bump class and per-section counts. It is a generated marker block a freshness gate holds to the notes, not per-note front-matter keys, which would hand-copy each note's sections; parsing sections in Liquid at render time stays refused as fragile. The amendment owns the design.
-
-**Push need (2026-10-21, inside the budget):** the same mid-iteration push as run-scratch-temp-residue's, whose `pages-build-deployment` publishes the table; `check-docs-render-fidelity` renders it locally first.
-
-**Cost while deferred:** a reader skipping several versions opens each note to learn which need action. Filed 2026-09-29 by companion-technical-gates' lead, at the operator's leave. Re-verified 2026-10-21 at spec: the page's `<ul>` loop and 31 notes carrying `release:`. Owner lookup: `releases.md`, `front-matter` in this file — none; owner docs/site-architecture.md, with installer/SPEC.md §The upgrade contract for the table.
-
 ## Technical Debt
-
-### run-scratch-temp-residue
-
-The run scratch now roots under `GATE_SDK_TMP_DIR` (gate-sdk/SPEC.md §run-gates, per-gate scratch isolation), but production `std::env::temp_dir()` sites still write the system temp dir, across guard-kit's decision-table sandbox, context-kit's index tests, the front-end parity arm, the installer smoke, a gate's work dir and `proc.rs`'s captures in a top-level arm's own process; the set is the grep below, never this list. On Windows a compiled member's temp lookup reads `TMP`, not the `TMPDIR` the runner binds, so every member capture stays at the system temp dir there.
-
-**Deliverable:** route each production site through the run's scratch root, or state per site why the system temp dir is correct, and bind `TMP` beside `TMPDIR` for a Windows child; drop the honest-limit sentence that names the `TMP` residue.
-
-**Push need (2026-10-21, inside the budget):** the iteration's one mid-iteration push, since `crate-tests-windows`' front-end-parity and guard-tests steps run the `TMP` binding before any local run can.
-
-**Cost while deferred:** one small transient tree or capture per run outside the tmp dir's one-component bound, on a tmpfs system temp dir. Filed 2026-10-21 by guard-grant-shrink-pass' close. Re-verified there: `grep -rn 'temp_dir()' native/src`, read for each hit above its file's first `#[cfg(test)]` outside a test-only module. Owner lookup: `temp_dir`, `system temp` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
 
 ## Deferred
 
@@ -970,4 +948,6 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 - wait-loop-trailing-read-block
 - tmp-dir-prune-coupling
+- run-scratch-temp-residue
+- releases-page-table
 
