@@ -1349,7 +1349,7 @@ Each role fixes its lead-token rule, whether it bears a declaration, and whether
 | `platforms` | backticked target triple | yes | yes |
 | `behavior` | bolded | yes | yes |
 
-**Two former headings stay readable for good.** `GATE_SDK_RELEASE_SECTION_ALIASES` takes the same element grammar and defaults to `gates: Tightened gates` and `knobs: Renamed knobs`. A reader finds a section under its heading or any alias. The gates section is machine-read on published notes: `check-tightened-gates-grammar` walks every note, the upgrade smoke reads `TO`'s note out of `TO`'s archive, and `check-release-bump` counts the newest note's sections. A published note cannot be migrated, and the smoke takes any historical pair, so an alias is permanent rather than a window. The smoke resolves both knobs in the invoking tree, so an archived note is read under today's headings and aliases.
+**Two former headings stay readable for good.** `GATE_SDK_RELEASE_SECTION_ALIASES` takes the same element grammar and defaults to `gates: Tightened gates` and `knobs: Renamed knobs`. A reader finds a section under its heading or any alias. The gates section is machine-read on published notes: `check-tightened-gates-grammar` walks every note, the upgrade smoke reads `TO`'s note out of `TO`'s archive, `check-release-bump` counts the newest note's sections, and the releases table counts every note's (§The releases table). A published note cannot be migrated, and the smoke takes any historical pair, so an alias is permanent rather than a window. The smoke resolves both knobs in the invoking tree, so an archived note is read under today's headings and aliases.
 
 The validator refuses at exit 2 where the knob file is read; its refusals are gate-sdk/SPEC.md §Layout and configuration's. Every reader learns a section's names from one resolver, `release_sections::roster()`, and none carries a section literal.
 
@@ -1385,6 +1385,23 @@ The validator refuses at exit 2 where the knob file is read; its refusals are ga
 Those four residue classes map onto the sections by design: **shadowed and custom gates** → New and tightened gates plus Gate-authoring changes; **own-config knob renames and removals** → Knob changes; **copied-out templates and depended-on behavior** → Behavior changes. The copied-out-template class earns no section of its own because a template you have copied out that then changed *is* depended-on behavior diverging from your copy — it is behavior-folded, not dropped. A template `init` seeded that you never edited is the one exception, because `init` rewrites it on upgrade: you take the change rather than diverge from it. So a change that tightens a gate through such a template is declared under New and tightened gates as well.
 
 Honest limit on Behavior changes: **its bullets are declared for the human upgrader, not smoke-asserted.** A non-gate change cannot red the battery, so the upgrade smoke's containment assertion, defined over battery reds, does not read this section. The section fixes where such changes are stated, and `check-release-bump` that they are stated, but neither makes them executable. Gates-section bullets stay the mechanical allowed-red set; behavior-changes bullets are reconciled by reading.
+
+### The releases table
+
+`docs/releases.md` carries one row per release note, between `<!-- release-table:begin -->` and `<!-- release-table:end -->` with a blank line inside each marker. `bash gate-sdk/bin/run-gates.sh --emit release-table` prints the block, and `--write` rewrites it and touches nothing else. A note is a file under `GATE_LOCAL_RELEASE_POSTS_DIR` carrying a non-empty `release:` key, so a note joins the table as it joins the nav. The page is `GATE_LOCAL_RELEASES_PAGE`.
+
+- **Rows** run newest first, ordered by version as `check-release-bump` orders notes (§Versioning).
+- **The header** is `| Release | Date | Bump | Action on upgrade |`, then the heading of each declaration-bearing roster role, in roster order.
+- **Release** is the note's `release:` value, linked to the note by its path relative to the page.
+- **Date** is the `YYYY-MM-DD` that opens the note's filename.
+- **Bump** is the highest component that moved from the next-older row, `major`, `minor` or `patch`, and `—` on the oldest row.
+- **Action on upgrade** is `yes` where the note's `gates` section carries a bullet, or its `knobs` section carries a rename or removal: a bullet carrying `→` anywhere after its lead token, so a removal naming several knobs before one arrow counts. Otherwise it is `no`. A knob addition asks nothing of an upgrader, so it does not set the flag.
+- **A count cell** is the bullet count of that role's section, found under its heading or an alias, counted as the summary table counts it. A `None` body is `0`, and `—` marks a note carrying no such section because it was published before the section existed.
+- **Exit 2**, from the arm and from its gate, on an unreadable posts dir, note or page. It also exits 2 on a `release:` value outside `check-release-bump`'s version grammar, two notes carrying one version, a note filename not opening with a date, a roster the validator refuses, and a block that is absent or occurs twice.
+
+`check-release-table-fresh` (this repo's `scripts/`) compares the page's block with the arm's rendering in process. A stale block is one finding, and it prints the regen command. Its positional form is `check-release-table-fresh [posts-dir page]`, so a fixture tree stands in.
+
+The table is generated rather than maintained. Liquid would have to re-parse each note's sections at render time, and counts the composing session wrote into a note's front matter would be a hand-kept copy of its sections. The arm reads them through the declaration holder every release gate reads, so the table and the gates cannot disagree on what a section holds.
 
 ## Docs
 
