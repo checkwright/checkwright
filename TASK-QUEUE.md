@@ -946,8 +946,3 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 ## Done
 
-- wait-loop-trailing-read-block
-- tmp-dir-prune-coupling
-- run-scratch-temp-residue
-- releases-page-table
-

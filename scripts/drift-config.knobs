@@ -8,7 +8,7 @@ DRIFT_KIT_PRICE_PAGE_CMD[] = curl
 DRIFT_KIT_PRICE_PAGE_CMD[] = -fsSL
 DRIFT_KIT_PRICE_PAGE_CMD[] = https://platform.claude.com/docs/en/about-claude/pricing.md
 DRIFT_KIT_PRICE_PAGE_SECTION = ## Model pricing
-# spec: drift-kit/SPEC.md §The manual-operation meter — this repo's ordinary work: its read-only inspection shapes, its scratch mkdir, its commit, its push watch, its liveness wait, its crate build and test, its gate door under each spelling and redirect, its queue file, which every stage edits, and its release declaration surface, which every landing session appends to by hand, each spelled as the ranking key spells it
+# spec: drift-kit/SPEC.md §The manual-operation meter — this repo's ordinary work: its read-only inspection shapes, its scratch mkdir, its commit, its push watch, its liveness wait, its crate build and test, its gate door under each spelling and redirect, its queue file, which every stage edits, its release declaration surface, which every landing session appends to by hand, its scratch and liveness-record removal, and its hop into the crate dir, each spelled as the ranking key spells it
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = grep
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = cat
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = git commit
@@ -49,3 +49,6 @@ DRIFT_KIT_MANUAL_OPS_IGNORE[] = python3 -
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = cat >
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = gh auth
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = git tag
+DRIFT_KIT_MANUAL_OPS_IGNORE[] = printf >>
+DRIFT_KIT_MANUAL_OPS_IGNORE[] = rm
+DRIFT_KIT_MANUAL_OPS_IGNORE[] = cd
