@@ -18,6 +18,18 @@
 
 ## New Features
 
+### releases-page-table
+
+[spec: SPEC-releases-table.md] [not-icebox-eligible: 2026-10-07 holds the operator's question of 2026-09-29 and the table shape answering it; evicting it would compress the question away]
+
+docs/releases.md renders its derived note list as a bare list of version links, which repeats the nav: the page carries `nav_children_key: release`, so the nav already lists every note. Operator question, 2026-09-29, lead-relayed: a stats table instead.
+
+**Deliverable:** a derived table whose columns answer an upgrader, above all whether a release needs action on upgrade (a `gates` bullet, or a knob rename or removal); also version, date, bump class and per-section counts. It is a generated marker block a freshness gate holds to the notes, not per-note front-matter keys, which would hand-copy each note's sections; parsing sections in Liquid at render time stays refused as fragile. The amendment owns the design.
+
+**Push need (2026-10-21, inside the budget):** the same mid-iteration push as run-scratch-temp-residue's, whose `pages-build-deployment` publishes the table; `check-docs-render-fidelity` renders it locally first.
+
+**Cost while deferred:** a reader skipping several versions opens each note to learn which need action. Filed 2026-09-29 by companion-technical-gates' lead, at the operator's leave. Re-verified 2026-10-21 at spec: the page's `<ul>` loop and 31 notes carrying `release:`. Owner lookup: `releases.md`, `front-matter` in this file — none; owner docs/site-architecture.md, with installer/SPEC.md §The upgrade contract for the table.
+
 ## Technical Debt
 
 ### tmp-dir-prune-coupling
@@ -167,18 +179,6 @@ the operator states that verification and workflow are fully decoupled, each shi
 **Deliverable:** a ruling on whether the gate binary is verification or substrate both halves share; if the decoupling then holds, the front door and docs/kits.md state it, and a workflow-only profile is weighed.
 
 **Cost while deferred:** the front door neither claims nor refutes a decoupling the operator believes in, and docs/kits.md reads as a dependency chain. Filed 2026-09-28 by plugin-marketplace-queue-verbs' lead. Re-verified: the three profiles' rows and comments in `installer/profiles.list`, and docs/kits.md line 13. Owner lookup: `decoupl`, `profiles.list`, `workflow-only` in this file — none; owner installer/SPEC.md §Profiles, with docs/kits.md.
-
-### releases-page-table
-
-[cost: event/low] [surface: docs] [not-icebox-eligible: 2026-10-07 holds the operator's question of 2026-09-29 and the table shape answering it; evicting it would compress the question away]
-
-docs/releases.md renders its derived note list as a bare list of version links, which repeats the nav: the page carries `nav_children_key: release`, so the nav already lists every note. Operator question, 2026-09-29, lead-relayed: a stats table instead.
-
-**Deliverable:** a derived table whose columns answer an upgrader, above all whether a release needs action on upgrade (its `gates` or `knobs` role section carries entries, roles per installer/SPEC.md §The upgrade contract); also version, date, bump class and per-section counts, which each note's In brief summary table already states. The note composer writes the counts and the action flag as front-matter keys and a gate holds them equal to the note's sections; parsing sections in Liquid at render time is refused as fragile.
-
-**Push need (2026-10-21, inside the budget):** the same mid-iteration push as run-scratch-temp-residue's, since only `pages-build-deployment` renders the table's Liquid.
-
-**Cost while deferred:** a reader skipping several versions opens each note to learn which need action. Filed 2026-09-29 by companion-technical-gates' lead, at the operator's leave. Re-verified: the page's `<ul>` loop and 29 notes carrying `release:`. Owner lookup: `releases.md`, `front-matter` in this file — none; owner docs/site-architecture.md, with installer/SPEC.md §The upgrade contract for the keys.
 
 ### front-door-job-observed
 
