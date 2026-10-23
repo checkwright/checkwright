@@ -83,6 +83,7 @@
 6808cp docs/posts/2026-09-29-checkwright-v0-30-0.md
 4672cp docs/posts/2026-09-30-checkwright-v0-31-0.md
 166603cp docs/posts/2026-10-23-checkwright-v0-32-0.md
+1788cp docs/posts/2026-10-24-checkwright-v0-32-1.md
 7064cp docs/projection-fan-outs.md
 1460cp docs/queue-kit/index.md
 8795cp docs/requirements.md
