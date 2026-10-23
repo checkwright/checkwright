@@ -46,14 +46,6 @@ v0.32.0 is cut, so the restoration `tarball-attestation-observed` recorded is ow
 
 **Cost while deferred:** the front door omits the step that shows the guarantee on the adopter's own tree, and an OpenSpec reader meets no overlap recipe. Surfaced 2026-10-23 at foreign-harness-write-path-pass' close. Owner lookup: `overlap/line`, `prove` in this file and the disposed-findings record, none; owner installer/SPEC.md §prove, with companion/SPEC.md §The OpenSpec overlap.
 
-### selection-probe-bare-auth
-
-the selection probe's claude binding (`scripts/drift-config.knobs`, `DRIFT_KIT_SELECTION_AGENTS[claude] = claude -p --bare …`) reads Anthropic auth under `--bare` strictly from `ANTHROPIC_API_KEY` or an apiKeyHelper passed through `--settings`, never OAuth or the keychain, and nothing on the binding says so.
-
-**Deliverable, debt (operator direction 2026-10-24, lead-relayed, not a ruling: keep `--bare`):** the binding's `# spec:` comment states that requirement, worded from `claude --help`'s own text, which also lists what `--bare` skips: hooks from settings and plugins, LSP, plugin sync, auto-memory, keychain reads and CLAUDE.md auto-discovery. The help text names no further user-settings skip, so the comment claims none.
-
-**Cost while deferred:** an OAuth-only operator's first live run reads the claude row `failed`. Surfaced 2026-10-23 at foreign-harness-write-path-pass' close (build batch 2 read `claude --help`, 65abcc8fb); premise re-measured 2026-10-24 by the lead. Owner lookup: `--bare` in this file and the disposed-findings record, none; owner drift-kit/SPEC.md §The agent-selection probe, the binding being this repo's.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -929,4 +921,6 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
+
+- selection-probe-bare-auth
 

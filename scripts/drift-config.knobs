@@ -53,6 +53,7 @@ DRIFT_KIT_MANUAL_OPS_IGNORE[] = printf >>
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = rm
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = cd
 # spec: drift-kit/SPEC.md §The agent-selection probe — this repo's agents, prompts and subject; run it by hand, never from a battery, hook or stage: before a scope weighs an entry whose cost-while-deferred names the probe, and again after that entry's change publishes
+# --bare reads Anthropic auth strictly from ANTHROPIC_API_KEY or an apiKeyHelper via --settings (OAuth and keychain are never read), and skips hooks from settings and plugins, LSP, plugin sync, auto-memory, keychain reads and CLAUDE.md auto-discovery (claude --help)
 DRIFT_KIT_SELECTION_AGENTS[claude] = claude -p --bare --no-session-persistence
 DRIFT_KIT_SELECTION_AGENTS[codex] = codex exec --skip-git-repo-check
 DRIFT_KIT_SELECTION_AGENTS[agy] = agy -p
