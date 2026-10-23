@@ -14,6 +14,20 @@
 
 ## New Features
 
+### npx-native-windows-route
+
+[spec: SPEC-npx-windows-route.md]
+
+the package route fails on native Windows: v0.32.0's front-door Windows legs ran `npx checkwright@0.32.0 init` to `The system cannot find the path specified.`, since the `checkwright` bin is the sh bootstrap, whose `#!/bin/sh` line npm's `.cmd` shim runs as a literal `/bin/sh`. installer/SPEC.md §Layout sends a native Windows adopter to `checkwright-pwsh`, yet docs/install.md §With Node prints only `npx checkwright init`, and `scripts/ci-front-door.ps1` runs that line.
+
+**Spec-ready:** the amendment's deltas 1 to 8 build (B) and its witness step. Delta 9 is (A), the fallback close builds on a red witness. The Done move lands before the drain stage, with the merge, and close's push watch reads the witness before the tag.
+
+**Shape (operator direction 2026-10-24, lead-relayed, not a ruling):** (B), one `npx` line on every host, conditioned on the `install-smoke-pwsh-windows` witness; if it fails, (A), with PowerShell 7 stated on the page. Spec owns the mechanism.
+
+**Push need (2026-10-24, inside the budget):** the v0.32.1 tag push, the patch release this defect is owed as; the witness rides the closing push.
+
+**Cost while deferred:** a first `npx` install on native Windows fails, and RELEASING.md §The front-door rehearsal owes the fix as the next patch release. Surfaced 2026-10-23 at foreign-harness-write-path-pass' close by the v0.32.0 publish run; not a regression, the job's first run. Owner lookup: `npx`, `checkwright-pwsh` in this file and the disposed-findings record, none; owner installer/SPEC.md §Layout.
+
 ## Technical Debt
 
 ### front-door-npm-visibility-wait
@@ -207,20 +221,6 @@ Cursor and Muse Code are installed on no build machine, so plugin/SPEC.md §The 
 **Deliverable:** install and run each on a machine that has it, turn its cells from read to run, and file any wiring defect.
 
 **Cost while deferred:** two tier-2 harnesses' skill load and guard reach rest on vendor docs. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: neither CLI on the build machine's PATH. Owner lookup: `cursor`, `muse` in this file, none; owner plugin/SPEC.md §The harnesses.
-
-### npx-native-windows-route
-
-[cost: event/high] [surface: installer]
-
-the package route fails on native Windows: v0.32.0's front-door Windows legs ran `npx checkwright@0.32.0 init` to `The system cannot find the path specified.`, since the `checkwright` bin is the sh bootstrap, whose `#!/bin/sh` line npm's `.cmd` shim runs as a literal `/bin/sh`. installer/SPEC.md §Layout sends a native Windows adopter to `checkwright-pwsh`, yet docs/install.md §With Node prints only `npx checkwright init`, and `scripts/ci-front-door.ps1` runs that line.
-
-**Design-pending, a feature:** the route is a governed contract (installer/SPEC.md §Layout and §The front door's verbs). Two shapes, unmeasured on a Windows runner. (A) The page and the driver spell the pwsh entry on Windows; its `#!/usr/bin/env pwsh` line makes the shim run `pwsh`, PowerShell 7, which docs/requirements.md's Windows floor (Windows PowerShell 5.1) does not carry, and `check-front-door-verbs` reads no such route. (B) The sh bootstrap's line becomes `#!/usr/bin/env sh`, so the shim runs `sh` from `PATH`, which the page's `windows-remedy` block already supplies, and the one line holds on every host. Either wants a running witness on `install-smoke-pwsh-windows` before a tag.
-
-**Shape (operator direction 2026-10-24, lead-relayed, not a ruling):** (B), one `npx` line on every host, conditioned on the `install-smoke-pwsh-windows` witness; if it fails, (A), with PowerShell 7 stated on the page. Spec owns the mechanism.
-
-**Push need (2026-10-24, inside the budget):** the v0.32.1 tag push, the patch release this defect is owed as; the witness rides the closing push.
-
-**Cost while deferred:** a first `npx` install on native Windows fails, and RELEASING.md §The front-door rehearsal owes the fix as the next patch release. Surfaced 2026-10-23 at foreign-harness-write-path-pass' close by the v0.32.0 publish run; not a regression, the job's first run. Owner lookup: `npx`, `checkwright-pwsh` in this file and the disposed-findings record, none; owner installer/SPEC.md §Layout.
 
 ### front-door-patch-observed
 
