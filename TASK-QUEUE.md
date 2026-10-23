@@ -886,6 +886,3 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 ## Done
 
-- tarball-attestation-observed
-- front-door-job-observed
-
