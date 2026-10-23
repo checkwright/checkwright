@@ -194,6 +194,20 @@ the observe half of `npx-native-windows-route` and `front-door-npm-visibility-wa
 
 **Cost while deferred:** both fixes stay unobserved on the published bytes until the run is read. Filed 2026-10-24 by front-door-patch-pass' scope. Owner lookup: the two produce halves, none further; owner RELEASING.md §The front-door rehearsal.
 
+### personal-adoption
+
+[cost: event/low] [surface: installer] [not-icebox-eligible: 2026-10-24 operator direction wants it for the next scope; evicting it would compress that direction away]
+
+a developer wants Checkwright's gates and workflow for their own work in a repository whose project does not adopt it. Uncovered today: `init` vendors the kits in one commit and refuses an unclean worktree (installer/SPEC.md §init); docs/choosing.md frames the fit as a team's; `prove` refuses a tree with no install lock (§prove). Per-clone pieces exist: the hooks are placed, never tracked, and `init --no-commit` skips the commit.
+
+**Operator direction 2026-10-24, on consult advice, lead-relayed, not a ruling:** worth building for the verification half, and not as an untracked overlay for the workflow half. Recommended shape: an `init --personal` arm making an untracked per-clone overlay, the lock roster and the gates directory written to `.git/info/exclude` as a marker-bounded block on the `.gitattributes` precedent, staging and the commit skipped since `git add` refuses an excluded path, hooks placed as today, `uninstall` dropping the block. Grounds: every gate reads the project's tracked content wherever the kits sit, the hooks are already per clone, the exclude set derives from the lock so no kit literal names a layout, and it is git-only on every OS with zero tracked footprint.
+
+**Refused on that advice:** a sibling directory outside the repository, since `GATE_SDK_ROOT` and `GATE_SDK_GATES_DIR` are env-only locators a placed hook cannot read and a kit root outside the toplevel is no pathspec, so the tracked-corpus readers go vacuous (gate-sdk/SPEC.md §Layout and configuration); and the workflow half as untracked state, since every stamp is committed and names its commit, the stage gates fire at the precommit tier on staged files, and lifecycle-kit/SPEC.md §Multi-operator semantics rules per-operator state files out. The workflow half rides git topology instead: `init` as today on a personal branch or fork, plus an export keeping commits that touch only lock-roster and workflow paths out of an upstream pull request, a costed arm, design-pending.
+
+**Deliverable:** design-pending, a feature. First a ruling on [verify-workflow-decoupling](#verify-workflow-decoupling), which this composes with as its first consumer: the halves part on tracking, not on the binary, which stays shared substrate. Then the overlay arm, the front door stating the overlay has no project CI, the inner two tiers only (gate-sdk/SPEC.md §Enforcement tiers). Copying the roster into `prove`'s clone, which reads HEAD, is a costed widening.
+
+**Cost while deferred:** a developer on a non-adopting project can use Checkwright only by vendoring into a tree they do not own. Filed 2026-10-24 by front-door-patch-pass' close, draining two gap bullets. Re-verified there: 37 crate modules name `ls-files`; §init's clean-tree clause and `--no-commit` valve; §prove's lockless refusal; the two env-only locators. Owner lookup: `personal`, `overlay`, `info/exclude` in this file and the disposed-findings record, none; owner installer/SPEC.md.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
