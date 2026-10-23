@@ -1060,6 +1060,15 @@ A **harness-integration arm** is a non-gate arm whose named caller is the **codi
 
 **`--hook <member>` takes the member name as argv, never the hook event name.** The harness settings file scopes hooks by matcher inside an event (§The hook contract). A before-tool-call event carrying several matcher groups need not have interchangeable members: a shell member and a ported member may sit in one group. An event-named arm would have to re-derive the matcher from the payload, would fire on every tool call rather than the matched ones, and could not express that mixture. The member name makes the port a one-for-one substitution of the wiring's program and leaves every matcher untouched.
 
+**`--hook <member> --binding <name>` reaches a member through a foreign binding's adapter.** `<name>` comes from the crate's closed set, `antigravity` alone, and without the token the arm speaks the shipped binding. The adapter reads the payload whole, translates it into the shipped binding's shape, and runs `--hook <member>` as a child of the same binary, in the tree the arm entered, on the translated payload. It answers in its own binding's envelope (§The hook contract, the Antigravity table):
+
+- **The payload.** The event is before-tool-call, and the working directory is the first workspace path. A shell call becomes the bash shell tool carrying the command, and a write call becomes the file-write tool carrying the written path. Any other tool is handed on under its own name, with neither. A payload without a tool call is handed on as no payload, the member's degraded input.
+- **The verdict.** A child's block, exit 2, is a deny whose reason is the child's stderr. Every other outcome is no decision: a grant, a rewrite, an advise, a notice, a decline and a failure to spawn. The child's stdout is never forwarded.
+- **A grant is withheld**, because each rests on a model of the shipped binding's permission matcher, the ground on which guard-kit grants nothing on the PowerShell tool (guard-kit/SPEC.md §The generic ruleset).
+- **The adapter always exits 0**, since a foreign binding may fail a call on any other status. An unknown or missing `<name>` is still exit 2 with the set named, on the shape of the unknown-member refusal.
+
+The adapter self-spawns rather than translating in process because the members print their envelopes at many sites. The child keeps every member, envelope and spelling of the shipped binding as its single copy, and the adapter is a pure pair of translations a unit test reaches without any member. It costs one process per guarded call. Its honest limit is that an advise reaches nobody: no channel was found that leaves the call to proceed and reaches the model. The hooks page documents a `reason` beside every decision and the `ask` and `overwrite` fields, and no run tried an `allow` carrying a `reason` or either field, so a channel may exist.
+
 **Two shapes are refused.** *One arm per member* is refused because arms speaking one protocol share one named caller, so the class rule is met once. A per-member spelling would also put a second copy of the crate's roster into the front-end's grammar. *Hooks stay shell as a class* is refused because a per-hook bash file is the duplicate a second-platform port has to write twice.
 
 **The channels.**
@@ -1121,7 +1130,7 @@ Three readers call it: `check-settings-paths` (context-kit/SPEC.md §check-setti
 
 #### The hook contract
 
-Every hook member speaks one contract, stated here in **roles**. A harness reaches it through a **binding**, its spelling of each role. Kit prose names the role and cites this section, and the binding table below is the one place a spelling is written. The kit ships one binding, Claude Code's. A harness speaking it reaches every member unchanged; a harness speaking another protocol is unwired until a binding of its own is built (plugin/SPEC.md §The guards).
+Every hook member speaks one contract, stated here in **roles**. A harness reaches it through a **binding**, its spelling of each role. Kit prose names the role and cites this section, and the binding table below is the one place a spelling is written. The kit ships two bindings. Claude Code's is the one every kit template and registration speaks, and a harness speaking it reaches every member unchanged. Antigravity's reaches the before-tool-call members through an adapter on the arm (§The harness-integration arm). A harness speaking a third protocol is unwired until a binding of its own is built (plugin/SPEC.md §The guards).
 
 - **The events.** *Before-tool-call* fires ahead of a tool call, scoped by the wiring's matcher to the tools a member serves. *Session-start* fires once per session, and never for a dispatched child. *Child-turn-end* fires when a dispatched child ends its turn. The main session's turn end is deliberately unwired (delegation-kit/SPEC.md §The turn-end liveness hook). A member is named by argv, never by its event (§The harness-integration arm).
 - **The tools a matcher names.** The *shell tools*, one per shell reader; the *dispatch tool*; the *message tool*; the *wake tools*; the *file-write tools*; the *search tools* (`GUARD_KIT_SEARCH_TOOLS`).
@@ -1153,6 +1162,20 @@ Every hook member speaks one contract, stated here in **roles**. A harness reach
 **The one copy.** Every reader of a row's spellings, a hook member or any other, takes them from one crate module, `native/src/hook/binding.rs`, which also builds the envelopes and reads the allow list and a shell rule's pattern. Its unit test holds every row and the module to one set of spellings, so a renamed key reds until this table moves with it.
 
 **Honest limits.** The test compares spellings, never the object a row places them in. Test and fixture data spell keys as literal text, and the manual-operation meter's edit-tool roster names tools the table does not. The table names the payloads the members read and not every field a harness sends. It names the permission spellings the kit reads, not the harness's whole permission grammar.
+
+**The binding table, Antigravity.** The adapter's binding: no kit template speaks it, and the plugin's rendering is its one wiring (plugin/SPEC.md §The guards).
+
+- Events: before-tool-call `PreToolUse`, which the payload does not name. <!-- harness-binding: the Antigravity binding table -->
+- Tools: shell `run_command`; file-write `write_file` and `edit_file`, and `write_to_file`, `replace_file_content` and `multi_replace_file_content`. <!-- harness-binding: the Antigravity binding table -->
+- Common payload: `workspacePaths`, the launch directory first; also `conversationId`, `transcriptPath`, `artifactDirectoryPath`, `modelName` and `stepIdx`, unread. <!-- harness-binding: the Antigravity binding table -->
+- Tool call: `toolCall`, carrying `name` and `args`; `args` carries `CommandLine`, and the written path as `Path` or `TargetFile`. <!-- harness-binding: the Antigravity binding table -->
+- Envelopes: block `{"decision":"deny","reason":…}`. No decision is an empty stdout, and every other object, `{}` included, blocks. A non-zero status fails the call. <!-- harness-binding: the Antigravity binding table -->
+- Variables: none. The hook runs in its hook file's directory. <!-- harness-binding: the Antigravity binding table -->
+- Wiring: a `hooks.json` keyed by hook name at the plugin root; `command`, run by `sh -c`, or `cmd /c` on Windows; `timeout`, default 30 seconds. <!-- harness-binding: the Antigravity binding table -->
+
+**Its measured record.** The rows were read off the CLI's embedded hooks documentation and off recorded firings of a plugin's hooks in a workspace-local copy. `write_file`, `edit_file`, `Path` and the payload rows were recorded at `agy` 1.3.4, and a signed-in 1.4.6 session's own toolset carries `write_file` and `edit_file` as its file-write tools. `write_to_file`, `replace_file_content`, `multi_replace_file_content` and `TargetFile` are read off the binary's own tool examples and system text at 1.4.6; that session's toolset carries none of them, so none has fired. The table has no transcript, permission-rule, child or turn-end row: the adapter serves before-tool-call members alone, and no member it serves reads those roles.
+
+**Its one copy** is `native/src/hook/antigravity.rs`, which also holds both translations. Its unit test holds every row and the module to one set of spellings, as `binding.rs`'s holds the shipped table.
 
 ### The port-candidate criteria
 
@@ -4212,7 +4235,7 @@ The publisher's `check-harness-literal.gate` (`precommit`, binary-dispatched, `#
 
 The `good/`+`bad/` pair: `good/` holds a literal under the valve in both window positions, a file excluded by pathspec that carries one bare, and a member carrying none. `bad/` holds a bare literal, an empty-reason valve, one closed mid-line and a valve one line too far away. `check-harness-literal.test.sh` holds what the pair cannot: each disabled clean in its own sentence, the same knobs finding the literal once set, a literal carrying pattern syntax read as a fixed string, the binary skip-and-count, a member under a name git quotes and the non-repository fail-close.
 
-Producer of a verdict alone; its consumers are the committing session, on the pre-commit hook and the battery, and the `--run-gate-tests` arm through the pair. Its inputs are the two knobs, each read whole on every run. This repo's tracked gate-sdk knob file sets both, the literals being the binding table's distinctive spellings (§The hook contract). A spelling a byte match cannot tell from prose stays unlisted: the prefix idiom's `:*` ends every bold lead closing on a colon, so its uses are swept by hand. The table and each adapter site reading a listed spelling carry the valve.
+Producer of a verdict alone; its consumers are the committing session, on the pre-commit hook and the battery, and the `--run-gate-tests` arm through the pair. Its inputs are the two knobs, each read whole on every run. This repo's tracked gate-sdk knob file sets both, the literals being both binding tables' distinctive spellings (§The hook contract). A spelling a byte match cannot tell from prose stays unlisted: the prefix idiom's `:*` ends every bold lead closing on a colon, so its uses are swept by hand. The table and each adapter site reading a listed spelling carry the valve.
 
 ### check-projection-roster
 

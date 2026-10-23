@@ -3,6 +3,7 @@
 // gate output contract's. `--hook <member>` is the one dispatching arm of that sub-class.
 use serde_json::Value;
 
+pub mod antigravity;
 pub mod binding;
 pub mod budget;
 pub mod dispatch;
@@ -311,7 +312,36 @@ pub fn run(args: &[String]) -> i32 {
         eprintln!("  help: this binary carries: {}", members().join(", "));
         return 2;
     };
-    f(&read_input())
+    match binding_operand(&args[1..]) {
+        Ok(None) => f(&read_input()),
+        Ok(Some(_)) => antigravity::run(member, read_input().bytes()),
+        Err(given) => {
+            eprintln!(
+                "checkwright-gates: no such hook binding: {} — the hook could not run",
+                given
+            );
+            eprintln!("  help: this binary carries: {}", BINDINGS.join(", "));
+            2
+        }
+    }
+}
+
+// spec: gate-sdk/SPEC.md §The harness-integration arm — the foreign bindings the arm's adapter
+// speaks, a closed set
+pub const BINDINGS: &[&str] = &[antigravity::NAME];
+
+// spec: gate-sdk/SPEC.md §The harness-integration arm — the token after the member: absent is the
+// shipped binding, and a `--binding` naming nothing in the set, or nothing at all, is refused
+fn binding_operand(rest: &[String]) -> Result<Option<&'static str>, String> {
+    if rest.first().map(String::as_str) != Some("--binding") {
+        return Ok(None);
+    }
+    let given = rest.get(1).map(String::as_str).unwrap_or("");
+    BINDINGS
+        .iter()
+        .find(|b| **b == given)
+        .map(|b| Some(*b))
+        .ok_or_else(|| if given.is_empty() { "(none named)".to_string() } else { given.to_string() })
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the payload read whole and parsed once; a read error,
@@ -470,6 +500,10 @@ mod tests {
             Registration::NoOperand
         );
         assert_eq!(
+            registration(&t("bash \"$r/gate-sdk/bin/run-gates.sh\" --hook shell-guard --binding antigravity")),
+            Registration::Member("shell-guard")
+        );
+        assert_eq!(
             registration(&t("bash gate-sdk/bin/run-gates.sh --run")),
             Registration::NotAMember
         );
@@ -483,6 +517,17 @@ mod tests {
         )
         .unwrap();
         assert_eq!(registration(&command_tokens(&exec)), Registration::Member("a b"));
+    }
+
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — no token is the shipped binding, a set
+    // member is its adapter, and an unknown or missing name is refused naming what was given
+    #[test]
+    fn the_binding_token_selects_an_adapter_from_the_closed_set() {
+        let v = |s: &[&str]| s.iter().map(|x| x.to_string()).collect::<Vec<_>>();
+        assert_eq!(binding_operand(&v(&[])), Ok(None));
+        assert_eq!(binding_operand(&v(&["--binding", "antigravity"])), Ok(Some("antigravity")));
+        assert_eq!(binding_operand(&v(&["--binding", "cursor"])), Err("cursor".to_string()));
+        assert_eq!(binding_operand(&v(&["--binding"])), Err("(none named)".to_string()));
     }
 
     // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the computed stamp is the one

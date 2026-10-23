@@ -1,0 +1,15 @@
+{
+  "fixture": {
+    "PreToolUse": [
+      {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "rem=1; p=$(cat); w=$(printf '%s' \"$p\" | sed -n 's/.*\"workspacePaths\"[[:space:]]*:[[:space:]]*\\[[[:space:]]*\"\\([^\"]*\\)\".*/\\1/p'); test -n \"$w\" && r=$(git -C \"$w\" rev-parse --show-toplevel 2>/dev/null) && test -f \"$r/gate-sdk/bin/run-gates.sh\" && command -v bash >/dev/null 2>&1 || exit 0; o=$(cd \"$r\" && printf '%s' \"$p\" | bash gate-sdk/bin/run-gates.sh --hook shell-guard --binding antigravity 2>/dev/null); case \"$o\" in '{\"decision\":\"deny\"'*) printf '%s\\n' \"$o\";; esac; exit 0"
+          }
+        ]
+      }
+    ]
+  }
+}

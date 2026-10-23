@@ -6,7 +6,7 @@ Checkwright's lifecycle stage skills and tool-call guards, packaged as a harness
 
 - **The lifecycle skills:** the stage skills and every other skill Checkwright's own repository binds, under the same names. Each runs its Checkwright template in your repository. Where your repository has a skill of its own that binds that template, it runs yours instead; otherwise it takes each slot's own text as its binding.
 - **The `install` skill**, which chooses a profile with you and runs the one-line install with `init`.
-- **The guards**, in Claude Code only: guard-kit's shell, wakeup and workflow-state guards. Each does nothing in a repository without Checkwright vendored.
+- **The guards**, in Claude Code, and in Antigravity the shell and state-file guards alone: guard-kit's shell, wakeup and workflow-state guards. Each does nothing in a repository without Checkwright vendored.
 
 ## Installing it
 
@@ -24,7 +24,7 @@ codex plugin marketplace add checkwright/checkwright
 codex plugin add checkwright@checkwright
 ```
 
-In Antigravity, from a clone of this repository: `agy plugin install ./plugin`. Codex and Antigravity register the skills and no guard.
+In Antigravity, from a clone of this repository: `agy plugin install ./plugin`. Codex registers the skills and no guard; Antigravity runs the shell and state-file guards, except on native Windows.
 
 Any other Agent Plugins client loads this `plugin/` directory by its own install route; [`plugin/SPEC.md` §The harnesses](SPEC.md#the-harnesses) lists the ones read.
 

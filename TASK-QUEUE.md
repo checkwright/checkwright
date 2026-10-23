@@ -18,14 +18,6 @@
 
 ## New Features
 
-### antigravity-hook-binding
-
-[spec: SPEC-antigravity-binding.md]
-
-a hook binding for the plugin's guards under Antigravity, split off `plugin-harness-reach` (decided 2026-10-18 by the intent oracle). Its protocol differs on every axis: camelCase `toolCall.name`/`args.CommandLine`, matcher `run_command`, a stdout decision `allow`/`deny`/`ask`, a named-hook `hooks.json` at the plugin root. It runs a hook in the plugin dir with no project-dir variable, so a binding needs payload and envelope translation in the `--hook` arm plus project discovery from `workspacePaths` without a launcher script.
-
-**Cost while deferred:** an Antigravity user installing the plugin gets the skills and no guard. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's Antigravity row reads not wired. Owner lookup: `antigravity`, `agy` in this file, none; owner plugin/SPEC.md §The harnesses with gate-sdk/SPEC.md §The hook contract.
-
 ### manifest-count-blank-run-bound
 
 [spec: SPEC-blank-run.md]
@@ -945,4 +937,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 ## Done
 
 - codex-patch-path-residue
+- antigravity-hook-binding
 

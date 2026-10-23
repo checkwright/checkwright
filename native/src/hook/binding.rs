@@ -8,6 +8,8 @@ pub const EVENT_SESSION_START: &str = "SessionStart";
 
 pub const TOOL_BASH: &str = "Bash";
 pub const TOOL_POWERSHELL: &str = "PowerShell";
+pub const TOOL_WRITE: &str = "Write";
+pub const TOOL_EDIT: &str = "Edit";
 
 pub const EVENT_NAME: &str = "hook_event_name";
 pub const SESSION_ID: &str = "session_id";
@@ -75,8 +77,6 @@ pub const UNREAD: &[&str] = &[
     "SendMessage",
     "ScheduleWakeup",
     "CronCreate",
-    "Write",
-    "Edit",
     "Glob",
     "Grep",
     "transcript_path",

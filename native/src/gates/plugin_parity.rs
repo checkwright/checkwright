@@ -4,7 +4,8 @@
 use super::install_pin::{is_triple, pin_of};
 use super::pinned_release::{self, read, Disposition};
 use super::skill_binding::template_of;
-use crate::hook::binding::{COMMAND, PROJECT_DIR_VAR, WIRING_ARGS};
+use crate::hook::antigravity;
+use crate::hook::binding::{COMMAND, EVENT_BEFORE_TOOL_CALL, PROJECT_DIR_VAR, WIRING_ARGS};
 use crate::{fresh, walk};
 use serde_json::{Map, Value};
 use std::collections::BTreeSet;
@@ -33,6 +34,29 @@ fn fail_open() -> String {
 // spec: plugin/SPEC.md §The guards — the shell-form front-end call a member is rendered behind
 fn front_end_call() -> String {
     format!("bash \"${{{}}}/gate-sdk/bin/run-gates.sh\" --hook ", PROJECT_DIR_VAR)
+}
+// spec: plugin/SPEC.md §The guards — the Antigravity command's head: `sh` reads an assignment, and
+// `cmd` runs `rem`, which ignores the rest of the line and prints nothing
+const CMD_COMMENT: &str = "rem=1; ";
+// spec: plugin/SPEC.md §The guards — the Antigravity prefix: the first workspace path read with `sed`,
+// its toplevel asked of git, the front end and `bash` tested, else exit 0 with nothing on stdout
+fn antigravity_prefix() -> String {
+    let w = antigravity::WORKSPACE_PATHS;
+    let read = format!("p=$(cat); w=$(printf '%s' \"$p\" | sed -n 's/.*\"{w}\"[[:space:]]*:[[:space:]]*\\[[[:space:]]*\"\\([^\"]*\\)\".*/\\1/p'); ");
+    // spec: gate-sdk/SPEC.md §The path-dialect contract — shell text the hook's own shell runs, so the
+    // toplevel it names is produced and read there, never in the crate
+    let find = "test -n \"$w\" && r=$(git -C \"$w\" rev-parse --show-toplevel 2>/dev/null) && test -f \"$r/gate-sdk/bin/run-gates.sh\" && command -v bash >/dev/null 2>&1 || exit 0; ";
+    format!("{read}{find}o=$(cd \"$r\" && printf '%s' \"$p\" | bash gate-sdk/bin/run-gates.sh --hook ")
+}
+// spec: plugin/SPEC.md §The guards — the Antigravity suffix: the front end's stdout printed only where
+// it opens with the deny envelope, and exit 0 whatever happened
+fn antigravity_suffix() -> String {
+    format!(
+        " --binding {} 2>/dev/null); case \"$o\" in '{{\"{}\":\"{}\"'*) printf '%s\\n' \"$o\";; esac; exit 0",
+        antigravity::NAME,
+        antigravity::DECISION,
+        antigravity::DECISION_DENY
+    )
 }
 // spec: plugin/SPEC.md §The skills — the Agent Skills bound on a description's length
 const DESCRIPTION_MAX: usize = 1024;
@@ -95,6 +119,60 @@ pub(crate) fn render_hooks(template: &Value) -> Result<Value, String> {
     }
     let mut root = Map::new();
     root.insert("hooks".to_string(), Value::Object(out));
+    Ok(Value::Object(root))
+}
+
+// spec: plugin/SPEC.md §The guards — the composed Antigravity command for one member
+pub(crate) fn antigravity_command(member: &str) -> String {
+    format!("{}{}{}{}", CMD_COMMENT, antigravity_prefix(), member, antigravity_suffix())
+}
+
+// spec: plugin/SPEC.md §The guards — one hook named for the package, one before-tool-call group per
+// template group whose tools have an Antigravity spelling, its matcher those spellings joined by `|`
+pub(crate) fn render_antigravity_hooks(template: &Value, package: &str) -> Result<Value, String> {
+    let groups = template
+        .get("hooks")
+        .and_then(|h| h.get(EVENT_BEFORE_TOOL_CALL))
+        .and_then(Value::as_array)
+        .ok_or_else(|| format!("{} carries no '{}' list under 'hooks'", HOOKS_TEMPLATE, EVENT_BEFORE_TOOL_CALL))?;
+    let mut out = Vec::new();
+    for group in groups {
+        let mut tools: Vec<&str> = Vec::new();
+        for t in group.get("matcher").and_then(Value::as_str).unwrap_or("").split('|') {
+            for s in antigravity::spellings(t) {
+                if !tools.contains(s) {
+                    tools.push(s);
+                }
+            }
+        }
+        if tools.is_empty() {
+            continue;
+        }
+        let mut group = group.clone();
+        if let Some(fields) = group.as_object_mut() {
+            fields.insert("matcher".to_string(), Value::String(tools.join("|")));
+        }
+        for hook in group.get_mut("hooks").and_then(Value::as_array_mut).into_iter().flatten() {
+            let member = match crate::hook::registration(&crate::hook::command_tokens(hook)) {
+                crate::hook::Registration::Member(m) => m.to_string(),
+                _ => {
+                    return Err(format!(
+                        "{} carries a hook that is no member registration, which the plugin has no command for: {}",
+                        HOOKS_TEMPLATE, hook
+                    ))
+                }
+            };
+            if let Some(fields) = hook.as_object_mut() {
+                fields.remove(WIRING_ARGS);
+                fields.insert(antigravity::WIRING_COMMAND.to_string(), Value::String(antigravity_command(&member)));
+            }
+        }
+        out.push(group);
+    }
+    let mut events = Map::new();
+    events.insert(antigravity::EVENT_BEFORE_TOOL_CALL.to_string(), Value::Array(out));
+    let mut root = Map::new();
+    root.insert(package.to_string(), Value::Object(events));
     Ok(Value::Object(root))
 }
 
@@ -383,17 +461,27 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    let hooks_path = format!("{}/{}", plugin, HOOKS);
-    let want_hooks = render_hooks(&json(&hooks_template)?)?;
-    if json(&hooks_path)? != want_hooks {
-        let pretty = serde_json::to_string_pretty(&want_hooks).unwrap_or_default();
-        let shown: Vec<String> = pretty.lines().map(|l| format!("    | {}", l)).collect();
-        findings.push(format!(
-            "  {}: not the rendering of {}; expected, compared as JSON:\n{}",
-            hooks_path,
-            hooks_template,
-            shown.join("\n")
-        ));
+    let template = json(&hooks_template)?;
+    let package = portable.get("name").and_then(Value::as_str).unwrap_or("");
+    for (path, kind, want) in [
+        (format!("{}/{}", plugin, HOOKS), "rendering", render_hooks(&template)?),
+        (
+            format!("{}/{}", plugin, antigravity::HOOK_FILE),
+            "Antigravity rendering",
+            render_antigravity_hooks(&template, package)?,
+        ),
+    ] {
+        if json(&path)? != want {
+            let pretty = serde_json::to_string_pretty(&want).unwrap_or_default();
+            let shown: Vec<String> = pretty.lines().map(|l| format!("    | {}", l)).collect();
+            findings.push(format!(
+                "  {}: not the {} of {}; expected, compared as JSON:\n{}",
+                path,
+                kind,
+                hooks_template,
+                shown.join("\n")
+            ));
+        }
     }
 
     // spec: plugin/SPEC.md §check-plugin-parity — the marketplace installs `plugin/` alone, so its
@@ -458,6 +546,113 @@ mod tests {
         .unwrap();
         assert!(render_hooks(&stray).unwrap_err().contains("no member registration"));
     }
+    // spec: plugin/SPEC.md §The guards — the Antigravity rendering: one hook named for the package,
+    // each group's matcher the Antigravity spellings of its tools, a group with none left out
+    #[test]
+    fn the_antigravity_rendering_maps_each_group_and_drops_a_group_with_no_spelling() {
+        let t: Value = serde_json::from_str(
+            r#"{"//":"note","hooks":{"PreToolUse":[
+                {"matcher":"Bash|PowerShell","hooks":[{"type":"command","command":"${CLAUDE_PROJECT_DIR}/@GATE_SDK_NATIVE_BIN@","args":["--hook","shell-guard"]}]},
+                {"matcher":"ScheduleWakeup|CronCreate","hooks":[{"type":"command","command":"${CLAUDE_PROJECT_DIR}/@GATE_SDK_NATIVE_BIN@","args":["--hook","wakeup-guard"]}]},
+                {"matcher":"Write|Edit","hooks":[{"type":"command","command":"${CLAUDE_PROJECT_DIR}/@GATE_SDK_NATIVE_BIN@","args":["--hook","workflow-state-guard"]}]}
+            ]}}"#,
+        )
+        .unwrap();
+        let want = serde_json::json!({"pkg":{"PreToolUse":[
+            {"matcher":"run_command","hooks":[{"type":"command","command":antigravity_command("shell-guard")}]},
+            {"matcher":"write_file|edit_file|write_to_file|replace_file_content|multi_replace_file_content",
+             "hooks":[{"type":"command","command":antigravity_command("workflow-state-guard")}]}
+        ]}});
+        assert_eq!(render_antigravity_hooks(&t, "pkg").unwrap(), want);
+        let c = antigravity_command("shell-guard");
+        assert!(c.starts_with("rem=1; p=$(cat); "), "{}", c);
+        assert!(c.contains("--hook shell-guard --binding antigravity"), "{}", c);
+        assert!(c.ends_with("exit 0"), "{}", c);
+    }
+
+    // spec: plugin/SPEC.md §The guards — under `sh` the command never fails a call: a payload whose
+    // workspace is no repository exits 0 with nothing on stdout
+    #[cfg(unix)]
+    #[test]
+    fn the_antigravity_command_exits_0_silently_outside_a_repository() {
+        use std::io::Write;
+        let dir = std::env::temp_dir();
+        let payload = serde_json::json!({"workspacePaths":[dir.join("checkwright-no-such-workspace").display().to_string()],
+            "toolCall":{"name":"run_command","args":{"CommandLine":"ls"}}});
+        let mut child = std::process::Command::new("sh")
+            .arg("-c")
+            .arg(antigravity_command("shell-guard"))
+            .stdin(std::process::Stdio::piped())
+            .stdout(std::process::Stdio::piped())
+            .spawn()
+            .expect("sh must spawn");
+        child.stdin.take().unwrap().write_all(payload.to_string().as_bytes()).unwrap();
+        let out = child.wait_with_output().unwrap();
+        assert!(out.status.success());
+        assert!(out.stdout.is_empty(), "{}", String::from_utf8_lossy(&out.stdout));
+    }
+
+    // spec: plugin/SPEC.md §The guards — Go's `syscall.EscapeArg`, the composition of the one argument
+    // `cmd /c` receives
+    #[cfg(windows)]
+    fn go_escape_arg(s: &str) -> String {
+        if s.is_empty() {
+            return "\"\"".to_string();
+        }
+        let has_space = s.contains(' ') || s.contains('\t');
+        if !has_space && !s.contains('"') && !s.contains('\\') {
+            return s.to_string();
+        }
+        let mut out = String::new();
+        if has_space {
+            out.push('"');
+        }
+        let mut slashes = 0;
+        for c in s.chars() {
+            match c {
+                '\\' => {
+                    slashes += 1;
+                    out.push(c);
+                }
+                '"' => {
+                    out.extend(std::iter::repeat('\\').take(slashes + 1));
+                    slashes = 0;
+                    out.push(c);
+                }
+                _ => {
+                    slashes = 0;
+                    out.push(c);
+                }
+            }
+        }
+        if has_space {
+            out.extend(std::iter::repeat('\\').take(slashes));
+            out.push('"');
+        }
+        out
+    }
+
+    // spec: plugin/SPEC.md §The guards — on native Windows `cmd` reads the command as a comment:
+    // exit 0 and nothing on stdout, so the package runs no guard there rather than failing a call
+    #[cfg(windows)]
+    #[test]
+    fn cmd_reads_the_antigravity_command_as_a_comment() {
+        use std::io::Write;
+        use std::os::windows::process::CommandExt;
+        let payload = r#"{"workspacePaths":["C:\\w"],"toolCall":{"name":"run_command","args":{"CommandLine":"dir"}}}"#;
+        let mut child = std::process::Command::new(antigravity::WINDOWS_SHELL)
+            .raw_arg(antigravity::WINDOWS_SHELL_RUN)
+            .raw_arg(go_escape_arg(&antigravity_command("shell-guard")))
+            .stdin(std::process::Stdio::piped())
+            .stdout(std::process::Stdio::piped())
+            .spawn()
+            .expect("cmd must spawn");
+        child.stdin.take().unwrap().write_all(payload.as_bytes()).unwrap();
+        let out = child.wait_with_output().unwrap();
+        assert!(out.status.success(), "cmd exited {:?}", out.status);
+        assert!(out.stdout.is_empty(), "cmd printed: {}", String::from_utf8_lossy(&out.stdout));
+    }
+
     // spec: plugin/SPEC.md §The skills — the front matter's scalars and the body after it
     #[test]
     fn the_front_matter_reader_takes_scalars_and_the_body() {
