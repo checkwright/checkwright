@@ -18,6 +18,48 @@
 
 ## New Features
 
+### antigravity-hook-binding
+
+[spec: SPEC-antigravity-binding.md]
+
+a hook binding for the plugin's guards under Antigravity, split off `plugin-harness-reach` (decided 2026-10-18 by the intent oracle). Its protocol differs on every axis: camelCase `toolCall.name`/`args.CommandLine`, matcher `run_command`, a stdout decision `allow`/`deny`/`ask`, a named-hook `hooks.json` at the plugin root. It runs a hook in the plugin dir with no project-dir variable, so a binding needs payload and envelope translation in the `--hook` arm plus project discovery from `workspacePaths` without a launcher script.
+
+**Cost while deferred:** an Antigravity user installing the plugin gets the skills and no guard. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's Antigravity row reads not wired. Owner lookup: `antigravity`, `agy` in this file, none; owner plugin/SPEC.md §The harnesses with gate-sdk/SPEC.md §The hook contract.
+
+### codex-patch-path-residue
+
+[spec: SPEC-patch-paths.md]
+
+Codex's patch tool matches `Write|Edit` but carries the patch as `tool_input.command` with no `file_path`, and `workflow-state-guard` allows on an empty path (`native/src/hook/workflow_state.rs`), so once Codex discovers the plugin's hooks a Codex session could hand-write the stage state file.
+
+**Deliverable:** read the patch's file headers for the written paths, or state why not, designed with [antigravity-hook-binding](#antigravity-hook-binding)'s write-tool reader as one `--hook` arm reader for a foreign write payload's path; then plugin/SPEC.md's Codex limit narrows.
+
+**Cost while deferred:** none until Codex discovers plugin hooks; from then, a Codex session's write to the state file passes the guard. Filed 2026-10-23 by foreign-harness-write-path-pass' scope as a split, operator-directed, from [codex-plugin-hook-discovery](#codex-plugin-hook-discovery), filed 2026-10-18 by harness-reach-pass' close. Re-verified 2026-10-23: `workflow_state.rs` line 24 allows on an empty path. Owner lookup: the parent's; owner lifecycle-kit/SPEC.md §check-stage-entry, with plugin/SPEC.md §The guards.
+
+### manifest-count-blank-run-bound
+
+[spec: SPEC-blank-run.md]
+
+`check-manifest-count` arm B reads a lead-in's list only past at most one blank line (canon-kit/SPEC.md §check-manifest-count states the bound), so a lead-in, two blank lines, then a list is silently unread, though Markdown reads a blank run as one separator. A fail-open on an adopter's prose; this tree never double-blanks.
+
+**Deliverable:** the bound widened to a blank run in the SPEC and the reader, with a bad-fixture case; a stated-contract change, so it rides an amendment.
+
+**Cost while deferred:** a miscounted lead-in behind a blank run passes unread. Surfaced 2026-10-18 by session-sweep-policy-pass' close (baked-calibration audit), promoted at the next scope's carried-bullet intake. Re-verified there: the reader's single-blank skip. Owner lookup: `manifest-count`, `manifest_count`, `lead_ins`, `blank run` in this file and the disposed-findings record found none; owner canon-kit/SPEC.md §check-manifest-count.
+
+### agent-selection-probe
+
+[spec: SPEC-selection-probe.md]
+
+surface (e) of `evaluator-agent-discovery`, split off at evaluator-discovery-pass' scope (operator direction 2026-10-17, lead-relayed, not a ruling): a repeatable cold agent-selection probe asking foreign agent CLIs and a fresh session, context-free, for a tool verifying coding-agent claims before merge, recording whether Checkwright appears.
+
+**Why split rather than built:** each run buys foreign-CLI credit, which has already walled a granted second-vendor run, and an agent's answer moves on its own index and training clock rather than this tree's, so a run in the iteration landing the evaluator surfaces measures their absence.
+
+**Deliverable:** the prompt set, the agents asked, the record's home and form, and the cadence, which the amendment designs as a drift-kit arm off by default, with this repository's binding.
+
+**Inferred, cannot run before build:** that an evaluating agent reading `CLAUDE.md` forms a worse impression — the probe this entry builds is what measures it, and its first run is the operator's.
+
+**Cost while deferred:** whether the evaluator surfaces change what an agent recommends stays unmeasured. Filed 2026-10-17 by evaluator-discovery-pass' scope as a split remainder. Owner lookup: the parent's, `llms`, `AGENTS.md`, `evaluator`, `keywords` in this file and the disposed-findings record, none; owner drift-kit/SPEC.md, beside [design-partner-preview](#design-partner-preview)'s observation record.
+
 ## Technical Debt
 
 ## Deferred
@@ -184,30 +226,6 @@ surface (c) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 
 **Cost while deferred:** a cloning agent's first read is maintainer-internal instructions; whether that costs a recommendation is unmeasured until [agent-selection-probe](#agent-selection-probe) runs. Filed 2026-10-17 by evaluator-discovery-pass' scope as a split remainder. Re-verified there: no root `AGENTS.md`. Owner lookup: the parent's, none; owner gate-sdk/SPEC.md §check-root-tiering.
 
-### agent-selection-probe
-
-[cost: event/low] [surface: drift-kit]
-
-surface (e) of `evaluator-agent-discovery`, split off at evaluator-discovery-pass' scope (operator direction 2026-10-17, lead-relayed, not a ruling): a repeatable cold agent-selection probe asking foreign agent CLIs and a fresh session, context-free, for a tool verifying coding-agent claims before merge, recording whether Checkwright appears.
-
-**Why split rather than built:** each run buys foreign-CLI credit, which has already walled a granted second-vendor run, and an agent's answer moves on its own index and training clock rather than this tree's, so a run in the iteration landing the evaluator surfaces measures their absence.
-
-**Deliverable:** design-pending, a feature: the prompt set, the agents asked, the record's home and form, and the cadence.
-
-**Inferred, not run:** that an evaluating agent reading `CLAUDE.md` forms a worse impression; this probe measures it.
-
-**Cost while deferred:** whether the evaluator surfaces change what an agent recommends stays unmeasured. Filed 2026-10-17 by evaluator-discovery-pass' scope as a split remainder. Owner lookup: the parent's, `llms`, `AGENTS.md`, `evaluator`, `keywords` in this file and the disposed-findings record, none; owner drift-kit/SPEC.md, beside [design-partner-preview](#design-partner-preview)'s observation record.
-
-### manifest-count-blank-run-bound
-
-[cost: event/low] [surface: canon-kit]
-
-`check-manifest-count` arm B reads a lead-in's list only past at most one blank line (canon-kit/SPEC.md §check-manifest-count states the bound), so a lead-in, two blank lines, then a list is silently unread, though Markdown reads a blank run as one separator. A fail-open on an adopter's prose; this tree never double-blanks.
-
-**Deliverable:** the bound widened to a blank run in the SPEC and the reader, with a bad-fixture case; a stated-contract change, so it rides an amendment.
-
-**Cost while deferred:** a miscounted lead-in behind a blank run passes unread. Surfaced 2026-10-18 by session-sweep-policy-pass' close (baked-calibration audit), promoted at the next scope's carried-bullet intake. Re-verified there: the reader's single-blank skip. Owner lookup: `manifest-count`, `manifest_count`, `lead_ins`, `blank run` in this file and the disposed-findings record found none; owner canon-kit/SPEC.md §check-manifest-count.
-
 ### codex-plugin-hook-discovery
 
 [cost: event/high] [surface: plugin]
@@ -218,16 +236,6 @@ surface (e) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 
 **Cost while deferred:** a Codex adopter gets the skills and no shell, wakeup or workflow-state guard. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's Codex row and limits. Re-probed 2026-10-23: `codex-cli` on PATH is still 0.163.0. Owner lookup: `codex`, `apply_patch` in this file and the disposed-findings record, none; owner plugin/SPEC.md §The harnesses.
 
-### codex-patch-path-residue
-
-[cost: event/low] [surface: plugin]
-
-Codex's patch tool matches `Write|Edit` but carries the patch as `tool_input.command` with no `file_path`, and `workflow-state-guard` allows on an empty path (`native/src/hook/workflow_state.rs`), so once Codex discovers the plugin's hooks a Codex session could hand-write the stage state file.
-
-**Deliverable:** read the patch's file headers for the written paths, or state why not, designed with [antigravity-hook-binding](#antigravity-hook-binding)'s write-tool reader as one `--hook` arm reader for a foreign write payload's path; then plugin/SPEC.md's Codex limit narrows.
-
-**Cost while deferred:** none until Codex discovers plugin hooks; from then, a Codex session's write to the state file passes the guard. Filed 2026-10-23 by foreign-harness-write-path-pass' scope as a split, operator-directed, from [codex-plugin-hook-discovery](#codex-plugin-hook-discovery), filed 2026-10-18 by harness-reach-pass' close. Re-verified 2026-10-23: `workflow_state.rs` line 24 allows on an empty path. Owner lookup: the parent's; owner lifecycle-kit/SPEC.md §check-stage-entry, with plugin/SPEC.md §The guards.
-
 ### codex-plugin-version-pin
 
 [cost: event/low] [surface: plugin] [observed-by: publish]
@@ -237,14 +245,6 @@ Codex keys an installed plugin at version `1.0.0`, since neither manifest carrie
 **Deliverable:** run it at the next release's pin move, and fix the manifest stance if it does not reach.
 
 **Cost while deferred:** a Codex user may stay on an old package after a release. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's limit and no `version` key in `plugin/plugin.json`. Owner lookup: `codex`, `marketplace upgrade` in this file, none; owner plugin/SPEC.md §The manifests.
-
-### antigravity-hook-binding
-
-[cost: event/low] [surface: plugin]
-
-a hook binding for the plugin's guards under Antigravity, split off `plugin-harness-reach` (decided 2026-10-18 by the intent oracle). Its protocol differs on every axis: camelCase `toolCall.name`/`args.CommandLine`, matcher `run_command`, a stdout decision `allow`/`deny`/`ask`, a named-hook `hooks.json` at the plugin root. It runs a hook in the plugin dir with no project-dir variable, so a binding needs payload and envelope translation in the `--hook` arm plus project discovery from `workspacePaths` without a launcher script.
-
-**Cost while deferred:** an Antigravity user installing the plugin gets the skills and no guard. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's Antigravity row reads not wired. Owner lookup: `antigravity`, `agy` in this file, none; owner plugin/SPEC.md §The harnesses with gate-sdk/SPEC.md §The hook contract.
 
 ### cursor-muse-plugin-observed
 
