@@ -17,7 +17,7 @@ An install needs a supported system and a few tools, and [What an install requir
 
 <!-- install-primary: tarball -->
 
-Run the one line for your system from your repository's root, in a new project or an existing one with every change committed: `init` makes one commit and refuses a dirty worktree. The line downloads the newest Release tarball, checks it against its published digest and, where `gh` is signed in and the release is attested, against its build attestation, unpacks it outside your repository and runs `init`, with no runtime to install first. A step-by-step form is linked under each line. The recommended path starts with `demo`, to see the guarantee. Then install with your line and run the commands `init` prints.
+Run the one line for your system from your repository's root, in a new project or an existing one with every change committed: `init` makes one commit and refuses a dirty worktree. The line downloads the newest Release tarball, checks it against its published digest and, where `gh` is signed in and the release is attested, against its build attestation, unpacks it outside your repository and runs `init`, with no runtime to install first. The recommended path starts with `demo`, to see the guarantee. Install with your line and run the commands `init` prints; `checkwright prove` then shows the guarantee on your tree ([Prove it on your tree](#prove-it-on-your-tree)).
 
 Pick your route:
 
@@ -30,13 +30,13 @@ Pick your route:
 
 ### Try it first
 
-`demo` in place of `init` runs the whole arc in a scratch repository of its own and removes it, without touching yours: it installs the `full` profile, runs the battery green, commits a task marked done with no evidence behind it and shows the claim caught, then withdraws the claim and runs green again. Its spellings are `sh -s -- demo` on the macOS and Linux line or the script-block form with `demo` on Windows; with Node, `npx checkwright demo`. On Windows, run the `PATH` block below first.
+`demo` in place of `init` runs the whole arc in a scratch repository of its own and removes it, without touching yours: it installs the `full` profile, runs the battery green, commits a task marked done with no evidence behind it and shows the claim caught, then withdraws the claim and runs green again. Each line below takes it as its verb; with Node, `npx checkwright demo`. On Windows, run the `PATH` block below first.
 
 ### macOS and Linux
 
 **You need** the tools [Requirements](#requirements) lists for installing on Linux and macOS.
 
-On macOS, stock bash is 3.2, below the floor. If your profile owes `bash` (Requirements), run this block, which installs Homebrew's bash and puts it first on your `PATH`, now and in `~/.zprofile`. If your login shell is bash, use `~/.bash_profile` instead. The floor's grounds are in [installer/SPEC.md](installer/SPEC.md#requirements) and context-kit's [env-probe](context-kit/SPEC.md#binenv-probe).
+On macOS, stock bash is 3.2, below the floor. If your profile owes `bash` (Requirements), run this block, which installs Homebrew's bash and puts it first on your `PATH`, now and in `~/.zprofile`. If your login shell is bash, use `~/.bash_profile` instead.
 
 <!-- macos-remedy:begin -->
 
@@ -62,9 +62,9 @@ The same install, one step at a time: [Installing step by step on macOS and Linu
 
 This is the native Windows route. Under WSL, take [macOS and Linux](#macos-and-linux).
 
-**You need** the tools [Requirements](#requirements) lists for installing on Windows, where the minimum Windows version is stated too. Git for Windows' bash is also what runs any shell gate you write, and a gate you write in PowerShell needs none ([Writing your own PowerShell gates](requirements.md#writing-your-own-powershell-gates)).
+**You need** the tools [Requirements](#requirements) lists for installing on Windows, where the minimum Windows version is stated too.
 
-The pre-commit hook needs no shell: it is the gate binary under the hook's name, and git starts it directly. The battery needs none either: run the gate binary with `--run`, or `gate-sdk/bin/run-gates.ps1` from PowerShell.
+The pre-commit hook needs no shell: git starts the gate binary directly. Nor does the battery: run the binary with `--run`, or `gate-sdk/bin/run-gates.ps1` from PowerShell.
 
 Run this block in PowerShell first. It puts Git's `usr\bin` and `bin` on your `PATH`, for this session and every later one:
 
@@ -112,14 +112,14 @@ codex plugin marketplace add checkwright/checkwright
 codex plugin add checkwright@checkwright
 ```
 
-The plugin installs no kit. It registers Checkwright's lifecycle skills, and its guards in Claude Code and, except on native Windows, Antigravity. Ask for its `install` skill in your repository: it chooses a profile with you and runs the same `init` this page documents. Then ask for its `adopt` skill: it fits the knobs to your layout, and works through the first reds with you until the battery is green or each has a disposition you accept. Any Agent Plugins client loads the repository's `plugin/` directory by its own install route ([plugin/README.md](plugin/README.md)), Antigravity with `agy plugin install ./plugin` from a clone; [plugin/SPEC.md](plugin/SPEC.md#the-harnesses) lists the harnesses read, Codex and Antigravity among them.
+The plugin installs no kit. It registers Checkwright's lifecycle skills, and its guards in Claude Code and, except on native Windows, Antigravity. Ask for its `install` skill in your repository: it chooses a profile with you and runs the same `init` this page documents. Then ask for its `adopt` skill: it fits the knobs to your layout, and works through the first reds with you until the battery is green or each has a disposition you accept. Any Agent Plugins client, Antigravity among them, loads the repository's `plugin/` directory by its own route ([plugin/README.md](plugin/README.md)).
 
 ### With another coding agent
 
 Give your agent this prompt:
 
 ```text
-Install Checkwright in this repository. Choose a profile with me from https://checkwright.dev/install.html#choosing-a-profile, then install it as https://checkwright.dev/install.html#install describes for this host, and run each command init prints. Then follow gate-sdk/templates/adopt.md.
+Install Checkwright in this repository. Choose a profile with me from https://checkwright.dev/install.html#choosing-a-profile, then install it as https://checkwright.dev/install.html#install describes for this host, and run each command init prints. Then follow gate-sdk/templates/adopt.md. Then run checkwright prove from the repository root, through the then: line init printed, and report its last line.
 ```
 
 The last step is the same walk the plugin's `adopt` skill runs.
@@ -138,6 +138,12 @@ Choose a profile with `--profile`. If another toolkit writes your specs, pass `-
 Moving to a profile that contains yours only adds. `init` refuses outside a git work tree or in a repository git refuses to read (the refusal names the command that prints why), on a dirty worktree (`--no-commit` stages instead of committing), or when `checkwright doctor` finds a missing tool. Re-running it is safe: it reports files you have edited instead of overwriting them, unless you pass `--force`. `--dry-run` prints the plan and writes nothing.
 
 **Choosing kits and gates.** `--with-kit` and `--without-kit` add a kit to your profile or take one out. `--with-gate` and `--without-gate` do the same for a gate. Each repeats. `checkwright.lock` records them, so a re-run keeps them until you pass new ones or `--no-selection`. `gate-sdk` stays, since it runs the others. To replace a gate with your own, put a gate of the same name in your gates directory. It runs instead of the kit's, and `init` never overwrites it.
+
+### Prove it on your tree
+
+`checkwright prove` makes the claim `demo` shows caught, a task marked done with no evidence behind it, on a scratch clone of your `HEAD`. It runs your own battery there before and after the claim and reports what your install enforces at commit and in CI, and what it leaves inactive. It writes nothing here. It asks nothing either, so a coding agent can run it unattended. The `then:` line `init` prints runs it through the binary `init` placed, and the [maintenance verbs](maintenance.md#managing) spell it for each route.
+
+Its last line is the verdict, and its exit status says the same: `PROVE: held`, exit `0`, with the minutes since the install commit, or `PROVE: not held`, exit `1`, with the cause. `starter`, the default, keeps no task queue, so it is not held; on a tree with no task list either, a `help:` line names the profile that adds one.
 
 ## Going further
 

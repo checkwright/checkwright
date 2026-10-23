@@ -16,14 +16,6 @@
 
 ## Technical Debt
 
-### prove-front-door-restoration
-
-v0.32.0 is cut, so the restoration `tarball-attestation-observed` recorded is owed: reverse 916026963's withdrawal (`checkwright prove` in docs/install.md's recommended-path sentence, the agent prompt's last step and its Prove it on your tree section; docs/maintenance.md's prove verb bullet; docs/openspec.md's overlap section and its `--recipe openspec-overlap` line), then delete `companion/fixtures/openspec/overlap/line.md` and re-point companion/SPEC.md's and the overlap step's reads of it.
-
-**Deliverable, debt, two obligations the reverse patch does not meet.** `prove` changed after the withdrawal (ebfab68bd, 16758beee, both inside v0.32.0), so the restored text is re-verified against installer/SPEC.md §prove as it stands. The reverse patch puts docs/install.md at 1542 words against `check-docs-page-length`'s 1500, measured at that close, so the page is cut to fit rather than the limit raised.
-
-**Cost while deferred:** the front door omits the step that shows the guarantee on the adopter's own tree, and an OpenSpec reader meets no overlap recipe. Surfaced 2026-10-23 at foreign-harness-write-path-pass' close. Owner lookup: `overlap/line`, `prove` in this file and the disposed-findings record, none; owner installer/SPEC.md §prove, with companion/SPEC.md §The OpenSpec overlap.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -903,4 +895,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - selection-probe-bare-auth
 - npx-native-windows-route
 - front-door-npm-visibility-wait
+- prove-front-door-restoration
 
