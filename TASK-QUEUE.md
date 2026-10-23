@@ -20,7 +20,7 @@
 
 the package route fails on native Windows: v0.32.0's front-door Windows legs ran `npx checkwright@0.32.0 init` to `The system cannot find the path specified.`, since the `checkwright` bin is the sh bootstrap, whose `#!/bin/sh` line npm's `.cmd` shim runs as a literal `/bin/sh`. installer/SPEC.md §Layout sends a native Windows adopter to `checkwright-pwsh`, yet docs/install.md §With Node prints only `npx checkwright init`, and `scripts/ci-front-door.ps1` runs that line.
 
-**Spec-ready:** the amendment's deltas 1 to 8 build (B) and its witness step. Delta 9 is (A), the fallback close builds on a red witness. The Done move lands before the drain stage, with the merge, and close's push watch reads the witness before the tag.
+**Spec-ready:** the amendment's deltas 1 to 8 build (B) and its witness step. Delta 9 is (A). On a red witness, close first diagnoses the red. It repairs (B) where the bootstrap's own code caused it, and builds (A) only where the shim's `sh` route fails. If (A) is beyond close's tier, the tag is withheld and (A) is filed (operator direction 2026-10-24, lead-relayed, not a ruling). The Done move lands before the drain stage, with the merge, and close's push watch reads the witness before the tag.
 
 **Shape (operator direction 2026-10-24, lead-relayed, not a ruling):** (B), one `npx` line on every host, conditioned on the `install-smoke-pwsh-windows` witness; if it fails, (A), with PowerShell 7 stated on the page. Spec owns the mechanism.
 
