@@ -182,18 +182,24 @@ fn line_key(k: &Kind, fields: &[&str]) -> Option<String> {
     Some(out)
 }
 
+// spec: drift-kit/SPEC.md §The install-observation record — a stored line matching a kind's key:
+// the kind named second, then the kind's key fields
+fn keyed_as(k: &Kind, want: &str, line: &str) -> bool {
+    let fields: Vec<&str> = line.split_whitespace().collect();
+    fields.len() > 2
+        && kind(fields[1]).is_some_and(|lk| lk.name == k.name)
+        && line_key(k, &fields[2..]).as_deref() == Some(want)
+}
+
 // spec: drift-kit/SPEC.md §The install-observation record — a replace is in place: the key's first
 // line is rewritten where it stands and any later duplicate of it is dropped, so a re-file of
 // unchanged fields leaves the record byte-identical.
-fn replace_in_place(body: &str, k: &Kind, want: &str, new: &str) -> Option<String> {
+// spec: drift-kit/SPEC.md §The agent-selection probe — the key rule is the caller's predicate
+pub fn replace_in_place(body: &str, is_key: &dyn Fn(&str) -> bool, new: &str) -> Option<String> {
     let mut out: Vec<String> = Vec::new();
     let mut seen = false;
     for l in body.lines() {
-        let fields: Vec<&str> = l.split_whitespace().collect();
-        let matches = fields.len() > 2
-            && kind(fields[1]).is_some_and(|lk| lk.name == k.name)
-            && line_key(k, &fields[2..]).as_deref() == Some(want);
-        if !matches {
+        if !is_key(l) {
             out.push(l.to_string());
             continue;
         }
@@ -209,6 +215,31 @@ fn replace_in_place(body: &str, k: &Kind, want: &str, new: &str) -> Option<Strin
     let mut text = out.join("\n");
     text.push('\n');
     Some(text)
+}
+
+// spec: drift-kit/SPEC.md §The install-observation record — the record write: the line replaces
+// the first one `is_key` matches, else it appends, creating the parent dir; true where it replaced
+pub fn write_line(
+    path: &std::path::Path,
+    spelled: &str,
+    line: &str,
+    is_key: Option<&dyn Fn(&str) -> bool>,
+) -> Result<bool, String> {
+    if let Some(dir) = path.parent() {
+        let _ = std::fs::create_dir_all(dir);
+    }
+    if let Some(is_key) = is_key {
+        let body = std::fs::read(path)
+            .map(|b| String::from_utf8_lossy(&b).into_owned())
+            .unwrap_or_default();
+        if let Some(text) = replace_in_place(&body, is_key, line) {
+            std::fs::write(path, text).map_err(|e| format!("cannot rewrite {}: {}", spelled, e))?;
+            return Ok(true);
+        }
+    }
+    super::kfric::append_creating(path, &format!("{}\n", line))
+        .map_err(|e| format!("cannot append to {}: {}", spelled, e))?;
+    Ok(false)
 }
 
 pub fn emit(args: &[String]) -> Result<String, String> {
@@ -233,28 +264,14 @@ pub fn emit(args: &[String]) -> Result<String, String> {
 
     let (record, spelled) = super::file_survey::anchored_capture(knob)?;
     let path = std::path::Path::new(&record);
-    if let Some(dir) = path.parent() {
-        let _ = std::fs::create_dir_all(dir);
-    }
     let line = line(&super::kpi::today_iso(), k.name, fields);
-
-    let mut replaced = false;
-    if !k.key.is_empty() {
+    let replaced = if k.key.is_empty() {
+        write_line(path, &spelled, &line, None)?
+    } else {
         let refs: Vec<&str> = fields.iter().map(String::as_str).collect();
         let want = line_key(k, &refs).ok_or_else(|| USAGE.to_string())?;
-        let body = std::fs::read(path)
-            .map(|b| String::from_utf8_lossy(&b).into_owned())
-            .unwrap_or_default();
-        if let Some(text) = replace_in_place(&body, k, &want, &line) {
-            std::fs::write(path, text)
-                .map_err(|e| format!("cannot rewrite {}: {}", spelled, e))?;
-            replaced = true;
-        }
-    }
-    if !replaced {
-        super::kfric::append_creating(path, &format!("{}\n", line))
-            .map_err(|e| format!("cannot append to {}: {}", spelled, e))?;
-    }
+        write_line(path, &spelled, &line, Some(&|l: &str| keyed_as(k, &want, l)))?
+    };
     Ok(format!(
         "file-install: {}{}\n",
         line,
@@ -393,7 +410,7 @@ mod tests {
         let body = "2026-01-01 install i1 linux bash5 12\n2026-01-01 proof i1 30\n";
         let want = line_key(proof, &["i1"]).expect("a key");
         assert_eq!(
-            replace_in_place(body, proof, &want, "2026-01-02 proof i1 20").as_deref(),
+            replace_in_place(body, &|l| keyed_as(proof, &want, l), "2026-01-02 proof i1 20").as_deref(),
             Some("2026-01-01 install i1 linux bash5 12\n2026-01-02 proof i1 20\n"),
             "the proof replaced its own line and left the install's alone"
         );
@@ -435,7 +452,7 @@ mod tests {
                     2026-01-03 install i2 macos bash3 -\n\
                     2026-01-04 install i1 linux bash5 99\n";
         let want = line_key(install, &["i1"]).expect("a key");
-        let out = replace_in_place(body, install, &want, "2026-02-01 install i1 linux bash5 7")
+        let out = replace_in_place(body, &|l| keyed_as(install, &want, l), "2026-02-01 install i1 linux bash5 7")
             .expect("the key was present");
         assert_eq!(
             out,
@@ -445,7 +462,7 @@ mod tests {
         );
         let absent = line_key(install, &["i9"]).expect("a key");
         assert!(
-            replace_in_place(body, install, &absent, "x").is_none(),
+            replace_in_place(body, &|l| keyed_as(install, &absent, l), "x").is_none(),
             "a key new to the record appends rather than rewriting"
         );
     }

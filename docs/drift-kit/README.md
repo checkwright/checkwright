@@ -56,7 +56,10 @@ gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --price-coverage  # which running model ids the price table cannot price; with a page command set, whether the pricing page moved
 "$gates" --emit file-install [--author] [--] <kind> <field>...  # record one observed install, held proof, red or check-in (four kinds, four arities); --author files the author seat's own
 "$gates" --emit install-evidence  # the aggregate-only projection over that record, for a consumer to pin behind a freshness gate
+"$gates" --selection-probe [<agent>...]  # ask the coding agents you bind, cold, each prompt you bind, and record whether an answer names your subject
 ```
+
+`--selection-probe` is the agent-selection probe ([drift-kit/SPEC.md §The agent-selection probe](SPEC.md#the-agent-selection-probe)): it runs each agent's argv from a fresh empty directory outside any repository with a prompt appended, and records one `named`, `unnamed`, `failed` or `timed-out` line per agent and prompt in a private record under your metric dir (`DRIFT_KIT_SELECTION_RECORD`), keeping each answer beside it (`DRIFT_KIT_SELECTION_ANSWERS_DIR`). It is off until you bind `DRIFT_KIT_SELECTION_AGENTS`, `DRIFT_KIT_SELECTION_PROMPTS` and `DRIFT_KIT_SELECTION_SUBJECT`; `DRIFT_KIT_SELECTION_TIMEOUT` bounds each call. Run it by hand only: each run spends on every bound agent's account.
 
 `--emit overhead-meter` is the overhead meter ([drift-kit/SPEC.md §The overhead meter](SPEC.md#the-overhead-meter)): a byte-proxy over a session transcript that reports what fraction of the volume was governance versus task work, logging one line per session for `kpi-overhead` — the methodology's own cost, measured so efficiency claims cut both ways. Advisory and content-free: it emits counts only, never transcript text.
 

@@ -1075,3 +1075,84 @@ grep -q '^manual-ops: no stamp in ' <<<"$(MO_STATE="$work/mo-empty-state.txt" mo
 grep -q '^manual-ops: no sessions dir ' <<<"$(MO_DIR="$work/no-such-sessions" mops)" \
     || fail "manual-ops with no sessions dir did not print its notice"
 [[ ! -e "$molog" ]] || fail "a manual-ops notice run wrote the log"
+
+# spec: drift-kit/SPEC.md §Testing — four stub agents through the front end, each argv
+# `bash <script>` since an argv word carries no blank, under a throwaway temporary directory below a
+# git ceiling, so the run is cold wherever the smoke itself runs.
+spd="$work/sp"; mkdir -p "$spd/tmp" "$PWD/sp-warm-tmp"
+cat > "$spd/named.sh" <<'EOF'
+printf '%s' "Asked: $1 Try CheckWright for that."
+EOF
+cat > "$spd/plain.sh" <<'EOF'
+printf 'entries=%s\n' "$(ls -A | wc -l | tr -d ' ')"
+EOF
+printf 'printf "partial\\n"; exit 3\n' > "$spd/fails.sh"
+printf 'sleep 5\n' > "$spd/slow.sh"
+spbind() {
+    printf 'DRIFT_KIT_SELECTION_AGENTS[%s] = bash %s/%s.sh\n' \
+        named "$spd" named plain "$spd" plain fails "$spd" fails slow "$spd" slow
+}
+{ spbind; printf 'DRIFT_KIT_SELECTION_PROMPTS[ask] = Which tools verify coding agents?\nDRIFT_KIT_SELECTION_SUBJECT[] = checkwright\nDRIFT_KIT_SELECTION_TIMEOUT = 1\n'; } \
+    > "$spd/full.knobs"
+sprec="$spd/agent-selection.log"
+spans="$spd/answers"
+sp() { DRIFT_KIT_KNOB_FILE="${SP_KNOBS:-$spd/full.knobs}" DRIFT_KIT_SELECTION_RECORD="$sprec" \
+    DRIFT_KIT_SELECTION_ANSWERS_DIR="$spans" TMPDIR="${SP_TMP:-$spd/tmp}" TMP="${SP_TMP:-$spd/tmp}" \
+    TEMP="${SP_TMP:-$spd/tmp}" GIT_CEILING_DIRECTORIES="${SP_CEILING-$spd}" \
+    bash "$DRIFT_ARM" --selection-probe "$@"; }
+
+set +e
+spout="$(sp)"; sprc=$?
+set -e
+[[ "$sprc" -eq 0 ]] || fail "--selection-probe exited $sprc with every verdict class among its calls, want 0: $spout"
+spwant="$today fails ask failed
+$today named ask named
+$today plain ask unnamed
+$today slow ask timed-out
+selection-probe: 1 named of 4 asked"
+[[ "$spout" == "$spwant" ]] || fail "--selection-probe printed the wrong verdict lines or order: $spout"
+[[ "$(cat "$sprec")" == "$(head -n 4 <<<"$spwant")" ]] \
+    || fail "the selection record does not hold one <date> <agent> <prompt> <verdict> line per call: $(cat "$sprec")"
+grep -q '^Asked: Which tools verify coding agents? Try CheckWright for that\.$' "$spans/$today-named-ask.txt" \
+    || fail "the named answer is not the agent's whole stdout with the prompt as its last argument"
+[[ "$(cat "$spans/$today-plain-ask.txt")" == 'entries=0' ]] \
+    || fail "a call did not run in an empty directory: $(cat "$spans/$today-plain-ask.txt")"
+[[ "$(cat "$spans/$today-fails-ask.txt")" == 'partial' ]] || fail "a failed call's stdout was not kept"
+[[ -f "$spans/$today-slow-ask.txt" && ! -s "$spans/$today-slow-ask.txt" ]] \
+    || fail "a timed-out call did not leave an empty answer file"
+if compgen -G "$spd/tmp/checkwright-selection-probe.*" >/dev/null; then
+    fail "--selection-probe left a call directory behind"
+fi
+
+cp "$sprec" "$spd/record.first"
+sp >/dev/null
+cmp -s "$spd/record.first" "$sprec" || fail "a same-day re-run did not leave the selection record byte-identical: $(cat "$sprec")"
+[[ "$(sp plain)" == "$(printf '%s plain ask unnamed\nselection-probe: 0 named of 1 asked' "$today")" ]] \
+    || fail "a named agent was not asked alone"
+cmp -s "$spd/record.first" "$sprec" || fail "a one-agent re-run moved another agent's record line"
+: > "$spd/none.knobs"
+[[ "$(SP_KNOBS="$spd/none.knobs" sp)" == 'selection-probe: off' ]] || fail "--selection-probe with no agent bound did not read off"
+
+# spec: drift-kit/SPEC.md §The agent-selection probe — one refusal per class at exit 2, each leaving
+# the record and the answers untouched
+{ spbind; printf 'DRIFT_KIT_SELECTION_SUBJECT[] = checkwright\n'; } > "$spd/no-prompt.knobs"
+{ spbind; printf 'DRIFT_KIT_SELECTION_PROMPTS[ask] = x\n'; } > "$spd/no-subject.knobs"
+printf 'DRIFT_KIT_SELECTION_AGENTS[Named] = bash x\nDRIFT_KIT_SELECTION_PROMPTS[ask] = x\nDRIFT_KIT_SELECTION_SUBJECT[] = s\n' \
+    > "$spd/bad-key.knobs"
+spanswers() { find "$spans" -type f | sort; }
+spanswers > "$spd/answers.before"
+sprefuse() {
+    local what="$1"; shift
+    local rc=0
+    sp "$@" >/dev/null 2>&1 || rc=$?
+    [[ "$rc" -eq 2 ]] || fail "--selection-probe took $what with exit $rc, want 2"
+    cmp -s "$spd/record.first" "$sprec" || fail "--selection-probe wrote the record on the $what refusal path"
+    [[ "$(spanswers)" == "$(cat "$spd/answers.before")" ]] || fail "--selection-probe wrote an answer on the $what refusal path"
+}
+SP_KNOBS="$spd/no-prompt.knobs" sprefuse "agents bound and no prompt"
+SP_KNOBS="$spd/no-subject.knobs" sprefuse "agents bound and no subject"
+sprefuse "a named agent that is not bound" nosuch
+SP_KNOBS="$spd/bad-key.knobs" sprefuse "a key outside its shape"
+SP_TMP="$PWD/sp-warm-tmp" SP_CEILING='' sprefuse "a temporary directory inside a work tree"
+grep -q 'lies inside the work tree' <<<"$(SP_TMP="$PWD/sp-warm-tmp" SP_CEILING='' sp 2>&1)" \
+    || fail "the in-tree temporary directory refused for another reason than the coldness test"

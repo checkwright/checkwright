@@ -721,11 +721,13 @@ pub(crate) mod kernel32 {
 // spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — `run_bounded` for a caller that needs
 // the child's *output* and not only its code. Capture goes to a file, not a pipe: a poll loop and a
 // filled pipe buffer deadlock each other. `Ok(None)` is the bound expiring.
+// spec: drift-kit/SPEC.md §The agent-selection probe — `cwd`, where given, is the child's own
 pub fn run_bounded_capture(
     program: &Program,
     args: &[&str],
     secs: u64,
     env: &[(&str, &str)],
+    cwd: Option<&std::path::Path>,
 ) -> Result<Option<(i32, Vec<u8>)>, String> {
     #[cfg(test)]
     recorder::note(program.invocation());
@@ -747,6 +749,9 @@ pub fn run_bounded_capture(
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::from(out))
         .stderr(std::process::Stdio::null());
+    if let Some(dir) = cwd {
+        cmd.current_dir(dir);
+    }
     let mut tree = Tree::spawn(cmd).map_err(|e| {
         let _ = std::fs::remove_file(&capture);
         spawn_err(e)
@@ -1442,10 +1447,10 @@ pub(crate) mod tests {
         std::fs::create_dir_all(&dir).expect("scratch");
         let marker = |name: &str| dir.join(name).to_string_lossy().replace('\\', "/");
         let script = |delay: u32, name: &str| format!("(sleep {}; echo late > '{}') & wait", delay, marker(name));
-        let fits = run_bounded_capture(&BASH, &["-c", &script(1, "fits")], 30, &[]).expect("bash spawns");
+        let fits = run_bounded_capture(&BASH, &["-c", &script(1, "fits")], 30, &[], None).expect("bash spawns");
         assert_eq!(fits.map(|(code, _)| code), Some(0));
         assert!(dir.join("fits").exists(), "the control writer never wrote, so the kill case proves nothing");
-        let expired = run_bounded_capture(&BASH, &["-c", &script(3, "killed")], 1, &[]).expect("bash spawns");
+        let expired = run_bounded_capture(&BASH, &["-c", &script(3, "killed")], 1, &[], None).expect("bash spawns");
         assert!(expired.is_none(), "the bound did not expire");
         std::thread::sleep(std::time::Duration::from_secs(4));
         assert!(!dir.join("killed").exists(), "the grandchild outlived the bound and wrote");

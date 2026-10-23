@@ -211,7 +211,7 @@ fn newest(refs: &str) -> Option<String> {
 fn probe(upstream: &str, timeout: u64) -> Option<String> {
     let env = [("GIT_TERMINAL_PROMPT", "0")];
     let (code, out) =
-        proc::run_bounded_capture(&programs::GIT, &["ls-remote", "--tags", "--refs", upstream], timeout, &env).ok()??;
+        proc::run_bounded_capture(&programs::GIT, &["ls-remote", "--tags", "--refs", upstream], timeout, &env, None).ok()??;
     if code != 0 {
         return None;
     }

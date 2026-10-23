@@ -82,6 +82,14 @@ fn author_install_record(resolve: Resolve) -> Result<Value, String> {
     under(resolve, "DRIFT_KIT_METRIC_DIR", "author-install-observations.log")
 }
 
+fn selection_record(resolve: Resolve) -> Result<Value, String> {
+    under(resolve, "DRIFT_KIT_METRIC_DIR", "agent-selection.log")
+}
+
+fn selection_answers_dir(resolve: Resolve) -> Result<Value, String> {
+    under(resolve, "DRIFT_KIT_METRIC_DIR", "agent-selection")
+}
+
 pub const KIT: Kit = Kit {
     root: "drift-kit",
     rows: &[
@@ -128,6 +136,22 @@ pub const KIT: Kit = Kit {
             author_install_record,
             &["DRIFT_KIT_METRIC_DIR"],
         ),
+        Row::keyed("DRIFT_KIT_SELECTION_AGENTS", &[]),
+        Row::keyed("DRIFT_KIT_SELECTION_PROMPTS", &[]),
+        Row::indexed("DRIFT_KIT_SELECTION_SUBJECT", &[]),
+        Row::scalar("DRIFT_KIT_SELECTION_TIMEOUT", "300"),
+        Row::derived(
+            "DRIFT_KIT_SELECTION_RECORD",
+            Shape::Scalar,
+            selection_record,
+            &["DRIFT_KIT_METRIC_DIR"],
+        ),
+        Row::derived(
+            "DRIFT_KIT_SELECTION_ANSWERS_DIR",
+            Shape::Scalar,
+            selection_answers_dir,
+            &["DRIFT_KIT_METRIC_DIR"],
+        ),
         Row::derived("DRIFT_KIT_STATE_FILE", Shape::Scalar, state_file, &["GATE_SDK_WORKFLOW_DIR"]),
         Row::scalar("DRIFT_KIT_SUPERVISION_LABEL", "supervision"),
         Row::scalar("DRIFT_KIT_FANOUT_SUFFIX", "+fanout"),
@@ -161,8 +185,10 @@ fn validate(v: &Values) -> Vec<String> {
         errs.push(format!("DRIFT_KIT_PRICE_COVERAGE_DAYS '{}' is not a non-negative integer", s));
     }
     let positive = |s: &str| digits(s) && !s.bytes().all(|b| b == b'0');
-    if let Some(s) = scalar(v, "DRIFT_KIT_PRICE_PAGE_TIMEOUT").filter(|s| !positive(s)) {
-        errs.push(format!("DRIFT_KIT_PRICE_PAGE_TIMEOUT '{}' is not a positive integer", s));
+    for name in ["DRIFT_KIT_PRICE_PAGE_TIMEOUT", "DRIFT_KIT_SELECTION_TIMEOUT"] {
+        if let Some(s) = scalar(v, name).filter(|s| !positive(s)) {
+            errs.push(format!("{} '{}' is not a positive integer", name, s));
+        }
     }
     if let Some(s) = scalar(v, "DRIFT_KIT_MANUAL_OPS_TOP").filter(|s| !positive(s)) {
         errs.push(format!("DRIFT_KIT_MANUAL_OPS_TOP '{}' is not a positive integer", s));

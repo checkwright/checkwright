@@ -67,6 +67,7 @@ pub mod reads_census;
 pub mod release_table;
 pub mod rewrite;
 pub mod scan_prompts;
+pub mod selection_probe;
 pub mod stage_economics;
 pub mod stage_contract;
 pub mod stage_rules;
@@ -819,6 +820,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Run(price_coverage::run),
         price_coverage::KNOBS,
     ),
+    // spec: drift-kit/SPEC.md §The agent-selection probe — an `Arm::Run` for `--price-coverage`'s
+    // reason: it spawns a consumer's agent programs, which reach the network
+    (
+        "--selection-probe",
+        Arm::Run(selection_probe::run),
+        selection_probe::KNOBS,
+    ),
     // spec: delegation-kit/SPEC.md §usage-verdict — an `Arm::Run` because its three-state exit
     // status carries a 1 a hook grades, which an emitting arm collapses to {0, 2}; its callers are
     // a session brief, a kit smoke and a gate in process, so it is no harness-integration arm
@@ -1153,8 +1161,8 @@ mod tests {
     // spec: gate-sdk/SPEC.md §The harness-integration arm — a renamed or deleted fail-open arm reds
     // here, before a stub's copy can name an arm the binary no longer dispatches
     // spec: gate-sdk/SPEC.md §The non-gate arm — the crate's network spawners, the arms reaching
-    // `curl`, `npm`, `docker`, a consumer's page fetch and a foreign adapter, are never fence-safe: admitting one reds
-    // here rather than in an adopter's scratch
+    // `curl`, `npm`, `docker`, a consumer's page fetch, its agent CLIs and a foreign adapter, are
+    // never fence-safe: admitting one reds here rather than in an adopter's scratch
     #[test]
     fn no_network_spawning_arm_is_fence_safe() {
         const NETWORK_ARMS: &[&str] = &[
@@ -1163,6 +1171,7 @@ mod tests {
             "--installer-smoke",
             "--with-foreign-shells",
             "--price-coverage",
+            "--selection-probe",
             "--foreign-run",
             "--foreign-resume",
         ];
