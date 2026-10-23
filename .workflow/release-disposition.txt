@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+front-door-patch-pass release v0.32.1 — patch, every declaration-bearing section None; cut on explicit operator direction (2026-10-24, lead-relayed, not a ruling) in the set record, publishing the npx Windows route and the restored front door
