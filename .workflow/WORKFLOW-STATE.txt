@@ -8,3 +8,4 @@ front-door-patch-pass scope a7a53ef4 2026-10-24 72cf23bb6
 front-door-patch-pass spec a6b3003c 2026-10-24 6a4a2176a
 front-door-patch-pass build ac46d295 2026-10-24 8e5ea09b3
 front-door-patch-pass build a2de21c6 2026-10-24 606b0e88a
+front-door-patch-pass validate a1a582c5 2026-10-24 0ad82a864
