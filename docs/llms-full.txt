@@ -420,7 +420,7 @@ To run each step yourself on Windows: [Installing step by step](https://checkwri
 
 ### With Node
 
-`npx checkwright init` runs the same `init` from the npm package, which carries npm's provenance attestation as the tarball carries a GitHub build attestation ([installer/SPEC.md](https://checkwright.dev/installer/SPEC.html#the-dependency-boundary)). `init` verifies the gate binary with `sha256sum` or `shasum`, and refuses without one. It needs Node 8.2 or later ([Requirements](https://checkwright.dev/install.html#requirements)).
+`npx checkwright init` runs the same `init` from the npm package, which carries npm's provenance attestation as the tarball carries a GitHub build attestation ([installer/SPEC.md](https://checkwright.dev/installer/SPEC.html#the-dependency-boundary)). The package's command is a shell script, so on Windows run the `PATH` block above first, which puts the `sh` npm starts it with on your `PATH`. `init` verifies the gate binary with `sha256sum` or `shasum`, and refuses without one. It needs Node 8.2 or later ([Requirements](https://checkwright.dev/install.html#requirements)).
 
 ### From a plugin marketplace
 
@@ -519,7 +519,7 @@ The install itself and the optional docs gates need these as well. `doctor` does
 | `sha256sum` or `shasum` | any | required to install on Linux and macOS | the release tarball and the gate binary are checked against their published digests |
 | Windows PowerShell | 5.1 | required to install on Windows | the one-line install, the install block and the bootstrap run under it; its `Get-FileHash` checks the digests |
 | `tar.exe` | Windows 10 version 1803 | required to install on Windows | the install block unpacks the tarball with `System32\tar.exe` |
-| Git for Windows | `git` at the floor above | required to install on Windows | it supplies `git`; `bash` only where a row above owes it |
+| Git for Windows | `git` at the floor above | required to install on Windows | it supplies `git`, and once the install page's `PATH` block has run, the `sh` and `sha256sum` `npx` runs the bootstrap with; `bash` only where a row above owes it |
 | `gh` | any carrying `gh attestation` | optional: to check the build attestation | the one-line install runs `gh attestation verify` when `gh` is signed in, and says so when it is not |
 | Node | 8.2 | optional: only to install with npx | the first Node to bundle an npm carrying `npx` |
 | Ruby | 2.3 | optional: only if you register site-kit's docs gates | the two gems below need it |

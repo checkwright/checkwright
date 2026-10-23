@@ -14,20 +14,6 @@
 
 ## New Features
 
-### npx-native-windows-route
-
-[spec: SPEC-npx-windows-route.md]
-
-the package route fails on native Windows: v0.32.0's front-door Windows legs ran `npx checkwright@0.32.0 init` to `The system cannot find the path specified.`, since the `checkwright` bin is the sh bootstrap, whose `#!/bin/sh` line npm's `.cmd` shim runs as a literal `/bin/sh`. installer/SPEC.md §Layout sends a native Windows adopter to `checkwright-pwsh`, yet docs/install.md §With Node prints only `npx checkwright init`, and `scripts/ci-front-door.ps1` runs that line.
-
-**Spec-ready:** the amendment's deltas 1 to 8 build (B) and its witness step. Delta 9 is (A). On a red witness, close first diagnoses the red. It repairs (B) where the bootstrap's own code caused it, and builds (A) only where the shim's `sh` route fails. If (A) is beyond close's tier, the tag is withheld and (A) is filed (operator direction 2026-10-24, lead-relayed, not a ruling). The Done move lands before the drain stage, with the merge, and close's push watch reads the witness before the tag.
-
-**Shape (operator direction 2026-10-24, lead-relayed, not a ruling):** (B), one `npx` line on every host, conditioned on the `install-smoke-pwsh-windows` witness; if it fails, (A), with PowerShell 7 stated on the page. Spec owns the mechanism.
-
-**Push need (2026-10-24, inside the budget):** the v0.32.1 tag push, the patch release this defect is owed as; the witness rides the closing push.
-
-**Cost while deferred:** a first `npx` install on native Windows fails, and RELEASING.md §The front-door rehearsal owes the fix as the next patch release. Surfaced 2026-10-23 at foreign-harness-write-path-pass' close by the v0.32.0 publish run; not a regression, the job's first run. Owner lookup: `npx`, `checkwright-pwsh` in this file and the disposed-findings record, none; owner installer/SPEC.md §Layout.
-
 ## Technical Debt
 
 ### front-door-npm-visibility-wait
@@ -218,7 +204,7 @@ Cursor and Muse Code are installed on no build machine, so plugin/SPEC.md §The 
 
 [cost: event/low] [surface: scripts] [observed-by: publish]
 
-the observe half of [npx-native-windows-route](#npx-native-windows-route) and [front-door-npm-visibility-wait](#front-door-npm-visibility-wait), split at front-door-patch-pass' scope: the v0.32.1 publish run's `front-door` job reads green on every leg, the Windows package route and a package route with no re-run included.
+the observe half of `npx-native-windows-route` and [front-door-npm-visibility-wait](#front-door-npm-visibility-wait), split at front-door-patch-pass' scope: the v0.32.1 publish run's `front-door` job reads green on every leg, the Windows package route and a package route with no re-run included.
 
 **Deliverable:** read that run; a red leg is filed as RELEASING.md §The front-door rehearsal rules it.
 
@@ -923,4 +909,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 ## Done
 
 - selection-probe-bare-auth
+- npx-native-windows-route
 

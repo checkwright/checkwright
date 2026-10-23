@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 # spec: installer/SPEC.md §The install boundary — the POSIX sh bootstrap, twin of the PowerShell half,
 # authored against that section's five steps: every install step is on the far side of the invoke
 # no-port: installer/SPEC.md §The install boundary — this file's whole body is `bootstrap`-
@@ -34,6 +34,10 @@ gate_path_rooted() {  # <path> — 0 when rooted in either dialect, walk::path_r
 # prints the directory it picks, which would corrupt every `$(cd … && pwd)` below
 unset CDPATH
 SELF="$0"
+# spec: installer/SPEC.md §Implementation — npm's .cmd shim hands sh a backslash-separated path
+case "$SELF" in
+    [ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz]:\\*) SELF="$(printf '%s' "$SELF" | tr '\\' '/')" ;;
+esac
 while [ -L "$SELF" ]; do
     LINK_DIR="$(cd "$(dirname "$SELF")" && pwd)"
     SELF="$(readlink "$SELF")"

@@ -40,7 +40,7 @@
 5236cp docs/index.md
 8768cp docs/install-block-contracts.md
 8675cp docs/install-parity-contracts.md
-9843cp docs/install.md
+9987cp docs/install.md
 1344cp docs/kits.md
 1458cp docs/lifecycle-kit/index.md
 3203cp docs/maintenance.md
@@ -85,7 +85,7 @@
 166603cp docs/posts/2026-10-23-checkwright-v0-32-0.md
 7064cp docs/projection-fan-outs.md
 1460cp docs/queue-kit/index.md
-8690cp docs/requirements.md
+8795cp docs/requirements.md
 6104cp docs/site-architecture.md
 2412cp docs/site-kit/index.md
 5463cp docs/spec-toolkits.md
@@ -100,7 +100,7 @@
 3130cp gate-sdk/templates/adopt.md
 355499cp guard-kit/SPEC.md
 4439cp guard-kit/templates/close-triage.md
-295201cp installer/SPEC.md
+295973cp installer/SPEC.md
 396655cp lifecycle-kit/SPEC.md
 8150cp lifecycle-kit/templates/consult.md
 1212cp lifecycle-kit/templates/frames/project-critique.md

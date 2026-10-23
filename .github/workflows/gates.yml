@@ -117,10 +117,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      # spec: installer/SPEC.md §Implementation — the unix bootstrap is POSIX sh; this names the /bin/sh it runs under
+      # spec: installer/SPEC.md §Implementation — the unix bootstrap is POSIX sh; this names the sh on PATH it runs under
       - name: name the shell the unix bootstrap runs under
         shell: bash
-        run: readlink -f /bin/sh
+        run: readlink -f "$(command -v sh)"
 
       # spec: installer/SPEC.md §The consumer smoke — the producer's upload, downloaded by pattern
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
@@ -1381,6 +1381,93 @@ jobs:
           [[ "$got" == "$PWSH_TARGET" ]] \
             || { echo "::error::the manifest records artifact target '$got' where this host is '$PWSH_TARGET'"; exit 1; }
           echo "the POSIX bootstrap installed $minimum here and recorded the $PWSH_TARGET artifact"
+
+      # spec: installer/SPEC.md §Layout
+      - name: the page's npx line installs through npm's cmd shim
+        if: matrix.part == 'bootstrap'
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Write-Host "== step 1: every sh stripped from PATH =="
+          $sysDir = [Environment]::SystemDirectory.TrimEnd('\')
+          $gitRoot = Split-Path (Split-Path (Split-Path (& git --exec-path)))
+          $kept = New-Object System.Collections.Generic.List[string]
+          foreach ($d in ($env:PATH -split ';')) {
+              if (-not $d) { continue }
+              if ((Test-Path -LiteralPath (Join-Path $d 'sh.exe')) -and $d.TrimEnd('\') -ne $sysDir) {
+                  Write-Host "  stripped $d"
+              } else { $kept.Add($d) }
+          }
+          $gitCmd = if ($gitRoot) { Join-Path $gitRoot 'cmd' } else { '' }
+          if ($gitCmd -and (Test-Path -LiteralPath (Join-Path $gitCmd 'git.exe')) -and -not $kept.Contains($gitCmd)) {
+              $kept.Add($gitCmd)
+              Write-Host "  kept git reachable through $gitCmd, which holds no sh"
+          }
+          $env:PATH = $kept -join ';'
+          $reachable = @(Get-Command sh -CommandType Application -All -ErrorAction SilentlyContinue |
+              Where-Object { (Split-Path $_.Source).TrimEnd('\') -ne $sysDir })
+          if ($reachable.Count -ne 0) { Write-Host "::error::sh still resolves on PATH after the strip: $($reachable.Source -join ', ')"; exit 1 }
+          if (-not (Get-Command git -CommandType Application -ErrorAction SilentlyContinue)) { Write-Host "::error::git no longer resolves on PATH after the strip: $env:PATH"; exit 1 }
+          $npx = Get-Command npx -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $npx) { Write-Host "::error::npx does not resolve on PATH after the strip: $env:PATH"; exit 1 }
+          Write-Host "no sh resolves; git and $($npx.Source) do"
+
+          Write-Host "== step 2: the page's windows-remedy block, verbatim =="
+          $body = @()
+          $inBlock = $false
+          foreach ($line in (Get-Content -LiteralPath 'docs/install.md')) {
+              if ($line -eq '<!-- windows-remedy:end -->') { $inBlock = $false }
+              if ($inBlock -and $line.Trim() -and $line -notmatch '^```') { $body += $line }
+              if ($line -eq '<!-- windows-remedy:begin -->') { $inBlock = $true }
+          }
+          if ($body.Count -eq 0) { Write-Host "::error::docs/install.md carries no windows-remedy block; this step runs the page's block and has none to run"; exit 1 }
+          $body | ForEach-Object { Write-Host $_ }
+          Invoke-Expression ($body -join "`n") | Out-Host
+          $gitHome = Split-Path (Split-Path (Split-Path ((& git --exec-path) -replace '/', '\')))
+          $sh = Get-Command sh -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $sh) { Write-Host "::error::no sh resolves on PATH after the page's windows-remedy block ran"; exit 1 }
+          if (-not $sh.Source.StartsWith($gitHome + '\', [StringComparison]::OrdinalIgnoreCase)) {
+              Write-Host "::error::sh resolves to $($sh.Source), outside the Git root $gitHome that git --exec-path names"
+              exit 1
+          }
+          Write-Host "the page's block put $($sh.Source) on PATH"
+
+          Write-Host "== step 3: the page's npx line, through the cmd shim =="
+          $counts = @{}
+          foreach ($l in (Get-Content -LiteralPath (Join-Path $env:PWSH_PKG 'profiles.list'))) {
+              if ($l -match '^#') { continue }
+              $f = $l -split "`t"
+              if ($f.Count -eq 2) { $counts[$f[0]]++ }
+          }
+          $minimum = ($counts.GetEnumerator() | Sort-Object Value, Name | Select-Object -First 1).Name
+          if (-not $minimum) { Write-Host "::error::the package's profiles.list names no profile"; exit 1 }
+          $consumer = Join-Path $env:PWSH_SCRATCH 'npx-cmd-consumer'
+          if (Test-Path -LiteralPath $consumer) { Remove-Item -Recurse -Force -LiteralPath $consumer }
+          New-Item -ItemType Directory -Force -Path $consumer | Out-Null
+          git -C $consumer init -q
+          git -C $consumer config user.email 'smoke@example.invalid'
+          git -C $consumer config user.name 'npx cmd shim smoke'
+          $line = @('--yes', "--package=$env:PWSH_TARBALL", '--', 'checkwright', 'init', '--profile', $minimum)
+          Write-Host "npx $($line -join ' ')"
+          Push-Location $consumer
+          $ErrorActionPreference = 'Continue'
+          try {
+              $out = @(& $npx.Source @line 2>&1 | ForEach-Object { "$_" })
+              $code = $LASTEXITCODE
+          } finally { $ErrorActionPreference = 'Stop'; Pop-Location }
+          $lock = Join-Path $consumer 'checkwright.lock'
+          $why = if ($code -ne 0) { "npx exited $code" }
+                 elseif (-not (Test-Path -LiteralPath $lock)) { 'npx exited 0 but wrote no checkwright.lock' }
+                 else {
+                     $got = (Get-Content -Raw -LiteralPath $lock | ConvertFrom-Json).artifact.target
+                     if ($got -ne $env:PWSH_TARGET) { "the lock records artifact target '$got' where this host is '$env:PWSH_TARGET'" }
+                 }
+          if ($why) {
+              $out | ForEach-Object { Write-Host $_ }
+              Write-Host "::error::the page's npx line through npm's cmd shim failed: $why"
+              exit 1
+          }
+          Write-Host "npx checkwright init installed $minimum through npm's cmd shim and Git's sh, and recorded the $env:PWSH_TARGET artifact"
 
       # spec: docs/install-block-contracts.md §The install blocks — the windows-install block
       - name: run the page's windows-install block against the packed tarball
