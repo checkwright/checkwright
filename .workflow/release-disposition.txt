@@ -1,4 +1,3 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
-foreign-harness-write-path-pass release v0.32.0 — a minor accumulated since v0.31.0, this iteration declaring the Antigravity hook binding, the patch-header write targets, the --selection-probe arm and the manifest-count blank-run read; cut on explicit operator direction of 2026-10-23 (lead-relayed, not a ruling): the second-vendor review counts clean, no open finding a wrong grant or a regression from v0.31.0, the multi-line-payload fall-through declared as a limit in the note.

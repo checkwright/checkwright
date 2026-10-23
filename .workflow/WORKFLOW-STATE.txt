@@ -4,11 +4,4 @@
 
 ---
 
-foreign-harness-write-path-pass scope ac651f70 2026-10-23 3bf00cbad
-foreign-harness-write-path-pass spec a9ec2962 2026-10-23 ba72f8c6f
-foreign-harness-write-path-pass align aed6a2b7 2026-10-23 4f6299266
-foreign-harness-write-path-pass build ab31bd8a 2026-10-23 1636dcc69
-foreign-harness-write-path-pass build a6790216 2026-10-23 5b8bddc56
-foreign-harness-write-path-pass build a81a08af 2026-10-23 65abcc8fb
-foreign-harness-write-path-pass validate ae577dfc 2026-10-23 44d79a607
-foreign-harness-write-path-pass close abd8fbf9 2026-10-23 052c757c3
+— scope a7a53ef4 2026-10-24 72cf23bb6

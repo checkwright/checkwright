@@ -1,18 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: foreign-harness-write-path-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-10-23, lead-relayed, not a ruling; the iteration opened undirected):** option A as scope proposed. Features for spec to author and pair: `antigravity-hook-binding`, `codex-patch-path-residue` (split this scope from `codex-plugin-hook-discovery`, whose discovery half stays deferred), `agent-selection-probe` and `manifest-count-blank-run-bound`. Stages scope, spec, align, build, validate and close; align because the Antigravity binding spans plugin/, gate-sdk's hook contract and native/. Drain 3 against inflow 2.0.
-
-  **Order (scope, own authority):** `antigravity-hook-binding` and `codex-patch-path-residue` first, as one design: a single `--hook` arm reader for a foreign write payload's written path. `agent-selection-probe` runs before `evaluator-root-agent-file` is next taken, since it measures that entry's cost.
-
-  **Release, with a grant (operator direction 2026-10-23, lead-relayed, not a ruling; revises the direction of 2026-10-21):** a grant of one second-vendor review run at validate, unspent; if it returns clean, close cuts v0.32.0.
-
-  **Push need (2026-10-23, inside the budget):** 2 against 2 — the closing push and the v0.32.0 tag push, the operator taking the option that named this fit. No mid-iteration push: the Antigravity binding's `workspacePaths` discovery meets `crate-tests-windows` first at the closing push, so a red there spends one of close's hotfix pushes.
 
 ---
 
