@@ -1,1 +1,8 @@
 # contract: lifecycle-kit/SPEC.md §The survey record — carried surveys, one block per survey; boundary-truncated, cited only behind a passing witness.
+
+## 2026-10-23 scope — How does the deferred pool rank for an undirected iteration, and which rows can land now?
+- corpus: TASK-QUEUE.md
+- oracle: bash gate-sdk/bin/run-gates.sh --emit queue-edges
+- rev: f70d1494038dedb34dc78b8f0763162c4ac90978
+- finding: 17 deferred rows, none session- or iteration-class, none at the recurrence threshold (max 1 of 2). Roadmap now rows (companion-toolkit-profile, design-partner-preview) gate on a published tag and an observed install, neither tree work; v0.31.0 is the last tag, 1663 commits back. Release-gated: tarball-attestation-observed, front-door-job-observed, codex-plugin-version-pin. Upstream-gated: codex-plugin-hook-discovery (codex-cli 0.163.0 on PATH, the version probed 2026-10-21). Not installed: cursor-muse-plugin-observed. Operator-present: notification-delivery-probe. Demand-gated: benchmark-ab-experiment, hosted-attestation-service, external-gate-quality-evidence. Landable features: antigravity-hook-binding (agy 1.3.4 on PATH), agent-selection-probe, manifest-count-blank-run-bound, evaluator-root-agent-file, record-stamp-encoding-compression; awaiting a ruling: smoke-whole-tree-precondition-unscoped, verify-workflow-decoupling. Inbound edges: design-partner-preview 3, benchmark-ab-experiment 2, agent-selection-probe 1 (from evaluator-root-agent-file).
+- inferred: landability of each event-gated row beyond the probes named here; whether Antigravity 1.3.4 runs plugin hooks at all (plugin/SPEC.md reads its protocol off the CLI docs)
