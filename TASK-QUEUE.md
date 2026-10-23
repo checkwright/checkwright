@@ -1,18 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: scratch-confinement-releases-table-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-10-21, lead-relayed, not a ruling; the iteration opened undirected):** option C, over scope's recommended A. Debt promoted by scope: `tmp-dir-prune-coupling` and `run-scratch-temp-residue`, gate-sdk's run scratch under `GATE_SDK_TMP_DIR`. Feature for spec to author and pair: `releases-page-table`. `wait-loop-trailing-read-block` is retired as decided by guard-kit/SPEC.md (disposed-findings record). Stages scope, spec, build, validate and close; drain 4 against inflow 2.8.
-
-  **Order (scope, own authority):** `tmp-dir-prune-coupling` builds before `run-scratch-temp-residue`, which moves more transient captures under the tmp dir.
-
-  **Release (operator direction 2026-10-21, lead-relayed, not a ruling):** v0.32.0 stays deferred, closing push only, no review grant.
-
-  **Push need (2026-10-21, inside the budget):** 2 against 2 — one mid-iteration push serving `run-scratch-temp-residue` (`crate-tests-windows`) and `releases-page-table` (`pages-build-deployment`), batched after both build, and the closing push.
 
 ---
 

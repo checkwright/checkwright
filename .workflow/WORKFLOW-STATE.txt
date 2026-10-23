@@ -4,9 +4,4 @@
 
 ---
 
-scratch-confinement-releases-table-pass scope abaa62d8 2026-10-21 1782def61
-scratch-confinement-releases-table-pass spec af040f0f 2026-10-21 9863e9dd9
-scratch-confinement-releases-table-pass build a23486c5 2026-10-21 eef58eab9
-scratch-confinement-releases-table-pass build a688d380 2026-10-21 e8e1c8a3a
-scratch-confinement-releases-table-pass validate abdb5a17 2026-10-21 8c82bcf32
-scratch-confinement-releases-table-pass close a6ac8254 2026-10-21 4b814a1a2
+— scope ac651f70 2026-10-23 3bf00cbad
