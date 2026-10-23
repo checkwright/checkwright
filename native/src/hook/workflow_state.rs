@@ -2,7 +2,8 @@
 // stamp is the `--enter-stage` arm's to write, and every gate that would catch a hand-stamp fires only
 // at commit, so an uncommitted hand-stamp is otherwise never seen at all.
 use crate::hook;
-use crate::hook::binding::{CHILD_ID, CHILD_TYPE, TOOL_INPUT, WRITTEN_PATH};
+use crate::hook::binding::{CHILD_ID, CHILD_TYPE};
+use crate::hook::patch;
 use crate::walk;
 use serde_json::Value;
 use std::path::{Path, PathBuf};
@@ -20,11 +21,14 @@ pub fn run(payload: Option<&Value>) -> i32 {
     if payload.is_none() {
         return degraded();
     }
-    let path = hook::field(payload, &[TOOL_INPUT, WRITTEN_PATH]);
-    if !path.is_empty() && same_file(&path, &state_file) {
-        return hook::block(NAME, &blocked(&state_file));
+    if let Some(target) = state_file_target(payload, &state_file) {
+        return hook::block(NAME, &blocked(&target, &state_file));
     }
     stamp_before_write(payload)
+}
+
+fn state_file_target(payload: Option<&Value>, state_file: &str) -> Option<String> {
+    patch::written_paths(payload).into_iter().find(|t| same_file(t, state_file))
 }
 
 // spec: lifecycle-kit/SPEC.md §check-dispatch-entry — the second rule, keyed on the caller and never
@@ -77,11 +81,13 @@ fn superseded_stage(payload: Option<&Value>, agent_type: &str, id: &str, state_t
         Ok(_) => return hook::decline(NAME, "the superseded-stage rule read an empty GATE_SDK_TMP_DIR", payload),
         Err(e) => return hook::decline(NAME, &format!("the superseded-stage rule could not resolve GATE_SDK_TMP_DIR ({})", e), payload),
     };
-    let path = hook::field(payload, &[TOOL_INPUT, WRITTEN_PATH]);
-    if !path.is_empty() && under(&path, &tmp) {
-        return 0;
-    }
-    hook::block(NAME, &left_stage(agent_type, id, &own, &cursor, &tmp))
+    let targets = patch::written_paths(payload);
+    let outside = match targets.iter().find(|t| !under(t, &tmp)) {
+        None if !targets.is_empty() => return 0,
+        None => "a call naming no target".to_string(),
+        Some(t) => format!("'{}'", t),
+    };
+    hook::block(NAME, &left_stage(agent_type, id, &own, &cursor, &tmp, &outside))
 }
 
 fn stamped(state_text: &str, id: &str) -> bool {
@@ -99,10 +105,10 @@ fn under(path: &str, dir: &str) -> bool {
         && resolve(path).starts_with(resolve(dir))
 }
 
-fn left_stage(agent_type: &str, id: &str, own: &str, cursor: &str, tmp: &str) -> String {
+fn left_stage(agent_type: &str, id: &str, own: &str, cursor: &str, tmp: &str, outside: &str) -> String {
     format!(
-        "this '{}' session ({}) entered '{}', and the cursor has moved to '{}': a later stage holds the tree. Answer through your report, and the live stage session lands the change. Your resume journal under the scratch dir ({}) stays writable.",
-        agent_type, id, own, cursor, tmp
+        "this '{}' session ({}) entered '{}', and the cursor has moved to '{}': a later stage holds the tree, so {} outside the scratch dir is refused. Answer through your report, and the live stage session lands the change. Your resume journal under the scratch dir ({}) stays writable.",
+        agent_type, id, own, cursor, outside, tmp
     )
 }
 
@@ -172,9 +178,10 @@ fn resolve(p: &str) -> PathBuf {
     }
 }
 
-fn blocked(state_file: &str) -> String {
+fn blocked(target: &str, state_file: &str) -> String {
     format!(
-        "{} is written by lifecycle-kit's --enter-stage arm, never by hand — run '{}' to stamp, or '{}' to rename the iteration (it rewrites the queue header and column 1 of every stamp in one motion, proving columns 2 through NF unchanged). The stamp *is* the stage transition, so a hand-written line moves the cursor for every reader for the rest of the session, and every gate that would catch it fires only at commit: an uncommitted hand-stamp is never seen at all. If enter-stage refuses, that refusal is a gate verdict to resolve at its source, not to write around.",
+        "this call writes '{}', which is {}: that file is written by lifecycle-kit's --enter-stage arm, never by hand — run '{}' to stamp, or '{}' to rename the iteration (it rewrites the queue header and column 1 of every stamp in one motion, proving columns 2 through NF unchanged). The stamp *is* the stage transition, so a hand-written line moves the cursor for every reader for the rest of the session, and every gate that would catch it fires only at commit: an uncommitted hand-stamp is never seen at all. If enter-stage refuses, that refusal is a gate verdict to resolve at its source, not to write around.",
+        target,
         state_file,
         door("--enter-stage <stage>", crate::gates::door_command("--enter-stage <stage>")),
         door("--enter-stage --rename <name>", crate::gates::door_command("--enter-stage --rename <name>"))
@@ -241,6 +248,24 @@ mod tests {
         assert!(msg.starts_with("--enter-stage <stage> ("), "the arm must still be named: {}", msg);
         assert!(msg.contains("could not be read: GATE_SDK_NATIVE_BIN is unset"), "the fault must be named: {}", msg);
         assert_eq!(door("x", Ok("./bin --enter-stage <stage>".to_string())), "./bin --enter-stage <stage>");
+    }
+
+    // spec: lifecycle-kit/SPEC.md §check-stage-evidence — a patch naming the state file among its
+    // targets trips the first rule, and one naming only other files does not
+    #[test]
+    fn a_patch_naming_the_state_file_trips_the_first_rule() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
+        let state = root.join(".workflow/WORKFLOW-STATE.txt").display().to_string();
+        let doc = |target: &str| -> Value {
+            serde_json::json!({"tool_input": {"command": format!(
+                "*** Begin Patch\n*** Add File: {}\n+x\n*** Update File: {}\n@@\n-a\n+b\n*** End Patch\n",
+                root.join("notes.md").display(),
+                target
+            )}})
+        };
+        assert_eq!(state_file_target(Some(&doc(&state)), &state), Some(state.clone()));
+        let other = root.join(".workflow/gap-inbox.md").display().to_string();
+        assert_eq!(state_file_target(Some(&doc(&other)), &state), None);
     }
 
     // spec: lifecycle-kit/SPEC.md §check-stage-entry — a path whose leaf does not yet exist still

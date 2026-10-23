@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: lifecycle-kit/SPEC.md §check-dispatch-entry — the workflow-state guard's stamp-before-write and superseded-stage rules end-to-end through a sandboxed --hook: a configured stage-session caller with no stamp is blocked, a caller whose stage the cursor has left is blocked outside the scratch dir and allowed inside it, a stamped one holding the cursor, a caller of another type and a top-level caller pass, an empty roster is inert, an unreadable state file declines through the advise envelope, and the state-file rule still blocks a stamped caller and follows a relocated LIFECYCLE_KIT_STATE_FILE
+# spec: lifecycle-kit/SPEC.md §check-dispatch-entry — the workflow-state guard's stamp-before-write and superseded-stage rules end-to-end through a sandboxed --hook: a configured stage-session caller with no stamp is blocked, a caller whose stage the cursor has left is blocked outside the scratch dir and allowed inside it, a patch with every target inside it included, a stamped one holding the cursor, a caller of another type and a top-level caller pass, an empty roster is inert, an unreadable state file declines through the advise envelope, and the state-file rule still blocks a stamped caller and follows a relocated LIFECYCLE_KIT_STATE_FILE
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -24,6 +24,13 @@ payload() {  # $1=agent_type (or '-' for none)  $2=agent_id  $3=file_path
     else
         printf '{"hook_event_name":"PreToolUse","tool_name":"Write","agent_type":"%s","agent_id":"%s","tool_input":{"file_path":"%s"}}' "$1" "$2" "$3"
     fi
+}
+
+patch_payload() {  # $1=agent_id  $2.. the patch's Add File targets
+    local id="$1" body='*** Begin Patch\n' t
+    shift
+    for t in "$@"; do body+="*** Add File: $t\\n+x\\n"; done
+    printf '{"hook_event_name":"PreToolUse","tool_name":"Edit","agent_type":"stage-session","agent_id":"%s","tool_input":{"command":"%s*** End Patch\\n"}}' "$id" "$body"
 }
 
 hook() {  # $1=knob file  $2=payload; prints stdout+stderr, returns the hook's exit
@@ -55,6 +62,11 @@ out="$(hook roster.knobs "$(payload stage-session aaaaaaaa00000000 "$sb/.tmp/jou
 [[ "$rc" -eq 0 && -z "$out" ]] || note superseded-scratch "want a silent exit 0 for a superseded caller writing under the scratch dir, got $rc -- $out"
 out="$(hook roster.knobs "$(payload stage-session aaaaaaaa00000000 "$sb/.tmp/../notes.md")")"; rc=$?
 [[ "$rc" -eq 2 ]] || note superseded-climb "want exit 2 for a superseded caller climbing out of the scratch dir, got $rc -- $out"
+out="$(hook roster.knobs "$(patch_payload aaaaaaaa00000000 "$sb/.tmp/journal/a.md" "$sb/notes.md")")"; rc=$?
+[[ "$rc" -eq 2 ]] || note superseded-patch "want exit 2 for a superseded caller's patch with one target outside the scratch dir, got $rc -- $out"
+grep -qF "'$sb/notes.md'" <<<"$out" || note superseded-patch-target "the block does not name the target outside the scratch dir: $out"
+out="$(hook roster.knobs "$(patch_payload aaaaaaaa00000000 "$sb/.tmp/journal/a.md" "$sb/.tmp/journal/b.md")")"; rc=$?
+[[ "$rc" -eq 0 && -z "$out" ]] || note superseded-patch-scratch "want a silent exit 0 for a superseded caller's patch with every target under the scratch dir, got $rc -- $out"
 out="$(hook roster.knobs "$(payload stage-session a94d72dcd2db52dbf notes.md)")"; rc=$?
 [[ "$rc" -eq 0 && -z "$out" ]] || note cursor-holder "want a silent exit 0 for the caller holding the cursor, got $rc -- $out"
 
@@ -75,5 +87,5 @@ out="$(hook absent.knobs "$(payload stage-session b1b2b3b4c5c6c7c8d notes.md)")"
 grep -qF '"additionalContext"' <<<"$out" || note decline-envelope "the decline did not write the PreToolUse advise envelope: $out"
 
 [[ "$fails" -eq 0 ]] || { echo "stamp-before-write.test: $fails assertion(s) failed"; exit 1; }
-echo "stamp-before-write.test: clean (an unstamped stage-session caller is blocked naming its id and the remedy; a caller whose stage the cursor has left is blocked naming both stages, allowed under the scratch dir and blocked climbing out of it; a stamped one holding the cursor, another type, a top-level caller and an empty roster pass silently; an unreadable state file declines through the advise envelope; the state-file rule still blocks a stamped caller and follows a relocated LIFECYCLE_KIT_STATE_FILE)"
+echo "stamp-before-write.test: clean (an unstamped stage-session caller is blocked naming its id and the remedy; a caller whose stage the cursor has left is blocked naming both stages, allowed under the scratch dir and blocked climbing out of it, its patch blocked on one target outside the scratch dir and allowed with every target inside it; a stamped one holding the cursor, another type, a top-level caller and an empty roster pass silently; an unreadable state file declines through the advise envelope; the state-file rule still blocks a stamped caller and follows a relocated LIFECYCLE_KIT_STATE_FILE)"
 exit 0

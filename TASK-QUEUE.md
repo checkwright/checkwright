@@ -26,16 +26,6 @@ a hook binding for the plugin's guards under Antigravity, split off `plugin-harn
 
 **Cost while deferred:** an Antigravity user installing the plugin gets the skills and no guard. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's Antigravity row reads not wired. Owner lookup: `antigravity`, `agy` in this file, none; owner plugin/SPEC.md §The harnesses with gate-sdk/SPEC.md §The hook contract.
 
-### codex-patch-path-residue
-
-[spec: SPEC-patch-paths.md]
-
-Codex's patch tool matches `Write|Edit` but carries the patch as `tool_input.command` with no `file_path`, and `workflow-state-guard` allows on an empty path (`native/src/hook/workflow_state.rs`), so once Codex discovers the plugin's hooks a Codex session could hand-write the stage state file.
-
-**Deliverable:** read the patch's file headers for the written paths, or state why not, designed with [antigravity-hook-binding](#antigravity-hook-binding)'s write-tool reader as one `--hook` arm reader for a foreign write payload's path; then plugin/SPEC.md's Codex limit narrows.
-
-**Cost while deferred:** none until Codex discovers plugin hooks; from then, a Codex session's write to the state file passes the guard. Filed 2026-10-23 by foreign-harness-write-path-pass' scope as a split, operator-directed, from [codex-plugin-hook-discovery](#codex-plugin-hook-discovery), filed 2026-10-18 by harness-reach-pass' close. Re-verified 2026-10-23: `workflow_state.rs` line 24 allows on an empty path. Owner lookup: the parent's; owner lifecycle-kit/SPEC.md §check-stage-entry, with plugin/SPEC.md §The guards.
-
 ### manifest-count-blank-run-bound
 
 [spec: SPEC-blank-run.md]
@@ -232,7 +222,7 @@ surface (c) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 
 `codex-cli` 0.162.1 and 0.163.0 (re-probed 2026-10-21 through the app server's `hooks/list`) discover no plugin hooks while the package root carries the portable `plugin.json` (with or without `extensions.com.openai` hooks or a `.codex-plugin/plugin.json` beside it); without that manifest `hooks/hooks.json` is discovered and the unchanged rendering blocks correctly. Likely upstream: Codex's build docs say `hooks/hooks.json` is discovered by default. Codex guard wiring is tier 1 (operator direction 2026-09-28).
 
-**Deliverable:** on a Codex release discovering hooks beside the root manifest, re-run plugin/SPEC.md §The validation leg's Codex install, wire the guards, and update plugin/SPEC.md's Codex row and plugin/README.md's guard bullet. Its patch residue split off as [codex-patch-path-residue](#codex-patch-path-residue) at foreign-harness-write-path-pass' scope (operator direction 2026-10-23, lead-relayed, not a ruling).
+**Deliverable:** on a Codex release discovering hooks beside the root manifest, re-run plugin/SPEC.md §The validation leg's Codex install, wire the guards, and update plugin/SPEC.md's Codex row and plugin/README.md's guard bullet. Its patch residue split off as `codex-patch-path-residue` at foreign-harness-write-path-pass' scope (operator direction 2026-10-23, lead-relayed, not a ruling).
 
 **Cost while deferred:** a Codex adopter gets the skills and no shell, wakeup or workflow-state guard. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's Codex row and limits. Re-probed 2026-10-23: `codex-cli` on PATH is still 0.163.0. Owner lookup: `codex`, `apply_patch` in this file and the disposed-findings record, none; owner plugin/SPEC.md §The harnesses.
 
@@ -953,4 +943,6 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
+
+- codex-patch-path-residue
 

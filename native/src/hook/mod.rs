@@ -8,6 +8,7 @@ pub mod budget;
 pub mod dispatch;
 pub mod escalation;
 pub mod model_verdict;
+pub mod patch;
 pub mod poll;
 pub mod session_context;
 pub mod shell_guard;

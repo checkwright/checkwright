@@ -93,7 +93,7 @@ The prefix differs from the settings rendering's anchor because the plugin loads
 
 - **It runs a plugin's hooks only after the user trusts them** in its `/hooks` view, and a changed rendering is skipped until trusted again.
 - **It sets no project-directory variable and runs a hook in the session's working directory**, so the prefix's fallback to `.` is the path it takes. Run on that copy, the shell guard blocks in a vendored repository, from a subdirectory launch too, and stays silent in an empty one.
-- **Two of the rendering's blocks reach less there.** No Codex tool matches `ScheduleWakeup|CronCreate`, so the wakeup guard never fires. Its patch tool matches `Write|Edit` but carries the patch text, never a written path, so `workflow-state-guard` reads no path and allows.
+- **The wakeup guard never fires there**, since no Codex tool matches `ScheduleWakeup|CronCreate`. Its patch tool matches `Write|Edit` and carries the patch as the command, and `workflow-state-guard` reads each path the patch's file headers name ([gate-sdk/SPEC.md §The hook contract](../gate-sdk/SPEC.md#the-hook-contract)).
 
 **Antigravity is not wired.** Its hook payload, its decision envelope and its hook file's shape each differ from the shipped binding. It runs a hook in the plugin's own directory with no project-directory variable, so a command there cannot find the repository's front end without reading the payload. It installs this package with its hooks skipped.
 
@@ -137,7 +137,7 @@ A build that changes the package runs the same commands locally, then installs i
 ## Honest limits
 
 - Claude Code's, Codex's and Antigravity's installs are run; every other harness in [§The harnesses](#the-harnesses) is read off its own documentation.
-- Codex runs no guard from this package, and once it discovers them, still no wakeup guard and no `workflow-state-guard` over a patch ([§The guards](#the-guards)).
+- Codex runs no guard from this package, and once it discovers them, still no wakeup guard ([§The guards](#the-guards)).
 - Codex records an install at version `1.0.0`, since neither manifest carries `version` ([§The manifests](#the-manifests)). Whether a pin move reaches an installed copy through `codex plugin marketplace upgrade` is unrun.
 - Antigravity, Cursor and Muse Code run no guard from this package.
 - (B)'s front-matter reader is a subset of YAML: a quoted value's escapes and a value continued onto a later line are not read, so the validation leg still catches a slip in either.

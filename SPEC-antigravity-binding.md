@@ -1,6 +1,6 @@
 # SPEC amendment: antigravity-binding
 
-Pairs `antigravity-hook-binding`. The plugin's guards reach Claude Code alone; Antigravity installs the package with its hooks skipped (plugin/SPEC.md §The guards). This amendment adds a second binding to gate-sdk/SPEC.md §The hook contract, Antigravity's, reached through an adapter on the `--hook` arm. It also renders the plugin's guards into the hook file Antigravity reads. The shell guard and `workflow-state-guard` run unchanged behind the adapter. `SPEC-patch-paths.md` is designed with it: the adapter hands a write tool's path to the one written-path reader that amendment gives `workflow-state-guard`, so either can land first.
+Pairs `antigravity-hook-binding`. The plugin's guards reach Claude Code alone; Antigravity installs the package with its hooks skipped (plugin/SPEC.md §The guards). This amendment adds a second binding to gate-sdk/SPEC.md §The hook contract, Antigravity's, reached through an adapter on the `--hook` arm. It also renders the plugin's guards into the hook file Antigravity reads. The shell guard and `workflow-state-guard` run unchanged behind the adapter. The write-path reader (gate-sdk/SPEC.md §The hook contract, *A write call's targets have one reader*) was designed with it: the adapter hands a write tool's path to that one reader `workflow-state-guard` reads through.
 
 **What was run at spec**, with `agy` 1.3.4; the installed `agy` was 1.4.6 by align, whose embedded hooks page and tool text were re-read there, and each claim below names the version it was read at. None of it touched the user's agy configuration: the plugin was a workspace-local copy under a scratch repository's `.agents/plugins/`, and the installs used a scratch `HOME`.
 
@@ -162,9 +162,9 @@ The docs mirror and the agent index regenerate: `bash gate-sdk/bin/run-gates.sh 
 - **The translated payload** (delta 3). Its producer is `translate_payload` and its consumer the child member. Each field has its reader:
   - `hook_event_name` is read by `hook::decline_envelope`;
   - `tool_name` and `tool_input.command` by the shell guard;
-  - `tool_input.file_path` by `workflow-state-guard`, through `SPEC-patch-paths.md`'s reader where that has landed;
+  - `tool_input.file_path` by `workflow-state-guard`, through the write-path reader (gate-sdk/SPEC.md §The hook contract);
   - No `session_id` or `transcript_path` is produced: their readers, the wakeup guard, the session-context member and the delegation-kit members, are members the rendering does not reach.
-  - `cwd` by `SPEC-patch-paths.md`'s relative-path join, and by nothing before it lands. That stays harmless, since a member ignores an unread key.
+  - `cwd` by the write-path reader's relative-path join (gate-sdk/SPEC.md §The hook contract).
   - No `agent_id` or `agent_type` is produced, so `workflow-state-guard`'s second and third rules exit 0 at their first test. Antigravity's subagents carry no child marker this binding reads.
 - **The deny envelope** (delta 3). Its producer is `translate_verdict`, and its consumer Antigravity, which shows the reason to the model.
 - **Roster-holding readers, each red condition named:**
