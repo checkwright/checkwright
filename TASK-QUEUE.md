@@ -178,6 +178,36 @@ Cursor and Muse Code are installed on no build machine, so plugin/SPEC.md §The 
 
 **Cost while deferred:** two tier-2 harnesses' skill load and guard reach rest on vendor docs. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: neither CLI on the build machine's PATH. Owner lookup: `cursor`, `muse` in this file, none; owner plugin/SPEC.md §The harnesses.
 
+### npx-native-windows-route
+
+[cost: event/high] [surface: installer]
+
+the package route fails on native Windows: v0.32.0's front-door Windows legs ran `npx checkwright@0.32.0 init` to `The system cannot find the path specified.`, since the `checkwright` bin is the sh bootstrap, whose `#!/bin/sh` line npm's `.cmd` shim runs as a literal `/bin/sh`. installer/SPEC.md §Layout sends a native Windows adopter to `checkwright-pwsh`, yet docs/install.md §With Node prints only `npx checkwright init`, and `scripts/ci-front-door.ps1` runs that line.
+
+**Design-pending, a feature:** the route is a governed contract (installer/SPEC.md §Layout and §The front door's verbs). Two shapes, unmeasured on a Windows runner. (A) The page and the driver spell the pwsh entry on Windows; its `#!/usr/bin/env pwsh` line makes the shim run `pwsh`, PowerShell 7, which docs/requirements.md's Windows floor (Windows PowerShell 5.1) does not carry, and `check-front-door-verbs` reads no such route. (B) The sh bootstrap's line becomes `#!/usr/bin/env sh`, so the shim runs `sh` from `PATH`, which the page's `windows-remedy` block already supplies, and the one line holds on every host. Either wants a running witness on `install-smoke-pwsh-windows` before a tag.
+
+**Cost while deferred:** a first `npx` install on native Windows fails, and RELEASING.md §The front-door rehearsal owes the fix as the next patch release. Surfaced 2026-10-23 at foreign-harness-write-path-pass' close by the v0.32.0 publish run; not a regression, the job's first run. Owner lookup: `npx`, `checkwright-pwsh` in this file and the disposed-findings record, none; owner installer/SPEC.md §Layout.
+
+### front-door-npm-visibility-wait
+
+[cost: event/low] [surface: scripts]
+
+the front-door job starts on the `npm` job's success with no wait for registry visibility: at v0.32.0 all seven legs first went red on the package route alone, npm `ETARGET` for `checkwright@0.32.0` about five minutes after publish, and a failed-jobs re-run went green on every Unix leg once `npm view` resolved it.
+
+**Deliverable, debt:** each driver (`scripts/ci-front-door.sh` and its `.ps1` twin) polls `npm view <pkg>@<v> version` under a bound before the package route, a lapsed bound being that route's finding; RELEASING.md §The front-door rehearsal's package-route bullet states the wait.
+
+**Cost while deferred:** every release spends a re-run of the front-door job, and its first red reads as a finding until the step's output is read. Surfaced 2026-10-23 at foreign-harness-write-path-pass' close by the v0.32.0 publish run. Owner lookup: `ETARGET`, `npm view` in this file and the disposed-findings record, none; owner RELEASING.md §The front-door rehearsal.
+
+### prove-front-door-restoration
+
+[cost: event/high] [surface: docs]
+
+v0.32.0 is cut, so the restoration `tarball-attestation-observed` recorded is owed: reverse 916026963's withdrawal (`checkwright prove` in docs/install.md's recommended-path sentence, the agent prompt's last step and its Prove it on your tree section; docs/maintenance.md's prove verb bullet; docs/openspec.md's overlap section and its `--recipe openspec-overlap` line), then delete `companion/fixtures/openspec/overlap/line.md` and re-point companion/SPEC.md's and the overlap step's reads of it.
+
+**Deliverable, debt, two obligations the reverse patch does not meet.** `prove` changed after the withdrawal (ebfab68bd, 16758beee, both inside v0.32.0), so the restored text is re-verified against installer/SPEC.md §prove as it stands. The reverse patch puts docs/install.md at 1542 words against `check-docs-page-length`'s 1500, measured at that close, so the page is cut to fit rather than the limit raised.
+
+**Cost while deferred:** the front door omits the step that shows the guarantee on the adopter's own tree, and an OpenSpec reader meets no overlap recipe. Surfaced 2026-10-23 at foreign-harness-write-path-pass' close. Owner lookup: `overlap/line`, `prove` in this file and the disposed-findings record, none; owner installer/SPEC.md §prove, with companion/SPEC.md §The OpenSpec overlap.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
