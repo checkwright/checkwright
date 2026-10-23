@@ -912,8 +912,3 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 ## Done
 
-- codex-patch-path-residue
-- antigravity-hook-binding
-- agent-selection-probe
-- manifest-count-blank-run-bound
-
