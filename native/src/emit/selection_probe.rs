@@ -179,8 +179,8 @@ fn ask(c: &Call, subject: &[String], secs: u64, dir: &Path) -> (&'static str, Ve
     }
 }
 
-// spec: drift-kit/SPEC.md §The agent-selection probe — a subject name occurring case-insensitively
-// with no word character, an ASCII letter, digit or `_`, on either side of it
+// spec: drift-kit/SPEC.md §The agent-selection probe — a subject name occurring under ASCII case
+// folding with no word character, an ASCII letter, digit or `_`, on either side of it
 fn names_subject(answer: &str, subject: &[String]) -> bool {
     let hay = answer.as_bytes();
     let word = |b: u8| b.is_ascii_alphanumeric() || b == b'_';
