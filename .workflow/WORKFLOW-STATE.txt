@@ -4,4 +4,4 @@
 
 ---
 
-— scope a7a53ef4 2026-10-24 72cf23bb6
+front-door-patch-pass scope a7a53ef4 2026-10-24 72cf23bb6
