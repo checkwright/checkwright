@@ -124,22 +124,6 @@ the consumer smoke gates its whole suite on an unscoped clean-tree preflight (in
 
 **Cost while deferred:** each validate rerun after a red run, and each capture left uncommitted while a validate battery is pending, costs a full `installer_smoke` suite. Filed 2026-09-10 by close, draining the gap inbox; thawed 2026-10-18 by close on the recurrence. Owner lookup: `dirty`, `validate-evidence`, `run-validate` in this file and the disposed-findings record — the 2026-10-16 record, deleted as its ground fell; owner installer/SPEC.md §The consumer smoke.
 
-### tarball-attestation-observed
-
-[cost: event/low] [surface: installer] [observed-by: publish]
-
-the observation half of `tarball-build-attestation`: the first Release cut after that entry landed carries an artifact attestation on its tarball, and a shell installer run against that Release verifies it where the verifier is present.
-
-**Deliverable:** that observation, read off the `publish` run and one install from the published Release, with any defect it shows filed.
-
-**Release (operator directions, lead-relayed, not rulings):** v0.32.0 has stayed deferred since a direction of 2026-10-12, closing push only. **The bar, the same direction:** cut once no open finding is a wrong grant or a regression from v0.31.0; a fall-through hole rides as a declared limit in the note. **Since 2026-10-13** that reading rests on the iteration's second-vendor review returning clean, a failed run or a finding leaving the bar a judgment being asked, never met by a same-vendor reader; **since 2026-10-14** a close promotes every verdict-moving guard change it would author rather than landing it (the close binding carries the rule). That cut's `publish` run produces this observation and [front-door-job-observed](#front-door-job-observed)'s.
-
-**Grants spent 2026-10-15 to 2026-10-21:** every review returned findings or failed (a credit wall, a content refusal), each finding fixed or landed in a later build, the last two wrong grants closed by the literal-only grant shrink at guard-grant-shrink-pass; each close deferred v0.32.0. The competitive-followup-pass close withdrew `prove` from docs/install.md and docs/maintenance.md and the overlap section from docs/openspec.md, its line held in `companion/fixtures/openspec/overlap/line.md`; **the cut restores them** and deletes the held file.
-
-**Bar narrowed, operator direction 2026-10-20, lead-relayed at guard-grant-shrink-pass' scope:** the zero-wrong-grant bar reads over the grant set that iteration's literal-only shrink left. Its one granted review ran at its validate and failed on the vendor's content refusal with no report, so **v0.32.0 stays deferred (operator direction 2026-10-21, lead-relayed, not a ruling):** closing push only, no tag, no publish and no second review run, no grant being held.
-
-**Cost while deferred:** the attestation step ships unobserved until a release exercises it. Filed 2026-10-04 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `attest`, `publish`, `tarball` in this file — tarball-build-attestation, its produce half, and front-door-rehearsal-rule, DISTINCT (a clean-seat rehearsal job, not this one observation).
-
 ### verify-workflow-decoupling
 
 [cost: event/low] [surface: installer] [not-icebox-eligible: 2026-10-06 holds the operator's stated aim of 2026-09-28 and the ruling it waits on; evicting it would compress the question away]
@@ -149,16 +133,6 @@ the operator states that verification and workflow are fully decoupled, each shi
 **Deliverable:** a ruling on whether the gate binary is verification or substrate both halves share; if the decoupling then holds, the front door and docs/kits.md state it, and a workflow-only profile is weighed.
 
 **Cost while deferred:** the front door neither claims nor refutes a decoupling the operator believes in, and docs/kits.md reads as a dependency chain. Filed 2026-09-28 by plugin-marketplace-queue-verbs' lead. Re-verified: the three profiles' rows and comments in `installer/profiles.list`, and docs/kits.md line 13. Owner lookup: `decoupl`, `profiles.list`, `workflow-only` in this file — none; owner installer/SPEC.md §Profiles, with docs/kits.md.
-
-### front-door-job-observed
-
-[cost: event/low] [surface: lifecycle-kit] [observed-by: publish]
-
-the observation half of `front-door-rehearsal-rule`'s second layer: the first Release cut after its post-publish job landed, `publish.yml`'s `front-door`, runs that job on the clean runners, and the run is read.
-
-**Deliverable:** that observation, read off the `publish` run, with any defect the clean-seat installs show filed.
-
-**Cost while deferred:** the post-publish job ships unobserved until a release exercises it. Filed 2026-10-10 as a split at scope, because a tag-triggered run cannot be produced by a mid-iteration push (lifecycle-kit/SPEC.md §The state machine). Owner lookup: `post-publish`, `publish`, `observed-by` in this file — [tarball-attestation-observed](#tarball-attestation-observed), DISTINCT (the attestation step's own first run, on the same release).
 
 ### notification-delivery-probe
 
@@ -911,4 +885,7 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
+
+- tarball-attestation-observed
+- front-door-job-observed
 
