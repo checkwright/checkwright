@@ -1,2 +1,1 @@
 # contract: lifecycle-kit/SPEC.md §The committed gap inbox — append-only mid-iteration gap capture, close-drained; one `- <YYYY-MM-DD> — <gap>` bullet per gap below (filed via run-gates.sh --emit file-gap).
-- 2026-10-23 — drift-kit --price-coverage reports the price page CHANGED since priced-as-of 2026-10-15 (new hash 33e7e4e045d7e534bb441ba0249156748b9f21ed): re-verify the price rows against the page, then record the new hash
