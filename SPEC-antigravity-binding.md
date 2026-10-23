@@ -2,9 +2,9 @@
 
 Pairs `antigravity-hook-binding`. The plugin's guards reach Claude Code alone; Antigravity installs the package with its hooks skipped (plugin/SPEC.md §The guards). This amendment adds a second binding to gate-sdk/SPEC.md §The hook contract, Antigravity's, reached through an adapter on the `--hook` arm. It also renders the plugin's guards into the hook file Antigravity reads. The shell guard and `workflow-state-guard` run unchanged behind the adapter. `SPEC-patch-paths.md` is designed with it: the adapter hands a write tool's path to the one written-path reader that amendment gives `workflow-state-guard`, so either can land first.
 
-**What was run at spec**, with `agy` 1.3.4. None of it touched the user's agy configuration: the plugin was a workspace-local copy under a scratch repository's `.agents/plugins/`, and the installs used a scratch `HOME`.
+**What was run at spec**, with `agy` 1.3.4; the installed `agy` was 1.4.6 by align, whose embedded hooks page and tool text were re-read there, and each claim below names the version it was read at. None of it touched the user's agy configuration: the plugin was a workspace-local copy under a scratch repository's `.agents/plugins/`, and the installs used a scratch `HOME`.
 
-- **The CLI's built-in documentation** is embedded in the binary and was read from it: the hooks page (`hooks.json`, events, the input and output contracts) and the plugins page.
+- **The CLI's built-in documentation** is embedded in the binary and was read from it at 1.3.4, and again at 1.4.6 where its payload, matcher and decision rows agree: the hooks page (`hooks.json`, events, the input and output contracts) and the plugins page.
 - **Installs under a scratch `HOME`.**
   - `agy plugin install` of a directory carrying a root `plugin.json` and a root `hooks.json` prints `hooks : 1 processed`. It copies the whole directory, a script beside the hook file included, to `<HOME>/.gemini/config/plugins/<name>/`, and `agy plugin list` shows `Components: 1 hook`.
   - A copy of `plugin/` with a root `hooks.json` validates with `hooks 1` and installs with `13 skills, 1 hook`. `agy plugin validate` warns `hooks/hooks.json: never loaded: plugin hooks are read only from hooks.json at the plugin root`. It also notes that a manifest declaring the Agent Plugins `$schema` loads as an Agent Plugins plugin while the CLI's `enable-agent-plugins-spec` flag is on, and as a native plugin otherwise.
@@ -19,7 +19,7 @@ Pairs `antigravity-hook-binding`. The plugin's guards reach Claude Code alone; A
 - **Not run**:
   - A hook from a plugin installed into a signed-in `HOME`'s `.gemini/config/plugins/`. That would write the user's own agy configuration. The workspace copy and the install path are loaded by the same runtime plugin discovery (the plugins page), so the installed path's firing is inferred from the workspace path's.
   - Native Windows. The hooks page says a command runs under `cmd /c` there.
-  - The `write_to_file` and `replace_file_content` tools, which the binary's own tool examples spell with `args.TargetFile`.
+  - The `write_to_file`, `replace_file_content` and `multi_replace_file_content` tools. The first two are spelled with `args.TargetFile` in the binary's own tool examples. `multi_replace_file_content` is named beside them in the system text embedded in `agy` 1.4.6, read at align, and its arguments are presumed to carry `TargetFile` as `replace_file_content`'s do. The 1.4.6 hooks page documents the matcher as a regular expression with `a|b` alternation.
 
 **The mechanism, and the shapes refused.**
 
@@ -43,14 +43,14 @@ New paragraphs after **Honest limits.**, the last paragraph before §The port-ca
 > **The binding table, Antigravity.** The adapter's binding: no kit template speaks it, and the plugin's rendering is its one wiring (plugin/SPEC.md §The guards).
 >
 > - Events: before-tool-call `PreToolUse`, which the payload does not name. <!-- harness-binding: the Antigravity binding table -->
-> - Tools: shell `run_command`; file-write `write_file` and `edit_file`, and `write_to_file` and `replace_file_content`. <!-- harness-binding: the Antigravity binding table -->
+> - Tools: shell `run_command`; file-write `write_file` and `edit_file`, and `write_to_file`, `replace_file_content` and `multi_replace_file_content`. <!-- harness-binding: the Antigravity binding table -->
 > - Common payload: `workspacePaths`, the launch directory first; also `conversationId`, `transcriptPath`, `artifactDirectoryPath`, `modelName` and `stepIdx`, which no member reads. <!-- harness-binding: the Antigravity binding table -->
 > - Tool call: `toolCall`, carrying `name` and `args`; `args` carries `CommandLine`, and the written path as `Path` or `TargetFile`. <!-- harness-binding: the Antigravity binding table -->
 > - Envelopes: block `{"decision":"deny","reason":…}`. No decision is an empty stdout, and every other object, `{}` included, blocks. A non-zero status fails the call. <!-- harness-binding: the Antigravity binding table -->
 > - Variables: none. The hook runs in its hook file's directory. <!-- harness-binding: the Antigravity binding table -->
 > - Wiring: a `hooks.json` keyed by hook name at the plugin root; `command`, run by `sh -c`, or `cmd /c` on Windows; `timeout`, default 30 seconds. <!-- harness-binding: the Antigravity binding table -->
 >
-> **Its measured record.** The rows were read off the CLI's embedded hooks documentation and off recorded firings of a plugin's hooks in a workspace-local copy. `write_to_file`, `replace_file_content` and `TargetFile` are read off the binary's own tool examples and have not fired. The table has no transcript, permission-rule, child or turn-end row: the adapter serves before-tool-call members alone, and no member it serves reads those roles.
+> **Its measured record.** The rows were read off the CLI's embedded hooks documentation and off recorded firings of a plugin's hooks in a workspace-local copy. `write_file`, `edit_file`, `Path` and the payload rows were recorded at `agy` 1.3.4. `write_to_file`, `replace_file_content`, `multi_replace_file_content` and `TargetFile` are read off the binary's own tool examples and system text at 1.4.6 and have not fired. The table has no transcript, permission-rule, child or turn-end row: the adapter serves before-tool-call members alone, and no member it serves reads those roles.
 >
 > **Its one copy** is `native/src/hook/antigravity.rs`, which also holds both translations. Its unit test holds every row and the module to one set of spellings, as `binding.rs`'s holds the shipped table.
 
@@ -65,7 +65,7 @@ New paragraph in `gate-sdk/SPEC.md` §The harness-integration arm, after the par
 > - **A grant is withheld**, because each rests on a model of the shipped binding's permission matcher, the ground on which guard-kit grants nothing on the PowerShell tool (guard-kit/SPEC.md §The generic ruleset).
 > - **The adapter always exits 0**, since a foreign binding may fail a call on any other status. An unknown `<name>` is still exit 2 with the set named, on the shape of the unknown-member refusal.
 >
-> Its honest limit is that an advise reaches nobody: the binding has no channel that leaves the call to proceed and reaches the model.
+> Its honest limit is that an advise reaches nobody: no channel was found that leaves the call to proceed and reaches the model. The hooks page documents a `reason` beside every decision and the `ask` and `overwrite` fields, and no run tried an `allow` carrying a `reason` or either field, so a channel may exist.
 
 ### (3) The adapter module {design-bearing}
 
@@ -75,11 +75,12 @@ All **Not yet applied.**
   - It holds delta 1's spellings as `pub const`s, with a test holding them to the new table in the shape of `binding.rs`'s. The split points are the table's own heading and **Its measured record.**, and the test also holds that `binding.rs`'s split still finds exactly its own rows.
   - It holds `translate_payload(&Value) -> Option<Value>`, which builds the shipped-binding payload from `binding.rs`'s own constants and never spells a shipped key again.
   - It holds `translate_verdict(status, stderr) -> String`, which returns the deny envelope or the empty string. The deny envelope's braces stay a literal with key order `decision`, `reason`, as `binding.rs`'s envelopes do, and the reason is serialized by `hook::quote`.
-  - It holds `run(member, payload_bytes) -> i32`, which spawns `std::env::current_exe()` with `--hook <member>` through `proc::run`, its stdin the translated payload. It prints the translated verdict and returns 0.
+  - It holds `run(member, payload_bytes) -> i32`, which spawns `proc::self_image()` with `--hook <member>` through `proc::run_with_stdin`, its stdin the translated payload. The crate bars `current_exe(` outside `proc.rs`, and `self_image` is its spelling for a child spawned while this process runs. `run` prints the translated verdict and returns 0.
+- **`native/src/hook/binding.rs`**: `Write` moves from `UNREAD` to a read constant, `TOOL_WRITE`, since `translate_payload` names the file-write tool it hands the member and the module spells no such tool today. Its table test is unchanged, because the table already lists `Write`.
 - **`native/src/hook/mod.rs`**: `run()` reads `--binding <name>` after the member, before it reads stdin. It dispatches to `antigravity::run` for `antigravity`, and refuses any other name at exit 2. Tree entry stays where it is, so the child resolves the tree the parent entered.
 - **The unit cases**, in `antigravity.rs`:
   - every observed payload shape at spec translated, the three tool calls (`run_command`, `write_file`, `edit_file`) and a payload with no `toolCall`;
-  - a `TargetFile` path;
+  - a `TargetFile` path, and a `multi_replace_file_content` call carrying one. The build fires that tool once under a signed-in `agy` where it can, records the payload in its journal, and drops the presumption from delta 4's honest limit when `TargetFile` is there;
   - an unknown tool name handed on with no command and no path;
   - each verdict class: exit 2 with stderr, exit 0 with each shipped envelope, a non-zero non-2 status;
   - the deny envelope's byte order and the escaping of a quote in the reason.
@@ -93,7 +94,7 @@ All **Not yet applied.**
 
 > **Antigravity reads `plugin/hooks.json`**, a second rendering of the same template in its own binding (gate-sdk/SPEC.md §The hook contract, the Antigravity table). It reads hooks only from a `hooks.json` at the plugin root and never from `hooks/hooks.json`, and no other harness reads the root file. The rendering:
 >
-> - is one hook named for the package, carrying one `PreToolUse` group per template group whose tools have an Antigravity spelling. Its matcher is those spellings joined by `|`: the shell group becomes `run_command`, and the file-write group becomes the four file-write tools. A group with no such tool, the wake group, is left out, and so is the PowerShell tool;
+> - is one hook named for the package, carrying one `PreToolUse` group per template group whose tools have an Antigravity spelling. Its matcher is those spellings joined by `|`: the shell group becomes `run_command`, and the file-write group becomes the five file-write tools. A group with no such tool, the wake group, is left out, and so is the PowerShell tool;
 > - composes each `command` as `rem=1; ` followed by the Antigravity prefix, then the member, then the suffix.
 >
 > The prefix reads the payload once and takes the first `workspacePaths` entry with `sed`. It asks git for that path's toplevel and tests for the vendored front end and for `bash`, and it exits 0 with nothing on stdout where any of the three fails. Otherwise it enters the toplevel and hands the payload to the front end as `--hook <member> --binding antigravity`. The suffix prints the front end's stdout only where it opens with the deny envelope, and exits 0 whatever happened. So the front end's own operator notice, which Antigravity would read as a deny, never reaches it, and the prefix never fails a call.
@@ -110,12 +111,17 @@ All **Not yet applied.**
 
 > - **Antigravity.** `agy plugin validate plugin` and `agy plugin install ./plugin`, `HOME` pointed at an absolute scratch directory, since `agy` refuses a relative one, then `agy plugin list`, which counts the skills and the hook. Where `agy` is signed in, a vendored scratch repository holding a copy of the package under `.agents/plugins/checkwright/` is opened with `agy -p`. There the shell guard denies a `cat` of a tracked file, `workflow-state-guard` denies a `write_file` to the state file, and both stay silent in an empty repository. A scratch `HOME` carries no login, so the session runs in the signed-in home with the package workspace-local, and writes nothing to that home's configuration.
 
-**`plugin/SPEC.md` §Honest limits**: the bullet "Antigravity, Cursor and Muse Code run no guard from this package." becomes "Cursor and Muse Code run no guard from this package, and Antigravity none on native Windows." Two bullets are added:
+**`plugin/SPEC.md` §Honest limits**: the bullet "Antigravity, Cursor and Muse Code run no guard from this package." becomes "Cursor and Muse Code run no guard from this package, and Antigravity none on native Windows." Three bullets are added:
 
-> - Under Antigravity the guards grant nothing and advise nothing: a grant becomes no decision, since its safety rests on the shipped binding's matcher, and an advise has no channel (gate-sdk/SPEC.md §The harness-integration arm). A workspace path whose JSON spelling carries an escaped quote or backslash defeats the prefix's `sed` read and leaves that session unguarded.
+> - A write through an Antigravity file-write tool whose arguments carry neither `Path` nor `TargetFile` reaches `workflow-state-guard` with an empty path, and the guard allows it. `multi_replace_file_content`'s `TargetFile` is presumed from `replace_file_content`'s, read off the embedded text of `agy` 1.4.6, and no run has fired it. Any edit tool the matcher does not name is unguarded.
+> - Under Antigravity the guards grant nothing and advise nothing: a grant becomes no decision, since its safety rests on the shipped binding's matcher, and no channel for an advise was found (gate-sdk/SPEC.md §The harness-integration arm). A workspace path whose JSON spelling carries an escaped quote or backslash defeats the prefix's `sed` read and leaves that session unguarded.
 > - Whether an installed copy's hooks fire is inferred from the workspace copy's, which share Antigravity's plugin loader. While the CLI's Agent Plugins flag is on, a package declaring the Agent Plugins `$schema` may load without its hooks, since that standard excludes hooks.
 
-**`plugin/README.md`**, line 27's second sentence becomes: "Codex registers the skills and no guard; Antigravity runs the shell and state-file guards, except on native Windows."
+**`plugin/README.md`**, line 27's second sentence becomes: "Codex registers the skills and no guard; Antigravity runs the shell and state-file guards, except on native Windows." Line 9's "**The guards**, in Claude Code only:" becomes "**The guards**, in Claude Code, and in Antigravity the shell and state-file guards alone:".
+
+**`docs/install.md`**, the plugin paragraph's "and in Claude Code its guards" becomes "and its guards in Claude Code and, except on native Windows, Antigravity". `docs/llms-full.txt` carries that paragraph and regenerates (delta 7).
+
+**The matcher is a regular expression**, which the Antigravity hooks page documents with `run_command|view_file` matching either tool (read from the CLI at 1.4.6). So a matcher joining spellings by `|` is the documented form, and no run of it is owed beyond the validation leg's.
 
 **The crate**:
 - `native/src/gates/plugin_parity.rs` gains the Antigravity rendering: the prefix and suffix as `fn`s beside `fail_open()`, and the tool-to-spelling map read from `antigravity.rs`. Assertion (C) compares the second file and reds it with the expected rendering.
@@ -144,7 +150,7 @@ All **Not yet applied.**
 
 > - **`--hook <member> --binding antigravity`** — the gate binary's hook arm reaches its before-tool-call members from Antigravity through an adapter, and the plugin package now carries `hooks.json` at its root, so installing it in Antigravity runs the shell and state-file guards. Nothing to do; to keep Antigravity unguarded, set `"enabled": false` on the `checkwright` hook in the installed copy's `hooks.json`.
 
-The docs mirror regenerates: `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write`.
+The docs mirror and the agent index regenerate: `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write` and `bash gate-sdk/bin/run-gates.sh --emit llms --write`.
 
 ## Producers and consumers
 
@@ -166,29 +172,36 @@ The docs mirror regenerates: `bash gate-sdk/bin/run-gates.sh --emit docs-mirror 
   - `check-harness-literal` reds a configured literal outside a valved line. Delta 6 adds the new literals and delta 1 valves the table rows. Any other site the build's run reds is reworded to the role.
   - `check-plugin-parity` (C) reds a stale `plugin/hooks.json`. It is generated in the same commit.
   - `check-md-refs` reds a dead anchor. Delta 4 adds none.
-  - `check-docs-mirror-fresh` reds until the mirror regenerates (delta 7).
+  - `check-docs-mirror-fresh` reds until the mirror regenerates (delta 7), and `check-llms-fresh` until the agent index does.
   - `check-release-declaration-parity` holds the next composed note to delta 7's bullet.
   - `check-amendment-queue` reds a `[spec:]` ref resolving to no file. The paired entry carries this file's name.
 - **Members, each one's satisfying value** (point 6), enumerated from `guard-kit/templates/settings-hooks.json`'s groups by `jq '.hooks.PreToolUse[].matcher'`:
   - `Bash|PowerShell` renders `run_command`, which carries `shell-guard`;
   - `ScheduleWakeup|CronCreate` has no Antigravity tool and is left out;
-  - `Write|Edit` renders the four file-write tools, which carry `workflow-state-guard`.
+  - `Write|Edit` renders the five file-write tools, which carry `workflow-state-guard`.
 
 ## Existing sections updated
 
 - `gate-sdk/SPEC.md` §The hook contract, its opening paragraph and a new table after **Honest limits.** (delta 1).
 - `gate-sdk/SPEC.md` §The harness-integration arm (delta 2).
-- `native/src/hook/antigravity.rs` and `native/src/hook/mod.rs` (delta 3).
-- `plugin/SPEC.md` §The harnesses, §The guards, §check-plugin-parity, §The validation leg and §Honest limits, and `plugin/README.md` (delta 4).
+- `native/src/hook/antigravity.rs`, `native/src/hook/mod.rs` and `native/src/hook/binding.rs` (delta 3).
+- `plugin/SPEC.md` §The harnesses, §The guards, §check-plugin-parity, §The validation leg and §Honest limits (delta 4).
+- `plugin/README.md` (delta 4).
+- `docs/install.md` (delta 4).
+- `docs/plugin/README.md`, through the docs mirror (delta 7).
 - `native/src/gates/plugin_parity.rs`, `plugin/hooks.json` and `scripts/gate-tests/check-plugin-parity/` (deltas 4 and 5).
 - `scripts/gate-sdk-config.knobs` (delta 6).
 - `.workflow/release-declarations.md` and the docs mirror (delta 7).
+- `docs/llms-full.txt`, through the agent index (delta 7).
 
-Roster probe: `git grep -n -i "antigravity"` over the tracked tree, the queue and `.workflow/` aside, names `plugin/SPEC.md` and `plugin/README.md` alone, every site of which delta 4 rewrites; the docs mirror copies them.
+Roster probe: `git grep -n -i -l "antigravity"` over the tracked tree, the queue, `.workflow/` and the amendments aside, names `plugin/SPEC.md`, `plugin/README.md`, `docs/install.md` and their projections, the docs mirror and `docs/llms-full.txt`. Delta 4 rewrites every site of the first three. `git grep -n -i "claude code only\|in claude code its guards"` found the two stale sentences in `plugin/README.md` and `docs/install.md`.
 
 ## Retired spellings
 
-- None — no delta retires a spelling; "not wired" leaves the Antigravity row, and the Codex and Cursor rows keep the phrase.
+- `in Claude Code only: guard-kit's` — the plugin README's guards bullet (delta 4).
+- `and in Claude Code its guards` — the install page's plugin paragraph (delta 4).
+
+"Not wired" leaves the Antigravity row, and the Codex and Cursor rows keep the phrase, so it is no retired spelling.
 
 ## Definition of Done
 

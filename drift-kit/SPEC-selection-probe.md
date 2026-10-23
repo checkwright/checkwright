@@ -1,6 +1,6 @@
 # SPEC amendment: selection-probe
 
-Pairs `agent-selection-probe`. Whether a coding agent asked cold for a kind of tool names a given tool is a measurement no surface here takes. The publisher's own tree cannot answer it, because an agent's answer moves on its own index and training clock, not on the tree's. The entry wants a repeatable cold probe: the prompt set, the agents asked, the record's home and form, and the cadence. This amendment ships the probe as a drift-kit arm, `--emit selection-probe`, off until a consumer binds its agents, prompts and subject. It records one verdict per agent and prompt in a private trend record beside the install-observation record, and keeps each answer beside it. Which agents, which prompts and which names count are each consumer's own vocabulary, so all three are knobs, and this repository binds its own in `scripts/drift-config.knobs`.
+Pairs `agent-selection-probe`. Whether a coding agent asked cold for a kind of tool names a given tool is a measurement no surface here takes. The publisher's own tree cannot answer it, because an agent's answer moves on its own index and training clock, not on the tree's. The entry wants a repeatable cold probe: the prompt set, the agents asked, the record's home and form, and the cadence. This amendment ships the probe as a drift-kit arm, `--selection-probe`, off until a consumer binds its agents, prompts and subject. It records one verdict per agent and prompt in a private trend record beside the install-observation record, and keeps each answer beside it. Which agents, which prompts and which names count are each consumer's own vocabulary, so all three are knobs, and this repository binds its own in `scripts/drift-config.knobs`.
 
 **What was read at spec.**
 
@@ -26,7 +26,7 @@ Pairs `agent-selection-probe`. Whether a coding agent asked cold for a kind of t
 >
 > Whether an agent asked cold for a kind of tool names yours is outside any tree's reach. Its answer moves on the agent's own index and training, so the measurement is taken from outside and kept as a trend.
 >
-> `bash gate-sdk/bin/run-gates.sh --emit selection-probe [<agent>…]` asks each bound agent, or each one named, every bound prompt.
+> `bash gate-sdk/bin/run-gates.sh --selection-probe [<agent>…]` asks each bound agent, or each one named, every bound prompt. It is a bare-flag arm and not an `--emit` one, since it spawns the consumer's agent programs, which reach the network (gate-sdk/SPEC.md §The non-gate arm).
 >
 > - **Where each call runs.** Each call runs in a fresh empty directory under the host's temporary directory, which the arm creates and removes. Before the first call the arm asks git whether that directory is inside a work tree, and refuses at exit 2 where it is, since an agent there would read a repository.
 > - **How it is spawned.** The agent's argv is spawned with no shell and the prompt appended as its last argument. Its stdin is empty, and the child inherits the arm's environment. The call is bounded by `DRIFT_KIT_SELECTION_TIMEOUT` seconds, and the bound kills the call's process tree.
@@ -74,8 +74,11 @@ All **Not yet applied.**
   - the bounded spawn is `proc::run_bounded_capture` run in the cold directory, and `proc.rs` gains a working-directory parameter on that one function if it has none;
   - the coldness test is `git rev-parse --is-inside-work-tree` through the crosser, refusing on a `true` answer;
   - its unit cases hold the subject match (case, word boundaries, a name inside a longer word not matching), the key shape and each refusal.
-- **`native/src/emit/mod.rs`** registers `--emit-selection-probe` in `ARMS` with `Grammar::Positional`, or the grammar the arm's `[<agent>…]` takes, declaring delta 2's six knobs. `native/src/knobs/drift_kit.rs` declares them, with the two derived defaults and the integer validator.
-- **`drift-kit/smoke/install.sh`** drives the arm through the front end with a throwaway knob file binding two stub agents, `bash -c` argvs printing a fixed answer. One answer names the subject in another case, and the other names none. A third stub exits non-zero, and a fourth sleeps past a one-second timeout. The smoke asserts:
+- **`native/src/emit/mod.rs`** registers `--selection-probe` in `ARMS` as an `Arm::Run`, on `--price-coverage`'s precedent, declaring delta 2's six knobs. The arm spawns a consumer's agent CLIs, which reach the network, so it takes a bare-flag `Arm::Run` spelling and not an `--emit` one, since that family joins the fence-safe set by derivation (gate-sdk/SPEC.md §The non-gate arm). The operands are parsed by the arm, and it prints each line as it lands. `native/src/knobs/drift_kit.rs` declares the knobs, with the two derived defaults and the integer validator.
+- **The spawn set.** Each agent's argv is built as a `Program::consumer` whose ground is `DRIFT_KIT_SELECTION_AGENTS`, which the roster's consumer-ground test (`programs.rs`) holds to a declared knob. The coldness probe spawns `git`.
+- **`native/src/emit/mod.rs`'s `no_network_spawning_arm_is_fence_safe`** gains `--selection-probe` in its `NETWORK_ARMS`, so admitting the arm to the fence-safe set reds the build.
+- **`gate-sdk/SPEC.md` §The non-gate arm** names the arm in the list of the crate's network spawners, after `--price-coverage`, as "`--selection-probe` (a consumer's `DRIFT_KIT_SELECTION_AGENTS`)", and in the **Changeable by a consumer** bullet of the spawn roster: "`--selection-probe` spawns whatever `DRIFT_KIT_SELECTION_AGENTS` names, and `git rev-parse` for its coldness test (drift-kit/SPEC.md §The agent-selection probe)."
+- **`drift-kit/smoke/install.sh`** drives the arm through the front end with a throwaway knob file binding four stub agents, each argv `bash <script>` over a script the smoke writes, since an argv word carries no blank and a `bash -c` script of one word could not sleep. One stub prints an answer naming the subject in another case, and one prints an answer naming none. A third exits non-zero, and a fourth sleeps past a one-second timeout. The smoke asserts:
   - each verdict and line;
   - the answer files;
   - a same-day re-run leaving the record byte-identical;
@@ -105,7 +108,7 @@ The build checks each argv against its CLI's `--help` and runs none, since a run
 
 **Not yet applied.** `.workflow/release-declarations.md`, under **Behavior changes**, gains:
 
-> - **`--emit selection-probe`** — a new drift-kit arm asking the coding agents you bind, from an empty directory outside any repository, each prompt you bind, and recording whether an answer names your subject. It is off until `DRIFT_KIT_SELECTION_AGENTS` is set. Nothing to do; each run spends on every bound agent's account.
+> - **`--selection-probe`** — a new drift-kit arm asking the coding agents you bind, from an empty directory outside any repository, each prompt you bind, and recording whether an answer names your subject. It is off until `DRIFT_KIT_SELECTION_AGENTS` is set. Nothing to do; each run spends on every bound agent's account.
 
 The docs mirror regenerates: `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write`.
 
@@ -123,6 +126,8 @@ The docs mirror regenerates: `bash gate-sdk/bin/run-gates.sh --emit docs-mirror 
   - `--emit knob-roster` and every reader of drift-kit's knob table read the declarations. A knob read before its declaration is refused, so deltas 2 and 3 land together.
   - `check-knob-citation` reds a knob cited in a manifest that no table declares. Delta 1 and the README cite only delta 2's.
   - `check-crate-arms` holds the arm table to the binary's roster, and the new row is registered in the same commit.
+  - `no_network_spawning_arm_is_fence_safe` reds the arm if it is ever admitted to the fence-safe set, and it names the arm from delta 3.
+  - the consumer-ground test in `programs.rs` reds an agent spawn whose ground is no declared knob. Delta 3's ground is `DRIFT_KIT_SELECTION_AGENTS`.
   - `check-gate-substrate-parity` reads gates, and this is no gate.
   - The enforcement map lists arms where it lists them, and regenerates on its own freshness red.
   - `check-docs-mirror-fresh` reds until the mirror regenerates (delta 5).
@@ -136,6 +141,7 @@ The docs mirror regenerates: `bash gate-sdk/bin/run-gates.sh --emit docs-mirror 
 - `drift-kit/SPEC.md`, a new section after §The install-evidence projection (delta 1), and §Layout and configuration's knob list and its metric-dir sentence (delta 2).
 - `native/src/emit/selection_probe.rs`, `native/src/emit/mod.rs`, `native/src/knobs/drift_kit.rs`, `native/src/proc.rs` where it gains the parameter, `drift-kit/smoke/install.sh` and `drift-kit/README.md` (delta 3).
 - `drift-kit/SPEC.md` §Testing gains the smoke bullet delta 3 describes, as its own bullet after **The manual-operation meter** (delta 3).
+- `gate-sdk/SPEC.md` §The non-gate arm, the network-spawner list and the spawn roster's **Changeable by a consumer** bullet (delta 3), with `no_network_spawning_arm_is_fence_safe` in `native/src/emit/mod.rs`.
 - `scripts/drift-config.knobs` (delta 4).
 - `.workflow/release-declarations.md` and the docs mirror (delta 5).
 

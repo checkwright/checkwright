@@ -116,7 +116,7 @@ The docs mirror regenerates: `bash gate-sdk/bin/run-gates.sh --emit docs-mirror 
   - `check-docs-mirror-fresh` reds until the mirror regenerates (delta 5).
   - `check-release-declaration-parity` holds the next composed note to delta 5's bullet.
   - `check-harness-literal` reds a configured literal outside a valved line on its corpus. Delta 1's header spellings and delta 2's sentences carry none of `GATE_SDK_HARNESS_LITERALS`' entries, and delta 4's text sits in `plugin/`, outside the corpus.
-- **A narrowing, so the red conditions are named (point 5).** Delta 2 narrows what the third rule admits: a write with any target outside the scratch dir. Its red condition is a block, monotone in that set. A call with one target, every Claude Code write among them, reads exactly as today.
+- **A narrowing, so the red conditions are named (point 5).** Delta 2 narrows what the third rule admits: a write with any target outside the scratch dir. Its red condition is a block, monotone in that set. A call with one target reads as today, except that a relative written path now joins the payload's working directory where today it joins the tree the arm entered. The two differ only when the session's working directory is not the tree's top, and Claude Code's write tools carry absolute paths.
 
 ## Existing sections updated
 
