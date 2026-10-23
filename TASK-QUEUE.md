@@ -1,8 +1,18 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: foreign-harness-write-path-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The set (operator direction 2026-10-23, lead-relayed, not a ruling; the iteration opened undirected):** option A as scope proposed. Features for spec to author and pair: `antigravity-hook-binding`, `codex-patch-path-residue` (split this scope from `codex-plugin-hook-discovery`, whose discovery half stays deferred), `agent-selection-probe` and `manifest-count-blank-run-bound`. Stages scope, spec, align, build, validate and close; align because the Antigravity binding spans plugin/, gate-sdk's hook contract and native/. Drain 3 against inflow 2.0.
+
+  **Order (scope, own authority):** `antigravity-hook-binding` and `codex-patch-path-residue` first, as one design: a single `--hook` arm reader for a foreign write payload's written path. `agent-selection-probe` runs before `evaluator-root-agent-file` is next taken, since it measures that entry's cost.
+
+  **Release, with a grant (operator direction 2026-10-23, lead-relayed, not a ruling; revises the direction of 2026-10-21):** a grant of one second-vendor review run at validate, unspent; if it returns clean, close cuts v0.32.0.
+
+  **Push need (2026-10-23, inside the budget):** 2 against 2 — the closing push and the v0.32.0 tag push, the operator taking the option that named this fit. No mid-iteration push: the Antigravity binding's `workspacePaths` discovery meets `crate-tests-windows` first at the closing push, so a red there spends one of close's hotfix pushes.
 
 ---
 
@@ -204,11 +214,19 @@ surface (e) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 
 `codex-cli` 0.162.1 and 0.163.0 (re-probed 2026-10-21 through the app server's `hooks/list`) discover no plugin hooks while the package root carries the portable `plugin.json` (with or without `extensions.com.openai` hooks or a `.codex-plugin/plugin.json` beside it); without that manifest `hooks/hooks.json` is discovered and the unchanged rendering blocks correctly. Likely upstream: Codex's build docs say `hooks/hooks.json` is discovered by default. Codex guard wiring is tier 1 (operator direction 2026-09-28).
 
-**Residue that bites once discovery lands:** Codex's patch tool matches `Write|Edit` but carries the patch as `tool_input.command` with no `file_path`, and `workflow-state-guard` allows on an empty path (`native/src/hook/workflow_state.rs`), so a Codex session could hand-write the stage state file; read the patch's file headers for the written paths, or state why not (owner lifecycle-kit/SPEC.md §check-stage-entry).
+**Deliverable:** on a Codex release discovering hooks beside the root manifest, re-run plugin/SPEC.md §The validation leg's Codex install, wire the guards, and update plugin/SPEC.md's Codex row and plugin/README.md's guard bullet. Its patch residue split off as [codex-patch-path-residue](#codex-patch-path-residue) at foreign-harness-write-path-pass' scope (operator direction 2026-10-23, lead-relayed, not a ruling).
 
-**Deliverable:** on a Codex release discovering hooks beside the root manifest, re-run plugin/SPEC.md §The validation leg's Codex install, wire the guards, close the patch residue, and update plugin/SPEC.md's Codex row and plugin/README.md's guard bullet.
+**Cost while deferred:** a Codex adopter gets the skills and no shell, wakeup or workflow-state guard. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's Codex row and limits. Re-probed 2026-10-23: `codex-cli` on PATH is still 0.163.0. Owner lookup: `codex`, `apply_patch` in this file and the disposed-findings record, none; owner plugin/SPEC.md §The harnesses.
 
-**Cost while deferred:** a Codex adopter gets the skills and no shell, wakeup or workflow-state guard. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's Codex row and limits, `workflow_state.rs` allowing on an empty `file_path`. Owner lookup: `codex`, `apply_patch` in this file and the disposed-findings record, none; owner plugin/SPEC.md §The harnesses.
+### codex-patch-path-residue
+
+[cost: event/low] [surface: plugin]
+
+Codex's patch tool matches `Write|Edit` but carries the patch as `tool_input.command` with no `file_path`, and `workflow-state-guard` allows on an empty path (`native/src/hook/workflow_state.rs`), so once Codex discovers the plugin's hooks a Codex session could hand-write the stage state file.
+
+**Deliverable:** read the patch's file headers for the written paths, or state why not, designed with [antigravity-hook-binding](#antigravity-hook-binding)'s write-tool reader as one `--hook` arm reader for a foreign write payload's path; then plugin/SPEC.md's Codex limit narrows.
+
+**Cost while deferred:** none until Codex discovers plugin hooks; from then, a Codex session's write to the state file passes the guard. Filed 2026-10-23 by foreign-harness-write-path-pass' scope as a split, operator-directed, from [codex-plugin-hook-discovery](#codex-plugin-hook-discovery), filed 2026-10-18 by harness-reach-pass' close. Re-verified 2026-10-23: `workflow_state.rs` line 24 allows on an empty path. Owner lookup: the parent's; owner lifecycle-kit/SPEC.md §check-stage-entry, with plugin/SPEC.md §The guards.
 
 ### codex-plugin-version-pin
 

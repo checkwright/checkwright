@@ -4,4 +4,4 @@
 
 ---
 
-— scope ac651f70 2026-10-23 3bf00cbad
+foreign-harness-write-path-pass scope ac651f70 2026-10-23 3bf00cbad
