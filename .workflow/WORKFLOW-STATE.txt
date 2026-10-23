@@ -5,3 +5,4 @@
 ---
 
 front-door-patch-pass scope a7a53ef4 2026-10-24 72cf23bb6
+front-door-patch-pass spec a6b3003c 2026-10-24 6a4a2176a
