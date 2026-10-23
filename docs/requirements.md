@@ -73,7 +73,7 @@ The pre-commit hook runs the gates your profile registers whose triggers match t
 
 <!-- commit-cost:begin -->
 
-On `linux x86_64` with `14` logical CPUs, the hook ran `41` pre-commit gates over every tracked file in **166 ms**, the median of three, measured at v0.32.0.
+On `linux x86_64` with `14` logical CPUs, the hook ran `41` pre-commit gates over every tracked file in **147 ms**, the median of three, measured at v0.32.1.
 
 <!-- commit-cost:end -->
 

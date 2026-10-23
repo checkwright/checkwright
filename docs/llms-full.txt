@@ -540,7 +540,7 @@ A missing tool comes from your distribution's package on Linux or WSL, from Home
 
 The pre-commit hook runs the gates your profile registers whose triggers match the staged files. It runs them one after another and stops at the first red. The figure runs every gate whose triggers match a file over every tracked file, in a repository the one-line install has just initialized with `full`, the profile that contains every other. A gate that reads the staged set from git itself sees nothing staged, so the figure is a reference reading, not a ceiling.
 
-On `linux x86_64` with `14` logical CPUs, the hook ran `41` pre-commit gates over every tracked file in **166 ms**, the median of three, measured at v0.32.0.
+On `linux x86_64` with `14` logical CPUs, the hook ran `41` pre-commit gates over every tracked file in **147 ms**, the median of three, measured at v0.32.1.
 
 To measure your own repository, run the gate binary with `--measure-commit`. It stages nothing and times the same run over every tracked file. Two costs sit outside the figure. First, the hook's own start: git starts it with no shell on any OS, and the `gates` workflow's probe step prints what that costs on each OS and architecture. Second, a gate you register yourself adds its own time.
 

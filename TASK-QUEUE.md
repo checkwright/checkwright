@@ -184,16 +184,6 @@ Cursor and Muse Code are installed on no build machine, so plugin/SPEC.md §The 
 
 **Cost while deferred:** two tier-2 harnesses' skill load and guard reach rest on vendor docs. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: neither CLI on the build machine's PATH. Owner lookup: `cursor`, `muse` in this file, none; owner plugin/SPEC.md §The harnesses.
 
-### front-door-patch-observed
-
-[cost: event/low] [surface: scripts] [observed-by: publish]
-
-the observe half of `npx-native-windows-route` and `front-door-npm-visibility-wait`, split at front-door-patch-pass' scope: the v0.32.1 publish run's `front-door` job reads green on every leg, the Windows package route and a package route with no re-run included.
-
-**Deliverable:** read that run; a red leg is filed as RELEASING.md §The front-door rehearsal rules it.
-
-**Cost while deferred:** both fixes stay unobserved on the published bytes until the run is read. Filed 2026-10-24 by front-door-patch-pass' scope. Owner lookup: the two produce halves, none further; owner RELEASING.md §The front-door rehearsal.
-
 ### personal-adoption
 
 [cost: event/low] [surface: installer] [not-icebox-eligible: 2026-10-24 operator direction wants it for the next scope; evicting it would compress that direction away]
@@ -905,4 +895,6 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
+
+- front-door-patch-observed
 
