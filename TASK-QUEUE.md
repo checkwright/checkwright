@@ -906,8 +906,3 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 ## Done
 
-- selection-probe-bare-auth
-- npx-native-windows-route
-- front-door-npm-visibility-wait
-- prove-front-door-restoration
-
