@@ -6,3 +6,4 @@
 
 foreign-harness-write-path-pass scope ac651f70 2026-10-23 3bf00cbad
 foreign-harness-write-path-pass spec a9ec2962 2026-10-23 ba72f8c6f
+foreign-harness-write-path-pass align aed6a2b7 2026-10-23 4f6299266
