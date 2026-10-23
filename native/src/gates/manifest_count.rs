@@ -139,7 +139,7 @@ fn lead_ins(text: &str, read: &mut usize) -> Vec<(usize, String, usize)> {
             continue;
         }
         let mut j = i + 1;
-        if j < n && spec::is_blank(lines[j]) {
+        while j < n && spec::is_blank(lines[j]) {
             j += 1;
         }
         if j >= n || fenced[j] || !spec::is_list_item(lines[j]) {
@@ -248,6 +248,16 @@ mod tests {
         let (read, out) = scan("Two cases:\n\n- a\n- b\n\nThe three arms:\n- a\n- b\n");
         assert_eq!(read, 2);
         assert_eq!(out, vec![(6, "three".to_string(), 2)]);
+    }
+
+    #[test]
+    fn a_blank_run_between_lead_in_and_list_is_read() {
+        let (read, out) = scan("Three cases:\n\n\n- a\n- b\n");
+        assert_eq!(read, 1);
+        assert_eq!(out, vec![(1, "Three".to_string(), 2)]);
+        let (read, out) = scan("Two cases:\n\n\n- a\n- b\n");
+        assert_eq!(read, 1);
+        assert!(out.is_empty(), "{:?}", out);
     }
 
     #[test]

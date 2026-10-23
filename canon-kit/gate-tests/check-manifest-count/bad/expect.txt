@@ -1,2 +1,3 @@
 restated collection total
 lead-in count: 'three' over 4 item(s)
+lead-in count: 'Two' over 3 item(s)

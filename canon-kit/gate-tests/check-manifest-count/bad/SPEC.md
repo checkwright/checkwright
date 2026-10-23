@@ -23,3 +23,10 @@ A lead-in count drifts when its list gains a member. The three arms:
 - the second arm
 - a third arm
 - a fourth arm, added later
+
+A blank run does not hide the same drift. Two kinds:
+
+
+- the first kind
+- the second kind
+- a third kind

@@ -18,16 +18,6 @@
 
 ## New Features
 
-### manifest-count-blank-run-bound
-
-[spec: SPEC-blank-run.md]
-
-`check-manifest-count` arm B reads a lead-in's list only past at most one blank line (canon-kit/SPEC.md §check-manifest-count states the bound), so a lead-in, two blank lines, then a list is silently unread, though Markdown reads a blank run as one separator. A fail-open on an adopter's prose; this tree never double-blanks.
-
-**Deliverable:** the bound widened to a blank run in the SPEC and the reader, with a bad-fixture case; a stated-contract change, so it rides an amendment.
-
-**Cost while deferred:** a miscounted lead-in behind a blank run passes unread. Surfaced 2026-10-18 by session-sweep-policy-pass' close (baked-calibration audit), promoted at the next scope's carried-bullet intake. Re-verified there: the reader's single-blank skip. Owner lookup: `manifest-count`, `manifest_count`, `lead_ins`, `blank run` in this file and the disposed-findings record found none; owner canon-kit/SPEC.md §check-manifest-count.
-
 ## Technical Debt
 
 ## Deferred
@@ -925,4 +915,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - codex-patch-path-residue
 - antigravity-hook-binding
 - agent-selection-probe
+- manifest-count-blank-run-bound
 
