@@ -37,6 +37,8 @@ fi
 install_url='https://checkwright.dev/install.sh'
 package='checkwright'
 lock='checkwright.lock'
+registry_bound=900
+registry_poll=15
 
 base="$(mktemp -d "${RUNNER_TEMP:-${TMPDIR:-/tmp}}/front-door.XXXXXX")" || {
     echo "front-door: seat: could not make a scratch directory" >&2
@@ -187,8 +189,21 @@ first_upgrade() {
     commit_lands 'commit after the update' || return 1
 }
 
+registry_visible() {
+    local waited=0
+    while :; do
+        : > "$log"
+        [ "$(npm view --prefer-online "$package@$version" version 2>> "$log")" = "$version" ] && return 0
+        [ "$waited" -ge "$registry_bound" ] && return 1
+        sleep "$registry_poll"
+        waited=$((waited + registry_poll))
+    done
+}
+
 package_route() {
     new_repo 'package' package || { bad 'repository' 'git init failed'; return 1; }
+    registry_visible || { bad 'registry' "npm view $package@$version version named no $version within ${registry_bound}s of polling"; return 1; }
+    ok 'registry'
     run npx --yes "$package@$version" init || { bad 'init' "npx $package@$version init exited non-zero"; return 1; }
     [ -f "$repo/$lock" ] || { bad 'init' "the install left no $lock"; return 1; }
     [ "$(lock_field version)" = "$version" ] || { bad 'init' "$lock names version '$(lock_field version)', not $version"; return 1; }

@@ -16,14 +16,6 @@
 
 ## Technical Debt
 
-### front-door-npm-visibility-wait
-
-the front-door job starts on the `npm` job's success with no wait for registry visibility: at v0.32.0 all seven legs first went red on the package route alone, npm `ETARGET` for `checkwright@0.32.0` about five minutes after publish, and a failed-jobs re-run went green on every Unix leg once `npm view` resolved it.
-
-**Deliverable, debt:** each driver (`scripts/ci-front-door.sh` and its `.ps1` twin) polls `npm view <pkg>@<v> version` under a bound before the package route, a lapsed bound being that route's finding; RELEASING.md §The front-door rehearsal's package-route bullet states the wait.
-
-**Cost while deferred:** every release spends a re-run of the front-door job, and its first red reads as a finding until the step's output is read. Surfaced 2026-10-23 at foreign-harness-write-path-pass' close by the v0.32.0 publish run. Owner lookup: `ETARGET`, `npm view` in this file and the disposed-findings record, none; owner RELEASING.md §The front-door rehearsal.
-
 ### prove-front-door-restoration
 
 v0.32.0 is cut, so the restoration `tarball-attestation-observed` recorded is owed: reverse 916026963's withdrawal (`checkwright prove` in docs/install.md's recommended-path sentence, the agent prompt's last step and its Prove it on your tree section; docs/maintenance.md's prove verb bullet; docs/openspec.md's overlap section and its `--recipe openspec-overlap` line), then delete `companion/fixtures/openspec/overlap/line.md` and re-point companion/SPEC.md's and the overlap step's reads of it.
@@ -204,7 +196,7 @@ Cursor and Muse Code are installed on no build machine, so plugin/SPEC.md §The 
 
 [cost: event/low] [surface: scripts] [observed-by: publish]
 
-the observe half of `npx-native-windows-route` and [front-door-npm-visibility-wait](#front-door-npm-visibility-wait), split at front-door-patch-pass' scope: the v0.32.1 publish run's `front-door` job reads green on every leg, the Windows package route and a package route with no re-run included.
+the observe half of `npx-native-windows-route` and `front-door-npm-visibility-wait`, split at front-door-patch-pass' scope: the v0.32.1 publish run's `front-door` job reads green on every leg, the Windows package route and a package route with no re-run included.
 
 **Deliverable:** read that run; a red leg is filed as RELEASING.md §The front-door rehearsal rules it.
 
@@ -910,4 +902,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 - selection-probe-bare-auth
 - npx-native-windows-route
+- front-door-npm-visibility-wait
 

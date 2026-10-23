@@ -34,6 +34,8 @@ if ($LASTEXITCODE -eq 0 -and "$inside".Trim() -eq 'true') {
 $InstallUrl = 'https://checkwright.dev/install.ps1'
 $Package = 'checkwright'
 $Lock = 'checkwright.lock'
+$RegistryBound = 900
+$RegistryPoll = 15
 $PsHost = (Get-Process -Id $PID).Path
 
 $tempRoot = if ($env:RUNNER_TEMP) { $env:RUNNER_TEMP } else { [IO.Path]::GetTempPath() }
@@ -257,8 +259,32 @@ function Test-FirstUpgrade {
     return $true
 }
 
+function Test-RegistryVisible {
+    param([string]$Npm)
+    $waited = 0
+    while ($true) {
+        $script:Log.Clear()
+        $out = @(& $Npm 'view' '--prefer-online' "$Package@$Version" 'version' 2>&1)
+        $seen = ''
+        foreach ($line in $out) {
+            if ($line -is [System.Management.Automation.ErrorRecord]) { $script:Log.Add("$line") } else { $seen = "$line".Trim() }
+        }
+        if ($seen -eq $Version) { return $true }
+        if ($waited -ge $RegistryBound) { return $false }
+        Start-Sleep -Seconds $RegistryPoll
+        $waited += $RegistryPoll
+    }
+}
+
 function Test-PackageRoute {
     if (-not (Initialize-Repo 'package' 'package')) { Write-Bad 'repository' 'git init failed'; return $false }
+    $npm = Get-Command npm -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+    if (-not $npm) { Write-Bad 'registry' 'npm does not resolve on PATH'; return $false }
+    if (-not (Test-RegistryVisible $npm.Source)) {
+        Write-Bad 'registry' "npm view $Package@$Version version named no $Version within $($RegistryBound)s of polling"
+        return $false
+    }
+    Write-Ok 'registry'
     $npx = Get-Command npx -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
     if (-not $npx) { Write-Bad 'init' 'npx does not resolve on PATH'; return $false }
     if ((Invoke-InRepo $npx.Source @('--yes', "$Package@$Version", 'init')) -ne 0) {
