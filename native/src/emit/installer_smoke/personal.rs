@@ -78,6 +78,7 @@ pub(super) fn personal(state: &mut Run) -> Step {
     }
     say(&format!("install: {} personal, HEAD, index and the README edit unchanged, {} path(s) ignored in one block", min, roster.len()));
 
+    live_hook_refused(&c, &followups(&said), &set)?;
     for line in followups(&said) {
         let toks: Vec<&str> = line.split_whitespace().collect();
         let r = run_line(&c, &toks, &set)?;
@@ -131,6 +132,35 @@ pub(super) fn personal(state: &mut Run) -> Step {
         return Err(failed(&m, "personal arm: uninstall left the exclude file off its pre-install bytes, a checkwright.lock, or a dirty porcelain"));
     }
     say("reversal: uninstall exit 0, no commit, the exclude file at its pre-install bytes, no manifest, porcelain empty");
+    Ok(())
+}
+
+// spec: installer/SPEC.md §The consumer smoke — a live pre-commit in the default hooks directory makes
+// the block's --install-hooks exit 2 naming it, with core.hooksPath unset and no hooks directory
+// placed; the plant is removed before the block runs
+fn live_hook_refused(c: &str, block: &[String], set: &[(String, String)]) -> Step {
+    let Some(line) = block.iter().find(|l| l.split_whitespace().any(|t| t == "--install-hooks")) else {
+        return Err(fail("personal arm: the follow-up block carries no --install-hooks line"));
+    };
+    let shown = git_out(c, &["rev-parse", "--git-path", "hooks"])?.trim().to_string();
+    let default = if crate::walk::path_root(&shown).is_some() { shown } else { format!("{}/{}", c, shown) };
+    let planted = format!("{}/pre-commit", default);
+    write(&planted, "#!/bin/sh\nexit 0\n")?;
+    crate::install::make_executable(std::path::Path::new(&planted)).map_err(refuse)?;
+    let toks: Vec<&str> = line.split_whitespace().collect();
+    let r = run_line(c, &toks, set)?;
+    let _ = std::fs::remove_file(&planted);
+    let unset = super::in_consumer_fed(&programs::GIT, &["config", "--get", "core.hooksPath"], &[], c, b"")?.code() == Some(1);
+    let common = git_out(c, &["rev-parse", "--git-common-dir"])?.trim().to_string();
+    let common = if crate::walk::path_root(&common).is_some() { common } else { format!("{}/{}", c, common) };
+    let placed = super::consumer::exists(&format!("{}/{}", common, crate::emit::hook_launcher::DIR));
+    if r.code() != Some(2) || !out(&r).contains("(pre-commit)") || !unset || placed {
+        return Err(failed(
+            &r,
+            "personal arm: --install-hooks over a live pre-commit did not exit 2 naming it with core.hooksPath unset and no hooks placed",
+        ));
+    }
+    say("hooks: --install-hooks over a live pre-commit exit 2 naming it, nothing placed");
     Ok(())
 }
 

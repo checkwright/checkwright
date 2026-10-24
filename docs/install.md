@@ -140,11 +140,11 @@ Moving to a profile that contains yours only adds. Re-running it is safe: it rep
 
 ### On a project that does not adopt it
 
-`checkwright init --personal` installs the checks for you alone. It writes the same files untracked, lists them in this clone's `.git/info/exclude`, and commits nothing, so the project's tree and history stay as they were. Your hooks and `--run` check your own commits in this clone, and the project's CI runs none of it. `prove` reads `HEAD`, so it has nothing to read here. It takes `starter` or `prose`: the workflow commits its own record, so a profile carrying it is refused. `uninstall` removes the files and the exclude lines.
+`checkwright init --personal` installs the checks for you alone. It writes the same files untracked, lists them in this clone's `.git/info/exclude`, and commits nothing, so the project's tree and history stay as they were. Your hooks and `--run` check your own commits in this clone, and the project's CI runs none of it. Where a hook manager already runs this clone's hooks, `--install-hooks` refuses rather than silence them, and `--run` is your check. `prove` reads `HEAD`, so it has nothing to read here. It takes `starter` or `prose`: the workflow commits its own record, so a profile carrying it is refused. `uninstall` removes the files and the exclude lines.
 
 ### Prove it on your tree
 
-`checkwright prove` makes the claim `demo` shows caught, a task marked done with no evidence behind it, on a scratch clone of your `HEAD`. It runs your own battery there before and after the claim and reports what your install enforces at commit and in CI, and what it leaves inactive, writing and asking nothing here, so a coding agent can run it unattended. The `then:` line `init` prints runs it through the binary `init` placed, and the [maintenance verbs](maintenance.md#managing) spell it for each route.
+`checkwright prove` makes the claim `demo` shows caught, a task marked done with no evidence behind it, on a scratch clone of your `HEAD`. It runs your own battery there before and after the claim and reports what your install enforces at commit and in CI, and what it leaves inactive, writing and asking nothing here, so a coding agent can run it unattended.
 
 Its last line is the verdict, and its exit status says the same: `PROVE: held`, exit `0`, with the minutes since the install commit, or `PROVE: not held`, exit `1`, with the cause. `starter`, the default, keeps no task queue, so it is not held; on a tree with no task list either, a `help:` line names the profile that adds one.
 

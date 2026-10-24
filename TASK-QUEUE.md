@@ -16,16 +16,6 @@
 
 ## New Features
 
-### hookspath-clobber
-
-[spec: SPEC-hookspath-clobber.md]
-
-`--install-hooks` writes `core.hooksPath` unconditionally (`native/src/emit/install_hooks.rs`, the `config` call), so a clone whose `core.hooksPath` already names the project's own hooks directory stops running those hooks without a word. gate-sdk/SPEC.md §install-hooks says an adopter's existing hooks are not overwritten, which holds for git's default `hooks` directory and not for a hooks path already set.
-
-**Deliverable:** a fix with a design choice: refuse, warn naming the prior value, or chain to the prior directory when `core.hooksPath` names a directory other than `gate-hooks`; the choice lands in §install-hooks with a unit test, and the personal install's front door states it.
-
-**Cost while deferred:** a project already running hooks through `core.hooksPath` (husky and its kin) loses them in that clone until someone notices, and a personal install on a non-adopting project hits this most. Filed 2026-10-24 by personal-overlay-pass' close, draining a gap bullet. Re-verified there: the write is unconditional and §install-hooks's not-overwritten claim covers only the default directory. Owner lookup: `hooksPath`, `install-hooks` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §install-hooks.
-
 ### personal-install-prove
 
 [spec: SPEC-personal-prove.md]
@@ -916,4 +906,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - personal-worktree-shared-block
 - personal-write-before-refusal
 - init-copy-follows-links
+- hookspath-clobber
 

@@ -97,10 +97,23 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
     if !Path::new(&bin).is_file() {
         return Err(absent(&bin));
     }
-    let hooks_dir = hook_launcher::hooks_dir(Path::new(&walk::cwd()?))
+    let here = walk::cwd()?;
+    let hooks_dir = hook_launcher::hooks_dir(Path::new(&here))
         .ok_or_else(|| "not inside a git repository — there is no clone to place the hooks in".to_string())?;
+    let replaced = match prior(&here, &hooks_dir)? {
+        Prior::Live { dir, names } => return Err(live_refusal(&dir, &names, &hooks_dir, &bin)),
+        Prior::Own | Prior::Quiet { set: None } => None,
+        Prior::Quiet { set: Some(value) } => Some(value),
+    };
 
     place(Path::new(&bin), &hooks_dir)?;
+    if let Some(value) = replaced {
+        println!(
+            "install-hooks: core.hooksPath was {}, which holds no hook git runs; this clone now runs {}",
+            value,
+            hooks_dir.display()
+        );
+    }
     // spec: gate-sdk/SPEC.md §install-hooks — an unwired clone is no opt-in: the refusal comes
     // ahead of the receipt, which would read as one
     config("core.hooksPath", &hooks_dir.display().to_string()).map_err(|e| {
@@ -131,6 +144,69 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
     println!();
     println!("Disable with:  git config --unset core.hooksPath");
     Ok(identity_rc)
+}
+
+// spec: gate-sdk/SPEC.md §install-hooks — the hooks directory git runs before this arm repoints it
+#[derive(Debug, PartialEq)]
+enum Prior {
+    Own,
+    Quiet { set: Option<String> },
+    Live { dir: PathBuf, names: Vec<String> },
+}
+
+fn prior(here: &str, hooks_dir: &Path) -> Result<Prior, String> {
+    let top = walk::toplevel_in_opt(here)?.unwrap_or_else(|| here.to_string());
+    let got = proc::run(&programs::GIT, &["-C", &top, "config", "--path", "--get", "core.hooksPath"])?;
+    let set = match (got.stdout(), got.code()) {
+        (Some(out), _) => Some(String::from_utf8_lossy(out).trim_end_matches(['\r', '\n']).to_string()).filter(|v| !v.is_empty()),
+        (None, Some(1)) => None,
+        (None, _) => return Err(format!("cannot read core.hooksPath ({})", got.failure_report().unwrap_or_default())),
+    };
+    let dir = match &set {
+        Some(value) => PathBuf::from(walk::abs_against(&top, value)),
+        None => {
+            let out = proc::run(&programs::GIT, &["-C", &top, "rev-parse", "--git-path", "hooks"])?;
+            let path = out.stdout().ok_or_else(|| {
+                format!("cannot resolve git's hooks directory ({})", out.failure_report().unwrap_or_default())
+            })?;
+            PathBuf::from(walk::abs_against(&top, String::from_utf8_lossy(path).trim()))
+        }
+    };
+    if hook_launcher::same_dir(&dir, hooks_dir) {
+        return Ok(Prior::Own);
+    }
+    let names = live_hooks(&dir)?;
+    if names.is_empty() {
+        Ok(Prior::Quiet { set })
+    } else {
+        Ok(Prior::Live { dir, names })
+    }
+}
+
+// spec: gate-sdk/SPEC.md §install-hooks — a live hook is a file git would run: a hook's name, a
+// symlink followed, and the executable bit where the host has one
+fn live_hooks(dir: &Path) -> Result<Vec<String>, String> {
+    if !dir.is_dir() {
+        return Ok(Vec::new());
+    }
+    let mut names: Vec<String> = walk::list_dir(dir)?
+        .into_iter()
+        .map(|(name, _)| name)
+        .filter(|name| hook_launcher::git_hook_named(name) && proc::is_executable(&dir.join(name)))
+        .collect();
+    names.sort();
+    Ok(names)
+}
+
+fn live_refusal(dir: &Path, names: &[String], hooks_dir: &Path, bin: &str) -> String {
+    format!(
+        "this clone runs hooks from {} ({}), and pointing core.hooksPath at {} would stop them running — nothing placed\n  help: call the gates from your hook manager — '{} --git-hook pre-commit' from its pre-commit and '{} --git-hook commit-msg <message-file>' from its commit-msg — or move those hooks aside or unset core.hooksPath, then re-run --install-hooks.",
+        dir.display(),
+        names.join(", "),
+        hooks_dir.display(),
+        bin,
+        bin
+    )
 }
 
 // spec: gate-sdk/SPEC.md §install-hooks — each served hook is a hard link to the binary under the
@@ -336,6 +412,99 @@ mod tests {
         assert_eq!(other_path, Ok(None));
         assert_eq!(opted, Ok(Some(hooks)));
         assert_eq!(below, Ok(None));
+    }
+
+    fn scratch_repo(tag: &str) -> (PathBuf, String, PathBuf) {
+        let d = std::env::temp_dir().join(format!("checkwright-install-hooks-prior-{}.{}", tag, std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(d.join("repo")).expect("scratch");
+        let top = walk::normalize_abs(&d.join("repo").display().to_string());
+        proc::run(&programs::GIT, &["-C", &top, "init", "-q"]).expect("git init");
+        let hooks = hook_launcher::hooks_dir(Path::new(&top)).expect("a hooks directory");
+        (d, top, hooks)
+    }
+
+    fn plant(dir: &Path, name: &str, executable: bool) {
+        std::fs::create_dir_all(dir).expect("hooks dir");
+        let file = dir.join(name);
+        std::fs::write(&file, "#!/bin/sh\nexit 0\n").expect("hook");
+        if executable {
+            crate::install::make_executable(&file).expect("chmod");
+        }
+    }
+
+    fn hooks_path(top: &str) -> Option<String> {
+        let out = proc::run(&programs::GIT, &["-C", top, "config", "--get", "core.hooksPath"]).expect("git config");
+        out.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string())
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — a live pre-commit in git's default directory refuses
+    // and wires nothing, where a directory of samples alone proceeds
+    #[test]
+    fn a_live_hook_in_the_default_directory_refuses_and_samples_proceed() {
+        let (d, top, hooks) = scratch_repo("default");
+        let default = PathBuf::from(format!("{}/.git/hooks", top));
+        let samples = prior(&top, &hooks);
+        plant(&default, "pre-commit", true);
+        let live = prior(&top, &hooks);
+        let unset = hooks_path(&top);
+        let placed = hooks.exists();
+        let _ = std::fs::remove_dir_all(&d);
+        assert_eq!(samples, Ok(Prior::Quiet { set: None }), "git's template hooks are samples");
+        match live {
+            Ok(Prior::Live { dir, names }) => {
+                assert!(hook_launcher::same_dir(&dir, &default) || dir == default, "{}", dir.display());
+                assert_eq!(names, vec!["pre-commit".to_string()]);
+                let said = live_refusal(&dir, &names, &hooks, "bin/gates");
+                assert!(said.contains("(pre-commit)") && said.contains("nothing placed"), "{}", said);
+                assert!(said.contains("'bin/gates --git-hook pre-commit'"), "{}", said);
+                assert!(said.contains("\n  help: "), "{}", said);
+            }
+            other => panic!("a live pre-commit must refuse: {:?}", other),
+        }
+        assert_eq!(unset, None);
+        assert!(!placed, "the refusal placed the hooks directory");
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — a core.hooksPath naming a directory with a live hook
+    // refuses with the value unchanged, and one holding no hook is replaced with a note
+    #[test]
+    fn a_hooks_path_with_a_live_hook_refuses_and_an_empty_one_is_replaced() {
+        let (d, top, hooks) = scratch_repo("set");
+        let theirs = d.join("husky").display().to_string();
+        proc::run(&programs::GIT, &["-C", &top, "config", "core.hooksPath", &theirs]).expect("git config");
+        let quiet = prior(&top, &hooks);
+        plant(Path::new(&theirs), "pre-push", true);
+        let live = prior(&top, &hooks);
+        let kept = hooks_path(&top);
+        let _ = std::fs::remove_dir_all(&d);
+        assert_eq!(quiet, Ok(Prior::Quiet { set: Some(theirs.clone()) }));
+        assert!(matches!(&live, Ok(Prior::Live { names, .. }) if names == &vec!["pre-push".to_string()]), "{:?}", live);
+        assert_eq!(kept, Some(theirs));
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — on a host with an executable bit, a hook without it is
+    // one git skips, so it proceeds
+    #[cfg(unix)]
+    #[test]
+    fn a_hook_without_the_executable_bit_proceeds() {
+        let (d, top, hooks) = scratch_repo("bit");
+        plant(&PathBuf::from(format!("{}/.git/hooks", top)), "pre-commit", false);
+        let got = prior(&top, &hooks);
+        let _ = std::fs::remove_dir_all(&d);
+        assert_eq!(got, Ok(Prior::Quiet { set: None }));
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — a core.hooksPath already naming the hooks directory is
+    // a re-run, whatever the default directory holds
+    #[test]
+    fn a_rerun_proceeds_past_a_live_hook_in_the_default_directory() {
+        let (d, top, hooks) = scratch_repo("rerun");
+        plant(&PathBuf::from(format!("{}/.git/hooks", top)), "pre-commit", true);
+        proc::run(&programs::GIT, &["-C", &top, "config", "core.hooksPath", &hooks.display().to_string()]).expect("git config");
+        let got = prior(&top, &hooks);
+        let _ = std::fs::remove_dir_all(&d);
+        assert_eq!(got, Ok(Prior::Own));
     }
 
     // spec: gate-sdk/SPEC.md §install-hooks — both served hooks are placed whatever the registry

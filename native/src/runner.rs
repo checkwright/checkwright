@@ -151,8 +151,9 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
           learns of a wrong-identity mapping before its first commit. The gate
           is resolved through the registry, so a consumer shadow still wins; a
           consumer without it is skipped. Exit 0 placed and verified, 1 the
-          identity gate's own finding, 2 no gate binary, no repository or an
-          uninterpretable manifest; unavailable is 2. With --refresh it only
+          identity gate's own finding, 2 no gate binary, no repository, a live
+          hook in the prior hooks directory or an uninterpretable manifest;
+          unavailable is 2. With --refresh it only
           re-places the two files of a clone already opted in, printing
           'install-hooks: refreshed <hooks-dir>'; in a clone not opted in, or
           off the work-tree top, it does nothing at exit 0. Takes no other

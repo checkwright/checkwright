@@ -10,6 +10,46 @@ pub const SERVED: &[&str] = &["pre-commit", "commit-msg"];
 
 pub const DIR: &str = "gate-hooks";
 
+// spec: gate-sdk/SPEC.md §install-hooks — githooks(5)'s roster at the git release this build read
+pub const GIT_HOOKS: &[&str] = &[
+    "applypatch-msg",
+    "pre-applypatch",
+    "post-applypatch",
+    "pre-commit",
+    "pre-merge-commit",
+    "prepare-commit-msg",
+    "commit-msg",
+    "post-commit",
+    "pre-rebase",
+    "post-checkout",
+    "post-merge",
+    "pre-push",
+    "pre-receive",
+    "update",
+    "proc-receive",
+    "post-receive",
+    "post-update",
+    "reference-transaction",
+    "push-to-checkout",
+    "pre-auto-gc",
+    "post-rewrite",
+    "sendemail-validate",
+    "fsmonitor-watchman",
+    "p4-changelist",
+    "p4-prepare-changelist",
+    "p4-post-changelist",
+    "p4-pre-submit",
+    "post-index-change",
+];
+
+fn git_hook_under(name: &str, suffix: &str) -> bool {
+    GIT_HOOKS.contains(&name) || GIT_HOOKS.contains(&strip_suffix_of(name, suffix))
+}
+
+pub fn git_hook_named(name: &str) -> bool {
+    git_hook_under(name, std::env::consts::EXE_SUFFIX)
+}
+
 const BIN_KNOB: &str = "GATE_SDK_NATIVE_BIN";
 
 fn strip_suffix_of<'a>(name: &'a str, suffix: &str) -> &'a str {
@@ -173,6 +213,19 @@ mod tests {
         }
         assert_eq!(served_under("pre-push.exe", ".exe"), None);
         assert_eq!(served_under(".exe", ".exe"), None);
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — a git hook's name, bare or under the host suffix, and
+    // never a sample
+    #[test]
+    fn a_git_hook_name_is_read_bare_or_under_the_host_suffix() {
+        assert!(git_hook_under("pre-push", ""));
+        assert!(git_hook_under("pre-push", ".exe"));
+        assert!(git_hook_under("pre-push.EXE", ".exe"));
+        for other in ["pre-commit.sample", "pre-push.exe", "husky.sh", "gate-hooks", ""] {
+            assert!(!git_hook_under(other, ""), "{}", other);
+        }
+        assert!(!git_hook_under("pre-commit.sample", ".exe"));
     }
 
     // spec: gate-sdk/SPEC.md §git-hook — a binary that cannot be started is refused naming the
