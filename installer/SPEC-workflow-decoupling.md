@@ -1,6 +1,6 @@
 # SPEC amendment: workflow-decoupling
 
-Pairs `verify-workflow-decoupling`. The entry's operator direction (2026-10-24, lead-relayed, not a ruling) settles its open question: the gate binary is substrate both halves share. On that basis this amendment states the decoupling where an adopter reads it, and weighs a workflow-only profile. `personal-adoption`'s amendment, `SPEC-personal-overlay.md`, is this statement's first consumer: the halves part on tracking, and that amendment builds the verification half as an untracked overlay.
+Pairs `verify-workflow-decoupling`. The entry's operator direction (2026-10-24, lead-relayed, not a ruling) settles its open question: the gate binary is substrate both halves share. On that basis this amendment states the decoupling where an adopter reads it. It also mints the `workflow` profile the weighing produced: `starter` plus the smallest set of workflow kits on which `prove` holds. That outcome is the lead's decision of 2026-10-24 on this stage's escalation. `personal-adoption`'s amendment, `SPEC-personal-overlay.md`, is this statement's first consumer: the halves part on tracking, and that amendment builds the verification half as an untracked overlay.
 
 **What the tree does today**, read at spec:
 
@@ -17,34 +17,54 @@ Pairs `verify-workflow-decoupling`. The entry's operator direction (2026-10-24, 
 
 `installer/SPEC.md` §Profiles gains a paragraph after the `full` bullet and before **The payload's reserved sibling is not a kit.** **Not yet applied.**
 
-> **The profiles split two halves that run on one substrate.** The gate binary gate-sdk ships is that substrate: the runner, the registry, the git hooks, and the arms the workflow calls. `--enter-stage` resolves the gates it runs from the vendored kits' `checks/`, whatever `gates.list` holds. So every profile carries gate-sdk, and a `--without-kit gate-sdk` is refused (§Selecting kits and gates). **Verification** is the registered battery over the project's tracked content. It ships without the workflow in `starter` and `prose` and under every payload recipe. **The workflow** is the stage machine and the process record it commits: stage stamps, the task queue, recorded test runs. It ships without canon-kit and site-kit in `delegation`, and a selection drops any gate-sdk gate an adopter does not want. **The halves part on tracking.** Verification reads what the project tracks, wherever the kits sit, so it runs from an untracked install too. The workflow commits its own record, so it needs a tracked one.
+> **The profiles split two halves that run on one substrate.** The gate binary gate-sdk ships is that substrate: the runner, the registry, the git hooks, and the arms the workflow calls. `--enter-stage` resolves the gates it runs from the vendored kits' `checks/`, whatever `gates.list` holds. So every profile carries gate-sdk, and a `--without-kit gate-sdk` is refused (§Selecting kits and gates). **Verification** is the registered battery over the project's tracked content. It ships without the workflow in `starter` and `prose` and under every payload recipe. **The workflow** is the stage machine and the process record it commits: stage stamps, the task queue, recorded test runs. It ships without canon-kit and site-kit in `workflow` and `delegation`. Both carry `starter` and so its gates, gate-sdk's own checks over the tree among them, and a selection drops any of those an adopter does not want. **The halves part on tracking.** Verification reads what the project tracks, wherever the kits sit, so it runs from an untracked install too. The workflow commits its own record, so it needs a tracked one.
 
 The last two sentences depend on whether `personal-adoption` lands in the same build batch. If it does, the sentence "so it runs from an untracked install too" ends ", the personal install (§The personal install)" instead, and that amendment's delta 6 adds the section it cites. If it does not, the sentences land as quoted, and `personal-adoption`'s merge adds the citation.
 
-### (2) The workflow-only profile, weighed {design-bearing}
+### (2) The `workflow` profile {design-bearing} {user-facing: the lead's decision of 2026-10-24 on this stage's escalation, taken under the entry's operator direction of that date, which leaves the weighing to spec}
 
-The weighing is recorded here. Its outcome waits on the lead's answer to this stage's escalation, since minting a profile adds a name adopters type. **Not yet applied** in either form.
+A fifth profile, `workflow`, is minted. It is `starter` plus the smallest set of workflow kits on which `prove` holds: lifecycle-kit and evidence-kit. The probe above shows that set is the minimum. It fits the lattice: it contains `starter`, sits inside `delegation`, and is an alternative to `prose`. It is not verification-free and is never described as such. `starter` is the lattice's bottom, and no profile drops a gate-sdk `zero-config` member (§What init seeds), so `workflow` carries gate-sdk's starting gates, its checks over the adopter's own shell among them. Only a selection removes those, per install. §The consumer smoke derives its per-profile pass and its lattice assertions from `profiles.list`, so the row adds a pass and no code. No crate source names a profile row: `grep -rn '"delegation"' native/src` finds none. Each edit is **Not yet applied.**
 
-- **What a fourth profile would be.** `workflow`, rostered `gate-sdk`, `lifecycle-kit` and `evidence-kit`, on the criterion *the smallest set on which `prove` holds*. The probe above shows that set is the minimum. It fits the lattice: it contains `starter`, sits inside `delegation`, and is an alternative to `prose`. §The consumer smoke derives its per-profile pass from `profiles.list`, so a row adds a pass to the smoke and no code to it.
-- **What it cannot be.** It cannot be *verification-free*. `starter` is the lattice's bottom, and no profile drops a gate-sdk `zero-config` member (§What init seeds), so the profile carries gate-sdk's starting gates. Only a selection removes those, and only per install.
-- **If the answer mints it**, this delta becomes these edits:
-  - a `profiles.list` row group with its criterion comment;
-  - a `workflow` bullet in §Profiles, `installer/README.md` §Choosing a profile and docs/install.md §Choosing a profile;
-  - delta 3's sentence naming `delegation` names `workflow` instead.
+- **`installer/profiles.list`**, a row group between `starter`'s and `delegation`'s:
 
-  The amendment is revised to carry them before build takes this unit.
-- **If the answer declines it**, this paragraph lands in §Profiles after delta 1's:
+  ```
+  # workflow — starter, the substrate and starting gates every profile carries,
+  # plus the smallest set of workflow kits on which `prove` holds: lifecycle-kit,
+  # the stage machine whose stamps make a done claim, and evidence-kit, whose
+  # manifest gate catches one made with no recorded test run. starter's gates
+  # come with it, gate-sdk's checks over the adopter's own shell among them,
+  # since no profile sits below starter; a selection drops them per install.
+  # queue-kit is left out: the claim is caught without it, the queue skeleton
+  # init seeds for lifecycle-kit carries the sections the claim is staged in,
+  # and delegation adds the kit.
+  workflow	gate-sdk
+  workflow	lifecycle-kit
+  workflow	evidence-kit
+  ```
 
-  > **No workflow-only profile is rostered.** The lattice's bottom puts gate-sdk's starting gates in every profile, so no profile can be free of verification. `delegation` already ships the workflow, and a selection narrows it per install.
+- **`installer/SPEC.md` §Profiles**:
+  - The opening sentence's list becomes `` `starter`, `workflow`, `delegation`, `prose` or `full` ``. The next sentence becomes: "They are not rungs on one ladder, since `prose` contains neither `workflow` nor `delegation` and answers a different question about what your repository is."
+  - A bullet after `starter`'s: "- **`workflow`** is `starter` plus the smallest set of workflow kits on which `prove` holds: lifecycle-kit's stage machine and evidence-kit's recorded test runs. `starter`'s gates come with it, gate-sdk's own checks over your tree among them."
+  - `delegation`'s bullet opens "**`delegation`** adds to `workflow` every kit whose subject is the agent session itself:", and the rest of the bullet is unchanged.
+  - The rosters sentence opens "`starter`, `workflow`, `delegation` and `prose` are rosters in `profiles.list`".
+- **`installer/SPEC.md` §The consumer smoke**, **What it costs to run.**: "That covers four profiles × install + battery + value arm" becomes "That covers each profile's install, battery and value arm". The re-measure clause stays.
+- **`installer/README.md` §Choosing a profile**:
+  - The opening line's list gains `` `workflow` `` after `` `starter` ``, and "Not four rungs on one ladder" becomes "Not rungs on one ladder".
+  - A bullet after `starter`'s: "- **`workflow`** — `starter` plus the stage machine and the recorded test runs, the least on which `prove` catches a done claim; it keeps `starter`'s gates."
+  - The rosters sentence opens "`starter`, `workflow`, `delegation` and `prose` are rosters".
+- **`docs/install.md` §Choosing a profile**: a bullet after `starter`'s, "- `workflow` — adds the stage machine and the recorded test runs to it, the least on which `prove` catches a done claim;". The page-length dependence is `SPEC-personal-overlay.md` delta 8's, measured with this bullet in place.
+
+docs/kits.md names no profile (delta 4) and takes no edit for this one.
 
 ### (3) The fit page states the decoupling {mechanical} {user-facing: the entry's operator direction of 2026-10-24, "the binary is substrate both halves share, and spec authors the statement"}
 
 `docs/choosing.md`. **Not yet applied.**
 
 - §When it does not fit: its last sentence, "A team wanting the lifecycle workflow without the gates finds no profile that ships it, as the next section shows.", is deleted.
+- §What you install: after "The `starter` profile is gate-sdk alone.", a sentence: "The `workflow` profile is `starter` plus lifecycle-kit and evidence-kit, the least on which a done claim is caught."
 - §What you install: the sentences from "The checks run without the workflow" to the end of the paragraph are replaced:
 
-  > The checks and the workflow install without each other, on one base. gate-sdk's binary is that base: it runs the checks, places the git hooks and carries the commands the workflow's stages run, so every profile carries gate-sdk. The checks run without the workflow: `starter` and `prose` carry no lifecycle-kit, and the companion recipes gate another toolkit's workflow. The workflow runs without the document and site checks, since `delegation` carries neither canon-kit nor site-kit, and `--without-gate` drops any of gate-sdk's own starting checks. The two part on what they write. The checks read what your repository tracks, and the workflow commits its own record: the stage stamps, the task queue and the recorded test runs. Under `delegation`, lifecycle-kit's checks enforce nothing until the files each one reads exist.
+  > The checks and the workflow install without each other, on one base. gate-sdk's binary is that base: it runs the checks, places the git hooks and carries the commands the workflow's stages run, so every profile carries gate-sdk. The checks run without the workflow: `starter` and `prose` carry no lifecycle-kit, and the companion recipes gate another toolkit's workflow. The workflow runs without the document and site checks, since `workflow` and `delegation` carry neither canon-kit nor site-kit. Both build on `starter`, so gate-sdk's own starting checks come with them, and `--without-gate` drops any of those. The two part on what they write. The checks read what your repository tracks, and the workflow commits its own record: the stage stamps, the task queue and the recorded test runs. Under `delegation`, lifecycle-kit's checks enforce nothing until the files each one reads exist.
 
 ### (4) The kit roster's reading order stops claiming a dependency chain {mechanical} {user-facing: as delta 3}
 
@@ -68,16 +88,20 @@ Each **Not yet applied.**
   - `check-front-door-verbs` reads docs/index.md, a front-door page. Delta 4's paragraph carries no route, verb or arm span. Delta 1's `--enter-stage` is in installer/SPEC.md, which is no front-door page.
   - `check-llms-fresh` reds `docs/llms-full.txt` until it is regenerated: it carries docs/index.md, docs/choosing.md and docs/kits.md in full.
   - `check-docs-mirror-fresh` reds `docs/installer/SPEC.md` until it is regenerated (delta 1).
-- **Delta 2, if minted**: the readers are `check-front-door-verbs`' profile set, the first column of `profiles.list` read at HEAD and at the pinned tag (installer/SPEC.md §The front door's verbs). A `--profile workflow` advertised on a front-door page is admitted while the close's release disposition is a release, so a mint makes this iteration's close release or withdraw the advertisement. The consumer smoke's lattice assertions read the row, and a pass is added per profile.
+- **The `workflow` row** (delta 2). Producer: `profiles.list`, read by the profile module behind the invoke. Consumers, each with its red condition:
+  - `init --profile workflow`, and `init --help`'s profile list, derived from the rows;
+  - the consumer smoke's lattice assertions. They red when a named kit does not resolve, when the bounds are not unique, or when moving up a comparable pair drops a gate. `workflow` ⊂ `delegation` ⊂ `full` and `starter` ⊂ `workflow` hold by the rows, and the registry is the union derivation over the kit set (§What init seeds), so containment holds for the registries too. Its per-profile pass reds as every profile's does. Its queue post-condition expects a queue file, which the probe's install carried;
+  - `check-front-door-verbs`' profile set: the first column of `profiles.list`, read at HEAD and at the pinned tag (§The front door's verbs). No delta writes `--profile workflow` on a front-door page, so nothing new is advertised. A later page that does is admitted while a close's disposition is a release;
+  - `SPEC-personal-overlay.md` delta 1's process-record refusal, which refuses `workflow`, since both of its added kits commit a record. That refusal's derived `help:` still names `starter` and `prose`.
 
 ## Existing sections updated
 
-- `installer/SPEC.md` §Profiles (deltas 1 and 2).
+- `installer/SPEC.md` §Profiles (deltas 1 and 2), and §The consumer smoke's **What it costs to run.** (delta 2).
+- `installer/profiles.list`, `installer/README.md` §Choosing a profile and `docs/install.md` §Choosing a profile (delta 2).
 - `docs/choosing.md` §When it does not fit and §What you install (delta 3).
 - `docs/kits.md` §The kits and `docs/index.md` §The kits (delta 4).
-- `docs/llms-full.txt`, regenerated with `bash gate-sdk/bin/run-gates.sh --emit llms --write` (deltas 3 and 4).
-- `docs/installer/SPEC.md`, the generated mirror, regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write` (deltas 1 and 2).
-- Contingent on delta 2's mint: `installer/profiles.list`, `installer/README.md` §Choosing a profile and `docs/install.md` §Choosing a profile (delta 2).
+- `docs/llms-full.txt`, regenerated with `bash gate-sdk/bin/run-gates.sh --emit llms --write` (deltas 2, 3 and 4).
+- `docs/installer/SPEC.md`, the generated mirror, regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write`, `docs/installer/README.md` among it (deltas 1 and 2).
 
 The surfaces were found by `git grep -n -i "machinery of the ones\|without the checks\|without the gates\|workflow without\|without the workflow\|decoupl"` over the tracked tree, with the queue, the survey record and the generated `docs/llms-full.txt` set aside.
 
