@@ -186,6 +186,86 @@ the workflow half of `personal-adoption`: a developer runs the stage machine on 
 
 **Cost while deferred:** a project already running hooks through `core.hooksPath` (husky and its kin) loses them in that clone until someone notices, and a personal install on a non-adopting project hits this most. Filed 2026-10-24 by personal-overlay-pass' close, draining a gap bullet. Re-verified there: the write is unconditional and §install-hooks's not-overwritten claim covers only the default directory. Owner lookup: `hooksPath`, `install-hooks` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §install-hooks.
 
+### personal-collapse-hides-files
+
+[cost: event/high] [surface: installer]
+
+`init --personal`'s exclude block collapses a first component the index holds nothing beneath to one directory line (`native/src/installer/personal.rs`, `body`), so a project whose `scripts/` holds only untracked files has those hidden too. installer/SPEC.md §The personal install says a directory shared with the gates directory keeps its own untracked files visible, which holds only where the project tracks something beneath it, and the consumed amendment promised the gates directory is never excluded whole for exactly that reason.
+
+**Deliverable:** debt: collapse only a component the install owns whole, never the gates directory; the section's collapse sentence and the unit test's untracked-only case move with it.
+
+**Cost while deferred:** an adopter's untracked project files under a shared directory vanish from `git status` and need `add -f`. Filed 2026-10-24 by personal-overlay-pass' close (second-vendor review), drained at the next scope. Owner lookup: `exclude block`, `info/exclude` in this file and the disposed-findings record, none; owner installer/SPEC.md §The personal install.
+
+### personal-worktree-shared-block
+
+[cost: event/low] [surface: installer]
+
+`init --personal` in two linked worktrees of one clone shares one exclude block, since `git rev-parse --git-path info/exclude` resolves to the common directory, and each run recomputes the block whole from its own roster, so a second worktree's install or uninstall un-excludes the first's files. §The personal install's honest limits name the sharing, not this.
+
+**Deliverable:** design-pending, a feature: merge across worktrees, refuse a second worktree's install, or state the limit; the choice lands in §The personal install.
+
+**Cost while deferred:** one worktree's install surfaces as untracked in the other. Filed 2026-10-24 by personal-overlay-pass' close (second-vendor review), drained at the next scope. Owner lookup: `worktree`, `exclude` in this file and the disposed-findings record, none; owner installer/SPEC.md §The personal install.
+
+### personal-write-before-refusal
+
+[cost: event/low] [surface: installer]
+
+`init --personal` writes the payload and `checkwright.lock` before `personal::write` meets an exclude file carrying the personal begin marker without its end marker (`native/src/installer/init.rs`, the lock write ahead of the personal branch; `marker::install_block` refuses there), so the run exits 2 leaving the files written and unexcluded.
+
+**Deliverable:** debt: check the block before the first write, so the refusal writes nothing.
+
+**Cost while deferred:** a clone with a hand-damaged block gets an install that shows as untracked and could be committed into the project. Filed 2026-10-24 by personal-overlay-pass' close (second-vendor review), drained at the next scope. Owner lookup: `begin marker`, `install_block` in this file and the disposed-findings record, none; owner installer/SPEC.md §The personal install.
+
+### marker-uninstall-newline
+
+[cost: event/low] [surface: gate-sdk]
+
+`marker::uninstall_block` is not `install_block`'s byte inverse when the file's last line had no newline: the append adds the newline that terminates it and the removal keeps it (`native/src/marker.rs`), so `uninstall` leaves an exclude file one newline longer than before `init`, against gate-sdk/SPEC.md §lib/inject.sh's pre-install-bytes claim.
+
+**Deliverable:** debt: the removal drops the separator newline its append added, with a unit test on an unterminated file.
+
+**Cost while deferred:** cosmetic, a trailing newline in the clone's exclude file. Filed 2026-10-24 by personal-overlay-pass' close (second-vendor review), drained at the next scope. Owner lookup: `uninstall_block`, `inject` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh.
+
+### init-dry-run-makes-dirs
+
+[cost: event/low] [surface: installer]
+
+`init --dry-run` creates the gates directory, and outside a personal install the workflow directory too (`native/src/installer/init.rs`, the unconditional `create_dir_all` pair after the kit copy), though installer/SPEC.md §init and docs/install.md say `--dry-run` writes nothing.
+
+**Deliverable:** debt: the pair runs only outside `dry`, and the consumer smoke's dry-run assertion reads the worktree's directories as well.
+
+**Cost while deferred:** empty directories left by a dry run, invisible to `git status`. Filed 2026-10-24 by personal-overlay-pass' close (second-vendor review), drained at the next scope. Owner lookup: `dry-run` in this file and the disposed-findings record, none; owner installer/SPEC.md §init.
+
+### init-copy-follows-links
+
+[cost: event/high] [surface: installer]
+
+`init` copies each payload file through `std::fs::copy` onto `root.join(dest)` (`native/src/installer/init.rs`, `copy_in`), following a symlink or junction at any component, so an untracked kit-root link pointing outside the clone receives the payload there; a personal install's tracked-path refusal does not see an untracked link.
+
+**Deliverable:** debt: refuse a destination any of whose components below the root is a link, before the first write, with a unit test and a sentence in §init.
+
+**Cost while deferred:** an install written through a link the adopter made, outside the clone. Filed 2026-10-24 by personal-overlay-pass' close (second-vendor review), drained at the next scope. Owner lookup: `symlink`, `junction` in this file and the disposed-findings record, none beyond the icebox's walk entry, a different module; owner installer/SPEC.md §init.
+
+### smoke-preflight-pathspec
+
+[cost: event/low] [surface: installer]
+
+The consumer smoke's preflight builds its exclude pathspec as `:(top,exclude)<dir>` with no `literal` magic (`native/src/emit/installer_smoke/roster.rs`, `dirty_outside`), so a `GATE_SDK_WORKFLOW_DIR` carrying a glob character excludes the wrong paths, and `below_root` accepts a directory the smoke itself reads (`docs`, say), whose dirty files then pass.
+
+**Deliverable:** debt: add `literal` to the magic and refuse a directory the smoke reads, each with a unit test.
+
+**Cost while deferred:** only under a misconfigured knob in a tree running `--installer-smoke`. Filed 2026-10-24 by personal-overlay-pass' close (second-vendor review), drained at the next scope. Owner lookup: `pathspec`, `preflight` in this file and the disposed-findings record, none; owner installer/SPEC.md §The consumer smoke.
+
+### oracle-turn-done-marker
+
+[cost: event/low] [surface: lifecycle-kit]
+
+Under the split lead posture, a scope session resumed as the intent oracle after its stage ended appends its answer to its resume journal past the `DONE` line, so `DONE` is no longer the last line and lifecycle-kit/templates/lead.md's last-line completion check reads that session as unfinished.
+
+**Deliverable:** design-pending, a feature: an oracle turn writes its own heading and re-stamps `DONE`, or the rule exempts oracle turns; stated where lifecycle-kit names the oracle.
+
+**Cost while deferred:** a lead's completion read misjudges a finished oracle and falls back to asking it. Filed 2026-10-24 by personal-overlay-pass' lead after its close (seen when the oracle answered spec's workflow-profile question), drained at the next scope. Owner lookup: `DONE`, `oracle` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §templates/lead.md.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
