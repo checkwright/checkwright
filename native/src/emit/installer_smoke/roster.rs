@@ -193,9 +193,11 @@ pub(super) fn preflight(state: &mut Run) -> Step {
             return Err(refuse(format!("{} not found on PATH — the smoke cannot run.", tool)));
         }
     }
+    let reads = read_roots(&state.root).map_err(refuse)?;
     let excluded = walk::knob_scalar("GATE_SDK_WORKFLOW_DIR")
         .ok()
-        .and_then(|d| below_root(&state.root, &d));
+        .and_then(|d| below_root(&state.root, &d))
+        .filter(|d| !reads_beneath(&state.root, d, &reads));
     let dirty = dirty_outside(&state.root, excluded.as_deref()).map_err(refuse)?;
     if dirty.is_empty() {
         return Ok(());
@@ -222,10 +224,33 @@ fn below_root(root: &str, dir: &str) -> Option<String> {
     std::path::Path::new(root).join(dir).is_dir().then(|| dir.to_string())
 }
 
+// spec: installer/SPEC.md §The consumer smoke — the roots the arms spell off the tree under test
+// beside the kit roots, the crate and the gates directory
+const TREE_READS: &[&str] = &["docs", "companion", "installer"];
+
+fn read_roots(root: &str) -> Result<Vec<String>, String> {
+    let mut reads = walk::kit_roots_at(root)?;
+    reads.push(walk::knob_scalar("GATE_SDK_NATIVE_CRATE")?);
+    reads.push(crate::knobs::gates_dir());
+    reads.extend(TREE_READS.iter().map(|r| r.to_string()));
+    Ok(reads)
+}
+
+// spec: installer/SPEC.md §The consumer smoke — a workflow directory that is, holds or lies under a
+// directory the smoke reads is excluded nowhere
+fn reads_beneath(root: &str, dir: &str, reads: &[String]) -> bool {
+    let at = walk::abs_against(root, dir);
+    reads
+        .iter()
+        .map(|r| walk::abs_against(root, r.trim_end_matches(['/', '\\'])))
+        .any(|r| walk::at_or_under(&at, &r) || walk::at_or_under(&r, &at))
+}
+
 // spec: installer/SPEC.md §The consumer smoke — the porcelain entries outside the excluded
-// directory, the whole tree's when none is excluded
+// directory, the whole tree's when none is excluded; the directory is a literal pathspec, so a
+// glob character in it names itself
 fn dirty_outside(root: &str, excluded: Option<&str>) -> Result<Vec<String>, String> {
-    let exclude = excluded.map(|d| format!(":(top,exclude){}", d));
+    let exclude = excluded.map(|d| format!(":(top,literal,exclude){}", d));
     let mut argv = vec!["-C", root, "status", "--porcelain", "--", ":(top)"];
     if let Some(e) = &exclude {
         argv.push(e);
@@ -390,7 +415,36 @@ mod tests {
             assert!(!check(ex.as_deref()).is_empty(), "with {:?} the workflow edit passed", bad);
         }
         assert_eq!(below_root(&root, "missing"), None, "a missing directory was excluded");
+
+        if cfg!(unix) {
+            for d in ["wf*", "wf1"] {
+                std::fs::create_dir_all(dir.join(d)).expect("make a workflow-shaped directory");
+                std::fs::write(dir.join(d).join("f.txt"), "a\n").expect("write");
+            }
+            git(&["add", "."]);
+            git(&["commit", "-q", "-m", "glob-shaped"]);
+            for d in ["wf*", "wf1"] {
+                std::fs::write(dir.join(d).join("f.txt"), "b\n").expect("modify");
+            }
+            let globbed = check(below_root(&root, "wf*").as_deref());
+            assert!(globbed.iter().any(|e| e.ends_with("wf1/f.txt")), "the glob excluded a directory it matched: {:?}", globbed);
+            assert!(!globbed.iter().any(|e| e.contains("wf*")), "the literal directory was not excluded: {:?}", globbed);
+        }
         std::fs::remove_dir_all(&dir).ok();
+    }
+
+    // spec: installer/SPEC.md §The consumer smoke — a workflow directory that is, holds or lies under
+    // a directory the smoke reads is excluded nowhere, and one beside them is
+    #[test]
+    fn a_workflow_directory_the_smoke_reads_is_not_excluded() {
+        let root = "/repo";
+        let reads: Vec<String> = ["docs", "vendored/a/", "native"].iter().map(|s| s.to_string()).collect();
+        for read in ["docs", "docs/sub", "vendored", "vendored/a", "native/src"] {
+            assert!(reads_beneath(root, read, &reads), "{} was excluded", read);
+        }
+        for beside in [".workflow", "docsx", "vendored-b"] {
+            assert!(!reads_beneath(root, beside, &reads), "{} was refused", beside);
+        }
     }
 
     // spec: evidence-kit/SPEC.md §Layout and configuration — the declaration this arm prints is

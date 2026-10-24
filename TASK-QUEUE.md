@@ -18,14 +18,6 @@
 
 ## Technical Debt
 
-### smoke-preflight-pathspec
-
-The consumer smoke's preflight builds its exclude pathspec as `:(top,exclude)<dir>` with no `literal` magic (`native/src/emit/installer_smoke/roster.rs`, `dirty_outside`), so a `GATE_SDK_WORKFLOW_DIR` carrying a glob character excludes the wrong paths, and `below_root` accepts a directory the smoke itself reads (`docs`, say), whose dirty files then pass.
-
-**Deliverable:** debt: add `literal` to the magic and refuse a directory the smoke reads, each with a unit test.
-
-**Cost while deferred:** only under a misconfigured knob in a tree running `--installer-smoke`. Filed 2026-10-24 by personal-overlay-pass' close (second-vendor review), drained at the next scope. Owner lookup: `pathspec`, `preflight` in this file and the disposed-findings record, none; owner installer/SPEC.md §The consumer smoke.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -898,4 +890,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - init-copy-follows-links
 - hookspath-clobber
 - personal-install-prove
+- smoke-preflight-pathspec
 
