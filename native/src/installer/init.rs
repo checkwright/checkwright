@@ -641,6 +641,24 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         })?;
     }
 
+    // spec: installer/SPEC.md §init — a destination under a kit directory or the gates directory
+    // reaching through a link is refused before the first write; a kit the payload lacks is the kit
+    // loop's own refusal
+    let carried: Vec<String> = kits.iter().filter(|k| pkg.payload.join(k).is_dir()).cloned().collect();
+    for dest in planned_paths(pkg, &root, &carried, &[&gates_list, &artifact_dest, &seam])? {
+        if !crate::walk::under(GATES_DIR, &dest) && !kits.iter().any(|k| crate::walk::under(k, &dest)) {
+            continue;
+        }
+        let link = super::link_below(&root, &dest).map_err(|e| refuse(format!("could not read where {} lands: {}", dest, e), "", 2))?;
+        if let Some(at) = link {
+            return Err(refuse(
+                format!("{} reaches through a link at {}", dest, at),
+                "init writes each file at its own path, never through a link or junction, which could land it outside this repository. Replace the link with the directory or file itself, or remove it, then re-run.",
+                2,
+            ));
+        }
+    }
+
     let mut r = Roster::new();
 
     // spec: installer/SPEC.md §The manifest — the kit files' hashes are taken before the first kit copy

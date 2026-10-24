@@ -122,6 +122,25 @@ pub fn seam_binary(root: &std::path::Path, seam: &str) -> Option<String> {
     Some(rel.to_string())
 }
 
+// spec: installer/SPEC.md §init — the first component of `rel` below `root`, the last included,
+// that is a link or junction; a component the tree lacks ends the walk, and one that cannot be
+// read is an error
+pub fn link_below(root: &std::path::Path, rel: &str) -> Result<Option<String>, String> {
+    let mut at = root.to_path_buf();
+    let mut seen: Vec<&str> = Vec::new();
+    for c in rel.split(['/', '\\']).filter(|c| !c.is_empty() && *c != ".") {
+        at.push(c);
+        seen.push(c);
+        match std::fs::symlink_metadata(&at) {
+            Ok(m) if m.file_type().is_symlink() => return Ok(Some(seen.join("/"))),
+            Ok(_) => {}
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(None),
+            Err(e) => return Err(format!("cannot read {}: {}", seen.join("/"), e)),
+        }
+    }
+    Ok(None)
+}
+
 // spec: installer/SPEC.md §The verbs — every refusal carries the verb's own prefix, an optional
 // `help:` line and an exit status, which is the published idiom rather than a second one.
 #[derive(Debug)]
@@ -347,6 +366,31 @@ mod tests {
             "demo" => demo::USAGE[0].to_string(),
             "prove" => prove::USAGE[0].to_string(),
             other => panic!("VERBS carries `{}`, which this test reads no usage line for", other),
+        }
+    }
+
+    // spec: installer/SPEC.md §init — a link at a directory component or at the file itself is
+    // named, and a plain path or one the tree lacks passes
+    #[cfg(unix)]
+    #[test]
+    fn a_destination_through_a_link_is_named_at_its_first_link() {
+        let dir = std::env::temp_dir().join(format!("cw-link-below-{}", std::process::id()));
+        let outside = std::env::temp_dir().join(format!("cw-link-below-{}-outside", std::process::id()));
+        for d in [&dir, &outside] {
+            std::fs::remove_dir_all(d).ok();
+            std::fs::create_dir_all(d).expect("cannot make the scratch dirs");
+        }
+        std::fs::create_dir_all(dir.join("kit/sub")).expect("cannot make the kit dir");
+        std::fs::write(dir.join("kit/sub/a.sh"), "x\n").expect("cannot write a plain file");
+        std::fs::write(outside.join("f.sh"), "x\n").expect("cannot write the link target");
+        std::os::unix::fs::symlink(&outside, dir.join("linked")).expect("cannot link a directory");
+        std::os::unix::fs::symlink(outside.join("f.sh"), dir.join("kit/f.sh")).expect("cannot link a file");
+        assert_eq!(link_below(&dir, "kit/sub/a.sh"), Ok(None), "a plain path");
+        assert_eq!(link_below(&dir, "absent/x.sh"), Ok(None), "a path the tree lacks");
+        assert_eq!(link_below(&dir, "linked/deeper/x.sh"), Ok(Some("linked".to_string())), "a directory link");
+        assert_eq!(link_below(&dir, "kit/f.sh"), Ok(Some("kit/f.sh".to_string())), "a file link");
+        for d in [&dir, &outside] {
+            std::fs::remove_dir_all(d).ok();
         }
     }
 

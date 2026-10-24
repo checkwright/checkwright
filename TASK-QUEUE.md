@@ -38,16 +38,6 @@
 
 ## Technical Debt
 
-### init-copy-follows-links
-
-`init` copies each payload file through `std::fs::copy` onto `root.join(dest)` (`native/src/installer/init.rs`, `copy_in`), following a symlink or junction at any component, so an untracked kit-root link pointing outside the clone receives the payload there; a personal install's tracked-path refusal does not see an untracked link.
-
-**Deliverable:** debt: refuse a destination any of whose components below the root is a link, before the first write, with a unit test and a sentence in §init.
-
-**Push need (2026-10-24, inside the budget):** one mid-iteration push only if the fix carries Windows-only junction code, which no local run reaches; a portable check rides the closing push.
-
-**Cost while deferred:** an install written through a link the adopter made, outside the clone. Filed 2026-10-24 by personal-overlay-pass' close (second-vendor review), drained at the next scope. Owner lookup: `symlink`, `junction` in this file and the disposed-findings record, none beyond the icebox's walk entry, a different module; owner installer/SPEC.md §init.
-
 ### smoke-preflight-pathspec
 
 The consumer smoke's preflight builds its exclude pathspec as `:(top,exclude)<dir>` with no `literal` magic (`native/src/emit/installer_smoke/roster.rs`, `dirty_outside`), so a `GATE_SDK_WORKFLOW_DIR` carrying a glob character excludes the wrong paths, and `below_root` accepts a directory the smoke itself reads (`docs`, say), whose dirty files then pass.
@@ -925,4 +915,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - personal-collapse-hides-files
 - personal-worktree-shared-block
 - personal-write-before-refusal
+- init-copy-follows-links
 
