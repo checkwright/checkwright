@@ -449,11 +449,12 @@ mod tests {
         let live = prior(&top, &hooks);
         let unset = hooks_path(&top);
         let placed = hooks.exists();
+        let same_while_present = matches!(&live, Ok(Prior::Live { dir, .. }) if hook_launcher::same_dir(dir, &default));
         let _ = std::fs::remove_dir_all(&d);
         assert_eq!(samples, Ok(Prior::Quiet { set: None }), "git's template hooks are samples");
         match live {
             Ok(Prior::Live { dir, names }) => {
-                assert!(hook_launcher::same_dir(&dir, &default) || dir == default, "{}", dir.display());
+                assert!(same_while_present, "{} is not {}", dir.display(), default.display());
                 assert_eq!(names, vec!["pre-commit".to_string()]);
                 let said = live_refusal(&dir, &names, &hooks, "bin/gates");
                 assert!(said.contains("(pre-commit)") && said.contains("nothing placed"), "{}", said);
