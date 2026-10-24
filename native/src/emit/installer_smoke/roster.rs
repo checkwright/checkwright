@@ -170,7 +170,7 @@ pub(super) fn declare(part: Option<u8>) {
 
 // spec: installer/SPEC.md §The consumer smoke — every precondition refuses at exit 2 before the
 // first arm: the scratch base and a set hand-off are directories, each program resolves, and the
-// tree the run packs is clean
+// tree under test is clean outside the workflow directory
 pub(super) fn preflight(state: &mut Run) -> Step {
     state.root = walk::toplevel().map_err(refuse)?;
     // spec: installer/SPEC.md §The consumer smoke — the system temp dir is the last fallback because
@@ -192,18 +192,51 @@ pub(super) fn preflight(state: &mut Run) -> Step {
             return Err(refuse(format!("{} not found on PATH — the smoke cannot run.", tool)));
         }
     }
-    let status = proc::run(&programs::GIT, &["-C", &state.root, "status", "--porcelain"]).map_err(refuse)?;
+    let excluded = walk::knob_scalar("GATE_SDK_WORKFLOW_DIR")
+        .ok()
+        .and_then(|d| below_root(&state.root, &d));
+    let dirty = dirty_outside(&state.root, excluded.as_deref()).map_err(refuse)?;
+    if dirty.is_empty() {
+        return Ok(());
+    }
+    Err(refuse(format!(
+        "the worktree is dirty{} — the smoke reads the tree under test beyond the payload, so a dirty \
+         path there makes its verdict describe a tree no commit holds. Commit or stash first.{}",
+        excluded.map(|d| format!(" outside {}", d)).unwrap_or_default(),
+        crate::emit::pack_installer::bounded_entries(&dirty)
+    )))
+}
+
+// spec: installer/SPEC.md §The consumer smoke — the excluded member is the workflow directory,
+// excluded only when it names an existing directory strictly below the toplevel
+fn below_root(root: &str, dir: &str) -> Option<String> {
+    let dir = dir.trim_end_matches(['/', '\\']);
+    if dir.is_empty() || walk::path_root(dir).is_some() {
+        return None;
+    }
+    let parts: Vec<&str> = dir.split(['/', '\\']).collect();
+    if parts.iter().all(|p| p.is_empty() || *p == ".") || parts.contains(&"..") {
+        return None;
+    }
+    std::path::Path::new(root).join(dir).is_dir().then(|| dir.to_string())
+}
+
+// spec: installer/SPEC.md §The consumer smoke — the porcelain entries outside the excluded
+// directory, the whole tree's when none is excluded
+fn dirty_outside(root: &str, excluded: Option<&str>) -> Result<Vec<String>, String> {
+    let exclude = excluded.map(|d| format!(":(top,exclude){}", d));
+    let mut argv = vec!["-C", root, "status", "--porcelain", "--", ":(top)"];
+    if let Some(e) = &exclude {
+        argv.push(e);
+    }
+    let status = proc::run(&programs::GIT, &argv)?;
     match status.stdout() {
-        Some([]) => Ok(()),
-        Some(_) => Err(refuse(
-            "the worktree is dirty — the pack step refuses to stamp a commit the payload does not \
-             match. Commit or stash first.",
-        )),
-        None => Err(refuse(format!(
+        Some(out) => Ok(String::from_utf8_lossy(out).lines().map(str::to_string).collect()),
+        None => Err(format!(
             "git status could not read {} — {}",
-            state.root,
+            root,
             status.failure_report().unwrap_or_default()
-        ))),
+        )),
     }
 }
 
@@ -309,6 +342,54 @@ mod tests {
             assert!(!h.contains('{') && !h.contains('}'), "{} left a placeholder: {}", r.name, h);
         }
         assert_eq!(header(&ARMS[1], &state), "pack");
+    }
+
+    // spec: installer/SPEC.md §The consumer smoke — the preflight passes a dirty workflow
+    // directory, refuses a dirty path anywhere else, and excludes nothing for a value not strictly
+    // below the root
+    #[test]
+    fn the_preflight_passes_the_workflow_directory_alone() {
+        let dir = std::env::temp_dir().join(format!("cw-smoke-preflight-{}", std::process::id()));
+        std::fs::remove_dir_all(&dir).ok();
+        std::fs::create_dir_all(dir.join(".workflow")).expect("cannot make the scratch repo");
+        let root = dir.to_string_lossy().into_owned();
+        let git = |args: &[&str]| {
+            let mut argv = vec!["-C", root.as_str()];
+            argv.extend_from_slice(args);
+            proc::run(&programs::GIT, &argv).expect("git did not spawn");
+        };
+        git(&["init", "-q"]);
+        git(&["config", "user.name", "Scratch"]);
+        git(&["config", "user.email", "scratch@example.com"]);
+        std::fs::write(dir.join("root.txt"), "a\n").expect("write root.txt");
+        std::fs::write(dir.join(".workflow/log.txt"), "a\n").expect("write the workflow file");
+        git(&["add", "."]);
+        git(&["commit", "-q", "-m", "scratch"]);
+        let excluded = below_root(&root, ".workflow/");
+        assert_eq!(excluded.as_deref(), Some(".workflow"));
+        let check = |ex: Option<&str>| dirty_outside(&root, ex).expect("git status did not read the scratch repo");
+
+        std::fs::write(dir.join(".workflow/log.txt"), "b\n").expect("modify the workflow file");
+        std::fs::write(dir.join(".workflow/new.txt"), "b\n").expect("plant an untracked workflow file");
+        assert!(check(excluded.as_deref()).is_empty(), "a dirty workflow directory refused");
+
+        std::fs::write(dir.join("root.txt"), "b\n").expect("modify root.txt");
+        std::fs::create_dir_all(dir.join("other")).expect("make an untracked directory");
+        std::fs::write(dir.join("other/f.txt"), "b\n").expect("plant an untracked file");
+        let dirty = check(excluded.as_deref());
+        assert!(dirty.iter().any(|e| e.ends_with("root.txt")), "a modified root file passed: {:?}", dirty);
+        assert!(dirty.iter().any(|e| e.ends_with("other/")), "an untracked directory passed: {:?}", dirty);
+        assert!(!dirty.iter().any(|e| e.contains(".workflow")), "the excluded directory was named: {:?}", dirty);
+
+        git(&["checkout", "-q", "--", "root.txt"]);
+        std::fs::remove_dir_all(dir.join("other")).expect("remove the untracked directory");
+        for bad in [".", "../x", ""] {
+            let ex = below_root(&root, bad);
+            assert_eq!(ex, None, "{:?} was taken as below the root", bad);
+            assert!(!check(ex.as_deref()).is_empty(), "with {:?} the workflow edit passed", bad);
+        }
+        assert_eq!(below_root(&root, "missing"), None, "a missing directory was excluded");
+        std::fs::remove_dir_all(&dir).ok();
     }
 
     // spec: evidence-kit/SPEC.md §Layout and configuration — the declaration this arm prints is

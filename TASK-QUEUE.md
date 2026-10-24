@@ -28,23 +28,9 @@ a developer wants Checkwright's gates and workflow for their own work in a repos
 
 **Deliverable:** design-pending, a feature. First `verify-workflow-decoupling`'s statement, which this composes with as its first consumer: the halves part on tracking, and the binary is substrate both share (that entry's 2026-10-24 direction). Then the overlay arm, the front door stating the overlay has no project CI, the inner two tiers only (gate-sdk/SPEC.md §Enforcement tiers). Copying the roster into `prove`'s clone, which reads HEAD, is a costed widening.
 
-**Push need (2026-10-24, inside the budget):** one mid-iteration push, since the init arm is native code `crate-tests-windows`, `install-smoke-pwsh-windows` and the macOS legs run before any local run can; [smoke-whole-tree-precondition-unscoped](#smoke-whole-tree-precondition-unscoped) rides the same batch.
+**Push need (2026-10-24, inside the budget):** one mid-iteration push, since the init arm is native code `crate-tests-windows`, `install-smoke-pwsh-windows` and the macOS legs run before any local run can; `smoke-whole-tree-precondition-unscoped` rides the same batch.
 
 **Cost while deferred:** a developer on a non-adopting project can use Checkwright only by vendoring into a tree they do not own. Filed 2026-10-24 by front-door-patch-pass' close, draining two gap bullets. Re-verified there: 37 crate modules name `ls-files`; §init's clean-tree clause and `--no-commit` valve; §prove's lockless refusal; the two env-only locators. Owner lookup: `personal`, `overlay`, `info/exclude` in this file and the disposed-findings record, none; owner installer/SPEC.md.
-
-### smoke-whole-tree-precondition-unscoped
-
-[spec: SPEC-smoke-preflight-scope.md] [recurrence: 2026-10-18]
-
-the consumer smoke gates its whole suite on an unscoped clean-tree preflight (installer/SPEC.md §The consumer smoke), so a dirty path the payload never reads still costs the full `installer_smoke` suite; the packer's own refusal is already footprint-scoped (§The packer).
-
-**Recurred 2026-10-18, at session-sweep-policy-pass' validate.** A completed `--run-validate` with one red suite folds `.workflow/validate-evidence.txt` (evidence-kit/SPEC.md §Evidence manifest: the fold follows the last suite, so a mid-roster abort writes nothing), and the rerun's preflight refused on that dirty manifest: one wasted validate run plus a manual restore. A 2026-10-16 bullet of this shape was discarded as tree-decided; that record is deleted, the honest limit stating the behaviour while rule-it-correct stays refused.
-
-**Ruled `lead, own-authority` 2026-09-10, lead-relayed, not the operator's: leave it filed.** Narrowing the preflight (B) and ruling it correct (C) were both refused at build. B is no one-liner: the smoke's post-run clean assertion is sound only because the preflight established a clean tree, so the pair moves together, an envelope change against the merged `pack-step-dirty-tree-predicate-unscoped` amendment. C stays live: the smoke asserts over the tree it packs, so its precondition may be correct on independent grounds. The recurrence adds a route from the other owner, run-validate keeping its fold out of a path a later suite's preflight reads (evidence-kit/SPEC.md §Evidence manifest), the same envelope question.
-
-**Taken 2026-10-24 into personal-overlay-pass (operator direction, lead-relayed, not a ruling),** reopening the lead's leave-it-filed: spec rules B or C in an amendment.
-
-**Cost while deferred:** each validate rerun after a red run, and each capture left uncommitted while a validate battery is pending, costs a full `installer_smoke` suite. Filed 2026-09-10 by close, draining the gap inbox; thawed 2026-10-18 by close on the recurrence. Owner lookup: `dirty`, `validate-evidence`, `run-validate` in this file and the disposed-findings record — the 2026-10-16 record, deleted as its ground fell; owner installer/SPEC.md §The consumer smoke.
 
 ## Technical Debt
 
@@ -903,4 +889,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 ## Done
 
 - verify-workflow-decoupling
+- smoke-whole-tree-precondition-unscoped
 

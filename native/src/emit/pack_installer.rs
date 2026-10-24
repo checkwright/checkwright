@@ -593,22 +593,28 @@ fn inside(root: &str, path: &str) -> Option<String> {
 
 // spec: installer/SPEC.md §The packer — the refusal names the entries it found, bounded and with
 // a total, so a reader tells a shipping path from scratch without re-running `git status` by hand
-const DIRTY_SHOWN: usize = 10;
+pub(crate) const DIRTY_SHOWN: usize = 10;
+
+// spec: installer/SPEC.md §The packer — the bounded form every path-naming refusal shares
+pub(crate) fn bounded_entries<S: AsRef<str>>(entries: &[S]) -> String {
+    let mut out = String::new();
+    for e in entries.iter().take(DIRTY_SHOWN) {
+        out.push_str(&format!("\n  {}", e.as_ref()));
+    }
+    if entries.len() > DIRTY_SHOWN {
+        out.push_str(&format!("\n  (and {} more)", entries.len() - DIRTY_SHOWN));
+    }
+    out
+}
 
 fn dirty_cause(root: &str, dirty: &str) -> String {
     let entries: Vec<&str> = dirty.lines().collect();
-    let mut cause = format!(
-        "{} path(s) the payload is assembled from are dirty in the worktree at {}:",
+    format!(
+        "{} path(s) the payload is assembled from are dirty in the worktree at {}:{}",
         entries.len(),
-        root
-    );
-    for e in entries.iter().take(DIRTY_SHOWN) {
-        cause.push_str(&format!("\n  {}", e));
-    }
-    if entries.len() > DIRTY_SHOWN {
-        cause.push_str(&format!("\n  (and {} more)", entries.len() - DIRTY_SHOWN));
-    }
-    cause
+        root,
+        bounded_entries(&entries)
+    )
 }
 
 fn is_commit(c: &str) -> bool {
