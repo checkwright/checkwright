@@ -124,7 +124,7 @@ the delivery rule under `lead-notification-wake-race`'s remedy, unprobed: does a
 
 ### evaluator-root-agent-file
 
-[cost: event/low] [surface: gate-sdk]
+[cost: event/low] [surface: gate-sdk] [not-icebox-eligible: 2026-10-25 split on the operator direction of 2026-10-17 and waits on the operator's first selection-probe run; evicting it would compress that direction away]
 
 surface (c) of `evaluator-agent-discovery`, split off at evaluator-discovery-pass' scope (operator direction 2026-10-17, lead-relayed, not a ruling): a root `AGENTS.md` for evaluators and adopters, since a cloning agent reads the maintainer-internal `CLAUDE.md`.
 
@@ -901,14 +901,4 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
-
-- marker-uninstall-newline
-- init-dry-run-makes-dirs
-- personal-collapse-hides-files
-- personal-worktree-shared-block
-- personal-write-before-refusal
-- init-copy-follows-links
-- hookspath-clobber
-- personal-install-prove
-- smoke-preflight-pathspec
 
