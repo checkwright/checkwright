@@ -13,3 +13,10 @@
 - rev: 877b08b0e583490d1ffc6752b39775049709dab6
 - finding: Beyond the footprint the smoke reads docs/index.md, docs/speckit.md, docs/openspec.md, companion/, the GATE_SDK_NATIVE_CRATE directory's worktree bytes and the toplevel knob files. The only status read rooted at the tree under test is the preflight's whole-tree porcelain in roster.rs; no post-run clean assertion covers that tree. WORKFLOW_DIR in consumer.rs names the scratch consumer's directory, so no arm reads the tree's workflow directory.
 - inferred: That no arm added after this rev reads the tree's workflow directory.
+
+## 2026-10-24 align — Which worktree paths outside the payload footprint does the consumer smoke read, completing the spec-stage survey?
+- corpus: native/src/emit/installer_smoke
+- oracle: grep -n 'state.root' native/src/emit/installer_smoke/*.rs
+- rev: e12c0d3e096586a9baf5f78d4c50e4a219132d7e
+- finding: Beyond the spec-stage list the close-surface arm (carry.rs expected) reads each held kit's canonical spec from the tree under test, a file the payload withholds; report.rs reads the tree's status only to print a diagnostic after a failure. No arm reads the tree's workflow directory: carry.rs's WORKFLOW_DIR names a path inside the scratch consumer.
+- inferred: That no read is spelled through a path variable the grep does not match.
