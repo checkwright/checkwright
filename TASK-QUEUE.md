@@ -16,22 +16,6 @@
 
 ## New Features
 
-### personal-adoption
-
-[spec: installer/SPEC.md] [not-icebox-eligible: 2026-10-24 operator direction wants it for the next scope; evicting it would compress that direction away]
-
-a developer wants Checkwright's gates and workflow for their own work in a repository whose project does not adopt it. Uncovered today: `init` vendors the kits in one commit and refuses an unclean worktree (installer/SPEC.md §init); docs/choosing.md frames the fit as a team's; `prove` refuses a tree with no install lock (§prove). Per-clone pieces exist: the hooks are placed, never tracked, and `init --no-commit` skips the commit.
-
-**Operator direction 2026-10-24, on consult advice, lead-relayed, not a ruling:** worth building for the verification half, and not as an untracked overlay for the workflow half. Recommended shape: an `init --personal` arm making an untracked per-clone overlay, the lock roster and the gates directory written to `.git/info/exclude` as a marker-bounded block on the `.gitattributes` precedent, staging and the commit skipped since `git add` refuses an excluded path, hooks placed as today, `uninstall` dropping the block. Grounds: every gate reads the project's tracked content wherever the kits sit, the hooks are already per clone, the exclude set derives from the lock so no kit literal names a layout, and it is git-only on every OS with zero tracked footprint.
-
-**Refused on that advice:** a sibling directory outside the repository, since `GATE_SDK_ROOT` and `GATE_SDK_GATES_DIR` are env-only locators a placed hook cannot read and a kit root outside the toplevel is no pathspec, so the tracked-corpus readers go vacuous (gate-sdk/SPEC.md §Layout and configuration); and the workflow half as untracked state, since every stamp is committed and names its commit, the stage gates fire at the precommit tier on staged files, and lifecycle-kit/SPEC.md §Multi-operator semantics rules per-operator state files out. The workflow half rides git topology instead, split off as [personal-workflow-export](#personal-workflow-export) at personal-overlay-pass' scope (operator direction 2026-10-24, lead-relayed, not a ruling); this entry is the verification half alone.
-
-**Deliverable:** design-pending, a feature. First `verify-workflow-decoupling`'s statement, which this composes with as its first consumer: the halves part on tracking, and the binary is substrate both share (that entry's 2026-10-24 direction). Then the overlay arm, the front door stating the overlay has no project CI, the inner two tiers only (gate-sdk/SPEC.md §Enforcement tiers). Copying the roster into `prove`'s clone, which reads HEAD, is a costed widening.
-
-**Push need (2026-10-24, inside the budget):** one mid-iteration push, since the init arm is native code `crate-tests-windows`, `install-smoke-pwsh-windows` and the macOS legs run before any local run can; `smoke-whole-tree-precondition-unscoped` rides the same batch.
-
-**Cost while deferred:** a developer on a non-adopting project can use Checkwright only by vendoring into a tree they do not own. Filed 2026-10-24 by front-door-patch-pass' close, draining two gap bullets. Re-verified there: 37 crate modules name `ls-files`; §init's clean-tree clause and `--no-commit` valve; §prove's lockless refusal; the two env-only locators. Owner lookup: `personal`, `overlay`, `info/exclude` in this file and the disposed-findings record, none; owner installer/SPEC.md.
-
 ## Technical Debt
 
 ## Deferred
@@ -184,7 +168,7 @@ Cursor and Muse Code are installed on no build machine, so plugin/SPEC.md §The 
 
 [cost: event/low] [surface: installer]
 
-the workflow half of [personal-adoption](#personal-adoption): a developer runs the stage machine on a personal branch or fork of a project that does not adopt it, `init` as today, plus an export keeping commits that touch only lock-roster and workflow paths out of an upstream pull request. Untracked workflow state was refused on consult advice, since every stamp is committed and names its commit (lifecycle-kit/SPEC.md §Multi-operator semantics).
+the workflow half of `personal-adoption`: a developer runs the stage machine on a personal branch or fork of a project that does not adopt it, `init` as today, plus an export keeping commits that touch only lock-roster and workflow paths out of an upstream pull request. Untracked workflow state was refused on consult advice, since every stamp is committed and names its commit (lifecycle-kit/SPEC.md §Multi-operator semantics).
 
 **Deliverable:** design-pending, a feature: the export arm's shape (a path-filtered branch rewrite or a patch series), how it reads the lock roster and the workflow paths without a kit literal naming a layout, and what it refuses.
 
@@ -890,4 +874,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 - verify-workflow-decoupling
 - smoke-whole-tree-precondition-unscoped
+- personal-adoption
 
