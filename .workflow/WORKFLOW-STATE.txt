@@ -10,3 +10,4 @@ personal-install-hardening-pass align ab6e0132 2026-10-24 c6d5f672f
 personal-install-hardening-pass build a7049b42 2026-10-24 669e85ba0
 personal-install-hardening-pass build aa9e00c9 2026-10-24 9ca87d551
 personal-install-hardening-pass validate a21e20a7 2026-10-25 d6ccfb18f
+personal-install-hardening-pass close a79daa34 2026-10-25 b12933797
