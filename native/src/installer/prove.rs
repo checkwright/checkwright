@@ -18,17 +18,17 @@ pub(super) const USAGE: &[&str] = &[
     "usage: checkwright prove",
     "",
     "Shows, on this repository, whether a task claimed done with no evidence is",
-    "caught: clones HEAD into a scratch repository, reports what the install",
-    "configures, enforces and leaves inactive, runs your battery, commits the claim",
-    "there and runs it again, then removes the scratch. It writes nothing here and",
-    "asks nothing. Exit status is the verdict: 0 held, 1 not held; the last line",
-    "of output states it.",
+    "caught: clones HEAD into a scratch repository, with a personal install copied",
+    "in, reports what the install configures, enforces and leaves inactive, runs",
+    "your battery, commits the claim there and runs it again, then removes the",
+    "scratch. It writes nothing here and asks nothing. Exit status is the verdict:",
+    "0 held, 1 not held; the last line of output states it.",
 ];
 
 // spec: installer/SPEC.md §prove — the three exit classes as a type, so a verdict about the tree
 // cannot be raised on a precondition's spelling or the reverse
 enum Outcome {
-    Held { head: String, minutes: i64 },
+    Held { head: String, minutes: Option<i64> },
     NotHeld { cause: String, help: String },
     Refuse { cause: String, help: String },
 }
@@ -67,7 +67,7 @@ pub fn run(args: &[String]) -> i32 {
     drop(scratch);
     match outcome {
         Outcome::Held { head, minutes } => {
-            println!("\n{}: held — caught at {}; time to proof {} min", VERDICT, head, minutes);
+            println!("\n{}", held_line(&head, minutes));
             0
         }
         Outcome::NotHeld { cause, help } => {
@@ -119,16 +119,16 @@ fn prove(scratch: &mut Scratch) -> Outcome {
         "run checkwright init here and commit what it writes; prove reads the {} HEAD carries.",
         lock::FILE
     );
-    let Ok(lock_text) = git(&root, &["show", &format!("HEAD:{}", lock::FILE)]) else {
-        let help = if super::personal::is_personal(&root) { personal_help(&root) } else { init_help };
-        return refuse_with(format!("HEAD carries no {}", lock::FILE), help);
-    };
-    let Some(manifest) = lock::Manifest::parse(&lock_text).filter(lock::Manifest::schema_ok) else {
-        return refuse_with(format!("the {} at HEAD carries a schema this build does not know", lock::FILE), init_help);
-    };
-    if manifest.field("version").is_empty() {
-        return refuse_with(format!("the {} at HEAD records no install, only files a removal kept", lock::FILE), init_help);
-    }
+    let committed = git(&root, &["show", &format!("HEAD:{}", lock::FILE)]).ok();
+    let personal = committed.is_none() && super::personal::is_personal(&root);
+    let manifest = step!(if personal {
+        let named = format!("this worktree's {}", lock::FILE);
+        let absent = format!("this worktree carries no {}", lock::FILE);
+        held_lock(std::fs::read_to_string(lock::path(&root)).ok(), &absent, &named, PERSONAL_HELP)
+    } else {
+        let absent = format!("HEAD carries no {}", lock::FILE);
+        held_lock(committed, &absent, &format!("the {} at HEAD", lock::FILE), &init_help)
+    });
 
     // spec: installer/SPEC.md §prove — the clone, under demo's base and with demo's local settings,
     // checked out detached at HEAD's commit
@@ -140,6 +140,9 @@ fn prove(scratch: &mut Scratch) -> Outcome {
     }
     step!(git_step(&clone, &["checkout", "-q", "--detach", &sha]));
     let head = step!(git_step(&clone, &["rev-parse", "--short", "HEAD"])).trim().to_string();
+    if personal {
+        step!(copy_install(&root, &clone, &manifest));
+    }
 
     let seam = manifest.own_file(&format!("{}/gate-sdk-config.knobs", GATES_DIR));
     let Some(bin) = super::seam_binary(&clone, &seam) else {
@@ -156,7 +159,7 @@ fn prove(scratch: &mut Scratch) -> Outcome {
 
     // spec: installer/SPEC.md §prove — the report: configured, enforced, inactive, then the note
     let door = super::init::command_token(&bin);
-    print!("{}", report(&root, &clone, &manifest, &door));
+    print!("{}", report(&root, &clone, &manifest, &door, personal));
 
     // spec: installer/SPEC.md §prove — both battery runs read the claim's files at the paths resolved
     // here, so an absolute knob rebased onto the clone is the file the battery reads
@@ -171,7 +174,7 @@ fn prove(scratch: &mut Scratch) -> Outcome {
 
     // spec: installer/SPEC.md §prove — the claim, over the files a battery at the clone's root reads
     println!("\nthe claim");
-    let claim = step!(stage(&clone, &gates, &manifest, &queue, &state, &head));
+    let claim = step!(stage(&clone, &gates, &manifest, personal, &queue, &state, &head));
     for (rel, body) in &claim.writes {
         if let Err(e) = std::fs::write(clone.join(rel), body) {
             return refuse(format!("cannot write {} in the clone: {}", rel, e));
@@ -195,14 +198,18 @@ fn prove(scratch: &mut Scratch) -> Outcome {
         }
     }
 
-    // spec: installer/SPEC.md §prove — time to proof, from the install commit to this run's clock
+    // spec: installer/SPEC.md §prove — time to proof, from the install commit to this run's clock; a
+    // personal proof has no install commit
+    if personal {
+        return Outcome::Held { head, minutes: None };
+    }
     let added = step!(git_step(
         &clone,
         &["log", "--full-history", "--no-renames", "--diff-filter=A", "--format=%ct", "HEAD", "--", lock::FILE]
     ));
     let since = added.lines().filter_map(|l| l.trim().parse::<i64>().ok()).min();
     let minutes = since.map(|t| minutes_since(t, crate::emit::kpi::now_epoch())).unwrap_or(0);
-    Outcome::Held { head, minutes }
+    Outcome::Held { head, minutes: Some(minutes) }
 }
 
 // spec: installer/SPEC.md §prove — a path clone, never `--local`: git then dies on a scratch on
@@ -216,19 +223,72 @@ fn minutes_since(then: i64, now: i64) -> i64 {
     (now - then).max(0) / 60
 }
 
-// spec: installer/SPEC.md §The personal install — the lockless refusal's help on a personal clone,
-// naming the placed binary's command token as the follow-up block spells it
-fn personal_help(root: &Path) -> String {
-    let seam = lock::Manifest::read(&lock::path(root))
-        .map(|m| m.own_file(&format!("{}/gate-sdk-config.knobs", GATES_DIR)))
-        .unwrap_or_default();
-    let door = super::seam_binary(root, &seam)
-        .map(|b| super::init::command_token(&b))
-        .unwrap_or_else(|| "the placed gate binary's".to_string());
-    format!(
-        "this clone's install is personal and commits nothing, and prove reads HEAD alone; {} --run checks the working tree instead.",
-        door
-    )
+// spec: installer/SPEC.md §prove — the verdict line; a personal proof has no time to proof
+fn held_line(head: &str, minutes: Option<i64>) -> String {
+    match minutes {
+        Some(m) => format!("{}: held — caught at {}; time to proof {} min", VERDICT, head, m),
+        None => format!("{}: held — caught at {}; personal install, no time to proof", VERDICT, head),
+    }
+}
+
+const PERSONAL_HELP: &str =
+    "this worktree holds no personal install; run init --personal here, or prove from the worktree that holds one.";
+
+// spec: installer/SPEC.md §prove — the lock a proof reads, held to three tests: present, a schema
+// this build knows, and a version
+fn held_lock(text: Option<String>, absent: &str, named: &str, help: &str) -> Result<lock::Manifest, Outcome> {
+    let Some(text) = text else {
+        return Err(refuse_with(absent, help));
+    };
+    let Some(manifest) = lock::Manifest::parse(&text).filter(lock::Manifest::schema_ok) else {
+        return Err(refuse_with(format!("{} carries a schema this build does not know", named), help));
+    };
+    if manifest.field("version").is_empty() {
+        return Err(refuse_with(format!("{} records no install, only files a removal kept", named), help));
+    }
+    Ok(manifest)
+}
+
+// spec: installer/SPEC.md §prove — a personal proof copies each recorded file the working tree holds
+// and the lock into the clone, refusing a destination through a link in HEAD's tree and a path HEAD
+// tracks before the first write, then writes the install's exclude block into the clone's own
+fn copy_install(root: &Path, clone: &Path, manifest: &lock::Manifest) -> Result<(), Outcome> {
+    let regular = |rel: &str| std::fs::symlink_metadata(root.join(rel)).is_ok_and(|m| m.is_file());
+    let recorded: Vec<String> = manifest.files().into_iter().map(|(p, _)| p).filter(|p| regular(p)).collect();
+    let mut set = recorded.clone();
+    set.push(lock::FILE.to_string());
+    for rel in &set {
+        let link = super::link_below(clone, rel).map_err(|e| refuse(format!("could not read where {} lands in the clone: {}", rel, e)))?;
+        if let Some(at) = link {
+            return Err(refuse(format!(
+                "{} reaches through a link in HEAD's tree at {}; prove writes nothing outside its clone",
+                rel, at
+            )));
+        }
+    }
+    let tracked = super::personal::tracked(clone, &set)
+        .map_err(|e| refuse(format!("could not read which install paths HEAD tracks: {}", e)))?;
+    if !tracked.is_empty() {
+        return Err(refuse_with(
+            format!(
+                "HEAD tracks {} path(s) this clone's personal install wrote:{}",
+                tracked.len(),
+                crate::emit::pack_installer::bounded_entries(&tracked)
+            ),
+            "re-run init --personal, which names the tracked paths an exclude cannot hide.",
+        ));
+    }
+    for rel in &set {
+        let dest = clone.join(rel);
+        if let Some(dir) = dest.parent() {
+            std::fs::create_dir_all(dir).map_err(|e| refuse(format!("cannot create {} in the clone: {}", dir.display(), e)))?;
+        }
+        std::fs::copy(root.join(rel), &dest).map_err(|e| refuse(format!("cannot copy {} into the clone: {}", rel, e)))?;
+    }
+    let kits: Vec<String> = manifest.field("kits").split_whitespace().map(String::from).collect();
+    super::personal::write(clone, &recorded, &kits)
+        .map_err(|e| refuse(format!("cannot write the personal install's exclude block in the clone: {}", e)))?;
+    Ok(())
 }
 
 // spec: installer/SPEC.md §prove — a knob's path inside the repository, rebased onto the clone and
@@ -313,11 +373,19 @@ struct Claim {
 
 // spec: installer/SPEC.md §prove — the stage claim where the clone holds both lifecycle files, else
 // the task claim
-fn stage(clone: &Path, gates: &str, manifest: &lock::Manifest, queue: &ClaimFile, state: &ClaimFile, head: &str) -> Result<Claim, Outcome> {
+fn stage(
+    clone: &Path,
+    gates: &str,
+    manifest: &lock::Manifest,
+    personal: bool,
+    queue: &ClaimFile,
+    state: &ClaimFile,
+    head: &str,
+) -> Result<Claim, Outcome> {
     let read = |f: &ClaimFile| f.rel.as_ref().and_then(|r| std::fs::read_to_string(clone.join(r)).ok());
     let (q, s) = match (read(queue), read(state)) {
         (Some(q), Some(s)) => (q, s),
-        (q, _) => return task_claim(clone, gates, manifest, if q.is_none() { queue } else { state }),
+        (q, _) => return task_claim(clone, gates, manifest, personal, if q.is_none() { queue } else { state }),
     };
     let (queue_rel, state_rel) = (queue.rel.clone().unwrap_or_default(), state.rel.clone().unwrap_or_default());
     let today = crate::emit::kpi::iso_day(crate::emit::kpi::now_epoch().div_euclid(86_400));
@@ -337,14 +405,14 @@ fn stage(clone: &Path, gates: &str, manifest: &lock::Manifest, queue: &ClaimFile
 
 // spec: installer/SPEC.md §prove — the task claim: demo's task ticked done naming a path under a
 // top-level directory named for the verb, appended to the first task list resolving in the clone
-fn task_claim(clone: &Path, gates: &str, manifest: &lock::Manifest, missing: &ClaimFile) -> Result<Claim, Outcome> {
+fn task_claim(clone: &Path, gates: &str, manifest: &lock::Manifest, personal: bool, missing: &ClaimFile) -> Result<Claim, Outcome> {
     let Some(list) = task_list(clone, gates).map_err(refuse)? else {
         return Err(Outcome::NotHeld {
             cause: format!(
                 "this tree keeps no {} and no task list to claim a task done in",
                 missing.rel.as_deref().unwrap_or(&missing.named)
             ),
-            help: not_held_help(manifest),
+            help: if personal { personal_not_held_help(manifest) } else { not_held_help(manifest) },
         });
     };
     let path = format!("prove/{}.md", demo::TASK);
@@ -385,13 +453,28 @@ fn not_held_help(manifest: &lock::Manifest) -> String {
         "re-run init with --profile {}, the profile demo installs, to keep a task queue and stage state",
         super::profile::DERIVED
     );
-    let kits = manifest.field("kits");
-    let owned = crate::knobs::static_owner(LISTS_KNOB).is_some_and(|k| kits.split_whitespace().any(|n| n == k.root));
-    let knob = if owned { format!(", or name a task list in {}", LISTS_KNOB) } else { String::new() };
+    let knob = if lists_owner_missing(manifest).is_none() { format!(", or name a task list in {}", LISTS_KNOB) } else { String::new() };
     format!("{}{}; init --help lists the profiles and the --with-kit selection.", profile, knob)
 }
 
-fn report(root: &Path, clone: &Path, manifest: &lock::Manifest, door: &str) -> String {
+// spec: installer/SPEC.md §prove — the task list knob's owning kit where the lock lacks it
+fn lists_owner_missing(manifest: &lock::Manifest) -> Option<&'static str> {
+    let kits = manifest.field("kits");
+    let owner = crate::knobs::static_owner(LISTS_KNOB)?.root;
+    (!kits.split_whitespace().any(|n| n == owner)).then_some(owner)
+}
+
+// spec: installer/SPEC.md §prove — a personal proof's no-file help drops the profile, which
+// `--personal` refuses, and names the knob, with the kit owning it where the lock lacks that kit
+fn personal_not_held_help(manifest: &lock::Manifest) -> String {
+    let name = format!("name a task list in {}; init --help lists the --with-kit selection.", LISTS_KNOB);
+    match lists_owner_missing(manifest) {
+        Some(owner) => format!("add {} with init --personal --with-kit {}, then {}", owner, owner, name),
+        None => name,
+    }
+}
+
+fn report(root: &Path, clone: &Path, manifest: &lock::Manifest, door: &str, personal: bool) -> String {
     let mut out = String::new();
     let kits: Vec<String> = manifest.field("kits").split_whitespace().map(String::from).collect();
     let list = manifest.own_file(&format!("{}/gates.list", GATES_DIR));
@@ -425,7 +508,11 @@ fn report(root: &Path, clone: &Path, manifest: &lock::Manifest, door: &str) -> S
     }
 
     if git(root, &["status", "--porcelain", "-z"]).is_ok_and(|s| !s.trim().is_empty()) {
-        out.push_str("note: your worktree differs from HEAD; this run read HEAD alone.\n");
+        out.push_str(if personal {
+            "note: your worktree differs from HEAD; this run read HEAD and this clone's personal install alone.\n"
+        } else {
+            "note: your worktree differs from HEAD; this run read HEAD alone.\n"
+        });
     }
     out
 }
@@ -583,14 +670,14 @@ mod tests {
         std::fs::write(clone.join("specs/b/tasks.md"), "- [ ] T002 two\n").expect("write");
         let missing = super::ClaimFile { knob: super::STATE_KNOB, named: "s".into(), rel: Some("s".into()) };
         let lock = super::lock::Manifest::parse(r#"{"kits":["gate-sdk","canon-kit"]}"#).expect("lock");
-        let Ok(claim) = super::task_claim(&clone, &gates, &lock, &missing) else { panic!("no task claim staged") };
+        let Ok(claim) = super::task_claim(&clone, &gates, &lock, false, &missing) else { panic!("no task claim staged") };
         assert_eq!(claim.named, "prove/add-login-page.md");
         assert_eq!(claim.writes.len(), 1);
         assert_eq!(claim.writes[0].0, "specs/a/tasks.md");
         assert_eq!(claim.writes[0].1, "- [x] T001 one\n- [x] add-login-page in prove/add-login-page.md\n");
         std::fs::create_dir_all(clone.join("prove")).expect("scratch");
         std::fs::write(clone.join("prove/add-login-page.md"), "").expect("write");
-        assert!(matches!(super::task_claim(&clone, &gates, &lock, &missing), Err(super::Outcome::Refuse { .. })));
+        assert!(matches!(super::task_claim(&clone, &gates, &lock, false, &missing), Err(super::Outcome::Refuse { .. })));
     }
 
     // spec: installer/SPEC.md §prove — a tree keeping no task list answers not held, its help naming
@@ -604,7 +691,7 @@ mod tests {
         let missing = super::ClaimFile { knob: super::QUEUE_KNOB, named: "TASK-QUEUE.md".into(), rel: None };
         for (kits, names) in [(r#"["canon-kit"]"#, true), (r#"["gate-sdk"]"#, false)] {
             let lock = super::lock::Manifest::parse(&format!(r#"{{"kits":{}}}"#, kits)).expect("lock");
-            let Err(super::Outcome::NotHeld { cause, help }) = super::task_claim(&clone, &gates, &lock, &missing) else {
+            let Err(super::Outcome::NotHeld { cause, help }) = super::task_claim(&clone, &gates, &lock, false, &missing) else {
                 panic!("a tree with no task list staged a claim")
             };
             assert_eq!(cause, "this tree keeps no TASK-QUEUE.md and no task list to claim a task done in");
@@ -642,6 +729,99 @@ mod tests {
         assert_eq!(env[0], (super::QUEUE_KNOB.to_string(), "q.md".to_string()));
         assert_eq!(env[1].0, super::STATE_KNOB);
         assert!(env[1].1.starts_with(super::ABSENT) && !env[1].1.contains("elsewhere"), "{:?}", env[1]);
+    }
+
+    // spec: installer/SPEC.md §prove — both held lines open on the verdict grammar's prefix
+    #[test]
+    fn the_held_line_takes_the_verdict_grammar_in_both_forms() {
+        let timed = super::held_line("abc1234", Some(7));
+        let personal = super::held_line("abc1234", None);
+        assert_eq!(timed, "PROVE: held — caught at abc1234; time to proof 7 min");
+        assert_eq!(personal, "PROVE: held — caught at abc1234; personal install, no time to proof");
+    }
+
+    // spec: installer/SPEC.md §prove — a personal proof's not-held help names the knob and never a
+    // profile, adding the owning kit where the lock lacks it
+    #[test]
+    fn the_personal_not_held_help_names_the_knob_and_no_profile() {
+        let owner = crate::knobs::static_owner(super::LISTS_KNOB).expect("an owner").root;
+        for (kits, adds) in [(format!(r#"["gate-sdk","{}"]"#, owner), false), (r#"["gate-sdk"]"#.to_string(), true)] {
+            let lock = super::lock::Manifest::parse(&format!(r#"{{"kits":{}}}"#, kits)).expect("lock");
+            let help = super::personal_not_held_help(&lock);
+            assert!(help.contains(super::LISTS_KNOB) && !help.contains("--profile"), "{}", help);
+            assert_eq!(help.contains(&format!("init --personal --with-kit {}", owner)), adds, "{}", help);
+        }
+    }
+
+    fn git_in(dir: &std::path::Path, args: &[&str]) {
+        super::git(dir, args).unwrap_or_else(|e| panic!("{}", e));
+    }
+
+    // spec: installer/SPEC.md §prove — a personal proof's working tree and clone: the working tree
+    // holds the install's two files, and the clone is a repository at HEAD holding a project file
+    fn personal_pair(t: &Tree) -> (std::path::PathBuf, std::path::PathBuf, super::lock::Manifest) {
+        let (root, clone) = (t.0.join("root"), t.clone());
+        std::fs::create_dir_all(root.join("scripts")).expect("scratch");
+        std::fs::write(root.join("scripts/gates.list"), "check-x\n").expect("write");
+        std::fs::write(root.join("vendored.txt"), "v").expect("write");
+        std::fs::write(root.join("checkwright.lock"), "{}").expect("write");
+        git_in(&clone, &["init", "-q"]);
+        let lock = super::lock::Manifest::parse(
+            r#"{"kits":["gate-sdk"],"files":{"scripts/gates.list":"h","vendored.txt":"h"}}"#,
+        )
+        .expect("lock");
+        (root, clone, lock)
+    }
+
+    fn untouched(clone: &std::path::Path) -> bool {
+        let exclude = std::fs::read_to_string(clone.join(".git/info/exclude")).unwrap_or_default();
+        !clone.join("vendored.txt").exists() && !clone.join("checkwright.lock").exists() && !exclude.contains("checkwright")
+    }
+
+    // spec: installer/SPEC.md §prove — a roster path the clone's index tracks refuses with nothing
+    // written in the clone
+    #[test]
+    fn a_tracked_roster_path_refuses_the_copy_writing_nothing() {
+        let t = Tree::new("copy-tracked");
+        let (root, clone, lock) = personal_pair(&t);
+        std::fs::create_dir_all(clone.join("scripts")).expect("scratch");
+        std::fs::write(clone.join("scripts/gates.list"), "theirs\n").expect("write");
+        git_in(&clone, &["add", "scripts/gates.list"]);
+        let got = super::copy_install(&root, &clone, &lock);
+        let Err(super::Outcome::Refuse { cause, help }) = got else { panic!("a tracked roster path must refuse") };
+        assert!(cause.starts_with("HEAD tracks 1 path(s) this clone's personal install wrote:"), "{}", cause);
+        assert!(cause.contains("scripts/gates.list") && help.contains("init --personal"), "{} / {}", cause, help);
+        assert_eq!(std::fs::read_to_string(clone.join("scripts/gates.list")).expect("reads"), "theirs\n");
+        assert!(untouched(&clone));
+    }
+
+    // spec: installer/SPEC.md §prove — a destination below a committed directory symlink refuses
+    // with nothing written in the clone or where the link points
+    #[cfg(unix)]
+    #[test]
+    fn a_destination_through_a_link_refuses_the_copy_writing_nothing() {
+        let t = Tree::new("copy-link");
+        let (root, clone, lock) = personal_pair(&t);
+        std::os::unix::fs::symlink("../outside", clone.join("scripts")).expect("symlink");
+        git_in(&clone, &["add", "scripts"]);
+        let got = super::copy_install(&root, &clone, &lock);
+        let Err(super::Outcome::Refuse { cause, .. }) = got else { panic!("a linked destination must refuse") };
+        assert_eq!(cause, "scripts/gates.list reaches through a link in HEAD's tree at scripts; prove writes nothing outside its clone");
+        assert!(!t.0.join("outside/gates.list").exists(), "the copy wrote through the link");
+        assert!(untouched(&clone));
+    }
+
+    // spec: installer/SPEC.md §prove — the copy carries each recorded file and the lock, and the
+    // clone's exclude block hides them
+    #[test]
+    fn the_copy_carries_the_install_and_its_exclude_block() {
+        let t = Tree::new("copy");
+        let (root, clone, lock) = personal_pair(&t);
+        assert!(super::copy_install(&root, &clone, &lock).is_ok());
+        assert_eq!(std::fs::read_to_string(clone.join("scripts/gates.list")).expect("copied"), "check-x\n");
+        assert!(clone.join("vendored.txt").is_file() && clone.join("checkwright.lock").is_file());
+        let ignored = super::git(&clone, &["check-ignore", "vendored.txt", "checkwright.lock", "scripts/gates.list"]).expect("ignored");
+        assert_eq!(ignored.lines().count(), 3, "{}", ignored);
     }
 
     // spec: installer/SPEC.md §prove — the summary is the battery's own line, else its last

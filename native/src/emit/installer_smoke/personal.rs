@@ -111,12 +111,37 @@ pub(super) fn personal(state: &mut Run) -> Step {
 
     let scratch = format!("{}/personal-prove", state.scratch);
     std::fs::create_dir_all(&scratch).map_err(|_| refuse("personal arm: could not make prove's scratch base"))?;
+    let (head1, porcelain1, exclude1) = (head(&c)?, porcelain(&c)?, read(&exclude));
     let m = state.verb_with(&c, &["prove"], &[("DEMO_TMP_DIR".to_string(), scratch)])?;
-    let help = find_line(&out(&m), |l| l.trim_start().starts_with("help: this clone's install is personal")).is_some();
-    if m.code() != Some(2) || !help {
-        return Err(failed(&m, format!("personal arm: prove exited {} without a help line naming the personal install", m.reported_code())));
+    let said = out(&m);
+    let verdict = format!(
+        "PROVE: not held — this tree keeps no {} and no task list to claim a task done in",
+        crate::installer::QUEUE_FILE
+    );
+    let last = said.lines().rev().find(|l| !l.trim().is_empty()).unwrap_or_default().trim_end_matches('\r');
+    let help = find_line(&said, |l| {
+        l.trim_start().starts_with("help: ") && l.contains(crate::gates::task_path_claim::LISTS_KNOB) && !l.contains("--profile")
+    })
+    .is_some();
+    let configured = find_line(&said, |l| {
+        let toks: Vec<&str> = l.split_whitespace().collect();
+        toks == ["profile", min.as_str()]
+    })
+    .is_some();
+    if m.code() != Some(1) || last != verdict || !help || !configured {
+        return Err(failed(
+            &m,
+            format!(
+                "personal arm: prove exited {} without the not-held verdict, a help naming the task list knob and no profile, or a configured block naming {}",
+                m.reported_code(),
+                min
+            ),
+        ));
     }
-    say("prove: exit 2, its help naming the personal install");
+    if head(&c)? != head1 || porcelain(&c)? != porcelain1 || read(&exclude) != exclude1 {
+        return Err(failed(&m, "personal arm: prove moved HEAD, the porcelain or the exclude file"));
+    }
+    say("prove: exit 1 not held over the copied install, its help naming the task list knob and no profile");
 
     refused(state, "process-record", &["init", "--personal", "--profile", PROFILE_DERIVED], "commits a process record", Plant::Nothing)?;
     refused(state, "tracked-path", &["init", "--personal", "--profile", &min], &format!("{}/gates.list", GATES_DIR), Plant::Registry)?;

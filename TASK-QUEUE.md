@@ -16,16 +16,6 @@
 
 ## New Features
 
-### personal-install-prove
-
-[spec: SPEC-personal-prove.md]
-
-`prove` refuses over a personal install (installer/SPEC.md §The personal install): it clones `HEAD`, and a personal install commits no `checkwright.lock`, so the clone carries no lock and no kits.
-
-**Deliverable:** a feature: copy the install roster the exclude block names into `prove`'s clone so it proves the working tree's install over `HEAD`'s tracked content, or state why it should stay refused; the personal arm's `prove` step moves with it.
-
-**Cost while deferred:** a personal adopter gets the battery and the hooks but no `prove` verdict. Filed 2026-10-24 by personal-overlay-pass' close, draining a gap bullet. Re-verified there: §The personal install states the refusal and the personal arm's step 4 asserts it; the landed parent's deliverable named the roster copy as a costed widening. Owner lookup: `prove`, `personal` in this file and the disposed-findings record, none beyond [personal-workflow-export](#personal-workflow-export), a different half; owner installer/SPEC.md §prove.
-
 ## Technical Debt
 
 ### smoke-preflight-pathspec
@@ -907,4 +897,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - personal-write-before-refusal
 - init-copy-follows-links
 - hookspath-clobber
+- personal-install-prove
 
