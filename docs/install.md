@@ -94,7 +94,7 @@ To run each step yourself on Windows: [Installing step by step](manual-install.m
 
 ### With Node
 
-`npx checkwright init` runs the same `init` from the npm package, which carries npm's provenance attestation as the tarball carries a GitHub build attestation ([installer/SPEC.md](installer/SPEC.md#the-dependency-boundary)). The package's command is a shell script, so on Windows run the `PATH` block above first, which puts the `sh` npm starts it with on your `PATH`. `init` verifies the gate binary with `sha256sum` or `shasum`, and refuses without one. It needs Node 8.2 or later ([Requirements](#requirements)).
+`npx checkwright init` runs the same `init` from the npm package, which carries npm's provenance attestation as the tarball carries a GitHub build attestation ([installer/SPEC.md](installer/SPEC.md#the-dependency-boundary)). The package's command is a shell script, so on Windows run the `PATH` block above first, which puts the `sh` npm starts it with on your `PATH`.
 
 ### From a plugin marketplace
 
@@ -112,7 +112,7 @@ codex plugin marketplace add checkwright/checkwright
 codex plugin add checkwright@checkwright
 ```
 
-The plugin installs no kit. It registers Checkwright's lifecycle skills, and its guards in Claude Code and, except on native Windows, Antigravity. Ask for its `install` skill in your repository: it chooses a profile with you and runs the same `init` this page documents. Then ask for its `adopt` skill: it fits the knobs to your layout, and works through the first reds with you until the battery is green or each has a disposition you accept. Any Agent Plugins client, Antigravity among them, loads the repository's `plugin/` directory by its own route ([plugin/README.md](plugin/README.md)).
+The plugin installs no kit. Ask for its `install` skill in your repository: it chooses a profile with you and runs the same `init` this page documents. Then ask for its `adopt` skill: it fits the knobs to your layout, and works through the first reds with you until the battery is green or each has a disposition you accept. Any Agent Plugins client, Antigravity among them, loads the repository's `plugin/` directory by its own route ([plugin/README.md](plugin/README.md)).
 
 ### With another coding agent
 
@@ -126,16 +126,15 @@ The last step is the same walk the plugin's `adopt` skill runs.
 
 ### Choosing a profile
 
-`init` vendors the kits, writes a `gates.list` and the config files they read, records the install in `checkwright.lock`, and makes one commit. It ends by printing the commands that finish the setup; run them.
-
 Choose a profile with `--profile`. If another toolkit writes your specs, pass `--recipe` with the toolkit's name, as [Spec toolkits](spec-toolkits.md) shows. With none, a first install takes `starter` and a re-run keeps the profile the install recorded:
 
 - `starter` — the gate SDK on its own;
+- `workflow` — adds the stage machine and the recorded test runs to it, the least on which `prove` catches a done claim;
 - `delegation` — adds the kits for agent sessions;
 - `prose` — adds canon-kit, for a repository of documents;
 - `full` — everything.
 
-Moving to a profile that contains yours only adds. `init` refuses outside a git work tree or in a repository git refuses to read (the refusal names the command that prints why), on a dirty worktree (`--no-commit` stages instead of committing), or when `checkwright doctor` finds a missing tool. Re-running it is safe: it reports files you have edited instead of overwriting them, unless you pass `--force`. `--dry-run` prints the plan and writes nothing.
+Moving to a profile that contains yours only adds. Re-running it is safe: it reports files you have edited instead of overwriting them, unless you pass `--force`. `--dry-run` prints the plan and writes nothing.
 
 **Choosing kits and gates.** `--with-kit` and `--without-kit` add a kit to your profile or take one out. `--with-gate` and `--without-gate` do the same for a gate. Each repeats. `checkwright.lock` records them, so a re-run keeps them until you pass new ones or `--no-selection`. `gate-sdk` stays, since it runs the others. To replace a gate with your own, put a gate of the same name in your gates directory. It runs instead of the kit's, and `init` never overwrites it.
 

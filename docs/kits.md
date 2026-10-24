@@ -10,7 +10,7 @@ One page per kit.
 
 ## The kits
 
-Read in this order: each kit assumes the machinery of the ones above it.
+Start with gate-sdk. Its binary is the runner, the registry, the git hooks and the commands the other kits call, so every install carries it. The rest follow in reading order, not dependency order: each installs beside gate-sdk alone.
 
 - [gate-sdk](gate-sdk/index.md) — the lint framework the other kits register into.
 - [lifecycle-kit](lifecycle-kit/index.md) — the iteration stage state machine for stateless sessions.

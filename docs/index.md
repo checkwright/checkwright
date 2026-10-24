@@ -86,7 +86,7 @@ Which harnesses it runs under, and what adapts to yours: the [tiered compatibili
 
 ## The kits
 
-Each kit has its own page, listed in reading order under [Kit Reference](kits.md) in the navigation, and each assumes the machinery of the ones above it. The Kit Reference page glosses every kit in one line.
+Each kit has its own page under [Kit Reference](kits.md) in the navigation, which glosses every kit in one line. gate-sdk is the base every other kit runs on, and beyond it the checks and the workflow install without each other ([What you install](choosing.md#what-you-install)).
 
 ## Positioning
 

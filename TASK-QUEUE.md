@@ -16,18 +16,6 @@
 
 ## New Features
 
-### verify-workflow-decoupling
-
-[spec: SPEC-workflow-decoupling.md] [not-icebox-eligible: 2026-10-06 holds the operator's stated aim of 2026-09-28 and the ruling it waits on; evicting it would compress the question away]
-
-the operator states that verification and workflow are fully decoupled, each shippable without the other; the tree shows one direction only. Verification without the workflow holds: `installer/profiles.list`'s starter profile is gate-sdk alone and prose is gate-sdk plus canon-kit, and the companion recipes gate another toolkit's workflow. The workflow without verification is not shipped: every profile carrying lifecycle-kit carries gate-sdk, forced in because without it there is no runner, hook generator or registry; `--enter-stage` is an arm of the gate binary; the delegation profile's comment reads "Vendored is not yet enforced"; docs/kits.md orders the roster as "each kit assumes the machinery of the ones above it". The operator's stated aim (2026-09-28, lead session; an aim, not a /consult objective): a competitive offering that is loosely coupled, composable, configurable and efficient.
-
-**Deliverable:** a ruling on whether the gate binary is verification or substrate both halves share; if the decoupling then holds, the front door and docs/kits.md state it, and a workflow-only profile is weighed.
-
-**Operator direction 2026-10-24, lead-relayed, not a ruling:** the binary is substrate both halves share, and spec authors the statement and weighs the workflow-only profile on that basis. This answer is the authority; [personal-adoption](#personal-adoption)'s filed Deliverable sentence and the consult advice it came from settled nothing.
-
-**Cost while deferred:** docs/choosing.md §What you install refutes a decoupling the operator believes in (re-verified at spec), and docs/kits.md reads as a dependency chain. Filed 2026-09-28 by plugin-marketplace-queue-verbs' lead. Re-verified: the three profiles' rows and comments in `installer/profiles.list`, and docs/kits.md line 13. Owner lookup: `decoupl`, `profiles.list`, `workflow-only` in this file — none; owner installer/SPEC.md §Profiles, with docs/kits.md.
-
 ### personal-adoption
 
 [spec: SPEC-personal-overlay.md] [not-icebox-eligible: 2026-10-24 operator direction wants it for the next scope; evicting it would compress that direction away]
@@ -38,7 +26,7 @@ a developer wants Checkwright's gates and workflow for their own work in a repos
 
 **Refused on that advice:** a sibling directory outside the repository, since `GATE_SDK_ROOT` and `GATE_SDK_GATES_DIR` are env-only locators a placed hook cannot read and a kit root outside the toplevel is no pathspec, so the tracked-corpus readers go vacuous (gate-sdk/SPEC.md §Layout and configuration); and the workflow half as untracked state, since every stamp is committed and names its commit, the stage gates fire at the precommit tier on staged files, and lifecycle-kit/SPEC.md §Multi-operator semantics rules per-operator state files out. The workflow half rides git topology instead, split off as [personal-workflow-export](#personal-workflow-export) at personal-overlay-pass' scope (operator direction 2026-10-24, lead-relayed, not a ruling); this entry is the verification half alone.
 
-**Deliverable:** design-pending, a feature. First [verify-workflow-decoupling](#verify-workflow-decoupling)'s statement, which this composes with as its first consumer: the halves part on tracking, and the binary is substrate both share (that entry's 2026-10-24 direction). Then the overlay arm, the front door stating the overlay has no project CI, the inner two tiers only (gate-sdk/SPEC.md §Enforcement tiers). Copying the roster into `prove`'s clone, which reads HEAD, is a costed widening.
+**Deliverable:** design-pending, a feature. First `verify-workflow-decoupling`'s statement, which this composes with as its first consumer: the halves part on tracking, and the binary is substrate both share (that entry's 2026-10-24 direction). Then the overlay arm, the front door stating the overlay has no project CI, the inner two tiers only (gate-sdk/SPEC.md §Enforcement tiers). Copying the roster into `prove`'s clone, which reads HEAD, is a costed widening.
 
 **Push need (2026-10-24, inside the budget):** one mid-iteration push, since the init arm is native code `crate-tests-windows`, `install-smoke-pwsh-windows` and the macOS legs run before any local run can; [smoke-whole-tree-precondition-unscoped](#smoke-whole-tree-precondition-unscoped) rides the same batch.
 
@@ -913,4 +901,6 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
+
+- verify-workflow-decoupling
 

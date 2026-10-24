@@ -5,7 +5,7 @@
 # derived at run time. A hand-maintained "all the kits" roster is drift the day
 # a kit lands.
 #
-# The rows below are the two rosters that are not derivable, each a judgment
+# The rows below are the rosters that are not derivable, each a judgment
 # recorded with the criterion that produced it. That split is the whole contract
 # of this file: **membership is hand-authored and shape is derived.** A row here
 # says which kits a profile carries; nothing here says how the profiles relate,
@@ -17,8 +17,8 @@
 # steps. The consumer smoke derives that order from these rows and the payload
 # and asserts it — every named kit resolves, the bounds are unique, the maximum
 # is the payload-derived profile, and moving up a comparable pair only ever adds
-# to the gate roster. A fourth profile is admitted exactly when it fits; there is
-# no count to raise here.
+# to the gate roster. A further profile is admitted exactly when it fits; there
+# is no count to raise here.
 
 # starter — the smallest set that reaches a green battery with a working
 # pre-commit hook and at least one gate that reds on a real consumer defect
@@ -32,18 +32,30 @@
 # list.
 starter	gate-sdk
 
-# delegation — starter plus every kit whose subject is the agent session
-# itself: the stage machine a session runs, the queue it selects work from, the
-# evidence a stage must produce before it can close, the protocol it follows
-# when it spawns a sub-session, the context budget it runs inside, the
-# permission surface it acts through, and the delivery doctrine it follows.
+# workflow — starter, the substrate and starting gates every profile carries,
+# plus the smallest set of workflow kits on which `prove` holds: lifecycle-kit,
+# the stage machine whose stamps make a done claim, and evidence-kit, whose
+# manifest gate catches one made with no recorded test run. starter's gates
+# come with it, gate-sdk's checks over the adopter's own shell among them,
+# since no profile sits below starter; a selection drops them per install.
+# queue-kit is left out: the claim is caught without it, the queue skeleton
+# init seeds for lifecycle-kit carries the sections the claim is staged in,
+# and delegation adds the kit.
+workflow	gate-sdk
+workflow	lifecycle-kit
+workflow	evidence-kit
+
+# delegation — workflow plus the rest of the kits whose subject is the agent
+# session itself: the queue it selects work from, the protocol it follows when
+# it spawns a sub-session, the context budget it runs inside, the permission
+# surface it acts through, and the delivery doctrine it follows.
 #
 # The honest consequence of the starting-subset rule, stated where the roster is
 # read rather than only on the install page: lifecycle-kit registers **no gate**
 # at install, because none of its gates is `zero-config` — for reasons that
 # differ across the roster rather than one reason covering it
-# (installer/SPEC.md §What init seeds). So an adopter who picks this profile
-# *for* lifecycle governance gets the stage machinery vendored and nothing
+# (installer/SPEC.md §What init seeds). So an adopter who picks this profile,
+# or `workflow`, *for* lifecycle governance gets the stage machinery vendored and nothing
 # enforcing it until the surface each gate reads exists — a stage stamp for
 # most, the kit's own installer for two. Vendored is not yet enforced.
 delegation	gate-sdk

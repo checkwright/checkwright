@@ -1,6 +1,6 @@
 # SPEC amendment: personal-overlay
 
-Pairs `personal-adoption`, its verification half alone. Under the entry's operator direction (2026-10-24, on consult advice, lead-relayed, not a ruling), a developer installs Checkwright's checks for their own work in a repository whose project does not adopt it. The install is an untracked per-clone overlay made by `init --personal`. It is the first consumer of `SPEC-workflow-decoupling.md`'s statement: the halves part on tracking, so the verification half runs untracked and the workflow half, which commits its record, is refused here. That half is `personal-workflow-export`, deferred.
+Pairs `personal-adoption`, its verification half alone. Under the entry's operator direction (2026-10-24, on consult advice, lead-relayed, not a ruling), a developer installs Checkwright's checks for their own work in a repository whose project does not adopt it. The install is an untracked per-clone overlay made by `init --personal`. It is the first consumer of installer/SPEC.md §Profiles' statement of the two halves: the halves part on tracking, so the verification half runs untracked and the workflow half, which commits its record, is refused here. That half is `personal-workflow-export`, deferred.
 
 **What the tree does today**, probed at spec against this tree's own pack at `877b08b0e`. Each consumer was a fresh repository carrying a tracked `README.md`, a tracked shell script, a tracked `scripts/build.sh` and a tracked `CLAUDE.md`. The overlay was simulated as `init --no-commit`, then `git reset`, then the lock's `files` paths and `checkwright.lock` written to `.git/info/exclude`:
 
@@ -107,7 +107,7 @@ Each **Not yet applied.**
   >
   > `checkwright init --personal` installs the checks for you alone. It writes the same files untracked, lists them in this clone's `.git/info/exclude`, and commits nothing, so the project's tree and history stay as they were. Your hooks and `--run` check your own commits in this clone, and the project's CI runs none of it. `prove` reads `HEAD`, so it has nothing to read here. It takes `starter` or `prose`: the workflow commits its own record, so a profile carrying it is refused. `uninstall` removes the files and the exclude lines.
 
-  The section adds 98 words to a page `check-docs-page-length` holds at 1500, and `SPEC-workflow-decoupling.md` delta 2's profile bullet adds 23 more. The page stood at 1493 words by that gate's measure (front matter and comments excluded), so the two together overrun it by about 114. The cut is owed in the same build: existing prose on the page that restates what an owner doc already states (the Content-tiering / SSOT rule) goes, never this section nor the bullet, and that gate's verdict on the page with both in place is the oracle.
+  The section adds 98 words to a page `check-docs-page-length` holds at 1500, and the `workflow` profile bullet adds 23 more. The page stood at 1493 words by that gate's measure (front matter and comments excluded), so the two together overrun it by about 114. The cut is owed in the same build, and the decoupling merge landed most of it: existing prose on the page that restates what an owner doc already states (the Content-tiering / SSOT rule) goes, never this section nor the bullet, and that gate's verdict on the page with both in place is the oracle.
 - `docs/choosing.md` §When it fits gains a last sentence: "A developer whose project has not adopted it can run the checks on their own clone alone, untracked ([On a project that does not adopt it](install.md#on-a-project-that-does-not-adopt-it))."
 - `docs/maintenance.md`, the bullet "`checkwright uninstall` reverses the install in one commit." ends ", or with none for a personal install".
 - `installer/README.md`'s flag table gains, after `--no-commit`: `| --personal | init, update | install untracked, for this clone alone, committing nothing |`.
@@ -150,7 +150,7 @@ Each is filed with `--emit file-gap` in the commit that lands this amendment. Ne
 - `.workflow/gap-inbox.md`, two bullets (delta 9).
 - `docs/llms-full.txt`, regenerated with `bash gate-sdk/bin/run-gates.sh --emit llms --write` (delta 8).
 - `docs/installer/SPEC.md` and `docs/installer/README.md`, the generated mirror, regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write` (deltas 6, 7 and 8).
-- `installer/SPEC.md` §Profiles, the citation `SPEC-workflow-decoupling.md`'s delta 1 defers to this merge when the two land in different batches (delta 6).
+- `installer/SPEC.md` §Profiles, the citation of §The personal install ending the halves paragraph's "so it runs from an untracked install too", which the decoupling merge deferred to this one since the section it cites lands here (delta 6).
 
 The verb surfaces were found by `grep -n "HEAD carries no\|nothing to commit\|fn vendor\|git_batched(&root, &\[\"add\"\]" native/src/installer/*.rs`. The doc surfaces were found by `git grep -n "in one commit\|--no-commit" docs/install.md docs/maintenance.md installer/README.md`.
 

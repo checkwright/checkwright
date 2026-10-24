@@ -67,14 +67,15 @@ The flags each verb takes, owned by the binary as the verbs are:
 
 ## Choosing a profile
 
-`starter`, `delegation`, `prose`, `full`. Not four rungs on one ladder: the profiles are ordered by kit-set containment, so moving to one that contains yours only ever adds, and two that contain neither the other — `delegation` and `prose` — are alternatives rather than steps.
+`starter`, `workflow`, `delegation`, `prose`, `full`. Not rungs on one ladder: the profiles are ordered by kit-set containment, so moving to one that contains yours only ever adds, and two that contain neither the other — `prose` and either of `workflow` and `delegation` — are alternatives rather than steps.
 
 - **`starter`** — the gate SDK on its own: a battery, a pre-commit hook, and gates that red on real defects in your tree with no configuration outside your gates directory.
-- **`delegation`** — adds every kit whose subject is the agent session itself.
+- **`workflow`** — `starter` plus the stage machine and the recorded test runs, the least on which `prove` catches a done claim; it keeps `starter`'s gates.
+- **`delegation`** — adds to `workflow` the rest of the kits whose subject is the agent session itself.
 - **`prose`** — adds canon-kit instead, for a repository whose artifacts are documents rather than code.
 - **`full`** — everything in the payload.
 
-`starter`, `delegation` and `prose` are rosters in `profiles.list`, each membership recorded beside the criterion behind it; `full` is derived from the payload at run time rather than listed. `--recipe <name>` applies a recipe the package carries, for a tree another tool lays out, such as a spec toolkit's.
+`starter`, `workflow`, `delegation` and `prose` are rosters in `profiles.list`, each membership recorded beside the criterion behind it; `full` is derived from the payload at run time rather than listed. `--recipe <name>` applies a recipe the package carries, for a tree another tool lays out, such as a spec toolkit's.
 
 `--with-kit`, `--without-kit`, `--with-gate` and `--without-gate` adjust a profile per install, and a gate file of your own under a kit gate's name, in your gates directory, replaces it ([SPEC.md §Selecting kits and gates](SPEC.md#selecting-kits-and-gates)).
 
