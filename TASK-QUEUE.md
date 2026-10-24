@@ -1,8 +1,16 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: personal-overlay-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The set (operator direction 2026-10-24, lead-relayed, not a ruling; the iteration opened undirected):** option A. Features for spec to author and pair: `verify-workflow-decoupling`, `personal-adoption` (the verification half) and `smoke-whole-tree-precondition-unscoped`, all on the installer surface; no debt promoted by scope. The workflow half split off as `personal-workflow-export`, deferred. Stages scope, spec, align (the overlay likely spans installer/, gate-sdk and docs/), build, validate and close; drain 3 against inflow 1.2.
+
+  **Order (scope, own authority):** `verify-workflow-decoupling`'s statement is authored before `personal-adoption`'s overlay, which it frames.
+
+  **Push need (2026-10-24, inside the budget):** 2 against 2 — the mid-iteration push on `personal-adoption`, which `smoke-whole-tree-precondition-unscoped` rides, and the closing push.
 
 ---
 
@@ -112,6 +120,8 @@ the consumer smoke gates its whole suite on an unscoped clean-tree preflight (in
 
 **Ruled `lead, own-authority` 2026-09-10, lead-relayed, not the operator's: leave it filed.** Narrowing the preflight (B) and ruling it correct (C) were both refused at build. B is no one-liner: the smoke's post-run clean assertion is sound only because the preflight established a clean tree, so the pair moves together, an envelope change against the merged `pack-step-dirty-tree-predicate-unscoped` amendment. C stays live: the smoke asserts over the tree it packs, so its precondition may be correct on independent grounds. The recurrence adds a route from the other owner, run-validate keeping its fold out of a path a later suite's preflight reads (evidence-kit/SPEC.md §Evidence manifest), the same envelope question.
 
+**Taken 2026-10-24 into personal-overlay-pass (operator direction, lead-relayed, not a ruling),** reopening the lead's leave-it-filed: spec rules B or C in an amendment.
+
 **Cost while deferred:** each validate rerun after a red run, and each capture left uncommitted while a validate battery is pending, costs a full `installer_smoke` suite. Filed 2026-09-10 by close, draining the gap inbox; thawed 2026-10-18 by close on the recurrence. Owner lookup: `dirty`, `validate-evidence`, `run-validate` in this file and the disposed-findings record — the 2026-10-16 record, deleted as its ground fell; owner installer/SPEC.md §The consumer smoke.
 
 ### verify-workflow-decoupling
@@ -121,6 +131,8 @@ the consumer smoke gates its whole suite on an unscoped clean-tree preflight (in
 the operator states that verification and workflow are fully decoupled, each shippable without the other; the tree shows one direction only. Verification without the workflow holds: `installer/profiles.list`'s starter profile is gate-sdk alone and prose is gate-sdk plus canon-kit, and the companion recipes gate another toolkit's workflow. The workflow without verification is not shipped: every profile carrying lifecycle-kit carries gate-sdk, forced in because without it there is no runner, hook generator or registry; `--enter-stage` is an arm of the gate binary; the delegation profile's comment reads "Vendored is not yet enforced"; docs/kits.md orders the roster as "each kit assumes the machinery of the ones above it". The operator's stated aim (2026-09-28, lead session; an aim, not a /consult objective): a competitive offering that is loosely coupled, composable, configurable and efficient.
 
 **Deliverable:** a ruling on whether the gate binary is verification or substrate both halves share; if the decoupling then holds, the front door and docs/kits.md state it, and a workflow-only profile is weighed.
+
+**Operator direction 2026-10-24, lead-relayed, not a ruling:** the binary is substrate both halves share, and spec authors the statement and weighs the workflow-only profile on that basis. This answer is the authority; [personal-adoption](#personal-adoption)'s filed Deliverable sentence and the consult advice it came from settled nothing.
 
 **Cost while deferred:** the front door neither claims nor refutes a decoupling the operator believes in, and docs/kits.md reads as a dependency chain. Filed 2026-09-28 by plugin-marketplace-queue-verbs' lead. Re-verified: the three profiles' rows and comments in `installer/profiles.list`, and docs/kits.md line 13. Owner lookup: `decoupl`, `profiles.list`, `workflow-only` in this file — none; owner installer/SPEC.md §Profiles, with docs/kits.md.
 
@@ -186,11 +198,23 @@ a developer wants Checkwright's gates and workflow for their own work in a repos
 
 **Operator direction 2026-10-24, on consult advice, lead-relayed, not a ruling:** worth building for the verification half, and not as an untracked overlay for the workflow half. Recommended shape: an `init --personal` arm making an untracked per-clone overlay, the lock roster and the gates directory written to `.git/info/exclude` as a marker-bounded block on the `.gitattributes` precedent, staging and the commit skipped since `git add` refuses an excluded path, hooks placed as today, `uninstall` dropping the block. Grounds: every gate reads the project's tracked content wherever the kits sit, the hooks are already per clone, the exclude set derives from the lock so no kit literal names a layout, and it is git-only on every OS with zero tracked footprint.
 
-**Refused on that advice:** a sibling directory outside the repository, since `GATE_SDK_ROOT` and `GATE_SDK_GATES_DIR` are env-only locators a placed hook cannot read and a kit root outside the toplevel is no pathspec, so the tracked-corpus readers go vacuous (gate-sdk/SPEC.md §Layout and configuration); and the workflow half as untracked state, since every stamp is committed and names its commit, the stage gates fire at the precommit tier on staged files, and lifecycle-kit/SPEC.md §Multi-operator semantics rules per-operator state files out. The workflow half rides git topology instead: `init` as today on a personal branch or fork, plus an export keeping commits that touch only lock-roster and workflow paths out of an upstream pull request, a costed arm, design-pending.
+**Refused on that advice:** a sibling directory outside the repository, since `GATE_SDK_ROOT` and `GATE_SDK_GATES_DIR` are env-only locators a placed hook cannot read and a kit root outside the toplevel is no pathspec, so the tracked-corpus readers go vacuous (gate-sdk/SPEC.md §Layout and configuration); and the workflow half as untracked state, since every stamp is committed and names its commit, the stage gates fire at the precommit tier on staged files, and lifecycle-kit/SPEC.md §Multi-operator semantics rules per-operator state files out. The workflow half rides git topology instead, split off as [personal-workflow-export](#personal-workflow-export) at personal-overlay-pass' scope (operator direction 2026-10-24, lead-relayed, not a ruling); this entry is the verification half alone.
 
-**Deliverable:** design-pending, a feature. First a ruling on [verify-workflow-decoupling](#verify-workflow-decoupling), which this composes with as its first consumer: the halves part on tracking, not on the binary, which stays shared substrate. Then the overlay arm, the front door stating the overlay has no project CI, the inner two tiers only (gate-sdk/SPEC.md §Enforcement tiers). Copying the roster into `prove`'s clone, which reads HEAD, is a costed widening.
+**Deliverable:** design-pending, a feature. First [verify-workflow-decoupling](#verify-workflow-decoupling)'s statement, which this composes with as its first consumer: the halves part on tracking, and the binary is substrate both share (that entry's 2026-10-24 direction). Then the overlay arm, the front door stating the overlay has no project CI, the inner two tiers only (gate-sdk/SPEC.md §Enforcement tiers). Copying the roster into `prove`'s clone, which reads HEAD, is a costed widening.
+
+**Push need (2026-10-24, inside the budget):** one mid-iteration push, since the init arm is native code `crate-tests-windows`, `install-smoke-pwsh-windows` and the macOS legs run before any local run can; [smoke-whole-tree-precondition-unscoped](#smoke-whole-tree-precondition-unscoped) rides the same batch.
 
 **Cost while deferred:** a developer on a non-adopting project can use Checkwright only by vendoring into a tree they do not own. Filed 2026-10-24 by front-door-patch-pass' close, draining two gap bullets. Re-verified there: 37 crate modules name `ls-files`; §init's clean-tree clause and `--no-commit` valve; §prove's lockless refusal; the two env-only locators. Owner lookup: `personal`, `overlay`, `info/exclude` in this file and the disposed-findings record, none; owner installer/SPEC.md.
+
+### personal-workflow-export
+
+[cost: event/low] [surface: installer]
+
+the workflow half of [personal-adoption](#personal-adoption): a developer runs the stage machine on a personal branch or fork of a project that does not adopt it, `init` as today, plus an export keeping commits that touch only lock-roster and workflow paths out of an upstream pull request. Untracked workflow state was refused on consult advice, since every stamp is committed and names its commit (lifecycle-kit/SPEC.md §Multi-operator semantics).
+
+**Deliverable:** design-pending, a feature: the export arm's shape (a path-filtered branch rewrite or a patch series), how it reads the lock roster and the workflow paths without a kit literal naming a layout, and what it refuses.
+
+**Cost while deferred:** the workflow half stays usable only by vendoring into a tree the developer does not own, or by stripping its commits by hand before an upstream pull request. Filed 2026-10-24 by personal-overlay-pass' scope, split from personal-adoption (operator direction 2026-10-24, lead-relayed, not a ruling). Owner lookup: `export`, `fork`, `personal branch` in this file, none beyond the parent; owner installer/SPEC.md.
 
 ## Icebox
 
