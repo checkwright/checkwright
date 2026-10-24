@@ -892,7 +892,3 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 ## Done
 
-- verify-workflow-decoupling
-- smoke-whole-tree-precondition-unscoped
-- personal-adoption
-
