@@ -138,7 +138,7 @@ Each is filed with `--emit file-gap` in the commit that lands this amendment. Ne
 - **The workflow directory.** The overlay excludes no workflow-directory path, since delta 1 refuses every kit seeding one. So no checked projection of that directory is ever made ignored, and its tracked-or-ignored partition (gate-sdk/SPEC.md §The workflow directory) is never put in question.
 - **The release.** No tracked install changes shape, and the lock's wire key is unchanged, so nothing in an existing tree reconciles. Which of the release note's declaration-bearing sections names the new flag is the close's call, under §The upgrade contract.
 
-**Inferred, not run:** the overlay's battery and hooks behave on macOS and native Windows as on Linux, since `git rev-parse --git-path`, the exclude rules and `core.hooksPath` are git's own on every host — delta 7's arm on the mid-iteration push's install-smoke legs
+**Inferred, cannot run before build:** the overlay's battery and hooks behave on macOS and native Windows as on Linux, since `git rev-parse --git-path`, the exclude rules and `core.hooksPath` are git's own on every host — no macOS or Windows host is on this machine, and the witness is delta 7's arm, which build writes and the mid-iteration push's install-smoke legs run
 
 ## Existing sections updated
 
