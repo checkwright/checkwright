@@ -179,7 +179,7 @@ pub fn remove_block(path: &str, begin: &str, end: &str) -> Result<bool, String> 
 }
 
 // spec: gate-sdk/SPEC.md §lib/inject.sh — the installer writer's inverse: `remove_block`'s removal
-// plus the one blank line `install_block`'s append put before the begin marker, so a file the
+// plus the separator `install_block`'s append put before the begin marker, so a file the
 // installer appended to reads its pre-install bytes again
 pub fn uninstall_block(path: &str, begin: &str, end: &str) -> Result<bool, String> {
     let text = fresh::read_captured(path)?;
@@ -200,13 +200,21 @@ pub fn uninstall_block(path: &str, begin: &str, end: &str) -> Result<bool, Strin
         out.push('\n');
     }
     let mut skip = true;
+    let mut tail = false;
     for line in &lines[b..] {
         if skip {
             skip = *line != end;
             continue;
         }
+        tail = true;
         out.push_str(line);
         out.push('\n');
+    }
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — an append onto an unterminated last line wrote the
+    // newline that terminates it rather than a blank line, so that newline goes while the block
+    // still ends the file
+    if head == b && b > 0 && !tail {
+        out.pop();
     }
     std::fs::write(path, out).map_err(|e| format!("cannot write {}: {}", path, e))?;
     Ok(true)
@@ -224,7 +232,7 @@ mod tests {
             .join(format!("cw-marker-uninstall-{}.txt", std::process::id()))
             .display()
             .to_string();
-        for before in ["", "# a comment\n", "kept\n\n"] {
+        for before in ["", "# a comment\n", "kept\n\n", "unterminated", "two\nlines"] {
             std::fs::write(&p, before).expect("cannot seed");
             install_block(&p, B, E, "one\n").expect("the block was not installed");
             install_block(&p, B, E, "two\n").expect("the block was not replaced");
@@ -232,6 +240,15 @@ mod tests {
             assert_eq!(fresh::read_captured(&p).expect("cannot read back"), before, "from {:?}", before);
             assert_eq!(uninstall_block(&p, B, E), Ok(false));
         }
+        // spec: gate-sdk/SPEC.md §lib/inject.sh — a line added after the block keeps the newline
+        // the append put on an unterminated line, since dropping it would join the two
+        std::fs::write(&p, "unterminated").expect("cannot seed");
+        install_block(&p, B, E, "one\n").expect("the block was not installed");
+        let mut grown = fresh::read_captured(&p).expect("cannot read back");
+        grown.push_str("added\n");
+        std::fs::write(&p, grown).expect("cannot grow");
+        assert_eq!(uninstall_block(&p, B, E), Ok(true));
+        assert_eq!(fresh::read_captured(&p).expect("cannot read back"), "unterminated\nadded\n");
         std::fs::write(&p, format!("head\n{}\na\n", B)).expect("cannot seed");
         assert!(uninstall_block(&p, B, E).is_err());
         std::fs::remove_file(&p).ok();

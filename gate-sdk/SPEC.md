@@ -2200,7 +2200,7 @@ The marker-bounded span mechanics every kit's agent-file injector shares — fiv
 
 `marker::remove_block(file, begin, end)` deletes the marker pair and everything between it (inclusive), leaves the rest of the file byte-identical, and returns whether it removed one. An **absent begin marker is a no-op reporting `false`**, not a refusal: the caller is a path reversing an installation, which cannot know whether the block was ever written there, so a second removal must be as quiet as the first. It refuses on the same malformed target its siblings refuse on.
 
-`marker::uninstall_block(file, begin, end)` is `install_block`'s inverse: `remove_block`'s removal, plus the one blank line immediately before the begin marker, which `install_block`'s append wrote. A caller reversing an install it appended uses it, so the file reads its pre-install bytes again where `remove_block` would leave that line behind. It shares `remove_block`'s no-op and refusal.
+`marker::uninstall_block(file, begin, end)` is `install_block`'s inverse: `remove_block`'s removal, plus the separator `install_block`'s append wrote before the begin marker. That is the one blank line immediately before it, or, where the file's last line had no newline, the newline that terminated it, which goes while the block still ends the file. A caller reversing an install it appended uses it, so the file reads its pre-install bytes again where `remove_block` would leave that line behind. It shares `remove_block`'s no-op and refusal.
 
 All of them agreeing on what a malformed target is, in one module, is the point of keeping them together. A caller that reads a block before rewriting it, or removes one it may never have written, must not meet three different answers to the same question.
 

@@ -82,14 +82,6 @@
 
 **Cost while deferred:** an install written through a link the adopter made, outside the clone. Filed 2026-10-24 by personal-overlay-pass' close (second-vendor review), drained at the next scope. Owner lookup: `symlink`, `junction` in this file and the disposed-findings record, none beyond the icebox's walk entry, a different module; owner installer/SPEC.md §init.
 
-### marker-uninstall-newline
-
-`marker::uninstall_block` is not `install_block`'s byte inverse when the file's last line had no newline: the append adds the newline that terminates it and the removal keeps it (`native/src/marker.rs`), so `uninstall` leaves an exclude file one newline longer than before `init`, against gate-sdk/SPEC.md §lib/inject.sh's pre-install-bytes claim.
-
-**Deliverable:** debt: the removal drops the separator newline its append added, with a unit test on an unterminated file.
-
-**Cost while deferred:** cosmetic, a trailing newline in the clone's exclude file. Filed 2026-10-24 by personal-overlay-pass' close (second-vendor review), drained at the next scope. Owner lookup: `uninstall_block`, `inject` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh.
-
 ### smoke-preflight-pathspec
 
 The consumer smoke's preflight builds its exclude pathspec as `:(top,exclude)<dir>` with no `literal` magic (`native/src/emit/installer_smoke/roster.rs`, `dirty_outside`), so a `GATE_SDK_WORKFLOW_DIR` carrying a glob character excludes the wrong paths, and `below_root` accepts a directory the smoke itself reads (`docs`, say), whose dirty files then pass.
@@ -961,4 +953,6 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
+
+- marker-uninstall-newline
 
