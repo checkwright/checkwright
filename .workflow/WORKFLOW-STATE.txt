@@ -8,3 +8,4 @@ personal-install-hardening-pass scope a5ce0300 2026-10-24 edd03ea0b
 personal-install-hardening-pass spec abe818bf 2026-10-24 e85de74cd
 personal-install-hardening-pass align ab6e0132 2026-10-24 c6d5f672f
 personal-install-hardening-pass build a7049b42 2026-10-24 669e85ba0
+personal-install-hardening-pass build aa9e00c9 2026-10-24 9ca87d551
