@@ -50,7 +50,7 @@ In `personal.rs`'s `tests`, over a scratch repository with one linked worktree a
 - **The worktree key** (delta 1). Producer: git's two directory answers, read on each `write`, `remove` and dry-run print. Consumers: the marker pair those three pass to the marker module, and delta 3's pruning test, which reads each keyed begin line's key back as a path under the common directory.
 - **The keyed marker pair** (delta 1). Producer: `write`. Consumers:
   - git's ignore rules, which read every line between any markers alike;
-  - `is_personal` (delta 2), and through it `init`'s mode, `uninstall`'s waiver and `prove`'s help;
+  - `is_personal` (delta 2), and through it `init`'s mode, `uninstall`'s waiver and `prove`'s lockless branch (the personal proof, once `personal-install-prove` lands);
   - `remove` and delta 3's pruning;
   - the consumer smoke's personal arm. It counts lines equal to the bare begin marker and finds one in its single-worktree consumer, so it is unchanged (`native/src/emit/installer_smoke/personal.rs`, `MARK`).
 - **The prune** (delta 3). Producer: `write` and `remove`, after their own block. Its red condition is a keyed block whose key names no directory. Consumers: the adopter's exclude file and the stdout line.

@@ -34,12 +34,15 @@ Each **Not yet applied.**
 - **The not-held help**, on a personal proof, drops `not_held_help`'s profile clause. Where the manifest's `kits` carries `CANON_KIT_TASK_LIST_GLOBS`' owning kit, it reads `name a task list in CANON_KIT_TASK_LIST_GLOBS; init --help lists the --with-kit selection.` Otherwise it reads `add <owner> with init --personal --with-kit <owner>, then name a task list in CANON_KIT_TASK_LIST_GLOBS; init --help lists the --with-kit selection.` `<owner>` is the root `knobs::static_owner` returns for the knob, so no kit literal is spelled.
 - **The note**, where the working tree differs from `HEAD`, reads `note: your worktree differs from HEAD; this run read HEAD and this clone's personal install alone.`
 - `personal_help` and its line are deleted. Their one caller was the lockless refusal this delta replaces.
+- **The usage text** (`USAGE` in `prove.rs`, the verb's `--help`) says the verb "clones HEAD into a scratch repository". Its sentence gains ", with a personal install copied in" after "scratch repository".
 
 ### (3) The SPEC sections {design-bearing}
 
 Each **Not yet applied.**
 
-- installer/SPEC.md §prove, **Preconditions**, the lock bullet becomes: "a `checkwright.lock` at `HEAD` carrying a `version` and a schema this build knows, else a refusal naming `init` and its commit. On a personal install (§The personal install) it is the working tree's lock, held to the same tests, and the run is a personal proof." The binary bullet ends ", or in the install a personal proof copies in".
+- installer/SPEC.md §prove, **Preconditions**, the lock bullet becomes: "a `checkwright.lock` at `HEAD` carrying a `version` and a schema this build knows, else a refusal naming `init` and its commit. On a personal install (§The personal install) it is the working tree's lock, held to the same tests, and the run is a personal proof. A worktree holding no such lock is refused with a help naming `init --personal` there." The binary bullet ends ", or in the install a personal proof copies in".
+- §prove, step 2: "Where your worktree differs from `HEAD`, a `note:` line says the run read `HEAD` alone." gains "On a personal proof the note says it read `HEAD` and this clone's personal install alone."
+- §prove, **Honest limits**, "a gate reading a file git ignores reads that file's absence in the clone" gains ", except the files a personal proof copies in".
 - §prove, **The run**, step 1 gains, after "checks `HEAD`'s commit out detached, …": "A personal proof then copies the install in: each recorded file the working tree holds and the lock, with their bytes and executable bit, and the install's exclude block written into the clone's own. A path `HEAD` tracks, or a destination reaching through a link in `HEAD`'s tree, refuses at exit 2, so nothing is written outside the clone or over `HEAD`'s content."
 - §prove, step 5: "On a catch, the whole minutes …" gains "A personal proof has no install commit and reports none."
 - §prove, the verdict list's **0** bullet gains "; on a personal proof `PROVE: held — caught at <head>; personal install, no time to proof`". The **1** bullet's help sentence gains "On a personal proof the help drops the profile, which `--personal` refuses, and names the knob, with the kit owning it where the lock lacks that kit."
@@ -70,7 +73,7 @@ Each **Not yet applied.**
 - `docs/install.md` §On a project that does not adopt it: "`prove` reads `HEAD`, so it has nothing to read here." becomes "`prove` proves `HEAD` with this install copied into its scratch clone."
 - `docs/install.md` §Prove it on your tree: "with the minutes since the install commit" becomes "with the minutes since the install commit, none for a personal install".
 
-Together with `hookspath-clobber`'s sentence in the same section, `check-docs-page-length`'s verdict on the page with every such delta in place is the oracle. A cut, where owed, takes prose restating an owner doc.
+The two edits add 6 words to `docs/install.md`, which counts 1494 under `check-docs-page-length`'s own rule against its bound of 1500. With `hookspath-clobber`'s 20-word sentence in the same section the page comes to 1520, so a cut of at least 20 words is owed there, from prose restating an owner doc (the cut is that amendment's delta 5). The gate's verdict on the page with every such delta in place is the oracle.
 
 ## Producers and consumers
 
@@ -91,7 +94,7 @@ Together with `hookspath-clobber`'s sentence in the same section, `check-docs-pa
 
 ## Existing sections updated
 
-- `native/src/installer/prove.rs` (`prove`, `Outcome::Held`, `not_held_help`, `report`, `personal_help` deleted, and the tests) (deltas 1, 2 and 5).
+- `native/src/installer/prove.rs` (`prove`, `Outcome::Held`, `not_held_help`, `report`, `USAGE`, `personal_help` deleted, and the tests) (deltas 1, 2 and 5).
 - `native/src/installer/mod.rs`, the link helper, where this delta lands before `init-copy-follows-links` (delta 1).
 - installer/SPEC.md §prove and §The personal install (delta 3).
 - `native/src/emit/installer_smoke/personal.rs` and installer/SPEC.md §The consumer smoke, the personal arm's step 4 (delta 4).

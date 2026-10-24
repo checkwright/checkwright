@@ -17,7 +17,7 @@ In `native/src/emit/install_hooks.rs`, `dispatch`, after the hooks directory res
 
 - **The prior directory** is `core.hooksPath`'s effective value, read with `git config --path --get core.hooksPath` so `~` expands, resolved against the work-tree top when relative, as git resolves it. With the key unset, it is the path `git rev-parse --git-path hooks` names, absolutized against the same top.
 - **The clone's own directory is no prior.** A prior directory naming the hooks directory (`hook_launcher::same_dir`) is a re-run, and the arm proceeds as today, with no read of its contents.
-- **A live hook** is a regular file in the prior directory, a symlink followed, whose name is a git hook name or that name with the host's executable suffix. On a host with an executable bit it must carry one, since git skips a hook that does not. The hook names are a new `hook_launcher::GIT_HOOKS` constant, githooks(5)'s roster as git 2.55 prints it: `applypatch-msg`, `pre-applypatch`, `post-applypatch`, `pre-commit`, `pre-merge-commit`, `prepare-commit-msg`, `commit-msg`, `post-commit`, `pre-rebase`, `post-checkout`, `post-merge`, `pre-push`, `pre-receive`, `update`, `proc-receive`, `post-receive`, `post-update`, `reference-transaction`, `push-to-checkout`, `pre-auto-gc`, `post-rewrite`, `sendemail-validate`, `fsmonitor-watchman`, `post-index-change`. A `*.sample` file is no hook by this rule, since no hook name ends in `.sample`.
+- **A live hook** is a regular file in the prior directory, a symlink followed, whose name is a git hook name or that name with the host's executable suffix. On a host with an executable bit it must carry one, since git skips a hook that does not. The hook names are a new `hook_launcher::GIT_HOOKS` constant, githooks(5)'s roster as git 2.55 prints it: `applypatch-msg`, `pre-applypatch`, `post-applypatch`, `pre-commit`, `pre-merge-commit`, `prepare-commit-msg`, `commit-msg`, `post-commit`, `pre-rebase`, `post-checkout`, `post-merge`, `pre-push`, `pre-receive`, `update`, `proc-receive`, `post-receive`, `post-update`, `reference-transaction`, `push-to-checkout`, `pre-auto-gc`, `post-rewrite`, `sendemail-validate`, `fsmonitor-watchman`, `p4-changelist`, `p4-prepare-changelist`, `p4-post-changelist`, `p4-pre-submit`, `post-index-change`. A `*.sample` file is no hook by this rule, since no hook name ends in `.sample`.
 - **Any live hook refuses at exit 2**, before any file is placed or any config written. The refusal is two lines on stderr:
 
   ```text
@@ -42,7 +42,7 @@ Each **Not yet applied.**
 
   > - It is its own directory, never git's default `hooks`, so `git config --unset core.hooksPath` stays the per-clone off switch. Git runs hooks from one directory, so pointing it here stops every other. **A clone already running hooks is refused at exit 2, placing nothing:** where the prior hooks directory, `core.hooksPath`'s effective value at any scope or else git's default, holds a live hook, a file named for a git hook (with the host's executable suffix or without) that git would run, the refusal names the directory and the hooks. Its help names the two routes: call `<bin> --git-hook` from that hook manager (§git-hook), or move those hooks aside and re-run. A prior `core.hooksPath` holding no live hook is replaced, and a note names the value. **Honest limit:** the hook names are githooks(5)'s at the git release this build read, so a hook a later release adds reads as no hook.
 
-- §The non-gate arm, the `--install-hooks` bullet's exit-2 list gains "a live hook in the prior hooks directory" after "no repository".
+- §The non-gate arm, the `--install-hooks` bullet's exit-2 list gains "a live hook in the prior hooks directory" after "no repository". So does §install-hooks' own exit-2 list, in the paragraph opening "It is an `Arm::Run`", and so does the gate binary's `--help` text for `--install-hooks` in `native/src/runner.rs`, which lists exit 2's causes too. They are three copies of one list, found by `grep -rn "uninterpretable manifest" gate-sdk native/src`.
 - The section's closing case paragraph gains the five unit tests of delta 1, stated as their cases.
 
 ### (4) The personal arm's live-hook step {design-bearing}
@@ -58,7 +58,9 @@ Each **Not yet applied.**
 - `docs/install.md` §On a project that does not adopt it gains, after the sentence ending "the project's CI runs none of it.": "Where a hook manager already runs this clone's hooks, `--install-hooks` refuses rather than silence them, and `--run` is your check."
 - installer/SPEC.md §The personal install, **Honest limits**, gains a last sentence: "On a clone already running hooks, `--install-hooks` refuses (gate-sdk/SPEC.md §install-hooks), so the install checks at the battery alone until those hooks call the gates, which a hook manager whose configuration the project tracks cannot do untracked."
 
-The page sentence adds 20 words to a page `check-docs-page-length` holds at 1500. `personal-install-prove`'s delta to the same section rewrites one sentence of it; that gate's verdict on the page with both in place is the oracle, and a cut, where owed, takes prose restating an owner doc, never these sentences.
+- installer/SPEC.md §Reviewing the pre-commit hook, the paragraph opening "**What installing it changes in your clone.**", its bullet "`core.hooksPath` is repointed at that directory. That config write is what makes the hooks fire at commit time." gains, after its first sentence, "Where the clone already runs hooks it is refused instead (gate-sdk/SPEC.md §install-hooks)."
+
+The page sentence adds 20 words to `docs/install.md`, which `check-docs-page-length` holds at 1500 and which counts 1494 under the gate's own rule (front matter and comments skipped), so the sentence alone takes it to 1514. `personal-install-prove`'s delta 6 adds 6 more to the same page, and the two together come to 1520. **A cut of at least 20 words is owed**, taken from prose restating an owner doc, never from these sentences; the build session picks it and lands it with the sentences, the gate's verdict on the page being the oracle.
 
 ### (6) The chaining gap {mechanical}
 
@@ -75,16 +77,16 @@ The page sentence adds 20 words to a page `check-docs-page-length` holds at 1500
 - **`hook_launcher::GIT_HOOKS`** (delta 1). Producer: the constant. Consumer: the live-hook test alone. It is distinct from `SERVED`, the two hooks the launcher answers to, which it does not change.
 - **The note** (delta 2). Producer: the bare arm, on a replaced value with no live hook. Consumer: the adopter. No smoke step reads it, since no consumer the smoke builds sets `core.hooksPath` beforehand; the unit test holding a no-hook prior reads the line.
 - **This repository.** Its clone's `core.hooksPath` names its own `gate-hooks`, so a re-run, `build-native.sh`'s refresh included, is the clone's-own case and proceeds as today.
-- **Every fresh consumer the smoke and the fixtures build** carries git's template hooks, all `*.sample`, so no existing arm meets the refusal. `gate-tests/native-git-hooks.test.sh` builds its repositories with `git init` too.
+- **Every fresh consumer the smoke and the fixtures build** carries git's template hooks, all `*.sample`, so on a host whose git config sets no `core.hooksPath` or `init.templateDir` no existing arm meets the refusal (probed: each `--install-hooks` call in `.github/workflows/gates.yml`, `gate-sdk/smoke/install.sh` and `native/src/emit/installer_smoke` runs in a repository with no prior `core.hooksPath`). `gate-tests/native-git-hooks.test.sh` builds its repositories with `git init` too. The smoke does not isolate itself from the host's global git config, so a host with a global `core.hooksPath` holding a live hook reds those arms with the refusal, which is correct; the isolation is filed as a gap.
 
 **Inferred, cannot run before build:** that Git for Windows runs a suffixless script hook in the default directory as live, so delta 1's suffix-or-none rule matches it — no Windows host is on this machine. The witness is delta 4's step on the Windows install-smoke legs. Those run at `init-copy-follows-links`' conditional mid-iteration push where that push happens, and at the closing push otherwise.
 
 ## Existing sections updated
 
 - `native/src/emit/install_hooks.rs` (`dispatch` and its tests) and `native/src/emit/hook_launcher.rs` (`GIT_HOOKS`) (deltas 1 and 2).
-- gate-sdk/SPEC.md §install-hooks and §The non-gate arm's `--install-hooks` bullet (delta 3).
+- gate-sdk/SPEC.md §install-hooks (the bullet and the exit-2 paragraph) and §The non-gate arm's `--install-hooks` bullet, and `native/src/runner.rs`'s `--install-hooks` help text (delta 3).
 - `native/src/emit/installer_smoke/personal.rs` and installer/SPEC.md §The consumer smoke, the personal arm's step 2 (delta 4).
-- `docs/install.md` §On a project that does not adopt it and installer/SPEC.md §The personal install (delta 5).
+- `docs/install.md` §On a project that does not adopt it and installer/SPEC.md §The personal install and §Reviewing the pre-commit hook (delta 5).
 - `.workflow/gap-inbox.md`, one bullet (delta 6).
 - `docs/llms-full.txt`, regenerated with `bash gate-sdk/bin/run-gates.sh --emit llms --write` (delta 5).
 - `docs/gate-sdk/SPEC.md` and `docs/installer/SPEC.md`, the generated mirror, regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write` (deltas 3, 4 and 5).
