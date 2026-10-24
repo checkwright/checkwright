@@ -1,16 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: personal-overlay-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-10-24, lead-relayed, not a ruling; the iteration opened undirected):** option A. Features for spec to author and pair: `verify-workflow-decoupling`, `personal-adoption` (the verification half) and `smoke-whole-tree-precondition-unscoped`, all on the installer surface; no debt promoted by scope. The workflow half split off as `personal-workflow-export`, deferred. Stages scope, spec, align (the overlay likely spans installer/, gate-sdk and docs/), build, validate and close; drain 3 against inflow 1.2.
-
-  **Order (scope, own authority):** `verify-workflow-decoupling`'s statement is authored before `personal-adoption`'s overlay, which it frames.
-
-  **Push need (2026-10-24, inside the budget):** 2 against 2 — the mid-iteration push on `personal-adoption`, which `smoke-whole-tree-precondition-unscoped` rides, and the closing push.
 
 ---
 

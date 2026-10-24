@@ -1,4 +1,3 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
-personal-overlay-pass release v0.33.0 — minor, Behavior changes non-empty (init --personal, the workflow profile); cut on the front-door trigger, since the front door advertises both and the pinned v0.32.1 carries neither
