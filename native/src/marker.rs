@@ -95,6 +95,7 @@ pub fn write_block(path: &str, begin: &str, end: &str, body: &str) -> Result<(),
 pub fn install_block(path: &str, begin: &str, end: &str, body: &str) -> Result<String, String> {
     let text = fresh::read_captured(path)?;
     let lines = fresh::file_lines(&text);
+    half_open(path, &lines, begin, end)?;
     let mut block = String::new();
     block.push_str(begin);
     block.push('\n');
@@ -114,12 +115,6 @@ pub fn install_block(path: &str, begin: &str, end: &str, body: &str) -> Result<S
         out.push_str(&block);
         std::fs::write(path, out).map_err(|e| format!("cannot write {}: {}", path, e))?;
         return Ok("appended".to_string());
-    }
-    if !lines.contains(&end) {
-        return Err(format!(
-            "{}: begin marker present but end marker missing — refusing to guess the block bounds",
-            path
-        ));
     }
 
     let mut out = String::new();
@@ -143,6 +138,23 @@ pub fn install_block(path: &str, begin: &str, end: &str, body: &str) -> Result<S
     Ok("replaced".to_string())
 }
 
+// spec: gate-sdk/SPEC.md §lib/inject.sh — the installer writer's refusal, readable before a
+// caller's first write: a begin marker without its end
+fn half_open(path: &str, lines: &[&str], begin: &str, end: &str) -> Result<(), String> {
+    if lines.contains(&begin) && !lines.contains(&end) {
+        return Err(format!(
+            "{}: begin marker present but end marker missing — refusing to guess the block bounds",
+            path
+        ));
+    }
+    Ok(())
+}
+
+pub fn installable(path: &str, begin: &str, end: &str) -> Result<(), String> {
+    let text = fresh::read_captured(path)?;
+    half_open(path, &fresh::file_lines(&text), begin, end)
+}
+
 // spec: gate-sdk/SPEC.md §lib/inject.sh — the removal half beside its two siblings: the marker pair
 // and everything between it go, the rest of the file byte-identical. An absent begin marker is a
 // no-op reporting `false`; a begin without its end is malformed on the writers' own terms.
@@ -152,12 +164,7 @@ pub fn remove_block(path: &str, begin: &str, end: &str) -> Result<bool, String> 
     if !lines.contains(&begin) {
         return Ok(false);
     }
-    if !lines.contains(&end) {
-        return Err(format!(
-            "{}: begin marker present but end marker missing — refusing to guess the block bounds",
-            path
-        ));
-    }
+    half_open(path, &lines, begin, end)?;
     let mut out = String::new();
     let mut skip = false;
     for line in &lines {
@@ -187,12 +194,7 @@ pub fn uninstall_block(path: &str, begin: &str, end: &str) -> Result<bool, Strin
     let Some(b) = lines.iter().position(|l| *l == begin) else {
         return Ok(false);
     };
-    if !lines.contains(&end) {
-        return Err(format!(
-            "{}: begin marker present but end marker missing — refusing to guess the block bounds",
-            path
-        ));
-    }
+    half_open(path, &lines, begin, end)?;
     let head = if b > 0 && lines[b - 1].is_empty() { b - 1 } else { b };
     let mut out = String::new();
     for line in &lines[..head] {
@@ -360,6 +362,9 @@ mod tests {
         assert!(install_block(&unbalanced, B, E, "new")
             .expect_err("a begin with no end must refuse")
             .contains("end marker missing"));
+        // spec: gate-sdk/SPEC.md §lib/inject.sh — the same refusal, read ahead of any write
+        assert_eq!(installable(&unbalanced, B, E), install_block(&unbalanced, B, E, "new").map(|_| ()));
+        assert_eq!(installable(&fresh_file, B, E), Ok(()));
 
         let empty = case("empty.md", "");
         assert_eq!(

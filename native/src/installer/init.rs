@@ -632,6 +632,13 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
                 2,
             ));
         }
+        personal::check(&root).map_err(|e| {
+            refuse(
+                format!("could not write the personal install's exclude block: {}", e),
+                "nothing was written. Restore this worktree's end marker in the exclude file, or delete its begin line, then re-run.",
+                2,
+            )
+        })?;
     }
 
     let mut r = Roster::new();

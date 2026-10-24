@@ -38,14 +38,6 @@
 
 ## Technical Debt
 
-### personal-write-before-refusal
-
-`init --personal` writes the payload and `checkwright.lock` before `personal::write` meets an exclude file carrying the personal begin marker without its end marker (`native/src/installer/init.rs`, the lock write ahead of the personal branch; `marker::install_block` refuses there), so the run exits 2 leaving the files written and unexcluded.
-
-**Deliverable:** debt: check the block before the first write, so the refusal writes nothing.
-
-**Cost while deferred:** a clone with a hand-damaged block gets an install that shows as untracked and could be committed into the project. Filed 2026-10-24 by personal-overlay-pass' close (second-vendor review), drained at the next scope. Owner lookup: `begin marker`, `install_block` in this file and the disposed-findings record, none; owner installer/SPEC.md §The personal install.
-
 ### init-copy-follows-links
 
 `init` copies each payload file through `std::fs::copy` onto `root.join(dest)` (`native/src/installer/init.rs`, `copy_in`), following a symlink or junction at any component, so an untracked kit-root link pointing outside the clone receives the payload there; a personal install's tracked-path refusal does not see an untracked link.
@@ -932,4 +924,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - init-dry-run-makes-dirs
 - personal-collapse-hides-files
 - personal-worktree-shared-block
+- personal-write-before-refusal
 

@@ -74,7 +74,7 @@ pub(super) const ARMS: &[Row] = &[
     row("toolchain-free arm", "{max}, cargo/rustc masked", super::masked::toolchain_free, 2),
     row("jq-less arm", "{min}, jq absent from the verbs' PATH", super::masked::jq_less, 2),
     row("bash-less arm", "the profiles owing no bash, bash absent from PATH", super::masked::bash_less, 2),
-    row("personal arm", "init --personal at {min}, its hooks, a re-run, prove, three refusals and uninstall", super::personal::personal, 2),
+    row("personal arm", "init --personal at {min}, its hooks, a re-run, prove, four refusals and uninstall", super::personal::personal, 2),
     row(
         "upgrade arm",
         "two cross-version hops, {min} profile — the lattice minimum, so the arm is the smallest install that carries the manifest behavior it asserts",

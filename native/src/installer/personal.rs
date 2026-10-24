@@ -169,6 +169,17 @@ pub fn write(root: &Path, recorded: &[String], kits: &[String]) -> Result<Exclud
     Ok(e)
 }
 
+// spec: installer/SPEC.md §The personal install — the writer's begin-without-end refusal, read over
+// this worktree's pair before the run's first write
+pub fn check(root: &Path) -> Result<(), String> {
+    let e = exclude(root)?;
+    if !e.path.is_file() {
+        return Ok(());
+    }
+    let (begin, end) = markers(worktree(root)?.key.as_deref());
+    crate::marker::installable(&e.path.to_string_lossy(), &begin, &end)
+}
+
 // spec: installer/SPEC.md §uninstall — this worktree's block goes with the separator its append wrote
 pub fn remove(root: &Path) -> Result<Exclude, String> {
     let mut e = exclude(root)?;

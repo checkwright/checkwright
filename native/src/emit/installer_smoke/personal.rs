@@ -1,6 +1,6 @@
 // spec: installer/SPEC.md §The consumer smoke — the personal arm: `init --personal` at the lattice
 // minimum on a consumer with a tracked file in the gates directory and an uncommitted edit, its
-// hooks, a re-run, prove, the three refusals and the reversal
+// hooks, a re-run, prove, the four refusals and the reversal
 use super::consumer::{
     commits, consumer, failed, find_line, git_out, head, out, path_set, porcelain, run_line, write, Lock, GATES_DIR,
     PROFILE_DERIVED,
@@ -117,9 +117,10 @@ pub(super) fn personal(state: &mut Run) -> Step {
     }
     say("prove: exit 2, its help naming the personal install");
 
-    refused(state, "process-record", &["init", "--personal", "--profile", PROFILE_DERIVED], "commits a process record", false)?;
-    refused(state, "tracked-path", &["init", "--personal", "--profile", &min], &format!("{}/gates.list", GATES_DIR), true)?;
-    refused(state, "no-commit", &["init", "--personal", "--no-commit"], "--personal beside --no-commit", false)?;
+    refused(state, "process-record", &["init", "--personal", "--profile", PROFILE_DERIVED], "commits a process record", Plant::Nothing)?;
+    refused(state, "tracked-path", &["init", "--personal", "--profile", &min], &format!("{}/gates.list", GATES_DIR), Plant::Registry)?;
+    refused(state, "no-commit", &["init", "--personal", "--no-commit"], "--personal beside --no-commit", Plant::Nothing)?;
+    refused(state, "half-open", &["init", "--personal", "--profile", &min], "end marker missing", Plant::HalfOpen)?;
 
     let before = commits(&c)?;
     let m = state.verb(&c, &["uninstall"])?;
@@ -133,16 +134,32 @@ pub(super) fn personal(state: &mut Run) -> Step {
     Ok(())
 }
 
+// spec: installer/SPEC.md §The consumer smoke — what a refusal's consumer carries ahead of the run:
+// nothing, a tracked registry, or an exclude block with its begin marker and no end
+enum Plant {
+    Nothing,
+    Registry,
+    HalfOpen,
+}
+
 // spec: installer/SPEC.md §The consumer smoke — a refusal in a fresh consumer exits 2, names what it
 // refused, and leaves the tree object, the porcelain and the exclude file as they were
-fn refused(state: &Run, label: &str, args: &[&str], names: &str, track_registry: bool) -> Step {
+fn refused(state: &Run, label: &str, args: &[&str], names: &str, plant: Plant) -> Step {
     let c = project(state, &format!("personal-{}", label))?;
-    if track_registry {
-        write(&format!("{}/{}/gates.list", c, GATES_DIR), "# the project's own\n")?;
-        git_out(&c, &["add", &format!("{}/gates.list", GATES_DIR)])?;
-        git_out(&c, &["commit", "-q", "-m", "a registry of its own"])?;
-    }
     let exclude = exclude_file(&c)?;
+    match plant {
+        Plant::Nothing => {}
+        Plant::Registry => {
+            write(&format!("{}/{}/gates.list", c, GATES_DIR), "# the project's own\n")?;
+            git_out(&c, &["add", &format!("{}/gates.list", GATES_DIR)])?;
+            git_out(&c, &["commit", "-q", "-m", "a registry of its own"])?;
+        }
+        Plant::HalfOpen => {
+            let mut text = read(&exclude);
+            text.push_str(&format!("{}\n/a-damaged-line\n", MARK));
+            write(&exclude, &text)?;
+        }
+    }
     let (tree0, porcelain0, exclude0) = (super::consumer::tree(&c)?, porcelain(&c)?, read(&exclude));
     let m = state.verb(&c, args)?;
     if m.code() != Some(2) || !out(&m).contains(names) {
