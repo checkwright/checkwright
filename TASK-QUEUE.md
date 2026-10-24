@@ -140,7 +140,7 @@ surface (c) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 
 `codex-cli` 0.162.1 and 0.163.0 (re-probed 2026-10-21 through the app server's `hooks/list`) discover no plugin hooks while the package root carries the portable `plugin.json` (with or without `extensions.com.openai` hooks or a `.codex-plugin/plugin.json` beside it); without that manifest `hooks/hooks.json` is discovered and the unchanged rendering blocks correctly. Likely upstream: Codex's build docs say `hooks/hooks.json` is discovered by default. Codex guard wiring is tier 1 (operator direction 2026-09-28).
 
-**Deliverable:** on a Codex release discovering hooks beside the root manifest, re-run plugin/SPEC.md §The validation leg's Codex install, wire the guards, and update plugin/SPEC.md's Codex row and plugin/README.md's guard bullet. Its patch residue split off as `codex-patch-path-residue` at foreign-harness-write-path-pass' scope (operator direction 2026-10-23, lead-relayed, not a ruling).
+**Deliverable:** on a Codex release discovering hooks beside the root manifest, re-run plugin/SPEC.md §The validation leg's Codex install, wire the guards, and update plugin/SPEC.md's Codex row and plugin/README.md's guard bullet. Its patch residue split off as `codex-patch-path-residue` at foreign-harness-write-path-pass' scope (operator direction 2026-10-23, lead-relayed, not a ruling), and landed there.
 
 **Cost while deferred:** a Codex adopter gets the skills and no shell, wakeup or workflow-state guard. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's Codex row and limits. Re-probed 2026-10-23: `codex-cli` on PATH is still 0.163.0. Owner lookup: `codex`, `apply_patch` in this file and the disposed-findings record, none; owner plugin/SPEC.md §The harnesses.
 
@@ -183,6 +183,26 @@ Under the split lead posture, a scope session resumed as the intent oracle after
 **Deliverable:** design-pending, a feature: an oracle turn writes its own heading and re-stamps `DONE`, or the rule exempts oracle turns; stated where lifecycle-kit names the oracle.
 
 **Cost while deferred:** a lead's completion read misjudges a finished oracle and falls back to asking it. Filed 2026-10-24 by personal-overlay-pass' lead after its close (seen when the oracle answered spec's workflow-profile question), drained at the next scope. Owner lookup: `DONE`, `oracle` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §templates/lead.md.
+
+### hookspath-chain
+
+[cost: event/low] [surface: gate-sdk]
+
+`--install-hooks` refuses a clone already running hooks (landed as `hookspath-clobber`), so a personal install on a project whose tracked hook manager runs its hooks gets no gate hooks: calling `--git-hook` from that manager means editing the project's tracked files.
+
+**Deliverable:** design-pending, a feature: chain rather than refuse. Record the prior hooks directory, run its same-named hook ahead of the battery from the placed hooks, place a forwarding launcher for each other live hook, re-place them on `--refresh`, and restore the prior value at uninstall. Script hooks on native Windows need git's own shebang handling; `git hook run` would supply it, its introducing release above the git floor (inferred, not probed).
+
+**Cost while deferred:** a personal adopter on such a project checks at the battery alone, never at commit. Filed 2026-10-25 by personal-install-hardening-pass' close, drained from the gap inbox. Re-verified there: a fresh clone whose global `core.hooksPath` names a directory holding a live `pre-commit` refuses `--install-hooks` at exit 2. Owner lookup: `chain`, `hooksPath` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §install-hooks.
+
+### smoke-git-config-isolation
+
+[cost: event/low] [surface: installer]
+
+The consumer smoke's scratch consumers read the host's global and system git config, which installer/SPEC.md §The consumer smoke leaves as it is by design. Since `hookspath-clobber`, a host whose global `core.hooksPath` or `init.templateDir` leaves a live hook in a fresh consumer reds every arm running `--install-hooks`.
+
+**Deliverable:** the smoke's git children run under `GIT_CONFIG_GLOBAL` naming an empty file, and `GIT_CONFIG_NOSYSTEM` where a leg allows it (cf. `fence_run.rs`), with that section's sentence rewritten. Read the Windows legs before dropping the system file, whose Git for Windows defaults (`core.autocrlf`, `core.symlinks`) the arms may lean on (inferred).
+
+**Cost while deferred:** a dev host so configured sees smoke reds; CI hosts are unaffected. Filed 2026-10-25 by personal-install-hardening-pass' close, drained from the gap inbox. Re-verified there: with the global file naming such a directory, `--install-hooks` in a fresh repository exits 2, and with `GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1` it exits 0; no `GIT_CONFIG` name appears under `native/src/emit/installer_smoke/`. Owner lookup: `GIT_CONFIG`, `global git` in this file and the disposed-findings record, none; owner installer/SPEC.md §The consumer smoke.
 
 ## Icebox
 
