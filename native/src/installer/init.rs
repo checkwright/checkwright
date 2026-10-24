@@ -988,7 +988,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         print!("{}", manifest_text(&r));
         if personal {
             let ex = personal::exclude(&root).map_err(|e| refuse(e, "", 2))?;
-            let block = personal::body(&root, &r.written).map_err(|e| refuse(e, "", 2))?;
+            let block = personal::body(&root, &r.written, &kits).map_err(|e| refuse(e, "", 2))?;
             println!("\nwould write this block to {}:", ex.shown);
             print!("{}\n{}{}\n", super::PERSONAL_BEGIN, block, super::PERSONAL_END);
         }
@@ -1015,7 +1015,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
 
     let phrase = profile_phrase(&profile_name, &profile_kits, &kits);
     if personal {
-        let ex = personal::write(&root, &r.written)
+        let ex = personal::write(&root, &r.written, &kits)
             .map_err(|e| refuse(format!("could not write the personal install's exclude block: {}", e), "", 2))?;
         println!(
             "INIT: vendored {} kit(s) at the {} (v{}) as a personal install, excluded in {} — nothing staged or committed.",

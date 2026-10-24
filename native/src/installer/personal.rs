@@ -48,13 +48,14 @@ fn escaped(p: &str) -> String {
 }
 
 // spec: installer/SPEC.md §The personal install — one anchored line per recorded path and the
-// manifest, a first component the index holds nothing beneath collapsed to one directory line
-pub fn body(root: &Path, recorded: &[String]) -> Result<String, String> {
+// manifest, a kit directory the index holds nothing beneath collapsed to one directory line
+pub fn body(root: &Path, recorded: &[String], kits: &[String]) -> Result<String, String> {
     let mut paths: Vec<String> = recorded.to_vec();
     paths.push(lock::FILE.to_string());
     let tops: Vec<String> = paths
         .iter()
         .filter_map(|p| p.split_once('/').map(|(c, _)| c.to_string()))
+        .filter(|c| kits.contains(c))
         .collect::<BTreeSet<_>>()
         .into_iter()
         .collect();
@@ -67,7 +68,7 @@ pub fn body(root: &Path, recorded: &[String]) -> Result<String, String> {
     let lines: BTreeSet<String> = paths
         .iter()
         .map(|p| match p.split_once('/') {
-            Some((top, _)) if !held.contains(top) => format!("/{}/", escaped(top)),
+            Some((top, _)) if tops.iter().any(|t| t == top) && !held.contains(top) => format!("/{}/", escaped(top)),
             _ => format!("/{}", escaped(p)),
         })
         .collect();
@@ -76,9 +77,9 @@ pub fn body(root: &Path, recorded: &[String]) -> Result<String, String> {
 
 // spec: installer/SPEC.md §The personal install — the block is recomputed whole on every write,
 // through the installer writer, into a file and directory made when absent
-pub fn write(root: &Path, recorded: &[String]) -> Result<Exclude, String> {
+pub fn write(root: &Path, recorded: &[String], kits: &[String]) -> Result<Exclude, String> {
     let e = exclude(root)?;
-    let text = body(root, recorded)?;
+    let text = body(root, recorded, kits)?;
     if let Some(dir) = e.path.parent() {
         std::fs::create_dir_all(dir).map_err(|err| format!("cannot create {}: {}", dir.display(), err))?;
     }
@@ -111,14 +112,15 @@ mod tests {
     use super::*;
     use crate::programs;
 
-    // spec: installer/SPEC.md §The personal install — the block's three line shapes over a scratch
-    // repository: a root file, a component the index holds nothing beneath, and a path under a
-    // tracked component, each anchored and escaped
+    // spec: installer/SPEC.md §The personal install — a root file, a kit directory with and one
+    // without tracked content beneath, and shared directories holding only untracked files
     #[test]
-    fn the_block_collapses_an_untracked_component_and_anchors_every_line() {
+    fn the_block_collapses_only_an_untracked_kit_directory_and_anchors_every_line() {
         let dir = std::env::temp_dir().join(format!("cw-personal-{}", std::process::id()));
         std::fs::remove_dir_all(&dir).ok();
-        std::fs::create_dir_all(dir.join("scripts")).expect("cannot make the scratch repo");
+        for d in ["scripts", "docs", "vendored"] {
+            std::fs::create_dir_all(dir.join(d)).expect("cannot make the scratch repo");
+        }
         let git = |args: &[&str]| {
             let d = dir.to_string_lossy().into_owned();
             let mut argv = vec!["-C", d.as_str()];
@@ -126,30 +128,38 @@ mod tests {
             crate::proc::run(&programs::GIT, &argv).expect("git did not spawn");
         };
         git(&["init", "-q"]);
-        std::fs::write(dir.join("scripts/build.sh"), "x\n").expect("cannot write the tracked script");
-        git(&["add", "scripts/build.sh"]);
+        std::fs::write(dir.join("vendored/own.txt"), "x\n").expect("cannot write the tracked file");
+        git(&["add", "vendored/own.txt"]);
         let recorded = vec![
             "gate-sdk/a.sh".to_string(),
             "gate-sdk/b/c.sh".to_string(),
+            "vendored/x.sh".to_string(),
             "scripts/gates.list".to_string(),
+            "docs/graph.html".to_string(),
             "odd[1]*.md".to_string(),
         ];
-        let text = body(&dir, &recorded).expect("the body was not derived");
+        let kits = vec!["gate-sdk".to_string(), "vendored".to_string()];
+        let text = body(&dir, &recorded, &kits).expect("the body was not derived");
         assert_eq!(
             text,
-            format!("/{}\n/gate-sdk/\n/odd\\[1]\\*.md\n/scripts/gates.list\n", lock::FILE),
+            format!(
+                "/{}\n/docs/graph.html\n/gate-sdk/\n/odd\\[1]\\*.md\n/scripts/gates.list\n/vendored/x.sh\n",
+                lock::FILE
+            ),
             "the block's lines"
         );
-        let e = write(&dir, &recorded).expect("the block was not written");
+        let e = write(&dir, &recorded, &kits).expect("the block was not written");
         assert!(is_personal(&dir), "the written block was not read as the mode");
         let ignored = |p: &str| super::super::git_code(&dir, &["check-ignore", "-q", p]) == Some(0);
         assert!(ignored("scripts/gates.list"), "the excluded gates-directory file is not ignored");
         assert!(ignored("gate-sdk/new.sh"), "a file under the collapsed kit root is not ignored");
-        assert!(!ignored("scripts/other.sh"), "a project file under the shared directory was hidden");
+        assert!(!ignored("scripts/other.sh"), "an untracked project file under the gates directory was hidden");
+        assert!(!ignored("docs/other.md"), "an untracked project file under a shared directory was hidden");
+        assert!(!ignored("vendored/new.sh"), "a file under a kit directory the index tracks was hidden");
         remove(&dir).expect("the block was not removed");
         assert!(!is_personal(&dir), "the removed block was still read as the mode");
         assert!(e.path.is_file());
-        assert_eq!(tracked(&dir, &["scripts/build.sh".to_string(), "scripts/gates.list".to_string()]), Ok(vec!["scripts/build.sh".to_string()]));
+        assert_eq!(tracked(&dir, &["vendored/own.txt".to_string(), "scripts/gates.list".to_string()]), Ok(vec!["vendored/own.txt".to_string()]));
         std::fs::remove_dir_all(&dir).ok();
     }
 }

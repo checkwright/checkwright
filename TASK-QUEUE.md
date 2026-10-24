@@ -48,14 +48,6 @@
 
 ## Technical Debt
 
-### personal-collapse-hides-files
-
-`init --personal`'s exclude block collapses a first component the index holds nothing beneath to one directory line (`native/src/installer/personal.rs`, `body`), so a project whose `scripts/` holds only untracked files has those hidden too. installer/SPEC.md §The personal install says a directory shared with the gates directory keeps its own untracked files visible, which holds only where the project tracks something beneath it, and the consumed amendment promised the gates directory is never excluded whole for exactly that reason.
-
-**Deliverable:** debt: collapse only a component the install owns whole, never the gates directory; the section's collapse sentence and the unit test's untracked-only case move with it.
-
-**Cost while deferred:** an adopter's untracked project files under a shared directory vanish from `git status` and need `add -f`. Filed 2026-10-24 by personal-overlay-pass' close (second-vendor review), drained at the next scope. Owner lookup: `exclude block`, `info/exclude` in this file and the disposed-findings record, none; owner installer/SPEC.md §The personal install.
-
 ### personal-write-before-refusal
 
 `init --personal` writes the payload and `checkwright.lock` before `personal::write` meets an exclude file carrying the personal begin marker without its end marker (`native/src/installer/init.rs`, the lock write ahead of the personal branch; `marker::install_block` refuses there), so the run exits 2 leaving the files written and unexcluded.
@@ -948,4 +940,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 - marker-uninstall-newline
 - init-dry-run-makes-dirs
+- personal-collapse-hides-files
 

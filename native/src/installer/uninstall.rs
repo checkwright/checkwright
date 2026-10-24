@@ -387,7 +387,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
         let done = if kept.is_empty() {
             super::personal::remove(&root).map(|e| format!("removed the personal install's block from {}", e.shown))
         } else {
-            super::personal::write(&root, &kept)
+            super::personal::write(&root, &kept, &kits)
                 .map(|e| format!("rewrote the personal install's block in {} over the {} kept file(s)", e.shown, kept.len()))
         };
         let done = done.map_err(|e| refuse(format!("the personal install's exclude block could not be updated: {}", e), "", 2))?;
