@@ -677,9 +677,11 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         }
     }
 
-    let _ = std::fs::create_dir_all(root.join(GATES_DIR));
-    if !personal {
-        let _ = std::fs::create_dir_all(root.join(WORKFLOW_DIR));
+    if !f.dry {
+        let _ = std::fs::create_dir_all(root.join(GATES_DIR));
+        if !personal {
+            let _ = std::fs::create_dir_all(root.join(WORKFLOW_DIR));
+        }
     }
     if claim(&root, &gates_list, &prior, f.force, &mut r) {
         if !f.dry {

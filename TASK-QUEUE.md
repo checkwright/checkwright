@@ -64,14 +64,6 @@
 
 **Cost while deferred:** a clone with a hand-damaged block gets an install that shows as untracked and could be committed into the project. Filed 2026-10-24 by personal-overlay-pass' close (second-vendor review), drained at the next scope. Owner lookup: `begin marker`, `install_block` in this file and the disposed-findings record, none; owner installer/SPEC.md §The personal install.
 
-### init-dry-run-makes-dirs
-
-`init --dry-run` creates the gates directory, and outside a personal install the workflow directory too (`native/src/installer/init.rs`, the unconditional `create_dir_all` pair after the kit copy), though installer/SPEC.md §init and docs/install.md say `--dry-run` writes nothing.
-
-**Deliverable:** debt: the pair runs only outside `dry`, and the consumer smoke's dry-run assertion reads the worktree's directories as well.
-
-**Cost while deferred:** empty directories left by a dry run, invisible to `git status`. Filed 2026-10-24 by personal-overlay-pass' close (second-vendor review), drained at the next scope. Owner lookup: `dry-run` in this file and the disposed-findings record, none; owner installer/SPEC.md §init.
-
 ### init-copy-follows-links
 
 `init` copies each payload file through `std::fs::copy` onto `root.join(dest)` (`native/src/installer/init.rs`, `copy_in`), following a symlink or junction at any component, so an untracked kit-root link pointing outside the clone receives the payload there; a personal install's tracked-path refusal does not see an untracked link.
@@ -955,4 +947,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 ## Done
 
 - marker-uninstall-newline
+- init-dry-run-makes-dirs
 

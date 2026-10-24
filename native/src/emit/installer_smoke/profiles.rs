@@ -1,7 +1,7 @@
 // spec: installer/SPEC.md §The consumer smoke — the profile invariant and the per-profile loop it
 // carries, then the seed arm, the demo arm and the two plan-parity legs over seeds
 use super::consumer::{
-    all_passed, commits, consumer, copy_tree, digest_of, exists, failed, find_line, first_starting, git, git_out,
+    all_passed, commits, consumer, copy_tree, digest_of, dirs, exists, failed, find_line, first_starting, git, git_out,
     hash_in, head, is_file, is_hash, mkdir, out, porcelain, run_line, seam_bin, sorted, tree, write, Lock, GATES_DIR,
     PROFILE_DERIVED, QUEUE_FILE,
 };
@@ -179,8 +179,9 @@ fn one_profile(state: &mut Run, profile: &str) -> Step {
     println!("{}", profile);
     let c = consumer(state, profile)?;
     let seed = tree(&c)?;
+    let seed_dirs = dirs(&c)?;
     let plan = dry_plan(state, profile, &c)?;
-    if tree(&c)? != seed || !porcelain(&c)?.is_empty() {
+    if tree(&c)? != seed || !porcelain(&c)?.is_empty() || dirs(&c)? != seed_dirs {
         return Err(fail(format!("{}: init --dry-run wrote to the consumer", profile)));
     }
     assert_install(state, profile, &c)?;

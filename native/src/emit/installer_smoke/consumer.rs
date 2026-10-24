@@ -2,7 +2,7 @@
 // entry point under the arm's PATH, the manifest as data and the consumer-layout constants
 use super::{fail, in_consumer, merged_in, refuse, text, Entry, Outcome, Run};
 use crate::programs::{self, Program};
-use crate::proc;
+use crate::{proc, walk};
 use std::path::Path;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
@@ -171,6 +171,25 @@ pub(super) fn commits(c: &str) -> Result<usize, Outcome> {
 
 pub(super) fn porcelain(c: &str) -> Result<String, Outcome> {
     git_out(c, &["status", "--porcelain"])
+}
+
+// spec: installer/SPEC.md §The consumer smoke — every directory of the worktree outside `.git`,
+// since `git status` reports no empty one
+pub(super) fn dirs(c: &str) -> Result<Vec<String>, Outcome> {
+    let mut out = Vec::new();
+    let mut todo = vec![String::new()];
+    while let Some(rel) = todo.pop() {
+        for (name, is_dir) in walk::list_dir(&Path::new(c).join(&rel)).map_err(fail)? {
+            if !is_dir || (rel.is_empty() && name == ".git") {
+                continue;
+            }
+            let sub = if rel.is_empty() { name } else { format!("{}/{}", rel, name) };
+            out.push(sub.clone());
+            todo.push(sub);
+        }
+    }
+    out.sort();
+    Ok(out)
 }
 
 // spec: installer/SPEC.md §The consumer smoke — a file's blob hash in the consumer's own repository
