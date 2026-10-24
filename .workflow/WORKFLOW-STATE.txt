@@ -9,3 +9,4 @@ personal-overlay-pass spec af380aaf 2026-10-24 1b3d10004
 personal-overlay-pass align af96692b 2026-10-24 59622d7ed
 personal-overlay-pass build a78ce966 2026-10-24 bdba4cb84
 personal-overlay-pass validate abe60b88 2026-10-24 8ce843c5b
+personal-overlay-pass close a4167616 2026-10-24 8d676b590
