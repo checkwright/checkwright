@@ -385,12 +385,16 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
     if personal {
         let kept: Vec<String> = keep.iter().map(|(p, _)| p.clone()).collect();
         let done = if kept.is_empty() {
-            super::personal::remove(&root).map(|e| format!("removed the personal install's block from {}", e.shown))
+            super::personal::remove(&root).map(|e| (format!("removed the personal install's block from {}", e.shown), e.said))
         } else {
-            super::personal::write(&root, &kept, &kits)
-                .map(|e| format!("rewrote the personal install's block in {} over the {} kept file(s)", e.shown, kept.len()))
+            super::personal::write(&root, &kept, &kits).map(|e| {
+                (format!("rewrote the personal install's block in {} over the {} kept file(s)", e.shown, kept.len()), e.said)
+            })
         };
-        let done = done.map_err(|e| refuse(format!("the personal install's exclude block could not be updated: {}", e), "", 2))?;
+        let (done, said) = done.map_err(|e| refuse(format!("the personal install's exclude block could not be updated: {}", e), "", 2))?;
+        for line in &said {
+            println!("{}", line);
+        }
         report_kept(&keep);
         if trimmed {
             println!("\ntrimmed the doctrine block out of {}, which is being kept.", AGENT_FILE);

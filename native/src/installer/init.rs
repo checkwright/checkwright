@@ -989,8 +989,10 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         if personal {
             let ex = personal::exclude(&root).map_err(|e| refuse(e, "", 2))?;
             let block = personal::body(&root, &r.written, &kits).map_err(|e| refuse(e, "", 2))?;
+            let wt = personal::worktree(&root).map_err(|e| refuse(e, "", 2))?;
+            let (begin, end) = personal::markers(wt.key.as_deref());
             println!("\nwould write this block to {}:", ex.shown);
-            print!("{}\n{}{}\n", super::PERSONAL_BEGIN, block, super::PERSONAL_END);
+            print!("{}\n{}{}\n", begin, block, end);
         }
         println!("\nDRY RUN: nothing was written.");
         return Ok(0);
@@ -1017,6 +1019,9 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     if personal {
         let ex = personal::write(&root, &r.written, &kits)
             .map_err(|e| refuse(format!("could not write the personal install's exclude block: {}", e), "", 2))?;
+        for line in &ex.said {
+            println!("{}", line);
+        }
         println!(
             "INIT: vendored {} kit(s) at the {} (v{}) as a personal install, excluded in {} — nothing staged or committed.",
             kits.len(),

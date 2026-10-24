@@ -10,6 +10,7 @@ use std::path::{Path, PathBuf};
 pub struct Exclude {
     pub shown: String,
     pub path: PathBuf,
+    pub said: Vec<String>,
 }
 
 pub fn exclude(root: &Path) -> Result<Exclude, String> {
@@ -24,14 +25,89 @@ pub fn exclude(root: &Path) -> Result<Exclude, String> {
     } else {
         root.join(&shown)
     };
-    Ok(Exclude { shown, path })
+    Ok(Exclude { shown, path, said: Vec::new() })
 }
 
+// spec: installer/SPEC.md §The personal install — the running worktree's key: none for the main
+// worktree, its git directory's path under the common directory for a linked one
+pub struct Worktree {
+    pub key: Option<String>,
+    pub common: PathBuf,
+}
+
+pub fn worktree(root: &Path) -> Result<Worktree, String> {
+    let said = super::git_capture(root, &["rev-parse", "--absolute-git-dir", "--git-common-dir"])?;
+    let mut lines = said.lines().map(str::trim);
+    let (Some(git_dir), Some(common)) = (lines.next(), lines.next()) else {
+        return Err("git named no git directory and common directory for this worktree".to_string());
+    };
+    let here = root.to_string_lossy();
+    let git_dir = PathBuf::from(crate::walk::abs_against(&here, git_dir));
+    let common = PathBuf::from(crate::walk::abs_against(&here, common));
+    if crate::emit::hook_launcher::same_dir(&git_dir, &common) {
+        return Ok(Worktree { key: None, common });
+    }
+    let canon = |p: &Path| {
+        crate::walk::canonicalize(p)
+            .map(|c| crate::walk::cross_arg(crate::walk::strip_extended_prefix(&c)))
+            .unwrap_or_else(|| crate::walk::cross_arg(&p.to_string_lossy()))
+    };
+    let (g, c) = (canon(&git_dir), canon(&common));
+    let key = crate::walk::rel_under(&c, &g)
+        .map(|k| k.trim_end_matches('/').to_string())
+        .filter(|k| !k.is_empty())
+        .ok_or_else(|| format!("this worktree's git directory {} lies outside the common directory {}", g, c))?;
+    Ok(Worktree { key: Some(key), common })
+}
+
+// spec: installer/SPEC.md §The personal install — the bare pair is the main worktree's, a linked
+// worktree's carries its key after one space
+pub fn markers(key: Option<&str>) -> (String, String) {
+    match key {
+        None => (PERSONAL_BEGIN.to_string(), PERSONAL_END.to_string()),
+        Some(k) => (format!("{} {}", PERSONAL_BEGIN, k), format!("{} {}", PERSONAL_END, k)),
+    }
+}
+
+// spec: installer/SPEC.md §The personal install — any worktree's block is the mode
 pub fn is_personal(root: &Path) -> bool {
+    let keyed = format!("{} ", PERSONAL_BEGIN);
     exclude(root)
         .ok()
         .and_then(|e| std::fs::read_to_string(&e.path).ok())
-        .is_some_and(|t| crate::fresh::file_lines(&t).contains(&PERSONAL_BEGIN))
+        .is_some_and(|t| crate::fresh::file_lines(&t).iter().any(|l| *l == PERSONAL_BEGIN || l.starts_with(&keyed)))
+}
+
+// spec: installer/SPEC.md §The personal install — a keyed block whose key names no directory under
+// the common directory is a worktree git no longer records, and goes; one whose end marker is
+// missing is named and left
+fn prune(e: &Exclude, wt: &Worktree) -> Result<Vec<String>, String> {
+    let text = crate::fresh::read_captured(&e.path.to_string_lossy())?;
+    let lines = crate::fresh::file_lines(&text);
+    let keyed = format!("{} ", PERSONAL_BEGIN);
+    let gone: Vec<String> = lines
+        .iter()
+        .filter_map(|l| l.strip_prefix(&keyed))
+        .filter(|k| !k.is_empty() && !wt.common.join(k).is_dir())
+        .map(str::to_string)
+        .collect();
+    let mut said = Vec::new();
+    for key in gone {
+        let (begin, end) = markers(Some(&key));
+        if !lines.contains(&end.as_str()) {
+            said.push(format!(
+                "personal: left the exclude block of {} in {}, its end marker missing",
+                key, e.shown
+            ));
+            continue;
+        }
+        crate::marker::uninstall_block(&e.path.to_string_lossy(), &begin, &end)?;
+        said.push(format!(
+            "personal: dropped the exclude block of {}, a worktree git no longer records",
+            key
+        ));
+    }
+    Ok(said)
 }
 
 // spec: installer/SPEC.md §The personal install — each of git's pattern metacharacters is escaped,
@@ -75,10 +151,11 @@ pub fn body(root: &Path, recorded: &[String], kits: &[String]) -> Result<String,
     Ok(lines.into_iter().map(|l| l + "\n").collect())
 }
 
-// spec: installer/SPEC.md §The personal install — the block is recomputed whole on every write,
-// through the installer writer, into a file and directory made when absent
+// spec: installer/SPEC.md §The personal install — this worktree's block is recomputed whole on
+// every write, through the installer writer, into a file and directory made when absent
 pub fn write(root: &Path, recorded: &[String], kits: &[String]) -> Result<Exclude, String> {
-    let e = exclude(root)?;
+    let mut e = exclude(root)?;
+    let wt = worktree(root)?;
     let text = body(root, recorded, kits)?;
     if let Some(dir) = e.path.parent() {
         std::fs::create_dir_all(dir).map_err(|err| format!("cannot create {}: {}", dir.display(), err))?;
@@ -86,14 +163,19 @@ pub fn write(root: &Path, recorded: &[String], kits: &[String]) -> Result<Exclud
     if !e.path.is_file() {
         std::fs::write(&e.path, "").map_err(|err| format!("cannot create {}: {}", e.shown, err))?;
     }
-    crate::marker::install_block(&e.path.to_string_lossy(), PERSONAL_BEGIN, PERSONAL_END, &text)?;
+    let (begin, end) = markers(wt.key.as_deref());
+    crate::marker::install_block(&e.path.to_string_lossy(), &begin, &end, &text)?;
+    e.said = prune(&e, &wt)?;
     Ok(e)
 }
 
-// spec: installer/SPEC.md §uninstall — the block goes with the separator its append wrote
+// spec: installer/SPEC.md §uninstall — this worktree's block goes with the separator its append wrote
 pub fn remove(root: &Path) -> Result<Exclude, String> {
-    let e = exclude(root)?;
-    crate::marker::uninstall_block(&e.path.to_string_lossy(), PERSONAL_BEGIN, PERSONAL_END)?;
+    let mut e = exclude(root)?;
+    let wt = worktree(root)?;
+    let (begin, end) = markers(wt.key.as_deref());
+    crate::marker::uninstall_block(&e.path.to_string_lossy(), &begin, &end)?;
+    e.said = prune(&e, &wt)?;
     Ok(e)
 }
 
@@ -161,5 +243,88 @@ mod tests {
         assert!(e.path.is_file());
         assert_eq!(tracked(&dir, &["vendored/own.txt".to_string(), "scripts/gates.list".to_string()]), Ok(vec!["vendored/own.txt".to_string()]));
         std::fs::remove_dir_all(&dir).ok();
+    }
+
+    // spec: installer/SPEC.md §The personal install — one block per worktree over a scratch
+    // repository with one linked worktree: the key, the bare block adopted, each removal taking its
+    // own block, and the prune of a worktree git no longer records
+    #[test]
+    fn each_worktree_keeps_its_own_block_and_a_gone_worktrees_block_is_pruned() {
+        let main = std::env::temp_dir().join(format!("cw-personal-wt-{}", std::process::id()));
+        let linked = std::env::temp_dir().join(format!("cw-personal-wt-{}-linked", std::process::id()));
+        for d in [&main, &linked] {
+            std::fs::remove_dir_all(d).ok();
+        }
+        std::fs::create_dir_all(&main).expect("cannot make the scratch repo");
+        let git = |args: &[&str]| {
+            let d = main.to_string_lossy().into_owned();
+            let mut argv = vec!["-C", d.as_str(), "-c", "user.name=t", "-c", "user.email=t@example.invalid"];
+            argv.extend_from_slice(args);
+            crate::proc::run(&programs::GIT, &argv).expect("git did not spawn");
+        };
+        git(&["init", "-q"]);
+        git(&["commit", "-q", "--allow-empty", "-m", "seed"]);
+        let linked_s = linked.to_string_lossy().into_owned();
+        let name = linked.file_name().expect("a named worktree").to_string_lossy().into_owned();
+        // spec: gate-sdk/SPEC.md §upgrade-smoke — the linked worktree is laid out by hand, git's
+        // own admin-directory shape, since crate source never adds one through git
+        let admin = main.join(".git/worktrees").join(&name);
+        std::fs::create_dir_all(&admin).expect("cannot make the admin directory");
+        std::fs::create_dir_all(&linked).expect("cannot make the linked worktree");
+        let head = super::super::git_capture(&main, &["rev-parse", "HEAD"]).expect("no seed commit");
+        for (file, body) in [
+            ("HEAD", head),
+            ("commondir", "../..\n".to_string()),
+            ("gitdir", format!("{}/.git\n", linked_s)),
+        ] {
+            std::fs::write(admin.join(file), body).expect("cannot write the admin directory");
+        }
+        std::fs::write(linked.join(".git"), format!("gitdir: {}\n", admin.display())).expect("cannot link the worktree");
+        let key = format!("worktrees/{}", name);
+        assert_eq!(worktree(&main).expect("no main key").key, None, "the main worktree's key");
+        assert_eq!(worktree(&linked).expect("no linked key").key, Some(key.clone()), "the linked worktree's key");
+
+        let e = exclude(&main).expect("no exclude file");
+        std::fs::create_dir_all(e.path.parent().expect("an info dir")).expect("cannot make info/");
+        std::fs::write(&e.path, "").expect("cannot seed the exclude file");
+        crate::marker::install_block(&e.path.to_string_lossy(), PERSONAL_BEGIN, PERSONAL_END, "/stale\n")
+            .expect("cannot seed a bare block");
+        let one = |p: &str| vec![p.to_string()];
+        write(&main, &one("main-only.txt"), &[]).expect("the main block was not written");
+        let read = || std::fs::read_to_string(&e.path).expect("cannot read the exclude file");
+        let bare = read().lines().filter(|l| *l == PERSONAL_BEGIN).count();
+        assert_eq!(bare, 1, "the bare block was duplicated rather than replaced");
+        assert!(!read().contains("/stale"), "the bare block was not replaced");
+
+        write(&linked, &one("linked-only.txt"), &[]).expect("the linked block was not written");
+        let ignored = |at: &Path, p: &str| super::super::git_code(at, &["check-ignore", "-q", p]) == Some(0);
+        for at in [&main, &linked] {
+            for p in ["main-only.txt", "linked-only.txt", lock::FILE] {
+                assert!(ignored(at, p), "{} does not read ignored from {}", p, at.display());
+            }
+        }
+        let main_block = crate::marker::read_block(&read(), PERSONAL_BEGIN, PERSONAL_END);
+        remove(&linked).expect("the linked block was not removed");
+        assert_eq!(crate::marker::read_block(&read(), PERSONAL_BEGIN, PERSONAL_END), main_block, "the main block moved");
+        assert!(ignored(&linked, "main-only.txt"), "the main worktree's path stopped reading ignored");
+        assert!(!ignored(&main, "linked-only.txt"), "the removed block's path still reads ignored");
+        assert!(is_personal(&linked), "a worktree without its own block lost the mode");
+
+        write(&linked, &one("linked-only.txt"), &[]).expect("the linked block was not rewritten");
+        git(&["worktree", "remove", "--force", &linked_s]);
+        let mut grown = read();
+        grown.push_str(&format!("{} worktrees/ghost\n/ghost\n", PERSONAL_BEGIN));
+        std::fs::write(&e.path, grown).expect("cannot plant a half-open block");
+        let said = write(&main, &one("main-only.txt"), &[]).expect("the main block was not rewritten").said;
+        assert_eq!(
+            said,
+            vec![
+                format!("personal: dropped the exclude block of {}, a worktree git no longer records", key),
+                format!("personal: left the exclude block of worktrees/ghost in {}, its end marker missing", e.shown),
+            ],
+            "the prune's report"
+        );
+        assert!(!read().contains(&key), "the gone worktree's block was not pruned");
+        std::fs::remove_dir_all(&main).ok();
     }
 }

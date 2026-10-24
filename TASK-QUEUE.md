@@ -26,16 +26,6 @@
 
 **Cost while deferred:** a project already running hooks through `core.hooksPath` (husky and its kin) loses them in that clone until someone notices, and a personal install on a non-adopting project hits this most. Filed 2026-10-24 by personal-overlay-pass' close, draining a gap bullet. Re-verified there: the write is unconditional and §install-hooks's not-overwritten claim covers only the default directory. Owner lookup: `hooksPath`, `install-hooks` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §install-hooks.
 
-### personal-worktree-shared-block
-
-[spec: SPEC-personal-worktree-block.md]
-
-`init --personal` in two linked worktrees of one clone shares one exclude block, since `git rev-parse --git-path info/exclude` resolves to the common directory, and each run recomputes the block whole from its own roster, so a second worktree's install or uninstall un-excludes the first's files. §The personal install's honest limits name the sharing, not this.
-
-**Deliverable:** a feature: one exclude block per worktree, the choice landing in §The personal install.
-
-**Cost while deferred:** one worktree's install surfaces as untracked in the other. Filed 2026-10-24 by personal-overlay-pass' close (second-vendor review), drained at the next scope. Owner lookup: `worktree`, `exclude` in this file and the disposed-findings record, none; owner installer/SPEC.md §The personal install.
-
 ### personal-install-prove
 
 [spec: SPEC-personal-prove.md]
@@ -941,4 +931,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - marker-uninstall-newline
 - init-dry-run-makes-dirs
 - personal-collapse-hides-files
+- personal-worktree-shared-block
 
