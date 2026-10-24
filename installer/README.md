@@ -52,6 +52,7 @@ The flags each verb takes, owned by the binary as the verbs are:
 | `--dry-run` | `init`, `update`, `uninstall` | print the plan, write nothing |
 | `--force` | `init`, `update`, `uninstall` | overwrite what the verb would otherwise protect |
 | `--no-commit` | `init`, `update`, `uninstall` | stage the change and leave the commit to you |
+| `--personal` | `init`, `update` | install untracked, for this clone alone, committing nothing |
 | `--with-kit` | `init`, `update` | add this kit to the profile; repeats |
 | `--without-kit` | `init`, `update` | take this kit out of the profile; repeats |
 | `--with-gate` | `init`, `update` | register this gate too; repeats |

@@ -3,7 +3,7 @@
 // committed, auditable source rather than something resolved at their build time.
 use crate::programs;
 use super::selection::{self, Selection};
-use super::{lock, payload_recipe, profile, recipe, refuse, workflow, Package, Refusal, AGENT_FILE, GATES_DIR, QUEUE_FILE};
+use super::{lock, payload_recipe, personal, profile, recipe, refuse, workflow, Package, Refusal, AGENT_FILE, GATES_DIR, QUEUE_FILE, WORKFLOW_DIR};
 use crate::{install, sha256, toolfloor};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
@@ -16,6 +16,7 @@ pub(super) struct Flags {
     dry: bool,
     force: bool,
     commit: bool,
+    personal: bool,
     // spec: installer/SPEC.md §Payload recipes — absent when neither `--recipe` nor `--no-recipe`
     // was passed, which is what re-applies the recorded set
     recipes: Option<Vec<String>>,
@@ -24,7 +25,7 @@ pub(super) struct Flags {
     selection: Option<Selection>,
 }
 
-pub(super) const USAGE: &str = "usage: checkwright init [--profile <name>] [--recipe <name>]... [--no-recipe] [--with-kit <kit>]... [--without-kit <kit>]... [--with-gate <gate>]... [--without-gate <gate>]... [--no-selection] [--dry-run] [--force] [--no-commit]";
+pub(super) const USAGE: &str = "usage: checkwright init [--profile <name>] [--recipe <name>]... [--no-recipe] [--with-kit <kit>]... [--without-kit <kit>]... [--with-gate <gate>]... [--without-gate <gate>]... [--no-selection] [--dry-run] [--force] [--no-commit] [--personal]";
 
 fn help(pkg: Option<&Package>) {
     println!("{}\n", USAGE);
@@ -47,6 +48,7 @@ pub(super) fn parse(args: &[String], pkg: Option<&Package>) -> Result<Option<Fla
         dry: false,
         force: false,
         commit: true,
+        personal: false,
         recipes: None,
         selection: None,
     };
@@ -114,6 +116,10 @@ pub(super) fn parse(args: &[String], pkg: Option<&Package>) -> Result<Option<Fla
                 f.commit = false;
                 i += 1;
             }
+            "--personal" => {
+                f.personal = true;
+                i += 1;
+            }
             "-h" | "--help" => {
                 help(pkg);
                 return Ok(None);
@@ -133,7 +139,20 @@ pub(super) fn parse(args: &[String], pkg: Option<&Package>) -> Result<Option<Fla
         }
         f.selection = Some(Selection::default());
     }
+    if f.personal && !f.commit {
+        return Err(no_commit_beside_personal());
+    }
     Ok(Some(f))
+}
+
+// spec: installer/SPEC.md §The personal install — `--no-commit` stages and a personal install stages
+// nothing, so the two never run together, whether the mode was passed or read off the block
+fn no_commit_beside_personal() -> Refusal {
+    refuse(
+        "--personal beside --no-commit",
+        "a personal install stages and commits nothing, and --no-commit stages the vendoring for you to commit; pass one of them.",
+        2,
+    )
 }
 
 pub fn run(args: &[String]) -> i32 {
@@ -390,10 +409,17 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         "the vendored source is meant to be committed, which is what makes it auditable. Run 'git init' first, or run init inside the repository you want governed.",
     )?;
 
+    // spec: installer/SPEC.md §The personal install — a run passing no `--personal` re-applies the
+    // mode the block records, as a run passing no `--profile` re-applies the profile
+    let personal = f.personal || personal::is_personal(&root);
+    if personal && !f.commit {
+        return Err(no_commit_beside_personal());
+    }
+
     // spec: installer/SPEC.md §init — the clean-worktree precondition exists so the one commit
     // init makes is exactly what it vendored; --no-commit is its valve, because an operator staging
-    // the vendoring themselves has taken that guarantee on.
-    if !f.dry && f.commit {
+    // the vendoring themselves has taken that guarantee on, and a personal install commits nothing.
+    if !f.dry && f.commit && !personal {
         let dirty = super::git_capture(&root, &["status", "--porcelain"]).unwrap_or_default();
         if !dirty.trim().is_empty() {
             return Err(refuse(
@@ -487,6 +513,9 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     let chosen = f.selection.clone().unwrap_or(recorded_selection);
     let kits = selection::kit_set(&pkg.root, &profile_kits, &chosen);
     selection::check(&pkg.root, &root, &kits, &chosen)?;
+    if personal {
+        refuse_process_records(pkg, &kits)?;
+    }
 
     // spec: installer/SPEC.md §Payload recipes — the three refusals run ahead of any write, since
     // each is a selection the run cannot honour
@@ -587,6 +616,24 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     let artifact_digest = sha256::file_hex(&pkg.artifact)
         .map_err(|e| refuse(format!("could not hash the gate binary: {}", e), "", 2))?;
 
+    let gates_list = format!("{}/gates.list", GATES_DIR);
+    if personal {
+        let planned = planned_paths(pkg, &root, &kits, &[&gates_list, &artifact_dest, &seam])?;
+        let tracked = personal::tracked(&root, &planned)
+            .map_err(|e| refuse(format!("could not read which planned paths this repository tracks: {}", e), "", 2))?;
+        if !tracked.is_empty() {
+            return Err(refuse(
+                format!(
+                    "{} path(s) this install would write are tracked by this repository:{}",
+                    tracked.len(),
+                    crate::emit::pack_installer::bounded_entries(&tracked)
+                ),
+                "a personal install writes only paths the repository does not track: an exclude line cannot hide a tracked file, and writing one would edit the project's own tree.",
+                2,
+            ));
+        }
+    }
+
     let mut r = Roster::new();
 
     // spec: installer/SPEC.md §The manifest — the kit files' hashes are taken before the first kit copy
@@ -631,8 +678,9 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     }
 
     let _ = std::fs::create_dir_all(root.join(GATES_DIR));
-    let _ = std::fs::create_dir_all(root.join(".workflow"));
-    let gates_list = format!("{}/gates.list", GATES_DIR);
+    if !personal {
+        let _ = std::fs::create_dir_all(root.join(WORKFLOW_DIR));
+    }
     if claim(&root, &gates_list, &prior, f.force, &mut r) {
         if !f.dry {
             std::fs::write(root.join(&gates_list), &planned_registry)
@@ -718,7 +766,9 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
 
     // spec: installer/SPEC.md §What init seeds — the CI workflow is create-once like the queue
     // file, and a package that cannot name a fetchable action seeds nothing and says why
-    if !root.join(workflow::PATH).is_file() {
+    if personal && !root.join(workflow::PATH).is_file() {
+        println!("init: {} not seeded — a personal install has no project CI.", workflow::PATH);
+    } else if !root.join(workflow::PATH).is_file() {
         let mut repository = read_package_field(pkg, &["repository", "url"]);
         if repository.is_empty() {
             repository = read_package_field(pkg, &["repository"]);
@@ -934,6 +984,12 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         }
         println!("\n{} that would be written:", lock::FILE);
         print!("{}", manifest_text(&r));
+        if personal {
+            let ex = personal::exclude(&root).map_err(|e| refuse(e, "", 2))?;
+            let block = personal::body(&root, &r.written).map_err(|e| refuse(e, "", 2))?;
+            println!("\nwould write this block to {}:", ex.shown);
+            print!("{}\n{}{}\n", super::PERSONAL_BEGIN, block, super::PERSONAL_END);
+        }
         println!("\nDRY RUN: nothing was written.");
         return Ok(0);
     }
@@ -955,13 +1011,27 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     }
     update_check_statement(&root);
 
+    let phrase = profile_phrase(&profile_name, &profile_kits, &kits);
+    if personal {
+        let ex = personal::write(&root, &r.written)
+            .map_err(|e| refuse(format!("could not write the personal install's exclude block: {}", e), "", 2))?;
+        println!(
+            "INIT: vendored {} kit(s) at the {} (v{}) as a personal install, excluded in {} — nothing staged or committed.",
+            kits.len(),
+            phrase,
+            version,
+            ex.shown
+        );
+        follow_up(&artifact_dest, true);
+        return Ok(0);
+    }
+
     super::git_batched(&root, &["add"], &stage)
         .map_err(|e| refuse(format!("could not stage the vendored files: {}", e), "", 2))?;
 
     // spec: installer/SPEC.md §init — idempotence is a property of the tree, so a re-run that
     // changed nothing exits clean rather than on an empty commit. The predicate reads the index and
     // stays the guard on whether a commit is attempted at all.
-    let phrase = profile_phrase(&profile_name, &profile_kits, &kits);
     let message = format!("chore: vendor Checkwright kits ({}, v{})", phrase, version);
     if super::git_code(&root, &["diff", "--cached", "--quiet"]) == Some(0) {
         // spec: installer/SPEC.md §init — a run init considers a no-op still commits what it
@@ -1018,20 +1088,84 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         );
     }
 
-    // spec: installer/SPEC.md §init — the follow-up block is a STATED GRAMMAR with a named
-    // reader, not a layout choice: the consumer smoke parses it out of what this prints, so
-    // reflowing these lines reds that arm instead of silently un-covering the pair.
-    let front = follow_up_front_end(&artifact_dest);
+    follow_up(&artifact_dest, false);
+    Ok(0)
+}
+
+// spec: installer/SPEC.md §init — the follow-up block is a STATED GRAMMAR with a named
+// reader, not a layout choice: the consumer smoke parses it out of what this prints, so
+// reflowing these lines reds that arm instead of silently un-covering the pair.
+fn follow_up(artifact_dest: &str, personal: bool) {
+    let front = follow_up_front_end(artifact_dest);
     println!("\nnext:");
     println!("  {} --install-hooks   # place the pre-commit and commit-msg hooks in this clone", front);
     println!("  {} --run             # the battery, green on what was just vendored", front);
     // spec: installer/SPEC.md §init — the proof step sits outside the block, unindented, so the
-    // block's readers never run it
-    println!(
-        "then: {} --prove reports what this tree enforces and whether a task claimed done with no evidence is caught here.",
-        front
-    );
-    Ok(0)
+    // block's readers never run it; a personal install has no proof step, since prove reads HEAD
+    if personal {
+        println!("then: this install is personal: the hooks and --run check your commits in this clone alone, and the project's CI runs none of it.");
+    } else {
+        println!(
+            "then: {} --prove reports what this tree enforces and whether a task claimed done with no evidence is caught here.",
+            front
+        );
+    }
+}
+
+// spec: installer/SPEC.md §The personal install — a kit committing a process record is refused, and
+// the help names the profiles whose kit sets pass the same test
+fn refuse_process_records(pkg: &Package, kits: &[String]) -> Result<(), Refusal> {
+    let record = |k: &String| recipe::process_record(k, &pkg.payload.join(k));
+    let marked: Vec<String> = kits
+        .iter()
+        .filter_map(|k| record(k).map(|p| format!("{} ({})", k, p)))
+        .collect();
+    if marked.is_empty() {
+        return Ok(());
+    }
+    let passing: Vec<String> = profile::names(&pkg.root)
+        .into_iter()
+        .filter(|p| profile::kits(&pkg.root, p).iter().all(|k| record(k).is_none()))
+        .collect();
+    Err(refuse(
+        format!("a personal install carries no kit that commits a process record: {}", marked.join(", ")),
+        format!(
+            "the workflow commits its own record, and an excluded path cannot hold one; the profiles whose kits pass are {}.",
+            passing.join(" ")
+        ),
+        2,
+    ))
+}
+
+// spec: installer/SPEC.md §The personal install — every path the run would write, read off the same
+// plans the run walks: each kit file, the gates-directory files, each create-once seed, the
+// projection and the manifest
+fn planned_paths(pkg: &Package, root: &Path, kits: &[String], fixed: &[&str]) -> Result<Vec<String>, Refusal> {
+    let mut out: Vec<String> = fixed.iter().map(|p| p.to_string()).collect();
+    out.push(lock::FILE.to_string());
+    for kit in kits {
+        let kit_payload = pkg.payload.join(kit);
+        for rel in super::files_under(&kit_payload).map_err(|e| refuse(e, "", 2))? {
+            out.push(format!("{}/{}", kit, rel));
+        }
+        out.extend(recipe::config_seam_plan(&kit_payload, GATES_DIR).into_iter().map(|(_, dest)| dest));
+        for s in recipe::seed(kit, &kit_payload, root, true).map_err(|e| refuse(e, "", 2))? {
+            out.push(match s {
+                recipe::Seeded::Path(p) => p,
+                recipe::Seeded::Plan(_, dest) => dest,
+            });
+        }
+        if recipe::needs_agent_file(kit) {
+            out.push(AGENT_FILE.to_string());
+        }
+    }
+    if recipe::queue_source(&pkg.payload, kits).is_some() && !root.join(QUEUE_FILE).is_file() {
+        out.push(QUEUE_FILE.to_string());
+    }
+    if let Some(p) = in_tree(root, &knob_at(root, "GATE_SDK_GRAPH_ARTIFACT")?) {
+        out.push(p);
+    }
+    Ok(out)
 }
 
 // spec: installer/SPEC.md §The update notice — the check is stated on every run that leaves it on,

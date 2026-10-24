@@ -130,8 +130,9 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
 
     // spec: installer/SPEC.md §init — the clean-worktree precondition is init's, on the same
     // terms: one commit is made, and a dirty tree would fold your work into it; --no-commit is the
-    // same valve.
-    if !f.dry && f.commit {
+    // same valve, and a personal install, which commits nothing, waives it
+    let personal = super::personal::is_personal(&root);
+    if !f.dry && f.commit && !personal {
         let dirty = super::git_capture(&root, &["status", "--porcelain"]).unwrap_or_default();
         if !dirty.trim().is_empty() {
             return Err(refuse(
@@ -302,6 +303,19 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
         if !hooks_line.is_empty() {
             println!("\nwould print this for you to run yourself:\n  {}", hooks_line);
         }
+        if personal {
+            let shown = super::personal::exclude(&root).map(|e| e.shown).unwrap_or_default();
+            if keep.is_empty() {
+                println!("\nwould remove the personal install's block from {}.", shown);
+            } else {
+                println!(
+                    "\nwould rewrite the personal install's block in {} over the {} kept file(s) and {}.",
+                    shown,
+                    keep.len(),
+                    lock::FILE
+                );
+            }
+        }
         println!("\nDRY RUN: nothing was written.");
         return Ok(0);
     }
@@ -365,6 +379,36 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
         })?;
     }
 
+    // spec: installer/SPEC.md §The personal install — nothing was tracked, so nothing is staged or
+    // committed; the block goes last, or is rewritten over what was kept so a protected path stays
+    // excluded
+    if personal {
+        let kept: Vec<String> = keep.iter().map(|(p, _)| p.clone()).collect();
+        let done = if kept.is_empty() {
+            super::personal::remove(&root).map(|e| format!("removed the personal install's block from {}", e.shown))
+        } else {
+            super::personal::write(&root, &kept)
+                .map(|e| format!("rewrote the personal install's block in {} over the {} kept file(s)", e.shown, kept.len()))
+        };
+        let done = done.map_err(|e| refuse(format!("the personal install's exclude block could not be updated: {}", e), "", 2))?;
+        report_kept(&keep);
+        if trimmed {
+            println!("\ntrimmed the doctrine block out of {}, which is being kept.", AGENT_FILE);
+        }
+        println!("\n{}.", done);
+        println!(
+            "\nUNINSTALL: removed {} file(s), none of which this repository was tracking — nothing to commit.",
+            remove_set.len()
+        );
+        if !hooks_line.is_empty() {
+            println!(
+                "\nthis clone's core.hooksPath still names the hooks directory that was just removed. Undo that yourself with:\n  {}",
+                hooks_line
+            );
+        }
+        return Ok(0);
+    }
+
     // spec: installer/SPEC.md §uninstall — the staged set is the removals and the manifest
     // disposition, never a kept file: staging one left for the adopter is the defect init's
     // written-set/roster split exists to prevent, and it stays one when the write is a removal.
@@ -391,19 +435,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
             .map_err(|e| refuse(format!("could not stage the removal: {}", e), "", 2))?;
     }
 
-    if !keep.is_empty() {
-        println!(
-            "\n{} file(s) have changed since init wrote them and were kept:",
-            keep.len()
-        );
-        for (p, _) in &keep {
-            println!("  {}", p);
-        }
-        println!(
-            "  help: they are yours. {} now records those paths and nothing else, at the hashes init wrote, so a future init still protects them rather than writing through them.",
-            lock::FILE
-        );
-    }
+    report_kept(&keep);
     if trimmed {
         println!(
             "\ntrimmed the doctrine block out of {} and left the change unstaged — the rest of that file is yours to review.",
@@ -443,6 +475,23 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
         );
     }
     Ok(0)
+}
+
+fn report_kept(keep: &[(String, String)]) {
+    if keep.is_empty() {
+        return;
+    }
+    println!(
+        "\n{} file(s) have changed since init wrote them and were kept:",
+        keep.len()
+    );
+    for (p, _) in keep {
+        println!("  {}", p);
+    }
+    println!(
+        "  help: they are yours. {} now records those paths and nothing else, at the hashes init wrote, so a future init still protects them rather than writing through them.",
+        lock::FILE
+    );
 }
 
 // spec: installer/SPEC.md §uninstall — a cache already gone is no failure; one that cannot be

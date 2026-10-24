@@ -1,7 +1,7 @@
 // spec: installer/SPEC.md §What init seeds — the crate's owner of the per-kit install recipe:
 // the starting gate roster a kit registers in a fresh consumer, and the seam surfaces those gates
 // need. Two output channels, and the difference between them is who writes the file.
-use super::{AGENT_FILE, GATES_DIR, STATE_FILE};
+use super::{AGENT_FILE, GATES_DIR, STATE_FILE, WORKFLOW_DIR};
 use std::path::Path;
 
 // spec: installer/SPEC.md §What init seeds — seed what is absent, plan what must be claimed: a
@@ -95,6 +95,13 @@ pub fn needs_queue(kit: &str) -> bool {
     matches!(kit, "canon-kit" | "lifecycle-kit" | "queue-kit")
 }
 
+// consumer-value-exempt: the queue template's name in a kit root (installer/SPEC.md §What init seeds)
+const QUEUE_TEMPLATE: &[&str] = &["templates", "TASK-QUEUE.md"];
+
+fn queue_template(kit_dir: &Path) -> std::path::PathBuf {
+    QUEUE_TEMPLATE.iter().fold(kit_dir.to_path_buf(), |d, seg| crate::walk::child(&d, seg))
+}
+
 // spec: installer/SPEC.md §What init seeds — the queue source is resolved once over the whole kit
 // set, never inside a per-kit call blind to the others: a kit declares itself the format's owner by
 // shipping `templates/TASK-QUEUE.md`, and `-` is the inline fallback.
@@ -105,10 +112,7 @@ pub fn queue_source(payload: &Path, kits: &[String]) -> Option<String> {
         if needs_queue(kit) {
             needs = true;
         }
-        // consumer-value-exempt: the queue template's name in a kit root (installer/SPEC.md §What init seeds)
-        let candidate = ["templates", "TASK-QUEUE.md"]
-            .iter()
-            .fold(crate::walk::child(payload, kit), |d, seg| crate::walk::child(&d, seg));
+        let candidate = queue_template(&crate::walk::child(payload, kit));
         if tpl.is_empty() && candidate.is_file() {
             tpl = candidate.to_string_lossy().into_owned();
         }
@@ -153,15 +157,17 @@ pub fn needs_agent_file(kit: &str) -> bool {
 
 // spec: installer/SPEC.md §init — the absence test is the one predicate the dry plan and the run
 // both read; `dry` withholds the write and nothing else.
-fn seed_absent(root: &Path, rel: &str, body: &str, dry: bool, out: &mut Vec<Seeded>) -> Result<(), String> {
-    let dest = root.join(rel);
-    if dest.is_file() {
+// spec: installer/SPEC.md §The personal install — a root of `None` is the empty tree, the plan
+// the process-record test reads off the kit alone
+fn seed_absent(root: Option<&Path>, rel: &str, body: &str, dry: bool, out: &mut Vec<Seeded>) -> Result<(), String> {
+    if root.is_some_and(|r| r.join(rel).is_file()) {
         return Ok(());
     }
-    if dry {
+    let Some(root) = root.filter(|_| !dry) else {
         out.push(Seeded::Path(rel.to_string()));
         return Ok(());
-    }
+    };
+    let dest = root.join(rel);
     if let Some(parent) = dest.parent() {
         std::fs::create_dir_all(parent).map_err(|e| format!("cannot create {}: {}", rel, e))?;
     }
@@ -171,6 +177,29 @@ fn seed_absent(root: &Path, rel: &str, body: &str, dry: bool, out: &mut Vec<Seed
 }
 
 pub fn seed(kit: &str, kit_payload: &Path, root: &Path, dry: bool) -> Result<Vec<Seeded>, String> {
+    seed_in(kit, kit_payload, Some(root), dry)
+}
+
+// spec: installer/SPEC.md §The personal install — a kit commits a process record when its seed plan
+// over the empty tree names a workflow-directory path or it ships the queue template, both read off
+// the kit and never off a tree, so a project already holding such a file cannot pass the test
+pub fn process_record(kit: &str, kit_payload: &Path) -> Option<String> {
+    let planned = seed_in(kit, kit_payload, None, true).unwrap_or_default();
+    let seeded = planned.into_iter().find_map(|s| {
+        let p = match s {
+            Seeded::Path(p) => p,
+            Seeded::Plan(_, dest) => dest,
+        };
+        crate::walk::under(WORKFLOW_DIR, &p).then_some(p)
+    });
+    seeded.or_else(|| {
+        queue_template(kit_payload)
+            .is_file()
+            .then(|| format!("{}/{}", kit, QUEUE_TEMPLATE.join("/")))
+    })
+}
+
+fn seed_in(kit: &str, kit_payload: &Path, root: Option<&Path>, dry: bool) -> Result<Vec<Seeded>, String> {
     let mut out: Vec<Seeded> = Vec::new();
     match kit {
         "gate-sdk" => {
@@ -214,10 +243,10 @@ pub fn seed(kit: &str, kit_payload: &Path, root: &Path, dry: bool) -> Result<Vec
         // spec: doctrine-kit/SPEC.md §install-doctrine — the block is the kit's own installer's to
         // write, and that installer is this binary's `--install-doctrine` arm, called in-process.
         "doctrine-kit" => {
-            if dry {
+            let Some(root) = root.filter(|_| !dry) else {
                 out.push(Seeded::Path(AGENT_FILE.to_string()));
                 return Ok(out);
-            }
+            };
             // spec: doctrine-kit/SPEC.md §install-doctrine — the consumer root goes over as the BASE
             // and the two paths as consumer-relative spellings, because resolving them here would
             // commit this machine's absolute path into the adopter's own agent file.
@@ -305,6 +334,28 @@ mod tests {
         assert!(queue_source(&dir, &["queue-kit".to_string()])
             .expect("the template was not resolved")
             .ends_with("queue-kit/templates/TASK-QUEUE.md"));
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    // spec: installer/SPEC.md §The personal install — the process-record test reads the kit alone:
+    // a workflow-directory seed or the queue template marks the kit, and a kit seeding elsewhere or
+    // reading the queue it does not ship passes
+    #[test]
+    fn a_process_record_is_a_workflow_seed_or_the_queue_template() {
+        let dir = std::env::temp_dir().join(format!("cw-process-record-{}", std::process::id()));
+        std::fs::remove_dir_all(&dir).ok();
+        for kit in ["gate-sdk", "canon-kit", "lifecycle-kit", "evidence-kit", "doctrine-kit"] {
+            std::fs::create_dir_all(dir.join(kit)).expect("cannot make the tree");
+        }
+        std::fs::create_dir_all(dir.join("queue-kit/templates")).expect("cannot make the tree");
+        std::fs::write(dir.join("queue-kit/templates/TASK-QUEUE.md"), "# q\n").expect("cannot write the template");
+        let record = |kit: &str| process_record(kit, &dir.join(kit));
+        assert_eq!(record("lifecycle-kit"), Some(STATE_FILE.to_string()));
+        assert!(record("evidence-kit").is_some_and(|p| crate::walk::under(WORKFLOW_DIR, &p)));
+        assert_eq!(record("queue-kit"), Some("queue-kit/templates/TASK-QUEUE.md".to_string()));
+        for kit in ["gate-sdk", "canon-kit", "doctrine-kit"] {
+            assert_eq!(record(kit), None, "{} was read as committing a process record", kit);
+        }
         std::fs::remove_dir_all(&dir).ok();
     }
 }

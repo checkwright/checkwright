@@ -536,10 +536,7 @@ fn bash_less_profile(state: &Run, p: &str, set: &[(String, String)]) -> Step {
         )));
     }
     say(&format!("{}: a clean commit passed through the installed hooks", p));
-    write(
-        &format!("{}/bash-less-plant.sh", c),
-        "#!/usr/bin/env bash\nset -o pipefail\nnames=(a b c)\nif printf \"%s\\n\" \"${names[@]}\" | grep -q b; then echo found; fi\n",
-    )?;
+    write(&format!("{}/bash-less-plant.sh", c), PIPELINE_PLANT)?;
     super::consumer::git(&c, &["add", "bash-less-plant.sh"])?;
     let r = merged_in(&programs::GIT, &["commit", "-m", "chore: add a pipeline that can lose its match"], set, &c)?;
     if r.succeeded() {
@@ -548,17 +545,12 @@ fn bash_less_profile(state: &Run, p: &str, set: &[(String, String)]) -> Step {
             p
         )));
     }
-    let gate = find_line(&out(&r), |l| l.starts_with("pre-commit: ") && l.ends_with(" failed (see above)."))
-        .map(|l| l["pre-commit: ".len()..l.len() - " failed (see above).".len()].to_string())
-        .filter(|g| !g.is_empty() && g.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-'))
-        .unwrap_or_default();
-    let list = std::fs::read_to_string(format!("{}/{}/gates.list", c, GATES_DIR)).unwrap_or_default();
-    if gate.is_empty() || !list.lines().any(|l| l == gate) {
+    let Some(gate) = refusing_gate(&out(&r), &c) else {
         return Err(failed(&r, format!(
             "{}: the refused commit was not refused by a registered gate the pre-commit hook named",
             p
         )));
-    }
+    };
     super::consumer::git(&c, &["reset", "-q", "--hard", "HEAD"])?;
     say(&format!(
         "{}: a planted shell pipeline that can lose its match was refused by {} through the installed hook",
@@ -566,6 +558,21 @@ fn bash_less_profile(state: &Run, p: &str, set: &[(String, String)]) -> Step {
     ));
     Ok(())
 }
+
+// spec: installer/SPEC.md §The consumer smoke — the gate a refused commit's pre-commit hook named,
+// held to the consumer's registry
+pub(super) fn refusing_gate(said: &str, c: &str) -> Option<String> {
+    let gate = find_line(said, |l| l.starts_with("pre-commit: ") && l.ends_with(" failed (see above)."))
+        .map(|l| l["pre-commit: ".len()..l.len() - " failed (see above).".len()].to_string())
+        .filter(|g| !g.is_empty() && g.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-'))?;
+    let list = std::fs::read_to_string(format!("{}/{}/gates.list", c, GATES_DIR)).unwrap_or_default();
+    list.lines().any(|l| l == gate).then_some(gate)
+}
+
+// spec: installer/SPEC.md §The consumer smoke — the planted defect the lattice minimum catches: a
+// shell pipeline under `pipefail` that can lose its match
+pub(super) const PIPELINE_PLANT: &str =
+    "#!/usr/bin/env bash\nset -o pipefail\nnames=(a b c)\nif printf \"%s\\n\" \"${names[@]}\" | grep -q b; then echo found; fi\n";
 
 #[cfg(test)]
 mod tests {

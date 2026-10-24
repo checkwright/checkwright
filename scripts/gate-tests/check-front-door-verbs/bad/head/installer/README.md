@@ -17,6 +17,7 @@
 | `--dry-run` | `init`, `update`, `uninstall` | print the plan |
 | `--force` | `init`, `update`, `uninstall` | overwrite |
 | `--no-commit` | `init`, `update` | leave the commit |
+| `--personal` | `init`, `update` | install untracked |
 | `--with-kit` | `init`, `update` | add a kit |
 | `--without-kit` | `init`, `update` | remove a kit |
 | `--with-gate` | `init`, `update` | add a gate |

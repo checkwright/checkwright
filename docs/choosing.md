@@ -10,7 +10,7 @@ Checkwright catches reproducible classes of unsupported claims in coding-agent d
 
 ## When it fits
 
-Checkwright fits a repository where coding agents commit and the team wants three claims caught before merge: a task marked done with no recorded test run, a skipped lifecycle stage, and a spec naming a path the tree lacks. Checkwright's checks run at commit and in CI with no agent harness, on a host where git is the one tool already required ([Requirements](requirements.md)). A team using Spec Kit or OpenSpec gets the artifacts those toolkits write held to the tree ([Spec toolkits](spec-toolkits.md)). Trying Checkwright is reversible: `demo` runs it in a scratch repository, and `uninstall` removes it ([Install](install.md)).
+Checkwright fits a repository where coding agents commit and the team wants three claims caught before merge: a task marked done with no recorded test run, a skipped lifecycle stage, and a spec naming a path the tree lacks. Checkwright's checks run at commit and in CI with no agent harness, on a host where git is the one tool already required ([Requirements](requirements.md)). A team using Spec Kit or OpenSpec gets the artifacts those toolkits write held to the tree ([Spec toolkits](spec-toolkits.md)). Trying Checkwright is reversible: `demo` runs it in a scratch repository, and `uninstall` removes it ([Install](install.md)). A developer whose project has not adopted it can run the checks on their own clone alone, untracked ([On a project that does not adopt it](install.md#on-a-project-that-does-not-adopt-it)).
 
 ## When it does not fit
 

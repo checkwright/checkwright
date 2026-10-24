@@ -98,7 +98,7 @@ Checkwright catches reproducible classes of unsupported claims in coding-agent d
 
 ## When it fits
 
-Checkwright fits a repository where coding agents commit and the team wants three claims caught before merge: a task marked done with no recorded test run, a skipped lifecycle stage, and a spec naming a path the tree lacks. Checkwright's checks run at commit and in CI with no agent harness, on a host where git is the one tool already required ([Requirements](https://checkwright.dev/requirements.html)). A team using Spec Kit or OpenSpec gets the artifacts those toolkits write held to the tree ([Spec toolkits](https://checkwright.dev/spec-toolkits.html)). Trying Checkwright is reversible: `demo` runs it in a scratch repository, and `uninstall` removes it ([Install](https://checkwright.dev/install.html)).
+Checkwright fits a repository where coding agents commit and the team wants three claims caught before merge: a task marked done with no recorded test run, a skipped lifecycle stage, and a spec naming a path the tree lacks. Checkwright's checks run at commit and in CI with no agent harness, on a host where git is the one tool already required ([Requirements](https://checkwright.dev/requirements.html)). A team using Spec Kit or OpenSpec gets the artifacts those toolkits write held to the tree ([Spec toolkits](https://checkwright.dev/spec-toolkits.html)). Trying Checkwright is reversible: `demo` runs it in a scratch repository, and `uninstall` removes it ([Install](https://checkwright.dev/install.html)). A developer whose project has not adopted it can run the checks on their own clone alone, untracked ([On a project that does not adopt it](https://checkwright.dev/install.html#on-a-project-that-does-not-adopt-it)).
 
 ## When it does not fit
 
@@ -462,11 +462,15 @@ Choose a profile with `--profile`. If another toolkit writes your specs, pass `-
 
 Moving to a profile that contains yours only adds. Re-running it is safe: it reports files you have edited instead of overwriting them, unless you pass `--force`. `--dry-run` prints the plan and writes nothing.
 
-**Choosing kits and gates.** `--with-kit` and `--without-kit` add a kit to your profile or take one out. `--with-gate` and `--without-gate` do the same for a gate. Each repeats. `checkwright.lock` records them, so a re-run keeps them until you pass new ones or `--no-selection`. `gate-sdk` stays, since it runs the others. To replace a gate with your own, put a gate of the same name in your gates directory. It runs instead of the kit's, and `init` never overwrites it.
+**Choosing kits and gates.** `--with-kit` and `--without-kit` add a kit to your profile or take one out. `--with-gate` and `--without-gate` do the same for a gate. Each repeats. `checkwright.lock` records them, so a re-run keeps them until you pass new ones or `--no-selection`. To replace a gate with your own, put a gate of the same name in your gates directory. It runs instead of the kit's, and `init` never overwrites it.
+
+### On a project that does not adopt it
+
+`checkwright init --personal` installs the checks for you alone. It writes the same files untracked, lists them in this clone's `.git/info/exclude`, and commits nothing, so the project's tree and history stay as they were. Your hooks and `--run` check your own commits in this clone, and the project's CI runs none of it. `prove` reads `HEAD`, so it has nothing to read here. It takes `starter` or `prose`: the workflow commits its own record, so a profile carrying it is refused. `uninstall` removes the files and the exclude lines.
 
 ### Prove it on your tree
 
-`checkwright prove` makes the claim `demo` shows caught, a task marked done with no evidence behind it, on a scratch clone of your `HEAD`. It runs your own battery there before and after the claim and reports what your install enforces at commit and in CI, and what it leaves inactive. It writes nothing here. It asks nothing either, so a coding agent can run it unattended. The `then:` line `init` prints runs it through the binary `init` placed, and the [maintenance verbs](https://checkwright.dev/maintenance.html#managing) spell it for each route.
+`checkwright prove` makes the claim `demo` shows caught, a task marked done with no evidence behind it, on a scratch clone of your `HEAD`. It runs your own battery there before and after the claim and reports what your install enforces at commit and in CI, and what it leaves inactive, writing and asking nothing here, so a coding agent can run it unattended. The `then:` line `init` prints runs it through the binary `init` placed, and the [maintenance verbs](https://checkwright.dev/maintenance.html#managing) spell it for each route.
 
 Its last line is the verdict, and its exit status says the same: `PROVE: held`, exit `0`, with the minutes since the install commit, or `PROVE: not held`, exit `1`, with the cause. `starter`, the default, keeps no task queue, so it is not held; on a tree with no task list either, a `help:` line names the profile that adds one.
 
@@ -647,7 +651,7 @@ Source: https://checkwright.dev/maintenance.html
 - `checkwright diff` lists the vendored files you have changed. Exit `0` means none.
 - `checkwright prove` shows what your install enforces and whether a task claimed done with no evidence is caught on your `HEAD`. Exit `0` means held. The `then:` line `init` printed runs it through the binary `init` placed.
 - `checkwright update` upgrades the install to the version you are running.
-- `checkwright uninstall` reverses the install in one commit.
+- `checkwright uninstall` reverses the install in one commit, or with none for a personal install.
 
 `uninstall` needs no version: any release that reads your `checkwright.lock` runs it, so the one line reverses an install an older release made. `uninstall` removes only files `init` wrote and you left untouched. It keeps and reports any you edited, and never removes a file you wrote. Run it with `--dry-run` first to see the plan. A remedy block changes your machine and not your repository, so `uninstall` leaves it in place.
 

@@ -12,6 +12,7 @@ mod consumer;
 mod lines;
 mod masked;
 mod moves;
+mod personal;
 mod profiles;
 mod report;
 mod roster;

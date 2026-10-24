@@ -120,7 +120,8 @@ fn prove(scratch: &mut Scratch) -> Outcome {
         lock::FILE
     );
     let Ok(lock_text) = git(&root, &["show", &format!("HEAD:{}", lock::FILE)]) else {
-        return refuse_with(format!("HEAD carries no {}", lock::FILE), init_help);
+        let help = if super::personal::is_personal(&root) { personal_help(&root) } else { init_help };
+        return refuse_with(format!("HEAD carries no {}", lock::FILE), help);
     };
     let Some(manifest) = lock::Manifest::parse(&lock_text).filter(lock::Manifest::schema_ok) else {
         return refuse_with(format!("the {} at HEAD carries a schema this build does not know", lock::FILE), init_help);
@@ -213,6 +214,21 @@ fn clone_argv<'a>(source: &'a str, target: &'a str) -> [&'a str; 6] {
 // spec: installer/SPEC.md §prove — whole minutes, and a committer time ahead of the clock reads as 0
 fn minutes_since(then: i64, now: i64) -> i64 {
     (now - then).max(0) / 60
+}
+
+// spec: installer/SPEC.md §The personal install — the lockless refusal's help on a personal clone,
+// naming the placed binary's command token as the follow-up block spells it
+fn personal_help(root: &Path) -> String {
+    let seam = lock::Manifest::read(&lock::path(root))
+        .map(|m| m.own_file(&format!("{}/gate-sdk-config.knobs", GATES_DIR)))
+        .unwrap_or_default();
+    let door = super::seam_binary(root, &seam)
+        .map(|b| super::init::command_token(&b))
+        .unwrap_or_else(|| "the placed gate binary's".to_string());
+    format!(
+        "this clone's install is personal and commits nothing, and prove reads HEAD alone; {} --run checks the working tree instead.",
+        door
+    )
 }
 
 // spec: installer/SPEC.md §prove — a knob's path inside the repository, rebased onto the clone and

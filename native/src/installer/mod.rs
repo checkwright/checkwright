@@ -7,6 +7,7 @@ pub mod doctor;
 pub mod init;
 pub mod lock;
 pub mod payload_recipe;
+pub mod personal;
 pub mod profile;
 pub mod prove;
 pub mod recipe;
@@ -44,6 +45,7 @@ pub const FLAGS: &[(&str, &[&str])] = &[
     ("--dry-run", &["init", "update", "uninstall"]),
     ("--force", &["init", "update", "uninstall"]),
     ("--no-commit", &["init", "update", "uninstall"]),
+    ("--personal", &["init", "update"]),
     ("--with-kit", &["init", "update"]),
     ("--without-kit", &["init", "update"]),
     ("--with-gate", &["init", "update"]),
@@ -64,7 +66,13 @@ pub const AGENT_FILE: &str = "CLAUDE.md";
 // consumer-value-exempt: the layout init writes a new tree against (installer/SPEC.md §What init seeds)
 pub const QUEUE_FILE: &str = "TASK-QUEUE.md";
 // consumer-value-exempt: the layout init writes a new tree against (installer/SPEC.md §What init seeds)
+pub const WORKFLOW_DIR: &str = ".workflow";
+// consumer-value-exempt: the layout init writes a new tree against (installer/SPEC.md §What init seeds)
 pub const STATE_FILE: &str = ".workflow/WORKFLOW-STATE.txt";
+// spec: installer/SPEC.md §The personal install — the markers bounding the block in the clone's
+// `info/exclude` that makes an install personal and is its record of being so
+pub const PERSONAL_BEGIN: &str = "# checkwright:personal:begin";
+pub const PERSONAL_END: &str = "# checkwright:personal:end";
 
 // spec: installer/SPEC.md §init — the rule that an install's size is never bounded by the host's
 // argv width: every git call naming the whole roster goes through `git_batched`, so the batching is
@@ -462,5 +470,12 @@ mod tests {
         assert!(chunks(&[]).is_empty(), "an empty roster is not a call");
         let wide = vec!["x".repeat(ARGV_BATCH_BYTES * 2)];
         assert_eq!(chunks(&wide).len(), 1, "an over-wide path lost its call");
+    }
+
+    // spec: installer/SPEC.md §The personal install — the state file is a process record, so the
+    // workflow directory the refusal tests against holds it
+    #[test]
+    fn the_state_file_sits_under_the_workflow_directory() {
+        assert!(walk::under(WORKFLOW_DIR, STATE_FILE), "{} is not under {}", STATE_FILE, WORKFLOW_DIR);
     }
 }

@@ -136,11 +136,15 @@ Choose a profile with `--profile`. If another toolkit writes your specs, pass `-
 
 Moving to a profile that contains yours only adds. Re-running it is safe: it reports files you have edited instead of overwriting them, unless you pass `--force`. `--dry-run` prints the plan and writes nothing.
 
-**Choosing kits and gates.** `--with-kit` and `--without-kit` add a kit to your profile or take one out. `--with-gate` and `--without-gate` do the same for a gate. Each repeats. `checkwright.lock` records them, so a re-run keeps them until you pass new ones or `--no-selection`. `gate-sdk` stays, since it runs the others. To replace a gate with your own, put a gate of the same name in your gates directory. It runs instead of the kit's, and `init` never overwrites it.
+**Choosing kits and gates.** `--with-kit` and `--without-kit` add a kit to your profile or take one out. `--with-gate` and `--without-gate` do the same for a gate. Each repeats. `checkwright.lock` records them, so a re-run keeps them until you pass new ones or `--no-selection`. To replace a gate with your own, put a gate of the same name in your gates directory. It runs instead of the kit's, and `init` never overwrites it.
+
+### On a project that does not adopt it
+
+`checkwright init --personal` installs the checks for you alone. It writes the same files untracked, lists them in this clone's `.git/info/exclude`, and commits nothing, so the project's tree and history stay as they were. Your hooks and `--run` check your own commits in this clone, and the project's CI runs none of it. `prove` reads `HEAD`, so it has nothing to read here. It takes `starter` or `prose`: the workflow commits its own record, so a profile carrying it is refused. `uninstall` removes the files and the exclude lines.
 
 ### Prove it on your tree
 
-`checkwright prove` makes the claim `demo` shows caught, a task marked done with no evidence behind it, on a scratch clone of your `HEAD`. It runs your own battery there before and after the claim and reports what your install enforces at commit and in CI, and what it leaves inactive. It writes nothing here. It asks nothing either, so a coding agent can run it unattended. The `then:` line `init` prints runs it through the binary `init` placed, and the [maintenance verbs](maintenance.md#managing) spell it for each route.
+`checkwright prove` makes the claim `demo` shows caught, a task marked done with no evidence behind it, on a scratch clone of your `HEAD`. It runs your own battery there before and after the claim and reports what your install enforces at commit and in CI, and what it leaves inactive, writing and asking nothing here, so a coding agent can run it unattended. The `then:` line `init` prints runs it through the binary `init` placed, and the [maintenance verbs](maintenance.md#managing) spell it for each route.
 
 Its last line is the verdict, and its exit status says the same: `PROVE: held`, exit `0`, with the minutes since the install commit, or `PROVE: not held`, exit `1`, with the cause. `starter`, the default, keeps no task queue, so it is not held; on a tree with no task list either, a `help:` line names the profile that adds one.
 

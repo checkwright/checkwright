@@ -178,9 +178,64 @@ pub fn remove_block(path: &str, begin: &str, end: &str) -> Result<bool, String> 
     Ok(true)
 }
 
+// spec: gate-sdk/SPEC.md §lib/inject.sh — the installer writer's inverse: `remove_block`'s removal
+// plus the one blank line `install_block`'s append put before the begin marker, so a file the
+// installer appended to reads its pre-install bytes again
+pub fn uninstall_block(path: &str, begin: &str, end: &str) -> Result<bool, String> {
+    let text = fresh::read_captured(path)?;
+    let lines = fresh::file_lines(&text);
+    let Some(b) = lines.iter().position(|l| *l == begin) else {
+        return Ok(false);
+    };
+    if !lines.contains(&end) {
+        return Err(format!(
+            "{}: begin marker present but end marker missing — refusing to guess the block bounds",
+            path
+        ));
+    }
+    let head = if b > 0 && lines[b - 1].is_empty() { b - 1 } else { b };
+    let mut out = String::new();
+    for line in &lines[..head] {
+        out.push_str(line);
+        out.push('\n');
+    }
+    let mut skip = true;
+    for line in &lines[b..] {
+        if skip {
+            skip = *line != end;
+            continue;
+        }
+        out.push_str(line);
+        out.push('\n');
+    }
+    std::fs::write(path, out).map_err(|e| format!("cannot write {}: {}", path, e))?;
+    Ok(true)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — what the installer writer appended, its inverse takes
+    // back byte for byte, a re-run is a no-op, and a half-open pair refuses
+    #[test]
+    fn the_installer_writers_inverse_restores_the_pre_install_bytes() {
+        let p = std::env::temp_dir()
+            .join(format!("cw-marker-uninstall-{}.txt", std::process::id()))
+            .display()
+            .to_string();
+        for before in ["", "# a comment\n", "kept\n\n"] {
+            std::fs::write(&p, before).expect("cannot seed");
+            install_block(&p, B, E, "one\n").expect("the block was not installed");
+            install_block(&p, B, E, "two\n").expect("the block was not replaced");
+            assert_eq!(uninstall_block(&p, B, E), Ok(true));
+            assert_eq!(fresh::read_captured(&p).expect("cannot read back"), before, "from {:?}", before);
+            assert_eq!(uninstall_block(&p, B, E), Ok(false));
+        }
+        std::fs::write(&p, format!("head\n{}\na\n", B)).expect("cannot seed");
+        assert!(uninstall_block(&p, B, E).is_err());
+        std::fs::remove_file(&p).ok();
+    }
 
     const B: &str = "<!-- x:begin -->";
     const E: &str = "<!-- x:end -->";

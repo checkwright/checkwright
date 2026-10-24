@@ -18,7 +18,7 @@
 
 ### personal-adoption
 
-[spec: SPEC-personal-overlay.md] [not-icebox-eligible: 2026-10-24 operator direction wants it for the next scope; evicting it would compress that direction away]
+[spec: installer/SPEC.md] [not-icebox-eligible: 2026-10-24 operator direction wants it for the next scope; evicting it would compress that direction away]
 
 a developer wants Checkwright's gates and workflow for their own work in a repository whose project does not adopt it. Uncovered today: `init` vendors the kits in one commit and refuses an unclean worktree (installer/SPEC.md §init); docs/choosing.md frames the fit as a team's; `prove` refuses a tree with no install lock (§prove). Per-clone pieces exist: the hooks are placed, never tracked, and `init --no-commit` skips the commit.
 

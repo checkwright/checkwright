@@ -14,7 +14,7 @@ nav_child_order: 3
 - `checkwright diff` lists the vendored files you have changed. Exit `0` means none.
 - `checkwright prove` shows what your install enforces and whether a task claimed done with no evidence is caught on your `HEAD`. Exit `0` means held. The `then:` line `init` printed runs it through the binary `init` placed.
 - `checkwright update` upgrades the install to the version you are running.
-- `checkwright uninstall` reverses the install in one commit.
+- `checkwright uninstall` reverses the install in one commit, or with none for a personal install.
 
 `uninstall` needs no version: any release that reads your `checkwright.lock` runs it, so the one line reverses an install an older release made. `uninstall` removes only files `init` wrote and you left untouched. It keeps and reports any you edited, and never removes a file you wrote. Run it with `--dry-run` first to see the plan. A remedy block changes your machine and not your repository, so `uninstall` leaves it in place.
 
