@@ -304,3 +304,4 @@ Knowledge-friction counts are excluded: their log is gitignored per-iteration sc
 | scratch-confinement-releases-table-pass | sc sp · b v c | 3f/3d | 1 · ≤0d | 21s clean | 156 |
 | foreign-harness-write-path-pass | sc sp a b v c | 5f/0d | 4 · ≤0d | 21s clean | 156 |
 | front-door-patch-pass | sc sp · b v c | 2f/1d | 1 · ≤0d | 21s clean | 156 |
+| personal-overlay-pass | sc sp a b v c | 5f/0d | 3 · ≤0d | 21s clean | 156 |

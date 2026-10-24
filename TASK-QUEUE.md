@@ -174,6 +174,26 @@ the workflow half of `personal-adoption`: a developer runs the stage machine on 
 
 **Cost while deferred:** the workflow half stays usable only by vendoring into a tree the developer does not own, or by stripping its commits by hand before an upstream pull request. Filed 2026-10-24 by personal-overlay-pass' scope, split from personal-adoption (operator direction 2026-10-24, lead-relayed, not a ruling). Owner lookup: `export`, `fork`, `personal branch` in this file, none beyond the parent; owner installer/SPEC.md.
 
+### personal-install-prove
+
+[cost: event/low] [surface: installer]
+
+`prove` refuses over a personal install (installer/SPEC.md §The personal install): it clones `HEAD`, and a personal install commits no `checkwright.lock`, so the clone carries no lock and no kits.
+
+**Deliverable:** a feature: copy the install roster the exclude block names into `prove`'s clone so it proves the working tree's install over `HEAD`'s tracked content, or state why it should stay refused; the personal arm's `prove` step moves with it.
+
+**Cost while deferred:** a personal adopter gets the battery and the hooks but no `prove` verdict. Filed 2026-10-24 by personal-overlay-pass' close, draining a gap bullet. Re-verified there: §The personal install states the refusal and the personal arm's step 4 asserts it; the landed parent's deliverable named the roster copy as a costed widening. Owner lookup: `prove`, `personal` in this file and the disposed-findings record, none beyond [personal-workflow-export](#personal-workflow-export), a different half; owner installer/SPEC.md §prove.
+
+### hookspath-clobber
+
+[cost: event/high] [surface: gate-sdk]
+
+`--install-hooks` writes `core.hooksPath` unconditionally (`native/src/emit/install_hooks.rs`, the `config` call), so a clone whose `core.hooksPath` already names the project's own hooks directory stops running those hooks without a word. gate-sdk/SPEC.md §install-hooks says an adopter's existing hooks are not overwritten, which holds for git's default `hooks` directory and not for a hooks path already set.
+
+**Deliverable:** a fix with a design choice: refuse, warn naming the prior value, or chain to the prior directory when `core.hooksPath` names a directory other than `gate-hooks`; the choice lands in §install-hooks with a unit test, and the personal install's front door states it.
+
+**Cost while deferred:** a project already running hooks through `core.hooksPath` (husky and its kin) loses them in that clone until someone notices, and a personal install on a non-adopting project hits this most. Filed 2026-10-24 by personal-overlay-pass' close, draining a gap bullet. Re-verified there: the write is unconditional and §install-hooks's not-overwritten claim covers only the default directory. Owner lookup: `hooksPath`, `install-hooks` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §install-hooks.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
