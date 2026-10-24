@@ -142,6 +142,17 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
             ));
         }
     }
+    // spec: installer/SPEC.md §uninstall — the block step's half-open refusal, read before the
+    // first removal
+    if personal {
+        super::personal::check(&root).map_err(|e| {
+            refuse(
+                format!("could not remove the personal install's exclude block: {}", e),
+                "nothing was removed. Restore this worktree's end marker in the exclude file, or delete its begin line, then re-run.",
+                2,
+            )
+        })?;
+    }
 
     let profile = manifest.field("profile");
     let version = manifest.field("version");

@@ -148,6 +148,7 @@ pub(super) fn personal(state: &mut Run) -> Step {
     refused(state, "no-commit", &["init", "--personal", "--no-commit"], "--personal beside --no-commit", Plant::Nothing)?;
     refused(state, "half-open", &["init", "--personal", "--profile", &min], "end marker missing", Plant::HalfOpen)?;
 
+    uninstall_half_open_refused(state, &c, &exclude)?;
     let before = commits(&c)?;
     let m = state.verb(&c, &["uninstall"])?;
     if !m.succeeded() || commits(&c)? != before {
@@ -186,6 +187,31 @@ fn live_hook_refused(c: &str, block: &[String], set: &[(String, String)]) -> Ste
         ));
     }
     say("hooks: --install-hooks over a live pre-commit exit 2 naming it, nothing placed");
+    Ok(())
+}
+
+// spec: installer/SPEC.md §The consumer smoke — uninstall over the block with its end marker deleted
+// exits 2 naming it and removes nothing; the end marker is restored for the reversal
+fn uninstall_half_open_refused(state: &Run, c: &str, exclude: &str) -> Step {
+    let whole = read(exclude);
+    let end = format!("{}\n", crate::installer::PERSONAL_END);
+    if !whole.contains(&end) {
+        return Err(fail("personal arm: the exclude file carries no end marker to delete"));
+    }
+    let damaged = whole.replacen(&end, "", 1);
+    write(exclude, &damaged)?;
+    let lock = format!("{}/checkwright.lock", c);
+    let (porcelain0, lock0) = (porcelain(c)?, read(&lock));
+    let m = state.verb(c, &["uninstall"])?;
+    let held = porcelain(c)? == porcelain0 && read(&lock) == lock0 && !lock0.is_empty() && read(exclude) == damaged;
+    write(exclude, &whole)?;
+    if m.code() != Some(2) || !out(&m).contains("end marker missing") || !held {
+        return Err(failed(
+            &m,
+            "personal arm: uninstall over a block missing its end marker did not exit 2 naming it with the porcelain, the manifest and the exclude file unchanged",
+        ));
+    }
+    say("refusal: uninstall over a block missing its end marker exit 2, naming it, nothing removed");
     Ok(())
 }
 
