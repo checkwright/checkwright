@@ -1,14 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: front-door-patch-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-10-24, lead-relayed, not a ruling; the iteration opened undirected):** option (a) as scope proposed. The feature for spec to author and pair is `npx-native-windows-route`. The debt is `front-door-npm-visibility-wait`, `prove-front-door-restoration` and `selection-probe-bare-auth`. The observe half of the two front-door units is split off as the deferred `front-door-patch-observed`. The close cuts the v0.32.1 patch release. Stages are scope, spec, build, validate and close, with no align unless spec's amendment spans two component dirs. Drain 3 against inflow 1.2; the set is bundled on the published front door.
-
-  **Push need (2026-10-24, inside the budget):** 2 against 2, the closing push and the v0.32.1 tag push. There is no mid-iteration push: the closing push's `gates` run carries `install-smoke-pwsh-windows`, which witnesses `npx-native-windows-route`'s shape before the tag. **On a red there (operator direction 2026-10-24, lead-relayed, not a ruling):** close first reads the step's cause. A cause in the bootstrap's own code is repaired in (B) within the two unasked fix pushes. A shim `sh` route that does not reach the bootstrap means building delta 9, shape (A). If delta 9 is beyond close's tier, the v0.32.1 tag is withheld and delta 9 is filed. Delta 9's text: `git show c5a43ac46^:installer/SPEC-npx-windows-route.md`.
 
 ---
 
