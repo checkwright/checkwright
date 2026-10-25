@@ -38,14 +38,6 @@ Under the split lead posture, a scope session resumed as the intent oracle after
 
 ## Technical Debt
 
-### marker-block-final-newline
-
-`install_block` and `uninstall_block` in `native/src/marker.rs` re-terminate an unterminated last line. (a) An exclude file holding `keep` with no newline, given personal installs in worktrees A then B and removals A then B, ends `keep\n`: A's removal keeps the newline B follows, so the writer meets gate-sdk/SPEC.md §lib/inject.sh's end-of-file condition while the personal install's pre-install-bytes promise fails for a non-LIFO removal. (b) Both rebuilds push `\n` after every kept line, so another block whose end marker is an unterminated last line gains a newline when this worktree's block is rewritten, against the promise that every other block stays byte-identical; the landed test compares only the extracted body.
-
-**Deliverable:** carry the input's final-newline state through both rebuilds and record which separator an append wrote, with a byte-level case for each half.
-
-**Cost while deferred:** a stray trailing newline in a hand-edited or multi-worktree exclude file. Filed 2026-10-25 by personal-install-hardening-pass' close (second-vendor review, read off source), drained from the gap inbox. Half (a) is read off source; its byte-level case runs it. Owner lookup: `newline`, `marker` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh.
-
 ### personal-exclude-crlf
 
 The personal install's exclude file carries two unstated assumptions. (a) Markers match as whole LF-split lines (`fresh::file_lines` keeps a CR), so a CRLF-converted exclude file hides an unkeyed block from mode detection and the half-open check, and an explicit `init --personal` appends a second block. (b) Two worktrees' runs read and rewrite the one shared exclude file with no lock, so concurrent runs can drop one worktree's block.
@@ -925,4 +917,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 ## Done
 
 - hookspath-prior-physical
+- marker-block-final-newline
 

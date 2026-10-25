@@ -134,8 +134,17 @@ pub fn install_block(path: &str, begin: &str, end: &str, body: &str) -> Result<S
             out.push('\n');
         }
     }
+    if !terminated(&text) {
+        out.pop();
+    }
     std::fs::write(path, out).map_err(|e| format!("cannot write {}: {}", path, e))?;
     Ok("replaced".to_string())
+}
+
+// spec: gate-sdk/SPEC.md §lib/inject.sh — a rebuild ends terminated iff its input did, so a block
+// another writer left as an unterminated last line stays byte-identical
+fn terminated(text: &str) -> bool {
+    text.is_empty() || text.ends_with('\n')
 }
 
 // spec: gate-sdk/SPEC.md §lib/inject.sh — the installer writer's refusal, readable before a
@@ -181,6 +190,9 @@ pub fn remove_block(path: &str, begin: &str, end: &str) -> Result<bool, String> 
             out.push('\n');
         }
     }
+    if !terminated(&text) {
+        out.pop();
+    }
     std::fs::write(path, out).map_err(|e| format!("cannot write {}: {}", path, e))?;
     Ok(true)
 }
@@ -201,21 +213,25 @@ pub fn uninstall_block(path: &str, begin: &str, end: &str) -> Result<bool, Strin
         out.push_str(line);
         out.push('\n');
     }
-    let mut skip = true;
-    let mut tail = false;
-    for line in &lines[b..] {
-        if skip {
-            skip = *line != end;
-            continue;
-        }
-        tail = true;
+    let rest = &lines[b..];
+    let mut tail = rest.iter().position(|l| *l == end).map_or(&[][..], |i| &rest[i + 1..]);
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — a newline this block's append put on an unterminated
+    // line stays while lines follow, and a blank line directly after the block goes in its place
+    if head == b && b > 0 && tail.first().is_some_and(|l| l.is_empty()) {
+        tail = &tail[1..];
+    }
+    for line in tail {
         out.push_str(line);
         out.push('\n');
     }
     // spec: gate-sdk/SPEC.md §lib/inject.sh — an append onto an unterminated last line wrote the
     // newline that terminates it rather than a blank line, so that newline goes while the block
     // still ends the file
-    if head == b && b > 0 && !tail {
+    if tail.is_empty() {
+        if head == b && b > 0 {
+            out.pop();
+        }
+    } else if !terminated(&text) {
         out.pop();
     }
     std::fs::write(path, out).map_err(|e| format!("cannot write {}: {}", path, e))?;
@@ -256,8 +272,60 @@ mod tests {
         std::fs::remove_file(&p).ok();
     }
 
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — two blocks installed in turn read the pre-install bytes
+    // again whichever order they are removed in, an unterminated last line included
+    #[test]
+    fn two_blocks_removed_in_either_order_restore_the_pre_install_bytes() {
+        let p = std::env::temp_dir()
+            .join(format!("cw-marker-two-{}.txt", std::process::id()))
+            .display()
+            .to_string();
+        for before in ["", "# a comment\n", "kept\n\n", "keep", "two\nlines"] {
+            for (first, second) in [((B, E), (B2, E2)), ((B2, E2), (B, E))] {
+                std::fs::write(&p, before).expect("cannot seed");
+                install_block(&p, B, E, "a\n").expect("the first block was not installed");
+                install_block(&p, B2, E2, "b\n").expect("the second block was not installed");
+                assert_eq!(uninstall_block(&p, first.0, first.1), Ok(true));
+                assert_eq!(uninstall_block(&p, second.0, second.1), Ok(true));
+                assert_eq!(
+                    fresh::read_captured(&p).expect("cannot read back"),
+                    before,
+                    "from {:?}, {} removed first",
+                    before,
+                    first.0
+                );
+            }
+        }
+        std::fs::remove_file(&p).ok();
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — another block whose end marker is an unterminated last
+    // line keeps its bytes through each rebuild of this one
+    #[test]
+    fn an_unterminated_last_line_stays_unterminated_through_every_rebuild() {
+        let p = std::env::temp_dir()
+            .join(format!("cw-marker-unterminated-{}.txt", std::process::id()))
+            .display()
+            .to_string();
+        let seed = format!("head\n{}\nold\n{}\n\n{}\nb\n{}", B, E, B2, E2);
+        std::fs::write(&p, &seed).expect("cannot seed");
+        assert_eq!(install_block(&p, B, E, "new\n"), Ok("replaced".to_string()));
+        assert_eq!(
+            fresh::read_captured(&p).expect("cannot read back"),
+            format!("head\n{}\nnew\n{}\n\n{}\nb\n{}", B, E, B2, E2)
+        );
+        assert_eq!(uninstall_block(&p, B, E), Ok(true));
+        assert_eq!(fresh::read_captured(&p).expect("cannot read back"), format!("head\n{}\nb\n{}", B2, E2));
+        std::fs::write(&p, &seed).expect("cannot reseed");
+        assert_eq!(remove_block(&p, B, E), Ok(true));
+        assert_eq!(fresh::read_captured(&p).expect("cannot read back"), format!("head\n\n{}\nb\n{}", B2, E2));
+        std::fs::remove_file(&p).ok();
+    }
+
     const B: &str = "<!-- x:begin -->";
     const E: &str = "<!-- x:end -->";
+    const B2: &str = "<!-- y:begin -->";
+    const E2: &str = "<!-- y:end -->";
 
     // spec: gate-sdk/SPEC.md §lib/inject.sh — the removal is idempotent and leaves the rest of the
     // file alone; a begin marker without its end refuses rather than guessing the bounds.
