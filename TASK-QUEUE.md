@@ -216,13 +216,13 @@ init and uninstall cannot tell a missing git identity from a hook's red at their
 
 [cost: event/low] [surface: gate-sdk]
 
-`--install-hooks` records a non-UTF-8 local `core.hooksPath` lossily: `prior` in native/src/emit/install_hooks.rs decodes git's output with `String::from_utf8_lossy`, so the chain record holds U+FFFD and the restore line sets a different value back, against gate-sdk/SPEC.md §install-hooks' "pastes as itself". Not folded into `restore-line-fidelity`, which it would widen (oracle decision, lead decision to file, 2026-10-25, lead-relayed, not a ruling).
+`--install-hooks` records a non-UTF-8 `core.hooksPath` lossily: `local_hooks_path` and `prior` in native/src/emit/install_hooks.rs decode git's output with `String::from_utf8_lossy`, so the chain record holds U+FFFD and the restore line sets a different value back, against gate-sdk/SPEC.md §install-hooks' "pastes as itself". Not folded into `restore-line-fidelity`, which it would widen (oracle decision, lead decision to file, 2026-10-25, lead-relayed, not a ruling).
 
 **Deliverable:** design-pending: a strict decode refused beside the line-break refusal (the likely remedy), or a byte-preserving record and restore line.
 
 **Inferred, not run:** the restore line sets a different value back — set a non-UTF-8 local core.hooksPath in a scratch repo, run `--install-hooks`, read its chain record and restore line
 
-**Cost while deferred:** an adopter with a non-UTF-8 hooks path is advised a restore that points git elsewhere. Filed 2026-10-25 by install-commit-hooks-pass' close from a gap bullet of that date; re-verified there: the lossy decode in `prior`, which the bullet named `local_hooks_path`. Owner lookup: `from_utf8_lossy`, `non-UTF`, `hooksPath`, `restore line` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §install-hooks.
+**Cost while deferred:** an adopter with a non-UTF-8 hooks path is advised a restore that points git elsewhere. Filed 2026-10-25 by install-commit-hooks-pass' close from a gap bullet of that date; re-verified there: both lossy decodes. Owner lookup: `from_utf8_lossy`, `non-UTF`, `hooksPath`, `restore line` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §install-hooks.
 
 ## Icebox
 
