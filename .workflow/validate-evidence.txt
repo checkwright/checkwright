@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+install-commit-hooks-pass gates sha256=ca9d4e1716c3adfabcfd5556ed3e1819be13b600d04fb12789091ffddf84a93d pass=156 fail=0 ignore=0 verdict=clean 2026-10-25
+install-commit-hooks-pass gate_sdk sha256=c1ad68813979393b485d2b07b7aafc72953e0f2453bed750b8e8ee5dd3711eae pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+install-commit-hooks-pass canon_kit sha256=7da861c196258fd00b91559ec77ed8c768822bd5bde1ce22c3191410addd736c pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+install-commit-hooks-pass context_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+install-commit-hooks-pass delegation_kit sha256=e8b7dacc5b3a03c2084bd61274ee3c701400be4001eeaafa4126bc7f4b710363 pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+install-commit-hooks-pass doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+install-commit-hooks-pass evidence_kit sha256=c62871f8123949178b90372d234262f4c133b06c830e8faa9bbb9af4d2767fea pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+install-commit-hooks-pass guard_kit sha256=6cb4ff2f4bd80b6561bd33590971d82cddcaa430595db7b5b0fefd800ace387b pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+install-commit-hooks-pass lifecycle_kit sha256=83b0f30c7091e60a96eac9d498bf22cc7766ac4d472b56501a4777e0e6507c4c pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+install-commit-hooks-pass queue_kit sha256=a4c89486a636a6d9c43ded5bbbb06f21bd7c7b3db7a8a330bdcf89eb952b9f7d pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+install-commit-hooks-pass site_kit sha256=9a315d2c0239c08b3c5d4fb7435d5c8a4f3a1faf11c4cdffd9788f2249ba03eb pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+install-commit-hooks-pass scripts sha256=479e481bd1d4c0da197db543326cac0c1fb2f54141758bc2821fef6b02dd543e pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+install-commit-hooks-pass guard_tests sha256=13a010dc18b6a1f9980ff8efb9e7220f407fce43aa2d0f3394a593247e43c367 pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+install-commit-hooks-pass demo sha256=c9ae63edef618792a68b2bd337116ca619800395cbda44863e41086ca49e4df8 pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+install-commit-hooks-pass installer_smoke sha256=ebd0bc4ecbbbc578a07d29ad967df690f7f5c13f9aa9817490f3d128ec46643b pass=30 fail=0 ignore=0 verdict=clean 2026-10-25
+install-commit-hooks-pass consumer_smoke sha256=02b004895002dd748e1cc8aa34085259969780e5d97b2d9d759090f9400b5065 pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+install-commit-hooks-pass upgrade sha256=f9904224c71e2cfa63c35ba15898f60aac13574f66d8d8c529c7dd3e7c400a5d pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+install-commit-hooks-pass agents_md_smoke sha256=2f1c2bc25040a8d0d246378b032198b82f1bcdf61f9f1ee504924c9db4e2e66c pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+install-commit-hooks-pass index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+install-commit-hooks-pass native_crate sha256=60bf59500761882fa3ecc70d2a07d51ba1fbd6936fc833c66d0577f8bcfceb81 pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+install-commit-hooks-pass projection_witness sha256=c359fbe53dfc2eb22ec6e11d1b332819949b19d5d884cac7c34728619527b734 pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
