@@ -155,7 +155,7 @@ graph LR
     n372["gate-sdk/templates/*.list"]
     n373["gate-sdk/templates/*.md"]
     n374["gate-sdk/templates/*.sh"]
-    n375["gate-sdk/templates/SPEC-*.md"]
+    n375["gate-sdk/templates/amendment.md"]
   end
   subgraph k_lifecycle["lifecycle-kit"]
     n411["lifecycle-kit/*.gate"]
@@ -186,7 +186,7 @@ graph LR
     n436["lifecycle-kit/templates/*.list"]
     n437["lifecycle-kit/templates/*.md"]
     n438["lifecycle-kit/templates/*.sh"]
-    n439["lifecycle-kit/templates/SPEC-*.md"]
+    n439["lifecycle-kit/templates/amendment.md"]
     n440["lifecycle-kit/templates/stages/*.md"]
   end
   subgraph k_queue["queue-kit"]
@@ -218,7 +218,7 @@ graph LR
     n699["queue-kit/templates/*.list"]
     n700["queue-kit/templates/*.md"]
     n701["queue-kit/templates/*.sh"]
-    n702["queue-kit/templates/SPEC-*.md"]
+    n702["queue-kit/templates/amendment.md"]
   end
   subgraph k_canon["canon-kit"]
     n141["canon-kit/*.gate"]
@@ -249,7 +249,7 @@ graph LR
     n166["canon-kit/templates/*.list"]
     n167["canon-kit/templates/*.md"]
     n168["canon-kit/templates/*.sh"]
-    n169["canon-kit/templates/SPEC-*.md"]
+    n169["canon-kit/templates/amendment.md"]
   end
   subgraph k_guard["guard-kit"]
     n376["guard-kit/*.gate"]
@@ -280,7 +280,7 @@ graph LR
     n401["guard-kit/templates/*.list"]
     n402["guard-kit/templates/*.md"]
     n403["guard-kit/templates/*.sh"]
-    n404["guard-kit/templates/SPEC-*.md"]
+    n404["guard-kit/templates/amendment.md"]
     n405["guard-kit/templates/settings-hooks.json"]
   end
   subgraph k_delegation["delegation-kit"]
@@ -312,8 +312,8 @@ graph LR
     n228["delegation-kit/templates/*.list"]
     n229["delegation-kit/templates/*.md"]
     n230["delegation-kit/templates/*.sh"]
-    n231["delegation-kit/templates/SPEC-*.md"]
-    n232["delegation-kit/templates/agent-execution.md"]
+    n231["delegation-kit/templates/agent-execution.md"]
+    n232["delegation-kit/templates/amendment.md"]
   end
   subgraph k_context["context-kit"]
     n174["context-kit/*.gate"]
@@ -344,7 +344,7 @@ graph LR
     n199["context-kit/templates/*.list"]
     n200["context-kit/templates/*.md"]
     n201["context-kit/templates/*.sh"]
-    n202["context-kit/templates/SPEC-*.md"]
+    n202["context-kit/templates/amendment.md"]
   end
   subgraph k_shared["shared / consumer surfaces"]
     n0["*"]
@@ -547,7 +547,7 @@ graph LR
     n285["doctrine-kit/templates/*.list"]
     n286["doctrine-kit/templates/*.md"]
     n287["doctrine-kit/templates/*.sh"]
-    n288["doctrine-kit/templates/SPEC-*.md"]
+    n288["doctrine-kit/templates/amendment.md"]
     n289["drift-kit/*.gate"]
     n290["drift-kit/*.ps1"]
     n291["drift-kit/*.sh"]
@@ -576,7 +576,7 @@ graph LR
     n314["drift-kit/templates/*.list"]
     n315["drift-kit/templates/*.md"]
     n316["drift-kit/templates/*.sh"]
-    n317["drift-kit/templates/SPEC-*.md"]
+    n317["drift-kit/templates/amendment.md"]
     n318["evidence-kit/*.gate"]
     n319["evidence-kit/*.ps1"]
     n320["evidence-kit/*.sh"]
@@ -605,7 +605,7 @@ graph LR
     n343["evidence-kit/templates/*.list"]
     n344["evidence-kit/templates/*.md"]
     n345["evidence-kit/templates/*.sh"]
-    n346["evidence-kit/templates/SPEC-*.md"]
+    n346["evidence-kit/templates/amendment.md"]
     n406["installer/README.md"]
     n407["installer/bin/checkwright.ps1"]
     n408["installer/bin/checkwright.sh"]
@@ -890,7 +890,7 @@ graph LR
     n746["site-kit/templates/*.list"]
     n747["site-kit/templates/*.md"]
     n748["site-kit/templates/*.sh"]
-    n749["site-kit/templates/SPEC-*.md"]
+    n749["site-kit/templates/amendment.md"]
   end
   n31 -->|"check-action-gh-repo"| n30
   n31 -->|"check-action-gh-repo"| n712
@@ -934,7 +934,7 @@ graph LR
   n63 <-->|"check-amendment-queue"| n375
   n63 <-->|"check-amendment-queue"| n169
   n63 <-->|"check-amendment-queue"| n202
-  n63 <-->|"check-amendment-queue"| n231
+  n63 <-->|"check-amendment-queue"| n232
   n63 <-->|"check-amendment-queue"| n288
   n63 <-->|"check-amendment-queue"| n317
   n63 <-->|"check-amendment-queue"| n346
@@ -950,7 +950,7 @@ graph LR
   n61 -->|"check-amendment-retired-spelling"| n375
   n61 -->|"check-amendment-retired-spelling"| n169
   n61 -->|"check-amendment-retired-spelling"| n202
-  n61 -->|"check-amendment-retired-spelling"| n231
+  n61 -->|"check-amendment-retired-spelling"| n232
   n61 -->|"check-amendment-retired-spelling"| n288
   n61 -->|"check-amendment-retired-spelling"| n317
   n61 -->|"check-amendment-retired-spelling"| n346
@@ -967,7 +967,7 @@ graph LR
   n61 -->|"check-amendment-update-target"| n375
   n61 -->|"check-amendment-update-target"| n169
   n61 -->|"check-amendment-update-target"| n202
-  n61 -->|"check-amendment-update-target"| n231
+  n61 -->|"check-amendment-update-target"| n232
   n61 -->|"check-amendment-update-target"| n288
   n61 -->|"check-amendment-update-target"| n317
   n61 -->|"check-amendment-update-target"| n346
@@ -1853,7 +1853,7 @@ graph LR
   n112 -->|"check-graph"| n375
   n112 -->|"check-graph"| n169
   n112 -->|"check-graph"| n202
-  n112 -->|"check-graph"| n231
+  n112 -->|"check-graph"| n232
   n112 -->|"check-graph"| n288
   n112 -->|"check-graph"| n317
   n112 -->|"check-graph"| n346
@@ -2897,7 +2897,7 @@ graph LR
   n122 -->|"check-root-tiering"| n597
   n122 -->|"check-root-tiering"| n624
   n122 -->|"check-root-tiering"| n652
-  n209 -->|"check-rule-citation"| n232
+  n209 -->|"check-rule-citation"| n231
   n209 -->|"check-rule-citation"| n598
   n651 -->|"check-scratch-citation"| n63
   n651 -->|"check-scratch-citation"| n37
@@ -3053,7 +3053,7 @@ graph LR
   n60 -->|"check-spec-embedded-source"| n375
   n60 -->|"check-spec-embedded-source"| n169
   n60 -->|"check-spec-embedded-source"| n202
-  n60 -->|"check-spec-embedded-source"| n231
+  n60 -->|"check-spec-embedded-source"| n232
   n60 -->|"check-spec-embedded-source"| n288
   n60 -->|"check-spec-embedded-source"| n317
   n60 -->|"check-spec-embedded-source"| n346
