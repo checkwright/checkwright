@@ -868,6 +868,3 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 ## Done
 
-- hook-restore-line-quoting
-- remove-block-unterminated-tail
-
