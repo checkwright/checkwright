@@ -183,13 +183,34 @@ static UPSTREAM: std::sync::OnceLock<String> = std::sync::OnceLock::new();
 
 const UPSTREAM_KNOB: &str = "GATE_SDK_UPDATE_UPSTREAM";
 
-// spec: installer/SPEC.md §The consumer smoke — the run-wide value first, so an arm's own value for
+// spec: installer/SPEC.md §The consumer smoke — the empty file every scrubbed spawn names as git's
+// global configuration, made in the scratch base before the first arm
+static GIT_GLOBAL: std::sync::OnceLock<String> = std::sync::OnceLock::new();
+
+const GIT_GLOBAL_FILE: &str = "git-global.config";
+
+// spec: installer/SPEC.md §The consumer smoke — the empty global file, and no system file off native
+// Windows
+fn git_isolation(global: &str) -> Vec<(String, String)> {
+    let mut out = vec![("GIT_CONFIG_GLOBAL".to_string(), global.to_string())];
+    if !cfg!(windows) {
+        out.push(("GIT_CONFIG_NOSYSTEM".to_string(), "1".to_string()));
+    }
+    out
+}
+
+fn with_run_wide(set: &[(String, String)]) -> Vec<(String, String)> {
+    run_wide(GIT_GLOBAL.get().map(String::as_str), UPSTREAM.get().map(String::as_str), set)
+}
+
+// spec: installer/SPEC.md §The consumer smoke — the run-wide values first, so an arm's own value for
 // the same name still wins
-fn with_upstream(set: &[(String, String)]) -> Vec<(String, String)> {
-    UPSTREAM
-        .get()
-        .map(|u| (UPSTREAM_KNOB.to_string(), u.clone()))
+fn run_wide(global: Option<&str>, upstream: Option<&str>, set: &[(String, String)]) -> Vec<(String, String)> {
+    global
+        .map(git_isolation)
+        .unwrap_or_default()
         .into_iter()
+        .chain(upstream.map(|u| (UPSTREAM_KNOB.to_string(), u.to_string())))
         .chain(set.iter().cloned())
         .collect()
 }
@@ -214,7 +235,7 @@ fn in_consumer_fed(
     input: &[u8],
 ) -> Result<proc::Completed, Outcome> {
     let unset = crate::knobs::inherited_under_static_prefixes();
-    let set = with_upstream(set);
+    let set = with_run_wide(set);
     let child = proc::ChildEnv {
         set: &set,
         unset: &unset,
@@ -227,7 +248,7 @@ fn in_consumer_fed(
 // every verb's verdict is read from
 fn merged_in(program: &Program, args: &[&str], set: &[(String, String)], cwd: &str) -> Result<proc::Merged, Outcome> {
     let unset = crate::knobs::inherited_under_static_prefixes();
-    proc::run_merged_scrubbed(program, args, &with_upstream(set), std::path::Path::new(cwd), &unset).map_err(refuse)
+    proc::run_merged_scrubbed(program, args, &with_run_wide(set), std::path::Path::new(cwd), &unset).map_err(refuse)
 }
 
 fn text(bytes: &[u8]) -> String {
@@ -291,5 +312,49 @@ mod tests {
         assert_eq!(text(done.stdout().unwrap_or_default()), "unset|set");
         let Ok(done) = joined else { panic!("the scrubbed merged spawn did not run") };
         assert_eq!(text(done.output()), "unset|set");
+    }
+
+    // spec: installer/SPEC.md §The consumer smoke — the isolation and the upstream precede the arm's
+    // own values, so an arm's value for the same name wins
+    #[test]
+    fn the_run_wide_values_precede_the_arms_own() {
+        let arm = [("GIT_CONFIG_GLOBAL".to_string(), "arm".to_string())];
+        let got = run_wide(Some("empty"), Some("up"), &arm);
+        assert_eq!(got.first(), Some(&("GIT_CONFIG_GLOBAL".to_string(), "empty".to_string())));
+        assert_eq!(got.last(), arm.last());
+        assert!(got.contains(&(UPSTREAM_KNOB.to_string(), "up".to_string())));
+        assert_eq!(
+            got.contains(&("GIT_CONFIG_NOSYSTEM".to_string(), "1".to_string())),
+            !cfg!(windows),
+            "the system file is dropped exactly off native Windows"
+        );
+        assert_eq!(run_wide(None, None, &arm), arm.to_vec());
+    }
+
+    // spec: installer/SPEC.md §The consumer smoke — a scratch consumer's git reads no host global
+    // file: a key the home's file sets reaches a bare child and not an isolated one
+    #[cfg(unix)]
+    #[test]
+    fn a_scratch_consumers_git_reads_no_host_global_file() {
+        let home = std::env::temp_dir().join(format!("cw-smoke-git-global-{}", std::process::id()));
+        std::fs::remove_dir_all(&home).ok();
+        std::fs::create_dir_all(&home).expect("cannot make the scratch home");
+        std::fs::write(home.join(".gitconfig"), "[smokeprobe]\n\tplanted = yes\n").expect("cannot write the home's file");
+        let empty = home.join(GIT_GLOBAL_FILE);
+        std::fs::write(&empty, b"").expect("cannot write the empty global file");
+        let h = home.display().to_string();
+        let base = [("HOME".to_string(), h.clone()), ("XDG_CONFIG_HOME".to_string(), h.clone())];
+        let probe = ["config", "--get", "smokeprobe.planted"];
+        let inherited = ["GIT_CONFIG_GLOBAL".to_string(), "GIT_CONFIG_NOSYSTEM".to_string()];
+        let read = |set: &[(String, String)]| {
+            let child = proc::ChildEnv { set, unset: &inherited, cwd: Some(&home) };
+            let done = proc::run_with_stdin_in(&crate::programs::GIT, &probe, b"", &child).expect("git did not spawn");
+            done.stdout().map(|o| text(o).trim().to_string()).unwrap_or_default()
+        };
+        let bare = read(&base);
+        let isolated = read(&run_wide(Some(&empty.display().to_string()), None, &base));
+        std::fs::remove_dir_all(&home).ok();
+        assert_eq!(bare, "yes", "the control child did not read the home's file, so the probe proves nothing");
+        assert_eq!(isolated, "", "an isolated child read the home's global file");
     }
 }
