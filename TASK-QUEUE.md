@@ -16,20 +16,6 @@
 
 ## Technical Debt
 
-### notification-delivery-probe
-
-[not-icebox-eligible: 2026-10-10 filed on the operator direction of 2026-10-02 and waits on a lead session with the operator present; evicting it would compress that direction away]
-
-the delivery rule under `lead-notification-wake-race`'s remedy, unprobed: does a completion notification queued during a supervisor's turn that makes no tool call wake its session, and does one tool call before the turn end drain it.
-
-**Deliverable:** that probe, run by a lead with the operator present, since a dispatched session's report is all its caller holds and no session reports on its own turn end (delegation-kit/SPEC.md §The delegation model); then lifecycle-kit/templates/lead.md §The lead model's wait clause and the agent-execution backgrounding bullet's bound confirmed or corrected against the result.
-
-**Run 2026-10-25** by a lead with the operator present, measured off the lead transcript's queue-operation and system rows. A trivial child dispatched, then a text-only turn end: the hand-back and its notification enqueued before the turn ended, and the hand-back dequeued 9 ms after it and woke the session with no operator input, the notification delivered inside the woken turn's first tool call. A child finishing 4 ms after the turn end woke it the same way; a notification queued mid-turn arrived at the next tool-result boundary. So on that harness build a queued completion does not stall a turn that ends without a tool call, and the clause's stated mechanism did not reproduce. Two samples, one build, both children worktree-isolated; the stalled 2026-10-02 transcripts may predate the hand-back channel (inferred).
-
-**What is left (operator direction 2026-10-25, lead-relayed, not a ruling):** keep lead.md's wait clause as a cheap belt and restate its ground to this measurement, the call's one read weighed against a stall's hours; check the agent-execution backgrounding bullet's bound against the same result.
-
-**Cost while deferred:** the lead's wait clause states a mechanism the probe did not reproduce, so every lead pays a tool call on a ground that reads as fact. Filed 2026-10-02 as a split at companion-tier-delegation-pass' scope, operator direction lead-relayed (not a ruling).
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -916,4 +902,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - marker-block-removal-fidelity
 - init-commit-runs-adopter-hooks
 - journal-mark-writer-unnamed
+- notification-delivery-probe
 
