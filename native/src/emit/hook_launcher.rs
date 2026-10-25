@@ -74,6 +74,11 @@ pub fn served(started_as: &str) -> Option<&'static str> {
     served_under(started_as, std::env::consts::EXE_SUFFIX)
 }
 
+// spec: gate-sdk/SPEC.md §install-hooks — a hook file's name with the host's executable suffix removed
+pub fn stem(name: &str) -> &str {
+    strip_suffix_of(name, std::env::consts::EXE_SUFFIX)
+}
+
 pub fn file_name(hook: &str) -> String {
     format!("{}{}", hook, std::env::consts::EXE_SUFFIX)
 }
@@ -169,7 +174,149 @@ fn in_file(path: &str, named_by: Option<&str>) -> Result<Option<String>, String>
     Ok(found)
 }
 
-pub fn launch(hook: &str, args: &[String]) -> i32 {
+// spec: gate-sdk/SPEC.md §install-hooks — the chain record's file, beside the placed hooks
+pub const CHAIN: &str = "chain";
+
+pub const CHAIN_DIR_KEY: &str = "dir=";
+
+pub const CHAIN_RESTORE_KEY: &str = "restore=";
+
+// spec: gate-sdk/SPEC.md §install-hooks — the prior hooks directory a placed hook chains, and the
+// local `core.hooksPath` value the restore line names
+#[derive(Debug, PartialEq)]
+pub struct Chain {
+    pub dir: PathBuf,
+    pub restore: String,
+}
+
+// spec: gate-sdk/SPEC.md §install-hooks — the restore is printed, never written: the receipt's and
+// `uninstall`'s command, the recorded local value where there is one
+pub fn restore_line(chain: Option<&Chain>) -> String {
+    match chain.map(|c| c.restore.as_str()).filter(|r| !r.is_empty()) {
+        Some(value) => format!("git config core.hooksPath {}", value),
+        None => "git config --unset core.hooksPath".to_string(),
+    }
+}
+
+// spec: gate-sdk/SPEC.md §git-hook — a record that cannot be read refuses, since reading past it
+// would drop the prior hooks silently; one naming the hooks directory itself is no record
+pub fn read_chain(hooks_dir: &Path) -> Result<Option<Chain>, String> {
+    let path = hooks_dir.join(CHAIN);
+    if path.symlink_metadata().is_err() {
+        return Ok(None);
+    }
+    let cannot = |cause: String| format!("cannot read the chain record {} ({})", path.display(), cause);
+    let text = std::fs::read_to_string(&path).map_err(|e| cannot(e.to_string()))?;
+    let field = |key: &str| text.lines().find_map(|l| l.trim_end_matches('\r').strip_prefix(key).map(str::to_string));
+    let dir = field(CHAIN_DIR_KEY).filter(|d| !d.is_empty()).ok_or_else(|| cannot(format!("no {} line", CHAIN_DIR_KEY)))?;
+    let chain = Chain { dir: PathBuf::from(dir), restore: field(CHAIN_RESTORE_KEY).unwrap_or_default() };
+    Ok((!same_dir(&chain.dir, hooks_dir)).then_some(chain))
+}
+
+// spec: gate-sdk/SPEC.md §git-hook — the start name's directory, where the chain record sits
+fn start_dir(started_as: &str) -> Option<&Path> {
+    Path::new(started_as).parent().filter(|p| !p.as_os_str().is_empty())
+}
+
+// spec: gate-sdk/SPEC.md §git-hook — a forwarding hook is the binary under a git hook's name it
+// does not serve, with the chain record beside it; any other such start name parses arms
+pub fn forward(started_as: &str) -> Option<&'static str> {
+    let name = Path::new(started_as).file_name()?.to_str()?;
+    let hook = GIT_HOOKS.iter().copied().find(|h| *h == stem(name) && !SERVED.contains(h))?;
+    start_dir(started_as)?.join(CHAIN).symlink_metadata().ok().map(|_| hook)
+}
+
+// spec: gate-sdk/SPEC.md §git-hook — the recorded directory's live hook of this name, bare ahead of
+// suffixed as git looks it up
+fn live_named(dir: &Path, hook: &str) -> Result<Option<PathBuf>, String> {
+    let names = super::install_hooks::live_hooks(dir)?;
+    Ok(names
+        .iter()
+        .find(|n| stem(n) == hook)
+        .map(|n| dir.join(n)))
+}
+
+fn chain_refusal(hook: &str, cause: &str) -> String {
+    format!("{}: {} — the hook could not run; treating as failure (not clean)", hook, cause)
+}
+
+// spec: gate-sdk/SPEC.md §git-hook — the chained start: `Ok(None)` is no record or no live hook of
+// this name, `Ok(Some(_))` the prior hook's path and status, `Err` the refusal line
+fn run_chained(hook: &str, started_as: &str, args: &[String]) -> Result<Option<(PathBuf, i32)>, String> {
+    let Some(dir) = start_dir(started_as) else {
+        return Ok(None);
+    };
+    let chain = read_chain(dir).map_err(|e| chain_refusal(hook, &e))?;
+    let Some(chain) = chain else {
+        return Ok(None);
+    };
+    let Some(path) = live_named(&chain.dir, hook).map_err(|e| chain_refusal(hook, &e))? else {
+        return Ok(None);
+    };
+    let code = start_prior(hook, &chain.dir, &path, args).map_err(|e| format!("{}: {}", hook, e))?;
+    Ok(Some((path, code)))
+}
+
+// spec: gate-sdk/SPEC.md §git-hook — on unix the prior hook starts directly, as git starts it
+#[cfg(not(windows))]
+fn start_prior(_hook: &str, _dir: &Path, path: &Path, args: &[String]) -> Result<i32, String> {
+    let argv: Vec<&str> = args.iter().map(String::as_str).collect();
+    let prior = programs::Program::consumer(programs::CHAINED_HOOK, path.display().to_string());
+    proc::run_to(&prior, &argv, &proc::Sink::Inherit)
+}
+
+// spec: gate-sdk/SPEC.md §git-hook — on native Windows git's own lookup and shebang handling start
+// it, with the standard input git gave the hook handed through a scratch file
+#[cfg(windows)]
+fn start_prior(hook: &str, dir: &Path, _path: &Path, args: &[String]) -> Result<i32, String> {
+    use std::io::Read;
+    let mut input = Vec::new();
+    std::io::stdin().read_to_end(&mut input).map_err(|e| format!("cannot read the hook's standard input: {}", e))?;
+    let file = scratch_input(&input)?;
+    let hooks_path = format!("core.hooksPath={}", dir.display());
+    let to_stdin = format!("--to-stdin={}", file.display());
+    let mut argv: Vec<&str> = vec!["-c", hooks_path.as_str(), "hook", "run", "--ignore-missing", to_stdin.as_str(), hook, "--"];
+    argv.extend(args.iter().map(String::as_str));
+    let ran = proc::run_to(&programs::GIT, &argv, &proc::Sink::Inherit);
+    let _ = std::fs::remove_file(&file);
+    ran
+}
+
+// spec: gate-sdk/SPEC.md §git-hook — the scratch file under the system temp dir, created new
+#[cfg(windows)]
+fn scratch_input(bytes: &[u8]) -> Result<PathBuf, String> {
+    use std::hash::{BuildHasher, Hasher};
+    use std::io::Write;
+    let drawn = std::collections::hash_map::RandomState::new().build_hasher().finish();
+    let file = proc::temp_base().join(format!("checkwright-chain-{}.{:016x}", std::process::id(), drawn));
+    let mut f = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&file)
+        .map_err(|e| format!("cannot create {}: {}", file.display(), e))?;
+    let written = f.write_all(bytes);
+    drop(f);
+    if let Err(e) = written {
+        let _ = std::fs::remove_file(&file);
+        return Err(format!("cannot write {}: {}", file.display(), e));
+    }
+    Ok(file)
+}
+
+// spec: gate-sdk/SPEC.md §git-hook — the forwarding hook runs the prior hook and returns its
+// status, reading no knob and starting no gate binary; with no live hook of its name it exits 0
+pub fn forward_run(hook: &str, started_as: &str, args: &[String]) -> i32 {
+    match run_chained(hook, started_as, args) {
+        Ok(Some((_, code))) => code,
+        Ok(None) => 0,
+        Err(e) => {
+            eprintln!("{}", e);
+            2
+        }
+    }
+}
+
+pub fn launch(hook: &str, started_as: &str, args: &[String]) -> i32 {
     let bin = match bin_knob() {
         Ok(b) => b,
         Err(e) => {
@@ -183,6 +330,17 @@ pub fn launch(hook: &str, args: &[String]) -> i32 {
             hook, BIN_KNOB, bin, BIN_KNOB
         );
         return 2;
+    }
+    match run_chained(hook, started_as, args) {
+        Ok(None) | Ok(Some((_, 0))) => {}
+        Ok(Some((path, code))) => {
+            eprintln!("{}: the chained hook {} exited {} — the gates did not run", hook, path.display(), code);
+            return code;
+        }
+        Err(e) => {
+            eprintln!("{}", e);
+            return 2;
+        }
     }
     let mut argv: Vec<&str> = vec!["--git-hook", hook];
     argv.extend(args.iter().map(String::as_str));
@@ -320,6 +478,64 @@ mod tests {
             assert!(e.starts_with(&format!("{}{}: ", at, lno)), "{:?} gave {}", bad, e);
         }
         assert!(missing.contains(&absent) && missing.contains("GATE_SDK_KNOB_FILE"), "{}", missing);
+    }
+
+    // spec: gate-sdk/SPEC.md §git-hook — a well-formed record reads, one with no `dir=` line or that
+    // cannot be read refuses naming its path, and one naming its own directory is no record
+    #[test]
+    fn the_chain_record_reads_refuses_or_is_none() {
+        let d = scratch("chain");
+        let (hooks, theirs) = (d.join("gate-hooks"), d.join("husky"));
+        std::fs::create_dir_all(&hooks).expect("hooks");
+        std::fs::create_dir_all(&theirs).expect("theirs");
+        let absent = read_chain(&hooks);
+        let record = hooks.join(CHAIN);
+        std::fs::write(&record, format!("dir={}\r\nrestore=.husky\r\n", theirs.display())).expect("write");
+        let formed = read_chain(&hooks);
+        std::fs::write(&record, "restore=.husky\n").expect("write");
+        let no_dir = read_chain(&hooks);
+        std::fs::write(&record, format!("dir={}\n", hooks.display())).expect("write");
+        let own = read_chain(&hooks);
+        std::fs::remove_file(&record).expect("remove");
+        std::fs::create_dir(&record).expect("a record that cannot be read");
+        let unreadable = read_chain(&hooks);
+        let _ = std::fs::remove_dir_all(&d);
+        assert_eq!(absent, Ok(None));
+        assert_eq!(formed, Ok(Some(Chain { dir: theirs, restore: ".husky".to_string() })));
+        let at = format!("cannot read the chain record {}", record.display());
+        assert!(no_dir.as_ref().is_err_and(|e| e.starts_with(&at) && e.contains("no dir= line")), "{:?}", no_dir);
+        assert_eq!(own, Ok(None));
+        assert!(unreadable.as_ref().is_err_and(|e| e.starts_with(&at)), "{:?}", unreadable);
+    }
+
+    // spec: gate-sdk/SPEC.md §git-hook — a git hook's name the gates do not serve is a forwarding
+    // hook only with the record beside it; a served name and a name that is no hook never are
+    #[test]
+    fn a_forwarding_hook_is_a_non_served_hook_name_beside_the_record() {
+        let d = scratch("forward");
+        let at = |name: &str| d.join(file_name(name)).display().to_string();
+        let without = forward(&at("post-merge"));
+        std::fs::write(d.join(CHAIN), "dir=/elsewhere\n").expect("record");
+        let beside = forward(&at("post-merge"));
+        let served_name = forward(&at("pre-commit"));
+        let no_hook = forward(&at("checkwright-gates"));
+        let bare = forward("post-merge");
+        let _ = std::fs::remove_dir_all(&d);
+        assert_eq!(without, None);
+        assert_eq!(beside, Some("post-merge"));
+        assert_eq!(served_name, None);
+        assert_eq!(no_hook, None);
+        assert_eq!(bare, None);
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — the restore line names the recorded value, else unsets
+    #[test]
+    fn the_restore_line_names_the_recorded_value_or_unsets() {
+        let with = Chain { dir: PathBuf::from("/r"), restore: ".husky".to_string() };
+        let without = Chain { dir: PathBuf::from("/r"), restore: String::new() };
+        assert_eq!(restore_line(Some(&with)), "git config core.hooksPath .husky");
+        assert_eq!(restore_line(Some(&without)), "git config --unset core.hooksPath");
+        assert_eq!(restore_line(None), "git config --unset core.hooksPath");
     }
 
     #[test]

@@ -72,9 +72,44 @@ fn refresh() -> Result<i32, String> {
     if !Path::new(&bin).is_file() {
         return Err(absent(&bin));
     }
-    place(Path::new(&bin), &hooks_dir)?;
+    refresh_place(Path::new(&bin), &hooks_dir)?;
     println!("install-hooks: refreshed {}", hooks_dir.display());
     Ok(0)
+}
+
+fn refresh_place(bin: &Path, hooks_dir: &Path) -> Result<(), String> {
+    let chain = hook_launcher::read_chain(hooks_dir)?;
+    place(bin, hooks_dir, &recorded_forwards(chain.as_ref())?)
+}
+
+// spec: gate-sdk/SPEC.md §install-hooks — a re-run and `--refresh` place a forwarding hook for each
+// live hook the recorded directory holds now, so one added there since is reached
+fn recorded_forwards(chain: Option<&hook_launcher::Chain>) -> Result<Vec<String>, String> {
+    match chain {
+        Some(c) => Ok(forwarded(&live_hooks(&c.dir)?)),
+        None => Ok(Vec::new()),
+    }
+}
+
+// spec: gate-sdk/SPEC.md §install-hooks — the hooks a forwarding hook serves: each live hook the
+// gates do not serve, its suffix removed, once
+fn forwarded(live: &[String]) -> Vec<String> {
+    let mut out: Vec<String> = live
+        .iter()
+        .map(|n| hook_launcher::stem(n).to_string())
+        .filter(|s| !hook_launcher::SERVED.contains(&s.as_str()))
+        .collect();
+    out.dedup();
+    out
+}
+
+// spec: gate-sdk/SPEC.md §install-hooks — what a bare run writes beside the placed hooks
+struct Plan {
+    record: Option<String>,
+    forwards: Vec<String>,
+    chained: Option<(PathBuf, Vec<String>)>,
+    replaced: Option<String>,
+    restore: Option<hook_launcher::Chain>,
 }
 
 fn dispatch(args: &[String]) -> Result<i32, String> {
@@ -100,14 +135,13 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
     let here = walk::cwd()?;
     let hooks_dir = hook_launcher::hooks_dir(Path::new(&here))
         .ok_or_else(|| "not inside a git repository — there is no clone to place the hooks in".to_string())?;
-    let replaced = match prior(&here, &hooks_dir)? {
-        Prior::Live { dir, names } => return Err(live_refusal(&dir, &names, &hooks_dir, &bin)),
-        Prior::Own | Prior::Quiet { set: None } => None,
-        Prior::Quiet { set: Some(value) } => Some(value),
-    };
+    let plan = plan(&here, &hooks_dir, &bin)?;
 
-    place(Path::new(&bin), &hooks_dir)?;
-    if let Some(value) = replaced {
+    wire(Path::new(&bin), &hooks_dir, &plan)?;
+    if let Some((dir, names)) = &plan.chained {
+        println!("{}", chain_line(dir, names, &hooks_dir));
+    }
+    if let Some(value) = plan.replaced {
         println!(
             "install-hooks: core.hooksPath was {}, which holds no hook git runs; this clone now runs {}",
             value,
@@ -142,15 +176,160 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
         println!("  {}", name);
     }
     println!();
-    println!("Disable with:  git config --unset core.hooksPath");
+    println!("Disable with:  {}", hook_launcher::restore_line(plan.restore.as_ref()));
     Ok(identity_rc)
+}
+
+// spec: gate-sdk/SPEC.md §install-hooks — a re-run keeps the record and re-places its forwarding
+// hooks; a first run records the prior directory, and over a live hook on native Windows it first
+// probes that this git can chain it
+fn plan(here: &str, hooks_dir: &Path, bin: &str) -> Result<Plan, String> {
+    let top = walk::toplevel_in_opt(here)?.unwrap_or_else(|| here.to_string());
+    let (dir, chained, replaced) = match prior(here, hooks_dir)? {
+        Prior::Own => {
+            let chain = hook_launcher::read_chain(hooks_dir)?;
+            let forwards = recorded_forwards(chain.as_ref())?;
+            return Ok(Plan { record: None, forwards, chained: None, replaced: None, restore: chain });
+        }
+        Prior::Quiet { dir, set } => (dir, None, set),
+        Prior::Live { dir, names } => {
+            if !chain_probe() {
+                return Err(live_refusal(&dir, &names, bin));
+            }
+            (dir.clone(), Some((dir, names)), None)
+        }
+    };
+    let restore = local_hooks_path(&top)?;
+    let record = record_text(&dir, &restore)?;
+    let forwards = chained.as_ref().map(|(_, names)| forwarded(names)).unwrap_or_default();
+    Ok(Plan {
+        record: Some(record),
+        forwards,
+        chained,
+        replaced,
+        restore: Some(hook_launcher::Chain { dir, restore }),
+    })
+}
+
+// spec: gate-sdk/SPEC.md §install-hooks — the record lands after the hooks and before git is
+// pointed at them, so a failed write leaves no clone running hooks without it
+fn wire(bin: &Path, hooks_dir: &Path, plan: &Plan) -> Result<(), String> {
+    place(bin, hooks_dir, &plan.forwards)?;
+    let Some(text) = &plan.record else {
+        return Ok(());
+    };
+    write_record(hooks_dir, text, &run_tag()).map_err(|e| {
+        format!(
+            "{} — the hooks are placed in {} and git is not pointed at them, so no hook runs; clear the cause and re-run",
+            e,
+            hooks_dir.display()
+        )
+    })
+}
+
+// spec: gate-sdk/SPEC.md §install-hooks — `core.hooksPath`'s local-scope value before the run, as
+// git prints it, empty where that scope set none
+fn local_hooks_path(top: &str) -> Result<String, String> {
+    let got = proc::run(&programs::GIT, &["-C", top, "config", "--local", "--get", "core.hooksPath"])?;
+    match (got.stdout(), got.code()) {
+        (Some(out), _) => {
+            let text = String::from_utf8_lossy(out);
+            Ok(text.strip_suffix('\n').unwrap_or(&text).to_string())
+        }
+        (None, Some(1)) => Ok(String::new()),
+        (None, _) => Err(format!("cannot read core.hooksPath ({})", got.failure_report().unwrap_or_default())),
+    }
+}
+
+// spec: gate-sdk/SPEC.md §install-hooks — the record holds one value per line, so a value carrying a
+// line break is refused before anything is placed
+fn record_text(dir: &Path, restore: &str) -> Result<String, String> {
+    let shown = dir.display().to_string();
+    if let Some(v) = [shown.as_str(), restore].into_iter().find(|v| v.contains(['\n', '\r'])) {
+        return Err(format!(
+            "core.hooksPath names {:?}, which carries a line break the chain record cannot hold — nothing placed",
+            v
+        ));
+    }
+    Ok(format!(
+        "{}{}\n{}{}\n",
+        hook_launcher::CHAIN_DIR_KEY,
+        shown,
+        hook_launcher::CHAIN_RESTORE_KEY,
+        restore
+    ))
+}
+
+// spec: gate-sdk/SPEC.md §install-hooks — the record is placed as a hook is: written under a sibling
+// name and renamed over it, the sibling removed on every path
+fn write_record(hooks_dir: &Path, text: &str, tag: &str) -> Result<(), String> {
+    use std::io::Write;
+    let dst = hooks_dir.join(hook_launcher::CHAIN);
+    let staged = hooks_dir.join(format!("{}{}.{}", hook_launcher::CHAIN, STAGED_SUFFIX, tag));
+    let written = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&staged)
+        .and_then(|mut f| f.write_all(text.as_bytes()))
+        .map_err(|e| format!("cannot write the chain record {}: {}", staged.display(), e));
+    let landed = written.and_then(|()| {
+        std::fs::rename(&staged, &dst).map_err(|e| format!("cannot write the chain record {}: {}", dst.display(), e))
+    });
+    match (landed, remove_own(&staged)) {
+        (Ok(()), None) => Ok(()),
+        (Ok(()), Some(left)) => {
+            eprintln!("install-hooks: {}", left);
+            Ok(())
+        }
+        (Err(e), None) => Err(e),
+        (Err(e), Some(left)) => Err(format!("{}; {}", e, left)),
+    }
+}
+
+fn chain_line(dir: &Path, names: &[String], hooks_dir: &Path) -> String {
+    format!(
+        "install-hooks: this clone ran hooks from {} ({}); each now runs from {}, ahead of the gates where they share a hook",
+        dir.display(),
+        names.join(", "),
+        hooks_dir.display()
+    )
+}
+
+// spec: gate-sdk/SPEC.md §install-hooks — on native Windows a chained hook starts through `git hook
+// run --to-stdin`, so a bare run over a live hook first asks this git to run one
+#[cfg(windows)]
+fn chain_probe() -> bool {
+    let d = proc::temp_base().join(format!("checkwright-chain-probe.{}", run_tag()));
+    let (empty, input) = (d.join("hooks"), d.join("stdin"));
+    let ready = std::fs::create_dir_all(&empty).and_then(|()| std::fs::write(&input, ""));
+    let ran = ready.is_ok()
+        && proc::run(
+            &programs::GIT,
+            &[
+                "-c",
+                &format!("core.hooksPath={}", empty.display()),
+                "hook",
+                "run",
+                "--ignore-missing",
+                &format!("--to-stdin={}", input.display()),
+                "pre-commit",
+            ],
+        )
+        .is_ok_and(|c| c.code() == Some(0));
+    let _ = std::fs::remove_dir_all(&d);
+    ran
+}
+
+#[cfg(not(windows))]
+fn chain_probe() -> bool {
+    true
 }
 
 // spec: gate-sdk/SPEC.md §install-hooks — the hooks directory git runs before this arm repoints it
 #[derive(Debug, PartialEq)]
 enum Prior {
     Own,
-    Quiet { set: Option<String> },
+    Quiet { dir: PathBuf, set: Option<String> },
     Live { dir: PathBuf, names: Vec<String> },
 }
 
@@ -177,7 +356,7 @@ fn prior(here: &str, hooks_dir: &Path) -> Result<Prior, String> {
     }
     let names = live_hooks(&dir)?;
     if names.is_empty() {
-        Ok(Prior::Quiet { set })
+        Ok(Prior::Quiet { dir, set })
     } else {
         Ok(Prior::Live { dir, names })
     }
@@ -185,7 +364,7 @@ fn prior(here: &str, hooks_dir: &Path) -> Result<Prior, String> {
 
 // spec: gate-sdk/SPEC.md §install-hooks — a live hook is a file git would run: a hook's name, a
 // symlink followed, and the executable bit where the host has one
-fn live_hooks(dir: &Path) -> Result<Vec<String>, String> {
+pub fn live_hooks(dir: &Path) -> Result<Vec<String>, String> {
     if !dir.is_dir() {
         return Ok(Vec::new());
     }
@@ -198,27 +377,28 @@ fn live_hooks(dir: &Path) -> Result<Vec<String>, String> {
     Ok(names)
 }
 
-fn live_refusal(dir: &Path, names: &[String], hooks_dir: &Path, bin: &str) -> String {
+// spec: gate-sdk/SPEC.md §install-hooks — the native Windows capability refusal: the directory, the
+// hooks and the cause, then the routes
+fn live_refusal(dir: &Path, names: &[String], bin: &str) -> String {
     format!(
-        "this clone runs hooks from {} ({}), and pointing core.hooksPath at {} would stop them running — nothing placed\n  help: call the gates from your hook manager — '{} --git-hook pre-commit' from its pre-commit and '{} --git-hook commit-msg <message-file>' from its commit-msg — or move those hooks aside or unset core.hooksPath, then re-run --install-hooks.",
+        "this clone runs hooks from {} ({}), which this git cannot chain ('git hook run --to-stdin' is not available) — nothing placed\n  help: upgrade git, or call the gates from your hook manager — '{} --git-hook pre-commit' from its pre-commit and '{} --git-hook commit-msg <message-file>' from its commit-msg — or move those hooks aside or unset core.hooksPath, then re-run --install-hooks.",
         dir.display(),
         names.join(", "),
-        hooks_dir.display(),
         bin,
         bin
     )
 }
 
-// spec: gate-sdk/SPEC.md §install-hooks — each served hook is a hard link to the binary under the
-// hook's name, a copy where the link cannot be made. The replacement is written under a sibling
-// name and renamed over the hook, so a placement that fails leaves the hook already there in place
-fn place(bin: &Path, dir: &Path) -> Result<(), String> {
-    place_as(bin, dir, &run_tag())
+// spec: gate-sdk/SPEC.md §install-hooks — each served and forwarding hook is a hard link to the
+// binary under the hook's name, else a copy, written under a sibling name and renamed over the
+// hook, so a placement that fails leaves the hook already there in place
+fn place(bin: &Path, dir: &Path, forwards: &[String]) -> Result<(), String> {
+    place_as(bin, dir, forwards, &run_tag())
 }
 
-fn place_as(bin: &Path, dir: &Path, tag: &str) -> Result<(), String> {
+fn place_as(bin: &Path, dir: &Path, forwards: &[String], tag: &str) -> Result<(), String> {
     std::fs::create_dir_all(dir).map_err(|e| format!("cannot create {}: {}", dir.display(), e))?;
-    for hook in hook_launcher::SERVED {
+    for hook in hook_launcher::SERVED.iter().copied().chain(forwards.iter().map(String::as_str)) {
         let dst = dir.join(hook_launcher::file_name(hook));
         let staged = dir.join(staged_name(hook, tag));
         stage(bin, &staged)?;
@@ -433,55 +613,156 @@ mod tests {
         }
     }
 
-    fn hooks_path(top: &str) -> Option<String> {
-        let out = proc::run(&programs::GIT, &["-C", top, "config", "--get", "core.hooksPath"]).expect("git config");
-        out.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string())
+    fn listed(dir: &Path) -> Vec<String> {
+        walk::list_dir(dir).expect("lists").into_iter().map(|(n, _)| n).collect()
     }
 
-    // spec: gate-sdk/SPEC.md §install-hooks — a live pre-commit in git's default directory refuses
-    // and wires nothing, where a directory of samples alone proceeds
+    // spec: gate-sdk/SPEC.md §install-hooks — a bare run's placement, record and config write
+    fn bare_run(top: &str, hooks: &Path, bin: &Path) -> Result<Plan, String> {
+        let plan = plan(top, hooks, &bin.display().to_string())?;
+        wire(bin, hooks, &plan)?;
+        proc::run(&programs::GIT, &["-C", top, "config", "core.hooksPath", &hooks.display().to_string()])?;
+        Ok(plan)
+    }
+
+    fn binary(d: &Path) -> PathBuf {
+        let bin = d.join("bin");
+        std::fs::write(&bin, "gates").expect("binary");
+        bin
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — a live pre-commit in git's default directory is
+    // chained: the record names that directory with an empty restore and no forwarding hook is
+    // placed, the gates serving pre-commit; a directory of samples alone records and forwards nothing
     #[test]
-    fn a_live_hook_in_the_default_directory_refuses_and_samples_proceed() {
+    fn a_live_hook_in_the_default_directory_is_chained_and_samples_forward_nothing() {
         let (d, top, hooks) = scratch_repo("default");
         let default = PathBuf::from(format!("{}/.git/hooks", top));
         let samples = prior(&top, &hooks);
+        let (sd, stop, shooks) = scratch_repo("samples");
+        let quiet = bare_run(&stop, &shooks, &binary(&sd)).map(|p| (p.forwards, p.chained));
+        let quiet_record = hook_launcher::read_chain(&shooks);
+        let quiet_files = listed(&shooks);
         plant(&default, "pre-commit", true);
         let live = prior(&top, &hooks);
-        let unset = hooks_path(&top);
-        let placed = hooks.exists();
-        let same_while_present = matches!(&live, Ok(Prior::Live { dir, .. }) if hook_launcher::same_dir(dir, &default));
+        let ran = bare_run(&top, &hooks, &binary(&d)).map(|p| (p.forwards, p.chained.map(|(_, n)| n)));
+        let record = hook_launcher::read_chain(&hooks);
+        let files = listed(&hooks);
+        let default_named = record.as_ref().is_ok_and(|r| r.as_ref().is_some_and(|c| hook_launcher::same_dir(&c.dir, &default)));
+        let samples_named = matches!(&quiet_record, Ok(Some(c)) if hook_launcher::same_dir(&c.dir, &PathBuf::from(format!("{}/.git/hooks", stop))));
         let _ = std::fs::remove_dir_all(&d);
-        assert_eq!(samples, Ok(Prior::Quiet { set: None }), "git's template hooks are samples");
-        match live {
-            Ok(Prior::Live { dir, names }) => {
-                assert!(same_while_present, "{} is not {}", dir.display(), default.display());
-                assert_eq!(names, vec!["pre-commit".to_string()]);
-                let said = live_refusal(&dir, &names, &hooks, "bin/gates");
-                assert!(said.contains("(pre-commit)") && said.contains("nothing placed"), "{}", said);
-                assert!(said.contains("'bin/gates --git-hook pre-commit'"), "{}", said);
-                assert!(said.contains("\n  help: "), "{}", said);
-            }
-            other => panic!("a live pre-commit must refuse: {:?}", other),
-        }
-        assert_eq!(unset, None);
-        assert!(!placed, "the refusal placed the hooks directory");
+        let _ = std::fs::remove_dir_all(&sd);
+        assert!(matches!(&samples, Ok(Prior::Quiet { set: None, .. })), "git's template hooks are samples: {:?}", samples);
+        assert!(matches!(&live, Ok(Prior::Live { names, .. }) if names == &vec!["pre-commit".to_string()]), "{:?}", live);
+        assert_eq!(ran, Ok((Vec::new(), Some(vec!["pre-commit".to_string()]))));
+        assert!(default_named, "{:?}", record);
+        assert_eq!(record.map(|r| r.map(|c| c.restore)), Ok(Some(String::new())));
+        let served_and_record = vec![hook_launcher::CHAIN.to_string(), hook_launcher::file_name("commit-msg"), hook_launcher::file_name("pre-commit")];
+        assert_eq!(files, served_and_record);
+        assert_eq!(quiet, Ok((Vec::new(), None)));
+        assert!(samples_named, "{:?}", quiet_record);
+        assert_eq!(quiet_files, served_and_record);
     }
 
-    // spec: gate-sdk/SPEC.md §install-hooks — a core.hooksPath naming a directory with a live hook
-    // refuses with the value unchanged, and one holding no hook is replaced with a note
+    // spec: gate-sdk/SPEC.md §install-hooks — a local core.hooksPath naming a directory with a live
+    // pre-push records that value to restore and places a forwarding pre-push; one holding no hook
+    // is replaced with a note
     #[test]
-    fn a_hooks_path_with_a_live_hook_refuses_and_an_empty_one_is_replaced() {
+    fn a_local_hooks_path_with_a_live_hook_is_recorded_and_forwarded() {
         let (d, top, hooks) = scratch_repo("set");
         let theirs = d.join("husky").display().to_string();
         proc::run(&programs::GIT, &["-C", &top, "config", "core.hooksPath", &theirs]).expect("git config");
         let quiet = prior(&top, &hooks);
         plant(Path::new(&theirs), "pre-push", true);
-        let live = prior(&top, &hooks);
-        let kept = hooks_path(&top);
+        let ran = bare_run(&top, &hooks, &binary(&d)).map(|p| (p.forwards, p.replaced));
+        let record = hook_launcher::read_chain(&hooks).map(|r| r.map(|c| c.restore));
+        let forwarding = proc::is_executable(&hooks.join(hook_launcher::file_name("pre-push")));
         let _ = std::fs::remove_dir_all(&d);
-        assert_eq!(quiet, Ok(Prior::Quiet { set: Some(theirs.clone()) }));
-        assert!(matches!(&live, Ok(Prior::Live { names, .. }) if names == &vec!["pre-push".to_string()]), "{:?}", live);
-        assert_eq!(kept, Some(theirs));
+        assert!(matches!(&quiet, Ok(Prior::Quiet { set: Some(v), .. }) if v == &theirs), "{:?}", quiet);
+        assert_eq!(ran, Ok((vec!["pre-push".to_string()], None)));
+        assert_eq!(record, Ok(Some(theirs)));
+        assert!(forwarding, "no forwarding pre-push was placed");
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — a value the local scope does not itself set, here an
+    // included file's, records an empty restore
+    #[test]
+    fn a_hooks_path_set_outside_the_local_scope_records_an_empty_restore() {
+        let (d, top, hooks) = scratch_repo("global");
+        let theirs = d.join("global-hooks");
+        plant(&theirs, "pre-push", true);
+        let included = d.join("gitconfig");
+        std::fs::write(&included, format!("[core]\n\thooksPath = {}\n", theirs.display())).expect("included config");
+        proc::run(&programs::GIT, &["-C", &top, "config", "include.path", &included.display().to_string()]).expect("git config");
+        let ran = bare_run(&top, &hooks, &binary(&d)).map(|p| p.forwards);
+        let record = hook_launcher::read_chain(&hooks);
+        let named = matches!(&record, Ok(Some(c)) if hook_launcher::same_dir(&c.dir, &theirs));
+        let _ = std::fs::remove_dir_all(&d);
+        assert_eq!(ran, Ok(vec!["pre-push".to_string()]));
+        assert!(named, "{:?}", record);
+        assert_eq!(record.map(|r| r.map(|c| c.restore)), Ok(Some(String::new())));
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — a re-run keeps the record byte-identical and, as a
+    // refresh does, forwards a hook the recorded directory gained since the first run
+    #[test]
+    fn a_rerun_keeps_the_record_and_forwards_a_hook_added_since() {
+        let (d, top, hooks) = scratch_repo("rechain");
+        let theirs = d.join("husky");
+        proc::run(&programs::GIT, &["-C", &top, "config", "core.hooksPath", &theirs.display().to_string()]).expect("git config");
+        plant(&theirs, "pre-push", true);
+        let bin = binary(&d);
+        bare_run(&top, &hooks, &bin).expect("first run");
+        let first = std::fs::read(hooks.join(hook_launcher::CHAIN)).expect("the record");
+        plant(&theirs, "post-merge", true);
+        let rerun = bare_run(&top, &hooks, &bin).map(|p| (p.record, p.forwards));
+        let kept = std::fs::read(hooks.join(hook_launcher::CHAIN)).expect("the record");
+        let after_rerun = listed(&hooks);
+        std::fs::remove_file(hooks.join(hook_launcher::file_name("post-merge"))).expect("remove");
+        let target = refresh_target(&top);
+        let refreshed = refresh_place(&bin, &hooks);
+        let after_refresh = listed(&hooks);
+        let _ = std::fs::remove_dir_all(&d);
+        assert_eq!(rerun, Ok((None, vec!["post-merge".to_string(), "pre-push".to_string()])));
+        assert_eq!(kept, first, "a re-run rewrote the record");
+        let every = vec![
+            hook_launcher::CHAIN.to_string(),
+            hook_launcher::file_name("commit-msg"),
+            hook_launcher::file_name("post-merge"),
+            hook_launcher::file_name("pre-commit"),
+            hook_launcher::file_name("pre-push"),
+        ];
+        assert_eq!(after_rerun, every);
+        assert_eq!(target, Ok(Some(hooks)));
+        assert_eq!(refreshed, Ok(()));
+        assert_eq!(after_refresh, every);
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — the native Windows refusal names the directory, the
+    // hooks and the cause, and its help names the routes
+    #[test]
+    fn the_capability_refusal_names_the_directory_the_hooks_and_the_routes() {
+        let said = live_refusal(Path::new("/r/.husky"), &["pre-commit".to_string(), "pre-push".to_string()], "bin/gates");
+        let lines: Vec<&str> = said.lines().collect();
+        assert_eq!(lines.len(), 2, "{}", said);
+        assert!(lines[0].starts_with("this clone runs hooks from /r/.husky (pre-commit, pre-push)"), "{}", said);
+        assert!(lines[0].contains("'git hook run --to-stdin' is not available") && lines[0].ends_with("nothing placed"), "{}", said);
+        assert!(lines[1].starts_with("  help: upgrade git") && lines[1].contains("'bin/gates --git-hook pre-commit'"), "{}", said);
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — the leg's git runs `git hook run --to-stdin`
+    #[cfg(windows)]
+    #[test]
+    fn the_chain_probe_passes_on_this_git() {
+        assert!(chain_probe(), "this git cannot run 'git hook run --to-stdin'");
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — a value carrying a line break is refused before
+    // anything is placed, the record holding one value per line
+    #[test]
+    fn a_value_with_a_line_break_is_refused() {
+        assert!(record_text(Path::new("/r/hooks"), "a\nb").is_err_and(|e| e.contains("line break")));
+        assert_eq!(record_text(Path::new("/r/hooks"), "").as_deref(), Ok("dir=/r/hooks\nrestore=\n"));
     }
 
     // spec: gate-sdk/SPEC.md §install-hooks — a relative core.hooksPath resolves physically, as git
@@ -514,7 +795,7 @@ mod tests {
         plant(&PathBuf::from(format!("{}/.git/hooks", top)), "pre-commit", false);
         let got = prior(&top, &hooks);
         let _ = std::fs::remove_dir_all(&d);
-        assert_eq!(got, Ok(Prior::Quiet { set: None }));
+        assert!(matches!(&got, Ok(Prior::Quiet { set: None, .. })), "{:?}", got);
     }
 
     // spec: gate-sdk/SPEC.md §install-hooks — a core.hooksPath already naming the hooks directory is
@@ -538,12 +819,12 @@ mod tests {
         std::fs::create_dir_all(&d).expect("scratch");
         let (bin, hooks) = (d.join("bin"), d.join("git/gate-hooks"));
         std::fs::write(&bin, "one").expect("binary");
-        place(&bin, &hooks).expect("first placement");
+        place(&bin, &hooks, &[]).expect("first placement");
         let names: Vec<String> = walk::list_dir(&hooks).expect("lists").into_iter().map(|(n, _)| n).collect();
         std::fs::remove_file(&bin).expect("the update's unlink");
         std::fs::write(&bin, "two").expect("the updated binary");
         let stale = std::fs::read_to_string(hooks.join(hook_launcher::file_name("pre-commit"))).expect("reads");
-        place(&bin, &hooks).expect("second placement");
+        place(&bin, &hooks, &[]).expect("second placement");
         let fresh: Vec<String> = hook_launcher::SERVED
             .iter()
             .map(|h| std::fs::read_to_string(hooks.join(hook_launcher::file_name(h))).expect("reads"))
@@ -565,11 +846,11 @@ mod tests {
         std::fs::create_dir_all(&d).expect("scratch");
         let (bin, hooks) = (d.join("bin"), d.join("git/gate-hooks"));
         std::fs::write(&bin, "one").expect("binary");
-        place(&bin, &hooks).expect("first placement");
-        place(&bin, &hooks).expect("a re-run over the same file");
+        place(&bin, &hooks, &[]).expect("first placement");
+        place(&bin, &hooks, &[]).expect("a re-run over the same file");
         let listed = |dir: &Path| -> Vec<String> { walk::list_dir(dir).expect("lists").into_iter().map(|(n, _)| n).collect() };
         let rerun = listed(&hooks);
-        let refused = place(&d.join("no-such-binary"), &hooks);
+        let refused = place(&d.join("no-such-binary"), &hooks, &[]);
         let after = listed(&hooks);
         let kept: Vec<String> = hook_launcher::SERVED
             .iter()
@@ -593,17 +874,17 @@ mod tests {
         std::fs::create_dir_all(&d).expect("scratch");
         let (bin, hooks) = (d.join("bin"), d.join("git/gate-hooks"));
         std::fs::write(&bin, "one").expect("binary");
-        place(&bin, &hooks).expect("first placement");
+        place(&bin, &hooks, &[]).expect("first placement");
         std::fs::remove_file(&bin).expect("the update's unlink");
         std::fs::write(&bin, "two").expect("the updated binary");
         let served = hooks.join(hook_launcher::file_name("pre-commit"));
         let theirs = hooks.join(staged_name("pre-commit", "7.drawn"));
         std::fs::hard_link(&served, &theirs).expect("another placement's sibling");
         let copied = copy_new(&bin, &theirs);
-        let second = place_as(&bin, &hooks, "7.drawn");
+        let second = place_as(&bin, &hooks, &[], "7.drawn");
         let through = std::fs::read_to_string(&served).expect("reads");
         let kept = std::fs::read_to_string(&theirs).unwrap_or_default();
-        let replaced = place(&bin, &hooks);
+        let replaced = place(&bin, &hooks, &[]);
         let fresh = std::fs::read_to_string(&served).expect("reads");
         let left: Vec<String> = walk::list_dir(&hooks).expect("lists").into_iter().map(|(n, _)| n).collect();
         let _ = std::fs::remove_dir_all(&d);
@@ -692,7 +973,7 @@ mod tests {
         for f in &foreign {
             std::fs::write(f, "theirs").expect("another run's sibling");
         }
-        let placed = place(&bin, &hooks);
+        let placed = place(&bin, &hooks, &[]);
         let kept: Vec<String> = foreign.iter().map(|f| std::fs::read_to_string(f).unwrap_or_default()).collect();
         let _ = std::fs::remove_dir_all(&d);
         assert_eq!(placed, Ok(()));

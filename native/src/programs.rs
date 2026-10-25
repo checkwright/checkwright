@@ -26,6 +26,11 @@ enum Identity {
 // whether a `.sh` declaration or `gate_command`'s answer
 pub const GATE_DECLARATION: &str = "gate declaration";
 
+// spec: gate-sdk/SPEC.md §The program roster — the ground a chained prior hook carries, on unix,
+// where it is started directly
+#[cfg(not(windows))]
+pub const CHAINED_HOOK: &str = "the chain record";
+
 // spec: gate-sdk/SPEC.md §The program roster — one row per member; the test-only `ALL` is emitted
 // from the same rows, so it is complete by construction
 macro_rules! roster {
@@ -111,7 +116,7 @@ pub fn name_of(program: &str) -> String {
 
 impl Program {
     // spec: gate-sdk/SPEC.md §The program roster — the one constructor for a program named outside
-    // the crate's source; `ground` is the knob or `GATE_DECLARATION` that named it
+    // the crate's source; `ground` is the knob, `GATE_DECLARATION` or `CHAINED_HOOK` that named it
     pub fn consumer(ground: &'static str, command: impl Into<String>) -> Program {
         Program {
             identity: Identity::Consumer {
@@ -354,8 +359,8 @@ mod tests {
 
     impl Scan<'_> {
         // spec: gate-sdk/SPEC.md §The program roster — a ground expression is a declared literal, the
-        // gate-declaration constant, or a `&'static str` parameter of the function it sits in, whose
-        // own callers are then read at the same argument position
+        // gate-declaration or chained-hook constant, or a `&'static str` parameter of the function it
+        // sits in, whose own callers are then read at the same argument position
         fn check(&mut self, file: usize, pos: usize, expr: &str) {
             if let Some(lit) = expr.strip_prefix('"') {
                 if !self.declared.iter().any(|d| d == lit.trim_end_matches('"')) {
@@ -363,7 +368,10 @@ mod tests {
                 }
                 return;
             }
-            if expr == "GATE_DECLARATION" || expr.ends_with("programs::GATE_DECLARATION") {
+            if ["GATE_DECLARATION", "CHAINED_HOOK"]
+                .iter()
+                .any(|c| expr == *c || expr.ends_with(&format!("programs::{}", c)))
+            {
                 return;
             }
             let forwarded = expr.chars().all(is_ident).then(|| enclosing_fn(&self.files[file].1, pos)).flatten();
@@ -387,7 +395,7 @@ mod tests {
 
     // spec: gate-sdk/SPEC.md §The program roster — assertion D over shipped scope
     #[test]
-    fn every_consumer_commands_ground_names_a_knob_or_the_gate_declaration() {
+    fn every_consumer_commands_ground_names_a_knob_the_gate_declaration_or_the_chained_hook() {
         let _knobs = crate::knobenv::lock();
         let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
         let files: Vec<(String, String)> = crate::walk::find_files(&src, &["rs"])
@@ -435,7 +443,7 @@ mod tests {
         assert!(seen > 0, "the scan found no Program::consumer call at all");
         assert!(
             scan.offenders.is_empty(),
-            "consumer-command grounds naming no declared knob and no GATE_DECLARATION, and not a \
+            "consumer-command grounds naming no declared knob, no GATE_DECLARATION and no CHAINED_HOOK, and not a \
              `&'static str` parameter whose callers pass one: {:?}",
             scan.offenders
         );

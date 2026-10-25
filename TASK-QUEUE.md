@@ -18,7 +18,7 @@
 
 ### hookspath-chain
 
-[spec: SPEC-hookspath-chain.md]
+[spec: gate-sdk/SPEC.md]
 
 `--install-hooks` refuses a clone already running hooks (landed as `hookspath-clobber`), so a personal install on a project whose tracked hook manager runs its hooks gets no gate hooks: calling `--git-hook` from that manager means editing the project's tracked files.
 

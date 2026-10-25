@@ -78,13 +78,23 @@ pub(super) fn personal(state: &mut Run) -> Step {
     }
     say(&format!("install: {} personal, HEAD, index and the README edit unchanged, {} path(s) ignored in one block", min, roster.len()));
 
-    live_hook_refused(&c, &followups(&said), &set)?;
+    let runs = plant_prior_hook(&c)?;
+    let mut chained = false;
     for line in followups(&said) {
         let toks: Vec<&str> = line.split_whitespace().collect();
         let r = run_line(&c, &toks, &set)?;
         if !r.succeeded() {
             return Err(failed(&r, format!("personal arm: the follow-up command '{}' failed", line)));
         }
+        if toks.contains(&"--install-hooks") {
+            chained = find_line(&out(&r), |l| l.starts_with("install-hooks: this clone ran hooks from ") && l.contains("(pre-commit)")).is_some();
+            if !chained {
+                return Err(failed(&r, "personal arm: --install-hooks over a live pre-commit printed no chain line naming it"));
+            }
+        }
+    }
+    if !chained {
+        return Err(fail("personal arm: the follow-up block carries no --install-hooks line"));
     }
     write(&format!("{}/personal-plant.sh", c), PIPELINE_PLANT)?;
     git_out(&c, &["add", "personal-plant.sh"])?;
@@ -100,7 +110,17 @@ pub(super) fn personal(state: &mut Run) -> Step {
     if !r.succeeded() || !hooked {
         return Err(failed(&r, "personal arm: the README edit did not commit through the installed hooks"));
     }
-    say(&format!("hooks: the plant refused by {}, the README edit committed through them", gate));
+    let ran = read(&runs).lines().count();
+    if ran != 2 {
+        return Err(fail(format!(
+            "personal arm: the chained pre-commit ran {} time(s) over the refused commit and the README commit, not twice",
+            ran
+        )));
+    }
+    say(&format!(
+        "hooks: --install-hooks chained the live pre-commit, which ran ahead of the gates at both commits; the plant refused by {}, the README edit committed through them",
+        gate
+    ));
 
     let (commits1, block1) = (commits(&c)?, read(&exclude));
     let m = state.verb(&c, &["init"])?;
@@ -161,33 +181,19 @@ pub(super) fn personal(state: &mut Run) -> Step {
     Ok(())
 }
 
-// spec: installer/SPEC.md §The consumer smoke — a live pre-commit in the default hooks directory makes
-// the block's --install-hooks exit 2 naming it, with core.hooksPath unset and no hooks directory
-// placed; the plant is removed before the block runs
-fn live_hook_refused(c: &str, block: &[String], set: &[(String, String)]) -> Step {
-    let Some(line) = block.iter().find(|l| l.split_whitespace().any(|t| t == "--install-hooks")) else {
-        return Err(fail("personal arm: the follow-up block carries no --install-hooks line"));
-    };
+// spec: installer/SPEC.md §The consumer smoke — a live pre-commit in the default hooks directory that
+// appends a line to a file under the git directory, left in place through the block and both
+// commits; the file's path is returned for the two-line read
+fn plant_prior_hook(c: &str) -> Result<String, Outcome> {
     let shown = git_out(c, &["rev-parse", "--git-path", "hooks"])?.trim().to_string();
     let default = if crate::walk::path_root(&shown).is_some() { shown } else { format!("{}/{}", c, shown) };
-    let planted = format!("{}/pre-commit", default);
-    write(&planted, "#!/bin/sh\nexit 0\n")?;
-    crate::install::make_executable(std::path::Path::new(&planted)).map_err(refuse)?;
-    let toks: Vec<&str> = line.split_whitespace().collect();
-    let r = run_line(c, &toks, set)?;
-    let _ = std::fs::remove_file(&planted);
-    let unset = super::in_consumer_fed(&programs::GIT, &["config", "--get", "core.hooksPath"], &[], c, b"")?.code() == Some(1);
     let common = git_out(c, &["rev-parse", "--git-common-dir"])?.trim().to_string();
     let common = if crate::walk::path_root(&common).is_some() { common } else { format!("{}/{}", c, common) };
-    let placed = super::consumer::exists(&format!("{}/{}", common, crate::emit::hook_launcher::DIR));
-    if r.code() != Some(2) || !out(&r).contains("(pre-commit)") || !unset || placed {
-        return Err(failed(
-            &r,
-            "personal arm: --install-hooks over a live pre-commit did not exit 2 naming it with core.hooksPath unset and no hooks placed",
-        ));
-    }
-    say("hooks: --install-hooks over a live pre-commit exit 2 naming it, nothing placed");
-    Ok(())
+    let runs = format!("{}/prior-hook-runs", common).replace('\\', "/");
+    let planted = format!("{}/pre-commit", default);
+    write(&planted, &format!("#!/bin/sh\necho ran >>'{}'\n", runs))?;
+    crate::install::make_executable(std::path::Path::new(&planted)).map_err(refuse)?;
+    Ok(runs)
 }
 
 // spec: installer/SPEC.md §The consumer smoke — uninstall over the block with its end marker deleted

@@ -211,10 +211,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
     // spec: installer/SPEC.md §uninstall — the placed hooks directory is this tool's own and is
     // removed; the opt-in is reported, not rewritten, git config being outside the ownership roster
     let hooks_dir = crate::emit::hook_launcher::hooks_dir(&root).filter(|d| d.is_dir());
-    let hooks_line = match &hooks_dir {
-        Some(d) if crate::emit::hook_launcher::opted_in(&root, d) => "git config --unset core.hooksPath",
-        _ => "",
-    };
+    let hooks_line = hooks_line(&root, hooks_dir.as_deref());
 
     // spec: installer/SPEC.md §uninstall — a run with nothing to remove says so and exits 0: the
     // install is still there, so narrowing the manifest here would disown an install that has not
@@ -492,6 +489,18 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
     Ok(0)
 }
 
+// spec: installer/SPEC.md §uninstall — read before the directory's removal: the line restoring the
+// prior `core.hooksPath` from the chain record, or unsetting it where none was set
+fn hooks_line(root: &std::path::Path, hooks_dir: Option<&std::path::Path>) -> String {
+    use crate::emit::hook_launcher;
+    match hooks_dir {
+        Some(d) if hook_launcher::opted_in(root, d) => {
+            hook_launcher::restore_line(hook_launcher::read_chain(d).ok().flatten().as_ref())
+        }
+        _ => String::new(),
+    }
+}
+
 fn report_kept(keep: &[(String, String)]) {
     if keep.is_empty() {
         return;
@@ -586,6 +595,32 @@ mod tests {
         assert_eq!(remove, vec!["gate-sdk/intact.sh".to_string()]);
         assert_eq!(keep.len(), 2);
         assert_eq!(keep[0].0, bin);
+    }
+
+    // spec: installer/SPEC.md §uninstall — an opted-in clone whose chain record carries a value
+    // prints the line restoring it, and one with no record prints the unset line
+    #[test]
+    fn the_hooks_line_restores_the_recorded_value() {
+        use crate::emit::hook_launcher;
+        use crate::{proc, programs, walk};
+        let d = std::env::temp_dir().join(format!("cw-uninstall-restore-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(d.join("repo")).expect("scratch");
+        let top = walk::normalize_abs(&d.join("repo").display().to_string());
+        let root = std::path::Path::new(&top);
+        proc::run(&programs::GIT, &["-C", &top, "init", "-q"]).expect("git init");
+        let hooks = hook_launcher::hooks_dir(root).expect("a hooks directory");
+        std::fs::create_dir_all(&hooks).expect("hooks dir");
+        let unopted = hooks_line(root, Some(&hooks));
+        proc::run(&programs::GIT, &["-C", &top, "config", "core.hooksPath", &hooks.display().to_string()]).expect("git config");
+        let bare = hooks_line(root, Some(&hooks));
+        let theirs = d.join("husky").display().to_string();
+        std::fs::write(hooks.join(hook_launcher::CHAIN), format!("dir={}\nrestore=.husky\n", theirs)).expect("record");
+        let restored = hooks_line(root, Some(&hooks));
+        let _ = std::fs::remove_dir_all(&d);
+        assert_eq!(unopted, "");
+        assert_eq!(bare, "git config --unset core.hooksPath");
+        assert_eq!(restored, "git config core.hooksPath .husky");
     }
 
     // spec: installer/SPEC.md §The verbs — `--help` answers on its own and an unknown argument is

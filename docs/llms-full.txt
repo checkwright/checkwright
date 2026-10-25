@@ -466,7 +466,7 @@ Moving to a profile that contains yours only adds. Re-running it is safe: it rep
 
 ### On a project that does not adopt it
 
-`checkwright init --personal` installs the checks for you alone. It writes the same files untracked, lists them in this clone's `.git/info/exclude`, and commits nothing, so the project's tree and history stay as they were. Your hooks and `--run` check your own commits in this clone, and the project's CI runs none of it. Where a hook manager already runs this clone's hooks, `--install-hooks` refuses rather than silence them, and `--run` is your check. `prove` proves `HEAD` with this install copied into its scratch clone. It takes `starter` or `prose`: the workflow commits its own record, so a profile carrying it is refused. `uninstall` removes the files and the exclude lines.
+`checkwright init --personal` installs the checks for you alone. It writes the same files untracked, lists them in this clone's `.git/info/exclude`, and commits nothing, so the project's tree and history stay as they were. Your hooks and `--run` check your own commits in this clone, and the project's CI runs none of it. Where a hook manager runs this clone's hooks, `--install-hooks` keeps them running, ahead of the gates where they share a hook. `prove` proves `HEAD` with this install copied into its scratch clone. It takes `starter` or `prose`: the workflow commits its own record, so a profile carrying it is refused. `uninstall` removes the files and the exclude lines.
 
 ### Prove it on your tree
 

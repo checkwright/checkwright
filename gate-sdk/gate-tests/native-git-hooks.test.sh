@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# spec: gate-sdk/SPEC.md §git-hook — the binary under a served hook's name is that hook's launcher: git starts it with no interpreter, a clean commit lands on the summary line, a red member refuses the commit by gate name, a registry with no commit-msg member leaves that hook silent, a binary that cannot be started refuses naming the path and both remedies, a knob naming a hook's own name is refused at 2, a knob-file line naming any other knob is skipped unread while one setting the launcher's own knob as no scalar is refused at 2, and a registered member whose declaration resolves and cannot be read refuses either hook at 2
-# spec: gate-sdk/SPEC.md §install-hooks — the arm places both hooks untracked in gate-hooks under the common git directory with an absolute core.hooksPath, so a linked worktree runs them; a re-run replaces both; an absent binary refuses at 2 and places nothing; a failed core.hooksPath write refuses at 2 ahead of the receipt; a failed blame.ignoreRevsFile write is reported with the status unmoved; a hook left behind by a replaced binary starts the binary now installed; --refresh re-places both hooks of an opted-in clone from a replaced binary with no config write, and places nothing off the work-tree top or in a clone not opted in
+# spec: gate-sdk/SPEC.md §git-hook — the binary under a served hook's name is that hook's launcher: git starts it with no interpreter, a clean commit lands on the summary line, a red member refuses the commit by gate name, a registry with no commit-msg member leaves that hook silent, a binary that cannot be started refuses naming the path and both remedies, a knob naming a hook's own name is refused at 2, a knob-file line naming any other knob is skipped unread while one setting the launcher's own knob as no scalar is refused at 2, a registered member whose declaration resolves and cannot be read refuses either hook at 2, and beside the chain record a placed hook runs the prior hook of its name first, a failing one ending the hook with the gates unrun, while a forwarding hook runs the prior hook of its own name
+# spec: gate-sdk/SPEC.md §install-hooks — the arm places both hooks untracked in gate-hooks under the common git directory with an absolute core.hooksPath, so a linked worktree runs them; a re-run replaces both; an absent binary refuses at 2 and places nothing; a failed core.hooksPath write refuses at 2 ahead of the receipt; a failed blame.ignoreRevsFile write is reported with the status unmoved; a hook left behind by a replaced binary starts the binary now installed; --refresh re-places both hooks of an opted-in clone from a replaced binary with no config write, and places nothing off the work-tree top or in a clone not opted in; a clone already running hooks is chained, its live prior hooks named on stdout
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -152,7 +152,7 @@ out="$( cd "$repo" && "./$bin_rel" --install-hooks 2>&1 )"; rc=$?
 for h in pre-commit commit-msg; do
     cmp -s "$hooks/$h$sfx" "$repo/$bin_rel" || note "rerun-$h" "a re-run did not replace $h$sfx with the binary"
 done
-[[ "$(find "$hooks" -type f | wc -l | tr -d ' ')" -eq 2 ]] || note rerun-count "a re-run left other than the two hooks: $(ls "$hooks")"
+[[ "$(find "$hooks" -type f ! -name chain | wc -l | tr -d ' ')" -eq 2 ]] || note rerun-count "a re-run left other than the two hooks beside the chain record: $(ls "$hooks")"
 
 # 11. a failed core.hooksPath write refuses the opt-in at 2, ahead of the receipt
 : >"$repo/.git/config.lock"
@@ -256,6 +256,39 @@ out="$( cd "$repo" && "./$bin_rel" --install-hooks --refresh 2>&1 )"; rc=$?
 out="$( cd "$repo" && "./$bin_rel" --install-hooks --refresh extra 2>&1 )"; rc=$?
 [[ "$rc" -eq 2 ]] || note refresh-operand "want exit 2 from --refresh with an operand, got $rc -- $out"
 
+# 17. a clone already running hooks keeps them, each ahead of the gates where they share a hook, and a failing prior hook refuses the commit with the gates unrun; its hooks are sh scripts, so a host with an executable suffix skips it
+if [[ -z "$sfx" ]]; then
+    chained="$SANDBOX/chained"
+    mkdir -p "$chained/gate-sdk" "$chained/scripts" "$chained/${bin_rel%/*}"
+    cp -R "$HERE/gate-sdk/bin" "$HERE/gate-sdk/lib" "$chained/gate-sdk/"
+    cp "$PINNED" "$chained/$bin_rel"
+    printf 'native/target/\n' >"$chained/.gitignore"
+    printf 'check-probe-word\n' >"$chained/scripts/gates.list"
+    cp "$repo/scripts/check-probe-word.sh" "$chained/scripts/"
+    git -C "$chained" init -q -b main
+    for h in pre-commit post-commit; do
+        printf '#!/bin/sh\necho %s >>"$(git rev-parse --git-dir)/chain-runs"\n' "$h" >"$chained/.git/hooks/$h"
+        chmod +x "$chained/.git/hooks/$h"
+    done
+    gc() { git -C "$chained" -c user.email=t@example.invalid -c user.name=t "$@"; }
+    out="$( cd "$chained" && "./$bin_rel" --install-hooks 2>/dev/null )"; rc=$?
+    [[ "$rc" -eq 0 ]] || note chain-install-status "want exit 0 from --install-hooks over live prior hooks, got $rc -- $out"
+    grep -qE '^install-hooks: this clone ran hooks from .* \(post-commit, pre-commit\); each now runs from ' <<<"$out" || note chain-line "the opt-in's stdout does not name the chained hooks: $out"
+    printf 'a note\n' >"$chained/a.txt"
+    gc add -A
+    out="$(gc commit -m 'docs: through the chain' 2>&1)"; rc=$?
+    [[ "$rc" -eq 0 ]] || note chain-clean-status "a clean commit through the chain was refused ($rc): $out"
+    grep -qF 'pre-commit: 1 gate(s) passed.' <<<"$out" || note chain-clean-summary "the gates did not run after the chained pre-commit: $out"
+    [[ "$(cat "$chained/.git/chain-runs" 2>/dev/null)" == $'pre-commit\npost-commit' ]] || note chain-runs "want the prior pre-commit then post-commit to run, got: $(cat "$chained/.git/chain-runs" 2>/dev/null)"
+    printf '#!/bin/sh\nexit 1\n' >"$chained/.git/hooks/pre-commit"
+    printf 'another note\n' >"$chained/b.txt"
+    gc add b.txt
+    out="$(gc commit -m 'docs: past a failing prior hook' 2>&1)"; rc=$?
+    [[ "$rc" -ne 0 ]] || note chain-red-status "a commit landed past a failing prior pre-commit: $out"
+    { grep -qF 'the chained hook' <<<"$out" && grep -qF 'the gates did not run' <<<"$out"; } || note chain-red-text "the refusal does not name the chained hook: $out"
+    grep -qF 'gate(s) passed.' <<<"$out" && note chain-red-gates "the gates ran past a failing prior hook: $out"
+fi
+
 [[ "$fails" -eq 0 ]] || { echo "native-git-hooks.test: $fails assertion(s) failed"; exit 1; }
-echo "native-git-hooks.test: clean (--install-hooks places both hooks untracked under the common git directory, absolute in core.hooksPath, refusing with nothing placed when the binary is absent; git starts the placed binary as each hook with no interpreter: a clean commit lands on the summary line, a red member refuses by gate name from the main checkout and from a linked worktree, the commit-msg hook is silent until a member registers at its tier and reaches one with no re-install; a hook outliving a replaced binary starts the installed one, an unstartable binary refuses naming the path and both remedies, a knob naming a hook is refused at 2, a re-run replaces both, a knob-file line naming a knob the launcher does not know is left to the installed build, --refresh re-places an opted-in clone's hooks and nothing else, a failed core.hooksPath write refuses at 2 with no receipt, a failed blame.ignoreRevsFile write is reported at exit 0, and an unreadable resolved member refuses either hook at 2)"
+echo "native-git-hooks.test: clean (--install-hooks places both hooks untracked under the common git directory, absolute in core.hooksPath, refusing with nothing placed when the binary is absent; git starts the placed binary as each hook with no interpreter: a clean commit lands on the summary line, a red member refuses by gate name from the main checkout and from a linked worktree, the commit-msg hook is silent until a member registers at its tier and reaches one with no re-install; a hook outliving a replaced binary starts the installed one, an unstartable binary refuses naming the path and both remedies, a knob naming a hook is refused at 2, a re-run replaces both, a knob-file line naming a knob the launcher does not know is left to the installed build, --refresh re-places an opted-in clone's hooks and nothing else, a failed core.hooksPath write refuses at 2 with no receipt, a failed blame.ignoreRevsFile write is reported at exit 0, an unreadable resolved member refuses either hook at 2, and a clone already running hooks keeps them, a prior pre-commit ahead of the gates and a prior post-commit through its forwarding hook, a failing prior hook refusing the commit with the gates unrun)"
 exit 0
