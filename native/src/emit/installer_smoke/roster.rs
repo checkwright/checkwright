@@ -184,7 +184,8 @@ pub(super) fn preflight(state: &mut Run) -> Step {
     }
     state.scratch = make_scratch(&base)?;
     let global = format!("{}/{}", state.scratch, super::GIT_GLOBAL_FILE);
-    std::fs::write(&global, b"").map_err(|e| refuse(format!("cannot write the empty git global file {}: {}", global, e)))?;
+    std::fs::write(&global, super::GIT_GLOBAL_BODY)
+        .map_err(|e| refuse(format!("cannot write the smoke's git global file {}: {}", global, e)))?;
     if super::GIT_GLOBAL.set(global).is_err() {
         return Err(refuse("the git global file was already set — the preflight ran twice in one process"));
     }

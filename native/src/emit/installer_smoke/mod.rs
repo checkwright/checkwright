@@ -183,14 +183,18 @@ static UPSTREAM: std::sync::OnceLock<String> = std::sync::OnceLock::new();
 
 const UPSTREAM_KNOB: &str = "GATE_SDK_UPDATE_UPSTREAM";
 
-// spec: installer/SPEC.md §The consumer smoke — the empty file every scrubbed spawn names as git's
-// global configuration, made in the scratch base before the first arm
+// spec: installer/SPEC.md §The consumer smoke — the file every scrubbed spawn names as git's global
+// configuration, made in the scratch base before the first arm
 static GIT_GLOBAL: std::sync::OnceLock<String> = std::sync::OnceLock::new();
 
 const GIT_GLOBAL_FILE: &str = "git-global.config";
 
-// spec: installer/SPEC.md §The consumer smoke — the empty global file, and no system file off native
-// Windows
+// spec: installer/SPEC.md §The consumer smoke — the line endings every leg checks out with, and
+// nothing else
+const GIT_GLOBAL_BODY: &str = "[core]\n\tautocrlf = false\n";
+
+// spec: installer/SPEC.md §The consumer smoke — the smoke's own global file, and no system file off
+// native Windows
 fn git_isolation(global: &str) -> Vec<(String, String)> {
     let mut out = vec![("GIT_CONFIG_GLOBAL".to_string(), global.to_string())];
     if !cfg!(windows) {
@@ -331,6 +335,19 @@ mod tests {
         assert_eq!(run_wide(None, None, &arm), arm.to_vec());
     }
 
+    // spec: installer/SPEC.md §The consumer smoke — a child's reading of one key, under the smoke's
+    // own global file where `isolated`, with any inherited isolation dropped first
+    fn read_key(dir: &std::path::Path, key: &str, base: &[(String, String)], isolated: bool) -> String {
+        let global = dir.join(GIT_GLOBAL_FILE);
+        std::fs::write(&global, GIT_GLOBAL_BODY).expect("cannot write the smoke's global file");
+        let set = if isolated { run_wide(Some(&global.display().to_string()), None, base) } else { base.to_vec() };
+        let inherited = ["GIT_CONFIG_GLOBAL".to_string(), "GIT_CONFIG_NOSYSTEM".to_string()];
+        let child = proc::ChildEnv { set: &set, unset: &inherited, cwd: Some(dir) };
+        let done = proc::run_with_stdin_in(&crate::programs::GIT, &["config", "--get", key], b"", &child)
+            .expect("git did not spawn");
+        done.stdout().map(|o| text(o).trim().to_string()).unwrap_or_default()
+    }
+
     // spec: installer/SPEC.md §The consumer smoke — a scratch consumer's git reads no host global
     // file: a key the home's file sets reaches a bare child and not an isolated one
     #[cfg(unix)]
@@ -340,21 +357,24 @@ mod tests {
         std::fs::remove_dir_all(&home).ok();
         std::fs::create_dir_all(&home).expect("cannot make the scratch home");
         std::fs::write(home.join(".gitconfig"), "[smokeprobe]\n\tplanted = yes\n").expect("cannot write the home's file");
-        let empty = home.join(GIT_GLOBAL_FILE);
-        std::fs::write(&empty, b"").expect("cannot write the empty global file");
         let h = home.display().to_string();
-        let base = [("HOME".to_string(), h.clone()), ("XDG_CONFIG_HOME".to_string(), h.clone())];
-        let probe = ["config", "--get", "smokeprobe.planted"];
-        let inherited = ["GIT_CONFIG_GLOBAL".to_string(), "GIT_CONFIG_NOSYSTEM".to_string()];
-        let read = |set: &[(String, String)]| {
-            let child = proc::ChildEnv { set, unset: &inherited, cwd: Some(&home) };
-            let done = proc::run_with_stdin_in(&crate::programs::GIT, &probe, b"", &child).expect("git did not spawn");
-            done.stdout().map(|o| text(o).trim().to_string()).unwrap_or_default()
-        };
-        let bare = read(&base);
-        let isolated = read(&run_wide(Some(&empty.display().to_string()), None, &base));
+        let base = [("HOME".to_string(), h.clone()), ("XDG_CONFIG_HOME".to_string(), h)];
+        let bare = read_key(&home, "smokeprobe.planted", &base, false);
+        let isolated = read_key(&home, "smokeprobe.planted", &base, true);
         std::fs::remove_dir_all(&home).ok();
         assert_eq!(bare, "yes", "the control child did not read the home's file, so the probe proves nothing");
         assert_eq!(isolated, "", "an isolated child read the home's global file");
+    }
+
+    // spec: installer/SPEC.md §The consumer smoke — an isolated child checks out with LF line endings
+    // on every host, Git for Windows' system `core.autocrlf` included
+    #[test]
+    fn an_isolated_child_reads_autocrlf_false() {
+        let dir = std::env::temp_dir().join(format!("cw-smoke-autocrlf-{}", std::process::id()));
+        std::fs::remove_dir_all(&dir).ok();
+        std::fs::create_dir_all(&dir).expect("cannot make the scratch dir");
+        let got = read_key(&dir, "core.autocrlf", &[], true);
+        std::fs::remove_dir_all(&dir).ok();
+        assert_eq!(got, "false");
     }
 }
