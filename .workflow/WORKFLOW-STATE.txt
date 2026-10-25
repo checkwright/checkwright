@@ -5,3 +5,4 @@
 ---
 
 personal-install-residue-pass scope a28e7d84 2026-10-25 128230549
+personal-install-residue-pass spec adf61252 2026-10-25 828086f29
