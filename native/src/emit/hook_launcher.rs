@@ -189,11 +189,45 @@ pub struct Chain {
     pub restore: String,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum Shell {
+    Posix,
+    PowerShell,
+}
+
+impl Shell {
+    pub fn host() -> Shell {
+        if cfg!(windows) { Shell::PowerShell } else { Shell::Posix }
+    }
+}
+
+// spec: gate-sdk/SPEC.md §install-hooks — one single-quoted word in the shell form named, so the
+// pasted restore sets the recorded value byte for byte
+pub fn shell_quoted(value: &str, shell: Shell) -> String {
+    let mut out = String::from("'");
+    for c in value.chars() {
+        match (shell, c) {
+            (Shell::Posix, '\'') => out.push_str("'\\''"),
+            (Shell::PowerShell, '\'' | '\u{2018}' | '\u{2019}' | '\u{201A}' | '\u{201B}') => {
+                out.push(c);
+                out.push(c);
+            }
+            _ => out.push(c),
+        }
+    }
+    out.push('\'');
+    out
+}
+
 // spec: gate-sdk/SPEC.md §install-hooks — the restore is printed, never written: the receipt's and
 // `uninstall`'s command, the recorded local value where there is one
 pub fn restore_line(chain: Option<&Chain>) -> String {
+    restore_line_in(chain, Shell::host())
+}
+
+fn restore_line_in(chain: Option<&Chain>, shell: Shell) -> String {
     match chain.map(|c| c.restore.as_str()).filter(|r| !r.is_empty()) {
-        Some(value) => format!("git config core.hooksPath {}", value),
+        Some(value) => format!("git config core.hooksPath {}", shell_quoted(value, shell)),
         None => "git config --unset core.hooksPath".to_string(),
     }
 }
@@ -551,9 +585,25 @@ mod tests {
     fn the_restore_line_names_the_recorded_value_or_unsets() {
         let with = Chain { dir: PathBuf::from("/r"), restore: ".husky".to_string() };
         let without = Chain { dir: PathBuf::from("/r"), restore: String::new() };
-        assert_eq!(restore_line(Some(&with)), "git config core.hooksPath .husky");
+        assert_eq!(restore_line(Some(&with)), "git config core.hooksPath '.husky'");
         assert_eq!(restore_line(Some(&without)), "git config --unset core.hooksPath");
         assert_eq!(restore_line(None), "git config --unset core.hooksPath");
+        for shell in [Shell::Posix, Shell::PowerShell] {
+            assert_eq!(restore_line_in(Some(&with), shell), "git config core.hooksPath '.husky'");
+            assert_eq!(restore_line_in(None, shell), "git config --unset core.hooksPath");
+        }
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — a space, a metacharacter and a quote stay inside one
+    // word in either shell form
+    #[test]
+    fn the_restore_value_is_one_single_quoted_word_in_either_shell_form() {
+        let value = "/opt/team hooks;$(rm -rf x)`y`\"it's\"\u{2019}";
+        assert_eq!(shell_quoted(value, Shell::Posix), "'/opt/team hooks;$(rm -rf x)`y`\"it'\\''s\"\u{2019}'");
+        assert_eq!(shell_quoted(value, Shell::PowerShell), "'/opt/team hooks;$(rm -rf x)`y`\"it''s\"\u{2019}\u{2019}'");
+        assert_eq!(shell_quoted("", Shell::Posix), "''");
+        assert_eq!(shell_quoted("C:\\hooks", Shell::PowerShell), "'C:\\hooks'");
+        assert_eq!(Shell::host() == Shell::PowerShell, cfg!(windows));
     }
 
     #[test]

@@ -620,7 +620,7 @@ mod tests {
         let _ = std::fs::remove_dir_all(&d);
         assert_eq!(unopted, "");
         assert_eq!(bare, "git config --unset core.hooksPath");
-        assert_eq!(restored, "git config core.hooksPath .husky");
+        assert_eq!(restored, "git config core.hooksPath '.husky'");
     }
 
     // spec: installer/SPEC.md §The verbs — `--help` answers on its own and an unknown argument is

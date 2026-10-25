@@ -14,14 +14,6 @@
 
 ## Technical Debt
 
-### hook-restore-line-quoting
-
-`hook_launcher::restore_line` (`native/src/emit/hook_launcher.rs`) prints the recorded local `core.hooksPath` unquoted as `git config core.hooksPath <value>`, in the `--install-hooks` receipt and in `uninstall`. A prior value with a space (`/opt/team hooks`) or a shell metacharacter prints a command that sets the wrong value or runs something else, against gate-sdk/SPEC.md §install-hooks's restore promise.
-
-**Deliverable:** quote the value for the host's shell, single-quoted: off Windows the POSIX form, a quote in the value spelled `'\''`; on native Windows the PowerShell form, a quote doubled (scope's calibration; the lead raised no objection). The quoting is a pure function taking the shell form, unit-tested in both forms on every host, so no code runs remote-first; one §install-hooks sentence states it.
-
-**Cost while deferred:** a clone whose prior hooks path carries a space or metacharacter gets a restore command that does not restore. Filed 2026-10-25 by personal-install-residue-pass' close (second-vendor review, read off the formatter), drained from the gap inbox. Re-verified at the next scope: line 196 formats `{}` bare; callers `install_hooks.rs` receipt and `installer/uninstall.rs`. Owner lookup: `hooksPath`, `restore_line` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §install-hooks.
-
 ### remove-block-unterminated-tail
 
 `marker::remove_block` (`native/src/marker.rs`) pops the final newline whenever its input was unterminated, so removing a block that is the file's unterminated last line (`head\nBEGIN\nbody\nEND`) leaves `head` with no newline, against gate-sdk/SPEC.md §lib/inject.sh's promise that the rest of the file stays byte-identical. That section's every-rebuild-carries-the-final-newline sentence says the opposite for this input.
@@ -883,4 +875,6 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
+
+- hook-restore-line-quoting
 
