@@ -1,8 +1,1 @@
 # contract: lifecycle-kit/SPEC.md §The survey record — carried surveys, one block per survey; boundary-truncated, cited only behind a passing witness.
-
-## 2026-10-25 scope — Which deferred entries can a stage session land in-tree this boundary, ranked by deferral cost
-- corpus: TASK-QUEUE.md .workflow/gap-inbox.md
-- oracle: bash gate-sdk/bin/run-gates.sh --emit queue-edges
-- rev: 44255bbe56094a3187e7b975ef71a764f2529857
-- finding: Scope: the Deferred section (12 entries) and the 2 carried gap bullets. No deferred entry carries a session or iteration cost class and none has reached the recurrence threshold (max count 1). Tree-actionable: the two carried gate-sdk native defects (hook_launcher::restore_line unquoted, marker::remove_block unterminated-tail newline), personal-workflow-export (installer feature, design-pending), record-stamp-encoding-compression (queue-kit feature, design-pending, wide date-predicate blast radius). Externally gated: companion-toolkit-profile and design-partner-preview (observed install), external-gate-quality-evidence (population), evaluator-root-agent-file (operator selection-probe run), notification-delivery-probe (lead with operator present), codex-plugin-hook-discovery (re-probed 2026-10-25 on 0.164.0: still no discovery beside the root manifest), codex-plugin-version-pin (publish run), cursor-muse-plugin-observed (no machine), benchmark-ab-experiment and hosted-attestation-service (later). Retired inbound edges all cite landed work; no disposed premise argued from. Supersession for the gate-sdk pair: none over hooksPath, restore_line, remove_block, marker, lib/inject, install-hooks, uninstall, newline, quoting.
-- inferred: whether codex releases after 0.164.0 discover plugin hooks beside a root plugin.json

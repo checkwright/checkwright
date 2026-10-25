@@ -1,12 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: restore-line-marker-tail-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-10-25, lead-relayed, not a ruling; the iteration opened undirected):** option A, two debt units, the two bullets personal-install-residue-pass' close carried in: `hook-restore-line-quoting` and `remove-block-unterminated-tail`. Stages scope, build, validate, close. Composition: stands alone, drain 2 against inflow 1.4. Push need: 1 against 2, the closing push only.
 
 ---
 
