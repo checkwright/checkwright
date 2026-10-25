@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+restore-line-marker-tail-pass gates sha256=71437737aa5211657db19466e91f5545598906116b3f6ab7087448ae44622191 pass=156 fail=0 ignore=0 verdict=clean 2026-10-25
+restore-line-marker-tail-pass gate_sdk sha256=c1ad68813979393b485d2b07b7aafc72953e0f2453bed750b8e8ee5dd3711eae pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+restore-line-marker-tail-pass canon_kit sha256=7da861c196258fd00b91559ec77ed8c768822bd5bde1ce22c3191410addd736c pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+restore-line-marker-tail-pass context_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+restore-line-marker-tail-pass delegation_kit sha256=e8b7dacc5b3a03c2084bd61274ee3c701400be4001eeaafa4126bc7f4b710363 pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+restore-line-marker-tail-pass doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+restore-line-marker-tail-pass evidence_kit sha256=c62871f8123949178b90372d234262f4c133b06c830e8faa9bbb9af4d2767fea pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+restore-line-marker-tail-pass guard_kit sha256=6cb4ff2f4bd80b6561bd33590971d82cddcaa430595db7b5b0fefd800ace387b pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+restore-line-marker-tail-pass lifecycle_kit sha256=83b0f30c7091e60a96eac9d498bf22cc7766ac4d472b56501a4777e0e6507c4c pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+restore-line-marker-tail-pass queue_kit sha256=a4c89486a636a6d9c43ded5bbbb06f21bd7c7b3db7a8a330bdcf89eb952b9f7d pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+restore-line-marker-tail-pass site_kit sha256=9a315d2c0239c08b3c5d4fb7435d5c8a4f3a1faf11c4cdffd9788f2249ba03eb pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+restore-line-marker-tail-pass scripts sha256=479e481bd1d4c0da197db543326cac0c1fb2f54141758bc2821fef6b02dd543e pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+restore-line-marker-tail-pass guard_tests sha256=13a010dc18b6a1f9980ff8efb9e7220f407fce43aa2d0f3394a593247e43c367 pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+restore-line-marker-tail-pass demo sha256=78f97261b304b17bbd7d5fbeea73a985b899ffb227e261eedaab59dfa2d644dc pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+restore-line-marker-tail-pass installer_smoke sha256=66672fc35780bf4c29e9614121cdc0f432ec443e25b60e08a27f4a00c186af8c pass=30 fail=0 ignore=0 verdict=clean 2026-10-25
+restore-line-marker-tail-pass consumer_smoke sha256=1f37331e1b3c622ac14022f2ad988f72d03bf9e24c80b06dfe1b7e8b7bf2525e pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+restore-line-marker-tail-pass upgrade sha256=3e36ab519fa8d807ba7b3b787bc6dbdb845fa7b85f9a0528f1d76e36533efe2e pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+restore-line-marker-tail-pass agents_md_smoke sha256=95a363b1e4b607bfcfc1eabcc6441dff6354538fd0d309ae6fbd3d4e7229b988 pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+restore-line-marker-tail-pass index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+restore-line-marker-tail-pass native_crate sha256=a6abb9410aa3fad29bc631ba654826318cb66cfb82fb31c33123276b54ec089b pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
+restore-line-marker-tail-pass projection_witness sha256=c359fbe53dfc2eb22ec6e11d1b332819949b19d5d884cac7c34728619527b734 pass=1 fail=0 ignore=0 verdict=clean 2026-10-25
