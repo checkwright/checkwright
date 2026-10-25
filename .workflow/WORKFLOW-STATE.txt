@@ -7,3 +7,4 @@
 restore-line-marker-tail-pass scope aee4d2cd 2026-10-25 2a15669eb
 restore-line-marker-tail-pass build a833e281 2026-10-25 5290deb2e
 restore-line-marker-tail-pass validate a405c8f2 2026-10-25 6ad7dda48
+restore-line-marker-tail-pass close a1a29484 2026-10-25 d9bd561be
