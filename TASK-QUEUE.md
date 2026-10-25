@@ -16,14 +16,6 @@
 
 ## Technical Debt
 
-### journal-mark-writer-unnamed
-
-Every stage template's last step says to append `DONE` to the resume journal and names no writer, and lead.md says the same of `DISPOSED`, so sessions spell the raw append: the manual-operation meter ranks `echo >>` in nine iterations' logs, about 110 calls, some on the absolute path. The journal arm already writes both: `--emit journal DONE`, and `--emit journal --lead DISPOSED`, which refuses only a segment already disposed (lifecycle-kit/SPEC.md §The journal arm).
-
-**Deliverable:** debt: each last step and lead.md's disposal sentence name the arm form.
-
-**Cost while deferred:** each stage session spends a hand-spelled append, a permission decision where the path is absolute. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close; filed at the next scope, the `--lead` form re-read there. Owner lookup: `DONE`, `DISPOSED`, `journal` in this file, none; owner lifecycle-kit/SPEC.md §templates/stages/.
-
 ### notification-delivery-probe
 
 [not-icebox-eligible: 2026-10-10 filed on the operator direction of 2026-10-02 and waits on a lead session with the operator present; evicting it would compress that direction away]
@@ -923,4 +915,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - restore-line-fidelity
 - marker-block-removal-fidelity
 - init-commit-runs-adopter-hooks
+- journal-mark-writer-unnamed
 
