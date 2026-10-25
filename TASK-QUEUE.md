@@ -1,14 +1,62 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: personal-install-residue-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The set (operator direction 2026-10-25, lead-relayed, not a ruling; the iteration opened undirected):** option C, seven units, the install-hooks and personal-install residue plus one lead-posture rider. Debt promoted by scope: `hookspath-prior-physical`, `marker-block-final-newline`, `personal-exclude-crlf`, `link-refusal-junction-case` (the four bullets personal-install-hardening-pass' close carried in), and `smoke-git-config-isolation`. Features for spec to author and pair: `hookspath-chain`, `oracle-turn-done-marker`. `notification-delivery-probe` stays deferred. Stages scope, spec, build, validate, close; align joins if an authored amendment spans two component directories. Composition: bundled, drain 3 against inflow 1.4.
+
+  **Order (scope, own authority):** `hookspath-prior-physical` lands before `hookspath-chain`, which records and runs the prior hooks directory and so needs it resolved physically. No other pairing among the set or the pool.
+
+  **Push need (2026-10-25, inside the budget):** 2 against 2. One mid-iteration push after `link-refusal-junction-case`, `smoke-git-config-isolation` and `hookspath-chain` build, since a Windows leg is the first runner of each, then the closing push.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### hookspath-prior-physical
+
+`--install-hooks` resolves the prior hooks directory lexically: `prior()` in `native/src/emit/install_hooks.rs` joins a relative `core.hooksPath` through `walk::abs_against`, whose `normalize_abs` folds `..` without reading links. With `core.hooksPath=alias/../hooks` and `alias` a symlink to `<outside>/sub`, git runs `<outside>/hooks`, while the refusal reads `<repo>/hooks`, finds no live hook and repoints `core.hooksPath`, silently disabling the live pre-commit (probed: exit 0, "holds no hook git runs"), against gate-sdk/SPEC.md §install-hooks's refusal.
+
+**Deliverable:** resolve the prior directory physically (canonicalize the joined path, or its deepest existing ancestor) before the live-hook read, with a unit case.
+
+**Cost while deferred:** a link-plus-dotdot `core.hooksPath` loses its hooks unnoticed. Filed 2026-10-25 by personal-install-hardening-pass' close (second-vendor review, probed there), drained from the gap inbox. Re-verified at the next scope: `prior()` still reaches `normalize_abs`. Owner lookup: `hooksPath`, `abs_against` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §install-hooks.
+
+### marker-block-final-newline
+
+`install_block` and `uninstall_block` in `native/src/marker.rs` re-terminate an unterminated last line. (a) An exclude file holding `keep` with no newline, given personal installs in worktrees A then B and removals A then B, ends `keep\n`: A's removal keeps the newline B follows, so the writer meets gate-sdk/SPEC.md §lib/inject.sh's end-of-file condition while the personal install's pre-install-bytes promise fails for a non-LIFO removal. (b) Both rebuilds push `\n` after every kept line, so another block whose end marker is an unterminated last line gains a newline when this worktree's block is rewritten, against the promise that every other block stays byte-identical; the landed test compares only the extracted body.
+
+**Deliverable:** carry the input's final-newline state through both rebuilds and record which separator an append wrote, with a byte-level case for each half.
+
+**Cost while deferred:** a stray trailing newline in a hand-edited or multi-worktree exclude file. Filed 2026-10-25 by personal-install-hardening-pass' close (second-vendor review, read off source), drained from the gap inbox. Half (a) is read off source; its byte-level case runs it. Owner lookup: `newline`, `marker` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh.
+
+### personal-exclude-crlf
+
+The personal install's exclude file carries two unstated assumptions. (a) Markers match as whole LF-split lines (`fresh::file_lines` keeps a CR), so a CRLF-converted exclude file hides an unkeyed block from mode detection and the half-open check, and an explicit `init --personal` appends a second block. (b) Two worktrees' runs read and rewrite the one shared exclude file with no lock, so concurrent runs can drop one worktree's block.
+
+**Deliverable (operator direction 2026-10-25, lead-relayed, not a ruling):** tolerate a trailing CR on marker lines, and state the single-writer limit in installer/SPEC.md §The personal install. No lock file.
+
+**Cost while deferred:** a CRLF-converted exclude file or two concurrent personal runs leave a duplicated or lost block. Filed 2026-10-25 by personal-install-hardening-pass' close (second-vendor review, read off source), drained from the gap inbox. Owner lookup: `CRLF`, `exclude file` in this file and the disposed-findings record, none; owner installer/SPEC.md §The personal install.
+
+### link-refusal-junction-case
+
+`init`'s link refusal has no native-Windows witness. The build inferred that `symlink_metadata` reads a junction as a link, but `link_below`'s unit test `a_destination_through_a_link_is_named_at_its_first_link` (`native/src/installer/mod.rs`) is `#[cfg(unix)]`, and the consumer smoke's personal arm plants no junction, so no Windows leg runs the junction case.
+
+**Deliverable:** a Windows-gated unit case creating a junction (`mklink /J` through `cmd`, or `std::os::windows::fs::symlink_dir` where the runner allows it) under a kit directory and asserting `link_below` names it.
+
+**Cost while deferred:** a junction under a kit root on native Windows may still receive the payload unrefused. Filed 2026-10-25 by personal-install-hardening-pass' close (read off the closing push's logs), drained from the gap inbox. Owner lookup: `junction`, `link_below` in this file and the disposed-findings record, none; owner installer/SPEC.md §init.
+
+### smoke-git-config-isolation
+
+The consumer smoke's scratch consumers read the host's global and system git config, which installer/SPEC.md §The consumer smoke leaves as it is by design. Since `hookspath-clobber`, a host whose global `core.hooksPath` or `init.templateDir` leaves a live hook in a fresh consumer reds every arm running `--install-hooks`.
+
+**Deliverable:** the smoke's git children run under `GIT_CONFIG_GLOBAL` naming an empty file, and `GIT_CONFIG_NOSYSTEM` where a leg allows it (cf. `fence_run.rs`), with that section's sentence rewritten. Read the Windows legs before dropping the system file, whose Git for Windows defaults (`core.autocrlf`, `core.symlinks`) the arms may lean on (inferred).
+
+**Cost while deferred:** a dev host so configured sees smoke reds; CI hosts are unaffected. Filed 2026-10-25 by personal-install-hardening-pass' close, drained from the gap inbox. Re-verified there: with the global file naming such a directory, `--install-hooks` in a fresh repository exits 2, and with `GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1` it exits 0; no `GIT_CONFIG` name appears under `native/src/emit/installer_smoke/`. Owner lookup: `GIT_CONFIG`, `global git` in this file and the disposed-findings record, none; owner installer/SPEC.md §The consumer smoke.
 
 ## Deferred
 
@@ -185,16 +233,6 @@ Under the split lead posture, a scope session resumed as the intent oracle after
 **Deliverable:** design-pending, a feature: chain rather than refuse. Record the prior hooks directory, run its same-named hook ahead of the battery from the placed hooks, place a forwarding launcher for each other live hook, re-place them on `--refresh`, and restore the prior value at uninstall. Script hooks on native Windows need git's own shebang handling; `git hook run` would supply it, its introducing release above the git floor (inferred, not probed).
 
 **Cost while deferred:** a personal adopter on such a project checks at the battery alone, never at commit. Filed 2026-10-25 by personal-install-hardening-pass' close, drained from the gap inbox. Re-verified there: a fresh clone whose global `core.hooksPath` names a directory holding a live `pre-commit` refuses `--install-hooks` at exit 2. Owner lookup: `chain`, `hooksPath` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §install-hooks.
-
-### smoke-git-config-isolation
-
-[cost: event/low] [surface: installer]
-
-The consumer smoke's scratch consumers read the host's global and system git config, which installer/SPEC.md §The consumer smoke leaves as it is by design. Since `hookspath-clobber`, a host whose global `core.hooksPath` or `init.templateDir` leaves a live hook in a fresh consumer reds every arm running `--install-hooks`.
-
-**Deliverable:** the smoke's git children run under `GIT_CONFIG_GLOBAL` naming an empty file, and `GIT_CONFIG_NOSYSTEM` where a leg allows it (cf. `fence_run.rs`), with that section's sentence rewritten. Read the Windows legs before dropping the system file, whose Git for Windows defaults (`core.autocrlf`, `core.symlinks`) the arms may lean on (inferred).
-
-**Cost while deferred:** a dev host so configured sees smoke reds; CI hosts are unaffected. Filed 2026-10-25 by personal-install-hardening-pass' close, drained from the gap inbox. Re-verified there: with the global file naming such a directory, `--install-hooks` in a fresh repository exits 2, and with `GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1` it exits 0; no `GIT_CONFIG` name appears under `native/src/emit/installer_smoke/`. Owner lookup: `GIT_CONFIG`, `global git` in this file and the disposed-findings record, none; owner installer/SPEC.md §The consumer smoke.
 
 ## Icebox
 
