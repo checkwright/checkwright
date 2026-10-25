@@ -75,7 +75,12 @@ pub fn is_personal(root: &Path) -> bool {
     exclude(root)
         .ok()
         .and_then(|e| std::fs::read_to_string(&e.path).ok())
-        .is_some_and(|t| crate::fresh::file_lines(&t).iter().any(|l| *l == PERSONAL_BEGIN || l.starts_with(&keyed)))
+        .is_some_and(|t| {
+            crate::fresh::file_lines(&t)
+                .iter()
+                .map(|l| crate::marker::bare(l))
+                .any(|l| l == PERSONAL_BEGIN || l.starts_with(&keyed))
+        })
 }
 
 // spec: installer/SPEC.md §The personal install — a keyed block whose key names no directory under
@@ -87,14 +92,14 @@ fn prune(e: &Exclude, wt: &Worktree) -> Result<Vec<String>, String> {
     let keyed = format!("{} ", PERSONAL_BEGIN);
     let gone: Vec<String> = lines
         .iter()
-        .filter_map(|l| l.strip_prefix(&keyed))
+        .filter_map(|l| crate::marker::bare(l).strip_prefix(&keyed))
         .filter(|k| !k.is_empty() && !wt.common.join(k).is_dir())
         .map(str::to_string)
         .collect();
     let mut said = Vec::new();
     for key in gone {
         let (begin, end) = markers(Some(&key));
-        if !lines.contains(&end.as_str()) {
+        if !crate::marker::has(&lines, &end) {
             said.push(format!(
                 "personal: left the exclude block of {} in {}, its end marker missing",
                 key, e.shown
@@ -322,6 +327,14 @@ mod tests {
         assert!(is_personal(&linked), "a worktree without its own block lost the mode");
 
         write(&linked, &one("linked-only.txt"), &[]).expect("the linked block was not rewritten");
+        // spec: installer/SPEC.md §The personal install — a CRLF-converted exclude file keeps both
+        // blocks: the mode reads, the bare block is replaced, and the live key is not pruned
+        std::fs::write(&e.path, read().replace('\n', "\r\n")).expect("cannot convert the exclude file");
+        assert!(is_personal(&main), "a CRLF bare block was not read as the mode");
+        let said = write(&main, &one("main-only.txt"), &[]).expect("the CRLF main block was not rewritten").said;
+        assert!(said.is_empty(), "a live worktree's CRLF block was pruned: {:?}", said);
+        assert_eq!(read().matches(PERSONAL_BEGIN).count(), 2, "a CRLF block was duplicated or dropped");
+        assert!(ignored(&main, "linked-only.txt"), "the linked block stopped reading ignored");
         git(&["worktree", "remove", "--force", &linked_s]);
         let mut grown = read();
         grown.push_str(&format!("{} worktrees/ghost\n/ghost\n", PERSONAL_BEGIN));

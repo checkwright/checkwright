@@ -38,14 +38,6 @@ Under the split lead posture, a scope session resumed as the intent oracle after
 
 ## Technical Debt
 
-### personal-exclude-crlf
-
-The personal install's exclude file carries two unstated assumptions. (a) Markers match as whole LF-split lines (`fresh::file_lines` keeps a CR), so a CRLF-converted exclude file hides an unkeyed block from mode detection and the half-open check, and an explicit `init --personal` appends a second block. (b) Two worktrees' runs read and rewrite the one shared exclude file with no lock, so concurrent runs can drop one worktree's block.
-
-**Deliverable (operator direction 2026-10-25, lead-relayed, not a ruling):** tolerate a trailing CR on marker lines, and state the single-writer limit in installer/SPEC.md §The personal install. No lock file.
-
-**Cost while deferred:** a CRLF-converted exclude file or two concurrent personal runs leave a duplicated or lost block. Filed 2026-10-25 by personal-install-hardening-pass' close (second-vendor review, read off source), drained from the gap inbox. Owner lookup: `CRLF`, `exclude file` in this file and the disposed-findings record, none; owner installer/SPEC.md §The personal install.
-
 ### link-refusal-junction-case
 
 `init`'s link refusal has no native-Windows witness. The build inferred that `symlink_metadata` reads a junction as a link, but `link_below`'s unit test `a_destination_through_a_link_is_named_at_its_first_link` (`native/src/installer/mod.rs`) is `#[cfg(unix)]`, and the consumer smoke's personal arm plants no junction, so no Windows leg runs the junction case.
@@ -918,4 +910,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 - hookspath-prior-physical
 - marker-block-final-newline
+- personal-exclude-crlf
 

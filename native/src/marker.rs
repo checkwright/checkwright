@@ -3,6 +3,20 @@
 // remover. It is the whole of the mechanism; nothing holds a second copy.
 use crate::fresh;
 
+// spec: gate-sdk/SPEC.md §lib/inject.sh — a line as a marker or blank-line test reads it: one
+// trailing carriage return dropped, so a CRLF-converted file keeps its blocks
+pub fn bare(line: &str) -> &str {
+    line.strip_suffix('\r').unwrap_or(line)
+}
+
+fn is(line: &str, marker: &str) -> bool {
+    bare(line) == marker
+}
+
+pub fn has(lines: &[&str], marker: &str) -> bool {
+    lines.iter().any(|l| is(l, marker))
+}
+
 // spec: gate-sdk/SPEC.md §lib/inject.sh — whole-line equality on each marker, the lines strictly
 // between them, and the trailing newlines a `$(…)` capture strips. An indented or embedded
 // spelling opens nothing, which is what keeps a marker from being forgeable by prose.
@@ -10,11 +24,11 @@ pub fn read_block(text: &str, begin: &str, end: &str) -> String {
     let mut inb = false;
     let mut out: Vec<&str> = Vec::new();
     for line in fresh::file_lines(text) {
-        if line == begin {
+        if is(line, begin) {
             inb = true;
             continue;
         }
-        if line == end {
+        if is(line, end) {
             inb = false;
             continue;
         }
@@ -29,8 +43,8 @@ pub fn read_block(text: &str, begin: &str, end: &str) -> String {
 // than asserted so the writer states its own refusal wording for each malformed shape.
 fn bounds(lines: &[&str], begin: &str, end: &str) -> (Option<usize>, Option<usize>) {
     (
-        lines.iter().position(|l| *l == begin),
-        lines.iter().position(|l| *l == end),
+        lines.iter().position(|l| is(l, begin)),
+        lines.iter().position(|l| is(l, end)),
     )
 }
 
@@ -109,7 +123,7 @@ pub fn install_block(path: &str, begin: &str, end: &str, body: &str) -> Result<S
     // spec: gate-sdk/SPEC.md §lib/inject.sh — the presence test is whole-line, the module's own
     // stated rule; the shell form gated the same replace on a substring grep, so a marker
     // occurring inside prose sent it down a replace path that matched nothing and reported it
-    if !lines.contains(&begin) {
+    if !has(&lines, begin) {
         let mut out = text;
         out.push('\n');
         out.push_str(&block);
@@ -120,12 +134,12 @@ pub fn install_block(path: &str, begin: &str, end: &str, body: &str) -> Result<S
     let mut out = String::new();
     let mut skip = false;
     for line in &lines {
-        if *line == begin {
+        if is(line, begin) {
             skip = true;
             out.push_str(&block);
             continue;
         }
-        if *line == end {
+        if is(line, end) {
             skip = false;
             continue;
         }
@@ -150,7 +164,7 @@ fn terminated(text: &str) -> bool {
 // spec: gate-sdk/SPEC.md §lib/inject.sh — the installer writer's refusal, readable before a
 // caller's first write: a begin marker without its end
 fn half_open(path: &str, lines: &[&str], begin: &str, end: &str) -> Result<(), String> {
-    if lines.contains(&begin) && !lines.contains(&end) {
+    if has(lines, begin) && !has(lines, end) {
         return Err(format!(
             "{}: begin marker present but end marker missing — refusing to guess the block bounds",
             path
@@ -170,18 +184,18 @@ pub fn installable(path: &str, begin: &str, end: &str) -> Result<(), String> {
 pub fn remove_block(path: &str, begin: &str, end: &str) -> Result<bool, String> {
     let text = fresh::read_captured(path)?;
     let lines = fresh::file_lines(&text);
-    if !lines.contains(&begin) {
+    if !has(&lines, begin) {
         return Ok(false);
     }
     half_open(path, &lines, begin, end)?;
     let mut out = String::new();
     let mut skip = false;
     for line in &lines {
-        if *line == begin {
+        if is(line, begin) {
             skip = true;
             continue;
         }
-        if *line == end {
+        if is(line, end) {
             skip = false;
             continue;
         }
@@ -203,21 +217,21 @@ pub fn remove_block(path: &str, begin: &str, end: &str) -> Result<bool, String> 
 pub fn uninstall_block(path: &str, begin: &str, end: &str) -> Result<bool, String> {
     let text = fresh::read_captured(path)?;
     let lines = fresh::file_lines(&text);
-    let Some(b) = lines.iter().position(|l| *l == begin) else {
+    let Some(b) = lines.iter().position(|l| is(l, begin)) else {
         return Ok(false);
     };
     half_open(path, &lines, begin, end)?;
-    let head = if b > 0 && lines[b - 1].is_empty() { b - 1 } else { b };
+    let head = if b > 0 && bare(lines[b - 1]).is_empty() { b - 1 } else { b };
     let mut out = String::new();
     for line in &lines[..head] {
         out.push_str(line);
         out.push('\n');
     }
     let rest = &lines[b..];
-    let mut tail = rest.iter().position(|l| *l == end).map_or(&[][..], |i| &rest[i + 1..]);
+    let mut tail = rest.iter().position(|l| is(l, end)).map_or(&[][..], |i| &rest[i + 1..]);
     // spec: gate-sdk/SPEC.md §lib/inject.sh — a newline this block's append put on an unterminated
     // line stays while lines follow, and a blank line directly after the block goes in its place
-    if head == b && b > 0 && tail.first().is_some_and(|l| l.is_empty()) {
+    if head == b && b > 0 && tail.first().is_some_and(|l| bare(l).is_empty()) {
         tail = &tail[1..];
     }
     for line in tail {
@@ -226,10 +240,13 @@ pub fn uninstall_block(path: &str, begin: &str, end: &str) -> Result<bool, Strin
     }
     // spec: gate-sdk/SPEC.md §lib/inject.sh — an append onto an unterminated last line wrote the
     // newline that terminates it rather than a blank line, so that newline goes while the block
-    // still ends the file
+    // still ends the file, with the carriage return a CRLF conversion put before it
     if tail.is_empty() {
         if head == b && b > 0 {
             out.pop();
+            if out.ends_with('\r') {
+                out.pop();
+            }
         }
     } else if !terminated(&text) {
         out.pop();
@@ -319,6 +336,35 @@ mod tests {
         std::fs::write(&p, &seed).expect("cannot reseed");
         assert_eq!(remove_block(&p, B, E), Ok(true));
         assert_eq!(fresh::read_captured(&p).expect("cannot read back"), format!("head\n\n{}\nb\n{}", B2, E2));
+        std::fs::remove_file(&p).ok();
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — a CRLF-converted file keeps its block: the installer
+    // writer replaces rather than appending a second, the half-open refusal reads, and the inverse
+    // restores the converted pre-install bytes
+    #[test]
+    fn a_marker_line_with_a_trailing_carriage_return_still_matches() {
+        let p = std::env::temp_dir()
+            .join(format!("cw-marker-crlf-{}.txt", std::process::id()))
+            .display()
+            .to_string();
+        let read = || fresh::read_captured(&p).expect("cannot read back");
+        for before in ["keep\r\n", "keep"] {
+            std::fs::write(&p, before).expect("cannot seed");
+            install_block(&p, B, E, "one\n").expect("the block was not installed");
+            std::fs::write(&p, read().replace("\r\n", "\n").replace('\n', "\r\n")).expect("cannot convert");
+            assert_eq!(installable(&p, B, E), Ok(()));
+            assert_eq!(install_block(&p, B, E, "two\n"), Ok("replaced".to_string()));
+            assert_eq!(read().matches(B).count(), 1, "a second block was appended from {:?}", before);
+            assert_eq!(read_block(&read(), B, E), "two");
+            assert_eq!(uninstall_block(&p, B, E), Ok(true));
+            assert_eq!(read(), before);
+        }
+        std::fs::write(&p, format!("a\r\n{}\r\nb\r\n{}\r\nc\r\n", B, E)).expect("cannot seed");
+        assert_eq!(remove_block(&p, B, E), Ok(true));
+        assert_eq!(read(), "a\r\nc\r\n");
+        std::fs::write(&p, format!("a\r\n{}\r\nb\r\n", B)).expect("cannot seed");
+        assert!(installable(&p, B, E).is_err(), "a CRLF half-open pair was not refused");
         std::fs::remove_file(&p).ok();
     }
 
