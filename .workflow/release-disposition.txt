@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+install-commit-hooks-pass release v0.35.0 — minor, five Behavior changes; cut on explicit operator direction, the set record's Push need line (2026-10-25) naming the release tag on init-commit-runs-adopter-hooks
