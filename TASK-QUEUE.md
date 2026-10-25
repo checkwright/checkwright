@@ -26,16 +26,6 @@
 
 **Cost while deferred:** a personal adopter on such a project checks at the battery alone, never at commit. Filed 2026-10-25 by personal-install-hardening-pass' close, drained from the gap inbox. Re-verified there: a fresh clone whose global `core.hooksPath` names a directory holding a live `pre-commit` refuses `--install-hooks` at exit 2. Owner lookup: `chain`, `hooksPath` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §install-hooks.
 
-### oracle-turn-done-marker
-
-[spec: SPEC-oracle-turn-done.md]
-
-Under the split lead posture, a scope session resumed as the intent oracle after its stage ended appends its answer to its resume journal past the `DONE` line, so `DONE` is no longer the last line and lifecycle-kit/templates/lead.md's last-line completion check reads that session as unfinished.
-
-**Deliverable:** a resumed turn that appends to its stage's journal re-stamps `DONE`, stated in the stage templates' last step and at lead.md's completion read; designed in the amendment.
-
-**Cost while deferred:** a lead's completion read misjudges a finished oracle and falls back to asking it. Filed 2026-10-24 by personal-overlay-pass' lead after its close (seen when the oracle answered spec's workflow-profile question), drained at the next scope. Owner lookup: `DONE`, `oracle` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §templates/lead.md.
-
 ## Technical Debt
 
 ### link-refusal-junction-case
@@ -911,4 +901,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - hookspath-prior-physical
 - marker-block-final-newline
 - personal-exclude-crlf
+- oracle-turn-done-marker
 
