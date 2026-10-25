@@ -68,7 +68,7 @@ a narrow external preview before any broad announcement: a preview cohort whose 
 
 **Readiness holds, both discharged:** the 2026-09-26 hold until v0.26.0 published the repaired front door, and the 2026-09-29 clean-container rehearsal, `front-door-container-rehearsal` at preview-readiness, filed to the author seat's record.
 
-**Operator-seat installs count toward the observed install (operator direction 2026-10-25, lead-relayed, not a ruling, revising 2026-09-29's that they gate nothing):** an agent session in one operator project on `prose` and one in a second on the full technical profile, each from a lead-drafted cold prompt, then friends on their own machines. `op-01` and `op-02`, both `prose`, were filed 2026-10-25; `op-02` stopped at init's commit (`init-commit-runs-adopter-hooks`).
+**Operator-seat installs count toward the observed install (operator direction 2026-10-25, lead-relayed, not a ruling, revising 2026-09-29's that they gate nothing):** an agent session in one operator project on `prose` and one in a second on the full technical profile, each from a lead-drafted cold prompt, then friends on their own machines. `op-01` and `op-02`, both `prose`, were filed 2026-10-25; `op-02` stopped at init's commit (`init-commit-runs-adopter-hooks`, landed at install-commit-hooks-pass).
 
 **Comparison arm (operator direction 2026-10-17, lead-relayed, not a ruling):** where the metrics allow, beside a custom-CI baseline and one named same-seat entrant, on mistakes caught, setup effort, interruptions and retention.
 
@@ -199,6 +199,30 @@ the tree-side first unit of [hosted-attestation-service](#hosted-attestation-ser
 **Deliverable:** design-pending, a feature: the predicate type's name and schema, the manifest fields it carries, whether the kits emit the Statement for a signer to wrap or sign it themselves, and its versioning rule.
 
 **Cost while deferred:** a gate run is readable only in this tree's own formats, so no attestation verifier or log reads one; nothing rots. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close from the operator direction of that date, lead-relayed (not a ruling). Owner lookup: `in-toto`, `predicate`, `DSSE` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md.
+
+### init-identity-precondition
+
+[cost: event/low] [surface: installer]
+
+init and uninstall cannot tell a missing git identity from a hook's red at their commit: with no identity configured, `git var GIT_COMMITTER_IDENT` exits 128 as `git commit` does, so a fourth precondition could refuse before any write, under the clean-worktree check's guard. Not folded into `init-commit-runs-adopter-hooks`: a new refusal across init, update and uninstall widens its envelope (oracle decision, lead decision to file, 2026-10-25, lead-relayed, not a ruling).
+
+**Deliverable:** a feature: the identity precondition on init, update and uninstall, its refusal, and installer/SPEC.md §init's precondition roster.
+
+**Inferred, not run:** an identity-less first install stages every vendored file and exits 1 with git's own account as the only attribution — `init` in a scratch repo with HOME at an empty directory and GIT_CONFIG_NOSYSTEM=1
+
+**Cost while deferred:** that failure, on a fresh machine, the seat likeliest to lack an identity. Filed 2026-10-25 by install-commit-hooks-pass' close from a gap bullet of that date; re-verified there: `git var GIT_COMMITTER_IDENT` exits 128 with no identity. Owner lookup: `GIT_COMMITTER_IDENT`, `identity`, `user.email` in this file and the disposed-findings record, none; owner installer/SPEC.md §init.
+
+### hookspath-non-utf8-restore
+
+[cost: event/low] [surface: gate-sdk]
+
+`--install-hooks` records a non-UTF-8 local `core.hooksPath` lossily: `prior` in native/src/emit/install_hooks.rs decodes git's output with `String::from_utf8_lossy`, so the chain record holds U+FFFD and the restore line sets a different value back, against gate-sdk/SPEC.md §install-hooks' "pastes as itself". Not folded into `restore-line-fidelity`, which it would widen (oracle decision, lead decision to file, 2026-10-25, lead-relayed, not a ruling).
+
+**Deliverable:** design-pending: a strict decode refused beside the line-break refusal (the likely remedy), or a byte-preserving record and restore line.
+
+**Inferred, not run:** the restore line sets a different value back — set a non-UTF-8 local core.hooksPath in a scratch repo, run `--install-hooks`, read its chain record and restore line
+
+**Cost while deferred:** an adopter with a non-UTF-8 hooks path is advised a restore that points git elsewhere. Filed 2026-10-25 by install-commit-hooks-pass' close from a gap bullet of that date; re-verified there: the lossy decode in `prior`, which the bullet named `local_hooks_path`. Owner lookup: `from_utf8_lossy`, `non-UTF`, `hooksPath`, `restore line` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §install-hooks.
 
 ## Icebox
 
