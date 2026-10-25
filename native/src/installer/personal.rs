@@ -279,6 +279,9 @@ mod tests {
             crate::proc::run(&programs::GIT, &argv).expect("git did not spawn");
         };
         git(&["init", "-q"]);
+        // comment-tier-exempt: auto maintenance stays off, since the seed commit's detached run
+        // prunes the worktree admin dir below while it is still half-written
+        git(&["config", "maintenance.auto", "false"]);
         git(&["commit", "-q", "--allow-empty", "-m", "seed"]);
         let linked_s = linked.to_string_lossy().into_owned();
         let name = linked.file_name().expect("a named worktree").to_string_lossy().into_owned();

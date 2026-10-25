@@ -349,6 +349,9 @@ mod tests {
         put(main.join("sub/a.txt"), "hi\n");
         let m = main.display().to_string();
         git(&["-C", &m, "init", "-q"]);
+        // comment-tier-exempt: auto maintenance stays off, since the seed commit's detached run
+        // prunes the worktree admin dir below while it is still half-written
+        git(&["-C", &m, "config", "maintenance.auto", "false"]);
         git(&["-C", &m, "add", "sub/a.txt"]);
         git(&["-C", &m, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "i"]);
         let head = String::from_utf8_lossy(&git(&["-C", &m, "rev-parse", "HEAD"])).into_owned();
