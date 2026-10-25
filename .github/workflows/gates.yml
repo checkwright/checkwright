@@ -1787,6 +1787,48 @@ jobs:
           if ($bad -gt 0) { exit 1 }
           Write-Host "5.1 reads the live one-liner as a string that parses, changed on comment lines only"
 
+      # spec: gate-sdk/SPEC.md §install-hooks — the restore is printed, never written: the PowerShell form under each host
+      - name: the restore line pastes as itself under Windows PowerShell 5.1
+        if: ${{ !cancelled() && matrix.part == 'bootstrap' }}
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Continue'
+          $repo = Join-Path $env:RUNNER_TEMP 'restore-line-probe-powershell'
+          if (Test-Path -LiteralPath $repo) { Remove-Item -Recurse -Force -LiteralPath $repo }
+          New-Item -ItemType Directory -Force -Path $repo | Out-Null
+          git -C $repo init -q
+          Push-Location $repo
+          $hostName = "PowerShell $($PSVersionTable.PSVersion) ($($PSVersionTable.PSEdition), argument passing $PSNativeCommandArgumentPassing)"
+          git config core.hooksPath 'a"b'
+          Write-Host "probe | $hostName | set [a`"b] | got [$(git config --local --get core.hooksPath)]"
+          git config core.hooksPath 'C:\probe dir\'
+          Write-Host "probe | $hostName | set [C:\probe dir\] | got [$(git config --local --get core.hooksPath)]"
+          git config core.hooksPath 'a b''c'
+          Write-Host "probe | $hostName | set [a b'c] | got [$(git config --local --get core.hooksPath)]"
+          Pop-Location
+          exit 0
+
+      # spec: gate-sdk/SPEC.md §install-hooks — the restore is printed, never written: the PowerShell form under each host
+      - name: the restore line pastes as itself under PowerShell 7
+        if: ${{ !cancelled() && matrix.part == 'bootstrap' }}
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Continue'
+          $repo = Join-Path $env:RUNNER_TEMP 'restore-line-probe-pwsh'
+          if (Test-Path -LiteralPath $repo) { Remove-Item -Recurse -Force -LiteralPath $repo }
+          New-Item -ItemType Directory -Force -Path $repo | Out-Null
+          git -C $repo init -q
+          Push-Location $repo
+          $hostName = "PowerShell $($PSVersionTable.PSVersion) ($($PSVersionTable.PSEdition), argument passing $PSNativeCommandArgumentPassing)"
+          git config core.hooksPath 'a"b'
+          Write-Host "probe | $hostName | set [a`"b] | got [$(git config --local --get core.hooksPath)]"
+          git config core.hooksPath 'C:\probe dir\'
+          Write-Host "probe | $hostName | set [C:\probe dir\] | got [$(git config --local --get core.hooksPath)]"
+          git config core.hooksPath 'a b''c'
+          Write-Host "probe | $hostName | set [a b'c] | got [$(git config --local --get core.hooksPath)]"
+          Pop-Location
+          exit 0
+
       # spec: installer/SPEC.md §The consumer smoke — each platform leg steers the roster at its host
       # spec: installer/SPEC.md §The consumer smoke — a smoke entry runs the setup arms and its part
       - name: install smoke on a native Windows host, one part of the roster

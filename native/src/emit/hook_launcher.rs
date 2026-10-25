@@ -606,6 +606,15 @@ mod tests {
         assert_eq!(Shell::host() == Shell::PowerShell, cfg!(windows));
     }
 
+    // spec: gate-sdk/SPEC.md §install-hooks — the Windows leg's restore-line step pastes these
+    // spellings, so a change here is a change to what that step measures
+    #[test]
+    fn the_windows_probe_values_spell_as_the_restore_step_pastes_them() {
+        assert_eq!(shell_quoted("a\"b", Shell::PowerShell), "'a\"b'");
+        assert_eq!(shell_quoted("C:\\probe dir\\", Shell::PowerShell), "'C:\\probe dir\\'");
+        assert_eq!(shell_quoted("a b'c", Shell::PowerShell), "'a b''c'");
+    }
+
     #[test]
     fn a_hooks_directory_missing_a_served_file_names_it() {
         let d = std::env::temp_dir().join(format!("checkwright-hook-launcher.{}", std::process::id()));
