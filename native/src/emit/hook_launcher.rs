@@ -102,7 +102,7 @@ pub fn opted_in(root: &Path, dir: &Path) -> bool {
         return false;
     };
     let value = String::from_utf8_lossy(out.stdout().unwrap_or_default()).trim().to_string();
-    !value.is_empty() && same_dir(Path::new(&walk::abs_against(&r, &value)), dir)
+    !value.is_empty() && same_dir(Path::new(&walk::physical_against(&r, &value)), dir)
 }
 
 pub fn missing(dir: &Path) -> Vec<String> {

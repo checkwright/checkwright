@@ -163,13 +163,13 @@ fn prior(here: &str, hooks_dir: &Path) -> Result<Prior, String> {
         (None, _) => return Err(format!("cannot read core.hooksPath ({})", got.failure_report().unwrap_or_default())),
     };
     let dir = match &set {
-        Some(value) => PathBuf::from(walk::abs_against(&top, value)),
+        Some(value) => PathBuf::from(walk::physical_against(&top, value)),
         None => {
             let out = proc::run(&programs::GIT, &["-C", &top, "rev-parse", "--git-path", "hooks"])?;
             let path = out.stdout().ok_or_else(|| {
                 format!("cannot resolve git's hooks directory ({})", out.failure_report().unwrap_or_default())
             })?;
-            PathBuf::from(walk::abs_against(&top, String::from_utf8_lossy(path).trim()))
+            PathBuf::from(walk::physical_against(&top, String::from_utf8_lossy(path).trim()))
         }
     };
     if hook_launcher::same_dir(&dir, hooks_dir) {
@@ -482,6 +482,27 @@ mod tests {
         assert_eq!(quiet, Ok(Prior::Quiet { set: Some(theirs.clone()) }));
         assert!(matches!(&live, Ok(Prior::Live { names, .. }) if names == &vec!["pre-push".to_string()]), "{:?}", live);
         assert_eq!(kept, Some(theirs));
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — a relative core.hooksPath resolves physically, as git
+    // resolves it: `alias/../hooks` with `alias` a link reads the link target's sibling, never the
+    // lexical `<top>/hooks`
+    #[cfg(unix)]
+    #[test]
+    fn a_hooks_path_through_a_link_and_dotdot_reads_the_directory_git_runs() {
+        let (d, top, hooks) = scratch_repo("physical");
+        let outside = d.join("outside");
+        std::fs::create_dir_all(outside.join("sub")).expect("scratch");
+        std::os::unix::fs::symlink(outside.join("sub"), Path::new(&top).join("alias")).expect("symlink");
+        plant(&outside.join("hooks"), "pre-commit", true);
+        std::fs::create_dir_all(Path::new(&top).join("hooks")).expect("the lexical reading's directory");
+        proc::run(&programs::GIT, &["-C", &top, "config", "core.hooksPath", "alias/../hooks"]).expect("git config");
+        let got = prior(&top, &hooks);
+        let runs = outside.join("hooks");
+        let same = matches!(&got, Ok(Prior::Live { dir, .. }) if hook_launcher::same_dir(dir, &runs));
+        let _ = std::fs::remove_dir_all(&d);
+        assert!(matches!(&got, Ok(Prior::Live { names, .. }) if names == &vec!["pre-commit".to_string()]), "{:?}", got);
+        assert!(same, "{:?} is not {}", got, runs.display());
     }
 
     // spec: gate-sdk/SPEC.md §install-hooks — on a host with an executable bit, a hook without it is

@@ -38,14 +38,6 @@ Under the split lead posture, a scope session resumed as the intent oracle after
 
 ## Technical Debt
 
-### hookspath-prior-physical
-
-`--install-hooks` resolves the prior hooks directory lexically: `prior()` in `native/src/emit/install_hooks.rs` joins a relative `core.hooksPath` through `walk::abs_against`, whose `normalize_abs` folds `..` without reading links. With `core.hooksPath=alias/../hooks` and `alias` a symlink to `<outside>/sub`, git runs `<outside>/hooks`, while the refusal reads `<repo>/hooks`, finds no live hook and repoints `core.hooksPath`, silently disabling the live pre-commit (probed: exit 0, "holds no hook git runs"), against gate-sdk/SPEC.md §install-hooks's refusal.
-
-**Deliverable:** resolve the prior directory physically (canonicalize the joined path, or its deepest existing ancestor) before the live-hook read, with a unit case.
-
-**Cost while deferred:** a link-plus-dotdot `core.hooksPath` loses its hooks unnoticed. Filed 2026-10-25 by personal-install-hardening-pass' close (second-vendor review, probed there), drained from the gap inbox. Re-verified at the next scope: `prior()` still reaches `normalize_abs`. Owner lookup: `hooksPath`, `abs_against` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §install-hooks.
-
 ### marker-block-final-newline
 
 `install_block` and `uninstall_block` in `native/src/marker.rs` re-terminate an unterminated last line. (a) An exclude file holding `keep` with no newline, given personal installs in worktrees A then B and removals A then B, ends `keep\n`: A's removal keeps the newline B follows, so the writer meets gate-sdk/SPEC.md §lib/inject.sh's end-of-file condition while the personal install's pre-install-bytes promise fails for a non-LIFO removal. (b) Both rebuilds push `\n` after every kept line, so another block whose end marker is an unterminated last line gains a newline when this worktree's block is rewritten, against the promise that every other block stays byte-identical; the landed test compares only the extracted body.
@@ -931,4 +923,6 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
+
+- hookspath-prior-physical
 

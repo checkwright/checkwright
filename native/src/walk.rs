@@ -614,6 +614,24 @@ fn physical(p: &str) -> Option<String> {
     Some(if cfg!(windows) { normalize_abs(c) } else { c.to_string() })
 }
 
+// spec: gate-sdk/SPEC.md §The crate's crosser — a path joined onto `here` and resolved as the
+// filesystem resolves it: the deepest prefix that exists resolves physically and the rest is kept
+// unfolded, so `<symlink>/..` names the link target's parent and a missing segment stays missing
+pub fn physical_against(here: &str, p: &str) -> String {
+    let joined = if path_root(p).is_some() { p.to_string() } else { child(Path::new(here), p).display().to_string() };
+    let raw = Path::new(&joined);
+    for base in raw.ancestors() {
+        let Some(resolved) = physical(&base.display().to_string()) else { continue };
+        let rest = raw.strip_prefix(base).map(|r| r.display().to_string()).unwrap_or_default();
+        if rest.is_empty() {
+            return resolved;
+        }
+        let composed = child(Path::new(&resolved), &rest).display().to_string();
+        return if cfg!(windows) { normalize_abs(&composed) } else { composed };
+    }
+    abs_against(here, p)
+}
+
 // spec: gate-sdk/SPEC.md §The crate's crosser — the main checkout's root when the working directory
 // is a linked worktree whose common dir's leaf is `.git`; none anywhere else, a failed spawn included
 pub fn main_checkout_root() -> Option<String> {
@@ -1539,6 +1557,31 @@ mod tests {
             env.set("GIT_DIR", &v);
         }
         let _ = std::fs::remove_dir_all(&d);
+    }
+
+    // spec: gate-sdk/SPEC.md §The crate's crosser — a joined path resolves as the filesystem
+    // resolves it: `<symlink>/..` climbs the target's parent, the deepest existing prefix resolves
+    // and a missing tail is kept unfolded
+    #[cfg(unix)]
+    #[test]
+    fn a_joined_path_resolves_physically_past_a_link_and_keeps_a_missing_tail() {
+        let d = std::env::temp_dir().join(format!("walk-physical-against-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        let (repo, outside) = (d.join("repo"), d.join("outside"));
+        std::fs::create_dir_all(&repo).expect("scratch");
+        std::fs::create_dir_all(outside.join("sub")).expect("scratch");
+        std::fs::create_dir_all(outside.join("hooks")).expect("scratch");
+        std::os::unix::fs::symlink(outside.join("sub"), repo.join("alias")).expect("symlink");
+        let top = physical(&repo.display().to_string()).expect("resolves");
+        let out = physical(&outside.display().to_string()).expect("resolves");
+        let through = physical_against(&top, "alias/../hooks");
+        let missing = physical_against(&top, "alias/../absent/../x");
+        let rooted = physical_against("/elsewhere", &format!("{}/alias/../hooks", top));
+        let _ = std::fs::remove_dir_all(&d);
+        assert_eq!(through, format!("{}/hooks", out));
+        assert_eq!(rooted, format!("{}/hooks", out));
+        assert_eq!(missing, format!("{}/absent/../x", out), "a missing segment was folded away");
+        assert_eq!(abs_against(&top, "alias/../hooks"), format!("{}/hooks", top), "the lexical control");
     }
 
     fn git_init(dir: &Path) {
