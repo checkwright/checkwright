@@ -692,7 +692,8 @@ mod tests {
         let theirs = d.join("global-hooks");
         plant(&theirs, "pre-push", true);
         let included = d.join("gitconfig");
-        std::fs::write(&included, format!("[core]\n\thooksPath = {}\n", theirs.display())).expect("included config");
+        let value = theirs.display().to_string().replace('\\', "/");
+        std::fs::write(&included, format!("[core]\n\thooksPath = {}\n", value)).expect("included config");
         proc::run(&programs::GIT, &["-C", &top, "config", "include.path", &included.display().to_string()]).expect("git config");
         let ran = bare_run(&top, &hooks, &binary(&d)).map(|p| p.forwards);
         let record = hook_launcher::read_chain(&hooks);

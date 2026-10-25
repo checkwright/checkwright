@@ -93,11 +93,11 @@ pub fn hooks_dir(root: &Path) -> Option<PathBuf> {
     Some(PathBuf::from(walk::abs_against(&r, &dir)).join(DIR))
 }
 
+// spec: gate-sdk/SPEC.md §install-hooks — two directories are one where both resolve physically to
+// one path, a part that does not exist yet kept as spelled
 pub fn same_dir(a: &Path, b: &Path) -> bool {
-    match (walk::canonicalize(a), walk::canonicalize(b)) {
-        (Some(x), Some(y)) => x == y,
-        _ => a == b,
-    }
+    let physical = |p: &Path| walk::physical_against(".", &p.display().to_string());
+    physical(a) == physical(b)
 }
 
 // spec: gate-sdk/SPEC.md §install-hooks — opted in is `core.hooksPath` naming the hooks directory
@@ -356,6 +356,24 @@ pub fn launch(hook: &str, started_as: &str, args: &[String]) -> i32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: gate-sdk/SPEC.md §install-hooks — a directory not placed yet, reached through a link,
+    // is the one its physical spelling names, as on a host whose temp dir sits behind one
+    #[cfg(unix)]
+    #[test]
+    fn an_absent_directory_through_a_link_is_its_physical_spelling() {
+        let d = std::env::temp_dir().join(format!("checkwright-same-dir.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(d.join("real/.git")).expect("scratch");
+        std::os::unix::fs::symlink(d.join("real"), d.join("alias")).expect("symlink");
+        let logical = d.join("alias/.git/gate-hooks");
+        let physical = PathBuf::from(walk::canonicalize(d.join("real")).expect("resolves")).join(".git/gate-hooks");
+        let same = same_dir(&logical, &physical);
+        let other = same_dir(&logical, &d.join("real/.git/hooks"));
+        let _ = std::fs::remove_dir_all(&d);
+        assert!(same, "{} and {} name one directory", logical.display(), physical.display());
+        assert!(!other, "a sibling read as the same directory");
+    }
 
     // spec: gate-sdk/SPEC.md §git-hook — the served set is closed, read off the start name's stem
     // with the host's executable suffix removed

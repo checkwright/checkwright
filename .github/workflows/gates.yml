@@ -1270,6 +1270,9 @@ jobs:
               else { Write-Host "BAD  $label -- $detail"; $script:fails++ }
           }
           function Digest([string] $path) { (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash }
+          # spec: gate-sdk/SPEC.md §install-hooks — the bare run's chain record is placed beside the hooks, never a sibling
+          $placed = @('pre-commit.exe', 'commit-msg.exe', 'chain')
+          function Siblings { @(Get-ChildItem -LiteralPath $hooks -File | Where-Object { $placed -notcontains $_.Name }) }
           function Refresh([string] $from) {
               Push-Location $repo
               try {
@@ -1321,7 +1324,7 @@ jobs:
               $which = { param($d) if ($d -eq $new) { 'second' } elseif ($d -eq $old) { 'first' } else { $d } }
               $refused = if ($rout -match 'cannot replace [^\r\n]*commit-msg') { $msg } elseif ($rout -match 'cannot replace [^\r\n]*pre-commit') { $pre } else { 'no hook named' }
               Check "the status says which: 0 with the second binary served by both, 2 naming a hook the first still serves" (($rcode -eq 0 -and $pre -eq $new -and $msg -eq $new) -or ($rcode -eq 2 -and $refused -eq $old)) "exit $rcode, pre-commit.exe $(& $which $pre), commit-msg.exe $(& $which $msg), the hook the refusal names $(& $which $refused)"
-              $left = @(Get-ChildItem -LiteralPath $hooks -File | Where-Object { $_.Name -ne 'pre-commit.exe' -and $_.Name -ne 'commit-msg.exe' })
+              $left = @(Siblings)
               Check "no sibling is left that the run did not report" ($left.Count -eq 0 -or $rout -match 'cannot remove') "left: $($left.Name -join ', ')"
               Write-Host "::notice::re-placing a running pre-commit.exe on $env:PWSH_TARGET exited $rcode with pre-commit.exe the $(& $which $pre) binary and commit-msg.exe the $(& $which $msg); siblings left: $($left.Count)"
           } finally {
@@ -1331,12 +1334,12 @@ jobs:
           Check "the held hook returned its child's status once released" ($held.ExitCode -eq 0) "exit $($held.ExitCode)"
 
           Write-Host "== with the hook no longer running, the re-placement lands =="
-          Get-ChildItem -LiteralPath $hooks -File | Where-Object { $_.Name -ne 'pre-commit.exe' -and $_.Name -ne 'commit-msg.exe' } | Remove-Item -Force
+          Siblings | Remove-Item -Force
           Refresh $second
           Check "the refresh exited 0" ($rcode -eq 0) "exit $rcode -- $rout"
           Check "both hooks are the second binary" ((Digest $preHook) -eq $new -and (Digest $msgHook) -eq $new) "pre-commit.exe $(Digest $preHook), commit-msg.exe $(Digest $msgHook), second $new"
-          $left = @(Get-ChildItem -LiteralPath $hooks -File | Where-Object { $_.Name -ne 'pre-commit.exe' -and $_.Name -ne 'commit-msg.exe' })
-          Check "no sibling is left" ($left.Count -eq 0) "left: $($left.Name -join ', ')"
+          $left = @(Siblings)
+          Check "no sibling is left"($left.Count -eq 0) "left: $($left.Name -join ', ')"
 
           if ($script:fails -gt 0) { Write-Host "::error::a hook re-placed while it runs: $($script:fails) assertion(s) failed"; exit 1 }
           Write-Host "a running hook was re-placed with a hook served throughout, and the re-placement landed once it had exited"
