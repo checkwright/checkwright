@@ -121,7 +121,10 @@ Each **Not yet applied.**
 
 - The same section's paragraph opening "**Both served hooks are always placed**": its sentence "A re-run replaces both files and is otherwise idempotent." becomes "A forwarding hook is placed the same way, and a re-run replaces every placed hook and is otherwise idempotent."
 - The paragraph opening "**`--refresh` re-places the files**" gains, after its first sentence, "The files are the served hooks and a forwarding hook for each live hook in the recorded directory."
-- The case paragraph opening "Its cases are the placement module's unit tests": its prior-directory sentences, from "The prior hooks directory has five" to the paragraph's end, are rewritten as the unit cases of deltas 1, 3, 4 and 6 and delta 5's suite case, stated as their cases.
+- The case paragraph opening "Its cases are the placement module's unit tests": its prior-directory sentences, from "The prior hooks directory has five" to the paragraph's end, are rewritten as the unit cases of deltas 1, 3, 4 and 6 and delta 5's suite case, stated as their cases. Its opening count "two in `gate-tests/native-git-hooks.test.sh`" becomes "three", the two `--refresh` cases and delta 5's.
+- §git-hook's paragraph opening "**On a host with an executable suffix the suite skips its two stub cases**": "its two stub cases, since each stub is a sh script copied under the binary's name" becomes "its two stub cases and its chain case, since each runs a sh script, a stub copied under the binary's name or a planted prior hook".
+- `native/src/runner.rs`, the `--install-hooks` usage text: "a live hook in the prior hooks directory" becomes "a live prior hook this git cannot chain on native Windows, a chain record that cannot be written", and "re-places the two files of a clone already opted in" becomes "re-places the served hooks and a forwarding hook for each live hook in the recorded directory, of a clone already opted in".
+- `gate-sdk/gate-tests/native-git-hooks.test.sh`'s two `# spec:` header lines and its closing summary line name the suite's cases, so each gains delta 5's chain case.
 - The paragraph opening "**It is an `Arm::Run`**", and §The non-gate arm's `--install-hooks` bullet: the exit-2 member "a live hook in the prior hooks directory" becomes "a live prior hook this git cannot chain on native Windows, a chain record that cannot be written".
 - §git-hook, after the paragraph opening "**The binary, started under a file name whose stem is a git hook it serves**", a new paragraph:
 
@@ -146,6 +149,12 @@ Each **Not yet applied.**
 - `.workflow/release-declarations.md`, the `**gate-sdk \`--install-hooks\`**` bullet, is rewritten whole, since the refusal it declares has not shipped:
 
   > - **gate-sdk `--install-hooks`** — a clone whose prior hooks directory, `core.hooksPath`'s effective value or else git's default `hooks`, holds a live hook now keeps running those hooks, chained from the placed ones, where `core.hooksPath` was repointed and they silently stopped. A hook the gates serve runs ahead of them, and each other through a forwarding hook. The receipt and `uninstall` print the command restoring the prior `core.hooksPath`. On native Windows a git without `git hook run --to-stdin` is refused at exit 2 placing nothing. Nothing to do unless the arm refuses; then upgrade git, or call `<bin> --git-hook pre-commit` and `<bin> --git-hook commit-msg <message-file>` from your hook manager.
+
+- installer/SPEC.md §Reviewing the pre-commit hook, four sentences state the arm's pre-chain behaviour:
+  - "Started under that name it only starts the binary `GATE_SDK_NATIVE_BIN` names on its `--git-hook` arm and returns its status (gate-sdk/SPEC.md §git-hook), so what a commit runs is the installed binary and the tracked declarations it reads." gains, before its "so", "after any prior hook of the same name the clone's chain record names (gate-sdk/SPEC.md §install-hooks)", and its closing clause becomes "so what a commit runs is the installed binary, the tracked declarations it reads and that prior hook".
+  - "Two files are written to `gate-hooks` under the clone's git directory, each a hard link to the gate binary, or a copy where the link cannot be made." becomes "The two served hooks are written to `gate-hooks` under the clone's git directory, each a hard link to the gate binary, or a copy where the link cannot be made. Where the clone already ran hooks, a chain record and a forwarding hook for each other live hook are written beside them."
+  - "Where the clone already runs hooks it is refused instead (gate-sdk/SPEC.md §install-hooks)." becomes "Where the clone already runs hooks, they keep running from the placed ones (gate-sdk/SPEC.md §install-hooks)."
+  - §How to review before running, "The hook only starts the installed binary" becomes "The hook starts the installed binary, after a prior hook of yours where the clone had one".
 
 The page sentence is three words shorter, so `check-docs-page-length` moves only down.
 
@@ -176,13 +185,13 @@ The page sentence is three words shorter, so `check-docs-page-length` moves only
 - `native/src/programs.rs` (`CHAINED_HOOK` and the ground scan) and gate-sdk/SPEC.md §The program roster (deltas 2 and 7).
 - `native/src/installer/uninstall.rs` (`hooks_line`) and installer/SPEC.md §uninstall (deltas 6 and 7).
 - `gate-sdk/gate-tests/native-git-hooks.test.sh` (delta 5).
-- gate-sdk/SPEC.md §install-hooks, §git-hook and §The non-gate arm's `--install-hooks` bullet (delta 7).
+- gate-sdk/SPEC.md §install-hooks, §git-hook and §The non-gate arm's `--install-hooks` bullet, and `native/src/runner.rs`'s `--install-hooks` usage text (delta 7).
 - `native/src/emit/installer_smoke/personal.rs` and installer/SPEC.md §The consumer smoke, the personal arm's step 2 (delta 7).
-- `docs/install.md` §On a project that does not adopt it, installer/SPEC.md §The personal install, and `.workflow/release-declarations.md` (delta 8).
+- `docs/install.md` §On a project that does not adopt it, installer/SPEC.md §The personal install and §Reviewing the pre-commit hook, and `.workflow/release-declarations.md` (delta 8).
 - `docs/llms-full.txt`, regenerated with `bash gate-sdk/bin/run-gates.sh --emit llms --write` (delta 8).
 - `docs/gate-sdk/SPEC.md` and `docs/installer/SPEC.md`, the generated mirror, regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write` (deltas 7 and 8).
 
-The arm's surfaces were found by `grep -n "Prior::\|live_refusal\|Disable with" native/src/emit/install_hooks.rs` and `grep -n "hook_launcher::" native/src/main.rs native/src/installer/uninstall.rs`. The doc surfaces were found by `git grep -n -i "already running hooks\|refuses rather than silence\|runs hooks from\|live hook\|hook manager" -- '*.md'` over the tracked tree, the mirrors and dated posts excluded, read for the passages stating what the arm does to a clone running hooks.
+The arm's surfaces were found by `grep -n "Prior::\|live_refusal\|Disable with" native/src/emit/install_hooks.rs` and `grep -n "hook_launcher::" native/src/main.rs native/src/installer/uninstall.rs`. The doc surfaces were found by `git grep -n -i "already running hooks\|refuses rather than silence\|runs hooks from\|live hook\|hook manager" -- '*.md'` over the tracked tree, the mirrors and dated posts excluded, read for the passages stating what the arm does to a clone running hooks. The usage text and the installer's review section were found by `git grep -n "hook in the prior hooks\|re-places the two files\|only starts the installed binary\|refused instead"` over the same tree.
 
 ## Retired spellings
 
