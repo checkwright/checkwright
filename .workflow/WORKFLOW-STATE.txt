@@ -4,4 +4,4 @@
 
 ---
 
-— scope aee4d2cd 2026-10-25 2a15669eb
+restore-line-marker-tail-pass scope aee4d2cd 2026-10-25 2a15669eb

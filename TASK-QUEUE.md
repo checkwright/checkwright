@@ -1,14 +1,34 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: restore-line-marker-tail-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The set (operator direction 2026-10-25, lead-relayed, not a ruling; the iteration opened undirected):** option A, two debt units, the two bullets personal-install-residue-pass' close carried in: `hook-restore-line-quoting` and `remove-block-unterminated-tail`. Stages scope, build, validate, close. Composition: stands alone, drain 2 against inflow 1.4. Push need: 1 against 2, the closing push only.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### hook-restore-line-quoting
+
+`hook_launcher::restore_line` (`native/src/emit/hook_launcher.rs`) prints the recorded local `core.hooksPath` unquoted as `git config core.hooksPath <value>`, in the `--install-hooks` receipt and in `uninstall`. A prior value with a space (`/opt/team hooks`) or a shell metacharacter prints a command that sets the wrong value or runs something else, against gate-sdk/SPEC.md §install-hooks's restore promise.
+
+**Deliverable:** quote the value for the host's shell, single-quoted: off Windows the POSIX form, a quote in the value spelled `'\''`; on native Windows the PowerShell form, a quote doubled (scope's calibration; the lead raised no objection). The quoting is a pure function taking the shell form, unit-tested in both forms on every host, so no code runs remote-first; one §install-hooks sentence states it.
+
+**Cost while deferred:** a clone whose prior hooks path carries a space or metacharacter gets a restore command that does not restore. Filed 2026-10-25 by personal-install-residue-pass' close (second-vendor review, read off the formatter), drained from the gap inbox. Re-verified at the next scope: line 196 formats `{}` bare; callers `install_hooks.rs` receipt and `installer/uninstall.rs`. Owner lookup: `hooksPath`, `restore_line` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §install-hooks.
+
+### remove-block-unterminated-tail
+
+`marker::remove_block` (`native/src/marker.rs`) pops the final newline whenever its input was unterminated, so removing a block that is the file's unterminated last line (`head\nBEGIN\nbody\nEND`) leaves `head` with no newline, against gate-sdk/SPEC.md §lib/inject.sh's promise that the rest of the file stays byte-identical. That section's every-rebuild-carries-the-final-newline sentence says the opposite for this input.
+
+**Deliverable (operator direction 2026-10-25, lead-relayed, not a ruling):** the byte-identical-rest promise governs. Carry the missing terminator only when the input's original last line survives; where the removed block owned it, the surviving line keeps its newline. Amend the final-newline sentence to say so, fix `remove_block`, and add a byte-level case for each side.
+
+**Cost while deferred:** removing an agent-file block that ends a file unterminated (`doctrine.rs`, the sole caller) strips the line before it of its newline. Filed 2026-10-25 by personal-install-residue-pass' close (second-vendor review, read off the loop), drained from the gap inbox. Re-verified at the next scope: the pop is unconditional. Owner lookup: `remove_block`, `marker` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh.
 
 ## Deferred
 
@@ -134,7 +154,7 @@ surface (c) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 
 **Deliverable:** on a Codex release discovering hooks beside the root manifest, re-run plugin/SPEC.md §The validation leg's Codex install, wire the guards, and update plugin/SPEC.md's Codex row and plugin/README.md's guard bullet. Its patch residue split off as `codex-patch-path-residue` at foreign-harness-write-path-pass' scope (operator direction 2026-10-23, lead-relayed, not a ruling), and landed there.
 
-**Cost while deferred:** a Codex adopter gets the skills and no shell, wakeup or workflow-state guard. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's Codex row and limits. Re-probed 2026-10-23: `codex-cli` on PATH is still 0.163.0. Owner lookup: `codex`, `apply_patch` in this file and the disposed-findings record, none; owner plugin/SPEC.md §The harnesses.
+**Cost while deferred:** a Codex adopter gets the skills and no shell, wakeup or workflow-state guard. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's Codex row and limits. Re-probed 2026-10-25 on 0.164.0 in a scratch home: still none beside the root manifest; with it moved aside the hooks are discovered, marked untrusted, since 0.164.0 gates plugin hooks on trust. Owner lookup: `codex`, `apply_patch` in this file and the disposed-findings record, none; owner plugin/SPEC.md §The harnesses.
 
 ### codex-plugin-version-pin
 
