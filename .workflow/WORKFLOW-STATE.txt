@@ -5,3 +5,4 @@
 ---
 
 install-commit-hooks-pass scope acf84d39 2026-10-25 905b7ae95
+install-commit-hooks-pass spec a2cccf67 2026-10-25 ebd627a27
