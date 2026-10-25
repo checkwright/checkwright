@@ -1,16 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: personal-install-hardening-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-10-24, lead-relayed, not a ruling; the iteration opened undirected):** option A, nine units on the personal-install surface. Debt promoted by scope: `personal-collapse-hides-files`, `personal-write-before-refusal`, `init-dry-run-makes-dirs`, `init-copy-follows-links`, `marker-uninstall-newline`, `smoke-preflight-pathspec`. Features for spec to author and pair: `hookspath-clobber`, `personal-worktree-shared-block`, `personal-install-prove`. `personal-workflow-export` and `oracle-turn-done-marker` stay deferred. Stages scope, spec, align (the `hookspath-clobber` amendment likely spans gate-sdk and installer/), build, validate and close; drain 9 against inflow 1.4.
-
-  **Order (scope, own authority):** `personal-install-prove` lands after `personal-collapse-hides-files` and `personal-worktree-shared-block`, since it copies the roster the exclude block names.
-
-  **Push need (2026-10-24, inside the budget):** 1 against 2, the closing push; `init-copy-follows-links` carries the one conditional mid-iteration push.
 
 ---
 
