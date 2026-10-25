@@ -16,12 +16,17 @@ Pairs `init-commit-runs-adopter-hooks`. `init` makes one commit, and that commit
 
 ## What changes
 
-### (1) A failed commit names the hooks that judged it {design-bearing} {user-facing: oracle decision 2026-10-25, lead-relayed (not a ruling), option (c): commit through the adopter's hooks and, on failure, name them with the remedy; never `--no-verify`, never an up-front refusal}
+### (1) A failed commit names the hook that judged it {design-bearing} {user-facing: oracle decision 2026-10-25, lead-relayed (not a ruling), option (c): commit through the adopter's hooks and, on failure, name them with the remedy; never `--no-verify`, never an up-front refusal; attribution: lead decision 2026-10-25 (not operator direction) — a read that errs or establishes nothing leaves the line as it is today, and the line never names a party the run cannot establish judged the commit, a gate's refusal never attributed to the adopter's hooks}
 
 `commit_or_refuse` (`native/src/installer/mod.rs`) is the one commit path for three commits: `init`'s vendoring commit, its no-op residue commit and `uninstall`'s removal commit. The change lands there, so it reaches all three. **Not yet applied.**
 
-- **After git's account, a failed commit names the hooks git ran for it.** The directory is read the way gate-sdk/SPEC.md §install-hooks reads the prior hooks directory: `core.hooksPath`'s effective value, resolved physically, or else git's default. Where that directory is the gate hooks directory, the run reads the chain record's recorded directory instead, since the gates are the clone's own opt-in. The hooks named are the directory's **live** hooks, on that section's predicate, among the three that can refuse a commit: `pre-commit`, `prepare-commit-msg` and `commit-msg`. The readers are `install_hooks::prior` and `live_hooks` (`native/src/emit/install_hooks.rs`), made callable from the installer rather than copied.
-- **The line and its help.** With one or more such hooks live, the refusal reads `<verb>: the commit failed, and your hooks in <dir> (<names>) judged it — the files are staged`. Its `help:` says those hooks judge every vendored file. It names the kit directories, from the kit set the run vendored, and tells the adopter to let those hooks pass them, since they are a vendored dependency, then commit the staged files. It also offers `--no-commit` as the way to make the commit yourself. With no such hook live, the line stays as it is today.
+- **After git's account, a failed commit names the hook that refused it, where git's own trace establishes one.** A live hook is no evidence: on git 2.55 a missing identity stops the commit before any hook runs, and a refused signature stops it after every hook passed, so naming the directory's live hooks would blame hooks that judged nothing. `git_commit` therefore spawns the commit with `GIT_TRACE2_EVENT` naming a fresh scratch file, set on that spawn alone (`proc::run_merged_in` carries an environment addition), and removes the file once read. A hook git ran is a `child_start` event whose `child_class` is `hook`, under the commit's own session id: a hook's nested git writes under a child id `<sid>/…`, which is not read. It refused when the `child_exit` matching its `child_id` carries a non-zero `code`. The hooks read are `pre-commit`, `prepare-commit-msg` and `commit-msg`, whose non-zero exit stops the commit at once; another hook's non-zero exit may be one git ignores, so it names nothing. The trace is read with the crate's `serde_json`.
+- **The directory.** It is read the way gate-sdk/SPEC.md §install-hooks reads the prior hooks directory: `core.hooksPath`'s effective value, resolved physically, or else git's default. The reader is `install_hooks::prior` (`native/src/emit/install_hooks.rs`), made callable from the installer rather than copied.
+- **The line stays as it is today, git's account standing, wherever the reads establish no adopter's hook.** That is the case when:
+  - the trace records no refusing hook, because git stopped outside its hooks, or a git without trace2 wrote no file;
+  - the trace or the directory read fails;
+  - the directory is the gate hooks directory. On an opted-in clone a served hook's launcher runs the adopter's chained hook and then the gates in the one process git traces as one hook, so the trace cannot tell them apart. Where the chained hook refused, the launcher's own line in git's account already names it (gate-sdk/SPEC.md §git-hook). No chain record is read, so `uninstall`, which removes the gate hooks directory and its record before its commit while `core.hooksPath` still names it, needs no case of its own: git runs no hook from the removed directory, the trace records none, and the line stays as it is today.
+- **The line and its help.** With a refusing hook established, the refusal reads `<verb>: the commit failed, and your <hook> hook in <dir> judged it — the files are staged`. Its `help:` says that hook judges every vendored file. It names the kit directories, from the kit set the run vendored, and tells the adopter to let that hook pass them, since they are a vendored dependency, then commit the staged files. It also offers `--no-commit` as the way to make the commit yourself.
 - **`init` never commits past a hook.** No `--no-verify` is passed, and no flag adds one. A hook that judges the whole tree meets the vendored files again at the adopter's next commit, so a bypass would only move the refusal to a commit `init` cannot report on. A `commit-msg` hook refusing `init`'s subject is the same case, and `--no-commit` is how an adopter commits under their own message convention.
 
 ### (2) A failed vendoring commit still hands over the setup {design-bearing} {user-facing: oracle decision 2026-10-25, lead-relayed (not a ruling), option (c1)}
@@ -52,7 +57,7 @@ Each **Not yet applied.**
 - `docs/install.md`, the WSL bullet's second sentence becomes "The pre-commit hook the follow-up's `--install-hooks` places runs the Linux gate binary, so commit to that repository from WSL too: Git for Windows cannot start it." The current wording reads as though the install places the hook, and `init` places none (installer/SPEC.md §init).
 - **The page budget.** The page stands at 1499 words against `check-docs-page-length`'s bound of 1500. Every word added is cut from prose on the same page that restates an owner doc, and that gate's verdict is the oracle.
 - `installer/README.md`, the paragraph opening "`init` vendors the selected profile's kit directories": the one commit runs the clone's own hooks, and a failed commit leaves the files staged with the setup commands printed.
-- The release declaration surface gains a `behavior` bullet for deltas 1 and 2: a failed install commit names the hooks that judged it and prints the follow-up block.
+- The release declaration surface gains a `behavior` bullet for deltas 1 and 2: a failed install commit names the hook that judged it and prints the follow-up block.
 
 ### (5) The SPEC sections {design-bearing}
 
@@ -60,17 +65,20 @@ Each **Not yet applied.**
 
 - installer/SPEC.md §init, *A failed commit relays git's own account* is rewritten:
 
-  > **A failed commit relays git's own account, names the hooks that judged it, and still hands over the setup.** The files stay staged and `init` exits 1, first printing what git and any hook it ran wrote. Where the directory git ran hooks from holds a live commit hook, read as gate-sdk/SPEC.md §install-hooks reads a prior hooks directory, the refusal names it. Its help line names the kit directories that hook must let pass, and `--no-commit`. It never passes `--no-verify`: a hook judging the whole tree meets the vendored files at the next commit anyway, and a bypass would move its refusal to where `init` cannot report it. Where no such hook is live, git's account carries the cause, a missing identity among them. The follow-up block and its `then:` line print after the refusal, so the setup does not wait on a re-run.
+  > **A failed commit relays git's own account, names the hook that judged it, and still hands over the setup.** The files stay staged and `init` exits 1, first printing what git and any hook it ran wrote. Where git's trace of the commit records a `pre-commit`, `prepare-commit-msg` or `commit-msg` hook exiting non-zero, from a directory read as gate-sdk/SPEC.md §install-hooks reads a prior hooks directory, the refusal names that hook and directory. Its help line names the kit directories that hook must let pass, and `--no-commit`. A live hook alone names nothing, since git can stop before its hooks run or after they pass. Neither does a hook in the gate hooks directory, where the trace cannot tell a chained hook from the gates; there a served hook's launcher writes its own line into git's account when the chained hook refused. It never passes `--no-verify`: a hook judging the whole tree meets the vendored files at the next commit anyway, and a bypass would move its refusal to where `init` cannot report it. Where the reads establish no refusing hook, or fail, git's account carries the cause, a missing identity among them. The follow-up block and its `then:` line print after the refusal, so the setup does not wait on a re-run.
 
 - installer/SPEC.md §init, *The commit passes the hooks it vendors*, gains its counterpart clause: the commit passes the clone's own hooks too, the adopter's included.
-- installer/SPEC.md §uninstall, *A failed commit leaves the removal staged and relays git's account, as `init`'s does* covers delta 1's line. It prints no follow-up block.
+- installer/SPEC.md §uninstall, *A failed commit leaves the removal staged and relays git's account, as `init`'s does* covers delta 1's line, under the same reads. It prints no follow-up block.
 
 ## Producers and consumers
 
 - **The hooks line** (delta 1).
-  - Producer: `commit_or_refuse`, on a failed commit, reading the hooks directory after the failure.
+  - Producer: `commit_or_refuse`, on a failed commit, reading the commit's trace and the hooks directory after the failure.
   - Consumers: the adopter, through stderr, and the unit test below.
-  - Fields: the directory and the hook names, which the adopter reads to find the hook, and the kit directories, which the adopter reads to scope the hook's exclusion. Each field has a reader.
+  - Fields: the directory and the hook name, which the adopter reads to find the hook, and the kit directories, which the adopter reads to scope the hook's exclusion. Each field has a reader.
+- **The commit's trace** (delta 1).
+  - Producer: git, writing `GIT_TRACE2_EVENT`'s file for the one spawned commit.
+  - Consumer: `commit_or_refuse`, which reads it once and removes it on every path. A missing or unreadable file is no evidence, never a refusal of its own.
 - **The follow-up block on failure** (delta 2).
   - Producer: `init`'s failure path for the vendoring commit.
   - Consumers: the adopter. The consumer smoke's follow-up arm reads only a successful run's output, so it is unchanged, as is the stated grammar in installer/SPEC.md §init.
@@ -83,12 +91,12 @@ Each **Not yet applied.**
   - No reader reds on a zero count of skeletons.
   - The surface ratchet holds one row per governed surface, keyed by path (context-kit/SPEC.md §The surface ratchet), so the row moves with the file.
   - The release declaration's `behavior` bullet is read by the note's composition at close and by `check-release-bump`'s section count.
-- **The witness.** A crate unit test runs `init` over a scratch repository whose default hooks directory holds a live `pre-commit` that exits 1. It asserts that `init` exits 1, the vendored files are staged, stderr names the directory and `pre-commit`, and stdout carries the `next:` block. The test sets its environment on the spawned `git` alone, never process-wide, for the reason gate-sdk/SPEC.md §install-hooks gives about `GIT_CONFIG_GLOBAL`. It runs on unix only, because the planted hook is a sh script; the Windows legs already commit through hooks of their own.
+- **The witness.** A crate unit test runs `init` over a scratch repository whose default hooks directory holds a live `pre-commit` that exits 1. It asserts that `init` exits 1, the vendored files are staged, stderr names the directory and `pre-commit`, and stdout carries the `next:` block. Two further cases hold the attribution: a `pre-commit` that exits 0 under a repository-local `commit.gpgSign` whose `gpg.program` is `false`, where the commit fails after its hooks pass, and a `core.hooksPath` naming the gate hooks directory over a `pre-commit` that exits 1. Each asserts the refusal line as it is today, naming no hook. The test sets its environment on the spawned `git` alone, never process-wide, for the reason gate-sdk/SPEC.md §install-hooks gives about `GIT_CONFIG_GLOBAL`. It runs on unix only, because the planted hook is a sh script; the Windows legs already commit through hooks of their own.
 
 ## Existing sections updated
 
 - `native/src/installer/mod.rs`: `commit_or_refuse` and `git_commit` (delta 1).
-- `native/src/emit/install_hooks.rs`: `prior` and `live_hooks`, made callable from the installer (delta 1).
+- `native/src/emit/install_hooks.rs`: `prior` and its `Prior`, made callable from the installer (delta 1).
 - `native/src/installer/init.rs`: the failure path and its unit tests (deltas 1 and 2).
 - `installer/SPEC.md` §init and §uninstall (deltas 1, 2 and 5).
 - `docs/install.md` and `installer/README.md` (delta 4).
