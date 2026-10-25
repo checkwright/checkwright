@@ -14,6 +14,16 @@
 
 ## New Features
 
+### init-identity-precondition
+
+[spec: SPEC-init-identity.md]
+
+init and uninstall cannot tell a missing git identity from a hook's red at their commit: with no identity configured, `git var GIT_COMMITTER_IDENT` exits 128 as `git commit` does, so a fourth precondition could refuse before any write, under the clean-worktree check's guard. Not folded into `init-commit-runs-adopter-hooks`: a new refusal across init, update and uninstall widens its envelope (oracle decision, lead decision to file, 2026-10-25, lead-relayed, not a ruling).
+
+**Deliverable:** a feature: the identity precondition on init, update and uninstall, its refusal, and installer/SPEC.md §init's precondition roster.
+
+**Cost while deferred:** an identity-less first install stages every vendored file and exits 1 with git's own account as the only attribution (run at spec over a scratch pack: 592 files staged, no commit), on a fresh machine, the seat likeliest to lack an identity. Filed 2026-10-25 by install-commit-hooks-pass' close from a gap bullet of that date; re-verified there: `git var GIT_COMMITTER_IDENT` exits 128 with no identity. Owner lookup: `GIT_COMMITTER_IDENT`, `identity`, `user.email` in this file and the disposed-findings record, none; owner installer/SPEC.md §init.
+
 ## Technical Debt
 
 ### uninstall-lost-restore-line
@@ -247,18 +257,6 @@ the tree-side first unit of [hosted-attestation-service](#hosted-attestation-ser
 **Deliverable:** design-pending, a feature: the predicate type's name and schema, the manifest fields it carries, whether the kits emit the Statement for a signer to wrap or sign it themselves, and its versioning rule.
 
 **Cost while deferred:** a gate run is readable only in this tree's own formats, so no attestation verifier or log reads one; nothing rots. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close from the operator direction of that date, lead-relayed (not a ruling). Owner lookup: `in-toto`, `predicate`, `DSSE` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md.
-
-### init-identity-precondition
-
-[cost: event/low] [surface: installer]
-
-init and uninstall cannot tell a missing git identity from a hook's red at their commit: with no identity configured, `git var GIT_COMMITTER_IDENT` exits 128 as `git commit` does, so a fourth precondition could refuse before any write, under the clean-worktree check's guard. Not folded into `init-commit-runs-adopter-hooks`: a new refusal across init, update and uninstall widens its envelope (oracle decision, lead decision to file, 2026-10-25, lead-relayed, not a ruling).
-
-**Deliverable:** a feature: the identity precondition on init, update and uninstall, its refusal, and installer/SPEC.md §init's precondition roster.
-
-**Inferred, not run:** an identity-less first install stages every vendored file and exits 1 with git's own account as the only attribution — `init` in a scratch repo with HOME at an empty directory and GIT_CONFIG_NOSYSTEM=1
-
-**Cost while deferred:** that failure, on a fresh machine, the seat likeliest to lack an identity. Filed 2026-10-25 by install-commit-hooks-pass' close from a gap bullet of that date; re-verified there: `git var GIT_COMMITTER_IDENT` exits 128 with no identity. Owner lookup: `GIT_COMMITTER_IDENT`, `identity`, `user.email` in this file and the disposed-findings record, none; owner installer/SPEC.md §init.
 
 ### hookspath-non-utf8-restore
 
