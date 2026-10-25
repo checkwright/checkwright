@@ -4,4 +4,4 @@
 
 ---
 
-— scope acf84d39 2026-10-25 905b7ae95
+install-commit-hooks-pass scope acf84d39 2026-10-25 905b7ae95

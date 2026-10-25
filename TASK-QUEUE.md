@@ -1,14 +1,50 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: install-commit-hooks-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The set (operator direction 2026-10-25, lead-relayed, not a ruling; the iteration opened undirected):** option A+, three debt units and two features. Debt: `journal-mark-writer-unnamed`, `notification-delivery-probe`, `marker-block-removal-fidelity`. Features, promoted by spec with their amendments: `init-commit-runs-adopter-hooks`, `restore-line-fidelity`. Stages scope, spec, build, validate, close, with align where check-stage-entry assertion C demands it. Composition: bundled, a lifecycle-kit debt lead with installer and native fill; drain 5 against inflow 1.4.
+
+  **Push need (operator direction 2026-10-25, the overrun chosen knowingly):** 3 against 2: the closing push, the release tag on `init-commit-runs-adopter-hooks` and the Windows probe on `restore-line-fidelity`.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### journal-mark-writer-unnamed
+
+Every stage template's last step says to append `DONE` to the resume journal and names no writer, and lead.md says the same of `DISPOSED`, so sessions spell the raw append: the manual-operation meter ranks `echo >>` in nine iterations' logs, about 110 calls, some on the absolute path. The journal arm already writes both: `--emit journal DONE`, and `--emit journal --lead DISPOSED`, which refuses only a segment already disposed (lifecycle-kit/SPEC.md §The journal arm).
+
+**Deliverable:** debt: each last step and lead.md's disposal sentence name the arm form.
+
+**Cost while deferred:** each stage session spends a hand-spelled append, a permission decision where the path is absolute. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close; filed at the next scope, the `--lead` form re-read there. Owner lookup: `DONE`, `DISPOSED`, `journal` in this file, none; owner lifecycle-kit/SPEC.md §templates/stages/.
+
+### notification-delivery-probe
+
+[not-icebox-eligible: 2026-10-10 filed on the operator direction of 2026-10-02 and waits on a lead session with the operator present; evicting it would compress that direction away]
+
+the delivery rule under `lead-notification-wake-race`'s remedy, unprobed: does a completion notification queued during a supervisor's turn that makes no tool call wake its session, and does one tool call before the turn end drain it.
+
+**Deliverable:** that probe, run by a lead with the operator present, since a dispatched session's report is all its caller holds and no session reports on its own turn end (delegation-kit/SPEC.md §The delegation model); then lifecycle-kit/templates/lead.md §The lead model's wait clause and the agent-execution backgrounding bullet's bound confirmed or corrected against the result.
+
+**Run 2026-10-25** by a lead with the operator present, measured off the lead transcript's queue-operation and system rows. A trivial child dispatched, then a text-only turn end: the hand-back and its notification enqueued before the turn ended, and the hand-back dequeued 9 ms after it and woke the session with no operator input, the notification delivered inside the woken turn's first tool call. A child finishing 4 ms after the turn end woke it the same way; a notification queued mid-turn arrived at the next tool-result boundary. So on that harness build a queued completion does not stall a turn that ends without a tool call, and the clause's stated mechanism did not reproduce. Two samples, one build, both children worktree-isolated; the stalled 2026-10-02 transcripts may predate the hand-back channel (inferred).
+
+**What is left (operator direction 2026-10-25, lead-relayed, not a ruling):** keep lead.md's wait clause as a cheap belt and restate its ground to this measurement, the call's one read weighed against a stall's hours; check the agent-execution backgrounding bullet's bound against the same result.
+
+**Cost while deferred:** the lead's wait clause states a mechanism the probe did not reproduce, so every lead pays a tool call on a ground that reads as fact. Filed 2026-10-02 as a split at companion-tier-delegation-pass' scope, operator direction lead-relayed (not a ruling).
+
+### marker-block-removal-fidelity
+
+Two departures of `marker::remove_block` from gate-sdk/SPEC.md §lib/inject.sh, both pre-existing. **Pairing:** `half_open` (native/src/marker.rs) asks only whether some begin and some end line exist, so a stray end before the begin, or a second unmatched begin after a complete block, deletes from that begin to end of file, where the SPEC refuses a begin without its end. **Bytes:** the file is read through `fresh::read_captured`, a lossy UTF-8 decode, so non-UTF-8 bytes outside the block come back as U+FFFD, against the byte-identical-rest promise; every writer in marker.rs reads the same way (re-read at filing). Reaches `--install-doctrine --remove` and the installer's exclude-block removal.
+
+**Deliverable:** debt: order-and-pairing refusal and a byte-faithful read, each with a unit test.
+
+**Cost while deferred:** a malformed or non-UTF-8 target loses content it never owned on removal. Surfaced 2026-10-25 by restore-line-marker-tail-pass' close second-vendor review; filed at the next scope, re-read there. Owner lookup: `remove_block`, `half_open`, `read_captured` in this file, none; owner gate-sdk/SPEC.md §lib/inject.sh.
 
 ## Deferred
 
@@ -102,20 +138,6 @@ buy discrimination in the queue's record stamps by RE-ENCODING them rather than 
 
 **Cost while deferred:** low and bounded — every entry needing discrimination keeps buying it with text against the entry budget. Filed 2026-09-01 by close under CLAUDE.md §Housekeeping's operator-directed exception; it rides no cut and is no hotfix.
 
-### notification-delivery-probe
-
-[cost: event/low] [surface: lifecycle-kit] [not-icebox-eligible: 2026-10-10 filed on the operator direction of 2026-10-02 and waits on a lead session with the operator present; evicting it would compress that direction away]
-
-the delivery rule under `lead-notification-wake-race`'s remedy, unprobed: does a completion notification queued during a supervisor's turn that makes no tool call wake its session, and does one tool call before the turn end drain it.
-
-**Deliverable:** that probe, run by a lead with the operator present, since a dispatched session's report is all its caller holds and no session reports on its own turn end (delegation-kit/SPEC.md §The delegation model); then lifecycle-kit/templates/lead.md §The lead model's wait clause and the agent-execution backgrounding bullet's bound confirmed or corrected against the result.
-
-**Run 2026-10-25** by a lead with the operator present, measured off the lead transcript's queue-operation and system rows. A trivial child dispatched, then a text-only turn end: the hand-back and its notification enqueued before the turn ended, and the hand-back dequeued 9 ms after it and woke the session with no operator input, the notification delivered inside the woken turn's first tool call. A child finishing 4 ms after the turn end woke it the same way; a notification queued mid-turn arrived at the next tool-result boundary. So on that harness build a queued completion does not stall a turn that ends without a tool call, and the clause's stated mechanism did not reproduce. Two samples, one build, both children worktree-isolated; the stalled 2026-10-02 transcripts may predate the hand-back channel (inferred).
-
-**What is left:** the wait clause kept as a cheap belt with its ground restated to this measurement, or rewritten to it.
-
-**Cost while deferred:** the lead's wait clause states a mechanism the probe did not reproduce, so every lead pays a tool call on a ground that reads as fact. Filed 2026-10-02 as a split at companion-tier-delegation-pass' scope, operator direction lead-relayed (not a ruling).
-
 ### evaluator-root-agent-file
 
 [cost: event/low] [surface: gate-sdk] [not-icebox-eligible: 2026-10-25 split on the operator direction of 2026-10-17 and waits on the operator's first selection-probe run; evicting it would compress that direction away]
@@ -178,27 +200,9 @@ the workflow half of `personal-adoption`: a developer runs the stage machine on 
 
 **Seen in the same runs, unverified here:** docs/install.md's WSL bullet reads as `init` placing the pre-commit hook, against §init's 'init places no git hook'; the vendored gate-sdk/README.md points at SPECs the vendored copy lacks; `init`'s commit subject ignores the adopter's prefix convention.
 
+**Push need (2026-10-25, operator direction):** the release tag at close, since the fix reaches the next operator-seat install only on a published binary; close's release policy decides the cut.
+
 **Cost while deferred:** an adopter whose tree already gates commits does not finish the install, and the failure reads as the adopter's to repair. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close; filed at the next scope. Owner lookup: `init`, `install commit`, `hook` in this file and the disposed-findings record, none; owner installer/SPEC.md §init.
-
-### journal-mark-writer-unnamed
-
-[cost: session/low] [surface: lifecycle-kit]
-
-Every stage template's last step says to append `DONE` to the resume journal and names no writer, and lead.md says the same of `DISPOSED`, so sessions spell the raw append: the manual-operation meter ranks `echo >>` in nine iterations' logs, about 110 calls, some on the absolute path. The journal arm already writes both: `--emit journal DONE`, and `--emit journal --lead DISPOSED`, which refuses only a segment already disposed (lifecycle-kit/SPEC.md §The journal arm).
-
-**Deliverable:** debt: each last step and lead.md's disposal sentence name the arm form.
-
-**Cost while deferred:** each stage session spends a hand-spelled append, a permission decision where the path is absolute. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close; filed at the next scope, the `--lead` form re-read there. Owner lookup: `DONE`, `DISPOSED`, `journal` in this file, none; owner lifecycle-kit/SPEC.md §templates/stages/.
-
-### marker-block-removal-fidelity
-
-[cost: event/low] [surface: native]
-
-Two departures of `marker::remove_block` from gate-sdk/SPEC.md §lib/inject.sh, both pre-existing. **Pairing:** `half_open` (native/src/marker.rs) asks only whether some begin and some end line exist, so a stray end before the begin, or a second unmatched begin after a complete block, deletes from that begin to end of file, where the SPEC refuses a begin without its end. **Bytes:** the file is read through `fresh::read_captured`, a lossy UTF-8 decode, so non-UTF-8 bytes outside the block come back as U+FFFD, against the byte-identical-rest promise; the replace and uninstall writers read the same way (inferred, unread). Reaches `--install-doctrine --remove` and the installer's exclude-block removal.
-
-**Deliverable:** debt: order-and-pairing refusal and a byte-faithful read, each with a unit test.
-
-**Cost while deferred:** a malformed or non-UTF-8 target loses content it never owned on removal. Surfaced 2026-10-25 by restore-line-marker-tail-pass' close second-vendor review; filed at the next scope, re-read there. Owner lookup: `remove_block`, `half_open`, `read_captured` in this file, none; owner gate-sdk/SPEC.md §lib/inject.sh.
 
 ### restore-line-fidelity
 
@@ -207,6 +211,8 @@ Two departures of `marker::remove_block` from gate-sdk/SPEC.md §lib/inject.sh, 
 Three ways the hooks restore line can advise wrongly, against gate-sdk/SPEC.md §install-hooks. **Unread chain:** `hooks_line` (native/src/installer/uninstall.rs) drops every `read_chain` error and prints `git config --unset core.hooksPath`, so an unreadable record holding a restore value is advised away rather than reported. **Empty value:** the chain record's empty `restore=` sentinel cannot tell a local `core.hooksPath` set to the empty string from none, which git may resolve differently (inferred, the probe guard-refused). **PowerShell 5.1:** `shell_quoted` single-quotes for PowerShell's parser, but Windows PowerShell 5.1's legacy native-argument passing drops an embedded double quote, so a recorded `a"b` would restore as `ab`, against 'pastes as itself' (inferred off Microsoft's about_parsing; no PowerShell here, and the unit test asserts the spelling, not git's argv).
 
 **Deliverable:** debt where the SPEC already decides (report the unread chain); the sentinel and the 5.1 quoting are design-pending.
+
+**Push need (2026-10-25, operator direction, the overrun chosen knowingly):** one mid-iteration push, a Windows-runner probe of how Windows PowerShell 5.1 passes an embedded double quote to git, since no local run reaches that host.
 
 **Cost while deferred:** an uninstall or hook move can advise a restore that leaves an adopter's own hooks off. Surfaced 2026-10-25 by restore-line-marker-tail-pass' close second-vendor review; filed at the next scope. Owner lookup: `restore line`, `read_chain`, `hooksPath` in this file, none; owner gate-sdk/SPEC.md §install-hooks.
 
