@@ -2753,7 +2753,7 @@ The prior hooks directory's unit cases each run over a scratch repository.
 - A live `pre-commit` in the default directory is chained: the record names that directory with an empty `restore`, and no forwarding hook is placed. A default directory of `*.sample` files writes a record and places none.
 - A local `core.hooksPath` naming a directory with a live `pre-push` records that value as `restore` and places a forwarding `pre-push`.
 - A value the local scope does not itself set records an empty `restore`. The case sets it in a file the local config includes, which the effective read follows and the local-scope read does not, rather than through `GIT_CONFIG_GLOBAL`, whose process-wide setting would reach every concurrent git-spawning test.
-- A re-run keeps the record byte-identical, and a `post-merge` planted in the recorded directory after the first run gains a forwarding hook at the re-run and at a `refresh_target`-gated refresh.
+- A re-run keeps the record byte-identical, and a `post-merge` planted in the recorded directory after the first run gains a forwarding hook at the re-run and at a refresh.
 - On a host with an executable bit, a `pre-commit` without one is no live hook, and a `core.hooksPath` already naming the hooks directory is a re-run whatever the default directory holds. On a host with symlinks, a relative `alias/../hooks` whose `alias` is a link reads the live `pre-commit` beside the link's target, an empty `<top>/hooks` notwithstanding.
 - The Windows refusal's two lines are held host-independently, and on native Windows a case holds the probe passing on the leg's git. A value carrying a line break is refused. In `uninstall`'s module, an opted-in clone whose record carries a value prints the line restoring it.
 
