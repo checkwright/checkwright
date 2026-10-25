@@ -1,16 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: personal-install-residue-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-10-25, lead-relayed, not a ruling; the iteration opened undirected):** option C, seven units, the install-hooks and personal-install residue plus one lead-posture rider. Debt promoted by scope: `hookspath-prior-physical`, `marker-block-final-newline`, `personal-exclude-crlf`, `link-refusal-junction-case` (the four bullets personal-install-hardening-pass' close carried in), and `smoke-git-config-isolation`. Features for spec to author and pair: `hookspath-chain`, `oracle-turn-done-marker`. `notification-delivery-probe` stays deferred. Stages scope, spec, build, validate, close; align joins if an authored amendment spans two component directories. Composition: bundled, drain 3 against inflow 1.4.
-
-  **Order (scope, own authority):** `hookspath-prior-physical` lands before `hookspath-chain`, which records and runs the prior hooks directory and so needs it resolved physically. No other pairing among the set or the pool.
-
-  **Push need (2026-10-25, inside the budget):** 2 against 2. One mid-iteration push after `link-refusal-junction-case`, `smoke-git-config-isolation` and `hookspath-chain` build, since a Windows leg is the first runner of each, then the closing push.
 
 ---
 
