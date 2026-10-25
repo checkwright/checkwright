@@ -1,14 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: install-commit-hooks-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-10-25, lead-relayed, not a ruling; the iteration opened undirected):** option A+, three debt units and two features. Debt: `journal-mark-writer-unnamed`, `notification-delivery-probe`, `marker-block-removal-fidelity`. Features, promoted by spec with their amendments: `init-commit-runs-adopter-hooks`, `restore-line-fidelity`. Stages scope, spec, build, validate, close, with align where check-stage-entry assertion C demands it. Composition: bundled, a lifecycle-kit debt lead with installer and native fill; drain 5 against inflow 1.4.
-
-  **Push need (operator direction 2026-10-25, the overrun chosen knowingly):** 3 against 2: the closing push, the release tag on `init-commit-runs-adopter-hooks` and the Windows probe on `restore-line-fidelity`.
 
 ---
 
