@@ -922,9 +922,3 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 ## Done
 
-- restore-line-fidelity
-- marker-block-removal-fidelity
-- init-commit-runs-adopter-hooks
-- journal-mark-writer-unnamed
-- notification-delivery-probe
-
