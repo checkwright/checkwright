@@ -872,11 +872,3 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 ## Done
 
-- hookspath-prior-physical
-- marker-block-final-newline
-- personal-exclude-crlf
-- oracle-turn-done-marker
-- hookspath-chain
-- link-refusal-junction-case
-- smoke-git-config-isolation
-

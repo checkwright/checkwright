@@ -306,3 +306,4 @@ Knowledge-friction counts are excluded: their log is gitignored per-iteration sc
 | front-door-patch-pass | sc sp · b v c | 2f/1d | 1 · ≤0d | 21s clean | 156 |
 | personal-overlay-pass | sc sp a b v c | 5f/0d | 3 · ≤0d | 21s clean | 156 |
 | personal-install-hardening-pass | sc sp a b v c | 3f/7d | 3 · ≤1d | 21s clean | 156 |
+| personal-install-residue-pass | sc sp a b v c | 2f/9d | 2 · ≤0d | 21s clean | 156 |
