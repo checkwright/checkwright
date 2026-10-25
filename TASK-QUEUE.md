@@ -14,6 +14,32 @@
 
 ## New Features
 
+### init-commit-runs-adopter-hooks
+
+[spec: installer/SPEC-init-foreign-hooks.md]
+
+`init`'s one install commit runs the adopter's own commit hooks over every vendored file. An operator-seat install (`op-02`, `prose`, v0.33.0) failed there: the adopter's amendment-pairing gate read canon-kit/templates/SPEC-amendment.md as an unpaired amendment, `init` printed its commit-failed line and stopped with 1010 files staged, and time to first green was never reached. Neither docs/install.md nor installer/SPEC.md §init says an adopter's existing hooks gate that commit, and the shipped template's `SPEC-*.md` name collides with a common amendment-file convention.
+
+**Deliverable:** design-pending, a feature: what `init` does about hooks it does not own at its commit (refuse up front, commit past them, or report the hook as the cause with its remedy), whether the template's name changes, and the docs stating it.
+
+**Seen in the same runs, unverified here:** docs/install.md's WSL bullet reads as `init` placing the pre-commit hook, against §init's 'init places no git hook'; the vendored gate-sdk/README.md points at SPECs the vendored copy lacks; `init`'s commit subject ignores the adopter's prefix convention.
+
+**Push need (2026-10-25, operator direction):** the release tag at close, since the fix reaches the next operator-seat install only on a published binary; close's release policy decides the cut.
+
+**Cost while deferred:** an adopter whose tree already gates commits does not finish the install, and the failure reads as the adopter's to repair. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close; filed at the next scope. Owner lookup: `init`, `install commit`, `hook` in this file and the disposed-findings record, none; owner installer/SPEC.md §init.
+
+### restore-line-fidelity
+
+[spec: gate-sdk/SPEC-restore-line.md]
+
+Three ways the hooks restore line can advise wrongly, against gate-sdk/SPEC.md §install-hooks. **Unread chain:** `hooks_line` (native/src/installer/uninstall.rs) drops every `read_chain` error and prints `git config --unset core.hooksPath`, so an unreadable record holding a restore value is advised away rather than reported. **Empty value:** the chain record's empty `restore=` sentinel cannot tell a local `core.hooksPath` set to the empty string from none, which git may resolve differently (inferred, the probe guard-refused). **PowerShell 5.1:** `shell_quoted` single-quotes for PowerShell's parser, but Windows PowerShell 5.1's legacy native-argument passing drops an embedded double quote, so a recorded `a"b` would restore as `ab`, against 'pastes as itself' (inferred off Microsoft's about_parsing; no PowerShell here, and the unit test asserts the spelling, not git's argv).
+
+**Deliverable:** debt where the SPEC already decides (report the unread chain); the sentinel and the 5.1 quoting are design-pending.
+
+**Push need (2026-10-25, operator direction, the overrun chosen knowingly):** one mid-iteration push, a Windows-runner probe of how Windows PowerShell 5.1 passes an embedded double quote to git, since no local run reaches that host.
+
+**Cost while deferred:** an uninstall or hook move can advise a restore that leaves an adopter's own hooks off. Surfaced 2026-10-25 by restore-line-marker-tail-pass' close second-vendor review; filed at the next scope. Owner lookup: `restore line`, `read_chain`, `hooksPath` in this file, none; owner gate-sdk/SPEC.md §install-hooks.
+
 ## Technical Debt
 
 ### journal-mark-writer-unnamed
@@ -189,32 +215,6 @@ the workflow half of `personal-adoption`: a developer runs the stage machine on 
 **Deliverable:** design-pending, a feature: the export arm's shape (a path-filtered branch rewrite or a patch series), how it reads the lock roster and the workflow paths without a kit literal naming a layout, and what it refuses.
 
 **Cost while deferred:** the workflow half stays usable only by vendoring into a tree the developer does not own, or by stripping its commits by hand before an upstream pull request. Filed 2026-10-24 by personal-overlay-pass' scope, split from personal-adoption (operator direction 2026-10-24, lead-relayed, not a ruling). Owner lookup: `export`, `fork`, `personal branch` in this file, none beyond the parent; owner installer/SPEC.md.
-
-### init-commit-runs-adopter-hooks
-
-[cost: event/high] [surface: installer]
-
-`init`'s one install commit runs the adopter's own commit hooks over every vendored file. An operator-seat install (`op-02`, `prose`, v0.33.0) failed there: the adopter's amendment-pairing gate read canon-kit/templates/SPEC-amendment.md as an unpaired amendment, `init` printed its commit-failed line and stopped with 1010 files staged, and time to first green was never reached. Neither docs/install.md nor installer/SPEC.md §init says an adopter's existing hooks gate that commit, and the shipped template's `SPEC-*.md` name collides with a common amendment-file convention.
-
-**Deliverable:** design-pending, a feature: what `init` does about hooks it does not own at its commit (refuse up front, commit past them, or report the hook as the cause with its remedy), whether the template's name changes, and the docs stating it.
-
-**Seen in the same runs, unverified here:** docs/install.md's WSL bullet reads as `init` placing the pre-commit hook, against §init's 'init places no git hook'; the vendored gate-sdk/README.md points at SPECs the vendored copy lacks; `init`'s commit subject ignores the adopter's prefix convention.
-
-**Push need (2026-10-25, operator direction):** the release tag at close, since the fix reaches the next operator-seat install only on a published binary; close's release policy decides the cut.
-
-**Cost while deferred:** an adopter whose tree already gates commits does not finish the install, and the failure reads as the adopter's to repair. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close; filed at the next scope. Owner lookup: `init`, `install commit`, `hook` in this file and the disposed-findings record, none; owner installer/SPEC.md §init.
-
-### restore-line-fidelity
-
-[cost: event/low] [surface: native]
-
-Three ways the hooks restore line can advise wrongly, against gate-sdk/SPEC.md §install-hooks. **Unread chain:** `hooks_line` (native/src/installer/uninstall.rs) drops every `read_chain` error and prints `git config --unset core.hooksPath`, so an unreadable record holding a restore value is advised away rather than reported. **Empty value:** the chain record's empty `restore=` sentinel cannot tell a local `core.hooksPath` set to the empty string from none, which git may resolve differently (inferred, the probe guard-refused). **PowerShell 5.1:** `shell_quoted` single-quotes for PowerShell's parser, but Windows PowerShell 5.1's legacy native-argument passing drops an embedded double quote, so a recorded `a"b` would restore as `ab`, against 'pastes as itself' (inferred off Microsoft's about_parsing; no PowerShell here, and the unit test asserts the spelling, not git's argv).
-
-**Deliverable:** debt where the SPEC already decides (report the unread chain); the sentinel and the 5.1 quoting are design-pending.
-
-**Push need (2026-10-25, operator direction, the overrun chosen knowingly):** one mid-iteration push, a Windows-runner probe of how Windows PowerShell 5.1 passes an embedded double quote to git, since no local run reaches that host.
-
-**Cost while deferred:** an uninstall or hook move can advise a restore that leaves an adopter's own hooks off. Surfaced 2026-10-25 by restore-line-marker-tail-pass' close second-vendor review; filed at the next scope. Owner lookup: `restore line`, `read_chain`, `hooksPath` in this file, none; owner gate-sdk/SPEC.md §install-hooks.
 
 ### npm-trusted-publishing
 
