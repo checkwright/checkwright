@@ -24,7 +24,7 @@ a controlled A/B trial.
 
 [roadmap: later/commercial] [cost: event/low] [surface: evidence-kit] [roadmap-summary: Gate runs verified by a neutral party no committing agent can touch.]
 
-hosted attestation. The team/paid rung: gates verified server-side by a party the committing agents cannot touch — hosted gate runs as a neutral attestation, cross-repo drift dashboards, maintained rulesets. A service, not code: cloning the kits does not clone the neutrality or the ops. Demand-gated — this entry is the public roadmap marker, not a scaffold; hosting and sequencing decisions are on record in the operator's local brief, and its prerequisite mechanism has landed (lifecycle-kit/SPEC.md §Multi-operator semantics). Its single-repo statistics half split off as `iteration-statistics-view`, landed at site-health-statistics-pass (operator direction 2026-10-17, on consult advice, lead-relayed, not a ruling); the cross-repo dashboards stay here. Surfaced 2026-07-07.
+hosted attestation. The team/paid rung: gates verified server-side by a party the committing agents cannot touch — hosted gate runs as a neutral attestation, cross-repo drift dashboards, maintained rulesets. A service, not code: cloning the kits does not clone the neutrality or the ops. No longer demand-gated: the operator direction of 2026-10-25, lead-relayed (not a ruling), advances the track. Its tree-side first unit is [gate-run-attestation-predicate](#gate-run-attestation-predicate); the service half, outside this tree, stays the operator's. Hosting and sequencing decisions are in the operator's local brief, and its prerequisite mechanism has landed (lifecycle-kit/SPEC.md §Multi-operator semantics). Its single-repo statistics half split off as `iteration-statistics-view`, landed at site-health-statistics-pass (operator direction 2026-10-17, on consult advice, lead-relayed, not a ruling); the cross-repo dashboards stay here. Surfaced 2026-07-07.
 
 **Cost while deferred:** zero — this is a service rather than tree mechanism, so nothing rots; the residue is that gate runs stay self-attested, which binds only when a party the committing agents cannot touch is asked to trust them.
 
@@ -48,21 +48,21 @@ the interop rung's submission half. The build half landed at companion-catalog-e
 
 [roadmap: now/adoption] [cost: event/low] [surface: drift-kit] [roadmap-summary: A small observed preview measuring first green, first useful red and retention on real installs.]
 
-a narrow external preview before any broad announcement: a preview cohort whose composition is ruled in the operator's private brief, the first install observed live and the rest arriving through the observation record, instrumented for time-to-first-green, first useful red, false-positive dispositions, and 7/30-day retention per kit. It is the first rung on this queue whose deliverable is **evidence from outside this tree** rather than a tree change.
+a narrow external preview before any broad announcement: a preview cohort whose composition is set in the operator's private brief, the first install observed live and the rest arriving through the observation record, instrumented for time-to-first-green, first useful red, false-positive dispositions, and 7/30-day retention per kit. It is the first rung on this queue whose deliverable is **evidence from outside this tree** rather than a tree change.
 
 **The TREE HALF landed in `external-install-evidence`** — drift-kit/SPEC.md §The install-observation record and §The install-evidence projection, the `--emit file-install` capture arm, and `docs/install-evidence.md` behind `check-install-evidence-fresh`. What is kept here is the expensive half: operator hours and a calendar window of thirty days or more, running beside later iterations and never inside a stage session. What re-promotes this entry is an observed install, not another tree change.
 
-**Sequencing is the load-bearing part.** The preview runs *before* [benchmark-ab-experiment](#benchmark-ab-experiment), so pilot findings shape that experiment's task classes and metrics rather than being retrofitted to them; per-gate true/false-positive history and profile retention are preview deliverables, not pre-launch builds. The launch ruling behind it stays in the private brief; this entry is the queue-visible rung.
+**Sequencing is the load-bearing part.** The preview runs *before* [benchmark-ab-experiment](#benchmark-ab-experiment), so pilot findings shape that experiment's task classes and metrics rather than being retrofitted to them; per-gate true/false-positive history and profile retention are preview deliverables, not pre-launch builds. The launch direction behind it stays in the private brief; this entry is the queue-visible rung.
 
 **Expected FIRST FINDING, not a precondition** (facts restated 2026-10-11 to the current floor, operator direction, lead-relayed, not a ruling): today's quick start is a one-line install under POSIX sh or PowerShell; bash is owed only by a runnable fence or a registered shell gate; native Windows needs Git for Windows for `git` (docs/requirements.md). That is why the merged channel gives the installer no delta — those host-floor facts are an output of the observation, not an input.
 
 **Refused, grounds carried forward:** parking behind `native-windows-bash-floor` (landed 2026-09-18) or the git-only-floor discharge (the trigger is what the preview measures); the icebox (the highest cost-while-deferred in the intake).
 
-**Held deferred twice on 2026-09-26, operator direction lead-relayed (not a ruling),** until v0.26.0 published the repaired front door (`front-door-demo-unreachable`, `demo-catches-a-done-claim`).
+**Operator direction on consult, 2026-09-27:** the cohort is one observed pre-submission install, then the installers the catalogs and the plugin marketplace send; the ledger's `catalog-then-plugin` ruling that sequenced those two ecosystem units first discharged 2026-09-29, both published. The observed install is owed before the catalog submission; the rest re-promotes on the first observed install.
 
-**Consult ruling, 2026-09-27, superseding the 2026-09-25 recommendation to promote next:** the cohort was re-ruled in the brief — one observed pre-submission install, then the installers the catalogs and the plugin marketplace send — so this entry runs *through* the two ecosystem units the ledger's `catalog-then-plugin` ruling sequenced first, not ahead of them; that ruling discharged 2026-09-29, the extension and the plugin package both published. The observed install is owed before the catalog submission; the rest re-promotes on the first observed install, as stated above.
+**Readiness holds, both discharged:** the 2026-09-26 hold until v0.26.0 published the repaired front door, and the 2026-09-29 clean-container rehearsal, `front-door-container-rehearsal` at preview-readiness, filed to the author seat's record.
 
-**Readiness ahead of the observed install, operator direction 2026-09-29, lead-relayed (not a ruling):** a clean-container first-run rehearsal ran first, as `front-door-container-rehearsal` at preview-readiness, its runs filed to the author seat's record, never the published one. Operator-seat adoption is independent evidence and gates nothing; counting it toward the observed install was declined.
+**Operator-seat installs count toward the observed install (operator direction 2026-10-25, lead-relayed, not a ruling, revising 2026-09-29's that they gate nothing):** an agent session in one operator project on `prose` and one in a second on the full technical profile, each from a lead-drafted cold prompt, then friends on their own machines. `op-01` and `op-02`, both `prose`, were filed 2026-10-25; `op-02` stopped at init's commit ([init-commit-runs-adopter-hooks](#init-commit-runs-adopter-hooks)).
 
 **Comparison arm (operator direction 2026-10-17, lead-relayed, not a ruling):** where the metrics allow, beside a custom-CI baseline and one named same-seat entrant, on mistakes caught, setup effort, interruptions and retention.
 
@@ -110,9 +110,11 @@ the delivery rule under `lead-notification-wake-race`'s remedy, unprobed: does a
 
 **Deliverable:** that probe, run by a lead with the operator present, since a dispatched session's report is all its caller holds and no session reports on its own turn end (delegation-kit/SPEC.md §The delegation model); then lifecycle-kit/templates/lead.md §The lead model's wait clause and the agent-execution backgrounding bullet's bound confirmed or corrected against the result.
 
-**Inferred, not run:** that a tool call before the turn end delivers the notification — two stalled transcripts show only an undrained queue at the stop, and one 2026-10-02 lead turn with tool calls received its notification inside the turn.
+**Run 2026-10-25** by a lead with the operator present, measured off the lead transcript's queue-operation and system rows. A trivial child dispatched, then a text-only turn end: the hand-back and its notification enqueued before the turn ended, and the hand-back dequeued 9 ms after it and woke the session with no operator input, the notification delivered inside the woken turn's first tool call. A child finishing 4 ms after the turn end woke it the same way; a notification queued mid-turn arrived at the next tool-result boundary. So on that harness build a queued completion does not stall a turn that ends without a tool call, and the clause's stated mechanism did not reproduce. Two samples, one build, both children worktree-isolated; the stalled 2026-10-02 transcripts may predate the hand-back channel (inferred).
 
-**Cost while deferred:** the lead's wait clause rests on an inferred mechanism; if it is wrong, a stall still costs hours of idle wall-clock until the operator wakes the lead. Filed 2026-10-02 as a split at companion-tier-delegation-pass' scope, operator direction lead-relayed (not a ruling).
+**What is left:** the wait clause kept as a cheap belt with its ground restated to this measurement, or rewritten to it.
+
+**Cost while deferred:** the lead's wait clause states a mechanism the probe did not reproduce, so every lead pays a tool call on a ground that reads as fact. Filed 2026-10-02 as a split at companion-tier-delegation-pass' scope, operator direction lead-relayed (not a ruling).
 
 ### evaluator-root-agent-file
 
@@ -124,7 +126,7 @@ surface (c) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 
 **Deliverable:** design-pending, a feature: the file's audience and home and the rule `check-root-tiering` takes on it, or a refusal recorded.
 
-**Cost while deferred:** a cloning agent's first read is maintainer-internal instructions; whether that costs a recommendation is unmeasured until drift-kit's `--selection-probe` runs (drift-kit/SPEC.md §The agent-selection probe). Run it before a scope weighs this entry, and again once its change publishes; its first run is the operator's. Filed 2026-10-17 by evaluator-discovery-pass' scope as a split remainder. Re-verified there: no root `AGENTS.md`. Owner lookup: the parent's, none; owner gate-sdk/SPEC.md §check-root-tiering.
+**Cost while deferred:** a cloning agent's first read is maintainer-internal instructions; whether that costs a recommendation is unmeasured until drift-kit's `--selection-probe` runs (drift-kit/SPEC.md §The agent-selection probe). Run it before a scope weighs this entry, and again once its change publishes. **First run, operator, 2026-10-25:** 2 named of 9 asked; codex named checkwright for gates and verify, agy on none, and claude failed all three, since the row's `--bare` in scripts/drift-config.knobs skips the stored login and exits 'Not logged in' on a subscription-login box. Owed first: an argv both cold and authenticated, or that row's honest limit stated, then a same-day re-run replacing the three failed lines. Filed 2026-10-17 by evaluator-discovery-pass' scope as a split remainder. Re-verified there: no root `AGENTS.md`. Owner lookup: the parent's, none; owner gate-sdk/SPEC.md §check-root-tiering.
 
 ### codex-plugin-hook-discovery
 
@@ -165,6 +167,88 @@ the workflow half of `personal-adoption`: a developer runs the stage machine on 
 **Deliverable:** design-pending, a feature: the export arm's shape (a path-filtered branch rewrite or a patch series), how it reads the lock roster and the workflow paths without a kit literal naming a layout, and what it refuses.
 
 **Cost while deferred:** the workflow half stays usable only by vendoring into a tree the developer does not own, or by stripping its commits by hand before an upstream pull request. Filed 2026-10-24 by personal-overlay-pass' scope, split from personal-adoption (operator direction 2026-10-24, lead-relayed, not a ruling). Owner lookup: `export`, `fork`, `personal branch` in this file, none beyond the parent; owner installer/SPEC.md.
+
+### init-commit-runs-adopter-hooks
+
+[cost: event/high] [surface: installer]
+
+`init`'s one install commit runs the adopter's own commit hooks over every vendored file. An operator-seat install (`op-02`, `prose`, v0.33.0) failed there: the adopter's amendment-pairing gate read canon-kit/templates/SPEC-amendment.md as an unpaired amendment, `init` printed its commit-failed line and stopped with 1010 files staged, and time to first green was never reached. Neither docs/install.md nor installer/SPEC.md §init says an adopter's existing hooks gate that commit, and the shipped template's `SPEC-*.md` name collides with a common amendment-file convention.
+
+**Deliverable:** design-pending, a feature: what `init` does about hooks it does not own at its commit (refuse up front, commit past them, or report the hook as the cause with its remedy), whether the template's name changes, and the docs stating it.
+
+**Seen in the same runs, unverified here:** docs/install.md's WSL bullet reads as `init` placing the pre-commit hook, against §init's 'init places no git hook'; the vendored gate-sdk/README.md points at SPECs the vendored copy lacks; `init`'s commit subject ignores the adopter's prefix convention.
+
+**Cost while deferred:** an adopter whose tree already gates commits does not finish the install, and the failure reads as the adopter's to repair. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close; filed at the next scope. Owner lookup: `init`, `install commit`, `hook` in this file and the disposed-findings record, none; owner installer/SPEC.md §init.
+
+### journal-mark-writer-unnamed
+
+[cost: session/low] [surface: lifecycle-kit]
+
+Every stage template's last step says to append `DONE` to the resume journal and names no writer, and lead.md says the same of `DISPOSED`, so sessions spell the raw append: the manual-operation meter ranks `echo >>` in nine iterations' logs, about 110 calls, some on the absolute path. The journal arm already writes both: `--emit journal DONE`, and `--emit journal --lead DISPOSED`, which refuses only a segment already disposed (lifecycle-kit/SPEC.md §The journal arm).
+
+**Deliverable:** debt: each last step and lead.md's disposal sentence name the arm form.
+
+**Cost while deferred:** each stage session spends a hand-spelled append, a permission decision where the path is absolute. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close; filed at the next scope, the `--lead` form re-read there. Owner lookup: `DONE`, `DISPOSED`, `journal` in this file, none; owner lifecycle-kit/SPEC.md §templates/stages/.
+
+### marker-block-removal-fidelity
+
+[cost: event/low] [surface: native]
+
+Two departures of `marker::remove_block` from gate-sdk/SPEC.md §lib/inject.sh, both pre-existing. **Pairing:** `half_open` (native/src/marker.rs) asks only whether some begin and some end line exist, so a stray end before the begin, or a second unmatched begin after a complete block, deletes from that begin to end of file, where the SPEC refuses a begin without its end. **Bytes:** the file is read through `fresh::read_captured`, a lossy UTF-8 decode, so non-UTF-8 bytes outside the block come back as U+FFFD, against the byte-identical-rest promise; the replace and uninstall writers read the same way (inferred, unread). Reaches `--install-doctrine --remove` and the installer's exclude-block removal.
+
+**Deliverable:** debt: order-and-pairing refusal and a byte-faithful read, each with a unit test.
+
+**Cost while deferred:** a malformed or non-UTF-8 target loses content it never owned on removal. Surfaced 2026-10-25 by restore-line-marker-tail-pass' close second-vendor review; filed at the next scope, re-read there. Owner lookup: `remove_block`, `half_open`, `read_captured` in this file, none; owner gate-sdk/SPEC.md §lib/inject.sh.
+
+### restore-line-fidelity
+
+[cost: event/low] [surface: native]
+
+Three ways the hooks restore line can advise wrongly, against gate-sdk/SPEC.md §install-hooks. **Unread chain:** `hooks_line` (native/src/installer/uninstall.rs) drops every `read_chain` error and prints `git config --unset core.hooksPath`, so an unreadable record holding a restore value is advised away rather than reported. **Empty value:** the chain record's empty `restore=` sentinel cannot tell a local `core.hooksPath` set to the empty string from none, which git may resolve differently (inferred, the probe guard-refused). **PowerShell 5.1:** `shell_quoted` single-quotes for PowerShell's parser, but Windows PowerShell 5.1's legacy native-argument passing drops an embedded double quote, so a recorded `a"b` would restore as `ab`, against 'pastes as itself' (inferred off Microsoft's about_parsing; no PowerShell here, and the unit test asserts the spelling, not git's argv).
+
+**Deliverable:** debt where the SPEC already decides (report the unread chain); the sentinel and the 5.1 quoting are design-pending.
+
+**Cost while deferred:** an uninstall or hook move can advise a restore that leaves an adopter's own hooks off. Surfaced 2026-10-25 by restore-line-marker-tail-pass' close second-vendor review; filed at the next scope. Owner lookup: `restore line`, `read_chain`, `hooksPath` in this file, none; owner gate-sdk/SPEC.md §install-hooks.
+
+### npm-trusted-publishing
+
+[cost: event/high] [surface: .github] [observed-by: publish]
+
+The publish workflow's npm job authenticates with a stored `NPM_TOKEN` secret, which expired under the v0.34.0 publish (run 40193208238): E404 on the registry PUT after provenance signing, a release left half-out. Rotation then hit two more traps RELEASING.md step 5 does not name: a fresh token failed EOTP until npm-side 2FA settings changed, and a `gh secret set` fed an empty non-interactive stdin set the secret empty with no 'Set Actions secret' line. npm's 90-day write-token cap is the release session's understanding, unverified.
+
+**Deliverable:** design-pending, a feature: npm trusted publishing from GitHub Actions (OIDC), which stores no token and removes all three failure modes, with RELEASING.md and the publish workflow's spec rewritten to it; its npm-side registration is the operator's. The observe half reads the next release's `publish` run.
+
+**Cost while deferred:** each token period ends in a release halted half-out, and each rotation can fail silently. Surfaced 2026-10-25 by the v0.34.0 release session; filed at the next scope. Owner lookup: `NPM`, `trusted publish` in this file, none; owner RELEASING.md step 5.
+
+### site-documents-unreleased
+
+[cost: event/low] [surface: docs]
+
+The site, served from master, documents behaviour no release ships yet. `hookspath-chain` landed after v0.33.0, and an operator-seat install (`op-01`) of v0.33.0 had its `core.hooksPath` replaced with no chain record and an unset restore while gate-sdk/SPEC.md §install-hooks on the site described chaining. v0.34.0 shipped that fix; the gap between a landing and its release stays.
+
+**Deliverable:** design-pending: whether the site may describe unreleased behaviour, and if not, what marks it (a since-version note, or a release-pinned SPEC copy).
+
+**Cost while deferred:** between a landing and its release, an adopter reading the site is told the published binary does what it does not. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close; filed at the next scope. Owner lookup: `unreleased`, `site` in this file, none; owner docs/site-architecture.md.
+
+### ruling-claim-outside-ledger
+
+[cost: event/low] [surface: lifecycle-kit]
+
+Only TRAJECTORY.md holds rulings (operator direction, 2026-10-25), yet tracked prose labels as rulings what it does not hold: record-stamp-encoding-compression's 'Operator-ruled 2026-09-01' and its `not-icebox-eligible` reason; design-partner-preview's 'Consult ruling, 2026-09-27' was relabelled at this filing. Others are unsurveyed.
+
+**Deliverable:** design-pending, a feature: relabel each instance as the direction it is, and a gate that reds a ruling claim on a tracked surface naming no ledger entry (enforcement-first).
+
+**Cost while deferred:** a session reading the label treats a direction as operator-class and escalates what it could decide. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close; filed at the next scope. Owner lookup: `ruling`, `ruled` in this file, the two instances; owner lifecycle-kit/SPEC.md §The steering vocabulary.
+
+### gate-run-attestation-predicate
+
+[cost: event/low] [surface: evidence-kit]
+
+the tree-side first unit of [hosted-attestation-service](#hosted-attestation-service): the evidence manifest (evidence-kit/SPEC.md §Evidence manifest) emitted as an in-toto Statement in a DSSE envelope under a Checkwright-owned gate-run predicate type, the versioned wire contract between the kits and any verifier. Unbuilt: in-toto appears only in docs/choosing.md's comparison rows. It needs no demand, since a predicate an adopter's CI signs with off-the-shelf attestation tooling is useful before any service exists.
+
+**Deliverable:** design-pending, a feature: the predicate type's name and schema, the manifest fields it carries, whether the kits emit the Statement for a signer to wrap or sign it themselves, and its versioning rule.
+
+**Cost while deferred:** a gate run is readable only in this tree's own formats, so no attestation verifier or log reads one; nothing rots. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close from the operator direction of that date, lead-relayed (not a ruling). Owner lookup: `in-toto`, `predicate`, `DSSE` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md.
 
 ## Icebox
 
