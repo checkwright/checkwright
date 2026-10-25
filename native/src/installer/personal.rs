@@ -106,6 +106,13 @@ fn prune(e: &Exclude, wt: &Worktree) -> Result<Vec<String>, String> {
             ));
             continue;
         }
+        if crate::marker::installable(&e.path.to_string_lossy(), &begin, &end).is_err() {
+            said.push(format!(
+                "personal: left the exclude block of {} in {}, its markers out of order",
+                key, e.shown
+            ));
+            continue;
+        }
         crate::marker::uninstall_block(&e.path.to_string_lossy(), &begin, &end)?;
         said.push(format!(
             "personal: dropped the exclude block of {}, a worktree git no longer records",
@@ -352,6 +359,20 @@ mod tests {
             "the prune's report"
         );
         assert!(!read().contains(&key), "the gone worktree's block was not pruned");
+        // spec: installer/SPEC.md §The personal install — a stray end ahead of a gone worktree's
+        // begin is named and left, never pruned through to the end of the file
+        let stray = format!("{} worktrees/stray\n{} worktrees/stray\n/stray\n{} worktrees/stray\n", PERSONAL_END, PERSONAL_BEGIN, PERSONAL_END);
+        let mut grown = read();
+        grown.push_str(&stray);
+        std::fs::write(&e.path, grown).expect("cannot plant an out-of-order block");
+        let said = write(&main, &one("main-only.txt"), &[]).expect("the main block was not rewritten").said;
+        assert_eq!(
+            said.last(),
+            Some(&format!("personal: left the exclude block of worktrees/stray in {}, its markers out of order", e.shown)),
+            "the prune's report: {:?}",
+            said
+        );
+        assert!(read().ends_with(&stray), "the out-of-order block was rewritten");
         std::fs::remove_dir_all(&main).ok();
     }
 }

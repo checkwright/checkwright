@@ -39,132 +39,62 @@ pub fn read_block(text: &str, begin: &str, end: &str) -> String {
     out.join("\n").trim_end_matches('\n').to_string()
 }
 
-// spec: gate-sdk/SPEC.md §lib/inject.sh — the marker pair's positions, whole-line. Returned rather
-// than asserted so the writer states its own refusal wording for each malformed shape.
-fn bounds(lines: &[&str], begin: &str, end: &str) -> (Option<usize>, Option<usize>) {
-    (
-        lines.iter().position(|l| is(l, begin)),
-        lines.iter().position(|l| is(l, end)),
-    )
+// spec: gate-sdk/SPEC.md §lib/inject.sh — every writer reads and rewrites the file as bytes, so a
+// byte outside the block that is not UTF-8 is written back as it was read
+fn read_bytes(path: &str) -> Result<Vec<u8>, String> {
+    std::fs::read(path).map_err(|_| fresh::fail_closed("cat", Some(1)))
 }
 
-// spec: gate-sdk/SPEC.md §lib/inject.sh — replace the span between an existing marker pair, the
-// file otherwise byte-untouched. Deliberately **tightens** the shell original, which appends a
-// fresh block on an absent begin marker where this refuses.
-pub fn write_block(path: &str, begin: &str, end: &str, body: &str) -> Result<(), String> {
-    let text = fresh::read_captured(path)?;
-    let lines = fresh::file_lines(&text);
-    let (b, e) = bounds(&lines, begin, end);
-    let (b, e) = match (b, e) {
-        (Some(b), Some(e)) if b < e => (b, e),
-        (Some(b), Some(e)) => {
+fn byte_lines(text: &[u8]) -> Vec<&[u8]> {
+    if text.is_empty() {
+        return Vec::new();
+    }
+    text.strip_suffix(b"\n").unwrap_or(text).split(|&c| c == b'\n').collect()
+}
+
+fn bare_bytes(line: &[u8]) -> &[u8] {
+    line.strip_suffix(b"\r").unwrap_or(line)
+}
+
+fn is_line(line: &[u8], marker: &str) -> bool {
+    bare_bytes(line) == marker.as_bytes()
+}
+
+fn has_line(lines: &[&[u8]], marker: &str) -> bool {
+    lines.iter().any(|l| is_line(l, marker))
+}
+
+fn write_bytes(path: &str, out: &[u8]) -> Result<(), String> {
+    std::fs::write(path, out).map_err(|e| format!("cannot write {}: {}", path, e))
+}
+
+// spec: gate-sdk/SPEC.md §lib/inject.sh — the one well-formedness test: once a begin marker is
+// present, each begin closes at an end before the next begin and each end closes an open begin
+fn paired(path: &str, lines: &[&[u8]], begin: &str, end: &str) -> Result<(), String> {
+    if !has_line(lines, begin) {
+        return Ok(());
+    }
+    let mut open: Option<usize> = None;
+    for (i, line) in lines.iter().enumerate() {
+        if is_line(line, begin) {
+            if let Some(o) = open {
+                return Err(format!(
+                    "{}: a second begin marker at line {} inside the block opened at line {} — refusing to guess the block bounds",
+                    path,
+                    i + 1,
+                    o + 1
+                ));
+            }
+            open = Some(i);
+        } else if is_line(line, end) && open.take().is_none() {
             return Err(format!(
-                "{}: the end marker precedes the begin marker (lines {} and {}) — refusing to \
-                 guess the block bounds",
+                "{}: the end marker at line {} precedes its begin marker — refusing to guess the block bounds",
                 path,
-                e + 1,
-                b + 1
-            ))
-        }
-        (Some(_), None) => {
-            return Err(format!(
-                "{}: begin marker present but end marker missing — refusing to guess the block \
-                 bounds",
-                path
-            ))
-        }
-        (None, Some(_)) => {
-            return Err(format!(
-                "{}: end marker present but begin marker missing — refusing to guess the block \
-                 bounds",
-                path
-            ))
-        }
-        (None, None) => {
-            return Err(format!(
-                "{}: no {} marker — refusing to append a fresh block, which would corrupt a \
-                 hand-authored page and read back as staleness",
-                path, begin
-            ))
-        }
-    };
-
-    let mut out: Vec<String> = lines[..=b].iter().map(|s| s.to_string()).collect();
-    for line in fresh::file_lines(body) {
-        out.push(line.to_string());
-    }
-    out.extend(lines[e..].iter().map(|s| s.to_string()));
-    let mut rendered = out.join("\n");
-    if text.ends_with('\n') {
-        rendered.push('\n');
-    }
-    std::fs::write(path, rendered).map_err(|e| format!("cannot write {}: {}", path, e))
-}
-
-// spec: gate-sdk/SPEC.md §lib/inject.sh — the installer half: `inject_marker_block`'s
-// append-on-absent disposition, which is correct for a seeding installer and is exactly what
-// `write_block` above refuses on behalf of a generator. Two writers, two misses, one module.
-// spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — the action word is the return value
-// because the caller reports it; the begin-without-end refusal is exit 2 at that caller.
-pub fn install_block(path: &str, begin: &str, end: &str, body: &str) -> Result<String, String> {
-    let text = fresh::read_captured(path)?;
-    let lines = fresh::file_lines(&text);
-    half_open(path, &lines, begin, end)?;
-    let mut block = String::new();
-    block.push_str(begin);
-    block.push('\n');
-    block.push_str(body);
-    if !body.ends_with('\n') {
-        block.push('\n');
-    }
-    block.push_str(end);
-    block.push('\n');
-
-    // spec: gate-sdk/SPEC.md §lib/inject.sh — the presence test is whole-line, the module's own
-    // stated rule; the shell form gated the same replace on a substring grep, so a marker
-    // occurring inside prose sent it down a replace path that matched nothing and reported it
-    if !has(&lines, begin) {
-        let mut out = text;
-        out.push('\n');
-        out.push_str(&block);
-        std::fs::write(path, out).map_err(|e| format!("cannot write {}: {}", path, e))?;
-        return Ok("appended".to_string());
-    }
-
-    let mut out = String::new();
-    let mut skip = false;
-    for line in &lines {
-        if is(line, begin) {
-            skip = true;
-            out.push_str(&block);
-            continue;
-        }
-        if is(line, end) {
-            skip = false;
-            continue;
-        }
-        if !skip {
-            out.push_str(line);
-            out.push('\n');
+                i + 1
+            ));
         }
     }
-    if !terminated(&text) {
-        out.pop();
-    }
-    std::fs::write(path, out).map_err(|e| format!("cannot write {}: {}", path, e))?;
-    Ok("replaced".to_string())
-}
-
-// spec: gate-sdk/SPEC.md §lib/inject.sh — a rebuild ends terminated iff its input did, so a block
-// another writer left as an unterminated last line stays byte-identical
-fn terminated(text: &str) -> bool {
-    text.is_empty() || text.ends_with('\n')
-}
-
-// spec: gate-sdk/SPEC.md §lib/inject.sh — the installer writer's refusal, readable before a
-// caller's first write: a begin marker without its end
-fn half_open(path: &str, lines: &[&str], begin: &str, end: &str) -> Result<(), String> {
-    if has(lines, begin) && !has(lines, end) {
+    if open.is_some() {
         return Err(format!(
             "{}: begin marker present but end marker missing — refusing to guess the block bounds",
             path
@@ -173,37 +103,129 @@ fn half_open(path: &str, lines: &[&str], begin: &str, end: &str) -> Result<(), S
     Ok(())
 }
 
-pub fn installable(path: &str, begin: &str, end: &str) -> Result<(), String> {
-    let text = fresh::read_captured(path)?;
-    half_open(path, &fresh::file_lines(&text), begin, end)
+// spec: gate-sdk/SPEC.md §lib/inject.sh — replace the span between an existing marker pair, the
+// file otherwise byte-untouched. Deliberately **tightens** the shell original, which appends a
+// fresh block on an absent begin marker where this refuses.
+pub fn write_block(path: &str, begin: &str, end: &str, body: &str) -> Result<(), String> {
+    let text = read_bytes(path)?;
+    let lines = byte_lines(&text);
+    if !has_line(&lines, begin) {
+        return Err(if has_line(&lines, end) {
+            format!("{}: end marker present but begin marker missing — refusing to guess the block bounds", path)
+        } else {
+            format!(
+                "{}: no {} marker — refusing to append a fresh block, which would corrupt a hand-authored page and read back as staleness",
+                path, begin
+            )
+        });
+    }
+    paired(path, &lines, begin, end)?;
+    let b = lines.iter().position(|l| is_line(l, begin)).unwrap_or_default();
+    let e = b + lines[b..].iter().position(|l| is_line(l, end)).unwrap_or_default();
+
+    let mut out: Vec<&[u8]> = lines[..=b].to_vec();
+    out.extend(fresh::file_lines(body).into_iter().map(str::as_bytes));
+    out.extend_from_slice(&lines[e..]);
+    let mut rendered = out.join(&b'\n');
+    if text.ends_with(b"\n") {
+        rendered.push(b'\n');
+    }
+    write_bytes(path, &rendered)
 }
 
-// spec: gate-sdk/SPEC.md §lib/inject.sh — the removal half beside its two siblings: the marker pair
-// and everything between it go, the rest of the file byte-identical. An absent begin marker is a
-// no-op reporting `false`; a begin without its end is malformed on the writers' own terms.
-pub fn remove_block(path: &str, begin: &str, end: &str) -> Result<bool, String> {
-    let text = fresh::read_captured(path)?;
-    let lines = fresh::file_lines(&text);
-    if !has(&lines, begin) {
-        return Ok(false);
+// spec: gate-sdk/SPEC.md §lib/inject.sh — the installer half: `inject_marker_block`'s
+// append-on-absent disposition, which is correct for a seeding installer and is exactly what
+// `write_block` above refuses on behalf of a generator. Two writers, two misses, one module.
+// spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — the action word is the return value
+// because the caller reports it; the begin-without-end refusal is exit 2 at that caller.
+pub fn install_block(path: &str, begin: &str, end: &str, body: &str) -> Result<String, String> {
+    let text = read_bytes(path)?;
+    let lines = byte_lines(&text);
+    paired(path, &lines, begin, end)?;
+    let mut block: Vec<u8> = Vec::new();
+    block.extend_from_slice(begin.as_bytes());
+    block.push(b'\n');
+    block.extend_from_slice(body.as_bytes());
+    if !body.ends_with('\n') {
+        block.push(b'\n');
     }
-    half_open(path, &lines, begin, end)?;
-    let mut out = String::new();
+    block.extend_from_slice(end.as_bytes());
+    block.push(b'\n');
+
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — the presence test is whole-line, the module's own
+    // stated rule; the shell form gated the same replace on a substring grep, so a marker
+    // occurring inside prose sent it down a replace path that matched nothing and reported it
+    if !has_line(&lines, begin) {
+        let mut out = text.clone();
+        out.push(b'\n');
+        out.extend_from_slice(&block);
+        write_bytes(path, &out)?;
+        return Ok("appended".to_string());
+    }
+
+    let mut out: Vec<u8> = Vec::new();
     let mut skip = false;
-    let mut last_kept = false;
     for line in &lines {
-        last_kept = false;
-        if is(line, begin) {
+        if is_line(line, begin) {
             skip = true;
+            out.extend_from_slice(&block);
             continue;
         }
-        if is(line, end) {
+        if is_line(line, end) {
             skip = false;
             continue;
         }
         if !skip {
-            out.push_str(line);
-            out.push('\n');
+            out.extend_from_slice(line);
+            out.push(b'\n');
+        }
+    }
+    if !terminated(&text) {
+        out.pop();
+    }
+    write_bytes(path, &out)?;
+    Ok("replaced".to_string())
+}
+
+// spec: gate-sdk/SPEC.md §lib/inject.sh — a rebuild ends terminated iff its input did, so a block
+// another writer left as an unterminated last line stays byte-identical
+fn terminated(text: &[u8]) -> bool {
+    text.is_empty() || text.ends_with(b"\n")
+}
+
+// spec: gate-sdk/SPEC.md §lib/inject.sh — the writers' refusal, readable before a caller's first
+// write
+pub fn installable(path: &str, begin: &str, end: &str) -> Result<(), String> {
+    let text = read_bytes(path)?;
+    paired(path, &byte_lines(&text), begin, end)
+}
+
+// spec: gate-sdk/SPEC.md §lib/inject.sh — the removal half beside its two siblings: the marker pair
+// and everything between it go, the rest of the file byte-identical. An absent begin marker is a
+// no-op reporting `false`; a target that does not pair is malformed on the writers' own terms.
+pub fn remove_block(path: &str, begin: &str, end: &str) -> Result<bool, String> {
+    let text = read_bytes(path)?;
+    let lines = byte_lines(&text);
+    if !has_line(&lines, begin) {
+        return Ok(false);
+    }
+    paired(path, &lines, begin, end)?;
+    let mut out: Vec<u8> = Vec::new();
+    let mut skip = false;
+    let mut last_kept = false;
+    for line in &lines {
+        last_kept = false;
+        if is_line(line, begin) {
+            skip = true;
+            continue;
+        }
+        if is_line(line, end) {
+            skip = false;
+            continue;
+        }
+        if !skip {
+            out.extend_from_slice(line);
+            out.push(b'\n');
             last_kept = true;
         }
     }
@@ -212,7 +234,7 @@ pub fn remove_block(path: &str, begin: &str, end: &str) -> Result<bool, String> 
     if !terminated(&text) && last_kept {
         out.pop();
     }
-    std::fs::write(path, out).map_err(|e| format!("cannot write {}: {}", path, e))?;
+    write_bytes(path, &out)?;
     Ok(true)
 }
 
@@ -220,28 +242,28 @@ pub fn remove_block(path: &str, begin: &str, end: &str) -> Result<bool, String> 
 // plus the separator `install_block`'s append put before the begin marker, so a file the
 // installer appended to reads its pre-install bytes again
 pub fn uninstall_block(path: &str, begin: &str, end: &str) -> Result<bool, String> {
-    let text = fresh::read_captured(path)?;
-    let lines = fresh::file_lines(&text);
-    let Some(b) = lines.iter().position(|l| is(l, begin)) else {
+    let text = read_bytes(path)?;
+    let lines = byte_lines(&text);
+    let Some(b) = lines.iter().position(|l| is_line(l, begin)) else {
         return Ok(false);
     };
-    half_open(path, &lines, begin, end)?;
-    let head = if b > 0 && bare(lines[b - 1]).is_empty() { b - 1 } else { b };
-    let mut out = String::new();
+    paired(path, &lines, begin, end)?;
+    let head = if b > 0 && bare_bytes(lines[b - 1]).is_empty() { b - 1 } else { b };
+    let mut out: Vec<u8> = Vec::new();
     for line in &lines[..head] {
-        out.push_str(line);
-        out.push('\n');
+        out.extend_from_slice(line);
+        out.push(b'\n');
     }
     let rest = &lines[b..];
-    let mut tail = rest.iter().position(|l| is(l, end)).map_or(&[][..], |i| &rest[i + 1..]);
+    let mut tail = rest.iter().position(|l| is_line(l, end)).map_or(&[][..], |i| &rest[i + 1..]);
     // spec: gate-sdk/SPEC.md §lib/inject.sh — a newline this block's append put on an unterminated
     // line stays while lines follow, and a blank line directly after the block goes in its place
-    if head == b && b > 0 && tail.first().is_some_and(|l| bare(l).is_empty()) {
+    if head == b && b > 0 && tail.first().is_some_and(|l| bare_bytes(l).is_empty()) {
         tail = &tail[1..];
     }
     for line in tail {
-        out.push_str(line);
-        out.push('\n');
+        out.extend_from_slice(line);
+        out.push(b'\n');
     }
     // spec: gate-sdk/SPEC.md §lib/inject.sh — an append onto an unterminated last line wrote the
     // newline that terminates it rather than a blank line, so that newline goes while the block
@@ -249,14 +271,14 @@ pub fn uninstall_block(path: &str, begin: &str, end: &str) -> Result<bool, Strin
     if tail.is_empty() {
         if head == b && b > 0 {
             out.pop();
-            if out.ends_with('\r') {
+            if out.ends_with(b"\r") {
                 out.pop();
             }
         }
     } else if !terminated(&text) {
         out.pop();
     }
-    std::fs::write(path, out).map_err(|e| format!("cannot write {}: {}", path, e))?;
+    write_bytes(path, &out)?;
     Ok(true)
 }
 
@@ -395,6 +417,64 @@ mod tests {
         assert_eq!(remove_block(&p, B, E), Ok(false));
         std::fs::write(&p, format!("head\n{}\na\n", B)).expect("cannot seed");
         assert!(remove_block(&p, B, E).is_err());
+        std::fs::remove_file(&p).ok();
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — a stray end ahead of the begin, a second begin left
+    // open after a complete block and a begin inside an open block each refuse every writer, the
+    // file untouched; an end with no begin anywhere is no block, so the removal stays a no-op
+    #[test]
+    fn a_target_whose_markers_do_not_pair_refuses_every_writer() {
+        let p = std::env::temp_dir()
+            .join(format!("cw-marker-pairing-{}.md", std::process::id()))
+            .display()
+            .to_string();
+        for (seed, said) in [
+            (format!("head\n{}\n{}\nowned\n", E, B), "precedes its begin marker"),
+            (format!("{}\na\n{}\nkept\n{}\nowned\n", B, E, B), "end marker missing"),
+            (format!("{}\na\n{}\nb\n{}\n", B, B, E), "a second begin marker at line 3"),
+        ] {
+            std::fs::write(&p, &seed).expect("cannot seed");
+            let refusals = [
+                remove_block(&p, B, E).map(|_| ()),
+                uninstall_block(&p, B, E).map(|_| ()),
+                install_block(&p, B, E, "x\n").map(|_| ()),
+                installable(&p, B, E),
+                write_block(&p, B, E, "x"),
+            ];
+            for r in refusals {
+                assert!(r.as_ref().is_err_and(|e| e.contains(said)), "{:?} over {:?}", r, seed);
+            }
+            assert_eq!(fresh::read_captured(&p).expect("cannot read back"), seed, "a refusal wrote");
+        }
+        std::fs::write(&p, format!("head\n{}\n", E)).expect("cannot seed");
+        assert_eq!(remove_block(&p, B, E), Ok(false));
+        std::fs::remove_file(&p).ok();
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — bytes that are not UTF-8 outside the block come back
+    // as they were read, through every writer
+    #[test]
+    fn bytes_outside_the_block_that_are_not_utf8_survive_every_writer() {
+        let p = std::env::temp_dir()
+            .join(format!("cw-marker-bytes-{}.md", std::process::id()))
+            .display()
+            .to_string();
+        let head: &[u8] = b"caf\xe9 \xff\xfe\n";
+        let tail: &[u8] = b"\x80tail\n";
+        let seeded = |body: &[u8]| -> Vec<u8> { [head, format!("{}\n", B).as_bytes(), body, format!("{}\n", E).as_bytes(), tail].concat() };
+        let read = || std::fs::read(&p).expect("cannot read back");
+        std::fs::write(&p, seeded(b"old\n")).expect("cannot seed");
+        write_block(&p, B, E, "new").expect("a well-formed pair is replaced");
+        assert_eq!(read(), seeded(b"new\n"));
+        assert_eq!(install_block(&p, B, E, "again\n"), Ok("replaced".to_string()));
+        assert_eq!(read(), seeded(b"again\n"));
+        assert_eq!(remove_block(&p, B, E), Ok(true));
+        assert_eq!(read(), [head, tail].concat());
+        std::fs::write(&p, head).expect("cannot seed");
+        assert_eq!(install_block(&p, B, E, "x\n"), Ok("appended".to_string()));
+        assert_eq!(uninstall_block(&p, B, E), Ok(true));
+        assert_eq!(read(), head);
         std::fs::remove_file(&p).ok();
     }
 

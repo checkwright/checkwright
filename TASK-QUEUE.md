@@ -52,14 +52,6 @@ the delivery rule under `lead-notification-wake-race`'s remedy, unprobed: does a
 
 **Cost while deferred:** the lead's wait clause states a mechanism the probe did not reproduce, so every lead pays a tool call on a ground that reads as fact. Filed 2026-10-02 as a split at companion-tier-delegation-pass' scope, operator direction lead-relayed (not a ruling).
 
-### marker-block-removal-fidelity
-
-Two departures of `marker::remove_block` from gate-sdk/SPEC.md §lib/inject.sh, both pre-existing. **Pairing:** `half_open` (native/src/marker.rs) asks only whether some begin and some end line exist, so a stray end before the begin, or a second unmatched begin after a complete block, deletes from that begin to end of file, where the SPEC refuses a begin without its end. **Bytes:** the file is read through `fresh::read_captured`, a lossy UTF-8 decode, so non-UTF-8 bytes outside the block come back as U+FFFD, against the byte-identical-rest promise; every writer in marker.rs reads the same way (re-read at filing). Reaches `--install-doctrine --remove` and the installer's exclude-block removal.
-
-**Deliverable:** debt: order-and-pairing refusal and a byte-faithful read, each with a unit test.
-
-**Cost while deferred:** a malformed or non-UTF-8 target loses content it never owned on removal. Surfaced 2026-10-25 by restore-line-marker-tail-pass' close second-vendor review; filed at the next scope, re-read there. Owner lookup: `remove_block`, `half_open`, `read_captured` in this file, none; owner gate-sdk/SPEC.md §lib/inject.sh.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -943,4 +935,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 ## Done
 
 - restore-line-fidelity
+- marker-block-removal-fidelity
 
