@@ -200,6 +200,11 @@ fn plan(here: &str, hooks_dir: &Path, bin: &str) -> Result<Plan, String> {
         }
     };
     let restore = local_hooks_path(&top)?;
+    if hook_launcher::Shell::host() == hook_launcher::Shell::PowerShell {
+        if let Some(refusal) = powershell_altered(&restore) {
+            return Err(refusal);
+        }
+    }
     let record = record_text(&dir, &restore)?;
     let forwards = chained.as_ref().map(|(_, names)| forwarded(names)).unwrap_or_default();
     Ok(Plan {
@@ -258,6 +263,20 @@ fn record_text(dir: &Path, restore: &str) -> Result<String, String> {
         hook_launcher::CHAIN_RESTORE_KEY,
         restore
     ))
+}
+
+// spec: gate-sdk/SPEC.md §install-hooks — on native Windows, the local values Windows PowerShell
+// 5.1 hands git altered from the restore line, measured on the Windows leg: a double quote, and
+// whitespace with a trailing backslash
+fn powershell_altered(value: &str) -> Option<String> {
+    let help = if value.contains('"') {
+        "it carries a double quote, which Windows PowerShell 5.1 drops from the restore line's argument — nothing placed\n  help: respell it: Windows admits no double quote in a file name, so this value names no directory here; set core.hooksPath to the directory you mean, then re-run --install-hooks."
+    } else if value.ends_with('\\') && value.contains(char::is_whitespace) {
+        "it holds whitespace and ends in a backslash, which Windows PowerShell 5.1 turns into a double quote in the restore line's argument — nothing placed\n  help: respell it without the trailing backslash, which names the same directory, then re-run --install-hooks."
+    } else {
+        return None;
+    };
+    Some(format!("core.hooksPath is set locally to '{}', which the restore line cannot carry: {}", value, help))
 }
 
 // spec: gate-sdk/SPEC.md §install-hooks — the record is placed as a hook is: written under a sibling
@@ -325,6 +344,10 @@ fn chain_probe() -> bool {
     true
 }
 
+// spec: gate-sdk/SPEC.md §install-hooks — an empty value is set and names no hook, which the record's
+// empty `restore=` cannot tell from no value, so it is refused rather than chained or recorded
+const EMPTY_REFUSAL: &str = "core.hooksPath is set to the empty string, under which git finds no hook — nothing placed\n  help: unset it with 'git config --unset core.hooksPath' at the scope that set it ('git config --show-origin --get core.hooksPath' names it), or set it to the directory you meant, then re-run --install-hooks.";
+
 // spec: gate-sdk/SPEC.md §install-hooks — the hooks directory git runs before this arm repoints it
 #[derive(Debug, PartialEq)]
 enum Prior {
@@ -337,7 +360,13 @@ fn prior(here: &str, hooks_dir: &Path) -> Result<Prior, String> {
     let top = walk::toplevel_in_opt(here)?.unwrap_or_else(|| here.to_string());
     let got = proc::run(&programs::GIT, &["-C", &top, "config", "--path", "--get", "core.hooksPath"])?;
     let set = match (got.stdout(), got.code()) {
-        (Some(out), _) => Some(String::from_utf8_lossy(out).trim_end_matches(['\r', '\n']).to_string()).filter(|v| !v.is_empty()),
+        (Some(out), _) => {
+            let value = String::from_utf8_lossy(out).trim_end_matches(['\r', '\n']).to_string();
+            if value.is_empty() {
+                return Err(EMPTY_REFUSAL.to_string());
+            }
+            Some(value)
+        }
         (None, Some(1)) => None,
         (None, _) => return Err(format!("cannot read core.hooksPath ({})", got.failure_report().unwrap_or_default())),
     };
@@ -684,6 +713,23 @@ mod tests {
         assert!(forwarding, "no forwarding pre-push was placed");
     }
 
+    // spec: gate-sdk/SPEC.md §install-hooks — an effective value set to the empty string is refused
+    // with nothing placed, its help naming the remedy
+    #[test]
+    fn an_empty_hooks_path_is_refused_with_nothing_placed() {
+        let (d, top, hooks) = scratch_repo("empty");
+        proc::run(&programs::GIT, &["-C", &top, "config", "core.hooksPath", ""]).expect("git config");
+        let ran = bare_run(&top, &hooks, &binary(&d)).map(|p| p.record);
+        let placed = hooks.exists();
+        let _ = std::fs::remove_dir_all(&d);
+        let said = ran.expect_err("an empty core.hooksPath was not refused");
+        let lines: Vec<&str> = said.lines().collect();
+        assert_eq!(lines.len(), 2, "{}", said);
+        assert!(lines[0].contains("set to the empty string") && lines[0].ends_with("nothing placed"), "{}", said);
+        assert!(lines[1].starts_with("  help: unset it with 'git config --unset core.hooksPath'"), "{}", said);
+        assert!(!placed, "the hooks directory was created");
+    }
+
     // spec: gate-sdk/SPEC.md §install-hooks — a value the local scope does not itself set, here an
     // included file's, records an empty restore
     #[test]
@@ -764,6 +810,23 @@ mod tests {
     fn a_value_with_a_line_break_is_refused() {
         assert!(record_text(Path::new("/r/hooks"), "a\nb").is_err_and(|e| e.contains("line break")));
         assert_eq!(record_text(Path::new("/r/hooks"), "").as_deref(), Ok("dir=/r/hooks\nrestore=\n"));
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — the two classes Windows PowerShell 5.1 alters are
+    // refused naming the value, the class and the respelling, and the control value passes
+    #[test]
+    fn the_values_windows_powershell_alters_are_refused_naming_the_class() {
+        let quote = powershell_altered("a\"b").expect("a double quote was not refused");
+        let lines: Vec<&str> = quote.lines().collect();
+        assert_eq!(lines.len(), 2, "{}", quote);
+        assert!(lines[0].starts_with("core.hooksPath is set locally to 'a\"b'") && lines[0].contains("carries a double quote"), "{}", quote);
+        assert!(lines[0].ends_with("nothing placed") && lines[1].contains("admits no double quote in a file name"), "{}", quote);
+        let slash = powershell_altered("C:\\probe dir\\").expect("a trailing backslash after whitespace was not refused");
+        assert!(slash.contains("'C:\\probe dir\\'") && slash.contains("ends in a backslash"), "{}", slash);
+        assert!(slash.contains("without the trailing backslash, which names the same directory"), "{}", slash);
+        for passes in ["a b'c", "C:\\hooks\\", "C:\\probe dir", ""] {
+            assert_eq!(powershell_altered(passes), None, "{:?}", passes);
+        }
     }
 
     // spec: gate-sdk/SPEC.md §install-hooks — a relative core.hooksPath resolves physically, as git

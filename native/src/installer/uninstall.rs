@@ -308,8 +308,10 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
         if hooks_dir.is_some() {
             println!("\nwould remove the placed git hooks, {} in this clone's git directory.", crate::emit::hook_launcher::DIR);
         }
-        if !hooks_line.is_empty() {
-            println!("\nwould print this for you to run yourself:\n  {}", hooks_line);
+        match &hooks_line {
+            Some(Ok(l)) => println!("\nwould print this for you to run yourself:\n  {}", l),
+            Some(Err(cause)) => println!("\nwould report: {}", unknown_prior(cause)),
+            None => {}
         }
         if personal {
             let shown = super::personal::exclude(&root).map(|e| e.shown).unwrap_or_default();
@@ -412,12 +414,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
             "\nUNINSTALL: removed {} file(s), none of which this repository was tracking — nothing to commit.",
             remove_set.len()
         );
-        if !hooks_line.is_empty() {
-            println!(
-                "\nthis clone's core.hooksPath still names the hooks directory that was just removed. Undo that yourself with:\n  {}",
-                hooks_line
-            );
-        }
+        report_hooks_line(&hooks_line);
         return Ok(0);
     }
 
@@ -480,24 +477,41 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
         );
     }
 
-    if !hooks_line.is_empty() {
-        println!(
-            "\nthis clone's core.hooksPath still names the hooks directory that was just removed. Undo that yourself with:\n  {}",
-            hooks_line
-        );
-    }
+    report_hooks_line(&hooks_line);
     Ok(0)
 }
 
 // spec: installer/SPEC.md §uninstall — read before the directory's removal: the line restoring the
-// prior `core.hooksPath` from the chain record, or unsetting it where none was set
-fn hooks_line(root: &std::path::Path, hooks_dir: Option<&std::path::Path>) -> String {
+// prior `core.hooksPath` from the chain record, or unsetting it where none was set; a record that
+// cannot be read is its own outcome, since no line is known to restore what it held
+fn hooks_line(root: &std::path::Path, hooks_dir: Option<&std::path::Path>) -> Option<Result<String, String>> {
     use crate::emit::hook_launcher;
     match hooks_dir {
         Some(d) if hook_launcher::opted_in(root, d) => {
-            hook_launcher::restore_line(hook_launcher::read_chain(d).ok().flatten().as_ref())
+            Some(hook_launcher::read_chain(d).map(|c| hook_launcher::restore_line(c.as_ref())))
         }
-        _ => String::new(),
+        _ => None,
+    }
+}
+
+fn unknown_prior(cause: &str) -> String {
+    format!(
+        "{}, so the value core.hooksPath had before the opt-in is unknown and no command is advised: set core.hooksPath back, or unset it, yourself.",
+        cause
+    )
+}
+
+fn report_hooks_line(line: &Option<Result<String, String>>) {
+    match line {
+        Some(Ok(l)) => println!(
+            "\nthis clone's core.hooksPath still names the hooks directory that was just removed. Undo that yourself with:\n  {}",
+            l
+        ),
+        Some(Err(cause)) => println!(
+            "\nthis clone's core.hooksPath still names the hooks directory that was just removed. {}",
+            unknown_prior(cause)
+        ),
+        None => {}
     }
 }
 
@@ -598,7 +612,8 @@ mod tests {
     }
 
     // spec: installer/SPEC.md §uninstall — an opted-in clone whose chain record carries a value
-    // prints the line restoring it, and one with no record prints the unset line
+    // prints the line restoring it, one with no record prints the unset line, and one whose record
+    // cannot be read advises no command
     #[test]
     fn the_hooks_line_restores_the_recorded_value() {
         use crate::emit::hook_launcher;
@@ -617,10 +632,17 @@ mod tests {
         let theirs = d.join("husky").display().to_string();
         std::fs::write(hooks.join(hook_launcher::CHAIN), format!("dir={}\nrestore=.husky\n", theirs)).expect("record");
         let restored = hooks_line(root, Some(&hooks));
+        std::fs::write(hooks.join(hook_launcher::CHAIN), "restore=.husky\n").expect("record");
+        let unread = hooks_line(root, Some(&hooks));
         let _ = std::fs::remove_dir_all(&d);
-        assert_eq!(unopted, "");
-        assert_eq!(bare, "git config --unset core.hooksPath");
-        assert_eq!(restored, "git config core.hooksPath '.husky'");
+        assert_eq!(unopted, None);
+        assert_eq!(bare, Some(Ok("git config --unset core.hooksPath".to_string())));
+        assert_eq!(restored, Some(Ok("git config core.hooksPath '.husky'".to_string())));
+        let cause = unread.expect("an opted-in clone").expect_err("an unreadable record read as one");
+        assert!(cause.starts_with("cannot read the chain record "), "{}", cause);
+        let said = unknown_prior(&cause);
+        assert!(said.contains("is unknown and no command is advised"), "{}", said);
+        assert!(!said.contains("git config"), "{}", said);
     }
 
     // spec: installer/SPEC.md §The verbs — `--help` answers on its own and an unknown argument is

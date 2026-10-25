@@ -28,18 +28,6 @@
 
 **Cost while deferred:** an adopter whose tree already gates commits does not finish the install, and the failure reads as the adopter's to repair. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close; filed at the next scope. Owner lookup: `init`, `install commit`, `hook` in this file and the disposed-findings record, none; owner installer/SPEC.md §init.
 
-### restore-line-fidelity
-
-[spec: gate-sdk/SPEC-restore-line.md]
-
-Three ways the hooks restore line can advise wrongly, against gate-sdk/SPEC.md §install-hooks. **Unread chain:** `hooks_line` (native/src/installer/uninstall.rs) drops every `read_chain` error and prints `git config --unset core.hooksPath`, so an unreadable record holding a restore value is advised away rather than reported. **Empty value:** the chain record's empty `restore=` sentinel cannot tell a local `core.hooksPath` set to the empty string from none, which git may resolve differently (inferred, the probe guard-refused). **PowerShell 5.1:** `shell_quoted` single-quotes for PowerShell's parser, but Windows PowerShell 5.1's legacy native-argument passing drops an embedded double quote, so a recorded `a"b` would restore as `ab`, against 'pastes as itself' (inferred off Microsoft's about_parsing; no PowerShell here, and the unit test asserts the spelling, not git's argv).
-
-**Deliverable:** debt where the SPEC already decides (report the unread chain); the sentinel and the 5.1 quoting are design-pending.
-
-**Push need (2026-10-25, operator direction, the overrun chosen knowingly):** one mid-iteration push, a Windows-runner probe of how Windows PowerShell 5.1 passes an embedded double quote to git, since no local run reaches that host.
-
-**Cost while deferred:** an uninstall or hook move can advise a restore that leaves an adopter's own hooks off. Surfaced 2026-10-25 by restore-line-marker-tail-pass' close second-vendor review; filed at the next scope. Owner lookup: `restore line`, `read_chain`, `hooksPath` in this file, none; owner gate-sdk/SPEC.md §install-hooks.
-
 ## Technical Debt
 
 ### journal-mark-writer-unnamed
@@ -953,4 +941,6 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
+
+- restore-line-fidelity
 

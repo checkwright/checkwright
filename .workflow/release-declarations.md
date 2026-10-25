@@ -1,1 +1,5 @@
 # contract: gate-sdk/SPEC.md §upgrade-smoke — the accumulating release declaration surface; the note's declaration-bearing sections in the note's grammar, Platforms excepted since composition derives it, appended by the session landing a kit-shipped change or the one discovering its omission, composed into the release note and drained to this header at the tag.
+
+## Behavior changes
+
+- **gate-sdk `--install-hooks` and installer `uninstall`, the restore line** — `--install-hooks` now refuses at exit 2, placing nothing, a `core.hooksPath` set to the empty string, and on native Windows a local value Windows PowerShell 5.1 would hand git altered from the restore line, one carrying a double quote or one holding whitespace and ending in a backslash, where it recorded a value its restore line could not set back. `uninstall` over a chain record it cannot read now prints the record's sentence and that the prior value is unknown, where it printed `git config --unset core.hooksPath`. Nothing to do unless the arm refuses; then unset or respell `core.hooksPath` as its help says, and re-run.

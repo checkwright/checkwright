@@ -1788,7 +1788,7 @@ jobs:
           Write-Host "5.1 reads the live one-liner as a string that parses, changed on comment lines only"
 
       # spec: gate-sdk/SPEC.md §install-hooks — the restore is printed, never written: the PowerShell form under each host
-      - name: the restore line pastes as itself under Windows PowerShell 5.1
+      - name: Windows PowerShell 5.1 alters the restore line's refused classes and passes the control
         if: ${{ !cancelled() && matrix.part == 'bootstrap' }}
         shell: powershell
         run: |
@@ -1798,36 +1798,72 @@ jobs:
           New-Item -ItemType Directory -Force -Path $repo | Out-Null
           git -C $repo init -q
           Push-Location $repo
-          $hostName = "PowerShell $($PSVersionTable.PSVersion) ($($PSVersionTable.PSEdition), argument passing $PSNativeCommandArgumentPassing)"
+          $hostName = "PowerShell $($PSVersionTable.PSVersion) ($($PSVersionTable.PSEdition))"
+          $script:fails = 0
+          function Read-Back([string] $set, [bool] $altered) {
+              $got = "$(git config --local --get core.hooksPath)"
+              Write-Host "probe | $hostName | set [$set] | got [$got]"
+              if ($altered -and $got -ceq $set) {
+                  Write-Host "::error::$hostName passed [$set] to git unchanged, so --install-hooks' refusal of its class has lost its ground (gate-sdk/SPEC.md §install-hooks)"
+                  $script:fails++
+              } elseif (-not $altered -and $got -cne $set) {
+                  Write-Host "::error::$hostName handed git [$got] for the restore line of [$set]"
+                  $script:fails++
+              }
+          }
           git config core.hooksPath 'a"b'
-          Write-Host "probe | $hostName | set [a`"b] | got [$(git config --local --get core.hooksPath)]"
+          Read-Back 'a"b' $true
           git config core.hooksPath 'C:\probe dir\'
-          Write-Host "probe | $hostName | set [C:\probe dir\] | got [$(git config --local --get core.hooksPath)]"
+          Read-Back 'C:\probe dir\' $true
           git config core.hooksPath 'a b''c'
-          Write-Host "probe | $hostName | set [a b'c] | got [$(git config --local --get core.hooksPath)]"
+          Read-Back "a b'c" $false
           Pop-Location
-          exit 0
+          if ($script:fails -ne 0) { exit 1 }
+          Write-Host "$hostName alters the two refused classes on the way to git and passes the control unchanged"
 
       # spec: gate-sdk/SPEC.md §install-hooks — the restore is printed, never written: the PowerShell form under each host
-      - name: the restore line pastes as itself under PowerShell 7
+      - name: the restore line pastes as itself under PowerShell 7, and the classes 5.1 alters are refused
         if: ${{ !cancelled() && matrix.part == 'bootstrap' }}
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Continue'
+          $bin = $env:PWSH_GATE_BIN
           $repo = Join-Path $env:RUNNER_TEMP 'restore-line-probe-pwsh'
           if (Test-Path -LiteralPath $repo) { Remove-Item -Recurse -Force -LiteralPath $repo }
-          New-Item -ItemType Directory -Force -Path $repo | Out-Null
+          New-Item -ItemType Directory -Force -Path (Join-Path $repo 'scripts') | Out-Null
           git -C $repo init -q
+          $kit = (Join-Path $env:GITHUB_WORKSPACE 'gate-sdk') -replace '\\', '/'
+          [IO.File]::WriteAllText((Join-Path $repo 'scripts/gates.list'), "check-pipe-membership`n")
+          [IO.File]::WriteAllText((Join-Path $repo 'scripts/gate-sdk-config.knobs'), "GATE_SDK_NATIVE_BIN = $($bin -replace '\\', '/')`nGATE_SDK_KIT_DIRS = $kit`n")
           Push-Location $repo
           $hostName = "PowerShell $($PSVersionTable.PSVersion) ($($PSVersionTable.PSEdition), argument passing $PSNativeCommandArgumentPassing)"
+          $hooks = Join-Path "$(git rev-parse --git-common-dir)" 'gate-hooks'
+          $script:fails = 0
+          function Read-Back([string] $set, [string] $class) {
+              $got = "$(git config --local --get core.hooksPath)"
+              Write-Host "probe | $hostName | set [$set] | got [$got]"
+              if ($got -cne $set) {
+                  Write-Host "::error::$hostName handed git [$got] for the restore line of [$set]"
+                  $script:fails++
+                  return
+              }
+              if (-not $class) { return }
+              $out = (& $bin --install-hooks 2>&1) -join "`n"
+              $code = $LASTEXITCODE
+              if ($code -ne 2 -or -not $out.Contains($class) -or (Test-Path -LiteralPath $hooks)) {
+                  Write-Host "::error::--install-hooks over a local core.hooksPath of [$set] did not refuse it as a value that $class, placing nothing: exit $code -- $out"
+                  $script:fails++
+              } else { Write-Host "ok   --install-hooks refuses [$set], a value that $class" }
+          }
           git config core.hooksPath 'a"b'
-          Write-Host "probe | $hostName | set [a`"b] | got [$(git config --local --get core.hooksPath)]"
+          Read-Back 'a"b' 'carries a double quote'
           git config core.hooksPath 'C:\probe dir\'
-          Write-Host "probe | $hostName | set [C:\probe dir\] | got [$(git config --local --get core.hooksPath)]"
+          Read-Back 'C:\probe dir\' 'ends in a backslash'
           git config core.hooksPath 'a b''c'
-          Write-Host "probe | $hostName | set [a b'c] | got [$(git config --local --get core.hooksPath)]"
+          Read-Back "a b'c" ''
           Pop-Location
-          exit 0
+          if ($script:fails -ne 0) { exit 1 }
+          Write-Host "$hostName passes all three values to git unchanged, and --install-hooks refuses the two classes Windows PowerShell 5.1 alters"
 
       # spec: installer/SPEC.md §The consumer smoke — each platform leg steers the roster at its host
       # spec: installer/SPEC.md §The consumer smoke — a smoke entry runs the setup arms and its part
