@@ -1,14 +1,68 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: installer-review-residue-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The set (operator direction 2026-10-25, lead-relayed, not a ruling; the iteration opened undirected):** option A, six debt units and two features. Debt, the six gap bullets install-commit-hooks-pass' close carried: `uninstall-lost-restore-line`, `personal-detect-non-utf8`, `init-attribution-read-order`, `init-refusing-hook-witness`, `hookspath-line-break-trim`, `env-probe-unchanged-markers`. Features, promoted by spec with their amendments: `init-identity-precondition`, `hookspath-non-utf8-restore`. Stages scope, spec, build, validate, close, with align where check-stage-entry assertion C demands it. Composition: bundled, the carried bullets joining both pool entries on init and uninstall's commit path (installer) and `--install-hooks`' `core.hooksPath` read (gate-sdk); drain 8 (6 taken at intake, 2 from the pool) against inflow 2.4. Supersession: `hookspath-line-break-trim` reshaped by `hookspath-non-utf8-restore`, the same decode line in `prior`, so the two land in one batch with the trim made over bytes; `uninstall-lost-restore-line` independent of `init-identity-precondition`.
+
+  **Push need (operator direction 2026-10-25, inside the budget):** 1 against 2, the closing push alone; no entry is observed by a remote run, and every fix is host-neutral code a local run reaches.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### uninstall-lost-restore-line
+
+`uninstall` prints no `core.hooksPath` restore line when it stops after removing the gate hooks directory: in native/src/installer/uninstall.rs the `?` on `commit_or_refuse` returns before the final `report_hooks_line`, as do the unread and staging refusals before it, and the chain record the line was read from is already gone. A signing or hook failure therefore loses the restore command, or the unknown-prior sentence, that installer/SPEC.md §uninstall promises, with nothing left to re-read.
+
+**Deliverable:** the hooks line reported on every exit after the removal, the refusals included, with a crate test over a failing commit.
+
+**Cost while deferred:** an adopter whose uninstall commit fails keeps a `core.hooksPath` naming a removed directory and is told no way back. Surfaced 2026-10-25 by install-commit-hooks-pass' close (its second-vendor review) as a gap bullet; filed at installer-review-residue-pass' scope. Re-verified there by reading the three return paths.
+
+### personal-detect-non-utf8
+
+`is_personal` (native/src/installer/personal.rs) reads `info/exclude` with `read_to_string`, so one non-UTF-8 byte anywhere in it, which the marker writers now preserve, reads as no personal install. Its callers take the mode from it — init.rs re-applies it, uninstall.rs and prove.rs branch on it — so a later `init` runs the ordinary committing install and `uninstall` leaves the exclude block, against installer/SPEC.md §The personal install.
+
+**Deliverable:** detection over the file's bytes, with a crate test placing a non-UTF-8 line beside the block.
+
+**Cost while deferred:** a personal install in a clone with a non-UTF-8 exclude line is silently re-installed as a tracked one. The init and uninstall consequences are read off the call sites, not run, since the dev binary carries no payload. Surfaced 2026-10-25 by install-commit-hooks-pass' close (its second-vendor review) as a gap bullet; filed at installer-review-residue-pass' scope.
+
+### init-attribution-read-order
+
+`commit_or_refuse_to` (native/src/installer/mod.rs) reads the directory a refusing hook ran from through `judged_in` after `git_commit` returns, so a hook that repoints `core.hooksPath` before exiting non-zero is attributed to a directory it did not run from. installer/SPEC.md §init names the hook's own directory and states no stability assumption.
+
+**Deliverable:** the hooks directory read before the commit and used for the attribution, with a crate test whose refusing hook repoints the path.
+
+**Cost while deferred:** low and exotic: a hook that rewrites the clone's config mid-commit sends the adopter to the wrong directory. Surfaced 2026-10-25 by install-commit-hooks-pass' close (its second-vendor review) as a gap bullet; filed at installer-review-residue-pass' scope. Re-verified there by reading the call order.
+
+### init-refusing-hook-witness
+
+The `init-commit-runs-adopter-hooks` amendment named a crate test running `init` over a repository with a refusing pre-commit, asserting exit 1, the staging, the stderr attribution and the `next:` block. It landed as tests of the `commit_vendoring` helper over a pre-staged file (native/src/installer/init.rs), so `init`'s own exit status and staging on that path have no end-to-end witness, and installer/SPEC.md §init records no narrowing.
+
+**Deliverable:** the end-to-end witness the amendment named, driving the `init` verb itself.
+
+**Cost while deferred:** a regression in `init`'s wiring around the helper ships green. Surfaced 2026-10-25 by install-commit-hooks-pass' close (its second-vendor review) as a gap bullet; filed at installer-review-residue-pass' scope. Re-verified there: both refusing-hook tests call `fail_vendoring` over `staged_scratch`.
+
+### hookspath-line-break-trim
+
+`prior` in native/src/emit/install_hooks.rs trims every trailing CR and LF off git's `core.hooksPath` output, so a value ending in a line break reads as a different directory and evades the line-break refusal gate-sdk/SPEC.md §install-hooks states. Run at scope: `git config --get` prints `hk\n\n` for the value `hk\n`, which the trim reduces to `hk`.
+
+**Deliverable:** strip only the one line feed git appends, so the refusal sees the value; a crate test over a value ending in a line break. Lands beside [hookspath-non-utf8-restore](#hookspath-non-utf8-restore), which owns the decode on the same line.
+
+**Cost while deferred:** an inherited hooks path ending in a line break is chained as a different directory. Surfaced 2026-10-25 by install-commit-hooks-pass' close (its second-vendor review) as a gap bullet; filed at installer-review-residue-pass' scope.
+
+### env-probe-unchanged-markers
+
+`--emit env-probe` (native/src/emit/env_probe.rs) compares `read_block`'s body and reports `unchanged` before the validating writer runs, so a target whose markers are malformed around an unchanged block exits 0 rather than refusing at exit 2, as gate-sdk/SPEC.md §lib/inject.sh's marker-block declaration says. Run at scope: a stray end marker above the block, and a second begin marker inside it, each exit 0 `unchanged`; the file is untouched either way.
+
+**Deliverable:** the marker validation run before the unchanged test, with a crate test over both shapes.
+
+**Cost while deferred:** a hand-damaged profile file is reported healthy until its content next changes. Surfaced 2026-10-25 by install-commit-hooks-pass' close (its second-vendor review) as a gap bullet; filed at installer-review-residue-pass' scope.
 
 ## Deferred
 
