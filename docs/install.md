@@ -17,13 +17,13 @@ An install needs a supported system and a few tools, and [What an install requir
 
 <!-- install-primary: tarball -->
 
-Run the one line for your system from your repository's root, in a new project or an existing one with every change committed: `init` makes one commit and refuses a dirty worktree. The line downloads the newest Release tarball, checks it against its published digest and, where `gh` is signed in and the release is attested, against its build attestation, unpacks it outside your repository and runs `init`, with no runtime to install first. The recommended path starts with `demo`, to see the guarantee. Install with your line and run the commands `init` prints; `checkwright prove` then shows the guarantee on your tree ([Prove it on your tree](#prove-it-on-your-tree)).
+Run the one line for your system from your repository's root, in a new project or an existing one with every change committed: `init` makes one commit and refuses a dirty worktree, and that commit runs your own hooks, so one judging every file must let the kit directories pass. The line downloads the newest Release tarball, verifies its digest and, where `gh` is signed in, its build attestation, then runs `init` from outside your repository, with no runtime to install first. The recommended path starts with `demo`, to see the guarantee. Install with your line and run the commands `init` prints; `checkwright prove` then shows the guarantee on your tree ([Prove it on your tree](#prove-it-on-your-tree)).
 
 Pick your route:
 
 - **macOS or Linux:** [the one line and its steps](#macos-and-linux).
 - **Windows:** [natively, in PowerShell](#windows).
-- **Windows through Windows Subsystem for Linux (WSL):** the [macOS and Linux](#macos-and-linux) line, in your WSL shell. The install places the Linux gate binary and the pre-commit hook runs it, so commit to that repository from WSL too: Git for Windows cannot start the Linux binary.
+- **Windows through Windows Subsystem for Linux (WSL):** the [macOS and Linux](#macos-and-linux) line, in your WSL shell. The pre-commit hook the follow-up's `--install-hooks` places runs the Linux gate binary, so commit to that repository from WSL too: Git for Windows cannot start it.
 - **With Node:** [`npx checkwright init`](#with-node).
 - **In Claude Code or Codex:** [the plugin marketplace](#from-a-plugin-marketplace).
 - **With another coding agent:** [a prompt to give it](#with-another-coding-agent).
@@ -94,7 +94,7 @@ To run each step yourself on Windows: [Installing step by step](manual-install.m
 
 ### With Node
 
-`npx checkwright init` runs the same `init` from the npm package, which carries npm's provenance attestation as the tarball carries a GitHub build attestation ([installer/SPEC.md](installer/SPEC.md#the-dependency-boundary)). The package's command is a shell script, so on Windows run the `PATH` block above first, which puts the `sh` npm starts it with on your `PATH`.
+`npx checkwright init` runs the same `init` from the npm package, which carries npm's provenance attestation ([installer/SPEC.md](installer/SPEC.md#the-dependency-boundary)). The package's command is a shell script, so on Windows run the `PATH` block above first, which puts the `sh` npm starts it with on your `PATH`.
 
 ### From a plugin marketplace
 

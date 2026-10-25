@@ -17,8 +17,8 @@
 1155cp .claude/commands/spec.md
 1728cp .claude/commands/validate.md
 12448cp CLAUDE.md
-254846cp canon-kit/SPEC.md
-5785cp canon-kit/templates/SPEC-amendment.md
+254907cp canon-kit/SPEC.md
+5785cp canon-kit/templates/amendment.md
 29066cp companion/SPEC.md
 118299cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
@@ -40,7 +40,7 @@
 5308cp docs/index.md
 8768cp docs/install-block-contracts.md
 8675cp docs/install-parity-contracts.md
-10360cp docs/install.md
+10349cp docs/install.md
 1506cp docs/kits.md
 1458cp docs/lifecycle-kit/index.md
 3465cp docs/maintenance.md
@@ -103,8 +103,8 @@
 3130cp gate-sdk/templates/adopt.md
 355499cp guard-kit/SPEC.md
 4439cp guard-kit/templates/close-triage.md
-309666cp installer/SPEC.md
-397058cp lifecycle-kit/SPEC.md
+312467cp installer/SPEC.md
+397048cp lifecycle-kit/SPEC.md
 8150cp lifecycle-kit/templates/consult.md
 1212cp lifecycle-kit/templates/frames/project-critique.md
 1902cp lifecycle-kit/templates/frames/stage-contract-sweep.md
@@ -112,7 +112,7 @@
 1922cp lifecycle-kit/templates/host-protocol.md
 44937cp lifecycle-kit/templates/lead.md
 2100cp lifecycle-kit/templates/release-sweep.md
-7622cp lifecycle-kit/templates/stages/align.md
+7617cp lifecycle-kit/templates/stages/align.md
 9785cp lifecycle-kit/templates/stages/build.md
 23639cp lifecycle-kit/templates/stages/close.md
 20609cp lifecycle-kit/templates/stages/scope.md

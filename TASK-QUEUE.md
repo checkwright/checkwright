@@ -14,20 +14,6 @@
 
 ## New Features
 
-### init-commit-runs-adopter-hooks
-
-[spec: installer/SPEC-init-foreign-hooks.md]
-
-`init`'s one install commit runs the adopter's own commit hooks over every vendored file. An operator-seat install (`op-02`, `prose`, v0.33.0) failed there: the adopter's amendment-pairing gate read canon-kit/templates/SPEC-amendment.md as an unpaired amendment, `init` printed its commit-failed line and stopped with 1010 files staged, and time to first green was never reached. Neither docs/install.md nor installer/SPEC.md §init says an adopter's existing hooks gate that commit, and the shipped template's `SPEC-*.md` name collides with a common amendment-file convention.
-
-**Deliverable:** design-pending, a feature: what `init` does about hooks it does not own at its commit (refuse up front, commit past them, or report the hook as the cause with its remedy), whether the template's name changes, and the docs stating it.
-
-**Seen in the same runs, unverified here:** docs/install.md's WSL bullet reads as `init` placing the pre-commit hook, against §init's 'init places no git hook'; the vendored gate-sdk/README.md points at SPECs the vendored copy lacks; `init`'s commit subject ignores the adopter's prefix convention.
-
-**Push need (2026-10-25, operator direction):** the release tag at close, since the fix reaches the next operator-seat install only on a published binary; close's release policy decides the cut.
-
-**Cost while deferred:** an adopter whose tree already gates commits does not finish the install, and the failure reads as the adopter's to repair. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close; filed at the next scope. Owner lookup: `init`, `install commit`, `hook` in this file and the disposed-findings record, none; owner installer/SPEC.md §init.
-
 ## Technical Debt
 
 ### journal-mark-writer-unnamed
@@ -104,7 +90,7 @@ a narrow external preview before any broad announcement: a preview cohort whose 
 
 **Readiness holds, both discharged:** the 2026-09-26 hold until v0.26.0 published the repaired front door, and the 2026-09-29 clean-container rehearsal, `front-door-container-rehearsal` at preview-readiness, filed to the author seat's record.
 
-**Operator-seat installs count toward the observed install (operator direction 2026-10-25, lead-relayed, not a ruling, revising 2026-09-29's that they gate nothing):** an agent session in one operator project on `prose` and one in a second on the full technical profile, each from a lead-drafted cold prompt, then friends on their own machines. `op-01` and `op-02`, both `prose`, were filed 2026-10-25; `op-02` stopped at init's commit ([init-commit-runs-adopter-hooks](#init-commit-runs-adopter-hooks)).
+**Operator-seat installs count toward the observed install (operator direction 2026-10-25, lead-relayed, not a ruling, revising 2026-09-29's that they gate nothing):** an agent session in one operator project on `prose` and one in a second on the full technical profile, each from a lead-drafted cold prompt, then friends on their own machines. `op-01` and `op-02`, both `prose`, were filed 2026-10-25; `op-02` stopped at init's commit (`init-commit-runs-adopter-hooks`).
 
 **Comparison arm (operator direction 2026-10-17, lead-relayed, not a ruling):** where the metrics allow, beside a custom-CI baseline and one named same-seat entrant, on mistakes caught, setup effort, interruptions and retention.
 
@@ -936,4 +922,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 - restore-line-fidelity
 - marker-block-removal-fidelity
+- init-commit-runs-adopter-hooks
 

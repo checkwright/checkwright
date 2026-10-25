@@ -80,7 +80,8 @@ mod tests {
         assert!(is_amendment("drift-kit/SPEC-kpi-port.md"));
         assert!(is_amendment("SPEC-root.md"));
         assert!(!is_amendment("gate-sdk/gate-tests/x/SPEC-fix.md"));
-        assert!(!is_amendment("canon-kit/templates/SPEC-amendment.md"));
+        assert!(!is_amendment("canon-kit/templates/amendment.md"));
+        assert!(!is_amendment("some-kit/templates/SPEC-skeleton.md"));
         assert!(!is_amendment("drift-kit/SPEC.md"));
         assert!(!is_amendment("drift-kit/SPEC-kpi-port.md.bak"));
     }

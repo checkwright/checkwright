@@ -462,7 +462,13 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
         super::commit_or_refuse(
             &root,
             &message,
-            "the commit failed — the removal is staged; commit it yourself to finish",
+            &super::Failed {
+                plain: "the commit failed — the removal is staged; commit it yourself to finish",
+                staged: "the removal is staged",
+                judged: "this removal stages",
+                valve: "",
+                kits: &kits,
+            },
         )?;
         println!(
             "\nUNINSTALL: removed {} file(s), kept {}, and committed the removal.",

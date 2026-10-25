@@ -6,10 +6,21 @@ use super::selection::{self, Selection};
 use super::{lock, payload_recipe, personal, profile, recipe, refuse, workflow, Package, Refusal, AGENT_FILE, GATES_DIR, QUEUE_FILE, WORKFLOW_DIR};
 use crate::{install, sha256, toolfloor};
 use std::collections::{BTreeMap, BTreeSet};
+use std::io::Write;
 use std::path::{Path, PathBuf};
 
 const COMMIT_FAILED: &str =
     "the commit failed — the files are staged; commit them yourself to finish the install";
+
+fn failed(kits: &[String]) -> super::Failed<'_> {
+    super::Failed {
+        plain: COMMIT_FAILED,
+        staged: "the files are staged",
+        judged: "this install vendored",
+        valve: " — or pass --no-commit to make the commit yourself",
+        kits,
+    }
+}
 
 pub(super) struct Flags {
     profile: String,
@@ -1054,7 +1065,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
             version,
             ex.shown
         );
-        follow_up(&artifact_dest, true);
+        follow_up(&mut std::io::stdout(), &artifact_dest, true);
         return Ok(0);
     }
 
@@ -1084,7 +1095,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
                     let listed = super::git_capture(&root, &["diff", "--cached", "--name-only"])
                         .unwrap_or_default();
                     let residue = listed.lines().filter(|l| !l.is_empty()).count();
-                    super::commit_or_refuse(&root, &message, COMMIT_FAILED)?;
+                    super::commit_or_refuse(&root, &message, &failed(&kits))?;
                     println!(
                         "INIT: already at the {} (v{}) — {} file(s) checked; {} that init had rewritten were uncommitted and are now committed.",
                         phrase, version, r.written.len(), residue
@@ -1104,7 +1115,10 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         // spec: installer/SPEC.md §init — the commit is the distribution model, not a
         // convenience: vendored-and-committed is what makes the tree auditable, so leaving it dirty
         // would hand the adopter the step that does the proving.
-        super::commit_or_refuse(&root, &message, COMMIT_FAILED)?;
+        let (mut out, mut err) = (std::io::stdout(), std::io::stderr());
+        if let Some(code) = commit_vendoring(&root, &message, &kits, &artifact_dest, &mut out, &mut err) {
+            return Ok(code);
+        }
         println!(
             "INIT: vendored {} kit(s) at the {} (v{}) and committed them.",
             kits.len(),
@@ -1120,24 +1134,41 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         );
     }
 
-    follow_up(&artifact_dest, false);
+    follow_up(&mut std::io::stdout(), &artifact_dest, false);
     Ok(0)
+}
+
+// spec: installer/SPEC.md §init — the vendoring commit: `None` once made, else the exit status
+// after the refusal and then the follow-up block, so the setup does not wait on a re-run
+fn commit_vendoring(
+    root: &Path,
+    message: &str,
+    kits: &[String],
+    artifact_dest: &str,
+    out: &mut dyn Write,
+    err: &mut dyn Write,
+) -> Option<i32> {
+    let refusal = super::commit_or_refuse_to(err, root, message, &failed(kits)).err()?;
+    let code = super::report(err, "init", &refusal);
+    follow_up(out, artifact_dest, false);
+    Some(code)
 }
 
 // spec: installer/SPEC.md §init — the follow-up block is a STATED GRAMMAR with a named
 // reader, not a layout choice: the consumer smoke parses it out of what this prints, so
 // reflowing these lines reds that arm instead of silently un-covering the pair.
-fn follow_up(artifact_dest: &str, personal: bool) {
+fn follow_up(out: &mut dyn Write, artifact_dest: &str, personal: bool) {
     let front = follow_up_front_end(artifact_dest);
-    println!("\nnext:");
-    println!("  {} --install-hooks   # place the pre-commit and commit-msg hooks in this clone", front);
-    println!("  {} --run             # the battery, green on what was just vendored", front);
+    let _ = writeln!(out, "\nnext:");
+    let _ = writeln!(out, "  {} --install-hooks   # place the pre-commit and commit-msg hooks in this clone", front);
+    let _ = writeln!(out, "  {} --run             # the battery, green on what was just vendored", front);
     // spec: installer/SPEC.md §init — the proof step sits outside the block, unindented, so the
     // block's readers never run it; a personal install has no proof step, since prove reads HEAD
     if personal {
-        println!("then: this install is personal: the hooks and --run check your commits in this clone alone, and the project's CI runs none of it.");
+        let _ = writeln!(out, "then: this install is personal: the hooks and --run check your commits in this clone alone, and the project's CI runs none of it.");
     } else {
-        println!(
+        let _ = writeln!(
+            out,
             "then: {} --prove reports what this tree enforces and whether a task claimed done with no evidence is caught here.",
             front
         );
@@ -1408,5 +1439,100 @@ mod tests {
         let outside = std::env::temp_dir().join("graph.html").to_string_lossy().into_owned();
         assert_eq!(in_tree(&root, &outside), None);
         std::fs::remove_dir_all(&root).ok();
+    }
+
+    // spec: installer/SPEC.md §init — a scratch repository with one vendored file staged, its
+    // identity and every other setting in the repository's own config, never the process environment
+    #[cfg(unix)]
+    fn staged_scratch(case: &str, config: &[(&str, &str)]) -> PathBuf {
+        let dir = std::env::temp_dir().join(format!("cw-init-hooks-{}-{}", std::process::id(), case));
+        std::fs::remove_dir_all(&dir).ok();
+        std::fs::create_dir_all(dir.join("a-kit")).expect("cannot make the scratch repo");
+        let git = |args: &[&str]| {
+            let d = dir.to_string_lossy().into_owned();
+            let mut argv = vec!["-C", d.as_str()];
+            argv.extend_from_slice(args);
+            crate::proc::run(&programs::GIT, &argv).expect("git did not spawn");
+        };
+        git(&["init", "-q"]);
+        for (k, v) in [("user.name", "Scratch"), ("user.email", "scratch@example.com")].iter().chain(config) {
+            git(&["config", k, v]);
+        }
+        std::fs::write(dir.join("a-kit").join("x.txt"), "x\n").expect("cannot write the vendored file");
+        git(&["add", "a-kit/x.txt"]);
+        dir
+    }
+
+    #[cfg(unix)]
+    fn live_hook(dir: &Path, status: i32) {
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::create_dir_all(dir).expect("cannot make the hooks directory");
+        let hook = dir.join("pre-commit");
+        std::fs::write(&hook, format!("#!/bin/sh\necho 'the hook speaks' >&2\nexit {}\n", status)).expect("cannot write the hook");
+        std::fs::set_permissions(&hook, std::fs::Permissions::from_mode(0o755)).expect("cannot mark the hook executable");
+    }
+
+    // spec: installer/SPEC.md §init — the vendoring commit's failure, as init's tail runs it: the
+    // exit status, the staged files, the refusal on stderr and the follow-up block on stdout
+    #[cfg(unix)]
+    fn fail_vendoring(dir: &Path) -> (Option<i32>, bool, String, String) {
+        let (mut out, mut err) = (Vec::new(), Vec::new());
+        let kits = vec!["a-kit".to_string()];
+        let code = commit_vendoring(dir, "chore: vendor", &kits, "scripts/checkwright-gates", &mut out, &mut err);
+        let staged = crate::listing::names(Some(&dir.to_string_lossy()), &["diff", "--cached", "--name-only", "-z"])
+            .unwrap_or_default();
+        (
+            code,
+            staged.iter().any(|l| l == "a-kit/x.txt"),
+            String::from_utf8_lossy(&out).into_owned(),
+            String::from_utf8_lossy(&err).into_owned(),
+        )
+    }
+
+    // spec: installer/SPEC.md §init — a live pre-commit in the default hooks directory exiting 1 is
+    // named with its directory and the kit directories, the files stay staged, and the block prints
+    #[cfg(unix)]
+    #[test]
+    fn a_refusing_adopter_hook_is_named_and_the_setup_still_handed_over() {
+        let dir = staged_scratch("refused", &[]);
+        live_hook(&dir.join(".git").join("hooks"), 1);
+        let (code, staged, out, err) = fail_vendoring(&dir);
+        assert_eq!(code, Some(1), "a failed vendoring commit did not exit 1");
+        assert!(staged, "the vendored file is no longer staged");
+        assert!(err.contains("the hook speaks"), "git's account was not relayed: {}", err);
+        let hooks = Path::new(".git").join("hooks").display().to_string();
+        let named = err
+            .lines()
+            .find(|l| l.contains("your pre-commit hook in ") && l.contains(&hooks) && l.ends_with("judged it — the files are staged"));
+        assert!(named.is_some(), "the refusal did not name the hook and its directory: {}", err);
+        assert!(err.contains("The kit directories (a-kit) are a vendored dependency") && err.contains("--no-commit"), "the help did not name the kit directories and the valve: {}", err);
+        assert!(out.contains("\nnext:\n") && out.contains("\nthen: "), "the follow-up block did not print: {}", out);
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    // spec: installer/SPEC.md §init — a commit stopped after every hook passed, and one refused from
+    // the gate hooks directory, keep the line as it stood: neither names a hook
+    #[cfg(unix)]
+    #[test]
+    fn a_failure_no_adopter_hook_judged_names_no_hook() {
+        let signed = staged_scratch("signed", &[("commit.gpgSign", "true"), ("gpg.program", "false")]);
+        live_hook(&signed.join(".git").join("hooks"), 0);
+        let gate = staged_scratch("gate", &[]);
+        let gate_dir = crate::emit::hook_launcher::hooks_dir(&gate).expect("no gate hooks directory");
+        live_hook(&gate_dir, 1);
+        crate::proc::run(
+            &programs::GIT,
+            &["-C", &gate.to_string_lossy(), "config", "core.hooksPath", &gate_dir.to_string_lossy()],
+        )
+        .expect("git did not spawn");
+        for dir in [&signed, &gate] {
+            let (code, staged, out, err) = fail_vendoring(dir);
+            assert_eq!(code, Some(1), "{}: a failed vendoring commit did not exit 1", dir.display());
+            assert!(staged, "{}: the vendored file is no longer staged", dir.display());
+            assert!(err.contains(&format!("checkwright init: {}\n", COMMIT_FAILED)), "{}: the line changed: {}", dir.display(), err);
+            assert!(!err.contains("judged it"), "{}: a hook was named: {}", dir.display(), err);
+            assert!(out.contains("\nnext:\n"), "{}: the follow-up block did not print: {}", dir.display(), out);
+            std::fs::remove_dir_all(dir).ok();
+        }
     }
 }

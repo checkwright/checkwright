@@ -349,14 +349,15 @@ fn chain_probe() -> bool {
 const EMPTY_REFUSAL: &str = "core.hooksPath is set to the empty string, under which git finds no hook — nothing placed\n  help: unset it with 'git config --unset core.hooksPath' at the scope that set it ('git config --show-origin --get core.hooksPath' names it), or set it to the directory you meant, then re-run --install-hooks.";
 
 // spec: gate-sdk/SPEC.md §install-hooks — the hooks directory git runs before this arm repoints it
+// spec: installer/SPEC.md §init — also the directory a failed install commit's hook is named in
 #[derive(Debug, PartialEq)]
-enum Prior {
+pub(crate) enum Prior {
     Own,
     Quiet { dir: PathBuf, set: Option<String> },
     Live { dir: PathBuf, names: Vec<String> },
 }
 
-fn prior(here: &str, hooks_dir: &Path) -> Result<Prior, String> {
+pub(crate) fn prior(here: &str, hooks_dir: &Path) -> Result<Prior, String> {
     let top = walk::toplevel_in_opt(here)?.unwrap_or_else(|| here.to_string());
     let got = proc::run(&programs::GIT, &["-C", &top, "config", "--path", "--get", "core.hooksPath"])?;
     let set = match (got.stdout(), got.code()) {

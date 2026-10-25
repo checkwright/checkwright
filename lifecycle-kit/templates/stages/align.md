@@ -16,7 +16,7 @@ Trigger 3 is mechanized at build entry: `check-stage-entry` assertion C blocks t
 
 **Where your dispatch names a foreign adapter**, this stage's reading runs there and every write stays yours: follow lifecycle-kit/templates/host-protocol.md (lifecycle-kit/SPEC.md §The host protocol).
 
-**Audit the amendment against itself before auditing it against the tree.** Two defects are visible on the amendment alone and both survive a green battery. An author-stated count ("three things and no fourth") is an assertion about the deliverable, so check it against what the deltas actually mandate rather than against the sentence it heads. And every `## Existing sections updated` entry must name the delta that owns it (canon-kit/templates/SPEC-amendment.md).
+**Audit the amendment against itself before auditing it against the tree.** Two defects are visible on the amendment alone and both survive a green battery. An author-stated count ("three things and no fourth") is an assertion about the deliverable, so check it against what the deltas actually mandate rather than against the sentence it heads. And every `## Existing sections updated` entry must name the delta that owns it (canon-kit/templates/amendment.md).
 
 **Read every delta for what a user meets.** A delta changing it carries the authoring stage's `{user-facing: …}` mark naming the direction that settles it (lifecycle-kit/templates/stages/spec.md). An unmarked one, or one whose direction does not settle the choice it makes, is an envelope question for the lead or the operator, never one to reword away.
 

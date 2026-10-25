@@ -293,7 +293,7 @@ Arm (e)'s calibration:
 
 ### check-amendment-update-target
 
-Invariant: in every amendment on disk, each entry under `## Existing sections updated` cites at least one delta, and every cited delta is defined under `## What changes` in the same amendment. The grammar it reads — what a delta is, what a citation looks like — is contract, stated at §The amendment lifecycle and shown to the author in `templates/SPEC-amendment.md`.
+Invariant: in every amendment on disk, each entry under `## Existing sections updated` cites at least one delta, and every cited delta is defined under `## What changes` in the same amendment. The grammar it reads — what a delta is, what a citation looks like — is contract, stated at §The amendment lifecycle and shown to the author in `templates/amendment.md`.
 
 The failure it closes: an update target no delta claims **reaches build as an orphan a batch adopts on its own authority**, in the template's words.
 
@@ -308,9 +308,9 @@ A fenced block is skipped whole: an amendment may embed a wire-contract delta un
 
 **Fail-closed (exit 2):** a scan root that is not a directory or is unwalkable; an amendment carrying `## Existing sections updated` but no `## What changes`, where no entry *can* be owned; and a file the finder returns and the reader cannot read. The unwalkable root refuses where §check-amendment-queue's finder returns empty, since here an empty set hides every violation silently; §The shared spec adapters owns the asymmetry.
 
-**No new knob.** The corpus is `spec_amendments` (§The shared spec adapters), the finder §check-amendment-queue uses. Its `templates/` exclusion keeps a shipped `SPEC-amendment.md` skeleton's illustrative headings from reddening the gate that governs its copies. The two heading names are **kit constants, not config**: they are canon-kit's own template's headings, so a consumer editing them has edited canon-kit's artifact rather than configured it. §check-spec-dod-singleton's Definition-of-Done heading is configurable because it appears in **consumer-authored canonical specs**; these appear in **copies of a kit-shipped skeleton**. A knob waits for an attested consumer rename.
+**No new knob.** The corpus is `spec_amendments` (§The shared spec adapters), the finder §check-amendment-queue uses. Its `templates/` exclusion keeps a shipped amendment skeleton's illustrative headings from reddening the gate that governs its copies. The two heading names are **kit constants, not config**: they are canon-kit's own template's headings, so a consumer editing them has edited canon-kit's artifact rather than configured it. §check-spec-dod-singleton's Definition-of-Done heading is configurable because it appears in **consumer-authored canonical specs**; these appear in **copies of a kit-shipped skeleton**. A knob waits for an attested consumer rename.
 
-**Deliberately not asserted: roster completeness.** Whether the roster names every surface the change obliges a write to is a claim about the world, not the file; arm B catches a target *listed and unowned*, never one never listed. §check-amendment-retired-spelling mechanizes one narrow slice: retiring a *literal* leaves the retired and replacing spellings in disjoint token spaces, so a survivor scan reconciles against this roster. The align stage carries the residue, reading the roster against the tree, and the build stage re-derives it before the merge counts as complete (lifecycle-kit/SPEC.md §templates/stages/). So a roster names the probe that produced it rather than claiming completeness (`templates/SPEC-amendment.md`), a claim inviting the merge to skip that re-derivation. The residue is a stale prose sentence, a semantic over-claim, a cross-reference dangled by a deletion, and the renumber case, whose two spellings share one token space.
+**Deliberately not asserted: roster completeness.** Whether the roster names every surface the change obliges a write to is a claim about the world, not the file; arm B catches a target *listed and unowned*, never one never listed. §check-amendment-retired-spelling mechanizes one narrow slice: retiring a *literal* leaves the retired and replacing spellings in disjoint token spaces, so a survivor scan reconciles against this roster. The align stage carries the residue, reading the roster against the tree, and the build stage re-derives it before the merge counts as complete (lifecycle-kit/SPEC.md §templates/stages/). So a roster names the probe that produced it rather than claiming completeness (`templates/amendment.md`), a claim inviting the merge to skip that re-derivation. The residue is a stale prose sentence, a semantic over-claim, a cross-reference dangled by a deletion, and the renumber case, whose two spellings share one token space.
 
 Three stronger arms are refused:
 
@@ -1198,7 +1198,7 @@ Producer: the pre-commit hook and `run-gates.sh`, on a commit touching a governe
 
 ### templates/
 
-`canon-config.knobs` — the consumer knob-file template: a one-line `#` pointer to the §Layout and configuration knob table, so the table stays the one owner of the knob roster rather than a parallel copy in the template drifting against it. `SPEC-amendment.md` — the amendment skeleton: delta sections plus the Definition-of-Done checklist (causal completeness, no information lost on merge, amendment deleted, none remaining, gaps filed as debt).
+`canon-config.knobs` — the consumer knob-file template: a one-line `#` pointer to the §Layout and configuration knob table, so the table stays the one owner of the knob roster rather than a parallel copy in the template drifting against it. `amendment.md` — the amendment skeleton, named outside the amendment glob so a copy is an amendment and the skeleton never is: delta sections plus the Definition-of-Done checklist (causal completeness, no information lost on merge, amendment deleted, none remaining, gaps filed as debt).
 
 ## Out of scope
 

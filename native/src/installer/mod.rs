@@ -161,14 +161,16 @@ pub fn refuse(message: impl Into<String>, help: impl Into<String>, code: i32) ->
 pub fn finish(verb: &str, outcome: Result<i32, Refusal>) -> i32 {
     match outcome {
         Ok(code) => code,
-        Err(r) => {
-            eprintln!("checkwright {}: {}", verb, r.message);
-            if !r.help.is_empty() {
-                eprintln!("  help: {}", r.help);
-            }
-            r.code
-        }
+        Err(r) => report(&mut std::io::stderr(), verb, &r),
     }
+}
+
+pub fn report(err: &mut dyn std::io::Write, verb: &str, r: &Refusal) -> i32 {
+    let _ = writeln!(err, "checkwright {}: {}", verb, r.message);
+    if !r.help.is_empty() {
+        let _ = writeln!(err, "  help: {}", r.help);
+    }
+    r.code
 }
 
 // spec: installer/SPEC.md §The verbs — `-h`/`--help` is intercepted first and answers on its own,
@@ -281,29 +283,129 @@ pub fn git_code(root: &Path, args: &[&str]) -> Option<i32> {
     proc::run(&programs::GIT, &argv).ok()?.code()
 }
 
-// spec: installer/SPEC.md §init — a failed commit is fatal, and its `Err` is git's own account,
-// hook output included, since the verb's refusal line cannot say which of them stopped it
-pub fn git_commit(root: &Path, message: &str) -> Result<(), String> {
-    let root = root.to_string_lossy().into_owned();
-    let done = proc::run(&programs::GIT, &["-C", &root, "commit", "-q", "-m", message])?;
-    if done.stdout().is_some() {
-        return Ok(());
-    }
-    let (out, err) = done.streams();
-    let account: Vec<String> = [out, err]
-        .iter()
-        .map(|s| String::from_utf8_lossy(s).trim_end().to_string())
-        .filter(|s| !s.is_empty())
-        .collect();
-    Err(account.join("\n"))
+// spec: installer/SPEC.md §init — the hooks whose non-zero exit stops a commit at once; another
+// hook's exit may be one git ignores, so it names nothing
+const STOPPING_HOOKS: &[&str] = &["pre-commit", "prepare-commit-msg", "commit-msg"];
+
+static TRACE_SEQ: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+
+// spec: installer/SPEC.md §init — a failed commit: git's own account, hook output included, and the
+// hook git's trace records refusing it, where the trace establishes one
+#[derive(Debug)]
+pub struct Unmade {
+    pub account: String,
+    pub hook: Option<String>,
 }
 
-pub fn commit_or_refuse(root: &Path, message: &str, refusal: &str) -> Result<(), Refusal> {
-    git_commit(root, message).map_err(|account| {
-        if !account.is_empty() {
-            eprintln!("{}", account);
+pub fn git_commit(root: &Path, message: &str) -> Result<(), Unmade> {
+    let root = root.to_string_lossy().into_owned();
+    let trace = trace_file();
+    let env: Vec<(String, String)> = trace
+        .iter()
+        .map(|t| ("GIT_TRACE2_EVENT".to_string(), t.display().to_string()))
+        .collect();
+    let done = proc::run_merged_in(&programs::GIT, &["-C", &root, "commit", "-q", "-m", message], &env, None);
+    let hook = trace.and_then(|t| {
+        let text = std::fs::read_to_string(&t).ok();
+        let _ = std::fs::remove_file(&t);
+        refusing_hook(&text?)
+    });
+    match done {
+        Ok(m) if m.succeeded() => Ok(()),
+        Ok(m) => Err(Unmade {
+            account: String::from_utf8_lossy(m.output()).trim_end().to_string(),
+            hook,
+        }),
+        Err(account) => Err(Unmade { account, hook: None }),
+    }
+}
+
+// spec: installer/SPEC.md §init — a fresh scratch file for the one spawned commit's trace, absolute
+// because git ignores a relative trace target
+fn trace_file() -> Option<PathBuf> {
+    let base = PathBuf::from(walk::abs_against(&walk::cwd().ok()?, &proc::temp_base().display().to_string()));
+    let t = base.join(format!(
+        "checkwright-commit-trace.{}.{}",
+        std::process::id(),
+        TRACE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+    ));
+    let _ = std::fs::remove_file(&t);
+    Some(t)
+}
+
+// spec: installer/SPEC.md §init — the stopping hook the commit's own session ran and saw exit
+// non-zero; the first event is the commit's, and a hook's nested git writes under a child session
+fn refusing_hook(trace: &str) -> Option<String> {
+    use serde_json::Value;
+    let events: Vec<Value> = trace.lines().filter_map(|l| serde_json::from_str(l).ok()).collect();
+    let sid = events.first()?.get("sid")?.as_str()?;
+    let field = |e: &Value, k: &str| e.get(k).and_then(Value::as_str).map(str::to_string);
+    let mut hooks: std::collections::BTreeMap<i64, String> = std::collections::BTreeMap::new();
+    for e in events.iter().filter(|e| e.get("sid").and_then(Value::as_str) == Some(sid)) {
+        let Some(id) = e.get("child_id").and_then(Value::as_i64) else { continue };
+        match field(e, "event").as_deref() {
+            Some("child_start") if field(e, "child_class").as_deref() == Some("hook") => {
+                if let Some(name) = field(e, "hook_name") {
+                    hooks.insert(id, name);
+                }
+            }
+            Some("child_exit") => {
+                let refused = e.get("code").and_then(Value::as_i64).is_some_and(|c| c != 0);
+                match hooks.get(&id) {
+                    Some(name) if refused && STOPPING_HOOKS.contains(&name.as_str()) => return Some(name.clone()),
+                    _ => {}
+                }
+            }
+            _ => {}
         }
-        refuse(refusal, "", 1)
+    }
+    None
+}
+
+// spec: installer/SPEC.md §init — the directory a refusing hook ran from, read as install-hooks
+// reads the prior one; the gate hooks directory, or a read that fails, establishes no adopter's hook
+fn judged_in(root: &Path) -> Option<PathBuf> {
+    let gate = crate::emit::hook_launcher::hooks_dir(root)?;
+    match crate::emit::install_hooks::prior(&root.to_string_lossy(), &gate) {
+        Ok(crate::emit::install_hooks::Prior::Quiet { dir, .. }) | Ok(crate::emit::install_hooks::Prior::Live { dir, .. }) => {
+            Some(dir)
+        }
+        _ => None,
+    }
+}
+
+// spec: installer/SPEC.md §init — what a verb's failed commit says: its line as it stands, and,
+// once a refusing hook is established, the line naming it with the kit directories it must pass
+pub struct Failed<'a> {
+    pub plain: &'a str,
+    pub staged: &'a str,
+    pub judged: &'a str,
+    pub valve: &'a str,
+    pub kits: &'a [String],
+}
+
+pub fn commit_or_refuse(root: &Path, message: &str, failed: &Failed) -> Result<(), Refusal> {
+    commit_or_refuse_to(&mut std::io::stderr(), root, message, failed)
+}
+
+pub fn commit_or_refuse_to(err: &mut dyn std::io::Write, root: &Path, message: &str, failed: &Failed) -> Result<(), Refusal> {
+    git_commit(root, message).map_err(|u| {
+        if !u.account.is_empty() {
+            let _ = writeln!(err, "{}", u.account);
+        }
+        match u.hook.and_then(|hook| judged_in(root).map(|dir| (hook, dir))) {
+            Some((hook, dir)) => refuse(
+                format!("the commit failed, and your {} hook in {} judged it — {}", hook, dir.display(), failed.staged),
+                format!(
+                    "that hook judges every file {}. The kit directories ({}) are a vendored dependency: let it pass them, then commit the staged files yourself{}.",
+                    failed.judged,
+                    failed.kits.join(", "),
+                    failed.valve
+                ),
+                1,
+            ),
+            None => refuse(failed.plain, "", 1),
+        }
     })
 }
 
@@ -450,7 +552,7 @@ mod tests {
         }
         std::fs::write(dir.join("f.txt"), "x\n").expect("cannot write the staged file");
         git(&["add", "f.txt"]);
-        let account = git_commit(&dir, "scratch").expect_err("the hook's refusal was not a failure");
+        let account = git_commit(&dir, "scratch").expect_err("the hook's refusal was not a failure").account;
         assert!(account.contains("the hook refused this commit"), "the account dropped the hook's words: {}", account);
         std::fs::remove_file(&hook).expect("cannot remove the hook");
         assert!(git_commit(&dir, "scratch").is_ok(), "a commit with no hook in the way failed");
