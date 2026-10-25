@@ -190,7 +190,9 @@ pub fn remove_block(path: &str, begin: &str, end: &str) -> Result<bool, String> 
     half_open(path, &lines, begin, end)?;
     let mut out = String::new();
     let mut skip = false;
+    let mut last_kept = false;
     for line in &lines {
+        last_kept = false;
         if is(line, begin) {
             skip = true;
             continue;
@@ -202,9 +204,12 @@ pub fn remove_block(path: &str, begin: &str, end: &str) -> Result<bool, String> 
         if !skip {
             out.push_str(line);
             out.push('\n');
+            last_kept = true;
         }
     }
-    if !terminated(&text) {
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — only a surviving last line carries the missing
+    // terminator; where the block owned it, the line before keeps its newline
+    if !terminated(&text) && last_kept {
         out.pop();
     }
     std::fs::write(path, out).map_err(|e| format!("cannot write {}: {}", path, e))?;
@@ -390,6 +395,28 @@ mod tests {
         assert_eq!(remove_block(&p, B, E), Ok(false));
         std::fs::write(&p, format!("head\n{}\na\n", B)).expect("cannot seed");
         assert!(remove_block(&p, B, E).is_err());
+        std::fs::remove_file(&p).ok();
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — an unterminated input stays unterminated only while its
+    // last line survives the removal; a block owning that line leaves the line before it terminated
+    #[test]
+    fn a_removed_block_that_ended_the_file_unterminated_leaves_the_line_before_it_terminated() {
+        let p = std::env::temp_dir()
+            .join(format!("cw-marker-tail-{}.md", std::process::id()))
+            .display()
+            .to_string();
+        for (before, after) in [
+            (format!("head\n{}\nbody\n{}", B, E), "head\n".to_string()),
+            (format!("head\r\n{}\r\nbody\r\n{}", B, E), "head\r\n".to_string()),
+            (format!("{}\nbody\n{}", B, E), String::new()),
+            (format!("head\n{}\nbody\n{}\ntail", B, E), "head\ntail".to_string()),
+            (format!("head\n{}\nbody\n{}\ntail\n", B, E), "head\ntail\n".to_string()),
+        ] {
+            std::fs::write(&p, &before).expect("cannot seed");
+            assert_eq!(remove_block(&p, B, E), Ok(true));
+            assert_eq!(fresh::read_captured(&p).expect("cannot read back").as_bytes(), after.as_bytes(), "from {:?}", before);
+        }
         std::fs::remove_file(&p).ok();
     }
 

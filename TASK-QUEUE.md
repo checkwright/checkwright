@@ -14,14 +14,6 @@
 
 ## Technical Debt
 
-### remove-block-unterminated-tail
-
-`marker::remove_block` (`native/src/marker.rs`) pops the final newline whenever its input was unterminated, so removing a block that is the file's unterminated last line (`head\nBEGIN\nbody\nEND`) leaves `head` with no newline, against gate-sdk/SPEC.md §lib/inject.sh's promise that the rest of the file stays byte-identical. That section's every-rebuild-carries-the-final-newline sentence says the opposite for this input.
-
-**Deliverable (operator direction 2026-10-25, lead-relayed, not a ruling):** the byte-identical-rest promise governs. Carry the missing terminator only when the input's original last line survives; where the removed block owned it, the surviving line keeps its newline. Amend the final-newline sentence to say so, fix `remove_block`, and add a byte-level case for each side.
-
-**Cost while deferred:** removing an agent-file block that ends a file unterminated (`doctrine.rs`, the sole caller) strips the line before it of its newline. Filed 2026-10-25 by personal-install-residue-pass' close (second-vendor review, read off the loop), drained from the gap inbox. Re-verified at the next scope: the pop is unconditional. Owner lookup: `remove_block`, `marker` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -877,4 +869,5 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 ## Done
 
 - hook-restore-line-quoting
+- remove-block-unterminated-tail
 
