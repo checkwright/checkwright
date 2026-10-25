@@ -16,6 +16,26 @@
 
 ## New Features
 
+### hookspath-chain
+
+[spec: SPEC-hookspath-chain.md]
+
+`--install-hooks` refuses a clone already running hooks (landed as `hookspath-clobber`), so a personal install on a project whose tracked hook manager runs its hooks gets no gate hooks: calling `--git-hook` from that manager means editing the project's tracked files.
+
+**Deliverable:** chain rather than refuse. Record the prior hooks directory, run its same-named hook ahead of the battery from the placed hooks, place a forwarding launcher for each other live hook, re-place them on `--refresh`, and restore the prior value at uninstall. Designed in the amendment, the native Windows path through `git hook run --to-stdin` included (git 2.36 introduced `git hook run`, above the 2.15 floor).
+
+**Cost while deferred:** a personal adopter on such a project checks at the battery alone, never at commit. Filed 2026-10-25 by personal-install-hardening-pass' close, drained from the gap inbox. Re-verified there: a fresh clone whose global `core.hooksPath` names a directory holding a live `pre-commit` refuses `--install-hooks` at exit 2. Owner lookup: `chain`, `hooksPath` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §install-hooks.
+
+### oracle-turn-done-marker
+
+[spec: SPEC-oracle-turn-done.md]
+
+Under the split lead posture, a scope session resumed as the intent oracle after its stage ended appends its answer to its resume journal past the `DONE` line, so `DONE` is no longer the last line and lifecycle-kit/templates/lead.md's last-line completion check reads that session as unfinished.
+
+**Deliverable:** a resumed turn that appends to its stage's journal re-stamps `DONE`, stated in the stage templates' last step and at lead.md's completion read; designed in the amendment.
+
+**Cost while deferred:** a lead's completion read misjudges a finished oracle and falls back to asking it. Filed 2026-10-24 by personal-overlay-pass' lead after its close (seen when the oracle answered spec's workflow-profile question), drained at the next scope. Owner lookup: `DONE`, `oracle` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §templates/lead.md.
+
 ## Technical Debt
 
 ### hookspath-prior-physical
@@ -213,26 +233,6 @@ the workflow half of `personal-adoption`: a developer runs the stage machine on 
 **Deliverable:** design-pending, a feature: the export arm's shape (a path-filtered branch rewrite or a patch series), how it reads the lock roster and the workflow paths without a kit literal naming a layout, and what it refuses.
 
 **Cost while deferred:** the workflow half stays usable only by vendoring into a tree the developer does not own, or by stripping its commits by hand before an upstream pull request. Filed 2026-10-24 by personal-overlay-pass' scope, split from personal-adoption (operator direction 2026-10-24, lead-relayed, not a ruling). Owner lookup: `export`, `fork`, `personal branch` in this file, none beyond the parent; owner installer/SPEC.md.
-
-### oracle-turn-done-marker
-
-[cost: event/low] [surface: lifecycle-kit]
-
-Under the split lead posture, a scope session resumed as the intent oracle after its stage ended appends its answer to its resume journal past the `DONE` line, so `DONE` is no longer the last line and lifecycle-kit/templates/lead.md's last-line completion check reads that session as unfinished.
-
-**Deliverable:** design-pending, a feature: an oracle turn writes its own heading and re-stamps `DONE`, or the rule exempts oracle turns; stated where lifecycle-kit names the oracle.
-
-**Cost while deferred:** a lead's completion read misjudges a finished oracle and falls back to asking it. Filed 2026-10-24 by personal-overlay-pass' lead after its close (seen when the oracle answered spec's workflow-profile question), drained at the next scope. Owner lookup: `DONE`, `oracle` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §templates/lead.md.
-
-### hookspath-chain
-
-[cost: event/low] [surface: gate-sdk]
-
-`--install-hooks` refuses a clone already running hooks (landed as `hookspath-clobber`), so a personal install on a project whose tracked hook manager runs its hooks gets no gate hooks: calling `--git-hook` from that manager means editing the project's tracked files.
-
-**Deliverable:** design-pending, a feature: chain rather than refuse. Record the prior hooks directory, run its same-named hook ahead of the battery from the placed hooks, place a forwarding launcher for each other live hook, re-place them on `--refresh`, and restore the prior value at uninstall. Script hooks on native Windows need git's own shebang handling; `git hook run` would supply it, its introducing release above the git floor (inferred, not probed).
-
-**Cost while deferred:** a personal adopter on such a project checks at the battery alone, never at commit. Filed 2026-10-25 by personal-install-hardening-pass' close, drained from the gap inbox. Re-verified there: a fresh clone whose global `core.hooksPath` names a directory holding a live `pre-commit` refuses `--install-hooks` at exit 2. Owner lookup: `chain`, `hooksPath` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §install-hooks.
 
 ## Icebox
 
