@@ -394,6 +394,34 @@ mod tests {
         }
     }
 
+    // spec: installer/SPEC.md §init — a junction, native Windows' unprivileged directory link, is
+    // named at the junction under either separator
+    #[cfg(windows)]
+    #[test]
+    fn a_destination_through_a_junction_is_named_at_the_junction() {
+        let dir = std::env::temp_dir().join(format!("cw-junction-below-{}", std::process::id()));
+        let outside = std::env::temp_dir().join(format!("cw-junction-below-{}-outside", std::process::id()));
+        for d in [&dir, &outside] {
+            std::fs::remove_dir_all(d).ok();
+            std::fs::create_dir_all(d).expect("cannot make the scratch dirs");
+        }
+        std::fs::create_dir_all(dir.join("kit")).expect("cannot make the kit dir");
+        let junction = dir.join("kit").join("linked");
+        let status = std::process::Command::new("cmd")
+            .args(["/C", "mklink", "/J"])
+            .arg(&junction)
+            .arg(&outside)
+            .status()
+            .expect("cmd did not spawn");
+        assert!(status.success(), "mklink /J failed: {}", status);
+        assert_eq!(link_below(&dir, "kit/linked/x.sh"), Ok(Some("kit/linked".to_string())), "a junction, `/`-separated");
+        assert_eq!(link_below(&dir, "kit\\linked\\x.sh"), Ok(Some("kit/linked".to_string())), "a junction, `\\`-separated");
+        std::fs::remove_dir(&junction).expect("cannot remove the junction");
+        for d in [&dir, &outside] {
+            std::fs::remove_dir_all(d).ok();
+        }
+    }
+
     // spec: installer/SPEC.md §init — a hook's refusal reaches the caller as the commit's account,
     // rather than as a bare failure that cannot say what stopped it
     #[test]
