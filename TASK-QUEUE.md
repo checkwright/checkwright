@@ -24,6 +24,16 @@ init and uninstall cannot tell a missing git identity from a hook's red at their
 
 **Cost while deferred:** an identity-less first install stages every vendored file and exits 1 with git's own account as the only attribution (run at spec over a scratch pack: 592 files staged, no commit), on a fresh machine, the seat likeliest to lack an identity. Filed 2026-10-25 by install-commit-hooks-pass' close from a gap bullet of that date; re-verified there: `git var GIT_COMMITTER_IDENT` exits 128 with no identity. Owner lookup: `GIT_COMMITTER_IDENT`, `identity`, `user.email` in this file and the disposed-findings record, none; owner installer/SPEC.md §init.
 
+### hookspath-non-utf8-restore
+
+[spec: SPEC-hookspath-utf8.md]
+
+`--install-hooks` records a non-UTF-8 `core.hooksPath` lossily: `local_hooks_path` and `prior` in native/src/emit/install_hooks.rs decode git's output with `String::from_utf8_lossy`, so the chain record holds U+FFFD and the restore line sets a different value back, against gate-sdk/SPEC.md §install-hooks' "pastes as itself". Not folded into `restore-line-fidelity`, which it would widen (oracle decision, lead decision to file, 2026-10-25, lead-relayed, not a ruling).
+
+**Deliverable:** a feature: a value, or the prior directory it resolves to, that is not UTF-8 refused at exit 2 beside the line-break refusal, the amendment's ruling.
+
+**Cost while deferred:** an adopter with a non-UTF-8 hooks path has its prior hooks silenced and is advised a restore that points git elsewhere (run at spec: the record's `dir=` and `restore=` carry U+FFFD, and a commit after the opt-in no longer runs the prior `pre-commit`; through a UTF-8 link the restore is right and the hook silenced all the same). Filed 2026-10-25 by install-commit-hooks-pass' close from a gap bullet of that date; re-verified there: both lossy decodes. Owner lookup: `from_utf8_lossy`, `non-UTF`, `hooksPath`, `restore line` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §install-hooks.
+
 ## Technical Debt
 
 ### uninstall-lost-restore-line
@@ -257,18 +267,6 @@ the tree-side first unit of [hosted-attestation-service](#hosted-attestation-ser
 **Deliverable:** design-pending, a feature: the predicate type's name and schema, the manifest fields it carries, whether the kits emit the Statement for a signer to wrap or sign it themselves, and its versioning rule.
 
 **Cost while deferred:** a gate run is readable only in this tree's own formats, so no attestation verifier or log reads one; nothing rots. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close from the operator direction of that date, lead-relayed (not a ruling). Owner lookup: `in-toto`, `predicate`, `DSSE` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md.
-
-### hookspath-non-utf8-restore
-
-[cost: event/low] [surface: gate-sdk]
-
-`--install-hooks` records a non-UTF-8 `core.hooksPath` lossily: `local_hooks_path` and `prior` in native/src/emit/install_hooks.rs decode git's output with `String::from_utf8_lossy`, so the chain record holds U+FFFD and the restore line sets a different value back, against gate-sdk/SPEC.md §install-hooks' "pastes as itself". Not folded into `restore-line-fidelity`, which it would widen (oracle decision, lead decision to file, 2026-10-25, lead-relayed, not a ruling).
-
-**Deliverable:** design-pending: a strict decode refused beside the line-break refusal (the likely remedy), or a byte-preserving record and restore line.
-
-**Inferred, not run:** the restore line sets a different value back — set a non-UTF-8 local core.hooksPath in a scratch repo, run `--install-hooks`, read its chain record and restore line
-
-**Cost while deferred:** an adopter with a non-UTF-8 hooks path is advised a restore that points git elsewhere. Filed 2026-10-25 by install-commit-hooks-pass' close from a gap bullet of that date; re-verified there: both lossy decodes. Owner lookup: `from_utf8_lossy`, `non-UTF`, `hooksPath`, `restore line` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §install-hooks.
 
 ## Icebox
 
