@@ -200,6 +200,16 @@ the tree-side first unit of [hosted-attestation-service](#hosted-attestation-ser
 
 **Cost while deferred:** a gate run is readable only in this tree's own formats, so no attestation verifier or log reads one; nothing rots. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close from the operator direction of that date, lead-relayed (not a ruling). Owner lookup: `in-toto`, `predicate`, `DSSE` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md.
 
+### nonutf8-repo-path-reads
+
+[cost: event/low] [surface: native]
+
+Three crate reads decode a repository path that is not UTF-8 lossily, each reproduced from a scratch tree. `walk::toplevel_args`, and `walk::cwd` beside it, read the work tree's own path that way, so `--install-hooks` in such a tree exits 2 with "not inside a git repository", a wrong cause. `hook_launcher::hooks_dir` reads the common git directory that way, so in a UTF-8 linked worktree whose common directory is not UTF-8, `--install-hooks` exits 0, creates a gate-hooks tree under a U+FFFD spelling and points `core.hooksPath` at it, so the prior `pre-commit` stops running. The placed commit-msg launcher then panics in `main`'s `std::env::args` on the non-UTF-8 message-file path git hands it, so every later commit there fails with a Rust panic.
+
+**Deliverable:** a fix with a design choice: one rule for a repository path the crate reads from git or argv and cannot spell, a named refusal or the bytes carried, applied at all three reads, with Linux-only crate cases and the rule in gate-sdk/SPEC.md §The crate's crosser and §git-hook. `hookspath-non-utf8-restore` settled the `core.hooksPath` value alone; the common-directory read was kept out of it by operator direction 2026-10-26.
+
+**Cost while deferred:** only an adopter whose repository path is not UTF-8 hits these, and the common-directory case leaves the clone unable to commit until `core.hooksPath` is unset. Filed 2026-10-26 by installer-review-residue-pass' close, from three spec-stage gap bullets. Owner lookup: `non-UTF`, `lossy`, `utf8`, `toplevel_in`, `hooks_dir`, `common-dir`, `env::args` in this file and the disposed-findings record: only the done `hookspath-non-utf8-restore` and `personal-detect-non-utf8`, each another read.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
