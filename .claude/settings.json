@@ -54,6 +54,7 @@
       "Bash(gh run watch *)",
       "Bash(ls *)",
       "Bash(grep *)",
+      "Bash(cut *)",
       "Bash(awk *)",
       "Bash(pgrep *)",
       "Bash(command -v *)",
