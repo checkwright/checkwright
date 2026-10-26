@@ -132,23 +132,13 @@ surface (c) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 
 ### codex-plugin-version-pin
 
-[cost: event/low] [surface: plugin] [observed-by: publish]
+[cost: event/low] [surface: plugin] [observed-by: publish] [not-icebox-eligible: 2026-10-26 its check runs at the next release's pin move]
 
 Codex keys an installed plugin at version `1.0.0`, since neither manifest carries `version` (plugin/SPEC.md §The manifests) and Codex does not take the marketplace entry's, so whether a pin move reaches an installed copy through `codex plugin marketplace upgrade` is unrun.
 
 **Deliverable:** run it at the next release's pin move, and fix the manifest stance if it does not reach.
 
 **Cost while deferred:** a Codex user may stay on an old package after a release. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's limit and no `version` key in `plugin/plugin.json`. Owner lookup: `codex`, `marketplace upgrade` in this file, none; owner plugin/SPEC.md §The manifests.
-
-### cursor-muse-plugin-observed
-
-[cost: event/low] [surface: plugin]
-
-Cursor and Muse Code are installed on no build machine, so plugin/SPEC.md §The harnesses carries their rows read off their docs only: Cursor reads an Agent Plugin's skills and imports a project's Claude Code settings hooks by default (its `Bash` to `Shell` tool-name mapping unrun), and Muse Code installs Claude-format plugins with an undocumented hook payload.
-
-**Deliverable:** install and run each on a machine that has it, turn its cells from read to run, and file any wiring defect.
-
-**Cost while deferred:** two tier-2 harnesses' skill load and guard reach rest on vendor docs. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: neither CLI on the build machine's PATH. Owner lookup: `cursor`, `muse` in this file, none; owner plugin/SPEC.md §The harnesses.
 
 ### personal-workflow-export
 
@@ -906,14 +896,9 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
-## Done
+### cursor-muse-plugin-observed
 
-- hookspath-non-utf8-restore
-- hookspath-line-break-trim
-- env-probe-unchanged-markers
-- init-identity-precondition
-- uninstall-lost-restore-line
-- personal-detect-non-utf8
-- init-attribution-read-order
-- init-refusing-hook-witness
+Cursor and Muse Code's plugin/SPEC.md §The harnesses rows rest on vendor docs alone (skill load, Cursor's Bash-to-Shell hook mapping, Muse's hook payload) until a machine carrying either CLI turns them from read to run, and no build machine carries one.
+
+## Done
 
