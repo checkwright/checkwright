@@ -69,12 +69,13 @@ pub fn markers(key: Option<&str>) -> (String, String) {
     }
 }
 
-// spec: installer/SPEC.md §The personal install — any worktree's block is the mode
+// spec: installer/SPEC.md §The personal install — any worktree's block is the mode, read over the
+// file's bytes so a line that is not UTF-8 beside it hides nothing
 pub fn is_personal(root: &Path) -> bool {
     let keyed = format!("{} ", PERSONAL_BEGIN);
     exclude(root)
         .ok()
-        .and_then(|e| std::fs::read_to_string(&e.path).ok())
+        .and_then(|e| crate::fresh::read_captured(&e.path.to_string_lossy()).ok())
         .is_some_and(|t| {
             crate::fresh::file_lines(&t)
                 .iter()
@@ -261,6 +262,10 @@ mod tests {
         assert!(!ignored("scripts/other.sh"), "an untracked project file under the gates directory was hidden");
         assert!(!ignored("docs/other.md"), "an untracked project file under a shared directory was hidden");
         assert!(!ignored("vendored/new.sh"), "a file under a kit directory the index tracks was hidden");
+        let mut raw = std::fs::read(&e.path).expect("cannot read the exclude file");
+        raw.extend_from_slice(b"/caf\xe9\n");
+        std::fs::write(&e.path, &raw).expect("cannot plant a non-UTF-8 line");
+        assert!(is_personal(&dir), "a non-UTF-8 line beside the block hid the mode");
         remove(&dir).expect("the block was not removed");
         assert!(!is_personal(&dir), "the removed block was still read as the mode");
         assert!(e.path.is_file());

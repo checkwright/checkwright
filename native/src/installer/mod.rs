@@ -388,12 +388,15 @@ pub fn commit_or_refuse(root: &Path, message: &str, failed: &Failed) -> Result<(
     commit_or_refuse_to(&mut std::io::stderr(), root, message, failed)
 }
 
+// spec: installer/SPEC.md §init — the directory is read before the commit, so a hook that repoints
+// `core.hooksPath` before refusing is named where it ran
 pub fn commit_or_refuse_to(err: &mut dyn std::io::Write, root: &Path, message: &str, failed: &Failed) -> Result<(), Refusal> {
+    let ran_in = judged_in(root);
     git_commit(root, message).map_err(|u| {
         if !u.account.is_empty() {
             let _ = writeln!(err, "{}", u.account);
         }
-        match u.hook.and_then(|hook| judged_in(root).map(|dir| (hook, dir))) {
+        match u.hook.zip(ran_in) {
             Some((hook, dir)) => refuse(
                 format!("the commit failed, and your {} hook in {} judged it — {}", hook, dir.display(), failed.staged),
                 format!(
@@ -407,6 +410,31 @@ pub fn commit_or_refuse_to(err: &mut dyn std::io::Write, root: &Path, message: &
             None => refuse(failed.plain, "", 1),
         }
     })
+}
+
+// spec: installer/SPEC.md §init — the identity precondition: the commit needs the author and the
+// committer both, read as git's strict read takes them, and a failed read relays git's account
+pub fn identity_or_refuse(err: &mut dyn std::io::Write, root: &Path, valve: &str) -> Result<(), Refusal> {
+    let root_s = root.to_string_lossy().into_owned();
+    for half in ["GIT_AUTHOR_IDENT", "GIT_COMMITTER_IDENT"] {
+        let account = match proc::run_merged_in(&programs::GIT, &["-C", &root_s, "var", half], &[], None) {
+            Ok(m) if m.succeeded() => continue,
+            Ok(m) => String::from_utf8_lossy(m.output()).trim_end().to_string(),
+            Err(spawn) => spawn,
+        };
+        if !account.is_empty() {
+            let _ = writeln!(err, "{}", account);
+        }
+        return Err(refuse(
+            "git has no identity to make the commit with",
+            format!(
+                "set user.name and user.email with 'git config --global' (or without --global for this repository alone), or pass --no-commit to stage {} and commit it yourself.",
+                valve
+            ),
+            1,
+        ));
+    }
+    Ok(())
 }
 
 // spec: installer/SPEC.md §init — the roster goes to git in batches, so a large profile's install
@@ -556,6 +584,33 @@ mod tests {
         assert!(account.contains("the hook refused this commit"), "the account dropped the hook's words: {}", account);
         std::fs::remove_file(&hook).expect("cannot remove the hook");
         assert!(git_commit(&dir, "scratch").is_ok(), "a commit with no hook in the way failed");
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    // spec: installer/SPEC.md §init — a local identity passes, and an empty local `user.name` refuses
+    // under any host's global config, with git's account and the verb's own valve
+    #[test]
+    fn the_identity_precondition_refuses_what_gits_strict_read_refuses() {
+        let dir = std::env::temp_dir().join(format!("cw-identity-{}", std::process::id()));
+        std::fs::remove_dir_all(&dir).ok();
+        std::fs::create_dir_all(&dir).expect("cannot make the scratch repo");
+        let git = |args: &[&str]| {
+            let d = dir.to_string_lossy().into_owned();
+            let mut argv = vec!["-C", d.as_str()];
+            argv.extend_from_slice(args);
+            proc::run(&programs::GIT, &argv).expect("git did not spawn");
+        };
+        git(&["init", "-q"]);
+        git(&["config", "user.name", "Scratch"]);
+        git(&["config", "user.email", "scratch@example.com"]);
+        let mut err = Vec::new();
+        assert!(identity_or_refuse(&mut err, &dir, "the vendoring").is_ok(), "a set identity was refused");
+        assert!(err.is_empty(), "a passing read printed: {}", String::from_utf8_lossy(&err));
+        git(&["config", "user.name", ""]);
+        let r = identity_or_refuse(&mut err, &dir, "the vendoring").expect_err("an empty name passed");
+        assert_eq!((r.message.as_str(), r.code), ("git has no identity to make the commit with", 1));
+        assert!(r.help.contains("--no-commit to stage the vendoring and commit it yourself"), "{}", r.help);
+        assert!(String::from_utf8_lossy(&err).contains("fatal: "), "git's account was not relayed");
         std::fs::remove_dir_all(&dir).ok();
     }
 

@@ -413,8 +413,8 @@ fn read_package_field(pkg: &Package, path: &[&str]) -> String {
 }
 
 fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
-    // spec: installer/SPEC.md §init — the three preconditions all refuse rather than warn, and
-    // all three are checked before any file is written: a partial install is the outcome none of
+    // spec: installer/SPEC.md §init — the four preconditions all refuse rather than warn, and
+    // all four are checked before any file is written: a partial install is the outcome none of
     // them may produce.
     let root = super::required_root(
         "the vendored source is meant to be committed, which is what makes it auditable. Run 'git init' first, or run init inside the repository you want governed.",
@@ -439,6 +439,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
                 1,
             ));
         }
+        super::identity_or_refuse(&mut std::io::stderr(), &root, "the vendoring")?;
     }
 
     let version = read_package_field(pkg, &["version"]);
@@ -1534,5 +1535,27 @@ mod tests {
             assert!(out.contains("\nnext:\n"), "{}: the follow-up block did not print: {}", dir.display(), out);
             std::fs::remove_dir_all(dir).ok();
         }
+    }
+
+    // spec: installer/SPEC.md §init — a refusing hook that repoints `core.hooksPath` before it exits is
+    // named in the directory it ran from
+    #[cfg(unix)]
+    #[test]
+    fn a_hook_repointing_the_path_is_named_where_it_ran() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = staged_scratch("repointed", &[]);
+        let elsewhere = dir.join("elsewhere");
+        std::fs::create_dir_all(&elsewhere).expect("cannot make the other directory");
+        let hooks = dir.join(".git").join("hooks");
+        std::fs::create_dir_all(&hooks).expect("cannot make the hooks directory");
+        let hook = hooks.join("pre-commit");
+        std::fs::write(&hook, format!("#!/bin/sh\ngit config core.hooksPath '{}'\nexit 1\n", elsewhere.display())).expect("cannot write the hook");
+        std::fs::set_permissions(&hook, std::fs::Permissions::from_mode(0o755)).expect("cannot mark the hook executable");
+        let (code, _, _, err) = fail_vendoring(&dir);
+        assert_eq!(code, Some(1), "a failed vendoring commit did not exit 1");
+        let ran = Path::new(".git").join("hooks").display().to_string();
+        let named = err.lines().find(|l| l.contains("your pre-commit hook in ")).unwrap_or_default();
+        assert!(named.contains(&ran) && !named.contains("elsewhere"), "the hook was not named where it ran: {}", err);
+        std::fs::remove_dir_all(&dir).ok();
     }
 }

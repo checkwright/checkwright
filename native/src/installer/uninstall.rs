@@ -141,6 +141,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
                 1,
             ));
         }
+        super::identity_or_refuse(&mut std::io::stderr(), &root, "the removal")?;
     }
     // spec: installer/SPEC.md §uninstall — the block step's half-open refusal, read before the
     // first removal
@@ -376,115 +377,119 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
             Err(e) => println!("\nthe placed git hooks at {} could not be removed ({}) — delete that directory yourself.", d.display(), e),
         }
     }
-    if keep.is_empty() {
-        std::fs::remove_file(&lock_path)
-            .map_err(|e| refuse(format!("could not remove {}: {}", lock::FILE, e), "", 2))?;
-    } else {
-        std::fs::write(&lock_path, residual(&keep)).map_err(|e| {
-            refuse(
-                format!("could not rewrite {} over the kept file(s): {}", lock::FILE, e),
-                "",
-                2,
-            )
-        })?;
-    }
-
-    // spec: installer/SPEC.md §The personal install — nothing was tracked, so nothing is staged or
-    // committed; the block goes last, or is rewritten over what was kept so a protected path stays
-    // excluded
-    if personal {
-        let kept: Vec<String> = keep.iter().map(|(p, _)| p.clone()).collect();
-        let done = if kept.is_empty() {
-            super::personal::remove(&root).map(|e| (format!("removed the personal install's block from {}", e.shown), e.said))
+    // spec: installer/SPEC.md §uninstall — the chain record is gone with the directory, so every exit
+    // from here, a refusal included, reports the line read before it
+    let outcome = (|| -> Result<i32, Refusal> {
+        if keep.is_empty() {
+            std::fs::remove_file(&lock_path)
+                .map_err(|e| refuse(format!("could not remove {}: {}", lock::FILE, e), "", 2))?;
         } else {
-            super::personal::write(&root, &kept, &kits).map(|e| {
-                (format!("rewrote the personal install's block in {} over the {} kept file(s)", e.shown, kept.len()), e.said)
-            })
-        };
-        let (done, said) = done.map_err(|e| refuse(format!("the personal install's exclude block could not be updated: {}", e), "", 2))?;
-        for line in &said {
-            println!("{}", line);
+            std::fs::write(&lock_path, residual(&keep)).map_err(|e| {
+                refuse(
+                    format!("could not rewrite {} over the kept file(s): {}", lock::FILE, e),
+                    "",
+                    2,
+                )
+            })?;
         }
+
+        // spec: installer/SPEC.md §The personal install — nothing was tracked, so nothing is staged or
+        // committed; the block goes last, or is rewritten over what was kept so a protected path stays
+        // excluded
+        if personal {
+            let kept: Vec<String> = keep.iter().map(|(p, _)| p.clone()).collect();
+            let done = if kept.is_empty() {
+                super::personal::remove(&root).map(|e| (format!("removed the personal install's block from {}", e.shown), e.said))
+            } else {
+                super::personal::write(&root, &kept, &kits).map(|e| {
+                    (format!("rewrote the personal install's block in {} over the {} kept file(s)", e.shown, kept.len()), e.said)
+                })
+            };
+            let (done, said) = done.map_err(|e| refuse(format!("the personal install's exclude block could not be updated: {}", e), "", 2))?;
+            for line in &said {
+                println!("{}", line);
+            }
+            report_kept(&keep);
+            if trimmed {
+                println!("\ntrimmed the doctrine block out of {}, which is being kept.", AGENT_FILE);
+            }
+            println!("\n{}.", done);
+            println!(
+                "\nUNINSTALL: removed {} file(s), none of which this repository was tracking — nothing to commit.",
+                remove_set.len()
+            );
+            return Ok(0);
+        }
+
+        // spec: installer/SPEC.md §uninstall — the staged set is the removals and the manifest
+        // disposition, never a kept file: staging one left for the adopter is the defect init's
+        // written-set/roster split exists to prevent, and it stays one when the write is a removal.
+        // spec: installer/SPEC.md §init — the read's status must survive: every file above is already
+        // deleted, so a read that failed and returned nothing would stage the manifest alone and commit
+        // it under a message claiming the removal.
+        let unread = |why: &str| {
+            refuse(
+                format!("could not read which of the removed files this repository tracks{}", why),
+                "nothing was staged and the removal is not committed; the files are gone from the worktree and 'git status' shows them, so stage and commit that yourself, or 'git restore' them to undo.",
+                1,
+            )
+        };
+        let listed = super::git_batched(&root, &["ls-files", "-z"], &remove_set).map_err(|_| unread(""))?;
+        let mut stage: Vec<String> =
+            crate::listing::decode(&listed).map_err(|e| unread(&format!(" — {}", e.text())))?;
+        let tracked_lock = super::git_code(&root, &["ls-files", "--error-unmatch", "--", lock::FILE])
+            == Some(0);
+        if lock_path.is_file() || tracked_lock {
+            stage.push(lock::FILE.to_string());
+        }
+        if !stage.is_empty() {
+            super::git_batched(&root, &["add"], &stage)
+                .map_err(|e| refuse(format!("could not stage the removal: {}", e), "", 2))?;
+        }
+
         report_kept(&keep);
         if trimmed {
-            println!("\ntrimmed the doctrine block out of {}, which is being kept.", AGENT_FILE);
+            println!(
+                "\ntrimmed the doctrine block out of {} and left the change unstaged — the rest of that file is yours to review.",
+                AGENT_FILE
+            );
         }
-        println!("\n{}.", done);
-        println!(
-            "\nUNINSTALL: removed {} file(s), none of which this repository was tracking — nothing to commit.",
-            remove_set.len()
-        );
-        report_hooks_line(&hooks_line);
-        return Ok(0);
-    }
 
-    // spec: installer/SPEC.md §uninstall — the staged set is the removals and the manifest
-    // disposition, never a kept file: staging one left for the adopter is the defect init's
-    // written-set/roster split exists to prevent, and it stays one when the write is a removal.
-    // spec: installer/SPEC.md §init — the read's status must survive: every file above is already
-    // deleted, so a read that failed and returned nothing would stage the manifest alone and commit
-    // it under a message claiming the removal.
-    let unread = |why: &str| {
-        refuse(
-            format!("could not read which of the removed files this repository tracks{}", why),
-            "nothing was staged and the removal is not committed; the files are gone from the worktree and 'git status' shows them, so stage and commit that yourself, or 'git restore' them to undo.",
-            1,
-        )
-    };
-    let listed = super::git_batched(&root, &["ls-files", "-z"], &remove_set).map_err(|_| unread(""))?;
-    let mut stage: Vec<String> =
-        crate::listing::decode(&listed).map_err(|e| unread(&format!(" — {}", e.text())))?;
-    let tracked_lock = super::git_code(&root, &["ls-files", "--error-unmatch", "--", lock::FILE])
-        == Some(0);
-    if lock_path.is_file() || tracked_lock {
-        stage.push(lock::FILE.to_string());
-    }
-    if !stage.is_empty() {
-        super::git_batched(&root, &["add"], &stage)
-            .map_err(|e| refuse(format!("could not stage the removal: {}", e), "", 2))?;
-    }
+        if super::git_code(&root, &["diff", "--cached", "--quiet"]) == Some(0) {
+            println!(
+                "\nUNINSTALL: removed {} file(s), none of which this repository was tracking — nothing to commit.",
+                remove_set.len()
+            );
+        } else if f.commit {
+            let message = format!("chore: remove Checkwright kits ({}, v{})", profile, version);
+            super::commit_or_refuse(
+                &root,
+                &message,
+                &super::Failed {
+                    plain: "the commit failed — the removal is staged; commit it yourself to finish",
+                    staged: "the removal is staged",
+                    judged: "this removal stages",
+                    valve: "",
+                    kits: &kits,
+                },
+            )?;
+            println!(
+                "\nUNINSTALL: removed {} file(s), kept {}, and committed the removal.",
+                remove_set.len(),
+                keep.len()
+            );
+        } else {
+            println!(
+                "\nUNINSTALL: removed {} file(s), kept {} and staged the removal — --no-commit, so the commit is yours.",
+                remove_set.len(),
+                keep.len()
+            );
+        }
 
-    report_kept(&keep);
-    if trimmed {
-        println!(
-            "\ntrimmed the doctrine block out of {} and left the change unstaged — the rest of that file is yours to review.",
-            AGENT_FILE
-        );
-    }
-
-    if super::git_code(&root, &["diff", "--cached", "--quiet"]) == Some(0) {
-        println!(
-            "\nUNINSTALL: removed {} file(s), none of which this repository was tracking — nothing to commit.",
-            remove_set.len()
-        );
-    } else if f.commit {
-        let message = format!("chore: remove Checkwright kits ({}, v{})", profile, version);
-        super::commit_or_refuse(
-            &root,
-            &message,
-            &super::Failed {
-                plain: "the commit failed — the removal is staged; commit it yourself to finish",
-                staged: "the removal is staged",
-                judged: "this removal stages",
-                valve: "",
-                kits: &kits,
-            },
-        )?;
-        println!(
-            "\nUNINSTALL: removed {} file(s), kept {}, and committed the removal.",
-            remove_set.len(),
-            keep.len()
-        );
-    } else {
-        println!(
-            "\nUNINSTALL: removed {} file(s), kept {} and staged the removal — --no-commit, so the commit is yours.",
-            remove_set.len(),
-            keep.len()
-        );
-    }
-
+        Ok(0)
+    })();
     report_hooks_line(&hooks_line);
-    Ok(0)
+    outcome
 }
 
 // spec: installer/SPEC.md §uninstall — read before the directory's removal: the line restoring the

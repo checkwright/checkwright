@@ -14,49 +14,7 @@
 
 ## New Features
 
-### init-identity-precondition
-
-[spec: SPEC-init-identity.md]
-
-init and uninstall cannot tell a missing git identity from a hook's red at their commit: with no identity configured, `git var GIT_COMMITTER_IDENT` exits 128 as `git commit` does, so a fourth precondition could refuse before any write, under the clean-worktree check's guard. Not folded into `init-commit-runs-adopter-hooks`: a new refusal across init, update and uninstall widens its envelope (oracle decision, lead decision to file, 2026-10-25, lead-relayed, not a ruling).
-
-**Deliverable:** a feature: the identity precondition on init, update and uninstall, its refusal, and installer/SPEC.md §init's precondition roster.
-
-**Cost while deferred:** an identity-less first install stages every vendored file and exits 1 with git's own account as the only attribution (run at spec over a scratch pack: 592 files staged, no commit), on a fresh machine, the seat likeliest to lack an identity. Filed 2026-10-25 by install-commit-hooks-pass' close from a gap bullet of that date; re-verified there: `git var GIT_COMMITTER_IDENT` exits 128 with no identity. Owner lookup: `GIT_COMMITTER_IDENT`, `identity`, `user.email` in this file and the disposed-findings record, none; owner installer/SPEC.md §init.
-
 ## Technical Debt
-
-### uninstall-lost-restore-line
-
-`uninstall` prints no `core.hooksPath` restore line when it stops after removing the gate hooks directory: in native/src/installer/uninstall.rs the `?` on `commit_or_refuse` returns before the final `report_hooks_line`, as do the unread and staging refusals before it, and the chain record the line was read from is already gone. A signing or hook failure therefore loses the restore command, or the unknown-prior sentence, that installer/SPEC.md §uninstall promises, with nothing left to re-read.
-
-**Deliverable:** the hooks line reported on every exit after the removal, the refusals included, with a crate test over a failing commit.
-
-**Cost while deferred:** an adopter whose uninstall commit fails keeps a `core.hooksPath` naming a removed directory and is told no way back. Surfaced 2026-10-25 by install-commit-hooks-pass' close (its second-vendor review) as a gap bullet; filed at installer-review-residue-pass' scope. Re-verified there by reading the three return paths.
-
-### personal-detect-non-utf8
-
-`is_personal` (native/src/installer/personal.rs) reads `info/exclude` with `read_to_string`, so one non-UTF-8 byte anywhere in it, which the marker writers now preserve, reads as no personal install. Its callers take the mode from it — init.rs re-applies it, uninstall.rs and prove.rs branch on it — so a later `init` runs the ordinary committing install and `uninstall` leaves the exclude block, against installer/SPEC.md §The personal install.
-
-**Deliverable:** detection over the file's bytes, with a crate test placing a non-UTF-8 line beside the block.
-
-**Cost while deferred:** a personal install in a clone with a non-UTF-8 exclude line is silently re-installed as a tracked one. The init and uninstall consequences are read off the call sites, not run, since the dev binary carries no payload. Surfaced 2026-10-25 by install-commit-hooks-pass' close (its second-vendor review) as a gap bullet; filed at installer-review-residue-pass' scope.
-
-### init-attribution-read-order
-
-`commit_or_refuse_to` (native/src/installer/mod.rs) reads the directory a refusing hook ran from through `judged_in` after `git_commit` returns, so a hook that repoints `core.hooksPath` before exiting non-zero is attributed to a directory it did not run from. installer/SPEC.md §init names the hook's own directory and states no stability assumption.
-
-**Deliverable:** the hooks directory read before the commit and used for the attribution, with a crate test whose refusing hook repoints the path.
-
-**Cost while deferred:** low and exotic: a hook that rewrites the clone's config mid-commit sends the adopter to the wrong directory. Surfaced 2026-10-25 by install-commit-hooks-pass' close (its second-vendor review) as a gap bullet; filed at installer-review-residue-pass' scope. Re-verified there by reading the call order.
-
-### init-refusing-hook-witness
-
-The `init-commit-runs-adopter-hooks` amendment named a crate test running `init` over a repository with a refusing pre-commit, asserting exit 1, the staging, the stderr attribution and the `next:` block. It landed as tests of the `commit_vendoring` helper over a pre-staged file (native/src/installer/init.rs), so `init`'s own exit status and staging on that path have no end-to-end witness, and installer/SPEC.md §init records no narrowing.
-
-**Deliverable:** the end-to-end witness the amendment named, driving the `init` verb itself.
-
-**Cost while deferred:** a regression in `init`'s wiring around the helper ships green. Surfaced 2026-10-25 by install-commit-hooks-pass' close (its second-vendor review) as a gap bullet; filed at installer-review-residue-pass' scope. Re-verified there: both refusing-hook tests call `fail_vendoring` over `staged_scratch`.
 
 ## Deferred
 
@@ -943,4 +901,9 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 - hookspath-non-utf8-restore
 - hookspath-line-break-trim
 - env-probe-unchanged-markers
+- init-identity-precondition
+- uninstall-lost-restore-line
+- personal-detect-non-utf8
+- init-attribution-read-order
+- init-refusing-hook-witness
 
