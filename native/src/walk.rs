@@ -609,27 +609,51 @@ fn repository_mark(start: &str) -> Option<PathBuf> {
 // spec: gate-sdk/SPEC.md §The crate's crosser — the anchor resolved physically with no lexical step
 // first; `\` folds on Windows alone, where it separates, since on POSIX it is a name byte
 fn physical(p: &str) -> Option<String> {
-    let c = canonicalize(p)?;
-    let c = strip_extended_prefix(&c);
-    Some(if cfg!(windows) { normalize_abs(c) } else { c.to_string() })
+    Some(physical_text(&canonicalize(p)?))
+}
+
+fn physical_text(c: &str) -> String {
+    let c = strip_extended_prefix(c);
+    if cfg!(windows) { normalize_abs(c) } else { c.to_string() }
+}
+
+fn joined_onto(here: &str, p: &str) -> String {
+    if path_root(p).is_some() { p.to_string() } else { child(Path::new(here), p).display().to_string() }
+}
+
+fn physical_rest(raw: &Path, base: &Path, resolved: String) -> String {
+    let rest = raw.strip_prefix(base).map(|r| r.display().to_string()).unwrap_or_default();
+    if rest.is_empty() {
+        return resolved;
+    }
+    let composed = child(Path::new(&resolved), &rest).display().to_string();
+    if cfg!(windows) { normalize_abs(&composed) } else { composed }
 }
 
 // spec: gate-sdk/SPEC.md §The crate's crosser — a path joined onto `here` and resolved as the
 // filesystem resolves it: the deepest prefix that exists resolves physically and the rest is kept
 // unfolded, so `<symlink>/..` names the link target's parent and a missing segment stays missing
 pub fn physical_against(here: &str, p: &str) -> String {
-    let joined = if path_root(p).is_some() { p.to_string() } else { child(Path::new(here), p).display().to_string() };
+    let joined = joined_onto(here, p);
     let raw = Path::new(&joined);
     for base in raw.ancestors() {
         let Some(resolved) = physical(&base.display().to_string()) else { continue };
-        let rest = raw.strip_prefix(base).map(|r| r.display().to_string()).unwrap_or_default();
-        if rest.is_empty() {
-            return resolved;
-        }
-        let composed = child(Path::new(&resolved), &rest).display().to_string();
-        return if cfg!(windows) { normalize_abs(&composed) } else { composed };
+        return physical_rest(raw, base, resolved);
     }
     abs_against(here, p)
+}
+
+// spec: gate-sdk/SPEC.md §The crate's crosser — `physical_against`'s strict form: the resolved deepest
+// existing ancestor, its bytes untouched, where it has no UTF-8 spelling
+pub fn physical_against_strict(here: &str, p: &str) -> Result<String, PathBuf> {
+    let joined = joined_onto(here, p);
+    let raw = Path::new(&joined);
+    for base in raw.ancestors() {
+        let Some(resolved) = resolve(base) else { continue };
+        let Some(text) = resolved.to_str() else { return Err(resolved) };
+        return Ok(physical_rest(raw, base, physical_text(text)));
+    }
+    Ok(abs_against(here, p))
 }
 
 // spec: gate-sdk/SPEC.md §The crate's crosser — the main checkout's root when the working directory
@@ -707,11 +731,16 @@ pub fn authoring_tree(crate_dir: &str) -> bool {
     }
 }
 
-// spec: gate-sdk/SPEC.md §The crate's crosser — the crate's only `std::fs::canonicalize`, and the
-// one producer that hands its answer back unconverted; the UNC clause there rules why, and what
-// each caller must hold.
+// spec: gate-sdk/SPEC.md §The crate's crosser — the crate's only `std::fs::canonicalize`, beneath
+// `canonicalize` and `physical_against_strict`
+fn resolve(p: impl AsRef<Path>) -> Option<PathBuf> {
+    fs::canonicalize(p).ok()
+}
+
+// spec: gate-sdk/SPEC.md §The crate's crosser — the one producer that hands its answer back
+// unconverted; the UNC clause there rules why, and what each caller must hold.
 pub fn canonicalize(p: impl AsRef<Path>) -> Option<String> {
-    fs::canonicalize(p).ok().map(|c| c.display().to_string())
+    resolve(p).map(|c| c.display().to_string())
 }
 
 // spec: gate-sdk/SPEC.md §The crate's crosser — a path a caller hands the binary as an argument
@@ -1582,6 +1611,29 @@ mod tests {
         assert_eq!(rooted, format!("{}/hooks", out));
         assert_eq!(missing, format!("{}/absent/../x", out), "a missing segment was folded away");
         assert_eq!(abs_against(&top, "alias/../hooks"), format!("{}/hooks", top), "the lexical control");
+    }
+
+    // spec: gate-sdk/SPEC.md §The crate's crosser — the strict form answers what `physical_against`
+    // answers where the resolved prefix is UTF-8, and otherwise the resolved deepest existing
+    // ancestor's own bytes
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn the_strict_form_answers_the_resolved_bytes_where_they_are_not_utf8() {
+        use std::os::unix::ffi::OsStrExt;
+        let d = std::env::temp_dir().join(format!("walk-physical-strict-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        let odd = d.join(std::ffi::OsStr::from_bytes(b"h\xffk"));
+        std::fs::create_dir_all(&odd).expect("scratch");
+        std::fs::create_dir_all(d.join("plain")).expect("scratch");
+        std::os::unix::fs::symlink(&odd, d.join("link")).expect("symlink");
+        let top = physical(&d.display().to_string()).expect("resolves");
+        let plain = (physical_against_strict(&top, "plain/absent"), physical_against(&top, "plain/absent"));
+        let through = physical_against_strict(&top, "link/absent");
+        let resolved = resolve(&odd).expect("resolves");
+        let _ = std::fs::remove_dir_all(&d);
+        assert_eq!(plain.0, Ok(plain.1));
+        assert_eq!(through, Err(resolved.clone()));
+        assert!(resolved.as_os_str().as_bytes().ends_with(b"/h\xffk"), "{:?}", resolved);
     }
 
     fn git_init(dir: &Path) {

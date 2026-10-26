@@ -24,16 +24,6 @@ init and uninstall cannot tell a missing git identity from a hook's red at their
 
 **Cost while deferred:** an identity-less first install stages every vendored file and exits 1 with git's own account as the only attribution (run at spec over a scratch pack: 592 files staged, no commit), on a fresh machine, the seat likeliest to lack an identity. Filed 2026-10-25 by install-commit-hooks-pass' close from a gap bullet of that date; re-verified there: `git var GIT_COMMITTER_IDENT` exits 128 with no identity. Owner lookup: `GIT_COMMITTER_IDENT`, `identity`, `user.email` in this file and the disposed-findings record, none; owner installer/SPEC.md §init.
 
-### hookspath-non-utf8-restore
-
-[spec: SPEC-hookspath-utf8.md]
-
-`--install-hooks` records a non-UTF-8 `core.hooksPath` lossily: `local_hooks_path` and `prior` in native/src/emit/install_hooks.rs decode git's output with `String::from_utf8_lossy`, so the chain record holds U+FFFD and the restore line sets a different value back, against gate-sdk/SPEC.md §install-hooks' "pastes as itself". Not folded into `restore-line-fidelity`, which it would widen (oracle decision, lead decision to file, 2026-10-25, lead-relayed, not a ruling).
-
-**Deliverable:** a feature: a value, or the prior directory it resolves to, that is not UTF-8 refused at exit 2 beside the line-break refusal, the amendment's ruling.
-
-**Cost while deferred:** an adopter with a non-UTF-8 hooks path has its prior hooks silenced and is advised a restore that points git elsewhere (run at spec: the record's `dir=` and `restore=` carry U+FFFD, and a commit after the opt-in no longer runs the prior `pre-commit`; through a UTF-8 link the restore is right and the hook silenced all the same). Filed 2026-10-25 by install-commit-hooks-pass' close from a gap bullet of that date; re-verified there: both lossy decodes. Owner lookup: `from_utf8_lossy`, `non-UTF`, `hooksPath`, `restore line` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §install-hooks.
-
 ## Technical Debt
 
 ### uninstall-lost-restore-line
@@ -67,22 +57,6 @@ The `init-commit-runs-adopter-hooks` amendment named a crate test running `init`
 **Deliverable:** the end-to-end witness the amendment named, driving the `init` verb itself.
 
 **Cost while deferred:** a regression in `init`'s wiring around the helper ships green. Surfaced 2026-10-25 by install-commit-hooks-pass' close (its second-vendor review) as a gap bullet; filed at installer-review-residue-pass' scope. Re-verified there: both refusing-hook tests call `fail_vendoring` over `staged_scratch`.
-
-### hookspath-line-break-trim
-
-`prior` in native/src/emit/install_hooks.rs trims every trailing CR and LF off git's `core.hooksPath` output, so a value ending in a line break reads as a different directory and evades the line-break refusal gate-sdk/SPEC.md §install-hooks states. Run at scope: `git config --get` prints `hk\n\n` for the value `hk\n`, which the trim reduces to `hk`.
-
-**Deliverable:** strip only the one line feed git appends, so the refusal sees the value; a crate test over a value ending in a line break. Lands beside [hookspath-non-utf8-restore](#hookspath-non-utf8-restore), which owns the decode on the same line.
-
-**Cost while deferred:** an inherited hooks path ending in a line break is chained as a different directory. Surfaced 2026-10-25 by install-commit-hooks-pass' close (its second-vendor review) as a gap bullet; filed at installer-review-residue-pass' scope.
-
-### env-probe-unchanged-markers
-
-`--emit env-probe` (native/src/emit/env_probe.rs) compares `read_block`'s body and reports `unchanged` before the validating writer runs, so a target whose markers are malformed around an unchanged block exits 0 rather than refusing at exit 2, as gate-sdk/SPEC.md §lib/inject.sh's marker-block declaration says. Run at scope: a stray end marker above the block, and a second begin marker inside it, each exit 0 `unchanged`; the file is untouched either way.
-
-**Deliverable:** the marker validation run before the unchanged test, with a crate test over both shapes.
-
-**Cost while deferred:** a hand-damaged profile file is reported healthy until its content next changes. Surfaced 2026-10-25 by install-commit-hooks-pass' close (its second-vendor review) as a gap bullet; filed at installer-review-residue-pass' scope.
 
 ## Deferred
 
@@ -965,4 +939,8 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ## Done
+
+- hookspath-non-utf8-restore
+- hookspath-line-break-trim
+- env-probe-unchanged-markers
 

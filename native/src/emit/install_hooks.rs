@@ -238,8 +238,10 @@ fn local_hooks_path(top: &str) -> Result<String, String> {
     let got = proc::run(&programs::GIT, &["-C", top, "config", "--local", "--get", "core.hooksPath"])?;
     match (got.stdout(), got.code()) {
         (Some(out), _) => {
-            let text = String::from_utf8_lossy(out);
-            Ok(text.strip_suffix('\n').unwrap_or(&text).to_string())
+            let value = git_value(out);
+            String::from_utf8(value.to_vec()).map_err(|_| {
+                not_utf8(&format!("core.hooksPath is set locally to '{}'", escaped_bytes(value)), LOCAL_UNSET)
+            })
         }
         (None, Some(1)) => Ok(String::new()),
         (None, _) => Err(format!("cannot read core.hooksPath ({})", got.failure_report().unwrap_or_default())),
@@ -348,6 +350,62 @@ fn chain_probe() -> bool {
 // empty `restore=` cannot tell from no value, so it is refused rather than chained or recorded
 const EMPTY_REFUSAL: &str = "core.hooksPath is set to the empty string, under which git finds no hook — nothing placed\n  help: unset it with 'git config --unset core.hooksPath' at the scope that set it ('git config --show-origin --get core.hooksPath' names it), or set it to the directory you meant, then re-run --install-hooks.";
 
+// spec: gate-sdk/SPEC.md §install-hooks — git's value with the one line feed it appends stripped, so
+// a line break the value keeps reaches the record's refusal
+fn git_value(out: &[u8]) -> &[u8] {
+    out.strip_suffix(b"\n").unwrap_or(out)
+}
+
+const EFFECTIVE_UNSET: &str = "unset it at the scope that set it ('git config --show-origin --get core.hooksPath' names it)";
+
+const LOCAL_UNSET: &str = "unset it with 'git config --local --unset core.hooksPath'";
+
+// spec: gate-sdk/SPEC.md §install-hooks — a value, or the prior directory it resolves to, that is not
+// UTF-8 is refused: the record and the restore line carry UTF-8 alone
+fn not_utf8(subject: &str, unset: &str) -> String {
+    format!(
+        "{}, which is not UTF-8, and the chain record and its restore line carry UTF-8 alone — nothing placed\n  help: rename the directory, or set core.hooksPath to a directory whose path is UTF-8, or {}, then re-run --install-hooks.",
+        subject, unset
+    )
+}
+
+fn escaped_bytes(mut b: &[u8]) -> String {
+    let mut out = String::new();
+    loop {
+        match std::str::from_utf8(b) {
+            Ok(s) => return out + s,
+            Err(e) => {
+                let (good, rest) = b.split_at(e.valid_up_to());
+                out.push_str(std::str::from_utf8(good).unwrap_or_default());
+                let bad = e.error_len().unwrap_or(rest.len());
+                for byte in &rest[..bad] {
+                    out.push_str(&format!("\\x{:02x}", byte));
+                }
+                b = &rest[bad..];
+            }
+        }
+    }
+}
+
+// spec: gate-sdk/SPEC.md §install-hooks — a path's own units, escaped for the message alone: its bytes
+// on POSIX, each unpaired surrogate of its UTF-16 on Windows
+#[cfg(not(windows))]
+fn escaped_path(p: &Path) -> String {
+    use std::os::unix::ffi::OsStrExt;
+    escaped_bytes(p.as_os_str().as_bytes())
+}
+
+#[cfg(windows)]
+fn escaped_path(p: &Path) -> String {
+    use std::os::windows::ffi::OsStrExt;
+    char::decode_utf16(p.as_os_str().encode_wide())
+        .map(|c| match c {
+            Ok(c) => c.to_string(),
+            Err(e) => format!("\\u{{{:04x}}}", e.unpaired_surrogate()),
+        })
+        .collect()
+}
+
 // spec: gate-sdk/SPEC.md §install-hooks — the hooks directory git runs before this arm repoints it
 // spec: installer/SPEC.md §init — also the directory a failed install commit's hook is named in
 #[derive(Debug, PartialEq)]
@@ -362,7 +420,10 @@ pub(crate) fn prior(here: &str, hooks_dir: &Path) -> Result<Prior, String> {
     let got = proc::run(&programs::GIT, &["-C", &top, "config", "--path", "--get", "core.hooksPath"])?;
     let set = match (got.stdout(), got.code()) {
         (Some(out), _) => {
-            let value = String::from_utf8_lossy(out).trim_end_matches(['\r', '\n']).to_string();
+            let value = git_value(out);
+            let value = String::from_utf8(value.to_vec()).map_err(|_| {
+                not_utf8(&format!("core.hooksPath is set to '{}'", escaped_bytes(value)), EFFECTIVE_UNSET)
+            })?;
             if value.is_empty() {
                 return Err(EMPTY_REFUSAL.to_string());
             }
@@ -372,7 +433,9 @@ pub(crate) fn prior(here: &str, hooks_dir: &Path) -> Result<Prior, String> {
         (None, _) => return Err(format!("cannot read core.hooksPath ({})", got.failure_report().unwrap_or_default())),
     };
     let dir = match &set {
-        Some(value) => PathBuf::from(walk::physical_against(&top, value)),
+        Some(value) => PathBuf::from(walk::physical_against_strict(&top, value).map_err(|dir| {
+            not_utf8(&format!("core.hooksPath '{}' resolves to '{}'", value, escaped_path(&dir)), EFFECTIVE_UNSET)
+        })?),
         None => {
             let out = proc::run(&programs::GIT, &["-C", &top, "rev-parse", "--git-path", "hooks"])?;
             let path = out.stdout().ok_or_else(|| {
@@ -729,6 +792,93 @@ mod tests {
         assert!(lines[0].contains("set to the empty string") && lines[0].ends_with("nothing placed"), "{}", said);
         assert!(lines[1].starts_with("  help: unset it with 'git config --unset core.hooksPath'"), "{}", said);
         assert!(!placed, "the hooks directory was created");
+    }
+
+    fn append_config(top: &str, bytes: &[u8]) {
+        use std::io::Write;
+        let mut f = std::fs::OpenOptions::new().append(true).open(Path::new(top).join(".git/config")).expect("config");
+        f.write_all(bytes).expect("appends");
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — a value that is not UTF-8, written into the config file
+    // as bytes so the case runs on every host, is refused with nothing placed
+    #[test]
+    fn a_value_that_is_not_utf8_is_refused_with_nothing_placed() {
+        let (d, top, hooks) = scratch_repo("not-utf8");
+        append_config(&top, b"[core]\n\thooksPath = h\xffk\n");
+        let ran = bare_run(&top, &hooks, &binary(&d)).map(|p| p.record);
+        let placed = hooks.exists();
+        let _ = std::fs::remove_dir_all(&d);
+        let said = ran.expect_err("a core.hooksPath that is not UTF-8 was not refused");
+        let lines: Vec<&str> = said.lines().collect();
+        assert_eq!(lines.len(), 2, "{}", said);
+        assert!(lines[0].starts_with("core.hooksPath is set to 'h\\xffk', which is not UTF-8"), "{}", said);
+        assert!(lines[0].ends_with("nothing placed") && lines[1].contains(EFFECTIVE_UNSET), "{}", said);
+        assert!(!placed, "the hooks directory was created");
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — a local value that is not UTF-8 under a UTF-8
+    // worktree-scope value reaches the local read alone, and is refused there
+    #[test]
+    fn a_local_value_that_is_not_utf8_under_a_worktree_value_is_refused() {
+        let (d, top, hooks) = scratch_repo("local-not-utf8");
+        append_config(&top, b"[core]\n\thooksPath = h\xffk\n");
+        proc::run(&programs::GIT, &["-C", &top, "config", "extensions.worktreeConfig", "true"]).expect("git config");
+        let theirs = d.join("theirs").display().to_string();
+        proc::run(&programs::GIT, &["-C", &top, "config", "--worktree", "core.hooksPath", &theirs]).expect("git config");
+        let ran = bare_run(&top, &hooks, &binary(&d)).map(|p| p.record);
+        let placed = hooks.exists();
+        let _ = std::fs::remove_dir_all(&d);
+        let said = ran.expect_err("a local core.hooksPath that is not UTF-8 was not refused");
+        assert!(said.starts_with("core.hooksPath is set locally to 'h\\xffk', which is not UTF-8"), "{}", said);
+        assert!(said.contains(LOCAL_UNSET), "{}", said);
+        assert!(!placed, "the hooks directory was created");
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — a UTF-8 value naming a link to a directory whose name
+    // is not UTF-8 is refused naming the resolved directory
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn a_value_resolving_to_a_directory_that_is_not_utf8_is_refused() {
+        use std::os::unix::ffi::OsStrExt;
+        let (d, top, hooks) = scratch_repo("resolves-not-utf8");
+        let odd = d.join(std::ffi::OsStr::from_bytes(b"h\xffk"));
+        plant(&odd, "pre-commit", true);
+        let link = d.join("link");
+        std::os::unix::fs::symlink(&odd, &link).expect("symlink");
+        let value = link.display().to_string();
+        proc::run(&programs::GIT, &["-C", &top, "config", "core.hooksPath", &value]).expect("git config");
+        let ran = bare_run(&top, &hooks, &binary(&d)).map(|p| p.record);
+        let placed = hooks.exists();
+        let _ = std::fs::remove_dir_all(&d);
+        let said = ran.expect_err("a link to a directory that is not UTF-8 was not refused");
+        assert!(said.starts_with(&format!("core.hooksPath '{}' resolves to '", value)), "{}", said);
+        assert!(said.contains("/h\\xffk', which is not UTF-8"), "{}", said);
+        assert!(!placed, "the hooks directory was created");
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — a value ending in a line break keeps it past the one
+    // line feed git appends, so the line-break refusal sees it
+    #[test]
+    fn a_value_ending_in_a_line_break_is_refused() {
+        let (d, top, hooks) = scratch_repo("trailing-break");
+        proc::run(&programs::GIT, &["-C", &top, "config", "core.hooksPath", "hk\n"]).expect("git config");
+        let ran = bare_run(&top, &hooks, &binary(&d)).map(|p| p.record);
+        let placed = hooks.exists();
+        let _ = std::fs::remove_dir_all(&d);
+        assert!(ran.is_err_and(|e| e.contains("line break")), "a trailing line break was trimmed away");
+        assert!(!placed, "the hooks directory was created");
+        assert_eq!(git_value(b"hk\n\n"), b"hk\n");
+        assert_eq!(git_value(b"hk\r\n"), b"hk\r");
+    }
+
+    // spec: gate-sdk/SPEC.md §install-hooks — each byte that is not UTF-8 is escaped as `\xNN` and
+    // the rest kept, a replacement character a real name holds included
+    #[test]
+    fn a_byte_that_is_not_utf8_is_escaped_and_the_rest_kept() {
+        assert_eq!(escaped_bytes(b"h\xffk"), "h\\xffk");
+        assert_eq!(escaped_bytes(b"\xe2\x82"), "\\xe2\\x82");
+        assert_eq!(escaped_bytes("a\u{fffd}é".as_bytes()), "a\u{fffd}é");
     }
 
     // spec: gate-sdk/SPEC.md §install-hooks — a value the local scope does not itself set, here an

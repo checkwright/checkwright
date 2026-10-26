@@ -273,17 +273,11 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
         std::fs::write(&file, SEED).map_err(|e| format!("cannot write {}: {}", file, e))?;
     }
 
-    // spec: gate-sdk/SPEC.md §lib/inject.sh — the presence test is whole-line on both halves, the
-    // ruled resolution of the shell form's substring `grep` guarding a whole-line `awk` extract.
-    let text = crate::fresh::read_captured(&file)?;
-    if crate::fresh::file_lines(&text).contains(&BEGIN) {
-        let old = crate::marker::read_block(&text, BEGIN, END);
-        if comparable(&new_body) == comparable(&old) {
-            return Ok(format!(
-                "env-probe: env profile block unchanged in {} (Probed date preserved)\n",
-                file
-            ));
-        }
+    if unchanged(&file, &new_body)? {
+        return Ok(format!(
+            "env-probe: env profile block unchanged in {} (Probed date preserved)\n",
+            file
+        ));
     }
 
     let action = crate::marker::install_block(&file, BEGIN, END, &new_body)
@@ -292,6 +286,17 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
         "env-probe: {} the env profile block in {}\n",
         action, file
     ))
+}
+
+// spec: gate-sdk/SPEC.md §lib/inject.sh — the writer's refusal of markers that do not pair runs
+// ahead of the comparison, so an unchanged block between them refuses as a changed one does
+fn unchanged(file: &str, new_body: &str) -> Result<bool, String> {
+    crate::marker::installable(file, BEGIN, END).map_err(|e| format!("failed to write profile block: {}", e))?;
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — the presence test is whole-line on both halves, the
+    // ruled resolution of the shell form's substring `grep` guarding a whole-line `awk` extract.
+    let text = crate::fresh::read_captured(file)?;
+    Ok(crate::fresh::file_lines(&text).contains(&BEGIN)
+        && comparable(new_body) == comparable(&crate::marker::read_block(&text, BEGIN, END)))
 }
 
 #[cfg(test)]
@@ -332,6 +337,39 @@ mod tests {
         let c = "_Probed 2026-09-03 by context-kit env-probe_\n\n- **OS:** y\n";
         assert_eq!(comparable(a), comparable(b));
         assert_ne!(comparable(b), comparable(c));
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — a stray end marker above an unchanged block, and a
+    // second begin marker inside one, each refuse with the file untouched; the well-formed control
+    // reads as unchanged
+    #[test]
+    fn markers_that_do_not_pair_around_an_unchanged_block_refuse() {
+        let d = std::env::temp_dir().join(format!("checkwright-env-probe-markers.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(&d).expect("scratch");
+        let body = "_Probed 2026-09-03 by context-kit env-probe_\n\n- **OS:** x\n";
+        let block = format!("{}\n{}{}\n", BEGIN, body, END);
+        let shapes = [
+            ("stray-end", format!("# gotchas\n{}\n{}", END, block)),
+            ("second-begin", format!("# gotchas\n{}\n{}{}\n{}\n", BEGIN, body, BEGIN, END)),
+        ];
+        let control = d.join("control").display().to_string();
+        std::fs::write(&control, format!("# gotchas\n{}", block)).expect("seed");
+        let well_formed = unchanged(&control, body);
+        let mut refused = Vec::new();
+        for (name, seed) in &shapes {
+            let p = d.join(name).display().to_string();
+            std::fs::write(&p, seed).expect("seed");
+            let got = unchanged(&p, body);
+            let kept = std::fs::read_to_string(&p).expect("reads back");
+            refused.push((name, got.is_err_and(|e| e.contains("refusing to guess the block bounds")), &kept == seed));
+        }
+        let _ = std::fs::remove_dir_all(&d);
+        assert_eq!(well_formed, Ok(true));
+        for (name, refusal, untouched) in refused {
+            assert!(refusal, "{}: malformed markers around an unchanged block read as unchanged", name);
+            assert!(untouched, "{}: the refusal wrote", name);
+        }
     }
 
     // spec: context-kit/SPEC.md §bin/env-probe — the block's five bullets, the absent list's
