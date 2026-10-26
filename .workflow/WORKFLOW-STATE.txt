@@ -9,3 +9,4 @@ installer-review-residue-pass spec a5dc21b7 2026-10-25 bf88a9b14
 installer-review-residue-pass align a295a491 2026-10-26 9a1622710
 installer-review-residue-pass align a9fba8f7 2026-10-26 a08040b4c
 installer-review-residue-pass build ac70c3c2 2026-10-26 3d0cf9dff
+installer-review-residue-pass build a69fb2fb 2026-10-26 b3fda40d7
