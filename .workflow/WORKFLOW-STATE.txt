@@ -6,3 +6,4 @@
 
 installer-review-residue-pass scope ad1924cd 2026-10-25 0779fbb03
 installer-review-residue-pass spec a5dc21b7 2026-10-25 bf88a9b14
+installer-review-residue-pass align a295a491 2026-10-26 9a1622710
